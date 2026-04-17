@@ -86,6 +86,28 @@ def _section(title: str, body: str) -> str:
     return f"# {title}\n\n{body}\n"
 
 
+def _load_skills(rness: Path) -> str:
+    """Concatenate every skill's content into one block.
+
+    Two layouts supported:
+      .rness/skills/<name>/SKILL.md   — folder-based (Claude Code convention)
+      .rness/skills/<name>.md         — flat
+    """
+    skills_dir = rness / "skills"
+    if not skills_dir.is_dir():
+        return ""
+    parts: list[str] = []
+    for skill_md in sorted(skills_dir.glob("*/SKILL.md")):
+        text = _read_or_empty(skill_md)
+        if text:
+            parts.append(f"## {skill_md.parent.name}\n\n{text}")
+    for flat in sorted(skills_dir.glob("*.md")):
+        text = _read_or_empty(flat)
+        if text:
+            parts.append(f"## {flat.stem}\n\n{text}")
+    return "\n\n".join(parts)
+
+
 def assemble_system_prompt(project_dir: Path, active_paradigm: str = "default") -> str:
     """Build the system prompt fresh from .rness/ files.
 
@@ -106,6 +128,9 @@ def assemble_system_prompt(project_dir: Path, active_paradigm: str = "default") 
         _section("Motivation", motivation),
         _section("Paradigm", paradigm),
     ]
+    skills_block = _load_skills(rness)
+    if skills_block:
+        parts.append(_section("Skills", skills_block))
     if intention:
         parts.append(_section("Current Intention", intention))
     parts.append(_section("Tools", TOOL_INSTRUCTIONS))
