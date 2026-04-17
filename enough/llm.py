@@ -36,18 +36,18 @@ async def stream_chat(
     temperature: float = 0.7,
     max_tokens: int | None = None,
     stop: list[str] | None = None,
+    include_reasoning: bool = False,
 ) -> AsyncIterator[str]:
     """Stream assistant content chunks from llama-server.
 
-    Yields plain text content pieces as they arrive (SSE `data: {...}` from the
-    OpenAI-compatible streaming format). Reasoning-channel content, if the
-    model produces it, is yielded interleaved but prefixed with a sentinel so
-    callers can strip or style it if they wish. For v0.01 we fold it into the
-    stream transparently because Gemma 4 emits reasoning before final answer
-    and users want to see the work.
+    Yields `content` tokens from the OpenAI-compatible streaming format. The
+    model's `reasoning_content` channel (e.g. Gemma 4's thinking output) is
+    dropped by default — it's emitted on a separate channel precisely because
+    clients are expected to treat it as internal. Set `include_reasoning=True`
+    if you want to surface it.
 
-    The caller is expected to handle connection lifecycle via the passed-in
-    client (so we can cancel mid-stream by cancelling the task).
+    The caller handles connection lifecycle via the passed-in client; we can
+    cancel mid-stream by aclose()'ing the generator.
     """
     url = base_url.rstrip("/") + "/v1/chat/completions"
     payload: dict[str, Any] = {
@@ -80,8 +80,7 @@ async def stream_chat(
             except (KeyError, IndexError):
                 continue
             delta = choice.get("delta") or {}
-            # Reasoning channel (Gemma 4 style) — emit as-is; the UI can style.
-            if (rc := delta.get("reasoning_content")):
+            if include_reasoning and (rc := delta.get("reasoning_content")):
                 yield rc
             if (c := delta.get("content")):
                 yield c
