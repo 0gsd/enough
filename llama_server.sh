@@ -1,14 +1,24 @@
 #!/usr/bin/env bash
-# Toggle llama-server for Gemma 4 26B MoE Q4_K_M on localhost:8080.
+# Toggle llama-server for a GGUF model on localhost:8080.
 # Usage: ./llama_server.sh [start|stop|status|logs|toggle]   (default: toggle)
+#
+# Configure via env vars (or edit the defaults below):
+#   MODEL  absolute path to a .gguf file (required — no default path ships)
+#   HOST   bind address                    (default: 127.0.0.1)
+#   PORT   server port                     (default: 8080)
+#   NGL    GPU layers to offload           (default: 99 = all, for Apple Metal)
+#   CTX    context window tokens           (default: 8192)
+#
+# Example:
+#   MODEL=~/models/gemma-4-26B-A4B-it-Q4_K_M.gguf ./llama_server.sh start
 
 set -euo pipefail
 
-MODEL="/Users/m3u/METMcloud/METMroot/tools/fmv/weights/gemma-root/gemma4-26b-gguf/gemma-4-26B-A4B-it-Q4_K_M.gguf"
-HOST="127.0.0.1"
-PORT="8080"
-NGL="99"
-CTX="8192"
+MODEL="${MODEL:-}"
+HOST="${HOST:-127.0.0.1}"
+PORT="${PORT:-8080}"
+NGL="${NGL:-99}"
+CTX="${CTX:-8192}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STATE_DIR="$SCRIPT_DIR/.llama-server"
@@ -28,8 +38,12 @@ start() {
     echo "error: llama-server not found. install with: brew install llama.cpp" >&2
     return 1
   fi
+  if [[ -z "$MODEL" ]]; then
+    echo "error: MODEL is not set. export MODEL=/path/to/model.gguf (or edit the default in this script)." >&2
+    return 1
+  fi
   if [[ ! -f "$MODEL" ]]; then
-    echo "error: model not found at $MODEL" >&2
+    echo "error: model file not found: $MODEL" >&2
     return 1
   fi
   mkdir -p "$STATE_DIR"
