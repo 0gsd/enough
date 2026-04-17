@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+
+# enough runtime state
+.llama-server/
+
+# Claude Code local settings
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Virtualenv
+.venv/
+venv/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project artifacts
+# (these appear inside user projects that `enough` bootstraps;
+#  ignored defensively in case someone runs enough inside the repo itself)
+.rness/knowledge/session-logs/

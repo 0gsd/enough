@@ -1,0 +1,151 @@
+{
+  "session_id": "20260417-0945",
+  "decisions": [
+    {
+      "dr_id": "DR-001",
+      "timestamp": "2026-04-17T09:30:00Z",
+      "phase": "prep",
+      "decision": "llama-server installed via Homebrew rather than built from source",
+      "category": "tool_selection",
+      "inputs": ["user is on macOS Apple Silicon", "brew is available", "llama.cpp bottle exists and is current"],
+      "alternatives_considered": [
+        {"option": "build llama.cpp from source with Metal", "reason_rejected": "bottle already has Metal support; build adds 10+ minutes for no gain"},
+        {"option": "use LM Studio or Ollama as the server", "reason_rejected": "spec explicitly requires llama-server from llama.cpp"}
+      ],
+      "weighting_logic": "Installation speed > source-of-truth control when the packaged binary is functionally identical",
+      "confidence": "high",
+      "reversibility": "easy (brew uninstall)",
+      "downstream_impact": "none — binary is ABI-equivalent to a from-source build"
+    },
+    {
+      "dr_id": "DR-002",
+      "timestamp": "2026-04-17T09:30:00Z",
+      "phase": "prep",
+      "decision": "llama-server launch params: -ngl 99 (full Metal offload), -c 8192 (context), --jinja (use embedded chat template)",
+      "category": "tool_selection",
+      "inputs": ["Gemma 4 26B MoE Q4_K_M is 15.6 GiB — fits in unified memory on Apple Silicon", "Gemma 4 GGUF has tokenizer.chat_template embedded"],
+      "alternatives_considered": [
+        {"option": "smaller ctx (4096)", "reason_rejected": "users likely want longer sessions once paradigms pile up in the system prompt"},
+        {"option": "partial layer offload", "reason_rejected": "full offload is fastest on M-series with enough RAM"}
+      ],
+      "weighting_logic": "Defaults should be 'right for the target hardware' not 'safe for anything'",
+      "confidence": "high",
+      "reversibility": "trivial (restart with different flags)"
+    },
+    {
+      "dr_id": "DR-003",
+      "timestamp": "2026-04-17T09:45:00Z",
+      "phase": "prep",
+      "decision": "llama_server.sh lives at repo root (prod), runtime state in .llama-server/ (gitignored)",
+      "category": "scope_definition",
+      "inputs": ["user wants root to be shippable", "pid/log files are runtime cruft, not deliverable"],
+      "alternatives_considered": [
+        {"option": "move script to dev/ since MODEL path is user-specific", "reason_rejected": "parameterizing via env var in Phase 6 will make it portable enough to ship"},
+        {"option": "delete the script and only document in README", "reason_rejected": "toggle convenience is worth the ~80 lines; users can ignore it"}
+      ],
+      "weighting_logic": "Ship the convenience if it can be made portable; mark portability as a todo for Phase 6",
+      "confidence": "medium",
+      "reversibility": "easy",
+      "downstream_impact": "Phase 6 must add MODEL env-var parameterization"
+    },
+    {
+      "dr_id": "DR-004",
+      "timestamp": "2026-04-17T09:50:00Z",
+      "phase": "scaffold",
+      "decision": "Package layout: enough/ (package) at repo root, not src/enough/",
+      "category": "scope_definition",
+      "inputs": ["spec explicitly shows enough/enough/ layout", "user is not PyPI-shipping yet"],
+      "alternatives_considered": [
+        {"option": "src layout", "reason_rejected": "spec overrides; src layout's import-isolation benefit is low for a v0.01 app that isn't a library"}
+      ],
+      "weighting_logic": "Follow spec unless there's a concrete reason not to",
+      "confidence": "high",
+      "reversibility": "moderate (would require moving files, updating imports)"
+    },
+    {
+      "dr_id": "DR-005",
+      "timestamp": "2026-04-17T09:50:00Z",
+      "phase": "scaffold",
+      "decision": "Build system: hatchling via uv, not setuptools",
+      "category": "tool_selection",
+      "inputs": ["uv is the env tool chosen", "hatchling is uv init's default and is lighter than setuptools for pure-python packages"],
+      "alternatives_considered": [
+        {"option": "setuptools", "reason_rejected": "legacy config surface (MANIFEST.in, setup.cfg) adds friction"},
+        {"option": "poetry-core", "reason_rejected": "mixing poetry conventions with uv is confusing"}
+      ],
+      "weighting_logic": "Match the tool ecosystem in use",
+      "confidence": "high",
+      "reversibility": "easy"
+    },
+    {
+      "dr_id": "DR-006",
+      "timestamp": "2026-04-17T09:50:00Z",
+      "phase": "scaffold",
+      "decision": "Tool-call parsing: regex-based on <tool name=\"X\">...</tool> tags",
+      "category": "framework_selection",
+      "inputs": ["spec says to use regex/string matching", "model output XML won't always be well-formed"],
+      "alternatives_considered": [
+        {"option": "lxml or ElementTree", "reason_rejected": "will fail on unclosed tags mid-stream; spec forbids"}
+      ],
+      "weighting_logic": "Robust-to-malformed-input > structurally elegant",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-007",
+      "timestamp": "2026-04-17T09:50:00Z",
+      "phase": "scaffold",
+      "decision": "Tool loop cap: 10 iterations per conversation turn",
+      "category": "scope_definition",
+      "inputs": ["spec specifies 10", "prevents runaway shell loops"],
+      "alternatives_considered": [
+        {"option": "no cap", "reason_rejected": "runaway risk"},
+        {"option": "user-configurable cap", "reason_rejected": "v0.01 — keep surface area small"}
+      ],
+      "weighting_logic": "Follow spec",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-008",
+      "timestamp": "2026-04-17T09:50:00Z",
+      "phase": "scaffold",
+      "decision": "htmx.min.js bundled into enough/static/ (not CDN)",
+      "category": "tool_selection",
+      "inputs": ["spec requires offline operation"],
+      "alternatives_considered": [
+        {"option": "CDN with local fallback", "reason_rejected": "spec explicitly says bundle"}
+      ],
+      "weighting_logic": "Follow spec",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-009",
+      "timestamp": "2026-04-17T09:50:00Z",
+      "phase": "scaffold",
+      "decision": "Conversation history lives in server memory (per-process) and resets on restart",
+      "category": "scope_definition",
+      "inputs": ["spec says no persistent conversation across restarts", "session logs exist for the record"],
+      "alternatives_considered": [
+        {"option": "SQLite or JSON file for durable history", "reason_rejected": "out of scope for v0.01; user said no deps beyond fastapi/uvicorn/httpx/sse-starlette"}
+      ],
+      "weighting_logic": "Follow spec",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-010",
+      "timestamp": "2026-04-17T09:50:00Z",
+      "phase": "scaffold",
+      "decision": "Session prompt assembly reads .rness/ files fresh on every request (no cache)",
+      "category": "framework_selection",
+      "inputs": ["spec explicitly requires: edits to AGENT.md etc. take effect on next message"],
+      "alternatives_considered": [
+        {"option": "cache with mtime check", "reason_rejected": "complexity without observable win for v0.01"}
+      ],
+      "weighting_logic": "Follow spec; the real cost is a few small disk reads",
+      "confidence": "high"
+    }
+  ],
+  "decision_graph": {
+    "DR-003": ["depends_on:DR-001"],
+    "DR-005": ["depends_on:DR-004"]
+  }
+}
