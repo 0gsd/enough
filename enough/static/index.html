@@ -372,21 +372,37 @@
   es.addEventListener('tool', (e) => {
     const { name, key, status } = JSON.parse(e.data);
     const r = currentResponse();
-    if (!r) return;
-    const indicators = r.querySelector('.tool-indicators');
-    // If status=running, create a new indicator; if status=ok/error, update the last running one for that name+key.
-    if (status === 'running') {
-      const id = `tool-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
-      indicators.insertAdjacentHTML('beforeend',
-        `<div class="tool-indicator running" id="${id}" data-name="${name}" data-key="${escapeHtml(key)}">${name} · ${escapeHtml(key)}</div>`);
-    } else {
-      // Find the last matching running indicator, update its class.
-      const running = indicators.querySelectorAll('.tool-indicator.running');
-      for (let i = running.length - 1; i >= 0; i--) {
-        if (running[i].dataset.name === name && running[i].dataset.key === key) {
-          running[i].classList.remove('running');
-          running[i].classList.add(status);
-          break;
+    if (r) {
+      const indicators = r.querySelector('.tool-indicators');
+      if (status === 'running') {
+        const id = `tool-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+        indicators.insertAdjacentHTML('beforeend',
+          `<div class="tool-indicator running" id="${id}" data-name="${name}" data-key="${escapeHtml(key)}">${name} · ${escapeHtml(key)}</div>`);
+      } else {
+        const running = indicators.querySelectorAll('.tool-indicator.running');
+        for (let i = running.length - 1; i >= 0; i--) {
+          if (running[i].dataset.name === name && running[i].dataset.key === key) {
+            running[i].classList.remove('running');
+            running[i].classList.add(status);
+            break;
+          }
+        }
+      }
+    }
+    // Side effects on the filesystem should refresh ambient views.
+    if (status === 'ok' && (name === 'write_file' || name === 'shell')) {
+      // File tree: refetch (the 10s poll might miss newly-created files).
+      htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+      // Preview pane: if it's showing the file we just wrote, refresh it.
+      if (name === 'write_file') {
+        const preview = document.getElementById('preview');
+        if (preview.classList.contains('open')) {
+          const pathEl = document.getElementById('preview-body').querySelector('.file-path');
+          if (pathEl && pathEl.textContent.trim() === key) {
+            htmx.ajax('GET', '/api/file?path=' + encodeURIComponent(key), {
+              target: '#preview-body', swap: 'innerHTML',
+            });
+          }
         }
       }
     }

@@ -285,7 +285,8 @@ def create_app(project_dir: Path, llm_url: str) -> FastAPI:
             "<!-- HISTORY -->",
             _render_turn_from_history(session.history),
         )
-        return HTMLResponse(html)
+        # No-cache so edits-in-place don't require force-reload during dev.
+        return HTMLResponse(html, headers={"Cache-Control": "no-store, must-revalidate"})
 
     @app.get("/api/files", response_class=HTMLResponse)
     async def api_files() -> HTMLResponse:
