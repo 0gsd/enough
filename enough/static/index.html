@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>enough</title>
+<link rel="icon" href="data:,">
+<script src="/static/htmx.min.js"></script>
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --bg-alt: #1e1e36;
+    --bg-raise: #22223a;
+    --fg: #e0e0e0;
+    --fg-muted: #9a9ab0;
+    --fg-faint: #5a5a75;
+    --accent-user: #8ec5ff;
+    --accent-agent: #b2f7b2;
+    --accent-tool: #f5d488;
+    --accent-error: #ff8a8a;
+    --border: #2e2e4a;
+    --input-bg: #252542;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.55;
+    overflow: hidden;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 12px;
+    height: 36px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-alt);
+  }
+  .topbar .brand {
+    color: var(--fg);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .topbar .brand .dim { color: var(--fg-faint); font-weight: 400; margin-left: 8px; font-size: 12px; }
+  .topbar button {
+    background: transparent;
+    color: var(--fg-muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+  }
+  .topbar button:hover { color: var(--fg); border-color: var(--fg-faint); }
+
+  /* ---------- Main layout ---------- */
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    height: calc(100vh - 36px);
+    transition: grid-template-columns 180ms ease;
+  }
+  .layout.sidebar-collapsed { grid-template-columns: 0 1fr; }
+  .layout.sidebar-collapsed .sidebar { overflow: hidden; border-right: none; }
+
+  .sidebar {
+    border-right: 1px solid var(--border);
+    background: var(--bg-alt);
+    overflow: auto;
+    padding: 10px 6px;
+    font-size: 12.5px;
+  }
+  .sidebar h3 {
+    color: var(--fg-faint);
+    font-size: 11px;
+    font-weight: 500;
+    margin: 4px 8px 6px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  ul.tree, ul.tree ul {
+    list-style: none; margin: 0; padding-left: 12px;
+  }
+  ul.tree { padding-left: 4px; }
+  ul.tree li { padding: 1px 0; color: var(--fg-muted); }
+  ul.tree li.dir > .dir-name { color: var(--fg); }
+  ul.tree li.file a {
+    color: var(--fg-muted);
+    text-decoration: none;
+  }
+  ul.tree li.file a:hover { color: var(--accent-user); }
+
+  /* ---------- Content: conversation + input ---------- */
+  .content {
+    position: relative;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .conversation {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 24px 24px 0 24px;
+    max-width: 880px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .empty-hint {
+    color: var(--fg-faint);
+    text-align: center;
+    padding: 40px 20px;
+    font-style: italic;
+  }
+  .msg {
+    margin: 0 0 20px 0;
+  }
+  .msg .role {
+    font-size: 11px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .msg.user .role { color: var(--accent-user); }
+  .msg.assistant .role { color: var(--accent-agent); }
+  .msg .body {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--fg);
+  }
+  .msg.assistant.pending .body::after {
+    content: "▋";
+    color: var(--accent-agent);
+    opacity: 0.6;
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .tool-indicators {
+    margin-top: 8px;
+  }
+  .tool-indicator {
+    font-size: 12px;
+    color: var(--accent-tool);
+    padding: 2px 0;
+  }
+  .tool-indicator.running::before { content: "⟳  "; }
+  .tool-indicator.ok::before { content: "✓  "; color: var(--accent-agent); }
+  .tool-indicator.error::before { content: "✗  "; color: var(--accent-error); }
+  .msg .body.error {
+    color: var(--accent-error);
+    border-left: 2px solid var(--accent-error);
+    padding-left: 10px;
+  }
+
+  /* ---------- Input dock ---------- */
+  .input-dock {
+    padding: 16px 24px 24px;
+    background: linear-gradient(180deg, transparent 0, var(--bg) 30%);
+    max-width: 880px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .input-form {
+    display: flex;
+    gap: 8px;
+  }
+  .input-form textarea {
+    flex: 1;
+    min-height: 44px;
+    max-height: 280px;
+    resize: none;
+    background: var(--input-bg);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  .input-form textarea:focus {
+    outline: none;
+    border-color: var(--fg-faint);
+  }
+  .input-form button {
+    background: var(--bg-raise);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  .input-form button:hover { border-color: var(--fg-muted); }
+  .input-form button:disabled { opacity: 0.5; cursor: wait; }
+  .input-form .hint {
+    position: absolute;
+    font-size: 11px;
+    color: var(--fg-faint);
+    margin-top: -14px;
+  }
+
+  /* ---------- Preview pane ---------- */
+  #preview {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 0;
+    background: var(--bg-alt);
+    border-left: 1px solid var(--border);
+    transition: width 180ms ease;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  #preview.open { width: 50%; }
+  #preview .preview-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px;
+    height: 34px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-raise);
+  }
+  #preview .preview-header .title { color: var(--fg-muted); font-size: 12px; }
+  #preview button.close {
+    background: transparent;
+    color: var(--fg-muted);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+  }
+  #preview-body {
+    flex: 1;
+    overflow: auto;
+    padding: 12px;
+  }
+  #preview .file-path {
+    color: var(--fg-faint);
+    font-size: 11px;
+    margin-bottom: 8px;
+    letter-spacing: 0.6px;
+  }
+  #preview pre.file-body {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--fg);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    margin: 0;
+  }
+  #preview .binary-file {
+    color: var(--fg-faint);
+    font-style: italic;
+  }
+
+  /* ---------- Scrollbar ---------- */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--fg-faint); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">enough<span class="dim">v0.0.1</span></div>
+  <div>
+    <button id="reset-btn" title="Clear the in-memory conversation (session log is preserved)">reset</button>
+    <button id="toggle-sidebar">≡ files</button>
+  </div>
+</div>
+
+<div class="layout" id="layout">
+  <aside class="sidebar">
+    <h3>project</h3>
+    <div id="tree" hx-get="/api/files" hx-trigger="load, every 10s" hx-swap="innerHTML">
+      <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div id="conversation" class="conversation">
+      <!-- HISTORY -->
+      <div class="empty-hint" id="empty-hint">
+        awaiting your first message.<br>
+        say hi, or ask me what i can do.
+      </div>
+    </div>
+
+    <div class="input-dock">
+      <form id="chat-form" class="input-form"
+            hx-post="/api/chat"
+            hx-target="#conversation"
+            hx-swap="beforeend"
+            hx-on::after-request="document.getElementById('message').value=''; document.getElementById('empty-hint')?.remove(); autoscroll();">
+        <textarea id="message" name="message" placeholder="message… (shift+enter for newline)"
+                  rows="1" autofocus></textarea>
+        <button type="submit" id="send-btn">send</button>
+      </form>
+    </div>
+
+    <div id="preview">
+      <div class="preview-header">
+        <span class="title">preview</span>
+        <button class="close" onclick="document.getElementById('preview').classList.remove('open')">×</button>
+      </div>
+      <div id="preview-body"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const conversation = document.getElementById('conversation');
+  const form = document.getElementById('chat-form');
+  const textarea = document.getElementById('message');
+  const sendBtn = document.getElementById('send-btn');
+
+  // Auto-expanding textarea.
+  textarea.addEventListener('input', () => {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 280) + 'px';
+  });
+
+  // Enter sends; shift+enter inserts newline.
+  textarea.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!sendBtn.disabled) form.requestSubmit();
+    }
+  });
+
+  // Sidebar toggle.
+  document.getElementById('toggle-sidebar').addEventListener('click', () => {
+    document.getElementById('layout').classList.toggle('sidebar-collapsed');
+  });
+
+  // Reset.
+  document.getElementById('reset-btn').addEventListener('click', async () => {
+    if (!confirm('Clear the in-memory conversation?\n(Session log on disk is preserved.)')) return;
+    await fetch('/api/reset');
+    conversation.innerHTML = '<div class="empty-hint" id="empty-hint">conversation cleared.<br>start anew.</div>';
+  });
+
+  // Streaming over SSE.
+  function autoscroll() {
+    conversation.scrollTop = conversation.scrollHeight;
+  }
+
+  function currentResponse() {
+    return document.getElementById('current-response');
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  const es = new EventSource('/api/stream');
+
+  es.addEventListener('token', (e) => {
+    const { text } = JSON.parse(e.data);
+    const r = currentResponse();
+    if (!r) return;
+    const body = r.querySelector('.body');
+    body.insertAdjacentHTML('beforeend', escapeHtml(text));
+    autoscroll();
+  });
+
+  es.addEventListener('tool', (e) => {
+    const { name, key, status } = JSON.parse(e.data);
+    const r = currentResponse();
+    if (!r) return;
+    const indicators = r.querySelector('.tool-indicators');
+    // If status=running, create a new indicator; if status=ok/error, update the last running one for that name+key.
+    if (status === 'running') {
+      const id = `tool-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+      indicators.insertAdjacentHTML('beforeend',
+        `<div class="tool-indicator running" id="${id}" data-name="${name}" data-key="${escapeHtml(key)}">${name} · ${escapeHtml(key)}</div>`);
+    } else {
+      // Find the last matching running indicator, update its class.
+      const running = indicators.querySelectorAll('.tool-indicator.running');
+      for (let i = running.length - 1; i >= 0; i--) {
+        if (running[i].dataset.name === name && running[i].dataset.key === key) {
+          running[i].classList.remove('running');
+          running[i].classList.add(status);
+          break;
+        }
+      }
+    }
+    autoscroll();
+  });
+
+  es.addEventListener('turn_start', () => {
+    // If there's no current response (i.e. first turn after a tool call broke the chain),
+    // spawn a new one. Otherwise keep the existing.
+    if (!currentResponse()) {
+      conversation.insertAdjacentHTML('beforeend',
+        '<div class="msg assistant pending" id="current-response">' +
+        '<div class="role">agent</div>' +
+        '<div class="body"></div>' +
+        '<div class="tool-indicators"></div>' +
+        '</div>');
+    }
+    autoscroll();
+  });
+
+  es.addEventListener('turn_end', () => {
+    const r = currentResponse();
+    if (r) {
+      // Strip the id so the next turn can claim it; keep visual "pending" if done is still pending.
+      r.removeAttribute('id');
+    }
+    autoscroll();
+  });
+
+  es.addEventListener('done', () => {
+    // Clear any lingering pending markers.
+    document.querySelectorAll('.msg.assistant.pending').forEach(el => el.classList.remove('pending'));
+    sendBtn.disabled = false;
+    textarea.disabled = false;
+    textarea.focus();
+    autoscroll();
+  });
+
+  es.addEventListener('error', (e) => {
+    try {
+      const { message } = JSON.parse(e.data || '{}');
+      conversation.insertAdjacentHTML('beforeend',
+        `<div class="msg assistant"><div class="role">error</div><div class="body error">${escapeHtml(message || 'stream error')}</div></div>`);
+    } catch (_) { /* ignore parse errors from native event */ }
+    autoscroll();
+  });
+
+  es.addEventListener('ping', () => { /* heartbeat */ });
+
+  // Disable the input while a turn is in flight.
+  form.addEventListener('htmx:beforeRequest', () => {
+    sendBtn.disabled = true;
+    textarea.disabled = true;
+  });
+  form.addEventListener('htmx:afterRequest', () => {
+    // `done` event re-enables; this is a fallback if the SSE is slow.
+    setTimeout(() => { textarea.focus(); }, 0);
+  });
+
+  autoscroll();
+</script>
+
+</body>
+</html>
