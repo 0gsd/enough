@@ -99,6 +99,10 @@ POLICY_REQUESTS_MD = """\
 Long, multi-step jobs get tracked as plain-markdown files the agent
 maintains across turns. Simple single-turn Q&A does NOT need this.
 
+The request file doubles as the **durable state** across conversation
+resets — see `context-management.md` for how it's used to recover when
+the context window fills up.
+
 ## When to create a request file
 
 Trigger on any of these:
@@ -155,13 +159,37 @@ Tasks (atomic — either done or not-done):
 Tasks:
 - [ ] ...
 
+## Progress Checkpoints
+
+Lightweight state dumps you write as work progresses. One per phase
+transition, or every 3–5 major tool calls, whichever comes first. These
+are what let the conversation survive a /reset.
+
+### Checkpoint 1 — YYYY-MM-DD HH:MM
+- **Just did:** <1–2 bullets>
+- **About to:** <1–2 bullets>
+- **Key state:** <file paths you wrote, variables/config the next turn
+  needs, external process state like "tor is running at 127.0.0.1:9050">
+
+### Checkpoint 2 — YYYY-MM-DD HH:MM
+- ...
+
+## Continuation
+
+Filled in when you sense context pressure and propose a conversation
+reset. Left empty while things are going smoothly.
+
+- **Resume instructions:** <what the next turn should do first>
+- **Required files:** <paths the next turn should `read_file`>
+- **Open questions:** <anything the user might need to answer>
+
 ## End output
 <Describe exactly what was produced when the request is complete. File
 paths, links, summaries of decisions. Fill this in when Status becomes
 `waiting-on-user`.>
 
 ## Notes
-<Dead ends, surprises, open questions, things the user should know.>
+<Dead ends, surprises, things the user should know.>
 ```
 
 ## Workflow
@@ -172,9 +200,11 @@ paths, links, summaries of decisions. Fill this in when Status becomes
 2. **As you complete tasks**, update the file with `write_file`. Tick
    checkboxes, add tasks you didn't foresee, split/merge sub-requests as
    reality demands.
-3. **When you believe the request is fulfilled**, fill in "End output",
+3. **Write a Progress Checkpoint** at every phase transition, or every
+   3–5 major tool calls. Don't skip this — it's your safety net.
+4. **When you believe the request is fulfilled**, fill in "End output",
    flip Status to `waiting-on-user`, and tell the user you're done.
-4. **The user confirms via the UI** (a "mark done" button in the preview
+5. **The user confirms via the UI** (a "mark done" button in the preview
    pane moves the file to `.rness/requests/done/`). Do NOT move it yourself
    — the move is the user's approval act.
 
@@ -189,6 +219,92 @@ paths, links, summaries of decisions. Fill this in when Status becomes
 - "What does `.rness/paradigms/default.md` say?"
 - "Rename this file to foo.md."
 - "Add a comma to this sentence."
+"""
+
+POLICY_CONTEXT_MGMT_MD = """\
+# Policy: Context Management
+
+Long working sessions fill the LLM's context window. When that happens the
+backend errors with "context exceeded", work stalls, and the conversation
+feels broken. This policy defines how you sense pressure building and
+gracefully reset without losing state.
+
+**The filesystem is your long-term memory.** Active request files, session
+logs, the user's paradigm, and `MOTIVATION.md` all persist. In-memory
+conversation history is the expensive part — and the part you can shed.
+
+## Self-monitoring
+
+You don't have a direct token counter, but these signals add up to
+pressure:
+
+| Signal | Weight | How to detect |
+|---|---|---|
+| Tool calls this turn or recent turns | High | Count them |
+| Large file contents read into context | High | A 10KB+ file you just `read_file`'d is ~2.5K tokens |
+| Tool outputs with lots of text (web scrapes, long shell stdout) | High | Same math |
+| Re-explaining things you covered earlier | High | You find yourself repeating ground |
+| Many sub-requests in the active request file | Medium | Each round adds context |
+| Hard error: "context exceeded" or 400 from the LLM | Certain | Pressure is already critical |
+
+Levels:
+- **Low** (most turns): Do nothing special.
+- **Medium** (15+ tool calls, or a few large reads): Write a fresh
+  Progress Checkpoint so your state is safe even if you crash.
+- **High** (20+ tool calls or a turn that returned a lot of file content):
+  Write a checkpoint AND a Continuation block. Warn the user that a reset
+  may soon be wise.
+- **Critical** (LLM returned context-exceeded, or you just can't remember
+  the early task): Write a final checkpoint + Continuation, tell the user
+  to `/reset`, and stop.
+
+## Graceful reset protocol
+
+When pressure is high or critical:
+
+1. **Flush to the request file.** Write one more Progress Checkpoint that
+   captures "just did / about to / key state" comprehensively. This is the
+   last thing the new session will see that was authored by the old one.
+2. **Write a Continuation block.** Three concrete fields:
+   - What the next turn should do first.
+   - Which files it should `read_file` to rebuild context.
+   - Any open questions for the user.
+3. **Tell the user:** something like *"I've checkpointed
+   `.rness/requests/<file>.md`. Context is getting heavy — mind hitting
+   /reset? I'll pick up from the checkpoint on the next message."*
+4. **On the next turn (post-reset)**, read the request file, scan the
+   Progress Checkpoints (newest first) and the Continuation block, then
+   proceed with the named next step.
+
+## Don't over-checkpoint
+
+- Simple Q&A doesn't need any of this.
+- If you've already written 3 checkpoints and the user hasn't reset,
+  things are probably fine — keep working.
+- One checkpoint per phase transition is usually plenty.
+
+## Artifacts beyond the request file
+
+When context is fresh after a reset, these are your other memory
+sources — read them on demand, not pre-emptively:
+
+- `.rness/knowledge/session-logs/<today>.md` — every prior exchange in
+  the current day's session, written by the harness.
+- `.rness/MOTIVATION.md` — accumulated learnings about the user and the
+  project. Terse; worth a skim at the start of any substantive turn.
+- `.rness/AGENT.md`, `.rness/paradigms/default.md` — your identity and
+  interaction rules. Always loaded into the system prompt; you don't need
+  to re-read them.
+- Any file you wrote in the project — `read_file` it when you need the
+  specifics again, don't hold the contents in your head.
+
+## When to re-create instead of recover
+
+If a reset happens in the middle of a very delicate piece of work (e.g.,
+you were 40% through a 2000-line code refactor and the Continuation would
+need to describe the edit state token-by-token), tell the user it's
+cleaner to start that sub-request fresh from a known-good baseline. Don't
+fake continuity when the bookkeeping cost exceeds the re-work cost.
 """
 
 INFOWORLD_README = """\
@@ -215,6 +331,7 @@ SKELETON_FILES: dict[str, str] = {
     ".rness/knowledge/user-profile.md": USER_PROFILE_MD,
     ".rness/models/providers.md": MODELS_PROVIDERS_MD,
     ".rness/policies/requests.md": POLICY_REQUESTS_MD,
+    ".rness/policies/context-management.md": POLICY_CONTEXT_MGMT_MD,
     "infoworld/README.md": INFOWORLD_README,
 }
 

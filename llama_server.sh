@@ -23,7 +23,7 @@ MODEL="${MODEL:-}"
 HOST="${HOST:-127.0.0.1}"
 PORT="${PORT:-8080}"
 NGL="${NGL:-99}"
-CTX="${CTX:-16384}"
+CTX="${CTX:-32768}"
 PARALLEL="${PARALLEL:-1}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
