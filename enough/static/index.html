@@ -233,6 +233,40 @@
     font-size: 16px;
     line-height: 1;
   }
+  .preview-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+    padding: 8px 12px 0;
+  }
+  .preview-actions button {
+    background: var(--bg-raise);
+    color: var(--fg-muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .preview-actions button:hover { color: var(--fg); border-color: var(--fg-faint); }
+  .preview-actions .mark-done { color: var(--accent-agent); border-color: var(--accent-agent); }
+  .preview-actions .mark-done:hover { background: color-mix(in oklab, var(--accent-agent) 15%, transparent); }
+  #preview textarea.file-edit {
+    width: calc(100% - 24px);
+    margin: 8px 12px;
+    min-height: calc(100vh - 180px);
+    background: var(--input-bg);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+    resize: vertical;
+  }
+  #preview textarea.file-edit:focus { outline: none; border-color: var(--fg-faint); }
   #preview-body {
     flex: 1;
     overflow: auto;
@@ -451,6 +485,62 @@
   });
 
   es.addEventListener('ping', () => { /* heartbeat */ });
+
+  // ---------- Preview-pane edit mode ----------
+  async function enterEditMode() {
+    const pathEl = document.querySelector('#preview-body .file-path');
+    if (!pathEl) return;
+    const path = pathEl.dataset.path;
+    const pre = document.querySelector('#preview-body .file-body');
+    const actions = document.querySelector('#preview-body .preview-actions');
+    if (!pre || !actions) return;
+    // Fetch raw text so we edit the true bytes, not the escaped display.
+    let raw;
+    try {
+      const r = await fetch('/api/file/raw?path=' + encodeURIComponent(path));
+      if (!r.ok) throw new Error(r.statusText);
+      raw = await r.text();
+    } catch (e) {
+      alert('could not load raw contents: ' + e.message);
+      return;
+    }
+    const textarea = document.createElement('textarea');
+    textarea.className = 'file-edit';
+    textarea.spellcheck = false;
+    textarea.value = raw;
+    pre.replaceWith(textarea);
+    actions.innerHTML =
+      '<button class="save-btn" onclick="saveEdit(\'' + path.replace(/'/g, "\\'") + '\')">save</button>' +
+      '<button class="cancel-btn" onclick="cancelEdit(\'' + path.replace(/'/g, "\\'") + '\')">cancel</button>';
+    textarea.focus();
+  }
+
+  async function saveEdit(path) {
+    const textarea = document.querySelector('#preview-body textarea.file-edit');
+    if (!textarea) return;
+    const fd = new FormData();
+    fd.append('path', path);
+    fd.append('content', textarea.value);
+    const r = await fetch('/api/file', { method: 'POST', body: fd });
+    if (!r.ok) { alert('save failed: ' + r.status + ' ' + r.statusText); return; }
+    const html = await r.text();
+    document.getElementById('preview-body').innerHTML = html;
+    htmx.process(document.getElementById('preview-body'));
+    // Freshen file tree too in case a new file was created via edit.
+    htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+  }
+
+  async function cancelEdit(path) {
+    // Re-fetch the preview fragment to restore the read-only view.
+    htmx.ajax('GET', '/api/file?path=' + encodeURIComponent(path), {
+      target: '#preview-body', swap: 'innerHTML',
+    });
+  }
+
+  // Expose to inline onclick handlers.
+  window.enterEditMode = enterEditMode;
+  window.saveEdit = saveEdit;
+  window.cancelEdit = cancelEdit;
 
   // Disable the input while a turn is in flight.
   form.addEventListener('htmx:beforeRequest', () => {

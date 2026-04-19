@@ -293,9 +293,8 @@ def create_app(project_dir: Path, llm_url: str) -> FastAPI:
         tree = build_file_tree(project_dir)
         return HTMLResponse(_tree_to_html(tree))
 
-    @app.get("/api/file", response_class=PlainTextResponse)
-    async def api_file(path: str = Query(...)) -> HTMLResponse:
-        # Safety: reject abs paths and escape attempts.
+    def _resolve_project_path(path: str) -> Path:
+        """Shared path-safety helper for /api/file{,/raw} and POST writes."""
         p = Path(path)
         if p.is_absolute() or ".." in p.parts:
             raise HTTPException(400, "invalid path")
@@ -304,22 +303,77 @@ def create_app(project_dir: Path, llm_url: str) -> FastAPI:
             target.relative_to(project_dir.resolve())
         except ValueError:
             raise HTTPException(400, "path escapes project dir") from None
+        return target
+
+    def _is_request_file(path: str) -> bool:
+        p = Path(path)
+        parts = p.parts
+        # Active request = directly under .rness/requests/ (not /done/).
+        return (
+            len(parts) >= 3
+            and parts[0] == ".rness"
+            and parts[1] == "requests"
+            and parts[2] != "done"
+            and parts[-1].endswith(".md")
+        )
+
+    @app.get("/api/file", response_class=HTMLResponse)
+    async def api_file(path: str = Query(...)) -> HTMLResponse:
+        target = _resolve_project_path(path)
         if not target.exists():
             raise HTTPException(404, "not found")
         if target.is_dir():
             raise HTTPException(400, "is a directory")
-        # Guess text vs binary.
         try:
             text = target.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             return HTMLResponse(
                 f'<div class="binary-file">binary file — {target.stat().st_size} bytes</div>'
             )
-        # Simple renderer: escape + preserve whitespace in <pre>.
+        # Preview chrome: path header, body, and (JS-driven) edit toggle affordance.
+        mark_done_btn = (
+            f'<button class="mark-done" onclick="markRequestDone(\'{_escape_html(path)}\')">mark done</button>'
+            if _is_request_file(path)
+            else ""
+        )
         return HTMLResponse(
-            f'<div class="file-path">{_escape_html(path)}</div>'
+            f'<div class="file-path" data-path="{_escape_html(path)}">{_escape_html(path)}</div>'
+            f'<div class="preview-actions">'
+            f'  {mark_done_btn}'
+            f'  <button class="edit-btn" onclick="enterEditMode()">edit</button>'
+            f'</div>'
             f'<pre class="file-body">{_escape_html(text)}</pre>'
         )
+
+    @app.get("/api/file/raw", response_class=PlainTextResponse)
+    async def api_file_raw(path: str = Query(...)) -> PlainTextResponse:
+        target = _resolve_project_path(path)
+        if not target.exists():
+            raise HTTPException(404, "not found")
+        if target.is_dir():
+            raise HTTPException(400, "is a directory")
+        try:
+            text = target.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            raise HTTPException(415, "not utf-8 text") from None
+        return PlainTextResponse(text)
+
+    @app.post("/api/file", response_class=HTMLResponse)
+    async def api_file_write(request: Request) -> HTMLResponse:
+        form = await request.form()
+        path = (form.get("path") or "").strip()
+        content = form.get("content")
+        if content is None:
+            raise HTTPException(400, "missing content")
+        if not path:
+            raise HTTPException(400, "missing path")
+        target = _resolve_project_path(path)
+        if target.is_dir():
+            raise HTTPException(400, "is a directory")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(str(content), encoding="utf-8")
+        # Return the re-rendered preview fragment so the UI can swap it in.
+        return await api_file(path=path)  # type: ignore[return-value]
 
     @app.post("/api/chat", response_class=HTMLResponse)
     async def api_chat(request: Request) -> HTMLResponse:
