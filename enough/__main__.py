@@ -38,6 +38,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Do not open a browser window on launch.",
     )
     parser.add_argument(
+        "--max-tool-iters",
+        type=int,
+        default=50,
+        help="Cap on tool invocations per user turn (default: 50). "
+             "Prevents runaway tool loops; raise for heavier multi-step work.",
+    )
+    parser.add_argument(
         "--version",
         action="version",
         version=f"enough {__version__}",
@@ -86,6 +93,7 @@ def main(argv: list[str] | None = None) -> int:
         project_dir=project_dir,
         port=args.port,
         llm_url=args.llm_url,
+        max_tool_iters=args.max_tool_iters,
     )
     return 0
 

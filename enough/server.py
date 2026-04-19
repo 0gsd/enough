@@ -50,7 +50,7 @@ IGNORE_DIRS = {
     ".pytest_cache", ".mypy_cache", ".ruff_cache", "dist", "build",
     ".llama-server",
 }
-MAX_TOOL_ITERS = 10
+DEFAULT_MAX_TOOL_ITERS = 50
 MAX_FILE_TREE_DEPTH = 4
 
 
@@ -62,6 +62,7 @@ MAX_FILE_TREE_DEPTH = 4
 class Session:
     project_dir: Path
     llm_url: str
+    max_tool_iters: int = DEFAULT_MAX_TOOL_ITERS
     history: list[dict[str, str]] = field(default_factory=list)  # OpenAI format
     # One queue per connected EventSource. A single shared queue would cause
     # zombie connections (e.g. after a page reload before the server notices)
@@ -185,7 +186,7 @@ async def _run_turn(session: Session, user_message: str) -> None:
         client = session.client
 
         try:
-            for _iter in range(MAX_TOOL_ITERS):
+            for _iter in range(session.max_tool_iters):
                 messages = [{"role": "system", "content": system_prompt}] + session.history
                 await session.emit("turn_start", {})
                 buffer = ""
@@ -223,7 +224,7 @@ async def _run_turn(session: Session, user_message: str) -> None:
             else:
                 await session.emit(
                     "error",
-                    {"message": f"tool loop cap ({MAX_TOOL_ITERS}) reached"},
+                    {"message": f"tool loop cap ({session.max_tool_iters}) reached"},
                 )
         except LLMError as e:
             # Try to give a hint if it looks like a context overflow.
@@ -281,8 +282,8 @@ async def _handle_tool(session: Session, call: ToolCall, sink: list[tuple[str, s
 # App factory
 # ---------------------------------------------------------------------------
 
-def create_app(project_dir: Path, llm_url: str) -> FastAPI:
-    session = Session(project_dir=project_dir, llm_url=llm_url)
+def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MAX_TOOL_ITERS) -> FastAPI:
+    session = Session(project_dir=project_dir, llm_url=llm_url, max_tool_iters=max_tool_iters)
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -533,6 +534,6 @@ def create_app(project_dir: Path, llm_url: str) -> FastAPI:
     return app
 
 
-def run(*, project_dir: Path, port: int, llm_url: str) -> None:
-    app = create_app(project_dir, llm_url)
+def run(*, project_dir: Path, port: int, llm_url: str, max_tool_iters: int = DEFAULT_MAX_TOOL_ITERS) -> None:
+    app = create_app(project_dir, llm_url, max_tool_iters=max_tool_iters)
     uvicorn.run(app, host="127.0.0.1", port=port, log_level="info")
