@@ -34,7 +34,7 @@ from sse_starlette.sse import EventSourceResponse
 
 from .llm import stream_chat
 from .logger import ExchangeLog, log_exchange
-from .prompt import assemble_system_prompt
+from .prompt import assemble_system_prompt, list_skills, set_skill_enabled
 from .tools import (
     ToolCall,
     execute,
@@ -292,6 +292,38 @@ def create_app(project_dir: Path, llm_url: str) -> FastAPI:
     async def api_files() -> HTMLResponse:
         tree = build_file_tree(project_dir)
         return HTMLResponse(_tree_to_html(tree))
+
+    @app.get("/api/skills", response_class=HTMLResponse)
+    async def api_skills() -> HTMLResponse:
+        items = list_skills(project_dir / ".rness")
+        if not items:
+            return HTMLResponse('<div class="empty-note">no skills in .rness/skills/</div>')
+        rows = []
+        for name, enabled in items:
+            cls = "on" if enabled else "off"
+            next_val = "0" if enabled else "1"
+            rows.append(
+                f'<li class="skill-row {cls}">'
+                f'  <button class="skill-toggle" '
+                f'    hx-post="/api/skills/toggle" '
+                f'    hx-vals=\'{{"name": "{_escape_html(name)}", "enabled": "{next_val}"}}\' '
+                f'    hx-target="#skills-list" hx-swap="innerHTML">'
+                f'    {"●" if enabled else "○"}'
+                f'  </button>'
+                f'  <span class="skill-name">{_escape_html(name)}</span>'
+                f'</li>'
+            )
+        return HTMLResponse('<ul class="skills">' + "".join(rows) + "</ul>")
+
+    @app.post("/api/skills/toggle", response_class=HTMLResponse)
+    async def api_skills_toggle(request: Request) -> HTMLResponse:
+        form = await request.form()
+        name = (form.get("name") or "").strip()
+        enabled_raw = (form.get("enabled") or "").strip()
+        if not name:
+            raise HTTPException(400, "missing name")
+        set_skill_enabled(project_dir / ".rness", name, enabled_raw == "1")
+        return await api_skills()  # type: ignore[return-value]
 
     def _resolve_project_path(path: str) -> Path:
         """Shared path-safety helper for /api/file{,/raw} and POST writes."""
