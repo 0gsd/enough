@@ -3,11 +3,16 @@
 # Usage: ./llama_server.sh [start|stop|status|logs|toggle]   (default: toggle)
 #
 # Configure via env vars (or edit the defaults below):
-#   MODEL  absolute path to a .gguf file (required — no default path ships)
-#   HOST   bind address                    (default: 127.0.0.1)
-#   PORT   server port                     (default: 8080)
-#   NGL    GPU layers to offload           (default: 99 = all, for Apple Metal)
-#   CTX    context window tokens           (default: 8192)
+#   MODEL     absolute path to a .gguf file (required — no default path ships)
+#   HOST      bind address                   (default: 127.0.0.1)
+#   PORT      server port                    (default: 8080)
+#   NGL       GPU layers to offload          (default: 99 = all, Apple Metal)
+#   CTX       TOTAL context across slots     (default: 16384)
+#   PARALLEL  concurrent request slots       (default: 1  — single-user,
+#             gives one request the FULL ctx. llama-server otherwise
+#             defaults to 4 slots and splits ctx across them, which
+#             gave a 2048-token-per-slot window on a 8192 total — too
+#             small for a system prompt with skills + policies.)
 #
 # Example:
 #   MODEL=~/models/gemma-4-26B-A4B-it-Q4_K_M.gguf ./llama_server.sh start
@@ -18,7 +23,8 @@ MODEL="${MODEL:-}"
 HOST="${HOST:-127.0.0.1}"
 PORT="${PORT:-8080}"
 NGL="${NGL:-99}"
-CTX="${CTX:-8192}"
+CTX="${CTX:-16384}"
+PARALLEL="${PARALLEL:-1}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STATE_DIR="$SCRIPT_DIR/.llama-server"
@@ -50,7 +56,7 @@ start() {
   nohup llama-server \
     -m "$MODEL" \
     --host "$HOST" --port "$PORT" \
-    -ngl "$NGL" -c "$CTX" --jinja \
+    -ngl "$NGL" -c "$CTX" --parallel "$PARALLEL" --jinja \
     >"$LOG_FILE" 2>&1 &
   echo $! >"$PID_FILE"
   disown

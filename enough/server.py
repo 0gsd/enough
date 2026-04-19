@@ -32,7 +32,7 @@ from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 
-from .llm import stream_chat
+from .llm import LLMError, stream_chat
 from .logger import ExchangeLog, log_exchange
 from .prompt import assemble_system_prompt, list_skills, set_skill_enabled
 from .tools import (
@@ -219,8 +219,20 @@ async def _run_turn(session: Session, user_message: str) -> None:
                     "error",
                     {"message": f"tool loop cap ({MAX_TOOL_ITERS}) reached"},
                 )
+        except LLMError as e:
+            # Try to give a hint if it looks like a context overflow.
+            hint = ""
+            low = e.detail.lower()
+            if any(k in low for k in ("context", "exceed", "n_ctx", "too many tokens", "token limit")):
+                hint = (
+                    "  (this looks like a context-window overflow. raise the "
+                    "llama-server -c flag and/or --parallel 1, or /reset the "
+                    "conversation, or disable some skills in the sidebar.)"
+                )
+            await session.emit("error", {"message": f"llm {e.status}: {e.detail}{hint}"})
+            log.exception("llm error")
         except httpx.HTTPError as e:
-            await session.emit("error", {"message": f"llm error: {e}"})
+            await session.emit("error", {"message": f"llm transport error: {e}"})
             log.exception("llm error")
         except Exception as e:  # noqa: BLE001
             await session.emit("error", {"message": f"server error: {e}"})

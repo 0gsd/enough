@@ -9,6 +9,15 @@ from typing import Any
 import httpx
 
 
+class LLMError(RuntimeError):
+    """Raised when llama-server returns a 4xx/5xx on the streaming endpoint."""
+
+    def __init__(self, status: int, detail: str) -> None:
+        self.status = status
+        self.detail = detail
+        super().__init__(f"llama-server {status}: {detail}")
+
+
 def check_llm_reachable(base_url: str, timeout: float = 3.0) -> tuple[bool, str]:
     """Synchronous health check. Returns (ok, reason)."""
     url = base_url.rstrip("/") + "/health"
@@ -62,7 +71,13 @@ async def stream_chat(
         payload["stop"] = stop
 
     async with client.stream("POST", url, json=payload, timeout=None) as resp:
-        resp.raise_for_status()
+        if resp.status_code >= 400:
+            # Read the body for context (llama-server returns useful JSON
+            # errors, e.g. context-exceeded messages). aread() after
+            # streaming-aware close is the supported way.
+            body = await resp.aread()
+            detail = body.decode("utf-8", errors="replace")[:500]
+            raise LLMError(resp.status_code, detail)
         async for line in resp.aiter_lines():
             if not line:
                 continue
