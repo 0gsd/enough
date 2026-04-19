@@ -63,12 +63,18 @@ class Session:
     project_dir: Path
     llm_url: str
     history: list[dict[str, str]] = field(default_factory=list)  # OpenAI format
-    events: asyncio.Queue[dict[str, Any]] = field(default_factory=asyncio.Queue)
+    # One queue per connected EventSource. A single shared queue would cause
+    # zombie connections (e.g. after a page reload before the server notices)
+    # to race living ones and steal events. Per-subscriber fan-out avoids
+    # that at the cost of N*payload-size memory — negligible for v0.02.
+    subscribers: list[asyncio.Queue[dict[str, Any]]] = field(default_factory=list)
     generation_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     client: httpx.AsyncClient | None = None
 
     async def emit(self, event: str, data: Any) -> None:
-        await self.events.put({"event": event, "data": json.dumps(data)})
+        payload = {"event": event, "data": json.dumps(data)}
+        for q in list(self.subscribers):  # snapshot — subscribers may unregister mid-iter
+            await q.put(payload)
 
 
 # ---------------------------------------------------------------------------
@@ -490,16 +496,26 @@ def create_app(project_dir: Path, llm_url: str) -> FastAPI:
 
     @app.get("/api/stream")
     async def api_stream(request: Request):
+        q: asyncio.Queue[dict[str, Any]] = asyncio.Queue()
+        session.subscribers.append(q)
+
         async def event_gen():
-            while True:
-                if await request.is_disconnected():
-                    break
+            try:
+                while True:
+                    if await request.is_disconnected():
+                        break
+                    try:
+                        item = await asyncio.wait_for(q.get(), timeout=15.0)
+                        yield item
+                    except asyncio.TimeoutError:
+                        # Heartbeat so proxies don't close the connection.
+                        yield {"event": "ping", "data": "{}"}
+            finally:
                 try:
-                    item = await asyncio.wait_for(session.events.get(), timeout=15.0)
-                    yield item
-                except asyncio.TimeoutError:
-                    # Heartbeat so proxies don't close the connection.
-                    yield {"event": "ping", "data": "{}"}
+                    session.subscribers.remove(q)
+                except ValueError:
+                    pass
+
         return EventSourceResponse(event_gen())
 
     @app.get("/api/reset", response_class=HTMLResponse)
