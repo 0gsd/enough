@@ -93,6 +93,104 @@ MODELS_PROVIDERS_MD = """\
 - Model: [detected at runtime or configured by user]
 """
 
+POLICY_REQUESTS_MD = """\
+# Policy: Request Tracking
+
+Long, multi-step jobs get tracked as plain-markdown files the agent
+maintains across turns. Simple single-turn Q&A does NOT need this.
+
+## When to create a request file
+
+Trigger on any of these:
+
+- The user says "build/implement/research X" and it'll take more than one
+  assistant turn.
+- You need to write multiple files, or do multiple tool calls with
+  dependencies between them.
+- You need to hit approval gates or ask the user mid-stream.
+
+Don't trigger on:
+
+- A single file edit.
+- A one-shot Q&A.
+- A quick tool call with a clear self-contained answer.
+
+## Where requests live
+
+- Active: `.rness/requests/<summary>_YYYY-MM-DD_HH-MM.md`
+- Done:   `.rness/requests/done/<summary>_YYYY-MM-DD_HH-MM.md`
+
+`<summary>` is a brief kebab-case description (4–8 words). Example:
+`fetch-gutenberg-tractatus_2026-04-19_17-32.md`.
+
+Get the timestamp with:
+
+    <tool name="shell">
+    <command>date +%Y-%m-%d_%H-%M</command>
+    </tool>
+
+## File structure
+
+```markdown
+# <Request title>
+
+**Created:** YYYY-MM-DD HH:MM
+**Status:** in-progress | waiting-on-user | complete
+
+## Request
+<The user's original ask, paraphrased in your own words so you're sure you
+understood it. Preserve any specific constraints they named.>
+
+## Sub-Requests
+
+A sub-request is a coherent piece of work with more than one atomic task.
+A request is composed of one or more sub-requests.
+
+### 1. <sub-request summary>
+Tasks (atomic — either done or not-done):
+- [ ] task
+- [x] task (completed)
+
+### 2. <sub-request summary>
+Tasks:
+- [ ] ...
+
+## End output
+<Describe exactly what was produced when the request is complete. File
+paths, links, summaries of decisions. Fill this in when Status becomes
+`waiting-on-user`.>
+
+## Notes
+<Dead ends, surprises, open questions, things the user should know.>
+```
+
+## Workflow
+
+1. **At the start of a complex request**, before doing substantive work,
+   write the initial file with the Request section, your first-pass list
+   of sub-requests, and any tasks you can foresee. Show the user the path.
+2. **As you complete tasks**, update the file with `write_file`. Tick
+   checkboxes, add tasks you didn't foresee, split/merge sub-requests as
+   reality demands.
+3. **When you believe the request is fulfilled**, fill in "End output",
+   flip Status to `waiting-on-user`, and tell the user you're done.
+4. **The user confirms via the UI** (a "mark done" button in the preview
+   pane moves the file to `.rness/requests/done/`). Do NOT move it yourself
+   — the move is the user's approval act.
+
+## Examples of requests that need tracking
+
+- "Build me a skill that indexes my infoworld/ wiki."
+- "Research the last five papers on <topic> and write me a synthesis."
+- "Refactor my paradigm files so they're less redundant."
+
+## Examples of requests that do NOT need tracking
+
+- "What does `.rness/paradigms/default.md` say?"
+- "Rename this file to foo.md."
+- "Add a comma to this sentence."
+"""
+
 INFOWORLD_README = """\
 # infoworld/
 
@@ -116,14 +214,16 @@ SKELETON_FILES: dict[str, str] = {
     ".rness/paradigms/default.md": PARADIGM_DEFAULT_MD,
     ".rness/knowledge/user-profile.md": USER_PROFILE_MD,
     ".rness/models/providers.md": MODELS_PROVIDERS_MD,
+    ".rness/policies/requests.md": POLICY_REQUESTS_MD,
     "infoworld/README.md": INFOWORLD_README,
 }
 
 EMPTY_DIRS: tuple[str, ...] = (
     ".rness/skills",
     ".rness/routines",
-    ".rness/policies",
     ".rness/knowledge/session-logs",
+    ".rness/requests",
+    ".rness/requests/done",
     "infoworld/wiki",
     "infoworld/personal",
 )

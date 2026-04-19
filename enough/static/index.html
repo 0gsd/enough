@@ -120,6 +120,27 @@
   ul.skills li.skill-row.on button.skill-toggle { color: var(--accent-agent); }
   ul.skills li.skill-row.off .skill-name { color: var(--fg-faint); text-decoration: line-through; }
   ul.skills .skill-name { color: var(--fg-muted); font-size: 12.5px; }
+
+  ul.requests {
+    list-style: none;
+    margin: 0 0 12px 0;
+    padding: 0 4px;
+  }
+  ul.requests li.request-row {
+    padding: 2px 4px;
+  }
+  ul.requests li.request-row a {
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    display: block;
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+  ul.requests li.request-row a:hover {
+    color: var(--fg);
+    background: var(--bg-raise);
+  }
   .empty-note {
     color: var(--fg-faint);
     font-style: italic;
@@ -341,6 +362,11 @@
 
 <div class="layout" id="layout">
   <aside class="sidebar">
+    <h3>requests</h3>
+    <div id="requests-list" hx-get="/api/requests" hx-trigger="load, every 10s, requests-refresh from:body" hx-swap="innerHTML">
+      <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+    </div>
+
     <h3>skills</h3>
     <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
       <div style="color: var(--fg-faint); padding: 8px">loading…</div>
@@ -573,10 +599,24 @@
     });
   }
 
+  async function markRequestDone(path) {
+    if (!confirm('mark this request complete and move it to .rness/requests/done/?')) return;
+    const fd = new FormData();
+    fd.append('path', path);
+    const r = await fetch('/api/requests/done', { method: 'POST', body: fd });
+    if (!r.ok) { alert('mark-done failed: ' + r.status + ' ' + r.statusText); return; }
+    // Close preview (the file no longer exists at that path) and refresh sidebars.
+    document.getElementById('preview').classList.remove('open');
+    document.getElementById('preview-body').innerHTML = '';
+    htmx.trigger(document.body, 'requests-refresh');
+    htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+  }
+
   // Expose to inline onclick handlers.
   window.enterEditMode = enterEditMode;
   window.saveEdit = saveEdit;
   window.cancelEdit = cancelEdit;
+  window.markRequestDone = markRequestDone;
 
   // Disable the input while a turn is in flight.
   form.addEventListener('htmx:beforeRequest', () => {

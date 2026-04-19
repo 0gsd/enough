@@ -325,6 +325,55 @@ def create_app(project_dir: Path, llm_url: str) -> FastAPI:
         set_skill_enabled(project_dir / ".rness", name, enabled_raw == "1")
         return await api_skills()  # type: ignore[return-value]
 
+    @app.get("/api/requests", response_class=HTMLResponse)
+    async def api_requests() -> HTMLResponse:
+        rdir = project_dir / ".rness" / "requests"
+        if not rdir.is_dir():
+            return HTMLResponse('<div class="empty-note">no .rness/requests/ yet</div>')
+        active = sorted(
+            (p for p in rdir.glob("*.md") if p.is_file()),
+            key=lambda p: p.name,
+            reverse=True,  # newest first (YYYY-MM-DD_HH-MM sorts chronologically)
+        )
+        if not active:
+            return HTMLResponse('<div class="empty-note">no active requests</div>')
+        rows = []
+        for p in active:
+            rel = f".rness/requests/{p.name}"
+            label = _escape_html(p.stem)
+            rows.append(
+                f'<li class="request-row">'
+                f'  <a href="#" '
+                f'    hx-get="/api/file?path={_escape_html(rel)}" '
+                f'    hx-target="#preview-body" hx-swap="innerHTML" '
+                f'    onclick="document.getElementById(\'preview\').classList.add(\'open\')">'
+                f'    {label}'
+                f'  </a>'
+                f'</li>'
+            )
+        return HTMLResponse('<ul class="requests">' + "".join(rows) + "</ul>")
+
+    @app.post("/api/requests/done", response_class=HTMLResponse)
+    async def api_requests_done(request: Request) -> HTMLResponse:
+        form = await request.form()
+        path = (form.get("path") or "").strip()
+        if not path:
+            raise HTTPException(400, "missing path")
+        if not _is_request_file(path):
+            raise HTTPException(400, "not an active request file")
+        target = _resolve_project_path(path)
+        if not target.is_file():
+            raise HTTPException(404, "not found")
+        done_dir = project_dir / ".rness" / "requests" / "done"
+        done_dir.mkdir(parents=True, exist_ok=True)
+        dest = done_dir / target.name
+        # If a file with the same name already exists in done/, disambiguate.
+        if dest.exists():
+            dest = done_dir / (target.stem + "_dup.md")
+        target.rename(dest)
+        # Return the new requests list so htmx can refresh the sidebar.
+        return await api_requests()  # type: ignore[return-value]
+
     def _resolve_project_path(path: str) -> Path:
         """Shared path-safety helper for /api/file{,/raw} and POST writes."""
         p = Path(path)
