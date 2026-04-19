@@ -1,0 +1,45 @@
+{
+  "checkpoint_id": "20260419-v002",
+  "session_phase": "complete",
+  "heuristic_pressure": "medium",
+  "plan": {
+    "goal": "v0.0.2 — three paradigm-oriented features: inline editor, skill on/off toggles, Requests/Sub-Requests/Tasks tracking system.",
+    "total_tasks": 4,
+    "completed": 4,
+    "current_task": "(done)",
+    "remaining_tasks": []
+  },
+  "decisions_since_last_checkpoint": [
+    "DR-019", "DR-020", "DR-021", "DR-022", "DR-023", "DR-024", "DR-025", "DR-026"
+  ],
+  "active_assumptions": [
+    "Policies auto-load like skills — scope creeping slightly past v0.01 spec but the user approved the pattern when it seeded the requests policy",
+    "Disabled-skills state lives in .rness/skills/.disabled (plain text, one name per line) — human-inspectable, editable outside the UI",
+    "Date format is YYYY-MM-DD_HH-MM (sortable) not the user's original MM_DD_YYYY-HH-MM — user approved the switch",
+    "Mark-done is a UI action (button on preview chrome), not an agent action — user's approval act by design"
+  ],
+  "key_state": {
+    "repo_root": "/Users/m3u/METMcloud/METMroot/enough",
+    "github_remote": "git@github.com:0gsd/enough.git",
+    "commits_on_main_total": 10,
+    "version": "0.0.2",
+    "new_modules": [],
+    "expanded_modules": ["skeleton", "prompt", "server", "static/index.html"],
+    "new_endpoints": [
+      "GET /api/file/raw",
+      "POST /api/file",
+      "GET /api/skills",
+      "POST /api/skills/toggle",
+      "GET /api/requests",
+      "POST /api/requests/done"
+    ],
+    "new_skeleton_paths": [
+      ".rness/policies/requests.md",
+      ".rness/requests/",
+      ".rness/requests/done/"
+    ],
+    "integration_test_passes": true
+  },
+  "resources_open": [],
+  "continuation_prompt": "v0.02 shipped. Things the user may hit in testing: (1) agent may forget to update an active request file across turns — a lightweight nudge in the policy or an in-chat 'active request: X' indicator could help; (2) edit mode has no conflict detection (last-write-wins if user and agent race on the same file); (3) the '.disabled' file is invisible in the default file tree (hidden-dotfile filter) — users may not realize it exists without reading docs; (4) request detection relies on model judgment — low-capability models may under-create or over-create request files. Don't build pre-emptively; see what actually bites in use."
+}

@@ -10,7 +10,7 @@ Multi-agent? Run multiple instances in different directories. There is no
 built-in orchestrator, no message bus, no agent framework. The filesystem is
 the coordination surface.
 
-Status: **v0.0.1 — pre-alpha.** The architecture is in place; the ideas on top
+Status: **v0.0.2 — pre-alpha.** The architecture is in place; the ideas on top
 of it are up to you.
 
 ---
@@ -31,9 +31,13 @@ of it are up to you.
 │   ├── AGENT.md              identity
 │   ├── MOTIVATION.md         evolving drive
 │   ├── paradigms/default.md  interaction conventions
-│   ├── skills/               (user-added)
-│   ├── routines/             (user-added)
-│   ├── policies/             (user-added)
+│   ├── skills/               user-added (SKILL.md or flat .md);
+│   │                         toggle on/off in the UI
+│   ├── routines/             user-added
+│   ├── policies/
+│   │   └── requests.md       seed: long-horizon request tracking
+│   ├── requests/             active request .md files
+│   │   └── done/             moved here when user clicks "mark done"
 │   ├── knowledge/
 │   │   ├── user-profile.md   what the agent knows about you
 │   │   └── session-logs/     one .md per day, full transcript
@@ -140,9 +144,20 @@ request**, so edits take effect on the very next message — no restart needed.
   session end; you approve or edit before saving.
 - `paradigms/default.md` — the active interaction paradigm. Session
   structure, output conventions, archival policy, security posture. Make more
-  paradigms as you need them; for v0.01 only `default.md` is loaded.
-- `skills/`, `routines/`, `policies/` — user-populated. v0.01 doesn't load
-  these automatically; they're yours to reference or have the agent read.
+  paradigms as you need them; for v0.02 only `default.md` is loaded.
+- `skills/` — drop-in skills. Two layouts supported:
+  `.rness/skills/<name>/SKILL.md` (folder-based, Claude Code convention) or
+  `.rness/skills/<name>.md` (flat). Auto-loaded into the system prompt.
+  Toggle on/off in the sidebar without moving files; disabled skills are
+  listed in `.rness/skills/.disabled`.
+- `policies/` — policy files auto-loaded into the system prompt under a
+  `# Policies` section. Ships with `requests.md` (see below); add your own
+  conventions here.
+- `requests/` + `requests/done/` — long-horizon work tracking. The agent
+  creates an `.md` file per complex multi-step request, maintains it across
+  turns (sub-requests → tasks → end output), and the user clicks "mark done"
+  in the preview pane to move it into `done/`. See the seed policy.
+- `routines/` — user-populated, not auto-loaded.
 - `knowledge/session-logs/` — one `.md` per day, every exchange appended,
   including tool calls.
 - `knowledge/user-profile.md` — what the agent knows about you. Starts empty.
@@ -151,6 +166,14 @@ request**, so edits take effect on the very next message — no restart needed.
 Optional:
 - `INTENTION.md` — if you put one here, it's injected into the system prompt
   as the current session intention.
+
+### Edit any of these in-browser
+
+Click a file in the sidebar → the preview pane opens. Hit the **edit**
+button in the preview chrome → inline textarea with save / cancel. All
+edits write straight to disk and take effect on the next message. You can
+still use your normal editor; it's just a convenience for quick paradigm
+tweaks.
 
 ---
 
@@ -204,20 +227,22 @@ we don't use an XML parser). See
 
 ---
 
-## What v0.01 *doesn't* do
+## What v0.02 *doesn't* do
 
 Deliberate omissions — see [bootstrap spec](dev/) for the full thinking:
 
 - No multi-agent coordination (one instance = one agent).
-- No skill auto-loading beyond what you manually reference.
 - No MOTIVATION auto-update (model proposes; you apply).
 - No RAG / embedding / vector store. The model greps.
 - No authentication. Localhost only.
 - No persistent conversation history across restarts (session logs remain).
 - No paradigm switching mid-session.
 
-These are all things that could be added — as a *paradigm*, *routine*, or a
-future version.
+Added in v0.02 (see `dev/.amanuensis/`):
+- Auto-load for `skills/` and `policies/` into the system prompt.
+- Inline editor in the preview pane.
+- Skill on/off toggles (UI + `.disabled` file).
+- Requests tracking (folders + seed policy + sidebar + mark-done).
 
 ---
 

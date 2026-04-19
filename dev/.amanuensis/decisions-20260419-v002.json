@@ -1,0 +1,116 @@
+{
+  "session_id": "20260419-v002",
+  "continues_from": "20260417-0945",
+  "decisions": [
+    {
+      "dr_id": "DR-019",
+      "timestamp": "2026-04-19T17:30:00Z",
+      "phase": "editor",
+      "decision": "Separate GET /api/file/raw endpoint for edit mode instead of re-using the HTML preview endpoint",
+      "category": "framing",
+      "inputs": ["preview returns escaped HTML in a <pre>; edit mode needs the original bytes"],
+      "alternatives_considered": [
+        {"option": "parse the escaped HTML back to text in JS", "reason_rejected": "fragile — anything in the rendered chrome (file-path div, actions row) would need stripping"},
+        {"option": "return raw text + HTML bundled in one response", "reason_rejected": "conflates two concerns; breaks the clean HTML-fragment-returning pattern used elsewhere"}
+      ],
+      "weighting_logic": "One endpoint, one content type, clean separation. The extra round-trip on edit-click is cheap (localhost).",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-020",
+      "timestamp": "2026-04-19T17:45:00Z",
+      "phase": "skills-toggle",
+      "decision": "Disabled-skills state in a plain-text .disabled file (one name per line), not JSON",
+      "category": "tool_selection",
+      "inputs": ["user should be able to inspect/edit this from a plain text editor", "the list is flat — no structured metadata needed"],
+      "alternatives_considered": [
+        {"option": ".enabled.json with per-skill objects", "reason_rejected": "premature structure; if we later need metadata (last-enabled timestamp, etc.) we can upgrade"}
+      ],
+      "weighting_logic": "Plain text is the project's language. Save JSON for when the fields demand it.",
+      "confidence": "high",
+      "reversibility": "easy"
+    },
+    {
+      "dr_id": "DR-021",
+      "timestamp": "2026-04-19T17:45:00Z",
+      "phase": "skills-toggle",
+      "decision": "Dedicated sidebar 'skills' section rather than inline toggles in the file tree",
+      "category": "framing",
+      "inputs": ["file tree re-renders every 10s via htmx poll — any local UI state would be clobbered", "skills are a first-class product concept deserving UI space"],
+      "alternatives_considered": [
+        {"option": "toggle icons beside each SKILL.md in the tree", "reason_rejected": "pollutes a generic browser with skill-specific semantics"},
+        {"option": "toggle in the preview pane when viewing a SKILL.md", "reason_rejected": "discovery sucks — user has to click into each skill to toggle it"}
+      ],
+      "weighting_logic": "Skills as a separate vertical section in the sidebar gives them a stable home and scales to other first-class concepts (requests, next).",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-022",
+      "timestamp": "2026-04-19T18:00:00Z",
+      "phase": "policies",
+      "decision": "Auto-load .rness/policies/*.md into system prompt under a # Policies section",
+      "category": "scope_definition",
+      "inputs": ["v0.01 spec said skills auto-load but policies were 'user-populated, not auto-loaded'", "but the Requests tracking system needs the convention in the prompt for the agent to comply"],
+      "alternatives_considered": [
+        {"option": "embed the requests convention in paradigms/default.md", "reason_rejected": "conflates paradigm (how sessions work) with policy (what must happen); paradigm file would balloon over time"},
+        {"option": "require user to manually reference policies from their paradigm", "reason_rejected": "defeats the purpose of shipping a sensible default"}
+      ],
+      "weighting_logic": "Policies are small, orthogonal to paradigms, and parallel to skills. Auto-load is the natural pattern.",
+      "confidence": "high",
+      "downstream_impact": "v0.02 users with existing projects can drop a .md file into .rness/policies/ and it's live on the next message."
+    },
+    {
+      "dr_id": "DR-023",
+      "timestamp": "2026-04-19T18:05:00Z",
+      "phase": "requests",
+      "decision": "Date format YYYY-MM-DD_HH-MM (sortable) rather than user's proposed MM_DD_YYYY-HH-MM",
+      "category": "framing",
+      "inputs": ["filename listings sort alphabetically; MM_DD_YYYY cross-year ordering breaks"],
+      "alternatives_considered": [
+        {"option": "keep user's MM_DD_YYYY-HH-MM", "reason_rejected": "asked them; they approved the switch"}
+      ],
+      "weighting_logic": "Sortable filenames are a force multiplier for a paradigm that lives in the filesystem.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-024",
+      "timestamp": "2026-04-19T18:10:00Z",
+      "phase": "requests",
+      "decision": "Mark-done is a UI action only — agent cannot move files into requests/done/ itself",
+      "category": "scope_definition",
+      "inputs": ["spec: the move IS the user's confirmation"],
+      "alternatives_considered": [
+        {"option": "agent uses shell mv when user confirms in chat", "reason_rejected": "adds a failure mode where agent prematurely moves without real confirmation; also weakens the sense that 'done' is a ceremonial act"}
+      ],
+      "weighting_logic": "The move is the approval. Keep it in the human's hands.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-025",
+      "timestamp": "2026-04-19T18:15:00Z",
+      "phase": "requests",
+      "decision": "Mark-done button is rendered by the server inside the preview fragment (when path matches .rness/requests/*.md) — not by frontend inspection",
+      "category": "framing",
+      "inputs": ["server owns path-classification (_is_request_file); frontend should not duplicate that logic"],
+      "alternatives_considered": [
+        {"option": "JS checks path prefix and adds button", "reason_rejected": "logic duplication — if we ever rename or nest the folder, we'd have to fix two places"}
+      ],
+      "weighting_logic": "Single source of truth for what counts as a 'request'.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-026",
+      "timestamp": "2026-04-19T18:20:00Z",
+      "phase": "requests",
+      "decision": "No conflict detection / locking on inline editor (last-write-wins)",
+      "category": "scope_definition",
+      "inputs": ["v0.02 scope is 'get the feature shipped'; races are rare on localhost-single-user"],
+      "alternatives_considered": [
+        {"option": "send mtime on GET, reject POST if mtime changed", "reason_rejected": "adds a field to the edit flow without observed value; the agent typically writes via write_file (not the editor) so the race window is narrow"}
+      ],
+      "weighting_logic": "Ship and watch. If the user hits a lost-edit issue in practice, add mtime check then.",
+      "confidence": "medium",
+      "reversibility": "easy"
+    }
+  ]
+}

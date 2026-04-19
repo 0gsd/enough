@@ -1,0 +1,21 @@
+{
+  "session_id": "20260419-v002",
+  "task": "enough v0.0.2 — inline editor, skill toggles, requests tracking",
+  "status": "complete",
+  "deliverable": "../../",
+  "amanuensis_files": {
+    "checkpoints": ["20260419-v002-state.json"],
+    "decisions": ["decisions-20260419-v002.json"],
+    "process": "process-20260419-v002.md",
+    "manifest": "manifest-20260419-v002.json"
+  },
+  "statistics": {
+    "total_decisions": 8,
+    "flagged_decisions": 1,
+    "unresolved_questions": 2,
+    "checkpoints_written": 1,
+    "sources_consulted": 1,
+    "dead_ends": 2,
+    "phases_completed": ["editor", "skills-toggle", "policies", "requests", "docs"]
+  }
+}
