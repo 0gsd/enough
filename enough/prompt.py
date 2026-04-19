@@ -134,6 +134,19 @@ def set_skill_enabled(rness: Path, name: str, enabled: bool) -> None:
             f.unlink()
 
 
+def _skill_root_note(root: str) -> str:
+    """Preamble that tells the model where a skill's companion files live,
+    so it prefixes relative paths (e.g. ``scripts/foo.py``) correctly when
+    using the ``shell`` or ``read_file`` tools."""
+    return (
+        f"> **Skill root:** `{root}`  \n"
+        f"> Any relative path referenced in this skill's docs (e.g. "
+        f"`scripts/foo.py`, `reference/bar.md`) resolves under that root. "
+        f"When you invoke `shell` or `read_file`, prefix the path with "
+        f"`{root}` — `shell` runs in the project root, not the skill root."
+    )
+
+
 def _load_skills(rness: Path) -> str:
     """Concatenate every ENABLED skill's content into one block.
 
@@ -141,6 +154,8 @@ def _load_skills(rness: Path) -> str:
       .rness/skills/<name>/SKILL.md   — folder-based (Claude Code convention)
       .rness/skills/<name>.md         — flat
     Skills listed in .rness/skills/.disabled are skipped.
+    Each folder-based skill's section begins with a path-hint preamble so
+    the agent knows where companion files live.
     """
     skills_dir = rness / "skills"
     if not skills_dir.is_dir():
@@ -153,13 +168,15 @@ def _load_skills(rness: Path) -> str:
             continue
         text = _read_or_empty(skill_md)
         if text:
-            parts.append(f"## {name}\n\n{text}")
+            root = f".rness/skills/{name}/"
+            parts.append(f"## {name}\n\n{_skill_root_note(root)}\n\n{text}")
     for flat in sorted(skills_dir.glob("*.md")):
         name = flat.stem
         if name in disabled:
             continue
         text = _read_or_empty(flat)
         if text:
+            # Flat skills have no companion-files root, so no path note.
             parts.append(f"## {name}\n\n{text}")
     return "\n\n".join(parts)
 
