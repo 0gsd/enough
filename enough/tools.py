@@ -110,6 +110,32 @@ def _safe_join(project_dir: Path, rel: str) -> Path:
     return target
 
 
+# Paths the agent cannot write to directly, regardless of intent. These are
+# locations whose semantics belong to the user/harness — writing here bypasses
+# UI affordances that represent user approval.
+_WRITE_PROTECTED_PREFIXES: tuple[tuple[str, ...], ...] = (
+    (".rness", "requests", "done"),
+)
+
+
+def _protected_write_reason(project_dir: Path, target: Path) -> str | None:
+    """Return an error message if `target` is a write-protected location, else None."""
+    try:
+        rel_parts = target.resolve(strict=False).relative_to(project_dir.resolve(strict=False)).parts
+    except ValueError:
+        return None  # Path safety will reject this separately.
+    for prefix in _WRITE_PROTECTED_PREFIXES:
+        if rel_parts[: len(prefix)] == prefix:
+            path_str = "/".join(prefix) + "/"
+            return (
+                f"writes under {path_str} are blocked by the harness. "
+                f"this is where the user confirms a request as complete — use "
+                f"the 'mark done' button in the preview pane instead of writing "
+                f"here yourself."
+            )
+    return None
+
+
 def run_read_file(project_dir: Path, call: ToolCall) -> ToolResult:
     if not call.path:
         return ToolResult("read_file", "", False, "error: missing <path>")
@@ -141,6 +167,8 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
         target = _safe_join(project_dir, call.path)
     except ValueError as e:
         return ToolResult("write_file", call.path, False, f"error: {e}")
+    if (why := _protected_write_reason(project_dir, target)):
+        return ToolResult("write_file", call.path, False, f"error: {why}")
     # The model's <content>...</content> typically has a leading newline from
     # formatting. Strip one leading newline to match expected conventions.
     body = call.content
