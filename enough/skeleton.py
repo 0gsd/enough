@@ -208,6 +208,25 @@ paths, links, summaries of decisions. Fill this in when Status becomes
    pane moves the file to `.rness/requests/done/`). Do NOT move it yourself
    — the move is the user's approval act.
 
+## Before updating an active request file
+
+DO NOT type the filename from memory. Your own slug spelling drifts across
+turns (`decentralized` becomes `decentralative`; `harness` becomes
+`harnesses`); typing a slightly different filename creates a new file
+instead of updating the existing one. Instead, always list the directory
+first:
+
+    <tool name="shell">
+    <command>ls .rness/requests/*.md</command>
+    </tool>
+
+and use the exact filename shown, verbatim, in your next `write_file`.
+
+The harness will actively reject creation of a second file in
+`.rness/requests/` that shares its `_YYYY-MM-DD_HH-MM` timestamp with an
+existing active file — the error message will name the canonical file to
+update.
+
 ## Examples of requests that need tracking
 
 - "Build me a skill that indexes my infoworld/ wiki."
