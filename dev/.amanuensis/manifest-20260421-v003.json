@@ -1,0 +1,21 @@
+{
+  "session_id": "20260421-v003",
+  "task": "enough v0.0.3 — ~/enough install dir, bootstrap.sh, global defaults via symlinks, read allowlist, customize UI, infoworld global",
+  "status": "complete",
+  "deliverable": "../../",
+  "amanuensis_files": {
+    "checkpoints": ["20260421-v003-state.json"],
+    "decisions": ["decisions-20260421-v003.json"],
+    "process": "process-20260421-v003.md",
+    "manifest": "manifest-20260421-v003.json"
+  },
+  "statistics": {
+    "total_decisions": 15,
+    "flagged_decisions": 1,
+    "unresolved_questions": 3,
+    "checkpoints_written": 1,
+    "sources_consulted": 1,
+    "dead_ends": 2,
+    "phases_completed": ["install-dir", "cli-guard", "installer", "defaults", "infoworld", "allowlist", "ui", "server", "docs"]
+  }
+}

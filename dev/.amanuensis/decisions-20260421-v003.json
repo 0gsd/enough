@@ -1,0 +1,269 @@
+{
+  "session_id": "20260421-v003",
+  "continues_from": "20260419-v002",
+  "decisions": [
+    {
+      "dr_id": "DR-027",
+      "timestamp": "2026-04-21T14:15:00Z",
+      "phase": "install-dir",
+      "decision": "~/enough/ as a single self-contained install root (code + defaults + weights + venv + infoworld)",
+      "category": "scope_definition",
+      "inputs": [
+        "user explicitly modeled it after ~/.claude and ~/.gemini",
+        "simpler than splitting between /usr/local and ~/.config",
+        "one directory to back up, one to delete to reset"
+      ],
+      "alternatives_considered": [
+        {"option": "/usr/local/enough for app + ~/enough for user data", "reason_rejected": "requires sudo + more moving parts; distinction rarely helps for a local-only tool"},
+        {"option": "~/.enough/ with dot-prefix like .claude", "reason_rejected": "user explicitly wanted no dot — makes the dir discoverable in Finder and Terminal tab-completion"}
+      ],
+      "weighting_logic": "Self-contained wins on simplicity. Users can still separate weights manually via symlink if they want weights on a different disk.",
+      "confidence": "high",
+      "reversibility": "easy (change a few constants)"
+    },
+    {
+      "dr_id": "DR-028",
+      "timestamp": "2026-04-21T14:20:00Z",
+      "phase": "install-dir",
+      "decision": "Dev clone at /Users/m3u/METMcloud/METMroot/enough stays; ~/enough/ is a separate user-realistic install created by bootstrap.sh doing a fresh `git clone`",
+      "category": "framework_selection",
+      "inputs": [
+        "user's instinct was right — two checkouts on the same machine is normal git",
+        "testing bootstrap.sh requires a blank-slate target; the install dir serves that role",
+        "dev changes commit from the dev clone and propagate to the install via git pull"
+      ],
+      "alternatives_considered": [
+        {"option": "Move the dev clone into ~/enough, develop in place", "reason_rejected": "conflates 'codebase' and 'user install' mental models; makes the 'nuke and reinstall' test impossible"}
+      ],
+      "weighting_logic": "Separation is free (disk), saves confusion (mental model), and enables clean reinstalls.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-029",
+      "timestamp": "2026-04-21T14:25:00Z",
+      "phase": "cli-guard",
+      "decision": "Refuse to run `enough` inside ~/enough/ or any subdirectory of it",
+      "category": "scope_definition",
+      "inputs": [
+        "skeleton would create symlinks pointing into the same tree",
+        "user data + install data shouldn't intermix"
+      ],
+      "alternatives_considered": [
+        {"option": "Warn but allow", "reason_rejected": "the resulting state is genuinely broken; fail-fast is kinder"},
+        {"option": "Detect and create project at a subdirectory like ~/enough/projects/", "reason_rejected": "surprising magic; violates 'explicit beats implicit'"}
+      ],
+      "weighting_logic": "Follow spec; fail fast with a clear error and a suggested next command.",
+      "confidence": "high",
+      "reversibility": "trivial"
+    },
+    {
+      "dr_id": "DR-030",
+      "timestamp": "2026-04-21T14:30:00Z",
+      "phase": "installer",
+      "decision": "bootstrap.sh with narration-at-each-step as a teaching tool",
+      "category": "creative_direction",
+      "inputs": [
+        "user explicitly: 'i want non-technical people to get slightly comfortable with the command line... and learn to fear it a little less'",
+        "each step already has a clear purpose; printing that purpose costs nothing"
+      ],
+      "alternatives_considered": [
+        {"option": "Silent installer with progress spinner", "reason_rejected": "misses the pedagogical goal"},
+        {"option": "Native .pkg/.dmg for macOS Installer.app", "reason_rejected": "weeks of work (signing, notarization, wizard screens) for a paradigm that's still shifting"}
+      ],
+      "weighting_logic": "Bash script = 90% of the UX of a real installer at 2% of the cost. Real installer is a v1.0 investment.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-031",
+      "timestamp": "2026-04-21T14:35:00Z",
+      "phase": "installer",
+      "decision": "PATH wrapper at ~/.local/bin/enough (3 lines, execs `uv run --project ~/enough enough`)",
+      "category": "tool_selection",
+      "inputs": [
+        "most modern user-local binary conventions use ~/.local/bin",
+        "avoids sudo and brew ownership complications",
+        "uv handles venv activation transparently"
+      ],
+      "alternatives_considered": [
+        {"option": "/usr/local/bin/enough", "reason_rejected": "needs sudo; fights brew ownership"},
+        {"option": "Shell alias in ~/.zshrc", "reason_rejected": "only works in shells that sourced it; invisible to non-shell spawners like `open`"}
+      ],
+      "weighting_logic": "Wrapper script is the most portable, hermetic approach. bootstrap.sh warns if ~/.local/bin isn't on PATH and prints the one-liner to add it.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-032",
+      "timestamp": "2026-04-21T15:00:00Z",
+      "phase": "defaults",
+      "decision": "Defaults live as committed .md files in <repo>/defaults/, not as Python string constants in skeleton.py",
+      "category": "framework_selection",
+      "inputs": [
+        "user wants to edit defaults directly (e.g. `nvim ~/enough/defaults/paradigms/default.md`)",
+        "Python strings are invisible to normal tooling (grep, editors, diff)",
+        "the defaults/ tree IS the shape of a `.rness/` — reading it is self-documenting"
+      ],
+      "alternatives_considered": [
+        {"option": "Keep as Python strings, generate files on first run", "reason_rejected": "editing requires a code change + redeploy; breaks the 'plain text all the way down' ethos"}
+      ],
+      "weighting_logic": "Plain text is the project's language. Python strings were convenient for v0.0.1 when defaults were tiny; they're now 300-line policy files.",
+      "confidence": "high",
+      "downstream_impact": "skeleton.py exports back-compat string constants (AGENT_MD, POLICY_REQUESTS_MD, etc.) by re-reading defaults/ at import time, so any test or tool that imported the constants still works."
+    },
+    {
+      "dr_id": "DR-033",
+      "timestamp": "2026-04-21T15:05:00Z",
+      "phase": "defaults",
+      "decision": "_install_defaults_root() resolves relative to the package (__file__.parents[1] / 'defaults'), not a hardcoded ~/enough/",
+      "category": "framework_selection",
+      "inputs": [
+        "enough can be run from a dev clone OR from ~/enough (via the PATH wrapper)",
+        "in either case, the 'defaults/' is the sibling of the 'enough/' Python package",
+        "relative resolution means no import of HOME or env parsing — just filesystem topology"
+      ],
+      "alternatives_considered": [
+        {"option": "Always ~/enough/defaults/", "reason_rejected": "breaks dev workflow (when running from /Users/m3u/METMcloud/METMroot/enough, ~/enough might not exist or might be stale)"},
+        {"option": "Env var ENOUGH_DEFAULTS", "reason_rejected": "punt on the fix; requires users to set env correctly"}
+      ],
+      "weighting_logic": "Resolve by topology, not config. If you moved the install somewhere else, it still works.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-034",
+      "timestamp": "2026-04-21T15:10:00Z",
+      "phase": "defaults",
+      "decision": "Per-file mode (symlink vs copy) declared in a table (_SKELETON_PLAN), not inferred",
+      "category": "framework_selection",
+      "inputs": [
+        "AGENT.md / MOTIVATION.md diverge fast — copy",
+        "paradigms / policies / models / skills / routines — global upgradable — symlink",
+        "knowledge/user-profile.md — per-project, starts empty — copy but inlined template (not in defaults/)"
+      ],
+      "alternatives_considered": [
+        {"option": "All symlinks (consistent)", "reason_rejected": "forces user to click 'customize' every single time before writing anything to AGENT.md — friction against the primary use case"},
+        {"option": "All copies (simple)", "reason_rejected": "loses the upgrade-everywhere property of symlinks for cross-cutting conventions like paradigms"}
+      ],
+      "weighting_logic": "Different files have different semantics. Encoding this as a table keeps the intent explicit and easy to change per-file.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-035",
+      "timestamp": "2026-04-21T15:20:00Z",
+      "phase": "infoworld",
+      "decision": "infoworld/ lives at ~/enough/infoworld/ (per-user, not per-install) and is symlinked into each project",
+      "category": "scope_definition",
+      "inputs": [
+        "user explicitly: 'users/the rness agent should always be able to read from the global root enough folder, including the infoworld/ folder, and also be able to write files into infoworld/personal'",
+        "all projects sharing the same grounded-knowledge store is the whole point"
+      ],
+      "alternatives_considered": [
+        {"option": "infoworld in defaults/ (version-controlled)", "reason_rejected": "wiki/ and personal/ are user data, not template content; would pollute the repo with gigabytes"},
+        {"option": "Per-project infoworld", "reason_rejected": "defeats the shared-knowledge design"}
+      ],
+      "weighting_logic": "Shared state is the goal; symlink is the lightest-weight mechanism.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-036",
+      "timestamp": "2026-04-21T15:25:00Z",
+      "phase": "infoworld",
+      "decision": "ensure_global_infoworld() auto-creates ~/enough/infoworld/ + subdirs on first skeleton run (not in bootstrap.sh exclusively)",
+      "category": "framework_selection",
+      "inputs": [
+        "user might run enough from a dev clone without running bootstrap.sh",
+        "skeleton creation is the right time to ensure everything needed exists"
+      ],
+      "alternatives_considered": [
+        {"option": "Require bootstrap.sh first; fail if infoworld root missing", "reason_rejected": "brittle for dev workflows; idempotent self-heal is friendlier"}
+      ],
+      "weighting_logic": "Self-heal is the cleaner invariant: 'infoworld exists wherever you create a project'.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-037",
+      "timestamp": "2026-04-21T15:40:00Z",
+      "phase": "allowlist",
+      "decision": "Read allowlist is itself a policy file (.rness/policies/read-allowlist.md), symlinked in and customizable via the same 'customize for this project' flow",
+      "category": "creative_direction",
+      "inputs": [
+        "user's suggestion: 'maybe it can just be a third document in policies, read_allowlist.md'",
+        "consistency: policy files govern agent behavior; this is agent behavior; therefore policy file"
+      ],
+      "alternatives_considered": [
+        {"option": "Hardcoded list in tools.py", "reason_rejected": "requires code change to broaden access"},
+        {"option": "JSON config file", "reason_rejected": "breaks the plain-text ethos and the 'symlink / customize' primitive"}
+      ],
+      "weighting_logic": "Turtles all the way down: the allowlist is policy, policy is markdown, markdown is editable via the UI. Nothing special-cased.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-038",
+      "timestamp": "2026-04-21T15:45:00Z",
+      "phase": "allowlist",
+      "decision": "Allowlist parser greps markdown bullets under `## allowlisted prefixes` — not a structured data file",
+      "category": "framing",
+      "inputs": [
+        "users read and write markdown naturally; JSON/YAML is a mode switch",
+        "the policy doubles as documentation for both the user and the agent"
+      ],
+      "alternatives_considered": [
+        {"option": "Separate .allowlist config file in JSON", "reason_rejected": "duplicates information between the human-readable policy text and the machine-readable config"}
+      ],
+      "weighting_logic": "If the policy text already shows the list to the reader, parsing it avoids drift between what the user sees and what the tool enforces.",
+      "confidence": "medium",
+      "downstream_impact": "Parser is permissive: matches `- \\`~/some/path/\\`` or `- /some/path` bullets, ignores prose. Fragile if someone writes 'paths are things like - ~/whatever' in the section body."
+    },
+    {
+      "dr_id": "DR-039",
+      "timestamp": "2026-04-21T15:55:00Z",
+      "phase": "allowlist",
+      "decision": "read_file honors the allowlist for absolute paths; shell remains unrestricted",
+      "category": "scope_definition",
+      "inputs": [
+        "shell was always the 'deliberate nuclear option'",
+        "restricting shell would require parsing arbitrary shell commands — fragile and easy to bypass"
+      ],
+      "alternatives_considered": [
+        {"option": "Parse shell commands for file references and allowlist-check them", "reason_rejected": "brittle; shell expansion, pipes, and variables make this nearly impossible"},
+        {"option": "Restrict shell to project-dir cwd (already the case) AND block commands starting with allowlist-touching paths", "reason_rejected": "partial safety theater"}
+      ],
+      "weighting_logic": "Two tools with different semantics: read_file is structured and audited, shell is raw power. Users who care about tight sandboxing should disable shell access entirely.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-040",
+      "timestamp": "2026-04-21T16:10:00Z",
+      "phase": "ui",
+      "decision": "Symlink rendering in the UI: italic + muted text, 'symlink → <target>' note in preview, 'customize for this project' button in place of 'edit'",
+      "category": "creative_direction",
+      "inputs": [
+        "user: 'we can show symlinked/uneditable defaults in italics or something, shouldn't be too hard to distinguish UI wise'",
+        "italic is the canonical typography for 'reference elsewhere'",
+        "explicit action button (not a silent refusal of edit) teaches the paradigm"
+      ],
+      "alternatives_considered": [
+        {"option": "Lock icon", "reason_rejected": "iconography adds visual weight; italic is information-dense at zero cost"},
+        {"option": "Make edit work on symlinks by writing through", "reason_rejected": "violates 'global defaults can't be edited from project'"}
+      ],
+      "weighting_logic": "Affordances match semantics. Editable = edit button. Not-editable-but-customizable = customize button. Both discoverable.",
+      "confidence": "high"
+    },
+    {
+      "dr_id": "DR-041",
+      "timestamp": "2026-04-21T16:30:00Z",
+      "phase": "server",
+      "decision": "Path-safety check uses LOGICAL composition (path_str against resolved project_root), not .resolve() on the target",
+      "category": "course_correction",
+      "inputs": [
+        "initial impl called target.resolve() which followed in-tree symlinks out of the project, then rejected them as 'path escapes project dir'",
+        "the threat model is user-provided path strings with absolute-path or ../ escapes, not symlinks placed legitimately inside the project by skeleton gen"
+      ],
+      "alternatives_considered": [
+        {"option": "Keep .resolve() + add allowlist of known-external symlink targets", "reason_rejected": "turns path-safety into a dynamic rule that depends on skeleton state"},
+        {"option": "Don't create external symlinks (use bind mounts or hardlinks)", "reason_rejected": "non-portable, surprising filesystem behavior"}
+      ],
+      "weighting_logic": "Threat model is path-string injection. Symlinks placed by the harness itself are trusted. Tool-level allowlist is the real 'can the agent read here?' gate; server path-safety should only reject user-supplied paths that try to escape via string manipulation.",
+      "confidence": "high",
+      "reversibility": "easy"
+    }
+  ]
+}

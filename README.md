@@ -10,7 +10,7 @@ Multi-agent? Run multiple instances in different directories. There is no
 built-in orchestrator, no message bus, no agent framework. The filesystem is
 the coordination surface.
 
-Status: **v0.0.2 — pre-alpha.** The architecture is in place; the ideas on top
+Status: **v0.0.3 — pre-alpha.** The architecture is in place; the ideas on top
 of it are up to you.
 
 ---
@@ -26,110 +26,135 @@ of it are up to you.
 │                           it; localhost:8080)   │
 └─────────────────────────────────────────────────┘
 
-./your-project/
-├── .rness/           ← agent config, paradigms, skills, knowledge
-│   ├── AGENT.md              identity
-│   ├── MOTIVATION.md         evolving drive
-│   ├── paradigms/default.md  interaction conventions
-│   ├── skills/               user-added (SKILL.md or flat .md);
-│   │                         toggle on/off in the UI
-│   ├── routines/             user-added
-│   ├── policies/
-│   │   └── requests.md       seed: long-horizon request tracking
-│   ├── requests/             active request .md files
-│   │   └── done/             moved here when user clicks "mark done"
-│   ├── knowledge/
-│   │   ├── user-profile.md   what the agent knows about you
-│   │   └── session-logs/     one .md per day, full transcript
-│   └── models/providers.md
-├── infoworld/        ← grounded truth store
-│   ├── wiki/                 wikipedia dumps (user-populated)
-│   └── personal/             your own reference material
+~/enough/                ← install dir (the "home base")
+├── defaults/            ← source-of-truth templates for every new project
+│   ├── AGENT.md
+│   ├── MOTIVATION.md
+│   ├── paradigms/default.md
+│   ├── policies/{requests,context-management,read-allowlist}.md
+│   ├── models/providers.md
+│   ├── skills/          ← drop a skill folder here to make it global
+│   └── routines/
+├── infoworld/           ← per-user shared knowledge store
+│   ├── wiki/
+│   ├── personal/
+│   └── public/
+├── weights/             ← GGUF model file(s)
+├── enough/              ← the Python package (CLI, server, skeleton, tools)
+├── bootstrap.sh
+└── llama_server.sh
+
+./your-project/          ← any directory where you run `enough`
+├── .rness/
+│   ├── AGENT.md                     (COPY — diverges per project)
+│   ├── MOTIVATION.md                (COPY)
+│   ├── paradigms/default.md         (symlink → ~/enough/defaults/...)
+│   ├── policies/                    (symlinked)
+│   │   ├── requests.md
+│   │   ├── context-management.md
+│   │   └── read-allowlist.md
+│   ├── models/providers.md          (symlink)
+│   ├── skills/                      (one symlink per skill; toggle on/off in UI)
+│   ├── routines/                    (symlinked, user-authored)
+│   ├── requests/                    (per-project; active .md files)
+│   │   └── done/                    (user confirms via "mark done" button)
+│   └── knowledge/
+│       ├── user-profile.md          (COPY)
+│       └── session-logs/            (one .md per day)
+├── infoworld/                       (symlink → ~/enough/infoworld/)
 └── [whatever else you're working on]
 ```
 
+Symlinked files render **italic + muted** in the UI. Click a symlinked file,
+hit **"customize for this project"** in the preview pane, and the symlink is
+replaced with a project-local copy you can edit. Edit a file in
+`~/enough/defaults/` directly and every project still using the symlink
+picks up the change on the next message.
+
 ---
 
-## Prerequisites
+## Install
 
+### One-shot: `bootstrap.sh`
+
+```bash
+git clone git@github.com:0gsd/enough.git /tmp/enough-seed
+cd /tmp/enough-seed
+bash bootstrap.sh
+```
+
+The script is idempotent and walks through eight steps, explaining each
+before it runs:
+
+1. macOS platform check
+2. Homebrew presence
+3. Installs `llama.cpp`, `uv`, `tor` via brew (skips ones already installed)
+4. Clones (or pulls) `github.com/0gsd/enough` to `~/enough`
+5. `uv sync` inside `~/enough`
+6. Model weights: either moves an existing GGUF you point to, or downloads
+   the recommended Gemma 4 26B MoE Q4_K_M (~16 GB) from HuggingFace
+7. Drops a shim at `~/.local/bin/enough` so the CLI is on PATH
+8. Done message with next-steps
+
+After that you can delete `/tmp/enough-seed` — `~/enough` is the install.
+
+### Prerequisites if you're skipping the script
+
+- **macOS** (Linux support is on the roadmap; nothing here is fundamentally
+  Mac-only, it just hasn't been tested)
 - **Python 3.11+**
+- **Homebrew**
 - **llama-server** (from [llama.cpp](https://github.com/ggml-org/llama.cpp))
-  listening on `http://localhost:8080` with a GGUF model loaded.
-  Recommended model: [ggml-org/gemma-4-26B-A4B-it-GGUF][g4] Q4_K_M — a 26B MoE
-  with only 4B active parameters, ~16 GB on disk, runs well on Apple Silicon.
-- [`uv`](https://docs.astral.sh/uv/) or `pip` for installing.
+  listening on `http://localhost:8080`
+- **[uv](https://docs.astral.sh/uv/)**
+- A GGUF model in `~/enough/weights/`. Recommended:
+  [ggml-org/gemma-4-26B-A4B-it-GGUF][g4] Q4_K_M — 26B MoE, ~4B active
+  parameters, ~16 GB on disk, fast on Apple Silicon.
 
 [g4]: https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF
 
 ---
 
-## Quick start
+## Running
 
 ```bash
-# 1. get llama-server on PATH (macOS homebrew shown; see llama.cpp README for others)
-brew install llama.cpp
+# Start the LLM (once per boot; bundled toggle script handles flags):
+MODEL=~/enough/weights/gemma-4-26B-A4B-it-Q4_K_M.gguf ~/enough/llama_server.sh start
 
-# 2. download a GGUF somewhere on disk, e.g.:
-#    ~/models/gemma-4-26B-A4B-it-Q4_K_M.gguf
-
-# 3. clone and install enough
-git clone git@github.com:0gsd/enough.git
-cd enough
-uv sync                    # or: pip install -e .
-
-# 4. start llama-server (the bundled toggle script handles the flags)
-MODEL=~/models/gemma-4-26B-A4B-it-Q4_K_M.gguf ./llama_server.sh start
-
-# 5. launch enough in any project directory
-cd ~/my-new-project
-uv run --project /path/to/enough enough        # or just `enough` if installed globally
+# Go to any directory and launch enough there:
+cd ~/my-project && enough
 ```
 
-`enough` will:
-1. Create a `.rness/` and `infoworld/` skeleton if they don't exist.
-2. Open a browser tab at <http://127.0.0.1:3456>.
-3. Put you face-to-face with a blank-slate agent who wants to help you define
-   what this instance of `enough` is for.
+The browser opens to `http://127.0.0.1:3456`. First launch in a new
+directory creates `.rness/` and symlinks the defaults in. Subsequent
+launches in the same dir reuse what's there.
 
-### Flags
+### CLI flags
 
 ```
-enough [--dir PATH] [--port N] [--llm-url URL] [--no-browser]
+enough [--dir PATH] [--port N] [--llm-url URL] [--no-browser] [--max-tool-iters N]
 ```
 
 | flag | default | notes |
 |---|---|---|
-| `--dir` | cwd | project directory |
+| `--dir` | cwd | project directory; refuses to run inside `~/enough/` itself |
 | `--port` | `3456` | web UI port |
 | `--llm-url` | `http://localhost:8080` | where llama-server is |
-| `--no-browser` | off | don't auto-open |
+| `--no-browser` | off | don't auto-open the tab |
+| `--max-tool-iters` | `50` | cap on tool invocations per user turn |
 
----
-
-## `./llama_server.sh` — the bundled toggle
-
-Optional convenience. Configurable via env vars:
+### `llama_server.sh` — LLM toggle
 
 ```bash
-MODEL=~/models/something.gguf ./llama_server.sh start    # start
-./llama_server.sh stop                                    # stop
-./llama_server.sh status                                  # status + health
-./llama_server.sh logs                                    # tail log
-./llama_server.sh                                         # toggle
+MODEL=<path> ./llama_server.sh start|stop|status|logs|toggle
 ```
 
-Defaults: `HOST=127.0.0.1 PORT=8080 NGL=99 CTX=8192`. Override any by
-exporting. Runtime state (pid, log) goes into the gitignored `.llama-server/`
-next to the script.
+Env defaults: `HOST=127.0.0.1 PORT=8080 NGL=99 CTX=32768 PARALLEL=1`.
+Override any by exporting. Runtime state (pid, log) goes into
+`.llama-server/` next to the script; that directory is gitignored.
 
-If you'd rather run llama-server yourself, the canonical invocation is:
-
-```bash
-llama-server -m <path.gguf> --host 127.0.0.1 --port 8080 -ngl 99 -c 8192 --jinja
-```
-
-The `--jinja` flag is important — it makes llama-server use the chat template
-embedded in the GGUF, which `enough` relies on.
+The `--jinja` flag is applied automatically — it makes llama-server use the
+chat template embedded in the GGUF, which `enough` relies on.
 
 ---
 
@@ -137,57 +162,73 @@ embedded in the GGUF, which `enough` relies on.
 
 Everything about your agent's identity, behavior, and memory lives here as
 plain text. The system prompt is **re-assembled from these files on every
-request**, so edits take effect on the very next message — no restart needed.
+request** — edits take effect on the very next message, no restart needed.
 
-- `AGENT.md` — who the agent is. Initially blank-slate.
-- `MOTIVATION.md` — accumulated learning. The agent proposes updates at
-  session end; you approve or edit before saving.
-- `paradigms/default.md` — the active interaction paradigm. Session
-  structure, output conventions, archival policy, security posture. Make more
-  paradigms as you need them; for v0.02 only `default.md` is loaded.
-- `skills/` — drop-in skills. Two layouts supported:
-  `.rness/skills/<name>/SKILL.md` (folder-based, Claude Code convention) or
-  `.rness/skills/<name>.md` (flat). Auto-loaded into the system prompt.
-  Toggle on/off in the sidebar without moving files; disabled skills are
-  listed in `.rness/skills/.disabled`.
-- `policies/` — policy files auto-loaded into the system prompt under a
-  `# Policies` section. Ships with `requests.md` (see below); add your own
-  conventions here.
-- `requests/` + `requests/done/` — long-horizon work tracking. The agent
-  creates an `.md` file per complex multi-step request, maintains it across
-  turns (sub-requests → tasks → end output), and the user clicks "mark done"
-  in the preview pane to move it into `done/`. See the seed policy.
-- `routines/` — user-populated, not auto-loaded.
-- `knowledge/session-logs/` — one `.md` per day, every exchange appended,
-  including tool calls.
-- `knowledge/user-profile.md` — what the agent knows about you. Starts empty.
+Files fall into three categories:
+
+**Copies (per-project, diverge from day one):**
+- `AGENT.md` — who the agent is.
+- `MOTIVATION.md` — accumulated learning; agent proposes updates at session
+  end, you apply.
+- `knowledge/user-profile.md` — what the agent knows about you.
+
+**Symlinks to `~/enough/defaults/` (global defaults, upgrade-in-place):**
+- `paradigms/default.md` — session structure, output conventions, security
+  posture.
+- `policies/requests.md` — long-horizon request tracking convention.
+- `policies/context-management.md` — how to sense pressure and gracefully
+  reset.
+- `policies/read-allowlist.md` — which paths OUTSIDE the project dir the
+  agent may read (default: `~/enough/` only).
 - `models/providers.md` — model/provider notes.
+- `skills/<name>/` — symlinked individually per skill. Drop a folder in
+  `~/enough/defaults/skills/` to make it global; drop directly into a
+  project's `.rness/skills/` to keep it project-local.
+- `routines/*.md` — same pattern.
+
+**Per-project, not sourced from defaults:**
+- `requests/` + `requests/done/` — active and completed requests.
+- `knowledge/session-logs/<YYYY-MM-DD>.md` — every exchange, written by
+  the harness.
 
 Optional:
-- `INTENTION.md` — if you put one here, it's injected into the system prompt
-  as the current session intention.
+- `INTENTION.md` — if present, injected as the current session intention.
 
-### Edit any of these in-browser
+### Editing in the UI
 
-Click a file in the sidebar → the preview pane opens. Hit the **edit**
-button in the preview chrome → inline textarea with save / cancel. All
-edits write straight to disk and take effect on the next message. You can
-still use your normal editor; it's just a convenience for quick paradigm
-tweaks.
+Click a file in the sidebar → preview pane opens. If it's a direct file
+(copy), hit **edit** → textarea → **save** / **cancel**. If it's a symlinked
+global default, you'll see a **"customize for this project"** button
+instead — one click replaces the symlink with a project-local copy, and the
+edit button appears.
+
+The sidebar also has:
+- **skills** — toggle any skill on/off. Disabled skills are excluded from
+  the system prompt and tracked in `.rness/skills/.disabled`.
+- **requests** — active request files, newest first. Click to preview; the
+  preview chrome grows a **mark done** button that moves the file into
+  `done/`.
 
 ---
 
-## `infoworld/` — grounded knowledge store
+## `infoworld/` — shared grounded knowledge
+
+Lives at `~/enough/infoworld/`, symlinked into every project as `./infoworld`.
+All projects on your machine see the same files; writes to
+`infoworld/personal/` etc. persist across projects.
 
 ```
-infoworld/
-├── wiki/       ← wikipedia dumps, offline reference
-└── personal/   ← your own docs, bibles, notes, whatever
+~/enough/infoworld/
+├── wiki/       ← wikipedia dumps (user-populated)
+├── personal/   ← your own docs, bibles, notes
+└── public/     ← reference material that could reasonably be shared or
+                  published (same behavior as personal/ for now; name
+                  reserves the slot for a future distinction)
 ```
 
-For v0.01 this is **just a directory convention**. The system prompt tells the
-agent to `grep` here before relying on training data. Smarter indexing /
-retrieval is a future-version concern.
+The system prompt tells the agent to `grep` / `read_file` here before
+relying on training data. Smarter indexing / retrieval is a future-version
+concern.
 
 ### Populating `infoworld/wiki/`
 
@@ -198,68 +239,101 @@ Two common paths:
    [`zimdump`](https://github.com/openzim/zim-tools) to extract plaintext.
 2. **Wikipedia dumps + WikiExtractor.** Grab `enwiki-latest-pages-articles.xml.bz2`
    from <https://dumps.wikimedia.org/enwiki/> and run
-   [WikiExtractor](https://github.com/attardi/wikiextractor) for plaintext
-   output in a nested directory structure.
-
-Then drop the plaintext into `infoworld/wiki/`. The agent will find it via
-`shell` + `grep`.
+   [WikiExtractor](https://github.com/attardi/wikiextractor).
 
 ---
 
 ## Tools the agent has
 
-The model gets three tools, described in its system prompt:
+Three tools, described in the system prompt:
 
-- `read_file` — read a text file, relative path only.
-- `write_file` — write a text file, relative path only, `mkdir -p` behavior.
-- `shell` — run any shell command in the project directory.
+- `read_file` — read a text file. Relative paths stay inside the project;
+  absolute paths (e.g. `~/enough/defaults/...`) are allowed iff they match
+  the **read allowlist** (`.rness/policies/read-allowlist.md`).
+- `write_file` — write a text file. Relative paths only, `mkdir -p`
+  behavior. Writing to `.rness/requests/done/` is blocked at the harness
+  level — the "mark done" UI button is the only legitimate way to move
+  files there (user approval = the rename).
+- `shell` — run any shell command in the project directory. Unrestricted
+  (the deliberate "nuclear option"); use sparingly.
 
-Rules:
-- Paths are relative to the project directory. Absolute paths and `../`
-  traversal are rejected.
-- Shell has no sandbox in v0.01. Everything is logged.
-- Tool loop is capped at **10 iterations per user turn.**
-
-Tool calls use an XML-ish tag format the model emits inline; the server parses
-them with regex (the model's output isn't guaranteed to be well-formed XML, so
-we don't use an XML parser). See
-[`enough/prompt.py`](enough/prompt.py) for the exact instructions.
+Tool calls use an XML-ish tag format the model emits inline; the server
+parses them with regex. Tool loop is capped per turn (default 50, set via
+`--max-tool-iters`).
 
 ---
 
-## What v0.02 *doesn't* do
+## Customizing globally
+
+You edit `~/enough/defaults/` and every project still using the symlinks
+picks up the change immediately.
+
+```bash
+nvim ~/enough/defaults/paradigms/default.md          # change the paradigm for ALL projects
+nvim ~/enough/defaults/policies/read-allowlist.md    # broaden read access
+ln -s /path/to/my/new-skill ~/enough/defaults/skills/ # add a global skill
+```
+
+`~/enough/` is a git checkout of `github.com/0gsd/enough`. If you plan to
+maintain your own edits and still pull upstream updates, fork the repo, set
+`~/enough`'s `origin` to your fork, and add upstream as a second remote:
+
+```bash
+cd ~/enough
+git remote set-url origin git@github.com:YOU/enough.git
+git remote add upstream git@github.com:0gsd/enough.git
+git pull upstream main    # pull upstream changes into your fork
+```
+
+---
+
+## What v0.0.3 *doesn't* do
 
 Deliberate omissions — see [bootstrap spec](dev/) for the full thinking:
 
 - No multi-agent coordination (one instance = one agent).
-- No MOTIVATION auto-update (model proposes; you apply).
+- No MOTIVATION.md auto-update (model proposes; you apply).
 - No RAG / embedding / vector store. The model greps.
 - No authentication. Localhost only.
 - No persistent conversation history across restarts (session logs remain).
 - No paradigm switching mid-session.
+- No Linux / Windows (macOS only for now).
 
-Added in v0.02 (see `dev/.amanuensis/`):
+Shipped in v0.0.2:
 - Auto-load for `skills/` and `policies/` into the system prompt.
 - Inline editor in the preview pane.
 - Skill on/off toggles (UI + `.disabled` file).
 - Requests tracking (folders + seed policy + sidebar + mark-done).
 
+Shipped in v0.0.3:
+- `~/enough/` as the install dir.
+- `bootstrap.sh` guided installer.
+- Global defaults under `~/enough/defaults/`; symlinks + "customize for
+  this project" UI affordance.
+- `~/enough/infoworld/` as per-user shared knowledge store, symlinked into
+  projects.
+- Read allowlist policy; absolute-path reads now allowed inside the
+  allowlisted prefixes.
+- Kernel-level guards: refuse to launch inside `~/enough/`, block writes to
+  `.rness/requests/done/`, detect slug-drift duplicate request files.
+
 ---
 
 ## Development
 
-Decision records, process docs, and session checkpoints for this build live
+Decision records, process docs, and session checkpoints for each build live
 under [`dev/.amanuensis/`](dev/.amanuensis). They capture the what/why of
-every non-trivial choice during the v0.01 build, for future-self or
-contributors.
+every non-trivial choice since v0.01 — helpful for understanding why things
+are the way they are and when something was a deliberate constraint vs. a
+gap to fill.
 
 ```bash
 uv sync               # create .venv, install deps
 uv run enough --help
 ```
 
-No tests yet. v0.0.1 was verified via manual end-to-end smoke against a
-running llama-server.
+No tests yet. Each version has been verified via manual end-to-end smoke
+against a running llama-server + browser session.
 
 ---
 
