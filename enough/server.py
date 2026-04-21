@@ -412,16 +412,23 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
         return await api_requests()  # type: ignore[return-value]
 
     def _resolve_project_path(path: str) -> Path:
-        """Shared path-safety helper for /api/file{,/raw} and POST writes."""
+        """Shared path-safety helper for /api/file{,/raw} and POST writes.
+
+        Containment check is done on the LOGICAL path (composition) so that
+        symlinks living at a valid relative location inside .rness/ and
+        pointing outside the project — intentional, used for global
+        defaults — aren't rejected. The tool layer has its own allowlist
+        for follow-through reads; this helper guards only against path-
+        string traversal (absolute paths and `..` components)."""
         p = Path(path)
         if p.is_absolute() or ".." in p.parts:
             raise HTTPException(400, "invalid path")
-        target = (project_dir / p).resolve()
-        try:
-            target.relative_to(project_dir.resolve())
-        except ValueError:
-            raise HTTPException(400, "path escapes project dir") from None
-        return target
+        # Compose against the resolved project root so we don't end up with
+        # /tmp-vs-/private/tmp mismatches on macOS. Don't resolve the final
+        # target — that would follow symlinks and break containment checks
+        # for in-tree symlinks.
+        project_root = project_dir.resolve()
+        return project_root / p
 
     def _is_request_file(path: str) -> bool:
         p = Path(path)
