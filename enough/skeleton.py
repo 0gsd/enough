@@ -69,9 +69,15 @@ This is the base interaction paradigm. It defines how sessions work.
 - MOTIVATION.md updates are proposed at session end, not applied automatically
 
 ## Security Posture
-- Tool use is unrestricted within the project directory
-- No network access (you are offline)
-- No access outside the project directory
+- Tool use is unrestricted within the project directory.
+- Network access is gated per skill (e.g. the-internet uses Tor).
+- Reading files outside the project directory is allowed if explicitly
+  asked, as is finding a local file and making a copy into the project
+  directory.
+- Do not move files out of or into the project directory yourself.
+- Do not write files outside the project directory.
+- In general, do not delete files (including within the project directory)
+  unless explicitly asked and confirmed by the user.
 """
 
 USER_PROFILE_MD = """\
@@ -336,11 +342,14 @@ relevant knowledge before answering from training data.
 
 - `wiki/` — Wikipedia article dumps (user-populated; see the enough README for
   how to download and extract plaintext from ZIM files or database dumps).
-- `personal/` — Whatever reference material you want the agent to treat as
+- `personal/` — Whatever reference material YOU want the agent to treat as
   authoritative: meeting notes, project docs, reading excerpts, bibles, etc.
+- `public/` — Reference material that could reasonably be shared or published
+  (same behavior as `personal/` for now; the distinction becomes meaningful
+  in a future release).
 
-For v0.01, the model greps these files using the `shell` tool. Future versions
-will provide indexed search.
+For v0.0.x, the model greps these files using the `shell` tool. Future
+versions will provide indexed search.
 """
 
 SKELETON_FILES: dict[str, str] = {
@@ -362,6 +371,7 @@ EMPTY_DIRS: tuple[str, ...] = (
     ".rness/requests/done",
     "infoworld/wiki",
     "infoworld/personal",
+    "infoworld/public",
 )
 
 
