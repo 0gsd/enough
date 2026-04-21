@@ -95,6 +95,13 @@
     text-decoration: none;
   }
   ul.tree li.file a:hover { color: var(--accent-user); }
+  /* Symlinked entries render in italic + slightly dimmer — signals "global default". */
+  ul.tree li.file.symlink a,
+  ul.tree li.dir.symlink > .dir-name {
+    font-style: italic;
+    color: var(--fg-faint);
+  }
+  ul.tree li.file.symlink a:hover { color: var(--accent-user); }
 
   ul.skills {
     list-style: none;
@@ -304,6 +311,20 @@
   .preview-actions button:hover { color: var(--fg); border-color: var(--fg-faint); }
   .preview-actions .mark-done { color: var(--accent-agent); border-color: var(--accent-agent); }
   .preview-actions .mark-done:hover { background: color-mix(in oklab, var(--accent-agent) 15%, transparent); }
+  .preview-actions .customize-btn { color: var(--accent-tool); border-color: var(--accent-tool); }
+  .preview-actions .customize-btn:hover { background: color-mix(in oklab, var(--accent-tool) 15%, transparent); }
+  .symlink-note {
+    font-size: 11px;
+    color: var(--fg-faint);
+    padding: 0 12px;
+    font-style: italic;
+  }
+  .symlink-note code {
+    font-size: 11px;
+    color: var(--fg-muted);
+    background: transparent;
+    padding: 0;
+  }
   #preview textarea.file-edit {
     width: calc(100% - 24px);
     margin: 8px 12px;
@@ -599,6 +620,19 @@
     });
   }
 
+  async function customizeForProject(path) {
+    if (!confirm('break the symlink and create an editable project-local copy of this file?\n\n' + path)) return;
+    const fd = new FormData();
+    fd.append('path', path);
+    const r = await fetch('/api/file/customize', { method: 'POST', body: fd });
+    if (!r.ok) { alert('customize failed: ' + r.status + ' ' + r.statusText); return; }
+    const html = await r.text();
+    document.getElementById('preview-body').innerHTML = html;
+    htmx.process(document.getElementById('preview-body'));
+    // Refresh file tree so the symlink italic disappears.
+    htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+  }
+
   async function markRequestDone(path) {
     if (!confirm('mark this request complete and move it to .rness/requests/done/?')) return;
     const fd = new FormData();
@@ -617,6 +651,7 @@
   window.saveEdit = saveEdit;
   window.cancelEdit = cancelEdit;
   window.markRequestDone = markRequestDone;
+  window.customizeForProject = customizeForProject;
 
   // Disable the input while a turn is in flight.
   form.addEventListener('htmx:beforeRequest', () => {

@@ -97,8 +97,22 @@ def _walk_tree(root: Path, rel_parts: tuple[str, ...], depth: int) -> list[dict[
         if p.name in IGNORE_DIRS:
             continue
         rel = "/".join(rel_parts + (p.name,))
-        node = {"name": p.name, "path": rel, "is_dir": p.is_dir()}
-        if p.is_dir():
+        node = {
+            "name": p.name,
+            "path": rel,
+            "is_dir": p.is_dir(),
+            "is_symlink": p.is_symlink(),
+        }
+        # Recurse into directories — including directories reached via a
+        # symlink (infoworld/) — but don't recurse through a symlinked
+        # directory's OWN children to avoid amplifying the "symlinked"
+        # visual: the top-level link is the meaningful UI unit.
+        if p.is_dir() and not p.is_symlink():
+            node["children"] = _walk_tree(root, rel_parts + (p.name,), depth + 1)
+        elif p.is_dir() and p.is_symlink():
+            # Walk the symlinked dir's contents but mark the root entry as
+            # the symlink; children appear plain (they live in the symlink
+            # target, not in the project proper).
             node["children"] = _walk_tree(root, rel_parts + (p.name,), depth + 1)
         out.append(node)
     return out
@@ -112,14 +126,18 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
     out = ['<ul class="tree">']
     for n in nodes:
         path = n["path"].replace('"', "&quot;")
+        sym_cls = " symlink" if n.get("is_symlink") else ""
         if n["is_dir"]:
-            out.append(f'<li class="dir"><span class="dir-name">{n["name"]}/</span>')
+            out.append(
+                f'<li class="dir{sym_cls}">'
+                f'<span class="dir-name">{n["name"]}/</span>'
+            )
             if n.get("children"):
                 out.append(_tree_to_html(n["children"]))
             out.append("</li>")
         else:
             out.append(
-                f'<li class="file"><a href="#" '
+                f'<li class="file{sym_cls}"><a href="#" '
                 f'hx-get="/api/file?path={path}" hx-target="#preview-body" '
                 f'hx-swap="innerHTML" '
                 f'onclick="document.getElementById(\'preview\').classList.add(\'open\')"'
@@ -417,6 +435,19 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
             and parts[-1].endswith(".md")
         )
 
+    def _is_external_symlink(path_str: str) -> tuple[bool, Path | None]:
+        """Is `path` a symlink whose resolved target lives outside the project?
+        Returns (yes_external, target_abs) for the truthy case."""
+        raw = project_dir / path_str
+        if not raw.is_symlink():
+            return False, None
+        target = raw.resolve(strict=False)
+        try:
+            target.relative_to(project_dir.resolve())
+            return False, target  # resolves inside the project — treat as normal
+        except ValueError:
+            return True, target
+
     @app.get("/api/file", response_class=HTMLResponse)
     async def api_file(path: str = Query(...)) -> HTMLResponse:
         target = _resolve_project_path(path)
@@ -430,20 +461,62 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
             return HTMLResponse(
                 f'<div class="binary-file">binary file — {target.stat().st_size} bytes</div>'
             )
-        # Preview chrome: path header, body, and (JS-driven) edit toggle affordance.
+        # Preview chrome: path header, body, and context-sensitive action buttons.
+        external, sym_target = _is_external_symlink(path)
         mark_done_btn = (
             f'<button class="mark-done" onclick="markRequestDone(\'{_escape_html(path)}\')">mark done</button>'
             if _is_request_file(path)
             else ""
         )
+        if external:
+            sym_note = (
+                f'<div class="symlink-note">symlink → '
+                f'<code>{_escape_html(str(sym_target))}</code></div>'
+            )
+            action_btn = (
+                f'<button class="customize-btn" '
+                f'onclick="customizeForProject(\'{_escape_html(path)}\')">'
+                f'customize for this project</button>'
+            )
+        else:
+            sym_note = ""
+            action_btn = (
+                '<button class="edit-btn" onclick="enterEditMode()">edit</button>'
+            )
         return HTMLResponse(
             f'<div class="file-path" data-path="{_escape_html(path)}">{_escape_html(path)}</div>'
+            f'{sym_note}'
             f'<div class="preview-actions">'
             f'  {mark_done_btn}'
-            f'  <button class="edit-btn" onclick="enterEditMode()">edit</button>'
+            f'  {action_btn}'
             f'</div>'
             f'<pre class="file-body">{_escape_html(text)}</pre>'
         )
+
+    @app.post("/api/file/customize", response_class=HTMLResponse)
+    async def api_file_customize(request: Request) -> HTMLResponse:
+        form = await request.form()
+        path = (form.get("path") or "").strip()
+        if not path:
+            raise HTTPException(400, "missing path")
+        raw = project_dir / path
+        if not raw.is_symlink():
+            raise HTTPException(400, "not a symlink — nothing to customize")
+        external, sym_target = _is_external_symlink(path)
+        if not external or sym_target is None:
+            raise HTTPException(400, "symlink resolves inside the project")
+        # Read the current target content, drop the symlink, write a copy.
+        try:
+            content = sym_target.read_text(encoding="utf-8")
+        except OSError as e:
+            raise HTTPException(500, f"could not read symlink target: {e}") from None
+        try:
+            raw.unlink()
+        except OSError as e:
+            raise HTTPException(500, f"could not remove symlink: {e}") from None
+        raw.write_text(content, encoding="utf-8")
+        # Return the refreshed preview fragment (now editable).
+        return await api_file(path=path)  # type: ignore[return-value]
 
     @app.get("/api/file/raw", response_class=PlainTextResponse)
     async def api_file_raw(path: str = Query(...)) -> PlainTextResponse:

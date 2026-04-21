@@ -93,14 +93,87 @@ def first_tool_call_end(buffered_text: str) -> int | None:
     return m.end() if m else None
 
 
-def _safe_join(project_dir: Path, rel: str) -> Path:
-    """Resolve `rel` under `project_dir`. Raise ValueError on escape."""
+_ALLOWLIST_RE = re.compile(
+    r"^\s*-\s+`?(?P<path>[^`\s][^`]*?)`?\s*$"
+)
+
+
+def _read_allowlist(project_dir: Path) -> list[Path]:
+    """Parse absolute-path prefixes from `.rness/policies/read-allowlist.md`.
+
+    Matches markdown bullets of the form:
+        - `~/enough/`
+        - `/Users/whoever/stuff/`
+
+    Non-matching lines (prose, headers) are ignored. Returns resolved Paths.
+    Missing policy file → empty list (strict containment).
+    """
+    policy = project_dir / ".rness" / "policies" / "read-allowlist.md"
+    if not policy.is_file():
+        return []
+    out: list[Path] = []
+    in_section = False
+    for line in policy.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip().lower()
+        if stripped.startswith("## "):
+            in_section = stripped.startswith("## allowlisted prefixes")
+            continue
+        if not in_section:
+            continue
+        m = _ALLOWLIST_RE.match(line)
+        if not m:
+            continue
+        raw = m.group("path").strip()
+        if not raw:
+            continue
+        expanded = Path(raw).expanduser()
+        try:
+            out.append(expanded.resolve(strict=False))
+        except OSError:
+            continue
+    return out
+
+
+def _under_any(target: Path, roots: list[Path]) -> bool:
+    for root in roots:
+        try:
+            target.relative_to(root)
+            return True
+        except ValueError:
+            continue
+    return False
+
+
+def _safe_join(
+    project_dir: Path,
+    rel: str,
+    *,
+    allow_outside_read: bool = False,
+) -> Path:
+    """Resolve `rel` under `project_dir`. Raise ValueError on escape.
+
+    With `allow_outside_read=True`, ABSOLUTE paths matching the read
+    allowlist (`.rness/policies/read-allowlist.md`) are permitted. Relative
+    `../` escapes are always rejected — the agent should use absolute
+    paths when reaching outside the project.
+    """
     if not rel:
         raise ValueError("empty path")
-    p = Path(rel)
+    p = Path(rel).expanduser()
     if p.is_absolute():
-        raise ValueError(f"absolute paths rejected: {rel!r}")
-    # Resolve and check containment. Use os.path.realpath to handle symlinks.
+        if not allow_outside_read:
+            raise ValueError(f"absolute paths rejected: {rel!r}")
+        target = p.resolve(strict=False)
+        allowlist = _read_allowlist(project_dir)
+        if not _under_any(target, allowlist):
+            pretty = ", ".join(str(a) for a in allowlist) or "(empty)"
+            raise ValueError(
+                f"path {rel!r} is outside the project and not on the read "
+                f"allowlist. allowlisted prefixes: {pretty}. to add a prefix, "
+                f"edit .rness/policies/read-allowlist.md."
+            )
+        return target
+    # Relative path — contained in project, as before.
     target = (project_dir / p).resolve(strict=False)
     root = project_dir.resolve(strict=False)
     try:
@@ -185,7 +258,7 @@ def run_read_file(project_dir: Path, call: ToolCall) -> ToolResult:
     if not call.path:
         return ToolResult("read_file", "", False, "error: missing <path>")
     try:
-        target = _safe_join(project_dir, call.path)
+        target = _safe_join(project_dir, call.path, allow_outside_read=True)
     except ValueError as e:
         return ToolResult("read_file", call.path, False, f"error: {e}")
     if not target.exists():
