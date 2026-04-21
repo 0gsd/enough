@@ -197,14 +197,16 @@ def _populate_routine_symlinks(project_dir: Path, defaults_root: Path) -> None:
 
 
 def ensure_skeleton(project_dir: Path) -> bool:
-    """Create `.rness/` + `infoworld` symlink if missing. Returns True on
-    first-time creation, False if `.rness/` already existed."""
+    """Create `.rness/` + `infoworld` symlink if missing, AND sync global
+    skills/routines on every call (idempotent). Returns True on first-time
+    `.rness/` creation, False if it already existed.
+
+    The skill/routine sync runs on every launch so newly-installed global
+    skills appear in existing projects too — with default-off status, per
+    the policy. It's idempotent: already-symlinked skills and already-
+    disabled entries are left alone."""
     rness = project_dir / ".rness"
-    if rness.exists():
-        # Even on re-entry, make sure the global infoworld root exists — it's
-        # per-user, not per-project.
-        ensure_global_infoworld()
-        return False
+    new_project = not rness.exists()
 
     defaults = _install_defaults_root()
     if not defaults.is_dir():
@@ -213,40 +215,41 @@ def ensure_skeleton(project_dir: Path) -> bool:
             "The installation looks broken — re-run bootstrap.sh."
         )
 
-    # Ensure global infoworld exists (per user).
+    # Always ensure global infoworld exists (per user, not per project).
     infoworld_root = ensure_global_infoworld()
 
-    # Symlinks + copies from defaults.
-    for src_rel, dst_rel, mode in _SKELETON_PLAN:
-        src = defaults / src_rel
-        if not src.is_file():
-            continue  # missing default = skip this entry (e.g. custom fork)
-        dst = project_dir / dst_rel
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        if mode == "symlink":
-            dst.symlink_to(src.resolve())
-        elif mode == "copy":
-            shutil.copy2(src, dst)
+    if new_project:
+        # First-time setup: copies, symlinks, empty dirs, infoworld link.
+        for src_rel, dst_rel, mode in _SKELETON_PLAN:
+            src = defaults / src_rel
+            if not src.is_file():
+                continue  # missing default = skip this entry
+            dst = project_dir / dst_rel
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            if mode == "symlink":
+                dst.symlink_to(src.resolve())
+            elif mode == "copy":
+                shutil.copy2(src, dst)
 
-    # Per-project files.
-    for rel, body in _PROJECT_LOCAL_FILES.items():
-        target = project_dir / rel
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(body, encoding="utf-8")
+        for rel, body in _PROJECT_LOCAL_FILES.items():
+            target = project_dir / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(body, encoding="utf-8")
 
-    # Empty dirs with .gitkeep.
-    for rel in _EMPTY_DIRS:
-        d = project_dir / rel
-        d.mkdir(parents=True, exist_ok=True)
-        (d / ".gitkeep").touch()
+        for rel in _EMPTY_DIRS:
+            d = project_dir / rel
+            d.mkdir(parents=True, exist_ok=True)
+            (d / ".gitkeep").touch()
 
-    # Skills / routines symlink fan-out (from defaults/skills, defaults/routines).
+        infoworld_link = project_dir / "infoworld"
+        if not infoworld_link.exists() and not infoworld_link.is_symlink():
+            infoworld_link.symlink_to(
+                infoworld_root.resolve(), target_is_directory=True
+            )
+
+    # ALWAYS run (idempotent): sync global skills/routines into the project.
+    # Picks up any new globals added after this project was first created.
     _populate_skill_symlinks(project_dir, defaults)
     _populate_routine_symlinks(project_dir, defaults)
 
-    # infoworld/ symlink at project root.
-    infoworld_link = project_dir / "infoworld"
-    if not infoworld_link.exists() and not infoworld_link.is_symlink():
-        infoworld_link.symlink_to(infoworld_root.resolve(), target_is_directory=True)
-
-    return True
+    return new_project
