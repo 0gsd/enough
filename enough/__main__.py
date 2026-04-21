@@ -63,6 +63,34 @@ def main(argv: list[str] | None = None) -> int:
     project_dir = args.dir.resolve()
     project_dir.mkdir(parents=True, exist_ok=True)
 
+    # Refuse to launch inside the install directory (~/enough) or anywhere
+    # beneath it. Creating a .rness/ there would write symlinks pointing at
+    # global defaults that are in the same tree — confusing at best,
+    # corrupting at worst. Keep the install immutable to enough itself.
+    install_dir = Path.home() / "enough"
+    try:
+        install_resolved = install_dir.resolve(strict=False)
+        project_dir.relative_to(install_resolved)
+    except ValueError:
+        pass  # project_dir is NOT under ~/enough/ — fine
+    else:
+        print(
+            f"error: {project_dir} is inside the enough install directory "
+            f"({install_resolved}).",
+            file=sys.stderr,
+        )
+        print(
+            "       enough refuses to create a .rness/ here because its files would "
+            "collide with global defaults.",
+            file=sys.stderr,
+        )
+        print(
+            "       cd to any other directory and run `enough` there — e.g. "
+            "`mkdir ~/my-project && cd $_ && enough`.",
+            file=sys.stderr,
+        )
+        return 2
+
     ok, why = check_llm_reachable(args.llm_url)
     if not ok:
         print(f"error: cannot reach llama-server at {args.llm_url}", file=sys.stderr)
