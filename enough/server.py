@@ -32,6 +32,7 @@ from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 
+from . import __version__
 from .llm import LLMError, stream_chat
 from .logger import ExchangeLog, log_exchange
 from .prompt import assemble_system_prompt, list_skills, set_skill_enabled
@@ -322,6 +323,7 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
             "<!-- HISTORY -->",
             _render_turn_from_history(session.history),
         )
+        html = html.replace("<!-- VERSION -->", f"v{__version__}")
         # No-cache so edits-in-place don't require force-reload during dev.
         return HTMLResponse(html, headers={"Cache-Control": "no-store, must-revalidate"})
 
@@ -442,6 +444,10 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
             and parts[-1].endswith(".md")
         )
 
+    def _is_skill_file(path: str) -> bool:
+        parts = Path(path).parts
+        return len(parts) >= 2 and parts[0] == ".rness" and parts[1] == "skills"
+
     def _is_external_symlink(path_str: str) -> tuple[bool, Path | None]:
         """Is `path` a symlink whose resolved target lives outside the project?
         Returns (yes_external, target_abs) for the truthy case."""
@@ -475,7 +481,18 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
             if _is_request_file(path)
             else ""
         )
-        if external:
+        if _is_skill_file(path):
+            # Skills are global. No in-UI edit or customize — edit at the
+            # source under ~/enough/defaults/skills/<name>/ instead.
+            sym_note = (
+                '<div class="symlink-note">'
+                'skill file — edit globally at '
+                '<code>~/enough/defaults/skills/</code>; '
+                'toggle on/off for this project in the sidebar.'
+                '</div>'
+            )
+            action_btn = ""
+        elif external:
             sym_note = (
                 f'<div class="symlink-note">symlink → '
                 f'<code>{_escape_html(str(sym_target))}</code></div>'
@@ -547,6 +564,12 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
             raise HTTPException(400, "missing content")
         if not path:
             raise HTTPException(400, "missing path")
+        if _is_skill_file(path):
+            raise HTTPException(
+                403,
+                "skill files are not editable from the project UI — "
+                "edit globally at ~/enough/defaults/skills/",
+            )
         target = _resolve_project_path(path)
         if target.is_dir():
             raise HTTPException(400, "is a directory")

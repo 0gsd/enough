@@ -145,16 +145,22 @@ def ensure_global_infoworld() -> Path:
 
 
 def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
-    """For each skill in ~/enough/defaults/skills/, symlink it into the
-    project's .rness/skills/. Individual skills can be 'customized' by
-    replacing their symlink with a copy. Skills that don't exist in
-    defaults/ are ignored here; users can still drop project-local skills
-    into `.rness/skills/` directly."""
+    """For each skill in `<defaults>/skills/`, symlink it into the project's
+    `.rness/skills/`. Globally-installed skills default to DISABLED in each
+    new project — every symlinked name is also added to
+    `.rness/skills/.disabled`, so the sidebar lists them as off and the
+    user opts in by toggling them on.
+
+    Skills that don't exist in defaults/ are ignored here; users can still
+    drop project-local skills into `.rness/skills/` directly (they'll
+    appear in the sidebar as enabled, since they aren't in .disabled)."""
     src_skills = defaults_root / "skills"
     if not src_skills.is_dir():
         return
     dst_skills = project_dir / ".rness" / "skills"
     dst_skills.mkdir(parents=True, exist_ok=True)
+
+    disabled_names: list[str] = []
     for entry in sorted(src_skills.iterdir()):
         if entry.name.startswith("."):
             continue
@@ -162,6 +168,18 @@ def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
         if dst.exists() or dst.is_symlink():
             continue
         dst.symlink_to(entry.resolve())
+        disabled_names.append(entry.name)
+
+    if disabled_names:
+        disabled_file = dst_skills / ".disabled"
+        existing = set()
+        if disabled_file.is_file():
+            existing = {
+                ln.strip() for ln in disabled_file.read_text(encoding="utf-8").splitlines()
+                if ln.strip() and not ln.startswith("#")
+            }
+        existing.update(disabled_names)
+        disabled_file.write_text("\n".join(sorted(existing)) + "\n", encoding="utf-8")
 
 
 def _populate_routine_symlinks(project_dir: Path, defaults_root: Path) -> None:
