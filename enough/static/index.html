@@ -21,6 +21,18 @@
     --border: #2e2e4a;
     --input-bg: #252542;
     --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+
+    /* Depth-based nav colors. Folders get progressively cooler/lighter;
+       files are closest to white. Symlinks a touch grayer than direct files. */
+    --nav-depth-1: #6b8cff;    /* royal blue — top-level folders (.rness, infoworld) */
+    --nav-depth-2: #8ea9ff;    /* direct children (paradigms, policies, skills…) */
+    --nav-depth-3: #b2c4ff;    /* grandchildren */
+    --nav-depth-4: #d4dcf0;    /* deeper */
+    --nav-file: #f0f0f8;       /* near-white — the thing you click */
+    --nav-file-symlink: #d4d4e0; /* slightly grayer, still near-white */
+    --nav-empty-dir: #5a5a75;  /* empty folder — dim, no zippy */
+    --zippy-color: var(--fg-muted);
+    --zippy-hover: var(--fg);
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
@@ -35,7 +47,7 @@
 
   /* ---------- Top bar ---------- */
   .topbar {
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex; align-items: center; gap: 10px;
     padding: 0 12px;
     height: 36px;
     border-bottom: 1px solid var(--border);
@@ -45,6 +57,7 @@
     color: var(--fg);
     font-weight: 600;
     letter-spacing: 0.3px;
+    margin-right: 4px;
   }
   .topbar .brand .dim { color: var(--fg-faint); font-weight: 400; margin-left: 8px; font-size: 12px; }
   .topbar button {
@@ -76,31 +89,86 @@
     padding: 10px 6px;
     font-size: 12.5px;
   }
-  .sidebar h3 {
+  /* Collapsible sidebar sections (requests / skills / project) */
+  .sidebar-section { margin-bottom: 6px; }
+  .sidebar-section h3.section-head {
     color: var(--fg-faint);
     font-size: 11px;
     font-weight: 500;
     margin: 4px 8px 6px 8px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
+    cursor: pointer;
+    user-select: none;
+    display: flex; align-items: center; gap: 6px;
   }
+  .sidebar-section h3.section-head:hover { color: var(--fg-muted); }
+  .sidebar-section h3.section-head .zippy {
+    display: inline-block;
+    width: 10px;
+    color: var(--zippy-color);
+    transition: transform 120ms ease;
+    font-size: 9px;
+  }
+  .sidebar-section.collapsed h3.section-head .zippy { transform: rotate(-90deg); }
+  .sidebar-section.collapsed .section-body { display: none; }
+
+  /* File tree */
   ul.tree, ul.tree ul {
-    list-style: none; margin: 0; padding-left: 12px;
+    list-style: none; margin: 0; padding-left: 14px;
   }
   ul.tree { padding-left: 4px; }
-  ul.tree li { padding: 1px 0; color: var(--fg-muted); }
-  ul.tree li.dir > .dir-name { color: var(--fg); }
+  ul.tree li { padding: 1px 0; }
+
+  .dir-row, .file-row {
+    display: flex; align-items: center; gap: 3px;
+    padding: 1px 0;
+  }
+  .dir-row { cursor: pointer; user-select: none; }
+  .dir-row:hover .dir-name { color: var(--nav-file); }
+
+  .zippy {
+    display: inline-block;
+    width: 10px;
+    color: var(--zippy-color);
+    font-size: 9px;
+    transition: transform 120ms ease;
+    flex-shrink: 0;
+  }
+  .zippy-spacer {
+    display: inline-block;
+    width: 10px;
+    flex-shrink: 0;
+  }
+  li.dir.collapsed > .dir-row > .zippy { transform: rotate(-90deg); }
+  li.dir.collapsed > ul.tree { display: none; }
+  li.dir.empty-folder > .dir-row > .dir-name { color: var(--nav-empty-dir); }
+
+  /* Depth-based folder colors. Each nested ul.tree bumps the depth. */
+  ul.tree li.dir.has-children > .dir-row > .dir-name               { color: var(--nav-depth-1); }
+  ul.tree ul.tree li.dir.has-children > .dir-row > .dir-name       { color: var(--nav-depth-2); }
+  ul.tree ul.tree ul.tree li.dir.has-children > .dir-row > .dir-name { color: var(--nav-depth-3); }
+  ul.tree ul.tree ul.tree ul.tree li.dir.has-children > .dir-row > .dir-name { color: var(--nav-depth-4); }
+
+  /* Collapsed folders with children pop slightly brighter — "there's stuff inside". */
+  li.dir.has-children.collapsed > .dir-row > .dir-name {
+    filter: brightness(1.15);
+    font-weight: 500;
+  }
+
+  /* Files: near-white regardless of depth. */
   ul.tree li.file a {
-    color: var(--fg-muted);
+    color: var(--nav-file);
     text-decoration: none;
   }
   ul.tree li.file a:hover { color: var(--accent-user); }
-  /* Symlinked entries render in italic + slightly dimmer — signals "global default". */
+
+  /* Symlinks (files and dirs): italic + slightly muted. */
   ul.tree li.file.symlink a,
-  ul.tree li.dir.symlink > .dir-name {
+  ul.tree li.dir.symlink > .dir-row > .dir-name {
     font-style: italic;
-    color: var(--fg-faint);
   }
+  ul.tree li.file.symlink a { color: var(--nav-file-symlink); }
   ul.tree li.file.symlink a:hover { color: var(--accent-user); }
 
   ul.skills {
@@ -375,28 +443,38 @@
 
 <div class="topbar">
   <div class="brand">enough<span class="dim"><!-- VERSION --></span></div>
-  <div>
-    <button id="reset-btn" title="Clear the in-memory conversation (session log is preserved)">reset</button>
-    <button id="toggle-sidebar">≡ files</button>
-  </div>
+  <button id="ui-btn" title="UI preferences (coming soon: themes, fonts, zoom)">ui</button>
+  <button id="toggle-sidebar" title="Show/hide the sidebar">≡ files</button>
 </div>
 
 <div class="layout" id="layout">
   <aside class="sidebar">
-    <h3>requests</h3>
-    <div id="requests-list" hx-get="/api/requests" hx-trigger="load, every 10s, requests-refresh from:body" hx-swap="innerHTML">
-      <div style="color: var(--fg-faint); padding: 8px">loading…</div>
-    </div>
+    <section class="sidebar-section" data-section="requests">
+      <h3 class="section-head"><span class="zippy">▾</span>requests</h3>
+      <div class="section-body">
+        <div id="requests-list" hx-get="/api/requests" hx-trigger="load, every 10s, requests-refresh from:body" hx-swap="innerHTML">
+          <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+        </div>
+      </div>
+    </section>
 
-    <h3>skills</h3>
-    <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
-      <div style="color: var(--fg-faint); padding: 8px">loading…</div>
-    </div>
+    <section class="sidebar-section" data-section="skills">
+      <h3 class="section-head"><span class="zippy">▾</span>skills</h3>
+      <div class="section-body">
+        <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
+          <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+        </div>
+      </div>
+    </section>
 
-    <h3>project</h3>
-    <div id="tree" hx-get="/api/files" hx-trigger="load, every 10s" hx-swap="innerHTML">
-      <div style="color: var(--fg-faint); padding: 8px">loading…</div>
-    </div>
+    <section class="sidebar-section" data-section="project">
+      <h3 class="section-head"><span class="zippy">▾</span>project</h3>
+      <div class="section-body">
+        <div id="tree" hx-get="/api/files" hx-trigger="load, every 10s" hx-swap="innerHTML">
+          <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+        </div>
+      </div>
+    </section>
   </aside>
 
   <main class="content">
@@ -442,24 +520,107 @@
     textarea.style.height = Math.min(textarea.scrollHeight, 280) + 'px';
   });
 
+  // Slash commands — intercepted locally, never sent to the LLM.
+  async function handleSlashCommand(raw) {
+    const cmd = raw.trim();
+    if (cmd === '/reset') {
+      await fetch('/api/reset');
+      conversation.innerHTML = '<div class="empty-hint" id="empty-hint">conversation cleared.<br>start anew.</div>';
+      textarea.value = '';
+      textarea.style.height = 'auto';
+      sendBtn.disabled = false;
+      textarea.disabled = false;
+      textarea.focus();
+      return true;
+    }
+    return false;
+  }
+
+  // Pre-submit wrapper: check for slash commands before htmx fires.
+  async function trySubmit() {
+    if (sendBtn.disabled) return;
+    if (await handleSlashCommand(textarea.value)) return;
+    form.requestSubmit();
+  }
+
   // Enter sends; shift+enter inserts newline.
   textarea.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if (!sendBtn.disabled) form.requestSubmit();
+      trySubmit();
     }
   });
+  // Also intercept the send button (and any other form submissions).
+  form.addEventListener('submit', async (e) => {
+    if (await handleSlashCommand(textarea.value)) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+  }, true);  // capture phase — run before htmx's submit handler
 
   // Sidebar toggle.
   document.getElementById('toggle-sidebar').addEventListener('click', () => {
     document.getElementById('layout').classList.toggle('sidebar-collapsed');
   });
 
-  // Reset.
-  document.getElementById('reset-btn').addEventListener('click', async () => {
-    if (!confirm('Clear the in-memory conversation?\n(Session log on disk is preserved.)')) return;
-    await fetch('/api/reset');
-    conversation.innerHTML = '<div class="empty-hint" id="empty-hint">conversation cleared.<br>start anew.</div>';
+  // UI button (wired to full settings modal in v0.0.4-B).
+  document.getElementById('ui-btn').addEventListener('click', () => {
+    alert('UI preferences panel ships in v0.0.4-B: font, theme, zoom.\nFor now, type /reset in the chat to clear the in-memory conversation.');
+  });
+
+  // ---------- Sidebar section collapse ----------
+  const SECTION_KEY = 'enough.sidebar.sections';
+  function getSectionState() {
+    try { return JSON.parse(localStorage.getItem(SECTION_KEY) || '{}'); }
+    catch (_) { return {}; }
+  }
+  function setSectionState(s) { localStorage.setItem(SECTION_KEY, JSON.stringify(s)); }
+  function applySectionState() {
+    const state = getSectionState();
+    document.querySelectorAll('.sidebar-section').forEach(sec => {
+      const name = sec.dataset.section;
+      if (state[name] === 'collapsed') sec.classList.add('collapsed');
+    });
+  }
+  applySectionState();
+  document.querySelectorAll('.sidebar-section .section-head').forEach(h => {
+    h.addEventListener('click', () => {
+      const sec = h.closest('.sidebar-section');
+      sec.classList.toggle('collapsed');
+      const state = getSectionState();
+      state[sec.dataset.section] = sec.classList.contains('collapsed') ? 'collapsed' : 'expanded';
+      setSectionState(state);
+    });
+  });
+
+  // ---------- File-tree folder collapse (event-delegated + localStorage) ----------
+  const TREE_KEY = 'enough.tree.collapsed';
+  function getTreeState() {
+    try { return JSON.parse(localStorage.getItem(TREE_KEY) || '{}'); }
+    catch (_) { return {}; }
+  }
+  function setTreeState(s) { localStorage.setItem(TREE_KEY, JSON.stringify(s)); }
+  function applyTreeState() {
+    const state = getTreeState();
+    document.querySelectorAll('#tree li.dir.has-children').forEach(li => {
+      const path = li.dataset.path;
+      if (state[path] === 'collapsed') li.classList.add('collapsed');
+    });
+  }
+  // Re-apply after every htmx swap of the tree.
+  document.body.addEventListener('htmx:afterSwap', (e) => {
+    if (e.target && e.target.id === 'tree') applyTreeState();
+  });
+  // Delegated click handler: toggle on dir-row of a has-children folder.
+  document.getElementById('tree').addEventListener('click', (e) => {
+    const row = e.target.closest('.dir-row');
+    if (!row) return;
+    const li = row.closest('li.dir.has-children');
+    if (!li) return;
+    li.classList.toggle('collapsed');
+    const state = getTreeState();
+    state[li.dataset.path] = li.classList.contains('collapsed') ? 'collapsed' : 'expanded';
+    setTreeState(state);
   });
 
   // Streaming over SSE.

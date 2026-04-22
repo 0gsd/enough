@@ -129,20 +129,26 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
         path = n["path"].replace('"', "&quot;")
         sym_cls = " symlink" if n.get("is_symlink") else ""
         if n["is_dir"]:
+            has_kids = bool(n.get("children"))
+            dir_state_cls = " has-children" if has_kids else " empty-folder"
+            # Zippy glyph: ▾ (expanded, default) if has children; nothing if empty.
+            zippy = '<span class="zippy">▾</span>' if has_kids else '<span class="zippy-spacer"></span>'
             out.append(
-                f'<li class="dir{sym_cls}">'
-                f'<span class="dir-name">{n["name"]}/</span>'
+                f'<li class="dir{sym_cls}{dir_state_cls}" data-path="{path}">'
+                f'<span class="dir-row">{zippy}<span class="dir-name">{n["name"]}/</span></span>'
             )
-            if n.get("children"):
+            if has_kids:
                 out.append(_tree_to_html(n["children"]))
             out.append("</li>")
         else:
             out.append(
-                f'<li class="file{sym_cls}"><a href="#" '
+                f'<li class="file{sym_cls}">'
+                f'<span class="file-row"><span class="zippy-spacer"></span>'
+                f'<a href="#" '
                 f'hx-get="/api/file?path={path}" hx-target="#preview-body" '
                 f'hx-swap="innerHTML" '
                 f'onclick="document.getElementById(\'preview\').classList.add(\'open\')"'
-                f'>{n["name"]}</a></li>'
+                f'>{n["name"]}</a></span></li>'
             )
     out.append("</ul>")
     return "".join(out)
