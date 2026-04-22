@@ -4,6 +4,9 @@
 # enough runtime state
 .llama-server/
 
+# Per-install user config (seeded from defaults/ui-config.json on first run).
+config/
+
 # Claude Code local settings
 .claude/
 

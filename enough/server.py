@@ -46,6 +46,10 @@ from .tools import (
 log = logging.getLogger("enough")
 
 STATIC_DIR = Path(__file__).parent / "static"
+INSTALL_ROOT = Path(__file__).resolve().parents[1]
+UI_CONFIG_TEMPLATE = INSTALL_ROOT / "defaults" / "ui-config.json"
+UI_CONFIG_LIVE = Path.home() / "enough" / "config" / "ui.json"
+
 IGNORE_DIRS = {
     "__pycache__", ".git", "node_modules", ".venv", "venv",
     ".pytest_cache", ".mypy_cache", ".ruff_cache", "dist", "build",
@@ -182,6 +186,83 @@ def _escape_html(s: str) -> str:
          .replace("<", "&lt;")
          .replace(">", "&gt;")
     )
+
+
+# ---------------------------------------------------------------------------
+# UI config (themes / fonts / zoom)
+# ---------------------------------------------------------------------------
+
+def _load_ui_config_template() -> dict[str, Any]:
+    """Fallback config for when neither the live file nor the shipped
+    template exists. Keeps the server usable in broken setups."""
+    return {
+        "current": {"theme": "enough-default", "font": "mono", "zoom": 100},
+        "fonts": {"mono": {"label": "Monospace", "stack": "ui-monospace, monospace"}},
+        "themes": {"enough-default": {"label": "Enough Default", "colors": {}}},
+    }
+
+
+def _ensure_live_ui_config() -> Path:
+    """Make sure ~/enough/config/ui.json exists. Seeds from the shipped
+    template on first run; otherwise leaves it alone. Returns the path."""
+    if not UI_CONFIG_LIVE.exists():
+        UI_CONFIG_LIVE.parent.mkdir(parents=True, exist_ok=True)
+        if UI_CONFIG_TEMPLATE.is_file():
+            UI_CONFIG_LIVE.write_text(
+                UI_CONFIG_TEMPLATE.read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+        else:
+            UI_CONFIG_LIVE.write_text(
+                json.dumps(_load_ui_config_template(), indent=2),
+                encoding="utf-8",
+            )
+    return UI_CONFIG_LIVE
+
+
+def _read_ui_config() -> dict[str, Any]:
+    path = _ensure_live_ui_config()
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        log.exception("failed to read live ui config; falling back to template")
+        if UI_CONFIG_TEMPLATE.is_file():
+            try:
+                return json.loads(UI_CONFIG_TEMPLATE.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+        return _load_ui_config_template()
+
+
+def _write_ui_config(cfg: dict[str, Any]) -> None:
+    path = _ensure_live_ui_config()
+    path.write_text(json.dumps(cfg, indent=2) + "\n", encoding="utf-8")
+
+
+def _validate_current(cfg: dict[str, Any], selection: dict[str, Any]) -> dict[str, Any]:
+    """Validate a proposed {theme, font, zoom} against the available options
+    in `cfg`. Returns a sanitized dict — falls back to existing values (or
+    the default) for any unknown entries."""
+    current = dict(cfg.get("current") or {})
+    themes = cfg.get("themes") or {}
+    fonts = cfg.get("fonts") or {}
+    if "theme" in selection:
+        t = str(selection["theme"])
+        if t in themes:
+            current["theme"] = t
+    if "font" in selection:
+        f = str(selection["font"])
+        if f in fonts:
+            current["font"] = f
+    if "zoom" in selection:
+        try:
+            z = int(selection["zoom"])
+        except (TypeError, ValueError):
+            z = current.get("zoom", 100)
+        if 50 <= z <= 200:
+            # Snap to 25-step increments.
+            current["zoom"] = int(round(z / 25) * 25)
+    return current
 
 
 async def _run_turn(session: Session, user_message: str) -> None:
@@ -632,6 +713,21 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
     async def api_reset() -> HTMLResponse:
         session.history.clear()
         return HTMLResponse("")
+
+    @app.get("/api/ui-config")
+    async def api_ui_config_get() -> dict[str, Any]:
+        return _read_ui_config()
+
+    @app.post("/api/ui-config")
+    async def api_ui_config_post(request: Request) -> dict[str, Any]:
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        cfg = _read_ui_config()
+        cfg["current"] = _validate_current(cfg, body or {})
+        _write_ui_config(cfg)
+        return cfg
 
     @app.get("/favicon.ico")
     async def favicon():

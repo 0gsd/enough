@@ -1,0 +1,160 @@
+{
+  "_doc": [
+    "UI configuration for enough.",
+    "",
+    "This file ships as a TEMPLATE at <install>/defaults/ui-config.json.",
+    "The first time enough runs, it is copied to ~/enough/config/ui.json",
+    "where it becomes your LIVE config. Edits to the live file are",
+    "preserved across upstream git pulls; edits to this template file",
+    "affect only future installs.",
+    "",
+    "Three knobs users can change:",
+    "  current.theme  — name of an entry under 'themes' below",
+    "  current.font   — name of an entry under 'fonts' below",
+    "  current.zoom   — integer percent, 50–200 in 25-step increments",
+    "",
+    "Power users: add your own entries under 'themes' or 'fonts' by",
+    "copying an existing block and renaming the key. The new entry's",
+    "'label' will appear in the UI dropdown on next reload. Every color",
+    "key is applied as a CSS custom property (--key), so any HTML/CSS",
+    "customization you do elsewhere can reference the same palette."
+  ],
+
+  "current": {
+    "theme": "enough-default",
+    "font": "mono",
+    "zoom": 100
+  },
+
+  "fonts": {
+    "mono": {
+      "label": "Monospace (SF Mono)",
+      "stack": "ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace"
+    },
+    "sans": {
+      "label": "Sans-serif",
+      "stack": "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif"
+    },
+    "serif": {
+      "label": "Serif (Georgia)",
+      "stack": "Georgia, 'Times New Roman', 'Hoefler Text', serif"
+    },
+    "mono-alt": {
+      "label": "Monospace (Courier)",
+      "stack": "'Courier New', Courier, 'Lucida Console', monospace"
+    }
+  },
+
+  "themes": {
+    "enough-default": {
+      "label": "Enough Default",
+      "colors": {
+        "bg": "#1a1a2e",
+        "bg-alt": "#1e1e36",
+        "bg-raise": "#22223a",
+        "fg": "#e0e0e0",
+        "fg-muted": "#9a9ab0",
+        "fg-faint": "#5a5a75",
+        "accent-user": "#8ec5ff",
+        "accent-agent": "#b2f7b2",
+        "accent-tool": "#f5d488",
+        "accent-error": "#ff8a8a",
+        "border": "#2e2e4a",
+        "input-bg": "#252542",
+        "nav-depth-1": "#6b8cff",
+        "nav-depth-2": "#8ea9ff",
+        "nav-depth-3": "#b2c4ff",
+        "nav-depth-4": "#d4dcf0",
+        "nav-file": "#f0f0f8",
+        "nav-file-symlink": "#d4d4e0",
+        "nav-empty-dir": "#5a5a75",
+        "zippy-color": "#9a9ab0",
+        "zippy-hover": "#e0e0e0"
+      }
+    },
+
+    "pastel": {
+      "label": "Pastel",
+      "_doc": "Pale yellow paper background, like the MacOS Terminal 'Man Page' scheme. High contrast but soft; accent colors are pastels-over-amber, not saturated.",
+      "colors": {
+        "bg": "#faf5dc",
+        "bg-alt": "#f3ead0",
+        "bg-raise": "#ebe0be",
+        "fg": "#3b3b3b",
+        "fg-muted": "#6d6960",
+        "fg-faint": "#a39d8e",
+        "accent-user": "#5975b2",
+        "accent-agent": "#6b9a64",
+        "accent-tool": "#c68527",
+        "accent-error": "#b8554f",
+        "border": "#d9ceaa",
+        "input-bg": "#f3ead0",
+        "nav-depth-1": "#2f4a8c",
+        "nav-depth-2": "#5975b2",
+        "nav-depth-3": "#7a94c5",
+        "nav-depth-4": "#9db1d4",
+        "nav-file": "#3b3b3b",
+        "nav-file-symlink": "#6d6960",
+        "nav-empty-dir": "#a39d8e",
+        "zippy-color": "#6d6960",
+        "zippy-hover": "#3b3b3b"
+      }
+    },
+
+    "wireframe": {
+      "label": "Wireframe",
+      "_doc": "White background, dark navy primary text, saturated primary colors for accents. Looks like a Figma wireframe or technical blueprint.",
+      "colors": {
+        "bg": "#ffffff",
+        "bg-alt": "#f9f9fc",
+        "bg-raise": "#f0f0f7",
+        "fg": "#0a1e4e",
+        "fg-muted": "#3d4b7a",
+        "fg-faint": "#8791b2",
+        "accent-user": "#0033cc",
+        "accent-agent": "#007a3d",
+        "accent-tool": "#cc6600",
+        "accent-error": "#cc0000",
+        "border": "#cfd3e1",
+        "input-bg": "#ffffff",
+        "nav-depth-1": "#0033cc",
+        "nav-depth-2": "#3355cc",
+        "nav-depth-3": "#5577cc",
+        "nav-depth-4": "#7799cc",
+        "nav-file": "#0a1e4e",
+        "nav-file-symlink": "#3d4b7a",
+        "nav-empty-dir": "#8791b2",
+        "zippy-color": "#3d4b7a",
+        "zippy-hover": "#0a1e4e"
+      }
+    },
+
+    "darknest": {
+      "label": "Darknest",
+      "_doc": "Jet black and grayscale. The black-and-white edition — no hue at all. Active skill indicators and role labels use pure white; folders and muted text are greys.",
+      "colors": {
+        "bg": "#000000",
+        "bg-alt": "#0a0a0a",
+        "bg-raise": "#1a1a1a",
+        "fg": "#ffffff",
+        "fg-muted": "#b0b0b0",
+        "fg-faint": "#707070",
+        "accent-user": "#d4d4d4",
+        "accent-agent": "#ffffff",
+        "accent-tool": "#c8c8c8",
+        "accent-error": "#ffffff",
+        "border": "#2a2a2a",
+        "input-bg": "#0a0a0a",
+        "nav-depth-1": "#c8c8c8",
+        "nav-depth-2": "#b0b0b0",
+        "nav-depth-3": "#989898",
+        "nav-depth-4": "#808080",
+        "nav-file": "#ffffff",
+        "nav-file-symlink": "#c8c8c8",
+        "nav-empty-dir": "#606060",
+        "zippy-color": "#b0b0b0",
+        "zippy-hover": "#ffffff"
+      }
+    }
+  }
+}
