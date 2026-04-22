@@ -716,8 +716,11 @@
       document.documentElement.style.setProperty('--font-mono', font.stack);
     }
     if (typeof cur.zoom === 'number') {
-      // CSS `zoom` works on Chromium + WebKit (and Firefox 126+).
-      document.body.style.zoom = (cur.zoom / 100).toString();
+      // CSS `zoom` on <html> behaves like browser zoom — scales viewport
+      // metrics (100vh, etc.) for children, so sidebar overflow/scroll
+      // works correctly at any zoom level. Zoom on <body> only scales
+      // rendering, leaving viewport units unchanged.
+      document.documentElement.style.zoom = (cur.zoom / 100).toString();
     }
   }
 
@@ -785,7 +788,7 @@
     const z = parseInt(e.target.value, 10);
     document.getElementById('ui-zoom-val').textContent = z + '%';
     // Apply live; debounce the POST so dragging doesn't flood the server.
-    document.body.style.zoom = (z / 100).toString();
+    document.documentElement.style.zoom = (z / 100).toString();
     if (zoomSaveTimer) clearTimeout(zoomSaveTimer);
     zoomSaveTimer = setTimeout(() => saveUIConfig({ zoom: z }), 250);
   });
