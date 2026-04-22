@@ -35,7 +35,7 @@
     --zippy-hover: var(--fg);
   }
   * { box-sizing: border-box; }
-  html, body { height: 100%; margin: 0; }
+  html, body { height: 100vh; margin: 0; }
   body {
     background: var(--bg);
     color: var(--fg);
@@ -43,6 +43,8 @@
     font-size: 14px;
     line-height: 1.55;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   /* ---------- Top bar ---------- */
@@ -50,6 +52,7 @@
     display: flex; align-items: center; gap: 10px;
     padding: 0 12px;
     height: 36px;
+    flex: 0 0 36px;
     border-bottom: 1px solid var(--border);
     background: var(--bg-alt);
   }
@@ -74,11 +77,11 @@
 
   /* ---------- Main layout ---------- */
   .layout {
+    flex: 1 1 auto;              /* fill remaining viewport after topbar */
+    min-height: 0;               /* allow children to shrink + scroll */
     display: grid;
     grid-template-columns: 240px 1fr;
-    grid-template-rows: 1fr;
-    height: calc(100vh - 36px);
-    min-height: 0;
+    grid-template-rows: minmax(0, 1fr);  /* bounded row → sidebar can scroll */
     transition: grid-template-columns 180ms ease;
   }
   .layout.sidebar-collapsed { grid-template-columns: 0 1fr; }
@@ -90,8 +93,12 @@
     overflow-y: auto;
     overflow-x: hidden;
     min-height: 0;
+    height: 100%;
     padding: 10px 6px;
     font-size: 12.5px;
+    /* tabindex on the element + :focus outline:none keeps pgup/pgdn
+       working without a visible focus ring when the user clicks in. */
+    outline: none;
   }
   /* Collapsible sidebar sections (requests / skills / project) */
   .sidebar-section { margin-bottom: 6px; }
@@ -537,7 +544,7 @@
 </div>
 
 <div class="layout" id="layout">
-  <aside class="sidebar">
+  <aside class="sidebar" tabindex="0">
     <section class="sidebar-section" data-section="requests">
       <h3 class="section-head"><span class="zippy">▾</span>requests</h3>
       <div class="section-body">
@@ -548,7 +555,7 @@
     </section>
 
     <section class="sidebar-section" data-section="skills">
-      <h3 class="section-head"><span class="zippy">▾</span>skills</h3>
+      <h3 class="section-head"><span class="zippy">▾</span>active skills</h3>
       <div class="section-body">
         <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
           <div style="color: var(--fg-faint); padding: 8px">loading…</div>
