@@ -196,7 +196,7 @@ def _load_ui_config_template() -> dict[str, Any]:
     """Fallback config for when neither the live file nor the shipped
     template exists. Keeps the server usable in broken setups."""
     return {
-        "current": {"theme": "enough-default", "font": "mono", "zoom": 100},
+        "current": {"theme": "enough-default", "font": "mono"},
         "fonts": {"mono": {"label": "Monospace", "stack": "ui-monospace, monospace"}},
         "themes": {"enough-default": {"label": "Enough Default", "colors": {}}},
     }
@@ -240,10 +240,13 @@ def _write_ui_config(cfg: dict[str, Any]) -> None:
 
 
 def _validate_current(cfg: dict[str, Any], selection: dict[str, Any]) -> dict[str, Any]:
-    """Validate a proposed {theme, font, zoom} against the available options
-    in `cfg`. Returns a sanitized dict — falls back to existing values (or
-    the default) for any unknown entries."""
+    """Validate a proposed {theme, font} against the available options in
+    `cfg`. Returns a sanitized dict — falls back to existing values for
+    any unknown entries. Unknown keys in `selection` are silently ignored
+    (e.g. legacy 'zoom' field from pre-0.0.5 configs — we just drop it)."""
     current = dict(cfg.get("current") or {})
+    # Strip any legacy fields so they don't stick around in the saved file.
+    current.pop("zoom", None)
     themes = cfg.get("themes") or {}
     fonts = cfg.get("fonts") or {}
     if "theme" in selection:
@@ -254,14 +257,6 @@ def _validate_current(cfg: dict[str, Any], selection: dict[str, Any]) -> dict[st
         f = str(selection["font"])
         if f in fonts:
             current["font"] = f
-    if "zoom" in selection:
-        try:
-            z = int(selection["zoom"])
-        except (TypeError, ValueError):
-            z = current.get("zoom", 100)
-        if 50 <= z <= 200:
-            # Snap to 25-step increments.
-            current["zoom"] = int(round(z / 25) * 25)
     return current
 
 

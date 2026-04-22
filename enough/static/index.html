@@ -621,12 +621,9 @@
         <div class="label">font</div>
         <select id="ui-font"></select>
       </label>
-      <label>
-        <div class="label">zoom <span id="ui-zoom-val">100%</span></div>
-        <input type="range" id="ui-zoom" min="50" max="200" step="25" value="100">
-      </label>
     </div>
     <div class="modal-foot">
+      for zoom, use your browser's native zoom (<kbd>⌘+</kbd>/<kbd>⌘-</kbd>).<br>
       add more themes or fonts by editing <code>~/enough/config/ui.json</code>
     </div>
   </div>
@@ -715,13 +712,6 @@
       // --font-mono holds "the active font stack," regardless of actual family.
       document.documentElement.style.setProperty('--font-mono', font.stack);
     }
-    if (typeof cur.zoom === 'number') {
-      // CSS `zoom` on <html> behaves like browser zoom — scales viewport
-      // metrics (100vh, etc.) for children, so sidebar overflow/scroll
-      // works correctly at any zoom level. Zoom on <body> only scales
-      // rendering, leaving viewport units unchanged.
-      document.documentElement.style.zoom = (cur.zoom / 100).toString();
-    }
   }
 
   function populateUIControls() {
@@ -729,8 +719,6 @@
     const cur = UI_CONFIG.current || {};
     const themeSel = document.getElementById('ui-theme');
     const fontSel  = document.getElementById('ui-font');
-    const zoomInp  = document.getElementById('ui-zoom');
-    const zoomVal  = document.getElementById('ui-zoom-val');
     themeSel.innerHTML = '';
     for (const [key, val] of Object.entries(UI_CONFIG.themes || {})) {
       const opt = document.createElement('option');
@@ -747,11 +735,8 @@
       if (key === cur.font) opt.selected = true;
       fontSel.appendChild(opt);
     }
-    zoomInp.value = cur.zoom || 100;
-    zoomVal.textContent = (cur.zoom || 100) + '%';
   }
 
-  let zoomSaveTimer = null;
   async function saveUIConfig(partial) {
     try {
       const r = await fetch('/api/ui-config', {
@@ -783,14 +768,6 @@
   });
   document.getElementById('ui-font').addEventListener('change', (e) => {
     saveUIConfig({ font: e.target.value });
-  });
-  document.getElementById('ui-zoom').addEventListener('input', (e) => {
-    const z = parseInt(e.target.value, 10);
-    document.getElementById('ui-zoom-val').textContent = z + '%';
-    // Apply live; debounce the POST so dragging doesn't flood the server.
-    document.documentElement.style.zoom = (z / 100).toString();
-    if (zoomSaveTimer) clearTimeout(zoomSaveTimer);
-    zoomSaveTimer = setTimeout(() => saveUIConfig({ zoom: z }), 250);
   });
   // Escape closes the modal.
   document.addEventListener('keydown', (e) => {

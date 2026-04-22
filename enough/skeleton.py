@@ -145,21 +145,34 @@ def ensure_global_infoworld() -> Path:
 
 
 def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
-    """For each skill in `<defaults>/skills/`, symlink it into the project's
-    `.rness/skills/`. Globally-installed skills default to DISABLED in each
-    new project — every symlinked name is also added to
-    `.rness/skills/.disabled`, so the sidebar lists them as off and the
-    user opts in by toggling them on.
+    """Sync global skills into `.rness/skills/` and prune dangling symlinks.
 
-    Skills that don't exist in defaults/ are ignored here; users can still
-    drop project-local skills into `.rness/skills/` directly (they'll
-    appear in the sidebar as enabled, since they aren't in .disabled)."""
+    - For each skill in `<defaults>/skills/`: if the project doesn't
+      already have an entry with that name, symlink it in and add to
+      `.disabled` (new globals default off).
+    - For each existing entry in `.rness/skills/`: if it's a symlink whose
+      target no longer exists (dangling — usually because the skill was
+      removed globally), unlink it. Project-local entries (real dirs or
+      files, not symlinks) are never touched.
+
+    The latter makes removal propagate automatically: `rm -rf
+    ~/enough/defaults/skills/foo` on the next `enough` launch cleans `foo`
+    out of every project using the (now-dangling) symlink."""
     src_skills = defaults_root / "skills"
-    if not src_skills.is_dir():
-        return
     dst_skills = project_dir / ".rness" / "skills"
     dst_skills.mkdir(parents=True, exist_ok=True)
 
+    # 1. Prune dangling symlinks.
+    for entry in sorted(dst_skills.iterdir()):
+        if entry.is_symlink() and not entry.exists():
+            try:
+                entry.unlink()
+            except OSError:
+                pass
+
+    # 2. Sync in any new globals (default-off).
+    if not src_skills.is_dir():
+        return
     disabled_names: list[str] = []
     for entry in sorted(src_skills.iterdir()):
         if entry.name.startswith("."):

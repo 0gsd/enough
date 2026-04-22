@@ -8,10 +8,11 @@
     "preserved across upstream git pulls; edits to this template file",
     "affect only future installs.",
     "",
-    "Three knobs users can change:",
+    "Two knobs users can change:",
     "  current.theme  — name of an entry under 'themes' below",
     "  current.font   — name of an entry under 'fonts' below",
-    "  current.zoom   — integer percent, 50–200 in 25-step increments",
+    "",
+    "For zoom, use your browser's native zoom (Cmd +/- on Mac, Ctrl on Win/Linux).",
     "",
     "Power users: add your own entries under 'themes' or 'fonts' by",
     "copying an existing block and renaming the key. The new entry's",
@@ -22,8 +23,7 @@
 
   "current": {
     "theme": "enough-default",
-    "font": "mono",
-    "zoom": 100
+    "font": "mono"
   },
 
   "fonts": {
