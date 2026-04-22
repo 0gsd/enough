@@ -76,7 +76,9 @@
   .layout {
     display: grid;
     grid-template-columns: 240px 1fr;
+    grid-template-rows: 1fr;
     height: calc(100vh - 36px);
+    min-height: 0;
     transition: grid-template-columns 180ms ease;
   }
   .layout.sidebar-collapsed { grid-template-columns: 0 1fr; }
@@ -85,7 +87,9 @@
   .sidebar {
     border-right: 1px solid var(--border);
     background: var(--bg-alt);
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
     padding: 10px 6px;
     font-size: 12.5px;
   }
