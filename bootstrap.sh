@@ -187,23 +187,35 @@ note ""
 WEIGHTS_DIR="$ENOUGH_HOME/weights"
 mkdir -p "$WEIGHTS_DIR"
 
-# (cute_name, filename, url, disk_gb)
-declare -a MODEL_KEYS=(g40-04 q35-09 g40-26 q36-27)
-declare -A MODEL_FN=(
-  [g40-04]="gemma-4-E4B-it-Q4_K_M.gguf"
-  [q35-09]="Qwen3.5-9B-Q4_K_M.gguf"
-  [g40-26]="gemma-4-26B-A4B-it-Q4_K_M.gguf"
-  [q36-27]="Qwen_Qwen3.6-27B-Q4_K_M.gguf"
-)
-declare -A MODEL_URL=(
-  [g40-04]="https://huggingface.co/ggml-org/gemma-4-E4B-it-GGUF/resolve/main/gemma-4-E4B-it-Q4_K_M.gguf"
-  [q35-09]="https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf"
-  [g40-26]="https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF/resolve/main/gemma-4-26B-A4B-it-Q4_K_M.gguf"
-  [q36-27]="https://huggingface.co/bartowski/Qwen_Qwen3.6-27B-GGUF/resolve/main/Qwen_Qwen3.6-27B-Q4_K_M.gguf"
-)
-declare -A MODEL_GB=(
-  [g40-04]=5.4  [q35-09]=5.6  [g40-26]=15.6  [q36-27]=16.5
-)
+# Registry lookup by cute name. Using case statements instead of
+# associative arrays so we stay compatible with macOS stock bash (3.2).
+# Keep in sync with defaults/models.json.
+MODEL_KEYS="g40-04 q35-09 g40-26 q36-27"
+
+model_filename() {
+  case "$1" in
+    g40-04) echo "gemma-4-E4B-it-Q4_K_M.gguf" ;;
+    q35-09) echo "Qwen3.5-9B-Q4_K_M.gguf" ;;
+    g40-26) echo "gemma-4-26B-A4B-it-Q4_K_M.gguf" ;;
+    q36-27) echo "Qwen_Qwen3.6-27B-Q4_K_M.gguf" ;;
+  esac
+}
+model_url() {
+  case "$1" in
+    g40-04) echo "https://huggingface.co/ggml-org/gemma-4-E4B-it-GGUF/resolve/main/gemma-4-E4B-it-Q4_K_M.gguf" ;;
+    q35-09) echo "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf" ;;
+    g40-26) echo "https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF/resolve/main/gemma-4-26B-A4B-it-Q4_K_M.gguf" ;;
+    q36-27) echo "https://huggingface.co/bartowski/Qwen_Qwen3.6-27B-GGUF/resolve/main/Qwen_Qwen3.6-27B-Q4_K_M.gguf" ;;
+  esac
+}
+model_gb() {
+  case "$1" in
+    g40-04) echo "5.4" ;;
+    q35-09) echo "5.6" ;;
+    g40-26) echo "15.6" ;;
+    q36-27) echo "16.5" ;;
+  esac
+}
 
 # Cumulative install tiers.
 echo
@@ -215,23 +227,23 @@ note "  4  →  all four models                   (~43 GB)"
 echo
 TIER=$(ask_text "install how many? [1-4]" "1")
 case "$TIER" in
-  1) SELECTED=(g40-04) ;;
-  2) SELECTED=(g40-04 q35-09) ;;
-  3) SELECTED=(g40-04 q35-09 g40-26) ;;
-  4) SELECTED=(g40-04 q35-09 g40-26 q36-27) ;;
+  1) SELECTED="g40-04" ;;
+  2) SELECTED="g40-04 q35-09" ;;
+  3) SELECTED="g40-04 q35-09 g40-26" ;;
+  4) SELECTED="g40-04 q35-09 g40-26 q36-27" ;;
   *)
     warn "unrecognized tier $TIER — defaulting to 1 (G40-04 only)"
-    SELECTED=(g40-04) ;;
+    SELECTED="g40-04" ;;
 esac
 
-for cute in "${SELECTED[@]}"; do
-  filename="${MODEL_FN[$cute]}"
+for cute in $SELECTED; do
+  filename=$(model_filename "$cute")
   dest="$WEIGHTS_DIR/$filename"
   if [[ -f "$dest" ]]; then
     ok "$cute already at $(basename "$dest")  ($(du -h "$dest" | awk '{print $1}'))"
   else
-    note "downloading $cute (~${MODEL_GB[$cute]} GB) → $(basename "$dest")"
-    curl -L --progress-bar -o "$dest" "${MODEL_URL[$cute]}"
+    note "downloading $cute (~$(model_gb "$cute") GB) → $(basename "$dest")"
+    curl -L --progress-bar -o "$dest" "$(model_url "$cute")"
     ok "$cute installed"
   fi
 done
@@ -245,8 +257,8 @@ fi
 
 echo
 note "all your installed models:"
-for cute in "${MODEL_KEYS[@]}"; do
-  fn="${MODEL_FN[$cute]}"
+for cute in $MODEL_KEYS; do
+  fn=$(model_filename "$cute")
   if [[ -f "$WEIGHTS_DIR/$fn" ]]; then
     dim "  ✓ $cute   $fn   ($(du -h "$WEIGHTS_DIR/$fn" | awk '{print $1}'))"
   else
