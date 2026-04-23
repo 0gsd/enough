@@ -36,6 +36,7 @@ from . import __version__
 from .llm import LLMError, stream_chat
 from .logger import ExchangeLog, log_exchange
 from .prompt import assemble_system_prompt, list_skills, set_skill_enabled
+from .supervisor import LlamaSupervisor
 from .tools import (
     ToolCall,
     execute,
@@ -386,15 +387,29 @@ async def _handle_tool(session: Session, call: ToolCall, sink: list[tuple[str, s
 # App factory
 # ---------------------------------------------------------------------------
 
-def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MAX_TOOL_ITERS) -> FastAPI:
+def create_app(
+    project_dir: Path,
+    llm_url: str,
+    max_tool_iters: int = DEFAULT_MAX_TOOL_ITERS,
+    *,
+    supervise: bool = True,
+) -> FastAPI:
     session = Session(project_dir=project_dir, llm_url=llm_url, max_tool_iters=max_tool_iters)
+    supervisor = LlamaSupervisor(llm_url=llm_url) if supervise else None
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
         session.client = httpx.AsyncClient()
+        if supervisor is not None:
+            try:
+                await supervisor.bootstrap()
+            except Exception:  # noqa: BLE001
+                log.exception("supervisor bootstrap failed")
         try:
             yield
         finally:
+            if supervisor is not None:
+                await supervisor.stop(only_if_owned=True)
             await session.client.aclose()
 
     app = FastAPI(title="enough", lifespan=lifespan)
@@ -729,15 +744,60 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
 
     @app.get("/api/models")
     async def api_models() -> dict[str, Any]:
-        """Registry + per-model installed/recommended view + total RAM.
-        v0.0.6-B uses this for inspection; v0.0.6-C will drive the
-        in-UI model switcher from the same payload."""
+        """Registry + per-model installed/recommended view + total RAM +
+        supervisor status."""
         from . import models as _models  # late import: avoid circular
-        return {
+        payload: dict[str, Any] = {
             "total_ram_gb": _models.total_ram_gb(),
             "current": _models.load_state().get("current"),
             "models": _models.all_models_view(),
+            "ctx_overrides": _models.load_state().get("ctx_overrides") or {},
         }
+        payload["supervisor"] = supervisor.status() if supervisor else {"mode": "off"}
+        return payload
+
+    @app.get("/api/llm-status")
+    async def api_llm_status() -> dict[str, Any]:
+        """Lightweight poll target for the UI: is llama-server alive, what
+        model is loaded, ready-for-requests?"""
+        if supervisor is None:
+            # Non-supervised mode: best-effort probe of /health.
+            try:
+                async with httpx.AsyncClient(timeout=2.0) as c:
+                    r = await c.get(llm_url.rstrip("/") + "/health")
+                return {"mode": "external", "ready": r.status_code == 200, "cute": None, "ctx": None}
+            except httpx.HTTPError:
+                return {"mode": "external", "ready": False, "cute": None, "ctx": None}
+        return supervisor.status()
+
+    @app.post("/api/model")
+    async def api_model_switch(request: Request) -> dict[str, Any]:
+        """Swap the loaded model and/or ctx. Body: {"cute": "g40-04",
+        "ctx": 16384 (optional)}. Returns supervisor status; the UI
+        should poll /api/llm-status for readiness."""
+        if supervisor is None:
+            raise HTTPException(
+                400,
+                "llama-server isn't supervised by this enough process — "
+                "restart enough without --no-supervise to enable switching.",
+            )
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        cute = (body or {}).get("cute")
+        ctx = (body or {}).get("ctx")
+        if not cute:
+            raise HTTPException(400, "missing 'cute' field")
+        try:
+            await supervisor.switch(str(cute), int(ctx) if ctx is not None else None)
+        except RuntimeError as e:
+            raise HTTPException(400, str(e)) from None
+        except Exception as e:  # noqa: BLE001
+            raise HTTPException(500, f"switch failed: {e}") from None
+        # Also clear in-memory conversation history — new model = fresh brain.
+        session.history.clear()
+        return supervisor.status()
 
     @app.post("/api/transcribe")
     async def api_transcribe(request: Request) -> dict[str, Any]:
@@ -820,6 +880,13 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
     return app
 
 
-def run(*, project_dir: Path, port: int, llm_url: str, max_tool_iters: int = DEFAULT_MAX_TOOL_ITERS) -> None:
-    app = create_app(project_dir, llm_url, max_tool_iters=max_tool_iters)
+def run(
+    *,
+    project_dir: Path,
+    port: int,
+    llm_url: str,
+    max_tool_iters: int = DEFAULT_MAX_TOOL_ITERS,
+    supervise: bool = True,
+) -> None:
+    app = create_app(project_dir, llm_url, max_tool_iters=max_tool_iters, supervise=supervise)
     uvicorn.run(app, host="127.0.0.1", port=port, log_level="info")

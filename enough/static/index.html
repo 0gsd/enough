@@ -552,14 +552,174 @@
     border-radius: 3px;
     font-size: 11px;
   }
+
+  /* ---------- Top-bar model badge + modal ---------- */
+  .model-badge {
+    background: transparent;
+    color: var(--fg-muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .model-badge:hover { color: var(--fg); border-color: var(--fg-faint); }
+  .model-badge .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--fg-faint);
+    flex-shrink: 0;
+  }
+  .model-badge.ready .dot { background: var(--accent-agent); }
+  .model-badge.loading .dot {
+    background: var(--accent-tool);
+    animation: model-pulse 1.2s ease-in-out infinite;
+  }
+  .model-badge.off .dot { background: var(--accent-error); }
+  @keyframes model-pulse { 50% { opacity: 0.35; } }
+  .model-badge .cute { font-weight: 600; }
+  .model-badge .ctx { color: var(--fg-faint); font-size: 11px; }
+
+  /* Reuse modal chrome from #ui-modal; the model modal has extra fields. */
+  #model-modal.hidden { display: none; }
+  #model-modal {
+    position: fixed; inset: 0; z-index: 1001;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #model-modal .modal-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+  }
+  #model-modal .modal-panel {
+    position: relative;
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    min-width: 420px;
+    max-width: 520px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  #model-modal .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  #model-modal .modal-head h3 {
+    margin: 0;
+    color: var(--fg);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  #model-modal .modal-close {
+    background: transparent; border: none;
+    color: var(--fg-muted);
+    font-size: 20px; line-height: 1;
+    cursor: pointer; padding: 0 4px;
+  }
+  #model-modal .modal-close:hover { color: var(--fg); }
+  #model-modal .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+  #model-modal .model-list {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  #model-modal .model-option {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color 120ms;
+  }
+  #model-modal .model-option:hover { border-color: var(--fg-faint); }
+  #model-modal .model-option.selected {
+    border-color: var(--accent-agent);
+    background: color-mix(in oklab, var(--accent-agent) 10%, transparent);
+  }
+  #model-modal .model-option.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  #model-modal .model-option .cute {
+    font-weight: 600;
+    color: var(--fg);
+    min-width: 64px;
+  }
+  #model-modal .model-option .label { color: var(--fg-muted); flex: 1; font-size: 12.5px; }
+  #model-modal .model-option .size  { color: var(--fg-faint); font-size: 11px; }
+  #model-modal .model-option.disabled .size { font-style: italic; }
+  #model-modal .ctx-row {
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  #model-modal .ctx-row .label {
+    font-size: 11px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    display: flex; justify-content: space-between;
+  }
+  #model-modal .ctx-row input[type="number"] {
+    background: var(--input-bg);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  #model-modal .ctx-row .hint {
+    font-size: 11px;
+    color: var(--fg-faint);
+  }
+  #model-modal .apply-row {
+    display: flex; justify-content: flex-end; gap: 8px; align-items: center;
+  }
+  #model-modal .apply-btn {
+    background: color-mix(in oklab, var(--accent-agent) 20%, var(--bg-raise));
+    color: var(--fg);
+    border: 1px solid var(--accent-agent);
+    border-radius: 4px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+  }
+  #model-modal .apply-btn:hover { background: color-mix(in oklab, var(--accent-agent) 30%, var(--bg-raise)); }
+  #model-modal .apply-btn:disabled { opacity: 0.5; cursor: wait; }
+  #model-modal .switch-status {
+    color: var(--fg-faint);
+    font-size: 11px;
+    flex: 1;
+  }
+  #model-modal .switch-status.error { color: var(--accent-error); }
+  #model-modal .switch-status.ready { color: var(--accent-agent); }
+  #model-modal .modal-foot {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--fg-faint);
+  }
+  #model-modal .modal-foot code {
+    color: var(--fg-muted);
+    background: var(--bg-raise);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 11px;
+  }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="brand">enough<span class="dim"><!-- VERSION --></span></div>
-  <button id="ui-btn" title="UI preferences (coming soon: themes, fonts, zoom)">ui</button>
+  <button id="ui-btn" title="UI preferences (theme, font)">ui</button>
   <button id="toggle-sidebar" title="Show/hide the sidebar">≡ files</button>
+  <button id="model-badge" class="model-badge off" title="Model &amp; context window">
+    <span class="dot"></span>
+    <span class="cute">…</span>
+    <span class="ctx"></span>
+  </button>
 </div>
 
 <div class="layout" id="layout">
@@ -624,6 +784,36 @@
       <div id="preview-body"></div>
     </div>
   </main>
+</div>
+
+<!-- Model + context modal -->
+<div id="model-modal" class="hidden" aria-hidden="true">
+  <div class="modal-backdrop" onclick="closeModelModal()"></div>
+  <div class="modal-panel" role="dialog" aria-labelledby="model-modal-title">
+    <div class="modal-head">
+      <h3 id="model-modal-title">model &amp; context</h3>
+      <button class="modal-close" onclick="closeModelModal()" aria-label="close">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="model-list" id="model-list">
+        <!-- rendered from /api/models -->
+      </div>
+      <div class="ctx-row">
+        <div class="label">context window <span id="ctx-hint-min-max">(min 2048, max 131072)</span></div>
+        <input type="number" id="ctx-input" min="2048" max="131072" step="1024">
+        <div class="hint" id="ctx-hint">recommended for this model + your RAM: <span id="ctx-recommended">—</span></div>
+      </div>
+      <div class="apply-row">
+        <span class="switch-status" id="switch-status"></span>
+        <button class="apply-btn" id="apply-model-btn" onclick="applyModel()">apply &amp; restart</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      switching unloads the current model from RAM, loads the new one, and
+      clears the in-memory conversation. request history on disk (session
+      logs, requests) is preserved.
+    </div>
+  </div>
 </div>
 
 <!-- UI preferences modal -->
@@ -799,6 +989,175 @@
   });
 
   loadUIConfig();
+
+  // ---------- Model badge + model modal (supervisor-aware) ----------
+  const modelBadge = document.getElementById('model-badge');
+  const modelModal = document.getElementById('model-modal');
+  let MODELS = null;         // last /api/models payload
+  let LLM_STATUS = null;     // last /api/llm-status payload
+  let selectedCute = null;   // current radio selection in modal
+
+  async function refreshLlmStatus() {
+    try {
+      const r = await fetch('/api/llm-status');
+      if (!r.ok) return;
+      LLM_STATUS = await r.json();
+      updateBadge();
+    } catch (_) { /* transient */ }
+  }
+
+  function updateBadge() {
+    if (!LLM_STATUS) return;
+    const { mode, ready, cute, ctx } = LLM_STATUS;
+    modelBadge.classList.remove('ready', 'loading', 'off');
+    if (mode === 'off' || !cute) {
+      modelBadge.classList.add('off');
+      modelBadge.querySelector('.cute').textContent = 'no model';
+      modelBadge.querySelector('.ctx').textContent = '';
+      return;
+    }
+    modelBadge.classList.add(ready ? 'ready' : 'loading');
+    // Look up cute_name for display (the config key is lowercase).
+    let display = cute.toUpperCase();
+    if (MODELS && MODELS.models) {
+      const m = MODELS.models.find(x => x.cute === cute);
+      if (m) display = m.cute.toUpperCase();  // same, but canonical
+    }
+    modelBadge.querySelector('.cute').textContent = display;
+    modelBadge.querySelector('.ctx').textContent = ctx
+      ? `· ${Math.round(ctx / 1024)}k`
+      : '';
+  }
+
+  async function loadModels() {
+    try {
+      const r = await fetch('/api/models');
+      if (!r.ok) return;
+      MODELS = await r.json();
+    } catch (_) { /* transient */ }
+  }
+
+  function renderModelList() {
+    if (!MODELS) return;
+    const list = document.getElementById('model-list');
+    list.innerHTML = '';
+    const curCute = selectedCute || (MODELS.current || (LLM_STATUS && LLM_STATUS.cute));
+    for (const m of MODELS.models) {
+      const disabled = !m.installed;
+      const isSel = m.cute === curCute;
+      const row = document.createElement('div');
+      row.className = 'model-option' + (isSel ? ' selected' : '') + (disabled ? ' disabled' : '');
+      row.dataset.cute = m.cute;
+      const size = m.disk_gb_approx ? `~${m.disk_gb_approx.toFixed(1)} GB` : '';
+      const installed = disabled ? '(not installed)' : '';
+      row.innerHTML =
+        `<span class="cute">${m.cute.toUpperCase()}</span>` +
+        `<span class="label">${m.label}</span>` +
+        `<span class="size">${size} ${installed}</span>`;
+      if (!disabled) {
+        row.addEventListener('click', () => {
+          selectedCute = m.cute;
+          renderModelList();
+          updateCtxInputForSelection();
+        });
+      }
+      list.appendChild(row);
+    }
+  }
+
+  function updateCtxInputForSelection() {
+    if (!MODELS) return;
+    const m = MODELS.models.find(x => x.cute === selectedCute);
+    if (!m) return;
+    const ctxInput = document.getElementById('ctx-input');
+    const override = (MODELS.ctx_overrides || {})[m.cute];
+    const recommended = m.ctx_recommended;
+    const max = m.ctx_max || 131072;
+    ctxInput.max = max;
+    ctxInput.value = override || recommended || 16384;
+    document.getElementById('ctx-recommended').textContent = (recommended || '?') + ' (for ' + (MODELS.total_ram_gb || '?') + ' GB RAM)';
+    document.getElementById('ctx-hint-min-max').textContent = `(min 2048, max ${max})`;
+  }
+
+  async function openModelModal() {
+    document.getElementById('switch-status').textContent = '';
+    document.getElementById('switch-status').className = 'switch-status';
+    document.getElementById('apply-model-btn').disabled = false;
+    await Promise.all([loadModels(), refreshLlmStatus()]);
+    selectedCute = (LLM_STATUS && LLM_STATUS.cute) || (MODELS && MODELS.current);
+    renderModelList();
+    updateCtxInputForSelection();
+    modelModal.classList.remove('hidden');
+  }
+  function closeModelModal() {
+    modelModal.classList.add('hidden');
+  }
+  window.closeModelModal = closeModelModal;
+
+  async function applyModel() {
+    if (!selectedCute) return;
+    const ctxInput = document.getElementById('ctx-input');
+    const ctx = parseInt(ctxInput.value, 10) || undefined;
+    const status = document.getElementById('switch-status');
+    const btn = document.getElementById('apply-model-btn');
+    btn.disabled = true;
+    status.className = 'switch-status';
+    status.textContent = 'restarting llama-server…';
+    try {
+      const r = await fetch('/api/model', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cute: selectedCute, ctx }),
+      });
+      if (!r.ok) {
+        const err = await r.text();
+        throw new Error(err.slice(0, 200));
+      }
+      status.textContent = 'model loading, waiting for health…';
+      // Poll /api/llm-status until ready.
+      const deadline = Date.now() + 300000; // 5 min ceiling
+      while (Date.now() < deadline) {
+        await new Promise(r => setTimeout(r, 1500));
+        await refreshLlmStatus();
+        if (LLM_STATUS && LLM_STATUS.ready && LLM_STATUS.cute === selectedCute) {
+          break;
+        }
+      }
+      await loadModels();
+      renderModelList();
+      if (LLM_STATUS && LLM_STATUS.ready) {
+        status.className = 'switch-status ready';
+        status.textContent = 'ready — conversation has been cleared.';
+        // Clear the on-screen conversation too (server already cleared history).
+        conversation.innerHTML =
+          '<div class="empty-hint" id="empty-hint">model switched. start anew.</div>';
+        setTimeout(closeModelModal, 900);
+      } else {
+        status.className = 'switch-status error';
+        status.textContent = 'health poll timed out. check terminal logs.';
+      }
+    } catch (e) {
+      status.className = 'switch-status error';
+      status.textContent = 'error: ' + (e && e.message ? e.message : e);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+  window.applyModel = applyModel;
+
+  modelBadge.addEventListener('click', openModelModal);
+  // Close on Escape when open.
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modelModal.classList.contains('hidden')) closeModelModal();
+  });
+
+  // Status polling: fast while loading, relaxed once ready.
+  async function pollLoop() {
+    await refreshLlmStatus();
+    const interval = (LLM_STATUS && LLM_STATUS.ready) ? 8000 : 2000;
+    setTimeout(pollLoop, interval);
+  }
+  loadModels().then(pollLoop);
 
   // ---------- Voice input (whisper.cpp) ----------
   const micBtn = document.getElementById('mic-btn');

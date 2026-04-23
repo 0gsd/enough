@@ -45,6 +45,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
              "Prevents runaway tool loops; raise for heavier multi-step work.",
     )
     parser.add_argument(
+        "--no-supervise",
+        action="store_true",
+        help="Don't supervise llama-server. Useful if you want to run "
+             "llama-server manually via llama_server.sh. In that mode the "
+             "in-UI model switcher is disabled.",
+    )
+    parser.add_argument(
         "--version",
         action="version",
         version=f"enough {__version__}",
@@ -91,15 +98,17 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
 
-    ok, why = check_llm_reachable(args.llm_url)
-    if not ok:
-        print(f"error: cannot reach llama-server at {args.llm_url}", file=sys.stderr)
-        print(f"       {why}", file=sys.stderr)
-        print("", file=sys.stderr)
-        print("start it with something like:", file=sys.stderr)
-        print("  llama-server -m <path-to.gguf> --host 127.0.0.1 --port 8080 -ngl 99 -c 8192 --jinja", file=sys.stderr)
-        print("(or run ./llama_server.sh start from the enough repo root)", file=sys.stderr)
-        return 2
+    if args.no_supervise:
+        ok, why = check_llm_reachable(args.llm_url)
+        if not ok:
+            print(f"error: cannot reach llama-server at {args.llm_url}", file=sys.stderr)
+            print(f"       {why}", file=sys.stderr)
+            print("", file=sys.stderr)
+            print("since you passed --no-supervise, enough won't launch it for you.", file=sys.stderr)
+            print("start it yourself with:", file=sys.stderr)
+            print("  MODEL=<cute-name> ~/enough/llama_server.sh start", file=sys.stderr)
+            print("or drop --no-supervise to let enough launch and manage llama-server.", file=sys.stderr)
+            return 2
 
     created = ensure_skeleton(project_dir)
     if created:
@@ -122,6 +131,7 @@ def main(argv: list[str] | None = None) -> int:
         port=args.port,
         llm_url=args.llm_url,
         max_tool_iters=args.max_tool_iters,
+        supervise=not args.no_supervise,
     )
     return 0
 
