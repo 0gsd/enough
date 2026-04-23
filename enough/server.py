@@ -50,6 +50,9 @@ INSTALL_ROOT = Path(__file__).resolve().parents[1]
 UI_CONFIG_TEMPLATE = INSTALL_ROOT / "defaults" / "ui-config.json"
 UI_CONFIG_LIVE = Path.home() / "enough" / "config" / "ui.json"
 
+WHISPER_DIR = Path.home() / "enough" / "weights" / "whisper"
+WHISPER_DEFAULT_MODEL = "ggml-base.en.bin"
+
 IGNORE_DIRS = {
     "__pycache__", ".git", "node_modules", ".venv", "venv",
     ".pytest_cache", ".mypy_cache", ".ruff_cache", "dist", "build",
@@ -723,6 +726,77 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
         cfg["current"] = _validate_current(cfg, body or {})
         _write_ui_config(cfg)
         return cfg
+
+    @app.post("/api/transcribe")
+    async def api_transcribe(request: Request) -> dict[str, Any]:
+        """Speech-to-text via whisper.cpp. Accepts a multipart/form-data POST
+        with an 'audio' field containing a 16 kHz mono WAV blob. Returns
+        {"text": "transcribed words"} on success."""
+        import shutil as _shutil
+        import subprocess as _sp
+        import tempfile as _tempfile
+
+        whisper_bin = _shutil.which("whisper-cli")
+        if not whisper_bin:
+            raise HTTPException(
+                503,
+                "whisper-cli not found on PATH. install it with `brew install whisper-cpp` "
+                "or re-run bootstrap.sh.",
+            )
+        model_path = WHISPER_DIR / WHISPER_DEFAULT_MODEL
+        if not model_path.is_file():
+            raise HTTPException(
+                503,
+                f"whisper model not found at {model_path}. re-run bootstrap.sh step 7 "
+                "to download it.",
+            )
+
+        form = await request.form()
+        blob = form.get("audio")
+        if blob is None or not hasattr(blob, "read"):
+            raise HTTPException(400, "missing 'audio' file part")
+        data = await blob.read()
+        if not data:
+            raise HTTPException(400, "empty audio upload")
+
+        # whisper-cli needs a file on disk. Temp-file the upload, pipe through,
+        # discard.
+        with _tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+            f.write(data)
+            in_path = Path(f.name)
+        try:
+            proc = await asyncio.to_thread(
+                _sp.run,
+                [
+                    whisper_bin,
+                    "-m", str(model_path),
+                    "-f", str(in_path),
+                    "-nt",              # no timestamps in output
+                    "--no-prints",      # suppress progress spam
+                    "-l", "en",         # English (matches base.en)
+                    "--output-txt",     # write .txt next to the wav
+                ],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+            if proc.returncode != 0:
+                raise HTTPException(
+                    500,
+                    f"whisper-cli failed (code {proc.returncode}): "
+                    f"{proc.stderr[-400:] if proc.stderr else 'no stderr'}",
+                )
+            # whisper-cli writes <basename>.wav.txt alongside the input.
+            txt_path = in_path.with_suffix(".wav.txt")
+            if txt_path.is_file():
+                text = txt_path.read_text(encoding="utf-8").strip()
+                txt_path.unlink(missing_ok=True)
+            else:
+                # Fallback: some builds print to stdout.
+                text = (proc.stdout or "").strip()
+            return {"text": text}
+        finally:
+            in_path.unlink(missing_ok=True)
 
     @app.get("/favicon.ico")
     async def favicon():

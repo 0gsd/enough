@@ -48,7 +48,7 @@ ask_text() {
   echo "${answer:-$default}"
 }
 
-TOTAL=8
+TOTAL=9
 
 # ---------------------------------------------------------------------------
 # Banner
@@ -66,9 +66,10 @@ BANNER
 
 note "This script sets up everything you need to run enough on a Mac:"
 note "  • Homebrew (package manager, if you don't have it)"
-note "  • llama.cpp, uv, tor via Homebrew"
+note "  • llama.cpp, uv, tor, whisper-cpp via Homebrew"
 note "  • a clone of the enough repo at ~/enough"
 note "  • a GGUF model file in ~/enough/weights/"
+note "  • a whisper model for voice input in ~/enough/weights/whisper/"
 note "  • an \`enough\` command on your PATH"
 note ""
 note "It's safe to re-run. Each step checks state first."
@@ -109,10 +110,11 @@ fi
 # 3. Brew deps
 # ---------------------------------------------------------------------------
 step 3 "installing Homebrew packages"
-note "three utilities go on this pass:"
-note "  • llama.cpp — the local LLM server that backs enough"
-note "  • uv        — manages the Python environment that runs enough itself"
-note "  • tor       — (optional) anonymization proxy for the the-internet skill"
+note "four utilities go on this pass:"
+note "  • llama.cpp   — the local LLM server that backs enough"
+note "  • uv          — manages the Python environment that runs enough itself"
+note "  • tor         — (optional) anonymization proxy for the the-internet skill"
+note "  • whisper-cpp — local speech-to-text for the mic button in chat"
 
 install_brew_pkg() {
   local pkg="$1"
@@ -125,7 +127,7 @@ install_brew_pkg() {
   fi
 }
 
-for pkg in llama.cpp uv tor; do
+for pkg in llama.cpp uv tor whisper-cpp; do
   install_brew_pkg "$pkg"
 done
 
@@ -214,9 +216,37 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 7. PATH wrapper
+# 7. Whisper model for voice input
 # ---------------------------------------------------------------------------
-step 7 "installing the \`enough\` command on your PATH"
+step 7 "placing the voice-input model"
+note "The mic button in the chat input sends audio to a local whisper.cpp"
+note "binary (installed via Homebrew in step 3) for transcription. It needs a"
+note "model file. Recommended: ggml-base.en.bin (~142 MB, English-only,"
+note "well-balanced accuracy vs speed). Everything stays on your machine —"
+note "no audio leaves this computer."
+note ""
+
+WHISPER_DIR="$ENOUGH_HOME/weights/whisper"
+WHISPER_MODEL_NAME="ggml-base.en.bin"
+WHISPER_MODEL_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/$WHISPER_MODEL_NAME"
+mkdir -p "$WHISPER_DIR"
+
+if [[ -f "$WHISPER_DIR/$WHISPER_MODEL_NAME" ]]; then
+  ok "whisper model already present:"
+  dim "$WHISPER_DIR/$WHISPER_MODEL_NAME  ($(du -h "$WHISPER_DIR/$WHISPER_MODEL_NAME" | awk '{print $1}'))"
+else
+  if ask_yn "download $WHISPER_MODEL_NAME (~142 MB)?" Y; then
+    curl -L --progress-bar -o "$WHISPER_DIR/$WHISPER_MODEL_NAME" "$WHISPER_MODEL_URL"
+    ok "whisper model downloaded"
+  else
+    warn "skipping. voice input won't work until a whisper .bin is in $WHISPER_DIR/"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
+# 8. PATH wrapper
+# ---------------------------------------------------------------------------
+step 8 "installing the \`enough\` command on your PATH"
 note "This is a 3-line shell script at ~/.local/bin/enough that runs"
 note "\`uv run --project ~/enough enough \"\$@\"\`. Once it's on PATH, you can"
 note "\`cd\` into any project dir and type \`enough\` to launch the harness there."
@@ -246,9 +276,9 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 8. Done
+# 9. Done
 # ---------------------------------------------------------------------------
-step 8 "done"
+step 9 "done"
 ok "enough is installed at ~/enough"
 ok "weights at ~/enough/weights/"
 ok "\`enough\` CLI at ~/.local/bin/enough"

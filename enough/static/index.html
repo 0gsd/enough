@@ -336,6 +336,25 @@
   }
   .input-form button:hover { border-color: var(--fg-muted); }
   .input-form button:disabled { opacity: 0.5; cursor: wait; }
+  .mic-btn {
+    min-width: 40px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .mic-btn .mic-icon { font-size: 15px; line-height: 1; }
+  .mic-btn.recording {
+    background: color-mix(in oklab, var(--accent-error) 18%, var(--bg-raise));
+    border-color: var(--accent-error);
+    color: var(--accent-error);
+    animation: mic-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes mic-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent-error) 40%, transparent); }
+    50%      { box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent-error) 10%, transparent); }
+  }
+  .mic-btn.transcribing {
+    opacity: 0.6;
+    cursor: wait;
+  }
   .input-form .hint {
     position: absolute;
     font-size: 11px;
@@ -591,6 +610,9 @@
         <textarea id="message" name="message" placeholder="message… (shift+enter for newline)"
                   rows="1" autofocus></textarea>
         <button type="submit" id="send-btn">send</button>
+        <button type="button" id="mic-btn" class="mic-btn" title="voice input (local whisper.cpp)">
+          <span class="mic-icon">🎤</span>
+        </button>
       </form>
     </div>
 
@@ -777,6 +799,154 @@
   });
 
   loadUIConfig();
+
+  // ---------- Voice input (whisper.cpp) ----------
+  const micBtn = document.getElementById('mic-btn');
+  let mic = {
+    recording: false,
+    stream: null,
+    ctx: null,
+    processor: null,
+    chunks: [],
+    captureRate: 16000,   // filled in when AudioContext starts
+  };
+
+  async function startMic() {
+    try {
+      mic.stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          noiseSuppression: true,
+          echoCancellation: true,
+        },
+      });
+    } catch (e) {
+      alert('microphone access denied: ' + (e && e.message ? e.message : e));
+      return;
+    }
+    // Prefer 16 kHz if the browser will honor it; otherwise capture at native
+    // rate and resample in encodeWAV().
+    try {
+      mic.ctx = new AudioContext({ sampleRate: 16000 });
+    } catch (_) {
+      mic.ctx = new AudioContext();
+    }
+    mic.captureRate = mic.ctx.sampleRate;
+    const source = mic.ctx.createMediaStreamSource(mic.stream);
+    // ScriptProcessor is deprecated but universally supported; AudioWorklet
+    // is cleaner but more code for the same effect at v0.0.6 scope.
+    mic.processor = mic.ctx.createScriptProcessor(4096, 1, 1);
+    mic.chunks = [];
+    mic.processor.onaudioprocess = (e) => {
+      if (!mic.recording) return;
+      const input = e.inputBuffer.getChannelData(0);
+      mic.chunks.push(new Float32Array(input));
+    };
+    source.connect(mic.processor);
+    mic.processor.connect(mic.ctx.destination);
+    mic.recording = true;
+    micBtn.classList.add('recording');
+    micBtn.querySelector('.mic-icon').textContent = '●';
+    micBtn.title = 'click to stop + transcribe';
+  }
+
+  async function stopMicAndTranscribe() {
+    mic.recording = false;
+    try { mic.processor && mic.processor.disconnect(); } catch (_) {}
+    try { mic.stream && mic.stream.getTracks().forEach(t => t.stop()); } catch (_) {}
+    try { mic.ctx && await mic.ctx.close(); } catch (_) {}
+
+    micBtn.classList.remove('recording');
+    micBtn.classList.add('transcribing');
+    micBtn.querySelector('.mic-icon').textContent = '…';
+
+    // Concatenate all sample chunks.
+    let total = 0;
+    for (const c of mic.chunks) total += c.length;
+    const flat = new Float32Array(total);
+    { let off = 0; for (const c of mic.chunks) { flat.set(c, off); off += c.length; } }
+
+    // Resample to 16 kHz mono if the capture rate didn't match. Linear
+    // interpolation is fine for speech.
+    const target = 16000;
+    let pcm16 = flat;
+    if (mic.captureRate !== target) {
+      const ratio = mic.captureRate / target;
+      const outLen = Math.floor(flat.length / ratio);
+      const out = new Float32Array(outLen);
+      for (let i = 0; i < outLen; i++) {
+        const src = i * ratio;
+        const i0 = Math.floor(src);
+        const i1 = Math.min(i0 + 1, flat.length - 1);
+        const frac = src - i0;
+        out[i] = flat[i0] * (1 - frac) + flat[i1] * frac;
+      }
+      pcm16 = out;
+    }
+
+    // Float32 → Int16 PCM + WAV header.
+    const wav = encodeWAV(pcm16, target);
+
+    try {
+      const fd = new FormData();
+      fd.append('audio', new Blob([wav], { type: 'audio/wav' }), 'mic.wav');
+      const r = await fetch('/api/transcribe', { method: 'POST', body: fd });
+      if (!r.ok) {
+        const err = await r.text();
+        throw new Error(`transcribe ${r.status}: ${err.slice(0, 200)}`);
+      }
+      const { text } = await r.json();
+      if (text) {
+        const cur = textarea.value;
+        const glue = (cur && !cur.endsWith(' ') && !cur.endsWith('\n')) ? ' ' : '';
+        textarea.value = cur + glue + text;
+        // Autosize.
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 280) + 'px';
+      }
+    } catch (e) {
+      console.warn('transcribe failed', e);
+      alert('transcription failed: ' + (e && e.message ? e.message : e));
+    } finally {
+      mic.chunks = [];
+      micBtn.classList.remove('transcribing');
+      micBtn.querySelector('.mic-icon').textContent = '🎤';
+      micBtn.title = 'voice input (local whisper.cpp)';
+      textarea.focus();
+    }
+  }
+
+  function encodeWAV(samples, sampleRate) {
+    // PCM16 WAV
+    const buf = new ArrayBuffer(44 + samples.length * 2);
+    const view = new DataView(buf);
+    const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
+    writeStr(0, 'RIFF');
+    view.setUint32(4, 36 + samples.length * 2, true);
+    writeStr(8, 'WAVE');
+    writeStr(12, 'fmt ');
+    view.setUint32(16, 16, true);           // subchunk1 size
+    view.setUint16(20, 1, true);            // PCM
+    view.setUint16(22, 1, true);            // mono
+    view.setUint32(24, sampleRate, true);   // sample rate
+    view.setUint32(28, sampleRate * 2, true); // byte rate
+    view.setUint16(32, 2, true);            // block align
+    view.setUint16(34, 16, true);           // bits/sample
+    writeStr(36, 'data');
+    view.setUint32(40, samples.length * 2, true);
+    const pcm = new Int16Array(buf, 44);
+    for (let i = 0; i < samples.length; i++) {
+      const s = Math.max(-1, Math.min(1, samples[i]));
+      pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    }
+    return buf;
+  }
+
+  micBtn.addEventListener('click', () => {
+    if (micBtn.classList.contains('transcribing')) return; // busy
+    if (mic.recording) stopMicAndTranscribe();
+    else startMic();
+  });
 
   // ---------- Sidebar section collapse ----------
   const SECTION_KEY = 'enough.sidebar.sections';
