@@ -727,6 +727,18 @@ def create_app(project_dir: Path, llm_url: str, max_tool_iters: int = DEFAULT_MA
         _write_ui_config(cfg)
         return cfg
 
+    @app.get("/api/models")
+    async def api_models() -> dict[str, Any]:
+        """Registry + per-model installed/recommended view + total RAM.
+        v0.0.6-B uses this for inspection; v0.0.6-C will drive the
+        in-UI model switcher from the same payload."""
+        from . import models as _models  # late import: avoid circular
+        return {
+            "total_ram_gb": _models.total_ram_gb(),
+            "current": _models.load_state().get("current"),
+            "models": _models.all_models_view(),
+        }
+
     @app.post("/api/transcribe")
     async def api_transcribe(request: Request) -> dict[str, Any]:
         """Speech-to-text via whisper.cpp. Accepts a multipart/form-data POST

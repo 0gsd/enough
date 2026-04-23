@@ -170,50 +170,89 @@ ok "~/enough/.venv is ready"
 # 6. Model weights
 # ---------------------------------------------------------------------------
 step 6 "placing the LLM weights"
-note "enough talks to a local llama-server that loads a GGUF model file."
-note "Recommended: Gemma 4 26B A4B-it Q4_K_M (~16 GB on disk, ~4B active"
-note "parameters at inference — fast on Apple Silicon)."
+note "enough ships with four supported local models. You pick how many to"
+note "install now; you can add the rest later by re-running this script."
+note "All are Q4_K_M (~4-bit) quantizations — good quality, fast on Apple"
+note "Silicon, and moderate disk footprint."
+note ""
+note "  [1] G40-04   Gemma 4 4B (E4B)        ~5.4 GB   fast; fits 16 GB Macs"
+note "  [2] Q35-09   Qwen3.5-9B              ~5.6 GB   balanced mid-size"
+note "  [3] G40-26   Gemma 4 26B MoE         ~15.6 GB  Gemma flagship (MoE)"
+note "  [4] Q36-27   Qwen3.6-27B             ~16.5 GB  Qwen dense, coding"
+note ""
+note "Default after install is always G40-04 regardless of which tier you"
+note "pick — lightest surface area, most forgiving hardware-wise."
 note ""
 
 WEIGHTS_DIR="$ENOUGH_HOME/weights"
 mkdir -p "$WEIGHTS_DIR"
-RECOMMENDED="gemma-4-26B-A4B-it-Q4_K_M.gguf"
-RECOMMENDED_URL="https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF/resolve/main/$RECOMMENDED"
 
-if compgen -G "$WEIGHTS_DIR/*.gguf" > /dev/null; then
-  ok "found at least one .gguf in ~/enough/weights/ — nothing to do here:"
-  for f in "$WEIGHTS_DIR"/*.gguf; do
-    dim "$(basename "$f")  ($(du -h "$f" | awk '{print $1}'))"
-  done
-else
-  note "no .gguf found in ~/enough/weights/ yet."
-  note "you can either (a) point to an existing GGUF you already have, or"
-  note "(b) download the recommended one from Hugging Face."
-  echo
-  if ask_yn "do you already have a Gemma 4 26B MoE GGUF on this machine?" N; then
-    EXISTING=$(ask_text "absolute path to the .gguf" "")
-    EXISTING="${EXISTING/#\~/$HOME}"
-    if [[ -f "$EXISTING" ]]; then
-      if ask_yn "move (not copy) it into ~/enough/weights/? saves 16GB of duplication" Y; then
-        mv "$EXISTING" "$WEIGHTS_DIR/"
-        ok "moved $(basename "$EXISTING") → $WEIGHTS_DIR/"
-      else
-        ln -s "$EXISTING" "$WEIGHTS_DIR/$(basename "$EXISTING")"
-        ok "symlinked $(basename "$EXISTING") → $WEIGHTS_DIR/"
-      fi
-    else
-      err "no file at $EXISTING — skipping weights step. re-run the script when it's in place."
-    fi
+# (cute_name, filename, url, disk_gb)
+declare -a MODEL_KEYS=(g40-04 q35-09 g40-26 q36-27)
+declare -A MODEL_FN=(
+  [g40-04]="gemma-4-E4B-it-Q4_K_M.gguf"
+  [q35-09]="Qwen3.5-9B-Q4_K_M.gguf"
+  [g40-26]="gemma-4-26B-A4B-it-Q4_K_M.gguf"
+  [q36-27]="Qwen_Qwen3.6-27B-Q4_K_M.gguf"
+)
+declare -A MODEL_URL=(
+  [g40-04]="https://huggingface.co/ggml-org/gemma-4-E4B-it-GGUF/resolve/main/gemma-4-E4B-it-Q4_K_M.gguf"
+  [q35-09]="https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf"
+  [g40-26]="https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF/resolve/main/gemma-4-26B-A4B-it-Q4_K_M.gguf"
+  [q36-27]="https://huggingface.co/bartowski/Qwen_Qwen3.6-27B-GGUF/resolve/main/Qwen_Qwen3.6-27B-Q4_K_M.gguf"
+)
+declare -A MODEL_GB=(
+  [g40-04]=5.4  [q35-09]=5.6  [g40-26]=15.6  [q36-27]=16.5
+)
+
+# Cumulative install tiers.
+echo
+note "cumulative install tiers:"
+note "  1  →  G40-04 only                       (~5.4 GB)"
+note "  2  →  G40-04 + Q35-09                   (~11 GB)"
+note "  3  →  G40-04 + Q35-09 + G40-26          (~27 GB)"
+note "  4  →  all four models                   (~43 GB)"
+echo
+TIER=$(ask_text "install how many? [1-4]" "1")
+case "$TIER" in
+  1) SELECTED=(g40-04) ;;
+  2) SELECTED=(g40-04 q35-09) ;;
+  3) SELECTED=(g40-04 q35-09 g40-26) ;;
+  4) SELECTED=(g40-04 q35-09 g40-26 q36-27) ;;
+  *)
+    warn "unrecognized tier $TIER — defaulting to 1 (G40-04 only)"
+    SELECTED=(g40-04) ;;
+esac
+
+for cute in "${SELECTED[@]}"; do
+  filename="${MODEL_FN[$cute]}"
+  dest="$WEIGHTS_DIR/$filename"
+  if [[ -f "$dest" ]]; then
+    ok "$cute already at $(basename "$dest")  ($(du -h "$dest" | awk '{print $1}'))"
   else
-    warn "downloading ~16 GB. this will take a while on normal home internet."
-    if ask_yn "proceed with download of $RECOMMENDED?" Y; then
-      curl -L --progress-bar -o "$WEIGHTS_DIR/$RECOMMENDED" "$RECOMMENDED_URL"
-      ok "downloaded $RECOMMENDED"
-    else
-      warn "skipping. put a .gguf into ~/enough/weights/ before running enough."
-    fi
+    note "downloading $cute (~${MODEL_GB[$cute]} GB) → $(basename "$dest")"
+    curl -L --progress-bar -o "$dest" "${MODEL_URL[$cute]}"
+    ok "$cute installed"
   fi
+done
+
+# Seed the live current selection if not yet set.
+mkdir -p "$ENOUGH_HOME/config"
+if [[ ! -f "$ENOUGH_HOME/config/models.json" ]]; then
+  echo '{"current": "g40-04"}' > "$ENOUGH_HOME/config/models.json"
+  ok "live model state seeded to default (G40-04)"
 fi
+
+echo
+note "all your installed models:"
+for cute in "${MODEL_KEYS[@]}"; do
+  fn="${MODEL_FN[$cute]}"
+  if [[ -f "$WEIGHTS_DIR/$fn" ]]; then
+    dim "  ✓ $cute   $fn   ($(du -h "$WEIGHTS_DIR/$fn" | awk '{print $1}'))"
+  else
+    dim "  · $cute   (not installed; re-run this script to add)"
+  fi
+done
 
 # ---------------------------------------------------------------------------
 # 7. Whisper model for voice input

@@ -3,19 +3,21 @@
 # Usage: ./llama_server.sh [start|stop|status|logs|toggle]   (default: toggle)
 #
 # Configure via env vars (or edit the defaults below):
-#   MODEL     absolute path to a .gguf file (required — no default path ships)
+#   MODEL     path to a .gguf file, OR a cute name (g40-04 / q35-09 / g40-26 /
+#             q36-27). If empty, resolves via ~/enough/config/models.json
+#             (the 'current' model selected by the user / installer).
 #   HOST      bind address                   (default: 127.0.0.1)
 #   PORT      server port                    (default: 8080)
 #   NGL       GPU layers to offload          (default: 99 = all, Apple Metal)
-#   CTX       TOTAL context across slots     (default: 16384)
-#   PARALLEL  concurrent request slots       (default: 1  — single-user,
-#             gives one request the FULL ctx. llama-server otherwise
-#             defaults to 4 slots and splits ctx across them, which
-#             gave a 2048-token-per-slot window on a 8192 total — too
-#             small for a system prompt with skills + policies.)
+#   CTX       TOTAL context across slots     (default: auto, sized from the
+#             chosen model's ctx_defaults for this host's RAM; override with
+#             a literal number)
+#   PARALLEL  concurrent request slots       (default: 1)
 #
-# Example:
-#   MODEL=~/models/gemma-4-26B-A4B-it-Q4_K_M.gguf ./llama_server.sh start
+# Examples:
+#   ./llama_server.sh start                         # current model, auto ctx
+#   MODEL=g40-04 ./llama_server.sh start            # cute name
+#   MODEL=~/some/path.gguf CTX=8192 ./llama_server.sh start  # direct path
 
 set -euo pipefail
 
@@ -23,8 +25,36 @@ MODEL="${MODEL:-}"
 HOST="${HOST:-127.0.0.1}"
 PORT="${PORT:-8080}"
 NGL="${NGL:-99}"
-CTX="${CTX:-32768}"
+CTX="${CTX:-}"
 PARALLEL="${PARALLEL:-1}"
+
+ENOUGH_HOME="$HOME/enough"
+resolve_model() {
+  # If MODEL contains '/', treat as a literal path; else resolve via the
+  # models registry. If MODEL is empty, use the current cute-name from the
+  # live config.
+  local want="$1"
+  if [[ "$want" == */* ]]; then
+    MODEL_PATH="$want"
+    # CTX stays as whatever caller set (or empty → llama-server default).
+    return 0
+  fi
+  if ! command -v uv >/dev/null 2>&1; then
+    echo "error: uv not on PATH; can't resolve cute model name without it." >&2
+    return 1
+  fi
+  local args=()
+  if [[ -n "$want" ]]; then args+=(--cute "$want"); fi
+  local out
+  if ! out=$(uv run --project "$ENOUGH_HOME" python -m enough.models params "${args[@]}" 2>&1); then
+    echo "error: could not resolve model: $out" >&2
+    return 1
+  fi
+  eval "$out"  # sets MODEL_PATH, CTX_RECOMMENDED, MODEL_CUTE, MODEL_LABEL
+  if [[ -z "${CTX}" ]]; then
+    CTX="$CTX_RECOMMENDED"
+  fi
+}
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STATE_DIR="$SCRIPT_DIR/.llama-server"
@@ -44,19 +74,23 @@ start() {
     echo "error: llama-server not found. install with: brew install llama.cpp" >&2
     return 1
   fi
-  if [[ -z "$MODEL" ]]; then
-    echo "error: MODEL is not set. export MODEL=/path/to/model.gguf (or edit the default in this script)." >&2
+  if ! resolve_model "$MODEL"; then
     return 1
   fi
-  if [[ ! -f "$MODEL" ]]; then
-    echo "error: model file not found: $MODEL" >&2
+  if [[ ! -f "$MODEL_PATH" ]]; then
+    echo "error: model file not found: $MODEL_PATH" >&2
+    echo "       re-run bootstrap.sh to download it, or pass MODEL=<cute-name-of-an-installed-model>." >&2
     return 1
   fi
   mkdir -p "$STATE_DIR"
+  local ctx_to_use="${CTX:-32768}"
+  echo "launching llama-server with:"
+  echo "  model: $MODEL_PATH"
+  echo "  ctx:   $ctx_to_use"
   nohup llama-server \
-    -m "$MODEL" \
+    -m "$MODEL_PATH" \
     --host "$HOST" --port "$PORT" \
-    -ngl "$NGL" -c "$CTX" --parallel "$PARALLEL" --jinja \
+    -ngl "$NGL" -c "$ctx_to_use" --parallel "$PARALLEL" --jinja \
     >"$LOG_FILE" 2>&1 &
   echo $! >"$PID_FILE"
   disown

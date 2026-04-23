@@ -1,0 +1,106 @@
+{
+  "_doc": [
+    "Model registry for enough.",
+    "",
+    "Four supported local LLMs, keyed by a short 'cute name' the user sees",
+    "in the UI and can pass as MODEL=<name> to llama_server.sh:",
+    "",
+    "  G40-04 — Gemma 4 4B (E4B MatFormer), ~5 GB",
+    "  Q35-09 — Qwen3.5-9B, ~5.5 GB",
+    "  G40-26 — Gemma 4 26B MoE (4B active), ~16 GB",
+    "  Q36-27 — Qwen3.6-27B dense, ~16 GB",
+    "",
+    "Each entry declares its GGUF download URL + filename, approximate",
+    "disk footprint, minimum recommended RAM, and a ctx_default table",
+    "that maps total-RAM tiers to a recommended context window. Those",
+    "defaults are starting points; the live config can override per model.",
+    "",
+    "To add a new model, copy an entry and rename its key. Put the new",
+    "entry in ~/enough/config/models.json (the live file) — edits to",
+    "this template only affect future installs.",
+    "",
+    "Live state is at ~/enough/config/models.json and tracks only:",
+    "  { \"current\": \"<cute-name>\" }",
+    "Installed-state is derived from whether the .gguf file exists at",
+    "~/enough/weights/<gguf_filename>."
+  ],
+
+  "default": "g40-04",
+
+  "models": {
+    "g40-04": {
+      "cute_name": "G40-04",
+      "label": "Gemma 4 4B (E4B)",
+      "family": "gemma-4",
+      "gguf_filename": "gemma-4-E4B-it-Q4_K_M.gguf",
+      "gguf_url": "https://huggingface.co/ggml-org/gemma-4-E4B-it-GGUF/resolve/main/gemma-4-E4B-it-Q4_K_M.gguf",
+      "disk_gb_approx": 5.4,
+      "ram_gb_recommended_min": 8,
+      "ctx_max": 131072,
+      "ctx_defaults": {
+        "gte_64gb": 65536,
+        "gte_32gb": 32768,
+        "gte_16gb": 16384,
+        "lt_16gb": 8192
+      }
+    },
+
+    "q35-09": {
+      "cute_name": "Q35-09",
+      "label": "Qwen3.5-9B",
+      "family": "qwen-3.5",
+      "gguf_filename": "Qwen3.5-9B-Q4_K_M.gguf",
+      "gguf_url": "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf",
+      "disk_gb_approx": 5.6,
+      "ram_gb_recommended_min": 10,
+      "ctx_max": 262144,
+      "ctx_defaults": {
+        "gte_64gb": 65536,
+        "gte_32gb": 32768,
+        "gte_16gb": 16384,
+        "lt_16gb": 8192
+      }
+    },
+
+    "g40-26": {
+      "cute_name": "G40-26",
+      "label": "Gemma 4 26B MoE (A4B)",
+      "family": "gemma-4",
+      "gguf_filename": "gemma-4-26B-A4B-it-Q4_K_M.gguf",
+      "gguf_url": "https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF/resolve/main/gemma-4-26B-A4B-it-Q4_K_M.gguf",
+      "disk_gb_approx": 15.6,
+      "ram_gb_recommended_min": 20,
+      "ctx_max": 131072,
+      "ctx_defaults": {
+        "gte_64gb": 65536,
+        "gte_32gb": 32768,
+        "gte_16gb": 8192,
+        "lt_16gb": 4096
+      }
+    },
+
+    "q36-27": {
+      "cute_name": "Q36-27",
+      "label": "Qwen3.6-27B (dense)",
+      "family": "qwen-3.6",
+      "gguf_filename": "Qwen_Qwen3.6-27B-Q4_K_M.gguf",
+      "gguf_url": "https://huggingface.co/bartowski/Qwen_Qwen3.6-27B-GGUF/resolve/main/Qwen_Qwen3.6-27B-Q4_K_M.gguf",
+      "disk_gb_approx": 16.5,
+      "ram_gb_recommended_min": 22,
+      "ctx_max": 262144,
+      "ctx_defaults": {
+        "gte_64gb": 65536,
+        "gte_32gb": 32768,
+        "gte_16gb": 8192,
+        "lt_16gb": 4096
+      }
+    }
+  },
+
+  "install_tiers": [
+    {"n": 1, "models": ["g40-04"],                                   "label": "just G40-04 (smallest, fits anywhere)"},
+    {"n": 2, "models": ["g40-04", "q35-09"],                         "label": "+ Q35-09 (balanced mid-size)"},
+    {"n": 3, "models": ["g40-04", "q35-09", "g40-26"],               "label": "+ G40-26 (Gemma MoE, flagship)"},
+    {"n": 4, "models": ["g40-04", "q35-09", "g40-26", "q36-27"],    "label": "+ Q36-27 (Qwen dense, coding flagship)"}
+  ]
+}
