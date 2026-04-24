@@ -121,7 +121,7 @@ install_brew_pkg() {
   if brew list --formula | grep -qx "$pkg"; then
     ok "$pkg already installed"
   else
-    note "installing $pkg via Homebrew…"
+    note "installing $pkg via Homebrew..."
     brew install "$pkg"
     ok "$pkg installed"
   fi
@@ -152,7 +152,7 @@ else
     err "~/enough exists but isn't a git repo. move it aside and re-run."
     exit 1
   fi
-  note "cloning $REPO_URL into $ENOUGH_HOME…"
+  note "cloning $REPO_URL into $ENOUGH_HOME..."
   git clone "$REPO_URL" "$ENOUGH_HOME"
   ok "cloned"
 fi
