@@ -26,12 +26,15 @@ if [[ "$(uname)" != "Darwin" ]]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SOURCE="$SCRIPT_DIR/defaults/macos/Launch in enough.workflow"
+# This script lives at <install>/shortcuts/, the workflow at <install>/defaults/macos/.
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+SOURCE="$REPO_ROOT/defaults/macos/Launch in enough.workflow"
 DEST="$HOME/Library/Services/Launch in enough.workflow"
 
 if [[ ! -d "$SOURCE" ]]; then
   echo "error: workflow bundle not found at $SOURCE" >&2
-  echo "       this script must be run from the enough repo root." >&2
+  echo "       this script must be run from inside an enough install" >&2
+  echo "       (~/enough/shortcuts/setup-quick-action.sh)." >&2
   exit 1
 fi
 
