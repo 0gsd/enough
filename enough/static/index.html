@@ -664,6 +664,80 @@
     font-style: italic;
   }
 
+  /* Auto-reset toggle. Sits below the gauge so it's visually paired with
+     the pressure indicator — see pressure, decide what to do about it. */
+  #model-modal .auto-reset-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+  }
+  #model-modal .auto-reset-row input[type="checkbox"] {
+    margin-top: 3px;
+    accent-color: var(--accent-agent);
+    cursor: pointer;
+  }
+  #model-modal .auto-reset-row .text {
+    display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0;
+    cursor: pointer;
+  }
+  #model-modal .auto-reset-row .label {
+    font-size: 12.5px;
+    color: var(--fg);
+  }
+  #model-modal .auto-reset-row .label .threshold-pct {
+    font-weight: 600;
+  }
+  #model-modal .auto-reset-row .hint {
+    font-size: 11px;
+    color: var(--fg-faint);
+    line-height: 1.4;
+  }
+
+  /* System bubbles (auto-reset chrome + harness-driven prompts).
+     Distinct from user/agent bubbles so it's clear the harness is talking,
+     not the user typing or the model responding spontaneously. */
+  .msg.system, .msg.harness {
+    background: var(--bg-raise);
+    border: 1px dashed var(--border);
+    color: var(--fg-muted);
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin: 8px 0;
+    font-size: 12px;
+  }
+  .msg.system .role, .msg.harness .role {
+    color: var(--fg-faint);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 2px;
+  }
+  .msg.system .body, .msg.harness .body {
+    color: var(--fg-muted);
+  }
+  /* The visible "reset divider" between auto-reset checkpoint phase and
+     the resumed conversation — gives the user a clean break. */
+  .reset-divider {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 18px 0;
+    position: relative;
+    overflow: visible;
+  }
+  .reset-divider::after {
+    content: 'auto-reset';
+    position: absolute;
+    top: -8px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg);
+    color: var(--fg-faint);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    padding: 0 8px;
+  }
+
   /* Reuse modal chrome from #ui-modal; the model modal has extra fields. */
   #model-modal.hidden { display: none; }
   #model-modal {
@@ -892,6 +966,13 @@
           <span class="none">no data yet — send a message first.</span>
         </div>
       </div>
+      <label class="auto-reset-row">
+        <input type="checkbox" id="auto-reset-toggle">
+        <span class="text">
+          <span class="label">auto-reset at <span class="threshold-pct" id="auto-reset-threshold">75</span>% pressure</span>
+          <span class="hint">when the gauge crosses the threshold, the agent writes a Continuation block to its active request file, the conversation clears, and it resumes from the checkpoint. experimental — leave off if you want full manual control.</span>
+        </span>
+      </label>
       <div class="model-list" id="model-list">
         <!-- rendered from /api/models -->
       </div>
@@ -1198,6 +1279,53 @@
   // model badge, since both are about the LLM session.
   tokenGauge.addEventListener('click', () => openModelModal());
 
+  // ---------- Orchestrator (auto-reset) config ----------
+  let ORCHESTRATOR = null;  // last /api/orchestrator payload
+
+  async function refreshOrchestrator() {
+    try {
+      const r = await fetch('/api/orchestrator');
+      if (!r.ok) return;
+      ORCHESTRATOR = await r.json();
+      renderOrchestrator();
+    } catch (_) { /* transient */ }
+  }
+
+  function renderOrchestrator() {
+    if (!ORCHESTRATOR) return;
+    const toggle = document.getElementById('auto-reset-toggle');
+    const pctEl = document.getElementById('auto-reset-threshold');
+    if (toggle) toggle.checked = !!ORCHESTRATOR.auto_reset;
+    if (pctEl) pctEl.textContent = ORCHESTRATOR.threshold_pct;
+  }
+
+  async function setAutoReset(enabled) {
+    try {
+      const r = await fetch('/api/orchestrator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ auto_reset: !!enabled }),
+      });
+      if (!r.ok) throw new Error(await r.text());
+      ORCHESTRATOR = await r.json();
+      renderOrchestrator();
+    } catch (e) {
+      // Snap toggle back to the persisted state and surface the failure
+      // so the user knows their click didn't take effect.
+      renderOrchestrator();
+      alert('could not save auto-reset setting: ' + (e && e.message ? e.message : e));
+    }
+  }
+
+  // Bind toggle once at script-init time — the modal markup is in the DOM
+  // already (just hidden), so this finds the element on first load.
+  (function bindOrchestratorToggle() {
+    const toggle = document.getElementById('auto-reset-toggle');
+    if (toggle) {
+      toggle.addEventListener('change', (e) => setAutoReset(e.target.checked));
+    }
+  })();
+
   async function refreshLlmStatus() {
     try {
       const r = await fetch('/api/llm-status');
@@ -1284,7 +1412,7 @@
     document.getElementById('switch-status').textContent = '';
     document.getElementById('switch-status').className = 'switch-status';
     document.getElementById('apply-model-btn').disabled = false;
-    await Promise.all([loadModels(), refreshLlmStatus(), refreshUsage()]);
+    await Promise.all([loadModels(), refreshLlmStatus(), refreshUsage(), refreshOrchestrator()]);
     selectedCute = (LLM_STATUS && LLM_STATUS.cute) || (MODELS && MODELS.current);
     renderModelList();
     updateCtxInputForSelection();
@@ -1365,6 +1493,9 @@
   // page reload mid-conversation, this restores the bar without waiting
   // for the next turn). Subsequent updates flow in via SSE.
   refreshUsage();
+  // Also prime the auto-reset toggle from disk so the modal renders the
+  // saved state the first time it's opened.
+  refreshOrchestrator();
 
   // ---------- Voice input (whisper.cpp) ----------
   const micBtn = document.getElementById('mic-btn');
@@ -1681,6 +1812,41 @@
       LAST_USAGE = JSON.parse(e.data);
       renderUsage();
     } catch (_) { /* ignore parse errors */ }
+  });
+
+  // Harness-driven prompts (auto-reset checkpoint + continue messages).
+  // Look like the user typed them but rendered with a distinct style so
+  // the user can tell the harness, not them, asked for it.
+  es.addEventListener('system_prompt', (e) => {
+    try {
+      const { text } = JSON.parse(e.data);
+      conversation.insertAdjacentHTML('beforeend',
+        `<div class="msg harness"><div class="role">harness</div>` +
+        `<div class="body">${escapeHtml(text)}</div></div>`);
+      autoscroll();
+    } catch (_) { /* ignore */ }
+  });
+
+  // System bubbles — harness narrating what's happening (auto-reset
+  // chrome). These don't go into the model's history; they're only for
+  // the human reading the chat.
+  es.addEventListener('system', (e) => {
+    try {
+      const { kind, message } = JSON.parse(e.data);
+      conversation.insertAdjacentHTML('beforeend',
+        `<div class="msg system" data-kind="${kind || 'note'}">` +
+        `<div class="role">${kind === 'auto_reset_starting' ? 'auto-reset' : 'harness'}</div>` +
+        `<div class="body">${escapeHtml(message || '')}</div></div>`);
+      autoscroll();
+    } catch (_) { /* ignore */ }
+  });
+
+  // The server says "the in-memory conversation has been wiped" — drop a
+  // visual divider so the user can see the seam between the pre-reset
+  // checkpoint phase and the post-reset continuation.
+  es.addEventListener('reset', () => {
+    conversation.insertAdjacentHTML('beforeend', '<hr class="reset-divider">');
+    autoscroll();
   });
 
   // ---------- Preview-pane edit mode ----------

@@ -54,6 +54,12 @@ UI_CONFIG_LIVE = Path.home() / "enough" / "config" / "ui.json"
 WHISPER_DIR = Path.home() / "enough" / "weights" / "whisper"
 WHISPER_DEFAULT_MODEL = "ggml-base.en.bin"
 
+ORCHESTRATOR_CONFIG = Path.home() / "enough" / "config" / "orchestrator.json"
+# Defaults are intentionally conservative: auto-reset off until the user
+# opts in. Threshold sits below the wall (max ~85%) to give the
+# checkpoint write itself enough headroom to complete.
+ORCHESTRATOR_DEFAULTS = {"auto_reset": False, "threshold_pct": 75}
+
 IGNORE_DIRS = {
     "__pycache__", ".git", "node_modules", ".venv", "venv",
     ".pytest_cache", ".mypy_cache", ".ruff_cache", "dist", "build",
@@ -184,6 +190,58 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
 # Chat generation
 # ---------------------------------------------------------------------------
 
+def _load_orchestrator_config() -> dict[str, Any]:
+    """Read the orchestrator config (auto-reset toggle + threshold). Falls
+    back to defaults for missing keys; never raises."""
+    try:
+        cfg = json.loads(ORCHESTRATOR_CONFIG.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        cfg = {}
+    out = dict(ORCHESTRATOR_DEFAULTS)
+    if isinstance(cfg, dict):
+        if isinstance(cfg.get("auto_reset"), bool):
+            out["auto_reset"] = cfg["auto_reset"]
+        # Clamp threshold to a sane range so a typo can't make the gauge
+        # unreachable (1) or fire trivially (0).
+        try:
+            t = int(cfg.get("threshold_pct", out["threshold_pct"]))
+            out["threshold_pct"] = max(40, min(95, t))
+        except (TypeError, ValueError):
+            pass
+    return out
+
+
+def _save_orchestrator_config(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Persist a sanitized orchestrator config and return the saved view."""
+    current = _load_orchestrator_config()
+    if "auto_reset" in cfg and isinstance(cfg["auto_reset"], bool):
+        current["auto_reset"] = cfg["auto_reset"]
+    if "threshold_pct" in cfg:
+        try:
+            current["threshold_pct"] = max(40, min(95, int(cfg["threshold_pct"])))
+        except (TypeError, ValueError):
+            pass
+    ORCHESTRATOR_CONFIG.parent.mkdir(parents=True, exist_ok=True)
+    ORCHESTRATOR_CONFIG.write_text(json.dumps(current, indent=2) + "\n", encoding="utf-8")
+    return current
+
+
+def _should_auto_reset(session: "Session") -> bool:
+    """Decide whether to fire the post-turn auto-reset based on live
+    config + the most recent usage measurement against the live ctx-size."""
+    cfg = _load_orchestrator_config()
+    if not cfg["auto_reset"]:
+        return False
+    ctx = _current_ctx_size(session) or session.last_usage.get("ctx")
+    if not ctx:
+        return False  # no ctx-size means we can't compute pct; bail safe
+    total = session.last_usage.get("total_tokens") or 0
+    if not total:
+        return False
+    pct = int((total / ctx) * 100)
+    return pct >= cfg["threshold_pct"]
+
+
 def _current_ctx_size(session: "Session") -> int | None:
     """Best-effort lookup of llama-server's current ctx-size, used to scale
     the token-pressure gauge. Returns None if we can't determine it (no
@@ -294,97 +352,211 @@ def _validate_current(cfg: dict[str, Any], selection: dict[str, Any]) -> dict[st
     return current
 
 
+CHECKPOINT_PROMPT = (
+    "[harness] context window is approaching the auto-reset threshold. "
+    "Before we lose continuity, do this in one short response:\n"
+    "1. Run `ls .rness/requests/*.md` to find your active request file (if any).\n"
+    "2. If one exists, update its 'Continuation' section now: what you just "
+    "did, what to do next, and any file paths or state the next turn must "
+    "know about.\n"
+    "3. End with a one-sentence summary of where things stand.\n"
+    "Keep this whole reply under ~250 tokens. The conversation will be "
+    "reset immediately after."
+)
+
+CONTINUE_PROMPT = (
+    "[harness] the conversation has been reset to free up context. Resume the "
+    "active work: list `.rness/requests/*.md`, read the most recent one's "
+    "Continuation section, and pick up from there."
+)
+
+
+async def _drive_message(
+    session: Session,
+    user_message: str,
+    system_prompt: str,
+    *,
+    is_synthetic: bool = False,
+    tool_calls_for_log: list[tuple[str, str]] | None = None,
+    assistant_text_for_log: list[str] | None = None,
+) -> None:
+    """Drive a single user message through the LLM tool loop.
+
+    Pulls the existing per-turn semantics out of `_run_turn` so synthetic
+    messages (auto-reset checkpoint + continue) can reuse them without
+    re-implementing the streaming, tool dispatch, and usage capture.
+
+    Synthetic messages emit a `system_prompt` event (for the harness-driven
+    user-side bubble) instead of `user`, so the UI can render them in a
+    distinct style and the user understands they didn't type that. The
+    message text still goes onto session.history under the `user` role —
+    that's how llama-server learns what was asked. Errors propagate; the
+    caller frames them.
+    """
+    assert session.client is not None
+    client = session.client
+
+    session.history.append({"role": "user", "content": user_message})
+    await session.emit(
+        "system_prompt" if is_synthetic else "user",
+        {"text": user_message},
+    )
+
+    for _iter in range(session.max_tool_iters):
+        messages = [{"role": "system", "content": system_prompt}] + session.history
+        await session.emit("turn_start", {})
+        buffer = ""
+        usage_sink: dict[str, int] = {}
+        agen = stream_chat(
+            session.llm_url, messages, client=client, usage_sink=usage_sink,
+        )
+        stopped_at_tool = False
+        try:
+            # Iterate by hand so we can apply a per-chunk inactivity
+            # timeout. If llama-server stops emitting tokens (a real
+            # symptom we've seen when the KV cache is over-pressured),
+            # an `async for` would just hang and the UI would spin
+            # forever with no error. wait_for() turns that silence
+            # into a visible failure.
+            while True:
+                try:
+                    chunk = await asyncio.wait_for(
+                        agen.__anext__(),
+                        timeout=LLM_STREAM_INACTIVITY_TIMEOUT,
+                    )
+                except StopAsyncIteration:
+                    break
+                buffer += chunk
+                await session.emit("token", {"text": chunk})
+                end = first_tool_call_end(buffer)
+                if end is not None:
+                    # Truncate assistant message to end of tool call, stop stream.
+                    buffer = buffer[:end]
+                    stopped_at_tool = True
+                    await agen.aclose()
+                    break
+        finally:
+            # Ensure the generator is closed on any exit path.
+            await agen.aclose()
+
+        # Record the assistant turn (possibly truncated at the tool call).
+        session.history.append({"role": "assistant", "content": buffer})
+        if assistant_text_for_log is not None:
+            assistant_text_for_log.append(buffer)
+        # Persist usage from this completion + emit a live update.
+        # llama-server reports prompt + completion tokens; for the
+        # gauge, total_tokens is what was actually loaded into the
+        # KV cache, so it's the truest pressure signal.
+        if usage_sink:
+            ctx = _current_ctx_size(session)
+            session.last_usage = {**usage_sink, "ctx": ctx} if ctx else dict(usage_sink)
+            await session.emit("usage", session.last_usage)
+        await session.emit("turn_end", {})
+
+        if not stopped_at_tool:
+            return  # natural end — no tool call
+
+        calls = parse_tool_calls(buffer)
+        if not calls:
+            # Shouldn't happen — first_tool_call_end said yes but parse failed.
+            return
+        call = calls[-1]  # the call we stopped at
+        await _handle_tool(session, call, tool_calls_for_log if tool_calls_for_log is not None else [])
+    else:
+        await session.emit(
+            "error",
+            {"message": f"tool loop cap ({session.max_tool_iters}) reached"},
+        )
+
+
+async def _do_auto_reset(session: Session, system_prompt: str) -> None:
+    """Run the checkpoint → reset → continue sequence inside the active
+    generation lock. Emits `system` events with progress so the UI can
+    explain what just happened, and a `reset` event so the conversation
+    pane clears between the checkpoint and continuation.
+
+    Re-entry is blocked by `session._in_auto_reset` — without that flag,
+    the synthetic continue turn could itself trip the threshold and
+    recurse forever.
+    """
+    cfg = _load_orchestrator_config()
+    pct = 0
+    if (ctx := session.last_usage.get("ctx")) and (total := session.last_usage.get("total_tokens")):
+        pct = int((total / ctx) * 100)
+    await session.emit(
+        "system",
+        {
+            "kind": "auto_reset_starting",
+            "message": f"context at {pct}% (threshold {cfg['threshold_pct']}%) — "
+                       "writing a checkpoint, then resetting to keep going.",
+        },
+    )
+
+    session._in_auto_reset = True
+    try:
+        # 1. Checkpoint turn — agent writes Continuation block to its
+        #    active request file. We let the existing tool loop handle
+        #    write_file via the agent's own response.
+        await _drive_message(session, CHECKPOINT_PROMPT, system_prompt, is_synthetic=True)
+
+        # 2. Hard reset of in-memory state. On-disk state (the request
+        #    file the agent just updated) is what carries us over.
+        session.history.clear()
+        session.last_usage = {}
+        await session.emit("reset", {"reason": "auto_reset"})
+        await session.emit(
+            "usage",
+            {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+        )
+        await session.emit(
+            "system",
+            {"kind": "auto_reset_continuing",
+             "message": "reset complete — continuing from the checkpoint."},
+        )
+
+        # 3. Continue turn — agent reads the request file and resumes.
+        await _drive_message(session, CONTINUE_PROMPT, system_prompt, is_synthetic=True)
+    finally:
+        session._in_auto_reset = False
+
+
 async def _run_turn(session: Session, user_message: str) -> None:
     """Drive one user turn: send to LLM, handle tool loop, emit SSE events.
 
     Emits:
-      - event: user         { "text": <user msg> }  (ack to all listeners)
-      - event: turn_start   { }
-      - event: token        { "text": <chunk> }
-      - event: tool         { "name": ..., "key": ..., "ok": ... }
-      - event: turn_end     { }
-      - event: done         { }
-      - event: error        { "message": ... }
+      - event: user           { "text": <user msg> }  (ack to all listeners)
+      - event: system_prompt  { "text": <synthetic harness-driven prompt> }
+      - event: system         { "kind": ..., "message": ... }  (auto-reset chrome)
+      - event: turn_start     { }
+      - event: token          { "text": <chunk> }
+      - event: tool           { "name": ..., "key": ..., "ok": ... }
+      - event: turn_end       { }
+      - event: usage          { prompt_tokens, completion_tokens, total_tokens, ctx }
+      - event: reset          { "reason": ... }
+      - event: done           { }
+      - event: error          { "message": ... }
     """
     async with session.generation_lock:
         # Re-assemble system prompt fresh per spec.
         system_prompt = assemble_system_prompt(session.project_dir)
 
-        # Append the user turn to history.
-        session.history.append({"role": "user", "content": user_message})
-        await session.emit("user", {"text": user_message})
-
         tool_calls_for_log: list[tuple[str, str]] = []
         assistant_text_for_log: list[str] = []
 
-        assert session.client is not None
-        client = session.client
-
         try:
-            for _iter in range(session.max_tool_iters):
-                messages = [{"role": "system", "content": system_prompt}] + session.history
-                await session.emit("turn_start", {})
-                buffer = ""
-                usage_sink: dict[str, int] = {}
-                agen = stream_chat(
-                    session.llm_url, messages, client=client, usage_sink=usage_sink,
-                )
-                stopped_at_tool = False
-                try:
-                    # Iterate by hand so we can apply a per-chunk inactivity
-                    # timeout. If llama-server stops emitting tokens (a real
-                    # symptom we've seen when the KV cache is over-pressured),
-                    # an `async for` would just hang and the UI would spin
-                    # forever with no error. wait_for() turns that silence
-                    # into a visible failure.
-                    while True:
-                        try:
-                            chunk = await asyncio.wait_for(
-                                agen.__anext__(),
-                                timeout=LLM_STREAM_INACTIVITY_TIMEOUT,
-                            )
-                        except StopAsyncIteration:
-                            break
-                        buffer += chunk
-                        await session.emit("token", {"text": chunk})
-                        end = first_tool_call_end(buffer)
-                        if end is not None:
-                            # Truncate assistant message to end of tool call, stop stream.
-                            buffer = buffer[:end]
-                            stopped_at_tool = True
-                            await agen.aclose()
-                            break
-                finally:
-                    # Ensure the generator is closed on any exit path.
-                    await agen.aclose()
-
-                # Record the assistant turn (possibly truncated at the tool call).
-                session.history.append({"role": "assistant", "content": buffer})
-                assistant_text_for_log.append(buffer)
-                # Persist usage from this completion + emit a live update.
-                # llama-server reports prompt + completion tokens; for the
-                # gauge, total_tokens is what was actually loaded into the
-                # KV cache, so it's the truest pressure signal.
-                if usage_sink:
-                    ctx = _current_ctx_size(session)
-                    session.last_usage = {**usage_sink, "ctx": ctx} if ctx else dict(usage_sink)
-                    await session.emit("usage", session.last_usage)
-                await session.emit("turn_end", {})
-
-                if not stopped_at_tool:
-                    break  # natural end — no tool call
-
-                calls = parse_tool_calls(buffer)
-                if not calls:
-                    # Shouldn't happen — first_tool_call_end said yes but parse failed.
-                    break
-                call = calls[-1]  # the call we stopped at
-                await _handle_tool(session, call, tool_calls_for_log)
-            else:
-                await session.emit(
-                    "error",
-                    {"message": f"tool loop cap ({session.max_tool_iters}) reached"},
-                )
+            await _drive_message(
+                session,
+                user_message,
+                system_prompt,
+                is_synthetic=False,
+                tool_calls_for_log=tool_calls_for_log,
+                assistant_text_for_log=assistant_text_for_log,
+            )
+            # Auto-reset only fires for real user turns (not when we're
+            # already in the middle of one) and only when the threshold
+            # is breached + the toggle is on.
+            if not getattr(session, "_in_auto_reset", False) and _should_auto_reset(session):
+                await _do_auto_reset(session, system_prompt)
         except asyncio.TimeoutError:
             await session.emit("error", {"message": (
                 f"the model went silent for over "
@@ -393,8 +565,8 @@ async def _run_turn(session: Session, user_message: str) -> None:
                 "generating and llama-server stalled. things to try:\n"
                 "  • type `/reset` in the chat input to clear the "
                 "conversation, then re-state the task more compactly\n"
-                "  • open the model modal and pick a larger ctx, or switch "
-                "to a model that fits more context, then Apply & Restart\n"
+                "  • open the model modal and enable auto-reset (or pick "
+                "a larger ctx) — that's what it's for\n"
                 "  • disable skills you aren't using in the sidebar to "
                 "shrink the system prompt"
             )})
@@ -410,11 +582,11 @@ async def _run_turn(session: Session, user_message: str) -> None:
                 msg = (
                     f"context window full (llm {e.status}): {e.detail}\n"
                     "things to try:\n"
-                    "  • /reset the conversation (button in the header) and "
-                    "re-state the task more compactly\n"
-                    "  • open the model modal and pick a larger ctx, or "
-                    "switch to a model that fits more context, then Apply & "
-                    "Restart\n"
+                    "  • type `/reset` in the chat input to clear the "
+                    "conversation, then re-state the task more compactly\n"
+                    "  • open the model modal and enable auto-reset (or "
+                    "pick a larger ctx, or switch to a model that fits "
+                    "more context)\n"
                     "  • disable skills you aren't using in the sidebar to "
                     "shrink the system prompt"
                 )
@@ -819,6 +991,19 @@ def create_app(
             **session.last_usage,
             "ctx": _current_ctx_size(session),
         }
+
+    @app.get("/api/orchestrator")
+    async def api_orchestrator_get() -> dict[str, Any]:
+        """Current auto-reset config (auto_reset bool + threshold_pct int)."""
+        return _load_orchestrator_config()
+
+    @app.post("/api/orchestrator")
+    async def api_orchestrator_post(request: Request) -> dict[str, Any]:
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        return _save_orchestrator_config(body or {})
 
     @app.get("/api/ui-config")
     async def api_ui_config_get() -> dict[str, Any]:
