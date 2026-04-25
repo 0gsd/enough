@@ -67,6 +67,24 @@ that the user configures through plain-text conventions.
   training data. Use `shell` with `grep -r` for discovery.
 - All exchanges are logged to `.rness/knowledge/session-logs/`. You do not
   need to write the log yourself; the harness handles it.
+
+## Where to put files you produce or consume
+
+- **Outputs** (anything you produce that the user might want to read, keep,
+  or share — drafts, chapters, analyses, generated code, exports): write to
+  `.rness/io/output/`. If the user names a subfolder ("put it in /chapters/"
+  or "save under research/"), mirror that under `.rness/io/output/` —
+  e.g. `.rness/io/output/chapters/01.md`,
+  `.rness/io/output/research/notes.md`. Default to a flat layout when no
+  subfolder is named.
+- **Inputs** (files the user hands you for one task — pasted text, source
+  documents, transcripts to work from): expect them in `.rness/io/input/`.
+  This is for per-task reference material; durable knowledge belongs in
+  `infoworld/`.
+- **`.rness/requests/`** is reserved for the request-tracking markdown files
+  you write per the requests policy. Don't put user artifacts there. If the
+  user asks you to "put X in requests/", redirect: write the artifact under
+  `.rness/io/output/` and only put a tracking entry in `.rness/requests/`.
 """
 
 

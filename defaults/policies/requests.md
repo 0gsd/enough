@@ -23,6 +23,20 @@ Don't trigger on:
 - A one-shot Q&A.
 - A quick tool call with a clear self-contained answer.
 
+## What `.rness/requests/` is for
+
+This directory exists for **your** request-tracking markdown files (the schema
+below) and nothing else. It is not a general scratch area.
+
+- User artifacts you produce → `.rness/io/output/` (mirror any subfolder the
+  user names there).
+- Files the user hands you for a task → `.rness/io/input/`.
+- If the user says "put X in `requests/`", they almost certainly mean "save
+  the artifact and track it as a request." Do both: write the artifact under
+  `.rness/io/output/` (mirroring any subfolder they named, e.g.
+  `.rness/io/output/requests/X`), and create a tracking file here per the
+  schema.
+
 ## Where requests live
 
 - Active: `.rness/requests/<summary>_YYYY-MM-DD_HH-MM.md`

@@ -60,7 +60,13 @@ IGNORE_DIRS = {
     ".llama-server",
 }
 DEFAULT_MAX_TOOL_ITERS = 50
-MAX_FILE_TREE_DEPTH = 4
+
+# How long we'll wait between streamed tokens before assuming llama-server
+# has wedged. Long enough to ride out big-prefill pauses on slow hardware,
+# short enough that a stuck process surfaces instead of leaving the UI
+# spinning forever. Hit the limit and the user gets a real error message,
+# not silence.
+LLM_STREAM_INACTIVITY_TIMEOUT = 180.0
 
 
 # ---------------------------------------------------------------------------
@@ -80,6 +86,12 @@ class Session:
     subscribers: list[asyncio.Queue[dict[str, Any]]] = field(default_factory=list)
     generation_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     client: httpx.AsyncClient | None = None
+    # Most recent llama-server usage report. Populated after every
+    # stream_chat call; powers the token-pressure gauge in the UI.
+    # Keys: prompt_tokens, completion_tokens, total_tokens, ctx (snapshot
+    # of the live ctx-size at the time the usage was recorded).
+    last_usage: dict[str, int] = field(default_factory=dict)
+    supervisor: Any = None  # LlamaSupervisor; stays Any to avoid forward-ref churn
 
     async def emit(self, event: str, data: Any) -> None:
         payload = {"event": event, "data": json.dumps(data)}
@@ -91,10 +103,25 @@ class Session:
 # File tree
 # ---------------------------------------------------------------------------
 
-def _walk_tree(root: Path, rel_parts: tuple[str, ...], depth: int) -> list[dict[str, Any]]:
-    if depth > MAX_FILE_TREE_DEPTH:
-        return []
+def _walk_tree(
+    root: Path,
+    rel_parts: tuple[str, ...],
+    visited: frozenset[Path],
+) -> list[dict[str, Any]]:
+    """Walk the project tree to arbitrary depth, with symlink-cycle protection.
+
+    `visited` carries the set of canonical paths already in the current
+    recursion chain. We snapshot it as we descend so sibling branches stay
+    independent — if `infoworld/` and `.rness/skills/` both happen to point
+    into `~/enough/`, walking one doesn't poison the other."""
     abs_dir = root.joinpath(*rel_parts)
+    try:
+        real = abs_dir.resolve()
+    except OSError:
+        return []
+    if real in visited:
+        return []
+    visited = visited | {real}
     try:
         entries = sorted(abs_dir.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
     except OSError:
@@ -112,23 +139,14 @@ def _walk_tree(root: Path, rel_parts: tuple[str, ...], depth: int) -> list[dict[
             "is_dir": p.is_dir(),
             "is_symlink": p.is_symlink(),
         }
-        # Recurse into directories — including directories reached via a
-        # symlink (infoworld/) — but don't recurse through a symlinked
-        # directory's OWN children to avoid amplifying the "symlinked"
-        # visual: the top-level link is the meaningful UI unit.
-        if p.is_dir() and not p.is_symlink():
-            node["children"] = _walk_tree(root, rel_parts + (p.name,), depth + 1)
-        elif p.is_dir() and p.is_symlink():
-            # Walk the symlinked dir's contents but mark the root entry as
-            # the symlink; children appear plain (they live in the symlink
-            # target, not in the project proper).
-            node["children"] = _walk_tree(root, rel_parts + (p.name,), depth + 1)
+        if p.is_dir():
+            node["children"] = _walk_tree(root, rel_parts + (p.name,), visited)
         out.append(node)
     return out
 
 
 def build_file_tree(root: Path) -> list[dict[str, Any]]:
-    return _walk_tree(root, (), 1)
+    return _walk_tree(root, (), frozenset())
 
 
 def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
@@ -165,6 +183,18 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
 # ---------------------------------------------------------------------------
 # Chat generation
 # ---------------------------------------------------------------------------
+
+def _current_ctx_size(session: "Session") -> int | None:
+    """Best-effort lookup of llama-server's current ctx-size, used to scale
+    the token-pressure gauge. Returns None if we can't determine it (no
+    supervisor, server still booting); the gauge then renders absolute
+    counts only."""
+    sup = session.supervisor
+    if sup is None:
+        return None
+    ctx = getattr(sup, "current_ctx", None)
+    return int(ctx) if ctx else None
+
 
 def _render_turn_from_history(history: list[dict[str, str]]) -> str:
     """Render the saved history as HTML for initial page load."""
@@ -295,10 +325,26 @@ async def _run_turn(session: Session, user_message: str) -> None:
                 messages = [{"role": "system", "content": system_prompt}] + session.history
                 await session.emit("turn_start", {})
                 buffer = ""
-                agen = stream_chat(session.llm_url, messages, client=client)
+                usage_sink: dict[str, int] = {}
+                agen = stream_chat(
+                    session.llm_url, messages, client=client, usage_sink=usage_sink,
+                )
                 stopped_at_tool = False
                 try:
-                    async for chunk in agen:
+                    # Iterate by hand so we can apply a per-chunk inactivity
+                    # timeout. If llama-server stops emitting tokens (a real
+                    # symptom we've seen when the KV cache is over-pressured),
+                    # an `async for` would just hang and the UI would spin
+                    # forever with no error. wait_for() turns that silence
+                    # into a visible failure.
+                    while True:
+                        try:
+                            chunk = await asyncio.wait_for(
+                                agen.__anext__(),
+                                timeout=LLM_STREAM_INACTIVITY_TIMEOUT,
+                            )
+                        except StopAsyncIteration:
+                            break
                         buffer += chunk
                         await session.emit("token", {"text": chunk})
                         end = first_tool_call_end(buffer)
@@ -315,6 +361,14 @@ async def _run_turn(session: Session, user_message: str) -> None:
                 # Record the assistant turn (possibly truncated at the tool call).
                 session.history.append({"role": "assistant", "content": buffer})
                 assistant_text_for_log.append(buffer)
+                # Persist usage from this completion + emit a live update.
+                # llama-server reports prompt + completion tokens; for the
+                # gauge, total_tokens is what was actually loaded into the
+                # KV cache, so it's the truest pressure signal.
+                if usage_sink:
+                    ctx = _current_ctx_size(session)
+                    session.last_usage = {**usage_sink, "ctx": ctx} if ctx else dict(usage_sink)
+                    await session.emit("usage", session.last_usage)
                 await session.emit("turn_end", {})
 
                 if not stopped_at_tool:
@@ -331,17 +385,42 @@ async def _run_turn(session: Session, user_message: str) -> None:
                     "error",
                     {"message": f"tool loop cap ({session.max_tool_iters}) reached"},
                 )
+        except asyncio.TimeoutError:
+            await session.emit("error", {"message": (
+                f"the model went silent for over "
+                f"{int(LLM_STREAM_INACTIVITY_TIMEOUT)}s mid-stream.\n"
+                "this usually means the context window filled up while "
+                "generating and llama-server stalled. things to try:\n"
+                "  • type `/reset` in the chat input to clear the "
+                "conversation, then re-state the task more compactly\n"
+                "  • open the model modal and pick a larger ctx, or switch "
+                "to a model that fits more context, then Apply & Restart\n"
+                "  • disable skills you aren't using in the sidebar to "
+                "shrink the system prompt"
+            )})
+            log.warning("llm stream timed out after %ss of silence", LLM_STREAM_INACTIVITY_TIMEOUT)
         except LLMError as e:
-            # Try to give a hint if it looks like a context overflow.
-            hint = ""
+            # llama-server returned a 4xx/5xx before the stream began —
+            # detect context-window exhaustion and give concrete remedies.
             low = e.detail.lower()
-            if any(k in low for k in ("context", "exceed", "n_ctx", "too many tokens", "token limit")):
-                hint = (
-                    "  (this looks like a context-window overflow. raise the "
-                    "llama-server -c flag and/or --parallel 1, or /reset the "
-                    "conversation, or disable some skills in the sidebar.)"
+            looks_like_overflow = any(
+                k in low for k in ("context", "exceed", "n_ctx", "too many tokens", "token limit")
+            )
+            if looks_like_overflow:
+                msg = (
+                    f"context window full (llm {e.status}): {e.detail}\n"
+                    "things to try:\n"
+                    "  • /reset the conversation (button in the header) and "
+                    "re-state the task more compactly\n"
+                    "  • open the model modal and pick a larger ctx, or "
+                    "switch to a model that fits more context, then Apply & "
+                    "Restart\n"
+                    "  • disable skills you aren't using in the sidebar to "
+                    "shrink the system prompt"
                 )
-            await session.emit("error", {"message": f"llm {e.status}: {e.detail}{hint}"})
+            else:
+                msg = f"llm {e.status}: {e.detail}"
+            await session.emit("error", {"message": msg})
             log.exception("llm error")
         except httpx.HTTPError as e:
             await session.emit("error", {"message": f"llm transport error: {e}"})
@@ -396,6 +475,7 @@ def create_app(
 ) -> FastAPI:
     session = Session(project_dir=project_dir, llm_url=llm_url, max_tool_iters=max_tool_iters)
     supervisor = LlamaSupervisor(llm_url=llm_url) if supervise else None
+    session.supervisor = supervisor  # so _run_turn can read current ctx for the usage gauge
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -725,7 +805,20 @@ def create_app(
     @app.get("/api/reset", response_class=HTMLResponse)
     async def api_reset() -> HTMLResponse:
         session.history.clear()
+        session.last_usage = {}
+        # Echo a usage event so the gauge zeroes out without waiting for
+        # the user to send their first post-reset turn.
+        await session.emit("usage", {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0})
         return HTMLResponse("")
+
+    @app.get("/api/usage")
+    async def api_usage() -> dict[str, Any]:
+        """Latest token-usage snapshot for the gauge. Used on modal open
+        and on page load — SSE pushes keep it live during a session."""
+        return {
+            **session.last_usage,
+            "ctx": _current_ctx_size(session),
+        }
 
     @app.get("/api/ui-config")
     async def api_ui_config_get() -> dict[str, Any]:
@@ -797,6 +890,8 @@ def create_app(
             raise HTTPException(500, f"switch failed: {e}") from None
         # Also clear in-memory conversation history — new model = fresh brain.
         session.history.clear()
+        session.last_usage = {}
+        await session.emit("usage", {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0})
         return supervisor.status()
 
     @app.post("/api/transcribe")

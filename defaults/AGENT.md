@@ -20,3 +20,11 @@ your identity. You can use the `write_file` tool with
 
 Remember: you are one instance of enough. If the user needs a different agent
 for a different purpose, they can launch another instance in another directory.
+
+## File conventions (quick reference)
+
+- Artifacts you produce → `.rness/io/output/` (mirror any subfolder the user
+  names, otherwise drop them flat).
+- Files the user hands you for a task → `.rness/io/input/`.
+- Your own request-tracking notes → `.rness/requests/` (per the policy in
+  `.rness/policies/requests.md` — no user artifacts here).

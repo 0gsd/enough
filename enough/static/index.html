@@ -581,6 +581,89 @@
   .model-badge .cute { font-weight: 600; }
   .model-badge .ctx { color: var(--fg-faint); font-size: 11px; }
 
+  /* Token-pressure gauge: lives next to the model badge in the topbar.
+     Shows what fraction of llama-server's context window the most recent
+     completion consumed. Color shifts green→yellow→red as pressure climbs. */
+  .token-gauge {
+    background: var(--bg-raise);
+    color: var(--fg-muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    display: inline-flex; align-items: center; gap: 6px;
+    line-height: 1;
+  }
+  .token-gauge:hover { color: var(--fg); border-color: var(--fg-faint); }
+  .token-gauge .bar {
+    width: 60px; height: 6px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    display: inline-block;
+  }
+  .token-gauge .bar .fill {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--accent-agent);
+    transition: width 220ms ease, background-color 220ms ease;
+  }
+  .token-gauge.warn .fill { background: var(--accent-tool); }
+  .token-gauge.danger .fill { background: var(--accent-error); }
+  .token-gauge.empty { opacity: 0.55; }
+  .token-gauge.empty .fill { background: var(--fg-faint); }
+  .token-gauge .label { white-space: nowrap; }
+
+  /* Bigger version of the gauge inside the model modal — shows the same
+     data with breakdown numbers underneath. */
+  #model-modal .usage-row {
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--bg-raise);
+  }
+  #model-modal .usage-row .label {
+    font-size: 11px;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  #model-modal .usage-row .label .pct {
+    font-weight: 600;
+    color: var(--fg);
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 13px;
+  }
+  #model-modal .usage-row .bar {
+    height: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  #model-modal .usage-row .bar .fill {
+    height: 100%; width: 0%;
+    background: var(--accent-agent);
+    transition: width 220ms ease, background-color 220ms ease;
+  }
+  #model-modal .usage-row.warn .fill { background: var(--accent-tool); }
+  #model-modal .usage-row.danger .fill { background: var(--accent-error); }
+  #model-modal .usage-row .breakdown {
+    font-size: 11px;
+    color: var(--fg-faint);
+    display: flex; justify-content: space-between;
+  }
+  #model-modal .usage-row .breakdown .none {
+    font-style: italic;
+  }
+
   /* Reuse modal chrome from #ui-modal; the model modal has extra fields. */
   #model-modal.hidden { display: none; }
   #model-modal {
@@ -720,6 +803,10 @@
     <span class="cute">…</span>
     <span class="ctx"></span>
   </button>
+  <button id="token-gauge" class="token-gauge empty" title="Token pressure on the context window — last completion's prompt + response. Click to open model settings.">
+    <span class="bar"><span class="fill"></span></span>
+    <span class="label">—</span>
+  </button>
 </div>
 
 <div class="layout" id="layout">
@@ -745,7 +832,7 @@
     <section class="sidebar-section" data-section="project">
       <h3 class="section-head"><span class="zippy">▾</span>project</h3>
       <div class="section-body">
-        <div id="tree" hx-get="/api/files" hx-trigger="load, every 10s" hx-swap="innerHTML">
+        <div id="tree" hx-get="/api/files" hx-trigger="load, every 3s" hx-swap="innerHTML">
           <div style="color: var(--fg-faint); padding: 8px">loading…</div>
         </div>
       </div>
@@ -795,6 +882,16 @@
       <button class="modal-close" onclick="closeModelModal()" aria-label="close">×</button>
     </div>
     <div class="modal-body">
+      <div class="usage-row" id="modal-usage-row">
+        <div class="label">
+          <span>token pressure (last completion)</span>
+          <span class="pct" id="modal-usage-pct">—</span>
+        </div>
+        <div class="bar"><span class="fill" id="modal-usage-fill"></span></div>
+        <div class="breakdown" id="modal-usage-breakdown">
+          <span class="none">no data yet — send a message first.</span>
+        </div>
+      </div>
       <div class="model-list" id="model-list">
         <!-- rendered from /api/models -->
       </div>
@@ -993,9 +1090,113 @@
   // ---------- Model badge + model modal (supervisor-aware) ----------
   const modelBadge = document.getElementById('model-badge');
   const modelModal = document.getElementById('model-modal');
+  const tokenGauge = document.getElementById('token-gauge');
   let MODELS = null;         // last /api/models payload
   let LLM_STATUS = null;     // last /api/llm-status payload
+  let LAST_USAGE = null;     // last /api/usage or SSE usage payload
   let selectedCute = null;   // current radio selection in modal
+
+  // ---------- Token-pressure gauge ----------
+  // Format big numbers compactly: 1234 -> "1.2k", 16384 -> "16k".
+  // Below 1k stays exact so 0–999 is honest; above, we round to a single
+  // decimal up to 9.9k and to integers from 10k onward.
+  function fmtTokens(n) {
+    if (n == null) return '—';
+    if (n < 1000) return String(n);
+    if (n < 10000) return (n / 1000).toFixed(1) + 'k';
+    return Math.round(n / 1000) + 'k';
+  }
+
+  function pressureClass(pct) {
+    if (pct >= 80) return 'danger';
+    if (pct >= 60) return 'warn';
+    return '';
+  }
+
+  // Render LAST_USAGE into both the topbar pill and the modal row. Called
+  // on every usage update (SSE) and on modal open (so the row is fresh).
+  function renderUsage() {
+    const u = LAST_USAGE || {};
+    const total = u.total_tokens != null
+      ? u.total_tokens
+      : (u.prompt_tokens || 0) + (u.completion_tokens || 0);
+    const ctx = u.ctx || (LLM_STATUS && LLM_STATUS.ctx) || null;
+    const hasData = total > 0;
+
+    // --- Topbar pill ---
+    tokenGauge.classList.remove('warn', 'danger', 'empty');
+    const fill = tokenGauge.querySelector('.fill');
+    const label = tokenGauge.querySelector('.label');
+    if (!hasData) {
+      tokenGauge.classList.add('empty');
+      fill.style.width = '0%';
+      label.textContent = ctx ? `0 / ${fmtTokens(ctx)}` : '—';
+      tokenGauge.title = 'No completion yet — gauge fills in once you send a message.';
+    } else if (ctx) {
+      const pct = Math.min(100, Math.round((total / ctx) * 100));
+      fill.style.width = pct + '%';
+      const cls = pressureClass(pct);
+      if (cls) tokenGauge.classList.add(cls);
+      label.textContent = `${fmtTokens(total)} / ${fmtTokens(ctx)} · ${pct}%`;
+      tokenGauge.title =
+        `Last completion used ${total.toLocaleString()} of ${ctx.toLocaleString()} tokens (${pct}%).\n` +
+        `Prompt: ${(u.prompt_tokens||0).toLocaleString()}  · ` +
+        `Output: ${(u.completion_tokens||0).toLocaleString()}.\n` +
+        `Click to open model settings.`;
+    } else {
+      // No ctx known (supervisor off / external server). Show absolute count only.
+      fill.style.width = '0%';
+      tokenGauge.classList.add('empty');
+      label.textContent = fmtTokens(total);
+      tokenGauge.title = `Last completion used ${total.toLocaleString()} tokens (ctx-size unknown).`;
+    }
+
+    // --- Modal row (only meaningful when the modal is open, but it's
+    // cheap to keep current so reopening it shows the latest). ---
+    const row = document.getElementById('modal-usage-row');
+    const modalFill = document.getElementById('modal-usage-fill');
+    const pctEl = document.getElementById('modal-usage-pct');
+    const breakdown = document.getElementById('modal-usage-breakdown');
+    if (!row) return;
+    row.classList.remove('warn', 'danger');
+    if (!hasData) {
+      modalFill.style.width = '0%';
+      pctEl.textContent = '—';
+      breakdown.innerHTML = '<span class="none">no data yet — send a message first.</span>';
+    } else if (ctx) {
+      const pct = Math.min(100, Math.round((total / ctx) * 100));
+      modalFill.style.width = pct + '%';
+      pctEl.textContent = pct + '%';
+      const cls = pressureClass(pct);
+      if (cls) row.classList.add(cls);
+      breakdown.innerHTML =
+        `<span>prompt ${(u.prompt_tokens||0).toLocaleString()} + ` +
+        `output ${(u.completion_tokens||0).toLocaleString()} = ` +
+        `${total.toLocaleString()} tokens</span>` +
+        `<span>of ${ctx.toLocaleString()} (ctx)</span>`;
+    } else {
+      modalFill.style.width = '0%';
+      pctEl.textContent = '—';
+      breakdown.innerHTML =
+        `<span>prompt ${(u.prompt_tokens||0).toLocaleString()} + ` +
+        `output ${(u.completion_tokens||0).toLocaleString()} = ` +
+        `${total.toLocaleString()} tokens</span>` +
+        `<span class="none">ctx unknown</span>`;
+    }
+  }
+
+  async function refreshUsage() {
+    try {
+      const r = await fetch('/api/usage');
+      if (!r.ok) return;
+      LAST_USAGE = await r.json();
+      renderUsage();
+    } catch (_) { /* transient */ }
+  }
+
+  // Clicking the gauge opens the model modal — same destination as the
+  // model badge, since both are about the LLM session.
+  tokenGauge.addEventListener('click', () => openModelModal());
 
   async function refreshLlmStatus() {
     try {
@@ -1083,12 +1284,14 @@
     document.getElementById('switch-status').textContent = '';
     document.getElementById('switch-status').className = 'switch-status';
     document.getElementById('apply-model-btn').disabled = false;
-    await Promise.all([loadModels(), refreshLlmStatus()]);
+    await Promise.all([loadModels(), refreshLlmStatus(), refreshUsage()]);
     selectedCute = (LLM_STATUS && LLM_STATUS.cute) || (MODELS && MODELS.current);
     renderModelList();
     updateCtxInputForSelection();
+    renderUsage();  // re-render now that LLM_STATUS is fresh (gives us ctx if usage was missing it)
     modelModal.classList.remove('hidden');
   }
+  window.openModelModal = openModelModal;
   function closeModelModal() {
     modelModal.classList.add('hidden');
   }
@@ -1158,6 +1361,10 @@
     setTimeout(pollLoop, interval);
   }
   loadModels().then(pollLoop);
+  // Prime the gauge with whatever the server last recorded (e.g. after a
+  // page reload mid-conversation, this restores the bar without waiting
+  // for the next turn). Subsequent updates flow in via SSE.
+  refreshUsage();
 
   // ---------- Voice input (whisper.cpp) ----------
   const micBtn = document.getElementById('mic-btn');
@@ -1408,7 +1615,7 @@
     }
     // Side effects on the filesystem should refresh ambient views.
     if (status === 'ok' && (name === 'write_file' || name === 'shell')) {
-      // File tree: refetch (the 10s poll might miss newly-created files).
+      // File tree: refetch (don't wait for the next poll tick).
       htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
       // Preview pane: if it's showing the file we just wrote, refresh it.
       if (name === 'write_file') {
@@ -1468,6 +1675,13 @@
   });
 
   es.addEventListener('ping', () => { /* heartbeat */ });
+
+  es.addEventListener('usage', (e) => {
+    try {
+      LAST_USAGE = JSON.parse(e.data);
+      renderUsage();
+    } catch (_) { /* ignore parse errors */ }
+  });
 
   // ---------- Preview-pane edit mode ----------
   async function enterEditMode() {

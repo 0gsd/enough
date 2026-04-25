@@ -79,6 +79,8 @@ _EMPTY_DIRS: tuple[str, ...] = (
     ".rness/knowledge/session-logs",
     ".rness/requests",
     ".rness/requests/done",
+    ".rness/io/input",
+    ".rness/io/output",
 )
 
 # Infoworld README lives at the GLOBAL infoworld root so it appears once
@@ -264,5 +266,13 @@ def ensure_skeleton(project_dir: Path) -> bool:
     # Picks up any new globals added after this project was first created.
     _populate_skill_symlinks(project_dir, defaults)
     _populate_routine_symlinks(project_dir, defaults)
+
+    # ALWAYS ensure the io/ scratch dirs exist — back-fills into projects
+    # created before these were added to the skeleton.
+    for rel in (".rness/io/input", ".rness/io/output"):
+        d = project_dir / rel
+        if not d.exists():
+            d.mkdir(parents=True, exist_ok=True)
+            (d / ".gitkeep").touch()
 
     return new_project

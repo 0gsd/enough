@@ -46,6 +46,7 @@ async def stream_chat(
     max_tokens: int | None = None,
     stop: list[str] | None = None,
     include_reasoning: bool = False,
+    usage_sink: dict[str, int] | None = None,
 ) -> AsyncIterator[str]:
     """Stream assistant content chunks from llama-server.
 
@@ -54,6 +55,13 @@ async def stream_chat(
     dropped by default — it's emitted on a separate channel precisely because
     clients are expected to treat it as internal. Set `include_reasoning=True`
     if you want to surface it.
+
+    If `usage_sink` is passed, llama-server is asked (via `stream_options`)
+    to include the final `usage` object on the stream's terminal chunk; we
+    update the sink in place with `prompt_tokens`, `completion_tokens`, and
+    `total_tokens`. A dict (rather than a return value) keeps this an out-
+    parameter — the caller can read it after the generator is exhausted
+    without changing the streaming contract.
 
     The caller handles connection lifecycle via the passed-in client; we can
     cancel mid-stream by aclose()'ing the generator.
@@ -65,6 +73,8 @@ async def stream_chat(
         "stream": True,
         "temperature": temperature,
     }
+    if usage_sink is not None:
+        payload["stream_options"] = {"include_usage": True}
     if max_tokens is not None:
         payload["max_tokens"] = max_tokens
     if stop:
@@ -90,6 +100,12 @@ async def stream_chat(
                 obj = json.loads(data)
             except json.JSONDecodeError:
                 continue
+            # Final chunk with `usage` typically has empty `choices`, so
+            # check usage before bailing out on the choices lookup.
+            if usage_sink is not None and (usage := obj.get("usage")):
+                for k in ("prompt_tokens", "completion_tokens", "total_tokens"):
+                    if (v := usage.get(k)) is not None:
+                        usage_sink[k] = int(v)
             try:
                 choice = obj["choices"][0]
             except (KeyError, IndexError):
