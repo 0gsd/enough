@@ -105,8 +105,8 @@ def _section(title: str, body: str) -> str:
 
 
 def _read_disabled_skills(rness: Path) -> set[str]:
-    """Names listed (one per line) in .rness/skills/.disabled are skipped."""
-    f = rness / "skills" / ".disabled"
+    """Names listed (one per line) in .rness/.skills/.disabled are skipped."""
+    f = rness / ".skills" / ".disabled"
     if not f.is_file():
         return set()
     try:
@@ -118,7 +118,7 @@ def _read_disabled_skills(rness: Path) -> set[str]:
 
 def list_skills(rness: Path) -> list[tuple[str, bool]]:
     """Return [(name, enabled), ...] for every skill present, in stable order."""
-    skills_dir = rness / "skills"
+    skills_dir = rness / ".skills"
     if not skills_dir.is_dir():
         return []
     names: list[str] = []
@@ -136,8 +136,8 @@ def list_skills(rness: Path) -> list[tuple[str, bool]]:
 
 
 def set_skill_enabled(rness: Path, name: str, enabled: bool) -> None:
-    """Add or remove `name` from .rness/skills/.disabled."""
-    f = rness / "skills" / ".disabled"
+    """Add or remove `name` from .rness/.skills/.disabled."""
+    f = rness / ".skills" / ".disabled"
     current = _read_disabled_skills(rness)
     if enabled:
         current.discard(name)
@@ -169,13 +169,13 @@ def _load_skills(rness: Path) -> str:
     """Concatenate every ENABLED skill's content into one block.
 
     Two layouts supported:
-      .rness/skills/<name>/SKILL.md   — folder-based (Claude Code convention)
-      .rness/skills/<name>.md         — flat
-    Skills listed in .rness/skills/.disabled are skipped.
+      .rness/.skills/<name>/SKILL.md   — folder-based (Claude Code convention)
+      .rness/.skills/<name>.md         — flat
+    Skills listed in .rness/.skills/.disabled are skipped.
     Each folder-based skill's section begins with a path-hint preamble so
     the agent knows where companion files live.
     """
-    skills_dir = rness / "skills"
+    skills_dir = rness / ".skills"
     if not skills_dir.is_dir():
         return ""
     disabled = _read_disabled_skills(rness)
@@ -186,7 +186,7 @@ def _load_skills(rness: Path) -> str:
             continue
         text = _read_or_empty(skill_md)
         if text:
-            root = f".rness/skills/{name}/"
+            root = f".rness/.skills/{name}/"
             parts.append(f"## {name}\n\n{_skill_root_note(root)}\n\n{text}")
     for flat in sorted(skills_dir.glob("*.md")):
         name = flat.stem
@@ -197,6 +197,109 @@ def _load_skills(rness: Path) -> str:
             # Flat skills have no companion-files root, so no path note.
             parts.append(f"## {name}\n\n{text}")
     return "\n\n".join(parts)
+
+
+# ---------------------------------------------------------------------------
+# Roles — toggleable consultant personas the orchestrator can confer with.
+# Same on/off file model as skills, different placement in the prompt:
+# roles aren't capabilities you stack, they're voices you can summon.
+# ---------------------------------------------------------------------------
+
+def _read_disabled_roles(rness: Path) -> set[str]:
+    """Names listed (one per line) in .rness/.roles/.disabled are skipped."""
+    f = rness / ".roles" / ".disabled"
+    if not f.is_file():
+        return set()
+    try:
+        text = f.read_text(encoding="utf-8")
+    except OSError:
+        return set()
+    return {ln.strip() for ln in text.splitlines() if ln.strip() and not ln.startswith("#")}
+
+
+def list_roles(rness: Path) -> list[tuple[str, bool]]:
+    """Return [(name, enabled), ...] for every role present, in stable order."""
+    roles_dir = rness / ".roles"
+    if not roles_dir.is_dir():
+        return []
+    names: list[str] = []
+    for entry in sorted(roles_dir.iterdir()):
+        if entry.name.startswith("."):
+            continue
+        if not entry.is_dir():
+            continue
+        names.append(entry.name)
+    disabled = _read_disabled_roles(rness)
+    return [(n, n not in disabled) for n in names]
+
+
+def set_role_enabled(rness: Path, name: str, enabled: bool) -> None:
+    """Add or remove `name` from .rness/.roles/.disabled."""
+    f = rness / ".roles" / ".disabled"
+    current = _read_disabled_roles(rness)
+    if enabled:
+        current.discard(name)
+    else:
+        current.add(name)
+    f.parent.mkdir(parents=True, exist_ok=True)
+    if current:
+        f.write_text("\n".join(sorted(current)) + "\n", encoding="utf-8")
+    else:
+        if f.exists():
+            f.unlink()
+
+
+_ROLES_FRAMING = (
+    "You have access to the following Role agents as **consultants**, not "
+    "as facets of yourself. They are voices with their own values, blind "
+    "spots, and ways of pushing back. You — the core agent defined above — "
+    "remain the orchestrator: you make the decisions, you talk to the "
+    "user, you do the work. Roles are advisors you can summon when a "
+    "decision deserves a second perspective.\n\n"
+    "Ways to use them:\n"
+    "- Solicit input: \"Let me check this with <role>...\" then answer in "
+    "their voice, citing what they'd flag.\n"
+    "- Stage a debate: when two enabled roles would disagree, sketch the "
+    "exchange briefly before resolving as yourself.\n"
+    "- Spot-check decisions: at meaningful inflection points (committing to "
+    "an approach, finalizing a plan), ask whether any active role would "
+    "object.\n\n"
+    "Do not *become* a role unless explicitly asked to roleplay. Default "
+    "to channeling them as quoted advisors. Final decisions, tool calls, "
+    "and direct address to the user are always yours."
+)
+
+
+def _load_roles(rness: Path) -> str:
+    """Concatenate every ENABLED role's AGENT.md + MOTIVATION.md into one
+    block, framed as the consultant model above. Each role gets a `## Role:
+    <name>` heading so the model can address them by name."""
+    roles_dir = rness / ".roles"
+    if not roles_dir.is_dir():
+        return ""
+    disabled = _read_disabled_roles(rness)
+    sections: list[str] = []
+    for entry in sorted(roles_dir.iterdir()):
+        if entry.name.startswith("."):
+            continue
+        if not entry.is_dir():
+            continue
+        name = entry.name
+        if name in disabled:
+            continue
+        agent_md = _read_or_empty(entry / "AGENT.md")
+        motiv_md = _read_or_empty(entry / "MOTIVATION.md")
+        if not agent_md and not motiv_md:
+            continue
+        body_parts: list[str] = []
+        if agent_md:
+            body_parts.append(f"### Identity\n\n{agent_md}")
+        if motiv_md:
+            body_parts.append(f"### Motivation\n\n{motiv_md}")
+        sections.append(f"## Role: {name}\n\n" + "\n\n".join(body_parts))
+    if not sections:
+        return ""
+    return _ROLES_FRAMING + "\n\n" + "\n\n".join(sections)
 
 
 def _load_policies(rness: Path) -> str:
@@ -230,8 +333,14 @@ def assemble_system_prompt(project_dir: Path, active_paradigm: str = "default") 
     parts = [
         _section("Identity", agent),
         _section("Motivation", motivation),
-        _section("Paradigm", paradigm),
     ]
+    roles_block = _load_roles(rness)
+    if roles_block:
+        # Sit between Motivation and Paradigm — close to identity (these
+        # are voices you have access to) but distinct from it (you aren't
+        # them; you can consult them).
+        parts.append(_section("Active Role Consultants", roles_block))
+    parts.append(_section("Paradigm", paradigm))
     policies_block = _load_policies(rness)
     if policies_block:
         parts.append(_section("Policies", policies_block))

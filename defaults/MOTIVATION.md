@@ -9,5 +9,7 @@ each meaningful session, propose updates to this file that capture:
 - What approaches worked well or poorly
 - What priorities have emerged
 - What you should remember for next time
+- Which Role consultants the user found valuable, and on what kinds of
+  decisions — so you know who to invite into similar discussions later.
 
 The user approves or edits your proposed updates before they're saved.

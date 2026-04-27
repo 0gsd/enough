@@ -35,7 +35,13 @@ from sse_starlette.sse import EventSourceResponse
 from . import __version__
 from .llm import LLMError, stream_chat
 from .logger import ExchangeLog, log_exchange
-from .prompt import assemble_system_prompt, list_skills, set_skill_enabled
+from .prompt import (
+    assemble_system_prompt,
+    list_roles,
+    list_skills,
+    set_role_enabled,
+    set_skill_enabled,
+)
 from .supervisor import LlamaSupervisor
 from .tools import (
     ToolCall,
@@ -118,7 +124,7 @@ def _walk_tree(
 
     `visited` carries the set of canonical paths already in the current
     recursion chain. We snapshot it as we descend so sibling branches stay
-    independent — if `infoworld/` and `.rness/skills/` both happen to point
+    independent — if `infoworld/` and `.rness/.skills/` both happen to point
     into `~/enough/`, walking one doesn't poison the other."""
     abs_dir = root.joinpath(*rel_parts)
     try:
@@ -355,7 +361,7 @@ def _validate_current(cfg: dict[str, Any], selection: dict[str, Any]) -> dict[st
 CHECKPOINT_PROMPT = (
     "[harness] context window is approaching the auto-reset threshold. "
     "Before we lose continuity, do this in one short response:\n"
-    "1. Run `ls .rness/requests/*.md` to find your active request file (if any).\n"
+    "1. Run `ls .rness/.requests/*.md` to find your active request file (if any).\n"
     "2. If one exists, update its 'Continuation' section now: what you just "
     "did, what to do next, and any file paths or state the next turn must "
     "know about.\n"
@@ -366,7 +372,7 @@ CHECKPOINT_PROMPT = (
 
 CONTINUE_PROMPT = (
     "[harness] the conversation has been reset to free up context. Resume the "
-    "active work: list `.rness/requests/*.md`, read the most recent one's "
+    "active work: list `.rness/.requests/*.md`, read the most recent one's "
     "Continuation section, and pick up from there."
 )
 
@@ -688,7 +694,7 @@ def create_app(
     async def api_skills() -> HTMLResponse:
         items = list_skills(project_dir / ".rness")
         if not items:
-            return HTMLResponse('<div class="empty-note">no skills in .rness/skills/</div>')
+            return HTMLResponse('<div class="empty-note">no skills in .rness/.skills/</div>')
         rows = []
         for name, enabled in items:
             cls = "on" if enabled else "off"
@@ -716,11 +722,43 @@ def create_app(
         set_skill_enabled(project_dir / ".rness", name, enabled_raw == "1")
         return await api_skills()  # type: ignore[return-value]
 
+    @app.get("/api/roles", response_class=HTMLResponse)
+    async def api_roles() -> HTMLResponse:
+        items = list_roles(project_dir / ".rness")
+        if not items:
+            return HTMLResponse('<div class="empty-note">no roles in .rness/.roles/</div>')
+        rows = []
+        for name, enabled in items:
+            cls = "on" if enabled else "off"
+            next_val = "0" if enabled else "1"
+            rows.append(
+                f'<li class="role-row {cls}">'
+                f'  <button class="role-toggle" '
+                f'    hx-post="/api/roles/toggle" '
+                f'    hx-vals=\'{{"name": "{_escape_html(name)}", "enabled": "{next_val}"}}\' '
+                f'    hx-target="#roles-list" hx-swap="innerHTML">'
+                f'    {"●" if enabled else "○"}'
+                f'  </button>'
+                f'  <span class="role-name">{_escape_html(name)}</span>'
+                f'</li>'
+            )
+        return HTMLResponse('<ul class="roles">' + "".join(rows) + "</ul>")
+
+    @app.post("/api/roles/toggle", response_class=HTMLResponse)
+    async def api_roles_toggle(request: Request) -> HTMLResponse:
+        form = await request.form()
+        name = (form.get("name") or "").strip()
+        enabled_raw = (form.get("enabled") or "").strip()
+        if not name:
+            raise HTTPException(400, "missing name")
+        set_role_enabled(project_dir / ".rness", name, enabled_raw == "1")
+        return await api_roles()  # type: ignore[return-value]
+
     @app.get("/api/requests", response_class=HTMLResponse)
     async def api_requests() -> HTMLResponse:
-        rdir = project_dir / ".rness" / "requests"
+        rdir = project_dir / ".rness" / ".requests"
         if not rdir.is_dir():
-            return HTMLResponse('<div class="empty-note">no .rness/requests/ yet</div>')
+            return HTMLResponse('<div class="empty-note">no .rness/.requests/ yet</div>')
         active = sorted(
             (p for p in rdir.glob("*.md") if p.is_file()),
             key=lambda p: p.name,
@@ -730,7 +768,7 @@ def create_app(
             return HTMLResponse('<div class="empty-note">no active requests</div>')
         rows = []
         for p in active:
-            rel = f".rness/requests/{p.name}"
+            rel = f".rness/.requests/{p.name}"
             label = _escape_html(p.stem)
             rows.append(
                 f'<li class="request-row">'
@@ -755,7 +793,7 @@ def create_app(
         target = _resolve_project_path(path)
         if not target.is_file():
             raise HTTPException(404, "not found")
-        done_dir = project_dir / ".rness" / "requests" / "done"
+        done_dir = project_dir / ".rness" / ".requests" / "done"
         done_dir.mkdir(parents=True, exist_ok=True)
         dest = done_dir / target.name
         # If a file with the same name already exists in done/, disambiguate.
@@ -787,18 +825,22 @@ def create_app(
     def _is_request_file(path: str) -> bool:
         p = Path(path)
         parts = p.parts
-        # Active request = directly under .rness/requests/ (not /done/).
+        # Active request = directly under .rness/.requests/ (not /done/).
         return (
             len(parts) >= 3
             and parts[0] == ".rness"
-            and parts[1] == "requests"
+            and parts[1] == ".requests"
             and parts[2] != "done"
             and parts[-1].endswith(".md")
         )
 
     def _is_skill_file(path: str) -> bool:
         parts = Path(path).parts
-        return len(parts) >= 2 and parts[0] == ".rness" and parts[1] == "skills"
+        return len(parts) >= 2 and parts[0] == ".rness" and parts[1] == ".skills"
+
+    def _is_role_file(path: str) -> bool:
+        parts = Path(path).parts
+        return len(parts) >= 2 and parts[0] == ".rness" and parts[1] == ".roles"
 
     def _is_external_symlink(path_str: str) -> tuple[bool, Path | None]:
         """Is `path` a symlink whose resolved target lives outside the project?
@@ -840,6 +882,16 @@ def create_app(
                 '<div class="symlink-note">'
                 'skill file — edit globally at '
                 '<code>~/enough/defaults/skills/</code>; '
+                'toggle on/off for this project in the sidebar.'
+                '</div>'
+            )
+            action_btn = ""
+        elif _is_role_file(path):
+            # Same pattern as skills — roles are global, edited at source.
+            sym_note = (
+                '<div class="symlink-note">'
+                'role file — edit globally at '
+                '<code>~/enough/defaults/roles/</code>; '
                 'toggle on/off for this project in the sidebar.'
                 '</div>'
             )
@@ -921,6 +973,12 @@ def create_app(
                 403,
                 "skill files are not editable from the project UI — "
                 "edit globally at ~/enough/defaults/skills/",
+            )
+        if _is_role_file(path):
+            raise HTTPException(
+                403,
+                "role files are not editable from the project UI — "
+                "edit globally at ~/enough/defaults/roles/",
             )
         target = _resolve_project_path(path)
         if target.is_dir():

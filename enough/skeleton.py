@@ -73,12 +73,16 @@ _PROJECT_LOCAL_FILES: dict[str, str] = {
 }
 
 # Empty dirs to create in every project.
+# Dotted dirs (`.skills`, `.requests`, `.roles`) are intentionally hidden
+# from the file tree — they're surfaced through dedicated sidebar
+# sections instead, since they're configuration rather than artifacts.
 _EMPTY_DIRS: tuple[str, ...] = (
-    ".rness/skills",
+    ".rness/.skills",
     ".rness/routines",
     ".rness/knowledge/session-logs",
-    ".rness/requests",
-    ".rness/requests/done",
+    ".rness/.requests",
+    ".rness/.requests/done",
+    ".rness/.roles",
     ".rness/io/input",
     ".rness/io/output",
 )
@@ -161,7 +165,7 @@ def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
     ~/enough/defaults/skills/foo` on the next `enough` launch cleans `foo`
     out of every project using the (now-dangling) symlink."""
     src_skills = defaults_root / "skills"
-    dst_skills = project_dir / ".rness" / "skills"
+    dst_skills = project_dir / ".rness" / ".skills"
     dst_skills.mkdir(parents=True, exist_ok=True)
 
     # 1. Prune dangling symlinks.
@@ -209,6 +213,74 @@ def _populate_routine_symlinks(project_dir: Path, defaults_root: Path) -> None:
         if dst.exists() or dst.is_symlink():
             continue
         dst.symlink_to(entry.resolve())
+
+
+def _populate_role_symlinks(project_dir: Path, defaults_root: Path) -> None:
+    """Sync global Role agents into `.rness/.roles/` and prune dangling
+    symlinks. Same shape and lifecycle as skills: each role is a folder
+    containing AGENT.md + MOTIVATION.md, default-off (added to .disabled
+    on first sync), togglable per-project via the sidebar."""
+    src_roles = defaults_root / "roles"
+    dst_roles = project_dir / ".rness" / ".roles"
+    dst_roles.mkdir(parents=True, exist_ok=True)
+
+    # 1. Prune dangling symlinks (target removed globally).
+    for entry in sorted(dst_roles.iterdir()):
+        if entry.is_symlink() and not entry.exists():
+            try:
+                entry.unlink()
+            except OSError:
+                pass
+
+    # 2. Sync in any new globals (default-off).
+    if not src_roles.is_dir():
+        return
+    disabled_names: list[str] = []
+    for entry in sorted(src_roles.iterdir()):
+        if entry.name.startswith(".") or not entry.is_dir():
+            continue
+        dst = dst_roles / entry.name
+        if dst.exists() or dst.is_symlink():
+            continue
+        dst.symlink_to(entry.resolve())
+        disabled_names.append(entry.name)
+
+    if disabled_names:
+        disabled_file = dst_roles / ".disabled"
+        existing = set()
+        if disabled_file.is_file():
+            existing = {
+                ln.strip() for ln in disabled_file.read_text(encoding="utf-8").splitlines()
+                if ln.strip() and not ln.startswith("#")
+            }
+        existing.update(disabled_names)
+        disabled_file.write_text("\n".join(sorted(existing)) + "\n", encoding="utf-8")
+
+
+def _migrate_to_dotted(project_dir: Path) -> None:
+    """v0.0.9-B migration: rename `.rness/skills/` → `.rness/.skills/`,
+    `.rness/requests/` → `.rness/.requests/`. Idempotent: skips when the
+    new path already exists. Preserves contents (symlinks survive a
+    rename of their parent dir, and request markdown moves with the
+    folder)."""
+    rness = project_dir / ".rness"
+    pairs = (
+        (rness / "skills",   rness / ".skills"),
+        (rness / "requests", rness / ".requests"),
+    )
+    for old, new in pairs:
+        if not (old.exists() or old.is_symlink()):
+            continue
+        if new.exists() or new.is_symlink():
+            # User is mid-migrated or did something custom; don't clobber.
+            continue
+        try:
+            old.rename(new)
+        except OSError:
+            # Different fs / permissions / etc. Skip silently — the
+            # _populate_* functions will create the new dirs as needed,
+            # and the user can move legacy contents manually.
+            pass
 
 
 def ensure_skeleton(project_dir: Path) -> bool:
@@ -262,10 +334,17 @@ def ensure_skeleton(project_dir: Path) -> bool:
                 infoworld_root.resolve(), target_is_directory=True
             )
 
-    # ALWAYS run (idempotent): sync global skills/routines into the project.
-    # Picks up any new globals added after this project was first created.
+    # ALWAYS run (idempotent): migrate skills/, requests/ to the new
+    # dotted layout BEFORE populating, so the populators target the
+    # post-migration paths.
+    _migrate_to_dotted(project_dir)
+
+    # ALWAYS run (idempotent): sync global skills/routines/roles into the
+    # project. Picks up any new globals added after this project was
+    # first created.
     _populate_skill_symlinks(project_dir, defaults)
     _populate_routine_symlinks(project_dir, defaults)
+    _populate_role_symlinks(project_dir, defaults)
 
     # ALWAYS ensure the io/ scratch dirs exist — back-fills into projects
     # created before these were added to the skeleton.

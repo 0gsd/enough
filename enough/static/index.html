@@ -207,6 +207,33 @@
   ul.skills li.skill-row.off .skill-name { color: var(--fg-faint); text-decoration: line-through; }
   ul.skills .skill-name { color: var(--fg-muted); font-size: 12.5px; }
 
+  /* Role consultants — same shape as skills, accent on the user color
+     so it reads as a different category at a glance. */
+  ul.roles {
+    list-style: none;
+    margin: 0 0 12px 0;
+    padding: 0 4px;
+  }
+  ul.roles li.role-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 4px;
+  }
+  ul.roles button.role-toggle {
+    background: transparent;
+    border: none;
+    color: var(--fg-faint);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0 3px;
+    font-family: inherit;
+    line-height: 1;
+  }
+  ul.roles li.role-row.on button.role-toggle { color: var(--accent-user); }
+  ul.roles li.role-row.off .role-name { color: var(--fg-faint); text-decoration: line-through; }
+  ul.roles .role-name { color: var(--fg-muted); font-size: 12.5px; }
+
   ul.requests {
     list-style: none;
     margin: 0 0 12px 0;
@@ -898,6 +925,15 @@
       <h3 class="section-head"><span class="zippy">▾</span>active skills</h3>
       <div class="section-body">
         <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
+          <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sidebar-section collapsed" data-section="roles">
+      <h3 class="section-head"><span class="zippy">▾</span>roles (consultants)</h3>
+      <div class="section-body">
+        <div id="roles-list" hx-get="/api/roles" hx-trigger="load, every 10s" hx-swap="innerHTML">
           <div style="color: var(--fg-faint); padding: 8px">loading…</div>
         </div>
       </div>

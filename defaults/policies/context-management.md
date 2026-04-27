@@ -46,7 +46,7 @@ When pressure is high or critical:
    - Which files it should `read_file` to rebuild context.
    - Any open questions for the user.
 3. **Tell the user:** something like *"I've checkpointed
-   `.rness/requests/<file>.md`. Context is getting heavy — mind hitting
+   `.rness/.requests/<file>.md`. Context is getting heavy — mind hitting
    /reset? I'll pick up from the checkpoint on the next message."*
 4. **On the next turn (post-reset)**, read the request file, scan the
    Progress Checkpoints (newest first) and the Continuation block, then

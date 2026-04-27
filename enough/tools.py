@@ -244,7 +244,7 @@ def _safe_join(
 # locations whose semantics belong to the user/harness — writing here bypasses
 # UI affordances that represent user approval.
 _WRITE_PROTECTED_PREFIXES: tuple[tuple[str, ...], ...] = (
-    (".rness", "requests", "done"),
+    (".rness", ".requests", "done"),
 )
 
 
@@ -287,14 +287,14 @@ def _duplicate_request_reason(project_dir: Path, target: Path) -> str | None:
         return None
     # Only the flat active-requests dir; ignore done/ (already protected)
     # and any deeper nesting.
-    if rel_parts[:2] != (".rness", "requests") or len(rel_parts) != 3:
+    if rel_parts[:2] != (".rness", ".requests") or len(rel_parts) != 3:
         return None
     m = _REQUEST_FILENAME_RE.match(rel_parts[-1])
     if not m:
         return None
     target_ts = m.group("ts")
     target_real = target.resolve(strict=False)
-    reqs_dir = project_dir / ".rness" / "requests"
+    reqs_dir = project_dir / ".rness" / ".requests"
     for other in reqs_dir.glob("*.md"):
         if other.resolve() == target_real:
             continue  # same file → legitimate update
@@ -302,7 +302,7 @@ def _duplicate_request_reason(project_dir: Path, target: Path) -> str | None:
         if other_m and other_m.group("ts") == target_ts:
             return (
                 f"a request with timestamp {target_ts} already exists at "
-                f".rness/requests/{other.name}. that's probably the file you "
+                f".rness/.requests/{other.name}. that's probably the file you "
                 f"meant to update — your slug spelling may have drifted "
                 f"between turns. `read_file` or `ls` first, then write to the "
                 f"exact existing filename. if you really need a parallel "
