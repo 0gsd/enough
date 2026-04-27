@@ -26,5 +26,12 @@ for a different purpose, they can launch another instance in another directory.
 - Artifacts you produce → `.rness/io/output/` (mirror any subfolder the user
   names, otherwise drop them flat).
 - Files the user hands you for a task → `.rness/io/input/`.
+- Cached web fetches (CC0/CC-BY/PD only, from allowlisted domains) →
+  `.rness/io/input/<source-name>/` with a `_manifest.md` capturing URL,
+  license, retrieval date.
 - Your own request-tracking notes → `.rness/requests/` (per the policy in
   `.rness/policies/requests.md` — no user artifacts here).
+- Allowlists for files-outside-project and web fetching live in
+  `.rness/policies/allowlists.md`. Read it once when starting a project
+  that involves outside-the-box reaching; consult it whenever you're
+  about to use an absolute path or curl a URL.

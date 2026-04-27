@@ -97,41 +97,80 @@ _ALLOWLIST_RE = re.compile(
     r"^\s*-\s+`?(?P<path>[^`\s][^`]*?)`?\s*$"
 )
 
+# Section headings recognized in policies/allowlists.md.
+# `read-allowlist.md`'s legacy `## allowlisted prefixes` heading is treated
+# as file-read for back-compat; it'll keep working until the file fully
+# migrates to allowlists.md.
+_ALLOWLIST_SECTION_KEYS: dict[str, str] = {
+    "## file-read prefixes":       "file_read",
+    "## file-read-write prefixes": "file_rw",
+    "## internet domains":         "internet",
+    "## allowlisted prefixes":     "file_read",  # legacy
+}
 
-def _read_allowlist(project_dir: Path) -> list[Path]:
-    """Parse absolute-path prefixes from `.rness/policies/read-allowlist.md`.
 
-    Matches markdown bullets of the form:
-        - `~/enough/`
-        - `/Users/whoever/stuff/`
+def _read_allowlists(project_dir: Path) -> dict[str, list[str]]:
+    """Parse the three allowlists from `.rness/policies/allowlists.md`,
+    falling back to legacy `read-allowlist.md` if the new file is absent.
 
-    Non-matching lines (prose, headers) are ignored. Returns resolved Paths.
-    Missing policy file → empty list (strict containment).
-    """
-    policy = project_dir / ".rness" / "policies" / "read-allowlist.md"
-    if not policy.is_file():
-        return []
-    out: list[Path] = []
-    in_section = False
+    Returns a dict with keys `file_read`, `file_rw`, `internet`. Each
+    value is a list of raw entries (paths or domains, lowercased for
+    domains, ~ unexpanded for paths). Missing file → empty lists.
+    Path-prefix lookups should call `_resolve_path_allowlist` to get
+    canonical absolute Paths."""
+    rness = project_dir / ".rness" / "policies"
+    candidates = [rness / "allowlists.md", rness / "read-allowlist.md"]
+    policy = next((p for p in candidates if p.is_file()), None)
+    out: dict[str, list[str]] = {"file_read": [], "file_rw": [], "internet": []}
+    if policy is None:
+        return out
+    current: str | None = None
     for line in policy.read_text(encoding="utf-8").splitlines():
         stripped = line.strip().lower()
         if stripped.startswith("## "):
-            in_section = stripped.startswith("## allowlisted prefixes")
+            current = _ALLOWLIST_SECTION_KEYS.get(stripped)
             continue
-        if not in_section:
+        if current is None:
             continue
         m = _ALLOWLIST_RE.match(line)
         if not m:
             continue
-        raw = m.group("path").strip()
-        if not raw:
+        entry = m.group("path").strip()
+        if not entry:
             continue
-        expanded = Path(raw).expanduser()
+        if current == "internet":
+            out[current].append(entry.lower())
+        else:
+            out[current].append(entry)
+    return out
+
+
+def _resolve_path_allowlist(entries: list[str]) -> list[Path]:
+    """Turn raw path entries (`~/foo/`, `/etc/`) into canonical Paths,
+    silently dropping any that won't resolve."""
+    out: list[Path] = []
+    for raw in entries:
         try:
-            out.append(expanded.resolve(strict=False))
+            out.append(Path(raw).expanduser().resolve(strict=False))
         except OSError:
             continue
     return out
+
+
+def _read_allowlist(project_dir: Path) -> list[Path]:
+    """Back-compat shim — file-read prefixes only. Existing callers (and
+    tests) that imported this name keep working.
+
+    The "read" allowlist transparently includes file-rw prefixes too,
+    since anything writable is implicitly readable."""
+    raw = _read_allowlists(project_dir)
+    return _resolve_path_allowlist(raw["file_read"] + raw["file_rw"])
+
+
+def _read_write_allowlist(project_dir: Path) -> list[Path]:
+    """Just the file-rw prefixes — destinations writes are allowed to."""
+    raw = _read_allowlists(project_dir)
+    return _resolve_path_allowlist(raw["file_rw"])
 
 
 def _under_any(target: Path, roots: list[Path]) -> bool:
@@ -149,29 +188,47 @@ def _safe_join(
     rel: str,
     *,
     allow_outside_read: bool = False,
+    allow_outside_write: bool = False,
 ) -> Path:
     """Resolve `rel` under `project_dir`. Raise ValueError on escape.
 
-    With `allow_outside_read=True`, ABSOLUTE paths matching the read
-    allowlist (`.rness/policies/read-allowlist.md`) are permitted. Relative
-    `../` escapes are always rejected — the agent should use absolute
-    paths when reaching outside the project.
-    """
+    With `allow_outside_read=True`, ABSOLUTE paths matching the file-read
+    or file-rw allowlist are permitted.
+
+    With `allow_outside_write=True`, ABSOLUTE paths matching the file-rw
+    allowlist (only) are permitted — for `write_file`. Reading a path
+    requires only `allow_outside_read`; writing requires the stricter
+    `allow_outside_write`.
+
+    Relative `../` escapes are always rejected — the agent should use
+    absolute paths when reaching outside the project."""
     if not rel:
         raise ValueError("empty path")
     p = Path(rel).expanduser()
     if p.is_absolute():
-        if not allow_outside_read:
+        if not (allow_outside_read or allow_outside_write):
             raise ValueError(f"absolute paths rejected: {rel!r}")
         target = p.resolve(strict=False)
-        allowlist = _read_allowlist(project_dir)
-        if not _under_any(target, allowlist):
-            pretty = ", ".join(str(a) for a in allowlist) or "(empty)"
-            raise ValueError(
-                f"path {rel!r} is outside the project and not on the read "
-                f"allowlist. allowlisted prefixes: {pretty}. to add a prefix, "
-                f"edit .rness/policies/read-allowlist.md."
-            )
+        if allow_outside_write:
+            allowlist = _read_write_allowlist(project_dir)
+            if not _under_any(target, allowlist):
+                pretty = ", ".join(str(a) for a in allowlist) or "(empty)"
+                raise ValueError(
+                    f"path {rel!r} is outside the project and not on the "
+                    f"file-read-write allowlist. allowlisted r/w prefixes: "
+                    f"{pretty}. to add a prefix, edit "
+                    f".rness/policies/allowlists.md."
+                )
+        else:
+            allowlist = _read_allowlist(project_dir)
+            if not _under_any(target, allowlist):
+                pretty = ", ".join(str(a) for a in allowlist) or "(empty)"
+                raise ValueError(
+                    f"path {rel!r} is outside the project and not on the "
+                    f"file-read allowlist. allowlisted read prefixes: "
+                    f"{pretty}. to add a prefix, edit "
+                    f".rness/policies/allowlists.md."
+                )
         return target
     # Relative path — contained in project, as before.
     target = (project_dir / p).resolve(strict=False)
@@ -282,7 +339,9 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
     if call.content is None:
         return ToolResult("write_file", call.path, False, "error: missing <content>")
     try:
-        target = _safe_join(project_dir, call.path)
+        # Absolute paths require the stricter file-rw allowlist; relative
+        # paths are always project-contained as before.
+        target = _safe_join(project_dir, call.path, allow_outside_write=True)
     except ValueError as e:
         return ToolResult("write_file", call.path, False, f"error: {e}")
     if (why := _protected_write_reason(project_dir, target)):

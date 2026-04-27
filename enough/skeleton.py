@@ -55,7 +55,7 @@ _SKELETON_PLAN: tuple[tuple[str, str, str], ...] = (
     ("paradigms/default.md",           ".rness/paradigms/default.md",            "symlink"),
     ("policies/requests.md",           ".rness/policies/requests.md",            "symlink"),
     ("policies/context-management.md", ".rness/policies/context-management.md",  "symlink"),
-    ("policies/read-allowlist.md",     ".rness/policies/read-allowlist.md",      "symlink"),
+    ("policies/allowlists.md",         ".rness/policies/allowlists.md",          "symlink"),
     ("models/providers.md",            ".rness/models/providers.md",             "symlink"),
 )
 
@@ -275,4 +275,48 @@ def ensure_skeleton(project_dir: Path) -> bool:
             d.mkdir(parents=True, exist_ok=True)
             (d / ".gitkeep").touch()
 
+    # ALWAYS run (idempotent): migrate read-allowlist.md → allowlists.md.
+    # The new file has three sections (read, r/w, internet) but the tools
+    # layer still parses the legacy `## allowlisted prefixes` heading, so
+    # a renamed-but-otherwise-untouched project-local copy keeps working.
+    _migrate_allowlist(project_dir, defaults)
+
     return new_project
+
+
+def _migrate_allowlist(project_dir: Path, defaults: Path) -> None:
+    """v0.0.9-A migration: read-allowlist.md → allowlists.md.
+
+    Three cases:
+    - Both files exist: do nothing (user has done something custom; don't
+      clobber — they'll resolve manually).
+    - Only new file exists: nothing to do.
+    - Only old file exists, and it's a symlink to defaults/...read-allowlist.md:
+      replace it with a symlink to defaults/...allowlists.md (the
+      authoritative new content).
+    - Only old file exists, and it's a real file (project-customized):
+      rename it in place to allowlists.md so the user's customizations
+      carry over."""
+    pol = project_dir / ".rness" / "policies"
+    old = pol / "read-allowlist.md"
+    new = pol / "allowlists.md"
+    if new.exists() or new.is_symlink():
+        return
+    if not (old.exists() or old.is_symlink()):
+        return
+    if old.is_symlink():
+        try:
+            old.unlink()
+        except OSError:
+            return
+        new_default = (defaults / "policies" / "allowlists.md").resolve()
+        if new_default.is_file():
+            try:
+                new.symlink_to(new_default)
+            except OSError:
+                pass
+    else:
+        try:
+            old.rename(new)
+        except OSError:
+            pass
