@@ -1,6 +1,6 @@
 [project]
 name = "enough"
-version = "0.0.7"
+version = "0.0.9"
 description = "A paradigmless personal computer harness powered by a local LLM."
 readme = "README.md"
 requires-python = ">=3.11"

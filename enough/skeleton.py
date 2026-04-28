@@ -7,7 +7,7 @@ v0.0.3+ layout:
 - On first run in a project, `.rness/` is populated with a mix of:
     - **symlinks** into `~/enough/defaults/...` — for files whose
       semantics are "global convention, upgradable centrally" (paradigms,
-      policies, models/providers.md, skills, routines).
+      policies, models/providers.md, skills, roles).
     - **copies** — for files that diverge per project from the start
       (AGENT.md, MOTIVATION.md, knowledge/user-profile.md).
 - `{project}/infoworld` is a symlink to `~/enough/infoworld/` so all
@@ -78,7 +78,6 @@ _PROJECT_LOCAL_FILES: dict[str, str] = {
 # sections instead, since they're configuration rather than artifacts.
 _EMPTY_DIRS: tuple[str, ...] = (
     ".rness/.skills",
-    ".rness/routines",
     ".rness/knowledge/session-logs",
     ".rness/.requests",
     ".rness/.requests/done",
@@ -201,20 +200,6 @@ def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
         disabled_file.write_text("\n".join(sorted(existing)) + "\n", encoding="utf-8")
 
 
-def _populate_routine_symlinks(project_dir: Path, defaults_root: Path) -> None:
-    """Same shape as skills: any .md file in defaults/routines/ gets symlinked."""
-    src = defaults_root / "routines"
-    if not src.is_dir():
-        return
-    dst_dir = project_dir / ".rness" / "routines"
-    dst_dir.mkdir(parents=True, exist_ok=True)
-    for entry in sorted(src.glob("*.md")):
-        dst = dst_dir / entry.name
-        if dst.exists() or dst.is_symlink():
-            continue
-        dst.symlink_to(entry.resolve())
-
-
 def _populate_role_symlinks(project_dir: Path, defaults_root: Path) -> None:
     """Sync global Role agents into `.rness/.roles/` and prune dangling
     symlinks. Same shape and lifecycle as skills: each role is a folder
@@ -285,13 +270,13 @@ def _migrate_to_dotted(project_dir: Path) -> None:
 
 def ensure_skeleton(project_dir: Path) -> bool:
     """Create `.rness/` + `infoworld` symlink if missing, AND sync global
-    skills/routines on every call (idempotent). Returns True on first-time
+    skills/roles on every call (idempotent). Returns True on first-time
     `.rness/` creation, False if it already existed.
 
-    The skill/routine sync runs on every launch so newly-installed global
-    skills appear in existing projects too — with default-off status, per
-    the policy. It's idempotent: already-symlinked skills and already-
-    disabled entries are left alone."""
+    The skill/role sync runs on every launch so newly-installed globals
+    appear in existing projects too — with default-off status, per the
+    policy. It's idempotent: already-symlinked entries and already-
+    disabled names are left alone."""
     rness = project_dir / ".rness"
     new_project = not rness.exists()
 
@@ -339,11 +324,9 @@ def ensure_skeleton(project_dir: Path) -> bool:
     # post-migration paths.
     _migrate_to_dotted(project_dir)
 
-    # ALWAYS run (idempotent): sync global skills/routines/roles into the
-    # project. Picks up any new globals added after this project was
-    # first created.
+    # ALWAYS run (idempotent): sync global skills/roles into the project.
+    # Picks up any new globals added after this project was first created.
     _populate_skill_symlinks(project_dir, defaults)
-    _populate_routine_symlinks(project_dir, defaults)
     _populate_role_symlinks(project_dir, defaults)
 
     # ALWAYS ensure the io/ scratch dirs exist — back-fills into projects
@@ -353,6 +336,27 @@ def ensure_skeleton(project_dir: Path) -> bool:
         if not d.exists():
             d.mkdir(parents=True, exist_ok=True)
             (d / ".gitkeep").touch()
+
+    # ALWAYS run (idempotent): clean up the legacy `.rness/routines/` dir
+    # left over from pre-0.0.9 projects. Routines were a pre-built
+    # abstraction with no working surface; nothing read them, no UI
+    # showed them, no scheduler triggered them. We rmdir() so projects
+    # that did somehow populate the dir keep their content; only the
+    # empty default state goes away.
+    legacy_routines = project_dir / ".rness" / "routines"
+    if legacy_routines.is_dir():
+        # Drop our own symlinks first (the populator made them), then try
+        # to remove the dir if empty.
+        for entry in legacy_routines.iterdir():
+            if entry.is_symlink():
+                try:
+                    entry.unlink()
+                except OSError:
+                    pass
+        try:
+            legacy_routines.rmdir()
+        except OSError:
+            pass  # not empty — leave the user's stuff alone
 
     # ALWAYS run (idempotent): migrate read-allowlist.md → allowlists.md.
     # The new file has three sections (read, r/w, internet) but the tools

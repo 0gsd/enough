@@ -1,342 +1,480 @@
 # enough
 
-A **paradigmless personal computer harness** powered by a local LLM. It ships
-empty. You make it useful by defining your own paradigms, workflows, agents,
-and knowledge stores through plain-text conventions in a `.rness/` directory.
-The model helps you do this from the very first message.
+A **paradigmless personal computer harness** powered by a local LLM that
+runs entirely on your Mac. Your conversations stay on your machine. Your
+files stay on your machine. The model that's answering you also stays on
+your machine — there's no API call to the cloud, no account to sign up
+for, no subscription.
 
-One `enough` instance = one agent = one context = one `.rness/` directory.
-Multi-agent? Run multiple instances in different directories. There is no
-built-in orchestrator, no message bus, no agent framework. The filesystem is
-the coordination surface.
+It ships almost empty. You make it useful by enabling skills, activating
+roles, customizing paradigms, and giving it long-running tasks to track.
+The agent helps you do all of this from your very first message.
 
-Status: **v0.0.3 — pre-alpha.** The architecture is in place; the ideas on top
-of it are up to you.
-
----
-
-## What's inside
-
-```
-┌─────────────────────────────────────────────────┐
-│  Browser (htmx)  ──SSE/HTTP──▶  FastAPI server  │
-│                                      │          │
-│                                      ▼          │
-│                           llama-server (you run │
-│                           it; localhost:8080)   │
-└─────────────────────────────────────────────────┘
-
-~/enough/                ← install dir (the "home base")
-├── defaults/            ← source-of-truth templates for every new project
-│   ├── AGENT.md
-│   ├── MOTIVATION.md
-│   ├── paradigms/default.md
-│   ├── policies/{requests,context-management,read-allowlist}.md
-│   ├── models/providers.md
-│   ├── skills/          ← drop a skill folder here to make it global
-│   └── routines/
-├── infoworld/           ← per-user shared knowledge store
-│   ├── wiki/
-│   ├── personal/
-│   └── public/
-├── weights/             ← GGUF model file(s)
-├── enough/              ← the Python package (CLI, server, skeleton, tools)
-├── bootstrap.sh
-└── llama_server.sh
-
-./your-project/          ← any directory where you run `enough`
-├── .rness/
-│   ├── AGENT.md                     (COPY — diverges per project)
-│   ├── MOTIVATION.md                (COPY)
-│   ├── paradigms/default.md         (symlink → ~/enough/defaults/...)
-│   ├── policies/                    (symlinked)
-│   │   ├── requests.md
-│   │   ├── context-management.md
-│   │   └── read-allowlist.md
-│   ├── models/providers.md          (symlink)
-│   ├── skills/                      (one symlink per skill; toggle on/off in UI)
-│   ├── routines/                    (symlinked, user-authored)
-│   ├── requests/                    (per-project; active .md files)
-│   │   └── done/                    (user confirms via "mark done" button)
-│   └── knowledge/
-│       ├── user-profile.md          (COPY)
-│       └── session-logs/            (one .md per day)
-├── infoworld/                       (symlink → ~/enough/infoworld/)
-└── [whatever else you're working on]
-```
-
-Symlinked files render **italic + muted** in the UI. Click a symlinked file,
-hit **"customize for this project"** in the preview pane, and the symlink is
-replaced with a project-local copy you can edit. Edit a file in
-`~/enough/defaults/` directly and every project still using the symlink
-picks up the change on the next message.
+> **Status:** v0.0.9 — pre-alpha but usable. Mac-only for now. The
+> architecture is settled; the ideas on top of it are up to you.
 
 ---
 
-## Install
+## Who is this for?
 
-### One-shot: `bootstrap.sh`
+If you're comfortable opening a Terminal window once to install something,
+and you use Word, Google Docs, or similar tools daily, you're the
+audience. Cloud LLM products feel scary or wasteful or both — `enough` is
+the local-first counterpoint. No telemetry, no logs leaving your machine,
+no model weights you don't own a copy of.
+
+You don't need to be a programmer. You don't need to know what an LLM is
+"under the hood." You do need to be willing to read a markdown file or
+two and edit text in your favorite text editor (or in `enough`'s built-in
+preview pane).
+
+---
+
+## What you'll need
+
+- A **Mac** (Apple Silicon or recent Intel; Linux/Windows support is on
+  the roadmap, not here yet)
+- About **5–30 GB of free disk space**, depending on which AI model you
+  pick during install (the smallest one is ~5 GB; the biggest is ~16 GB)
+- About **10 minutes** for the install
+- Comfort with running **one Terminal command** to get started
+
+The installer takes care of everything else: it'll ask before installing
+anything, and it explains what each step does as it runs.
+
+---
+
+## Installing it
+
+Open Terminal and paste:
 
 ```bash
-git clone git@github.com:0gsd/enough.git /tmp/enough-seed
+git clone https://github.com/0gsd/enough.git /tmp/enough-seed
 cd /tmp/enough-seed
 bash bootstrap.sh
 ```
 
-The script is idempotent and walks through eight steps, explaining each
-before it runs:
+The installer walks through nine steps in order, asking permission and
+explaining each one:
 
-1. macOS platform check
-2. Homebrew presence
-3. Installs `llama.cpp`, `uv`, `tor` via brew (skips ones already installed)
-4. Clones (or pulls) `github.com/0gsd/enough` to `~/enough`
-5. `uv sync` inside `~/enough`
-6. Model weights: either moves an existing GGUF you point to, or downloads
-   the recommended Gemma 4 26B MoE Q4_K_M (~16 GB) from HuggingFace
-7. Drops a shim at `~/.local/bin/enough` so the CLI is on PATH
-8. Done message with next-steps
+1. Confirms you're on a Mac
+2. Checks for Homebrew (the standard Mac package manager) — installs if missing
+3. Installs the supporting tools: `llama.cpp` (the local AI runtime),
+   `uv` (Python environment manager), `tor` (optional privacy proxy), and
+   `whisper-cpp` (for voice input)
+4. Clones `enough` itself into `~/enough/` (your home folder)
+5. Sets up the Python environment
+6. Lets you pick which AI model(s) to download — pick **tier 1** if you
+   want the lightest setup, **tier 4** if you want all four models
+7. Downloads a voice-recognition model (~140 MB) for the mic button
+8. Installs an `enough` command on your PATH so you can run it from any folder
+9. Tells you what to do next
 
-After that you can delete `/tmp/enough-seed` — `~/enough` is the install.
+After install, you can delete `/tmp/enough-seed/`. Your install lives at
+`~/enough/`.
 
-### Prerequisites if you're skipping the script
+### The "open enough" launcher
 
-- **macOS** (Linux support is on the roadmap; nothing here is fundamentally
-  Mac-only, it just hasn't been tested)
-- **Python 3.11+**
-- **Homebrew**
-- **llama-server** (from [llama.cpp](https://github.com/ggml-org/llama.cpp))
-  listening on `http://localhost:8080`
-- **[uv](https://docs.astral.sh/uv/)**
-- A GGUF model in `~/enough/weights/`. Recommended:
-  [ggml-org/gemma-4-26B-A4B-it-GGUF][g4] Q4_K_M — 26B MoE, ~4B active
-  parameters, ~16 GB on disk, fast on Apple Silicon.
-
-[g4]: https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF
+There's also a double-clickable launcher in `shortcuts/`:
+`enough-on.command` starts the local AI server and opens `enough` in your
+browser, all from a Finder double-click. See [`shortcuts/README.md`](shortcuts/README.md)
+for setup.
 
 ---
 
-## Running
+## Your first time
+
+Open Terminal, navigate to any folder you want to work in (or create a
+new one), and run:
 
 ```bash
-# Start the LLM (once per boot; bundled toggle script handles flags):
-MODEL=~/enough/weights/gemma-4-26B-A4B-it-Q4_K_M.gguf ~/enough/llama_server.sh start
-
-# Go to any directory and launch enough there:
-cd ~/my-project && enough
+enough
 ```
 
-The browser opens to `http://127.0.0.1:3456`. First launch in a new
-directory creates `.rness/` and symlinks the defaults in. Subsequent
-launches in the same dir reuse what's there.
+Your browser will open at `http://127.0.0.1:3456` showing a chat
+interface, a file sidebar, and a model badge in the top-right.
 
-### CLI flags
+The first time you launch in a folder, `enough` creates a hidden
+`.rness/` directory in it — that's where the agent's identity, memory,
+and configuration live. Type a message to start. The agent will likely
+ask you what kind of work you want to do here and what personality it
+should have.
 
-```
-enough [--dir PATH] [--port N] [--llm-url URL] [--no-browser] [--max-tool-iters N]
-```
-
-| flag | default | notes |
-|---|---|---|
-| `--dir` | cwd | project directory; refuses to run inside `~/enough/` itself |
-| `--port` | `3456` | web UI port |
-| `--llm-url` | `http://localhost:8080` | where llama-server is |
-| `--no-browser` | off | don't auto-open the tab |
-| `--max-tool-iters` | `50` | cap on tool invocations per user turn |
-
-### `llama_server.sh` — LLM toggle
-
-```bash
-MODEL=<path> ./llama_server.sh start|stop|status|logs|toggle
-```
-
-Env defaults: `HOST=127.0.0.1 PORT=8080 NGL=99 CTX=32768 PARALLEL=1`.
-Override any by exporting. Runtime state (pid, log) goes into
-`.llama-server/` next to the script; that directory is gitignored.
-
-The `--jinja` flag is applied automatically — it makes llama-server use the
-chat template embedded in the GGUF, which `enough` relies on.
+That's it. That's the whole loop.
 
 ---
 
-## The `.rness/` directory
+## The pieces
 
-Everything about your agent's identity, behavior, and memory lives here as
-plain text. The system prompt is **re-assembled from these files on every
-request** — edits take effect on the very next message, no restart needed.
+`enough` has a small set of concepts. Each is a markdown file or folder
+you can read, edit, or toggle. Here's what they are and how to use them.
 
-Files fall into three categories:
+### Projects
 
-**Copies (per-project, diverge from day one):**
-- `AGENT.md` — who the agent is.
-- `MOTIVATION.md` — accumulated learning; agent proposes updates at session
-  end, you apply.
-- `knowledge/user-profile.md` — what the agent knows about you.
+A **project** is just a folder on your Mac. When you `cd` into it and run
+`enough`, that folder becomes the agent's home: it has its own
+identity (`AGENT.md`), its own running notes (`MOTIVATION.md`), its own
+list of in-progress jobs (`.requests/`), its own session logs.
 
-**Symlinks to `~/enough/defaults/` (global defaults, upgrade-in-place):**
-- `paradigms/default.md` — session structure, output conventions, security
-  posture.
-- `policies/requests.md` — long-horizon request tracking convention.
-- `policies/context-management.md` — how to sense pressure and gracefully
-  reset.
-- `policies/read-allowlist.md` — which paths OUTSIDE the project dir the
-  agent may read (default: `~/enough/` only).
-- `models/providers.md` — model/provider notes.
-- `skills/<name>/` — symlinked individually per skill. Drop a folder in
-  `~/enough/defaults/skills/` to make it global; drop directly into a
-  project's `.rness/skills/` to keep it project-local.
-- `routines/*.md` — same pattern.
+Run `enough` in `~/Documents/my-novel/` and it's your novelist agent. Run
+it in `~/Documents/research/`, different folder, different agent, fresh
+brain.
 
-**Per-project, not sourced from defaults:**
-- `requests/` + `requests/done/` — active and completed requests.
-- `knowledge/session-logs/<YYYY-MM-DD>.md` — every exchange, written by
-  the harness.
+**One folder = one agent.** No multi-agent orchestration, no shared
+state. If you want a different agent, go to a different folder.
 
-Optional:
-- `INTENTION.md` — if present, injected as the current session intention.
+The hidden `.rness/` directory inside your project is where all the
+agent's stuff lives. Most of it you'll never touch directly — the sidebar
+surfaces what matters.
 
-### Editing in the UI
+### Skills
 
-Click a file in the sidebar → preview pane opens. If it's a direct file
-(copy), hit **edit** → textarea → **save** / **cancel**. If it's a symlinked
-global default, you'll see a **"customize for this project"** button
-instead — one click replaces the symlink with a project-local copy, and the
-edit button appears.
+A **skill** is a packaged capability you can toggle on or off — like a
+Word add-in or a Chrome extension. Each skill is a folder with a
+`SKILL.md` describing what it does, and (optionally) helper scripts.
 
-The sidebar also has:
-- **skills** — toggle any skill on/off. Disabled skills are excluded from
-  the system prompt and tracked in `.rness/skills/.disabled`.
-- **requests** — active request files, newest first. Click to preview; the
-  preview chrome grows a **mark done** button that moves the file into
-  `done/`.
+`enough` ships with four skills out of the box:
+
+- **`docs-maintainer`** — reads codebases and writes accurate docs.
+- **`irefy`** ("I read everything for you") — produces a one-page
+  analytical digest of any long document.
+- **`the-internet`** — fetches web pages through Tor for anonymized
+  reading.
+- **`wiki-links`** — historical fiction research helper.
+
+**How to use them:** open the sidebar (left side of the window), expand
+the **active skills** section. Each skill has a circle next to its name —
+filled = on, empty = off. Click to toggle. Changes apply on your very
+next message.
+
+Skills default to **off** so the agent's system prompt stays small and
+fast. Turn on only what you need for the current job.
+
+To add a new skill globally, drop a folder into
+`~/enough/defaults/skills/`. It'll show up (default-off) in every
+project on your next `enough` launch.
+
+### Roles (consultants)
+
+A **role** is a different kind of voice the agent can consult — an
+advisor with their own values, blind spots, and ways of pushing back.
+The agent itself is the orchestrator; roles are voices it can summon for
+a second opinion.
+
+`enough` ships with one role:
+
+- **`open-skeptic`** — an "enlightenable doomer." Skeptical that AI
+  should be replicating human judgment, relationships, or care, but
+  enthusiastic about AI as a productivity multiplier in its lane.
+  Specific, persuadable, non-preachy. Useful when you want a sanity check
+  on whether you're asking AI to do something it shouldn't.
+
+**How to use them:** in the sidebar, expand the **roles (consultants)**
+section. Toggle on a role to make its perspective available to the
+orchestrator.
+
+Once active, you can prompt the agent like:
+
+> "What would open-skeptic say about this plan?"
+
+Or just let the agent volunteer their perspective on its own — it knows
+the active roles are available as advisors.
+
+To add new roles globally, drop a folder containing `AGENT.md` and
+`MOTIVATION.md` into `~/enough/defaults/roles/`.
+
+### Paradigms
+
+A **paradigm** is the agent's "operating manual" — how it structures
+sessions, what its security posture is, how it handles requests, when to
+write checkpoints. It's a single markdown file the agent reads every
+turn.
+
+`enough` ships with one paradigm: **`default.md`**. It covers things like:
+
+- Show commands before running them
+- Don't write outside the project folder unless the user opts in
+- Cache public-domain web content into the project (with manifest)
+- Don't auto-update memory files; propose changes for the user to apply
+
+**How to use it:**
+
+- For **most users**, don't touch it — the default is sensible.
+- To **see what it says**, click `.rness/paradigms/default.md` in the
+  sidebar. It opens in the preview pane.
+- To **change it for one project only**: in the preview pane, click
+  *"customize for this project"*. The default symlink is replaced with a
+  project-local copy you can edit.
+- To **change it for all projects**, edit `~/enough/defaults/paradigms/default.md`
+  directly. Every project still using the default symlink picks up the
+  change on the next message.
+
+Power users can author multiple paradigm files and switch between them.
+Most won't need to.
+
+### Requests (long-horizon job tracking)
+
+When you ask the agent to do something that takes more than one
+conversation turn — write a 50-page report, build a piece of software,
+research a topic across many sources — it creates a **request file**
+under `.rness/.requests/`. This is its working memory for the job.
+
+The file tracks:
+
+- The original ask, paraphrased
+- Sub-requests (parts of the work)
+- Tasks (atomic, checkbox-style)
+- Progress checkpoints — notes the agent leaves itself
+- A continuation block (used when the conversation needs to reset
+  mid-job; see auto-reset below)
+
+**How to use them:**
+
+- The agent creates and updates them automatically.
+- The sidebar's **requests** section lists active requests, newest first.
+  Click any one to see it in the preview pane.
+- When the agent says it's done with a request, the preview pane gets a
+  **mark done** button. One click moves the file to
+  `.rness/.requests/done/`. That click is your approval — the agent
+  can't move it itself.
+
+This is how `enough` survives losing its memory mid-job. (See auto-reset.)
+
+### Models and the token gauge
+
+The little badge in the top-right (e.g., `Q35-09 · 16k`) shows which AI
+model is loaded and how much "memory" (context window) it has. Click the
+badge to open the **model & context** modal.
+
+In there you can:
+
+- **Switch models** — pick a different one and click *Apply & Restart*.
+  The smaller models are faster and use less RAM; the bigger ones are
+  smarter but slower.
+- **Change the context window size** — bigger means the agent can
+  remember more before it starts forgetting; smaller means less RAM and
+  faster.
+- **Watch the token-pressure gauge** — a colored bar that fills up as
+  the conversation grows. Green is fine, yellow is "getting full," red
+  is "about to overflow."
+- **Toggle auto-reset** — see below.
+
+Right next to the model badge is a smaller version of the token gauge,
+always visible while you work. Hover for details.
+
+### Auto-reset (for very long jobs)
+
+Local AI models have a finite memory. When you push past it, you get an
+error and the conversation breaks. This is annoying. `enough` has a
+feature to handle it gracefully:
+
+When you turn on **auto-reset** (in the model modal), the agent watches
+its own token pressure. When it crosses the threshold (default 75%), it:
+
+1. Pauses to write a fresh "continuation" note in its active request
+   file — what it just did, what to do next, key state to remember
+2. Wipes its conversational memory
+3. Reads the request file again to remind itself
+4. Continues the work
+
+You see this happen in the chat pane: a gray banner explains it,
+followed by the checkpoint exchange, a divider, then a fresh start where
+the agent picks up the task. No data loss — the request file on disk is
+the durable memory.
+
+This is **off by default** because it's experimental. Try it on
+medium-sized tasks first.
+
+### infoworld (your private knowledge library)
+
+`infoworld/` is a folder shared across all your `enough` projects. The
+agent treats it as an "offline reference library" — it'll grep here
+before relying on its training data.
+
+It lives at `~/enough/infoworld/` and is symlinked into every project
+as `infoworld/`. Three subfolders:
+
+- `wiki/` — for Wikipedia dumps (you populate)
+- `personal/` — your own notes, drafts, books, references
+- `public/` — material you'd be OK sharing or publishing
+
+**How to use it:** drop any plain text or markdown into the appropriate
+subfolder. The agent will find it via `grep` when relevant. No indexing,
+no embeddings, no setup — just text on disk.
+
+To populate `wiki/` with Wikipedia content, see *Populating infoworld*
+in [`docs/`](docs/) (or just paste Wikipedia article text into
+`infoworld/personal/` for a lighter setup).
+
+### Allowlists
+
+`enough` is privacy-conservative by default. The agent can read and
+write inside your project folder freely, but reaching outside it — onto
+your wider Mac, or out to the internet — requires explicit permission.
+
+These permissions live in `.rness/policies/allowlists.md` and have three
+sections:
+
+- **File-read prefixes** — paths the agent may read (default: just
+  `~/enough/` so it can see its own defaults)
+- **File-read-write prefixes** — paths the agent may also write to
+  (default: empty — opt in deliberately)
+- **Internet domains** — websites the agent may fetch from (default:
+  Project Gutenberg, Wikipedia, Wikisource, the Internet Archive,
+  Standard Ebooks — places generally safe for grabbing public-domain or
+  CC-licensed text)
+
+**How to use them:**
+
+- Click `.rness/policies/allowlists.md` in the sidebar to see the
+  current rules.
+- Add a path or domain by editing the file (use *customize for this
+  project* to make a project-local copy first).
+- The agent will tell you when it tries to reach somewhere not on the
+  list and ask whether to add it.
+
+The internet allowlist is **guidance**, not a hard wall — the agent can
+technically curl anywhere via its `shell` tool. The list shapes what it
+will *willingly* fetch without asking.
+
+### Session logs
+
+Every conversation is automatically saved to
+`.rness/knowledge/session-logs/<date>.md` — one file per day. You don't
+need to do anything; the harness writes them. The agent can read them
+later if it needs to remember a conversation from yesterday.
 
 ---
 
-## `infoworld/` — shared grounded knowledge
+## What the agent can actually do (its tools)
 
-Lives at `~/enough/infoworld/`, symlinked into every project as `./infoworld`.
-All projects on your machine see the same files; writes to
-`infoworld/personal/` etc. persist across projects.
+The agent has three tools. They're how it does anything that isn't just
+talking to you.
 
-```
-~/enough/infoworld/
-├── wiki/       ← wikipedia dumps (user-populated)
-├── personal/   ← your own docs, bibles, notes
-└── public/     ← reference material that could reasonably be shared or
-                  published (same behavior as personal/ for now; name
-                  reserves the slot for a future distinction)
-```
+- **`read_file`** — reads a text file. By default, restricted to your
+  project folder. Absolute paths (e.g. `~/enough/...`) work only if
+  they're on the file-read allowlist.
+- **`write_file`** — writes a text file. Same restrictions, plus the
+  stricter file-read-write list for absolute paths. Can't write to
+  `.rness/.requests/done/` (only the *mark done* button does that).
+- **`shell`** — runs any shell command in your project folder. This is
+  the deliberate "nuclear option" — it can in principle do anything
+  your terminal can do. The agent is instructed to use it sparingly and
+  show you what it's doing.
 
-The system prompt tells the agent to `grep` / `read_file` here before
-relying on training data. Smarter indexing / retrieval is a future-version
-concern.
-
-### Populating `infoworld/wiki/`
-
-Two common paths:
-
-1. **Kiwix ZIM extraction.** Download a `.zim` from
-   [kiwix.org](https://kiwix.org/), then use
-   [`zimdump`](https://github.com/openzim/zim-tools) to extract plaintext.
-2. **Wikipedia dumps + WikiExtractor.** Grab `enwiki-latest-pages-articles.xml.bz2`
-   from <https://dumps.wikimedia.org/enwiki/> and run
-   [WikiExtractor](https://github.com/attardi/wikiextractor).
+The tool loop is capped at 50 calls per turn, so a runaway agent can't
+loop forever.
 
 ---
 
-## Tools the agent has
+## A few tips for non-technical users
 
-Three tools, described in the system prompt:
-
-- `read_file` — read a text file. Relative paths stay inside the project;
-  absolute paths (e.g. `~/enough/defaults/...`) are allowed iff they match
-  the **read allowlist** (`.rness/policies/read-allowlist.md`).
-- `write_file` — write a text file. Relative paths only, `mkdir -p`
-  behavior. Writing to `.rness/requests/done/` is blocked at the harness
-  level — the "mark done" UI button is the only legitimate way to move
-  files there (user approval = the rename).
-- `shell` — run any shell command in the project directory. Unrestricted
-  (the deliberate "nuclear option"); use sparingly.
-
-Tool calls use an XML-ish tag format the model emits inline; the server
-parses them with regex. Tool loop is capped per turn (default 50, set via
-`--max-tool-iters`).
+- **The "agent" is just text in, text out.** It's a model running locally,
+  not a service. When you close `enough`, it stops. When you open it, it
+  starts fresh (but reads its memory files).
+- **Your work is in plain files.** Even the agent's "memory" is text.
+  Open `.rness/AGENT.md` in TextEdit or any editor — that's literally
+  what the agent thinks of itself.
+- **You can't "break" things in a serious way.** The worst case is your
+  project folder gets messy. `enough` doesn't touch other parts of your
+  Mac without your explicit allowlist.
+- **The first conversation in a new project is meta.** The agent will
+  ask what kind of work you want to do. Tell it. That conversation will
+  shape the agent's identity in `AGENT.md`.
+- **If something feels wrong, type `/reset` in the chat.** It clears the
+  conversation memory but keeps everything on disk. Then ask again.
+- **The token gauge tells you how "full" the agent's brain is.** When
+  it's red, the conversation is about to break. Either reset or turn on
+  auto-reset.
 
 ---
 
-## Customizing globally
+## Customizing: global vs. per-project
 
-You edit `~/enough/defaults/` and every project still using the symlinks
-picks up the change immediately.
+`enough` is built on a "default + override" pattern.
 
-```bash
-nvim ~/enough/defaults/paradigms/default.md          # change the paradigm for ALL projects
-nvim ~/enough/defaults/policies/read-allowlist.md    # broaden read access
-ln -s /path/to/my/new-skill ~/enough/defaults/skills/ # add a global skill
-```
+**Global:** edit `~/enough/defaults/...` and every project that hasn't
+been customized yet picks up the change. This is how you'd, for
+example:
 
-`~/enough/` is a git checkout of `github.com/0gsd/enough`. If you plan to
-maintain your own edits and still pull upstream updates, fork the repo, set
-`~/enough`'s `origin` to your fork, and add upstream as a second remote:
+- Change every project's default paradigm
+- Add a new skill available everywhere
+- Add a new role available everywhere
+- Update the read allowlist for every project
+
+**Per-project:** in the preview pane, click *customize for this project*
+on a symlinked file. That replaces the global symlink with a local copy
+you can edit independently. Other projects keep using the global
+default.
+
+Symlinked files render *italic + muted* in the file tree. Project-local
+copies render normally.
+
+---
+
+## What `enough` deliberately doesn't do
+
+These are choices, not gaps:
+
+- **No multi-agent orchestration.** One folder, one agent. If you want
+  multiple agents working together, run multiple `enough` instances and
+  let them coordinate through the filesystem.
+- **No cloud anything.** No telemetry, no remote API, no model weights
+  you don't own.
+- **No authentication.** Localhost-only, single-user.
+- **No automatic memory updates.** The agent proposes changes to
+  `MOTIVATION.md`; you apply them.
+- **No vector store / RAG.** The agent uses `grep`. This is fine at
+  personal scale and avoids a whole category of complexity.
+- **No paradigm switching mid-session** (yet).
+
+---
+
+## Customizing the install via Git
+
+`~/enough/` is a clone of `github.com/0gsd/enough`. To pull in upstream
+updates without losing your customizations, fork the repo on GitHub and
+point your install at your fork:
 
 ```bash
 cd ~/enough
 git remote set-url origin git@github.com:YOU/enough.git
 git remote add upstream git@github.com:0gsd/enough.git
-git pull upstream main    # pull upstream changes into your fork
+git pull upstream main
 ```
-
----
-
-## What v0.0.3 *doesn't* do
-
-Deliberate omissions — see [bootstrap spec](dev/) for the full thinking:
-
-- No multi-agent coordination (one instance = one agent).
-- No MOTIVATION.md auto-update (model proposes; you apply).
-- No RAG / embedding / vector store. The model greps.
-- No authentication. Localhost only.
-- No persistent conversation history across restarts (session logs remain).
-- No paradigm switching mid-session.
-- No Linux / Windows (macOS only for now).
-
-Shipped in v0.0.2:
-- Auto-load for `skills/` and `policies/` into the system prompt.
-- Inline editor in the preview pane.
-- Skill on/off toggles (UI + `.disabled` file).
-- Requests tracking (folders + seed policy + sidebar + mark-done).
-
-Shipped in v0.0.3:
-- `~/enough/` as the install dir.
-- `bootstrap.sh` guided installer.
-- Global defaults under `~/enough/defaults/`; symlinks + "customize for
-  this project" UI affordance.
-- `~/enough/infoworld/` as per-user shared knowledge store, symlinked into
-  projects.
-- Read allowlist policy; absolute-path reads now allowed inside the
-  allowlisted prefixes.
-- Kernel-level guards: refuse to launch inside `~/enough/`, block writes to
-  `.rness/requests/done/`, detect slug-drift duplicate request files.
 
 ---
 
 ## Development
 
-Decision records, process docs, and session checkpoints for each build live
-under [`dev/.amanuensis/`](dev/.amanuensis). They capture the what/why of
-every non-trivial choice since v0.01 — helpful for understanding why things
-are the way they are and when something was a deliberate constraint vs. a
-gap to fill.
+The code is small and readable. Roughly:
+
+- `enough/server.py` — FastAPI app: chat, SSE streaming, file tree, model modal, auto-reset orchestration
+- `enough/prompt.py` — assembles the system prompt from `.rness/` on every turn
+- `enough/tools.py` — `read_file` / `write_file` / `shell`, plus path safety
+- `enough/skeleton.py` — creates `.rness/` for new projects, syncs globals on every launch
+- `enough/llm.py` — talks to llama-server (local LLM via OpenAI-compatible API)
+- `enough/supervisor.py` — manages the llama-server subprocess
+- `enough/static/index.html` — the entire UI (htmx + vanilla JS)
+- `defaults/` — the shipped templates that get copied or symlinked into every new project
+
+To work on it:
 
 ```bash
-uv sync               # create .venv, install deps
+git clone https://github.com/0gsd/enough.git
+cd enough
+uv sync
 uv run enough --help
 ```
 
-No tests yet. Each version has been verified via manual end-to-end smoke
-against a running llama-server + browser session.
+There's no automated test suite yet. Each release is verified via manual
+end-to-end smoke tests against a running llama-server + browser session.
 
 ---
 
 ## License
 
 Apache 2.0. See [LICENSE](LICENSE).
+
+Third-party content (the bundled `defaults/skills/` packages) carries
+its own licenses — see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
