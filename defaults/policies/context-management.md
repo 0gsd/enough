@@ -59,6 +59,44 @@ When pressure is high or critical:
   things are probably fine — keep working.
 - One checkpoint per phase transition is usually plenty.
 
+## On long tool loops — break into chunks the harness can intervene in
+
+Local context windows are small (often 16–32K tokens). A single user
+turn that runs many tool calls in a row — fetching a large page,
+writing several long files, processing a corpus — will fill the window
+even if no individual call is huge. Each tool result accumulates into
+history, and history is sent on every subsequent inference.
+
+The harness watches for this. When pressure crosses the auto-reset
+threshold (default 75%), it will:
+
+- **With auto-reset ON**: pause after your current tool result, ask
+  you to write a Continuation block to the active request file, clear
+  the conversation, then re-prompt you to resume from the request
+  file. This happens automatically; you don't need to detect it.
+- **With auto-reset OFF**: pause your turn after the current tool
+  result and notify the user. The user has to send a follow-up
+  message to continue.
+
+You can help this work well:
+
+1. **Always create a request file for jobs that involve more than one
+   substantial tool call**, per `requests.md`. The file is what
+   carries continuity through a reset — without it, post-reset you
+   start blind.
+2. **Update Progress Checkpoints frequently during long tool loops** —
+   every 3–5 tool calls, especially after each "phase" (fetch done,
+   plan done, draft 1 done, etc.). The harness's auto-checkpoint is a
+   safety net, not a substitute for the running notes you keep
+   yourself.
+3. **Prefer many small writes over one huge write.** Writing a
+   15,000-word output as 10 sequential `write_file` calls is fine —
+   the harness will pause and resume across the gaps. Trying to emit
+   15,000 words in a single turn is what causes the wall.
+4. **When the harness pauses you**, don't fight it. Trust the request
+   file's Continuation block to carry you across the gap, and use the
+   resumed turn to read it and proceed.
+
 ## Artifacts beyond the request file
 
 When context is fresh after a reset, these are your other memory

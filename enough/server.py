@@ -232,20 +232,43 @@ def _save_orchestrator_config(cfg: dict[str, Any]) -> dict[str, Any]:
     return current
 
 
-def _should_auto_reset(session: "Session") -> bool:
-    """Decide whether to fire the post-turn auto-reset based on live
-    config + the most recent usage measurement against the live ctx-size."""
+def _estimate_total_tokens(session: "Session", system_prompt: str) -> int:
+    """Char-based token estimate, used when llama-server didn't ship a
+    `usage` payload on the stream (older llama.cpp builds, pre-stream
+    errors, etc.). Conservative ratio (~3 chars/token, slightly under
+    the typical English norm) so we err toward triggering auto-reset
+    earlier rather than later — better to pause one turn early than to
+    overflow the context window mid-job."""
+    chars = len(system_prompt or "")
+    for msg in session.history:
+        chars += len(msg.get("content", "") or "")
+    return chars // 3
+
+
+def _pressure_pct(session: "Session", system_prompt: str) -> int:
+    """Best-effort context-window pressure as an integer percentage.
+    Prefers the most recent llama-server usage report; falls back to
+    `_estimate_total_tokens` when usage data isn't available. Returns 0
+    if we can't even determine the ctx-size (e.g. external llama-server
+    in --no-supervise mode where current_ctx is None)."""
+    ctx = _current_ctx_size(session) or session.last_usage.get("ctx")
+    if not ctx:
+        return 0
+    total = session.last_usage.get("total_tokens") or 0
+    if not total:
+        total = _estimate_total_tokens(session, system_prompt)
+    return min(100, int((total / ctx) * 100))
+
+
+def _should_auto_reset(session: "Session", system_prompt: str) -> bool:
+    """Decide whether to fire auto-reset based on live config + current
+    pressure. Pressure prefers real usage but falls back to a char-count
+    estimate so that older llama.cpp builds (which may not ship `usage`
+    on the stream) don't silently disable the safety net."""
     cfg = _load_orchestrator_config()
     if not cfg["auto_reset"]:
         return False
-    ctx = _current_ctx_size(session) or session.last_usage.get("ctx")
-    if not ctx:
-        return False  # no ctx-size means we can't compute pct; bail safe
-    total = session.last_usage.get("total_tokens") or 0
-    if not total:
-        return False
-    pct = int((total / ctx) * 100)
-    return pct >= cfg["threshold_pct"]
+    return _pressure_pct(session, system_prompt) >= cfg["threshold_pct"]
 
 
 def _current_ctx_size(session: "Session") -> int | None:
@@ -468,6 +491,32 @@ async def _drive_message(
             return
         call = calls[-1]  # the call we stopped at
         await _handle_tool(session, call, tool_calls_for_log if tool_calls_for_log is not None else [])
+
+        # Mid-turn pressure check. Auto-reset's end-of-turn check is no
+        # help during long tool loops (the agent never voluntarily ends
+        # the turn — it just keeps emitting more tool calls). So after
+        # each tool result is appended to history, evaluate pressure
+        # against the threshold and exit early if we're at/over it. The
+        # caller (_run_turn) will then decide whether to fire auto-reset
+        # or just end the turn quietly.
+        cfg = _load_orchestrator_config()
+        pct = _pressure_pct(session, system_prompt)
+        if pct >= cfg["threshold_pct"]:
+            if not cfg["auto_reset"]:
+                # Auto-reset is OFF. _run_turn won't fire anything; the
+                # turn just stops. Emit a heads-up so the user knows
+                # why and what to do.
+                await session.emit("system", {
+                    "kind": "pressure_pause",
+                    "message": (
+                        f"context at {pct}% (threshold {cfg['threshold_pct']}%) "
+                        "— pausing mid-turn to avoid overflowing the window. "
+                        "send a follow-up message to continue, or enable "
+                        "auto-reset in the model modal for hands-free "
+                        "continuation on long jobs."
+                    ),
+                })
+            return
     else:
         await session.emit(
             "error",
@@ -486,9 +535,7 @@ async def _do_auto_reset(session: Session, system_prompt: str) -> None:
     recurse forever.
     """
     cfg = _load_orchestrator_config()
-    pct = 0
-    if (ctx := session.last_usage.get("ctx")) and (total := session.last_usage.get("total_tokens")):
-        pct = int((total / ctx) * 100)
+    pct = _pressure_pct(session, system_prompt)
     await session.emit(
         "system",
         {
@@ -561,7 +608,7 @@ async def _run_turn(session: Session, user_message: str) -> None:
             # Auto-reset only fires for real user turns (not when we're
             # already in the middle of one) and only when the threshold
             # is breached + the toggle is on.
-            if not getattr(session, "_in_auto_reset", False) and _should_auto_reset(session):
+            if not getattr(session, "_in_auto_reset", False) and _should_auto_reset(session, system_prompt):
                 await _do_auto_reset(session, system_prompt)
         except asyncio.TimeoutError:
             await session.emit("error", {"message": (
