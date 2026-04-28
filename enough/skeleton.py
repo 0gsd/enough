@@ -343,12 +343,15 @@ def ensure_skeleton(project_dir: Path) -> bool:
     # showed them, no scheduler triggered them. We rmdir() so projects
     # that did somehow populate the dir keep their content; only the
     # empty default state goes away.
+    #
+    # Removable contents: symlinks (we made them via the old populator)
+    # and the `.gitkeep` placeholder (we put it there ourselves). If
+    # anything else is in the dir, rmdir() will fail and we leave the
+    # whole thing alone.
     legacy_routines = project_dir / ".rness" / "routines"
     if legacy_routines.is_dir():
-        # Drop our own symlinks first (the populator made them), then try
-        # to remove the dir if empty.
         for entry in legacy_routines.iterdir():
-            if entry.is_symlink():
+            if entry.is_symlink() or entry.name == ".gitkeep":
                 try:
                     entry.unlink()
                 except OSError:
