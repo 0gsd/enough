@@ -206,9 +206,24 @@ def _safe_join(
         raise ValueError("empty path")
     p = Path(rel).expanduser()
     if p.is_absolute():
+        target = p.resolve(strict=False)
+        project_root = project_dir.resolve(strict=False)
+        # If the absolute path actually resolves to somewhere inside the
+        # project, accept it directly — no allowlist consultation needed.
+        # Users (and agents that echo paths back to themselves) commonly
+        # supply the full absolute path of a file they already have a
+        # relative handle to; that's a typing-style preference, not a
+        # containment violation. The allowlist exists to gate paths that
+        # are GENUINELY outside the project.
+        try:
+            target.relative_to(project_root)
+            return target
+        except ValueError:
+            pass
+        # Genuinely outside the project — fall through to allowlist
+        # enforcement.
         if not (allow_outside_read or allow_outside_write):
             raise ValueError(f"absolute paths rejected: {rel!r}")
-        target = p.resolve(strict=False)
         if allow_outside_write:
             allowlist = _read_write_allowlist(project_dir)
             if not _under_any(target, allowlist):
