@@ -4,6 +4,9 @@ Optional macOS launchers that let you start `enough` without typing it
 in a terminal each time. Both are templates — they don't do anything
 useful from inside `~/enough/`. Use them as described below.
 
+For the first-time installer launcher, see `install-enough.command` at
+the repo root.
+
 ## `enough-on.command` — per-project double-click launcher
 
 ```bash
