@@ -140,12 +140,16 @@ Word add-in or a Chrome extension. Each skill is a folder with a
 
 `enough` ships with four skills out of the box:
 
-- **`docs-maintainer`** — reads codebases and writes accurate docs.
 - **`irefy`** ("I read everything for you") — produces a one-page
   analytical digest of any long document.
+- **`memoir-dialectic`** — patient, multi-session collaborator for
+  planning and optionally drafting a memoir. The folder on disk is the
+  memory; you can disappear for weeks and pick up where you left off.
+- **`skillmd-scan`** — security and epistemic auditor for skill
+  packages. Scans a skill's `SKILL.md`, references, and scripts for
+  prompt-injection patterns and other risks before you install it.
 - **`the-internet`** — fetches web pages through Tor for anonymized
   reading.
-- **`wiki-links`** — historical fiction research helper.
 
 **How to use them:** open the sidebar (left side of the window), expand
 the **active skills** section. Each skill has a circle next to its name —
