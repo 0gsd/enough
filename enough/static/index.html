@@ -389,6 +389,111 @@
     margin-top: -14px;
   }
 
+  /* ---------- Help affordance: [?] button on hover, help viewer panel ---------- */
+  .help-trigger {
+    margin-left: auto;
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+    border: 1px solid var(--fg-faint);
+    border-radius: 50%;
+    background: var(--bg-raise);
+    color: var(--fg-muted);
+    font-size: 10px;
+    line-height: 14px;
+    text-align: center;
+    padding: 0;
+    font-family: inherit;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 220ms ease, color 120ms ease, border-color 120ms ease;
+    pointer-events: none;
+    user-select: none;
+  }
+  .help-trigger.shown {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .help-trigger:hover {
+    color: var(--accent-tool);
+    border-color: var(--accent-tool);
+  }
+  /* Section-heads use lowercase letterspacing — keep [?] readable */
+  .section-head .help-trigger { text-transform: none; letter-spacing: 0; }
+
+  #help-viewer {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 0;
+    background: color-mix(in oklab, var(--bg-alt), var(--accent-tool) 8%);
+    border-left: 3px solid var(--accent-tool);
+    transition: width 180ms ease;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    z-index: 5;
+  }
+  #help-viewer.open { width: 50%; }
+  #help-viewer .help-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px;
+    height: 34px;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in oklab, var(--bg-raise), var(--accent-tool) 6%);
+    flex: 0 0 34px;
+  }
+  #help-viewer .help-header .title {
+    color: var(--accent-tool);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+  #help-viewer button.close {
+    background: transparent;
+    color: var(--fg-muted);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+  }
+  #help-viewer button.close:hover { color: var(--fg); }
+  #help-body {
+    flex: 1;
+    overflow: auto;
+    padding: 16px 20px 24px;
+    color: var(--fg);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  #help-body h1 {
+    font-size: 16px;
+    margin: 0 0 4px;
+    color: var(--fg);
+    font-weight: 600;
+  }
+  #help-body .help-path {
+    color: var(--fg-faint);
+    font-size: 11px;
+    letter-spacing: 0.6px;
+    margin-bottom: 14px;
+    font-family: var(--font-mono);
+  }
+  #help-body h2 {
+    font-size: 11px;
+    margin: 18px 0 6px;
+    color: var(--accent-tool);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  #help-body p { margin: 0 0 10px; }
+  #help-body ul { margin: 0 0 10px; padding-left: 20px; }
+  #help-body li { margin-bottom: 4px; }
+  #help-body code {
+    color: var(--accent-user);
+    background: transparent;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
   /* ---------- Preview pane ---------- */
   #preview {
     position: absolute;
@@ -913,7 +1018,7 @@
 <div class="layout" id="layout">
   <aside class="sidebar" tabindex="0">
     <section class="sidebar-section" data-section="requests">
-      <h3 class="section-head"><span class="zippy">▾</span>requests</h3>
+      <h3 class="section-head" data-help="requests"><span class="zippy">▾</span>requests</h3>
       <div class="section-body">
         <div id="requests-list" hx-get="/api/requests" hx-trigger="load, every 10s, requests-refresh from:body" hx-swap="innerHTML">
           <div style="color: var(--fg-faint); padding: 8px">loading…</div>
@@ -922,7 +1027,7 @@
     </section>
 
     <section class="sidebar-section" data-section="skills">
-      <h3 class="section-head"><span class="zippy">▾</span>active skills</h3>
+      <h3 class="section-head" data-help="skills"><span class="zippy">▾</span>active skills</h3>
       <div class="section-body">
         <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
           <div style="color: var(--fg-faint); padding: 8px">loading…</div>
@@ -931,7 +1036,7 @@
     </section>
 
     <section class="sidebar-section collapsed" data-section="roles">
-      <h3 class="section-head"><span class="zippy">▾</span>roles (consultants)</h3>
+      <h3 class="section-head" data-help="roles"><span class="zippy">▾</span>roles</h3>
       <div class="section-body">
         <div id="roles-list" hx-get="/api/roles" hx-trigger="load, every 10s" hx-swap="innerHTML">
           <div style="color: var(--fg-faint); padding: 8px">loading…</div>
@@ -979,6 +1084,14 @@
         <button class="close" onclick="document.getElementById('preview').classList.remove('open')">×</button>
       </div>
       <div id="preview-body"></div>
+    </div>
+
+    <div id="help-viewer" aria-hidden="true">
+      <div class="help-header">
+        <span class="title">help</span>
+        <button class="close" onclick="closeHelp()" aria-label="close help">×</button>
+      </div>
+      <div id="help-body"></div>
     </div>
   </main>
 </div>
@@ -1056,6 +1169,252 @@
 </div>
 
 <script>
+  // ---------- Help affordance: hover-to-reveal [?], click for full panel ----------
+  // 1s hover before [?] appears, stays for 5s after the cursor leaves the row
+  // (or the [?] itself). Click opens a themed right-side viewer with three
+  // sections: what / how / ideas.
+  const HELP_DOCS = {
+    'requests': {
+      name: 'requests',
+      path: '.rness/.requests/',
+      what: 'Persistent task containers. Each request is a markdown file capturing a goal, the agent\'s reasoning so far, and a continuation block so work can resume across context resets — these are the unit of long-running effort in enough.',
+      how: 'New requests appear here automatically as you and the agent work. Click one to view it in the file panel; from there you can mark it done (it moves to <code>.rness/.requests/done/</code>) or customize. To start a request manually, drop a markdown file into <code>.rness/.requests/</code> with a brief goal at the top.',
+      ideas: [
+        'Treat a request as a long-running project — break a vague intent into one and let the agent flesh it out across multiple sessions.',
+        'Use <code>done/</code> as a journal of what you\'ve actually shipped.',
+        'When auto-reset checkpoints, the agent writes a Continuation block to the active request — read it before resuming if you want to redirect.',
+      ],
+    },
+    'skills': {
+      name: 'active skills',
+      path: '.rness/.skills/',
+      what: 'Per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. Active skills add vocabulary, recipes, or behaviors the agent will reach for during conversation.',
+      how: 'Click ● / ○ to toggle a skill on or off for this project. To install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). Edit a skill at the source and the change propagates everywhere it\'s symlinked.',
+      ideas: [
+        'Pair 2–3 task-specific skills for a focused session — one investigative, one stylistic, one for the actual output.',
+        'Build a personal skill that captures your house style or domain conventions.',
+        'Turn everything off for raw conversation — sometimes the base model breathes better with no scaffolding.',
+      ],
+    },
+    'roles': {
+      name: 'roles',
+      path: '.rness/.roles/',
+      what: 'Consultant agents you can summon in conversation, sourced from <code>~/enough/defaults/roles/</code>. Each role is a folder containing AGENT.md (instructions) and MOTIVATION.md (drives) — the same shape that defines the main agent, but scoped to a persona.',
+      how: 'Click ● / ○ to enable a role for this project. Add new roles globally by creating <code>~/enough/defaults/roles/&lt;name&gt;/</code> with AGENT.md and MOTIVATION.md inside. Edits propagate from the source, just like skills.',
+      ideas: [
+        'A "code reviewer" who gives PR-style feedback without rewriting your work.',
+        'A "rubber duck" that asks Socratic questions instead of answering.',
+        'A domain expert (legal, design, copy) whose voice you don\'t want to learn yourself.',
+      ],
+    },
+    'rness': {
+      name: '.rness/',
+      path: '.rness/',
+      what: 'The project\'s working room — every config, instruction, knowledge file, and history log the agent uses for this project. The leading dot keeps it hidden from <code>ls</code>; this UI shows it as a normal folder.',
+      how: 'Most contents are symlinks to <code>~/enough/defaults/</code> and update centrally. To diverge for this project alone, open a file and click <em>customize</em> — it becomes a real local copy. Add new files freely; the agent will discover them on its next turn.',
+      ideas: [
+        'Commit <code>.rness/</code> to git so collaborators (human and agent) share project context.',
+        'Treat it as living documentation — what would a new teammate need to know?',
+        'Periodically prune stale knowledge so the agent doesn\'t cite obsolete decisions.',
+      ],
+    },
+    'agent-md': {
+      name: 'AGENT.md',
+      path: '.rness/AGENT.md',
+      what: 'The agent\'s working instructions for this project. Read every turn alongside MOTIVATION.md. Everything in here shapes how the agent talks, what it does, and what it avoids.',
+      how: 'Click the file to view it; hit <em>customize</em> to fork a project-local copy and edit. Or open <code>.rness/AGENT.md</code> in any editor — changes take effect on the next message.',
+      ideas: [
+        'Add project-specific guardrails (e.g., "always run pytest before claiming a fix works").',
+        'Name the conventions of this codebase so the agent doesn\'t have to guess.',
+        'Encode the collaboration style you want — terse, exploratory, deferential, blunt.',
+      ],
+    },
+    'motivation-md': {
+      name: 'MOTIVATION.md',
+      path: '.rness/MOTIVATION.md',
+      what: 'The agent\'s "why" for this project — values, priorities, and goals beyond the literal task list. Read alongside AGENT.md every turn.',
+      how: 'Same as AGENT.md — click to preview, customize for a project-local copy, or edit the file directly.',
+      ideas: [
+        'Spell out tradeoffs you care about: correctness over speed, brevity over thoroughness, etc.',
+        'Name the user-facing experience the project aims for, in your own words.',
+        'Describe what "done" feels like — the agent will calibrate its sense of progress against that.',
+      ],
+    },
+    'paradigms': {
+      name: 'paradigms/',
+      path: '.rness/paradigms/',
+      what: 'Reasoning frameworks the agent uses. Each paradigm is a markdown file describing a way to approach problems — heuristics, decision criteria, when to ask vs. act.',
+      how: 'Symlinked from <code>~/enough/defaults/paradigms/</code>. Edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. New paradigms can be added simply by dropping a markdown file into the defaults folder.',
+      ideas: [
+        'Write paradigms for distinct modes — exploration vs. execution, brainstorm vs. critique.',
+        'Codify your debugging methodology so the agent doesn\'t reinvent it.',
+        'Encode how to weigh tests vs. shipping for the kind of work you do.',
+      ],
+    },
+    'policies': {
+      name: 'policies/',
+      path: '.rness/policies/',
+      what: 'Hard rules the agent must follow — what tools to use, which files it can read or write, how to format requests, how to handle context-window pressure, and which paths are allowlisted.',
+      how: 'Symlinked from <code>~/enough/defaults/policies/</code>. Edit globally to update the rules for every project, or customize per-project. Allowlists in particular are the most common thing to tune locally.',
+      ideas: [
+        'Tighten the read/write allowlist when working with secrets or sensitive code.',
+        'Add a policy for how to handle long-running scripts or background processes.',
+        'Define your own checkpoint format if the default Continuation block doesn\'t fit.',
+      ],
+    },
+    'models': {
+      name: 'models/',
+      path: '.rness/models/',
+      what: 'Model and provider configuration. <code>providers.md</code> documents which local or remote LLMs are available and what each is best at, so the agent can recommend or switch wisely.',
+      how: 'Symlinked from <code>~/enough/defaults/models/</code>. Edit globally to add new model entries. Note: the live ctx-size and current model are managed separately via the model picker in the top bar.',
+      ideas: [
+        'Document your machine\'s actual model loadout so the agent picks well.',
+        'Note context-window quirks for each model — some handle long context worse than the spec implies.',
+        'Record your own latency/quality tradeoffs as a hint for the agent.',
+      ],
+    },
+    'knowledge': {
+      name: 'knowledge/',
+      path: '.rness/knowledge/',
+      what: 'Project-specific knowledge that doesn\'t belong in code: <code>user-profile.md</code> (what the agent has learned about you for this project) and <code>session-logs/</code> (every turn\'s prompt and response, saved as markdown).',
+      how: '<code>user-profile.md</code> is a real file — both the agent and you can edit it. Session logs are append-only. Add new subfolders for any project-local memory you want the agent to consult.',
+      ideas: [
+        'Maintain a glossary subfolder for project-specific jargon.',
+        'Let the agent write a "lessons learned" file as you fix bugs together.',
+        'Archive old session logs periodically so grep stays fast.',
+      ],
+    },
+    'io': {
+      name: 'io/',
+      path: '.rness/io/',
+      what: 'Scratch space for files the agent reads from (<code>input/</code>) or writes to (<code>output/</code>). Useful when you want the agent to process a file without polluting the project root.',
+      how: 'Drop files into <code>.rness/io/input/</code> and the agent will see them. Anything the agent generates lands in <code>.rness/io/output/</code> — review and move what you want to keep, then clear the rest.',
+      ideas: [
+        'Drop a CSV or transcript into <code>input/</code> and ask the agent to summarize.',
+        'Collect multiple draft outputs in <code>output/</code> and pick the best one.',
+        'Clear both periodically — the agent doesn\'t need yesterday\'s scratch work in its context.',
+      ],
+    },
+    'infoworld': {
+      name: 'infoworld/',
+      path: 'infoworld/ → ~/enough/infoworld/',
+      what: 'A grounded-knowledge store shared across every enough project on this machine. Symlinked into each project so the agent has a common factual substrate. Three subdirs: <code>wiki/</code> (Wikipedia dumps), <code>personal/</code> (your reference material), <code>public/</code> (shareable refs).',
+      how: 'Add files via your filesystem — drop markdown, txt, or extracted Wikipedia text into the appropriate subdir. The agent greps these files before answering from training data. There\'s no UI for editing; the filesystem is the interface.',
+      ideas: [
+        'Stash meeting notes in <code>personal/</code> to make them queryable from any project.',
+        'Download a topic-specific Wikipedia dump (history, pharmacology, music theory) for a research project.',
+        'Keep style guides, contracts, or reference bibles in <code>public/</code> for the agent to cite.',
+      ],
+    },
+  };
+
+  function helpDocToHtml(doc) {
+    const liItems = (doc.ideas || []).map(s => `<li>${s}</li>`).join('');
+    return (
+      `<h1>${doc.name}</h1>` +
+      `<div class="help-path">${doc.path}</div>` +
+      `<h2>what it is</h2><p>${doc.what}</p>` +
+      `<h2>how to use it</h2><p>${doc.how}</p>` +
+      `<h2>ideas</h2><ul>${liItems}</ul>`
+    );
+  }
+
+  function openHelp(id) {
+    const doc = HELP_DOCS[id];
+    if (!doc) return;
+    document.getElementById('help-body').innerHTML = helpDocToHtml(doc);
+    const v = document.getElementById('help-viewer');
+    v.classList.add('open');
+    v.setAttribute('aria-hidden', 'false');
+    // Mutually exclusive with the file preview pane.
+    document.getElementById('preview').classList.remove('open');
+  }
+
+  function closeHelp() {
+    const v = document.getElementById('help-viewer');
+    v.classList.remove('open');
+    v.setAttribute('aria-hidden', 'true');
+  }
+  window.openHelp = openHelp;
+  window.closeHelp = closeHelp;
+
+  // Hover-delay state lives on the row element itself (no global Map needed),
+  // so HTMX swaps that destroy the row also destroy the timers.
+  function _scheduleHelpShow(row) {
+    if (row._helpFadeTimer) {
+      clearTimeout(row._helpFadeTimer);
+      row._helpFadeTimer = null;
+    }
+    if (row._helpButton && row._helpButton.classList.contains('shown')) return;
+    if (row._helpShowTimer) return;
+    row._helpShowTimer = setTimeout(() => {
+      row._helpShowTimer = null;
+      let btn = row._helpButton;
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'help-trigger';
+        btn.textContent = '?';
+        btn.setAttribute('aria-label', 'help');
+        btn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          ev.preventDefault();
+          openHelp(row.dataset.help);
+        });
+        row.appendChild(btn);
+        row._helpButton = btn;
+      }
+      requestAnimationFrame(() => btn.classList.add('shown'));
+    }, 1000);
+  }
+
+  function _scheduleHelpFade(row) {
+    if (row._helpShowTimer) {
+      clearTimeout(row._helpShowTimer);
+      row._helpShowTimer = null;
+    }
+    if (!row._helpButton || !row._helpButton.classList.contains('shown')) return;
+    if (row._helpFadeTimer) clearTimeout(row._helpFadeTimer);
+    row._helpFadeTimer = setTimeout(() => {
+      row._helpFadeTimer = null;
+      const btn = row._helpButton;
+      if (!btn) return;
+      btn.classList.remove('shown');
+      // Wait for opacity transition, then detach so the row stays clean.
+      setTimeout(() => {
+        if (row._helpButton && !row._helpButton.classList.contains('shown')) {
+          row._helpButton.remove();
+          row._helpButton = null;
+        }
+      }, 280);
+    }, 5000);
+  }
+
+  // Event delegation on the sidebar — works across HTMX file-tree refreshes.
+  // mouseover/mouseout bubble (mouseenter/leave don't), so we filter via
+  // relatedTarget to detect actual row entry/exit.
+  const sidebarEl = document.querySelector('.sidebar');
+  if (sidebarEl) {
+    sidebarEl.addEventListener('mouseover', (e) => {
+      const row = e.target.closest('[data-help]');
+      if (!row) return;
+      const from = e.relatedTarget;
+      if (from && row.contains(from)) return;
+      _scheduleHelpShow(row);
+    });
+    sidebarEl.addEventListener('mouseout', (e) => {
+      const row = e.target.closest('[data-help]');
+      if (!row) return;
+      const to = e.relatedTarget;
+      if (to && row.contains(to)) return;
+      _scheduleHelpFade(row);
+    });
+    // Clicking a tree file opens the preview — close help to avoid stacking.
+    sidebarEl.addEventListener('click', (e) => {
+      if (e.target.closest('.file-row a')) closeHelp();
+    });
+  }
+
   const conversation = document.getElementById('conversation');
   const form = document.getElementById('chat-form');
   const textarea = document.getElementById('message');

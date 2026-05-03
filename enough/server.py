@@ -161,11 +161,28 @@ def build_file_tree(root: Path) -> list[dict[str, Any]]:
     return _walk_tree(root, (), frozenset())
 
 
+# Paths in the project tree that get a [?] help affordance on hover.
+# IDs match the keys in HELP_DOCS in static/index.html.
+_HELP_IDS: dict[str, str] = {
+    ".rness": "rness",
+    ".rness/AGENT.md": "agent-md",
+    ".rness/MOTIVATION.md": "motivation-md",
+    ".rness/paradigms": "paradigms",
+    ".rness/policies": "policies",
+    ".rness/models": "models",
+    ".rness/knowledge": "knowledge",
+    ".rness/io": "io",
+    "infoworld": "infoworld",
+}
+
+
 def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
     out = ['<ul class="tree">']
     for n in nodes:
         path = n["path"].replace('"', "&quot;")
         sym_cls = " symlink" if n.get("is_symlink") else ""
+        help_id = _HELP_IDS.get(n["path"])
+        help_attr = f' data-help="{help_id}"' if help_id else ""
         if n["is_dir"]:
             has_kids = bool(n.get("children"))
             dir_state_cls = " has-children" if has_kids else " empty-folder"
@@ -173,7 +190,7 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
             zippy = '<span class="zippy">▾</span>' if has_kids else '<span class="zippy-spacer"></span>'
             out.append(
                 f'<li class="dir{sym_cls}{dir_state_cls}" data-path="{path}">'
-                f'<span class="dir-row">{zippy}<span class="dir-name">{n["name"]}/</span></span>'
+                f'<span class="dir-row"{help_attr}>{zippy}<span class="dir-name">{n["name"]}/</span></span>'
             )
             if has_kids:
                 out.append(_tree_to_html(n["children"]))
@@ -181,7 +198,7 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
         else:
             out.append(
                 f'<li class="file{sym_cls}">'
-                f'<span class="file-row"><span class="zippy-spacer"></span>'
+                f'<span class="file-row"{help_attr}><span class="zippy-spacer"></span>'
                 f'<a href="#" '
                 f'hx-get="/api/file?path={path}" hx-target="#preview-body" '
                 f'hx-swap="innerHTML" '
