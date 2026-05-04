@@ -113,6 +113,17 @@ def main(argv: list[str] | None = None) -> int:
     created = ensure_skeleton(project_dir)
     if created:
         print(f"created .rness/ skeleton in {project_dir}")
+    else:
+        # Existing project — check whether ~/enough/defaults/ has gained
+        # any new shared defaults this .rness/ is missing. Just notify;
+        # the user opts in via /update-enough in the chat.
+        from .skeleton import detect_drift
+        missing = detect_drift(project_dir)
+        if missing:
+            print(f"  ! {len(missing)} new default(s) available from ~/enough/defaults/:")
+            for _src, dst, _mode in missing:
+                print(f"      - {dst}")
+            print(f"    type /update-enough in the chat box to apply, or ignore.")
 
     url = f"http://127.0.0.1:{args.port}"
     print(f"enough {__version__} — serving {project_dir}")

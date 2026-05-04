@@ -1439,6 +1439,44 @@
       textarea.focus();
       return true;
     }
+    if (cmd === '/update-enough') {
+      textarea.value = '';
+      textarea.style.height = 'auto';
+      // Drop the empty-state hint so our notice appears in a clean conversation pane.
+      document.getElementById('empty-hint')?.remove();
+      let resp;
+      try {
+        resp = await (await fetch('/api/update-enough')).json();
+      } catch (e) {
+        conversation.insertAdjacentHTML('beforeend',
+          `<div class="msg harness"><div class="role">harness</div>` +
+          `<div class="body">/update-enough failed: ${escapeHtml(String(e))}</div></div>`);
+        autoscroll();
+        return true;
+      }
+      let body;
+      if (!resp.had_drift) {
+        body = 'this project is already up to date with <code>~/enough/defaults/</code>. nothing to apply.';
+      } else if (resp.applied.length === 0) {
+        body = 'no new defaults were applied. (something may be wrong — check the install at <code>~/enough/defaults/</code>.)';
+      } else {
+        const lines = resp.applied.map(it =>
+          `&nbsp;&nbsp;• <code>${escapeHtml(it.dst)}</code> ` +
+          `<span class="dim">(${escapeHtml(it.mode)} from <code>defaults/${escapeHtml(it.src)}</code>)</span>`
+        ).join('<br>');
+        body = `pulled in ${resp.applied.length} new default${resp.applied.length === 1 ? '' : 's'} from <code>~/enough/defaults/</code>:<br>${lines}`;
+        if (resp.remaining.length) {
+          body += `<br><br>still missing (could not apply): ${resp.remaining.length}`;
+        }
+      }
+      conversation.insertAdjacentHTML('beforeend',
+        `<div class="msg harness"><div class="role">harness</div><div class="body">${body}</div></div>`);
+      autoscroll();
+      sendBtn.disabled = false;
+      textarea.disabled = false;
+      textarea.focus();
+      return true;
+    }
     return false;
   }
 

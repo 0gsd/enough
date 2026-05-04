@@ -352,4 +352,41 @@ def assemble_system_prompt(project_dir: Path, active_paradigm: str = "default") 
     parts.append(_section("Tools", TOOL_INSTRUCTIONS))
     parts.append(_section("Context", HARNESS_CONTEXT_TMPL.format(project_dir=project_dir)))
 
+    drift_note = _drift_notice(project_dir)
+    if drift_note:
+        parts.append(_section("Available Updates", drift_note))
+
     return "\n".join(p for p in parts if p).strip() + "\n"
+
+
+def _drift_notice(project_dir: Path) -> str:
+    """Build a system-prompt section that nudges the agent to offer the
+    user a project update when `~/enough/defaults/` has new entries this
+    `.rness/` is missing. Returns "" when there's no drift — most
+    projects, most of the time."""
+    # Imported lazily so the module-level import graph stays clean
+    # (skeleton imports Path & shutil, doesn't pull in prompt.py).
+    from .skeleton import detect_drift
+    missing = detect_drift(project_dir)
+    if not missing:
+        return ""
+    listed = "\n".join(
+        f"- `{dst}` ({mode}, from `defaults/{src}`)"
+        for (src, dst, mode) in missing
+    )
+    return (
+        "A newer version of enough has been installed at `~/enough/`, and "
+        "this project's `.rness/` is missing some defaults that have since "
+        "been added:\n\n"
+        f"{listed}\n\n"
+        "On your FIRST response to the user this session, mention that "
+        "these updates are available and offer to apply them. If the user "
+        "agrees, instruct them to type `/update-enough` into the chat box "
+        "(it's a slash command intercepted by the harness — not something "
+        "you can run yourself). If the user declines or says \"not now\", "
+        "tell them they can run `/update-enough` any time later. Do NOT "
+        "raise this again on subsequent turns — once is enough.\n\n"
+        "(If the user has already responded and you've already mentioned "
+        "this earlier in the session, don't bring it up again — drop "
+        "straight into whatever they're asking about.)"
+    )

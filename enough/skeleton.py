@@ -88,6 +88,90 @@ _EMPTY_DIRS: tuple[str, ...] = (
     ".rness/io/output",
 )
 
+
+# ---------------------------------------------------------------------------
+# Drift detection / opt-in update
+# ---------------------------------------------------------------------------
+#
+# `_SKELETON_PLAN` runs only on first-time `.rness/` creation. That keeps
+# us from clobbering project-local edits — but it also means a new shared
+# default added to ~/enough/defaults/ (e.g. a new paradigm, a new
+# knowledge dir) won't appear in projects whose `.rness/` predates it.
+#
+# These helpers detect that drift and let the user opt in to receive the
+# new defaults via the `/update-enough` slash command. We never overwrite
+# anything that already exists in the project — only ADD missing entries.
+
+def _is_skeleton_item_present(project_dir: Path, dst_rel: str, mode: str) -> bool:
+    """True iff the skeleton-plan destination already exists. For symlink
+    mode we accept any existing file/dir/symlink as 'present' — we don't
+    second-guess the user if they replaced a symlink with a real file."""
+    dst = project_dir / dst_rel
+    return dst.exists() or dst.is_symlink()
+
+
+def _apply_missing_skeleton_items(
+    project_dir: Path,
+    defaults: Path,
+    plan: tuple[tuple[str, str, str], ...],
+) -> list[tuple[str, str, str]]:
+    """Apply every plan entry whose destination doesn't already exist.
+
+    Returns the list of entries actually applied. Idempotent: re-running
+    on the same project does nothing once everything's in place.
+    Never overwrites: an existing file at a destination is left alone."""
+    applied: list[tuple[str, str, str]] = []
+    for src_rel, dst_rel, mode in plan:
+        src = defaults / src_rel
+        # symlink targets can be files or dirs; copy needs a file.
+        if mode == "copy" and not src.is_file():
+            continue
+        if mode == "symlink" and not src.exists():
+            continue
+        if _is_skeleton_item_present(project_dir, dst_rel, mode):
+            continue
+        dst = project_dir / dst_rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if mode == "symlink":
+            dst.symlink_to(src.resolve())
+        elif mode == "copy":
+            shutil.copy2(src, dst)
+        applied.append((src_rel, dst_rel, mode))
+    return applied
+
+
+def detect_drift(project_dir: Path) -> list[tuple[str, str, str]]:
+    """Return skeleton-plan entries whose destinations are missing in
+    `project_dir/.rness/`. Empty list = the project is up to date with
+    `~/enough/defaults/`.
+
+    This is a read-only check; nothing is mutated. Use `apply_drift` to
+    actually pull the missing defaults in."""
+    defaults = _install_defaults_root()
+    if not defaults.is_dir():
+        return []
+    missing: list[tuple[str, str, str]] = []
+    for src_rel, dst_rel, mode in _SKELETON_PLAN:
+        src = defaults / src_rel
+        if mode == "copy" and not src.is_file():
+            continue
+        if mode == "symlink" and not src.exists():
+            continue
+        if _is_skeleton_item_present(project_dir, dst_rel, mode):
+            continue
+        missing.append((src_rel, dst_rel, mode))
+    return missing
+
+
+def apply_drift(project_dir: Path) -> list[tuple[str, str, str]]:
+    """Pull in any missing skeleton-plan entries from `~/enough/defaults/`.
+    Returns what was actually applied. Safe to call on a fully-up-to-date
+    project (returns an empty list)."""
+    defaults = _install_defaults_root()
+    if not defaults.is_dir():
+        return []
+    return _apply_missing_skeleton_items(project_dir, defaults, _SKELETON_PLAN)
+
 # Infoworld README lives at the GLOBAL infoworld root so it appears once
 # across all projects sharing that symlinked directory.
 _INFOWORLD_README = """\
@@ -294,19 +378,7 @@ def ensure_skeleton(project_dir: Path) -> bool:
 
     if new_project:
         # First-time setup: copies, symlinks, empty dirs, infoworld link.
-        for src_rel, dst_rel, mode in _SKELETON_PLAN:
-            src = defaults / src_rel
-            # symlink targets can be files or dirs; copy needs a file.
-            if mode == "copy" and not src.is_file():
-                continue
-            if mode == "symlink" and not src.exists():
-                continue
-            dst = project_dir / dst_rel
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            if mode == "symlink":
-                dst.symlink_to(src.resolve())
-            elif mode == "copy":
-                shutil.copy2(src, dst)
+        _apply_missing_skeleton_items(project_dir, defaults, _SKELETON_PLAN)
 
         for rel, body in _PROJECT_LOCAL_FILES.items():
             target = project_dir / rel

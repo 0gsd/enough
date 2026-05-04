@@ -1105,6 +1105,32 @@ def create_app(
         await session.emit("usage", {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0})
         return HTMLResponse("")
 
+    @app.get("/api/update-enough")
+    async def api_update_enough() -> dict[str, Any]:
+        """Pull in any missing default files (paradigms, policies,
+        knowledge dirs) from ~/enough/defaults/ that this project's
+        `.rness/` is missing. Idempotent: safe to call when nothing's
+        missing.
+
+        Returns a JSON summary the JS slash-command handler renders
+        inline as a system notice."""
+        from .skeleton import apply_drift, detect_drift
+        # Detect first so we have a "what changed" view independent of
+        # the apply step. The two should match in normal flow.
+        before = detect_drift(session.project_dir)
+        applied = apply_drift(session.project_dir)
+        return {
+            "applied": [
+                {"src": src, "dst": dst, "mode": mode}
+                for (src, dst, mode) in applied
+            ],
+            "remaining": [
+                {"src": src, "dst": dst, "mode": mode}
+                for (src, dst, mode) in detect_drift(session.project_dir)
+            ],
+            "had_drift": bool(before),
+        }
+
     @app.get("/api/usage")
     async def api_usage() -> dict[str, Any]:
         """Latest token-usage snapshot for the gauge. Used on modal open
