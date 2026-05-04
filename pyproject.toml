@@ -24,6 +24,10 @@ dependencies = [
     "httpx>=0.27",
     "sse-starlette>=2.1",
     "python-multipart>=0.0.9",
+    # offline translation (translator skill): MADLAD-400-3B-MT via ct2.
+    "ctranslate2>=4.5",
+    "sentencepiece>=0.2",
+    "huggingface_hub>=0.26",
 ]
 
 [project.scripts]

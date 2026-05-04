@@ -39,8 +39,9 @@ preview pane).
 
 - A **Mac** (Apple Silicon or recent Intel; Linux/Windows support is on
   the roadmap, not here yet)
-- About **5–30 GB of free disk space**, depending on which AI model you
-  pick during install (the smallest one is ~5 GB; the biggest is ~16 GB)
+- About **8–35 GB of free disk space**, depending on which AI model you
+  pick during install (the smallest LLM is ~5 GB; the biggest is ~16 GB),
+  plus ~3 GB if you opt to install the offline-translation model
 - About **10 minutes** for the install
 - Comfort with running **one Terminal command** to get started
 
@@ -59,7 +60,7 @@ cd /tmp/enough-seed
 bash bootstrap.sh
 ```
 
-The installer walks through nine steps in order, asking permission and
+The installer walks through ten steps in order, asking permission and
 explaining each one:
 
 1. Confirms you're on a Mac
@@ -68,12 +69,17 @@ explaining each one:
    `uv` (Python environment manager), `tor` (optional privacy proxy), and
    `whisper-cpp` (for voice input)
 4. Clones `enough` itself into `~/enough/` (your home folder)
-5. Sets up the Python environment
+5. Sets up the Python environment (this also installs the offline
+   translation libraries: `ctranslate2`, `sentencepiece`, `huggingface_hub`)
 6. Lets you pick which AI model(s) to download — pick **tier 1** if you
    want the lightest setup, **tier 4** if you want all four models
 7. Downloads a voice-recognition model (~140 MB) for the mic button
-8. Installs an `enough` command on your PATH so you can run it from any folder
-9. Tells you what to do next
+8. Optionally downloads the offline translation model
+   (MADLAD-400-3B-MT, ~3 GB). Powers the `translator` skill — translation
+   across ~419 languages, fully offline. You can defer this and the
+   skill will download the model on first use instead
+9. Installs an `enough` command on your PATH so you can run it from any folder
+10. Tells you what to do next
 
 After install, you can delete `/tmp/enough-seed/`. Your install lives at
 `~/enough/`.
@@ -138,7 +144,7 @@ A **skill** is a packaged capability you can toggle on or off — like a
 Word add-in or a Chrome extension. Each skill is a folder with a
 `SKILL.md` describing what it does, and (optionally) helper scripts.
 
-`enough` ships with four skills out of the box:
+`enough` ships with five skills out of the box:
 
 - **`irefy`** ("I read everything for you") — produces a one-page
   analytical digest of any long document.
@@ -150,6 +156,11 @@ Word add-in or a Chrome extension. Each skill is a folder with a
   prompt-injection patterns and other risks before you install it.
 - **`the-internet`** — fetches web pages through Tor for anonymized
   reading.
+- **`translator`** — offline machine translation across ~419 languages,
+  powered by Google's MADLAD-400-3B-MT (Apache 2.0). After the one-time
+  ~3 GB model download, translation works fully offline — no API call,
+  no account, no rate limit. Routing is described in the companion
+  `translation` paradigm.
 
 **How to use them:** open the sidebar (left side of the window), expand
 the **active skills** section. Each skill has a circle next to its name —
@@ -199,12 +210,21 @@ sessions, what its security posture is, how it handles requests, when to
 write checkpoints. It's a single markdown file the agent reads every
 turn.
 
-`enough` ships with one paradigm: **`default.md`**. It covers things like:
+`enough` ships with two paradigms:
+
+**`default.md`** — the base interaction paradigm. Covers things like:
 
 - Show commands before running them
 - Don't write outside the project folder unless the user opts in
 - Cache public-domain web content into the project (with manifest)
 - Don't auto-update memory files; propose changes for the user to apply
+
+**`translation.md`** — declares offline translation as a first-class
+capability. Tells the agent when to route requests to the `translator`
+skill, which model variant to pick (3B default vs. opt-in 7B vs.
+license-gated NLLB-200), how to fall back when MADLAD struggles on
+low-resource pairs, and how to consult the bundled Rosetta primers at
+`.rness/knowledge/rosetta-primers/` for ground-truth verification.
 
 **How to use it:**
 

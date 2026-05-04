@@ -6,12 +6,18 @@
 #   2. Makes sure Homebrew is present (explains what it is if not).
 #   3. Installs llama.cpp, uv, and tor via brew (skips ones already installed).
 #   4. Clones github.com/0gsd/enough to ~/enough (or `git pull`s if already there).
-#   5. Runs `uv sync` inside ~/enough so the Python env is ready.
+#   5. Runs `uv sync` inside ~/enough so the Python env is ready
+#      (this also installs the offline-translation dependencies:
+#      ctranslate2, sentencepiece, huggingface_hub).
 #   6. Sets up ~/enough/weights/ and either moves an existing GGUF into it
 #      or downloads the recommended Gemma 4 26B MoE Q4_K_M (~16 GB).
-#   7. Drops a tiny `enough` launcher at ~/.local/bin/enough so you can run
+#   7. Downloads the whisper model for voice input (~142 MB).
+#   8. Optionally downloads the MADLAD-400-3B-MT translation model
+#      (~3 GB) into ~/.local/share/translator/. Powers the `translator`
+#      skill — offline translation across ~419 languages.
+#   9. Drops a tiny `enough` launcher at ~/.local/bin/enough so you can run
 #      `enough` from any directory without remembering uv incantations.
-#   8. Tells you what's next.
+#  10. Tells you what's next.
 #
 # You can re-run this script safely. Each step checks state before acting.
 # If anything blows up, fix the thing it complained about and re-run.
@@ -48,7 +54,7 @@ ask_text() {
   echo "${answer:-$default}"
 }
 
-TOTAL=9
+TOTAL=10
 
 # ---------------------------------------------------------------------------
 # Banner
@@ -70,6 +76,7 @@ note "  • llama.cpp, uv, tor, whisper-cpp via Homebrew"
 note "  • a clone of the enough repo at ~/enough"
 note "  • a GGUF model file in ~/enough/weights/"
 note "  • a whisper model for voice input in ~/enough/weights/whisper/"
+note "  • (optional) MADLAD-400 translation model in ~/.local/share/translator/"
 note "  • an \`enough\` command on your PATH"
 note ""
 note "It's safe to re-run. Each step checks state first."
@@ -295,9 +302,45 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 8. PATH wrapper
+# 8. Offline translation model (MADLAD-400-3B-MT)
 # ---------------------------------------------------------------------------
-step 8 "installing the \`enough\` command on your PATH"
+step 8 "placing the offline-translation model"
+note "enough ships with a \`translator\` skill that does offline translation"
+note "across ~419 languages — no API call, no account, no network hop after"
+note "the model is downloaded. It's powered by Google's MADLAD-400-3B-MT"
+note "(Apache 2.0), served through CTranslate2 + SentencePiece for fast"
+note "CPU/Metal inference."
+note ""
+note "The Python deps (ctranslate2, sentencepiece, huggingface_hub) were"
+note "already installed in step 5 via \`uv sync\`. What's left is the model"
+note "weights themselves: ~3 GB, downloaded once, never phones home again."
+note ""
+note "You can skip this and the model will be downloaded on first use of"
+note "the translator skill instead. It'll go to ~/.local/share/translator/"
+note "either way."
+note ""
+
+TRANSLATOR_HOME_DIR="${TRANSLATOR_HOME:-$HOME/.local/share/translator}"
+TRANSLATOR_MODEL_DIR="$TRANSLATOR_HOME_DIR/madlad400-3b-ct2"
+
+if [[ -f "$TRANSLATOR_MODEL_DIR/model.bin" && -f "$TRANSLATOR_MODEL_DIR/sentencepiece.model" ]]; then
+  ok "MADLAD-400-3B-MT already at $TRANSLATOR_MODEL_DIR"
+else
+  if ask_yn "download MADLAD-400-3B-MT now (~3 GB)?" Y; then
+    note "downloading via huggingface_hub.snapshot_download..."
+    ( cd "$ENOUGH_HOME" && uv run python defaults/skills/translator/scripts/bootstrap.py --install )
+    ok "translator model installed"
+  else
+    warn "skipping. translator skill will download the model on first use."
+    note "to download manually later, run:"
+    note "  cd ~/enough && uv run python defaults/skills/translator/scripts/bootstrap.py --install"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
+# 9. PATH wrapper
+# ---------------------------------------------------------------------------
+step 9 "installing the \`enough\` command on your PATH"
 note "This is a 3-line shell script at ~/.local/bin/enough that runs"
 note "\`uv run --project ~/enough enough \"\$@\"\`. Once it's on PATH, you can"
 note "\`cd\` into any project dir and type \`enough\` to launch the harness there."
@@ -327,9 +370,9 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 9. Done
+# 10. Done
 # ---------------------------------------------------------------------------
-step 9 "done"
+step 10 "done"
 ok "enough is installed at ~/enough"
 ok "weights at ~/enough/weights/"
 ok "\`enough\` CLI at ~/.local/bin/enough"

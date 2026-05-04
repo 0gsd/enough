@@ -53,10 +53,12 @@ _SKELETON_PLAN: tuple[tuple[str, str, str], ...] = (
     ("AGENT.md",                       ".rness/AGENT.md",                        "copy"),
     ("MOTIVATION.md",                  ".rness/MOTIVATION.md",                   "copy"),
     ("paradigms/default.md",           ".rness/paradigms/default.md",            "symlink"),
+    ("paradigms/translation.md",       ".rness/paradigms/translation.md",        "symlink"),
     ("policies/requests.md",           ".rness/policies/requests.md",            "symlink"),
     ("policies/context-management.md", ".rness/policies/context-management.md",  "symlink"),
     ("policies/allowlists.md",         ".rness/policies/allowlists.md",          "symlink"),
     ("models/providers.md",            ".rness/models/providers.md",             "symlink"),
+    ("knowledge/rosetta-primers",      ".rness/knowledge/rosetta-primers",       "symlink"),
 )
 
 # Project-local files not sourced from defaults/ (generated inline).
@@ -294,8 +296,11 @@ def ensure_skeleton(project_dir: Path) -> bool:
         # First-time setup: copies, symlinks, empty dirs, infoworld link.
         for src_rel, dst_rel, mode in _SKELETON_PLAN:
             src = defaults / src_rel
-            if not src.is_file():
-                continue  # missing default = skip this entry
+            # symlink targets can be files or dirs; copy needs a file.
+            if mode == "copy" and not src.is_file():
+                continue
+            if mode == "symlink" and not src.exists():
+                continue
             dst = project_dir / dst_rel
             dst.parent.mkdir(parents=True, exist_ok=True)
             if mode == "symlink":

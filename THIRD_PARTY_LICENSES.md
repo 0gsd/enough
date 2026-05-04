@@ -87,6 +87,17 @@ All three by Georgi Gerganov and contributors.
 | python-multipart | Apache-2.0 | Multipart form parsing | <https://github.com/Kludex/python-multipart> |
 | pydantic | MIT | Data models under FastAPI | <https://github.com/pydantic/pydantic> |
 
+### Translation runtime
+
+The `translator` skill (default-installed) uses these Python libraries
+to run the MADLAD-400 translation model offline:
+
+| Project | License | Role | Source |
+|---|---|---|---|
+| CTranslate2 | MIT | Fast inference engine for transformer models (translation) | <https://github.com/OpenNMT/CTranslate2> |
+| SentencePiece | Apache-2.0 | Subword tokenizer for the MADLAD model | <https://github.com/google/sentencepiece> |
+| huggingface_hub | Apache-2.0 | Downloads model weights from Hugging Face on first use | <https://github.com/huggingface/huggingface_hub> |
+
 ### Front-end
 
 | Project | License | Role | Source |
@@ -129,24 +140,33 @@ card before commercial use.
 | G40-26 | Gemma 4 26B A4B (MoE) | Gemma Terms of Use | <https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF> |
 | Q36-27 | Qwen3.6-27B (dense) | Apache-2.0 | <https://huggingface.co/bartowski/Qwen_Qwen3.6-27B-GGUF> |
 | — | OpenAI Whisper `base.en` | MIT | <https://huggingface.co/ggerganov/whisper.cpp> |
+| — | MADLAD-400-3B-MT (CT2) | Apache-2.0 | <https://huggingface.co/santhosh/madlad400-3b-ct2> |
+| — | MADLAD-400-7B-MT (CT2, opt-in) | Apache-2.0 | <https://huggingface.co/avans06/madlad400-7b-mt-bt-ct2-int8_float16> |
 
 Gemma weights require acceptance of Google's Gemma Terms of Use; users
 download them from Hugging Face after accepting those terms on the model
 card page. The OpenAI Whisper model weights are MIT-licensed; the
 whisper.cpp GGML conversion ships under the same terms.
 
+MADLAD-400 weights (3B and 7B) are released by Google under Apache 2.0
+— both the upstream model and the pre-converted CTranslate2 builds
+linked above. They power the `translator` skill and live at
+`~/.local/share/translator/` after first download (override with the
+`TRANSLATOR_HOME` env var).
+
 ---
 
 ## Skills shipped under `defaults/skills/`
 
-Four skills ship with enough as "first-party" defaults:
+Five skills ship with enough as "first-party" defaults:
 
 | Skill | Purpose | Author |
 |---|---|---|
-| docs-maintainer | Generate and audit developer documentation | Graham Smith |
 | irefy | Analytical one-page digests of long text | Graham Smith |
+| memoir-dialectic | Patient multi-session memoir collaborator | Graham Smith |
+| skillmd-scan | Security and epistemic auditor for skill packages | Graham Smith |
 | the-internet | Tor-anonymized web fetching | Graham Smith |
-| wiki-links | Research-web generation for historical fiction | Graham Smith |
+| translator | Offline machine translation across ~419 languages | Graham Smith |
 
 These are authored for the enough project and fall under the
 repository's Apache 2.0 license (see [LICENSE](LICENSE)). Users may add
