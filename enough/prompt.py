@@ -360,10 +360,15 @@ def assemble_system_prompt(project_dir: Path, active_paradigm: str = "default") 
 
 
 def _drift_notice(project_dir: Path) -> str:
-    """Build a system-prompt section that nudges the agent to offer the
-    user a project update when `~/enough/defaults/` has new entries this
-    `.rness/` is missing. Returns "" when there's no drift — most
-    projects, most of the time."""
+    """Build a brief system-prompt section informing the agent that
+    `~/enough/defaults/` has shared defaults this `.rness/` is missing.
+
+    The user-facing nudge lives in the empty-hint banner the harness
+    renders on the chat pane, NOT in the agent's first response. This
+    note exists so the agent has context if the user asks about
+    `/update-enough` mid-conversation. Don't raise it unprompted.
+
+    Returns "" when there's no drift — most projects, most of the time."""
     # Imported lazily so the module-level import graph stays clean
     # (skeleton imports Path & shutil, doesn't pull in prompt.py).
     from .skeleton import detect_drift
@@ -375,18 +380,13 @@ def _drift_notice(project_dir: Path) -> str:
         for (src, dst, mode) in missing
     )
     return (
+        "FYI only — do not raise this unprompted.\n\n"
         "A newer version of enough has been installed at `~/enough/`, and "
         "this project's `.rness/` is missing some defaults that have since "
         "been added:\n\n"
         f"{listed}\n\n"
-        "On your FIRST response to the user this session, mention that "
-        "these updates are available and offer to apply them. If the user "
-        "agrees, instruct them to type `/update-enough` into the chat box "
-        "(it's a slash command intercepted by the harness — not something "
-        "you can run yourself). If the user declines or says \"not now\", "
-        "tell them they can run `/update-enough` any time later. Do NOT "
-        "raise this again on subsequent turns — once is enough.\n\n"
-        "(If the user has already responded and you've already mentioned "
-        "this earlier in the session, don't bring it up again — drop "
-        "straight into whatever they're asking about.)"
+        "The harness shows the user a notice in the empty-conversation "
+        "pane that lists these and points them at `/update-enough`. You "
+        "don't need to mention it; if the user asks what `/update-enough` "
+        "is or what's new, you can answer based on the list above."
     )

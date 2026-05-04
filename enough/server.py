@@ -327,6 +327,61 @@ def _escape_html(s: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Empty-hint rendering
+# ---------------------------------------------------------------------------
+#
+# The empty-state pane (shown when the conversation is empty) is the
+# right place to surface launch-time information the user actually needs
+# to see — e.g. "new defaults are available, type /update-enough to
+# apply". Terminal output is too easy to miss; an inline banner that
+# tracks server state isn't.
+#
+# Each branch returns HTML for the contents of `<div id="empty-hint">`.
+# The default branch keeps the original italic-faint hint; "notice"
+# branches use the `.empty-hint--notice` class for bright, structured
+# rendering. Add new branches as new launch states emerge (first-launch
+# onboarding, model-not-running advisory, etc.).
+
+_DEFAULT_EMPTY_HINT = (
+    '<div class="empty-hint" id="empty-hint">'
+    'awaiting your first message.<br>'
+    'say hi, or ask me what i can do.'
+    '</div>'
+)
+
+
+def _render_empty_hint(project_dir: Path) -> str:
+    """Return the HTML for the empty-conversation pane. Picks the most
+    salient state-aware notice if any apply; otherwise falls back to the
+    default 'awaiting your first message' italic hint."""
+    # Drift: ~/enough/defaults/ has shared defaults this .rness/ is
+    # missing. Surface them prominently with the /update-enough hook.
+    from .skeleton import detect_drift
+    missing = detect_drift(project_dir)
+    if missing:
+        n = len(missing)
+        items = "".join(
+            f'<li>{_escape_html(dst)}</li>'
+            for (_src, dst, _mode) in missing
+        )
+        return (
+            '<div class="empty-hint empty-hint--notice" id="empty-hint">'
+            f'<div class="notice-title">'
+            f'{n} new default{"s" if n != 1 else ""} '
+            f'available from <code>~/enough/defaults/</code>'
+            '</div>'
+            f'<ul class="notice-list">{items}</ul>'
+            '<div class="notice-cta">'
+            'type <code>/update-enough</code> in the chat box to apply, '
+            'or ignore.'
+            '</div>'
+            '</div>'
+        )
+
+    return _DEFAULT_EMPTY_HINT
+
+
+# ---------------------------------------------------------------------------
 # UI config (themes / fonts / zoom)
 # ---------------------------------------------------------------------------
 
@@ -744,6 +799,12 @@ def create_app(
         html = html.replace(
             "<!-- HISTORY -->",
             _render_turn_from_history(session.history),
+        )
+        # State-aware empty-hint (drift notice, etc.). Empty-when-history-
+        # exists semantics are still handled by the post-send htmx hook.
+        html = html.replace(
+            "<!-- EMPTY_HINT -->",
+            _render_empty_hint(session.project_dir),
         )
         html = html.replace("<!-- VERSION -->", f"v{__version__}")
         # No-cache so edits-in-place don't require force-reload during dev.
