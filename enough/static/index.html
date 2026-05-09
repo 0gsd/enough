@@ -1,2427 +1,2933 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>enough</title>
-<link rel="icon" href="data:,">
-<script src="/static/htmx.min.js"></script>
-<style>
-  :root {
-    --bg: #1a1a2e;
-    --bg-alt: #1e1e36;
-    --bg-raise: #22223a;
-    --fg: #e0e0e0;
-    --fg-muted: #9a9ab0;
-    --fg-faint: #5a5a75;
-    --accent-user: #8ec5ff;
-    --accent-agent: #b2f7b2;
-    --accent-tool: #f5d488;
-    --accent-error: #ff8a8a;
-    --border: #2e2e4a;
-    --input-bg: #252542;
-    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>enough</title>
+  <link rel="icon" href="data:,">
+  <script src="/static/htmx.min.js"></script>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --bg-alt: #1e1e36;
+      --bg-raise: #22223a;
+      --fg: #e0e0e0;
+      --fg-muted: #9a9ab0;
+      --fg-faint: #5a5a75;
+      --accent-user: #8ec5ff;
+      --accent-agent: #b2f7b2;
+      --accent-tool: #f5d488;
+      --accent-error: #ff8a8a;
+      --border: #2e2e4a;
+      --input-bg: #252542;
+      --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
 
-    /* Depth-based nav colors. Folders get progressively cooler/lighter;
+      /* Depth-based nav colors. Folders get progressively cooler/lighter;
        files are closest to white. Symlinks a touch grayer than direct files. */
-    --nav-depth-1: #6b8cff;    /* royal blue — top-level folders (.rness, infoworld) */
-    --nav-depth-2: #8ea9ff;    /* direct children (paradigms, policies, skills…) */
-    --nav-depth-3: #b2c4ff;    /* grandchildren */
-    --nav-depth-4: #d4dcf0;    /* deeper */
-    --nav-file: #f0f0f8;       /* near-white — the thing you click */
-    --nav-file-symlink: #d4d4e0; /* slightly grayer, still near-white */
-    --nav-empty-dir: #5a5a75;  /* empty folder — dim, no zippy */
-    --zippy-color: var(--fg-muted);
-    --zippy-hover: var(--fg);
-  }
-  * { box-sizing: border-box; }
-  html, body { height: 100vh; margin: 0; }
-  body {
-    background: var(--bg);
-    color: var(--fg);
-    font-family: var(--font-mono);
-    font-size: 14px;
-    line-height: 1.55;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
+      --nav-depth-1: #6b8cff;
+      /* royal blue — top-level folders (.rness, infoworld) */
+      --nav-depth-2: #8ea9ff;
+      /* direct children (paradigms, policies, skills…) */
+      --nav-depth-3: #b2c4ff;
+      /* grandchildren */
+      --nav-depth-4: #d4dcf0;
+      /* deeper */
+      --nav-file: #f0f0f8;
+      /* near-white — the thing you click */
+      --nav-file-symlink: #d4d4e0;
+      /* slightly grayer, still near-white */
+      --nav-empty-dir: #5a5a75;
+      /* empty folder — dim, no zippy */
+      --zippy-color: var(--fg-muted);
+      --zippy-hover: var(--fg);
+    }
 
-  /* ---------- Top bar ---------- */
-  .topbar {
-    display: flex; align-items: center; gap: 10px;
-    padding: 0 12px;
-    height: 36px;
-    flex: 0 0 36px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-alt);
-  }
-  .topbar .brand {
-    color: var(--fg);
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    margin-right: 4px;
-  }
-  .topbar .brand .dim { color: var(--fg-faint); font-weight: 400; margin-left: 8px; font-size: 12px; }
-  .topbar button {
-    background: transparent;
-    color: var(--fg-muted);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 4px 10px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 12px;
-  }
-  .topbar button:hover { color: var(--fg); border-color: var(--fg-faint); }
+    * {
+      box-sizing: border-box;
+    }
 
-  /* ---------- Main layout ---------- */
-  .layout {
-    flex: 1 1 auto;              /* fill remaining viewport after topbar */
-    min-height: 0;               /* allow children to shrink + scroll */
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    grid-template-rows: minmax(0, 1fr);  /* bounded row → sidebar can scroll */
-    transition: grid-template-columns 180ms ease;
-  }
-  .layout.sidebar-collapsed { grid-template-columns: 0 1fr; }
-  .layout.sidebar-collapsed .sidebar { overflow: hidden; border-right: none; }
+    html,
+    body {
+      height: 100vh;
+      margin: 0;
+    }
 
-  .sidebar {
-    border-right: 1px solid var(--border);
-    background: var(--bg-alt);
-    overflow-y: auto;
-    overflow-x: hidden;
-    min-height: 0;
-    height: 100%;
-    padding: 10px 6px;
-    font-size: 12.5px;
-    /* tabindex on the element + :focus outline:none keeps pgup/pgdn
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.55;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      height: 36px;
+      flex: 0 0 36px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-alt);
+    }
+
+    .topbar .brand {
+      color: var(--fg);
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      margin-right: 4px;
+    }
+
+    .topbar .brand .dim {
+      color: var(--fg-faint);
+      font-weight: 400;
+      margin-left: 8px;
+      font-size: 12px;
+    }
+
+    .topbar button {
+      background: transparent;
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+    }
+
+    .topbar button:hover {
+      color: var(--fg);
+      border-color: var(--fg-faint);
+    }
+
+    /* ---------- Main layout ---------- */
+    .layout {
+      flex: 1 1 auto;
+      /* fill remaining viewport after topbar */
+      min-height: 0;
+      /* allow children to shrink + scroll */
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      grid-template-rows: minmax(0, 1fr);
+      /* bounded row → sidebar can scroll */
+      transition: grid-template-columns 180ms ease;
+    }
+
+    .layout.sidebar-collapsed {
+      grid-template-columns: 0 1fr;
+    }
+
+    .layout.sidebar-collapsed .sidebar {
+      overflow: hidden;
+      border-right: none;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--border);
+      background: var(--bg-alt);
+      overflow-y: auto;
+      overflow-x: hidden;
+      min-height: 0;
+      height: 100%;
+      padding: 10px 6px;
+      font-size: 12.5px;
+      /* tabindex on the element + :focus outline:none keeps pgup/pgdn
        working without a visible focus ring when the user clicks in. */
-    outline: none;
-  }
-  /* Collapsible sidebar sections (requests / skills / project) */
-  .sidebar-section { margin-bottom: 6px; }
-  .sidebar-section h3.section-head {
-    color: var(--fg-faint);
-    font-size: 11px;
-    font-weight: 500;
-    margin: 4px 8px 6px 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    cursor: pointer;
-    user-select: none;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .sidebar-section h3.section-head:hover { color: var(--fg-muted); }
-  .sidebar-section h3.section-head .zippy {
-    display: inline-block;
-    width: 10px;
-    color: var(--zippy-color);
-    transition: transform 120ms ease;
-    font-size: 9px;
-  }
-  .sidebar-section.collapsed h3.section-head .zippy { transform: rotate(-90deg); }
-  .sidebar-section.collapsed .section-body { display: none; }
+      outline: none;
+    }
 
-  /* File tree */
-  ul.tree, ul.tree ul {
-    list-style: none; margin: 0; padding-left: 14px;
-  }
-  ul.tree { padding-left: 4px; }
-  ul.tree li { padding: 1px 0; }
+    /* Collapsible sidebar sections (requests / skills / project) */
+    .sidebar-section {
+      margin-bottom: 6px;
+    }
 
-  .dir-row, .file-row {
-    display: flex; align-items: center; gap: 3px;
-    padding: 1px 0;
-  }
-  .dir-row { cursor: pointer; user-select: none; }
-  .dir-row:hover .dir-name { color: var(--nav-file); }
+    .sidebar-section h3.section-head {
+      color: var(--fg-faint);
+      font-size: 11px;
+      font-weight: 500;
+      margin: 4px 8px 6px 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-  .zippy {
-    display: inline-block;
-    width: 10px;
-    color: var(--zippy-color);
-    font-size: 9px;
-    transition: transform 120ms ease;
-    flex-shrink: 0;
-  }
-  .zippy-spacer {
-    display: inline-block;
-    width: 10px;
-    flex-shrink: 0;
-  }
-  li.dir.collapsed > .dir-row > .zippy { transform: rotate(-90deg); }
-  li.dir.collapsed > ul.tree { display: none; }
-  li.dir.empty-folder > .dir-row > .dir-name { color: var(--nav-empty-dir); }
+    .sidebar-section h3.section-head:hover {
+      color: var(--fg-muted);
+    }
 
-  /* Depth-based folder colors. Each nested ul.tree bumps the depth. */
-  ul.tree li.dir.has-children > .dir-row > .dir-name               { color: var(--nav-depth-1); }
-  ul.tree ul.tree li.dir.has-children > .dir-row > .dir-name       { color: var(--nav-depth-2); }
-  ul.tree ul.tree ul.tree li.dir.has-children > .dir-row > .dir-name { color: var(--nav-depth-3); }
-  ul.tree ul.tree ul.tree ul.tree li.dir.has-children > .dir-row > .dir-name { color: var(--nav-depth-4); }
+    .sidebar-section h3.section-head .zippy {
+      display: inline-block;
+      width: 10px;
+      color: var(--zippy-color);
+      transition: transform 120ms ease;
+      font-size: 9px;
+    }
 
-  /* Collapsed folders with children pop slightly brighter — "there's stuff inside". */
-  li.dir.has-children.collapsed > .dir-row > .dir-name {
-    filter: brightness(1.15);
-    font-weight: 500;
-  }
+    .sidebar-section.collapsed h3.section-head .zippy {
+      transform: rotate(-90deg);
+    }
 
-  /* Files: near-white regardless of depth. */
-  ul.tree li.file a {
-    color: var(--nav-file);
-    text-decoration: none;
-  }
-  ul.tree li.file a:hover { color: var(--accent-user); }
+    .sidebar-section.collapsed .section-body {
+      display: none;
+    }
 
-  /* Symlinks (files and dirs): italic + slightly muted. */
-  ul.tree li.file.symlink a,
-  ul.tree li.dir.symlink > .dir-row > .dir-name {
-    font-style: italic;
-  }
-  ul.tree li.file.symlink a { color: var(--nav-file-symlink); }
-  ul.tree li.file.symlink a:hover { color: var(--accent-user); }
+    /* File tree */
+    ul.tree,
+    ul.tree ul {
+      list-style: none;
+      margin: 0;
+      padding-left: 14px;
+    }
 
-  ul.skills {
-    list-style: none;
-    margin: 0 0 12px 0;
-    padding: 0 4px;
-  }
-  ul.skills li.skill-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 2px 4px;
-  }
-  ul.skills button.skill-toggle {
-    background: transparent;
-    border: none;
-    color: var(--fg-faint);
-    cursor: pointer;
-    font-size: 12px;
-    padding: 0 3px;
-    font-family: inherit;
-    line-height: 1;
-  }
-  ul.skills li.skill-row.on button.skill-toggle { color: var(--accent-agent); }
-  ul.skills li.skill-row.off .skill-name { color: var(--fg-faint); text-decoration: line-through; }
-  ul.skills .skill-name { color: var(--fg-muted); font-size: 12.5px; }
+    ul.tree {
+      padding-left: 4px;
+    }
 
-  /* Role consultants — same shape as skills, accent on the user color
+    ul.tree li {
+      padding: 1px 0;
+    }
+
+    .dir-row,
+    .file-row {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 1px 0;
+    }
+
+    .dir-row {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .dir-row:hover .dir-name {
+      color: var(--nav-file);
+    }
+
+    .zippy {
+      display: inline-block;
+      width: 10px;
+      color: var(--zippy-color);
+      font-size: 9px;
+      transition: transform 120ms ease;
+      flex-shrink: 0;
+    }
+
+    .zippy-spacer {
+      display: inline-block;
+      width: 10px;
+      flex-shrink: 0;
+    }
+
+    li.dir.collapsed>.dir-row>.zippy {
+      transform: rotate(-90deg);
+    }
+
+    li.dir.collapsed>ul.tree {
+      display: none;
+    }
+
+    li.dir.empty-folder>.dir-row>.dir-name {
+      color: var(--nav-empty-dir);
+    }
+
+    /* Depth-based folder colors. Each nested ul.tree bumps the depth. */
+    ul.tree li.dir.has-children>.dir-row>.dir-name {
+      color: var(--nav-depth-1);
+    }
+
+    ul.tree ul.tree li.dir.has-children>.dir-row>.dir-name {
+      color: var(--nav-depth-2);
+    }
+
+    ul.tree ul.tree ul.tree li.dir.has-children>.dir-row>.dir-name {
+      color: var(--nav-depth-3);
+    }
+
+    ul.tree ul.tree ul.tree ul.tree li.dir.has-children>.dir-row>.dir-name {
+      color: var(--nav-depth-4);
+    }
+
+    /* Collapsed folders with children pop slightly brighter — "there's stuff inside". */
+    li.dir.has-children.collapsed>.dir-row>.dir-name {
+      filter: brightness(1.15);
+      font-weight: 500;
+    }
+
+    /* Files: near-white regardless of depth. */
+    ul.tree li.file a {
+      color: var(--nav-file);
+      text-decoration: none;
+    }
+
+    ul.tree li.file a:hover {
+      color: var(--accent-user);
+    }
+
+    /* Symlinks (files and dirs): italic + slightly muted. */
+    ul.tree li.file.symlink a,
+    ul.tree li.dir.symlink>.dir-row>.dir-name {
+      font-style: italic;
+    }
+
+    ul.tree li.file.symlink a {
+      color: var(--nav-file-symlink);
+    }
+
+    ul.tree li.file.symlink a:hover {
+      color: var(--accent-user);
+    }
+
+    ul.skills {
+      list-style: none;
+      margin: 0 0 12px 0;
+      padding: 0 4px;
+    }
+
+    ul.skills li.skill-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 4px;
+    }
+
+    ul.skills button.skill-toggle {
+      background: transparent;
+      border: none;
+      color: var(--fg-faint);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0 3px;
+      font-family: inherit;
+      line-height: 1;
+    }
+
+    ul.skills li.skill-row.on button.skill-toggle {
+      color: var(--accent-agent);
+    }
+
+    ul.skills li.skill-row.off .skill-name {
+      color: var(--fg-faint);
+      text-decoration: line-through;
+    }
+
+    ul.skills .skill-name {
+      color: var(--fg-muted);
+      font-size: 12.5px;
+    }
+
+    /* Role consultants — same shape as skills, accent on the user color
      so it reads as a different category at a glance. */
-  ul.roles {
-    list-style: none;
-    margin: 0 0 12px 0;
-    padding: 0 4px;
-  }
-  ul.roles li.role-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 2px 4px;
-  }
-  ul.roles button.role-toggle {
-    background: transparent;
-    border: none;
-    color: var(--fg-faint);
-    cursor: pointer;
-    font-size: 12px;
-    padding: 0 3px;
-    font-family: inherit;
-    line-height: 1;
-  }
-  ul.roles li.role-row.on button.role-toggle { color: var(--accent-user); }
-  ul.roles li.role-row.off .role-name { color: var(--fg-faint); text-decoration: line-through; }
-  ul.roles .role-name { color: var(--fg-muted); font-size: 12.5px; }
+    ul.roles {
+      list-style: none;
+      margin: 0 0 12px 0;
+      padding: 0 4px;
+    }
 
-  ul.requests {
-    list-style: none;
-    margin: 0 0 12px 0;
-    padding: 0 4px;
-  }
-  ul.requests li.request-row {
-    padding: 2px 4px;
-  }
-  ul.requests li.request-row a {
-    color: var(--fg-muted);
-    text-decoration: none;
-    font-size: 12.5px;
-    display: block;
-    padding: 2px 4px;
-    border-radius: 3px;
-  }
-  ul.requests li.request-row a:hover {
-    color: var(--fg);
-    background: var(--bg-raise);
-  }
-  .empty-note {
-    color: var(--fg-faint);
-    font-style: italic;
-    padding: 6px 8px;
-    font-size: 12px;
-  }
+    ul.roles li.role-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 4px;
+    }
 
-  /* ---------- Content: conversation + input ---------- */
-  .content {
-    position: relative;
-    display: flex; flex-direction: column;
-    overflow: hidden;
-  }
-  .conversation {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    padding: 24px 24px 0 24px;
-    max-width: 880px;
-    width: 100%;
-    margin: 0 auto;
-  }
-  .empty-hint {
-    color: var(--fg-faint);
-    text-align: center;
-    padding: 40px 20px;
-    font-style: italic;
-  }
-  /* Bright, state-aware variant for launch-time notices (drift,
+    ul.roles button.role-toggle {
+      background: transparent;
+      border: none;
+      color: var(--fg-faint);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0 3px;
+      font-family: inherit;
+      line-height: 1;
+    }
+
+    ul.roles li.role-row.on button.role-toggle {
+      color: var(--accent-user);
+    }
+
+    ul.roles li.role-row.off .role-name {
+      color: var(--fg-faint);
+      text-decoration: line-through;
+    }
+
+    ul.roles .role-name {
+      color: var(--fg-muted);
+      font-size: 12.5px;
+    }
+
+    ul.requests {
+      list-style: none;
+      margin: 0 0 12px 0;
+      padding: 0 4px;
+    }
+
+    ul.requests li.request-row {
+      padding: 2px 4px;
+    }
+
+    ul.requests li.request-row a {
+      color: var(--fg-muted);
+      text-decoration: none;
+      font-size: 12.5px;
+      display: block;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+
+    ul.requests li.request-row a:hover {
+      color: var(--fg);
+      background: var(--bg-raise);
+    }
+
+    .empty-note {
+      color: var(--fg-faint);
+      font-style: italic;
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+
+    /* ---------- Content: conversation + input ---------- */
+    .content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .conversation {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 24px 24px 0 24px;
+      max-width: 880px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .empty-hint {
+      color: var(--fg-faint);
+      text-align: center;
+      padding: 40px 20px;
+      font-style: italic;
+    }
+
+    /* Bright, state-aware variant for launch-time notices (drift,
      onboarding, etc.). Inherits .empty-hint's centering + padding;
      overrides color and italic to draw the eye. */
-  .empty-hint.empty-hint--notice {
-    color: var(--fg);
-    font-style: normal;
-    max-width: 560px;
-    margin: 16px auto;
-    padding: 32px 32px 28px 32px;
-  }
-  .empty-hint--notice .notice-title {
-    font-weight: 600;
-    font-size: 15px;
-    margin-bottom: 18px;
-    color: var(--fg);
-  }
-  .empty-hint--notice .notice-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 auto 18px auto;
-    font-size: 13px;
-    text-align: left;
-    display: inline-block;
-  }
-  .empty-hint--notice .notice-list li {
-    padding: 3px 0;
-    color: var(--fg);
-    font-family: var(--font-mono, ui-monospace, monospace);
-  }
-  .empty-hint--notice .notice-list li::before {
-    content: "•";
-    margin-right: 10px;
-    color: var(--fg-muted);
-  }
-  .empty-hint--notice .notice-cta {
-    font-size: 13px;
-    color: var(--fg-muted);
-    margin-top: 4px;
-  }
-  .empty-hint--notice code {
-    background: var(--bg-raise);
-    padding: 1px 6px;
-    border-radius: 3px;
-    font-family: var(--font-mono, ui-monospace, monospace);
-    font-size: 0.92em;
-    color: var(--fg);
-  }
-  .msg {
-    margin: 0 0 20px 0;
-  }
-  .msg .role {
-    font-size: 11px;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-  .msg.user .role { color: var(--accent-user); }
-  .msg.assistant .role { color: var(--accent-agent); }
-  .msg .body {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    color: var(--fg);
-  }
-  .msg.assistant.pending .body::after {
-    content: "▋";
-    color: var(--accent-agent);
-    opacity: 0.6;
-    animation: blink 1s infinite;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
-  .tool-indicators {
-    margin-top: 8px;
-  }
-  .tool-indicator {
-    font-size: 12px;
-    color: var(--accent-tool);
-    padding: 2px 0;
-  }
-  .tool-indicator.running::before { content: "⟳  "; }
-  .tool-indicator.ok::before { content: "✓  "; color: var(--accent-agent); }
-  .tool-indicator.error::before { content: "✗  "; color: var(--accent-error); }
-  .msg .body.error {
-    color: var(--accent-error);
-    border-left: 2px solid var(--accent-error);
-    padding-left: 10px;
-  }
+    .empty-hint.empty-hint--notice {
+      color: var(--fg);
+      font-style: normal;
+      max-width: 560px;
+      margin: 16px auto;
+      padding: 32px 32px 28px 32px;
+    }
 
-  /* ---------- Input dock ---------- */
-  .input-dock {
-    padding: 16px 24px 24px;
-    background: linear-gradient(180deg, transparent 0, var(--bg) 30%);
-    max-width: 880px;
-    width: 100%;
-    margin: 0 auto;
-  }
-  .input-form {
-    display: flex;
-    gap: 8px;
-  }
-  .input-form textarea {
-    flex: 1;
-    min-height: 44px;
-    max-height: 280px;
-    resize: none;
-    background: var(--input-bg);
-    color: var(--fg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 10px 12px;
-    font-family: inherit;
-    font-size: 14px;
-    line-height: 1.45;
-  }
-  .input-form textarea:focus {
-    outline: none;
-    border-color: var(--fg-faint);
-  }
-  .input-form button {
-    background: var(--bg-raise);
-    color: var(--fg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px 14px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 13px;
-  }
-  .input-form button:hover { border-color: var(--fg-muted); }
-  .input-form button:disabled { opacity: 0.5; cursor: wait; }
-  .mic-btn {
-    min-width: 40px;
-    display: inline-flex; align-items: center; justify-content: center;
-  }
-  .mic-btn .mic-icon { font-size: 15px; line-height: 1; }
-  .mic-btn.recording {
-    background: color-mix(in oklab, var(--accent-error) 18%, var(--bg-raise));
-    border-color: var(--accent-error);
-    color: var(--accent-error);
-    animation: mic-pulse 1.2s ease-in-out infinite;
-  }
-  @keyframes mic-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent-error) 40%, transparent); }
-    50%      { box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent-error) 10%, transparent); }
-  }
-  .mic-btn.transcribing {
-    opacity: 0.6;
-    cursor: wait;
-  }
-  .input-form .hint {
-    position: absolute;
-    font-size: 11px;
-    color: var(--fg-faint);
-    margin-top: -14px;
-  }
+    .empty-hint--notice .notice-title {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 18px;
+      color: var(--fg);
+    }
 
-  /* ---------- Help affordance: [?] button on hover, help viewer panel ---------- */
-  .help-trigger {
-    margin-left: auto;
-    width: 16px; height: 16px;
-    flex-shrink: 0;
-    border: 1px solid var(--fg-faint);
-    border-radius: 50%;
-    background: var(--bg-raise);
-    color: var(--fg-muted);
-    font-size: 10px;
-    line-height: 14px;
-    text-align: center;
-    padding: 0;
-    font-family: inherit;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 220ms ease, color 120ms ease, border-color 120ms ease;
-    pointer-events: none;
-    user-select: none;
-  }
-  .help-trigger.shown {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  .help-trigger:hover {
-    color: var(--accent-tool);
-    border-color: var(--accent-tool);
-  }
-  /* Section-heads use lowercase letterspacing — keep [?] readable */
-  .section-head .help-trigger { text-transform: none; letter-spacing: 0; }
+    .empty-hint--notice .notice-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 auto 18px auto;
+      font-size: 13px;
+      text-align: left;
+      display: inline-block;
+    }
 
-  #help-viewer {
-    position: absolute;
-    top: 0; right: 0; bottom: 0;
-    width: 0;
-    background: color-mix(in oklab, var(--bg-alt), var(--accent-tool) 8%);
-    border-left: 3px solid var(--accent-tool);
-    transition: width 180ms ease;
-    overflow: hidden;
-    display: flex; flex-direction: column;
-    z-index: 5;
-  }
-  #help-viewer.open { width: 50%; }
-  #help-viewer .help-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 10px;
-    height: 34px;
-    border-bottom: 1px solid var(--border);
-    background: color-mix(in oklab, var(--bg-raise), var(--accent-tool) 6%);
-    flex: 0 0 34px;
-  }
-  #help-viewer .help-header .title {
-    color: var(--accent-tool);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-  }
-  #help-viewer button.close {
-    background: transparent;
-    color: var(--fg-muted);
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    line-height: 1;
-  }
-  #help-viewer button.close:hover { color: var(--fg); }
-  #help-body {
-    flex: 1;
-    overflow: auto;
-    padding: 16px 20px 24px;
-    color: var(--fg);
-    font-size: 13px;
-    line-height: 1.6;
-  }
-  #help-body h1 {
-    font-size: 16px;
-    margin: 0 0 4px;
-    color: var(--fg);
-    font-weight: 600;
-  }
-  #help-body .help-path {
-    color: var(--fg-faint);
-    font-size: 11px;
-    letter-spacing: 0.6px;
-    margin-bottom: 14px;
-    font-family: var(--font-mono);
-  }
-  #help-body h2 {
-    font-size: 11px;
-    margin: 18px 0 6px;
-    color: var(--accent-tool);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-  }
-  #help-body p { margin: 0 0 10px; }
-  #help-body ul { margin: 0 0 10px; padding-left: 20px; }
-  #help-body li { margin-bottom: 4px; }
-  #help-body code {
-    color: var(--accent-user);
-    background: transparent;
-    font-family: var(--font-mono);
-    font-size: 12px;
-  }
+    .empty-hint--notice .notice-list li {
+      padding: 3px 0;
+      color: var(--fg);
+      font-family: var(--font-mono, ui-monospace, monospace);
+    }
 
-  /* ---------- Preview pane ---------- */
-  #preview {
-    position: absolute;
-    top: 0; right: 0; bottom: 0;
-    width: 0;
-    background: var(--bg-alt);
-    border-left: 1px solid var(--border);
-    transition: width 180ms ease;
-    overflow: hidden;
-    display: flex; flex-direction: column;
-  }
-  #preview.open { width: 50%; }
-  #preview .preview-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 10px;
-    height: 34px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-raise);
-  }
-  #preview .preview-header .title { color: var(--fg-muted); font-size: 12px; }
-  #preview button.close {
-    background: transparent;
-    color: var(--fg-muted);
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    line-height: 1;
-  }
-  .preview-actions {
-    display: flex;
-    gap: 6px;
-    justify-content: flex-end;
-    padding: 8px 12px 0;
-  }
-  .preview-actions button {
-    background: var(--bg-raise);
-    color: var(--fg-muted);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 3px 10px;
-    font-family: inherit;
-    font-size: 11px;
-    cursor: pointer;
-  }
-  .preview-actions button:hover { color: var(--fg); border-color: var(--fg-faint); }
-  .preview-actions .mark-done { color: var(--accent-agent); border-color: var(--accent-agent); }
-  .preview-actions .mark-done:hover { background: color-mix(in oklab, var(--accent-agent) 15%, transparent); }
-  .preview-actions .customize-btn { color: var(--accent-tool); border-color: var(--accent-tool); }
-  .preview-actions .customize-btn:hover { background: color-mix(in oklab, var(--accent-tool) 15%, transparent); }
-  .symlink-note {
-    font-size: 11px;
-    color: var(--fg-faint);
-    padding: 0 12px;
-    font-style: italic;
-  }
-  .symlink-note code {
-    font-size: 11px;
-    color: var(--fg-muted);
-    background: transparent;
-    padding: 0;
-  }
-  #preview textarea.file-edit {
-    width: calc(100% - 24px);
-    margin: 8px 12px;
-    min-height: calc(100vh - 180px);
-    background: var(--input-bg);
-    color: var(--fg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 10px;
-    font-family: var(--font-mono);
-    font-size: 12.5px;
-    line-height: 1.55;
-    resize: vertical;
-  }
-  #preview textarea.file-edit:focus { outline: none; border-color: var(--fg-faint); }
-  #preview-body {
-    flex: 1;
-    overflow: auto;
-    padding: 12px;
-  }
-  #preview .file-path {
-    color: var(--fg-faint);
-    font-size: 11px;
-    margin-bottom: 8px;
-    letter-spacing: 0.6px;
-  }
-  #preview pre.file-body {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    color: var(--fg);
-    font-family: var(--font-mono);
-    font-size: 12.5px;
-    margin: 0;
-  }
-  #preview .binary-file {
-    color: var(--fg-faint);
-    font-style: italic;
-  }
+    .empty-hint--notice .notice-list li::before {
+      content: "•";
+      margin-right: 10px;
+      color: var(--fg-muted);
+    }
 
-  /* ---------- Scrollbar ---------- */
-  ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--fg-faint); }
+    .empty-hint--notice .notice-cta {
+      font-size: 13px;
+      color: var(--fg-muted);
+      margin-top: 4px;
+    }
 
-  /* ---------- UI preferences modal ---------- */
-  #ui-modal.hidden { display: none; }
-  #ui-modal {
-    position: fixed; inset: 0; z-index: 1000;
-    display: flex; align-items: center; justify-content: center;
-  }
-  #ui-modal .modal-backdrop {
-    position: absolute; inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-  }
-  #ui-modal .modal-panel {
-    position: relative;
-    background: var(--bg-alt);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    min-width: 360px;
-    max-width: 440px;
-    padding: 0;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-  }
-  #ui-modal .modal-head {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  #ui-modal .modal-head h3 {
-    margin: 0;
-    color: var(--fg);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-  #ui-modal .modal-close {
-    background: transparent;
-    border: none;
-    color: var(--fg-muted);
-    font-size: 20px;
-    line-height: 1;
-    cursor: pointer;
-    padding: 0 4px;
-  }
-  #ui-modal .modal-close:hover { color: var(--fg); }
-  #ui-modal .modal-body {
-    padding: 16px;
-    display: flex; flex-direction: column; gap: 14px;
-  }
-  #ui-modal label {
-    display: flex; flex-direction: column; gap: 4px;
-  }
-  #ui-modal .label {
-    font-size: 11px;
-    color: var(--fg-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    display: flex; justify-content: space-between;
-  }
-  #ui-modal select, #ui-modal input[type="range"] {
-    background: var(--input-bg);
-    color: var(--fg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 6px 8px;
-    font-family: inherit;
-    font-size: 13px;
-  }
-  #ui-modal select:focus, #ui-modal input[type="range"]:focus {
-    outline: none;
-    border-color: var(--fg-faint);
-  }
-  #ui-modal input[type="range"] { padding: 0; }
-  #ui-modal .modal-foot {
-    padding: 10px 16px;
-    border-top: 1px solid var(--border);
-    font-size: 11px;
-    color: var(--fg-faint);
-  }
-  #ui-modal .modal-foot code {
-    color: var(--fg-muted);
-    background: var(--bg-raise);
-    padding: 1px 5px;
-    border-radius: 3px;
-    font-size: 11px;
-  }
+    .empty-hint--notice code {
+      background: var(--bg-raise);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-family: var(--font-mono, ui-monospace, monospace);
+      font-size: 0.92em;
+      color: var(--fg);
+    }
 
-  /* ---------- Top-bar model badge + modal ---------- */
-  .model-badge {
-    background: transparent;
-    color: var(--fg-muted);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 3px 10px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 12px;
-    display: inline-flex; align-items: center; gap: 6px;
-  }
-  .model-badge:hover { color: var(--fg); border-color: var(--fg-faint); }
-  .model-badge .dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--fg-faint);
-    flex-shrink: 0;
-  }
-  .model-badge.ready .dot { background: var(--accent-agent); }
-  .model-badge.loading .dot {
-    background: var(--accent-tool);
-    animation: model-pulse 1.2s ease-in-out infinite;
-  }
-  .model-badge.off .dot { background: var(--accent-error); }
-  @keyframes model-pulse { 50% { opacity: 0.35; } }
-  .model-badge .cute { font-weight: 600; }
-  .model-badge .ctx { color: var(--fg-faint); font-size: 11px; }
+    .msg {
+      margin: 0 0 20px 0;
+    }
 
-  /* Token-pressure gauge: lives next to the model badge in the topbar.
+    .msg .role {
+      font-size: 11px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .msg.user .role {
+      color: var(--accent-user);
+    }
+
+    .msg.assistant .role {
+      color: var(--accent-agent);
+    }
+
+    .msg .body {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: var(--fg);
+    }
+
+    .msg.assistant.pending .body::after {
+      content: "▋";
+      color: var(--accent-agent);
+      opacity: 0.6;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    .tool-indicators {
+      margin-top: 8px;
+    }
+
+    .tool-indicator {
+      font-size: 12px;
+      color: var(--accent-tool);
+      padding: 2px 0;
+    }
+
+    .tool-indicator.running::before {
+      content: "⟳  ";
+    }
+
+    .tool-indicator.ok::before {
+      content: "✓  ";
+      color: var(--accent-agent);
+    }
+
+    .tool-indicator.error::before {
+      content: "✗  ";
+      color: var(--accent-error);
+    }
+
+    .msg .body.error {
+      color: var(--accent-error);
+      border-left: 2px solid var(--accent-error);
+      padding-left: 10px;
+    }
+
+    /* ---------- Input dock ---------- */
+    .input-dock {
+      padding: 16px 24px 24px;
+      background: linear-gradient(180deg, transparent 0, var(--bg) 30%);
+      max-width: 880px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .input-form {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-form textarea {
+      flex: 1;
+      min-height: 44px;
+      max-height: 280px;
+      resize: none;
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .input-form textarea:focus {
+      outline: none;
+      border-color: var(--fg-faint);
+    }
+
+    .input-form button {
+      background: var(--bg-raise);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .input-form button:hover {
+      border-color: var(--fg-muted);
+    }
+
+    .input-form button:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+
+    .mic-btn {
+      min-width: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mic-btn .mic-icon {
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .mic-btn.recording {
+      background: color-mix(in oklab, var(--accent-error) 18%, var(--bg-raise));
+      border-color: var(--accent-error);
+      color: var(--accent-error);
+      animation: mic-pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes mic-pulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent-error) 40%, transparent);
+      }
+
+      50% {
+        box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent-error) 10%, transparent);
+      }
+    }
+
+    .mic-btn.transcribing {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .input-form .hint {
+      position: absolute;
+      font-size: 11px;
+      color: var(--fg-faint);
+      margin-top: -14px;
+    }
+
+    /* ---------- Help affordance: [?] button on hover, help viewer panel ---------- */
+    .help-trigger {
+      margin-left: auto;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      border: 1px solid var(--fg-faint);
+      border-radius: 50%;
+      background: var(--bg-raise);
+      color: var(--fg-muted);
+      font-size: 10px;
+      line-height: 14px;
+      text-align: center;
+      padding: 0;
+      font-family: inherit;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 220ms ease, color 120ms ease, border-color 120ms ease;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .help-trigger.shown {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .help-trigger:hover {
+      color: var(--accent-tool);
+      border-color: var(--accent-tool);
+    }
+
+    /* Section-heads use lowercase letterspacing — keep [?] readable */
+    .section-head .help-trigger {
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    #help-viewer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 0;
+      background: color-mix(in oklab, var(--bg-alt), var(--accent-tool) 8%);
+      border-left: 3px solid var(--accent-tool);
+      transition: width 180ms ease;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      z-index: 5;
+    }
+
+    #help-viewer.open {
+      width: 50%;
+    }
+
+    #help-viewer .help-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      height: 34px;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in oklab, var(--bg-raise), var(--accent-tool) 6%);
+      flex: 0 0 34px;
+    }
+
+    #help-viewer .help-header .title {
+      color: var(--accent-tool);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    #help-viewer button.close {
+      background: transparent;
+      color: var(--fg-muted);
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    #help-viewer button.close:hover {
+      color: var(--fg);
+    }
+
+    #help-body {
+      flex: 1;
+      overflow: auto;
+      padding: 16px 20px 24px;
+      color: var(--fg);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    #help-body h1 {
+      font-size: 16px;
+      margin: 0 0 4px;
+      color: var(--fg);
+      font-weight: 600;
+    }
+
+    #help-body .help-path {
+      color: var(--fg-faint);
+      font-size: 11px;
+      letter-spacing: 0.6px;
+      margin-bottom: 14px;
+      font-family: var(--font-mono);
+    }
+
+    #help-body h2 {
+      font-size: 11px;
+      margin: 18px 0 6px;
+      color: var(--accent-tool);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    #help-body p {
+      margin: 0 0 10px;
+    }
+
+    #help-body ul {
+      margin: 0 0 10px;
+      padding-left: 20px;
+    }
+
+    #help-body li {
+      margin-bottom: 4px;
+    }
+
+    #help-body code {
+      color: var(--accent-user);
+      background: transparent;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    /* ---------- Preview pane ---------- */
+    #preview {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 0;
+      background: var(--bg-alt);
+      border-left: 1px solid var(--border);
+      transition: width 180ms ease;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #preview.open {
+      width: 50%;
+    }
+
+    #preview .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      height: 34px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-raise);
+    }
+
+    #preview .preview-header .title {
+      color: var(--fg-muted);
+      font-size: 12px;
+    }
+
+    #preview button.close {
+      background: transparent;
+      color: var(--fg-muted);
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+      padding: 8px 12px 0;
+    }
+
+    .preview-actions button {
+      background: var(--bg-raise);
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 10px;
+      font-family: inherit;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .preview-actions button:hover {
+      color: var(--fg);
+      border-color: var(--fg-faint);
+    }
+
+    .preview-actions .mark-done {
+      color: var(--accent-agent);
+      border-color: var(--accent-agent);
+    }
+
+    .preview-actions .mark-done:hover {
+      background: color-mix(in oklab, var(--accent-agent) 15%, transparent);
+    }
+
+    .preview-actions .customize-btn {
+      color: var(--accent-tool);
+      border-color: var(--accent-tool);
+    }
+
+    .preview-actions .customize-btn:hover {
+      background: color-mix(in oklab, var(--accent-tool) 15%, transparent);
+    }
+
+    .symlink-note {
+      font-size: 11px;
+      color: var(--fg-faint);
+      padding: 0 12px;
+      font-style: italic;
+    }
+
+    .symlink-note code {
+      font-size: 11px;
+      color: var(--fg-muted);
+      background: transparent;
+      padding: 0;
+    }
+
+    #preview textarea.file-edit {
+      width: calc(100% - 24px);
+      margin: 8px 12px;
+      min-height: calc(100vh - 180px);
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.55;
+      resize: vertical;
+    }
+
+    #preview textarea.file-edit:focus {
+      outline: none;
+      border-color: var(--fg-faint);
+    }
+
+    #preview-body {
+      flex: 1;
+      overflow: auto;
+      padding: 12px;
+    }
+
+    #preview .file-path {
+      color: var(--fg-faint);
+      font-size: 11px;
+      margin-bottom: 8px;
+      letter-spacing: 0.6px;
+    }
+
+    #preview pre.file-body {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      margin: 0;
+    }
+
+    #preview .binary-file {
+      color: var(--fg-faint);
+      font-style: italic;
+    }
+
+    /* ---------- Scrollbar ---------- */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--fg-faint);
+    }
+
+    /* ---------- UI preferences modal ---------- */
+    #ui-modal.hidden {
+      display: none;
+    }
+
+    #ui-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #ui-modal .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    #ui-modal .modal-panel {
+      position: relative;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 360px;
+      max-width: 440px;
+      padding: 0;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    #ui-modal .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #ui-modal .modal-head h3 {
+      margin: 0;
+      color: var(--fg);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    #ui-modal .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--fg-muted);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    #ui-modal .modal-close:hover {
+      color: var(--fg);
+    }
+
+    #ui-modal .modal-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    #ui-modal label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #ui-modal .label {
+      font-size: 11px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #ui-modal select,
+    #ui-modal input[type="range"] {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    #ui-modal select:focus,
+    #ui-modal input[type="range"]:focus {
+      outline: none;
+      border-color: var(--fg-faint);
+    }
+
+    #ui-modal input[type="range"] {
+      padding: 0;
+    }
+
+    #ui-modal .modal-foot {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--fg-faint);
+    }
+
+    #ui-modal .modal-foot code {
+      color: var(--fg-muted);
+      background: var(--bg-raise);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    /* ---------- Top-bar model badge + modal ---------- */
+    .model-badge {
+      background: transparent;
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .model-badge:hover {
+      color: var(--fg);
+      border-color: var(--fg-faint);
+    }
+
+    .model-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--fg-faint);
+      flex-shrink: 0;
+    }
+
+    .model-badge.ready .dot {
+      background: var(--accent-agent);
+    }
+
+    .model-badge.loading .dot {
+      background: var(--accent-tool);
+      animation: model-pulse 1.2s ease-in-out infinite;
+    }
+
+    .model-badge.off .dot {
+      background: var(--accent-error);
+    }
+
+    @keyframes model-pulse {
+      50% {
+        opacity: 0.35;
+      }
+    }
+
+    .model-badge .cute {
+      font-weight: 600;
+    }
+
+    .model-badge .ctx {
+      color: var(--fg-faint);
+      font-size: 11px;
+    }
+
+    /* Token-pressure gauge: lives next to the model badge in the topbar.
      Shows what fraction of llama-server's context window the most recent
      completion consumed. Color shifts green→yellow→red as pressure climbs. */
-  .token-gauge {
-    background: var(--bg-raise);
-    color: var(--fg-muted);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 3px 8px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 11px;
-    display: inline-flex; align-items: center; gap: 6px;
-    line-height: 1;
-  }
-  .token-gauge:hover { color: var(--fg); border-color: var(--fg-faint); }
-  .token-gauge .bar {
-    width: 60px; height: 6px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    overflow: hidden;
-    display: inline-block;
-  }
-  .token-gauge .bar .fill {
-    display: block;
-    height: 100%;
-    width: 0%;
-    background: var(--accent-agent);
-    transition: width 220ms ease, background-color 220ms ease;
-  }
-  .token-gauge.warn .fill { background: var(--accent-tool); }
-  .token-gauge.danger .fill { background: var(--accent-error); }
-  .token-gauge.empty { opacity: 0.55; }
-  .token-gauge.empty .fill { background: var(--fg-faint); }
-  .token-gauge .label { white-space: nowrap; }
+    .token-gauge {
+      background: var(--bg-raise);
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      line-height: 1;
+    }
 
-  /* Bigger version of the gauge inside the model modal — shows the same
+    .token-gauge:hover {
+      color: var(--fg);
+      border-color: var(--fg-faint);
+    }
+
+    .token-gauge .bar {
+      width: 60px;
+      height: 6px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .token-gauge .bar .fill {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--accent-agent);
+      transition: width 220ms ease, background-color 220ms ease;
+    }
+
+    .token-gauge.warn .fill {
+      background: var(--accent-tool);
+    }
+
+    .token-gauge.danger .fill {
+      background: var(--accent-error);
+    }
+
+    .token-gauge.empty {
+      opacity: 0.55;
+    }
+
+    .token-gauge.empty .fill {
+      background: var(--fg-faint);
+    }
+
+    .token-gauge .label {
+      white-space: nowrap;
+    }
+
+    /* Bigger version of the gauge inside the model modal — shows the same
      data with breakdown numbers underneath. */
-  #model-modal .usage-row {
-    display: flex; flex-direction: column; gap: 6px;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    background: var(--bg-raise);
-  }
-  #model-modal .usage-row .label {
-    font-size: 11px;
-    color: var(--fg-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    display: flex; justify-content: space-between; align-items: baseline;
-  }
-  #model-modal .usage-row .label .pct {
-    font-weight: 600;
-    color: var(--fg);
-    text-transform: none;
-    letter-spacing: 0;
-    font-size: 13px;
-  }
-  #model-modal .usage-row .bar {
-    height: 8px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  #model-modal .usage-row .bar .fill {
-    height: 100%; width: 0%;
-    background: var(--accent-agent);
-    transition: width 220ms ease, background-color 220ms ease;
-  }
-  #model-modal .usage-row.warn .fill { background: var(--accent-tool); }
-  #model-modal .usage-row.danger .fill { background: var(--accent-error); }
-  #model-modal .usage-row .breakdown {
-    font-size: 11px;
-    color: var(--fg-faint);
-    display: flex; justify-content: space-between;
-  }
-  #model-modal .usage-row .breakdown .none {
-    font-style: italic;
-  }
+    #model-modal .usage-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: var(--bg-raise);
+    }
 
-  /* Auto-reset toggle. Sits below the gauge so it's visually paired with
+    #model-modal .usage-row .label {
+      font-size: 11px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    #model-modal .usage-row .label .pct {
+      font-weight: 600;
+      color: var(--fg);
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 13px;
+    }
+
+    #model-modal .usage-row .bar {
+      height: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    #model-modal .usage-row .bar .fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-agent);
+      transition: width 220ms ease, background-color 220ms ease;
+    }
+
+    #model-modal .usage-row.warn .fill {
+      background: var(--accent-tool);
+    }
+
+    #model-modal .usage-row.danger .fill {
+      background: var(--accent-error);
+    }
+
+    #model-modal .usage-row .breakdown {
+      font-size: 11px;
+      color: var(--fg-faint);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #model-modal .usage-row .breakdown .none {
+      font-style: italic;
+    }
+
+    /* Auto-reset toggle. Sits below the gauge so it's visually paired with
      the pressure indicator — see pressure, decide what to do about it. */
-  #model-modal .auto-reset-row {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 8px 10px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-  }
-  #model-modal .auto-reset-row input[type="checkbox"] {
-    margin-top: 3px;
-    accent-color: var(--accent-agent);
-    cursor: pointer;
-  }
-  #model-modal .auto-reset-row .text {
-    display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0;
-    cursor: pointer;
-  }
-  #model-modal .auto-reset-row .label {
-    font-size: 12.5px;
-    color: var(--fg);
-  }
-  #model-modal .auto-reset-row .label .threshold-pct {
-    font-weight: 600;
-  }
-  #model-modal .auto-reset-row .hint {
-    font-size: 11px;
-    color: var(--fg-faint);
-    line-height: 1.4;
-  }
+    #model-modal .auto-reset-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+    }
 
-  /* System bubbles (auto-reset chrome + harness-driven prompts).
+    #model-modal .auto-reset-row input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: var(--accent-agent);
+      cursor: pointer;
+    }
+
+    #model-modal .auto-reset-row .text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    #model-modal .auto-reset-row .label {
+      font-size: 12.5px;
+      color: var(--fg);
+    }
+
+    #model-modal .auto-reset-row .label .threshold-pct {
+      font-weight: 600;
+    }
+
+    #model-modal .auto-reset-row .hint {
+      font-size: 11px;
+      color: var(--fg-faint);
+      line-height: 1.4;
+    }
+
+    /* System bubbles (auto-reset chrome + harness-driven prompts).
      Distinct from user/agent bubbles so it's clear the harness is talking,
      not the user typing or the model responding spontaneously. */
-  .msg.system, .msg.harness {
-    background: var(--bg-raise);
-    border: 1px dashed var(--border);
-    color: var(--fg-muted);
-    padding: 6px 12px;
-    border-radius: 4px;
-    margin: 8px 0;
-    font-size: 12px;
-  }
-  .msg.system .role, .msg.harness .role {
-    color: var(--fg-faint);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    margin-bottom: 2px;
-  }
-  .msg.system .body, .msg.harness .body {
-    color: var(--fg-muted);
-  }
-  /* The visible "reset divider" between auto-reset checkpoint phase and
-     the resumed conversation — gives the user a clean break. */
-  .reset-divider {
-    border: none;
-    border-top: 1px dashed var(--border);
-    margin: 18px 0;
-    position: relative;
-    overflow: visible;
-  }
-  .reset-divider::after {
-    content: 'auto-reset';
-    position: absolute;
-    top: -8px; left: 50%;
-    transform: translateX(-50%);
-    background: var(--bg);
-    color: var(--fg-faint);
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.7px;
-    padding: 0 8px;
-  }
+    .msg.system,
+    .msg.harness {
+      background: var(--bg-raise);
+      border: 1px dashed var(--border);
+      color: var(--fg-muted);
+      padding: 6px 12px;
+      border-radius: 4px;
+      margin: 8px 0;
+      font-size: 12px;
+    }
 
-  /* Reuse modal chrome from #ui-modal; the model modal has extra fields. */
-  #model-modal.hidden { display: none; }
-  #model-modal {
-    position: fixed; inset: 0; z-index: 1001;
-    display: flex; align-items: center; justify-content: center;
-  }
-  #model-modal .modal-backdrop {
-    position: absolute; inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-  }
-  #model-modal .modal-panel {
-    position: relative;
-    background: var(--bg-alt);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    min-width: 420px;
-    max-width: 520px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-  }
-  #model-modal .modal-head {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  #model-modal .modal-head h3 {
-    margin: 0;
-    color: var(--fg);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-  #model-modal .modal-close {
-    background: transparent; border: none;
-    color: var(--fg-muted);
-    font-size: 20px; line-height: 1;
-    cursor: pointer; padding: 0 4px;
-  }
-  #model-modal .modal-close:hover { color: var(--fg); }
-  #model-modal .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
-  #model-modal .model-list {
-    display: flex; flex-direction: column; gap: 4px;
-  }
-  #model-modal .model-option {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 10px;
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    cursor: pointer;
-    transition: border-color 120ms;
-  }
-  #model-modal .model-option:hover { border-color: var(--fg-faint); }
-  #model-modal .model-option.selected {
-    border-color: var(--accent-agent);
-    background: color-mix(in oklab, var(--accent-agent) 10%, transparent);
-  }
-  #model-modal .model-option.disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
-  #model-modal .model-option .cute {
-    font-weight: 600;
-    color: var(--fg);
-    min-width: 64px;
-  }
-  #model-modal .model-option .label { color: var(--fg-muted); flex: 1; font-size: 12.5px; }
-  #model-modal .model-option .size  { color: var(--fg-faint); font-size: 11px; }
-  #model-modal .model-option.disabled .size { font-style: italic; }
-  #model-modal .ctx-row {
-    display: flex; flex-direction: column; gap: 4px;
-  }
-  #model-modal .ctx-row .label {
-    font-size: 11px;
-    color: var(--fg-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    display: flex; justify-content: space-between;
-  }
-  #model-modal .ctx-row input[type="number"] {
-    background: var(--input-bg);
-    color: var(--fg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 6px 8px;
-    font-family: inherit;
-    font-size: 13px;
-  }
-  #model-modal .ctx-row .hint {
-    font-size: 11px;
-    color: var(--fg-faint);
-  }
-  #model-modal .apply-row {
-    display: flex; justify-content: flex-end; gap: 8px; align-items: center;
-  }
-  #model-modal .apply-btn {
-    background: color-mix(in oklab, var(--accent-agent) 20%, var(--bg-raise));
-    color: var(--fg);
-    border: 1px solid var(--accent-agent);
-    border-radius: 4px;
-    padding: 6px 14px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 12px;
-  }
-  #model-modal .apply-btn:hover { background: color-mix(in oklab, var(--accent-agent) 30%, var(--bg-raise)); }
-  #model-modal .apply-btn:disabled { opacity: 0.5; cursor: wait; }
-  #model-modal .switch-status {
-    color: var(--fg-faint);
-    font-size: 11px;
-    flex: 1;
-  }
-  #model-modal .switch-status.error { color: var(--accent-error); }
-  #model-modal .switch-status.ready { color: var(--accent-agent); }
-  #model-modal .modal-foot {
-    padding: 10px 16px;
-    border-top: 1px solid var(--border);
-    font-size: 11px;
-    color: var(--fg-faint);
-  }
-  #model-modal .modal-foot code {
-    color: var(--fg-muted);
-    background: var(--bg-raise);
-    padding: 1px 5px;
-    border-radius: 3px;
-    font-size: 11px;
-  }
-</style>
+    .msg.system .role,
+    .msg.harness .role {
+      color: var(--fg-faint);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 2px;
+    }
+
+    .msg.system .body,
+    .msg.harness .body {
+      color: var(--fg-muted);
+    }
+
+    /* The visible "reset divider" between auto-reset checkpoint phase and
+     the resumed conversation — gives the user a clean break. */
+    .reset-divider {
+      border: none;
+      border-top: 1px dashed var(--border);
+      margin: 18px 0;
+      position: relative;
+      overflow: visible;
+    }
+
+    .reset-divider::after {
+      content: 'auto-reset';
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg);
+      color: var(--fg-faint);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      padding: 0 8px;
+    }
+
+    /* Reuse modal chrome from #ui-modal; the model modal has extra fields. */
+    #model-modal.hidden {
+      display: none;
+    }
+
+    #model-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #model-modal .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    #model-modal .modal-panel {
+      position: relative;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 420px;
+      max-width: 520px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    #model-modal .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #model-modal .modal-head h3 {
+      margin: 0;
+      color: var(--fg);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    #model-modal .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--fg-muted);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    #model-modal .modal-close:hover {
+      color: var(--fg);
+    }
+
+    #model-modal .modal-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    #model-modal .model-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #model-modal .model-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: border-color 120ms;
+    }
+
+    #model-modal .model-option:hover {
+      border-color: var(--fg-faint);
+    }
+
+    #model-modal .model-option.selected {
+      border-color: var(--accent-agent);
+      background: color-mix(in oklab, var(--accent-agent) 10%, transparent);
+    }
+
+    #model-modal .model-option.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    #model-modal .model-option .cute {
+      font-weight: 600;
+      color: var(--fg);
+      min-width: 64px;
+    }
+
+    #model-modal .model-option .label {
+      color: var(--fg-muted);
+      flex: 1;
+      font-size: 12.5px;
+    }
+
+    #model-modal .model-option .size {
+      color: var(--fg-faint);
+      font-size: 11px;
+    }
+
+    #model-modal .model-option.disabled .size {
+      font-style: italic;
+    }
+
+    #model-modal .ctx-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #model-modal .ctx-row .label {
+      font-size: 11px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #model-modal .ctx-row input[type="number"] {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    #model-modal .ctx-row .hint {
+      font-size: 11px;
+      color: var(--fg-faint);
+    }
+
+    #model-modal .apply-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #model-modal .apply-btn {
+      background: color-mix(in oklab, var(--accent-agent) 20%, var(--bg-raise));
+      color: var(--fg);
+      border: 1px solid var(--accent-agent);
+      border-radius: 4px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+    }
+
+    #model-modal .apply-btn:hover {
+      background: color-mix(in oklab, var(--accent-agent) 30%, var(--bg-raise));
+    }
+
+    #model-modal .apply-btn:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+
+    #model-modal .switch-status {
+      color: var(--fg-faint);
+      font-size: 11px;
+      flex: 1;
+    }
+
+    #model-modal .switch-status.error {
+      color: var(--accent-error);
+    }
+
+    #model-modal .switch-status.ready {
+      color: var(--accent-agent);
+    }
+
+    #model-modal .modal-foot {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--fg-faint);
+    }
+
+    #model-modal .modal-foot code {
+      color: var(--fg-muted);
+      background: var(--bg-raise);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="topbar">
-  <div class="brand">enough<span class="dim"><!-- VERSION --></span></div>
-  <button id="ui-btn" title="UI preferences (theme, font)">ui</button>
-  <button id="toggle-sidebar" title="Show/hide the sidebar">≡ files</button>
-  <button id="model-badge" class="model-badge off" title="Model &amp; context window">
-    <span class="dot"></span>
-    <span class="cute">…</span>
-    <span class="ctx"></span>
-  </button>
-  <button id="token-gauge" class="token-gauge empty" title="Token pressure on the context window — last completion's prompt + response. Click to open model settings.">
-    <span class="bar"><span class="fill"></span></span>
-    <span class="label">—</span>
-  </button>
-</div>
+  <div class="topbar">
+    <div class="brand">enough<span class="dim"><!-- VERSION --></span></div>
+    <button id="ui-btn" title="UI preferences (theme, font)">ui</button>
+    <button id="toggle-sidebar" title="Show/hide the sidebar">≡ files</button>
+    <button id="model-badge" class="model-badge off" title="Model &amp; context window">
+      <span class="dot"></span>
+      <span class="cute">…</span>
+      <span class="ctx"></span>
+    </button>
+    <button id="token-gauge" class="token-gauge empty"
+      title="Token pressure on the context window — last completion's prompt + response. Click to open model settings.">
+      <span class="bar"><span class="fill"></span></span>
+      <span class="label">—</span>
+    </button>
+  </div>
 
-<div class="layout" id="layout">
-  <aside class="sidebar" tabindex="0">
-    <section class="sidebar-section" data-section="requests">
-      <h3 class="section-head" data-help="requests"><span class="zippy">▾</span>requests</h3>
-      <div class="section-body">
-        <div id="requests-list" hx-get="/api/requests" hx-trigger="load, every 10s, requests-refresh from:body" hx-swap="innerHTML">
-          <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+  <div class="layout" id="layout">
+    <aside class="sidebar" tabindex="0">
+      <section class="sidebar-section" data-section="requests">
+        <h3 class="section-head" data-help="requests"><span class="zippy">▾</span>requests</h3>
+        <div class="section-body">
+          <div id="requests-list" hx-get="/api/requests" hx-trigger="load, every 10s, requests-refresh from:body"
+            hx-swap="innerHTML">
+            <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sidebar-section" data-section="skills">
+        <h3 class="section-head" data-help="skills"><span class="zippy">▾</span>active skills</h3>
+        <div class="section-body">
+          <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
+            <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sidebar-section collapsed" data-section="roles">
+        <h3 class="section-head" data-help="roles"><span class="zippy">▾</span>roles</h3>
+        <div class="section-body">
+          <div id="roles-list" hx-get="/api/roles" hx-trigger="load, every 10s" hx-swap="innerHTML">
+            <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sidebar-section" data-section="project">
+        <h3 class="section-head"><span class="zippy">▾</span>project</h3>
+        <div class="section-body">
+          <div id="tree" hx-get="/api/files" hx-trigger="load, every 3s" hx-swap="innerHTML">
+            <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="content">
+      <div id="conversation" class="conversation">
+        <!-- HISTORY -->
+        <!-- EMPTY_HINT -->
+      </div>
+
+      <div class="input-dock">
+        <form id="chat-form" class="input-form" hx-post="/api/chat" hx-target="#conversation" hx-swap="beforeend"
+          hx-on::after-request="document.getElementById('message').value=''; document.getElementById('empty-hint')?.remove(); autoscroll();">
+          <textarea id="message" name="message" placeholder="message… (shift+enter for newline)" rows="1"
+            autofocus></textarea>
+          <button type="submit" id="send-btn">send</button>
+          <button type="button" id="mic-btn" class="mic-btn" title="voice input (local whisper.cpp)">
+            <span class="mic-icon">🎤</span>
+          </button>
+        </form>
+      </div>
+
+      <div id="preview">
+        <div class="preview-header">
+          <span class="title">preview</span>
+          <button class="close" onclick="document.getElementById('preview').classList.remove('open')">×</button>
+        </div>
+        <div id="preview-body"></div>
+      </div>
+
+      <div id="help-viewer" aria-hidden="true">
+        <div class="help-header">
+          <span class="title">help</span>
+          <button class="close" onclick="closeHelp()" aria-label="close help">×</button>
+        </div>
+        <div id="help-body"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Model + context modal -->
+  <div id="model-modal" class="hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeModelModal()"></div>
+    <div class="modal-panel" role="dialog" aria-labelledby="model-modal-title">
+      <div class="modal-head">
+        <h3 id="model-modal-title">model &amp; context</h3>
+        <button class="modal-close" onclick="closeModelModal()" aria-label="close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="usage-row" id="modal-usage-row">
+          <div class="label">
+            <span>token pressure (last completion)</span>
+            <span class="pct" id="modal-usage-pct">—</span>
+          </div>
+          <div class="bar"><span class="fill" id="modal-usage-fill"></span></div>
+          <div class="breakdown" id="modal-usage-breakdown">
+            <span class="none">no data yet — send a message first.</span>
+          </div>
+        </div>
+        <label class="auto-reset-row">
+          <input type="checkbox" id="auto-reset-toggle">
+          <span class="text">
+            <span class="label">auto-reset at <span class="threshold-pct" id="auto-reset-threshold">75</span>%
+              pressure</span>
+            <span class="hint">when the gauge crosses the threshold, the agent writes a Continuation block to its active
+              request file, the conversation clears, and it resumes from the checkpoint. experimental — leave off if you
+              want full manual control.</span>
+          </span>
+        </label>
+        <div class="model-list" id="model-list">
+          <!-- rendered from /api/models -->
+        </div>
+        <div class="ctx-row">
+          <div class="label">context window <span id="ctx-hint-min-max">(min 2048, max 131072)</span></div>
+          <input type="number" id="ctx-input" min="2048" max="131072" step="1024">
+          <div class="hint" id="ctx-hint">recommended for this model + your RAM: <span id="ctx-recommended">—</span>
+          </div>
+        </div>
+        <div class="apply-row">
+          <span class="switch-status" id="switch-status"></span>
+          <button class="apply-btn" id="apply-model-btn" onclick="applyModel()">apply &amp; restart</button>
         </div>
       </div>
-    </section>
-
-    <section class="sidebar-section" data-section="skills">
-      <h3 class="section-head" data-help="skills"><span class="zippy">▾</span>active skills</h3>
-      <div class="section-body">
-        <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
-          <div style="color: var(--fg-faint); padding: 8px">loading…</div>
-        </div>
+      <div class="modal-foot">
+        switching unloads the current model from RAM, loads the new one, and
+        clears the in-memory conversation. request history on disk (session
+        logs, requests) is preserved.
       </div>
-    </section>
-
-    <section class="sidebar-section collapsed" data-section="roles">
-      <h3 class="section-head" data-help="roles"><span class="zippy">▾</span>roles</h3>
-      <div class="section-body">
-        <div id="roles-list" hx-get="/api/roles" hx-trigger="load, every 10s" hx-swap="innerHTML">
-          <div style="color: var(--fg-faint); padding: 8px">loading…</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="sidebar-section" data-section="project">
-      <h3 class="section-head"><span class="zippy">▾</span>project</h3>
-      <div class="section-body">
-        <div id="tree" hx-get="/api/files" hx-trigger="load, every 3s" hx-swap="innerHTML">
-          <div style="color: var(--fg-faint); padding: 8px">loading…</div>
-        </div>
-      </div>
-    </section>
-  </aside>
-
-  <main class="content">
-    <div id="conversation" class="conversation">
-      <!-- HISTORY -->
-      <!-- EMPTY_HINT -->
-    </div>
-
-    <div class="input-dock">
-      <form id="chat-form" class="input-form"
-            hx-post="/api/chat"
-            hx-target="#conversation"
-            hx-swap="beforeend"
-            hx-on::after-request="document.getElementById('message').value=''; document.getElementById('empty-hint')?.remove(); autoscroll();">
-        <textarea id="message" name="message" placeholder="message… (shift+enter for newline)"
-                  rows="1" autofocus></textarea>
-        <button type="submit" id="send-btn">send</button>
-        <button type="button" id="mic-btn" class="mic-btn" title="voice input (local whisper.cpp)">
-          <span class="mic-icon">🎤</span>
-        </button>
-      </form>
-    </div>
-
-    <div id="preview">
-      <div class="preview-header">
-        <span class="title">preview</span>
-        <button class="close" onclick="document.getElementById('preview').classList.remove('open')">×</button>
-      </div>
-      <div id="preview-body"></div>
-    </div>
-
-    <div id="help-viewer" aria-hidden="true">
-      <div class="help-header">
-        <span class="title">help</span>
-        <button class="close" onclick="closeHelp()" aria-label="close help">×</button>
-      </div>
-      <div id="help-body"></div>
-    </div>
-  </main>
-</div>
-
-<!-- Model + context modal -->
-<div id="model-modal" class="hidden" aria-hidden="true">
-  <div class="modal-backdrop" onclick="closeModelModal()"></div>
-  <div class="modal-panel" role="dialog" aria-labelledby="model-modal-title">
-    <div class="modal-head">
-      <h3 id="model-modal-title">model &amp; context</h3>
-      <button class="modal-close" onclick="closeModelModal()" aria-label="close">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="usage-row" id="modal-usage-row">
-        <div class="label">
-          <span>token pressure (last completion)</span>
-          <span class="pct" id="modal-usage-pct">—</span>
-        </div>
-        <div class="bar"><span class="fill" id="modal-usage-fill"></span></div>
-        <div class="breakdown" id="modal-usage-breakdown">
-          <span class="none">no data yet — send a message first.</span>
-        </div>
-      </div>
-      <label class="auto-reset-row">
-        <input type="checkbox" id="auto-reset-toggle">
-        <span class="text">
-          <span class="label">auto-reset at <span class="threshold-pct" id="auto-reset-threshold">75</span>% pressure</span>
-          <span class="hint">when the gauge crosses the threshold, the agent writes a Continuation block to its active request file, the conversation clears, and it resumes from the checkpoint. experimental — leave off if you want full manual control.</span>
-        </span>
-      </label>
-      <div class="model-list" id="model-list">
-        <!-- rendered from /api/models -->
-      </div>
-      <div class="ctx-row">
-        <div class="label">context window <span id="ctx-hint-min-max">(min 2048, max 131072)</span></div>
-        <input type="number" id="ctx-input" min="2048" max="131072" step="1024">
-        <div class="hint" id="ctx-hint">recommended for this model + your RAM: <span id="ctx-recommended">—</span></div>
-      </div>
-      <div class="apply-row">
-        <span class="switch-status" id="switch-status"></span>
-        <button class="apply-btn" id="apply-model-btn" onclick="applyModel()">apply &amp; restart</button>
-      </div>
-    </div>
-    <div class="modal-foot">
-      switching unloads the current model from RAM, loads the new one, and
-      clears the in-memory conversation. request history on disk (session
-      logs, requests) is preserved.
     </div>
   </div>
-</div>
 
-<!-- UI preferences modal -->
-<div id="ui-modal" class="hidden" aria-hidden="true">
-  <div class="modal-backdrop" onclick="closeUIModal()"></div>
-  <div class="modal-panel" role="dialog" aria-labelledby="ui-modal-title">
-    <div class="modal-head">
-      <h3 id="ui-modal-title">UI preferences</h3>
-      <button class="modal-close" onclick="closeUIModal()" aria-label="close">×</button>
-    </div>
-    <div class="modal-body">
-      <label>
-        <div class="label">theme</div>
-        <select id="ui-theme"></select>
-      </label>
-      <label>
-        <div class="label">font</div>
-        <select id="ui-font"></select>
-      </label>
-    </div>
-    <div class="modal-foot">
-      for zoom, use your browser's native zoom (<kbd>⌘+</kbd>/<kbd>⌘-</kbd>).<br>
-      add more themes or fonts by editing <code>~/enough/config/ui.json</code>
+  <!-- UI preferences modal -->
+  <div id="ui-modal" class="hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeUIModal()"></div>
+    <div class="modal-panel" role="dialog" aria-labelledby="ui-modal-title">
+      <div class="modal-head">
+        <h3 id="ui-modal-title">UI preferences</h3>
+        <button class="modal-close" onclick="closeUIModal()" aria-label="close">×</button>
+      </div>
+      <div class="modal-body">
+        <label>
+          <div class="label">theme</div>
+          <select id="ui-theme"></select>
+        </label>
+        <label>
+          <div class="label">font</div>
+          <select id="ui-font"></select>
+        </label>
+      </div>
+      <div class="modal-foot">
+        for zoom, use your browser's native zoom (<kbd>⌘+</kbd>/<kbd>⌘-</kbd>).<br>
+        add more themes or fonts by editing <code>~/enough/config/ui.json</code>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-  // ---------- Help affordance: hover-to-reveal [?], click for full panel ----------
-  // 1s hover before [?] appears, stays for 5s after the cursor leaves the row
-  // (or the [?] itself). Click opens a themed right-side viewer with three
-  // sections: what / how / ideas.
-  const HELP_DOCS = {
-    'requests': {
-      name: 'requests',
-      path: '.rness/.requests/',
-      what: 'Persistent task containers. Each request is a markdown file capturing a goal, the agent\'s reasoning so far, and a continuation block so work can resume across context resets — these are the unit of long-running effort in enough.',
-      how: 'New requests appear here automatically as you and the agent work. Click one to view it in the file panel; from there you can mark it done (it moves to <code>.rness/.requests/done/</code>) or customize. To start a request manually, drop a markdown file into <code>.rness/.requests/</code> with a brief goal at the top.',
-      ideas: [
-        'Treat a request as a long-running project — break a vague intent into one and let the agent flesh it out across multiple sessions.',
-        'Use <code>done/</code> as a journal of what you\'ve actually shipped.',
-        'When auto-reset checkpoints, the agent writes a Continuation block to the active request — read it before resuming if you want to redirect.',
-      ],
-    },
-    'skills': {
-      name: 'active skills',
-      path: '.rness/.skills/',
-      what: 'Per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. Active skills add vocabulary, recipes, or behaviors the agent will reach for during conversation.',
-      how: 'Click ● / ○ to toggle a skill on or off for this project. To install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). Edit a skill at the source and the change propagates everywhere it\'s symlinked.',
-      ideas: [
-        'Pair 2–3 task-specific skills for a focused session — one investigative, one stylistic, one for the actual output.',
-        'Build a personal skill that captures your house style or domain conventions.',
-        'Turn everything off for raw conversation — sometimes the base model breathes better with no scaffolding.',
-      ],
-    },
-    'roles': {
-      name: 'roles',
-      path: '.rness/.roles/',
-      what: 'Consultant agents you can summon in conversation, sourced from <code>~/enough/defaults/roles/</code>. Each role is a folder containing AGENT.md (instructions) and MOTIVATION.md (drives) — the same shape that defines the main agent, but scoped to a persona.',
-      how: 'Click ● / ○ to enable a role for this project. Add new roles globally by creating <code>~/enough/defaults/roles/&lt;name&gt;/</code> with AGENT.md and MOTIVATION.md inside. Edits propagate from the source, just like skills.',
-      ideas: [
-        'A "code reviewer" who gives PR-style feedback without rewriting your work.',
-        'A "rubber duck" that asks Socratic questions instead of answering.',
-        'A domain expert (legal, design, copy) whose voice you don\'t want to learn yourself.',
-      ],
-    },
-    'rness': {
-      name: '.rness/',
-      path: '.rness/',
-      what: 'The project\'s working room — every config, instruction, knowledge file, and history log the agent uses for this project. The leading dot keeps it hidden from <code>ls</code>; this UI shows it as a normal folder.',
-      how: 'Most contents are symlinks to <code>~/enough/defaults/</code> and update centrally. To diverge for this project alone, open a file and click <em>customize</em> — it becomes a real local copy. Add new files freely; the agent will discover them on its next turn.',
-      ideas: [
-        'Commit <code>.rness/</code> to git so collaborators (human and agent) share project context.',
-        'Treat it as living documentation — what would a new teammate need to know?',
-        'Periodically prune stale knowledge so the agent doesn\'t cite obsolete decisions.',
-      ],
-    },
-    'agent-md': {
-      name: 'AGENT.md',
-      path: '.rness/AGENT.md',
-      what: 'The agent\'s working instructions for this project. Read every turn alongside MOTIVATION.md. Everything in here shapes how the agent talks, what it does, and what it avoids.',
-      how: 'Click the file to view it; hit <em>customize</em> to fork a project-local copy and edit. Or open <code>.rness/AGENT.md</code> in any editor — changes take effect on the next message.',
-      ideas: [
-        'Add project-specific guardrails (e.g., "always run pytest before claiming a fix works").',
-        'Name the conventions of this codebase so the agent doesn\'t have to guess.',
-        'Encode the collaboration style you want — terse, exploratory, deferential, blunt.',
-      ],
-    },
-    'motivation-md': {
-      name: 'MOTIVATION.md',
-      path: '.rness/MOTIVATION.md',
-      what: 'The agent\'s "why" for this project — values, priorities, and goals beyond the literal task list. Read alongside AGENT.md every turn.',
-      how: 'Same as AGENT.md — click to preview, customize for a project-local copy, or edit the file directly.',
-      ideas: [
-        'Spell out tradeoffs you care about: correctness over speed, brevity over thoroughness, etc.',
-        'Name the user-facing experience the project aims for, in your own words.',
-        'Describe what "done" feels like — the agent will calibrate its sense of progress against that.',
-      ],
-    },
-    'paradigms': {
-      name: 'paradigms/',
-      path: '.rness/paradigms/',
-      what: 'Reasoning frameworks the agent uses. Each paradigm is a markdown file describing a way to approach problems — heuristics, decision criteria, when to ask vs. act.',
-      how: 'Symlinked from <code>~/enough/defaults/paradigms/</code>. Edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. New paradigms can be added simply by dropping a markdown file into the defaults folder.',
-      ideas: [
-        'Write paradigms for distinct modes — exploration vs. execution, brainstorm vs. critique.',
-        'Codify your debugging methodology so the agent doesn\'t reinvent it.',
-        'Encode how to weigh tests vs. shipping for the kind of work you do.',
-      ],
-    },
-    'policies': {
-      name: 'policies/',
-      path: '.rness/policies/',
-      what: 'Hard rules the agent must follow — what tools to use, which files it can read or write, how to format requests, how to handle context-window pressure, and which paths are allowlisted.',
-      how: 'Symlinked from <code>~/enough/defaults/policies/</code>. Edit globally to update the rules for every project, or customize per-project. Allowlists in particular are the most common thing to tune locally.',
-      ideas: [
-        'Tighten the read/write allowlist when working with secrets or sensitive code.',
-        'Add a policy for how to handle long-running scripts or background processes.',
-        'Define your own checkpoint format if the default Continuation block doesn\'t fit.',
-      ],
-    },
-    'models': {
-      name: 'models/',
-      path: '.rness/models/',
-      what: 'Model and provider configuration. <code>providers.md</code> documents which local or remote LLMs are available and what each is best at, so the agent can recommend or switch wisely.',
-      how: 'Symlinked from <code>~/enough/defaults/models/</code>. Edit globally to add new model entries. Note: the live ctx-size and current model are managed separately via the model picker in the top bar.',
-      ideas: [
-        'Document your machine\'s actual model loadout so the agent picks well.',
-        'Note context-window quirks for each model — some handle long context worse than the spec implies.',
-        'Record your own latency/quality tradeoffs as a hint for the agent.',
-      ],
-    },
-    'knowledge': {
-      name: 'knowledge/',
-      path: '.rness/knowledge/',
-      what: 'Project-specific knowledge that doesn\'t belong in code: <code>user-profile.md</code> (what the agent has learned about you for this project) and <code>session-logs/</code> (every turn\'s prompt and response, saved as markdown).',
-      how: '<code>user-profile.md</code> is a real file — both the agent and you can edit it. Session logs are append-only. Add new subfolders for any project-local memory you want the agent to consult.',
-      ideas: [
-        'Maintain a glossary subfolder for project-specific jargon.',
-        'Let the agent write a "lessons learned" file as you fix bugs together.',
-        'Archive old session logs periodically so grep stays fast.',
-      ],
-    },
-    'io': {
-      name: 'io/',
-      path: '.rness/io/',
-      what: 'Scratch space for files the agent reads from (<code>input/</code>) or writes to (<code>output/</code>). Useful when you want the agent to process a file without polluting the project root.',
-      how: 'Drop files into <code>.rness/io/input/</code> and the agent will see them. Anything the agent generates lands in <code>.rness/io/output/</code> — review and move what you want to keep, then clear the rest.',
-      ideas: [
-        'Drop a CSV or transcript into <code>input/</code> and ask the agent to summarize.',
-        'Collect multiple draft outputs in <code>output/</code> and pick the best one.',
-        'Clear both periodically — the agent doesn\'t need yesterday\'s scratch work in its context.',
-      ],
-    },
-    'infoworld': {
-      name: 'infoworld/',
-      path: 'infoworld/ → ~/enough/infoworld/',
-      what: 'A grounded-knowledge store shared across every enough project on this machine. Symlinked into each project so the agent has a common factual substrate. Three subdirs: <code>wiki/</code> (Wikipedia dumps), <code>personal/</code> (your reference material), <code>public/</code> (shareable refs).',
-      how: 'Add files via your filesystem — drop markdown, txt, or extracted Wikipedia text into the appropriate subdir. The agent greps these files before answering from training data. There\'s no UI for editing; the filesystem is the interface.',
-      ideas: [
-        'Stash meeting notes in <code>personal/</code> to make them queryable from any project.',
-        'Download a topic-specific Wikipedia dump (history, pharmacology, music theory) for a research project.',
-        'Keep style guides, contracts, or reference bibles in <code>public/</code> for the agent to cite.',
-      ],
-    },
-  };
+  <script>
+    // ---------- Help affordance: hover-to-reveal [?], click for full panel ----------
+    // 1s hover before [?] appears, stays for 5s after the cursor leaves the row
+    // (or the [?] itself). Click opens a themed right-side viewer with three
+    // sections: what / how / ideas.
+    const HELP_DOCS = {
+      'requests': {
+        name: 'requests',
+        path: '.rness/.requests/',
+        what: 'persistent task and sub-task containers. each request is a markdown file capturing the goal of your request, the agent\'s reasoning so far, and a continuation block so work can resume across context resets — these are the unit of long-running effort in enough. they are also helpful to continue work if you hit a context window.',
+        how: 'new requests appear here automatically as you and the agent work. click one to view it in the file panel; from there you can mark it done (it moves to <code>.rness/.requests/done/</code>) or customize. to start a request manually, drop a markdown file into your project\'s <code>.rness/.requests/</code> with a brief goal at the top.',
+        ideas: [
+          'treat a request as a long-running project — break a vague intent into one and let the agent flesh it out across multiple sessions.',
+          'use requests in your project\'s <code>.rness/.requests/done/</code> folder as a journal of what you\'ve actually completed.',
+          'at context window auto-reset checkpoints, the agent writes a Continuation block to the active request — read it before resuming if you want to redirect.',
+        ],
+      },
+      'skills': {
+        name: 'active skills',
+        path: '.rness/.skills/',
+        what: 'per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. active skills add vocabulary, recipes, or behaviors the agent will reach for during conversation.',
+        how: 'click ● / ○ to toggle a skill on or off for this project. you can add project-level skills to <code>.rness/.skills/</code> — skill statuses are saved per project. to install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). edit a global skill at the source and the change propagates everywhere it\'s symlinked.',
+        ideas: [
+          'pair 2–3 task-specific skills for a focused session — one investigative, one stylistic, one for the actual output.',
+          'build a personal skill that captures your house style or domain conventions.',
+          'turn everything off for a pure conversation — sometimes the model has more breathing room for emergent epiphanies with no scaffolding.',
+        ],
+      },
+      'roles': {
+        name: 'roles',
+        path: '.rness/.roles/',
+        what: 'consultant agents you can summon in conversation, sourced from <code>~/enough/defaults/roles/</code>. each role is a folder containing AGENT.md (instructions) and MOTIVATION.md (drives) — the same pair of files that defines the main agent, but scoped to a complementary (or adversarial) persona.',
+        how: 'click ● / ○ to enable a role for this project. add new roles globally by creating <code>~/enough/defaults/roles/&lt;name&gt;/</code> with AGENT.md and MOTIVATION.md inside; project-level works and edits propagate, just like skills.',
+        ideas: [
+          'open-skeptic is included; this role can be helpful to poke holes in your brilliant ideas.',
+          'build a "rubber duck" that asks Socratic questions instead of answering.',
+          'use your knowledge base\'s files to craft a domain expert (legal, design, copy).',
+        ],
+      },
+      'rness': {
+        name: '.rness/',
+        path: '.rness/',
+        what: 'the project\'s working room — every config, instruction, knowledge file, and history log the agent uses for this project. the leading dot keeps it hidden in your system\'s file manager; the enough UI shows it as a normal folder.',
+        how: 'some contents are symlinks to <code>~/enough/defaults/</code> and update centrally. to diverge for a project, open a file and click <em>customize</em> — it becomes a project-local copy. add new files freely via conversations or your system\'s file manager; the agent will discover any files added locally on its next turn.',
+        ideas: [
+          'get to know the components that drive your enough workflow and edit them wherever you like.',
+          'treat it as living documentation — what would a new teammate or agent or role need to know?',
+          'periodically prune stale knowledge so the agent doesn\'t cite obsolete decisions.',
+        ],
+      },
+      'agent-md': {
+        name: 'AGENT.md',
+        path: '.rness/AGENT.md',
+        what: 'the agent\'s working instructions for this project. used for every turn alongside MOTIVATION.md. everything in here shapes how the agent talks, what it does, and what it avoids.',
+        how: 'click the file to view it; hit <em>customize</em> to fork a project-local copy and edit. or open <code>.rness/AGENT.md</code> in any editor — saved changes take effect on the next message.',
+        ideas: [
+          'add project-specific guardrails (e.g., "always double-check both spelling and factuality before finalzing an edit").',
+          'list the naming conventions of your project so the agent doesn\'t have to guess (or hallucinnovate).',
+          'encode the collaboration style you want — terse, exploratory, deferential, blunt.',
+        ],
+      },
+      'motivation-md': {
+        name: 'MOTIVATION.md',
+        path: '.rness/MOTIVATION.md',
+        what: 'the agent\'s "why" for this project — values, priorities, and goals beyond the literal task list. used alongside AGENT.md every turn.',
+        how: 'same as AGENT.md — click to preview, customize for a project-local copy, or edit the file directly.',
+        ideas: [
+          'spell out tradeoffs you care about: correctness over speed, brevity over thoroughness, etc.',
+          'name the user-facing experience the project aims for, in your own words.',
+          'describe what "done" feels like — the agent will calibrate its sense of progress against that.',
+        ],
+      },
+      'paradigms': {
+        name: 'paradigms/',
+        path: '.rness/paradigms/',
+        what: 'reasoning frameworks the agent uses. each paradigm is a markdown file describing a way to approach problems — heuristics, decision criteria, when to ask vs. act.',
+        how: 'symlinked from <code>~/enough/defaults/paradigms/</code>. edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. new paradigms can be added simply by dropping a markdown file into the defaults folder.',
+        ideas: [
+          'write paradigms for distinct modes — exploration vs. execution, brainstorm vs. critique.',
+          'codify your preferred working styles so the agent can better accommodate them.',
+          'encode how to weigh proofing vs. polishing, or testing vs. shipping, for the kind of work you do.',
+        ],
+      },
+      'policies': {
+        name: 'policies/',
+        path: '.rness/policies/',
+        what: 'hard rules the agent must follow — what tools to use, which files it can read or write, how to format requests, how to handle context-window pressure, and which paths are allowlisted.',
+        how: 'symlinked from <code>~/enough/defaults/policies/</code>. edit globally to update the rules for every project, or customize per-project. allowlists in particular are the most common thing to tune locally, and both local paths and web URLs need to be explicitly listed.',
+        ideas: [
+          'tighten the read/write allowlist when working with secrets or sensitive code.',
+          'add a policy for how to handle long-running scripts or background processes.',
+          'define your own checkpoint format if the default Continuation block doesn\'t fit.',
+        ],
+      },
+      'models': {
+        name: 'models/',
+        path: '.rness/models/',
+        what: 'model and provider configuration. <code>providers.md</code> documents which local or remote LLMs are available and what each is best at, so the agent can recommend or switch wisely.',
+        how: 'symlinked from <code>~/enough/defaults/models/</code>. Edit globally to add new model entries. Note: the live ctx-size and current model are managed separately via the model picker in the top bar.',
+        ideas: [
+          'document your machine\'s actual model loadout so the agent picks well.',
+          'note context-window quirks for each model — some handle long context worse than the spec implies.',
+          'record your own latency/quality tradeoffs as a hint for the agent.',
+        ],
+      },
+      'knowledge': {
+        name: 'knowledge/',
+        path: '.rness/knowledge/',
+        what: 'project-specific knowledge that doesn\'t belong in <code>.rness/io/</code>: always contains <code>user-profile.md</code> (what the agent has learned about you for this project) and <code>session-logs/</code> (each turn\'s prompt and response, saved as markdown).',
+        how: '<code>user-profile.md</code> is a real file — both the agent and you can edit it. session logs are append-only. add new subfolders for any project-local memory you want the agent to consult.',
+        ideas: [
+          'maintain a glossary subfolder for project-specific jargon.',
+          'let the agent write a "lessons learned" file as you iterate together.',
+          'archive old session logs periodically so agent searches stay fast.',
+        ],
+      },
+      'io': {
+        name: 'io/',
+        path: '.rness/io/',
+        what: 'scratch space for files the agent reads from (<code>input/</code>) or writes to (<code>output/</code>). useful when you want the agent to process a file without polluting the project root.',
+        how: 'drop files into <code>.rness/io/input/</code> and the agent will see them. anything the agent generates lands in <code>.rness/io/output/</code> — review and move what you want to keep, then clear the rest.',
+        ideas: [
+          'drop a CSV or transcript into <code>input/</code> and ask the agent to summarize.',
+          'collect multiple draft outputs in <code>output/</code> and pick the best one.',
+          'clear both periodically — the agent doesn\'t need yesterday\'s scratch work in its context.',
+        ],
+      },
+      'infoworld': {
+        name: 'infoworld/',
+        path: 'infoworld/ → ~/enough/infoworld/',
+        what: 'a grounded-knowledge store shared across every enough project on this machine. symlinked into each project so the agent has a common factual substrate. three subdirectories: <code>wiki/</code> (Wikipedia dumps or your own wiki content), <code>personal/</code> (your reference material), <code>public/</code> (shareable content, though don\'t worry, nobody can see these files unless you share them somewhere :).',
+        how: 'add files via your filesystem — drop markdown, txt, or extracted Wikipedia text into the appropriate subdir. the agent sees these files before answering from its internal data. there\'s no UI for editing; the your system\'s file manager is the way.',
+        ideas: [
+          'stash meeting notes in <code>personal/</code> to make them queryable from any project.',
+          'download a topic-specific Wikipedia dump (history, pharmacology, music theory) for a research project.',
+          'keep style guides, contracts, or reference bibles in <code>public/</code> for the agent to cite.',
+        ],
+      },
+    };
 
-  function helpDocToHtml(doc) {
-    const liItems = (doc.ideas || []).map(s => `<li>${s}</li>`).join('');
-    return (
-      `<h1>${doc.name}</h1>` +
-      `<div class="help-path">${doc.path}</div>` +
-      `<h2>what it is</h2><p>${doc.what}</p>` +
-      `<h2>how to use it</h2><p>${doc.how}</p>` +
-      `<h2>ideas</h2><ul>${liItems}</ul>`
-    );
-  }
-
-  function openHelp(id) {
-    const doc = HELP_DOCS[id];
-    if (!doc) return;
-    document.getElementById('help-body').innerHTML = helpDocToHtml(doc);
-    const v = document.getElementById('help-viewer');
-    v.classList.add('open');
-    v.setAttribute('aria-hidden', 'false');
-    // Mutually exclusive with the file preview pane.
-    document.getElementById('preview').classList.remove('open');
-  }
-
-  function closeHelp() {
-    const v = document.getElementById('help-viewer');
-    v.classList.remove('open');
-    v.setAttribute('aria-hidden', 'true');
-  }
-  window.openHelp = openHelp;
-  window.closeHelp = closeHelp;
-
-  // Hover-delay state lives on the row element itself (no global Map needed),
-  // so HTMX swaps that destroy the row also destroy the timers.
-  function _scheduleHelpShow(row) {
-    if (row._helpFadeTimer) {
-      clearTimeout(row._helpFadeTimer);
-      row._helpFadeTimer = null;
+    function helpDocToHtml(doc) {
+      const liItems = (doc.ideas || []).map(s => `<li>${s}</li>`).join('');
+      return (
+        `<h1>${doc.name}</h1>` +
+        `<div class="help-path">${doc.path}</div>` +
+        `<h2>what it is</h2><p>${doc.what}</p>` +
+        `<h2>how to use it</h2><p>${doc.how}</p>` +
+        `<h2>ideas</h2><ul>${liItems}</ul>`
+      );
     }
-    if (row._helpButton && row._helpButton.classList.contains('shown')) return;
-    if (row._helpShowTimer) return;
-    row._helpShowTimer = setTimeout(() => {
-      row._helpShowTimer = null;
-      let btn = row._helpButton;
-      if (!btn) {
-        btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'help-trigger';
-        btn.textContent = '?';
-        btn.setAttribute('aria-label', 'help');
-        btn.addEventListener('click', (ev) => {
-          ev.stopPropagation();
-          ev.preventDefault();
-          openHelp(row.dataset.help);
-        });
-        row.appendChild(btn);
-        row._helpButton = btn;
+
+    function openHelp(id) {
+      const doc = HELP_DOCS[id];
+      if (!doc) return;
+      document.getElementById('help-body').innerHTML = helpDocToHtml(doc);
+      const v = document.getElementById('help-viewer');
+      v.classList.add('open');
+      v.setAttribute('aria-hidden', 'false');
+      // Mutually exclusive with the file preview pane.
+      document.getElementById('preview').classList.remove('open');
+    }
+
+    function closeHelp() {
+      const v = document.getElementById('help-viewer');
+      v.classList.remove('open');
+      v.setAttribute('aria-hidden', 'true');
+    }
+    window.openHelp = openHelp;
+    window.closeHelp = closeHelp;
+
+    // Hover-delay state lives on the row element itself (no global Map needed),
+    // so HTMX swaps that destroy the row also destroy the timers.
+    function _scheduleHelpShow(row) {
+      if (row._helpFadeTimer) {
+        clearTimeout(row._helpFadeTimer);
+        row._helpFadeTimer = null;
       }
-      requestAnimationFrame(() => btn.classList.add('shown'));
-    }, 1000);
-  }
-
-  function _scheduleHelpFade(row) {
-    if (row._helpShowTimer) {
-      clearTimeout(row._helpShowTimer);
-      row._helpShowTimer = null;
-    }
-    if (!row._helpButton || !row._helpButton.classList.contains('shown')) return;
-    if (row._helpFadeTimer) clearTimeout(row._helpFadeTimer);
-    row._helpFadeTimer = setTimeout(() => {
-      row._helpFadeTimer = null;
-      const btn = row._helpButton;
-      if (!btn) return;
-      btn.classList.remove('shown');
-      // Wait for opacity transition, then detach so the row stays clean.
-      setTimeout(() => {
-        if (row._helpButton && !row._helpButton.classList.contains('shown')) {
-          row._helpButton.remove();
-          row._helpButton = null;
+      if (row._helpButton && row._helpButton.classList.contains('shown')) return;
+      if (row._helpShowTimer) return;
+      row._helpShowTimer = setTimeout(() => {
+        row._helpShowTimer = null;
+        let btn = row._helpButton;
+        if (!btn) {
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'help-trigger';
+          btn.textContent = '?';
+          btn.setAttribute('aria-label', 'help');
+          btn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            ev.preventDefault();
+            openHelp(row.dataset.help);
+          });
+          row.appendChild(btn);
+          row._helpButton = btn;
         }
-      }, 280);
-    }, 5000);
-  }
-
-  // Event delegation on the sidebar — works across HTMX file-tree refreshes.
-  // mouseover/mouseout bubble (mouseenter/leave don't), so we filter via
-  // relatedTarget to detect actual row entry/exit.
-  const sidebarEl = document.querySelector('.sidebar');
-  if (sidebarEl) {
-    sidebarEl.addEventListener('mouseover', (e) => {
-      const row = e.target.closest('[data-help]');
-      if (!row) return;
-      const from = e.relatedTarget;
-      if (from && row.contains(from)) return;
-      _scheduleHelpShow(row);
-    });
-    sidebarEl.addEventListener('mouseout', (e) => {
-      const row = e.target.closest('[data-help]');
-      if (!row) return;
-      const to = e.relatedTarget;
-      if (to && row.contains(to)) return;
-      _scheduleHelpFade(row);
-    });
-    // Clicking a tree file opens the preview — close help to avoid stacking.
-    sidebarEl.addEventListener('click', (e) => {
-      if (e.target.closest('.file-row a')) closeHelp();
-    });
-  }
-
-  const conversation = document.getElementById('conversation');
-  const form = document.getElementById('chat-form');
-  const textarea = document.getElementById('message');
-  const sendBtn = document.getElementById('send-btn');
-
-  // Auto-expanding textarea.
-  textarea.addEventListener('input', () => {
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 280) + 'px';
-  });
-
-  // Slash commands — intercepted locally, never sent to the LLM.
-  async function handleSlashCommand(raw) {
-    const cmd = raw.trim();
-    if (cmd === '/reset') {
-      await fetch('/api/reset');
-      conversation.innerHTML = '<div class="empty-hint" id="empty-hint">conversation cleared.<br>start anew.</div>';
-      textarea.value = '';
-      textarea.style.height = 'auto';
-      sendBtn.disabled = false;
-      textarea.disabled = false;
-      textarea.focus();
-      return true;
+        requestAnimationFrame(() => btn.classList.add('shown'));
+      }, 1000);
     }
-    if (cmd === '/update-enough') {
-      textarea.value = '';
+
+    function _scheduleHelpFade(row) {
+      if (row._helpShowTimer) {
+        clearTimeout(row._helpShowTimer);
+        row._helpShowTimer = null;
+      }
+      if (!row._helpButton || !row._helpButton.classList.contains('shown')) return;
+      if (row._helpFadeTimer) clearTimeout(row._helpFadeTimer);
+      row._helpFadeTimer = setTimeout(() => {
+        row._helpFadeTimer = null;
+        const btn = row._helpButton;
+        if (!btn) return;
+        btn.classList.remove('shown');
+        // Wait for opacity transition, then detach so the row stays clean.
+        setTimeout(() => {
+          if (row._helpButton && !row._helpButton.classList.contains('shown')) {
+            row._helpButton.remove();
+            row._helpButton = null;
+          }
+        }, 280);
+      }, 5000);
+    }
+
+    // Event delegation on the sidebar — works across HTMX file-tree refreshes.
+    // mouseover/mouseout bubble (mouseenter/leave don't), so we filter via
+    // relatedTarget to detect actual row entry/exit.
+    const sidebarEl = document.querySelector('.sidebar');
+    if (sidebarEl) {
+      sidebarEl.addEventListener('mouseover', (e) => {
+        const row = e.target.closest('[data-help]');
+        if (!row) return;
+        const from = e.relatedTarget;
+        if (from && row.contains(from)) return;
+        _scheduleHelpShow(row);
+      });
+      sidebarEl.addEventListener('mouseout', (e) => {
+        const row = e.target.closest('[data-help]');
+        if (!row) return;
+        const to = e.relatedTarget;
+        if (to && row.contains(to)) return;
+        _scheduleHelpFade(row);
+      });
+      // Clicking a tree file opens the preview — close help to avoid stacking.
+      sidebarEl.addEventListener('click', (e) => {
+        if (e.target.closest('.file-row a')) closeHelp();
+      });
+    }
+
+    const conversation = document.getElementById('conversation');
+    const form = document.getElementById('chat-form');
+    const textarea = document.getElementById('message');
+    const sendBtn = document.getElementById('send-btn');
+
+    // Auto-expanding textarea.
+    textarea.addEventListener('input', () => {
       textarea.style.height = 'auto';
-      // Drop the empty-state hint so our notice appears in a clean conversation pane.
-      document.getElementById('empty-hint')?.remove();
-      let resp;
-      try {
-        resp = await (await fetch('/api/update-enough')).json();
-      } catch (e) {
-        conversation.insertAdjacentHTML('beforeend',
-          `<div class="msg harness"><div class="role">harness</div>` +
-          `<div class="body">/update-enough failed: ${escapeHtml(String(e))}</div></div>`);
-        autoscroll();
+      textarea.style.height = Math.min(textarea.scrollHeight, 280) + 'px';
+    });
+
+    // Slash commands — intercepted locally, never sent to the LLM.
+    async function handleSlashCommand(raw) {
+      const cmd = raw.trim();
+      if (cmd === '/reset') {
+        await fetch('/api/reset');
+        conversation.innerHTML = '<div class="empty-hint" id="empty-hint">conversation cleared.<br>start anew.</div>';
+        textarea.value = '';
+        textarea.style.height = 'auto';
+        sendBtn.disabled = false;
+        textarea.disabled = false;
+        textarea.focus();
         return true;
       }
-      let body;
-      if (!resp.had_drift) {
-        body = 'this project is already up to date with <code>~/enough/defaults/</code>. nothing to apply.';
-      } else if (resp.applied.length === 0) {
-        body = 'no new defaults were applied. (something may be wrong — check the install at <code>~/enough/defaults/</code>.)';
-      } else {
-        const lines = resp.applied.map(it =>
-          `&nbsp;&nbsp;• <code>${escapeHtml(it.dst)}</code> ` +
-          `<span class="dim">(${escapeHtml(it.mode)} from <code>defaults/${escapeHtml(it.src)}</code>)</span>`
-        ).join('<br>');
-        body = `pulled in ${resp.applied.length} new default${resp.applied.length === 1 ? '' : 's'} from <code>~/enough/defaults/</code>:<br>${lines}`;
-        if (resp.remaining.length) {
-          body += `<br><br>still missing (could not apply): ${resp.remaining.length}`;
-        }
-      }
-      conversation.insertAdjacentHTML('beforeend',
-        `<div class="msg harness"><div class="role">harness</div><div class="body">${body}</div></div>`);
-      autoscroll();
-      sendBtn.disabled = false;
-      textarea.disabled = false;
-      textarea.focus();
-      return true;
-    }
-    return false;
-  }
-
-  // Pre-submit wrapper: check for slash commands before htmx fires.
-  async function trySubmit() {
-    if (sendBtn.disabled) return;
-    if (await handleSlashCommand(textarea.value)) return;
-    form.requestSubmit();
-  }
-
-  // Enter sends; shift+enter inserts newline.
-  textarea.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      trySubmit();
-    }
-  });
-  // Also intercept the send button (and any other form submissions).
-  form.addEventListener('submit', async (e) => {
-    if (await handleSlashCommand(textarea.value)) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    }
-  }, true);  // capture phase — run before htmx's submit handler
-
-  // Sidebar toggle.
-  document.getElementById('toggle-sidebar').addEventListener('click', () => {
-    document.getElementById('layout').classList.toggle('sidebar-collapsed');
-  });
-
-  // ---------- UI preferences (theme / font / zoom) ----------
-  let UI_CONFIG = null;
-
-  async function loadUIConfig() {
-    try {
-      const r = await fetch('/api/ui-config');
-      if (!r.ok) throw new Error(r.statusText);
-      UI_CONFIG = await r.json();
-      applyUIConfig();
-    } catch (e) {
-      console.warn('ui-config load failed', e);
-    }
-  }
-
-  function applyUIConfig() {
-    if (!UI_CONFIG) return;
-    const cur = UI_CONFIG.current || {};
-    const theme = (UI_CONFIG.themes || {})[cur.theme] || (UI_CONFIG.themes || {})['enough-default'];
-    const font  = (UI_CONFIG.fonts  || {})[cur.font]  || (UI_CONFIG.fonts  || {})['mono'];
-    if (theme && theme.colors) {
-      for (const [k, v] of Object.entries(theme.colors)) {
-        document.documentElement.style.setProperty('--' + k, v);
-      }
-    }
-    if (font && font.stack) {
-      // --font-mono holds "the active font stack," regardless of actual family.
-      document.documentElement.style.setProperty('--font-mono', font.stack);
-    }
-  }
-
-  function populateUIControls() {
-    if (!UI_CONFIG) return;
-    const cur = UI_CONFIG.current || {};
-    const themeSel = document.getElementById('ui-theme');
-    const fontSel  = document.getElementById('ui-font');
-    themeSel.innerHTML = '';
-    for (const [key, val] of Object.entries(UI_CONFIG.themes || {})) {
-      const opt = document.createElement('option');
-      opt.value = key;
-      opt.textContent = val.label || key;
-      if (key === cur.theme) opt.selected = true;
-      themeSel.appendChild(opt);
-    }
-    fontSel.innerHTML = '';
-    for (const [key, val] of Object.entries(UI_CONFIG.fonts || {})) {
-      const opt = document.createElement('option');
-      opt.value = key;
-      opt.textContent = val.label || key;
-      if (key === cur.font) opt.selected = true;
-      fontSel.appendChild(opt);
-    }
-  }
-
-  async function saveUIConfig(partial) {
-    try {
-      const r = await fetch('/api/ui-config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(partial),
-      });
-      if (!r.ok) throw new Error(r.statusText);
-      UI_CONFIG = await r.json();
-      applyUIConfig();
-    } catch (e) {
-      console.warn('ui-config save failed', e);
-    }
-  }
-
-  function openUIModal() {
-    if (!UI_CONFIG) return;
-    populateUIControls();
-    document.getElementById('ui-modal').classList.remove('hidden');
-  }
-  function closeUIModal() {
-    document.getElementById('ui-modal').classList.add('hidden');
-  }
-  window.closeUIModal = closeUIModal;  // inline onclick handlers need this
-
-  document.getElementById('ui-btn').addEventListener('click', openUIModal);
-  document.getElementById('ui-theme').addEventListener('change', (e) => {
-    saveUIConfig({ theme: e.target.value });
-  });
-  document.getElementById('ui-font').addEventListener('change', (e) => {
-    saveUIConfig({ font: e.target.value });
-  });
-  // Escape closes the modal.
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !document.getElementById('ui-modal').classList.contains('hidden')) {
-      closeUIModal();
-    }
-  });
-
-  loadUIConfig();
-
-  // ---------- Model badge + model modal (supervisor-aware) ----------
-  const modelBadge = document.getElementById('model-badge');
-  const modelModal = document.getElementById('model-modal');
-  const tokenGauge = document.getElementById('token-gauge');
-  let MODELS = null;         // last /api/models payload
-  let LLM_STATUS = null;     // last /api/llm-status payload
-  let LAST_USAGE = null;     // last /api/usage or SSE usage payload
-  let selectedCute = null;   // current radio selection in modal
-
-  // ---------- Token-pressure gauge ----------
-  // Format big numbers compactly: 1234 -> "1.2k", 16384 -> "16k".
-  // Below 1k stays exact so 0–999 is honest; above, we round to a single
-  // decimal up to 9.9k and to integers from 10k onward.
-  function fmtTokens(n) {
-    if (n == null) return '—';
-    if (n < 1000) return String(n);
-    if (n < 10000) return (n / 1000).toFixed(1) + 'k';
-    return Math.round(n / 1000) + 'k';
-  }
-
-  function pressureClass(pct) {
-    if (pct >= 80) return 'danger';
-    if (pct >= 60) return 'warn';
-    return '';
-  }
-
-  // Render LAST_USAGE into both the topbar pill and the modal row. Called
-  // on every usage update (SSE) and on modal open (so the row is fresh).
-  function renderUsage() {
-    const u = LAST_USAGE || {};
-    const total = u.total_tokens != null
-      ? u.total_tokens
-      : (u.prompt_tokens || 0) + (u.completion_tokens || 0);
-    const ctx = u.ctx || (LLM_STATUS && LLM_STATUS.ctx) || null;
-    const hasData = total > 0;
-
-    // --- Topbar pill ---
-    tokenGauge.classList.remove('warn', 'danger', 'empty');
-    const fill = tokenGauge.querySelector('.fill');
-    const label = tokenGauge.querySelector('.label');
-    if (!hasData) {
-      tokenGauge.classList.add('empty');
-      fill.style.width = '0%';
-      label.textContent = ctx ? `0 / ${fmtTokens(ctx)}` : '—';
-      tokenGauge.title = 'No completion yet — gauge fills in once you send a message.';
-    } else if (ctx) {
-      const pct = Math.min(100, Math.round((total / ctx) * 100));
-      fill.style.width = pct + '%';
-      const cls = pressureClass(pct);
-      if (cls) tokenGauge.classList.add(cls);
-      label.textContent = `${fmtTokens(total)} / ${fmtTokens(ctx)} · ${pct}%`;
-      tokenGauge.title =
-        `Last completion used ${total.toLocaleString()} of ${ctx.toLocaleString()} tokens (${pct}%).\n` +
-        `Prompt: ${(u.prompt_tokens||0).toLocaleString()}  · ` +
-        `Output: ${(u.completion_tokens||0).toLocaleString()}.\n` +
-        `Click to open model settings.`;
-    } else {
-      // No ctx known (supervisor off / external server). Show absolute count only.
-      fill.style.width = '0%';
-      tokenGauge.classList.add('empty');
-      label.textContent = fmtTokens(total);
-      tokenGauge.title = `Last completion used ${total.toLocaleString()} tokens (ctx-size unknown).`;
-    }
-
-    // --- Modal row (only meaningful when the modal is open, but it's
-    // cheap to keep current so reopening it shows the latest). ---
-    const row = document.getElementById('modal-usage-row');
-    const modalFill = document.getElementById('modal-usage-fill');
-    const pctEl = document.getElementById('modal-usage-pct');
-    const breakdown = document.getElementById('modal-usage-breakdown');
-    if (!row) return;
-    row.classList.remove('warn', 'danger');
-    if (!hasData) {
-      modalFill.style.width = '0%';
-      pctEl.textContent = '—';
-      breakdown.innerHTML = '<span class="none">no data yet — send a message first.</span>';
-    } else if (ctx) {
-      const pct = Math.min(100, Math.round((total / ctx) * 100));
-      modalFill.style.width = pct + '%';
-      pctEl.textContent = pct + '%';
-      const cls = pressureClass(pct);
-      if (cls) row.classList.add(cls);
-      breakdown.innerHTML =
-        `<span>prompt ${(u.prompt_tokens||0).toLocaleString()} + ` +
-        `output ${(u.completion_tokens||0).toLocaleString()} = ` +
-        `${total.toLocaleString()} tokens</span>` +
-        `<span>of ${ctx.toLocaleString()} (ctx)</span>`;
-    } else {
-      modalFill.style.width = '0%';
-      pctEl.textContent = '—';
-      breakdown.innerHTML =
-        `<span>prompt ${(u.prompt_tokens||0).toLocaleString()} + ` +
-        `output ${(u.completion_tokens||0).toLocaleString()} = ` +
-        `${total.toLocaleString()} tokens</span>` +
-        `<span class="none">ctx unknown</span>`;
-    }
-  }
-
-  async function refreshUsage() {
-    try {
-      const r = await fetch('/api/usage');
-      if (!r.ok) return;
-      LAST_USAGE = await r.json();
-      renderUsage();
-    } catch (_) { /* transient */ }
-  }
-
-  // Clicking the gauge opens the model modal — same destination as the
-  // model badge, since both are about the LLM session.
-  tokenGauge.addEventListener('click', () => openModelModal());
-
-  // ---------- Orchestrator (auto-reset) config ----------
-  let ORCHESTRATOR = null;  // last /api/orchestrator payload
-
-  async function refreshOrchestrator() {
-    try {
-      const r = await fetch('/api/orchestrator');
-      if (!r.ok) return;
-      ORCHESTRATOR = await r.json();
-      renderOrchestrator();
-    } catch (_) { /* transient */ }
-  }
-
-  function renderOrchestrator() {
-    if (!ORCHESTRATOR) return;
-    const toggle = document.getElementById('auto-reset-toggle');
-    const pctEl = document.getElementById('auto-reset-threshold');
-    if (toggle) toggle.checked = !!ORCHESTRATOR.auto_reset;
-    if (pctEl) pctEl.textContent = ORCHESTRATOR.threshold_pct;
-  }
-
-  async function setAutoReset(enabled) {
-    try {
-      const r = await fetch('/api/orchestrator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ auto_reset: !!enabled }),
-      });
-      if (!r.ok) throw new Error(await r.text());
-      ORCHESTRATOR = await r.json();
-      renderOrchestrator();
-    } catch (e) {
-      // Snap toggle back to the persisted state and surface the failure
-      // so the user knows their click didn't take effect.
-      renderOrchestrator();
-      alert('could not save auto-reset setting: ' + (e && e.message ? e.message : e));
-    }
-  }
-
-  // Bind toggle once at script-init time — the modal markup is in the DOM
-  // already (just hidden), so this finds the element on first load.
-  (function bindOrchestratorToggle() {
-    const toggle = document.getElementById('auto-reset-toggle');
-    if (toggle) {
-      toggle.addEventListener('change', (e) => setAutoReset(e.target.checked));
-    }
-  })();
-
-  async function refreshLlmStatus() {
-    try {
-      const r = await fetch('/api/llm-status');
-      if (!r.ok) return;
-      LLM_STATUS = await r.json();
-      updateBadge();
-    } catch (_) { /* transient */ }
-  }
-
-  function updateBadge() {
-    if (!LLM_STATUS) return;
-    const { mode, ready, cute, ctx } = LLM_STATUS;
-    modelBadge.classList.remove('ready', 'loading', 'off');
-    if (mode === 'off' || !cute) {
-      modelBadge.classList.add('off');
-      modelBadge.querySelector('.cute').textContent = 'no model';
-      modelBadge.querySelector('.ctx').textContent = '';
-      return;
-    }
-    modelBadge.classList.add(ready ? 'ready' : 'loading');
-    // Look up cute_name for display (the config key is lowercase).
-    let display = cute.toUpperCase();
-    if (MODELS && MODELS.models) {
-      const m = MODELS.models.find(x => x.cute === cute);
-      if (m) display = m.cute.toUpperCase();  // same, but canonical
-    }
-    modelBadge.querySelector('.cute').textContent = display;
-    modelBadge.querySelector('.ctx').textContent = ctx
-      ? `· ${Math.round(ctx / 1024)}k`
-      : '';
-  }
-
-  async function loadModels() {
-    try {
-      const r = await fetch('/api/models');
-      if (!r.ok) return;
-      MODELS = await r.json();
-    } catch (_) { /* transient */ }
-  }
-
-  function renderModelList() {
-    if (!MODELS) return;
-    const list = document.getElementById('model-list');
-    list.innerHTML = '';
-    const curCute = selectedCute || (MODELS.current || (LLM_STATUS && LLM_STATUS.cute));
-    for (const m of MODELS.models) {
-      const disabled = !m.installed;
-      const isSel = m.cute === curCute;
-      const row = document.createElement('div');
-      row.className = 'model-option' + (isSel ? ' selected' : '') + (disabled ? ' disabled' : '');
-      row.dataset.cute = m.cute;
-      const size = m.disk_gb_approx ? `~${m.disk_gb_approx.toFixed(1)} GB` : '';
-      const installed = disabled ? '(not installed)' : '';
-      row.innerHTML =
-        `<span class="cute">${m.cute.toUpperCase()}</span>` +
-        `<span class="label">${m.label}</span>` +
-        `<span class="size">${size} ${installed}</span>`;
-      if (!disabled) {
-        row.addEventListener('click', () => {
-          selectedCute = m.cute;
-          renderModelList();
-          updateCtxInputForSelection();
-        });
-      }
-      list.appendChild(row);
-    }
-  }
-
-  function updateCtxInputForSelection() {
-    if (!MODELS) return;
-    const m = MODELS.models.find(x => x.cute === selectedCute);
-    if (!m) return;
-    const ctxInput = document.getElementById('ctx-input');
-    const override = (MODELS.ctx_overrides || {})[m.cute];
-    const recommended = m.ctx_recommended;
-    const max = m.ctx_max || 131072;
-    ctxInput.max = max;
-    ctxInput.value = override || recommended || 16384;
-    document.getElementById('ctx-recommended').textContent = (recommended || '?') + ' (for ' + (MODELS.total_ram_gb || '?') + ' GB RAM)';
-    document.getElementById('ctx-hint-min-max').textContent = `(min 2048, max ${max})`;
-  }
-
-  async function openModelModal() {
-    document.getElementById('switch-status').textContent = '';
-    document.getElementById('switch-status').className = 'switch-status';
-    document.getElementById('apply-model-btn').disabled = false;
-    await Promise.all([loadModels(), refreshLlmStatus(), refreshUsage(), refreshOrchestrator()]);
-    selectedCute = (LLM_STATUS && LLM_STATUS.cute) || (MODELS && MODELS.current);
-    renderModelList();
-    updateCtxInputForSelection();
-    renderUsage();  // re-render now that LLM_STATUS is fresh (gives us ctx if usage was missing it)
-    modelModal.classList.remove('hidden');
-  }
-  window.openModelModal = openModelModal;
-  function closeModelModal() {
-    modelModal.classList.add('hidden');
-  }
-  window.closeModelModal = closeModelModal;
-
-  async function applyModel() {
-    if (!selectedCute) return;
-    const ctxInput = document.getElementById('ctx-input');
-    const ctx = parseInt(ctxInput.value, 10) || undefined;
-    const status = document.getElementById('switch-status');
-    const btn = document.getElementById('apply-model-btn');
-    btn.disabled = true;
-    status.className = 'switch-status';
-    status.textContent = 'restarting llama-server…';
-    try {
-      const r = await fetch('/api/model', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cute: selectedCute, ctx }),
-      });
-      if (!r.ok) {
-        const err = await r.text();
-        throw new Error(err.slice(0, 200));
-      }
-      status.textContent = 'model loading, waiting for health…';
-      // Poll /api/llm-status until ready.
-      const deadline = Date.now() + 300000; // 5 min ceiling
-      while (Date.now() < deadline) {
-        await new Promise(r => setTimeout(r, 1500));
-        await refreshLlmStatus();
-        if (LLM_STATUS && LLM_STATUS.ready && LLM_STATUS.cute === selectedCute) {
-          break;
-        }
-      }
-      await loadModels();
-      renderModelList();
-      if (LLM_STATUS && LLM_STATUS.ready) {
-        status.className = 'switch-status ready';
-        status.textContent = 'ready — conversation has been cleared.';
-        // Clear the on-screen conversation too (server already cleared history).
-        conversation.innerHTML =
-          '<div class="empty-hint" id="empty-hint">model switched. start anew.</div>';
-        setTimeout(closeModelModal, 900);
-      } else {
-        status.className = 'switch-status error';
-        status.textContent = 'health poll timed out. check terminal logs.';
-      }
-    } catch (e) {
-      status.className = 'switch-status error';
-      status.textContent = 'error: ' + (e && e.message ? e.message : e);
-    } finally {
-      btn.disabled = false;
-    }
-  }
-  window.applyModel = applyModel;
-
-  modelBadge.addEventListener('click', openModelModal);
-  // Close on Escape when open.
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !modelModal.classList.contains('hidden')) closeModelModal();
-  });
-
-  // Status polling: fast while loading, relaxed once ready.
-  async function pollLoop() {
-    await refreshLlmStatus();
-    const interval = (LLM_STATUS && LLM_STATUS.ready) ? 8000 : 2000;
-    setTimeout(pollLoop, interval);
-  }
-  loadModels().then(pollLoop);
-  // Prime the gauge with whatever the server last recorded (e.g. after a
-  // page reload mid-conversation, this restores the bar without waiting
-  // for the next turn). Subsequent updates flow in via SSE.
-  refreshUsage();
-  // Also prime the auto-reset toggle from disk so the modal renders the
-  // saved state the first time it's opened.
-  refreshOrchestrator();
-
-  // ---------- Voice input (whisper.cpp) ----------
-  const micBtn = document.getElementById('mic-btn');
-  let mic = {
-    recording: false,
-    stream: null,
-    ctx: null,
-    processor: null,
-    chunks: [],
-    captureRate: 16000,   // filled in when AudioContext starts
-  };
-
-  async function startMic() {
-    try {
-      mic.stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          channelCount: 1,
-          noiseSuppression: true,
-          echoCancellation: true,
-        },
-      });
-    } catch (e) {
-      alert('microphone access denied: ' + (e && e.message ? e.message : e));
-      return;
-    }
-    // Prefer 16 kHz if the browser will honor it; otherwise capture at native
-    // rate and resample in encodeWAV().
-    try {
-      mic.ctx = new AudioContext({ sampleRate: 16000 });
-    } catch (_) {
-      mic.ctx = new AudioContext();
-    }
-    mic.captureRate = mic.ctx.sampleRate;
-    const source = mic.ctx.createMediaStreamSource(mic.stream);
-    // ScriptProcessor is deprecated but universally supported; AudioWorklet
-    // is cleaner but more code for the same effect at v0.0.6 scope.
-    mic.processor = mic.ctx.createScriptProcessor(4096, 1, 1);
-    mic.chunks = [];
-    mic.processor.onaudioprocess = (e) => {
-      if (!mic.recording) return;
-      const input = e.inputBuffer.getChannelData(0);
-      mic.chunks.push(new Float32Array(input));
-    };
-    source.connect(mic.processor);
-    mic.processor.connect(mic.ctx.destination);
-    mic.recording = true;
-    micBtn.classList.add('recording');
-    micBtn.querySelector('.mic-icon').textContent = '●';
-    micBtn.title = 'click to stop + transcribe';
-  }
-
-  async function stopMicAndTranscribe() {
-    mic.recording = false;
-    try { mic.processor && mic.processor.disconnect(); } catch (_) {}
-    try { mic.stream && mic.stream.getTracks().forEach(t => t.stop()); } catch (_) {}
-    try { mic.ctx && await mic.ctx.close(); } catch (_) {}
-
-    micBtn.classList.remove('recording');
-    micBtn.classList.add('transcribing');
-    micBtn.querySelector('.mic-icon').textContent = '…';
-
-    // Concatenate all sample chunks.
-    let total = 0;
-    for (const c of mic.chunks) total += c.length;
-    const flat = new Float32Array(total);
-    { let off = 0; for (const c of mic.chunks) { flat.set(c, off); off += c.length; } }
-
-    // Resample to 16 kHz mono if the capture rate didn't match. Linear
-    // interpolation is fine for speech.
-    const target = 16000;
-    let pcm16 = flat;
-    if (mic.captureRate !== target) {
-      const ratio = mic.captureRate / target;
-      const outLen = Math.floor(flat.length / ratio);
-      const out = new Float32Array(outLen);
-      for (let i = 0; i < outLen; i++) {
-        const src = i * ratio;
-        const i0 = Math.floor(src);
-        const i1 = Math.min(i0 + 1, flat.length - 1);
-        const frac = src - i0;
-        out[i] = flat[i0] * (1 - frac) + flat[i1] * frac;
-      }
-      pcm16 = out;
-    }
-
-    // Float32 → Int16 PCM + WAV header.
-    const wav = encodeWAV(pcm16, target);
-
-    try {
-      const fd = new FormData();
-      fd.append('audio', new Blob([wav], { type: 'audio/wav' }), 'mic.wav');
-      const r = await fetch('/api/transcribe', { method: 'POST', body: fd });
-      if (!r.ok) {
-        const err = await r.text();
-        throw new Error(`transcribe ${r.status}: ${err.slice(0, 200)}`);
-      }
-      const { text } = await r.json();
-      if (text) {
-        const cur = textarea.value;
-        const glue = (cur && !cur.endsWith(' ') && !cur.endsWith('\n')) ? ' ' : '';
-        textarea.value = cur + glue + text;
-        // Autosize.
+      if (cmd === '/update-enough') {
+        textarea.value = '';
         textarea.style.height = 'auto';
-        textarea.style.height = Math.min(textarea.scrollHeight, 280) + 'px';
+        // Drop the empty-state hint so our notice appears in a clean conversation pane.
+        document.getElementById('empty-hint')?.remove();
+        let resp;
+        try {
+          resp = await (await fetch('/api/update-enough')).json();
+        } catch (e) {
+          conversation.insertAdjacentHTML('beforeend',
+            `<div class="msg harness"><div class="role">harness</div>` +
+            `<div class="body">/update-enough failed: ${escapeHtml(String(e))}</div></div>`);
+          autoscroll();
+          return true;
+        }
+        let body;
+        if (!resp.had_drift) {
+          body = 'this project is already up to date with <code>~/enough/defaults/</code>. nothing to apply.';
+        } else if (resp.applied.length === 0) {
+          body = 'no new defaults were applied. (something may be wrong — check the install at <code>~/enough/defaults/</code>.)';
+        } else {
+          const lines = resp.applied.map(it =>
+            `&nbsp;&nbsp;• <code>${escapeHtml(it.dst)}</code> ` +
+            `<span class="dim">(${escapeHtml(it.mode)} from <code>defaults/${escapeHtml(it.src)}</code>)</span>`
+          ).join('<br>');
+          body = `pulled in ${resp.applied.length} new default${resp.applied.length === 1 ? '' : 's'} from <code>~/enough/defaults/</code>:<br>${lines}`;
+          if (resp.remaining.length) {
+            body += `<br><br>still missing (could not apply): ${resp.remaining.length}`;
+          }
+        }
+        conversation.insertAdjacentHTML('beforeend',
+          `<div class="msg harness"><div class="role">harness</div><div class="body">${body}</div></div>`);
+        autoscroll();
+        sendBtn.disabled = false;
+        textarea.disabled = false;
+        textarea.focus();
+        return true;
       }
-    } catch (e) {
-      console.warn('transcribe failed', e);
-      alert('transcription failed: ' + (e && e.message ? e.message : e));
-    } finally {
-      mic.chunks = [];
-      micBtn.classList.remove('transcribing');
-      micBtn.querySelector('.mic-icon').textContent = '🎤';
-      micBtn.title = 'voice input (local whisper.cpp)';
-      textarea.focus();
+      return false;
     }
-  }
 
-  function encodeWAV(samples, sampleRate) {
-    // PCM16 WAV
-    const buf = new ArrayBuffer(44 + samples.length * 2);
-    const view = new DataView(buf);
-    const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
-    writeStr(0, 'RIFF');
-    view.setUint32(4, 36 + samples.length * 2, true);
-    writeStr(8, 'WAVE');
-    writeStr(12, 'fmt ');
-    view.setUint32(16, 16, true);           // subchunk1 size
-    view.setUint16(20, 1, true);            // PCM
-    view.setUint16(22, 1, true);            // mono
-    view.setUint32(24, sampleRate, true);   // sample rate
-    view.setUint32(28, sampleRate * 2, true); // byte rate
-    view.setUint16(32, 2, true);            // block align
-    view.setUint16(34, 16, true);           // bits/sample
-    writeStr(36, 'data');
-    view.setUint32(40, samples.length * 2, true);
-    const pcm = new Int16Array(buf, 44);
-    for (let i = 0; i < samples.length; i++) {
-      const s = Math.max(-1, Math.min(1, samples[i]));
-      pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    // Pre-submit wrapper: check for slash commands before htmx fires.
+    async function trySubmit() {
+      if (sendBtn.disabled) return;
+      if (await handleSlashCommand(textarea.value)) return;
+      form.requestSubmit();
     }
-    return buf;
-  }
 
-  micBtn.addEventListener('click', () => {
-    if (micBtn.classList.contains('transcribing')) return; // busy
-    if (mic.recording) stopMicAndTranscribe();
-    else startMic();
-  });
-
-  // ---------- Sidebar section collapse ----------
-  const SECTION_KEY = 'enough.sidebar.sections';
-  function getSectionState() {
-    try { return JSON.parse(localStorage.getItem(SECTION_KEY) || '{}'); }
-    catch (_) { return {}; }
-  }
-  function setSectionState(s) { localStorage.setItem(SECTION_KEY, JSON.stringify(s)); }
-  function applySectionState() {
-    const state = getSectionState();
-    document.querySelectorAll('.sidebar-section').forEach(sec => {
-      const name = sec.dataset.section;
-      if (state[name] === 'collapsed') sec.classList.add('collapsed');
+    // Enter sends; shift+enter inserts newline.
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        trySubmit();
+      }
     });
-  }
-  applySectionState();
-  document.querySelectorAll('.sidebar-section .section-head').forEach(h => {
-    h.addEventListener('click', () => {
-      const sec = h.closest('.sidebar-section');
-      sec.classList.toggle('collapsed');
-      const state = getSectionState();
-      state[sec.dataset.section] = sec.classList.contains('collapsed') ? 'collapsed' : 'expanded';
-      setSectionState(state);
+    // Also intercept the send button (and any other form submissions).
+    form.addEventListener('submit', async (e) => {
+      if (await handleSlashCommand(textarea.value)) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }, true);  // capture phase — run before htmx's submit handler
+
+    // Sidebar toggle.
+    document.getElementById('toggle-sidebar').addEventListener('click', () => {
+      document.getElementById('layout').classList.toggle('sidebar-collapsed');
     });
-  });
 
-  // ---------- File-tree folder collapse (event-delegated + localStorage) ----------
-  const TREE_KEY = 'enough.tree.collapsed';
-  function getTreeState() {
-    try { return JSON.parse(localStorage.getItem(TREE_KEY) || '{}'); }
-    catch (_) { return {}; }
-  }
-  function setTreeState(s) { localStorage.setItem(TREE_KEY, JSON.stringify(s)); }
-  function applyTreeState() {
-    const state = getTreeState();
-    document.querySelectorAll('#tree li.dir.has-children').forEach(li => {
-      const path = li.dataset.path;
-      if (state[path] === 'collapsed') li.classList.add('collapsed');
+    // ---------- UI preferences (theme / font / zoom) ----------
+    let UI_CONFIG = null;
+
+    async function loadUIConfig() {
+      try {
+        const r = await fetch('/api/ui-config');
+        if (!r.ok) throw new Error(r.statusText);
+        UI_CONFIG = await r.json();
+        applyUIConfig();
+      } catch (e) {
+        console.warn('ui-config load failed', e);
+      }
+    }
+
+    function applyUIConfig() {
+      if (!UI_CONFIG) return;
+      const cur = UI_CONFIG.current || {};
+      const theme = (UI_CONFIG.themes || {})[cur.theme] || (UI_CONFIG.themes || {})['enough-default'];
+      const font = (UI_CONFIG.fonts || {})[cur.font] || (UI_CONFIG.fonts || {})['mono'];
+      if (theme && theme.colors) {
+        for (const [k, v] of Object.entries(theme.colors)) {
+          document.documentElement.style.setProperty('--' + k, v);
+        }
+      }
+      if (font && font.stack) {
+        // --font-mono holds "the active font stack," regardless of actual family.
+        document.documentElement.style.setProperty('--font-mono', font.stack);
+      }
+    }
+
+    function populateUIControls() {
+      if (!UI_CONFIG) return;
+      const cur = UI_CONFIG.current || {};
+      const themeSel = document.getElementById('ui-theme');
+      const fontSel = document.getElementById('ui-font');
+      themeSel.innerHTML = '';
+      for (const [key, val] of Object.entries(UI_CONFIG.themes || {})) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = val.label || key;
+        if (key === cur.theme) opt.selected = true;
+        themeSel.appendChild(opt);
+      }
+      fontSel.innerHTML = '';
+      for (const [key, val] of Object.entries(UI_CONFIG.fonts || {})) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = val.label || key;
+        if (key === cur.font) opt.selected = true;
+        fontSel.appendChild(opt);
+      }
+    }
+
+    async function saveUIConfig(partial) {
+      try {
+        const r = await fetch('/api/ui-config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(partial),
+        });
+        if (!r.ok) throw new Error(r.statusText);
+        UI_CONFIG = await r.json();
+        applyUIConfig();
+      } catch (e) {
+        console.warn('ui-config save failed', e);
+      }
+    }
+
+    function openUIModal() {
+      if (!UI_CONFIG) return;
+      populateUIControls();
+      document.getElementById('ui-modal').classList.remove('hidden');
+    }
+    function closeUIModal() {
+      document.getElementById('ui-modal').classList.add('hidden');
+    }
+    window.closeUIModal = closeUIModal;  // inline onclick handlers need this
+
+    document.getElementById('ui-btn').addEventListener('click', openUIModal);
+    document.getElementById('ui-theme').addEventListener('change', (e) => {
+      saveUIConfig({ theme: e.target.value });
     });
-  }
-  // Re-apply after every htmx swap of the tree.
-  document.body.addEventListener('htmx:afterSwap', (e) => {
-    if (e.target && e.target.id === 'tree') applyTreeState();
-  });
-  // Delegated click handler: toggle on dir-row of a has-children folder.
-  document.getElementById('tree').addEventListener('click', (e) => {
-    const row = e.target.closest('.dir-row');
-    if (!row) return;
-    const li = row.closest('li.dir.has-children');
-    if (!li) return;
-    li.classList.toggle('collapsed');
-    const state = getTreeState();
-    state[li.dataset.path] = li.classList.contains('collapsed') ? 'collapsed' : 'expanded';
-    setTreeState(state);
-  });
+    document.getElementById('ui-font').addEventListener('change', (e) => {
+      saveUIConfig({ font: e.target.value });
+    });
+    // Escape closes the modal.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !document.getElementById('ui-modal').classList.contains('hidden')) {
+        closeUIModal();
+      }
+    });
 
-  // Streaming over SSE.
-  function autoscroll() {
-    conversation.scrollTop = conversation.scrollHeight;
-  }
+    loadUIConfig();
 
-  function currentResponse() {
-    return document.getElementById('current-response');
-  }
+    // ---------- Model badge + model modal (supervisor-aware) ----------
+    const modelBadge = document.getElementById('model-badge');
+    const modelModal = document.getElementById('model-modal');
+    const tokenGauge = document.getElementById('token-gauge');
+    let MODELS = null;         // last /api/models payload
+    let LLM_STATUS = null;     // last /api/llm-status payload
+    let LAST_USAGE = null;     // last /api/usage or SSE usage payload
+    let selectedCute = null;   // current radio selection in modal
 
-  function escapeHtml(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
+    // ---------- Token-pressure gauge ----------
+    // Format big numbers compactly: 1234 -> "1.2k", 16384 -> "16k".
+    // Below 1k stays exact so 0–999 is honest; above, we round to a single
+    // decimal up to 9.9k and to integers from 10k onward.
+    function fmtTokens(n) {
+      if (n == null) return '—';
+      if (n < 1000) return String(n);
+      if (n < 10000) return (n / 1000).toFixed(1) + 'k';
+      return Math.round(n / 1000) + 'k';
+    }
 
-  const es = new EventSource('/api/stream');
+    function pressureClass(pct) {
+      if (pct >= 80) return 'danger';
+      if (pct >= 60) return 'warn';
+      return '';
+    }
 
-  es.addEventListener('token', (e) => {
-    const { text } = JSON.parse(e.data);
-    const r = currentResponse();
-    if (!r) return;
-    const body = r.querySelector('.body');
-    body.insertAdjacentHTML('beforeend', escapeHtml(text));
-    autoscroll();
-  });
+    // Render LAST_USAGE into both the topbar pill and the modal row. Called
+    // on every usage update (SSE) and on modal open (so the row is fresh).
+    function renderUsage() {
+      const u = LAST_USAGE || {};
+      const total = u.total_tokens != null
+        ? u.total_tokens
+        : (u.prompt_tokens || 0) + (u.completion_tokens || 0);
+      const ctx = u.ctx || (LLM_STATUS && LLM_STATUS.ctx) || null;
+      const hasData = total > 0;
 
-  es.addEventListener('tool', (e) => {
-    const { name, key, status } = JSON.parse(e.data);
-    const r = currentResponse();
-    if (r) {
-      const indicators = r.querySelector('.tool-indicators');
-      if (status === 'running') {
-        const id = `tool-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
-        indicators.insertAdjacentHTML('beforeend',
-          `<div class="tool-indicator running" id="${id}" data-name="${name}" data-key="${escapeHtml(key)}">${name} · ${escapeHtml(key)}</div>`);
+      // --- Topbar pill ---
+      tokenGauge.classList.remove('warn', 'danger', 'empty');
+      const fill = tokenGauge.querySelector('.fill');
+      const label = tokenGauge.querySelector('.label');
+      if (!hasData) {
+        tokenGauge.classList.add('empty');
+        fill.style.width = '0%';
+        label.textContent = ctx ? `0 / ${fmtTokens(ctx)}` : '—';
+        tokenGauge.title = 'No completion yet — gauge fills in once you send a message.';
+      } else if (ctx) {
+        const pct = Math.min(100, Math.round((total / ctx) * 100));
+        fill.style.width = pct + '%';
+        const cls = pressureClass(pct);
+        if (cls) tokenGauge.classList.add(cls);
+        label.textContent = `${fmtTokens(total)} / ${fmtTokens(ctx)} · ${pct}%`;
+        tokenGauge.title =
+          `Last completion used ${total.toLocaleString()} of ${ctx.toLocaleString()} tokens (${pct}%).\n` +
+          `Prompt: ${(u.prompt_tokens || 0).toLocaleString()}  · ` +
+          `Output: ${(u.completion_tokens || 0).toLocaleString()}.\n` +
+          `Click to open model settings.`;
       } else {
-        const running = indicators.querySelectorAll('.tool-indicator.running');
-        for (let i = running.length - 1; i >= 0; i--) {
-          if (running[i].dataset.name === name && running[i].dataset.key === key) {
-            running[i].classList.remove('running');
-            running[i].classList.add(status);
+        // No ctx known (supervisor off / external server). Show absolute count only.
+        fill.style.width = '0%';
+        tokenGauge.classList.add('empty');
+        label.textContent = fmtTokens(total);
+        tokenGauge.title = `Last completion used ${total.toLocaleString()} tokens (ctx-size unknown).`;
+      }
+
+      // --- Modal row (only meaningful when the modal is open, but it's
+      // cheap to keep current so reopening it shows the latest). ---
+      const row = document.getElementById('modal-usage-row');
+      const modalFill = document.getElementById('modal-usage-fill');
+      const pctEl = document.getElementById('modal-usage-pct');
+      const breakdown = document.getElementById('modal-usage-breakdown');
+      if (!row) return;
+      row.classList.remove('warn', 'danger');
+      if (!hasData) {
+        modalFill.style.width = '0%';
+        pctEl.textContent = '—';
+        breakdown.innerHTML = '<span class="none">no data yet — send a message first.</span>';
+      } else if (ctx) {
+        const pct = Math.min(100, Math.round((total / ctx) * 100));
+        modalFill.style.width = pct + '%';
+        pctEl.textContent = pct + '%';
+        const cls = pressureClass(pct);
+        if (cls) row.classList.add(cls);
+        breakdown.innerHTML =
+          `<span>prompt ${(u.prompt_tokens || 0).toLocaleString()} + ` +
+          `output ${(u.completion_tokens || 0).toLocaleString()} = ` +
+          `${total.toLocaleString()} tokens</span>` +
+          `<span>of ${ctx.toLocaleString()} (ctx)</span>`;
+      } else {
+        modalFill.style.width = '0%';
+        pctEl.textContent = '—';
+        breakdown.innerHTML =
+          `<span>prompt ${(u.prompt_tokens || 0).toLocaleString()} + ` +
+          `output ${(u.completion_tokens || 0).toLocaleString()} = ` +
+          `${total.toLocaleString()} tokens</span>` +
+          `<span class="none">ctx unknown</span>`;
+      }
+    }
+
+    async function refreshUsage() {
+      try {
+        const r = await fetch('/api/usage');
+        if (!r.ok) return;
+        LAST_USAGE = await r.json();
+        renderUsage();
+      } catch (_) { /* transient */ }
+    }
+
+    // Clicking the gauge opens the model modal — same destination as the
+    // model badge, since both are about the LLM session.
+    tokenGauge.addEventListener('click', () => openModelModal());
+
+    // ---------- Orchestrator (auto-reset) config ----------
+    let ORCHESTRATOR = null;  // last /api/orchestrator payload
+
+    async function refreshOrchestrator() {
+      try {
+        const r = await fetch('/api/orchestrator');
+        if (!r.ok) return;
+        ORCHESTRATOR = await r.json();
+        renderOrchestrator();
+      } catch (_) { /* transient */ }
+    }
+
+    function renderOrchestrator() {
+      if (!ORCHESTRATOR) return;
+      const toggle = document.getElementById('auto-reset-toggle');
+      const pctEl = document.getElementById('auto-reset-threshold');
+      if (toggle) toggle.checked = !!ORCHESTRATOR.auto_reset;
+      if (pctEl) pctEl.textContent = ORCHESTRATOR.threshold_pct;
+    }
+
+    async function setAutoReset(enabled) {
+      try {
+        const r = await fetch('/api/orchestrator', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ auto_reset: !!enabled }),
+        });
+        if (!r.ok) throw new Error(await r.text());
+        ORCHESTRATOR = await r.json();
+        renderOrchestrator();
+      } catch (e) {
+        // Snap toggle back to the persisted state and surface the failure
+        // so the user knows their click didn't take effect.
+        renderOrchestrator();
+        alert('could not save auto-reset setting: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    // Bind toggle once at script-init time — the modal markup is in the DOM
+    // already (just hidden), so this finds the element on first load.
+    (function bindOrchestratorToggle() {
+      const toggle = document.getElementById('auto-reset-toggle');
+      if (toggle) {
+        toggle.addEventListener('change', (e) => setAutoReset(e.target.checked));
+      }
+    })();
+
+    async function refreshLlmStatus() {
+      try {
+        const r = await fetch('/api/llm-status');
+        if (!r.ok) return;
+        LLM_STATUS = await r.json();
+        updateBadge();
+      } catch (_) { /* transient */ }
+    }
+
+    function updateBadge() {
+      if (!LLM_STATUS) return;
+      const { mode, ready, cute, ctx } = LLM_STATUS;
+      modelBadge.classList.remove('ready', 'loading', 'off');
+      if (mode === 'off' || !cute) {
+        modelBadge.classList.add('off');
+        modelBadge.querySelector('.cute').textContent = 'no model';
+        modelBadge.querySelector('.ctx').textContent = '';
+        return;
+      }
+      modelBadge.classList.add(ready ? 'ready' : 'loading');
+      // Look up cute_name for display (the config key is lowercase).
+      let display = cute.toUpperCase();
+      if (MODELS && MODELS.models) {
+        const m = MODELS.models.find(x => x.cute === cute);
+        if (m) display = m.cute.toUpperCase();  // same, but canonical
+      }
+      modelBadge.querySelector('.cute').textContent = display;
+      modelBadge.querySelector('.ctx').textContent = ctx
+        ? `· ${Math.round(ctx / 1024)}k`
+        : '';
+    }
+
+    async function loadModels() {
+      try {
+        const r = await fetch('/api/models');
+        if (!r.ok) return;
+        MODELS = await r.json();
+      } catch (_) { /* transient */ }
+    }
+
+    function renderModelList() {
+      if (!MODELS) return;
+      const list = document.getElementById('model-list');
+      list.innerHTML = '';
+      const curCute = selectedCute || (MODELS.current || (LLM_STATUS && LLM_STATUS.cute));
+      for (const m of MODELS.models) {
+        const disabled = !m.installed;
+        const isSel = m.cute === curCute;
+        const row = document.createElement('div');
+        row.className = 'model-option' + (isSel ? ' selected' : '') + (disabled ? ' disabled' : '');
+        row.dataset.cute = m.cute;
+        const size = m.disk_gb_approx ? `~${m.disk_gb_approx.toFixed(1)} GB` : '';
+        const installed = disabled ? '(not installed)' : '';
+        row.innerHTML =
+          `<span class="cute">${m.cute.toUpperCase()}</span>` +
+          `<span class="label">${m.label}</span>` +
+          `<span class="size">${size} ${installed}</span>`;
+        if (!disabled) {
+          row.addEventListener('click', () => {
+            selectedCute = m.cute;
+            renderModelList();
+            updateCtxInputForSelection();
+          });
+        }
+        list.appendChild(row);
+      }
+    }
+
+    function updateCtxInputForSelection() {
+      if (!MODELS) return;
+      const m = MODELS.models.find(x => x.cute === selectedCute);
+      if (!m) return;
+      const ctxInput = document.getElementById('ctx-input');
+      const override = (MODELS.ctx_overrides || {})[m.cute];
+      const recommended = m.ctx_recommended;
+      const max = m.ctx_max || 131072;
+      ctxInput.max = max;
+      ctxInput.value = override || recommended || 16384;
+      document.getElementById('ctx-recommended').textContent = (recommended || '?') + ' (for ' + (MODELS.total_ram_gb || '?') + ' GB RAM)';
+      document.getElementById('ctx-hint-min-max').textContent = `(min 2048, max ${max})`;
+    }
+
+    async function openModelModal() {
+      document.getElementById('switch-status').textContent = '';
+      document.getElementById('switch-status').className = 'switch-status';
+      document.getElementById('apply-model-btn').disabled = false;
+      await Promise.all([loadModels(), refreshLlmStatus(), refreshUsage(), refreshOrchestrator()]);
+      selectedCute = (LLM_STATUS && LLM_STATUS.cute) || (MODELS && MODELS.current);
+      renderModelList();
+      updateCtxInputForSelection();
+      renderUsage();  // re-render now that LLM_STATUS is fresh (gives us ctx if usage was missing it)
+      modelModal.classList.remove('hidden');
+    }
+    window.openModelModal = openModelModal;
+    function closeModelModal() {
+      modelModal.classList.add('hidden');
+    }
+    window.closeModelModal = closeModelModal;
+
+    async function applyModel() {
+      if (!selectedCute) return;
+      const ctxInput = document.getElementById('ctx-input');
+      const ctx = parseInt(ctxInput.value, 10) || undefined;
+      const status = document.getElementById('switch-status');
+      const btn = document.getElementById('apply-model-btn');
+      btn.disabled = true;
+      status.className = 'switch-status';
+      status.textContent = 'restarting llama-server…';
+      try {
+        const r = await fetch('/api/model', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cute: selectedCute, ctx }),
+        });
+        if (!r.ok) {
+          const err = await r.text();
+          throw new Error(err.slice(0, 200));
+        }
+        status.textContent = 'model loading, waiting for health…';
+        // Poll /api/llm-status until ready.
+        const deadline = Date.now() + 300000; // 5 min ceiling
+        while (Date.now() < deadline) {
+          await new Promise(r => setTimeout(r, 1500));
+          await refreshLlmStatus();
+          if (LLM_STATUS && LLM_STATUS.ready && LLM_STATUS.cute === selectedCute) {
             break;
           }
         }
+        await loadModels();
+        renderModelList();
+        if (LLM_STATUS && LLM_STATUS.ready) {
+          status.className = 'switch-status ready';
+          status.textContent = 'ready — conversation has been cleared.';
+          // Clear the on-screen conversation too (server already cleared history).
+          conversation.innerHTML =
+            '<div class="empty-hint" id="empty-hint">model switched. start anew.</div>';
+          setTimeout(closeModelModal, 900);
+        } else {
+          status.className = 'switch-status error';
+          status.textContent = 'health poll timed out. check terminal logs.';
+        }
+      } catch (e) {
+        status.className = 'switch-status error';
+        status.textContent = 'error: ' + (e && e.message ? e.message : e);
+      } finally {
+        btn.disabled = false;
       }
     }
-    // Side effects on the filesystem should refresh ambient views.
-    if (status === 'ok' && (name === 'write_file' || name === 'shell')) {
-      // File tree: refetch (don't wait for the next poll tick).
-      htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
-      // Preview pane: if it's showing the file we just wrote, refresh it.
-      if (name === 'write_file') {
-        const preview = document.getElementById('preview');
-        if (preview.classList.contains('open')) {
-          const pathEl = document.getElementById('preview-body').querySelector('.file-path');
-          if (pathEl && pathEl.textContent.trim() === key) {
-            htmx.ajax('GET', '/api/file?path=' + encodeURIComponent(key), {
-              target: '#preview-body', swap: 'innerHTML',
-            });
+    window.applyModel = applyModel;
+
+    modelBadge.addEventListener('click', openModelModal);
+    // Close on Escape when open.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modelModal.classList.contains('hidden')) closeModelModal();
+    });
+
+    // Status polling: fast while loading, relaxed once ready.
+    async function pollLoop() {
+      await refreshLlmStatus();
+      const interval = (LLM_STATUS && LLM_STATUS.ready) ? 8000 : 2000;
+      setTimeout(pollLoop, interval);
+    }
+    loadModels().then(pollLoop);
+    // Prime the gauge with whatever the server last recorded (e.g. after a
+    // page reload mid-conversation, this restores the bar without waiting
+    // for the next turn). Subsequent updates flow in via SSE.
+    refreshUsage();
+    // Also prime the auto-reset toggle from disk so the modal renders the
+    // saved state the first time it's opened.
+    refreshOrchestrator();
+
+    // ---------- Voice input (whisper.cpp) ----------
+    const micBtn = document.getElementById('mic-btn');
+    let mic = {
+      recording: false,
+      stream: null,
+      ctx: null,
+      processor: null,
+      chunks: [],
+      captureRate: 16000,   // filled in when AudioContext starts
+    };
+
+    async function startMic() {
+      try {
+        mic.stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            channelCount: 1,
+            noiseSuppression: true,
+            echoCancellation: true,
+          },
+        });
+      } catch (e) {
+        alert('microphone access denied: ' + (e && e.message ? e.message : e));
+        return;
+      }
+      // Prefer 16 kHz if the browser will honor it; otherwise capture at native
+      // rate and resample in encodeWAV().
+      try {
+        mic.ctx = new AudioContext({ sampleRate: 16000 });
+      } catch (_) {
+        mic.ctx = new AudioContext();
+      }
+      mic.captureRate = mic.ctx.sampleRate;
+      const source = mic.ctx.createMediaStreamSource(mic.stream);
+      // ScriptProcessor is deprecated but universally supported; AudioWorklet
+      // is cleaner but more code for the same effect at v0.0.6 scope.
+      mic.processor = mic.ctx.createScriptProcessor(4096, 1, 1);
+      mic.chunks = [];
+      mic.processor.onaudioprocess = (e) => {
+        if (!mic.recording) return;
+        const input = e.inputBuffer.getChannelData(0);
+        mic.chunks.push(new Float32Array(input));
+      };
+      source.connect(mic.processor);
+      mic.processor.connect(mic.ctx.destination);
+      mic.recording = true;
+      micBtn.classList.add('recording');
+      micBtn.querySelector('.mic-icon').textContent = '●';
+      micBtn.title = 'click to stop + transcribe';
+    }
+
+    async function stopMicAndTranscribe() {
+      mic.recording = false;
+      try { mic.processor && mic.processor.disconnect(); } catch (_) { }
+      try { mic.stream && mic.stream.getTracks().forEach(t => t.stop()); } catch (_) { }
+      try { mic.ctx && await mic.ctx.close(); } catch (_) { }
+
+      micBtn.classList.remove('recording');
+      micBtn.classList.add('transcribing');
+      micBtn.querySelector('.mic-icon').textContent = '…';
+
+      // Concatenate all sample chunks.
+      let total = 0;
+      for (const c of mic.chunks) total += c.length;
+      const flat = new Float32Array(total);
+      { let off = 0; for (const c of mic.chunks) { flat.set(c, off); off += c.length; } }
+
+      // Resample to 16 kHz mono if the capture rate didn't match. Linear
+      // interpolation is fine for speech.
+      const target = 16000;
+      let pcm16 = flat;
+      if (mic.captureRate !== target) {
+        const ratio = mic.captureRate / target;
+        const outLen = Math.floor(flat.length / ratio);
+        const out = new Float32Array(outLen);
+        for (let i = 0; i < outLen; i++) {
+          const src = i * ratio;
+          const i0 = Math.floor(src);
+          const i1 = Math.min(i0 + 1, flat.length - 1);
+          const frac = src - i0;
+          out[i] = flat[i0] * (1 - frac) + flat[i1] * frac;
+        }
+        pcm16 = out;
+      }
+
+      // Float32 → Int16 PCM + WAV header.
+      const wav = encodeWAV(pcm16, target);
+
+      try {
+        const fd = new FormData();
+        fd.append('audio', new Blob([wav], { type: 'audio/wav' }), 'mic.wav');
+        const r = await fetch('/api/transcribe', { method: 'POST', body: fd });
+        if (!r.ok) {
+          const err = await r.text();
+          throw new Error(`transcribe ${r.status}: ${err.slice(0, 200)}`);
+        }
+        const { text } = await r.json();
+        if (text) {
+          const cur = textarea.value;
+          const glue = (cur && !cur.endsWith(' ') && !cur.endsWith('\n')) ? ' ' : '';
+          textarea.value = cur + glue + text;
+          // Autosize.
+          textarea.style.height = 'auto';
+          textarea.style.height = Math.min(textarea.scrollHeight, 280) + 'px';
+        }
+      } catch (e) {
+        console.warn('transcribe failed', e);
+        alert('transcription failed: ' + (e && e.message ? e.message : e));
+      } finally {
+        mic.chunks = [];
+        micBtn.classList.remove('transcribing');
+        micBtn.querySelector('.mic-icon').textContent = '🎤';
+        micBtn.title = 'voice input (local whisper.cpp)';
+        textarea.focus();
+      }
+    }
+
+    function encodeWAV(samples, sampleRate) {
+      // PCM16 WAV
+      const buf = new ArrayBuffer(44 + samples.length * 2);
+      const view = new DataView(buf);
+      const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
+      writeStr(0, 'RIFF');
+      view.setUint32(4, 36 + samples.length * 2, true);
+      writeStr(8, 'WAVE');
+      writeStr(12, 'fmt ');
+      view.setUint32(16, 16, true);           // subchunk1 size
+      view.setUint16(20, 1, true);            // PCM
+      view.setUint16(22, 1, true);            // mono
+      view.setUint32(24, sampleRate, true);   // sample rate
+      view.setUint32(28, sampleRate * 2, true); // byte rate
+      view.setUint16(32, 2, true);            // block align
+      view.setUint16(34, 16, true);           // bits/sample
+      writeStr(36, 'data');
+      view.setUint32(40, samples.length * 2, true);
+      const pcm = new Int16Array(buf, 44);
+      for (let i = 0; i < samples.length; i++) {
+        const s = Math.max(-1, Math.min(1, samples[i]));
+        pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+      }
+      return buf;
+    }
+
+    micBtn.addEventListener('click', () => {
+      if (micBtn.classList.contains('transcribing')) return; // busy
+      if (mic.recording) stopMicAndTranscribe();
+      else startMic();
+    });
+
+    // ---------- Sidebar section collapse ----------
+    const SECTION_KEY = 'enough.sidebar.sections';
+    function getSectionState() {
+      try { return JSON.parse(localStorage.getItem(SECTION_KEY) || '{}'); }
+      catch (_) { return {}; }
+    }
+    function setSectionState(s) { localStorage.setItem(SECTION_KEY, JSON.stringify(s)); }
+    function applySectionState() {
+      const state = getSectionState();
+      document.querySelectorAll('.sidebar-section').forEach(sec => {
+        const name = sec.dataset.section;
+        if (state[name] === 'collapsed') sec.classList.add('collapsed');
+      });
+    }
+    applySectionState();
+    document.querySelectorAll('.sidebar-section .section-head').forEach(h => {
+      h.addEventListener('click', () => {
+        const sec = h.closest('.sidebar-section');
+        sec.classList.toggle('collapsed');
+        const state = getSectionState();
+        state[sec.dataset.section] = sec.classList.contains('collapsed') ? 'collapsed' : 'expanded';
+        setSectionState(state);
+      });
+    });
+
+    // ---------- File-tree folder collapse (event-delegated + localStorage) ----------
+    const TREE_KEY = 'enough.tree.collapsed';
+    function getTreeState() {
+      try { return JSON.parse(localStorage.getItem(TREE_KEY) || '{}'); }
+      catch (_) { return {}; }
+    }
+    function setTreeState(s) { localStorage.setItem(TREE_KEY, JSON.stringify(s)); }
+    function applyTreeState() {
+      const state = getTreeState();
+      document.querySelectorAll('#tree li.dir.has-children').forEach(li => {
+        const path = li.dataset.path;
+        if (state[path] === 'collapsed') li.classList.add('collapsed');
+      });
+    }
+    // Re-apply after every htmx swap of the tree.
+    document.body.addEventListener('htmx:afterSwap', (e) => {
+      if (e.target && e.target.id === 'tree') applyTreeState();
+    });
+    // Delegated click handler: toggle on dir-row of a has-children folder.
+    document.getElementById('tree').addEventListener('click', (e) => {
+      const row = e.target.closest('.dir-row');
+      if (!row) return;
+      const li = row.closest('li.dir.has-children');
+      if (!li) return;
+      li.classList.toggle('collapsed');
+      const state = getTreeState();
+      state[li.dataset.path] = li.classList.contains('collapsed') ? 'collapsed' : 'expanded';
+      setTreeState(state);
+    });
+
+    // Streaming over SSE.
+    function autoscroll() {
+      conversation.scrollTop = conversation.scrollHeight;
+    }
+
+    function currentResponse() {
+      return document.getElementById('current-response');
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    const es = new EventSource('/api/stream');
+
+    es.addEventListener('token', (e) => {
+      const { text } = JSON.parse(e.data);
+      const r = currentResponse();
+      if (!r) return;
+      const body = r.querySelector('.body');
+      body.insertAdjacentHTML('beforeend', escapeHtml(text));
+      autoscroll();
+    });
+
+    es.addEventListener('tool', (e) => {
+      const { name, key, status } = JSON.parse(e.data);
+      const r = currentResponse();
+      if (r) {
+        const indicators = r.querySelector('.tool-indicators');
+        if (status === 'running') {
+          const id = `tool-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+          indicators.insertAdjacentHTML('beforeend',
+            `<div class="tool-indicator running" id="${id}" data-name="${name}" data-key="${escapeHtml(key)}">${name} · ${escapeHtml(key)}</div>`);
+        } else {
+          const running = indicators.querySelectorAll('.tool-indicator.running');
+          for (let i = running.length - 1; i >= 0; i--) {
+            if (running[i].dataset.name === name && running[i].dataset.key === key) {
+              running[i].classList.remove('running');
+              running[i].classList.add(status);
+              break;
+            }
           }
         }
       }
-    }
-    autoscroll();
-  });
-
-  es.addEventListener('turn_start', () => {
-    // If there's no current response (i.e. first turn after a tool call broke the chain),
-    // spawn a new one. Otherwise keep the existing.
-    if (!currentResponse()) {
-      conversation.insertAdjacentHTML('beforeend',
-        '<div class="msg assistant pending" id="current-response">' +
-        '<div class="role">agent</div>' +
-        '<div class="body"></div>' +
-        '<div class="tool-indicators"></div>' +
-        '</div>');
-    }
-    autoscroll();
-  });
-
-  es.addEventListener('turn_end', () => {
-    const r = currentResponse();
-    if (r) {
-      // Strip the id so the next turn can claim it; keep visual "pending" if done is still pending.
-      r.removeAttribute('id');
-    }
-    autoscroll();
-  });
-
-  es.addEventListener('done', () => {
-    // Clear any lingering pending markers.
-    document.querySelectorAll('.msg.assistant.pending').forEach(el => el.classList.remove('pending'));
-    sendBtn.disabled = false;
-    textarea.disabled = false;
-    textarea.focus();
-    autoscroll();
-  });
-
-  es.addEventListener('error', (e) => {
-    try {
-      const { message } = JSON.parse(e.data || '{}');
-      conversation.insertAdjacentHTML('beforeend',
-        `<div class="msg assistant"><div class="role">error</div><div class="body error">${escapeHtml(message || 'stream error')}</div></div>`);
-    } catch (_) { /* ignore parse errors from native event */ }
-    autoscroll();
-  });
-
-  es.addEventListener('ping', () => { /* heartbeat */ });
-
-  es.addEventListener('usage', (e) => {
-    try {
-      LAST_USAGE = JSON.parse(e.data);
-      renderUsage();
-    } catch (_) { /* ignore parse errors */ }
-  });
-
-  // Harness-driven prompts (auto-reset checkpoint + continue messages).
-  // Look like the user typed them but rendered with a distinct style so
-  // the user can tell the harness, not them, asked for it.
-  es.addEventListener('system_prompt', (e) => {
-    try {
-      const { text } = JSON.parse(e.data);
-      conversation.insertAdjacentHTML('beforeend',
-        `<div class="msg harness"><div class="role">harness</div>` +
-        `<div class="body">${escapeHtml(text)}</div></div>`);
+      // Side effects on the filesystem should refresh ambient views.
+      if (status === 'ok' && (name === 'write_file' || name === 'shell')) {
+        // File tree: refetch (don't wait for the next poll tick).
+        htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+        // Preview pane: if it's showing the file we just wrote, refresh it.
+        if (name === 'write_file') {
+          const preview = document.getElementById('preview');
+          if (preview.classList.contains('open')) {
+            const pathEl = document.getElementById('preview-body').querySelector('.file-path');
+            if (pathEl && pathEl.textContent.trim() === key) {
+              htmx.ajax('GET', '/api/file?path=' + encodeURIComponent(key), {
+                target: '#preview-body', swap: 'innerHTML',
+              });
+            }
+          }
+        }
+      }
       autoscroll();
-    } catch (_) { /* ignore */ }
-  });
-
-  // System bubbles — harness narrating what's happening (auto-reset
-  // chrome). These don't go into the model's history; they're only for
-  // the human reading the chat.
-  es.addEventListener('system', (e) => {
-    try {
-      const { kind, message } = JSON.parse(e.data);
-      conversation.insertAdjacentHTML('beforeend',
-        `<div class="msg system" data-kind="${kind || 'note'}">` +
-        `<div class="role">${kind === 'auto_reset_starting' ? 'auto-reset' : 'harness'}</div>` +
-        `<div class="body">${escapeHtml(message || '')}</div></div>`);
-      autoscroll();
-    } catch (_) { /* ignore */ }
-  });
-
-  // The server says "the in-memory conversation has been wiped" — drop a
-  // visual divider so the user can see the seam between the pre-reset
-  // checkpoint phase and the post-reset continuation.
-  es.addEventListener('reset', () => {
-    conversation.insertAdjacentHTML('beforeend', '<hr class="reset-divider">');
-    autoscroll();
-  });
-
-  // ---------- Preview-pane edit mode ----------
-  async function enterEditMode() {
-    const pathEl = document.querySelector('#preview-body .file-path');
-    if (!pathEl) return;
-    const path = pathEl.dataset.path;
-    const pre = document.querySelector('#preview-body .file-body');
-    const actions = document.querySelector('#preview-body .preview-actions');
-    if (!pre || !actions) return;
-    // Fetch raw text so we edit the true bytes, not the escaped display.
-    let raw;
-    try {
-      const r = await fetch('/api/file/raw?path=' + encodeURIComponent(path));
-      if (!r.ok) throw new Error(r.statusText);
-      raw = await r.text();
-    } catch (e) {
-      alert('could not load raw contents: ' + e.message);
-      return;
-    }
-    const textarea = document.createElement('textarea');
-    textarea.className = 'file-edit';
-    textarea.spellcheck = false;
-    textarea.value = raw;
-    pre.replaceWith(textarea);
-    actions.innerHTML =
-      '<button class="save-btn" onclick="saveEdit(\'' + path.replace(/'/g, "\\'") + '\')">save</button>' +
-      '<button class="cancel-btn" onclick="cancelEdit(\'' + path.replace(/'/g, "\\'") + '\')">cancel</button>';
-    textarea.focus();
-  }
-
-  async function saveEdit(path) {
-    const textarea = document.querySelector('#preview-body textarea.file-edit');
-    if (!textarea) return;
-    const fd = new FormData();
-    fd.append('path', path);
-    fd.append('content', textarea.value);
-    const r = await fetch('/api/file', { method: 'POST', body: fd });
-    if (!r.ok) { alert('save failed: ' + r.status + ' ' + r.statusText); return; }
-    const html = await r.text();
-    document.getElementById('preview-body').innerHTML = html;
-    htmx.process(document.getElementById('preview-body'));
-    // Freshen file tree too in case a new file was created via edit.
-    htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
-  }
-
-  async function cancelEdit(path) {
-    // Re-fetch the preview fragment to restore the read-only view.
-    htmx.ajax('GET', '/api/file?path=' + encodeURIComponent(path), {
-      target: '#preview-body', swap: 'innerHTML',
     });
-  }
 
-  async function customizeForProject(path) {
-    if (!confirm('break the symlink and create an editable project-local copy of this file?\n\n' + path)) return;
-    const fd = new FormData();
-    fd.append('path', path);
-    const r = await fetch('/api/file/customize', { method: 'POST', body: fd });
-    if (!r.ok) { alert('customize failed: ' + r.status + ' ' + r.statusText); return; }
-    const html = await r.text();
-    document.getElementById('preview-body').innerHTML = html;
-    htmx.process(document.getElementById('preview-body'));
-    // Refresh file tree so the symlink italic disappears.
-    htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
-  }
+    es.addEventListener('turn_start', () => {
+      // If there's no current response (i.e. first turn after a tool call broke the chain),
+      // spawn a new one. Otherwise keep the existing.
+      if (!currentResponse()) {
+        conversation.insertAdjacentHTML('beforeend',
+          '<div class="msg assistant pending" id="current-response">' +
+          '<div class="role">agent</div>' +
+          '<div class="body"></div>' +
+          '<div class="tool-indicators"></div>' +
+          '</div>');
+      }
+      autoscroll();
+    });
 
-  async function markRequestDone(path) {
-    if (!confirm('mark this request complete and move it to .rness/requests/done/?')) return;
-    const fd = new FormData();
-    fd.append('path', path);
-    const r = await fetch('/api/requests/done', { method: 'POST', body: fd });
-    if (!r.ok) { alert('mark-done failed: ' + r.status + ' ' + r.statusText); return; }
-    // Close preview (the file no longer exists at that path) and refresh sidebars.
-    document.getElementById('preview').classList.remove('open');
-    document.getElementById('preview-body').innerHTML = '';
-    htmx.trigger(document.body, 'requests-refresh');
-    htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
-  }
+    es.addEventListener('turn_end', () => {
+      const r = currentResponse();
+      if (r) {
+        // Strip the id so the next turn can claim it; keep visual "pending" if done is still pending.
+        r.removeAttribute('id');
+      }
+      autoscroll();
+    });
 
-  // Expose to inline onclick handlers.
-  window.enterEditMode = enterEditMode;
-  window.saveEdit = saveEdit;
-  window.cancelEdit = cancelEdit;
-  window.markRequestDone = markRequestDone;
-  window.customizeForProject = customizeForProject;
+    es.addEventListener('done', () => {
+      // Clear any lingering pending markers.
+      document.querySelectorAll('.msg.assistant.pending').forEach(el => el.classList.remove('pending'));
+      sendBtn.disabled = false;
+      textarea.disabled = false;
+      textarea.focus();
+      autoscroll();
+    });
 
-  // Disable the input while a turn is in flight.
-  form.addEventListener('htmx:beforeRequest', () => {
-    sendBtn.disabled = true;
-    textarea.disabled = true;
-  });
-  form.addEventListener('htmx:afterRequest', () => {
-    // `done` event re-enables; this is a fallback if the SSE is slow.
-    setTimeout(() => { textarea.focus(); }, 0);
-  });
+    es.addEventListener('error', (e) => {
+      try {
+        const { message } = JSON.parse(e.data || '{}');
+        conversation.insertAdjacentHTML('beforeend',
+          `<div class="msg assistant"><div class="role">error</div><div class="body error">${escapeHtml(message || 'stream error')}</div></div>`);
+      } catch (_) { /* ignore parse errors from native event */ }
+      autoscroll();
+    });
 
-  autoscroll();
-</script>
+    es.addEventListener('ping', () => { /* heartbeat */ });
+
+    es.addEventListener('usage', (e) => {
+      try {
+        LAST_USAGE = JSON.parse(e.data);
+        renderUsage();
+      } catch (_) { /* ignore parse errors */ }
+    });
+
+    // Harness-driven prompts (auto-reset checkpoint + continue messages).
+    // Look like the user typed them but rendered with a distinct style so
+    // the user can tell the harness, not them, asked for it.
+    es.addEventListener('system_prompt', (e) => {
+      try {
+        const { text } = JSON.parse(e.data);
+        conversation.insertAdjacentHTML('beforeend',
+          `<div class="msg harness"><div class="role">harness</div>` +
+          `<div class="body">${escapeHtml(text)}</div></div>`);
+        autoscroll();
+      } catch (_) { /* ignore */ }
+    });
+
+    // System bubbles — harness narrating what's happening (auto-reset
+    // chrome). These don't go into the model's history; they're only for
+    // the human reading the chat.
+    es.addEventListener('system', (e) => {
+      try {
+        const { kind, message } = JSON.parse(e.data);
+        conversation.insertAdjacentHTML('beforeend',
+          `<div class="msg system" data-kind="${kind || 'note'}">` +
+          `<div class="role">${kind === 'auto_reset_starting' ? 'auto-reset' : 'harness'}</div>` +
+          `<div class="body">${escapeHtml(message || '')}</div></div>`);
+        autoscroll();
+      } catch (_) { /* ignore */ }
+    });
+
+    // The server says "the in-memory conversation has been wiped" — drop a
+    // visual divider so the user can see the seam between the pre-reset
+    // checkpoint phase and the post-reset continuation.
+    es.addEventListener('reset', () => {
+      conversation.insertAdjacentHTML('beforeend', '<hr class="reset-divider">');
+      autoscroll();
+    });
+
+    // ---------- Preview-pane edit mode ----------
+    async function enterEditMode() {
+      const pathEl = document.querySelector('#preview-body .file-path');
+      if (!pathEl) return;
+      const path = pathEl.dataset.path;
+      const pre = document.querySelector('#preview-body .file-body');
+      const actions = document.querySelector('#preview-body .preview-actions');
+      if (!pre || !actions) return;
+      // Fetch raw text so we edit the true bytes, not the escaped display.
+      let raw;
+      try {
+        const r = await fetch('/api/file/raw?path=' + encodeURIComponent(path));
+        if (!r.ok) throw new Error(r.statusText);
+        raw = await r.text();
+      } catch (e) {
+        alert('could not load raw contents: ' + e.message);
+        return;
+      }
+      const textarea = document.createElement('textarea');
+      textarea.className = 'file-edit';
+      textarea.spellcheck = false;
+      textarea.value = raw;
+      pre.replaceWith(textarea);
+      actions.innerHTML =
+        '<button class="save-btn" onclick="saveEdit(\'' + path.replace(/'/g, "\\'") + '\')">save</button>' +
+        '<button class="cancel-btn" onclick="cancelEdit(\'' + path.replace(/'/g, "\\'") + '\')">cancel</button>';
+      textarea.focus();
+    }
+
+    async function saveEdit(path) {
+      const textarea = document.querySelector('#preview-body textarea.file-edit');
+      if (!textarea) return;
+      const fd = new FormData();
+      fd.append('path', path);
+      fd.append('content', textarea.value);
+      const r = await fetch('/api/file', { method: 'POST', body: fd });
+      if (!r.ok) { alert('save failed: ' + r.status + ' ' + r.statusText); return; }
+      const html = await r.text();
+      document.getElementById('preview-body').innerHTML = html;
+      htmx.process(document.getElementById('preview-body'));
+      // Freshen file tree too in case a new file was created via edit.
+      htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+    }
+
+    async function cancelEdit(path) {
+      // Re-fetch the preview fragment to restore the read-only view.
+      htmx.ajax('GET', '/api/file?path=' + encodeURIComponent(path), {
+        target: '#preview-body', swap: 'innerHTML',
+      });
+    }
+
+    async function customizeForProject(path) {
+      if (!confirm('break the symlink and create an editable project-local copy of this file?\n\n' + path)) return;
+      const fd = new FormData();
+      fd.append('path', path);
+      const r = await fetch('/api/file/customize', { method: 'POST', body: fd });
+      if (!r.ok) { alert('customize failed: ' + r.status + ' ' + r.statusText); return; }
+      const html = await r.text();
+      document.getElementById('preview-body').innerHTML = html;
+      htmx.process(document.getElementById('preview-body'));
+      // Refresh file tree so the symlink italic disappears.
+      htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+    }
+
+    async function markRequestDone(path) {
+      if (!confirm('mark this request complete and move it to .rness/requests/done/?')) return;
+      const fd = new FormData();
+      fd.append('path', path);
+      const r = await fetch('/api/requests/done', { method: 'POST', body: fd });
+      if (!r.ok) { alert('mark-done failed: ' + r.status + ' ' + r.statusText); return; }
+      // Close preview (the file no longer exists at that path) and refresh sidebars.
+      document.getElementById('preview').classList.remove('open');
+      document.getElementById('preview-body').innerHTML = '';
+      htmx.trigger(document.body, 'requests-refresh');
+      htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+    }
+
+    // Expose to inline onclick handlers.
+    window.enterEditMode = enterEditMode;
+    window.saveEdit = saveEdit;
+    window.cancelEdit = cancelEdit;
+    window.markRequestDone = markRequestDone;
+    window.customizeForProject = customizeForProject;
+
+    // Disable the input while a turn is in flight.
+    form.addEventListener('htmx:beforeRequest', () => {
+      sendBtn.disabled = true;
+      textarea.disabled = true;
+    });
+    form.addEventListener('htmx:afterRequest', () => {
+      // `done` event re-enables; this is a fallback if the SSE is slow.
+      setTimeout(() => { textarea.focus(); }, 0);
+    });
+
+    autoscroll();
+  </script>
 
 </body>
+
 </html>
