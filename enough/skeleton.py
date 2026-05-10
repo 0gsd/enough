@@ -7,7 +7,7 @@ v0.0.3+ layout:
 - On first run in a project, `.rness/` is populated with a mix of:
     - **symlinks** into `~/enough/defaults/...` — for files whose
       semantics are "global convention, upgradable centrally" (paradigms,
-      policies, models/providers.md, skills, roles).
+      policies, skills, roles).
     - **copies** — for files that diverge per project from the start
       (AGENT.md, MOTIVATION.md, knowledge/user-profile.md).
 - `{project}/infoworld` is a symlink to `~/enough/infoworld/` so all
@@ -57,7 +57,6 @@ _SKELETON_PLAN: tuple[tuple[str, str, str], ...] = (
     ("policies/requests.md",           ".rness/policies/requests.md",            "symlink"),
     ("policies/context-management.md", ".rness/policies/context-management.md",  "symlink"),
     ("policies/allowlists.md",         ".rness/policies/allowlists.md",          "symlink"),
-    ("models/providers.md",            ".rness/models/providers.md",             "symlink"),
     ("knowledge/rosetta-primers",      ".rness/knowledge/rosetta-primers",       "symlink"),
 )
 
@@ -213,7 +212,6 @@ MOTIVATION_MD = _read_default("MOTIVATION.md")
 PARADIGM_DEFAULT_MD = _read_default("paradigms/default.md")
 POLICY_REQUESTS_MD = _read_default("policies/requests.md")
 POLICY_CONTEXT_MGMT_MD = _read_default("policies/context-management.md")
-MODELS_PROVIDERS_MD = _read_default("models/providers.md")
 USER_PROFILE_MD = _PROJECT_LOCAL_FILES[".rness/knowledge/user-profile.md"]
 INFOWORLD_README = _INFOWORLD_README
 

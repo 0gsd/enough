@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>enough</title>
-  <link rel="icon" href="data:,">
+  <link rel="icon" type="image/png" href="/static/enoughavi.png">
   <script src="/static/htmx.min.js"></script>
   <style>
     :root {
@@ -1809,17 +1809,6 @@
           'tighten the read/write allowlist when working with secrets or sensitive code.',
           'add a policy for how to handle long-running scripts or background processes.',
           'define your own checkpoint format if the default Continuation block doesn\'t fit.',
-        ],
-      },
-      'models': {
-        name: 'models/',
-        path: '.rness/models/',
-        what: 'model and provider configuration. <code>providers.md</code> documents which local or remote LLMs are available and what each is best at, so the agent can recommend or switch wisely.',
-        how: 'symlinked from <code>~/enough/defaults/models/</code>. Edit globally to add new model entries. Note: the live ctx-size and current model are managed separately via the model picker in the top bar.',
-        ideas: [
-          'document your machine\'s actual model loadout so the agent picks well.',
-          'note context-window quirks for each model — some handle long context worse than the spec implies.',
-          'record your own latency/quality tradeoffs as a hint for the agent.',
         ],
       },
       'knowledge': {

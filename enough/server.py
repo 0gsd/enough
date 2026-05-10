@@ -169,7 +169,6 @@ _HELP_IDS: dict[str, str] = {
     ".rness/MOTIVATION.md": "motivation-md",
     ".rness/paradigms": "paradigms",
     ".rness/policies": "policies",
-    ".rness/models": "models",
     ".rness/knowledge": "knowledge",
     ".rness/io": "io",
     "infoworld": "infoworld",
