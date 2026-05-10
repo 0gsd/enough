@@ -1740,9 +1740,9 @@
         what: 'per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. active skills add vocabulary, recipes, or behaviors the agent will reach for during conversation.',
         how: 'click ● / ○ to toggle a skill on or off for this project. you can add project-level skills to <code>.rness/.skills/</code> — skill statuses are saved per project. to install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). edit a global skill at the source and the change propagates everywhere it\'s symlinked.',
         ideas: [
-          'pair 2–3 task-specific skills for a focused session — one investigative, one stylistic, one for the actual output.',
-          'build a personal skill that captures your house style or domain conventions.',
-          'turn everything off for a pure conversation — sometimes the model has more breathing room for emergent epiphanies with no scaffolding.',
+          'five skills are included: irefy which summarizes and evaluates any text, memoir-dialectic which can help you structure your memoirs, skillmd-scan to scan downloaded 3P skills for security risks, the-internet which lets the agent fetch web content anonymously using TOR, and translator for universal text translation.',
+          'build global or project-local skills to capture your house style or domain conventions.',
+          'turn everything off for "pure conversation" — sometimes the model has more breathing room for emergent epiphanies with no scaffolding.',
         ],
       },
       'roles': {
@@ -1759,7 +1759,7 @@
       'rness': {
         name: '.rness/',
         path: '.rness/',
-        what: 'the project\'s working room — every config, instruction, knowledge file, and history log the agent uses for this project. the leading dot keeps it hidden in your system\'s file manager; the enough UI shows it as a normal folder.',
+        what: 'a harness made visible, .rness is where each project\'s "system" lives — every config, instruction, knowledge file, and history log the agent uses for this project. the leading dot keeps it hidden in your system\'s file manager; the enough UI shows it as a normal folder.',
         how: 'some contents are symlinks to <code>~/enough/defaults/</code> and update centrally. to diverge for a project, open a file and click <em>customize</em> — it becomes a project-local copy. add new files freely via conversations or your system\'s file manager; the agent will discover any files added locally on its next turn.',
         ideas: [
           'get to know the components that drive your enough workflow and edit them wherever you like.',
@@ -1796,7 +1796,7 @@
         how: 'symlinked from <code>~/enough/defaults/paradigms/</code>. edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. new paradigms can be added simply by dropping a markdown file into the defaults folder.',
         ideas: [
           'write paradigms for distinct modes — exploration vs. execution, brainstorm vs. critique.',
-          'codify your preferred working styles so the agent can better accommodate them.',
+          'the included translation.md paradigm can be used in combination with the translator skill to translate text from any language to any language.',
           'encode how to weigh proofing vs. polishing, or testing vs. shipping, for the kind of work you do.',
         ],
       },
@@ -1804,7 +1804,7 @@
         name: 'policies/',
         path: '.rness/policies/',
         what: 'hard rules the agent must follow — what tools to use, which files it can read or write, how to format requests, how to handle context-window pressure, and which paths are allowlisted.',
-        how: 'symlinked from <code>~/enough/defaults/policies/</code>. edit globally to update the rules for every project, or customize per-project. allowlists in particular are the most common thing to tune locally, and both local paths and web URLs need to be explicitly listed.',
+        how: 'symlinked from <code>~/enough/defaults/policies/</code>. edit globally to update the rules for every project, or customize per-project. allowlists in particular are the most common thing to tune, as both local paths and web URLs need to be explicitly listed.',
         ideas: [
           'tighten the read/write allowlist when working with secrets or sensitive code.',
           'add a policy for how to handle long-running scripts or background processes.',
@@ -1814,7 +1814,7 @@
       'knowledge': {
         name: 'knowledge/',
         path: '.rness/knowledge/',
-        what: 'project-specific knowledge that doesn\'t belong in <code>.rness/io/</code>: always contains <code>user-profile.md</code> (what the agent has learned about you for this project) and <code>session-logs/</code> (each turn\'s prompt and response, saved as markdown).',
+        what: 'project-specific knowledge that doesn\'t belong in <code>.rness/io/</code> or <code>~/enough/infoworld/</code>: always contains <code>user-profile.md</code> (what the agent has learned about you for this project) and <code>session-logs/</code> (each turn\'s prompt and response, saved as markdown).',
         how: '<code>user-profile.md</code> is a real file — both the agent and you can edit it. session logs are append-only. add new subfolders for any project-local memory you want the agent to consult.',
         ideas: [
           'maintain a glossary subfolder for project-specific jargon.',
@@ -1825,11 +1825,11 @@
       'io': {
         name: 'io/',
         path: '.rness/io/',
-        what: 'scratch space for files the agent reads from (<code>input/</code>) or writes to (<code>output/</code>). useful when you want the agent to process a file without polluting the project root.',
+        what: 'a project-level space for files the agent reads from (<code>input/</code>) or writes to (<code>output/</code>). useful when you want the agent to process a file without polluting the project root.',
         how: 'drop files into <code>.rness/io/input/</code> and the agent will see them. anything the agent generates lands in <code>.rness/io/output/</code> — review and move what you want to keep, then clear the rest.',
         ideas: [
           'drop a CSV or transcript into <code>input/</code> and ask the agent to summarize.',
-          'collect multiple draft outputs in <code>output/</code> and pick the best one.',
+          'collect multiple draft outputs in <code>output/</code> and pick the best one (or have the model cross-evaluate them).',
           'clear both periodically — the agent doesn\'t need yesterday\'s scratch work in its context.',
         ],
       },
@@ -1837,11 +1837,11 @@
         name: 'infoworld/',
         path: 'infoworld/ → ~/enough/infoworld/',
         what: 'a grounded-knowledge store shared across every enough project on this machine. symlinked into each project so the agent has a common factual substrate. three subdirectories: <code>wiki/</code> (Wikipedia dumps or your own wiki content), <code>personal/</code> (your reference material), <code>public/</code> (shareable content, though don\'t worry, nobody can see these files unless you share them somewhere :).',
-        how: 'add files via your filesystem — drop markdown, txt, or extracted Wikipedia text into the appropriate subdir. the agent sees these files before answering from its internal data. there\'s no UI for editing; the your system\'s file manager is the way.',
+        how: 'add files to <code>~/enough/infoworld/</code> via your system\'s file manager — drop markdown, txt, or extracted Wikipedia text into the appropriate subdir. the agent sees these files before answering from its internal data. there\'s no UI for editing; your system\'s file manager and preferred text editor is the way to go.',
         ideas: [
           'stash meeting notes in <code>personal/</code> to make them queryable from any project.',
           'download a topic-specific Wikipedia dump (history, pharmacology, music theory) for a research project.',
-          'keep style guides, contracts, or reference bibles in <code>public/</code> for the agent to cite.',
+          'store finished documents in public/ to make it easier to remember to post them somewhere on the internet.',
         ],
       },
     };
