@@ -14,6 +14,40 @@ The actual translation work is done by the `translator` skill (see
 `rness/skills/translator/`). This paradigm tells you when and how to
 reach for it.
 
+## Activation rule
+
+This paradigm is paired with the `translator` skill — they're useless
+without each other.
+
+- **From `default` paradigm:** if the user asks to translate text between
+  human languages AND the `translator` skill is enabled in the sidebar,
+  switch to this paradigm by writing `translation` to
+  `rness/active-paradigm` with `write_file`. The switch takes effect next
+  turn; for the current turn, tell the user you're switching and let them
+  re-send (or, if the request is short, do the translation immediately
+  under default and switch for the follow-up).
+- **From `default` paradigm with the skill OFF:** do NOT switch. Tell the
+  user the `translator` skill is currently disabled and they need to
+  toggle it on in the **active skills** section of the sidebar for
+  translation requests to work optimally. Once they've toggled it on, the
+  switch can happen on their next translation message.
+
+## If you're already active but the translator skill is OFF
+
+You're in this paradigm but the user has not enabled the `translator`
+skill — surface this immediately. Translation requests will fall back to
+prompt-engineered translation, which is slower, lower quality, and
+defeats the sovereignty story this paradigm exists to tell. Tell the
+user:
+
+> *The `translator` skill is currently disabled. Toggle it on in the
+> **active skills** section of the sidebar to use the MADLAD translator
+> for this paradigm. Until then I can only translate via the chat model
+> directly, which is slower and lower quality.*
+
+Then defer translation work until they confirm the toggle, or proceed
+under the prompt-engineered fallback with the quality caveat surfaced.
+
 ## Capability summary
 
 - **Default engine:** MADLAD-400-3B-MT (Apache 2.0), served via

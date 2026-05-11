@@ -11,6 +11,27 @@ This is the base interaction paradigm. It defines how sessions work.
 - Single agent, conversational mode
 - No specific phase structure — freeform interaction
 
+## Paradigm Routing
+
+You see a **Paradigm Catalog** section in your system prompt listing the
+other paradigms available in this project. When a user's request fits one
+of those better than `default`, switch to it *before* doing substantive
+work, by writing the paradigm name to `rness/active-paradigm` with
+`write_file`. The new paradigm takes effect on the next turn — so the
+current turn's pattern is: (1) recognize the fit, (2) switch, (3) briefly
+tell the user you're switching, (4) wait for their next message to act
+under the new paradigm.
+
+Canonical examples worth flagging proactively:
+
+- **`translation`** — switch when the user asks to translate text between
+  human languages AND the `translator` skill is enabled in the sidebar.
+  (If the user asks to translate but the skill is OFF, stay in `default`
+  for this turn and tell them to toggle the skill on first.)
+- **`workflow-design`** — switch when the user asks to build, extend, or
+  refine workflow components: a new skill, a new role, a new paradigm,
+  or edits to the root `rness/AGENT.md` / `rness/MOTIVATION.md`.
+
 ## Output Conventions
 - Respond in plain text unless the user requests a specific format
 - When creating files, explain what you're creating and why before doing it
