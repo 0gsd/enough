@@ -1783,7 +1783,7 @@
         what: 'the reasoning framework the agent is currently using. exactly one paradigm is active at any time; click another to switch. the active paradigm is loaded in full into the system prompt every turn, and the agent also sees a brief catalog of the other available paradigms so it can suggest (or initiate) a switch when the work would benefit from one.',
         how: 'click ● next to a paradigm to make it active for this project. the choice is recorded in <code>rness/active-paradigm</code>. agent-initiated switches happen by writing that file too, and take effect on the next turn. add new paradigms by dropping a markdown file into <code>~/enough/defaults/paradigms/</code> (or into your project\'s <code>rness/paradigms/</code> for project-local ones). a YAML frontmatter block at the top — <code>name:</code> and <code>description:</code> — tells the agent what the paradigm is for.',
         ideas: [
-          'two paradigms ship by default: <em>default</em> for general-purpose work, and <em>translation</em> which pairs with the translator skill for multi-language work.',
+          'three paradigms ship by default: <em>default</em> for general-purpose work, <em>translation</em> which pairs with the translator skill for multi-language work, and <em>workflow-design</em> which puts the agent in "build mode" for creating new skills/paradigms/roles or refining the root AGENT.md / MOTIVATION.md.',
           'write a paradigm for a distinct mode of work (research vs. writing, exploration vs. execution) and switch between them as the day unfolds.',
           'a paradigm description is essentially "when should I use this" — write it for the agent\'s benefit, since that\'s the signal it reads to recommend switching.',
         ],

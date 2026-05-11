@@ -54,6 +54,7 @@ _SKELETON_PLAN: tuple[tuple[str, str, str], ...] = (
     ("MOTIVATION.md",                  "rness/MOTIVATION.md",                   "copy"),
     ("paradigms/default.md",           "rness/paradigms/default.md",            "symlink"),
     ("paradigms/translation.md",       "rness/paradigms/translation.md",        "symlink"),
+    ("paradigms/workflow-design.md",   "rness/paradigms/workflow-design.md",    "symlink"),
     ("policies/requests.md",           "rness/policies/requests.md",            "symlink"),
     ("policies/context-management.md", "rness/policies/context-management.md",  "symlink"),
     ("policies/allowlists.md",         "rness/policies/allowlists.md",          "symlink"),
