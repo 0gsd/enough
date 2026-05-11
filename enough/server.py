@@ -78,6 +78,17 @@ IGNORE_DIRS = {
     ".pytest_cache", ".mypy_cache", ".ruff_cache", "dist", "build",
     ".llama-server",
 }
+
+# Paths hidden from the file-tree sidebar because they're surfaced via
+# dedicated sidebar sections at the top (paradigm picker, skills toggle,
+# roles toggle). The files themselves still exist and the agent can
+# read/write them normally — this is purely a tree-rendering filter to
+# avoid duplicating UI affordances.
+HIDDEN_TREE_PATHS: frozenset[str] = frozenset({
+    "rness/paradigms",
+    "rness/roles",
+    "rness/skills",
+})
 DEFAULT_MAX_TOOL_ITERS = 50
 
 # How long we'll wait between streamed tokens before assuming llama-server
@@ -152,6 +163,8 @@ def _walk_tree(
         if p.name in IGNORE_DIRS:
             continue
         rel = "/".join(rel_parts + (p.name,))
+        if rel in HIDDEN_TREE_PATHS:
+            continue
         node = {
             "name": p.name,
             "path": rel,
@@ -174,9 +187,9 @@ _HELP_IDS: dict[str, str] = {
     "rness": "rness",
     "rness/AGENT.md": "agent-md",
     "rness/MOTIVATION.md": "motivation-md",
-    "rness/paradigms": "paradigms",
     "rness/policies": "policies",
     "rness/knowledge": "knowledge",
+    "rness/requests": "requests",
     "rness/io": "io",
     "infoworld": "infoworld",
 }
@@ -925,34 +938,6 @@ def create_app(
         set_role_enabled(project_dir / "rness", name, enabled_raw == "1")
         return await api_roles()  # type: ignore[return-value]
 
-    @app.get("/api/requests", response_class=HTMLResponse)
-    async def api_requests() -> HTMLResponse:
-        rdir = project_dir / "rness" / "requests"
-        if not rdir.is_dir():
-            return HTMLResponse('<div class="empty-note">no rness/requests/ yet</div>')
-        active = sorted(
-            (p for p in rdir.glob("*.md") if p.is_file()),
-            key=lambda p: p.name,
-            reverse=True,  # newest first (YYYY-MM-DD_HH-MM sorts chronologically)
-        )
-        if not active:
-            return HTMLResponse('<div class="empty-note">no active requests</div>')
-        rows = []
-        for p in active:
-            rel = f"rness/requests/{p.name}"
-            label = _escape_html(p.stem)
-            rows.append(
-                f'<li class="request-row">'
-                f'  <a href="#" '
-                f'    hx-get="/api/file?path={_escape_html(rel)}" '
-                f'    hx-target="#preview-body" hx-swap="innerHTML" '
-                f'    onclick="document.getElementById(\'preview\').classList.add(\'open\')">'
-                f'    {label}'
-                f'  </a>'
-                f'</li>'
-            )
-        return HTMLResponse('<ul class="requests">' + "".join(rows) + "</ul>")
-
     @app.post("/api/requests/done", response_class=HTMLResponse)
     async def api_requests_done(request: Request) -> HTMLResponse:
         form = await request.form()
@@ -971,8 +956,9 @@ def create_app(
         if dest.exists():
             dest = done_dir / (target.stem + "_dup.md")
         target.rename(dest)
-        # Return the new requests list so htmx can refresh the sidebar.
-        return await api_requests()  # type: ignore[return-value]
+        # No body needed — the caller closes the preview pane and refreshes
+        # the file tree itself; this response just confirms the move.
+        return HTMLResponse("")
 
     def _resolve_project_path(path: str) -> Path:
         """Shared path-safety helper for /api/file{,/raw} and POST writes.

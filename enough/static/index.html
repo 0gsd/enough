@@ -411,30 +411,6 @@
       font-size: 12.5px;
     }
 
-    ul.requests {
-      list-style: none;
-      margin: 0 0 12px 0;
-      padding: 0 4px;
-    }
-
-    ul.requests li.request-row {
-      padding: 2px 4px;
-    }
-
-    ul.requests li.request-row a {
-      color: var(--fg-muted);
-      text-decoration: none;
-      font-size: 12.5px;
-      display: block;
-      padding: 2px 4px;
-      border-radius: 3px;
-    }
-
-    ul.requests li.request-row a:hover {
-      color: var(--fg);
-      background: var(--bg-raise);
-    }
-
     .empty-note {
       color: var(--fg-faint);
       font-style: italic;
@@ -1621,16 +1597,6 @@
         </div>
       </section>
 
-      <section class="sidebar-section" data-section="requests">
-        <h3 class="section-head" data-help="requests"><span class="zippy">▾</span>requests</h3>
-        <div class="section-body">
-          <div id="requests-list" hx-get="/api/requests" hx-trigger="load, every 10s, requests-refresh from:body"
-            hx-swap="innerHTML">
-            <div style="color: var(--fg-faint); padding: 8px">loading…</div>
-          </div>
-        </div>
-      </section>
-
       <section class="sidebar-section collapsed" data-section="roles">
         <h3 class="section-head" data-help="roles"><span class="zippy">▾</span>roles</h3>
         <div class="section-body">
@@ -1789,13 +1755,13 @@
         ],
       },
       'requests': {
-        name: 'requests',
+        name: 'requests/',
         path: 'rness/requests/',
-        what: 'persistent task and sub-task containers. each request is a markdown file capturing the goal of your request, the agent\'s reasoning so far, and a continuation block so work can resume across context resets — these are the unit of long-running effort in enough. they are also helpful to continue work if you hit a context window.',
-        how: 'new requests appear here automatically as you and the agent work. click one to view it in the file panel; from there you can mark it done (it moves to <code>rness/requests/done/</code>) or customize. to start a request manually, drop a markdown file into your project\'s <code>rness/requests/</code> with a brief goal at the top.',
+        what: 'persistent task and sub-task containers. each request is a markdown file capturing the goal of your request, the agent\'s reasoning so far, and a continuation block so work can resume across context resets — these are the unit of long-running effort in enough. they are also helpful to continue work if you hit a context window. completed requests live alongside the active ones in <code>rness/requests/done/</code>.',
+        how: 'new requests appear in <code>rness/requests/</code> automatically as you and the agent work — click any file in the project tree to view it in the file panel. from there you can <em>mark done</em> (the file moves to <code>rness/requests/done/</code>) or <em>customize</em>. to start a request manually, drop a markdown file into <code>rness/requests/</code> with a brief goal at the top.',
         ideas: [
           'treat a request as a long-running project — break a vague intent into one and let the agent flesh it out across multiple sessions.',
-          'use requests in your project\'s <code>rness/requests/done/</code> folder as a journal of what you\'ve actually completed.',
+          'browse <code>rness/requests/done/</code> as a journal of what you\'ve actually completed — it\'s the most honest record of your work with this agent.',
           'at context window auto-reset checkpoints, the agent writes a Continuation block to the active request — read it before resuming if you want to redirect.',
         ],
       },
@@ -2955,10 +2921,11 @@
       fd.append('path', path);
       const r = await fetch('/api/requests/done', { method: 'POST', body: fd });
       if (!r.ok) { alert('mark-done failed: ' + r.status + ' ' + r.statusText); return; }
-      // Close preview (the file no longer exists at that path) and refresh sidebars.
+      // Close preview (the file no longer exists at that path) and refresh
+      // the file tree so the request moves visibly from requests/ to
+      // requests/done/.
       document.getElementById('preview').classList.remove('open');
       document.getElementById('preview-body').innerHTML = '';
-      htmx.trigger(document.body, 'requests-refresh');
       htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
     }
 
