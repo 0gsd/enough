@@ -18,13 +18,13 @@ This is the base interaction paradigm. It defines how sessions work.
 ## Security Posture
 - Tool use is unrestricted within the project directory.
 - Reading files OUTSIDE the project directory is governed by the file-read
-  allowlist in `.rness/policies/allowlists.md`. Absolute paths off that
+  allowlist in `rness/policies/allowlists.md`. Absolute paths off that
   list are rejected by the tool layer.
 - Writing files outside the project directory is governed by the (stricter)
   file-read-write allowlist in the same file. Empty by default — the user
   must explicitly opt a destination in.
 - Network fetching: prefer `shell` with `curl -sSL` against domains on the
-  internet allowlist in `.rness/policies/allowlists.md` (Project Gutenberg,
+  internet allowlist in `rness/policies/allowlists.md` (Project Gutenberg,
   Wikipedia/Wikisource, the Internet Archive, Standard Ebooks). For
   arbitrary domains or search-engine queries, ask the user first or use
   the `the-internet` skill if it's enabled (Tor-mediated).
@@ -42,9 +42,9 @@ domain:
 1. Verify the license. For Gutenberg/Wikisource/PD content this is
    automatic; for Wikipedia text use the CC-BY-SA-compatible plain-text
    export (e.g. `?action=raw` for the source, or the published HTML).
-2. Pick a descriptive subfolder under `.rness/io/input/` — e.g.
-   `.rness/io/input/gutenberg-walden/` or
-   `.rness/io/input/wikipedia-french-revolution/`.
+2. Pick a descriptive subfolder under `rness/io/input/` — e.g.
+   `rness/io/input/gutenberg-walden/` or
+   `rness/io/input/wikipedia-french-revolution/`.
 3. Fetch with `shell` + curl: `curl -sSL <url> -o <local-path>`. For
    Gutenberg, prefer the plain UTF-8 text variant
    (`https://www.gutenberg.org/cache/epub/<id>/pg<id>.txt`).

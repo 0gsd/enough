@@ -27,7 +27,7 @@ above are read-only.)
 ## Internet domains
 
 These are domains generally safe to fetch from for caching public-domain,
-CC0, and CC-BY texts into `.rness/io/input/`. The agent SHOULD NOT make
+CC0, and CC-BY texts into `rness/io/input/`. The agent SHOULD NOT make
 arbitrary web requests, run search-engine queries, or follow redirects to
 non-listed hosts without first asking the user.
 
@@ -56,7 +56,7 @@ non-listed hosts without first asking the user.
   (e.g. `infoworld/personal/foo.md`) and doesn't need allowlist
   approval.
 - For internet fetching: prefer `shell` with `curl -sSL <url> -o <path>`
-  to a path under `.rness/io/input/<source-name>/`. Save a sibling
+  to a path under `rness/io/input/<source-name>/`. Save a sibling
   `_manifest.md` capturing source URL, license (CC0 / CC-BY / public
   domain — verify before fetching), retrieval date, and any rights
   notes. Decline non-CC0/CC-BY/public-domain content unless the user

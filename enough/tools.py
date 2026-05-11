@@ -110,7 +110,7 @@ _ALLOWLIST_SECTION_KEYS: dict[str, str] = {
 
 
 def _read_allowlists(project_dir: Path) -> dict[str, list[str]]:
-    """Parse the three allowlists from `.rness/policies/allowlists.md`,
+    """Parse the three allowlists from `rness/policies/allowlists.md`,
     falling back to legacy `read-allowlist.md` if the new file is absent.
 
     Returns a dict with keys `file_read`, `file_rw`, `internet`. Each
@@ -118,7 +118,7 @@ def _read_allowlists(project_dir: Path) -> dict[str, list[str]]:
     domains, ~ unexpanded for paths). Missing file → empty lists.
     Path-prefix lookups should call `_resolve_path_allowlist` to get
     canonical absolute Paths."""
-    rness = project_dir / ".rness" / "policies"
+    rness = project_dir / "rness" / "policies"
     candidates = [rness / "allowlists.md", rness / "read-allowlist.md"]
     policy = next((p for p in candidates if p.is_file()), None)
     out: dict[str, list[str]] = {"file_read": [], "file_rw": [], "internet": []}
@@ -232,7 +232,7 @@ def _safe_join(
                     f"path {rel!r} is outside the project and not on the "
                     f"file-read-write allowlist. allowlisted r/w prefixes: "
                     f"{pretty}. to add a prefix, edit "
-                    f".rness/policies/allowlists.md."
+                    f"rness/policies/allowlists.md."
                 )
         else:
             allowlist = _read_allowlist(project_dir)
@@ -242,7 +242,7 @@ def _safe_join(
                     f"path {rel!r} is outside the project and not on the "
                     f"file-read allowlist. allowlisted read prefixes: "
                     f"{pretty}. to add a prefix, edit "
-                    f".rness/policies/allowlists.md."
+                    f"rness/policies/allowlists.md."
                 )
         return target
     # Relative path — contained in project, as before.
@@ -259,7 +259,7 @@ def _safe_join(
 # locations whose semantics belong to the user/harness — writing here bypasses
 # UI affordances that represent user approval.
 _WRITE_PROTECTED_PREFIXES: tuple[tuple[str, ...], ...] = (
-    (".rness", ".requests", "done"),
+    ("rness", "requests", "done"),
 )
 
 
@@ -291,7 +291,7 @@ def _duplicate_request_reason(project_dir: Path, target: Path) -> str | None:
     """Catch slug-drift: agent regenerates a request filename with a different
     spelling (e.g. `decentralized` → `decentralative`) on a later turn,
     creating a new file instead of updating the existing one. When a write
-    targets `.rness/requests/<slug>_<ts>.md` and another file with the same
+    targets `rness/requests/<slug>_<ts>.md` and another file with the same
     `<ts>` but a different `<slug>` already exists, point the agent at the
     canonical filename."""
     try:
@@ -302,14 +302,14 @@ def _duplicate_request_reason(project_dir: Path, target: Path) -> str | None:
         return None
     # Only the flat active-requests dir; ignore done/ (already protected)
     # and any deeper nesting.
-    if rel_parts[:2] != (".rness", ".requests") or len(rel_parts) != 3:
+    if rel_parts[:2] != ("rness", "requests") or len(rel_parts) != 3:
         return None
     m = _REQUEST_FILENAME_RE.match(rel_parts[-1])
     if not m:
         return None
     target_ts = m.group("ts")
     target_real = target.resolve(strict=False)
-    reqs_dir = project_dir / ".rness" / ".requests"
+    reqs_dir = project_dir / "rness" / "requests"
     for other in reqs_dir.glob("*.md"):
         if other.resolve() == target_real:
             continue  # same file → legitimate update
@@ -317,7 +317,7 @@ def _duplicate_request_reason(project_dir: Path, target: Path) -> str | None:
         if other_m and other_m.group("ts") == target_ts:
             return (
                 f"a request with timestamp {target_ts} already exists at "
-                f".rness/.requests/{other.name}. that's probably the file you "
+                f"rness/requests/{other.name}. that's probably the file you "
                 f"meant to update — your slug spelling may have drifted "
                 f"between turns. `read_file` or `ls` first, then write to the "
                 f"exact existing filename. if you really need a parallel "

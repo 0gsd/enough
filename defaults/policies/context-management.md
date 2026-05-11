@@ -46,7 +46,7 @@ When pressure is high or critical:
    - Which files it should `read_file` to rebuild context.
    - Any open questions for the user.
 3. **Tell the user:** something like *"I've checkpointed
-   `.rness/.requests/<file>.md`. Context is getting heavy — mind hitting
+   `rness/requests/<file>.md`. Context is getting heavy — mind hitting
    /reset? I'll pick up from the checkpoint on the next message."*
 4. **On the next turn (post-reset)**, read the request file, scan the
    Progress Checkpoints (newest first) and the Continuation block, then
@@ -102,11 +102,11 @@ You can help this work well:
 When context is fresh after a reset, these are your other memory
 sources — read them on demand, not pre-emptively:
 
-- `.rness/knowledge/session-logs/<today>.md` — every prior exchange in
+- `rness/knowledge/session-logs/<today>.md` — every prior exchange in
   the current day's session, written by the harness.
-- `.rness/MOTIVATION.md` — accumulated learnings about the user and the
+- `rness/MOTIVATION.md` — accumulated learnings about the user and the
   project. Terse; worth a skim at the start of any substantive turn.
-- `.rness/AGENT.md`, `.rness/paradigms/default.md` — your identity and
+- `rness/AGENT.md`, `rness/paradigms/default.md` — your identity and
   interaction rules. Always loaded into the system prompt; you don't need
   to re-read them.
 - Any file you wrote in the project — `read_file` it when you need the

@@ -71,7 +71,7 @@ def main(argv: list[str] | None = None) -> int:
     project_dir.mkdir(parents=True, exist_ok=True)
 
     # Refuse to launch inside the install directory (~/enough) or anywhere
-    # beneath it. Creating a .rness/ there would write symlinks pointing at
+    # beneath it. Creating a rness/ there would write symlinks pointing at
     # global defaults that are in the same tree — confusing at best,
     # corrupting at worst. Keep the install immutable to enough itself.
     install_dir = Path.home() / "enough"
@@ -87,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
             file=sys.stderr,
         )
         print(
-            "       enough refuses to create a .rness/ here because its files would "
+            "       enough refuses to create a rness/ here because its files would "
             "collide with global defaults.",
             file=sys.stderr,
         )
@@ -112,10 +112,10 @@ def main(argv: list[str] | None = None) -> int:
 
     created = ensure_skeleton(project_dir)
     if created:
-        print(f"created .rness/ skeleton in {project_dir}")
+        print(f"created rness/ skeleton in {project_dir}")
     else:
         # Existing project — check whether ~/enough/defaults/ has gained
-        # any new shared defaults this .rness/ is missing. Just notify;
+        # any new shared defaults this rness/ is missing. Just notify;
         # the user opts in via /update-enough in the chat.
         from .skeleton import detect_drift
         missing = detect_drift(project_dir)

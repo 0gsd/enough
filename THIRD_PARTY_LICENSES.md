@@ -171,7 +171,7 @@ Five skills ship with enough as "first-party" defaults:
 These are authored for the enough project and fall under the
 repository's Apache 2.0 license (see [LICENSE](LICENSE)). Users may add
 their own skills at `~/enough/defaults/skills/` or in any project's
-`.rness/skills/` directory; those skills are governed by whatever terms
+`rness/skills/` directory; those skills are governed by whatever terms
 the skill author chooses.
 
 ---

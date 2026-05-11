@@ -1,4 +1,4 @@
-"""Assemble the system prompt fresh from `.rness/` on every request.
+"""Assemble the system prompt fresh from `rness/` on every request.
 
 Spec: edits to AGENT.md, MOTIVATION.md, or paradigm files take effect on the
 next message. No caching.
@@ -52,39 +52,39 @@ You are running inside an "enough" harness — a paradigmless personal computer
 that the user configures through plain-text conventions.
 
 - Project directory: {project_dir}
-- Your own configuration files ALL live under `.rness/`. Canonical paths:
-    - `.rness/AGENT.md`             — your identity
-    - `.rness/MOTIVATION.md`        — evolving drive
-    - `.rness/paradigms/default.md` — active interaction paradigm
-    - `.rness/knowledge/user-profile.md` — what you know about the user
+- Your own configuration files ALL live under `rness/`. Canonical paths:
+    - `rness/AGENT.md`             — your identity
+    - `rness/MOTIVATION.md`        — evolving drive
+    - `rness/paradigms/default.md` — active interaction paradigm
+    - `rness/knowledge/user-profile.md` — what you know about the user
   When editing any of these, always use the full path (e.g.
-  `<path>.rness/AGENT.md</path>`, not just `AGENT.md`). Tool paths are
+  `<path>rness/AGENT.md</path>`, not just `AGENT.md`). Tool paths are
   resolved from the project root, so a bare `AGENT.md` would create a NEW
   file at the project root — almost never what you or the user want.
 - The `infoworld/` directory contains grounded knowledge (offline reference
   material). When the user asks something that could be answered from stored
   knowledge, prefer grepping or reading from `infoworld/` over relying on
   training data. Use `shell` with `grep -r` for discovery.
-- All exchanges are logged to `.rness/knowledge/session-logs/`. You do not
+- All exchanges are logged to `rness/knowledge/session-logs/`. You do not
   need to write the log yourself; the harness handles it.
 
 ## Where to put files you produce or consume
 
 - **Outputs** (anything you produce that the user might want to read, keep,
   or share — drafts, chapters, analyses, generated code, exports): write to
-  `.rness/io/output/`. If the user names a subfolder ("put it in /chapters/"
-  or "save under research/"), mirror that under `.rness/io/output/` —
-  e.g. `.rness/io/output/chapters/01.md`,
-  `.rness/io/output/research/notes.md`. Default to a flat layout when no
+  `rness/io/output/`. If the user names a subfolder ("put it in /chapters/"
+  or "save under research/"), mirror that under `rness/io/output/` —
+  e.g. `rness/io/output/chapters/01.md`,
+  `rness/io/output/research/notes.md`. Default to a flat layout when no
   subfolder is named.
 - **Inputs** (files the user hands you for one task — pasted text, source
-  documents, transcripts to work from): expect them in `.rness/io/input/`.
+  documents, transcripts to work from): expect them in `rness/io/input/`.
   This is for per-task reference material; durable knowledge belongs in
   `infoworld/`.
-- **`.rness/requests/`** is reserved for the request-tracking markdown files
+- **`rness/requests/`** is reserved for the request-tracking markdown files
   you write per the requests policy. Don't put user artifacts there. If the
   user asks you to "put X in requests/", redirect: write the artifact under
-  `.rness/io/output/` and only put a tracking entry in `.rness/requests/`.
+  `rness/io/output/` and only put a tracking entry in `rness/requests/`.
 """
 
 
@@ -105,8 +105,8 @@ def _section(title: str, body: str) -> str:
 
 
 def _read_disabled_skills(rness: Path) -> set[str]:
-    """Names listed (one per line) in .rness/.skills/.disabled are skipped."""
-    f = rness / ".skills" / ".disabled"
+    """Names listed (one per line) in rness/skills/.disabled are skipped."""
+    f = rness / "skills" / ".disabled"
     if not f.is_file():
         return set()
     try:
@@ -118,7 +118,7 @@ def _read_disabled_skills(rness: Path) -> set[str]:
 
 def list_skills(rness: Path) -> list[tuple[str, bool]]:
     """Return [(name, enabled), ...] for every skill present, in stable order."""
-    skills_dir = rness / ".skills"
+    skills_dir = rness / "skills"
     if not skills_dir.is_dir():
         return []
     names: list[str] = []
@@ -136,8 +136,8 @@ def list_skills(rness: Path) -> list[tuple[str, bool]]:
 
 
 def set_skill_enabled(rness: Path, name: str, enabled: bool) -> None:
-    """Add or remove `name` from .rness/.skills/.disabled."""
-    f = rness / ".skills" / ".disabled"
+    """Add or remove `name` from rness/skills/.disabled."""
+    f = rness / "skills" / ".disabled"
     current = _read_disabled_skills(rness)
     if enabled:
         current.discard(name)
@@ -169,13 +169,13 @@ def _load_skills(rness: Path) -> str:
     """Concatenate every ENABLED skill's content into one block.
 
     Two layouts supported:
-      .rness/.skills/<name>/SKILL.md   — folder-based (Claude Code convention)
-      .rness/.skills/<name>.md         — flat
-    Skills listed in .rness/.skills/.disabled are skipped.
+      rness/skills/<name>/SKILL.md   — folder-based (Claude Code convention)
+      rness/skills/<name>.md         — flat
+    Skills listed in rness/skills/.disabled are skipped.
     Each folder-based skill's section begins with a path-hint preamble so
     the agent knows where companion files live.
     """
-    skills_dir = rness / ".skills"
+    skills_dir = rness / "skills"
     if not skills_dir.is_dir():
         return ""
     disabled = _read_disabled_skills(rness)
@@ -186,7 +186,7 @@ def _load_skills(rness: Path) -> str:
             continue
         text = _read_or_empty(skill_md)
         if text:
-            root = f".rness/.skills/{name}/"
+            root = f"rness/skills/{name}/"
             parts.append(f"## {name}\n\n{_skill_root_note(root)}\n\n{text}")
     for flat in sorted(skills_dir.glob("*.md")):
         name = flat.stem
@@ -206,8 +206,8 @@ def _load_skills(rness: Path) -> str:
 # ---------------------------------------------------------------------------
 
 def _read_disabled_roles(rness: Path) -> set[str]:
-    """Names listed (one per line) in .rness/.roles/.disabled are skipped."""
-    f = rness / ".roles" / ".disabled"
+    """Names listed (one per line) in rness/roles/.disabled are skipped."""
+    f = rness / "roles" / ".disabled"
     if not f.is_file():
         return set()
     try:
@@ -219,7 +219,7 @@ def _read_disabled_roles(rness: Path) -> set[str]:
 
 def list_roles(rness: Path) -> list[tuple[str, bool]]:
     """Return [(name, enabled), ...] for every role present, in stable order."""
-    roles_dir = rness / ".roles"
+    roles_dir = rness / "roles"
     if not roles_dir.is_dir():
         return []
     names: list[str] = []
@@ -234,8 +234,8 @@ def list_roles(rness: Path) -> list[tuple[str, bool]]:
 
 
 def set_role_enabled(rness: Path, name: str, enabled: bool) -> None:
-    """Add or remove `name` from .rness/.roles/.disabled."""
-    f = rness / ".roles" / ".disabled"
+    """Add or remove `name` from rness/roles/.disabled."""
+    f = rness / "roles" / ".disabled"
     current = _read_disabled_roles(rness)
     if enabled:
         current.discard(name)
@@ -274,7 +274,7 @@ def _load_roles(rness: Path) -> str:
     """Concatenate every ENABLED role's AGENT.md + MOTIVATION.md into one
     block, framed as the consultant model above. Each role gets a `## Role:
     <name>` heading so the model can address them by name."""
-    roles_dir = rness / ".roles"
+    roles_dir = rness / "roles"
     if not roles_dir.is_dir():
         return ""
     disabled = _read_disabled_roles(rness)
@@ -303,7 +303,7 @@ def _load_roles(rness: Path) -> str:
 
 
 def _load_policies(rness: Path) -> str:
-    """Concatenate every policy under .rness/policies/ into one block."""
+    """Concatenate every policy under rness/policies/ into one block."""
     policies_dir = rness / "policies"
     if not policies_dir.is_dir():
         return ""
@@ -316,12 +316,12 @@ def _load_policies(rness: Path) -> str:
 
 
 def assemble_system_prompt(project_dir: Path, active_paradigm: str = "default") -> str:
-    """Build the system prompt fresh from .rness/ files.
+    """Build the system prompt fresh from rness/ files.
 
     Concatenates: AGENT.md, MOTIVATION.md, active paradigm, optional INTENTION.md,
     tool instructions, and the harness-context block.
     """
-    rness = project_dir / ".rness"
+    rness = project_dir / "rness"
 
     agent = _read_or_empty(rness / "AGENT.md")
     motivation = _read_or_empty(rness / "MOTIVATION.md")
@@ -361,7 +361,7 @@ def assemble_system_prompt(project_dir: Path, active_paradigm: str = "default") 
 
 def _drift_notice(project_dir: Path) -> str:
     """Build a brief system-prompt section informing the agent that
-    `~/enough/defaults/` has shared defaults this `.rness/` is missing.
+    `~/enough/defaults/` has shared defaults this `rness/` is missing.
 
     The user-facing nudge lives in the empty-hint banner the harness
     renders on the chat pane, NOT in the agent's first response. This
@@ -382,7 +382,7 @@ def _drift_notice(project_dir: Path) -> str:
     return (
         "FYI only — do not raise this unprompted.\n\n"
         "A newer version of enough has been installed at `~/enough/`, and "
-        "this project's `.rness/` is missing some defaults that have since "
+        "this project's `rness/` is missing some defaults that have since "
         "been added:\n\n"
         f"{listed}\n\n"
         "The harness shows the user a notice in the empty-conversation "

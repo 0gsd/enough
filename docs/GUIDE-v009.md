@@ -105,8 +105,8 @@ enough
 Your browser will open at `http://127.0.0.1:3456` showing a chat
 interface, a file sidebar, and a model badge in the top-right.
 
-The first time you launch in a folder, `enough` creates a hidden
-`.rness/` directory in it — that's where the agent's identity, memory,
+The first time you launch in a folder, `enough` creates an
+`rness/` directory in it — that's where the agent's identity, memory,
 and configuration live. Type a message to start. The agent will likely
 ask you what kind of work you want to do here and what personality it
 should have.
@@ -134,7 +134,7 @@ brain.
 **One folder = one agent.** No multi-agent orchestration, no shared
 state. If you want a different agent, go to a different folder.
 
-The hidden `.rness/` directory inside your project is where all the
+The `rness/` directory inside your project is where all the
 agent's stuff lives. Most of it you'll never touch directly — the sidebar
 surfaces what matters.
 
@@ -224,12 +224,12 @@ capability. Tells the agent when to route requests to the `translator`
 skill, which model variant to pick (3B default vs. opt-in 7B vs.
 license-gated NLLB-200), how to fall back when MADLAD struggles on
 low-resource pairs, and how to consult the bundled Rosetta primers at
-`.rness/knowledge/rosetta-primers/` for ground-truth verification.
+`rness/knowledge/rosetta-primers/` for ground-truth verification.
 
 **How to use it:**
 
 - For **most users**, don't touch it — the default is sensible.
-- To **see what it says**, click `.rness/paradigms/default.md` in the
+- To **see what it says**, click `rness/paradigms/default.md` in the
   sidebar. It opens in the preview pane.
 - To **change it for one project only**: in the preview pane, click
   *"customize for this project"*. The default symlink is replaced with a
@@ -246,7 +246,7 @@ Most won't need to.
 When you ask the agent to do something that takes more than one
 conversation turn — write a 50-page report, build a piece of software,
 research a topic across many sources — it creates a **request file**
-under `.rness/.requests/`. This is its working memory for the job.
+under `rness/requests/`. This is its working memory for the job.
 
 The file tracks:
 
@@ -264,7 +264,7 @@ The file tracks:
   Click any one to see it in the preview pane.
 - When the agent says it's done with a request, the preview pane gets a
   **mark done** button. One click moves the file to
-  `.rness/.requests/done/`. That click is your approval — the agent
+  `rness/requests/done/`. That click is your approval — the agent
   can't move it itself.
 
 This is how `enough` survives losing its memory mid-job. (See auto-reset.)
@@ -341,7 +341,7 @@ text into `infoworld/personal/` for a lighter setup).
 write inside your project folder freely, but reaching outside it — onto
 your wider Mac, or out to the internet — requires explicit permission.
 
-These permissions live in `.rness/policies/allowlists.md` and have three
+These permissions live in `rness/policies/allowlists.md` and have three
 sections:
 
 - **File-read prefixes** — paths the agent may read (default: just
@@ -355,7 +355,7 @@ sections:
 
 **How to use them:**
 
-- Click `.rness/policies/allowlists.md` in the sidebar to see the
+- Click `rness/policies/allowlists.md` in the sidebar to see the
   current rules.
 - Add a path or domain by editing the file (use *customize for this
   project* to make a project-local copy first).
@@ -369,7 +369,7 @@ will *willingly* fetch without asking.
 ### Session logs
 
 Every conversation is automatically saved to
-`.rness/knowledge/session-logs/<date>.md` — one file per day. You don't
+`rness/knowledge/session-logs/<date>.md` — one file per day. You don't
 need to do anything; the harness writes them. The agent can read them
 later if it needs to remember a conversation from yesterday.
 
@@ -385,7 +385,7 @@ talking to you.
   they're on the file-read allowlist.
 - **`write_file`** — writes a text file. Same restrictions, plus the
   stricter file-read-write list for absolute paths. Can't write to
-  `.rness/.requests/done/` (only the *mark done* button does that).
+  `rness/requests/done/` (only the *mark done* button does that).
 - **`shell`** — runs any shell command in your project folder. This is
   the deliberate "nuclear option" — it can in principle do anything
   your terminal can do. The agent is instructed to use it sparingly and
@@ -402,7 +402,7 @@ loop forever.
   not a service. When you close `enough`, it stops. When you open it, it
   starts fresh (but reads its memory files).
 - **Your work is in plain files.** Even the agent's "memory" is text.
-  Open `.rness/AGENT.md` in TextEdit or any editor — that's literally
+  Open `rness/AGENT.md` in TextEdit or any editor — that's literally
   what the agent thinks of itself.
 - **You can't "break" things in a serious way.** The worst case is your
   project folder gets messy. `enough` doesn't touch other parts of your
@@ -479,9 +479,9 @@ git pull upstream main
 The code is small and readable. Roughly:
 
 - `enough/server.py` — FastAPI app: chat, SSE streaming, file tree, model modal, auto-reset orchestration
-- `enough/prompt.py` — assembles the system prompt from `.rness/` on every turn
+- `enough/prompt.py` — assembles the system prompt from `rness/` on every turn
 - `enough/tools.py` — `read_file` / `write_file` / `shell`, plus path safety
-- `enough/skeleton.py` — creates `.rness/` for new projects, syncs globals on every launch
+- `enough/skeleton.py` — creates `rness/` for new projects, syncs globals on every launch
 - `enough/llm.py` — talks to llama-server (local LLM via OpenAI-compatible API)
 - `enough/supervisor.py` — manages the llama-server subprocess
 - `enough/static/index.html` — the entire UI (htmx + vanilla JS)

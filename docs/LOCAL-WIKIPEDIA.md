@@ -18,7 +18,7 @@ Best for: dipping in, picking up a few articles relevant to a current
 project, no commitment.
 
 The agent's default paradigm already knows how to fetch from
-Wikipedia (via the internet allowlist in `.rness/policies/allowlists.md`)
+Wikipedia (via the internet allowlist in `rness/policies/allowlists.md`)
 and cache the result. Just ask:
 
 > "Cache the Wikipedia article on the French Revolution into `infoworld/wiki/`."
@@ -34,7 +34,7 @@ This works well for the dozen or two articles you actually care about.
 It's not a strategy for "cache all of Wikipedia."
 
 If you want it project-local instead of global, ask for it under
-`.rness/io/input/` instead.
+`rness/io/input/` instead.
 
 ---
 
@@ -108,7 +108,7 @@ handles HTML fine via `grep`.
 
 Once populated, just mention to the agent that `infoworld/wiki/` is
 populated and it'll start consulting it before reaching for training
-data. You can also edit `.rness/MOTIVATION.md` to note which corpora
+data. You can also edit `rness/MOTIVATION.md` to note which corpora
 are available locally.
 
 ---

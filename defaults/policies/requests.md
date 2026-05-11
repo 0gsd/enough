@@ -23,24 +23,24 @@ Don't trigger on:
 - A one-shot Q&A.
 - A quick tool call with a clear self-contained answer.
 
-## What `.rness/.requests/` is for
+## What `rness/requests/` is for
 
 This directory exists for **your** request-tracking markdown files (the schema
 below) and nothing else. It is not a general scratch area.
 
-- User artifacts you produce → `.rness/io/output/` (mirror any subfolder the
+- User artifacts you produce → `rness/io/output/` (mirror any subfolder the
   user names there).
-- Files the user hands you for a task → `.rness/io/input/`.
+- Files the user hands you for a task → `rness/io/input/`.
 - If the user says "put X in `requests/`", they almost certainly mean "save
   the artifact and track it as a request." Do both: write the artifact under
-  `.rness/io/output/` (mirroring any subfolder they named, e.g.
-  `.rness/io/output/requests/X`), and create a tracking file here per the
+  `rness/io/output/` (mirroring any subfolder they named, e.g.
+  `rness/io/output/requests/X`), and create a tracking file here per the
   schema.
 
 ## Where requests live
 
-- Active: `.rness/.requests/<summary>_YYYY-MM-DD_HH-MM.md`
-- Done:   `.rness/.requests/done/<summary>_YYYY-MM-DD_HH-MM.md`
+- Active: `rness/requests/<summary>_YYYY-MM-DD_HH-MM.md`
+- Done:   `rness/requests/done/<summary>_YYYY-MM-DD_HH-MM.md`
 
 `<summary>` is a brief kebab-case description (4–8 words). Example:
 `fetch-gutenberg-tractatus_2026-04-19_17-32.md`.
@@ -123,7 +123,7 @@ paths, links, summaries of decisions. Fill this in when Status becomes
 4. **When you believe the request is fulfilled**, fill in "End output",
    flip Status to `waiting-on-user`, and tell the user you're done.
 5. **The user confirms via the UI** (a "mark done" button in the preview
-   pane moves the file to `.rness/.requests/done/`). Do NOT move it yourself
+   pane moves the file to `rness/requests/done/`). Do NOT move it yourself
    — the move is the user's approval act.
 
 ## Before updating an active request file
@@ -135,13 +135,13 @@ instead of updating the existing one. Instead, always list the directory
 first:
 
     <tool name="shell">
-    <command>ls .rness/.requests/*.md</command>
+    <command>ls rness/requests/*.md</command>
     </tool>
 
 and use the exact filename shown, verbatim, in your next `write_file`.
 
 The harness will actively reject creation of a second file in
-`.rness/.requests/` that shares its `_YYYY-MM-DD_HH-MM` timestamp with an
+`rness/requests/` that shares its `_YYYY-MM-DD_HH-MM` timestamp with an
 existing active file — the error message will name the canonical file to
 update.
 
@@ -153,6 +153,6 @@ update.
 
 ## Examples of requests that do NOT need tracking
 
-- "What does `.rness/paradigms/default.md` say?"
+- "What does `rness/paradigms/default.md` say?"
 - "Rename this file to foo.md."
 - "Add a comma to this sentence."

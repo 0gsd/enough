@@ -46,7 +46,7 @@ again. After install, translation works with the network unplugged.
 
 For higher quality on **low-resource languages specifically** (under-served
 African, indigenous American, and Pacific languages), the user can opt
-into the NLLB-200 paradigm — see `.rness/paradigms/translation.md`.
+into the NLLB-200 paradigm — see `rness/paradigms/translation.md`.
 NLLB-200 is CC-BY-NC, so it's gated behind that paradigm flag for
 personal-use-only contexts. Don't reach for it without checking the
 paradigm.
@@ -154,7 +154,7 @@ on an external SSD).
     - The NLLB-200 paradigm option, if the user has accepted its
       CC-BY-NC license terms
     - The Rosetta primers reference set in
-      `.rness/knowledge/rosetta-primers/` — bundled Swadesh lists,
+      `rness/knowledge/rosetta-primers/` — bundled Swadesh lists,
       grammar sketches, and parallel Genesis translations from the
       Long Now Rosetta Project, useful as a sanity check or as
       few-shot grounding when MADLAD is shaky
@@ -215,5 +215,5 @@ dependency, no SDK lock-in" principle for a high-stakes capability:
 If the user wants higher-quality translation for low-resource languages
 and is willing to accept a non-commercial license for personal use, the
 NLLB-200 paradigm (gated behind a flag in
-`.rness/paradigms/translation.md`) provides that path — explicitly,
+`rness/paradigms/translation.md`) provides that path — explicitly,
 with the license tradeoff visible.

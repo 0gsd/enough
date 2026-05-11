@@ -26,7 +26,7 @@
       /* Depth-based nav colors. Folders get progressively cooler/lighter;
        files are closest to white. Symlinks a touch grayer than direct files. */
       --nav-depth-1: #6b8cff;
-      /* royal blue — top-level folders (.rness, infoworld) */
+      /* royal blue — top-level folders (rness, infoworld) */
       --nav-depth-2: #8ea9ff;
       /* direct children (paradigms, policies, skills…) */
       --nav-depth-3: #b2c4ff;
@@ -1725,20 +1725,20 @@
     const HELP_DOCS = {
       'requests': {
         name: 'requests',
-        path: '.rness/.requests/',
+        path: 'rness/requests/',
         what: 'persistent task and sub-task containers. each request is a markdown file capturing the goal of your request, the agent\'s reasoning so far, and a continuation block so work can resume across context resets — these are the unit of long-running effort in enough. they are also helpful to continue work if you hit a context window.',
-        how: 'new requests appear here automatically as you and the agent work. click one to view it in the file panel; from there you can mark it done (it moves to <code>.rness/.requests/done/</code>) or customize. to start a request manually, drop a markdown file into your project\'s <code>.rness/.requests/</code> with a brief goal at the top.',
+        how: 'new requests appear here automatically as you and the agent work. click one to view it in the file panel; from there you can mark it done (it moves to <code>rness/requests/done/</code>) or customize. to start a request manually, drop a markdown file into your project\'s <code>rness/requests/</code> with a brief goal at the top.',
         ideas: [
           'treat a request as a long-running project — break a vague intent into one and let the agent flesh it out across multiple sessions.',
-          'use requests in your project\'s <code>.rness/.requests/done/</code> folder as a journal of what you\'ve actually completed.',
+          'use requests in your project\'s <code>rness/requests/done/</code> folder as a journal of what you\'ve actually completed.',
           'at context window auto-reset checkpoints, the agent writes a Continuation block to the active request — read it before resuming if you want to redirect.',
         ],
       },
       'skills': {
         name: 'active skills',
-        path: '.rness/.skills/',
+        path: 'rness/skills/',
         what: 'per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. active skills add vocabulary, recipes, or behaviors the agent will reach for during conversation.',
-        how: 'click ● / ○ to toggle a skill on or off for this project. you can add project-level skills to <code>.rness/.skills/</code> — skill statuses are saved per project. to install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). edit a global skill at the source and the change propagates everywhere it\'s symlinked.',
+        how: 'click ● / ○ to toggle a skill on or off for this project. you can add project-level skills to <code>rness/skills/</code> — skill statuses are saved per project. to install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). edit a global skill at the source and the change propagates everywhere it\'s symlinked.',
         ideas: [
           'five skills are included: irefy which summarizes and evaluates any text, memoir-dialectic which can help you structure your memoirs, skillmd-scan to scan downloaded 3P skills for security risks, the-internet which lets the agent fetch web content anonymously using TOR, and translator for universal text translation.',
           'build global or project-local skills to capture your house style or domain conventions.',
@@ -1747,7 +1747,7 @@
       },
       'roles': {
         name: 'roles',
-        path: '.rness/.roles/',
+        path: 'rness/roles/',
         what: 'consultant agents you can summon in conversation, sourced from <code>~/enough/defaults/roles/</code>. each role is a folder containing AGENT.md (instructions) and MOTIVATION.md (drives) — the same pair of files that defines the main agent, but scoped to a complementary (or adversarial) persona.',
         how: 'click ● / ○ to enable a role for this project. add new roles globally by creating <code>~/enough/defaults/roles/&lt;name&gt;/</code> with AGENT.md and MOTIVATION.md inside; project-level works and edits propagate, just like skills.',
         ideas: [
@@ -1757,9 +1757,9 @@
         ],
       },
       'rness': {
-        name: '.rness/',
-        path: '.rness/',
-        what: 'a harness made visible, .rness is where each project\'s "system" lives — every config, instruction, knowledge file, and history log the agent uses for this project. the leading dot keeps it hidden in your system\'s file manager; the enough UI shows it as a normal folder.',
+        name: 'rness/',
+        path: 'rness/',
+        what: 'a harness made visible. rness/ is where each project\'s "system" lives — every config, instruction, knowledge file, and history log the agent uses for this project. it sits at the top of the project so you can edit it directly with any file manager or editor; the enough UI also surfaces its contents in the sidebar.',
         how: 'some contents are symlinks to <code>~/enough/defaults/</code> and update centrally. to diverge for a project, open a file and click <em>customize</em> — it becomes a project-local copy. add new files freely via conversations or your system\'s file manager; the agent will discover any files added locally on its next turn.',
         ideas: [
           'get to know the components that drive your enough workflow and edit them wherever you like.',
@@ -1769,9 +1769,9 @@
       },
       'agent-md': {
         name: 'AGENT.md',
-        path: '.rness/AGENT.md',
+        path: 'rness/AGENT.md',
         what: 'the agent\'s working instructions for this project. used for every turn alongside MOTIVATION.md. everything in here shapes how the agent talks, what it does, and what it avoids.',
-        how: 'click the file to view it; hit <em>customize</em> to fork a project-local copy and edit. or open <code>.rness/AGENT.md</code> in any editor — saved changes take effect on the next message.',
+        how: 'click the file to view it; hit <em>customize</em> to fork a project-local copy and edit. or open <code>rness/AGENT.md</code> in any editor — saved changes take effect on the next message.',
         ideas: [
           'add project-specific guardrails (e.g., "always double-check both spelling and factuality before finalzing an edit").',
           'list the naming conventions of your project so the agent doesn\'t have to guess (or hallucinnovate).',
@@ -1780,7 +1780,7 @@
       },
       'motivation-md': {
         name: 'MOTIVATION.md',
-        path: '.rness/MOTIVATION.md',
+        path: 'rness/MOTIVATION.md',
         what: 'the agent\'s "why" for this project — values, priorities, and goals beyond the literal task list. used alongside AGENT.md every turn.',
         how: 'same as AGENT.md — click to preview, customize for a project-local copy, or edit the file directly.',
         ideas: [
@@ -1791,7 +1791,7 @@
       },
       'paradigms': {
         name: 'paradigms/',
-        path: '.rness/paradigms/',
+        path: 'rness/paradigms/',
         what: 'reasoning frameworks the agent uses. each paradigm is a markdown file describing a way to approach problems — heuristics, decision criteria, when to ask vs. act.',
         how: 'symlinked from <code>~/enough/defaults/paradigms/</code>. edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. new paradigms can be added simply by dropping a markdown file into the defaults folder.',
         ideas: [
@@ -1802,7 +1802,7 @@
       },
       'policies': {
         name: 'policies/',
-        path: '.rness/policies/',
+        path: 'rness/policies/',
         what: 'hard rules the agent must follow — what tools to use, which files it can read or write, how to format requests, how to handle context-window pressure, and which paths are allowlisted.',
         how: 'symlinked from <code>~/enough/defaults/policies/</code>. edit globally to update the rules for every project, or customize per-project. allowlists in particular are the most common thing to tune, as both local paths and web URLs need to be explicitly listed.',
         ideas: [
@@ -1813,8 +1813,8 @@
       },
       'knowledge': {
         name: 'knowledge/',
-        path: '.rness/knowledge/',
-        what: 'project-specific knowledge that doesn\'t belong in <code>.rness/io/</code> or <code>~/enough/infoworld/</code>: always contains <code>user-profile.md</code> (what the agent has learned about you for this project) and <code>session-logs/</code> (each turn\'s prompt and response, saved as markdown).',
+        path: 'rness/knowledge/',
+        what: 'project-specific knowledge that doesn\'t belong in <code>rness/io/</code> or <code>~/enough/infoworld/</code>: always contains <code>user-profile.md</code> (what the agent has learned about you for this project) and <code>session-logs/</code> (each turn\'s prompt and response, saved as markdown).',
         how: '<code>user-profile.md</code> is a real file — both the agent and you can edit it. session logs are append-only. add new subfolders for any project-local memory you want the agent to consult.',
         ideas: [
           'maintain a glossary subfolder for project-specific jargon.',
@@ -1824,9 +1824,9 @@
       },
       'io': {
         name: 'io/',
-        path: '.rness/io/',
+        path: 'rness/io/',
         what: 'a project-level space for files the agent reads from (<code>input/</code>) or writes to (<code>output/</code>). useful when you want the agent to process a file without polluting the project root.',
-        how: 'drop files into <code>.rness/io/input/</code> and the agent will see them. anything the agent generates lands in <code>.rness/io/output/</code> — review and move what you want to keep, then clear the rest.',
+        how: 'drop files into <code>rness/io/input/</code> and the agent will see them. anything the agent generates lands in <code>rness/io/output/</code> — review and move what you want to keep, then clear the rest.',
         ideas: [
           'drop a CSV or transcript into <code>input/</code> and ask the agent to summarize.',
           'collect multiple draft outputs in <code>output/</code> and pick the best one (or have the model cross-evaluate them).',
@@ -2885,7 +2885,7 @@
     }
 
     async function markRequestDone(path) {
-      if (!confirm('mark this request complete and move it to .rness/requests/done/?')) return;
+      if (!confirm('mark this request complete and move it to rness/requests/done/?')) return;
       const fd = new FormData();
       fd.append('path', path);
       const r = await fetch('/api/requests/done', { method: 'POST', body: fd });

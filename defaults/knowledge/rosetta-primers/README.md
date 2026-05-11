@@ -42,8 +42,8 @@ language subfolder, drop a `_manifest.md` next to the files capturing:
 - License (be specific: CC0 / CC-BY / CC-BY-SA / public domain)
 - Any rights notes the source page mentions
 
-Same convention as `.rness/io/input/` web caches — see
-`.rness/paradigms/default.md` for the canonical workflow.
+Same convention as `rness/io/input/` web caches — see
+`rness/paradigms/default.md` for the canonical workflow.
 
 ## Suggested layout
 

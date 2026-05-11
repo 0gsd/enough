@@ -6,7 +6,7 @@ permanent, locally-hosted, ~419-language translator at hand — no cloud
 dependency, no account, no rate limit.
 
 The actual translation work is done by the `translator` skill (see
-`.rness/.skills/translator/`). This paradigm tells you when and how to
+`rness/skills/translator/`). This paradigm tells you when and how to
 reach for it.
 
 ## Capability summary
@@ -84,7 +84,7 @@ spans, near-gibberish), in this order:
 1. **Re-attempt with paragraph splits.** Sometimes a long input causes
    degradation that a chunked re-run fixes.
 2. **Suggest the 7B variant**, with the disk and time costs surfaced.
-3. **Consult the Rosetta primers** at `.rness/knowledge/rosetta-primers/`
+3. **Consult the Rosetta primers** at `rness/knowledge/rosetta-primers/`
    if populated for the target language — Swadesh lists, grammar
    sketches, and parallel Genesis from the Long Now Rosetta Project.
    Use them as ground truth to verify or repair MADLAD output, not as

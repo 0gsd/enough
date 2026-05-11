@@ -1,10 +1,10 @@
-"""Generate the `.rness/` skeleton for a new project.
+"""Generate the `rness/` skeleton for a new project.
 
 v0.0.3+ layout:
 
 - `~/enough/defaults/` holds the source-of-truth default files (shipped
   with the repo at `<install_root>/defaults/`).
-- On first run in a project, `.rness/` is populated with a mix of:
+- On first run in a project, `rness/` is populated with a mix of:
     - **symlinks** into `~/enough/defaults/...` — for files whose
       semantics are "global convention, upgradable centrally" (paradigms,
       policies, skills, roles).
@@ -44,25 +44,25 @@ def _global_infoworld_root() -> Path:
 
 
 # ---------------------------------------------------------------------------
-# Per-file policy: how each default file should appear in a new .rness/.
+# Per-file policy: how each default file should appear in a new rness/.
 # ---------------------------------------------------------------------------
 
 # (src_rel_to_defaults, dst_rel_to_project, mode)
 # mode: "symlink" | "copy"
 _SKELETON_PLAN: tuple[tuple[str, str, str], ...] = (
-    ("AGENT.md",                       ".rness/AGENT.md",                        "copy"),
-    ("MOTIVATION.md",                  ".rness/MOTIVATION.md",                   "copy"),
-    ("paradigms/default.md",           ".rness/paradigms/default.md",            "symlink"),
-    ("paradigms/translation.md",       ".rness/paradigms/translation.md",        "symlink"),
-    ("policies/requests.md",           ".rness/policies/requests.md",            "symlink"),
-    ("policies/context-management.md", ".rness/policies/context-management.md",  "symlink"),
-    ("policies/allowlists.md",         ".rness/policies/allowlists.md",          "symlink"),
-    ("knowledge/rosetta-primers",      ".rness/knowledge/rosetta-primers",       "symlink"),
+    ("AGENT.md",                       "rness/AGENT.md",                        "copy"),
+    ("MOTIVATION.md",                  "rness/MOTIVATION.md",                   "copy"),
+    ("paradigms/default.md",           "rness/paradigms/default.md",            "symlink"),
+    ("paradigms/translation.md",       "rness/paradigms/translation.md",        "symlink"),
+    ("policies/requests.md",           "rness/policies/requests.md",            "symlink"),
+    ("policies/context-management.md", "rness/policies/context-management.md",  "symlink"),
+    ("policies/allowlists.md",         "rness/policies/allowlists.md",          "symlink"),
+    ("knowledge/rosetta-primers",      "rness/knowledge/rosetta-primers",       "symlink"),
 )
 
 # Project-local files not sourced from defaults/ (generated inline).
 _PROJECT_LOCAL_FILES: dict[str, str] = {
-    ".rness/knowledge/user-profile.md": (
+    "rness/knowledge/user-profile.md": (
         "# User Profile\n"
         "\n"
         "This file stores information about the user that helps you work with them\n"
@@ -74,17 +74,17 @@ _PROJECT_LOCAL_FILES: dict[str, str] = {
 }
 
 # Empty dirs to create in every project.
-# Dotted dirs (`.skills`, `.requests`, `.roles`) are intentionally hidden
-# from the file tree — they're surfaced through dedicated sidebar
-# sections instead, since they're configuration rather than artifacts.
+# `skills/`, `requests/`, and `roles/` are surfaced through dedicated
+# sidebar sections (since they're configuration rather than artifacts) but
+# still live in the file tree so they're easy to discover.
 _EMPTY_DIRS: tuple[str, ...] = (
-    ".rness/.skills",
-    ".rness/knowledge/session-logs",
-    ".rness/.requests",
-    ".rness/.requests/done",
-    ".rness/.roles",
-    ".rness/io/input",
-    ".rness/io/output",
+    "rness/skills",
+    "rness/knowledge/session-logs",
+    "rness/requests",
+    "rness/requests/done",
+    "rness/roles",
+    "rness/io/input",
+    "rness/io/output",
 )
 
 
@@ -92,10 +92,10 @@ _EMPTY_DIRS: tuple[str, ...] = (
 # Drift detection / opt-in update
 # ---------------------------------------------------------------------------
 #
-# `_SKELETON_PLAN` runs only on first-time `.rness/` creation. That keeps
+# `_SKELETON_PLAN` runs only on first-time `rness/` creation. That keeps
 # us from clobbering project-local edits — but it also means a new shared
 # default added to ~/enough/defaults/ (e.g. a new paradigm, a new
-# knowledge dir) won't appear in projects whose `.rness/` predates it.
+# knowledge dir) won't appear in projects whose `rness/` predates it.
 #
 # These helpers detect that drift and let the user opt in to receive the
 # new defaults via the `/update-enough` slash command. We never overwrite
@@ -141,7 +141,7 @@ def _apply_missing_skeleton_items(
 
 def detect_drift(project_dir: Path) -> list[tuple[str, str, str]]:
     """Return skeleton-plan entries whose destinations are missing in
-    `project_dir/.rness/`. Empty list = the project is up to date with
+    `project_dir/rness/`. Empty list = the project is up to date with
     `~/enough/defaults/`.
 
     This is a read-only check; nothing is mutated. Use `apply_drift` to
@@ -212,7 +212,7 @@ MOTIVATION_MD = _read_default("MOTIVATION.md")
 PARADIGM_DEFAULT_MD = _read_default("paradigms/default.md")
 POLICY_REQUESTS_MD = _read_default("policies/requests.md")
 POLICY_CONTEXT_MGMT_MD = _read_default("policies/context-management.md")
-USER_PROFILE_MD = _PROJECT_LOCAL_FILES[".rness/knowledge/user-profile.md"]
+USER_PROFILE_MD = _PROJECT_LOCAL_FILES["rness/knowledge/user-profile.md"]
 INFOWORLD_README = _INFOWORLD_README
 
 
@@ -234,12 +234,12 @@ def ensure_global_infoworld() -> Path:
 
 
 def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
-    """Sync global skills into `.rness/skills/` and prune dangling symlinks.
+    """Sync global skills into `rness/skills/` and prune dangling symlinks.
 
     - For each skill in `<defaults>/skills/`: if the project doesn't
       already have an entry with that name, symlink it in and add to
       `.disabled` (new globals default off).
-    - For each existing entry in `.rness/skills/`: if it's a symlink whose
+    - For each existing entry in `rness/skills/`: if it's a symlink whose
       target no longer exists (dangling — usually because the skill was
       removed globally), unlink it. Project-local entries (real dirs or
       files, not symlinks) are never touched.
@@ -248,7 +248,7 @@ def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
     ~/enough/defaults/skills/foo` on the next `enough` launch cleans `foo`
     out of every project using the (now-dangling) symlink."""
     src_skills = defaults_root / "skills"
-    dst_skills = project_dir / ".rness" / ".skills"
+    dst_skills = project_dir / "rness" / "skills"
     dst_skills.mkdir(parents=True, exist_ok=True)
 
     # 1. Prune dangling symlinks.
@@ -285,12 +285,12 @@ def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
 
 
 def _populate_role_symlinks(project_dir: Path, defaults_root: Path) -> None:
-    """Sync global Role agents into `.rness/.roles/` and prune dangling
+    """Sync global Role agents into `rness/roles/` and prune dangling
     symlinks. Same shape and lifecycle as skills: each role is a folder
     containing AGENT.md + MOTIVATION.md, default-off (added to .disabled
     on first sync), togglable per-project via the sidebar."""
     src_roles = defaults_root / "roles"
-    dst_roles = project_dir / ".rness" / ".roles"
+    dst_roles = project_dir / "rness" / "roles"
     dst_roles.mkdir(parents=True, exist_ok=True)
 
     # 1. Prune dangling symlinks (target removed globally).
@@ -326,16 +326,23 @@ def _populate_role_symlinks(project_dir: Path, defaults_root: Path) -> None:
         disabled_file.write_text("\n".join(sorted(existing)) + "\n", encoding="utf-8")
 
 
-def _migrate_to_dotted(project_dir: Path) -> None:
-    """v0.0.9-B migration: rename `.rness/skills/` → `.rness/.skills/`,
-    `.rness/requests/` → `.rness/.requests/`. Idempotent: skips when the
-    new path already exists. Preserves contents (symlinks survive a
-    rename of their parent dir, and request markdown moves with the
-    folder)."""
-    rness = project_dir / ".rness"
+def _migrate_undot(project_dir: Path) -> None:
+    """Migration: drop the dots from project skeleton paths.
+
+    Renames (each idempotent, skipping when the new path already exists):
+      - `.rness/`          → `rness/`
+      - `rness/.skills/`   → `rness/skills/`
+      - `rness/.requests/` → `rness/requests/`
+      - `rness/.roles/`    → `rness/roles/`
+
+    Symlinks survive a rename of their parent dir, so global skill/role
+    targets stay valid. Run BEFORE any populator/skeleton step so the
+    rest of the launch sees the new paths."""
     pairs = (
-        (rness / "skills",   rness / ".skills"),
-        (rness / "requests", rness / ".requests"),
+        (project_dir / ".rness",            project_dir / "rness"),
+        (project_dir / "rness" / ".skills",   project_dir / "rness" / "skills"),
+        (project_dir / "rness" / ".requests", project_dir / "rness" / "requests"),
+        (project_dir / "rness" / ".roles",    project_dir / "rness" / "roles"),
     )
     for old, new in pairs:
         if not (old.exists() or old.is_symlink()):
@@ -353,15 +360,22 @@ def _migrate_to_dotted(project_dir: Path) -> None:
 
 
 def ensure_skeleton(project_dir: Path) -> bool:
-    """Create `.rness/` + `infoworld` symlink if missing, AND sync global
+    """Create `rness/` + `infoworld` symlink if missing, AND sync global
     skills/roles on every call (idempotent). Returns True on first-time
-    `.rness/` creation, False if it already existed.
+    `rness/` creation, False if it already existed.
 
     The skill/role sync runs on every launch so newly-installed globals
     appear in existing projects too — with default-off status, per the
     policy. It's idempotent: already-symlinked entries and already-
     disabled names are left alone."""
-    rness = project_dir / ".rness"
+    # Run the un-dot migration FIRST so an existing project still on the
+    # legacy `.rness/` layout gets renamed to `rness/` before we decide
+    # whether this is a new project. Without this, an existing `.rness/`
+    # would be invisible to the `rness.exists()` check below and we'd
+    # spuriously re-run first-time setup.
+    _migrate_undot(project_dir)
+
+    rness = project_dir / "rness"
     new_project = not rness.exists()
 
     defaults = _install_defaults_root()
@@ -394,11 +408,6 @@ def ensure_skeleton(project_dir: Path) -> bool:
                 infoworld_root.resolve(), target_is_directory=True
             )
 
-    # ALWAYS run (idempotent): migrate skills/, requests/ to the new
-    # dotted layout BEFORE populating, so the populators target the
-    # post-migration paths.
-    _migrate_to_dotted(project_dir)
-
     # ALWAYS run (idempotent): sync global skills/roles into the project.
     # Picks up any new globals added after this project was first created.
     _populate_skill_symlinks(project_dir, defaults)
@@ -406,13 +415,13 @@ def ensure_skeleton(project_dir: Path) -> bool:
 
     # ALWAYS ensure the io/ scratch dirs exist — back-fills into projects
     # created before these were added to the skeleton.
-    for rel in (".rness/io/input", ".rness/io/output"):
+    for rel in ("rness/io/input", "rness/io/output"):
         d = project_dir / rel
         if not d.exists():
             d.mkdir(parents=True, exist_ok=True)
             (d / ".gitkeep").touch()
 
-    # ALWAYS run (idempotent): clean up the legacy `.rness/routines/` dir
+    # ALWAYS run (idempotent): clean up the legacy `rness/routines/` dir
     # left over from pre-0.0.9 projects. Routines were a pre-built
     # abstraction with no working surface; nothing read them, no UI
     # showed them, no scheduler triggered them. We rmdir() so projects
@@ -423,7 +432,7 @@ def ensure_skeleton(project_dir: Path) -> bool:
     # and the `.gitkeep` placeholder (we put it there ourselves). If
     # anything else is in the dir, rmdir() will fail and we leave the
     # whole thing alone.
-    legacy_routines = project_dir / ".rness" / "routines"
+    legacy_routines = project_dir / "rness" / "routines"
     if legacy_routines.is_dir():
         for entry in legacy_routines.iterdir():
             if entry.is_symlink() or entry.name == ".gitkeep":
@@ -458,7 +467,7 @@ def _migrate_allowlist(project_dir: Path, defaults: Path) -> None:
     - Only old file exists, and it's a real file (project-customized):
       rename it in place to allowlists.md so the user's customizations
       carry over."""
-    pol = project_dir / ".rness" / "policies"
+    pol = project_dir / "rness" / "policies"
     old = pol / "read-allowlist.md"
     new = pol / "allowlists.md"
     if new.exists() or new.is_symlink():

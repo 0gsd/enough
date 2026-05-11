@@ -1,4 +1,4 @@
-"""Session logging to `.rness/knowledge/session-logs/YYYY-MM-DD.md`.
+"""Session logging to `rness/knowledge/session-logs/YYYY-MM-DD.md`.
 
 One file per day; a single exchange is one H2 timestamp section containing the
 user message, the final assistant response, and a list of tool calls/results.
@@ -15,12 +15,12 @@ from pathlib import Path
 class ExchangeLog:
     user: str
     assistant: str                       # final rendered assistant output
-    tool_calls: list[tuple[str, str]]    # (tool_name, short_key)  e.g. ("read_file", ".rness/AGENT.md")
+    tool_calls: list[tuple[str, str]]    # (tool_name, short_key)  e.g. ("read_file", "rness/AGENT.md")
 
 
 def _session_log_path(project_dir: Path, now: dt.datetime | None = None) -> Path:
     now = now or dt.datetime.now()
-    return project_dir / ".rness" / "knowledge" / "session-logs" / f"{now:%Y-%m-%d}.md"
+    return project_dir / "rness" / "knowledge" / "session-logs" / f"{now:%Y-%m-%d}.md"
 
 
 def log_exchange(

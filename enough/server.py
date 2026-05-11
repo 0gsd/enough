@@ -11,7 +11,7 @@ Architecture
   kicks off a generation task. The task streams from llama-server, watches for
   complete `<tool name="...">...</tool>` blocks, executes them, loops.
 - Tool iterations are capped at 10 per user turn (per spec).
-- System prompt is re-assembled from `.rness/` on every user turn (no cache).
+- System prompt is re-assembled from `rness/` on every user turn (no cache).
 """
 
 from __future__ import annotations
@@ -124,7 +124,7 @@ def _walk_tree(
 
     `visited` carries the set of canonical paths already in the current
     recursion chain. We snapshot it as we descend so sibling branches stay
-    independent — if `infoworld/` and `.rness/.skills/` both happen to point
+    independent — if `infoworld/` and `rness/skills/` both happen to point
     into `~/enough/`, walking one doesn't poison the other."""
     abs_dir = root.joinpath(*rel_parts)
     try:
@@ -140,7 +140,7 @@ def _walk_tree(
         return []
     out: list[dict[str, Any]] = []
     for p in entries:
-        if p.name.startswith(".") and p.name != ".rness":
+        if p.name.startswith("."):
             continue
         if p.name in IGNORE_DIRS:
             continue
@@ -164,13 +164,13 @@ def build_file_tree(root: Path) -> list[dict[str, Any]]:
 # Paths in the project tree that get a [?] help affordance on hover.
 # IDs match the keys in HELP_DOCS in static/index.html.
 _HELP_IDS: dict[str, str] = {
-    ".rness": "rness",
-    ".rness/AGENT.md": "agent-md",
-    ".rness/MOTIVATION.md": "motivation-md",
-    ".rness/paradigms": "paradigms",
-    ".rness/policies": "policies",
-    ".rness/knowledge": "knowledge",
-    ".rness/io": "io",
+    "rness": "rness",
+    "rness/AGENT.md": "agent-md",
+    "rness/MOTIVATION.md": "motivation-md",
+    "rness/paradigms": "paradigms",
+    "rness/policies": "policies",
+    "rness/knowledge": "knowledge",
+    "rness/io": "io",
     "infoworld": "infoworld",
 }
 
@@ -353,7 +353,7 @@ def _render_empty_hint(project_dir: Path) -> str:
     """Return the HTML for the empty-conversation pane. Picks the most
     salient state-aware notice if any apply; otherwise falls back to the
     default 'awaiting your first message' italic hint."""
-    # Drift: ~/enough/defaults/ has shared defaults this .rness/ is
+    # Drift: ~/enough/defaults/ has shared defaults this rness/ is
     # missing. Surface them prominently with the /update-enough hook.
     from .skeleton import detect_drift
     missing = detect_drift(project_dir)
@@ -455,7 +455,7 @@ def _validate_current(cfg: dict[str, Any], selection: dict[str, Any]) -> dict[st
 CHECKPOINT_PROMPT = (
     "[harness] context window is approaching the auto-reset threshold. "
     "Before we lose continuity, do this in one short response:\n"
-    "1. Run `ls .rness/.requests/*.md` to find your active request file (if any).\n"
+    "1. Run `ls rness/requests/*.md` to find your active request file (if any).\n"
     "2. If one exists, update its 'Continuation' section now: what you just "
     "did, what to do next, and any file paths or state the next turn must "
     "know about.\n"
@@ -466,7 +466,7 @@ CHECKPOINT_PROMPT = (
 
 CONTINUE_PROMPT = (
     "[harness] the conversation has been reset to free up context. Resume the "
-    "active work: list `.rness/.requests/*.md`, read the most recent one's "
+    "active work: list `rness/requests/*.md`, read the most recent one's "
     "Continuation section, and pick up from there."
 )
 
@@ -816,9 +816,9 @@ def create_app(
 
     @app.get("/api/skills", response_class=HTMLResponse)
     async def api_skills() -> HTMLResponse:
-        items = list_skills(project_dir / ".rness")
+        items = list_skills(project_dir / "rness")
         if not items:
-            return HTMLResponse('<div class="empty-note">no skills in .rness/.skills/</div>')
+            return HTMLResponse('<div class="empty-note">no skills in rness/skills/</div>')
         rows = []
         for name, enabled in items:
             cls = "on" if enabled else "off"
@@ -843,14 +843,14 @@ def create_app(
         enabled_raw = (form.get("enabled") or "").strip()
         if not name:
             raise HTTPException(400, "missing name")
-        set_skill_enabled(project_dir / ".rness", name, enabled_raw == "1")
+        set_skill_enabled(project_dir / "rness", name, enabled_raw == "1")
         return await api_skills()  # type: ignore[return-value]
 
     @app.get("/api/roles", response_class=HTMLResponse)
     async def api_roles() -> HTMLResponse:
-        items = list_roles(project_dir / ".rness")
+        items = list_roles(project_dir / "rness")
         if not items:
-            return HTMLResponse('<div class="empty-note">no roles in .rness/.roles/</div>')
+            return HTMLResponse('<div class="empty-note">no roles in rness/roles/</div>')
         rows = []
         for name, enabled in items:
             cls = "on" if enabled else "off"
@@ -875,14 +875,14 @@ def create_app(
         enabled_raw = (form.get("enabled") or "").strip()
         if not name:
             raise HTTPException(400, "missing name")
-        set_role_enabled(project_dir / ".rness", name, enabled_raw == "1")
+        set_role_enabled(project_dir / "rness", name, enabled_raw == "1")
         return await api_roles()  # type: ignore[return-value]
 
     @app.get("/api/requests", response_class=HTMLResponse)
     async def api_requests() -> HTMLResponse:
-        rdir = project_dir / ".rness" / ".requests"
+        rdir = project_dir / "rness" / "requests"
         if not rdir.is_dir():
-            return HTMLResponse('<div class="empty-note">no .rness/.requests/ yet</div>')
+            return HTMLResponse('<div class="empty-note">no rness/requests/ yet</div>')
         active = sorted(
             (p for p in rdir.glob("*.md") if p.is_file()),
             key=lambda p: p.name,
@@ -892,7 +892,7 @@ def create_app(
             return HTMLResponse('<div class="empty-note">no active requests</div>')
         rows = []
         for p in active:
-            rel = f".rness/.requests/{p.name}"
+            rel = f"rness/requests/{p.name}"
             label = _escape_html(p.stem)
             rows.append(
                 f'<li class="request-row">'
@@ -917,7 +917,7 @@ def create_app(
         target = _resolve_project_path(path)
         if not target.is_file():
             raise HTTPException(404, "not found")
-        done_dir = project_dir / ".rness" / ".requests" / "done"
+        done_dir = project_dir / "rness" / "requests" / "done"
         done_dir.mkdir(parents=True, exist_ok=True)
         dest = done_dir / target.name
         # If a file with the same name already exists in done/, disambiguate.
@@ -931,7 +931,7 @@ def create_app(
         """Shared path-safety helper for /api/file{,/raw} and POST writes.
 
         Containment check is done on the LOGICAL path (composition) so that
-        symlinks living at a valid relative location inside .rness/ and
+        symlinks living at a valid relative location inside rness/ and
         pointing outside the project — intentional, used for global
         defaults — aren't rejected. The tool layer has its own allowlist
         for follow-through reads; this helper guards only against path-
@@ -949,22 +949,22 @@ def create_app(
     def _is_request_file(path: str) -> bool:
         p = Path(path)
         parts = p.parts
-        # Active request = directly under .rness/.requests/ (not /done/).
+        # Active request = directly under rness/requests/ (not /done/).
         return (
             len(parts) >= 3
-            and parts[0] == ".rness"
-            and parts[1] == ".requests"
+            and parts[0] == "rness"
+            and parts[1] == "requests"
             and parts[2] != "done"
             and parts[-1].endswith(".md")
         )
 
     def _is_skill_file(path: str) -> bool:
         parts = Path(path).parts
-        return len(parts) >= 2 and parts[0] == ".rness" and parts[1] == ".skills"
+        return len(parts) >= 2 and parts[0] == "rness" and parts[1] == "skills"
 
     def _is_role_file(path: str) -> bool:
         parts = Path(path).parts
-        return len(parts) >= 2 and parts[0] == ".rness" and parts[1] == ".roles"
+        return len(parts) >= 2 and parts[0] == "rness" and parts[1] == "roles"
 
     def _is_external_symlink(path_str: str) -> tuple[bool, Path | None]:
         """Is `path` a symlink whose resolved target lives outside the project?
@@ -1169,7 +1169,7 @@ def create_app(
     async def api_update_enough() -> dict[str, Any]:
         """Pull in any missing default files (paradigms, policies,
         knowledge dirs) from ~/enough/defaults/ that this project's
-        `.rness/` is missing. Idempotent: safe to call when nothing's
+        `rness/` is missing. Idempotent: safe to call when nothing's
         missing.
 
         Returns a JSON summary the JS slash-command handler renders
