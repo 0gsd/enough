@@ -37,8 +37,11 @@ from .llm import LLMError, stream_chat
 from .logger import ExchangeLog, log_exchange
 from .prompt import (
     assemble_system_prompt,
+    get_active_paradigm,
+    list_paradigms,
     list_roles,
     list_skills,
+    set_active_paradigm,
     set_role_enabled,
     set_skill_enabled,
 )
@@ -813,6 +816,46 @@ def create_app(
     async def api_files() -> HTMLResponse:
         tree = build_file_tree(project_dir)
         return HTMLResponse(_tree_to_html(tree))
+
+    @app.get("/api/paradigm", response_class=HTMLResponse)
+    async def api_paradigm() -> HTMLResponse:
+        rness = project_dir / "rness"
+        items = list_paradigms(rness)
+        if not items:
+            return HTMLResponse('<div class="empty-note">no paradigms in rness/paradigms/</div>')
+        active = get_active_paradigm(rness)
+        rows = []
+        for name, desc in items:
+            is_active = name == active
+            cls = "on" if is_active else "off"
+            marker = "●" if is_active else "○"
+            tip = _escape_html(desc) if desc else ""
+            rows.append(
+                f'<li class="paradigm-row {cls}" title="{tip}">'
+                f'  <button class="paradigm-toggle" '
+                f'    hx-post="/api/paradigm/set" '
+                f'    hx-vals=\'{{"name": "{_escape_html(name)}"}}\' '
+                f'    hx-target="#paradigm-list" hx-swap="innerHTML">'
+                f'    {marker}'
+                f'  </button>'
+                f'  <span class="paradigm-name">{_escape_html(name)}</span>'
+                f'</li>'
+            )
+        return HTMLResponse('<ul class="paradigms">' + "".join(rows) + "</ul>")
+
+    @app.post("/api/paradigm/set", response_class=HTMLResponse)
+    async def api_paradigm_set(request: Request) -> HTMLResponse:
+        form = await request.form()
+        name = (form.get("name") or "").strip()
+        if not name:
+            raise HTTPException(400, "missing name")
+        rness = project_dir / "rness"
+        # Validate: only allow names that resolve to an existing paradigm file.
+        valid_names = {n for n, _d in list_paradigms(rness)}
+        if name not in valid_names:
+            raise HTTPException(400, f"unknown paradigm: {name}")
+        set_active_paradigm(rness, name)
+        return await api_paradigm()  # type: ignore[return-value]
 
     @app.get("/api/skills", response_class=HTMLResponse)
     async def api_skills() -> HTMLResponse:

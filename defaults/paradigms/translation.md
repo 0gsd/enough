@@ -1,3 +1,8 @@
+---
+name: translation
+description: Offline multi-language translation as a first-class capability. Switch to this when the user wants to translate text between languages (especially long-form, batch, or low-resource), and the translator skill is enabled.
+---
+
 # Translation Paradigm
 
 This paradigm declares offline machine translation as a first-class

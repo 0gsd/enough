@@ -315,19 +315,145 @@ def _load_policies(rness: Path) -> str:
     return "\n\n".join(parts)
 
 
-def assemble_system_prompt(project_dir: Path, active_paradigm: str = "default") -> str:
+# ---------------------------------------------------------------------------
+# Paradigms — exactly one active at a time; the agent and user can switch.
+# Each paradigm file may carry a YAML-style frontmatter block:
+#     ---
+#     name: <slug>
+#     description: <one-line when-to-use>
+#     ---
+# Missing or malformed frontmatter is tolerated: name falls back to the
+# filename stem, description to "".
+# ---------------------------------------------------------------------------
+
+_ACTIVE_PARADIGM_FILE = "active-paradigm"
+
+
+def _parse_paradigm_frontmatter(text: str) -> tuple[dict[str, str], str]:
+    """Return (frontmatter_dict, body_without_frontmatter).
+
+    Recognizes a leading `---` line followed by `key: value` lines and a
+    closing `---`. Anything else is treated as no frontmatter."""
+    if not text.startswith("---"):
+        return {}, text
+    lines = text.splitlines()
+    if len(lines) < 2:
+        return {}, text
+    end_idx: int | None = None
+    for i in range(1, len(lines)):
+        if lines[i].strip() == "---":
+            end_idx = i
+            break
+    if end_idx is None:
+        return {}, text
+    meta: dict[str, str] = {}
+    for raw in lines[1:end_idx]:
+        if ":" not in raw:
+            continue
+        k, v = raw.split(":", 1)
+        meta[k.strip()] = v.strip()
+    body = "\n".join(lines[end_idx + 1:]).lstrip("\n")
+    return meta, body
+
+
+def list_paradigms(rness: Path) -> list[tuple[str, str]]:
+    """Return [(name, description), ...] for every paradigm file present.
+
+    `name` defaults to the filename stem when frontmatter is missing.
+    Stable alphabetical order."""
+    paradigms_dir = rness / "paradigms"
+    if not paradigms_dir.is_dir():
+        return []
+    out: list[tuple[str, str]] = []
+    for p in sorted(paradigms_dir.glob("*.md")):
+        text = _read_or_empty(p)
+        meta, _body = _parse_paradigm_frontmatter(text)
+        name = meta.get("name") or p.stem
+        desc = meta.get("description", "")
+        out.append((name, desc))
+    return out
+
+
+def get_active_paradigm(rness: Path) -> str:
+    """Read the active paradigm name from `rness/active-paradigm`. Falls
+    back to 'default' when the file is missing OR names a paradigm that
+    doesn't exist on disk."""
+    f = rness / _ACTIVE_PARADIGM_FILE
+    name = "default"
+    if f.is_file():
+        try:
+            content = f.read_text(encoding="utf-8").strip()
+            if content:
+                name = content.splitlines()[0].strip()
+        except OSError:
+            pass
+    if not (rness / "paradigms" / f"{name}.md").is_file():
+        return "default"
+    return name
+
+
+def set_active_paradigm(rness: Path, name: str) -> None:
+    """Write `name` to `rness/active-paradigm`. Caller is responsible for
+    validating the paradigm exists; this just records the choice."""
+    f = rness / _ACTIVE_PARADIGM_FILE
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(name + "\n", encoding="utf-8")
+
+
+def _load_active_paradigm_body(rness: Path, active: str) -> str:
+    """Read the active paradigm's content, stripping its frontmatter so
+    the YAML doesn't leak into the system prompt."""
+    p = rness / "paradigms" / f"{active}.md"
+    text = _read_or_empty(p)
+    if not text:
+        return ""
+    _meta, body = _parse_paradigm_frontmatter(text)
+    return body.strip()
+
+
+def _load_paradigm_catalog(rness: Path, active: str) -> str:
+    """Build a brief catalog of available paradigms for the agent — so it
+    knows what alternatives exist and how to switch.
+
+    Returns "" if there's only one paradigm (no choice to make)."""
+    items = list_paradigms(rness)
+    if len(items) <= 1:
+        return ""
+    lines = [f"Currently active: **{active}**", ""]
+    lines.append(
+        "Other paradigms available in this project. To switch, write the "
+        "paradigm name (no extension) to `rness/active-paradigm` using "
+        "`write_file`. The switch takes effect on the NEXT turn — for "
+        "the current turn you remain under the active paradigm above."
+    )
+    lines.append("")
+    for name, desc in items:
+        if name == active:
+            continue
+        if desc:
+            lines.append(f"- **{name}** — {desc}")
+        else:
+            lines.append(f"- **{name}**")
+    return "\n".join(lines)
+
+
+def assemble_system_prompt(project_dir: Path) -> str:
     """Build the system prompt fresh from rness/ files.
 
-    Concatenates: AGENT.md, MOTIVATION.md, active paradigm, optional INTENTION.md,
-    tool instructions, and the harness-context block.
+    The active paradigm is read from `rness/active-paradigm` on every call,
+    so an agent-initiated paradigm switch takes effect on the very next
+    invocation of this function (i.e. the next user turn).
+
+    Concatenates: AGENT.md, MOTIVATION.md, active paradigm + catalog,
+    optional INTENTION.md, tool instructions, and the harness-context block.
     """
     rness = project_dir / "rness"
 
     agent = _read_or_empty(rness / "AGENT.md")
     motivation = _read_or_empty(rness / "MOTIVATION.md")
-    paradigm = _read_or_empty(rness / "paradigms" / f"{active_paradigm}.md")
-    if not paradigm and active_paradigm != "default":
-        paradigm = _read_or_empty(rness / "paradigms" / "default.md")
+    active_paradigm = get_active_paradigm(rness)
+    paradigm = _load_active_paradigm_body(rness, active_paradigm)
+    catalog = _load_paradigm_catalog(rness, active_paradigm)
     intention = _read_or_empty(rness / "INTENTION.md")
 
     parts = [
@@ -340,7 +466,9 @@ def assemble_system_prompt(project_dir: Path, active_paradigm: str = "default") 
         # are voices you have access to) but distinct from it (you aren't
         # them; you can consult them).
         parts.append(_section("Active Role Consultants", roles_block))
-    parts.append(_section("Paradigm", paradigm))
+    parts.append(_section(f"Paradigm: {active_paradigm}", paradigm))
+    if catalog:
+        parts.append(_section("Paradigm Catalog", catalog))
     policies_block = _load_policies(rness)
     if policies_block:
         parts.append(_section("Policies", policies_block))

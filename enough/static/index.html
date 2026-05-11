@@ -328,6 +328,51 @@
 
     /* Role consultants — same shape as skills, accent on the user color
      so it reads as a different category at a glance. */
+    ul.paradigms {
+      list-style: none;
+      margin: 0 0 12px 0;
+      padding: 0 4px;
+    }
+
+    ul.paradigms li.paradigm-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 4px;
+    }
+
+    ul.paradigms button.paradigm-toggle {
+      background: transparent;
+      border: none;
+      color: var(--fg-faint);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0 3px;
+      font-family: inherit;
+      line-height: 1;
+    }
+
+    ul.paradigms li.paradigm-row.on button.paradigm-toggle {
+      color: var(--accent-agent);
+    }
+
+    ul.paradigms li.paradigm-row.on .paradigm-name {
+      color: var(--fg);
+      font-weight: 500;
+    }
+
+    ul.paradigms li.paradigm-row.off .paradigm-name {
+      color: var(--fg-muted);
+    }
+
+    ul.paradigms li.paradigm-row.off:hover .paradigm-name {
+      color: var(--fg);
+    }
+
+    ul.paradigms .paradigm-name {
+      font-size: 12.5px;
+    }
+
     ul.roles {
       list-style: none;
       margin: 0 0 12px 0;
@@ -1567,6 +1612,15 @@
 
   <div class="layout" id="layout">
     <aside class="sidebar" tabindex="0">
+      <section class="sidebar-section" data-section="paradigm">
+        <h3 class="section-head" data-help="paradigm-active"><span class="zippy">▾</span>paradigm</h3>
+        <div class="section-body">
+          <div id="paradigm-list" hx-get="/api/paradigm" hx-trigger="load, every 10s" hx-swap="innerHTML">
+            <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+          </div>
+        </div>
+      </section>
+
       <section class="sidebar-section" data-section="requests">
         <h3 class="section-head" data-help="requests"><span class="zippy">▾</span>requests</h3>
         <div class="section-body">
@@ -1577,19 +1631,19 @@
         </div>
       </section>
 
-      <section class="sidebar-section" data-section="skills">
-        <h3 class="section-head" data-help="skills"><span class="zippy">▾</span>active skills</h3>
+      <section class="sidebar-section collapsed" data-section="roles">
+        <h3 class="section-head" data-help="roles"><span class="zippy">▾</span>roles</h3>
         <div class="section-body">
-          <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
+          <div id="roles-list" hx-get="/api/roles" hx-trigger="load, every 10s" hx-swap="innerHTML">
             <div style="color: var(--fg-faint); padding: 8px">loading…</div>
           </div>
         </div>
       </section>
 
-      <section class="sidebar-section collapsed" data-section="roles">
-        <h3 class="section-head" data-help="roles"><span class="zippy">▾</span>roles</h3>
+      <section class="sidebar-section" data-section="skills">
+        <h3 class="section-head" data-help="skills"><span class="zippy">▾</span>active skills</h3>
         <div class="section-body">
-          <div id="roles-list" hx-get="/api/roles" hx-trigger="load, every 10s" hx-swap="innerHTML">
+          <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
             <div style="color: var(--fg-faint); padding: 8px">loading…</div>
           </div>
         </div>
@@ -1723,6 +1777,17 @@
     // (or the [?] itself). Click opens a themed right-side viewer with three
     // sections: what / how / ideas.
     const HELP_DOCS = {
+      'paradigm-active': {
+        name: 'paradigm',
+        path: 'rness/active-paradigm',
+        what: 'the reasoning framework the agent is currently using. exactly one paradigm is active at any time; click another to switch. the active paradigm is loaded in full into the system prompt every turn, and the agent also sees a brief catalog of the other available paradigms so it can suggest (or initiate) a switch when the work would benefit from one.',
+        how: 'click ● next to a paradigm to make it active for this project. the choice is recorded in <code>rness/active-paradigm</code>. agent-initiated switches happen by writing that file too, and take effect on the next turn. add new paradigms by dropping a markdown file into <code>~/enough/defaults/paradigms/</code> (or into your project\'s <code>rness/paradigms/</code> for project-local ones). a YAML frontmatter block at the top — <code>name:</code> and <code>description:</code> — tells the agent what the paradigm is for.',
+        ideas: [
+          'two paradigms ship by default: <em>default</em> for general-purpose work, and <em>translation</em> which pairs with the translator skill for multi-language work.',
+          'write a paradigm for a distinct mode of work (research vs. writing, exploration vs. execution) and switch between them as the day unfolds.',
+          'a paradigm description is essentially "when should I use this" — write it for the agent\'s benefit, since that\'s the signal it reads to recommend switching.',
+        ],
+      },
       'requests': {
         name: 'requests',
         path: 'rness/requests/',
@@ -1792,8 +1857,8 @@
       'paradigms': {
         name: 'paradigms/',
         path: 'rness/paradigms/',
-        what: 'reasoning frameworks the agent uses. each paradigm is a markdown file describing a way to approach problems — heuristics, decision criteria, when to ask vs. act.',
-        how: 'symlinked from <code>~/enough/defaults/paradigms/</code>. edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. new paradigms can be added simply by dropping a markdown file into the defaults folder.',
+        what: 'the full set of reasoning frameworks available in this project. each paradigm is a markdown file with a YAML frontmatter block (<code>name</code> + <code>description</code>) and a body describing how to approach work — heuristics, decision criteria, when to ask vs. act. exactly one is active at any time (see the <strong>paradigm</strong> section at the top of the sidebar to switch).',
+        how: 'symlinked from <code>~/enough/defaults/paradigms/</code>. edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. new paradigms can be added simply by dropping a markdown file into the defaults folder — give it a frontmatter <code>name:</code> and <code>description:</code> so the agent knows when to recommend it.',
         ideas: [
           'write paradigms for distinct modes — exploration vs. execution, brainstorm vs. critique.',
           'the included translation.md paradigm can be used in combination with the translator skill to translate text from any language to any language.',

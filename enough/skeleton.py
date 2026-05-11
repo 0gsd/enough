@@ -71,6 +71,7 @@ _PROJECT_LOCAL_FILES: dict[str, str] = {
         "It starts empty. Update it as you learn about the user's preferences,\n"
         "expertise, communication style, and goals.\n"
     ),
+    "rness/active-paradigm": "default\n",
 }
 
 # Empty dirs to create in every project.
@@ -420,6 +421,15 @@ def ensure_skeleton(project_dir: Path) -> bool:
         if not d.exists():
             d.mkdir(parents=True, exist_ok=True)
             (d / ".gitkeep").touch()
+
+    # ALWAYS ensure rness/active-paradigm exists. New projects get this via
+    # _PROJECT_LOCAL_FILES; existing projects need the back-fill so the UI
+    # paradigm selector renders a definite choice instead of relying on the
+    # missing-file fallback.
+    active_paradigm = project_dir / "rness" / "active-paradigm"
+    if not active_paradigm.exists():
+        active_paradigm.parent.mkdir(parents=True, exist_ok=True)
+        active_paradigm.write_text("default\n", encoding="utf-8")
 
     # ALWAYS run (idempotent): clean up the legacy `rness/routines/` dir
     # left over from pre-0.0.9 projects. Routines were a pre-built

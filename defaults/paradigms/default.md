@@ -1,3 +1,8 @@
+---
+name: default
+description: General-purpose interaction. Single agent, conversational, freeform — appropriate for most work. Use whenever no other paradigm is a better fit.
+---
+
 # Default Paradigm
 
 This is the base interaction paradigm. It defines how sessions work.
