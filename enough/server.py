@@ -20,6 +20,8 @@ import asyncio
 import datetime as dt
 import json
 import logging
+import subprocess
+import sys
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -48,6 +50,8 @@ from .prompt import (
 from .supervisor import LlamaSupervisor
 from .tools import (
     ToolCall,
+    _read_allowlist,
+    _under_any,
     execute,
     first_tool_call_end,
     parse_tool_calls,
@@ -1021,6 +1025,79 @@ def create_app(
             return False, target  # resolves inside the project — treat as normal
         except ValueError:
             return True, target
+
+    @app.get("/api/reveal", response_class=HTMLResponse)
+    async def api_reveal(path: str = Query(...)) -> HTMLResponse:
+        """Pop open Finder (macOS) at the given path. Used by the agent
+        to drop clickable links into chat completions — e.g. "your new
+        skill lives here: [Open in Finder](/api/reveal?path=rness/skills/foo)".
+
+        Path-safety rules mirror `read_file`: project-relative paths are
+        always OK; absolute (or `~`-prefixed) paths must resolve under
+        the read-allowlist from `rness/policies/allowlists.md` (which
+        transparently includes file-rw prefixes too)."""
+        if sys.platform != "darwin":
+            raise HTTPException(
+                501,
+                "Open-in-Finder is macOS-only. (`/api/reveal` shells out to "
+                "the macOS `open` command.)",
+            )
+        raw = path.strip()
+        if not raw:
+            raise HTTPException(400, "missing path")
+        # Resolve to an absolute path. `~` expansion is convenient for
+        # the agent when emitting `~/enough/...` links.
+        p = Path(raw).expanduser()
+        if p.is_absolute():
+            target = p.resolve(strict=False)
+            project_root = project_dir.resolve(strict=False)
+            try:
+                target.relative_to(project_root)
+                inside_project = True
+            except ValueError:
+                inside_project = False
+            if not inside_project:
+                allowlist = _read_allowlist(project_dir)
+                if not _under_any(target, allowlist):
+                    raise HTTPException(
+                        403,
+                        f"{raw} is outside the project and off the read-"
+                        "allowlist. add its prefix to rness/policies/"
+                        "allowlists.md or use a project-relative path.",
+                    )
+        else:
+            if ".." in p.parts:
+                raise HTTPException(400, "invalid path")
+            target = (project_dir / p).resolve(strict=False)
+            try:
+                target.relative_to(project_dir.resolve(strict=False))
+            except ValueError:
+                raise HTTPException(400, "path escapes project root")
+        if not target.exists():
+            raise HTTPException(404, f"not found: {target}")
+        # `open` opens files in the default app and reveals folders in
+        # Finder. Use `-R` to highlight a file in its parent folder
+        # rather than opening it directly (more useful for "go check
+        # out this newly-created file" cases).
+        cmd = ["/usr/bin/open"]
+        if target.is_file():
+            cmd.extend(["-R", str(target)])
+        else:
+            cmd.append(str(target))
+        try:
+            subprocess.Popen(cmd)
+        except OSError as e:
+            raise HTTPException(500, f"open failed: {e}")
+        # Tiny auto-closing page so the user's click doesn't leave a
+        # blank tab behind. Falls back to a manual close-this-tab note.
+        return HTMLResponse(
+            "<!doctype html><meta charset=utf-8>"
+            "<title>Opened in Finder</title>"
+            "<style>body{font-family:system-ui;padding:24px;color:#555}</style>"
+            "<p>Opened <code>" + _escape_html(str(target)) + "</code> "
+            "in Finder. You can close this tab.</p>"
+            "<script>setTimeout(()=>window.close(), 200)</script>"
+        )
 
     @app.get("/api/file", response_class=HTMLResponse)
     async def api_file(path: str = Query(...)) -> HTMLResponse:
