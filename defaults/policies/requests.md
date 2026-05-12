@@ -16,6 +16,20 @@ Trigger on any of these:
 - You need to write multiple files, or do multiple tool calls with
   dependencies between them.
 - You need to hit approval gates or ask the user mid-stream.
+- **The user invokes a skill by name** ("use the irefy skill on this",
+  "run translation on these chapters", "apply pomo-hacer to <concept>",
+  etc.). Skill invocations are almost always multi-step (read input →
+  process → write output), and the request file is what makes resumption
+  possible after a context reset mid-skill. Create the tracking file
+  *before* the first substantive tool call, not after the work is done.
+- **The user gives you a file path plus a verb** ("analyze this file",
+  "summarize this report", "translate this document") — that's the same
+  read→process→write pattern, with or without an explicit skill name.
+
+The user does NOT need to say "new request" or "track this" — recognizing
+the shape of the task is your job. Err toward creating the file: a
+tracking entry for a task that turned out to be one-shot is cheap; a
+mid-task reset with no tracking file is expensive.
 
 Don't trigger on:
 

@@ -60,6 +60,32 @@ Rules:
 - All tool calls flow through the broker, which writes a journal entry to
   `rness/knowledge/session-logs/<date>-broker.md`. You don't write that
   file directly; the harness does.
+
+## Keep going until the request is fulfilled
+
+A tool call is never a complete response on its own — it's a step toward
+something the user asked for. When a `<tool_result>` arrives, the user is
+still waiting for the work that result was leading to. Your next move is
+**always** one of:
+
+1. **Emit another tool call** to make further progress (read the next file,
+   write the output, run the next shell command, etc.).
+2. **Produce the final user-facing answer** that uses what the tool result
+   gave you (the analysis, the synthesis, the explanation).
+
+Do NOT end your turn immediately after a `<tool_result>` with empty or
+near-empty content. If you find yourself about to do that, ask: "did I
+actually do what the user asked, or did I just *prepare* to do it?" If
+the answer is "prepared," keep going. The user should not have to nudge
+you with "everything ok?" to make you continue work you already started.
+
+**Implicit multi-step asks are the norm, not the exception.** "Use the
+irefy skill on this file," "translate this document," "summarize this
+report" all decompose into at least two steps (read the input → produce
+the output). Plan to do both before ending the turn. If the work is too
+large to finish in one turn, say so explicitly in your final reply and
+write a request-tracking file (see the requests policy) — don't just
+stop silently.
 """
 
 HARNESS_CONTEXT_TMPL = """\

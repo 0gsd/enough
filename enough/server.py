@@ -474,7 +474,7 @@ def _validate_current(cfg: dict[str, Any], selection: dict[str, Any]) -> dict[st
 
 
 CHECKPOINT_PROMPT = (
-    "[harness] context window is approaching the auto-reset threshold. "
+    "[rness] context window is approaching the auto-reset threshold. "
     "Before we lose continuity, do this in one short response:\n"
     "1. Run `ls rness/requests/*.md` to find your active request file. "
     "If none exists, create one at "
@@ -492,7 +492,7 @@ CHECKPOINT_PROMPT = (
 )
 
 CONTINUE_PROMPT = (
-    "[harness] the conversation has been reset to free up context. Resume the "
+    "[rness] the conversation has been reset to free up context. Resume the "
     "active work: list `rness/requests/*.md`, read the most recent one's "
     "Continuation section, and pick up from there."
 )

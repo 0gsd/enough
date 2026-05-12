@@ -1477,11 +1477,11 @@
       line-height: 1.4;
     }
 
-    /* System bubbles (auto-reset chrome + harness-driven prompts).
-     Distinct from user/agent bubbles so it's clear the harness is talking,
+    /* System bubbles (auto-reset chrome + rness-driven prompts).
+     Distinct from user/agent bubbles so it's clear rness is talking,
      not the user typing or the model responding spontaneously. */
     .msg.system,
-    .msg.harness {
+    .msg.rness {
       background: var(--bg-raise);
       border: 1px dashed var(--border);
       color: var(--fg-muted);
@@ -1492,7 +1492,7 @@
     }
 
     .msg.system .role,
-    .msg.harness .role {
+    .msg.rness .role {
       color: var(--fg-faint);
       font-size: 10px;
       text-transform: uppercase;
@@ -1501,7 +1501,7 @@
     }
 
     .msg.system .body,
-    .msg.harness .body {
+    .msg.rness .body {
       color: var(--fg-muted);
     }
 
@@ -1990,7 +1990,7 @@
       'rness': {
         name: 'rness/',
         path: 'rness/',
-        what: 'a harness made visible. rness/ is where each project\'s "system" lives — every config, instruction, knowledge file, and history log the agent uses for this project. it sits at the top of the project so you can edit it directly with any file manager or editor; the enough UI also surfaces its contents in the sidebar.',
+        what: 'the project\'s externalized system. rness/ is where each project\'s config, instructions, knowledge files, and history logs live — everything the agent uses for this project. it sits at the top of the project so you can edit it directly with any file manager or editor; the enough UI also surfaces its contents in the sidebar.',
         how: 'some contents are symlinks to <code>~/enough/defaults/</code> and update centrally. to diverge for a project, open a file and click <em>customize</em> — it becomes a project-local copy. add new files freely via conversations or your system\'s file manager; the agent will discover any files added locally on its next turn.',
         ideas: [
           'get to know the components that drive your enough workflow and edit them wherever you like.',
@@ -2218,7 +2218,7 @@
           resp = await (await fetch('/api/update-enough')).json();
         } catch (e) {
           conversation.insertAdjacentHTML('beforeend',
-            `<div class="msg harness"><div class="role">harness</div>` +
+            `<div class="msg rness"><div class="role">rness</div>` +
             `<div class="body">/update-enough failed: ${escapeHtml(String(e))}</div></div>`);
           autoscroll();
           return true;
@@ -2239,7 +2239,7 @@
           }
         }
         conversation.insertAdjacentHTML('beforeend',
-          `<div class="msg harness"><div class="role">harness</div><div class="body">${body}</div></div>`);
+          `<div class="msg rness"><div class="role">rness</div><div class="body">${body}</div></div>`);
         autoscroll();
         sendBtn.disabled = false;
         textarea.disabled = false;
@@ -3049,20 +3049,20 @@
       } catch (_) { /* ignore parse errors */ }
     });
 
-    // Harness-driven prompts (auto-reset checkpoint + continue messages).
+    // rness-driven prompts (auto-reset checkpoint + continue messages).
     // Look like the user typed them but rendered with a distinct style so
-    // the user can tell the harness, not them, asked for it.
+    // the user can tell rness, not them, asked for it.
     es.addEventListener('system_prompt', (e) => {
       try {
         const { text } = JSON.parse(e.data);
         conversation.insertAdjacentHTML('beforeend',
-          `<div class="msg harness"><div class="role">harness</div>` +
+          `<div class="msg rness"><div class="role">rness</div>` +
           `<div class="body">${escapeHtml(text)}</div></div>`);
         autoscroll();
       } catch (_) { /* ignore */ }
     });
 
-    // System bubbles — harness narrating what's happening (auto-reset
+    // System bubbles — rness narrating what's happening (auto-reset
     // chrome). These don't go into the model's history; they're only for
     // the human reading the chat.
     es.addEventListener('system', (e) => {
@@ -3070,7 +3070,7 @@
         const { kind, message } = JSON.parse(e.data);
         conversation.insertAdjacentHTML('beforeend',
           `<div class="msg system" data-kind="${kind || 'note'}">` +
-          `<div class="role">${kind === 'auto_reset_starting' ? 'auto-reset' : 'harness'}</div>` +
+          `<div class="role">${kind === 'auto_reset_starting' ? 'auto-reset' : 'rness'}</div>` +
           `<div class="body">${escapeHtml(message || '')}</div></div>`);
         autoscroll();
       } catch (_) { /* ignore */ }
