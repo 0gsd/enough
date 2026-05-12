@@ -476,10 +476,16 @@ def _validate_current(cfg: dict[str, Any], selection: dict[str, Any]) -> dict[st
 CHECKPOINT_PROMPT = (
     "[harness] context window is approaching the auto-reset threshold. "
     "Before we lose continuity, do this in one short response:\n"
-    "1. Run `ls rness/requests/*.md` to find your active request file (if any).\n"
-    "2. If one exists, update its 'Continuation' section now: what you just "
-    "did, what to do next, and any file paths or state the next turn must "
-    "know about.\n"
+    "1. Run `ls rness/requests/*.md` to find your active request file. "
+    "If none exists, create one at "
+    "`rness/requests/<slug>_<YYYY-MM-DD_HH-MM>.md` with a minimal "
+    "Request + Continuation block.\n"
+    "2. You MUST call the `write_file` tool to update (or create) that "
+    "file with a fresh `## Continuation` section containing: what you "
+    "just did, what to do next, any file paths/hashes the next turn "
+    "must know, and any caveats. Narrating the update in chat does "
+    "NOT persist it — only `write_file` does. The chat history is "
+    "about to be wiped.\n"
     "3. End with a one-sentence summary of where things stand.\n"
     "Keep this whole reply under ~250 tokens. The conversation will be "
     "reset immediately after."
@@ -568,10 +574,29 @@ async def _drive_message(
         # llama-server reports prompt + completion tokens; for the
         # gauge, total_tokens is what was actually loaded into the
         # KV cache, so it's the truest pressure signal.
+        #
+        # When the stream was cut at a tool call (or the build doesn't
+        # ship `usage`), `usage_sink` is empty — fall back to the same
+        # char-based estimate that `_pressure_pct` uses, so the UI
+        # gauge stays in sync with the threshold logic instead of
+        # frozen at zero. We mark the synthetic payload `estimated`
+        # and do NOT write it into `session.last_usage` (which stays
+        # reserved for real numbers, so a future real reading wins).
+        ctx = _current_ctx_size(session)
         if usage_sink:
-            ctx = _current_ctx_size(session)
             session.last_usage = {**usage_sink, "ctx": ctx} if ctx else dict(usage_sink)
             await session.emit("usage", session.last_usage)
+        else:
+            est_total = _estimate_total_tokens(session, system_prompt)
+            est_payload: dict[str, Any] = {
+                "prompt_tokens": est_total,
+                "completion_tokens": 0,
+                "total_tokens": est_total,
+                "estimated": True,
+            }
+            if ctx:
+                est_payload["ctx"] = ctx
+            await session.emit("usage", est_payload)
         await session.emit("turn_end", {})
 
         if not stopped_at_tool:
@@ -616,11 +641,22 @@ async def _drive_message(
         )
 
 
-async def _do_auto_reset(session: Session, system_prompt: str) -> None:
+async def _do_auto_reset(
+    session: Session,
+    system_prompt: str,
+    *,
+    tool_calls_for_log: list[tuple[str, str]] | None = None,
+    assistant_text_for_log: list[str] | None = None,
+) -> None:
     """Run the checkpoint → reset → continue sequence inside the active
     generation lock. Emits `system` events with progress so the UI can
     explain what just happened, and a `reset` event so the conversation
     pane clears between the checkpoint and continuation.
+
+    The caller's log sinks are threaded through to the synthetic
+    checkpoint + continue turns so the day's session log captures
+    write_file calls and the agent's checkpoint/resume notes — that's
+    the only record of what happened across the reset boundary.
 
     Re-entry is blocked by `session._in_auto_reset` — without that flag,
     the synthetic continue turn could itself trip the threshold and
@@ -642,7 +678,12 @@ async def _do_auto_reset(session: Session, system_prompt: str) -> None:
         # 1. Checkpoint turn — agent writes Continuation block to its
         #    active request file. We let the existing tool loop handle
         #    write_file via the agent's own response.
-        await _drive_message(session, CHECKPOINT_PROMPT, system_prompt, is_synthetic=True)
+        await _drive_message(
+            session, CHECKPOINT_PROMPT, system_prompt,
+            is_synthetic=True,
+            tool_calls_for_log=tool_calls_for_log,
+            assistant_text_for_log=assistant_text_for_log,
+        )
 
         # 2. Hard reset of in-memory state. On-disk state (the request
         #    file the agent just updated) is what carries us over.
@@ -660,7 +701,12 @@ async def _do_auto_reset(session: Session, system_prompt: str) -> None:
         )
 
         # 3. Continue turn — agent reads the request file and resumes.
-        await _drive_message(session, CONTINUE_PROMPT, system_prompt, is_synthetic=True)
+        await _drive_message(
+            session, CONTINUE_PROMPT, system_prompt,
+            is_synthetic=True,
+            tool_calls_for_log=tool_calls_for_log,
+            assistant_text_for_log=assistant_text_for_log,
+        )
     finally:
         session._in_auto_reset = False
 
@@ -701,7 +747,11 @@ async def _run_turn(session: Session, user_message: str) -> None:
             # already in the middle of one) and only when the threshold
             # is breached + the toggle is on.
             if not getattr(session, "_in_auto_reset", False) and _should_auto_reset(session, system_prompt):
-                await _do_auto_reset(session, system_prompt)
+                await _do_auto_reset(
+                    session, system_prompt,
+                    tool_calls_for_log=tool_calls_for_log,
+                    assistant_text_for_log=assistant_text_for_log,
+                )
         except asyncio.TimeoutError:
             await session.emit("error", {"message": (
                 f"the model went silent for over "

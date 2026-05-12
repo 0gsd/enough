@@ -684,12 +684,31 @@ def run_fetch_url(project_dir: Path, call: ToolCall) -> ToolResult:
             convert_note = " — converted HTML→markdown via pandoc"
         elif broker.is_enabled("fetch_url_cache_and_convert"):
             convert_note = " — HTML cached raw (pandoc unavailable or errored)"
+    # When a Tor-routed fetch comes back 4xx/5xx, the most common cause
+    # is exit-node blocking (Google/Cloudflare/etc. block Tor IPs by
+    # policy). Without this hint the agent will retry the same URL or
+    # nearby variants and burn the context window on identical 429s.
+    block_hint = ""
+    if use_tor and resp.status_code >= 400:
+        block_hint = (
+            f"\nhint: {host} returned HTTP {resp.status_code} via a Tor "
+            f"exit node. many sites (google.com, cloudflare-fronted sites, "
+            f"some news outlets) reject Tor traffic by policy. options: "
+            f"(a) try an on-allowlist source for the same info — "
+            f"en.wikipedia.org, en.wikisource.org, www.gutenberg.org, "
+            f"archive.org all route direct and rarely block; "
+            f"(b) add {host} to rness/policies/allowlists.md under "
+            f"'## Internet domains' to fetch it directly without Tor "
+            f"(only if you trust the site with your real IP); "
+            f"(c) stop retrying — the block is likely persistent.\n"
+        )
     body = (
         f"ok — fetched {url} ({routing}, HTTP {resp.status_code}, "
         f"{ctype_main}, {len(resp.content)} bytes){convert_note}.\n"
         f"cached at: {cache_rel}\n"
-        f"hash: {short_hash} — grep rness/io/input/_broker-index.md to find later.\n"
-        f"\n--- preview ---\n{preview}\n"
+        f"hash: {short_hash} — grep rness/io/input/_broker-index.md to find later."
+        f"{block_hint}\n"
+        f"--- preview ---\n{preview}\n"
     )
     return ToolResult("fetch_url", url, resp.status_code < 400, body)
 

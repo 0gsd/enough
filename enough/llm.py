@@ -115,5 +115,8 @@ async def stream_chat(
                 yield rc
             if (c := delta.get("content")):
                 yield c
-            if choice.get("finish_reason"):
-                break
+            # Don't break on finish_reason — llama-server sends the
+            # `usage` chunk *after* the finish_reason chunk when
+            # stream_options.include_usage is set, and breaking early
+            # would silently drop the token counts. [DONE] (above) is
+            # the authoritative terminator.
