@@ -115,7 +115,8 @@ to run the MADLAD-400 translation model offline:
 
 | Project | License | Role | Source |
 |---|---|---|---|
-| Tor | BSD-3-Clause | Anonymized web fetch (used by the `the-internet` skill) | <https://www.torproject.org> |
+| Tor | BSD-3-Clause | Anonymized web fetch for off-allowlist domains (used by the broker's `fetch_url` tool) | <https://www.torproject.org> |
+| Pandoc | GPL-2.0-or-later | HTML→markdown conversion for fetched documents (invoked as an external binary; not bundled with this package) | <https://pandoc.org> |
 
 ### System fonts (referenced, not bundled)
 
@@ -165,7 +166,6 @@ Five skills ship with enough as "first-party" defaults:
 | irefy | Analytical one-page digests of long text | Graham Smith |
 | memoir-dialectic | Patient multi-session memoir collaborator | Graham Smith |
 | skillmd-scan | Security and epistemic auditor for skill packages | Graham Smith |
-| the-internet | Tor-anonymized web fetching | Graham Smith |
 | translator | Offline machine translation across ~419 languages | Graham Smith |
 
 These are authored for the enough project and fall under the

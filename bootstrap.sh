@@ -103,8 +103,8 @@ ok "macOS detected ($(sw_vers -productVersion))"
 # ---------------------------------------------------------------------------
 step 2 "checking for Homebrew"
 note "Homebrew is the standard package manager for macOS. We use it to install"
-note "llama.cpp (the LLM server), uv (fast Python env tool), and tor (optional,"
-note "used by the the-internet skill to anonymize web requests)."
+note "llama.cpp (the LLM server), uv (fast Python env tool), tor (used by the"
+note "broker to anonymize off-allowlist web fetches), and pandoc (HTML→markdown)."
 if command -v brew >/dev/null 2>&1; then
   ok "Homebrew is installed ($(brew --version | head -1))"
 else

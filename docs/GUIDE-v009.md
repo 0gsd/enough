@@ -154,8 +154,6 @@ Word add-in or a Chrome extension. Each skill is a folder with a
 - **`skillmd-scan`** — security and epistemic auditor for skill
   packages. Scans a skill's `SKILL.md`, references, and scripts for
   prompt-injection patterns and other risks before you install it.
-- **`the-internet`** — fetches web pages through Tor for anonymized
-  reading.
 - **`translator`** — offline machine translation across ~419 languages,
   powered by Google's MADLAD-400-3B-MT (Apache 2.0). After the one-time
   ~3 GB model download, translation works fully offline — no API call,

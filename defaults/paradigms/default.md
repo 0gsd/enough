@@ -49,40 +49,44 @@ Canonical examples worth flagging proactively:
 - Writing files outside the project directory is governed by the (stricter)
   file-read-write allowlist in the same file. Empty by default — the user
   must explicitly opt a destination in.
-- Network fetching: prefer `shell` with `curl -sSL` against domains on the
-  internet allowlist in `rness/policies/allowlists.md` (Project Gutenberg,
-  Wikipedia/Wikisource, the Internet Archive, Standard Ebooks). For
-  arbitrary domains or search-engine queries, ask the user first or use
-  the `the-internet` skill if it's enabled (Tor-mediated).
+- Network fetching: **always use `fetch_url`** for web reads. The broker
+  routes allowlisted domains directly and off-allowlist domains through
+  Tor for anonymity; you don't need to think about the routing decision.
+  Use `shell` + curl only when you need something `fetch_url` can't do
+  (POST requests, custom headers, etc.) and surface that need to the
+  user first.
 - Do not move files out of the project directory yourself.
 - In general, do not delete files (including within the project directory)
   unless explicitly asked and confirmed by the user.
 
-## Web Caching Workflow
+## Web Fetching via the Broker
 
 When the user asks you to "fetch", "cache", "grab", or "download" a public
 text — a Project Gutenberg book, a Wikipedia article, a Wikisource page,
-an archive.org item, etc. — and that text is CC0, CC-BY, or public
-domain:
+an archive.org item, etc.:
 
-1. Verify the license. For Gutenberg/Wikisource/PD content this is
-   automatic; for Wikipedia text use the CC-BY-SA-compatible plain-text
-   export (e.g. `?action=raw` for the source, or the published HTML).
-2. Pick a descriptive subfolder under `rness/io/input/` — e.g.
-   `rness/io/input/gutenberg-walden/` or
-   `rness/io/input/wikipedia-french-revolution/`.
-3. Fetch with `shell` + curl: `curl -sSL <url> -o <local-path>`. For
-   Gutenberg, prefer the plain UTF-8 text variant
-   (`https://www.gutenberg.org/cache/epub/<id>/pg<id>.txt`).
-4. Drop a sibling `_manifest.md` in the same subfolder capturing:
-   - source URL(s), retrieval date (use `date -u +"%Y-%m-%d"`)
-   - license (CC0 / CC-BY / public domain — be specific)
-   - any rights notes the source page mentions
-5. Tell the user what you cached and where, so they can verify before
-   you start consuming the text.
+1. Verify the license is appropriate (CC0 / CC-BY / public domain / user-
+   approved). The broker doesn't check this — it just transports bytes —
+   so the responsibility is yours. Decline non-permissively-licensed
+   content unless the user explicitly approves it.
+2. Call `fetch_url` with the URL. The broker:
+   - fetches directly for allowlisted hosts, via Tor otherwise
+   - converts HTML to markdown via pandoc
+   - caches the result under
+     `rness/io/input/<timestamp>-<hash>-<slug>.md`
+   - appends a row to `rness/io/input/_broker-index.md` (a queryable
+     fetch log)
+3. The tool result is a short preview + cache path. **Don't paste the
+   full body into the conversation.** If you need to act on the full
+   content, `read_file` the cache path. If you only need a question
+   answered, the preview is often enough; `read_file` the rest on demand.
+4. If you've fetched something before, the broker index is there to
+   help — `shell` + `grep` it for the URL, hash, or slug rather than
+   re-fetching.
 
-If the user asks for something that ISN'T on the internet allowlist, or
-isn't clearly CC0/CC-BY/public domain, decline and ask before fetching.
-"Decline" means propose the conservative alternative — adding the domain
-to the allowlist, or using the user's existing `infoworld/` corpus —
-rather than just refusing.
+If the content isn't clearly CC0/CC-BY/public domain (or otherwise
+sanctioned by the user), decline and ask before fetching. "Decline"
+means propose the conservative alternative — using the user's existing
+`infoworld/` corpus, asking them to verify the license, or suggesting
+they add the domain to the allowlist if they want it fetched directly
+instead of via Tor — rather than just refusing.

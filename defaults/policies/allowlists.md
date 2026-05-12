@@ -5,10 +5,8 @@ Three lists govern what the agent can reach beyond the project directory:
 1. **File-read prefixes** — absolute paths the `read_file` tool may read.
 2. **File-read-write prefixes** — absolute paths `write_file` may also write to.
    (A path on this list is implicitly readable too — no need to add it twice.)
-3. **Internet domains** — hostnames the agent may fetch from when using
-   `shell` with curl/wget. Guidance, not enforcement: the `shell` tool itself
-   doesn't restrict outbound connections (it's the nuclear option). Treat
-   anything off this list as out-of-bounds and ask first.
+3. **Internet domains** — hostnames the broker fetches directly (without
+   anonymization). See "Internet domains" below for the routing rules.
 
 Writes outside the project directory are rejected unless the destination
 is on the file-read-write prefix list. Reads from absolute paths off both
@@ -26,10 +24,11 @@ above are read-only.)
 
 ## Internet domains
 
-These are domains generally safe to fetch from for caching public-domain,
-CC0, and CC-BY texts into `rness/io/input/`. The agent SHOULD NOT make
-arbitrary web requests, run search-engine queries, or follow redirects to
-non-listed hosts without first asking the user.
+These are domains the broker fetches **directly** when the agent uses
+the `fetch_url` tool. Off-list domains aren't rejected — they're routed
+through the local Tor proxy (127.0.0.1:9050) for anonymity. The
+allowlist is the boundary between "fetch fast, identifiable" and "fetch
+slower, anonymized."
 
 - `gutenberg.org`
 - `www.gutenberg.org`
@@ -55,12 +54,18 @@ non-listed hosts without first asking the user.
   `~/enough/infoworld/`, so reading from there uses relative paths
   (e.g. `infoworld/personal/foo.md`) and doesn't need allowlist
   approval.
-- For internet fetching: prefer `shell` with `curl -sSL <url> -o <path>`
-  to a path under `rness/io/input/<source-name>/`. Save a sibling
-  `_manifest.md` capturing source URL, license (CC0 / CC-BY / public
-  domain — verify before fetching), retrieval date, and any rights
-  notes. Decline non-CC0/CC-BY/public-domain content unless the user
-  explicitly approves it.
+- For internet fetching, **use `fetch_url`** — not `shell` + curl. The
+  broker handles routing (direct for allowlisted hosts, Tor for
+  everything else), converts HTML to markdown via pandoc, caches the
+  result under `rness/io/input/<timestamp>-<hash>-<slug>.md`, and
+  indexes it in `rness/io/input/_broker-index.md`. The tool result is
+  a short preview + cache path; read the full content via `read_file`
+  if needed. This keeps fetched documents out of your context window.
+- License/rights are still your responsibility. The broker does not
+  check copyright — it just transports bytes. When caching content
+  the user might publish or otherwise re-use, confirm the license
+  (CC0 / CC-BY / public domain / explicit user approval) before
+  treating it as freely usable.
 
 ## Notes for the user
 
@@ -70,6 +75,6 @@ non-listed hosts without first asking the user.
 - To give one project a custom allowlist, click "customize for this
   project" in the preview pane — that replaces the symlink with a
   project-local copy you can edit independently.
-- Internet domains are guidance, not enforcement: anything the `shell`
-  tool can curl, the agent can technically reach. The list shapes what
-  the agent will *willingly* fetch without asking.
+- Off-allowlist internet fetches now go through Tor automatically. To
+  block off-allowlist fetches entirely, open the **broker** pane in
+  the top nav and turn off the "Tor for off-allowlist domains" toggle.
