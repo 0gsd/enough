@@ -117,11 +117,12 @@ fi
 # 3. Brew deps
 # ---------------------------------------------------------------------------
 step 3 "installing Homebrew packages"
-note "four utilities go on this pass:"
+note "five utilities go on this pass:"
 note "  • llama.cpp   — the local LLM server that backs enough"
 note "  • uv          — manages the Python environment that runs enough itself"
-note "  • tor         — (optional) anonymization proxy for the the-internet skill"
+note "  • tor         — anonymization proxy used by the broker for off-allowlist web fetches"
 note "  • whisper-cpp — local speech-to-text for the mic button in chat"
+note "  • pandoc      — universal document converter; used by the broker to convert fetched HTML to markdown"
 
 install_brew_pkg() {
   local pkg="$1"
@@ -134,7 +135,7 @@ install_brew_pkg() {
   fi
 }
 
-for pkg in llama.cpp uv tor whisper-cpp; do
+for pkg in llama.cpp uv tor whisper-cpp pandoc; do
   install_brew_pkg "$pkg"
 done
 

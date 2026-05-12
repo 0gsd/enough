@@ -33,18 +33,33 @@ file contents here
 <command>ls -la</command>
 </tool>
 
+<tool name="fetch_url">
+<url>https://example.com/some-article</url>
+</tool>
+
 Rules:
 - All paths are relative to the project directory. Absolute paths and `../`
   traversal are rejected.
 - `write_file` creates parent directories automatically.
 - `shell` executes in the project directory. stdout and stderr are captured
   and returned. There is no sandbox — be deliberate.
+- `fetch_url` is the canonical way to read from the web — prefer it over
+  `shell` + `curl`. It handles internet-allowlist routing (direct fetch
+  for allowlisted domains; transparent Tor anonymization for off-allowlist
+  ones), converts HTML to markdown via pandoc, caches the result under
+  `rness/io/input/<timestamp>-<hash>-<slug>.md`, and indexes it in
+  `rness/io/input/_broker-index.md`. The tool result is just a short
+  preview + the cache path — read the full content with `read_file` if
+  needed. This keeps fetched documents out of your context window.
 - After a tool call, the harness will send back:
-  <tool_result name="toolname" path="..." (or command="...")>
+  <tool_result name="toolname" path="..." (or command="...", url="..."")>
   [result or error]
   </tool_result>
 - You may chain tool calls across turns. The harness caps a single user turn
   at 10 tool iterations.
+- All tool calls flow through the broker, which writes a journal entry to
+  `rness/knowledge/session-logs/<date>-broker.md`. You don't write that
+  file directly; the harness does.
 """
 
 HARNESS_CONTEXT_TMPL = """\

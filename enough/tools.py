@@ -1,20 +1,37 @@
-"""Tool execution: read_file, write_file, shell.
+"""Tool execution: read_file, write_file, shell, fetch_url.
 
 All paths are resolved under the project directory. Absolute paths and
 `../` traversal are rejected. Shell commands run with the project dir as cwd,
-no sandbox, full stdout/stderr capture.
+no sandbox, full stdout/stderr capture. `fetch_url` is the canonical way
+for the agent to read from the web — handles internet-allowlist routing,
+Tor fallback for off-list domains, markdown conversion, and caching into
+`rness/io/input/`.
 
 The tool-call parser (regex over the XML-ish tags defined in prompt.py) lives
 here too, so callers (server.py) can do: `for call in parse_tool_calls(text): ...`.
+
+Each call is also passed through the broker (broker.py) for trace logging
+to `rness/knowledge/session-logs/<date>-broker.md`, gated by user-controlled
+toggles in `~/enough/config/broker.json`.
 """
 
 from __future__ import annotations
 
+import datetime as dt
+import hashlib
+import logging
 import os
 import re
 import subprocess
+import urllib.parse
 from dataclasses import dataclass
 from pathlib import Path
+
+import httpx
+
+from . import broker
+
+log = logging.getLogger("enough.tools")
 
 # Regex for a complete tool call. Non-greedy body so we stop at the first
 # </tool>. We don't use an XML parser because the model's output isn't
@@ -26,6 +43,7 @@ _TOOL_BLOCK_RE = re.compile(
 _PATH_RE = re.compile(r"<path>(.*?)</path>", re.DOTALL)
 _CONTENT_RE = re.compile(r"<content>(.*?)</content>", re.DOTALL)
 _COMMAND_RE = re.compile(r"<command>(.*?)</command>", re.DOTALL)
+_URL_RE = re.compile(r"<url>(.*?)</url>", re.DOTALL)
 
 # Detection-only (partial-text) pattern for streaming: is there a closing tag
 # at or near the end of the buffer?
@@ -34,10 +52,11 @@ _CLOSING_TOOL_RE = re.compile(r"</tool>")
 
 @dataclass
 class ToolCall:
-    name: str                 # read_file | write_file | shell
+    name: str                 # read_file | write_file | shell | fetch_url
     path: str | None
     content: str | None
     command: str | None
+    url: str | None
     raw: str                  # full matched <tool>...</tool> substring
     span: tuple[int, int]     # (start, end) indices into the source text
 
@@ -51,7 +70,12 @@ class ToolResult:
 
     def render(self) -> str:
         """Format for injection into the conversation as a user message."""
-        attr = 'path' if self.name in ('read_file', 'write_file') else 'command'
+        if self.name in ('read_file', 'write_file'):
+            attr = 'path'
+        elif self.name == 'fetch_url':
+            attr = 'url'
+        else:
+            attr = 'command'
         safe_key = self.key.replace('"', "&quot;")
         return (
             f'<tool_result name="{self.name}" {attr}="{safe_key}">\n'
@@ -68,12 +92,14 @@ def parse_tool_calls(text: str) -> list[ToolCall]:
         path_m = _PATH_RE.search(body)
         content_m = _CONTENT_RE.search(body)
         command_m = _COMMAND_RE.search(body)
+        url_m = _URL_RE.search(body)
         calls.append(
             ToolCall(
                 name=name,
                 path=path_m.group(1).strip() if path_m else None,
                 content=content_m.group(1) if content_m else None,  # preserve whitespace
                 command=command_m.group(1).strip() if command_m else None,
+                url=url_m.group(1).strip() if url_m else None,
                 raw=m.group(0),
                 span=(m.start(), m.end()),
             )
@@ -413,11 +439,296 @@ def run_shell(project_dir: Path, call: ToolCall, timeout: float = 60.0) -> ToolR
     )
 
 
+# ---------------------------------------------------------------------------
+# fetch_url — agent's canonical way to read from the web.
+# ---------------------------------------------------------------------------
+#
+# Flow:
+#   1. Toggle check: broker.fetch_url_enabled must be on, else canned denial.
+#   2. URL parse: extract host, reject anything that doesn't look like http(s).
+#   3. Allowlist check on host:
+#      - on internet allowlist → direct fetch
+#      - off allowlist:
+#          - broker.fetch_url_tor_for_offlist=on → fetch via Tor SOCKS5
+#          - broker.fetch_url_tor_for_offlist=off → canned denial
+#   4. Fetch with size cap and timeout.
+#   5. Content-type dispatch:
+#      - text/html → pandoc html→markdown (cache as .md)
+#      - text/plain, text/markdown → cache as-is
+#      - everything else → cache raw bytes with a stub note in the index
+#   6. Write cache file under rness/io/input/, append to _broker-index.md.
+#   7. Return short preview + cache path to the agent.
+
+_TOR_PROXY = "socks5h://127.0.0.1:9050"  # 'h' = resolve DNS through Tor too
+_FETCH_TIMEOUT_S = 30.0
+_FETCH_MAX_BYTES = 10 * 1024 * 1024  # 10 MB hard cap
+_PREVIEW_CHARS = 500
+
+
+def _read_internet_allowlist(project_dir: Path) -> list[str]:
+    """Return the list of allowlisted internet hostnames. Lowercased,
+    leading/trailing whitespace stripped. Empty if the file or section
+    is missing."""
+    raw = _read_allowlists(project_dir)
+    return [h.lower().strip() for h in raw.get("internet", []) if h.strip()]
+
+
+def _host_on_allowlist(host: str, allowlist: list[str]) -> bool:
+    """True iff `host` matches any allowlist entry exactly or as a subdomain.
+    e.g. 'en.wikipedia.org' matches an entry 'wikipedia.org' AND
+    'en.wikipedia.org'."""
+    h = host.lower()
+    for entry in allowlist:
+        if h == entry or h.endswith("." + entry):
+            return True
+    return False
+
+
+def _slugify(text: str, max_len: int = 40) -> str:
+    """Conservative slug: alphanum + hyphens, lowercased, deduped hyphens."""
+    s = re.sub(r"[^a-zA-Z0-9]+", "-", text).strip("-").lower()
+    if not s:
+        s = "untitled"
+    return s[:max_len].strip("-") or "untitled"
+
+
+def _short_hash(seed: str) -> str:
+    return hashlib.sha256(seed.encode("utf-8", errors="ignore")).hexdigest()[:8]
+
+
+def _markdownify_via_pandoc(html: str) -> tuple[str, bool]:
+    """Convert HTML to GitHub-flavored markdown via pandoc. Returns
+    (markdown_or_original, converted_ok). Falls back to the raw HTML if
+    pandoc isn't installed or errors — the journal will note the fallback."""
+    try:
+        proc = subprocess.run(
+            ["pandoc", "-f", "html", "-t", "gfm", "--wrap=none"],
+            input=html,
+            text=True,
+            capture_output=True,
+            timeout=30.0,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired) as e:
+        log.warning("pandoc unavailable or timed out (%s); returning raw HTML", e)
+        return html, False
+    if proc.returncode != 0:
+        log.warning("pandoc exit %d: %s", proc.returncode, proc.stderr[:200])
+        return html, False
+    return proc.stdout, True
+
+
+def _title_from_html(html: str) -> str:
+    """Pull <title> if present; otherwise an empty string. Used for the
+    index row's human-readable column."""
+    m = re.search(r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL)
+    if not m:
+        return ""
+    title = re.sub(r"\s+", " ", m.group(1)).strip()
+    return title[:120]
+
+
+def _append_broker_index(
+    project_dir: Path,
+    *,
+    timestamp: str,
+    url: str,
+    short_hash: str,
+    cache_rel: str,
+    title: str,
+    status: int | str,
+) -> None:
+    """Append one row to rness/io/input/_broker-index.md, creating the
+    file with a header on first call."""
+    index = project_dir / "rness" / "io" / "input" / "_broker-index.md"
+    index.parent.mkdir(parents=True, exist_ok=True)
+    if not index.exists():
+        index.write_text(
+            "# Broker fetch index\n\n"
+            "Auto-maintained by `fetch_url`. Newest entries at the bottom.\n"
+            "Grep the URL or hash columns to find a cached document.\n\n"
+            "| time | hash | url | cache | title | status |\n"
+            "|---|---|---|---|---|---|\n",
+            encoding="utf-8",
+        )
+    # Escape pipes so they don't break the table.
+    def cell(s: str) -> str:
+        return s.replace("|", "\\|").replace("\n", " ")
+    row = (
+        f"| {cell(timestamp)} "
+        f"| `{cell(short_hash)}` "
+        f"| {cell(url)} "
+        f"| `{cell(cache_rel)}` "
+        f"| {cell(title)} "
+        f"| {cell(str(status))} |\n"
+    )
+    with index.open("a", encoding="utf-8") as f:
+        f.write(row)
+
+
+def run_fetch_url(project_dir: Path, call: ToolCall) -> ToolResult:
+    """Fetch a URL with broker semantics: allowlist routing, optional Tor
+    fallback, markdown conversion, and io/input caching.
+
+    The agent only ever sees a short preview + cache path in the result —
+    full content lives on disk, retrievable via `read_file` if needed."""
+    if not broker.is_enabled("fetch_url_enabled"):
+        return ToolResult(
+            "fetch_url", call.url or "", False,
+            broker.denial_tool_disabled("fetch_url"),
+        )
+    url = (call.url or "").strip()
+    if not url:
+        return ToolResult("fetch_url", "", False, "error: missing <url>")
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        return ToolResult(
+            "fetch_url", url, False,
+            "error: only http(s) URLs are supported by fetch_url.",
+        )
+    host = parsed.hostname.lower()
+    allowlist = _read_internet_allowlist(project_dir)
+    on_allowlist = _host_on_allowlist(host, allowlist)
+    use_tor = not on_allowlist
+    if use_tor and not broker.is_enabled("fetch_url_tor_for_offlist"):
+        return ToolResult(
+            "fetch_url", url, False,
+            broker.denial_off_internet_allowlist_no_tor(host),
+        )
+    client_kwargs: dict[str, object] = {
+        "timeout": _FETCH_TIMEOUT_S,
+        "follow_redirects": True,
+        "headers": {"User-Agent": "enough-broker/0.0 (+local research client)"},
+    }
+    if use_tor:
+        client_kwargs["proxy"] = _TOR_PROXY
+    try:
+        with httpx.Client(**client_kwargs) as client:
+            resp = client.get(url)
+    except httpx.RequestError as e:
+        return ToolResult(
+            "fetch_url", url, False,
+            f"error: fetch failed ({type(e).__name__}): {e}. "
+            f"{'(via Tor)' if use_tor else '(direct)'}",
+        )
+    if len(resp.content) > _FETCH_MAX_BYTES:
+        return ToolResult(
+            "fetch_url", url, False,
+            f"error: response too large ({len(resp.content)} bytes, cap "
+            f"{_FETCH_MAX_BYTES}). use shell + curl with explicit -o to "
+            f"a path you control if you really need this.",
+        )
+    ctype = (resp.headers.get("content-type") or "").lower()
+    # Strip charset suffix; just want the MIME prefix.
+    ctype_main = ctype.split(";", 1)[0].strip()
+    cache_content: str | bytes
+    cache_ext: str
+    converted_ok = False
+    title = ""
+    if ctype_main.startswith("text/html"):
+        html = resp.text
+        title = _title_from_html(html)
+        if broker.is_enabled("fetch_url_cache_and_convert"):
+            md, converted_ok = _markdownify_via_pandoc(html)
+            cache_content = md
+            cache_ext = "md" if converted_ok else "html"
+        else:
+            cache_content = html
+            cache_ext = "html"
+    elif ctype_main in ("text/plain", "text/markdown", "application/json"):
+        cache_content = resp.text
+        cache_ext = "md" if ctype_main == "text/markdown" else "txt"
+    else:
+        cache_content = resp.content
+        cache_ext = "bin"
+    now = dt.datetime.now()
+    timestamp_full = now.strftime("%Y-%m-%d %H:%M:%S")
+    timestamp_short = now.strftime("%Y-%m-%d-%H%M")
+    slug_seed = parsed.path.rstrip("/").rsplit("/", 1)[-1] or host
+    slug = _slugify(slug_seed)
+    short_hash = _short_hash(url + timestamp_full)
+    filename = f"{timestamp_short}-{short_hash}-{slug}.{cache_ext}"
+    cache_path = project_dir / "rness" / "io" / "input" / filename
+    cache_rel = f"rness/io/input/{filename}"
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        if isinstance(cache_content, str):
+            cache_path.write_text(cache_content, encoding="utf-8")
+        else:
+            cache_path.write_bytes(cache_content)
+    except OSError as e:
+        return ToolResult(
+            "fetch_url", url, False,
+            f"error: fetched {len(resp.content)} bytes but could not cache: {e}",
+        )
+    if broker.is_enabled("fetch_url_cache_and_convert"):
+        _append_broker_index(
+            project_dir,
+            timestamp=timestamp_full,
+            url=url,
+            short_hash=short_hash,
+            cache_rel=cache_rel,
+            title=title,
+            status=resp.status_code,
+        )
+    # Preview: first N chars of text content; for binary, just a size note.
+    if isinstance(cache_content, str):
+        preview = cache_content[:_PREVIEW_CHARS]
+        if len(cache_content) > _PREVIEW_CHARS:
+            preview += f"\n… (+{len(cache_content) - _PREVIEW_CHARS} chars; full text at {cache_rel})"
+    else:
+        preview = f"(binary content — {len(cache_content)} bytes; cached at {cache_rel})"
+    routing = "via Tor" if use_tor else "direct"
+    convert_note = ""
+    if ctype_main.startswith("text/html"):
+        if converted_ok:
+            convert_note = " — converted HTML→markdown via pandoc"
+        elif broker.is_enabled("fetch_url_cache_and_convert"):
+            convert_note = " — HTML cached raw (pandoc unavailable or errored)"
+    body = (
+        f"ok — fetched {url} ({routing}, HTTP {resp.status_code}, "
+        f"{ctype_main}, {len(resp.content)} bytes){convert_note}.\n"
+        f"cached at: {cache_rel}\n"
+        f"hash: {short_hash} — grep rness/io/input/_broker-index.md to find later.\n"
+        f"\n--- preview ---\n{preview}\n"
+    )
+    return ToolResult("fetch_url", url, resp.status_code < 400, body)
+
+
+# ---------------------------------------------------------------------------
+# Dispatch
+# ---------------------------------------------------------------------------
+
 _DISPATCH = {
     "read_file": run_read_file,
     "write_file": run_write_file,
     "shell": run_shell,
+    "fetch_url": run_fetch_url,
 }
+
+# Map tool name to its per-tool "brokered" toggle. When that toggle is
+# OFF, we still run the tool but skip the broker journal entry — the
+# allowlist checks live inside the runners themselves and aren't affected.
+_TRACE_TOGGLE = {
+    "read_file": "read_file_brokered",
+    "write_file": "write_file_brokered",
+    "shell": "shell_brokered",
+    "fetch_url": "fetch_url_enabled",
+}
+
+
+def _trace_args_for(call: ToolCall) -> dict[str, object]:
+    """Build the args dict for the broker journal entry. Skip None fields
+    and `content` (always summarized via len rather than dumping the body)."""
+    out: dict[str, object] = {}
+    if call.path is not None:
+        out["path"] = call.path
+    if call.command is not None:
+        out["command"] = call.command
+    if call.url is not None:
+        out["url"] = call.url
+    if call.content is not None:
+        out["content"] = f"<{len(call.content)} chars>"
+    return out
 
 
 def execute(project_dir: Path, call: ToolCall) -> ToolResult:
@@ -428,4 +739,18 @@ def execute(project_dir: Path, call: ToolCall) -> ToolResult:
             f"error: unknown tool {call.name!r}. "
             f"available: {', '.join(_DISPATCH)}",
         )
-    return fn(project_dir, call)
+    result = fn(project_dir, call)
+    # Trace logging: gated on (a) the per-tool toggle AND (b) the global
+    # trace_log_enabled. broker.trace() does the second check internally.
+    trace_toggle = _TRACE_TOGGLE.get(call.name)
+    if trace_toggle is None or broker.is_enabled(trace_toggle):
+        decision = "allowed" if result.ok else "denied/error"
+        broker.trace(
+            project_dir,
+            tool=call.name,
+            decision=decision,
+            args=_trace_args_for(call),
+            result_ok=result.ok,
+            result_summary=result.body,
+        )
+    return result
