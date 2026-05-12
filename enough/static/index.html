@@ -1086,6 +1086,175 @@
       font-size: 11px;
     }
 
+    /* ---------- Broker modal ---------- */
+    #broker-modal.hidden {
+      display: none;
+    }
+
+    #broker-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #broker-modal .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    #broker-modal .modal-panel.broker-panel {
+      position: relative;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 480px;
+      max-width: 560px;
+      max-height: 86vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    #broker-modal .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+
+    #broker-modal .modal-head h3 {
+      margin: 0;
+      color: var(--fg);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    #broker-modal .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--fg-muted);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    #broker-modal .modal-close:hover {
+      color: var(--fg);
+    }
+
+    #broker-modal .modal-body {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    #broker-modal .broker-intro {
+      color: var(--fg-muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 0 0 4px 0;
+    }
+
+    #broker-modal .broker-intro code {
+      color: var(--fg);
+      background: var(--bg-raise);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    #broker-modal .broker-group-head {
+      color: var(--fg-faint);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin: 8px 0 2px 0;
+      padding-top: 6px;
+      border-top: 1px solid var(--border);
+    }
+
+    #broker-modal .broker-group-head:first-child {
+      border-top: none;
+      margin-top: 0;
+      padding-top: 0;
+    }
+
+    #broker-modal .broker-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 4px 0;
+    }
+
+    #broker-modal .broker-toggle {
+      background: transparent;
+      border: none;
+      color: var(--fg-faint);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0 3px;
+      font-family: inherit;
+      line-height: 1;
+      flex: 0 0 auto;
+      margin-top: 1px;
+    }
+
+    #broker-modal .broker-row.on .broker-toggle {
+      color: var(--accent-agent);
+    }
+
+    #broker-modal .broker-meta {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    #broker-modal .broker-label {
+      color: var(--fg);
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+
+    #broker-modal .broker-row.off .broker-label {
+      color: var(--fg-muted);
+    }
+
+    #broker-modal .broker-desc {
+      color: var(--fg-faint);
+      font-size: 11px;
+      line-height: 1.5;
+      margin-top: 1px;
+    }
+
+    #broker-modal .broker-journal-btn {
+      background: var(--input-bg);
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 10px;
+      align-self: flex-start;
+    }
+
+    #broker-modal .broker-journal-btn:hover {
+      color: var(--fg);
+      border-color: var(--fg-faint);
+    }
+
     /* ---------- Top-bar model badge + modal ---------- */
     .model-badge {
       background: transparent;
@@ -1584,6 +1753,7 @@
       <span class="bar"><span class="fill"></span></span>
       <span class="label">—</span>
     </button>
+    <button id="broker-btn" title="Broker — tool routing, logging, and per-tool toggles">broker</button>
   </div>
 
   <div class="layout" id="layout">
@@ -1662,6 +1832,36 @@
   </div>
 
   <!-- Model + context modal -->
+  <!-- Broker modal -->
+  <div id="broker-modal" class="hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeBrokerModal()"></div>
+    <div class="modal-panel broker-panel" role="dialog" aria-labelledby="broker-modal-title">
+      <div class="modal-head">
+        <h3 id="broker-modal-title">broker</h3>
+        <button class="modal-close" onclick="closeBrokerModal()" aria-label="close">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="broker-intro">
+          This is the broker configuration. The broker is the layer all
+          tool calls flow through — it enforces allowlists, anonymizes
+          off-allowlist web fetches via Tor, converts fetched HTML to
+          markdown, and writes a journal of every action to
+          <code>rness/knowledge/session-logs/&lt;date&gt;-broker.md</code>.
+          Toggles below let you turn individual broker behaviors off (e.g.
+          to skip logging overhead or block off-allowlist fetches outright).
+          Allowlist enforcement itself stays on regardless. Unless you know
+          what you're doing, leave these on.
+        </p>
+        <div id="broker-toggles" hx-get="/api/broker" hx-trigger="load" hx-swap="innerHTML">
+          <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+        </div>
+        <button class="broker-journal-btn" onclick="openBrokerJournal()">
+          open today's broker journal
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="model-modal" class="hidden" aria-hidden="true">
     <div class="modal-backdrop" onclick="closeModelModal()"></div>
     <div class="modal-panel" role="dialog" aria-labelledby="model-modal-title">
@@ -2169,6 +2369,39 @@
     });
 
     loadUIConfig();
+
+    // ---------- Broker modal ----------
+    function openBrokerModal() {
+      const modal = document.getElementById('broker-modal');
+      modal.classList.remove('hidden');
+      // Force htmx to re-fetch the toggle list each time it opens so the
+      // state reflects any out-of-band edits to ~/enough/config/broker.json.
+      htmx.ajax('GET', '/api/broker', { target: '#broker-toggles', swap: 'innerHTML' });
+    }
+    function closeBrokerModal() {
+      document.getElementById('broker-modal').classList.add('hidden');
+    }
+    window.closeBrokerModal = closeBrokerModal;
+
+    async function openBrokerJournal() {
+      const r = await fetch('/api/broker/journal-path');
+      if (!r.ok) { alert('could not locate broker journal'); return; }
+      const { path } = await r.json();
+      closeBrokerModal();
+      // Open the journal in the file preview pane via the same flow
+      // that file-tree clicks use.
+      htmx.ajax('GET', '/api/file?path=' + encodeURIComponent(path),
+        { target: '#preview-body', swap: 'innerHTML' });
+      document.getElementById('preview').classList.add('open');
+    }
+    window.openBrokerJournal = openBrokerJournal;
+
+    document.getElementById('broker-btn').addEventListener('click', openBrokerModal);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !document.getElementById('broker-modal').classList.contains('hidden')) {
+        closeBrokerModal();
+      }
+    });
 
     // ---------- Model badge + model modal (supervisor-aware) ----------
     const modelBadge = document.getElementById('model-badge');

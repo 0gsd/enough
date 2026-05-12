@@ -35,6 +35,7 @@ from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 
 from . import __version__
+from . import broker as _broker
 from .llm import LLMError, stream_chat
 from .logger import ExchangeLog, log_exchange
 from .prompt import (
@@ -1296,6 +1297,78 @@ def create_app(
             ],
             "had_drift": bool(before),
         }
+
+    @app.get("/api/broker", response_class=HTMLResponse)
+    async def api_broker_toggles() -> HTMLResponse:
+        """Render the broker pane's toggle list. Each row is a clickable
+        button that POSTs to /api/broker/toggle and re-renders this same
+        list via htmx. Grouped by tool so additions to the catalog stay
+        readable as the list grows."""
+        cfg = _broker.load_config()
+        rows: list[str] = []
+        last_group: str | None = None
+        for t in _broker.TOGGLES:
+            if t.group != last_group:
+                heading = {
+                    "general": "general",
+                    "read_file": "read_file",
+                    "write_file": "write_file",
+                    "shell": "shell",
+                    "fetch_url": "fetch_url",
+                }.get(t.group, t.group)
+                rows.append(
+                    f'<div class="broker-group-head">{_escape_html(heading)}</div>'
+                )
+                last_group = t.group
+            on = cfg.get(t.key, t.default)
+            cls = "on" if on else "off"
+            marker = "●" if on else "○"
+            rows.append(
+                f'<div class="broker-row {cls}" title="{_escape_html(t.description)}">'
+                f'  <button class="broker-toggle" '
+                f'    hx-post="/api/broker/toggle" '
+                f'    hx-vals=\'{{"key": "{_escape_html(t.key)}"}}\' '
+                f'    hx-target="#broker-toggles" hx-swap="innerHTML">'
+                f'    {marker}'
+                f'  </button>'
+                f'  <div class="broker-meta">'
+                f'    <div class="broker-label">{_escape_html(t.label)}</div>'
+                f'    <div class="broker-desc">{_escape_html(t.description)}</div>'
+                f'  </div>'
+                f'</div>'
+            )
+        return HTMLResponse("".join(rows))
+
+    @app.post("/api/broker/toggle", response_class=HTMLResponse)
+    async def api_broker_toggle(request: Request) -> HTMLResponse:
+        form = await request.form()
+        key = (form.get("key") or "").strip()
+        if not key:
+            raise HTTPException(400, "missing key")
+        valid = {t.key for t in _broker.TOGGLES}
+        if key not in valid:
+            raise HTTPException(400, f"unknown toggle: {key}")
+        cfg = _broker.load_config()
+        cfg[key] = not cfg.get(key, True)
+        _broker.save_config(cfg)
+        return await api_broker_toggles()  # type: ignore[return-value]
+
+    @app.get("/api/broker/journal-path")
+    async def api_broker_journal_path() -> dict[str, str]:
+        """Return the relative path to today's broker journal, for the UI
+        to open in the file preview pane. Creates the file (empty) if
+        missing so the preview pane has something to load."""
+        now = dt.datetime.now()
+        rel = f"rness/knowledge/session-logs/{now:%Y-%m-%d}-broker.md"
+        target = project_dir / rel
+        if not target.exists():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(
+                f"# broker journal — {now:%Y-%m-%d}\n\n"
+                "_(no broker activity logged yet today)_\n",
+                encoding="utf-8",
+            )
+        return {"path": rel}
 
     @app.get("/api/usage")
     async def api_usage() -> dict[str, Any]:
