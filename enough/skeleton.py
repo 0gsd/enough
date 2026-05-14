@@ -9,7 +9,7 @@ v0.0.3+ layout:
       semantics are "global convention, upgradable centrally" (paradigms,
       policies, skills, roles).
     - **copies** — for files that diverge per project from the start
-      (AGENT.md, MOTIVATION.md, knowledge/user-profile.md).
+      (AGENT.md, MOTIVATION.md, knowledge/project-profile.md).
 - `{project}/infoworld` is a symlink to `~/enough/infoworld/` so all
   projects share a common grounded-knowledge store. The infoworld tree
   is auto-created if missing.
@@ -55,22 +55,28 @@ _SKELETON_PLAN: tuple[tuple[str, str, str], ...] = (
     ("paradigms/default.md",           "rness/paradigms/default.md",            "symlink"),
     ("paradigms/translation.md",       "rness/paradigms/translation.md",        "symlink"),
     ("paradigms/workflow-design.md",   "rness/paradigms/workflow-design.md",    "symlink"),
-    ("policies/requests.md",           "rness/policies/requests.md",            "symlink"),
-    ("policies/context-management.md", "rness/policies/context-management.md",  "symlink"),
-    ("policies/allowlists.md",         "rness/policies/allowlists.md",          "symlink"),
+    ("policies/requests.md",            "rness/policies/requests.md",            "symlink"),
+    ("policies/context-management.md",  "rness/policies/context-management.md",  "symlink"),
+    ("policies/allowlists.md",          "rness/policies/allowlists.md",          "symlink"),
+    ("policies/profile-maintenance.md", "rness/policies/profile-maintenance.md", "symlink"),
     ("knowledge/rosetta-primers",      "rness/knowledge/rosetta-primers",       "symlink"),
 )
 
 # Project-local files not sourced from defaults/ (generated inline).
 _PROJECT_LOCAL_FILES: dict[str, str] = {
-    "rness/knowledge/user-profile.md": (
-        "# User Profile\n"
+    "rness/knowledge/project-profile.md": (
+        "# Project Profile\n"
         "\n"
-        "This file stores information about the user that helps you work with them\n"
-        "effectively.\n"
+        "Living notes about *this specific project* — the user's preferences\n"
+        "and working style as observed in this folder, the kind of work that\n"
+        "happens here, the conventions you've adopted, the recurring people /\n"
+        "places / files that matter. Project-local memory, not a user dossier;\n"
+        "different projects get different profiles.\n"
         "\n"
-        "It starts empty. Update it as you learn about the user's preferences,\n"
-        "expertise, communication style, and goals.\n"
+        "Starts empty. The harness pipes this file into your system prompt\n"
+        "on every turn, so anything written here is in your working memory.\n"
+        "Update it via `write_file` per the `profile-maintenance` policy:\n"
+        "concrete observations, not labels; pruned when stale; never bloated.\n"
     ),
     "rness/active-paradigm": "default\n",
 }
@@ -214,7 +220,9 @@ MOTIVATION_MD = _read_default("MOTIVATION.md")
 PARADIGM_DEFAULT_MD = _read_default("paradigms/default.md")
 POLICY_REQUESTS_MD = _read_default("policies/requests.md")
 POLICY_CONTEXT_MGMT_MD = _read_default("policies/context-management.md")
-USER_PROFILE_MD = _PROJECT_LOCAL_FILES["rness/knowledge/user-profile.md"]
+PROJECT_PROFILE_MD = _PROJECT_LOCAL_FILES["rness/knowledge/project-profile.md"]
+# Back-compat alias for tooling that imported the old name.
+USER_PROFILE_MD = PROJECT_PROFILE_MD
 INFOWORLD_README = _INFOWORLD_README
 
 
@@ -361,6 +369,35 @@ def _migrate_undot(project_dir: Path) -> None:
             pass
 
 
+def _migrate_user_profile_to_project_profile(project_dir: Path) -> None:
+    """v0.0.9-B migration: rness/knowledge/user-profile.md → project-profile.md.
+
+    The file was renamed to reflect what it actually is: per-project working
+    memory, not a per-user dossier (a user with five enough projects has
+    five different profiles — they're profiles of how this project gets
+    worked on, not of the user themselves).
+
+    Idempotent and conservative:
+    - If only the old file exists, rename in place (preserves any content
+      the agent or user wrote into it).
+    - If the new file already exists, do nothing (assume the user / agent
+      has resolved it manually).
+    - If neither exists, do nothing (skeleton-creation handles the new
+      project case).
+    """
+    k = project_dir / "rness" / "knowledge"
+    old = k / "user-profile.md"
+    new = k / "project-profile.md"
+    if new.exists() or new.is_symlink():
+        return
+    if not (old.exists() or old.is_symlink()):
+        return
+    try:
+        old.rename(new)
+    except OSError:
+        pass  # different fs / permissions / etc. — leave manual cleanup to user
+
+
 def ensure_skeleton(project_dir: Path) -> bool:
     """Create `rness/` + `infoworld` symlink if missing, AND sync global
     skills/roles on every call (idempotent). Returns True on first-time
@@ -455,6 +492,12 @@ def ensure_skeleton(project_dir: Path) -> bool:
             legacy_routines.rmdir()
         except OSError:
             pass  # not empty — leave the user's stuff alone
+
+    # ALWAYS run (idempotent): migrate knowledge/user-profile.md →
+    # project-profile.md. Existing projects predating the rename get
+    # their file renamed in place so anything the agent wrote into it
+    # carries over.
+    _migrate_user_profile_to_project_profile(project_dir)
 
     # ALWAYS run (idempotent): migrate read-allowlist.md → allowlists.md.
     # The new file has three sections (read, r/w, internet) but the tools

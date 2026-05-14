@@ -1842,14 +1842,14 @@
       </div>
       <div class="modal-body">
         <p class="broker-intro">
-          This is the broker configuration. The broker is the layer all
+          this is the broker configuration. the broker is the layer all
           tool calls flow through — it enforces allowlists, anonymizes
-          off-allowlist web fetches via Tor, converts fetched HTML to
+          off-allowlist web fetches via tor, converts fetched html to
           markdown, and writes a journal of every action to
           <code>rness/knowledge/session-logs/&lt;date&gt;-broker.md</code>.
-          Toggles below let you turn individual broker behaviors off (e.g.
+          toggles below let you turn individual broker behaviors off (e.g.
           to skip logging overhead or block off-allowlist fetches outright).
-          Allowlist enforcement itself stays on regardless. Unless you know
+          allowlist enforcement itself stays on regardless. unless you know
           what you're doing, leave these on.
         </p>
         <div id="broker-toggles" hx-get="/api/broker" hx-trigger="load" hx-swap="innerHTML">
@@ -2045,8 +2045,8 @@
       'knowledge': {
         name: 'knowledge/',
         path: 'rness/knowledge/',
-        what: 'project-specific knowledge that doesn\'t belong in <code>rness/io/</code> or <code>~/enough/infoworld/</code>: always contains <code>user-profile.md</code> (what the agent has learned about you for this project) and <code>session-logs/</code> (each turn\'s prompt and response, saved as markdown).',
-        how: '<code>user-profile.md</code> is a real file — both the agent and you can edit it. session logs are append-only. add new subfolders for any project-local memory you want the agent to consult.',
+        what: 'project-specific knowledge that doesn\'t belong in <code>rness/io/</code> or <code>~/enough/infoworld/</code>: always contains <code>project-profile.md</code> (living notes the agent keeps about this project — your preferences and working style as observed here, recurring people / files, conventions adopted) and <code>session-logs/</code> (each turn\'s prompt and response, saved as markdown).',
+        how: '<code>project-profile.md</code> is piped into the system prompt on every turn — both the agent and you can edit it. session logs are append-only. add new subfolders for any project-local memory you want the agent to consult.',
         ideas: [
           'maintain a glossary subfolder for project-specific jargon.',
           'let the agent write a "lessons learned" file as you iterate together.',

@@ -94,10 +94,13 @@ that the user configures through plain-text conventions.
 
 - Project directory: {project_dir}
 - Your own configuration files ALL live under `rness/`. Canonical paths:
-    - `rness/AGENT.md`             — your identity
-    - `rness/MOTIVATION.md`        — evolving drive
-    - `rness/paradigms/default.md` — active interaction paradigm
-    - `rness/knowledge/user-profile.md` — what you know about the user
+    - `rness/AGENT.md`                    — your identity
+    - `rness/MOTIVATION.md`               — evolving drive
+    - `rness/paradigms/default.md`        — active interaction paradigm
+    - `rness/knowledge/project-profile.md` — living notes about this project
+                                             (piped into your prompt every
+                                             turn; update per the
+                                             profile-maintenance policy)
   When editing any of these, always use the full path (e.g.
   `<path>rness/AGENT.md</path>`, not just `AGENT.md`). Tool paths are
   resolved from the project root, so a bare `AGENT.md` would create a NEW
@@ -136,6 +139,14 @@ def _read_or_empty(path: Path) -> str:
         return ""
     except OSError:
         return ""
+
+
+def _is_stock_project_profile(body: str) -> bool:
+    """Detect the unmodified seed template shipped by `skeleton.py` so we
+    don't waste tokens piping placeholder prose into the system prompt
+    every turn. Match on a stable phrase that won't appear once the agent
+    has written real observations."""
+    return "Starts empty. The harness pipes this file" in body
 
 
 def _section(title: str, body: str) -> str:
@@ -485,13 +496,15 @@ def assemble_system_prompt(project_dir: Path) -> str:
     so an agent-initiated paradigm switch takes effect on the very next
     invocation of this function (i.e. the next user turn).
 
-    Concatenates: AGENT.md, MOTIVATION.md, active paradigm + catalog,
-    optional INTENTION.md, tool instructions, and the harness-context block.
+    Concatenates: AGENT.md, MOTIVATION.md, Project Profile (per-turn
+    working memory), active paradigm + catalog, optional INTENTION.md,
+    tool instructions, and the rness-context block.
     """
     rness = project_dir / "rness"
 
     agent = _read_or_empty(rness / "AGENT.md")
     motivation = _read_or_empty(rness / "MOTIVATION.md")
+    project_profile = _read_or_empty(rness / "knowledge" / "project-profile.md")
     active_paradigm = get_active_paradigm(rness)
     paradigm = _load_active_paradigm_body(rness, active_paradigm)
     catalog = _load_paradigm_catalog(rness, active_paradigm)
@@ -501,6 +514,12 @@ def assemble_system_prompt(project_dir: Path) -> str:
         _section("Identity", agent),
         _section("Motivation", motivation),
     ]
+    # Project Profile sits adjacent to Motivation — both are "what you've
+    # learned" memory the agent grows over time. Skipped when the file is
+    # only the stock empty template (no real observations yet) so we don't
+    # waste tokens on placeholder prose every turn.
+    if project_profile and not _is_stock_project_profile(project_profile):
+        parts.append(_section("Project Profile", project_profile))
     roles_block = _load_roles(rness)
     if roles_block:
         # Sit between Motivation and Paradigm — close to identity (these

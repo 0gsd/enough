@@ -5,11 +5,11 @@ the project overview and philosophy, see the [README](../README.md). For
 populating `infoworld/` with a large Wikipedia corpus, see
 [LOCAL-WIKIPEDIA.md](LOCAL-WIKIPEDIA.md).
 
-`enough` is a **paradigmless personal computer harness** powered by a
-local LLM that runs entirely on your Mac. Your conversations stay on your
-machine. Your files stay on your machine. The model that's answering you
-also stays on your machine — there's no API call to the cloud, no account
-to sign up for, no subscription.
+`enough` is a **paradigmless personal computer** powered by a local LLM
+that runs entirely on your Mac. Your conversations stay on your machine.
+Your files stay on your machine. The model that's answering you also
+stays on your machine — there's no API call to the cloud, no account to
+sign up for, no subscription.
 
 It ships almost empty. You make it useful by enabling skills, activating
 roles, customizing paradigms, and giving it long-running tasks to track.
@@ -66,8 +66,8 @@ explaining each one:
 1. Confirms you're on a Mac
 2. Checks for Homebrew (the standard Mac package manager) — installs if missing
 3. Installs the supporting tools: `llama.cpp` (the local AI runtime),
-   `uv` (Python environment manager), `tor` (optional privacy proxy), and
-   `whisper-cpp` (for voice input)
+   `uv` (Python environment manager), `tor` (privacy proxy for
+   off-allowlist web fetches), and `whisper-cpp` (for voice input)
 4. Clones `enough` itself into `~/enough/` (your home folder)
 5. Sets up the Python environment (this also installs the offline
    translation libraries: `ctranslate2`, `sentencepiece`, `huggingface_hub`)
@@ -88,7 +88,7 @@ After install, you can delete `/tmp/enough-seed/`. Your install lives at
 
 There's also a double-clickable launcher in `shortcuts/`:
 `enough-on.command` starts the local AI server and opens `enough` in your
-browser, all from a Finder double-click. See [`shortcuts/README.md`](shortcuts/README.md)
+browser, all from a Finder double-click. See [`shortcuts/README.md`](../shortcuts/README.md)
 for setup.
 
 ---
@@ -105,11 +105,11 @@ enough
 Your browser will open at `http://127.0.0.1:3456` showing a chat
 interface, a file sidebar, and a model badge in the top-right.
 
-The first time you launch in a folder, `enough` creates an
-`rness/` directory in it — that's where the agent's identity, memory,
-and configuration live. Type a message to start. The agent will likely
-ask you what kind of work you want to do here and what personality it
-should have.
+The first time you launch in a folder, `enough` creates an `rness/`
+directory in it — that's where the agent's identity, memory, and
+configuration live. Type a message to start. The agent will likely ask
+you what kind of work you want to do here and what personality it should
+have.
 
 That's it. That's the whole loop.
 
@@ -123,9 +123,10 @@ you can read, edit, or toggle. Here's what they are and how to use them.
 ### Projects
 
 A **project** is just a folder on your Mac. When you `cd` into it and run
-`enough`, that folder becomes the agent's home: it has its own
-identity (`AGENT.md`), its own running notes (`MOTIVATION.md`), its own
-list of in-progress jobs (`.requests/`), its own session logs.
+`enough`, that folder becomes the agent's home: it has its own identity
+(`AGENT.md`), its own running notes (`MOTIVATION.md`), its own profile
+of how this project gets worked on (`knowledge/project-profile.md`), its
+own list of in-progress jobs (`requests/`), its own session logs.
 
 Run `enough` in `~/Documents/my-novel/` and it's your novelist agent. Run
 it in `~/Documents/research/`, different folder, different agent, fresh
@@ -134,9 +135,32 @@ brain.
 **One folder = one agent.** No multi-agent orchestration, no shared
 state. If you want a different agent, go to a different folder.
 
-The `rness/` directory inside your project is where all the
-agent's stuff lives. Most of it you'll never touch directly — the sidebar
+The `rness/` directory inside your project is where all the agent's
+stuff lives. Most of it you'll never touch directly — the sidebar
 surfaces what matters.
+
+### The agent's living memory: `project-profile.md`
+
+`rness/knowledge/project-profile.md` is the agent's per-project working
+memory. It's where the agent records observations about how *this
+project* gets worked on — your preferences as it's seen them in this
+folder, recurring people/files, conventions you've adopted, open
+threads it expects to come back to.
+
+This file is **piped into the system prompt on every turn**, so anything
+the agent writes there is in its working memory next message — without
+having to remember to `read_file` it. The
+`profile-maintenance.md` policy tells the agent when to update it
+(after observing a clear preference, when a pattern repeats, after
+finishing a multi-turn job) and what *not* to put in (vague labels,
+demographics, the full transcript).
+
+The profile is **per-project, not per-user**: a novel-writing project
+profiles you differently than an infra-debugging one. Different folder,
+different brain, different profile.
+
+You can edit `project-profile.md` yourself any time — the agent reads
+the file fresh every turn, so your edits land immediately.
 
 ### Skills
 
@@ -144,10 +168,12 @@ A **skill** is a packaged capability you can toggle on or off — like a
 Word add-in or a Chrome extension. Each skill is a folder with a
 `SKILL.md` describing what it does, and (optionally) helper scripts.
 
-`enough` ships with five skills out of the box:
+`enough` ships with four skills out of the box:
 
 - **`irefy`** ("I read everything for you") — produces a one-page
-  analytical digest of any long document.
+  analytical digest of any long document. Two scored indices (Conveyance
+  Success and Conveyance Evil), three lenses (Intention, Method,
+  Verdict). Use on Deep Research reports, blog posts, papers, anything.
 - **`memoir-dialectic`** — patient, multi-session collaborator for
   planning and optionally drafting a memoir. The folder on disk is the
   memory; you can disappear for weeks and pick up where you left off.
@@ -208,14 +234,13 @@ sessions, what its security posture is, how it handles requests, when to
 write checkpoints. It's a single markdown file the agent reads every
 turn.
 
-`enough` ships with two paradigms:
+`enough` ships with three paradigms:
 
-**`default.md`** — the base interaction paradigm. Covers things like:
-
-- Show commands before running them
-- Don't write outside the project folder unless the user opts in
-- Cache public-domain web content into the project (with manifest)
-- Don't auto-update memory files; propose changes for the user to apply
+**`default.md`** — the base interaction paradigm. Covers things like
+showing commands before running them, not writing outside the project
+folder unless you opt in, caching public-domain web content into the
+project, and proposing rather than auto-applying changes to identity
+files.
 
 **`translation.md`** — declares offline translation as a first-class
 capability. Tells the agent when to route requests to the `translator`
@@ -224,27 +249,36 @@ license-gated NLLB-200), how to fall back when MADLAD struggles on
 low-resource pairs, and how to consult the bundled Rosetta primers at
 `rness/knowledge/rosetta-primers/` for ground-truth verification.
 
+**`workflow-design.md`** — the meta-paradigm for *building* enough
+itself: adding skills, authoring roles, refining policies, editing
+`rness/AGENT.md` or `rness/MOTIVATION.md`. The agent switches into this
+one when you ask it to help you build or change part of its own
+workflow.
+
 **How to use it:**
 
 - For **most users**, don't touch it — the default is sensible.
-- To **see what it says**, click `rness/paradigms/default.md` in the
+- The agent will **switch paradigms on its own** when your request
+  better fits another one (e.g. you start a translation job; you ask
+  to build a new skill). The active paradigm shows in the sidebar
+  under **paradigm**.
+- To **see what one says**, click `rness/paradigms/default.md` in the
   sidebar. It opens in the preview pane.
 - To **change it for one project only**: in the preview pane, click
   *"customize for this project"*. The default symlink is replaced with a
   project-local copy you can edit.
-- To **change it for all projects**, edit `~/enough/defaults/paradigms/default.md`
-  directly. Every project still using the default symlink picks up the
-  change on the next message.
-
-Power users can author multiple paradigm files and switch between them.
-Most won't need to.
+- To **change it for all projects**, edit
+  `~/enough/defaults/paradigms/default.md` directly. Every project
+  still using the default symlink picks up the change on the next
+  message.
 
 ### Requests (long-horizon job tracking)
 
 When you ask the agent to do something that takes more than one
 conversation turn — write a 50-page report, build a piece of software,
-research a topic across many sources — it creates a **request file**
-under `rness/requests/`. This is its working memory for the job.
+research a topic across many sources, run a skill across a long document
+— it creates a **request file** under `rness/requests/`. This is its
+working memory for the job.
 
 The file tracks:
 
@@ -254,6 +288,12 @@ The file tracks:
 - Progress checkpoints — notes the agent leaves itself
 - A continuation block (used when the conversation needs to reset
   mid-job; see auto-reset below)
+
+**You don't have to say "track this as a request."** The agent
+recognizes the shape of a multi-step task on its own: skill
+invocations, "use X on this file," "translate this document,"
+"research X and write a synthesis." For one-shot Q&A and single file
+edits, no request file is created.
 
 **How to use them:**
 
@@ -283,7 +323,9 @@ In there you can:
   faster.
 - **Watch the token-pressure gauge** — a colored bar that fills up as
   the conversation grows. Green is fine, yellow is "getting full," red
-  is "about to overflow."
+  is "about to overflow." Updates every turn (including mid-tool-loop;
+  if the model doesn't ship a usage payload, a character-based estimate
+  drives the gauge so it never sits frozen at zero).
 - **Toggle auto-reset** — see below.
 
 Right next to the model badge is a smaller version of the token gauge,
@@ -300,17 +342,54 @@ its own token pressure. When it crosses the threshold (default 75%), it:
 
 1. Pauses to write a fresh "continuation" note in its active request
    file — what it just did, what to do next, key state to remember
+   (the agent is explicitly required to call `write_file` here, so the
+   note actually lands on disk)
 2. Wipes its conversational memory
 3. Reads the request file again to remind itself
 4. Continues the work
 
 You see this happen in the chat pane: a gray banner explains it,
-followed by the checkpoint exchange, a divider, then a fresh start where
-the agent picks up the task. No data loss — the request file on disk is
-the durable memory.
+followed by the checkpoint exchange, a divider, then a fresh start
+where the agent picks up the task. No data loss — the request file on
+disk is the durable memory.
 
 This is **off by default** because it's experimental. Try it on
 medium-sized tasks first.
+
+### The broker (tool gateway)
+
+Every tool call the agent makes flows through a layer called the
+**broker**. The broker enforces allowlists, routes web fetches (direct
+for trusted domains, via Tor for everything else), converts fetched
+HTML to markdown, caches fetched documents, and writes a journal of
+every action.
+
+Click the **broker** button in the top nav to open the broker pane.
+You'll see toggles for:
+
+- **Trace logging** — every brokered tool call gets a markdown entry
+  in `rness/knowledge/session-logs/<date>-broker.md`. The journal is
+  your accountability trail; turn it off only for a quieter
+  filesystem.
+- **Per-tool brokering** — `read_file`, `write_file`, and `shell` each
+  have a toggle that controls whether the broker logs them.
+  Allowlist enforcement stays on regardless; the toggle is purely
+  about journaling overhead.
+- **`fetch_url` enabled** — the canonical web-fetch tool. When off,
+  the agent falls back to `curl` via shell — no Tor, no markdown
+  conversion, no caching.
+- **`fetch_url`: Tor for off-allowlist domains** — when on (default),
+  off-allowlist domains route through the local Tor proxy
+  (`127.0.0.1:9050`) for anonymization. Turn it off to deny
+  off-allowlist fetches outright.
+- **`fetch_url`: cache + markdown convert** — fetched HTML gets
+  pandoc-converted to markdown and cached under
+  `rness/io/input/<timestamp>-<hash>-<slug>.md`, with a row in
+  `_broker-index.md`. The agent gets a short preview instead of the
+  full body, saving context window space.
+
+From the broker pane you can also **open today's broker journal**
+directly in the preview pane.
 
 ### infoworld (your private knowledge library)
 
@@ -337,7 +416,8 @@ text into `infoworld/personal/` for a lighter setup).
 
 `enough` is privacy-conservative by default. The agent can read and
 write inside your project folder freely, but reaching outside it — onto
-your wider Mac, or out to the internet — requires explicit permission.
+your wider Mac, or out to the internet — requires explicit permission
+(or, for the internet, anonymization via Tor).
 
 These permissions live in `rness/policies/allowlists.md` and have three
 sections:
@@ -346,10 +426,11 @@ sections:
   `~/enough/` so it can see its own defaults)
 - **File-read-write prefixes** — paths the agent may also write to
   (default: empty — opt in deliberately)
-- **Internet domains** — websites the agent may fetch from (default:
-  Project Gutenberg, Wikipedia, Wikisource, the Internet Archive,
-  Standard Ebooks — places generally safe for grabbing public-domain or
-  CC-licensed text)
+- **Internet domains** — websites the broker fetches **directly**
+  (default: Project Gutenberg, Wikipedia, Wikisource, Wikimedia
+  Commons, the Internet Archive, Standard Ebooks — places generally
+  safe for grabbing public-domain or CC-licensed text). Off-allowlist
+  domains aren't rejected — they're routed through Tor.
 
 **How to use them:**
 
@@ -357,25 +438,24 @@ sections:
   current rules.
 - Add a path or domain by editing the file (use *customize for this
   project* to make a project-local copy first).
-- The agent will tell you when it tries to reach somewhere not on the
-  list and ask whether to add it.
-
-The internet allowlist is **guidance**, not a hard wall — the agent can
-technically curl anywhere via its `shell` tool. The list shapes what it
-will *willingly* fetch without asking.
+- To **block** off-allowlist internet fetches outright, open the
+  broker pane and turn off "Tor for off-allowlist domains" — the
+  agent will then get a polite denial when it tries to fetch a
+  non-allowlisted domain.
 
 ### Session logs
 
 Every conversation is automatically saved to
-`rness/knowledge/session-logs/<date>.md` — one file per day. You don't
-need to do anything; the harness writes them. The agent can read them
-later if it needs to remember a conversation from yesterday.
+`rness/knowledge/session-logs/<date>.md` — one file per day, with a
+companion `<date>-broker.md` for tool-call journaling. You don't need
+to do anything; the harness writes them. The agent can read them later
+if it needs to remember a conversation from yesterday.
 
 ---
 
 ## What the agent can actually do (its tools)
 
-The agent has three tools. They're how it does anything that isn't just
+The agent has four tools. They're how it does anything that isn't just
 talking to you.
 
 - **`read_file`** — reads a text file. By default, restricted to your
@@ -388,6 +468,11 @@ talking to you.
   the deliberate "nuclear option" — it can in principle do anything
   your terminal can do. The agent is instructed to use it sparingly and
   show you what it's doing.
+- **`fetch_url`** — the canonical way to read from the web. Routes
+  through the broker: allowlisted domains direct, others via Tor.
+  Converts HTML to markdown via pandoc and caches under
+  `rness/io/input/`. The agent gets a short preview + cache path; the
+  full document doesn't go in the context window.
 
 The tool loop is capped at 50 calls per turn, so a runaway agent can't
 loop forever.
@@ -407,7 +492,8 @@ loop forever.
   Mac without your explicit allowlist.
 - **The first conversation in a new project is meta.** The agent will
   ask what kind of work you want to do. Tell it. That conversation will
-  shape the agent's identity in `AGENT.md`.
+  shape the agent's identity in `AGENT.md` and seed
+  `project-profile.md`.
 - **If something feels wrong, type `/reset` in the chat.** It clears the
   conversation memory but keeps everything on disk. Then ask again.
 - **The token gauge tells you how "full" the agent's brain is.** When
@@ -428,6 +514,12 @@ example:
 - Add a new skill available everywhere
 - Add a new role available everywhere
 - Update the read allowlist for every project
+- Add a new policy that should apply everywhere
+
+When the project's `rness/` is missing defaults that have been added to
+`~/enough/defaults/` since this project was created, the empty-state
+chat banner shows a notice and the agent's system prompt gets an "FYI"
+about it. Type `/update-enough` in the chat to apply.
 
 **Per-project:** in the preview pane, click *customize for this project*
 on a symlinked file. That replaces the global symlink with a local copy
@@ -449,11 +541,13 @@ These are choices, not gaps:
 - **No cloud anything.** No telemetry, no remote API, no model weights
   you don't own.
 - **No authentication.** Localhost-only, single-user.
-- **No automatic memory updates.** The agent proposes changes to
-  `MOTIVATION.md`; you apply them.
+- **No automatic memory updates *for identity files*.** The agent
+  proposes changes to `AGENT.md` and `MOTIVATION.md`; you apply them.
+  (The exception is `project-profile.md` — that's living per-project
+  memory the agent maintains itself per the `profile-maintenance`
+  policy.)
 - **No vector store / RAG.** The agent uses `grep`. This is fine at
   personal scale and avoids a whole category of complexity.
-- **No paradigm switching mid-session** (yet).
 
 ---
 
@@ -476,14 +570,22 @@ git pull upstream main
 
 The code is small and readable. Roughly:
 
-- `enough/server.py` — FastAPI app: chat, SSE streaming, file tree, model modal, auto-reset orchestration
-- `enough/prompt.py` — assembles the system prompt from `rness/` on every turn
-- `enough/tools.py` — `read_file` / `write_file` / `shell`, plus path safety
-- `enough/skeleton.py` — creates `rness/` for new projects, syncs globals on every launch
-- `enough/llm.py` — talks to llama-server (local LLM via OpenAI-compatible API)
+- `enough/server.py` — FastAPI app: chat, SSE streaming, file tree,
+  model modal, broker modal, auto-reset orchestration
+- `enough/prompt.py` — assembles the system prompt from `rness/` on
+  every turn (no caching, so edits land on the next message)
+- `enough/broker.py` — broker config + trace logging + canned
+  denial messages
+- `enough/tools.py` — `read_file`, `write_file`, `shell`, `fetch_url`,
+  plus path safety and Tor routing
+- `enough/skeleton.py` — creates `rness/` for new projects, syncs
+  global skills/roles on every launch, runs migrations
+- `enough/llm.py` — talks to llama-server (local LLM via
+  OpenAI-compatible API)
 - `enough/supervisor.py` — manages the llama-server subprocess
 - `enough/static/index.html` — the entire UI (htmx + vanilla JS)
-- `defaults/` — the shipped templates that get copied or symlinked into every new project
+- `defaults/` — the shipped templates that get copied or symlinked
+  into every new project
 
 To work on it:
 
@@ -501,7 +603,7 @@ end-to-end smoke tests against a running llama-server + browser session.
 
 ## License
 
-Apache 2.0. See [LICENSE](LICENSE).
+Apache 2.0. See [LICENSE](../LICENSE).
 
 Third-party content (the bundled `defaults/skills/` packages) carries
-its own licenses — see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+its own licenses — see [THIRD_PARTY_LICENSES.md](../THIRD_PARTY_LICENSES.md).

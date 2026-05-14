@@ -52,9 +52,9 @@ TOGGLES: tuple[Toggle, ...] = (
         key="trace_log_enabled",
         label="trace logging (all tools)",
         description=(
-            "Write every brokered tool call to "
-            "rness/knowledge/session-logs/<date>-broker.md. Useful for audit "
-            "and debugging. Turn off if you want a quieter filesystem."
+            "write every brokered tool call to "
+            "rness/knowledge/session-logs/<date>-broker.md. useful for audit "
+            "and debugging. turn off if you want a quieter filesystem."
         ),
         default=True,
         group="general",
@@ -63,8 +63,8 @@ TOGGLES: tuple[Toggle, ...] = (
         key="read_file_brokered",
         label="read_file: brokered",
         description=(
-            "Route read_file through the broker for allowlist enforcement "
-            "and trace logging. (Allowlists stay enforced even if you "
+            "route read_file through the broker for allowlist enforcement "
+            "and trace logging. (allowlists stay enforced even if you "
             "disable this — the toggle just affects logging.)"
         ),
         default=True,
@@ -74,7 +74,7 @@ TOGGLES: tuple[Toggle, ...] = (
         key="write_file_brokered",
         label="write_file: brokered",
         description=(
-            "Route write_file through the broker for allowlist enforcement, "
+            "route write_file through the broker for allowlist enforcement, "
             "protected-dir checks, and trace logging."
         ),
         default=True,
@@ -84,7 +84,7 @@ TOGGLES: tuple[Toggle, ...] = (
         key="shell_brokered",
         label="shell: brokered",
         description=(
-            "Trace-log shell commands (the agent's nuclear option). Doesn't "
+            "trace-log shell commands (the agent's nuclear option). doesn't "
             "restrict what shell can do — there's no path allowlist for "
             "shell by design — but the journal entry is your accountability."
         ),
@@ -95,8 +95,8 @@ TOGGLES: tuple[Toggle, ...] = (
         key="fetch_url_enabled",
         label="fetch_url: enabled",
         description=(
-            "Allow the agent to use the fetch_url tool. When off, the agent "
-            "falls back to curl-via-shell for web reads — no Tor, no "
+            "allow the agent to use the fetch_url tool. when off, the agent "
+            "falls back to curl-via-shell for web reads — no tor, no "
             "markdown conversion, no caching."
         ),
         default=True,
@@ -104,11 +104,11 @@ TOGGLES: tuple[Toggle, ...] = (
     ),
     Toggle(
         key="fetch_url_tor_for_offlist",
-        label="fetch_url: Tor for off-allowlist domains",
+        label="fetch_url: tor for off-allowlist domains",
         description=(
-            "When fetch_url targets a domain that isn't on the internet "
-            "allowlist, route the request through the local Tor proxy at "
-            "127.0.0.1:9050. Allowlist domains are fetched directly. Turn "
+            "when fetch_url targets a domain that isn't on the internet "
+            "allowlist, route the request through the local tor proxy at "
+            "127.0.0.1:9050. allowlist domains are fetched directly. turn "
             "this off to deny off-allowlist fetches outright."
         ),
         default=True,
@@ -118,9 +118,9 @@ TOGGLES: tuple[Toggle, ...] = (
         key="fetch_url_cache_and_convert",
         label="fetch_url: cache + markdown convert",
         description=(
-            "Convert fetched HTML to markdown via pandoc and store the "
+            "convert fetched html to markdown via pandoc and store the "
             "result in rness/io/input/<timestamp>-<hash>-<slug>.md, plus "
-            "a row in _broker-index.md. The agent gets a short preview "
+            "a row in _broker-index.md. the agent gets a short preview "
             "instead of the full body — saves context window space."
         ),
         default=True,
