@@ -1059,6 +1059,84 @@
     }
     #review-mode .review-body img { max-width: 100%; }
 
+    /* ---------- Phase 5d: line-nav column ----------
+       16px-wide column pinned to the right wall of review mode. Each
+       source line gets one row; rows with highlights show colored
+       dotted bands (per-color sub-strips when a line has multiple
+       highlights of different colors). Clicking a row scrolls the
+       review body to that line. */
+    #review-mode .review-linenav {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 16px;
+      background: var(--bg);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 25;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    #review-mode .review-linenav .ln-row {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: row;
+      min-height: 1px;
+    }
+
+    /* Default (un-highlighted) cell: themed grey, dotted. */
+    #review-mode .review-linenav .ln-cell {
+      flex: 1 1 0;
+      background-image: repeating-linear-gradient(
+        to right,
+        var(--review-fg-faint, #8888) 0 1px,
+        transparent 1px 2px
+      );
+      background-size: auto 1px;
+      background-repeat: repeat-y;
+      background-position: 0 50%;
+    }
+    /* When highlighted, the cell gets per-color dot pattern. The
+       repeating gradient gives the "1px on, 1px off" effect across
+       the cell's width (or the per-color sub-cell when split). */
+    #review-mode .review-linenav .ln-cell-yellow {
+      background-image: repeating-linear-gradient(
+        to right,
+        rgba(255, 215, 0, 0.95) 0 1px,
+        transparent 1px 2px
+      );
+    }
+    #review-mode .review-linenav .ln-cell-green {
+      background-image: repeating-linear-gradient(
+        to right,
+        rgba(127, 255, 0, 0.92) 0 1px,
+        transparent 1px 2px
+      );
+    }
+    #review-mode .review-linenav .ln-cell-blue {
+      background-image: repeating-linear-gradient(
+        to right,
+        rgba( 64, 195, 255, 0.92) 0 1px,
+        transparent 1px 2px
+      );
+    }
+    #review-mode .review-linenav .ln-cell-pink {
+      background-image: repeating-linear-gradient(
+        to right,
+        rgba(255, 105, 180, 0.92) 0 1px,
+        transparent 1px 2px
+      );
+    }
+
+    /* When the linenav exists, give the body a bit of right padding
+       so the rightmost text doesn't crowd against the column. */
+    #review-mode .review-body {
+      padding-right: max(48px, calc(50% - 380px - 16px));
+    }
+
     /* The bottom chat pill: docked to the bottom of the review pane,
        collapsible, vertically resizable. When collapsed only a slim
        ribbon remains, with an obvious chevron to re-expand. */
@@ -2414,6 +2492,11 @@
           </div>
         </div>
         <div class="review-body" id="review-body" data-path=""></div>
+        <!-- Phase 5d: line-nav column. Pinned to the right wall of
+             #review-mode; populated by JS after each highlight
+             render with one row per source line. Clicking a row
+             scrolls the body to that line's block. -->
+        <div class="review-linenav" id="review-linenav" aria-label="line navigation"></div>
         <div class="review-chat" id="review-chat">
           <div class="review-chat-head" onclick="toggleReviewChat()">
             <span>chat</span>
@@ -4671,6 +4754,129 @@
       }
       // Add the per-highlight "i" handles.
       attachHighlightHandles(body);
+      // Refresh the right-wall line-nav column with the same highlights.
+      renderLineNav();
+    }
+
+    // ---------- Phase 5d: line-nav column ----------
+    //
+    // For each source line in REVIEW_SOURCE, render one row in the
+    // right-wall column. Rows for un-highlighted lines show a muted
+    // grey dot pattern; rows whose lines are touched by highlights
+    // show one colored sub-cell per color present (so a line covered
+    // by both yellow and green gets a yellow cell + a green cell
+    // sharing the row width). Clicking a row scrolls the review body
+    // to that line.
+
+    function renderLineNav() {
+      const nav = document.getElementById('review-linenav');
+      if (!nav) return;
+      nav.innerHTML = '';
+      const source = REVIEW_SOURCE || '';
+      const lines = source.split('\n');
+      const numLines = Math.max(1, lines.length);
+      // Compute, for each highlight, [startLine, endLine] inclusive.
+      // Prefer src_start/src_end hints; fall back to a snippet search
+      // in the source. Skip stale highlights and ones we can't locate.
+      const colorsByLine = Array.from({ length: numLines }, () => []);
+      // Pre-compute cumulative line offsets so we can map byte → line in O(log n).
+      const lineStarts = [0];
+      for (let i = 0; i < lines.length; i++) {
+        lineStarts.push(lineStarts[i] + lines[i].length + 1);  // +1 for the \n
+      }
+      function lineFromOffset(off) {
+        // Binary search.
+        let lo = 0, hi = lineStarts.length - 1;
+        while (lo < hi) {
+          const mid = (lo + hi + 1) >> 1;
+          if (lineStarts[mid] <= off) lo = mid;
+          else hi = mid - 1;
+        }
+        return lo;
+      }
+      for (const h of REVIEW_HIGHLIGHTS) {
+        if (h.stale) continue;
+        let s = h.src_start, e = h.src_end;
+        if (s == null || e == null) {
+          // Fall back to snippet search in source.
+          const idx = source.indexOf(h.snippet || '');
+          if (idx < 0) continue;
+          s = idx;
+          e = idx + (h.snippet || '').length;
+        }
+        const startLine = lineFromOffset(s);
+        const endLine = lineFromOffset(Math.max(s, e - 1));
+        for (let i = startLine; i <= endLine && i < numLines; i++) {
+          if (!colorsByLine[i].includes(h.color)) {
+            colorsByLine[i].push(h.color);
+          }
+        }
+      }
+      // Render rows. One per source line; rows are flex:1 so they
+      // distribute equally across the column's height regardless of
+      // doc length.
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < numLines; i++) {
+        const row = document.createElement('div');
+        row.className = 'ln-row';
+        row.dataset.line = String(i);
+        row.title = `line ${i + 1}`;
+        const colors = colorsByLine[i];
+        if (colors.length === 0) {
+          // No highlight on this line — single muted cell.
+          const c = document.createElement('div');
+          c.className = 'ln-cell';
+          row.appendChild(c);
+        } else {
+          // One sub-cell per color, equal-width (flex:1 each).
+          for (const color of colors) {
+            const c = document.createElement('div');
+            c.className = 'ln-cell ln-cell-' + color;
+            row.appendChild(c);
+          }
+        }
+        frag.appendChild(row);
+      }
+      nav.appendChild(frag);
+    }
+
+    // Click anywhere in the linenav column → scroll the body to that
+    // source line. Delegated handler reads the row's data-line.
+    document.getElementById('review-linenav').addEventListener('click', (e) => {
+      const row = e.target.closest('.ln-row');
+      if (!row) return;
+      const line = +row.dataset.line;
+      scrollReviewBodyToLine(line);
+    });
+
+    function scrollReviewBodyToLine(line) {
+      // Map line number → source byte offset → containing block →
+      // scrollIntoView. Falls back to a proportional scroll if no
+      // block contains the line (shouldn't happen for valid lines
+      // but defensive).
+      const body = document.getElementById('review-body');
+      if (!body) return;
+      const source = REVIEW_SOURCE || '';
+      const lines = source.split('\n');
+      let off = 0;
+      for (let i = 0; i < line && i < lines.length; i++) {
+        off += lines[i].length + 1;  // +1 for \n
+      }
+      // Find the block whose [start, end) contains off.
+      const idx = REVIEW_BLOCKS.findIndex(b => b.start <= off && off < b.end);
+      if (idx >= 0) {
+        const el = body.querySelector(`[data-block-idx="${idx}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+      }
+      // Proportional fallback.
+      const numLines = Math.max(1, lines.length);
+      body.scrollTo({
+        top: (line / numLines) * body.scrollHeight,
+        behavior: 'smooth',
+      });
     }
 
     function attachHighlightHandles(rootEl) {
