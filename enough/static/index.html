@@ -1252,11 +1252,11 @@
       filter: grayscale(0.6);
     }
 
-    /* Selection toolbar inside review mode. Anchored to the top of
-       the review pane; appears on non-empty selection, slides up out
-       of view when the selection clears. Three groups: format
-       buttons left, edit-mode button center, highlight colors right
-       (Phase 3 fills the right group in). */
+    /* Selection toolbar inside review mode. Always docked at the top
+       of the pane (Phase 5a) — controls grey out when their
+       preconditions aren't met instead of the whole bar appearing
+       and disappearing. Three groups: format buttons left,
+       edit-mode button center, highlight colors right. */
     #review-mode .review-toolbar {
       position: absolute;
       top: 0;
@@ -1272,15 +1272,6 @@
       border-bottom: 1px solid var(--border);
       z-index: 32;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-      transform: translateY(0);
-      transition: transform 140ms ease, opacity 140ms ease;
-    }
-
-    #review-mode .review-toolbar[hidden] {
-      display: flex;            /* override the [hidden] default so we can animate */
-      transform: translateY(-110%);
-      opacity: 0;
-      pointer-events: none;
     }
 
     #review-mode .review-toolbar .rt-group {
@@ -1347,9 +1338,9 @@
       filter: brightness(1.08);
     }
 
-    /* When the toolbar is visible, give the review body extra top
-       padding so its first line isn't covered by the bar. */
-    #review-mode .review-toolbar:not([hidden]) ~ .review-body {
+    /* Top padding for the always-on toolbar so the document's first
+       line isn't covered. */
+    #review-mode .review-toolbar ~ .review-body {
       padding-top: 96px;
     }
 
@@ -2289,12 +2280,12 @@
            conversation so the user can talk to the agent without
            leaving the document. -->
       <div id="review-mode" aria-hidden="true">
-        <!-- Selection toolbar — slides down from the top of the review
-             pane whenever the user has a non-empty text selection.
-             Phase 2 ships format buttons (B / I / U / heading) +
-             "edit mode" jump; Phase 3 will add the four highlight
-             color circles on the right. -->
-        <div class="review-toolbar" id="review-toolbar" hidden>
+        <!-- Selection toolbar — Phase 5a made this always-visible.
+             Individual buttons grey out when they don't apply to the
+             current selection (or when there's no selection). The
+             format/edit-mode/highlight groups are arranged left /
+             center / right. -->
+        <div class="review-toolbar" id="review-toolbar">
           <div class="rt-group rt-format" role="group" aria-label="format">
             <button type="button" data-fmt="bold" title="bold (wrap selection in **…**)"><b>B</b></button>
             <button type="button" data-fmt="italic" title="italic (wrap selection in *…*)"><i>I</i></button>
@@ -4290,10 +4281,32 @@
     // "edit mode" jump: capture the selection's rendered text, exit
     // review mode, open preview > edit on the same file, then in the
     // textarea search for that text and select it (scrolling to it).
+    //
+    // Phase 5a: works without a selection too. We pick the topmost
+    // visible block as the focus target and scroll the textarea to
+    // that block's source position so the user lands roughly where
+    // they were reading. No text is selected in the textarea in that
+    // case — just the scroll.
     async function applyEditModeJump() {
-      const sel = getReviewSelection();
       const path = REVIEW_PATH;
-      const focusText = sel ? sel.text : null;
+      const sel = getReviewSelection();
+      let focusText = null;
+      if (sel) {
+        focusText = sel.text;
+      } else {
+        const top = findTopmostVisibleReviewBlock();
+        if (top && REVIEW_BLOCKS[top.idx]) {
+          // First non-empty line of the block makes a good unique
+          // search target — full block.raw can be long, and just a
+          // few words near the start lands the cursor right.
+          const raw = REVIEW_BLOCKS[top.idx].raw;
+          const firstLine = raw.split('\n').find(l => l.trim()) || '';
+          // Strip leading markers (# / - / > / 1. ) so the search
+          // hits the rendered text and the textarea consistently.
+          focusText = firstLine.replace(/^(#{1,6}\s+|\s*[-*+]\s+|\s*\d+\.\s+|>\s?)/, '').trim()
+                              .slice(0, 80) || null;
+        }
+      }
       PENDING_EDIT_FOCUS = focusText ? { path, text: focusText } : null;
       exitReviewMode();
       if (!path) return;
@@ -4329,35 +4342,29 @@
       }
     }
 
-    // Show / hide the toolbar based on the current selection. Called
-    // from the document-level selectionchange listener.
+    // Update the toolbar's per-button disabled states. Phase 5a made
+    // the toolbar permanently visible — this function no longer
+    // shows or hides it; it only flips disabled/enabled on each
+    // control based on the current selection.
     //
-    // Visibility uses the PERMISSIVE check: any non-empty selection
-    // inside the review body shows the toolbar. Individual buttons
-    // grey out when their preconditions don't hold:
-    //   - Format buttons + heading dropdown: require a single-block
-    //     selection in a paragraph or heading. Multi-block selections
-    //     (which the user normally makes when highlighting across
-    //     paragraphs) leave the format group disabled but keep the
-    //     color circles + edit-mode button live.
-    //   - Color circles + edit-mode button: always live whenever the
-    //     toolbar is visible.
+    // Gating rules:
+    //   - Format buttons + heading dropdown: enabled only when
+    //     there's a single-block selection inside a paragraph or
+    //     heading.
+    //   - Edit-mode button: ALWAYS enabled (with-selection jumps to
+    //     the selection text in the textarea; no-selection jumps to
+    //     the topmost visible block).
+    //   - Color circles: enabled only when there's a selection AND
+    //     the selection doesn't overlap any existing highlight
+    //     (Phase 5b — one highlight per span max, no stacking).
     function refreshReviewToolbar() {
       const root = document.getElementById('review-mode');
-      const toolbar = document.getElementById('review-toolbar');
-      if (!root.classList.contains('open')) {
-        toolbar.hidden = true;
-        return;
-      }
+      if (!root || !root.classList.contains('open')) return;
+
       const any = getAnyReviewSelection();
-      if (!any) {
-        toolbar.hidden = true;
-        return;
-      }
-      toolbar.hidden = false;
 
       // Format / heading: gated on single-block + p/heading.
-      const single = getSingleBlockSelection();
+      const single = any ? getSingleBlockSelection() : null;
       const block = single ? REVIEW_BLOCKS[single.blockIdx] : null;
       const formatOk = block && (block.type === 'p' || block.type === 'heading');
       document.querySelectorAll('#review-toolbar button[data-fmt]').forEach(btn => {
@@ -4371,16 +4378,70 @@
       } else {
         headingSel.value = '';
       }
-      // Color circles: always interactive when the toolbar is visible.
-      // Their "active" state (border ring) is set in the wrapper
-      // installed below to reflect which colors already cover the
-      // selection.
+      // Color circles: disabled when there's no selection OR when
+      // any part of the selection already overlaps an existing
+      // highlight. Phase 5c moves color-change / removal into the
+      // per-highlight "i" handle so the toolbar circles are
+      // strictly for adding NEW highlights on un-highlighted text.
+      const overlap = any ? selectionOverlapsAnyHighlight() : true;
+      document.querySelectorAll('#review-toolbar .rt-color').forEach(btn => {
+        btn.disabled = !any || overlap;
+        // Drop any "active" rings — they belonged to the old
+        // toggle-by-clicking-same-color flow.
+        btn.classList.remove('active');
+      });
     }
 
-    function hideReviewToolbar() {
-      const tb = document.getElementById('review-toolbar');
-      if (tb) tb.hidden = true;
+    // Returns {el, idx} for the topmost block currently within the
+    // review body's viewport — used by the edit-mode jump when
+    // there's no selection so we can scroll the textarea to a
+    // sensible "where the user was reading" position. Returns null
+    // if review mode isn't open or the body is empty.
+    function findTopmostVisibleReviewBlock() {
+      const body = document.getElementById('review-body');
+      if (!body) return null;
+      const bodyRect = body.getBoundingClientRect();
+      // Account for the toolbar overlay so the "top" is the first
+      // line the user can actually see, not the first line behind
+      // the toolbar.
+      const toolbar = document.getElementById('review-toolbar');
+      const toolbarH = toolbar ? toolbar.getBoundingClientRect().height : 0;
+      const visibleTop = bodyRect.top + toolbarH;
+      const blocks = body.querySelectorAll('[data-block-idx]');
+      for (const b of blocks) {
+        const rect = b.getBoundingClientRect();
+        // Block is visible if its bottom is at or below the visible
+        // top. (Bottom > visibleTop means at least one pixel of the
+        // block is showing.)
+        if (rect.bottom > visibleTop) {
+          return { el: b, idx: +b.dataset.blockIdx };
+        }
+      }
+      return null;
     }
+
+    // True iff the live (or last-saved) review selection touches any
+    // .hl wrapper. Used by refreshReviewToolbar to disable the color
+    // circles when the user is selecting over already-highlighted
+    // text, which Phase 5b disallows.
+    function selectionOverlapsAnyHighlight() {
+      const live = getAnyReviewSelection();
+      if (!live) return false;
+      const body = document.getElementById('review-body');
+      if (!body) return false;
+      const spans = body.querySelectorAll('span.hl');
+      for (const sp of spans) {
+        try {
+          if (live.range.intersectsNode(sp)) return true;
+        } catch (_) { /* defensively skip detached nodes */ }
+      }
+      return false;
+    }
+
+    // Phase 5a no-op: the toolbar is always visible. Kept as a stub
+    // so any pre-existing call sites still work; refreshReviewToolbar
+    // is the only function that mutates per-button enabled states.
+    function hideReviewToolbar() { /* no-op since Phase 5a */ }
 
     // Wire up: selection changes anywhere in the document re-evaluate
     // the toolbar AND snapshot the live selection (so clicking into
@@ -4642,29 +4703,16 @@
     }
 
     async function applyHighlight(color) {
-      // Toggle behavior: if the selection EXACTLY equals an existing
-      // highlight of this color, remove that highlight. Otherwise,
-      // create a new one. (Partial overlap creates a new highlight —
-      // simpler / more predictable than trying to extend or split
-      // an existing one. The user can always remove the parent
-      // explicitly by selecting it exactly.)
+      // Phase 5b: one highlight per span max. Refuse silently when the
+      // current selection overlaps any existing highlight — the user
+      // should change / remove via the "i" handle popup (Phase 5c),
+      // not via the toolbar. The toolbar button is also disabled in
+      // this case (see refreshReviewToolbar) so this is defense in
+      // depth for any programmatic callers.
+      if (selectionOverlapsAnyHighlight()) return;
       const ctx = selectionAnchorContext();
       if (!ctx) return;
-      const existing = REVIEW_HIGHLIGHTS.find(
-        h => h.color === color && !h.stale && h.snippet === ctx.snippet
-      );
-      if (existing) {
-        // Remove it.
-        try {
-          const url = '/api/highlights?path=' + encodeURIComponent(REVIEW_PATH) +
-                      '&id=' + encodeURIComponent(existing.id);
-          const r = await fetch(url, { method: 'DELETE' });
-          if (!r.ok) throw new Error(r.statusText);
-        } catch (e) {
-          alert('could not remove highlight: ' + e.message);
-          return;
-        }
-      } else {
+      {
         // Compute source-position hints from the current block map.
         // (Best-effort: skip when the selection isn't single-block-
         // resolvable — Phase 5 can do better.)
@@ -4795,19 +4843,10 @@
       hideReviewUndoBar();
     });
 
-    // Extend the existing toolbar refresh to also paint color buttons
-    // as "active" when the selection is covered by that color.
-    const _origRefreshReviewToolbar = refreshReviewToolbar;
-    refreshReviewToolbar = function() {
-      _origRefreshReviewToolbar();
-      // Update color circle active states from the live selection.
-      const covering = highlightsCoveringSelection();
-      const activeColors = new Set(covering.map(h => h.color));
-      document.querySelectorAll('#review-toolbar .rt-color').forEach(btn => {
-        if (activeColors.has(btn.dataset.color)) btn.classList.add('active');
-        else btn.classList.remove('active');
-      });
-    };
+    // (Phase 5a removed the wrapper that painted toolbar color
+    // circles as "active" — that semantic moved to the per-highlight
+    // "i" handle popup in Phase 5c. Toolbar circles are now strictly
+    // for adding new highlights and are simply enabled/disabled.)
 
     // Shift+Enter inserts a newline; bare Enter submits.
     document.getElementById('review-chat-input')
