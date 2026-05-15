@@ -1294,6 +1294,59 @@
       padding-top: 96px;
     }
 
+    /* ---------- Highlights (Phase 3) ----------
+       Four pastel colors that work on both light and dark review
+       themes. We use rgba so the alpha-blends keep text readable on
+       either contrast: ~0.45 over white gives a soft pastel; ~0.45
+       over near-black gives a glowing tint where white text still
+       reads. Colors stack via nested spans — overlapping highlights
+       blend their alphas so the user sees a third color in the
+       intersection. */
+    #review-mode .review-body .hl {
+      border-radius: 2px;
+      padding: 0 1px;
+      transition: box-shadow 80ms ease;
+    }
+    #review-mode .review-body .hl-yellow { background-color: rgba(255, 215, 0,   0.45); }
+    #review-mode .review-body .hl-green  { background-color: rgba(127, 255, 0,   0.42); }
+    #review-mode .review-body .hl-blue   { background-color: rgba( 64, 195, 255, 0.42); }
+    #review-mode .review-body .hl-pink   { background-color: rgba(255, 105, 180, 0.42); }
+
+    /* Hover affordance — a faint inner ring on a highlighted span, so
+       the user can see precise edges. (Does double-duty when Phase 4
+       teaches the agent to scroll to a particular highlight.) */
+    #review-mode .review-body .hl:hover {
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+    }
+
+    /* Color-circle buttons in the right group of the selection
+       toolbar. Round, filled with the same pastel they apply,
+       outlined when "active" for the current selection. */
+    #review-mode .review-toolbar .rt-highlights {
+      gap: 8px;
+    }
+    #review-mode .review-toolbar .rt-color {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      padding: 0;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 80ms ease, border-color 120ms ease;
+    }
+    #review-mode .review-toolbar .rt-color:hover {
+      transform: scale(1.12);
+    }
+    #review-mode .review-toolbar .rt-color.active {
+      border-color: var(--fg);
+      box-shadow: 0 0 0 2px var(--bg-raise);
+    }
+    #review-mode .review-toolbar .rt-color[data-color="yellow"] { background: rgba(255, 215, 0,   0.85); }
+    #review-mode .review-toolbar .rt-color[data-color="green"]  { background: rgba(127, 255, 0,   0.78); }
+    #review-mode .review-toolbar .rt-color[data-color="blue"]   { background: rgba( 64, 195, 255, 0.78); }
+    #review-mode .review-toolbar .rt-color[data-color="pink"]   { background: rgba(255, 105, 180, 0.78); }
+
     /* ---------- Scrollbar ---------- */
     ::-webkit-scrollbar {
       width: 10px;
@@ -2198,8 +2251,14 @@
           <div class="rt-group rt-edit">
             <button type="button" id="rt-edit-mode" title="exit review and open the editor at this selection">edit mode</button>
           </div>
-          <div class="rt-group rt-highlights" aria-label="highlight colors (Phase 3)">
-            <!-- Reserved for Phase 3 highlight color circles. -->
+          <div class="rt-group rt-highlights" aria-label="highlight colors">
+            <!-- Click a circle to apply that color to the selection;
+                 click again on an already-active color to remove it.
+                 Multiple colors can be stacked on the same span. -->
+            <button type="button" class="rt-color" data-color="yellow" title="highlight yellow"></button>
+            <button type="button" class="rt-color" data-color="green"  title="highlight green"></button>
+            <button type="button" class="rt-color" data-color="blue"   title="highlight blue"></button>
+            <button type="button" class="rt-color" data-color="pink"   title="highlight pink"></button>
           </div>
         </div>
         <div class="review-body" id="review-body" data-path=""></div>
@@ -3738,6 +3797,11 @@
       const rendered = renderMarkdown(raw);
       REVIEW_BLOCKS = rendered.blocks;
       body.innerHTML = rendered.html;
+      // Load saved highlights and paint them onto the freshly rendered
+      // body. Awaited so re-renders triggered by edits don't race
+      // ahead of the wrap pass.
+      await loadHighlightsForReview();
+      renderHighlights();
       applyReviewContrast();
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
@@ -4010,6 +4074,12 @@
       const rendered = renderMarkdown(newSource);
       REVIEW_BLOCKS = rendered.blocks;
       body.innerHTML = rendered.html;
+      // Re-paint saved highlights (the body.innerHTML rewrite wiped
+      // any prior wraps). Highlights are anchored by text content,
+      // not source position, so a format edit that adds **…** around
+      // text doesn't unanchor the highlight — the visible snippet is
+      // unchanged.
+      renderHighlights();
       body.scrollTop = scrollY;
       // Selection is gone after re-render; toolbar will hide on the
       // next selectionchange tick.
@@ -4109,6 +4179,282 @@
       e.preventDefault();
       applyEditModeJump();
     });
+
+    // ---------- Phase 3: highlights ----------
+    //
+    // Per-doc colored highlights, persisted in a sidecar JSON via the
+    // /api/highlights endpoints. Storage uses snippet + before/after
+    // anchors (robust across small file edits) plus src position
+    // hints (for the agent's queries in Phase 4). Rendering uses
+    // text-anchor search through the rendered DOM, then wraps each
+    // matched range in nested <span class="hl hl-<color>"> spans —
+    // overlap blends naturally via rgba alpha compositing.
+
+    let REVIEW_HIGHLIGHTS = [];   // current sidecar contents for the open doc
+    const HL_ANCHOR_LEN = 60;     // chars of context captured / required for re-anchoring
+
+    async function loadHighlightsForReview() {
+      // Called on entry to review mode and after every CRUD op. Fills
+      // REVIEW_HIGHLIGHTS, then triggers a re-render of the visual
+      // wrapping. Failures (404, network) leave the list empty —
+      // highlights are always nice-to-have, never blocking.
+      if (!REVIEW_PATH) {
+        REVIEW_HIGHLIGHTS = [];
+        return;
+      }
+      try {
+        const r = await fetch('/api/highlights?path=' + encodeURIComponent(REVIEW_PATH));
+        if (!r.ok) {
+          REVIEW_HIGHLIGHTS = [];
+          return;
+        }
+        const data = await r.json();
+        REVIEW_HIGHLIGHTS = data.highlights || [];
+      } catch (_) {
+        REVIEW_HIGHLIGHTS = [];
+      }
+    }
+
+    function renderHighlights() {
+      // Walks the rendered review body, finds each saved highlight by
+      // its before+snippet+after anchor signature, and wraps the
+      // matched snippet in <span class="hl hl-<color>"> nodes. Stacks
+      // additively for overlapping highlights — each color gets its
+      // own pass and innermost wraps render through outer ones.
+      const body = document.getElementById('review-body');
+      if (!body) return;
+      // Strip any existing highlight spans from a prior render so we
+      // start fresh (e.g. after add/remove). Replace each .hl span
+      // with its text contents in place.
+      body.querySelectorAll('span.hl').forEach(span => {
+        const parent = span.parentNode;
+        while (span.firstChild) parent.insertBefore(span.firstChild, span);
+        parent.removeChild(span);
+        parent.normalize();    // re-merge adjacent text nodes
+      });
+      // Re-wrap from scratch.
+      for (const h of REVIEW_HIGHLIGHTS) {
+        if (h.stale) continue;   // Phase 5 will surface stale ones in a sidebar pane
+        wrapHighlight(body, h);
+      }
+    }
+
+    function wrapHighlight(rootEl, h) {
+      // Find the unique occurrence of `before_anchor + snippet +
+      // after_anchor` in the document text, then wrap the snippet
+      // portion in <span class="hl hl-<color>"> via the Range API.
+      // If the anchored pattern doesn't match (file was edited
+      // externally) we fall back to a bare snippet search; if even
+      // that fails we silently skip — Phase 5 marks the highlight
+      // stale and surfaces it in a sidebar pane.
+
+      // Build the document's full plain text + a parallel index of
+      // (textNode, offsetInDoc).
+      const nodes = [];
+      const offsets = [];
+      let plain = '';
+      const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT);
+      while (true) {
+        const n = walker.nextNode();
+        if (!n) break;
+        // Skip text inside existing highlight spans we may already have
+        // wrapped earlier in this pass — search the underlying text only.
+        nodes.push(n);
+        offsets.push(plain.length);
+        plain += n.nodeValue;
+      }
+      // Try anchored search first.
+      const needle = (h.before_anchor || '') + h.snippet + (h.after_anchor || '');
+      let idx = needle ? plain.indexOf(needle) : -1;
+      let snippetStart;
+      if (idx >= 0) {
+        snippetStart = idx + (h.before_anchor || '').length;
+      } else {
+        // Fallback: bare snippet search. Take the first occurrence.
+        snippetStart = plain.indexOf(h.snippet);
+        if (snippetStart < 0) return;   // give up silently for v1
+      }
+      const snippetEnd = snippetStart + h.snippet.length;
+      // Wrap the [snippetStart, snippetEnd) range across whatever text
+      // nodes it touches.
+      wrapPlainRange(nodes, offsets, snippetStart, snippetEnd, h.color, h.id);
+    }
+
+    function wrapPlainRange(nodes, offsets, plainStart, plainEnd, color, hlId) {
+      // Identify which text nodes overlap [plainStart, plainEnd) and
+      // wrap each overlap (after splitText) in its own .hl span. We
+      // walk in reverse order so splits earlier in the doc don't
+      // shift the indexes we still need.
+      const targets = [];
+      for (let i = 0; i < nodes.length; i++) {
+        const start = offsets[i];
+        const end = start + nodes[i].nodeValue.length;
+        if (end <= plainStart) continue;
+        if (start >= plainEnd) break;
+        const localStart = Math.max(0, plainStart - start);
+        const localEnd = Math.min(nodes[i].nodeValue.length, plainEnd - start);
+        targets.push({ node: nodes[i], localStart, localEnd });
+      }
+      // Wrap right-to-left so splits in earlier nodes don't invalidate
+      // anything we haven't processed yet.
+      for (let i = targets.length - 1; i >= 0; i--) {
+        const { node, localStart, localEnd } = targets[i];
+        let target = node;
+        if (localEnd < node.nodeValue.length) {
+          target.splitText(localEnd);
+          // After splitText, `target` keeps [0, localEnd); the second
+          // part is the new sibling — don't need it.
+        }
+        if (localStart > 0) {
+          target = target.splitText(localStart);
+        }
+        const span = document.createElement('span');
+        span.className = 'hl hl-' + color;
+        span.dataset.hlId = hlId;
+        target.parentNode.insertBefore(span, target);
+        span.appendChild(target);
+      }
+    }
+
+    // ---------- Highlight CRUD wired to the toolbar buttons ----------
+
+    function selectionAnchorContext() {
+      // Returns {snippet, before, after} from the current selection,
+      // pulling up to HL_ANCHOR_LEN chars of context on each side.
+      // Falls back to '' for missing context.
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+      const range = sel.getRangeAt(0);
+      const body = document.getElementById('review-body');
+      if (!body || !body.contains(range.commonAncestorContainer)) return null;
+      const snippet = range.toString();
+      if (!snippet) return null;
+      // Build the full doc plain text + locate the snippet in it for
+      // anchor extraction.
+      let plain = '';
+      const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
+      const nodeOffsets = new Map();
+      while (true) {
+        const n = walker.nextNode();
+        if (!n) break;
+        nodeOffsets.set(n, plain.length);
+        plain += n.nodeValue;
+      }
+      // Compute snippet start in plain via startContainer + startOffset.
+      const startNode = range.startContainer;
+      const startBase = nodeOffsets.get(startNode) ?? 0;
+      let snipStart = startBase + range.startOffset;
+      // Defensive: if snippet doesn't actually appear at snipStart
+      // (rare — selection endpoints sometimes land on element nodes),
+      // fall back to plain.indexOf.
+      if (plain.substr(snipStart, snippet.length) !== snippet) {
+        const idx = plain.indexOf(snippet);
+        if (idx >= 0) snipStart = idx;
+      }
+      const before = plain.slice(Math.max(0, snipStart - HL_ANCHOR_LEN), snipStart);
+      const after = plain.slice(snipStart + snippet.length,
+                                snipStart + snippet.length + HL_ANCHOR_LEN);
+      return { snippet, before, after };
+    }
+
+    function highlightsCoveringSelection() {
+      // Returns the saved highlights whose snippet matches (or
+      // overlaps) the current selection text — used to drive the
+      // toolbar's "active" state on color circles. Cheap: just
+      // checks whether any of `selection.text` is contained in any
+      // highlight's snippet, or vice versa.
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed) return [];
+      const text = sel.toString();
+      if (!text) return [];
+      return REVIEW_HIGHLIGHTS.filter(h => {
+        if (h.stale) return false;
+        return h.snippet.includes(text) || text.includes(h.snippet);
+      });
+    }
+
+    async function applyHighlight(color) {
+      // Toggle behavior: if the selection is already covered by a
+      // highlight of this color (snippet match), remove that
+      // highlight instead. Otherwise, create a new one.
+      const ctx = selectionAnchorContext();
+      if (!ctx) return;
+      const existing = REVIEW_HIGHLIGHTS.find(
+        h => h.color === color && !h.stale &&
+             (h.snippet === ctx.snippet || h.snippet.includes(ctx.snippet))
+      );
+      if (existing) {
+        // Remove it.
+        try {
+          const url = '/api/highlights?path=' + encodeURIComponent(REVIEW_PATH) +
+                      '&id=' + encodeURIComponent(existing.id);
+          const r = await fetch(url, { method: 'DELETE' });
+          if (!r.ok) throw new Error(r.statusText);
+        } catch (e) {
+          alert('could not remove highlight: ' + e.message);
+          return;
+        }
+      } else {
+        // Compute source-position hints from the current block map.
+        // (Best-effort: skip when the selection isn't single-block-
+        // resolvable — Phase 5 can do better.)
+        const selInfo = getReviewSelection();
+        let srcStart = '', srcEnd = '';
+        if (selInfo) {
+          const block = REVIEW_BLOCKS[selInfo.blockIdx];
+          if (block && (block.type === 'p' || block.type === 'heading')) {
+            const map = buildBlockPlainMap(block.raw);
+            const s = map.positions[selInfo.plainStartInBlock];
+            const e = map.positions[selInfo.plainEndInBlock - 1];
+            if (s != null && e != null) {
+              srcStart = String(block.start + s);
+              srcEnd = String(block.start + e + 1);
+            }
+          }
+        }
+        const fd = new FormData();
+        fd.append('path', REVIEW_PATH);
+        fd.append('color', color);
+        fd.append('snippet', ctx.snippet);
+        fd.append('before_anchor', ctx.before);
+        fd.append('after_anchor', ctx.after);
+        if (srcStart !== '') fd.append('src_start', srcStart);
+        if (srcEnd !== '')   fd.append('src_end', srcEnd);
+        try {
+          const r = await fetch('/api/highlights', { method: 'POST', body: fd });
+          if (!r.ok) throw new Error(r.statusText);
+        } catch (e) {
+          alert('could not save highlight: ' + e.message);
+          return;
+        }
+      }
+      // Refresh from server (single source of truth) and re-render.
+      await loadHighlightsForReview();
+      renderHighlights();
+      refreshReviewToolbar();
+    }
+
+    document.querySelectorAll('#review-toolbar .rt-color').forEach(btn => {
+      btn.addEventListener('mousedown', (e) => {
+        // mousedown so the selection isn't lost on focus.
+        e.preventDefault();
+        applyHighlight(btn.dataset.color);
+      });
+    });
+
+    // Extend the existing toolbar refresh to also paint color buttons
+    // as "active" when the selection is covered by that color.
+    const _origRefreshReviewToolbar = refreshReviewToolbar;
+    refreshReviewToolbar = function() {
+      _origRefreshReviewToolbar();
+      // Update color circle active states from the live selection.
+      const covering = highlightsCoveringSelection();
+      const activeColors = new Set(covering.map(h => h.color));
+      document.querySelectorAll('#review-toolbar .rt-color').forEach(btn => {
+        if (activeColors.has(btn.dataset.color)) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+    };
 
     // Shift+Enter inserts a newline; bare Enter submits.
     document.getElementById('review-chat-input')

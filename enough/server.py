@@ -1255,6 +1255,72 @@ def create_app(
             raise HTTPException(415, "not utf-8 text") from None
         return PlainTextResponse(text)
 
+    # ---------- Highlights (review-mode color metadata) ----------
+    #
+    # Per-doc CRUD over the dotted JSON sidecar managed by
+    # `enough.highlights`. The review-mode JS calls these on entry
+    # (GET) and on every color-button toggle (POST/DELETE). Returns
+    # plain JSON; the journal entry is written by the highlights
+    # module so each call shows up alongside tool-call traces in
+    # `rness/knowledge/session-logs/<date>-broker.md`.
+    from . import highlights as _highlights
+
+    @app.get("/api/highlights")
+    async def api_highlights_get(path: str = Query(...)) -> dict[str, Any]:
+        # Resolve through the same path-safety helper as /api/file so
+        # off-allowlist paths get the same 4xx behavior. We don't need
+        # the resolved path itself — load_highlights uses doc_rel.
+        _resolve_project_path(path)
+        items = _highlights.load_highlights(project_dir, path)
+        return {"path": path, "highlights": items}
+
+    @app.post("/api/highlights")
+    async def api_highlights_post(request: Request) -> dict[str, Any]:
+        form = await request.form()
+        path = (form.get("path") or "").strip()
+        if not path:
+            raise HTTPException(400, "missing path")
+        _resolve_project_path(path)
+        color = (form.get("color") or "").strip()
+        snippet = form.get("snippet") or ""
+        if not snippet:
+            raise HTTPException(400, "missing snippet")
+        before_anchor = form.get("before_anchor") or ""
+        after_anchor = form.get("after_anchor") or ""
+        # src_start / src_end are optional ints; missing/blank ⇒ None.
+        def _maybe_int(name: str) -> int | None:
+            v = form.get(name)
+            if v is None or v == "":
+                return None
+            try:
+                return int(v)
+            except ValueError:
+                raise HTTPException(400, f"{name} must be int") from None
+        try:
+            entry = _highlights.add_highlight(
+                project_dir, path,
+                color=color,
+                snippet=snippet,
+                before_anchor=before_anchor,
+                after_anchor=after_anchor,
+                src_start=_maybe_int("src_start"),
+                src_end=_maybe_int("src_end"),
+            )
+        except ValueError as e:
+            raise HTTPException(400, str(e)) from None
+        return {"path": path, "highlight": entry}
+
+    @app.delete("/api/highlights")
+    async def api_highlights_delete(
+        path: str = Query(...),
+        id: str = Query(...),
+    ) -> dict[str, Any]:
+        _resolve_project_path(path)
+        ok = _highlights.delete_highlight(project_dir, path, id)
+        if not ok:
+            raise HTTPException(404, "no such highlight id")
+        return {"path": path, "id": id, "removed": True}
+
     @app.post("/api/file", response_class=HTMLResponse)
     async def api_file_write(request: Request) -> HTMLResponse:
         form = await request.form()
