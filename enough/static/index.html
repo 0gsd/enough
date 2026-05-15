@@ -3886,6 +3886,13 @@
     let REVIEW_SOURCE = '';       // raw markdown source as last loaded
     let REVIEW_BLOCKS = [];       // [{start, end, raw, type}] aligned with rendered blocks
     let PENDING_EDIT_FOCUS = null; // {path, text} consumed by enterEditMode after a "edit mode" jump from review
+    // Sticky snapshot of the most recent non-empty selection in the
+    // review body. Browsers collapse the document selection when an
+    // input/textarea takes focus — without this snapshot the user
+    // would lose their selection the moment they clicked into the
+    // chat pill input. Updated on every non-empty selectionchange,
+    // cleared on review-mode exit and after a chat send.
+    let LAST_REVIEW_SELECTION = null;  // { text, lineHint } | null
 
     async function enterReviewMode(path) {
       // Fetch raw file contents (preview's HTML escape is per-byte and
@@ -3935,6 +3942,9 @@
       document.getElementById('exit-review-btn').classList.remove('visible');
       document.getElementById('tree')?.classList.remove('review-disabled');
       REVIEW_PATH = null;
+      // Drop the sticky selection snapshot too — its line-hint
+      // refers to a document we're no longer reviewing.
+      LAST_REVIEW_SELECTION = null;
       // Per spec: exiting closes the file completely (does NOT drop into
       // preview mode). The user is back at the regular chat view with
       // the full session history intact.
@@ -3979,16 +3989,21 @@
       const main = document.getElementById('message');
       const form = document.getElementById('chat-form');
       if (!main || !form) return;
-      // Phase 4b: if the user has an active text selection in the
-      // review body when they submit, prepend a context preamble to
-      // the message so the agent knows what they're pointing at.
-      // Convention is `[review-mode selection in <path>, line N]\n```\n<text>\n```\n\n<user's message>`
+      // Phase 4b: attach a context preamble whenever the user had an
+      // active selection in the review body. We try the live
+      // selection first; if it's collapsed (the common case — the
+      // user clicked into THIS textarea, which collapses the
+      // document selection), fall back to LAST_REVIEW_SELECTION,
+      // which the selectionchange listener kept fresh.
+      //
+      // Convention: `[review-mode selection in <path>, line N]\n```\n<text>\n```\n\n<user's message>`
       // — visible in the chat (the user can verify what was attached)
-      // and parseable by the agent (its prompt explains the convention).
+      // and parseable by the agent (its system prompt explains it).
       let outgoing = text;
-      const sel = (typeof getAnyReviewSelection === 'function')
+      let selData = null;
+      const live = (typeof getAnyReviewSelection === 'function')
         ? getAnyReviewSelection() : null;
-      if (sel && REVIEW_PATH) {
+      if (live && REVIEW_PATH) {
         let lineHint = '';
         const single = (typeof getSingleBlockSelection === 'function')
           ? getSingleBlockSelection() : null;
@@ -3999,9 +4014,14 @@
             lineHint = `, line ${lineNum}`;
           }
         }
+        selData = { text: live.text, lineHint };
+      } else if (LAST_REVIEW_SELECTION && REVIEW_PATH) {
+        selData = LAST_REVIEW_SELECTION;
+      }
+      if (selData) {
         outgoing =
-          '[review-mode selection in ' + REVIEW_PATH + lineHint + ']\n' +
-          '```\n' + sel.text + '\n```\n\n' +
+          '[review-mode selection in ' + REVIEW_PATH + selData.lineHint + ']\n' +
+          '```\n' + selData.text + '\n```\n\n' +
           text;
       }
       main.value = outgoing;
@@ -4009,6 +4029,11 @@
       // as if the user typed in the main chat box and pressed send.
       htmx.trigger(form, 'submit');
       input.value = '';
+      // Clear the sticky selection so a stale snapshot doesn't leak
+      // into the NEXT message — if the agent rewrites the snippet,
+      // the old text would no longer be in the document anyway.
+      // The user can re-select to attach context to a follow-up.
+      LAST_REVIEW_SELECTION = null;
     }
     window.sendFromReviewChat = sendFromReviewChat;
 
@@ -4019,6 +4044,27 @@
     // surfaces the format toolbar so the user can apply bold / italic /
     // underline, change the block's heading level, or jump out to the
     // textarea editor with the selection re-applied.
+
+    // Returns the visible text of a Range using text-node concatenation
+    // (NOT range.toString()). Critical for highlight consistency:
+    // wrapHighlight searches by walking text nodes and concatenating
+    // their values, which never inserts whitespace at block boundaries.
+    // range.toString() in some browsers DOES insert newlines between
+    // <p> elements ("foo\n\nbar" instead of "foobar"), so storing the
+    // toString form in the sidecar made block-spanning highlights
+    // invisible after re-render — the search would never match. Using
+    // cloneContents().textContent guarantees both sides see the same
+    // string. (Phase 5 root-cause fix.)
+    function rangeTextContent(range) {
+      if (!range) return '';
+      try {
+        return range.cloneContents().textContent || '';
+      } catch (_) {
+        // Fallback for any browser quirk; preserves the previous
+        // behavior in the worst case.
+        return range.toString();
+      }
+    }
 
     // Permissive: returns {range, text} for ANY non-empty selection that
     // lives inside the review body, regardless of whether it spans
@@ -4043,7 +4089,7 @@
       if (!(inBody(range.commonAncestorContainer)
             || inBody(range.startContainer)
             || inBody(range.endContainer))) return null;
-      const text = range.toString();
+      const text = rangeTextContent(range);
       if (!text || !text.trim()) return null;
       return { range, text };
     }
@@ -4076,6 +4122,8 @@
         block,
         blockIdx,
         range,
+        // Use rangeTextContent (already in `any.text`) so the snippet
+        // matches what wrapHighlight will search for later.
         text: any.text,
         plainStartInBlock: Math.min(plainStart, plainEnd),
         plainEndInBlock: Math.max(plainStart, plainEnd),
@@ -4335,8 +4383,34 @@
     }
 
     // Wire up: selection changes anywhere in the document re-evaluate
-    // the toolbar; format/edit-mode buttons dispatch their actions.
-    document.addEventListener('selectionchange', refreshReviewToolbar);
+    // the toolbar AND snapshot the live selection (so clicking into
+    // the chat pill input doesn't lose it for the preamble).
+    document.addEventListener('selectionchange', () => {
+      captureLastReviewSelection();
+      refreshReviewToolbar();
+    });
+
+    function captureLastReviewSelection() {
+      // Snapshot only when there's a live non-empty selection in the
+      // review body. We deliberately do NOT clear on empty — the
+      // user clicking into the chat input collapses the live
+      // selection, and the whole point of this snapshot is to
+      // preserve their intent across that focus shift. Cleared on
+      // review-mode exit and after a chat send (see exitReviewMode
+      // and sendFromReviewChat).
+      const live = getAnyReviewSelection();
+      if (!live) return;
+      let lineHint = '';
+      const single = getSingleBlockSelection();
+      if (single) {
+        const block = REVIEW_BLOCKS[single.blockIdx];
+        if (block) {
+          const lineNum = REVIEW_SOURCE.slice(0, block.start).split('\n').length;
+          lineHint = `, line ${lineNum}`;
+        }
+      }
+      LAST_REVIEW_SELECTION = { text: live.text, lineHint };
+    }
 
     document.querySelectorAll('#review-toolbar button[data-fmt]').forEach(btn => {
       btn.addEventListener('mousedown', (e) => {
@@ -4497,12 +4571,21 @@
       // Returns {snippet, before, after} from the current selection,
       // pulling up to HL_ANCHOR_LEN chars of context on each side.
       // Falls back to '' for missing context.
+      //
+      // Uses the same permissive accept rule as getAnyReviewSelection
+      // (any endpoint inside the body is enough) so block-spanning
+      // selections work — and uses rangeTextContent so the snippet
+      // string is the same one wrapHighlight will search for later.
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
       const range = sel.getRangeAt(0);
       const body = document.getElementById('review-body');
-      if (!body || !body.contains(range.commonAncestorContainer)) return null;
-      const snippet = range.toString();
+      if (!body) return null;
+      const inBody = (n) => n && (n === body || body.contains(n));
+      if (!(inBody(range.commonAncestorContainer)
+            || inBody(range.startContainer)
+            || inBody(range.endContainer))) return null;
+      const snippet = rangeTextContent(range);
       if (!snippet) return null;
       // Build the full doc plain text + locate the snippet in it for
       // anchor extraction.
@@ -4516,15 +4599,23 @@
         plain += n.nodeValue;
       }
       // Compute snippet start in plain via startContainer + startOffset.
-      const startNode = range.startContainer;
-      const startBase = nodeOffsets.get(startNode) ?? 0;
-      let snipStart = startBase + range.startOffset;
-      // Defensive: if snippet doesn't actually appear at snipStart
-      // (rare — selection endpoints sometimes land on element nodes),
-      // fall back to plain.indexOf.
-      if (plain.substr(snipStart, snippet.length) !== snippet) {
-        const idx = plain.indexOf(snippet);
-        if (idx >= 0) snipStart = idx;
+      // Falls back to indexOf when the start container isn't a text
+      // node (selection endpoints can land on elements at boundaries).
+      let snipStart = -1;
+      if (range.startContainer.nodeType === 3) {
+        const startBase = nodeOffsets.get(range.startContainer) ?? 0;
+        const candidate = startBase + range.startOffset;
+        if (plain.substr(candidate, snippet.length) === snippet) {
+          snipStart = candidate;
+        }
+      }
+      if (snipStart < 0) {
+        snipStart = plain.indexOf(snippet);
+        if (snipStart < 0) {
+          // Snippet doesn't appear in the rendered text — shouldn't
+          // happen with rangeTextContent, but bail safely.
+          return null;
+        }
       }
       const before = plain.slice(Math.max(0, snipStart - HL_ANCHOR_LEN), snipStart);
       const after = plain.slice(snipStart + snippet.length,
@@ -4533,30 +4624,34 @@
     }
 
     function highlightsCoveringSelection() {
-      // Returns the saved highlights whose snippet matches (or
-      // overlaps) the current selection text — used to drive the
-      // toolbar's "active" state on color circles. Cheap: just
-      // checks whether any of `selection.text` is contained in any
-      // highlight's snippet, or vice versa.
-      const sel = window.getSelection();
-      if (!sel || sel.isCollapsed) return [];
-      const text = sel.toString();
-      if (!text) return [];
-      return REVIEW_HIGHLIGHTS.filter(h => {
-        if (h.stale) return false;
-        return h.snippet.includes(text) || text.includes(h.snippet);
-      });
+      // Returns the saved highlights whose snippet EXACTLY matches the
+      // current selection text. Drives the toolbar's "active" state
+      // on color circles, which must be honest about what clicking
+      // would do: with exact-match toggling (below), an "active"
+      // ring means clicking removes; a partial overlap would create a
+      // new highlight, not toggle the existing one — so we don't
+      // light up the ring in that case.
+      //
+      // Uses rangeTextContent (no inserted whitespace at block
+      // boundaries) so block-spanning selections compare against
+      // sidecar entries the same way wrapHighlight searches them.
+      const live = getAnyReviewSelection();
+      if (!live) return [];
+      const text = live.text;
+      return REVIEW_HIGHLIGHTS.filter(h => !h.stale && h.snippet === text);
     }
 
     async function applyHighlight(color) {
-      // Toggle behavior: if the selection is already covered by a
-      // highlight of this color (snippet match), remove that
-      // highlight instead. Otherwise, create a new one.
+      // Toggle behavior: if the selection EXACTLY equals an existing
+      // highlight of this color, remove that highlight. Otherwise,
+      // create a new one. (Partial overlap creates a new highlight —
+      // simpler / more predictable than trying to extend or split
+      // an existing one. The user can always remove the parent
+      // explicitly by selecting it exactly.)
       const ctx = selectionAnchorContext();
       if (!ctx) return;
       const existing = REVIEW_HIGHLIGHTS.find(
-        h => h.color === color && !h.stale &&
-             (h.snippet === ctx.snippet || h.snippet.includes(ctx.snippet))
+        h => h.color === color && !h.stale && h.snippet === ctx.snippet
       );
       if (existing) {
         // Remove it.
