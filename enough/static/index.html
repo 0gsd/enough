@@ -947,6 +947,266 @@
       font-style: italic;
     }
 
+    /* The "review mode" launch button. Sits LEFT of edit in the preview
+       actions row; high-contrast accent so it doesn't disappear into
+       the muted button row. Color comes from --accent-user (always a
+       theme-defined readable accent), inverted (filled vs. outlined). */
+    .preview-actions .review-btn {
+      background: var(--accent-user);
+      color: var(--bg);
+      border-color: var(--accent-user);
+      font-weight: 600;
+    }
+
+    .preview-actions .review-btn:hover {
+      filter: brightness(1.1);
+      color: var(--bg);
+    }
+
+    /* ---------- Review mode ---------- */
+    /* Full-frame document reader + revision-focused editor. Overlays the
+       entire content area (chat, preview, help) when active. The sidebar
+       stays visible (skills/roles/paradigms remain interactive) but the
+       file-tree section is greyed out — exit review mode to navigate
+       to a different file. */
+    #review-mode {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--review-bg, var(--bg));
+      color: var(--review-fg, var(--fg));
+      z-index: 30;
+    }
+
+    #review-mode.open {
+      display: flex;
+    }
+
+    /* Body of the rendered document. Scrollable; the chat pill floats
+       over the bottom edge so it's always reachable. */
+    #review-mode .review-body {
+      flex: 1;
+      overflow: auto;
+      padding: 48px max(48px, calc(50% - 380px)) 120px;
+      font-size: 18px;          /* ~150% of the 12px preview default */
+      line-height: 1.65;
+      font-family: var(--font-serif, Georgia, 'Times New Roman', serif);
+    }
+
+    /* Pretty-rendered markdown styles. Scoped to .review-body so they
+       don't bleed into the rest of the UI. Colors use --review-fg/bg
+       so the max-contrast theme override (computed at runtime from the
+       active theme's luminance) just works. */
+    #review-mode .review-body h1,
+    #review-mode .review-body h2,
+    #review-mode .review-body h3,
+    #review-mode .review-body h4,
+    #review-mode .review-body h5,
+    #review-mode .review-body h6 {
+      font-weight: 700;
+      line-height: 1.25;
+      margin: 1.6em 0 0.6em;
+      color: var(--review-fg);
+    }
+    #review-mode .review-body h1 { font-size: 2.0em; border-bottom: 1px solid var(--review-fg-faint); padding-bottom: 0.3em; }
+    #review-mode .review-body h2 { font-size: 1.55em; border-bottom: 1px solid var(--review-fg-faint); padding-bottom: 0.2em; }
+    #review-mode .review-body h3 { font-size: 1.25em; }
+    #review-mode .review-body h4 { font-size: 1.1em; }
+    #review-mode .review-body h5,
+    #review-mode .review-body h6 { font-size: 1.0em; font-style: italic; }
+
+    #review-mode .review-body p { margin: 0.85em 0; }
+    #review-mode .review-body strong { font-weight: 700; }
+    #review-mode .review-body em { font-style: italic; }
+    #review-mode .review-body u { text-decoration: underline; }
+    #review-mode .review-body a { color: var(--review-fg); text-decoration: underline; text-decoration-style: dotted; }
+    #review-mode .review-body a:hover { text-decoration-style: solid; }
+    #review-mode .review-body ul,
+    #review-mode .review-body ol { margin: 0.7em 0 0.7em 1.6em; padding-left: 0.4em; }
+    #review-mode .review-body li { margin: 0.25em 0; }
+    #review-mode .review-body blockquote {
+      border-left: 3px solid var(--review-fg-faint);
+      padding: 0.2em 0.9em;
+      margin: 1em 0;
+      color: var(--review-fg-muted);
+      font-style: italic;
+    }
+    #review-mode .review-body code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--review-code-bg);
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+    }
+    #review-mode .review-body pre {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--review-code-bg);
+      padding: 0.9em 1.1em;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1em 0;
+    }
+    #review-mode .review-body pre code {
+      background: transparent;
+      padding: 0;
+    }
+    #review-mode .review-body hr {
+      border: none;
+      border-top: 1px solid var(--review-fg-faint);
+      margin: 2em 0;
+    }
+    #review-mode .review-body img { max-width: 100%; }
+
+    /* The bottom chat pill: docked to the bottom of the review pane,
+       collapsible, vertically resizable. When collapsed only a slim
+       ribbon remains, with an obvious chevron to re-expand. */
+    #review-mode .review-chat {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 16px;
+      max-width: 880px;
+      margin: 0 auto;
+      background: var(--bg-raise);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+      display: flex;
+      flex-direction: column;
+      transition: max-height 180ms ease, padding 180ms ease;
+      max-height: 280px;
+      overflow: hidden;
+      font-family: var(--font-sans, system-ui, sans-serif);
+    }
+
+    #review-mode .review-chat.collapsed {
+      max-height: 28px;
+    }
+
+    #review-mode .review-chat-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 10px;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--fg-muted);
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    #review-mode .review-chat.collapsed .review-chat-head {
+      border-bottom: none;
+    }
+
+    #review-mode .review-chat-head .toggle {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--fg);
+    }
+
+    /* Conversation tail. Shows the most recent ~6 lines of the live
+       chat; mirrored from the underlying #conversation div via SSE
+       handlers so the pill stays in sync without a separate session. */
+    #review-mode .review-chat-tail {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      min-height: 0;
+      resize: vertical;
+    }
+
+    #review-mode .review-chat.collapsed .review-chat-tail,
+    #review-mode .review-chat.collapsed .review-chat-form {
+      display: none;
+    }
+
+    #review-mode .review-chat-tail .msg {
+      margin: 4px 0;
+    }
+    #review-mode .review-chat-tail .role {
+      font-size: 10px;
+      color: var(--fg-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    #review-mode .review-chat-tail .body {
+      color: var(--fg);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    #review-mode .review-chat-tail .msg.user .role { color: var(--accent-user); }
+    #review-mode .review-chat-tail .msg.agent .role { color: var(--accent-agent); }
+    #review-mode .review-chat-tail .msg.system .body,
+    #review-mode .review-chat-tail .msg.rness .body { color: var(--fg-muted); font-style: italic; }
+
+    #review-mode .review-chat-form {
+      display: flex;
+      gap: 6px;
+      padding: 6px 10px 8px;
+      border-top: 1px solid var(--border);
+    }
+    #review-mode .review-chat-form textarea {
+      flex: 1;
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 12.5px;
+      line-height: 1.4;
+      resize: none;
+    }
+    #review-mode .review-chat-form textarea:focus {
+      outline: none;
+      border-color: var(--fg-faint);
+    }
+    #review-mode .review-chat-form button {
+      background: var(--bg-raise);
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 12px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+    }
+    #review-mode .review-chat-form button:hover {
+      color: var(--fg);
+      border-color: var(--fg-faint);
+    }
+
+    /* The exit-review button in the topbar. Hidden until review mode
+       is active; conspicuous red so the way out is unmistakable. */
+    .topbar #exit-review-btn {
+      display: none;
+      background: var(--accent-error);
+      color: var(--bg);
+      border-color: var(--accent-error);
+      font-weight: 700;
+      padding: 4px 10px;
+    }
+    .topbar #exit-review-btn.visible { display: inline-flex; align-items: center; }
+    .topbar #exit-review-btn:hover { filter: brightness(1.1); color: var(--bg); }
+
+    /* File-tree greyout while review mode is active. The tree stays
+       visible (so the user keeps their bearings) but clicks pass through
+       to nothing; sidebar sections OUTSIDE #tree (skills, roles,
+       paradigms) stay interactive so the user can still toggle those. */
+    #tree.review-disabled {
+      opacity: 0.4;
+      pointer-events: none;
+      filter: grayscale(0.6);
+    }
+
     /* ---------- Scrollbar ---------- */
     ::-webkit-scrollbar {
       width: 10px;
@@ -1754,6 +2014,7 @@
       <span class="label">—</span>
     </button>
     <button id="broker-btn" title="Broker — tool routing, logging, and per-tool toggles">broker</button>
+    <button id="exit-review-btn" title="Exit review mode — closes the file and returns to the chat">× exit review</button>
   </div>
 
   <div class="layout" id="layout">
@@ -1819,6 +2080,30 @@
           <button class="close" onclick="document.getElementById('preview').classList.remove('open')">×</button>
         </div>
         <div id="preview-body"></div>
+      </div>
+
+      <!-- Review mode: full-frame markdown viewer + revision-focused
+           editor. Shown only when the user clicks "review mode" in a
+           file's preview actions; hidden otherwise. The body renders
+           the document as pretty markdown (150% size, max-contrast
+           theme); the chat pill at the bottom mirrors the live
+           conversation so the user can talk to the agent without
+           leaving the document. -->
+      <div id="review-mode" aria-hidden="true">
+        <div class="review-body" id="review-body" data-path=""></div>
+        <div class="review-chat" id="review-chat">
+          <div class="review-chat-head" onclick="toggleReviewChat()">
+            <span>chat</span>
+            <span class="toggle" id="review-chat-toggle">▾</span>
+          </div>
+          <div class="review-chat-tail" id="review-chat-tail"></div>
+          <form class="review-chat-form" id="review-chat-form"
+                onsubmit="event.preventDefault(); sendFromReviewChat();">
+            <textarea id="review-chat-input" rows="2"
+              placeholder="message the agent about this document…"></textarea>
+            <button type="submit">send</button>
+          </form>
+        </div>
       </div>
 
       <div id="help-viewer" aria-hidden="true">
@@ -2303,6 +2588,12 @@
       if (font && font.stack) {
         // --font-mono holds "the active font stack," regardless of actual family.
         document.documentElement.style.setProperty('--font-mono', font.stack);
+      }
+      // If review mode is currently open, re-derive the max-contrast
+      // overrides from the new theme. (Function may be undefined during
+      // initial bootstrap before review-mode JS has been parsed; guard.)
+      if (typeof applyReviewContrast === 'function') {
+        applyReviewContrast();
       }
     }
 
@@ -2938,6 +3229,12 @@
     // Streaming over SSE.
     function autoscroll() {
       conversation.scrollTop = conversation.scrollHeight;
+      // Mirror the latest conversation tail into the review-mode chat
+      // pill (no-op when not in review mode — refreshReviewChatTail
+      // bails out silently if the pill DOM isn't visible).
+      if (typeof refreshReviewChatTail === 'function') {
+        refreshReviewChatTail();
+      }
     }
 
     function currentResponse() {
@@ -3083,6 +3380,298 @@
       conversation.insertAdjacentHTML('beforeend', '<hr class="reset-divider">');
       autoscroll();
     });
+
+    // ---------- Review mode ----------
+    //
+    // Full-frame markdown viewer + revision-focused editor. Phase 1
+    // shipped: enter/exit, pretty-rendered markdown body, max-contrast
+    // theme, chat-pill mirror of the live conversation, file-tree
+    // greyout. Phases 2–5 (selection toolbar, highlights, agent
+    // integration) layer on top of this.
+
+    // Markdown → HTML renderer. Hand-rolled, no deps. Covers the
+    // formats we actually need: headings (#..######), bold (**),
+    // italic (*), underline (<u>...</u> HTML inline — markdown lacks a
+    // native syntax), inline code (`x`), code fences (``` blocks),
+    // links ([t](u)), images (![alt](u)), unordered/ordered lists,
+    // blockquotes (> ), horizontal rules (---), paragraphs.
+    //
+    // Not covered (fall through as text): tables, footnotes, strikethrough,
+    // definition lists, task lists, raw HTML beyond <u>. Add later if
+    // we need them.
+    //
+    // Order matters: code blocks first (they swallow other syntax),
+    // then escaping, then block-level (headings/lists/quotes/hr),
+    // then inline (bold/italic/underline/code/links).
+    function renderMarkdown(src) {
+      // 1. Extract fenced code blocks first; replace with placeholders
+      //    so their contents don't get touched by inline rules.
+      const codeBlocks = [];
+      src = src.replace(/```([\w-]*)\n([\s\S]*?)```/g, (_m, lang, code) => {
+        const idx = codeBlocks.length;
+        codeBlocks.push({ lang: lang || '', code });
+        return ` CODEBLOCK${idx} `;
+      });
+
+      // 2. Escape raw HTML except our allowed <u>...</u> tags. We
+      //    convert <u>/</u> to placeholders, escape everything else,
+      //    then put them back.
+      src = src.replace(/<u>/gi, ' UOPEN ')
+               .replace(/<\/u>/gi, ' UCLOSE ');
+      src = escapeHtml(src);
+      src = src.replace(/ UOPEN /g, '<u>')
+               .replace(/ UCLOSE /g, '</u>');
+
+      // 3. Block-level pass: split by blank lines into "blocks", then
+      //    classify each. This gives us paragraph/heading/list/quote
+      //    boundaries without a real parser.
+      const blocks = src.split(/\n{2,}/);
+      const out = [];
+      for (let raw of blocks) {
+        const block = raw.replace(/\s+$/, '');
+        if (!block) continue;
+        // Code block placeholder: rehydrate as a real <pre><code>.
+        const cbm = block.match(/^ CODEBLOCK(\d+) $/);
+        if (cbm) {
+          const cb = codeBlocks[+cbm[1]];
+          const langClass = cb.lang ? ` class="language-${cb.lang}"` : '';
+          out.push(`<pre><code${langClass}>${escapeHtml(cb.code)}</code></pre>`);
+          continue;
+        }
+        // Heading
+        const hm = block.match(/^(#{1,6})\s+(.*)$/);
+        if (hm) {
+          const level = hm[1].length;
+          out.push(`<h${level}>${renderInline(hm[2])}</h${level}>`);
+          continue;
+        }
+        // Horizontal rule
+        if (/^(\*\s*){3,}$|^(-\s*){3,}$|^(_\s*){3,}$/.test(block)) {
+          out.push('<hr>');
+          continue;
+        }
+        // Blockquote (one or more lines starting with >)
+        if (/^>\s?/.test(block)) {
+          const inner = block.split('\n').map(l => l.replace(/^>\s?/, '')).join('\n');
+          out.push(`<blockquote>${renderInline(inner.replace(/\n/g, '<br>'))}</blockquote>`);
+          continue;
+        }
+        // Ordered list
+        if (/^\s*\d+\.\s+/.test(block)) {
+          const items = block.split(/\n(?=\s*\d+\.\s+)/).map(line => {
+            const m = line.match(/^\s*\d+\.\s+([\s\S]*)$/);
+            return m ? `<li>${renderInline(m[1].replace(/\n\s+/g, ' '))}</li>` : '';
+          }).join('');
+          out.push(`<ol>${items}</ol>`);
+          continue;
+        }
+        // Unordered list
+        if (/^\s*[-*+]\s+/.test(block)) {
+          const items = block.split(/\n(?=\s*[-*+]\s+)/).map(line => {
+            const m = line.match(/^\s*[-*+]\s+([\s\S]*)$/);
+            return m ? `<li>${renderInline(m[1].replace(/\n\s+/g, ' '))}</li>` : '';
+          }).join('');
+          out.push(`<ul>${items}</ul>`);
+          continue;
+        }
+        // Default: paragraph. Single newlines → <br> (markdown
+        // technically requires two trailing spaces, but for a
+        // user-facing reader the soft-break behavior is friendlier).
+        out.push(`<p>${renderInline(block.replace(/\n/g, '<br>'))}</p>`);
+      }
+      return out.join('\n');
+    }
+
+    // Inline-level rules: bold, italic, underline, links, inline code.
+    // Bold MUST come before italic (** vs *), and code spans before
+    // both (so `*foo*` inside backticks isn't italicized).
+    function renderInline(s) {
+      // Inline code spans first — protect their contents from other rules.
+      const codeSpans = [];
+      s = s.replace(/`([^`]+)`/g, (_m, c) => {
+        const i = codeSpans.length;
+        codeSpans.push(c);
+        return ` CS${i} `;
+      });
+      // Images: ![alt](url) — render before links so the ! isn't lost.
+      s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g,
+        (_m, alt, url) => `<img src="${url}" alt="${alt}">`);
+      // Links: [text](url)
+      s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,
+        (_m, text, url) => `<a href="${url}">${text}</a>`);
+      // Bold: **text** (greedy non-line-spanning)
+      s = s.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+      // Italic: *text* (avoid matching inside ** by requiring single *)
+      s = s.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+      // (Underline already passed through as <u>...</u> from the prep step.)
+      // Rehydrate code spans last.
+      s = s.replace(/ CS(\d+) /g,
+        (_m, i) => `<code>${escapeHtml(codeSpans[+i])}</code>`);
+      return s;
+    }
+
+    // Theme luminance detection. Reads --bg from the live computed
+    // style, parses it, computes WCAG relative luminance, returns
+    // 'light' or 'dark'. Handles hex (#rgb / #rrggbb) and rgb()/rgba()
+    // — the only forms our themes ship. If parsing fails we default to
+    // 'dark' (matches the enough-default theme).
+    function detectThemeMode() {
+      const bg = getComputedStyle(document.body).getPropertyValue('--bg').trim()
+              || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      const rgb = parseColor(bg);
+      if (!rgb) return 'dark';
+      const [r, g, b] = rgb.map(c => {
+        c /= 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      return lum > 0.5 ? 'light' : 'dark';
+    }
+
+    function parseColor(s) {
+      s = (s || '').trim();
+      if (!s) return null;
+      let m = s.match(/^#([0-9a-f]{3})$/i);
+      if (m) {
+        const h = m[1];
+        return [h[0], h[1], h[2]].map(c => parseInt(c + c, 16));
+      }
+      m = s.match(/^#([0-9a-f]{6})$/i);
+      if (m) {
+        return [m[1].slice(0, 2), m[1].slice(2, 4), m[1].slice(4, 6)]
+          .map(c => parseInt(c, 16));
+      }
+      m = s.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+      if (m) return [+m[1], +m[2], +m[3]];
+      return null;
+    }
+
+    // Apply max-contrast colors to the review pane based on the active
+    // theme's luminance. Light themes get pure black-on-white;
+    // dark themes get pure white-on-near-black. Set as CSS vars on the
+    // #review-mode root so the cascade picks them up everywhere inside.
+    function applyReviewContrast() {
+      const root = document.getElementById('review-mode');
+      if (!root) return;
+      const mode = detectThemeMode();
+      if (mode === 'light') {
+        root.style.setProperty('--review-bg', '#ffffff');
+        root.style.setProperty('--review-fg', '#000000');
+        root.style.setProperty('--review-fg-muted', '#444444');
+        root.style.setProperty('--review-fg-faint', '#999999');
+        root.style.setProperty('--review-code-bg', '#f0f0f0');
+      } else {
+        root.style.setProperty('--review-bg', '#0a0a0a');
+        root.style.setProperty('--review-fg', '#ffffff');
+        root.style.setProperty('--review-fg-muted', '#c0c0c0');
+        root.style.setProperty('--review-fg-faint', '#666666');
+        root.style.setProperty('--review-code-bg', '#1f1f1f');
+      }
+    }
+
+    // ---------- Review mode lifecycle ----------
+    let REVIEW_PATH = null;       // path of the file currently open in review mode
+
+    async function enterReviewMode(path) {
+      // Fetch raw file contents (preview's HTML escape is per-byte and
+      // would need un-escaping; the raw endpoint is the source of truth).
+      let raw;
+      try {
+        const r = await fetch('/api/file/raw?path=' + encodeURIComponent(path));
+        if (!r.ok) throw new Error(r.statusText);
+        raw = await r.text();
+      } catch (e) {
+        alert('could not load document for review: ' + e.message);
+        return;
+      }
+      REVIEW_PATH = path;
+      const root = document.getElementById('review-mode');
+      const body = document.getElementById('review-body');
+      body.dataset.path = path;
+      body.innerHTML = renderMarkdown(raw);
+      applyReviewContrast();
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      // Topbar: show the red exit button.
+      document.getElementById('exit-review-btn').classList.add('visible');
+      // Greyout file tree (the rest of the sidebar stays interactive).
+      document.getElementById('tree')?.classList.add('review-disabled');
+      // Hide preview if it was open — review mode is the focused replacement.
+      document.getElementById('preview')?.classList.remove('open');
+      // Mirror the conversation tail into the pill so the user sees
+      // recent context.
+      refreshReviewChatTail();
+      // Wire the input to the same submission flow as the main chat.
+      // (sendFromReviewChat reuses the existing /api/chat hx-post.)
+    }
+
+    function exitReviewMode() {
+      const root = document.getElementById('review-mode');
+      root.classList.remove('open');
+      root.setAttribute('aria-hidden', 'true');
+      document.getElementById('exit-review-btn').classList.remove('visible');
+      document.getElementById('tree')?.classList.remove('review-disabled');
+      REVIEW_PATH = null;
+      // Per spec: exiting closes the file completely (does NOT drop into
+      // preview mode). The user is back at the regular chat view with
+      // the full session history intact.
+    }
+
+    document.getElementById('exit-review-btn')
+      .addEventListener('click', exitReviewMode);
+
+    // ---------- Review-mode chat pill ----------
+    function toggleReviewChat() {
+      const pill = document.getElementById('review-chat');
+      const tog = document.getElementById('review-chat-toggle');
+      pill.classList.toggle('collapsed');
+      tog.textContent = pill.classList.contains('collapsed') ? '▴' : '▾';
+    }
+    window.toggleReviewChat = toggleReviewChat;
+
+    // Mirror the most recent N messages from #conversation into the pill
+    // tail. Cheap clone-and-trim; called on entry and after every SSE
+    // event that adds to the conversation.
+    const REVIEW_CHAT_TAIL_N = 12;
+    function refreshReviewChatTail() {
+      const tail = document.getElementById('review-chat-tail');
+      if (!tail) return;
+      const conv = document.getElementById('conversation');
+      if (!conv) return;
+      const msgs = Array.from(conv.querySelectorAll('.msg'));
+      const recent = msgs.slice(-REVIEW_CHAT_TAIL_N);
+      tail.innerHTML = recent.map(m => m.outerHTML).join('');
+      tail.scrollTop = tail.scrollHeight;
+    }
+    window.refreshReviewChatTail = refreshReviewChatTail;
+
+    // Send from the review pill: drop the text into the main chat
+    // textarea and submit the existing form. This way every send path
+    // (main chat / pill / future selection-aware edits) goes through
+    // the same /api/chat endpoint and the same SSE pipeline.
+    function sendFromReviewChat() {
+      const input = document.getElementById('review-chat-input');
+      const text = (input.value || '').trim();
+      if (!text) return;
+      const main = document.getElementById('message');
+      const form = document.getElementById('chat-form');
+      if (!main || !form) return;
+      main.value = text;
+      // Trigger an htmx submit on the existing form — same code path
+      // as if the user typed in the main chat box and pressed send.
+      htmx.trigger(form, 'submit');
+      input.value = '';
+    }
+    window.sendFromReviewChat = sendFromReviewChat;
+
+    // Shift+Enter inserts a newline; bare Enter submits.
+    document.getElementById('review-chat-input')
+      .addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendFromReviewChat();
+        }
+      });
 
     // ---------- Preview-pane edit mode ----------
     async function enterEditMode() {

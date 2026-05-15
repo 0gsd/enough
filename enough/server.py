@@ -1192,11 +1192,26 @@ def create_app(
             action_btn = (
                 '<button class="edit-btn" onclick="enterEditMode()">edit</button>'
             )
+        # Review-mode button: only meaningful for markdown-ish text files.
+        # Renders LEFT of the edit button, with a contrasting accent fill
+        # so it stands out from the muted action row. Plain-text files
+        # would technically render fine too (no markdown ⇒ paragraphs),
+        # but for v1 we gate to .md/.markdown to keep the button's
+        # promise honest.
+        review_btn = ""
+        lower = path.lower()
+        if lower.endswith((".md", ".markdown")) and not _is_skill_file(path) and not _is_role_file(path):
+            review_btn = (
+                f'<button class="review-btn" '
+                f'onclick="enterReviewMode(\'{_escape_html(path)}\')">'
+                f'review mode</button>'
+            )
         return HTMLResponse(
             f'<div class="file-path" data-path="{_escape_html(path)}">{_escape_html(path)}</div>'
             f'{sym_note}'
             f'<div class="preview-actions">'
             f'  {mark_done_btn}'
+            f'  {review_btn}'
             f'  {action_btn}'
             f'</div>'
             f'<pre class="file-body">{_escape_html(text)}</pre>'
