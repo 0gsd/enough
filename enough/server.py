@@ -1328,6 +1328,35 @@ def create_app(
             raise HTTPException(404, "no such highlight id")
         return {"path": path, "id": id, "removed": True}
 
+    @app.patch("/api/highlights")
+    async def api_highlights_patch(request: Request) -> dict[str, Any]:
+        """Mutate fields on an existing highlight — primarily the
+        color, used by the per-highlight handle popup (Phase 5c) when
+        the user clicks a different circle. Whitelist of safe fields
+        is enforced inside highlights.update_highlight."""
+        form = await request.form()
+        path = (form.get("path") or "").strip()
+        hl_id = (form.get("id") or "").strip()
+        if not path or not hl_id:
+            raise HTTPException(400, "missing path or id")
+        _resolve_project_path(path)
+        changes: dict[str, Any] = {}
+        if (color := form.get("color")):
+            color = color.strip().lower()
+            if color not in _highlights.ALLOWED_COLORS:
+                raise HTTPException(
+                    400,
+                    f"unknown color {color!r}; allowed: "
+                    + ", ".join(_highlights.ALLOWED_COLORS),
+                )
+            changes["color"] = color
+        if not changes:
+            raise HTTPException(400, "no updatable fields supplied")
+        updated = _highlights.update_highlight(project_dir, path, hl_id, **changes)
+        if updated is None:
+            raise HTTPException(404, "no such highlight id")
+        return {"path": path, "highlight": updated}
+
     @app.post("/api/file", response_class=HTMLResponse)
     async def api_file_write(request: Request) -> HTMLResponse:
         form = await request.form()

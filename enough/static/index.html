@@ -1369,6 +1369,108 @@
       box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
     }
 
+    /* The per-highlight "i" handle (Phase 5c). One small circle
+       anchored to the FIRST wrapped span of each highlight, sitting
+       just above the first letter. Same color as the highlight
+       (filled) so the user can tell which highlight it belongs to. */
+    #review-mode .review-body .hl.hl-first {
+      position: relative;     /* makes the absolute handle anchor here */
+    }
+    #review-mode .review-body .hl-handle {
+      position: absolute;
+      top: -16px;
+      left: -2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1.5px solid var(--review-bg);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-serif, Georgia, serif);
+      font-style: italic;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--review-bg);
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+      user-select: none;
+      line-height: 1;
+      padding: 0;
+      z-index: 12;
+    }
+    #review-mode .review-body .hl-handle.hl-handle-yellow { background: rgba(255, 215, 0,   0.95); }
+    #review-mode .review-body .hl-handle.hl-handle-green  { background: rgba(127, 255, 0,   0.85); }
+    #review-mode .review-body .hl-handle.hl-handle-blue   { background: rgba( 64, 195, 255, 0.90); }
+    #review-mode .review-body .hl-handle.hl-handle-pink   { background: rgba(255, 105, 180, 0.90); }
+    #review-mode .review-body .hl-handle:hover {
+      transform: scale(1.18);
+    }
+
+    /* The handle's popup — anchored next to the clicked handle, in
+       the gutter when there's room. Hidden by default; shown by JS
+       with explicit top/left coordinates relative to the viewport. */
+    #review-hl-popup {
+      position: fixed;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 12px;
+      background: var(--bg-raise);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      z-index: 60;
+      font-family: var(--font-sans, system-ui, sans-serif);
+      font-size: 12px;
+      min-width: 168px;
+    }
+    #review-hl-popup.open { display: flex; }
+    #review-hl-popup .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #review-hl-popup .row.colors {
+      justify-content: space-between;
+    }
+    #review-hl-popup .lbl {
+      color: var(--fg-muted);
+      font-size: 11px;
+    }
+    #review-hl-popup .rt-color {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      padding: 0;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 80ms ease, border-color 120ms ease;
+    }
+    #review-hl-popup .rt-color:hover { transform: scale(1.12); }
+    #review-hl-popup .rt-color.active {
+      border-color: var(--fg);
+      box-shadow: 0 0 0 2px var(--bg-raise);
+    }
+    #review-hl-popup .rt-color[data-color="yellow"] { background: rgba(255, 215, 0,   0.85); }
+    #review-hl-popup .rt-color[data-color="green"]  { background: rgba(127, 255, 0,   0.78); }
+    #review-hl-popup .rt-color[data-color="blue"]   { background: rgba( 64, 195, 255, 0.78); }
+    #review-hl-popup .rt-color[data-color="pink"]   { background: rgba(255, 105, 180, 0.78); }
+    #review-hl-popup .edit-btn {
+      background: var(--accent-tool);
+      color: var(--bg);
+      border: 1px solid var(--accent-tool);
+      border-radius: 4px;
+      padding: 4px 12px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    #review-hl-popup .edit-btn:hover { filter: brightness(1.08); }
+
     /* Color-circle buttons in the right group of the selection
        toolbar. Round, filled with the same pastel they apply,
        outlined when "active" for the current selection. */
@@ -2334,6 +2436,24 @@
               placeholder="message the agent about this document…"></textarea>
             <button type="submit">send</button>
           </form>
+        </div>
+      </div>
+
+      <!-- Per-highlight popup (Phase 5c). Floats above everything,
+           absolutely positioned next to whatever handle was clicked.
+           One element reused across all handles to avoid DOM bloat
+           on docs with lots of highlights. -->
+      <div id="review-hl-popup" role="dialog" aria-hidden="true">
+        <div class="lbl">change color</div>
+        <div class="row colors">
+          <button type="button" class="rt-color" data-color="yellow" title="yellow"></button>
+          <button type="button" class="rt-color" data-color="green"  title="green"></button>
+          <button type="button" class="rt-color" data-color="blue"   title="blue"></button>
+          <button type="button" class="rt-color" data-color="pink"   title="pink"></button>
+        </div>
+        <div class="lbl">click the active color to remove this highlight</div>
+        <div class="row">
+          <button type="button" class="edit-btn">edit text in editor</button>
         </div>
       </div>
 
@@ -4528,14 +4648,16 @@
     function renderHighlights() {
       // Walks the rendered review body, finds each saved highlight by
       // its before+snippet+after anchor signature, and wraps the
-      // matched snippet in <span class="hl hl-<color>"> nodes. Stacks
-      // additively for overlapping highlights — each color gets its
-      // own pass and innermost wraps render through outer ones.
+      // matched snippet in <span class="hl hl-<color>"> nodes. Then
+      // (Phase 5c) attaches a tiny "i" handle to the FIRST wrapped
+      // span of each highlight so the user can manage that highlight
+      // without re-selecting it.
       const body = document.getElementById('review-body');
       if (!body) return;
-      // Strip any existing highlight spans from a prior render so we
-      // start fresh (e.g. after add/remove). Replace each .hl span
-      // with its text contents in place.
+      // Strip any existing highlight handles + wraps from a prior
+      // render so we start clean. Order matters: handles first
+      // (they're inside .hl spans), then unwrap the spans.
+      body.querySelectorAll('.hl-handle').forEach(h => h.remove());
       body.querySelectorAll('span.hl').forEach(span => {
         const parent = span.parentNode;
         while (span.firstChild) parent.insertBefore(span.firstChild, span);
@@ -4546,6 +4668,40 @@
       for (const h of REVIEW_HIGHLIGHTS) {
         if (h.stale) continue;   // Phase 5 will surface stale ones in a sidebar pane
         wrapHighlight(body, h);
+      }
+      // Add the per-highlight "i" handles.
+      attachHighlightHandles(body);
+    }
+
+    function attachHighlightHandles(rootEl) {
+      // For each unique highlight id, find the FIRST wrapped span (a
+      // single highlight may produce multiple .hl spans if it crosses
+      // inline element boundaries) and attach the handle there. Mark
+      // that span with `.hl-first` so the CSS knows where to anchor
+      // the absolutely-positioned handle.
+      const seen = new Set();
+      const allSpans = rootEl.querySelectorAll('span.hl[data-hl-id]');
+      for (const span of allSpans) {
+        const id = span.dataset.hlId;
+        if (seen.has(id)) continue;
+        seen.add(id);
+        const h = REVIEW_HIGHLIGHTS.find(x => x.id === id);
+        if (!h) continue;
+        span.classList.add('hl-first');
+        const handle = document.createElement('button');
+        handle.type = 'button';
+        handle.className = 'hl-handle hl-handle-' + h.color;
+        handle.dataset.hlId = id;
+        handle.textContent = 'i';
+        handle.title = `${h.color} highlight — click to manage`;
+        handle.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          openHighlightPopup(handle, h);
+        });
+        // Insert as the FIRST child of the span so it floats above
+        // the span's first character.
+        span.insertBefore(handle, span.firstChild);
       }
     }
 
@@ -4759,6 +4915,156 @@
         applyHighlight(btn.dataset.color);
       });
     });
+
+    // ---------- Phase 5c: per-highlight popup ----------
+    //
+    // One reusable popup attached to the page-level
+    // #review-hl-popup element. Opened by clicking an "i" handle on
+    // any highlighted span; closed by clicking outside it or by
+    // re-clicking the same handle. Lets the user change color
+    // (server-side PATCH /api/highlights), remove (DELETE), or jump
+    // to the snippet in preview-edit.
+
+    let POPUP_HL_ID = null;     // id of the highlight the popup is currently bound to
+    const popupEl = () => document.getElementById('review-hl-popup');
+
+    function openHighlightPopup(handle, h) {
+      // If the popup is already open for the same handle, treat the
+      // click as "close" — feels right and gives the user a way out
+      // without hunting for an empty area to click.
+      if (POPUP_HL_ID === h.id) {
+        closeHighlightPopup();
+        return;
+      }
+      POPUP_HL_ID = h.id;
+      const popup = popupEl();
+      // Color circles: light up the highlight's current color so the
+      // user can see what's engaged. Clicking it removes; clicking a
+      // different color updates.
+      popup.querySelectorAll('.rt-color').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.color === h.color);
+      });
+      // Position: prefer the right gutter; if there isn't 200px of
+      // room there, fall back to the left of the handle.
+      const handleRect = handle.getBoundingClientRect();
+      // Make popup visible before measuring (so we can compute its width).
+      popup.style.left = '0px';
+      popup.style.top = '0px';
+      popup.classList.add('open');
+      const popupRect = popup.getBoundingClientRect();
+      const margin = 8;
+      let left = handleRect.right + margin;
+      if (left + popupRect.width > window.innerWidth - margin) {
+        left = handleRect.left - popupRect.width - margin;
+        if (left < margin) left = margin;
+      }
+      let top = handleRect.top;
+      if (top + popupRect.height > window.innerHeight - margin) {
+        top = window.innerHeight - popupRect.height - margin;
+      }
+      popup.style.left = left + 'px';
+      popup.style.top = top + 'px';
+      popup.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeHighlightPopup() {
+      const popup = popupEl();
+      popup.classList.remove('open');
+      popup.setAttribute('aria-hidden', 'true');
+      POPUP_HL_ID = null;
+    }
+
+    // Click outside the popup closes it. We attach this on mousedown
+    // (not click) for the same reason all the other handlers do —
+    // mousedown fires before focus shifts and selection changes.
+    document.addEventListener('mousedown', (e) => {
+      const popup = popupEl();
+      if (!popup.classList.contains('open')) return;
+      if (popup.contains(e.target)) return;
+      // Don't close when the user clicked ANOTHER handle — that
+      // handler will swap us to the new highlight via openHighlightPopup.
+      if (e.target.classList && e.target.classList.contains('hl-handle')) return;
+      closeHighlightPopup();
+    });
+
+    // Color circles inside the popup: click engaged → remove; click
+    // any other → change.
+    document.querySelectorAll('#review-hl-popup .rt-color').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        if (!POPUP_HL_ID || !REVIEW_PATH) return;
+        const target = btn.dataset.color;
+        const h = REVIEW_HIGHLIGHTS.find(x => x.id === POPUP_HL_ID);
+        if (!h) { closeHighlightPopup(); return; }
+        if (btn.classList.contains('active')) {
+          // Engaged → remove.
+          try {
+            const url = '/api/highlights?path=' + encodeURIComponent(REVIEW_PATH) +
+                        '&id=' + encodeURIComponent(POPUP_HL_ID);
+            const r = await fetch(url, { method: 'DELETE' });
+            if (!r.ok) throw new Error(r.statusText);
+          } catch (err) {
+            alert('could not remove highlight: ' + err.message);
+            return;
+          }
+        } else {
+          // Different color → update.
+          try {
+            const fd = new FormData();
+            fd.append('path', REVIEW_PATH);
+            fd.append('id', POPUP_HL_ID);
+            fd.append('color', target);
+            const r = await fetch('/api/highlights', { method: 'PATCH', body: fd });
+            if (!r.ok) throw new Error(r.statusText);
+          } catch (err) {
+            alert('could not change color: ' + err.message);
+            return;
+          }
+        }
+        closeHighlightPopup();
+        await loadHighlightsForReview();
+        renderHighlights();
+        refreshReviewToolbar();
+      });
+    });
+
+    // "edit text in editor": exit review and open preview-edit at the
+    // highlight's snippet — same flow as the toolbar's edit-mode
+    // jump, but the focus text comes from the highlight rather than
+    // the live selection.
+    document.querySelector('#review-hl-popup .edit-btn')
+      .addEventListener('click', async () => {
+        if (!POPUP_HL_ID || !REVIEW_PATH) return;
+        const h = REVIEW_HIGHLIGHTS.find(x => x.id === POPUP_HL_ID);
+        if (!h) return;
+        PENDING_EDIT_FOCUS = { path: REVIEW_PATH, text: h.snippet };
+        closeHighlightPopup();
+        const path = REVIEW_PATH;
+        exitReviewMode();
+        // Reuse the same fetch-and-enter-edit chain that
+        // applyEditModeJump uses.
+        try {
+          const r = await fetch('/api/file?path=' + encodeURIComponent(path));
+          if (!r.ok) throw new Error(r.statusText);
+          document.getElementById('preview-body').innerHTML = await r.text();
+          document.getElementById('preview').classList.add('open');
+          await enterEditMode();
+          const ta = document.querySelector('#preview-body textarea.file-edit');
+          if (ta && PENDING_EDIT_FOCUS) {
+            const idx = ta.value.indexOf(PENDING_EDIT_FOCUS.text);
+            if (idx >= 0) {
+              ta.focus();
+              ta.setSelectionRange(idx, idx + PENDING_EDIT_FOCUS.text.length);
+              const before = ta.value.slice(0, idx);
+              const linesBefore = before.split('\n').length;
+              const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 18;
+              ta.scrollTop = Math.max(0, (linesBefore - 4) * lineHeight);
+            }
+          }
+          PENDING_EDIT_FOCUS = null;
+        } catch (err) {
+          alert('could not open editor: ' + err.message);
+        }
+      });
 
     // ---------- Phase 4b: save / undo affordance for agent edits ----------
     //
