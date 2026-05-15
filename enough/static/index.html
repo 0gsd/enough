@@ -1207,6 +1207,93 @@
       filter: grayscale(0.6);
     }
 
+    /* Selection toolbar inside review mode. Anchored to the top of
+       the review pane; appears on non-empty selection, slides up out
+       of view when the selection clears. Three groups: format
+       buttons left, edit-mode button center, highlight colors right
+       (Phase 3 fills the right group in). */
+    #review-mode .review-toolbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 14px;
+      background: var(--bg-raise);
+      color: var(--fg);
+      border-bottom: 1px solid var(--border);
+      z-index: 32;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+      transform: translateY(0);
+      transition: transform 140ms ease, opacity 140ms ease;
+    }
+
+    #review-mode .review-toolbar[hidden] {
+      display: flex;            /* override the [hidden] default so we can animate */
+      transform: translateY(-110%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #review-mode .review-toolbar .rt-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #review-mode .review-toolbar button {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      min-width: 32px;
+    }
+
+    #review-mode .review-toolbar button:hover {
+      border-color: var(--fg-faint);
+    }
+
+    #review-mode .review-toolbar button.active {
+      background: var(--accent-user);
+      color: var(--bg);
+      border-color: var(--accent-user);
+    }
+
+    #review-mode .review-toolbar select {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    #review-mode .review-toolbar #rt-edit-mode {
+      background: var(--accent-tool);
+      color: var(--bg);
+      border-color: var(--accent-tool);
+      font-weight: 600;
+      padding: 4px 14px;
+    }
+    #review-mode .review-toolbar #rt-edit-mode:hover {
+      filter: brightness(1.08);
+    }
+
+    /* When the toolbar is visible, give the review body extra top
+       padding so its first line isn't covered by the bar. */
+    #review-mode .review-toolbar:not([hidden]) ~ .review-body {
+      padding-top: 96px;
+    }
+
     /* ---------- Scrollbar ---------- */
     ::-webkit-scrollbar {
       width: 10px;
@@ -2090,6 +2177,31 @@
            conversation so the user can talk to the agent without
            leaving the document. -->
       <div id="review-mode" aria-hidden="true">
+        <!-- Selection toolbar — slides down from the top of the review
+             pane whenever the user has a non-empty text selection.
+             Phase 2 ships format buttons (B / I / U / heading) +
+             "edit mode" jump; Phase 3 will add the four highlight
+             color circles on the right. -->
+        <div class="review-toolbar" id="review-toolbar" hidden>
+          <div class="rt-group rt-format" role="group" aria-label="format">
+            <button type="button" data-fmt="bold" title="bold (wrap selection in **…**)"><b>B</b></button>
+            <button type="button" data-fmt="italic" title="italic (wrap selection in *…*)"><i>I</i></button>
+            <button type="button" data-fmt="underline" title="underline (wrap selection in <u>…</u>)"><u>U</u></button>
+            <select id="rt-heading" title="heading level for the selection's block">
+              <option value="">heading…</option>
+              <option value="0">¶ paragraph</option>
+              <option value="1"># H1</option>
+              <option value="2">## H2</option>
+              <option value="3">### H3</option>
+            </select>
+          </div>
+          <div class="rt-group rt-edit">
+            <button type="button" id="rt-edit-mode" title="exit review and open the editor at this selection">edit mode</button>
+          </div>
+          <div class="rt-group rt-highlights" aria-label="highlight colors (Phase 3)">
+            <!-- Reserved for Phase 3 highlight color circles. -->
+          </div>
+        </div>
         <div class="review-body" id="review-body" data-path=""></div>
         <div class="review-chat" id="review-chat">
           <div class="review-chat-head" onclick="toggleReviewChat()">
@@ -3404,82 +3516,113 @@
     // then escaping, then block-level (headings/lists/quotes/hr),
     // then inline (bold/italic/underline/code/links).
     function renderMarkdown(src) {
-      // 1. Extract fenced code blocks first; replace with placeholders
-      //    so their contents don't get touched by inline rules.
-      const codeBlocks = [];
-      src = src.replace(/```([\w-]*)\n([\s\S]*?)```/g, (_m, lang, code) => {
-        const idx = codeBlocks.length;
-        codeBlocks.push({ lang: lang || '', code });
-        return ` CODEBLOCK${idx} `;
-      });
-
-      // 2. Escape raw HTML except our allowed <u>...</u> tags. We
-      //    convert <u>/</u> to placeholders, escape everything else,
-      //    then put them back.
-      src = src.replace(/<u>/gi, ' UOPEN ')
-               .replace(/<\/u>/gi, ' UCLOSE ');
-      src = escapeHtml(src);
-      src = src.replace(/ UOPEN /g, '<u>')
-               .replace(/ UCLOSE /g, '</u>');
-
-      // 3. Block-level pass: split by blank lines into "blocks", then
-      //    classify each. This gives us paragraph/heading/list/quote
-      //    boundaries without a real parser.
-      const blocks = src.split(/\n{2,}/);
-      const out = [];
-      for (let raw of blocks) {
-        const block = raw.replace(/\s+$/, '');
-        if (!block) continue;
-        // Code block placeholder: rehydrate as a real <pre><code>.
-        const cbm = block.match(/^ CODEBLOCK(\d+) $/);
-        if (cbm) {
-          const cb = codeBlocks[+cbm[1]];
-          const langClass = cb.lang ? ` class="language-${cb.lang}"` : '';
-          out.push(`<pre><code${langClass}>${escapeHtml(cb.code)}</code></pre>`);
-          continue;
+      // Phase 2 changed this function to ALSO track where each rendered
+      // block came from in the source. Returns {html, blocks} where
+      // `blocks` is an aligned array of {start, end, raw, type} — the
+      // selection toolbar uses block.start/end to translate a DOM
+      // selection back into a source-position rewrite.
+      //
+      // 1. Walk the source, identifying block boundaries (blank-line
+      //    delimited, except fenced code blocks which capture across
+      //    blank lines) and recording each block's source span.
+      const blocks = [];
+      let cursor = 0;
+      while (cursor < src.length) {
+        // Skip leading blank/whitespace before the next block.
+        while (cursor < src.length && (src[cursor] === '\n' || src[cursor] === ' ' || src[cursor] === '\t' || src[cursor] === '\r')) {
+          cursor++;
         }
-        // Heading
-        const hm = block.match(/^(#{1,6})\s+(.*)$/);
-        if (hm) {
-          const level = hm[1].length;
-          out.push(`<h${level}>${renderInline(hm[2])}</h${level}>`);
-          continue;
+        if (cursor >= src.length) break;
+        const start = cursor;
+        let end;
+        if (src.startsWith('```', cursor)) {
+          // Fenced code block: capture through the closing fence
+          // (multi-line; eats blank lines inside).
+          const after = src.indexOf('```', cursor + 3);
+          end = after === -1 ? src.length : after + 3;
+          if (src[end] === '\n') end++;
+        } else {
+          const nl = src.indexOf('\n\n', cursor);
+          end = nl === -1 ? src.length : nl;
         }
-        // Horizontal rule
-        if (/^(\*\s*){3,}$|^(-\s*){3,}$|^(_\s*){3,}$/.test(block)) {
-          out.push('<hr>');
-          continue;
+        const raw = src.slice(start, end).replace(/\s+$/, '');
+        if (raw) {
+          let type = 'p';
+          if (raw.startsWith('```')) type = 'code';
+          else if (/^#{1,6}\s+/.test(raw)) type = 'heading';
+          else if (/^>\s?/.test(raw)) type = 'blockquote';
+          else if (/^\s*\d+\.\s+/.test(raw)) type = 'ol';
+          else if (/^\s*[-*+]\s+/.test(raw)) type = 'ul';
+          else if (/^(\*\s*){3,}$|^(-\s*){3,}$|^(_\s*){3,}$/.test(raw)) type = 'hr';
+          blocks.push({ start, end, raw, type });
         }
-        // Blockquote (one or more lines starting with >)
-        if (/^>\s?/.test(block)) {
-          const inner = block.split('\n').map(l => l.replace(/^>\s?/, '')).join('\n');
-          out.push(`<blockquote>${renderInline(inner.replace(/\n/g, '<br>'))}</blockquote>`);
-          continue;
-        }
-        // Ordered list
-        if (/^\s*\d+\.\s+/.test(block)) {
-          const items = block.split(/\n(?=\s*\d+\.\s+)/).map(line => {
-            const m = line.match(/^\s*\d+\.\s+([\s\S]*)$/);
-            return m ? `<li>${renderInline(m[1].replace(/\n\s+/g, ' '))}</li>` : '';
-          }).join('');
-          out.push(`<ol>${items}</ol>`);
-          continue;
-        }
-        // Unordered list
-        if (/^\s*[-*+]\s+/.test(block)) {
-          const items = block.split(/\n(?=\s*[-*+]\s+)/).map(line => {
-            const m = line.match(/^\s*[-*+]\s+([\s\S]*)$/);
-            return m ? `<li>${renderInline(m[1].replace(/\n\s+/g, ' '))}</li>` : '';
-          }).join('');
-          out.push(`<ul>${items}</ul>`);
-          continue;
-        }
-        // Default: paragraph. Single newlines → <br> (markdown
-        // technically requires two trailing spaces, but for a
-        // user-facing reader the soft-break behavior is friendlier).
-        out.push(`<p>${renderInline(block.replace(/\n/g, '<br>'))}</p>`);
+        cursor = end;
       }
-      return out.join('\n');
+
+      // 2. Render each block to HTML with data-block-idx so the
+      //    selection toolbar can find the source block from the DOM.
+      const out = [];
+      blocks.forEach((b, idx) => {
+        switch (b.type) {
+          case 'code': {
+            const m = b.raw.match(/^```([\w-]*)\n?([\s\S]*?)\n?```?\s*$/);
+            const lang = m ? m[1] : '';
+            const code = m ? m[2] : b.raw;
+            const langClass = lang ? ` class="language-${lang}"` : '';
+            out.push(`<pre data-block-idx="${idx}"><code${langClass}>${escapeHtml(code)}</code></pre>`);
+            break;
+          }
+          case 'heading': {
+            const hm = b.raw.match(/^(#{1,6})\s+(.*)$/);
+            const level = hm[1].length;
+            out.push(`<h${level} data-block-idx="${idx}">${renderInline(escapeMarkdownInline(hm[2]))}</h${level}>`);
+            break;
+          }
+          case 'hr':
+            out.push(`<hr data-block-idx="${idx}">`);
+            break;
+          case 'blockquote': {
+            const inner = b.raw.split('\n').map(l => l.replace(/^>\s?/, '')).join('\n');
+            out.push(`<blockquote data-block-idx="${idx}">${renderInline(escapeMarkdownInline(inner.replace(/\n/g, '<br>')))}</blockquote>`);
+            break;
+          }
+          case 'ol': {
+            const items = b.raw.split(/\n(?=\s*\d+\.\s+)/).map(line => {
+              const m = line.match(/^\s*\d+\.\s+([\s\S]*)$/);
+              return m ? `<li>${renderInline(escapeMarkdownInline(m[1].replace(/\n\s+/g, ' ')))}</li>` : '';
+            }).join('');
+            out.push(`<ol data-block-idx="${idx}">${items}</ol>`);
+            break;
+          }
+          case 'ul': {
+            const items = b.raw.split(/\n(?=\s*[-*+]\s+)/).map(line => {
+              const m = line.match(/^\s*[-*+]\s+([\s\S]*)$/);
+              return m ? `<li>${renderInline(escapeMarkdownInline(m[1].replace(/\n\s+/g, ' ')))}</li>` : '';
+            }).join('');
+            out.push(`<ul data-block-idx="${idx}">${items}</ul>`);
+            break;
+          }
+          default:
+            // Paragraph. Single newlines render as soft <br> for a
+            // friendlier reading view than strict markdown semantics.
+            out.push(`<p data-block-idx="${idx}">${renderInline(escapeMarkdownInline(b.raw.replace(/\n/g, '<br>')))}</p>`);
+        }
+      });
+      return { html: out.join('\n'), blocks };
+    }
+
+    // Escape HTML in raw markdown content while preserving our allowed
+    // inline tags (<u>, <br>). Used by the renderer when feeding inline
+    // content to renderInline so user-typed angle brackets can't break
+    // the DOM but legitimate <u> tags survive.
+    function escapeMarkdownInline(s) {
+      s = s.replace(/<u>/gi, '\x00UOPEN\x00')
+           .replace(/<\/u>/gi, '\x00UCLOSE\x00')
+           .replace(/<br\s*\/?>/gi, '\x00BR\x00');
+      s = escapeHtml(s);
+      return s.replace(/\x00UOPEN\x00/g, '<u>')
+              .replace(/\x00UCLOSE\x00/g, '</u>')
+              .replace(/\x00BR\x00/g, '<br>');
     }
 
     // Inline-level rules: bold, italic, underline, links, inline code.
@@ -3571,6 +3714,9 @@
 
     // ---------- Review mode lifecycle ----------
     let REVIEW_PATH = null;       // path of the file currently open in review mode
+    let REVIEW_SOURCE = '';       // raw markdown source as last loaded
+    let REVIEW_BLOCKS = [];       // [{start, end, raw, type}] aligned with rendered blocks
+    let PENDING_EDIT_FOCUS = null; // {path, text} consumed by enterEditMode after a "edit mode" jump from review
 
     async function enterReviewMode(path) {
       // Fetch raw file contents (preview's HTML escape is per-byte and
@@ -3585,10 +3731,13 @@
         return;
       }
       REVIEW_PATH = path;
+      REVIEW_SOURCE = raw;
       const root = document.getElementById('review-mode');
       const body = document.getElementById('review-body');
       body.dataset.path = path;
-      body.innerHTML = renderMarkdown(raw);
+      const rendered = renderMarkdown(raw);
+      REVIEW_BLOCKS = rendered.blocks;
+      body.innerHTML = rendered.html;
       applyReviewContrast();
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
@@ -3663,6 +3812,303 @@
       input.value = '';
     }
     window.sendFromReviewChat = sendFromReviewChat;
+
+    // ---------- Phase 2: selection toolbar ----------
+    //
+    // Listens for selection changes inside the review body. When a
+    // non-empty selection lives entirely within one rendered block,
+    // surfaces the format toolbar so the user can apply bold / italic /
+    // underline, change the block's heading level, or jump out to the
+    // textarea editor with the selection re-applied.
+
+    function getReviewSelection() {
+      // Returns null when nothing useful is selected (collapsed, empty,
+      // outside review-body, or spanning multiple blocks). On success
+      // returns {block, blockIdx, range, text, plainStartInBlock,
+      // plainEndInBlock} — enough to do source-position rewrites.
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+      const range = sel.getRangeAt(0);
+      const body = document.getElementById('review-body');
+      if (!body || !body.contains(range.commonAncestorContainer)) return null;
+      const text = range.toString();
+      if (!text || !text.trim()) return null;
+
+      // Find the block element via the common ancestor's nearest
+      // [data-block-idx] ancestor.
+      let common = range.commonAncestorContainer;
+      if (common.nodeType === 3) common = common.parentNode;
+      const block = common.closest('[data-block-idx]');
+      if (!block) return null;
+      const blockIdx = +block.dataset.blockIdx;
+
+      // Multi-block selections aren't supported in Phase 2 — bail so
+      // the toolbar stays hidden rather than producing weird output.
+      // (Anchor block === focus block is the safe single-block
+      // condition.)
+      const startBlock = (range.startContainer.nodeType === 3
+        ? range.startContainer.parentNode
+        : range.startContainer).closest('[data-block-idx]');
+      const endBlock = (range.endContainer.nodeType === 3
+        ? range.endContainer.parentNode
+        : range.endContainer).closest('[data-block-idx]');
+      if (startBlock !== endBlock) return null;
+
+      // Compute the rendered text offsets of the selection within the
+      // block. We walk text nodes inside the block, accumulating
+      // character counts until we reach startContainer / endContainer.
+      const plainStart = textOffsetInBlock(block, range.startContainer, range.startOffset);
+      const plainEnd = textOffsetInBlock(block, range.endContainer, range.endOffset);
+      if (plainStart < 0 || plainEnd < 0) return null;
+
+      return {
+        block,
+        blockIdx,
+        range,
+        text,
+        plainStartInBlock: Math.min(plainStart, plainEnd),
+        plainEndInBlock: Math.max(plainStart, plainEnd),
+      };
+    }
+
+    function textOffsetInBlock(blockEl, container, offset) {
+      // Walks DOM text nodes inside blockEl in document order; returns
+      // the running plain-text offset where (container, offset) lands.
+      // Returns -1 if container isn't reached (defensive).
+      let total = 0;
+      const walker = document.createTreeWalker(blockEl, NodeFilter.SHOW_TEXT);
+      while (true) {
+        const n = walker.nextNode();
+        if (!n) break;
+        if (n === container) return total + offset;
+        total += n.nodeValue.length;
+      }
+      // If container is the block itself with element children, treat
+      // offset as a child index.
+      if (container === blockEl) return total;
+      return -1;
+    }
+
+    // Build a per-block plain↔source position map. Walks the block's
+    // raw markdown source character by character, skipping inline
+    // markdown delimiters (** __ * _ ` <u> </u> [text](url)) and
+    // recording the source offset for each surviving plain char. The
+    // selection toolbar uses this to translate a rendered selection
+    // range into source-position rewrites.
+    function buildBlockPlainMap(rawSource) {
+      let plain = '';
+      const positions = [];   // positions[i] = source offset where plain[i] lives
+      let i = 0;
+      // Drop a leading list/heading/quote marker so plain offsets line up
+      // with what the user actually sees rendered. Save the prefix length
+      // so callers can add it back when computing source offsets.
+      let prefixLen = 0;
+      const headingM = rawSource.match(/^(#{1,6})\s+/);
+      const listM = rawSource.match(/^\s*([-*+]|\d+\.)\s+/);
+      const quoteM = rawSource.match(/^>\s?/);
+      if (headingM) prefixLen = headingM[0].length;
+      else if (listM) prefixLen = listM[0].length;
+      else if (quoteM) prefixLen = quoteM[0].length;
+      i = prefixLen;
+      while (i < rawSource.length) {
+        // Inline markdown delimiters → skip without emitting.
+        if (rawSource.startsWith('**', i)) { i += 2; continue; }
+        if (rawSource.startsWith('__', i)) { i += 2; continue; }
+        if (rawSource[i] === '*' || rawSource[i] === '_') { i++; continue; }
+        if (rawSource[i] === '`') { i++; continue; }
+        if (rawSource.startsWith('<u>', i)) { i += 3; continue; }
+        if (rawSource.startsWith('</u>', i)) { i += 4; continue; }
+        // Image / link: ![alt](url) or [text](url) — emit visible text only.
+        const linkM = rawSource.slice(i).match(/^!?\[([^\]]+)\]\(([^)\s]+)\)/);
+        if (linkM) {
+          const isImage = linkM[0].startsWith('!');
+          const text = linkM[1];
+          const textOffsetInMatch = isImage ? 2 : 1; // after "![" or "["
+          for (let j = 0; j < text.length; j++) {
+            plain += text[j];
+            positions.push(i + textOffsetInMatch + j);
+          }
+          i += linkM[0].length;
+          continue;
+        }
+        // Default char: emit and record.
+        plain += rawSource[i];
+        positions.push(i);
+        i++;
+      }
+      return { plain, positions, prefixLen };
+    }
+
+    // Apply a format wrap (bold | italic | underline) to the current
+    // selection. Single-block only; ignores no-ops (empty selection).
+    //
+    // v1 limitation: only supported inside paragraphs and headings.
+    // Lists, blockquotes, and code blocks are rejected silently
+    // because their multi-line / per-line-marker source structure
+    // would mis-target the rewrite. Phase 3 will revisit.
+    async function applyFormat(kind) {
+      const sel = getReviewSelection();
+      if (!sel) return;
+      const block = REVIEW_BLOCKS[sel.blockIdx];
+      if (!block) return;
+      if (block.type !== 'p' && block.type !== 'heading') return;
+
+      const map = buildBlockPlainMap(block.raw);
+      // Translate rendered offsets to source offsets within the block.
+      const srcStart = map.positions[sel.plainStartInBlock];
+      const srcEndChar = map.positions[sel.plainEndInBlock - 1];
+      if (srcStart == null || srcEndChar == null) return;
+      const srcEnd = srcEndChar + 1;
+
+      const open = kind === 'bold' ? '**' : kind === 'italic' ? '*' : '<u>';
+      const close = kind === 'bold' ? '**' : kind === 'italic' ? '*' : '</u>';
+      const newBlockRaw =
+        block.raw.slice(0, srcStart) + open +
+        block.raw.slice(srcStart, srcEnd) + close +
+        block.raw.slice(srcEnd);
+
+      await replaceBlockAndSave(sel.blockIdx, newBlockRaw);
+    }
+
+    // Apply a heading level (0 = paragraph, 1/2/3 = h1/h2/h3) to the
+    // selection's block. Headings replace the block's leading marker;
+    // they're not selection-relative.
+    async function applyHeading(level) {
+      const sel = getReviewSelection();
+      if (!sel) return;
+      const block = REVIEW_BLOCKS[sel.blockIdx];
+      if (!block) return;
+      // Same v1 limitation as applyFormat.
+      if (block.type !== 'p' && block.type !== 'heading') return;
+      // Strip any existing leading heading marker.
+      let body = block.raw.replace(/^(#{1,6})\s+/, '');
+      const newBlockRaw = level > 0 ? '#'.repeat(level) + ' ' + body : body;
+      await replaceBlockAndSave(sel.blockIdx, newBlockRaw);
+    }
+
+    // Save the rewritten source back to disk via the existing
+    // /api/file POST endpoint, then re-render the review pane from
+    // the new source. Keeps the user's scroll position so the edit
+    // doesn't yank them away from where they were working.
+    async function replaceBlockAndSave(blockIdx, newBlockRaw) {
+      const block = REVIEW_BLOCKS[blockIdx];
+      const newSource =
+        REVIEW_SOURCE.slice(0, block.start) + newBlockRaw +
+        REVIEW_SOURCE.slice(block.end);
+      const fd = new FormData();
+      fd.append('path', REVIEW_PATH);
+      fd.append('content', newSource);
+      const r = await fetch('/api/file', { method: 'POST', body: fd });
+      if (!r.ok) {
+        alert('save failed: ' + r.status + ' ' + r.statusText);
+        return;
+      }
+      // Re-render in place. Preserve scroll position.
+      const body = document.getElementById('review-body');
+      const scrollY = body.scrollTop;
+      REVIEW_SOURCE = newSource;
+      const rendered = renderMarkdown(newSource);
+      REVIEW_BLOCKS = rendered.blocks;
+      body.innerHTML = rendered.html;
+      body.scrollTop = scrollY;
+      // Selection is gone after re-render; toolbar will hide on the
+      // next selectionchange tick.
+      hideReviewToolbar();
+    }
+
+    // "edit mode" jump: capture the selection's rendered text, exit
+    // review mode, open preview > edit on the same file, then in the
+    // textarea search for that text and select it (scrolling to it).
+    async function applyEditModeJump() {
+      const sel = getReviewSelection();
+      const path = REVIEW_PATH;
+      const focusText = sel ? sel.text : null;
+      PENDING_EDIT_FOCUS = focusText ? { path, text: focusText } : null;
+      exitReviewMode();
+      if (!path) return;
+      // Reopen the preview pane on this path, then enter edit mode.
+      // The HTMX preview fetch is async; chain via fetch + manual
+      // fragment swap so we can call enterEditMode reliably after.
+      const previewBody = document.getElementById('preview-body');
+      try {
+        const r = await fetch('/api/file?path=' + encodeURIComponent(path));
+        if (!r.ok) throw new Error(r.statusText);
+        previewBody.innerHTML = await r.text();
+        document.getElementById('preview').classList.add('open');
+        await enterEditMode();
+        // After enterEditMode, the textarea exists; apply pending focus.
+        if (PENDING_EDIT_FOCUS) {
+          const ta = document.querySelector('#preview-body textarea.file-edit');
+          if (ta) {
+            const idx = ta.value.indexOf(PENDING_EDIT_FOCUS.text);
+            if (idx >= 0) {
+              ta.focus();
+              ta.setSelectionRange(idx, idx + PENDING_EDIT_FOCUS.text.length);
+              // Scroll the textarea so the selection is visible.
+              const before = ta.value.slice(0, idx);
+              const linesBefore = before.split('\n').length;
+              const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 18;
+              ta.scrollTop = Math.max(0, (linesBefore - 4) * lineHeight);
+            }
+          }
+          PENDING_EDIT_FOCUS = null;
+        }
+      } catch (e) {
+        alert('could not open editor: ' + e.message);
+      }
+    }
+
+    // Show / hide the toolbar based on the current selection. Called
+    // from the document-level selectionchange listener.
+    function refreshReviewToolbar() {
+      const root = document.getElementById('review-mode');
+      const toolbar = document.getElementById('review-toolbar');
+      if (!root.classList.contains('open')) {
+        toolbar.hidden = true;
+        return;
+      }
+      const sel = getReviewSelection();
+      if (!sel) {
+        toolbar.hidden = true;
+        return;
+      }
+      toolbar.hidden = false;
+      // Reset heading dropdown to reflect the block's current level.
+      const headingSel = document.getElementById('rt-heading');
+      const block = REVIEW_BLOCKS[sel.blockIdx];
+      if (block && block.type === 'heading') {
+        const level = block.raw.match(/^(#{1,6})\s+/)[1].length;
+        headingSel.value = String(level);
+      } else {
+        headingSel.value = '';
+      }
+    }
+
+    function hideReviewToolbar() {
+      const tb = document.getElementById('review-toolbar');
+      if (tb) tb.hidden = true;
+    }
+
+    // Wire up: selection changes anywhere in the document re-evaluate
+    // the toolbar; format/edit-mode buttons dispatch their actions.
+    document.addEventListener('selectionchange', refreshReviewToolbar);
+
+    document.querySelectorAll('#review-toolbar button[data-fmt]').forEach(btn => {
+      btn.addEventListener('mousedown', (e) => {
+        // mousedown (not click) so the selection isn't lost on focus.
+        e.preventDefault();
+        applyFormat(btn.dataset.fmt);
+      });
+    });
+    document.getElementById('rt-heading').addEventListener('change', (e) => {
+      const v = e.target.value;
+      if (v === '') return;
+      applyHeading(+v);
+    });
+    document.getElementById('rt-edit-mode').addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      applyEditModeJump();
+    });
 
     // Shift+Enter inserts a newline; bare Enter submits.
     document.getElementById('review-chat-input')
