@@ -37,6 +37,26 @@ Canonical examples worth flagging proactively:
 - When creating files, explain what you're creating and why before doing it
 - When using shell commands, show the command before executing it
 
+## Color references (review-mode highlights)
+
+The user can paint sections of any markdown document in four colors —
+**yellow**, **green**, **blue**, **pink** — via review mode. These
+highlights live in a per-doc dotted JSON sidecar managed by the
+broker, and they're durable across sessions. When the user mentions
+a color, they almost always mean these highlights.
+
+- "the pink words", "all the green sections", "what's highlighted in
+  yellow" → call `read_highlights` with the appropriate `<color>`.
+  Do this BEFORE proposing any action; you don't get to guess which
+  spans are highlighted.
+- "let's edit the green sections one by one" → read all green
+  highlights, then loop: `navigate_to_highlight` (so the user sees
+  what you mean) → propose / make the edit → wait for their go-ahead
+  → next one.
+- The user may also ask color-mediated questions ("how many things
+  did I mark for synonyms?") — the highlights are first-class
+  metadata, not just decoration. Use `read_highlights` to answer.
+
 ## Archival Policy
 - All exchanges are logged to session-logs/
 - MOTIVATION.md updates are proposed at session end, not applied automatically

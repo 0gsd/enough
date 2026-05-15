@@ -24,12 +24,13 @@ import os
 import re
 import subprocess
 import urllib.parse
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 import httpx
 
-from . import broker
+from . import broker, highlights
 
 log = logging.getLogger("enough.tools")
 
@@ -44,6 +45,10 @@ _PATH_RE = re.compile(r"<path>(.*?)</path>", re.DOTALL)
 _CONTENT_RE = re.compile(r"<content>(.*?)</content>", re.DOTALL)
 _COMMAND_RE = re.compile(r"<command>(.*?)</command>", re.DOTALL)
 _URL_RE = re.compile(r"<url>(.*?)</url>", re.DOTALL)
+# Catches any other inner tag so new tools can ship without re-touching
+# the parser; `ToolCall.extra` exposes them by name.
+_INNER_TAG_RE = re.compile(r"<([a-zA-Z_][a-zA-Z0-9_-]*)>(.*?)</\1>", re.DOTALL)
+_KNOWN_INNER_TAGS = frozenset({"path", "content", "command", "url"})
 
 # Detection-only (partial-text) pattern for streaming: is there a closing tag
 # at or near the end of the buffer?
@@ -52,11 +57,12 @@ _CLOSING_TOOL_RE = re.compile(r"</tool>")
 
 @dataclass
 class ToolCall:
-    name: str                 # read_file | write_file | shell | fetch_url
+    name: str                 # read_file | write_file | shell | fetch_url | read_highlights | navigate_to_highlight | ...
     path: str | None
     content: str | None
     command: str | None
     url: str | None
+    extra: dict[str, str]     # any other inner tags (e.g. <color>green</color>) — keeps the schema open
     raw: str                  # full matched <tool>...</tool> substring
     span: tuple[int, int]     # (start, end) indices into the source text
 
@@ -67,6 +73,12 @@ class ToolResult:
     key: str                  # path for file ops, command for shell
     ok: bool
     body: str                 # stdout-like; for write_file a confirmation
+    side_effects: dict[str, Any] = field(default_factory=dict)
+    # Optional: a name → payload map for things the tool wants the
+    # server layer to do AFTER the result is recorded. Currently used
+    # by `navigate_to_highlight` to ask the UI (via SSE) to scroll to
+    # a specific highlight without going through the agent's tool-result
+    # text. Existing tools leave this empty and behave exactly as before.
 
     def render(self) -> str:
         """Format for injection into the conversation as a user message."""
@@ -93,6 +105,16 @@ def parse_tool_calls(text: str) -> list[ToolCall]:
         content_m = _CONTENT_RE.search(body)
         command_m = _COMMAND_RE.search(body)
         url_m = _URL_RE.search(body)
+        # Sweep for any non-standard inner tags so new tools (e.g.
+        # read_highlights with <color>green</color>) work without
+        # touching the parser. We only collect tags we don't already
+        # extract via the named regexes above.
+        extra: dict[str, str] = {}
+        for tag_m in _INNER_TAG_RE.finditer(body):
+            tag, value = tag_m.group(1), tag_m.group(2)
+            if tag in _KNOWN_INNER_TAGS:
+                continue
+            extra[tag] = value.strip()
         calls.append(
             ToolCall(
                 name=name,
@@ -100,6 +122,7 @@ def parse_tool_calls(text: str) -> list[ToolCall]:
                 content=content_m.group(1) if content_m else None,  # preserve whitespace
                 command=command_m.group(1).strip() if command_m else None,
                 url=url_m.group(1).strip() if url_m else None,
+                extra=extra,
                 raw=m.group(0),
                 span=(m.start(), m.end()),
             )
@@ -714,6 +737,129 @@ def run_fetch_url(project_dir: Path, call: ToolCall) -> ToolResult:
 
 
 # ---------------------------------------------------------------------------
+# read_highlights — agent-facing query into the per-doc highlights sidecar.
+# ---------------------------------------------------------------------------
+#
+# Accepts <path> (the document) and optional <color> (yellow / green /
+# blue / pink). Returns a brief markdown listing of matching highlights:
+# id, color, snippet preview, and source-position hint when available.
+# This is what the agent calls when the user says e.g. "the pink words"
+# — it gets concrete entries it can then cross-reference with the doc
+# text via read_file.
+
+def run_read_highlights(project_dir: Path, call: ToolCall) -> ToolResult:
+    path = (call.path or "").strip()
+    if not path:
+        return ToolResult("read_highlights", "", False, "error: missing <path>")
+    color = (call.extra.get("color") or "").strip().lower() or None
+    if color and color not in highlights.ALLOWED_COLORS:
+        return ToolResult(
+            "read_highlights", path, False,
+            f"error: unknown color {color!r}. allowed: "
+            + ", ".join(highlights.ALLOWED_COLORS),
+        )
+    items = highlights.load_highlights(project_dir, path)
+    if color:
+        items = [h for h in items if h.get("color") == color]
+    if not items:
+        scope = f" ({color})" if color else ""
+        return ToolResult(
+            "read_highlights", path, True,
+            f"no highlights{scope} on {path}.",
+        )
+    lines = [
+        f"highlights on {path}"
+        + (f" filtered to {color}" if color else "")
+        + f": {len(items)} found.",
+        "",
+    ]
+    for i, h in enumerate(items, 1):
+        snippet = (h.get("snippet") or "").replace("\n", " ")
+        if len(snippet) > 140:
+            snippet = snippet[:140] + "…"
+        loc = ""
+        if h.get("src_start") is not None:
+            loc = f" [src bytes {h['src_start']}–{h.get('src_end', '?')}]"
+        stale = " [STALE]" if h.get("stale") else ""
+        lines.append(
+            f"{i}. {h.get('id', '?')} [{h.get('color', '?')}]{stale}{loc} — \"{snippet}\""
+        )
+    return ToolResult("read_highlights", path, True, "\n".join(lines))
+
+
+# ---------------------------------------------------------------------------
+# navigate_to_highlight — agent-driven UI navigation. Asks the front-end
+# to scroll the open review-mode pane to a specific highlight so a
+# multi-step "edit the green sections one by one" workflow has visual
+# anchoring. The actual scroll is performed by a JS handler listening
+# for the `review_navigate` SSE event the server emits when this tool's
+# side_effects payload is non-empty.
+# ---------------------------------------------------------------------------
+
+def run_navigate_to_highlight(project_dir: Path, call: ToolCall) -> ToolResult:
+    path = (call.path or "").strip()
+    if not path:
+        return ToolResult("navigate_to_highlight", "", False, "error: missing <path>")
+    hl_id = (call.extra.get("id") or "").strip() or None
+    color = (call.extra.get("color") or "").strip().lower() or None
+    index_str = (call.extra.get("index") or "").strip()
+    index: int | None = None
+    if index_str:
+        try:
+            index = int(index_str)
+        except ValueError:
+            return ToolResult("navigate_to_highlight", path, False,
+                              f"error: <index> must be an integer, got {index_str!r}")
+    items = highlights.load_highlights(project_dir, path)
+    target: dict[str, Any] | None = None
+    if hl_id:
+        target = next((h for h in items if h.get("id") == hl_id), None)
+        if target is None:
+            return ToolResult("navigate_to_highlight", path, False,
+                              f"no highlight with id {hl_id!r} on {path}")
+    elif color:
+        if color not in highlights.ALLOWED_COLORS:
+            return ToolResult("navigate_to_highlight", path, False,
+                              f"error: unknown color {color!r}")
+        filtered = [h for h in items if h.get("color") == color]
+        if not filtered:
+            return ToolResult("navigate_to_highlight", path, False,
+                              f"no {color} highlights on {path}")
+        if index is not None:
+            if index < 1 or index > len(filtered):
+                return ToolResult("navigate_to_highlight", path, False,
+                                  f"index {index} out of range; {len(filtered)} {color} highlights")
+            target = filtered[index - 1]
+        else:
+            target = filtered[0]
+    else:
+        return ToolResult(
+            "navigate_to_highlight", path, False,
+            "error: must specify <id>, or <color> (with optional <index>).",
+        )
+    snippet = (target.get("snippet") or "").replace("\n", " ")
+    if len(snippet) > 120:
+        snippet = snippet[:120] + "…"
+    body = (
+        f"navigating review pane to {target['color']} highlight "
+        f"{target['id']} on {path}: \"{snippet}\""
+    )
+    # The side-effects payload is what server._handle_tool reads to
+    # emit the SSE event the front-end consumes.
+    return ToolResult(
+        "navigate_to_highlight", path, True, body,
+        side_effects={
+            "review_navigate": {
+                "path": path,
+                "id": target["id"],
+                "color": target["color"],
+                "snippet": target.get("snippet") or "",
+            },
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
 # Dispatch
 # ---------------------------------------------------------------------------
 
@@ -722,16 +868,23 @@ _DISPATCH = {
     "write_file": run_write_file,
     "shell": run_shell,
     "fetch_url": run_fetch_url,
+    "read_highlights": run_read_highlights,
+    "navigate_to_highlight": run_navigate_to_highlight,
 }
 
 # Map tool name to its per-tool "brokered" toggle. When that toggle is
 # OFF, we still run the tool but skip the broker journal entry — the
 # allowlist checks live inside the runners themselves and aren't affected.
+# Highlight tools always trace (they're tied to the broker journal by
+# the highlights module itself, so the entry shows up regardless of
+# this map; this entry just keeps the dispatch happy).
 _TRACE_TOGGLE = {
     "read_file": "read_file_brokered",
     "write_file": "write_file_brokered",
     "shell": "shell_brokered",
     "fetch_url": "fetch_url_enabled",
+    "read_highlights": "trace_log_enabled",
+    "navigate_to_highlight": "trace_log_enabled",
 }
 
 
@@ -745,6 +898,10 @@ def _trace_args_for(call: ToolCall) -> dict[str, object]:
         out["command"] = call.command
     if call.url is not None:
         out["url"] = call.url
+    # Surface any non-standard inner tags (e.g. <color>green</color>)
+    # in the journal so highlight-tool calls show their parameters.
+    for k, v in (call.extra or {}).items():
+        out[k] = v
     if call.content is not None:
         out["content"] = f"<{len(call.content)} chars>"
     return out

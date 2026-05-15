@@ -826,6 +826,13 @@ async def _handle_tool(session: Session, call: ToolCall, sink: list[tuple[str, s
         "tool",
         {"name": call.name, "key": key, "status": "ok" if result.ok else "error"},
     )
+    # Side effects: tools whose ToolResult.side_effects is non-empty
+    # are asking the server layer to do something the agent itself
+    # can't (emit an SSE event, mutate a session field, etc.).
+    # Currently used by `navigate_to_highlight` to ask the UI to
+    # scroll the open review pane to a saved highlight.
+    for kind, payload in (result.side_effects or {}).items():
+        await session.emit(kind, payload)
     session.history.append({"role": "user", "content": result.render()})
 
 

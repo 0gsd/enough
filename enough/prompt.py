@@ -37,6 +37,17 @@ file contents here
 <url>https://example.com/some-article</url>
 </tool>
 
+<tool name="read_highlights">
+<path>relative/path/to/file.md</path>
+<color>green</color>
+</tool>
+
+<tool name="navigate_to_highlight">
+<path>relative/path/to/file.md</path>
+<color>green</color>
+<index>2</index>
+</tool>
+
 Rules:
 - All paths are relative to the project directory. Absolute paths and `../`
   traversal are rejected.
@@ -60,6 +71,26 @@ Rules:
 - All tool calls flow through the broker, which writes a journal entry to
   `rness/knowledge/session-logs/<date>-broker.md`. You don't write that
   file directly; the harness does.
+
+## Working with review-mode color highlights
+
+Review mode (the full-frame markdown reader) lets the user paint
+sections of a document in four colors — yellow, green, blue, pink —
+which persist across sessions in a per-doc dotted JSON sidecar
+(`<dirname>/.<filename>.highlights.json`). When the user references a
+color ("the pink words", "all the green sections", "edit the yellow
+parts one by one"), they are talking about these highlights.
+
+- `read_highlights` returns the current highlights for a document,
+  optionally filtered by color. Use it whenever a color is named —
+  don't guess what's highlighted.
+- `navigate_to_highlight` asks the UI to scroll the open review pane
+  to a specific saved highlight. Use it when working through a set
+  ("now the second green one") so the user can see what you're
+  about to act on.
+- For "edit the green sections one by one" workflows: read all green
+  highlights, then for each, navigate to it, propose / apply the
+  edit, confirm with the user, navigate to the next.
 
 ## Keep going until the request is fulfilled
 

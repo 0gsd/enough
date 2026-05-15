@@ -1266,6 +1266,20 @@
       border-color: var(--accent-user);
     }
 
+    /* Disabled state — applied per-button when the current selection
+       can't be operated on by that control (e.g. format buttons when
+       the selection spans paragraphs, where source-rewrites would
+       mis-target). The toolbar itself stays visible. */
+    #review-mode .review-toolbar button:disabled,
+    #review-mode .review-toolbar select:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      filter: grayscale(0.5);
+    }
+    #review-mode .review-toolbar button:disabled:hover {
+      border-color: var(--border);
+    }
+
     #review-mode .review-toolbar select {
       background: var(--bg);
       color: var(--fg);
@@ -3510,6 +3524,34 @@
 
     es.addEventListener('ping', () => { /* heartbeat */ });
 
+    // Agent-driven review-mode navigation (Phase 4a):
+    // navigate_to_highlight emits this event so the UI can scroll the
+    // open review pane to a specific saved highlight. We find the
+    // highlight's wrapped span by its dataset.hlId, scroll it into
+    // the middle of the viewport, and pulse a brief outline so the
+    // user can see WHERE the agent is pointing them.
+    es.addEventListener('review_navigate', (e) => {
+      try {
+        const { id, path, snippet } = JSON.parse(e.data);
+        const root = document.getElementById('review-mode');
+        if (!root.classList.contains('open')) return;          // ignore if review mode isn't open
+        if (REVIEW_PATH !== path) return;                       // ignore if user is on a different doc
+        // Find the wrapped highlight span by id. May be split
+        // across multiple .hl spans for the same highlight (one per
+        // text node touched by the wrap pass) — pick the first.
+        const target = document.querySelector(
+          `#review-body span.hl[data-hl-id="${CSS.escape(id)}"]`
+        );
+        if (!target) return;
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Brief pulse so the user notices the destination.
+        target.style.transition = 'box-shadow 200ms ease';
+        const orig = target.style.boxShadow;
+        target.style.boxShadow = '0 0 0 3px var(--fg)';
+        setTimeout(() => { target.style.boxShadow = orig; }, 1200);
+      } catch (_) { /* ignore parse errors */ }
+    });
+
     es.addEventListener('usage', (e) => {
       try {
         LAST_USAGE = JSON.parse(e.data);
@@ -3885,31 +3927,48 @@
     // underline, change the block's heading level, or jump out to the
     // textarea editor with the selection re-applied.
 
-    function getReviewSelection() {
-      // Returns null when nothing useful is selected (collapsed, empty,
-      // outside review-body, or spanning multiple blocks). On success
-      // returns {block, blockIdx, range, text, plainStartInBlock,
-      // plainEndInBlock} — enough to do source-position rewrites.
+    // Permissive: returns {range, text} for ANY non-empty selection that
+    // lives inside the review body, regardless of whether it spans
+    // blocks. Drives toolbar visibility, the highlight color circles,
+    // the edit-mode jump, and (Phase 4b) the chat-pill preamble
+    // injection. Never returns null when the user has visibly
+    // selected text inside the document — the visibility regression
+    // we're fixing was exactly the opposite.
+    function getAnyReviewSelection() {
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
       const range = sel.getRangeAt(0);
       const body = document.getElementById('review-body');
-      if (!body || !body.contains(range.commonAncestorContainer)) return null;
+      if (!body) return null;
+      // We accept the selection if EITHER endpoint or the common
+      // ancestor sits inside the review body. The previous gate
+      // (commonAncestorContainer must be inside body) was too strict
+      // because a click-and-drag from the body to the chat pill (or
+      // out past the document) bumps the common ancestor up to a
+      // shared parent above #review-body.
+      const inBody = (n) => n && (n === body || body.contains(n));
+      if (!(inBody(range.commonAncestorContainer)
+            || inBody(range.startContainer)
+            || inBody(range.endContainer))) return null;
       const text = range.toString();
       if (!text || !text.trim()) return null;
+      return { range, text };
+    }
 
-      // Find the block element via the common ancestor's nearest
-      // [data-block-idx] ancestor.
+    // Strict: returns the block-aware selection info needed for
+    // source-rewrite operations (format edits, heading change). Null
+    // when the selection spans multiple blocks, sits in a code/hr
+    // block, or otherwise isn't safe to rewrite. Format buttons grey
+    // out when this returns null; the toolbar itself stays visible.
+    function getSingleBlockSelection() {
+      const any = getAnyReviewSelection();
+      if (!any) return null;
+      const range = any.range;
       let common = range.commonAncestorContainer;
       if (common.nodeType === 3) common = common.parentNode;
       const block = common.closest('[data-block-idx]');
       if (!block) return null;
       const blockIdx = +block.dataset.blockIdx;
-
-      // Multi-block selections aren't supported in Phase 2 — bail so
-      // the toolbar stays hidden rather than producing weird output.
-      // (Anchor block === focus block is the safe single-block
-      // condition.)
       const startBlock = (range.startContainer.nodeType === 3
         ? range.startContainer.parentNode
         : range.startContainer).closest('[data-block-idx]');
@@ -3917,23 +3976,24 @@
         ? range.endContainer.parentNode
         : range.endContainer).closest('[data-block-idx]');
       if (startBlock !== endBlock) return null;
-
-      // Compute the rendered text offsets of the selection within the
-      // block. We walk text nodes inside the block, accumulating
-      // character counts until we reach startContainer / endContainer.
       const plainStart = textOffsetInBlock(block, range.startContainer, range.startOffset);
       const plainEnd = textOffsetInBlock(block, range.endContainer, range.endOffset);
       if (plainStart < 0 || plainEnd < 0) return null;
-
       return {
         block,
         blockIdx,
         range,
-        text,
+        text: any.text,
         plainStartInBlock: Math.min(plainStart, plainEnd),
         plainEndInBlock: Math.max(plainStart, plainEnd),
       };
     }
+
+    // Back-compat shim: existing call sites (applyFormat, applyHeading,
+    // applyEditModeJump, the highlight src-position hint logic) used
+    // the old strict `getReviewSelection`. Keep them pointed at the
+    // strict variant so their semantics don't change.
+    const getReviewSelection = getSingleBlockSelection;
 
     function textOffsetInBlock(blockEl, container, offset) {
       // Walks DOM text nodes inside blockEl in document order; returns
@@ -4130,6 +4190,17 @@
 
     // Show / hide the toolbar based on the current selection. Called
     // from the document-level selectionchange listener.
+    //
+    // Visibility uses the PERMISSIVE check: any non-empty selection
+    // inside the review body shows the toolbar. Individual buttons
+    // grey out when their preconditions don't hold:
+    //   - Format buttons + heading dropdown: require a single-block
+    //     selection in a paragraph or heading. Multi-block selections
+    //     (which the user normally makes when highlighting across
+    //     paragraphs) leave the format group disabled but keep the
+    //     color circles + edit-mode button live.
+    //   - Color circles + edit-mode button: always live whenever the
+    //     toolbar is visible.
     function refreshReviewToolbar() {
       const root = document.getElementById('review-mode');
       const toolbar = document.getElementById('review-toolbar');
@@ -4137,21 +4208,32 @@
         toolbar.hidden = true;
         return;
       }
-      const sel = getReviewSelection();
-      if (!sel) {
+      const any = getAnyReviewSelection();
+      if (!any) {
         toolbar.hidden = true;
         return;
       }
       toolbar.hidden = false;
-      // Reset heading dropdown to reflect the block's current level.
+
+      // Format / heading: gated on single-block + p/heading.
+      const single = getSingleBlockSelection();
+      const block = single ? REVIEW_BLOCKS[single.blockIdx] : null;
+      const formatOk = block && (block.type === 'p' || block.type === 'heading');
+      document.querySelectorAll('#review-toolbar button[data-fmt]').forEach(btn => {
+        btn.disabled = !formatOk;
+      });
       const headingSel = document.getElementById('rt-heading');
-      const block = REVIEW_BLOCKS[sel.blockIdx];
+      headingSel.disabled = !formatOk;
       if (block && block.type === 'heading') {
         const level = block.raw.match(/^(#{1,6})\s+/)[1].length;
         headingSel.value = String(level);
       } else {
         headingSel.value = '';
       }
+      // Color circles: always interactive when the toolbar is visible.
+      // Their "active" state (border ring) is set in the wrapper
+      // installed below to reflect which colors already cover the
+      // selection.
     }
 
     function hideReviewToolbar() {
