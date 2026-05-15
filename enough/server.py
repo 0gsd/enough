@@ -1353,9 +1353,64 @@ def create_app(
         if target.is_dir():
             raise HTTPException(400, "is a directory")
         target.parent.mkdir(parents=True, exist_ok=True)
+        # Stash the previous contents so the user-side "undo last
+        # edit" affordance (Phase 4b) can revert. Cheap; no-op when
+        # the file doesn't exist yet.
+        from . import tools as _tools
+        _tools.stash_for_undo(target)
         target.write_text(str(content), encoding="utf-8")
         # Return the re-rendered preview fragment so the UI can swap it in.
         return await api_file(path=path)  # type: ignore[return-value]
+
+    @app.post("/api/file/undo", response_class=HTMLResponse)
+    async def api_file_undo(request: Request) -> HTMLResponse:
+        """Restore a file from its `.<filename>.undo` sibling and
+        delete the stash. Returns the re-rendered preview fragment so
+        the UI can swap it in just like a save would. 404 when no
+        undo is available — the UI uses that to grey out the button."""
+        form = await request.form()
+        path = (form.get("path") or "").strip()
+        if not path:
+            raise HTTPException(400, "missing path")
+        target = _resolve_project_path(path)
+        from . import tools as _tools
+        undo = _tools._undo_path(target)
+        if not undo.is_file():
+            raise HTTPException(404, "no undo stash for this path")
+        try:
+            prior = undo.read_bytes()
+        except OSError as e:
+            raise HTTPException(500, f"undo unreadable: {e}") from None
+        try:
+            target.write_bytes(prior)
+        except OSError as e:
+            raise HTTPException(500, f"could not restore: {e}") from None
+        try:
+            undo.unlink()
+        except OSError:
+            pass    # leaving a stale stash is harmless; just log via the warning above if needed
+        return await api_file(path=path)  # type: ignore[return-value]
+
+    @app.post("/api/file/dismiss-undo")
+    async def api_file_dismiss_undo(request: Request) -> dict[str, Any]:
+        """Drop the `.undo` stash without restoring — the user clicked
+        "save" / "looks good", and we honor that by closing the door
+        on undoing this edit later. Idempotent."""
+        form = await request.form()
+        path = (form.get("path") or "").strip()
+        if not path:
+            raise HTTPException(400, "missing path")
+        target = _resolve_project_path(path)
+        from . import tools as _tools
+        undo = _tools._undo_path(target)
+        removed = False
+        if undo.is_file():
+            try:
+                undo.unlink()
+                removed = True
+            except OSError as e:
+                raise HTTPException(500, f"could not dismiss: {e}") from None
+        return {"path": path, "dismissed": removed}
 
     @app.post("/api/chat", response_class=HTMLResponse)
     async def api_chat(request: Request) -> HTMLResponse:

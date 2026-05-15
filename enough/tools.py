@@ -397,6 +397,38 @@ def run_read_file(project_dir: Path, call: ToolCall) -> ToolResult:
     return ToolResult("read_file", call.path, True, text)
 
 
+def _undo_path(target: Path) -> Path:
+    """Sibling dotfile that holds the file's previous contents so the
+    most recent write can be reverted. One-deep stash — Phase 4b ships
+    the simplest version of "save or undo"; a future deeper history
+    can layer on top without changing the call sites here."""
+    return target.parent / f".{target.name}.undo"
+
+
+def stash_for_undo(target: Path) -> bool:
+    """Copy `target`'s current contents to its `.undo` sibling so a
+    subsequent revert is possible. No-op when the target doesn't exist
+    (a fresh write has nothing to undo back to). Returns True iff a
+    stash was actually written.
+
+    Called by both write paths (the agent's `write_file` tool and the
+    UI's POST /api/file save) so any write is undoable, not just edits
+    initiated from review mode."""
+    if not target.is_file():
+        return False
+    try:
+        prior = target.read_bytes()
+    except OSError:
+        return False
+    undo = _undo_path(target)
+    try:
+        undo.write_bytes(prior)
+    except OSError as e:
+        log.warning("could not write undo stash for %s: %s", target, e)
+        return False
+    return True
+
+
 def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
     if not call.path:
         return ToolResult("write_file", "", False, "error: missing <path>")
@@ -418,6 +450,11 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
     if body.startswith("\n"):
         body = body[1:]
     target.parent.mkdir(parents=True, exist_ok=True)
+    # Always stash the previous contents so the most recent write can
+    # be undone — the user-facing "save or undo?" affordance in
+    # review mode reads this. Cheap (one extra small file write per
+    # write_file) and safe (no-op for newly-created files).
+    stash_for_undo(target)
     try:
         target.write_text(body, encoding="utf-8")
     except OSError as e:

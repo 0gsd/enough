@@ -1147,6 +1147,51 @@
     #review-mode .review-chat-tail .msg.system .body,
     #review-mode .review-chat-tail .msg.rness .body { color: var(--fg-muted); font-style: italic; }
 
+    /* Save/undo affordance sits between the chat tail and the input
+       row. Hidden by default; shown only after an agent write_file
+       lands on the document currently open in review mode. */
+    #review-mode .review-undo-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: color-mix(in oklab, var(--accent-tool) 12%, transparent);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--fg);
+    }
+    #review-mode .review-undo-bar[hidden] { display: none; }
+    #review-mode .review-undo-bar .lbl { flex: 1; }
+    #review-mode .review-undo-bar code {
+      background: transparent;
+      color: var(--fg-muted);
+      font-size: 11px;
+    }
+    #review-mode .review-undo-bar button {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12px;
+    }
+    #review-mode .review-undo-bar #review-undo-keep {
+      background: var(--accent-agent);
+      color: var(--bg);
+      border-color: var(--accent-agent);
+      font-weight: 600;
+    }
+    #review-mode .review-undo-bar #review-undo-revert {
+      background: var(--accent-error);
+      color: var(--bg);
+      border-color: var(--accent-error);
+      font-weight: 600;
+    }
+    #review-mode .review-undo-bar button:hover { filter: brightness(1.08); }
+
     #review-mode .review-chat-form {
       display: flex;
       gap: 6px;
@@ -2282,6 +2327,16 @@
             <span class="toggle" id="review-chat-toggle">▾</span>
           </div>
           <div class="review-chat-tail" id="review-chat-tail"></div>
+          <!-- Save / undo affordance: appears after the agent's turn
+               ends if a write_file landed on the document currently
+               open in review mode. Honors the "this is theatre" spec
+               from Phase 4 — the file is already saved on disk; the
+               .undo sidecar is what makes "undo" possible. -->
+          <div class="review-undo-bar" id="review-undo-bar" hidden>
+            <span class="lbl">agent edited <code id="review-undo-path"></code> — keep it?</span>
+            <button type="button" id="review-undo-keep">✓ save</button>
+            <button type="button" id="review-undo-revert">↶ undo</button>
+          </div>
           <form class="review-chat-form" id="review-chat-form"
                 onsubmit="event.preventDefault(); sendFromReviewChat();">
             <textarea id="review-chat-input" rows="2"
@@ -3476,6 +3531,19 @@
               });
             }
           }
+          // Phase 4b: if review mode is open AND this write targeted
+          // the doc the user is reviewing, remember it so the
+          // save/undo bar surfaces when the agent's turn ends.
+          const reviewRoot = document.getElementById('review-mode');
+          if (reviewRoot && reviewRoot.classList.contains('open')
+              && REVIEW_PATH === key
+              && typeof showReviewUndoBar === 'function') {
+            REVIEW_LAST_AGENT_WRITE = key;
+            // Surface immediately — the user sees the bar as soon as
+            // the edit lands, not at end-of-turn (which could be
+            // many tool calls later for big edits).
+            showReviewUndoBar(key);
+          }
         }
       }
       autoscroll();
@@ -3911,7 +3979,32 @@
       const main = document.getElementById('message');
       const form = document.getElementById('chat-form');
       if (!main || !form) return;
-      main.value = text;
+      // Phase 4b: if the user has an active text selection in the
+      // review body when they submit, prepend a context preamble to
+      // the message so the agent knows what they're pointing at.
+      // Convention is `[review-mode selection in <path>, line N]\n```\n<text>\n```\n\n<user's message>`
+      // — visible in the chat (the user can verify what was attached)
+      // and parseable by the agent (its prompt explains the convention).
+      let outgoing = text;
+      const sel = (typeof getAnyReviewSelection === 'function')
+        ? getAnyReviewSelection() : null;
+      if (sel && REVIEW_PATH) {
+        let lineHint = '';
+        const single = (typeof getSingleBlockSelection === 'function')
+          ? getSingleBlockSelection() : null;
+        if (single) {
+          const block = REVIEW_BLOCKS[single.blockIdx];
+          if (block) {
+            const lineNum = REVIEW_SOURCE.slice(0, block.start).split('\n').length;
+            lineHint = `, line ${lineNum}`;
+          }
+        }
+        outgoing =
+          '[review-mode selection in ' + REVIEW_PATH + lineHint + ']\n' +
+          '```\n' + sel.text + '\n```\n\n' +
+          text;
+      }
+      main.value = outgoing;
       // Trigger an htmx submit on the existing form — same code path
       // as if the user typed in the main chat box and pressed send.
       htmx.trigger(form, 'submit');
@@ -4522,6 +4615,89 @@
         e.preventDefault();
         applyHighlight(btn.dataset.color);
       });
+    });
+
+    // ---------- Phase 4b: save / undo affordance for agent edits ----------
+    //
+    // When a write_file lands on the document currently open in review
+    // mode (tracked via the SSE `tool` event), we surface a save/undo
+    // bar in the chat pill. "Save" dismisses the .undo stash so the
+    // edit can no longer be reverted; "Undo" POSTs to /api/file/undo
+    // which restores from the stash. Both then re-render the body.
+    //
+    // One-deep undo: the stash always reflects the most recent write.
+    // A subsequent agent edit overwrites it, so only the last edit is
+    // revertable. Sufficient for the "save or undo?" UX the spec
+    // describes; deeper history is a future enhancement.
+
+    let REVIEW_LAST_AGENT_WRITE = null;     // path of the most recent write_file in this turn
+
+    function showReviewUndoBar(path) {
+      const bar = document.getElementById('review-undo-bar');
+      document.getElementById('review-undo-path').textContent = path;
+      bar.hidden = false;
+      // Re-render the document so the user can see the agent's edit.
+      // We pass through the same load+render path as enterReviewMode,
+      // minus the wholesale state reset.
+      reloadReviewBody();
+    }
+
+    function hideReviewUndoBar() {
+      const bar = document.getElementById('review-undo-bar');
+      bar.hidden = true;
+      REVIEW_LAST_AGENT_WRITE = null;
+    }
+
+    async function reloadReviewBody() {
+      // Fetch the current source from disk and re-render. Used after
+      // an agent edit (so the user sees the change) and after an
+      // undo (so the user sees the revert).
+      if (!REVIEW_PATH) return;
+      try {
+        const r = await fetch('/api/file/raw?path=' + encodeURIComponent(REVIEW_PATH));
+        if (!r.ok) return;
+        const raw = await r.text();
+        REVIEW_SOURCE = raw;
+        const body = document.getElementById('review-body');
+        const scrollY = body.scrollTop;
+        const rendered = renderMarkdown(raw);
+        REVIEW_BLOCKS = rendered.blocks;
+        body.innerHTML = rendered.html;
+        await loadHighlightsForReview();
+        renderHighlights();
+        body.scrollTop = scrollY;
+      } catch (_) { /* transient — let next event try again */ }
+    }
+
+    document.getElementById('review-undo-keep').addEventListener('click', async () => {
+      const path = REVIEW_LAST_AGENT_WRITE;
+      if (!path) { hideReviewUndoBar(); return; }
+      try {
+        const fd = new FormData();
+        fd.append('path', path);
+        await fetch('/api/file/dismiss-undo', { method: 'POST', body: fd });
+      } catch (_) { /* best-effort; bar dismisses either way */ }
+      hideReviewUndoBar();
+    });
+
+    document.getElementById('review-undo-revert').addEventListener('click', async () => {
+      const path = REVIEW_LAST_AGENT_WRITE;
+      if (!path) { hideReviewUndoBar(); return; }
+      try {
+        const fd = new FormData();
+        fd.append('path', path);
+        const r = await fetch('/api/file/undo', { method: 'POST', body: fd });
+        if (!r.ok) {
+          alert('undo failed: ' + r.status + ' ' + r.statusText);
+          return;
+        }
+        // Restored on disk; refresh the in-memory view.
+        await reloadReviewBody();
+      } catch (e) {
+        alert('undo failed: ' + e.message);
+        return;
+      }
+      hideReviewUndoBar();
     });
 
     // Extend the existing toolbar refresh to also paint color buttons

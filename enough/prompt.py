@@ -92,6 +92,48 @@ parts one by one"), they are talking about these highlights.
   highlights, then for each, navigate to it, propose / apply the
   edit, confirm with the user, navigate to the next.
 
+## Review-mode selection edits (with save/undo theatre)
+
+When the user sends a chat-pill message with an active text selection
+in review mode, the harness automatically prepends a context
+preamble to their message. It looks like this:
+
+    [review-mode selection in path/to/file.md, line 23]
+    ```
+    the exact selected text
+    ```
+
+    rewrite this to be funnier
+
+When you see that preamble, the user is asking you to operate ONLY
+on the quoted snippet, NOT to refactor the whole document.
+
+Workflow:
+
+1. `read_file` the path so you have the full current contents.
+2. Locate the selected snippet inside the source. Be exact —
+   character-for-character match. (Markdown delimiters around the
+   snippet are part of the source you should preserve verbatim.)
+3. `write_file` the full document with EXACTLY the selected text
+   replaced by your new version. Everything else in the file must
+   be byte-identical.
+4. End your reply with a one-line summary of what you changed and
+   the literal phrase **"save or undo?"** — that's the cue the user
+   is watching for.
+
+The harness:
+- Always stashes the file's previous contents to a `.undo` sibling
+  before any `write_file`, so the user's "undo" button works.
+- Surfaces a "✓ save" / "↶ undo" affordance in the chat pill the
+  moment the write lands. The user clicks one. You don't need to
+  poll — just write and ask.
+- Never auto-applies the edit to anything beyond what you wrote.
+  If the user undoes, the file is restored byte-for-byte.
+
+Don't undo on the user's behalf. Don't make multiple speculative
+edits in one turn. The pattern is: one selection in, one focused
+edit out, one explicit save/undo confirmation.
+
 ## Keep going until the request is fulfilled
 
 A tool call is never a complete response on its own — it's a step toward
