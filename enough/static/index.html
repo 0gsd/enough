@@ -120,10 +120,36 @@
       line-height: 1;
     }
 
-    /* Pushes the right-side counters (Commit 2) away from the left
-       button cluster — flex spacer eats the available width. */
+    /* Pushes the right-side counters away from the left button
+       cluster — flex spacer eats the available width. */
     .topbar .topbar-spacer {
       flex: 1 1 auto;
+    }
+
+    /* Document stat counters. Hidden when no document is active
+       (no preview, no edit-mode textarea, no review mode). Each
+       .dc has a small glyph (¶ / W / C) + a value. */
+    .topbar .doc-counters {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+    .topbar .doc-counters[hidden] { display: none; }
+    .topbar .doc-counters .dc {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .topbar .doc-counters .dc-glyph {
+      color: var(--fg-faint);
+      font-weight: 600;
+    }
+    .topbar .doc-counters .dc-val {
+      color: var(--fg);
     }
 
     /* ---------- Main layout ---------- */
@@ -2559,8 +2585,21 @@
       <span class="ctx"></span>
       <span class="model-gauge"><span class="fill"></span></span>
     </button>
-    <!-- Right half: document stat counters (Commit 2 fills these in) -->
+    <!-- Right half: document stat counters. Visible only when a
+         document is active (preview, edit, or review mode). The three
+         readouts are ¶ (paragraphs), W (words), C (characters). -->
     <span class="topbar-spacer"></span>
+    <div class="doc-counters" id="doc-counters" hidden>
+      <span class="dc" title="paragraphs (blank-line separated blocks)">
+        <span class="dc-glyph">¶</span><span class="dc-val" id="doc-paras">0</span>
+      </span>
+      <span class="dc" title="words (whitespace separated)">
+        <span class="dc-glyph">W</span><span class="dc-val" id="doc-words">0</span>
+      </span>
+      <span class="dc" title="characters (including spaces and newlines)">
+        <span class="dc-glyph">C</span><span class="dc-val" id="doc-chars">0</span>
+      </span>
+    </div>
     <!-- Exit-review button stays right-most so muscle memory lands. -->
     <button id="exit-review-btn" title="Exit review mode (esc)">× exit review</button>
   </div>
@@ -4378,6 +4417,9 @@
       // Sync the context chip to current state (typically nothing
       // queued at entry, but the entry-state should still match).
       updateReviewChatChip();
+      // Refresh the topbar's document stat counters now that we have
+      // a document loaded into REVIEW_SOURCE.
+      updateDocCounters();
       // Wire the input to the same submission flow as the main chat.
       // (sendFromReviewChat reuses the existing /api/chat hx-post.)
     }
@@ -4394,6 +4436,10 @@
       LAST_REVIEW_SELECTION = null;
       // Hide the context chip — its content no longer applies.
       if (typeof updateReviewChatChip === 'function') updateReviewChatChip();
+      // Refresh the doc counters — review-mode source is gone now;
+      // they'll fall through to the preview pane if a file is open
+      // there, otherwise hide.
+      if (typeof updateDocCounters === 'function') updateDocCounters();
       // Per spec: exiting closes the file completely (does NOT drop into
       // preview mode). The user is back at the regular chat view with
       // the full session history intact.
@@ -4800,6 +4846,8 @@
       // unchanged.
       renderHighlights();
       body.scrollTop = scrollY;
+      // Refresh topbar doc counters since REVIEW_SOURCE just changed.
+      if (typeof updateDocCounters === 'function') updateDocCounters();
     }
 
     async function replaceBlockAndSave(blockIdx, newBlockRaw) {
@@ -5043,6 +5091,71 @@
     document.addEventListener('selectionchange', () => {
       captureLastReviewSelection();
       refreshReviewToolbar();
+    });
+
+    // ---------- Document stat counters (¶ / W / C) ----------
+    //
+    // Pinned to the right side of the topbar. Shown whenever a
+    // document is active in any of three places:
+    //   - review mode (uses REVIEW_SOURCE)
+    //   - preview-edit mode (uses the live textarea value)
+    //   - preview pane read-only (uses the .file-body textContent)
+    // Updated via a MutationObserver on #preview-body (catches
+    // file loads, save/cancel, agent writes) plus a document-level
+    // input listener (catches live typing in the textarea). Review-
+    // mode call sites poke updateDocCounters directly since their
+    // source lives in a JS variable, not the DOM.
+    function updateDocCounters() {
+      const wrap = document.getElementById('doc-counters');
+      if (!wrap) return;
+      let source = null;
+      const reviewOpen = document.getElementById('review-mode')?.classList.contains('open');
+      if (reviewOpen && typeof REVIEW_SOURCE === 'string' && REVIEW_PATH) {
+        source = REVIEW_SOURCE;
+      } else {
+        const ta = document.querySelector('#preview-body textarea.file-edit');
+        if (ta) {
+          source = ta.value;
+        } else {
+          const fileBody = document.querySelector('#preview-body .file-body');
+          if (fileBody) source = fileBody.textContent;
+        }
+      }
+      if (source == null) {
+        wrap.hidden = true;
+        return;
+      }
+      wrap.hidden = false;
+      // Paragraphs: non-empty blank-line-separated blocks. Catches
+      // headings, list groups, code blocks, etc. — anything readers
+      // intuitively call a "paragraph" maps cleanly.
+      const paras = source.split(/\n\s*\n/).filter(p => p.trim()).length;
+      const trimmed = source.trim();
+      const words = trimmed ? trimmed.split(/\s+/).length : 0;
+      const chars = source.length;
+      document.getElementById('doc-paras').textContent = paras.toLocaleString();
+      document.getElementById('doc-words').textContent = words.toLocaleString();
+      document.getElementById('doc-chars').textContent = chars.toLocaleString();
+    }
+    window.updateDocCounters = updateDocCounters;
+
+    // Watch the preview pane for any content change (htmx swaps from
+    // file clicks, edit-mode enter/exit, post-write_file refresh).
+    // Subtree + characterData catches partial mutations like the
+    // file-body textContent updating in place.
+    (function attachDocCounterObserver() {
+      const target = document.getElementById('preview-body');
+      if (!target) return;
+      const obs = new MutationObserver(() => updateDocCounters());
+      obs.observe(target, { childList: true, subtree: true, characterData: true });
+    })();
+
+    // Live updates while the user (or agent) is typing in the
+    // preview-edit textarea.
+    document.addEventListener('input', (e) => {
+      if (e.target && e.target.matches && e.target.matches('textarea.file-edit')) {
+        updateDocCounters();
+      }
     });
 
     // ---------- Global keyboard shortcuts (documented in the UI modal) ----------
@@ -5872,6 +5985,7 @@
         await loadHighlightsForReview();
         renderHighlights();
         body.scrollTop = scrollY;
+        if (typeof updateDocCounters === 'function') updateDocCounters();
       } catch (_) { /* transient — let next event try again */ }
     }
 
