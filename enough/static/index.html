@@ -1137,6 +1137,24 @@
       padding-right: max(48px, calc(50% - 380px - 16px));
     }
 
+    /* Viewport-position cursor: a slim solid bar overlaid on the
+       linenav that tracks where the user is scrolled in the document.
+       Updated on scroll. Solid color so it pops out from the dotted
+       row pattern below it. Uses --accent-user (a theme-defined
+       readable accent) so it stays visible across all themes. */
+    #review-mode .review-linenav .ln-cursor {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent-user);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+      transform: translateY(-50%);
+      transition: top 60ms linear;
+      z-index: 26;
+    }
+
     /* The bottom chat pill: docked to the bottom of the review pane,
        collapsible, vertically resizable. When collapsed only a slim
        ribbon remains, with an obvious chevron to re-expand. */
@@ -4398,46 +4416,121 @@
       return { plain, positions, prefixLen };
     }
 
-    // Apply a format wrap (bold | italic | underline) to the current
-    // selection. Single-block only; ignores no-ops (empty selection).
-    //
-    // v1 limitation: only supported inside paragraphs and headings.
-    // Lists, blockquotes, and code blocks are rejected silently
-    // because their multi-line / per-line-marker source structure
-    // would mis-target the rewrite. Phase 3 will revisit.
-    async function applyFormat(kind) {
-      const sel = getReviewSelection();
-      if (!sel) return;
-      const block = REVIEW_BLOCKS[sel.blockIdx];
-      if (!block) return;
-      if (block.type !== 'p' && block.type !== 'heading') return;
+    // Returns [{idx, type, block, el}] for every block the current
+    // live selection touches, in document order. Powers the gating
+    // logic in refreshReviewToolbar (Phase 5d) and the multi-block
+    // applyFormat path. Empty list when no selection / no blocks
+    // intersect.
+    function getSelectedBlocks() {
+      const any = getAnyReviewSelection();
+      if (!any) return [];
+      const body = document.getElementById('review-body');
+      if (!body) return [];
+      const out = [];
+      const blockEls = body.querySelectorAll('[data-block-idx]');
+      for (const el of blockEls) {
+        let intersects = false;
+        try {
+          intersects = any.range.intersectsNode(el);
+        } catch (_) { /* defensive */ }
+        if (!intersects) continue;
+        const idx = +el.dataset.blockIdx;
+        const block = REVIEW_BLOCKS[idx];
+        if (!block) continue;
+        out.push({ idx, type: block.type, block, el });
+      }
+      return out;
+    }
 
-      const map = buildBlockPlainMap(block.raw);
-      // Translate rendered offsets to source offsets within the block.
-      const srcStart = map.positions[sel.plainStartInBlock];
-      const srcEndChar = map.positions[sel.plainEndInBlock - 1];
-      if (srcStart == null || srcEndChar == null) return;
-      const srcEnd = srcEndChar + 1;
+    // Apply a format wrap (bold | italic | underline) to the current
+    // selection.
+    //
+    // Single-block selection: wraps the selection text in the block's
+    // source. Multi-block selection (all-paragraph blocks only):
+    // wraps the selection's portion within EACH block separately
+    // (markdown emphasis can't span blank-line block boundaries, so
+    // we get e.g. "**para 1 end**\n\n**para 2 start**"). Heading
+    // blocks are only formatted when they're the ONLY block in the
+    // selection — mixing a heading with anything else is rejected
+    // at the toolbar gate (refreshReviewToolbar).
+    //
+    // Lists, blockquotes, and code blocks remain rejected — their
+    // per-line markers in the source would mis-target the rewrite.
+    async function applyFormat(kind) {
+      const live = getAnyReviewSelection();
+      if (!live) return;
+      const blocks = getSelectedBlocks();
+      if (blocks.length === 0) return;
+      const allP = blocks.every(b => b.type === 'p');
+      const singleHeading = blocks.length === 1 && blocks[0].type === 'heading';
+      if (!allP && !singleHeading) return;
 
       const open = kind === 'bold' ? '**' : kind === 'italic' ? '*' : '<u>';
       const close = kind === 'bold' ? '**' : kind === 'italic' ? '*' : '</u>';
-      const newBlockRaw =
-        block.raw.slice(0, srcStart) + open +
-        block.raw.slice(srcStart, srcEnd) + close +
-        block.raw.slice(srcEnd);
 
-      await replaceBlockAndSave(sel.blockIdx, newBlockRaw);
+      // Process blocks in REVERSE source order so each per-block
+      // rewrite leaves earlier source offsets untouched.
+      let newSource = REVIEW_SOURCE;
+      for (let i = blocks.length - 1; i >= 0; i--) {
+        const b = blocks[i];
+        // Determine the rendered-text extent within THIS block:
+        //   - first selected block: from selection start to end of block text
+        //   - last selected block:  from start of block text to selection end
+        //   - middle blocks:        full block text
+        let plainStart, plainEnd;
+        if (i === 0) {
+          plainStart = textOffsetInBlock(
+            b.el, live.range.startContainer, live.range.startOffset);
+        } else {
+          plainStart = 0;
+        }
+        if (i === blocks.length - 1) {
+          plainEnd = textOffsetInBlock(
+            b.el, live.range.endContainer, live.range.endOffset);
+        } else {
+          plainEnd = totalTextLength(b.el);
+        }
+        if (plainStart < 0 || plainEnd < 0) continue;
+        const [pStart, pEnd] = [Math.min(plainStart, plainEnd),
+                                Math.max(plainStart, plainEnd)];
+        if (pStart >= pEnd) continue;
+        const map = buildBlockPlainMap(b.block.raw);
+        const s = map.positions[pStart];
+        const eChar = map.positions[pEnd - 1];
+        if (s == null || eChar == null) continue;
+        const e = eChar + 1;
+        const newBlockRaw =
+          b.block.raw.slice(0, s) + open +
+          b.block.raw.slice(s, e) + close +
+          b.block.raw.slice(e);
+        newSource =
+          newSource.slice(0, b.block.start) + newBlockRaw +
+          newSource.slice(b.block.end);
+      }
+      await saveAndRerender(newSource);
+    }
+
+    function totalTextLength(el) {
+      let n = 0;
+      const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      while (true) {
+        const t = w.nextNode();
+        if (!t) break;
+        n += t.nodeValue.length;
+      }
+      return n;
     }
 
     // Apply a heading level (0 = paragraph, 1/2/3 = h1/h2/h3) to the
     // selection's block. Headings replace the block's leading marker;
-    // they're not selection-relative.
+    // they're not selection-relative. Single-block only — multi-block
+    // heading conversions would be a stretch and the toolbar gate
+    // disables the dropdown anyway.
     async function applyHeading(level) {
       const sel = getReviewSelection();
       if (!sel) return;
       const block = REVIEW_BLOCKS[sel.blockIdx];
       if (!block) return;
-      // Same v1 limitation as applyFormat.
       if (block.type !== 'p' && block.type !== 'heading') return;
       // Strip any existing leading heading marker.
       let body = block.raw.replace(/^(#{1,6})\s+/, '');
@@ -4445,15 +4538,9 @@
       await replaceBlockAndSave(sel.blockIdx, newBlockRaw);
     }
 
-    // Save the rewritten source back to disk via the existing
-    // /api/file POST endpoint, then re-render the review pane from
-    // the new source. Keeps the user's scroll position so the edit
-    // doesn't yank them away from where they were working.
-    async function replaceBlockAndSave(blockIdx, newBlockRaw) {
-      const block = REVIEW_BLOCKS[blockIdx];
-      const newSource =
-        REVIEW_SOURCE.slice(0, block.start) + newBlockRaw +
-        REVIEW_SOURCE.slice(block.end);
+    // Generic save-and-rerender used by both the single-block path
+    // (replaceBlockAndSave) and the multi-block applyFormat path.
+    async function saveAndRerender(newSource) {
       const fd = new FormData();
       fd.append('path', REVIEW_PATH);
       fd.append('content', newSource);
@@ -4462,7 +4549,6 @@
         alert('save failed: ' + r.status + ' ' + r.statusText);
         return;
       }
-      // Re-render in place. Preserve scroll position.
       const body = document.getElementById('review-body');
       const scrollY = body.scrollTop;
       REVIEW_SOURCE = newSource;
@@ -4476,9 +4562,14 @@
       // unchanged.
       renderHighlights();
       body.scrollTop = scrollY;
-      // Selection is gone after re-render; toolbar will hide on the
-      // next selectionchange tick.
-      hideReviewToolbar();
+    }
+
+    async function replaceBlockAndSave(blockIdx, newBlockRaw) {
+      const block = REVIEW_BLOCKS[blockIdx];
+      const newSource =
+        REVIEW_SOURCE.slice(0, block.start) + newBlockRaw +
+        REVIEW_SOURCE.slice(block.end);
+      await saveAndRerender(newSource);
     }
 
     // "edit mode" jump: capture the selection's rendered text, exit
@@ -4565,34 +4656,87 @@
       if (!root || !root.classList.contains('open')) return;
 
       const any = getAnyReviewSelection();
+      const blocks = any ? getSelectedBlocks() : [];
+      // Format/highlight rule (Phase 5d quirk fixes):
+      //   - All blocks paragraph: OK (single para or multiple paras)
+      //   - Exactly one heading block: OK
+      //   - Anything else (heading + paragraph mix, multiple headings,
+      //     any list / blockquote / code in the mix): rejected.
+      const allP = blocks.length > 0 && blocks.every(b => b.type === 'p');
+      const singleHeading = blocks.length === 1 && blocks[0].type === 'heading';
+      const formatOk = allP || singleHeading;
 
-      // Format / heading: gated on single-block + p/heading.
-      const single = any ? getSingleBlockSelection() : null;
-      const block = single ? REVIEW_BLOCKS[single.blockIdx] : null;
-      const formatOk = block && (block.type === 'p' || block.type === 'heading');
+      // Format buttons (B / I / U): enabled when formatOk.
       document.querySelectorAll('#review-toolbar button[data-fmt]').forEach(btn => {
         btn.disabled = !formatOk;
       });
+
+      // Heading dropdown: still single-block only (changing heading
+      // level is a per-block operation; bulk conversion would be a
+      // surprise). Enabled when there's exactly one selected block
+      // and it's a paragraph or heading.
       const headingSel = document.getElementById('rt-heading');
-      headingSel.disabled = !formatOk;
-      if (block && block.type === 'heading') {
-        const level = block.raw.match(/^(#{1,6})\s+/)[1].length;
+      const headingOk = blocks.length === 1
+        && (blocks[0].type === 'p' || blocks[0].type === 'heading');
+      headingSel.disabled = !headingOk;
+      if (blocks.length === 1 && blocks[0].type === 'heading') {
+        const level = blocks[0].block.raw.match(/^(#{1,6})\s+/)[1].length;
         headingSel.value = String(level);
       } else {
         headingSel.value = '';
       }
-      // Color circles: disabled when there's no selection OR when
-      // any part of the selection already overlaps an existing
-      // highlight. Phase 5c moves color-change / removal into the
-      // per-highlight "i" handle so the toolbar circles are
-      // strictly for adding NEW highlights on un-highlighted text.
+
+      // Color circles: same block-type gate as format (Phase 5d:
+      // user explicitly asked for highlight buttons to be disabled
+      // when selection crosses heading + paragraph), PLUS the
+      // no-multi-highlight-overlap rule.
       const overlap = any ? selectionOverlapsAnyHighlight() : true;
+      const highlightOk = formatOk && !overlap;
       document.querySelectorAll('#review-toolbar .rt-color').forEach(btn => {
-        btn.disabled = !any || overlap;
+        btn.disabled = !highlightOk;
         // Drop any "active" rings — they belonged to the old
         // toggle-by-clicking-same-color flow.
         btn.classList.remove('active');
       });
+    }
+
+    // Programmatically select the text of a saved highlight by id.
+    // Used by openHighlightPopup so clicking the "i" button auto-
+    // captures the highlight as a selection: the user can immediately
+    // click into the chat pill and have the preamble injector pick
+    // it up. Skips the .hl-handle <button> child by starting at the
+    // first TEXT node inside the first wrapped span.
+    function selectHighlightText(hlId) {
+      const body = document.getElementById('review-body');
+      if (!body) return;
+      const spans = body.querySelectorAll(
+        `span.hl[data-hl-id="${CSS.escape(hlId)}"]`);
+      if (spans.length === 0) return;
+      // Walk text nodes inside the first span to find the first one
+      // (skips the handle button which is the span's first child).
+      const firstText = firstTextNodeWithin(spans[0]);
+      const lastText = lastTextNodeWithin(spans[spans.length - 1]);
+      if (!firstText || !lastText) return;
+      const range = document.createRange();
+      range.setStart(firstText, 0);
+      range.setEnd(lastText, lastText.nodeValue.length);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      // captureLastReviewSelection runs via the document-level
+      // selectionchange listener, so LAST_REVIEW_SELECTION is
+      // refreshed without us doing it inline.
+    }
+
+    function firstTextNodeWithin(el) {
+      const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      return w.nextNode();
+    }
+    function lastTextNodeWithin(el) {
+      const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      let last = null, n;
+      while ((n = w.nextNode())) last = n;
+      return last;
     }
 
     // Returns {el, idx} for the topmost block currently within the
@@ -4838,7 +4982,41 @@
         frag.appendChild(row);
       }
       nav.appendChild(frag);
+      // Viewport-position cursor (Phase 5d quirk fix). One bar
+      // overlay; updated on every body scroll. Kept as a sibling of
+      // the rows so it doesn't get wiped by the row flex layout.
+      const cursor = document.createElement('div');
+      cursor.className = 'ln-cursor';
+      nav.appendChild(cursor);
+      updateLineNavCursor();
     }
+
+    function updateLineNavCursor() {
+      const nav = document.getElementById('review-linenav');
+      const cursor = nav ? nav.querySelector('.ln-cursor') : null;
+      if (!cursor) return;
+      const body = document.getElementById('review-body');
+      if (!body) return;
+      const scrollable = body.scrollHeight - body.clientHeight;
+      if (scrollable <= 0) {
+        // Whole doc fits in the viewport — point at the middle.
+        cursor.style.top = '50%';
+        return;
+      }
+      // Pixel position of the visible center as a fraction of
+      // scrollable height (0 = top of doc, 1 = bottom). Mirror this
+      // fraction onto the nav column's height. We use scrollable
+      // (not scrollHeight) so 0% means truly at the top and 100%
+      // means truly at the bottom — matches what the eye sees.
+      const frac = (body.scrollTop + body.clientHeight / 2) / body.scrollHeight;
+      cursor.style.top = (Math.max(0, Math.min(1, frac)) * 100) + '%';
+    }
+
+    // Wire the scroll listener once, at startup. It's idempotent
+    // (no-op when the linenav doesn't exist yet) so attaching here
+    // is safe even before review mode opens.
+    document.getElementById('review-body')
+      ?.addEventListener('scroll', updateLineNavCursor, { passive: true });
 
     // Click anywhere in the linenav column → scroll the body to that
     // source line. Delegated handler reads the row's data-line.
@@ -5143,6 +5321,12 @@
         return;
       }
       POPUP_HL_ID = h.id;
+      // Auto-select the highlight's text (Phase 5d quirk fix). This
+      // makes the selection live AND triggers the selectionchange
+      // listener that snapshots LAST_REVIEW_SELECTION — so when the
+      // user clicks into the chat input next, the preamble injector
+      // already has their highlight queued up. Saves a re-select.
+      selectHighlightText(h.id);
       const popup = popupEl();
       // Color circles: light up the highlight's current color so the
       // user can see what's engaged. Clicking it removes; clicking a
