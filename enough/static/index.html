@@ -1288,6 +1288,46 @@
     }
     #review-mode .review-undo-bar button:hover { filter: brightness(1.08); }
 
+    /* Context chip — slim row showing the queued selection above
+       the chat input. Color-coded faintly so it reads "this is
+       coming along with your next message" without dominating. */
+    #review-mode .review-chat-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: color-mix(in oklab, var(--accent-user) 12%, transparent);
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--fg-muted);
+      font-family: var(--font-sans, system-ui, sans-serif);
+    }
+    #review-mode .review-chat-chip[hidden] { display: none; }
+    #review-mode .review-chat-chip .lbl {
+      color: var(--accent-user);
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    #review-mode .review-chat-chip .text {
+      flex: 1;
+      color: var(--fg);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-style: italic;
+    }
+    #review-mode .review-chat-chip button {
+      background: transparent;
+      color: var(--fg-muted);
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+    #review-mode .review-chat-chip button:hover { color: var(--accent-error); }
+
     #review-mode .review-chat-form {
       display: flex;
       gap: 6px;
@@ -2530,6 +2570,17 @@
             <span class="lbl">agent edited <code id="review-undo-path"></code> — keep it?</span>
             <button type="button" id="review-undo-keep">✓ save</button>
             <button type="button" id="review-undo-revert">↶ undo</button>
+          </div>
+          <!-- Context chip (Phase 5d quirk fix): when a review-mode
+               selection (live or snapshotted via an "i" handle click)
+               is queued, this chip shows the first ~50 chars so the
+               user can SEE what will get attached to their message.
+               The × button clears the queue. Hidden when nothing's
+               queued. -->
+          <div class="review-chat-chip" id="review-chat-chip" hidden>
+            <span class="lbl">↪ context:</span>
+            <span class="text" id="review-chat-chip-text"></span>
+            <button type="button" id="review-chat-chip-clear" title="clear queued selection">×</button>
           </div>
           <form class="review-chat-form" id="review-chat-form"
                 onsubmit="event.preventDefault(); sendFromReviewChat();">
@@ -4143,6 +4194,9 @@
       // Mirror the conversation tail into the pill so the user sees
       // recent context.
       refreshReviewChatTail();
+      // Sync the context chip to current state (typically nothing
+      // queued at entry, but the entry-state should still match).
+      updateReviewChatChip();
       // Wire the input to the same submission flow as the main chat.
       // (sendFromReviewChat reuses the existing /api/chat hx-post.)
     }
@@ -4157,6 +4211,8 @@
       // Drop the sticky selection snapshot too — its line-hint
       // refers to a document we're no longer reviewing.
       LAST_REVIEW_SELECTION = null;
+      // Hide the context chip — its content no longer applies.
+      if (typeof updateReviewChatChip === 'function') updateReviewChatChip();
       // Per spec: exiting closes the file completely (does NOT drop into
       // preview mode). The user is back at the regular chat view with
       // the full session history intact.
@@ -4246,6 +4302,7 @@
       // the old text would no longer be in the document anyway.
       // The user can re-select to attach context to a follow-up.
       LAST_REVIEW_SELECTION = null;
+      updateReviewChatChip();
     }
     window.sendFromReviewChat = sendFromReviewChat;
 
@@ -4723,9 +4780,18 @@
       const sel = window.getSelection();
       sel.removeAllRanges();
       sel.addRange(range);
-      // captureLastReviewSelection runs via the document-level
-      // selectionchange listener, so LAST_REVIEW_SELECTION is
-      // refreshed without us doing it inline.
+      // Synchronously snapshot LAST_REVIEW_SELECTION too — the
+      // browser's selectionchange event for this addRange fires
+      // ASYNCHRONOUSLY, and the user's next click (into the chat
+      // input) typically beats it. Without a sync snapshot the
+      // input focus collapses the selection before captureLast-
+      // ReviewSelection ever sees the non-empty state, leaving
+      // the chat-pill preamble injector empty-handed.
+      captureLastReviewSelection();
+      // Also refresh the toolbar + context chip so they reflect
+      // the new selection state without waiting for the async event.
+      refreshReviewToolbar();
+      updateReviewChatChip();
     }
 
     function firstTextNodeWithin(el) {
@@ -4818,6 +4884,35 @@
         }
       }
       LAST_REVIEW_SELECTION = { text: live.text, lineHint };
+      updateReviewChatChip();
+    }
+
+    // Render (or hide) the chat-pill context chip based on whether
+    // a selection is queued — live OR snapshotted. Shows the first
+    // ~60 visible chars so the user knows exactly what's about to
+    // get attached to their next message.
+    function updateReviewChatChip() {
+      const chip = document.getElementById('review-chat-chip');
+      const txt = document.getElementById('review-chat-chip-text');
+      if (!chip || !txt) return;
+      const root = document.getElementById('review-mode');
+      if (!root || !root.classList.contains('open')) {
+        chip.hidden = true;
+        return;
+      }
+      const live = getAnyReviewSelection();
+      const queued = live
+        ? live.text
+        : (LAST_REVIEW_SELECTION ? LAST_REVIEW_SELECTION.text : null);
+      if (!queued) {
+        chip.hidden = true;
+        return;
+      }
+      // Compact display: single line, ellipsized.
+      const flat = queued.replace(/\s+/g, ' ').trim();
+      const shown = flat.length > 60 ? flat.slice(0, 60) + '…' : flat;
+      txt.textContent = '"' + shown + '"';
+      chip.hidden = false;
     }
 
     document.querySelectorAll('#review-toolbar button[data-fmt]').forEach(btn => {
@@ -5551,6 +5646,20 @@
           e.preventDefault();
           sendFromReviewChat();
         }
+      });
+
+    // Context chip × button: drops the queued selection without
+    // sending. Clears both the live document selection (so the chip
+    // matches reality) and the LAST_REVIEW_SELECTION snapshot.
+    document.getElementById('review-chat-chip-clear')
+      .addEventListener('click', (e) => {
+        e.preventDefault();
+        LAST_REVIEW_SELECTION = null;
+        // Collapse any live document selection too.
+        const sel = window.getSelection();
+        if (sel) sel.removeAllRanges();
+        updateReviewChatChip();
+        refreshReviewToolbar();
       });
 
     // ---------- Preview-pane edit mode ----------
