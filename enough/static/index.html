@@ -2162,30 +2162,39 @@
       overflow: hidden;
     }
 
-    /* Collapsed token-pressure gauge — a 6px bar pinned to the bottom
+    /* Collapsed token-pressure gauge — a 5px bar pinned to the bottom
        edge of the model badge. Replaces the standalone .token-gauge
        button. Fill width = % of context window used; color shifts
-       green → yellow → red as pressure climbs. */
+       green → yellow → red as pressure climbs.
+       Track color uses --border (a visibly distinct separator) so
+       the bar reads as "present" even before any data has arrived. */
     .model-badge .model-gauge {
       position: absolute;
       left: 0;
       right: 0;
       bottom: 0;
-      height: 4px;
-      background: var(--bg-raise);
+      height: 5px;
+      background: var(--border);
       display: block;
       pointer-events: none;
+      border-top: 1px solid var(--bg-alt);
     }
     .model-badge .model-gauge .fill {
       display: block;
       height: 100%;
       width: 0;
       background: var(--accent-agent);
-      transition: width 120ms ease, background 200ms ease;
+      transition: width 120ms ease, background 200ms ease, opacity 200ms ease;
     }
     .model-badge.gauge-warn .model-gauge .fill { background: var(--accent-tool); }
     .model-badge.gauge-danger .model-gauge .fill { background: var(--accent-error); }
-    .model-badge.gauge-empty .model-gauge .fill { background: var(--fg-faint); }
+    /* Empty state: fill the bar fully at low opacity in fg-faint so
+       the user can SEE the gauge exists before any completion has
+       arrived. The JS sets width to 100% in this state too. */
+    .model-badge.gauge-empty .model-gauge .fill {
+      background: var(--fg-faint);
+      opacity: 0.4;
+    }
 
     .model-badge:hover {
       color: var(--fg);
@@ -3570,11 +3579,16 @@
       const hasData = total > 0;
 
       // --- Topbar model-badge bottom bar ---
+      // Width semantics:
+      //   - Empty (no data yet): set width to 100% so the muted full
+      //     bar is visible — tells the user "the gauge is here, just
+      //     waiting for your first completion."
+      //   - Has data: width is the percent of ctx used.
       modelBadge.classList.remove('gauge-warn', 'gauge-danger', 'gauge-empty');
       const gaugeFill = modelBadge.querySelector('.model-gauge .fill');
       if (!hasData) {
         modelBadge.classList.add('gauge-empty');
-        if (gaugeFill) gaugeFill.style.width = '0%';
+        if (gaugeFill) gaugeFill.style.width = '100%';
         modelBadge.title = ctx
           ? `Token pressure: 0 / ${fmtTokens(ctx)} — gauge fills in once you send a message.`
           : 'Model & context window — gauge fills in once you send a message.';
@@ -3590,8 +3604,9 @@
           `Output: ${(u.completion_tokens || 0).toLocaleString()}.\n` +
           `Click to open model settings.`;
       } else {
-        // No ctx known (supervisor off / external server) — show pct-less bar.
-        if (gaugeFill) gaugeFill.style.width = '0%';
+        // No ctx known (supervisor off / external server) — show the
+        // muted full bar same as the empty case.
+        if (gaugeFill) gaugeFill.style.width = '100%';
         modelBadge.classList.add('gauge-empty');
         modelBadge.title = `Token pressure: ${total.toLocaleString()} tokens used (ctx-size unknown).`;
       }
