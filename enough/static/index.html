@@ -106,6 +106,26 @@
       border-color: var(--fg-faint);
     }
 
+    /* Icon-only topbar buttons (file toggle, broker, UI prefs). Square,
+       large emoji rendering. The emoji color comes from the glyph
+       itself, not --fg, so they stay visible across all themes. */
+    .topbar .icon-btn {
+      width: 30px;
+      height: 26px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    /* Pushes the right-side counters (Commit 2) away from the left
+       button cluster — flex spacer eats the available width. */
+    .topbar .topbar-spacer {
+      flex: 1 1 auto;
+    }
+
     /* ---------- Main layout ---------- */
     .layout {
       flex: 1 1 auto;
@@ -1685,6 +1705,79 @@
       box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
     }
 
+    /* Wider variant: the UI modal grew to accommodate two reference
+       columns (keyboard shortcuts + markdown cheat sheet) added to
+       the same surface as the theme/font selectors. */
+    #ui-modal .ui-panel-wide {
+      min-width: 640px;
+      max-width: 760px;
+    }
+    #ui-modal .ui-modal-body-wide {
+      gap: 18px;
+    }
+    #ui-modal .ui-prefs-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-end;
+    }
+    #ui-modal .ui-prefs-row label { flex: 1 1 0; }
+
+    #ui-modal .ui-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    #ui-modal .ui-col h4 {
+      margin: 0 0 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--fg-muted);
+      font-weight: 600;
+    }
+    #ui-modal .ui-col .ui-col-note {
+      margin: 8px 0 0;
+      font-size: 11px;
+      color: var(--fg-faint);
+    }
+    #ui-modal .ui-col dl {
+      margin: 0;
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 12px;
+      row-gap: 4px;
+      font-size: 12px;
+      align-items: baseline;
+    }
+    #ui-modal .ui-col dt {
+      color: var(--fg);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    #ui-modal .ui-col dt code,
+    #ui-modal .ui-col dt kbd {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 1px 5px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--bg-raise);
+      color: var(--fg);
+      font-weight: normal;
+    }
+    #ui-modal .ui-col dd {
+      margin: 0;
+      color: var(--fg-muted);
+    }
+    #ui-modal .ui-col dd code,
+    #ui-modal .ui-col dd kbd {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
     #ui-modal .modal-head {
       display: flex;
       align-items: center;
@@ -1949,14 +2042,41 @@
       color: var(--fg-muted);
       border: 1px solid var(--border);
       border-radius: 4px;
-      padding: 3px 10px;
+      padding: 3px 10px 8px;   /* extra bottom padding for the gauge bar */
       cursor: pointer;
       font-family: inherit;
       font-size: 12px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      position: relative;
+      overflow: hidden;
     }
+
+    /* Collapsed token-pressure gauge — a 6px bar pinned to the bottom
+       edge of the model badge. Replaces the standalone .token-gauge
+       button. Fill width = % of context window used; color shifts
+       green → yellow → red as pressure climbs. */
+    .model-badge .model-gauge {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 4px;
+      background: var(--bg-raise);
+      display: block;
+      pointer-events: none;
+    }
+    .model-badge .model-gauge .fill {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--accent-agent);
+      transition: width 120ms ease, background 200ms ease;
+    }
+    .model-badge.gauge-warn .model-gauge .fill { background: var(--accent-tool); }
+    .model-badge.gauge-danger .model-gauge .fill { background: var(--accent-error); }
+    .model-badge.gauge-empty .model-gauge .fill { background: var(--fg-faint); }
 
     .model-badge:hover {
       color: var(--fg);
@@ -2429,20 +2549,20 @@
 
   <div class="topbar">
     <div class="brand">enough<span class="dim"><!-- VERSION --></span></div>
-    <button id="ui-btn" title="UI preferences (theme, font)">ui</button>
-    <button id="toggle-sidebar" title="Show/hide the sidebar">≡ files</button>
-    <button id="model-badge" class="model-badge off" title="Model &amp; context window">
+    <!-- Left half: file toggle → broker → UI prefs → model+gauge -->
+    <button id="toggle-sidebar" class="icon-btn" title="Show/hide the file sidebar (cmd+\\)" aria-label="files">📁</button>
+    <button id="broker-btn" class="icon-btn" title="Broker — tool routing, logging, and per-tool toggles" aria-label="broker">🔀</button>
+    <button id="ui-btn" class="icon-btn" title="UI preferences + keyboard shortcuts + markdown cheat sheet" aria-label="ui preferences">🖌️</button>
+    <button id="model-badge" class="model-badge off" title="Model &amp; context window — bottom bar shows live token-pressure">
       <span class="dot"></span>
       <span class="cute">…</span>
       <span class="ctx"></span>
+      <span class="model-gauge"><span class="fill"></span></span>
     </button>
-    <button id="token-gauge" class="token-gauge empty"
-      title="Token pressure on the context window — last completion's prompt + response. Click to open model settings.">
-      <span class="bar"><span class="fill"></span></span>
-      <span class="label">—</span>
-    </button>
-    <button id="broker-btn" title="Broker — tool routing, logging, and per-tool toggles">broker</button>
-    <button id="exit-review-btn" title="Exit review mode — closes the file and returns to the chat">× exit review</button>
+    <!-- Right half: document stat counters (Commit 2 fills these in) -->
+    <span class="topbar-spacer"></span>
+    <!-- Exit-review button stays right-most so muscle memory lands. -->
+    <button id="exit-review-btn" title="Exit review mode (esc)">× exit review</button>
   </div>
 
   <div class="layout" id="layout">
@@ -2701,22 +2821,81 @@
   </div>
 
   <!-- UI preferences modal -->
-  <div id="ui-modal" class="hidden" aria-hidden="true">
+  <div id="ui-modal" class="hidden ui-modal-wide" aria-hidden="true">
     <div class="modal-backdrop" onclick="closeUIModal()"></div>
-    <div class="modal-panel" role="dialog" aria-labelledby="ui-modal-title">
+    <div class="modal-panel ui-panel-wide" role="dialog" aria-labelledby="ui-modal-title">
       <div class="modal-head">
-        <h3 id="ui-modal-title">UI preferences</h3>
+        <h3 id="ui-modal-title">ui preferences · shortcuts · markdown</h3>
         <button class="modal-close" onclick="closeUIModal()" aria-label="close">×</button>
       </div>
-      <div class="modal-body">
-        <label>
-          <div class="label">theme</div>
-          <select id="ui-theme"></select>
-        </label>
-        <label>
-          <div class="label">font</div>
-          <select id="ui-font"></select>
-        </label>
+      <div class="modal-body ui-modal-body-wide">
+        <!-- Top row: theme + font selectors stay narrow and inline. -->
+        <div class="ui-prefs-row">
+          <label>
+            <div class="label">theme</div>
+            <select id="ui-theme"></select>
+          </label>
+          <label>
+            <div class="label">font</div>
+            <select id="ui-font"></select>
+          </label>
+        </div>
+        <!-- Two-column reference: keyboard shortcuts | markdown cheat sheet -->
+        <div class="ui-cols">
+          <section class="ui-col">
+            <h4>keyboard shortcuts</h4>
+            <dl class="kb-table">
+              <dt><kbd>esc</kbd></dt>
+              <dd>exit review mode / edit mode</dd>
+              <dt><kbd>⌘</kbd>+<kbd>\\</kbd></dt>
+              <dd>show / hide the file sidebar</dd>
+              <dt><kbd>⌘</kbd>+<kbd>k</kbd></dt>
+              <dd>focus the chat input</dd>
+              <dt><kbd>⌘</kbd>+<kbd>enter</kbd></dt>
+              <dd>send the chat message</dd>
+              <dt><kbd>shift</kbd>+<kbd>enter</kbd></dt>
+              <dd>newline in the chat input (instead of send)</dd>
+              <dt><kbd>⌘</kbd>+<kbd>b</kbd> / <kbd>i</kbd> / <kbd>u</kbd></dt>
+              <dd>bold / italic / underline the current selection (review mode)</dd>
+              <dt><kbd>⌘</kbd>+<kbd>s</kbd></dt>
+              <dd>save the current edit (edit mode)</dd>
+            </dl>
+            <p class="ui-col-note">
+              on a non-mac keyboard, use <kbd>ctrl</kbd> instead of <kbd>⌘</kbd>.
+            </p>
+          </section>
+          <section class="ui-col">
+            <h4>markdown cheat sheet</h4>
+            <dl class="md-table">
+              <dt><code>**bold**</code></dt>
+              <dd><strong>bold</strong></dd>
+              <dt><code>*italic*</code></dt>
+              <dd><em>italic</em></dd>
+              <dt><code>&lt;u&gt;underline&lt;/u&gt;</code></dt>
+              <dd><u>underline</u></dd>
+              <dt><code># heading 1</code></dt>
+              <dd>biggest heading</dd>
+              <dt><code>## heading 2</code></dt>
+              <dd>sub-heading</dd>
+              <dt><code>### heading 3</code></dt>
+              <dd>sub-sub-heading</dd>
+              <dt><code>- item</code></dt>
+              <dd>unordered list item</dd>
+              <dt><code>1. item</code></dt>
+              <dd>ordered list item</dd>
+              <dt><code>&gt; quote</code></dt>
+              <dd>blockquote</dd>
+              <dt><code>`code`</code></dt>
+              <dd>inline code</dd>
+              <dt><code>```<br>block<br>```</code></dt>
+              <dd>fenced code block</dd>
+              <dt><code>[text](url)</code></dt>
+              <dd>link</dd>
+              <dt><code>---</code></dt>
+              <dd>horizontal rule</dd>
+            </dl>
+          </section>
+        </div>
       </div>
       <div class="modal-foot">
         for zoom, use your browser's native zoom (<kbd>⌘+</kbd>/<kbd>⌘-</kbd>).<br>
@@ -3200,7 +3379,6 @@
     // ---------- Model badge + model modal (supervisor-aware) ----------
     const modelBadge = document.getElementById('model-badge');
     const modelModal = document.getElementById('model-modal');
-    const tokenGauge = document.getElementById('token-gauge');
     let MODELS = null;         // last /api/models payload
     let LLM_STATUS = null;     // last /api/llm-status payload
     let LAST_USAGE = null;     // last /api/usage or SSE usage payload
@@ -3223,8 +3401,11 @@
       return '';
     }
 
-    // Render LAST_USAGE into both the topbar pill and the modal row. Called
-    // on every usage update (SSE) and on modal open (so the row is fresh).
+    // Render LAST_USAGE into the model-badge's bottom gauge bar (the
+    // standalone .token-gauge was collapsed into the badge in the
+    // topbar refresh — the bar lives along the bottom edge of the
+    // badge button and shifts color green → yellow → red as pressure
+    // climbs). Also updates the modal row when the model modal is open.
     function renderUsage() {
       const u = LAST_USAGE || {};
       const total = u.total_tokens != null
@@ -3233,32 +3414,31 @@
       const ctx = u.ctx || (LLM_STATUS && LLM_STATUS.ctx) || null;
       const hasData = total > 0;
 
-      // --- Topbar pill ---
-      tokenGauge.classList.remove('warn', 'danger', 'empty');
-      const fill = tokenGauge.querySelector('.fill');
-      const label = tokenGauge.querySelector('.label');
+      // --- Topbar model-badge bottom bar ---
+      modelBadge.classList.remove('gauge-warn', 'gauge-danger', 'gauge-empty');
+      const gaugeFill = modelBadge.querySelector('.model-gauge .fill');
       if (!hasData) {
-        tokenGauge.classList.add('empty');
-        fill.style.width = '0%';
-        label.textContent = ctx ? `0 / ${fmtTokens(ctx)}` : '—';
-        tokenGauge.title = 'No completion yet — gauge fills in once you send a message.';
+        modelBadge.classList.add('gauge-empty');
+        if (gaugeFill) gaugeFill.style.width = '0%';
+        modelBadge.title = ctx
+          ? `Token pressure: 0 / ${fmtTokens(ctx)} — gauge fills in once you send a message.`
+          : 'Model & context window — gauge fills in once you send a message.';
       } else if (ctx) {
         const pct = Math.min(100, Math.round((total / ctx) * 100));
-        fill.style.width = pct + '%';
+        if (gaugeFill) gaugeFill.style.width = pct + '%';
         const cls = pressureClass(pct);
-        if (cls) tokenGauge.classList.add(cls);
-        label.textContent = `${fmtTokens(total)} / ${fmtTokens(ctx)} · ${pct}%`;
-        tokenGauge.title =
-          `Last completion used ${total.toLocaleString()} of ${ctx.toLocaleString()} tokens (${pct}%).\n` +
-          `Prompt: ${(u.prompt_tokens || 0).toLocaleString()}  · ` +
+        if (cls === 'warn') modelBadge.classList.add('gauge-warn');
+        if (cls === 'danger') modelBadge.classList.add('gauge-danger');
+        modelBadge.title =
+          `Token pressure: ${fmtTokens(total)} / ${fmtTokens(ctx)} (${pct}%).\n` +
+          `Prompt: ${(u.prompt_tokens || 0).toLocaleString()}  ·  ` +
           `Output: ${(u.completion_tokens || 0).toLocaleString()}.\n` +
           `Click to open model settings.`;
       } else {
-        // No ctx known (supervisor off / external server). Show absolute count only.
-        fill.style.width = '0%';
-        tokenGauge.classList.add('empty');
-        label.textContent = fmtTokens(total);
-        tokenGauge.title = `Last completion used ${total.toLocaleString()} tokens (ctx-size unknown).`;
+        // No ctx known (supervisor off / external server) — show pct-less bar.
+        if (gaugeFill) gaugeFill.style.width = '0%';
+        modelBadge.classList.add('gauge-empty');
+        modelBadge.title = `Token pressure: ${total.toLocaleString()} tokens used (ctx-size unknown).`;
       }
 
       // --- Modal row (only meaningful when the modal is open, but it's
@@ -3304,9 +3484,10 @@
       } catch (_) { /* transient */ }
     }
 
-    // Clicking the gauge opens the model modal — same destination as the
-    // model badge, since both are about the LLM session.
-    tokenGauge.addEventListener('click', () => openModelModal());
+    // (The standalone token-gauge button was retired in the Phase 5d
+    // topbar refresh; the gauge now lives along the bottom of the
+    // model badge itself, and clicking the badge already opens the
+    // model modal.)
 
     // ---------- Orchestrator (auto-reset) config ----------
     let ORCHESTRATOR = null;  // last /api/orchestrator payload
@@ -4862,6 +5043,97 @@
     document.addEventListener('selectionchange', () => {
       captureLastReviewSelection();
       refreshReviewToolbar();
+    });
+
+    // ---------- Global keyboard shortcuts (documented in the UI modal) ----------
+    //
+    //   esc                          → exit review mode / edit mode
+    //   cmd/ctrl + \                 → toggle sidebar
+    //   cmd/ctrl + k                 → focus chat input
+    //   cmd/ctrl + enter             → submit the focused chat input
+    //   cmd/ctrl + b / i / u         → bold / italic / underline (review mode)
+    //   cmd/ctrl + s                 → save (preview-edit mode)
+    //
+    // We avoid hijacking the user's modifier+key combo unless we have
+    // a specific behavior to attach AND we won't trample a native
+    // browser shortcut the user might expect (so e.g. cmd+w stays
+    // "close tab", we don't touch it).
+    document.addEventListener('keydown', (e) => {
+      const mod = e.metaKey || e.ctrlKey;
+      const key = e.key;
+      const tag = (e.target && e.target.tagName) || '';
+
+      // esc — exit review or edit mode if either is active.
+      if (key === 'Escape') {
+        const reviewOpen = document.getElementById('review-mode')?.classList.contains('open');
+        if (reviewOpen) {
+          e.preventDefault();
+          exitReviewMode();
+          return;
+        }
+        // Edit-mode "exit": click the cancel button if it's visible.
+        const cancelBtn = document.querySelector('#preview-body .cancel-btn');
+        if (cancelBtn) {
+          e.preventDefault();
+          cancelBtn.click();
+          return;
+        }
+      }
+
+      if (!mod) return;
+
+      // cmd+\\ — toggle sidebar.
+      if (key === '\\') {
+        e.preventDefault();
+        document.getElementById('toggle-sidebar')?.click();
+        return;
+      }
+
+      // cmd+k — focus the chat input that's most relevant right now.
+      if (key === 'k' || key === 'K') {
+        e.preventDefault();
+        const reviewOpen = document.getElementById('review-mode')?.classList.contains('open');
+        const target = reviewOpen
+          ? document.getElementById('review-chat-input')
+          : document.getElementById('message');
+        target?.focus();
+        return;
+      }
+
+      // cmd+enter — submit the focused chat input.
+      if (key === 'Enter') {
+        if (tag === 'TEXTAREA' && e.target.id === 'review-chat-input') {
+          e.preventDefault();
+          sendFromReviewChat();
+          return;
+        }
+        if (tag === 'TEXTAREA' && e.target.id === 'message') {
+          e.preventDefault();
+          document.getElementById('chat-form')?.requestSubmit();
+          return;
+        }
+        return;
+      }
+
+      // cmd+b / i / u — review-mode format shortcuts. Only fire when
+      // review mode is open and the user isn't typing in an input.
+      if ((key === 'b' || key === 'i' || key === 'u') && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+        const reviewOpen = document.getElementById('review-mode')?.classList.contains('open');
+        if (!reviewOpen) return;
+        e.preventDefault();
+        const map = { b: 'bold', i: 'italic', u: 'underline' };
+        applyFormat(map[key]);
+        return;
+      }
+
+      // cmd+s — save the current preview-edit textarea.
+      if (key === 's' || key === 'S') {
+        const saveBtn = document.querySelector('#preview-body .save-btn');
+        if (saveBtn) {
+          e.preventDefault();
+          saveBtn.click();
+        }
+      }
     });
 
     function captureLastReviewSelection() {
