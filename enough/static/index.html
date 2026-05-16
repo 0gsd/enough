@@ -1411,8 +1411,10 @@
       border-color: var(--fg-faint);
     }
 
-    /* The exit-review button in the topbar. Hidden until review mode
-       is active; conspicuous red so the way out is unmistakable. */
+    /* The exit-review button in the topbar. Hidden until review or
+       edit mode is active; conspicuous red so the way out is
+       unmistakable. The label updates between "exit review" and
+       "exit edit" based on which mode is open. */
     .topbar #exit-review-btn {
       display: none;
       background: var(--accent-error);
@@ -1423,6 +1425,87 @@
     }
     .topbar #exit-review-btn.visible { display: inline-flex; align-items: center; }
     .topbar #exit-review-btn:hover { filter: brightness(1.1); color: var(--bg); }
+
+    /* ---------- Edit mode (full-frame plain-text editor) ---------- */
+    /* Sibling overlay of #review-mode. Same z-layout (covers the
+       chat + preview), same chat pill at the bottom, same line-nav
+       column on the right — but the body is a textarea and the
+       colors track the active theme (no max-contrast override). */
+    #edit-mode {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--fg);
+      z-index: 30;
+    }
+    #edit-mode.open { display: flex; }
+
+    #edit-mode .edit-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 14px;
+      background: var(--bg-raise);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    #edit-mode .edit-toolbar .title {
+      color: var(--fg-muted);
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+    #edit-mode .edit-toolbar .edit-actions {
+      display: flex;
+      gap: 6px;
+    }
+    #edit-mode .edit-toolbar button {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 12px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    #edit-mode .edit-toolbar button:hover {
+      border-color: var(--fg-faint);
+    }
+    #edit-mode .edit-toolbar button.primary {
+      background: var(--accent-agent);
+      color: var(--bg);
+      border-color: var(--accent-agent);
+      font-weight: 600;
+    }
+    #edit-mode .edit-toolbar button.primary:hover { filter: brightness(1.08); }
+
+    /* The main textarea: fills the area between toolbar and chat pill,
+       leaves room for the 16px line-nav on the right. Mono font, soft
+       grey-on-bg color scheme that matches the active theme so the
+       user feels grounded in the same visual environment as the rest
+       of the app. */
+    #edit-mode .edit-textarea {
+      flex: 1 1 0;
+      width: 100%;
+      min-height: 0;
+      box-sizing: border-box;
+      padding: 24px max(56px, calc(50% - 380px + 16px)) 120px 48px;
+      background: var(--bg);
+      color: var(--fg);
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+
+    /* When the user resizes the body chat-pill tail, prevent textarea
+       focus rings from leaking into the toolbar / chat area. */
+    #edit-mode .edit-textarea:focus { outline: none; }
 
     /* File-tree greyout while review mode is active. The tree stays
        visible (so the user keeps their bearings) but clicks pass through
@@ -2750,6 +2833,39 @@
         </div>
       </div>
 
+      <!-- Edit mode: full-frame plain-text editor that replaces the
+           in-pane preview-edit. Theme-matching (no max-contrast),
+           plaintext (no markdown render, no highlights). Has its
+           own chat pill mirror and a line-nav column (greyed since
+           there are no highlights — but the viewport cursor still
+           tracks scroll position). Save and revert close edit mode
+           and re-open the preview pane on the same file; the topbar
+           X exits to the regular chat view. -->
+      <div id="edit-mode" aria-hidden="true">
+        <div class="edit-toolbar">
+          <span class="title" id="edit-title"></span>
+          <div class="edit-actions">
+            <button type="button" id="edit-save-btn" class="primary">save</button>
+            <button type="button" id="edit-revert-btn">revert</button>
+          </div>
+        </div>
+        <textarea id="edit-textarea" class="edit-textarea" spellcheck="false"></textarea>
+        <div class="review-linenav" id="edit-linenav" aria-label="line navigation"></div>
+        <div class="review-chat" id="edit-chat">
+          <div class="review-chat-head" onclick="toggleEditChat()">
+            <span>chat</span>
+            <span class="toggle" id="edit-chat-toggle">▾</span>
+          </div>
+          <div class="review-chat-tail" id="edit-chat-tail"></div>
+          <form class="review-chat-form" id="edit-chat-form"
+                onsubmit="event.preventDefault(); sendFromEditChat();">
+            <textarea id="edit-chat-input" rows="2"
+              placeholder="message the agent about this document…"></textarea>
+            <button type="submit">send</button>
+          </form>
+        </div>
+      </div>
+
       <!-- Per-highlight popup (Phase 5c). Floats above everything,
            absolutely positioned next to whatever handle was clicked.
            One element reused across all handles to avoid DOM bloat
@@ -3954,9 +4070,13 @@
       conversation.scrollTop = conversation.scrollHeight;
       // Mirror the latest conversation tail into the review-mode chat
       // pill (no-op when not in review mode — refreshReviewChatTail
-      // bails out silently if the pill DOM isn't visible).
+      // bails out silently if the pill DOM isn't visible). Same for
+      // edit-mode's pill (Commit 3).
       if (typeof refreshReviewChatTail === 'function') {
         refreshReviewChatTail();
+      }
+      if (typeof refreshEditChatTail === 'function') {
+        refreshEditChatTail();
       }
     }
 
@@ -4405,8 +4525,12 @@
       applyReviewContrast();
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
-      // Topbar: show the red exit button.
-      document.getElementById('exit-review-btn').classList.add('visible');
+      // Topbar: show the red exit button (label set explicitly in
+      // case a prior edit-mode session left it as "× exit edit").
+      const exitBtn = document.getElementById('exit-review-btn');
+      exitBtn.textContent = '× exit review';
+      exitBtn.title = 'Exit review mode (esc)';
+      exitBtn.classList.add('visible');
       // Greyout file tree (the rest of the sidebar stays interactive).
       document.getElementById('tree')?.classList.add('review-disabled');
       // Hide preview if it was open — review mode is the focused replacement.
@@ -4428,7 +4552,13 @@
       const root = document.getElementById('review-mode');
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
-      document.getElementById('exit-review-btn').classList.remove('visible');
+      const exitBtn = document.getElementById('exit-review-btn');
+      exitBtn.classList.remove('visible');
+      // Reset the label in case it was set to "× exit edit" by a
+      // prior edit-mode session that didn't have a chance to clean
+      // up itself.
+      exitBtn.textContent = '× exit review';
+      exitBtn.title = 'Exit review mode (esc)';
       document.getElementById('tree')?.classList.remove('review-disabled');
       REVIEW_PATH = null;
       // Drop the sticky selection snapshot too — its line-hint
@@ -4445,8 +4575,17 @@
       // the full session history intact.
     }
 
+    // Topbar X button: dispatches to whichever full-frame mode is
+    // currently open. Label updates dynamically in enterReviewMode /
+    // enterEditMode (and resets on exit).
     document.getElementById('exit-review-btn')
-      .addEventListener('click', exitReviewMode);
+      .addEventListener('click', () => {
+        if (document.getElementById('edit-mode')?.classList.contains('open')) {
+          exitEditMode();
+        } else if (document.getElementById('review-mode')?.classList.contains('open')) {
+          exitReviewMode();
+        }
+      });
 
     // ---------- Review-mode chat pill ----------
     function toggleReviewChat() {
@@ -5178,17 +5317,16 @@
 
       // esc — exit review or edit mode if either is active.
       if (key === 'Escape') {
+        const editOpen = document.getElementById('edit-mode')?.classList.contains('open');
+        if (editOpen) {
+          e.preventDefault();
+          exitEditMode();
+          return;
+        }
         const reviewOpen = document.getElementById('review-mode')?.classList.contains('open');
         if (reviewOpen) {
           e.preventDefault();
           exitReviewMode();
-          return;
-        }
-        // Edit-mode "exit": click the cancel button if it's visible.
-        const cancelBtn = document.querySelector('#preview-body .cancel-btn');
-        if (cancelBtn) {
-          e.preventDefault();
-          cancelBtn.click();
           return;
         }
       }
@@ -5205,10 +5343,13 @@
       // cmd+k — focus the chat input that's most relevant right now.
       if (key === 'k' || key === 'K') {
         e.preventDefault();
+        const editOpen = document.getElementById('edit-mode')?.classList.contains('open');
         const reviewOpen = document.getElementById('review-mode')?.classList.contains('open');
-        const target = reviewOpen
-          ? document.getElementById('review-chat-input')
-          : document.getElementById('message');
+        const target = editOpen
+          ? document.getElementById('edit-chat-input')
+          : reviewOpen
+            ? document.getElementById('review-chat-input')
+            : document.getElementById('message');
         target?.focus();
         return;
       }
@@ -5218,6 +5359,11 @@
         if (tag === 'TEXTAREA' && e.target.id === 'review-chat-input') {
           e.preventDefault();
           sendFromReviewChat();
+          return;
+        }
+        if (tag === 'TEXTAREA' && e.target.id === 'edit-chat-input') {
+          e.preventDefault();
+          sendFromEditChat();
           return;
         }
         if (tag === 'TEXTAREA' && e.target.id === 'message') {
@@ -5239,12 +5385,12 @@
         return;
       }
 
-      // cmd+s — save the current preview-edit textarea.
+      // cmd+s — save the current edit-mode textarea.
       if (key === 's' || key === 'S') {
-        const saveBtn = document.querySelector('#preview-body .save-btn');
-        if (saveBtn) {
+        const editOpen = document.getElementById('edit-mode')?.classList.contains('open');
+        if (editOpen) {
           e.preventDefault();
-          saveBtn.click();
+          saveEdit();
         }
       }
     });
@@ -6048,15 +6194,34 @@
         refreshReviewToolbar();
       });
 
-    // ---------- Preview-pane edit mode ----------
+    // ---------- Full-frame edit mode (Commit 3) ----------
+    //
+    // Replaces the old in-pane preview-edit. Opens a separate
+    // full-frame container (#edit-mode), sibling of #review-mode,
+    // with: a top toolbar (filename + save + revert), a textarea
+    // that fills the body, a line-nav column on the right, and the
+    // same chat pill the review mode shows. Save/revert close edit
+    // mode and re-open the preview pane on the file; the topbar X
+    // exits entirely to the chat view.
+    //
+    // The PENDING_EDIT_FOCUS handoff from review-mode → edit-mode
+    // (search-and-select a snippet in the textarea) still works —
+    // openEditMode looks for it and applies after the textarea is
+    // populated.
+    let EDIT_PATH = null;
+    let EDIT_PRISTINE = '';     // raw bytes at the moment we entered edit mode
+
     async function enterEditMode() {
+      // Triggered either by the preview-pane "edit mode" button
+      // (which has a .file-path element near it) OR by a synthetic
+      // jump from review-mode (no preview path; we use REVIEW_PATH
+      // via the PENDING_EDIT_FOCUS handoff). Either way, resolve a
+      // single path.
+      let path = null;
       const pathEl = document.querySelector('#preview-body .file-path');
-      if (!pathEl) return;
-      const path = pathEl.dataset.path;
-      const pre = document.querySelector('#preview-body .file-body');
-      const actions = document.querySelector('#preview-body .preview-actions');
-      if (!pre || !actions) return;
-      // Fetch raw text so we edit the true bytes, not the escaped display.
+      if (pathEl) path = pathEl.dataset.path;
+      else if (PENDING_EDIT_FOCUS) path = PENDING_EDIT_FOCUS.path;
+      if (!path) return;
       let raw;
       try {
         const r = await fetch('/api/file/raw?path=' + encodeURIComponent(path));
@@ -6066,38 +6231,212 @@
         alert('could not load raw contents: ' + e.message);
         return;
       }
-      const textarea = document.createElement('textarea');
-      textarea.className = 'file-edit';
-      textarea.spellcheck = false;
-      textarea.value = raw;
-      pre.replaceWith(textarea);
-      actions.innerHTML =
-        '<button class="save-btn" onclick="saveEdit(\'' + path.replace(/'/g, "\\'") + '\')">save</button>' +
-        '<button class="cancel-btn" onclick="cancelEdit(\'' + path.replace(/'/g, "\\'") + '\')">cancel</button>';
-      textarea.focus();
+      EDIT_PATH = path;
+      EDIT_PRISTINE = raw;
+      const root = document.getElementById('edit-mode');
+      const ta = document.getElementById('edit-textarea');
+      document.getElementById('edit-title').textContent = path;
+      ta.value = raw;
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      // Sidebar greyout + topbar X label (shared with review mode).
+      document.getElementById('tree')?.classList.add('review-disabled');
+      const exitBtn = document.getElementById('exit-review-btn');
+      exitBtn.textContent = '× exit edit';
+      exitBtn.title = 'Exit edit mode without saving (esc)';
+      exitBtn.classList.add('visible');
+      // Preview pane is supplanted by the full-frame editor.
+      document.getElementById('preview')?.classList.remove('open');
+      // Initial render of the line-nav for this textarea.
+      renderEditLineNav();
+      updateDocCounters();
+      // Apply pending search-and-select handoff from review mode,
+      // if any (textarea is now populated so we can locate the
+      // snippet and re-select it).
+      if (PENDING_EDIT_FOCUS && PENDING_EDIT_FOCUS.text) {
+        const idx = ta.value.indexOf(PENDING_EDIT_FOCUS.text);
+        if (idx >= 0) {
+          ta.focus();
+          ta.setSelectionRange(idx, idx + PENDING_EDIT_FOCUS.text.length);
+          const before = ta.value.slice(0, idx);
+          const linesBefore = before.split('\n').length;
+          const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 18;
+          ta.scrollTop = Math.max(0, (linesBefore - 4) * lineHeight);
+        }
+        PENDING_EDIT_FOCUS = null;
+      } else {
+        ta.focus();
+      }
     }
 
-    async function saveEdit(path) {
-      const textarea = document.querySelector('#preview-body textarea.file-edit');
-      if (!textarea) return;
+    async function saveEdit() {
+      if (!EDIT_PATH) return;
+      const ta = document.getElementById('edit-textarea');
       const fd = new FormData();
-      fd.append('path', path);
-      fd.append('content', textarea.value);
+      fd.append('path', EDIT_PATH);
+      fd.append('content', ta.value);
       const r = await fetch('/api/file', { method: 'POST', body: fd });
-      if (!r.ok) { alert('save failed: ' + r.status + ' ' + r.statusText); return; }
+      if (!r.ok) {
+        alert('save failed: ' + r.status + ' ' + r.statusText);
+        return;
+      }
       const html = await r.text();
-      document.getElementById('preview-body').innerHTML = html;
-      htmx.process(document.getElementById('preview-body'));
-      // Freshen file tree too in case a new file was created via edit.
+      const path = EDIT_PATH;
+      exitEditMode({ keepFile: true });
+      // Re-open the preview pane on the just-saved file.
+      const previewBody = document.getElementById('preview-body');
+      if (previewBody) {
+        previewBody.innerHTML = html;
+        htmx.process(previewBody);
+      }
+      document.getElementById('preview')?.classList.add('open');
       htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
     }
 
-    async function cancelEdit(path) {
-      // Re-fetch the preview fragment to restore the read-only view.
-      htmx.ajax('GET', '/api/file?path=' + encodeURIComponent(path), {
-        target: '#preview-body', swap: 'innerHTML',
-      });
+    async function revertEdit() {
+      if (!EDIT_PATH) return;
+      // Discard local changes; reload the textarea to its pristine
+      // snapshot. The user is asked to confirm so a slip-of-the-finger
+      // doesn't nuke a session of editing.
+      const ta = document.getElementById('edit-textarea');
+      if (ta.value !== EDIT_PRISTINE) {
+        if (!confirm('discard all unsaved changes and revert to the file\'s contents on disk?')) return;
+      }
+      ta.value = EDIT_PRISTINE;
+      ta.focus();
+      renderEditLineNav();
+      updateDocCounters();
     }
+
+    function exitEditMode({ keepFile = false } = {}) {
+      const root = document.getElementById('edit-mode');
+      root.classList.remove('open');
+      root.setAttribute('aria-hidden', 'true');
+      document.getElementById('tree')?.classList.remove('review-disabled');
+      const exitBtn = document.getElementById('exit-review-btn');
+      exitBtn.classList.remove('visible');
+      exitBtn.textContent = '× exit review';   // reset to default
+      exitBtn.title = 'Exit review mode — closes the file and returns to the chat';
+      EDIT_PATH = null;
+      EDIT_PRISTINE = '';
+      if (!keepFile) {
+        // Topbar X behavior: close the preview pane too so the user
+        // returns to the bare chat view (parity with review-mode exit).
+        document.getElementById('preview')?.classList.remove('open');
+      }
+      updateDocCounters();
+    }
+
+    // Buttons + chat-pill wiring for edit mode.
+    document.getElementById('edit-save-btn').addEventListener('click', saveEdit);
+    document.getElementById('edit-revert-btn').addEventListener('click', revertEdit);
+
+    function toggleEditChat() {
+      const pill = document.getElementById('edit-chat');
+      const tog = document.getElementById('edit-chat-toggle');
+      pill.classList.toggle('collapsed');
+      tog.textContent = pill.classList.contains('collapsed') ? '▴' : '▾';
+    }
+    window.toggleEditChat = toggleEditChat;
+
+    function refreshEditChatTail() {
+      const tail = document.getElementById('edit-chat-tail');
+      if (!tail) return;
+      const conv = document.getElementById('conversation');
+      if (!conv) return;
+      const msgs = Array.from(conv.querySelectorAll('.msg'));
+      const recent = msgs.slice(-REVIEW_CHAT_TAIL_N);
+      tail.innerHTML = recent.map(m => m.outerHTML).join('');
+      tail.scrollTop = tail.scrollHeight;
+    }
+    window.refreshEditChatTail = refreshEditChatTail;
+
+    function sendFromEditChat() {
+      const input = document.getElementById('edit-chat-input');
+      const text = (input.value || '').trim();
+      if (!text) return;
+      const main = document.getElementById('message');
+      const form = document.getElementById('chat-form');
+      if (!main || !form) return;
+      // No preamble injection for v1 — the user can quote the
+      // selection manually if they want context attached. (Future:
+      // attach textarea selection like review-mode does.)
+      main.value = text;
+      htmx.trigger(form, 'submit');
+      input.value = '';
+    }
+    window.sendFromEditChat = sendFromEditChat;
+
+    document.getElementById('edit-chat-input')
+      .addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendFromEditChat();
+        }
+      });
+
+    // Live line-nav + cursor updates as the user types or scrolls
+    // the edit textarea.
+    const editTa = document.getElementById('edit-textarea');
+    editTa.addEventListener('input', () => {
+      renderEditLineNav();
+    });
+    editTa.addEventListener('scroll', updateEditLineNavCursor, { passive: true });
+
+    function renderEditLineNav() {
+      const nav = document.getElementById('edit-linenav');
+      if (!nav) return;
+      const ta = document.getElementById('edit-textarea');
+      const source = ta.value || '';
+      const lines = source.split('\n');
+      const numLines = Math.max(1, lines.length);
+      nav.innerHTML = '';
+      // Edit mode has no highlights, so every row is muted grey.
+      // The line-nav still serves as a viewport-position indicator
+      // and a clickable jump target.
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < numLines; i++) {
+        const row = document.createElement('div');
+        row.className = 'ln-row';
+        row.dataset.line = String(i);
+        row.title = `line ${i + 1}`;
+        const c = document.createElement('div');
+        c.className = 'ln-cell';
+        row.appendChild(c);
+        frag.appendChild(row);
+      }
+      nav.appendChild(frag);
+      const cursor = document.createElement('div');
+      cursor.className = 'ln-cursor';
+      nav.appendChild(cursor);
+      updateEditLineNavCursor();
+    }
+
+    function updateEditLineNavCursor() {
+      const nav = document.getElementById('edit-linenav');
+      const cursor = nav ? nav.querySelector('.ln-cursor') : null;
+      if (!cursor) return;
+      const ta = document.getElementById('edit-textarea');
+      if (!ta) return;
+      const scrollable = ta.scrollHeight - ta.clientHeight;
+      if (scrollable <= 0) {
+        cursor.style.top = '50%';
+        return;
+      }
+      const frac = (ta.scrollTop + ta.clientHeight / 2) / ta.scrollHeight;
+      cursor.style.top = (Math.max(0, Math.min(1, frac)) * 100) + '%';
+    }
+
+    // Click in edit-linenav → scroll the textarea to that line.
+    document.getElementById('edit-linenav').addEventListener('click', (e) => {
+      const row = e.target.closest('.ln-row');
+      if (!row) return;
+      const line = +row.dataset.line;
+      const ta = document.getElementById('edit-textarea');
+      const lines = ta.value.split('\n');
+      const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 18;
+      ta.scrollTop = Math.max(0, line * lineHeight - ta.clientHeight / 3);
+    });
 
     async function customizeForProject(path) {
       if (!confirm('break the symlink and create an editable project-local copy of this file?\n\n' + path)) return;

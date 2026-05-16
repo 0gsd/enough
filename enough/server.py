@@ -1197,7 +1197,7 @@ def create_app(
         else:
             sym_note = ""
             action_btn = (
-                '<button class="edit-btn" onclick="enterEditMode()">edit</button>'
+                '<button class="edit-btn" onclick="enterEditMode()">edit mode</button>'
             )
         # Review-mode button: only meaningful for markdown-ish text files.
         # Renders LEFT of the edit button, with a contrasting accent fill
