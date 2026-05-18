@@ -48,6 +48,24 @@ file contents here
 <index>2</index>
 </tool>
 
+<tool name="cloud_pipeline">
+<content>
+{
+  "steps": [
+    {"prompt": "Write chapter 1 of a novel about …"},
+    {"prompt": "Write chapter 2, picking up from chapter 1 …"},
+    {"prompt": "Write chapter 3 …"}
+  ],
+  "compile": {"method": "concat", "separator": "\n\n---\n\n"},
+  "final_pass": {
+    "prompt": "Proofread the following manuscript for typos, internal consistency, and prose flow. Return the corrected text only.\n\n{compiled}"
+  },
+  "output_path": "rness/io/output/cloud-pipeline/novel-draft.md",
+  "model": "openai/gpt-4o-mini"
+}
+</content>
+</tool>
+
 Rules:
 - All paths are relative to the project directory. Absolute paths and `../`
   traversal are rejected.
@@ -62,6 +80,33 @@ Rules:
   `rness/io/input/_broker-index.md`. The tool result is just a short
   preview + the cache path — read the full content with `read_file` if
   needed. This keeps fetched documents out of your context window.
+- `cloud_pipeline` is the broker-driven multi-step batch tool for
+  OpenRouter. Use it when the user wants a single large job done by a
+  cloud model in many sequential calls — generating long-form content
+  by section (e.g. "write 36 chapters"), running per-chunk transformations
+  across a corpus, or producing a draft and then a single proofread/
+  edit pass over the compiled result. The broker runs every step server-
+  side (so you don't have to loop), caches each response under
+  `rness/io/cloud-cache/<timestamp>-<slug>.md`, optionally compiles
+  them, optionally final-passes, and returns a short structured summary
+  plus output path. Pre-conditions: the `local_models_only` broker
+  toggle must be OFF and the OpenRouter key must be present + healthy.
+  The full per-step text never enters your context window — read
+  individual cache files with `read_file` only when you need to inspect
+  output. Don't use for one-off chat-style requests; for those, just
+  respond normally (the active OPRO-API model will route your reply
+  through the cloud automatically).
+  - **compile.method** has two options: `"concat"` joins step outputs
+    verbatim with a separator; `"summarize_each"` makes a follow-up
+    cloud call per step to produce a one-paragraph summary, and the
+    compiled artifact (plus any final_pass input) is built from the
+    summaries instead of the full step bodies. Full step outputs are
+    still cached individually on disk. Use `summarize_each` when a
+    final pass over all steps would otherwise blow past the model's
+    context — e.g. when arc-level editing a 36-chapter draft where
+    each chapter is 5k words. The `summary_prompt` field accepts a
+    template containing the literal `{step}` placeholder, which is
+    substituted with each step's full text before sending.
 - After a tool call, the harness will send back:
   <tool_result name="toolname" path="..." (or command="...", url="..."")>
   [result or error]

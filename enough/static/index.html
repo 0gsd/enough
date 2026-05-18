@@ -2660,6 +2660,291 @@
       border-radius: 3px;
       font-size: 11px;
     }
+
+    /* ---------- OPRO-API row variant in the model list ---------- */
+    /* Lit when the OPRO-API entry has a healthy key, dimmed otherwise.
+       The status badge sits where 'size' sits on local rows. */
+    #model-modal .model-option.cloud .cute {
+      color: var(--accent-user);
+    }
+    #model-modal .model-option.cloud .opro-status {
+      font-size: 10.5px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      padding: 1px 6px;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      color: var(--fg-muted);
+    }
+    #model-modal .model-option.cloud .opro-status.healthy {
+      color: var(--accent-agent);
+      border-color: color-mix(in oklab, var(--accent-agent) 50%, var(--border));
+    }
+    #model-modal .model-option.cloud .opro-status.unhealthy {
+      color: var(--accent-error);
+      border-color: color-mix(in oklab, var(--accent-error) 50%, var(--border));
+    }
+    #model-modal .model-option.cloud .opro-status.unconfigured {
+      color: var(--accent-tool);
+      border-color: color-mix(in oklab, var(--accent-tool) 50%, var(--border));
+    }
+
+    /* ---------- Inline OPRO-API settings panel ----------
+       Appears below the model list when the OPRO-API row is selected
+       AND a key is configured. Holds the management surface:
+       model id, last-verified info, and the four action buttons
+       (re-test, change model, update key, remove key). */
+    #opro-settings {
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: color-mix(in oklab, var(--bg-raise) 60%, transparent);
+    }
+    #opro-settings.hidden { display: none; }
+    #opro-settings .opro-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+    #opro-settings .opro-row .label {
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      font-size: 10.5px;
+      letter-spacing: 0.5px;
+      min-width: 90px;
+    }
+    #opro-settings .opro-row .value {
+      color: var(--fg);
+      flex: 1;
+    }
+    #opro-settings .opro-row .value.error {
+      color: var(--accent-error);
+    }
+    #opro-settings .opro-row .value.ok {
+      color: var(--accent-agent);
+    }
+    #opro-settings input[type="text"] {
+      flex: 1;
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+    #opro-settings .opro-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    #opro-settings .opro-btn {
+      background: var(--bg-raise);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 11.5px;
+    }
+    #opro-settings .opro-btn:hover {
+      border-color: var(--fg-faint);
+    }
+    #opro-settings .opro-btn.danger {
+      color: var(--accent-error);
+      border-color: color-mix(in oklab, var(--accent-error) 30%, var(--border));
+    }
+    #opro-settings .opro-btn.danger:hover {
+      background: color-mix(in oklab, var(--accent-error) 12%, var(--bg-raise));
+    }
+    #opro-settings .opro-btn:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+
+    /* ---------- OPRO onboarding wizard modal ----------
+       Three-screen flow: understanding → key entry → health check.
+       Intentionally a separate modal from the model picker so the
+       commitment moment is visually distinct. */
+    #opro-wizard-modal.hidden { display: none; }
+    #opro-wizard-modal {
+      position: fixed; inset: 0; z-index: 60;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #opro-wizard-modal .modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+    }
+    #opro-wizard-modal .modal-panel {
+      position: relative;
+      width: min(560px, 92vw);
+      max-height: 92vh;
+      overflow: auto;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+    #opro-wizard-modal .modal-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    #opro-wizard-modal .modal-head h3 {
+      flex: 1;
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    #opro-wizard-modal .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--fg-muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+    #opro-wizard-modal .step-dots {
+      display: flex;
+      gap: 4px;
+      padding: 8px 16px 0;
+    }
+    #opro-wizard-modal .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+    #opro-wizard-modal .step-dot.active {
+      background: var(--accent-agent);
+    }
+    #opro-wizard-modal .step-dot.done {
+      background: color-mix(in oklab, var(--accent-agent) 60%, var(--border));
+    }
+    #opro-wizard-modal .wizard-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 13px;
+    }
+    #opro-wizard-modal .wizard-body p,
+    #opro-wizard-modal .wizard-body ul {
+      margin: 0;
+      color: var(--fg-muted);
+      line-height: 1.55;
+    }
+    #opro-wizard-modal .wizard-body strong { color: var(--fg); }
+    #opro-wizard-modal .wizard-body code {
+      background: var(--bg-raise);
+      color: var(--fg-muted);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    #opro-wizard-modal .wizard-body a {
+      color: var(--accent-user);
+      text-decoration: underline;
+    }
+    #opro-wizard-modal .confirm-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px 12px;
+      background: color-mix(in oklab, var(--bg-raise) 70%, transparent);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+    }
+    #opro-wizard-modal .confirm-list label {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      cursor: pointer;
+      color: var(--fg-muted);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+    #opro-wizard-modal .confirm-list label input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: var(--accent-agent);
+    }
+    #opro-wizard-modal .key-input-row {
+      display: flex;
+      gap: 6px;
+    }
+    #opro-wizard-modal .key-input-row input {
+      flex: 1;
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+    }
+    #opro-wizard-modal .key-input-row .reveal-btn {
+      background: var(--bg-raise);
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 12px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 11px;
+    }
+    #opro-wizard-modal .key-input-row .reveal-btn:hover { color: var(--fg); }
+    #opro-wizard-modal .health-panel {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: var(--bg-raise);
+      font-size: 12.5px;
+    }
+    #opro-wizard-modal .health-panel.checking { color: var(--fg-muted); }
+    #opro-wizard-modal .health-panel.ok {
+      color: var(--accent-agent);
+      border-color: color-mix(in oklab, var(--accent-agent) 50%, var(--border));
+    }
+    #opro-wizard-modal .health-panel.fail {
+      color: var(--accent-error);
+      border-color: color-mix(in oklab, var(--accent-error) 50%, var(--border));
+    }
+    #opro-wizard-modal .wizard-foot {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+    #opro-wizard-modal .wizard-foot .secondary {
+      background: transparent;
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    #opro-wizard-modal .wizard-foot .primary {
+      background: color-mix(in oklab, var(--accent-agent) 20%, var(--bg-raise));
+      color: var(--fg);
+      border: 1px solid var(--accent-agent);
+      border-radius: 4px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    #opro-wizard-modal .wizard-foot button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 
@@ -2965,6 +3250,29 @@
         <div class="model-list" id="model-list">
           <!-- rendered from /api/models -->
         </div>
+        <!-- OpenRouter settings panel: visible when OPRO-API is selected
+             AND a key is configured. Appears inline below the model list
+             so management lives where selection happens. -->
+        <div id="opro-settings" class="hidden">
+          <div class="opro-row">
+            <span class="label">model id</span>
+            <input type="text" id="opro-model-input" placeholder="openai/gpt-4o-mini">
+            <button class="opro-btn" id="opro-model-save" onclick="oproSaveModel()">save</button>
+          </div>
+          <div class="opro-row">
+            <span class="label">last verified</span>
+            <span class="value" id="opro-verified-line">—</span>
+          </div>
+          <div class="opro-row" id="opro-error-row" style="display:none">
+            <span class="label">last error</span>
+            <span class="value error" id="opro-error-line">—</span>
+          </div>
+          <div class="opro-actions">
+            <button class="opro-btn" onclick="oproHealthCheck()">re-test key</button>
+            <button class="opro-btn" onclick="oproOpenWizardForUpdate()">update key</button>
+            <button class="opro-btn danger" onclick="oproClearKey()">remove key</button>
+          </div>
+        </div>
         <div class="ctx-row">
           <div class="label">context window <span id="ctx-hint-min-max">(min 2048, max 131072)</span></div>
           <input type="number" id="ctx-input" min="2048" max="131072" step="1024">
@@ -2980,6 +3288,114 @@
         switching unloads the current model from RAM, loads the new one, and
         clears the in-memory conversation. request history on disk (session
         logs, requests) is preserved.
+      </div>
+    </div>
+  </div>
+
+  <!-- OPRO-API onboarding wizard. Three screens: understanding,
+       key entry, health check. The "convoluted by design" framing
+       lives here — each step requires an explicit action; nothing
+       proceeds silently. -->
+  <div id="opro-wizard-modal" class="hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="oproWizardClose()"></div>
+    <div class="modal-panel" role="dialog" aria-labelledby="opro-wizard-title">
+      <div class="modal-head">
+        <h3 id="opro-wizard-title">OpenRouter — onboarding</h3>
+        <button class="modal-close" onclick="oproWizardClose()" aria-label="close">×</button>
+      </div>
+      <div class="step-dots">
+        <span class="step-dot active" id="opro-dot-1"></span>
+        <span class="step-dot" id="opro-dot-2"></span>
+        <span class="step-dot" id="opro-dot-3"></span>
+      </div>
+
+      <!-- screen 1: understanding -->
+      <div class="wizard-body" id="opro-screen-1">
+        <p>
+          You're about to enable <strong>OPRO-API</strong>, a fifth model
+          slot that routes chat completions through
+          <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a>
+          to a cloud-hosted model of your choice (GPT, Claude, Llama,
+          Mistral, and others). This pierces enough's local-only default —
+          please confirm the three things below before continuing.
+        </p>
+        <div class="confirm-list">
+          <label>
+            <input type="checkbox" class="opro-confirm" id="opro-cb-account">
+            <span>
+              I have (or will create) an
+              <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter account</a>,
+              and I understand that I manage model selection, fallbacks,
+              and per-model preferences in the OpenRouter dashboard.
+            </span>
+          </label>
+          <label>
+            <input type="checkbox" class="opro-confirm" id="opro-cb-key">
+            <span>
+              I will generate an API key at
+              <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>
+              and set up billing on my OpenRouter account. enough will
+              never bill me — OpenRouter bills me directly for usage.
+            </span>
+          </label>
+          <label>
+            <input type="checkbox" class="opro-confirm" id="opro-cb-risk">
+            <span>
+              I understand that prompts and outputs sent via OPRO-API
+              <strong>leave my machine</strong> and that using a cloud
+              provider introduces both ongoing cost and the privacy
+              tradeoffs that come with any third-party API.
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- screen 2: key entry -->
+      <div class="wizard-body hidden" id="opro-screen-2">
+        <p>
+          Paste your OpenRouter API key below. It starts with
+          <code>sk-or-</code> and is typically 50+ characters. The key
+          will be stored in your operating system's keyring
+          (<strong>macOS Keychain</strong> on this machine),
+          <strong>never as plaintext on disk</strong>, and is read only
+          by enough's broker when constructing outbound requests.
+        </p>
+        <div class="key-input-row">
+          <input
+            type="password"
+            id="opro-key-input"
+            placeholder="sk-or-v1-…"
+            autocomplete="off"
+            spellcheck="false">
+          <button type="button" class="reveal-btn" id="opro-reveal-btn"
+            onclick="oproToggleReveal()">show</button>
+        </div>
+        <p style="color: var(--fg-faint); font-size: 11.5px;">
+          Tip: paste, glance to confirm, then click <strong>save &amp;
+          verify</strong>. A free <code>openrouter/free</code> ping runs
+          automatically to verify the key works before we mark OPRO-API
+          ready.
+        </p>
+      </div>
+
+      <!-- screen 3: health check result -->
+      <div class="wizard-body hidden" id="opro-screen-3">
+        <p>
+          Pinging <code>openrouter/free</code> with the stored key to
+          verify routing and auth. This costs nothing and takes a few
+          seconds.
+        </p>
+        <div class="health-panel checking" id="opro-health-panel">
+          <span id="opro-health-status">checking…</span>
+        </div>
+        <p style="color: var(--fg-faint); font-size: 11.5px;" id="opro-health-hint"></p>
+      </div>
+
+      <div class="wizard-foot">
+        <button type="button" class="secondary" id="opro-wizard-back"
+          onclick="oproWizardBack()">back</button>
+        <button type="button" class="primary" id="opro-wizard-next"
+          onclick="oproWizardNext()">next</button>
       </div>
     </div>
   </div>
@@ -3752,23 +4168,58 @@
       list.innerHTML = '';
       const curCute = selectedCute || (MODELS.current || (LLM_STATUS && LLM_STATUS.cute));
       for (const m of MODELS.models) {
+        const isCloud = !!m.cloud;
+        // Local: 'installed' means the gguf exists on disk. Cloud: 'installed'
+        // means a healthy key is present. Either way it gates selectability.
         const disabled = !m.installed;
         const isSel = m.cute === curCute;
         const row = document.createElement('div');
-        row.className = 'model-option' + (isSel ? ' selected' : '') + (disabled ? ' disabled' : '');
+        row.className = 'model-option'
+          + (isSel ? ' selected' : '')
+          + (disabled ? ' disabled' : '')
+          + (isCloud ? ' cloud' : '');
         row.dataset.cute = m.cute;
-        const size = m.disk_gb_approx ? `~${m.disk_gb_approx.toFixed(1)} GB` : '';
-        const installed = disabled ? '(not installed)' : '';
-        row.innerHTML =
-          `<span class="cute">${m.cute.toUpperCase()}</span>` +
-          `<span class="label">${m.label}</span>` +
-          `<span class="size">${size} ${installed}</span>`;
-        if (!disabled) {
+        if (isCloud) {
+          // Cloud row variant: status badge instead of size + installed label.
+          let badge = 'unconfigured';
+          let badgeText = 'needs setup';
+          if (m.cloud_key_present && m.cloud_healthy) {
+            badge = 'healthy'; badgeText = 'ready';
+          } else if (m.cloud_key_present && m.cloud_healthy === false) {
+            badge = 'unhealthy'; badgeText = 'unhealthy';
+          }
+          row.innerHTML =
+            `<span class="cute">${m.cute.toUpperCase()}</span>` +
+            `<span class="label">${m.label} <span style="color:var(--fg-faint)">— ${m.cloud_model_id || ''}</span></span>` +
+            `<span class="opro-status ${badge}">${badgeText}</span>`;
+          // Always clickable: click opens wizard when no/bad key, or
+          // selects + reveals the settings panel when healthy.
+          row.classList.remove('disabled');
           row.addEventListener('click', () => {
+            if (!m.cloud_key_present || !m.cloud_healthy) {
+              oproOpenWizard(false);
+              return;
+            }
             selectedCute = m.cute;
             renderModelList();
+            oproRenderSettings();
             updateCtxInputForSelection();
           });
+        } else {
+          const size = m.disk_gb_approx ? `~${m.disk_gb_approx.toFixed(1)} GB` : '';
+          const installed = disabled ? '(not installed)' : '';
+          row.innerHTML =
+            `<span class="cute">${m.cute.toUpperCase()}</span>` +
+            `<span class="label">${m.label}</span>` +
+            `<span class="size">${size} ${installed}</span>`;
+          if (!disabled) {
+            row.addEventListener('click', () => {
+              selectedCute = m.cute;
+              renderModelList();
+              oproRenderSettings();
+              updateCtxInputForSelection();
+            });
+          }
         }
         list.appendChild(row);
       }
@@ -3796,6 +4247,7 @@
       selectedCute = (LLM_STATUS && LLM_STATUS.cute) || (MODELS && MODELS.current);
       renderModelList();
       updateCtxInputForSelection();
+      oproRenderSettings();
       renderUsage();  // re-render now that LLM_STATUS is fresh (gives us ctx if usage was missing it)
       modelModal.classList.remove('hidden');
     }
@@ -3813,6 +4265,34 @@
       const btn = document.getElementById('apply-model-btn');
       btn.disabled = true;
       status.className = 'switch-status';
+      // Cloud path: no llama-server to restart, no health-poll to wait
+      // on. Just record the selection and surface the server-side note
+      // (which currently says "agent routing wires up in phase 3").
+      if (selectedCute === 'opro-api') {
+        status.textContent = 'selecting OPRO-API…';
+        try {
+          const r = await fetch('/api/model', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cute: 'opro-api' }),
+          });
+          if (!r.ok) {
+            const err = await r.text();
+            throw new Error(err.slice(0, 240));
+          }
+          const body = await r.json();
+          status.className = 'switch-status ready';
+          status.textContent = body.note || 'OPRO-API selected.';
+          conversation.innerHTML =
+            '<div class="empty-hint" id="empty-hint">model switched. start anew.</div>';
+        } catch (e) {
+          status.className = 'switch-status error';
+          status.textContent = 'error: ' + (e && e.message ? e.message : e);
+        } finally {
+          btn.disabled = false;
+        }
+        return;
+      }
       status.textContent = 'restarting llama-server…';
       try {
         const r = await fetch('/api/model', {
@@ -3855,6 +4335,320 @@
       }
     }
     window.applyModel = applyModel;
+
+    // ============================================================
+    // OPRO-API (OpenRouter) — wizard + inline settings panel.
+    //
+    // State machine (wizard):
+    //   step 1: understanding (three checkboxes)
+    //   step 2: paste key
+    //   step 3: health check result
+    //
+    // Update-key flow re-enters at step 2 (we trust prior acceptance
+    // of step 1; if you'd rather force re-acceptance every time,
+    // call oproOpenWizard(false) instead of oproOpenWizard(true)).
+    // ============================================================
+
+    let OPRO_STEP = 1;
+    let OPRO_LAST_STATUS = null;
+
+    // Visibility: settings panel below the model list — shown only
+    // when the OPRO-API row is the current selection AND a key is
+    // present (otherwise the click opens the wizard, not the panel).
+    function oproRenderSettings() {
+      const panel = document.getElementById('opro-settings');
+      if (!panel) return;
+      if (selectedCute !== 'opro-api' || !MODELS) {
+        panel.classList.add('hidden');
+        return;
+      }
+      const m = MODELS.models.find(x => x.cute === 'opro-api');
+      if (!m || !m.cloud_key_present) {
+        panel.classList.add('hidden');
+        return;
+      }
+      panel.classList.remove('hidden');
+      document.getElementById('opro-model-input').value = m.cloud_model_id || '';
+      const verified = document.getElementById('opro-verified-line');
+      if (m.cloud_last_verified_at) {
+        const when = m.cloud_last_verified_at.replace('T', ' ').replace('Z', ' UTC');
+        verified.textContent = (m.cloud_healthy ? 'OK at ' : 'failed at ') + when;
+        verified.className = 'value ' + (m.cloud_healthy ? 'ok' : 'error');
+      } else {
+        verified.textContent = 'not yet verified';
+        verified.className = 'value';
+      }
+      const errRow = document.getElementById('opro-error-row');
+      if (m.cloud_last_error) {
+        errRow.style.display = '';
+        document.getElementById('opro-error-line').textContent = m.cloud_last_error;
+      } else {
+        errRow.style.display = 'none';
+      }
+    }
+
+    // Wizard step navigation. Visibility = one screen visible at a time.
+    function oproShowStep(n) {
+      OPRO_STEP = n;
+      for (let i = 1; i <= 3; i++) {
+        const screen = document.getElementById('opro-screen-' + i);
+        const dot = document.getElementById('opro-dot-' + i);
+        if (i === n) {
+          screen.classList.remove('hidden');
+          dot.classList.add('active');
+          dot.classList.remove('done');
+        } else {
+          screen.classList.add('hidden');
+          dot.classList.remove('active');
+          if (i < n) dot.classList.add('done');
+          else dot.classList.remove('done');
+        }
+      }
+      const back = document.getElementById('opro-wizard-back');
+      const next = document.getElementById('opro-wizard-next');
+      back.style.visibility = n === 1 ? 'hidden' : 'visible';
+      // Buttons & enablement vary per step.
+      if (n === 1) {
+        next.textContent = 'next';
+        oproRefreshNextEnabled();
+      } else if (n === 2) {
+        next.textContent = 'save & verify';
+        oproRefreshNextEnabled();
+      } else if (n === 3) {
+        next.textContent = 'done';
+        next.disabled = false;
+      }
+    }
+
+    function oproRefreshNextEnabled() {
+      const next = document.getElementById('opro-wizard-next');
+      if (OPRO_STEP === 1) {
+        const allChecked = ['opro-cb-account','opro-cb-key','opro-cb-risk']
+          .every(id => document.getElementById(id).checked);
+        next.disabled = !allChecked;
+      } else if (OPRO_STEP === 2) {
+        const v = (document.getElementById('opro-key-input').value || '').trim();
+        next.disabled = v.length < 10;  // soft sanity check; server validates format
+      }
+    }
+
+    function oproOpenWizard(skipUnderstanding) {
+      // skipUnderstanding=true for update-key flow (user already agreed once)
+      const modal = document.getElementById('opro-wizard-modal');
+      // Reset all checkboxes + the key input on a fresh open.
+      ['opro-cb-account','opro-cb-key','opro-cb-risk'].forEach(id => {
+        document.getElementById(id).checked = !!skipUnderstanding;
+      });
+      document.getElementById('opro-key-input').value = '';
+      document.getElementById('opro-key-input').type = 'password';
+      document.getElementById('opro-reveal-btn').textContent = 'show';
+      document.getElementById('opro-health-panel').className = 'health-panel checking';
+      document.getElementById('opro-health-status').textContent = 'checking…';
+      document.getElementById('opro-health-hint').textContent = '';
+      modal.classList.remove('hidden');
+      oproShowStep(skipUnderstanding ? 2 : 1);
+      // Focus the key input on step 2 entries (improves paste flow).
+      if (skipUnderstanding) {
+        setTimeout(() => document.getElementById('opro-key-input').focus(), 50);
+      }
+    }
+    window.oproOpenWizard = oproOpenWizard;
+    function oproOpenWizardForUpdate() { oproOpenWizard(true); }
+    window.oproOpenWizardForUpdate = oproOpenWizardForUpdate;
+
+    function oproWizardClose() {
+      document.getElementById('opro-wizard-modal').classList.add('hidden');
+      // Refresh the model list so the OPRO-API row reflects any new state.
+      loadModels().then(() => { renderModelList(); oproRenderSettings(); });
+    }
+    window.oproWizardClose = oproWizardClose;
+
+    function oproWizardBack() {
+      if (OPRO_STEP > 1) oproShowStep(OPRO_STEP - 1);
+    }
+    window.oproWizardBack = oproWizardBack;
+
+    async function oproWizardNext() {
+      if (OPRO_STEP === 1) {
+        oproShowStep(2);
+        setTimeout(() => document.getElementById('opro-key-input').focus(), 50);
+      } else if (OPRO_STEP === 2) {
+        await oproSubmitKey();
+      } else if (OPRO_STEP === 3) {
+        oproWizardClose();
+      }
+    }
+    window.oproWizardNext = oproWizardNext;
+
+    function oproToggleReveal() {
+      const input = document.getElementById('opro-key-input');
+      const btn = document.getElementById('opro-reveal-btn');
+      if (input.type === 'password') {
+        input.type = 'text'; btn.textContent = 'hide';
+      } else {
+        input.type = 'password'; btn.textContent = 'show';
+      }
+    }
+    window.oproToggleReveal = oproToggleReveal;
+
+    async function oproSubmitKey() {
+      const key = (document.getElementById('opro-key-input').value || '').trim();
+      const next = document.getElementById('opro-wizard-next');
+      next.disabled = true;
+      // Advance to step 3 immediately so user sees the "checking" panel.
+      oproShowStep(3);
+      const panel = document.getElementById('opro-health-panel');
+      const statusEl = document.getElementById('opro-health-status');
+      const hintEl = document.getElementById('opro-health-hint');
+      panel.className = 'health-panel checking';
+      statusEl.textContent = 'storing key in keychain + pinging openrouter/free…';
+      hintEl.textContent = '';
+      try {
+        const r = await fetch('/api/cloud/set-key', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ api_key: key }),
+        });
+        if (!r.ok) {
+          const errText = await r.text();
+          panel.className = 'health-panel fail';
+          statusEl.textContent = 'failed: ' + errText.slice(0, 300);
+          next.textContent = 'try again';
+          next.disabled = false;
+          // Go back to step 2 so user can fix the key.
+          next.onclick = () => { next.onclick = null; oproShowStep(2); };
+          return;
+        }
+        const body = await r.json();
+        OPRO_LAST_STATUS = body.status;
+        if (body.health && body.health.ok) {
+          panel.className = 'health-panel ok';
+          statusEl.textContent =
+            '✓ verified at ' + (body.health.checked_at || '') +
+            ' against ' + (body.health.model || 'openrouter/free') +
+            '. OPRO-API is ready to use.';
+          hintEl.textContent =
+            'You can now select OPRO-API from the model picker. ' +
+            'Manage the key (update / remove / re-test) any time from ' +
+            'the settings panel that appears when OPRO-API is selected.';
+          next.textContent = 'done';
+          next.disabled = false;
+        } else {
+          panel.className = 'health-panel fail';
+          statusEl.textContent =
+            'key stored, but health check failed: ' +
+            ((body.health && body.health.error) || 'unknown');
+          hintEl.textContent =
+            'Common causes: insufficient credits on the OpenRouter ' +
+            'account (top up at openrouter.ai), restricted key, or a ' +
+            'network/proxy issue. You can re-test from the OPRO-API ' +
+            'settings panel after fixing the underlying issue.';
+          next.textContent = 'close';
+          next.disabled = false;
+        }
+      } catch (e) {
+        panel.className = 'health-panel fail';
+        statusEl.textContent = 'request failed: ' + (e && e.message ? e.message : e);
+        next.textContent = 'try again';
+        next.disabled = false;
+      }
+    }
+
+    // Inline settings-panel actions.
+    async function oproHealthCheck() {
+      const verified = document.getElementById('opro-verified-line');
+      verified.textContent = 'pinging openrouter/free…';
+      verified.className = 'value';
+      try {
+        const r = await fetch('/api/cloud/health-check', { method: 'POST' });
+        if (!r.ok) { verified.textContent = 'request failed'; verified.className = 'value error'; return; }
+        await loadModels();
+        renderModelList();
+        oproRenderSettings();
+      } catch (e) {
+        verified.textContent = 'error: ' + (e && e.message ? e.message : e);
+        verified.className = 'value error';
+      }
+    }
+    window.oproHealthCheck = oproHealthCheck;
+
+    async function oproSaveModel() {
+      const model = (document.getElementById('opro-model-input').value || '').trim();
+      if (!model) return;
+      const btn = document.getElementById('opro-model-save');
+      btn.disabled = true; btn.textContent = 'saving…';
+      try {
+        const r = await fetch('/api/cloud/set-model', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model_id: model }),
+        });
+        if (!r.ok) {
+          const err = await r.text();
+          btn.textContent = 'failed';
+          console.warn('opro set-model failed:', err);
+        } else {
+          btn.textContent = 'saved';
+          await loadModels();
+          renderModelList();
+          oproRenderSettings();
+        }
+      } finally {
+        setTimeout(() => { btn.textContent = 'save'; btn.disabled = false; }, 1100);
+      }
+    }
+    window.oproSaveModel = oproSaveModel;
+
+    async function oproClearKey() {
+      const ok = confirm(
+        'Remove the OpenRouter API key from the keychain?\n\n' +
+        'OPRO-API will become unusable until you complete the ' +
+        'onboarding wizard again. The "Local Models Only" broker ' +
+        'toggle is left as-is — flip it back on yourself if you ' +
+        'want the OPRO-API entry to disappear from the model picker.'
+      );
+      if (!ok) return;
+      try {
+        const r = await fetch('/api/cloud/clear-key', { method: 'POST' });
+        if (!r.ok) {
+          alert('Failed to clear key: ' + (await r.text()).slice(0, 300));
+          return;
+        }
+        // If OPRO-API was the active selection, drop back to whatever
+        // the local current is (no actual local switch happens — the
+        // server-side state lands in phase 3).
+        if (selectedCute === 'opro-api') {
+          selectedCute = MODELS && MODELS.current && MODELS.current !== 'opro-api'
+            ? MODELS.current
+            : null;
+        }
+        await loadModels();
+        renderModelList();
+        oproRenderSettings();
+      } catch (e) {
+        alert('Error: ' + (e && e.message ? e.message : e));
+      }
+    }
+    window.oproClearKey = oproClearKey;
+
+    // Wire up wizard-only event listeners (checkbox state + key input).
+    // Idempotent: attached once at script load, no harm if the wizard
+    // never opens.
+    ['opro-cb-account','opro-cb-key','opro-cb-risk'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', oproRefreshNextEnabled);
+    });
+    {
+      const keyInput = document.getElementById('opro-key-input');
+      if (keyInput) keyInput.addEventListener('input', oproRefreshNextEnabled);
+    }
+    // Escape closes the wizard (in addition to the modal-close X).
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const w = document.getElementById('opro-wizard-modal');
+        if (w && !w.classList.contains('hidden')) oproWizardClose();
+      }
+    });
 
     modelBadge.addEventListener('click', openModelModal);
     // Close on Escape when open.

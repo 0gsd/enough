@@ -1,0 +1,15 @@
+{
+  "_comment_1": "OpenRouter cloud-model config for the OPRO-API fifth model slot.",
+  "_comment_2": "Lives at ~/enough/config/openrouter.json. THE API KEY IS NOT STORED HERE.",
+  "_comment_3": "The key is held in the OS keyring (Keychain/Secret Service/Credential Manager).",
+  "_comment_4": "This file only stores metadata: enablement flag, the model id to use for chat,",
+  "_comment_5": "the most-recent health-check result, and whether a key is present in the keyring.",
+
+  "enabled": false,
+  "model_id": "openai/gpt-4o-mini",
+  "key_in_keychain": false,
+  "last_verified_at": null,
+  "last_verified_ok": null,
+  "last_verified_model": null,
+  "last_error": null
+}

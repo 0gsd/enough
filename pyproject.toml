@@ -28,6 +28,11 @@ dependencies = [
     "ctranslate2>=4.5",
     "sentencepiece>=0.2",
     "huggingface_hub>=0.26",
+    # opt-in OpenRouter cloud-model fifth slot: api key lives in the OS
+    # keyring (Keychain on macOS, Secret Service on Linux, Credential
+    # Manager on Windows), never plaintext on disk. broker reads it
+    # on-demand and injects it into outbound requests.
+    "keyring>=24",
 ]
 
 [project.scripts]

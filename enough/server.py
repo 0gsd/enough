@@ -37,6 +37,8 @@ from sse_starlette.sse import EventSourceResponse
 from . import __version__
 from . import broker as _broker
 from .llm import LLMError, stream_chat
+from . import cloud as _cloud
+from . import models as _models
 from .logger import ExchangeLog, log_exchange
 from .prompt import (
     assemble_system_prompt,
@@ -534,9 +536,25 @@ async def _drive_message(
         await session.emit("turn_start", {})
         buffer = ""
         usage_sink: dict[str, int] = {}
-        agen = stream_chat(
-            session.llm_url, messages, client=client, usage_sink=usage_sink,
-        )
+        # Routing: when the active model is OPRO-API (the OpenRouter cloud
+        # slot) the chat completion is streamed from cloud.py with the api
+        # key injected at the http layer; otherwise the existing local
+        # llama-server path runs. Both generators yield content tokens and
+        # populate usage_sink the same way, so the downstream loop is
+        # untouched. Failure raises (LLMError or CloudHTTPError); the
+        # caller's existing exception handling catches both.
+        try:
+            _active_model = _models.load_state().get("current")
+        except Exception:  # noqa: BLE001
+            _active_model = None
+        if _active_model == "opro-api":
+            agen = _cloud.stream_chat_completion(
+                messages, client=client, usage_sink=usage_sink,
+            )
+        else:
+            agen = stream_chat(
+                session.llm_url, messages, client=client, usage_sink=usage_sink,
+            )
         stopped_at_tool = False
         try:
             # Iterate by hand so we can apply a per-chunk inactivity
@@ -570,6 +588,23 @@ async def _drive_message(
         session.history.append({"role": "assistant", "content": buffer})
         if assistant_text_for_log is not None:
             assistant_text_for_log.append(buffer)
+        # When the turn ran against OPRO-API, durably cache the completion
+        # under rness/io/cloud-cache/ so a future local-LLM agent (or this
+        # agent in a later session) can read what the cloud said. Failure
+        # here never breaks the turn — a missing cache file is a UX
+        # regression, not a correctness one.
+        if _active_model == "opro-api" and buffer:
+            try:
+                _cloud.cache_completion(
+                    session.project_dir,
+                    messages=messages,
+                    response_text=buffer,
+                    model=_cloud.load_cloud_config()["model_id"],
+                    usage=usage_sink,
+                    source="chat",
+                )
+            except Exception as e:  # noqa: BLE001
+                log.warning("cloud-cache write failed: %s", e)
         # Persist usage from this completion + emit a live update.
         # llama-server reports prompt + completion tokens; for the
         # gauge, total_tokens is what was actually loaded into the
@@ -1629,10 +1664,93 @@ def create_app(
         _write_ui_config(cfg)
         return cfg
 
+    # ---------------------- OpenRouter (OPRO-API) ------------------------
+    # The fifth model slot. Gated by the `local_models_only` broker toggle
+    # (default on); these endpoints work regardless of the toggle but the
+    # UI only surfaces them when the toggle is off. The api key never
+    # transits these endpoints in either direction except for the one-time
+    # POST to /api/cloud/set-key — from there it lives in the OS keyring
+    # and is accessed only by enough.cloud.
+
+    @app.get("/api/cloud/status")
+    async def api_cloud_status() -> dict[str, Any]:
+        """Current OpenRouter status: enablement flag, model id, whether a
+        key is present in the keyring, last verified result. NEVER returns
+        the api key value itself."""
+        from . import cloud as _cloud
+        return _cloud.status_snapshot()
+
+    @app.post("/api/cloud/set-key")
+    async def api_cloud_set_key(request: Request) -> dict[str, Any]:
+        """Store or update the OpenRouter api key in the OS keyring, then
+        run a fresh health check. Body: {"api_key": "sk-or-..."}. The key
+        is validated against the OpenRouter prefix format before storage.
+        Returns {"status": status_snapshot, "health": health_check_result}
+        so the wizard / settings UI can show both in one round-trip."""
+        from . import cloud as _cloud
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        api_key = ((body or {}).get("api_key") or "").strip()
+        if not api_key:
+            raise HTTPException(400, "missing api_key")
+        try:
+            _cloud.set_api_key(api_key)
+        except _cloud.CloudKeyringUnavailable as e:
+            raise HTTPException(500, str(e)) from None
+        except _cloud.CloudError as e:
+            raise HTTPException(400, str(e)) from None
+        health = _cloud.health_check()
+        return {"status": _cloud.status_snapshot(), "health": health}
+
+    @app.post("/api/cloud/clear-key")
+    async def api_cloud_clear_key() -> dict[str, Any]:
+        """Remove the OpenRouter api key from the OS keyring and reset
+        the verified-state metadata. Idempotent — safe to call when no
+        key is present. Returns the post-clear status snapshot."""
+        from . import cloud as _cloud
+        _cloud.clear_api_key()
+        return _cloud.status_snapshot()
+
+    @app.post("/api/cloud/health-check")
+    async def api_cloud_health_check() -> dict[str, Any]:
+        """Re-test the currently-stored api key against OpenRouter via the
+        zero-cost `openrouter/free` auto-selector. Updates the on-disk
+        last-verified metadata. Returns both the health result and the
+        updated status snapshot."""
+        from . import cloud as _cloud
+        health = _cloud.health_check()
+        return {"status": _cloud.status_snapshot(), "health": health}
+
+    @app.post("/api/cloud/set-model")
+    async def api_cloud_set_model(request: Request) -> dict[str, Any]:
+        """Update which OpenRouter model id chat completions go to. Body:
+        {"model_id": "openai/gpt-4o-mini"}. No client-side validation —
+        OpenRouter has hundreds of models and the canonical list changes;
+        unrecognized ids fail at request time with a clear 404 message."""
+        from . import cloud as _cloud
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        model_id = ((body or {}).get("model_id") or "").strip()
+        if not model_id:
+            raise HTTPException(400, "missing model_id")
+        try:
+            _cloud.set_model_id(model_id)
+        except _cloud.CloudError as e:
+            raise HTTPException(400, str(e)) from None
+        return _cloud.status_snapshot()
+
     @app.get("/api/models")
     async def api_models() -> dict[str, Any]:
         """Registry + per-model installed/recommended view + total RAM +
-        supervisor status."""
+        supervisor status. When the `local_models_only` broker toggle is
+        off, also injects a virtual OPRO-API entry at the end of the model
+        list so the modal renders it as a fifth slot. The OPRO-API entry
+        carries `cloud: True` plus cloud-specific status fields so the
+        frontend can render and dispatch it differently from local models."""
         from . import models as _models  # late import: avoid circular
         payload: dict[str, Any] = {
             "total_ram_gb": _models.total_ram_gb(),
@@ -1641,12 +1759,62 @@ def create_app(
             "ctx_overrides": _models.load_state().get("ctx_overrides") or {},
         }
         payload["supervisor"] = supervisor.status() if supervisor else {"mode": "off"}
+
+        # Inject OPRO-API when cloud is unlocked. The model list is the
+        # only frontend surface that needs to know about it; everything
+        # else flows through /api/cloud/*.
+        if not _broker.is_enabled("local_models_only"):
+            from . import cloud as _cloud
+            cloud_status = _cloud.status_snapshot()
+            payload["models"] = list(payload["models"]) + [{
+                "cute": "opro-api",
+                "label": "OpenRouter (cloud)",
+                "family": "cloud",
+                # `installed` doubles as the "can switch to this" flag in
+                # the UI — true only when a key is present AND the most
+                # recent health check passed.
+                "installed": bool(
+                    cloud_status["key_present"]
+                    and cloud_status["last_verified_ok"]
+                ),
+                "path": None,
+                "disk_gb_approx": None,
+                "ram_gb_recommended_min": None,
+                "ctx_max": None,
+                "ctx_recommended": None,
+                # cloud-only fields the frontend uses for rendering
+                "cloud": True,
+                "cloud_model_id": cloud_status["model_id"],
+                "cloud_key_present": cloud_status["key_present"],
+                "cloud_healthy": cloud_status["last_verified_ok"],
+                "cloud_last_verified_at": cloud_status["last_verified_at"],
+                "cloud_last_error": cloud_status["last_error"],
+            }]
         return payload
 
     @app.get("/api/llm-status")
     async def api_llm_status() -> dict[str, Any]:
         """Lightweight poll target for the UI: is llama-server alive, what
-        model is loaded, ready-for-requests?"""
+        model is loaded, ready-for-requests? When OPRO-API is the active
+        model, the supervisor's local-llama state is irrelevant — what
+        matters is whether the cloud key is healthy."""
+        # Short-circuit: OPRO-API mode. Local llama-server may or may not
+        # be running in the background; we report cloud-readiness instead.
+        try:
+            current = _models.load_state().get("current")
+        except Exception:  # noqa: BLE001
+            current = None
+        if current == "opro-api":
+            cloud_status = _cloud.status_snapshot()
+            return {
+                "mode": "cloud",
+                "ready": bool(cloud_status["key_present"] and cloud_status["last_verified_ok"]),
+                "cute": "opro-api",
+                "ctx": None,
+                "cloud_model_id": cloud_status["model_id"],
+                "cloud_healthy": cloud_status["last_verified_ok"],
+                "cloud_last_error": cloud_status["last_error"],
+            }
         if supervisor is None:
             # Non-supervised mode: best-effort probe of /health.
             try:
@@ -1661,13 +1829,15 @@ def create_app(
     async def api_model_switch(request: Request) -> dict[str, Any]:
         """Swap the loaded model and/or ctx. Body: {"cute": "g40-04",
         "ctx": 16384 (optional)}. Returns supervisor status; the UI
-        should poll /api/llm-status for readiness."""
-        if supervisor is None:
-            raise HTTPException(
-                400,
-                "llama-server isn't supervised by this enough process — "
-                "restart enough without --no-supervise to enable switching.",
-            )
+        should poll /api/llm-status for readiness.
+
+        Special case for "opro-api" (the OpenRouter cloud slot): there's
+        no llama-server to restart — we just persist the selection via
+        `models.save_state` and return a synthetic status. The supervisor
+        keeps running its existing local model in the background; the
+        actual cloud-routing of chat completions lands when llm.py is
+        extended in phase 3. For phase 2 the selection is recorded so the
+        UI flow is testable end-to-end."""
         try:
             body = await request.json()
         except Exception:  # noqa: BLE001
@@ -1676,6 +1846,49 @@ def create_app(
         ctx = (body or {}).get("ctx")
         if not cute:
             raise HTTPException(400, "missing 'cute' field")
+
+        if cute == "opro-api":
+            # gating: refuse if cloud is locked or the key isn't healthy.
+            if _broker.is_enabled("local_models_only"):
+                raise HTTPException(400, _broker.denial_local_models_only())
+            from . import cloud as _cloud
+            from . import models as _models  # late import: avoid circular
+            status = _cloud.status_snapshot()
+            if not status["key_present"]:
+                raise HTTPException(400, _broker.denial_cloud_key_missing())
+            if not status["last_verified_ok"]:
+                raise HTTPException(
+                    400,
+                    _broker.denial_cloud_unhealthy(status["last_error"] or "unverified"),
+                )
+            # persist the selection. don't touch the supervisor — the
+            # local llama-server keeps running for now. routing of chat
+            # completions to OpenRouter is wired in phase 3.
+            state = _models.load_state()
+            state["current"] = "opro-api"
+            _models.save_state(state)
+            session.history.clear()
+            session.last_usage = {}
+            await session.emit("usage", {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0})
+            return {
+                "mode": "cloud",
+                "ready": True,
+                "cute": "opro-api",
+                "cloud_model_id": status["model_id"],
+                "note": (
+                    "OPRO-API selected. agent routing to OpenRouter is "
+                    "wired in the next update — until then, the model "
+                    "badge reflects the selection but chat completions "
+                    "still use the local model in the background."
+                ),
+            }
+
+        if supervisor is None:
+            raise HTTPException(
+                400,
+                "llama-server isn't supervised by this enough process — "
+                "restart enough without --no-supervise to enable switching.",
+            )
         try:
             await supervisor.switch(str(cute), int(ctx) if ctx is not None else None)
         except RuntimeError as e:

@@ -347,13 +347,24 @@ def _preferred_ctx(cute: str) -> int:
 
 
 def _resolve_startup_choice() -> tuple[str | None, int]:
-    """Pick which (cute, ctx) to launch with on enough startup."""
+    """Pick which (cute, ctx) to launch with on enough startup.
+
+    Returns (None, _) when no local llama-server should be spawned —
+    either because no model is configured / installed, or because the
+    active selection is the cloud slot (opro-api), in which case
+    chat completions route through enough.cloud at request time and
+    a local llama-server would just waste RAM."""
     try:
         state = _models.load_state()
     except Exception:  # noqa: BLE001
         return (None, 16384)
     cute = state.get("current")
     if not cute:
+        return (None, 16384)
+    # Cloud slot: no local process to launch. The supervisor returns
+    # mode="off" and /api/llm-status synthesizes a cloud-mode response
+    # from the OpenRouter status snapshot instead.
+    if cute == "opro-api":
         return (None, 16384)
     try:
         info = _models.resolve(cute)

@@ -86,6 +86,8 @@ class ToolResult:
             attr = 'path'
         elif self.name == 'fetch_url':
             attr = 'url'
+        elif self.name == 'cloud_pipeline':
+            attr = 'output'
         else:
             attr = 'command'
         safe_key = self.key.replace('"', "&quot;")
@@ -94,6 +96,26 @@ class ToolResult:
             f'{self.body}\n'
             f'</tool_result>'
         )
+
+
+# Shell-command patterns we refuse to execute because they look like
+# attempts to extract the OpenRouter api key out of the OS keyring or to
+# probe our internal keyring service name. The patterns are intentionally
+# very specific — `enough-broker` and `openrouter-api-key` are identifiers
+# we coined ourselves, so a shell command referencing them by name has no
+# legitimate purpose during agent execution. (If the user wants to debug
+# their keyring backend, they can run those commands in a terminal outside
+# this session.) Phase 1 defined the denial message; this is its wiring.
+_CLOUD_KEY_EXFIL_PATTERNS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"\benough-broker\b"),
+     "shell command references the broker's keyring service name"),
+    (re.compile(r"\bopenrouter-api-key\b"),
+     "shell command references the keyring account name for the api key"),
+    (re.compile(r"keyring\.(get|set|delete)_password"),
+     "shell command invokes the Python keyring api directly"),
+    (re.compile(r"\bsecret-tool\s+(lookup|search|store)\b"),
+     "shell command uses the Linux Secret Service CLI"),
+)
 
 
 def parse_tool_calls(text: str) -> list[ToolCall]:
@@ -468,6 +490,18 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
 def run_shell(project_dir: Path, call: ToolCall, timeout: float = 60.0) -> ToolResult:
     if not call.command:
         return ToolResult("shell", "", False, "error: missing <command>")
+    # Pre-execution scan: refuse anything that looks like an attempt to
+    # extract the OpenRouter api key from the keyring. The keyring access
+    # itself is OS-level protected on macOS (first-time read by an
+    # unknown process prompts the user), but a defense-in-depth shell
+    # filter catches the easy case where an injected prompt asks the
+    # agent to "just run this one debugging command".
+    for pat, reason in _CLOUD_KEY_EXFIL_PATTERNS:
+        if pat.search(call.command):
+            return ToolResult(
+                "shell", call.command, False,
+                broker.denial_cloud_key_exfiltration_attempt(reason),
+            )
     try:
         proc = subprocess.run(
             call.command,
@@ -897,6 +931,95 @@ def run_navigate_to_highlight(project_dir: Path, call: ToolCall) -> ToolResult:
 
 
 # ---------------------------------------------------------------------------
+# cloud_pipeline — broker-driven multi-step batch execution against
+# OpenRouter. The agent passes a JSON spec in <content>; the broker
+# (via enough.cloud.pipeline_run) runs every step, caches each, optionally
+# compiles + final-passes the result, and returns a structured summary.
+# Designed for the "write 36 chapters then proofread them" use case where
+# letting the agent loop per-step would burn turns and inflate hijack
+# surface. Always non-streaming.
+# ---------------------------------------------------------------------------
+
+def run_cloud_pipeline(project_dir: Path, call: ToolCall) -> ToolResult:
+    # late import: avoid importing httpx/keyring at module top when this
+    # tool is never invoked (most sessions).
+    from . import cloud as _cloud
+    import json as _json
+
+    # Gating chain: local_models_only must be off, key must be present and
+    # healthy, spec must parse. Each failure returns a clear denial so the
+    # agent can either give up or surface the issue to the user.
+    if broker.is_enabled("local_models_only"):
+        return ToolResult(
+            "cloud_pipeline", "", False,
+            broker.denial_local_models_only(),
+        )
+    cloud_status = _cloud.status_snapshot()
+    if not cloud_status["key_present"]:
+        return ToolResult(
+            "cloud_pipeline", "", False,
+            broker.denial_cloud_key_missing(),
+        )
+    if not cloud_status["last_verified_ok"]:
+        return ToolResult(
+            "cloud_pipeline", "", False,
+            broker.denial_cloud_unhealthy(cloud_status["last_error"] or "unverified"),
+        )
+    if not call.content:
+        return ToolResult(
+            "cloud_pipeline", "", False,
+            "error: missing <content> with the pipeline spec (json object). "
+            "schema: {steps: [{prompt, system?}, …], compile?: {method, separator?}, "
+            "final_pass?: {prompt, system?}, output_path?, model?, temperature?, "
+            "max_tokens_per_step?}",
+        )
+    try:
+        spec = _json.loads(call.content)
+    except _json.JSONDecodeError as e:
+        return ToolResult(
+            "cloud_pipeline", "", False,
+            f"error: <content> must be valid json — {e}",
+        )
+
+    try:
+        result = _cloud.pipeline_run(project_dir, spec)
+    except _cloud.PipelineError as e:
+        return ToolResult("cloud_pipeline", "", False, f"pipeline error: {e}")
+    except _cloud.CloudError as e:
+        return ToolResult("cloud_pipeline", "", False, f"cloud error: {e}")
+
+    # Summary body: keep it small so the agent's context isn't blown out.
+    # The actual prose lives on disk; the agent can read_file specific
+    # paths if it needs to inspect output.
+    totals = result["totals"]
+    body_lines = [
+        f"pipeline ok — {result['step_count']} steps via {result['model']}",
+        f"tokens: prompt {totals['prompt']} / completion {totals['completion']} / total {totals['total']}",
+    ]
+    if result.get("output_path"):
+        body_lines.append(f"output: {result['output_path']}")
+    if result.get("final_path"):
+        body_lines.append(f"final-pass cache: {result['final_path']}")
+    body_lines.append(
+        f"per-step caches: {len(result['step_paths'])} files in rness/io/cloud-cache/"
+    )
+    if result.get("summary_paths"):
+        body_lines.append(
+            f"per-step summaries (summarize_each): {len(result['summary_paths'])} additional cache files"
+        )
+    body_lines.append(
+        "(read_file any individual cache to see its prompt + response; "
+        "the cloud-cache index is at rness/io/cloud-cache/_cloud-index.md)"
+    )
+    return ToolResult(
+        "cloud_pipeline",
+        result.get("output_path") or "(no output_path)",
+        True,
+        "\n".join(body_lines),
+    )
+
+
+# ---------------------------------------------------------------------------
 # Dispatch
 # ---------------------------------------------------------------------------
 
@@ -907,6 +1030,7 @@ _DISPATCH = {
     "fetch_url": run_fetch_url,
     "read_highlights": run_read_highlights,
     "navigate_to_highlight": run_navigate_to_highlight,
+    "cloud_pipeline": run_cloud_pipeline,
 }
 
 # Map tool name to its per-tool "brokered" toggle. When that toggle is
@@ -922,6 +1046,10 @@ _TRACE_TOGGLE = {
     "fetch_url": "fetch_url_enabled",
     "read_highlights": "trace_log_enabled",
     "navigate_to_highlight": "trace_log_enabled",
+    # cloud_pipeline is gated by `local_models_only` (off) + a healthy
+    # key; we trace it under the universal trace toggle so the journal
+    # captures every cloud batch the agent runs.
+    "cloud_pipeline": "trace_log_enabled",
 }
 
 

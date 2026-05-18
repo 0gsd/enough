@@ -126,6 +126,22 @@ TOGGLES: tuple[Toggle, ...] = (
         default=True,
         group="fetch_url",
     ),
+    Toggle(
+        key="local_models_only",
+        label="local models only",
+        description=(
+            "when on (the default), only locally-hosted models appear in "
+            "the model picker — your prompts and outputs never leave this "
+            "machine. turn off to unlock the OPRO-API option, which routes "
+            "requests through OpenRouter to a cloud-hosted model of your "
+            "choice. cloud use requires an OpenRouter account, a paid api "
+            "key (set up via the onboarding wizard the first time you pick "
+            "OPRO-API), and the understanding that prompts will leave your "
+            "machine and you will be billed by OpenRouter for usage."
+        ),
+        default=True,
+        group="general",
+    ),
 )
 
 
@@ -283,4 +299,47 @@ def denial_tool_disabled(tool: str) -> str:
         f"error: the {tool} tool is disabled in the broker config. "
         f"re-enable it in the broker pane (top-nav 'broker' button), "
         f"or use a different tool to achieve the same end."
+    )
+
+
+def denial_local_models_only() -> str:
+    return (
+        "error: cannot use OpenRouter/cloud features — 'local models only' "
+        "is enabled in the broker config (its default). turn it off in the "
+        "broker pane (top-nav 'broker' button) to unlock the OPRO-API model "
+        "slot. note: enabling cloud features means prompts will leave this "
+        "machine and you will be billed by OpenRouter for usage."
+    )
+
+
+def denial_cloud_key_missing() -> str:
+    return (
+        "error: no OpenRouter api key is configured. select the OPRO-API "
+        "model from the model picker to run the onboarding wizard, or set "
+        "a key directly via the OpenRouter settings panel. the key is "
+        "stored in the OS keyring, never on disk in plaintext."
+    )
+
+
+def denial_cloud_unhealthy(reason: str) -> str:
+    return (
+        f"error: OpenRouter health check has failed ({reason}). re-run the "
+        f"health check from the OpenRouter settings panel after fixing the "
+        f"underlying issue (commonly: out of credits → top up account; "
+        f"invalid key → paste the correct key; network → check connectivity)."
+    )
+
+
+def denial_cloud_key_exfiltration_attempt(pattern: str) -> str:
+    """Triggered when a shell command (or other tool input) looks like it
+    is trying to read the OpenRouter api key out of the OS keyring or the
+    config file. Phase 1 defines the message; phase 3 wires the detection
+    into the shell tool runner."""
+    return (
+        f"error: refused — the requested operation matches a pattern "
+        f"associated with api key exfiltration ({pattern}). the OpenRouter "
+        f"key lives in the OS keyring and is read only by enough's broker; "
+        f"no agent tool should need to extract it. if this is a legitimate "
+        f"operation (e.g. you are debugging the keyring backend), run the "
+        f"command directly in a terminal outside this agent session."
     )
