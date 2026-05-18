@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.0.9)
+# enough — Agent Guide (v0.1.0)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an

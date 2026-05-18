@@ -7,8 +7,9 @@
 #   3. Installs llama.cpp, uv, and tor via brew (skips ones already installed).
 #   4. Clones github.com/0gsd/enough to ~/enough (or `git pull`s if already there).
 #   5. Runs `uv sync` inside ~/enough so the Python env is ready
-#      (this also installs the offline-translation dependencies:
-#      ctranslate2, sentencepiece, huggingface_hub).
+#      (this also installs the offline-translation dependencies —
+#      ctranslate2, sentencepiece, huggingface_hub — and the keyring
+#      binding used for the optional OpenRouter cloud-model slot).
 #   6. Sets up ~/enough/weights/ and either moves an existing GGUF into it
 #      or downloads the recommended Gemma 4 26B MoE Q4_K_M (~16 GB).
 #   7. Downloads the whisper model for voice input (~142 MB).
@@ -91,7 +92,7 @@ fi
 # 1. Platform check
 # ---------------------------------------------------------------------------
 step 1 "checking your platform"
-note "enough v0.0.3 ships for macOS only. Linux support is on the roadmap."
+note "enough v0.1.0 ships for macOS only. Linux support is on the roadmap."
 if [[ "$(uname)" != "Darwin" ]]; then
   err "this script only runs on macOS. detected: $(uname)"
   exit 1
@@ -171,6 +172,13 @@ fi
 step 5 "preparing the Python environment"
 note "\`uv sync\` reads ~/enough/pyproject.toml, creates ~/enough/.venv, and"
 note "installs every Python dependency enough needs. No global pip pollution."
+note "this also includes:"
+note "  • ctranslate2, sentencepiece, huggingface_hub — for the offline"
+note "    \`translator\` skill (used by step 8 below)"
+note "  • keyring — the cross-platform binding to the OS credential store"
+note "    (macOS Keychain on this machine). Used by the optional OpenRouter"
+note "    cloud-model slot to store an api key without ever writing it to"
+note "    disk in plaintext. The slot itself is off by default; see step 10."
 ( cd "$ENOUGH_HOME" && uv sync )
 ok "~/enough/.venv is ready"
 
@@ -390,5 +398,24 @@ note "  3. run:"
 note "     enough"
 note ""
 note "  4. open http://127.0.0.1:3456 and say hi to your fresh agent."
+note ""
+note "optional: enable the OpenRouter cloud-model slot (OPRO-API)"
+note ""
+note "  enough is local-first by default — the four models you just installed"
+note "  run entirely on this machine. if you'd also like to route through a"
+note "  cloud model via openrouter.ai (gpt, claude, mistral, etc.), enough"
+note "  has a fifth opt-in model slot that's intentionally hard to enable"
+note "  accidentally:"
+note ""
+note "    a. open the broker pane (top-nav 'broker' icon) and turn OFF"
+note "       'local models only'"
+note "    b. open the model picker — OPRO-API now appears as a fifth slot"
+note "    c. click it to run a 3-screen onboarding wizard (account / billing"
+note "       acknowledgement, paste an openrouter api key, automatic health"
+note "       check). the key is stored in macOS Keychain, never on disk in"
+note "       plaintext"
+note ""
+note "  privacy is what local-first guarantees; cloud cost is sometimes lower"
+note "  than the marginal electricity of local inference. the choice is yours."
 note ""
 note "troubleshooting: re-run this script any time — it's idempotent."
