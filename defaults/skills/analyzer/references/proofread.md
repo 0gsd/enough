@@ -35,7 +35,9 @@ Proofread mode is backed by **Harper** (<https://writewithharper.com>), a
 local, privacy-first grammar/spell checker by Automattic — Apache 2.0, no
 network calls, no AI. It runs in milliseconds per file and emits a precise,
 rule-named list of findings. The `bootstrap.sh` installer puts it on PATH
-as `harper` via Homebrew.
+via `brew install harper`, which provides two binaries: **`harper-cli`**
+(the one this mode uses) and `harper-ls` (a language server for editors,
+unused here).
 
 **Use Harper to drive the mechanical-fixes pass.** It catches more than a
 sweep of the eye on long manuscripts and gives every finding a stable rule
@@ -47,20 +49,20 @@ For each chunk (the whole document if single-pass, or each chapter file
 when running the long-book loop):
 
 ```bash
-harper lint <path> --format json --dialect <us|gb|au|ca>
+harper-cli lint <path> --format json --dialect <us|gb|au|ca>
 ```
 
 - The output is structured JSON: a list of files, each with a list of
   lints. Each lint carries `rule`, `kind`, `span` (char_start/char_end),
   `line`, `column`, `message`, `priority`, `suggestions[]`, and
   `matched_text`.
-- `harper lint` exits non-zero when any lints are found. That is normal;
-  it does not mean the run failed. Read the JSON regardless.
+- `harper-cli lint` exits non-zero when any lints are found. That is
+  normal; it does not mean the run failed. Read the JSON regardless.
 - If the document is in a single file, pass that file. For the long-book
   loop, run Harper against each `scratch/ch{N}.txt` separately.
-- If `harper` is not on PATH (older install, manual setup, etc.), continue
-  without it — do the mechanical pass by attention as before, and note in
-  the report that Harper was unavailable. Do not block.
+- If `harper-cli` is not on PATH (older install, manual setup, etc.),
+  continue without it — do the mechanical pass by attention as before,
+  and note in the report that Harper was unavailable. Do not block.
 
 ### Dialect detection
 
@@ -160,7 +162,7 @@ The document size determines the strategy. Decide before you start.
 ### Up to ~5,000 words (an essay, a short story, a long memo)
 
 - Read the whole thing into context.
-- Run `harper lint <path> --format json --dialect <us|gb|au|ca>` once.
+- Run `harper-cli lint <path> --format json --dialect <us|gb|au|ca>` once.
 - Pass 1: mechanical fixes — start from Harper's JSON, apply the
   silently-fixable subset (see mapping rules above), log every change.
 - Pass 2: substantive suggestions — your own pass plus Harper's
@@ -175,9 +177,9 @@ The document size determines the strategy. Decide before you start.
   treat each section as a chunk.
 - If it doesn't, split into ~3,000-word chunks at paragraph boundaries — do
   not split inside a paragraph.
-- For each chunk, run `harper lint` on that chunk's file, then the three
-  passes locally; after every chunk, update the running phrase-frequency
-  table (see below).
+- For each chunk, run `harper-cli lint` on that chunk's file, then the
+  three passes locally; after every chunk, update the running
+  phrase-frequency table (see below).
 - After all chunks, do a **cross-chunk pass** for pattern findings before
   writing the report.
 
@@ -205,9 +207,9 @@ try to hold the whole book at once.
 For each chapter:
 
 1. Read just that chapter.
-2. Run `harper lint scratch/ch{N}.txt --format json --dialect <detected>
-   > scratch/ch{N}-harper.json`. Skip this step (and proceed without
-   it) if `harper` is not on PATH.
+2. Run `harper-cli lint scratch/ch{N}.txt --format json --dialect
+   <detected> > scratch/ch{N}-harper.json`. Skip this step (and proceed
+   without it) if `harper-cli` is not on PATH.
 3. Pass 1 — mechanical fixes. Use the Harper JSON as the primary
    detector; apply the silently-fixable subset per the mapping rules
    above. Write the corrected chapter text to
@@ -323,7 +325,7 @@ per suggestion at most, and only when it sharpens the note.
 **Source:** [path or URL]
 **Length:** [word count] words   |   **Date:** [YYYY-MM-DD]
 **Chunking strategy:** [single-pass / N sections / N chapters via scratch dir]
-**Detector:** [Harper vX.Y.Z + LLM review | LLM only — harper not on PATH]
+**Detector:** [Harper vX.Y.Z + LLM review | LLM only — harper-cli not on PATH]
 **Dialect:** [us / gb / au / ca]
 **Scratch directory (if any):** `rness/io/output/analyzer/<slug>-scratch/`
 

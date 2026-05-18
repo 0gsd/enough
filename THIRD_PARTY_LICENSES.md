@@ -117,7 +117,7 @@ to run the MADLAD-400 translation model offline:
 |---|---|---|---|
 | Tor | BSD-3-Clause | Anonymized web fetch for off-allowlist domains (used by the broker's `fetch_url` tool) | <https://www.torproject.org> |
 | Pandoc | GPL-2.0-or-later | HTML→markdown conversion for fetched documents (invoked as an external binary; not bundled with this package) | <https://pandoc.org> |
-| Harper | Apache-2.0 | Local grammar/spell checker (Automattic). Powers the mechanical pass of the `analyzer` skill's proofread mode (invoked as the `harper` binary; not bundled with this package). | <https://github.com/Automattic/harper> |
+| Harper | Apache-2.0 | Local grammar/spell checker (Automattic). Installed via `brew install harper`, which provides `harper-cli` (used by the `analyzer` skill's proofread mode) and `harper-ls` (a language server, unused by enough). Not bundled with this package. | <https://github.com/Automattic/harper> |
 
 ### System fonts (referenced, not bundled)
 
