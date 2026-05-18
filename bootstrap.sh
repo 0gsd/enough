@@ -4,7 +4,8 @@
 # What this does, top to bottom:
 #   1. Checks you're on macOS.
 #   2. Makes sure Homebrew is present (explains what it is if not).
-#   3. Installs llama.cpp, uv, and tor via brew (skips ones already installed).
+#   3. Installs llama.cpp, uv, tor, whisper-cpp, pandoc, and harper via brew
+#      (skips ones already installed).
 #   4. Clones github.com/0gsd/enough to ~/enough (or `git pull`s if already there).
 #   5. Runs `uv sync` inside ~/enough so the Python env is ready
 #      (this also installs the offline-translation dependencies —
@@ -73,7 +74,7 @@ BANNER
 
 note "This script sets up everything you need to run enough on a Mac:"
 note "  • Homebrew (package manager, if you don't have it)"
-note "  • llama.cpp, uv, tor, whisper-cpp via Homebrew"
+note "  • llama.cpp, uv, tor, whisper-cpp, pandoc, harper via Homebrew"
 note "  • a clone of the enough repo at ~/enough"
 note "  • a GGUF model file in ~/enough/weights/"
 note "  • a whisper model for voice input in ~/enough/weights/whisper/"
@@ -118,12 +119,13 @@ fi
 # 3. Brew deps
 # ---------------------------------------------------------------------------
 step 3 "installing Homebrew packages"
-note "five utilities go on this pass:"
+note "six utilities go on this pass:"
 note "  • llama.cpp   — the local LLM server that backs enough"
 note "  • uv          — manages the Python environment that runs enough itself"
 note "  • tor         — anonymization proxy used by the broker for off-allowlist web fetches"
 note "  • whisper-cpp — local speech-to-text for the mic button in chat"
 note "  • pandoc      — universal document converter; used by the broker to convert fetched HTML to markdown"
+note "  • harper      — local grammar/spell checker (Apache 2.0, by Automattic) used by the analyzer skill's proofread mode"
 
 install_brew_pkg() {
   local pkg="$1"
@@ -136,7 +138,7 @@ install_brew_pkg() {
   fi
 }
 
-for pkg in llama.cpp uv tor whisper-cpp pandoc; do
+for pkg in llama.cpp uv tor whisper-cpp pandoc harper; do
   install_brew_pkg "$pkg"
 done
 

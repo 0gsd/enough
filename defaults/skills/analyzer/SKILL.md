@@ -1,6 +1,6 @@
 ---
 name: analyzer
-description: "Three-mode analytical toolkit for documents, books, web pages, and decisions. SUMMARIZE produces an even-handed one-page digest of any text (author motivation, intended audience, tone, key quotes). PROOFREAD makes light spelling/typo corrections on full-length documents (including entire books, chapter by chapter) and produces a separate proof report with suggestions and repeated-phrase findings. DECIDE picks three archetypal personas from a built-in roster and runs a transcripted debate over a question, complex decision, or 'what should I do next' — returning a recommendation plus the full debate. Use for 'analyze this', 'summarize this', 'one-pager', 'tl;dr but smart', 'read this for me', 'proofread this', 'copy-edit this book', 'fix typos in', 'spot repetition', 'help me decide', 'pros and cons', 'what should I do about', 'three perspectives on', 'debate this'. Works with .txt, .md, .docx, .pdf, .epub, .html, pasted text, web pages, and free-form questions."
+description: "Three-mode analytical toolkit for documents, books, web pages, and decisions. SUMMARIZE produces an even-handed one-page digest of any text (author motivation, intended audience, tone, key quotes). PROOFREAD makes light spelling/typo corrections on full-length documents (including entire books, chapter by chapter), driven by the Harper grammar checker (local, offline, rule-named findings), and produces a separate proof report with suggestions and repeated-phrase findings. DECIDE picks three archetypal personas from a built-in roster and runs a transcripted debate over a question, complex decision, or 'what should I do next' — returning a recommendation plus the full debate. Use for 'analyze this', 'summarize this', 'one-pager', 'tl;dr but smart', 'read this for me', 'proofread this', 'copy-edit this book', 'fix typos in', 'spot repetition', 'help me decide', 'pros and cons', 'what should I do about', 'three perspectives on', 'debate this'. Works with .txt, .md, .docx, .pdf, .epub, .html, pasted text, web pages, and free-form questions."
 ---
 
 # analyzer
@@ -16,7 +16,7 @@ guidance lives in `references/` and is loaded only when a mode fires.
 | Mode        | What it does                                                                                                                  | Reference to load                |
 |-------------|-------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
 | `summarize` | One-page even-handed digest of any text — author motivation, biases, intended audience, tone/lexicon, the point, key quotes.  | `references/summarize.md`        |
-| `proofread` | Full-document copy-editing pass (typos/spelling) with a separate proof report covering suggestions and repeated-phrase notes. | `references/proofread.md`        |
+| `proofread` | Full-document copy-editing pass (typos/spelling) driven by Harper (`brew install harper`), with a separate proof report covering suggestions and repeated-phrase notes. | `references/proofread.md`        |
 | `decide`    | Three archetypes from the roster below debate the user's question; output is a recommendation plus the full debate.           | `references/decide.md`           |
 
 ---

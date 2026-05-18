@@ -117,6 +117,7 @@ to run the MADLAD-400 translation model offline:
 |---|---|---|---|
 | Tor | BSD-3-Clause | Anonymized web fetch for off-allowlist domains (used by the broker's `fetch_url` tool) | <https://www.torproject.org> |
 | Pandoc | GPL-2.0-or-later | HTML→markdown conversion for fetched documents (invoked as an external binary; not bundled with this package) | <https://pandoc.org> |
+| Harper | Apache-2.0 | Local grammar/spell checker (Automattic). Powers the mechanical pass of the `analyzer` skill's proofread mode (invoked as the `harper` binary; not bundled with this package). | <https://github.com/Automattic/harper> |
 
 ### System fonts (referenced, not bundled)
 
@@ -194,6 +195,10 @@ Special gratitude to:
 - The **Qwen team at Alibaba** and **Google DeepMind's Gemma team** —
   for open-weights model releases that make a local-first product
   viable in the first place.
+- **Automattic** and the Harper maintainers — for a local, offline,
+  rule-based grammar checker that doesn't phone home and doesn't pretend
+  to be an oracle. The analyzer skill's proofread mode is much sharper
+  with it on PATH.
 - Every maintainer of every transitively-depended project not named
   above. You are seen and appreciated.
 

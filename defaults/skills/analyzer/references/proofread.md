@@ -29,6 +29,95 @@ they will say so; default is both.
 
 ---
 
+## Harper-assisted mechanical pass
+
+Proofread mode is backed by **Harper** (<https://writewithharper.com>), a
+local, privacy-first grammar/spell checker by Automattic — Apache 2.0, no
+network calls, no AI. It runs in milliseconds per file and emits a precise,
+rule-named list of findings. The `bootstrap.sh` installer puts it on PATH
+as `harper` via Homebrew.
+
+**Use Harper to drive the mechanical-fixes pass.** It catches more than a
+sweep of the eye on long manuscripts and gives every finding a stable rule
+name, which makes the change log honest and reproducible.
+
+### Invocation
+
+For each chunk (the whole document if single-pass, or each chapter file
+when running the long-book loop):
+
+```bash
+harper lint <path> --format json --dialect <us|gb|au|ca>
+```
+
+- The output is structured JSON: a list of files, each with a list of
+  lints. Each lint carries `rule`, `kind`, `span` (char_start/char_end),
+  `line`, `column`, `message`, `priority`, `suggestions[]`, and
+  `matched_text`.
+- `harper lint` exits non-zero when any lints are found. That is normal;
+  it does not mean the run failed. Read the JSON regardless.
+- If the document is in a single file, pass that file. For the long-book
+  loop, run Harper against each `scratch/ch{N}.txt` separately.
+- If `harper` is not on PATH (older install, manual setup, etc.), continue
+  without it — do the mechanical pass by attention as before, and note in
+  the report that Harper was unavailable. Do not block.
+
+### Dialect detection
+
+Before invoking, scan ~2,000 words of the document for dialect markers
+(`colour`/`color`, `realise`/`realize`, `centre`/`center`, `travelled`/
+`traveled`). Pass the prevailing dialect via `--dialect`. If mixed and the
+user hasn't said which dialect to honor, run with `--dialect us` (Harper's
+default) and flag the mix as a suggestion rather than normalizing it.
+
+### Mapping Harper findings to the existing safety rules
+
+Harper's findings span a wide range of severities. The "safe to fix
+silently" rules below still govern — Harper is a detector, not an
+authority. Map each finding before applying:
+
+- **Spelling and obvious typos** (`SpellCheck` and similar) — apply
+  silently when the suggestion is unambiguous (single suggestion, or a
+  clear best match). Multi-candidate spellings: take the one that matches
+  the document's other usage; if no precedent, move it to suggestions.
+- **Doubled words, stray whitespace, missing terminal punctuation** —
+  apply silently.
+- **Capitalization of proper nouns the document uses correctly elsewhere**
+  — apply silently (this matches the existing rule).
+- **Grammar, style, usage, word-choice rules** (`Wordiness`,
+  `RepeatedWords`, `OxfordComma`, `ThatWhich`, anything tagged Style or
+  Usage) — **do not apply silently.** These go in the suggestions section
+  of the report with Harper's rule name attached.
+- **Anything inside dialogue, quoted material, code blocks, URLs, or
+  epigraphs** — do not apply, even for spelling. Filter those spans out
+  before consulting Harper's findings; or skip findings whose
+  `matched_text` lies inside such a span.
+- **Anything in a passage you've already identified as intentional
+  non-standard voice** (dialect, period prose, e.e. cummings) — move
+  Harper findings there to suggestions instead of applying.
+
+When applying a Harper-flagged fix silently, log the rule name in the
+change log so the author can audit it:
+
+```
+ch02 ¶4 — "recieved" → "received" — spelling [harper: SpellCheck]
+```
+
+### What Harper does not do
+
+Harper does not detect:
+
+- Repeated phrases across long stretches (the analyzer-distinctive
+  pattern detector below).
+- Substantive suggestions (sentence-level, paragraph-flow, structural).
+- Persona-flavored notes ("The Editor would say…").
+- Anything about the document's argument or shape.
+
+These remain the LLM's contribution. Harper handles the line, you handle
+the paragraph and the whole.
+
+---
+
 ## What counts as "safe to fix silently"
 
 Apply, but log every change in the report:
@@ -71,9 +160,13 @@ The document size determines the strategy. Decide before you start.
 ### Up to ~5,000 words (an essay, a short story, a long memo)
 
 - Read the whole thing into context.
-- Pass 1: mechanical fixes (apply + log).
-- Pass 2: substantive suggestions.
-- Pass 3: pattern findings on the full text.
+- Run `harper lint <path> --format json --dialect <us|gb|au|ca>` once.
+- Pass 1: mechanical fixes — start from Harper's JSON, apply the
+  silently-fixable subset (see mapping rules above), log every change.
+- Pass 2: substantive suggestions — your own pass plus Harper's
+  grammar/style findings (logged with rule names, not applied).
+- Pass 3: pattern findings on the full text (LLM only; Harper does not
+  do this).
 - Write both deliverables.
 
 ### 5,000 – 30,000 words (a paper, a novella, a long report)
@@ -82,8 +175,9 @@ The document size determines the strategy. Decide before you start.
   treat each section as a chunk.
 - If it doesn't, split into ~3,000-word chunks at paragraph boundaries — do
   not split inside a paragraph.
-- For each chunk, run the three passes locally; after every chunk, update
-  the running phrase-frequency table (see below).
+- For each chunk, run `harper lint` on that chunk's file, then the three
+  passes locally; after every chunk, update the running phrase-frequency
+  table (see below).
 - After all chunks, do a **cross-chunk pass** for pattern findings before
   writing the report.
 
@@ -111,15 +205,22 @@ try to hold the whole book at once.
 For each chapter:
 
 1. Read just that chapter.
-2. Pass 1 — mechanical fixes. Write the corrected chapter text to
+2. Run `harper lint scratch/ch{N}.txt --format json --dialect <detected>
+   > scratch/ch{N}-harper.json`. Skip this step (and proceed without
+   it) if `harper` is not on PATH.
+3. Pass 1 — mechanical fixes. Use the Harper JSON as the primary
+   detector; apply the silently-fixable subset per the mapping rules
+   above. Write the corrected chapter text to
    `scratch/ch{N}-corrected.txt`. Append every change to
-   `scratch/ch{N}-changes.md` (the per-chapter change log).
-3. Pass 2 — substantive suggestions. Append to
+   `scratch/ch{N}-changes.md` (the per-chapter change log), including
+   Harper rule names where applicable.
+4. Pass 2 — substantive suggestions, including Harper's grammar/style
+   findings that were not applied. Append to
    `scratch/ch{N}-suggestions.md`.
-4. Pass 3 — repeated-phrase scan within the chapter. Then update the
-   global phrase-frequency table in `scratch/phrase-table.md` (see
-   below for the schema).
-5. Update the tasklist: mark this chapter done.
+5. Pass 3 — repeated-phrase scan within the chapter (LLM only). Then
+   update the global phrase-frequency table in `scratch/phrase-table.md`
+   (see below for the schema).
+6. Update the tasklist: mark this chapter done.
 
 **Finalization:**
 
@@ -222,6 +323,8 @@ per suggestion at most, and only when it sharpens the note.
 **Source:** [path or URL]
 **Length:** [word count] words   |   **Date:** [YYYY-MM-DD]
 **Chunking strategy:** [single-pass / N sections / N chapters via scratch dir]
+**Detector:** [Harper vX.Y.Z + LLM review | LLM only — harper not on PATH]
+**Dialect:** [us / gb / au / ca]
 **Scratch directory (if any):** `rness/io/output/analyzer/<slug>-scratch/`
 
 ---
@@ -242,11 +345,14 @@ fix.
 ## Mechanical fixes (applied)
 
 For each change, one line in the format:
-`[location] — "before" → "after" — [reason]`
+`[location] — "before" → "after" — [reason] [detector tag, if any]`
+
+The detector tag is `[harper: <RuleName>]` for fixes Harper flagged, or
+omitted for fixes you caught by attention.
 
 For example:
-- ch02 ¶4 — "recieved" → "received" — spelling
-- ch07 ¶12 — "the the river" → "the river" — doubled word
+- ch02 ¶4 — "recieved" → "received" — spelling [harper: SpellCheck]
+- ch07 ¶12 — "the the river" → "the river" — doubled word [harper: RepeatedWords]
 - ch11 ¶3 — "paris" → "Paris" — proper noun capitalization (matches every
   other instance in the document)
 
@@ -256,7 +362,9 @@ For example:
 
 ## Suggestions (not applied)
 
-Grouped by scope, smallest to largest.
+Grouped by scope, smallest to largest. Suggestions surfaced by Harper
+carry their rule name in brackets, e.g. `[harper: Wordiness]`, so the
+author can re-run Harper themselves and reconcile.
 
 ### Word and phrase
 
