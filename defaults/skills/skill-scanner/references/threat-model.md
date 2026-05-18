@@ -8,7 +8,7 @@ Memory Vaccine audits workspace content that has already been admitted — docum
 
 Skill packages are a different beast. They are third-party code and instructions that the user is considering admitting into their system. The threat is not drift — it is deliberate or negligent harm at the point of entry. A workspace document that contains a vague directive is careless. A skill SKILL.md that contains a hidden instruction to exfiltrate data is adversarial.
 
-skillmd-scan must handle both: the careless (epistemic contamination) and the adversarial (injection, escalation, payload).
+skill-scanner must handle both: the careless (epistemic contamination) and the adversarial (injection, escalation, payload).
 
 ---
 
@@ -142,7 +142,7 @@ Any content that references file paths outside the skill's expected operating bo
 
 Malicious or dangerous patterns in bundled executable code.
 
-**Why this is new:** Memory Vaccine is a text-only epistemic auditor. It reads code as text and can catch P6 (filesystem directives) in source code, but it does not perform static analysis for code-specific threats. skillmd-scan adds this capability because untrusted skill packages may contain scripts that execute with the user's permissions.
+**Why this is new:** Memory Vaccine is a text-only epistemic auditor. It reads code as text and can catch P6 (filesystem directives) in source code, but it does not perform static analysis for code-specific threats. skill-scanner adds this capability because untrusted skill packages may contain scripts that execute with the user's permissions.
 
 **Categories:**
 
@@ -270,11 +270,11 @@ The classification is advisory. The user decides.
 
 ## Limitations of Static Analysis
 
-skillmd-scan's P7 (Executable Payload) analysis is pattern-based static analysis. It has known limitations:
+skill-scanner's P7 (Executable Payload) analysis is pattern-based static analysis. It has known limitations:
 
 1. **Obfuscation can defeat patterns.** Sufficiently creative encoding will evade regex-based detection. The scan report notes this limitation explicitly.
 2. **False positives are possible.** Legitimate code sometimes uses `eval`, `subprocess`, or network calls. The confidence grading system helps, but the user must exercise judgment.
-3. **Dynamic behavior is invisible.** Code that downloads and executes a payload at runtime cannot be detected by examining the source alone. skillmd-scan can flag the download mechanism (P7a) and the execution mechanism (P7b), but cannot predict what will be downloaded.
+3. **Dynamic behavior is invisible.** Code that downloads and executes a payload at runtime cannot be detected by examining the source alone. skill-scanner can flag the download mechanism (P7a) and the execution mechanism (P7b), but cannot predict what will be downloaded.
 4. **Language coverage is finite.** The payload scanner focuses on Python, shell, and JavaScript — the most common skill scripting languages. Skills using Rust, Go, or compiled binaries require a different analysis approach (and should receive automatic HIGH findings for including compiled binaries without source).
 
-These limitations do not make the scan worthless. They make it a first gate, not the only gate. skillmd-scan catches the common, the careless, and the moderately clever. The truly sophisticated adversary requires additional measures — and the truly sophisticated adversary is unlikely to distribute their attack via a skill zip file when they could just send a phishing email.
+These limitations do not make the scan worthless. They make it a first gate, not the only gate. skill-scanner catches the common, the careless, and the moderately clever. The truly sophisticated adversary requires additional measures — and the truly sophisticated adversary is unlikely to distribute their attack via a skill zip file when they could just send a phishing email.

@@ -1,6 +1,6 @@
 # Audit Protocol
 
-The step-by-step procedure for conducting a skillmd-scan audit. This document specifies the execution sequence, scoring mechanics, and exact output format.
+The step-by-step procedure for conducting a skill-scanner audit. This document specifies the execution sequence, the explainer composition rules, scoring mechanics, and the exact output format.
 
 ## Pre-Audit Setup
 
@@ -43,6 +43,10 @@ For every file, verify that the extension matches the content:
 - Any mismatch is a P7h (Polyglot File) finding
 
 ## Execution Sequence
+
+### Phase 0a: Compose the Plain-English Explainer
+
+Before the safety scan, compose the 2–3 paragraph explainer that will lead the report. This phase has its own rules — see "Explainer Rules" below. The explainer is composed first so that even a skill that ultimately receives a `DO NOT INSTALL` verdict still gets explained in the report; the user needs to understand what was being offered, not just that it was unsafe.
 
 ### Phase 1: Frontmatter Audit
 
@@ -118,7 +122,7 @@ Scan all content (markdown, code, config) for privilege escalation patterns:
 Run the payload scanner script on the entire package:
 
 ```bash
-python /path/to/skillmd-scan/scripts/payload_scanner.py <skill-directory>
+python defaults/skills/skill-scanner/scripts/payload_scanner.py <skill-directory>
 ```
 
 The script handles all P7 subcategories (P7a–P7h) and produces structured JSON output.
@@ -173,25 +177,76 @@ Each finding has: pattern ID, file path, location, exact text, confidence (HIGH/
 - **FINDINGS PRESENT**: No HIGH findings, one or more MEDIUM.
 - **DO NOT INSTALL**: One or more HIGH findings.
 
+## Explainer Rules
+
+The plain-English explainer leads the report. It is the first thing the user reads — often the only thing they read carefully — so it must be honest, useful, and grounded.
+
+### Sources (in priority order)
+
+1. The `description:` field in the YAML frontmatter (authoritative short statement of purpose).
+2. Section headings and the first sentence of each major section in `SKILL.md`.
+3. "When to use" / "When not to use" lists in `SKILL.md`, if present.
+4. The body of `SKILL.md` (workflow, output, edge cases).
+5. `references/*.md`, if and only if the SKILL.md is genuinely terse and underdescribes the capability.
+
+The frontmatter `description:` is the most useful source for the first paragraph; the body is the most useful source for the second; the third paragraph (if present) names what makes the skill distinctive or notable.
+
+### Length and shape
+
+- **2–3 paragraphs.** Two is fine for narrow skills. Three for skills with notable depth or unusual capabilities. Never more than three.
+- **Roughly 120–280 words total.**
+- **Plain English.** Assume the reader has no skill-ecosystem context. Words like "frontmatter," "context window," "MCP," "tool use" should be replaced with what they actually mean, or dropped.
+- **Vivid verbs, no hedging.** "Translates," "audits," "writes," "edits," "drafts" beat "can be used to translate," "is capable of auditing."
+- **A sense of why someone would want it.** Not just what it does mechanically — what problem it solves, who would reach for it, what they'd get back.
+
+### Hard rules
+
+- **Do not invent capabilities.** If the SKILL.md doesn't say it, the explainer doesn't say it. Read carefully; this is the most common failure.
+- **Do not invent provenance.** No "from Anthropic," "open source," "MIT-licensed," "battle-tested," etc., unless the frontmatter or SKILL.md says so explicitly.
+- **Do not invent comparisons.** No "like ChatGPT but for X," "the GitHub Copilot of Y" unless the SKILL.md uses the comparison.
+- **No superlatives without basis.** No "best," "most powerful," "industry-leading," "state-of-the-art" unless the SKILL.md substantiates them. "Useful," "thoughtful," "carefully designed" require visible care in the SKILL.md.
+- **Be honest about scope.** If the skill is narrow, say so. "It does one thing: X" is a strong, honest sentence.
+- **Be honest about dullness.** If a skill is mechanical and unglamorous, don't pretend otherwise. "It's a small utility, but it solves a real annoyance" beats hype.
+- **Use the skill's own examples when possible.** If the SKILL.md says "use this for translating love letters, README files, or angry emails," repurpose that — those are the author's own use cases, not invented ones.
+
+### Self-check (run before emitting)
+
+Re-read the explainer with the SKILL.md open. For every claim in the explainer, find the supporting sentence(s) in the SKILL.md. If you can't, cut the claim. Then check:
+
+- Does any sentence describe a capability not in the SKILL.md? → cut
+- Does any sentence use a superlative not earned in the SKILL.md? → soften
+- Does it feel like marketing copy from a different skill? → rewrite from the SKILL.md, don't paraphrase your own assumptions
+
+The explainer is also subject to the report-wide Phase 6 self-check (S-class and P-class). It must not itself contain vague directives, unqualified universals, or authority laundering — the explainer is part of the report and the report holds itself to the standard it audits against.
+
 ## Output Format
 
-### Scan Report (`skillmd-scan-report.md`)
+### Scan Report (`skill-scanner-report.md`)
+
+The report leads with the explainer (which is what the user reads first), followed by the verdict and findings. Suggested ordering and template below.
 
 ```markdown
-# skillmd-scan — Scan Report
+# skill-scanner — Scan Report: [Skill name]
 
 | Field | Value |
 |-------|-------|
 | Package | [path or filename] |
 | Scan date | [YYYY-MM-DD] |
 | Skill name | [from frontmatter] |
-| Skill description | [from frontmatter, truncated if long] |
 | Strictness | [gentle / standard / strict] |
 | Files scanned | [N] |
 
 ---
 
+## What this skill does
+
+[2–3 paragraph plain-English explainer composed per the rules above. This is the first thing the user reads. No findings yet; just what the skill is, who would use it, and why it might be worth their time. Honest about scope.]
+
+---
+
 ## Verdict: [CLEAN / FINDINGS PRESENT / DO NOT INSTALL]
+
+[One short paragraph in plain English explaining the verdict in human terms. For CLEAN: "No injection, escalation, or payload risks found; safe to install." For FINDINGS PRESENT: brief description of what to look at. For DO NOT INSTALL: brief description of why, so the user understands the stakes without needing to read the full findings.]
 
 ### Summary
 
@@ -270,7 +325,7 @@ Each finding has: pattern ID, file path, location, exact text, confidence (HIGH/
 
 ## Self-Check Confirmation
 
-This report was audited against its own S-class and P-class criteria.
+This report was audited against its own S-class and P-class criteria, and the explainer was checked against the skill's SKILL.md for grounding.
 Self-check findings: [0 / list corrections]
 Self-check status: PASS
 ```

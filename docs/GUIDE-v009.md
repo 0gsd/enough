@@ -170,15 +170,20 @@ Word add-in or a Chrome extension. Each skill is a folder with a
 
 `enough` ships with four skills out of the box:
 
-- **`irefy`** ("I read everything for you") — produces a one-page
-  analytical digest of any long document. Two scored indices (Conveyance
-  Success and Conveyance Evil), three lenses (Intention, Method,
-  Verdict). Use on Deep Research reports, blog posts, papers, anything.
+- **`analyzer`** — three-mode workbench for documents and decisions.
+  *Summarize* produces an even-handed one-page digest of any text
+  (author motivation, intended audience, tone, key quotes). *Proofread*
+  copy-edits full-length documents — books included, chapter by chapter —
+  and writes a separate proof report with suggestions and repeated-phrase
+  findings. *Decide* picks three archetypal personas from a built-in
+  roster and runs a debate over any question you can't crack alone, then
+  recommends an answer with the full transcript attached.
 - **`memoir-dialectic`** — patient, multi-session collaborator for
   planning and optionally drafting a memoir. The folder on disk is the
   memory; you can disappear for weeks and pick up where you left off.
-- **`skillmd-scan`** — security and epistemic auditor for skill
-  packages. Scans a skill's `SKILL.md`, references, and scripts for
+- **`skill-scanner`** — plain-English explainer and security/epistemic
+  auditor for skill packages. Tells you in 2–3 paragraphs what a skill
+  actually does and who would want it, then scans the package for
   prompt-injection patterns and other risks before you install it.
 - **`translator`** — offline machine translation across ~419 languages,
   powered by Google's MADLAD-400-3B-MT (Apache 2.0). After the one-time

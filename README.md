@@ -12,13 +12,13 @@ this is because enough imposes very few paradigms on your wordflows -- in a worl
 
 enough's core design principles make it easy and fun for *anyone* to build out their own "knowledge operating system" with global- and project-level agent paradigms, skills, roles, and knowledge stores.
 
-[skillmd.discourse.group](https://skillmd.discourse.group) is a support forum where users can get help with anything they want to build into their setups, provide assistance to others, and/or just show off the "thought enhancing prosthetics" they've cooked up.
+[enough.discourse.group](https://enough.discourse.group) is a support forum where users can get help with anything they want to build into their setups, provide assistance to others, and/or just show off the "thought enhancing prosthetics" they've cooked up.
 
 enough is built and tested on MacOS & Apple Silicon. Linux support is planned; Windows support is totally feasible.
 
 one forward-looking note: enough may one day expand to a wider ecosystem with additional modules, or even become a full-blown business with employees and balance sheets. if and when this happens, it will be done transparently and with users' best interests in mind.
 
-for now, this seems like it could be enough.
+for now, the idea is that this might be enough for quite a while.
 
 ---
 

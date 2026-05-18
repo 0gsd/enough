@@ -159,13 +159,13 @@ linked above. They power the `translator` skill and live at
 
 ## Skills shipped under `defaults/skills/`
 
-Five skills ship with enough as "first-party" defaults:
+Four skills ship with enough as "first-party" defaults:
 
 | Skill | Purpose | Author |
 |---|---|---|
-| irefy | Analytical one-page digests of long text | Graham Smith |
+| analyzer | Three-mode analytical workbench: summarize, proofread, decide | Graham Smith |
 | memoir-dialectic | Patient multi-session memoir collaborator | Graham Smith |
-| skillmd-scan | Security and epistemic auditor for skill packages | Graham Smith |
+| skill-scanner | Plain-English explainer and security/epistemic auditor for skill packages | Graham Smith |
 | translator | Offline machine translation across ~419 languages | Graham Smith |
 
 These are authored for the enough project and fall under the

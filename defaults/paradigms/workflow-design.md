@@ -135,7 +135,7 @@ skill is either:
 name: my-skill
 description: One paragraph the agent reads to decide whether to engage.
   Start with what the skill does, then enumerate trigger phrases the
-  user might say ("translate this", "do an irefy", etc.), then list
+  user might say ("translate this", "analyze this report", etc.), then list
   what it does NOT cover. Be specific — vague descriptions cause
   spurious activations.
 ---

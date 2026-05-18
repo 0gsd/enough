@@ -153,7 +153,7 @@ the answer is "prepared," keep going. The user should not have to nudge
 you with "everything ok?" to make you continue work you already started.
 
 **Implicit multi-step asks are the norm, not the exception.** "Use the
-irefy skill on this file," "translate this document," "summarize this
+analyzer skill on this file," "translate this document," "summarize this
 report" all decompose into at least two steps (read the input → produce
 the output). Plan to do both before ending the turn. If the work is too
 large to finish in one turn, say so explicitly in your final reply and

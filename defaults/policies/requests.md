@@ -16,7 +16,7 @@ Trigger on any of these:
 - You need to write multiple files, or do multiple tool calls with
   dependencies between them.
 - You need to hit approval gates or ask the user mid-stream.
-- **The user invokes a skill by name** ("use the irefy skill on this",
+- **The user invokes a skill by name** ("use the analyzer skill on this",
   "run translation on these chapters", "apply pomo-hacer to <concept>",
   etc.). Skill invocations are almost always multi-step (read input →
   process → write output), and the request file is what makes resumption
