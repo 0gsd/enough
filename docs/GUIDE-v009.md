@@ -239,7 +239,7 @@ sessions, what its security posture is, how it handles requests, when to
 write checkpoints. It's a single markdown file the agent reads every
 turn.
 
-`enough` ships with three paradigms:
+`enough` ships with four paradigms:
 
 **`default.md`** — the base interaction paradigm. Covers things like
 showing commands before running them, not writing outside the project
@@ -253,6 +253,17 @@ skill, which model variant to pick (3B default vs. opt-in 7B vs.
 license-gated NLLB-200), how to fall back when MADLAD struggles on
 low-resource pairs, and how to consult the bundled Rosetta primers at
 `rness/knowledge/rosetta-primers/` for ground-truth verification.
+
+**`text-planning.md`** — the long-horizon planning paradigm for any
+structured text you intend to write: novel, novella, story collection,
+non-fiction book, essay, manifesto, blog post. The agent switches into
+this when you express planning intent and either `analyzer` or
+`memoir-dialectic` is enabled. Treats the project folder as the heart
+of a single writing project, co-authors a `<project>-text-plan.md` at
+the root over many short sessions, and — when the plan is ready —
+generates per-section scaffolds (`<section>-scaffold.md`) that are
+purely structural guides you expand into prose yourself. Plan →
+scaffold → prose; your voice stays your voice.
 
 **`workflow-design.md`** — the meta-paradigm for *building* enough
 itself: adding skills, authoring roles, refining policies, editing

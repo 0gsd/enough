@@ -28,6 +28,13 @@ Canonical examples worth flagging proactively:
   human languages AND the `translator` skill is enabled in the sidebar.
   (If the user asks to translate but the skill is OFF, stay in `default`
   for this turn and tell them to toggle the skill on first.)
+- **`text-planning`** — switch when the user asks to plan, outline, or
+  structure a long-form text (novel, novella, story collection, non-
+  fiction book, essay, manifesto, blog post) AND either the `analyzer`
+  or `memoir-dialectic` skill is enabled. Treats the project folder as
+  the heart of a single writing project and builds a co-authored plan
+  document at the root. (If the user expresses planning intent but
+  neither skill is on, stay here and tell them to toggle one.)
 - **`workflow-design`** — switch when the user asks to build, extend, or
   refine workflow components: a new skill, a new role, a new paradigm,
   or edits to the root `rness/AGENT.md` / `rness/MOTIVATION.md`.
