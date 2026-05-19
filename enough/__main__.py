@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import urllib.parse
 import webbrowser
 from pathlib import Path
 
@@ -132,8 +133,17 @@ def main(argv: list[str] | None = None) -> int:
     print("  ctrl-c to stop")
 
     if not args.no_browser:
+        # Open a local file:// loader page that polls `url` and redirects
+        # when uvicorn is listening. Without this, the browser hits the
+        # port before uvicorn binds and shows its native "can't reach
+        # this site" page until the user manually refreshes.
+        loader_path = Path(__file__).parent / "static" / "loader.html"
+        loader_url = (
+            loader_path.resolve().as_uri()
+            + "?target=" + urllib.parse.quote(url, safe="")
+        )
         try:
-            webbrowser.open(url)
+            webbrowser.open(loader_url)
         except Exception:
             pass
 

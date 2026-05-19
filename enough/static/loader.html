@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>enough — starting…</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background: #000;
+    overflow: hidden;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  img {
+    width: min(60vw, 80vmin);
+    max-width: 720px;
+    height: auto;
+    opacity: 1;
+    animation: pulse 2.4s ease-in-out infinite;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0; }
+  }
+</style>
+</head>
+<body>
+  <img src="enough-loader_1-2.svg" alt="enough">
+  <script>
+    (function () {
+      // The launcher (__main__.py) appends ?target=<url-encoded-server-url>.
+      // We poll a known static asset on that origin; as soon as the request
+      // resolves (in no-cors mode, even an opaque response is success), we
+      // redirect. Connection-refused rejects fetch, so we keep polling.
+      var params = new URLSearchParams(window.location.search);
+      var target = params.get('target') || 'http://127.0.0.1:3456';
+      var probe = target.replace(/\/+$/, '') + '/static/htmx.min.js';
+
+      var stopped = false;
+      function poll() {
+        if (stopped) return;
+        fetch(probe, { mode: 'no-cors', cache: 'no-store' })
+          .then(function () {
+            stopped = true;
+            window.location.replace(target);
+          })
+          .catch(function () {
+            setTimeout(poll, 250);
+          });
+      }
+      poll();
+    })();
+  </script>
+</body>
+</html>
