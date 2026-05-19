@@ -52,9 +52,10 @@ def _global_infoworld_root() -> Path:
 _SKELETON_PLAN: tuple[tuple[str, str, str], ...] = (
     ("AGENT.md",                       "rness/AGENT.md",                        "copy"),
     ("MOTIVATION.md",                  "rness/MOTIVATION.md",                   "copy"),
-    ("paradigms/default.md",           "rness/paradigms/default.md",            "symlink"),
-    ("paradigms/translation.md",       "rness/paradigms/translation.md",        "symlink"),
-    ("paradigms/workflow-design.md",   "rness/paradigms/workflow-design.md",    "symlink"),
+    # NOTE: paradigms are no longer in this plan. They're synced dynamically
+    # on every launch by `_populate_paradigm_symlinks` so newly-shipped
+    # paradigm files appear in existing projects automatically — same
+    # lifecycle as skills and roles. See ensure_skeleton() below.
     ("policies/requests.md",            "rness/policies/requests.md",            "symlink"),
     ("policies/context-management.md",  "rness/policies/context-management.md",  "symlink"),
     ("policies/allowlists.md",          "rness/policies/allowlists.md",          "symlink"),
@@ -336,6 +337,44 @@ def _populate_role_symlinks(project_dir: Path, defaults_root: Path) -> None:
         disabled_file.write_text("\n".join(sorted(existing)) + "\n", encoding="utf-8")
 
 
+def _populate_paradigm_symlinks(project_dir: Path, defaults_root: Path) -> None:
+    """Sync global paradigms into `rness/paradigms/` and prune dangling
+    symlinks.
+
+    Paradigms differ from skills/roles in two ways:
+      - they're single files (`paradigms/*.md`), not folders.
+      - they're always selectable — there is no `.disabled` notion.
+        Exactly one is active at a time, named in `rness/active-paradigm`.
+
+    If the currently-active paradigm gets removed from
+    `defaults/paradigms/`, the dangling symlink is pruned here and
+    `get_active_paradigm()` falls back to 'default' on the next read.
+    Project-local paradigm files (real files, not symlinks) are never
+    touched."""
+    src_paradigms = defaults_root / "paradigms"
+    dst_paradigms = project_dir / "rness" / "paradigms"
+    dst_paradigms.mkdir(parents=True, exist_ok=True)
+
+    # 1. Prune dangling symlinks (target removed globally).
+    for entry in sorted(dst_paradigms.iterdir()):
+        if entry.is_symlink() and not entry.exists():
+            try:
+                entry.unlink()
+            except OSError:
+                pass
+
+    # 2. Sync in any new globals.
+    if not src_paradigms.is_dir():
+        return
+    for entry in sorted(src_paradigms.glob("*.md")):
+        if entry.name.startswith("."):
+            continue
+        dst = dst_paradigms / entry.name
+        if dst.exists() or dst.is_symlink():
+            continue
+        dst.symlink_to(entry.resolve())
+
+
 def _migrate_undot(project_dir: Path) -> None:
     """Migration: drop the dots from project skeleton paths.
 
@@ -447,10 +486,12 @@ def ensure_skeleton(project_dir: Path) -> bool:
                 infoworld_root.resolve(), target_is_directory=True
             )
 
-    # ALWAYS run (idempotent): sync global skills/roles into the project.
-    # Picks up any new globals added after this project was first created.
+    # ALWAYS run (idempotent): sync global skills/roles/paradigms into the
+    # project. Picks up any new globals added after this project was first
+    # created.
     _populate_skill_symlinks(project_dir, defaults)
     _populate_role_symlinks(project_dir, defaults)
+    _populate_paradigm_symlinks(project_dir, defaults)
 
     # ALWAYS ensure the io/ scratch dirs exist — back-fills into projects
     # created before these were added to the skeleton.
