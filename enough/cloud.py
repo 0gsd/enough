@@ -67,7 +67,7 @@ CONFIG_PATH = Path.home() / "enough" / "config" / "openrouter.json"
 
 DEFAULT_CONFIG: dict[str, Any] = {
     "enabled": False,
-    "model_id": "openai/gpt-4o-mini",
+    "model_id": "openrouter/auto",
     "key_in_keychain": False,
     "last_verified_at": None,
     "last_verified_ok": None,
@@ -76,7 +76,13 @@ DEFAULT_CONFIG: dict[str, Any] = {
 }
 """Fallback schema for ~/enough/config/openrouter.json. The template at
 defaults/openrouter-config.json mirrors these keys; this dict is the
-in-code source of truth so missing keys never blow up callers."""
+in-code source of truth so missing keys never blow up callers.
+
+`model_id` defaults to `openrouter/auto` — OpenRouter's automatic router
+that picks a model per-request based on the prompt. Users override this
+in the OPRO-API settings panel of the model picker (or by POSTing to
+`/api/cloud/set-model`) to pin a specific slug like
+`anthropic/claude-3.5-sonnet` or `deepseek/deepseek-r1`."""
 
 HEALTH_CHECK_MODEL = "openrouter/free"
 """Auto-selector for whatever free model is currently routable. Used by
@@ -720,7 +726,7 @@ def pipeline_run(
             "system": "You are a copy editor." (optional)
           },
           "output_path": "rness/io/output/cloud-pipeline/foo.md" (optional),
-          "model": "openai/gpt-4o-mini" (optional — defaults to configured),
+          "model": "openrouter/auto" (optional — defaults to configured),
           "temperature": 0.7 (optional),
           "max_tokens_per_step": null | int (optional)
         }

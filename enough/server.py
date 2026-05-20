@@ -1726,9 +1726,10 @@ def create_app(
     @app.post("/api/cloud/set-model")
     async def api_cloud_set_model(request: Request) -> dict[str, Any]:
         """Update which OpenRouter model id chat completions go to. Body:
-        {"model_id": "openai/gpt-4o-mini"}. No client-side validation —
-        OpenRouter has hundreds of models and the canonical list changes;
-        unrecognized ids fail at request time with a clear 404 message."""
+        {"model_id": "openrouter/auto"} or any slug from openrouter.ai/models.
+        No client-side validation — OpenRouter has hundreds of models and the
+        canonical list changes; unrecognized ids fail at request time with a
+        clear 404 message."""
         from . import cloud as _cloud
         try:
             body = await request.json()

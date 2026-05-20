@@ -61,7 +61,7 @@ file contents here
     "prompt": "Proofread the following manuscript for typos, internal consistency, and prose flow. Return the corrected text only.\n\n{compiled}"
   },
   "output_path": "rness/io/output/cloud-pipeline/novel-draft.md",
-  "model": "openai/gpt-4o-mini"
+  "model": "openrouter/auto"
 }
 </content>
 </tool>

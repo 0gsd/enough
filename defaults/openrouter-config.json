@@ -6,7 +6,7 @@
   "_comment_5": "the most-recent health-check result, and whether a key is present in the keyring.",
 
   "enabled": false,
-  "model_id": "openai/gpt-4o-mini",
+  "model_id": "openrouter/auto",
   "key_in_keychain": false,
   "last_verified_at": null,
   "last_verified_ok": null,

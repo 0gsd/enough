@@ -2704,6 +2704,19 @@
       background: color-mix(in oklab, var(--bg-raise) 60%, transparent);
     }
     #opro-settings.hidden { display: none; }
+    #opro-settings .opro-explainer {
+      margin: 0;
+      font-size: 11.5px;
+      color: var(--fg-muted);
+      line-height: 1.45;
+    }
+    #opro-settings .opro-explainer code {
+      font-family: var(--font-mono);
+      background: color-mix(in oklab, var(--bg-raise) 80%, transparent);
+      padding: 0 4px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
     #opro-settings .opro-row {
       display: flex;
       align-items: center;
@@ -3254,9 +3267,18 @@
              AND a key is configured. Appears inline below the model list
              so management lives where selection happens. -->
         <div id="opro-settings" class="hidden">
+          <p class="opro-explainer">
+            OpenRouter routes through <code>openrouter/auto</code> by default —
+            it picks a model per-request based on the prompt. Pin a specific
+            slug from
+            <a href="https://openrouter.ai/models" target="_blank" rel="noopener">openrouter.ai/models</a>
+            (e.g. <code>anthropic/claude-3.5-sonnet</code>,
+            <code>deepseek/deepseek-r1</code>) if you'd rather decide yourself.
+          </p>
           <div class="opro-row">
             <span class="label">model id</span>
-            <input type="text" id="opro-model-input" placeholder="openai/gpt-4o-mini">
+            <input type="text" id="opro-model-input" placeholder="openrouter/auto">
+            <button class="opro-btn" onclick="oproUseAuto()" title="reset to openrouter/auto and save">use auto</button>
             <button class="opro-btn" id="opro-model-save" onclick="oproSaveModel()">save</button>
           </div>
           <div class="opro-row">
@@ -3324,9 +3346,11 @@
             <input type="checkbox" class="opro-confirm" id="opro-cb-account">
             <span>
               I have (or will create) an
-              <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter account</a>,
-              and I understand that I manage model selection, fallbacks,
-              and per-model preferences in the OpenRouter dashboard.
+              <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter account</a>.
+              enough defaults to <code>openrouter/auto</code> routing — OpenRouter picks
+              a model per-request — and lets me pin a specific slug
+              (e.g. <code>anthropic/claude-3.5-sonnet</code>) from the OPRO-API
+              settings panel of the model picker after setup.
             </span>
           </label>
           <label>
@@ -4598,6 +4622,15 @@
       }
     }
     window.oproSaveModel = oproSaveModel;
+
+    // One-click preset: reset the field to `openrouter/auto` and save. This
+    // is the recommended default — OpenRouter chooses a model per-request
+    // based on the prompt. Users can still type any slug into the input.
+    function oproUseAuto() {
+      document.getElementById('opro-model-input').value = 'openrouter/auto';
+      oproSaveModel();
+    }
+    window.oproUseAuto = oproUseAuto;
 
     async function oproClearKey() {
       const ok = confirm(

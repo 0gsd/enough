@@ -330,7 +330,7 @@ Broker-driven multi-step batch execution. Agent invokes via:
   "compile": {"method": "concat" | "summarize_each", ...},
   "final_pass": {"prompt": "...{compiled}..."},
   "output_path": "rness/io/output/...",
-  "model": "openai/gpt-4o-mini"
+  "model": "openrouter/auto"
 }
 </content>
 </tool>
