@@ -1764,7 +1764,12 @@
     #review-mode .review-toolbar .rt-color[data-color="blue"]   { background: rgba( 64, 195, 255, 0.78); }
     #review-mode .review-toolbar .rt-color[data-color="pink"]   { background: rgba(255, 105, 180, 0.78); }
 
-    /* ---------- Scrollbar ---------- */
+    /* ---------- Scrollbar ----------
+       Chrome/Safari use the WebKit pseudo-elements; Firefox uses the
+       standardized `scrollbar-*` properties. We declare both so the
+       scrollbar reads as thin + themed across all three. (`scrollbar-color`
+       has no hover state in the spec, so Firefox doesn't get the thumb
+       brighten on hover — close enough that we don't need a workaround.) */
     ::-webkit-scrollbar {
       width: 10px;
       height: 10px;
@@ -1781,6 +1786,11 @@
 
     ::-webkit-scrollbar-thumb:hover {
       background: var(--fg-faint);
+    }
+
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
     }
 
     /* ---------- UI preferences modal ---------- */
@@ -7310,7 +7320,8 @@
     // Expose to inline onclick handlers.
     window.enterEditMode = enterEditMode;
     window.saveEdit = saveEdit;
-    window.cancelEdit = cancelEdit;
+    window.revertEdit = revertEdit;
+    window.exitEditMode = exitEditMode;
     window.markRequestDone = markRequestDone;
     window.customizeForProject = customizeForProject;
 
