@@ -1111,7 +1111,17 @@
        dotted bands (per-color sub-strips when a line has multiple
        highlights of different colors). Clicking a row scrolls the
        review body to that line. */
-    #review-mode .review-linenav {
+    /* NOTE: the `.review-linenav` and `.review-chat*` (head, tail, form)
+       rules below intentionally have NO `#review-mode` prefix. Both
+       #review-mode and #edit-mode render these widgets, and both create
+       a positioning context (`position: absolute; inset: 0`) for the
+       `position: absolute` chat pill + line-nav to land against. The
+       class names retain the "review-" prefix for historical consistency,
+       but the styles apply equally in either mode. Other `.review-*`
+       widgets (`.review-body`, `.review-toolbar`, `.review-undo-bar`,
+       `.review-chat-chip`) live only inside #review-mode and keep the
+       full-prefix scoping. */
+    .review-linenav {
       position: absolute;
       top: 0;
       right: 0;
@@ -1126,7 +1136,7 @@
       overflow: hidden;
     }
 
-    #review-mode .review-linenav .ln-row {
+    .review-linenav .ln-row {
       flex: 1 1 0;
       display: flex;
       flex-direction: row;
@@ -1134,7 +1144,7 @@
     }
 
     /* Default (un-highlighted) cell: themed grey, dotted. */
-    #review-mode .review-linenav .ln-cell {
+    .review-linenav .ln-cell {
       flex: 1 1 0;
       background-image: repeating-linear-gradient(
         to right,
@@ -1148,28 +1158,28 @@
     /* When highlighted, the cell gets per-color dot pattern. The
        repeating gradient gives the "1px on, 1px off" effect across
        the cell's width (or the per-color sub-cell when split). */
-    #review-mode .review-linenav .ln-cell-yellow {
+    .review-linenav .ln-cell-yellow {
       background-image: repeating-linear-gradient(
         to right,
         rgba(255, 215, 0, 0.95) 0 1px,
         transparent 1px 2px
       );
     }
-    #review-mode .review-linenav .ln-cell-green {
+    .review-linenav .ln-cell-green {
       background-image: repeating-linear-gradient(
         to right,
         rgba(127, 255, 0, 0.92) 0 1px,
         transparent 1px 2px
       );
     }
-    #review-mode .review-linenav .ln-cell-blue {
+    .review-linenav .ln-cell-blue {
       background-image: repeating-linear-gradient(
         to right,
         rgba( 64, 195, 255, 0.92) 0 1px,
         transparent 1px 2px
       );
     }
-    #review-mode .review-linenav .ln-cell-pink {
+    .review-linenav .ln-cell-pink {
       background-image: repeating-linear-gradient(
         to right,
         rgba(255, 105, 180, 0.92) 0 1px,
@@ -1188,7 +1198,7 @@
        Updated on scroll. Solid color so it pops out from the dotted
        row pattern below it. Uses --accent-user (a theme-defined
        readable accent) so it stays visible across all themes. */
-    #review-mode .review-linenav .ln-cursor {
+    .review-linenav .ln-cursor {
       position: absolute;
       left: 0;
       right: 0;
@@ -1204,7 +1214,7 @@
     /* The bottom chat pill: docked to the bottom of the review pane,
        collapsible, vertically resizable. When collapsed only a slim
        ribbon remains, with an obvious chevron to re-expand. */
-    #review-mode .review-chat {
+    .review-chat {
       position: absolute;
       left: 24px;
       right: 24px;
@@ -1224,11 +1234,11 @@
       font-family: var(--font-sans, system-ui, sans-serif);
     }
 
-    #review-mode .review-chat.collapsed {
+    .review-chat.collapsed {
       max-height: 28px;
     }
 
-    #review-mode .review-chat-head {
+    .review-chat-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -1242,11 +1252,11 @@
       text-transform: uppercase;
     }
 
-    #review-mode .review-chat.collapsed .review-chat-head {
+    .review-chat.collapsed .review-chat-head {
       border-bottom: none;
     }
 
-    #review-mode .review-chat-head .toggle {
+    .review-chat-head .toggle {
       font-family: var(--font-mono);
       font-size: 13px;
       color: var(--fg);
@@ -1255,7 +1265,7 @@
     /* Conversation tail. Shows the most recent ~6 lines of the live
        chat; mirrored from the underlying #conversation div via SSE
        handlers so the pill stays in sync without a separate session. */
-    #review-mode .review-chat-tail {
+    .review-chat-tail {
       flex: 1;
       overflow-y: auto;
       padding: 8px 12px;
@@ -1265,29 +1275,29 @@
       resize: vertical;
     }
 
-    #review-mode .review-chat.collapsed .review-chat-tail,
-    #review-mode .review-chat.collapsed .review-chat-form {
+    .review-chat.collapsed .review-chat-tail,
+    .review-chat.collapsed .review-chat-form {
       display: none;
     }
 
-    #review-mode .review-chat-tail .msg {
+    .review-chat-tail .msg {
       margin: 4px 0;
     }
-    #review-mode .review-chat-tail .role {
+    .review-chat-tail .role {
       font-size: 10px;
       color: var(--fg-faint);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    #review-mode .review-chat-tail .body {
+    .review-chat-tail .body {
       color: var(--fg);
       white-space: pre-wrap;
       word-break: break-word;
     }
-    #review-mode .review-chat-tail .msg.user .role { color: var(--accent-user); }
-    #review-mode .review-chat-tail .msg.agent .role { color: var(--accent-agent); }
-    #review-mode .review-chat-tail .msg.system .body,
-    #review-mode .review-chat-tail .msg.rness .body { color: var(--fg-muted); font-style: italic; }
+    .review-chat-tail .msg.user .role { color: var(--accent-user); }
+    .review-chat-tail .msg.agent .role { color: var(--accent-agent); }
+    .review-chat-tail .msg.system .body,
+    .review-chat-tail .msg.rness .body { color: var(--fg-muted); font-style: italic; }
 
     /* Save/undo affordance sits between the chat tail and the input
        row. Hidden by default; shown only after an agent write_file
@@ -1374,13 +1384,13 @@
     }
     #review-mode .review-chat-chip button:hover { color: var(--accent-error); }
 
-    #review-mode .review-chat-form {
+    .review-chat-form {
       display: flex;
       gap: 6px;
       padding: 6px 10px 8px;
       border-top: 1px solid var(--border);
     }
-    #review-mode .review-chat-form textarea {
+    .review-chat-form textarea {
       flex: 1;
       background: var(--input-bg);
       color: var(--fg);
@@ -1392,11 +1402,11 @@
       line-height: 1.4;
       resize: none;
     }
-    #review-mode .review-chat-form textarea:focus {
+    .review-chat-form textarea:focus {
       outline: none;
       border-color: var(--fg-faint);
     }
-    #review-mode .review-chat-form button {
+    .review-chat-form button {
       background: var(--bg-raise);
       color: var(--fg-muted);
       border: 1px solid var(--border);
@@ -1406,7 +1416,7 @@
       font-family: inherit;
       font-size: 12px;
     }
-    #review-mode .review-chat-form button:hover {
+    .review-chat-form button:hover {
       color: var(--fg);
       border-color: var(--fg-faint);
     }
