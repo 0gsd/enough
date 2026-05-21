@@ -2357,6 +2357,11 @@
     }
 
     #model-modal .usage-row .bar .fill {
+      /* The fill is a <span> — without display:block the `width: N%`
+         the JS sets has no effect (inline elements ignore explicit
+         width), and the bar reads as empty even when the percentage
+         text next to it is correct. */
+      display: block;
       height: 100%;
       width: 0%;
       background: var(--accent-agent);
@@ -5176,8 +5181,21 @@
           end = after === -1 ? src.length : after + 3;
           if (src[end] === '\n') end++;
         } else {
-          const nl = src.indexOf('\n\n', cursor);
-          end = nl === -1 ? src.length : nl;
+          // Headings are single-line per the markdown spec — they end at
+          // the next newline, NOT the next blank line. Without this
+          // check, `### Foo\nbody line` becomes one block (because there's
+          // no `\n\n` between heading and body), gets tagged `heading`,
+          // and then the heading-render regex (no /s, no /m) returns null
+          // when it can't span both lines. The renderer would then crash
+          // on `hm[1]`. Detect the heading-start and stop at the newline.
+          const firstNl = src.indexOf('\n', cursor);
+          const firstLine = firstNl === -1 ? src.slice(cursor) : src.slice(cursor, firstNl);
+          if (/^#{1,6}\s+/.test(firstLine)) {
+            end = firstNl === -1 ? src.length : firstNl;
+          } else {
+            const nl = src.indexOf('\n\n', cursor);
+            end = nl === -1 ? src.length : nl;
+          }
         }
         const raw = src.slice(start, end).replace(/\s+$/, '');
         if (raw) {
@@ -5207,9 +5225,18 @@
             break;
           }
           case 'heading': {
+            // The block-splitter above guarantees single-line heading
+            // blocks, so this regex should always match. Belt-and-
+            // suspenders fallback: if a future change inadvertently
+            // sends a multi-line heading block through, render it as a
+            // paragraph rather than crash on hm[1].
             const hm = b.raw.match(/^(#{1,6})\s+(.*)$/);
-            const level = hm[1].length;
-            out.push(`<h${level} data-block-idx="${idx}">${renderInline(escapeMarkdownInline(hm[2]))}</h${level}>`);
+            if (hm) {
+              const level = hm[1].length;
+              out.push(`<h${level} data-block-idx="${idx}">${renderInline(escapeMarkdownInline(hm[2]))}</h${level}>`);
+            } else {
+              out.push(`<p data-block-idx="${idx}">${renderInline(escapeMarkdownInline(b.raw.replace(/\n/g, '<br>')))}</p>`);
+            }
             break;
           }
           case 'hr':
@@ -6111,9 +6138,20 @@
       if (!wrap) return;
       let source = null;
       const reviewOpen = document.getElementById('review-mode')?.classList.contains('open');
+      const editOpen = document.getElementById('edit-mode')?.classList.contains('open');
+      // The preview pane keeps its inner HTML around even after the user
+      // closes it (the X just drops the .open class on the wrapper).
+      // Without this guard, the counters would keep showing stats from
+      // the last opened doc forever. Gate the preview-pane reads on the
+      // pane actually being visible.
+      const previewOpen = document.getElementById('preview')?.classList.contains('open');
       if (reviewOpen && typeof REVIEW_SOURCE === 'string' && REVIEW_PATH) {
         source = REVIEW_SOURCE;
-      } else {
+      } else if (editOpen) {
+        // Edit-mode owns its own textarea outside #preview-body.
+        const ta = document.getElementById('edit-textarea');
+        if (ta) source = ta.value;
+      } else if (previewOpen) {
         const ta = document.querySelector('#preview-body textarea.file-edit');
         if (ta) {
           source = ta.value;
@@ -6151,10 +6189,13 @@
       obs.observe(target, { childList: true, subtree: true, characterData: true });
     })();
 
-    // Live updates while the user (or agent) is typing in the
-    // preview-edit textarea.
+    // Live updates while the user (or agent) is typing in either
+    // textarea — the legacy preview-edit `textarea.file-edit` or the
+    // full-frame edit-mode `#edit-textarea`.
     document.addEventListener('input', (e) => {
-      if (e.target && e.target.matches && e.target.matches('textarea.file-edit')) {
+      if (!e.target || !e.target.matches) return;
+      if (e.target.matches('textarea.file-edit') ||
+          e.target.matches('#edit-textarea')) {
         updateDocCounters();
       }
     });

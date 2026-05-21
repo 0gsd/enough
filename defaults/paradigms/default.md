@@ -24,10 +24,17 @@ under the new paradigm.
 
 Canonical examples worth flagging proactively:
 
-- **`translation`** — switch when the user asks to translate text between
-  human languages AND the `translator` skill is enabled in the sidebar.
-  (If the user asks to translate but the skill is OFF, stay in `default`
-  for this turn and tell them to toggle the skill on first.)
+- **`translation`** — switch *unconditionally* when the user asks to
+  translate text between human languages, regardless of whether the
+  `translator` skill is currently enabled. You cannot toggle skills
+  yourself (there is no tool for it), so the switch is what gets the
+  paradigm's guidance loaded for the next turn either way. If the skill
+  is OFF, also tell the user in the same turn to toggle the `translator`
+  skill on in the **active skills** section of the sidebar — the
+  paradigm's MADLAD-backed offline translator depends on it, and
+  prompt-engineered fallback is slower / lower quality. The translation
+  paradigm itself surfaces the same warning on every turn the skill
+  remains off, so the user keeps seeing the reminder until they act.
 - **`text-planning`** — switch when the user asks to plan, outline, or
   structure a long-form text (novel, novella, story collection, non-
   fiction book, essay, manifesto, blog post) AND either the `analyzer`

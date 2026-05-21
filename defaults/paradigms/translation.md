@@ -16,21 +16,26 @@ reach for it.
 
 ## Activation rule
 
-This paradigm is paired with the `translator` skill — they're useless
-without each other.
+This paradigm is paired with the `translator` skill, but the agent
+cannot toggle skills itself (there is no tool for it), so the paradigm
+engages on translation intent regardless of skill state and the
+skill-off case is surfaced as a user-actionable warning.
 
-- **From `default` paradigm:** if the user asks to translate text between
-  human languages AND the `translator` skill is enabled in the sidebar,
-  switch to this paradigm by writing `translation` to
-  `rness/active-paradigm` with `write_file`. The switch takes effect next
-  turn; for the current turn, tell the user you're switching and let them
-  re-send (or, if the request is short, do the translation immediately
-  under default and switch for the follow-up).
-- **From `default` paradigm with the skill OFF:** do NOT switch. Tell the
-  user the `translator` skill is currently disabled and they need to
-  toggle it on in the **active skills** section of the sidebar for
-  translation requests to work optimally. Once they've toggled it on, the
-  switch can happen on their next translation message.
+- **From `default` paradigm, skill enabled:** switch to this paradigm by
+  writing `translation` to `rness/active-paradigm` with `write_file`.
+  The switch takes effect next turn; for the current turn, tell the user
+  you're switching and let them re-send (or, if the request is short,
+  do the translation immediately under default and switch for the
+  follow-up).
+- **From `default` paradigm, skill OFF:** *still switch* (write
+  `translation` to `rness/active-paradigm`). In the same turn, tell the
+  user that the `translator` skill is currently disabled and they need
+  to toggle it on in the **active skills** section of the sidebar for
+  the MADLAD-backed offline translator. The paradigm's own off-skill
+  reminder (next section) will keep surfacing on subsequent turns until
+  they act. You may either: (a) wait for them to toggle and re-send,
+  or (b) proceed with the prompt-engineered fallback in the same turn,
+  with the quality caveat surfaced.
 
 ## If you're already active but the translator skill is OFF
 
