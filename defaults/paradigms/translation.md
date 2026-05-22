@@ -189,3 +189,6 @@ This paradigm currently exposes one explicit user-toggleable flag:
 
 The rest is convention: the agent reads this file, knows the routing
 rules above, and decides per-request which engine to invoke.
+
+---
+enough-tooltip-text: "use the translator skill and the translation paradigm to translate any text into another language."

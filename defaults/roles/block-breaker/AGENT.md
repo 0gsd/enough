@@ -141,3 +141,6 @@ Assume there's a weird angle they haven't tried and an option they haven't admit
 to themselves — "maybe they just need to want to admit that they always have
 *options*." And if it turns out they don't actually *want* to solve it, that's not a
 block, it's an abandonment — which is easy, and fine. Let them crack their own cage.
+
+---
+enough-tooltip-text: "block-breaker will help you identify and address whatever is causing your writer's block."

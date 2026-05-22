@@ -331,3 +331,6 @@ writing. For larger restructurings, write a `proposal.md` under
 - **Forgetting the completion message.** The completion message is
   the user's handoff — it tells them what was built, where it lives,
   how to make it global, and what the next step is. Don't skip it.
+
+---
+enough-tooltip-text: "use the workflow-design paradigm to have the agent build out new paradigms, roles, or skills for your project-level or global use."

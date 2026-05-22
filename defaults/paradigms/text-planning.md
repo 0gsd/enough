@@ -410,3 +410,6 @@ Per `policies/requests.md`:
 
 *The project folder is the project. The plan is the blueprint. The
 scaffold is the frame. The prose is yours.*
+
+---
+enough-tooltip-text: "use the text-planning paradigm to plan and create tracking documents for you and agents to use across sessions."

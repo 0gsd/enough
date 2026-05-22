@@ -392,3 +392,6 @@ skill-scanner avoids becoming the threat it detects.
 
 *The ecosystem is open. The gate is not. And it tells you what's on the
 other side of it.*
+
+---
+enough-tooltip-text: "turn on skill-scanner and point the agent at a skill zip or folder you found online to make sure it's safe and explain what it can do."

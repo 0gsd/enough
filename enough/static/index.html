@@ -137,17 +137,23 @@
       font-size: 11px;
       color: var(--fg-muted);
     }
-    .topbar .doc-counters[hidden] { display: none; }
+
+    .topbar .doc-counters[hidden] {
+      display: none;
+    }
+
     .topbar .doc-counters .dc {
       display: inline-flex;
       align-items: baseline;
       gap: 4px;
       white-space: nowrap;
     }
+
     .topbar .doc-counters .dc-glyph {
       color: var(--fg-faint);
       font-weight: 600;
     }
+
     .topbar .doc-counters .dc-val {
       color: var(--fg);
     }
@@ -1035,7 +1041,8 @@
       flex: 1;
       overflow: auto;
       padding: 48px max(48px, calc(50% - 380px)) 120px;
-      font-size: 18px;          /* ~150% of the 12px preview default */
+      font-size: 18px;
+      /* ~150% of the 12px preview default */
       line-height: 1.65;
       font-family: var(--font-serif, Georgia, 'Times New Roman', serif);
     }
@@ -1055,22 +1062,69 @@
       margin: 1.6em 0 0.6em;
       color: var(--review-fg);
     }
-    #review-mode .review-body h1 { font-size: 2.0em; border-bottom: 1px solid var(--review-fg-faint); padding-bottom: 0.3em; }
-    #review-mode .review-body h2 { font-size: 1.55em; border-bottom: 1px solid var(--review-fg-faint); padding-bottom: 0.2em; }
-    #review-mode .review-body h3 { font-size: 1.25em; }
-    #review-mode .review-body h4 { font-size: 1.1em; }
-    #review-mode .review-body h5,
-    #review-mode .review-body h6 { font-size: 1.0em; font-style: italic; }
 
-    #review-mode .review-body p { margin: 0.85em 0; }
-    #review-mode .review-body strong { font-weight: 700; }
-    #review-mode .review-body em { font-style: italic; }
-    #review-mode .review-body u { text-decoration: underline; }
-    #review-mode .review-body a { color: var(--review-fg); text-decoration: underline; text-decoration-style: dotted; }
-    #review-mode .review-body a:hover { text-decoration-style: solid; }
+    #review-mode .review-body h1 {
+      font-size: 2.0em;
+      border-bottom: 1px solid var(--review-fg-faint);
+      padding-bottom: 0.3em;
+    }
+
+    #review-mode .review-body h2 {
+      font-size: 1.55em;
+      border-bottom: 1px solid var(--review-fg-faint);
+      padding-bottom: 0.2em;
+    }
+
+    #review-mode .review-body h3 {
+      font-size: 1.25em;
+    }
+
+    #review-mode .review-body h4 {
+      font-size: 1.1em;
+    }
+
+    #review-mode .review-body h5,
+    #review-mode .review-body h6 {
+      font-size: 1.0em;
+      font-style: italic;
+    }
+
+    #review-mode .review-body p {
+      margin: 0.85em 0;
+    }
+
+    #review-mode .review-body strong {
+      font-weight: 700;
+    }
+
+    #review-mode .review-body em {
+      font-style: italic;
+    }
+
+    #review-mode .review-body u {
+      text-decoration: underline;
+    }
+
+    #review-mode .review-body a {
+      color: var(--review-fg);
+      text-decoration: underline;
+      text-decoration-style: dotted;
+    }
+
+    #review-mode .review-body a:hover {
+      text-decoration-style: solid;
+    }
+
     #review-mode .review-body ul,
-    #review-mode .review-body ol { margin: 0.7em 0 0.7em 1.6em; padding-left: 0.4em; }
-    #review-mode .review-body li { margin: 0.25em 0; }
+    #review-mode .review-body ol {
+      margin: 0.7em 0 0.7em 1.6em;
+      padding-left: 0.4em;
+    }
+
+    #review-mode .review-body li {
+      margin: 0.25em 0;
+    }
+
     #review-mode .review-body blockquote {
       border-left: 3px solid var(--review-fg-faint);
       padding: 0.2em 0.9em;
@@ -1078,6 +1132,7 @@
       color: var(--review-fg-muted);
       font-style: italic;
     }
+
     #review-mode .review-body code {
       font-family: var(--font-mono);
       font-size: 0.9em;
@@ -1085,6 +1140,7 @@
       padding: 0.1em 0.35em;
       border-radius: 3px;
     }
+
     #review-mode .review-body pre {
       font-family: var(--font-mono);
       font-size: 0.85em;
@@ -1094,16 +1150,21 @@
       overflow-x: auto;
       margin: 1em 0;
     }
+
     #review-mode .review-body pre code {
       background: transparent;
       padding: 0;
     }
+
     #review-mode .review-body hr {
       border: none;
       border-top: 1px solid var(--review-fg-faint);
       margin: 2em 0;
     }
-    #review-mode .review-body img { max-width: 100%; }
+
+    #review-mode .review-body img {
+      max-width: 100%;
+    }
 
     /* ---------- Phase 5d: line-nav column ----------
        16px-wide column pinned to the right wall of review mode. Each
@@ -1146,45 +1207,39 @@
     /* Default (un-highlighted) cell: themed grey, dotted. */
     .review-linenav .ln-cell {
       flex: 1 1 0;
-      background-image: repeating-linear-gradient(
-        to right,
-        var(--review-fg-faint, #8888) 0 1px,
-        transparent 1px 2px
-      );
+      background-image: repeating-linear-gradient(to right,
+          var(--review-fg-faint, #8888) 0 1px,
+          transparent 1px 2px);
       background-size: auto 1px;
       background-repeat: repeat-y;
       background-position: 0 50%;
     }
+
     /* When highlighted, the cell gets per-color dot pattern. The
        repeating gradient gives the "1px on, 1px off" effect across
        the cell's width (or the per-color sub-cell when split). */
     .review-linenav .ln-cell-yellow {
-      background-image: repeating-linear-gradient(
-        to right,
-        rgba(255, 215, 0, 0.95) 0 1px,
-        transparent 1px 2px
-      );
+      background-image: repeating-linear-gradient(to right,
+          rgba(255, 215, 0, 0.95) 0 1px,
+          transparent 1px 2px);
     }
+
     .review-linenav .ln-cell-green {
-      background-image: repeating-linear-gradient(
-        to right,
-        rgba(127, 255, 0, 0.92) 0 1px,
-        transparent 1px 2px
-      );
+      background-image: repeating-linear-gradient(to right,
+          rgba(127, 255, 0, 0.92) 0 1px,
+          transparent 1px 2px);
     }
+
     .review-linenav .ln-cell-blue {
-      background-image: repeating-linear-gradient(
-        to right,
-        rgba( 64, 195, 255, 0.92) 0 1px,
-        transparent 1px 2px
-      );
+      background-image: repeating-linear-gradient(to right,
+          rgba(64, 195, 255, 0.92) 0 1px,
+          transparent 1px 2px);
     }
+
     .review-linenav .ln-cell-pink {
-      background-image: repeating-linear-gradient(
-        to right,
-        rgba(255, 105, 180, 0.92) 0 1px,
-        transparent 1px 2px
-      );
+      background-image: repeating-linear-gradient(to right,
+          rgba(255, 105, 180, 0.92) 0 1px,
+          transparent 1px 2px);
     }
 
     /* When the linenav exists, give the body a bit of right padding
@@ -1283,21 +1338,33 @@
     .review-chat-tail .msg {
       margin: 4px 0;
     }
+
     .review-chat-tail .role {
       font-size: 10px;
       color: var(--fg-faint);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
+
     .review-chat-tail .body {
       color: var(--fg);
       white-space: pre-wrap;
       word-break: break-word;
     }
-    .review-chat-tail .msg.user .role { color: var(--accent-user); }
-    .review-chat-tail .msg.agent .role { color: var(--accent-agent); }
+
+    .review-chat-tail .msg.user .role {
+      color: var(--accent-user);
+    }
+
+    .review-chat-tail .msg.agent .role {
+      color: var(--accent-agent);
+    }
+
     .review-chat-tail .msg.system .body,
-    .review-chat-tail .msg.rness .body { color: var(--fg-muted); font-style: italic; }
+    .review-chat-tail .msg.rness .body {
+      color: var(--fg-muted);
+      font-style: italic;
+    }
 
     /* Save/undo affordance sits between the chat tail and the input
        row. Hidden by default; shown only after an agent write_file
@@ -1313,13 +1380,21 @@
       font-size: 12px;
       color: var(--fg);
     }
-    #review-mode .review-undo-bar[hidden] { display: none; }
-    #review-mode .review-undo-bar .lbl { flex: 1; }
+
+    #review-mode .review-undo-bar[hidden] {
+      display: none;
+    }
+
+    #review-mode .review-undo-bar .lbl {
+      flex: 1;
+    }
+
     #review-mode .review-undo-bar code {
       background: transparent;
       color: var(--fg-muted);
       font-size: 11px;
     }
+
     #review-mode .review-undo-bar button {
       background: var(--bg);
       color: var(--fg);
@@ -1330,19 +1405,24 @@
       font-family: inherit;
       font-size: 12px;
     }
+
     #review-mode .review-undo-bar #review-undo-keep {
       background: var(--accent-agent);
       color: var(--bg);
       border-color: var(--accent-agent);
       font-weight: 600;
     }
+
     #review-mode .review-undo-bar #review-undo-revert {
       background: var(--accent-error);
       color: var(--bg);
       border-color: var(--accent-error);
       font-weight: 600;
     }
-    #review-mode .review-undo-bar button:hover { filter: brightness(1.08); }
+
+    #review-mode .review-undo-bar button:hover {
+      filter: brightness(1.08);
+    }
 
     /* Context chip — slim row showing the queued selection above
        the chat input. Color-coded faintly so it reads "this is
@@ -1358,12 +1438,17 @@
       color: var(--fg-muted);
       font-family: var(--font-sans, system-ui, sans-serif);
     }
-    #review-mode .review-chat-chip[hidden] { display: none; }
+
+    #review-mode .review-chat-chip[hidden] {
+      display: none;
+    }
+
     #review-mode .review-chat-chip .lbl {
       color: var(--accent-user);
       font-weight: 600;
       flex-shrink: 0;
     }
+
     #review-mode .review-chat-chip .text {
       flex: 1;
       color: var(--fg);
@@ -1372,6 +1457,7 @@
       text-overflow: ellipsis;
       font-style: italic;
     }
+
     #review-mode .review-chat-chip button {
       background: transparent;
       color: var(--fg-muted);
@@ -1382,7 +1468,10 @@
       padding: 0 4px;
       flex-shrink: 0;
     }
-    #review-mode .review-chat-chip button:hover { color: var(--accent-error); }
+
+    #review-mode .review-chat-chip button:hover {
+      color: var(--accent-error);
+    }
 
     .review-chat-form {
       display: flex;
@@ -1390,6 +1479,7 @@
       padding: 6px 10px 8px;
       border-top: 1px solid var(--border);
     }
+
     .review-chat-form textarea {
       flex: 1;
       background: var(--input-bg);
@@ -1402,10 +1492,12 @@
       line-height: 1.4;
       resize: none;
     }
+
     .review-chat-form textarea:focus {
       outline: none;
       border-color: var(--fg-faint);
     }
+
     .review-chat-form button {
       background: var(--bg-raise);
       color: var(--fg-muted);
@@ -1416,6 +1508,7 @@
       font-family: inherit;
       font-size: 12px;
     }
+
     .review-chat-form button:hover {
       color: var(--fg);
       border-color: var(--fg-faint);
@@ -1433,8 +1526,16 @@
       font-weight: 700;
       padding: 4px 10px;
     }
-    .topbar #exit-review-btn.visible { display: inline-flex; align-items: center; }
-    .topbar #exit-review-btn:hover { filter: brightness(1.1); color: var(--bg); }
+
+    .topbar #exit-review-btn.visible {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .topbar #exit-review-btn:hover {
+      filter: brightness(1.1);
+      color: var(--bg);
+    }
 
     /* ---------- Edit mode (full-frame plain-text editor) ---------- */
     /* Sibling overlay of #review-mode. Same z-layout (covers the
@@ -1450,7 +1551,10 @@
       color: var(--fg);
       z-index: 30;
     }
-    #edit-mode.open { display: flex; }
+
+    #edit-mode.open {
+      display: flex;
+    }
 
     #edit-mode .edit-toolbar {
       display: flex;
@@ -1462,15 +1566,18 @@
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
+
     #edit-mode .edit-toolbar .title {
       color: var(--fg-muted);
       font-size: 12px;
       font-family: var(--font-mono);
     }
+
     #edit-mode .edit-toolbar .edit-actions {
       display: flex;
       gap: 6px;
     }
+
     #edit-mode .edit-toolbar button {
       background: var(--bg);
       color: var(--fg);
@@ -1481,16 +1588,21 @@
       font-size: 12px;
       cursor: pointer;
     }
+
     #edit-mode .edit-toolbar button:hover {
       border-color: var(--fg-faint);
     }
+
     #edit-mode .edit-toolbar button.primary {
       background: var(--accent-agent);
       color: var(--bg);
       border-color: var(--accent-agent);
       font-weight: 600;
     }
-    #edit-mode .edit-toolbar button.primary:hover { filter: brightness(1.08); }
+
+    #edit-mode .edit-toolbar button.primary:hover {
+      filter: brightness(1.08);
+    }
 
     /* The main textarea: fills the area between toolbar and chat pill,
        leaves room for the 16px line-nav on the right. Mono font, soft
@@ -1515,7 +1627,9 @@
 
     /* When the user resizes the body chat-pill tail, prevent textarea
        focus rings from leaking into the toolbar / chat area. */
-    #edit-mode .edit-textarea:focus { outline: none; }
+    #edit-mode .edit-textarea:focus {
+      outline: none;
+    }
 
     /* File-tree greyout while review mode is active. The tree stays
        visible (so the user keeps their bearings) but clicks pass through
@@ -1587,6 +1701,7 @@
       cursor: not-allowed;
       filter: grayscale(0.5);
     }
+
     #review-mode .review-toolbar button:disabled:hover {
       border-color: var(--border);
     }
@@ -1609,13 +1724,14 @@
       font-weight: 600;
       padding: 4px 14px;
     }
+
     #review-mode .review-toolbar #rt-edit-mode:hover {
       filter: brightness(1.08);
     }
 
     /* Top padding for the always-on toolbar so the document's first
        line isn't covered. */
-    #review-mode .review-toolbar ~ .review-body {
+    #review-mode .review-toolbar~.review-body {
       padding-top: 96px;
     }
 
@@ -1632,10 +1748,22 @@
       padding: 0 1px;
       transition: box-shadow 80ms ease;
     }
-    #review-mode .review-body .hl-yellow { background-color: rgba(255, 215, 0,   0.45); }
-    #review-mode .review-body .hl-green  { background-color: rgba(127, 255, 0,   0.42); }
-    #review-mode .review-body .hl-blue   { background-color: rgba( 64, 195, 255, 0.42); }
-    #review-mode .review-body .hl-pink   { background-color: rgba(255, 105, 180, 0.42); }
+
+    #review-mode .review-body .hl-yellow {
+      background-color: rgba(255, 215, 0, 0.45);
+    }
+
+    #review-mode .review-body .hl-green {
+      background-color: rgba(127, 255, 0, 0.42);
+    }
+
+    #review-mode .review-body .hl-blue {
+      background-color: rgba(64, 195, 255, 0.42);
+    }
+
+    #review-mode .review-body .hl-pink {
+      background-color: rgba(255, 105, 180, 0.42);
+    }
 
     /* Hover affordance — a faint inner ring on a highlighted span, so
        the user can see precise edges. (Does double-duty when Phase 4
@@ -1649,8 +1777,10 @@
        just above the first letter. Same color as the highlight
        (filled) so the user can tell which highlight it belongs to. */
     #review-mode .review-body .hl.hl-first {
-      position: relative;     /* makes the absolute handle anchor here */
+      position: relative;
+      /* makes the absolute handle anchor here */
     }
+
     #review-mode .review-body .hl-handle {
       position: absolute;
       top: -16px;
@@ -1674,10 +1804,23 @@
       padding: 0;
       z-index: 12;
     }
-    #review-mode .review-body .hl-handle.hl-handle-yellow { background: rgba(255, 215, 0,   0.95); }
-    #review-mode .review-body .hl-handle.hl-handle-green  { background: rgba(127, 255, 0,   0.85); }
-    #review-mode .review-body .hl-handle.hl-handle-blue   { background: rgba( 64, 195, 255, 0.90); }
-    #review-mode .review-body .hl-handle.hl-handle-pink   { background: rgba(255, 105, 180, 0.90); }
+
+    #review-mode .review-body .hl-handle.hl-handle-yellow {
+      background: rgba(255, 215, 0, 0.95);
+    }
+
+    #review-mode .review-body .hl-handle.hl-handle-green {
+      background: rgba(127, 255, 0, 0.85);
+    }
+
+    #review-mode .review-body .hl-handle.hl-handle-blue {
+      background: rgba(64, 195, 255, 0.90);
+    }
+
+    #review-mode .review-body .hl-handle.hl-handle-pink {
+      background: rgba(255, 105, 180, 0.90);
+    }
+
     #review-mode .review-body .hl-handle:hover {
       transform: scale(1.18);
     }
@@ -1701,19 +1844,26 @@
       font-size: 12px;
       min-width: 168px;
     }
-    #review-hl-popup.open { display: flex; }
+
+    #review-hl-popup.open {
+      display: flex;
+    }
+
     #review-hl-popup .row {
       display: flex;
       align-items: center;
       gap: 8px;
     }
+
     #review-hl-popup .row.colors {
       justify-content: space-between;
     }
+
     #review-hl-popup .lbl {
       color: var(--fg-muted);
       font-size: 11px;
     }
+
     #review-hl-popup .rt-color {
       width: 22px;
       height: 22px;
@@ -1724,15 +1874,32 @@
       cursor: pointer;
       transition: transform 80ms ease, border-color 120ms ease;
     }
-    #review-hl-popup .rt-color:hover { transform: scale(1.12); }
+
+    #review-hl-popup .rt-color:hover {
+      transform: scale(1.12);
+    }
+
     #review-hl-popup .rt-color.active {
       border-color: var(--fg);
       box-shadow: 0 0 0 2px var(--bg-raise);
     }
-    #review-hl-popup .rt-color[data-color="yellow"] { background: rgba(255, 215, 0,   0.85); }
-    #review-hl-popup .rt-color[data-color="green"]  { background: rgba(127, 255, 0,   0.78); }
-    #review-hl-popup .rt-color[data-color="blue"]   { background: rgba( 64, 195, 255, 0.78); }
-    #review-hl-popup .rt-color[data-color="pink"]   { background: rgba(255, 105, 180, 0.78); }
+
+    #review-hl-popup .rt-color[data-color="yellow"] {
+      background: rgba(255, 215, 0, 0.85);
+    }
+
+    #review-hl-popup .rt-color[data-color="green"] {
+      background: rgba(127, 255, 0, 0.78);
+    }
+
+    #review-hl-popup .rt-color[data-color="blue"] {
+      background: rgba(64, 195, 255, 0.78);
+    }
+
+    #review-hl-popup .rt-color[data-color="pink"] {
+      background: rgba(255, 105, 180, 0.78);
+    }
+
     #review-hl-popup .edit-btn {
       background: var(--accent-tool);
       color: var(--bg);
@@ -1744,7 +1911,10 @@
       cursor: pointer;
       font-weight: 600;
     }
-    #review-hl-popup .edit-btn:hover { filter: brightness(1.08); }
+
+    #review-hl-popup .edit-btn:hover {
+      filter: brightness(1.08);
+    }
 
     /* Color-circle buttons in the right group of the selection
        toolbar. Round, filled with the same pastel they apply,
@@ -1752,6 +1922,7 @@
     #review-mode .review-toolbar .rt-highlights {
       gap: 8px;
     }
+
     #review-mode .review-toolbar .rt-color {
       width: 22px;
       height: 22px;
@@ -1762,17 +1933,31 @@
       cursor: pointer;
       transition: transform 80ms ease, border-color 120ms ease;
     }
+
     #review-mode .review-toolbar .rt-color:hover {
       transform: scale(1.12);
     }
+
     #review-mode .review-toolbar .rt-color.active {
       border-color: var(--fg);
       box-shadow: 0 0 0 2px var(--bg-raise);
     }
-    #review-mode .review-toolbar .rt-color[data-color="yellow"] { background: rgba(255, 215, 0,   0.85); }
-    #review-mode .review-toolbar .rt-color[data-color="green"]  { background: rgba(127, 255, 0,   0.78); }
-    #review-mode .review-toolbar .rt-color[data-color="blue"]   { background: rgba( 64, 195, 255, 0.78); }
-    #review-mode .review-toolbar .rt-color[data-color="pink"]   { background: rgba(255, 105, 180, 0.78); }
+
+    #review-mode .review-toolbar .rt-color[data-color="yellow"] {
+      background: rgba(255, 215, 0, 0.85);
+    }
+
+    #review-mode .review-toolbar .rt-color[data-color="green"] {
+      background: rgba(127, 255, 0, 0.78);
+    }
+
+    #review-mode .review-toolbar .rt-color[data-color="blue"] {
+      background: rgba(64, 195, 255, 0.78);
+    }
+
+    #review-mode .review-toolbar .rt-color[data-color="pink"] {
+      background: rgba(255, 105, 180, 0.78);
+    }
 
     /* ---------- Scrollbar ----------
        Chrome/Safari use the WebKit pseudo-elements; Firefox uses the
@@ -1841,15 +2026,20 @@
       min-width: 640px;
       max-width: 760px;
     }
+
     #ui-modal .ui-modal-body-wide {
       gap: 18px;
     }
+
     #ui-modal .ui-prefs-row {
       display: flex;
       gap: 14px;
       align-items: flex-end;
     }
-    #ui-modal .ui-prefs-row label { flex: 1 1 0; }
+
+    #ui-modal .ui-prefs-row label {
+      flex: 1 1 0;
+    }
 
     #ui-modal .ui-cols {
       display: grid;
@@ -1858,6 +2048,7 @@
       padding-top: 8px;
       border-top: 1px solid var(--border);
     }
+
     #ui-modal .ui-col h4 {
       margin: 0 0 8px;
       font-size: 11px;
@@ -1866,11 +2057,13 @@
       color: var(--fg-muted);
       font-weight: 600;
     }
+
     #ui-modal .ui-col .ui-col-note {
       margin: 8px 0 0;
       font-size: 11px;
       color: var(--fg-faint);
     }
+
     #ui-modal .ui-col dl {
       margin: 0;
       display: grid;
@@ -1880,11 +2073,13 @@
       font-size: 12px;
       align-items: baseline;
     }
+
     #ui-modal .ui-col dt {
       color: var(--fg);
       font-weight: 600;
       white-space: nowrap;
     }
+
     #ui-modal .ui-col dt code,
     #ui-modal .ui-col dt kbd {
       font-family: var(--font-mono);
@@ -1896,10 +2091,12 @@
       color: var(--fg);
       font-weight: normal;
     }
+
     #ui-modal .ui-col dd {
       margin: 0;
       color: var(--fg-muted);
     }
+
     #ui-modal .ui-col dd code,
     #ui-modal .ui-col dd kbd {
       font-family: var(--font-mono);
@@ -2171,7 +2368,8 @@
       color: var(--fg-muted);
       border: 1px solid var(--border);
       border-radius: 4px;
-      padding: 3px 10px 8px;   /* extra bottom padding for the gauge bar */
+      padding: 3px 10px 8px;
+      /* extra bottom padding for the gauge bar */
       cursor: pointer;
       font-family: inherit;
       font-size: 12px;
@@ -2199,6 +2397,7 @@
       pointer-events: none;
       border-top: 1px solid var(--bg-alt);
     }
+
     .model-badge .model-gauge .fill {
       display: block;
       height: 100%;
@@ -2206,8 +2405,15 @@
       background: var(--accent-agent);
       transition: width 120ms ease, background 200ms ease, opacity 200ms ease;
     }
-    .model-badge.gauge-warn .model-gauge .fill { background: var(--accent-tool); }
-    .model-badge.gauge-danger .model-gauge .fill { background: var(--accent-error); }
+
+    .model-badge.gauge-warn .model-gauge .fill {
+      background: var(--accent-tool);
+    }
+
+    .model-badge.gauge-danger .model-gauge .fill {
+      background: var(--accent-error);
+    }
+
     /* Empty state: fill the bar fully at low opacity in fg-faint so
        the user can SEE the gauge exists before any completion has
        arrived. The JS sets width to 100% in this state too. */
@@ -2692,6 +2898,7 @@
     #model-modal .model-option.cloud .cute {
       color: var(--accent-user);
     }
+
     #model-modal .model-option.cloud .opro-status {
       font-size: 10.5px;
       letter-spacing: 0.4px;
@@ -2701,14 +2908,17 @@
       border: 1px solid var(--border);
       color: var(--fg-muted);
     }
+
     #model-modal .model-option.cloud .opro-status.healthy {
       color: var(--accent-agent);
       border-color: color-mix(in oklab, var(--accent-agent) 50%, var(--border));
     }
+
     #model-modal .model-option.cloud .opro-status.unhealthy {
       color: var(--accent-error);
       border-color: color-mix(in oklab, var(--accent-error) 50%, var(--border));
     }
+
     #model-modal .model-option.cloud .opro-status.unconfigured {
       color: var(--accent-tool);
       border-color: color-mix(in oklab, var(--accent-tool) 50%, var(--border));
@@ -2728,13 +2938,18 @@
       gap: 10px;
       background: color-mix(in oklab, var(--bg-raise) 60%, transparent);
     }
-    #opro-settings.hidden { display: none; }
+
+    #opro-settings.hidden {
+      display: none;
+    }
+
     #opro-settings .opro-explainer {
       margin: 0;
       font-size: 11.5px;
       color: var(--fg-muted);
       line-height: 1.45;
     }
+
     #opro-settings .opro-explainer code {
       font-family: var(--font-mono);
       background: color-mix(in oklab, var(--bg-raise) 80%, transparent);
@@ -2742,12 +2957,14 @@
       border-radius: 3px;
       font-size: 11px;
     }
+
     #opro-settings .opro-row {
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 12px;
     }
+
     #opro-settings .opro-row .label {
       color: var(--fg-muted);
       text-transform: uppercase;
@@ -2755,16 +2972,20 @@
       letter-spacing: 0.5px;
       min-width: 90px;
     }
+
     #opro-settings .opro-row .value {
       color: var(--fg);
       flex: 1;
     }
+
     #opro-settings .opro-row .value.error {
       color: var(--accent-error);
     }
+
     #opro-settings .opro-row .value.ok {
       color: var(--accent-agent);
     }
+
     #opro-settings input[type="text"] {
       flex: 1;
       background: var(--input-bg);
@@ -2775,11 +2996,13 @@
       font-family: var(--font-mono);
       font-size: 12px;
     }
+
     #opro-settings .opro-actions {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
     }
+
     #opro-settings .opro-btn {
       background: var(--bg-raise);
       color: var(--fg);
@@ -2790,16 +3013,20 @@
       font-family: inherit;
       font-size: 11.5px;
     }
+
     #opro-settings .opro-btn:hover {
       border-color: var(--fg-faint);
     }
+
     #opro-settings .opro-btn.danger {
       color: var(--accent-error);
       border-color: color-mix(in oklab, var(--accent-error) 30%, var(--border));
     }
+
     #opro-settings .opro-btn.danger:hover {
       background: color-mix(in oklab, var(--accent-error) 12%, var(--bg-raise));
     }
+
     #opro-settings .opro-btn:disabled {
       opacity: 0.5;
       cursor: wait;
@@ -2809,15 +3036,25 @@
        Three-screen flow: understanding → key entry → health check.
        Intentionally a separate modal from the model picker so the
        commitment moment is visually distinct. */
-    #opro-wizard-modal.hidden { display: none; }
-    #opro-wizard-modal {
-      position: fixed; inset: 0; z-index: 60;
-      display: flex; align-items: center; justify-content: center;
+    #opro-wizard-modal.hidden {
+      display: none;
     }
+
+    #opro-wizard-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     #opro-wizard-modal .modal-backdrop {
-      position: absolute; inset: 0;
+      position: absolute;
+      inset: 0;
       background: rgba(0, 0, 0, 0.55);
     }
+
     #opro-wizard-modal .modal-panel {
       position: relative;
       width: min(560px, 92vw);
@@ -2828,6 +3065,7 @@
       border-radius: 8px;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     }
+
     #opro-wizard-modal .modal-head {
       display: flex;
       align-items: center;
@@ -2835,6 +3073,7 @@
       padding: 14px 16px;
       border-bottom: 1px solid var(--border);
     }
+
     #opro-wizard-modal .modal-head h3 {
       flex: 1;
       margin: 0;
@@ -2843,6 +3082,7 @@
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
+
     #opro-wizard-modal .modal-close {
       background: transparent;
       border: none;
@@ -2850,22 +3090,28 @@
       font-size: 20px;
       cursor: pointer;
     }
+
     #opro-wizard-modal .step-dots {
       display: flex;
       gap: 4px;
       padding: 8px 16px 0;
     }
+
     #opro-wizard-modal .step-dot {
-      width: 8px; height: 8px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: var(--border);
     }
+
     #opro-wizard-modal .step-dot.active {
       background: var(--accent-agent);
     }
+
     #opro-wizard-modal .step-dot.done {
       background: color-mix(in oklab, var(--accent-agent) 60%, var(--border));
     }
+
     #opro-wizard-modal .wizard-body {
       padding: 16px;
       display: flex;
@@ -2873,13 +3119,18 @@
       gap: 14px;
       font-size: 13px;
     }
+
     #opro-wizard-modal .wizard-body p,
     #opro-wizard-modal .wizard-body ul {
       margin: 0;
       color: var(--fg-muted);
       line-height: 1.55;
     }
-    #opro-wizard-modal .wizard-body strong { color: var(--fg); }
+
+    #opro-wizard-modal .wizard-body strong {
+      color: var(--fg);
+    }
+
     #opro-wizard-modal .wizard-body code {
       background: var(--bg-raise);
       color: var(--fg-muted);
@@ -2887,10 +3138,12 @@
       border-radius: 3px;
       font-size: 12px;
     }
+
     #opro-wizard-modal .wizard-body a {
       color: var(--accent-user);
       text-decoration: underline;
     }
+
     #opro-wizard-modal .confirm-list {
       display: flex;
       flex-direction: column;
@@ -2900,6 +3153,7 @@
       border: 1px solid var(--border);
       border-radius: 5px;
     }
+
     #opro-wizard-modal .confirm-list label {
       display: flex;
       gap: 9px;
@@ -2909,14 +3163,17 @@
       font-size: 12.5px;
       line-height: 1.5;
     }
+
     #opro-wizard-modal .confirm-list label input[type="checkbox"] {
       margin-top: 3px;
       accent-color: var(--accent-agent);
     }
+
     #opro-wizard-modal .key-input-row {
       display: flex;
       gap: 6px;
     }
+
     #opro-wizard-modal .key-input-row input {
       flex: 1;
       background: var(--input-bg);
@@ -2927,6 +3184,7 @@
       font-family: var(--font-mono);
       font-size: 12.5px;
     }
+
     #opro-wizard-modal .key-input-row .reveal-btn {
       background: var(--bg-raise);
       color: var(--fg-muted);
@@ -2937,7 +3195,11 @@
       font-family: inherit;
       font-size: 11px;
     }
-    #opro-wizard-modal .key-input-row .reveal-btn:hover { color: var(--fg); }
+
+    #opro-wizard-modal .key-input-row .reveal-btn:hover {
+      color: var(--fg);
+    }
+
     #opro-wizard-modal .health-panel {
       padding: 14px;
       border: 1px solid var(--border);
@@ -2945,15 +3207,21 @@
       background: var(--bg-raise);
       font-size: 12.5px;
     }
-    #opro-wizard-modal .health-panel.checking { color: var(--fg-muted); }
+
+    #opro-wizard-modal .health-panel.checking {
+      color: var(--fg-muted);
+    }
+
     #opro-wizard-modal .health-panel.ok {
       color: var(--accent-agent);
       border-color: color-mix(in oklab, var(--accent-agent) 50%, var(--border));
     }
+
     #opro-wizard-modal .health-panel.fail {
       color: var(--accent-error);
       border-color: color-mix(in oklab, var(--accent-error) 50%, var(--border));
     }
+
     #opro-wizard-modal .wizard-foot {
       display: flex;
       gap: 8px;
@@ -2961,6 +3229,7 @@
       padding: 12px 16px;
       border-top: 1px solid var(--border);
     }
+
     #opro-wizard-modal .wizard-foot .secondary {
       background: transparent;
       color: var(--fg-muted);
@@ -2970,6 +3239,7 @@
       cursor: pointer;
       font-size: 12px;
     }
+
     #opro-wizard-modal .wizard-foot .primary {
       background: color-mix(in oklab, var(--accent-agent) 20%, var(--bg-raise));
       color: var(--fg);
@@ -2979,6 +3249,7 @@
       cursor: pointer;
       font-size: 12px;
     }
+
     #opro-wizard-modal .wizard-foot button:disabled {
       opacity: 0.45;
       cursor: not-allowed;
@@ -2991,10 +3262,14 @@
   <div class="topbar">
     <div class="brand">enough<span class="dim"><!-- VERSION --></span></div>
     <!-- Left half: file toggle → broker → UI prefs → model+gauge -->
-    <button id="toggle-sidebar" class="icon-btn" title="Show/hide the file sidebar (cmd+\\)" aria-label="files">📁</button>
-    <button id="broker-btn" class="icon-btn" title="Broker — tool routing, logging, and per-tool toggles" aria-label="broker">🔀</button>
-    <button id="ui-btn" class="icon-btn" title="UI preferences + keyboard shortcuts + markdown cheat sheet" aria-label="ui preferences">🖌️</button>
-    <button id="model-badge" class="model-badge off" title="Model &amp; context window — bottom bar shows live token-pressure">
+    <button id="toggle-sidebar" class="icon-btn" title="Show/hide the file sidebar (cmd+\\)"
+      aria-label="files">📁</button>
+    <button id="broker-btn" class="icon-btn" title="Broker — tool routing, logging, and per-tool toggles"
+      aria-label="broker">🔀</button>
+    <button id="ui-btn" class="icon-btn" title="UI preferences + keyboard shortcuts + markdown cheat sheet"
+      aria-label="ui preferences">🖌️</button>
+    <button id="model-badge" class="model-badge off"
+      title="Model &amp; context window — bottom bar shows live token-pressure">
       <span class="dot"></span>
       <span class="cute">…</span>
       <span class="ctx"></span>
@@ -3111,16 +3386,17 @@
             </select>
           </div>
           <div class="rt-group rt-edit">
-            <button type="button" id="rt-edit-mode" title="exit review and open the editor at this selection">edit mode</button>
+            <button type="button" id="rt-edit-mode" title="exit review and open the editor at this selection">edit
+              mode</button>
           </div>
           <div class="rt-group rt-highlights" aria-label="highlight colors">
             <!-- Click a circle to apply that color to the selection;
                  click again on an already-active color to remove it.
                  Multiple colors can be stacked on the same span. -->
             <button type="button" class="rt-color" data-color="yellow" title="highlight yellow"></button>
-            <button type="button" class="rt-color" data-color="green"  title="highlight green"></button>
-            <button type="button" class="rt-color" data-color="blue"   title="highlight blue"></button>
-            <button type="button" class="rt-color" data-color="pink"   title="highlight pink"></button>
+            <button type="button" class="rt-color" data-color="green" title="highlight green"></button>
+            <button type="button" class="rt-color" data-color="blue" title="highlight blue"></button>
+            <button type="button" class="rt-color" data-color="pink" title="highlight pink"></button>
           </div>
         </div>
         <div class="review-body" id="review-body" data-path=""></div>
@@ -3156,10 +3432,8 @@
             <span class="text" id="review-chat-chip-text"></span>
             <button type="button" id="review-chat-chip-clear" title="clear queued selection">×</button>
           </div>
-          <form class="review-chat-form" id="review-chat-form"
-                onsubmit="event.preventDefault(); sendFromReviewChat();">
-            <textarea id="review-chat-input" rows="2"
-              placeholder="message the agent about this document…"></textarea>
+          <form class="review-chat-form" id="review-chat-form" onsubmit="event.preventDefault(); sendFromReviewChat();">
+            <textarea id="review-chat-input" rows="2" placeholder="message the agent about this document…"></textarea>
             <button type="submit">send</button>
           </form>
         </div>
@@ -3189,10 +3463,8 @@
             <span class="toggle" id="edit-chat-toggle">▾</span>
           </div>
           <div class="review-chat-tail" id="edit-chat-tail"></div>
-          <form class="review-chat-form" id="edit-chat-form"
-                onsubmit="event.preventDefault(); sendFromEditChat();">
-            <textarea id="edit-chat-input" rows="2"
-              placeholder="message the agent about this document…"></textarea>
+          <form class="review-chat-form" id="edit-chat-form" onsubmit="event.preventDefault(); sendFromEditChat();">
+            <textarea id="edit-chat-input" rows="2" placeholder="message the agent about this document…"></textarea>
             <button type="submit">send</button>
           </form>
         </div>
@@ -3206,9 +3478,9 @@
         <div class="lbl">change color</div>
         <div class="row colors">
           <button type="button" class="rt-color" data-color="yellow" title="yellow"></button>
-          <button type="button" class="rt-color" data-color="green"  title="green"></button>
-          <button type="button" class="rt-color" data-color="blue"   title="blue"></button>
-          <button type="button" class="rt-color" data-color="pink"   title="pink"></button>
+          <button type="button" class="rt-color" data-color="green" title="green"></button>
+          <button type="button" class="rt-color" data-color="blue" title="blue"></button>
+          <button type="button" class="rt-color" data-color="pink" title="pink"></button>
         </div>
         <div class="lbl">click the active color to remove this highlight</div>
         <div class="row">
@@ -3410,18 +3682,12 @@
           by enough's broker when constructing outbound requests.
         </p>
         <div class="key-input-row">
-          <input
-            type="password"
-            id="opro-key-input"
-            placeholder="sk-or-v1-…"
-            autocomplete="off"
-            spellcheck="false">
-          <button type="button" class="reveal-btn" id="opro-reveal-btn"
-            onclick="oproToggleReveal()">show</button>
+          <input type="password" id="opro-key-input" placeholder="sk-or-v1-…" autocomplete="off" spellcheck="false">
+          <button type="button" class="reveal-btn" id="opro-reveal-btn" onclick="oproToggleReveal()">show</button>
         </div>
         <p style="color: var(--fg-faint); font-size: 11.5px;">
           Tip: paste, glance to confirm, then click <strong>save &amp;
-          verify</strong>. A free <code>openrouter/free</code> ping runs
+            verify</strong>. A free <code>openrouter/free</code> ping runs
           automatically to verify the key works before we mark OPRO-API
           ready.
         </p>
@@ -3441,10 +3707,8 @@
       </div>
 
       <div class="wizard-foot">
-        <button type="button" class="secondary" id="opro-wizard-back"
-          onclick="oproWizardBack()">back</button>
-        <button type="button" class="primary" id="opro-wizard-next"
-          onclick="oproWizardNext()">next</button>
+        <button type="button" class="secondary" id="opro-wizard-back" onclick="oproWizardBack()">back</button>
+        <button type="button" class="primary" id="opro-wizard-next" onclick="oproWizardNext()">next</button>
       </div>
     </div>
   </div>
@@ -3545,7 +3809,7 @@
         what: 'the reasoning framework the agent is currently using. exactly one paradigm is active at any time; click another to switch. the active paradigm is loaded in full into the system prompt every turn, and the agent also sees a brief catalog of the other available paradigms so it can suggest (or initiate) a switch when the work would benefit from one.',
         how: 'click ● next to a paradigm to make it active for this project. the choice is recorded in <code>rness/active-paradigm</code>. agent-initiated switches happen by writing that file too, and take effect on the next turn. add new paradigms by dropping a markdown file into <code>~/enough/defaults/paradigms/</code> (or into your project\'s <code>rness/paradigms/</code> for project-local ones). a YAML frontmatter block at the top — <code>name:</code> and <code>description:</code> — tells the agent what the paradigm is for.',
         ideas: [
-          'three paradigms ship by default: <em>default</em> for general-purpose work, <em>translation</em> which pairs with the translator skill for multi-language work, and <em>workflow-design</em> which puts the agent in "build mode" for creating new skills/paradigms/roles or refining the root AGENT.md / MOTIVATION.md.',
+          'four paradigms are included: <em>default</em> for general-purpose work, <em>text-planning</em> for planning whatever your text may be and keeping track of its progress,<em>translation</em> which pairs with the translator skill for multi-language work, and <em>workflow-design</em> which puts the agent in "build mode" for creating new skills/paradigms/roles or refining the root AGENT.md / MOTIVATION.md.',
           'write a paradigm for a distinct mode of work (research vs. writing, exploration vs. execution) and switch between them as the day unfolds.',
           'a paradigm description is essentially "when should I use this" — write it for the agent\'s benefit, since that\'s the signal it reads to recommend switching.',
         ],
@@ -3567,7 +3831,7 @@
         what: 'per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. active skills add vocabulary, recipes, or behaviors the agent will reach for during conversation.',
         how: 'click ● / ○ to toggle a skill on or off for this project. you can add project-level skills to <code>rness/skills/</code> — skill statuses are saved per project. to install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). edit a global skill at the source and the change propagates everywhere it\'s symlinked.',
         ideas: [
-          'four skills are included: irefy which summarizes and evaluates any text, memoir-dialectic which can help you structure your memoirs, skillmd-scan to scan downloaded 3P skills for security risks, and translator (paired with the <em>translation</em> paradigm) for universal text translation. (Anonymized web fetching used to be a skill; it\'s now built into the broker — see the broker pane in the top nav.)',
+          'four default skills are included: <em>analyzer</em> which can summarize or proofread any text as well as help you make decisions about anything, <em>memoir-dialectic</em> which can help you structure your memoirs, <em>skill-scanner</em> to scan downloaded 3P skills for security risks and describe what they can help you with, and <em>translator</em> (paired with the <em>translation</em> paradigm) for universal text translation.',
           'build global or project-local skills to capture your house style or domain conventions.',
           'turn everything off for "pure conversation" — sometimes the model has more breathing room for emergent epiphanies with no scaffolding.',
         ],
@@ -3578,9 +3842,9 @@
         what: 'consultant agents you can summon in conversation, sourced from <code>~/enough/defaults/roles/</code>. each role is a folder containing AGENT.md (instructions) and MOTIVATION.md (drives) — the same pair of files that defines the main agent, but scoped to a complementary (or adversarial) persona.',
         how: 'click ● / ○ to enable a role for this project. add new roles globally by creating <code>~/enough/defaults/roles/&lt;name&gt;/</code> with AGENT.md and MOTIVATION.md inside; project-level works and edits propagate, just like skills.',
         ideas: [
-          'open-skeptic is included; this role can be helpful to poke holes in your brilliant ideas.',
+          'two default roles are included: <em>block-breaker</em> will help you break whatever writer\'s block is bothering you, and<em>open-skeptic</em> pokes at and pushes back on your brilliant ideas to help you push forward.',
           'build a "rubber duck" that asks Socratic questions instead of answering.',
-          'use your knowledge base\'s files to craft a domain expert (legal, design, copy).',
+          'use your knowledge base\'s files with the <em>workflow-design</em> paradigm to craft a domain expert (legal, design, copy) role.',
         ],
       },
       'rness': {
@@ -3622,9 +3886,9 @@
         what: 'the full set of reasoning frameworks available in this project. each paradigm is a markdown file with a YAML frontmatter block (<code>name</code> + <code>description</code>) and a body describing how to approach work — heuristics, decision criteria, when to ask vs. act. exactly one is active at any time (see the <strong>paradigm</strong> section at the top of the sidebar to switch).',
         how: 'symlinked from <code>~/enough/defaults/paradigms/</code>. edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. new paradigms can be added simply by dropping a markdown file into the defaults folder — give it a frontmatter <code>name:</code> and <code>description:</code> so the agent knows when to recommend it.',
         ideas: [
-          'write paradigms for distinct modes — exploration vs. execution, brainstorm vs. critique.',
-          'the included translation paradigm is paired with the translator skill — enable both to unlock universal text translation across ~419 languages.',
-          'encode how to weigh proofing vs. polishing, or testing vs. shipping, for the kind of work you do.',
+          'four paradigms are included: <em>default</em> for general-purpose work, <em>text-planning</em> for planning whatever your text may be and keeping track of its progress,<em>translation</em> which pairs with the translator skill for multi-language work, and <em>workflow-design</em> which puts the agent in "build mode" for creating new skills/paradigms/roles or refining the root AGENT.md / MOTIVATION.md.',
+          'write a paradigm for a distinct mode of work (research vs. writing, exploration vs. execution) and switch between them as the day unfolds.',
+          'a paradigm description is essentially "when should I use this" — write it for the agent\'s benefit, since that\'s the signal it reads to recommend switching.'
         ],
       },
       'policies': {
@@ -4472,7 +4736,7 @@
     function oproRefreshNextEnabled() {
       const next = document.getElementById('opro-wizard-next');
       if (OPRO_STEP === 1) {
-        const allChecked = ['opro-cb-account','opro-cb-key','opro-cb-risk']
+        const allChecked = ['opro-cb-account', 'opro-cb-key', 'opro-cb-risk']
           .every(id => document.getElementById(id).checked);
         next.disabled = !allChecked;
       } else if (OPRO_STEP === 2) {
@@ -4485,7 +4749,7 @@
       // skipUnderstanding=true for update-key flow (user already agreed once)
       const modal = document.getElementById('opro-wizard-modal');
       // Reset all checkboxes + the key input on a fresh open.
-      ['opro-cb-account','opro-cb-key','opro-cb-risk'].forEach(id => {
+      ['opro-cb-account', 'opro-cb-key', 'opro-cb-risk'].forEach(id => {
         document.getElementById(id).checked = !!skipUnderstanding;
       });
       document.getElementById('opro-key-input').value = '';
@@ -4692,7 +4956,7 @@
     // Wire up wizard-only event listeners (checkbox state + key input).
     // Idempotent: attached once at script load, no harm if the wizard
     // never opens.
-    ['opro-cb-account','opro-cb-key','opro-cb-risk'].forEach(id => {
+    ['opro-cb-account', 'opro-cb-key', 'opro-cb-risk'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('change', oproRefreshNextEnabled);
     });
@@ -5006,8 +5270,8 @@
           // save/undo bar surfaces when the agent's turn ends.
           const reviewRoot = document.getElementById('review-mode');
           if (reviewRoot && reviewRoot.classList.contains('open')
-              && REVIEW_PATH === key
-              && typeof showReviewUndoBar === 'function') {
+            && REVIEW_PATH === key
+            && typeof showReviewUndoBar === 'function') {
             REVIEW_LAST_AGENT_WRITE = key;
             // Surface immediately — the user sees the bar as soon as
             // the edit lands, not at end-of-turn (which could be
@@ -5278,12 +5542,12 @@
     // the DOM but legitimate <u> tags survive.
     function escapeMarkdownInline(s) {
       s = s.replace(/<u>/gi, '\x00UOPEN\x00')
-           .replace(/<\/u>/gi, '\x00UCLOSE\x00')
-           .replace(/<br\s*\/?>/gi, '\x00BR\x00');
+        .replace(/<\/u>/gi, '\x00UCLOSE\x00')
+        .replace(/<br\s*\/?>/gi, '\x00BR\x00');
       s = escapeHtml(s);
       return s.replace(/\x00UOPEN\x00/g, '<u>')
-              .replace(/\x00UCLOSE\x00/g, '</u>')
-              .replace(/\x00BR\x00/g, '<br>');
+        .replace(/\x00UCLOSE\x00/g, '</u>')
+        .replace(/\x00BR\x00/g, '<br>');
     }
 
     // Inline-level rules: bold, italic, underline, links, inline code.
@@ -5321,7 +5585,7 @@
     // 'dark' (matches the enough-default theme).
     function detectThemeMode() {
       const bg = getComputedStyle(document.body).getPropertyValue('--bg').trim()
-              || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+        || getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
       const rgb = parseColor(bg);
       if (!rgb) return 'dark';
       const [r, g, b] = rgb.map(c => {
@@ -5611,8 +5875,8 @@
       // shared parent above #review-body.
       const inBody = (n) => n && (n === body || body.contains(n));
       if (!(inBody(range.commonAncestorContainer)
-            || inBody(range.startContainer)
-            || inBody(range.endContainer))) return null;
+        || inBody(range.startContainer)
+        || inBody(range.endContainer))) return null;
       const text = rangeTextContent(range);
       if (!text || !text.trim()) return null;
       return { range, text };
@@ -5804,7 +6068,7 @@
         }
         if (plainStart < 0 || plainEnd < 0) continue;
         const [pStart, pEnd] = [Math.min(plainStart, plainEnd),
-                                Math.max(plainStart, plainEnd)];
+        Math.max(plainStart, plainEnd)];
         if (pStart >= pEnd) continue;
         const map = buildBlockPlainMap(b.block.raw);
         const s = map.positions[pStart];
@@ -5912,7 +6176,7 @@
           // Strip leading markers (# / - / > / 1. ) so the search
           // hits the rendered text and the textarea consistently.
           focusText = firstLine.replace(/^(#{1,6}\s+|\s*[-*+]\s+|\s*\d+\.\s+|>\s?)/, '').trim()
-                              .slice(0, 80) || null;
+            .slice(0, 80) || null;
         }
       }
       PENDING_EDIT_FOCUS = focusText ? { path, text: focusText } : null;
@@ -6195,7 +6459,7 @@
     document.addEventListener('input', (e) => {
       if (!e.target || !e.target.matches) return;
       if (e.target.matches('textarea.file-edit') ||
-          e.target.matches('#edit-textarea')) {
+        e.target.matches('#edit-textarea')) {
         updateDocCounters();
       }
     });
@@ -6713,8 +6977,8 @@
       if (!body) return null;
       const inBody = (n) => n && (n === body || body.contains(n));
       if (!(inBody(range.commonAncestorContainer)
-            || inBody(range.startContainer)
-            || inBody(range.endContainer))) return null;
+        || inBody(range.startContainer)
+        || inBody(range.endContainer))) return null;
       const snippet = rangeTextContent(range);
       if (!snippet) return null;
       // Build the full doc plain text + locate the snippet in it for
@@ -6749,7 +7013,7 @@
       }
       const before = plain.slice(Math.max(0, snipStart - HL_ANCHOR_LEN), snipStart);
       const after = plain.slice(snipStart + snippet.length,
-                                snipStart + snippet.length + HL_ANCHOR_LEN);
+        snipStart + snippet.length + HL_ANCHOR_LEN);
       return { snippet, before, after };
     }
 
@@ -6806,7 +7070,7 @@
         fd.append('before_anchor', ctx.before);
         fd.append('after_anchor', ctx.after);
         if (srcStart !== '') fd.append('src_start', srcStart);
-        if (srcEnd !== '')   fd.append('src_end', srcEnd);
+        if (srcEnd !== '') fd.append('src_end', srcEnd);
         try {
           const r = await fetch('/api/highlights', { method: 'POST', body: fd });
           if (!r.ok) throw new Error(r.statusText);
@@ -6918,7 +7182,7 @@
           // Engaged → remove.
           try {
             const url = '/api/highlights?path=' + encodeURIComponent(REVIEW_PATH) +
-                        '&id=' + encodeURIComponent(POPUP_HL_ID);
+              '&id=' + encodeURIComponent(POPUP_HL_ID);
             const r = await fetch(url, { method: 'DELETE' });
             if (!r.ok) throw new Error(r.statusText);
           } catch (err) {

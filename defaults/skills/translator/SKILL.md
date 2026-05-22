@@ -217,3 +217,6 @@ and is willing to accept a non-commercial license for personal use, the
 NLLB-200 paradigm (gated behind a flag in
 `rness/paradigms/translation.md`) provides that path — explicitly,
 with the license tradeoff visible.
+
+---
+enough-tooltip-text: "use the translator skill and the translation paradigm to translate any text into another language."

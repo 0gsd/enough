@@ -6,6 +6,7 @@ next message. No caching.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 TOOL_INSTRUCTIONS = """\
@@ -286,23 +287,32 @@ def _read_disabled_skills(rness: Path) -> set[str]:
     return {ln.strip() for ln in text.splitlines() if ln.strip() and not ln.startswith("#")}
 
 
-def list_skills(rness: Path) -> list[tuple[str, bool]]:
-    """Return [(name, enabled), ...] for every skill present, in stable order."""
+def list_skills(rness: Path) -> list[tuple[str, bool, str]]:
+    """Return [(name, enabled, tooltip), ...] for every skill present, in
+    stable order. `tooltip` is the user-facing UI tooltip from the bottom
+    `enough-tooltip-text:` field of the skill's SKILL.md (or flat .md);
+    "" if not set."""
     skills_dir = rness / "skills"
     if not skills_dir.is_dir():
         return []
-    names: list[str] = []
+    entries: list[tuple[str, Path]] = []
     seen: set[str] = set()
     for skill_md in sorted(skills_dir.glob("*/SKILL.md")):
         name = skill_md.parent.name
         if name not in seen:
-            seen.add(name); names.append(name)
+            seen.add(name)
+            entries.append((name, skill_md))
     for flat in sorted(skills_dir.glob("*.md")):
         name = flat.stem
         if name not in seen:
-            seen.add(name); names.append(name)
+            seen.add(name)
+            entries.append((name, flat))
     disabled = _read_disabled_skills(rness)
-    return [(n, n not in disabled) for n in names]
+    out: list[tuple[str, bool, str]] = []
+    for name, path in entries:
+        tooltip = _extract_enough_tooltip(_read_or_empty(path))
+        out.append((name, name not in disabled, tooltip))
+    return out
 
 
 def set_skill_enabled(rness: Path, name: str, enabled: bool) -> None:
@@ -387,20 +397,27 @@ def _read_disabled_roles(rness: Path) -> set[str]:
     return {ln.strip() for ln in text.splitlines() if ln.strip() and not ln.startswith("#")}
 
 
-def list_roles(rness: Path) -> list[tuple[str, bool]]:
-    """Return [(name, enabled), ...] for every role present, in stable order."""
+def list_roles(rness: Path) -> list[tuple[str, bool, str]]:
+    """Return [(name, enabled, tooltip), ...] for every role present, in
+    stable order. `tooltip` is the user-facing UI tooltip from the bottom
+    `enough-tooltip-text:` field of the role's AGENT.md; "" if not set."""
     roles_dir = rness / "roles"
     if not roles_dir.is_dir():
         return []
-    names: list[str] = []
+    entries: list[tuple[str, Path]] = []
     for entry in sorted(roles_dir.iterdir()):
         if entry.name.startswith("."):
             continue
         if not entry.is_dir():
             continue
-        names.append(entry.name)
+        entries.append((entry.name, entry / "AGENT.md"))
     disabled = _read_disabled_roles(rness)
-    return [(n, n not in disabled) for n in names]
+    out: list[tuple[str, bool, str]] = []
+    for name, agent_path in entries:
+        text = _read_or_empty(agent_path) if agent_path.is_file() else ""
+        tooltip = _extract_enough_tooltip(text)
+        out.append((name, name not in disabled, tooltip))
+    return out
 
 
 def set_role_enabled(rness: Path, name: str, enabled: bool) -> None:
@@ -499,6 +516,35 @@ def _load_policies(rness: Path) -> str:
 _ACTIVE_PARADIGM_FILE = "active-paradigm"
 
 
+# A user-facing UI tooltip can be placed at the bottom of any paradigm/skill/role
+# file as a single line of the form:
+#     enough-tooltip-text: "Short user-facing description shown on hover."
+# Distinct from the agent-facing `description:` in top frontmatter, which the
+# model reads. The tooltip is for the human looking at the toggle list.
+_ENOUGH_TOOLTIP_RE = re.compile(
+    r'^enough-tooltip-text:\s*(.*?)\s*$',
+    re.MULTILINE,
+)
+
+
+def _extract_enough_tooltip(text: str) -> str:
+    """Pull the user-facing tooltip from a markdown file's trailing metadata.
+
+    Looks for a line of the form `enough-tooltip-text: "..."` (quotes
+    optional) and returns the unquoted value. Returns "" if the field is
+    missing or its value is empty. Only the first match is honored."""
+    m = _ENOUGH_TOOLTIP_RE.search(text)
+    if not m:
+        return ""
+    value = m.group(1).strip()
+    if len(value) >= 2 and (
+        (value[0] == '"' and value[-1] == '"')
+        or (value[0] == "'" and value[-1] == "'")
+    ):
+        value = value[1:-1]
+    return value
+
+
 def _parse_paradigm_frontmatter(text: str) -> tuple[dict[str, str], str]:
     """Return (frontmatter_dict, body_without_frontmatter).
 
@@ -526,21 +572,26 @@ def _parse_paradigm_frontmatter(text: str) -> tuple[dict[str, str], str]:
     return meta, body
 
 
-def list_paradigms(rness: Path) -> list[tuple[str, str]]:
-    """Return [(name, description), ...] for every paradigm file present.
+def list_paradigms(rness: Path) -> list[tuple[str, str, str]]:
+    """Return [(name, description, tooltip), ...] for every paradigm file present.
 
     `name` defaults to the filename stem when frontmatter is missing.
+    `description` is the agent-facing one-liner from top frontmatter (used in
+    the paradigm catalog the model sees).
+    `tooltip` is the user-facing UI tooltip from the bottom
+    `enough-tooltip-text:` field, "" if not set.
     Stable alphabetical order."""
     paradigms_dir = rness / "paradigms"
     if not paradigms_dir.is_dir():
         return []
-    out: list[tuple[str, str]] = []
+    out: list[tuple[str, str, str]] = []
     for p in sorted(paradigms_dir.glob("*.md")):
         text = _read_or_empty(p)
         meta, _body = _parse_paradigm_frontmatter(text)
         name = meta.get("name") or p.stem
         desc = meta.get("description", "")
-        out.append((name, desc))
+        tooltip = _extract_enough_tooltip(text)
+        out.append((name, desc, tooltip))
     return out
 
 
@@ -597,7 +648,7 @@ def _load_paradigm_catalog(rness: Path, active: str) -> str:
         "the current turn you remain under the active paradigm above."
     )
     lines.append("")
-    for name, desc in items:
+    for name, desc, _tooltip in items:
         if name == active:
             continue
         if desc:

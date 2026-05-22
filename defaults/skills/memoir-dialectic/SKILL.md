@@ -87,3 +87,6 @@ Only if scope (b) — plan + draft — was chosen.
 | `NOTES.md` | Raw, unsorted user dumps awaiting redistribution | Living | — |
 | `MEMOIR-OUTLINE.md` | Structural synthesis of all PLAN- docs | After planning | — |
 | `MEMOIR-DRAFT-NN.md` | Optional drafted prose | Draft order | 10 KB |
+
+---
+enough-tooltip-text: "memoir-dialectic is designed to help you plan and write a memoir through a patient, detailed, iterative dialogue; use with the text-planning paradigm to help keep track."

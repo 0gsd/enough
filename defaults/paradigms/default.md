@@ -124,3 +124,6 @@ means propose the conservative alternative — using the user's existing
 `infoworld/` corpus, asking them to verify the license, or suggesting
 they add the domain to the allowlist if they want it fetched directly
 instead of via Tor — rather than just refusing.
+
+---
+enough-tooltip-text: "more like the absence of any specific paradigm than a paradigm itself."

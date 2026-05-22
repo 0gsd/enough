@@ -935,11 +935,15 @@ def create_app(
             return HTMLResponse('<div class="empty-note">no paradigms in rness/paradigms/</div>')
         active = get_active_paradigm(rness)
         rows = []
-        for name, desc in items:
+        for name, desc, tooltip in items:
             is_active = name == active
             cls = "on" if is_active else "off"
             marker = "●" if is_active else "○"
-            tip = _escape_html(desc) if desc else ""
+            # Prefer the user-facing tooltip; fall back to the agent-facing
+            # description so existing paradigms don't lose their hover text
+            # until each one's `enough-tooltip-text:` is populated.
+            tip_text = tooltip if tooltip else desc
+            tip = _escape_html(tip_text) if tip_text else ""
             rows.append(
                 f'<li class="paradigm-row {cls}" title="{tip}">'
                 f'  <button class="paradigm-toggle" '
@@ -961,7 +965,7 @@ def create_app(
             raise HTTPException(400, "missing name")
         rness = project_dir / "rness"
         # Validate: only allow names that resolve to an existing paradigm file.
-        valid_names = {n for n, _d in list_paradigms(rness)}
+        valid_names = {n for n, _d, _t in list_paradigms(rness)}
         if name not in valid_names:
             raise HTTPException(400, f"unknown paradigm: {name}")
         set_active_paradigm(rness, name)
@@ -973,11 +977,13 @@ def create_app(
         if not items:
             return HTMLResponse('<div class="empty-note">no skills in rness/skills/</div>')
         rows = []
-        for name, enabled in items:
+        for name, enabled, tooltip in items:
             cls = "on" if enabled else "off"
             next_val = "0" if enabled else "1"
+            tip = _escape_html(tooltip) if tooltip else ""
+            title_attr = f' title="{tip}"' if tip else ""
             rows.append(
-                f'<li class="skill-row {cls}">'
+                f'<li class="skill-row {cls}"{title_attr}>'
                 f'  <button class="skill-toggle" '
                 f'    hx-post="/api/skills/toggle" '
                 f'    hx-vals=\'{{"name": "{_escape_html(name)}", "enabled": "{next_val}"}}\' '
@@ -1005,11 +1011,13 @@ def create_app(
         if not items:
             return HTMLResponse('<div class="empty-note">no roles in rness/roles/</div>')
         rows = []
-        for name, enabled in items:
+        for name, enabled, tooltip in items:
             cls = "on" if enabled else "off"
             next_val = "0" if enabled else "1"
+            tip = _escape_html(tooltip) if tooltip else ""
+            title_attr = f' title="{tip}"' if tip else ""
             rows.append(
-                f'<li class="role-row {cls}">'
+                f'<li class="role-row {cls}"{title_attr}>'
                 f'  <button class="role-toggle" '
                 f'    hx-post="/api/roles/toggle" '
                 f'    hx-vals=\'{{"name": "{_escape_html(name)}", "enabled": "{next_val}"}}\' '

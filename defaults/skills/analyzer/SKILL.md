@@ -115,3 +115,6 @@ If `rness/io/output/analyzer/` does not exist, create it.
 ---
 
 *Three lenses. One workbench. The user decides.*
+
+---
+enough-tooltip-text: "use analyzer to summarize a document or webpage, proofread any text including full length works, or help you decide between possible options."
