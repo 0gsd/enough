@@ -180,32 +180,6 @@ def apply_drift(project_dir: Path) -> list[tuple[str, str, str]]:
         return []
     return _apply_missing_skeleton_items(project_dir, defaults, _SKELETON_PLAN)
 
-# Infoworld README lives at the GLOBAL infoworld root so it appears once
-# across all projects sharing that symlinked directory.
-_INFOWORLD_README = """\
-# infoworld/
-
-A grounded truth store shared across every enough project on this machine.
-It lives at `~/enough/infoworld/` and is symlinked into each project as
-`{project}/infoworld`. The model is instructed to check these files for
-relevant knowledge before answering from training data.
-
-## Subdirectories
-
-- `wiki/` — Wikipedia article dumps (user-populated; see the enough README
-  for how to download and extract plaintext from ZIM files or database
-  dumps).
-- `personal/` — Whatever reference material YOU want the agent to treat as
-  authoritative: meeting notes, project docs, reading excerpts, bibles, etc.
-- `public/` — Reference material that could reasonably be shared or
-  published (same behavior as `personal/` for now; the distinction becomes
-  meaningful in a future release).
-
-For v0.0.x, the model greps these files using the `shell` tool. Future
-versions will provide indexed search.
-"""
-
-
 # ---------------------------------------------------------------------------
 # Legacy constants (kept for back-compat with amanuensis/test scripts that
 # import them by name). New code should not rely on these.
@@ -224,7 +198,6 @@ POLICY_CONTEXT_MGMT_MD = _read_default("policies/context-management.md")
 PROJECT_PROFILE_MD = _PROJECT_LOCAL_FILES["rness/knowledge/project-profile.md"]
 # Back-compat alias for tooling that imported the old name.
 USER_PROFILE_MD = PROJECT_PROFILE_MD
-INFOWORLD_README = _INFOWORLD_README
 
 
 # ---------------------------------------------------------------------------
@@ -232,15 +205,17 @@ INFOWORLD_README = _INFOWORLD_README
 # ---------------------------------------------------------------------------
 
 def ensure_global_infoworld() -> Path:
-    """Create `~/enough/infoworld/{wiki,personal,public}` with README if missing.
-    Returns the absolute path to the infoworld root."""
+    """Create `~/enough/infoworld/{wiki,personal,public}` if missing.
+    Returns the absolute path to the infoworld root.
+
+    Previously also wrote a `README.md` at the root, but the contents
+    are now covered by the main project README + AGENT_GUIDE, so we
+    leave the directory clean and let users put whatever they want there
+    without an unsolicited file to ignore or delete."""
     root = _global_infoworld_root()
     for sub in ("wiki", "personal", "public"):
         (root / sub).mkdir(parents=True, exist_ok=True)
         (root / sub / ".gitkeep").touch(exist_ok=True)
-    readme = root / "README.md"
-    if not readme.exists():
-        readme.write_text(_INFOWORLD_README, encoding="utf-8")
     return root
 
 

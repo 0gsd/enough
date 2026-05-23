@@ -3354,7 +3354,7 @@
       <div id="preview">
         <div class="preview-header">
           <span class="title">preview</span>
-          <button class="close" onclick="document.getElementById('preview').classList.remove('open')">×</button>
+          <button class="close" onclick="closePreviewPane()">×</button>
         </div>
         <div id="preview-body"></div>
       </div>
@@ -3928,7 +3928,7 @@
         name: 'infoworld/',
         path: 'infoworld/ → ~/enough/infoworld/',
         what: 'a grounded-knowledge store shared across every enough project on this machine. symlinked into each project so the agent has a common factual substrate. three subdirectories: <code>wiki/</code> (Wikipedia dumps or your own wiki content), <code>personal/</code> (your reference material), <code>public/</code> (shareable content, though don\'t worry, nobody can see these files unless you share them somewhere :).',
-        how: 'add files to <code>~/enough/infoworld/</code> via your system\'s file manager — drop markdown, txt, or extracted Wikipedia text into the appropriate subdir. the agent sees these files before answering from its internal data. there\'s no UI for editing; your system\'s file manager and preferred text editor is the way to go.',
+        how: 'add files to <code>~/enough/infoworld/</code> via your system\'s file manager — drop markdown, txt, or extracted Wikipedia text into the appropriate subfolder. or, add ~/enough/infoworld/* to the write allowlist in policies/ and tell the agent to put files in one of the subfolders. the agent sees these files before answering from its internal data. you can review or edit files from infoworld inside enough just like files in your project directory, but remember that the files in infoworld are global, so any edits you make will persist across projects.',
         ideas: [
           'stash meeting notes in <code>personal/</code> to make them queryable from any project.',
           'download a topic-specific Wikipedia dump (history, pharmacology, music theory) for a research project.',
@@ -6441,6 +6441,17 @@
       document.getElementById('doc-chars').textContent = chars.toLocaleString();
     }
     window.updateDocCounters = updateDocCounters;
+
+    // Close the preview pane AND refresh the doc counters in the same
+    // motion. The X button in the preview header used to just drop the
+    // .open class — that hid the pane but left the file-body element
+    // in the DOM and the topbar counters showing stats from the now-
+    // hidden doc. Routing through this helper keeps the two in sync.
+    function closePreviewPane() {
+      document.getElementById('preview')?.classList.remove('open');
+      updateDocCounters();
+    }
+    window.closePreviewPane = closePreviewPane;
 
     // Watch the preview pane for any content change (htmx swaps from
     // file clicks, edit-mode enter/exit, post-write_file refresh).
