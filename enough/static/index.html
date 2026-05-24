@@ -3254,6 +3254,144 @@
       opacity: 0.45;
       cursor: not-allowed;
     }
+
+    /* ---------- Tree context menu (option-click in the sidebar tree) ----------
+       A small floating menu anchored to the cursor. Shown by the JS
+       at the top of the script block; positioned absolutely via inline
+       style.left / style.top set at show time. The backdrop is the
+       document itself — any click outside the menu hides it. */
+    #tree-context-menu {
+      position: fixed;
+      z-index: 950;
+      min-width: 180px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.32);
+      padding: 4px 0;
+      font-size: 12.5px;
+      color: var(--fg);
+      user-select: none;
+    }
+    #tree-context-menu.hidden { display: none; }
+    #tree-context-menu .ctx-item {
+      display: block;
+      width: 100%;
+      padding: 5px 12px;
+      background: transparent;
+      border: none;
+      color: var(--fg);
+      font-family: inherit;
+      font-size: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    #tree-context-menu .ctx-item:hover {
+      background: color-mix(in oklab, var(--accent-user) 18%, transparent);
+    }
+    #tree-context-menu .ctx-sep {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+    #tree-context-menu .ctx-target {
+      padding: 3px 12px 6px;
+      font-size: 10.5px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 240px;
+    }
+
+    /* ---------- Tree prompt modal (new folder / new file) ---------- */
+    #tree-prompt-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #tree-prompt-modal.hidden { display: none; }
+    #tree-prompt-modal .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+    #tree-prompt-modal .modal-panel {
+      position: relative;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 360px;
+      max-width: 480px;
+      padding: 18px 20px 16px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #tree-prompt-modal .prompt-title {
+      margin: 0;
+      font-size: 13px;
+      color: var(--fg);
+      font-weight: 600;
+    }
+    #tree-prompt-modal .prompt-title .target {
+      color: var(--accent-user);
+      font-family: var(--font-mono);
+      font-weight: 400;
+    }
+    #tree-prompt-modal input[type="text"] {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+    }
+    #tree-prompt-modal input[type="text"]:focus {
+      outline: none;
+      border-color: var(--fg-faint);
+    }
+    #tree-prompt-modal .prompt-error {
+      color: var(--accent-error);
+      font-size: 11.5px;
+      min-height: 14px;
+    }
+    #tree-prompt-modal .prompt-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    #tree-prompt-modal .prompt-actions button {
+      background: var(--bg-raise);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    #tree-prompt-modal .prompt-actions button:hover {
+      border-color: var(--fg-faint);
+    }
+    #tree-prompt-modal .prompt-actions button.primary {
+      background: var(--accent-agent);
+      color: var(--bg);
+      border-color: var(--accent-agent);
+      font-weight: 600;
+    }
+    #tree-prompt-modal .prompt-actions button.primary:hover {
+      filter: brightness(1.08);
+    }
   </style>
 </head>
 
@@ -3315,7 +3453,7 @@
       </section>
 
       <section class="sidebar-section" data-section="skills">
-        <h3 class="section-head" data-help="skills"><span class="zippy">▾</span>active skills</h3>
+        <h3 class="section-head" data-help="skills"><span class="zippy">▾</span>skills</h3>
         <div class="section-body">
           <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
             <div style="color: var(--fg-faint); padding: 8px">loading…</div>
@@ -3752,9 +3890,12 @@
               <dd>bold / italic / underline the current selection (review mode)</dd>
               <dt><kbd>⌘</kbd>+<kbd>s</kbd></dt>
               <dd>save the current edit (edit mode)</dd>
+              <dt><kbd>⌥</kbd>+click</dt>
+              <dd>file-tree context menu (new file / folder, copy path / name)</dd>
             </dl>
             <p class="ui-col-note">
-              on a non-mac keyboard, use <kbd>ctrl</kbd> instead of <kbd>⌘</kbd>.
+              on a non-mac keyboard, use <kbd>ctrl</kbd> instead of
+              <kbd>⌘</kbd>, and <kbd>alt</kbd> instead of <kbd>⌥</kbd>.
             </p>
           </section>
           <section class="ui-col">
@@ -3797,6 +3938,33 @@
     </div>
   </div>
 
+  <!-- Tree context menu (option-click on a folder or file row in the
+       sidebar tree). Items are rebuilt per target via JS; only the
+       container CSS is static. Clicking anywhere outside closes it. -->
+  <div id="tree-context-menu" class="hidden" role="menu" aria-hidden="true"></div>
+
+  <!-- Prompt modal for "new subfolder" / "new md file". The header line
+       names the target folder; the input takes the new name; Enter or
+       Create submits, Cancel or backdrop or Escape closes. -->
+  <div id="tree-prompt-modal" class="hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeTreePrompt()"></div>
+    <div class="modal-panel" role="dialog" aria-labelledby="tree-prompt-title">
+      <h3 class="prompt-title" id="tree-prompt-title">
+        New <span id="tree-prompt-kind">folder</span> name in
+        <span class="target" id="tree-prompt-target">…</span>:
+      </h3>
+      <input type="text" id="tree-prompt-input"
+             autocomplete="off" spellcheck="false"
+             placeholder="">
+      <div class="prompt-error" id="tree-prompt-error"></div>
+      <div class="prompt-actions">
+        <button type="button" onclick="closeTreePrompt()">Cancel</button>
+        <button type="button" class="primary" id="tree-prompt-submit"
+                onclick="submitTreePrompt()">Create</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ---------- Help affordance: hover-to-reveal [?], click for full panel ----------
     // 1s hover before [?] appears, stays for 5s after the cursor leaves the row
@@ -3826,7 +3994,7 @@
         ],
       },
       'skills': {
-        name: 'active skills',
+        name: 'skills',
         path: 'rness/skills/',
         what: 'per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. active skills add vocabulary, recipes, or behaviors the agent will reach for during conversation.',
         how: 'click ● / ○ to toggle a skill on or off for this project. you can add project-level skills to <code>rness/skills/</code> — skill statuses are saved per project. to install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). edit a global skill at the source and the change propagates everywhere it\'s symlinked.',
@@ -6452,6 +6620,226 @@
       updateDocCounters();
     }
     window.closePreviewPane = closePreviewPane;
+
+    // ---------- Tree context menu (option/alt-click in #tree) ----------
+    //
+    // Captures option-click on any folder or file row in the project
+    // tree and pops a small menu at the cursor. Right-click is left
+    // untouched. Items vary by target kind:
+    //
+    //   folder → new subfolder | new md file | copy path | copy folder name
+    //   file   → copy path | copy file name
+    //
+    // "copy path" is intelligent: project-relative for paths under the
+    // project root (most things), but `~/enough/infoworld/<rest>` when
+    // the tree path is under the `infoworld/` symlink (which points
+    // outside the project) — i.e. what the user would actually want
+    // to paste into a shell or a doc.
+
+    // Map a project-tree path string to the form the user wants on the
+    // clipboard. Tree paths look like "rness/io/output/foo.md" or
+    // "infoworld/personal/note.md" or just "AGENT.md" at the root.
+    function treePathForClipboard(treePath) {
+      const INFOWORLD = 'infoworld/';
+      if (treePath === 'infoworld') return '~/enough/infoworld';
+      if (treePath.startsWith(INFOWORLD)) {
+        return '~/enough/' + treePath;   // -> ~/enough/infoworld/<rest>
+      }
+      return treePath;   // project-relative, as displayed
+    }
+
+    function copyToClipboard(text) {
+      // Use the async clipboard API where available (all current evergreen
+      // browsers + a secure context, which 127.0.0.1 counts as). Fall
+      // back to the deprecated execCommand path otherwise.
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {});
+        return;
+      }
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (_) { /* noop */ }
+      document.body.removeChild(ta);
+    }
+
+    // Track the row currently targeted by an open context menu, so the
+    // item handlers know what to operate on.
+    let TREE_CTX_TARGET = null;  // { kind, path, name } | null
+
+    function hideTreeContextMenu() {
+      const menu = document.getElementById('tree-context-menu');
+      if (!menu) return;
+      menu.classList.add('hidden');
+      menu.setAttribute('aria-hidden', 'true');
+      menu.innerHTML = '';
+      TREE_CTX_TARGET = null;
+    }
+    window.hideTreeContextMenu = hideTreeContextMenu;
+
+    function showTreeContextMenu(x, y, target) {
+      const menu = document.getElementById('tree-context-menu');
+      if (!menu) return;
+      TREE_CTX_TARGET = target;
+      const items = [];
+      items.push(
+        `<div class="ctx-target" title="${target.path}">${target.kind === 'dir' ? '📁' : '📄'} ${target.name}</div>`
+      );
+      if (target.kind === 'dir') {
+        items.push('<button type="button" class="ctx-item" data-act="new-folder">new subfolder</button>');
+        items.push('<button type="button" class="ctx-item" data-act="new-file">new md file</button>');
+        items.push('<div class="ctx-sep"></div>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-path">copy path</button>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-name">copy folder name</button>');
+      } else {
+        items.push('<button type="button" class="ctx-item" data-act="copy-path">copy path</button>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-name">copy file name</button>');
+      }
+      menu.innerHTML = items.join('');
+      menu.classList.remove('hidden');
+      menu.setAttribute('aria-hidden', 'false');
+      // Position. Defer to next frame so we can read the rendered size
+      // and clamp inside the viewport.
+      menu.style.left = x + 'px';
+      menu.style.top  = y + 'px';
+      requestAnimationFrame(() => {
+        const rect = menu.getBoundingClientRect();
+        const vw = window.innerWidth, vh = window.innerHeight;
+        if (rect.right > vw - 6) menu.style.left = Math.max(6, vw - rect.width - 6) + 'px';
+        if (rect.bottom > vh - 6) menu.style.top  = Math.max(6, vh - rect.height - 6) + 'px';
+      });
+    }
+
+    // Capture-phase listener on #tree. Capture runs BEFORE the bubble-
+    // phase inline `onclick` on file <a> tags and BEFORE htmx's
+    // bubble-phase request dispatch — so when we stopPropagation here
+    // on an option-click, neither the preview-pane open nor the htmx
+    // file load fires. Plain (non-alt) clicks pass through untouched.
+    (function bindTreeContextMenu() {
+      const tree = document.getElementById('tree');
+      if (!tree) return;
+      tree.addEventListener('click', (e) => {
+        if (!e.altKey) return;
+        const li = e.target.closest('li[data-kind]');
+        if (!li || !tree.contains(li)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        showTreeContextMenu(e.clientX, e.clientY, {
+          kind: li.dataset.kind,
+          path: li.dataset.path,
+          name: li.dataset.name,
+        });
+      }, true);   // <-- capture phase
+    })();
+
+    // Item dispatch (event-delegated on the menu itself).
+    document.getElementById('tree-context-menu')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('.ctx-item');
+      if (!btn || !TREE_CTX_TARGET) return;
+      const act = btn.dataset.act;
+      const t = TREE_CTX_TARGET;
+      hideTreeContextMenu();
+      switch (act) {
+        case 'copy-path': copyToClipboard(treePathForClipboard(t.path)); break;
+        case 'copy-name': copyToClipboard(t.name); break;
+        case 'new-folder': openTreePrompt('folder', t.path, t.name); break;
+        case 'new-file':   openTreePrompt('file',   t.path, t.name); break;
+      }
+    });
+
+    // Any click outside the menu closes it. Escape too.
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('tree-context-menu');
+      if (!menu || menu.classList.contains('hidden')) return;
+      if (!menu.contains(e.target)) hideTreeContextMenu();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hideTreeContextMenu();
+    });
+
+    // ---------- Tree prompt modal (new folder / new file) ----------
+    let TREE_PROMPT_STATE = null;  // { kind: 'folder'|'file', parent, parentName }
+
+    function openTreePrompt(kind, parentPath, parentName) {
+      TREE_PROMPT_STATE = { kind, parent: parentPath, parentName };
+      document.getElementById('tree-prompt-kind').textContent = kind;
+      document.getElementById('tree-prompt-target').textContent = parentName + '/';
+      const input = document.getElementById('tree-prompt-input');
+      input.placeholder = kind === 'folder' ? 'subfolder-name' : 'note (.md appended if omitted)';
+      input.value = '';
+      document.getElementById('tree-prompt-error').textContent = '';
+      const modal = document.getElementById('tree-prompt-modal');
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      setTimeout(() => input.focus(), 0);
+    }
+    window.openTreePrompt = openTreePrompt;
+
+    function closeTreePrompt() {
+      const modal = document.getElementById('tree-prompt-modal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+      TREE_PROMPT_STATE = null;
+    }
+    window.closeTreePrompt = closeTreePrompt;
+
+    async function submitTreePrompt() {
+      if (!TREE_PROMPT_STATE) return;
+      const { kind, parent } = TREE_PROMPT_STATE;
+      const input = document.getElementById('tree-prompt-input');
+      const errBox = document.getElementById('tree-prompt-error');
+      const name = (input.value || '').trim();
+      if (!name) {
+        errBox.textContent = 'name is required';
+        input.focus();
+        return;
+      }
+      if (name.includes('/') || name.includes('\\')) {
+        errBox.textContent = 'name may not contain path separators';
+        return;
+      }
+      const endpoint = kind === 'folder' ? '/api/file/new-folder' : '/api/file/new-file';
+      const submitBtn = document.getElementById('tree-prompt-submit');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'creating…';
+      try {
+        const r = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ parent, name }),
+        });
+        if (!r.ok) {
+          let msg = `${r.status} ${r.statusText}`;
+          try {
+            const j = await r.json();
+            if (j && j.detail) msg = j.detail;
+          } catch (_) { /* leave default */ }
+          errBox.textContent = msg;
+          return;
+        }
+        closeTreePrompt();
+        // Force-refresh the tree so the new entry appears immediately
+        // rather than waiting on the 3s poll.
+        htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+      } catch (e) {
+        errBox.textContent = e.message || String(e);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create';
+      }
+    }
+    window.submitTreePrompt = submitTreePrompt;
+
+    // Enter submits, Escape cancels (only while the modal is open).
+    document.getElementById('tree-prompt-input')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); submitTreePrompt(); }
+      else if (e.key === 'Escape') { e.preventDefault(); closeTreePrompt(); }
+    });
 
     // Watch the preview pane for any content change (htmx swaps from
     // file clicks, edit-mode enter/exit, post-write_file refresh).

@@ -202,16 +202,22 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
     out = ['<ul class="tree">']
     for n in nodes:
         path = n["path"].replace('"', "&quot;")
+        name_attr = n["name"].replace('"', "&quot;")
         sym_cls = " symlink" if n.get("is_symlink") else ""
         help_id = _HELP_IDS.get(n["path"])
         help_attr = f' data-help="{help_id}"' if help_id else ""
+        # `data-path` + `data-name` on the row's <li> are read by the
+        # tree context menu (option-click) so the JS can identify the
+        # target without parsing the inner DOM. Folder rows already
+        # need `data-path` for other reasons; file rows pick it up here.
         if n["is_dir"]:
             has_kids = bool(n.get("children"))
             dir_state_cls = " has-children" if has_kids else " empty-folder"
             # Zippy glyph: ▾ (expanded, default) if has children; nothing if empty.
             zippy = '<span class="zippy">▾</span>' if has_kids else '<span class="zippy-spacer"></span>'
             out.append(
-                f'<li class="dir{sym_cls}{dir_state_cls}" data-path="{path}">'
+                f'<li class="dir{sym_cls}{dir_state_cls}" '
+                f'data-path="{path}" data-name="{name_attr}" data-kind="dir">'
                 f'<span class="dir-row"{help_attr}>{zippy}<span class="dir-name">{n["name"]}/</span></span>'
             )
             if has_kids:
@@ -219,7 +225,8 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
             out.append("</li>")
         else:
             out.append(
-                f'<li class="file{sym_cls}">'
+                f'<li class="file{sym_cls}" '
+                f'data-path="{path}" data-name="{name_attr}" data-kind="file">'
                 f'<span class="file-row"{help_attr}><span class="zippy-spacer"></span>'
                 f'<a href="#" '
                 f'hx-get="/api/file?path={path}" hx-target="#preview-body" '
@@ -1304,6 +1311,79 @@ def create_app(
         except UnicodeDecodeError:
             raise HTTPException(415, "not utf-8 text") from None
         return PlainTextResponse(text)
+
+    # ---------- Tree create operations (new folder / new file) ----------
+    #
+    # Backing for the option-click context menu in the sidebar tree.
+    # Validation is intentionally strict: names are single path segments
+    # (no slashes, no `..`, no leading dot beyond the dotfile pattern,
+    # no NUL). The parent must already exist as a directory inside the
+    # project root (or inside an in-tree symlink target like
+    # `infoworld/`). Existing entries are never clobbered.
+
+    def _validate_new_name(name: str) -> str:
+        name = (name or "").strip()
+        if not name:
+            raise HTTPException(400, "name is required")
+        if "/" in name or "\\" in name or "\x00" in name:
+            raise HTTPException(400, "name may not contain path separators")
+        if name in (".", ".."):
+            raise HTTPException(400, "invalid name")
+        if len(name) > 255:
+            raise HTTPException(400, "name too long")
+        return name
+
+    @app.post("/api/file/new-folder")
+    async def api_file_new_folder(request: Request) -> dict[str, Any]:
+        """Create a new directory at `<parent>/<name>`. Body JSON:
+        {"parent": "rness/io/output", "name": "drafts"}. Parent must be
+        an existing directory inside the project. Returns the new
+        project-relative path."""
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        parent_rel = (body.get("parent") or "").strip()
+        name = _validate_new_name(body.get("name") or "")
+        # Empty parent means project root, which is fine.
+        parent = _resolve_project_path(parent_rel) if parent_rel else project_dir.resolve()
+        if not parent.exists() or not parent.is_dir():
+            raise HTTPException(404, "parent directory not found")
+        target = parent / name
+        if target.exists():
+            raise HTTPException(409, f"already exists: {name}")
+        try:
+            target.mkdir()
+        except OSError as e:
+            raise HTTPException(500, f"could not create folder: {e}") from None
+        return {"ok": True, "path": f"{parent_rel.rstrip('/')}/{name}" if parent_rel else name}
+
+    @app.post("/api/file/new-file")
+    async def api_file_new_file(request: Request) -> dict[str, Any]:
+        """Create a new empty file at `<parent>/<name>`. Same shape as
+        new-folder. The client may pass a bare name (e.g. `notes`); we
+        append `.md` if no `.md`/`.markdown` extension is present, since
+        the context-menu entry is "new md file" by intent."""
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        parent_rel = (body.get("parent") or "").strip()
+        name = _validate_new_name(body.get("name") or "")
+        lower = name.lower()
+        if not (lower.endswith(".md") or lower.endswith(".markdown")):
+            name = name + ".md"
+        parent = _resolve_project_path(parent_rel) if parent_rel else project_dir.resolve()
+        if not parent.exists() or not parent.is_dir():
+            raise HTTPException(404, "parent directory not found")
+        target = parent / name
+        if target.exists():
+            raise HTTPException(409, f"already exists: {name}")
+        try:
+            target.write_text("", encoding="utf-8")
+        except OSError as e:
+            raise HTTPException(500, f"could not create file: {e}") from None
+        return {"ok": True, "path": f"{parent_rel.rstrip('/')}/{name}" if parent_rel else name}
 
     # ---------- Highlights (review-mode color metadata) ----------
     #
