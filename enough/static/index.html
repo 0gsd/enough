@@ -3273,7 +3273,11 @@
       color: var(--fg);
       user-select: none;
     }
-    #tree-context-menu.hidden { display: none; }
+
+    #tree-context-menu.hidden {
+      display: none;
+    }
+
     #tree-context-menu .ctx-item {
       display: block;
       width: 100%;
@@ -3286,14 +3290,17 @@
       text-align: left;
       cursor: pointer;
     }
+
     #tree-context-menu .ctx-item:hover {
       background: color-mix(in oklab, var(--accent-user) 18%, transparent);
     }
+
     #tree-context-menu .ctx-sep {
       height: 1px;
       background: var(--border);
       margin: 4px 0;
     }
+
     #tree-context-menu .ctx-target {
       padding: 3px 12px 6px;
       font-size: 10.5px;
@@ -3317,12 +3324,17 @@
       align-items: center;
       justify-content: center;
     }
-    #tree-prompt-modal.hidden { display: none; }
+
+    #tree-prompt-modal.hidden {
+      display: none;
+    }
+
     #tree-prompt-modal .modal-backdrop {
       position: absolute;
       inset: 0;
       background: rgba(0, 0, 0, 0.45);
     }
+
     #tree-prompt-modal .modal-panel {
       position: relative;
       background: var(--bg-alt);
@@ -3336,17 +3348,20 @@
       flex-direction: column;
       gap: 12px;
     }
+
     #tree-prompt-modal .prompt-title {
       margin: 0;
       font-size: 13px;
       color: var(--fg);
       font-weight: 600;
     }
+
     #tree-prompt-modal .prompt-title .target {
       color: var(--accent-user);
       font-family: var(--font-mono);
       font-weight: 400;
     }
+
     #tree-prompt-modal input[type="text"] {
       background: var(--input-bg);
       color: var(--fg);
@@ -3356,20 +3371,24 @@
       font-family: var(--font-mono);
       font-size: 12.5px;
     }
+
     #tree-prompt-modal input[type="text"]:focus {
       outline: none;
       border-color: var(--fg-faint);
     }
+
     #tree-prompt-modal .prompt-error {
       color: var(--accent-error);
       font-size: 11.5px;
       min-height: 14px;
     }
+
     #tree-prompt-modal .prompt-actions {
       display: flex;
       gap: 8px;
       justify-content: flex-end;
     }
+
     #tree-prompt-modal .prompt-actions button {
       background: var(--bg-raise);
       color: var(--fg);
@@ -3380,15 +3399,18 @@
       font-size: 12px;
       cursor: pointer;
     }
+
     #tree-prompt-modal .prompt-actions button:hover {
       border-color: var(--fg-faint);
     }
+
     #tree-prompt-modal .prompt-actions button.primary {
       background: var(--accent-agent);
       color: var(--bg);
       border-color: var(--accent-agent);
       font-weight: 600;
     }
+
     #tree-prompt-modal .prompt-actions button.primary:hover {
       filter: brightness(1.08);
     }
@@ -3953,14 +3975,11 @@
         New <span id="tree-prompt-kind">folder</span> name in
         <span class="target" id="tree-prompt-target">…</span>:
       </h3>
-      <input type="text" id="tree-prompt-input"
-             autocomplete="off" spellcheck="false"
-             placeholder="">
+      <input type="text" id="tree-prompt-input" autocomplete="off" spellcheck="false" placeholder="">
       <div class="prompt-error" id="tree-prompt-error"></div>
       <div class="prompt-actions">
         <button type="button" onclick="closeTreePrompt()">Cancel</button>
-        <button type="button" class="primary" id="tree-prompt-submit"
-                onclick="submitTreePrompt()">Create</button>
+        <button type="button" class="primary" id="tree-prompt-submit" onclick="submitTreePrompt()">Create</button>
       </div>
     </div>
   </div>
@@ -3977,7 +3996,7 @@
         what: 'the reasoning framework the agent is currently using. exactly one paradigm is active at any time; click another to switch. the active paradigm is loaded in full into the system prompt every turn, and the agent also sees a brief catalog of the other available paradigms so it can suggest (or initiate) a switch when the work would benefit from one.',
         how: 'click ● next to a paradigm to make it active for this project. the choice is recorded in <code>rness/active-paradigm</code>. agent-initiated switches happen by writing that file too, and take effect on the next turn. add new paradigms by dropping a markdown file into <code>~/enough/defaults/paradigms/</code> (or into your project\'s <code>rness/paradigms/</code> for project-local ones). a YAML frontmatter block at the top — <code>name:</code> and <code>description:</code> — tells the agent what the paradigm is for.',
         ideas: [
-          'four paradigms are included: <em>default</em> for general-purpose work, <em>text-planning</em> for planning whatever your text may be and keeping track of its progress,<em>translation</em> which pairs with the translator skill for multi-language work, and <em>workflow-design</em> which puts the agent in "build mode" for creating new skills/paradigms/roles or refining the root AGENT.md / MOTIVATION.md.',
+          'four paradigms are included: <em>default</em> for general-purpose work, <em>text-planning</em> for planning whatever your text may be and keeping track of its progress, <em>translation</em> which pairs with the translator skill for multi-language work, and <em>workflow-design</em> which puts the agent in "build mode" for creating new skills/paradigms/roles or refining the root AGENT.md / MOTIVATION.md.',
           'write a paradigm for a distinct mode of work (research vs. writing, exploration vs. execution) and switch between them as the day unfolds.',
           'a paradigm description is essentially "when should I use this" — write it for the agent\'s benefit, since that\'s the signal it reads to recommend switching.',
         ],
@@ -4010,7 +4029,7 @@
         what: 'consultant agents you can summon in conversation, sourced from <code>~/enough/defaults/roles/</code>. each role is a folder containing AGENT.md (instructions) and MOTIVATION.md (drives) — the same pair of files that defines the main agent, but scoped to a complementary (or adversarial) persona.',
         how: 'click ● / ○ to enable a role for this project. add new roles globally by creating <code>~/enough/defaults/roles/&lt;name&gt;/</code> with AGENT.md and MOTIVATION.md inside; project-level works and edits propagate, just like skills.',
         ideas: [
-          'two default roles are included: <em>block-breaker</em> will help you break whatever writer\'s block is bothering you, and<em>open-skeptic</em> pokes at and pushes back on your brilliant ideas to help you push forward.',
+          'two default roles are included: <em>block-breaker</em> will help you break whatever writer\'s block is bothering you, and <em>open-skeptic</em> pokes at and pushes back on your brilliant ideas to help you push forward.',
           'build a "rubber duck" that asks Socratic questions instead of answering.',
           'use your knowledge base\'s files with the <em>workflow-design</em> paradigm to craft a domain expert (legal, design, copy) role.',
         ],
@@ -4054,7 +4073,7 @@
         what: 'the full set of reasoning frameworks available in this project. each paradigm is a markdown file with a YAML frontmatter block (<code>name</code> + <code>description</code>) and a body describing how to approach work — heuristics, decision criteria, when to ask vs. act. exactly one is active at any time (see the <strong>paradigm</strong> section at the top of the sidebar to switch).',
         how: 'symlinked from <code>~/enough/defaults/paradigms/</code>. edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. new paradigms can be added simply by dropping a markdown file into the defaults folder — give it a frontmatter <code>name:</code> and <code>description:</code> so the agent knows when to recommend it.',
         ideas: [
-          'four paradigms are included: <em>default</em> for general-purpose work, <em>text-planning</em> for planning whatever your text may be and keeping track of its progress,<em>translation</em> which pairs with the translator skill for multi-language work, and <em>workflow-design</em> which puts the agent in "build mode" for creating new skills/paradigms/roles or refining the root AGENT.md / MOTIVATION.md.',
+          'four paradigms are included: <em>default</em> for general-purpose work, <em>text-planning</em> for planning whatever your text may be and keeping track of its progress, <em>translation</em> which pairs with the translator skill for multi-language work, and <em>workflow-design</em> which puts the agent in "build mode" for creating new skills/paradigms/roles or refining the root AGENT.md / MOTIVATION.md.',
           'write a paradigm for a distinct mode of work (research vs. writing, exploration vs. execution) and switch between them as the day unfolds.',
           'a paradigm description is essentially "when should I use this" — write it for the agent\'s benefit, since that\'s the signal it reads to recommend switching.'
         ],
@@ -6653,7 +6672,7 @@
       // browsers + a secure context, which 127.0.0.1 counts as). Fall
       // back to the deprecated execCommand path otherwise.
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).catch(() => {});
+        navigator.clipboard.writeText(text).catch(() => { });
         return;
       }
       const ta = document.createElement('textarea');
@@ -6705,12 +6724,12 @@
       // Position. Defer to next frame so we can read the rendered size
       // and clamp inside the viewport.
       menu.style.left = x + 'px';
-      menu.style.top  = y + 'px';
+      menu.style.top = y + 'px';
       requestAnimationFrame(() => {
         const rect = menu.getBoundingClientRect();
         const vw = window.innerWidth, vh = window.innerHeight;
         if (rect.right > vw - 6) menu.style.left = Math.max(6, vw - rect.width - 6) + 'px';
-        if (rect.bottom > vh - 6) menu.style.top  = Math.max(6, vh - rect.height - 6) + 'px';
+        if (rect.bottom > vh - 6) menu.style.top = Math.max(6, vh - rect.height - 6) + 'px';
       });
     }
 
@@ -6747,7 +6766,7 @@
         case 'copy-path': copyToClipboard(treePathForClipboard(t.path)); break;
         case 'copy-name': copyToClipboard(t.name); break;
         case 'new-folder': openTreePrompt('folder', t.path, t.name); break;
-        case 'new-file':   openTreePrompt('file',   t.path, t.name); break;
+        case 'new-file': openTreePrompt('file', t.path, t.name); break;
       }
     });
 
