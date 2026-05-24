@@ -1,10 +1,12 @@
 # enough
 
-enough is a user-configurable system (aka agent harness) with local LLM weights and openrouter support for academic, creative, and personal writing. it is oriented towards so-called non-technical people, specifically writers, but extensible to many use cases, and designed to remain useful and usable for decades. 
+enough is a configurable personal language system with local models and openrouter support for planning, reviewing, and writing text(s). 
 
-it's built upon GGML, llama.cpp, and whisper.cpp by Georgi Gerganov, the superb GGUF-work of Unsloth, FastAPI by Sebastián Ramírez, HTMX by Carson Gross, UV by Astral, and many other wonderful open source projects.
+optimized for so-called non-technical users. designed to be useful and usable for decades. visit https://enough.support for more details.
 
-for installation instructions and up-to-the-update information, visit [enough.support](https://enough.discourse.group/c/enough-documentation/12).
+it's built upon GGML, llama.cpp, and whisper.cpp by Georgi Gerganov, the superb GGUF-work of Unsloth, FastAPI by Sebastián Ramírez, HTMX by Carson Gross, UV by Astral, and many other wonderful free and open source software projects.
+
+<em>this is very much beta software</em>. for installation instructions and up-to-the-update information, visit [enough.support](https://enough.discourse.group/c/enough-documentation/12).
 
 enough is designed for people who want to enjoy the many benefits of LLMs *without* giving up control of their data or being bound to hosted or otherwise restrictive inference providers. it's designed to be useful for private local work right now, but to remain fully available and extensible to whatever new weights and capabilities emerge over the next 5, 10, or 50 years (provided the community continues to want and support it).
 
