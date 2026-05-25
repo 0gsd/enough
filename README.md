@@ -1,14 +1,12 @@
 # enough
 
-enough is a configurable personal language system with local models and openrouter support for planning, reviewing, and writing text(s). 
-
-optimized for so-called non-technical users. designed to be useful and usable for decades. visit https://enough.support for more details.
+enough is an extensible personal language system with local models and openrouter support for planning, reviewing, and writing text(s). it's optimized for so-called non-technical users, and intended to be useful and usable for decades. 
 
 it's built upon GGML, llama.cpp, and whisper.cpp by Georgi Gerganov, the superb GGUF-work of Unsloth, FastAPI by Sebastián Ramírez, HTMX by Carson Gross, UV by Astral, and many other wonderful free and open source software projects.
 
 <em>this is very much beta software</em>. for installation instructions and up-to-the-update information, visit [enough.support](https://enough.discourse.group/c/enough-documentation/12).
 
-enough is designed for people who want to enjoy the many benefits of LLMs *without* giving up control of their data or being bound to hosted or otherwise restrictive inference providers. it's designed to be useful for private local work right now, but to remain fully available and extensible to whatever new weights and capabilities emerge over the next 5, 10, or 50 years (provided the community continues to want and support it).
+enough is designed for people who want to enjoy the many benefits of LLMs *without* giving up control of their data or being bound to hosted or otherwise restrictive inference providers. it's designed to be useful for private local work right now, but to remain available and be updated to take advantage of whatever new models and capabilities emerge over the next 5, 10, or 50 years (provided the community continues to want and support it).
 
 in its current form, enough is best suited for text-based knowledge work: creative writing, journaling, synthesis, exegesis, research, etc.
 
