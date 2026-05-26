@@ -44,18 +44,18 @@ Every Python module in `enough/`:
 
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
-| [enough/server.py](../enough/server.py) | ~2000 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints. | `create_app()`, `_drive_message()`, all `@app.{get,post}` handlers |
-| [enough/prompt.py](../enough/prompt.py) | ~570 | Assembles the system prompt from `rness/` on every turn (no caching). | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `get_active_paradigm()` / `set_active_paradigm()` |
+| [enough/server.py](../enough/server.py) | ~2080 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints. | `create_app()`, `_drive_message()`, all `@app.{get,post}` handlers |
+| [enough/prompt.py](../enough/prompt.py) | ~750 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/role/paradigm enumeration + toggle-state helpers. | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
 | [enough/broker.py](../enough/broker.py) | ~340 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
 | [enough/tools.py](../enough/tools.py) | ~1100 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`), the tool-call XML parser, the dispatch table. | `_DISPATCH`, `_TRACE_TOGGLE`, `execute()`, `parse_tool_calls()`, `_CLOUD_KEY_EXFIL_PATTERNS` |
-| [enough/cloud.py](../enough/cloud.py) | ~700 | OpenRouter integration: keyring read/write, in-memory key cache, OpenAI-compatible streaming + non-streaming clients, health check, response caching to `rness/io/cloud-cache/`, the broker-driven `pipeline_run()`. | `set_api_key()` / `clear_api_key()` / `has_api_key()`, `_get_api_key_for_broker()`, `health_check()`, `chat_completion()`, `stream_chat_completion()`, `cache_completion()`, `pipeline_run()` |
+| [enough/cloud.py](../enough/cloud.py) | ~1000 | OpenRouter integration: keyring read/write, in-memory key cache, OpenAI-compatible streaming + non-streaming clients, health check, response caching to `rness/io/cloud-cache/`, the broker-driven `pipeline_run()`. | `set_api_key()` / `clear_api_key()` / `has_api_key()`, `_get_api_key_for_broker()`, `health_check()`, `chat_completion()`, `stream_chat_completion()`, `cache_completion()`, `pipeline_run()` |
 | [enough/llm.py](../enough/llm.py) | ~125 | OpenAI-compatible client for the local llama-server. Streaming-only path for chat. | `stream_chat()`, `check_llm_reachable()` |
 | [enough/supervisor.py](../enough/supervisor.py) | ~400 | Manages the local llama-server subprocess. Adopts an existing process if one's already up; spawns its own otherwise. Skips spawning entirely when the active model is `opro-api`. | `LlamaSupervisor`, `_resolve_startup_choice()` |
 | [enough/models.py](../enough/models.py) | ~280 | Local-model registry (4 cute-named local models, defined in `defaults/models.json`). Selection state in `~/enough/config/models.json`. | `load_registry()`, `load_state()`, `save_state()`, `resolve()`, `all_models_view()` |
-| [enough/skeleton.py](../enough/skeleton.py) | ~450 | Creates `rness/` for new projects (copies / symlinks from `defaults/`), syncs global skills/roles on every launch, runs migrations. | `ensure_skeleton()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS` |
+| [enough/skeleton.py](../enough/skeleton.py) | ~560 | Creates `rness/` for new projects (copies from `defaults/`), syncs global skills/roles/paradigms on every launch via dedicated populators, runs migrations. | `ensure_skeleton()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS`, `_populate_skill_symlinks` / `_populate_role_symlinks` / `_populate_paradigm_symlinks` |
 | [enough/highlights.py](../enough/highlights.py) | ~250 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
 | [enough/logger.py](../enough/logger.py) | small | Stdlib logging setup. | — |
-| [enough/static/index.html](../enough/static/index.html) | ~7300 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree, chat pane, SSE consumer |
+| [enough/static/index.html](../enough/static/index.html) | ~8000 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), chat pane, SSE consumer |
 
 `defaults/` ships templates that get copied or symlinked into project
 skeletons by `skeleton.py`:
@@ -134,9 +134,14 @@ cache.
 | Cloud cache | `rness/io/cloud-cache/<timestamp>-<slug>.md` + `_cloud-index.md` | none | no |
 
 **Active vs available**: skills and roles ship as files but only become
-part of the system prompt when toggled on in the sidebar. The toggle
-state lives in `~/enough/config/ui.json` per skill / role name. Paradigms
-are different — exactly one is active, named in `rness/active-paradigm`.
+part of the system prompt when toggled on in the sidebar. The
+*disabled* set is persisted per-project as a plain newline-delimited
+text file: `rness/skills/.disabled` and `rness/roles/.disabled`. Read/
+written via `prompt._read_disabled_skills()` / `set_skill_enabled()` (and
+the role-side equivalents). New globals appear in every project with
+their name added to `.disabled` on first sync — i.e. defaulted off.
+Paradigms are different — exactly one is active, named in
+`rness/active-paradigm`.
 
 ---
 
@@ -173,7 +178,8 @@ message.
 ### The cloud slot (OPRO-API)
 
 The fifth slot. Not in `models.json` (cloud entries don't have gguf
-files or RAM tiers). Instead, [`/api/models`](../enough/server.py:1632)
+files or RAM tiers). Instead, the `/api/models` handler in
+[server.py](../enough/server.py) (search for `@app.get("/api/models")`)
 injects a synthetic entry with `cloud: true` when the
 `local_models_only` broker toggle is OFF. The entry's `installed` flag
 mirrors `key_present AND last_verified_ok`, gating selection.
@@ -408,8 +414,8 @@ The current toggle catalog (8 toggles, all default `True`):
 | `navigate_to_highlight` | `tools.run_navigate_to_highlight` | path under project |
 | `cloud_pipeline` | `tools.run_cloud_pipeline` | `local_models_only` off + key present + key healthy + spec parses |
 
-All registered in `_DISPATCH` (line 903 in tools.py) and
-`_TRACE_TOGGLE` (line 918). The tool-call XML parser
+All registered in `_DISPATCH` (~line 1026 in tools.py) and
+`_TRACE_TOGGLE` (~line 1042). The tool-call XML parser
 (`parse_tool_calls`) handles arbitrary tool names — extra inner tags
 (beyond `<path>`, `<content>`, `<command>`, `<url>`) end up in
 `ToolCall.extra` so new tools don't need parser changes.
@@ -455,7 +461,8 @@ Every new tool needs an example block + prose explanation there.
 
 1. Define `run_<tool>(project_dir: Path, call: ToolCall) -> ToolResult`
    in [tools.py](../enough/tools.py).
-2. Register in `_DISPATCH` (line 903) and `_TRACE_TOGGLE` (line 918).
+2. Register in `_DISPATCH` (~line 1026 in tools.py) and `_TRACE_TOGGLE`
+   (~line 1042). Both grep cleanly by name if line numbers drift again.
 3. If `ToolResult.render()` needs a specific attribute (e.g. `output=`
    for `cloud_pipeline`), add a branch in `render()`.
 4. Add an XML example block + prose to `TOOL_INSTRUCTIONS` in
@@ -481,7 +488,7 @@ imports — `cloud`, `models`, `tools` are typical late imports.
 ### Change the UI
 
 [enough/static/index.html](../enough/static/index.html) is a single
-~7300-line file with inline CSS and JS. Conventions:
+~8000-line file with inline CSS and JS. Conventions:
 
 - All modals follow the same `#<name>-modal` pattern with `.hidden`
   class and a `.modal-backdrop` for click-outside dismissal.
@@ -573,10 +580,19 @@ normally.
 1. Creates `rness/` if missing
 2. Copies `_PROJECT_LOCAL_FILES` (AGENT.md, MOTIVATION.md, profile,
    active-paradigm seed) only if absent — preserves user edits
-3. Symlinks `_SKELETON_PLAN` entries from `~/enough/defaults/...` —
-   updates the symlinks if the targets moved
-4. Creates `_EMPTY_DIRS` (requests, session-logs, io, etc.) as needed
-5. Runs migrations for older project layouts
+3. Symlinks `_SKELETON_PLAN` entries (policies, AGENT/MOTIVATION,
+   `knowledge/rosetta-primers`) from `~/enough/defaults/...` on
+   first-time `rness/` creation
+4. Runs three populators on **every** launch — `_populate_skill_symlinks`,
+   `_populate_role_symlinks`, `_populate_paradigm_symlinks` — so newly
+   shipped skills/roles/paradigms appear in existing projects without
+   the user running `/update-enough`. Each populator globs
+   `~/enough/defaults/<kind>/`, symlinks anything new, prunes dangling
+   symlinks left over from removed globals. Skills/roles default-off
+   (added to `.disabled`); paradigms have no off concept — exactly one
+   is active at a time.
+5. Creates `_EMPTY_DIRS` (requests, session-logs, io, etc.) as needed
+6. Runs migrations for older project layouts
 
 ---
 
@@ -614,11 +630,21 @@ uv sync                    # installs all deps including keyring
 uv run enough --help
 ```
 
-Dependencies of note:
+Dependencies of note (Python, via `uv sync`):
 - `fastapi`, `uvicorn[standard]`, `sse-starlette` — the web layer
 - `httpx[socks]` — outbound HTTP, with SOCKS support for Tor routing
 - `keyring>=24` — OS keyring for the OpenRouter api key
 - `ctranslate2`, `sentencepiece`, `huggingface_hub` — translator skill
+
+Plus external binaries installed by `bootstrap.sh` via Homebrew:
+- `llama.cpp` — local LLM inference server (backs everything except OPRO-API)
+- `whisper-cpp` — local speech-to-text for the chat mic button
+- `tor` — anonymized off-allowlist web fetch via the broker
+- `pandoc` — HTML → markdown conversion for fetched documents
+- `harper` — local grammar/spell checker (Automattic, Apache-2.0).
+  The analyzer skill's proofread mode shells out to `harper-cli`
+  for the silent-fix pass; absence is handled gracefully (skill falls
+  back to LLM-only scanning).
 
 No automated test suite yet. Smoke tests are written as Python scripts
 that exercise the modules directly (sometimes via FastAPI's TestClient
