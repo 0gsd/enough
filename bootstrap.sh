@@ -151,7 +151,7 @@ note "It's a clone of github.com/0gsd/enough — when you want the latest code,"
 note "you cd here and \`git pull\`."
 
 ENOUGH_HOME="$HOME/enough"
-REPO_URL="${ENOUGH_REPO_URL:-git@github.com:0gsd/enough.git}"
+REPO_URL="${ENOUGH_REPO_URL:-https://github.com/0gsd/enough.git}"
 
 if [[ -d "$ENOUGH_HOME/.git" ]]; then
   ok "~/enough already exists as a git repo"
