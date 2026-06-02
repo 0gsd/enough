@@ -1167,11 +1167,14 @@
     }
 
     /* ---------- Phase 5d: line-nav column ----------
-       16px-wide column pinned to the right wall of review mode. Each
-       source line gets one row; rows with highlights show colored
-       dotted bands (per-color sub-strips when a line has multiple
-       highlights of different colors). Clicking a row scrolls the
-       review body to that line. */
+       16px-wide column pinned to the right wall. It's a document
+       overview/minimap: a dotted backdrop track (`.ln-track`) plus one
+       colored band (`.ln-mark`) per highlight, positioned in
+       scroll-fraction space (see positionReviewMarks / positionEditMarks
+       in the script) so a marker sits where its text actually renders.
+       The `.ln-cursor` bar marks the current viewport position in the
+       same space. Clicking a marker jumps to its highlight; clicking the
+       track scrolls proportionally. */
     /* NOTE: the `.review-linenav` and `.review-chat*` (head, tail, form)
        rules below intentionally have NO `#review-mode` prefix. Both
        #review-mode and #edit-mode render these widgets, and both create
@@ -1197,50 +1200,6 @@
       overflow: hidden;
     }
 
-    .review-linenav .ln-row {
-      flex: 1 1 0;
-      display: flex;
-      flex-direction: row;
-      min-height: 1px;
-    }
-
-    /* Default (un-highlighted) cell: themed grey, dotted. */
-    .review-linenav .ln-cell {
-      flex: 1 1 0;
-      background-image: repeating-linear-gradient(to right,
-          var(--review-fg-faint, #8888) 0 1px,
-          transparent 1px 2px);
-      background-size: auto 1px;
-      background-repeat: repeat-y;
-      background-position: 0 50%;
-    }
-
-    /* When highlighted, the cell gets per-color dot pattern. The
-       repeating gradient gives the "1px on, 1px off" effect across
-       the cell's width (or the per-color sub-cell when split). */
-    .review-linenav .ln-cell-yellow {
-      background-image: repeating-linear-gradient(to right,
-          rgba(255, 215, 0, 0.95) 0 1px,
-          transparent 1px 2px);
-    }
-
-    .review-linenav .ln-cell-green {
-      background-image: repeating-linear-gradient(to right,
-          rgba(127, 255, 0, 0.92) 0 1px,
-          transparent 1px 2px);
-    }
-
-    .review-linenav .ln-cell-blue {
-      background-image: repeating-linear-gradient(to right,
-          rgba(64, 195, 255, 0.92) 0 1px,
-          transparent 1px 2px);
-    }
-
-    .review-linenav .ln-cell-pink {
-      background-image: repeating-linear-gradient(to right,
-          rgba(255, 105, 180, 0.92) 0 1px,
-          transparent 1px 2px);
-    }
 
     /* When the linenav exists, give the body a bit of right padding
        so the rightmost text doesn't crowd against the column. */
@@ -1264,6 +1223,52 @@
       transform: translateY(-50%);
       transition: top 60ms linear;
       z-index: 26;
+    }
+
+    /* ---------- Phase 5d (rev 2): overview-style line-nav ----------
+       The rail is now a document MINIMAP, not a per-source-line ruler.
+       Both the highlight markers and the viewport cursor live in the
+       same coordinate space: fraction of the rendered scroll height.
+       That makes a marker's vertical position match where the text
+       actually sits on screen (and where the cursor lands when you
+       scroll to it) — in BOTH review (rendered markdown) and edit
+       (wrapped textarea) modes, each at its own natural scale.
+
+       `.ln-track` is a static dotted backdrop so the column still reads
+       as a rail. `.ln-mark`s are absolutely positioned colored bands,
+       sized/placed by JS from measured pixel offsets. Applies to both
+       #review-linenav and #edit-linenav (they share the class). */
+    .review-linenav .ln-track {
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(to bottom,
+          var(--review-fg-faint, #8888) 0 1px,
+          transparent 1px 5px);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .review-linenav .ln-mark {
+      position: absolute;
+      left: 1px;
+      right: 1px;
+      min-height: 3px;
+      border-radius: 2px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+      pointer-events: auto;
+      cursor: pointer;
+      z-index: 25;
+    }
+
+    .review-linenav .ln-mark-yellow { background: rgba(255, 215, 0, 0.92); }
+    .review-linenav .ln-mark-green  { background: rgba(127, 255, 0, 0.88); }
+    .review-linenav .ln-mark-blue   { background: rgba(64, 195, 255, 0.88); }
+    .review-linenav .ln-mark-pink   { background: rgba(255, 105, 180, 0.88); }
+
+    .review-linenav .ln-mark:hover {
+      left: 0;
+      right: 0;
+      filter: brightness(1.25);
     }
 
     /* The bottom chat pill: docked to the bottom of the review pane,
@@ -5865,6 +5870,16 @@
       applyReviewContrast();
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
+      // Always open at the very top of the document.
+      body.scrollTop = 0;
+      // renderHighlights() ran while the pane was still display:none, so
+      // the rail markers + cursor couldn't be measured (zero height).
+      // Now that it's laid out, re-measure on the next frame (double rAF
+      // so wrapped text / fonts have settled).
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        positionReviewMarks();
+        updateLineNavCursor();
+      }));
       // Topbar: show the red exit button (label set explicitly in
       // case a prior edit-mode session left it as "× exit edit").
       const exitBtn = document.getElementById('exit-review-btn');
@@ -7124,82 +7139,79 @@
     // to that line.
 
     function renderLineNav() {
+      // Rebuild the rail DOM: a dotted backdrop track, one colored
+      // marker per non-stale highlight, and the viewport cursor. The
+      // markers carry the data needed to *position* them (hl id for the
+      // accurate rendered-span lookup, src_start as a fallback) but the
+      // actual top/height is set by positionReviewMarks(), which must
+      // run once the pane is laid out (see enterReviewMode).
       const nav = document.getElementById('review-linenav');
       if (!nav) return;
       nav.innerHTML = '';
-      const source = REVIEW_SOURCE || '';
-      const lines = source.split('\n');
-      const numLines = Math.max(1, lines.length);
-      // Compute, for each highlight, [startLine, endLine] inclusive.
-      // Prefer src_start/src_end hints; fall back to a snippet search
-      // in the source. Skip stale highlights and ones we can't locate.
-      const colorsByLine = Array.from({ length: numLines }, () => []);
-      // Pre-compute cumulative line offsets so we can map byte → line in O(log n).
-      const lineStarts = [0];
-      for (let i = 0; i < lines.length; i++) {
-        lineStarts.push(lineStarts[i] + lines[i].length + 1);  // +1 for the \n
-      }
-      function lineFromOffset(off) {
-        // Binary search.
-        let lo = 0, hi = lineStarts.length - 1;
-        while (lo < hi) {
-          const mid = (lo + hi + 1) >> 1;
-          if (lineStarts[mid] <= off) lo = mid;
-          else hi = mid - 1;
-        }
-        return lo;
-      }
+      const track = document.createElement('div');
+      track.className = 'ln-track';
+      nav.appendChild(track);
       for (const h of REVIEW_HIGHLIGHTS) {
         if (h.stale) continue;
-        let s = h.src_start, e = h.src_end;
-        if (s == null || e == null) {
-          // Fall back to snippet search in source.
-          const idx = source.indexOf(h.snippet || '');
-          if (idx < 0) continue;
-          s = idx;
-          e = idx + (h.snippet || '').length;
-        }
-        const startLine = lineFromOffset(s);
-        const endLine = lineFromOffset(Math.max(s, e - 1));
-        for (let i = startLine; i <= endLine && i < numLines; i++) {
-          if (!colorsByLine[i].includes(h.color)) {
-            colorsByLine[i].push(h.color);
-          }
-        }
+        const mark = document.createElement('div');
+        mark.className = 'ln-mark ln-mark-' + h.color;
+        mark.dataset.hlId = h.id;
+        if (h.src_start != null) mark.dataset.srcStart = String(h.src_start);
+        mark.title = (h.snippet || '').slice(0, 80);
+        nav.appendChild(mark);
       }
-      // Render rows. One per source line; rows are flex:1 so they
-      // distribute equally across the column's height regardless of
-      // doc length.
-      const frag = document.createDocumentFragment();
-      for (let i = 0; i < numLines; i++) {
-        const row = document.createElement('div');
-        row.className = 'ln-row';
-        row.dataset.line = String(i);
-        row.title = `line ${i + 1}`;
-        const colors = colorsByLine[i];
-        if (colors.length === 0) {
-          // No highlight on this line — single muted cell.
-          const c = document.createElement('div');
-          c.className = 'ln-cell';
-          row.appendChild(c);
-        } else {
-          // One sub-cell per color, equal-width (flex:1 each).
-          for (const color of colors) {
-            const c = document.createElement('div');
-            c.className = 'ln-cell ln-cell-' + color;
-            row.appendChild(c);
-          }
-        }
-        frag.appendChild(row);
-      }
-      nav.appendChild(frag);
-      // Viewport-position cursor (Phase 5d quirk fix). One bar
-      // overlay; updated on every body scroll. Kept as a sibling of
-      // the rows so it doesn't get wiped by the row flex layout.
       const cursor = document.createElement('div');
       cursor.className = 'ln-cursor';
       nav.appendChild(cursor);
+      positionReviewMarks();
       updateLineNavCursor();
+    }
+
+    function positionReviewMarks() {
+      // Place each marker band in scroll-fraction space. We measure the
+      // highlight's REAL rendered position from its wrapped `.hl` spans
+      // (most accurate — matches what the eye and the cursor see). If a
+      // highlight has no spans (e.g. it failed to re-anchor), fall back
+      // to the offset of the source block that contains src_start. A
+      // mark we can't place at all is hidden rather than parked at 0.
+      const nav = document.getElementById('review-linenav');
+      const body = document.getElementById('review-body');
+      if (!nav || !body) return;
+      const H = body.scrollHeight;
+      if (H <= 0) return;   // not laid out yet; caller reschedules via rAF
+      const bodyRect = body.getBoundingClientRect();
+      nav.querySelectorAll('.ln-mark').forEach((mark) => {
+        let top = null, bot = null;
+        const id = mark.dataset.hlId;
+        if (id) {
+          const spans = body.querySelectorAll(
+            `span.hl[data-hl-id="${CSS.escape(id)}"]`);
+          spans.forEach((s) => {
+            const r = s.getBoundingClientRect();
+            const t = (r.top - bodyRect.top) + body.scrollTop;
+            const b = (r.bottom - bodyRect.top) + body.scrollTop;
+            if (top === null || t < top) top = t;
+            if (bot === null || b > bot) bot = b;
+          });
+        }
+        if (top === null && mark.dataset.srcStart != null) {
+          const s = +mark.dataset.srcStart;
+          const idx = REVIEW_BLOCKS.findIndex(b => b.start <= s && s < b.end);
+          const el = idx >= 0
+            ? body.querySelector(`[data-block-idx="${idx}"]`) : null;
+          if (el) {
+            const r = el.getBoundingClientRect();
+            top = (r.top - bodyRect.top) + body.scrollTop;
+            bot = top + el.offsetHeight;
+          }
+        }
+        if (top === null) { mark.style.display = 'none'; return; }
+        mark.style.display = '';
+        const topF = Math.max(0, Math.min(1, top / H));
+        const hF = Math.max(0, Math.min(1, (bot - top) / H));
+        mark.style.top = (topF * 100) + '%';
+        mark.style.height = 'max(3px, ' + (hF * 100) + '%)';
+      });
     }
 
     function updateLineNavCursor() {
@@ -7214,11 +7226,10 @@
         cursor.style.top = '50%';
         return;
       }
-      // Pixel position of the visible center as a fraction of
-      // scrollable height (0 = top of doc, 1 = bottom). Mirror this
-      // fraction onto the nav column's height. We use scrollable
-      // (not scrollHeight) so 0% means truly at the top and 100%
-      // means truly at the bottom — matches what the eye sees.
+      // Content pixel at the visible center, as a fraction of total
+      // content height. This is the SAME mapping the markers use
+      // (content pixel → pixel / scrollHeight), so when you scroll a
+      // marker to the viewport center the cursor lands exactly on it.
       const frac = (body.scrollTop + body.clientHeight / 2) / body.scrollHeight;
       cursor.style.top = (Math.max(0, Math.min(1, frac)) * 100) + '%';
     }
@@ -7229,44 +7240,42 @@
     document.getElementById('review-body')
       ?.addEventListener('scroll', updateLineNavCursor, { passive: true });
 
-    // Click anywhere in the linenav column → scroll the body to that
-    // source line. Delegated handler reads the row's data-line.
-    document.getElementById('review-linenav').addEventListener('click', (e) => {
-      const row = e.target.closest('.ln-row');
-      if (!row) return;
-      const line = +row.dataset.line;
-      scrollReviewBodyToLine(line);
+    // Re-measure marker positions when the window resizes — wrapping
+    // (and therefore the rendered height every highlight maps onto)
+    // changes with width. Cheap; only runs for the open mode.
+    window.addEventListener('resize', () => {
+      if (document.getElementById('review-mode')?.classList.contains('open')) {
+        positionReviewMarks();
+        updateLineNavCursor();
+      }
+      if (document.getElementById('edit-mode')?.classList.contains('open')) {
+        positionEditMarks();
+        updateEditLineNavCursor();
+      }
     });
 
-    function scrollReviewBodyToLine(line) {
-      // Map line number → source byte offset → containing block →
-      // scrollIntoView. Falls back to a proportional scroll if no
-      // block contains the line (shouldn't happen for valid lines
-      // but defensive).
+    // Click in the linenav column. Clicking a highlight marker jumps to
+    // that highlight's text; clicking anywhere else does a proportional
+    // scroll to the matching fraction of the document (overview-style).
+    document.getElementById('review-linenav').addEventListener('click', (e) => {
       const body = document.getElementById('review-body');
       if (!body) return;
-      const source = REVIEW_SOURCE || '';
-      const lines = source.split('\n');
-      let off = 0;
-      for (let i = 0; i < line && i < lines.length; i++) {
-        off += lines[i].length + 1;  // +1 for \n
-      }
-      // Find the block whose [start, end) contains off.
-      const idx = REVIEW_BLOCKS.findIndex(b => b.start <= off && off < b.end);
-      if (idx >= 0) {
-        const el = body.querySelector(`[data-block-idx="${idx}"]`);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const mark = e.target.closest('.ln-mark');
+      if (mark && mark.dataset.hlId) {
+        const span = body.querySelector(
+          `span.hl[data-hl-id="${CSS.escape(mark.dataset.hlId)}"]`);
+        if (span) {
+          span.scrollIntoView({ behavior: 'smooth', block: 'center' });
           return;
         }
       }
-      // Proportional fallback.
-      const numLines = Math.max(1, lines.length);
+      const rect = e.currentTarget.getBoundingClientRect();
+      const frac = (e.clientY - rect.top) / rect.height;
       body.scrollTo({
-        top: (line / numLines) * body.scrollHeight,
+        top: Math.max(0, frac * body.scrollHeight - body.clientHeight / 2),
         behavior: 'smooth',
       });
-    }
+    });
 
     function attachHighlightHandles(rootEl) {
       // For each unique highlight id, find the FIRST wrapped span (a
@@ -7795,6 +7804,7 @@
     // populated.
     let EDIT_PATH = null;
     let EDIT_PRISTINE = '';     // raw bytes at the moment we entered edit mode
+    let EDIT_HIGHLIGHTS = [];   // sidecar highlights for the file being edited
 
     async function enterEditMode() {
       // Triggered either by the preview-pane "edit mode" button
@@ -7818,6 +7828,15 @@
       }
       EDIT_PATH = path;
       EDIT_PRISTINE = raw;
+      // Load the same per-doc highlight sidecar review mode uses, so the
+      // rail can show where the highlights are even while editing the
+      // raw source. Failures are non-blocking (empty rail).
+      try {
+        const hr = await fetch('/api/highlights?path=' + encodeURIComponent(path));
+        EDIT_HIGHLIGHTS = hr.ok ? ((await hr.json()).highlights || []) : [];
+      } catch (_) {
+        EDIT_HIGHLIGHTS = [];
+      }
       const root = document.getElementById('edit-mode');
       const ta = document.getElementById('edit-textarea');
       document.getElementById('edit-title').textContent = path;
@@ -7852,6 +7871,13 @@
       } else {
         ta.focus();
       }
+      // renderEditLineNav() ran above; re-measure marker positions now
+      // that the textarea is laid out (mirror measurement needs a real
+      // clientWidth and scrollHeight).
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        positionEditMarks();
+        updateEditLineNavCursor();
+      }));
     }
 
     async function saveEdit() {
@@ -7969,32 +7995,96 @@
     editTa.addEventListener('scroll', updateEditLineNavCursor, { passive: true });
 
     function renderEditLineNav() {
+      // Edit-mode rail. Same overview model as review mode, but the
+      // highlights are mapped onto the *wrapped textarea* rather than
+      // rendered markdown (different scale — exactly why each mode
+      // measures its own geometry). Markers are placed by
+      // positionEditMarks(), which mirror-measures the textarea.
       const nav = document.getElementById('edit-linenav');
       if (!nav) return;
-      const ta = document.getElementById('edit-textarea');
-      const source = ta.value || '';
-      const lines = source.split('\n');
-      const numLines = Math.max(1, lines.length);
       nav.innerHTML = '';
-      // Edit mode has no highlights, so every row is muted grey.
-      // The line-nav still serves as a viewport-position indicator
-      // and a clickable jump target.
-      const frag = document.createDocumentFragment();
-      for (let i = 0; i < numLines; i++) {
-        const row = document.createElement('div');
-        row.className = 'ln-row';
-        row.dataset.line = String(i);
-        row.title = `line ${i + 1}`;
-        const c = document.createElement('div');
-        c.className = 'ln-cell';
-        row.appendChild(c);
-        frag.appendChild(row);
+      const track = document.createElement('div');
+      track.className = 'ln-track';
+      nav.appendChild(track);
+      for (const h of EDIT_HIGHLIGHTS) {
+        if (h.stale) continue;
+        const mark = document.createElement('div');
+        mark.className = 'ln-mark ln-mark-' + h.color;
+        mark.dataset.snippet = h.snippet || '';
+        if (h.src_start != null) mark.dataset.srcStart = String(h.src_start);
+        if (h.src_end != null) mark.dataset.srcEnd = String(h.src_end);
+        mark.title = (h.snippet || '').slice(0, 80);
+        nav.appendChild(mark);
       }
-      nav.appendChild(frag);
       const cursor = document.createElement('div');
       cursor.className = 'ln-cursor';
       nav.appendChild(cursor);
+      positionEditMarks();
       updateEditLineNavCursor();
+    }
+
+    function positionEditMarks() {
+      // Map each highlight's character range to a pixel offset inside
+      // the textarea using a hidden mirror div that replicates the
+      // textarea's wrapping (font, padding, width, box-sizing). Then
+      // express top/height as a fraction of the textarea's scrollHeight
+      // so markers share the cursor's coordinate space.
+      const nav = document.getElementById('edit-linenav');
+      const ta = document.getElementById('edit-textarea');
+      if (!nav || !ta) return;
+      const marks = nav.querySelectorAll('.ln-mark');
+      const H = ta.scrollHeight;
+      if (H <= 0 || !marks.length) return;   // not laid out / nothing to do
+      const value = ta.value;
+      const pristine = (value === EDIT_PRISTINE);
+
+      // One reusable mirror for all measurements this pass.
+      const mirror = document.createElement('div');
+      const cs = getComputedStyle(ta);
+      ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight',
+       'letterSpacing', 'textTransform', 'tabSize', 'paddingTop',
+       'paddingRight', 'paddingBottom', 'paddingLeft'].forEach((p) => {
+        mirror.style[p] = cs[p];
+      });
+      mirror.style.position = 'absolute';
+      mirror.style.visibility = 'hidden';
+      mirror.style.left = '-99999px';
+      mirror.style.top = '0';
+      mirror.style.boxSizing = cs.boxSizing;
+      mirror.style.width = ta.clientWidth + 'px';
+      mirror.style.whiteSpace = 'pre-wrap';
+      mirror.style.overflowWrap = 'break-word';
+      mirror.style.wordBreak = cs.wordBreak;
+      document.body.appendChild(mirror);
+      const measureTop = (charIdx) => {
+        mirror.textContent = value.slice(0, charIdx);
+        const m = document.createElement('span');
+        m.textContent = '\u200b';  // zero-width space anchor (measure point)
+        mirror.appendChild(m);
+        return m.offsetTop;
+      };
+
+      marks.forEach((mark) => {
+        let s = null, e = null;
+        const snip = mark.dataset.snippet || '';
+        if (pristine && mark.dataset.srcStart) {
+          s = +mark.dataset.srcStart;
+          e = mark.dataset.srcEnd ? +mark.dataset.srcEnd : s + snip.length;
+        } else if (snip) {
+          const idx = value.indexOf(snip);
+          if (idx >= 0) { s = idx; e = idx + snip.length; }
+        }
+        if (s === null) { mark.style.display = 'none'; return; }
+        const top = measureTop(s);
+        const bot = measureTop(Math.max(s, e));
+        mark.style.display = '';
+        const topF = Math.max(0, Math.min(1, top / H));
+        const hF = Math.max(0, Math.min(1, Math.max(bot - top, 0) / H));
+        mark.style.top = (topF * 100) + '%';
+        mark.style.height = 'max(3px, ' + (hF * 100) + '%)';
+      });
+
+      document.body.removeChild(mirror);
     }
 
     function updateEditLineNavCursor() {
@@ -8012,15 +8102,17 @@
       cursor.style.top = (Math.max(0, Math.min(1, frac)) * 100) + '%';
     }
 
-    // Click in edit-linenav → scroll the textarea to that line.
+    // Click in edit-linenav. A marker scrolls to its highlight; the
+    // track scrolls proportionally (overview-style), matching review.
     document.getElementById('edit-linenav').addEventListener('click', (e) => {
-      const row = e.target.closest('.ln-row');
-      if (!row) return;
-      const line = +row.dataset.line;
       const ta = document.getElementById('edit-textarea');
-      const lines = ta.value.split('\n');
-      const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 18;
-      ta.scrollTop = Math.max(0, line * lineHeight - ta.clientHeight / 3);
+      if (!ta) return;
+      const mark = e.target.closest('.ln-mark');
+      const rect = e.currentTarget.getBoundingClientRect();
+      const frac = mark
+        ? (parseFloat(mark.style.top) || 0) / 100
+        : (e.clientY - rect.top) / rect.height;
+      ta.scrollTop = Math.max(0, frac * ta.scrollHeight - ta.clientHeight / 2);
     });
 
     async function customizeForProject(path) {

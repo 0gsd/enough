@@ -43,6 +43,17 @@ enough = "enough.__main__:main"
 [project.urls]
 Repository = "https://github.com/0gsd/enough"
 
+[tool.uv]
+# Dependency cooldown (supply-chain hardening). Never resolve to a
+# package release younger than this, giving the community time to catch
+# a compromised/yanked upload before it can land in our lockfile. Stored
+# as an absolute cutoff in uv.lock at lock time, so end-user `uv sync`
+# installs the exact versions we vetted — it does NOT re-resolve by date.
+# Applies on `uv lock` / `uv add` / `uv lock --upgrade`. In a security
+# emergency, override one package with exclude-newer-package, e.g.:
+#   exclude-newer-package = { some-pkg = "2026-06-01T00:00:00Z" }
+exclude-newer = "1 week"
+
 [build-system]
 requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
