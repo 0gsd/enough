@@ -936,6 +936,8 @@ def create_app(
 
     @app.get("/api/paradigm", response_class=HTMLResponse)
     async def api_paradigm() -> HTMLResponse:
+        from .skeleton import resync_globals
+        resync_globals(project_dir)  # pick up globals added since launch
         rness = project_dir / "rness"
         items = list_paradigms(rness)
         if not items:
@@ -980,6 +982,8 @@ def create_app(
 
     @app.get("/api/skills", response_class=HTMLResponse)
     async def api_skills() -> HTMLResponse:
+        from .skeleton import resync_globals
+        resync_globals(project_dir)  # pick up globals added since launch
         items = list_skills(project_dir / "rness")
         if not items:
             return HTMLResponse('<div class="empty-note">no skills in rness/skills/</div>')
@@ -1014,6 +1018,8 @@ def create_app(
 
     @app.get("/api/roles", response_class=HTMLResponse)
     async def api_roles() -> HTMLResponse:
+        from .skeleton import resync_globals
+        resync_globals(project_dir)  # pick up globals added since launch
         items = list_roles(project_dir / "rness")
         if not items:
             return HTMLResponse('<div class="empty-note">no roles in rness/roles/</div>')

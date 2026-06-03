@@ -524,6 +524,30 @@ def ensure_skeleton(project_dir: Path) -> bool:
     return new_project
 
 
+def resync_globals(project_dir: Path) -> None:
+    """Re-run the global skill/role/paradigm sync for an existing project,
+    without the rest of the first-launch skeleton pass.
+
+    `ensure_skeleton()` only runs at launch, so a global dropped into
+    `~/enough/defaults/{skills,roles,paradigms}/` while a project is already
+    open wouldn't appear until the next restart. The sidebar list endpoints
+    call this first so a plain refresh picks up newly-added globals live.
+
+    Identical semantics to the launch-time sync: idempotent, cheap (symlink
+    existence checks only), and new skills/roles still arrive default-off
+    (added to `.disabled`). No-op if `rness/` doesn't exist yet (nothing to
+    sync into) or the install defaults are missing."""
+    rness = project_dir / "rness"
+    if not rness.is_dir():
+        return
+    defaults = _install_defaults_root()
+    if not defaults.is_dir():
+        return
+    _populate_skill_symlinks(project_dir, defaults)
+    _populate_role_symlinks(project_dir, defaults)
+    _populate_paradigm_symlinks(project_dir, defaults)
+
+
 def _migrate_allowlist(project_dir: Path, defaults: Path) -> None:
     """v0.0.9-A migration: read-allowlist.md → allowlists.md.
 
