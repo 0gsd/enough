@@ -30,7 +30,7 @@ from typing import Any
 
 import httpx
 
-from . import broker, highlights
+from . import broker, girraph, highlights
 
 log = logging.getLogger("enough.tools")
 
@@ -466,6 +466,17 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
         return ToolResult("write_file", call.path, False, f"error: {why}")
     if (why := _duplicate_request_reason(project_dir, target)):
         return ToolResult("write_file", call.path, False, f"error: {why}")
+    if target.suffix == ".girraph":
+        # Whole-file clobbering would defeat the node-level concurrency
+        # story (the user may be editing the same girraph in its panel).
+        return ToolResult(
+            "write_file", call.path, False,
+            "error: .girraph files are edited node-by-node, never written "
+            "whole. use add_node / update_node / link_nodes / remove_node "
+            "(and read_girraph to see current state). to start a new "
+            "girraph, call add_node with no <parent> — the file is created "
+            "and your label becomes its title.",
+        )
     # The model's <content>...</content> typically has a leading newline from
     # formatting. Strip one leading newline to match expected conventions.
     body = call.content
@@ -931,6 +942,213 @@ def run_navigate_to_highlight(project_dir: Path, call: ToolCall) -> ToolResult:
 
 
 # ---------------------------------------------------------------------------
+# Girraph tools — node-level ops over .girraph files (plain-text IBIS
+# maps; format + ops live in girraph.py). Five tools: read_girraph,
+# add_node, update_node, link_nodes, remove_node. All writes hold the
+# per-path lock across load→mutate→save; whole-file write_file on
+# .girraph is denied above. Reads are depth-limited and render refs as
+# one-line stubs so the agent can never slurp a girraph tree into its
+# context by accident.
+# ---------------------------------------------------------------------------
+
+def _girraph_target(
+    project_dir: Path, rel: str | None, *, for_write: bool
+) -> Path:
+    """Resolve + validate a girraph path. Raises ValueError with an
+    agent-actionable message."""
+    rel = (rel or "").strip()
+    if not rel:
+        raise ValueError("missing <path>")
+    if not rel.endswith(".girraph"):
+        raise ValueError(
+            f"{rel!r} is not a .girraph file — girraph tools only operate "
+            f"on .girraph paths."
+        )
+    return _safe_join(
+        project_dir, rel,
+        allow_outside_read=True,
+        allow_outside_write=for_write,
+    )
+
+
+def _girraph_warnings_note(g: "girraph.Girraph") -> str:
+    if not g.warnings:
+        return ""
+    listed = "\n".join(f"- {w}" for w in g.warnings[:8])
+    more = f"\n(+{len(g.warnings) - 8} more)" if len(g.warnings) > 8 else ""
+    return f"\nparse warnings:\n{listed}{more}\n"
+
+
+def run_read_girraph(project_dir: Path, call: ToolCall) -> ToolResult:
+    try:
+        target = _girraph_target(project_dir, call.path, for_write=False)
+        g = girraph.load(target)
+    except (ValueError, girraph.GirraphError) as e:
+        return ToolResult("read_girraph", call.path or "", False, f"error: {e}")
+    node = (call.extra.get("node") or "").strip() or None
+    depth_str = (call.extra.get("depth") or "").strip()
+    depth = 1
+    if depth_str:
+        try:
+            depth = max(0, int(depth_str))
+        except ValueError:
+            return ToolResult(
+                "read_girraph", call.path, False,
+                f"error: <depth> must be an integer, got {depth_str!r}",
+            )
+    try:
+        art = girraph.ascii_render(g, node=node, depth=depth, project_dir=project_dir)
+    except girraph.GirraphError as e:
+        return ToolResult("read_girraph", call.path, False, f"error: {e}")
+    body = (
+        f"{call.path} — {len(g.nodes)} nodes, depth {depth}"
+        f"{f', subtree of {node}' if node else ''}\n"
+        f"{_girraph_warnings_note(g)}\n{art}\n"
+    )
+    return ToolResult("read_girraph", call.path, True, body)
+
+
+def run_girraph_add_node(project_dir: Path, call: ToolCall) -> ToolResult:
+    try:
+        target = _girraph_target(project_dir, call.path, for_write=True)
+    except ValueError as e:
+        return ToolResult("add_node", call.path or "", False, f"error: {e}")
+    node_type = (call.extra.get("type") or "").strip()
+    label = (call.extra.get("label") or "").strip()
+    parent = (call.extra.get("parent") or "").strip() or None
+    ref = (call.extra.get("ref") or "").strip() or None
+    by = (call.extra.get("by") or "").strip() or None
+    detail = call.extra.get("detail") or ""
+    with girraph.path_lock(target):
+        created_file = False
+        if target.is_file():
+            try:
+                g = girraph.load(target)
+            except girraph.GirraphError as e:
+                return ToolResult("add_node", call.path, False, f"error: {e}")
+        else:
+            if parent:
+                return ToolResult(
+                    "add_node", call.path, False,
+                    f"error: {call.path} does not exist, so <parent> can't "
+                    f"resolve. omit <parent> to create the file — your "
+                    f"label becomes its title and its root node.",
+                )
+            g = girraph.new_girraph(label)
+            created_file = True
+        try:
+            node = girraph.add_node(
+                g, type=node_type, label=label, parent=parent,
+                ref=ref, by=by, detail=detail,
+            )
+        except girraph.GirraphError as e:
+            return ToolResult("add_node", call.path, False, f"error: {e}")
+        girraph.save(target, g)
+    note = " (file created)" if created_file else ""
+    return ToolResult(
+        "add_node", call.path, True,
+        f"ok — added {node.id} to {call.path}{note}: "
+        f"{node.id} {node.sigil} {node.label}"
+        + (f" < {node.parent}" if node.parent else ""),
+    )
+
+
+def run_girraph_update_node(project_dir: Path, call: ToolCall) -> ToolResult:
+    try:
+        target = _girraph_target(project_dir, call.path, for_write=True)
+    except ValueError as e:
+        return ToolResult("update_node", call.path or "", False, f"error: {e}")
+    node_id = (call.extra.get("id") or "").strip()
+    if not node_id:
+        return ToolResult("update_node", call.path, False, "error: missing <id>")
+    # Only tags PRESENT in the call are patched; an empty tag clears the
+    # field. (call.extra only contains tags the model actually emitted.)
+    patch: dict[str, str] = {}
+    for field_name in ("label", "detail", "ref", "by", "parent"):
+        if field_name in call.extra:
+            patch[field_name] = call.extra[field_name]
+    if not patch:
+        return ToolResult(
+            "update_node", call.path, False,
+            "error: nothing to update — include at least one of <label>, "
+            "<detail>, <ref>, <by>, <parent> (empty tag clears the field).",
+        )
+    with girraph.path_lock(target):
+        try:
+            g = girraph.load(target)
+            node = girraph.update_node(g, node_id, **patch)
+        except girraph.GirraphError as e:
+            return ToolResult("update_node", call.path, False, f"error: {e}")
+        girraph.save(target, g)
+    return ToolResult(
+        "update_node", call.path, True,
+        f"ok — patched {', '.join(sorted(patch))} on {node.id} in {call.path}.",
+    )
+
+
+def run_girraph_link_nodes(project_dir: Path, call: ToolCall) -> ToolResult:
+    try:
+        target = _girraph_target(project_dir, call.path, for_write=True)
+    except ValueError as e:
+        return ToolResult("link_nodes", call.path or "", False, f"error: {e}")
+    from_id = (call.extra.get("from") or "").strip()
+    to_id = (call.extra.get("to") or "").strip()
+    if not from_id or not to_id:
+        return ToolResult(
+            "link_nodes", call.path, False,
+            "error: link_nodes needs <from> and <to> node ids.",
+        )
+    remove = (call.extra.get("remove") or "").strip().lower() in ("true", "yes", "1")
+    with girraph.path_lock(target):
+        try:
+            g = girraph.load(target)
+            if remove:
+                girraph.unlink_nodes(g, from_id, to_id)
+            else:
+                girraph.link_nodes(g, from_id, to_id)
+        except girraph.GirraphError as e:
+            return ToolResult("link_nodes", call.path, False, f"error: {e}")
+        girraph.save(target, g)
+    verb = "removed cross-edge" if remove else "added cross-edge"
+    return ToolResult(
+        "link_nodes", call.path, True,
+        f"ok — {verb} {from_id} [-> {to_id}] in {call.path}.",
+    )
+
+
+def run_girraph_remove_node(project_dir: Path, call: ToolCall) -> ToolResult:
+    try:
+        target = _girraph_target(project_dir, call.path, for_write=True)
+    except ValueError as e:
+        return ToolResult("remove_node", call.path or "", False, f"error: {e}")
+    node_id = (call.extra.get("id") or "").strip()
+    if not node_id:
+        return ToolResult("remove_node", call.path, False, "error: missing <id>")
+    confirmed = (call.extra.get("confirmed") or "").strip().lower() in ("yes", "true")
+    if not confirmed:
+        return ToolResult(
+            "remove_node", call.path, False,
+            "error: node removal requires explicit user confirmation (the "
+            "no-deletes-without-confirmation policy). ask the user, and "
+            "only after they confirm in their own words include "
+            "<confirmed>yes</confirmed>. never pre-fill it.",
+        )
+    cascade = (call.extra.get("cascade") or "").strip().lower() in ("true", "yes")
+    with girraph.path_lock(target):
+        try:
+            g = girraph.load(target)
+            removed = girraph.remove_node(g, node_id, cascade=cascade)
+        except girraph.GirraphError as e:
+            return ToolResult("remove_node", call.path, False, f"error: {e}")
+        girraph.save(target, g)
+    return ToolResult(
+        "remove_node", call.path, True,
+        f"ok — removed {', '.join(removed)} from {call.path}. "
+        f"(ids are never reused; cross-edges to removed nodes were cleaned up.)",
+    )
+
+
+# ---------------------------------------------------------------------------
 # cloud_pipeline — broker-driven multi-step batch execution against
 # OpenRouter. The agent passes a JSON spec in <content>; the broker
 # (via enough.cloud.pipeline_run) runs every step, caches each, optionally
@@ -1031,6 +1249,11 @@ _DISPATCH = {
     "read_highlights": run_read_highlights,
     "navigate_to_highlight": run_navigate_to_highlight,
     "cloud_pipeline": run_cloud_pipeline,
+    "read_girraph": run_read_girraph,
+    "add_node": run_girraph_add_node,
+    "update_node": run_girraph_update_node,
+    "link_nodes": run_girraph_link_nodes,
+    "remove_node": run_girraph_remove_node,
 }
 
 # Map tool name to its per-tool "brokered" toggle. When that toggle is
@@ -1050,6 +1273,13 @@ _TRACE_TOGGLE = {
     # key; we trace it under the universal trace toggle so the journal
     # captures every cloud batch the agent runs.
     "cloud_pipeline": "trace_log_enabled",
+    # Girraph ops trace under the universal toggle — node-level edits
+    # are exactly the kind of thing the journal exists to reconstruct.
+    "read_girraph": "trace_log_enabled",
+    "add_node": "trace_log_enabled",
+    "update_node": "trace_log_enabled",
+    "link_nodes": "trace_log_enabled",
+    "remove_node": "trace_log_enabled",
 }
 
 

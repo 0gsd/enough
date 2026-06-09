@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.1.0)
+# enough — Agent Guide (v0.1.1)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -54,6 +54,7 @@ Every Python module in `enough/`:
 | [enough/models.py](../enough/models.py) | ~280 | Local-model registry (4 cute-named local models, defined in `defaults/models.json`). Selection state in `~/enough/config/models.json`. | `load_registry()`, `load_state()`, `save_state()`, `resolve()`, `all_models_view()` |
 | [enough/skeleton.py](../enough/skeleton.py) | ~560 | Creates `rness/` for new projects (copies from `defaults/`), syncs global skills/roles/paradigms on every launch via dedicated populators, runs migrations. | `ensure_skeleton()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS`, `_populate_skill_symlinks` / `_populate_role_symlinks` / `_populate_paradigm_symlinks` |
 | [enough/highlights.py](../enough/highlights.py) | ~250 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
+| [enough/girraph.py](../enough/girraph.py) | ~600 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
 | [enough/logger.py](../enough/logger.py) | small | Stdlib logging setup. | — |
 | [enough/static/index.html](../enough/static/index.html) | ~8000 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), chat pane, SSE consumer |
 
@@ -413,6 +414,11 @@ The current toggle catalog (8 toggles, all default `True`):
 | `read_highlights` | `tools.run_read_highlights` | path under project |
 | `navigate_to_highlight` | `tools.run_navigate_to_highlight` | path under project |
 | `cloud_pipeline` | `tools.run_cloud_pipeline` | `local_models_only` off + key present + key healthy + spec parses |
+| `read_girraph` | `tools.run_read_girraph` | `.girraph` path under project or read allowlist; depth-limited (default 1), refs returned as stubs |
+| `add_node` | `tools.run_girraph_add_node` | `.girraph` path; parentless call on a missing file creates it |
+| `update_node` | `tools.run_girraph_update_node` | `.girraph` path; patches only fields present, empty tag clears |
+| `link_nodes` | `tools.run_girraph_link_nodes` | `.girraph` path; `<remove>true</remove>` unlinks |
+| `remove_node` | `tools.run_girraph_remove_node` | `<confirmed>yes</confirmed>` required (user must confirm); children require `<cascade>true</cascade>` — no orphaning |
 
 All registered in `_DISPATCH` (~line 1026 in tools.py) and
 `_TRACE_TOGGLE` (~line 1042). The tool-call XML parser
@@ -423,6 +429,50 @@ All registered in `_DISPATCH` (~line 1026 in tools.py) and
 Tool documentation that the agent reads is in
 [enough/prompt.py](../enough/prompt.py) under `TOOL_INSTRUCTIONS`.
 Every new tool needs an example block + prose explanation there.
+
+---
+
+## Girraphs (the IBIS-map primitive)
+
+A girraph (pronounced "graph") is a plain-text argument map in a
+`.girraph` file: issues `?`, positions `!`, supporting/objecting
+arguments `+`/`-`, notes `.`, nested girraphs `@`. Nodes are
+one-per-line with stable broker-assigned IDs, `< parent` tree edges,
+`[-> id]` cross-edges, `ref:<path>` transclusions (markdown doc or
+another `.girraph` — that's the recursion), `by:<slug>` attribution,
+and optional indented detail blocks collected at the end of the file.
+Full format spec and design rationale: [docs/girraph-plan.md](girraph-plan.md);
+user-facing explainer: [docs/girraphs.md](girraphs.md).
+
+Architecture notes:
+
+- **`enough/girraph.py` owns the format.** Nothing else parses or
+  writes `.girraph` content. The agent's five tools (`tools.py`) and
+  the UI's `/api/girraph*` endpoints (`server.py`) both call its
+  node-level ops under `girraph.path_lock()` — that's the concurrency
+  story (last-write-wins at node granularity) for simultaneous
+  user-panel and agent edits.
+- **Whole-file writes are denied** for `.girraph` paths in both
+  `run_write_file` and `POST /api/file`. Files remain the source of
+  truth (a text editor outside the harness can still edit them);
+  any index is a derived, disposable cache.
+- **IDs are never reused.** The `next:` header line carries per-prefix
+  high-water marks maintained by the broker; `assign_id()` honors it
+  even after the max-numbered node is deleted.
+- **Round-trip safety.** Unparsable lines are preserved verbatim and
+  surfaced as warnings — the serializer never destroys content it
+  didn't understand. Tests in `tests/test_girraph*.py` pin this.
+- **The UI panel** (`#girraph-mode` in index.html, `gp*` functions) is
+  a third full-frame mode alongside review and edit. Breadcrumb stack
+  navigation through `@`/doc refs; pushing an already-visited path
+  pops back to it, which is what makes cyclic refs navigable.
+- **The default skill** `defaults/skills/ibis-girraphiti/` carries the
+  IBIS discipline (anti-solution-jumping, the user-confirmation
+  stopping rule, `by:` etiquette). Disabled by default like all new
+  globals.
+- TODO (stubbed, deliberately out of v1 scope): graphviz/mermaid
+  export; query engine (grep suffices; an embedded index like Kuzu
+  could later be added as a derived cache without migration pain).
 
 ---
 

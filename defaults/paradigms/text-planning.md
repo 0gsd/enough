@@ -273,6 +273,20 @@ Genre suggestions are inline above; don't break them out into separate
 template files. The skeleton is the same shape for every text; the
 "Structure" and "Sections" parts flex to whatever the text needs.
 
+## With the ibis-girraphiti skill (girraph-backed structure)
+
+When the `ibis-girraphiti` skill is enabled alongside this paradigm,
+*contested* plan structure lives in a girraph at the project root
+(`<slug>-structure.girraph`), edited via the girraph node tools and the
+user's girraph panel. The split: questions still being argued — what
+the text is really about, what belongs in or out, competing orderings —
+get mapped as issues/positions/arguments in the girraph; the
+`<project>-text-plan.md` remains the home for *settled* decisions.
+When the user confirms a branch of the map, migrate its conclusion into
+the plan document and note the girraph node id next to it. Without the
+skill enabled, keep all structure in the plan document as described
+above.
+
 ## Live document awareness
 
 The plan is a living document the user can edit at any time, including

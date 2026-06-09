@@ -1166,6 +1166,33 @@
       max-width: 100%;
     }
 
+    #review-mode .review-body table {
+      border-collapse: collapse;
+      margin: 1.2em 0;
+      font-size: 0.85em;
+      line-height: 1.45;
+    }
+
+    #review-mode .review-body th,
+    #review-mode .review-body td {
+      border: 1px solid var(--review-fg-faint);
+      padding: 0.4em 0.8em;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    #review-mode .review-body th {
+      font-weight: 700;
+      background: var(--review-code-bg);
+    }
+
+    /* Pipe/ASCII diagrams that aren't real tables: monospace so the
+       author's column alignment survives. White-space preserved by
+       <pre>; no wrapping, scroll instead. */
+    #review-mode .review-body pre.text-art {
+      white-space: pre;
+    }
+
     /* ---------- Phase 5d: line-nav column ----------
        16px-wide column pinned to the right wall. It's a document
        overview/minimap: a dotted backdrop track (`.ln-track`) plus one
@@ -1644,6 +1671,351 @@
       opacity: 0.4;
       pointer-events: none;
       filter: grayscale(0.6);
+    }
+
+    /* ---------- Girraph panel ----------
+       Third full-frame mode (alongside review and edit) for .girraph
+       files: an editable IBIS tree. Same shell pattern as #edit-mode;
+       all edits go through the /api/girraph node ops — the same ops
+       the agent's tools use, which is what makes simultaneous
+       user-and-agent editing safe. */
+    #girraph-mode {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--fg);
+      z-index: 30;
+    }
+
+    #girraph-mode.open {
+      display: flex;
+    }
+
+    #girraph-mode .girraph-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: var(--bg-raise);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    /* Breadcrumbs: the descent stack through nested girraphs and doc
+       refs. Click any crumb to pop back to that level — that's also
+       the cycle escape hatch. */
+    #girraph-mode .gp-crumbs {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+    }
+
+    #girraph-mode .gp-crumbs .crumb {
+      background: none;
+      border: none;
+      color: var(--fg-muted);
+      font: inherit;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+
+    #girraph-mode .gp-crumbs .crumb:hover {
+      color: var(--fg);
+      background: var(--bg);
+    }
+
+    #girraph-mode .gp-crumbs .crumb.current {
+      color: var(--fg);
+      font-weight: 600;
+      cursor: default;
+    }
+
+    #girraph-mode .gp-crumbs .sep {
+      color: var(--fg-faint);
+    }
+
+    #girraph-mode .girraph-toolbar button.gp-act {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    #girraph-mode .girraph-toolbar button.gp-act:hover {
+      border-color: var(--fg-faint);
+    }
+
+    #girraph-mode .girraph-body {
+      flex: 1;
+      overflow: auto;
+      padding: 24px max(48px, calc(50% - 420px)) 120px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    #girraph-mode .gp-title {
+      font-size: 1.4em;
+      font-weight: 700;
+      margin: 0 0 14px;
+    }
+
+    #girraph-mode .gp-warnings {
+      color: var(--warn, #e0a458);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      margin: 0 0 12px;
+      white-space: pre-wrap;
+    }
+
+    /* One node = one row, mirroring the file format. Children indent
+       under a left guide line. */
+    #girraph-mode .gp-children {
+      margin-left: 14px;
+      padding-left: 12px;
+      border-left: 1px solid var(--border);
+    }
+
+    #girraph-mode .gp-children.collapsed {
+      display: none;
+    }
+
+    #girraph-mode .gp-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 6px;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    /* Labels keep their natural width; chips wrap to the next line
+       instead of squeezing the label into a one-word-wide column. */
+    #girraph-mode .gp-row .gp-label {
+      flex: 0 1 auto;
+      min-width: 0;
+    }
+
+    #girraph-mode .gp-row:hover {
+      background: var(--bg-alt);
+    }
+
+    #girraph-mode .gp-row .gp-toggle {
+      background: none;
+      border: none;
+      color: var(--fg-faint);
+      cursor: pointer;
+      width: 16px;
+      padding: 0;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    #girraph-mode .gp-row .gp-toggle.leaf {
+      visibility: hidden;
+    }
+
+    #girraph-mode .gp-row .gp-id {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--fg-faint);
+      flex-shrink: 0;
+    }
+
+    #girraph-mode .gp-row .gp-label {
+      cursor: text;
+    }
+
+    #girraph-mode .gp-row .gp-label:hover {
+      text-decoration: underline dotted var(--fg-faint);
+    }
+
+    #girraph-mode .gp-row input.gp-label-input {
+      flex: 1;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--accent-agent);
+      border-radius: 3px;
+      font: inherit;
+      padding: 0 4px;
+    }
+
+    /* Inline chips: cross-edges (clickable jump), refs (navigate /
+       render in place), attribution, broken-ref repair. */
+    #girraph-mode .gp-chip {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 0 7px;
+      background: var(--bg-raise);
+      color: var(--fg-muted);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    #girraph-mode .gp-chip:hover {
+      color: var(--fg);
+      border-color: var(--fg-faint);
+    }
+
+    #girraph-mode .gp-chip.broken {
+      color: var(--warn, #e0a458);
+      border-color: var(--warn, #e0a458);
+    }
+
+    #girraph-mode .gp-chip.gp-by {
+      cursor: default;
+      background: none;
+      border-style: dotted;
+    }
+
+    /* Per-row action cluster — quiet until the row is hovered. */
+    #girraph-mode .gp-row .gp-acts {
+      display: none;
+      gap: 2px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    #girraph-mode .gp-row:hover .gp-acts {
+      display: inline-flex;
+    }
+
+    #girraph-mode .gp-acts button {
+      background: none;
+      border: none;
+      color: var(--fg-faint);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0 4px;
+      border-radius: 3px;
+    }
+
+    #girraph-mode .gp-acts button:hover {
+      color: var(--fg);
+      background: var(--bg-raise);
+    }
+
+    /* Detail blocks: collapsed to a marker on the row; expanded as an
+       indented editable block. */
+    #girraph-mode .gp-detail {
+      margin: 2px 0 6px 36px;
+      padding: 6px 10px;
+      border-left: 2px solid var(--fg-faint);
+      color: var(--fg-muted);
+      font-size: 13px;
+      white-space: pre-wrap;
+      cursor: text;
+    }
+
+    #girraph-mode textarea.gp-detail-input {
+      width: calc(100% - 36px);
+      margin-left: 36px;
+      box-sizing: border-box;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--accent-agent);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      padding: 6px 8px;
+      min-height: 64px;
+      resize: vertical;
+    }
+
+    /* Inline add-child form, shown under a row on demand. */
+    #girraph-mode .gp-add-form {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin: 4px 0 6px 36px;
+    }
+
+    #girraph-mode .gp-add-form select,
+    #girraph-mode .gp-add-form input {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font: inherit;
+      font-size: 12.5px;
+      padding: 3px 6px;
+    }
+
+    #girraph-mode .gp-add-form input {
+      flex: 1;
+    }
+
+    /* Read-only markdown doc rendered in place for a doc-ref node.
+       Reuses the review-mode markdown styles via the .review-body
+       class but stays theme-colored (not max-contrast). */
+    #girraph-mode .gp-doc-note {
+      font-size: 12px;
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+      margin-bottom: 14px;
+    }
+
+    /* Compact markdown styling for the read-only transcluded doc view.
+       (The full review-mode styles are scoped to #review-mode; this is
+       the small theme-colored subset the girraph panel needs.) */
+    #girraph-mode .gp-doc h1,
+    #girraph-mode .gp-doc h2,
+    #girraph-mode .gp-doc h3 {
+      line-height: 1.3;
+      margin: 1.2em 0 0.5em;
+    }
+
+    #girraph-mode .gp-doc p {
+      margin: 0.7em 0;
+    }
+
+    #girraph-mode .gp-doc pre,
+    #girraph-mode .gp-doc code {
+      font-family: var(--font-mono);
+      background: var(--bg-raise);
+      border-radius: 3px;
+    }
+
+    #girraph-mode .gp-doc pre {
+      padding: 0.8em 1em;
+      overflow-x: auto;
+    }
+
+    #girraph-mode .gp-doc pre.text-art {
+      white-space: pre;
+    }
+
+    #girraph-mode .gp-doc blockquote {
+      border-left: 3px solid var(--fg-faint);
+      margin: 1em 0;
+      padding: 0.2em 0.9em;
+      color: var(--fg-muted);
+    }
+
+    #girraph-mode .gp-doc table {
+      border-collapse: collapse;
+      margin: 1em 0;
+    }
+
+    #girraph-mode .gp-doc th,
+    #girraph-mode .gp-doc td {
+      border: 1px solid var(--border);
+      padding: 0.3em 0.7em;
+      text-align: left;
+      vertical-align: top;
     }
 
     /* Selection toolbar inside review mode. Always docked at the top
@@ -3633,6 +4005,24 @@
             <button type="submit">send</button>
           </form>
         </div>
+      </div>
+
+      <!-- Girraph panel: full-frame editable IBIS-tree view for
+           .girraph files. Opened from the 🦒 button in a girraph
+           file's preview. All edits POST/PATCH/DELETE through
+           /api/girraph node ops — the same code path the agent's
+           tools use, so user and agent can edit the same map
+           concurrently. Breadcrumbs track descent into nested
+           girraphs (@ refs) and read-only doc refs; clicking a crumb
+           pops back, which is also the cycle escape hatch. -->
+      <div id="girraph-mode" aria-hidden="true">
+        <div class="girraph-toolbar">
+          <span>🦒</span>
+          <nav class="gp-crumbs" id="gp-crumbs" aria-label="girraph navigation"></nav>
+          <button type="button" class="gp-act" id="gp-refresh" title="re-read the file (pick up agent edits)">↻</button>
+          <button type="button" class="gp-act" id="gp-add-root" title="add a top-level node">+ root node</button>
+        </div>
+        <div class="girraph-body" id="girraph-body"></div>
       </div>
 
       <!-- Per-highlight popup (Phase 5c). Floats above everything,
@@ -5659,6 +6049,8 @@
           if (raw.startsWith('```')) type = 'code';
           else if (/^#{1,6}\s+/.test(raw)) type = 'heading';
           else if (/^>\s?/.test(raw)) type = 'blockquote';
+          else if (looksLikePipeTable(raw)) type = 'table';
+          else if (looksLikeTextArt(raw)) type = 'textart';
           else if (/^\s*\d+\.\s+/.test(raw)) type = 'ol';
           else if (/^\s*[-*+]\s+/.test(raw)) type = 'ul';
           else if (/^(\*\s*){3,}$|^(-\s*){3,}$|^(_\s*){3,}$/.test(raw)) type = 'hr';
@@ -5698,6 +6090,31 @@
           case 'hr':
             out.push(`<hr data-block-idx="${idx}">`);
             break;
+          case 'table': {
+            const lines = b.raw.split('\n').map(l => l.trim()).filter(Boolean);
+            const sepIdx = lines.findIndex((l, i) => i > 0 && isTableSeparatorRow(l));
+            const headerLines = sepIdx > 0 ? lines.slice(0, sepIdx) : [];
+            const bodyLines = sepIdx > 0 ? lines.slice(sepIdx + 1) : lines;
+            // Column alignment from the separator row (`:---` / `---:` / `:---:`).
+            const aligns = sepIdx > 0 ? splitTableRow(lines[sepIdx]).map(c => {
+              const left = c.startsWith(':'), right = c.endsWith(':');
+              return left && right ? 'center' : right ? 'right' : '';
+            }) : [];
+            const tr = (line, tag) => '<tr>' + splitTableRow(line).map((c, i) => {
+              const a = aligns[i] ? ` style="text-align:${aligns[i]}"` : '';
+              return `<${tag}${a}>${renderInline(escapeMarkdownInline(c))}</${tag}>`;
+            }).join('') + '</tr>';
+            const thead = headerLines.length
+              ? `<thead>${headerLines.map(l => tr(l, 'th')).join('')}</thead>` : '';
+            const tbody = `<tbody>${bodyLines.map(l => tr(l, 'td')).join('')}</tbody>`;
+            out.push(`<table data-block-idx="${idx}">${thead}${tbody}</table>`);
+            break;
+          }
+          case 'textart':
+            // Intentional alignment without table semantics — preserve it
+            // verbatim in monospace rather than mangling it into prose.
+            out.push(`<pre data-block-idx="${idx}" class="text-art"><code>${escapeHtml(b.raw)}</code></pre>`);
+            break;
           case 'blockquote': {
             const inner = b.raw.split('\n').map(l => l.replace(/^>\s?/, '')).join('\n');
             out.push(`<blockquote data-block-idx="${idx}">${renderInline(escapeMarkdownInline(inner.replace(/\n/g, '<br>')))}</blockquote>`);
@@ -5726,6 +6143,40 @@
         }
       });
       return { html: out.join('\n'), blocks };
+    }
+
+    // ---------- Pipe-table / text-art detection ----------
+    // GFM pipe table: a |-delimited header row followed by a `| :--- |`
+    // separator row. LLM outputs (Gemini especially) emit these
+    // constantly; without explicit handling they fall into the paragraph
+    // branch and render as muddled proportional-font prose.
+
+    function isTableSeparatorRow(line) {
+      return /^\|?[\s:\-|]+\|?$/.test(line.trim()) && line.includes('-');
+    }
+
+    function splitTableRow(line) {
+      let s = line.trim();
+      if (s.startsWith('|')) s = s.slice(1);
+      if (s.endsWith('|')) s = s.slice(0, -1);
+      return s.split(/(?<!\\)\|/).map(c => c.trim().replace(/\\\|/g, '|'));
+    }
+
+    function looksLikePipeTable(raw) {
+      const lines = raw.split('\n');
+      if (lines.length < 2) return false;
+      return /^\s*\|.*\|\s*$/.test(lines[0]) && isTableSeparatorRow(lines[1]);
+    }
+
+    // Pipe rows with no separator row, or +--- / box-drawing diagrams:
+    // not a real table, but the alignment is clearly intentional — lock
+    // the block to monospace instead of guessing at structure.
+    function looksLikeTextArt(raw) {
+      const lines = raw.split('\n');
+      const arty = lines.filter(l =>
+        /^\s*\|.*\|\s*$/.test(l) || /^\s*[+┌┐└┘├┤│╔╗╚╝║╠╣]/.test(l)
+      ).length;
+      return arty >= 2 && arty >= Math.ceil(lines.length * 0.6);
     }
 
     // Escape HTML in raw markdown content while preserving our allowed
@@ -5937,10 +6388,453 @@
       .addEventListener('click', () => {
         if (document.getElementById('edit-mode')?.classList.contains('open')) {
           exitEditMode();
+        } else if (document.getElementById('girraph-mode')?.classList.contains('open')) {
+          exitGirraphMode();
         } else if (document.getElementById('review-mode')?.classList.contains('open')) {
           exitReviewMode();
         }
       });
+
+    // ---------- Girraph panel ----------
+    //
+    // Editable IBIS tree for .girraph files. State is a descent stack:
+    // entry 0 is the girraph the user opened; pushing happens when they
+    // click into a nested girraph (@ ref) or a doc ref. Clicking a
+    // breadcrumb pops back. Pushing a path that's ALREADY in the stack
+    // jumps back to that level instead of growing the stack — that's
+    // what makes deliberately cyclic refs (A→B→A) navigable instead of
+    // a trap. All mutations go through /api/girraph node ops and then
+    // re-fetch, so the panel always shows the file's real state
+    // (including anything the agent changed in the meantime).
+    let GIRRAPH_STACK = [];   // [{kind:'girraph'|'doc', path}]
+
+    async function enterGirraphMode(path) {
+      GIRRAPH_STACK = [{ kind: 'girraph', path }];
+      const ok = await renderGirraphTop();
+      if (!ok) { GIRRAPH_STACK = []; return; }
+      const root = document.getElementById('girraph-mode');
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      const exitBtn = document.getElementById('exit-review-btn');
+      exitBtn.textContent = '× exit girraph';
+      exitBtn.title = 'Exit girraph panel (esc)';
+      exitBtn.classList.add('visible');
+      document.getElementById('tree')?.classList.add('review-disabled');
+      document.getElementById('preview')?.classList.remove('open');
+    }
+
+    function exitGirraphMode() {
+      const root = document.getElementById('girraph-mode');
+      root.classList.remove('open');
+      root.setAttribute('aria-hidden', 'true');
+      const exitBtn = document.getElementById('exit-review-btn');
+      exitBtn.classList.remove('visible');
+      exitBtn.textContent = '× exit review';
+      exitBtn.title = 'Exit review mode (esc)';
+      document.getElementById('tree')?.classList.remove('review-disabled');
+      GIRRAPH_STACK = [];
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (!document.getElementById('girraph-mode')?.classList.contains('open')) return;
+      // Don't steal esc from an in-progress inline edit.
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      exitGirraphMode();
+    });
+
+    function gpTop() { return GIRRAPH_STACK[GIRRAPH_STACK.length - 1]; }
+
+    function gpPush(entry) {
+      const idx = GIRRAPH_STACK.findIndex(
+        (e) => e.kind === entry.kind && e.path === entry.path);
+      if (idx !== -1) GIRRAPH_STACK = GIRRAPH_STACK.slice(0, idx + 1);
+      else GIRRAPH_STACK.push(entry);
+      renderGirraphTop();
+    }
+
+    function renderGpCrumbs() {
+      const nav = document.getElementById('gp-crumbs');
+      nav.innerHTML = '';
+      GIRRAPH_STACK.forEach((entry, i) => {
+        if (i > 0) {
+          const sep = document.createElement('span');
+          sep.className = 'sep';
+          sep.textContent = '›';
+          nav.appendChild(sep);
+        }
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'crumb' + (i === GIRRAPH_STACK.length - 1 ? ' current' : '');
+        const base = entry.path.split('/').pop();
+        b.textContent = (entry.kind === 'doc' ? '📄 ' : '🦒 ') + base;
+        b.title = entry.path;
+        if (i < GIRRAPH_STACK.length - 1) {
+          b.onclick = () => { GIRRAPH_STACK = GIRRAPH_STACK.slice(0, i + 1); renderGirraphTop(); };
+        }
+        nav.appendChild(b);
+      });
+    }
+
+    async function renderGirraphTop() {
+      const top = gpTop();
+      if (!top) return false;
+      renderGpCrumbs();
+      const body = document.getElementById('girraph-body');
+      document.getElementById('gp-add-root').style.display =
+        top.kind === 'girraph' ? '' : 'none';
+      if (top.kind === 'doc') {
+        // Doc-ref transclusion: render the markdown read-only in place.
+        let raw;
+        try {
+          const r = await fetch('/api/file/raw?path=' + encodeURIComponent(top.path));
+          if (!r.ok) throw new Error(r.statusText);
+          raw = await r.text();
+        } catch (e) {
+          body.innerHTML = '<div class="gp-warnings">could not load '
+            + escapeHtml(top.path) + ': ' + escapeHtml(e.message) + '</div>';
+          return true;
+        }
+        body.innerHTML =
+          '<div class="gp-doc-note">read-only · ' + escapeHtml(top.path)
+          + ' · click a breadcrumb to go back</div>'
+          + '<div class="gp-doc">' + renderMarkdown(raw).html + '</div>';
+        body.scrollTop = 0;
+        return true;
+      }
+      let data;
+      try {
+        const r = await fetch('/api/girraph?path=' + encodeURIComponent(top.path));
+        if (!r.ok) {
+          let detail = r.statusText;
+          try { detail = (await r.json()).detail || detail; } catch (_e) { /* keep statusText */ }
+          throw new Error(detail);
+        }
+        data = await r.json();
+      } catch (e) {
+        alert('could not load girraph: ' + e.message);
+        return false;
+      }
+      body.innerHTML = '';
+      if (data.title) {
+        const h = document.createElement('div');
+        h.className = 'gp-title';
+        h.textContent = data.title;
+        body.appendChild(h);
+      }
+      if (data.warnings && data.warnings.length) {
+        const w = document.createElement('div');
+        w.className = 'gp-warnings';
+        w.textContent = data.warnings.map((x) => '⚠ ' + x).join('\n');
+        body.appendChild(w);
+      }
+      const byId = {};
+      data.nodes.forEach((n) => { byId[n.id] = n; });
+      const kidsOf = {};
+      data.nodes.forEach((n) => {
+        if (n.parent && byId[n.parent]) (kidsOf[n.parent] = kidsOf[n.parent] || []).push(n);
+      });
+      const rendered = new Set();
+      data.roots.forEach((rid) => {
+        if (byId[rid]) body.appendChild(gpNodeTree(byId[rid], kidsOf, rendered));
+      });
+      // Parent-edge cycle members are unreachable from any root (the
+      // file's warnings already flag them) — surface them anyway.
+      data.nodes.forEach((n) => {
+        if (!rendered.has(n.id)) body.appendChild(gpNodeTree(n, kidsOf, rendered));
+      });
+      if (!data.nodes.length) {
+        const empty = document.createElement('div');
+        empty.className = 'gp-doc-note';
+        empty.textContent = 'empty girraph — use “+ root node” to start the map.';
+        body.appendChild(empty);
+      }
+      return true;
+    }
+
+    function gpChip(text) {
+      const c = document.createElement('button');
+      c.type = 'button';
+      c.className = 'gp-chip';
+      c.textContent = text;
+      return c;
+    }
+
+    function gpActBtn(parent, glyph, title, fn) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = glyph;
+      b.title = title;
+      b.onclick = fn;
+      parent.appendChild(b);
+    }
+
+    function gpNodeTree(n, kidsOf, rendered) {
+      rendered.add(n.id);
+      const wrap = document.createElement('div');
+      wrap.dataset.gpNode = n.id;
+      const row = document.createElement('div');
+      row.className = 'gp-row';
+      row.dataset.id = n.id;
+      // `rendered` guards parent-edge cycles (a1 < a2 < a1) from
+      // recursing forever; the broken edge is reported via warnings.
+      const children = (kidsOf[n.id] || []).filter((k) => !rendered.has(k.id));
+      const tog = document.createElement('button');
+      tog.type = 'button';
+      tog.className = 'gp-toggle' + (children.length ? '' : ' leaf');
+      tog.textContent = '▾';
+      row.appendChild(tog);
+      const idEl = document.createElement('span');
+      idEl.className = 'gp-id';
+      idEl.textContent = n.id;
+      row.appendChild(idEl);
+      const em = document.createElement('span');
+      em.textContent = n.emoji;
+      em.title = n.type;
+      row.appendChild(em);
+      const label = document.createElement('span');
+      label.className = 'gp-label';
+      label.textContent = n.label || '(unlabeled)';
+      label.title = 'click to edit';
+      label.onclick = () => gpEditLabel(n, label);
+      row.appendChild(label);
+      n.cross.forEach((t) => {
+        const c = gpChip('→ ' + t);
+        c.title = 'cross-edge — click to jump (shift-click to remove)';
+        c.onclick = (ev) => (ev.shiftKey ? gpRemoveCross(n, t) : gpJumpTo(t));
+        row.appendChild(c);
+      });
+      if (n.ref) {
+        const c = gpChip((n.ref_broken ? '⚠ ' : (n.ref_kind === 'girraph' ? '🦒 ' : '📄 ')) + n.ref);
+        if (n.ref_broken) {
+          c.classList.add('broken');
+          c.title = 'broken ref — click to repair';
+          c.onclick = () => gpRepairRef(n);
+        } else if (n.ref_kind === 'girraph') {
+          c.title = 'open the nested girraph';
+          c.onclick = () => gpPush({ kind: 'girraph', path: n.ref });
+        } else {
+          c.title = 'render this doc here (read-only)';
+          c.onclick = () => gpPush({ kind: 'doc', path: n.ref });
+        }
+        row.appendChild(c);
+      }
+      if (n.by) {
+        const c = gpChip('by:' + n.by);
+        c.classList.add('gp-by');
+        c.title = 'attribution';
+        row.appendChild(c);
+      }
+      const acts = document.createElement('span');
+      acts.className = 'gp-acts';
+      gpActBtn(acts, '＋', 'add child node', () => gpShowAddForm(wrap, n.id));
+      gpActBtn(acts, '⤳', 'add cross-edge from this node', () => gpAddCross(n));
+      gpActBtn(acts, '≡', n.detail ? 'edit detail block' : 'add detail block', () => gpEditDetail(wrap, n));
+      gpActBtn(acts, '✕', 'remove node…', () => gpRemove(n, (kidsOf[n.id] || []).length));
+      row.appendChild(acts);
+      wrap.appendChild(row);
+      if (n.detail) {
+        const d = document.createElement('div');
+        d.className = 'gp-detail';
+        d.textContent = n.detail;
+        d.title = 'click to edit';
+        d.onclick = () => gpEditDetail(wrap, n);
+        wrap.appendChild(d);
+      }
+      if (children.length) {
+        const box = document.createElement('div');
+        box.className = 'gp-children';
+        tog.onclick = () => {
+          box.classList.toggle('collapsed');
+          tog.textContent = box.classList.contains('collapsed') ? '▸' : '▾';
+        };
+        children.forEach((k) => box.appendChild(gpNodeTree(k, kidsOf, rendered)));
+        wrap.appendChild(box);
+      }
+      return wrap;
+    }
+
+    // ----- panel ops (each re-fetches on success so the view always
+    // reflects the file, including concurrent agent edits) -----
+
+    async function gpApi(method, url, form) {
+      const opts = { method };
+      if (form) {
+        const fd = new FormData();
+        Object.entries(form).forEach(([k, v]) => fd.append(k, v));
+        opts.body = fd;
+      }
+      const r = await fetch(url, opts);
+      if (!r.ok) {
+        let detail = r.statusText;
+        try { detail = (await r.json()).detail || detail; } catch (_e) { /* keep statusText */ }
+        throw new Error(detail);
+      }
+      return r.json();
+    }
+
+    async function gpPatch(nodeId, fields) {
+      try {
+        await gpApi('PATCH', '/api/girraph/node',
+          Object.assign({ path: gpTop().path, id: nodeId }, fields));
+        await renderGirraphTop();
+      } catch (e) {
+        alert('girraph edit failed: ' + e.message);
+        await renderGirraphTop();
+      }
+    }
+
+    function gpEditLabel(n, labelEl) {
+      const input = document.createElement('input');
+      input.className = 'gp-label-input';
+      input.value = n.label;
+      labelEl.replaceWith(input);
+      input.focus();
+      input.select();
+      let done = false;
+      const commit = () => {
+        if (done) return;
+        done = true;
+        const v = input.value.trim();
+        if (v && v !== n.label) gpPatch(n.id, { label: v });
+        else renderGirraphTop();
+      };
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') commit();
+        if (e.key === 'Escape') { done = true; renderGirraphTop(); }
+      });
+      input.addEventListener('blur', commit);
+    }
+
+    function gpEditDetail(wrap, n) {
+      if (wrap.querySelector('.gp-detail-input')) return;
+      const ta = document.createElement('textarea');
+      ta.className = 'gp-detail-input';
+      ta.value = n.detail || '';
+      ta.placeholder = 'detail block (markdown) — empty clears it. esc to cancel, ctrl/cmd-enter to save.';
+      const existing = wrap.querySelector('.gp-detail');
+      if (existing) existing.replaceWith(ta); else wrap.querySelector('.gp-row').after(ta);
+      ta.focus();
+      let done = false;
+      const commit = () => {
+        if (done) return;
+        done = true;
+        if (ta.value !== (n.detail || '')) gpPatch(n.id, { detail: ta.value });
+        else renderGirraphTop();
+      };
+      ta.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { done = true; renderGirraphTop(); }
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) commit();
+      });
+      ta.addEventListener('blur', commit);
+    }
+
+    function gpShowAddForm(wrap, parentId) {
+      if (document.querySelector('.gp-add-form')) {
+        document.querySelector('.gp-add-form').remove();
+      }
+      const form = document.createElement('form');
+      form.className = 'gp-add-form';
+      const sel = document.createElement('select');
+      [['issue', '❓ issue'], ['position', '💡 position'], ['support', '➕ support'],
+       ['objection', '➖ objection'], ['note', '📄 note'], ['girraph', '🦒 nested girraph']]
+        .forEach(([v, t]) => {
+          const o = document.createElement('option');
+          o.value = v; o.textContent = t;
+          sel.appendChild(o);
+        });
+      const labelIn = document.createElement('input');
+      labelIn.placeholder = 'label…';
+      const refIn = document.createElement('input');
+      refIn.placeholder = 'ref: path (optional; required for 🦒)';
+      refIn.style.maxWidth = '220px';
+      const add = document.createElement('button');
+      add.type = 'submit';
+      add.className = 'gp-act';
+      add.textContent = 'add';
+      form.append(sel, labelIn, refIn, add);
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+        const payload = {
+          path: gpTop().path,
+          type: sel.value,
+          label: labelIn.value.trim(),
+          by: 'user',
+        };
+        if (parentId) payload.parent = parentId;
+        if (refIn.value.trim()) payload.ref = refIn.value.trim();
+        try {
+          await gpApi('POST', '/api/girraph/node', payload);
+          await renderGirraphTop();
+        } catch (err) {
+          alert('add failed: ' + err.message);
+        }
+      };
+      if (wrap) wrap.querySelector('.gp-row').after(form);
+      else document.getElementById('girraph-body').prepend(form);
+      labelIn.focus();
+    }
+
+    function gpAddCross(n) {
+      const target = prompt('cross-edge from ' + n.id + ' to which node id? (e.g. a2)');
+      if (!target) return;
+      gpApi('POST', '/api/girraph/link',
+        { path: gpTop().path, from: n.id, to: target.trim() })
+        .then(renderGirraphTop)
+        .catch((e) => alert('link failed: ' + e.message));
+    }
+
+    function gpRemoveCross(n, target) {
+      if (!confirm('remove cross-edge ' + n.id + ' → ' + target + '?')) return;
+      gpApi('POST', '/api/girraph/link',
+        { path: gpTop().path, from: n.id, to: target, remove: 'true' })
+        .then(renderGirraphTop)
+        .catch((e) => alert('unlink failed: ' + e.message));
+    }
+
+    function gpRemove(n, childCount) {
+      const msg = childCount
+        ? 'remove ' + n.id + ' AND its ' + childCount + ' child(ren) (whole subtree)? this cannot be undone.'
+        : 'remove ' + n.id + ' ("' + (n.label || '').slice(0, 60) + '")? this cannot be undone.';
+      if (!confirm(msg)) return;
+      const params = new URLSearchParams({ path: gpTop().path, id: n.id });
+      if (childCount) params.set('cascade', 'true');
+      gpApi('DELETE', '/api/girraph/node?' + params.toString())
+        .then(renderGirraphTop)
+        .catch((e) => alert('remove failed: ' + e.message));
+    }
+
+    async function gpRepairRef(n) {
+      let suggestions = [];
+      try {
+        const data = await gpApi('GET',
+          '/api/girraph/ref-candidates?name=' + encodeURIComponent(n.ref));
+        suggestions = data.candidates || [];
+      } catch (_e) { /* suggestions are best-effort */ }
+      let msg = 'broken ref on ' + n.id + ': ' + n.ref + '\n\nenter a new path';
+      if (suggestions.length) {
+        msg += ', or the number of a match found in the project:\n'
+          + suggestions.map((s, i) => '  ' + (i + 1) + '. ' + s).join('\n');
+      }
+      const answer = prompt(msg);
+      if (!answer) return;
+      const idx = parseInt(answer, 10);
+      const newRef = (!isNaN(idx) && idx >= 1 && idx <= suggestions.length)
+        ? suggestions[idx - 1] : answer.trim();
+      gpPatch(n.id, { ref: newRef });
+    }
+
+    function gpJumpTo(id) {
+      const row = document.querySelector('#girraph-body .gp-row[data-id="' + id + '"]');
+      if (!row) { alert('node ' + id + ' is not in view (collapsed or missing).'); return; }
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      row.style.transition = 'background 0.2s';
+      row.style.background = 'var(--bg-raise)';
+      setTimeout(() => { row.style.background = ''; }, 900);
+    }
+
+    document.getElementById('gp-refresh').addEventListener('click', () => renderGirraphTop());
+    document.getElementById('gp-add-root').addEventListener('click', () => gpShowAddForm(null, ''));
 
     // ---------- Review-mode chat pill ----------
     function toggleReviewChat() {

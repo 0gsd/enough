@@ -67,6 +67,38 @@ file contents here
 </content>
 </tool>
 
+<tool name="read_girraph">
+<path>plans/plugin-api.girraph</path>
+<node>p1</node>
+<depth>1</depth>
+</tool>
+
+<tool name="add_node">
+<path>plans/plugin-api.girraph</path>
+<type>objection</type>
+<label>API surface = forever maintenance</label>
+<parent>p1</parent>
+<by>open-skeptic</by>
+</tool>
+
+<tool name="update_node">
+<path>plans/plugin-api.girraph</path>
+<id>a2</id>
+<label>sharper version of the claim</label>
+</tool>
+
+<tool name="link_nodes">
+<path>plans/plugin-api.girraph</path>
+<from>a3</from>
+<to>a2</to>
+</tool>
+
+<tool name="remove_node">
+<path>plans/plugin-api.girraph</path>
+<id>a2</id>
+<confirmed>yes</confirmed>
+</tool>
+
 Rules:
 - All paths are relative to the project directory. Absolute paths and `../`
   traversal are rejected.
@@ -117,6 +149,40 @@ Rules:
 - All tool calls flow through the broker, which writes a journal entry to
   `rness/knowledge/session-logs/<date>-broker.md`. You don't write that
   file directly; the harness does.
+
+## Working with girraphs
+
+A girraph (pronounced "graph") is a plain-text IBIS map in a `.girraph`
+file: issues (`?` ❓), positions (`!` 💡), supporting/objecting arguments
+(`+` ➕ / `-` ➖), notes (`.` 📄), and nested girraphs (`@` 🦒). Nodes
+have stable ids (q1, p2, a3…), a `< parent` tree edge, optional
+`[-> id]` cross-edges, `ref:<path>` transclusions (a markdown doc, or
+another `.girraph` — that's the recursion), `by:<name>` attribution, and
+optional longer detail blocks. The user has an editable panel for the
+same files, so girraphs are shared ground between you and them.
+
+When to reach for one: mapping a contested or wicked question before
+solving it, structuring a plan whose parts argue with each other, or
+any "let's map this out" moment. For linear notes, plain markdown is
+still the right tool.
+
+Rules:
+- Edit girraphs ONLY through the node tools above. `write_file` on a
+  `.girraph` is refused — node-level ops are what let you and the user
+  edit the same map at the same time without clobbering each other.
+- To start a new girraph, call `add_node` with no `<parent>`: the file
+  is created and your label becomes its title and root node.
+- `read_girraph` is depth-limited (default 1 = node + children) and
+  renders `ref:`/`@` targets as one-line stubs. NEVER chase every ref
+  or re-read a whole deep tree — expand only the branch you're working
+  on. Girraphs are your checkpoint-native map: after a context reset,
+  re-orient by reading the working branch, not the world.
+- `by:` records whose claim a node is — `user`, `agent`, or a role
+  name. Keep it honest; don't relabel the user's claims as your own.
+- `remove_node` requires the user's explicit confirmation in their own
+  words this turn (`<confirmed>yes</confirmed>` — never pre-fill it),
+  and refuses to orphan: removing a node with children needs
+  `<cascade>true</cascade>`, which removes the whole subtree.
 
 ## Working with review-mode color highlights
 
