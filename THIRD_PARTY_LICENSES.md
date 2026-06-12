@@ -138,9 +138,9 @@ card before commercial use.
 | Cute name | Model | Source license | Weights repo |
 |---|---|---|---|
 | G40-04 | Gemma 4 4B (E4B) | Gemma Terms of Use | <https://huggingface.co/ggml-org/gemma-4-E4B-it-GGUF> |
-| Q35-09 | Qwen3.5-9B | Apache-2.0 | <https://huggingface.co/unsloth/Qwen3.5-9B-GGUF> |
+| Q35-09 | Qwen3.5-9B (MTP build) | Apache-2.0 | <https://huggingface.co/unsloth/Qwen3.5-9B-MTP-GGUF> |
 | G40-26 | Gemma 4 26B A4B (MoE) | Gemma Terms of Use | <https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF> |
-| Q36-27 | Qwen3.6-27B (dense) | Apache-2.0 | <https://huggingface.co/bartowski/Qwen_Qwen3.6-27B-GGUF> |
+| Q36-27 | Qwen3.6-27B (dense, MTP build) | Apache-2.0 | <https://huggingface.co/unsloth/Qwen3.6-27B-MTP-GGUF> |
 | — | OpenAI Whisper `base.en` | MIT | <https://huggingface.co/ggerganov/whisper.cpp> |
 | — | MADLAD-400-3B-MT (CT2) | Apache-2.0 | <https://huggingface.co/santhosh/madlad400-3b-ct2> |
 | — | MADLAD-400-7B-MT (CT2, opt-in) | Apache-2.0 | <https://huggingface.co/avans06/madlad400-7b-mt-bt-ct2-int8_float16> |

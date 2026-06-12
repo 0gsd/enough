@@ -13,11 +13,15 @@
 #             chosen model's ctx_defaults for this host's RAM; override with
 #             a literal number)
 #   PARALLEL  concurrent request slots       (default: 1)
+#   SPEC      MTP speculative decoding       (default: auto = on for models
+#             whose registry entry has an 'mtp' block AND the installed
+#             llama.cpp release is new enough; SPEC=off disables)
 #
 # Examples:
 #   ./llama_server.sh start                         # current model, auto ctx
 #   MODEL=g40-04 ./llama_server.sh start            # cute name
 #   MODEL=~/some/path.gguf CTX=8192 ./llama_server.sh start  # direct path
+#   SPEC=off ./llama_server.sh start                # force MTP off
 
 set -euo pipefail
 
@@ -27,6 +31,11 @@ PORT="${PORT:-8080}"
 NGL="${NGL:-99}"
 CTX="${CTX:-}"
 PARALLEL="${PARALLEL:-1}"
+SPEC="${SPEC:-auto}"
+
+# Filled in by resolve_model for registry models with MTP heads.
+SPEC_ARGS=""
+SPEC_MIN_RELEASE=0
 
 ENOUGH_HOME="$HOME/enough"
 resolve_model() {
@@ -50,9 +59,35 @@ resolve_model() {
     echo "error: could not resolve model: $out" >&2
     return 1
   fi
-  eval "$out"  # sets MODEL_PATH, CTX_RECOMMENDED, MODEL_CUTE, MODEL_LABEL
+  eval "$out"  # sets MODEL_PATH, CTX_RECOMMENDED, MODEL_CUTE, MODEL_LABEL,
+               # SPEC_ARGS, SPEC_MIN_RELEASE
   if [[ -z "${CTX}" ]]; then
     CTX="$CTX_RECOMMENDED"
+  fi
+}
+
+llama_release() {
+  # The numeric b-release of the installed llama.cpp, e.g. "9200".
+  # Empty if unparseable (treat as too old).
+  llama-server --version 2>&1 | sed -n 's/^version: \([0-9][0-9]*\).*/\1/p' | head -n 1
+}
+
+resolve_spec_flags() {
+  # Decide the speculative-decoding flags for this launch. MTP drafts come
+  # from head tensors inside the main GGUF, so this is just flags — but
+  # only on a llama.cpp new enough to know them (older builds reject
+  # unknown args at startup, which would look like a broken install).
+  SPEC_FLAGS=""
+  if [[ "$SPEC" == "off" || -z "$SPEC_ARGS" ]]; then
+    return 0
+  fi
+  local rel
+  rel="$(llama_release)"
+  if [[ -n "$rel" && "$rel" -ge "$SPEC_MIN_RELEASE" ]]; then
+    SPEC_FLAGS="$SPEC_ARGS"
+  else
+    echo "note: llama.cpp release ${rel:-unknown} < $SPEC_MIN_RELEASE — starting without MTP" >&2
+    echo "      (brew upgrade llama.cpp to enable speculative decoding)" >&2
   fi
 }
 
@@ -83,14 +118,20 @@ start() {
     return 1
   fi
   mkdir -p "$STATE_DIR"
+  resolve_spec_flags
   local ctx_to_use="${CTX:-32768}"
   echo "launching llama-server with:"
   echo "  model: $MODEL_PATH"
   echo "  ctx:   $ctx_to_use"
+  echo "  mtp:   ${SPEC_FLAGS:-off}"
+  # SPEC_FLAGS is deliberately unquoted: it's a space-separated flag
+  # string (no values with spaces) that llama-server gets as N args.
+  # shellcheck disable=SC2086
   nohup llama-server \
     -m "$MODEL_PATH" \
     --host "$HOST" --port "$PORT" \
     -ngl "$NGL" -c "$ctx_to_use" --parallel "$PARALLEL" --jinja \
+    $SPEC_FLAGS \
     >"$LOG_FILE" 2>&1 &
   echo $! >"$PID_FILE"
   disown

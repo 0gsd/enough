@@ -213,25 +213,25 @@ MODEL_KEYS="g40-04 q35-09 g40-26 q36-27"
 model_filename() {
   case "$1" in
     g40-04) echo "gemma-4-E4B-it-Q4_K_M.gguf" ;;
-    q35-09) echo "Qwen3.5-9B-Q4_K_M.gguf" ;;
+    q35-09) echo "Qwen3.5-9B-MTP-Q4_K_M.gguf" ;;
     g40-26) echo "gemma-4-26B-A4B-it-Q4_K_M.gguf" ;;
-    q36-27) echo "Qwen_Qwen3.6-27B-Q4_K_M.gguf" ;;
+    q36-27) echo "Qwen3.6-27B-MTP-Q4_K_M.gguf" ;;
   esac
 }
 model_url() {
   case "$1" in
     g40-04) echo "https://huggingface.co/ggml-org/gemma-4-E4B-it-GGUF/resolve/main/gemma-4-E4B-it-Q4_K_M.gguf" ;;
-    q35-09) echo "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf" ;;
+    q35-09) echo "https://huggingface.co/unsloth/Qwen3.5-9B-MTP-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf" ;;
     g40-26) echo "https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF/resolve/main/gemma-4-26B-A4B-it-Q4_K_M.gguf" ;;
-    q36-27) echo "https://huggingface.co/bartowski/Qwen_Qwen3.6-27B-GGUF/resolve/main/Qwen_Qwen3.6-27B-Q4_K_M.gguf" ;;
+    q36-27) echo "https://huggingface.co/unsloth/Qwen3.6-27B-MTP-GGUF/resolve/main/Qwen3.6-27B-Q4_K_M.gguf" ;;
   esac
 }
 model_gb() {
   case "$1" in
     g40-04) echo "5.4" ;;
-    q35-09) echo "5.6" ;;
+    q35-09) echo "5.9" ;;
     g40-26) echo "15.6" ;;
-    q36-27) echo "16.5" ;;
+    q36-27) echo "17.1" ;;
   esac
 }
 
@@ -241,7 +241,7 @@ note "cumulative install tiers:"
 note "  1  →  G40-04 only                       (~5.4 GB)"
 note "  2  →  G40-04 + Q35-09                   (~11 GB)"
 note "  3  →  G40-04 + Q35-09 + G40-26          (~27 GB)"
-note "  4  →  all four models                   (~43 GB)"
+note "  4  →  all four models                   (~44 GB)"
 echo
 TIER=$(ask_text "install how many? [1-4]" "1")
 case "$TIER" in

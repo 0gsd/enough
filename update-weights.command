@@ -78,17 +78,28 @@ fi
 model_filename() {
   case "$1" in
     g40-04) echo "gemma-4-E4B-it-Q4_K_M.gguf" ;;
-    q35-09) echo "Qwen3.5-9B-Q4_K_M.gguf" ;;
+    q35-09) echo "Qwen3.5-9B-MTP-Q4_K_M.gguf" ;;
     g40-26) echo "gemma-4-26B-A4B-it-Q4_K_M.gguf" ;;
-    q36-27) echo "Qwen_Qwen3.6-27B-Q4_K_M.gguf" ;;
+    q36-27) echo "Qwen3.6-27B-MTP-Q4_K_M.gguf" ;;
   esac
 }
 model_url() {
   case "$1" in
     g40-04) echo "https://huggingface.co/ggml-org/gemma-4-E4B-it-GGUF/resolve/main/gemma-4-E4B-it-Q4_K_M.gguf" ;;
-    q35-09) echo "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf" ;;
+    q35-09) echo "https://huggingface.co/unsloth/Qwen3.5-9B-MTP-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf" ;;
     g40-26) echo "https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF/resolve/main/gemma-4-26B-A4B-it-Q4_K_M.gguf" ;;
-    q36-27) echo "https://huggingface.co/bartowski/Qwen_Qwen3.6-27B-GGUF/resolve/main/Qwen_Qwen3.6-27B-Q4_K_M.gguf" ;;
+    q36-27) echo "https://huggingface.co/unsloth/Qwen3.6-27B-MTP-GGUF/resolve/main/Qwen3.6-27B-Q4_K_M.gguf" ;;
+  esac
+}
+model_legacy_filename() {
+  # Filenames from before the Qwens moved to MTP-preserving GGUFs
+  # (June 2026). A legacy file still counts as "installed"; the refresh
+  # fetches the MTP build under the new name, then retires the old file
+  # so disk footprint stays flat.
+  case "$1" in
+    q35-09) echo "Qwen3.5-9B-Q4_K_M.gguf" ;;
+    q36-27) echo "Qwen_Qwen3.6-27B-Q4_K_M.gguf" ;;
+    *)      echo "" ;;
   esac
 }
 ALL_MODEL_KEYS="g40-04 q35-09 g40-26 q36-27"
@@ -96,11 +107,14 @@ ALL_MODEL_KEYS="g40-04 q35-09 g40-26 q36-27"
 WHISPER_NAME="ggml-base.en.bin"
 WHISPER_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/$WHISPER_NAME"
 
-# Detect what's installed.
+# Detect what's installed (a pre-MTP legacy filename counts).
 INSTALLED_MODELS=()
 for k in $ALL_MODEL_KEYS; do
   fn=$(model_filename "$k")
-  [[ -f "$WEIGHTS_DIR/$fn" ]] && INSTALLED_MODELS+=("$k")
+  legacy=$(model_legacy_filename "$k")
+  if [[ -f "$WEIGHTS_DIR/$fn" ]] || [[ -n "$legacy" && -f "$WEIGHTS_DIR/$legacy" ]]; then
+    INSTALLED_MODELS+=("$k")
+  fi
 done
 WHISPER_INSTALLED=0
 [[ -f "$WHISPER_DIR/$WHISPER_NAME" ]] && WHISPER_INSTALLED=1
@@ -120,8 +134,13 @@ fi
 bold "found $COUNT installed asset(s):"
 for k in "${INSTALLED_MODELS[@]}"; do
   fn=$(model_filename "$k")
+  note=""
+  if [[ ! -f "$WEIGHTS_DIR/$fn" ]]; then
+    fn=$(model_legacy_filename "$k")
+    note="  (pre-MTP — will upgrade)"
+  fi
   sz=$(du -h "$WEIGHTS_DIR/$fn" 2>/dev/null | awk '{print $1}')
-  info "    $k    $fn    ($sz)"
+  info "    $k    $fn    ($sz)$note"
 done
 if (( WHISPER_INSTALLED )); then
   sz=$(du -h "$WHISPER_DIR/$WHISPER_NAME" 2>/dev/null | awk '{print $1}')
@@ -157,7 +176,7 @@ ok "huggingface.co reachable"
 mkdir -p "$WEIGHTS_DIR" "$WHISPER_DIR"
 
 redownload() {
-  # redownload <url> <destpath>
+  # redownload <url> <destpath>  — returns non-zero if curl failed
   local url="$1" dest="$2"
   echo
   info "refreshing $(basename "$dest")"
@@ -166,12 +185,20 @@ redownload() {
     ok "got $(basename "$dest")"
   else
     warn "download failed for $(basename "$dest") — keeping existing copy"
+    return 1
   fi
 }
 
 bold "[1/3] refreshing GGUF weights"
 for k in "${INSTALLED_MODELS[@]}"; do
-  redownload "$(model_url "$k")" "$WEIGHTS_DIR/$(model_filename "$k")"
+  if redownload "$(model_url "$k")" "$WEIGHTS_DIR/$(model_filename "$k")"; then
+    # Retire the pre-MTP file only once its replacement is fully here.
+    legacy=$(model_legacy_filename "$k")
+    if [[ -n "$legacy" && -f "$WEIGHTS_DIR/$legacy" ]]; then
+      rm -f "$WEIGHTS_DIR/$legacy"
+      info "retired pre-MTP file $legacy"
+    fi
+  fi
 done
 
 if (( WHISPER_INSTALLED )); then

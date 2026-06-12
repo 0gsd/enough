@@ -19,6 +19,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -104,6 +106,8 @@ def resolve(cute: str | None = None) -> dict:
           "installed": bool,
           "disk_gb_approx": ..., "ram_gb_recommended_min": ...,
           "ctx_max": ..., "ctx_recommended": <int>,
+          "spec_args": "<llama-server speculative-decoding flags, or ''>",
+          "spec_min_release": <int llama.cpp b-release required, 0 if n/a>,
         }
     """
     registry = load_registry()
@@ -123,7 +127,47 @@ def resolve(cute: str | None = None) -> dict:
         "ram_gb_recommended_min": entry.get("ram_gb_recommended_min"),
         "ctx_max": entry.get("ctx_max"),
         "ctx_recommended": recommend_ctx(entry, total_ram_gb()),
+        "spec_args": spec_args(entry),
+        "spec_min_release": int((entry.get("mtp") or {}).get("llama_cpp_min_release", 0)),
     }
+
+
+def spec_args(model_entry: dict) -> str:
+    """llama-server flags for MTP speculative decoding, from the entry's
+    optional 'mtp' block. Empty string when the model has no MTP heads."""
+    mtp = model_entry.get("mtp") or {}
+    if not mtp.get("spec_type"):
+        return ""
+    args = ["--spec-type", str(mtp["spec_type"])]
+    if mtp.get("spec_draft_n_max"):
+        args += ["--spec-draft-n-max", str(mtp["spec_draft_n_max"])]
+    return " ".join(args)
+
+
+def llama_release(binary: str = "llama-server") -> int:
+    """Numeric b-release of the installed llama.cpp ('version: 9200 (…)'
+    → 9200). 0 when the binary is missing or the output is unparseable."""
+    try:
+        out = subprocess.run(
+            [binary, "--version"],
+            capture_output=True, text=True, timeout=10,
+        )
+        m = re.search(r"^version:\s*(\d+)", out.stdout + out.stderr, re.M)
+        return int(m.group(1)) if m else 0
+    except Exception:
+        return 0
+
+
+def spec_flags(info: dict, binary: str = "llama-server") -> list[str]:
+    """Speculative-decoding argv for a resolve()d model, gated on the
+    installed llama.cpp release (older builds reject the unknown flags at
+    startup). Empty when the model has no MTP heads or the build is too
+    old."""
+    if not info.get("spec_args"):
+        return []
+    if llama_release(binary) < int(info.get("spec_min_release") or 0):
+        return []
+    return str(info["spec_args"]).split()
 
 
 def recommend_ctx(model_entry: dict, ram_gb: int) -> int:
@@ -161,11 +205,14 @@ def _cli_params(args: argparse.Namespace) -> int:
     if not info["installed"]:
         print(f"model {info['cute']} not installed at expected path", file=sys.stderr)
         return 2
-    # Shell-sourceable:
-    print(f"MODEL_PATH={info['path']!s}")
+    # Shell-sourceable (values quoted: labels have spaces/parens, and
+    # SPEC_ARGS is a flag string the server script word-splits itself):
+    print(f"MODEL_PATH={shlex.quote(str(info['path']))}")
     print(f"CTX_RECOMMENDED={info['ctx_recommended']}")
-    print(f"MODEL_CUTE={info['cute']}")
-    print(f"MODEL_LABEL={info['label']!s}")
+    print(f"MODEL_CUTE={shlex.quote(info['cute'])}")
+    print(f"MODEL_LABEL={shlex.quote(str(info['label']))}")
+    print(f"SPEC_ARGS={shlex.quote(info['spec_args'])}")
+    print(f"SPEC_MIN_RELEASE={info['spec_min_release']}")
     return 0
 
 

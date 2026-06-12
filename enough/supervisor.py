@@ -173,6 +173,14 @@ class LlamaSupervisor:
             "--parallel", str(self.parallel),
             "--jinja",
         ]
+        spec = _models.spec_flags(info, binary)
+        if info.get("spec_args") and not spec:
+            log.info(
+                "model %s has MTP heads but llama.cpp predates b%s — "
+                "starting without speculative decoding (brew upgrade llama.cpp)",
+                cute, info["spec_min_release"],
+            )
+        cmd += spec
         log.info("launching llama-server: %s", " ".join(cmd))
         f = open(log_path, "ab", buffering=0)  # noqa: SIM115  (intentionally leaked to subprocess)
         self.proc = subprocess.Popen(
