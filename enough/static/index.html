@@ -74,7 +74,41 @@
       flex: 0 0 36px;
       border-bottom: 1px solid var(--border);
       background: var(--bg-alt);
+      position: relative;  /* anchor for the absolutely-centered project title */
     }
+
+    /* Project title — absolutely centered in the header so it reads as
+       "which folder is this?" at a glance, independent of the left/right
+       button clusters. The name ellipsizes; the pencil opens the editor. */
+    .topbar .project-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      max-width: 38%;
+      pointer-events: none;  /* clicks fall through except on the children */
+    }
+    .topbar .project-title .proj-name {
+      font-weight: 600;
+      color: var(--fg);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: auto;
+    }
+    .topbar .project-title .proj-edit {
+      border: none;
+      background: transparent;
+      color: var(--fg-faint);
+      cursor: pointer;
+      padding: 1px 4px;
+      font-size: 12px;
+      line-height: 1;
+      pointer-events: auto;
+    }
+    .topbar .project-title .proj-edit:hover { color: var(--fg); }
 
     .topbar .brand {
       color: var(--fg);
@@ -2584,6 +2618,137 @@
       justify-content: center;
     }
 
+    /* ---------- Project name/description modal ---------- */
+    #project-modal.hidden { display: none; }
+    #project-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #project-modal .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+    #project-modal .modal-panel {
+      position: relative;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 480px;
+      max-width: 560px;
+      max-height: 86vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+    #project-modal .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+    #project-modal .modal-head h3 {
+      margin: 0;
+      color: var(--fg);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    #project-modal .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--fg-muted);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+    #project-modal .modal-close:hover { color: var(--fg); }
+    #project-modal .modal-body {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      min-height: 0;
+    }
+    #project-modal .proj-field { display: flex; flex-direction: column; gap: 4px; }
+    #project-modal .proj-label {
+      color: var(--fg-faint);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+    }
+    #project-modal .proj-input,
+    #project-modal .proj-textarea {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 7px 9px;
+      font-family: inherit;
+      font-size: 13px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #project-modal .proj-textarea {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      resize: vertical;
+      min-height: 130px;
+    }
+    #project-modal .proj-input:focus,
+    #project-modal .proj-textarea:focus {
+      outline: none;
+      border-color: var(--fg-faint);
+    }
+    #project-modal .proj-path {
+      color: var(--fg-muted);
+      background: var(--bg-raise);
+      padding: 6px 9px;
+      border-radius: 4px;
+      font-size: 11px;
+      word-break: break-all;
+      user-select: all;
+    }
+    #project-modal .proj-desc-hint {
+      color: var(--fg-faint);
+      font-size: 11px;
+      line-height: 1.5;
+      margin-top: -4px;
+    }
+    #project-modal .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+    #project-modal .proj-save-btn {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--fg-faint);
+      border-radius: 4px;
+      padding: 7px 16px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #project-modal .proj-save-btn:hover {
+      border-color: var(--accent-user);
+      color: var(--accent-user);
+    }
+
     #broker-modal .modal-backdrop {
       position: absolute;
       inset: 0;
@@ -3812,6 +3977,14 @@
       <span class="ctx"></span>
       <span class="model-gauge"><span class="fill"></span></span>
     </button>
+    <!-- Centered project title (folder name unless a custom one is set).
+         The pencil opens an editor for the display name + description; the
+         folder on disk is never renamed. -->
+    <div class="project-title" id="project-title">
+      <span class="proj-name" id="project-name"><!-- PROJECT_NAME --></span>
+      <button class="proj-edit" id="project-edit" type="button"
+        title="Edit project name &amp; description" aria-label="edit project">✎</button>
+    </div>
     <!-- Right half: document stat counters. Visible only when a
          document is active (preview, edit, or review mode). The three
          readouts are ¶ (paragraphs), W (words), C (characters). -->
@@ -4055,6 +4228,39 @@
 
   <!-- Model + context modal -->
   <!-- Broker modal -->
+  <div id="project-modal" class="hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeProjectModal()"></div>
+    <div class="modal-panel" role="dialog" aria-labelledby="project-modal-title">
+      <div class="modal-head">
+        <h3 id="project-modal-title">project</h3>
+        <button class="modal-close" onclick="closeProjectModal()" aria-label="close">×</button>
+      </div>
+      <div class="modal-body">
+        <label class="proj-field">
+          <span class="proj-label">name</span>
+          <input type="text" id="project-name-input" class="proj-input"
+            maxlength="120" placeholder="project name" autocomplete="off">
+        </label>
+        <div class="proj-field">
+          <span class="proj-label">folder on disk (not editable)</span>
+          <code class="proj-path" id="project-path"></code>
+        </div>
+        <label class="proj-field">
+          <span class="proj-label">description</span>
+          <textarea id="project-desc-input" class="proj-textarea" rows="8" maxlength="8000"
+            placeholder="What is this project? Its purpose, scope, who it's for, how you want to work on it…"></textarea>
+        </label>
+        <div class="proj-desc-hint">
+          the agent reads this description as project context on every turn —
+          a good place to brief it before your first message.
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="proj-save-btn" onclick="saveProjectModal()">save</button>
+      </div>
+    </div>
+  </div>
+
   <div id="broker-modal" class="hidden" aria-hidden="true">
     <div class="modal-backdrop" onclick="closeBrokerModal()"></div>
     <div class="modal-panel broker-panel" role="dialog" aria-labelledby="broker-modal-title">
@@ -4850,6 +5056,62 @@
         closeBrokerModal();
       }
     });
+
+    // ---------- Project name/description modal ----------
+    function applyProjectName(name) {
+      document.getElementById('project-name').textContent = name;
+      // Browser tab title too, so you can tell instances apart at a glance.
+      document.title = name ? (name + ' — enough') : 'enough';
+    }
+    async function openProjectModal() {
+      let data;
+      try {
+        data = await (await fetch('/api/project')).json();
+      } catch (_) {
+        data = { name: '', description: '', path: '' };
+      }
+      document.getElementById('project-name-input').value = data.name || '';
+      document.getElementById('project-desc-input').value = data.description || '';
+      document.getElementById('project-path').textContent = data.path || '';
+      document.getElementById('project-modal').classList.remove('hidden');
+      const nameInput = document.getElementById('project-name-input');
+      nameInput.focus();
+      nameInput.select();
+    }
+    function closeProjectModal() {
+      document.getElementById('project-modal').classList.add('hidden');
+    }
+    window.closeProjectModal = closeProjectModal;
+    async function saveProjectModal() {
+      const name = document.getElementById('project-name-input').value;
+      const description = document.getElementById('project-desc-input').value;
+      let data;
+      try {
+        const r = await fetch('/api/project', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, description }),
+        });
+        if (!r.ok) throw new Error('save failed');
+        data = await r.json();
+      } catch (_) {
+        alert('could not save project info');
+        return;
+      }
+      applyProjectName(data.name || '');
+      closeProjectModal();
+    }
+    window.saveProjectModal = saveProjectModal;
+    document.getElementById('project-edit').addEventListener('click', openProjectModal);
+    document.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('project-modal');
+      if (modal.classList.contains('hidden')) return;
+      if (e.key === 'Escape') closeProjectModal();
+      // cmd/ctrl+enter saves from anywhere in the modal.
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) saveProjectModal();
+    });
+    // Reflect the server-templated project name into the tab title on load.
+    applyProjectName(document.getElementById('project-name').textContent.trim());
 
     // ---------- Model badge + model modal (supervisor-aware) ----------
     const modelBadge = document.getElementById('model-badge');

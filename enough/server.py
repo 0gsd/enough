@@ -383,9 +383,34 @@ def _render_empty_hint(project_dir: Path) -> str:
     """Return the HTML for the empty-conversation pane. Picks the most
     salient state-aware notice if any apply; otherwise falls back to the
     default 'awaiting your first message' italic hint."""
+    # Cloud-sync root: highest-priority warning. enough's skeleton (symlinks)
+    # and launcher (executable bit) don't survive Google Drive / Dropbox /
+    # iCloud sync between machines, so flag it up front and let the user
+    # decide how to handle it.
+    from .skeleton import cloud_sync_provider, detect_drift
+    provider = cloud_sync_provider(project_dir)
+    if provider:
+        return (
+            '<div class="empty-hint empty-hint--notice" id="empty-hint">'
+            f'<div class="notice-title">heads up — this project is inside '
+            f'{_escape_html(provider)}</div>'
+            '<ul class="notice-list">'
+            '<li>cloud sync can’t preserve the symlinks enough uses for '
+            'its <code>rness/</code> skeleton, or the executable bit on '
+            '<code>enough-on.command</code>, across machines</li>'
+            '<li>enough re-heals broken skeleton links on each launch, but '
+            'shared multi-Mac use here is still fragile</li>'
+            '</ul>'
+            '<div class="notice-cta">'
+            'for multi-Mac setups, keep projects on local disk — or use a '
+            'plain-file notes app (e.g. Obsidian) for the prose. otherwise, '
+            'carry on; this is just a heads up.'
+            '</div>'
+            '</div>'
+        )
+
     # Drift: ~/enough/defaults/ has shared defaults this rness/ is
     # missing. Surface them prominently with the /update-enough hook.
-    from .skeleton import detect_drift
     missing = detect_drift(project_dir)
     if missing:
         n = len(missing)
@@ -926,8 +951,39 @@ def create_app(
             _render_empty_hint(session.project_dir),
         )
         html = html.replace("<!-- VERSION -->", f"v{__version__}")
+        # Project display name in the header (folder basename unless the user
+        # set a custom one). Templated so there's no first-paint flash.
+        from . import project_meta
+        html = html.replace(
+            "<!-- PROJECT_NAME -->",
+            _escape_html(project_meta.load(session.project_dir)["name"]),
+        )
         # No-cache so edits-in-place don't require force-reload during dev.
         return HTMLResponse(html, headers={"Cache-Control": "no-store, must-revalidate"})
+
+    @app.get("/api/project")
+    async def api_project_get() -> dict[str, Any]:
+        """Project display metadata: editable name + description + the
+        read-only on-disk path. Powers the header title and its edit modal."""
+        from . import project_meta
+        return project_meta.load(session.project_dir)
+
+    @app.post("/api/project")
+    async def api_project_set(request: Request) -> dict[str, Any]:
+        """Persist the project's display name and/or description. Body:
+        {"name": "...", "description": "..."}. The folder on disk is never
+        renamed — only `rness/project.json` is written. Returns the refreshed
+        metadata so the UI can update the header in place."""
+        from . import project_meta
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        return project_meta.save(
+            session.project_dir,
+            (body or {}).get("name"),
+            (body or {}).get("description"),
+        )
 
     @app.get("/api/files", response_class=HTMLResponse)
     async def api_files() -> HTMLResponse:

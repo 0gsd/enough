@@ -737,9 +737,12 @@ def assemble_system_prompt(project_dir: Path) -> str:
     """
     rness = project_dir / "rness"
 
+    from . import project_meta
+
     agent = _read_or_empty(rness / "AGENT.md")
     motivation = _read_or_empty(rness / "MOTIVATION.md")
     project_profile = _read_or_empty(rness / "knowledge" / "project-profile.md")
+    description = project_meta.load(project_dir)["description"].strip()
     active_paradigm = get_active_paradigm(rness)
     paradigm = _load_active_paradigm_body(rness, active_paradigm)
     catalog = _load_paradigm_catalog(rness, active_paradigm)
@@ -749,6 +752,18 @@ def assemble_system_prompt(project_dir: Path) -> str:
         _section("Identity", agent),
         _section("Motivation", motivation),
     ]
+    # User-authored project description (set via the project-title edit
+    # dialog; stored in rness/project.json). States what this project IS and
+    # how the user wants it approached — distinct from the agent-maintained
+    # Project Profile below. Injected verbatim so the very first turn already
+    # has the project's intent in context.
+    if description:
+        parts.append(_section(
+            "Project Description",
+            "The user wrote this description of the project (editable in the "
+            "UI; informational context, not a standing instruction to act "
+            "on):\n\n" + description,
+        ))
     # Project Profile sits adjacent to Motivation — both are "what you've
     # learned" memory the agent grows over time. Skipped when the file is
     # only the stock empty template (no real observations yet) so we don't

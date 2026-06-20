@@ -22,6 +22,7 @@ demand.
 
 from __future__ import annotations
 
+import os
 import shutil
 from pathlib import Path
 
@@ -41,6 +42,38 @@ def _global_infoworld_root() -> Path:
     """The per-user shared infoworld directory. Lives at `~/enough/infoworld/`
     regardless of where the enough package itself is installed."""
     return Path.home() / "enough" / "infoworld"
+
+
+def cloud_sync_provider(path: Path) -> str | None:
+    """Human label for the cloud-sync service hosting `path`, or None.
+
+    enough's project skeleton is built from POSIX symlinks, and its
+    double-click launcher relies on the Unix executable bit. Google Drive,
+    Dropbox, iCloud Drive, and OneDrive preserve neither across machines —
+    symlinks come back blanked or as alias files, and `.command` files lose
+    `+x` on sync. A project run from inside one of these roots will see its
+    skeleton links (and launcher) break when shared between Macs. The UI
+    calls this to surface a launch-time warning."""
+    s = str(path).lower()
+    # macOS File-Provider mounts (Drive for Desktop, Dropbox, OneDrive, etc.).
+    if "/library/cloudstorage/googledrive" in s:
+        return "Google Drive"
+    if "/library/cloudstorage/dropbox" in s:
+        return "Dropbox"
+    if "/library/cloudstorage/onedrive" in s:
+        return "OneDrive"
+    if "/library/cloudstorage/icloud" in s:
+        return "iCloud Drive"
+    if "/library/cloudstorage/" in s:
+        return "a cloud-synced folder"
+    # iCloud Drive's on-disk location, plus legacy non-File-Provider roots.
+    if "/library/mobile documents/com~apple~clouddocs" in s:
+        return "iCloud Drive"
+    if "/google drive/" in s or "/googledrive-" in s:
+        return "Google Drive"
+    if "/dropbox/" in s:
+        return "Dropbox"
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -412,6 +445,83 @@ def _migrate_user_profile_to_project_profile(project_dir: Path) -> None:
         pass  # different fs / permissions / etc. — leave manual cleanup to user
 
 
+def _symlink_is_broken(link: Path) -> bool:
+    """True iff `link` is a symlink that doesn't usefully resolve — i.e.
+    dangling (target missing, e.g. an absolute path into another machine's
+    home dir) or blanked (empty target, which cloud-sync filesystems sometimes
+    leave behind). A symlink that resolves to a real file/dir is NOT broken,
+    even if it points somewhere unexpected — we don't second-guess a working
+    link. Non-symlinks always return False: a real file/dir (or a Finder
+    alias the user might be relying on) is theirs, not ours to repair."""
+    if not link.is_symlink():
+        return False
+    try:
+        target = os.readlink(link)
+    except OSError:
+        return True
+    if not target.strip():
+        return True  # blanked target — classic cloud-sync corruption
+    return not link.exists()  # follows the link; True == dangling
+
+
+def _heal_skeleton_symlinks(
+    project_dir: Path, defaults: Path, infoworld_root: Path
+) -> list[str]:
+    """Repair skeleton symlinks broken by a cloud-sync filesystem (Google
+    Drive, Dropbox, iCloud) syncing them between machines.
+
+    The per-launch `_populate_*` pass already self-heals skills/roles/
+    paradigms (it prunes dangling links and resyncs). Two surfaces it does
+    NOT cover:
+
+      1. `_SKELETON_PLAN` symlink entries (policies/*, knowledge primers) —
+         `_is_skeleton_item_present()` counts a *broken* symlink as 'present',
+         so drift-detection never repairs it. We re-point broken ones here.
+      2. The top-level `infoworld` link — only ever created on first run, so
+         an existing project whose link got mangled never recovered.
+
+    Only *broken* symlinks (dangling or blanked) are touched; working links
+    and real files (e.g. a 'customize for this project' copy) are left alone.
+    A cloud filesystem that turned the link into an alias *file* is also left
+    alone — we won't delete a real file we can't positively identify as junk.
+    Returns the destinations repaired (for logging / tests)."""
+    repaired: list[str] = []
+
+    for src_rel, dst_rel, mode in _SKELETON_PLAN:
+        if mode != "symlink":
+            continue
+        src = defaults / src_rel
+        if not src.exists():
+            continue
+        dst = project_dir / dst_rel
+        if _symlink_is_broken(dst):
+            try:
+                dst.unlink()
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                dst.symlink_to(src.resolve())
+                repaired.append(dst_rel)
+            except OSError:
+                pass
+
+    # infoworld: clear a broken link, then (re)create when nothing real is
+    # squatting the name. This also back-fills the link into older projects
+    # whose first-run predated a given enough version.
+    infoworld_link = project_dir / "infoworld"
+    if _symlink_is_broken(infoworld_link):
+        try:
+            infoworld_link.unlink()
+        except OSError:
+            pass
+    if not infoworld_link.exists() and not infoworld_link.is_symlink():
+        try:
+            infoworld_link.symlink_to(infoworld_root.resolve(), target_is_directory=True)
+            repaired.append("infoworld")
+        except OSError:
+            pass
+
+    return repaired
+
+
 def ensure_skeleton(project_dir: Path) -> bool:
     """Create `rness/` + `infoworld` symlink if missing, AND sync global
     skills/roles on every call (idempotent). Returns True on first-time
@@ -467,6 +577,11 @@ def ensure_skeleton(project_dir: Path) -> bool:
     _populate_skill_symlinks(project_dir, defaults)
     _populate_role_symlinks(project_dir, defaults)
     _populate_paradigm_symlinks(project_dir, defaults)
+
+    # ALWAYS run (idempotent): re-point any skeleton symlinks a cloud-sync
+    # filesystem broke between machines (the static plan links + infoworld),
+    # and back-fill infoworld for older projects. No-op on healthy projects.
+    _heal_skeleton_symlinks(project_dir, defaults, infoworld_root)
 
     # ALWAYS ensure the io/ scratch dirs exist — back-fills into projects
     # created before these were added to the skeleton.
