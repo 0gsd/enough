@@ -39,3 +39,4 @@ venv/
 #  ignored defensively in case someone runs enough inside the repo itself)
 rness/knowledge/session-logs/
 dev/
+tests/
