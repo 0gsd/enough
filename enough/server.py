@@ -82,15 +82,23 @@ IGNORE_DIRS = {
     ".llama-server",
 }
 
-# Paths hidden from the file-tree sidebar because they're surfaced via
-# dedicated sidebar sections at the top (paradigm picker, skills toggle,
-# roles toggle). The files themselves still exist and the agent can
-# read/write them normally — this is purely a tree-rendering filter to
-# avoid duplicating UI affordances.
+# Paths hidden from the file-tree sidebar. The files themselves still
+# exist and the agent can read/write them normally — this is purely a
+# tree-rendering filter to keep the sidebar focused on user content.
 HIDDEN_TREE_PATHS: frozenset[str] = frozenset({
+    # Surfaced via dedicated sidebar sections at the top (paradigm
+    # picker, skills toggle, roles toggle) — hidden here to avoid
+    # duplicating UI affordances.
     "rness/paradigms",
     "rness/roles",
     "rness/skills",
+    # Internal machinery the user shouldn't need to touch directly: the
+    # launcher shortcut, the active-paradigm pointer (set via the
+    # paradigm picker), and the project metadata (name + description,
+    # edited via the project title/description UI).
+    "enough-on.command",
+    "rness/active-paradigm",
+    "rness/project.json",
 })
 DEFAULT_MAX_TOOL_ITERS = 50
 

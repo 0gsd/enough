@@ -74,7 +74,8 @@
       flex: 0 0 36px;
       border-bottom: 1px solid var(--border);
       background: var(--bg-alt);
-      position: relative;  /* anchor for the absolutely-centered project title */
+      position: relative;
+      /* anchor for the absolutely-centered project title */
     }
 
     /* Project title — absolutely centered in the header so it reads as
@@ -88,8 +89,10 @@
       align-items: center;
       gap: 4px;
       max-width: 38%;
-      pointer-events: none;  /* clicks fall through except on the children */
+      pointer-events: none;
+      /* clicks fall through except on the children */
     }
+
     .topbar .project-title .proj-name {
       font-weight: 600;
       color: var(--fg);
@@ -98,6 +101,7 @@
       text-overflow: ellipsis;
       pointer-events: auto;
     }
+
     .topbar .project-title .proj-edit {
       border: none;
       background: transparent;
@@ -108,7 +112,10 @@
       line-height: 1;
       pointer-events: auto;
     }
-    .topbar .project-title .proj-edit:hover { color: var(--fg); }
+
+    .topbar .project-title .proj-edit:hover {
+      color: var(--fg);
+    }
 
     .topbar .brand {
       color: var(--fg);
@@ -1321,10 +1328,21 @@
       z-index: 25;
     }
 
-    .review-linenav .ln-mark-yellow { background: rgba(255, 215, 0, 0.92); }
-    .review-linenav .ln-mark-green  { background: rgba(127, 255, 0, 0.88); }
-    .review-linenav .ln-mark-blue   { background: rgba(64, 195, 255, 0.88); }
-    .review-linenav .ln-mark-pink   { background: rgba(255, 105, 180, 0.88); }
+    .review-linenav .ln-mark-yellow {
+      background: rgba(255, 215, 0, 0.92);
+    }
+
+    .review-linenav .ln-mark-green {
+      background: rgba(127, 255, 0, 0.88);
+    }
+
+    .review-linenav .ln-mark-blue {
+      background: rgba(64, 195, 255, 0.88);
+    }
+
+    .review-linenav .ln-mark-pink {
+      background: rgba(255, 105, 180, 0.88);
+    }
 
     .review-linenav .ln-mark:hover {
       left: 0;
@@ -2619,7 +2637,10 @@
     }
 
     /* ---------- Project name/description modal ---------- */
-    #project-modal.hidden { display: none; }
+    #project-modal.hidden {
+      display: none;
+    }
+
     #project-modal {
       position: fixed;
       inset: 0;
@@ -2628,11 +2649,13 @@
       align-items: center;
       justify-content: center;
     }
+
     #project-modal .modal-backdrop {
       position: absolute;
       inset: 0;
       background: rgba(0, 0, 0, 0.45);
     }
+
     #project-modal .modal-panel {
       position: relative;
       background: var(--bg-alt);
@@ -2645,6 +2668,7 @@
       flex-direction: column;
       box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
     }
+
     #project-modal .modal-head {
       display: flex;
       align-items: center;
@@ -2653,6 +2677,7 @@
       border-bottom: 1px solid var(--border);
       flex: 0 0 auto;
     }
+
     #project-modal .modal-head h3 {
       margin: 0;
       color: var(--fg);
@@ -2661,6 +2686,7 @@
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
+
     #project-modal .modal-close {
       background: transparent;
       border: none;
@@ -2670,7 +2696,11 @@
       cursor: pointer;
       padding: 0 4px;
     }
-    #project-modal .modal-close:hover { color: var(--fg); }
+
+    #project-modal .modal-close:hover {
+      color: var(--fg);
+    }
+
     #project-modal .modal-body {
       padding: 14px 16px;
       display: flex;
@@ -2679,13 +2709,20 @@
       overflow-y: auto;
       min-height: 0;
     }
-    #project-modal .proj-field { display: flex; flex-direction: column; gap: 4px; }
+
+    #project-modal .proj-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
     #project-modal .proj-label {
       color: var(--fg-faint);
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.7px;
     }
+
     #project-modal .proj-input,
     #project-modal .proj-textarea {
       background: var(--input-bg);
@@ -2698,6 +2735,7 @@
       width: 100%;
       box-sizing: border-box;
     }
+
     #project-modal .proj-textarea {
       font-family: var(--font-mono);
       font-size: 12px;
@@ -2705,11 +2743,13 @@
       resize: vertical;
       min-height: 130px;
     }
+
     #project-modal .proj-input:focus,
     #project-modal .proj-textarea:focus {
       outline: none;
       border-color: var(--fg-faint);
     }
+
     #project-modal .proj-path {
       color: var(--fg-muted);
       background: var(--bg-raise);
@@ -2719,12 +2759,14 @@
       word-break: break-all;
       user-select: all;
     }
+
     #project-modal .proj-desc-hint {
       color: var(--fg-faint);
       font-size: 11px;
       line-height: 1.5;
       margin-top: -4px;
     }
+
     #project-modal .modal-foot {
       display: flex;
       justify-content: flex-end;
@@ -2733,6 +2775,7 @@
       border-top: 1px solid var(--border);
       flex: 0 0 auto;
     }
+
     #project-modal .proj-save-btn {
       background: var(--input-bg);
       color: var(--fg);
@@ -2744,6 +2787,7 @@
       font-weight: 600;
       cursor: pointer;
     }
+
     #project-modal .proj-save-btn:hover {
       border-color: var(--accent-user);
       color: var(--accent-user);
@@ -3982,8 +4026,8 @@
          folder on disk is never renamed. -->
     <div class="project-title" id="project-title">
       <span class="proj-name" id="project-name"><!-- PROJECT_NAME --></span>
-      <button class="proj-edit" id="project-edit" type="button"
-        title="Edit project name &amp; description" aria-label="edit project">✎</button>
+      <button class="proj-edit" id="project-edit" type="button" title="Edit project name &amp; description"
+        aria-label="edit project">✎</button>
     </div>
     <!-- Right half: document stat counters. Visible only when a
          document is active (preview, edit, or review mode). The three
@@ -4238,8 +4282,8 @@
       <div class="modal-body">
         <label class="proj-field">
           <span class="proj-label">name</span>
-          <input type="text" id="project-name-input" class="proj-input"
-            maxlength="120" placeholder="project name" autocomplete="off">
+          <input type="text" id="project-name-input" class="proj-input" maxlength="120" placeholder="project name"
+            autocomplete="off">
         </label>
         <div class="proj-field">
           <span class="proj-label">folder on disk (not editable)</span>
@@ -4619,7 +4663,7 @@
         what: 'per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. active skills add vocabulary, recipes, or behaviors the agent will reach for during conversation.',
         how: 'click ● / ○ to toggle a skill on or off for this project. you can add project-level skills to <code>rness/skills/</code> — skill statuses are saved per project. to install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). edit a global skill at the source and the change propagates everywhere it\'s symlinked.',
         ideas: [
-          'four default skills are included: <em>analyzer</em> which can summarize or proofread any text as well as help you make decisions about anything, <em>memoir-dialectic</em> which can help you structure your memoirs, <em>skill-scanner</em> to scan downloaded 3P skills for security risks and describe what they can help you with, and <em>translator</em> (paired with the <em>translation</em> paradigm) for universal text translation.',
+          'five default skills are included:<ul><li><em>analyzer</em> which can summarize or proofread any text as well as help you make decisions about anything</li><ul><li><em>ibis-girraphiti</em> to develop editable issue-based information system (IBIS) problem graphs for your wickedest problems, in .girraph format</li><li><em>memoir-dialectic</em> which can help you structure your memoirs</li><li><em>skill-scanner</em> to scan downloaded 3P skills for security risks and describe what they can help you with</li><li><em>translator</em> (paired with the <em>translation</em> paradigm) for universal text translation</li></ul>',
           'build global or project-local skills to capture your house style or domain conventions.',
           'turn everything off for "pure conversation" — sometimes the model has more breathing room for emergent epiphanies with no scaffolding.',
         ],
@@ -6999,7 +7043,7 @@
       form.className = 'gp-add-form';
       const sel = document.createElement('select');
       [['issue', '❓ issue'], ['position', '💡 position'], ['support', '➕ support'],
-       ['objection', '➖ objection'], ['note', '📄 note'], ['girraph', '🦒 nested girraph']]
+      ['objection', '➖ objection'], ['note', '📄 note'], ['girraph', '🦒 nested girraph']]
         .forEach(([v, t]) => {
           const o = document.createElement('option');
           o.value = v; o.textContent = t;
@@ -9198,10 +9242,10 @@
       const mirror = document.createElement('div');
       const cs = getComputedStyle(ta);
       ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight',
-       'letterSpacing', 'textTransform', 'tabSize', 'paddingTop',
-       'paddingRight', 'paddingBottom', 'paddingLeft'].forEach((p) => {
-        mirror.style[p] = cs[p];
-      });
+        'letterSpacing', 'textTransform', 'tabSize', 'paddingTop',
+        'paddingRight', 'paddingBottom', 'paddingLeft'].forEach((p) => {
+          mirror.style[p] = cs[p];
+        });
       mirror.style.position = 'absolute';
       mirror.style.visibility = 'hidden';
       mirror.style.left = '-99999px';
