@@ -159,6 +159,15 @@
       justify-content: center;
       font-size: 15px;
       line-height: 1;
+      /* Stay clickable above the absolutely-positioned centered project
+         title, which can overlap the icon row at narrow widths. */
+      position: relative;
+      z-index: 2;
+    }
+
+    .topbar .model-badge {
+      position: relative;
+      z-index: 2;
     }
 
     /* Pushes the right-side counters away from the left button
@@ -4000,6 +4009,711 @@
     #tree-prompt-modal .prompt-actions button.primary:hover {
       filter: brightness(1.08);
     }
+
+    /* ---------- Wikisink: setup modal ---------- */
+    #wiki-setup-modal.hidden {
+      display: none;
+    }
+
+    #wiki-setup-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #wiki-setup-modal .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    #wiki-setup-modal .modal-panel {
+      position: relative;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 480px;
+      max-width: 580px;
+      max-height: 86vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    #wiki-setup-modal .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+
+    #wiki-setup-modal .modal-head h3 {
+      margin: 0;
+      color: var(--fg);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    #wiki-setup-modal .modal-close {
+      background: none;
+      border: none;
+      color: var(--fg-muted);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
+    #wiki-setup-modal .modal-close:hover {
+      color: var(--fg);
+    }
+
+    #wiki-setup-modal .modal-body {
+      padding: 14px 16px;
+      overflow-y: auto;
+      color: var(--fg);
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+
+    #wiki-setup-modal .modal-foot {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex: 0 0 auto;
+    }
+
+    #wiki-setup-modal .modal-foot button {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 6px 14px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    #wiki-setup-modal .modal-foot button.primary {
+      background: var(--accent-user);
+      color: var(--bg);
+      border-color: transparent;
+      font-weight: 600;
+    }
+
+    #wiki-setup-modal .modal-foot button:hover {
+      filter: brightness(1.1);
+    }
+
+    .wiki-setup-intro {
+      color: var(--fg-muted);
+      margin: 0 0 12px;
+    }
+
+    .wiki-flavor {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      padding: 7px 9px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+
+    .wiki-flavor:hover {
+      background: var(--bg-raise);
+    }
+
+    .wiki-flavor input {
+      flex: 0 0 auto;
+    }
+
+    .wiki-flavor .fl-label {
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    .wiki-flavor .fl-size {
+      color: var(--accent-tool);
+      font-weight: 600;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    .wiki-flavor .fl-blurb {
+      display: block;
+      color: var(--fg-muted);
+      font-size: 11.5px;
+    }
+
+    .wiki-dim {
+      color: var(--fg-faint);
+      padding: 8px 0;
+    }
+
+    .wiki-storage-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 12px;
+    }
+
+    .wiki-storage-field .lbl {
+      color: var(--fg-muted);
+      font-size: 11px;
+    }
+
+    .wiki-storage-field input {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 6px 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .wiki-diskfree {
+      color: var(--fg-faint);
+      font-size: 11px;
+      margin-top: 4px;
+      min-height: 14px;
+    }
+
+    .wiki-confirm-text {
+      color: var(--fg);
+    }
+
+    .wiki-progress-bar {
+      height: 10px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      margin: 10px 0 8px;
+    }
+
+    .wiki-progress-bar .fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-agent);
+      transition: width 0.4s ease;
+    }
+
+    .wiki-progress-stats {
+      color: var(--fg-muted);
+      font-size: 11.5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .wiki-setup-error {
+      color: var(--accent-error);
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+
+    /* ---------- Wikisink: view mode ---------- */
+    /* Browser-style offline Wikipedia reader. Same full-frame overlay
+       skeleton as #review-mode; "fancy style" typography but a notch
+       smaller and with thinner margins (wider column) than review. */
+    #wiki-mode {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--review-bg, var(--bg));
+      color: var(--review-fg, var(--fg));
+      z-index: 30;
+    }
+
+    #wiki-mode.open {
+      display: flex;
+    }
+
+    .wiki-toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 7px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-alt);
+      color: var(--fg);
+      flex: 0 0 auto;
+    }
+
+    .wiki-toolbar button {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      min-width: 28px;
+      height: 26px;
+      padding: 0 7px;
+      font-size: 13px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .wiki-toolbar button:hover:not(:disabled) {
+      filter: brightness(1.15);
+    }
+
+    .wiki-toolbar button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .wiki-search-wrap {
+      position: relative;
+      flex: 0 1 320px;
+      min-width: 150px;
+    }
+
+    .wiki-search-wrap input {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 12.5px;
+    }
+
+    #wiki-suggest {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 2px;
+      background: var(--bg-raise);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      z-index: 40;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    #wiki-suggest .sug {
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 12.5px;
+      color: var(--fg);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #wiki-suggest .sug:hover,
+    #wiki-suggest .sug.active {
+      background: var(--input-bg);
+    }
+
+    .wiki-title-span {
+      font-weight: 600;
+      color: var(--fg);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 26%;
+      margin-left: 6px;
+    }
+
+    .wiki-source-badge {
+      font-size: 10.5px;
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+
+    .wiki-source-badge.live {
+      color: var(--accent-agent);
+      border-color: var(--accent-agent);
+    }
+
+    .wiki-source-badge.preserved {
+      color: var(--accent-tool);
+      border-color: var(--accent-tool);
+    }
+
+    .wiki-toolbar .spacer {
+      flex: 1;
+    }
+
+    /* Article body: 16px serif on a ~820px column (review mode is 18px
+       on ~720px) — encyclopedia-dense but still fancy. */
+    .wiki-body {
+      flex: 1;
+      overflow: auto;
+      padding: 40px max(40px, calc(50% - 410px)) 120px;
+      font-size: 16px;
+      line-height: 1.6;
+      font-family: var(--font-serif, Georgia, 'Times New Roman', serif);
+      color: var(--review-fg, var(--fg));
+    }
+
+    .wiki-body h1,
+    .wiki-body h2,
+    .wiki-body h3,
+    .wiki-body h4 {
+      font-weight: 700;
+      line-height: 1.25;
+      margin: 1.4em 0 0.5em;
+      color: var(--review-fg, var(--fg));
+    }
+
+    .wiki-body h1 { font-size: 1.7em; }
+    .wiki-body h2 {
+      font-size: 1.35em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.15em;
+    }
+    .wiki-body h3 { font-size: 1.15em; }
+
+    .wiki-body p { margin: 0.7em 0; }
+
+    .wiki-body a[data-wiki-path] {
+      color: var(--accent-user);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .wiki-body a[data-wiki-path]:hover {
+      text-decoration: underline;
+    }
+
+    .wiki-body a.wiki-external {
+      color: var(--accent-agent);
+    }
+
+    .wiki-body a.wiki-external::after {
+      content: '↗';
+      font-size: 0.75em;
+      vertical-align: super;
+      margin-left: 1px;
+    }
+
+    .wiki-body ul,
+    .wiki-body ol { margin: 0.6em 0 0.6em 1.6em; }
+
+    .wiki-body blockquote {
+      border-left: 3px solid var(--border);
+      margin: 0.8em 0;
+      padding: 0.1em 0 0.1em 12px;
+      color: var(--review-fg-muted, var(--fg-muted));
+    }
+
+    .wiki-body table {
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 0.8em 0;
+      font-family: var(--font-mono);
+    }
+
+    .wiki-body th,
+    .wiki-body td {
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .wiki-body th {
+      background: var(--review-code-bg, var(--bg-raise));
+    }
+
+    /* Wikipedia infoboxes keep their class through sanitization; pin
+       them to the right like the real thing. */
+    .wiki-body table.infobox {
+      float: right;
+      clear: right;
+      max-width: 300px;
+      margin: 0 0 12px 18px;
+      background: var(--review-code-bg, var(--bg-raise));
+    }
+
+    .wiki-body sup { font-size: 0.7em; }
+
+    .wiki-body code,
+    .wiki-body pre {
+      font-family: var(--font-mono);
+      background: var(--review-code-bg, var(--bg-raise));
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    .wiki-body pre {
+      padding: 10px 12px;
+      overflow-x: auto;
+    }
+
+    .wiki-note {
+      color: var(--review-fg-muted, var(--fg-muted));
+      font-style: italic;
+      margin: 2em auto;
+      max-width: 480px;
+      text-align: center;
+    }
+
+    .wiki-results h2 {
+      font-size: 1.2em;
+    }
+
+    .wiki-results .hit {
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wiki-results .hit a {
+      font-size: 1.05em;
+    }
+
+    #wiki-toast {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--bg-raise);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 12.5px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 50;
+      max-width: 70%;
+    }
+
+    #wiki-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #wiki-toast.error {
+      color: var(--accent-error);
+      border-color: var(--accent-error);
+    }
+
+    /* ---------- Wikisink: comments ---------- */
+    .wiki-comment-mark {
+      background: color-mix(in srgb, var(--accent-tool) 26%, transparent);
+      border-bottom: 2px solid var(--accent-tool);
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    .wiki-comment-mark.resolved {
+      background: transparent;
+      border-bottom-style: dotted;
+      opacity: 0.75;
+    }
+
+    .wiki-para-pin {
+      display: inline-block;
+      cursor: pointer;
+      font-size: 0.8em;
+      margin-right: 6px;
+      opacity: 0.8;
+      user-select: none;
+    }
+
+    #wiki-comments-panel {
+      position: absolute;
+      top: 41px;
+      right: 0;
+      bottom: 0;
+      width: 320px;
+      background: var(--bg-alt);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+      z-index: 35;
+      padding: 10px;
+      font-size: 12.5px;
+      font-family: var(--font-mono);
+      color: var(--fg);
+    }
+
+    #wiki-comments-panel .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--fg-muted);
+      margin-bottom: 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .wiki-comment-card {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg-raise);
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+
+    .wiki-comment-card.focus {
+      border-color: var(--accent-tool);
+      box-shadow: 0 0 0 1px var(--accent-tool);
+    }
+
+    .wiki-comment-card.resolved {
+      opacity: 0.62;
+    }
+
+    .wiki-comment-card .c-quote {
+      color: var(--fg-muted);
+      border-left: 2px solid var(--accent-tool);
+      padding-left: 7px;
+      margin-bottom: 5px;
+      font-size: 11.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wiki-comment-card .c-body {
+      white-space: pre-wrap;
+      margin-bottom: 5px;
+    }
+
+    .wiki-comment-card .c-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--fg-faint);
+      font-size: 10.5px;
+      margin-bottom: 4px;
+    }
+
+    .wiki-state-chip {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 6px;
+      font-size: 9.5px;
+      color: var(--fg-muted);
+    }
+
+    .wiki-state-chip.orphaned {
+      color: var(--accent-error);
+      border-color: var(--accent-error);
+    }
+
+    .wiki-comment-card .c-replies {
+      border-top: 1px dashed var(--border);
+      margin-top: 5px;
+      padding-top: 5px;
+    }
+
+    .wiki-comment-card .c-reply {
+      color: var(--fg-muted);
+      margin-bottom: 4px;
+      padding-left: 8px;
+      white-space: pre-wrap;
+    }
+
+    .wiki-comment-card .c-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .wiki-comment-card .c-actions button,
+    .wiki-composer button {
+      background: var(--input-bg);
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 10.5px;
+      padding: 2px 7px;
+      cursor: pointer;
+    }
+
+    .wiki-comment-card .c-actions button:hover,
+    .wiki-composer button:hover {
+      color: var(--fg);
+      filter: brightness(1.15);
+    }
+
+    .wiki-comment-card textarea,
+    .wiki-composer textarea {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 5px 7px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    .wiki-composer {
+      border: 1px solid var(--accent-tool);
+      border-radius: 6px;
+      background: var(--bg-raise);
+      padding: 8px 10px;
+      margin-bottom: 10px;
+    }
+
+    .wiki-composer .lbl {
+      color: var(--fg-muted);
+      font-size: 10.5px;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .wiki-composer .row {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+      margin-top: 6px;
+    }
+
+    #wiki-sel-popup {
+      position: absolute;
+      display: none;
+      gap: 4px;
+      background: var(--bg-raise);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px;
+      z-index: 45;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    #wiki-sel-popup.show {
+      display: flex;
+    }
+
+    #wiki-sel-popup button {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 11.5px;
+      padding: 4px 8px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    #wiki-sel-popup button:hover {
+      filter: brightness(1.2);
+    }
   </style>
 </head>
 
@@ -4014,6 +4728,8 @@
       aria-label="broker">🔀</button>
     <button id="ui-btn" class="icon-btn" title="UI preferences + keyboard shortcuts + markdown cheat sheet"
       aria-label="ui preferences">🖌️</button>
+    <button id="wikisink-btn" class="icon-btn" title="Wikisink — your local offline Wikipedia: browse, save, comment, update"
+      aria-label="wikisink">🚰</button>
     <button id="model-badge" class="model-badge off"
       title="Model &amp; context window — bottom bar shows live token-pressure">
       <span class="dot"></span>
@@ -4242,6 +4958,69 @@
         <div class="girraph-body" id="girraph-body"></div>
       </div>
 
+      <!-- Wikisink view mode: browser-style offline Wikipedia reader.
+           Reads straight out of the ZIM archive (with overlay/preserved
+           precedence) via /api/wiki/*; internal links stay in-app via
+           data-wiki-path delegation. Chat pill reuses the review-chat
+           classes wholesale. -->
+      <div id="wiki-mode" aria-hidden="true">
+        <div class="wiki-toolbar" id="wiki-toolbar">
+          <button type="button" id="wiki-back" title="back" disabled>←</button>
+          <button type="button" id="wiki-fwd" title="forward" disabled>→</button>
+          <div class="wiki-search-wrap">
+            <input id="wiki-search" placeholder="search wikipedia…" autocomplete="off" spellcheck="false">
+            <div id="wiki-suggest" hidden></div>
+          </div>
+          <button type="button" id="wiki-random" title="random article">🎲</button>
+          <span class="wiki-title-span" id="wiki-article-title" data-help="wikisink"></span>
+          <span class="wiki-source-badge" id="wiki-source-badge" hidden></span>
+          <span class="spacer"></span>
+          <button type="button" id="wiki-comment-here"
+            title="add a comment anchored to the paragraph nearest the middle of the view">💬</button>
+          <button type="button" id="wiki-save-project"
+            title="save this article to the project's wiki/ folder as markdown">📥</button>
+          <button type="button" id="wiki-save-infoworld"
+            title="save this article to ~/enough/infoworld/wiki (shared across all projects)">🌐</button>
+          <button type="button" id="wiki-override" hidden
+            title="deletion override — keep this article's local copy forever and stop updating it">🛡</button>
+          <button type="button" id="wiki-comments-toggle" data-help="wiki-comments"
+            title="show/hide the comments panel">🗨</button>
+          <button type="button" id="wiki-settings"
+            title="wikisink settings — archive info, updates, storage">⚙</button>
+        </div>
+        <div class="wiki-body" id="wiki-body" data-path=""></div>
+        <div id="wiki-comments-panel" hidden>
+          <div class="panel-head" data-help="wiki-comments">
+            <span>comments</span>
+            <button type="button" class="modal-close" onclick="toggleWikiCommentsPanel(false)"
+              aria-label="close comments">×</button>
+          </div>
+          <div id="wiki-composer-slot"></div>
+          <div id="wiki-comments-list"></div>
+        </div>
+        <div id="wiki-sel-popup" role="dialog" aria-hidden="true">
+          <button type="button" id="wsp-comment">💬 comment</button>
+          <button type="button" id="wsp-ask">🤖 ask agent</button>
+          <button type="button" id="wsp-save">📥 save article</button>
+        </div>
+        <div class="review-chat" id="wiki-chat">
+          <div class="review-chat-head" onclick="toggleWikiChat()">
+            <span>chat</span>
+            <span class="toggle" id="wiki-chat-toggle">▾</span>
+          </div>
+          <div class="review-chat-tail" id="wiki-chat-tail"></div>
+          <div class="review-chat-chip" id="wiki-chat-chip" hidden>
+            <span class="lbl">↪ context:</span>
+            <span class="text" id="wiki-chat-chip-text"></span>
+            <button type="button" id="wiki-chat-chip-clear" title="clear queued selection">×</button>
+          </div>
+          <form class="review-chat-form" id="wiki-chat-form" onsubmit="event.preventDefault(); sendFromWikiChat();">
+            <textarea id="wiki-chat-input" rows="2" placeholder="ask the agent about this article…"></textarea>
+            <button type="submit">send</button>
+          </form>
+        </div>
+      </div>
+
       <!-- Per-highlight popup (Phase 5c). Floats above everything,
            absolutely positioned next to whatever handle was clicked.
            One element reused across all handles to avoid DOM bloat
@@ -4302,6 +5081,48 @@
       <div class="modal-foot">
         <button class="proj-save-btn" onclick="saveProjectModal()">save</button>
       </div>
+    </div>
+  </div>
+
+  <div id="wiki-setup-modal" class="hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="wikiBackdropClose()"></div>
+    <div class="modal-panel" role="dialog" aria-labelledby="wiki-setup-title">
+      <div class="modal-head">
+        <h3 id="wiki-setup-title" data-help="wikisink">🚰 wikisink — local wikipedia</h3>
+        <button class="modal-close" onclick="closeWikiSetup()" aria-label="close">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="wiki-setup-choose">
+          <p class="wiki-setup-intro">
+            wikisink puts an offline copy of english wikipedia on your
+            machine — browsable and searchable in-app, readable by the
+            agent, no internet needed once installed. pick a size:
+          </p>
+          <div id="wiki-flavor-list">
+            <div class="wiki-dim">loading current sizes from download.kiwix.org…</div>
+          </div>
+          <label class="wiki-storage-field">
+            <span class="lbl">store it at (any folder works — external drives too)</span>
+            <input type="text" id="wiki-storage-input" value="~/enough/wikisink"
+              spellcheck="false" autocomplete="off">
+          </label>
+          <div class="wiki-diskfree" id="wiki-diskfree"></div>
+        </div>
+        <div id="wiki-setup-confirm" hidden>
+          <p class="wiki-confirm-text" id="wiki-confirm-text"></p>
+        </div>
+        <div id="wiki-setup-progress" hidden>
+          <div id="wiki-progress-label" class="wiki-setup-intro"></div>
+          <div class="wiki-progress-bar"><div class="fill" id="wiki-progress-fill"></div></div>
+          <div class="wiki-progress-stats" id="wiki-progress-stats"></div>
+        </div>
+        <div id="wiki-setup-done" hidden>
+          <p>✅ the archive is installed and ready. the 🚰 button now opens
+            wikisink view — enjoy the rabbit holes.</p>
+        </div>
+        <div class="wiki-setup-error" id="wiki-setup-error" hidden></div>
+      </div>
+      <div class="modal-foot" id="wiki-setup-foot"></div>
     </div>
   </div>
 
@@ -4635,6 +5456,37 @@
     // (or the [?] itself). Click opens a themed right-side viewer with three
     // sections: what / how / ideas.
     const HELP_DOCS = {
+      'wikisink': {
+        name: 'wikisink',
+        path: '~/enough/wikisink/',
+        what: 'your local, offline copy of (a slice of) english wikipedia — a single Kiwix ZIM archive read in place, never extracted, so the file manager only ever shows articles you explicitly save. the 🚰 button opens a browser-style reader with full-text search, cross-links, a random-article die, an agent chat pill, comments, and two save buttons (📥 project <code>wiki/</code>, 🌐 <code>infoworld/wiki/</code>). the agent can search and read the whole archive via its wiki tools.',
+        how: 'first click of 🚰 runs the setup wizard: pick a size (top-1M-articles no-images ≈ 16 GB is the default; full english ≈ 49 GB; smaller options too), pick a storage folder (external drives work), confirm, and let the resumable download run — pause, quit, resume anytime. once installed, ask the agent to run a <strong>wikisink</strong> to refresh your saved/commented ("watched") articles from live wikipedia and get a report: watched-article changes, edit spikes, pageview movers &amp; losers, and suspicious deletions. the 🛡 button on any article is the <em>deletion override</em>: keep your local copy forever, excluded from updates. ⚙ opens settings, including base-archive replacement when a newer snapshot ships.',
+        ideas: [
+          'save the articles a project leans on into its <code>wiki/</code> folder — the agent grounds itself on them (with CC BY-SA attribution frontmatter built in).',
+          'comment on claims you doubt, then run a wikisink later — comments survive article updates (re-pinned or orphaned, never lost) and commented articles are watched automatically.',
+          'when a wikisink report flags a suspicious deletion (deleted for "notability" rather than quality — the classic case), open the article and hit 🛡 before the next base-archive swap.',
+        ],
+      },
+      'project-wiki': {
+        name: 'wiki/',
+        path: 'wiki/',
+        what: 'wikipedia articles saved into this project from the wikisink browser (📥). each file is markdown with attribution frontmatter: title, source URL, CC BY-SA license, retrieval date, and which archive snapshot or live revision it came from.',
+        how: 'created automatically on your first project-level save — no setup. wikisink update runs treat everything here as <em>watched</em>: refreshed from live wikipedia and reported on. re-saving an article overwrites the file with the freshest copy. (🌐 saves to the global <code>infoworld/wiki/</code> instead, shared across all projects.)',
+        ideas: [
+          'saved articles are plain markdown — the agent can grep, read, and quote them like any other project file.',
+          'wikipedia text is CC BY-SA: if part of an article ends up in something you publish, the frontmatter has everything you need for attribution.',
+        ],
+      },
+      'wiki-comments': {
+        name: 'comments',
+        path: '~/enough/wikisink/comments/',
+        what: 'google-docs-style comments on wikipedia articles — highlight text and hit 💬, or use the toolbar 💬 to pin a comment to a paragraph. threads support replies and resolve/reopen. comments attach to the <em>article</em>, not to any saved file, so they follow the article whether it\'s saved, merely browsed, updated, or even deleted from live wikipedia.',
+        how: 'select text in the wikisink reader → 💬 comment. anchoring degrades gracefully when articles change: exact text match first; if the quoted text was edited away, the comment re-pins to its paragraph (marked "re-pinned"); if the paragraph is gone too it survives as "orphaned" in the panel. nothing is ever deleted automatically. commenting on an article adds it to the watched set for wikisink updates.',
+        ideas: [
+          'comment on statistics or claims likely to change — after a wikisink run, re-pinned comments are a signal that exact spot was edited.',
+          'ask the agent about a highlighted passage via 🤖 in the selection popup — the passage is quoted into the chat automatically.',
+        ],
+      },
       'paradigm-active': {
         name: 'paradigm',
         path: 'rness/active-paradigm',
@@ -4851,26 +5703,32 @@
       }, 5000);
     }
 
-    // Event delegation on the sidebar — works across HTMX file-tree refreshes.
+    // Event delegation for the hover-? affordance — works across HTMX
+    // refreshes. Bound to every surface that carries data-help elements:
+    // the sidebar, the wikisink browser, and the wikisink setup modal.
     // mouseover/mouseout bubble (mouseenter/leave don't), so we filter via
     // relatedTarget to detect actual row entry/exit.
-    const sidebarEl = document.querySelector('.sidebar');
-    if (sidebarEl) {
-      sidebarEl.addEventListener('mouseover', (e) => {
+    for (const rootSel of ['.sidebar', '#wiki-mode', '#wiki-setup-modal']) {
+      const rootEl = document.querySelector(rootSel);
+      if (!rootEl) continue;
+      rootEl.addEventListener('mouseover', (e) => {
         const row = e.target.closest('[data-help]');
         if (!row) return;
         const from = e.relatedTarget;
         if (from && row.contains(from)) return;
         _scheduleHelpShow(row);
       });
-      sidebarEl.addEventListener('mouseout', (e) => {
+      rootEl.addEventListener('mouseout', (e) => {
         const row = e.target.closest('[data-help]');
         if (!row) return;
         const to = e.relatedTarget;
         if (to && row.contains(to)) return;
         _scheduleHelpFade(row);
       });
-      // Clicking a tree file opens the preview — close help to avoid stacking.
+    }
+    // Clicking a tree file opens the preview — close help to avoid stacking.
+    const sidebarEl = document.querySelector('.sidebar');
+    if (sidebarEl) {
       sidebarEl.addEventListener('click', (e) => {
         if (e.target.closest('.file-row a')) closeHelp();
       });
@@ -6097,6 +6955,9 @@
       if (typeof refreshEditChatTail === 'function') {
         refreshEditChatTail();
       }
+      if (typeof refreshWikiChatTail === 'function') {
+        refreshWikiChatTail();
+      }
     }
 
     function currentResponse() {
@@ -6282,6 +7143,1072 @@
     es.addEventListener('reset', () => {
       conversation.insertAdjacentHTML('beforeend', '<hr class="reset-divider">');
       autoscroll();
+    });
+
+    // ---------- Wikisink (🚰): setup wizard + download progress ----------
+    //
+    // First click walks the user through choosing an archive flavor and
+    // storage location, confirms the multi-GB download, then streams
+    // progress over SSE. Once installed, the button opens wiki view mode.
+
+    let WIKI_STATUS = null;
+    let WIKI_SETUP_STATE = 'choose'; // choose | confirm | downloading | paused | done | error
+    let WIKI_CHOSEN = null;          // flavor entry selected in the wizard
+    let WIKI_FLAVORS = [];
+
+    function wikiFmtBytes(n) {
+      if (!n && n !== 0) return '?';
+      const G = 1024 ** 3, M = 1024 ** 2, K = 1024;
+      if (n >= G) return (n / G).toFixed(1).replace(/\.0$/, '') + ' GB';
+      if (n >= M) return (n / M).toFixed(0) + ' MB';
+      if (n >= K) return (n / K).toFixed(0) + ' KB';
+      return n + ' B';
+    }
+
+    async function fetchWikiStatus() {
+      try { return await (await fetch('/api/wiki/status')).json(); }
+      catch (_) { return null; }
+    }
+
+    async function onWikisinkClick() {
+      WIKI_STATUS = await fetchWikiStatus();
+      if (WIKI_STATUS && WIKI_STATUS.installed) {
+        if (typeof enterWikiMode === 'function') enterWikiMode();
+        return;
+      }
+      openWikiSetup();
+    }
+    document.getElementById('wikisink-btn').addEventListener('click', onWikisinkClick);
+
+    function setWikiSetupState(state) {
+      WIKI_SETUP_STATE = state;
+      const sections = {
+        choose: 'wiki-setup-choose',
+        confirm: 'wiki-setup-confirm',
+        downloading: 'wiki-setup-progress',
+        paused: 'wiki-setup-progress',
+        error: 'wiki-setup-progress',
+        done: 'wiki-setup-done',
+      };
+      for (const id of ['wiki-setup-choose', 'wiki-setup-confirm',
+                        'wiki-setup-progress', 'wiki-setup-done']) {
+        document.getElementById(id).hidden = id !== sections[state];
+      }
+      const err = document.getElementById('wiki-setup-error');
+      if (state !== 'error') { err.hidden = true; err.textContent = ''; }
+      renderWikiSetupFoot();
+    }
+
+    function wikiSetupError(msg) {
+      const err = document.getElementById('wiki-setup-error');
+      err.textContent = msg;
+      err.hidden = false;
+      WIKI_SETUP_STATE = 'error';
+      renderWikiSetupFoot();
+    }
+
+    function renderWikiSetupFoot() {
+      const foot = document.getElementById('wiki-setup-foot');
+      const b = (label, fn, primary) =>
+        `<button class="${primary ? 'primary' : ''}" onclick="${fn}">${label}</button>`;
+      switch (WIKI_SETUP_STATE) {
+        case 'choose':
+          foot.innerHTML = b('continue →', 'wikiSetupConfirmStep()', true);
+          break;
+        case 'confirm':
+          foot.innerHTML = b('← back', 'setWikiSetupState(\'choose\')', false) +
+            b(`yes — download ${WIKI_CHOSEN ? WIKI_CHOSEN.size_human : ''}`,
+              'startWikiDownload()', true);
+          break;
+        case 'downloading':
+          foot.innerHTML = b('pause', 'wikiDownloadCtl(\'pause\')', false) +
+            b('cancel', 'wikiDownloadCtl(\'cancel\')', false);
+          break;
+        case 'paused':
+          foot.innerHTML = b('cancel', 'wikiDownloadCtl(\'cancel\')', false) +
+            b('resume', 'wikiDownloadCtl(\'resume\')', true);
+          break;
+        case 'error':
+          foot.innerHTML = b('cancel', 'wikiDownloadCtl(\'cancel\')', false) +
+            b('retry', 'wikiDownloadCtl(\'resume\')', true);
+          break;
+        case 'done':
+          foot.innerHTML = b('open wikisink 🚰', 'wikiSetupOpenView()', true);
+          break;
+      }
+    }
+
+    let _wikiModalOpenedAt = 0;
+
+    async function openWikiSetup() {
+      _wikiModalOpenedAt = Date.now();
+      document.getElementById('wiki-setup-modal').classList.remove('hidden');
+      WIKI_STATUS = WIKI_STATUS || await fetchWikiStatus();
+      const dl = (WIKI_STATUS && WIKI_STATUS.download) || {};
+      if (dl.status === 'downloading' || dl.status === 'paused' || dl.status === 'error') {
+        setWikiSetupState(dl.status === 'downloading' ? 'downloading' : 'paused');
+        updateWikiProgressUI({
+          status: dl.status, bytes_done: dl.bytes_done, bytes_total: dl.bytes_total,
+        });
+        if (dl.status === 'error' && dl.error) wikiSetupError(dl.error);
+        return;
+      }
+      setWikiSetupState('choose');
+      if (WIKI_STATUS && WIKI_STATUS.storage_dir) {
+        document.getElementById('wiki-storage-input').value = WIKI_STATUS.storage_dir;
+      }
+      refreshWikiDiskfree();
+      try {
+        const js = await (await fetch('/api/wiki/flavors')).json();
+        WIKI_FLAVORS = js.flavors || [];
+        const list = document.getElementById('wiki-flavor-list');
+        list.innerHTML = WIKI_FLAVORS.map((f, i) => `
+          <label class="wiki-flavor">
+            <input type="radio" name="wiki-flavor" value="${f.flavor}" ${f.is_default ? 'checked' : ''}>
+            <span><span class="fl-label">${escapeHtml(f.label)}</span>
+              <span class="fl-blurb">${escapeHtml(f.blurb)} · snapshot ${escapeHtml(f.date)}</span></span>
+            <span class="fl-size">${escapeHtml(f.size_human)}</span>
+          </label>`).join('');
+        if (!js.live) {
+          list.insertAdjacentHTML('beforeend',
+            '<div class="wiki-dim">couldn\'t reach download.kiwix.org — sizes shown are approximate.</div>');
+        }
+      } catch (_) {
+        document.getElementById('wiki-flavor-list').innerHTML =
+          '<div class="wiki-dim">could not load the flavor list — check your connection and reopen.</div>';
+      }
+    }
+
+    function closeWikiSetup() {
+      document.getElementById('wiki-setup-modal').classList.add('hidden');
+    }
+    window.closeWikiSetup = closeWikiSetup;
+    // Backdrop dismissal ignores clicks that land within a beat of the
+    // modal opening — the opening click's trailing events (or an eager
+    // double-click on 🚰) would otherwise close it instantly.
+    function wikiBackdropClose() {
+      if (Date.now() - _wikiModalOpenedAt < 400) return;
+      closeWikiSetup();
+    }
+    window.wikiBackdropClose = wikiBackdropClose;
+    window.setWikiSetupState = setWikiSetupState;
+
+    let _wikiDiskTimer = null;
+    function refreshWikiDiskfree() {
+      clearTimeout(_wikiDiskTimer);
+      _wikiDiskTimer = setTimeout(async () => {
+        const dir = document.getElementById('wiki-storage-input').value.trim();
+        const out = document.getElementById('wiki-diskfree');
+        if (!dir) { out.textContent = ''; return; }
+        try {
+          const js = await (await fetch('/api/wiki/diskspace?dir=' + encodeURIComponent(dir))).json();
+          out.textContent = `free space there: ${js.free_human}`;
+        } catch (_) { out.textContent = ''; }
+      }, 250);
+    }
+    document.getElementById('wiki-storage-input').addEventListener('input', refreshWikiDiskfree);
+
+    function wikiSetupConfirmStep() {
+      const picked = document.querySelector('input[name="wiki-flavor"]:checked');
+      if (!picked) return;
+      WIKI_CHOSEN = WIKI_FLAVORS.find(f => f.flavor === picked.value);
+      if (!WIKI_CHOSEN) return;
+      const dir = document.getElementById('wiki-storage-input').value.trim() || '~/enough/wikisink';
+      document.getElementById('wiki-confirm-text').textContent =
+        `are you sure? this downloads ${WIKI_CHOSEN.size_human} ` +
+        `(${WIKI_CHOSEN.label}, snapshot ${WIKI_CHOSEN.date}) from download.kiwix.org ` +
+        `into ${dir}. it can take a while on a normal connection, but it's ` +
+        `pausable, resumable, and survives restarts — everything else keeps ` +
+        `working while it runs.`;
+      setWikiSetupState('confirm');
+    }
+    window.wikiSetupConfirmStep = wikiSetupConfirmStep;
+
+    async function startWikiDownload() {
+      const dir = document.getElementById('wiki-storage-input').value.trim();
+      try {
+        const r = await fetch('/api/wiki/setup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ flavor: WIKI_CHOSEN.flavor, storage_dir: dir }),
+        });
+        if (!r.ok) {
+          const js = await r.json().catch(() => ({}));
+          throw new Error(js.detail || `setup failed (${r.status})`);
+        }
+        setWikiSetupState('downloading');
+        document.getElementById('wiki-progress-label').textContent =
+          `downloading ${WIKI_CHOSEN.filename}…`;
+      } catch (e) {
+        wikiSetupError(String(e.message || e));
+      }
+    }
+    window.startWikiDownload = startWikiDownload;
+
+    async function wikiDownloadCtl(action) {
+      try {
+        const r = await fetch('/api/wiki/download/' + action, { method: 'POST' });
+        if (!r.ok) {
+          const js = await r.json().catch(() => ({}));
+          throw new Error(js.detail || `${action} failed`);
+        }
+        if (action === 'cancel') { setWikiSetupState('choose'); openWikiSetup(); }
+        if (action === 'resume') setWikiSetupState('downloading');
+        // pause confirmation arrives via the wiki_download SSE event
+      } catch (e) {
+        wikiSetupError(String(e.message || e));
+      }
+    }
+    window.wikiDownloadCtl = wikiDownloadCtl;
+
+    async function wikiSetupOpenView() {
+      closeWikiSetup();
+      WIKI_STATUS = await fetchWikiStatus();
+      if (typeof enterWikiMode === 'function') enterWikiMode();
+    }
+    window.wikiSetupOpenView = wikiSetupOpenView;
+
+    function updateWikiProgressUI(d) {
+      const fill = document.getElementById('wiki-progress-fill');
+      const stats = document.getElementById('wiki-progress-stats');
+      const pct = d.pct != null ? d.pct
+        : (d.bytes_total ? Math.round(1000 * d.bytes_done / d.bytes_total) / 10 : null);
+      if (pct != null) fill.style.width = pct + '%';
+      const bits = [];
+      if (pct != null) bits.push(pct.toFixed(1) + '%');
+      bits.push(`${wikiFmtBytes(d.bytes_done)} / ${wikiFmtBytes(d.bytes_total)}`);
+      if (d.rate_bps) bits.push(wikiFmtBytes(d.rate_bps) + '/s');
+      if (d.eta_s != null) {
+        const h = Math.floor(d.eta_s / 3600), m = Math.round((d.eta_s % 3600) / 60);
+        bits.push('~' + (h ? `${h}h ${m}m` : `${m}m`) + ' left');
+      }
+      stats.textContent = bits.join(' · ');
+    }
+
+    // ---------- Wikisink (🚰): view mode ----------
+    //
+    // Browser-style reader over the local archive. History is a simple
+    // stack (back/forward), search combines live title suggestions with
+    // full-text results, and every article render re-applies comments.
+
+    let WIKI_PATH = null;      // ZIM path of the loaded article
+    let WIKI_TITLE = null;
+    let WIKI_HISTORY = [];
+    let WIKI_HISTORY_IDX = -1;
+    let LAST_WIKI_SELECTION = null;  // sticky selection snapshot (chat pill)
+
+    async function enterWikiMode() {
+      const root = document.getElementById('wiki-mode');
+      applyReviewContrast();
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      const exitBtn = document.getElementById('exit-review-btn');
+      exitBtn.textContent = '× exit wikisink';
+      exitBtn.title = 'Exit wikisink (esc)';
+      exitBtn.classList.add('visible');
+      document.getElementById('tree')?.classList.add('review-disabled');
+      document.getElementById('preview')?.classList.remove('open');
+      if (typeof refreshWikiChatTail === 'function') refreshWikiChatTail();
+      if (!WIKI_PATH) {
+        const last = WIKI_STATUS && WIKI_STATUS.last_viewed;
+        if (last && last.path) {
+          loadWikiArticle(last.path);
+        } else {
+          wikiRandom();
+        }
+      }
+    }
+
+    function exitWikiMode() {
+      const root = document.getElementById('wiki-mode');
+      root.classList.remove('open');
+      root.setAttribute('aria-hidden', 'true');
+      const exitBtn = document.getElementById('exit-review-btn');
+      exitBtn.classList.remove('visible');
+      exitBtn.textContent = '× exit review';
+      exitBtn.title = 'Exit review mode (esc)';
+      document.getElementById('tree')?.classList.remove('review-disabled');
+      LAST_WIKI_SELECTION = null;
+      hideWikiSuggest();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (!document.getElementById('wiki-mode')?.classList.contains('open')) return;
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      exitWikiMode();
+    });
+
+    function wikiSetSourceBadge(art) {
+      const badge = document.getElementById('wiki-source-badge');
+      badge.hidden = false;
+      badge.className = 'wiki-source-badge';
+      if (art.source === 'overlay') {
+        badge.classList.add('live');
+        const when = (art.meta && art.meta.fetched_at || '').slice(0, 10);
+        badge.textContent = 'live' + (when ? ' ' + when : '');
+        badge.title = 'refreshed from live Wikipedia by a wikisink run' +
+          (art.meta && art.meta.revid ? ` (revision ${art.meta.revid})` : '');
+      } else if (art.source === 'preserved') {
+        badge.classList.add('preserved');
+        badge.textContent = 'preserved';
+        badge.title = 'deletion override — kept locally and excluded from updates';
+      } else {
+        badge.textContent = 'ZIM ' + (art.snapshot || '');
+        badge.title = 'served from the local archive snapshot';
+      }
+    }
+
+    function wikiUpdateNavButtons() {
+      document.getElementById('wiki-back').disabled = WIKI_HISTORY_IDX <= 0;
+      document.getElementById('wiki-fwd').disabled =
+        WIKI_HISTORY_IDX >= WIKI_HISTORY.length - 1;
+    }
+
+    function wikiUpdateOverrideButton(art) {
+      const btn = document.getElementById('wiki-override');
+      btn.hidden = false;
+      if (art.overridden) {
+        btn.textContent = '🛡✓';
+        btn.title = 'deletion override active — this article is preserved locally ' +
+          'and never refreshed. click to lift the override (the preserved copy stays on disk).';
+      } else {
+        btn.textContent = '🛡';
+        btn.title = 'deletion override — keep this article\'s local copy forever and ' +
+          'stop updating it. use when Wikipedia deletes something you consider ' +
+          'valuable (wikisink reports flag suspicious deletions).';
+      }
+      btn.dataset.overridden = art.overridden ? '1' : '';
+    }
+
+    async function loadWikiArticle(path, opts = {}) {
+      const { push = true, frag = null } = opts;
+      const body = document.getElementById('wiki-body');
+      hideWikiSuggest();
+      let art;
+      try {
+        const r = await fetch('/api/wiki/article?path=' + encodeURIComponent(path));
+        if (!r.ok) {
+          const js = await r.json().catch(() => ({}));
+          body.innerHTML = `<div class="wiki-note">${escapeHtml(js.detail ||
+            'that article isn\'t in the local archive')}</div>`;
+          return;
+        }
+        art = await r.json();
+      } catch (e) {
+        body.innerHTML = `<div class="wiki-note">couldn't load the article: ${escapeHtml(String(e))}</div>`;
+        return;
+      }
+      WIKI_PATH = art.path;
+      WIKI_TITLE = art.title;
+      body.dataset.path = art.path;
+      body.innerHTML = art.html;
+      document.getElementById('wiki-article-title').textContent = art.title;
+      wikiSetSourceBadge(art);
+      wikiUpdateOverrideButton(art);
+      if (push) {
+        WIKI_HISTORY = WIKI_HISTORY.slice(0, WIKI_HISTORY_IDX + 1);
+        WIKI_HISTORY.push(art.path);
+        WIKI_HISTORY_IDX = WIKI_HISTORY.length - 1;
+      }
+      wikiUpdateNavButtons();
+      if (frag) {
+        const el = body.querySelector('#' + CSS.escape(frag));
+        if (el) el.scrollIntoView();
+        else body.scrollTop = 0;
+      } else {
+        body.scrollTop = 0;
+      }
+      if (typeof renderWikiComments === 'function') renderWikiComments();
+    }
+
+    document.getElementById('wiki-body').addEventListener('click', (e) => {
+      const a = e.target.closest('a[data-wiki-path]');
+      if (!a) return;
+      e.preventDefault();
+      loadWikiArticle(a.dataset.wikiPath, { frag: a.dataset.wikiFrag || null });
+    });
+
+    document.getElementById('wiki-back').addEventListener('click', () => {
+      if (WIKI_HISTORY_IDX > 0) {
+        WIKI_HISTORY_IDX--;
+        loadWikiArticle(WIKI_HISTORY[WIKI_HISTORY_IDX], { push: false });
+      }
+    });
+    document.getElementById('wiki-fwd').addEventListener('click', () => {
+      if (WIKI_HISTORY_IDX < WIKI_HISTORY.length - 1) {
+        WIKI_HISTORY_IDX++;
+        loadWikiArticle(WIKI_HISTORY[WIKI_HISTORY_IDX], { push: false });
+      }
+    });
+
+    async function wikiRandom() {
+      try {
+        const r = await fetch('/api/wiki/random');
+        if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.status);
+        const js = await r.json();
+        loadWikiArticle(js.path);
+      } catch (e) {
+        document.getElementById('wiki-body').innerHTML =
+          `<div class="wiki-note">${escapeHtml(String(e.message || e))}</div>`;
+      }
+    }
+    document.getElementById('wiki-random').addEventListener('click', wikiRandom);
+
+    // Search: live title suggestions while typing; Enter runs full-text
+    // search and renders a results page into the body.
+    let _wikiSuggestTimer = null;
+
+    function hideWikiSuggest() {
+      const el = document.getElementById('wiki-suggest');
+      el.hidden = true;
+      el.innerHTML = '';
+    }
+
+    document.getElementById('wiki-search').addEventListener('input', (e) => {
+      clearTimeout(_wikiSuggestTimer);
+      const q = e.target.value.trim();
+      if (!q) { hideWikiSuggest(); return; }
+      _wikiSuggestTimer = setTimeout(async () => {
+        try {
+          const r = await fetch('/api/wiki/suggest?q=' + encodeURIComponent(q));
+          if (!r.ok) return;
+          const js = await r.json();
+          const el = document.getElementById('wiki-suggest');
+          if (!js.results.length) { hideWikiSuggest(); return; }
+          el.innerHTML = js.results.map(s =>
+            `<div class="sug" data-path="${escapeHtml(s.path)}">${escapeHtml(s.title)}</div>`).join('');
+          el.hidden = false;
+        } catch (_) { /* suggestions are best-effort */ }
+      }, 200);
+    });
+
+    document.getElementById('wiki-suggest').addEventListener('mousedown', (e) => {
+      const sug = e.target.closest('.sug');
+      if (!sug) return;
+      e.preventDefault();
+      document.getElementById('wiki-search').value = '';
+      loadWikiArticle(sug.dataset.path);
+    });
+
+    document.getElementById('wiki-search').addEventListener('keydown', async (e) => {
+      if (e.key === 'Escape') { hideWikiSuggest(); return; }
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      const q = e.target.value.trim();
+      if (!q) return;
+      hideWikiSuggest();
+      const body = document.getElementById('wiki-body');
+      body.innerHTML = '<div class="wiki-note">searching…</div>';
+      try {
+        const r = await fetch('/api/wiki/search?q=' + encodeURIComponent(q) + '&n=30');
+        if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.status);
+        const js = await r.json();
+        const hits = js.results.map(h =>
+          `<div class="hit"><a href="#" data-wiki-path="${escapeHtml(h.path)}">${escapeHtml(h.title)}</a></div>`
+        ).join('');
+        body.innerHTML = `<div class="wiki-results"><h2>search: ${escapeHtml(q)}</h2>` +
+          `<p class="wiki-note" style="text-align:left;margin:0.5em 0">` +
+          `${js.estimated_matches} match${js.estimated_matches === 1 ? '' : 'es'} in the local archive</p>` +
+          (hits || '<div class="wiki-note">nothing found</div>') + '</div>';
+        document.getElementById('wiki-article-title').textContent = '';
+        document.getElementById('wiki-source-badge').hidden = true;
+      } catch (err) {
+        body.innerHTML = `<div class="wiki-note">search failed: ${escapeHtml(String(err.message || err))}</div>`;
+      }
+    });
+
+    // Transient toast inside wiki mode (saves, comment ops, errors).
+    let _wikiToastTimer = null;
+    function wikiToast(msg, isError) {
+      let el = document.getElementById('wiki-toast');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'wiki-toast';
+        document.getElementById('wiki-mode').appendChild(el);
+      }
+      el.textContent = msg;
+      el.classList.toggle('error', !!isError);
+      el.classList.add('show');
+      clearTimeout(_wikiToastTimer);
+      _wikiToastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+    }
+
+    async function wikiSaveArticle(dest) {
+      if (!WIKI_PATH) { wikiToast('no article loaded', true); return; }
+      try {
+        const r = await fetch('/api/wiki/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: WIKI_PATH, dest }),
+        });
+        const js = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(js.detail || `save failed (${r.status})`);
+        wikiToast(`saved to ${js.saved_path}`);
+        if (dest === 'project') {
+          htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+        }
+      } catch (e) {
+        wikiToast(String(e.message || e), true);
+      }
+    }
+    document.getElementById('wiki-save-project')
+      .addEventListener('click', () => wikiSaveArticle('project'));
+    document.getElementById('wiki-save-infoworld')
+      .addEventListener('click', () => wikiSaveArticle('infoworld'));
+
+    // ---------- Wikisink: comments ----------
+    //
+    // Quote anchors re-attach by exact text match (prefix/suffix break
+    // ties), degrade to a paragraph pin when the text changed, and
+    // survive as "orphaned" panel entries when the paragraph is gone
+    // too. State transitions are PATCHed back so the panel can label
+    // degraded comments honestly. Nothing is ever deleted automatically.
+
+    let WIKI_COMMENTS = [];
+    let WIKI_PENDING_ANCHOR = null;
+
+    function wikiBlocks() {
+      return Array.from(document.getElementById('wiki-body').children)
+        .filter(el => !el.classList.contains('wiki-note'));
+    }
+
+    function wikiHeadingPathFor(block) {
+      const path = [];
+      let el = block;
+      let wantLevel = 6;
+      while (el) {
+        const m = /^H([1-6])$/.exec(el.tagName || '');
+        if (m && +m[1] < wantLevel) {
+          path.unshift(el.textContent.trim().slice(0, 200));
+          wantLevel = +m[1];
+          if (wantLevel <= 2) break;
+        }
+        el = el.previousElementSibling;
+      }
+      return path.slice(-4);
+    }
+
+    function wikiBlockOf(node) {
+      const body = document.getElementById('wiki-body');
+      let el = node.nodeType === 1 ? node : node.parentElement;
+      while (el && el.parentElement !== body) el = el.parentElement;
+      return el;
+    }
+
+    function computeWikiSelectionAnchor() {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+      const range = sel.getRangeAt(0);
+      const body = document.getElementById('wiki-body');
+      if (!body.contains(range.startContainer)) return null;
+      const quote = sel.toString().trim();
+      if (!quote) return null;
+      const block = wikiBlockOf(range.startContainer);
+      if (!block) return null;
+      const blocks = wikiBlocks();
+      const paraIndex = blocks.indexOf(block);
+      const blockText = block.textContent;
+      const idx = blockText.indexOf(quote);
+      return {
+        type: 'quote',
+        quote,
+        prefix: idx >= 0 ? blockText.slice(Math.max(0, idx - 60), idx) : '',
+        suffix: idx >= 0 ? blockText.slice(idx + quote.length, idx + quote.length + 60) : '',
+        heading_path: wikiHeadingPathFor(block),
+        para_index: paraIndex >= 0 ? paraIndex : null,
+        source: { kind: 'wikisink', snapshot: (WIKI_STATUS || {}).snapshot || null },
+      };
+    }
+
+    // Map [start, end) character offsets inside a block to a DOM Range
+    // and wrap it. extractContents splits partially-covered inline
+    // nodes for us; we never let quotes span block boundaries.
+    function wikiWrapBlockRange(block, start, end, comment) {
+      const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+      let pos = 0, startNode = null, startOff = 0, endNode = null, endOff = 0;
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        const len = n.textContent.length;
+        if (startNode === null && pos + len > start) {
+          startNode = n; startOff = start - pos;
+        }
+        if (pos + len >= end) {
+          endNode = n; endOff = end - pos;
+          break;
+        }
+        pos += len;
+      }
+      if (!startNode || !endNode) return false;
+      try {
+        const range = document.createRange();
+        range.setStart(startNode, startOff);
+        range.setEnd(endNode, endOff);
+        const span = document.createElement('span');
+        span.className = 'wiki-comment-mark' + (comment.resolved ? ' resolved' : '');
+        span.dataset.cid = comment.id;
+        span.appendChild(range.extractContents());
+        range.insertNode(span);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function wikiPinToBlock(block, comment) {
+      const pin = document.createElement('span');
+      pin.className = 'wiki-para-pin';
+      pin.dataset.cid = comment.id;
+      pin.textContent = '💬';
+      pin.title = 'comment pinned to this paragraph (original text no longer matches)';
+      block.insertBefore(pin, block.firstChild);
+    }
+
+    function wikiBlockForHeadingPath(headingPath, blocks) {
+      if (!headingPath || !headingPath.length) return null;
+      const want = headingPath[headingPath.length - 1];
+      const idx = blocks.findIndex(b =>
+        /^H[1-6]$/.test(b.tagName) && b.textContent.trim() === want);
+      if (idx === -1) return null;
+      return blocks[idx + 1] || blocks[idx];
+    }
+
+    // Attach one comment to the rendered article. Returns the state it
+    // ended up in: anchored | paragraph | orphaned.
+    function wikiAttachComment(comment) {
+      const blocks = wikiBlocks();
+      const a = comment.anchor || {};
+      if (a.type === 'quote' && a.quote) {
+        const candidates = [];
+        for (const b of blocks) {
+          const text = b.textContent;
+          let from = 0, idx;
+          while ((idx = text.indexOf(a.quote, from)) !== -1) {
+            candidates.push({ block: b, idx, text });
+            from = idx + 1;
+          }
+        }
+        let best = null;
+        if (candidates.length === 1) {
+          best = candidates[0];
+        } else if (candidates.length > 1) {
+          // Prefix/suffix similarity breaks ties.
+          let bestScore = -1;
+          for (const c of candidates) {
+            const pre = c.text.slice(Math.max(0, c.idx - 60), c.idx);
+            const post = c.text.slice(c.idx + a.quote.length, c.idx + a.quote.length + 60);
+            let score = 0;
+            if (a.prefix && pre.endsWith(a.prefix.slice(-20))) score += 2;
+            if (a.suffix && post.startsWith(a.suffix.slice(0, 20))) score += 2;
+            if (score > bestScore) { bestScore = score; best = c; }
+          }
+        }
+        if (best && wikiWrapBlockRange(best.block, best.idx, best.idx + a.quote.length, comment)) {
+          return 'anchored';
+        }
+      }
+      // Paragraph fallback: recorded index first, then heading path.
+      const blocksNow = wikiBlocks();
+      let target = (a.para_index != null && blocksNow[a.para_index]) || null;
+      if (!target) target = wikiBlockForHeadingPath(a.heading_path, blocksNow);
+      if (target) {
+        wikiPinToBlock(target, comment);
+        return 'paragraph';
+      }
+      return 'orphaned';
+    }
+
+    async function renderWikiComments() {
+      const body = document.getElementById('wiki-body');
+      // Unwrap any previous marks/pins (article body may be re-rendered
+      // or comments changed).
+      body.querySelectorAll('.wiki-comment-mark').forEach(m => {
+        const parent = m.parentNode;
+        while (m.firstChild) parent.insertBefore(m.firstChild, m);
+        parent.removeChild(m);
+        parent.normalize();
+      });
+      body.querySelectorAll('.wiki-para-pin').forEach(p => p.remove());
+      if (!WIKI_PATH) { WIKI_COMMENTS = []; renderWikiCommentsPanel(); return; }
+      let doc;
+      try {
+        doc = await (await fetch('/api/wiki/comments?path=' + encodeURIComponent(WIKI_PATH))).json();
+      } catch (_) { return; }
+      WIKI_COMMENTS = doc.comments || [];
+      for (const c of WIKI_COMMENTS) {
+        const state = wikiAttachComment(c);
+        if (state !== c.state) {
+          c.state = state;
+          fetch('/api/wiki/comments', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: WIKI_PATH, id: c.id, state }),
+          }).catch(() => { });
+        }
+      }
+      renderWikiCommentsPanel();
+      if (WIKI_COMMENTS.length) {
+        document.getElementById('wiki-comments-toggle').title =
+          `show/hide the comments panel (${WIKI_COMMENTS.length})`;
+      }
+    }
+
+    function toggleWikiCommentsPanel(force) {
+      const panel = document.getElementById('wiki-comments-panel');
+      const show = force !== undefined ? force : panel.hidden;
+      panel.hidden = !show;
+    }
+    window.toggleWikiCommentsPanel = toggleWikiCommentsPanel;
+    document.getElementById('wiki-comments-toggle')
+      .addEventListener('click', () => toggleWikiCommentsPanel());
+
+    function wikiStateChip(c) {
+      if (c.state === 'orphaned') {
+        return '<span class="wiki-state-chip orphaned" title="the anchored text and its paragraph are gone from the current version — the comment is kept anyway">orphaned</span>';
+      }
+      if (c.state === 'paragraph' && c.anchor && c.anchor.type === 'quote') {
+        return '<span class="wiki-state-chip" title="the exact quoted text no longer matches — pinned to its paragraph instead">re-pinned</span>';
+      }
+      return '';
+    }
+
+    function renderWikiCommentsPanel() {
+      const list = document.getElementById('wiki-comments-list');
+      if (!WIKI_COMMENTS.length) {
+        list.innerHTML = '<div class="wiki-dim">no comments on this article yet — select some text or hit 💬 in the toolbar.</div>';
+        return;
+      }
+      list.innerHTML = WIKI_COMMENTS.map(c => {
+        const quote = c.anchor && c.anchor.quote
+          ? `<div class="c-quote" title="${escapeHtml(c.anchor.quote)}">“${escapeHtml(c.anchor.quote.slice(0, 80))}”</div>` : '';
+        const replies = (c.replies || []).map(r =>
+          `<div class="c-reply">↳ ${escapeHtml(r.body)}</div>`).join('');
+        return `<div class="wiki-comment-card${c.resolved ? ' resolved' : ''}" data-cid="${c.id}">
+          ${quote}
+          <div class="c-body">${escapeHtml(c.body)}</div>
+          <div class="c-meta"><span>${escapeHtml((c.created_at || '').slice(0, 10))}</span>${wikiStateChip(c)}</div>
+          ${replies ? `<div class="c-replies">${replies}</div>` : ''}
+          <div class="c-actions">
+            <button type="button" data-act="jump" title="scroll to this comment's spot">↧ jump</button>
+            <button type="button" data-act="reply">reply</button>
+            <button type="button" data-act="resolve">${c.resolved ? 'reopen' : 'resolve'}</button>
+            <button type="button" data-act="delete">delete</button>
+          </div>
+          <div class="c-reply-slot"></div>
+        </div>`;
+      }).join('');
+    }
+
+    function wikiFocusComment(cid, scrollPanel = true) {
+      toggleWikiCommentsPanel(true);
+      document.querySelectorAll('.wiki-comment-card.focus')
+        .forEach(el => el.classList.remove('focus'));
+      const card = document.querySelector(`.wiki-comment-card[data-cid="${cid}"]`);
+      if (card) {
+        card.classList.add('focus');
+        if (scrollPanel) card.scrollIntoView({ block: 'nearest' });
+        setTimeout(() => card.classList.remove('focus'), 2200);
+      }
+    }
+
+    // Clicking a mark or pin in the article focuses its card.
+    document.getElementById('wiki-body').addEventListener('click', (e) => {
+      const marked = e.target.closest('.wiki-comment-mark, .wiki-para-pin');
+      if (marked) wikiFocusComment(marked.dataset.cid);
+    });
+
+    // Panel card actions.
+    document.getElementById('wiki-comments-list').addEventListener('click', async (e) => {
+      const btn = e.target.closest('button[data-act]');
+      if (!btn) return;
+      const card = btn.closest('.wiki-comment-card');
+      const cid = card.dataset.cid;
+      const comment = WIKI_COMMENTS.find(c => c.id === cid);
+      if (!comment) return;
+      const act = btn.dataset.act;
+      if (act === 'jump') {
+        const mark = document.querySelector(`#wiki-body [data-cid="${cid}"]`);
+        if (mark) mark.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        else wikiToast('this comment is orphaned — no spot to jump to', true);
+      } else if (act === 'resolve') {
+        await fetch('/api/wiki/comments', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: WIKI_PATH, id: cid, resolved: !comment.resolved }),
+        }).catch(() => { });
+        renderWikiComments();
+      } else if (act === 'delete') {
+        if (!confirm('delete this comment (and its replies)?')) return;
+        await fetch('/api/wiki/comments?path=' + encodeURIComponent(WIKI_PATH) +
+          '&id=' + encodeURIComponent(cid), { method: 'DELETE' }).catch(() => { });
+        renderWikiComments();
+      } else if (act === 'reply') {
+        const slot = card.querySelector('.c-reply-slot');
+        if (slot.querySelector('textarea')) return;
+        slot.innerHTML = `<textarea rows="2" placeholder="reply…"></textarea>
+          <div class="c-actions"><button type="button" data-send="1">send reply</button></div>`;
+        slot.querySelector('textarea').focus();
+        slot.querySelector('[data-send]').addEventListener('click', async () => {
+          const text = slot.querySelector('textarea').value.trim();
+          if (!text) return;
+          await fetch('/api/wiki/comments/reply', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: WIKI_PATH, id: cid, body: text }),
+          }).catch(() => { });
+          renderWikiComments();
+        });
+        e.stopPropagation();
+      }
+    });
+
+    // Composer (new comment) — lives at the top of the panel.
+    function openWikiComposer(anchor) {
+      WIKI_PENDING_ANCHOR = anchor;
+      toggleWikiCommentsPanel(true);
+      const slot = document.getElementById('wiki-composer-slot');
+      const label = anchor && anchor.type === 'quote' && anchor.quote
+        ? `on: “${anchor.quote.slice(0, 70)}”`
+        : 'on this paragraph';
+      slot.innerHTML = `<div class="wiki-composer">
+        <div class="lbl">${escapeHtml(label)}</div>
+        <textarea id="wiki-composer-text" rows="3" placeholder="write a comment…"></textarea>
+        <div class="row">
+          <button type="button" onclick="closeWikiComposer()">cancel</button>
+          <button type="button" onclick="submitWikiComposer()">comment</button>
+        </div>
+      </div>`;
+      document.getElementById('wiki-composer-text').focus();
+    }
+
+    function closeWikiComposer() {
+      WIKI_PENDING_ANCHOR = null;
+      document.getElementById('wiki-composer-slot').innerHTML = '';
+    }
+    window.closeWikiComposer = closeWikiComposer;
+
+    async function submitWikiComposer() {
+      const text = (document.getElementById('wiki-composer-text')?.value || '').trim();
+      if (!text || !WIKI_PATH) return;
+      try {
+        const r = await fetch('/api/wiki/comments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path: WIKI_PATH, title: WIKI_TITLE, body: text,
+            anchor: WIKI_PENDING_ANCHOR,
+          }),
+        });
+        if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.status);
+        closeWikiComposer();
+        wikiToast('comment added');
+        renderWikiComments();
+      } catch (e) {
+        wikiToast('comment failed: ' + String(e.message || e), true);
+      }
+    }
+    window.submitWikiComposer = submitWikiComposer;
+
+    // Toolbar 💬 "add comment here": paragraph anchor on the block
+    // nearest the vertical middle of the viewport.
+    document.getElementById('wiki-comment-here').addEventListener('click', () => {
+      if (!WIKI_PATH) { wikiToast('no article loaded', true); return; }
+      const bodyEl = document.getElementById('wiki-body');
+      const mid = bodyEl.getBoundingClientRect().top + bodyEl.clientHeight / 2;
+      let best = null, bestDist = Infinity;
+      const blocks = wikiBlocks();
+      blocks.forEach((b, i) => {
+        const r = b.getBoundingClientRect();
+        const d = Math.abs((r.top + r.bottom) / 2 - mid);
+        if (d < bestDist) { bestDist = d; best = { block: b, index: i }; }
+      });
+      if (!best) return;
+      openWikiComposer({
+        type: 'paragraph', quote: '', prefix: '', suffix: '',
+        heading_path: wikiHeadingPathFor(best.block),
+        para_index: best.index,
+        source: { kind: 'wikisink', snapshot: (WIKI_STATUS || {}).snapshot || null },
+      });
+    });
+
+    // Selection popup: comment / ask agent / save.
+    let _wikiSelTimer = null;
+    document.addEventListener('selectionchange', () => {
+      if (!document.getElementById('wiki-mode').classList.contains('open')) return;
+      clearTimeout(_wikiSelTimer);
+      _wikiSelTimer = setTimeout(() => {
+        const popup = document.getElementById('wiki-sel-popup');
+        const sel = window.getSelection();
+        const body = document.getElementById('wiki-body');
+        if (!sel || sel.isCollapsed || !sel.rangeCount ||
+          !body.contains(sel.getRangeAt(0).startContainer)) {
+          popup.classList.remove('show');
+          return;
+        }
+        const text = sel.toString().trim();
+        if (!text) { popup.classList.remove('show'); return; }
+        LAST_WIKI_SELECTION = { text };
+        const rect = sel.getRangeAt(0).getBoundingClientRect();
+        const modeRect = document.getElementById('wiki-mode').getBoundingClientRect();
+        popup.style.left = Math.max(8, rect.left - modeRect.left) + 'px';
+        popup.style.top = Math.max(8, rect.bottom - modeRect.top + 8) + 'px';
+        popup.classList.add('show');
+      }, 180);
+    });
+
+    document.getElementById('wsp-comment').addEventListener('click', () => {
+      const anchor = computeWikiSelectionAnchor();
+      document.getElementById('wiki-sel-popup').classList.remove('show');
+      if (anchor) openWikiComposer(anchor);
+    });
+    document.getElementById('wsp-save').addEventListener('click', () => {
+      document.getElementById('wiki-sel-popup').classList.remove('show');
+      wikiSaveArticle('project');
+    });
+    document.getElementById('wsp-ask').addEventListener('click', () => {
+      // Selection already snapshotted into LAST_WIKI_SELECTION by the
+      // selectionchange handler; queue it and hand focus to the pill.
+      document.getElementById('wiki-sel-popup').classList.remove('show');
+      if (typeof updateWikiChatChip === 'function') updateWikiChatChip();
+      const chat = document.getElementById('wiki-chat');
+      chat.classList.remove('collapsed');
+      document.getElementById('wiki-chat-input').focus();
+    });
+
+    function toggleWikiChat() {
+      document.getElementById('wiki-chat').classList.toggle('collapsed');
+      const t = document.getElementById('wiki-chat-toggle');
+      t.textContent = document.getElementById('wiki-chat').classList.contains('collapsed') ? '▴' : '▾';
+    }
+    window.toggleWikiChat = toggleWikiChat;
+
+    // ---------- Wikisink: chat pill ----------
+    //
+    // Mirrors the conversation tail (like review mode) and routes sends
+    // through the main chat form with a wikisink preamble the agent's
+    // system prompt knows how to read:
+    //   with a selection:  [wikisink selection in "TITLE" (path)] + ```snippet```
+    //   without:           [wikisink article: "TITLE" (path)]
+    // The article preamble is ALWAYS attached so the agent can introspect
+    // the loaded page via read_wiki_article.
+
+    function refreshWikiChatTail() {
+      const tail = document.getElementById('wiki-chat-tail');
+      if (!tail) return;
+      if (!document.getElementById('wiki-mode').classList.contains('open')) return;
+      const conv = document.getElementById('conversation');
+      if (!conv) return;
+      const msgs = Array.from(conv.querySelectorAll('.msg'));
+      tail.innerHTML = msgs.slice(-REVIEW_CHAT_TAIL_N).map(m => m.outerHTML).join('');
+      tail.scrollTop = tail.scrollHeight;
+    }
+    window.refreshWikiChatTail = refreshWikiChatTail;
+
+    function updateWikiChatChip() {
+      const chip = document.getElementById('wiki-chat-chip');
+      const textEl = document.getElementById('wiki-chat-chip-text');
+      if (!chip || !textEl) return;
+      if (LAST_WIKI_SELECTION && LAST_WIKI_SELECTION.text) {
+        textEl.textContent = LAST_WIKI_SELECTION.text.slice(0, 50) +
+          (LAST_WIKI_SELECTION.text.length > 50 ? '…' : '');
+        chip.hidden = false;
+      } else {
+        chip.hidden = true;
+      }
+    }
+    window.updateWikiChatChip = updateWikiChatChip;
+    document.getElementById('wiki-chat-chip-clear').addEventListener('click', () => {
+      LAST_WIKI_SELECTION = null;
+      updateWikiChatChip();
+    });
+
+    function sendFromWikiChat() {
+      const input = document.getElementById('wiki-chat-input');
+      const text = (input.value || '').trim();
+      if (!text) return;
+      const main = document.getElementById('message');
+      const form = document.getElementById('chat-form');
+      if (!main || !form) return;
+      let outgoing;
+      const where = `"${WIKI_TITLE || '?'}" (${WIKI_PATH || '?'})`;
+      const liveSel = window.getSelection();
+      const body = document.getElementById('wiki-body');
+      let selText = null;
+      if (liveSel && !liveSel.isCollapsed && liveSel.rangeCount &&
+        body.contains(liveSel.getRangeAt(0).startContainer)) {
+        selText = liveSel.toString().trim();
+      } else if (LAST_WIKI_SELECTION && LAST_WIKI_SELECTION.text) {
+        selText = LAST_WIKI_SELECTION.text;
+      }
+      if (selText) {
+        outgoing = `[wikisink selection in ${where}]\n\`\`\`\n${selText}\n\`\`\`\n\n${text}`;
+      } else {
+        outgoing = `[wikisink article: ${where}]\n\n${text}`;
+      }
+      main.value = outgoing;
+      htmx.trigger(form, 'submit');
+      input.value = '';
+      LAST_WIKI_SELECTION = null;
+      updateWikiChatChip();
+    }
+    window.sendFromWikiChat = sendFromWikiChat;
+
+    // 🛡 deletion override: preserve/un-preserve the current article.
+    document.getElementById('wiki-override').addEventListener('click', async () => {
+      if (!WIKI_PATH) return;
+      const btn = document.getElementById('wiki-override');
+      const active = btn.dataset.overridden === '1';
+      const msg = active
+        ? `lift the deletion override on “${WIKI_TITLE}”? wikisink runs will refresh it again (the preserved copy stays on disk).`
+        : `preserve “${WIKI_TITLE}” permanently? your local copy is kept forever and wikisink runs will never overwrite or remove it — even if Wikipedia deletes the article.`;
+      if (!confirm(msg)) return;
+      try {
+        let r;
+        if (active) {
+          r = await fetch('/api/wiki/override?path=' + encodeURIComponent(WIKI_PATH),
+            { method: 'DELETE' });
+        } else {
+          r = await fetch('/api/wiki/override', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: WIKI_PATH, title: WIKI_TITLE }),
+          });
+        }
+        if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.status);
+        wikiToast(active ? 'override lifted — updates resume' : 'preserved — this copy is yours now');
+        loadWikiArticle(WIKI_PATH, { push: false });
+      } catch (e) {
+        wikiToast(String(e.message || e), true);
+      }
+    });
+
+    // ⚙ settings: reuse the setup modal (shows newer-snapshot offer,
+    // storage info, and re-download options).
+    document.getElementById('wiki-settings').addEventListener('click', () => {
+      WIKI_STATUS = null; // force re-fetch so newer_snapshot reflects reality
+      openWikiSetup();
+    });
+
+    es.addEventListener('wiki_download', (e) => {
+      let d;
+      try { d = JSON.parse(e.data); } catch (_) { return; }
+      const btn = document.getElementById('wikisink-btn');
+      btn.title = d.status === 'downloading'
+        ? `Wikisink — downloading… ${d.pct != null ? d.pct + '%' : ''}`
+        : 'Wikisink — your local offline Wikipedia: browse, save, comment, update';
+      const modalOpen = !document.getElementById('wiki-setup-modal').classList.contains('hidden');
+      if (d.status === 'downloading') {
+        if (modalOpen) {
+          if (WIKI_SETUP_STATE !== 'downloading') setWikiSetupState('downloading');
+          updateWikiProgressUI(d);
+        }
+      } else if (d.status === 'paused') {
+        if (modalOpen) { setWikiSetupState('paused'); updateWikiProgressUI(d); }
+      } else if (d.status === 'error') {
+        if (modalOpen) wikiSetupError(d.error || 'download failed');
+      } else if (d.status === 'done') {
+        fetchWikiStatus().then(s => { WIKI_STATUS = s; });
+        if (modalOpen) setWikiSetupState('done');
+      }
     });
 
     // ---------- Review mode ----------
@@ -6568,21 +8495,25 @@
     // dark themes get pure white-on-near-black. Set as CSS vars on the
     // #review-mode root so the cascade picks them up everywhere inside.
     function applyReviewContrast() {
-      const root = document.getElementById('review-mode');
-      if (!root) return;
+      // Max-contrast overrides for both full-frame readers: review mode
+      // and wikisink view share the --review-* custom properties.
       const mode = detectThemeMode();
-      if (mode === 'light') {
-        root.style.setProperty('--review-bg', '#ffffff');
-        root.style.setProperty('--review-fg', '#000000');
-        root.style.setProperty('--review-fg-muted', '#444444');
-        root.style.setProperty('--review-fg-faint', '#999999');
-        root.style.setProperty('--review-code-bg', '#f0f0f0');
-      } else {
-        root.style.setProperty('--review-bg', '#0a0a0a');
-        root.style.setProperty('--review-fg', '#ffffff');
-        root.style.setProperty('--review-fg-muted', '#c0c0c0');
-        root.style.setProperty('--review-fg-faint', '#666666');
-        root.style.setProperty('--review-code-bg', '#1f1f1f');
+      for (const id of ['review-mode', 'wiki-mode']) {
+        const root = document.getElementById(id);
+        if (!root) continue;
+        if (mode === 'light') {
+          root.style.setProperty('--review-bg', '#ffffff');
+          root.style.setProperty('--review-fg', '#000000');
+          root.style.setProperty('--review-fg-muted', '#444444');
+          root.style.setProperty('--review-fg-faint', '#999999');
+          root.style.setProperty('--review-code-bg', '#f0f0f0');
+        } else {
+          root.style.setProperty('--review-bg', '#0a0a0a');
+          root.style.setProperty('--review-fg', '#ffffff');
+          root.style.setProperty('--review-fg-muted', '#c0c0c0');
+          root.style.setProperty('--review-fg-faint', '#666666');
+          root.style.setProperty('--review-code-bg', '#1f1f1f');
+        }
       }
     }
 
@@ -6696,6 +8627,8 @@
           exitEditMode();
         } else if (document.getElementById('girraph-mode')?.classList.contains('open')) {
           exitGirraphMode();
+        } else if (document.getElementById('wiki-mode')?.classList.contains('open')) {
+          exitWikiMode();
         } else if (document.getElementById('review-mode')?.classList.contains('open')) {
           exitReviewMode();
         }

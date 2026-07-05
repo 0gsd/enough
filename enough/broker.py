@@ -142,6 +142,30 @@ TOGGLES: tuple[Toggle, ...] = (
         default=True,
         group="general",
     ),
+    Toggle(
+        key="wikisink_enabled",
+        label="wikisink tools",
+        description=(
+            "let the agent use the local wikipedia archive: wiki_search, "
+            "read_wiki_article, wiki_status, and wikisink (the update run). "
+            "turn off to hide the whole subsystem from the agent — the 🚰 "
+            "browser UI keeps working either way."
+        ),
+        default=True,
+        group="wikisink",
+    ),
+    Toggle(
+        key="wikisink_live_updates",
+        label="live updates (wikisink runs)",
+        description=(
+            "allow wikisink update runs to call the wikipedia/wikimedia "
+            "APIs: refreshing watched articles, edit-spike stats, pageview "
+            "rankings, and deletion checks. turn off for a fully-offline "
+            "wikisink — update runs then report from local state only."
+        ),
+        default=True,
+        group="wikisink",
+    ),
 )
 
 

@@ -20,6 +20,7 @@ import asyncio
 import datetime as dt
 import json
 import logging
+import shutil
 import subprocess
 import sys
 from contextlib import asynccontextmanager
@@ -36,6 +37,7 @@ from sse_starlette.sse import EventSourceResponse
 
 from . import __version__
 from . import broker as _broker
+from .wikisink import config as _wikisink_config
 from .llm import LLMError, stream_chat
 from . import cloud as _cloud
 from . import models as _models
@@ -144,10 +146,25 @@ class Session:
 # File tree
 # ---------------------------------------------------------------------------
 
+def _wikisink_storage_real() -> Path | None:
+    """Resolved wikisink storage dir, or None when unset/missing. The
+    archive and its sidecar stores (overlay, comments, preserved, …)
+    must never render in the file tree — only articles explicitly saved
+    into a project's wiki/ or infoworld/wiki/ are user-visible files.
+    Resolved fresh per tree build: cheap (one tiny JSON read) and always
+    honors a just-changed storage_dir, wherever the user pointed it."""
+    try:
+        d = _wikisink_config.storage_dir()
+        return d.resolve() if d.exists() else None
+    except OSError:
+        return None
+
+
 def _walk_tree(
     root: Path,
     rel_parts: tuple[str, ...],
     visited: frozenset[Path],
+    wikisink_real: Path | None = None,
 ) -> list[dict[str, Any]]:
     """Walk the project tree to arbitrary depth, with symlink-cycle protection.
 
@@ -176,6 +193,12 @@ def _walk_tree(
         rel = "/".join(rel_parts + (p.name,))
         if rel in HIDDEN_TREE_PATHS:
             continue
+        if wikisink_real is not None and p.is_dir():
+            try:
+                if p.resolve() == wikisink_real:
+                    continue
+            except OSError:
+                pass
         node = {
             "name": p.name,
             "path": rel,
@@ -183,13 +206,13 @@ def _walk_tree(
             "is_symlink": p.is_symlink(),
         }
         if p.is_dir():
-            node["children"] = _walk_tree(root, rel_parts + (p.name,), visited)
+            node["children"] = _walk_tree(root, rel_parts + (p.name,), visited, wikisink_real)
         out.append(node)
     return out
 
 
 def build_file_tree(root: Path) -> list[dict[str, Any]]:
-    return _walk_tree(root, (), frozenset())
+    return _walk_tree(root, (), frozenset(), _wikisink_storage_real())
 
 
 # Paths in the project tree that get a [?] help affordance on hover.
@@ -203,6 +226,7 @@ _HELP_IDS: dict[str, str] = {
     "rness/requests": "requests",
     "rness/io": "io",
     "infoworld": "infoworld",
+    "wiki": "project-wiki",
 }
 
 
@@ -929,6 +953,16 @@ def create_app(
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
         session.client = httpx.AsyncClient()
+        # Wikisink update runs execute in worker threads (agent tool /
+        # endpoint); this hook lets them fan wiki_sink progress events
+        # out over SSE without touching the loop directly.
+        from .wikisink import update as _wiki_update
+        loop = asyncio.get_running_loop()
+
+        def _wiki_progress(data: dict[str, Any]) -> None:
+            asyncio.run_coroutine_threadsafe(session.emit("wiki_sink", data), loop)
+
+        _wiki_update.PROGRESS_EMITTER = _wiki_progress
         if supervisor is not None:
             try:
                 await supervisor.bootstrap()
@@ -937,6 +971,7 @@ def create_app(
         try:
             yield
         finally:
+            _wiki_update.PROGRESS_EMITTER = None
             if supervisor is not None:
                 await supervisor.stop(only_if_owned=True)
             await session.client.aclose()
@@ -1751,6 +1786,327 @@ def create_app(
             if len(hits) >= 20:
                 break
         return {"name": base, "candidates": sorted(hits)}
+
+    # ------------------------------------------------------------------
+    # Wikisink — local Wikipedia (🚰)
+    # ------------------------------------------------------------------
+
+    from .wikisink import download as _wiki_download
+    from .wikisink import overlay as _wiki_overlay
+    from .wikisink import zim as _wiki_zim
+
+    wiki_dl = _wiki_download.DownloadManager(emit=session.emit)
+
+    def _wiki_503(e: Exception) -> HTTPException:
+        # WikisinkUnavailable messages are user-facing and actionable.
+        return HTTPException(503, str(e))
+
+    @app.get("/api/wiki/status")
+    async def api_wiki_status() -> dict[str, Any]:
+        def _status() -> dict[str, Any]:
+            cfg = _wikisink_config.load_config()
+            installed = _wikisink_config.installed(cfg)
+            info = None
+            if installed:
+                try:
+                    info = _wiki_zim.snapshot_info()
+                except _wiki_zim.WikisinkUnavailable as e:
+                    # e.g. libzim wheel missing even though the file exists
+                    installed = False
+                    info = {"error": str(e)}
+            try:
+                comment_count = len(list(_wikisink_config.comments_dir(cfg).glob("*.json")))
+            except OSError:
+                comment_count = 0
+            return {
+                "installed": installed,
+                "zim": info,
+                "flavor": (cfg.get("zim") or {}).get("flavor"),
+                "snapshot": (cfg.get("zim") or {}).get("snapshot"),
+                "storage_dir": str(_wikisink_config.storage_dir(cfg)),
+                "download": cfg.get("download"),
+                "download_active": wiki_dl.active,
+                "last_viewed": cfg.get("last_viewed"),
+                "last_wikisink_at": cfg.get("last_wikisink_at"),
+                # cached_only: status must stay instant; the flavors call
+                # made when the setup modal opens warms this cache.
+                "newer_snapshot": _wiki_download.newer_snapshot_available(
+                    cfg, cached_only=True) if installed else None,
+                "counts": {
+                    "watched": len(cfg.get("watched", [])),
+                    "comments": comment_count,
+                    "overrides": len(cfg.get("overrides", [])),
+                },
+                "overrides": cfg.get("overrides", []),
+            }
+        return await asyncio.to_thread(_status)
+
+    @app.get("/api/wiki/article")
+    async def api_wiki_article(
+        path: str | None = Query(None), title: str | None = Query(None)
+    ) -> dict[str, Any]:
+        if not path and not title:
+            raise HTTPException(400, "missing path or title")
+
+        def _fetch() -> dict[str, Any]:
+            art = _wiki_overlay.resolve_article(path=path, title=title)
+            art["html"] = _wiki_zim.sanitize_and_rewrite(art["html"], art["path"])
+            _wikisink_config.record_viewed(art["path"], art["title"])
+            cfg = _wikisink_config.load_config()
+            art["snapshot"] = (cfg.get("zim") or {}).get("snapshot")
+            art["overridden"] = _wikisink_config.is_overridden(art["path"], cfg)
+            return art
+
+        try:
+            return await asyncio.to_thread(_fetch)
+        except KeyError:
+            raise HTTPException(404, f"no article for {path or title!r} in the local archive") from None
+        except _wiki_zim.WikisinkUnavailable as e:
+            raise _wiki_503(e) from None
+
+    @app.get("/api/wiki/search")
+    async def api_wiki_search(
+        q: str = Query(...), offset: int = Query(0, ge=0), n: int = Query(20, ge=1, le=50)
+    ) -> dict[str, Any]:
+        try:
+            return await asyncio.to_thread(_wiki_zim.search, q, offset, n)
+        except _wiki_zim.WikisinkUnavailable as e:
+            raise _wiki_503(e) from None
+
+    @app.get("/api/wiki/suggest")
+    async def api_wiki_suggest(
+        q: str = Query(...), n: int = Query(10, ge=1, le=25)
+    ) -> dict[str, Any]:
+        try:
+            return {"results": await asyncio.to_thread(_wiki_zim.suggest, q, n)}
+        except _wiki_zim.WikisinkUnavailable as e:
+            raise _wiki_503(e) from None
+
+    @app.get("/api/wiki/random")
+    async def api_wiki_random() -> dict[str, Any]:
+        try:
+            return await asyncio.to_thread(_wiki_zim.random_article)
+        except _wiki_zim.WikisinkUnavailable as e:
+            raise _wiki_503(e) from None
+
+    from .wikisink import comments as _wiki_comments
+
+    @app.get("/api/wiki/comments")
+    async def api_wiki_comments_get(path: str = Query(...)) -> dict[str, Any]:
+        return await asyncio.to_thread(_wiki_comments.load_comments, path)
+
+    @app.post("/api/wiki/comments")
+    async def api_wiki_comments_post(request: Request) -> dict[str, Any]:
+        body = await request.json()
+        path = (body.get("path") or "").strip()
+        text = (body.get("body") or "").strip()
+        if not path or not text:
+            raise HTTPException(400, "missing path or body")
+        entry = await asyncio.to_thread(
+            _wiki_comments.add_comment, path,
+            (body.get("title") or "").strip(), text, body.get("anchor"))
+        _broker.trace(project_dir, tool="wiki_comment", decision="allowed",
+                      args={"path": path, "op": "add", "id": entry["id"]},
+                      result_ok=True, result_summary=text[:120])
+        return entry
+
+    @app.patch("/api/wiki/comments")
+    async def api_wiki_comments_patch(request: Request) -> dict[str, Any]:
+        body = await request.json()
+        path = (body.get("path") or "").strip()
+        cid = (body.get("id") or "").strip()
+        try:
+            entry = await asyncio.to_thread(
+                _wiki_comments.update_comment, path, cid,
+                body=body.get("body"), resolved=body.get("resolved"),
+                state=body.get("state"))
+        except KeyError:
+            raise HTTPException(404, f"no comment {cid!r}") from None
+        # State reconciliation (anchored/paragraph/orphaned) happens on
+        # every render — journaling those would flood the log; only real
+        # edits get traced.
+        if body.get("body") is not None or body.get("resolved") is not None:
+            _broker.trace(project_dir, tool="wiki_comment", decision="allowed",
+                          args={"path": path, "op": "edit", "id": cid},
+                          result_ok=True, result_summary="")
+        return entry
+
+    @app.post("/api/wiki/comments/reply")
+    async def api_wiki_comments_reply(request: Request) -> dict[str, Any]:
+        body = await request.json()
+        path = (body.get("path") or "").strip()
+        cid = (body.get("id") or "").strip()
+        text = (body.get("body") or "").strip()
+        if not text:
+            raise HTTPException(400, "missing body")
+        try:
+            reply = await asyncio.to_thread(_wiki_comments.add_reply, path, cid, text)
+        except KeyError:
+            raise HTTPException(404, f"no comment {cid!r}") from None
+        _broker.trace(project_dir, tool="wiki_comment", decision="allowed",
+                      args={"path": path, "op": "reply", "id": cid},
+                      result_ok=True, result_summary=text[:120])
+        return reply
+
+    @app.delete("/api/wiki/comments")
+    async def api_wiki_comments_delete(
+        path: str = Query(...), id: str = Query(...)
+    ) -> dict[str, Any]:
+        try:
+            await asyncio.to_thread(_wiki_comments.delete_comment, path, id)
+        except KeyError:
+            raise HTTPException(404, f"no comment {id!r}") from None
+        _broker.trace(project_dir, tool="wiki_comment", decision="allowed",
+                      args={"path": path, "op": "delete", "id": id},
+                      result_ok=True, result_summary="")
+        return {"ok": True}
+
+    @app.post("/api/wiki/save")
+    async def api_wiki_save(request: Request) -> dict[str, Any]:
+        from .wikisink import save as _wiki_save
+
+        body = await request.json()
+        path = (body.get("path") or "").strip()
+        dest = (body.get("dest") or "").strip()
+        if not path:
+            raise HTTPException(400, "missing path")
+        try:
+            result = await asyncio.to_thread(
+                _wiki_save.save_article, project_dir, path, dest)
+        except ValueError as e:
+            raise HTTPException(400, str(e)) from None
+        except KeyError:
+            raise HTTPException(404, f"no article for {path!r}") from None
+        except _wiki_zim.WikisinkUnavailable as e:
+            raise _wiki_503(e) from None
+        _broker.trace(project_dir, tool="wiki_save", decision="allowed",
+                      args={"path": path, "dest": dest},
+                      result_ok=True, result_summary=result["saved_path"])
+        return result
+
+    @app.get("/api/wiki/flavors")
+    async def api_wiki_flavors(force: bool = Query(False)) -> dict[str, Any]:
+        return await asyncio.to_thread(_wiki_download.list_flavors, force)
+
+    @app.get("/api/wiki/diskspace")
+    async def api_wiki_diskspace(dir: str = Query(...)) -> dict[str, Any]:
+        """Free-space readout for the setup modal's storage-dir field.
+        Walks up to the nearest existing ancestor so a not-yet-created
+        default like ~/enough/wikisink still reports its volume."""
+        p = Path(dir).expanduser()
+        probe = p
+        while not probe.exists() and probe != probe.parent:
+            probe = probe.parent
+        try:
+            free = shutil.disk_usage(probe).free
+        except OSError as e:
+            raise HTTPException(400, f"can't inspect {p}: {e}") from None
+        return {"dir": str(p), "free_bytes": free,
+                "free_human": _wiki_download.bytes_to_human(free)}
+
+    @app.post("/api/wiki/setup")
+    async def api_wiki_setup(request: Request) -> dict[str, Any]:
+        body = await request.json()
+        flavor = (body.get("flavor") or "").strip()
+        storage_dir = (body.get("storage_dir") or "").strip() or None
+        listing = await asyncio.to_thread(_wiki_download.list_flavors)
+        entry = next((f for f in listing["flavors"] if f["flavor"] == flavor), None)
+        if entry is None:
+            raise HTTPException(404, f"unknown flavor {flavor!r}")
+        try:
+            wiki_dl.start(flavor=entry["flavor"], filename=entry["filename"],
+                          url=entry["url"], size_bytes=entry["size_bytes"],
+                          snapshot=entry["date"], storage_dir=storage_dir)
+        except _wiki_download.DownloadError as e:
+            code = 409 if "already running" in str(e) else 400
+            raise HTTPException(code, str(e)) from None
+        await session.emit("system", {
+            "kind": "wikisink_setup",
+            "message": (
+                f"wikisink: downloading {entry['label']} "
+                f"({entry['size_human']}, snapshot {entry['date']}) from "
+                "download.kiwix.org. this can take a while — it's resumable, "
+                "survives restarts, and the 🚰 button shows progress. "
+                "everything else keeps working meanwhile."
+            ),
+        })
+        return {"started": True, "filename": entry["filename"],
+                "size_bytes": entry["size_bytes"]}
+
+    @app.get("/api/wiki/overrides")
+    async def api_wiki_overrides_get() -> dict[str, Any]:
+        cfg = _wikisink_config.load_config()
+        return {"overrides": cfg.get("overrides", [])}
+
+    @app.post("/api/wiki/override")
+    async def api_wiki_override_post(request: Request) -> dict[str, Any]:
+        """Deletion override: preserve this article's local copy forever
+        and stop trying to update it. User-initiated only (the agent has
+        deliberately no tool for this)."""
+        body = await request.json()
+        path = (body.get("path") or "").strip()
+        if not path:
+            raise HTTPException(400, "missing path")
+        try:
+            entry = await asyncio.to_thread(
+                _wiki_overlay.preserve, path, body.get("title") or None,
+                reason=(body.get("reason") or "").strip(),
+                deletion_log_excerpt=(body.get("deletion_log_excerpt") or "").strip())
+        except KeyError:
+            raise HTTPException(404, f"no local copy of {path!r} to preserve") from None
+        except _wiki_zim.WikisinkUnavailable as e:
+            raise _wiki_503(e) from None
+        _broker.trace(project_dir, tool="wiki_override", decision="allowed",
+                      args={"path": path, "op": "preserve"},
+                      result_ok=True, result_summary=entry["preserved_file"])
+        return entry
+
+    @app.delete("/api/wiki/override")
+    async def api_wiki_override_delete(path: str = Query(...)) -> dict[str, Any]:
+        removed = await asyncio.to_thread(_wikisink_config.remove_override, path)
+        if removed is None:
+            raise HTTPException(404, f"no override for {path!r}")
+        # The preserved file stays on disk — deleting bytes is a separate,
+        # user-confirmed act; un-overriding just resumes normal serving.
+        _broker.trace(project_dir, tool="wiki_override", decision="allowed",
+                      args={"path": path, "op": "remove"},
+                      result_ok=True, result_summary="preserved file kept")
+        return {"ok": True, "preserved_file_kept": removed.get("preserved_file")}
+
+    @app.post("/api/wiki/wikisink")
+    async def api_wiki_wikisink(request: Request) -> dict[str, Any]:
+        """UI-triggered update run — same engine as the agent's wikisink
+        tool. Progress streams over SSE `wiki_sink`; the report lands in
+        chat as a copyable system message."""
+        from .wikisink import update as _wiki_update
+
+        body = await request.json() if int(request.headers.get("content-length") or 0) else {}
+        scope = body.get("scope") if body.get("scope") in ("watched", "report-only") else "watched"
+        try:
+            report = await asyncio.to_thread(
+                _wiki_update.run_wikisink, project_dir, scope)
+        except _wiki_zim.WikisinkUnavailable as e:
+            raise _wiki_503(e) from None
+        _broker.trace(project_dir, tool="wikisink", decision="allowed",
+                      args={"scope": scope, "trigger": "ui"},
+                      result_ok=True, result_summary=f"report {len(report)} chars")
+        await session.emit("system", {"kind": "wikisink_report", "message": report})
+        return {"ok": True, "report": report}
+
+    @app.post("/api/wiki/download/{action}")
+    async def api_wiki_download_ctl(action: str) -> dict[str, Any]:
+        try:
+            if action == "pause":
+                wiki_dl.pause()
+            elif action == "resume":
+                wiki_dl.resume()
+            elif action == "cancel":
+                wiki_dl.cancel()
+            else:
+                raise HTTPException(404, f"unknown action {action!r}")
+        except _wiki_download.DownloadError as e:
+            raise HTTPException(400, str(e)) from None
+        return {"ok": True, "action": action}
 
     @app.post("/api/file", response_class=HTMLResponse)
     async def api_file_write(request: Request) -> HTMLResponse:

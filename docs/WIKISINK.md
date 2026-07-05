@@ -1,0 +1,175 @@
+# Wikisink — local Wikipedia for `enough`
+
+Wikisink (the 🚰 button) puts an offline copy of English Wikipedia on
+your machine: browsable in-app, full-text searchable, readable by the
+agent, annotatable with persistent comments, and refreshable on demand
+with an intelligence report on what changed. No internet needed after
+setup — and when you *are* online, a "wikisink" run keeps the articles
+you care about current.
+
+## Setup
+
+Click 🚰 for the first time. The wizard asks three things:
+
+1. **Size.** Current builds from [Kiwix](https://kiwix.org) (all text-only
+   unless noted):
+
+   | flavor | what's in it | approx. size |
+   |---|---|---|
+   | `top1m_nopic` *(default)* | the 1M most-read articles | ~16 GB |
+   | `all_nopic` | every English article | ~49 GB |
+   | `top_nopic` | top ~50k articles | ~2.1 GB |
+   | `top_mini` | top ~50k, intro sections only | ~320 MB |
+   | `simple_all_nopic` | complete Simple English Wikipedia | ~950 MB |
+
+   Live sizes are fetched from `download.kiwix.org` when the wizard opens.
+   The "top" selections are built by Kiwix from Wikimedia pageview data
+   and refresh with each snapshot (every 1–3 months).
+
+2. **Storage.** Default `~/enough/wikisink`; any folder works, external
+   drives included. About 5% headroom beyond the archive size is required.
+
+3. **Confirmation.** The download is resumable (HTTP ranges), survives
+   quits and restarts, and runs in the background — pause/resume/cancel
+   from the same modal. Everything else in enough keeps working.
+
+The archive is a single `.zim` file read in place — never extracted into
+a million files, never shown in the file manager. Only articles you
+explicitly save become visible files.
+
+## Browsing (Wikisink view)
+
+Once installed, 🚰 opens the reader on your last-viewed page (or a random
+article the first time). Toolbar, left to right:
+
+- **← →** history · **search box** with live title suggestions (Enter =
+  full-text search over the whole archive) · **🎲** random article
+- **source badge** — `ZIM <date>` (archive snapshot), `live <date>`
+  (refreshed from Wikipedia by a wikisink run), or `preserved`
+  (deletion override)
+- **💬** add a comment pinned to the paragraph in view
+- **📥** save to this project's `wiki/` folder (created on first save)
+- **🌐** save to `~/enough/infoworld/wiki/` (shared across all projects)
+- **🛡** deletion override (see below) · **🗨** comments panel · **⚙** settings
+
+Internal links stay in-app; external links open in your browser. The
+chat pill at the bottom talks to the agent: with text selected, your
+question carries the quoted selection; without, it carries the article
+reference so the agent can read the page itself (`read_wiki_article`).
+
+Saved articles are markdown with attribution frontmatter (title, source
+URL, **CC BY-SA 4.0** license, retrieval date, snapshot/revision).
+Infoworld saves get a sibling `_manifest.md` carrying the same
+attribution as a standalone file (source URL, license, retrieval date,
+origin), so every article folder in the shared commons is
+self-describing — and ready-made for attribution if the text ends up in
+something you publish.
+
+## Comments
+
+Select text → **💬 comment**, or use the toolbar 💬 for a paragraph-level
+note. Threads live in the 🗨 panel: reply, resolve/reopen, delete, jump.
+
+Comments attach to the *article*, not to a saved file, and they survive
+updates by degrading gracefully:
+
+1. **anchored** — the quoted text still exists; shown highlighted.
+2. **re-pinned** — the exact text was edited away; the comment pins to
+   its original paragraph (by position, then by section heading).
+3. **orphaned** — paragraph's gone too; the comment stays in the panel,
+   clearly labeled.
+
+Nothing is ever deleted automatically.
+
+## The wikisink (updating)
+
+Ask the agent — "run a wikisink" — or it happens via the `wikisink`
+tool. Every article you've **saved** (project or infoworld) or
+**commented on** is *watched*. A run:
+
+1. checks watched articles against live Wikipedia (batched, polite,
+   descriptive User-Agent);
+2. refreshes changed ones into a local **overlay** (the reader then
+   serves the overlay copy — badge flips to `live`);
+3. detects **edit spikes** — any watched article with >30 edits in a day
+   or >10/day average since the last run, plus Wikipedia-wide top-edited
+   candidates (flagged if they're in your local archive);
+4. snapshots the daily **top-1000 pageview rankings** and diffs against
+   the previous run: climbers, fallers, new entries, dropouts, plus
+   view trends for your watched articles;
+5. checks for **deletions** of watched or recently-viewed articles and
+   scores how suspicious each one looks (see below);
+6. notes when a **newer base snapshot** is available (replacing the
+   multi-GB base is always your call, via ⚙).
+
+The report arrives in chat as markdown — copy it from there; it is not
+saved into your project unless you ask. The full uncapped version lands
+in `<storage>/state/run-<timestamp>/report.md`. Interrupted runs younger
+than 24h resume instead of refetching. `<scope>report-only</scope>`
+skips the overlay refresh.
+
+Two broker toggles govern all of this (🔀 pane, "wikisink" group):
+`wikisink tools` gates the agent's access entirely; `live updates` can
+force runs fully offline (report from local state only).
+
+## Deletion overrides
+
+Sometimes Wikipedia deletes an article that was useful — a niche
+programming language cut for "notability" rather than quality. The run
+report scores deletions: AfD/PROD/notability rationales score
+suspicious; copyvio/vandalism/author-request score benign; watched and
+commented articles score higher.
+
+To keep one: open the article in the reader and click **🛡**. Your local
+copy is copied into the preserved store, served forever (badge:
+`preserved`), excluded from all future refreshes, and still searchable.
+Click 🛡✓ to lift the override; the preserved file stays on disk until
+you delete it yourself. Overriding is deliberately UI-only — the agent
+can recommend it but never do it.
+
+## Storage layout
+
+```
+~/enough/wikisink/              (or wherever you chose)
+  wikipedia_en_*.zim            the base archive
+  downloads/*.part              resumable partial download
+  overlay/                      live-refreshed watched articles
+  preserved/                    deletion-overridden articles
+  comments/                     comment threads (one JSON per article)
+  rankings/                     daily top-1000 pageview snapshots
+  state/run-*/                  update-run scratch + full reports
+~/enough/config/wikisink.json   config, watch registry, overrides
+```
+
+None of this appears in the file manager — even if you point storage
+inside a project folder, the tree filter hides it.
+
+## Troubleshooting
+
+- **Download interrupted?** Click 🚰 → resume. Partial data is kept in
+  `downloads/*.part`; resume picks up mid-byte via HTTP ranges.
+- **"not enough free space"** — the wizard needs archive size + 5%.
+  Point storage at a bigger volume; external drives are fine.
+- **`libzim` missing** — the reader returns "libzim isn't installed";
+  run `uv sync` in the enough checkout and restart.
+- **Sizes look stale in the wizard** — the live listing fetch failed;
+  approximate fallback sizes are shown. Reopen when online.
+- **Agent can't see wiki tools** — check the 🔀 broker pane's wikisink
+  toggles.
+
+## Licensing
+
+Wikipedia text is **CC BY-SA 4.0** (legacy content CC BY-SA 3.0 + GFDL).
+Personal offline reference is unrestricted; if you fold article text
+into published work, attribute and share alike — every save's
+frontmatter/manifest carries what you need. See
+[Wikipedia:Copyrights](https://en.wikipedia.org/wiki/Wikipedia:Copyrights).
+
+## Agent tools reference
+
+| tool | args | does |
+|---|---|---|
+| `wiki_search` | `<query>`, `<limit>` | full-text search, titles + paths |
+| `read_wiki_article` | `<path>` or `<title>` | article → markdown, cached under `rness/io/input/`, preview returned |
+| `wiki_status` | — | install/watch/override state, last run |
+| `wikisink` | `<scope>watched\|report-only</scope>` | the update run; returns the report |

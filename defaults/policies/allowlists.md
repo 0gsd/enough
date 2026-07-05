@@ -37,6 +37,9 @@ slower, anonymized."
 - `commons.wikimedia.org`
 - `archive.org`
 - `standardebooks.org`
+- `download.kiwix.org`
+- `dumps.wikimedia.org`
+- `wikimedia.org`
 
 ## Notes for the agent
 

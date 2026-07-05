@@ -1241,6 +1241,29 @@ def run_cloud_pipeline(project_dir: Path, call: ToolCall) -> ToolResult:
 # Dispatch
 # ---------------------------------------------------------------------------
 
+# Wikisink runners live in wikisink/agent.py; these thin wrappers import
+# lazily so tools.py and the wikisink package stay import-acyclic (and a
+# missing libzim wheel can't break tool dispatch as a whole).
+def run_wiki_search(project_dir: Path, call: ToolCall) -> ToolResult:
+    from .wikisink import agent as _wiki_agent
+    return _wiki_agent.run_wiki_search(project_dir, call)
+
+
+def run_read_wiki_article(project_dir: Path, call: ToolCall) -> ToolResult:
+    from .wikisink import agent as _wiki_agent
+    return _wiki_agent.run_read_wiki_article(project_dir, call)
+
+
+def run_wiki_status(project_dir: Path, call: ToolCall) -> ToolResult:
+    from .wikisink import agent as _wiki_agent
+    return _wiki_agent.run_wiki_status(project_dir, call)
+
+
+def run_wikisink(project_dir: Path, call: ToolCall) -> ToolResult:
+    from .wikisink import agent as _wiki_agent
+    return _wiki_agent.run_wikisink(project_dir, call)
+
+
 _DISPATCH = {
     "read_file": run_read_file,
     "write_file": run_write_file,
@@ -1254,6 +1277,10 @@ _DISPATCH = {
     "update_node": run_girraph_update_node,
     "link_nodes": run_girraph_link_nodes,
     "remove_node": run_girraph_remove_node,
+    "wiki_search": run_wiki_search,
+    "read_wiki_article": run_read_wiki_article,
+    "wiki_status": run_wiki_status,
+    "wikisink": run_wikisink,
 }
 
 # Map tool name to its per-tool "brokered" toggle. When that toggle is
@@ -1280,6 +1307,12 @@ _TRACE_TOGGLE = {
     "update_node": "trace_log_enabled",
     "link_nodes": "trace_log_enabled",
     "remove_node": "trace_log_enabled",
+    # Wikisink tools trace under the universal toggle — an update run
+    # that rewrites the overlay is exactly what the journal is for.
+    "wiki_search": "trace_log_enabled",
+    "read_wiki_article": "trace_log_enabled",
+    "wiki_status": "trace_log_enabled",
+    "wikisink": "trace_log_enabled",
 }
 
 

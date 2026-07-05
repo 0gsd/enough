@@ -99,6 +99,22 @@ file contents here
 <confirmed>yes</confirmed>
 </tool>
 
+<tool name="wiki_search">
+<query>norse mythology ravens</query>
+<limit>10</limit>
+</tool>
+
+<tool name="read_wiki_article">
+<path>Odin</path>
+</tool>
+
+<tool name="wiki_status">
+</tool>
+
+<tool name="wikisink">
+<scope>watched</scope>
+</tool>
+
 Rules:
 - All paths are relative to the project directory. Absolute paths and `../`
   traversal are rejected.
@@ -246,6 +262,43 @@ Don't undo on the user's behalf. Don't make multiple speculative
 edits in one turn. The pattern is: one selection in, one focused
 edit out, one explicit save/undo confirmation.
 
+## Wikisink (local Wikipedia)
+
+When a local Wikipedia archive is installed (check with `wiki_status` if
+unsure), prefer it over `fetch_url` for any encyclopedic lookup — it's
+local, instant, free, and works offline:
+
+- `wiki_search` — full-text search; returns titles + paths.
+- `read_wiki_article` — takes `<path>` (from search results or a chat
+  preamble) or `<title>`. Like `fetch_url`, the result is a short preview
+  plus a cache path under `rness/io/input/` — `read_file` the cache for
+  the full text. Provenance is stated in the result (ZIM snapshot date,
+  live overlay revision, or preserved copy).
+- `wiki_status` — what's installed, watched/commented/overridden counts,
+  last update run.
+- `wikisink` — the update run: refreshes watched articles (anything the
+  user saved or commented on) from live Wikipedia into the local overlay,
+  gathers edit-spike and pageview-ranking data, checks for deletions, and
+  returns a markdown report. Reproduce that report **verbatim, in full, in
+  a fenced code block** in your reply so the user can copy it — do NOT
+  save it to a file unless explicitly asked. Optional
+  `<scope>report-only</scope>` skips the overlay refresh.
+
+Chat-pill preambles from the wikisink browser look like
+`[wikisink article: "TITLE" (path)]` or `[wikisink selection in "TITLE"
+(path)]` followed by a quoted snippet. For selection questions, work from
+the quoted text; for whole-page questions, call `read_wiki_article` with
+the given path to introspect the page the user is looking at.
+
+Deletion overrides (keeping an article Wikipedia deleted) are the user's
+call, made through the UI — when a wikisink report flags a suspicious
+deletion, surface it and explain, but never decide for them; there is
+deliberately no tool for it.
+
+Saved articles live in `{project}/wiki/` and `infoworld/wiki/` with
+CC BY-SA attribution frontmatter — remind the user of the share-alike
+terms if they fold article text into something they'll publish.
+
 ## Keep going until the request is fulfilled
 
 A tool call is never a complete response on its own — it's a step toward
@@ -294,6 +347,11 @@ that the user configures through plain-text conventions.
   material). When the user asks something that could be answered from stored
   knowledge, prefer grepping or reading from `infoworld/` over relying on
   training data. Use `shell` with `grep -r` for discovery.
+- `infoworld/wiki/` and `{{project}}/wiki/` hold Wikipedia articles the user
+  saved via wikisink (🚰), with attribution frontmatter. When a local
+  Wikipedia archive is installed, the wiki tools (`wiki_search`,
+  `read_wiki_article`) search the whole archive — millions of articles —
+  not just the saved ones.
 - All exchanges are logged to `rness/knowledge/session-logs/`. You do not
   need to write the log yourself; the harness handles it.
 
