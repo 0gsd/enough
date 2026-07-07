@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.1.1)
+# enough — Agent Guide (v0.1.5)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -10,7 +10,9 @@ LLM. It runs on the user's machine, exposes a chat UI at
 `http://127.0.0.1:3456`, and lets the user shape the agent's behavior by
 editing markdown files. A fifth optional model slot routes through
 OpenRouter when the user has explicitly enabled it; everything else stays
-local.
+local. An optional **wikisink** subsystem puts an offline copy of
+Wikipedia on the machine (see its own section below and
+[docs/WIKISINK.md](WIKISINK.md)).
 
 This guide tells you what files are involved in what, how the runtime
 flows, what to edit when the user asks you to do common things, and the
@@ -25,7 +27,8 @@ Three locations that matter:
 | Path | What it is | Authority |
 |---|---|---|
 | `~/enough/` | The global install. Cloned from the repo by `bootstrap.sh`. Contains `defaults/` (templates that get copied / symlinked into every project), `infoworld/` (shared knowledge library), and the Python source. | Edit these to affect every project. |
-| `~/enough/config/` | User-global JSON config. `broker.json` (toggle states), `models.json` (active local model), `openrouter.json` (cloud-slot metadata, **no api key**), `ui.json` (theme/font), `orchestrator.json` (auto-reset config). | Edit per-machine settings. |
+| `~/enough/config/` | User-global JSON config. `broker.json` (toggle states), `models.json` (active local model), `openrouter.json` (cloud-slot metadata, **no api key**), `ui.json` (theme/font), `orchestrator.json` (auto-reset config), `wikisink.json` (wikisink install registry + watch/override registries + reading state). | Edit per-machine settings. |
+| `~/enough/wikisink/` | Default wikisink location: the user's wikisink *data* (comments, overlays, preserved articles, rankings, run state) and — unless pointed elsewhere — the base `.zim` archive(s). Archives can live anywhere, external drives included; several installs can be registered at once. Hidden from the file-manager tree. | Managed via the 🚰 UI; don't hand-edit. |
 | `<project>/rness/` | The agent's per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/roles; per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`; per-project state in `io/`, `requests/`, `knowledge/`. | Edit to affect just this project. |
 
 Plus one **off-disk** location: the **OS keyring** (macOS Keychain /
@@ -44,10 +47,11 @@ Every Python module in `enough/`:
 
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
-| [enough/server.py](../enough/server.py) | ~2080 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints. | `create_app()`, `_drive_message()`, all `@app.{get,post}` handlers |
-| [enough/prompt.py](../enough/prompt.py) | ~750 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/role/paradigm enumeration + toggle-state helpers. | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
-| [enough/broker.py](../enough/broker.py) | ~340 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
-| [enough/tools.py](../enough/tools.py) | ~1100 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`), the tool-call XML parser, the dispatch table. | `_DISPATCH`, `_TRACE_TOGGLE`, `execute()`, `parse_tool_calls()`, `_CLOUD_KEY_EXFIL_PATTERNS` |
+| [enough/server.py](../enough/server.py) | ~2800 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`). | `create_app()`, `_drive_message()`, all `@app.{get,post}` handlers |
+| [enough/prompt.py](../enough/prompt.py) | ~890 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/role/paradigm enumeration + toggle-state helpers. | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
+| [enough/broker.py](../enough/broker.py) | ~380 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
+| [enough/tools.py](../enough/tools.py) | ~1360 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers), the tool-call XML parser, the dispatch table. | `_DISPATCH`, `_TRACE_TOGGLE`, `execute()`, `parse_tool_calls()`, `_CLOUD_KEY_EXFIL_PATTERNS` |
+| [enough/wikisink/](../enough/wikisink/) | ~2500 (pkg) | Local offline Wikipedia. `config.py` (install registry, schema v2 multi-install, data paths), `zim.py` (libzim reader, search, sanitize/rewrite), `download.py` (Kiwix flavor listing + resumable downloads), `overlay.py` (live-refreshed + preserved article stores), `comments.py` (per-article threads), `save.py` (article → markdown with attribution), `update.py` (the "wikisink" update run), `rankings.py` (pageview snapshots), `report.py` (run report), `agent.py` (the four agent tool runners). | `config.load_config()` / `installs()` / `active_install()` / `unavailable_reason()`, `zim.get_article()` / `search()`, `download.DownloadManager`, `update.run_wikisink()` |
 | [enough/cloud.py](../enough/cloud.py) | ~1000 | OpenRouter integration: keyring read/write, in-memory key cache, OpenAI-compatible streaming + non-streaming clients, health check, response caching to `rness/io/cloud-cache/`, the broker-driven `pipeline_run()`. | `set_api_key()` / `clear_api_key()` / `has_api_key()`, `_get_api_key_for_broker()`, `health_check()`, `chat_completion()`, `stream_chat_completion()`, `cache_completion()`, `pipeline_run()` |
 | [enough/llm.py](../enough/llm.py) | ~125 | OpenAI-compatible client for the local llama-server. Streaming-only path for chat. | `stream_chat()`, `check_llm_reachable()` |
 | [enough/supervisor.py](../enough/supervisor.py) | ~400 | Manages the local llama-server subprocess. Adopts an existing process if one's already up; spawns its own otherwise. Skips spawning entirely when the active model is `opro-api`. | `LlamaSupervisor`, `_resolve_startup_choice()` |
@@ -56,7 +60,7 @@ Every Python module in `enough/`:
 | [enough/highlights.py](../enough/highlights.py) | ~250 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
 | [enough/girraph.py](../enough/girraph.py) | ~600 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
 | [enough/logger.py](../enough/logger.py) | small | Stdlib logging setup. | — |
-| [enough/static/index.html](../enough/static/index.html) | ~8000 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), chat pane, SSE consumer |
+| [enough/static/index.html](../enough/static/index.html) | ~11500 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), chat pane, SSE consumer, wikisink setup/installs modal + reader mode, girraph panel, review mode |
 
 `defaults/` ships templates that get copied or symlinked into project
 skeletons by `skeleton.py`:
@@ -133,6 +137,9 @@ cache.
 | Broker journal | `rness/knowledge/session-logs/<date>-broker.md` | none | no |
 | Fetched web cache | `rness/io/input/<timestamp>-<hash>-<slug>.md` | none | no |
 | Cloud cache | `rness/io/cloud-cache/<timestamp>-<slug>.md` + `_cloud-index.md` | none | no |
+| Saved wiki articles | `<project>/wiki/*.md` (per-project) or `~/enough/infoworld/wiki/` (shared) | none — created on first save | no (agent reads on demand) |
+| Wikisink registry/state | `~/enough/config/wikisink.json` (user-global, **not** per-project) | none | no |
+| Wiki comments/overlays | `<wikisink data dir>/comments/`, `overlay/`, `preserved/` | none | no |
 
 **Active vs available**: skills and roles ship as files but only become
 part of the system prompt when toggled on in the sidebar. The
@@ -388,7 +395,7 @@ the same process as the agent. Three jobs:
    error strings for the agent. The runner returns one of these as the
    tool body when a precondition fails.
 
-The current toggle catalog (8 toggles, all default `True`):
+The current toggle catalog (10 toggles, all default `True`):
 
 | Key | Group | Affects |
 |---|---|---|
@@ -400,6 +407,8 @@ The current toggle catalog (8 toggles, all default `True`):
 | `fetch_url_enabled` | fetch_url | Whether `fetch_url` works at all (otherwise agent falls back to `curl` via shell) |
 | `fetch_url_tor_for_offlist` | fetch_url | Off-allowlist fetches via Tor (vs outright denial) |
 | `fetch_url_cache_and_convert` | fetch_url | Pandoc HTML→markdown + cache in `rness/io/input/` |
+| `wikisink_enabled` | wikisink | Whether the agent's four wiki tools work at all (the 🚰 browser UI is ungated) |
+| `wikisink_live_updates` | wikisink | Whether wikisink update runs may call the Wikipedia/Wikimedia APIs (off = report from local state only) |
 
 ---
 
@@ -419,9 +428,13 @@ The current toggle catalog (8 toggles, all default `True`):
 | `update_node` | `tools.run_girraph_update_node` | `.girraph` path; patches only fields present, empty tag clears |
 | `link_nodes` | `tools.run_girraph_link_nodes` | `.girraph` path; `<remove>true</remove>` unlinks |
 | `remove_node` | `tools.run_girraph_remove_node` | `<confirmed>yes</confirmed>` required (user must confirm); children require `<cascade>true</cascade>` — no orphaning |
+| `wiki_search` | `tools.run_wiki_search` → `wikisink/agent.py` | `wikisink_enabled` toggle + an installed, reachable archive |
+| `read_wiki_article` | `tools.run_read_wiki_article` → `wikisink/agent.py` | same; full text cached under `rness/io/input/`, preview returned |
+| `wiki_status` | `tools.run_wiki_status` → `wikisink/agent.py` | `wikisink_enabled` toggle (works without an archive — that's the point) |
+| `wikisink` | `tools.run_wikisink` → `wikisink/agent.py` | `wikisink_enabled` toggle; network calls additionally gated by `wikisink_live_updates` |
 
-All registered in `_DISPATCH` (~line 1026 in tools.py) and
-`_TRACE_TOGGLE` (~line 1042). The tool-call XML parser
+All registered in `_DISPATCH` (~line 1267 in tools.py) and
+`_TRACE_TOGGLE` (~line 1292). The tool-call XML parser
 (`parse_tool_calls`) handles arbitrary tool names — extra inner tags
 (beyond `<path>`, `<content>`, `<command>`, `<url>`) end up in
 `ToolCall.extra` so new tools don't need parser changes.
@@ -476,6 +489,83 @@ Architecture notes:
 
 ---
 
+## Wikisink (local offline Wikipedia)
+
+The 🚰 subsystem: a Kiwix `.zim` archive of (a slice of) English
+Wikipedia, read in place via `libzim`, browsable in-app, searchable and
+readable by the agent, annotatable with comments, and refreshable
+against live Wikipedia. User-facing doc: [docs/WIKISINK.md](WIKISINK.md).
+All code lives in the [enough/wikisink/](../enough/wikisink/) package;
+`server.py` mounts the `/api/wiki/*` endpoints and hides wikisink dirs
+from the file tree.
+
+Architecture notes:
+
+- **`wikisink/config.py` owns all state** — one JSON file at
+  `~/enough/config/wikisink.json` (schema **v2**). It is user-global,
+  not per-project: every project shares the same archives, watch
+  registry, comments, and overrides. `ENOUGH_WIKISINK_CONFIG` overrides
+  the path (test/dev hook — use it; never touch real user state in
+  tests).
+- **Multiple installs, one active.** `installs[]` is a registry of base
+  archives, each with its own `storage_dir` (internal disk, external
+  drives, anywhere); `active_install` names the one being served.
+  Installs are **only created by completed downloads** (there is no
+  adopt-existing-file path) and "forget" only unregisters — the `.zim`
+  file is never deleted, except an old snapshot after an explicit
+  in-place upgrade (`replace_id`).
+- **Availability is a live property, not an error.** An install whose
+  file isn't reachable (drive detached) stays registered.
+  `config.installed()` = active archive servable *right now*;
+  `config.configured()` = any install registered;
+  `config.unavailable_reason()` = the user-facing explanation
+  distinguishing never-installed from drive-detached. `zim.py` raises
+  `WikisinkUnavailable` with that reason; endpoints surface it as a 503
+  with an actionable message.
+- **`volume_mounted()` guards every mkdir** under user-chosen paths.
+  Without it, `mkdir -p /Volumes/<name>/...` while a drive is detached
+  silently plants a phantom directory on the macOS boot volume that
+  shadows the next mount. If you add any code that creates directories
+  under a wikisink path, route it through the config helpers or apply
+  the same guard.
+- **Archives vs data.** Each install's `storage_dir` holds only the
+  `.zim` and its resumable `downloads/*.part`. The user's own data
+  (comments, overlays, preserved articles, rankings, run state) lives
+  under `data_dir` — local disk for fresh setups, so it survives drive
+  detachment; pre-v2 configs keep data beside their original archive
+  location (migration moves no files). Reads from an unreachable data
+  dir degrade gracefully (empty stores); writes fail loudly.
+- **v1 → v2 migration is automatic and one-way** (`config._migrate_v1`),
+  runs inside `load_config()` when an on-disk config has `version < 2`,
+  and persists on the next `save_config()`. Don't reintroduce the old
+  top-level `storage_dir` / `zim` keys — `active_zim_meta()` is the
+  compat shim for provenance strings.
+- **Switching installs is deliberately UI-only** (like deletion
+  overrides): `POST /api/wiki/installs/activate`, driven from the
+  installs manager in the 🚰 modal. The agent's `wiki_status` reports
+  install availability and tells the agent to *suggest* the modal —
+  there is intentionally no agent tool for switching, forgetting, or
+  overriding.
+- **`/api/wiki/*` endpoint map**: `status` (installs + availability +
+  counts; must stay instant — no network), `article`, `search`,
+  `suggest`, `random`, `comments` (+ reply), `save`, `flavors`,
+  `diskspace`, `setup` (start download; optional `replace_id`;
+  409s on duplicate target), `download/{pause,resume,cancel}`,
+  `installs/activate`, `installs` (DELETE = forget), `overrides`,
+  `override`, `wikisink` (the update run).
+- **The reader caches one `Archive` handle** (`zim.py` module singleton
+  under a lock). It is dropped whenever the file goes missing and on
+  `reset_archive()` (called after installs change) — a remounted drive
+  must never reuse a dead file handle.
+- **Frontend states** for the 🚰 modal (`setWikiSetupState` in
+  index.html): `manage | choose | confirm | downloading | paused |
+  error | done`. `manage` is the installs list (availability dots,
+  switch/forget, newer-snapshot upgrade offer); `choose` is the flavor
+  wizard, reached on first-ever setup or via "+ add an install".
+  Download progress streams over the `wiki_download` SSE event.
+
+---
+
 ## Tasks you might be asked to do
 
 ### Add a new skill
@@ -511,8 +601,8 @@ Architecture notes:
 
 1. Define `run_<tool>(project_dir: Path, call: ToolCall) -> ToolResult`
    in [tools.py](../enough/tools.py).
-2. Register in `_DISPATCH` (~line 1026 in tools.py) and `_TRACE_TOGGLE`
-   (~line 1042). Both grep cleanly by name if line numbers drift again.
+2. Register in `_DISPATCH` (~line 1267 in tools.py) and `_TRACE_TOGGLE`
+   (~line 1292). Both grep cleanly by name if line numbers drift again.
 3. If `ToolResult.render()` needs a specific attribute (e.g. `output=`
    for `cloud_pipeline`), add a branch in `render()`.
 4. Add an XML example block + prose to `TOOL_INSTRUCTIONS` in
@@ -538,7 +628,7 @@ imports — `cloud`, `models`, `tools` are typical late imports.
 ### Change the UI
 
 [enough/static/index.html](../enough/static/index.html) is a single
-~8000-line file with inline CSS and JS. Conventions:
+~11500-line file with inline CSS and JS. Conventions:
 
 - All modals follow the same `#<name>-modal` pattern with `.hidden`
   class and a `.modal-backdrop` for click-outside dismissal.
@@ -564,6 +654,19 @@ Edit [defaults/openrouter-config.json](../defaults/openrouter-config.json)
 (the `model_id` field). Note: this is only the default; existing users'
 `~/enough/config/openrouter.json` keeps whatever value they last set
 via the settings panel. There's no auto-migration.
+
+### Modify wikisink
+
+Read the Wikisink section above first, then
+[docs/WIKISINK.md](WIKISINK.md) for the user-facing contract. Rules of
+thumb: all state changes go through `wikisink/config.py` helpers (never
+hand-roll JSON edits or mkdirs); anything that could remove or replace
+user-visible data (archives, preserved articles, comments) must be
+user-confirmed in the UI — the agent gets read/search/update-run tools
+only; test against a scratch config via `ENOUGH_WIKISINK_CONFIG` and a
+tiny real ZIM (openzim's `zim-testing-suite` has ~40 KB ones) rather
+than mocking libzim. Adding a wikisink flavor = append to
+`download.FLAVORS`; the wizard and listing regex pick it up.
 
 ---
 
@@ -606,9 +709,25 @@ A list of things that will confuse you if you don't see them coming:
 - **Skills are off by default; paradigms are exactly one active at a
   time; roles are individually toggleable.** Three different
   on/off patterns for three concepts — don't conflate them.
-- **There's no automated test suite.** Smoke tests are written
-  ad-hoc as Python scripts that exercise the imports + a TestClient
-  against `create_app()`. See git history for examples.
+- **Wikisink state is user-global, not per-project.** One
+  `~/enough/config/wikisink.json` for the whole machine. Comments and
+  watches attach to *articles* (stable slug+hash keys via
+  `config.article_key()`), not to saved files or to any one archive —
+  they survive archive swaps and install switches.
+- **`installed` ≠ `configured` in wikisink.** A registered install on a
+  detached drive is configured-but-not-installed; treat that as a
+  normal, recoverable state (offer switching/reattaching), never as
+  "not set up" — the old single-install code made that mistake and
+  would have sent a user with 49 GB on a detached drive back through
+  the setup wizard.
+- **Never `mkdir` under a `/Volumes/...` path without
+  `config.volume_mounted()`.** See the Wikisink section for why.
+- **A pytest suite exists locally but is gitignored** (`tests/` is in
+  `.gitignore` by deliberate choice — `git log` has the story). Run
+  `uv run pytest tests/ -q` before declaring done; it covers girraphs
+  and project metadata. Wikisink and the web layer are exercised via
+  ad-hoc smoke scripts (TestClient against `create_app()`, or a live
+  server with `ENOUGH_WIKISINK_CONFIG` pointed at scratch state).
 
 ---
 
@@ -696,11 +815,14 @@ Plus external binaries installed by `bootstrap.sh` via Homebrew:
   for the silent-fix pass; absence is handled gracefully (skill falls
   back to LLM-only scanning).
 
-No automated test suite yet. Smoke tests are written as Python scripts
-that exercise the modules directly (sometimes via FastAPI's TestClient
-against `create_app()`). When making changes, run the relevant smoke
-flow before declaring done — examples are in git history under recent
-commits touching `cloud.py`, `tools.py`, and `server.py`.
+A small pytest suite lives in `tests/` (girraphs, project metadata) —
+present in local checkouts but gitignored, so a fresh clone won't have
+it. Run `uv run pytest tests/ -q` when it's there. Everything else is
+smoke-tested via ad-hoc Python scripts that exercise the modules
+directly (sometimes via FastAPI's TestClient against `create_app()`).
+When making changes, run the relevant smoke flow before declaring done
+— examples are in git history under recent commits touching `cloud.py`,
+`tools.py`, and `server.py`.
 
 ---
 

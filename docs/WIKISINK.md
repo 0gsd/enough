@@ -37,6 +37,28 @@ The archive is a single `.zim` file read in place — never extracted into
 a million files, never shown in the file manager. Only articles you
 explicitly save become visible files.
 
+## Multiple installs
+
+You can keep **several archives in several places** — say, the full
+49 GB `all_nopic` on an external drive plus a small `top_mini` on the
+internal disk as a fallback. Each completed download registers as an
+*install*; the one marked **active** is what the reader and the agent
+serve.
+
+Click ⚙ (or 🚰 when the active archive is unreachable) to open the
+installs list: every install shows its location and a live availability
+dot. From there you can **switch to** any reachable install, **+ add an
+install** in a new location, or **forget…** one you no longer want
+tracked (the `.zim` file itself is never deleted — reclaim the space
+yourself in Finder).
+
+Detaching the drive that holds the active archive doesn't lose
+anything: the install stays registered and simply shows as unreachable.
+Reattach the drive and it works again — no re-setup. Meanwhile you can
+switch to another install or add one. Your comments, watch registry,
+and deletion overrides are independent of any single install and carry
+across switches.
+
 ## Browsing (Wikisink view)
 
 Once installed, 🚰 opens the reader on your last-viewed page (or a random
@@ -130,22 +152,31 @@ can recommend it but never do it.
 ## Storage layout
 
 ```
-~/enough/wikisink/              (or wherever you chose)
-  wikipedia_en_*.zim            the base archive
+<each install's folder>         (~/enough/wikisink, /Volumes/…, wherever)
+  wikipedia_en_*.zim            that install's base archive
   downloads/*.part              resumable partial download
+~/enough/wikisink/              your data, independent of any install*
   overlay/                      live-refreshed watched articles
   preserved/                    deletion-overridden articles
   comments/                     comment threads (one JSON per article)
   rankings/                     daily top-1000 pageview snapshots
   state/run-*/                  update-run scratch + full reports
-~/enough/config/wikisink.json   config, watch registry, overrides
+~/enough/config/wikisink.json   config, install registry, watch registry, overrides
 ```
+
+\* Setups created before multi-install support keep their data beside
+the original archive location; fresh setups always keep it on the local
+disk so comments and preserved articles never vanish with a drive.
 
 None of this appears in the file manager — even if you point storage
 inside a project folder, the tree filter hides it.
 
 ## Troubleshooting
 
+- **"isn't reachable — the drive may be detached"** — the active
+  archive lives on a volume that isn't mounted. Reattach the drive
+  (nothing to redo; it heals instantly), or click 🚰 and switch to
+  another install / add a new one.
 - **Download interrupted?** Click 🚰 → resume. Partial data is kept in
   `downloads/*.part`; resume picks up mid-byte via HTTP ranges.
 - **"not enough free space"** — the wizard needs archive size + 5%.

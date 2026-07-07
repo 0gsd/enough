@@ -62,14 +62,22 @@ def resolve_article(path: str | None = None, title: str | None = None) -> dict[s
     ident = path or title or ""
     key = wconfig.article_key(ident)
 
+    # Data stores can sit on a v1-era external volume; when that volume
+    # is away, reads degrade to the base archive instead of erroring.
+    def _try_store(dir_fn, k: str):
+        try:
+            return _read_store(dir_fn(cfg), k)
+        except OSError:
+            return None
+
     if wconfig.is_overridden(ident, cfg):
-        found = _read_store(wconfig.preserved_dir(cfg), key)
+        found = _try_store(wconfig.preserved_dir, key)
         if found:
             html, meta = found
             return {"path": ident, "title": meta.get("title") or title or ident,
                     "html": html, "source": "preserved", "meta": meta}
 
-    found = _read_store(wconfig.overlay_dir(cfg), key)
+    found = _try_store(wconfig.overlay_dir, key)
     if found:
         html, meta = found
         return {"path": ident, "title": meta.get("title") or title or ident,
@@ -81,13 +89,13 @@ def resolve_article(path: str | None = None, title: str | None = None) -> dict[s
     # written post-lookup still win next time.
     canon_key = wconfig.article_key(art["path"])
     if canon_key != key:
-        found = _read_store(wconfig.overlay_dir(cfg), canon_key)
+        found = _try_store(wconfig.overlay_dir, canon_key)
         if found:
             html, meta = found
             return {"path": art["path"], "title": art["title"], "html": html,
                     "source": "overlay", "meta": meta}
     return {"path": art["path"], "title": art["title"], "html": art["html"],
-            "source": "zim", "meta": {"snapshot": (cfg.get("zim") or {}).get("snapshot")}}
+            "source": "zim", "meta": {"snapshot": wconfig.active_zim_meta(cfg).get("snapshot")}}
 
 
 def put_overlay(path: str, title: str, html: str, meta: dict[str, Any]) -> Path:

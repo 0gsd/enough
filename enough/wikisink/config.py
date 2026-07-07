@@ -6,11 +6,22 @@ registry (saved / commented articles the update engine refreshes), the
 deletion-override registry, and reading state (last viewed article plus
 a bounded ring of recently viewed paths used for deletion checks).
 
-Storage layout under `storage_dir` (default ~/enough/wikisink, user may
-point it anywhere, external drives included):
+Since schema v2 there can be several *installs* — base archives living
+in different places (internal disk, external drives) — with one marked
+active. An install whose file isn't currently reachable (drive
+detached) stays registered; the UI offers switching to another install
+or adding one, and everything heals when the drive comes back.
+
+Each install's storage dir holds only the big, replaceable bits:
 
     <flavor>_<date>.zim         the base archive, read in place
     downloads/<file>.part       resumable partial download
+
+The user's own data lives under `data_dir` (v2 default
+~/enough/wikisink — always the local disk for fresh setups, so comments
+and preserved articles never vanish with a drive; v1 configs keep their
+original storage dir to avoid moving files):
+
     overlay/<key>.html + .meta.json    live-refreshed watched articles
     preserved/<key>.html + .meta.json  deletion-overridden articles
     comments/<key>.json         per-article comment threads
@@ -49,20 +60,17 @@ VIEWED_RING_MAX = 200
 
 def _defaults() -> dict[str, Any]:
     return {
-        "version": 1,
-        "storage_dir": str(DEFAULT_STORAGE_DIR),
-        "zim": {
-            "flavor": None,       # e.g. "wikipedia_en_top1m_nopic"
-            "filename": None,     # e.g. "wikipedia_en_top1m_nopic_2026-04.zim"
-            "snapshot": None,     # e.g. "2026-04"
-            "url": None,
-            "size_bytes": 0,
-            "installed_at": None,
-        },
+        "version": 2,
+        "data_dir": str(DEFAULT_STORAGE_DIR),
+        "installs": [],           # [{"id", "storage_dir", "flavor", "filename",
+                                  #   "snapshot", "url", "size_bytes", "installed_at"}]
+        "active_install": None,   # id of the install being served
         "download": {
             "status": "idle",     # idle | downloading | paused | error | done
             "filename": None,
             "url": None,
+            "storage_dir": None,  # where this download lands
+            "replace_id": None,   # install being upgraded in place, if any
             "bytes_done": 0,
             "bytes_total": 0,
             "error": None,
@@ -74,6 +82,31 @@ def _defaults() -> dict[str, Any]:
         "overrides": [],          # [{"path", "title", "preserved_file", "reason",
                                   #   "deletion_log_excerpt", "detected_at", "overridden_at"}]
     }
+
+
+def _migrate_v1(cfg: dict[str, Any], on_disk: dict[str, Any]) -> None:
+    """Fold a v1 single-install config into the v2 shape, in place.
+    The old storage dir becomes data_dir (nothing on disk moves) and the
+    old zim block, if an archive was installed, becomes the one active
+    install. Next save_config persists the v2 shape."""
+    old_storage = on_disk.get("storage_dir") or str(DEFAULT_STORAGE_DIR)
+    cfg["data_dir"] = old_storage
+    zim = on_disk.get("zim") or {}
+    if isinstance(zim, dict) and zim.get("filename"):
+        entry = {
+            "id": install_id(old_storage, zim["filename"]),
+            "storage_dir": old_storage,
+            "flavor": zim.get("flavor"),
+            "filename": zim["filename"],
+            "snapshot": zim.get("snapshot"),
+            "url": zim.get("url"),
+            "size_bytes": zim.get("size_bytes") or 0,
+            "installed_at": zim.get("installed_at"),
+        }
+        cfg["installs"] = [entry]
+        cfg["active_install"] = entry["id"]
+    if cfg["download"].get("filename") and not cfg["download"].get("storage_dir"):
+        cfg["download"]["storage_dir"] = old_storage
 
 
 def load_config() -> dict[str, Any]:
@@ -94,8 +127,11 @@ def load_config() -> dict[str, Any]:
                                 cfg[key][k2] = v2
                     elif type(value) is type(cfg[key]) or cfg[key] is None or value is None:
                         cfg[key] = value
-        except (OSError, json.JSONDecodeError) as e:
+                if int(on_disk.get("version") or 1) < 2:
+                    _migrate_v1(cfg, on_disk)
+        except (OSError, json.JSONDecodeError, ValueError) as e:
             log.warning("wikisink config read failed (%s); using defaults", e)
+    cfg["version"] = 2
     return cfg
 
 
@@ -108,23 +144,171 @@ def save_config(cfg: dict[str, Any]) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Storage paths
+# Installs — registered base archives, one active
 # ---------------------------------------------------------------------------
 
-def storage_dir(cfg: dict[str, Any] | None = None) -> Path:
+def install_id(storage_dir: str, filename: str) -> str:
+    """Stable id for an install: where it lives + what file it is."""
+    return hashlib.sha256(f"{storage_dir}\n{filename}".encode()).hexdigest()[:10]
+
+
+def installs(cfg: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     cfg = cfg or load_config()
-    raw = cfg.get("storage_dir") or str(DEFAULT_STORAGE_DIR)
+    return [i for i in cfg.get("installs", []) if isinstance(i, dict) and i.get("filename")]
+
+
+def get_install(install: str, cfg: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    return next((i for i in installs(cfg) if i.get("id") == install), None)
+
+
+def active_install(cfg: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    cfg = cfg or load_config()
+    return get_install(cfg.get("active_install") or "", cfg)
+
+
+def install_zim_path(entry: dict[str, Any]) -> Path:
+    """Where this install's archive lives (or would live) — existence not
+    checked; pair with install_available."""
+    return Path(entry.get("storage_dir") or str(DEFAULT_STORAGE_DIR)).expanduser() \
+        / entry["filename"]
+
+
+def install_available(entry: dict[str, Any]) -> bool:
+    try:
+        return install_zim_path(entry).is_file()
+    except OSError:
+        return False
+
+
+def volume_mounted(p: Path) -> bool:
+    """False when `p` sits on a macOS external volume that isn't mounted.
+    Guards every mkdir under a user-chosen dir: creating
+    /Volumes/<name>/... while the drive is away would silently plant a
+    real directory on the boot volume and then shadow the next mount."""
+    parts = p.expanduser().parts
+    if len(parts) >= 3 and parts[0] == "/" and parts[1] == "Volumes":
+        return Path("/Volumes", parts[2]).exists()
+    return True
+
+
+def zim_file(cfg: dict[str, Any] | None = None) -> Path | None:
+    """Path to the active install's archive, or None when there is no
+    active install or its file isn't reachable right now."""
+    entry = active_install(cfg)
+    if entry is None:
+        return None
+    p = install_zim_path(entry)
+    return p if install_available(entry) else None
+
+
+def installed(cfg: dict[str, Any] | None = None) -> bool:
+    """True when the active archive is actually servable right now."""
+    return zim_file(cfg) is not None
+
+
+def configured(cfg: dict[str, Any] | None = None) -> bool:
+    """True when any install is registered, reachable or not."""
+    return bool(installs(cfg))
+
+
+def unavailable_reason(cfg: dict[str, Any] | None = None) -> str | None:
+    """User-facing reason the archive can't be served, or None when it
+    can. Distinguishes never-installed from drive-not-attached."""
+    cfg = cfg or load_config()
+    if installed(cfg):
+        return None
+    entry = active_install(cfg)
+    if entry is None:
+        return ("no local wikipedia archive is installed yet — click the 🚰 "
+                "button in the top bar to set one up.")
+    where = entry.get("storage_dir") or str(DEFAULT_STORAGE_DIR)
+    others = [i for i in installs(cfg)
+              if i.get("id") != entry.get("id") and install_available(i)]
+    msg = (f"the active wikipedia archive ({entry.get('filename')}) isn't "
+           f"reachable at {where} — if that's an external drive, it may be "
+           "detached. reattach it, or click 🚰 to switch installs or add one.")
+    if others:
+        msg += (f" {len(others)} other install"
+                f"{'s are' if len(others) > 1 else ' is'} available right now.")
+    return msg
+
+
+def add_install(entry: dict[str, Any], *, activate: bool = True) -> dict[str, Any]:
+    """Register an install (replacing any existing entry with the same
+    id) and optionally make it active. Returns the saved config."""
+    cfg = load_config()
+    cfg["installs"] = [i for i in installs(cfg) if i.get("id") != entry["id"]] + [entry]
+    if activate:
+        cfg["active_install"] = entry["id"]
+    save_config(cfg)
+    return cfg
+
+
+def remove_install(install: str) -> dict[str, Any] | None:
+    """Forget an install (registry only — the archive file always stays
+    on disk; deleting gigabytes is the user's own act, in the Finder).
+    If it was active, fall back to any reachable install. Returns the
+    removed entry, or None if the id is unknown."""
+    cfg = load_config()
+    removed = get_install(install, cfg)
+    if removed is None:
+        return None
+    cfg["installs"] = [i for i in installs(cfg) if i.get("id") != install]
+    if cfg.get("active_install") == install:
+        fallback = next((i for i in cfg["installs"] if install_available(i)),
+                        next(iter(cfg["installs"]), None))
+        cfg["active_install"] = fallback["id"] if fallback else None
+    save_config(cfg)
+    return removed
+
+
+def set_active_install(install: str) -> dict[str, Any] | None:
+    """Switch the served archive. Returns the entry, or None if unknown."""
+    cfg = load_config()
+    entry = get_install(install, cfg)
+    if entry is None:
+        return None
+    cfg["active_install"] = install
+    save_config(cfg)
+    return entry
+
+
+def active_zim_meta(cfg: dict[str, Any] | None = None) -> dict[str, Any]:
+    """The active install's metadata (flavor/snapshot/filename/…), or an
+    empty dict — shaped like the old single-install `zim` block for the
+    provenance strings sprinkled around the package."""
+    return active_install(cfg) or {}
+
+
+# ---------------------------------------------------------------------------
+# Data paths — the user's own wikisink data, independent of any install
+# ---------------------------------------------------------------------------
+
+def data_dir(cfg: dict[str, Any] | None = None) -> Path:
+    cfg = cfg or load_config()
+    raw = cfg.get("data_dir") or str(DEFAULT_STORAGE_DIR)
     return Path(raw).expanduser()
 
 
 def _subdir(name: str, cfg: dict[str, Any] | None = None) -> Path:
-    d = storage_dir(cfg) / name
+    base = data_dir(cfg)
+    if not volume_mounted(base):
+        raise OSError(
+            f"wikisink data at {base} isn't reachable — the volume isn't mounted")
+    d = base / name
     d.mkdir(parents=True, exist_ok=True)
     return d
 
 
-def downloads_dir(cfg: dict[str, Any] | None = None) -> Path:
-    return _subdir("downloads", cfg)
+def downloads_dir(storage: Path) -> Path:
+    """Partial downloads live beside their final destination (same
+    volume, so the finishing rename is atomic)."""
+    if not volume_mounted(storage):
+        raise OSError(
+            f"download target {storage} isn't reachable — the volume isn't mounted")
+    d = storage / "downloads"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
 
 
 def overlay_dir(cfg: dict[str, Any] | None = None) -> Path:
@@ -145,20 +329,6 @@ def rankings_dir(cfg: dict[str, Any] | None = None) -> Path:
 
 def state_dir(cfg: dict[str, Any] | None = None) -> Path:
     return _subdir("state", cfg)
-
-
-def zim_file(cfg: dict[str, Any] | None = None) -> Path | None:
-    """Path to the installed base archive, or None if not installed."""
-    cfg = cfg or load_config()
-    name = (cfg.get("zim") or {}).get("filename")
-    if not name:
-        return None
-    p = storage_dir(cfg) / name
-    return p if p.is_file() else None
-
-
-def installed(cfg: dict[str, Any] | None = None) -> bool:
-    return zim_file(cfg) is not None
 
 
 # ---------------------------------------------------------------------------

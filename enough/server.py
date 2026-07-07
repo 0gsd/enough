@@ -146,25 +146,32 @@ class Session:
 # File tree
 # ---------------------------------------------------------------------------
 
-def _wikisink_storage_real() -> Path | None:
-    """Resolved wikisink storage dir, or None when unset/missing. The
-    archive and its sidecar stores (overlay, comments, preserved, …)
-    must never render in the file tree — only articles explicitly saved
-    into a project's wiki/ or infoworld/wiki/ are user-visible files.
-    Resolved fresh per tree build: cheap (one tiny JSON read) and always
-    honors a just-changed storage_dir, wherever the user pointed it."""
-    try:
-        d = _wikisink_config.storage_dir()
-        return d.resolve() if d.exists() else None
-    except OSError:
-        return None
+def _wikisink_storage_real() -> frozenset[Path]:
+    """Resolved wikisink dirs — the data dir plus every registered
+    install's storage dir. Archives and sidecar stores (overlay,
+    comments, preserved, …) must never render in the file tree — only
+    articles explicitly saved into a project's wiki/ or infoworld/wiki/
+    are user-visible files. Resolved fresh per tree build: cheap (one
+    tiny JSON read) and always honors just-changed locations."""
+    cfg = _wikisink_config.load_config()
+    dirs = [_wikisink_config.data_dir(cfg)]
+    dirs += [Path(i.get("storage_dir") or "").expanduser()
+             for i in _wikisink_config.installs(cfg)]
+    out = set()
+    for d in dirs:
+        try:
+            if d != Path(".") and d.exists():
+                out.add(d.resolve())
+        except OSError:
+            continue
+    return frozenset(out)
 
 
 def _walk_tree(
     root: Path,
     rel_parts: tuple[str, ...],
     visited: frozenset[Path],
-    wikisink_real: Path | None = None,
+    wikisink_real: frozenset[Path] = frozenset(),
 ) -> list[dict[str, Any]]:
     """Walk the project tree to arbitrary depth, with symlink-cycle protection.
 
@@ -193,9 +200,9 @@ def _walk_tree(
         rel = "/".join(rel_parts + (p.name,))
         if rel in HIDDEN_TREE_PATHS:
             continue
-        if wikisink_real is not None and p.is_dir():
+        if wikisink_real and p.is_dir():
             try:
-                if p.resolve() == wikisink_real:
+                if p.resolve() in wikisink_real:
                     continue
             except OSError:
                 pass
@@ -1810,20 +1817,39 @@ def create_app(
             if installed:
                 try:
                     info = _wiki_zim.snapshot_info()
-                except _wiki_zim.WikisinkUnavailable as e:
-                    # e.g. libzim wheel missing even though the file exists
+                except (_wiki_zim.WikisinkUnavailable, RuntimeError) as e:
+                    # libzim wheel missing, or the file is corrupt/truncated
+                    # (a real possibility with removable drives)
                     installed = False
                     info = {"error": str(e)}
             try:
                 comment_count = len(list(_wikisink_config.comments_dir(cfg).glob("*.json")))
             except OSError:
                 comment_count = 0
+            active_meta = _wikisink_config.active_zim_meta(cfg)
+            install_rows = [{
+                **i,
+                "size_human": _wiki_download.bytes_to_human(i.get("size_bytes") or 0),
+                "available": _wikisink_config.install_available(i),
+                "active": i.get("id") == cfg.get("active_install"),
+            } for i in _wikisink_config.installs(cfg)]
             return {
+                # installed = the active archive is servable right now;
+                # configured = installs exist, reachable or not. A detached
+                # drive is configured-but-not-installed, and the reason
+                # explains that in user words.
                 "installed": installed,
+                "configured": _wikisink_config.configured(cfg),
+                "unavailable_reason": (None if installed
+                                       else _wikisink_config.unavailable_reason(cfg)),
+                "installs": install_rows,
+                "active_install": cfg.get("active_install"),
                 "zim": info,
-                "flavor": (cfg.get("zim") or {}).get("flavor"),
-                "snapshot": (cfg.get("zim") or {}).get("snapshot"),
-                "storage_dir": str(_wikisink_config.storage_dir(cfg)),
+                "flavor": active_meta.get("flavor"),
+                "snapshot": active_meta.get("snapshot"),
+                "storage_dir": str(active_meta.get("storage_dir")
+                                   or _wikisink_config.DEFAULT_STORAGE_DIR),
+                "data_dir": str(_wikisink_config.data_dir(cfg)),
                 "download": cfg.get("download"),
                 "download_active": wiki_dl.active,
                 "last_viewed": cfg.get("last_viewed"),
@@ -1840,6 +1866,37 @@ def create_app(
                 "overrides": cfg.get("overrides", []),
             }
         return await asyncio.to_thread(_status)
+
+    @app.post("/api/wiki/installs/activate")
+    async def api_wiki_install_activate(request: Request) -> dict[str, Any]:
+        """Switch which registered archive is served. Switching to a
+        currently unreachable install is allowed (the user may be about
+        to plug the drive in) — the UI warns, nothing breaks."""
+        body = await request.json()
+        install = (body.get("id") or "").strip()
+        entry = await asyncio.to_thread(_wikisink_config.set_active_install, install)
+        if entry is None:
+            raise HTTPException(404, f"no install {install!r}")
+        _wiki_zim.reset_archive()
+        _broker.trace(project_dir, tool="wiki_install", decision="allowed",
+                      args={"op": "activate", "id": install},
+                      result_ok=True, result_summary=entry.get("filename") or "")
+        return {"ok": True, "active": entry,
+                "available": _wikisink_config.install_available(entry)}
+
+    @app.delete("/api/wiki/installs")
+    async def api_wiki_install_forget(id: str = Query(...)) -> dict[str, Any]:
+        """Forget an install (registry only). The archive file always
+        stays on disk — deleting gigabytes is the user's own act."""
+        removed = await asyncio.to_thread(_wikisink_config.remove_install, id)
+        if removed is None:
+            raise HTTPException(404, f"no install {id!r}")
+        _wiki_zim.reset_archive()
+        _broker.trace(project_dir, tool="wiki_install", decision="allowed",
+                      args={"op": "forget", "id": id},
+                      result_ok=True,
+                      result_summary=f"file kept: {removed.get('filename')}")
+        return {"ok": True, "file_kept": str(_wikisink_config.install_zim_path(removed))}
 
     @app.get("/api/wiki/article")
     async def api_wiki_article(
@@ -2009,14 +2066,30 @@ def create_app(
         body = await request.json()
         flavor = (body.get("flavor") or "").strip()
         storage_dir = (body.get("storage_dir") or "").strip() or None
+        replace_id = (body.get("replace_id") or "").strip() or None
         listing = await asyncio.to_thread(_wiki_download.list_flavors)
         entry = next((f for f in listing["flavors"] if f["flavor"] == flavor), None)
         if entry is None:
             raise HTTPException(404, f"unknown flavor {flavor!r}")
+        # Same file into the same place = the install that's already
+        # registered; switching to it beats re-downloading 16-49 GB.
+        target = str(Path(storage_dir or str(
+            _wikisink_config.DEFAULT_STORAGE_DIR)).expanduser())
+        dupe = _wikisink_config.get_install(
+            _wikisink_config.install_id(target, entry["filename"]))
+        if dupe is not None and not replace_id:
+            raise HTTPException(409, (
+                f"{entry['filename']} is already installed at {target} — "
+                "switch to it in the installs list instead of downloading again."
+                if _wikisink_config.install_available(dupe) else
+                f"{entry['filename']} is already registered at {target} but "
+                "unreachable — reattach that drive, or forget the install "
+                "first if it's gone for good."))
         try:
             wiki_dl.start(flavor=entry["flavor"], filename=entry["filename"],
                           url=entry["url"], size_bytes=entry["size_bytes"],
-                          snapshot=entry["date"], storage_dir=storage_dir)
+                          snapshot=entry["date"], storage_dir=storage_dir,
+                          replace_id=replace_id)
         except _wiki_download.DownloadError as e:
             code = 409 if "already running" in str(e) else 400
             raise HTTPException(code, str(e)) from None

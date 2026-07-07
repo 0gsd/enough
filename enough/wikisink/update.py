@@ -394,7 +394,8 @@ def run_wikisink(project_dir: Path, scope: str = "watched") -> str:
     cfg = wconfig.load_config()
     if not wconfig.installed(cfg):
         raise wzim.WikisinkUnavailable(
-            "no local wikipedia archive installed — set one up via the 🚰 button first.")
+            wconfig.unavailable_reason(cfg)
+            or "the wikipedia archive isn't reachable right now.")
     live = broker.is_enabled("wikisink_live_updates")
     now = dt.datetime.now()
     run_dir = _find_resumable(now)

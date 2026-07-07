@@ -175,7 +175,7 @@ def newer_snapshot_available(cfg: dict[str, Any] | None = None,
     if cached_only and not listing_is_cached():
         return None
     cfg = cfg or wconfig.load_config()
-    zim = cfg.get("zim") or {}
+    zim = wconfig.active_zim_meta(cfg)
     flavor, snapshot = zim.get("flavor"), zim.get("snapshot")
     if not flavor or not snapshot:
         return None
@@ -223,6 +223,9 @@ class DownloadManager:
         return cfg["download"]
 
     def preflight(self, size_bytes: int, storage: Path) -> None:
+        if not wconfig.volume_mounted(storage):
+            raise DownloadError(
+                f"storage dir {storage} isn't reachable — is the drive attached?")
         storage.mkdir(parents=True, exist_ok=True)
         if not (storage / ".").exists():
             raise DownloadError(f"storage dir {storage} isn't reachable")
@@ -235,24 +238,27 @@ class DownloadManager:
             )
 
     def start(self, *, flavor: str, filename: str, url: str, size_bytes: int,
-              snapshot: str, storage_dir: str | None = None) -> None:
+              snapshot: str, storage_dir: str | None = None,
+              replace_id: str | None = None) -> None:
         """Kick off (or resume) a download as a background task on the
-        running event loop. Raises DownloadError on preflight failure."""
+        running event loop. The finished archive is registered as a new
+        install (activated on completion); `replace_id` instead upgrades
+        that install in place — its old file is deleted when the new one
+        lands. Raises DownloadError on preflight failure."""
         if self.active:
             raise DownloadError("a download is already running")
-        cfg = wconfig.load_config()
-        if storage_dir:
-            cfg["storage_dir"] = str(Path(storage_dir).expanduser())
-            wconfig.save_config(cfg)
-        storage = wconfig.storage_dir(cfg)
+        if replace_id and wconfig.get_install(replace_id) is None:
+            raise DownloadError(f"no install {replace_id!r} to replace")
+        storage = Path(storage_dir or str(wconfig.DEFAULT_STORAGE_DIR)).expanduser()
         self.preflight(size_bytes, storage)
         self._pause = False
         self._cancel = False
         self._persist(status="downloading", filename=filename, url=url,
+                      storage_dir=str(storage), replace_id=replace_id,
                       bytes_total=size_bytes, error=None)
         self._task = asyncio.get_running_loop().create_task(
             self._run(flavor=flavor, filename=filename, url=url,
-                      snapshot=snapshot, storage=storage)
+                      snapshot=snapshot, storage=storage, replace_id=replace_id)
         )
 
     def resume(self) -> None:
@@ -261,13 +267,14 @@ class DownloadManager:
         dl = cfg["download"]
         if dl.get("status") not in ("paused", "error", "downloading") or not dl.get("url"):
             raise DownloadError("nothing to resume")
-        zimc = cfg.get("zim") or {}
         # Flavor/snapshot ride along in the filename: wikipedia_en_<flavor>_<date>.zim
         m = re.fullmatch(r"wikipedia_en_(.+)_(\d{4}-\d{2})\.zim", dl["filename"] or "")
-        flavor = m.group(1) if m else (zimc.get("flavor") or "unknown")
-        snapshot = m.group(2) if m else (zimc.get("snapshot") or "")
+        flavor = m.group(1) if m else "unknown"
+        snapshot = m.group(2) if m else ""
         self.start(flavor=flavor, filename=dl["filename"], url=dl["url"],
-                   size_bytes=dl.get("bytes_total") or 0, snapshot=snapshot)
+                   size_bytes=dl.get("bytes_total") or 0, snapshot=snapshot,
+                   storage_dir=dl.get("storage_dir"),
+                   replace_id=dl.get("replace_id"))
 
     def pause(self) -> None:
         self._pause = True
@@ -277,19 +284,25 @@ class DownloadManager:
         if not self.active:
             # Nothing running (e.g. paused across a restart): clean up now.
             cfg = wconfig.load_config()
-            part = wconfig.downloads_dir(cfg) / f"{cfg['download'].get('filename')}.part"
-            part.unlink(missing_ok=True)
+            dl = cfg["download"]
+            storage = Path(dl.get("storage_dir")
+                           or str(wconfig.DEFAULT_STORAGE_DIR)).expanduser()
+            if wconfig.volume_mounted(storage):
+                part = storage / "downloads" / f"{dl.get('filename')}.part"
+                part.unlink(missing_ok=True)
             self._persist(status="idle", filename=None, url=None,
+                          storage_dir=None, replace_id=None,
                           bytes_done=0, bytes_total=0, error=None)
 
     async def _run(self, *, flavor: str, filename: str, url: str,
-                   snapshot: str, storage: Path) -> None:
-        part = wconfig.downloads_dir() / f"{filename}.part"
+                   snapshot: str, storage: Path, replace_id: str | None = None) -> None:
+        part = wconfig.downloads_dir(storage) / f"{filename}.part"
         try:
             await self._download(url, part)
             if self._cancel:
                 part.unlink(missing_ok=True)
                 self._persist(status="idle", filename=None, url=None,
+                              storage_dir=None, replace_id=None,
                               bytes_done=0, bytes_total=0, error=None)
                 await self._fire({"status": "idle"})
                 return
@@ -298,22 +311,30 @@ class DownloadManager:
                 self._persist(status="paused", bytes_done=done)
                 await self._fire({"status": "paused", "bytes_done": done})
                 return
-            # Complete: move into place, swap config, drop any old archive.
+            # Complete: move into place and register + activate the
+            # install. Other installs are untouched; only an explicit
+            # replace (snapshot upgrade, confirmed at start) deletes its
+            # predecessor's file.
             final = storage / filename
-            old = wconfig.zim_file()
             part.rename(final)
-            cfg = wconfig.load_config()
-            cfg["zim"] = {
+            replaced = wconfig.get_install(replace_id) if replace_id else None
+            entry = {
+                "id": wconfig.install_id(str(storage), filename),
+                "storage_dir": str(storage),
                 "flavor": flavor, "filename": filename, "snapshot": snapshot,
                 "url": url, "size_bytes": final.stat().st_size,
                 "installed_at": wconfig._now_iso(),
             }
-            cfg["download"] = {**cfg["download"], "status": "done",
-                               "bytes_done": final.stat().st_size, "error": None}
-            wconfig.save_config(cfg)
+            wconfig.add_install(entry)
+            if replaced is not None and replaced["id"] != entry["id"]:
+                wconfig.remove_install(replaced["id"])
+                wconfig.set_active_install(entry["id"])
+                old = wconfig.install_zim_path(replaced)
+                if wconfig.volume_mounted(old) and old != final:
+                    old.unlink(missing_ok=True)
+            self._persist(status="done", bytes_done=final.stat().st_size,
+                          error=None)
             wzim.reset_archive()
-            if old is not None and old != final:
-                old.unlink(missing_ok=True)  # replaced snapshot; user confirmed at start
             await self._fire({"status": "done", "filename": filename})
             log.info("wikisink archive installed: %s", final)
         except Exception as e:  # noqa: BLE001 — surfaced to the UI, not raised into the loop

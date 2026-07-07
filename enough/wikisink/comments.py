@@ -41,8 +41,14 @@ def _doc_path(article_path: str) -> Path:
 
 
 def load_comments(article_path: str) -> dict[str, Any]:
-    p = _doc_path(article_path)
-    if p.is_file():
+    try:
+        p = _doc_path(article_path)
+    except OSError as e:
+        # v1-era data dir on a detached volume: read as "no comments"
+        # rather than erroring the reader; writes still fail loudly.
+        log.warning("wikisink comments unreachable (%s)", e)
+        p = None
+    if p is not None and p.is_file():
         try:
             doc = json.loads(p.read_text(encoding="utf-8"))
             if isinstance(doc, dict) and isinstance(doc.get("comments"), list):
@@ -142,7 +148,11 @@ def commented_articles() -> list[dict[str, str]]:
     """[{path, title, count}] for every article with live comments —
     input to the update engine's watched set."""
     out = []
-    for p in sorted(wconfig.comments_dir().glob("*.json")):
+    try:
+        docs = sorted(wconfig.comments_dir().glob("*.json"))
+    except OSError:
+        return out  # data dir on a detached volume — nothing readable now
+    for p in docs:
         try:
             doc = json.loads(p.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):

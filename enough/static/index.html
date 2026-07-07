@@ -4218,6 +4218,95 @@
       white-space: pre-wrap;
     }
 
+    /* installs manager (multiple archives, e.g. one per drive) */
+    .wiki-manage-note {
+      border: 1px solid var(--accent-tool);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      color: var(--fg);
+      font-size: 12.5px;
+    }
+
+    .wiki-install {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
+
+    .wiki-install.active {
+      border-color: var(--accent-agent);
+    }
+
+    .wiki-install .in-dot {
+      flex: 0 0 auto;
+      font-size: 10px;
+      color: var(--accent-agent);
+    }
+
+    .wiki-install.unavailable .in-dot {
+      color: var(--fg-faint);
+    }
+
+    .wiki-install .in-main {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .wiki-install .in-title {
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    .wiki-install .in-title .in-flag {
+      font-weight: 400;
+      font-size: 11px;
+      color: var(--accent-agent);
+      margin-left: 6px;
+    }
+
+    .wiki-install.unavailable .in-title .in-flag {
+      color: var(--accent-tool);
+    }
+
+    .wiki-install .in-sub {
+      display: block;
+      color: var(--fg-muted);
+      font-size: 11.5px;
+      font-family: var(--font-mono);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .wiki-install .in-actions {
+      flex: 0 0 auto;
+      display: flex;
+      gap: 6px;
+    }
+
+    .wiki-install .in-actions button {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 9px;
+      font-size: 11.5px;
+      cursor: pointer;
+    }
+
+    .wiki-install .in-actions button:hover {
+      background: var(--bg-raise);
+    }
+
+    .wiki-install .in-actions button.primary {
+      border-color: var(--accent-agent);
+    }
+
     /* ---------- Wikisink: view mode ---------- */
     /* Browser-style offline Wikipedia reader. Same full-frame overlay
        skeleton as #review-mode; "fancy style" typography but a notch
@@ -5092,6 +5181,15 @@
         <button class="modal-close" onclick="closeWikiSetup()" aria-label="close">×</button>
       </div>
       <div class="modal-body">
+        <div id="wiki-setup-manage" hidden>
+          <div class="wiki-manage-note" id="wiki-manage-note" hidden></div>
+          <p class="wiki-setup-intro">
+            your archives. each install lives wherever you put it —
+            internal disk, external drives — and you can switch between
+            them anytime. an unreachable one just means its drive isn't
+            attached right now; it comes back when the drive does.</p>
+          <div id="wiki-install-list"></div>
+        </div>
         <div id="wiki-setup-choose">
           <p class="wiki-setup-intro">
             wikisink puts an offline copy of english wikipedia on your
@@ -5460,7 +5558,7 @@
         name: 'wikisink',
         path: '~/enough/wikisink/',
         what: 'your local, offline copy of (a slice of) english wikipedia — a single Kiwix ZIM archive read in place, never extracted, so the file manager only ever shows articles you explicitly save. the 🚰 button opens a browser-style reader with full-text search, cross-links, a random-article die, an agent chat pill, comments, and two save buttons (📥 project <code>wiki/</code>, 🌐 <code>infoworld/wiki/</code>). the agent can search and read the whole archive via its wiki tools.',
-        how: 'first click of 🚰 runs the setup wizard: pick a size (top-1M-articles no-images ≈ 16 GB is the default; full english ≈ 49 GB; smaller options too), pick a storage folder (external drives work), confirm, and let the resumable download run — pause, quit, resume anytime. once installed, ask the agent to run a <strong>wikisink</strong> to refresh your saved/commented ("watched") articles from live wikipedia and get a report: watched-article changes, edit spikes, pageview movers &amp; losers, and suspicious deletions. the 🛡 button on any article is the <em>deletion override</em>: keep your local copy forever, excluded from updates. ⚙ opens settings, including base-archive replacement when a newer snapshot ships.',
+        how: 'first click of 🚰 runs the setup wizard: pick a size (top-1M-articles no-images ≈ 16 GB is the default; full english ≈ 49 GB; smaller options too), pick a storage folder (external drives work), confirm, and let the resumable download run — pause, quit, resume anytime. you can keep <em>several installs</em> in different places (say, the full archive on an external drive plus a small one on the internal disk) and switch between them in the ⚙ installs list; if a drive is detached, its install just shows as unreachable until the drive returns. once installed, ask the agent to run a <strong>wikisink</strong> to refresh your saved/commented ("watched") articles from live wikipedia and get a report: watched-article changes, edit spikes, pageview movers &amp; losers, and suspicious deletions. the 🛡 button on any article is the <em>deletion override</em>: keep your local copy forever, excluded from updates. ⚙ opens the installs manager, including base-archive replacement when a newer snapshot ships.',
         ideas: [
           'save the articles a project leans on into its <code>wiki/</code> folder — the agent grounds itself on them (with CC BY-SA attribution frontmatter built in).',
           'comment on claims you doubt, then run a wikisink later — comments survive article updates (re-pinned or orphaned, never lost) and commented articles are watched automatically.',
@@ -7152,9 +7250,10 @@
     // progress over SSE. Once installed, the button opens wiki view mode.
 
     let WIKI_STATUS = null;
-    let WIKI_SETUP_STATE = 'choose'; // choose | confirm | downloading | paused | done | error
+    let WIKI_SETUP_STATE = 'choose'; // manage | choose | confirm | downloading | paused | done | error
     let WIKI_CHOSEN = null;          // flavor entry selected in the wizard
     let WIKI_FLAVORS = [];
+    let WIKI_REPLACE_ID = null;      // install being upgraded in place, if any
 
     function wikiFmtBytes(n) {
       if (!n && n !== 0) return '?';
@@ -7183,6 +7282,7 @@
     function setWikiSetupState(state) {
       WIKI_SETUP_STATE = state;
       const sections = {
+        manage: 'wiki-setup-manage',
         choose: 'wiki-setup-choose',
         confirm: 'wiki-setup-confirm',
         downloading: 'wiki-setup-progress',
@@ -7190,7 +7290,7 @@
         error: 'wiki-setup-progress',
         done: 'wiki-setup-done',
       };
-      for (const id of ['wiki-setup-choose', 'wiki-setup-confirm',
+      for (const id of ['wiki-setup-manage', 'wiki-setup-choose', 'wiki-setup-confirm',
                         'wiki-setup-progress', 'wiki-setup-done']) {
         document.getElementById(id).hidden = id !== sections[state];
       }
@@ -7212,9 +7312,18 @@
       const b = (label, fn, primary) =>
         `<button class="${primary ? 'primary' : ''}" onclick="${fn}">${label}</button>`;
       switch (WIKI_SETUP_STATE) {
-        case 'choose':
-          foot.innerHTML = b('continue →', 'wikiSetupConfirmStep()', true);
+        case 'manage': {
+          const canOpen = WIKI_STATUS && WIKI_STATUS.installed;
+          foot.innerHTML = b('+ add an install', 'wikiSetupChooseStep()', !canOpen) +
+            (canOpen ? b('open wikisink 🚰', 'wikiSetupOpenView()', true) : '');
           break;
+        }
+        case 'choose': {
+          const back = WIKI_STATUS && WIKI_STATUS.configured
+            ? b('← installs', 'wikiShowManage()', false) : '';
+          foot.innerHTML = back + b('continue →', 'wikiSetupConfirmStep()', true);
+          break;
+        }
         case 'confirm':
           foot.innerHTML = b('← back', 'setWikiSetupState(\'choose\')', false) +
             b(`yes — download ${WIKI_CHOSEN ? WIKI_CHOSEN.size_human : ''}`,
@@ -7240,7 +7349,7 @@
 
     let _wikiModalOpenedAt = 0;
 
-    async function openWikiSetup() {
+    async function openWikiSetup(view) {
       _wikiModalOpenedAt = Date.now();
       document.getElementById('wiki-setup-modal').classList.remove('hidden');
       WIKI_STATUS = WIKI_STATUS || await fetchWikiStatus();
@@ -7253,31 +7362,180 @@
         if (dl.status === 'error' && dl.error) wikiSetupError(dl.error);
         return;
       }
-      setWikiSetupState('choose');
-      if (WIKI_STATUS && WIKI_STATUS.storage_dir) {
-        document.getElementById('wiki-storage-input').value = WIKI_STATUS.storage_dir;
+      WIKI_REPLACE_ID = null;
+      // Anything already installed (even on a detached drive) opens on
+      // the installs list; the flavor wizard is for the very first setup
+      // or an explicit "+ add an install".
+      if (view !== 'choose' && WIKI_STATUS && WIKI_STATUS.configured) {
+        wikiShowManage();
+      } else {
+        wikiSetupChooseStep();
       }
-      refreshWikiDiskfree();
+    }
+
+    function wikiShowManage() {
+      setWikiSetupState('manage');
+      renderWikiManage();
+      // Warm the kiwix listing cache in the background so the
+      // newer-snapshot offer can appear on the active install.
+      loadWikiFlavors().then(async () => {
+        if (WIKI_SETUP_STATE !== 'manage') return;
+        WIKI_STATUS = await fetchWikiStatus() || WIKI_STATUS;
+        renderWikiManage();
+      });
+    }
+    window.wikiShowManage = wikiShowManage;
+
+    function renderWikiManage() {
+      const s = WIKI_STATUS || {};
+      const note = document.getElementById('wiki-manage-note');
+      if (s.configured && !s.installed && s.unavailable_reason) {
+        note.textContent = s.unavailable_reason;
+        note.hidden = false;
+      } else {
+        note.hidden = true;
+        note.textContent = '';
+      }
+      const list = document.getElementById('wiki-install-list');
+      const rows = (s.installs || []).map(i => {
+        const label = (WIKI_FLAVORS.find(f => f.flavor === i.flavor) || {}).label
+          || i.flavor || i.filename;
+        const actions = [];
+        if (i.active && s.newer_snapshot && s.newer_snapshot.flavor === i.flavor) {
+          actions.push(`<button class="primary" onclick="wikiStartReplace()"
+            title="download the ${escapeHtml(s.newer_snapshot.date)} snapshot into the same place and swap it in">
+            update → ${escapeHtml(s.newer_snapshot.date)}</button>`);
+        }
+        if (!i.active && i.available) {
+          actions.push(`<button class="primary" onclick="wikiActivateInstall('${i.id}')">switch to</button>`);
+        }
+        actions.push(`<button onclick="wikiForgetInstall('${i.id}')">forget…</button>`);
+        return `
+          <div class="wiki-install ${i.active ? 'active' : ''} ${i.available ? '' : 'unavailable'}">
+            <span class="in-dot" title="${i.available ? 'available' : 'not reachable — drive detached?'}">●</span>
+            <span class="in-main">
+              <span class="in-title">${escapeHtml(label)} · ${escapeHtml(i.snapshot || '?')} · ${escapeHtml(i.size_human || '')}
+                ${i.active ? '<span class="in-flag">active</span>' : ''}
+                ${i.available ? '' : '<span class="in-flag">drive detached?</span>'}</span>
+              <span class="in-sub" title="${escapeHtml(i.storage_dir || '')}">${escapeHtml(i.storage_dir || '')}</span>
+            </span>
+            <span class="in-actions">${actions.join('')}</span>
+          </div>`;
+      });
+      list.innerHTML = rows.join('') ||
+        '<div class="wiki-dim">no installs yet.</div>';
+    }
+
+    async function wikiActivateInstall(id) {
+      try {
+        const r = await fetch('/api/wiki/installs/activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id }),
+        });
+        const js = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(js.detail || `switch failed (${r.status})`);
+        // New archive, new world: drop reader state so the last-viewed
+        // article reloads from the newly active install.
+        WIKI_STATUS = await fetchWikiStatus();
+        WIKI_PATH = null;
+        WIKI_TITLE = null;
+        WIKI_HISTORY = [];
+        WIKI_HISTORY_IDX = -1;
+        document.getElementById('wiki-body').innerHTML = '';
+        if (js.available) {
+          closeWikiSetup();
+          if (typeof enterWikiMode === 'function') enterWikiMode();
+          wikiToast('switched — reading from ' +
+            ((js.active || {}).filename || 'the new archive'));
+        } else {
+          renderWikiManage();
+        }
+      } catch (e) {
+        wikiSetupError(String(e.message || e));
+      }
+    }
+    window.wikiActivateInstall = wikiActivateInstall;
+
+    async function wikiForgetInstall(id) {
+      const entry = ((WIKI_STATUS || {}).installs || []).find(i => i.id === id) || {};
+      const msg = `forget the install at ${entry.storage_dir || '?'} ` +
+        `(${entry.filename || '?'})?\n\nthe archive file itself is never deleted — ` +
+        `it stays on disk and you can reclaim the space in Finder. but enough ` +
+        `stops tracking it, so using it again later would mean a fresh download.`;
+      if (!confirm(msg)) return;
+      try {
+        const r = await fetch('/api/wiki/installs?id=' + encodeURIComponent(id),
+          { method: 'DELETE' });
+        const js = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(js.detail || `forget failed (${r.status})`);
+        WIKI_STATUS = await fetchWikiStatus();
+        if (WIKI_STATUS && WIKI_STATUS.configured) renderWikiManage();
+        else wikiSetupChooseStep();
+      } catch (e) {
+        wikiSetupError(String(e.message || e));
+      }
+    }
+    window.wikiForgetInstall = wikiForgetInstall;
+
+    function wikiStartReplace() {
+      const s = WIKI_STATUS || {};
+      const ns = s.newer_snapshot;
+      const active = (s.installs || []).find(i => i.active);
+      if (!ns || !active) return;
+      const label = (WIKI_FLAVORS.find(f => f.flavor === ns.flavor) || {}).label
+        || ns.flavor;
+      WIKI_CHOSEN = { ...ns, label, size_human: ns.size_human || '' };
+      WIKI_REPLACE_ID = active.id;
+      document.getElementById('wiki-storage-input').value = active.storage_dir || '';
+      document.getElementById('wiki-confirm-text').textContent =
+        `update this install? this downloads ${WIKI_CHOSEN.size_human} ` +
+        `(${label}, snapshot ${ns.date}) into ${active.storage_dir} and swaps ` +
+        `it in when done — the old ${active.snapshot} file is deleted then, ` +
+        `not before. your comments, saves, and overrides all carry over.`;
+      setWikiSetupState('confirm');
+    }
+    window.wikiStartReplace = wikiStartReplace;
+
+    async function loadWikiFlavors() {
       try {
         const js = await (await fetch('/api/wiki/flavors')).json();
         WIKI_FLAVORS = js.flavors || [];
-        const list = document.getElementById('wiki-flavor-list');
-        list.innerHTML = WIKI_FLAVORS.map((f, i) => `
-          <label class="wiki-flavor">
-            <input type="radio" name="wiki-flavor" value="${f.flavor}" ${f.is_default ? 'checked' : ''}>
-            <span><span class="fl-label">${escapeHtml(f.label)}</span>
-              <span class="fl-blurb">${escapeHtml(f.blurb)} · snapshot ${escapeHtml(f.date)}</span></span>
-            <span class="fl-size">${escapeHtml(f.size_human)}</span>
-          </label>`).join('');
-        if (!js.live) {
-          list.insertAdjacentHTML('beforeend',
-            '<div class="wiki-dim">couldn\'t reach download.kiwix.org — sizes shown are approximate.</div>');
-        }
-      } catch (_) {
-        document.getElementById('wiki-flavor-list').innerHTML =
+        return js;
+      } catch (_) { return null; }
+    }
+
+    async function wikiSetupChooseStep() {
+      WIKI_REPLACE_ID = null;
+      setWikiSetupState('choose');
+      const input = document.getElementById('wiki-storage-input');
+      // First-ever setup prefills the configured/default location; adding
+      // an extra install suggests the local default (the external one is
+      // presumably what the new copy is a fallback for).
+      input.value = (WIKI_STATUS && WIKI_STATUS.configured)
+        ? '~/enough/wikisink'
+        : ((WIKI_STATUS && WIKI_STATUS.storage_dir) || '~/enough/wikisink');
+      refreshWikiDiskfree();
+      const js = await loadWikiFlavors();
+      const list = document.getElementById('wiki-flavor-list');
+      if (!js) {
+        list.innerHTML =
           '<div class="wiki-dim">could not load the flavor list — check your connection and reopen.</div>';
+        return;
+      }
+      list.innerHTML = WIKI_FLAVORS.map((f, i) => `
+        <label class="wiki-flavor">
+          <input type="radio" name="wiki-flavor" value="${f.flavor}" ${f.is_default ? 'checked' : ''}>
+          <span><span class="fl-label">${escapeHtml(f.label)}</span>
+            <span class="fl-blurb">${escapeHtml(f.blurb)} · snapshot ${escapeHtml(f.date)}</span></span>
+          <span class="fl-size">${escapeHtml(f.size_human)}</span>
+        </label>`).join('');
+      if (!js.live) {
+        list.insertAdjacentHTML('beforeend',
+          '<div class="wiki-dim">couldn\'t reach download.kiwix.org — sizes shown are approximate.</div>');
       }
     }
+    window.wikiSetupChooseStep = wikiSetupChooseStep;
 
     function closeWikiSetup() {
       document.getElementById('wiki-setup-modal').classList.add('hidden');
@@ -7330,7 +7588,8 @@
         const r = await fetch('/api/wiki/setup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ flavor: WIKI_CHOSEN.flavor, storage_dir: dir }),
+          body: JSON.stringify({ flavor: WIKI_CHOSEN.flavor, storage_dir: dir,
+                                 replace_id: WIKI_REPLACE_ID }),
         });
         if (!r.ok) {
           const js = await r.json().catch(() => ({}));
@@ -7352,7 +7611,7 @@
           const js = await r.json().catch(() => ({}));
           throw new Error(js.detail || `${action} failed`);
         }
-        if (action === 'cancel') { setWikiSetupState('choose'); openWikiSetup(); }
+        if (action === 'cancel') { WIKI_STATUS = null; openWikiSetup(); }
         if (action === 'resume') setWikiSetupState('downloading');
         // pause confirmation arrives via the wiki_download SSE event
       } catch (e) {
@@ -8206,6 +8465,11 @@
       } else if (d.status === 'error') {
         if (modalOpen) wikiSetupError(d.error || 'download failed');
       } else if (d.status === 'done') {
+        // The finished install auto-activates: drop reader state so the
+        // next article load comes from the new archive.
+        WIKI_PATH = null;
+        WIKI_HISTORY = [];
+        WIKI_HISTORY_IDX = -1;
         fetchWikiStatus().then(s => { WIKI_STATUS = s; });
         if (modalOpen) setWikiSetupState('done');
       }

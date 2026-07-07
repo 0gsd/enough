@@ -45,7 +45,7 @@ def source_url(title: str) -> str:
 
 
 def _origin_line(art: dict[str, Any], cfg: dict[str, Any]) -> str:
-    zim = cfg.get("zim") or {}
+    zim = wconfig.active_zim_meta(cfg)
     if art["source"] == "overlay":
         revid = (art.get("meta") or {}).get("revid")
         return f"wikisink overlay (live Wikipedia{f', revision {revid}' if revid else ''})"

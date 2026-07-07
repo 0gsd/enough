@@ -99,7 +99,7 @@ def run_read_wiki_article(project_dir: Path, call: ToolCall) -> ToolResult:
     elif art["source"] == "preserved":
         provenance = "preserved local copy (deletion override)"
     else:
-        provenance = f"local ZIM snapshot {(cfg.get('zim') or {}).get('snapshot')}"
+        provenance = f"local ZIM snapshot {wconfig.active_zim_meta(cfg).get('snapshot')}"
     preview = text[:PREVIEW_CHARS]
     body = (
         f"“{art['title']}” — {provenance}\n"
@@ -138,12 +138,28 @@ def run_wiki_status(project_dir: Path, call: ToolCall) -> ToolResult:
             lines.append(
                 f"archive: {info['filename']} — {info['article_count']} articles, "
                 f"snapshot date {info['date']} "
-                f"(flavor {(cfg.get('zim') or {}).get('flavor')})")
+                f"(flavor {wconfig.active_zim_meta(cfg).get('flavor')})")
         except wzim.WikisinkUnavailable as e:
             lines.append(f"archive present but unreadable: {e}")
     else:
-        lines.append("no archive installed — the user can set one up via "
-                     "the 🚰 button in the top bar.")
+        # Distinguishes never-installed from a detached drive, and points
+        # at reachable alternates the user can switch to via 🚰.
+        lines.append(wconfig.unavailable_reason(cfg)
+                     or "the archive isn't reachable right now.")
+    insts = wconfig.installs(cfg)
+    if len(insts) > 1 or (insts and not installed):
+        lines.append("installs (" + str(len(insts)) + "):")
+        for i in insts:
+            marks = []
+            if i.get("id") == cfg.get("active_install"):
+                marks.append("active")
+            marks.append("available" if wconfig.install_available(i) else
+                         "unreachable — drive detached?")
+            lines.append(f"  - {i.get('filename')} at {i.get('storage_dir')} "
+                         f"[{', '.join(marks)}]")
+        if not installed:
+            lines.append("switching installs is done in the 🚰 modal — "
+                         "suggest it to the user; there is no agent tool for it.")
     dl = cfg.get("download") or {}
     if dl.get("status") not in (None, "idle", "done"):
         pct = (100 * dl.get("bytes_done", 0) / dl["bytes_total"]) if dl.get("bytes_total") else 0

@@ -46,13 +46,19 @@ def _ensure_archive() -> Any:
             "the libzim package isn't installed — run `uv sync` in the "
             "enough checkout (or `pip install libzim`) and restart."
         )
+    global _archive, _archive_path
     path = wconfig.zim_file()
     if path is None:
+        # Drop any cached Archive: its file handle is dead if the drive
+        # just detached, and a reattach would otherwise reuse it.
+        _archive = None
+        _archive_path = None
+        # Message distinguishes never-installed from a detached drive
+        # (and points at reachable alternate installs when they exist).
         raise WikisinkUnavailable(
-            "no local wikipedia archive is installed yet — click the 🚰 "
-            "button in the top bar to set one up."
+            wconfig.unavailable_reason()
+            or "the wikipedia archive isn't reachable right now."
         )
-    global _archive, _archive_path
     if _archive is None or _archive_path != path:
         log.info("opening ZIM archive %s", path)
         _archive = Archive(str(path))
