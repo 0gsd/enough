@@ -601,13 +601,19 @@ def _short_hash(seed: str) -> str:
     return hashlib.sha256(seed.encode("utf-8", errors="ignore")).hexdigest()[:8]
 
 
-def _markdownify_via_pandoc(html: str) -> tuple[str, bool]:
+def _markdownify_via_pandoc(html: str, *, strip_raw_html: bool = False) -> tuple[str, bool]:
     """Convert HTML to GitHub-flavored markdown via pandoc. Returns
     (markdown_or_original, converted_ok). Falls back to the raw HTML if
-    pandoc isn't installed or errors — the journal will note the fallback."""
+    pandoc isn't installed or errors — the journal will note the fallback.
+
+    strip_raw_html: drop tags gfm can't express (divs, spans, …) instead
+    of passing them through raw — text content is kept. Wanted for
+    wikisink saves, where structural page chrome would otherwise litter
+    the markdown."""
+    target = "gfm-raw_html" if strip_raw_html else "gfm"
     try:
         proc = subprocess.run(
-            ["pandoc", "-f", "html", "-t", "gfm", "--wrap=none"],
+            ["pandoc", "-f", "html", "-t", target, "--wrap=none"],
             input=html,
             text=True,
             capture_output=True,

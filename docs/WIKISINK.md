@@ -79,13 +79,27 @@ chat pill at the bottom talks to the agent: with text selected, your
 question carries the quoted selection; without, it carries the article
 reference so the agent can read the page itself (`read_wiki_article`).
 
-Saved articles are markdown with attribution frontmatter (title, source
-URL, **CC BY-SA 4.0** license, retrieval date, snapshot/revision).
-Infoworld saves get a sibling `_manifest.md` carrying the same
-attribution as a standalone file (source URL, license, retrieval date,
-origin), so every article folder in the shared commons is
-self-describing — and ready-made for attribution if the text ends up in
-something you publish.
+A saved article is a **folder** — `wiki/<slug>/` in the project (📥) or
+`~/enough/infoworld/wiki/<slug>/` (🌐) — containing `article.html` (the
+article **exactly as the archive had it**) and `_manifest.md` (title,
+source URL, **CC BY-SA 4.0** license, retrieval date, origin), so every
+saved article is self-describing — and ready-made for attribution if
+the text ends up in something you publish.
+
+Clicking `article.html` in the file tree opens it **in the wikisink
+reader** at full fidelity — infoboxes, tables, and all — even when no
+archive is installed or its drive is detached. Its links browse the
+live archive as usual. Saved copies aren't meant to be hand-edited
+(they'd silently drift out of sync with the archive); re-save from the
+reader to refresh one instead.
+
+To **unsave**, hover the article's folder in the file tree for a
+moment and click the 🗑 that appears. The saved copy is deleted after
+confirmation; the article stays in the archive, and comments and
+deletion overrides are untouched. The agent reads articles as clean
+extracted text through its wiki tools either way, so saving is for
+*you* (offline-offline copies, publishing attribution), not a
+prerequisite for the agent.
 
 ## Comments
 

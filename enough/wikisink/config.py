@@ -387,6 +387,20 @@ def upsert_watched(path: str, title: str, *, saved_to: str | None = None,
     save_config(cfg)
 
 
+def remove_saved_to(path: str, saved_to: str) -> None:
+    """Unsave bookkeeping: drop one destination tag from an article's
+    watch entry. The entry itself survives while any other save
+    destination or a comment still wants it watched."""
+    cfg = load_config()
+    entry = next((w for w in cfg.get("watched", []) if w.get("path") == path), None)
+    if entry is None:
+        return
+    entry["saved_to"] = [t for t in entry.get("saved_to", []) if t != saved_to]
+    if not entry["saved_to"] and not entry.get("commented"):
+        cfg["watched"] = [w for w in cfg["watched"] if w.get("path") != path]
+    save_config(cfg)
+
+
 def is_overridden(path: str, cfg: dict[str, Any] | None = None) -> bool:
     cfg = cfg or load_config()
     return any(o.get("path") == path for o in cfg.get("overrides", []))

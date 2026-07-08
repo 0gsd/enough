@@ -801,6 +801,39 @@
       letter-spacing: 0;
     }
 
+    /* Unsave affordance: 🗑 on saved-article folder rows, same hover-
+       delay pattern as the help [?]. */
+    .trash-trigger {
+      margin-left: auto;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      border: 1px solid var(--fg-faint);
+      border-radius: 4px;
+      background: var(--bg-raise);
+      color: var(--fg-muted);
+      font-size: 10px;
+      line-height: 14px;
+      text-align: center;
+      padding: 0;
+      font-family: inherit;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 220ms ease, color 120ms ease, border-color 120ms ease;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .trash-trigger.shown {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .trash-trigger:hover {
+      color: var(--accent-error);
+      border-color: var(--accent-error);
+    }
+
     #help-viewer {
       position: absolute;
       top: 0;
@@ -4429,6 +4462,11 @@
       border-color: var(--accent-agent);
     }
 
+    .wiki-source-badge.saved {
+      color: var(--accent-user);
+      border-color: var(--accent-user);
+    }
+
     .wiki-source-badge.preserved {
       color: var(--accent-tool);
       border-color: var(--accent-tool);
@@ -5061,25 +5099,25 @@
             <div id="wiki-suggest" hidden></div>
           </div>
           <button type="button" id="wiki-random" title="random article">🎲</button>
-          <span class="wiki-title-span" id="wiki-article-title" data-help="wikisink"></span>
+          <span class="wiki-title-span" id="wiki-article-title"></span>
           <span class="wiki-source-badge" id="wiki-source-badge" hidden></span>
           <span class="spacer"></span>
           <button type="button" id="wiki-comment-here"
             title="add a comment anchored to the paragraph nearest the middle of the view">💬</button>
           <button type="button" id="wiki-save-project"
-            title="save this article to the project's wiki/ folder as markdown">📥</button>
+            title="save this article to the project's wiki/ folder (full fidelity — opens back in this reader)">📥</button>
           <button type="button" id="wiki-save-infoworld"
             title="save this article to ~/enough/infoworld/wiki (shared across all projects)">🌐</button>
           <button type="button" id="wiki-override" hidden
             title="deletion override — keep this article's local copy forever and stop updating it">🛡</button>
-          <button type="button" id="wiki-comments-toggle" data-help="wiki-comments"
+          <button type="button" id="wiki-comments-toggle"
             title="show/hide the comments panel">🗨</button>
           <button type="button" id="wiki-settings"
             title="wikisink settings — archive info, updates, storage">⚙</button>
         </div>
         <div class="wiki-body" id="wiki-body" data-path=""></div>
         <div id="wiki-comments-panel" hidden>
-          <div class="panel-head" data-help="wiki-comments">
+          <div class="panel-head">
             <span>comments</span>
             <button type="button" class="modal-close" onclick="toggleWikiCommentsPanel(false)"
               aria-label="close comments">×</button>
@@ -5177,7 +5215,7 @@
     <div class="modal-backdrop" onclick="wikiBackdropClose()"></div>
     <div class="modal-panel" role="dialog" aria-labelledby="wiki-setup-title">
       <div class="modal-head">
-        <h3 id="wiki-setup-title" data-help="wikisink">🚰 wikisink — local wikipedia</h3>
+        <h3 id="wiki-setup-title">🚰 wikisink — local wikipedia</h3>
         <button class="modal-close" onclick="closeWikiSetup()" aria-label="close">×</button>
       </div>
       <div class="modal-body">
@@ -5560,7 +5598,7 @@
         what: 'your local, offline copy of (a slice of) english wikipedia — a single Kiwix ZIM archive read in place, never extracted, so the file manager only ever shows articles you explicitly save. the 🚰 button opens a browser-style reader with full-text search, cross-links, a random-article die, an agent chat pill, comments, and two save buttons (📥 project <code>wiki/</code>, 🌐 <code>infoworld/wiki/</code>). the agent can search and read the whole archive via its wiki tools.',
         how: 'first click of 🚰 runs the setup wizard: pick a size (top-1M-articles no-images ≈ 16 GB is the default; full english ≈ 49 GB; smaller options too), pick a storage folder (external drives work), confirm, and let the resumable download run — pause, quit, resume anytime. you can keep <em>several installs</em> in different places (say, the full archive on an external drive plus a small one on the internal disk) and switch between them in the ⚙ installs list; if a drive is detached, its install just shows as unreachable until the drive returns. once installed, ask the agent to run a <strong>wikisink</strong> to refresh your saved/commented ("watched") articles from live wikipedia and get a report: watched-article changes, edit spikes, pageview movers &amp; losers, and suspicious deletions. the 🛡 button on any article is the <em>deletion override</em>: keep your local copy forever, excluded from updates. ⚙ opens the installs manager, including base-archive replacement when a newer snapshot ships.',
         ideas: [
-          'save the articles a project leans on into its <code>wiki/</code> folder — the agent grounds itself on them (with CC BY-SA attribution frontmatter built in).',
+          'save the articles a project leans on into its <code>wiki/</code> folder — full-fidelity copies that open back in the reader, each with a CC BY-SA attribution manifest built in.',
           'comment on claims you doubt, then run a wikisink later — comments survive article updates (re-pinned or orphaned, never lost) and commented articles are watched automatically.',
           'when a wikisink report flags a suspicious deletion (deleted for "notability" rather than quality — the classic case), open the article and hit 🛡 before the next base-archive swap.',
         ],
@@ -5568,11 +5606,12 @@
       'project-wiki': {
         name: 'wiki/',
         path: 'wiki/',
-        what: 'wikipedia articles saved into this project from the wikisink browser (📥). each file is markdown with attribution frontmatter: title, source URL, CC BY-SA license, retrieval date, and which archive snapshot or live revision it came from.',
-        how: 'created automatically on your first project-level save — no setup. wikisink update runs treat everything here as <em>watched</em>: refreshed from live wikipedia and reported on. re-saving an article overwrites the file with the freshest copy. (🌐 saves to the global <code>infoworld/wiki/</code> instead, shared across all projects.)',
+        what: 'wikipedia articles saved into this project from the wikisink browser (📥). each save is a folder: <code>article.html</code> (the article exactly as the archive had it — click it to read in the wikisink viewer, full fidelity, infoboxes and all) plus <code>_manifest.md</code> (source URL, CC BY-SA license, retrieval date, origin).',
+        how: 'created automatically on your first project-level save — no setup. wikisink update runs treat everything here as <em>watched</em>: refreshed from live wikipedia and reported on. re-saving an article overwrites the folder with the freshest copy; to remove one, hover its folder in the tree a moment and click the 🗑 that appears. saved copies aren\'t meant to be hand-edited — they\'d drift out of sync with the archive. (🌐 saves to the global <code>infoworld/wiki/</code> instead, shared across all projects.)',
         ideas: [
-          'saved articles are plain markdown — the agent can grep, read, and quote them like any other project file.',
-          'wikipedia text is CC BY-SA: if part of an article ends up in something you publish, the frontmatter has everything you need for attribution.',
+          'saved articles open in the reader even when the archive\'s drive is detached — they\'re your offline-offline copies.',
+          'the agent reads articles through its wiki tools (clean text extraction), so it can ground itself on saved and archived articles alike.',
+          'wikipedia text is CC BY-SA: if part of an article ends up in something you publish, the manifest has everything you need for attribution.',
         ],
       },
       'wiki-comments': {
@@ -5802,11 +5841,13 @@
     }
 
     // Event delegation for the hover-? affordance — works across HTMX
-    // refreshes. Bound to every surface that carries data-help elements:
-    // the sidebar, the wikisink browser, and the wikisink setup modal.
+    // refreshes. Sidebar-only: the help viewer lives in the main pane
+    // (z-index below the full-frame modes), so data-help inside the
+    // wikisink browser/modal would open help invisibly underneath —
+    // those surfaces rely on plain tooltips instead.
     // mouseover/mouseout bubble (mouseenter/leave don't), so we filter via
     // relatedTarget to detect actual row entry/exit.
-    for (const rootSel of ['.sidebar', '#wiki-mode', '#wiki-setup-modal']) {
+    for (const rootSel of ['.sidebar']) {
       const rootEl = document.querySelector(rootSel);
       if (!rootEl) continue;
       rootEl.addEventListener('mouseover', (e) => {
@@ -5829,6 +5870,86 @@
     if (sidebarEl) {
       sidebarEl.addEventListener('click', (e) => {
         if (e.target.closest('.file-row a')) closeHelp();
+      });
+    }
+
+    // ---------- Unsave affordance: 🗑 on saved-article folder rows ----------
+    //
+    // Same hover-delay pattern as the help [?]. Must show well inside the
+    // tree's 3s auto-refresh window (the htmx swap wipes injected
+    // buttons), so the delay stays comfortably under that.
+    const TRASH_HOVER_MS = 1500;
+
+    async function wikiUnsave(dirPath, dirName) {
+      const msg = `unsave “${dirName}”?\n\nthis deletes the saved copy ` +
+        `(${dirPath}/) from disk. the article itself stays in the archive, ` +
+        `and any comments or deletion overrides are untouched.`;
+      if (!confirm(msg)) return;
+      try {
+        const r = await fetch('/api/wiki/unsave', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dir: dirPath }),
+        });
+        const js = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(js.detail || `unsave failed (${r.status})`);
+        htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+      } catch (e) {
+        alert(String(e.message || e));
+      }
+    }
+
+    if (sidebarEl) {
+      sidebarEl.addEventListener('mouseover', (e) => {
+        const li = e.target.closest('li[data-wiki-saved]');
+        if (!li) return;
+        const row = li.querySelector(':scope > .dir-row');
+        if (!row || (e.relatedTarget && row.contains(e.relatedTarget))) return;
+        if (!row.contains(e.target)) return;
+        if (li._trashFadeTimer) { clearTimeout(li._trashFadeTimer); li._trashFadeTimer = null; }
+        if (li._trashButton && li._trashButton.classList.contains('shown')) return;
+        if (li._trashShowTimer) return;
+        li._trashShowTimer = setTimeout(() => {
+          li._trashShowTimer = null;
+          let btn = li._trashButton;
+          if (!btn) {
+            btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'trash-trigger';
+            btn.textContent = '🗑';
+            btn.title = 'unsave — delete this saved copy (the archive keeps the article)';
+            btn.setAttribute('aria-label', 'unsave article');
+            btn.addEventListener('click', (ev) => {
+              ev.stopPropagation();
+              ev.preventDefault();
+              wikiUnsave(li.dataset.path, li.dataset.name);
+            });
+            row.appendChild(btn);
+            li._trashButton = btn;
+          }
+          requestAnimationFrame(() => btn.classList.add('shown'));
+        }, TRASH_HOVER_MS);
+      });
+      sidebarEl.addEventListener('mouseout', (e) => {
+        const li = e.target.closest('li[data-wiki-saved]');
+        if (!li) return;
+        const row = li.querySelector(':scope > .dir-row');
+        if (row && e.relatedTarget && row.contains(e.relatedTarget)) return;
+        if (li._trashShowTimer) { clearTimeout(li._trashShowTimer); li._trashShowTimer = null; }
+        if (!li._trashButton || !li._trashButton.classList.contains('shown')) return;
+        if (li._trashFadeTimer) clearTimeout(li._trashFadeTimer);
+        li._trashFadeTimer = setTimeout(() => {
+          li._trashFadeTimer = null;
+          const btn = li._trashButton;
+          if (!btn) return;
+          btn.classList.remove('shown');
+          setTimeout(() => {
+            if (li._trashButton && !li._trashButton.classList.contains('shown')) {
+              li._trashButton.remove();
+              li._trashButton = null;
+            }
+          }, 280);
+        }, 3000);
       });
     }
 
@@ -7712,6 +7833,11 @@
         badge.classList.add('preserved');
         badge.textContent = 'preserved';
         badge.title = 'deletion override — kept locally and excluded from updates';
+      } else if (art.source === 'saved') {
+        badge.classList.add('saved');
+        const when = (art.meta && art.meta.retrieved) || '';
+        badge.textContent = 'saved' + (when ? ' ' + when : '');
+        badge.title = 'your saved copy, served from its folder — re-save (📥/🌐) to refresh it; links go to the archive';
       } else {
         badge.textContent = 'ZIM ' + (art.snapshot || '');
         badge.title = 'served from the local archive snapshot';
@@ -7740,8 +7866,33 @@
       btn.dataset.overridden = art.overridden ? '1' : '';
     }
 
-    async function loadWikiArticle(path, opts = {}) {
+    function wikiRenderArticle(art, opts = {}) {
       const { push = true, frag = null } = opts;
+      const body = document.getElementById('wiki-body');
+      WIKI_PATH = art.path;
+      WIKI_TITLE = art.title;
+      body.dataset.path = art.path;
+      body.innerHTML = art.html;
+      document.getElementById('wiki-article-title').textContent = art.title;
+      wikiSetSourceBadge(art);
+      wikiUpdateOverrideButton(art);
+      if (push && art.path) {
+        WIKI_HISTORY = WIKI_HISTORY.slice(0, WIKI_HISTORY_IDX + 1);
+        WIKI_HISTORY.push(art.path);
+        WIKI_HISTORY_IDX = WIKI_HISTORY.length - 1;
+      }
+      wikiUpdateNavButtons();
+      if (frag) {
+        const el = body.querySelector('#' + CSS.escape(frag));
+        if (el) el.scrollIntoView();
+        else body.scrollTop = 0;
+      } else {
+        body.scrollTop = 0;
+      }
+      if (typeof renderWikiComments === 'function') renderWikiComments();
+    }
+
+    async function loadWikiArticle(path, opts = {}) {
       const body = document.getElementById('wiki-body');
       hideWikiSuggest();
       let art;
@@ -7758,28 +7909,31 @@
         body.innerHTML = `<div class="wiki-note">couldn't load the article: ${escapeHtml(String(e))}</div>`;
         return;
       }
-      WIKI_PATH = art.path;
-      WIKI_TITLE = art.title;
-      body.dataset.path = art.path;
-      body.innerHTML = art.html;
-      document.getElementById('wiki-article-title').textContent = art.title;
-      wikiSetSourceBadge(art);
-      wikiUpdateOverrideButton(art);
-      if (push) {
-        WIKI_HISTORY = WIKI_HISTORY.slice(0, WIKI_HISTORY_IDX + 1);
-        WIKI_HISTORY.push(art.path);
-        WIKI_HISTORY_IDX = WIKI_HISTORY.length - 1;
-      }
-      wikiUpdateNavButtons();
-      if (frag) {
-        const el = body.querySelector('#' + CSS.escape(frag));
-        if (el) el.scrollIntoView();
-        else body.scrollTop = 0;
-      } else {
-        body.scrollTop = 0;
-      }
-      if (typeof renderWikiComments === 'function') renderWikiComments();
+      wikiRenderArticle(art, opts);
     }
+
+    // Saved-article folders in the file tree route here (server tags the
+    // article.html link): show the *saved copy* in the reader, even when
+    // no archive is installed or the drive's away. Internal links then
+    // browse the live archive as usual.
+    async function openSavedWikiArticle(relpath) {
+      let art;
+      try {
+        const r = await fetch('/api/wiki/saved?file=' + encodeURIComponent(relpath));
+        const js = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(js.detail || `couldn't open saved article (${r.status})`);
+        art = js;
+      } catch (e) {
+        alert(String(e.message || e));
+        return;
+      }
+      WIKI_PATH = art.path || relpath;  // set before enterWikiMode so it won't auto-load
+      if (!document.getElementById('wiki-mode').classList.contains('open')) {
+        enterWikiMode();
+      }
+      wikiRenderArticle(art, { push: true });
+    }
+    window.openSavedWikiArticle = openSavedWikiArticle;
 
     document.getElementById('wiki-body').addEventListener('click', (e) => {
       const a = e.target.closest('a[data-wiki-path]');

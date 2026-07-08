@@ -51,7 +51,7 @@ Every Python module in `enough/`:
 | [enough/prompt.py](../enough/prompt.py) | ~890 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/role/paradigm enumeration + toggle-state helpers. | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
 | [enough/broker.py](../enough/broker.py) | ~380 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
 | [enough/tools.py](../enough/tools.py) | ~1360 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers), the tool-call XML parser, the dispatch table. | `_DISPATCH`, `_TRACE_TOGGLE`, `execute()`, `parse_tool_calls()`, `_CLOUD_KEY_EXFIL_PATTERNS` |
-| [enough/wikisink/](../enough/wikisink/) | ~2500 (pkg) | Local offline Wikipedia. `config.py` (install registry, schema v2 multi-install, data paths), `zim.py` (libzim reader, search, sanitize/rewrite), `download.py` (Kiwix flavor listing + resumable downloads), `overlay.py` (live-refreshed + preserved article stores), `comments.py` (per-article threads), `save.py` (article → markdown with attribution), `update.py` (the "wikisink" update run), `rankings.py` (pageview snapshots), `report.py` (run report), `agent.py` (the four agent tool runners). | `config.load_config()` / `installs()` / `active_install()` / `unavailable_reason()`, `zim.get_article()` / `search()`, `download.DownloadManager`, `update.run_wikisink()` |
+| [enough/wikisink/](../enough/wikisink/) | ~2500 (pkg) | Local offline Wikipedia. `config.py` (install registry, schema v2 multi-install, data paths), `zim.py` (libzim reader, search, sanitize/rewrite), `download.py` (Kiwix flavor listing + resumable downloads), `overlay.py` (live-refreshed + preserved article stores), `comments.py` (per-article threads), `save.py` (save/read/unsave article folders + the clean HTML→markdown text pipeline), `update.py` (the "wikisink" update run), `rankings.py` (pageview snapshots), `report.py` (run report), `agent.py` (the four agent tool runners). | `config.load_config()` / `installs()` / `active_install()` / `unavailable_reason()`, `zim.get_article()` / `search()`, `download.DownloadManager`, `update.run_wikisink()` |
 | [enough/cloud.py](../enough/cloud.py) | ~1000 | OpenRouter integration: keyring read/write, in-memory key cache, OpenAI-compatible streaming + non-streaming clients, health check, response caching to `rness/io/cloud-cache/`, the broker-driven `pipeline_run()`. | `set_api_key()` / `clear_api_key()` / `has_api_key()`, `_get_api_key_for_broker()`, `health_check()`, `chat_completion()`, `stream_chat_completion()`, `cache_completion()`, `pipeline_run()` |
 | [enough/llm.py](../enough/llm.py) | ~125 | OpenAI-compatible client for the local llama-server. Streaming-only path for chat. | `stream_chat()`, `check_llm_reachable()` |
 | [enough/supervisor.py](../enough/supervisor.py) | ~400 | Manages the local llama-server subprocess. Adopts an existing process if one's already up; spawns its own otherwise. Skips spawning entirely when the active model is `opro-api`. | `LlamaSupervisor`, `_resolve_startup_choice()` |
@@ -137,7 +137,7 @@ cache.
 | Broker journal | `rness/knowledge/session-logs/<date>-broker.md` | none | no |
 | Fetched web cache | `rness/io/input/<timestamp>-<hash>-<slug>.md` | none | no |
 | Cloud cache | `rness/io/cloud-cache/<timestamp>-<slug>.md` + `_cloud-index.md` | none | no |
-| Saved wiki articles | `<project>/wiki/*.md` (per-project) or `~/enough/infoworld/wiki/` (shared) | none — created on first save | no (agent reads on demand) |
+| Saved wiki articles | `<project>/wiki/<slug>/` or `~/enough/infoworld/wiki/<slug>/` — folder of `article.html` (verbatim archive copy) + `_manifest.md` + hidden `.meta.json` | none — created on first save | no (agent reads on demand) |
 | Wikisink registry/state | `~/enough/config/wikisink.json` (user-global, **not** per-project) | none | no |
 | Wiki comments/overlays | `<wikisink data dir>/comments/`, `overlay/`, `preserved/` | none | no |
 
@@ -548,11 +548,22 @@ Architecture notes:
   overriding.
 - **`/api/wiki/*` endpoint map**: `status` (installs + availability +
   counts; must stay instant — no network), `article`, `search`,
-  `suggest`, `random`, `comments` (+ reply), `save`, `flavors`,
-  `diskspace`, `setup` (start download; optional `replace_id`;
-  409s on duplicate target), `download/{pause,resume,cancel}`,
-  `installs/activate`, `installs` (DELETE = forget), `overrides`,
-  `override`, `wikisink` (the update run).
+  `suggest`, `random`, `comments` (+ reply), `save`, `saved` (GET —
+  render a saved folder through the reader's sanitize pipeline; works
+  archive-less), `unsave` (POST — delete a saved folder + registry
+  tag), `flavors`, `diskspace`, `setup` (start download; optional
+  `replace_id`; 409s on duplicate target),
+  `download/{pause,resume,cancel}`, `installs/activate`, `installs`
+  (DELETE = forget), `overrides`, `override`, `wikisink` (the update
+  run).
+- **Saved articles are verbatim HTML folders, not markdown.** The
+  stored `article.html` is the archive/overlay copy byte-for-byte
+  (plus an attribution comment); sanitization happens at *view* time
+  via `GET /api/wiki/saved`, so saved articles render identically to
+  live browsing. Don't convert saves to markdown — that loses complex
+  tables and invites hand-edits that drift from the archive. Markdown
+  exists only as the agent-facing text pipeline
+  (`save.article_markdown()`, used by `read_wiki_article`'s cache).
 - **The reader caches one `Archive` handle** (`zim.py` module singleton
   under a lock). It is dropped whenever the file goes missing and on
   `reset_archive()` (called after installs change) — a remounted drive

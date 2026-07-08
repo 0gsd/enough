@@ -213,7 +213,21 @@ def _walk_tree(
             "is_symlink": p.is_symlink(),
         }
         if p.is_dir():
+            # Saved wikisink articles are folders shaped {article.html,
+            # _manifest.md, .meta.json}; the tree marks them so the UI
+            # can route clicks into the reader and offer unsave.
+            try:
+                if (p / "article.html").is_file() and (p / ".meta.json").is_file():
+                    node["wiki_saved"] = True
+            except OSError:
+                pass
             node["children"] = _walk_tree(root, rel_parts + (p.name,), visited, wikisink_real)
+        elif p.name == "article.html":
+            try:
+                if (p.parent / ".meta.json").is_file():
+                    node["wiki_article"] = True
+            except OSError:
+                pass
         out.append(node)
     return out
 
@@ -252,16 +266,29 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
         if n["is_dir"]:
             has_kids = bool(n.get("children"))
             dir_state_cls = " has-children" if has_kids else " empty-folder"
+            saved_attr = ' data-wiki-saved="1"' if n.get("wiki_saved") else ""
             # Zippy glyph: ▾ (expanded, default) if has children; nothing if empty.
             zippy = '<span class="zippy">▾</span>' if has_kids else '<span class="zippy-spacer"></span>'
             out.append(
                 f'<li class="dir{sym_cls}{dir_state_cls}" '
-                f'data-path="{path}" data-name="{name_attr}" data-kind="dir">'
+                f'data-path="{path}" data-name="{name_attr}" data-kind="dir"{saved_attr}>'
                 f'<span class="dir-row"{help_attr}>{zippy}<span class="dir-name">{n["name"]}/</span></span>'
             )
             if has_kids:
                 out.append(_tree_to_html(n["children"]))
             out.append("</li>")
+        elif n.get("wiki_article"):
+            # Saved article: opens in the wikisink reader, not the file
+            # preview — the HTML is a verbatim archive copy, not a doc
+            # to edit.
+            out.append(
+                f'<li class="file{sym_cls}" '
+                f'data-path="{path}" data-name="{name_attr}" data-kind="file">'
+                f'<span class="file-row"><span class="zippy-spacer"></span>'
+                f'<a href="#" data-wiki-article="{path}" '
+                f'onclick="openSavedWikiArticle(\'{path}\'); return false;"'
+                f'>{n["name"]}</a></span></li>'
+            )
         else:
             out.append(
                 f'<li class="file{sym_cls}" '
@@ -2039,6 +2066,52 @@ def create_app(
         _broker.trace(project_dir, tool="wiki_save", decision="allowed",
                       args={"path": path, "dest": dest},
                       result_ok=True, result_summary=result["saved_path"])
+        return result
+
+    @app.get("/api/wiki/saved")
+    async def api_wiki_saved(file: str = Query(...)) -> dict[str, Any]:
+        """A saved article folder, rendered for the reader. Serves the
+        stored verbatim copy through the same sanitize pipeline as live
+        browsing — works even when no archive is installed/reachable
+        (that's much of the point of saving)."""
+        from .wikisink import save as _wiki_save
+
+        def _load() -> dict[str, Any]:
+            art = _wiki_save.read_saved(project_dir, file)
+            art["html"] = _wiki_zim.sanitize_and_rewrite(art["html"], art["path"])
+            if art["path"]:
+                _wikisink_config.record_viewed(art["path"], art["title"])
+                cfg = _wikisink_config.load_config()
+                art["overridden"] = _wikisink_config.is_overridden(art["path"], cfg)
+            return art
+
+        try:
+            return await asyncio.to_thread(_load)
+        except ValueError as e:
+            raise HTTPException(404, str(e)) from None
+        except OSError as e:
+            raise HTTPException(500, f"couldn't read the saved article: {e}") from None
+
+    @app.post("/api/wiki/unsave")
+    async def api_wiki_unsave(request: Request) -> dict[str, Any]:
+        """Delete a saved-article folder (user-initiated from the tree's
+        trash affordance). Only the saved copy goes; the archive copy,
+        comments, and overrides are untouched."""
+        from .wikisink import save as _wiki_save
+
+        body = await request.json()
+        ref = (body.get("dir") or "").strip()
+        if not ref:
+            raise HTTPException(400, "missing dir")
+        try:
+            result = await asyncio.to_thread(_wiki_save.unsave_article, project_dir, ref)
+        except ValueError as e:
+            raise HTTPException(400, str(e)) from None
+        except OSError as e:
+            raise HTTPException(500, f"unsave failed: {e}") from None
+        _broker.trace(project_dir, tool="wiki_save", decision="allowed",
+                      args={"dir": ref, "op": "unsave"},
+                      result_ok=True, result_summary=result["removed"])
         return result
 
     @app.get("/api/wiki/flavors")

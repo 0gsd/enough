@@ -81,10 +81,11 @@ def run_read_wiki_article(project_dir: Path, call: ToolCall) -> ToolResult:
     except wzim.WikisinkUnavailable as e:
         return _unavailable("read_wiki_article", key, e)
 
-    from ..tools import _markdownify_via_pandoc
+    from . import save as wsave
 
-    md, converted = _markdownify_via_pandoc(art["html"])
-    text = md if converted else art["html"]
+    # Chrome-free markdown (or cleaned HTML if pandoc is missing) — the
+    # same text pipeline everywhere the agent reads articles.
+    text, converted = wsave.article_markdown(art)
     cache_dir = project_dir / "rness" / "io" / "input"
     cache_dir.mkdir(parents=True, exist_ok=True)
     cache_name = f"wiki-{wconfig.article_key(art['path'])}.{'md' if converted else 'html'}"
