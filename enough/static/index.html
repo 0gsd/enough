@@ -3671,7 +3671,9 @@
     #opro-wizard-modal {
       position: fixed;
       inset: 0;
-      z-index: 60;
+      /* Must sit above #model-modal (1001): the wizard is opened from the
+         model picker's "needs setup" row. */
+      z-index: 1002;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -3687,7 +3689,11 @@
       position: relative;
       width: min(560px, 92vw);
       max-height: 92vh;
-      overflow: auto;
+      /* Flex column so head/dots/foot stay pinned and only the step body
+         scrolls — the primary button must always be visible. */
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       background: var(--bg-alt);
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -3746,6 +3752,18 @@
       flex-direction: column;
       gap: 14px;
       font-size: 13px;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    /* One wizard screen at a time. The JS toggles .hidden on the three
+       step bodies; without this rule they all render stacked. */
+    #opro-wizard-modal .wizard-body.hidden {
+      display: none;
+    }
+
+    #opro-wizard-modal .wizard-foot {
+      flex-shrink: 0;
     }
 
     #opro-wizard-modal .wizard-body p,
@@ -6475,6 +6493,10 @@
           row.classList.remove('disabled');
           row.addEventListener('click', () => {
             if (!m.cloud_key_present || !m.cloud_healthy) {
+              // Hide the picker while the wizard runs (it would otherwise
+              // cover the wizard); the wizard reopens it on close.
+              closeModelModal();
+              OPRO_RETURN_TO_PICKER = true;
               oproOpenWizard(false);
               return;
             }
@@ -6629,6 +6651,9 @@
 
     let OPRO_STEP = 1;
     let OPRO_LAST_STATUS = null;
+    // Set when the wizard is opened from the model picker's "needs setup"
+    // row, so closing the wizard returns the user to the picker.
+    let OPRO_RETURN_TO_PICKER = false;
 
     // Visibility: settings panel below the model list — shown only
     // when the OPRO-API row is the current selection AND a key is
@@ -6736,6 +6761,13 @@
 
     function oproWizardClose() {
       document.getElementById('opro-wizard-modal').classList.add('hidden');
+      if (OPRO_RETURN_TO_PICKER) {
+        OPRO_RETURN_TO_PICKER = false;
+        // Came from the model picker — reopen it so the OPRO-API row
+        // shows the fresh state (openModelModal reloads everything).
+        openModelModal();
+        return;
+      }
       // Refresh the model list so the OPRO-API row reflects any new state.
       loadModels().then(() => { renderModelList(); oproRenderSettings(); });
     }
