@@ -62,7 +62,7 @@ do, so you can both work the map at once without stepping on each
 other. Removing nodes always requires your confirmation.
 
 **The discipline (optional but recommended):** enable the
-`ibis-girraphiti` skill in the sidebar and the agent becomes a proper
+`girraph-merirmaid` skill in the sidebar and the agent becomes a proper
 mapping partner — one question per turn, no jumping to solutions until
 *you* say the map is done. Wicked problems have no stopping rule, so
 your confirmation is the stopping rule.

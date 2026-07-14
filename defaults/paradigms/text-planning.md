@@ -273,9 +273,9 @@ Genre suggestions are inline above; don't break them out into separate
 template files. The skeleton is the same shape for every text; the
 "Structure" and "Sections" parts flex to whatever the text needs.
 
-## With the ibis-girraphiti skill (girraph-backed structure)
+## With the girraph-merirmaid skill (girraph-backed structure)
 
-When the `ibis-girraphiti` skill is enabled alongside this paradigm,
+When the `girraph-merirmaid` skill is enabled alongside this paradigm,
 *contested* plan structure lives in a girraph at the project root
 (`<slug>-structure.girraph`), edited via the girraph node tools and the
 user's girraph panel. The split: questions still being argued — what

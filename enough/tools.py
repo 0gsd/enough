@@ -456,6 +456,15 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
         return ToolResult("write_file", "", False, "error: missing <path>")
     if call.content is None:
         return ToolResult("write_file", call.path, False, "error: missing <content>")
+    # Cachebox mirror guard: refuse to edit a modality:mirror file under the
+    # cacheawl store BEFORE allowlist resolution, so the denial explains the
+    # real reason (mirrors are backend-owned) rather than an allowlist miss.
+    from . import cacheawl as _cacheawl  # late import: avoid an import cycle
+    _raw = Path(call.path).expanduser()
+    _cand = _raw.resolve(strict=False) if _raw.is_absolute() \
+        else (project_dir / _raw).resolve(strict=False)
+    if (why := _cacheawl.mirror_write_denial(_cand)):
+        return ToolResult("write_file", call.path, False, why)
     try:
         # Absolute paths require the stricter file-rw allowlist; relative
         # paths are always project-contained as before.
@@ -570,6 +579,100 @@ _FETCH_MAX_BYTES = 10 * 1024 * 1024  # 10 MB hard cap
 _PREVIEW_CHARS = 500
 
 
+class FetchDenied(Exception):
+    """A fetch the broker refuses outright: fetch_url disabled, an
+    off-allowlist host with Tor routing turned off, or a non-http(s) URL.
+    Carries the agent-facing denial string as its message."""
+
+
+class FetchError(Exception):
+    """A permitted fetch that failed at the network layer or blew the size
+    cap. Carries an agent-facing message."""
+
+
+@dataclass
+class FetchResponse:
+    """Normalized fetch result for callers other than run_fetch_url (e.g.
+    the cacheawl url-ingest crawler) so they share one HTTP stack."""
+    status: int
+    content_type: str       # main MIME type, lowercased, charset stripped
+    text: str               # decoded text (empty for binary types)
+    content: bytes
+    title: str
+    final_url: str
+
+
+def _fetch_http(
+    project_dir: Path, url: str, *,
+    timeout: float = _FETCH_TIMEOUT_S, max_bytes: int = _FETCH_MAX_BYTES,
+) -> tuple[httpx.Response, bool, str]:
+    """The gating + GET core shared by run_fetch_url and fetch_gated:
+    toggle check, scheme check, allowlist→direct / off-list→Tor routing,
+    the size cap. Returns (httpx response, used_tor, host). Raises
+    FetchDenied for broker refusals and FetchError for network/size
+    failures — with the exact strings run_fetch_url historically returned,
+    so its output is unchanged."""
+    if not broker.is_enabled("fetch_url_enabled"):
+        raise FetchDenied(broker.denial_tool_disabled("fetch_url"))
+    url = (url or "").strip()
+    if not url:
+        raise FetchError("error: missing <url>")
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        raise FetchDenied("error: only http(s) URLs are supported by fetch_url.")
+    host = parsed.hostname.lower()
+    allowlist = _read_internet_allowlist(project_dir)
+    on_allowlist = _host_on_allowlist(host, allowlist)
+    use_tor = not on_allowlist
+    if use_tor and not broker.is_enabled("fetch_url_tor_for_offlist"):
+        raise FetchDenied(broker.denial_off_internet_allowlist_no_tor(host))
+    client_kwargs: dict[str, object] = {
+        "timeout": timeout,
+        "follow_redirects": True,
+        "headers": {"User-Agent": "enough-broker/0.0 (+local research client)"},
+    }
+    if use_tor:
+        client_kwargs["proxy"] = _TOR_PROXY
+    try:
+        with httpx.Client(**client_kwargs) as client:
+            resp = client.get(url)
+    except httpx.RequestError as e:
+        raise FetchError(
+            f"error: fetch failed ({type(e).__name__}): {e}. "
+            f"{'(via Tor)' if use_tor else '(direct)'}"
+        ) from e
+    if len(resp.content) > max_bytes:
+        raise FetchError(
+            f"error: response too large ({len(resp.content)} bytes, cap "
+            f"{max_bytes}). use shell + curl with explicit -o to a path you "
+            f"control if you really need this."
+        )
+    return resp, use_tor, host
+
+
+def fetch_gated(
+    project_dir: Path, url: str, *,
+    timeout: float = _FETCH_TIMEOUT_S, max_bytes: int = _FETCH_MAX_BYTES,
+) -> tuple[FetchResponse, bool]:
+    """Public gated-fetch for non-tool callers (cacheawl). Same broker
+    gating as fetch_url; returns a normalized (FetchResponse, used_tor).
+    Raises FetchDenied / FetchError like _fetch_http."""
+    resp, use_tor, _host = _fetch_http(project_dir, url, timeout=timeout,
+                                       max_bytes=max_bytes)
+    ctype_main = (resp.headers.get("content-type") or "").split(";", 1)[0].strip().lower()
+    is_texty = ctype_main.startswith("text/") or ctype_main in (
+        "application/json", "application/xml", "application/xhtml+xml")
+    text = resp.text if is_texty else ""
+    title = _title_from_html(resp.text) if ctype_main.startswith("text/html") else ""
+    return (
+        FetchResponse(
+            status=resp.status_code, content_type=ctype_main, text=text,
+            content=resp.content, title=title, final_url=str(resp.url),
+        ),
+        use_tor,
+    )
+
+
 def _read_internet_allowlist(project_dir: Path) -> list[str]:
     """Return the list of allowlisted internet hostnames. Lowercased,
     leading/trailing whitespace stripped. Empty if the file or section
@@ -682,52 +785,15 @@ def run_fetch_url(project_dir: Path, call: ToolCall) -> ToolResult:
 
     The agent only ever sees a short preview + cache path in the result —
     full content lives on disk, retrievable via `read_file` if needed."""
-    if not broker.is_enabled("fetch_url_enabled"):
-        return ToolResult(
-            "fetch_url", call.url or "", False,
-            broker.denial_tool_disabled("fetch_url"),
-        )
     url = (call.url or "").strip()
     if not url:
         return ToolResult("fetch_url", "", False, "error: missing <url>")
-    parsed = urllib.parse.urlparse(url)
-    if parsed.scheme not in ("http", "https") or not parsed.hostname:
-        return ToolResult(
-            "fetch_url", url, False,
-            "error: only http(s) URLs are supported by fetch_url.",
-        )
-    host = parsed.hostname.lower()
-    allowlist = _read_internet_allowlist(project_dir)
-    on_allowlist = _host_on_allowlist(host, allowlist)
-    use_tor = not on_allowlist
-    if use_tor and not broker.is_enabled("fetch_url_tor_for_offlist"):
-        return ToolResult(
-            "fetch_url", url, False,
-            broker.denial_off_internet_allowlist_no_tor(host),
-        )
-    client_kwargs: dict[str, object] = {
-        "timeout": _FETCH_TIMEOUT_S,
-        "follow_redirects": True,
-        "headers": {"User-Agent": "enough-broker/0.0 (+local research client)"},
-    }
-    if use_tor:
-        client_kwargs["proxy"] = _TOR_PROXY
     try:
-        with httpx.Client(**client_kwargs) as client:
-            resp = client.get(url)
-    except httpx.RequestError as e:
-        return ToolResult(
-            "fetch_url", url, False,
-            f"error: fetch failed ({type(e).__name__}): {e}. "
-            f"{'(via Tor)' if use_tor else '(direct)'}",
-        )
-    if len(resp.content) > _FETCH_MAX_BYTES:
-        return ToolResult(
-            "fetch_url", url, False,
-            f"error: response too large ({len(resp.content)} bytes, cap "
-            f"{_FETCH_MAX_BYTES}). use shell + curl with explicit -o to "
-            f"a path you control if you really need this.",
-        )
+        resp, use_tor, host = _fetch_http(project_dir, url)
+    except FetchDenied as e:
+        return ToolResult("fetch_url", url, False, str(e))
+    except FetchError as e:
+        return ToolResult("fetch_url", url, False, str(e))
     ctype = (resp.headers.get("content-type") or "").lower()
     # Strip charset suffix; just want the MIME prefix.
     ctype_main = ctype.split(";", 1)[0].strip()
@@ -1270,6 +1336,114 @@ def run_wikisink(project_dir: Path, call: ToolCall) -> ToolResult:
     return _wiki_agent.run_wikisink(project_dir, call)
 
 
+# ---------------------------------------------------------------------------
+# cacheawl tools — the global file store at ~/enough/cacheawl/. Three tools:
+# cachebox_list (list boxes or a box's contents), cachebox_create (empty
+# box), cachebox_ingest (populate a box from a path/url/wikisink source).
+# All gated by the `cacheawl_enabled` broker toggle. The module (cacheawl.py)
+# owns the store; these runners are thin adapters. url ingests additionally
+# honor the fetch_url toggles by construction (they route through
+# fetch_gated).
+# ---------------------------------------------------------------------------
+
+def _cacheawl_denied(name: str, key: str = "") -> ToolResult:
+    return ToolResult(name, key, False, broker.denial_cacheawl_disabled())
+
+
+def run_cachebox_list(project_dir: Path, call: ToolCall) -> ToolResult:
+    if not broker.is_enabled("cacheawl_enabled"):
+        return _cacheawl_denied("cachebox_list")
+    from . import cacheawl as _cacheawl
+    box = (call.extra.get("box") or "").strip()
+    try:
+        if box:
+            _cacheawl.reconcile(box)
+            data = _cacheawl.cachebox_tree(box)
+            lines = [
+                f"cachebox {box!r} — {data['item_count']} files, "
+                f"{data['total_size_human']}, status {data['status']}",
+                f"origin: {data.get('origin')}",
+                "contents (folders first):",
+            ]
+
+            def render(nodes: list[dict[str, Any]], indent: str = "  ") -> None:
+                for n in nodes:
+                    if n["is_dir"]:
+                        lines.append(f"{indent}{n['name']}/")
+                        render(n.get("children") or [], indent + "  ")
+                    else:
+                        lines.append(f"{indent}{n['name']}")
+
+            render(data.get("tree") or [])
+            return ToolResult("cachebox_list", box, True, "\n".join(lines))
+        _cacheawl.reconcile_all()
+        boxes = _cacheawl.list_cacheboxes()
+        if not boxes:
+            return ToolResult("cachebox_list", "", True,
+                              "no cacheboxes yet. create one with cachebox_create.")
+        lines = [f"{len(boxes)} cachebox(es) in ~/enough/cacheawl/:"]
+        for b in boxes:
+            o = b.get("origin") or {}
+            lines.append(
+                f"- {b['name']} — {b['item_count']} files, {b['total_size_human']}, "
+                f"origin {o.get('type', '?')}"
+                + (f":{o.get('value')}" if o.get('value') else "")
+                + (f" [status: {b['status']}]" if b['status'] != 'complete' else "")
+            )
+        return ToolResult("cachebox_list", "", True, "\n".join(lines))
+    except _cacheawl.CacheawlError as e:
+        return ToolResult("cachebox_list", box, False, f"error: {e}")
+
+
+def run_cachebox_create(project_dir: Path, call: ToolCall) -> ToolResult:
+    if not broker.is_enabled("cacheawl_enabled"):
+        return _cacheawl_denied("cachebox_create")
+    from . import cacheawl as _cacheawl
+    name = (call.extra.get("name") or call.path or "").strip()
+    if not name:
+        return ToolResult("cachebox_create", "", False,
+                          "error: missing <name> for the new cachebox.")
+    try:
+        summary = _cacheawl.create_cachebox(name)
+    except _cacheawl.CacheawlError as e:
+        return ToolResult("cachebox_create", name, False, f"error: {e}")
+    return ToolResult("cachebox_create", name, True,
+                      f"ok — created empty cachebox {name!r} at "
+                      f"~/enough/cacheawl/{name}/ (mirror generated).")
+
+
+def run_cachebox_ingest(project_dir: Path, call: ToolCall) -> ToolResult:
+    if not broker.is_enabled("cacheawl_enabled"):
+        return _cacheawl_denied("cachebox_ingest")
+    from . import cacheawl as _cacheawl
+    box = (call.extra.get("box") or "").strip()
+    source_type = (call.extra.get("type") or "").strip().lower()
+    value = (call.extra.get("value") or "").strip()
+    depth_raw = (call.extra.get("depth") or "").strip()
+    all_flag = (call.extra.get("all") or "").strip().lower() in ("true", "yes", "1")
+    if not box:
+        return ToolResult("cachebox_ingest", "", False,
+                          "error: missing <box> (the destination cachebox name).")
+    if not source_type or not value:
+        return ToolResult("cachebox_ingest", box, False,
+                          "error: ingest needs <type> (path|url|wikisink) and "
+                          "<value> (the source).")
+    depth: Any = depth_raw or 1
+    try:
+        summary = _cacheawl.run_ingest(
+            project_dir, box=box, source_type=source_type, value=value,
+            depth=depth, all_flag=all_flag)
+    except _cacheawl.CacheawlError as e:
+        return ToolResult("cachebox_ingest", box, False, f"error: {e}")
+    return ToolResult(
+        "cachebox_ingest", box, True,
+        f"ok — ingested {summary.get('files_written', 0)} file(s) into cachebox "
+        f"{box!r} from {source_type}:{value} (depth "
+        f"{summary.get('origin', {}).get('depth')}). now "
+        f"{summary['item_count']} files, {summary['total_size_human']}.",
+    )
+
+
 _DISPATCH = {
     "read_file": run_read_file,
     "write_file": run_write_file,
@@ -1287,6 +1461,9 @@ _DISPATCH = {
     "read_wiki_article": run_read_wiki_article,
     "wiki_status": run_wiki_status,
     "wikisink": run_wikisink,
+    "cachebox_list": run_cachebox_list,
+    "cachebox_create": run_cachebox_create,
+    "cachebox_ingest": run_cachebox_ingest,
 }
 
 # Map tool name to its per-tool "brokered" toggle. When that toggle is
@@ -1319,6 +1496,11 @@ _TRACE_TOGGLE = {
     "read_wiki_article": "trace_log_enabled",
     "wiki_status": "trace_log_enabled",
     "wikisink": "trace_log_enabled",
+    # cacheawl tools are gated by `cacheawl_enabled`; trace them under the
+    # universal toggle so every box mutation lands in the journal.
+    "cachebox_list": "trace_log_enabled",
+    "cachebox_create": "trace_log_enabled",
+    "cachebox_ingest": "trace_log_enabled",
 }
 
 

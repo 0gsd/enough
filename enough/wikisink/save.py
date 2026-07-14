@@ -3,7 +3,9 @@
 A saved article is a *folder* (both destinations):
 
 - `project`   — `{project}/wiki/<slug>/`
-- `infoworld` — `~/enough/infoworld/wiki/<slug>/`
+- `cacheawl`  — `~/enough/cacheawl/wiki/<slug>/` (the global wiki cachebox;
+                the legacy destination name `infoworld` is accepted as an
+                alias during the transition)
 
 containing:
 
@@ -47,10 +49,16 @@ from . import zim as wzim
 
 log = logging.getLogger("enough.wikisink")
 
-INFOWORLD_WIKI = Path.home() / "enough" / "infoworld" / "wiki"
-
 META_NAME = ".meta.json"
 ARTICLE_NAME = "article.html"
+
+
+def _cacheawl_wiki_dir() -> Path:
+    """The global wiki cachebox: ``~/enough/cacheawl/wiki/`` (honoring the
+    ENOUGH_CACHEAWL_ROOT test override). Resolved lazily so tests never
+    touch the real store."""
+    from .. import cacheawl as _cacheawl
+    return _cacheawl.root() / "wiki"
 
 
 def _slug(title: str) -> str:
@@ -230,19 +238,17 @@ def _manifest_body(art: dict[str, Any], cfg: dict[str, Any], today: str) -> str:
     )
 
 
-def save_article(project_dir: Path, path: str, dest: str) -> dict[str, Any]:
-    """Save an article as a self-describing folder. `dest` is "project"
-    or "infoworld". Returns {saved_path, dest, title}; raises KeyError /
-    WikisinkUnavailable / ValueError on bad dest."""
-    if dest not in ("project", "infoworld"):
-        raise ValueError(f"unknown save destination {dest!r}")
-    cfg = wconfig.load_config()
-    art = woverlay.resolve_article(path=path)
+def save_article_to_dir(base_dir: Path, art: dict[str, Any],
+                        cfg: dict[str, Any] | None = None,
+                        dest: str = "cacheawl") -> Path:
+    """Write a resolved article as a self-describing folder under
+    ``base_dir`` (``base_dir/<slug>/`` with article.html + _manifest.md +
+    .meta.json). The reusable core shared by ``save_article`` and the
+    cacheawl wikisink ingest. Returns the folder path."""
+    cfg = cfg or wconfig.load_config()
     slug = _slug(art["title"])
     today = dt.date.today().isoformat()
-
-    base = (project_dir / "wiki") if dest == "project" else INFOWORLD_WIKI
-    art_dir = base / slug
+    art_dir = base_dir / slug
     art_dir.mkdir(parents=True, exist_ok=True)
     (art_dir / ARTICLE_NAME).write_text(
         _attribution_comment(art, cfg, today) + art["html"], encoding="utf-8")
@@ -259,15 +265,33 @@ def save_article(project_dir: Path, path: str, dest: str) -> dict[str, Any]:
         "dest": dest,
     }, indent=2) + "\n", encoding="utf-8")
     # Replace any pre-folder-era flat saves of the same article.
-    for legacy in (base / f"{slug}.md", base / f"{slug}.html", art_dir / "article.md"):
+    for legacy in (base_dir / f"{slug}.md", base_dir / f"{slug}.html",
+                   art_dir / "article.md"):
         legacy.unlink(missing_ok=True)
+    return art_dir
+
+
+def save_article(project_dir: Path, path: str, dest: str) -> dict[str, Any]:
+    """Save an article as a self-describing folder. `dest` is "project" or
+    "cacheawl" ("infoworld" accepted as a legacy alias for cacheawl).
+    Returns {saved_path, dest, title}; raises KeyError / WikisinkUnavailable
+    / ValueError on bad dest."""
+    if dest == "infoworld":  # legacy alias — the frontend still sends this
+        dest = "cacheawl"
+    if dest not in ("project", "cacheawl"):
+        raise ValueError(f"unknown save destination {dest!r}")
+    cfg = wconfig.load_config()
+    art = woverlay.resolve_article(path=path)
+
+    base = (project_dir / "wiki") if dest == "project" else _cacheawl_wiki_dir()
+    art_dir = save_article_to_dir(base, art, cfg, dest=dest)
 
     if dest == "project":
         saved_display = str(art_dir.relative_to(project_dir)) + f"/{ARTICLE_NAME}"
         watched_tag = f"project:{project_dir.resolve()}"
     else:
         saved_display = str(art_dir / ARTICLE_NAME)
-        watched_tag = "infoworld"
+        watched_tag = "cacheawl"
 
     wconfig.upsert_watched(art["path"], art["title"], saved_to=watched_tag)
     log.info("wikisink saved %s -> %s", art["title"], art_dir)
@@ -289,9 +313,9 @@ def _resolve_saved_dir(project_dir: Path, ref: str) -> Path:
     d = p if p.is_dir() else p.parent
     if not (d / META_NAME).is_file() or not (d / ARTICLE_NAME).is_file():
         raise ValueError(f"{ref!r} is not a saved wikisink article folder")
-    roots = (project_dir.resolve(), INFOWORLD_WIKI.resolve())
+    roots = (project_dir.resolve(), _cacheawl_wiki_dir().resolve())
     if not any(d == r or r in d.parents for r in roots):
-        raise ValueError(f"{ref!r} is outside the project and infoworld wiki")
+        raise ValueError(f"{ref!r} is outside the project and cacheawl wiki")
     return d
 
 
@@ -326,11 +350,14 @@ def unsave_article(project_dir: Path, ref: str) -> dict[str, Any]:
         meta = {}
     title = meta.get("title") or d.name
     zim_path = meta.get("zim_path") or ""
-    under_infoworld = INFOWORLD_WIKI.resolve() in d.parents
-    tag = "infoworld" if under_infoworld else f"project:{project_dir.resolve()}"
+    under_cacheawl = _cacheawl_wiki_dir().resolve() in d.parents
+    tag = "cacheawl" if under_cacheawl else f"project:{project_dir.resolve()}"
     shutil.rmtree(d)
     if zim_path:
         wconfig.remove_saved_to(zim_path, tag)
+        # Legacy tag cleanup so pre-transition saves fully unwatch.
+        if under_cacheawl:
+            wconfig.remove_saved_to(zim_path, "infoworld")
     log.info("wikisink unsaved %s (%s)", title, d)
     return {"removed": str(d), "title": title,
-            "dest": "infoworld" if under_infoworld else "project"}
+            "dest": "cacheawl" if under_cacheawl else "project"}

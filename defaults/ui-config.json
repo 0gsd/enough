@@ -48,10 +48,12 @@
   "themes": {
     "enough-default": {
       "label": "Enough Default",
+      "icons": "dark",
       "colors": {
         "bg": "#1a1a2e",
         "bg-alt": "#1e1e36",
         "bg-raise": "#22223a",
+        "btn-bg": "#2a2a4a",
         "fg": "#e0e0e0",
         "fg-muted": "#9a9ab0",
         "fg-faint": "#5a5a75",
@@ -76,10 +78,12 @@
     "pastel": {
       "label": "Pastel",
       "_doc": "Pale yellow paper background, like the MacOS Terminal 'Man Page' scheme. High contrast but soft; accent colors are pastels-over-amber, not saturated.",
+      "icons": "light",
       "colors": {
         "bg": "#faf5dc",
         "bg-alt": "#f3ead0",
         "bg-raise": "#ebe0be",
+        "btn-bg": "#e6dab4",
         "fg": "#3b3b3b",
         "fg-muted": "#6d6960",
         "fg-faint": "#a39d8e",
@@ -104,10 +108,12 @@
     "wireframe": {
       "label": "Wireframe",
       "_doc": "White background, dark navy primary text, saturated primary colors for accents. Looks like a Figma wireframe or technical blueprint.",
+      "icons": "light",
       "colors": {
         "bg": "#ffffff",
         "bg-alt": "#f9f9fc",
         "bg-raise": "#f0f0f7",
+        "btn-bg": "#e8e8f2",
         "fg": "#0a1e4e",
         "fg-muted": "#3d4b7a",
         "fg-faint": "#8791b2",
@@ -132,10 +138,12 @@
     "darknest": {
       "label": "Darknest",
       "_doc": "Jet black and grayscale. The black-and-white edition — no hue at all. Active skill indicators and role labels use pure white; folders and muted text are greys.",
+      "icons": "dark",
       "colors": {
         "bg": "#000000",
         "bg-alt": "#0a0a0a",
         "bg-raise": "#1a1a1a",
+        "btn-bg": "#262626",
         "fg": "#ffffff",
         "fg-muted": "#b0b0b0",
         "fg-faint": "#707070",

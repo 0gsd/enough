@@ -166,6 +166,19 @@ TOGGLES: tuple[Toggle, ...] = (
         default=True,
         group="wikisink",
     ),
+    Toggle(
+        key="cacheawl_enabled",
+        label="cacheawl tools",
+        description=(
+            "let the agent use the global file store at ~/enough/cacheawl/: "
+            "cachebox_list, cachebox_create, and cachebox_ingest. turn off to "
+            "hide cacheboxes from the agent — the cacheawl browser UI keeps "
+            "working either way. url ingests still honor the fetch_url "
+            "toggles on top of this one."
+        ),
+        default=True,
+        group="cacheawl",
+    ),
 )
 
 
@@ -351,6 +364,15 @@ def denial_cloud_unhealthy(reason: str) -> str:
         f"health check from the OpenRouter settings panel after fixing the "
         f"underlying issue (commonly: out of credits → top up account; "
         f"invalid key → paste the correct key; network → check connectivity)."
+    )
+
+
+def denial_cacheawl_disabled() -> str:
+    return (
+        "error: the cacheawl tools are disabled in the broker config. "
+        "re-enable 'cacheawl tools' in the broker pane (top-nav 'broker' "
+        "button) to let the agent list, create, and ingest into cacheboxes "
+        "under ~/enough/cacheawl/."
     )
 
 

@@ -34,7 +34,7 @@ Format (v0.1):
     p1 ! Ship a minimal one < q1
     a1 + Ecosystem growth needs stable hooks < p1 by:graham
     a3 + Skills already cover 80% of cases < p2 [-> a2]
-    n1 . Background reading < q1 ref:infoworld/plugins-survey.md
+    n1 . Background reading < q1 ref:rness/io/input/plugins-survey.md
     g1 @ Subproblem: versioning < p1 ref:rness/girraphs/versioning.girraph
 
     q1 >

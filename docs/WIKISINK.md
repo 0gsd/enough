@@ -70,8 +70,9 @@ article the first time). Toolbar, left to right:
   (refreshed from Wikipedia by a wikisink run), or `preserved`
   (deletion override)
 - **💬** add a comment pinned to the paragraph in view
-- **📥** save to this project's `wiki/` folder (created on first save)
-- **🌐** save to `~/enough/infoworld/wiki/` (shared across all projects)
+- **save** — one button with a two-choice flyout: this project's `wiki/`
+  folder (created on first save), or the global `~/enough/cacheawl/wiki/`
+  cachebox (shared across all projects)
 - **🛡** deletion override (see below) · **🗨** comments panel · **⚙** settings
 
 Internal links stay in-app; external links open in your browser. The
@@ -79,8 +80,8 @@ chat pill at the bottom talks to the agent: with text selected, your
 question carries the quoted selection; without, it carries the article
 reference so the agent can read the page itself (`read_wiki_article`).
 
-A saved article is a **folder** — `wiki/<slug>/` in the project (📥) or
-`~/enough/infoworld/wiki/<slug>/` (🌐) — containing `article.html` (the
+A saved article is a **folder** — `wiki/<slug>/` in the project or
+`~/enough/cacheawl/wiki/<slug>/` in the global wiki cachebox — containing `article.html` (the
 article **exactly as the archive had it**) and `_manifest.md` (title,
 source URL, **CC BY-SA 4.0** license, retrieval date, origin), so every
 saved article is self-describing — and ready-made for attribution if
@@ -120,8 +121,8 @@ Nothing is ever deleted automatically.
 ## The wikisink (updating)
 
 Ask the agent — "run a wikisink" — or it happens via the `wikisink`
-tool. Every article you've **saved** (project or infoworld) or
-**commented on** is *watched*. A run:
+tool. Every article you've **saved** (project or the global cacheawl wiki
+cachebox) or **commented on** is *watched*. A run:
 
 1. checks watched articles against live Wikipedia (batched, polite,
    descriptive User-Agent);

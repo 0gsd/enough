@@ -10,14 +10,15 @@ v0.0.3+ layout:
       policies, skills, roles).
     - **copies** — for files that diverge per project from the start
       (AGENT.md, MOTIVATION.md, knowledge/project-profile.md).
-- `{project}/infoworld` is a symlink to `~/enough/infoworld/` so all
-  projects share a common grounded-knowledge store. The infoworld tree
-  is auto-created if missing.
+The old per-project `infoworld` symlink (into `~/enough/infoworld/`) is
+gone: that shared library is dissolved into the global **cacheawl** store
+(`~/enough/cacheawl/{personal,public,wiki}` cacheboxes). `ensure_skeleton`
+prunes the dead link from existing projects; the one-time folder move runs
+at server startup via `cacheawl.migrate_infoworld`.
 
 If `~/enough/` doesn't exist (dev setup, or enough run before running
 bootstrap.sh), the installer defaults directory is located relative to
-this package's install path, and `~/enough/infoworld/` is created on
-demand.
+this package's install path.
 """
 
 from __future__ import annotations
@@ -36,12 +37,6 @@ def _install_defaults_root() -> Path:
     Resolves relative to this package file, so it works whether enough is
     run from ~/enough, a dev clone, or any other location."""
     return Path(__file__).resolve().parents[1] / "defaults"
-
-
-def _global_infoworld_root() -> Path:
-    """The per-user shared infoworld directory. Lives at `~/enough/infoworld/`
-    regardless of where the enough package itself is installed."""
-    return Path.home() / "enough" / "infoworld"
 
 
 def cloud_sync_provider(path: Path) -> str | None:
@@ -236,21 +231,6 @@ USER_PROFILE_MD = PROJECT_PROFILE_MD
 # ---------------------------------------------------------------------------
 # Skeleton creation
 # ---------------------------------------------------------------------------
-
-def ensure_global_infoworld() -> Path:
-    """Create `~/enough/infoworld/{wiki,personal,public}` if missing.
-    Returns the absolute path to the infoworld root.
-
-    Previously also wrote a `README.md` at the root, but the contents
-    are now covered by the main project README + AGENT_GUIDE, so we
-    leave the directory clean and let users put whatever they want there
-    without an unsolicited file to ignore or delete."""
-    root = _global_infoworld_root()
-    for sub in ("wiki", "personal", "public"):
-        (root / sub).mkdir(parents=True, exist_ok=True)
-        (root / sub / ".gitkeep").touch(exist_ok=True)
-    return root
-
 
 def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
     """Sync global skills into `rness/skills/` and prune dangling symlinks.
@@ -464,21 +444,20 @@ def _symlink_is_broken(link: Path) -> bool:
     return not link.exists()  # follows the link; True == dangling
 
 
-def _heal_skeleton_symlinks(
-    project_dir: Path, defaults: Path, infoworld_root: Path
-) -> list[str]:
+def _heal_skeleton_symlinks(project_dir: Path, defaults: Path) -> list[str]:
     """Repair skeleton symlinks broken by a cloud-sync filesystem (Google
     Drive, Dropbox, iCloud) syncing them between machines.
 
     The per-launch `_populate_*` pass already self-heals skills/roles/
-    paradigms (it prunes dangling links and resyncs). Two surfaces it does
-    NOT cover:
+    paradigms (it prunes dangling links and resyncs). The surface it does
+    NOT cover is `_SKELETON_PLAN` symlink entries (policies/*, knowledge
+    primers): `_is_skeleton_item_present()` counts a *broken* symlink as
+    'present', so drift-detection never repairs it. We re-point broken ones
+    here.
 
-      1. `_SKELETON_PLAN` symlink entries (policies/*, knowledge primers) —
-         `_is_skeleton_item_present()` counts a *broken* symlink as 'present',
-         so drift-detection never repairs it. We re-point broken ones here.
-      2. The top-level `infoworld` link — only ever created on first run, so
-         an existing project whose link got mangled never recovered.
+    (The old top-level `infoworld` link is no longer created or healed —
+    infoworld is dissolved into cacheawl. `_prune_infoworld_link` removes
+    the dead link from existing projects.)
 
     Only *broken* symlinks (dangling or blanked) are touched; working links
     and real files (e.g. a 'customize for this project' copy) are left alone.
@@ -503,29 +482,30 @@ def _heal_skeleton_symlinks(
             except OSError:
                 pass
 
-    # infoworld: clear a broken link, then (re)create when nothing real is
-    # squatting the name. This also back-fills the link into older projects
-    # whose first-run predated a given enough version.
-    infoworld_link = project_dir / "infoworld"
-    if _symlink_is_broken(infoworld_link):
-        try:
-            infoworld_link.unlink()
-        except OSError:
-            pass
-    if not infoworld_link.exists() and not infoworld_link.is_symlink():
-        try:
-            infoworld_link.symlink_to(infoworld_root.resolve(), target_is_directory=True)
-            repaired.append("infoworld")
-        except OSError:
-            pass
-
     return repaired
 
 
+def _prune_infoworld_link(project_dir: Path) -> bool:
+    """Remove the per-project `infoworld` symlink left over from before the
+    dissolve. infoworld is now the cacheawl `personal`/`public`/`wiki`
+    cacheboxes — a global store with no per-project symlink. Only a symlink
+    is removed (that's the artifact this package created); a real
+    `infoworld/` directory the user made themselves is left untouched.
+    Returns True iff a link was pruned."""
+    link = project_dir / "infoworld"
+    if link.is_symlink():
+        try:
+            link.unlink()
+            return True
+        except OSError:
+            pass
+    return False
+
+
 def ensure_skeleton(project_dir: Path) -> bool:
-    """Create `rness/` + `infoworld` symlink if missing, AND sync global
-    skills/roles on every call (idempotent). Returns True on first-time
-    `rness/` creation, False if it already existed.
+    """Create `rness/` if missing, prune the dead `infoworld` link, AND
+    sync global skills/roles on every call (idempotent). Returns True on
+    first-time `rness/` creation, False if it already existed.
 
     The skill/role sync runs on every launch so newly-installed globals
     appear in existing projects too — with default-off status, per the
@@ -548,11 +528,8 @@ def ensure_skeleton(project_dir: Path) -> bool:
             "The installation looks broken — re-run bootstrap.sh."
         )
 
-    # Always ensure global infoworld exists (per user, not per project).
-    infoworld_root = ensure_global_infoworld()
-
     if new_project:
-        # First-time setup: copies, symlinks, empty dirs, infoworld link.
+        # First-time setup: copies, symlinks, empty dirs.
         _apply_missing_skeleton_items(project_dir, defaults, _SKELETON_PLAN)
 
         for rel, body in _PROJECT_LOCAL_FILES.items():
@@ -565,11 +542,11 @@ def ensure_skeleton(project_dir: Path) -> bool:
             d.mkdir(parents=True, exist_ok=True)
             (d / ".gitkeep").touch()
 
-        infoworld_link = project_dir / "infoworld"
-        if not infoworld_link.exists() and not infoworld_link.is_symlink():
-            infoworld_link.symlink_to(
-                infoworld_root.resolve(), target_is_directory=True
-            )
+    # ALWAYS run (idempotent): remove the dead per-project `infoworld`
+    # symlink. infoworld is dissolved into the global cacheawl store
+    # (personal/public/wiki cacheboxes); the actual folder move happens
+    # once at server startup (cacheawl.migrate_infoworld).
+    _prune_infoworld_link(project_dir)
 
     # ALWAYS run (idempotent): sync global skills/roles/paradigms into the
     # project. Picks up any new globals added after this project was first
@@ -579,9 +556,9 @@ def ensure_skeleton(project_dir: Path) -> bool:
     _populate_paradigm_symlinks(project_dir, defaults)
 
     # ALWAYS run (idempotent): re-point any skeleton symlinks a cloud-sync
-    # filesystem broke between machines (the static plan links + infoworld),
-    # and back-fill infoworld for older projects. No-op on healthy projects.
-    _heal_skeleton_symlinks(project_dir, defaults, infoworld_root)
+    # filesystem broke between machines (the static plan links).
+    # No-op on healthy projects.
+    _heal_skeleton_symlinks(project_dir, defaults)
 
     # ALWAYS ensure the io/ scratch dirs exist — back-fills into projects
     # created before these were added to the skeleton.

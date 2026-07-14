@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.1.5)
+# enough — Agent Guide (v0.1.6)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -26,9 +26,10 @@ Three locations that matter:
 
 | Path | What it is | Authority |
 |---|---|---|
-| `~/enough/` | The global install. Cloned from the repo by `bootstrap.sh`. Contains `defaults/` (templates that get copied / symlinked into every project), `infoworld/` (shared knowledge library), and the Python source. | Edit these to affect every project. |
+| `~/enough/` | The global install. Cloned from the repo by `bootstrap.sh`. Contains `defaults/` (templates that get copied / symlinked into every project), `cacheawl/` (the machine-global file store — see below), and the Python source. (The old `infoworld/` library is dissolved into `cacheawl/` on first 0.1.6 launch.) | Edit these to affect every project. |
 | `~/enough/config/` | User-global JSON config. `broker.json` (toggle states), `models.json` (active local model), `openrouter.json` (cloud-slot metadata, **no api key**), `ui.json` (theme/font), `orchestrator.json` (auto-reset config), `wikisink.json` (wikisink install registry + watch/override registries + reading state). | Edit per-machine settings. |
 | `~/enough/wikisink/` | Default wikisink location: the user's wikisink *data* (comments, overlays, preserved articles, rankings, run state) and — unless pointed elsewhere — the base `.zim` archive(s). Archives can live anywhere, external drives included; several installs can be registered at once. Hidden from the file-manager tree. | Managed via the 🚰 UI; don't hand-edit. |
+| `~/enough/cacheawl/` | The machine-global **cacheawl** store: root-level folders are *cacheboxes* (plain kept-forever text, or cached replicas ingested from a path/URL/wikisink). Global wiki saves land in the `wiki/` box; the dissolved infoworld folders become the `personal`/`public`/`wiki` boxes. Overridable via `ENOUGH_CACHEAWL_ROOT`. Hidden from every project's file tree. | Managed via the cacheawl mode UI + agent tools; sidecars are backend-owned. |
 | `<project>/rness/` | The agent's per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/roles; per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`; per-project state in `io/`, `requests/`, `knowledge/`. | Edit to affect just this project. |
 
 Plus one **off-disk** location: the **OS keyring** (macOS Keychain /
@@ -58,9 +59,10 @@ Every Python module in `enough/`:
 | [enough/models.py](../enough/models.py) | ~280 | Local-model registry (4 cute-named local models, defined in `defaults/models.json`). Selection state in `~/enough/config/models.json`. | `load_registry()`, `load_state()`, `save_state()`, `resolve()`, `all_models_view()` |
 | [enough/skeleton.py](../enough/skeleton.py) | ~560 | Creates `rness/` for new projects (copies from `defaults/`), syncs global skills/roles/paradigms on every launch via dedicated populators, runs migrations. | `ensure_skeleton()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS`, `_populate_skill_symlinks` / `_populate_role_symlinks` / `_populate_paradigm_symlinks` |
 | [enough/highlights.py](../enough/highlights.py) | ~250 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
-| [enough/girraph.py](../enough/girraph.py) | ~600 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
+| [enough/girraph.py](../enough/girraph.py) | ~695 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
+| [enough/cacheawl.py](../enough/cacheawl.py) | ~1340 | The cacheawl store: cachebox CRUD, path/URL/wikisink **ingest**, the `_cachebox.merirmaid` mirror generator + reconcile, the mirror/sidecar write-guards, transfer (copy/move), and the launch-time `infoworld` migration. Root is `~/enough/cacheawl/` (or `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store; nothing else writes there. | `root()`, `create_cachebox()` / `list_cacheboxes()` / `cachebox_tree()`, `run_ingest()`, `regenerate_mirror()` / `reconcile()` / `reconcile_all()`, `mirror_write_denial()`, `migrate_infoworld()` |
 | [enough/logger.py](../enough/logger.py) | small | Stdlib logging setup. | — |
-| [enough/static/index.html](../enough/static/index.html) | ~11500 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), chat pane, SSE consumer, wikisink setup/installs modal + reader mode, girraph panel, review mode |
+| [enough/static/index.html](../enough/static/index.html) | ~14800 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), chat pane, SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode, cacheawl split-view mode, SVG icon pipeline (`data-icon`/`iconSrc`), `setActiveMode` registry, confirmOverlay |
 
 `defaults/` ships templates that get copied or symlinked into project
 skeletons by `skeleton.py`:
@@ -137,7 +139,8 @@ cache.
 | Broker journal | `rness/knowledge/session-logs/<date>-broker.md` | none | no |
 | Fetched web cache | `rness/io/input/<timestamp>-<hash>-<slug>.md` | none | no |
 | Cloud cache | `rness/io/cloud-cache/<timestamp>-<slug>.md` + `_cloud-index.md` | none | no |
-| Saved wiki articles | `<project>/wiki/<slug>/` or `~/enough/infoworld/wiki/<slug>/` — folder of `article.html` (verbatim archive copy) + `_manifest.md` + hidden `.meta.json` | none — created on first save | no (agent reads on demand) |
+| Saved wiki articles | `<project>/wiki/<slug>/` or `~/enough/cacheawl/wiki/<slug>/` (the global wiki cachebox; `"infoworld"` accepted as a legacy alias) — folder of `article.html` (verbatim archive copy) + `_manifest.md` + hidden `.meta.json` | none — created on first save | no (agent reads on demand) |
+| Cacheboxes | `~/enough/cacheawl/<box>/…` — root-level box folders + backend-owned `.cachebox.json` + `_cachebox.merirmaid` sidecars | none — created via UI/agent/migration | no (agent reaches via cachebox tools) |
 | Wikisink registry/state | `~/enough/config/wikisink.json` (user-global, **not** per-project) | none | no |
 | Wiki comments/overlays | `<wikisink data dir>/comments/`, `overlay/`, `preserved/` | none | no |
 
@@ -395,7 +398,7 @@ the same process as the agent. Three jobs:
    error strings for the agent. The runner returns one of these as the
    tool body when a precondition fails.
 
-The current toggle catalog (10 toggles, all default `True`):
+The current toggle catalog (11 toggles, all default `True`):
 
 | Key | Group | Affects |
 |---|---|---|
@@ -409,6 +412,7 @@ The current toggle catalog (10 toggles, all default `True`):
 | `fetch_url_cache_and_convert` | fetch_url | Pandoc HTML→markdown + cache in `rness/io/input/` |
 | `wikisink_enabled` | wikisink | Whether the agent's four wiki tools work at all (the 🚰 browser UI is ungated) |
 | `wikisink_live_updates` | wikisink | Whether wikisink update runs may call the Wikipedia/Wikimedia APIs (off = report from local state only) |
+| `cacheawl_enabled` | cacheawl | Whether the agent's three cachebox tools work at all (the cacheawl browser UI is ungated; URL ingests still additionally honor the `fetch_url_*` toggles) |
 
 ---
 
@@ -432,9 +436,12 @@ The current toggle catalog (10 toggles, all default `True`):
 | `read_wiki_article` | `tools.run_read_wiki_article` → `wikisink/agent.py` | same; full text cached under `rness/io/input/`, preview returned |
 | `wiki_status` | `tools.run_wiki_status` → `wikisink/agent.py` | `wikisink_enabled` toggle (works without an archive — that's the point) |
 | `wikisink` | `tools.run_wikisink` → `wikisink/agent.py` | `wikisink_enabled` toggle; network calls additionally gated by `wikisink_live_updates` |
+| `cachebox_list` | `tools.run_cachebox_list` → `cacheawl.py` | `cacheawl_enabled` toggle; no arg = list boxes, `<box>` = its contents tree (reconciles first) |
+| `cachebox_create` | `tools.run_cachebox_create` → `cacheawl.py` | `cacheawl_enabled` toggle; creates an empty box (name-validated) + its mirror |
+| `cachebox_ingest` | `tools.run_cachebox_ingest` → `cacheawl.py` | `cacheawl_enabled` toggle; `path`/`url`/`wikisink` source to a depth. URL ingests also honor the `fetch_url_*` toggles; runs in the background, box registered `ingesting` up front |
 
-All registered in `_DISPATCH` (~line 1267 in tools.py) and
-`_TRACE_TOGGLE` (~line 1292). The tool-call XML parser
+All registered in `_DISPATCH` (~line 1447 in tools.py) and
+`_TRACE_TOGGLE` (~line 1475). The tool-call XML parser
 (`parse_tool_calls`) handles arbitrary tool names — extra inner tags
 (beyond `<path>`, `<content>`, `<command>`, `<url>`) end up in
 `ToolCall.extra` so new tools don't need parser changes.
@@ -476,16 +483,62 @@ Architecture notes:
   surfaced as warnings — the serializer never destroys content it
   didn't understand. Tests in `tests/test_girraph*.py` pin this.
 - **The UI panel** (`#girraph-mode` in index.html, `gp*` functions) is
-  a third full-frame mode alongside review and edit. Breadcrumb stack
-  navigation through `@`/doc refs; pushing an already-visited path
-  pops back to it, which is what makes cyclic refs navigable.
-- **The default skill** `defaults/skills/ibis-girraphiti/` carries the
-  IBIS discipline (anti-solution-jumping, the user-confirmation
-  stopping rule, `by:` etiquette). Disabled by default like all new
-  globals.
-- TODO (stubbed, deliberately out of v1 scope): graphviz/mermaid
-  export; query engine (grep suffices; an embedded index like Kuzu
-  could later be added as a derived cache without migration pain).
+  a full-frame mode alongside the unified read/edit mode, merirmaid, and
+  cacheawl. Breadcrumb stack navigation through `@`/doc refs; pushing an
+  already-visited path pops back to it, which is what makes cyclic refs
+  navigable.
+- **The default skill** `defaults/skills/girraph-merirmaid/` (renamed
+  from `ibis-girraphiti` in 0.1.6) carries the IBIS discipline
+  (anti-solution-jumping, the user-confirmation stopping rule, `by:`
+  etiquette) *and* the Mermaid-generation rules for merirmaid files, with
+  `references/` docs for both. Disabled by default like all new globals —
+  and because the rename creates a fresh global, existing projects get it
+  defaulted off (re-enable in the sidebar).
+- **Mermaid export is no longer a girraph TODO.** It shipped in 0.1.6 as
+  the sibling **merirmaid** primitive (see the merirmaid section below and
+  [docs/merirmaid-plan.md](merirmaid-plan.md)) — a girraph is not converted
+  to Mermaid; the two are separate formats for separate jobs. Still out of
+  v1 scope for girraph: a query engine (grep suffices; an embedded index
+  like Kuzu could later be added as a derived cache without migration pain).
+
+---
+
+## Merirmaid (the Mermaid-diagram primitive)
+
+A `.merirmaid` file is a Mermaid diagram with a small frontmatter header,
+rendered to SVG live in the browser by a **vendored** (local, no CDN)
+`enough/static/mermaid.min.js` (v11.16.0, MIT — shipped like
+`htmx.min.js`). Full format spec and rationale:
+[docs/merirmaid-plan.md](merirmaid-plan.md). The paradigm-shift from
+girraph: there is no owning Python module for the *format* — the source is
+plain text the agent writes with `write_file` and the frontend renders. The
+only backend code that touches `.merirmaid` content is the cachebox mirror
+generator in `cacheawl.py`.
+
+Architecture notes:
+
+- **Two modalities, in the frontmatter.** `modality: wip` is a working
+  whiteboard — node *label* text is user-editable in merirmaid mode (with a
+  live char count vs the soft `node-char-limit`); structure edits are
+  agent-only, via the chat pill. `modality: mirror` is a source-of-truth
+  diagram of some external structure (the launch case: a cachebox's
+  contents) — **read-only** in the UI, regenerated only by the system that
+  owns the mirrored structure.
+- **Whole-file writes are allowed** (unlike `.girraph` — no broker-assigned
+  IDs to protect), with exactly one exception: `run_write_file` and
+  `POST /api/file` refuse to modify a file whose frontmatter says
+  `modality: mirror` *and* which lives under `~/enough/cacheawl/`. That
+  guard is `cacheawl.mirror_write_denial(target)` (returns the denial string
+  or `None`); both write paths call it.
+- **Merirmaid mode** (`#merirmaid-mode` in index.html) is a full-frame mode
+  like girraph mode: lazy-loads mermaid.js on first open, renders the SVG,
+  intercepts Mermaid `click "path"` interactions to push targets onto a
+  breadcrumb stack (`.merirmaid`/`.girraph`/`.md`), and shows the raw source
+  in a `<pre>` on a render error instead of a blank pane. Active-mode icon
+  top-right with the exit ribbon, per the mode conventions (see "Change the
+  UI").
+- **The girraph-merirmaid skill** carries the Mermaid-authoring rules
+  (stay well under `node-char-limit` to leave room for user edits, etc.).
 
 ---
 
@@ -556,6 +609,15 @@ Architecture notes:
   `download/{pause,resume,cancel}`, `installs/activate`, `installs`
   (DELETE = forget), `overrides`, `override`, `wikisink` (the update
   run).
+- **Save targets, two of them.** A save goes either to the project
+  (`<project>/wiki/<slug>/`) or to the machine-global wiki cachebox
+  (`~/enough/cacheawl/wiki/<slug>/`) — the reader's single save button
+  opens a two-choice flyout. `save.save_article(project_dir, path, dest)`
+  takes `dest` in `{"project", "cacheawl"}`; the frontend still sends the
+  legacy value `"infoworld"`, which `save.py` accepts as an **alias** for
+  `"cacheawl"`. The global destination moved from `~/enough/infoworld/wiki/`
+  to the cacheawl store in 0.1.6 (the whole infoworld library dissolved
+  into cacheboxes — see the Cacheawl section).
 - **Saved articles are verbatim HTML folders, not markdown.** The
   stored `article.html` is the archive/overlay copy byte-for-byte
   (plus an attribution comment); sanitization happens at *view* time
@@ -574,6 +636,74 @@ Architecture notes:
   switch/forget, newer-snapshot upgrade offer); `choose` is the flavor
   wizard, reached on first-ever setup or via "+ add an install".
   Download progress streams over the `wiki_download` SSE event.
+
+---
+
+## Cacheawl (the machine-global file store)
+
+The store at `~/enough/cacheawl/` where the user keeps text forever. All
+code lives in [enough/cacheawl.py](../enough/cacheawl.py); `server.py`
+mounts the `/api/cacheawl/*` endpoints and hides the store from every
+project tree (like wikisink dirs). Backend contract:
+[docs/cacheawl-plan.md](cacheawl-plan.md).
+
+- **A cachebox is a root-level folder** in the store. Only direct children
+  of `cacheawl/` are cacheboxes; anything deeper is a plain folder. Some
+  boxes are plain kept-forever text; others are **cached replicas** ingested
+  from a `path` / `url` / `wikisink` source recorded in `origin`.
+- **`cacheawl.py` owns everything under the store.** Nothing else writes
+  there. The root is resolvable via `ENOUGH_CACHEAWL_ROOT` (a test/dev hook
+  mirroring `ENOUGH_WIKISINK_CONFIG` — use it; never touch real user state
+  in tests).
+- **Two backend-owned sidecars per box, both write-refused.**
+  `.cachebox.json` is hidden metadata (origin, status, timestamps, a tree
+  fingerprint used by reconcile). `_cachebox.merirmaid` is an
+  auto-generated `modality: mirror` diagram of the box, regenerated on every
+  backend mutation. **Both the agent's `write_file` and `POST /api/file`
+  refuse to modify them** — the mirror via `mirror_write_denial()` (`403` /
+  tool error telling the caller to change the box contents instead), the
+  `.cachebox.json` by name. Don't add a code path that writes them from
+  anywhere but `cacheawl.py`.
+- **The `cacheawl:<box>/<rel>` path scheme.** `server.py`'s
+  `_resolve_project_path` accepts virtual paths prefixed `cacheawl:` and
+  resolves the remainder against `cacheawl.root()` — that's how cacheawl
+  mode launches store files into the read/edit, girraph, and merirmaid
+  modes without global-path endpoints. Same traversal rules apply inside
+  the store (absolute / `..` / empty → `400`); the mirror + sidecar
+  write-guards downstream see the resolved target and keep applying. In-tree
+  relative paths never reach the store — the prefix is the only door.
+- **Ingest runs in the background.** The box is registered synchronously
+  with `status: "ingesting"` before the response returns (so
+  `GET /api/cacheawl/ingest-status?box=…` is immediately pollable); the work
+  runs in a thread. On failure the box ends `status: "failed"` with
+  `ingest.error` set — never a phantom "complete". Hard caps live in
+  `cacheawl.py` (`INGEST_URL_PAGE_CAP` ~500, `INGEST_WIKI_ARTICLE_CAP` ~200,
+  `INGEST_PATH_FILE_CAP`). URL ingests reuse the shared `fetch_url` plumbing,
+  so they honor the `fetch_url_*` toggles *on top of* `cacheawl_enabled`.
+- **Reconcile keeps mirrors honest.** `GET /api/cacheawl/tree` (and the
+  `cachebox_list` tool) call `reconcile()` / `reconcile_all()` first — a
+  cheap fingerprint check that regenerates a stale mirror so manual file
+  drops the backend didn't perform show up.
+- **Transfer is single-item.** `POST /api/cacheawl/transfer` copies/moves a
+  file or folder between the project and a box (either direction) or between
+  boxes; traversal-checked on both sides; sidecars can be neither source nor
+  destination; refuses to clobber without `overwrite: true`.
+- **The infoworld migration.** On first 0.1.6 launch,
+  `cacheawl.migrate_infoworld()` (called from `create_app`'s startup)
+  dissolves `~/enough/infoworld/{personal,public,wiki}` into three
+  same-named cacheboxes. Idempotent and **move-only** (`os.rename` within a
+  volume; cross-volume copies-then-verifies before removing the source). A
+  missing infoworld root is a clean no-op; an already-migrated box is left
+  alone. The source root honors `ENOUGH_INFOWORLD_ROOT` (paired test hook)
+  so suites never move the real library. Global wiki saves that used to land
+  in `~/enough/infoworld/wiki/` now land in the `wiki` cachebox; `"infoworld"`
+  survives as a legacy `dest` alias in `save.py`.
+- **The UI** is a full-frame split-view mode (`#cacheawl-mode` in
+  index.html): a project pane and a cachebox pane, drag-to-copy /
+  shift-drag-to-move (both mapping to `transfer`), an ingest bar that
+  composes an agent chat request, and per-file open into the natural mode
+  via the `cacheawl:` scheme. Ingest progress is **polled**
+  (`ingest-status`), not streamed, in v1.
 
 ---
 
@@ -612,8 +742,8 @@ Architecture notes:
 
 1. Define `run_<tool>(project_dir: Path, call: ToolCall) -> ToolResult`
    in [tools.py](../enough/tools.py).
-2. Register in `_DISPATCH` (~line 1267 in tools.py) and `_TRACE_TOGGLE`
-   (~line 1292). Both grep cleanly by name if line numbers drift again.
+2. Register in `_DISPATCH` (~line 1447 in tools.py) and `_TRACE_TOGGLE`
+   (~line 1475). Both grep cleanly by name if line numbers drift again.
 3. If `ToolResult.render()` needs a specific attribute (e.g. `output=`
    for `cloud_pipeline`), add a branch in `render()`.
 4. Add an XML example block + prose to `TOOL_INSTRUCTIONS` in
@@ -639,7 +769,7 @@ imports — `cloud`, `models`, `tools` are typical late imports.
 ### Change the UI
 
 [enough/static/index.html](../enough/static/index.html) is a single
-~11500-line file with inline CSS and JS. Conventions:
+~14800-line file with inline CSS and JS. Conventions:
 
 - All modals follow the same `#<name>-modal` pattern with `.hidden`
   class and a `.modal-backdrop` for click-outside dismissal.
@@ -651,6 +781,47 @@ imports — `cloud`, `models`, `tools` are typical late imports.
 - New endpoints that the frontend hits typically need a corresponding
   fetch/htmx call in the relevant `open<Thing>Modal()` or render
   function.
+
+The 0.1.6 UI revamp added several mechanisms you'll want to reuse rather
+than reinvent:
+
+- **The SVG icon pipeline.** 33 custom icons are built by
+  [scripts/build_icons.py](../scripts/build_icons.py) (reading
+  `scripts/icons-bbox.json`; strips hidden Illustrator layers, squares the
+  viewBox at 82% fill) into `enough/static/icons/build/` — two variants per
+  icon: `<name>.svg` (black line-work, light themes) and `<name>-dark.svg`
+  (white, dark themes; produced by a black↔white swap incl. gradient stops).
+  Don't hand-edit `build/`; edit the source SVG + rerun the script. In the
+  DOM, every icon is `<img class="svg-icon" data-icon="<name>">`; `iconSrc()`
+  resolves the variant, `setIcon(el, name)` swaps a toggle icon, and
+  `refreshThemeIcons()` re-derives all variants on a live theme change (no
+  reload). Reuse those helpers — don't write `<img src>` by hand.
+- **Theme-aware icon variants.** The active variant comes from the theme's
+  `icons` key (`"dark"` | `"light"`), reflected onto the root as the
+  `data-icons` attribute; themes predating the key fall back to a luminance
+  heuristic on their `bg`.
+- **`btn-bg` color key.** Button chips paint on `var(--btn-bg,
+  var(--bg-raise))` — a new theme color that **falls back to `--bg-raise`
+  when absent** (so old user configs still look right). See "What NOT to
+  touch" about never defining `--btn-bg` in `:root`.
+- **The `setActiveMode(name, opts)` registry** (search the comment block in
+  index.html) is the contract every full-frame mode registers through:
+  `{icon, onExit, onIconClick?, hoverIcon?, iconTitle?, exitTitle?}`. It
+  paints the mode's icon into the **reserved top-right active-mode area**
+  with a `ribbon-redx` hanging off its bottom edge (the ribbon exits;
+  clicking the icon runs `onIconClick` — read/edit uses it to toggle the
+  eye/pencil face, with `readedit-switch` as the `hoverIcon`).
+  `clearActiveMode()` returns to the home/chat view; `ACTIVE_MODE` holds the
+  live registration. Wire new modes through this, not ad-hoc show/hide.
+- **`confirmOverlay(...)`** is the reusable ribbon dialog (`#confirm-overlay`):
+  ribbon-check confirms, ribbon-redx cancels, ribbon-alert marks the
+  warning. Use it for confirmations (e.g. the cachebox-update wikisink run)
+  instead of `confirm()`.
+- **The mode system.** preview/review/edit were unified into ONE read/edit
+  mode with two faces (read-eye / edit-pencil) that lives either as a mini
+  side panel or a full frame (`full2mini` / `mini2full` toggle, dirty
+  guards). It sits in the same full-frame family as wikisink, girraph,
+  merirmaid, and cacheawl — all registered via `setActiveMode`.
 
 ### Add a new local model
 
@@ -733,12 +904,33 @@ A list of things that will confuse you if you don't see them coming:
   the setup wizard.
 - **Never `mkdir` under a `/Volumes/...` path without
   `config.volume_mounted()`.** See the Wikisink section for why.
+- **Cachebox sidecars are backend-owned.** `_cachebox.merirmaid` and
+  `.cachebox.json` are written only by `cacheawl.py`. Both write endpoints
+  (`write_file`, `POST /api/file`) already refuse them; don't add a path
+  that edits a mirror from anywhere else — it would drift from the box it
+  mirrors and get clobbered on the next regeneration. To change what a
+  mirror shows, change the box contents.
+- **Don't put `--btn-bg` in `:root`.** Button chips use `var(--btn-bg,
+  var(--bg-raise))`, and the fallback is load-bearing: old user configs that
+  predate the `btn-bg` theme color rely on `--btn-bg` being *undefined* so
+  the `--bg-raise` fallback kicks in. A `:root` default would defeat that.
+  The shipped themes carry `btn-bg` in their theme `colors` (and the
+  server backfills it for pre-0.1.6 configs — see `_merge_shipped_theme_keys`
+  in server.py); the CSS default must stay absent.
+- **The `cacheawl:` scheme resolves through `_resolve_project_path` only.**
+  That's the single door from the project-relative file endpoints into the
+  machine-global store. Don't add other global-path prefixes or bypass the
+  helper — the traversal check and the mirror/sidecar write-guards all hang
+  off that one resolution point.
 - **A pytest suite exists locally but is gitignored** (`tests/` is in
   `.gitignore` by deliberate choice — `git log` has the story). Run
-  `uv run pytest tests/ -q` before declaring done; it covers girraphs
-  and project metadata. Wikisink and the web layer are exercised via
-  ad-hoc smoke scripts (TestClient against `create_app()`, or a live
-  server with `ENOUGH_WIKISINK_CONFIG` pointed at scratch state).
+  `uv run pytest tests/ -q` before declaring done; it covers girraphs,
+  project metadata, the cacheawl store + `/api/cacheawl/*` + the
+  `cacheawl:` scheme, and the ui-config theme-key merge. Suites isolate
+  global state via env hooks — `ENOUGH_WIKISINK_CONFIG`,
+  `ENOUGH_CACHEAWL_ROOT`, `ENOUGH_INFOWORLD_ROOT`, `ENOUGH_UI_CONFIG` — all
+  pointed at `tmp_path`; **never run against real `~/enough` state.** The
+  rest of the web layer is exercised via TestClient against `create_app()`.
 
 ---
 
@@ -797,7 +989,7 @@ modifications:
    state across projects. Different folder → different agent →
    different memory. This is a discipline, not a limitation. Users
    running multiple `enough` instances coordinate through the
-   filesystem (e.g. shared `infoworld/`).
+   filesystem (e.g. a shared cachebox in `~/enough/cacheawl/`).
 
 ---
 
@@ -826,7 +1018,8 @@ Plus external binaries installed by `bootstrap.sh` via Homebrew:
   for the silent-fix pass; absence is handled gracefully (skill falls
   back to LLM-only scanning).
 
-A small pytest suite lives in `tests/` (girraphs, project metadata) —
+A pytest suite lives in `tests/` (girraphs, project metadata, the cacheawl
+store + endpoints + `cacheawl:` scheme, the ui-config theme-key merge) —
 present in local checkouts but gitignored, so a fresh clone won't have
 it. Run `uv run pytest tests/ -q` when it's there. Everything else is
 smoke-tested via ad-hoc Python scripts that exercise the modules

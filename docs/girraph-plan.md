@@ -8,8 +8,8 @@ end-of-file detail blocks, no-orphan + explicit-cascade removal.
 A girraph (pronounced "graph" — the `ir` is for iterative/recursive) is a
 plain-text, IBIS-flavored graph document: issues, positions, arguments,
 notes, where any node can recursively be another girraph, an inline
-details view, or a reference to any markdown doc in the project or
-infoworld. Core primitive, not a paradigm.
+details view, or a reference to any markdown doc in the project. Core
+primitive, not a paradigm.
 
 Charter constraints (non-negotiable):
 
@@ -43,7 +43,7 @@ p2 ! Don't — skills are enough < q1
 a1 + Ecosystem growth needs stable hooks < p1 by:graham
 a2 - API surface = forever maintenance < p1 by:open-skeptic
 a3 + Skills already cover 80% of cases < p2 [-> a2]
-n1 . Background reading < q1 ref:infoworld/plugins-survey.md
+n1 . Background reading < q1 ref:rness/knowledge/plugins-survey.md
 g1 @ Subproblem: versioning policy < p1 ref:rness/girraphs/versioning.girraph
 
 q1 >
@@ -209,9 +209,9 @@ Derived view (also a broker-exposed function so the agent can embed it
 in docs): indented tree, type emoji, `[→ id]` annotations, detail blocks
 elided to a marker. A view, never the storage format.
 
-## Default skill: ibis-girraphiti
+## Default skill: girraph-merirmaid
 
-`defaults/skills/ibis-girraphiti/SKILL.md`, disabled by default,
+`defaults/skills/girraph-merirmaid/SKILL.md`, disabled by default,
 following the SKILL.md format + description-field discipline from
 `defaults/paradigms/workflow-design.md`. Carries the IBIS discipline:
 
@@ -225,16 +225,22 @@ following the SKILL.md format + description-field discipline from
   synthesized stakeholder roles.
 
 Plus one short paragraph in `defaults/paradigms/text-planning.md`: when
-ibis-girraphiti is enabled, plan structure lives in a girraph at the
+girraph-merirmaid is enabled, plan structure lives in a girraph at the
 project root.
 
 ## Out of scope for v1
 
 - Query engine of any kind (grep covers it; an embedded index like Kuzu
   can come later as a derived cache without migration pain).
-- Graphviz/mermaid export (TODO stub only).
 - Drawn-edge graph layout.
 - Multi-user/sync.
+
+Mermaid diagramming is no longer a girraph TODO: it shipped in 0.1.6 as
+its own **merirmaid** primitive (`.merirmaid` files rendered live in the
+browser), paired with girraph under the renamed `girraph-merirmaid` skill.
+See [merirmaid-plan.md](merirmaid-plan.md). A girraph is not exported to
+Mermaid — they are sibling formats for different jobs (IBIS argument maps
+vs. free-form diagrams).
 
 ---
 
@@ -260,7 +266,7 @@ project root.
       doc-ref read-only transclusion, broken-ref ⚠ chip + repair
       prompt with same-basename suggestions. Smoke-tested live in a
       browser, including the deliberate A→B→A ref cycle.
-- [x] **Phase 5 — skill + docs**: `defaults/skills/ibis-girraphiti/`
+- [x] **Phase 5 — skill + docs**: `defaults/skills/girraph-merirmaid/`
       (disabled by default per globals convention), text-planning
       paragraph, `docs/girraphs.md` explainer, AGENT_GUIDE girraph
       section + tools table + code map row.

@@ -147,22 +147,75 @@
       border-color: var(--fg-faint);
     }
 
-    /* Icon-only topbar buttons (file toggle, broker, UI prefs). Square,
-       large emoji rendering. The emoji color comes from the glyph
-       itself, not --fg, so they stay visible across all themes. */
+    /* Custom SVG icons. One <img.svg-icon data-icon="…"> per button; the
+       src is driven by iconSrc() (light/dark variant per active theme). The
+       SVGs already carry ~18% internal margin, so button padding stays
+       modest. object-fit keeps the square art centered. */
+    .svg-icon {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Icon-only topbar buttons (broker, UI prefs, wikisink) get a shared
+       "button chip" background one step raised from the app bg — same for
+       all buttons within a theme. Falls back to --bg-raise for old user
+       configs that predate --btn-bg. */
     .topbar .icon-btn {
-      width: 30px;
-      height: 26px;
-      padding: 0;
+      width: 28px;
+      height: 28px;
+      padding: 3px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
+      background: var(--btn-bg, var(--bg-raise));
+      border: 1px solid var(--border);
+      border-radius: 5px;
       line-height: 1;
       /* Stay clickable above the absolutely-positioned centered project
          title, which can overlap the icon row at narrow widths. */
       position: relative;
       z-index: 2;
+    }
+
+    .topbar .icon-btn:hover {
+      filter: brightness(1.18);
+      border-color: var(--fg-faint);
+    }
+
+    /* Bare two-state toggles (sidebar show/hide, comments panel show/hide):
+       NOT on a chip — just the icon, no background/border. The on-state gets
+       a soft drop-shadow glow on dark themes (the original art carried a
+       raster glow we stripped at build time; recreated here). */
+    .bare-toggle {
+      background: transparent !important;
+      border: 1px solid transparent !important;
+      border-radius: 5px;
+      padding: 2px !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .topbar .bare-toggle {
+      width: 28px;
+      height: 28px;
+      position: relative;
+      z-index: 2;
+    }
+    .bare-toggle:hover {
+      filter: brightness(1.18);
+    }
+    /* On-state glow. Dark themes get a soft blue bloom; light themes a
+       subtler neutral lift so the "active" read survives on paper. */
+    html[data-icons="dark"] .bare-toggle.on .svg-icon {
+      filter: drop-shadow(0 0 4px var(--accent-user));
+    }
+    html[data-icons="light"] .bare-toggle.on .svg-icon {
+      filter: drop-shadow(0 0 2px color-mix(in oklab, var(--accent-user) 55%, transparent));
     }
 
     .topbar .model-badge {
@@ -701,7 +754,7 @@
     }
 
     .input-form button {
-      background: var(--bg-raise);
+      background: var(--btn-bg, var(--bg-raise));
       color: var(--fg);
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -720,16 +773,23 @@
       cursor: wait;
     }
 
-    .mic-btn {
-      min-width: 40px;
+    /* Square icon chips flanking the textarea (speak left, send right).
+       Sized to sit flush with the 44px-min textarea; modest padding since
+       the SVGs carry their own internal margin. */
+    .input-form .icon-chip {
+      flex: 0 0 auto;
+      width: 44px;
+      height: 44px;
+      padding: 9px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
     }
 
-    .mic-btn .mic-icon {
-      font-size: 15px;
-      line-height: 1;
+    .mic-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .mic-btn.recording {
@@ -959,7 +1019,8 @@
     #preview .preview-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
+      gap: 8px;
       padding: 6px 10px;
       height: 34px;
       border-bottom: 1px solid var(--border);
@@ -1059,6 +1120,9 @@
       flex: 1;
       overflow: auto;
       padding: 12px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
 
     #preview .file-path {
@@ -1078,6 +1142,128 @@
     }
 
     #preview .binary-file {
+      color: var(--fg-faint);
+      font-style: italic;
+    }
+
+    /* Mini panel "expand to full size" button (mini2full icon). */
+    #preview .mini-full-btn {
+      width: 26px;
+      height: 26px;
+      padding: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--btn-bg, var(--bg-raise));
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    #preview .mini-full-btn:hover {
+      filter: brightness(1.18);
+      border-color: var(--fg-faint);
+    }
+
+    #preview .mini-full-btn .svg-icon {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Mini EDIT face: plaintext markdown editor filling the panel body. */
+    #preview textarea.mini-edit {
+      flex: 1 1 auto;
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px;
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.55;
+      resize: none;
+      min-height: 0;
+    }
+
+    #preview textarea.mini-edit:focus {
+      outline: none;
+    }
+
+    /* Mini READ face: compact prettified markdown (reuses renderMarkdown
+       output). A lighter-weight version of the full review-body styles —
+       the mini panel intentionally omits the review toolbar/highlights. */
+    #preview .mini-read {
+      flex: 0 0 auto;
+      color: var(--fg);
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    #preview .preview-actions { flex: 0 0 auto; }
+
+    #preview .mini-read h1,
+    #preview .mini-read h2,
+    #preview .mini-read h3,
+    #preview .mini-read h4,
+    #preview .mini-read h5,
+    #preview .mini-read h6 {
+      font-weight: 700;
+      line-height: 1.25;
+      margin: 1.2em 0 0.5em;
+      color: var(--fg);
+    }
+
+    #preview .mini-read h1 { font-size: 1.6em; border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }
+    #preview .mini-read h2 { font-size: 1.35em; border-bottom: 1px solid var(--border); padding-bottom: 0.15em; }
+    #preview .mini-read h3 { font-size: 1.15em; }
+    #preview .mini-read h4 { font-size: 1.05em; }
+
+    #preview .mini-read p { margin: 0.7em 0; }
+
+    #preview .mini-read ul,
+    #preview .mini-read ol { margin: 0.6em 0; padding-left: 1.5em; }
+
+    #preview .mini-read li { margin: 0.2em 0; }
+
+    #preview .mini-read a { color: var(--accent-tool); }
+
+    #preview .mini-read blockquote {
+      margin: 0.7em 0;
+      padding-left: 12px;
+      border-left: 3px solid var(--border);
+      color: var(--fg-muted);
+    }
+
+    #preview .mini-read code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--bg-raise);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    #preview .mini-read pre {
+      background: var(--bg-raise);
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+
+    #preview .mini-read pre code { background: transparent; padding: 0; }
+
+    #preview .mini-read hr { border: none; border-top: 1px solid var(--border); margin: 1.2em 0; }
+
+    #preview .mini-read img { max-width: 100%; }
+
+    #preview .mini-read table { border-collapse: collapse; margin: 0.7em 0; }
+    #preview .mini-read th,
+    #preview .mini-read td { border: 1px solid var(--border); padding: 4px 8px; }
+
+    #preview .mini-read .mini-note {
       color: var(--fg-faint);
       font-style: italic;
     }
@@ -1640,27 +1826,72 @@
       border-color: var(--fg-faint);
     }
 
-    /* The exit-review button in the topbar. Hidden until review or
-       edit mode is active; conspicuous red so the way out is
-       unmistakable. The label updates between "exit review" and
-       "exit edit" based on which mode is open. */
-    .topbar #exit-review-btn {
-      display: none;
-      background: var(--accent-error);
-      color: var(--bg);
-      border-color: var(--accent-error);
-      font-weight: 700;
-      padding: 4px 10px;
-    }
-
-    .topbar #exit-review-btn.visible {
+    /* Active-mode area (topbar top-right). Holds the current mode's icon
+       with a redx ribbon hanging off the bottom edge, banner-style. The
+       container is `hidden` on the home/chat view. */
+    .topbar .active-mode {
+      position: relative;
+      z-index: 6;
       display: inline-flex;
       align-items: center;
+      margin-left: 2px;
     }
 
-    .topbar #exit-review-btn:hover {
-      filter: brightness(1.1);
-      color: var(--bg);
+    .topbar .active-mode[hidden] {
+      display: none;
+    }
+
+    /* The mode icon chip. Sits in the topbar row. */
+    .topbar .active-mode .active-mode-icon {
+      width: 30px;
+      height: 30px;
+      padding: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--btn-bg, var(--bg-raise));
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      cursor: default;
+    }
+
+    /* When the mode wires an onIconClick (read/edit face toggle), the
+       icon becomes interactive. */
+    .topbar .active-mode .active-mode-icon.interactive {
+      cursor: pointer;
+    }
+
+    .topbar .active-mode .active-mode-icon.interactive:hover,
+    .topbar .active-mode .active-mode-icon.interactive:focus-visible {
+      filter: brightness(1.18);
+      border-color: var(--fg-faint);
+      outline: none;
+    }
+
+    /* The ribbon hangs off the bottom edge of the icon, overlapping the
+       content below the topbar. Bigger tap target, unmistakable exit. */
+    .topbar .active-mode .active-mode-ribbon {
+      position: absolute;
+      top: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 26px;
+      height: 30px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      z-index: 7;
+      line-height: 1;
+    }
+
+    .topbar .active-mode .active-mode-ribbon:hover {
+      filter: brightness(1.12);
+    }
+
+    .topbar .active-mode .active-mode-ribbon .svg-icon {
+      width: 100%;
+      height: 100%;
     }
 
     /* ---------- Edit mode (full-frame plain-text editor) ---------- */
@@ -2112,6 +2343,668 @@
       vertical-align: top;
     }
 
+    /* ---------- Merirmaid mode ----------
+       Full-frame Mermaid-diagram viewer/editor for .merirmaid files
+       (wave 2c). Same shell pattern as #girraph-mode: absolute-inset
+       overlay inside <main class="content">, toolbar + body + a chat
+       pill mirroring the live conversation. Rendering is done client
+       side by the vendored mermaid.min.js (lazy-loaded on first open). */
+    #merirmaid-mode {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--fg);
+      z-index: 30;
+    }
+
+    #merirmaid-mode.open {
+      display: flex;
+    }
+
+    #merirmaid-mode .merirmaid-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: var(--bg-raise);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    #merirmaid-mode .mm-title {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 34%;
+    }
+
+    /* Modality badge — mirrors .wiki-source-badge styling. */
+    #merirmaid-mode .mm-badge {
+      font-size: 10.5px;
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 2px 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    #merirmaid-mode .mm-badge.wip {
+      color: var(--accent-user);
+      border-color: var(--accent-user);
+    }
+
+    #merirmaid-mode .mm-badge.mirror {
+      color: var(--accent-tool);
+      border-color: var(--accent-tool);
+    }
+
+    /* Breadcrumbs: the click-navigation descent stack (same push/pop
+       semantics as girraph mode's @-ref crumbs). */
+    #merirmaid-mode .mm-crumbs {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      min-width: 0;
+    }
+
+    #merirmaid-mode .mm-crumbs .crumb {
+      background: none;
+      border: none;
+      color: var(--fg-muted);
+      font: inherit;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+
+    #merirmaid-mode .mm-crumbs .crumb:hover {
+      color: var(--fg);
+      background: var(--bg);
+    }
+
+    #merirmaid-mode .mm-crumbs .crumb.current {
+      color: var(--fg);
+      font-weight: 600;
+      cursor: default;
+    }
+
+    #merirmaid-mode .mm-crumbs .sep {
+      color: var(--fg-faint);
+    }
+
+    #merirmaid-mode .merirmaid-toolbar button.mm-act {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    #merirmaid-mode .merirmaid-toolbar button.mm-act:hover {
+      border-color: var(--fg-faint);
+    }
+
+    #merirmaid-mode .merirmaid-body {
+      flex: 1;
+      overflow: auto;
+      padding: 24px max(32px, calc(50% - 480px)) 120px;
+      font-size: 14px;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    #merirmaid-mode .mm-diagram {
+      display: flex;
+      justify-content: center;
+    }
+
+    #merirmaid-mode .mm-diagram svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* A node wired to a click-link — cursor + subtle affordance. */
+    #merirmaid-mode .mm-diagram g.mm-clickable {
+      cursor: pointer;
+    }
+
+    #merirmaid-mode .mm-diagram g.mm-editable {
+      cursor: text;
+    }
+
+    /* Warning banner (bad/missing frontmatter, unnavigable link) —
+       reuses the girraph gp-warnings look. */
+    #merirmaid-mode .mm-warnings {
+      color: var(--warn, #e0a458);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      margin: 0 0 12px;
+      white-space: pre-wrap;
+    }
+
+    /* Render-error view — the mermaid error message plus the raw
+       source, so the pane is never blank. */
+    #merirmaid-mode .mm-error {
+      color: var(--accent-error, #d66);
+      font-size: 12.5px;
+      font-family: var(--font-mono);
+      margin: 0 0 10px;
+      white-space: pre-wrap;
+    }
+
+    #merirmaid-mode .mm-source {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      background: var(--bg-raise);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 12px 14px;
+      overflow-x: auto;
+      white-space: pre;
+      color: var(--fg-muted);
+    }
+
+    #merirmaid-mode .mm-doc-note {
+      font-size: 12px;
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+      margin-bottom: 14px;
+    }
+
+    /* Reuse the girraph doc markdown subset for the .md crumb view. */
+    #merirmaid-mode .gp-doc h1,
+    #merirmaid-mode .gp-doc h2,
+    #merirmaid-mode .gp-doc h3 { line-height: 1.3; margin: 1.2em 0 0.5em; }
+    #merirmaid-mode .gp-doc p { margin: 0.7em 0; }
+    #merirmaid-mode .gp-doc pre,
+    #merirmaid-mode .gp-doc code {
+      font-family: var(--font-mono);
+      background: var(--bg-raise);
+      border-radius: 3px;
+    }
+    #merirmaid-mode .gp-doc pre { padding: 0.8em 1em; overflow-x: auto; }
+    #merirmaid-mode .gp-doc blockquote {
+      border-left: 3px solid var(--fg-faint);
+      margin: 1em 0;
+      padding: 0.2em 0.9em;
+      color: var(--fg-muted);
+    }
+    #merirmaid-mode .gp-doc table { border-collapse: collapse; margin: 1em 0; }
+    #merirmaid-mode .gp-doc th,
+    #merirmaid-mode .gp-doc td {
+      border: 1px solid var(--border);
+      padding: 0.3em 0.7em;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    /* In-place node-label editor (wip only). Fixed-positioned over the
+       clicked node; a live char counter sits under the input. */
+    #mm-label-editor {
+      position: fixed;
+      z-index: 60;
+      display: none;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    #mm-label-editor.open { display: flex; }
+
+    #mm-label-editor input {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      padding: 4px 6px;
+      background: var(--bg);
+      color: var(--fg);
+      border: 2px solid var(--accent-user, #6ab);
+      border-radius: 4px;
+      min-width: 120px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    #mm-label-editor .mm-count {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--fg-muted);
+      background: var(--bg-raise);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 6px;
+      align-self: flex-start;
+    }
+
+    #mm-label-editor .mm-count.over {
+      color: var(--warn, #e0a458);
+      border-color: var(--warn, #e0a458);
+    }
+
+    /* Transient inline banner for unnavigable / rejected link targets. */
+    #merirmaid-mode .mm-flash {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-raise);
+      color: var(--warn, #e0a458);
+      border: 1px solid var(--warn, #e0a458);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+      z-index: 40;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    }
+
+    /* ================================================================
+       Cacheawl mode (wave 2d): full-frame two-pane file manager for the
+       global cachebox store. Top ~1/3 = project pane, bottom ~2/3 =
+       cacheawl pane. Same full-frame shell as girraph/merirmaid modes.
+       ================================================================ */
+    #cacheawl-mode {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--fg);
+      z-index: 30;
+      /* reserve room for the collapsed chat pill handle at the bottom */
+      padding-bottom: 34px;
+    }
+
+    #cacheawl-mode.open { display: flex; }
+
+    #cacheawl-mode .ca-pane {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* Project pane = top third; cacheawl pane = bottom two-thirds. */
+    #cacheawl-mode .ca-project {
+      flex: 1 1 33%;
+      border-bottom: 2px solid var(--border);
+    }
+
+    #cacheawl-mode .ca-store {
+      flex: 2 1 67%;
+    }
+
+    #cacheawl-mode .ca-pane-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      background: var(--bg-raise);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    #cacheawl-mode .ca-pane-head img.svg-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    #cacheawl-mode .ca-pane-title {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 30%;
+      flex-shrink: 0;
+    }
+
+    /* Per-pane breadcrumb (same look as merirmaid crumbs). */
+    #cacheawl-mode .ca-crumbs {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      overflow-x: auto;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      min-width: 0;
+      font-size: 11.5px;
+    }
+
+    #cacheawl-mode .ca-crumbs .crumb {
+      background: none;
+      border: 1px solid transparent;
+      color: var(--fg-muted);
+      font: inherit;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    #cacheawl-mode .ca-crumbs .crumb:hover {
+      color: var(--fg);
+      background: var(--bg);
+    }
+
+    #cacheawl-mode .ca-crumbs .crumb.current {
+      color: var(--fg);
+      font-weight: 600;
+      cursor: default;
+    }
+
+    /* A crumb lit up as an active drag-drop target. */
+    #cacheawl-mode .ca-crumbs .crumb.ca-drop {
+      border-color: var(--accent-agent, #6ab);
+      background: color-mix(in oklab, var(--accent-agent, #6ab) 16%, transparent);
+      color: var(--fg);
+    }
+
+    #cacheawl-mode .ca-crumbs .sep { color: var(--fg-faint); }
+
+    /* The icon grid — the body of each pane. */
+    #cacheawl-mode .ca-grid {
+      flex: 1;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+      gap: 6px;
+      align-content: start;
+      padding: 12px 14px;
+    }
+
+    /* Whole-grid drop highlight (dropping onto the pane background). */
+    #cacheawl-mode .ca-grid.ca-drop {
+      outline: 2px dashed var(--accent-agent, #6ab);
+      outline-offset: -6px;
+      background: color-mix(in oklab, var(--accent-agent, #6ab) 7%, transparent);
+    }
+
+    #cacheawl-mode .ca-empty {
+      grid-column: 1 / -1;
+      color: var(--fg-muted);
+      font-size: 12px;
+      font-style: italic;
+      padding: 6px 2px;
+    }
+
+    /* One file/folder tile. */
+    #cacheawl-mode .ca-tile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 4px 6px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      text-align: center;
+    }
+
+    #cacheawl-mode .ca-tile:hover { background: var(--bg-raise); }
+
+    #cacheawl-mode .ca-tile.selected {
+      background: color-mix(in oklab, var(--accent-user, #6ab) 20%, transparent);
+      border-color: var(--accent-user, #6ab);
+    }
+
+    /* A folder/cachebox tile lit as an active drop target. */
+    #cacheawl-mode .ca-tile.ca-drop {
+      border-color: var(--accent-agent, #6ab);
+      background: color-mix(in oklab, var(--accent-agent, #6ab) 18%, transparent);
+    }
+
+    #cacheawl-mode .ca-tile.ca-dragging { opacity: 0.4; }
+
+    #cacheawl-mode .ca-tile-icon {
+      position: relative;
+      width: 46px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #cacheawl-mode .ca-tile-icon > img.svg-icon {
+      width: 44px;
+      height: 44px;
+    }
+
+    /* File-type overlay badge, bottom-right of the file icon (~40%). */
+    #cacheawl-mode .ca-badge {
+      position: absolute;
+      right: -2px;
+      bottom: -1px;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #cacheawl-mode .ca-badge img.svg-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Text extension chip variant (non-girraph/merirmaid files). */
+    #cacheawl-mode .ca-badge.ca-badge-ext {
+      min-width: 16px;
+      height: 13px;
+      padding: 0 3px;
+      font-family: var(--font-mono);
+      font-size: 8.5px;
+      line-height: 13px;
+      font-weight: 700;
+      color: var(--bg);
+      background: var(--fg-muted);
+      border-radius: 3px;
+      text-transform: lowercase;
+    }
+
+    #cacheawl-mode .ca-tile-name {
+      font-size: 11px;
+      line-height: 1.25;
+      word-break: break-word;
+      max-width: 100%;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    /* Ingest input bar — footer of the cacheawl pane, above the chat pill. */
+    #cacheawl-mode .ca-ingest {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: var(--bg-raise);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+
+    #cacheawl-mode .ca-ingest select,
+    #cacheawl-mode .ca-ingest input[type="text"] {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 7px;
+      font-family: inherit;
+      font-size: 12px;
+    }
+
+    #cacheawl-mode .ca-ingest input[type="text"] {
+      flex: 1 1 180px;
+      min-width: 120px;
+    }
+
+    #cacheawl-mode .ca-ingest label.ca-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      color: var(--fg-muted);
+      white-space: nowrap;
+    }
+
+    #cacheawl-mode .ca-ingest label.ca-all.disabled { opacity: 0.4; }
+
+    #cacheawl-mode .ca-ingest button.ca-ingest-go {
+      background: var(--accent-agent, #6ab);
+      color: var(--bg);
+      border: 1px solid var(--accent-agent, #6ab);
+      border-radius: 4px;
+      padding: 4px 12px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    #cacheawl-mode .ca-ingest button.ca-ingest-go:hover { filter: brightness(1.1); }
+
+    /* Cacheawl chat pill sits at the very bottom (collapsed by default). */
+    #cacheawl-mode .review-chat { bottom: 4px; }
+
+    /* Cacheawl context menu — clone of the tree context menu look. */
+    #ca-context-menu {
+      position: fixed;
+      z-index: 70;
+      min-width: 150px;
+      background: var(--bg-raise);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      padding: 4px;
+      font-size: 12px;
+    }
+
+    #ca-context-menu.hidden { display: none; }
+
+    #ca-context-menu .ctx-target {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--fg-muted);
+      padding: 3px 8px 5px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 260px;
+    }
+
+    #ca-context-menu .ctx-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      color: var(--fg);
+      font: inherit;
+      padding: 5px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #ca-context-menu .ctx-item:hover { background: var(--bg); }
+
+    #ca-context-menu .ctx-sep {
+      height: 1px;
+      background: var(--border);
+      margin: 3px 0;
+    }
+
+    /* Simple name-prompt overlay for new folder / new cachebox. */
+    #ca-prompt {
+      position: fixed;
+      inset: 0;
+      z-index: 72;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    #ca-prompt.open { display: flex; }
+
+    #ca-prompt .ca-prompt-card {
+      background: var(--bg-raise);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+      width: min(90vw, 400px);
+      padding: 16px 18px;
+    }
+
+    #ca-prompt .ca-prompt-title { font-weight: 600; margin-bottom: 4px; }
+    #ca-prompt .ca-prompt-sub {
+      font-size: 11.5px;
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+      margin-bottom: 10px;
+    }
+
+    #ca-prompt input {
+      width: 100%;
+      background: var(--bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      box-sizing: border-box;
+    }
+
+    #ca-prompt .ca-prompt-err {
+      color: var(--accent-error, #d66);
+      font-size: 11.5px;
+      min-height: 14px;
+      margin: 6px 0;
+    }
+
+    #ca-prompt .ca-prompt-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    #ca-prompt .ca-prompt-actions button {
+      border-radius: 4px;
+      padding: 5px 14px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+    }
+
+    #ca-prompt .ca-prompt-actions button.primary {
+      background: var(--accent-agent, #6ab);
+      border-color: var(--accent-agent, #6ab);
+      color: var(--bg);
+      font-weight: 600;
+    }
+
     /* Selection toolbar inside review mode. Always docked at the top
        of the pane (Phase 5a) — controls grey out when their
        preconditions aren't met instead of the whole bar appearing
@@ -2138,6 +3031,23 @@
       display: flex;
       align-items: center;
       gap: 6px;
+    }
+
+    /* "Shrink to mini panel" button (full2mini icon), shared by the
+       review and edit full-frame toolbars. */
+    .rt-mini-btn {
+      width: 30px;
+      height: 30px;
+      padding: 4px !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .rt-mini-btn .svg-icon {
+      width: 100%;
+      height: 100%;
     }
 
     #review-mode .review-toolbar button {
@@ -4389,7 +5299,7 @@
     }
 
     .wiki-toolbar button {
-      background: var(--input-bg);
+      background: var(--btn-bg, var(--bg-raise));
       color: var(--fg);
       border: 1px solid var(--border);
       border-radius: 5px;
@@ -4408,6 +5318,171 @@
     .wiki-toolbar button:disabled {
       opacity: 0.4;
       cursor: default;
+    }
+
+    /* Square icon chips in the wiki toolbar (random, comment, save,
+       cachebox-update, settings). SVG art carries its own margin. */
+    .wiki-toolbar button.wt-icon {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      padding: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* The flex/inline-flex display above beats the UA [hidden] rule, so
+       restore hidden semantics explicitly for these elements. */
+    .wiki-toolbar button.wt-icon[hidden] {
+      display: none;
+    }
+
+    /* Bare comments toggle sits at the far right; give it a square footprint
+       so the glow/hover reads consistently with the topbar treatment. */
+    .wiki-toolbar .bare-toggle {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+    }
+
+    /* Inline icon inside a text-label popup button (selection popup). */
+    .svg-icon.inline {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      vertical-align: -2px;
+    }
+
+    /* ---------- Wiki save flyout ---------- */
+    .wiki-save-wrap {
+      position: relative;
+      display: inline-flex;
+    }
+
+    /* Free-floating overlay choices (NOT chips): bare icons + labels hanging
+       below the save button, dismissed by outside-click or esc. */
+    .save-flyout[hidden] {
+      display: none;
+    }
+    .save-flyout {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 6px;
+      background: var(--bg-raise);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+    }
+
+    .save-flyout .save-choice {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: var(--fg);
+      padding: 5px 10px 5px 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 12.5px;
+      white-space: nowrap;
+      width: 100%;
+      height: auto;
+      min-width: 0;
+    }
+
+    .save-flyout .save-choice .svg-icon {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
+    }
+
+    .save-flyout .save-choice:hover {
+      background: var(--btn-bg, var(--bg-raise));
+      border-color: var(--fg-faint);
+      filter: none;
+    }
+
+    /* ---------- Reusable confirm overlay (ribbon banners) ---------- */
+    /* confirmOverlay({title, message, confirmLabel, cancelLabel}) → Promise<bool>.
+       Later waves reuse this for any in-app confirmation. */
+    #confirm-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    #confirm-overlay[hidden] {
+      display: none;
+    }
+    .confirm-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 26px 20px;
+      max-width: 440px;
+      width: calc(100% - 48px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+    .confirm-card .confirm-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--fg);
+      margin-bottom: 12px;
+    }
+    .confirm-card .confirm-message {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      text-align: left;
+      color: var(--fg-muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .confirm-card .confirm-message img.svg-icon {
+      width: 26px;
+      height: 26px;
+      flex: 0 0 auto;
+    }
+    /* Ribbon controls hang banner-style: icon on top, label beneath. */
+    .confirm-actions {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+    }
+    .confirm-ribbon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+    .confirm-ribbon img.svg-icon {
+      width: 46px;
+      height: 46px;
+    }
+    .confirm-ribbon:hover {
+      filter: brightness(1.15);
+    }
+    .confirm-ribbon:hover img.svg-icon {
+      filter: drop-shadow(0 0 5px color-mix(in oklab, var(--accent-user) 55%, transparent));
     }
 
     .wiki-search-wrap {
@@ -4867,14 +5942,16 @@
   <div class="topbar">
     <div class="brand">enough<span class="dim"><!-- VERSION --></span></div>
     <!-- Left half: file toggle → broker → UI prefs → model+gauge -->
-    <button id="toggle-sidebar" class="icon-btn" title="Show/hide the file sidebar (cmd+\\)"
-      aria-label="files">📁</button>
+    <button id="toggle-sidebar" class="bare-toggle on" title="Show/hide the file sidebar (cmd+\\)"
+      aria-label="files"><img class="svg-icon" data-icon="projectnav-on" alt="files" draggable="false"></button>
     <button id="broker-btn" class="icon-btn" title="Broker — tool routing, logging, and per-tool toggles"
-      aria-label="broker">🔀</button>
+      aria-label="broker"><img class="svg-icon" data-icon="broker" alt="broker" draggable="false"></button>
     <button id="ui-btn" class="icon-btn" title="UI preferences + keyboard shortcuts + markdown cheat sheet"
-      aria-label="ui preferences">🖌️</button>
+      aria-label="ui preferences"><img class="svg-icon" data-icon="uiq" alt="ui preferences" draggable="false"></button>
     <button id="wikisink-btn" class="icon-btn" title="Wikisink — your local offline Wikipedia: browse, save, comment, update"
-      aria-label="wikisink">🚰</button>
+      aria-label="wikisink"><img class="svg-icon" data-icon="wikisink" alt="wikisink" draggable="false"></button>
+    <button id="cacheawl-btn" class="icon-btn" title="Cacheawl — the global cachebox store: two-pane file manager"
+      aria-label="cacheawl"><img class="svg-icon" data-icon="cacheawl" alt="cacheawl" draggable="false"></button>
     <button id="model-badge" class="model-badge off"
       title="Model &amp; context window — bottom bar shows live token-pressure">
       <span class="dot"></span>
@@ -4905,8 +5982,20 @@
         <span class="dc-glyph">C</span><span class="dc-val" id="doc-chars">0</span>
       </span>
     </div>
-    <!-- Exit-review button stays right-most so muscle memory lands. -->
-    <button id="exit-review-btn" title="Exit review mode (esc)">× exit review</button>
+    <!-- Active-mode area (reserved top-right). Empty on the home/chat
+         view. When a mode is active, setActiveMode() shows the mode's
+         icon here with a ribbon-redx "hanging off" the bottom edge
+         (banner-style, overlapping content below the topbar). Clicking
+         the ribbon exits the mode; clicking the icon runs the mode's
+         onIconClick (read/edit toggles face; other modes: no-op). -->
+    <div id="active-mode" class="active-mode" hidden>
+      <button type="button" id="active-mode-icon" class="active-mode-icon" aria-label="mode">
+        <img class="svg-icon" id="active-mode-img" data-icon="" alt="" draggable="false">
+      </button>
+      <button type="button" id="active-mode-ribbon" class="active-mode-ribbon" aria-label="exit mode">
+        <img class="svg-icon" data-icon="ribbon-redx" alt="exit" draggable="false">
+      </button>
+    </div>
   </div>
 
   <div class="layout" id="layout">
@@ -4957,19 +6046,32 @@
       <div class="input-dock">
         <form id="chat-form" class="input-form" hx-post="/api/chat" hx-target="#conversation" hx-swap="beforeend"
           hx-on::after-request="document.getElementById('message').value=''; document.getElementById('empty-hint')?.remove(); autoscroll();">
+          <button type="button" id="mic-btn" class="mic-btn icon-chip" title="voice input (local whisper.cpp)"
+            aria-label="voice input"><img class="svg-icon" data-icon="speak" alt="speak" draggable="false"></button>
           <textarea id="message" name="message" placeholder="message… (shift+enter for newline)" rows="1"
             autofocus></textarea>
-          <button type="submit" id="send-btn">send</button>
-          <button type="button" id="mic-btn" class="mic-btn" title="voice input (local whisper.cpp)">
-            <span class="mic-icon">🎤</span>
-          </button>
+          <button type="submit" id="send-btn" class="icon-chip" aria-label="send"><img class="svg-icon"
+              data-icon="send-chat" alt="send" draggable="false"></button>
         </form>
       </div>
 
+      <!-- Mini read/edit panel. Same side-panel geometry as the old
+           preview pane; now the MINI size of the unified read/edit mode.
+           Shows either face (read = prettified markdown, edit = plaintext
+           textarea) into #preview-body. No × close button — exit happens
+           via the topbar exit ribbon. The full-size button expands to the
+           full-frame read/edit view, preserving face + state. -->
       <div id="preview">
+        <!-- Expand button sits at the LEFT of the header: the top-right
+             corner underneath is reserved for the active-mode icon's exit
+             ribbon, which hangs from the topbar and would overlap (and
+             steal clicks from) anything placed there. -->
         <div class="preview-header">
-          <span class="title">preview</span>
-          <button class="close" onclick="closePreviewPane()">×</button>
+          <button type="button" class="mini-full-btn" id="mini-full-btn"
+            title="expand to full size" aria-label="expand to full size">
+            <img class="svg-icon" data-icon="mini2full" alt="full size" draggable="false">
+          </button>
+          <span class="title" id="preview-title">preview</span>
         </div>
         <div id="preview-body"></div>
       </div>
@@ -4988,6 +6090,12 @@
              format/edit-mode/highlight groups are arranged left /
              center / right. -->
         <div class="review-toolbar" id="review-toolbar">
+          <div class="rt-group rt-size">
+            <button type="button" id="review-mini-btn" class="rt-mini-btn"
+              title="shrink to mini panel" aria-label="shrink to mini panel">
+              <img class="svg-icon" data-icon="full2mini" alt="mini panel" draggable="false">
+            </button>
+          </div>
           <div class="rt-group rt-format" role="group" aria-label="format">
             <button type="button" data-fmt="bold" title="bold (wrap selection in **…**)"><b>B</b></button>
             <button type="button" data-fmt="italic" title="italic (wrap selection in *…*)"><i>I</i></button>
@@ -5066,6 +6174,10 @@
         <div class="edit-toolbar">
           <span class="title" id="edit-title"></span>
           <div class="edit-actions">
+            <button type="button" id="edit-mini-btn" class="rt-mini-btn"
+              title="shrink to mini panel" aria-label="shrink to mini panel">
+              <img class="svg-icon" data-icon="full2mini" alt="mini panel" draggable="false">
+            </button>
             <button type="button" id="edit-save-btn" class="primary">save</button>
             <button type="button" id="edit-revert-btn">revert</button>
           </div>
@@ -5103,6 +6215,43 @@
         <div class="girraph-body" id="girraph-body"></div>
       </div>
 
+      <!-- Merirmaid view mode (wave 2c): full-frame Mermaid-diagram
+           viewer/editor for .merirmaid files. Opened from a .merirmaid
+           row in the tree, or by click-link navigation from another
+           diagram. The body holds the rendered SVG (mermaid.min.js is
+           lazy-loaded on first open); the chat pill mirrors the live
+           conversation so structure edits happen via the agent without
+           leaving the diagram. -->
+      <div id="merirmaid-mode" aria-hidden="true">
+        <div class="merirmaid-toolbar">
+          <span>🧜</span>
+          <span class="mm-title" id="merirmaid-title"></span>
+          <span class="mm-badge" id="merirmaid-badge" hidden></span>
+          <nav class="mm-crumbs" id="mm-crumbs" aria-label="merirmaid navigation"></nav>
+          <button type="button" class="mm-act" id="mm-refresh" title="re-read the file (pick up agent edits)">↻</button>
+        </div>
+        <div class="merirmaid-body" id="merirmaid-body"></div>
+        <div class="review-chat" id="merirmaid-chat">
+          <div class="review-chat-head" onclick="toggleMerirmaidChat()">
+            <span>chat</span>
+            <span class="toggle" id="merirmaid-chat-toggle">▾</span>
+          </div>
+          <div class="review-chat-tail" id="merirmaid-chat-tail"></div>
+          <form class="review-chat-form" id="merirmaid-chat-form" onsubmit="event.preventDefault(); sendFromMerirmaidChat();">
+            <textarea id="merirmaid-chat-input" rows="2" placeholder="ask the agent to change this diagram…"></textarea>
+            <button type="submit">send</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- In-place merirmaid node-label editor (fixed-positioned; moved
+           over the clicked node at edit time). Lives outside
+           #merirmaid-mode so its fixed position isn't clipped. -->
+      <div id="mm-label-editor">
+        <input type="text" id="mm-label-input" spellcheck="false" autocomplete="off" aria-label="node label">
+        <span class="mm-count" id="mm-label-count"></span>
+      </div>
+
       <!-- Wikisink view mode: browser-style offline Wikipedia reader.
            Reads straight out of the ZIM archive (with overlay/preserved
            precedence) via /api/wiki/*; internal links stay in-app via
@@ -5116,22 +6265,45 @@
             <input id="wiki-search" placeholder="search wikipedia…" autocomplete="off" spellcheck="false">
             <div id="wiki-suggest" hidden></div>
           </div>
-          <button type="button" id="wiki-random" title="random article">🎲</button>
+          <button type="button" id="wiki-random" class="wt-icon" title="random article"
+            aria-label="random article"><img class="svg-icon" data-icon="d6" alt="random" draggable="false"></button>
           <span class="wiki-title-span" id="wiki-article-title"></span>
           <span class="wiki-source-badge" id="wiki-source-badge" hidden></span>
           <span class="spacer"></span>
-          <button type="button" id="wiki-comment-here"
-            title="add a comment anchored to the paragraph nearest the middle of the view">💬</button>
-          <button type="button" id="wiki-save-project"
-            title="save this article to the project's wiki/ folder (full fidelity — opens back in this reader)">📥</button>
-          <button type="button" id="wiki-save-infoworld"
-            title="save this article to ~/enough/infoworld/wiki (shared across all projects)">🌐</button>
+          <button type="button" id="wiki-comment-here" class="wt-icon"
+            title="add a comment anchored to the paragraph nearest the middle of the view"
+            aria-label="comment here"><img class="svg-icon" data-icon="comment" alt="comment" draggable="false"></button>
+          <!-- Save flyout: one button, two free-floating overlay choices. -->
+          <div class="wiki-save-wrap" id="wiki-save-wrap">
+            <button type="button" id="wiki-save-btn" class="wt-icon"
+              title="save this article — choose project or infoworld"
+              aria-label="save article"><img class="svg-icon" data-icon="savewiki" alt="save" draggable="false"></button>
+            <div id="wiki-save-flyout" class="save-flyout" hidden role="menu">
+              <button type="button" class="save-choice" id="wiki-save-project" role="menuitem"
+                title="save this article to the project's wiki/ folder (full fidelity — opens back in this reader)">
+                <img class="svg-icon" data-icon="savewiki-project" alt="" draggable="false">
+                <span>to project</span>
+              </button>
+              <button type="button" class="save-choice" id="wiki-save-infoworld" role="menuitem"
+                title="save this article to ~/enough/infoworld/wiki (shared across all projects)">
+                <img class="svg-icon" data-icon="savewiki-cacheawl" alt="" draggable="false">
+                <span>to infoworld</span>
+              </button>
+            </div>
+          </div>
+          <button type="button" id="wiki-cachebox-update" class="wt-icon" hidden
+            title="update this saved article by running a wikisink refresh"
+            aria-label="update saved article"><img class="svg-icon" data-icon="cachebox-update" alt="update" draggable="false"></button>
           <button type="button" id="wiki-override" hidden
             title="deletion override — keep this article's local copy forever and stop updating it">🛡</button>
-          <button type="button" id="wiki-comments-toggle"
-            title="show/hide the comments panel">🗨</button>
-          <button type="button" id="wiki-settings"
-            title="wikisink settings — archive info, updates, storage">⚙</button>
+          <button type="button" id="wiki-settings" class="wt-icon"
+            title="wikisink settings — archive info, updates, storage"
+            aria-label="wikisink settings"><img class="svg-icon" data-icon="wikisink-settings" alt="settings" draggable="false"></button>
+          <!-- Comments panel toggle: bare two-state, far-right, mirrors the
+               projectnav treatment (on = panel visible, with dark-theme glow). -->
+          <button type="button" id="wiki-comments-toggle" class="bare-toggle"
+            title="show/hide the comments panel" aria-label="toggle comments panel"><img class="svg-icon"
+              data-icon="commentsright-off" alt="comments" draggable="false"></button>
         </div>
         <div class="wiki-body" id="wiki-body" data-path=""></div>
         <div id="wiki-comments-panel" hidden>
@@ -5144,9 +6316,9 @@
           <div id="wiki-comments-list"></div>
         </div>
         <div id="wiki-sel-popup" role="dialog" aria-hidden="true">
-          <button type="button" id="wsp-comment">💬 comment</button>
+          <button type="button" id="wsp-comment"><img class="svg-icon inline" data-icon="comment" alt="" draggable="false"> comment</button>
           <button type="button" id="wsp-ask">🤖 ask agent</button>
-          <button type="button" id="wsp-save">📥 save article</button>
+          <button type="button" id="wsp-save"><img class="svg-icon inline" data-icon="savewiki-project" alt="" draggable="false"> save article</button>
         </div>
         <div class="review-chat" id="wiki-chat">
           <div class="review-chat-head" onclick="toggleWikiChat()">
@@ -5163,6 +6335,83 @@
             <textarea id="wiki-chat-input" rows="2" placeholder="ask the agent about this article…"></textarea>
             <button type="submit">send</button>
           </form>
+        </div>
+      </div>
+
+      <!-- Cacheawl view mode (wave 2d): full-frame two-pane file manager
+           for the global cachebox store (~/enough/cacheawl/). TOP third =
+           the project pane (project file tree as an icon grid); BOTTOM two
+           thirds = the cacheawl pane (cacheboxes and their contents). Each
+           pane drills with its own breadcrumb. Single click selects; double
+           click opens/descends; shift click pops a context menu; drag-drop
+           between panes/folders = copy (shift-drop = move) via
+           /api/cacheawl/transfer. The ingest bar composes a vetting request
+           into the MAIN chat; the chat pill mirrors the live conversation. -->
+      <div id="cacheawl-mode" aria-hidden="true">
+        <div class="ca-pane ca-project" id="ca-project-pane">
+          <div class="ca-pane-head">
+            <img class="svg-icon" data-icon="folder-project" alt="" draggable="false">
+            <span class="ca-pane-title" id="ca-project-name">project</span>
+            <nav class="ca-crumbs" id="ca-project-crumbs" aria-label="project navigation"></nav>
+          </div>
+          <div class="ca-grid" id="ca-project-grid" data-pane="project"></div>
+        </div>
+        <div class="ca-pane ca-store" id="ca-store-pane">
+          <div class="ca-pane-head">
+            <img class="svg-icon" data-icon="cacheawl" alt="" draggable="false">
+            <span class="ca-pane-title">cacheawl</span>
+            <nav class="ca-crumbs" id="ca-store-crumbs" aria-label="cacheawl navigation"></nav>
+          </div>
+          <div class="ca-grid" id="ca-store-grid" data-pane="cachebox"></div>
+          <form class="ca-ingest" id="ca-ingest-form"
+                onsubmit="event.preventDefault(); submitCacheawlIngest();">
+            <select id="ca-ingest-type" title="ingest source type"
+                    onchange="caIngestTypeChanged()">
+              <option value="path">path:</option>
+              <option value="url">url:</option>
+              <option value="wikisink">wikisink:</option>
+            </select>
+            <input type="text" id="ca-ingest-value" autocomplete="off" spellcheck="false"
+                   placeholder="source to ingest (folder path, url, or article title)…">
+            <select id="ca-ingest-depth" title="crawl/copy depth">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+            <label class="ca-all" id="ca-ingest-all-label" title="unlimited subdirectory depth (path/url only)">
+              <input type="checkbox" id="ca-ingest-all"> all
+            </label>
+            <button type="submit" class="ca-ingest-go">ingest</button>
+          </form>
+        </div>
+        <div class="review-chat collapsed" id="cacheawl-chat">
+          <div class="review-chat-head" onclick="toggleCacheawlChat()">
+            <span>chat</span>
+            <span class="toggle" id="cacheawl-chat-toggle">▴</span>
+          </div>
+          <div class="review-chat-tail" id="cacheawl-chat-tail"></div>
+          <form class="review-chat-form" id="cacheawl-chat-form"
+                onsubmit="event.preventDefault(); sendFromCacheawlChat();">
+            <textarea id="cacheawl-chat-input" rows="2" placeholder="message the agent about the cachebox store…"></textarea>
+            <button type="submit">send</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Cacheawl per-item / background context menu (shift-click). -->
+      <div id="ca-context-menu" class="hidden" role="menu" aria-hidden="true"></div>
+
+      <!-- Cacheawl name prompt (new folder / new cachebox). -->
+      <div id="ca-prompt" role="dialog" aria-hidden="true">
+        <div class="ca-prompt-card">
+          <div class="ca-prompt-title" id="ca-prompt-title">new</div>
+          <div class="ca-prompt-sub" id="ca-prompt-sub"></div>
+          <input type="text" id="ca-prompt-input" autocomplete="off" spellcheck="false">
+          <div class="ca-prompt-err" id="ca-prompt-err"></div>
+          <div class="ca-prompt-actions">
+            <button type="button" onclick="closeCaPrompt()">cancel</button>
+            <button type="button" class="primary" id="ca-prompt-ok" onclick="submitCaPrompt()">create</button>
+          </div>
         </div>
       </div>
 
@@ -5604,6 +6853,29 @@
     </div>
   </div>
 
+  <!-- Reusable confirm overlay. Populated + shown by confirmOverlay();
+       ribbon-check confirms, ribbon-redx cancels, ribbon-alert marks the
+       warning. Later waves reuse this component. -->
+  <div id="confirm-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="confirm-card">
+      <div class="confirm-title" id="confirm-title"></div>
+      <div class="confirm-message">
+        <img class="svg-icon" data-icon="ribbon-alert" alt="warning" draggable="false">
+        <span id="confirm-message-text"></span>
+      </div>
+      <div class="confirm-actions">
+        <button type="button" class="confirm-ribbon" id="confirm-ok">
+          <img class="svg-icon" data-icon="ribbon-check" alt="" draggable="false">
+          <span id="confirm-ok-label">confirm</span>
+        </button>
+        <button type="button" class="confirm-ribbon" id="confirm-cancel">
+          <img class="svg-icon" data-icon="ribbon-redx" alt="" draggable="false">
+          <span id="confirm-cancel-label">cancel</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ---------- Help affordance: hover-to-reveal [?], click for full panel ----------
     // 1s hover before [?] appears, stays for 5s after the cursor leaves the row
@@ -5613,7 +6885,7 @@
       'wikisink': {
         name: 'wikisink',
         path: '~/enough/wikisink/',
-        what: 'your local, offline copy of (a slice of) english wikipedia — a single Kiwix ZIM archive read in place, never extracted, so the file manager only ever shows articles you explicitly save. the 🚰 button opens a browser-style reader with full-text search, cross-links, a random-article die, an agent chat pill, comments, and two save buttons (📥 project <code>wiki/</code>, 🌐 <code>infoworld/wiki/</code>). the agent can search and read the whole archive via its wiki tools.',
+        what: 'your local, offline copy of (a slice of) english wikipedia — a single Kiwix ZIM archive read in place, never extracted, so the file manager only ever shows articles you explicitly save. the 🚰 button opens a browser-style reader with full-text search, cross-links, a random-article die, an agent chat pill, comments, and a single <strong>save button</strong> whose flyout offers two destinations (this project\'s <code>wiki/</code>, or the global <code>~/enough/cacheawl/wiki/</code> cachebox shared across projects). the agent can search and read the whole archive via its wiki tools.',
         how: 'first click of 🚰 runs the setup wizard: pick a size (top-1M-articles no-images ≈ 16 GB is the default; full english ≈ 49 GB; smaller options too), pick a storage folder (external drives work), confirm, and let the resumable download run — pause, quit, resume anytime. you can keep <em>several installs</em> in different places (say, the full archive on an external drive plus a small one on the internal disk) and switch between them in the ⚙ installs list; if a drive is detached, its install just shows as unreachable until the drive returns. once installed, ask the agent to run a <strong>wikisink</strong> to refresh your saved/commented ("watched") articles from live wikipedia and get a report: watched-article changes, edit spikes, pageview movers &amp; losers, and suspicious deletions. the 🛡 button on any article is the <em>deletion override</em>: keep your local copy forever, excluded from updates. ⚙ opens the installs manager, including base-archive replacement when a newer snapshot ships.',
         ideas: [
           'save the articles a project leans on into its <code>wiki/</code> folder — full-fidelity copies that open back in the reader, each with a CC BY-SA attribution manifest built in.',
@@ -5624,8 +6896,8 @@
       'project-wiki': {
         name: 'wiki/',
         path: 'wiki/',
-        what: 'wikipedia articles saved into this project from the wikisink browser (📥). each save is a folder: <code>article.html</code> (the article exactly as the archive had it — click it to read in the wikisink viewer, full fidelity, infoboxes and all) plus <code>_manifest.md</code> (source URL, CC BY-SA license, retrieval date, origin).',
-        how: 'created automatically on your first project-level save — no setup. wikisink update runs treat everything here as <em>watched</em>: refreshed from live wikipedia and reported on. re-saving an article overwrites the folder with the freshest copy; to remove one, hover its folder in the tree a moment and click the 🗑 that appears. saved copies aren\'t meant to be hand-edited — they\'d drift out of sync with the archive. (🌐 saves to the global <code>infoworld/wiki/</code> instead, shared across all projects.)',
+        what: 'wikipedia articles saved into this project from the wikisink browser (the save button → "this project"). each save is a folder: <code>article.html</code> (the article exactly as the archive had it — click it to read in the wikisink viewer, full fidelity, infoboxes and all) plus <code>_manifest.md</code> (source URL, CC BY-SA license, retrieval date, origin).',
+        how: 'created automatically on your first project-level save — no setup. wikisink update runs treat everything here as <em>watched</em>: refreshed from live wikipedia and reported on. re-saving an article overwrites the folder with the freshest copy; to remove one, hover its folder in the tree a moment and click the 🗑 that appears. saved copies aren\'t meant to be hand-edited — they\'d drift out of sync with the archive. (the save button\'s other choice saves to the global <code>~/enough/cacheawl/wiki/</code> cachebox instead, shared across all projects.)',
         ideas: [
           'saved articles open in the reader even when the archive\'s drive is detached — they\'re your offline-offline copies.',
           'the agent reads articles through its wiki tools (clean text extraction), so it can ground itself on saved and archived articles alike.',
@@ -5670,7 +6942,7 @@
         what: 'per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. active skills add vocabulary, recipes, or behaviors the agent will reach for during conversation.',
         how: 'click ● / ○ to toggle a skill on or off for this project. you can add project-level skills to <code>rness/skills/</code> — skill statuses are saved per project. to install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). edit a global skill at the source and the change propagates everywhere it\'s symlinked.',
         ideas: [
-          'five default skills are included:<ul><li><em>analyzer</em> which can summarize or proofread any text as well as help you make decisions about anything</li><ul><li><em>ibis-girraphiti</em> to develop editable issue-based information system (IBIS) problem graphs for your wickedest problems, in .girraph format</li><li><em>memoir-dialectic</em> which can help you structure your memoirs</li><li><em>skill-scanner</em> to scan downloaded 3P skills for security risks and describe what they can help you with</li><li><em>translator</em> (paired with the <em>translation</em> paradigm) for universal text translation</li></ul>',
+          'five default skills are included:<ul><li><em>analyzer</em> which can summarize or proofread any text as well as help you make decisions about anything</li><ul><li><em>girraph-merirmaid</em> to develop editable issue-based information system (IBIS) problem graphs for your wickedest problems in .girraph format, and Mermaid diagrams of any structure or process in .merirmaid format</li><li><em>memoir-dialectic</em> which can help you structure your memoirs</li><li><em>skill-scanner</em> to scan downloaded 3P skills for security risks and describe what they can help you with</li><li><em>translator</em> (paired with the <em>translation</em> paradigm) for universal text translation</li></ul>',
           'build global or project-local skills to capture your house style or domain conventions.',
           'turn everything off for "pure conversation" — sometimes the model has more breathing room for emergent epiphanies with no scaffolding.',
         ],
@@ -5764,14 +7036,46 @@
         ],
       },
       'infoworld': {
-        name: 'infoworld/',
-        path: 'infoworld/ → ~/enough/infoworld/',
-        what: 'a grounded-knowledge store shared across every enough project on this machine. symlinked into each project so the agent has a common factual substrate. three subdirectories: <code>wiki/</code> (Wikipedia dumps or your own wiki content), <code>personal/</code> (your reference material), <code>public/</code> (shareable content, though don\'t worry, nobody can see these files unless you share them somewhere :).',
-        how: 'add files to <code>~/enough/infoworld/</code> via your system\'s file manager — drop markdown, txt, or extracted Wikipedia text into the appropriate subfolder. or, add ~/enough/infoworld/* to the write allowlist in policies/ and tell the agent to put files in one of the subfolders. the agent sees these files before answering from its internal data. you can review or edit files from infoworld inside enough just like files in your project directory, but remember that the files in infoworld are global, so any edits you make will persist across projects.',
+        name: 'cacheawl',
+        path: '~/enough/cacheawl/',
+        what: 'the machine-global file store, shared across every enough project. (this replaces the old <code>infoworld/</code> library — on your first launch of this version, your <code>personal/</code>, <code>public/</code>, and <code>wiki/</code> folders were moved here, each becoming a cachebox.) a <em>cachebox</em> is a top-level folder in the store: either plain text you want to keep forever, or a "cached replica" ingested from a local path, a website, or a set of wikipedia articles. the store is hidden from every project\'s file tree and managed through cacheawl mode + the agent\'s cachebox tools.',
+        how: 'open cacheawl mode (the topbar cacheawl button) for a two-pane view: your project on one side, the cacheboxes on the other. drag a file across to copy it, shift-drag to move; the ingest bar composes a request to the agent to pull in a path/site/wiki topic. or just ask the agent — it can list, create, and ingest into cacheboxes (gated by the "cacheawl tools" broker toggle). each box carries an auto-generated <code>_cachebox.merirmaid</code> diagram of its contents (read-only — it regenerates from the files) and hidden metadata; you never edit those directly.',
         ideas: [
-          'stash meeting notes in <code>personal/</code> to make them queryable from any project.',
-          'download a topic-specific Wikipedia dump (history, pharmacology, music theory) for a research project.',
-          'store finished documents in public/ to make it easier to remember to post them somewhere on the internet.',
+          'ingest a documentation site to a shallow depth so the agent can ground on it fully offline.',
+          'keep a <code>personal</code> cachebox of reference material queryable from any project.',
+          'save wikipedia articles you rely on to the global <code>wiki</code> cachebox — shared everywhere, not tied to one project.',
+        ],
+      },
+      'mode-system': {
+        name: 'read / edit mode',
+        path: 'the file viewer',
+        what: 'clicking a file opens it in one unified <strong>read/edit mode</strong> with two faces — a read face (eye) and an edit face (pencil). it lives either as a mini side panel next to the chat or expanded to a full frame; use the mini↔full toggle to switch. edits are dirty-guarded, so you won\'t lose unsaved changes by navigating away by accident.',
+        how: 'single-click a file in the tree to open it in the mini panel; expand it to a full frame when you want room. the active mode always shows its icon top-right; click that icon to flip between the read (eye) and edit (pencil) faces, and click the little ribbon hanging off its corner (the red x) to exit the mode entirely. the same top-right icon + exit-ribbon pattern is shared by every full-frame mode (wikisink, girraph, merirmaid, cacheawl).',
+        ideas: [
+          'keep a file open in the mini panel while you chat — reference and conversation side by side.',
+          'go full-frame for long documents or when editing, back to mini when you just need a peek.',
+        ],
+      },
+      'merirmaid': {
+        name: 'merirmaid',
+        path: '*.merirmaid',
+        what: 'enough\'s flavor of a <a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid</a> diagram: plain-text diagram source with a small header, rendered live to a picture in the browser (flowcharts, sequence diagrams, state machines, ER diagrams — anything Mermaid supports). two kinds: a <em>wip</em> diagram you can tweak, and a <em>mirror</em> that reflects some structure (like a cachebox\'s contents) and is read-only.',
+        how: 'ask the agent to draw or revise a diagram — it writes the <code>.merirmaid</code> source; opening the file renders it. in a wip diagram you can click a node\'s text to edit the label in place (with a live character count); structural changes go through the agent via the chat pill. nodes can link to other diagrams or docs — click them to follow, with breadcrumbs to step back. a bad diagram shows the error plus the raw source, never a blank pane. mirror diagrams show a "mirror" badge instead of edit handles.',
+        ideas: [
+          'have the agent diagram a process or architecture you\'re reasoning about, then refine it in conversation.',
+          'link a set of diagrams together with clickable nodes to build a navigable map.',
+          'pair it with girraphs: a girraph for the argument, a merirmaid for the flow.',
+        ],
+      },
+      'cacheawl': {
+        name: 'cacheawl',
+        path: '~/enough/cacheawl/',
+        what: 'the machine-global store of <em>cacheboxes</em> — top-level folders holding text you want to keep forever, or cached replicas ingested from a local path, a website, or wikipedia articles. shared across every project and hidden from project file trees. this is where the old <code>infoworld</code> library now lives.',
+        how: 'open cacheawl mode from the topbar for the two-pane view (project ↔ cacheboxes): drag to copy a file between them, shift-drag to move, and use the ingest bar to ask the agent to pull a source into a box. or talk to the agent directly — it can list, create, and ingest into boxes when the "cacheawl tools" broker toggle is on (url ingests also respect your fetch_url toggles). every box shows an auto-generated diagram of its contents (<code>_cachebox.merirmaid</code>, read-only) and keeps hidden metadata you don\'t touch.',
+        ideas: [
+          'ingest a docs site or a folder of notes so the agent can work from it offline.',
+          'move a finished artifact into a cachebox to keep it out of the working project but still reachable everywhere.',
+          'double-click a box\'s diagram to see its shape at a glance in the merirmaid viewer.',
         ],
       },
     };
@@ -5794,8 +7098,9 @@
       const v = document.getElementById('help-viewer');
       v.classList.add('open');
       v.setAttribute('aria-hidden', 'false');
-      // Mutually exclusive with the file preview pane.
-      document.getElementById('preview').classList.remove('open');
+      // Mutually exclusive with the mini read/edit panel.
+      if (typeof RE_SIZE !== 'undefined' && RE_SIZE === 'mini') closeReadEdit();
+      else document.getElementById('preview').classList.remove('open');
     }
 
     function closeHelp() {
@@ -6058,9 +7363,15 @@
       }
     }, true);  // capture phase — run before htmx's submit handler
 
-    // Sidebar toggle.
+    // Sidebar toggle — bare two-state icon: projectnav-on when the sidebar
+    // is visible, projectnav-off when hidden. The .on class drives the CSS
+    // glow. Icon + state swap together on every click.
     document.getElementById('toggle-sidebar').addEventListener('click', () => {
-      document.getElementById('layout').classList.toggle('sidebar-collapsed');
+      const collapsed = document.getElementById('layout')
+        .classList.toggle('sidebar-collapsed');
+      const btn = document.getElementById('toggle-sidebar');
+      btn.classList.toggle('on', !collapsed);
+      setIcon(btn.querySelector('.svg-icon'), collapsed ? 'projectnav-off' : 'projectnav-on');
     });
 
     // ---------- UI preferences (theme / font / zoom) ----------
@@ -6077,7 +7388,214 @@
       }
     }
 
+    // ---------- Icon variants (dark/light SVG line-art swap) ----------
+    //
+    // Custom SVG icons ship in two variants under /static/icons/build/:
+    // "<name>.svg" (black line-work, for light themes) and "<name>-dark.svg"
+    // (white line-work, for dark themes). The active variant is resolved
+    // from the theme's `icons` key ("dark" | "light"); user themes that
+    // predate the key fall back to a luminance heuristic on their `bg`.
+    //
+    // ONE mechanism, used everywhere: any <img class="svg-icon" data-icon="…">
+    // gets its src set by iconSrc(). setIcon(el, name) swaps the two-state
+    // toggle icons; refreshThemeIcons() re-derives every icon's variant on a
+    // live theme change (no reload). Later waves: reuse setIcon/iconSrc.
+    let ICON_VARIANT = 'dark';
+
+    function iconSrc(name) {
+      const suffix = ICON_VARIANT === 'dark' ? '-dark' : '';
+      return '/static/icons/build/' + name + suffix + '.svg';
+    }
+    function setIcon(el, name) {
+      if (!el) return;
+      el.dataset.icon = name;
+      el.src = iconSrc(name);
+    }
+    function refreshThemeIcons() {
+      document.querySelectorAll('img.svg-icon[data-icon]').forEach((el) => {
+        el.src = iconSrc(el.dataset.icon);
+      });
+    }
+    // Relative luminance of a #rrggbb color (0..1). < 0.5 → dark theme.
+    function _hexLuminance(hex) {
+      const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(String(hex || '').trim());
+      if (!m) return 0;  // treat unparseable as dark (safest for our default)
+      const [r, g, b] = [1, 2, 3].map((i) => {
+        const c = parseInt(m[i], 16) / 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    }
+    function resolveIconVariant(theme) {
+      const key = theme && theme.icons;
+      if (key === 'dark' || key === 'light') return key;
+      // User-customized theme lacking the key: derive from bg luminance.
+      const bg = theme && theme.colors && theme.colors.bg;
+      return _hexLuminance(bg) < 0.5 ? 'dark' : 'light';
+    }
+
+    // ---------- Reusable confirm overlay ----------
+    // confirmOverlay({title, message, confirmLabel, cancelLabel}) → Promise<bool>.
+    // Ribbon-check confirms, ribbon-redx cancels; esc / outside-click → false.
+    // A small self-contained component so later waves can reuse it.
+    let _confirmResolve = null;
+    function confirmOverlay(opts = {}) {
+      document.getElementById('confirm-title').textContent = opts.title || 'Are you sure?';
+      document.getElementById('confirm-message-text').textContent = opts.message || '';
+      document.getElementById('confirm-ok-label').textContent = opts.confirmLabel || 'confirm';
+      document.getElementById('confirm-cancel-label').textContent = opts.cancelLabel || 'cancel';
+      document.getElementById('confirm-overlay').hidden = false;
+      return new Promise((resolve) => { _confirmResolve = resolve; });
+    }
+    function _closeConfirm(result) {
+      const el = document.getElementById('confirm-overlay');
+      if (el.hidden) return;
+      el.hidden = true;
+      const r = _confirmResolve; _confirmResolve = null;
+      if (r) r(result);
+    }
+    document.getElementById('confirm-ok').addEventListener('click', () => _closeConfirm(true));
+    document.getElementById('confirm-cancel').addEventListener('click', () => _closeConfirm(false));
+    document.getElementById('confirm-overlay').addEventListener('click', (e) => {
+      if (e.target.id === 'confirm-overlay') _closeConfirm(false);
+    });
+    // Capture phase + stopPropagation so our esc wins over the wiki/modal
+    // esc handlers while the overlay is open.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !document.getElementById('confirm-overlay').hidden) {
+        e.stopPropagation();
+        _closeConfirm(false);
+      }
+    }, true);
+    window.confirmOverlay = confirmOverlay;
+
+    // ================================================================
+    // Active-mode registry (topbar top-right)
+    // ================================================================
+    //
+    // Exactly one "mode" is active at a time (or none, on the home/chat
+    // view). setActiveMode paints the mode's icon in the reserved
+    // top-right area with a ribbon-redx "hanging off" its bottom edge.
+    // The ribbon exits the mode; the icon runs the mode's onIconClick.
+    //
+    // REGISTRATION CONTRACT — later waves (merirmaid, cacheawl) register
+    // their modes through this exact interface:
+    //
+    //   setActiveMode(name, {
+    //     icon:        <string>   required. svg icon basename shown in the
+    //                             topbar (resolved via iconSrc / theme).
+    //     onExit:      <function> required. Fully leaves the mode. Called
+    //                             by the ribbon, by esc, and by any legacy
+    //                             in-mode exit button you keep wired.
+    //     onIconClick: <function|null> optional. Runs when the mode ICON
+    //                             is clicked/activated. read/edit uses it
+    //                             to toggle face. null/omitted → the icon
+    //                             is inert (cursor:default, no handler).
+    //     hoverIcon:   <string|null> optional. Icon basename shown while
+    //                             the mode icon is hovered/focused (read/
+    //                             edit swaps to readedit-switch). null → no
+    //                             swap. Only meaningful with onIconClick.
+    //     iconTitle:   <string>   optional. title + aria-label for the icon.
+    //     exitTitle:   <string>   optional. title + aria-label for the
+    //                             ribbon (defaults to "exit <name>").
+    //   })
+    //
+    // clearActiveMode() returns to the home view (idempotent). Reading the
+    // live registration: ACTIVE_MODE (object) or null.
+    let ACTIVE_MODE = null;
+
+    function setActiveMode(name, opts = {}) {
+      ACTIVE_MODE = Object.assign({ name }, opts);
+      const wrap = document.getElementById('active-mode');
+      const iconBtn = document.getElementById('active-mode-icon');
+      const iconImg = document.getElementById('active-mode-img');
+      const ribbon = document.getElementById('active-mode-ribbon');
+      setIcon(iconImg, opts.icon);
+      iconBtn.title = opts.iconTitle || name;
+      iconBtn.setAttribute('aria-label', opts.iconTitle || name);
+      iconBtn.classList.toggle('interactive', !!opts.onIconClick);
+      // Non-interactive icons shouldn't grab keyboard focus.
+      if (opts.onIconClick) iconBtn.removeAttribute('tabindex');
+      else iconBtn.setAttribute('tabindex', '-1');
+      const exitLabel = opts.exitTitle || ('exit ' + name);
+      ribbon.title = exitLabel;
+      ribbon.setAttribute('aria-label', exitLabel);
+      wrap.hidden = false;
+    }
+    window.setActiveMode = setActiveMode;
+
+    // Update just the icon (and its title) for the current mode without
+    // re-registering — used by read/edit when the face toggles.
+    function updateActiveModeIcon(icon, iconTitle) {
+      if (!ACTIVE_MODE) return;
+      ACTIVE_MODE.icon = icon;
+      if (iconTitle !== undefined) ACTIVE_MODE.iconTitle = iconTitle;
+      const iconBtn = document.getElementById('active-mode-icon');
+      setIcon(document.getElementById('active-mode-img'), icon);
+      if (iconTitle !== undefined) {
+        iconBtn.title = iconTitle;
+        iconBtn.setAttribute('aria-label', iconTitle);
+      }
+    }
+
+    function clearActiveMode() {
+      ACTIVE_MODE = null;
+      document.getElementById('active-mode').hidden = true;
+    }
+    window.clearActiveMode = clearActiveMode;
+
+    (function wireActiveModeControls() {
+      const iconBtn = document.getElementById('active-mode-icon');
+      const iconImg = document.getElementById('active-mode-img');
+      const ribbon = document.getElementById('active-mode-ribbon');
+      iconBtn.addEventListener('click', () => {
+        if (ACTIVE_MODE && ACTIVE_MODE.onIconClick) ACTIVE_MODE.onIconClick();
+      });
+      // Hover/focus swap to the mode's hoverIcon (keyboard-reachable via
+      // focus, since the icon is a real <button>).
+      const enter = () => {
+        if (ACTIVE_MODE && ACTIVE_MODE.hoverIcon) setIcon(iconImg, ACTIVE_MODE.hoverIcon);
+      };
+      const leave = () => {
+        if (ACTIVE_MODE && ACTIVE_MODE.icon) setIcon(iconImg, ACTIVE_MODE.icon);
+      };
+      iconBtn.addEventListener('mouseenter', enter);
+      iconBtn.addEventListener('mouseleave', leave);
+      iconBtn.addEventListener('focus', enter);
+      iconBtn.addEventListener('blur', leave);
+      ribbon.addEventListener('click', () => {
+        if (ACTIVE_MODE && ACTIVE_MODE.onExit) ACTIVE_MODE.onExit();
+      });
+    })();
+
+    // Unified esc → exit the active mode. Guarded so it doesn't fire
+    // while the confirmOverlay is open (that overlay stops esc in a
+    // capture-phase listener) or while a chat composer / search field /
+    // modal input / girraph inline-edit field is focused. The full/mini
+    // editor textareas are NOT guarded — esc exits from them (via the
+    // mode's onExit, which runs its own unsaved-edits confirm).
+    function _escComposerFocused() {
+      const el = document.activeElement;
+      if (!el) return false;
+      const composers = ['message', 'review-chat-input', 'edit-chat-input',
+        'wiki-chat-input', 'wiki-search', 'merirmaid-chat-input', 'mm-label-input',
+        'cacheawl-chat-input', 'ca-ingest-value', 'ca-prompt-input'];
+      if (composers.includes(el.id)) return true;
+      if (el.closest && el.closest('.modal-panel')) return true;
+      if (el.closest && el.closest('#girraph-body')
+        && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) return true;
+      return false;
+    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      if (!ACTIVE_MODE || !ACTIVE_MODE.onExit) return;
+      if (_escComposerFocused()) return;
+      e.preventDefault();
+      ACTIVE_MODE.onExit();
+    });
+
     function applyUIConfig() {
+      if (!UI_CONFIG) return;
       if (!UI_CONFIG) return;
       const cur = UI_CONFIG.current || {};
       const theme = (UI_CONFIG.themes || {})[cur.theme] || (UI_CONFIG.themes || {})['enough-default'];
@@ -6086,16 +7604,33 @@
         for (const [k, v] of Object.entries(theme.colors)) {
           document.documentElement.style.setProperty('--' + k, v);
         }
+        // Old user configs predate --btn-bg: clear any inline value left by a
+        // previously-applied theme so the CSS var(--btn-bg, var(--bg-raise))
+        // fallback engages instead of leaking the last theme's chip color.
+        if (!('btn-bg' in theme.colors)) {
+          document.documentElement.style.removeProperty('--btn-bg');
+        }
       }
       if (font && font.stack) {
         // --font-mono holds "the active font stack," regardless of actual family.
         document.documentElement.style.setProperty('--font-mono', font.stack);
       }
+      // Resolve + apply the icon variant live (drives CSS glow states via the
+      // data-icons attribute, and re-points every <img.svg-icon> src).
+      ICON_VARIANT = resolveIconVariant(theme);
+      document.documentElement.setAttribute('data-icons', ICON_VARIANT);
+      refreshThemeIcons();
       // If review mode is currently open, re-derive the max-contrast
       // overrides from the new theme. (Function may be undefined during
       // initial bootstrap before review-mode JS has been parsed; guard.)
       if (typeof applyReviewContrast === 'function') {
         applyReviewContrast();
+      }
+      // If merirmaid mode is open, re-render its diagram so the mermaid
+      // theme tracks the new app theme. (Guarded; may be undefined during
+      // initial bootstrap before merirmaid JS is parsed.)
+      if (typeof mmOnThemeChange === 'function') {
+        mmOnThemeChange();
       }
     }
 
@@ -6181,11 +7716,9 @@
       if (!r.ok) { alert('could not locate broker journal'); return; }
       const { path } = await r.json();
       closeBrokerModal();
-      // Open the journal in the file preview pane via the same flow
-      // that file-tree clicks use.
-      htmx.ajax('GET', '/api/file?path=' + encodeURIComponent(path),
-        { target: '#preview-body', swap: 'innerHTML' });
-      document.getElementById('preview').classList.add('open');
+      // Open the journal in the read/edit mini panel (read face), same
+      // as a file-tree click.
+      openReadEdit(path, { size: 'mini', face: 'read' });
     }
     window.openBrokerJournal = openBrokerJournal;
 
@@ -7036,7 +8569,7 @@
       mic.processor.connect(mic.ctx.destination);
       mic.recording = true;
       micBtn.classList.add('recording');
-      micBtn.querySelector('.mic-icon').textContent = '●';
+      // Icon stays put; the .recording pulse glow is the active affordance.
       micBtn.title = 'click to stop + transcribe';
     }
 
@@ -7048,7 +8581,6 @@
 
       micBtn.classList.remove('recording');
       micBtn.classList.add('transcribing');
-      micBtn.querySelector('.mic-icon').textContent = '…';
 
       // Concatenate all sample chunks.
       let total = 0;
@@ -7100,7 +8632,6 @@
       } finally {
         mic.chunks = [];
         micBtn.classList.remove('transcribing');
-        micBtn.querySelector('.mic-icon').textContent = '🎤';
         micBtn.title = 'voice input (local whisper.cpp)';
         textarea.focus();
       }
@@ -7193,6 +8724,31 @@
       setTreeState(state);
     });
 
+    // Intercept file-row clicks (capture phase, so we win over htmx's
+    // delegated handler and the server-rendered inline onclick that
+    // used to open the plain preview pane). Clicking a file now opens
+    // the unified read/edit MINI panel in READ face. A .girraph file
+    // opens the girraph panel directly (it has no read/edit face);
+    // saved-article anchors carry no hx-get so they fall through to
+    // their own openSavedWikiArticle handler.
+    document.getElementById('tree').addEventListener('click', (e) => {
+      const a = e.target.closest('.file-row a[hx-get]');
+      if (!a) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const li = a.closest('li.file');
+      const path = li ? li.dataset.path : null;
+      if (!path) return;
+      closeHelp();
+      if (path.toLowerCase().endsWith('.girraph')) {
+        enterGirraphMode(path);
+      } else if (path.toLowerCase().endsWith('.merirmaid')) {
+        enterMerirmaidMode(path);
+      } else {
+        openReadEdit(path, { size: 'mini', face: 'read' });
+      }
+    }, true);  // capture — pre-empt htmx + the inline onclick
+
     // Streaming over SSE.
     function autoscroll() {
       conversation.scrollTop = conversation.scrollHeight;
@@ -7208,6 +8764,12 @@
       }
       if (typeof refreshWikiChatTail === 'function') {
         refreshWikiChatTail();
+      }
+      if (typeof refreshMerirmaidChatTail === 'function') {
+        refreshMerirmaidChatTail();
+      }
+      if (typeof refreshCacheawlChatTail === 'function') {
+        refreshCacheawlChatTail();
       }
     }
 
@@ -7254,16 +8816,17 @@
       if (status === 'ok' && (name === 'write_file' || name === 'shell')) {
         // File tree: refetch (don't wait for the next poll tick).
         htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
-        // Preview pane: if it's showing the file we just wrote, refresh it.
+        // Mini READ panel: if it's showing the file the agent just
+        // wrote, re-render it from disk so the user sees the update.
+        // (The full read face gets the save/undo bar instead, below.)
         if (name === 'write_file') {
-          const preview = document.getElementById('preview');
-          if (preview.classList.contains('open')) {
-            const pathEl = document.getElementById('preview-body').querySelector('.file-path');
-            if (pathEl && pathEl.textContent.trim() === key) {
-              htmx.ajax('GET', '/api/file?path=' + encodeURIComponent(key), {
-                target: '#preview-body', swap: 'innerHTML',
-              });
-            }
+          if (typeof RE_SIZE !== 'undefined' && RE_SIZE === 'mini'
+            && RE_FACE === 'read' && RE_PATH === key) {
+            _reLoadDisk(key).then((raw) => {
+              if (RE_SIZE === 'mini' && RE_FACE === 'read' && RE_PATH === key) {
+                _showMiniRead(key, raw);
+              }
+            }).catch(() => { });
           }
           // Phase 4b: if review mode is open AND this write targeted
           // the doc the user is reviewing, remember it so the
@@ -7422,8 +8985,20 @@
       catch (_) { return null; }
     }
 
+    // The topbar 🚰 button shows wikisink.svg when the active archive is
+    // servable, wikisink-off.svg when it isn't onboarded or the drive is
+    // detached (installed === false covers both). Driven from whatever
+    // status the page already fetches — no dedicated poll loop.
+    function updateWikisinkBtnIcon(status) {
+      const img = document.querySelector('#wikisink-btn .svg-icon');
+      if (!img) return;
+      const ok = !!(status && status.installed);
+      setIcon(img, ok ? 'wikisink' : 'wikisink-off');
+    }
+
     async function onWikisinkClick() {
       WIKI_STATUS = await fetchWikiStatus();
+      updateWikisinkBtnIcon(WIKI_STATUS);
       if (WIKI_STATUS && WIKI_STATUS.installed) {
         if (typeof enterWikiMode === 'function') enterWikiMode();
         return;
@@ -7431,6 +9006,9 @@
       openWikiSetup();
     }
     document.getElementById('wikisink-btn').addEventListener('click', onWikisinkClick);
+    // One-shot status fetch on load so the 🚰 button shows its off variant
+    // immediately when wikisink isn't reachable (no ongoing poll).
+    fetchWikiStatus().then((s) => { WIKI_STATUS = s || WIKI_STATUS; updateWikisinkBtnIcon(s); });
 
     function setWikiSetupState(state) {
       WIKI_SETUP_STATE = state;
@@ -7810,16 +9388,19 @@
     let LAST_WIKI_SELECTION = null;  // sticky selection snapshot (chat pill)
 
     async function enterWikiMode() {
+      // Opening wikisink supplants any read/edit view (both sizes).
+      if (typeof RE_SIZE !== 'undefined' && RE_SIZE) _teardownReadEdit();
       const root = document.getElementById('wiki-mode');
       applyReviewContrast();
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
-      const exitBtn = document.getElementById('exit-review-btn');
-      exitBtn.textContent = '× exit wikisink';
-      exitBtn.title = 'Exit wikisink (esc)';
-      exitBtn.classList.add('visible');
+      setActiveMode('wikisink', {
+        icon: 'wikisink',
+        onExit: exitWikiMode,
+        iconTitle: 'wikisink',
+        exitTitle: 'exit wikisink',
+      });
       document.getElementById('tree')?.classList.add('review-disabled');
-      document.getElementById('preview')?.classList.remove('open');
       if (typeof refreshWikiChatTail === 'function') refreshWikiChatTail();
       if (!WIKI_PATH) {
         const last = WIKI_STATUS && WIKI_STATUS.last_viewed;
@@ -7835,26 +9416,18 @@
       const root = document.getElementById('wiki-mode');
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
-      const exitBtn = document.getElementById('exit-review-btn');
-      exitBtn.classList.remove('visible');
-      exitBtn.textContent = '× exit review';
-      exitBtn.title = 'Exit review mode (esc)';
+      clearActiveMode();
       document.getElementById('tree')?.classList.remove('review-disabled');
       LAST_WIKI_SELECTION = null;
       hideWikiSuggest();
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key !== 'Escape') return;
-      if (!document.getElementById('wiki-mode')?.classList.contains('open')) return;
-      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-      exitWikiMode();
-    });
-
     function wikiSetSourceBadge(art) {
       const badge = document.getElementById('wiki-source-badge');
       badge.hidden = false;
       badge.className = 'wiki-source-badge';
+      // The cachebox-update chip is offered only for saved-article views.
+      document.getElementById('wiki-cachebox-update').hidden = art.source !== 'saved';
       if (art.source === 'overlay') {
         badge.classList.add('live');
         const when = (art.meta && art.meta.fetched_at || '').slice(0, 10);
@@ -7869,7 +9442,7 @@
         badge.classList.add('saved');
         const when = (art.meta && art.meta.retrieved) || '';
         badge.textContent = 'saved' + (when ? ' ' + when : '');
-        badge.title = 'your saved copy, served from its folder — re-save (📥/🌐) to refresh it; links go to the archive';
+        badge.title = 'your saved copy, served from its folder — re-save (the save button) to refresh it; links go to the archive';
       } else {
         badge.textContent = 'ZIM ' + (art.snapshot || '');
         badge.title = 'served from the local archive snapshot';
@@ -8058,6 +9631,7 @@
           (hits || '<div class="wiki-note">nothing found</div>') + '</div>';
         document.getElementById('wiki-article-title').textContent = '';
         document.getElementById('wiki-source-badge').hidden = true;
+        document.getElementById('wiki-cachebox-update').hidden = true;
       } catch (err) {
         body.innerHTML = `<div class="wiki-note">search failed: ${escapeHtml(String(err.message || err))}</div>`;
       }
@@ -8097,10 +9671,58 @@
         wikiToast(String(e.message || e), true);
       }
     }
+    // Save flyout: one savewiki button pops two free-floating overlay
+    // choices; a choice runs the save and closes; outside-click / esc close.
+    function openWikiSaveFlyout(open) {
+      const fly = document.getElementById('wiki-save-flyout');
+      const show = open !== undefined ? open : fly.hidden;
+      fly.hidden = !show;
+    }
+    document.getElementById('wiki-save-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openWikiSaveFlyout();
+    });
     document.getElementById('wiki-save-project')
-      .addEventListener('click', () => wikiSaveArticle('project'));
+      .addEventListener('click', () => { openWikiSaveFlyout(false); wikiSaveArticle('project'); });
     document.getElementById('wiki-save-infoworld')
-      .addEventListener('click', () => wikiSaveArticle('infoworld'));
+      .addEventListener('click', () => { openWikiSaveFlyout(false); wikiSaveArticle('infoworld'); /* cacheawl */ });
+    document.addEventListener('click', (e) => {
+      const fly = document.getElementById('wiki-save-flyout');
+      if (fly.hidden) return;
+      if (!document.getElementById('wiki-save-wrap').contains(e.target)) openWikiSaveFlyout(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !document.getElementById('wiki-save-flyout').hidden) {
+        e.stopPropagation();
+        openWikiSaveFlyout(false);
+      }
+    }, true);
+
+    // Cachebox update: only shown while viewing a SAVED article. Confirms via
+    // the reusable overlay, then POSTs the existing wikisink update run.
+    document.getElementById('wiki-cachebox-update').addEventListener('click', async () => {
+      const ok = await confirmOverlay({
+        title: 'Update this saved article?',
+        message: 'This starts a wikisink update run against live Wikipedia to ' +
+          'refresh watched articles, including saved copies. It may take a while ' +
+          'and needs the archive reachable. Continue?',
+        confirmLabel: 'run update',
+        cancelLabel: 'cancel',
+      });
+      if (!ok) return;
+      try {
+        const r = await fetch('/api/wiki/wikisink', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scope: 'watched' }),
+        });
+        const js = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(js.detail || `update failed (${r.status})`);
+        wikiToast('wikisink update started — see the report in chat');
+      } catch (e) {
+        wikiToast(String(e.message || e), true);
+      }
+    });
 
     // ---------- Wikisink: comments ----------
     //
@@ -8301,6 +9923,10 @@
       const panel = document.getElementById('wiki-comments-panel');
       const show = force !== undefined ? force : panel.hidden;
       panel.hidden = !show;
+      // Bare two-state toggle: on = panel visible (with the dark-theme glow).
+      const btn = document.getElementById('wiki-comments-toggle');
+      btn.classList.toggle('on', show);
+      setIcon(btn.querySelector('.svg-icon'), show ? 'commentsright-on' : 'commentsright-off');
     }
     window.toggleWikiCommentsPanel = toggleWikiCommentsPanel;
     document.getElementById('wiki-comments-toggle')
@@ -8656,7 +10282,7 @@
         WIKI_PATH = null;
         WIKI_HISTORY = [];
         WIKI_HISTORY_IDX = -1;
-        fetchWikiStatus().then(s => { WIKI_STATUS = s; });
+        fetchWikiStatus().then(s => { WIKI_STATUS = s; updateWikisinkBtnIcon(s); });
         if (modalOpen) setWikiSetupState('done');
       }
     });
@@ -8980,109 +10606,431 @@
     // cleared on review-mode exit and after a chat send.
     let LAST_REVIEW_SELECTION = null;  // { text, lineHint } | null
 
-    async function enterReviewMode(path) {
-      // Fetch raw file contents (preview's HTML escape is per-byte and
-      // would need un-escaping; the raw endpoint is the source of truth).
-      let raw;
-      try {
-        const r = await fetch('/api/file/raw?path=' + encodeURIComponent(path));
-        if (!r.ok) throw new Error(r.statusText);
-        raw = await r.text();
-      } catch (e) {
-        alert('could not load document for review: ' + e.message);
-        return;
+    // ================================================================
+    // Unified read/edit mode — two SIZES × two FACES
+    // ================================================================
+    //
+    //   SIZE  'mini'  → the side panel (#preview), same geometry as the
+    //                   old preview pane.
+    //         'full'  → the full-frame overlays: #review-mode (read face)
+    //                   and #edit-mode (edit face).
+    //   FACE  'read'  → prettified markdown (the former "review mode").
+    //         'edit'  → plaintext markdown editing (the former "editor").
+    //
+    // The full faces reuse the existing #review-mode / #edit-mode DOM
+    // trees wholesale (all their features — highlights, selection
+    // toolbar, formatting, revision workflow, chat pills — keep working);
+    // this layer just orchestrates them as two faces of ONE mode with
+    // ONE exit and ONE face toggle (the topbar active-mode icon). The
+    // mini size renders lighter-weight faces into #preview.
+    //
+    // Unsaved edit-face text is held in RE_EDIT_BUFFER and ALWAYS survives
+    // a size switch; a face switch away from a dirty editor, or exiting
+    // the mode dirty, prompts via confirmOverlay first.
+    let RE_SIZE = null;        // null | 'mini' | 'full'
+    let RE_FACE = 'read';      // 'read' | 'edit'
+    let RE_PATH = null;        // file path currently open
+    let RE_PRISTINE = '';      // on-disk baseline for the current face
+    let RE_EDIT_BUFFER = null; // live edit-face text (survives size switches)
+
+    function reIsActive() { return RE_SIZE !== null; }
+    window.reIsActive = reIsActive;
+
+    function reEditTextarea() {
+      return RE_SIZE === 'full'
+        ? document.getElementById('edit-textarea')
+        : document.getElementById('mini-edit-textarea');
+    }
+    function reCurrentEditValue() {
+      const ta = reEditTextarea();
+      return ta ? ta.value : (RE_EDIT_BUFFER == null ? RE_PRISTINE : RE_EDIT_BUFFER);
+    }
+    function reIsDirty() {
+      return RE_EDIT_BUFFER != null && RE_EDIT_BUFFER !== RE_PRISTINE;
+    }
+    window.reIsDirty = reIsDirty;
+
+    async function _reLoadDisk(path) {
+      const r = await fetch('/api/file/raw?path=' + encodeURIComponent(path));
+      if (!r.ok) throw new Error(r.statusText || ('HTTP ' + r.status));
+      return await r.text();
+    }
+
+    // ---- active-mode registration for read/edit --------------------
+    function reToggleFace() {
+      reSetFace(RE_FACE === 'read' ? 'edit' : 'read');
+    }
+    function _reModeIcon() { return RE_FACE === 'read' ? 'read-eye' : 'edit-pencil'; }
+    function _reModeTitle() {
+      return RE_FACE === 'read' ? 'reading — click to edit'
+        : 'editing — click to read';
+    }
+    function _reRegisterMode() {
+      setActiveMode('readedit', {
+        icon: _reModeIcon(),
+        hoverIcon: 'readedit-switch',
+        onIconClick: reToggleFace,
+        onExit: closeReadEdit,
+        iconTitle: _reModeTitle(),
+        exitTitle: 'exit read/edit',
+      });
+    }
+    function _reUpdateModeIcon() { updateActiveModeIcon(_reModeIcon(), _reModeTitle()); }
+
+    function _reSyncTreeGrey() {
+      const tree = document.getElementById('tree');
+      if (!tree) return;
+      tree.classList.toggle('review-disabled', RE_SIZE === 'full');
+    }
+
+    // ---- internal face renderers -----------------------------------
+    // Full READ face — the former review mode. rawOpt lets callers skip
+    // a redundant disk fetch (they already hold the bytes).
+    async function _showFullRead(path, rawOpt) {
+      let raw = rawOpt;
+      if (raw == null) {
+        try { raw = await _reLoadDisk(path); }
+        catch (e) { alert('could not load document for review: ' + e.message); return false; }
       }
       REVIEW_PATH = path;
       REVIEW_SOURCE = raw;
+      RE_PRISTINE = raw;
       const root = document.getElementById('review-mode');
       const body = document.getElementById('review-body');
       body.dataset.path = path;
       const rendered = renderMarkdown(raw);
       REVIEW_BLOCKS = rendered.blocks;
       body.innerHTML = rendered.html;
-      // Load saved highlights and paint them onto the freshly rendered
-      // body. Awaited so re-renders triggered by edits don't race
-      // ahead of the wrap pass.
       await loadHighlightsForReview();
       renderHighlights();
       applyReviewContrast();
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
-      // Always open at the very top of the document.
       body.scrollTop = 0;
-      // renderHighlights() ran while the pane was still display:none, so
-      // the rail markers + cursor couldn't be measured (zero height).
-      // Now that it's laid out, re-measure on the next frame (double rAF
-      // so wrapped text / fonts have settled).
       requestAnimationFrame(() => requestAnimationFrame(() => {
         positionReviewMarks();
         updateLineNavCursor();
       }));
-      // Topbar: show the red exit button (label set explicitly in
-      // case a prior edit-mode session left it as "× exit edit").
-      const exitBtn = document.getElementById('exit-review-btn');
-      exitBtn.textContent = '× exit review';
-      exitBtn.title = 'Exit review mode (esc)';
-      exitBtn.classList.add('visible');
-      // Greyout file tree (the rest of the sidebar stays interactive).
-      document.getElementById('tree')?.classList.add('review-disabled');
-      // Hide preview if it was open — review mode is the focused replacement.
-      document.getElementById('preview')?.classList.remove('open');
-      // Mirror the conversation tail into the pill so the user sees
-      // recent context.
       refreshReviewChatTail();
-      // Sync the context chip to current state (typically nothing
-      // queued at entry, but the entry-state should still match).
       updateReviewChatChip();
-      // Refresh the topbar's document stat counters now that we have
-      // a document loaded into REVIEW_SOURCE.
       updateDocCounters();
-      // Wire the input to the same submission flow as the main chat.
-      // (sendFromReviewChat reuses the existing /api/chat hx-post.)
+      return true;
     }
-
-    function exitReviewMode() {
+    function _hideFullRead() {
       const root = document.getElementById('review-mode');
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
-      const exitBtn = document.getElementById('exit-review-btn');
-      exitBtn.classList.remove('visible');
-      // Reset the label in case it was set to "× exit edit" by a
-      // prior edit-mode session that didn't have a chance to clean
-      // up itself.
-      exitBtn.textContent = '× exit review';
-      exitBtn.title = 'Exit review mode (esc)';
-      document.getElementById('tree')?.classList.remove('review-disabled');
-      REVIEW_PATH = null;
-      // Drop the sticky selection snapshot too — its line-hint
-      // refers to a document we're no longer reviewing.
-      LAST_REVIEW_SELECTION = null;
-      // Hide the context chip — its content no longer applies.
-      if (typeof updateReviewChatChip === 'function') updateReviewChatChip();
-      // Refresh the doc counters — review-mode source is gone now;
-      // they'll fall through to the preview pane if a file is open
-      // there, otherwise hide.
-      if (typeof updateDocCounters === 'function') updateDocCounters();
-      // Per spec: exiting closes the file completely (does NOT drop into
-      // preview mode). The user is back at the regular chat view with
-      // the full session history intact.
     }
 
-    // Topbar X button: dispatches to whichever full-frame mode is
-    // currently open. Label updates dynamically in enterReviewMode /
-    // enterEditMode (and resets on exit).
-    document.getElementById('exit-review-btn')
-      .addEventListener('click', () => {
-        if (document.getElementById('edit-mode')?.classList.contains('open')) {
-          exitEditMode();
-        } else if (document.getElementById('girraph-mode')?.classList.contains('open')) {
-          exitGirraphMode();
-        } else if (document.getElementById('wiki-mode')?.classList.contains('open')) {
-          exitWikiMode();
-        } else if (document.getElementById('review-mode')?.classList.contains('open')) {
-          exitReviewMode();
+    // Mini READ face — compact prettified markdown into #preview.
+    function _showMiniRead(path, raw) {
+      RE_PRISTINE = raw;
+      REVIEW_PATH = null;   // mini read carries no highlights/toolbar state
+      const body = document.getElementById('preview-body');
+      body.innerHTML = '';
+      // Context actions (customize / mark-done) preserved from the old
+      // preview pane, shown only when they apply.
+      const actions = _miniReadActions(path);
+      if (actions) body.appendChild(actions);
+      const wrap = document.createElement('div');
+      wrap.className = 'mini-read';
+      try {
+        wrap.innerHTML = renderMarkdown(raw).html;
+      } catch (_) {
+        wrap.innerHTML = '<pre></pre>';
+        wrap.querySelector('pre').textContent = raw;
+      }
+      body.appendChild(wrap);
+      body.scrollTop = 0;
+      document.getElementById('preview-title').textContent = 'read · ' + path.split('/').pop();
+      document.getElementById('preview').classList.add('open');
+      updateDocCounters();
+    }
+
+    function _isRequestPath(path) {
+      const parts = path.split('/');
+      return parts.length >= 3 && parts[0] === 'rness' && parts[1] === 'requests'
+        && parts[2] !== 'done' && path.endsWith('.md');
+    }
+    // Build the mini-read action row (customize / mark-done), mirroring
+    // the server-rendered preview actions. Symlink status is read off the
+    // file tree; customize is offered for external symlinks that aren't
+    // skills/roles (those are edited globally).
+    function _miniReadActions(path) {
+      const row = document.createElement('div');
+      row.className = 'preview-actions';
+      let any = false;
+      if (_isRequestPath(path)) {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'mark-done'; b.textContent = 'mark done';
+        b.addEventListener('click', () => markRequestDone(path));
+        row.appendChild(b); any = true;
+      }
+      const sel = '#tree li.file[data-path="' +
+        ((window.CSS && CSS.escape) ? CSS.escape(path) : path) + '"]';
+      const li = document.querySelector(sel);
+      const isSym = li && li.classList.contains('symlink');
+      if (isSym && !path.startsWith('rness/skills/') && !path.startsWith('rness/roles/')) {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'customize-btn';
+        b.textContent = 'customize for this project';
+        b.addEventListener('click', () => customizeForProject(path));
+        row.appendChild(b); any = true;
+      }
+      return any ? row : null;
+    }
+
+    // Full EDIT face — the former editor. text is the content to load
+    // (disk bytes, or preserved unsaved buffer on a size switch).
+    function _showFullEdit(path, text, focusText) {
+      EDIT_PATH = path;
+      EDIT_PRISTINE = RE_PRISTINE;
+      const root = document.getElementById('edit-mode');
+      const ta = document.getElementById('edit-textarea');
+      document.getElementById('edit-title').textContent = path;
+      ta.value = text;
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      // Highlights sidecar for the rail (best-effort, non-blocking).
+      fetch('/api/highlights?path=' + encodeURIComponent(path))
+        .then(hr => hr.ok ? hr.json() : { highlights: [] })
+        .then(j => { EDIT_HIGHLIGHTS = j.highlights || []; renderEditLineNav(); })
+        .catch(() => { EDIT_HIGHLIGHTS = []; });
+      renderEditLineNav();
+      refreshEditChatTail();
+      updateDocCounters();
+      if (focusText) {
+        const idx = ta.value.indexOf(focusText);
+        if (idx >= 0) {
+          ta.focus();
+          ta.setSelectionRange(idx, idx + focusText.length);
+          const before = ta.value.slice(0, idx);
+          const linesBefore = before.split('\n').length;
+          const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 18;
+          ta.scrollTop = Math.max(0, (linesBefore - 4) * lineHeight);
+        } else { ta.focus(); }
+      } else { ta.focus(); }
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        positionEditMarks();
+        updateEditLineNavCursor();
+      }));
+    }
+    function _hideFullEdit() {
+      const root = document.getElementById('edit-mode');
+      root.classList.remove('open');
+      root.setAttribute('aria-hidden', 'true');
+      EDIT_PATH = null;
+    }
+
+    // Mini EDIT face — plaintext textarea into #preview.
+    function _showMiniEdit(path, text) {
+      const body = document.getElementById('preview-body');
+      body.innerHTML = '';
+      const ta = document.createElement('textarea');
+      ta.id = 'mini-edit-textarea';
+      ta.className = 'mini-edit';
+      ta.spellcheck = false;
+      ta.value = text;
+      body.appendChild(ta);
+      document.getElementById('preview-title').textContent = 'edit · ' + path.split('/').pop();
+      document.getElementById('preview').classList.add('open');
+      ta.focus();
+      updateDocCounters();
+    }
+
+    function _hideMini() {
+      const p = document.getElementById('preview');
+      p.classList.remove('open');
+      document.getElementById('preview-body').innerHTML = '';
+      document.getElementById('preview-title').textContent = 'preview';
+    }
+
+    // Hide whichever container is currently showing (no state reset).
+    function _reHideCurrent() {
+      if (RE_SIZE === 'full') {
+        if (RE_FACE === 'read') _hideFullRead(); else _hideFullEdit();
+      } else if (RE_SIZE === 'mini') {
+        _hideMini();
+      }
+    }
+
+    // Capture / restore best-effort scroll (read) or scroll+caret (edit)
+    // across a size switch.
+    function _reCaptureView() {
+      if (RE_FACE === 'edit') {
+        const ta = reEditTextarea();
+        return ta ? { selStart: ta.selectionStart, selEnd: ta.selectionEnd } : null;
+      }
+      const body = RE_SIZE === 'full'
+        ? document.getElementById('review-body')
+        : document.getElementById('preview-body');
+      const el = body && body.firstElementChild ? body : body;
+      return el ? { ratio: el.scrollHeight ? el.scrollTop / el.scrollHeight : 0 } : null;
+    }
+    function _reApplyView(v) {
+      if (!v) return;
+      if (RE_FACE === 'edit' && v.selStart != null) {
+        const ta = reEditTextarea();
+        if (ta) { try { ta.setSelectionRange(v.selStart, v.selEnd); } catch (_) { } }
+        return;
+      }
+      if (v.ratio != null) {
+        const body = RE_SIZE === 'full'
+          ? document.getElementById('review-body')
+          : document.getElementById('preview-body');
+        if (body) requestAnimationFrame(() => { body.scrollTop = v.ratio * body.scrollHeight; });
+      }
+    }
+
+    // ---- public orchestrator API -----------------------------------
+
+    // Open a document in read/edit. The single entry point for the
+    // file-tree click (mini/read), the "review mode" button (full/read),
+    // and the "edit mode" button (full/edit).
+    async function openReadEdit(path, opts = {}) {
+      const size = opts.size || 'mini';
+      const face = opts.face || 'read';
+      let raw;
+      try { raw = await _reLoadDisk(path); }
+      catch (e) {
+        alert('could not open “' + path + '”: ' + e.message +
+          (/415/.test(String(e.message)) ? ' (not a text file)' : ''));
+        return;
+      }
+      // Leaving a dirty editor for a different file → confirm.
+      if (reIsActive() && reIsDirty() && RE_PATH !== path) {
+        const ok = await confirmOverlay({
+          title: 'Discard unsaved edits?',
+          message: 'You have unsaved changes in “' + (RE_PATH || '') +
+            '”. Open a different document and discard them?',
+          confirmLabel: 'discard', cancelLabel: 'keep editing',
+        });
+        if (!ok) return;
+      }
+      _reHideCurrent();
+      RE_PATH = path;
+      RE_FACE = face;
+      RE_SIZE = size;
+      RE_PRISTINE = raw;
+      RE_EDIT_BUFFER = face === 'edit' ? raw : null;
+      if (face === 'read') {
+        if (size === 'full') { if (!(await _showFullRead(path, raw))) { _teardownReadEdit(); return; } }
+        else _showMiniRead(path, raw);
+      } else {
+        if (size === 'full') _showFullEdit(path, raw, opts.focusText);
+        else _showMiniEdit(path, raw);
+      }
+      _reRegisterMode();
+      _reSyncTreeGrey();
+    }
+    window.openReadEdit = openReadEdit;
+
+    // Toggle the face at the current size (topbar icon). edit→read while
+    // dirty prompts to discard.
+    async function reSetFace(face) {
+      if (!reIsActive() || face === RE_FACE) return;
+      const path = RE_PATH;
+      if (RE_FACE === 'edit') {
+        RE_EDIT_BUFFER = reCurrentEditValue();
+        if (reIsDirty()) {
+          const ok = await confirmOverlay({
+            title: 'Discard unsaved edits?',
+            message: 'Switch to reading and discard your unsaved changes?',
+            confirmLabel: 'discard', cancelLabel: 'keep editing',
+          });
+          if (!ok) return;
         }
-      });
+        RE_EDIT_BUFFER = null;
+      }
+      // Re-read disk so the target face reflects the file's real state.
+      let raw;
+      try { raw = await _reLoadDisk(path); }
+      catch (e) { alert('could not reload document: ' + e.message); return; }
+      _reHideCurrent();
+      RE_FACE = face;
+      RE_PRISTINE = raw;
+      if (face === 'read') {
+        RE_EDIT_BUFFER = null;
+        if (RE_SIZE === 'full') await _showFullRead(path, raw);
+        else _showMiniRead(path, raw);
+      } else {
+        RE_EDIT_BUFFER = raw;
+        if (RE_SIZE === 'full') _showFullEdit(path, raw);
+        else _showMiniEdit(path, raw);
+      }
+      _reUpdateModeIcon();
+      _reSyncTreeGrey();
+    }
+    window.reSetFace = reSetFace;
+
+    // Switch size (mini↔full) preserving face; unsaved edit text carries
+    // over untouched (no confirm).
+    async function reSetSize(size) {
+      if (!reIsActive() || size === RE_SIZE) return;
+      const path = RE_PATH;
+      const view = _reCaptureView();
+      let carry = null;
+      if (RE_FACE === 'edit') { RE_EDIT_BUFFER = reCurrentEditValue(); carry = RE_EDIT_BUFFER; }
+      _reHideCurrent();
+      RE_SIZE = size;
+      if (RE_FACE === 'read') {
+        // Read is never dirty — refetch for a fresh render at the new size.
+        let raw = RE_PRISTINE;
+        try { raw = await _reLoadDisk(path); } catch (_) { /* fall back to cached */ }
+        RE_PRISTINE = raw;
+        if (size === 'full') await _showFullRead(path, raw);
+        else _showMiniRead(path, raw);
+      } else {
+        if (size === 'full') _showFullEdit(path, carry);
+        else _showMiniEdit(path, carry);
+      }
+      _reApplyView(view);
+      _reSyncTreeGrey();
+    }
+    window.reSetSize = reSetSize;
+
+    // Tear down everything with NO confirm (used when another mode takes
+    // over, and as the final step of closeReadEdit).
+    function _teardownReadEdit() {
+      _hideFullRead();
+      _hideFullEdit();
+      _hideMini();
+      RE_SIZE = null; RE_FACE = 'read'; RE_PATH = null;
+      RE_PRISTINE = ''; RE_EDIT_BUFFER = null;
+      REVIEW_PATH = null; EDIT_PATH = null; LAST_REVIEW_SELECTION = null;
+      clearActiveMode();
+      document.getElementById('tree')?.classList.remove('review-disabled');
+      if (typeof updateReviewChatChip === 'function') updateReviewChatChip();
+      updateDocCounters();
+    }
+    window._teardownReadEdit = _teardownReadEdit;
+
+    // Exit the mode (ribbon / esc / legacy in-mode exit). Dirty editor →
+    // confirm before discarding.
+    async function closeReadEdit() {
+      if (!reIsActive()) { _teardownReadEdit(); return; }
+      if (RE_FACE === 'edit') RE_EDIT_BUFFER = reCurrentEditValue();
+      if (reIsDirty()) {
+        const ok = await confirmOverlay({
+          title: 'Discard unsaved edits?',
+          message: 'You have unsaved changes in “' + (RE_PATH || '') +
+            '”. Close and discard them?',
+          confirmLabel: 'discard', cancelLabel: 'keep editing',
+        });
+        if (!ok) return;
+      }
+      _teardownReadEdit();
+    }
+    window.closeReadEdit = closeReadEdit;
+
+    // ---- legacy entry points (kept as globals for server-rendered
+    //      onclick handlers and old call sites) ----------------------
+    // "review mode" button in a file's preview actions → full read.
+    function enterReviewMode(path) { return openReadEdit(path, { size: 'full', face: 'read' }); }
+    // esc/ribbon compat: exiting the read face closes the whole mode.
+    function exitReviewMode() { return closeReadEdit(); }
+    window.enterReviewMode = enterReviewMode;
+    window.exitReviewMode = exitReviewMode;
 
     // ---------- Girraph panel ----------
     //
@@ -9098,39 +11046,31 @@
     let GIRRAPH_STACK = [];   // [{kind:'girraph'|'doc', path}]
 
     async function enterGirraphMode(path) {
+      // Opening a girraph supplants any read/edit view (both sizes).
+      if (typeof RE_SIZE !== 'undefined' && RE_SIZE) _teardownReadEdit();
       GIRRAPH_STACK = [{ kind: 'girraph', path }];
       const ok = await renderGirraphTop();
       if (!ok) { GIRRAPH_STACK = []; return; }
       const root = document.getElementById('girraph-mode');
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
-      const exitBtn = document.getElementById('exit-review-btn');
-      exitBtn.textContent = '× exit girraph';
-      exitBtn.title = 'Exit girraph panel (esc)';
-      exitBtn.classList.add('visible');
+      setActiveMode('girraph', {
+        icon: 'girraphmode',
+        onExit: exitGirraphMode,
+        iconTitle: 'girraph',
+        exitTitle: 'exit girraph',
+      });
       document.getElementById('tree')?.classList.add('review-disabled');
-      document.getElementById('preview')?.classList.remove('open');
     }
 
     function exitGirraphMode() {
       const root = document.getElementById('girraph-mode');
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
-      const exitBtn = document.getElementById('exit-review-btn');
-      exitBtn.classList.remove('visible');
-      exitBtn.textContent = '× exit review';
-      exitBtn.title = 'Exit review mode (esc)';
+      clearActiveMode();
       document.getElementById('tree')?.classList.remove('review-disabled');
       GIRRAPH_STACK = [];
     }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key !== 'Escape') return;
-      if (!document.getElementById('girraph-mode')?.classList.contains('open')) return;
-      // Don't steal esc from an in-progress inline edit.
-      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-      exitGirraphMode();
-    });
 
     function gpTop() { return GIRRAPH_STACK[GIRRAPH_STACK.length - 1]; }
 
@@ -9201,8 +11141,13 @@
         }
         data = await r.json();
       } catch (e) {
-        alert('could not load girraph: ' + e.message);
-        return false;
+        // Non-blocking, like the doc-load failure above: a blocking
+        // alert() here freezes the tab and there's a perfectly good
+        // body to render the error into (exit ribbon still works).
+        body.innerHTML = '<div class="gp-warnings">could not load girraph: '
+          + escapeHtml(e.message) + '</div>';
+        body.scrollTop = 0;
+        return true;
       }
       body.innerHTML = '';
       if (data.title) {
@@ -9524,6 +11469,1271 @@
 
     document.getElementById('gp-refresh').addEventListener('click', () => renderGirraphTop());
     document.getElementById('gp-add-root').addEventListener('click', () => gpShowAddForm(null, ''));
+
+    // ================================================================
+    // Merirmaid mode (wave 2c) — Mermaid diagram viewer/editor
+    // ================================================================
+    //
+    // Full-frame mode for .merirmaid files: frontmatter + Mermaid source,
+    // rendered client-side by the vendored mermaid.min.js (lazy-loaded on
+    // first open — it's ~3.5 MB, must not weigh down initial page load).
+    // Navigation between diagrams uses a breadcrumb descent stack with the
+    // same push/pop-back semantics as girraph mode (pushing an
+    // already-visited path pops back to it, keeping cycles navigable).
+    let MERIRMAID_STACK = [];     // [{kind:'merirmaid'|'doc', path}]
+    let MM_CURRENT = null;        // {path, parsed} for the visible diagram
+    let MM_LINKS = {};            // nodeId -> raw target string (current render)
+    let MM_PATH = null;           // top diagram path (for the chat preamble)
+    let MM_TITLE = null;          // top diagram title (for the chat preamble)
+    let MM_RENDER_SEQ = 0;        // guards against out-of-order async renders
+    let MM_MERMAID_LOADING = null;
+    let MM_MERMAID_INITED = false;
+
+    // Node shapes we can locate/patch by nodeId, longest opener first so
+    // `[[`/`([` win over `[`. Each is [openDelim, closeDelim].
+    const MM_SHAPES = [
+      ['([', '])'], ['[[', ']]'], ['[(', ')]'], ['{{', '}}'], ['((', '))'],
+      ['>', ']'], ['[', ']'], ['(', ')'], ['{', '}'],
+    ];
+
+    function mmTop() { return MERIRMAID_STACK[MERIRMAID_STACK.length - 1]; }
+
+    async function enterMerirmaidMode(path) {
+      // Supplant any read/edit view or an open girraph mode.
+      if (typeof RE_SIZE !== 'undefined' && RE_SIZE) _teardownReadEdit();
+      const g = document.getElementById('girraph-mode');
+      if (g && g.classList.contains('open')) exitGirraphMode();
+      MERIRMAID_STACK = [{ kind: 'merirmaid', path }];
+      const root = document.getElementById('merirmaid-mode');
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      setActiveMode('merirmaid', {
+        icon: 'merirmaidmode',
+        onIconClick: null,
+        onExit: exitMerirmaidMode,
+        iconTitle: 'merirmaid',
+        exitTitle: 'exit merirmaid',
+      });
+      document.getElementById('tree')?.classList.add('review-disabled');
+      await renderMerirmaidTop();
+      refreshMerirmaidChatTail();
+    }
+    window.enterMerirmaidMode = enterMerirmaidMode;
+
+    function exitMerirmaidMode() {
+      mmCloseLabelEditor();
+      const root = document.getElementById('merirmaid-mode');
+      root.classList.remove('open');
+      root.setAttribute('aria-hidden', 'true');
+      clearActiveMode();
+      document.getElementById('tree')?.classList.remove('review-disabled');
+      MERIRMAID_STACK = [];
+      MM_CURRENT = null; MM_LINKS = {}; MM_PATH = null; MM_TITLE = null;
+    }
+    window.exitMerirmaidMode = exitMerirmaidMode;
+
+    function mmPush(entry) {
+      const idx = MERIRMAID_STACK.findIndex(
+        (e) => e.kind === entry.kind && e.path === entry.path);
+      if (idx !== -1) MERIRMAID_STACK = MERIRMAID_STACK.slice(0, idx + 1);
+      else MERIRMAID_STACK.push(entry);
+      renderMerirmaidTop();
+    }
+
+    function renderMmCrumbs() {
+      const nav = document.getElementById('mm-crumbs');
+      nav.innerHTML = '';
+      MERIRMAID_STACK.forEach((entry, i) => {
+        if (i > 0) {
+          const sep = document.createElement('span');
+          sep.className = 'sep'; sep.textContent = '›';
+          nav.appendChild(sep);
+        }
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'crumb' + (i === MERIRMAID_STACK.length - 1 ? ' current' : '');
+        const base = entry.path.split('/').pop();
+        b.textContent = (entry.kind === 'doc' ? '📄 ' : '🧜 ') + base;
+        b.title = entry.path;
+        if (i < MERIRMAID_STACK.length - 1) {
+          b.onclick = () => { MERIRMAID_STACK = MERIRMAID_STACK.slice(0, i + 1); renderMerirmaidTop(); };
+        }
+        nav.appendChild(b);
+      });
+    }
+
+    async function mmLoadDisk(path) {
+      const r = await fetch('/api/file/raw?path=' + encodeURIComponent(path));
+      if (!r.ok) {
+        let detail = r.statusText;
+        try { detail = (await r.json()).detail || detail; } catch (_e) { /* keep */ }
+        throw new Error(detail);
+      }
+      return r.text();
+    }
+
+    // Parse a .merirmaid file: split frontmatter (--- fenced key: value
+    // block at the very top) from the Mermaid body. `header` is the raw
+    // frontmatter text verbatim (preserved byte-for-byte on save so
+    // unknown keys survive). Missing/invalid frontmatter → wip + warning.
+    function mmParseFile(raw) {
+      const res = { meta: {}, header: '', body: raw, warning: null, modality: 'wip', charLimit: 48 };
+      const m = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*\r?\n?/.exec(raw);
+      if (!m) {
+        res.warning = 'No frontmatter found — treating this as a work-in-progress (wip) diagram.';
+        return res;
+      }
+      res.header = raw.slice(0, m[0].length);
+      res.body = raw.slice(m[0].length);
+      m[1].split(/\r?\n/).forEach((ln) => {
+        const km = /^([A-Za-z0-9_-]+):\s*(.*)$/.exec(ln);
+        if (km) res.meta[km[1]] = km[2].replace(/\s+#.*$/, '').trim();
+      });
+      if (res.meta['merirmaid'] === undefined) {
+        res.warning = 'Frontmatter is missing "merirmaid: 1" — treating as wip.';
+      }
+      const mod = (res.meta.modality || '').toLowerCase();
+      if (mod === 'mirror') res.modality = 'mirror';
+      else {
+        res.modality = 'wip';
+        if (mod !== 'wip' && !res.warning) {
+          res.warning = 'Frontmatter modality is missing or invalid — defaulting to wip.';
+        }
+      }
+      const lim = parseInt(res.meta['node-char-limit'], 10);
+      res.charLimit = (lim > 0) ? lim : 48;
+      return res;
+    }
+
+    function mmMermaidTheme() {
+      return (typeof ICON_VARIANT !== 'undefined' && ICON_VARIANT === 'dark') ? 'dark' : 'default';
+    }
+
+    // Lazy-load + one-time initialize mermaid.min.js. Returns a promise
+    // that resolves once window.mermaid is ready.
+    function mmEnsureMermaid() {
+      if (window.mermaid && MM_MERMAID_INITED) return Promise.resolve();
+      if (MM_MERMAID_LOADING) return MM_MERMAID_LOADING;
+      MM_MERMAID_LOADING = new Promise((resolve, reject) => {
+        if (window.mermaid) { resolve(); return; }
+        const s = document.createElement('script');
+        s.src = '/static/mermaid.min.js';
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error('could not load /static/mermaid.min.js'));
+        document.head.appendChild(s);
+      }).then(() => {
+        if (!MM_MERMAID_INITED) {
+          window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: mmMermaidTheme() });
+          MM_MERMAID_INITED = true;
+        }
+      }).catch((e) => { MM_MERMAID_LOADING = null; throw e; });
+      return MM_MERMAID_LOADING;
+    }
+
+    async function renderMerirmaidTop() {
+      mmCloseLabelEditor();
+      const top = mmTop();
+      if (!top) return;
+      renderMmCrumbs();
+      const body = document.getElementById('merirmaid-body');
+      const badge = document.getElementById('merirmaid-badge');
+      const titleEl = document.getElementById('merirmaid-title');
+
+      if (top.kind === 'doc') {
+        badge.hidden = true;
+        titleEl.textContent = top.path.split('/').pop();
+        let raw;
+        try { raw = await mmLoadDisk(top.path); }
+        catch (e) {
+          body.innerHTML = '<div class="mm-warnings">could not load '
+            + escapeHtml(top.path) + ': ' + escapeHtml(e.message) + '</div>';
+          return;
+        }
+        body.innerHTML =
+          '<div class="mm-doc-note">read-only · ' + escapeHtml(top.path)
+          + ' · click a breadcrumb to go back</div>'
+          + '<div class="gp-doc">' + renderMarkdown(raw).html + '</div>';
+        body.scrollTop = 0;
+        return;
+      }
+
+      // merirmaid kind
+      let raw;
+      try { raw = await mmLoadDisk(top.path); }
+      catch (e) {
+        badge.hidden = true;
+        titleEl.textContent = top.path.split('/').pop();
+        body.innerHTML = '<div class="mm-warnings">could not load '
+          + escapeHtml(top.path) + ': ' + escapeHtml(e.message) + '</div>';
+        return;
+      }
+      const parsed = mmParseFile(raw);
+      MM_CURRENT = { path: top.path, parsed };
+      MM_PATH = top.path;
+      MM_TITLE = parsed.meta.title || top.path.split('/').pop();
+      titleEl.textContent = MM_TITLE;
+      badge.hidden = false;
+      badge.className = 'mm-badge ' + parsed.modality;
+      badge.textContent = parsed.modality === 'mirror' ? 'mirror · source of truth' : 'wip · editable';
+      badge.title = parsed.modality === 'mirror'
+        ? 'read-only mirror of an external structure — edit the source it mirrors, not this file'
+        : 'work-in-progress diagram — click a node label to edit its text';
+      await mmRenderDiagram(top.path, parsed, body);
+    }
+    window.renderMerirmaidTop = renderMerirmaidTop;
+
+    // Strip `click <id> "target"` lines out of the source (we do the
+    // navigation ourselves, without loosening securityLevel) and collect
+    // the nodeId→target map.
+    function mmExtractClicks(bodySrc) {
+      const links = {};
+      const out = [];
+      bodySrc.split(/\r?\n/).forEach((line) => {
+        const m = /^\s*click\s+("?)([^\s"]+)\1\s+(.*)$/.exec(line);
+        if (m) {
+          const tm = /"([^"]+)"/.exec(m[3]);
+          if (tm) links[m[2]] = tm[1];
+          return; // strip the click line
+        }
+        out.push(line);
+      });
+      return { cleaned: out.join('\n'), links };
+    }
+
+    function mmIsFlowchart(bodySrc) {
+      const firstLine = (bodySrc.split(/\r?\n/).find((l) => l.trim()) || '').trim();
+      return /^(flowchart|graph)\b/.test(firstLine);
+    }
+
+    async function mmRenderDiagram(path, parsed, body) {
+      mmCloseLabelEditor();
+      const seq = ++MM_RENDER_SEQ;
+      body.innerHTML = '<div class="mm-doc-note">rendering…</div>';
+      try {
+        await mmEnsureMermaid();
+      } catch (e) {
+        if (seq !== MM_RENDER_SEQ) return;
+        body.innerHTML = '<div class="mm-error">could not load the mermaid renderer: '
+          + escapeHtml(e.message) + '</div>'
+          + '<pre class="mm-source">' + escapeHtml(parsed.body) + '</pre>';
+        return;
+      }
+      if (seq !== MM_RENDER_SEQ) return;
+      // Re-apply theme each render so an app-theme swap takes effect.
+      window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: mmMermaidTheme() });
+
+      const { cleaned, links } = mmExtractClicks(parsed.body);
+      MM_LINKS = links;
+
+      body.innerHTML = '';
+      if (parsed.warning) {
+        const w = document.createElement('div');
+        w.className = 'mm-warnings';
+        w.textContent = '⚠ ' + parsed.warning;
+        body.appendChild(w);
+      }
+      const holder = document.createElement('div');
+      holder.className = 'mm-diagram';
+      body.appendChild(holder);
+
+      let out;
+      try {
+        out = await window.mermaid.render('mm-svg-' + seq, cleaned);
+      } catch (e) {
+        if (seq !== MM_RENDER_SEQ) return;
+        // Never a blank pane: error message + raw source.
+        // mermaid.render can leave a stray #dmm-svg-* orphan on failure.
+        const orphan = document.getElementById('dmm-svg-' + seq);
+        if (orphan) orphan.remove();
+        body.innerHTML = '';
+        if (parsed.warning) {
+          const w = document.createElement('div');
+          w.className = 'mm-warnings'; w.textContent = '⚠ ' + parsed.warning;
+          body.appendChild(w);
+        }
+        const err = document.createElement('div');
+        err.className = 'mm-error';
+        err.textContent = 'mermaid could not render this diagram:\n' + (e && e.message ? e.message : String(e));
+        const pre = document.createElement('pre');
+        pre.className = 'mm-source';
+        pre.textContent = parsed.body;
+        body.appendChild(err); body.appendChild(pre);
+        return;
+      }
+      if (seq !== MM_RENDER_SEQ) return;
+      holder.innerHTML = out.svg;
+      const svg = holder.querySelector('svg');
+      if (svg) { svg.removeAttribute('height'); svg.style.maxWidth = '100%'; }
+      mmWireNodes(holder, path, parsed);
+      body.scrollTop = 0;
+    }
+
+    // Extract the mermaid node id from a rendered <g class="node"> element.
+    // Flowchart node dom ids render as `<renderId>-flowchart-<id>-<n>`
+    // (the renderId prefix is the id we pass to mermaid.render, and it
+    // itself contains hyphens), so anchor the parse on the `flowchart-`
+    // marker rather than the string start. Some builds also stamp a
+    // data-id — prefer it when present.
+    function mmNodeId(g) {
+      const dataId = g.getAttribute('data-id');
+      if (dataId) return dataId;
+      const raw = g.id || '';
+      const marker = raw.indexOf('flowchart-');
+      let s = marker >= 0 ? raw.slice(marker + 'flowchart-'.length) : raw;
+      s = s.replace(/-\d+$/, '');
+      return s || null;
+    }
+
+    function mmWireNodes(holder, path, parsed) {
+      const editable = parsed.modality === 'wip' && mmIsFlowchart(parsed.body);
+      holder.querySelectorAll('g.node').forEach((g) => {
+        const id = mmNodeId(g);
+        if (!id) return;
+        if (MM_LINKS[id] !== undefined) {
+          // A click-link node: navigate on click (takes precedence over
+          // label editing).
+          g.classList.add('mm-clickable');
+          g.addEventListener('click', (ev) => {
+            ev.preventDefault(); ev.stopPropagation();
+            mmFollowLink(MM_LINKS[id], path);
+          });
+          return;
+        }
+        if (editable) {
+          g.classList.add('mm-editable');
+          g.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            mmOpenLabelEditor(g, id, path);
+          });
+        }
+      });
+    }
+
+    // ----- click-link navigation -----
+
+    function mmResolvePath(fromPath, target) {
+      const t = String(target || '').trim();
+      if (!t) return null;
+      if (/^([a-z]+:)?\/\//i.test(t) || t.startsWith('/') || t.startsWith('#')) return null;
+      const baseDir = fromPath.includes('/') ? fromPath.slice(0, fromPath.lastIndexOf('/')) : '';
+      const parts = baseDir ? baseDir.split('/') : [];
+      let escaped = false;
+      t.split('/').forEach((seg) => {
+        if (seg === '' || seg === '.') return;
+        if (seg === '..') {
+          if (parts.length === 0 || parts[parts.length - 1] === '..') { escaped = true; parts.push('..'); }
+          else parts.pop();
+        } else parts.push(seg);
+      });
+      if (escaped || parts[0] === '..') return null;
+      return parts.join('/');
+    }
+
+    function mmFlash(msg) {
+      const body = document.getElementById('merirmaid-body');
+      if (!body) return;
+      const prev = body.querySelector('.mm-flash');
+      if (prev) prev.remove();
+      const el = document.createElement('div');
+      el.className = 'mm-flash';
+      el.textContent = msg;
+      body.appendChild(el);
+      setTimeout(() => { if (el.parentNode) el.remove(); }, 4000);
+    }
+
+    function mmFollowLink(target, fromPath) {
+      const resolved = mmResolvePath(fromPath, target);
+      if (!resolved) {
+        mmFlash('cannot follow "' + target + '" — it escapes the project or is an absolute/external link');
+        return;
+      }
+      const low = resolved.toLowerCase();
+      if (low.endsWith('.merirmaid')) mmPush({ kind: 'merirmaid', path: resolved });
+      else if (low.endsWith('.md')) mmPush({ kind: 'doc', path: resolved });
+      else if (low.endsWith('.girraph')) { exitMerirmaidMode(); enterGirraphMode(resolved); }
+      else mmFlash('unsupported link target: ' + resolved + ' (expected .merirmaid, .md, or .girraph)');
+    }
+
+    // ----- node-label editing (wip flowcharts only) -----
+
+    // Locate a node's editable label region in the Mermaid source by its
+    // node id. Returns {replaceStart, replaceEnd, currentText, quoted} or
+    // null if it can't be confidently located.
+    function mmLocateNode(src, id) {
+      const idEsc = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      for (const [open, close] of MM_SHAPES) {
+        const openEsc = open.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp('(^|[^A-Za-z0-9_])' + idEsc + '[ \\t]*' + openEsc);
+        const mm = re.exec(src);
+        if (!mm) continue;
+        const idPos = mm.index + mm[1].length;
+        const openIdx = src.indexOf(open, idPos + id.length);
+        if (openIdx === -1) continue;
+        const innerStart = openIdx + open.length;
+        // Quoted label: "…" possibly containing the close delimiter.
+        if (src[innerStart] === '"') {
+          const q2 = src.indexOf('"', innerStart + 1);
+          if (q2 === -1) continue;
+          const closeIdx = src.indexOf(close, q2 + 1);
+          if (closeIdx === -1) continue;
+          return {
+            replaceStart: innerStart,
+            replaceEnd: q2 + 1,
+            currentText: src.slice(innerStart + 1, q2).replace(/#quot;/g, '"'),
+            quoted: true,
+          };
+        }
+        const closeIdx = src.indexOf(close, innerStart);
+        if (closeIdx === -1) continue;
+        return {
+          replaceStart: innerStart,
+          replaceEnd: closeIdx,
+          currentText: src.slice(innerStart, closeIdx),
+          quoted: false,
+        };
+      }
+      return null;
+    }
+
+    // Quote/escape label text for the Mermaid source when it contains
+    // characters that would break an unquoted label.
+    function mmQuoteLabel(text) {
+      if (/[[\](){}"|;#<>]/.test(text) || /^\s|\s$/.test(text)) {
+        return '"' + text.replace(/"/g, '#quot;') + '"';
+      }
+      return text;
+    }
+
+    function mmPatchLabel(src, id, newText) {
+      const loc = mmLocateNode(src, id);
+      if (!loc) return null;
+      return src.slice(0, loc.replaceStart) + mmQuoteLabel(newText) + src.slice(loc.replaceEnd);
+    }
+
+    let _mmEditState = null;   // {g, id, path, loc} while an editor is open
+
+    function mmCloseLabelEditor() {
+      const box = document.getElementById('mm-label-editor');
+      if (box) box.classList.remove('open');
+      _mmEditState = null;
+    }
+    window.mmCloseLabelEditor = mmCloseLabelEditor;
+
+    function mmOpenLabelEditor(g, id, path) {
+      if (!MM_CURRENT) return;
+      const loc = mmLocateNode(MM_CURRENT.parsed.body, id);
+      if (!loc) {
+        mmFlash('couldn\'t locate node "' + id + '" in the source — ask the agent to edit it via chat');
+        return;
+      }
+      mmCloseLabelEditor();
+      _mmEditState = { g, id, path, loc };
+      const box = document.getElementById('mm-label-editor');
+      const input = document.getElementById('mm-label-input');
+      const count = document.getElementById('mm-label-count');
+      const limit = MM_CURRENT.parsed.charLimit;
+      input.value = loc.currentText;
+      const updateCount = () => {
+        const n = input.value.length;
+        count.textContent = n + ' / ' + limit;
+        count.classList.toggle('over', n > limit);
+      };
+      updateCount();
+      // Position over the clicked node.
+      const rect = g.getBoundingClientRect();
+      box.style.left = Math.max(6, rect.left) + 'px';
+      box.style.top = (rect.top - 4) + 'px';
+      box.style.minWidth = Math.max(120, rect.width) + 'px';
+      box.classList.add('open');
+      input.focus();
+      input.select();
+
+      let done = false;
+      const cleanup = () => {
+        input.removeEventListener('keydown', onKey);
+        input.removeEventListener('input', updateCount);
+        input.removeEventListener('blur', onBlur);
+      };
+      const commit = async () => {
+        if (done) return; done = true; cleanup();
+        const newText = input.value;
+        mmCloseLabelEditor();
+        if (newText === loc.currentText) return;
+        const patched = mmPatchLabel(MM_CURRENT.parsed.body, id, newText);
+        if (patched == null) {
+          mmFlash('couldn\'t patch node "' + id + '" — ask the agent to edit it via chat');
+          return;
+        }
+        const newRaw = MM_CURRENT.parsed.header + patched;
+        try {
+          const fd = new FormData();
+          fd.append('path', path);
+          fd.append('content', newRaw);
+          const r = await fetch('/api/file', { method: 'POST', body: fd });
+          if (!r.ok) {
+            let detail = r.statusText;
+            try { detail = (await r.json()).detail || detail; } catch (_e) { /* keep */ }
+            throw new Error(detail);
+          }
+        } catch (e) {
+          mmFlash('save failed: ' + e.message);
+          return;
+        }
+        MM_CURRENT.parsed.body = patched;
+        await mmRenderDiagram(path, MM_CURRENT.parsed, document.getElementById('merirmaid-body'));
+      };
+      const onBlur = () => { commit(); };
+      const onKey = (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commit(); }
+        else if (e.key === 'Escape') { e.preventDefault(); done = true; cleanup(); mmCloseLabelEditor(); }
+      };
+      input.addEventListener('keydown', onKey);
+      input.addEventListener('input', updateCount);
+      input.addEventListener('blur', onBlur);
+    }
+
+    // Re-render on app-theme change (hook called from applyUIConfig) so the
+    // mermaid theme tracks light/dark.
+    function mmOnThemeChange() {
+      const root = document.getElementById('merirmaid-mode');
+      if (!root || !root.classList.contains('open')) return;
+      const top = mmTop();
+      if (!MM_CURRENT || !top || top.kind !== 'merirmaid') return;
+      mmRenderDiagram(MM_CURRENT.path, MM_CURRENT.parsed, document.getElementById('merirmaid-body'));
+    }
+    window.mmOnThemeChange = mmOnThemeChange;
+
+    document.getElementById('mm-refresh').addEventListener('click', () => renderMerirmaidTop());
+    // Reposition/close the label editor if the body scrolls under it.
+    document.getElementById('merirmaid-body').addEventListener('scroll', () => {
+      if (_mmEditState) mmCloseLabelEditor();
+    });
+
+    // ----- merirmaid chat pill (mirrors the wiki/review pill) -----
+    function toggleMerirmaidChat() {
+      const pill = document.getElementById('merirmaid-chat');
+      const tog = document.getElementById('merirmaid-chat-toggle');
+      pill.classList.toggle('collapsed');
+      tog.textContent = pill.classList.contains('collapsed') ? '▴' : '▾';
+    }
+    window.toggleMerirmaidChat = toggleMerirmaidChat;
+
+    function refreshMerirmaidChatTail() {
+      const tail = document.getElementById('merirmaid-chat-tail');
+      if (!tail) return;
+      if (!document.getElementById('merirmaid-mode').classList.contains('open')) return;
+      const conv = document.getElementById('conversation');
+      if (!conv) return;
+      const msgs = Array.from(conv.querySelectorAll('.msg'));
+      tail.innerHTML = msgs.slice(-REVIEW_CHAT_TAIL_N).map((m) => m.outerHTML).join('');
+      tail.scrollTop = tail.scrollHeight;
+    }
+    window.refreshMerirmaidChatTail = refreshMerirmaidChatTail;
+
+    function sendFromMerirmaidChat() {
+      const input = document.getElementById('merirmaid-chat-input');
+      const text = (input.value || '').trim();
+      if (!text) return;
+      const main = document.getElementById('message');
+      const form = document.getElementById('chat-form');
+      if (!main || !form) return;
+      const where = `"${MM_TITLE || '?'}" (${MM_PATH || '?'})`;
+      main.value = `[merirmaid diagram: ${where}]\n\n${text}`;
+      htmx.trigger(form, 'submit');
+      input.value = '';
+    }
+    window.sendFromMerirmaidChat = sendFromMerirmaidChat;
+
+    // ================================================================
+    // Cacheawl mode (wave 2d) — full-frame two-pane file manager for the
+    // global cachebox store. Data comes from GET /api/cacheawl/tree in one
+    // call (project tree + every cachebox tree). Mutations go through
+    // POST /api/cacheawl/transfer (copy/move) and /api/cacheawl/create
+    // (new cachebox); ingest is composed into the MAIN chat, not called
+    // directly. See docs/cacheawl-plan.md for the contract.
+    // ================================================================
+    let CA_DATA = null;          // { root, project:[nodes], cacheboxes:[{...,tree}] }
+    let CA_PROJECT_SUB = [];     // folder names descended into the project pane
+    let CA_STORE_BOX = null;     // current cachebox name, or null at the box list
+    let CA_STORE_SUB = [];       // folder names descended inside the current box
+    let CA_SELECTED = null;      // { pane, key } — single selection across both panes
+    let CA_DRAG = null;          // { pane, box, path, name, is_dir } while dragging
+
+    async function enterCacheawlMode() {
+      // Supplant any read/edit view or an open girraph/merirmaid mode.
+      if (typeof RE_SIZE !== 'undefined' && RE_SIZE) _teardownReadEdit();
+      const g = document.getElementById('girraph-mode');
+      if (g && g.classList.contains('open')) exitGirraphMode();
+      const m = document.getElementById('merirmaid-mode');
+      if (m && m.classList.contains('open')) exitMerirmaidMode();
+      CA_PROJECT_SUB = []; CA_STORE_BOX = null; CA_STORE_SUB = []; CA_SELECTED = null;
+      const root = document.getElementById('cacheawl-mode');
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      // Reflect the current project name in the project-pane header.
+      const pn = document.getElementById('project-name');
+      const nameEl = document.getElementById('ca-project-name');
+      if (pn && nameEl) nameEl.textContent = (pn.textContent || 'project').trim() || 'project';
+      setActiveMode('cacheawl', {
+        icon: 'cacheawl',
+        onIconClick: null,
+        onExit: exitCacheawlMode,
+        iconTitle: 'cacheawl',
+        exitTitle: 'exit cacheawl',
+      });
+      document.getElementById('tree')?.classList.add('review-disabled');
+      caIngestTypeChanged();
+      refreshCacheawlChatTail();
+      await caLoadTree();
+    }
+    window.enterCacheawlMode = enterCacheawlMode;
+
+    function exitCacheawlMode() {
+      caHideContextMenu();
+      closeCaPrompt();
+      const root = document.getElementById('cacheawl-mode');
+      root.classList.remove('open');
+      root.setAttribute('aria-hidden', 'true');
+      clearActiveMode();
+      document.getElementById('tree')?.classList.remove('review-disabled');
+      CA_DATA = null; CA_SELECTED = null; CA_DRAG = null;
+    }
+    window.exitCacheawlMode = exitCacheawlMode;
+
+    function caIsOpen() {
+      return document.getElementById('cacheawl-mode').classList.contains('open');
+    }
+
+    async function caLoadTree() {
+      try {
+        const r = await fetch('/api/cacheawl/tree');
+        if (!r.ok) {
+          let detail = r.statusText;
+          try { detail = (await r.json()).detail || detail; } catch (_e) { /* keep */ }
+          throw new Error(detail);
+        }
+        CA_DATA = await r.json();
+      } catch (e) {
+        CA_DATA = { root: '', project: [], cacheboxes: [] };
+        const g = document.getElementById('ca-store-grid');
+        if (g) g.innerHTML = '<div class="ca-empty">could not load cacheawl: ' +
+          (e.message || String(e)) + '</div>';
+      }
+      // If the box we were viewing vanished (deleted/renamed), reset to list.
+      if (CA_STORE_BOX && !(CA_DATA.cacheboxes || []).some((b) => b.name === CA_STORE_BOX)) {
+        CA_STORE_BOX = null; CA_STORE_SUB = [];
+      }
+      caRenderProject();
+      caRenderStore();
+    }
+
+    // Resolve the node list at a descent path within a nested tree.
+    function caNodesAt(rootNodes, parts) {
+      let nodes = rootNodes || [];
+      for (const part of parts) {
+        const found = nodes.find((n) => n.is_dir && n.name === part);
+        if (!found) return [];
+        nodes = found.children || [];
+      }
+      return nodes || [];
+    }
+
+    // Stable ordering: directories first, then alphabetical (mirrors the
+    // backend's documented folders-before-files ordering).
+    function caSortNodes(nodes) {
+      return nodes.slice().sort((a, b) => {
+        if (!!a.is_dir !== !!b.is_dir) return a.is_dir ? -1 : 1;
+        return a.name.localeCompare(b.name);
+      });
+    }
+
+    function caCurrentBox() {
+      if (!CA_STORE_BOX || !CA_DATA) return null;
+      return (CA_DATA.cacheboxes || []).find((b) => b.name === CA_STORE_BOX) || null;
+    }
+
+    // ----- badge classification for file tiles -----
+    function caFileBadge(name, isMirror) {
+      const low = (name || '').toLowerCase();
+      if (isMirror || low.endsWith('.merirmaid')) return { kind: 'icon', icon: 'merirmaidmode' };
+      if (low.endsWith('.girraph')) return { kind: 'icon', icon: 'girraphmode' };
+      const dot = name.lastIndexOf('.');
+      let ext = (dot > 0 && dot < name.length - 1) ? name.slice(dot + 1) : '';
+      ext = ext.toLowerCase();
+      if (!ext) return null;                       // no extension → no chip
+      if (ext.length > 4) ext = ext.slice(0, 4);
+      return { kind: 'ext', ext };
+    }
+
+    // Build one tile element. `descriptor` carries everything the click /
+    // drag handlers need: pane, box (cachebox pane), path (relative), name,
+    // is_dir, is_box (a root cachebox pseudo-node), is_mirror.
+    function caTile(d) {
+      const tile = document.createElement('div');
+      tile.className = 'ca-tile';
+      tile.setAttribute('draggable', 'true');
+      tile.dataset.pane = d.pane;
+      tile.dataset.key = d.key;
+      const iconWrap = document.createElement('div');
+      iconWrap.className = 'ca-tile-icon';
+      const img = document.createElement('img');
+      img.className = 'svg-icon';
+      img.draggable = false;
+      img.alt = '';
+      let iconName;
+      if (d.is_box) iconName = 'cachebox';
+      else if (d.is_dir) iconName = 'folder';
+      else iconName = 'file';
+      setIcon(img, iconName);
+      iconWrap.appendChild(img);
+      if (!d.is_dir && !d.is_box) {
+        const badge = caFileBadge(d.name, d.is_mirror);
+        if (badge && badge.kind === 'icon') {
+          const b = document.createElement('span');
+          b.className = 'ca-badge';
+          const bi = document.createElement('img');
+          bi.className = 'svg-icon'; bi.draggable = false; bi.alt = '';
+          setIcon(bi, badge.icon);
+          b.appendChild(bi);
+          iconWrap.appendChild(b);
+        } else if (badge && badge.kind === 'ext') {
+          const b = document.createElement('span');
+          b.className = 'ca-badge ca-badge-ext';
+          b.textContent = badge.ext;
+          iconWrap.appendChild(b);
+        }
+      }
+      tile.appendChild(iconWrap);
+      const nm = document.createElement('div');
+      nm.className = 'ca-tile-name';
+      nm.textContent = d.name;
+      nm.title = d.name;
+      tile.appendChild(nm);
+      if (CA_SELECTED && CA_SELECTED.pane === d.pane && CA_SELECTED.key === d.key) {
+        tile.classList.add('selected');
+      }
+      caWireTile(tile, d);
+      return tile;
+    }
+
+    // ----- crumb rendering (per pane) -----
+    function caRenderProjectCrumbs() {
+      const nav = document.getElementById('ca-project-crumbs');
+      nav.innerHTML = '';
+      const rootName = (document.getElementById('ca-project-name').textContent || 'project');
+      const mk = (label, parts, isCurrent) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'crumb' + (isCurrent ? ' current' : '');
+        b.textContent = label;
+        if (!isCurrent) {
+          b.onclick = () => { CA_PROJECT_SUB = parts.slice(); caRenderProject(); };
+        }
+        // drop target = the folder this crumb represents
+        caWireCrumbDrop(b, { root: 'project', path: parts.join('/') });
+        return b;
+      };
+      nav.appendChild(mk(rootName, [], CA_PROJECT_SUB.length === 0));
+      CA_PROJECT_SUB.forEach((part, i) => {
+        const sep = document.createElement('span'); sep.className = 'sep'; sep.textContent = '›';
+        nav.appendChild(sep);
+        nav.appendChild(mk(part, CA_PROJECT_SUB.slice(0, i + 1), i === CA_PROJECT_SUB.length - 1));
+      });
+    }
+
+    function caRenderStoreCrumbs() {
+      const nav = document.getElementById('ca-store-crumbs');
+      nav.innerHTML = '';
+      // root "cacheawl" crumb → back to the cachebox list (not a drop target).
+      const rootBtn = document.createElement('button');
+      rootBtn.type = 'button';
+      rootBtn.className = 'crumb' + (CA_STORE_BOX === null ? ' current' : '');
+      rootBtn.textContent = 'cacheawl';
+      if (CA_STORE_BOX !== null) {
+        rootBtn.onclick = () => { CA_STORE_BOX = null; CA_STORE_SUB = []; caRenderStore(); };
+      }
+      nav.appendChild(rootBtn);
+      if (CA_STORE_BOX !== null) {
+        const sep = document.createElement('span'); sep.className = 'sep'; sep.textContent = '›';
+        nav.appendChild(sep);
+        const boxBtn = document.createElement('button');
+        boxBtn.type = 'button';
+        boxBtn.className = 'crumb' + (CA_STORE_SUB.length === 0 ? ' current' : '');
+        boxBtn.textContent = CA_STORE_BOX;
+        if (CA_STORE_SUB.length) {
+          boxBtn.onclick = () => { CA_STORE_SUB = []; caRenderStore(); };
+        }
+        caWireCrumbDrop(boxBtn, { root: 'cachebox', box: CA_STORE_BOX, path: '' });
+        nav.appendChild(boxBtn);
+        CA_STORE_SUB.forEach((part, i) => {
+          const s = document.createElement('span'); s.className = 'sep'; s.textContent = '›';
+          nav.appendChild(s);
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'crumb' + (i === CA_STORE_SUB.length - 1 ? ' current' : '');
+          b.textContent = part;
+          const parts = CA_STORE_SUB.slice(0, i + 1);
+          if (i < CA_STORE_SUB.length - 1) {
+            b.onclick = () => { CA_STORE_SUB = parts; caRenderStore(); };
+          }
+          caWireCrumbDrop(b, { root: 'cachebox', box: CA_STORE_BOX, path: parts.join('/') });
+          nav.appendChild(b);
+        });
+      }
+    }
+
+    // ----- pane rendering -----
+    function caRenderProject() {
+      caRenderProjectCrumbs();
+      const grid = document.getElementById('ca-project-grid');
+      grid.innerHTML = '';
+      const nodes = caSortNodes(caNodesAt(CA_DATA ? CA_DATA.project : [], CA_PROJECT_SUB));
+      if (!nodes.length) {
+        grid.innerHTML = '<div class="ca-empty">empty folder</div>';
+      }
+      nodes.forEach((n) => {
+        grid.appendChild(caTile({
+          pane: 'project', key: n.path, name: n.name, path: n.path,
+          is_dir: !!n.is_dir, is_box: false, is_mirror: false,
+        }));
+      });
+    }
+
+    function caRenderStore() {
+      caRenderStoreCrumbs();
+      const grid = document.getElementById('ca-store-grid');
+      grid.innerHTML = '';
+      if (CA_STORE_BOX === null) {
+        const boxes = (CA_DATA ? CA_DATA.cacheboxes : []) || [];
+        if (!boxes.length) {
+          grid.innerHTML = '<div class="ca-empty">no cacheboxes yet — shift-click here to make one, or use the ingest bar below</div>';
+        }
+        boxes.slice().sort((a, b) => a.name.localeCompare(b.name)).forEach((box) => {
+          grid.appendChild(caTile({
+            pane: 'cachebox', key: 'box:' + box.name, name: box.name, path: '',
+            box: box.name, is_dir: true, is_box: true, is_mirror: false,
+          }));
+        });
+      } else {
+        const box = caCurrentBox();
+        const nodes = caSortNodes(caNodesAt(box ? box.tree : [], CA_STORE_SUB));
+        if (!nodes.length) {
+          grid.innerHTML = '<div class="ca-empty">empty</div>';
+        }
+        nodes.forEach((n) => {
+          grid.appendChild(caTile({
+            pane: 'cachebox', key: CA_STORE_BOX + '::' + n.path, name: n.name, path: n.path,
+            box: CA_STORE_BOX, is_dir: !!n.is_dir, is_box: false, is_mirror: !!n.is_mirror,
+          }));
+        });
+      }
+    }
+
+    // ----- selection -----
+    function caSelect(pane, key) {
+      CA_SELECTED = { pane, key };
+      document.querySelectorAll('#cacheawl-mode .ca-tile.selected')
+        .forEach((t) => t.classList.remove('selected'));
+      const t = document.querySelector('#cacheawl-mode .ca-tile[data-pane="' +
+        pane + '"][data-key="' + (window.CSS && CSS.escape ? CSS.escape(key) : key) + '"]');
+      if (t) t.classList.add('selected');
+    }
+
+    // ----- open / drill / launch (double click) -----
+    function caOpenTile(d) {
+      if (d.is_box) { CA_STORE_BOX = d.name; CA_STORE_SUB = []; caRenderStore(); return; }
+      if (d.is_dir) {
+        if (d.pane === 'project') { CA_PROJECT_SUB = CA_PROJECT_SUB.concat([d.name]); caRenderProject(); }
+        else { CA_STORE_SUB = CA_STORE_SUB.concat([d.name]); caRenderStore(); }
+        return;
+      }
+      caLaunchFile(d);
+    }
+
+    // File launch. Project-pane files carry project-relative paths; cachebox
+    // files are addressed with the `cacheawl:<box>/<rel>` virtual prefix that
+    // _resolve_project_path on the server maps into the global store — so
+    // both panes launch into the same real modes (girraph / merirmaid /
+    // read-edit), mirroring the tree router.
+    function caLaunchFile(d) {
+      const low = (d.name || '').toLowerCase();
+      const path = d.pane === 'project'
+        ? d.path
+        : 'cacheawl:' + d.box + (d.path ? '/' + d.path : '');
+      exitCacheawlMode();
+      if (low.endsWith('.girraph')) enterGirraphMode(path);
+      else if (low.endsWith('.merirmaid')) enterMerirmaidMode(path);
+      else openReadEdit(path, { size: 'full', face: 'read' });
+    }
+
+    // ----- tile wiring: click / dblclick / shift-menu / drag-drop -----
+    function caWireTile(tile, d) {
+      tile.addEventListener('click', (e) => {
+        if (e.shiftKey) {
+          e.preventDefault();
+          e.stopPropagation();   // don't let the doc close-handler eat this click
+          caShowContextMenu(e.clientX, e.clientY, d);
+          return;
+        }
+        caSelect(d.pane, d.key);
+      });
+      tile.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        caHideContextMenu();
+        caOpenTile(d);
+      });
+      // ----- drag source -----
+      tile.addEventListener('dragstart', (e) => {
+        CA_DRAG = { pane: d.pane, box: d.box || null, path: d.path, name: d.name, is_dir: d.is_dir || d.is_box };
+        tile.classList.add('ca-dragging');
+        try { e.dataTransfer.setData('text/plain', d.name); e.dataTransfer.effectAllowed = 'copyMove'; } catch (_e) { /* noop */ }
+      });
+      tile.addEventListener('dragend', () => {
+        tile.classList.remove('ca-dragging');
+        CA_DRAG = null;
+        document.querySelectorAll('#cacheawl-mode .ca-drop').forEach((el) => el.classList.remove('ca-drop'));
+      });
+      // ----- drop target (only folders / cacheboxes accept drops) -----
+      if (d.is_dir || d.is_box) {
+        const dst = d.is_box
+          ? { root: 'cachebox', box: d.name, path: '' }
+          : (d.pane === 'project'
+            ? { root: 'project', path: d.path }
+            : { root: 'cachebox', box: CA_STORE_BOX, path: d.path });
+        tile.addEventListener('dragover', (e) => {
+          if (!CA_DRAG) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = e.shiftKey ? 'move' : 'copy';
+          tile.classList.add('ca-drop');
+        });
+        tile.addEventListener('dragleave', () => tile.classList.remove('ca-drop'));
+        tile.addEventListener('drop', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          tile.classList.remove('ca-drop');
+          caHandleDrop(dst, e.shiftKey);
+        });
+      }
+    }
+
+    // Wire a crumb button as a drop target for `dst` ({root,box?,path}).
+    function caWireCrumbDrop(btn, dst) {
+      btn.addEventListener('dragover', (e) => {
+        if (!CA_DRAG) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = e.shiftKey ? 'move' : 'copy';
+        btn.classList.add('ca-drop');
+      });
+      btn.addEventListener('dragleave', () => btn.classList.remove('ca-drop'));
+      btn.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        btn.classList.remove('ca-drop');
+        caHandleDrop(dst, e.shiftKey);
+      });
+    }
+
+    // Pane-background drop targets (drop into the folder the pane shows).
+    (function wireCacheawlPaneDrops() {
+      const wire = (grid, dstFn) => {
+        grid.addEventListener('dragover', (e) => {
+          if (!CA_DRAG) return;
+          const dst = dstFn();
+          if (!dst) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = e.shiftKey ? 'move' : 'copy';
+          grid.classList.add('ca-drop');
+        });
+        grid.addEventListener('dragleave', (e) => {
+          if (e.target === grid) grid.classList.remove('ca-drop');
+        });
+        grid.addEventListener('drop', (e) => {
+          grid.classList.remove('ca-drop');
+          const dst = dstFn();
+          if (!dst) return;
+          e.preventDefault();
+          caHandleDrop(dst, e.shiftKey);
+        });
+      };
+      wire(document.getElementById('ca-project-grid'),
+        () => ({ root: 'project', path: CA_PROJECT_SUB.join('/') }));
+      wire(document.getElementById('ca-store-grid'),
+        () => (CA_STORE_BOX ? { root: 'cachebox', box: CA_STORE_BOX, path: CA_STORE_SUB.join('/') } : null));
+    })();
+
+    function caDragSrc() {
+      if (!CA_DRAG) return null;
+      if (CA_DRAG.pane === 'project') return { root: 'project', path: CA_DRAG.path };
+      return { root: 'cachebox', box: CA_DRAG.box, path: CA_DRAG.path };
+    }
+
+    async function caHandleDrop(dst, moveMode) {
+      const src = caDragSrc();
+      if (!src) return;
+      // No-op guard: dropping onto the exact same location.
+      if (src.root === dst.root && (src.box || null) === (dst.box || null)) {
+        const srcParent = src.path.split('/').slice(0, -1).join('/');
+        if (srcParent === (dst.path || '') || src.path === (dst.path || '')) return;
+      }
+      await caTransfer(src, dst, moveMode ? 'move' : 'copy', false);
+    }
+
+    async function caTransfer(src, dst, op, overwrite) {
+      try {
+        const r = await fetch('/api/cacheawl/transfer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ op, src, dst, overwrite }),
+        });
+        if (!r.ok) {
+          let detail = r.statusText;
+          try { detail = (await r.json()).detail || detail; } catch (_e) { /* keep */ }
+          // Conflict → confirm overwrite and retry.
+          if (!overwrite && /already exists/i.test(detail)) {
+            const ok = await confirmOverlay({
+              title: 'Overwrite?',
+              message: detail + '  Replace it?',
+              confirmLabel: 'overwrite', cancelLabel: 'cancel',
+            });
+            if (ok) return caTransfer(src, dst, op, true);
+            return;
+          }
+          alert('transfer failed: ' + detail);
+          return;
+        }
+        await caLoadTree();   // endpoint reconciles mirrors server-side
+      } catch (e) {
+        alert('transfer failed: ' + (e.message || String(e)));
+      }
+    }
+
+    // ----- context menu (shift-click on a tile; shift-click on the store
+    // background offers "new cachebox") -----
+    let CA_CTX = null;
+    function caHideContextMenu() {
+      const menu = document.getElementById('ca-context-menu');
+      if (!menu) return;
+      menu.classList.add('hidden');
+      menu.setAttribute('aria-hidden', 'true');
+      menu.innerHTML = '';
+      CA_CTX = null;
+    }
+    window.caHideContextMenu = caHideContextMenu;
+
+    function caClipboardPath(d) {
+      if (d.background) return '';
+      if (d.pane === 'project') return treePathForClipboard(d.path);
+      const root = (CA_DATA && CA_DATA.root) || '~/enough/cacheawl';
+      return root + '/' + d.box + (d.path ? '/' + d.path : '');
+    }
+
+    function caShowContextMenu(x, y, d) {
+      const menu = document.getElementById('ca-context-menu');
+      if (!menu) return;
+      CA_CTX = d;
+      const items = [];
+      if (d.background) {
+        items.push('<div class="ctx-target">cacheawl store</div>');
+        items.push('<button type="button" class="ctx-item" data-act="new-cachebox">new cachebox</button>');
+      } else {
+        const glyph = (d.is_box ? '📦' : (d.is_dir ? '📁' : '📄'));
+        items.push('<div class="ctx-target" title="' + (d.name || '') + '">' + glyph + ' ' + (d.name || '') + '</div>');
+        // "new folder" applies where a create endpoint exists: project dirs
+        // (POST /api/file/new-folder) and cachebox roots (a new cachebox).
+        if (d.pane === 'project' && d.is_dir) {
+          items.push('<button type="button" class="ctx-item" data-act="new-folder">new subfolder</button>');
+          items.push('<div class="ctx-sep"></div>');
+        } else if (d.is_box) {
+          items.push('<button type="button" class="ctx-item" data-act="new-cachebox">new cachebox</button>');
+          items.push('<div class="ctx-sep"></div>');
+        }
+        items.push('<button type="button" class="ctx-item" data-act="copy-path">copy path</button>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-name">copy name</button>');
+      }
+      menu.innerHTML = items.join('');
+      menu.classList.remove('hidden');
+      menu.setAttribute('aria-hidden', 'false');
+      menu.style.left = x + 'px';
+      menu.style.top = y + 'px';
+      requestAnimationFrame(() => {
+        const rect = menu.getBoundingClientRect();
+        const vw = window.innerWidth, vh = window.innerHeight;
+        if (rect.right > vw - 6) menu.style.left = Math.max(6, vw - rect.width - 6) + 'px';
+        if (rect.bottom > vh - 6) menu.style.top = Math.max(6, vh - rect.height - 6) + 'px';
+      });
+    }
+
+    document.getElementById('ca-context-menu')?.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.ctx-item');
+      if (!btn || !CA_CTX) return;
+      const d = CA_CTX;
+      const act = btn.dataset.act;
+      caHideContextMenu();
+      if (act === 'copy-path') { copyToClipboard(caClipboardPath(d)); return; }
+      if (act === 'copy-name') { copyToClipboard(d.name || ''); return; }
+      if (act === 'new-cachebox') {
+        const name = await openCaPrompt('New cachebox', 'a root folder in the cacheawl store', 'cachebox-name');
+        if (name == null) return;
+        try {
+          const r = await fetch('/api/cacheawl/create', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name }),
+          });
+          if (!r.ok) { let m = r.statusText; try { m = (await r.json()).detail || m; } catch (_e) {} alert('could not create cachebox: ' + m); return; }
+          await caLoadTree();
+        } catch (err) { alert('could not create cachebox: ' + (err.message || String(err))); }
+        return;
+      }
+      if (act === 'new-folder') {
+        // project-pane directory only (backend endpoint is project-scoped)
+        const parent = d.path;
+        const name = await openCaPrompt('New subfolder', 'inside ' + (d.name || '') + '/', 'subfolder-name');
+        if (name == null) return;
+        try {
+          const r = await fetch('/api/file/new-folder', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ parent, name }),
+          });
+          if (!r.ok) { let m = r.statusText; try { m = (await r.json()).detail || m; } catch (_e) {} alert('could not create folder: ' + m); return; }
+          await caLoadTree();
+        } catch (err) { alert('could not create folder: ' + (err.message || String(err))); }
+        return;
+      }
+    });
+
+    // Shift-click on the store-grid background → "new cachebox" menu.
+    document.getElementById('ca-store-grid')?.addEventListener('click', (e) => {
+      if (!e.shiftKey) return;
+      if (e.target.closest('.ca-tile')) return;   // tile handled its own menu
+      e.preventDefault();
+      e.stopPropagation();   // don't let the doc close-handler eat this click
+      caShowContextMenu(e.clientX, e.clientY, { background: true });
+    });
+
+    // Close the menu on any outside click / escape.
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('ca-context-menu');
+      if (!menu || menu.classList.contains('hidden')) return;
+      if (!menu.contains(e.target)) caHideContextMenu();
+    });
+
+    // ----- name prompt overlay (new folder / new cachebox) -----
+    let _caPromptResolve = null;
+    function openCaPrompt(title, sub, placeholder) {
+      return new Promise((resolve) => {
+        _caPromptResolve = resolve;
+        document.getElementById('ca-prompt-title').textContent = title;
+        document.getElementById('ca-prompt-sub').textContent = sub || '';
+        document.getElementById('ca-prompt-err').textContent = '';
+        const inp = document.getElementById('ca-prompt-input');
+        inp.value = ''; inp.placeholder = placeholder || 'name';
+        const ov = document.getElementById('ca-prompt');
+        ov.classList.add('open');
+        ov.setAttribute('aria-hidden', 'false');
+        setTimeout(() => inp.focus(), 0);
+      });
+    }
+    function closeCaPrompt() {
+      const ov = document.getElementById('ca-prompt');
+      if (!ov) return;
+      ov.classList.remove('open');
+      ov.setAttribute('aria-hidden', 'true');
+      if (_caPromptResolve) { const r = _caPromptResolve; _caPromptResolve = null; r(null); }
+    }
+    window.closeCaPrompt = closeCaPrompt;
+    function submitCaPrompt() {
+      const inp = document.getElementById('ca-prompt-input');
+      const name = (inp.value || '').trim();
+      const err = document.getElementById('ca-prompt-err');
+      if (!name) { err.textContent = 'name is required'; inp.focus(); return; }
+      if (name.includes('/') || name.includes('\\')) { err.textContent = 'no path separators'; return; }
+      const ov = document.getElementById('ca-prompt');
+      ov.classList.remove('open');
+      ov.setAttribute('aria-hidden', 'true');
+      if (_caPromptResolve) { const r = _caPromptResolve; _caPromptResolve = null; r(name); }
+    }
+    window.submitCaPrompt = submitCaPrompt;
+    document.getElementById('ca-prompt-input')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); submitCaPrompt(); }
+      else if (e.key === 'Escape') { e.preventDefault(); closeCaPrompt(); }
+    });
+
+    // ----- ingest bar -----
+    // "all" is meaningless for wikisink (per the contract: 400 on the API),
+    // so disable + ignore the checkbox when type=wikisink.
+    function caIngestTypeChanged() {
+      const type = document.getElementById('ca-ingest-type').value;
+      const label = document.getElementById('ca-ingest-all-label');
+      const cb = document.getElementById('ca-ingest-all');
+      const isWiki = (type === 'wikisink');
+      cb.disabled = isWiki;
+      if (isWiki) cb.checked = false;
+      label.classList.toggle('disabled', isWiki);
+    }
+    window.caIngestTypeChanged = caIngestTypeChanged;
+
+    // Submitting does NOT call the ingest endpoint — it composes a structured
+    // vetting request into the MAIN chat (the agent checks viability/licensing
+    // and runs the cachebox_ingest tool itself). Same submit path as the pill.
+    function submitCacheawlIngest() {
+      const type = document.getElementById('ca-ingest-type').value;
+      const value = (document.getElementById('ca-ingest-value').value || '').trim();
+      if (!value) { document.getElementById('ca-ingest-value').focus(); return; }
+      const depth = document.getElementById('ca-ingest-depth').value;
+      const allOn = (type !== 'wikisink') && document.getElementById('ca-ingest-all').checked;
+      const msg = 'cacheawl ingest request — type: ' + type + ', value: ' + value +
+        ', depth: ' + depth + ', all: ' + (allOn ? 'yes' : 'no') +
+        '. Please check this request is viable and unrestricted (licensing/robots), ' +
+        'confirm anything doubtful with me, then run the ingest.';
+      const main = document.getElementById('message');
+      const form = document.getElementById('chat-form');
+      if (!main || !form) return;
+      main.value = msg;
+      htmx.trigger(form, 'submit');
+      document.getElementById('ca-ingest-value').value = '';
+      // Surface the conversation so the user sees the request land.
+      const pill = document.getElementById('cacheawl-chat');
+      if (pill && pill.classList.contains('collapsed')) toggleCacheawlChat();
+      refreshCacheawlChatTail();
+    }
+    window.submitCacheawlIngest = submitCacheawlIngest;
+
+    // ----- chat pill (mirrors the merirmaid/review pill) -----
+    function toggleCacheawlChat() {
+      const pill = document.getElementById('cacheawl-chat');
+      const tog = document.getElementById('cacheawl-chat-toggle');
+      pill.classList.toggle('collapsed');
+      tog.textContent = pill.classList.contains('collapsed') ? '▴' : '▾';
+    }
+    window.toggleCacheawlChat = toggleCacheawlChat;
+
+    function refreshCacheawlChatTail() {
+      const tail = document.getElementById('cacheawl-chat-tail');
+      if (!tail) return;
+      if (!caIsOpen()) return;
+      const conv = document.getElementById('conversation');
+      if (!conv) return;
+      const msgs = Array.from(conv.querySelectorAll('.msg'));
+      tail.innerHTML = msgs.slice(-REVIEW_CHAT_TAIL_N).map((m) => m.outerHTML).join('');
+      tail.scrollTop = tail.scrollHeight;
+    }
+    window.refreshCacheawlChatTail = refreshCacheawlChatTail;
+
+    function sendFromCacheawlChat() {
+      const input = document.getElementById('cacheawl-chat-input');
+      const text = (input.value || '').trim();
+      if (!text) return;
+      const main = document.getElementById('message');
+      const form = document.getElementById('chat-form');
+      if (!main || !form) return;
+      main.value = '[cacheawl store]\n\n' + text;
+      htmx.trigger(form, 'submit');
+      input.value = '';
+    }
+    window.sendFromCacheawlChat = sendFromCacheawlChat;
+
+    // Topbar launcher.
+    document.getElementById('cacheawl-btn')?.addEventListener('click', enterCacheawlMode);
 
     // ---------- Review-mode chat pill ----------
     function toggleReviewChat() {
@@ -9945,7 +13155,8 @@
     // they were reading. No text is selected in the textarea in that
     // case — just the scroll.
     async function applyEditModeJump() {
-      const path = REVIEW_PATH;
+      const path = REVIEW_PATH || RE_PATH;
+      if (!path) return;
       const sel = getReviewSelection();
       let focusText = null;
       if (sel) {
@@ -9964,39 +13175,9 @@
             .slice(0, 80) || null;
         }
       }
-      PENDING_EDIT_FOCUS = focusText ? { path, text: focusText } : null;
-      exitReviewMode();
-      if (!path) return;
-      // Reopen the preview pane on this path, then enter edit mode.
-      // The HTMX preview fetch is async; chain via fetch + manual
-      // fragment swap so we can call enterEditMode reliably after.
-      const previewBody = document.getElementById('preview-body');
-      try {
-        const r = await fetch('/api/file?path=' + encodeURIComponent(path));
-        if (!r.ok) throw new Error(r.statusText);
-        previewBody.innerHTML = await r.text();
-        document.getElementById('preview').classList.add('open');
-        await enterEditMode();
-        // After enterEditMode, the textarea exists; apply pending focus.
-        if (PENDING_EDIT_FOCUS) {
-          const ta = document.querySelector('#preview-body textarea.file-edit');
-          if (ta) {
-            const idx = ta.value.indexOf(PENDING_EDIT_FOCUS.text);
-            if (idx >= 0) {
-              ta.focus();
-              ta.setSelectionRange(idx, idx + PENDING_EDIT_FOCUS.text.length);
-              // Scroll the textarea so the selection is visible.
-              const before = ta.value.slice(0, idx);
-              const linesBefore = before.split('\n').length;
-              const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 18;
-              ta.scrollTop = Math.max(0, (linesBefore - 4) * lineHeight);
-            }
-          }
-          PENDING_EDIT_FOCUS = null;
-        }
-      } catch (e) {
-        alert('could not open editor: ' + e.message);
-      }
+      // Switch the read/edit mode to the full EDIT face on the same
+      // document, landing the caret at the focus snippet.
+      await openReadEdit(path, { size: 'full', face: 'edit', focusText: focusText || undefined });
     }
 
     // Update the toolbar's per-button disabled states. Phase 5a made
@@ -10197,14 +13378,20 @@
       if (reviewOpen && typeof REVIEW_SOURCE === 'string' && REVIEW_PATH) {
         source = REVIEW_SOURCE;
       } else if (editOpen) {
-        // Edit-mode owns its own textarea outside #preview-body.
+        // Full edit face owns its own textarea outside #preview-body.
         const ta = document.getElementById('edit-textarea');
         if (ta) source = ta.value;
       } else if (previewOpen) {
-        const ta = document.querySelector('#preview-body textarea.file-edit');
-        if (ta) {
-          source = ta.value;
+        // Mini read/edit panel. Edit face → the live textarea; read face
+        // → the on-disk source baseline (RE_PRISTINE).
+        const miniTa = document.getElementById('mini-edit-textarea');
+        if (miniTa) {
+          source = miniTa.value;
+        } else if (typeof RE_SIZE !== 'undefined' && RE_SIZE === 'mini'
+          && RE_FACE === 'read' && typeof RE_PRISTINE === 'string') {
+          source = RE_PRISTINE;
         } else {
+          // Legacy server-rendered fragment (e.g. after customize).
           const fileBody = document.querySelector('#preview-body .file-body');
           if (fileBody) source = fileBody.textContent;
         }
@@ -10474,8 +13661,12 @@
     // full-frame edit-mode `#edit-textarea`.
     document.addEventListener('input', (e) => {
       if (!e.target || !e.target.matches) return;
-      if (e.target.matches('textarea.file-edit') ||
-        e.target.matches('#edit-textarea')) {
+      if (e.target.matches('#edit-textarea') || e.target.matches('#mini-edit-textarea')) {
+        // Keep the preserved edit buffer (survives size switches) and the
+        // dirty state in sync with live typing.
+        if (typeof RE_FACE !== 'undefined' && RE_FACE === 'edit') {
+          RE_EDIT_BUFFER = e.target.value;
+        }
         updateDocCounters();
       }
     });
@@ -10498,21 +13689,9 @@
       const key = e.key;
       const tag = (e.target && e.target.tagName) || '';
 
-      // esc — exit review or edit mode if either is active.
-      if (key === 'Escape') {
-        const editOpen = document.getElementById('edit-mode')?.classList.contains('open');
-        if (editOpen) {
-          e.preventDefault();
-          exitEditMode();
-          return;
-        }
-        const reviewOpen = document.getElementById('review-mode')?.classList.contains('open');
-        if (reviewOpen) {
-          e.preventDefault();
-          exitReviewMode();
-          return;
-        }
-      }
+      // esc is handled by the unified active-mode handler (see
+      // setActiveMode section) — it exits whatever mode is active,
+      // guarded against composer/modal focus and the confirm overlay.
 
       if (!mod) return;
 
@@ -10568,10 +13747,9 @@
         return;
       }
 
-      // cmd+s — save the current edit-mode textarea.
+      // cmd+s — save the current edit face (mini or full).
       if (key === 's' || key === 'S') {
-        const editOpen = document.getElementById('edit-mode')?.classList.contains('open');
-        if (editOpen) {
+        if (typeof RE_FACE !== 'undefined' && RE_FACE === 'edit' && reIsActive()) {
           e.preventDefault();
           saveEdit();
         }
@@ -11220,43 +14398,18 @@
       });
     });
 
-    // "edit text in editor": exit review and open preview-edit at the
-    // highlight's snippet — same flow as the toolbar's edit-mode
-    // jump, but the focus text comes from the highlight rather than
-    // the live selection.
+    // "edit text in editor": switch the read/edit mode to the full EDIT
+    // face on the same document, landing the caret at the highlight's
+    // snippet. Same as the toolbar edit jump, but the focus text comes
+    // from the highlight rather than the live selection.
     document.querySelector('#review-hl-popup .edit-btn')
       .addEventListener('click', async () => {
-        if (!POPUP_HL_ID || !REVIEW_PATH) return;
+        const path = REVIEW_PATH || RE_PATH;
+        if (!POPUP_HL_ID || !path) return;
         const h = REVIEW_HIGHLIGHTS.find(x => x.id === POPUP_HL_ID);
         if (!h) return;
-        PENDING_EDIT_FOCUS = { path: REVIEW_PATH, text: h.snippet };
         closeHighlightPopup();
-        const path = REVIEW_PATH;
-        exitReviewMode();
-        // Reuse the same fetch-and-enter-edit chain that
-        // applyEditModeJump uses.
-        try {
-          const r = await fetch('/api/file?path=' + encodeURIComponent(path));
-          if (!r.ok) throw new Error(r.statusText);
-          document.getElementById('preview-body').innerHTML = await r.text();
-          document.getElementById('preview').classList.add('open');
-          await enterEditMode();
-          const ta = document.querySelector('#preview-body textarea.file-edit');
-          if (ta && PENDING_EDIT_FOCUS) {
-            const idx = ta.value.indexOf(PENDING_EDIT_FOCUS.text);
-            if (idx >= 0) {
-              ta.focus();
-              ta.setSelectionRange(idx, idx + PENDING_EDIT_FOCUS.text.length);
-              const before = ta.value.slice(0, idx);
-              const linesBefore = before.split('\n').length;
-              const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 18;
-              ta.scrollTop = Math.max(0, (linesBefore - 4) * lineHeight);
-            }
-          }
-          PENDING_EDIT_FOCUS = null;
-        } catch (err) {
-          alert('could not open editor: ' + err.message);
-        }
+        await openReadEdit(path, { size: 'full', face: 'edit', focusText: h.snippet });
       });
 
     // ---------- Phase 4b: save / undo affordance for agent edits ----------
@@ -11389,141 +14542,76 @@
     let EDIT_PRISTINE = '';     // raw bytes at the moment we entered edit mode
     let EDIT_HIGHLIGHTS = [];   // sidecar highlights for the file being edited
 
-    async function enterEditMode() {
-      // Triggered either by the preview-pane "edit mode" button
-      // (which has a .file-path element near it) OR by a synthetic
-      // jump from review-mode (no preview path; we use REVIEW_PATH
-      // via the PENDING_EDIT_FOCUS handoff). Either way, resolve a
-      // single path.
+    // Legacy entry point: the "edit mode" button in a server-rendered
+    // preview fragment, or a review→edit jump. Routes into the unified
+    // read/edit orchestrator (full edit face).
+    function enterEditMode() {
+      if (reIsActive()) return reSetFace('edit');
       let path = null;
       const pathEl = document.querySelector('#preview-body .file-path');
       if (pathEl) path = pathEl.dataset.path;
       else if (PENDING_EDIT_FOCUS) path = PENDING_EDIT_FOCUS.path;
       if (!path) return;
-      let raw;
-      try {
-        const r = await fetch('/api/file/raw?path=' + encodeURIComponent(path));
-        if (!r.ok) throw new Error(r.statusText);
-        raw = await r.text();
-      } catch (e) {
-        alert('could not load raw contents: ' + e.message);
-        return;
-      }
-      EDIT_PATH = path;
-      EDIT_PRISTINE = raw;
-      // Load the same per-doc highlight sidecar review mode uses, so the
-      // rail can show where the highlights are even while editing the
-      // raw source. Failures are non-blocking (empty rail).
-      try {
-        const hr = await fetch('/api/highlights?path=' + encodeURIComponent(path));
-        EDIT_HIGHLIGHTS = hr.ok ? ((await hr.json()).highlights || []) : [];
-      } catch (_) {
-        EDIT_HIGHLIGHTS = [];
-      }
-      const root = document.getElementById('edit-mode');
-      const ta = document.getElementById('edit-textarea');
-      document.getElementById('edit-title').textContent = path;
-      ta.value = raw;
-      root.classList.add('open');
-      root.setAttribute('aria-hidden', 'false');
-      // Sidebar greyout + topbar X label (shared with review mode).
-      document.getElementById('tree')?.classList.add('review-disabled');
-      const exitBtn = document.getElementById('exit-review-btn');
-      exitBtn.textContent = '× exit edit';
-      exitBtn.title = 'Exit edit mode without saving (esc)';
-      exitBtn.classList.add('visible');
-      // Preview pane is supplanted by the full-frame editor.
-      document.getElementById('preview')?.classList.remove('open');
-      // Initial render of the line-nav for this textarea.
-      renderEditLineNav();
-      updateDocCounters();
-      // Apply pending search-and-select handoff from review mode,
-      // if any (textarea is now populated so we can locate the
-      // snippet and re-select it).
-      if (PENDING_EDIT_FOCUS && PENDING_EDIT_FOCUS.text) {
-        const idx = ta.value.indexOf(PENDING_EDIT_FOCUS.text);
-        if (idx >= 0) {
-          ta.focus();
-          ta.setSelectionRange(idx, idx + PENDING_EDIT_FOCUS.text.length);
-          const before = ta.value.slice(0, idx);
-          const linesBefore = before.split('\n').length;
-          const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 18;
-          ta.scrollTop = Math.max(0, (linesBefore - 4) * lineHeight);
-        }
-        PENDING_EDIT_FOCUS = null;
-      } else {
-        ta.focus();
-      }
-      // renderEditLineNav() ran above; re-measure marker positions now
-      // that the textarea is laid out (mirror measurement needs a real
-      // clientWidth and scrollHeight).
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        positionEditMarks();
-        updateEditLineNavCursor();
-      }));
+      const focusText = (PENDING_EDIT_FOCUS && PENDING_EDIT_FOCUS.path === path)
+        ? PENDING_EDIT_FOCUS.text : undefined;
+      PENDING_EDIT_FOCUS = null;
+      return openReadEdit(path, { size: 'full', face: 'edit', focusText });
     }
 
+    // Save the current edit face (mini or full). Writes the file, marks
+    // the buffer clean, refreshes the tree, and stays in the editor.
     async function saveEdit() {
-      if (!EDIT_PATH) return;
-      const ta = document.getElementById('edit-textarea');
+      if (RE_FACE !== 'edit' || !RE_PATH) return;
+      const ta = reEditTextarea();
+      if (!ta) return;
+      const content = ta.value;
       const fd = new FormData();
-      fd.append('path', EDIT_PATH);
-      fd.append('content', ta.value);
+      fd.append('path', RE_PATH);
+      fd.append('content', content);
       const r = await fetch('/api/file', { method: 'POST', body: fd });
-      if (!r.ok) {
-        alert('save failed: ' + r.status + ' ' + r.statusText);
-        return;
-      }
-      const html = await r.text();
-      const path = EDIT_PATH;
-      exitEditMode({ keepFile: true });
-      // Re-open the preview pane on the just-saved file.
-      const previewBody = document.getElementById('preview-body');
-      if (previewBody) {
-        previewBody.innerHTML = html;
-        htmx.process(previewBody);
-      }
-      document.getElementById('preview')?.classList.add('open');
+      if (!r.ok) { alert('save failed: ' + r.status + ' ' + r.statusText); return; }
+      await r.text();
+      RE_PRISTINE = content;
+      RE_EDIT_BUFFER = content;
+      EDIT_PRISTINE = content;
+      if (RE_SIZE === 'full') renderEditLineNav();
+      updateDocCounters();
+      // Refresh the file tree (a new file / size change should show).
       htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
     }
 
     async function revertEdit() {
-      if (!EDIT_PATH) return;
-      // Discard local changes; reload the textarea to its pristine
-      // snapshot. The user is asked to confirm so a slip-of-the-finger
-      // doesn't nuke a session of editing.
-      const ta = document.getElementById('edit-textarea');
-      if (ta.value !== EDIT_PRISTINE) {
-        if (!confirm('discard all unsaved changes and revert to the file\'s contents on disk?')) return;
+      if (RE_FACE !== 'edit' || !RE_PATH) return;
+      const ta = reEditTextarea();
+      if (!ta) return;
+      if (ta.value !== RE_PRISTINE) {
+        const ok = await confirmOverlay({
+          title: 'Revert changes?',
+          message: 'Discard all unsaved changes and revert to the file’s contents on disk?',
+          confirmLabel: 'revert', cancelLabel: 'keep editing',
+        });
+        if (!ok) return;
       }
-      ta.value = EDIT_PRISTINE;
+      ta.value = RE_PRISTINE;
+      RE_EDIT_BUFFER = RE_PRISTINE;
       ta.focus();
-      renderEditLineNav();
+      if (RE_SIZE === 'full') renderEditLineNav();
       updateDocCounters();
     }
 
-    function exitEditMode({ keepFile = false } = {}) {
-      const root = document.getElementById('edit-mode');
-      root.classList.remove('open');
-      root.setAttribute('aria-hidden', 'true');
-      document.getElementById('tree')?.classList.remove('review-disabled');
-      const exitBtn = document.getElementById('exit-review-btn');
-      exitBtn.classList.remove('visible');
-      exitBtn.textContent = '× exit review';   // reset to default
-      exitBtn.title = 'Exit review mode — closes the file and returns to the chat';
-      EDIT_PATH = null;
-      EDIT_PRISTINE = '';
-      if (!keepFile) {
-        // Topbar X behavior: close the preview pane too so the user
-        // returns to the bare chat view (parity with review-mode exit).
-        document.getElementById('preview')?.classList.remove('open');
-      }
-      updateDocCounters();
-    }
+    // Legacy compat: exiting the edit face closes the whole read/edit
+    // mode (dirty guard runs inside closeReadEdit).
+    function exitEditMode() { return closeReadEdit(); }
 
     // Buttons + chat-pill wiring for edit mode.
     document.getElementById('edit-save-btn').addEventListener('click', saveEdit);
     document.getElementById('edit-revert-btn').addEventListener('click', revertEdit);
+
+    // Size-switch buttons: mini→full (preview header) and full→mini
+    // (both full toolbars). Face + state are preserved by reSetSize.
+    document.getElementById('mini-full-btn').addEventListener('click', () => reSetSize('full'));
+    document.getElementById('review-mini-btn').addEventListener('click', () => reSetSize('mini'));
+    document.getElementById('edit-mini-btn').addEventListener('click', () => reSetSize('mini'));
 
     function toggleEditChat() {
       const pill = document.getElementById('edit-chat');
@@ -11699,29 +14787,37 @@
     });
 
     async function customizeForProject(path) {
-      if (!confirm('break the symlink and create an editable project-local copy of this file?\n\n' + path)) return;
+      const ok = await confirmOverlay({
+        title: 'Customize for this project?',
+        message: 'Break the symlink and create an editable project-local copy of “' + path + '”?',
+        confirmLabel: 'customize', cancelLabel: 'cancel',
+      });
+      if (!ok) return;
       const fd = new FormData();
       fd.append('path', path);
       const r = await fetch('/api/file/customize', { method: 'POST', body: fd });
       if (!r.ok) { alert('customize failed: ' + r.status + ' ' + r.statusText); return; }
-      const html = await r.text();
-      document.getElementById('preview-body').innerHTML = html;
-      htmx.process(document.getElementById('preview-body'));
-      // Refresh file tree so the symlink italic disappears.
+      await r.text();
+      // Refresh file tree so the symlink italic disappears, then re-open
+      // the (now project-local) file in read face at the current size.
       htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+      openReadEdit(path, { size: RE_SIZE || 'mini', face: 'read' });
     }
 
     async function markRequestDone(path) {
-      if (!confirm('mark this request complete and move it to rness/requests/done/?')) return;
+      const ok = await confirmOverlay({
+        title: 'Mark request done?',
+        message: 'Mark this request complete and move it to rness/requests/done/?',
+        confirmLabel: 'mark done', cancelLabel: 'cancel',
+      });
+      if (!ok) return;
       const fd = new FormData();
       fd.append('path', path);
       const r = await fetch('/api/requests/done', { method: 'POST', body: fd });
       if (!r.ok) { alert('mark-done failed: ' + r.status + ' ' + r.statusText); return; }
-      // Close preview (the file no longer exists at that path) and refresh
-      // the file tree so the request moves visibly from requests/ to
-      // requests/done/.
-      document.getElementById('preview').classList.remove('open');
-      document.getElementById('preview-body').innerHTML = '';
+      // The file no longer exists at that path — close the read/edit view
+      // and refresh the tree so it moves from requests/ to requests/done/.
+      if (reIsActive()) _teardownReadEdit();
       htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
     }
 

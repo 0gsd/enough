@@ -20,6 +20,7 @@ import asyncio
 import datetime as dt
 import json
 import logging
+import os
 import shutil
 import subprocess
 import sys
@@ -67,7 +68,15 @@ log = logging.getLogger("enough")
 STATIC_DIR = Path(__file__).parent / "static"
 INSTALL_ROOT = Path(__file__).resolve().parents[1]
 UI_CONFIG_TEMPLATE = INSTALL_ROOT / "defaults" / "ui-config.json"
-UI_CONFIG_LIVE = Path.home() / "enough" / "config" / "ui.json"
+_DEFAULT_UI_CONFIG_LIVE = Path.home() / "enough" / "config" / "ui.json"
+
+
+def _ui_config_live_path() -> Path:
+    """Live ui.json location, honoring ENOUGH_UI_CONFIG (a test/dev hook,
+    mirroring the ENOUGH_WIKISINK_CONFIG / ENOUGH_CACHEAWL_ROOT precedent) so
+    suites never touch the real ~/enough/config/ui.json."""
+    env = os.environ.get("ENOUGH_UI_CONFIG")
+    return Path(env).expanduser() if env else _DEFAULT_UI_CONFIG_LIVE
 
 WHISPER_DIR = Path.home() / "enough" / "weights" / "whisper"
 WHISPER_DEFAULT_MODEL = "ggml-base.en.bin"
@@ -150,8 +159,8 @@ def _wikisink_storage_real() -> frozenset[Path]:
     """Resolved wikisink dirs — the data dir plus every registered
     install's storage dir. Archives and sidecar stores (overlay,
     comments, preserved, …) must never render in the file tree — only
-    articles explicitly saved into a project's wiki/ or infoworld/wiki/
-    are user-visible files. Resolved fresh per tree build: cheap (one
+    articles explicitly saved into a project's wiki/ (or the global wiki
+    cachebox) are user-visible files. Resolved fresh per tree build: cheap (one
     tiny JSON read) and always honors just-changed locations."""
     cfg = _wikisink_config.load_config()
     dirs = [_wikisink_config.data_dir(cfg)]
@@ -177,8 +186,8 @@ def _walk_tree(
 
     `visited` carries the set of canonical paths already in the current
     recursion chain. We snapshot it as we descend so sibling branches stay
-    independent — if `infoworld/` and `rness/skills/` both happen to point
-    into `~/enough/`, walking one doesn't poison the other."""
+    independent — if two in-tree symlinks (e.g. under `rness/skills/`) both
+    happen to point into `~/enough/`, walking one doesn't poison the other."""
     abs_dir = root.joinpath(*rel_parts)
     try:
         real = abs_dir.resolve()
@@ -232,8 +241,25 @@ def _walk_tree(
     return out
 
 
+def _hidden_global_dirs() -> frozenset[Path]:
+    """Resolved global dirs that must never render in a project's file tree:
+    the wikisink storage/data dirs plus the cacheawl store root. cacheawl is
+    a global store (like wikisink) accessed through its own UI/tools, not a
+    per-project artifact — hide it the same way, in case a project ever
+    symlinks to or sits near it."""
+    dirs = set(_wikisink_storage_real())
+    try:
+        from . import cacheawl as _cacheawl
+        r = _cacheawl.root()
+        if r.exists():
+            dirs.add(r.resolve())
+    except OSError:
+        pass
+    return frozenset(dirs)
+
+
 def build_file_tree(root: Path) -> list[dict[str, Any]]:
-    return _walk_tree(root, (), frozenset(), _wikisink_storage_real())
+    return _walk_tree(root, (), frozenset(), _hidden_global_dirs())
 
 
 # Paths in the project tree that get a [?] help affordance on hover.
@@ -246,7 +272,6 @@ _HELP_IDS: dict[str, str] = {
     "rness/knowledge": "knowledge",
     "rness/requests": "requests",
     "rness/io": "io",
-    "infoworld": "infoworld",
     "wiki": "project-wiki",
 }
 
@@ -518,25 +543,76 @@ def _load_ui_config_template() -> dict[str, Any]:
 def _ensure_live_ui_config() -> Path:
     """Make sure ~/enough/config/ui.json exists. Seeds from the shipped
     template on first run; otherwise leaves it alone. Returns the path."""
-    if not UI_CONFIG_LIVE.exists():
-        UI_CONFIG_LIVE.parent.mkdir(parents=True, exist_ok=True)
+    live = _ui_config_live_path()
+    if not live.exists():
+        live.parent.mkdir(parents=True, exist_ok=True)
         if UI_CONFIG_TEMPLATE.is_file():
-            UI_CONFIG_LIVE.write_text(
+            live.write_text(
                 UI_CONFIG_TEMPLATE.read_text(encoding="utf-8"),
                 encoding="utf-8",
             )
         else:
-            UI_CONFIG_LIVE.write_text(
+            live.write_text(
                 json.dumps(_load_ui_config_template(), indent=2),
                 encoding="utf-8",
             )
-    return UI_CONFIG_LIVE
+    return live
+
+
+# The four themes that ship in defaults/ui-config.json. Only these get the
+# merge-on-read treatment below — user-authored custom themes are never
+# touched (we can't know what an unshipped theme "should" contain).
+_SHIPPED_THEMES = ("enough-default", "pastel", "wireframe", "darknest")
+
+
+def _merge_shipped_theme_keys(cfg: dict[str, Any]) -> dict[str, Any]:
+    """Merge-on-read backfill for the four SHIPPED themes.
+
+    Existing users' live ~/enough/config/ui.json predates the 0.1.6
+    theme-level `icons` key and the `btn-bg` color, so their copies of the
+    shipped themes lack them. Fill those in from the defaults template
+    WITHOUT ever overwriting a value the user customized, and without
+    touching any custom theme they added. Purely a read-time view — no
+    config rewrite — so /api/ui-config serves a complete theme even for a
+    config file written by an older enough.
+
+    Missing template → return `cfg` unchanged (nothing to merge from)."""
+    if not UI_CONFIG_TEMPLATE.is_file():
+        return cfg
+    try:
+        template = json.loads(UI_CONFIG_TEMPLATE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return cfg
+    tmpl_themes = template.get("themes") or {}
+    user_themes = cfg.get("themes")
+    if not isinstance(user_themes, dict):
+        return cfg
+    for name in _SHIPPED_THEMES:
+        tmpl = tmpl_themes.get(name)
+        user = user_themes.get(name)
+        if not isinstance(tmpl, dict) or not isinstance(user, dict):
+            continue
+        # Fill theme-level `icons` only if the user's theme lacks it.
+        if "icons" not in user and "icons" in tmpl:
+            user["icons"] = tmpl["icons"]
+        # Fill any missing `colors` entries (e.g. btn-bg); never clobber
+        # a color the user already set.
+        tmpl_colors = tmpl.get("colors")
+        if isinstance(tmpl_colors, dict):
+            user_colors = user.get("colors")
+            if not isinstance(user_colors, dict):
+                user_colors = {}
+                user["colors"] = user_colors
+            for key, value in tmpl_colors.items():
+                if key not in user_colors:
+                    user_colors[key] = value
+    return cfg
 
 
 def _read_ui_config() -> dict[str, Any]:
     path = _ensure_live_ui_config()
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return _merge_shipped_theme_keys(json.loads(path.read_text(encoding="utf-8")))
     except (OSError, json.JSONDecodeError):
         log.exception("failed to read live ui config; falling back to template")
         if UI_CONFIG_TEMPLATE.is_file():
@@ -997,6 +1073,17 @@ def create_app(
             asyncio.run_coroutine_threadsafe(session.emit("wiki_sink", data), loop)
 
         _wiki_update.PROGRESS_EMITTER = _wiki_progress
+        # One-time, idempotent dissolve of ~/enough/infoworld/ into cacheawl
+        # cacheboxes (personal/public/wiki). Missing infoworld = no-op; a box
+        # of the same name already present = skipped. Move-only.
+        try:
+            from . import cacheawl as _cacheawl
+            report = await asyncio.to_thread(_cacheawl.migrate_infoworld)
+            if report.get("migrated"):
+                log.info("cacheawl: migrated infoworld folders %s",
+                         report["migrated"])
+        except Exception:  # noqa: BLE001 — never block startup on migration
+            log.exception("cacheawl infoworld migration failed")
         if supervisor is not None:
             try:
                 await supervisor.bootstrap()
@@ -1215,7 +1302,20 @@ def create_app(
         pointing outside the project — intentional, used for global
         defaults — aren't rejected. The tool layer has its own allowlist
         for follow-through reads; this helper guards only against path-
-        string traversal (absolute paths and `..` components)."""
+        string traversal (absolute paths and `..` components).
+
+        A `cacheawl:<box>/<rel>` prefix addresses the machine-global
+        cachebox store instead of the project — that's how cacheawl mode
+        launches store files into read/edit, girraph, and merirmaid
+        modes. Same traversal rules apply inside the store; the mirror
+        and sidecar write-guards downstream see the resolved target and
+        keep applying."""
+        if path.startswith("cacheawl:"):
+            rel = Path(path[len("cacheawl:"):].lstrip("/"))
+            if rel.is_absolute() or ".." in rel.parts or not rel.parts:
+                raise HTTPException(400, "invalid path")
+            from . import cacheawl as _cacheawl
+            return _cacheawl.root().resolve() / rel
         p = Path(path)
         if p.is_absolute() or ".." in p.parts:
             raise HTTPException(400, "invalid path")
@@ -1467,8 +1567,8 @@ def create_app(
     # Validation is intentionally strict: names are single path segments
     # (no slashes, no `..`, no leading dot beyond the dotfile pattern,
     # no NUL). The parent must already exist as a directory inside the
-    # project root (or inside an in-tree symlink target like
-    # `infoworld/`). Existing entries are never clobbered.
+    # project root (or inside an in-tree symlink target).
+    # Existing entries are never clobbered.
 
     def _validate_new_name(name: str) -> str:
         name = (name or "").strip()
@@ -2254,6 +2354,140 @@ def create_app(
             raise HTTPException(400, str(e)) from None
         return {"ok": True, "action": action}
 
+    # -----------------------------------------------------------------
+    # cacheawl — the global file store. Backend for the (future) split-view
+    # cachebox UI. Contract documented in docs/cacheawl-plan.md.
+    # -----------------------------------------------------------------
+    _ingest_tasks: set[asyncio.Task[Any]] = set()
+
+    @app.get("/api/cacheawl/tree")
+    async def api_cacheawl_tree() -> dict[str, Any]:
+        """Project tree + every cachebox tree in one payload for the split
+        view. Triggers a cheap reconcile per box first so manual file drops
+        the backend didn't see are reflected."""
+        from . import cacheawl as _cacheawl
+
+        def _build() -> dict[str, Any]:
+            _cacheawl.reconcile_all()
+            boxes = []
+            for summary in _cacheawl.list_cacheboxes():
+                boxes.append(_cacheawl.cachebox_tree(summary["name"]))
+            return {
+                "root": str(_cacheawl.root()),
+                "project": build_file_tree(project_dir),
+                "cacheboxes": boxes,
+            }
+
+        return await asyncio.to_thread(_build)
+
+    @app.post("/api/cacheawl/create")
+    async def api_cacheawl_create(request: Request) -> dict[str, Any]:
+        from . import cacheawl as _cacheawl
+        body = await request.json()
+        name = (body.get("name") or "").strip()
+        try:
+            summary = await asyncio.to_thread(_cacheawl.create_cachebox, name)
+        except _cacheawl.CacheawlError as e:
+            raise HTTPException(400, str(e)) from None
+        return summary
+
+    @app.post("/api/cacheawl/rename")
+    async def api_cacheawl_rename(request: Request) -> dict[str, Any]:
+        from . import cacheawl as _cacheawl
+        body = await request.json()
+        name = (body.get("name") or "").strip()
+        new_name = (body.get("new_name") or "").strip()
+        try:
+            return await asyncio.to_thread(_cacheawl.rename_cachebox, name, new_name)
+        except _cacheawl.CacheawlError as e:
+            raise HTTPException(400, str(e)) from None
+
+    @app.post("/api/cacheawl/delete")
+    async def api_cacheawl_delete(request: Request) -> dict[str, Any]:
+        """Delete a cachebox and its contents. Requires an explicit
+        {confirm: true} — the no-deletes-without-confirmation discipline."""
+        from . import cacheawl as _cacheawl
+        body = await request.json()
+        name = (body.get("name") or "").strip()
+        confirm = bool(body.get("confirm"))
+        try:
+            return await asyncio.to_thread(
+                _cacheawl.delete_cachebox, name, confirm=confirm)
+        except _cacheawl.CacheawlError as e:
+            # A missing box is a 404; an unconfirmed delete is a 400.
+            code = 404 if "no cachebox" in str(e) else 400
+            raise HTTPException(code, str(e)) from None
+
+    @app.post("/api/cacheawl/transfer")
+    async def api_cacheawl_transfer(request: Request) -> dict[str, Any]:
+        """Copy/move a file or folder between the project dir and a cachebox
+        (either direction) or within/between cacheboxes. Body:
+        {op, src:{root,box?,path}, dst:{root,box?,path}, overwrite?}."""
+        from . import cacheawl as _cacheawl
+        body = await request.json()
+        op = (body.get("op") or "").strip()
+        src = body.get("src") or {}
+        dst = body.get("dst") or {}
+        try:
+            return await asyncio.to_thread(
+                _cacheawl.transfer, project_dir, op=op,
+                src_kind=(src.get("root") or "").strip(),
+                src_box=(src.get("box") or None),
+                src_path=(src.get("path") or ""),
+                dst_kind=(dst.get("root") or "").strip(),
+                dst_box=(dst.get("box") or None),
+                dst_path=(dst.get("path") or ""),
+                overwrite=bool(body.get("overwrite")),
+            )
+        except _cacheawl.CacheawlError as e:
+            raise HTTPException(400, str(e)) from None
+
+    @app.post("/api/cacheawl/ingest")
+    async def api_cacheawl_ingest(request: Request) -> dict[str, Any]:
+        """Start an ingest into a cachebox. Long-running work runs in the
+        background; poll /api/cacheawl/ingest-status. Obvious input errors
+        fail fast with a 400."""
+        from . import cacheawl as _cacheawl
+        body = await request.json()
+        box = (body.get("box") or "").strip()
+        source_type = (body.get("type") or "").strip().lower()
+        value = (body.get("value") or "").strip()
+        depth = body.get("depth", 1)
+        all_flag = bool(body.get("all"))
+        # Register the box (status 'ingesting') synchronously so a malformed
+        # request 400s up front and ingest-status is pollable immediately —
+        # no window where the box doesn't exist yet.
+        try:
+            origin = await asyncio.to_thread(
+                _cacheawl.register_ingest, box=box, source_type=source_type,
+                value=value, depth=depth, all_flag=all_flag)
+        except _cacheawl.CacheawlError as e:
+            raise HTTPException(400, str(e)) from None
+
+        loop = asyncio.get_running_loop()
+
+        def _run() -> None:
+            try:
+                _cacheawl.run_ingest(
+                    project_dir, box=box, source_type=source_type,
+                    value=value, depth=depth, all_flag=all_flag)
+            except Exception:  # noqa: BLE001 — status file records the failure
+                log.exception("cacheawl ingest failed for box %s", box)
+
+        task = loop.create_task(asyncio.to_thread(_run))
+        _ingest_tasks.add(task)
+        task.add_done_callback(_ingest_tasks.discard)
+        return {"box": box, "status": "ingesting", "origin": origin}
+
+    @app.get("/api/cacheawl/ingest-status")
+    async def api_cacheawl_ingest_status(box: str = Query(...)) -> dict[str, Any]:
+        from . import cacheawl as _cacheawl
+        try:
+            _cacheawl._require_box(box)
+        except _cacheawl.CacheawlError as e:
+            raise HTTPException(404, str(e)) from None
+        return await asyncio.to_thread(_cacheawl.ingest_status, box)
+
     @app.post("/api/file", response_class=HTMLResponse)
     async def api_file_write(request: Request) -> HTMLResponse:
         form = await request.form()
@@ -2287,6 +2521,19 @@ def create_app(
                 "(node ops), not whole-file writes",
             )
         target = _resolve_project_path(path)
+        # Cachebox mirror guard: the same rule as the agent's write_file —
+        # a modality:mirror file under ~/enough/cacheawl/ is backend-owned
+        # and regenerated from the box contents, so whole-file edits are
+        # refused (in-tree paths never reach cacheawl, but a symlink or an
+        # allowlisted path could).
+        from . import cacheawl as _cacheawl
+        if (why := _cacheawl.mirror_write_denial(target)):
+            raise HTTPException(403, why)
+        if target.name == ".cachebox.json":
+            # Box metadata is backend-owned like the mirror; a corrupted
+            # sidecar breaks ingest-status and origin tracking.
+            raise HTTPException(
+                403, "cachebox metadata is backend-owned — not editable")
         if target.is_dir():
             raise HTTPException(400, "is a directory")
         target.parent.mkdir(parents=True, exist_ok=True)

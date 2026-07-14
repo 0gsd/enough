@@ -18,7 +18,7 @@ with this summary.
 
 ## Bundled code
 
-Only one third-party source file ships in this repository:
+Two third-party source files ship in this repository:
 
 ### htmx
 
@@ -53,6 +53,40 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+
+### Mermaid
+
+`enough/static/mermaid.min.js` is a copy of **Mermaid**
+(<https://mermaid.js.org>, <https://github.com/mermaid-js/mermaid>), the
+minified UMD build of Mermaid v11, distributed under the MIT License,
+reproduced below verbatim. It renders `.merirmaid` diagrams client-side
+(vendored, no CDN); the `girraph-merirmaid` skill also ships excerpts of
+Mermaid's MIT-licensed syntax documentation under
+`defaults/skills/girraph-merirmaid/references/`.
+
+```
+The MIT License (MIT)
+
+Copyright (c) 2014 - 2022 Knut Sveidqvist
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
 
 ---
@@ -103,6 +137,7 @@ to run the MADLAD-400 translation model offline:
 | Project | License | Role | Source |
 |---|---|---|---|
 | htmx | BSD-2-Clause | Progressive-enhancement frontend (see bundled copy above) | <https://htmx.org> |
+| Mermaid | MIT | Client-side diagram rendering for `.merirmaid` files (see bundled copy above) | <https://mermaid.js.org> |
 
 ### Tooling
 

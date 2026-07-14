@@ -29,8 +29,8 @@ original storage dir to avoid moving files):
     state/run-<ts>/             wikisink update-run scratch + reports
 
 None of this ever appears in the file-manager tree (server-side filter);
-only articles explicitly saved to a project's wiki/ or infoworld/wiki/
-are user-visible files.
+only articles explicitly saved to a project's wiki/ or the global wiki
+cachebox (~/enough/cacheawl/wiki/) are user-visible files.
 """
 
 from __future__ import annotations
@@ -368,8 +368,9 @@ def record_viewed(path: str, title: str) -> None:
 def upsert_watched(path: str, title: str, *, saved_to: str | None = None,
                    commented: bool | None = None) -> None:
     """Add or update a watch-registry entry. `saved_to` is a destination
-    tag ("project:<abs-dir>" or "infoworld") appended if new; `commented`
-    flips the commented flag."""
+    tag ("project:<abs-dir>" or "cacheawl"; the legacy "infoworld" tag is
+    still honored on unsave) appended if new; `commented` flips the
+    commented flag."""
     cfg = load_config()
     watched = cfg.get("watched", [])
     entry = next((w for w in watched if w.get("path") == path), None)
