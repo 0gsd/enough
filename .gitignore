@@ -18,6 +18,11 @@ __pycache__/
 .eggs/
 build/
 dist/
+# …but the built UI icons are a shipped asset, not a build artifact:
+# scripts/build_icons.py generates them from the Illustrator sources and
+# they must travel with the repo (the frontend loads /static/icons/build/).
+!enough/static/icons/build/
+!enough/static/icons/build/**
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
