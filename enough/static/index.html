@@ -201,10 +201,22 @@
       cursor: pointer;
     }
     .topbar .bare-toggle {
-      width: 28px;
+      /* Wide pill toggle: HEIGHT matches the neighbouring topbar chips
+         (28px); WIDTH follows the pill's landscape aspect. The built icon
+         has a SQUARE viewBox with the pill centred and lots of vertical
+         padding, so object-fit:cover (below) scales it to the box WIDTH and
+         crops the transparent top/bottom — that's what lets the wide pill
+         fill the height instead of shrinking to ~1/3 of it under contain. */
+      width: 62px;
       height: 28px;
       position: relative;
       z-index: 2;
+    }
+    /* Scale the square-viewBox pill art to the toggle's width and crop the
+       excess vertical padding (see the width note above). Only the bare
+       two-state pills use this; every other .svg-icon stays object-fit:contain. */
+    .bare-toggle .svg-icon {
+      object-fit: cover;
     }
     .bare-toggle:hover {
       filter: brightness(1.18);
@@ -239,6 +251,11 @@
       font-family: var(--font-mono);
       font-size: 11px;
       color: var(--fg-muted);
+      /* Sits just right of the model badge (flex gap = same 10px as the
+         cacheawl→model-badge gap); stay above the absolutely-centered
+         project title if they overlap at narrow widths. */
+      position: relative;
+      z-index: 2;
     }
 
     .topbar .doc-counters[hidden] {
@@ -1868,20 +1885,23 @@
       outline: none;
     }
 
-    /* The ribbon hangs off the bottom edge of the icon, overlapping the
-       content below the topbar. Bigger tap target, unmistakable exit. */
+    /* The ribbon hangs off the LEFT edge of the icon, rotated 90° clockwise
+       and extending leftward, vertically centred on the icon. Staying inside
+       the topbar row (rather than dangling below) keeps it clear of the mode
+       toolbars — e.g. the wiki toolbar — that used to bury it. Bigger tap
+       target, unmistakable exit. */
     .topbar .active-mode .active-mode-ribbon {
       position: absolute;
-      top: 26px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 26px;
+      top: 50%;
+      right: calc(100% - 6px);   /* overlap the icon's left edge by ~6px, then extend left */
+      transform: translateY(-50%);
+      width: 30px;
       height: 30px;
       padding: 0;
       border: none;
       background: transparent;
       cursor: pointer;
-      z-index: 7;
+      z-index: 8;
       line-height: 1;
     }
 
@@ -1889,9 +1909,11 @@
       filter: brightness(1.12);
     }
 
+    /* Rotation lives on the IMG (the svg is not rebuilt). */
     .topbar .active-mode .active-mode-ribbon .svg-icon {
       width: 100%;
       height: 100%;
+      transform: rotate(90deg);
     }
 
     /* ---------- Edit mode (full-frame plain-text editor) ---------- */
@@ -1988,15 +2010,10 @@
       outline: none;
     }
 
-    /* File-tree greyout while review mode is active. The tree stays
-       visible (so the user keeps their bearings) but clicks pass through
-       to nothing; sidebar sections OUTSIDE #tree (skills, roles,
-       paradigms) stay interactive so the user can still toggle those. */
-    #tree.review-disabled {
-      opacity: 0.4;
-      pointer-events: none;
-      filter: grayscale(0.6);
-    }
+    /* (The former #tree.review-disabled greyout was removed with the
+       mode-supplant work: a tree click during ANY full-frame mode now
+       cleanly supplants that mode and opens the file, so the tree stays
+       fully live and predictable in every mode.) */
 
     /* ---------- Girraph panel ----------
        Third full-frame mode (alongside review and edit) for .girraph
@@ -5337,12 +5354,13 @@
       display: none;
     }
 
-    /* Bare comments toggle sits at the far right; give it a square footprint
-       so the glow/hover reads consistently with the topbar treatment. */
+    /* Bare comments toggle sits at the far right; give it the same wide-pill
+       footprint as the topbar toggles — HEIGHT matches the wiki-toolbar
+       buttons, WIDTH follows the pill aspect (see .topbar .bare-toggle). */
     .wiki-toolbar .bare-toggle {
-      width: 28px;
+      width: 62px;
       height: 28px;
-      min-width: 28px;
+      min-width: 62px;
     }
 
     /* Inline icon inside a text-label popup button (selection popup). */
@@ -5359,8 +5377,10 @@
       display: inline-flex;
     }
 
-    /* Free-floating overlay choices (NOT chips): bare icons + labels hanging
-       below the save button, dismissed by outside-click or esc. */
+    /* Free-floating overlay choices (NOT chips): large bare icons hanging
+       below the save button, laid SIDE BY SIDE, dismissed by outside-click
+       or esc. No text labels — the art carries its own wording; the accessible
+       name lives on each button's aria-label/title. */
     .save-flyout[hidden] {
       display: none;
     }
@@ -5370,9 +5390,9 @@
       right: 0;
       z-index: 60;
       display: flex;
-      flex-direction: column;
-      gap: 4px;
-      padding: 6px;
+      flex-direction: row;
+      gap: 8px;
+      padding: 8px;
       background: var(--bg-raise);
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -5382,24 +5402,21 @@
     .save-flyout .save-choice {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
       background: transparent;
       border: 1px solid transparent;
       border-radius: 6px;
       color: var(--fg);
-      padding: 5px 10px 5px 6px;
+      padding: 4px;
       cursor: pointer;
       font-family: inherit;
-      font-size: 12.5px;
-      white-space: nowrap;
-      width: 100%;
       height: auto;
       min-width: 0;
     }
 
     .save-flyout .save-choice .svg-icon {
-      width: 22px;
-      height: 22px;
+      width: 88px;
+      height: 88px;
       flex: 0 0 auto;
     }
 
@@ -5959,18 +5976,11 @@
       <span class="ctx"></span>
       <span class="model-gauge"><span class="fill"></span></span>
     </button>
-    <!-- Centered project title (folder name unless a custom one is set).
-         The pencil opens an editor for the display name + description; the
-         folder on disk is never renamed. -->
-    <div class="project-title" id="project-title">
-      <span class="proj-name" id="project-name"><!-- PROJECT_NAME --></span>
-      <button class="proj-edit" id="project-edit" type="button" title="Edit project name &amp; description"
-        aria-label="edit project">✎</button>
-    </div>
-    <!-- Right half: document stat counters. Visible only when a
-         document is active (preview, edit, or review mode). The three
-         readouts are ¶ (paragraphs), W (words), C (characters). -->
-    <span class="topbar-spacer"></span>
+    <!-- Document stat counters. Sit just right of the model badge (flex
+         gap = the same 10px gap the badge has from the cacheawl button on
+         its left). Visible only when a document is active (preview, edit,
+         or review mode). The three readouts are ¶ (paragraphs), W (words),
+         C (characters). -->
     <div class="doc-counters" id="doc-counters" hidden>
       <span class="dc" title="paragraphs (blank-line separated blocks)">
         <span class="dc-glyph">¶</span><span class="dc-val" id="doc-paras">0</span>
@@ -5982,12 +5992,22 @@
         <span class="dc-glyph">C</span><span class="dc-val" id="doc-chars">0</span>
       </span>
     </div>
+    <!-- Centered project title (folder name unless a custom one is set).
+         The pencil opens an editor for the display name + description; the
+         folder on disk is never renamed. -->
+    <div class="project-title" id="project-title">
+      <span class="proj-name" id="project-name"><!-- PROJECT_NAME --></span>
+      <button class="proj-edit" id="project-edit" type="button" title="Edit project name &amp; description"
+        aria-label="edit project">✎</button>
+    </div>
+    <!-- Right half: reserved for the active-mode icon (+ its exit ribbon). -->
+    <span class="topbar-spacer"></span>
     <!-- Active-mode area (reserved top-right). Empty on the home/chat
          view. When a mode is active, setActiveMode() shows the mode's
-         icon here with a ribbon-redx "hanging off" the bottom edge
-         (banner-style, overlapping content below the topbar). Clicking
-         the ribbon exits the mode; clicking the icon runs the mode's
-         onIconClick (read/edit toggles face; other modes: no-op). -->
+         icon here with a ribbon-redx "hanging off" the LEFT edge (rotated
+         90° CW, extending leftward, vertically centered on the icon).
+         Clicking the ribbon exits the mode; clicking the icon runs the
+         mode's onIconClick (read/edit toggles face; other modes: no-op). -->
     <div id="active-mode" class="active-mode" hidden>
       <button type="button" id="active-mode-icon" class="active-mode-icon" aria-label="mode">
         <img class="svg-icon" id="active-mode-img" data-icon="" alt="" draggable="false">
@@ -6280,22 +6300,24 @@
               aria-label="save article"><img class="svg-icon" data-icon="savewiki" alt="save" draggable="false"></button>
             <div id="wiki-save-flyout" class="save-flyout" hidden role="menu">
               <button type="button" class="save-choice" id="wiki-save-project" role="menuitem"
+                aria-label="save to project"
                 title="save this article to the project's wiki/ folder (full fidelity — opens back in this reader)">
-                <img class="svg-icon" data-icon="savewiki-project" alt="" draggable="false">
-                <span>to project</span>
+                <img class="svg-icon" data-icon="savewiki-project" alt="save to project" draggable="false">
               </button>
               <button type="button" class="save-choice" id="wiki-save-infoworld" role="menuitem"
-                title="save this article to ~/enough/infoworld/wiki (shared across all projects)">
-                <img class="svg-icon" data-icon="savewiki-cacheawl" alt="" draggable="false">
-                <span>to infoworld</span>
+                aria-label="save to cacheawl (shared across projects)"
+                title="save this article to ~/enough/cacheawl/wiki (shared across all projects)">
+                <img class="svg-icon" data-icon="savewiki-cacheawl" alt="save to cacheawl" draggable="false">
               </button>
             </div>
           </div>
           <button type="button" id="wiki-cachebox-update" class="wt-icon" hidden
             title="update this saved article by running a wikisink refresh"
             aria-label="update saved article"><img class="svg-icon" data-icon="cachebox-update" alt="update" draggable="false"></button>
-          <button type="button" id="wiki-override" hidden
-            title="deletion override — keep this article's local copy forever and stop updating it">🛡</button>
+          <button type="button" id="wiki-override" class="wt-icon" hidden
+            aria-label="deletion override"
+            title="deletion override — keep this article's local copy forever and stop updating it"><img
+              class="svg-icon" data-icon="wiki-unlocked" alt="deletion override" draggable="false"></button>
           <button type="button" id="wiki-settings" class="wt-icon"
             title="wikisink settings — archive info, updates, storage"
             aria-label="wikisink settings"><img class="svg-icon" data-icon="wikisink-settings" alt="settings" draggable="false"></button>
@@ -7475,7 +7497,8 @@
     //
     // Exactly one "mode" is active at a time (or none, on the home/chat
     // view). setActiveMode paints the mode's icon in the reserved
-    // top-right area with a ribbon-redx "hanging off" its bottom edge.
+    // top-right area with a ribbon-redx "hanging off" its left edge (rotated
+    // 90° CW, extending leftward, vertically centered on the icon).
     // The ribbon exits the mode; the icon runs the mode's onIconClick.
     //
     // REGISTRATION CONTRACT — later waves (merirmaid, cacheawl) register
@@ -7487,6 +7510,13 @@
     //     onExit:      <function> required. Fully leaves the mode. Called
     //                             by the ribbon, by esc, and by any legacy
     //                             in-mode exit button you keep wired.
+    //     onSupplant:  <function> optional, synchronous, non-prompting
+    //                             teardown used when another mode takes over;
+    //                             defaults to onExit. (read/edit uses
+    //                             _teardownReadEdit here so a hand-off drops
+    //                             the buffer without a dirty prompt, while
+    //                             onExit keeps its async dirty prompt for the
+    //                             ribbon/esc path.)
     //     onIconClick: <function|null> optional. Runs when the mode ICON
     //                             is clicked/activated. read/edit uses it
     //                             to toggle face. null/omitted → the icon
@@ -7505,6 +7535,17 @@
     let ACTIVE_MODE = null;
 
     function setActiveMode(name, opts = {}) {
+      // If a DIFFERENT mode is currently active, supplant it first — run its
+      // non-prompting teardown (onSupplant, defaulting to onExit) before the
+      // new mode registers. This is the single choke point that guarantees
+      // exactly one mode is ever live: a tree click (openReadEdit /
+      // enterGirraphMode / …) or a topbar mode button now cleanly tears down
+      // whatever was open instead of leaving an orphaned frame behind.
+      const prev = ACTIVE_MODE;
+      if (prev && prev.name !== name) {
+        const teardown = prev.onSupplant || prev.onExit;
+        if (teardown) teardown();
+      }
       ACTIVE_MODE = Object.assign({ name }, opts);
       const wrap = document.getElementById('active-mode');
       const iconBtn = document.getElementById('active-mode-icon');
@@ -9388,8 +9429,7 @@
     let LAST_WIKI_SELECTION = null;  // sticky selection snapshot (chat pill)
 
     async function enterWikiMode() {
-      // Opening wikisink supplants any read/edit view (both sizes).
-      if (typeof RE_SIZE !== 'undefined' && RE_SIZE) _teardownReadEdit();
+      // Any previously-active mode is supplanted by setActiveMode below.
       const root = document.getElementById('wiki-mode');
       applyReviewContrast();
       root.classList.add('open');
@@ -9400,7 +9440,6 @@
         iconTitle: 'wikisink',
         exitTitle: 'exit wikisink',
       });
-      document.getElementById('tree')?.classList.add('review-disabled');
       if (typeof refreshWikiChatTail === 'function') refreshWikiChatTail();
       if (!WIKI_PATH) {
         const last = WIKI_STATUS && WIKI_STATUS.last_viewed;
@@ -9417,7 +9456,6 @@
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
       clearActiveMode();
-      document.getElementById('tree')?.classList.remove('review-disabled');
       LAST_WIKI_SELECTION = null;
       hideWikiSuggest();
     }
@@ -9458,12 +9496,15 @@
     function wikiUpdateOverrideButton(art) {
       const btn = document.getElementById('wiki-override');
       btn.hidden = false;
+      // Two-state icon chip: wiki-locked when this article IS overridden
+      // (the "preserved" state), wiki-unlocked when it is NOT (the default).
+      const img = btn.querySelector('.svg-icon');
       if (art.overridden) {
-        btn.textContent = '🛡✓';
+        if (img) setIcon(img, 'wiki-locked');
         btn.title = 'deletion override active — this article is preserved locally ' +
           'and never refreshed. click to lift the override (the preserved copy stays on disk).';
       } else {
-        btn.textContent = '🛡';
+        if (img) setIcon(img, 'wiki-unlocked');
         btn.title = 'deletion override — keep this article\'s local copy forever and ' +
           'stop updating it. use when Wikipedia deletes something you consider ' +
           'valuable (wikisink reports flag suspicious deletions).';
@@ -10671,6 +10712,10 @@
         hoverIcon: 'readedit-switch',
         onIconClick: reToggleFace,
         onExit: closeReadEdit,
+        // Supplanted by another mode → synchronous, non-prompting teardown
+        // (drops the buffer, preserving wave-2b behavior). onExit stays the
+        // async dirty-prompting close for the ribbon/esc path.
+        onSupplant: _teardownReadEdit,
         iconTitle: _reModeTitle(),
         exitTitle: 'exit read/edit',
       });
@@ -10678,9 +10723,11 @@
     function _reUpdateModeIcon() { updateActiveModeIcon(_reModeIcon(), _reModeTitle()); }
 
     function _reSyncTreeGrey() {
-      const tree = document.getElementById('tree');
-      if (!tree) return;
-      tree.classList.toggle('review-disabled', RE_SIZE === 'full');
+      // No-op since the mode-supplant work: the file tree stays fully live in
+      // every mode (including full read/edit). A tree click now supplants the
+      // active mode and opens the file; dirty edit buffers are still guarded
+      // by openReadEdit's own discard prompt. Kept as a stub so the existing
+      // call sites don't need to change.
     }
 
     // ---- internal face renderers -----------------------------------
@@ -10999,7 +11046,6 @@
       RE_PRISTINE = ''; RE_EDIT_BUFFER = null;
       REVIEW_PATH = null; EDIT_PATH = null; LAST_REVIEW_SELECTION = null;
       clearActiveMode();
-      document.getElementById('tree')?.classList.remove('review-disabled');
       if (typeof updateReviewChatChip === 'function') updateReviewChatChip();
       updateDocCounters();
     }
@@ -11046,8 +11092,7 @@
     let GIRRAPH_STACK = [];   // [{kind:'girraph'|'doc', path}]
 
     async function enterGirraphMode(path) {
-      // Opening a girraph supplants any read/edit view (both sizes).
-      if (typeof RE_SIZE !== 'undefined' && RE_SIZE) _teardownReadEdit();
+      // Any previously-active mode is supplanted by setActiveMode below.
       GIRRAPH_STACK = [{ kind: 'girraph', path }];
       const ok = await renderGirraphTop();
       if (!ok) { GIRRAPH_STACK = []; return; }
@@ -11060,7 +11105,6 @@
         iconTitle: 'girraph',
         exitTitle: 'exit girraph',
       });
-      document.getElementById('tree')?.classList.add('review-disabled');
     }
 
     function exitGirraphMode() {
@@ -11068,7 +11112,6 @@
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
       clearActiveMode();
-      document.getElementById('tree')?.classList.remove('review-disabled');
       GIRRAPH_STACK = [];
     }
 
@@ -11499,10 +11542,8 @@
     function mmTop() { return MERIRMAID_STACK[MERIRMAID_STACK.length - 1]; }
 
     async function enterMerirmaidMode(path) {
-      // Supplant any read/edit view or an open girraph mode.
-      if (typeof RE_SIZE !== 'undefined' && RE_SIZE) _teardownReadEdit();
-      const g = document.getElementById('girraph-mode');
-      if (g && g.classList.contains('open')) exitGirraphMode();
+      // Any previously-active mode (read/edit, girraph, …) is supplanted by
+      // setActiveMode below.
       MERIRMAID_STACK = [{ kind: 'merirmaid', path }];
       const root = document.getElementById('merirmaid-mode');
       root.classList.add('open');
@@ -11514,7 +11555,6 @@
         iconTitle: 'merirmaid',
         exitTitle: 'exit merirmaid',
       });
-      document.getElementById('tree')?.classList.add('review-disabled');
       await renderMerirmaidTop();
       refreshMerirmaidChatTail();
     }
@@ -11526,7 +11566,6 @@
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
       clearActiveMode();
-      document.getElementById('tree')?.classList.remove('review-disabled');
       MERIRMAID_STACK = [];
       MM_CURRENT = null; MM_LINKS = {}; MM_PATH = null; MM_TITLE = null;
     }
@@ -12060,12 +12099,8 @@
     let CA_DRAG = null;          // { pane, box, path, name, is_dir } while dragging
 
     async function enterCacheawlMode() {
-      // Supplant any read/edit view or an open girraph/merirmaid mode.
-      if (typeof RE_SIZE !== 'undefined' && RE_SIZE) _teardownReadEdit();
-      const g = document.getElementById('girraph-mode');
-      if (g && g.classList.contains('open')) exitGirraphMode();
-      const m = document.getElementById('merirmaid-mode');
-      if (m && m.classList.contains('open')) exitMerirmaidMode();
+      // Any previously-active mode (read/edit, girraph, merirmaid, …) is
+      // supplanted by setActiveMode below.
       CA_PROJECT_SUB = []; CA_STORE_BOX = null; CA_STORE_SUB = []; CA_SELECTED = null;
       const root = document.getElementById('cacheawl-mode');
       root.classList.add('open');
@@ -12081,7 +12116,6 @@
         iconTitle: 'cacheawl',
         exitTitle: 'exit cacheawl',
       });
-      document.getElementById('tree')?.classList.add('review-disabled');
       caIngestTypeChanged();
       refreshCacheawlChatTail();
       await caLoadTree();
@@ -12095,7 +12129,6 @@
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
       clearActiveMode();
-      document.getElementById('tree')?.classList.remove('review-disabled');
       CA_DATA = null; CA_SELECTED = null; CA_DRAG = null;
     }
     window.exitCacheawlMode = exitCacheawlMode;

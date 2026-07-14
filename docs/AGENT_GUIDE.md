@@ -806,11 +806,15 @@ than reinvent:
   touch" about never defining `--btn-bg` in `:root`.
 - **The `setActiveMode(name, opts)` registry** (search the comment block in
   index.html) is the contract every full-frame mode registers through:
-  `{icon, onExit, onIconClick?, hoverIcon?, iconTitle?, exitTitle?}`. It
+  `{icon, onExit, onSupplant?, onIconClick?, hoverIcon?, iconTitle?, exitTitle?}`. It
   paints the mode's icon into the **reserved top-right active-mode area**
-  with a `ribbon-redx` hanging off its bottom edge (the ribbon exits;
+  with a `ribbon-redx` hanging off its left edge (rotated 90° clockwise,
+  extending leftward, vertically centered on the icon) (the ribbon exits;
   clicking the icon runs `onIconClick` — read/edit uses it to toggle the
-  eye/pencil face, with `readedit-switch` as the `hoverIcon`).
+  eye/pencil face, with `readedit-switch` as the `hoverIcon`). Registering a
+  mode while another is active auto-supplants the old one (its `onSupplant`,
+  defaulting to `onExit`) — that's how a tree click cleanly leaves the
+  current mode and opens the file.
   `clearActiveMode()` returns to the home/chat view; `ACTIVE_MODE` holds the
   live registration. Wire new modes through this, not ad-hoc show/hide.
 - **`confirmOverlay(...)`** is the reusable ribbon dialog (`#confirm-overlay`):

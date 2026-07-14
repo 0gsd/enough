@@ -143,10 +143,20 @@ FILL_RATIO = 0.82  # visible art occupies ~82% of the new square canvas
 # the pill-only bbox (browser-measured; identical to projectnav-off's),
 # so the pair aligns pixel-for-pixel. The UI recreates the glow with a
 # CSS drop-shadow on the on-state, which scales cleanly at any size.
+#
+# comment.svg carries a WIDE bbox (91.2x77.76). Under the default 0.82
+# square-canvas fill, its long side lands at 82% of the canvas but its
+# short (vertical) side only fills ~70%, so on the wiki toolbar it reads
+# visibly shorter than its square-ish neighbors (d6, wikisink-settings).
+# A per-icon `fill_ratio` override packs the art tighter in the square so
+# its height fill matches those neighbors (~0.95 → ~81% vertical fill).
 SPECIAL_CASES = {
     "projectnav-on.svg": {
         "strip_images": True,
         "visBBox": {"x": 18.6, "y": 33.31, "w": 54, "h": 23.62},
+    },
+    "comment.svg": {
+        "fill_ratio": 0.95,
     },
 }
 
@@ -569,7 +579,8 @@ def rewrite_viewbox(root, bbox_entry, filename, warnings):
         return
     vb = bbox_entry["visBBox"]
     x, y, w, h = vb["x"], vb["y"], vb["w"], vb["h"]
-    side = max(w, h) / FILL_RATIO
+    fill_ratio = bbox_entry.get("fill_ratio", FILL_RATIO)
+    side = max(w, h) / fill_ratio
     cx = x + w / 2
     cy = y + h / 2
     new_x = cx - side / 2
@@ -749,11 +760,15 @@ def main():
 
     bbox_raw = json.loads(BBOX_JSON.read_text())
     bbox_data = {k: v for k, v in bbox_raw.items() if not k.startswith("_")}
-    # SPECIAL_CASES bbox overrides win over the measured JSON (both
-    # process_icon and validate_output see the effective value).
+    # SPECIAL_CASES bbox / fill_ratio overrides win over the measured JSON
+    # (both process_icon and validate_output see the effective value).
     for fname, spec in SPECIAL_CASES.items():
-        if "visBBox" in spec and fname in bbox_data:
+        if fname not in bbox_data:
+            continue
+        if "visBBox" in spec:
             bbox_data[fname] = {**bbox_data[fname], "visBBox": spec["visBBox"]}
+        if "fill_ratio" in spec:
+            bbox_data[fname] = {**bbox_data[fname], "fill_ratio": spec["fill_ratio"]}
 
     svg_paths = sorted(p for p in ICONS_DIR.glob("*.svg") if p.is_file())
     if not svg_paths:

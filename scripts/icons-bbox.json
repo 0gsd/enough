@@ -30,6 +30,8 @@
   "send-chat.svg":         {"viewBox": "0 0 105.84 90.24",    "visBBox": {"x": 15.2,  "y": 26.55, "w": 60.81, "h": 37.14}},
   "speak.svg":             {"viewBox": "0 0 105.84 90.24",    "visBBox": {"x": 19.59, "y": 18.19, "w": 52.01, "h": 53.85}},
   "uiq.svg":               {"viewBox": "0 0 54 54",           "visBBox": {"x": 3.37,  "y": 0,     "w": 47.25, "h": 54.01}},
+  "wiki-locked.svg":       {"viewBox": "0 0 118.93 128.81",   "visBBox": {"x": 35.49, "y": 31.08, "w": 40.5,  "h": 54}},
+  "wiki-unlocked.svg":     {"viewBox": "0 0 118.93 128.81",   "visBBox": {"x": 35.49, "y": 31.08, "w": 40.5,  "h": 54}},
   "wikisink-off.svg":      {"viewBox": "0 0 105.84 90.24",    "visBBox": {"x": 18.6,  "y": 18.12, "w": 54,    "h": 54}},
   "wikisink-settings.svg": {"viewBox": "0 0 105.84 90.24",    "visBBox": {"x": 18.68, "y": 14.34, "w": 53.84, "h": 61.57}},
   "wikisink.svg":          {"viewBox": "0 0 54 54",           "visBBox": {"x": 0,     "y": 0,     "w": 54,    "h": 54}}
