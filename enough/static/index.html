@@ -484,8 +484,10 @@
       line-height: 1;
     }
 
+    /* GBY trifecta: paradigm = green (--accent-agent), role = blue
+       (--accent-user), skill = gold (--accent-tool). */
     ul.skills li.skill-row.on button.skill-toggle {
-      color: var(--accent-agent);
+      color: var(--accent-tool);
     }
 
     ul.skills li.skill-row.off .skill-name {
@@ -3025,8 +3027,9 @@
     /* Selection toolbar inside review mode. Always docked at the top
        of the pane (Phase 5a) — controls grey out when their
        preconditions aren't met instead of the whole bar appearing
-       and disappearing. Three groups: format buttons left,
-       edit-mode button center, highlight colors right. */
+       and disappearing. Format buttons left, highlight colors right;
+       switching to the edit face is the top-right active-mode icon's
+       job (the old center "edit mode" button is gone). */
     #review-mode .review-toolbar {
       position: absolute;
       top: 0;
@@ -3113,18 +3116,6 @@
       font-family: inherit;
       font-size: 12px;
       cursor: pointer;
-    }
-
-    #review-mode .review-toolbar #rt-edit-mode {
-      background: var(--accent-tool);
-      color: var(--bg);
-      border-color: var(--accent-tool);
-      font-weight: 600;
-      padding: 4px 14px;
-    }
-
-    #review-mode .review-toolbar #rt-edit-mode:hover {
-      filter: brightness(1.08);
     }
 
     /* Top padding for the always-on toolbar so the document's first
@@ -6127,10 +6118,6 @@
               <option value="2">## H2</option>
               <option value="3">### H3</option>
             </select>
-          </div>
-          <div class="rt-group rt-edit">
-            <button type="button" id="rt-edit-mode" title="exit review and open the editor at this selection">edit
-              mode</button>
           </div>
           <div class="rt-group rt-highlights" aria-label="highlight colors">
             <!-- Click a circle to apply that color to the selection;
@@ -10989,6 +10976,29 @@
         }
         RE_EDIT_BUFFER = null;
       }
+      // Carry the reading position into the editor (this jump used to
+      // live on the review toolbar's "edit mode" button, now removed —
+      // the face toggle is the one way in): with a selection, land on
+      // the selection text; without one, land on the topmost visible
+      // block. Computed BEFORE the read face is hidden (needs its DOM).
+      let focusText = null;
+      if (face === 'edit' && RE_FACE === 'read' && RE_SIZE === 'full') {
+        const sel = getReviewSelection();
+        if (sel) {
+          focusText = sel.text;
+        } else {
+          const top = findTopmostVisibleReviewBlock();
+          if (top && REVIEW_BLOCKS[top.idx]) {
+            // First non-empty line of the block, stripped of leading
+            // markers (# / - / > / 1. ) so the search hits the
+            // textarea text consistently.
+            const blockRaw = REVIEW_BLOCKS[top.idx].raw;
+            const firstLine = blockRaw.split('\n').find(l => l.trim()) || '';
+            focusText = firstLine.replace(/^(#{1,6}\s+|\s*[-*+]\s+|\s*\d+\.\s+|>\s?)/, '').trim()
+              .slice(0, 80) || null;
+          }
+        }
+      }
       // Re-read disk so the target face reflects the file's real state.
       let raw;
       try { raw = await _reLoadDisk(path); }
@@ -11002,7 +11012,7 @@
         else _showMiniRead(path, raw);
       } else {
         RE_EDIT_BUFFER = raw;
-        if (RE_SIZE === 'full') _showFullEdit(path, raw);
+        if (RE_SIZE === 'full') _showFullEdit(path, raw, focusText || undefined);
         else _showMiniEdit(path, raw);
       }
       _reUpdateModeIcon();
@@ -12186,8 +12196,9 @@
     }
 
     // ----- badge classification for file tiles -----
-    function caFileBadge(name, isMirror) {
+    function caFileBadge(name, isMirror, isWikiArticle) {
       const low = (name || '').toLowerCase();
+      if (isWikiArticle) return { kind: 'icon', icon: 'wikisink' };
       if (isMirror || low.endsWith('.merirmaid')) return { kind: 'icon', icon: 'merirmaidmode' };
       if (low.endsWith('.girraph')) return { kind: 'icon', icon: 'girraphmode' };
       const dot = name.lastIndexOf('.');
@@ -12220,7 +12231,7 @@
       setIcon(img, iconName);
       iconWrap.appendChild(img);
       if (!d.is_dir && !d.is_box) {
-        const badge = caFileBadge(d.name, d.is_mirror);
+        const badge = caFileBadge(d.name, d.is_mirror, d.wiki_article);
         if (badge && badge.kind === 'icon') {
           const b = document.createElement('span');
           b.className = 'ca-badge';
@@ -12328,6 +12339,7 @@
         grid.appendChild(caTile({
           pane: 'project', key: n.path, name: n.name, path: n.path,
           is_dir: !!n.is_dir, is_box: false, is_mirror: false,
+          wiki_article: !!n.wiki_article,
         }));
       });
     }
@@ -12357,6 +12369,7 @@
           grid.appendChild(caTile({
             pane: 'cachebox', key: CA_STORE_BOX + '::' + n.path, name: n.name, path: n.path,
             box: CA_STORE_BOX, is_dir: !!n.is_dir, is_box: false, is_mirror: !!n.is_mirror,
+            wiki_article: !!n.wiki_article,
           }));
         });
       }
@@ -12394,7 +12407,8 @@
         ? d.path
         : 'cacheawl:' + d.box + (d.path ? '/' + d.path : '');
       exitCacheawlMode();
-      if (low.endsWith('.girraph')) enterGirraphMode(path);
+      if (d.wiki_article) openSavedWikiArticle(path);
+      else if (low.endsWith('.girraph')) enterGirraphMode(path);
       else if (low.endsWith('.merirmaid')) enterMerirmaidMode(path);
       else openReadEdit(path, { size: 'full', face: 'read' });
     }
@@ -12947,9 +12961,9 @@
     }
 
     // Back-compat shim: existing call sites (applyFormat, applyHeading,
-    // applyEditModeJump, the highlight src-position hint logic) used
-    // the old strict `getReviewSelection`. Keep them pointed at the
-    // strict variant so their semantics don't change.
+    // the highlight src-position hint logic) used the old strict
+    // `getReviewSelection`. Keep them pointed at the strict variant so
+    // their semantics don't change.
     const getReviewSelection = getSingleBlockSelection;
 
     function textOffsetInBlock(blockEl, container, offset) {
@@ -13178,41 +13192,6 @@
       await saveAndRerender(newSource);
     }
 
-    // "edit mode" jump: capture the selection's rendered text, exit
-    // review mode, open preview > edit on the same file, then in the
-    // textarea search for that text and select it (scrolling to it).
-    //
-    // Phase 5a: works without a selection too. We pick the topmost
-    // visible block as the focus target and scroll the textarea to
-    // that block's source position so the user lands roughly where
-    // they were reading. No text is selected in the textarea in that
-    // case — just the scroll.
-    async function applyEditModeJump() {
-      const path = REVIEW_PATH || RE_PATH;
-      if (!path) return;
-      const sel = getReviewSelection();
-      let focusText = null;
-      if (sel) {
-        focusText = sel.text;
-      } else {
-        const top = findTopmostVisibleReviewBlock();
-        if (top && REVIEW_BLOCKS[top.idx]) {
-          // First non-empty line of the block makes a good unique
-          // search target — full block.raw can be long, and just a
-          // few words near the start lands the cursor right.
-          const raw = REVIEW_BLOCKS[top.idx].raw;
-          const firstLine = raw.split('\n').find(l => l.trim()) || '';
-          // Strip leading markers (# / - / > / 1. ) so the search
-          // hits the rendered text and the textarea consistently.
-          focusText = firstLine.replace(/^(#{1,6}\s+|\s*[-*+]\s+|\s*\d+\.\s+|>\s?)/, '').trim()
-            .slice(0, 80) || null;
-        }
-      }
-      // Switch the read/edit mode to the full EDIT face on the same
-      // document, landing the caret at the focus snippet.
-      await openReadEdit(path, { size: 'full', face: 'edit', focusText: focusText || undefined });
-    }
-
     // Update the toolbar's per-button disabled states. Phase 5a made
     // the toolbar permanently visible — this function no longer
     // shows or hides it; it only flips disabled/enabled on each
@@ -13222,9 +13201,6 @@
     //   - Format buttons + heading dropdown: enabled only when
     //     there's a single-block selection inside a paragraph or
     //     heading.
-    //   - Edit-mode button: ALWAYS enabled (with-selection jumps to
-    //     the selection text in the textarea; no-selection jumps to
-    //     the topmost visible block).
     //   - Color circles: enabled only when there's a selection AND
     //     the selection doesn't overlap any existing highlight
     //     (Phase 5b — one highlight per span max, no stacking).
@@ -13326,7 +13302,7 @@
     }
 
     // Returns {el, idx} for the topmost block currently within the
-    // review body's viewport — used by the edit-mode jump when
+    // review body's viewport — used by the read→edit face toggle when
     // there's no selection so we can scroll the textarea to a
     // sensible "where the user was reading" position. Returns null
     // if review mode isn't open or the body is empty.
@@ -13852,11 +13828,6 @@
       if (v === '') return;
       applyHeading(+v);
     });
-    document.getElementById('rt-edit-mode').addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      applyEditModeJump();
-    });
-
     // ---------- Phase 3: highlights ----------
     //
     // Per-doc colored highlights, persisted in a sidecar JSON via the

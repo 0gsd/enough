@@ -252,6 +252,15 @@ def _scan_tree(box: Path, rel_parts: tuple[str, ...] = ()) -> list[dict[str, Any
                 node["size"] = 0
             if p.name == MIRROR_NAME:
                 node["is_mirror"] = True
+            elif p.name == "article.html":
+                # Saved wikisink article (folder shape: article.html +
+                # .meta.json sidecar) — the UI routes these into the
+                # wikisink reader, not the raw-text editor.
+                try:
+                    if (p.parent / ".meta.json").is_file():
+                        node["wiki_article"] = True
+                except OSError:
+                    pass
         out.append(node)
     return out
 

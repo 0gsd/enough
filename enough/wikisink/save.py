@@ -301,11 +301,21 @@ def save_article(project_dir: Path, path: str, dest: str) -> dict[str, Any]:
 def _resolve_saved_dir(project_dir: Path, ref: str) -> Path:
     """Resolve a tree path (or absolute path) to a saved-article folder,
     validating shape and containment. `ref` may point at the folder or
-    at any file inside it. Raises ValueError with a user-facing message
-    when it isn't a saved-article folder we're allowed to touch."""
-    p = Path(ref)
-    if not p.is_absolute():
-        p = project_dir / p
+    at any file inside it. A ``cacheawl:<box>/<rel>`` prefix addresses the
+    machine-global cachebox store (same virtual prefix the file endpoints
+    use — it's how cacheawl mode launches store articles into the reader).
+    Raises ValueError with a user-facing message when it isn't a
+    saved-article folder we're allowed to touch."""
+    from .. import cacheawl as _cacheawl
+    if ref.startswith("cacheawl:"):
+        rel = Path(ref[len("cacheawl:"):].lstrip("/"))
+        if rel.is_absolute() or ".." in rel.parts or not rel.parts:
+            raise ValueError(f"invalid cacheawl path {ref!r}")
+        p = _cacheawl.root() / rel
+    else:
+        p = Path(ref)
+        if not p.is_absolute():
+            p = project_dir / p
     try:
         p = p.resolve()
     except OSError as e:
@@ -313,7 +323,10 @@ def _resolve_saved_dir(project_dir: Path, ref: str) -> Path:
     d = p if p.is_dir() else p.parent
     if not (d / META_NAME).is_file() or not (d / ARTICLE_NAME).is_file():
         raise ValueError(f"{ref!r} is not a saved wikisink article folder")
-    roots = (project_dir.resolve(), _cacheawl_wiki_dir().resolve())
+    # The whole cacheawl store is a valid root (not just its wiki/ box):
+    # article folders can be copied into other cacheboxes via transfer,
+    # and the reader should open them wherever they live in the store.
+    roots = (project_dir.resolve(), _cacheawl.root().resolve())
     if not any(d == r or r in d.parents for r in roots):
         raise ValueError(f"{ref!r} is outside the project and cacheawl wiki")
     return d

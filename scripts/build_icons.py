@@ -150,12 +150,21 @@ FILL_RATIO = 0.82  # visible art occupies ~82% of the new square canvas
 # visibly shorter than its square-ish neighbors (d6, wikisink-settings).
 # A per-icon `fill_ratio` override packs the art tighter in the square so
 # its height fill matches those neighbors (~0.95 → ~81% vertical fill).
+#
+# girraphmode.svg has the same problem rotated 90°: a TALL bbox
+# (79.2x116.16, the giraffe), whose width fills only ~56% of the square
+# under the default 0.82 — it reads visibly smaller than merirmaidmode
+# and friends in the topbar chip and cacheawl badges. Same fill_ratio
+# treatment as comment.svg.
 SPECIAL_CASES = {
     "projectnav-on.svg": {
         "strip_images": True,
         "visBBox": {"x": 18.6, "y": 33.31, "w": 54, "h": 23.62},
     },
     "comment.svg": {
+        "fill_ratio": 0.95,
+    },
+    "girraphmode.svg": {
         "fill_ratio": 0.95,
     },
 }
