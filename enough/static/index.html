@@ -2048,6 +2048,12 @@
       font-size: 12px;
     }
 
+    #girraph-mode .girraph-toolbar .gp-mode-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
     /* Breadcrumbs: the descent stack through nested girraphs and doc
        refs. Click any crumb to pop back to that level — that's also
        the cycle escape hatch. */
@@ -2391,6 +2397,12 @@
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
       font-size: 12px;
+    }
+
+    #merirmaid-mode .merirmaid-toolbar .mm-mode-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
     }
 
     #merirmaid-mode .mm-title {
@@ -6214,7 +6226,7 @@
            pops back, which is also the cycle escape hatch. -->
       <div id="girraph-mode" aria-hidden="true">
         <div class="girraph-toolbar">
-          <span>🦒</span>
+          <img class="svg-icon gp-mode-icon" data-icon="girraphmode" alt="" draggable="false">
           <nav class="gp-crumbs" id="gp-crumbs" aria-label="girraph navigation"></nav>
           <button type="button" class="gp-act" id="gp-refresh" title="re-read the file (pick up agent edits)">↻</button>
           <button type="button" class="gp-act" id="gp-add-root" title="add a top-level node">+ root node</button>
@@ -6231,7 +6243,7 @@
            leaving the diagram. -->
       <div id="merirmaid-mode" aria-hidden="true">
         <div class="merirmaid-toolbar">
-          <span>🧜</span>
+          <img class="svg-icon mm-mode-icon" data-icon="merirmaidmode" alt="" draggable="false">
           <span class="mm-title" id="merirmaid-title"></span>
           <span class="mm-badge" id="merirmaid-badge" hidden></span>
           <nav class="mm-crumbs" id="mm-crumbs" aria-label="merirmaid navigation"></nav>
@@ -9431,7 +9443,17 @@
       if (!WIKI_PATH) {
         const last = WIKI_STATUS && WIKI_STATUS.last_viewed;
         if (last && last.path) {
-          loadWikiArticle(last.path);
+          // The last-viewed article can be missing from THIS archive
+          // (archive swapped/shrunk, or the entry was recorded from a
+          // saved copy the archive never had). Opening the pane should
+          // never strand the user on an error page — note it and roll
+          // a random article instead.
+          loadWikiArticle(last.path).then((ok) => {
+            if (!ok) {
+              wikiToast(`“${last.title || last.path}” isn't in this archive — rolled a random article instead`, true);
+              wikiRandom();
+            }
+          });
         } else {
           wikiRandom();
         }
@@ -9525,6 +9547,10 @@
       if (typeof renderWikiComments === 'function') renderWikiComments();
     }
 
+    // Returns true when the article rendered, false on any failure
+    // (missing from the archive, network error). Callers that have a
+    // fallback — the last-viewed auto-load — check the result; direct
+    // navigation just leaves the error note in the body.
     async function loadWikiArticle(path, opts = {}) {
       const body = document.getElementById('wiki-body');
       hideWikiSuggest();
@@ -9535,14 +9561,15 @@
           const js = await r.json().catch(() => ({}));
           body.innerHTML = `<div class="wiki-note">${escapeHtml(js.detail ||
             'that article isn\'t in the local archive')}</div>`;
-          return;
+          return false;
         }
         art = await r.json();
       } catch (e) {
         body.innerHTML = `<div class="wiki-note">couldn't load the article: ${escapeHtml(String(e))}</div>`;
-        return;
+        return false;
       }
       wikiRenderArticle(art, opts);
+      return true;
     }
 
     // Saved-article folders in the file tree route here (server tags the
@@ -11148,8 +11175,11 @@
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'crumb' + (i === GIRRAPH_STACK.length - 1 ? ' current' : '');
+        // No 🦒 prefix on girraph crumbs — the toolbar's mode icon
+        // already says where we are; doc refs keep 📄 to flag the
+        // read-only detour.
         const base = entry.path.split('/').pop();
-        b.textContent = (entry.kind === 'doc' ? '📄 ' : '🦒 ') + base;
+        b.textContent = (entry.kind === 'doc' ? '📄 ' : '') + base;
         b.title = entry.path;
         if (i < GIRRAPH_STACK.length - 1) {
           b.onclick = () => { GIRRAPH_STACK = GIRRAPH_STACK.slice(0, i + 1); renderGirraphTop(); };
@@ -11601,8 +11631,11 @@
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'crumb' + (i === MERIRMAID_STACK.length - 1 ? ' current' : '');
+        // No 🧜 prefix on merirmaid crumbs — the toolbar's mode icon
+        // already says where we are; doc refs keep 📄 to flag the
+        // read-only detour (same convention as the girraph crumbs).
         const base = entry.path.split('/').pop();
-        b.textContent = (entry.kind === 'doc' ? '📄 ' : '🧜 ') + base;
+        b.textContent = (entry.kind === 'doc' ? '📄 ' : '') + base;
         b.title = entry.path;
         if (i < MERIRMAID_STACK.length - 1) {
           b.onclick = () => { MERIRMAID_STACK = MERIRMAID_STACK.slice(0, i + 1); renderMerirmaidTop(); };
@@ -12158,9 +12191,18 @@
         CA_DATA = await r.json();
       } catch (e) {
         CA_DATA = { root: '', project: [], cacheboxes: [] };
-        const g = document.getElementById('ca-store-grid');
-        if (g) g.innerHTML = '<div class="ca-empty">could not load cacheawl: ' +
-          (e.message || String(e)) + '</div>';
+        // Surface the failure in BOTH panes and STOP — falling through
+        // to the normal renders would repaint the grids with their
+        // generic empty states ("empty folder" / "no cacheboxes yet"),
+        // making a transient fetch failure (server restarting, timeout)
+        // look like the store is actually empty.
+        const msg = 'could not load cacheawl: ' + escapeHtml(e.message || String(e)) +
+          ' — <a href="#" onclick="caLoadTree(); return false;">retry</a>';
+        const sg = document.getElementById('ca-store-grid');
+        const pg = document.getElementById('ca-project-grid');
+        if (sg) sg.innerHTML = '<div class="ca-empty">' + msg + '</div>';
+        if (pg) pg.innerHTML = '<div class="ca-empty">' + msg + '</div>';
+        return;
       }
       // If the box we were viewing vanished (deleted/renamed), reset to list.
       if (CA_STORE_BOX && !(CA_DATA.cacheboxes || []).some((b) => b.name === CA_STORE_BOX)) {

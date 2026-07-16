@@ -45,12 +45,15 @@ enough/static/icons/build/:
      most of the byte savings come from, since a file may define 40
      gradients for one visible + N invisible layers, and needs at most a
      handful for the one layer that's left.
-   - Rewrites the root viewBox to a SQUARE, centered on the icon's visible
-     bounding box (as given by scripts/icons-bbox.json, NOT recomputed
-     here — see below), with side = max(visW, visH) / 0.82. That puts the
-     visible artwork at ~82% of the canvas for every icon regardless of
-     how its original artboard was sized, so the whole icon set gets
-     uniform, comparable padding for the first time.
+   - viewBox policy (since the 2026-07-16 uniform re-export): every source
+     ships a 72x72 artboard with the art framed by the designer, so the
+     source viewBox is kept verbatim whenever the measured visible bbox
+     (scripts/icons-bbox.json, NOT recomputed here — see below) fits
+     inside it. Only art that OVERFLOWS its artboard (a layer Illustrator
+     didn't rescale during the re-export — it would render clipped) gets
+     an auto-fitted square viewBox centered on its bbox, with side =
+     max(visW, visH) / fill_ratio (per-icon in SPECIAL_CASES, default
+     AUTO_FIT_FILL).
    - Strips any fixed width="" / height="" from the root <svg> so it is
      sized purely by CSS via its viewBox.
 
@@ -131,41 +134,51 @@ ICONS_DIR = REPO_ROOT / "enough" / "static" / "icons"
 BUILD_DIR = ICONS_DIR / "build"
 BBOX_JSON = SCRIPT_DIR / "icons-bbox.json"
 
-FILL_RATIO = 0.82  # visible art occupies ~82% of the new square canvas
+# Since the 2026-07-16 re-export every source ships a uniform 72x72
+# artboard with the art framed by the designer, so the source viewBox is
+# ground truth and is KEPT whenever the measured art fits inside it.
+# Auto-fit (below) only kicks in for icons whose artwork overflows the
+# artboard — layers Illustrator didn't rescale during the re-export.
+AUTO_FIT_FILL = 0.8  # default long-side fill for auto-fitted icons
 
 # Per-icon overrides, applied on top of icons-bbox.json.
 #
 # projectnav-on.svg embeds a rasterized soft-glow PNG behind the toggle
-# knob whose footprint (90x90) dwarfs the pill itself (54x23.62). Left
-# alone, the glow inflates the measured bbox and the "on" pill renders
-# ~40% smaller than projectnav-off's — unacceptable for a two-state
-# toggle pair. We strip the <image> glow at build time and normalize on
-# the pill-only bbox (browser-measured; identical to projectnav-off's),
-# so the pair aligns pixel-for-pixel. The UI recreates the glow with a
-# CSS drop-shadow on the on-state, which scales cleanly at any size.
+# knob whose footprint (~90x90) dwarfs the pill itself (54x23.6). We
+# strip the <image> glow at build time and override the visBBox with the
+# pill-only bbox (identical to projectnav-off's), so the pill FITS the
+# artboard and the source viewBox is kept — the pair aligns
+# pixel-for-pixel. The UI recreates the glow with a CSS drop-shadow on
+# the on-state, which scales cleanly at any size.
 #
-# comment.svg carries a WIDE bbox (91.2x77.76). Under the default 0.82
-# square-canvas fill, its long side lands at 82% of the canvas but its
-# short (vertical) side only fills ~70%, so on the wiki toolbar it reads
-# visibly shorter than its square-ish neighbors (d6, wikisink-settings).
-# A per-icon `fill_ratio` override packs the art tighter in the square so
-# its height fill matches those neighbors (~0.95 → ~81% vertical fill).
-#
-# girraphmode.svg has the same problem rotated 90°: a TALL bbox
-# (79.2x116.16, the giraffe), whose width fills only ~56% of the square
-# under the default 0.82 — it reads visibly smaller than merirmaidmode
-# and friends in the topbar chip and cacheawl badges. Same fill_ratio
-# treatment as comment.svg.
+# The four remaining overrides are the re-export stragglers whose art
+# kept its pre-2026-07-16 size and overflows the 72x72 artboard, so they
+# get auto-fitted; each fill_ratio is chosen to visually match its
+# closest in-convention sibling:
+#   comment.svg          wide 91x78  → 0.95 (matches the wiki-toolbar
+#                        neighbors' height; the user approved this look)
+#   girraphmode.svg      tall 79x116 → 0.98 (best possible — a 1.47:1
+#                        drawing can never fill a square chip's width;
+#                        a true fix needs the art rescaled in Illustrator)
+#   folder-project.svg   square 97x97 → 0.75 (matches folder.svg, 54/72)
+#   savewiki-project.svg square 97x97 → 0.82 (matches savewiki-cacheawl,
+#                        59/72)
 SPECIAL_CASES = {
     "projectnav-on.svg": {
         "strip_images": True,
-        "visBBox": {"x": 18.6, "y": 33.31, "w": 54, "h": 23.62},
+        "visBBox": {"x": 9, "y": 24.2, "w": 54, "h": 23.6},
     },
     "comment.svg": {
         "fill_ratio": 0.95,
     },
     "girraphmode.svg": {
-        "fill_ratio": 0.95,
+        "fill_ratio": 0.98,
+    },
+    "folder-project.svg": {
+        "fill_ratio": 0.75,
+    },
+    "savewiki-project.svg": {
+        "fill_ratio": 0.82,
     },
 }
 
@@ -578,6 +591,10 @@ def prune_defs(root, style_text):
 
 
 def rewrite_viewbox(root, bbox_entry, filename, warnings):
+    """Keep the source viewBox when the measured art fits inside it (the
+    designer's framing on the uniform 72x72 artboards is ground truth);
+    auto-fit a square viewBox centered on the art only when it overflows
+    the artboard — which would otherwise render clipped."""
     if bbox_entry is None:
         warnings.append(
             f"WARNING: no icons-bbox.json entry for '{filename}' — leaving its "
@@ -588,7 +605,29 @@ def rewrite_viewbox(root, bbox_entry, filename, warnings):
         return
     vb = bbox_entry["visBBox"]
     x, y, w, h = vb["x"], vb["y"], vb["w"], vb["h"]
-    fill_ratio = bbox_entry.get("fill_ratio", FILL_RATIO)
+    src = (root.get("viewBox") or "").split()
+    if len(src) == 4:
+        sx, sy, sw, sh = (float(p) for p in src)
+        eps = 0.25  # measurement jitter tolerance
+        fits = (
+            x >= sx - eps and y >= sy - eps
+            and x + w <= sx + sw + eps and y + h <= sy + sh + eps
+        )
+        if fits and abs(sw - sh) < 1e-6:
+            return  # art fits the square artboard — trust the export
+        if fits:
+            # Rectangular artboard (shouldn't happen post re-export):
+            # square it up around the artboard center, no rescale.
+            side = max(sw, sh)
+            root.set("viewBox", f"{fmt_num(sx + sw / 2 - side / 2)} "
+                                f"{fmt_num(sy + sh / 2 - side / 2)} "
+                                f"{fmt_num(side)} {fmt_num(side)}")
+            return
+    warnings.append(
+        f"note: '{filename}' art ({w}x{h} at {x},{y}) overflows its artboard "
+        f"— auto-fitting. Rescale the art in Illustrator for a proper fix."
+    )
+    fill_ratio = bbox_entry.get("fill_ratio", AUTO_FIT_FILL)
     side = max(w, h) / fill_ratio
     cx = x + w / 2
     cy = y + h / 2

@@ -2371,7 +2371,13 @@ def create_app(
             _cacheawl.reconcile_all()
             boxes = []
             for summary in _cacheawl.list_cacheboxes():
-                boxes.append(_cacheawl.cachebox_tree(summary["name"]))
+                # A box can vanish (rename/delete race) or error between
+                # the listing and its tree scan — skip it rather than
+                # 500ing the whole two-pane view.
+                try:
+                    boxes.append(_cacheawl.cachebox_tree(summary["name"]))
+                except (_cacheawl.CacheawlError, OSError):
+                    log.warning("cacheawl tree: skipping box %r", summary["name"])
             return {
                 "root": str(_cacheawl.root()),
                 "project": build_file_tree(project_dir),
