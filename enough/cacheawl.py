@@ -332,33 +332,76 @@ def _mm_label(text: str) -> str:
             .replace("\n", " ").strip())
 
 
-def _mirror_body(name: str, meta: dict[str, Any], box: Path) -> str:
-    """The Mermaid ``flowchart TD`` for a cachebox: a root node, folder and
-    file nodes mirroring the tree (depth-capped), and a metadata node."""
+def _safe_subrel(box: Path, subpath: str) -> tuple[str, ...]:
+    """Validate a box-relative subfolder path and return its parts. ``""``
+    (or ``/``) → the box root (empty tuple). Rejects absolute paths, ``..``
+    components, and anything resolving outside the box, and requires the
+    target to be an existing directory. Raises ``CacheawlError`` otherwise —
+    the same traversal discipline the transfer/`cacheawl:` scheme apply."""
+    sub = (subpath or "").strip().strip("/")
+    if not sub:
+        return ()
+    p = Path(sub)
+    if p.is_absolute() or ".." in p.parts:
+        raise CacheawlError(f"invalid subpath: {subpath!r}")
+    target = box / p
+    try:
+        target.resolve(strict=False).relative_to(box.resolve(strict=False))
+    except ValueError:
+        raise CacheawlError(f"subpath escapes the cachebox: {subpath!r}") from None
+    if not target.is_dir():
+        raise CacheawlError(f"no such folder in cachebox: {subpath!r}")
+    return p.parts
+
+
+def _mirror_body(name: str, meta: dict[str, Any], box: Path,
+                 subpath: str = "") -> tuple[str, dict[str, dict[str, Any]]]:
+    """The Mermaid ``flowchart TD`` for a cachebox (``subpath=""``) or a
+    subfolder within it: a root node, folder and file nodes mirroring the
+    tree (depth-capped), and a metadata node.
+
+    Returns ``(body, node_map)`` where ``node_map`` is ``{node_id: {"path":
+    <box-relative path>, "is_dir": bool}}`` — the viewer's shift-click menu
+    resolves a rendered node back to its on-disk location through it. Paths
+    are relative to the **box root** regardless of ``subpath`` (join with
+    the box dir for the absolute path)."""
+    subrel = _safe_subrel(box, subpath)
+    base = box.joinpath(*subrel)
     lines = ["flowchart TD"]
     edges: list[str] = []
-    stats = _stats(box)
+    node_map: dict[str, dict[str, Any]] = {}
+    stats = _stats(base)
 
     root_id = "root"
-    lines.append(f'  {root_id}["📦 {_mm_label(name)}"]')
+    root_label = f"📁 {_mm_label(subrel[-1])}" if subrel else f"📦 {_mm_label(name)}"
+    lines.append(f'  {root_id}["{root_label}"]')
+    node_map[root_id] = {"path": "/".join(subrel), "is_dir": True}
 
-    # Metadata node.
-    origin = meta.get("origin") or {}
-    otype = origin.get("type") or "folder"
-    oval = origin.get("value")
-    odepth = origin.get("depth")
-    origin_str = otype
-    if oval:
-        origin_str += f": {oval}"
-    if odepth not in (None, ""):
-        origin_str += f" (depth {odepth})"
-    meta_lines = [
-        f"origin: {origin_str}",
-        f"status: {meta.get('status', 'complete')}",
-        f"items: {stats['item_count']} · size: {_sizeof_human(stats['total_size'])}",
-        f"created: {meta.get('created_at', '?')}",
-        f"updated: {meta.get('updated_at', '?')}",
-    ]
+    # Metadata node — full origin for a box root; a lighter folder header
+    # for a subfolder (origin is box-level, not per-folder).
+    if subrel:
+        meta_lines = [
+            f"folder: {'/'.join(subrel)}",
+            f"in cachebox: {name}",
+            f"items: {stats['item_count']} · size: {_sizeof_human(stats['total_size'])}",
+        ]
+    else:
+        origin = meta.get("origin") or {}
+        otype = origin.get("type") or "folder"
+        oval = origin.get("value")
+        odepth = origin.get("depth")
+        origin_str = otype
+        if oval:
+            origin_str += f": {oval}"
+        if odepth not in (None, ""):
+            origin_str += f" (depth {odepth})"
+        meta_lines = [
+            f"origin: {origin_str}",
+            f"status: {meta.get('status', 'complete')}",
+            f"items: {stats['item_count']} · size: {_sizeof_human(stats['total_size'])}",
+            f"created: {meta.get('created_at', '?')}",
+            f"updated: {meta.get('updated_at', '?')}",
+        ]
     meta_label = _mm_label("<br/>".join(meta_lines))
     lines.append(f'  meta["🛈 {meta_label}"]')
     edges.append(f"  {root_id} -.-> meta")
@@ -381,10 +424,13 @@ def _mirror_body(name: str, meta: dict[str, Any], box: Path) -> str:
             cid = _node_id("/".join(rel_parts) + "/…")
             lines.append(f'  {cid}["… {len(descendants)} items"]')
             edges.append(f"  {parent_id} --> {cid}")
+            # The collapse node stands in for its (uncollapsed) folder.
+            node_map[cid] = {"path": "/".join(rel_parts), "is_dir": True}
             return
         for e in entries:
             rel = "/".join(rel_parts + (e.name,))
             nid = _node_id(rel)
+            node_map[nid] = {"path": rel, "is_dir": e.is_dir()}
             if e.is_dir():
                 lines.append(f'  {nid}["📁 {_mm_label(e.name)}"]')
                 edges.append(f"  {parent_id} --> {nid}")
@@ -393,22 +439,48 @@ def _mirror_body(name: str, meta: dict[str, Any], box: Path) -> str:
                 lines.append(f'  {nid}["📄 {_mm_label(e.name)}"]')
                 edges.append(f"  {parent_id} --> {nid}")
 
-    walk((), root_id, 0)
-    return "\n".join(lines + edges) + "\n"
+    walk(subrel, root_id, 0)
+    return "\n".join(lines + edges) + "\n", node_map
 
 
-def _mirror_text(name: str, meta: dict[str, Any], box: Path) -> str:
+def _mirror_frontmatter(name: str, subpath: str = "") -> str:
+    """The ``---`` frontmatter block for a mirror. Box root vs a subfolder
+    differ only in ``title`` and ``source``."""
+    sub = (subpath or "").strip().strip("/")
+    if sub:
+        title = f"folder: {sub} — cachebox: {name}"
+        source = f"cachebox:{name}/{sub}"
+    else:
+        title = f"cachebox: {name}"
+        source = f"cachebox:{name}"
     fm = [
         "---",
         "merirmaid: 1",
-        f"title: cachebox: {name}",
+        f"title: {title}",
         "modality: mirror",
         "node-char-limit: 48",
-        f"source: cachebox:{name}",
+        f"source: {source}",
         f"generated: {_now_iso()}",
         "---",
     ]
-    return "\n".join(fm) + "\n" + _mirror_body(name, meta, box)
+    return "\n".join(fm) + "\n"
+
+
+def _mirror_text(name: str, meta: dict[str, Any], box: Path) -> str:
+    body, _map = _mirror_body(name, meta, box)
+    return _mirror_frontmatter(name) + body
+
+
+def build_mirror(name: str, subpath: str = "") -> tuple[str, dict[str, dict[str, Any]]]:
+    """Return ``(merirmaid_text, node_map)`` for a cachebox (``subpath=""``)
+    or a subfolder within it. Pure generation — **never writes**; the
+    on-demand sub-folder mirrors that back the cacheawl squircles are not
+    persisted (no anonymous ``.merirmaid`` files sprinkled through folders).
+    Raises ``CacheawlError`` for a missing box or an invalid subpath."""
+    box = _require_box(name)
+    meta = load_meta(name)
+    body, node_map = _mirror_body(name, meta, box, subpath)
+    return _mirror_frontmatter(name, subpath) + body, node_map
 
 
 def regenerate_mirror(name: str) -> Path:

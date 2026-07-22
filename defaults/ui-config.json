@@ -9,8 +9,10 @@
     "affect only future installs.",
     "",
     "Two knobs users can change:",
-    "  current.theme  — name of an entry under 'themes' below",
-    "  current.font   — name of an entry under 'fonts' below",
+    "  current.theme  \u2014 name of an entry under 'themes' below",
+    "  current.font   \u2014 name of an entry under 'fonts' below",
+    "  help_highlight_on_new_project \u2014 light up the (?) help",
+    "    bubbles on a project's first launch until each is viewed (default true)",
     "",
     "For zoom, use your browser's native zoom (Cmd +/- on Mac, Ctrl on Win/Linux).",
     "",
@@ -20,12 +22,11 @@
     "key is applied as a CSS custom property (--key), so any HTML/CSS",
     "customization you do elsewhere can reference the same palette."
   ],
-
   "current": {
     "theme": "enough-default",
     "font": "mono"
   },
-
+  "help_highlight_on_new_project": true,
   "fonts": {
     "mono": {
       "label": "Monospace (SF Mono)",
@@ -44,7 +45,6 @@
       "stack": "'Courier New', Courier, 'Lucida Console', monospace"
     }
   },
-
   "themes": {
     "enough-default": {
       "label": "Enough Default",
@@ -74,7 +74,6 @@
         "zippy-hover": "#e0e0e0"
       }
     },
-
     "pastel": {
       "label": "Pastel",
       "_doc": "Pale yellow paper background, like the MacOS Terminal 'Man Page' scheme. High contrast but soft; accent colors are pastels-over-amber, not saturated.",
@@ -104,7 +103,6 @@
         "zippy-hover": "#3b3b3b"
       }
     },
-
     "wireframe": {
       "label": "Wireframe",
       "_doc": "White background, dark navy primary text, saturated primary colors for accents. Looks like a Figma wireframe or technical blueprint.",
@@ -134,10 +132,9 @@
         "zippy-hover": "#0a1e4e"
       }
     },
-
     "darknest": {
       "label": "Darknest",
-      "_doc": "Jet black and grayscale. The black-and-white edition — no hue at all. Active skill indicators and role labels use pure white; folders and muted text are greys.",
+      "_doc": "Jet black and grayscale. The black-and-white edition \u2014 no hue at all. Active skill indicators and role labels use pure white; folders and muted text are greys.",
       "icons": "dark",
       "colors": {
         "bg": "#000000",

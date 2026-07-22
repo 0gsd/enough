@@ -880,6 +880,25 @@
       letter-spacing: 0;
     }
 
+    /* First-launch highlight: the [?] stays lit + gently pulses until the
+       user opens it, then reverts to the normal hover→fade behavior. */
+    .help-trigger.pending {
+      opacity: 1;
+      pointer-events: auto;
+      color: var(--accent-user);
+      border-color: var(--accent-user);
+      animation: helpPulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes helpPulse {
+      0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent-user) 60%, transparent); }
+      70%      { box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent-user) 0%, transparent); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .help-trigger.pending { animation: none; }
+    }
+
     /* Unsave affordance: 🗑 on saved-article folder rows, same hover-
        delay pattern as the help [?]. */
     .trash-trigger {
@@ -2434,6 +2453,19 @@
       border-color: var(--accent-tool);
     }
 
+    /* View/edit split: tint the whole toolbar by modality so "read-only
+       mirror" vs "editable wip" reads at a glance — a colored left stripe
+       + bottom border matching the badge color. */
+    #merirmaid-mode.mm-face-mirror .merirmaid-toolbar {
+      border-bottom-color: var(--accent-tool);
+      box-shadow: inset 3px 0 0 var(--accent-tool);
+    }
+
+    #merirmaid-mode.mm-face-wip .merirmaid-toolbar {
+      border-bottom-color: var(--accent-user);
+      box-shadow: inset 3px 0 0 var(--accent-user);
+    }
+
     /* Breadcrumbs: the click-navigation descent stack (same push/pop
        semantics as girraph mode's @-ref crumbs). */
     #merirmaid-mode .mm-crumbs {
@@ -2772,6 +2804,7 @@
 
     /* One file/folder tile. */
     #cacheawl-mode .ca-tile {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -2782,6 +2815,40 @@
       cursor: pointer;
       user-select: none;
       text-align: center;
+    }
+
+    /* Squircle launcher (upper-left of a cachebox / folder tile) → opens
+       that folder's merirmaid mirror in the read-only viewer. Subtle until
+       the tile is hovered so the grid stays clean. */
+    #cacheawl-mode .ca-squircle {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--bg-raise);
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.12s ease, border-color 0.12s ease;
+    }
+
+    #cacheawl-mode .ca-tile:hover .ca-squircle { opacity: 1; }
+
+    #cacheawl-mode .ca-squircle:hover {
+      opacity: 1;
+      border-color: var(--accent-tool);
+    }
+
+    #cacheawl-mode .ca-squircle img.svg-icon {
+      width: 15px;
+      height: 15px;
+      pointer-events: none;
     }
 
     #cacheawl-mode .ca-tile:hover { background: var(--bg-raise); }
@@ -2914,7 +2981,8 @@
     #cacheawl-mode .review-chat { bottom: 4px; }
 
     /* Cacheawl context menu — clone of the tree context menu look. */
-    #ca-context-menu {
+    #ca-context-menu,
+    #mm-node-menu {
       position: fixed;
       z-index: 70;
       min-width: 150px;
@@ -2926,9 +2994,11 @@
       font-size: 12px;
     }
 
-    #ca-context-menu.hidden { display: none; }
+    #ca-context-menu.hidden,
+    #mm-node-menu.hidden { display: none; }
 
-    #ca-context-menu .ctx-target {
+    #ca-context-menu .ctx-target,
+    #mm-node-menu .ctx-target {
       font-family: var(--font-mono);
       font-size: 11px;
       color: var(--fg-muted);
@@ -2941,7 +3011,8 @@
       max-width: 260px;
     }
 
-    #ca-context-menu .ctx-item {
+    #ca-context-menu .ctx-item,
+    #mm-node-menu .ctx-item {
       display: block;
       width: 100%;
       text-align: left;
@@ -2954,9 +3025,11 @@
       cursor: pointer;
     }
 
-    #ca-context-menu .ctx-item:hover { background: var(--bg); }
+    #ca-context-menu .ctx-item:hover,
+    #mm-node-menu .ctx-item:hover { background: var(--bg); }
 
-    #ca-context-menu .ctx-sep {
+    #ca-context-menu .ctx-sep,
+    #mm-node-menu .ctx-sep {
       height: 1px;
       background: var(--border);
       margin: 3px 0;
@@ -3440,6 +3513,22 @@
 
     #ui-modal .ui-prefs-row label {
       flex: 1 1 0;
+    }
+
+    #ui-modal .ui-prefs-row label.ui-check-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--fg-muted);
+    }
+
+    #ui-modal .ui-check-label input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      cursor: pointer;
+      accent-color: var(--accent-user);
     }
 
     #ui-modal .ui-cols {
@@ -6271,6 +6360,12 @@
         <span class="mm-count" id="mm-label-count"></span>
       </div>
 
+      <!-- Per-node action menu (shift-click a node in the merirmaid
+           viewer). Fixed-positioned, kept outside #merirmaid-mode like the
+           label editor so it isn't clipped. Options are filled in per node
+           type from the mirror's node_map. -->
+      <div id="mm-node-menu" class="hidden" role="menu" aria-hidden="true"></div>
+
       <!-- Wikisink view mode: browser-style offline Wikipedia reader.
            Reads straight out of the ZIM archive (with overlay/preserved
            precedence) via /api/wiki/*; internal links stay in-app via
@@ -6783,6 +6878,13 @@
             <select id="ui-font"></select>
           </label>
         </div>
+        <!-- Global help-bubble setting. -->
+        <div class="ui-prefs-row">
+          <label class="ui-check-label" title="On a project's first launch, light up every (?) help bubble until you've opened each one.">
+            <input type="checkbox" id="ui-help-highlight">
+            <span>highlight <strong>(?)</strong>s on new folder launch</span>
+          </label>
+        </div>
         <!-- Two-column reference: keyboard shortcuts | markdown cheat sheet -->
         <div class="ui-cols">
           <section class="ui-col">
@@ -6902,204 +7004,90 @@
     // 1s hover before [?] appears, stays for 5s after the cursor leaves the row
     // (or the [?] itself). Click opens a themed right-side viewer with three
     // sections: what / how / ideas.
-    const HELP_DOCS = {
-      'wikisink': {
-        name: 'wikisink',
-        path: '~/enough/wikisink/',
-        what: 'your local, offline copy of (a slice of) english wikipedia — a single Kiwix ZIM archive read in place, never extracted, so the file manager only ever shows articles you explicitly save. the 🚰 button opens a browser-style reader with full-text search, cross-links, a random-article die, an agent chat pill, comments, and a single <strong>save button</strong> whose flyout offers two destinations (this project\'s <code>wiki/</code>, or the global <code>~/enough/cacheawl/wiki/</code> cachebox shared across projects). the agent can search and read the whole archive via its wiki tools.',
-        how: 'first click of 🚰 runs the setup wizard: pick a size (top-1M-articles no-images ≈ 16 GB is the default; full english ≈ 49 GB; smaller options too), pick a storage folder (external drives work), confirm, and let the resumable download run — pause, quit, resume anytime. you can keep <em>several installs</em> in different places (say, the full archive on an external drive plus a small one on the internal disk) and switch between them in the ⚙ installs list; if a drive is detached, its install just shows as unreachable until the drive returns. once installed, ask the agent to run a <strong>wikisink</strong> to refresh your saved/commented ("watched") articles from live wikipedia and get a report: watched-article changes, edit spikes, pageview movers &amp; losers, and suspicious deletions. the 🛡 button on any article is the <em>deletion override</em>: keep your local copy forever, excluded from updates. ⚙ opens the installs manager, including base-archive replacement when a newer snapshot ships.',
-        ideas: [
-          'save the articles a project leans on into its <code>wiki/</code> folder — full-fidelity copies that open back in the reader, each with a CC BY-SA attribution manifest built in.',
-          'comment on claims you doubt, then run a wikisink later — comments survive article updates (re-pinned or orphaned, never lost) and commented articles are watched automatically.',
-          'when a wikisink report flags a suspicious deletion (deleted for "notability" rather than quality — the classic case), open the article and hit 🛡 before the next base-archive swap.',
-        ],
-      },
-      'project-wiki': {
-        name: 'wiki/',
-        path: 'wiki/',
-        what: 'wikipedia articles saved into this project from the wikisink browser (the save button → "this project"). each save is a folder: <code>article.html</code> (the article exactly as the archive had it — click it to read in the wikisink viewer, full fidelity, infoboxes and all) plus <code>_manifest.md</code> (source URL, CC BY-SA license, retrieval date, origin).',
-        how: 'created automatically on your first project-level save — no setup. wikisink update runs treat everything here as <em>watched</em>: refreshed from live wikipedia and reported on. re-saving an article overwrites the folder with the freshest copy; to remove one, hover its folder in the tree a moment and click the 🗑 that appears. saved copies aren\'t meant to be hand-edited — they\'d drift out of sync with the archive. (the save button\'s other choice saves to the global <code>~/enough/cacheawl/wiki/</code> cachebox instead, shared across all projects.)',
-        ideas: [
-          'saved articles open in the reader even when the archive\'s drive is detached — they\'re your offline-offline copies.',
-          'the agent reads articles through its wiki tools (clean text extraction), so it can ground itself on saved and archived articles alike.',
-          'wikipedia text is CC BY-SA: if part of an article ends up in something you publish, the manifest has everything you need for attribution.',
-        ],
-      },
-      'wiki-comments': {
-        name: 'comments',
-        path: '~/enough/wikisink/comments/',
-        what: 'google-docs-style comments on wikipedia articles — highlight text and hit 💬, or use the toolbar 💬 to pin a comment to a paragraph. threads support replies and resolve/reopen. comments attach to the <em>article</em>, not to any saved file, so they follow the article whether it\'s saved, merely browsed, updated, or even deleted from live wikipedia.',
-        how: 'select text in the wikisink reader → 💬 comment. anchoring degrades gracefully when articles change: exact text match first; if the quoted text was edited away, the comment re-pins to its paragraph (marked "re-pinned"); if the paragraph is gone too it survives as "orphaned" in the panel. nothing is ever deleted automatically. commenting on an article adds it to the watched set for wikisink updates.',
-        ideas: [
-          'comment on statistics or claims likely to change — after a wikisink run, re-pinned comments are a signal that exact spot was edited.',
-          'ask the agent about a highlighted passage via 🤖 in the selection popup — the passage is quoted into the chat automatically.',
-        ],
-      },
-      'paradigm-active': {
-        name: 'paradigm',
-        path: 'rness/active-paradigm',
-        what: 'the reasoning framework the agent is currently using. exactly one paradigm is active at any time; click another to switch. the active paradigm is loaded in full into the system prompt every turn, and the agent also sees a brief catalog of the other available paradigms so it can suggest (or initiate) a switch when the work would benefit from one.',
-        how: 'click ● next to a paradigm to make it active for this project. the choice is recorded in <code>rness/active-paradigm</code>. agent-initiated switches happen by writing that file too, and take effect on the next turn. add new paradigms by dropping a markdown file into <code>~/enough/defaults/paradigms/</code> (or into your project\'s <code>rness/paradigms/</code> for project-local ones). a YAML frontmatter block at the top — <code>name:</code> and <code>description:</code> — tells the agent what the paradigm is for.',
-        ideas: [
-          'four paradigms are included: <em>default</em> for general-purpose work, <em>text-planning</em> for planning whatever your text may be and keeping track of its progress, <em>translation</em> which pairs with the translator skill for multi-language work, and <em>workflow-design</em> which puts the agent in "build mode" for creating new skills/paradigms/roles or refining the root AGENT.md / MOTIVATION.md.',
-          'write a paradigm for a distinct mode of work (research vs. writing, exploration vs. execution) and switch between them as the day unfolds.',
-          'a paradigm description is essentially "when should I use this" — write it for the agent\'s benefit, since that\'s the signal it reads to recommend switching.',
-        ],
-      },
-      'requests': {
-        name: 'requests/',
-        path: 'rness/requests/',
-        what: 'persistent task and sub-task containers. each request is a markdown file capturing the goal of your request, the agent\'s reasoning so far, and a continuation block so work can resume across context resets — these are the unit of long-running effort in enough. they are also helpful to continue work if you hit a context window. completed requests live alongside the active ones in <code>rness/requests/done/</code>.',
-        how: 'new requests appear in <code>rness/requests/</code> automatically as you and the agent work — click any file in the project tree to view it in the file panel. from there you can <em>mark done</em> (the file moves to <code>rness/requests/done/</code>) or <em>customize</em>. to start a request manually, drop a markdown file into <code>rness/requests/</code> with a brief goal at the top.',
-        ideas: [
-          'treat a request as a long-running project — break a vague intent into one and let the agent flesh it out across multiple sessions.',
-          'browse <code>rness/requests/done/</code> as a journal of what you\'ve actually completed — it\'s the most honest record of your work with this agent.',
-          'at context window auto-reset checkpoints, the agent writes a Continuation block to the active request — read it before resuming if you want to redirect.',
-        ],
-      },
-      'skills': {
-        name: 'skills',
-        path: 'rness/skills/',
-        what: 'per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. active skills add vocabulary, recipes, or behaviors the agent will reach for during conversation.',
-        how: 'click ● / ○ to toggle a skill on or off for this project. you can add project-level skills to <code>rness/skills/</code> — skill statuses are saved per project. to install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). edit a global skill at the source and the change propagates everywhere it\'s symlinked.',
-        ideas: [
-          'five default skills are included:<ul><li><em>analyzer</em> which can summarize or proofread any text as well as help you make decisions about anything</li><ul><li><em>girraph-merirmaid</em> to develop editable issue-based information system (IBIS) problem graphs for your wickedest problems in .girraph format, and Mermaid diagrams of any structure or process in .merirmaid format</li><li><em>memoir-dialectic</em> which can help you structure your memoirs</li><li><em>skill-scanner</em> to scan downloaded 3P skills for security risks and describe what they can help you with</li><li><em>translator</em> (paired with the <em>translation</em> paradigm) for universal text translation</li></ul>',
-          'build global or project-local skills to capture your house style or domain conventions.',
-          'turn everything off for "pure conversation" — sometimes the model has more breathing room for emergent epiphanies with no scaffolding.',
-        ],
-      },
-      'roles': {
-        name: 'roles',
-        path: 'rness/roles/',
-        what: 'consultant agents you can summon in conversation, sourced from <code>~/enough/defaults/roles/</code>. each role is a folder containing AGENT.md (instructions) and MOTIVATION.md (drives) — the same pair of files that defines the main agent, but scoped to a complementary (or adversarial) persona.',
-        how: 'click ● / ○ to enable a role for this project. add new roles globally by creating <code>~/enough/defaults/roles/&lt;name&gt;/</code> with AGENT.md and MOTIVATION.md inside; project-level works and edits propagate, just like skills.',
-        ideas: [
-          'two default roles are included: <em>block-breaker</em> will help you break whatever writer\'s block is bothering you, and <em>open-skeptic</em> pokes at and pushes back on your brilliant ideas to help you push forward.',
-          'build a "rubber duck" that asks Socratic questions instead of answering.',
-          'use your knowledge base\'s files with the <em>workflow-design</em> paradigm to craft a domain expert (legal, design, copy) role.',
-        ],
-      },
-      'rness': {
-        name: 'rness/',
-        path: 'rness/',
-        what: 'the project\'s externalized system. rness/ is where each project\'s config, instructions, knowledge files, and history logs live — everything the agent uses for this project. it sits at the top of the project so you can edit it directly with any file manager or editor; the enough UI also surfaces its contents in the sidebar.',
-        how: 'some contents are symlinks to <code>~/enough/defaults/</code> and update centrally. to diverge for a project, open a file and click <em>customize</em> — it becomes a project-local copy. add new files freely via conversations or your system\'s file manager; the agent will discover any files added locally on its next turn.',
-        ideas: [
-          'get to know the components that drive your enough workflow and edit them wherever you like.',
-          'treat it as living documentation — what would a new teammate or agent or role need to know?',
-          'periodically prune stale knowledge so the agent doesn\'t cite obsolete decisions.',
-        ],
-      },
-      'agent-md': {
-        name: 'AGENT.md',
-        path: 'rness/AGENT.md',
-        what: 'the agent\'s working instructions for this project. used for every turn alongside MOTIVATION.md. everything in here shapes how the agent talks, what it does, and what it avoids.',
-        how: 'click the file to view it; hit <em>customize</em> to fork a project-local copy and edit. or open <code>rness/AGENT.md</code> in any editor — saved changes take effect on the next message.',
-        ideas: [
-          'add project-specific guardrails (e.g., "always double-check both spelling and factuality before finalzing an edit").',
-          'list the naming conventions of your project so the agent doesn\'t have to guess (or hallucinnovate).',
-          'encode the collaboration style you want — terse, exploratory, deferential, blunt.',
-        ],
-      },
-      'motivation-md': {
-        name: 'MOTIVATION.md',
-        path: 'rness/MOTIVATION.md',
-        what: 'the agent\'s "why" for this project — values, priorities, and goals beyond the literal task list. used alongside AGENT.md every turn.',
-        how: 'same as AGENT.md — click to preview, customize for a project-local copy, or edit the file directly.',
-        ideas: [
-          'spell out tradeoffs you care about: correctness over speed, brevity over thoroughness, etc.',
-          'name the user-facing experience the project aims for, in your own words.',
-          'describe what "done" feels like — the agent will calibrate its sense of progress against that.',
-        ],
-      },
-      'paradigms': {
-        name: 'paradigms/',
-        path: 'rness/paradigms/',
-        what: 'the full set of reasoning frameworks available in this project. each paradigm is a markdown file with a YAML frontmatter block (<code>name</code> + <code>description</code>) and a body describing how to approach work — heuristics, decision criteria, when to ask vs. act. exactly one is active at any time (see the <strong>paradigm</strong> section at the top of the sidebar to switch).',
-        how: 'symlinked from <code>~/enough/defaults/paradigms/</code>. edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. new paradigms can be added simply by dropping a markdown file into the defaults folder — give it a frontmatter <code>name:</code> and <code>description:</code> so the agent knows when to recommend it.',
-        ideas: [
-          'four paradigms are included: <em>default</em> for general-purpose work, <em>text-planning</em> for planning whatever your text may be and keeping track of its progress, <em>translation</em> which pairs with the translator skill for multi-language work, and <em>workflow-design</em> which puts the agent in "build mode" for creating new skills/paradigms/roles or refining the root AGENT.md / MOTIVATION.md.',
-          'write a paradigm for a distinct mode of work (research vs. writing, exploration vs. execution) and switch between them as the day unfolds.',
-          'a paradigm description is essentially "when should I use this" — write it for the agent\'s benefit, since that\'s the signal it reads to recommend switching.'
-        ],
-      },
-      'policies': {
-        name: 'policies/',
-        path: 'rness/policies/',
-        what: 'hard rules the agent must follow — what tools to use, which files it can read or write, how to format requests, how to handle context-window pressure, and which paths are allowlisted.',
-        how: 'symlinked from <code>~/enough/defaults/policies/</code>. edit globally to update the rules for every project, or customize per-project. allowlists in particular are the most common thing to tune, as both local paths and web URLs need to be explicitly listed.',
-        ideas: [
-          'tighten the read/write allowlist when working with secrets or sensitive code.',
-          'add a policy for how to handle long-running scripts or background processes.',
-          'define your own checkpoint format if the default Continuation block doesn\'t fit.',
-        ],
-      },
-      'knowledge': {
-        name: 'knowledge/',
-        path: 'rness/knowledge/',
-        what: 'project-specific knowledge that doesn\'t belong in <code>rness/io/</code> or <code>~/enough/infoworld/</code>: always contains <code>project-profile.md</code> (living notes the agent keeps about this project — your preferences and working style as observed here, recurring people / files, conventions adopted) and <code>session-logs/</code> (each turn\'s prompt and response, saved as markdown).',
-        how: '<code>project-profile.md</code> is piped into the system prompt on every turn — both the agent and you can edit it. session logs are append-only. add new subfolders for any project-local memory you want the agent to consult.',
-        ideas: [
-          'maintain a glossary subfolder for project-specific jargon.',
-          'let the agent write a "lessons learned" file as you iterate together.',
-          'archive old session logs periodically so agent searches stay fast.',
-        ],
-      },
-      'io': {
-        name: 'io/',
-        path: 'rness/io/',
-        what: 'a project-level space for files the agent reads from (<code>input/</code>) or writes to (<code>output/</code>). useful when you want the agent to process a file without polluting the project root.',
-        how: 'drop files into <code>rness/io/input/</code> and the agent will see them. anything the agent generates lands in <code>rness/io/output/</code> — review and move what you want to keep, then clear the rest.',
-        ideas: [
-          'drop a CSV or transcript into <code>input/</code> and ask the agent to summarize.',
-          'collect multiple draft outputs in <code>output/</code> and pick the best one (or have the model cross-evaluate them).',
-          'clear both periodically — the agent doesn\'t need yesterday\'s scratch work in its context.',
-        ],
-      },
-      'infoworld': {
-        name: 'cacheawl',
-        path: '~/enough/cacheawl/',
-        what: 'the machine-global file store, shared across every enough project. (this replaces the old <code>infoworld/</code> library — on your first launch of this version, your <code>personal/</code>, <code>public/</code>, and <code>wiki/</code> folders were moved here, each becoming a cachebox.) a <em>cachebox</em> is a top-level folder in the store: either plain text you want to keep forever, or a "cached replica" ingested from a local path, a website, or a set of wikipedia articles. the store is hidden from every project\'s file tree and managed through cacheawl mode + the agent\'s cachebox tools.',
-        how: 'open cacheawl mode (the topbar cacheawl button) for a two-pane view: your project on one side, the cacheboxes on the other. drag a file across to copy it, shift-drag to move; the ingest bar composes a request to the agent to pull in a path/site/wiki topic. or just ask the agent — it can list, create, and ingest into cacheboxes (gated by the "cacheawl tools" broker toggle). each box carries an auto-generated <code>_cachebox.merirmaid</code> diagram of its contents (read-only — it regenerates from the files) and hidden metadata; you never edit those directly.',
-        ideas: [
-          'ingest a documentation site to a shallow depth so the agent can ground on it fully offline.',
-          'keep a <code>personal</code> cachebox of reference material queryable from any project.',
-          'save wikipedia articles you rely on to the global <code>wiki</code> cachebox — shared everywhere, not tied to one project.',
-        ],
-      },
-      'mode-system': {
-        name: 'read / edit mode',
-        path: 'the file viewer',
-        what: 'clicking a file opens it in one unified <strong>read/edit mode</strong> with two faces — a read face (eye) and an edit face (pencil). it lives either as a mini side panel next to the chat or expanded to a full frame; use the mini↔full toggle to switch. edits are dirty-guarded, so you won\'t lose unsaved changes by navigating away by accident.',
-        how: 'single-click a file in the tree to open it in the mini panel; expand it to a full frame when you want room. the active mode always shows its icon top-right; click that icon to flip between the read (eye) and edit (pencil) faces, and click the little ribbon hanging off its corner (the red x) to exit the mode entirely. the same top-right icon + exit-ribbon pattern is shared by every full-frame mode (wikisink, girraph, merirmaid, cacheawl).',
-        ideas: [
-          'keep a file open in the mini panel while you chat — reference and conversation side by side.',
-          'go full-frame for long documents or when editing, back to mini when you just need a peek.',
-        ],
-      },
-      'merirmaid': {
-        name: 'merirmaid',
-        path: '*.merirmaid',
-        what: 'enough\'s flavor of a <a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid</a> diagram: plain-text diagram source with a small header, rendered live to a picture in the browser (flowcharts, sequence diagrams, state machines, ER diagrams — anything Mermaid supports). two kinds: a <em>wip</em> diagram you can tweak, and a <em>mirror</em> that reflects some structure (like a cachebox\'s contents) and is read-only.',
-        how: 'ask the agent to draw or revise a diagram — it writes the <code>.merirmaid</code> source; opening the file renders it. in a wip diagram you can click a node\'s text to edit the label in place (with a live character count); structural changes go through the agent via the chat pill. nodes can link to other diagrams or docs — click them to follow, with breadcrumbs to step back. a bad diagram shows the error plus the raw source, never a blank pane. mirror diagrams show a "mirror" badge instead of edit handles.',
-        ideas: [
-          'have the agent diagram a process or architecture you\'re reasoning about, then refine it in conversation.',
-          'link a set of diagrams together with clickable nodes to build a navigable map.',
-          'pair it with girraphs: a girraph for the argument, a merirmaid for the flow.',
-        ],
-      },
-      'cacheawl': {
-        name: 'cacheawl',
-        path: '~/enough/cacheawl/',
-        what: 'the machine-global store of <em>cacheboxes</em> — top-level folders holding text you want to keep forever, or cached replicas ingested from a local path, a website, or wikipedia articles. shared across every project and hidden from project file trees. this is where the old <code>infoworld</code> library now lives.',
-        how: 'open cacheawl mode from the topbar for the two-pane view (project ↔ cacheboxes): drag to copy a file between them, shift-drag to move, and use the ingest bar to ask the agent to pull a source into a box. or talk to the agent directly — it can list, create, and ingest into boxes when the "cacheawl tools" broker toggle is on (url ingests also respect your fetch_url toggles). every box shows an auto-generated diagram of its contents (<code>_cachebox.merirmaid</code>, read-only) and keeps hidden metadata you don\'t touch.',
-        ideas: [
-          'ingest a docs site or a folder of notes so the agent can work from it offline.',
-          'move a finished artifact into a cachebox to keep it out of the working project but still reachable everywhere.',
-          'double-click a box\'s diagram to see its shape at a glance in the merirmaid viewer.',
-        ],
-      },
-    };
+    // Help content is authored in /static/help-docs.md (one `## <id>` section
+    // per bubble) and loaded at startup into this map, replacing the old
+    // inline object. The {{skills-list}} / {{roles-list}} / {{paradigms-list}}
+    // tokens expand from /api/help/defaults so the default lists track what's
+    // actually installed. Populated by loadHelpDocs().
+    let HELP_DOCS = {};
+    let HELP_DOCS_READY = null;
+
+    function _helpExpandTokens(text, defaults) {
+      if (!text || text.indexOf('{{') === -1) return text;
+      const mk = (items) => {
+        if (!items || !items.length) return '<ul></ul>';
+        return '<ul class="help-defaults">' + items.map((it) =>
+          '<li><em>' + escapeHtml(it.name) + '</em>' +
+          (it.desc ? ' — ' + escapeHtml(it.desc) : '') + '</li>').join('') + '</ul>';
+      };
+      return text
+        .replace(/\{\{skills-list\}\}/g, mk(defaults.skills))
+        .replace(/\{\{roles-list\}\}/g, mk(defaults.roles))
+        .replace(/\{\{paradigms-list\}\}/g, mk(defaults.paradigms));
+    }
+
+    // Parse the combined help-docs.md into {id: {name, path, what, how,
+    // ideas[]}} — the same shape the old inline HELP_DOCS had. Sections start
+    // at `## <id>`; `name:`/`path:` lines head the section; `### what|how|
+    // ideas` bodies follow (what/how kept as raw inline HTML; ideas split on
+    // `- ` bullet lines).
+    function _parseHelpDocs(md, defaults) {
+      const docs = {};
+      let cur = null, section = null, buf = [];
+      const flushBody = () => {
+        if (cur && section) {
+          if (section === 'ideas') {
+            cur.ideas = buf.join('\n').split(/\r?\n/)
+              .map((l) => l.replace(/^\s*-\s+/, '').trim())
+              .filter((l) => l.length)
+              .map((l) => _helpExpandTokens(l, defaults));
+          } else {
+            cur[section] = _helpExpandTokens(buf.join('\n').trim(), defaults);
+          }
+        }
+        buf = [];
+      };
+      for (const raw of md.split(/\r?\n/)) {
+        let m;
+        if ((m = /^##\s+(?!#)(\S.*)$/.exec(raw))) {
+          flushBody();
+          const id = m[1].trim();
+          cur = { name: id, path: '', what: '', how: '', ideas: [] };
+          docs[id] = cur; section = null; buf = [];
+          continue;
+        }
+        if ((m = /^###\s+(what|how|ideas)\s*$/.exec(raw))) {
+          flushBody(); section = m[1]; buf = []; continue;
+        }
+        if (cur && section === null) {
+          if ((m = /^name:\s*(.*)$/.exec(raw))) { cur.name = m[1].trim(); continue; }
+          if ((m = /^path:\s*(.*)$/.exec(raw))) { cur.path = m[1].trim(); continue; }
+          continue;   // blank/comment lines in the section head
+        }
+        if (section) buf.push(raw);
+      }
+      flushBody();
+      return docs;
+    }
+
+    async function loadHelpDocs() {
+      if (HELP_DOCS_READY) return HELP_DOCS_READY;
+      HELP_DOCS_READY = (async () => {
+        let md = '', defaults = { skills: [], roles: [], paradigms: [] };
+        try {
+          const [mdR, defR] = await Promise.all([
+            fetch('/static/help-docs.md'),
+            fetch('/api/help/defaults'),
+          ]);
+          if (mdR.ok) md = await mdR.text();
+          if (defR.ok) defaults = await defR.json();
+        } catch (_e) { /* leave HELP_DOCS empty; bubbles just no-op */ }
+        HELP_DOCS = _parseHelpDocs(md, defaults);
+        return HELP_DOCS;
+      })();
+      return HELP_DOCS_READY;
+    }
+    loadHelpDocs();
 
     function helpDocToHtml(doc) {
       const liItems = (doc.ideas || []).map(s => `<li>${s}</li>`).join('');
@@ -7112,9 +7100,11 @@
       );
     }
 
-    function openHelp(id) {
+    async function openHelp(id) {
+      await loadHelpDocs();   // no-op after first load; content is external now
       const doc = HELP_DOCS[id];
       if (!doc) return;
+      markHelpViewed(id);     // first-launch highlight: this bubble is now seen
       document.getElementById('help-body').innerHTML = helpDocToHtml(doc);
       const v = document.getElementById('help-viewer');
       v.classList.add('open');
@@ -7134,6 +7124,24 @@
 
     // Hover-delay state lives on the row element itself (no global Map needed),
     // so HTMX swaps that destroy the row also destroy the timers.
+    // Create (once) the [?] button for a row and wire its click.
+    function _makeHelpButton(row) {
+      if (row._helpButton) return row._helpButton;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'help-trigger';
+      btn.textContent = '?';
+      btn.setAttribute('aria-label', 'help');
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        ev.preventDefault();
+        openHelp(row.dataset.help);
+      });
+      row.appendChild(btn);
+      row._helpButton = btn;
+      return btn;
+    }
+
     function _scheduleHelpShow(row) {
       if (row._helpFadeTimer) {
         clearTimeout(row._helpFadeTimer);
@@ -7143,21 +7151,7 @@
       if (row._helpShowTimer) return;
       row._helpShowTimer = setTimeout(() => {
         row._helpShowTimer = null;
-        let btn = row._helpButton;
-        if (!btn) {
-          btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'help-trigger';
-          btn.textContent = '?';
-          btn.setAttribute('aria-label', 'help');
-          btn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            ev.preventDefault();
-            openHelp(row.dataset.help);
-          });
-          row.appendChild(btn);
-          row._helpButton = btn;
-        }
+        const btn = _makeHelpButton(row);
         requestAnimationFrame(() => btn.classList.add('shown'));
       }, 1000);
     }
@@ -7167,6 +7161,8 @@
         clearTimeout(row._helpShowTimer);
         row._helpShowTimer = null;
       }
+      // First-launch highlighted bubbles stay lit until viewed — never fade.
+      if (row._helpButton && row._helpButton.classList.contains('pending')) return;
       if (!row._helpButton || !row._helpButton.classList.contains('shown')) return;
       if (row._helpFadeTimer) clearTimeout(row._helpFadeTimer);
       row._helpFadeTimer = setTimeout(() => {
@@ -7216,6 +7212,63 @@
         if (e.target.closest('.file-row a')) closeHelp();
       });
     }
+
+    // ---------- First-launch help highlights ----------
+    // On a project's first launch (when the global setting is on), every help
+    // (?) bubble is lit up persistently until the user opens it, then that
+    // bubble reverts to the quiet hover→fade behavior. State lives in
+    // rness/active-paradigm's "Help bubble highlights" section, via
+    // /api/help/highlights. Sidebar-scoped, like the bubbles themselves.
+    let HELP_PENDING = null;   // Set of pending bubble ids (null until loaded)
+
+    async function loadHelpHighlights() {
+      try {
+        await loadHelpDocs();
+        const r = await fetch('/api/help/highlights');
+        if (!r.ok) return;
+        const data = await r.json();
+        let pending = data.pending;
+        if (pending === 'all') pending = Object.keys(HELP_DOCS);
+        HELP_PENDING = new Set(Array.isArray(pending) ? pending : []);
+        applyHelpHighlights();
+      } catch (_e) { /* highlights are a nicety — ignore failures */ }
+    }
+
+    function applyHelpHighlights() {
+      if (!HELP_PENDING || !HELP_PENDING.size) return;
+      document.querySelectorAll('.sidebar [data-help]').forEach((row) => {
+        if (!HELP_PENDING.has(row.dataset.help)) return;
+        if (row._helpFadeTimer) { clearTimeout(row._helpFadeTimer); row._helpFadeTimer = null; }
+        const btn = _makeHelpButton(row);
+        btn.classList.add('shown', 'pending');
+      });
+    }
+
+    // A bubble is "viewed" the moment its panel opens: drop it from the
+    // pending set, persist the reduced list, and let it fade normally.
+    async function markHelpViewed(id) {
+      if (!HELP_PENDING || !HELP_PENDING.has(id)) return;
+      HELP_PENDING.delete(id);
+      document.querySelectorAll('.sidebar [data-help="' + id + '"]').forEach((row) => {
+        if (row._helpButton) {
+          row._helpButton.classList.remove('pending');
+          _scheduleHelpFade(row);   // now on the normal 5s fade timer
+        }
+      });
+      try {
+        await fetch('/api/help/highlights', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pending: [...HELP_PENDING] }),
+        });
+      } catch (_e) { /* best-effort persistence */ }
+    }
+
+    // The sidebar's HTMX partials (paradigm/roles/skills/tree) re-render on
+    // their own timers and wipe injected buttons — re-light after each settle.
+    document.body.addEventListener('htmx:afterSettle', () => applyHelpHighlights());
+
+    loadHelpHighlights();
 
     // ---------- Unsave affordance: 🗑 on saved-article folder rows ----------
     //
@@ -7695,6 +7748,11 @@
         if (key === cur.font) opt.selected = true;
         fontSel.appendChild(opt);
       }
+      const hl = document.getElementById('ui-help-highlight');
+      if (hl) {
+        const v = UI_CONFIG.help_highlight_on_new_project;
+        hl.checked = (v === undefined || v === null) ? true : !!v;  // default on
+      }
     }
 
     async function saveUIConfig(partial) {
@@ -7728,6 +7786,9 @@
     });
     document.getElementById('ui-font').addEventListener('change', (e) => {
       saveUIConfig({ font: e.target.value });
+    });
+    document.getElementById('ui-help-highlight')?.addEventListener('change', (e) => {
+      saveUIConfig({ help_highlight_on_new_project: e.target.checked });
     });
     // Escape closes the modal.
     document.addEventListener('keydown', (e) => {
@@ -11600,10 +11661,34 @@
     }
     window.enterMerirmaidMode = enterMerirmaidMode;
 
+    // Open a cachebox / subfolder mirror in the read-only viewer WITHOUT a
+    // disk file: the diagram is generated on demand by the backend
+    // (GET /api/cacheawl/mirror). `subpath` empty → the whole box. Backs the
+    // cacheawl squircles; sub-folder mirrors are never written to disk.
+    async function enterMerirmaidMirror(box, subpath) {
+      const sub = subpath || '';
+      const pseudo = 'cacheawl:' + box + (sub ? '/' + sub : '');
+      MERIRMAID_STACK = [{ kind: 'mirror', box, subpath: sub, path: pseudo }];
+      const root = document.getElementById('merirmaid-mode');
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      setActiveMode('merirmaid', {
+        icon: 'merirmaidmode',
+        onIconClick: null,
+        onExit: exitMerirmaidMode,
+        iconTitle: 'merirmaid',
+        exitTitle: 'exit merirmaid',
+      });
+      await renderMerirmaidTop();
+      refreshMerirmaidChatTail();
+    }
+    window.enterMerirmaidMirror = enterMerirmaidMirror;
+
     function exitMerirmaidMode() {
       mmCloseLabelEditor();
+      mmHideNodeMenu();
       const root = document.getElementById('merirmaid-mode');
-      root.classList.remove('open');
+      root.classList.remove('open', 'mm-face-mirror', 'mm-face-wip');
       root.setAttribute('aria-hidden', 'true');
       clearActiveMode();
       MERIRMAID_STACK = [];
@@ -11723,6 +11808,7 @@
 
       if (top.kind === 'doc') {
         badge.hidden = true;
+        mmApplyModalityChrome('doc');   // neutral — a read-only .md detour
         titleEl.textContent = top.path.split('/').pop();
         let raw;
         try { raw = await mmLoadDisk(top.path); }
@@ -11739,20 +11825,53 @@
         return;
       }
 
-      // merirmaid kind
-      let raw;
-      try { raw = await mmLoadDisk(top.path); }
-      catch (e) {
-        badge.hidden = true;
-        titleEl.textContent = top.path.split('/').pop();
-        body.innerHTML = '<div class="mm-warnings">could not load '
-          + escapeHtml(top.path) + ': ' + escapeHtml(e.message) + '</div>';
-        return;
+      // merirmaid (disk file) or mirror (on-demand virtual) kind
+      let raw = null;
+      let nodeMap = null, boxPath = null, boxName = null, subpath = '';
+      if (top.kind === 'mirror') {
+        let payload;
+        try { payload = await mmFetchMirror(top.box, top.subpath); }
+        catch (e) {
+          badge.hidden = true;
+          titleEl.textContent = top.box + (top.subpath ? '/' + top.subpath : '');
+          body.innerHTML = '<div class="mm-warnings">could not load mirror for '
+            + escapeHtml(top.box) + (top.subpath ? '/' + escapeHtml(top.subpath) : '')
+            + ': ' + escapeHtml(e.message) + '</div>';
+          return;
+        }
+        raw = payload.text;
+        nodeMap = payload.node_map || {};
+        boxPath = payload.box_path || null;
+        boxName = top.box; subpath = top.subpath || '';
+      } else {
+        try { raw = await mmLoadDisk(top.path); }
+        catch (e) {
+          badge.hidden = true;
+          titleEl.textContent = top.path.split('/').pop();
+          body.innerHTML = '<div class="mm-warnings">could not load '
+            + escapeHtml(top.path) + ': ' + escapeHtml(e.message) + '</div>';
+          return;
+        }
       }
       const parsed = mmParseFile(raw);
-      MM_CURRENT = { path: top.path, parsed };
+      // A cachebox mirror opened as a FILE (double-click on _cachebox.merirmaid)
+      // has no node_map yet — fetch it so the shift-click node menu can
+      // resolve nodes to disk. Virtual mirrors already carry it.
+      if (top.kind === 'merirmaid' && parsed.modality === 'mirror'
+          && typeof top.path === 'string' && top.path.startsWith('cacheawl:')) {
+        const bx = mmCacheawlBox(top.path);
+        if (bx) {
+          try {
+            const payload = await mmFetchMirror(bx.box, '');
+            nodeMap = payload.node_map || {};
+            boxPath = payload.box_path || null;
+            boxName = bx.box; subpath = '';
+          } catch (_e) { /* menu just won't offer disk actions */ }
+        }
+      }
+      MM_CURRENT = { path: top.path, parsed, nodeMap, boxPath, boxName, subpath };
       MM_PATH = top.path;
-      MM_TITLE = parsed.meta.title || top.path.split('/').pop();
+      MM_TITLE = parsed.meta.title || (top.path || '').split('/').pop();
       titleEl.textContent = MM_TITLE;
       badge.hidden = false;
       badge.className = 'mm-badge ' + parsed.modality;
@@ -11760,9 +11879,168 @@
       badge.title = parsed.modality === 'mirror'
         ? 'read-only mirror of an external structure — edit the source it mirrors, not this file'
         : 'work-in-progress diagram — click a node label to edit its text';
+      mmApplyModalityChrome(parsed.modality);
       await mmRenderDiagram(top.path, parsed, body);
     }
     window.renderMerirmaidTop = renderMerirmaidTop;
+
+    // ----- on-demand mirror plumbing (cacheawl squircles + node menu) -----
+
+    // Fetch a cachebox / subfolder mirror from the backend. Returns
+    // {text, node_map, box_path, modality, subpath}.
+    async function mmFetchMirror(box, subpath) {
+      const q = '/api/cacheawl/mirror?box=' + encodeURIComponent(box)
+        + (subpath ? '&path=' + encodeURIComponent(subpath) : '');
+      const r = await fetch(q);
+      if (!r.ok) {
+        let detail = r.statusText;
+        try { detail = (await r.json()).detail || detail; } catch (_e) { /* keep */ }
+        throw new Error(detail);
+      }
+      return r.json();
+    }
+
+    // Derive the cachebox name from a `cacheawl:<box>/<rel>` file path.
+    function mmCacheawlBox(path) {
+      if (!path || !path.startsWith('cacheawl:')) return null;
+      const rest = path.slice('cacheawl:'.length).replace(/^\/+/, '');
+      const slash = rest.indexOf('/');
+      const box = slash === -1 ? rest : rest.slice(0, slash);
+      return box ? { box } : null;
+    }
+
+    // Tint the mode chrome by modality; any other value clears the tint.
+    function mmApplyModalityChrome(modality) {
+      const root = document.getElementById('merirmaid-mode');
+      if (!root) return;
+      root.classList.remove('mm-face-mirror', 'mm-face-wip');
+      if (modality === 'mirror') root.classList.add('mm-face-mirror');
+      else if (modality === 'wip') root.classList.add('mm-face-wip');
+    }
+
+    function mmModeLabel(name) {
+      const low = (name || '').toLowerCase();
+      if (low.endsWith('.girraph')) return 'girraph';
+      if (low.endsWith('.merirmaid')) return 'merirmaid';
+      return 'read/edit';
+    }
+
+    // Visible text of a rendered node (emoji + label) — the fallback action
+    // for wip / non-cachebox nodes that have no on-disk mapping.
+    function mmNodeLabelText(g) {
+      return (g && g.textContent || '').trim();
+    }
+
+    // ----- shift-click node menu -----
+    let MM_NODE_CTX = null;
+
+    function mmHideNodeMenu() {
+      const menu = document.getElementById('mm-node-menu');
+      if (!menu) return;
+      menu.classList.add('hidden');
+      menu.setAttribute('aria-hidden', 'true');
+      menu.innerHTML = '';
+      MM_NODE_CTX = null;
+    }
+    window.mmHideNodeMenu = mmHideNodeMenu;
+
+    function mmShowNodeMenu(x, y, g, id, path, nodeMap) {
+      const menu = document.getElementById('mm-node-menu');
+      if (!menu) return;
+      const info = (nodeMap && nodeMap[id]) ? nodeMap[id] : null;
+      const box = (MM_CURRENT && MM_CURRENT.boxName) || null;
+      const label = mmNodeLabelText(g) || id;
+      MM_NODE_CTX = { id, path, box, info, label };
+      const items = [];
+      const glyph = info ? (info.is_dir ? '📁' : '📄') : '◦';
+      const targetName = info
+        ? (info.path ? info.path.split('/').pop() : (box || 'cachebox'))
+        : label;
+      items.push('<div class="ctx-target" title="' + escapeHtml(targetName) + '">'
+        + glyph + ' ' + escapeHtml(targetName) + '</div>');
+      if (info && box) {
+        items.push('<button type="button" class="ctx-item" data-act="copy-disk-path">copy path on disk</button>');
+        if (info.is_dir) {
+          items.push('<button type="button" class="ctx-item" data-act="open-folder">open folder in cacheawl</button>');
+        } else {
+          items.push('<button type="button" class="ctx-item" data-act="copy-file">copy file to clipboard</button>');
+          items.push('<button type="button" class="ctx-item" data-act="open-file">open in '
+            + escapeHtml(mmModeLabel(targetName)) + ' mode</button>');
+        }
+      } else {
+        // Non-mirror node (wip diagram, or a node with no mapping): the hook
+        // is here per the split's contract, filtered to what's meaningful.
+        items.push('<button type="button" class="ctx-item" data-act="copy-label">copy node label</button>');
+      }
+      menu.innerHTML = items.join('');
+      menu.classList.remove('hidden');
+      menu.setAttribute('aria-hidden', 'false');
+      menu.style.left = x + 'px';
+      menu.style.top = y + 'px';
+      requestAnimationFrame(() => {
+        const rect = menu.getBoundingClientRect();
+        const vw = window.innerWidth, vh = window.innerHeight;
+        if (rect.right > vw - 6) menu.style.left = Math.max(6, vw - rect.width - 6) + 'px';
+        if (rect.bottom > vh - 6) menu.style.top = Math.max(6, vh - rect.height - 6) + 'px';
+      });
+    }
+
+    async function mmOpenFolderInCacheawl(box, relPath) {
+      exitMerirmaidMode();
+      await enterCacheawlMode();     // resets state + loads the tree
+      CA_STORE_BOX = box;
+      CA_STORE_SUB = relPath ? relPath.split('/') : [];
+      caRenderStore();
+    }
+
+    function mmOpenNodeFile(box, relPath, name) {
+      const path = 'cacheawl:' + box + (relPath ? '/' + relPath : '');
+      const low = (name || relPath || '').toLowerCase();
+      exitMerirmaidMode();
+      if (low.endsWith('.girraph')) enterGirraphMode(path);
+      else if (low.endsWith('.merirmaid')) enterMerirmaidMode(path);
+      else openReadEdit(path, { size: 'full', face: 'read' });
+    }
+
+    document.getElementById('mm-node-menu')?.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.ctx-item');
+      if (!btn || !MM_NODE_CTX) return;
+      const ctx = MM_NODE_CTX;
+      const act = btn.dataset.act;
+      mmHideNodeMenu();
+      if (act === 'copy-label') { copyToClipboard(ctx.label); return; }
+      const info = ctx.info, box = ctx.box;
+      if (!info || !box) return;
+      const rel = info.path || '';
+      if (act === 'copy-disk-path') {
+        const base = (MM_CURRENT && MM_CURRENT.boxPath)
+          || (((CA_DATA && CA_DATA.root) || '~/enough/cacheawl') + '/' + box);
+        copyToClipboard(base + (rel ? '/' + rel : ''));
+        return;
+      }
+      if (act === 'open-folder') { await mmOpenFolderInCacheawl(box, rel); return; }
+      if (act === 'copy-file') {
+        try {
+          const vp = 'cacheawl:' + box + (rel ? '/' + rel : '');
+          const r = await fetch('/api/file/raw?path=' + encodeURIComponent(vp));
+          if (!r.ok) {
+            let d = r.statusText;
+            try { d = (await r.json()).detail || d; } catch (_e) { /* keep */ }
+            throw new Error(d);
+          }
+          copyToClipboard(await r.text());
+        } catch (err) { mmFlash('could not copy file: ' + (err.message || String(err))); }
+        return;
+      }
+      if (act === 'open-file') { mmOpenNodeFile(box, rel, rel.split('/').pop()); return; }
+    });
+
+    // Close the node menu on any outside click.
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('mm-node-menu');
+      if (!menu || menu.classList.contains('hidden')) return;
+      if (!menu.contains(e.target)) mmHideNodeMenu();
+    });
 
     // Strip `click <id> "target"` lines out of the source (we do the
     // navigation ourselves, without loosening securityLevel) and collect
@@ -11789,6 +12067,7 @@
 
     async function mmRenderDiagram(path, parsed, body) {
       mmCloseLabelEditor();
+      mmHideNodeMenu();
       const seq = ++MM_RENDER_SEQ;
       body.innerHTML = '<div class="mm-doc-note">rendering…</div>';
       try {
@@ -11868,14 +12147,24 @@
 
     function mmWireNodes(holder, path, parsed) {
       const editable = parsed.modality === 'wip' && mmIsFlowchart(parsed.body);
+      const nodeMap = (MM_CURRENT && MM_CURRENT.nodeMap) || null;
       holder.querySelectorAll('g.node').forEach((g) => {
         const id = mmNodeId(g);
         if (!id) return;
+        // Shift-click → per-node action menu, in BOTH faces (mirror + wip).
+        // Takes precedence over navigation / label editing (which bail on
+        // shiftKey below).
+        g.addEventListener('click', (ev) => {
+          if (!ev.shiftKey) return;
+          ev.preventDefault(); ev.stopPropagation();
+          mmShowNodeMenu(ev.clientX, ev.clientY, g, id, path, nodeMap);
+        });
         if (MM_LINKS[id] !== undefined) {
           // A click-link node: navigate on click (takes precedence over
           // label editing).
           g.classList.add('mm-clickable');
           g.addEventListener('click', (ev) => {
+            if (ev.shiftKey) return;
             ev.preventDefault(); ev.stopPropagation();
             mmFollowLink(MM_LINKS[id], path);
           });
@@ -11884,6 +12173,7 @@
         if (editable) {
           g.classList.add('mm-editable');
           g.addEventListener('click', (ev) => {
+            if (ev.shiftKey) return;
             ev.stopPropagation();
             mmOpenLabelEditor(g, id, path);
           });
@@ -12297,6 +12587,32 @@
       tile.appendChild(nm);
       if (CA_SELECTED && CA_SELECTED.pane === d.pane && CA_SELECTED.key === d.key) {
         tile.classList.add('selected');
+      }
+      // Squircle launcher → open this cachebox/folder's merirmaid mirror
+      // (read-only view). Cacheboxes and their subfolders only; project-pane
+      // folders aren't cacheboxes and have no mirror.
+      if (d.pane === 'cachebox' && (d.is_box || d.is_dir)) {
+        const sq = document.createElement('button');
+        sq.type = 'button';
+        sq.className = 'ca-squircle';
+        sq.title = 'view folder diagram (merirmaid mirror)';
+        sq.setAttribute('aria-label', 'view diagram');
+        sq.draggable = false;
+        const si = document.createElement('img');
+        si.className = 'svg-icon'; si.draggable = false; si.alt = '';
+        setIcon(si, 'merirmaidmode');
+        sq.appendChild(si);
+        sq.addEventListener('click', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          caHideContextMenu();
+          const box = d.is_box ? d.name : CA_STORE_BOX;
+          const subpath = d.is_box ? '' : d.path;
+          exitCacheawlMode();
+          enterMerirmaidMirror(box, subpath);
+        });
+        // Grabbing the squircle must not start a tile drag.
+        sq.addEventListener('dragstart', (e) => { e.preventDefault(); e.stopPropagation(); });
+        tile.appendChild(sq);
       }
       caWireTile(tile, d);
       return tile;

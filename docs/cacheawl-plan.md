@@ -250,3 +250,57 @@ card — the scheme is the whole contract for cross-mode launching.
   `GET /api/cacheawl/ingest-status`; a future `wiki_sink`-style SSE event
   could layer on without changing the status shape.
 - Multi-select batch transfer UX (backend transfer is single-item).
+
+---
+
+## v0.1.7 additions — the mirror endpoint & folder squircles
+
+> Draft spec for review (pinned 2026-07-21). Adds a read-only endpoint that
+> serves both the persisted box mirror and on-demand sub-folder mirrors,
+> plus the UI squircle that launches them. See
+> [merirmaid-plan.md](merirmaid-plan.md) for the viewer side.
+
+### `GET /api/cacheawl/mirror?box=NAME&path=REL`  → mirror payload
+
+Serves a `modality: mirror` diagram for a box or any folder within it.
+
+```jsonc
+{
+  "text": "---\nmerirmaid: 1\n…\nflowchart TD\n  …",   // full .merirmaid source
+  "node_map": {                                          // id → real location
+    "n_book_3baff3":            { "path": "book",            "is_dir": true  },
+    "n_book_chapter1-md_7baae9":{ "path": "book/chapter1.md","is_dir": false }
+  },
+  "modality": "mirror",
+  "subpath": "book",       // "" for the box root
+  "box_path": "/Users/you/enough/cacheawl/rust-book"  // abs box dir for copy-path
+}
+```
+
+- **`path` omitted / empty** → the box root. Returns the content of the
+  persisted `_cachebox.merirmaid` (regenerating it first if the fingerprint
+  is stale, same reconcile as `tree`).
+- **`path` set** → an **on-demand virtual mirror** scoped to that subtree.
+  Generated fresh from current contents via `_mirror_body(subpath=…)` and
+  **never written to disk** (honors "no extra subfile per folder").
+- `node_map` is what lets the viewer's shift-click menu resolve a node to
+  its on-disk path/type without re-parsing the Mermaid source. `path` is
+  relative to the box root; the absolute disk path is `root()/box/path`.
+- Traversal rejected exactly as elsewhere (`..`, absolute, escapes root →
+  `400`); `404` if the box or folder doesn't exist.
+- Read-only endpoint: it never mutates the store (sub-mirrors aren't
+  persisted; a stale root mirror is refreshed by the existing reconcile,
+  not by this call's semantics).
+
+### Squircle placement in the icon grid
+
+A **30px squircle** launcher (see merirmaid-plan) renders in the
+upper-left of:
+
+- each **cachebox header** → `GET …/mirror?box=NAME` (root).
+- each **folder node** hitbox in the grid → `GET …/mirror?box=NAME&path=REL`.
+
+Click → open the merirmaid **view-only** face with the returned payload.
+This is additive to the existing single/double/shift-click grid semantics;
+the squircle is its own hitbox in the corner, so it doesn't collide with
+select/open/context-menu on the tile body.

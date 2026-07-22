@@ -46,10 +46,12 @@ from .logger import ExchangeLog, log_exchange
 from .prompt import (
     assemble_system_prompt,
     get_active_paradigm,
+    get_help_highlights,
     list_paradigms,
     list_roles,
     list_skills,
     set_active_paradigm,
+    set_help_highlights,
     set_role_enabled,
     set_skill_enabled,
 )
@@ -1271,6 +1273,54 @@ def create_app(
             raise HTTPException(400, "missing name")
         set_role_enabled(project_dir / "rness", name, enabled_raw == "1")
         return await api_roles()  # type: ignore[return-value]
+
+    @app.get("/api/help/defaults")
+    async def api_help_defaults() -> dict[str, Any]:
+        """Installed skills / roles / paradigms (name + description) for the
+        help viewer's {{skills-list}} / {{roles-list}} / {{paradigms-list}}
+        tokens, so the default lists in help stay in sync with what's actually
+        present instead of drifting hand-maintained prose."""
+        rness = project_dir / "rness"
+
+        def _build() -> dict[str, Any]:
+            from .skeleton import resync_globals
+            resync_globals(project_dir)  # pick up globals added since launch
+            skills = [{"name": n, "desc": t} for n, _en, t in list_skills(rness)]
+            roles = [{"name": n, "desc": t} for n, _en, t in list_roles(rness)]
+            # Paradigms carry an agent-facing description; prefer the
+            # user-facing tooltip when present (same rule as the sidebar).
+            paradigms = [{"name": n, "desc": (t or d)}
+                         for n, d, t in list_paradigms(rness)]
+            return {"skills": skills, "roles": roles, "paradigms": paradigms}
+
+        return await asyncio.to_thread(_build)
+
+    @app.get("/api/help/highlights")
+    async def api_help_highlights_get() -> dict[str, Any]:
+        """Pending first-launch help-bubble ids for this project, from the
+        multipurpose `rness/active-paradigm` file: a list, the sentinel
+        ``"all"`` (every bubble — the frontend owns the id list and expands
+        it), or ``[]``. Also returns the global default toggle so the UI can
+        render its state without a second call."""
+        rness = project_dir / "rness"
+        pending = await asyncio.to_thread(get_help_highlights, rness)
+        cfg = _read_ui_config()
+        on_new = cfg.get("help_highlight_on_new_project")
+        return {"pending": pending,
+                "highlight_on_new_project": True if on_new is None else bool(on_new)}
+
+    @app.post("/api/help/highlights")
+    async def api_help_highlights_post(request: Request) -> dict[str, Any]:
+        """Persist the reduced pending list as the user views bubbles. Body
+        ``{"pending": [...]}`` (the frontend sends the authoritative remaining
+        list, having expanded any ``all`` sentinel itself)."""
+        body = await request.json()
+        pending = body.get("pending")
+        if not isinstance(pending, list):
+            raise HTTPException(400, "pending must be a list of bubble ids")
+        clean = [str(p) for p in pending if isinstance(p, str)]
+        await asyncio.to_thread(set_help_highlights, project_dir / "rness", clean)
+        return {"pending": clean}
 
     @app.post("/api/requests/done", response_class=HTMLResponse)
     async def api_requests_done(request: Request) -> HTMLResponse:
@@ -2494,6 +2544,37 @@ def create_app(
             raise HTTPException(404, str(e)) from None
         return await asyncio.to_thread(_cacheawl.ingest_status, box)
 
+    @app.get("/api/cacheawl/mirror")
+    async def api_cacheawl_mirror(
+        box: str = Query(...), path: str = Query(""),
+    ) -> dict[str, Any]:
+        """Read-only mirror diagram for a cachebox (``path`` empty) or a
+        subfolder within it (``path`` set). The box root returns the
+        persisted ``_cachebox.merirmaid`` content (reconciled first so
+        manual drops are reflected); a subfolder returns an **on-demand
+        virtual mirror** generated from current contents and never written.
+        Payload: ``{text, node_map, modality, subpath}`` — ``node_map`` maps
+        each rendered node id to ``{path, is_dir}`` (path relative to the box
+        root) so the viewer's shift-click menu can resolve nodes to disk."""
+        from . import cacheawl as _cacheawl
+
+        def _build() -> dict[str, Any]:
+            subpath = (path or "").strip().strip("/")
+            if not subpath:
+                # Keep the persisted root mirror fresh (fingerprint check).
+                _cacheawl.reconcile(box)
+            text, node_map = _cacheawl.build_mirror(box, subpath)
+            return {"text": text, "node_map": node_map,
+                    "modality": "mirror", "subpath": subpath,
+                    "box_path": str(_cacheawl.box_dir(box))}
+
+        try:
+            return await asyncio.to_thread(_build)
+        except _cacheawl.CacheawlError as e:
+            msg = str(e)
+            code = 404 if ("no cachebox" in msg or "no such folder" in msg) else 400
+            raise HTTPException(code, msg) from None
+
     @app.post("/api/file", response_class=HTMLResponse)
     async def api_file_write(request: Request) -> HTMLResponse:
         form = await request.form()
@@ -2787,6 +2868,11 @@ def create_app(
             raise HTTPException(400, "expected json body") from None
         cfg = _read_ui_config()
         cfg["current"] = _validate_current(cfg, body or {})
+        # The global "highlight (?)s on new folder launch" toggle lives at the
+        # top level (not under `current`, which _validate_current rebuilds from
+        # theme/font only). Read by skeleton seeding at project instantiation.
+        if isinstance(body, dict) and "help_highlight_on_new_project" in body:
+            cfg["help_highlight_on_new_project"] = bool(body["help_highlight_on_new_project"])
         _write_ui_config(cfg)
         return cfg
 

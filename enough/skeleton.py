@@ -502,6 +502,22 @@ def _prune_infoworld_link(project_dir: Path) -> bool:
     return False
 
 
+def _help_highlight_default() -> bool:
+    """Read the global 'highlight (?)s on new folder launch' toggle from the
+    live ui config (honoring ENOUGH_UI_CONFIG). Defaults to True when unset or
+    unreadable — new users get the guided tour unless they opt out."""
+    import json
+
+    raw = os.environ.get("ENOUGH_UI_CONFIG")
+    path = Path(raw).expanduser() if raw else Path.home() / "enough" / "config" / "ui.json"
+    try:
+        cfg = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return True
+    val = cfg.get("help_highlight_on_new_project")
+    return True if val is None else bool(val)
+
+
 def ensure_skeleton(project_dir: Path) -> bool:
     """Create `rness/` if missing, prune the dead `infoworld` link, AND
     sync global skills/roles on every call (idempotent). Returns True on
@@ -542,6 +558,15 @@ def ensure_skeleton(project_dir: Path) -> bool:
             d.mkdir(parents=True, exist_ok=True)
             (d / ".gitkeep").touch()
 
+        # Seed the multipurpose active-paradigm file. Its help-bubble-
+        # highlights section is lit up ('all') iff the global "highlight
+        # (?)s on new folder launch" setting is on. This is the ONLY place
+        # highlights are seeded — established projects never get them
+        # retroactively (see ensure_multipurpose_file below).
+        from .prompt import seed_multipurpose_file
+        seed_multipurpose_file(project_dir / "rness",
+                               highlight_all=_help_highlight_default())
+
     # ALWAYS run (idempotent): remove the dead per-project `infoworld`
     # symlink. infoworld is dissolved into the global cacheawl store
     # (personal/public/wiki cacheboxes); the actual folder move happens
@@ -568,14 +593,12 @@ def ensure_skeleton(project_dir: Path) -> bool:
             d.mkdir(parents=True, exist_ok=True)
             (d / ".gitkeep").touch()
 
-    # ALWAYS ensure rness/active-paradigm exists. New projects get this via
-    # _PROJECT_LOCAL_FILES; existing projects need the back-fill so the UI
-    # paradigm selector renders a definite choice instead of relying on the
-    # missing-file fallback.
-    active_paradigm = project_dir / "rness" / "active-paradigm"
-    if not active_paradigm.exists():
-        active_paradigm.parent.mkdir(parents=True, exist_ok=True)
-        active_paradigm.write_text("default\n", encoding="utf-8")
+    # ALWAYS ensure rness/active-paradigm exists AND is in the multipurpose
+    # markdown form. New projects were seeded just above (with highlights when
+    # enabled); existing projects get a one-time upgrade from the legacy bare
+    # form — WITHOUT seeding highlights, since they aren't new folders.
+    from .prompt import ensure_multipurpose_file
+    ensure_multipurpose_file(project_dir / "rness")
 
     # ALWAYS run (idempotent): clean up the legacy `rness/routines/` dir
     # left over from pre-0.0.9 projects. Routines were a pre-built
