@@ -3,6 +3,11 @@
 > Draft spec for review. Restructures how the `(?)` help affordance is
 > stored and how it behaves on a project's first launch. Companion to the
 > merirmaid/cacheawl plans. Nothing here is committed — red-line freely.
+>
+> **SUPERSEDED IN PART (2026-07-23):** the first-launch-highlight +
+> hover-reveal design below is replaced by a per-project on/off toggle —
+> see [mode-stack-plan.md](mode-stack-plan.md) item 5. The externalized
+> help-docs.md content pipeline (sections 1–3) remains current.
 
 ## Motivation (from the 0.1.7 planning round)
 

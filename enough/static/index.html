@@ -880,24 +880,6 @@
       letter-spacing: 0;
     }
 
-    /* First-launch highlight: the [?] stays lit + gently pulses until the
-       user opens it, then reverts to the normal hover→fade behavior. */
-    .help-trigger.pending {
-      opacity: 1;
-      pointer-events: auto;
-      color: var(--accent-user);
-      border-color: var(--accent-user);
-      animation: helpPulse 1.8s ease-in-out infinite;
-    }
-
-    @keyframes helpPulse {
-      0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent-user) 60%, transparent); }
-      70%      { box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent-user) 0%, transparent); }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .help-trigger.pending { animation: none; }
-    }
 
     /* Unsave affordance: 🗑 on saved-article folder rows, same hover-
        delay pattern as the help [?]. */
@@ -1864,57 +1846,75 @@
       border-color: var(--fg-faint);
     }
 
-    /* Active-mode area (topbar top-right). Holds the current mode's icon
-       with a redx ribbon hanging off the bottom edge, banner-style. The
-       container is `hidden` on the home/chat view. */
-    .topbar .active-mode {
-      position: relative;
+    /* Mode-stack indicators (topbar right half). One delineated bar-height
+       square per LIVE mode in the stack, TOP-OF-STACK LEFTMOST, spaced
+       space-evenly across the right half of the bar. These are deliberately
+       NOT buttons/chips: no item-1 gradient, no radius, no --btn-bg — they
+       paint the bar's own --bg-alt and are delineated only by 1px 50%-gray
+       (#808080, theme-independent) left/right edge lines, so each square
+       visually interrupts the bar. Every square carries a redx exit ribbon
+       hanging off its LEFT edge (rotated 90° CW), exactly the treatment the
+       old single indicator used. The container is `hidden` when the stack is
+       empty (empty stack === the chat/home view). */
+    .topbar .mode-stack {
+      position: absolute;
+      left: 50%;
+      right: 12px;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      align-items: stretch;
+      justify-content: space-evenly;
+      pointer-events: none;   /* gaps fall through; squares re-enable below */
       z-index: 6;
-      display: inline-flex;
-      align-items: center;
-      margin-left: 2px;
     }
 
-    .topbar .active-mode[hidden] {
+    .topbar .mode-stack[hidden] {
       display: none;
     }
 
-    /* The mode icon chip. Sits in the topbar row. */
-    .topbar .active-mode .active-mode-icon {
-      width: 30px;
-      height: 30px;
-      padding: 3px;
+    /* One indicator: a full-bar-height (36px) square, flush top/bottom. */
+    .topbar .mode-indicator {
+      position: relative;
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
+      box-sizing: border-box;
+      padding: 2px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: var(--btn-bg, var(--bg-raise));
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      cursor: default;
+      background: var(--bg-alt);
+      border-left: 1px solid #808080;
+      border-right: 1px solid #808080;
+      pointer-events: auto;
+      cursor: default;   /* top-of-stack indicator is inert */
     }
 
-    /* When the mode wires an onIconClick (read/edit face toggle), the
-       icon becomes interactive. */
-    .topbar .active-mode .active-mode-icon.interactive {
+    /* Buried entries raise-to-top on click. */
+    .topbar .mode-indicator.buried {
       cursor: pointer;
     }
 
-    .topbar .active-mode .active-mode-icon.interactive:hover,
-    .topbar .active-mode .active-mode-icon.interactive:focus-visible {
-      filter: brightness(1.18);
-      border-color: var(--fg-faint);
-      outline: none;
+    .topbar .mode-indicator.buried:hover {
+      filter: brightness(1.12);
     }
 
-    /* The ribbon hangs off the LEFT edge of the icon, rotated 90° clockwise
-       and extending leftward, vertically centred on the icon. Staying inside
-       the topbar row (rather than dangling below) keeps it clear of the mode
-       toolbars — e.g. the wiki toolbar — that used to bury it. Bigger tap
-       target, unmistakable exit. */
-    .topbar .active-mode .active-mode-ribbon {
+    /* Icon fills the square minus ~2px padding (~32px — roughly 2× a chip
+       icon, per item 2). */
+    .topbar .mode-indicator > .svg-icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    /* Exit ribbon: identical treatment to the legacy single indicator —
+       hangs off the square's LEFT edge, rotated 90° CW, overlapping the edge
+       by ~6px, vertically centred, staying inside the topbar row (clear of
+       the mode toolbars below). Clicking it runs THAT entry's onExit. */
+    .topbar .mode-indicator .mode-ribbon {
       position: absolute;
       top: 50%;
-      right: calc(100% - 6px);   /* overlap the icon's left edge by ~6px, then extend left */
+      right: calc(100% - 6px);   /* overlap the square's left edge by ~6px, then extend left */
       transform: translateY(-50%);
       width: 30px;
       height: 30px;
@@ -1926,15 +1926,42 @@
       line-height: 1;
     }
 
-    .topbar .active-mode .active-mode-ribbon:hover {
+    .topbar .mode-indicator .mode-ribbon:hover {
       filter: brightness(1.12);
     }
 
     /* Rotation lives on the IMG (the svg is not rebuilt). */
-    .topbar .active-mode .active-mode-ribbon .svg-icon {
+    .topbar .mode-indicator .mode-ribbon .svg-icon {
       width: 100%;
       height: 100%;
       transform: rotate(90deg);
+    }
+
+    /* Item 1 — shared 3D lift for square icon-button chips. A subtle vertical
+       gray gradient layered ABOVE the chip's own background-color (which stays
+       var(--btn-bg, var(--bg-raise)) on each chip's own rule — untouched here,
+       so the load-bearing fallback survives) and BEHIND the icon. Literal
+       rgb(128,128,128) so it reads the same in any theme. Two-stop ramp (QA
+       outcome in docs/mode-stack-plan.md item 1): 0.42 → 0.10 at 62% → 0,
+       which avoids the hard band a single 0.5 stop showed on light themes.
+       One grouped rule (implementer's choice) rather than per-chip repetition;
+       `!important` on background-image only lets it win over the varied
+       specificity of each chip's background shorthand without touching their
+       background-COLOR. Excludes .bare-toggle, .model-badge, ribbons, and the
+       item-2 mode indicators (deliberately not buttons). The relocated face
+       toggles (#review-face-btn / #edit-face-btn reuse .rt-mini-btn,
+       #mini-face-btn reuses .mini-full-btn) are covered automatically. */
+    .topbar .icon-btn,
+    .input-form .icon-chip,
+    .wiki-toolbar button.wt-icon,
+    .save-flyout .save-choice,
+    #preview .mini-full-btn,
+    .rt-mini-btn,
+    #girraph-mode .girraph-toolbar .icon-btn-like {
+      background-image: linear-gradient(to bottom,
+        rgba(128, 128, 128, 0.42),
+        rgba(128, 128, 128, 0.10) 62%,
+        rgba(128, 128, 128, 0)) !important;
     }
 
     /* ---------- Edit mode (full-frame plain-text editor) ---------- */
@@ -2071,6 +2098,43 @@
       width: 20px;
       height: 20px;
       flex-shrink: 0;
+    }
+
+    /* Item 6 — merirmaid button, styled as a square icon chip (same pattern
+       as .topbar .icon-btn) at the toolbar's left end. Two states carried
+       entirely by title/aria-label (see _updateGpMerirmaidBtn): "add" (no
+       link yet, dimmed) vs "open" (link exists, full opacity). */
+    #girraph-mode .girraph-toolbar .icon-btn-like {
+      width: 26px;
+      height: 26px;
+      padding: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background-color: var(--btn-bg, var(--bg-raise));
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    #girraph-mode .girraph-toolbar .icon-btn-like[hidden] {
+      display: none;
+    }
+
+    #girraph-mode .girraph-toolbar .icon-btn-like:hover {
+      filter: brightness(1.18);
+      border-color: var(--fg-faint);
+    }
+
+    #girraph-mode .girraph-toolbar .icon-btn-like img.svg-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    #girraph-mode .girraph-toolbar .gp-merirmaid.gp-merirmaid-add {
+      opacity: 0.55;
     }
 
     /* Breadcrumbs: the descent stack through nested girraphs and doc
@@ -3113,8 +3177,8 @@
        of the pane (Phase 5a) — controls grey out when their
        preconditions aren't met instead of the whole bar appearing
        and disappearing. Format buttons left, highlight colors right;
-       switching to the edit face is the top-right active-mode icon's
-       job (the old center "edit mode" button is gone). */
+       switching to the edit face is #review-face-btn in the rt-size
+       group (item 4 moved it off the topbar indicator). */
     #review-mode .review-toolbar {
       position: absolute;
       top: 0;
@@ -6092,22 +6156,17 @@
       <button class="proj-edit" id="project-edit" type="button" title="Edit project name &amp; description"
         aria-label="edit project">✎</button>
     </div>
-    <!-- Right half: reserved for the active-mode icon (+ its exit ribbon). -->
+    <!-- Right half: the mode STACK indicators (see the mode-stack JS). -->
     <span class="topbar-spacer"></span>
-    <!-- Active-mode area (reserved top-right). Empty on the home/chat
-         view. When a mode is active, setActiveMode() shows the mode's
-         icon here with a ribbon-redx "hanging off" the LEFT edge (rotated
-         90° CW, extending leftward, vertically centered on the icon).
-         Clicking the ribbon exits the mode; clicking the icon runs the
-         mode's onIconClick (read/edit toggles face; other modes: no-op). -->
-    <div id="active-mode" class="active-mode" hidden>
-      <button type="button" id="active-mode-icon" class="active-mode-icon" aria-label="mode">
-        <img class="svg-icon" id="active-mode-img" data-icon="" alt="" draggable="false">
-      </button>
-      <button type="button" id="active-mode-ribbon" class="active-mode-ribbon" aria-label="exit mode">
-        <img class="svg-icon" data-icon="ribbon-redx" alt="exit" draggable="false">
-      </button>
-    </div>
+    <!-- Mode-stack area (right half of the bar). Empty on the home/chat
+         view. The mode-stack manager (_modeRender) fills this with one
+         item-2 square per live mode, TOP-OF-STACK LEFTMOST, space-evenly
+         across the right half. Each square shows the mode's icon and carries
+         a ribbon-redx exit hanging off its LEFT edge (rotated 90° CW).
+         Clicking a buried square raises that mode; the top square is inert;
+         clicking a square's ribbon exits that mode. Rebuilt on every stack
+         change — do not hand-populate. -->
+    <div id="mode-stack" class="mode-stack" hidden></div>
   </div>
 
   <div class="layout" id="layout">
@@ -6171,17 +6230,23 @@
            preview pane; now the MINI size of the unified read/edit mode.
            Shows either face (read = prettified markdown, edit = plaintext
            textarea) into #preview-body. No × close button — exit happens
-           via the topbar exit ribbon. The full-size button expands to the
-           full-frame read/edit view, preserving face + state. -->
+           via the readedit indicator's exit ribbon in the topbar mode
+           stack. The full-size button expands to the full-frame read/edit
+           view, preserving face + state. -->
       <div id="preview">
-        <!-- Expand button sits at the LEFT of the header: the top-right
-             corner underneath is reserved for the active-mode icon's exit
-             ribbon, which hangs from the topbar and would overlap (and
+        <!-- Size + face buttons sit at the LEFT of the header: the top-right
+             corner underneath is reserved for the mode-stack indicators'
+             exit ribbons, which hang from the topbar and would overlap (and
              steal clicks from) anything placed there. -->
         <div class="preview-header">
           <button type="button" class="mini-full-btn" id="mini-full-btn"
             title="expand to full size" aria-label="expand to full size">
             <img class="svg-icon" data-icon="mini2full" alt="full size" draggable="false">
+          </button>
+          <!-- Face toggle (item 4): read ↔ edit for the mini panel. -->
+          <button type="button" class="mini-full-btn" id="mini-face-btn"
+            title="switch to edit face" aria-label="switch to edit face">
+            <img class="svg-icon" data-icon="readedit-switch" alt="switch face" draggable="false">
           </button>
           <span class="title" id="preview-title">preview</span>
         </div>
@@ -6206,6 +6271,12 @@
             <button type="button" id="review-mini-btn" class="rt-mini-btn"
               title="shrink to mini panel" aria-label="shrink to mini panel">
               <img class="svg-icon" data-icon="full2mini" alt="mini panel" draggable="false">
+            </button>
+            <!-- Face toggle (item 4): read ↔ edit, moved off the topbar
+                 indicator onto this dedicated chip. Title swaps per face. -->
+            <button type="button" id="review-face-btn" class="rt-mini-btn"
+              title="switch to edit face" aria-label="switch to edit face">
+              <img class="svg-icon" data-icon="readedit-switch" alt="switch face" draggable="false">
             </button>
           </div>
           <div class="rt-group rt-format" role="group" aria-label="format">
@@ -6286,6 +6357,11 @@
               title="shrink to mini panel" aria-label="shrink to mini panel">
               <img class="svg-icon" data-icon="full2mini" alt="mini panel" draggable="false">
             </button>
+            <!-- Face toggle (item 4): edit ↔ read. Title swaps per face. -->
+            <button type="button" id="edit-face-btn" class="rt-mini-btn"
+              title="switch to read face" aria-label="switch to read face">
+              <img class="svg-icon" data-icon="readedit-switch" alt="switch face" draggable="false">
+            </button>
             <button type="button" id="edit-save-btn" class="primary">save</button>
             <button type="button" id="edit-revert-btn">revert</button>
           </div>
@@ -6312,10 +6388,17 @@
            tools use, so user and agent can edit the same map
            concurrently. Breadcrumbs track descent into nested
            girraphs (@ refs) and read-only doc refs; clicking a crumb
-           pops back, which is also the cycle escape hatch. -->
+           pops back, which is also the cycle escape hatch. The
+           #gp-merirmaid button (upper left, right of the mode icon)
+           shows only when the descent stack's top is a girraph (not a
+           doc detour): "add merirmaid" when no linked diagram exists
+           yet, "open merirmaid" once one does — state comes from the
+           GET /api/girraph `merirmaid` field, refreshed every
+           renderGirraphTop(). -->
       <div id="girraph-mode" aria-hidden="true">
         <div class="girraph-toolbar">
           <img class="svg-icon gp-mode-icon" data-icon="girraphmode" alt="" draggable="false">
+          <button type="button" class="gp-merirmaid icon-btn-like" id="gp-merirmaid" hidden><img class="svg-icon" data-icon="merirmaidmode" alt="" draggable="false"></button>
           <nav class="gp-crumbs" id="gp-crumbs" aria-label="girraph navigation"></nav>
           <button type="button" class="gp-act" id="gp-refresh" title="re-read the file (pick up agent edits)">↻</button>
           <button type="button" class="gp-act" id="gp-add-root" title="add a top-level node">+ root node</button>
@@ -6880,9 +6963,9 @@
         </div>
         <!-- Global help-bubble setting. -->
         <div class="ui-prefs-row">
-          <label class="ui-check-label" title="On a project's first launch, light up every (?) help bubble until you've opened each one.">
-            <input type="checkbox" id="ui-help-highlight">
-            <span>highlight <strong>(?)</strong>s on new folder launch</span>
+          <label class="ui-check-label" title="show (?) help bubbles in the sidebar (saved per folder)">
+            <input type="checkbox" id="ui-help-bubbles">
+            <span>help <strong>(?)</strong> bubbles</span>
           </label>
         </div>
         <!-- Two-column reference: keyboard shortcuts | markdown cheat sheet -->
@@ -7000,10 +7083,11 @@
   </div>
 
   <script>
-    // ---------- Help affordance: hover-to-reveal [?], click for full panel ----------
-    // 1s hover before [?] appears, stays for 5s after the cursor leaves the row
-    // (or the [?] itself). Click opens a themed right-side viewer with three
-    // sections: what / how / ideas.
+    // ---------- Help affordance: persistent [?] bubbles, click for full panel ----------
+    // Bubbles show/hide per the project-wide help-bubbles toggle (see
+    // "Help bubbles on/off" below) — no hover reveal, no timers, no fade.
+    // Click opens a themed right-side viewer with three sections: what / how
+    // / ideas.
     // Help content is authored in /static/help-docs.md (one `## <id>` section
     // per bubble) and loaded at startup into this map, replacing the old
     // inline object. The {{skills-list}} / {{roles-list}} / {{paradigms-list}}
@@ -7104,7 +7188,6 @@
       await loadHelpDocs();   // no-op after first load; content is external now
       const doc = HELP_DOCS[id];
       if (!doc) return;
-      markHelpViewed(id);     // first-launch highlight: this bubble is now seen
       document.getElementById('help-body').innerHTML = helpDocToHtml(doc);
       const v = document.getElementById('help-viewer');
       v.classList.add('open');
@@ -7122,9 +7205,8 @@
     window.openHelp = openHelp;
     window.closeHelp = closeHelp;
 
-    // Hover-delay state lives on the row element itself (no global Map needed),
-    // so HTMX swaps that destroy the row also destroy the timers.
-    // Create (once) the [?] button for a row and wire its click.
+    // Create (once) the [?] button for a row and wire its click. Persistent
+    // renderer used by applyHelpBubbles() below — no hover timers, no fade.
     function _makeHelpButton(row) {
       if (row._helpButton) return row._helpButton;
       const btn = document.createElement('button');
@@ -7142,69 +7224,6 @@
       return btn;
     }
 
-    function _scheduleHelpShow(row) {
-      if (row._helpFadeTimer) {
-        clearTimeout(row._helpFadeTimer);
-        row._helpFadeTimer = null;
-      }
-      if (row._helpButton && row._helpButton.classList.contains('shown')) return;
-      if (row._helpShowTimer) return;
-      row._helpShowTimer = setTimeout(() => {
-        row._helpShowTimer = null;
-        const btn = _makeHelpButton(row);
-        requestAnimationFrame(() => btn.classList.add('shown'));
-      }, 1000);
-    }
-
-    function _scheduleHelpFade(row) {
-      if (row._helpShowTimer) {
-        clearTimeout(row._helpShowTimer);
-        row._helpShowTimer = null;
-      }
-      // First-launch highlighted bubbles stay lit until viewed — never fade.
-      if (row._helpButton && row._helpButton.classList.contains('pending')) return;
-      if (!row._helpButton || !row._helpButton.classList.contains('shown')) return;
-      if (row._helpFadeTimer) clearTimeout(row._helpFadeTimer);
-      row._helpFadeTimer = setTimeout(() => {
-        row._helpFadeTimer = null;
-        const btn = row._helpButton;
-        if (!btn) return;
-        btn.classList.remove('shown');
-        // Wait for opacity transition, then detach so the row stays clean.
-        setTimeout(() => {
-          if (row._helpButton && !row._helpButton.classList.contains('shown')) {
-            row._helpButton.remove();
-            row._helpButton = null;
-          }
-        }, 280);
-      }, 5000);
-    }
-
-    // Event delegation for the hover-? affordance — works across HTMX
-    // refreshes. Sidebar-only: the help viewer lives in the main pane
-    // (z-index below the full-frame modes), so data-help inside the
-    // wikisink browser/modal would open help invisibly underneath —
-    // those surfaces rely on plain tooltips instead.
-    // mouseover/mouseout bubble (mouseenter/leave don't), so we filter via
-    // relatedTarget to detect actual row entry/exit.
-    for (const rootSel of ['.sidebar']) {
-      const rootEl = document.querySelector(rootSel);
-      if (!rootEl) continue;
-      rootEl.addEventListener('mouseover', (e) => {
-        const row = e.target.closest('[data-help]');
-        if (!row) return;
-        const from = e.relatedTarget;
-        if (from && row.contains(from)) return;
-        _scheduleHelpShow(row);
-      });
-      rootEl.addEventListener('mouseout', (e) => {
-        const row = e.target.closest('[data-help]');
-        if (!row) return;
-        const to = e.relatedTarget;
-        if (to && row.contains(to)) return;
-        _scheduleHelpFade(row);
-      });
-    }
     // Clicking a tree file opens the preview — close help to avoid stacking.
     const sidebarEl = document.querySelector('.sidebar');
     if (sidebarEl) {
@@ -7213,62 +7232,44 @@
       });
     }
 
-    // ---------- First-launch help highlights ----------
-    // On a project's first launch (when the global setting is on), every help
-    // (?) bubble is lit up persistently until the user opens it, then that
-    // bubble reverts to the quiet hover→fade behavior. State lives in
-    // rness/active-paradigm's "Help bubble highlights" section, via
-    // /api/help/highlights. Sidebar-scoped, like the bubbles themselves.
-    let HELP_PENDING = null;   // Set of pending bubble ids (null until loaded)
+    // ---------- Help bubbles on/off ----------
+    // One per-project boolean (GET/POST /api/help/bubbles), sticky across
+    // launches, default on. When on, every `.sidebar [data-help]` row shows
+    // its (?) persistently — no hover, no timers, no fade. When off, no (?)
+    // buttons at all. Toggled from the ui-modal `#ui-help-bubbles` checkbox.
+    let HELP_BUBBLES_ON = true;
 
-    async function loadHelpHighlights() {
+    async function loadHelpBubbles() {
       try {
-        await loadHelpDocs();
-        const r = await fetch('/api/help/highlights');
+        const r = await fetch('/api/help/bubbles');
         if (!r.ok) return;
         const data = await r.json();
-        let pending = data.pending;
-        if (pending === 'all') pending = Object.keys(HELP_DOCS);
-        HELP_PENDING = new Set(Array.isArray(pending) ? pending : []);
-        applyHelpHighlights();
-      } catch (_e) { /* highlights are a nicety — ignore failures */ }
+        HELP_BUBBLES_ON = (data.enabled === undefined) ? true : !!data.enabled;
+      } catch (_e) { /* best-effort; default stays on */ }
+      applyHelpBubbles();
     }
 
-    function applyHelpHighlights() {
-      if (!HELP_PENDING || !HELP_PENDING.size) return;
-      document.querySelectorAll('.sidebar [data-help]').forEach((row) => {
-        if (!HELP_PENDING.has(row.dataset.help)) return;
-        if (row._helpFadeTimer) { clearTimeout(row._helpFadeTimer); row._helpFadeTimer = null; }
-        const btn = _makeHelpButton(row);
-        btn.classList.add('shown', 'pending');
-      });
-    }
-
-    // A bubble is "viewed" the moment its panel opens: drop it from the
-    // pending set, persist the reduced list, and let it fade normally.
-    async function markHelpViewed(id) {
-      if (!HELP_PENDING || !HELP_PENDING.has(id)) return;
-      HELP_PENDING.delete(id);
-      document.querySelectorAll('.sidebar [data-help="' + id + '"]').forEach((row) => {
-        if (row._helpButton) {
-          row._helpButton.classList.remove('pending');
-          _scheduleHelpFade(row);   // now on the normal 5s fade timer
-        }
-      });
-      try {
-        await fetch('/api/help/highlights', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pending: [...HELP_PENDING] }),
+    function applyHelpBubbles() {
+      if (HELP_BUBBLES_ON) {
+        document.querySelectorAll('.sidebar [data-help]').forEach((row) => {
+          const btn = _makeHelpButton(row);
+          btn.classList.add('shown');
         });
-      } catch (_e) { /* best-effort persistence */ }
+      } else {
+        document.querySelectorAll('.sidebar [data-help]').forEach((row) => {
+          if (row._helpButton) {
+            row._helpButton.remove();
+            row._helpButton = null;
+          }
+        });
+      }
     }
 
     // The sidebar's HTMX partials (paradigm/roles/skills/tree) re-render on
-    // their own timers and wipe injected buttons — re-light after each settle.
-    document.body.addEventListener('htmx:afterSettle', () => applyHelpHighlights());
+    // their own timers and wipe injected buttons — re-apply after each settle.
+    document.body.addEventListener('htmx:afterSettle', () => applyHelpBubbles());
 
-    loadHelpHighlights();
+    loadHelpBubbles();
 
     // ---------- Unsave affordance: 🗑 on saved-article folder rows ----------
     //
@@ -7544,124 +7545,188 @@
     window.confirmOverlay = confirmOverlay;
 
     // ================================================================
-    // Active-mode registry (topbar top-right)
+    // Mode STACK (topbar right-half indicators)
     // ================================================================
     //
-    // Exactly one "mode" is active at a time (or none, on the home/chat
-    // view). setActiveMode paints the mode's icon in the reserved
-    // top-right area with a ribbon-redx "hanging off" its left edge (rotated
-    // 90° CW, extending leftward, vertically centered on the icon).
-    // The ribbon exits the mode; the icon runs the mode's onIconClick.
+    // Modes are STACKED, not mutually exclusive. Opening a mode pushes it on
+    // TOP of whatever is already open; closing a mode removes its entry and
+    // reveals the mode below it — which never tore down (its DOM, internal
+    // state, and .open class stayed live underneath the whole time). The
+    // chat/home view is simply the empty stack. This replaces the old
+    // single-ACTIVE_MODE "supplant the previous mode on register" behavior;
+    // there is no supplant/teardown-on-register anymore.
     //
-    // REGISTRATION CONTRACT — later waves (merirmaid, cacheawl) register
-    // their modes through this exact interface:
+    // Each stack entry:
+    //   { name, icon, iconTitle, exitTitle, onExit, onRaise?, rootId }
+    //     name      unique per stack: readedit / girraph / merirmaid /
+    //               cacheawl / wikisink. One live instance per mode.
+    //     icon      svg basename shown in the indicator (theme-resolved via
+    //               setIcon/iconSrc — never a raw <img src>, so a live theme
+    //               change repaints it through refreshThemeIcons).
+    //     iconTitle indicator tooltip (defaults to name).
+    //     exitTitle ribbon tooltip (defaults to "exit <name>").
+    //     onExit    fully leaves the mode; each mode's onExit calls
+    //               modeRemove('<its name>'). Invoked by the entry's ribbon
+    //               and by esc (top entry only).
+    //     onRaise   optional. Runs when a BURIED entry is raised to the top
+    //               (cacheawl refreshes its tree; others omit). It is NOT a
+    //               re-enter — raising is pure z-order + indicator work.
+    //     rootId    the mode's full-frame overlay id. The manager owns each
+    //               root's inline z-index (z = 30 + stackIndex). readedit is
+    //               special-cased: its full roots are BOTH #review-mode and
+    //               #edit-mode, and its mini #preview panel floats at
+    //               31 + index while the entry is stacked (cleared otherwise).
     //
-    //   setActiveMode(name, {
-    //     icon:        <string>   required. svg icon basename shown in the
-    //                             topbar (resolved via iconSrc / theme).
-    //     onExit:      <function> required. Fully leaves the mode. Called
-    //                             by the ribbon, by esc, and by any legacy
-    //                             in-mode exit button you keep wired.
-    //     onSupplant:  <function> optional, synchronous, non-prompting
-    //                             teardown used when another mode takes over;
-    //                             defaults to onExit. (read/edit uses
-    //                             _teardownReadEdit here so a hand-off drops
-    //                             the buffer without a dirty prompt, while
-    //                             onExit keeps its async dirty prompt for the
-    //                             ribbon/esc path.)
-    //     onIconClick: <function|null> optional. Runs when the mode ICON
-    //                             is clicked/activated. read/edit uses it
-    //                             to toggle face. null/omitted → the icon
-    //                             is inert (cursor:default, no handler).
-    //     hoverIcon:   <string|null> optional. Icon basename shown while
-    //                             the mode icon is hovered/focused (read/
-    //                             edit swaps to readedit-switch). null → no
-    //                             swap. Only meaningful with onIconClick.
-    //     iconTitle:   <string>   optional. title + aria-label for the icon.
-    //     exitTitle:   <string>   optional. title + aria-label for the
-    //                             ribbon (defaults to "exit <name>").
-    //   })
+    // The manager renders one item-2 square per entry into #mode-stack,
+    // TOP-OF-STACK LEFTMOST. Buried squares raise on click; the top square is
+    // inert. Each square carries its own exit ribbon.
     //
-    // clearActiveMode() returns to the home view (idempotent). Reading the
-    // live registration: ACTIVE_MODE (object) or null.
-    let ACTIVE_MODE = null;
+    // API: modePush / modeRemove / modeRaise / modeTop / modeUpdateIcon.
+    // COMPAT: window.setActiveMode → modePush; window.clearActiveMode →
+    // modeRemove(top-of-stack). Kept only as a soft landing for stray call
+    // sites — every mode's own exit calls modeRemove('<name>') explicitly so
+    // a buried entry can be closed directly from its ribbon.
+    let MODE_STACK = [];
 
-    function setActiveMode(name, opts = {}) {
-      // If a DIFFERENT mode is currently active, supplant it first — run its
-      // non-prompting teardown (onSupplant, defaulting to onExit) before the
-      // new mode registers. This is the single choke point that guarantees
-      // exactly one mode is ever live: a tree click (openReadEdit /
-      // enterGirraphMode / …) or a topbar mode button now cleanly tears down
-      // whatever was open instead of leaving an orphaned frame behind.
-      const prev = ACTIVE_MODE;
-      if (prev && prev.name !== name) {
-        const teardown = prev.onSupplant || prev.onExit;
-        if (teardown) teardown();
-      }
-      ACTIVE_MODE = Object.assign({ name }, opts);
-      const wrap = document.getElementById('active-mode');
-      const iconBtn = document.getElementById('active-mode-icon');
-      const iconImg = document.getElementById('active-mode-img');
-      const ribbon = document.getElementById('active-mode-ribbon');
-      setIcon(iconImg, opts.icon);
-      iconBtn.title = opts.iconTitle || name;
-      iconBtn.setAttribute('aria-label', opts.iconTitle || name);
-      iconBtn.classList.toggle('interactive', !!opts.onIconClick);
-      // Non-interactive icons shouldn't grab keyboard focus.
-      if (opts.onIconClick) iconBtn.removeAttribute('tabindex');
-      else iconBtn.setAttribute('tabindex', '-1');
-      const exitLabel = opts.exitTitle || ('exit ' + name);
-      ribbon.title = exitLabel;
-      ribbon.setAttribute('aria-label', exitLabel);
-      wrap.hidden = false;
+    // Full-frame overlay id per mode. readedit is intentionally absent —
+    // it owns two roots (+ the mini panel), handled in _modeRootEls / z-order.
+    const _MODE_ROOT_IDS = {
+      girraph: 'girraph-mode', merirmaid: 'merirmaid-mode',
+      wikisink: 'wiki-mode', cacheawl: 'cacheawl-mode',
+    };
+    // Every root the manager may touch — cleared to the CSS default (30) each
+    // pass before the live entries get their z = 30 + index.
+    const _ALL_MODE_ROOTS = ['review-mode', 'edit-mode', 'girraph-mode',
+      'merirmaid-mode', 'wiki-mode', 'cacheawl-mode', 'preview'];
+
+    function _modeIndex(name) { return MODE_STACK.findIndex((e) => e.name === name); }
+    function modeTop() { return MODE_STACK.length ? MODE_STACK[MODE_STACK.length - 1] : null; }
+    window.modeTop = modeTop;
+
+    function _modeRootEls(entry) {
+      const ids = entry.name === 'readedit'
+        ? ['review-mode', 'edit-mode']
+        : [entry.rootId];
+      return ids.map((id) => id && document.getElementById(id)).filter(Boolean);
     }
+
+    // Re-apply inline z-index so stack order = paint order. Confirm overlay
+    // (950+) and modals (1000+) sit far above 30 + stack depth, so they stay
+    // on top regardless.
+    function _modeApplyZ() {
+      _ALL_MODE_ROOTS.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.style.zIndex = '';
+      });
+      MODE_STACK.forEach((entry, i) => {
+        _modeRootEls(entry).forEach((el) => { el.style.zIndex = String(30 + i); });
+        if (entry.name === 'readedit') {
+          const pv = document.getElementById('preview');
+          if (pv) pv.style.zIndex = String(31 + i);
+        }
+      });
+    }
+
+    // Rebuild the indicator row: one square per entry, TOP-OF-STACK LEFTMOST.
+    function _modeRender() {
+      const wrap = document.getElementById('mode-stack');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+      for (let i = MODE_STACK.length - 1; i >= 0; i--) {
+        const entry = MODE_STACK[i];
+        const isTop = i === MODE_STACK.length - 1;
+        const sq = document.createElement('div');
+        sq.className = 'mode-indicator' + (isTop ? '' : ' buried');
+        sq.dataset.mode = entry.name;
+        sq.title = entry.iconTitle || entry.name;
+        // Exit ribbon — closes THIS entry (even when buried).
+        const ribbon = document.createElement('button');
+        ribbon.type = 'button';
+        ribbon.className = 'mode-ribbon';
+        const exitLabel = entry.exitTitle || ('exit ' + entry.name);
+        ribbon.title = exitLabel;
+        ribbon.setAttribute('aria-label', exitLabel);
+        const rimg = document.createElement('img');
+        rimg.className = 'svg-icon';
+        rimg.alt = 'exit';
+        rimg.draggable = false;
+        setIcon(rimg, 'ribbon-redx');
+        ribbon.appendChild(rimg);
+        ribbon.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          if (entry.onExit) entry.onExit();
+        });
+        // Mode icon.
+        const img = document.createElement('img');
+        img.className = 'svg-icon';
+        img.alt = entry.name;
+        img.draggable = false;
+        setIcon(img, entry.icon);
+        sq.appendChild(ribbon);
+        sq.appendChild(img);
+        // Buried square → raise; top square is inert.
+        if (!isTop) sq.addEventListener('click', () => modeRaise(entry.name));
+        wrap.appendChild(sq);
+      }
+      wrap.hidden = MODE_STACK.length === 0;
+    }
+
+    function _modeSync() { _modeApplyZ(); _modeRender(); }
+
+    // Push a mode on top, OR (if already stacked) update its opts and raise it
+    // in place — the caller has already re-targeted the mode's own content
+    // (e.g. enterGirraphMode reset GIRRAPH_STACK). No teardown of the previous
+    // top: it stays fully live underneath.
+    function modePush(name, opts = {}) {
+      const entry = Object.assign(
+        { name, rootId: _MODE_ROOT_IDS[name] || null }, opts);
+      const idx = _modeIndex(name);
+      if (idx !== -1) MODE_STACK.splice(idx, 1);
+      MODE_STACK.push(entry);
+      _modeSync();
+    }
+    window.modePush = modePush;
+
+    // Remove a mode's entry at any depth; empty stack → chat/home.
+    function modeRemove(name) {
+      const idx = _modeIndex(name);
+      if (idx === -1) return;
+      MODE_STACK.splice(idx, 1);
+      _modeSync();
+    }
+    window.modeRemove = modeRemove;
+
+    // Raise a buried entry to the top (indicator click). Pure z-order +
+    // indicator work, plus the optional onRaise hook — never a re-enter.
+    function modeRaise(name) {
+      const idx = _modeIndex(name);
+      if (idx === -1 || idx === MODE_STACK.length - 1) return;
+      const [entry] = MODE_STACK.splice(idx, 1);
+      MODE_STACK.push(entry);
+      _modeSync();
+      if (entry.onRaise) entry.onRaise();
+    }
+    window.modeRaise = modeRaise;
+
+    // Update a stacked entry's icon + title in place — read/edit's face
+    // toggle swaps read-eye ↔ edit-pencil without moving the entry.
+    function modeUpdateIcon(name, icon, title) {
+      const idx = _modeIndex(name);
+      if (idx === -1) return;
+      MODE_STACK[idx].icon = icon;
+      if (title !== undefined) MODE_STACK[idx].iconTitle = title;
+      _modeRender();
+    }
+    window.modeUpdateIcon = modeUpdateIcon;
+
+    // ---- legacy compatibility wrappers -----------------------------
+    function setActiveMode(name, opts = {}) { modePush(name, opts); }
     window.setActiveMode = setActiveMode;
-
-    // Update just the icon (and its title) for the current mode without
-    // re-registering — used by read/edit when the face toggles.
-    function updateActiveModeIcon(icon, iconTitle) {
-      if (!ACTIVE_MODE) return;
-      ACTIVE_MODE.icon = icon;
-      if (iconTitle !== undefined) ACTIVE_MODE.iconTitle = iconTitle;
-      const iconBtn = document.getElementById('active-mode-icon');
-      setIcon(document.getElementById('active-mode-img'), icon);
-      if (iconTitle !== undefined) {
-        iconBtn.title = iconTitle;
-        iconBtn.setAttribute('aria-label', iconTitle);
-      }
-    }
-
-    function clearActiveMode() {
-      ACTIVE_MODE = null;
-      document.getElementById('active-mode').hidden = true;
-    }
+    // Legacy callers pass no name → remove the top-of-stack entry.
+    function clearActiveMode() { const t = modeTop(); if (t) modeRemove(t.name); }
     window.clearActiveMode = clearActiveMode;
 
-    (function wireActiveModeControls() {
-      const iconBtn = document.getElementById('active-mode-icon');
-      const iconImg = document.getElementById('active-mode-img');
-      const ribbon = document.getElementById('active-mode-ribbon');
-      iconBtn.addEventListener('click', () => {
-        if (ACTIVE_MODE && ACTIVE_MODE.onIconClick) ACTIVE_MODE.onIconClick();
-      });
-      // Hover/focus swap to the mode's hoverIcon (keyboard-reachable via
-      // focus, since the icon is a real <button>).
-      const enter = () => {
-        if (ACTIVE_MODE && ACTIVE_MODE.hoverIcon) setIcon(iconImg, ACTIVE_MODE.hoverIcon);
-      };
-      const leave = () => {
-        if (ACTIVE_MODE && ACTIVE_MODE.icon) setIcon(iconImg, ACTIVE_MODE.icon);
-      };
-      iconBtn.addEventListener('mouseenter', enter);
-      iconBtn.addEventListener('mouseleave', leave);
-      iconBtn.addEventListener('focus', enter);
-      iconBtn.addEventListener('blur', leave);
-      ribbon.addEventListener('click', () => {
-        if (ACTIVE_MODE && ACTIVE_MODE.onExit) ACTIVE_MODE.onExit();
-      });
-    })();
-
-    // Unified esc → exit the active mode. Guarded so it doesn't fire
+    // Unified esc → exit the TOP mode only. Guarded so it doesn't fire
     // while the confirmOverlay is open (that overlay stops esc in a
     // capture-phase listener) or while a chat composer / search field /
     // modal input / girraph inline-edit field is focused. The full/mini
@@ -7681,10 +7746,11 @@
     }
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
-      if (!ACTIVE_MODE || !ACTIVE_MODE.onExit) return;
+      const top = modeTop();
+      if (!top || !top.onExit) return;
       if (_escComposerFocused()) return;
       e.preventDefault();
-      ACTIVE_MODE.onExit();
+      top.onExit();
     });
 
     function applyUIConfig() {
@@ -7748,11 +7814,8 @@
         if (key === cur.font) opt.selected = true;
         fontSel.appendChild(opt);
       }
-      const hl = document.getElementById('ui-help-highlight');
-      if (hl) {
-        const v = UI_CONFIG.help_highlight_on_new_project;
-        hl.checked = (v === undefined || v === null) ? true : !!v;  // default on
-      }
+      const hb = document.getElementById('ui-help-bubbles');
+      if (hb) hb.checked = HELP_BUBBLES_ON;
     }
 
     async function saveUIConfig(partial) {
@@ -7787,8 +7850,17 @@
     document.getElementById('ui-font').addEventListener('change', (e) => {
       saveUIConfig({ font: e.target.value });
     });
-    document.getElementById('ui-help-highlight')?.addEventListener('change', (e) => {
-      saveUIConfig({ help_highlight_on_new_project: e.target.checked });
+    document.getElementById('ui-help-bubbles')?.addEventListener('change', async (e) => {
+      const enabled = e.target.checked;
+      try {
+        await fetch('/api/help/bubbles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled }),
+        });
+      } catch (_e) { /* best-effort persistence */ }
+      HELP_BUBBLES_ON = enabled;
+      applyHelpBubbles();
     });
     // Escape closes the modal.
     document.addEventListener('keydown', (e) => {
@@ -9101,6 +9173,8 @@
       WIKI_STATUS = await fetchWikiStatus();
       updateWikisinkBtnIcon(WIKI_STATUS);
       if (WIKI_STATUS && WIKI_STATUS.installed) {
+        // Already stacked (buried or top) → raise, don't reload the article.
+        if (_modeIndex('wikisink') !== -1) { modeRaise('wikisink'); return; }
         if (typeof enterWikiMode === 'function') enterWikiMode();
         return;
       }
@@ -9489,12 +9563,14 @@
     let LAST_WIKI_SELECTION = null;  // sticky selection snapshot (chat pill)
 
     async function enterWikiMode() {
-      // Any previously-active mode is supplanted by setActiveMode below.
+      // Stacks on top of whatever is open. (Topbar-button re-entry while
+      // already stacked is handled by onWikisinkClick, which raises instead
+      // of re-entering so the current article isn't reloaded.)
       const root = document.getElementById('wiki-mode');
       applyReviewContrast();
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
-      setActiveMode('wikisink', {
+      modePush('wikisink', {
         icon: 'wikisink',
         onExit: exitWikiMode,
         iconTitle: 'wikisink',
@@ -9525,7 +9601,7 @@
       const root = document.getElementById('wiki-mode');
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
-      clearActiveMode();
+      modeRemove('wikisink');
       LAST_WIKI_SELECTION = null;
       hideWikiSuggest();
     }
@@ -10737,8 +10813,16 @@
     // trees wholesale (all their features — highlights, selection
     // toolbar, formatting, revision workflow, chat pills — keep working);
     // this layer just orchestrates them as two faces of ONE mode with
-    // ONE exit and ONE face toggle (the topbar active-mode icon). The
-    // mini size renders lighter-weight faces into #preview.
+    // ONE exit and ONE face toggle (the dedicated #review-face-btn /
+    // #edit-face-btn / #mini-face-btn buttons in the read/edit chrome — the
+    // topbar mode-stack indicator is no longer a button). The mini size
+    // renders lighter-weight faces into #preview.
+    //
+    // As a stack member, read/edit overlays ANY other mode and its buffers
+    // stay alive while buried: opening girraph/merirmaid/etc. over a dirty
+    // editor no longer prompts or drops the buffer — the editor waits
+    // underneath. The dirty-discard prompt still guards readedit→readedit
+    // path changes (openReadEdit) and closing the mode (closeReadEdit).
     //
     // Unsaved edit-face text is held in RE_EDIT_BUFFER and ALWAYS survives
     // a size switch; a face switch away from a dirty editor, or exiting
@@ -10772,37 +10856,41 @@
       return await r.text();
     }
 
-    // ---- active-mode registration for read/edit --------------------
+    // ---- mode-stack registration for read/edit ---------------------
+    // The topbar indicator is no longer clickable (item 4): the face toggle
+    // moved onto dedicated buttons (#review-face-btn / #edit-face-btn /
+    // #mini-face-btn), all calling reToggleFace(). The indicator still swaps
+    // its FACE icon (read-eye ↔ edit-pencil) via modeUpdateIcon.
     function reToggleFace() {
       reSetFace(RE_FACE === 'read' ? 'edit' : 'read');
     }
     function _reModeIcon() { return RE_FACE === 'read' ? 'read-eye' : 'edit-pencil'; }
     function _reModeTitle() {
-      return RE_FACE === 'read' ? 'reading — click to edit'
-        : 'editing — click to read';
+      return RE_FACE === 'read' ? 'read/edit — reading' : 'read/edit — editing';
+    }
+    // Keep the three relocated face-toggle buttons' titles in sync with the
+    // current face: they always advertise the face they switch TO. Updated
+    // wherever the indicator icon updates (registration + face change).
+    function _reUpdateFaceButtons() {
+      const toRead = RE_FACE === 'edit';   // editing now → button goes to read
+      const title = toRead ? 'switch to read face' : 'switch to edit face';
+      ['review-face-btn', 'edit-face-btn', 'mini-face-btn'].forEach((id) => {
+        const b = document.getElementById(id);
+        if (b) { b.title = title; b.setAttribute('aria-label', title); }
+      });
     }
     function _reRegisterMode() {
-      setActiveMode('readedit', {
+      modePush('readedit', {
         icon: _reModeIcon(),
-        hoverIcon: 'readedit-switch',
-        onIconClick: reToggleFace,
         onExit: closeReadEdit,
-        // Supplanted by another mode → synchronous, non-prompting teardown
-        // (drops the buffer, preserving wave-2b behavior). onExit stays the
-        // async dirty-prompting close for the ribbon/esc path.
-        onSupplant: _teardownReadEdit,
         iconTitle: _reModeTitle(),
         exitTitle: 'exit read/edit',
       });
+      _reUpdateFaceButtons();
     }
-    function _reUpdateModeIcon() { updateActiveModeIcon(_reModeIcon(), _reModeTitle()); }
-
-    function _reSyncTreeGrey() {
-      // No-op since the mode-supplant work: the file tree stays fully live in
-      // every mode (including full read/edit). A tree click now supplants the
-      // active mode and opens the file; dirty edit buffers are still guarded
-      // by openReadEdit's own discard prompt. Kept as a stub so the existing
-      // call sites don't need to change.
+    function _reUpdateModeIcon() {
+      modeUpdateIcon('readedit', _reModeIcon(), _reModeTitle());
+      _reUpdateFaceButtons();
     }
 
     // ---- internal face renderers -----------------------------------
@@ -11043,7 +11131,6 @@
         else _showMiniEdit(path, raw);
       }
       _reRegisterMode();
-      _reSyncTreeGrey();
     }
     window.openReadEdit = openReadEdit;
 
@@ -11104,7 +11191,6 @@
         else _showMiniEdit(path, raw);
       }
       _reUpdateModeIcon();
-      _reSyncTreeGrey();
     }
     window.reSetFace = reSetFace;
 
@@ -11130,7 +11216,6 @@
         else _showMiniEdit(path, carry);
       }
       _reApplyView(view);
-      _reSyncTreeGrey();
     }
     window.reSetSize = reSetSize;
 
@@ -11143,7 +11228,7 @@
       RE_SIZE = null; RE_FACE = 'read'; RE_PATH = null;
       RE_PRISTINE = ''; RE_EDIT_BUFFER = null;
       REVIEW_PATH = null; EDIT_PATH = null; LAST_REVIEW_SELECTION = null;
-      clearActiveMode();
+      modeRemove('readedit');
       if (typeof updateReviewChatChip === 'function') updateReviewChatChip();
       updateDocCounters();
     }
@@ -11189,15 +11274,21 @@
     // (including anything the agent changed in the meantime).
     let GIRRAPH_STACK = [];   // [{kind:'girraph'|'doc', path}]
 
+    // Item 6 — girraph → merirmaid: the top-of-stack girraph's linked
+    // .merirmaid sibling path, or null if none exists yet. Refreshed from
+    // the `merirmaid` field of every /api/girraph fetch in renderGirraphTop().
+    let GP_MERIRMAID = null;
+
     async function enterGirraphMode(path) {
-      // Any previously-active mode is supplanted by setActiveMode below.
+      // Stacks on top of whatever is open (or raises the existing girraph
+      // entry — modePush dedups by name after we reset GIRRAPH_STACK here).
       GIRRAPH_STACK = [{ kind: 'girraph', path }];
       const ok = await renderGirraphTop();
       if (!ok) { GIRRAPH_STACK = []; return; }
       const root = document.getElementById('girraph-mode');
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
-      setActiveMode('girraph', {
+      modePush('girraph', {
         icon: 'girraphmode',
         onExit: exitGirraphMode,
         iconTitle: 'girraph',
@@ -11209,8 +11300,9 @@
       const root = document.getElementById('girraph-mode');
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
-      clearActiveMode();
+      modeRemove('girraph');
       GIRRAPH_STACK = [];
+      GP_MERIRMAID = null;
     }
 
     function gpTop() { return GIRRAPH_STACK[GIRRAPH_STACK.length - 1]; }
@@ -11256,6 +11348,7 @@
       const body = document.getElementById('girraph-body');
       document.getElementById('gp-add-root').style.display =
         top.kind === 'girraph' ? '' : 'none';
+      document.getElementById('gp-merirmaid').hidden = top.kind !== 'girraph';
       if (top.kind === 'doc') {
         // Doc-ref transclusion: render the markdown read-only in place.
         let raw;
@@ -11284,6 +11377,8 @@
           throw new Error(detail);
         }
         data = await r.json();
+        GP_MERIRMAID = data.merirmaid || null;
+        _updateGpMerirmaidBtn();
       } catch (e) {
         // Non-blocking, like the doc-load failure above: a blocking
         // alert() here freezes the tab and there's a perfectly good
@@ -11614,6 +11709,43 @@
     document.getElementById('gp-refresh').addEventListener('click', () => renderGirraphTop());
     document.getElementById('gp-add-root').addEventListener('click', () => gpShowAddForm(null, ''));
 
+    // Item 6 — girraph → merirmaid button. Two states carried by
+    // title/aria-label + a dimming class; GP_MERIRMAID (kept current by
+    // renderGirraphTop()) says which one applies.
+    function _updateGpMerirmaidBtn() {
+      const btn = document.getElementById('gp-merirmaid');
+      if (!btn) return;
+      if (GP_MERIRMAID) {
+        btn.title = 'open the linked merirmaid diagram';
+        btn.setAttribute('aria-label', 'open the linked merirmaid diagram');
+        btn.classList.remove('gp-merirmaid-add');
+      } else {
+        btn.title = 'add merirmaid — create a linked merirmaid diagram of this girraph';
+        btn.setAttribute('aria-label', 'add merirmaid — create a linked merirmaid diagram of this girraph');
+        btn.classList.add('gp-merirmaid-add');
+      }
+    }
+
+    document.getElementById('gp-merirmaid').addEventListener('click', async () => {
+      if (GP_MERIRMAID) { enterMerirmaidMode(GP_MERIRMAID); return; }
+      const top = gpTop();
+      if (!top || top.kind !== 'girraph') return;
+      try {
+        const r = await fetch('/api/girraph/merirmaid', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: top.path }),
+        });
+        const js = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(js.detail || `merirmaid create failed (${r.status})`);
+        GP_MERIRMAID = js.merirmaid;
+        _updateGpMerirmaidBtn();
+        enterMerirmaidMode(js.merirmaid);
+      } catch (e) {
+        alert(String(e.message || e));
+      }
+    });
+
     // ================================================================
     // Merirmaid mode (wave 2c) — Mermaid diagram viewer/editor
     // ================================================================
@@ -11643,15 +11775,14 @@
     function mmTop() { return MERIRMAID_STACK[MERIRMAID_STACK.length - 1]; }
 
     async function enterMerirmaidMode(path) {
-      // Any previously-active mode (read/edit, girraph, …) is supplanted by
-      // setActiveMode below.
+      // Stacks on top of whatever is open (or raises the existing merirmaid
+      // entry — modePush dedups by name after we reset MERIRMAID_STACK).
       MERIRMAID_STACK = [{ kind: 'merirmaid', path }];
       const root = document.getElementById('merirmaid-mode');
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
-      setActiveMode('merirmaid', {
+      modePush('merirmaid', {
         icon: 'merirmaidmode',
-        onIconClick: null,
         onExit: exitMerirmaidMode,
         iconTitle: 'merirmaid',
         exitTitle: 'exit merirmaid',
@@ -11672,9 +11803,8 @@
       const root = document.getElementById('merirmaid-mode');
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
-      setActiveMode('merirmaid', {
+      modePush('merirmaid', {
         icon: 'merirmaidmode',
-        onIconClick: null,
         onExit: exitMerirmaidMode,
         iconTitle: 'merirmaid',
         exitTitle: 'exit merirmaid',
@@ -11690,7 +11820,7 @@
       const root = document.getElementById('merirmaid-mode');
       root.classList.remove('open', 'mm-face-mirror', 'mm-face-wip');
       root.setAttribute('aria-hidden', 'true');
-      clearActiveMode();
+      modeRemove('merirmaid');
       MERIRMAID_STACK = [];
       MM_CURRENT = null; MM_LINKS = {}; MM_PATH = null; MM_TITLE = null;
     }
@@ -12432,8 +12562,9 @@
     let CA_DRAG = null;          // { pane, box, path, name, is_dir } while dragging
 
     async function enterCacheawlMode() {
-      // Any previously-active mode (read/edit, girraph, merirmaid, …) is
-      // supplanted by setActiveMode below.
+      // Stacks on top of whatever is open. (Topbar-button re-entry while
+      // already stacked raises instead — see the cacheawl-btn handler — so
+      // the tree isn't reset; raising reruns caLoadTree via the onRaise hook.)
       CA_PROJECT_SUB = []; CA_STORE_BOX = null; CA_STORE_SUB = []; CA_SELECTED = null;
       const root = document.getElementById('cacheawl-mode');
       root.classList.add('open');
@@ -12442,10 +12573,11 @@
       const pn = document.getElementById('project-name');
       const nameEl = document.getElementById('ca-project-name');
       if (pn && nameEl) nameEl.textContent = (pn.textContent || 'project').trim() || 'project';
-      setActiveMode('cacheawl', {
+      modePush('cacheawl', {
         icon: 'cacheawl',
-        onIconClick: null,
         onExit: exitCacheawlMode,
+        // Raising a buried cacheawl refreshes its (possibly stale) tree.
+        onRaise: caLoadTree,
         iconTitle: 'cacheawl',
         exitTitle: 'exit cacheawl',
       });
@@ -12461,7 +12593,7 @@
       const root = document.getElementById('cacheawl-mode');
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
-      clearActiveMode();
+      modeRemove('cacheawl');
       CA_DATA = null; CA_SELECTED = null; CA_DRAG = null;
     }
     window.exitCacheawlMode = exitCacheawlMode;
@@ -13138,7 +13270,11 @@
     window.sendFromCacheawlChat = sendFromCacheawlChat;
 
     // Topbar launcher.
-    document.getElementById('cacheawl-btn')?.addEventListener('click', enterCacheawlMode);
+    document.getElementById('cacheawl-btn')?.addEventListener('click', () => {
+      // Already stacked → raise (reruns caLoadTree via onRaise); else open.
+      if (_modeIndex('cacheawl') !== -1) { modeRaise('cacheawl'); return; }
+      enterCacheawlMode();
+    });
 
     // ---------- Review-mode chat pill ----------
     function toggleReviewChat() {
@@ -14056,9 +14192,9 @@
       const key = e.key;
       const tag = (e.target && e.target.tagName) || '';
 
-      // esc is handled by the unified active-mode handler (see
-      // setActiveMode section) — it exits whatever mode is active,
-      // guarded against composer/modal focus and the confirm overlay.
+      // esc is handled by the unified mode-stack handler (see the MODE_STACK
+      // section) — it exits the TOP mode only, guarded against
+      // composer/modal focus and the confirm overlay.
 
       if (!mod) return;
 
@@ -14974,6 +15110,10 @@
     document.getElementById('mini-full-btn').addEventListener('click', () => reSetSize('full'));
     document.getElementById('review-mini-btn').addEventListener('click', () => reSetSize('mini'));
     document.getElementById('edit-mini-btn').addEventListener('click', () => reSetSize('mini'));
+    // Relocated read/edit face toggles (item 4) — all call reToggleFace().
+    document.getElementById('review-face-btn').addEventListener('click', () => reToggleFace());
+    document.getElementById('edit-face-btn').addEventListener('click', () => reToggleFace());
+    document.getElementById('mini-face-btn').addEventListener('click', () => reToggleFace());
 
     function toggleEditChat() {
       const pill = document.getElementById('edit-chat');

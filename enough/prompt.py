@@ -783,28 +783,29 @@ def list_paradigms(rness: Path) -> list[tuple[str, str, str]]:
 #     # Active paradigm
 #     default
 #
-#     # Help bubble highlights
-#     all
+#     # Help bubbles
+#     on
 #
 # `get_active_paradigm` stays back-compatible with the legacy bare form (and
-# with the agent writing just a name via write_file). The highlights section
-# drives the first-launch "(?) bubbles lit up until viewed" behavior: it holds
-# the pending (not-yet-viewed) bubble ids, the sentinel `all` (every bubble
-# pending — the frontend, which owns the id list, expands it), or nothing
-# (all seen / never seeded). The file stays hidden from the project tree and
-# the cacheawl pane (HIDDEN_TREE_PATHS + build_file_tree).
+# with the agent writing just a name via write_file). The help-bubbles section
+# is one sticky per-folder boolean (`on`/`off`) driving whether the sidebar's
+# `(?)` bubbles show at all — default `on` for a folder's first launch. Every
+# legacy value (the old first-launch `all` sentinel, a list of pending bubble
+# ids, or an empty/absent section) reads as `on`, so pre-0.1.7 files upgrade
+# to "bubbles shown" without a migration pass. The file stays hidden from the
+# project tree and the cacheawl pane (HIDDEN_TREE_PATHS + build_file_tree).
 # ---------------------------------------------------------------------------
 
 _MP_PARADIGM_HEAD = "Active paradigm"
-_MP_HIGHLIGHTS_HEAD = "Help bubble highlights"
+_MP_HIGHLIGHTS_HEAD = "Help bubbles"
 
 
-def _parse_multipurpose(text: str) -> tuple[str | None, "str | list[str] | None"]:
+def _parse_multipurpose(text: str) -> tuple[str | None, bool]:
     """Parse the multipurpose active-paradigm file. Returns
-    ``(paradigm_name | None, highlights)`` where highlights is a list of
-    pending bubble ids, the string ``"all"``, or ``None`` when the section is
-    absent. A legacy bare file (no ``#`` headings) yields ``(first_line,
-    None)``."""
+    ``(paradigm_name | None, bubbles_enabled)``. Help bubbles are enabled
+    unless the section value is literally ``off`` — a missing section and
+    every legacy value (``all``, id lists, empty) read as enabled. A legacy
+    bare file (no ``#`` headings) yields ``(first_line, True)``."""
     lines = text.splitlines()
     heads = [(i, ln) for i, ln in enumerate(lines) if re.match(r"^#\s+\S", ln)]
 
@@ -818,8 +819,8 @@ def _parse_multipurpose(text: str) -> tuple[str | None, "str | list[str] | None"
     if not heads:  # legacy bare form
         for ln in lines:
             if ln.strip():
-                return ln.strip(), None
-        return None, None
+                return ln.strip(), True
+        return None, True
 
     name = None
     para = _section(_MP_PARADIGM_HEAD)
@@ -829,30 +830,25 @@ def _parse_multipurpose(text: str) -> tuple[str | None, "str | list[str] | None"
                 name = ln.strip()
                 break
 
-    highlights: str | list[str] | None = None
+    enabled = True
     hl = _section(_MP_HIGHLIGHTS_HEAD)
     if hl is not None:
-        items = []
+        vals = []
         for ln in hl:
             s = re.sub(r"^-\s+", "", ln.strip()).strip()  # tolerate bullets
             if s:
-                items.append(s)
-        if len(items) == 1 and items[0].lower() == "all":
-            highlights = "all"
-        else:
-            highlights = items  # possibly empty
-    return name, highlights
+                vals.append(s)
+        # Only an explicit `off` disables; every legacy value reads as on.
+        if len(vals) == 1 and vals[0].lower() == "off":
+            enabled = False
+    return name, enabled
 
 
-def _render_multipurpose(name: str, highlights: "str | list[str] | None") -> str:
-    """Render the multipurpose file from a paradigm name + highlights."""
+def _render_multipurpose(name: str, bubbles_enabled: bool) -> str:
+    """Render the multipurpose file from a paradigm name + the help-bubble
+    on/off state."""
     out = [f"# {_MP_PARADIGM_HEAD}", name or "default", "",
-           f"# {_MP_HIGHLIGHTS_HEAD}"]
-    if highlights == "all":
-        out.append("all")
-    elif highlights:
-        out.extend(f"- {h}" for h in highlights)
-    # empty list / None → an empty section (nothing pending)
+           f"# {_MP_HIGHLIGHTS_HEAD}", "on" if bubbles_enabled else "off"]
     return "\n".join(out).rstrip("\n") + "\n"
 
 
@@ -876,64 +872,66 @@ def get_active_paradigm(rness: Path) -> str:
 
 def set_active_paradigm(rness: Path, name: str) -> None:
     """Record `name` as the active paradigm, PRESERVING the help-bubble
-    highlights section. Caller validates that the paradigm exists."""
+    on/off state. Caller validates that the paradigm exists."""
     f = rness / _ACTIVE_PARADIGM_FILE
     f.parent.mkdir(parents=True, exist_ok=True)
-    highlights: str | list[str] | None = None
+    bubbles = True
     if f.is_file():
         try:
-            _n, highlights = _parse_multipurpose(f.read_text(encoding="utf-8"))
+            _n, bubbles = _parse_multipurpose(f.read_text(encoding="utf-8"))
         except OSError:
-            highlights = None
-    f.write_text(_render_multipurpose(name, highlights), encoding="utf-8")
+            bubbles = True
+    f.write_text(_render_multipurpose(name, bubbles), encoding="utf-8")
 
 
-def get_help_highlights(rness: Path) -> "str | list[str]":
-    """Pending help-bubble ids: a list, the sentinel ``"all"``, or ``[]`` when
-    the section is absent/empty."""
+def get_help_bubbles(rness: Path) -> bool:
+    """Whether the sidebar's ``(?)`` help bubbles are shown for this project.
+    Stored in the multipurpose ``rness/active-paradigm`` file's help-bubble
+    section as ``on``/``off``. A missing file/section and every legacy value
+    (the old ``all`` sentinel, id lists, an empty section, an unreadable
+    file) read as **on** — the default."""
     f = rness / _ACTIVE_PARADIGM_FILE
     if not f.is_file():
-        return []
+        return True
     try:
-        _n, hl = _parse_multipurpose(f.read_text(encoding="utf-8"))
+        _n, enabled = _parse_multipurpose(f.read_text(encoding="utf-8"))
     except OSError:
-        return []
-    return "all" if hl == "all" else (hl or [])
+        return True
+    return enabled
 
 
-def set_help_highlights(rness: Path, highlights: "str | list[str]") -> None:
-    """Rewrite the highlights section, preserving the active paradigm."""
+def set_help_bubbles(rness: Path, enabled: bool) -> None:
+    """Persist the help-bubble on/off state, preserving the active paradigm."""
     f = rness / _ACTIVE_PARADIGM_FILE
     f.parent.mkdir(parents=True, exist_ok=True)
     name = "default"
     if f.is_file():
         try:
-            n, _hl = _parse_multipurpose(f.read_text(encoding="utf-8"))
+            n, _b = _parse_multipurpose(f.read_text(encoding="utf-8"))
             if n:
                 name = n
         except OSError:
             pass
-    f.write_text(_render_multipurpose(name, highlights), encoding="utf-8")
+    f.write_text(_render_multipurpose(name, enabled), encoding="utf-8")
 
 
-def seed_multipurpose_file(rness: Path, *, highlight_all: bool) -> None:
+def seed_multipurpose_file(rness: Path) -> None:
     """Write a fresh multipurpose file for a NEW project: paradigm=default,
-    highlights=``all`` when ``highlight_all`` else empty."""
+    help bubbles on (the default for a folder's first launch)."""
     f = rness / _ACTIVE_PARADIGM_FILE
     f.parent.mkdir(parents=True, exist_ok=True)
-    f.write_text(_render_multipurpose("default", "all" if highlight_all else []),
-                 encoding="utf-8")
+    f.write_text(_render_multipurpose("default", True), encoding="utf-8")
 
 
 def ensure_multipurpose_file(rness: Path) -> None:
-    """Idempotently ensure the file exists in markdown form WITHOUT seeding
-    highlights (for existing projects). Missing → create with an empty
-    highlights section; legacy bare → upgrade preserving the paradigm value;
-    already markdown → leave untouched."""
+    """Idempotently ensure the file exists in markdown form (for existing
+    projects). Missing → create with bubbles on; legacy bare → upgrade
+    preserving the paradigm value (bubbles on); already markdown → leave
+    untouched."""
     f = rness / _ACTIVE_PARADIGM_FILE
     if not f.is_file():
         f.parent.mkdir(parents=True, exist_ok=True)
-        f.write_text(_render_multipurpose("default", []), encoding="utf-8")
+        f.write_text(_render_multipurpose("default", True), encoding="utf-8")
         return
     try:
         text = f.read_text(encoding="utf-8")
@@ -941,8 +939,8 @@ def ensure_multipurpose_file(rness: Path) -> None:
         return
     if re.search(rf"^#\s+{re.escape(_MP_PARADIGM_HEAD)}\b", text, re.I | re.M):
         return  # already in markdown form
-    name, _hl = _parse_multipurpose(text)  # legacy bare → preserve the name
-    f.write_text(_render_multipurpose(name or "default", []), encoding="utf-8")
+    name, _b = _parse_multipurpose(text)  # legacy bare → preserve the name
+    f.write_text(_render_multipurpose(name or "default", True), encoding="utf-8")
 
 
 def _load_active_paradigm_body(rness: Path, active: str) -> str:

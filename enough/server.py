@@ -46,12 +46,12 @@ from .logger import ExchangeLog, log_exchange
 from .prompt import (
     assemble_system_prompt,
     get_active_paradigm,
-    get_help_highlights,
+    get_help_bubbles,
     list_paradigms,
     list_roles,
     list_skills,
     set_active_paradigm,
-    set_help_highlights,
+    set_help_bubbles,
     set_role_enabled,
     set_skill_enabled,
 )
@@ -1295,32 +1295,25 @@ def create_app(
 
         return await asyncio.to_thread(_build)
 
-    @app.get("/api/help/highlights")
-    async def api_help_highlights_get() -> dict[str, Any]:
-        """Pending first-launch help-bubble ids for this project, from the
-        multipurpose `rness/active-paradigm` file: a list, the sentinel
-        ``"all"`` (every bubble — the frontend owns the id list and expands
-        it), or ``[]``. Also returns the global default toggle so the UI can
-        render its state without a second call."""
+    @app.get("/api/help/bubbles")
+    async def api_help_bubbles_get() -> dict[str, Any]:
+        """Whether the sidebar's ``(?)`` help bubbles are shown for this
+        project — a sticky per-folder boolean stored in the multipurpose
+        `rness/active-paradigm` file, default on."""
         rness = project_dir / "rness"
-        pending = await asyncio.to_thread(get_help_highlights, rness)
-        cfg = _read_ui_config()
-        on_new = cfg.get("help_highlight_on_new_project")
-        return {"pending": pending,
-                "highlight_on_new_project": True if on_new is None else bool(on_new)}
+        enabled = await asyncio.to_thread(get_help_bubbles, rness)
+        return {"enabled": enabled}
 
-    @app.post("/api/help/highlights")
-    async def api_help_highlights_post(request: Request) -> dict[str, Any]:
-        """Persist the reduced pending list as the user views bubbles. Body
-        ``{"pending": [...]}`` (the frontend sends the authoritative remaining
-        list, having expanded any ``all`` sentinel itself)."""
+    @app.post("/api/help/bubbles")
+    async def api_help_bubbles_post(request: Request) -> dict[str, Any]:
+        """Set the per-project help-bubble on/off state. Body
+        ``{"enabled": bool}``; 400 on a non-boolean."""
         body = await request.json()
-        pending = body.get("pending")
-        if not isinstance(pending, list):
-            raise HTTPException(400, "pending must be a list of bubble ids")
-        clean = [str(p) for p in pending if isinstance(p, str)]
-        await asyncio.to_thread(set_help_highlights, project_dir / "rness", clean)
-        return {"pending": clean}
+        enabled = body.get("enabled") if isinstance(body, dict) else None
+        if not isinstance(enabled, bool):
+            raise HTTPException(400, "enabled must be a boolean")
+        await asyncio.to_thread(set_help_bubbles, project_dir / "rness", enabled)
+        return {"enabled": enabled}
 
     @app.post("/api/requests/done", response_class=HTMLResponse)
     async def api_requests_done(request: Request) -> HTMLResponse:
@@ -1795,6 +1788,14 @@ def create_app(
             raise HTTPException(400, "not a .girraph path")
         return target
 
+    def _merirmaid_echo(path: str) -> str:
+        """The sibling `.merirmaid` path in the SAME scheme the request used —
+        so a `cacheawl:`-prefixed girraph answers with a `cacheawl:`-prefixed
+        mirror, and an in-tree girraph with an in-tree mirror."""
+        if path.endswith(".girraph"):
+            return path[: -len(".girraph")] + ".merirmaid"
+        return path
+
     def _girraph_node_json(g: "_girraph.Girraph", n: "_girraph.Node") -> dict[str, Any]:
         ref_kind = ""
         ref_broken = False
@@ -1835,7 +1836,12 @@ def create_app(
             g = _girraph.load(target)
         except _girraph.GirraphError as e:
             raise HTTPException(404, str(e)) from None
-        return _girraph_tree_json(path, g)
+        out = _girraph_tree_json(path, g)
+        # The linked-mirror state, so the frontend's add/open-merirmaid
+        # button needs no extra round trip. Echoed in the request's own path
+        # scheme (cacheawl: prefix preserved).
+        out["merirmaid"] = _merirmaid_echo(path) if _girraph.has_mirror(target) else None
+        return out
 
     @app.post("/api/girraph/node")
     async def api_girraph_add_node(request: Request) -> dict[str, Any]:
@@ -1952,6 +1958,37 @@ def create_app(
             result_ok=True, result_summary=f"{verb}ed {from_id} -> {to_id}",
         )
         return {"path": path, "from": from_id, "to": to_id, "removed": remove}
+
+    @app.post("/api/girraph/merirmaid")
+    async def api_girraph_merirmaid(request: Request) -> dict[str, Any]:
+        """Create (or idempotently regenerate) the sibling `.merirmaid` mirror
+        for a girraph. 404 if the girraph is missing/unparsable; 409 if a
+        `.merirmaid` already claims the sibling name but is NOT a
+        girraph-mirror (a hand-authored diagram — we won't clobber it). When
+        the sibling already IS a girraph-mirror this just regenerates it.
+        Returns ``{"merirmaid": "<sibling path in the request's scheme>"}``."""
+        body = await request.json()
+        path = (body.get("path") or "").strip() if isinstance(body, dict) else ""
+        target = _girraph_path(path)
+        with _girraph.path_lock(target):
+            try:
+                _girraph.load(target)
+            except _girraph.GirraphError as e:
+                raise HTTPException(404, str(e)) from None
+            mp = _girraph.mirror_path(target)
+            if mp.exists() and not _girraph.has_mirror(target):
+                raise HTTPException(
+                    409,
+                    f"{mp.name} already exists and is not a girraph mirror "
+                    f"(modality/kind mismatch) — rename or remove it first.",
+                )
+            _girraph.create_mirror(target, path)
+        _broker.trace(
+            project_dir, tool="girraph", decision="create merirmaid (panel)",
+            args={"path": path}, result_ok=True,
+            result_summary=f"mirror for {path}",
+        )
+        return {"merirmaid": _merirmaid_echo(path)}
 
     @app.get("/api/girraph/ref-candidates")
     async def api_girraph_ref_candidates(name: str = Query(...)) -> dict[str, Any]:
@@ -2868,11 +2905,6 @@ def create_app(
             raise HTTPException(400, "expected json body") from None
         cfg = _read_ui_config()
         cfg["current"] = _validate_current(cfg, body or {})
-        # The global "highlight (?)s on new folder launch" toggle lives at the
-        # top level (not under `current`, which _validate_current rebuilds from
-        # theme/font only). Read by skeleton seeding at project instantiation.
-        if isinstance(body, dict) and "help_highlight_on_new_project" in body:
-            cfg["help_highlight_on_new_project"] = bool(body["help_highlight_on_new_project"])
         _write_ui_config(cfg)
         return cfg
 

@@ -50,6 +50,8 @@ Emoji live in the render views only.
 
 from __future__ import annotations
 
+import datetime as _dt
+import os as _os
 import re
 import threading
 from dataclasses import dataclass, field
@@ -409,6 +411,13 @@ def dumps(g: Girraph) -> str:
 def save(path: Path, g: Girraph) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(dumps(g), encoding="utf-8")
+    # A user-initiated girraph→merirmaid link makes the sibling `.merirmaid`
+    # a live mirror (like the cachebox mirrors). Regenerate it on every save
+    # — a no-op unless the mirror-link sniff passes. Every save() call site
+    # (the agent tools and the UI endpoints) already holds path_lock(path);
+    # refresh_mirror does not re-acquire it, so this is the single choke
+    # point for keeping the mirror honest.
+    refresh_mirror(path)
 
 
 # ---------------------------------------------------------------------------
@@ -672,6 +681,185 @@ def ascii_render(
 
 def new_girraph(title: str) -> Girraph:
     return Girraph(title=" ".join((title or "").split()))
+
+
+# ---------------------------------------------------------------------------
+# Merirmaid mirror — a girraph rendered as a linked Mermaid diagram in a
+# sibling `.merirmaid` file. User-initiated once, then automatic: the
+# mirror is regenerated on every girraph save (mirror semantics, exactly
+# like the cachebox mirrors in cacheawl.py). The mirror is read-only in
+# the UI (`modality: mirror`); its `kind: girraph-mirror` frontmatter is
+# the cheap sniff that distinguishes "this .merirmaid is our generated
+# mirror" from "a hand-authored diagram that happens to share the name".
+# ---------------------------------------------------------------------------
+
+MIRROR_SUFFIX = ".merirmaid"
+MIRROR_KIND = "girraph-mirror"
+MIRROR_CHAR_LIMIT = 48
+
+# Mermaid node shapes by girraph node type: (open, close) delimiters that
+# wrap the quoted label. issue → hexagon, position → stadium, support /
+# objection → rect, note → rounded, girraph → subroutine.
+_MERMAID_SHAPE = {
+    "issue": ("{{", "}}"),
+    "position": ("([", "])"),
+    "support": ("[", "]"),
+    "objection": ("[", "]"),
+    "note": ("(", ")"),
+    "girraph": ("[[", "]]"),
+}
+
+
+def _mirror_now_iso() -> str:
+    return _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _mermaid_label(text: str, char_limit: int) -> str:
+    """Hard-truncate to `char_limit` (… marker) and escape for a quoted
+    Mermaid label: embedded double quotes become the `#quot;` entity, which
+    the merirmaid viewer's label editor un-escapes on the way back in."""
+    s = " ".join((text or "").split())
+    if char_limit > 0 and len(s) > char_limit:
+        s = s[: max(char_limit - 1, 0)].rstrip() + "…"
+    return s.replace('"', "#quot;")
+
+
+def _mirror_node_text(n: Node) -> str:
+    """The human label for a mirror node: emoji sigil + label, falling back
+    to the ref's stem (then `(unlabeled)`) — mirrors ascii_render's rule."""
+    label = n.label or (Path(n.ref).stem.replace("-", " ") if n.ref else "(unlabeled)")
+    return f"{n.emoji} {label}"
+
+
+def to_mermaid(g: Girraph, *, source_rel: str, char_limit: int = MIRROR_CHAR_LIMIT) -> str:
+    """Render `g` as a full `.merirmaid` file (frontmatter + flowchart).
+
+    `source_rel` is the girraph's project-relative path. It is recorded in
+    the frontmatter `source:` line AND used as the base for rebasing every
+    `ref:` target into a path relative to the mirror's own directory — the
+    mirror is a sibling of the girraph, so a project-relative ref is made
+    relative to `dirname(source_rel)` for the `click` lines the merirmaid
+    viewer intercepts. Output is deterministic: node order = file order,
+    edges/classes/clicks in that same order."""
+    title = g.title or Path(source_rel).stem
+    fm = [
+        "---",
+        "merirmaid: 1",
+        f"title: {title}",
+        "modality: mirror",
+        f"kind: {MIRROR_KIND}",
+        f"source: {source_rel}",
+        f"node-char-limit: {char_limit}",
+        f"generated: {_mirror_now_iso()}",
+        "---",
+    ]
+
+    src_dir = _os.path.dirname(source_rel)
+    ordered = [g.nodes[v] for k, v in g.order if k == "node" and v in g.nodes]
+
+    lines = ["flowchart TD"]
+    for n in ordered:
+        open_d, close_d = _MERMAID_SHAPE.get(n.type, ("[", "]"))
+        label = _mermaid_label(_mirror_node_text(n), char_limit)
+        lines.append(f'  {n.id}{open_d}"{label}"{close_d}')
+
+    # Tree edges (parent --> child), then cross-links (-.->), file order.
+    for n in ordered:
+        if n.parent and n.parent in g.nodes:
+            lines.append(f"  {n.parent} --> {n.id}")
+    for n in ordered:
+        for c in n.cross:
+            if c in g.nodes:
+                lines.append(f"  {n.id} -.-> {c}")
+
+    # classDefs colour supports green-ish / objections red-ish — stroke
+    # only, so fills stay theme-neutral in either app theme.
+    support_ids = [n.id for n in ordered if n.type == "support"]
+    objection_ids = [n.id for n in ordered if n.type == "objection"]
+    if support_ids or objection_ids:
+        lines.append("  classDef support stroke:#3fa34d;")
+        lines.append("  classDef objection stroke:#c0392b;")
+        if support_ids:
+            lines.append(f"  class {','.join(support_ids)} support;")
+        if objection_ids:
+            lines.append(f"  class {','.join(objection_ids)} objection;")
+
+    # click lines for every ref: target (notes → .md, @ nodes → .girraph),
+    # rebased relative to the mirror's directory so navigation resolves.
+    for n in ordered:
+        if n.ref:
+            rel = _os.path.relpath(n.ref, src_dir) if src_dir else n.ref
+            rel = rel.replace(_os.sep, "/")
+            lines.append(f'  click {n.id} "{_mermaid_label(rel, 0)}"')
+
+    return "\n".join(fm) + "\n" + "\n".join(lines) + "\n"
+
+
+def mirror_path(path: Path) -> Path:
+    """The sibling `.merirmaid` for a `.girraph` file: same directory, same
+    stem, `.merirmaid` extension."""
+    return path.with_suffix(MIRROR_SUFFIX)
+
+
+def _frontmatter_value(text: str, key: str) -> str | None:
+    """Read `key`'s value from the leading `---` frontmatter block, or None
+    (no block, or the key is absent before the closing fence)."""
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return None
+    pat = re.compile(rf"^{re.escape(key)}:\s*(\S.*?)\s*$")
+    for ln in lines[1:]:
+        if ln.strip() == "---":
+            break
+        m = pat.match(ln)
+        if m:
+            return m.group(1).strip()
+    return None
+
+
+def has_mirror(path: Path) -> bool:
+    """The mirror-link sniff: the sibling `.merirmaid` exists AND its
+    frontmatter declares `kind: girraph-mirror`. Reads one small file."""
+    try:
+        text = mirror_path(path).read_text(encoding="utf-8")
+    except OSError:
+        return False
+    return _frontmatter_value(text, "kind") == MIRROR_KIND
+
+
+def create_mirror(path: Path, source_rel: str, *,
+                  char_limit: int = MIRROR_CHAR_LIMIT) -> Path:
+    """Generate (or overwrite) the sibling `.merirmaid` for the girraph at
+    `path`, recording `source_rel` — the project-relative girraph path — in
+    its frontmatter. Returns the mirror path. Hold path_lock(path)."""
+    g = load(path)
+    mp = mirror_path(path)
+    mp.parent.mkdir(parents=True, exist_ok=True)
+    mp.write_text(to_mermaid(g, source_rel=source_rel, char_limit=char_limit),
+                  encoding="utf-8")
+    return mp
+
+
+def refresh_mirror(path: Path) -> Path | None:
+    """Regenerate the sibling `.merirmaid` IFF the mirror-link sniff passes
+    (sibling exists and is `kind: girraph-mirror`); otherwise a no-op
+    returning None. Preserves the mirror's existing frontmatter `source:` so
+    the rebased click-paths stay stable across regenerations. Called from
+    `save()` under the caller's path_lock; does not re-acquire the lock."""
+    mp = mirror_path(path)
+    try:
+        existing = mp.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    if _frontmatter_value(existing, "kind") != MIRROR_KIND:
+        return None
+    try:
+        g = load(path)
+    except GirraphError:
+        return None
+    source_rel = _frontmatter_value(existing, "source") or path.name
+    mp.write_text(to_mermaid(g, source_rel=source_rel), encoding="utf-8")
+    return mp
 
 
 # ---------------------------------------------------------------------------
