@@ -12115,9 +12115,11 @@
       });
     }
 
+    // Mode-stack semantics: entering the target mode PUSHES it over this
+    // merirmaid (or raises + re-targets an existing entry) — no explicit
+    // exit here, so closing the target drops back to this diagram.
     async function mmOpenFolderInCacheawl(box, relPath) {
-      exitMerirmaidMode();
-      await enterCacheawlMode();     // resets state + loads the tree
+      await enterCacheawlMode();     // resets state + loads the tree (raises if stacked)
       CA_STORE_BOX = box;
       CA_STORE_SUB = relPath ? relPath.split('/') : [];
       caRenderStore();
@@ -12126,7 +12128,6 @@
     function mmOpenNodeFile(box, relPath, name) {
       const path = 'cacheawl:' + box + (relPath ? '/' + relPath : '');
       const low = (name || relPath || '').toLowerCase();
-      exitMerirmaidMode();
       if (low.endsWith('.girraph')) enterGirraphMode(path);
       else if (low.endsWith('.merirmaid')) enterMerirmaidMode(path);
       else openReadEdit(path, { size: 'full', face: 'read' });
@@ -12352,7 +12353,7 @@
       const low = resolved.toLowerCase();
       if (low.endsWith('.merirmaid')) mmPush({ kind: 'merirmaid', path: resolved });
       else if (low.endsWith('.md')) mmPush({ kind: 'doc', path: resolved });
-      else if (low.endsWith('.girraph')) { exitMerirmaidMode(); enterGirraphMode(resolved); }
+      else if (low.endsWith('.girraph')) enterGirraphMode(resolved);   // stacks over this diagram
       else mmFlash('unsupported link target: ' + resolved + ' (expected .merirmaid, .md, or .girraph)');
     }
 
@@ -12739,7 +12740,7 @@
           caHideContextMenu();
           const box = d.is_box ? d.name : CA_STORE_BOX;
           const subpath = d.is_box ? '' : d.path;
-          exitCacheawlMode();
+          // Stacks over cacheawl — closing the diagram returns here.
           enterMerirmaidMirror(box, subpath);
         });
         // Grabbing the squircle must not start a tile drag.
@@ -12896,7 +12897,8 @@
       const path = d.pane === 'project'
         ? d.path
         : 'cacheawl:' + d.box + (d.path ? '/' + d.path : '');
-      exitCacheawlMode();
+      // The launched mode STACKS over cacheawl (mode-stack semantics):
+      // closing it drops back to this pane, descent state intact.
       if (d.wiki_article) openSavedWikiArticle(path);
       else if (low.endsWith('.girraph')) enterGirraphMode(path);
       else if (low.endsWith('.merirmaid')) enterMerirmaidMode(path);
