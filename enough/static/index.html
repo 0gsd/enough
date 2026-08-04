@@ -1326,7 +1326,7 @@
 
     /* Body of the rendered document. Scrollable; the chat pill floats
        over the bottom edge so it's always reachable. */
-    #review-mode .review-body {
+    :is(#review-mode, #ref-mode) .review-body {
       flex: 1;
       overflow: auto;
       padding: 48px max(48px, calc(50% - 380px)) 120px;
@@ -1340,81 +1340,81 @@
        don't bleed into the rest of the UI. Colors use --review-fg/bg
        so the max-contrast theme override (computed at runtime from the
        active theme's luminance) just works. */
-    #review-mode .review-body h1,
-    #review-mode .review-body h2,
-    #review-mode .review-body h3,
-    #review-mode .review-body h4,
-    #review-mode .review-body h5,
-    #review-mode .review-body h6 {
+    :is(#review-mode, #ref-mode) .review-body h1,
+    :is(#review-mode, #ref-mode) .review-body h2,
+    :is(#review-mode, #ref-mode) .review-body h3,
+    :is(#review-mode, #ref-mode) .review-body h4,
+    :is(#review-mode, #ref-mode) .review-body h5,
+    :is(#review-mode, #ref-mode) .review-body h6 {
       font-weight: 700;
       line-height: 1.25;
       margin: 1.6em 0 0.6em;
       color: var(--review-fg);
     }
 
-    #review-mode .review-body h1 {
+    :is(#review-mode, #ref-mode) .review-body h1 {
       font-size: 2.0em;
       border-bottom: 1px solid var(--review-fg-faint);
       padding-bottom: 0.3em;
     }
 
-    #review-mode .review-body h2 {
+    :is(#review-mode, #ref-mode) .review-body h2 {
       font-size: 1.55em;
       border-bottom: 1px solid var(--review-fg-faint);
       padding-bottom: 0.2em;
     }
 
-    #review-mode .review-body h3 {
+    :is(#review-mode, #ref-mode) .review-body h3 {
       font-size: 1.25em;
     }
 
-    #review-mode .review-body h4 {
+    :is(#review-mode, #ref-mode) .review-body h4 {
       font-size: 1.1em;
     }
 
-    #review-mode .review-body h5,
-    #review-mode .review-body h6 {
+    :is(#review-mode, #ref-mode) .review-body h5,
+    :is(#review-mode, #ref-mode) .review-body h6 {
       font-size: 1.0em;
       font-style: italic;
     }
 
-    #review-mode .review-body p {
+    :is(#review-mode, #ref-mode) .review-body p {
       margin: 0.85em 0;
     }
 
-    #review-mode .review-body strong {
+    :is(#review-mode, #ref-mode) .review-body strong {
       font-weight: 700;
     }
 
-    #review-mode .review-body em {
+    :is(#review-mode, #ref-mode) .review-body em {
       font-style: italic;
     }
 
-    #review-mode .review-body u {
+    :is(#review-mode, #ref-mode) .review-body u {
       text-decoration: underline;
     }
 
-    #review-mode .review-body a {
+    :is(#review-mode, #ref-mode) .review-body a {
       color: var(--review-fg);
       text-decoration: underline;
       text-decoration-style: dotted;
     }
 
-    #review-mode .review-body a:hover {
+    :is(#review-mode, #ref-mode) .review-body a:hover {
       text-decoration-style: solid;
     }
 
-    #review-mode .review-body ul,
-    #review-mode .review-body ol {
+    :is(#review-mode, #ref-mode) .review-body ul,
+    :is(#review-mode, #ref-mode) .review-body ol {
       margin: 0.7em 0 0.7em 1.6em;
       padding-left: 0.4em;
     }
 
-    #review-mode .review-body li {
+    :is(#review-mode, #ref-mode) .review-body li {
       margin: 0.25em 0;
     }
 
-    #review-mode .review-body blockquote {
+    :is(#review-mode, #ref-mode) .review-body blockquote {
       border-left: 3px solid var(--review-fg-faint);
       padding: 0.2em 0.9em;
       margin: 1em 0;
@@ -1422,7 +1422,7 @@
       font-style: italic;
     }
 
-    #review-mode .review-body code {
+    :is(#review-mode, #ref-mode) .review-body code {
       font-family: var(--font-mono);
       font-size: 0.9em;
       background: var(--review-code-bg);
@@ -1430,7 +1430,7 @@
       border-radius: 3px;
     }
 
-    #review-mode .review-body pre {
+    :is(#review-mode, #ref-mode) .review-body pre {
       font-family: var(--font-mono);
       font-size: 0.85em;
       background: var(--review-code-bg);
@@ -1440,37 +1440,37 @@
       margin: 1em 0;
     }
 
-    #review-mode .review-body pre code {
+    :is(#review-mode, #ref-mode) .review-body pre code {
       background: transparent;
       padding: 0;
     }
 
-    #review-mode .review-body hr {
+    :is(#review-mode, #ref-mode) .review-body hr {
       border: none;
       border-top: 1px solid var(--review-fg-faint);
       margin: 2em 0;
     }
 
-    #review-mode .review-body img {
+    :is(#review-mode, #ref-mode) .review-body img {
       max-width: 100%;
     }
 
-    #review-mode .review-body table {
+    :is(#review-mode, #ref-mode) .review-body table {
       border-collapse: collapse;
       margin: 1.2em 0;
       font-size: 0.85em;
       line-height: 1.45;
     }
 
-    #review-mode .review-body th,
-    #review-mode .review-body td {
+    :is(#review-mode, #ref-mode) .review-body th,
+    :is(#review-mode, #ref-mode) .review-body td {
       border: 1px solid var(--review-fg-faint);
       padding: 0.4em 0.8em;
       text-align: left;
       vertical-align: top;
     }
 
-    #review-mode .review-body th {
+    :is(#review-mode, #ref-mode) .review-body th {
       font-weight: 700;
       background: var(--review-code-bg);
     }
@@ -1478,7 +1478,7 @@
     /* Pipe/ASCII diagrams that aren't real tables: monospace so the
        author's column alignment survives. White-space preserved by
        <pre>; no wrapping, scroll instead. */
-    #review-mode .review-body pre.text-art {
+    :is(#review-mode, #ref-mode) .review-body pre.text-art {
       white-space: pre;
     }
 
@@ -1519,7 +1519,7 @@
 
     /* When the linenav exists, give the body a bit of right padding
        so the rightmost text doesn't crowd against the column. */
-    #review-mode .review-body {
+    :is(#review-mode, #ref-mode) .review-body {
       padding-right: max(48px, calc(50% - 380px - 16px));
     }
 
@@ -2457,6 +2457,136 @@
        overlay inside <main class="content">, toolbar + body + a chat
        pill mirroring the live conversation. Rendering is done client
        side by the vendored mermaid.min.js (lazy-loaded on first open). */
+    /* ---------------- Reference mode (read-only manual) ---------------- */
+    /* Full-frame reader for the bundled help-center manual — view only:
+       no edit face, no highlighting, no chat pill. Shares the pretty
+       markdown styles and the max-contrast --review-* vars with review
+       mode via the .review-body class. */
+    #ref-mode {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--review-bg, var(--bg));
+      color: var(--review-fg, var(--fg));
+      z-index: 30;
+    }
+
+    #ref-mode.open {
+      display: flex;
+    }
+
+    /* Mini size: dock to the right edge so the rest of the UI stays
+       visible and usable beside the manual. Same stack entry, same
+       content — geometry only. */
+    #ref-mode.ref-mini {
+      left: auto;
+      width: min(520px, 92vw);
+      border-left: 1px solid var(--border);
+      box-shadow: -6px 0 18px rgba(0, 0, 0, 0.25);
+    }
+
+    #ref-mode.ref-mini .review-body {
+      padding: 24px 22px 60px;
+      font-size: 15px;
+    }
+
+    #ref-mode .ref-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: var(--bg-raise);
+      color: var(--fg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    #ref-mode .ref-toolbar .ref-mode-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    #ref-mode .ref-toolbar .spacer {
+      flex: 1;
+    }
+
+    #ref-mode .ref-title {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* "read only" badge — mirrors .mm-badge.mirror styling. */
+    #ref-mode .ref-badge {
+      font-size: 10.5px;
+      color: var(--accent-tool);
+      border: 1px solid var(--accent-tool);
+      border-radius: 10px;
+      padding: 2px 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Square chip → gets the shared 3D gradient treatment. */
+    #ref-mode #ref-size-btn {
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 0;
+      background-color: var(--btn-bg, var(--bg-raise));
+      background-image: linear-gradient(to bottom,
+          rgba(128, 128, 128, 0.42), rgba(128, 128, 128, 0.10) 62%,
+          rgba(128, 128, 128, 0));
+    }
+
+    #ref-mode #ref-size-btn img {
+      width: 16px;
+      height: 16px;
+    }
+
+    #ref-mode .ref-error {
+      color: var(--accent-error);
+      font-family: var(--font-mono);
+    }
+
+    /* Big friendly help-center launcher at the top of the UI modal. */
+    .help-center-launch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px 16px;
+      margin: 2px 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--fg);
+      background-color: var(--btn-bg, var(--bg-raise));
+      background-image: linear-gradient(to bottom,
+          rgba(128, 128, 128, 0.42), rgba(128, 128, 128, 0.10) 62%,
+          rgba(128, 128, 128, 0));
+    }
+
+    .help-center-launch:hover {
+      filter: brightness(1.08);
+    }
+
+    .help-center-launch .svg-icon {
+      width: 34px;
+      height: 34px;
+    }
+
     #merirmaid-mode {
       position: absolute;
       inset: 0;
@@ -3281,32 +3411,32 @@
        reads. Colors stack via nested spans — overlapping highlights
        blend their alphas so the user sees a third color in the
        intersection. */
-    #review-mode .review-body .hl {
+    :is(#review-mode, #ref-mode) .review-body .hl {
       border-radius: 2px;
       padding: 0 1px;
       transition: box-shadow 80ms ease;
     }
 
-    #review-mode .review-body .hl-yellow {
+    :is(#review-mode, #ref-mode) .review-body .hl-yellow {
       background-color: rgba(255, 215, 0, 0.45);
     }
 
-    #review-mode .review-body .hl-green {
+    :is(#review-mode, #ref-mode) .review-body .hl-green {
       background-color: rgba(127, 255, 0, 0.42);
     }
 
-    #review-mode .review-body .hl-blue {
+    :is(#review-mode, #ref-mode) .review-body .hl-blue {
       background-color: rgba(64, 195, 255, 0.42);
     }
 
-    #review-mode .review-body .hl-pink {
+    :is(#review-mode, #ref-mode) .review-body .hl-pink {
       background-color: rgba(255, 105, 180, 0.42);
     }
 
     /* Hover affordance — a faint inner ring on a highlighted span, so
        the user can see precise edges. (Does double-duty when Phase 4
        teaches the agent to scroll to a particular highlight.) */
-    #review-mode .review-body .hl:hover {
+    :is(#review-mode, #ref-mode) .review-body .hl:hover {
       box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
     }
 
@@ -3314,12 +3444,12 @@
        anchored to the FIRST wrapped span of each highlight, sitting
        just above the first letter. Same color as the highlight
        (filled) so the user can tell which highlight it belongs to. */
-    #review-mode .review-body .hl.hl-first {
+    :is(#review-mode, #ref-mode) .review-body .hl.hl-first {
       position: relative;
       /* makes the absolute handle anchor here */
     }
 
-    #review-mode .review-body .hl-handle {
+    :is(#review-mode, #ref-mode) .review-body .hl-handle {
       position: absolute;
       top: -16px;
       left: -2px;
@@ -3343,23 +3473,23 @@
       z-index: 12;
     }
 
-    #review-mode .review-body .hl-handle.hl-handle-yellow {
+    :is(#review-mode, #ref-mode) .review-body .hl-handle.hl-handle-yellow {
       background: rgba(255, 215, 0, 0.95);
     }
 
-    #review-mode .review-body .hl-handle.hl-handle-green {
+    :is(#review-mode, #ref-mode) .review-body .hl-handle.hl-handle-green {
       background: rgba(127, 255, 0, 0.85);
     }
 
-    #review-mode .review-body .hl-handle.hl-handle-blue {
+    :is(#review-mode, #ref-mode) .review-body .hl-handle.hl-handle-blue {
       background: rgba(64, 195, 255, 0.90);
     }
 
-    #review-mode .review-body .hl-handle.hl-handle-pink {
+    :is(#review-mode, #ref-mode) .review-body .hl-handle.hl-handle-pink {
       background: rgba(255, 105, 180, 0.90);
     }
 
-    #review-mode .review-body .hl-handle:hover {
+    :is(#review-mode, #ref-mode) .review-body .hl-handle:hover {
       transform: scale(1.18);
     }
 
@@ -6119,7 +6249,7 @@
       aria-label="files"><img class="svg-icon" data-icon="projectnav-on" alt="files" draggable="false"></button>
     <button id="broker-btn" class="icon-btn" title="Broker — tool routing, logging, and per-tool toggles"
       aria-label="broker"><img class="svg-icon" data-icon="broker" alt="broker" draggable="false"></button>
-    <button id="ui-btn" class="icon-btn" title="UI preferences + keyboard shortcuts + markdown cheat sheet"
+    <button id="ui-btn" class="icon-btn" title="UI preferences + help center + keyboard shortcuts + markdown cheat sheet"
       aria-label="ui preferences"><img class="svg-icon" data-icon="uiq" alt="ui preferences" draggable="false"></button>
     <button id="wikisink-btn" class="icon-btn" title="Wikisink — your local offline Wikipedia: browse, save, comment, update"
       aria-label="wikisink"><img class="svg-icon" data-icon="wikisink" alt="wikisink" draggable="false"></button>
@@ -6433,6 +6563,25 @@
             <button type="submit">send</button>
           </form>
         </div>
+      </div>
+
+      <!-- Reference mode: full-frame read-only viewer for the bundled
+           help-center manual (docs/HELP_CENTER.md, served at
+           /api/help-center). No edit face, no highlights — a locked
+           reference doc. The ref-mini class docks it right for
+           side-by-side reading; the mode stack treats it like any other
+           full-frame mode. Launched from the UI modal's hxc button. -->
+      <div id="ref-mode" aria-hidden="true">
+        <div class="ref-toolbar">
+          <img class="svg-icon ref-mode-icon" data-icon="hxc" alt="" draggable="false">
+          <span class="ref-title">help center</span>
+          <span class="ref-badge">reference · read-only</span>
+          <span class="spacer"></span>
+          <button type="button" id="ref-size-btn" title="shrink to a side panel" onclick="refToggleSize()">
+            <img class="svg-icon" data-icon="full2mini" alt="" draggable="false">
+          </button>
+        </div>
+        <div class="review-body ref-body" id="ref-body"></div>
       </div>
 
       <!-- In-place merirmaid node-label editor (fixed-positioned; moved
@@ -6950,6 +7099,14 @@
         <button class="modal-close" onclick="closeUIModal()" aria-label="close">×</button>
       </div>
       <div class="modal-body ui-modal-body-wide">
+        <!-- Big friendly launcher: opens the bundled manual in the
+             read-only reference mode (see #ref-mode). -->
+        <button type="button" class="help-center-launch" id="ui-help-center-btn"
+          title="open the enough manual in a read-only reference view"
+          onclick="closeUIModal(); enterRefMode();">
+          <img class="svg-icon" data-icon="hxc" alt="" draggable="false">
+          <span>open the help center</span>
+        </button>
         <!-- Top row: theme + font selectors stay narrow and inline. -->
         <div class="ui-prefs-row">
           <label>
@@ -6974,7 +7131,7 @@
             <h4>keyboard shortcuts</h4>
             <dl class="kb-table">
               <dt><kbd>esc</kbd></dt>
-              <dd>exit review mode / edit mode</dd>
+              <dd>close the topmost open mode (modes stack)</dd>
               <dt><kbd>⌘</kbd>+<kbd>\\</kbd></dt>
               <dd>show / hide the file sidebar</dd>
               <dt><kbd>⌘</kbd>+<kbd>k</kbd></dt>
@@ -7593,11 +7750,12 @@
     const _MODE_ROOT_IDS = {
       girraph: 'girraph-mode', merirmaid: 'merirmaid-mode',
       wikisink: 'wiki-mode', cacheawl: 'cacheawl-mode',
+      ref: 'ref-mode',
     };
     // Every root the manager may touch — cleared to the CSS default (30) each
     // pass before the live entries get their z = 30 + index.
     const _ALL_MODE_ROOTS = ['review-mode', 'edit-mode', 'girraph-mode',
-      'merirmaid-mode', 'wiki-mode', 'cacheawl-mode', 'preview'];
+      'merirmaid-mode', 'wiki-mode', 'cacheawl-mode', 'ref-mode', 'preview'];
 
     function _modeIndex(name) { return MODE_STACK.findIndex((e) => e.name === name); }
     function modeTop() { return MODE_STACK.length ? MODE_STACK[MODE_STACK.length - 1] : null; }
@@ -7744,14 +7902,83 @@
         && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) return true;
       return false;
     }
+    // Any OPEN modal owns esc (each modal has its own esc-to-close
+    // listener) — don't also pop the mode stack underneath it, even when
+    // focus never entered the modal panel (e.g. it was opened by a
+    // topbar click and the button kept focus).
+    function _escModalOpen() {
+      return Array.from(document.querySelectorAll('[id$="-modal"]')).some(
+        (m) => !m.classList.contains('hidden') && !m.hidden);
+    }
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape') return;
       const top = modeTop();
       if (!top || !top.onExit) return;
+      if (_escModalOpen()) return;
       if (_escComposerFocused()) return;
       e.preventDefault();
       top.onExit();
     });
+
+    // ================================================================
+    // Reference mode — the read-only manual viewer (launched from the
+    // hxc button in the UI modal). Renders /api/help-center
+    // (docs/HELP_CENTER.md in the install checkout) through
+    // renderMarkdown into a review-body-styled frame. View only by
+    // design: no edit face, no highlighting, no chat pill. A normal
+    // mode-stack citizen; the ref-mini class docks it to the right
+    // edge so the UI stays usable beside it.
+    async function enterRefMode() {
+      const root = document.getElementById('ref-mode');
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      modePush('ref', {
+        icon: 'hxc',
+        onExit: exitRefMode,
+        iconTitle: 'help center (reference)',
+        exitTitle: 'close the help center',
+      });
+      applyReviewContrast();
+      // Re-fetched on every open so hand-edits to the manual show up
+      // without a reload. ~tens of KB, local — cheap.
+      const body = document.getElementById('ref-body');
+      try {
+        const r = await fetch('/api/help-center');
+        if (!r.ok) {
+          let detail = 'HTTP ' + r.status;
+          try { detail = (await r.json()).detail || detail; } catch (_e) { /* noop */ }
+          throw new Error(detail);
+        }
+        const src = await r.text();
+        body.innerHTML = renderMarkdown(src).html;
+      } catch (err) {
+        body.innerHTML = '<p class="ref-error">could not load the help center: '
+          + escapeHtml(String((err && err.message) || err)) + '</p>';
+      }
+    }
+    window.enterRefMode = enterRefMode;
+
+    function exitRefMode() {
+      const root = document.getElementById('ref-mode');
+      root.classList.remove('open', 'ref-mini');
+      root.setAttribute('aria-hidden', 'true');
+      const btn = document.getElementById('ref-size-btn');
+      if (btn) {
+        setIcon(btn.querySelector('img'), 'full2mini');
+        btn.title = 'shrink to a side panel';
+      }
+      modeRemove('ref');
+    }
+    window.exitRefMode = exitRefMode;
+
+    function refToggleSize() {
+      const root = document.getElementById('ref-mode');
+      const mini = root.classList.toggle('ref-mini');
+      const btn = document.getElementById('ref-size-btn');
+      setIcon(btn.querySelector('img'), mini ? 'mini2full' : 'full2mini');
+      btn.title = mini ? 'expand to full frame' : 'shrink to a side panel';
+    }
+    window.refToggleSize = refToggleSize;
 
     function applyUIConfig() {
       if (!UI_CONFIG) return;
@@ -10766,7 +10993,7 @@
       // Max-contrast overrides for both full-frame readers: review mode
       // and wikisink view share the --review-* custom properties.
       const mode = detectThemeMode();
-      for (const id of ['review-mode', 'wiki-mode']) {
+      for (const id of ['review-mode', 'wiki-mode', 'ref-mode']) {
         const root = document.getElementById(id);
         if (!root) continue;
         if (mode === 'light') {

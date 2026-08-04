@@ -45,3 +45,12 @@ venv/
 rness/knowledge/session-logs/
 dev/
 tests/
+
+# Historical planning docs — folded into docs/AGENT_GUIDE.md (0.1.7) and
+# untracked; kept locally for archaeology but not shipped.
+docs/cacheawl-plan.md
+docs/girraph-plan.md
+docs/girraphs.md
+docs/help-system-plan.md
+docs/merirmaid-plan.md
+docs/mode-stack-plan.md

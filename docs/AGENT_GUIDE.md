@@ -2,8 +2,14 @@
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
-> end-user-facing intro see the [README](../README.md). This doc is dense,
+> end-user-facing intro see the [README](../README.md), and for the full
+> user manual see [docs/HELP_CENTER.md](HELP_CENTER.md) (served in-app
+> via the help-center reference mode). This doc is dense,
 > file-path-heavy, and assumes you can read Python and call tools.
+> The historical planning docs (girraph-plan, girraphs, merirmaid-plan,
+> cacheawl-plan, mode-stack-plan, help-system-plan) were folded into
+> this guide and removed from the repo — don't go looking for them; the
+> load-bearing content is in the sections below.
 
 `enough` is a paradigmless personal computer harness powered by a local
 LLM. It runs on the user's machine, exposes a chat UI at
@@ -127,7 +133,7 @@ cache.
 |---|---|---|---|
 | Agent identity | `rness/AGENT.md` (copied) | `defaults/AGENT.md` | yes — top of prompt |
 | Motivation | `rness/MOTIVATION.md` (copied) | `defaults/MOTIVATION.md` | yes |
-| Active paradigm | `rness/active-paradigm` (one line, just the name) | seeded with `"default\n"` | yes — full file inlined |
+| Active paradigm | `rness/active-paradigm` (multipurpose markdown: paradigm name + help-bubbles state — see "What NOT to touch") | seeded by `prompt.seed_multipurpose_file()` | the active paradigm's full file, yes |
 | Paradigms | `rness/paradigms/<name>.md` (symlink) | `defaults/paradigms/<name>.md` | the active one, yes |
 | Skills | `rness/skills/<name>/SKILL.md` (symlink) | `defaults/skills/<name>/SKILL.md` | the toggled-on ones, yes |
 | Roles | `rness/roles/<name>/AGENT.md`+`MOTIVATION.md` (symlink) | `defaults/roles/<name>/` | the toggled-on ones, yes |
@@ -461,8 +467,61 @@ one-per-line with stable broker-assigned IDs, `< parent` tree edges,
 `[-> id]` cross-edges, `ref:<path>` transclusions (markdown doc or
 another `.girraph` — that's the recursion), `by:<slug>` attribution,
 and optional indented detail blocks collected at the end of the file.
-Full format spec and design rationale: [docs/girraph-plan.md](girraph-plan.md);
-user-facing explainer: [docs/girraphs.md](girraphs.md).
+User-facing explainer: [docs/HELP_CENTER.md](HELP_CENTER.md) §15.
+
+Format spec (formerly docs/girraph-plan.md, folded in here):
+
+```
+%girraph 0.1
+title: Should enough ship a plugin API?
+next: q2 p3 a4 n2 g2
+
+q1 ? Should enough ship a plugin API?
+p1 ! Ship a minimal one < q1
+a1 + Ecosystem growth needs stable hooks < p1 by:graham
+a2 - API surface = forever maintenance < p1 by:open-skeptic
+n1 . Background reading < q1 ref:rness/knowledge/plugins-survey.md
+g1 @ Subproblem: versioning < p1 ref:rness/girraphs/versioning.girraph
+
+q1 >
+  Indented free-form detail block under `id >`. Markdown allowed.
+```
+
+- **Header**: `%girraph 0.1` magic line (required, first), optional
+  `title:` and `next:`, then a blank line. `next:` is the
+  broker-maintained per-prefix high-water-mark list that makes "IDs are
+  never reused" a guarantee; absent (hand-authored file) the broker
+  derives max+1 and adds it on first write.
+- **Node record**: `<id> <sigil> <label> [modifiers...]`, one per line.
+  `id` is `[a-z]+[0-9]+` (conventional prefixes: `q` issue, `p`
+  position, `a` argument, `n` note, `g` nested girraph; any prefix
+  legal). Sigils: `?` issue ❓, `!` position 💡, `+` support ➕,
+  `-` objection ➖, `.` note 📄, `@` nested girraph 🦒 (must carry a
+  `ref:` to a `.girraph`).
+- **Modifiers** (stripped right-to-left off the line end; the rest is
+  the label): `< <id>` parent edge (at most one), `[-> <id>]`
+  cross-edge (repeatable; ASCII canonical, `[→ id]` accepted),
+  `ref:<path>` transclusion (project-root-relative; markdown doc or
+  another `.girraph` — same mechanism, that's the recursion),
+  `by:<slug>` attribution (`user`, `agent`, or a role name).
+  Canonical order: `id sigil label < parent [-> x] ref:… by:…`. A label
+  *ending* in modifier-shaped text will be misparsed as metadata —
+  known plain-text tradeoff; tools always serialize canonically.
+- **Detail blocks**: `<id> >` + indented lines; parser accepts them
+  anywhere, canonical serialization collects them at end-of-file in
+  node order.
+- **Root**: the first parentless node (derived — no `root:` header).
+  Multiple parentless nodes = a forest. Parent edges are validated
+  acyclic per file; cycles via `ref:` are legal and the navigator's
+  visited-set handles them.
+- **remove_node semantics**: no orphaning, ever — removing a node with
+  children errors and lists them unless `<cascade>true</cascade>`;
+  cross-edges pointing at removed nodes are deleted from their source
+  lines (journaled); `<confirmed>yes</confirmed>` must reflect explicit
+  user confirmation this turn.
+- Prior art: Argdown (sigils, plain-text spirit) — but explicit parent
+  edges instead of indentation, so every node line is independently
+  patchable by a small model; stable IDs instead of title strings.
 
 Architecture notes:
 
@@ -495,11 +554,29 @@ Architecture notes:
   and because the rename creates a fresh global, existing projects get it
   defaulted off (re-enable in the sidebar).
 - **Mermaid export is no longer a girraph TODO.** It shipped in 0.1.6 as
-  the sibling **merirmaid** primitive (see the merirmaid section below and
-  [docs/merirmaid-plan.md](merirmaid-plan.md)) — a girraph is not converted
-  to Mermaid; the two are separate formats for separate jobs. Still out of
-  v1 scope for girraph: a query engine (grep suffices; an embedded index
-  like Kuzu could later be added as a derived cache without migration pain).
+  the sibling **merirmaid** primitive (see the merirmaid section below) —
+  a girraph is not converted to Mermaid; the two are separate formats for
+  separate jobs. Still out of v1 scope for girraph: a query engine (grep
+  suffices; an embedded index like Kuzu could later be added as a derived
+  cache without migration pain).
+- **Girraph → merirmaid mirrors (0.1.7).** A girraph can grow a linked,
+  auto-regenerating Mermaid mirror: `girraph.to_mermaid()` renders a full
+  `.merirmaid` text (frontmatter `modality: mirror`, `kind:
+  girraph-mirror`, `source: <girraph path>`; issue `{{…}}` hexagon,
+  position `([…])` stadium, support/objection rects with green/red
+  stroke-only classDefs, note `(…)`, nested girraph `[[…]]`; tree edges
+  `-->`, cross-links `-.->`; `click <id> "<path>"` for every ref). The
+  sibling-path rule: `<dir>/<base>.merirmaid` next to the `.girraph`;
+  the link exists ⇔ that file exists AND its frontmatter says
+  `kind: girraph-mirror`. `POST /api/girraph/merirmaid` creates it
+  (409 if a non-mirror file claims the name); `GET /api/girraph`
+  returns a `merirmaid` field for the UI's add/open toolbar button.
+  After every successful girraph mutation through ANY door (the
+  `/api/girraph/*` node ops and the girraph tool runners),
+  `girraph.refresh_mirror(path)` regenerates the sibling if it exists,
+  inside the existing `path_lock`. External text-editor edits to the
+  girraph do NOT auto-refresh — the next harness mutation catches up
+  (same reconcile philosophy as cacheawl).
 
 ---
 
@@ -508,12 +585,35 @@ Architecture notes:
 A `.merirmaid` file is a Mermaid diagram with a small frontmatter header,
 rendered to SVG live in the browser by a **vendored** (local, no CDN)
 `enough/static/mermaid.min.js` (v11.16.0, MIT — shipped like
-`htmx.min.js`). Full format spec and rationale:
-[docs/merirmaid-plan.md](merirmaid-plan.md). The paradigm-shift from
-girraph: there is no owning Python module for the *format* — the source is
-plain text the agent writes with `write_file` and the frontend renders. The
-only backend code that touches `.merirmaid` content is the cachebox mirror
-generator in `cacheawl.py`.
+`htmx.min.js`). The paradigm-shift from girraph: there is no owning
+Python module for the *format* — the source is plain text the agent
+writes with `write_file` and the frontend renders. The backend code that
+touches `.merirmaid` content is the cachebox mirror generator in
+`cacheawl.py` and the girraph-mirror generator in `girraph.py`.
+
+Format (formerly docs/merirmaid-plan.md, folded in here):
+
+```
+---
+merirmaid: 1
+title: How the broker gates tools
+modality: wip            # wip | mirror
+node-char-limit: 48      # soft per-node-label limit the editor surfaces
+source: cachebox:wiki    # mirrors only — what this file mirrors
+generated: 2026-07-13T21:40:00Z   # mirrors only — last regeneration
+---
+flowchart TD
+  A[tool call] --> B{broker toggle on?}
+```
+
+`merirmaid: 1`, `title`, and `modality` are required; unknown keys are
+preserved. Everything after the closing fence is verbatim Mermaid
+source, any diagram type. Diagrams link via Mermaid `click` interactions
+with a relative path (`click A "other.merirmaid"`); targets may be
+`.merirmaid`, `.girraph`, or `.md` — the viewer intercepts and pushes
+onto its breadcrumb stack. `node-char-limit` is soft: the in-node editor
+shows a live count and warns past it but doesn't block; agent-authored
+diagrams should stay well under it (leave room for user edits).
 
 Architecture notes:
 
@@ -539,6 +639,19 @@ Architecture notes:
   UI").
 - **The girraph-merirmaid skill** carries the Mermaid-authoring rules
   (stay well under `node-char-limit` to leave room for user edits, etc.).
+- **Two faces, one viewer (0.1.7).** `modality` drives the chrome:
+  `mirror` → view-only face (cool/slate toolbar tint, "mirror" badge,
+  no label editing — forced regardless of source); `wip` → edit face
+  (warm/amber tint, in-place label editing). Shift-click any node opens
+  a per-node action menu filtered by type — folder: copy path / open in
+  cacheawl; file: copy path / copy contents / open in its natural mode
+  via the `cacheawl:` scheme. The menu resolves nodes through the
+  mirror payload's `node_map` (`{nodeId → {path, is_dir}}`).
+- **On-demand sub-folder mirrors.** Only the box-root
+  `_cachebox.merirmaid` is persisted; `GET /api/cacheawl/mirror?box=…
+  &path=…` generates subtree mirrors fresh per request (never written
+  to disk). The 30px **squircle** launcher on cachebox headers and
+  folder tiles opens these in the view-only face.
 
 ---
 
@@ -644,8 +757,34 @@ Architecture notes:
 The store at `~/enough/cacheawl/` where the user keeps text forever. All
 code lives in [enough/cacheawl.py](../enough/cacheawl.py); `server.py`
 mounts the `/api/cacheawl/*` endpoints and hides the store from every
-project tree (like wikisink dirs). Backend contract:
-[docs/cacheawl-plan.md](cacheawl-plan.md).
+project tree (like wikisink dirs).
+
+The `/api/cacheawl/*` endpoint map (the contract the UI was built
+against, formerly docs/cacheawl-plan.md):
+
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `tree` | GET | Split-view payload: project tree + every cachebox summary+tree in one call. Reconciles every box first. |
+| `create` | POST | `{name}` → new empty box. Names: letters/digits/spaces/hyphens/underscores, no leading symbol, ≤64 chars; 400 on bad/duplicate. |
+| `rename` | POST | `{name, new_name}`; 400 if the target exists. |
+| `delete` | POST | `{name, confirm: true}` — unconfirmed → 400; permanent whole-folder delete; UI gates behind a confirm dialog. |
+| `transfer` | POST | `{op: copy\|move, src, dst, overwrite?}` — each side `{root: project\|cachebox, box?, path}`. Traversal-checked both sides; sidecars refused; no clobber without `overwrite: true`; regenerates mirrors for boxes touched (`result.boxes_updated`). |
+| `ingest` | POST | `{box, type: path\|url\|wikisink, value, depth?\|all?}` — box registered `ingesting` synchronously, work in background. `all` invalid for wikisink. |
+| `ingest-status` | GET | `?box=` — poll while `ingesting`; failure ends `status: "failed"` + `ingest.error`, never a phantom complete. |
+| `mirror` | GET | `?box=&path=` — the box-root `_cachebox.merirmaid` (path empty; reconciled first) or an on-demand, never-persisted subtree mirror. Payload carries `text`, `node_map`, `modality`, `subpath`, `box_path`. Read-only. |
+
+Cachebox summary fields worth knowing: `origin.type` ∈ `folder` |
+`path` | `url` | `wikisink` | `infoworld-migration`; `origin.depth` is
+1–3, `"all"`, or null; `status` ∈ `complete` | `ingesting` | `failed`;
+`ingest.phase` walks queued → starting → copying/crawling/expanding →
+capped/complete/failed. Tree nodes: `{name, path, is_dir, size,
+is_mirror, children?}` — folders before files, each group alphabetical;
+`is_mirror` routes to the merirmaid viewer, never the text editor.
+Ingest semantics: `path` copies text files (binaries skipped by
+extension + null-byte sniff), never follows symlinks out of the source
+root; `url` is a same-origin crawl to `depth` link layers, robots.txt
+respected, pages pandoc'd to markdown; `wikisink` fuzzy-matches an
+article then expands crosslinks `depth` layers.
 
 - **A cachebox is a root-level folder** in the store. Only direct children
   of `cacheawl/` are cacheboxes; anything deeper is a plain folder. Some
@@ -704,6 +843,37 @@ project tree (like wikisink dirs). Backend contract:
   composes an agent chat request, and per-file open into the natural mode
   via the `cacheawl:` scheme. Ingest progress is **polled**
   (`ingest-status`), not streamed, in v1.
+
+---
+
+## The help system
+
+Three layers, all markdown (design formerly in docs/help-system-plan.md):
+
+- **`(?)` bubbles.** Content lives in one combined file,
+  `enough/static/help-docs.md` — one `## <id>` section per bubble, with
+  `name:` / `path:` lines under the heading and `### what` / `### how` /
+  `### ideas` bodies (inline HTML allowed; rendered through the existing
+  `renderMarkdown()`). The tokens `{{skills-list}}` / `{{roles-list}}` /
+  `{{paradigms-list}}` expand client-side into the *actually installed*
+  set via `GET /api/help/defaults` (name + description from frontmatter)
+  — never hand-maintain those lists in prose. Bubbles are governed by
+  one per-project boolean (`GET`/`POST /api/help/bubbles`, stored in the
+  multipurpose `rness/active-paradigm` file, default on, surfaced as the
+  "help (?) bubbles" checkbox in the UI modal): on = every `[data-help]`
+  row shows its `(?)` persistently (re-applied after `htmx:afterSettle`),
+  off = none. There are no hover timers and no first-launch highlight
+  machinery — that design was superseded.
+- **The manual.** `docs/HELP_CENTER.md` is the complete end-user manual
+  (voice-matched to the project; edit it like documentation, verify
+  claims against the code first). `GET /api/help-center` serves it raw;
+  the **reference mode** (`#ref-mode`, the `hxc` button at the top of
+  the UI modal) renders it read-only in-app. See the mode-stack notes
+  under "Change the UI".
+- **Cheat sheets.** Keyboard shortcuts + markdown reference live inline
+  in the UI modal markup (`.ui-cols` in index.html). The esc row reads
+  "close the topmost open mode (modes stack)" — keep it true to
+  `modeTop()` semantics if you touch either.
 
 ---
 
@@ -804,19 +974,42 @@ than reinvent:
   var(--bg-raise))` — a new theme color that **falls back to `--bg-raise`
   when absent** (so old user configs still look right). See "What NOT to
   touch" about never defining `--btn-bg` in `:root`.
-- **The `setActiveMode(name, opts)` registry** (search the comment block in
-  index.html) is the contract every full-frame mode registers through:
-  `{icon, onExit, onSupplant?, onIconClick?, hoverIcon?, iconTitle?, exitTitle?}`. It
-  paints the mode's icon into the **reserved top-right active-mode area**
-  with a `ribbon-redx` hanging off its left edge (rotated 90° clockwise,
-  extending leftward, vertically centered on the icon) (the ribbon exits;
-  clicking the icon runs `onIconClick` — read/edit uses it to toggle the
-  eye/pencil face, with `readedit-switch` as the `hoverIcon`). Registering a
-  mode while another is active auto-supplants the old one (its `onSupplant`,
-  defaulting to `onExit`) — that's how a tree click cleanly leaves the
-  current mode and opens the file.
-  `clearActiveMode()` returns to the home/chat view; `ACTIVE_MODE` holds the
-  live registration. Wire new modes through this, not ad-hoc show/hide.
+- **The MODE STACK** (formerly docs/mode-stack-plan.md; search `MODE_STACK`
+  in index.html) is the contract every full-frame mode registers through.
+  Modes don't supplant each other — they stack like windows, and closing
+  one reveals the mode beneath with its state intact. The API:
+  - `modePush(name, opts)` — open/register. `opts`:
+    `{icon, onExit, iconTitle?, exitTitle?, onRaise?, rootId?}`. If `name`
+    is already stacked, its opts update and it **raises** in place (the
+    caller has already re-targeted content — e.g. `enterGirraphMode` on a
+    new file resets `GIRRAPH_STACK` itself). One live instance per name
+    (`readedit`, `girraph`, `merirmaid`, `wikisink`, `cacheawl`, `ref`).
+  - `modeRemove(name)` — splice at any depth, re-apply z-order, re-render
+    indicators. Empty stack = the chat home.
+  - `modeRaise(name)` — z-order + indicators only, plus the optional
+    `onRaise` hook (cacheawl wires `caLoadTree()` to refresh stale data);
+    **never** a re-enter.
+  - `modeTop()` / `modeUpdateIcon(name, icon, title)` — top entry;
+    in-place icon swap (read/edit's eye↔pencil face).
+  - Z-order: the manager assigns `z = 30 + index` inline on each entry's
+    root(s) (roots in `_MODE_ROOT_IDS` / `_ALL_MODE_ROOTS`; readedit owns
+    `review-mode` + `edit-mode`, and `#preview` floats at `31 + index`
+    while readedit is stacked, so the mini panel sits over buried
+    full-frame modes). Confirm overlay (950+) and modals (1000+) stay
+    above everything.
+  - **Indicators**: one bar-height square per entry in `#mode-stack`
+    (topbar right half), **top-of-stack leftmost**, `--bg-alt` background,
+    1px 50%-gray left/right edge lines, no chip/gradient (deliberately
+    not buttons). Each carries its own `ribbon-redx` off its left edge
+    (closes that entry, even buried); clicking a buried square raises it;
+    the top square is inert.
+  - **Esc** targets `modeTop()` only, guarded so it doesn't fire while
+    the confirm overlay is up, while a chat composer / search / inline
+    edit field is focused, or while ANY modal is open (`_escModalOpen` —
+    modals own esc for themselves).
+  - `setActiveMode` / `clearActiveMode` survive only as thin compat
+    wrappers (push / remove-top). Wire new modes through the stack, not
+    ad-hoc show/hide.
 - **`confirmOverlay(...)`** is the reusable ribbon dialog (`#confirm-overlay`):
   ribbon-check confirms, ribbon-redx cancels, ribbon-alert marks the
   warning. Use it for confirmations (e.g. the cachebox-update wikisink run)
@@ -824,8 +1017,23 @@ than reinvent:
 - **The mode system.** preview/review/edit were unified into ONE read/edit
   mode with two faces (read-eye / edit-pencil) that lives either as a mini
   side panel or a full frame (`full2mini` / `mini2full` toggle, dirty
-  guards). It sits in the same full-frame family as wikisink, girraph,
-  merirmaid, and cacheawl — all registered via `setActiveMode`.
+  guards). Face toggling happens on dedicated `readedit-switch` buttons in
+  the read/edit chrome (`#review-face-btn` / `#edit-face-btn` /
+  `#mini-face-btn`) — the topbar indicator is not a button. The full-frame
+  family is wikisink, girraph, merirmaid, cacheawl, read/edit, and the
+  read-only **reference mode** below — all stack citizens.
+- **Reference mode (`#ref-mode`, name `ref`).** The read-only manual
+  viewer: fetches `GET /api/help-center` (which serves the repo's
+  `docs/HELP_CENTER.md`) and renders it through `renderMarkdown` into a
+  `.review-body`-styled frame (the pretty-markdown CSS is shared via
+  `:is(#review-mode, #ref-mode) .review-body` selectors, and
+  `applyReviewContrast()` covers `ref-mode` alongside review/wiki). View
+  only by design: no edit face, no highlighting, no chat pill. The
+  `ref-mini` class docks it to the right edge for side-by-side reading
+  (`refToggleSize()`); launched from the big `hxc`-icon button at the top
+  of the UI modal. The 3D icon-button gradient used on square chips is
+  the shipped two-stop ramp `rgba(128,128,128,0.42) → 0.10 at 62% → 0`
+  over `var(--btn-bg, var(--bg-raise))`.
 
 ### Add a new local model
 
@@ -860,10 +1068,16 @@ than mocking libzim. Adding a wikisink flavor = append to
 
 A list of things that will confuse you if you don't see them coming:
 
-- **The active-paradigm file is one line.** `rness/active-paradigm`
-  contains exactly the paradigm name (e.g. `text-planning\n`). It is
-  read/written via `prompt.get_active_paradigm()` /
-  `prompt.set_active_paradigm()`. Don't add YAML or extra metadata.
+- **The active-paradigm file is multipurpose markdown (0.1.7).**
+  `rness/active-paradigm` (filename unchanged, no extension) carries a
+  `# Active paradigm` section (the paradigm name on the first
+  non-heading line) and a `# Help bubbles` section storing `on`/`off`.
+  Read/write ONLY via `prompt.get_active_paradigm()` /
+  `set_active_paradigm()` / `get_help_bubbles()` / `set_help_bubbles()`
+  — `set_*` preserves the other section. Back-compatible: a legacy bare
+  `default\n` still parses, and every legacy help value (the old `all`
+  sentinel, id lists, empty/missing) reads as bubbles-on. Don't add
+  YAML or further sections.
 - **Adding to `broker.TOGGLES` is a UI change.** The `/api/broker`
   handler iterates the tuple; the frontend renders whatever comes back.
   No CSS or JS update needed for the row itself.

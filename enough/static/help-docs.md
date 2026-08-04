@@ -236,7 +236,7 @@ path: the file viewer
 clicking a file opens it in one unified <strong>read/edit mode</strong> with two faces — a read face (eye) and an edit face (pencil). it lives either as a mini side panel next to the chat or expanded to a full frame; use the mini↔full toggle to switch. edits are dirty-guarded, so you won't lose unsaved changes by navigating away by accident.
 
 ### how
-single-click a file in the tree to open it in the mini panel; expand it to a full frame when you want room. the active mode always shows its icon top-right; click that icon to flip between the read (eye) and edit (pencil) faces, and click the little ribbon hanging off its corner (the red x) to exit the mode entirely. the same top-right icon + exit-ribbon pattern is shared by every full-frame mode (wikisink, girraph, merirmaid, cacheawl).
+single-click a file in the tree to open it in the mini panel; expand it to a full frame when you want room. flip between the read (eye) and edit (pencil) faces with the dedicated face-toggle buttons in the read/edit chrome. every open mode shows a square indicator top-right (newest on the left) with a little red-x ribbon to close it — modes <em>stack</em>, so closing one reveals the mode beneath exactly as you left it. click a buried indicator to bring that mode forward; press <code>esc</code> to close the topmost mode. the same indicator + ribbon pattern covers every full-frame mode (wikisink, girraph, merirmaid, cacheawl, and the read-only <strong>help center</strong> reference mode, launched from the big button in the ui window).
 
 ### ideas
 - keep a file open in the mini panel while you chat — reference and conversation side by side.

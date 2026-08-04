@@ -1315,6 +1315,20 @@ def create_app(
         await asyncio.to_thread(set_help_bubbles, project_dir / "rness", enabled)
         return {"enabled": enabled}
 
+    @app.get("/api/help-center", response_class=PlainTextResponse)
+    async def api_help_center() -> PlainTextResponse:
+        """The full help-center manual (docs/HELP_CENTER.md in the install
+        checkout), served as raw markdown for the read-only reference mode."""
+        doc = Path(__file__).resolve().parent.parent / "docs" / "HELP_CENTER.md"
+        text = await asyncio.to_thread(
+            lambda: doc.read_text(encoding="utf-8") if doc.is_file() else None)
+        if text is None:
+            raise HTTPException(
+                404,
+                "HELP_CENTER.md not found in this install — run /update-enough "
+                "to pick up the bundled manual.")
+        return PlainTextResponse(text, media_type="text/markdown; charset=utf-8")
+
     @app.post("/api/requests/done", response_class=HTMLResponse)
     async def api_requests_done(request: Request) -> HTMLResponse:
         form = await request.form()
