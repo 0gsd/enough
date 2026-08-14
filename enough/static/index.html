@@ -4601,15 +4601,28 @@
       gap: 4px;
     }
 
+    /* Wave 3 (the in-app model manager, docs/seven-models-plan.md §4) turned
+       each row into a COLUMN: the old one-line identity strip is now
+       `.mo-main`, with optional note lines (verdict reasons / llama.cpp gate /
+       last download error) and an optional progress block stacked under it.
+       .cute / .label / .size / .opro-status keep their existing rules — they
+       just live one level deeper now. */
     #model-modal .model-option {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
       padding: 8px 10px;
       border: 1px solid var(--border);
       border-radius: 5px;
       cursor: pointer;
       transition: border-color 120ms;
+    }
+
+    #model-modal .model-option .mo-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     #model-modal .model-option:hover {
@@ -4621,9 +4634,18 @@
       background: color-mix(in oklab, var(--accent-agent) 10%, transparent);
     }
 
+    /* `disabled` means "not switchable" (not installed, or gated by a too-old
+       llama.cpp) — it does NOT mean "inert". Not-installed rows carry a live
+       download button, so the dimming is scoped to the identity text instead
+       of the whole row the way it was before the manager landed. */
     #model-modal .model-option.disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
+      cursor: default;
+    }
+
+    #model-modal .model-option.disabled .mo-main .cute,
+    #model-modal .model-option.disabled .mo-main .label,
+    #model-modal .model-option.disabled .mo-main .size {
+      opacity: 0.55;
     }
 
     #model-modal .model-option .cute {
@@ -4641,6 +4663,18 @@
     #model-modal .model-option .size {
       color: var(--fg-faint);
       font-size: 11px;
+      white-space: nowrap;
+    }
+
+    /* The label yields before the size does: sizes are short and load-bearing
+       ("~20.7 GB incl. draft"), labels are long and already identified by the
+       cute name to their left. Without this the row grew to three lines on
+       the wider entries once the manager's buttons joined the strip. */
+    #model-modal .model-option .mo-main .label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     #model-modal .model-option.disabled .size {
@@ -4763,6 +4797,115 @@
     #model-modal .model-option.cloud .opro-status.unconfigured {
       color: var(--accent-tool);
       border-color: color-mix(in oklab, var(--accent-tool) 50%, var(--border));
+    }
+
+    /* ---------- Per-model management (the in-app model manager) ----------
+       Rows gained download / resume / cancel / delete. The action buttons
+       reuse the wikisink installs-manager text-button treatment (they are
+       text chips, NOT square icon chips, so the item-1 3D gradient
+       deliberately does not apply to them — see docs/mode-stack-plan.md). */
+
+    /* Feasibility glyph — the same ✓ / ~ / ✗ the install-menu CLI prints.
+       Rendered as a fixed-width slot on EVERY row (empty on installed and
+       cloud rows) so the `cute` column stays aligned down the list. */
+    #model-modal .model-option .mo-verdict {
+      flex: 0 0 auto;
+      width: 10px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--fg-faint);
+    }
+
+    #model-modal .model-option .mo-verdict.good { color: var(--accent-agent); }
+    #model-modal .model-option .mo-verdict.tight { color: var(--accent-tool); }
+    #model-modal .model-option .mo-verdict.no { color: var(--accent-error); }
+
+    #model-modal .model-option .mo-actions {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #model-modal .model-option .mo-actions button {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 9px;
+      font-family: inherit;
+      font-size: 11.5px;
+      cursor: pointer;
+    }
+
+    #model-modal .model-option .mo-actions button:hover:not(:disabled) {
+      background: var(--bg-raise);
+    }
+
+    /* Disabled = another download is already running. The server enforces
+       one-at-a-time; this is the UI saying so before the 409 does. */
+    #model-modal .model-option .mo-actions button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    #model-modal .model-option .mo-actions button.primary {
+      border-color: var(--accent-agent);
+    }
+
+    #model-modal .model-option .mo-actions button.danger {
+      color: var(--accent-error);
+      border-color: color-mix(in oklab, var(--accent-error) 55%, var(--border));
+    }
+
+    #model-modal .model-option .mo-inuse {
+      flex: 0 0 auto;
+      font-size: 11px;
+      color: var(--fg-faint);
+    }
+
+    #model-modal .model-option .mo-note {
+      font-size: 11px;
+      line-height: 1.35;
+      color: var(--fg-muted);
+    }
+
+    #model-modal .model-option .mo-note.gate { color: var(--accent-tool); }
+    #model-modal .model-option .mo-note.bad { color: var(--accent-error); }
+
+    #model-modal .model-option .mo-note code {
+      background: var(--bg-raise);
+      border-radius: 3px;
+      padding: 0 4px;
+    }
+
+    /* Progress block — same bar shape as the wikisink download, one notch
+       shorter because it sits inside a list row rather than a modal step. */
+    #model-modal .model-option.downloading {
+      border-color: color-mix(in oklab, var(--accent-agent) 60%, var(--border));
+    }
+
+    #model-modal .model-option .mo-bar {
+      height: 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    #model-modal .model-option .mo-bar .fill {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: var(--accent-agent);
+      transition: width 0.4s ease;
+    }
+
+    #model-modal .model-option .mo-stats {
+      font-size: 11px;
+      color: var(--fg-muted);
+      font-variant-numeric: tabular-nums;
     }
 
     /* ---------- Inline OPRO-API settings panel ----------
@@ -5718,7 +5861,14 @@
     #confirm-overlay {
       position: fixed;
       inset: 0;
-      z-index: 200;
+      /* Above EVERYTHING, modals included (model 1001, opro wizard 1002).
+         Raised from 200 in wave 3: the model manager's delete + "download it
+         anyway" confirmations are raised from inside #model-modal, and at 200
+         the card rendered behind the modal panel — invisible, with a dialog
+         waiting on a click nobody could see. A confirmation is by definition
+         the topmost thing on screen; no existing caller regresses, since all
+         the others fire from full-frame modes (z 30–40). */
+      z-index: 1100;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -8388,28 +8538,225 @@
         const r = await fetch('/api/models');
         if (!r.ok) return;
         MODELS = await r.json();
+        // The server's snapshot is the authority at load time: it knows about
+        // a download this page never saw the events for (mid-download reload,
+        // or a `.part` left by a previous run). Later `model-dl` events
+        // rebind MODEL_DL on top of it; MODELS.download keeps the partials
+        // map until the next load.
+        MODEL_DL = MODELS.download || null;
       } catch (_) { /* transient */ }
     }
+
+    // ================================================================
+    // In-app model manager (docs/seven-models-plan.md §4, wave 3)
+    // ================================================================
+    //
+    // The picker's rows carry a management axis on top of the switch:
+    //
+    //   installed          → switch (unchanged) + delete… (never the model
+    //                        in use), plus "fetch draft" when the entry grew
+    //                        an MTP companion after the main gguf landed
+    //   not installed      → size incl. draft, ✓/~/✗ feasibility verdict with
+    //                        its reasons, and download (or resume, when a
+    //                        `.part` is on disk)
+    //   downloading        → progress bar + done/total + rate/ETA + cancel
+    //   too-old llama.cpp  → the switch affordance is replaced by the
+    //                        "needs llama.cpp ≥ bNNNN" note. Downloading
+    //                        stays allowed on purpose — a too-old build
+    //                        blocks loading, not fetching.
+    //
+    // The server enforces one active download; the UI mirrors that by
+    // disabling every other row's download button rather than letting the
+    // user find out through a 409.
+    let MODEL_DL = null;       // last `model-dl` event / server snapshot
+
+    function modelDlSnap() { return MODEL_DL || (MODELS && MODELS.download) || null; }
+
+    // `active` exists only on the /api/models snapshot — SSE events don't
+    // carry it, so `!== false` keeps a live event truthy.
+    function modelDlActive() {
+      const d = modelDlSnap();
+      return !!d && d.status === 'downloading' && d.active !== false;
+    }
+
+    // Bytes of `.part` on disk for a model, from the last /api/models load.
+    // Non-zero = the row offers "resume" instead of "download".
+    function modelPartialBytes(cute) {
+      const p = (MODELS && MODELS.download && MODELS.download.partials) || {};
+      return p[cute] || 0;
+    }
+
+    // What a not-installed model actually costs to fetch — main gguf plus the
+    // MTP draft companion when the entry declares one, phrased the way the
+    // install-menu CLI phrases it ("20.7 GB incl. draft").
+    function modelDownloadSizeText(m) {
+      const main = m.disk_gb_approx || 0;
+      const draft = m.draft_filename ? (m.draft_disk_gb_approx || 0) : 0;
+      if (!main && !draft) return '';
+      return draft
+        ? `~${(main + draft).toFixed(1)} GB incl. draft`
+        : `~${main.toFixed(1)} GB`;
+    }
+
+    // The per-model llama.cpp hard gate: null when this build can load the
+    // model, else the sentence that replaces the switch affordance. Computed
+    // from the entry's `llama_cpp_min_release` against the payload's
+    // `llama_release` (0 = no llama.cpp on PATH, which gates every gated
+    // model — correctly).
+    function modelGateNote(m) {
+      const need = m.llama_cpp_min_release || 0;
+      if (!need) return null;
+      const have = (MODELS && MODELS.llama_release) || 0;
+      if (have >= need) return null;
+      const got = have ? `you have b${have}` : 'no llama.cpp on PATH';
+      return `needs llama.cpp ≥ b${need} (${got}) — run \`brew upgrade llama.cpp\`, ` +
+        'then reopen this picker.' +
+        // Downloading is deliberately never gated: fetch now, upgrade later.
+        (m.installed ? '' : ' downloading it now is fine.');
+    }
+
+    function modelStatusLine(msg, kind) {
+      const el = document.getElementById('switch-status');
+      if (!el) return;
+      el.className = 'switch-status' + (kind ? ' ' + kind : '');
+      el.textContent = msg || '';
+    }
+
+    async function modelPost(url) {
+      const r = await fetch(url, { method: 'POST' });
+      const js = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(js.detail || `request failed (${r.status})`);
+      return js;
+    }
+
+    // Paint one downloading row's bar + stats from a `model-dl` payload.
+    // Never assumes a 0 start: a resumed 19 GB file whose first event says
+    // 18 GB renders as 18 GB.
+    function modelDlPaint(row, d) {
+      const fill = row.querySelector('.mo-bar .fill');
+      const stats = row.querySelector('.mo-stats');
+      if (!fill || !stats) return;
+      const pct = d.pct != null ? d.pct
+        : (d.bytes_total ? Math.round(1000 * d.bytes_done / d.bytes_total) / 10 : null);
+      fill.style.width = (pct != null ? pct : 0) + '%';
+      const bits = [];
+      // Phase is named rather than given a second bar: the event stream only
+      // ever describes one file at a time, and the draft is a ~2–3 GB tail on
+      // a 19–54 GB fetch, not a parallel track.
+      if (d.phase === 'draft') bits.push('fetching draft…');
+      bits.push(pct != null ? pct.toFixed(1) + '%' : 'size unknown');
+      bits.push(`${d.human_done || '0 B'} / ${d.human_total || '?'}`);
+      if (d.rate_bps) bits.push(wikiFmtBytes(d.rate_bps) + '/s');
+      if (d.eta_s != null) {
+        const s = d.eta_s;
+        const h = Math.floor(s / 3600), mn = Math.round((s % 3600) / 60);
+        bits.push('~' + (h ? `${h}h ${mn}m` : (s < 60 ? `${s}s` : `${mn}m`)) + ' left');
+      }
+      stats.textContent = bits.join(' · ');
+    }
+
+    async function modelDownload(m) {
+      const verdict = (m.feasibility && m.feasibility.verdict) || null;
+      const reasons = ((m.feasibility && m.feasibility.reasons) || []).join('; ');
+      // A ✗ verdict refuses to RECOMMEND, not to allow — but the reason gets
+      // quoted back before any bytes move. (Implementer's choice of mechanism:
+      // the house confirmOverlay, same as every other destructive/expensive
+      // confirmation.) Only ✗ confirms; ~ is just a note on the row.
+      if (verdict === 'no' && !m.installed) {
+        const ok = await confirmOverlay({
+          title: 'Download it anyway?',
+          message: `this machine probably can't run ${m.label}: ${reasons}. ` +
+            'the download will work fine — it\'s the loading that may not. ' +
+            'you can delete it again afterwards.',
+          confirmLabel: 'download anyway',
+          cancelLabel: 'never mind',
+        });
+        if (!ok) return;
+      }
+      try {
+        const snap = await modelPost('/api/models/download/' + encodeURIComponent(m.cute));
+        MODEL_DL = snap;   // opening snapshot; the rest arrives over SSE
+        modelStatusLine(`downloading ${m.label} — you can keep working.`);
+        renderModelList();
+      } catch (e) {
+        modelStatusLine(String(e.message || e), 'error');
+      }
+    }
+
+    async function modelCancelDownload(m) {
+      try {
+        await modelPost('/api/models/download/' + encodeURIComponent(m.cute) + '/cancel');
+        // Asynchronous by nature — the `cancelled` event is what flips the
+        // row; this only says the request landed.
+        modelStatusLine('stopping — the partial file is kept, so resume picks up where it left off.');
+      } catch (e) {
+        modelStatusLine(String(e.message || e), 'error');
+      }
+    }
+
+    async function modelDelete(m) {
+      let what = m.disk_gb_approx
+        ? `~${m.disk_gb_approx.toFixed(1)} GB of weights`
+        : 'its weights';
+      const extra = [];
+      if (m.draft_installed && m.draft_disk_gb_approx) {
+        extra.push(`its ~${m.draft_disk_gb_approx.toFixed(1)} GB draft file`);
+      }
+      if (modelPartialBytes(m.cute)) extra.push('the partial download');
+      if (extra.length) what += ` (plus ${extra.join(' and ')})`;
+      const ok = await confirmOverlay({
+        title: `Delete ${m.label}?`,
+        message: `this removes ${what} from disk. nothing else changes, and ` +
+          'you can download it again later — at full size, from scratch.',
+        confirmLabel: 'delete',
+        cancelLabel: 'keep it',
+      });
+      if (!ok) return;
+      try {
+        const js = await modelPost('/api/models/delete/' + encodeURIComponent(m.cute));
+        if (selectedCute === m.cute) selectedCute = (MODELS && MODELS.current) || null;
+        await loadModels();
+        renderModelList();
+        updateCtxInputForSelection();
+        modelStatusLine(`deleted ${m.label} — freed ${js.freed_human || 'the space'}.`, 'ready');
+      } catch (e) {
+        modelStatusLine(String(e.message || e), 'error');
+      }
+    }
+    window.modelDownload = modelDownload;
+    window.modelCancelDownload = modelCancelDownload;
+    window.modelDelete = modelDelete;
 
     function renderModelList() {
       if (!MODELS) return;
       const list = document.getElementById('model-list');
       list.innerHTML = '';
       const curCute = selectedCute || (MODELS.current || (LLM_STATUS && LLM_STATUS.cute));
+      const dl = modelDlSnap();
+      const dlActive = modelDlActive();
       for (const m of MODELS.models) {
         const isCloud = !!m.cloud;
         // Local: 'installed' means the gguf exists on disk. Cloud: 'installed'
-        // means a healthy key is present. Either way it gates selectability.
-        const disabled = !m.installed;
+        // means a healthy key is present. Either way it gates SWITCHING — and
+        // so does the llama.cpp release gate, which is the only other reason a
+        // model on disk can't be loaded.
+        const gate = isCloud ? null : modelGateNote(m);
+        const selectable = isCloud || (m.installed && !gate);
         const isSel = m.cute === curCute;
+        const isDownloading = !isCloud && dlActive && dl && dl.cute === m.cute;
         const row = document.createElement('div');
         row.className = 'model-option'
           + (isSel ? ' selected' : '')
-          + (disabled ? ' disabled' : '')
-          + (isCloud ? ' cloud' : '');
+          + (selectable ? '' : ' disabled')
+          + (isCloud ? ' cloud' : '')
+          + (isDownloading ? ' downloading' : '');
         row.dataset.cute = m.cute;
+        const main = document.createElement('div');
+        main.className = 'mo-main';
+        row.appendChild(main);
         if (isCloud) {
           // Cloud row variant: status badge instead of size + installed label.
+          // No manager affordances — there's nothing on disk to manage.
           let badge = 'unconfigured';
           let badgeText = 'needs setup';
           if (m.cloud_key_present && m.cloud_healthy) {
@@ -8417,7 +8764,8 @@
           } else if (m.cloud_key_present && m.cloud_healthy === false) {
             badge = 'unhealthy'; badgeText = 'unhealthy';
           }
-          row.innerHTML =
+          main.innerHTML =
+            `<span class="mo-verdict"></span>` +
             `<span class="cute">${m.cute.toUpperCase()}</span>` +
             `<span class="label">${m.label} <span style="color:var(--fg-faint)">— ${m.cloud_model_id || ''}</span></span>` +
             `<span class="opro-status ${badge}">${badgeText}</span>`;
@@ -8438,24 +8786,111 @@
             oproRenderSettings();
             updateCtxInputForSelection();
           });
-        } else {
-          const size = m.disk_gb_approx ? `~${m.disk_gb_approx.toFixed(1)} GB` : '';
-          const installed = disabled ? '(not installed)' : '';
-          row.innerHTML =
-            `<span class="cute">${m.cute.toUpperCase()}</span>` +
-            `<span class="label">${m.label}</span>` +
-            `<span class="size">${size} ${installed}</span>`;
-          if (!disabled) {
-            row.addEventListener('click', () => {
-              selectedCute = m.cute;
-              renderModelList();
-              oproRenderSettings();
-              updateCtxInputForSelection();
-            });
+          list.appendChild(row);
+          continue;
+        }
+
+        const installed = !!m.installed;
+        const partial = modelPartialBytes(m.cute);
+        const verdict = (m.feasibility && m.feasibility.verdict) || '';
+        const reasons = (m.feasibility && m.feasibility.reasons) || [];
+        const glyph = { good: '✓', tight: '~', no: '✗' }[verdict] || '';
+        // The old "(not installed)" suffix is gone: a download button and a
+        // verdict glyph say it louder, and the row has no width to spare.
+        const size = installed
+          ? (m.disk_gb_approx ? `~${m.disk_gb_approx.toFixed(1)} GB` : '')
+          : modelDownloadSizeText(m);
+        main.innerHTML =
+          `<span class="mo-verdict ${installed ? '' : verdict}"` +
+          (installed || !verdict ? '' : ` title="${escapeHtml(reasons.join('; ') || 'fits this machine')}"`) +
+          `>${installed ? '' : glyph}</span>` +
+          `<span class="cute">${m.cute.toUpperCase()}</span>` +
+          `<span class="label">${escapeHtml(m.label)}</span>` +
+          `<span class="size">${escapeHtml(size)}</span>`;
+
+        // --- actions ---
+        const acts = [];
+        if (isDownloading) {
+          // The running download owns the row; nothing else is offered while
+          // bytes are moving (delete would 409 anyway, switching mid-fetch is
+          // meaningless).
+          acts.push('<button type="button" data-act="cancel">cancel</button>');
+        } else if (installed) {
+          if (m.cute === MODELS.current) {
+            acts.push('<span class="mo-inuse">in use</span>');
+          } else {
+            acts.push('<button type="button" class="danger" data-act="delete">delete…</button>');
           }
+          // Main gguf predates the entry growing an MTP companion: the
+          // backend judges "already installed" per FILE, so this fetches
+          // just the missing draft.
+          if (m.draft_filename && !m.draft_installed) {
+            acts.push('<button type="button" data-act="download"' +
+              (dlActive ? ' disabled title="another download is running"' : '') +
+              '>fetch draft</button>');
+          }
+        } else {
+          acts.push('<button type="button" class="primary" data-act="download"' +
+            (dlActive ? ' disabled title="another download is running"' : '') +
+            `>${partial ? 'resume' : 'download'}</button>`);
+        }
+        if (acts.length) {
+          const wrap = document.createElement('span');
+          wrap.className = 'mo-actions';
+          wrap.innerHTML = acts.join('');
+          main.appendChild(wrap);
+        }
+
+        // --- note lines ---
+        const notes = [];
+        if (gate) notes.push(`<div class="mo-note gate">${escapeHtml(gate)}</div>`);
+        if (!isDownloading) {
+          if (!installed && reasons.length) {
+            notes.push(`<div class="mo-note${verdict === 'no' ? ' bad' : ''}">` +
+              `${escapeHtml(reasons.join('; '))}</div>`);
+          }
+          if (!installed && partial) {
+            notes.push('<div class="mo-note">' +
+              `${wikiFmtBytes(partial)} already on disk — resume continues from there.</div>`);
+          }
+          if (dl && dl.cute === m.cute && dl.status === 'error') {
+            notes.push(`<div class="mo-note bad">download failed: ${escapeHtml(dl.error || 'unknown error')}</div>`);
+          }
+        }
+        if (notes.length) row.insertAdjacentHTML('beforeend', notes.join(''));
+
+        // --- progress block ---
+        if (isDownloading) {
+          row.insertAdjacentHTML('beforeend',
+            '<div class="mo-bar"><span class="fill"></span></div>' +
+            '<div class="mo-stats"></div>');
+          modelDlPaint(row, dl);
+        }
+
+        main.querySelectorAll('button[data-act]').forEach((b) => {
+          b.addEventListener('click', (ev) => {
+            ev.stopPropagation();   // don't also select the row
+            if (b.disabled) return;
+            const act = b.dataset.act;
+            if (act === 'download') modelDownload(m);
+            else if (act === 'cancel') modelCancelDownload(m);
+            else if (act === 'delete') modelDelete(m);
+          });
+        });
+        if (selectable) {
+          row.addEventListener('click', () => {
+            selectedCute = m.cute;
+            renderModelList();
+            oproRenderSettings();
+            updateCtxInputForSelection();
+          });
         }
         list.appendChild(row);
       }
+    }
+
+    function modelModalOpen() {
+      return !document.getElementById('model-modal').classList.contains('hidden');
     }
 
     function updateCtxInputForSelection() {
@@ -9322,6 +9757,51 @@
         LAST_USAGE = JSON.parse(e.data);
         renderUsage();
       } catch (_) { /* ignore parse errors */ }
+    });
+
+    // In-app model manager progress. Every event carries every key (contract
+    // in docs/seven-models-plan.md §4), so there's nothing to merge — the
+    // event IS the snapshot. Tracked even while the picker is closed, so
+    // reopening it lands on the live state.
+    es.addEventListener('model-dl', (e) => {
+      let d;
+      try { d = JSON.parse(e.data); } catch (_) { return; }
+      MODEL_DL = d;
+      const open = modelModalOpen();
+      if (d.status === 'downloading') {
+        if (!open) return;
+        // Repaint in place while the row is already the downloading one — a
+        // full re-render twice a second would fight the bar's width
+        // transition and rebuild the DOM under the user's cursor. A phase
+        // change (main → draft) doesn't change the row's identity, so it
+        // repaints too; only the first event of a download re-renders.
+        const rows = document.querySelectorAll('#model-list .model-option.downloading');
+        const row = Array.from(rows).find((r) => r.dataset.cute === d.cute);
+        if (row) modelDlPaint(row, d);
+        else renderModelList();
+        return;
+      }
+      // done / cancelled / error — `installed` and the partials map both
+      // changed, so re-read them. Flip the row optimistically first so a
+      // finished download reads as installed without waiting on the fetch.
+      if (d.status === 'done' && MODELS && MODELS.models) {
+        const m = MODELS.models.find((x) => x.cute === d.cute);
+        if (m) {
+          if (d.installed != null) m.installed = !!d.installed;
+          if (d.draft_installed != null) m.draft_installed = !!d.draft_installed;
+        }
+      }
+      if (open) {
+        if (d.status === 'done') {
+          modelStatusLine(`${d.label} installed — select it and hit apply to switch.`, 'ready');
+        } else if (d.status === 'error') {
+          modelStatusLine(`download failed: ${d.error || 'unknown error'}`, 'error');
+        } else if (d.status === 'cancelled') {
+          modelStatusLine('download stopped — the partial file is kept for resume.');
+        }
+        renderModelList();
+      }
+      loadModels().then(() => { if (modelModalOpen()) renderModelList(); });
     });
 
     // rness-driven prompts (auto-reset checkpoint + continue messages).

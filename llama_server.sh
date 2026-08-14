@@ -3,9 +3,12 @@
 # Usage: ./llama_server.sh [start|stop|status|logs|toggle]   (default: toggle)
 #
 # Configure via env vars (or edit the defaults below):
-#   MODEL     path to a .gguf file, OR a cute name (g40-04 / q35-09 / g40-26 /
-#             q36-27). If empty, resolves via ~/enough/config/models.json
-#             (the 'current' model selected by the user / installer).
+#   MODEL     path to a .gguf file, OR a cute name (g40-04 / q35-09 / g40-12 /
+#             g40-26 / q36-27 / q38-04 / q38-16). If empty, resolves via
+#             ~/enough/config/models.json (the 'current' model selected by
+#             the user / installer). Some models declare a minimum llama.cpp
+#             b-release and refuse to launch below it — `brew upgrade
+#             llama.cpp` is the fix, and the error says so.
 #   HOST      bind address                   (default: 127.0.0.1)
 #   PORT      server port                    (default: 8080)
 #   NGL       GPU layers to offload          (default: 99 = all, Apple Metal)
@@ -15,7 +18,9 @@
 #   PARALLEL  concurrent request slots       (default: 1)
 #   SPEC      MTP speculative decoding       (default: auto = on for models
 #             whose registry entry has an 'mtp' block AND the installed
-#             llama.cpp release is new enough; SPEC=off disables)
+#             llama.cpp release is new enough AND — for models whose MTP
+#             head is a separate draft GGUF — that draft is downloaded;
+#             SPEC=off disables)
 #
 # Examples:
 #   ./llama_server.sh start                         # current model, auto ctx
@@ -36,6 +41,15 @@ SPEC="${SPEC:-auto}"
 # Filled in by resolve_model for registry models with MTP heads.
 SPEC_ARGS=""
 SPEC_MIN_RELEASE=0
+# Path to a separate MTP draft GGUF (qwen-3.8 shape), empty when the model
+# has none or it isn't downloaded. MIN_RELEASE is the model's HARD
+# llama.cpp gate (0 = ungated), distinct from SPEC_MIN_RELEASE's soft one.
+DRAFT_PATH=""
+MIN_RELEASE=0
+# Derived by resolve_spec_flags; declared here so `set -u` is happy on
+# code paths that skip it (MODEL given as a literal .gguf path).
+DRAFT_ARGS=()
+DRAFT_NOTE=""
 
 ENOUGH_HOME="$HOME/enough"
 resolve_model() {
@@ -60,7 +74,7 @@ resolve_model() {
     return 1
   fi
   eval "$out"  # sets MODEL_PATH, CTX_RECOMMENDED, MODEL_CUTE, MODEL_LABEL,
-               # SPEC_ARGS, SPEC_MIN_RELEASE
+               # SPEC_ARGS, SPEC_MIN_RELEASE, DRAFT_PATH, MIN_RELEASE
   if [[ -z "${CTX}" ]]; then
     CTX="$CTX_RECOMMENDED"
   fi
@@ -72,12 +86,34 @@ llama_release() {
   llama-server --version 2>&1 | sed -n 's/^version: \([0-9][0-9]*\).*/\1/p' | head -n 1
 }
 
+check_min_release() {
+  # The model's HARD llama.cpp gate. Below it the architecture can't be
+  # loaded at all, and llama-server would die with an opaque tensor error
+  # — so refuse up front and name the fix. Ungated models (MIN_RELEASE=0)
+  # always pass.
+  [[ "${MIN_RELEASE:-0}" -gt 0 ]] || return 0
+  local rel have
+  rel="$(llama_release)"
+  have="no llama.cpp on PATH"
+  [[ -n "$rel" ]] && have="b$rel"
+  if [[ -z "$rel" || "$rel" -lt "$MIN_RELEASE" ]]; then
+    echo "error: ${MODEL_LABEL:-this model} needs llama.cpp b$MIN_RELEASE or newer ($have)." >&2
+    echo "       run: brew upgrade llama.cpp" >&2
+    return 1
+  fi
+  return 0
+}
+
 resolve_spec_flags() {
-  # Decide the speculative-decoding flags for this launch. MTP drafts come
-  # from head tensors inside the main GGUF, so this is just flags — but
-  # only on a llama.cpp new enough to know them (older builds reject
-  # unknown args at startup, which would look like a broken install).
+  # Decide the speculative-decoding flags for this launch. Two MTP shapes:
+  # head tensors inside the main GGUF (flags only), or a separate draft
+  # GGUF passed with --spec-draft-model. Either way only on a llama.cpp
+  # new enough to know the flags (older builds reject unknown args at
+  # startup, which would look like a broken install), and a declared but
+  # not-downloaded draft file just means a plain launch.
   SPEC_FLAGS=""
+  DRAFT_ARGS=()
+  DRAFT_NOTE=""
   if [[ "$SPEC" == "off" || -z "$SPEC_ARGS" ]]; then
     return 0
   fi
@@ -85,6 +121,13 @@ resolve_spec_flags() {
   rel="$(llama_release)"
   if [[ -n "$rel" && "$rel" -ge "$SPEC_MIN_RELEASE" ]]; then
     SPEC_FLAGS="$SPEC_ARGS"
+    if [[ -n "$DRAFT_PATH" && -f "$DRAFT_PATH" ]]; then
+      DRAFT_ARGS=(--spec-draft-model "$DRAFT_PATH")
+      DRAFT_NOTE=" (draft: $DRAFT_PATH)"
+    elif [[ -n "$DRAFT_PATH" ]]; then
+      echo "note: MTP draft file missing ($DRAFT_PATH) — starting without MTP" >&2
+      SPEC_FLAGS=""
+    fi
   else
     echo "note: llama.cpp release ${rel:-unknown} < $SPEC_MIN_RELEASE — starting without MTP" >&2
     echo "      (brew upgrade llama.cpp to enable speculative decoding)" >&2
@@ -117,21 +160,27 @@ start() {
     echo "       re-run bootstrap.sh to download it, or pass MODEL=<cute-name-of-an-installed-model>." >&2
     return 1
   fi
+  if ! check_min_release; then
+    return 1
+  fi
   mkdir -p "$STATE_DIR"
   resolve_spec_flags
   local ctx_to_use="${CTX:-32768}"
   echo "launching llama-server with:"
   echo "  model: $MODEL_PATH"
   echo "  ctx:   $ctx_to_use"
-  echo "  mtp:   ${SPEC_FLAGS:-off}"
+  echo "  mtp:   ${SPEC_FLAGS:-off}${DRAFT_NOTE}"
   # SPEC_FLAGS is deliberately unquoted: it's a space-separated flag
-  # string (no values with spaces) that llama-server gets as N args.
+  # string (no values with spaces) that llama-server gets as N args. The
+  # draft file IS a path, so it rides in an array instead — expanded with
+  # the bash-3.2-safe empty-array idiom (plain "${a[@]}" is an unbound
+  # variable there under `set -u`).
   # shellcheck disable=SC2086
   nohup llama-server \
     -m "$MODEL_PATH" \
     --host "$HOST" --port "$PORT" \
     -ngl "$NGL" -c "$ctx_to_use" --parallel "$PARALLEL" --jinja \
-    $SPEC_FLAGS \
+    $SPEC_FLAGS ${DRAFT_ARGS[@]+"${DRAFT_ARGS[@]}"} \
     >"$LOG_FILE" 2>&1 &
   echo $! >"$PID_FILE"
   disown

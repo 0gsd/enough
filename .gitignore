@@ -44,10 +44,12 @@ venv/
 #  ignored defensively in case someone runs enough inside the repo itself)
 rness/knowledge/session-logs/
 dev/
-tests/
 
 # Historical planning docs — folded into docs/AGENT_GUIDE.md (0.1.7) and
 # untracked; kept locally for archaeology but not shipped.
+docs/seven-models-plan.md
+docs/tauri-plan.md
+docs/linux-plan.md
 docs/cacheawl-plan.md
 docs/girraph-plan.md
 docs/girraphs.md

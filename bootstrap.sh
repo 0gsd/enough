@@ -11,8 +11,9 @@
 #      (this also installs the offline-translation dependencies —
 #      ctranslate2, sentencepiece, huggingface_hub — and the keyring
 #      binding used for the optional OpenRouter cloud-model slot).
-#   6. Sets up ~/enough/weights/ and either moves an existing GGUF into it
-#      or downloads the recommended Gemma 4 26B MoE Q4_K_M (~16 GB).
+#   6. Sets up ~/enough/weights/ and walks the full 7-model registry one
+#      model at a time — live machine-feasibility verdict, size (main +
+#      any MTP draft), y/n per model, sane defaults pre-picked.
 #   7. Downloads the whisper model for voice input (~142 MB).
 #   8. Optionally downloads the MADLAD-400-3B-MT translation model
 #      (~3 GB) into ~/.local/share/translator/. Powers the `translator`
@@ -188,100 +189,205 @@ ok "~/enough/.venv is ready"
 # 6. Model weights
 # ---------------------------------------------------------------------------
 step 6 "placing the LLM weights"
-note "enough ships with four supported local models. You pick how many to"
-note "install now; you can add the rest later by re-running this script."
-note "All are Q4_K_M (~4-bit) quantizations — good quality, fast on Apple"
-note "Silicon, and moderate disk footprint."
-note ""
-note "  [1] G40-04   Gemma 4 4B (E4B)        ~5.4 GB   fast; fits 16 GB Macs"
-note "  [2] Q35-09   Qwen3.5-9B              ~5.6 GB   balanced mid-size"
-note "  [3] G40-26   Gemma 4 26B MoE         ~15.6 GB  Gemma flagship (MoE)"
-note "  [4] Q36-27   Qwen3.6-27B             ~16.5 GB  Qwen dense, coding"
-note ""
-note "Default after install is always G40-04 regardless of which tier you"
-note "pick — lightest surface area, most forgiving hardware-wise."
+note "enough ships with 7 local models across two families — Gemma and Qwen —"
+note "from a 4B model that's happy on a 16 GB Mac up to a 54 GB flagship that"
+note "wants a Mac Studio. Instead of a fixed list, this step reads the real"
+note "model registry live (the same registry the running app uses) and checks"
+note "this machine's RAM and free disk against every entry."
 note ""
 
 WEIGHTS_DIR="$ENOUGH_HOME/weights"
 mkdir -p "$WEIGHTS_DIR"
 
-# Registry lookup by cute name. Using case statements instead of
-# associative arrays so we stay compatible with macOS stock bash (3.2).
-# Keep in sync with defaults/models.json.
-MODEL_KEYS="g40-04 q35-09 g40-26 q36-27"
+# Captured now, before anything below touches the registry: enough.models'
+# resolve() (called per-model further down, purely to read a label/URL for
+# display) has the side effect of auto-seeding config/models.json to the
+# registry default the first time it runs on a fresh install. Checking
+# file-existence AFTER that loop would always see it as "already there" and
+# silently skip the smallest-installed-model fallback below — so the seed
+# decision has to be based on whether it existed at THIS point, not later.
+HAD_LIVE_STATE=""
+[[ -f "$ENOUGH_HOME/config/models.json" ]] && HAD_LIVE_STATE="1"
 
-model_filename() {
-  case "$1" in
-    g40-04) echo "gemma-4-E4B-it-Q4_K_M.gguf" ;;
-    q35-09) echo "Qwen3.5-9B-MTP-Q4_K_M.gguf" ;;
-    g40-26) echo "gemma-4-26B-A4B-it-Q4_K_M.gguf" ;;
-    q36-27) echo "Qwen3.6-27B-MTP-Q4_K_M.gguf" ;;
-  esac
-}
-model_url() {
-  case "$1" in
-    g40-04) echo "https://huggingface.co/ggml-org/gemma-4-E4B-it-GGUF/resolve/main/gemma-4-E4B-it-Q4_K_M.gguf" ;;
-    q35-09) echo "https://huggingface.co/unsloth/Qwen3.5-9B-MTP-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf" ;;
-    g40-26) echo "https://huggingface.co/ggml-org/gemma-4-26B-A4B-it-GGUF/resolve/main/gemma-4-26B-A4B-it-Q4_K_M.gguf" ;;
-    q36-27) echo "https://huggingface.co/unsloth/Qwen3.6-27B-MTP-GGUF/resolve/main/Qwen3.6-27B-Q4_K_M.gguf" ;;
-  esac
-}
-model_gb() {
-  case "$1" in
-    g40-04) echo "5.4" ;;
-    q35-09) echo "5.9" ;;
-    g40-26) echo "15.6" ;;
-    q36-27) echo "17.1" ;;
-  esac
-}
-
-# Cumulative install tiers.
+note "here's what enough knows about this machine, model by model:"
+note "  ✓ good to go     ~ tight but workable     ✗ out of reach here"
 echo
-note "cumulative install tiers:"
-note "  1  →  G40-04 only                       (~5.4 GB)"
-note "  2  →  G40-04 + Q35-09                   (~11 GB)"
-note "  3  →  G40-04 + Q35-09 + G40-26          (~27 GB)"
-note "  4  →  all four models                   (~44 GB)"
+uv run --project "$ENOUGH_HOME" python -m enough.models install-menu | while IFS= read -r line; do
+  dim "$line"
+done
 echo
-TIER=$(ask_text "install how many? [1-4]" "1")
-case "$TIER" in
-  1) SELECTED="g40-04" ;;
-  2) SELECTED="g40-04 q35-09" ;;
-  3) SELECTED="g40-04 q35-09 g40-26" ;;
-  4) SELECTED="g40-04 q35-09 g40-26 q36-27" ;;
-  *)
-    warn "unrecognized tier $TIER — defaulting to 1 (G40-04 only)"
-    SELECTED="g40-04" ;;
-esac
+note "you'll get a y/n for each one you don't already have. say no to any you"
+note "don't want yet — re-run this script later to add them, already-installed"
+note "ones are skipped automatically. a handful of small, comfortable-fit"
+note "models default to yes; everything else defaults to no, so a green light"
+note "never turns into an accidental double-digit-GB download."
+note ""
 
-for cute in $SELECTED; do
-  filename=$(model_filename "$cute")
-  dest="$WEIGHTS_DIR/$filename"
-  if [[ -f "$dest" ]]; then
-    ok "$cute already at $(basename "$dest")  ($(du -h "$dest" | awk '{print $1}'))"
-  else
-    note "downloading $cute (~$(model_gb "$cute") GB) → $(basename "$dest")"
-    curl -L --progress-bar -o "$dest" "$(model_url "$cute")"
+# model_row <cute> — prints shell-sourceable ROW_*/MODEL_*/DRAFT_* vars for
+# one registry entry, read live off enough.models instead of a shadow copy
+# of the registry in this script (that shadow copy — model_filename/
+# model_url/model_gb case tables — is exactly what this replaces).
+# ROW_* mirrors what `install-menu --json` reports (label, size, verdict,
+# reasons, default_yes, the llama.cpp release gate). MODEL_*/DRAFT_* come
+# from resolve(), which — unlike the `params` CLI subcommand llama_server.sh
+# uses — works for a model that isn't installed yet, which is exactly the
+# case here.
+model_row() {
+  uv run --project "$ENOUGH_HOME" python - "$1" <<'PYEOF'
+import shlex
+import sys
+from enough import models as m
+
+cute = sys.argv[1]
+rows = {r["cute"]: r for r in m.install_menu_rows()}
+row = rows[cute]
+info = m.resolve(cute)
+
+
+def q(v):
+    return shlex.quote("" if v is None else str(v))
+
+
+fields = {
+    "ROW_LABEL": row["label"],
+    "ROW_MAIN_GB": row["disk_gb_approx"],
+    "ROW_SIZE_GB": row["size_gb"],
+    "ROW_DRAFT_GB": row["draft_disk_gb_approx"] or "",
+    "ROW_INSTALLED": "1" if row["installed"] else "",
+    "ROW_VERDICT": row["verdict"],
+    "ROW_REASONS": "; ".join(row["reasons"]),
+    "ROW_DEFAULT_YES": "1" if row["default_yes"] else "",
+    "ROW_MIN_RELEASE": row["llama_cpp_min_release"],
+    "MODEL_FILENAME": info["filename"],
+    "MODEL_URL": info["url"],
+    "DRAFT_FILENAME": info["draft_filename"] or "",
+    "DRAFT_URL": info["draft_url"] or "",
+}
+for key, value in fields.items():
+    print(f"{key}={q(value)}")
+PYEOF
+}
+
+# download_model_file <url> <dest> — fetches into a .part file under
+# weights/downloads/ via `curl -C -` (resumable), then moves it into place
+# on success. This is the same partial-file convention the in-app
+# ModelDownloadManager uses (see docs/seven-models-plan.md's Wave 2a
+# notes) — sharing it means a download interrupted here resumes correctly
+# whether it's re-run from this script or finished later from the model
+# picker, and, more importantly, means a partial download can never look
+# "installed": resolve()'s installed check only ever looks at the final
+# filename in weights/, never at weights/downloads/.
+download_model_file() {
+  local url="$1" dest="$2"
+  local part_dir="$WEIGHTS_DIR/downloads"
+  local part="$part_dir/$(basename "$dest").part"
+  mkdir -p "$part_dir"
+  curl -L -C - --progress-bar -o "$part" "$url"
+  mv "$part" "$dest"
+}
+
+MODEL_KEYS=$(uv run --project "$ENOUGH_HOME" python -c "
+from enough import models as m
+print(' '.join(r['cute'] for r in m.install_menu_rows()))
+")
+
+for cute in $MODEL_KEYS; do
+  eval "$(model_row "$cute")"
+
+  if [[ -n "$ROW_INSTALLED" ]]; then
+    ok "$cute already at $MODEL_FILENAME  ($(du -h "$WEIGHTS_DIR/$MODEL_FILENAME" | awk '{print $1}'))"
+    if [[ -n "$DRAFT_FILENAME" ]]; then
+      draft_dest="$WEIGHTS_DIR/$DRAFT_FILENAME"
+      if [[ -f "$draft_dest" ]]; then
+        ok "$cute's MTP draft already at $DRAFT_FILENAME  ($(du -h "$draft_dest" | awk '{print $1}'))"
+      elif ask_yn "also grab $cute's MTP draft (~${ROW_DRAFT_GB} GB, faster generation)?" Y; then
+        note "downloading $cute's MTP draft (~${ROW_DRAFT_GB} GB) → $(basename "$draft_dest")"
+        download_model_file "$DRAFT_URL" "$draft_dest"
+        ok "$cute draft installed"
+      fi
+    fi
+    continue
+  fi
+
+  glyph="~"
+  [[ "$ROW_VERDICT" == "good" ]] && glyph="✓"
+  [[ "$ROW_VERDICT" == "no" ]] && glyph="✗"
+  size_note="${ROW_SIZE_GB} GB"
+  [[ -n "$ROW_DRAFT_GB" ]] && size_note="$size_note (incl. ${ROW_DRAFT_GB} GB MTP draft)"
+
+  echo
+  note "$glyph $cute — $ROW_LABEL — $size_note"
+  if [[ -n "$ROW_REASONS" ]]; then
+    dim "$ROW_REASONS"
+  fi
+  if [[ "$ROW_MIN_RELEASE" != "0" ]]; then
+    dim "needs llama.cpp b${ROW_MIN_RELEASE}+ to load — step 3 installs llama.cpp via"
+    dim "brew; if yours is older, \`brew upgrade llama.cpp\` after this script finishes."
+  fi
+
+  default="N"
+  [[ -n "$ROW_DEFAULT_YES" ]] && default="Y"
+  if ask_yn "install $cute?" "$default"; then
+    dest="$WEIGHTS_DIR/$MODEL_FILENAME"
+    note "downloading $cute (~${ROW_MAIN_GB} GB) → $(basename "$dest")"
+    download_model_file "$MODEL_URL" "$dest"
     ok "$cute installed"
+    if [[ -n "$DRAFT_FILENAME" ]]; then
+      draft_dest="$WEIGHTS_DIR/$DRAFT_FILENAME"
+      note "downloading $cute's MTP draft (~${ROW_DRAFT_GB} GB) → $(basename "$draft_dest")"
+      download_model_file "$DRAFT_URL" "$draft_dest"
+      ok "$cute draft installed"
+    fi
   fi
 done
 
-# Seed the live current selection if not yet set.
+INSTALLED_COUNT=$(uv run --project "$ENOUGH_HOME" python -c "
+from enough import models as m
+print(sum(1 for r in m.install_menu_rows() if r['installed']))
+")
+
+echo
+if [[ "$INSTALLED_COUNT" == "0" ]]; then
+  warn "no local models installed. that's fine if you're planning to run"
+  warn "cloud-only through the OPRO-API slot (see step 10) — otherwise,"
+  warn "re-run this script anytime to add one."
+fi
+
+# Seed the live current selection if not yet set. g40-04 is the default
+# when it's installed (lightest surface area, most forgiving hardware-wise);
+# if it isn't, fall back to whichever installed model has the smallest
+# total download, so `current` never points at a model that isn't actually
+# on disk. If nothing at all is installed (the cloud-only path above), seed
+# g40-04 anyway — a harmless default that just means nothing loads until
+# the user installs or switches.
 mkdir -p "$ENOUGH_HOME/config"
-if [[ ! -f "$ENOUGH_HOME/config/models.json" ]]; then
-  echo '{"current": "g40-04"}' > "$ENOUGH_HOME/config/models.json"
-  ok "live model state seeded to default (G40-04)"
+if [[ -z "$HAD_LIVE_STATE" ]]; then
+  SEED_CUTE=$(uv run --project "$ENOUGH_HOME" python -c "
+from enough import models as m
+rows = m.install_menu_rows()
+by_cute = {r['cute']: r for r in rows}
+if by_cute.get('g40-04', {}).get('installed'):
+    print('g40-04')
+else:
+    installed = [r for r in rows if r['installed']]
+    if installed:
+        installed.sort(key=lambda r: r['size_gb'])
+        print(installed[0]['cute'])
+    else:
+        print('g40-04')
+")
+  printf '{"current": "%s"}\n' "$SEED_CUTE" > "$ENOUGH_HOME/config/models.json"
+  if [[ "$SEED_CUTE" == "g40-04" ]]; then
+    ok "live model state seeded to default (G40-04)"
+  else
+    ok "live model state seeded to $SEED_CUTE (G40-04 wasn't installed; smallest model that is)"
+  fi
 fi
 
 echo
-note "all your installed models:"
-for cute in $MODEL_KEYS; do
-  fn=$(model_filename "$cute")
-  if [[ -f "$WEIGHTS_DIR/$fn" ]]; then
-    dim "  ✓ $cute   $fn   ($(du -h "$WEIGHTS_DIR/$fn" | awk '{print $1}'))"
-  else
-    dim "  · $cute   (not installed; re-run this script to add)"
-  fi
+note "all your local models:"
+uv run --project "$ENOUGH_HOME" python -m enough.models install-menu | while IFS= read -r line; do
+  dim "$line"
 done
 
 # ---------------------------------------------------------------------------
@@ -403,9 +509,9 @@ note "  4. open http://127.0.0.1:3456 and say hi to your fresh agent."
 note ""
 note "optional: enable the OpenRouter cloud-model slot (OPRO-API)"
 note ""
-note "  enough is local-first by default — the four models you just installed"
-note "  run entirely on this machine. if you'd also like to route through a"
-note "  cloud model via openrouter.ai (gpt, claude, mistral, etc.), enough"
+note "  enough is local-first by default — whichever local models you just"
+note "  installed run entirely on this machine. if you'd also like to route"
+note "  through a cloud model via openrouter.ai (gpt, claude, mistral, etc.), enough"
 note "  has a fifth opt-in model slot that's intentionally hard to enable"
 note "  accidentally:"
 note ""

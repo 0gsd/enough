@@ -28,6 +28,7 @@ import subprocess
 import time
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -41,14 +42,18 @@ class LlamaSupervisor:
         self,
         *,
         llm_url: str = "http://127.0.0.1:8080",
-        port: int = 8080,
+        port: int | None = None,
         host: str = "127.0.0.1",
         ngl: int = 99,
         parallel: int = 1,
     ) -> None:
         self.llm_url = llm_url.rstrip("/")
         self.host = host
-        self.port = port
+        # The spawn/probe port follows llm_url unless explicitly overridden —
+        # letting the two disagree means health-polling one port while the
+        # child binds another (or adopting, then killing, a foreign
+        # llama-server on 8080).
+        self.port = port if port is not None else (urlsplit(self.llm_url).port or 8080)
         self.ngl = ngl
         self.parallel = parallel
 
@@ -157,6 +162,12 @@ class LlamaSupervisor:
             raise RuntimeError(
                 "llama-server not on PATH. install with `brew install llama.cpp`."
             )
+        # Hard gate: a llama.cpp older than the model's architecture would
+        # fail deep inside the loader with an opaque tensor error. Say what
+        # to upgrade instead.
+        gate = _models.release_gate(info, binary)
+        if gate:
+            raise RuntimeError(gate)
 
         state_dir = Path.home() / "enough" / ".llama-server"
         state_dir.mkdir(parents=True, exist_ok=True)
@@ -175,12 +186,22 @@ class LlamaSupervisor:
         ]
         spec = _models.spec_flags(info, binary)
         if info.get("spec_args") and not spec:
-            log.info(
-                "model %s has MTP heads but llama.cpp predates b%s — "
-                "starting without speculative decoding (brew upgrade llama.cpp)",
-                cute, info["spec_min_release"],
-            )
-        cmd += spec
+            # Two ways to lose MTP, and the user fixes each differently.
+            # Either way it's a plain launch, never an error — the draft
+            # only ever buys speed.
+            if info.get("draft_filename") and not info.get("draft_path"):
+                log.info(
+                    "model %s has a separate MTP draft (%s) that isn't in "
+                    "~/enough/weights/ — starting without speculative decoding",
+                    cute, info["draft_filename"],
+                )
+            else:
+                log.info(
+                    "model %s has MTP heads but llama.cpp predates b%s — "
+                    "starting without speculative decoding (brew upgrade llama.cpp)",
+                    cute, info["spec_min_release"],
+                )
+        cmd += spec + _models.draft_flags(info, binary)
         log.info("launching llama-server: %s", " ".join(cmd))
         f = open(log_path, "ab", buffering=0)  # noqa: SIM115  (intentionally leaked to subprocess)
         self.proc = subprocess.Popen(
@@ -271,6 +292,12 @@ class LlamaSupervisor:
         info = _models.resolve(cute)
         if not info["installed"]:
             raise RuntimeError(f"model {cute} is not installed; cannot switch to it.")
+        # Check the llama.cpp gate BEFORE stopping — a too-old build should
+        # leave the user on the model they already had running, not on
+        # nothing. _launch re-checks for the bootstrap path.
+        gate = _models.release_gate(info)
+        if gate:
+            raise RuntimeError(gate)
         resolved_ctx = int(ctx) if ctx else _preferred_ctx(cute)
 
         await self.stop()

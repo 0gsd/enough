@@ -3002,20 +3002,47 @@ def create_app(
             raise HTTPException(400, str(e)) from None
         return _cloud.status_snapshot()
 
+    # ------------------------------------------------------------------
+    # Models — the picker's view, the switch, and the in-app manager's
+    # download/delete side. Download progress streams over the `model-dl`
+    # SSE event; contract in docs/seven-models-plan.md §4.
+    # ------------------------------------------------------------------
+
+    from . import model_download as _model_download
+
+    model_dl = _model_download.ModelDownloadManager(emit=session.emit)
+
     @app.get("/api/models")
     async def api_models() -> dict[str, Any]:
         """Registry + per-model installed/recommended view + total RAM +
-        supervisor status. When the `local_models_only` broker toggle is
-        off, also injects a virtual OPRO-API entry at the end of the model
-        list so the modal renders it as a fifth slot. The OPRO-API entry
-        carries `cloud: True` plus cloud-specific status fields so the
-        frontend can render and dispatch it differently from local models."""
+        supervisor status + the download manager's snapshot. When the
+        `local_models_only` broker toggle is off, also injects a virtual
+        OPRO-API entry at the end of the model list so the modal renders it
+        as a fifth slot. The OPRO-API entry carries `cloud: True` plus
+        cloud-specific status fields so the frontend can render and dispatch
+        it differently from local models."""
         from . import models as _models  # late import: avoid circular
+        views = _models.all_models_view()
         payload: dict[str, Any] = {
             "total_ram_gb": _models.total_ram_gb(),
             "current": _models.load_state().get("current"),
-            "models": _models.all_models_view(),
+            "models": views,
             "ctx_overrides": _models.load_state().get("ctx_overrides") or {},
+            # Same shape as the `model-dl` event, so a page that loads
+            # mid-download renders from this and then keeps up over SSE.
+            "download": model_dl.state(views),
+            # The installed llama.cpp b-release. Wave 3 addition: each entry
+            # already carries `llama_cpp_min_release`, but that number means
+            # nothing to the picker without what's actually on this machine to
+            # compare it against — the model manager renders "needs llama.cpp
+            # ≥ bNNNN" in place of the switch affordance off the pair. One
+            # number for the whole payload rather than a per-model
+            # `release_gate()` sentence, because release_gate() re-probes the
+            # binary per call and seven subprocess spawns per picker open is
+            # not worth a prettier string. Off-thread: it shells out to
+            # `llama-server --version` (10 s timeout), and 0 means "no
+            # llama.cpp on PATH", which gates every gated model — correctly.
+            "llama_release": await asyncio.to_thread(_models.llama_release),
         }
         payload["supervisor"] = supervisor.status() if supervisor else {"mode": "off"}
 
@@ -3159,6 +3186,50 @@ def create_app(
         session.last_usage = {}
         await session.emit("usage", {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0})
         return supervisor.status()
+
+    @app.post("/api/models/download/{cute}")
+    async def api_model_download(cute: str) -> dict[str, Any]:
+        """Download a model's weights into ~/enough/weights: the main GGUF,
+        then its MTP draft file automatically when the registry entry
+        declares one. Returns `{"started": true, ...}` plus the opening
+        progress snapshot; the rest arrives on the `model-dl` SSE event.
+
+        Resumable — a `.part` file left by a cancel or a quit is continued
+        with a ranged GET rather than re-fetched, across restarts. 404 for an
+        unknown model, 409 when it's already installed or another download is
+        running, 400 when the volume can't hold what's left."""
+        try:
+            snap = model_dl.start(cute)
+        except KeyError:
+            raise HTTPException(404, f"unknown model {cute!r}") from None
+        except _model_download.ModelDownloadError as e:
+            raise HTTPException(e.status, str(e)) from None
+        return {"started": True, **snap}
+
+    @app.post("/api/models/download/{cute}/cancel")
+    async def api_model_download_cancel(cute: str) -> dict[str, Any]:
+        """Stop the running download and KEEP its partial file, so starting
+        the same model again resumes from where it stopped. 409 when nothing
+        is running, or when what's running is a different model. The stop
+        itself lands at the next chunk boundary — the `model-dl` event with
+        `status: "cancelled"` is what confirms it."""
+        try:
+            return model_dl.cancel(cute)
+        except _model_download.ModelDownloadError as e:
+            raise HTTPException(e.status, str(e)) from None
+
+    @app.post("/api/models/delete/{cute}")
+    async def api_model_delete(cute: str) -> dict[str, Any]:
+        """Remove a model's weights: main GGUF, MTP draft file, and any
+        partial download. 404 for an unknown model or one with nothing on
+        disk, 409 when it's the model currently in use (switch away first) or
+        the one being downloaded (cancel first)."""
+        try:
+            return await asyncio.to_thread(model_dl.delete, cute)
+        except KeyError:
+            raise HTTPException(404, f"unknown model {cute!r}") from None
+        except _model_download.ModelDownloadError as e:
+            raise HTTPException(e.status, str(e)) from None
 
     @app.post("/api/transcribe")
     async def api_transcribe(request: Request) -> dict[str, Any]:

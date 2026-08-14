@@ -62,7 +62,8 @@ Every Python module in `enough/`:
 | [enough/cloud.py](../enough/cloud.py) | ~1000 | OpenRouter integration: keyring read/write, in-memory key cache, OpenAI-compatible streaming + non-streaming clients, health check, response caching to `rness/io/cloud-cache/`, the broker-driven `pipeline_run()`. | `set_api_key()` / `clear_api_key()` / `has_api_key()`, `_get_api_key_for_broker()`, `health_check()`, `chat_completion()`, `stream_chat_completion()`, `cache_completion()`, `pipeline_run()` |
 | [enough/llm.py](../enough/llm.py) | ~125 | OpenAI-compatible client for the local llama-server. Streaming-only path for chat. | `stream_chat()`, `check_llm_reachable()` |
 | [enough/supervisor.py](../enough/supervisor.py) | ~400 | Manages the local llama-server subprocess. Adopts an existing process if one's already up; spawns its own otherwise. Skips spawning entirely when the active model is `opro-api`. | `LlamaSupervisor`, `_resolve_startup_choice()` |
-| [enough/models.py](../enough/models.py) | ~280 | Local-model registry (4 cute-named local models, defined in `defaults/models.json`). Selection state in `~/enough/config/models.json`. | `load_registry()`, `load_state()`, `save_state()`, `resolve()`, `all_models_view()` |
+| [enough/models.py](../enough/models.py) | ~550 | Local-model registry (7 cute-named local models, defined in `defaults/models.json`; two carry separate MTP draft GGUFs, two carry a `llama_cpp_min_release` gate). Feasibility verdicts (RAM + free disk), `install-menu` CLI for bootstrap.sh. Selection state in `~/enough/config/models.json`. | `load_registry()`, `load_state()`, `save_state()`, `resolve()`, `all_models_view()`, `feasibility()`, `release_gate()`, `install_menu_rows()` |
+| [enough/model_download.py](../enough/model_download.py) | ~330 | Resumable GGUF downloads for the in-app model manager: main file then optional MTP draft, ranged-GET resume off a `.part`, one active download per process, cancel-keeps-partial, delete. Backs `/api/models/{download,delete}/*`; progress on the `model-dl` SSE event. | `ModelDownloadManager` (`start` / `cancel` / `delete` / `state`), `pending_phases()`, `partials()` |
 | [enough/skeleton.py](../enough/skeleton.py) | ~560 | Creates `rness/` for new projects (copies from `defaults/`), syncs global skills/roles/paradigms on every launch via dedicated populators, runs migrations. | `ensure_skeleton()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS`, `_populate_skill_symlinks` / `_populate_role_symlinks` / `_populate_paradigm_symlinks` |
 | [enough/highlights.py](../enough/highlights.py) | ~250 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
 | [enough/girraph.py](../enough/girraph.py) | ~695 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
@@ -166,25 +167,37 @@ Paradigms are different — exactly one is active, named in
 
 Two layers.
 
-### Local models (the four llama.cpp slots)
+### Local models (the seven llama.cpp slots)
 
 Registry template at [defaults/models.json](../defaults/models.json) —
-ships 4 entries (cute names like `g40-04`, `q35-09`, `g40-26`, `q36-27`).
+ships 7 entries (`g40-04`, `q35-09`, `g40-12`, `g40-26`, `q36-27`,
+`q38-04`, `q38-16`; note `q38-*` suffixes mean quant bits, not params).
 Each entry: `cute_name`, `label`, `family`, `gguf_filename`, `gguf_url`,
 `disk_gb_approx`, `ram_gb_recommended_min`, `ctx_max`, `ctx_defaults`
-(a RAM-tier → context-window map).
+(a RAM-tier → context-window map). Optional: `llama_cpp_min_release`
+(hard gate on switching/launching — `models.release_gate()` is the single
+source of the user-facing message) and an `mtp` block for speculative
+decoding, in two shapes: embedded head tensors (`q35-09`/`q36-27`) or a
+separate draft GGUF (`q38-*`: `draft_gguf_filename`/`draft_gguf_url`/
+`draft_disk_gb_approx`; a missing draft file always launches plain).
 
 Live state at `~/enough/config/models.json`: just `{"current": "<cute>"}`
 plus optional `ctx_overrides`.
 
 `enough.models.resolve(cute)` merges the registry + live state +
-filesystem (does the .gguf exist?) into a complete view. `all_models_view()`
-returns the full list, used by `/api/models`.
+filesystem (does the .gguf exist?) into a complete view, including a
+machine-feasibility verdict (`feasibility()`: RAM + free-disk, good /
+tight / no). `all_models_view()` returns the full list, used by
+`/api/models` (whose payload also carries the installed llama.cpp
+release and a `download` snapshot from the in-app download manager,
+`enough/model_download.py` — resumable downloads, `model-dl` SSE events,
+`/api/models/download|cancel|delete` endpoints).
 
 To **add a new local model**: append an entry to
 [defaults/models.json](../defaults/models.json). It shows up in the model
 modal on next page load; the supervisor will spawn llama-server with it
-when the user selects it.
+when the user selects it. `bootstrap.sh` step 6 reads the same registry
+(via `python -m enough.models install-menu`), so no shell tables to sync.
 
 To **change which local model is active**: write to
 `~/enough/config/models.json` via `models.save_state({...})`, or POST to
@@ -1146,7 +1159,10 @@ A list of things that will confuse you if you don't see them coming:
   project metadata, the cacheawl store + `/api/cacheawl/*` + the
   `cacheawl:` scheme, and the ui-config theme-key merge. Suites isolate
   global state via env hooks — `ENOUGH_WIKISINK_CONFIG`,
-  `ENOUGH_CACHEAWL_ROOT`, `ENOUGH_INFOWORLD_ROOT`, `ENOUGH_UI_CONFIG` — all
+  `ENOUGH_CACHEAWL_ROOT`, `ENOUGH_INFOWORLD_ROOT`, `ENOUGH_UI_CONFIG`,
+  `ENOUGH_WEIGHTS_DIR`, `ENOUGH_LIVE_STATE`, `ENOUGH_MODELS_REGISTRY`
+  (plus `ENOUGH_MODELS_URL_BASE`, which rebases the model download URLs
+  onto a local stub server, keyed by local gguf_filename) — all
   pointed at `tmp_path`; **never run against real `~/enough` state.** The
   rest of the web layer is exercised via TestClient against `create_app()`.
 

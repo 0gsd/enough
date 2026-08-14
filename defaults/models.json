@@ -2,26 +2,50 @@
   "_doc": [
     "Model registry for enough.",
     "",
-    "Four supported local LLMs, keyed by a short 'cute name' the user sees",
+    "Seven supported local LLMs, keyed by a short 'cute name' the user sees",
     "in the UI and can pass as MODEL=<name> to llama_server.sh:",
     "",
     "  G40-04 — Gemma 4 4B (E4B MatFormer), ~5 GB",
     "  Q35-09 — Qwen3.5-9B, ~6 GB (MTP build)",
+    "  G40-12 — Gemma 4 12B, ~7 GB (quantization-aware-trained q4_0)",
     "  G40-26 — Gemma 4 26B MoE (4B active), ~16 GB",
     "  Q36-27 — Qwen3.6-27B dense, ~17 GB (MTP build)",
+    "  Q38-04 — Qwen3.8-27B at 4-bit, ~19 GB + a ~1.7 GB MTP draft",
+    "  Q38-16 — Qwen3.8-27B at 16-bit, ~54 GB + a ~3.2 GB MTP draft",
+    "",
+    "Naming caution: the numeric suffix means PARAMETER COUNT on the",
+    "gemma-4 / qwen-3.5 / qwen-3.6 entries but QUANT BITS on the two",
+    "qwen-3.8 ones (g40-04 = 4B params; q38-04 = 4-bit). The 'label'",
+    "field carries the disambiguation — never render the cute name alone.",
     "",
     "Each entry declares its GGUF download URL + filename, approximate",
     "disk footprint, minimum recommended RAM, and a ctx_default table",
     "that maps total-RAM tiers to a recommended context window. Those",
     "defaults are starting points; the live config can override per model.",
     "",
-    "An optional 'mtp' block marks models whose GGUF carries Multi-Token",
-    "Prediction head tensors (speculative decoding with no separate draft",
-    "model). llama_server.sh appends the spec flags when the installed",
-    "llama.cpp release is >= llama_cpp_min_release, else starts plain.",
-    "The Qwens use MTP-preserving GGUFs from unsloth; note their local",
-    "gguf_filename carries an -MTP- marker so a pre-MTP file left in",
-    "~/enough/weights/ is never mistaken for the MTP build.",
+    "An optional top-level 'llama_cpp_min_release' is a HARD gate: the",
+    "b-release of llama.cpp below which the model's architecture cannot",
+    "be loaded at all. Absent or 0 means no gate. enough.models.release_gate()",
+    "turns it into a friendly 'brew upgrade llama.cpp' error; both the",
+    "supervisor and llama_server.sh refuse to launch below it, rather",
+    "than letting llama-server fail with an opaque tensor error.",
+    "",
+    "An optional 'mtp' block marks models that support Multi-Token",
+    "Prediction speculative decoding. Two shapes, both behind the same",
+    "spec_type/spec_draft_n_max keys:",
+    "  - EMBEDDED heads (q35-09, q36-27): the MTP tensors ride inside the",
+    "    main GGUF, so the block is flags only. The Qwens use MTP-preserving",
+    "    GGUFs from unsloth; note their local gguf_filename carries an",
+    "    -MTP- marker so a pre-MTP file left in ~/enough/weights/ is never",
+    "    mistaken for the MTP build.",
+    "  - SEPARATE draft file (q38-04, q38-16): the MTP head ships as its",
+    "    own GGUF, named by draft_gguf_filename / draft_gguf_url /",
+    "    draft_disk_gb_approx. It lands in ~/enough/weights/ beside the",
+    "    main file and is passed with --spec-draft-model.",
+    "The 'mtp' block's own llama_cpp_min_release is a SOFT gate on the",
+    "spec flags only: too old, or draft file simply not downloaded, and",
+    "the model launches plain. MTP is always a speed bonus, never a",
+    "requirement, so 'installed' is derived from the main GGUF alone.",
     "",
     "To add a new model, copy an entry and rename its key. Put the new",
     "entry in ~/enough/config/models.json (the live file) — edits to",
@@ -30,7 +54,9 @@
     "Live state is at ~/enough/config/models.json and tracks only:",
     "  { \"current\": \"<cute-name>\" }",
     "Installed-state is derived from whether the .gguf file exists at",
-    "~/enough/weights/<gguf_filename>."
+    "~/enough/weights/<gguf_filename>. Which models a given machine can",
+    "actually run is NOT stored here — enough.models.feasibility() derives",
+    "it live from ram_gb_recommended_min + disk_gb_approx vs this host."
   ],
 
   "default": "g40-04",
@@ -75,6 +101,23 @@
       }
     },
 
+    "g40-12": {
+      "cute_name": "G40-12",
+      "label": "Gemma 4 12B (QAT)",
+      "family": "gemma-4",
+      "gguf_filename": "gemma-4-12b-it-qat-q4_0.gguf",
+      "gguf_url": "https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf/resolve/main/gemma-4-12b-it-qat-q4_0.gguf",
+      "disk_gb_approx": 7.0,
+      "ram_gb_recommended_min": 12,
+      "ctx_max": 262144,
+      "ctx_defaults": {
+        "gte_64gb": 65536,
+        "gte_32gb": 32768,
+        "gte_16gb": 8192,
+        "lt_16gb": 4096
+      }
+    },
+
     "g40-26": {
       "cute_name": "G40-26",
       "label": "Gemma 4 26B MoE (A4B)",
@@ -112,13 +155,58 @@
         "spec_draft_n_max": 3,
         "llama_cpp_min_release": 9180
       }
-    }
-  },
+    },
 
-  "install_tiers": [
-    {"n": 1, "models": ["g40-04"],                                   "label": "just G40-04 (smallest, fits anywhere)"},
-    {"n": 2, "models": ["g40-04", "q35-09"],                         "label": "+ Q35-09 (balanced mid-size)"},
-    {"n": 3, "models": ["g40-04", "q35-09", "g40-26"],               "label": "+ G40-26 (Gemma MoE, flagship)"},
-    {"n": 4, "models": ["g40-04", "q35-09", "g40-26", "q36-27"],    "label": "+ Q36-27 (Qwen dense, coding flagship)"}
-  ]
+    "q38-04": {
+      "cute_name": "Q38-04",
+      "label": "Qwen3.8 27B (4-bit)",
+      "family": "qwen-3.8",
+      "gguf_filename": "Qwen3.8-27B-Q4_K_M.gguf",
+      "gguf_url": "https://huggingface.co/ggml-org/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-Q4_K_M.gguf",
+      "disk_gb_approx": 19.0,
+      "ram_gb_recommended_min": 24,
+      "ctx_max": 262144,
+      "llama_cpp_min_release": 9200,
+      "ctx_defaults": {
+        "gte_64gb": 131072,
+        "gte_32gb": 65536,
+        "gte_16gb": 16384,
+        "lt_16gb": 4096
+      },
+      "mtp": {
+        "spec_type": "draft-mtp",
+        "spec_draft_n_max": 3,
+        "llama_cpp_min_release": 9200,
+        "draft_gguf_filename": "mtp-Qwen3.8-27B-Q4_0.gguf",
+        "draft_gguf_url": "https://huggingface.co/ggml-org/Qwen3.8-27B-GGUF/resolve/main/mtp-Qwen3.8-27B-Q4_0.gguf",
+        "draft_disk_gb_approx": 1.7
+      }
+    },
+
+    "q38-16": {
+      "cute_name": "Q38-16",
+      "label": "Qwen3.8 27B (16-bit)",
+      "family": "qwen-3.8",
+      "gguf_filename": "Qwen3.8-27B-BF16.gguf",
+      "gguf_url": "https://huggingface.co/ggml-org/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-BF16.gguf",
+      "disk_gb_approx": 53.8,
+      "ram_gb_recommended_min": 64,
+      "ctx_max": 262144,
+      "llama_cpp_min_release": 9200,
+      "ctx_defaults": {
+        "gte_64gb": 32768,
+        "gte_32gb": 8192,
+        "gte_16gb": 4096,
+        "lt_16gb": 4096
+      },
+      "mtp": {
+        "spec_type": "draft-mtp",
+        "spec_draft_n_max": 3,
+        "llama_cpp_min_release": 9200,
+        "draft_gguf_filename": "mtp-Qwen3.8-27B-Q8_0.gguf",
+        "draft_gguf_url": "https://huggingface.co/ggml-org/Qwen3.8-27B-GGUF/resolve/main/mtp-Qwen3.8-27B-Q8_0.gguf",
+        "draft_disk_gb_approx": 3.2
+      }
+    }
+  }
 }
