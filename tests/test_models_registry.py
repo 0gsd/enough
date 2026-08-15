@@ -250,7 +250,10 @@ def test_release_gate_names_the_release_and_the_fix(iso: Path, host):
     msg = models.release_gate(models.resolve("drafty"))
     assert msg is not None
     assert "b9200" in msg and "b9100" in msg
-    assert "brew upgrade llama.cpp" in msg
+    # The fix clause is per-platform (models.install_hint): brew on macOS,
+    # the pinned bootstrap.sh release on Linux. Assert the one for the
+    # platform the suite is running on — CI runs both.
+    assert models.install_hint(**models.LLAMA_CPP_UPGRADE_HINT) in msg
     assert "Draft-file MTP 27B" in msg
 
 
