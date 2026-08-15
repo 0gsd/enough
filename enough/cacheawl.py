@@ -210,12 +210,31 @@ def load_meta(name: str) -> dict[str, Any]:
 
 
 def save_meta(name: str, meta: dict[str, Any]) -> None:
+    """Write a cachebox's metadata **atomically** (tmp file + os.replace).
+
+    Atomicity is load-bearing, not tidiness. An ingest runs on a worker
+    thread that calls this repeatedly while the UI (and the agent, and
+    `GET /api/cacheawl/ingest-status`) reads the same file from the request
+    thread. With a plain `write_text` — truncate, then write — a concurrent
+    reader can catch the file empty or half-written; `load_meta` then hits a
+    JSONDecodeError and, by design, falls back to `_default_meta()`, whose
+    status is **"complete"**. That is exactly the phantom-complete state
+    `run_ingest` promises never to produce: a poller sees "complete" a few
+    hundred milliseconds into a copy and walks away with an empty box.
+    `os.replace` is atomic on POSIX and Windows alike, so the reader sees
+    either the old JSON or the new one and never a torn one.
+
+    The temp file is a dotfile sibling, so the tree scanners, the content
+    fingerprint, and `_is_sidecar` all skip it even in the crash window
+    where one survives."""
     meta = dict(meta)
     meta["name"] = name
     meta["updated_at"] = _now_iso()
     p = _meta_path(name)
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+    tmp = p.with_name(f"{META_NAME}.{os.getpid()}.tmp")
+    tmp.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+    os.replace(tmp, p)
 
 
 # ---------------------------------------------------------------------------

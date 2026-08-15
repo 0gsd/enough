@@ -1447,19 +1447,21 @@ def create_app(
 
     @app.get("/api/reveal", response_class=HTMLResponse)
     async def api_reveal(path: str = Query(...)) -> HTMLResponse:
-        """Pop open Finder (macOS) at the given path. Used by the agent
-        to drop clickable links into chat completions — e.g. "your new
-        skill lives here: [Open in Finder](/api/reveal?path=rness/skills/foo)".
+        """Pop open the platform file manager at the given path — Finder
+        via `open -R` on macOS, whatever `xdg-open` resolves to on Linux.
+        Used by the agent to drop clickable links into chat completions —
+        e.g. "your new skill lives here:
+        [Open in Finder](/api/reveal?path=rness/skills/foo)".
 
         Path-safety rules mirror `read_file`: project-relative paths are
         always OK; absolute (or `~`-prefixed) paths must resolve under
         the read-allowlist from `rness/policies/allowlists.md` (which
         transparently includes file-rw prefixes too)."""
-        if sys.platform != "darwin":
+        if not (sys.platform == "darwin" or sys.platform.startswith("linux")):
             raise HTTPException(
                 501,
-                "Open-in-Finder is macOS-only. (`/api/reveal` shells out to "
-                "the macOS `open` command.)",
+                f"reveal-in-file-manager needs macOS (`open -R`) or Linux "
+                f"(`xdg-open`); this machine reports {sys.platform!r}.",
             )
         raw = path.strip()
         if not raw:
@@ -1494,15 +1496,34 @@ def create_app(
                 raise HTTPException(400, "path escapes project root")
         if not target.exists():
             raise HTTPException(404, f"not found: {target}")
-        # `open` opens files in the default app and reveals folders in
-        # Finder. Use `-R` to highlight a file in its parent folder
-        # rather than opening it directly (more useful for "go check
-        # out this newly-created file" cases).
-        cmd = ["/usr/bin/open"]
-        if target.is_file():
-            cmd.extend(["-R", str(target)])
+        if sys.platform == "darwin":
+            # `open` opens files in the default app and reveals folders in
+            # Finder. Use `-R` to highlight a file in its parent folder
+            # rather than opening it directly (more useful for "go check
+            # out this newly-created file" cases).
+            manager = "Finder"
+            cmd = ["/usr/bin/open"]
+            if target.is_file():
+                cmd.extend(["-R", str(target)])
+            else:
+                cmd.append(str(target))
         else:
-            cmd.append(str(target))
+            import shutil as _shutil
+            xdg = _shutil.which("xdg-open")
+            if not xdg:
+                raise HTTPException(
+                    501,
+                    "xdg-open isn't installed, so there's no way to ask this "
+                    "desktop to open a folder. `sudo apt install xdg-utils` "
+                    "(Debian/Ubuntu) or `sudo dnf install xdg-utils` (Fedora).",
+                )
+            # xdg-open has no `-R` equivalent — there is no cross-desktop
+            # "select this file in its folder" verb. Opening a file would
+            # launch it in its default application, which is emphatically
+            # not what "reveal" means, so a file reveals as its PARENT
+            # folder. Same intent, one click of divergence from macOS.
+            manager = "your file manager"
+            cmd = [xdg, str(target if target.is_dir() else target.parent)]
         try:
             subprocess.Popen(cmd)
         except OSError as e:
@@ -1511,10 +1532,10 @@ def create_app(
         # blank tab behind. Falls back to a manual close-this-tab note.
         return HTMLResponse(
             "<!doctype html><meta charset=utf-8>"
-            "<title>Opened in Finder</title>"
+            f"<title>Opened in {_escape_html(manager)}</title>"
             "<style>body{font-family:system-ui;padding:24px;color:#555}</style>"
             "<p>Opened <code>" + _escape_html(str(target)) + "</code> "
-            "in Finder. You can close this tab.</p>"
+            f"in {_escape_html(manager)}. You can close this tab.</p>"
             "<script>setTimeout(()=>window.close(), 200)</script>"
         )
 
@@ -3271,10 +3292,19 @@ def create_app(
 
         whisper_bin = _shutil.which("whisper-cli")
         if not whisper_bin:
+            from . import models as _m
             raise HTTPException(
                 503,
-                "whisper-cli not found on PATH. install it with `brew install whisper-cpp` "
-                "or re-run bootstrap.sh.",
+                "whisper-cli not found on PATH. "
+                + _m.install_hint(
+                    mac="install it with `brew install whisper-cpp` or re-run bootstrap.sh.",
+                    linux=(
+                        "no distro packages whisper.cpp yet — build it from "
+                        "https://github.com/ggml-org/whisper.cpp and put "
+                        "`whisper-cli` on your PATH. Voice input is optional; "
+                        "everything else works without it."
+                    ),
+                ),
             )
         model_path = WHISPER_DIR / WHISPER_DEFAULT_MODEL
         if not model_path.is_file():

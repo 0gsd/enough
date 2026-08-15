@@ -34,10 +34,12 @@ they will say so; default is both.
 Proofread mode is backed by **Harper** (<https://writewithharper.com>), a
 local, privacy-first grammar/spell checker by Automattic — Apache 2.0, no
 network calls, no AI. It runs in milliseconds per file and emits a precise,
-rule-named list of findings. The `bootstrap.sh` installer puts it on PATH
-via `brew install harper`, which provides two binaries: **`harper-cli`**
-(the one this mode uses) and `harper-ls` (a language server for editors,
-unused here).
+rule-named list of findings. It provides two binaries: **`harper-cli`** (the
+one this mode uses) and `harper-ls` (a language server for editors, unused
+here). On macOS `bootstrap.sh` puts it on PATH via `brew install harper`; on
+Linux no distro packages it, so `bootstrap.sh` lists it as an optional extra
+and the user installs it from Automattic's releases or with
+`cargo install harper-cli`. Either way its absence is handled — see below.
 
 **Use Harper to drive the mechanical-fixes pass.** It catches more than a
 sweep of the eye on long manuscripts and gives every finding a stable rule

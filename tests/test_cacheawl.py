@@ -312,3 +312,57 @@ def test_build_mirror_subpath_validation(caroot: Path):
     # Empty / root subpath is valid and equals the box root.
     _text, nmap = ca.build_mirror("box", "")
     assert nmap["root"]["path"] == ""
+
+
+# --------------------------------------------------------------------------
+# save_meta atomicity — the phantom-"complete" race
+# --------------------------------------------------------------------------
+
+def test_save_meta_is_atomic_under_concurrent_reads(caroot: Path):
+    """A reader must never observe a torn `.cachebox.json`.
+
+    This is the mechanism behind the long-standing
+    `test_ingest_path_via_endpoint` flake: `run_ingest` writes metadata from
+    a worker thread while `GET /api/cacheawl/ingest-status` reads it from
+    the request thread. A non-atomic truncate-then-write let the reader hit
+    a JSONDecodeError, and `load_meta`'s documented fallback is
+    `_default_meta()` — whose status is "complete". The poller then saw a
+    phantom "complete" mid-copy and asserted against an empty box.
+
+    Writer only ever writes "ingesting"; if the reader ever sees anything
+    else, it read something that was never on disk as a whole."""
+    import threading
+
+    ca.create_cachebox("racy")
+    meta = ca.load_meta("racy")
+    meta["status"] = "ingesting"
+    # Long, varying payload so a torn write would span multiple filesystem
+    # blocks and be trivially detectable.
+    meta["ingest"] = {"phase": "copying", "files_written": 0, "error": None,
+                      "pad": "x" * 8192}
+    # Land "ingesting" on disk BEFORE the reader starts — a fresh box is
+    # legitimately "complete", and reading that would prove nothing.
+    ca.save_meta("racy", meta)
+
+    stop = threading.Event()
+    seen: list[str] = []
+
+    def writer() -> None:
+        for i in range(400):
+            meta["ingest"]["files_written"] = i
+            ca.save_meta("racy", meta)
+        stop.set()
+
+    def reader() -> None:
+        while not stop.is_set():
+            seen.append(ca.ingest_status("racy")["status"])
+
+    t = threading.Thread(target=writer)
+    r = threading.Thread(target=reader)
+    t.start(); r.start()
+    t.join(); r.join()
+
+    assert seen, "reader never got a look in"
+    assert set(seen) == {"ingesting"}, f"torn read surfaced {set(seen)}"
+    # And no temp file survives a clean run.
+    assert list(ca.box_dir("racy").glob(f"{ca.META_NAME}.*.tmp")) == []

@@ -19,11 +19,13 @@ much RAM they want, and a RAM-aware context-window recommender.
 Also exposes a small CLI:
     python -m enough.models params [--cute NAME]
     python -m enough.models resolve-path [--cute NAME]
+    python -m enough.models llama-server-path
     python -m enough.models install-menu [--json]
 
-…the first two of which `llama_server.sh` uses to turn a cute name into a
-concrete model path + context window; the third is what `bootstrap.sh`
-and the in-app model manager render as a per-model install picker.
+…the first three of which `llama_server.sh` uses to turn a cute name into a
+concrete model path + context window and to locate the binary that will
+load it; the fourth is what `bootstrap.sh` and the in-app model manager
+render as a per-model install picker.
 """
 
 from __future__ import annotations
@@ -326,6 +328,41 @@ def spec_args(model_entry: dict) -> str:
 LLAMA_SERVER_ENV = "ENOUGH_LLAMA_SERVER"
 
 
+def install_hint(*, mac: str, linux: str, other: str = "") -> str:
+    """Pick the per-platform "how do I get this" clause for an absence
+    message. macOS is Homebrew; Linux is apt/dnf (Ubuntu 24.04 primary,
+    Fedora secondary — docs/linux-plan.md §3.3) or, for llama.cpp
+    specifically, the pinned prebuilt release bootstrap.sh drops in
+    `~/enough/bin/`. Anything else falls back to the macOS wording, which
+    at least names the thing to install.
+
+    One helper rather than `sys.platform` branches sprinkled through the
+    error copy: absence messages are the whole degrade-gracefully story,
+    and telling a Fedora user to run `brew` is the same as telling them
+    nothing."""
+    if sys.platform == "darwin":
+        return mac
+    if sys.platform.startswith("linux"):
+        return linux
+    return other or mac
+
+
+LLAMA_CPP_UPGRADE_HINT = dict(
+    mac="run `brew upgrade llama.cpp`, then try again.",
+    linux=(
+        "re-run ~/enough/bootstrap.sh — it installs a pinned llama.cpp "
+        "release into ~/enough/bin/, which outranks anything on PATH."
+    ),
+)
+LLAMA_CPP_INSTALL_HINT = dict(
+    mac="install it with `brew install llama.cpp`",
+    linux=(
+        "run ~/enough/bootstrap.sh, which installs a pinned llama.cpp "
+        "release into ~/enough/bin/"
+    ),
+)
+
+
 def _enough_bin_dir() -> Path:
     """`~/enough/bin` — where the Linux installer drops the prebuilt
     llama.cpp release (docs/linux-plan.md §3.2). Derived from `Path.home()`,
@@ -414,7 +451,7 @@ def release_gate(info: dict, binary: str | None = None) -> str | None:
     return (
         f"{info.get('label') or info.get('cute') or 'this model'} needs "
         f"llama.cpp b{need} or newer ({got}). "
-        "run `brew upgrade llama.cpp`, then try again."
+        + install_hint(**LLAMA_CPP_UPGRADE_HINT)
     )
 
 
@@ -535,6 +572,24 @@ def _cli_params(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cli_llama_server_path(_args: argparse.Namespace) -> int:
+    """Print the resolved llama-server path. `llama_server.sh` asks through
+    this rather than running its own `command -v llama-server`, so the shell
+    launcher and the supervisor can never disagree about which build is
+    "the" llama.cpp — which matters most exactly where they'd differ, on
+    Linux, where the pinned release lives in ~/enough/bin and not on PATH."""
+    binary = find_llama_server()
+    if not binary:
+        print(
+            "llama-server not found "
+            f"(${LLAMA_SERVER_ENV} → ~/enough/bin/llama-server → PATH)",
+            file=sys.stderr,
+        )
+        return 2
+    print(binary)
+    return 0
+
+
 def _cli_resolve_path(args: argparse.Namespace) -> int:
     info = resolve(args.cute)
     if not info["installed"]:
@@ -594,6 +649,12 @@ def main(argv: list[str] | None = None) -> int:
     p = sub.add_parser("resolve-path", help="print the gguf path only")
     p.add_argument("--cute", default=None)
     p.set_defaults(fn=_cli_resolve_path)
+
+    p = sub.add_parser(
+        "llama-server-path",
+        help="print the resolved llama-server binary (env → ~/enough/bin → PATH)",
+    )
+    p.set_defaults(fn=_cli_llama_server_path)
 
     p = sub.add_parser("list", help="list all registered models + install state")
     p.set_defaults(fn=_cli_list)

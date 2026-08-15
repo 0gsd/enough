@@ -1,0 +1,95 @@
+# enough — continuous integration.
+#
+# The Linux port's definition of done (docs/linux-plan.md §3.4): "works on
+# Linux" is a durable check, not a one-time test. The ubuntu job is the
+# point; macOS rides along because the repo is macOS-first and a matrix
+# entry is free.
+#
+# Three things run on both platforms:
+#   1. `bash -n` over the two shipped shell scripts. On macOS that is bash
+#      3.2, which is exactly the compatibility floor bootstrap.sh has to
+#      hold — so the macOS job is the bash-3.2 linter, for free.
+#   2. the pytest suite.
+#   3. scripts/smoke_boot.py — a real `python -m enough` against a scratch
+#      project with every ENOUGH_* seam and $HOME redirected into a temp
+#      dir, asserting the app boots, serves /api/project, reports seven
+#      models with feasibility verdicts, degrades gracefully with no
+#      llama-server present, and shuts down cleanly. Run it locally the
+#      same way: `uv run python scripts/smoke_boot.py`.
+#
+# Deliberately NOT here: anything needing model weights, llama.cpp, a GPU,
+# or a network hop beyond PyPI. Those belong in the VM pass before any
+# public Linux claim.
+
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Read-only. Nothing in this workflow publishes, comments, or pushes.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Pin the interpreter rather than inheriting whatever the runner image
+  # ships this month. 3.12 has manylinux/macos wheels for every native
+  # dependency in uv.lock (libzim, ctranslate2, sentencepiece).
+  UV_PYTHON: "3.12"
+  UV_NO_PROGRESS: "1"
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      # Actions are pinned by commit SHA, not by moving tag — same posture
+      # as pyproject's `exclude-newer` cooldown and desktop/fetch-sidecars.sh's
+      # checksums. Bumping one means bumping the SHA next to the comment.
+      - name: checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+
+      - name: shell syntax (bash 3.2 floor on macOS)
+        run: |
+          bash --version | head -1
+          bash -n bootstrap.sh
+          bash -n llama_server.sh
+
+      # --frozen: install exactly what uv.lock pins, never re-resolve.
+      # The lockfile is the vetted set; CI is not a place to discover a
+      # new transitive dependency.
+      - name: uv sync
+        run: uv sync --frozen
+
+      - name: pytest
+        run: uv run pytest -q
+
+      - name: headless boot smoke
+        run: uv run python scripts/smoke_boot.py
+
+      # Runs the real bootstrap.sh with `uname`, `curl`, `git`, `uv`, `brew`
+      # and the checksum tools shimmed, so nothing is downloaded or
+      # installed. Seven scenarios: the arch/Vulkan decision table, the
+      # checksum-mismatch abort, the missing-prerequisite message, an
+      # idempotent re-run — and one that pins the macOS path to the same
+      # ten steps it has always had. Host-independent (uname is a shim) and
+      # bash-3.2 clean, so both jobs run it.
+      - name: bootstrap.sh install harness
+        run: bash tests/bootstrap_linux_harness.sh

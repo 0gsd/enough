@@ -16,7 +16,7 @@ guidance lives in `references/` and is loaded only when a mode fires.
 | Mode        | What it does                                                                                                                  | Reference to load                |
 |-------------|-------------------------------------------------------------------------------------------------------------------------------|----------------------------------|
 | `summarize` | One-page even-handed digest of any text — author motivation, biases, intended audience, tone/lexicon, the point, key quotes.  | `references/summarize.md`        |
-| `proofread` | Full-document copy-editing pass (typos/spelling) driven by Harper (`brew install harper`), with a separate proof report covering suggestions and repeated-phrase notes. | `references/proofread.md`        |
+| `proofread` | Full-document copy-editing pass (typos/spelling) driven by Harper (optional; see `references/proofread.md`), with a separate proof report covering suggestions and repeated-phrase notes. | `references/proofread.md`        |
 | `decide`    | Three archetypes from the roster below debate the user's question; output is a recommendation plus the full debate.           | `references/decide.md`           |
 
 ---

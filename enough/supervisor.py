@@ -22,6 +22,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import re
 import signal
 import subprocess
 import time
@@ -165,9 +166,10 @@ class LlamaSupervisor:
         if not binary:
             raise RuntimeError(
                 "llama-server not found. enough looks at $ENOUGH_LLAMA_SERVER, "
-                "then ~/enough/bin/llama-server, then PATH. install it with "
-                "`brew install llama.cpp`, or drop a prebuilt llama.cpp release "
-                "binary into ~/enough/bin/."
+                "then ~/enough/bin/llama-server, then PATH. "
+                + _models.install_hint(**_models.LLAMA_CPP_INSTALL_HINT)
+                + ", or drop a prebuilt llama.cpp release binary into "
+                "~/enough/bin/."
             )
         # Hard gate: a llama.cpp older than the model's architecture would
         # fail deep inside the loader with an opaque tensor error. Say what
@@ -205,8 +207,9 @@ class LlamaSupervisor:
             else:
                 log.info(
                     "model %s has MTP heads but llama.cpp predates b%s — "
-                    "starting without speculative decoding (brew upgrade llama.cpp)",
+                    "starting without speculative decoding (%s)",
                     cute, info["spec_min_release"],
+                    _models.install_hint(**_models.LLAMA_CPP_UPGRADE_HINT),
                 )
         cmd += spec + _models.draft_flags(info, binary)
         log.info("launching llama-server: %s", " ".join(cmd))
@@ -350,8 +353,20 @@ def _pid_alive(pid: int) -> bool:
 
 
 def _find_pid_on_port(port: int) -> int | None:
-    """macOS: lsof -iTCP:<port> -sTCP:LISTEN -t. Also checks our state
-    dir's pidfile for the common case of script-launched llama-server."""
+    """Who is listening on `port`? Three probes, cheapest first:
+
+    1. our own pidfile (`~/enough/.llama-server/server.pid`) — the common
+       case (a script- or supervisor-launched llama-server), and the only
+       one that needs no external tool at all;
+    2. `lsof -iTCP:<port> -sTCP:LISTEN -t` — always present on macOS,
+       usually packaged on Linux;
+    3. `ss -ltnp` — iproute2, effectively universal on modern Linux
+       including the minimal containers that ship no lsof (Ubuntu 24.04
+       has no lsof by default; it has ss). macOS has no `ss`, so on a Mac
+       this rung is simply a FileNotFoundError and we return None.
+
+    None when nothing answers — which the caller treats as "adopted, pid
+    unknown", not as an error."""
     pidfile = Path.home() / "enough" / ".llama-server" / "server.pid"
     if pidfile.is_file():
         try:
@@ -360,17 +375,56 @@ def _find_pid_on_port(port: int) -> int | None:
                 return pid
         except (OSError, ValueError):
             pass
+    return _pid_via_lsof(port) or _pid_via_ss(port)
+
+
+def _pid_via_lsof(port: int) -> int | None:
     try:
         out = subprocess.check_output(
             ["lsof", "-iTCP:%d" % port, "-sTCP:LISTEN", "-t"],
-            text=True, stderr=subprocess.DEVNULL,
+            text=True, stderr=subprocess.DEVNULL, timeout=10,
         )
-        for line in out.splitlines():
-            line = line.strip()
-            if line.isdigit():
-                return int(line)
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        pass
+    except (subprocess.SubprocessError, OSError):
+        return None
+    for line in out.splitlines():
+        line = line.strip()
+        if line.isdigit():
+            return int(line)
+    return None
+
+
+_SS_PID_RE = re.compile(r"\bpid=(\d+)")
+
+
+def _pid_via_ss(port: int) -> int | None:
+    """Parse `ss -ltnp`. Columns are
+    `State Recv-Q Send-Q Local-Address:Port Peer-Address:Port Process`,
+    and the process column reads
+    `users:(("llama-server",pid=1234,fd=12))`. `ss` only names the owning
+    process for processes the caller owns — which is exactly the
+    llama-server-we-might-adopt case, so no sudo dance.
+
+    No `sport = :N` filter expression: the syntax differs across iproute2
+    versions and quoting it through argv is its own small trap. Listing
+    every listener and matching the port in Python is boring and works
+    everywhere."""
+    try:
+        out = subprocess.check_output(
+            ["ss", "-ltnp"], text=True, stderr=subprocess.DEVNULL, timeout=10,
+        )
+    except (subprocess.SubprocessError, OSError):
+        return None
+    want = str(port)
+    for line in out.splitlines():
+        fields = line.split()
+        if len(fields) < 4 or fields[0].upper() != "LISTEN":
+            continue
+        # Local Address:Port — "127.0.0.1:8080", "*:8080", "[::]:8080".
+        if fields[3].rsplit(":", 1)[-1] != want:
+            continue
+        m = _SS_PID_RE.search(line)
+        if m:
+            return int(m.group(1))
     return None
 
 

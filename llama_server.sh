@@ -7,8 +7,15 @@
 #             g40-26 / q36-27 / q38-04 / q38-16). If empty, resolves via
 #             ~/enough/config/models.json (the 'current' model selected by
 #             the user / installer). Some models declare a minimum llama.cpp
-#             b-release and refuse to launch below it — `brew upgrade
-#             llama.cpp` is the fix, and the error says so.
+#             b-release and refuse to launch below it; the error names the
+#             per-platform fix (brew on macOS, bootstrap.sh on Linux).
+#
+# The llama-server binary is located by enough.models.find_llama_server()
+# — $ENOUGH_LLAMA_SERVER → ~/enough/bin/llama-server → PATH — not by a
+# `command -v` here, so this script and the Python supervisor can never
+# disagree about which build is "the" llama.cpp. That matters most on
+# Linux, where bootstrap.sh's pinned release lives in ~/enough/bin and is
+# deliberately not on PATH (docs/linux-plan.md §3.2).
 #   HOST      bind address                   (default: 127.0.0.1)
 #   PORT      server port                    (default: 8080)
 #   NGL       GPU layers to offload          (default: 99 = all, Apple Metal)
@@ -80,10 +87,41 @@ resolve_model() {
   fi
 }
 
+# Resolved once by resolve_llama_server(); empty until then.
+LLAMA_BIN=""
+
+resolve_llama_server() {
+  # ONE lookup order for three platforms, owned by
+  # enough.models.find_llama_server(): $ENOUGH_LLAMA_SERVER →
+  # ~/enough/bin/llama-server → PATH. Reached through `uv run` because
+  # that's how every other registry question in this script is answered.
+  # Without uv we fall back to a bare PATH lookup — which is precisely the
+  # macOS/brew case, the only one where PATH alone was ever right.
+  [[ -n "$LLAMA_BIN" ]] && return 0
+  if command -v uv >/dev/null 2>&1; then
+    LLAMA_BIN="$(uv run --project "$ENOUGH_HOME" python -m enough.models llama-server-path 2>/dev/null || true)"
+  fi
+  if [[ -z "$LLAMA_BIN" ]]; then
+    LLAMA_BIN="$(command -v llama-server 2>/dev/null || true)"
+  fi
+  [[ -n "$LLAMA_BIN" ]]
+}
+
+upgrade_hint() {
+  # Per-platform "how do I get a newer llama.cpp". macOS is brew; Linux is
+  # the pinned prebuilt release bootstrap.sh drops into ~/enough/bin/.
+  if [[ "$(uname)" == "Darwin" ]]; then
+    echo "brew upgrade llama.cpp"
+  else
+    echo "re-run ~/enough/bootstrap.sh (it refreshes ~/enough/bin/llama-server)"
+  fi
+}
+
 llama_release() {
   # The numeric b-release of the installed llama.cpp, e.g. "9200".
-  # Empty if unparseable (treat as too old).
-  llama-server --version 2>&1 | sed -n 's/^version: \([0-9][0-9]*\).*/\1/p' | head -n 1
+  # Empty if unparseable or absent (treat as too old).
+  resolve_llama_server || return 0
+  "$LLAMA_BIN" --version 2>&1 | sed -n 's/^version: \([0-9][0-9]*\).*/\1/p' | head -n 1
 }
 
 check_min_release() {
@@ -94,11 +132,11 @@ check_min_release() {
   [[ "${MIN_RELEASE:-0}" -gt 0 ]] || return 0
   local rel have
   rel="$(llama_release)"
-  have="no llama.cpp on PATH"
+  have="no llama.cpp found"
   [[ -n "$rel" ]] && have="b$rel"
   if [[ -z "$rel" || "$rel" -lt "$MIN_RELEASE" ]]; then
     echo "error: ${MODEL_LABEL:-this model} needs llama.cpp b$MIN_RELEASE or newer ($have)." >&2
-    echo "       run: brew upgrade llama.cpp" >&2
+    echo "       fix: $(upgrade_hint)" >&2
     return 1
   fi
   return 0
@@ -130,7 +168,7 @@ resolve_spec_flags() {
     fi
   else
     echo "note: llama.cpp release ${rel:-unknown} < $SPEC_MIN_RELEASE — starting without MTP" >&2
-    echo "      (brew upgrade llama.cpp to enable speculative decoding)" >&2
+    echo "      ($(upgrade_hint) to enable speculative decoding)" >&2
   fi
 }
 
@@ -148,8 +186,15 @@ start() {
     echo "already running (pid $(cat "$PID_FILE")) on $HOST:$PORT"
     return 0
   fi
-  if ! command -v llama-server >/dev/null 2>&1; then
-    echo "error: llama-server not found. install with: brew install llama.cpp" >&2
+  if ! resolve_llama_server; then
+    echo "error: llama-server not found. enough looks at \$ENOUGH_LLAMA_SERVER," >&2
+    echo "       then ~/enough/bin/llama-server, then PATH." >&2
+    if [[ "$(uname)" == "Darwin" ]]; then
+      echo "       install it with: brew install llama.cpp" >&2
+    else
+      echo "       run ~/enough/bootstrap.sh — it installs a pinned llama.cpp" >&2
+      echo "       release into ~/enough/bin/." >&2
+    fi
     return 1
   fi
   if ! resolve_model "$MODEL"; then
@@ -176,7 +221,7 @@ start() {
   # the bash-3.2-safe empty-array idiom (plain "${a[@]}" is an unbound
   # variable there under `set -u`).
   # shellcheck disable=SC2086
-  nohup llama-server \
+  nohup "$LLAMA_BIN" \
     -m "$MODEL_PATH" \
     --host "$HOST" --port "$PORT" \
     -ngl "$NGL" -c "$ctx_to_use" --parallel "$PARALLEL" --jinja \

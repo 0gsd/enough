@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.1.6)
+# enough — Agent Guide (v0.2.0)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -117,6 +117,73 @@ symlinks its `rness/` skeleton into the .app**, the same way a CLI project
 symlinks into `~/enough/defaults`. Full decision record: the
 "Milestone 2a landed" and "Milestone 2b landed" blocks in
 docs/tauri-plan.md (local planning doc, untracked).
+
+---
+
+## Platforms, and CI
+
+enough runs on **macOS** (where it grew up) and **Linux** (backend port
+landed 0.2.0, proven by CI, not yet claimed in the user-facing manual —
+see the "Phase 3 landed" block in docs/linux-plan.md, a local planning
+doc, untracked). The platform-specific surface is deliberately tiny and
+enumerated here:
+
+| Seam | File | Shape |
+|---|---|---|
+| llama-server lookup | [enough/models.py](../enough/models.py) `find_llama_server()` | `$ENOUGH_LLAMA_SERVER` → `~/enough/bin/llama-server` → PATH. Three installers depend on the order — see "What NOT to touch" |
+| llama-server lookup, from shell | `python -m enough.models llama-server-path` | `llama_server.sh` asks through this CLI verb instead of running its own `command -v llama-server`, so the shell launcher can't disagree with the supervisor. Falls back to a bare PATH lookup only when `uv` is absent |
+| absence-message wording | `models.install_hint(mac=…, linux=…)` + `LLAMA_CPP_{INSTALL,UPGRADE}_HINT` | the ONE place "how do I install this" branches. Used by `release_gate()`, `supervisor._launch`, `/api/transcribe`. Don't inline a new `sys.platform` check — add a call |
+| who's on my port | [enough/supervisor.py](../enough/supervisor.py) `_find_pid_on_port()` | pidfile → `lsof` → `ss -ltnp` (Ubuntu 24.04 ships `ss` and no `lsof`) |
+| reveal in file manager | [enough/server.py](../enough/server.py) `/api/reveal` | `open -R` (darwin) / `xdg-open` (linux) / 501. On Linux a **file** reveals as its parent folder — `xdg-open` has no `-R`, and opening the file would *launch* it |
+| total RAM | `models.total_ram_gb()` | `sysctl hw.memsize` then `/proc/meminfo` (`models.MEMINFO`, monkeypatchable) |
+| keyring | [enough/cloud.py](../enough/cloud.py) | Keychain / Secret Service / Credential Manager — the `keyring` library already handles it, and the error copy already names all three |
+| installer | [bootstrap.sh](../bootstrap.sh) | `uname` → `platform_darwin`/`platform_linux` + `deps_darwin`/`deps_linux` function groups. Step numbers auto-increment (`STEP_N`) so the preludes can differ; both platforms land on ten. macOS = brew; Linux = a checksum-pinned llama.cpp release archive into `~/enough/bin/` and optional extras *printed*, never installed |
+
+**CI: [.github/workflows/ci.yml](../.github/workflows/ci.yml).** One `test`
+job on `[ubuntu-latest, macos-latest]`, triggered by push to `main` and
+every pull request. Steps: checkout → setup-uv → `bash -n bootstrap.sh
+llama_server.sh` → `uv sync --frozen` → `uv run pytest -q` → the boot
+smoke → the bootstrap harness. Actions are pinned by commit SHA (bumping
+one means bumping the SHA and its comment); `UV_PYTHON` is pinned to
+3.12; `--frozen` means CI never re-resolves the lockfile. `bash -n` runs
+on macOS too **on purpose**: macOS bash is 3.2, which is bootstrap.sh's
+compatibility floor, so that job is the bash-3.2 linter for free.
+
+Two of those steps are scripts you can and should run locally:
+
+```bash
+uv run python scripts/smoke_boot.py     # ~1.4s, 17 assertions
+bash tests/bootstrap_linux_harness.sh   # ~5s, 66 assertions (-v to watch)
+```
+
+- **[scripts/smoke_boot.py](../scripts/smoke_boot.py)** boots a real
+  `python -m enough` subprocess against a scratch project and asserts:
+  `/api/project` answers, the `rness/` skeleton got built, `GET /` serves
+  the UI, `/api/models` lists 7 models each with a feasibility verdict,
+  `total_ram_gb > 0`, `/api/llm-status` degrades gracefully (200,
+  `ready: False`) with no llama-server anywhere, and `POST /api/shutdown`
+  403s without the desktop token / 200s with it / exits within 30s. It
+  redirects **every** `ENOUGH_*` seam *and `$HOME`* into a temp dir (the
+  `$HOME` half is not optional — `broker.json`, `openrouter.json`,
+  `orchestrator.json` and `~/enough/.llama-server/server.pid` have no env
+  hook), and picks a free port for `--llm-url` so it can never adopt or
+  kill the developer's real llama-server on 8080. Copy its `build_env()`
+  when you need a scratch server of your own.
+- **[tests/bootstrap_linux_harness.sh](../tests/bootstrap_linux_harness.sh)**
+  runs the *real* bootstrap.sh with `uname`, `curl`, `git`, `uv`, `brew`,
+  `ldconfig` and the checksum tools shimmed — seven scenarios covering the
+  arch/Vulkan decision, the checksum-mismatch abort, a missing
+  prerequisite, an idempotent re-run, and (scenario G) a **macOS
+  no-regression check** pinning the ten step labels and the six brew
+  formulae. Nothing is downloaded or installed. If you touch bootstrap.sh,
+  run this.
+
+**A clean `POST /api/shutdown` exits with wait status `-SIGTERM`, not 0.**
+`server.request_process_exit()` SIGTERMs the process; uvicorn's
+`capture_signals` re-raises the captured signal after the graceful
+shutdown completes and default handlers are restored. Both are clean; a
+non-zero *exit* code is not. Anything that reads the child's status needs
+to accept both.
 
 ---
 
@@ -1201,6 +1268,12 @@ A list of things that will confuse you if you don't see them coming:
   onto a local stub server, keyed by local gguf_filename) — all
   pointed at `tmp_path`; **never run against real `~/enough` state.** The
   rest of the web layer is exercised via TestClient against `create_app()`.
+  **The `ENOUGH_*` list is not sufficient on its own**: `broker.json`,
+  `openrouter.json`, `orchestrator.json`, `~/enough/.llama-server/server.pid`
+  and `~/enough/bin/` are plain `Path.home()` reads with no hook, so a
+  suite (or a scratch server) that touches any of them must also
+  `monkeypatch.setenv("HOME", …)`. `tests/test_llama_server_lookup.py`,
+  `tests/test_platform_linux.py` and `scripts/smoke_boot.py` all do.
 - **The `ENOUGH_DESKTOP*` vars are NOT scratch-isolation hooks** — they
   are the desktop shell's capability gate, set by the shell when it
   spawns a backend. `ENOUGH_DESKTOP=1` enables `POST /api/shutdown` (the
@@ -1224,8 +1297,15 @@ A list of things that will confuse you if you don't see them coming:
   explicit `binary=` only when you already resolved one and want the
   version you gate on to be the version you run). Three installers depend
   on that order: the desktop app points rung 1 at its bundled sidecar, the
-  Linux installer owns rung 2, Homebrew is rung 3. Don't reintroduce a
-  bare `shutil.which("llama-server")` anywhere.
+  Linux installer owns rung 2 (`bootstrap.sh` unpacks a checksum-pinned
+  llama.cpp release archive into `~/enough/bin/` — `.so` files flat beside
+  the binary, because its only RPATH is `$ORIGIN` and the `libggml-cpu-*`
+  backends are `dlopen`'d from the same dir), Homebrew is rung 3. Don't
+  reintroduce a bare `shutil.which("llama-server")` anywhere — **including
+  in shell**: `llama_server.sh` asks
+  `python -m enough.models llama-server-path` rather than running its own
+  `command -v llama-server`, because on Linux the pinned build is
+  deliberately not on PATH and the two would have silently disagreed.
 
 ---
 
@@ -1313,15 +1393,29 @@ Plus external binaries installed by `bootstrap.sh` via Homebrew:
   for the silent-fix pass; absence is handled gracefully (skill falls
   back to LLM-only scanning).
 
+Plus, on Linux, the same roles filled differently (see "Platforms, and
+CI"): llama.cpp is a checksum-pinned prebuilt release in `~/enough/bin/`
+rather than a formula; pandoc and tor come from apt/dnf; whisper.cpp and
+harper have no distro package and are built from their own repos.
+`bootstrap.sh` prints those commands and installs none of them.
+
 A pytest suite lives in `tests/` (girraphs, project metadata, the cacheawl
-store + endpoints + `cacheawl:` scheme, the ui-config theme-key merge) —
-present in local checkouts but gitignored, so a fresh clone won't have
-it. Run `uv run pytest tests/ -q` when it's there. Everything else is
-smoke-tested via ad-hoc Python scripts that exercise the modules
-directly (sometimes via FastAPI's TestClient against `create_app()`).
-When making changes, run the relevant smoke flow before declaring done
-— examples are in git history under recent commits touching `cloud.py`,
-`tools.py`, and `server.py`.
+store + endpoints + `cacheawl:` scheme, the ui-config theme-key merge, the
+models registry/feasibility/downloads, the llama-server lookup, the desktop
+shutdown gate, the platform seams) — **tracked since the seven-models
+round**, so a fresh clone has it. Before declaring anything done:
+
+```bash
+uv run pytest -q                        # 231 tests
+uv run python scripts/smoke_boot.py     # real boot, scratch dir
+bash tests/bootstrap_linux_harness.sh   # only if you touched bootstrap.sh
+```
+
+CI runs exactly those three on ubuntu-latest and macos-latest. Anything
+not covered by them is smoke-tested via ad-hoc Python scripts that
+exercise the modules directly (sometimes via FastAPI's TestClient against
+`create_app()`) — examples are in git history under recent commits
+touching `cloud.py`, `tools.py`, and `server.py`.
 
 ---
 
