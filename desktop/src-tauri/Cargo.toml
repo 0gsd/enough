@@ -1,0 +1,28 @@
+[package]
+name = "enough-desktop"
+version = "0.2.0"
+description = "enough.app — the desktop shell"
+authors = ["enough"]
+license = "Apache-2.0"
+edition = "2021"
+rust-version = "1.77"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+# Only two third-party deps beyond Tauri itself: serde for desktop.json and
+# libc for signalling the backend's process group. HTTP to 127.0.0.1 is
+# hand-rolled in `http.rs` (plain HTTP/1.1, one origin, no TLS) rather than
+# pulling a client crate in for three requests.
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+libc = "0.2"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"

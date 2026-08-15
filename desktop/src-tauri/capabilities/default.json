@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Shell-owned windows only. The whole launch flow lives in Rust, so the shell's own pages call no Tauri APIs; and because no `remote` origins are listed here, the enough UI at http://127.0.0.1:<port> gets no IPC surface at all once the window navigates to it.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

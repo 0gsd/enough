@@ -1,6 +1,8 @@
+Hi, this is Graham, the creator of enough. This document -- except this part, I mean -- is written and maintained primarily by agents. I will almost certainly salt and pepper some Grahamisms in there once in a while, but the idea is to not let my own desire to write fun stuff get in the way of comprehensive documentation.
+
 # the enough help center
 
-> Everything you can do with enough, in one place. Written against enough **0.1.6**, including the July 2026 interface round (the mode stack, per-folder help bubbles, girraph→merirmaid mirrors). Where this document and the app in front of you disagree, the app is right and this document has a bug — corrections welcome at [enough.support](https://enough.support).
+> Everything you can do with enough, in one place. Written against enough **0.2.0**, including the August 2026 round (seven local models with feasibility-checked installs, and **enough.app** — the signed, notarized desktop application) and the July 2026 interface round (the mode stack, per-folder help bubbles, girraph→merirmaid mirrors). Where this document and the app in front of you disagree, the app is right and this document has a bug — corrections welcome at [enough.support](https://enough.support).
 
 enough is a personal language system that runs on your own machine. You point it at a folder, talk to it, and it helps you plan, write, review, research, and translate. The models are local by default. Your files stay yours. And nearly everything you'll see it do is defined in plain markdown files that you can open, read, and change.
 
@@ -18,14 +20,20 @@ Hold onto one idea while you read: **the built-in features in this manual are a 
 
 ### 1.2 Installing
 
-Clone the repository, then double-click `install-enough.command` inside the clone:
+Two doors, same house.
+
+**The app — the short way.** Download the `enough` DMG from the releases page, open it, drag **enough** into Applications, and launch. macOS will note that it's an app from the internet — it's signed and notarized, so this is the friendly blue dialog with an **Open** button, once, not a warning to fight past. A first-run guide takes it from there: it builds its own Python environment, shows you the model list with an honest verdict about what fits *this* machine (section 11.1), lists which optional extras you already have, and asks you to pick a project folder. Most of the wait is model download. No Terminal, no Homebrew, no git.
+
+The app carries its own inference engine and Python. The optional extras — voice input, webpage fetching, grammar checking, translation — are still separate programs; the guide's Extras page names each one, what turns off without it, and how to get it. Nothing is required, and nothing installs behind your back.
+
+**The terminal — the long way, with more levers.** Clone the repository, then double-click `install-enough.command` inside the clone:
 
 ```bash
 git clone https://github.com/0gsd/enough.git ~/Downloads/enough-seed
 open ~/Downloads/enough-seed
 ```
 
-The first time you double-click it, macOS Gatekeeper may balk at an "unidentified developer." Right-click the file and choose **Open** once; macOS remembers the trust from then on.
+The first time you double-click it, macOS Gatekeeper may balk at an "unidentified developer" — that caution is about the `.command` file, which isn't signed the way the app is. Right-click the file and choose **Open** once; macOS remembers the trust from then on.
 
 The launcher runs `bootstrap.sh`, a ten-step interactive installer that asks before each step and explains what it's about to do. Ctrl-C is safe at any point. Re-running is safe too — it checks state first and picks up where you left off. The steps, roughly:
 
@@ -34,7 +42,7 @@ The launcher runs `bootstrap.sh`, a ten-step interactive installer that asks bef
 3. Install the helper programs enough leans on: `llama.cpp` (local model inference), `whisper-cpp` (voice input), `tor` (anonymized web fetches), `pandoc` (webpage-to-markdown conversion), and `harper` (local grammar checking, used by the analyzer skill).
 4. Set up `~/enough/`, the global install directory.
 5. Prepare the Python environment (via `uv`).
-6. Download model weights. You pick an install tier here — the smallest model alone, or progressively larger sets. Section 11.1 describes the four models so you know what you're choosing.
+6. Download model weights. Every supported model is offered one at a time, each with its size and a feasibility check against your machine's memory and free disk — ✓ means comfortable, ~ means tight, ✗ means look elsewhere. Say yes to as many or as few as you like; section 11.1 describes them all, and anything you skip is a one-click install later.
 7. Place the voice-input (whisper) model.
 8. Place the offline-translation model, used by the `translator` skill.
 9. Put the `enough` command on your PATH.
@@ -44,7 +52,9 @@ Updating later: run `update-enough.command` from `~/enough/`, or type `/update-e
 
 ### 1.3 Launching
 
-enough runs per project folder. Open a terminal in any folder and run:
+**From the app:** double-click. You get a folder picker — any folder can become a project — and the interface opens in the app's own window. The **enough** menu holds one setting, **Reopen Last Project on Launch**, off by default: flip it on and the app skips the picker and resumes where you were. One window, one project at a time; quit and relaunch to move.
+
+**From the terminal:** enough runs per project folder. Open a terminal in any folder and run:
 
 ```bash
 enough
@@ -400,16 +410,23 @@ The model badge in the top bar opens the model window: which brain is answering 
 
 ### 11.1 Local models: overview and usage recommendations
 
-Four supported local models, each a one-click install if you skipped it at setup:
+Seven supported local models — and the window is now also where you install them. Each row you don't have yet shows its download size and a feasibility verdict computed against *this machine's* memory and free disk: ✓ comfortable, ~ tight, ✗ not recommended. Downloads run with a live progress bar, survive a quit (they resume where they stopped), and can be cancelled without losing the part you already have. Installed models switch with a click, and any model except the active one can be deleted from its row when you want the disk back.
 
 | cute name | model | disk | min RAM | notes |
 |---|---|---|---|---|
 | **G40-04** | Gemma 4 4B (E4B) | ~5.4 GB | 8 GB | the smallest; fits anywhere; the default |
 | **Q35-09** | Qwen3.5-9B | ~5.9 GB | 10 GB | balanced mid-size; MTP speculative decoding |
+| **G40-12** | Gemma 4 12B (QAT) | ~7.0 GB | 12 GB | quantization-aware trained; the 16 GB sweet spot |
 | **G40-26** | Gemma 4 26B MoE (4B active) | ~15.6 GB | 20 GB | big-model quality at mid-model speed |
-| **Q36-27** | Qwen3.6-27B dense | ~17.1 GB | 22 GB | the heavyweight; MTP; longest legs |
+| **Q36-27** | Qwen3.6-27B dense | ~17.1 GB | 22 GB | the seasoned heavyweight; MTP; long legs |
+| **Q38-04** | Qwen3.8 27B (4-bit) | ~19 GB + 1.7 draft | 24 GB | the newest Qwen; drafts its own speculation |
+| **Q38-16** | Qwen3.8 27B (16-bit) | ~54 GB + 3.2 draft | 64 GB | full precision, for the biggest Macs |
 
-Rules of thumb. On an 8–16 GB machine, live on G40-04 and treat Q35-09 as the upgrade once you have headroom. On 32 GB, Q35-09 is a comfortable daily driver with G40-26 for the harder synthesis work. On 64 GB, run Q36-27 or G40-26 as your default and stop thinking about it. Context windows scale with your RAM automatically — each model ships a sensible per-RAM-tier default, overridable in config — and the Qwen builds carry Multi-Token Prediction heads, which buy free extra speed via speculative decoding on recent llama.cpp builds.
+One naming wrinkle, so it never trips you: in the two Q38 names, the number after the dash is the **quantization width**, not the parameter count — Q38-04 and Q38-16 are the *same* 27-billion-parameter model, at 4-bit and 16-bit precision. (G40-04, from the older convention, really is a 4-billion-parameter model.) The labels in the window spell this out so the cute names never have to.
+
+Rules of thumb. On an 8–16 GB machine, live on G40-04, and make G40-12 the upgrade once you have headroom — quantization-aware training gives it unusually clean output for its size. On 32 GB, G40-12 or Q35-09 is a comfortable daily driver, with G40-26 or Q38-04 for the harder synthesis work. On 64 GB and up, Q38-04 or Q36-27 as your default and stop thinking about it. Q38-16 is its own category: the full-precision heavyweight for machines with serious unified memory and ~57 GB of disk to spare — if you have a Mac Studio and want the ceiling, this is the ceiling. Context windows scale with your RAM automatically — each model ships a sensible per-RAM-tier default, overridable in config — and the Qwen builds carry Multi-Token Prediction for free extra speed: built into the model file for Q35/Q36, and via a small companion "draft" file for the Q38 pair, which downloads alongside automatically.
+
+One more note for terminal installs: a model can be *downloaded* on any llama.cpp but *run* only on a recent enough build. If yours is too old for a newer model, the window says so and names the fix (`brew upgrade llama.cpp`). App installs never see that note — the app ships its own inference engine.
 
 Switching models restarts the local inference server and clears the in-memory conversation. Your files, logs, and request state all persist; a switch costs you chat scrollback, not work.
 

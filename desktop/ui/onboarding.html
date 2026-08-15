@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>enough — first run</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  /* Same black field and muted palette as loading.html — the wizard is the
+     shell's second (and last) page, not a different product. Nothing here is
+     shared with enough/static/index.html; the app UI takes over the window
+     the moment onboarding hands off to the §2 launch flow. */
+  :root {
+    --ink:      #d8d4d6;
+    --ink-dim:  #747072;
+    --ink-far:  #4a4749;
+    --rule:     #262426;
+    --raise:    #131113;
+    --ok:       #7fa87f;
+    --bad:      #b98080;
+  }
+  html, body { margin: 0; height: 100%; background: #000; }
+  body {
+    color: var(--ink);
+    font: 400 15px/1.55 ui-sans-serif, -apple-system, system-ui, sans-serif;
+    -webkit-user-select: none; user-select: none; cursor: default;
+    display: flex; flex-direction: column; height: 100%;
+  }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+
+  header { padding: 26px 34px 0; }
+  #steps { display: flex; gap: 8px; list-style: none; margin: 0; padding: 0; }
+  #steps li {
+    flex: 1; height: 3px; border-radius: 2px; background: var(--rule);
+    transition: background .3s;
+  }
+  #steps li.done { background: var(--ink-far); }
+  #steps li.now  { background: var(--ink-dim); }
+  h1 { font-size: 25px; font-weight: 500; letter-spacing: -0.02em; margin: 26px 0 6px; }
+  .lede { color: var(--ink-dim); margin: 0 0 18px; max-width: 62ch; }
+
+  main { flex: 1; overflow-y: auto; padding: 0 34px; }
+  footer {
+    padding: 16px 34px 26px; display: flex; align-items: center; gap: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  #hint { color: var(--ink-far); font-size: 12.5px; flex: 1; }
+
+  button {
+    font: inherit; font-size: 14px; color: var(--ink);
+    background: var(--raise); border: 1px solid var(--rule);
+    border-radius: 7px; padding: 7px 16px; cursor: pointer;
+  }
+  button:hover:not(:disabled) { border-color: var(--ink-far); }
+  button:disabled { opacity: .4; cursor: default; }
+  button.primary { background: #1e1c1e; border-color: var(--ink-far); }
+  button.link {
+    background: none; border: none; padding: 4px 6px;
+    color: var(--ink-dim); font-size: 13px; text-decoration: underline;
+  }
+
+  .pane { display: none; }
+  .pane.on { display: block; }
+
+  .log {
+    background: var(--raise); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 10px 12px; height: 232px; overflow-y: auto;
+    white-space: pre-wrap; word-break: break-word;
+    color: var(--ink-dim); -webkit-user-select: text; user-select: text;
+  }
+  .err { color: var(--bad); margin: 10px 0 0; max-width: 70ch; }
+
+  /* --- model rows: the seven-models picker's information, re-rendered.
+         The manager behind them (verdicts, sizes, download + resume) is the
+         backend's, unchanged. --- */
+  .row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 11px 12px; border: 1px solid var(--rule); border-radius: 9px;
+    margin-bottom: 8px; background: var(--raise);
+  }
+  .row.sel { border-color: var(--ink-far); }
+  .row .glyph { width: 14px; text-align: center; color: var(--ink-dim); flex: none; padding-top: 1px; }
+  .row .glyph.good { color: var(--ok); }
+  .row .glyph.bad  { color: var(--bad); }
+  .row .body { flex: 1; min-width: 0; }
+  .row .name { display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap; }
+  .row .size { color: var(--ink-far); font-size: 12.5px; }
+  .row .note { color: var(--ink-far); font-size: 12.5px; margin-top: 3px; }
+  .row .act { flex: none; display: flex; gap: 7px; align-items: center; }
+  .bar { height: 4px; background: var(--rule); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--ink-dim); width: 0; transition: width .3s; }
+  .tag { font-size: 11.5px; color: var(--ink-far); border: 1px solid var(--rule);
+         border-radius: 5px; padding: 1px 6px; }
+
+  .extras { list-style: none; margin: 0; padding: 0; }
+  .extras li {
+    display: flex; gap: 12px; padding: 10px 12px; border: 1px solid var(--rule);
+    border-radius: 9px; margin-bottom: 8px; background: var(--raise);
+  }
+  .extras .glyph { flex: none; width: 14px; text-align: center; }
+  .extras .lose { color: var(--ink-far); font-size: 12.5px; margin-top: 2px; }
+  .facts { color: var(--ink-far); font-size: 12px; margin-top: 20px; line-height: 1.7; }
+  .facts div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<header>
+  <ul id="steps">
+    <li data-step="welcome"></li><li data-step="environment"></li>
+    <li data-step="models"></li><li data-step="extras"></li>
+  </ul>
+</header>
+
+<main>
+  <!-- 1 ------------------------------------------------------------------ -->
+  <section class="pane" id="pane-welcome">
+    <h1>enough</h1>
+    <p class="lede">
+      A paradigmless personal computer harness: one folder, one agent, one
+      local model. Nothing you write here leaves this Mac unless you ask it to.
+    </p>
+    <p class="lede">
+      This app carries everything it needs. The next three screens set up a
+      Python environment, download a model, and show you which optional extras
+      this Mac already has. Then you pick a folder and start.
+    </p>
+    <div class="facts" id="welcome-facts"></div>
+  </section>
+
+  <!-- 2 ------------------------------------------------------------------ -->
+  <section class="pane" id="pane-environment">
+    <h1>Environment</h1>
+    <p class="lede">
+      The bundled <code>uv</code> builds a Python environment for enough. It
+      downloads a Python and the libraries the app needs — a few hundred
+      megabytes, once. This is the first thing that touches the network.
+    </p>
+    <div class="log" id="log-env">idle.</div>
+    <p class="err" id="err-env" hidden></p>
+  </section>
+
+  <!-- 3 ------------------------------------------------------------------ -->
+  <section class="pane" id="pane-models">
+    <h1>Model</h1>
+    <p class="lede">
+      enough thinks with a local model. Pick one that fits this Mac — the
+      check marks are this machine's verdict, not a general recommendation.
+      Downloads resume if they're interrupted.
+    </p>
+    <div class="log" id="log-models" style="height:auto;min-height:0;padding:8px 12px">starting…</div>
+    <div id="model-list" style="margin-top:12px"></div>
+    <p class="err" id="err-models" hidden></p>
+  </section>
+
+  <!-- 4 ------------------------------------------------------------------ -->
+  <section class="pane" id="pane-extras">
+    <h1>Extras</h1>
+    <p class="lede">
+      Optional capabilities. enough works without every one of these — each
+      simply switches off the feature next to it. Install any of them later
+      and it will be picked up on the next launch; nothing here is required
+      now, and nothing here installs itself.
+    </p>
+    <ul class="extras" id="extras-list"></ul>
+  </section>
+</main>
+
+<footer>
+  <span id="hint"></span>
+  <button id="back" class="link" hidden>back</button>
+  <button id="go" class="primary">Continue</button>
+</footer>
+
+<script>
+"use strict";
+// The shell's IPC. `__TAURI_INTERNALS__` is always injected into the app's own
+// pages; the enough UI on 127.0.0.1 never gets it (no `remote` origins in
+// capabilities/default.json), which is what keeps 2a's property intact.
+const invoke = (cmd, args) => window.__TAURI_INTERNALS__.invoke(cmd, args || {});
+
+const STEPS = ["welcome", "environment", "models", "extras"];
+let step = "welcome";
+let state = null;
+let busy = false;
+let models = null;        // last /api/models payload
+let chosen = null;        // cute name the user picked
+let poll = null;
+
+const $ = (id) => document.getElementById(id);
+const go = $("go"), back = $("back"), hint = $("hint");
+
+// Rust streams progress in here (no IPC events, same as the loading screen).
+window.__obLog = (pane, text) => {
+  const el = $("log-" + pane);
+  if (!el) return;
+  if (el.dataset.fresh !== "1") { el.textContent = ""; el.dataset.fresh = "1"; }
+  el.textContent += (el.textContent ? "\n" : "") + text;
+  el.scrollTop = el.scrollHeight;
+};
+
+function paint() {
+  for (const s of STEPS) {
+    $("pane-" + s).classList.toggle("on", s === step);
+    const li = document.querySelector(`#steps li[data-step="${s}"]`);
+    li.className = s === step ? "now"
+                 : (state && state.steps.find((x) => x.id === s).done) ? "done" : "";
+  }
+  back.hidden = step === "welcome" || step === "environment";
+}
+
+function setBusy(on, label) {
+  busy = on;
+  go.disabled = on;
+  go.textContent = on ? (label || "working…") : (step === "extras" ? "Choose a folder" : "Continue");
+}
+
+function fail(pane, msg) {
+  const el = $("err-" + pane);
+  if (el) { el.textContent = msg; el.hidden = false; }
+}
+function clearFail(pane) {
+  const el = $("err-" + pane);
+  if (el) el.hidden = true;
+}
+
+async function refresh() {
+  state = await invoke("ob_state");
+  return state;
+}
+
+// --- 1. welcome ------------------------------------------------------------
+
+function paintWelcome() {
+  $("welcome-facts").innerHTML =
+    [["code", state.code + (state.snapshot !== "unknown" ? "  (v" + state.snapshot + ")" : "")],
+     ["uv", state.uv || "(not found)"],
+     ["llama-server", state.llama_server]]
+    .map(([k, v]) => `<div><span class="mono">${k}</span> — <span class="mono">${esc(v)}</span></div>`)
+    .join("");
+  hint.textContent = state.bundled
+    ? "Everything below ships inside this app."
+    : "Running against a development checkout.";
+}
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// --- 2. environment --------------------------------------------------------
+
+async function runEnvironment() {
+  clearFail("environment");
+  $("log-env").dataset.fresh = "0";
+  hint.textContent = "This can take a few minutes on a slow connection.";
+  setBusy(true, "installing…");
+  try {
+    await invoke("ob_env_sync");
+    await refresh();
+    hint.textContent = "";
+    return true;
+  } catch (e) {
+    fail("environment", String(e));
+    hint.textContent = "Continue to try again.";
+    return false;
+  } finally {
+    setBusy(false);
+  }
+}
+
+// --- 3. models -------------------------------------------------------------
+
+async function enterModels() {
+  clearFail("models");
+  $("log-models").dataset.fresh = "0";
+  setBusy(true, "starting…");
+  try {
+    await invoke("ob_models_boot");
+    $("log-models").textContent = "ready.";
+    await loadModels();
+  } catch (e) {
+    fail("models", String(e));
+  } finally {
+    setBusy(false);
+    syncModelGate();
+  }
+}
+
+async function loadModels() {
+  models = await invoke("ob_api", { method: "GET", path: "/api/models" });
+  if (chosen === null) chosen = preselect(models);
+  renderModels();
+  const dl = models.download || {};
+  if (dl.status === "downloading" && dl.active !== false) startPoll();
+  else stopPoll();
+}
+
+// §3: default preselect is the smallest model with a `good` verdict.
+function preselect(m) {
+  const good = (m.models || []).filter(
+    (x) => !x.cloud && x.feasibility && x.feasibility.verdict === "good");
+  const pool = good.length ? good : (m.models || []).filter((x) => !x.cloud);
+  let best = null;
+  for (const x of pool) {
+    const size = (x.disk_gb_approx || 0) + (x.draft_disk_gb_approx || 0);
+    if (!best || size < best.size) best = { cute: x.cute, size };
+  }
+  return best && best.cute;
+}
+
+function renderModels() {
+  const dl = models.download || {};
+  const running = dl.status === "downloading" && dl.active !== false;
+  const list = $("model-list");
+  list.innerHTML = "";
+  for (const m of models.models || []) {
+    if (m.cloud) continue;   // OPRO-API is a settings-time choice, not a first-run one
+    const f = m.feasibility || {};
+    const glyph = m.installed ? "" : f.verdict === "good" ? "✓" : f.verdict === "no" ? "✗" : "~";
+    const gated = (m.llama_cpp_min_release || 0) > (models.llama_release || 0);
+    const active = running && dl.cute === m.cute;
+    const part = (dl.partials || {})[m.cute];
+
+    const row = document.createElement("div");
+    row.className = "row" + (chosen === m.cute ? " sel" : "");
+    row.innerHTML = `
+      <span class="glyph ${f.verdict === "good" ? "good" : f.verdict === "no" ? "bad" : ""}">${glyph}</span>
+      <div class="body">
+        <div class="name">
+          <strong>${esc(m.label || m.cute)}</strong>
+          <span class="size">${esc(m.size_human || sizeOf(m))}</span>
+          ${m.installed ? '<span class="tag">installed</span>' : ""}
+          ${gated ? '<span class="tag">needs a newer llama.cpp</span>' : ""}
+        </div>
+        ${f.reasons && f.reasons.length && !m.installed
+            ? `<div class="note">${esc(f.reasons.join(" · "))}</div>` : ""}
+        ${part && !m.installed && !active
+            ? `<div class="note">partly downloaded — resuming continues from there.</div>` : ""}
+        ${active ? `<div class="bar"><i style="width:${(dl.pct || 0)}%"></i></div>
+                    <div class="note">${esc(dlLine(dl))}</div>` : ""}
+      </div>
+      <div class="act"></div>`;
+
+    const act = row.querySelector(".act");
+    // `active` is tested BEFORE `installed`: the backend judges "installed"
+    // per FILE, so a two-phase model whose main GGUF has landed reads as
+    // installed while its MTP draft is still coming down. That row is still
+    // a download in flight — it keeps the cancel button, not a "use this"
+    // that would select a half-fetched model.
+    if (active) {
+      const b = document.createElement("button");
+      b.textContent = "cancel";
+      b.onclick = () => cancelDownload(m.cute);
+      act.appendChild(b);
+    } else if (m.installed) {
+      const b = document.createElement("button");
+      b.textContent = chosen === m.cute ? "selected" : "use this";
+      b.disabled = chosen === m.cute;
+      b.onclick = () => { chosen = m.cute; renderModels(); syncModelGate(); };
+      act.appendChild(b);
+    } else {
+      const b = document.createElement("button");
+      b.textContent = part ? "resume" : "download";
+      b.disabled = running;
+      if (running) b.title = "another download is running";
+      b.onclick = () => startDownload(m);
+      act.appendChild(b);
+    }
+    list.appendChild(row);
+  }
+  syncModelGate();
+}
+
+function sizeOf(m) {
+  const g = (m.disk_gb_approx || 0) + (m.draft_disk_gb_approx || 0);
+  return g ? "~" + g.toFixed(1) + " GB" : "";
+}
+
+function dlLine(dl) {
+  const bits = [];
+  if (dl.phase === "draft") bits.push("fetching draft…");
+  if (dl.pct != null) bits.push(dl.pct.toFixed(1) + "%");
+  if (dl.human_total) bits.push(dl.human_done + " / " + dl.human_total);
+  if (dl.eta_s) bits.push("~" + Math.round(dl.eta_s) + "s left");
+  return bits.join(" · ");
+}
+
+function syncModelGate() {
+  const dl = (models && models.download) || {};
+  const running = dl.status === "downloading" && dl.active !== false;
+  const m = chosen && (models ? (models.models || []).find((x) => x.cute === chosen) : null);
+  // Same per-file subtlety as the rows: "installed" can be true while the
+  // draft is still downloading, and Continue must not hand a half-fetched
+  // model to the supervisor.
+  const ready = !!(m && m.installed && !(running && dl.cute === chosen));
+  go.disabled = busy || !ready;
+  hint.textContent = ready
+    ? ""
+    : running ? "Downloading — this can be left running."
+    : chosen ? "Download the model you want to start with."
+             : "Pick a model to download.";
+}
+
+async function startDownload(m) {
+  const f = m.feasibility || {};
+  if (f.verdict === "no" && f.reasons && f.reasons.length) {
+    if (!confirmish(m, f)) return;
+  }
+  chosen = m.cute;
+  clearFail("models");
+  try {
+    await invoke("ob_api", { method: "POST", path: "/api/models/download/" + m.cute });
+    await loadModels();
+    startPoll();
+  } catch (e) {
+    fail("models", String(e));
+  }
+}
+
+// A ✗-verdict download is legal (downloading works; it's loading that may
+// not), so it asks rather than refuses — quoting the backend's own reasons.
+function confirmish(m, f) {
+  return window.confirm(
+    "This Mac probably can't run " + (m.label || m.cute) + ":\n\n" +
+    f.reasons.join("\n") +
+    "\n\nThe download itself will be fine. Download anyway?");
+}
+
+async function cancelDownload(cute) {
+  try {
+    await invoke("ob_api", { method: "POST", path: "/api/models/download/" + cute + "/cancel" });
+  } catch (e) {
+    fail("models", String(e));
+  }
+}
+
+function startPoll() {
+  if (poll) return;
+  // The `download` key on /api/models carries the same shape as the SSE
+  // `model-dl` event, so a poll is a complete picture — no stream to hold
+  // open through the shell.
+  poll = setInterval(async () => {
+    try { await loadModels(); } catch (e) { /* transient; next tick */ }
+  }, 700);
+}
+function stopPoll() { if (poll) { clearInterval(poll); poll = null; } }
+
+// --- 4. extras -------------------------------------------------------------
+
+async function enterExtras() {
+  const items = await invoke("ob_extras");
+  $("extras-list").innerHTML = items.map((x) => `
+    <li>
+      <span class="glyph" style="color:${x.found ? "var(--ok)" : "var(--ink-far)"}">${x.found ? "✓" : "—"}</span>
+      <div>
+        <div><strong>${esc(x.label)}</strong>
+          <span class="size">${x.found ? esc(x.where_) : esc(x.how)}</span></div>
+        <div class="lose">${x.found ? "available" : esc(x.lose)}</div>
+      </div>
+    </li>`).join("");
+  hint.textContent = "You can install any of these later.";
+}
+
+// --- driver ----------------------------------------------------------------
+
+async function enter(s) {
+  step = s;
+  clearFail(s);
+  paint();
+  setBusy(false);
+  hint.textContent = "";
+  if (s === "welcome") paintWelcome();
+  if (s === "models") { chosen = null; await enterModels(); }
+  if (s === "extras") { stopPoll(); await enterExtras(); }
+  if (s === "environment") {
+    // The one step that starts by itself: there is nothing to decide on it,
+    // and making the user press Continue to watch a progress log is friction
+    // for its own sake.
+    const ok = await runEnvironment();
+    if (ok) await enter("models");
+  }
+}
+
+go.onclick = async () => {
+  if (busy) return;
+  try {
+    if (step === "welcome") {
+      await invoke("ob_advance", { step: "welcome" });
+      await refresh();
+      return enter("environment");
+    }
+    if (step === "environment") return enter("environment");   // retry
+    if (step === "models") {
+      setBusy(true, "selecting…");
+      try {
+        // The same call the in-app picker makes: it persists the selection
+        // and starts llama-server loading it, so the first project opens
+        // ready to talk. A load failure is reported, not fatal — the choice
+        // is saved before the launch either way.
+        await invoke("ob_api", {
+          method: "POST", path: "/api/model",
+          body: JSON.stringify({ cute: chosen }),
+        });
+      } catch (e) {
+        fail("models", "selected, but llama-server didn't start: " + e);
+      }
+      setBusy(false);
+      await invoke("ob_advance", { step: "models" });
+      await refresh();
+      return enter("extras");
+    }
+    if (step === "extras") {
+      setBusy(true, "finishing…");
+      await invoke("ob_advance", { step: "extras" });
+      // The shell takes the window from here: it stops the temporary backend
+      // and opens the folder picker (§2).
+      hint.textContent = "";
+      document.body.style.opacity = "0.35";
+    }
+  } catch (e) {
+    fail(step, String(e));
+    setBusy(false);
+  }
+};
+
+back.onclick = () => {
+  if (busy) return;
+  enter(step === "extras" ? "models" : "welcome");
+};
+
+(async () => {
+  await refresh();
+  await enter(state.step || "welcome");
+})();
+</script>
+</body>
+</html>

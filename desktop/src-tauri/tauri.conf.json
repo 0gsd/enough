@@ -1,0 +1,35 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "enough",
+  "version": "0.2.0",
+  "identifier": "com.enough.desktop",
+  "build": {
+    "frontendDist": "../ui"
+  },
+  "app": {
+    "windows": [],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "icon": ["icons/icon.icns", "icons/icon.png"],
+    "category": "Productivity",
+    "shortDescription": "enough — a paradigmless personal computer harness",
+    "longDescription": "enough runs a local LLM harness against a folder on your Mac. This app bundles uv and llama.cpp, so a fresh machine needs no Terminal, no Homebrew and no git — download, drag to Applications, launch.",
+    "externalBin": ["binaries/uv"],
+    "resources": {
+      "vendor/llama": "llama",
+      "snapshot/enough-src": "enough-src"
+    },
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "entitlements": "entitlements.plist",
+      "hardenedRuntime": true,
+      "signingIdentity": null,
+      "providerShortName": null
+    }
+  }
+}

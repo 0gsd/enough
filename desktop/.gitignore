@@ -1,0 +1,3 @@
+# Download cache for fetch-sidecars.sh (archives + extraction scratch).
+/vendor-dl
+.DS_Store

@@ -94,7 +94,7 @@ fi
 # 1. Platform check
 # ---------------------------------------------------------------------------
 step 1 "checking your platform"
-note "enough v0.1.6 ships for macOS only. Linux support is on the roadmap."
+note "enough v0.2.0 ships for macOS only. Linux support is on the roadmap."
 if [[ "$(uname)" != "Darwin" ]]; then
   err "this script only runs on macOS. detected: $(uname)"
   exit 1

@@ -22,7 +22,6 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-import shutil
 import signal
 import subprocess
 import time
@@ -157,10 +156,18 @@ class LlamaSupervisor:
                 f"model {cute} isn't installed at {info['filename']}. "
                 "install via bootstrap.sh or drop the gguf into ~/enough/weights/."
             )
-        binary = shutil.which("llama-server")
+        # One lookup order for three platforms: $ENOUGH_LLAMA_SERVER (the
+        # desktop shell's bundled sidecar) → ~/enough/bin (the Linux
+        # installer's prebuilt release) → PATH (brew, distro, manual).
+        # See models.find_llama_server(), docs/tauri-plan.md §4,
+        # docs/linux-plan.md §3.2.
+        binary = _models.find_llama_server()
         if not binary:
             raise RuntimeError(
-                "llama-server not on PATH. install with `brew install llama.cpp`."
+                "llama-server not found. enough looks at $ENOUGH_LLAMA_SERVER, "
+                "then ~/enough/bin/llama-server, then PATH. install it with "
+                "`brew install llama.cpp`, or drop a prebuilt llama.cpp release "
+                "binary into ~/enough/bin/."
             )
         # Hard gate: a llama.cpp older than the model's architecture would
         # fail deep inside the loader with an opaque tensor error. Say what

@@ -22,6 +22,7 @@ import json
 import logging
 import os
 import shutil
+import signal
 import subprocess
 import sys
 from contextlib import asynccontextmanager
@@ -82,6 +83,34 @@ def _ui_config_live_path() -> Path:
 
 WHISPER_DIR = Path.home() / "enough" / "weights" / "whisper"
 WHISPER_DEFAULT_MODEL = "ggml-base.en.bin"
+
+# --- Desktop shell (enough.app) hooks --------------------------------------
+# `POST /api/shutdown` exists only for a server the desktop shell spawned.
+# The shell sets ENOUGH_DESKTOP=1 in the child's environment; without it the
+# endpoint 404s, so a plain `enough` in a terminal can never be killed by a
+# stray POST from some page the user happens to have open. The shell also
+# sets a per-launch ENOUGH_DESKTOP_TOKEN and sends it back in a custom
+# header — a custom header can't ride along on a cross-origin form POST
+# without a CORS preflight this app never answers.
+DESKTOP_ENV = "ENOUGH_DESKTOP"
+DESKTOP_TOKEN_ENV = "ENOUGH_DESKTOP_TOKEN"
+DESKTOP_TOKEN_HEADER = "x-enough-desktop-token"
+
+
+def request_process_exit(delay: float = 0.25) -> None:
+    """Ask this uvicorn process to exit shortly after the current response.
+
+    SIGTERM to ourselves is uvicorn's own graceful-shutdown path: it drains
+    connections and runs the lifespan teardown, which is what stops an
+    *owned* llama-server and closes the httpx client. The small delay lets
+    the shutdown response actually reach the shell first.
+
+    Module-level (rather than inline in the handler) so tests can swap it
+    out — the real thing would take the test runner down with it.
+    """
+    loop = asyncio.get_running_loop()
+    loop.call_later(delay, lambda: os.kill(os.getpid(), signal.SIGTERM))
+
 
 ORCHESTRATOR_CONFIG = Path.home() / "enough" / "config" / "orchestrator.json"
 # Defaults are intentionally conservative: auto-reset off until the user
@@ -3301,6 +3330,33 @@ def create_app(
             return {"text": text}
         finally:
             in_path.unlink(missing_ok=True)
+
+    @app.post("/api/shutdown")
+    async def api_shutdown(request: Request) -> dict[str, Any]:
+        """Graceful stop — the desktop shell's quit path.
+
+        Gated on ENOUGH_DESKTOP=1 (404 otherwise) plus, when the shell set
+        one, a matching ENOUGH_DESKTOP_TOKEN in the X-Enough-Desktop-Token
+        header (403 otherwise). See the DESKTOP_ENV block above for why.
+
+        Order matters: stop the llama-server *first* with
+        `only_if_owned=True` so an adopted one survives — quitting the app
+        must behave exactly like ctrl-c'ing the CLI — then ask uvicorn to
+        exit. The lifespan teardown repeats the stop; it's idempotent.
+        """
+        if os.environ.get(DESKTOP_ENV) != "1":
+            raise HTTPException(404, "Not Found")
+        token = os.environ.get(DESKTOP_TOKEN_ENV) or ""
+        if token and request.headers.get(DESKTOP_TOKEN_HEADER) != token:
+            raise HTTPException(403, "bad desktop token")
+        if supervisor is not None:
+            try:
+                await supervisor.stop(only_if_owned=True)
+            except Exception:  # noqa: BLE001 — never block the quit path
+                log.exception("supervisor stop during /api/shutdown failed")
+        request_process_exit()
+        log.info("shutdown requested by the desktop shell")
+        return {"ok": True, "stopping": True}
 
     @app.get("/favicon.ico")
     async def favicon():

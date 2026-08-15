@@ -33,7 +33,7 @@ Three locations that matter:
 | Path | What it is | Authority |
 |---|---|---|
 | `~/enough/` | The global install. Cloned from the repo by `bootstrap.sh`. Contains `defaults/` (templates that get copied / symlinked into every project), `cacheawl/` (the machine-global file store — see below), and the Python source. (The old `infoworld/` library is dissolved into `cacheawl/` on first 0.1.6 launch.) | Edit these to affect every project. |
-| `~/enough/config/` | User-global JSON config. `broker.json` (toggle states), `models.json` (active local model), `openrouter.json` (cloud-slot metadata, **no api key**), `ui.json` (theme/font), `orchestrator.json` (auto-reset config), `wikisink.json` (wikisink install registry + watch/override registries + reading state). | Edit per-machine settings. |
+| `~/enough/config/` | User-global JSON config. `broker.json` (toggle states), `models.json` (active local model), `openrouter.json` (cloud-slot metadata, **no api key**), `ui.json` (theme/font), `orchestrator.json` (auto-reset config), `wikisink.json` (wikisink install registry + watch/override registries + reading state), `desktop.json` (desktop-shell launch prefs: reopen toggle, last/known projects, onboarding state — shared-visible with the CLI, written by `desktop/src-tauri/src/config.rs`). | Edit per-machine settings. |
 | `~/enough/wikisink/` | Default wikisink location: the user's wikisink *data* (comments, overlays, preserved articles, rankings, run state) and — unless pointed elsewhere — the base `.zim` archive(s). Archives can live anywhere, external drives included; several installs can be registered at once. Hidden from the file-manager tree. | Managed via the 🚰 UI; don't hand-edit. |
 | `~/enough/cacheawl/` | The machine-global **cacheawl** store: root-level folders are *cacheboxes* (plain kept-forever text, or cached replicas ingested from a path/URL/wikisink). Global wiki saves land in the `wiki/` box; the dissolved infoworld folders become the `personal`/`public`/`wiki` boxes. Overridable via `ENOUGH_CACHEAWL_ROOT`. Hidden from every project's file tree. | Managed via the cacheawl mode UI + agent tools; sidecars are backend-owned. |
 | `<project>/rness/` | The agent's per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/roles; per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`; per-project state in `io/`, `requests/`, `knowledge/`. | Edit to affect just this project. |
@@ -54,7 +54,7 @@ Every Python module in `enough/`:
 
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
-| [enough/server.py](../enough/server.py) | ~2800 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`). | `create_app()`, `_drive_message()`, all `@app.{get,post}` handlers |
+| [enough/server.py](../enough/server.py) | ~3300 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, and the desktop-gated `POST /api/shutdown` — see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). | `create_app()`, `_drive_message()`, `request_process_exit()` (module-level so tests can swap it), all `@app.{get,post}` handlers |
 | [enough/prompt.py](../enough/prompt.py) | ~890 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/role/paradigm enumeration + toggle-state helpers. | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
 | [enough/broker.py](../enough/broker.py) | ~380 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
 | [enough/tools.py](../enough/tools.py) | ~1360 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers), the tool-call XML parser, the dispatch table. | `_DISPATCH`, `_TRACE_TOGGLE`, `execute()`, `parse_tool_calls()`, `_CLOUD_KEY_EXFIL_PATTERNS` |
@@ -82,6 +82,41 @@ skeletons by `skeleton.py`:
 - `defaults/models.json` — local-model registry template
 - `defaults/openrouter-config.json` — cloud-slot metadata template
 - `defaults/ui-config.json` — UI prefs template
+
+## The desktop shell
+
+Top-level [desktop/](../desktop/) is the macOS app around the backend:
+Tauri v2 + Rust, **no Node build step** — plain `cargo build` in
+`desktop/src-tauri/` produces the whole binary (the shell's one static
+page is embedded at compile time via `tauri::generate_context!`).
+Toolchain: `brew install rustup` (keg-only — put
+`/opt/homebrew/opt/rustup/bin` on PATH), `rustup default stable`. Rust
+unit tests: `cargo test` in `desktop/src-tauri/`.
+
+| File | Role |
+|---|---|
+| [desktop/src-tauri/src/main.rs](../desktop/src-tauri/src/main.rs) | window, native menu (Settings `CheckMenuItem` + Edit submenu), both quit paths, signal traps |
+| [desktop/src-tauri/src/launch.rs](../desktop/src-tauri/src/launch.rs) | the launch flow: reopen-or-pick, `known_projects` MRU upkeep |
+| [desktop/src-tauri/src/backend.rs](../desktop/src-tauri/src/backend.rs) | spawn / health-probe / stop the uvicorn child (`POST /api/shutdown` → SIGTERM → SIGKILL ladder; child in its own process group) |
+| [desktop/src-tauri/src/config.rs](../desktop/src-tauri/src/config.rs) | `~/enough/config/desktop.json` — tmp+rename writes, unknown-key round-trip |
+| [desktop/src-tauri/src/guards.rs](../desktop/src-tauri/src/guards.rs) | pre-flight refusals. **Deliberately mirrors** `enough/skeleton.py`'s `cloud_sync_provider` path list and the `~/enough` refusal in `enough/__main__.py` — touch one, touch the other (unit tests pin the list) |
+| [desktop/src-tauri/src/http.rs](../desktop/src-tauri/src/http.rs) | ~60-line loopback-only HTTP/1.1 client (no client crate) |
+| [desktop/src-tauri/src/bundled.rs](../desktop/src-tauri/src/bundled.rs) | where the bundle's payload lives (uv sidecar, llama.cpp, source snapshot), derived from `current_exe()` |
+| [desktop/src-tauri/src/onboarding.rs](../desktop/src-tauri/src/onboarding.rs) | the first-run wizard's six IPC commands + the launch thread's wait loop |
+| [desktop/src-tauri/build.rs](../desktop/src-tauri/build.rs) | stages the source snapshot (pyproject, uv.lock, `enough/`, `defaults/`, licenses) into the bundle on every `cargo build` |
+| [desktop/ui/loading.html](../desktop/ui/loading.html) | the shell's only page; static, zero Tauri IPC exposed to the enough UI |
+| [desktop/ui/onboarding.html](../desktop/ui/onboarding.html) | the first-run wizard: welcome → environment → models → extras. Drives the *existing* `/api/models*` endpoints through the Rust proxy; shares nothing with `index.html` |
+| [desktop/fetch-sidecars.sh](../desktop/fetch-sidecars.sh) | checksum-pinned fetch of the `uv` and `llama.cpp` release binaries (they are gitignored, not vendored) |
+| [desktop/RELEASE.md](../desktop/RELEASE.md) | the user-executed sign / notarize / staple / verify checklist |
+
+The shell talks to the backend it spawned through the `ENOUGH_DESKTOP*`
+env gate (see "What NOT to touch"). The .app runs the source snapshot
+sealed inside its own bundle — never `~/enough` — while state stays in
+`~/enough` exactly as for a CLI install; **so a project created by the .app
+symlinks its `rness/` skeleton into the .app**, the same way a CLI project
+symlinks into `~/enough/defaults`. Full decision record: the
+"Milestone 2a landed" and "Milestone 2b landed" blocks in
+docs/tauri-plan.md (local planning doc, untracked).
 
 ---
 
@@ -1153,18 +1188,44 @@ A list of things that will confuse you if you don't see them coming:
   machine-global store. Don't add other global-path prefixes or bypass the
   helper — the traversal check and the mirror/sidecar write-guards all hang
   off that one resolution point.
-- **A pytest suite exists locally but is gitignored** (`tests/` is in
-  `.gitignore` by deliberate choice — `git log` has the story). Run
+- **The pytest suite lives in `tests/`** (tracked since the seven-models
+  round; it was gitignored before — `git log` has the story). Run
   `uv run pytest tests/ -q` before declaring done; it covers girraphs,
   project metadata, the cacheawl store + `/api/cacheawl/*` + the
-  `cacheawl:` scheme, and the ui-config theme-key merge. Suites isolate
-  global state via env hooks — `ENOUGH_WIKISINK_CONFIG`,
+  `cacheawl:` scheme, the ui-config theme-key merge, the models
+  registry/feasibility/downloads, and the desktop shutdown gate. Suites
+  isolate global state via env hooks — `ENOUGH_WIKISINK_CONFIG`,
   `ENOUGH_CACHEAWL_ROOT`, `ENOUGH_INFOWORLD_ROOT`, `ENOUGH_UI_CONFIG`,
   `ENOUGH_WEIGHTS_DIR`, `ENOUGH_LIVE_STATE`, `ENOUGH_MODELS_REGISTRY`
   (plus `ENOUGH_MODELS_URL_BASE`, which rebases the model download URLs
   onto a local stub server, keyed by local gguf_filename) — all
   pointed at `tmp_path`; **never run against real `~/enough` state.** The
   rest of the web layer is exercised via TestClient against `create_app()`.
+- **The `ENOUGH_DESKTOP*` vars are NOT scratch-isolation hooks** — they
+  are the desktop shell's capability gate, set by the shell when it
+  spawns a backend. `ENOUGH_DESKTOP=1` enables `POST /api/shutdown` (the
+  route 404s without it, so a CLI `enough` has no shutdown surface);
+  `ENOUGH_DESKTOP_TOKEN` is a per-launch secret the caller must echo in
+  the `X-Enough-Desktop-Token` header (mismatch → 403; it's CSRF
+  protection, not a local-process boundary). `ENOUGH_DESKTOP_CODE` and
+  `ENOUGH_DESKTOP_UV` are read by the *shell*, not the backend: they
+  override which checkout it runs (`uv run --project $ENOUGH_DESKTOP_CODE`)
+  and which `uv` binary it uses; `ENOUGH_DESKTOP_LLM_URL` (2b) makes it
+  pass `--llm-url`, which is the one piece of shared state the `ENOUGH_*`
+  hooks can't isolate — a scratch run without it would reach the machine's
+  real llama-server on 8080. Decisions + rationale: the "Milestone 2a
+  landed" and "Milestone 2b landed" blocks in docs/tauri-plan.md (local
+  planning doc, untracked).
+- **`ENOUGH_LLAMA_SERVER` is a real lookup rung, not a test hook.**
+  `models.find_llama_server()` is the single place the llama-server binary
+  is located — `$ENOUGH_LLAMA_SERVER` → `~/enough/bin/llama-server` →
+  PATH — and `supervisor._launch`, `llama_release()`, `release_gate()`,
+  `spec_flags()` and `draft_flags()` all resolve through it (pass an
+  explicit `binary=` only when you already resolved one and want the
+  version you gate on to be the version you run). Three installers depend
+  on that order: the desktop app points rung 1 at its bundled sidecar, the
+  Linux installer owns rung 2, Homebrew is rung 3. Don't reintroduce a
+  bare `shutil.which("llama-server")` anywhere.
 
 ---
 

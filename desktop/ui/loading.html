@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>enough — starting…</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  /* Deliberately a plain-text echo of enough/static/loader.html's aesthetic
+     (black field, 2.4s opacity pulse) rather than a copy of its 450 KB
+     wordmark SVG — one asset, one home, no drift. */
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    background: #000; overflow: hidden;
+  }
+  body {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 2.2rem;
+    font: 400 1rem/1.5 ui-sans-serif, -apple-system, system-ui, sans-serif;
+    -webkit-user-select: none; user-select: none;
+    cursor: default;
+  }
+  #mark {
+    color: #747072;
+    font-size: min(14vw, 5.5rem);
+    letter-spacing: -0.04em;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  #status {
+    color: #4a4749;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    min-height: 1.5em;
+    text-align: center;
+    padding: 0 2rem;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #mark { animation: none; opacity: 0.85; }
+  }
+</style>
+</head>
+<body>
+  <div id="mark">enough</div>
+  <!-- Updated from Rust via WebviewWindow::eval(); no IPC, no polling. -->
+  <div id="status">starting…</div>
+</body>
+</html>

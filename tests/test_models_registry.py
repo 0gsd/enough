@@ -398,7 +398,10 @@ def launcher(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         sup.subprocess, "Popen",
         lambda cmd, **kw: (argv.append(list(cmd)), _FakeProc())[1],
     )
-    monkeypatch.setattr(sup.shutil, "which", lambda _n: "/fake/bin/llama-server")
+    # The supervisor no longer reaches for `shutil.which` itself — it asks
+    # models.find_llama_server(), which is the one place the
+    # $ENOUGH_LLAMA_SERVER → ~/enough/bin → PATH order lives.
+    monkeypatch.setattr(models, "find_llama_server", lambda: "/fake/bin/llama-server")
 
     def _set_model(**over):
         info = {

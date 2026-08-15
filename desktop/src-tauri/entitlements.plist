@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  enough.app — hardened-runtime entitlements (docs/tauri-plan.md §4).
+
+  Two entries, deliberately. Everything else enough does is ordinary
+  unprivileged work that Developer ID distribution grants by default.
+
+  NOT here, and why:
+
+  * App Sandbox (com.apple.security.app-sandbox) — the app spawns uv,
+    python and llama-server, and reads whatever project folder the user
+    picks. Developer ID distribution does not require the sandbox, and
+    adopting it would mean re-architecting all three. §4 decision.
+
+  * com.apple.security.cs.disable-library-validation — not needed. The only
+    dylibs loaded into a hardened process we sign are llama-server's own,
+    which carry the same Team ID after signing. The uv-managed CPython, its
+    C extensions and llama-server itself are separate PROCESSES; library
+    validation does not reach across a process boundary.
+
+  * com.apple.security.cs.allow-jit / allow-unsigned-executable-memory —
+    WKWebView's JavaScript runs in Apple's own WebContent process, which
+    carries its own entitlements. Our binary never maps executable memory.
+
+  * com.apple.security.cs.allow-dyld-environment-variables — the bundled
+    llama-server finds its dylibs through an @loader_path rpath, so nothing
+    here ever sets DYLD_*. (Which is also why the dylibs live in the same
+    directory as the binary: the hardened runtime strips DYLD_* anyway.)
+
+  If a later round adds in-app installers for the extras (whisper, pandoc,
+  tor, harper), revisit this file deliberately rather than by reflex.
+-->
+<plist version="1.0">
+<dict>
+    <!-- Outbound: model weights from huggingface, python packages via uv,
+         and every broker web fetch. -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+    <!-- Inbound: the loopback listeners. uvicorn serves the UI on 127.0.0.1
+         and llama-server serves inference on 127.0.0.1:8080; the WKWebView
+         connects to the first and the backend to the second. -->
+    <key>com.apple.security.network.server</key>
+    <true/>
+</dict>
+</plist>

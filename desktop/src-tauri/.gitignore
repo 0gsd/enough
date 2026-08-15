@@ -1,0 +1,7 @@
+/target
+/gen
+# Third-party binaries fetched by ../fetch-sidecars.sh (checksum-pinned there).
+/binaries
+/vendor
+# Staged by build.rs from the repo root on every build.
+/snapshot

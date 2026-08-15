@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.11"
 
 [options]
-exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
+exclude-newer = "2026-08-08T02:14:48.539957Z"
 exclude-newer-span = "P1W"
 
 [[package]]
@@ -208,7 +208,7 @@ wheels = [
 
 [[package]]
 name = "enough"
-version = "0.1.6"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "ctranslate2" },

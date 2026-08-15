@@ -9,6 +9,12 @@ much RAM they want, and a RAM-aware context-window recommender.
 - Two env hooks, both for scratch/QA installs: `ENOUGH_WEIGHTS_DIR` moves the
   weights dir, `ENOUGH_MODELS_URL_BASE` rebases every download URL onto a
   local stub server. Neither is a user-facing setting.
+- `find_llama_server()` is the ONE place the llama-server binary is located:
+  `$ENOUGH_LLAMA_SERVER` → `~/enough/bin/llama-server` → PATH. Three
+  installers depend on that order — the desktop app points rung 1 at its
+  bundled sidecar, the Linux installer owns rung 2, Homebrew is rung 3 —
+  so `supervisor._launch` and every release-probing helper below resolve
+  through it rather than reaching for `shutil.which` themselves.
 
 Also exposes a small CLI:
     python -m enough.models params [--cute NAME]
@@ -24,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import os
 import re
 import shlex
@@ -31,6 +38,8 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+log = logging.getLogger("enough.models")
 
 
 def _weights_dir_default() -> Path:
@@ -314,9 +323,66 @@ def spec_args(model_entry: dict) -> str:
     return " ".join(args)
 
 
-def llama_release(binary: str = "llama-server") -> int:
+LLAMA_SERVER_ENV = "ENOUGH_LLAMA_SERVER"
+
+
+def _enough_bin_dir() -> Path:
+    """`~/enough/bin` — where the Linux installer drops the prebuilt
+    llama.cpp release (docs/linux-plan.md §3.2). Derived from `Path.home()`,
+    so a scratch `$HOME` moves it with everything else."""
+    return Path.home() / "enough" / "bin"
+
+
+def find_llama_server() -> str | None:
+    """Locate the `llama-server` binary. Returns None when there isn't one.
+
+    ONE lookup order for three platforms (docs/tauri-plan.md §4,
+    docs/linux-plan.md §3.2):
+
+    1. ``$ENOUGH_LLAMA_SERVER`` — an explicit path. The desktop shell points
+       this at the sidecar inside enough.app; a power user can point it at
+       any build they like.
+    2. ``~/enough/bin/llama-server`` — where the Linux installer puts the
+       prebuilt release archive's binary.
+    3. ``PATH`` — Homebrew on macOS, distro packages / manual installs
+       elsewhere.
+
+    An override that doesn't resolve falls through to the next rung rather
+    than failing hard (a stale env var in a shell profile shouldn't make a
+    perfectly good brew install unreachable), but it says so in the log —
+    silently running a *different* llama.cpp than the one you pointed at is
+    the confusing failure, so it must at least be visible.
+
+    Read per call, not cached at import: `PATH` and the env var are exactly
+    the things a QA harness or a sidecar-spawning shell changes underneath a
+    long-lived process, and one `which` is not worth memoizing.
+    """
+    env = os.environ.get(LLAMA_SERVER_ENV)
+    if env:
+        cand = Path(env).expanduser()
+        if cand.is_file() and os.access(cand, os.X_OK):
+            return str(cand)
+        log.warning(
+            "%s points at %s, which isn't an executable file — falling back "
+            "to ~/enough/bin then PATH", LLAMA_SERVER_ENV, env,
+        )
+    cand = _enough_bin_dir() / "llama-server"
+    if cand.is_file() and os.access(cand, os.X_OK):
+        return str(cand)
+    return shutil.which("llama-server")
+
+
+def llama_release(binary: str | None = None) -> int:
     """Numeric b-release of the installed llama.cpp ('version: 9200 (…)'
-    → 9200). 0 when the binary is missing or the output is unparseable."""
+    → 9200). 0 when the binary is missing or the output is unparseable.
+
+    `binary=None` means "look it up" via `find_llama_server()`; callers that
+    already resolved a path (the supervisor's launch path) pass it in so the
+    version they gate on is the version they run."""
+    if binary is None:
+        binary = find_llama_server()
+        if binary is None:
+            return 0
     try:
         out = subprocess.run(
             [binary, "--version"],
@@ -328,7 +394,7 @@ def llama_release(binary: str = "llama-server") -> int:
         return 0
 
 
-def release_gate(info: dict, binary: str = "llama-server") -> str | None:
+def release_gate(info: dict, binary: str | None = None) -> str | None:
     """The HARD per-model llama.cpp gate: None when the installed build
     can load this model at all, else a user-facing sentence explaining
     what to upgrade. Models without a top-level `llama_cpp_min_release`
@@ -352,7 +418,7 @@ def release_gate(info: dict, binary: str = "llama-server") -> str | None:
     )
 
 
-def spec_flags(info: dict, binary: str = "llama-server") -> list[str]:
+def spec_flags(info: dict, binary: str | None = None) -> list[str]:
     """Speculative-decoding argv for a resolve()d model, gated on the
     installed llama.cpp release (older builds reject the unknown flags at
     startup). Empty when the model has no MTP heads, the build is too
@@ -368,7 +434,7 @@ def spec_flags(info: dict, binary: str = "llama-server") -> list[str]:
     return str(info["spec_args"]).split()
 
 
-def draft_flags(info: dict, binary: str = "llama-server") -> list[str]:
+def draft_flags(info: dict, binary: str | None = None) -> list[str]:
     """Draft-file argv for models whose MTP head ships as a SEPARATE GGUF
     (the qwen-3.8 shape) rather than embedded in the main file (q35/q36).
     Empty unless the draft file is actually on disk AND the spec flags
