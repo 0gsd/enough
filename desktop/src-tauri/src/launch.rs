@@ -52,7 +52,7 @@ fn confirm(app: &AppHandle, title: &str, body: &str, yes: &str, no: &str) -> boo
 fn pick_folder(app: &AppHandle) -> Option<PathBuf> {
     app.dialog()
         .file()
-        .set_title("Choose a folder for enough")
+        .set_title("Choose your project folder — enough works inside it (not an install location)")
         .blocking_pick_folder()
         .and_then(|p| p.into_path().ok())
 }

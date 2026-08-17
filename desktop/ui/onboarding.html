@@ -122,7 +122,7 @@
     <p class="lede">
       This app carries everything it needs. The next three screens set up a
       Python environment, download a model, and show you which optional extras
-      this Mac already has. Then you pick a folder and start.
+      this Mac already has. Then you pick a project folder — the folder of notes and drafts you want to work in; enough itself is already installed — and start.
     </p>
     <div class="facts" id="welcome-facts"></div>
   </section>
@@ -211,7 +211,7 @@ function paint() {
 function setBusy(on, label) {
   busy = on;
   go.disabled = on;
-  go.textContent = on ? (label || "working…") : (step === "extras" ? "Choose a folder" : "Continue");
+  go.textContent = on ? (label || "working…") : (step === "extras" ? "Choose project folder" : "Continue");
 }
 
 function fail(pane, msg) {
@@ -456,7 +456,7 @@ async function enterExtras() {
         <div class="lose">${x.found ? "available" : esc(x.lose)}</div>
       </div>
     </li>`).join("");
-  hint.textContent = "You can install any of these later.";
+  hint.textContent = "You can install any of these later. Next: pick the folder you want to work in — any folder of notes or drafts, not an install location.";
 }
 
 // --- driver ----------------------------------------------------------------

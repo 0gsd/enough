@@ -37,6 +37,8 @@ import hashlib
 import json
 import logging
 import re
+import subprocess
+import sys
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
@@ -258,22 +260,48 @@ def clear_api_key() -> None:
     save_cloud_config(cfg)
 
 
+def _keychain_item_exists_macos() -> bool | None:
+    """macOS: does the keychain ITEM exist — without reading its secret.
+    `security find-generic-password` with no `-w` returns only metadata,
+    which macOS answers without consulting the item's access-control list;
+    reading the value (`-w`, or keyring.get_password) is what triggers the
+    "python wants to access key…" password prompt for any binary that
+    didn't create the item — i.e. every fresh venv the desktop app builds.
+    Returns None when the probe itself can't run (not macOS, no `security`),
+    so the caller can fall through to keyring."""
+    if sys.platform != "darwin":
+        return None
+    try:
+        proc = subprocess.run(
+            ["security", "find-generic-password",
+             "-s", KEYRING_SERVICE, "-a", KEYRING_ACCOUNT_API_KEY],
+            capture_output=True, text=True, timeout=5,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return proc.returncode == 0
+
+
 def has_api_key() -> bool:
-    """Cheap presence check. Hits the keyring once per process if not
-    cached. False on keyring errors — callers treat as 'no key' rather
-    than raising, because UI status panels need a non-throwing path."""
-    global _API_KEY_CACHE
+    """Cheap presence check — and deliberately a METADATA check, not a
+    read. This runs on every cloud-config load (which is many requests),
+    whether or not the cloud slot is even in use, so it must never be the
+    thing that pops a keychain password prompt or that hoards the secret
+    in memory. The value is only ever read by _get_api_key_for_broker(),
+    at the one moment an outbound cloud request needs it. False on keyring
+    errors — callers treat as 'no key' rather than raising, because UI
+    status panels need a non-throwing path."""
     if _API_KEY_CACHE is not None:
         return True
+    exists = _keychain_item_exists_macos()
+    if exists is not None:
+        return exists
     try:
-        value = keyring.get_password(KEYRING_SERVICE, KEYRING_ACCOUNT_API_KEY)
+        cred = keyring.get_credential(KEYRING_SERVICE, KEYRING_ACCOUNT_API_KEY)
     except KeyringError as e:
-        log.warning("keyring read failed (%s); treating as no key", e)
+        log.warning("keyring probe failed (%s); treating as no key", e)
         return False
-    if value:
-        _API_KEY_CACHE = value
-        return True
-    return False
+    return cred is not None
 
 
 def _get_api_key_for_broker() -> str:
