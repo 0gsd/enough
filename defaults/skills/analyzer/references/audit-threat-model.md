@@ -1,20 +1,35 @@
-# Threat Model
+# analyzer — audit mode: threat model
 
-The complete taxonomy of skill-package-specific threats. Adapted from Memory Vaccine's S-class (self-injection) and P-class (privilege escalation) frameworks, extended with P7 (Executable Payload) and P8 (Audit Evasion) for the specific attack surface of untrusted skill packages.
+The complete taxonomy of package-specific threats, named and graded. Load this
+before running `references/audit.md`; every finding in an audit report cites one
+of the pattern ids below.
 
-## Context: Why Skill Packages Are Different
+The S-class (self-injection) and P1–P6 (privilege escalation) taxonomies are
+adapted from the Memory Vaccine epistemic-hygiene framework; P7 (Executable
+Payload) and P8 (Audit Evasion) are extensions for the specific attack surface
+of an untrusted package.
 
-Memory Vaccine audits workspace content that has already been admitted — documents, logs, outputs, persisted state. The threat is accumulated drift: content that erodes reasoning quality or blurs privilege boundaries over time.
+## Context: why packages are different
 
-Skill packages are a different beast. They are third-party code and instructions that the user is considering admitting into their system. The threat is not drift — it is deliberate or negligent harm at the point of entry. A workspace document that contains a vague directive is careless. A skill SKILL.md that contains a hidden instruction to exfiltrate data is adversarial.
+Ordinary workspace hygiene deals with content that has already been admitted —
+documents, logs, outputs, persisted state. The threat there is accumulated
+drift: content that erodes reasoning quality or blurs privilege boundaries over
+time.
 
-skill-scanner must handle both: the careless (epistemic contamination) and the adversarial (injection, escalation, payload).
+A third-party package is a different beast. It is code and instructions the user
+is considering admitting into their system. The threat is not drift — it is
+deliberate or negligent harm at the point of entry. A workspace document that
+contains a vague directive is careless. A `SKILL.md` that contains a hidden
+instruction to exfiltrate data is adversarial.
+
+The audit must handle both: the careless (epistemic contamination) and the
+adversarial (injection, escalation, payload).
 
 ---
 
 ## S-Class: Epistemic Contamination
 
-These patterns are inherited directly from Memory Vaccine. In a skill package, they indicate poor quality rather than malice — but poor quality in a skill is amplified because the skill's instructions are re-ingested on every invocation. A vague directive in a workspace doc is read once; a vague directive in a SKILL.md is read every time the skill triggers.
+In a package, these patterns usually indicate poor quality rather than malice — but poor quality in a skill is amplified because the skill's instructions are re-ingested on every invocation. A vague directive in a workspace doc is read once; a vague directive in a SKILL.md is read every time the skill triggers.
 
 ### S1 — Vague Directive
 
@@ -84,7 +99,7 @@ Vague appeals to unnamed authorities.
 
 ## P-Class: Privilege Escalation and Injection
 
-P1 through P6 are adapted from Memory Vaccine. P7 and P8 are new, specific to the skill package attack surface.
+P1 through P6 are the inherited privilege-escalation patterns. P7 and P8 are specific to the package attack surface.
 
 ### P1 — Direct Modification Instruction
 
@@ -132,17 +147,19 @@ Content structured to be misinterpreted by other skills.
 
 Any content that references file paths outside the skill's expected operating boundaries.
 
-**In skill context:** A skill that writes to `/mnt/skills/user/`, reads from `~/.ssh/`, or accesses other skills' directories.
+**In skill context:** A skill that writes into another skill's directory, reads from `~/.ssh/`, or reaches into skill installation directories (`/mnt/skills/`, `~/.claude/skills/`, and in enough `rness/skills/` and `~/enough/defaults/skills/`).
 
-**Detection:** Paths matching skill installation directories, home directory sensitive locations, system directories. Any path + write-action combination targeting locations outside the skill's working directory and output directory.
+**Detection:** Paths matching skill installation directories, home-directory sensitive locations, system directories. Any path + write-action combination targeting locations outside the skill's working directory and its output directory.
+
+**In enough specifically**, the expected boundary is: read and write inside the project directory (`rness/io/output/<skill-name>/` for artifacts), read-only against `~/enough/` per the file-read allowlist, nothing else without the user having added a prefix to `rness/policies/allowlists.md`. Anything naming `~/enough/config/`, the keyring service `enough-broker`, the account `openrouter-api-key`, or another skill's files is a P6 finding.
 
 **Confidence:** HIGH for any write to skill directories or sensitive system paths.
 
-### P7 — Executable Payload (NEW)
+### P7 — Executable Payload
 
 Malicious or dangerous patterns in bundled executable code.
 
-**Why this is new:** Memory Vaccine is a text-only epistemic auditor. It reads code as text and can catch P6 (filesystem directives) in source code, but it does not perform static analysis for code-specific threats. skill-scanner adds this capability because untrusted skill packages may contain scripts that execute with the user's permissions.
+**Why this class exists:** a text-only epistemic audit reads code as text and can catch P6 (filesystem directives) in source, but it does not perform static analysis for code-specific threats. Untrusted packages may contain scripts that execute with the user's permissions, so the audit adds a deterministic scanner (`scripts/payload_scanner.py`) for this class.
 
 **Categories:**
 
@@ -170,7 +187,7 @@ In JavaScript: `eval()`, `Function()`, `setTimeout`/`setInterval` with string ar
 #### P7c — Filesystem Overreach
 Code that reads or writes outside expected boundaries.
 
-**Detection targets:** Operations on paths outside the skill's own directory, `/home/claude/`, and `/mnt/user-data/outputs/`. Specifically: `/mnt/skills/`, `/etc/`, `/usr/`, `~/.ssh/`, `~/.aws/`, `~/.config/`, `~/.gnupg/`, `/tmp/` with suspicious patterns.
+**Detection targets:** Operations on paths outside the skill's own directory and the project's output directory. Specifically: `/mnt/skills/`, `/etc/`, `/usr/`, `~/.ssh/`, `~/.aws/`, `~/.config/`, `~/.gnupg/`, `~/enough/config/`, `/tmp/` with suspicious patterns.
 
 Also: `shutil.rmtree` on directories outside the working area, `os.chmod` on files outside the working area, symlink creation pointing outside the working area.
 
@@ -190,7 +207,7 @@ Code patterns designed to conceal intent.
 #### P7e — Credential/Data Harvesting
 Code that accesses sensitive user data.
 
-**Detection targets:** Reads from `~/.ssh/`, `~/.aws/`, `~/.config/`, `~/.gnupg/`, `~/.netrc`, `~/.env`. Access to `os.environ` or `os.getenv` for sensitive keys (`API_KEY`, `SECRET`, `TOKEN`, `PASSWORD`, `CREDENTIAL`, `AWS_`, `GITHUB_`). Cookie jar access, browser profile reads.
+**Detection targets:** Reads from `~/.ssh/`, `~/.aws/`, `~/.config/`, `~/.gnupg/`, `~/.netrc`, `~/.env`. Access to `os.environ` or `os.getenv` for sensitive keys (`API_KEY`, `SECRET`, `TOKEN`, `PASSWORD`, `CREDENTIAL`, `AWS_`, `GITHUB_`). Cookie jar access, browser profile reads. In enough: any use of the `keyring` library, the service name `enough-broker`, the account `openrouter-api-key`, or `secret-tool lookup/search/store` — the OpenRouter key lives in the OS keyring and nothing in a skill has business touching it.
 
 **Severity:** HIGH for any credential access without clear, documented purpose.
 
@@ -215,11 +232,11 @@ Files whose content does not match their extension.
 
 **Severity:** HIGH for executable content in non-executable extensions.
 
-### P8 — Audit Evasion (NEW)
+### P8 — Audit Evasion
 
 Content designed to manipulate the auditing process itself.
 
-**Why this is new:** Memory Vaccine does not need this because it audits workspace content that is already inside the trust boundary. Untrusted skill packages are outside the trust boundary, and their authors might anticipate auditing and try to circumvent it.
+**Why this class exists:** workspace hygiene doesn't need it — that content is already inside the trust boundary. Untrusted packages are outside it, and their authors may anticipate an audit and try to circumvent it.
 
 **Detection targets:**
 
@@ -258,11 +275,11 @@ Claims of authorization, certification, or community approval:
 
 ## Severity Classification
 
-After individual findings are graded, the skill package receives one of three verdicts:
+After individual findings are graded, the package receives one of three verdicts. This vocabulary is used verbatim in the report **and** in the `verdict.json` sidecar (see `audit.md` → Output):
 
-- **CLEAN**: Zero HIGH or MEDIUM findings at the current strictness level. The skill can be installed with reasonable confidence.
-- **FINDINGS PRESENT**: One or more MEDIUM findings, zero HIGH. The user should review the findings before installing.
-- **DO NOT INSTALL**: One or more HIGH findings. The skill contains material risk.
+- **`pass`**: Zero HIGH and zero MEDIUM findings at the current strictness level. Reasonable to trust.
+- **`flag`**: One or more MEDIUM findings, zero HIGH. The user should review the findings before enabling it.
+- **`fail`**: One or more HIGH findings. The package carries material risk.
 
 The classification is advisory. The user decides.
 
@@ -270,11 +287,11 @@ The classification is advisory. The user decides.
 
 ## Limitations of Static Analysis
 
-skill-scanner's P7 (Executable Payload) analysis is pattern-based static analysis. It has known limitations:
+The P7 (Executable Payload) analysis is pattern-based static analysis. It has known limitations:
 
-1. **Obfuscation can defeat patterns.** Sufficiently creative encoding will evade regex-based detection. The scan report notes this limitation explicitly.
+1. **Obfuscation can defeat patterns.** Sufficiently creative encoding will evade regex-based detection. The report notes this limitation explicitly.
 2. **False positives are possible.** Legitimate code sometimes uses `eval`, `subprocess`, or network calls. The confidence grading system helps, but the user must exercise judgment.
-3. **Dynamic behavior is invisible.** Code that downloads and executes a payload at runtime cannot be detected by examining the source alone. skill-scanner can flag the download mechanism (P7a) and the execution mechanism (P7b), but cannot predict what will be downloaded.
-4. **Language coverage is finite.** The payload scanner focuses on Python, shell, and JavaScript — the most common skill scripting languages. Skills using Rust, Go, or compiled binaries require a different analysis approach (and should receive automatic HIGH findings for including compiled binaries without source).
+3. **Dynamic behavior is invisible.** Code that downloads and executes a payload at runtime cannot be detected by examining the source alone. The audit can flag the download mechanism (P7a) and the execution mechanism (P7b), but cannot predict what will be downloaded.
+4. **Language coverage is finite.** The payload scanner focuses on Python, shell, and JavaScript — the most common skill scripting languages. Packages using Rust, Go, or compiled binaries require a different analysis approach (and receive automatic HIGH findings for including compiled binaries without source).
 
-These limitations do not make the scan worthless. They make it a first gate, not the only gate. skill-scanner catches the common, the careless, and the moderately clever. The truly sophisticated adversary requires additional measures — and the truly sophisticated adversary is unlikely to distribute their attack via a skill zip file when they could just send a phishing email.
+These limitations do not make the audit worthless. They make it a first gate, not the only gate. It catches the common, the careless, and the moderately clever. The truly sophisticated adversary requires additional measures — and the truly sophisticated adversary is unlikely to distribute their attack via a skill zip when they could just send a phishing email.

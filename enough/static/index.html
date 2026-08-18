@@ -500,6 +500,67 @@
       font-size: 12.5px;
     }
 
+    /* First-use audit of untrusted skills. A skill enough SHIPPED carries no
+       mark at all — this chrome only ever appears on something that arrived
+       from outside (a 3P import, or one the agent wrote itself). */
+    ul.skills .skill-mark {
+      margin-left: auto;
+      font-size: 10px;
+      letter-spacing: 0.2px;
+      color: var(--fg-faint);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 4px;
+      line-height: 15px;
+      white-space: nowrap;
+      cursor: help;
+    }
+
+    ul.skills .skill-mark.m-auditing {
+      color: var(--accent-tool);
+      border-color: var(--accent-tool);
+    }
+
+    ul.skills .skill-mark.m-flag,
+    ul.skills .skill-mark.m-fail {
+      color: var(--accent-error);
+      border-color: var(--accent-error);
+    }
+
+    ul.skills .skill-mark.m-pass {
+      color: var(--accent-agent);
+      border-color: var(--accent-agent);
+    }
+
+    ul.skills li.skill-row.st-auditing button.skill-toggle {
+      color: var(--accent-tool);
+      cursor: default;
+      opacity: 0.7;
+    }
+
+    /* Second line under a row: the audit's affordance ("read report · enable
+       anyway") or its live progress while it runs. */
+    ul.skills li.skill-note {
+      padding: 0 4px 4px 24px;
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--fg-faint);
+    }
+
+    ul.skills li.skill-note .skill-link {
+      background: none;
+      border: none;
+      padding: 0;
+      font: inherit;
+      color: var(--accent-user);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    ul.skills li.skill-note .skill-link:hover {
+      filter: brightness(1.2);
+    }
+
     /* Role consultants — same shape as skills, accent on the user color
      so it reads as a different category at a glance. */
     ul.paradigms {
@@ -2556,21 +2617,21 @@
       font-family: var(--font-mono);
     }
 
-    /* Big friendly help-center launcher at the top of the UI modal. */
+    /* Help-center launcher: a normal small button in the UI modal's header
+       row, pushed to the right so it sits beside the close ×. (0.2.2 — it
+       used to be a full-width friendly banner at the top of the body.) */
     .help-center-launch {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-      padding: 12px 16px;
-      margin: 2px 0 14px;
+      gap: 6px;
+      margin-left: auto;
+      margin-right: 10px;
+      padding: 3px 9px;
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 5px;
       cursor: pointer;
       font: inherit;
-      font-size: 14.5px;
-      font-weight: 600;
+      font-size: 12px;
       color: var(--fg);
       background-color: var(--btn-bg, var(--bg-raise));
       background-image: linear-gradient(to bottom,
@@ -2583,8 +2644,8 @@
     }
 
     .help-center-launch .svg-icon {
-      width: 34px;
-      height: 34px;
+      width: 15px;
+      height: 15px;
     }
 
     #merirmaid-mode {
@@ -5783,6 +5844,31 @@
       display: none;
     }
 
+    /* Newer-snapshot pill: a text badge, not an icon chip. Unobtrusive
+       until it has something to say, then it says it in one line. */
+    .wiki-toolbar button.wt-badge {
+      height: 22px;
+      min-width: 0;
+      padding: 0 9px;
+      border-radius: 11px;
+      font-size: 11px;
+      white-space: nowrap;
+      color: var(--accent-agent);
+      border-color: var(--accent-agent);
+    }
+
+    .wiki-toolbar button.wt-badge[hidden] {
+      display: none;
+    }
+
+    /* While the update runs the badge stops being a button and becomes the
+       progress readout. */
+    .wiki-toolbar button.wt-badge.busy {
+      color: var(--accent-tool);
+      border-color: var(--accent-tool);
+      cursor: default;
+    }
+
     /* Bare comments toggle sits at the far right; give it the same wide-pill
        footprint as the topbar toggles — HEIGHT matches the wiki-toolbar
        buttons, WIDTH follows the pill aspect (see .topbar .bare-toggle). */
@@ -6794,6 +6880,12 @@
             aria-label="deletion override"
             title="deletion override — keep this article's local copy forever and stop updating it"><img
               class="svg-icon" data-icon="wiki-unlocked" alt="deletion override" draggable="false"></button>
+          <!-- Newer-snapshot offer. Appears only when a listing check (at
+               most once per 24 h, fired in the background after the reader
+               renders) finds a fresher build of the flavor you have. Click →
+               confirm → the SAME update flow the 🚰 manage list runs; the
+               badge then becomes the progress readout. -->
+          <button type="button" id="wiki-newer-badge" class="wt-badge" hidden></button>
           <button type="button" id="wiki-settings" class="wt-icon"
             title="wikisink settings — archive info, updates, storage"
             aria-label="wikisink settings"><img class="svg-icon" data-icon="wikisink-settings" alt="settings" draggable="false"></button>
@@ -7246,17 +7338,17 @@
     <div class="modal-panel ui-panel-wide" role="dialog" aria-labelledby="ui-modal-title">
       <div class="modal-head">
         <h3 id="ui-modal-title">ui preferences · shortcuts · markdown</h3>
-        <button class="modal-close" onclick="closeUIModal()" aria-label="close">×</button>
-      </div>
-      <div class="modal-body ui-modal-body-wide">
-        <!-- Big friendly launcher: opens the bundled manual in the
-             read-only reference mode (see #ref-mode). -->
+        <!-- Opens the bundled manual in the read-only reference mode
+             (see #ref-mode). Small, inline in the header row. -->
         <button type="button" class="help-center-launch" id="ui-help-center-btn"
           title="open the enough manual in a read-only reference view"
           onclick="closeUIModal(); enterRefMode();">
           <img class="svg-icon" data-icon="hxc" alt="" draggable="false">
-          <span>open the help center</span>
+          <span>help</span>
         </button>
+        <button class="modal-close" onclick="closeUIModal()" aria-label="close">×</button>
+      </div>
+      <div class="modal-body ui-modal-body-wide">
         <!-- Top row: theme + font selectors stay narrow and inline. -->
         <div class="ui-prefs-row">
           <label>
@@ -9763,6 +9855,92 @@
     // in docs/seven-models-plan.md §4), so there's nothing to merge — the
     // event IS the snapshot. Tracked even while the picker is closed, so
     // reopening it lands on the live state.
+    // ---------- Skills: the first-use audit of untrusted skills ----------
+    //
+    // Shipped skills look exactly as they always have. Anything else under
+    // rness/skills/ arrived from outside, so the server marks its row
+    // ("unverified" → "auditing…" → "audited" / "flagged" / "failed") and
+    // refuses to enable it until an audit clears it. Every bit of that state
+    // is rendered server-side into the row; this side owns the two buttons,
+    // the live progress line, and keeping the list fresh.
+    const SKILL_AUDIT_MSG = {};   // skill → last progress line, while auditing
+
+    function skillsRefresh() {
+      if (window.htmx) {
+        htmx.ajax('GET', '/api/skills', { target: '#skills-list', swap: 'innerHTML' });
+      }
+    }
+
+    // Paint the in-flight progress line under any row still auditing. Same
+    // idea as the model picker's status line: the row goes disabled, and a
+    // muted line under it says what's happening.
+    function skillPaintAuditMsgs() {
+      // Idempotent: htmx can settle the same list more than once per refresh,
+      // and our own lines must not stack up. (Server-rendered notes carry no
+      // data-progress, so the affordance lines are never touched.)
+      document.querySelectorAll('#skills-list li.skill-note[data-progress]')
+        .forEach((n) => n.remove());
+      document.querySelectorAll('#skills-list li.skill-row').forEach((row) => {
+        const name = row.dataset.skill;
+        const msg = SKILL_AUDIT_MSG[name];
+        if (!msg) return;
+        if (row.dataset.auditState !== 'auditing') { delete SKILL_AUDIT_MSG[name]; return; }
+        const note = document.createElement('li');
+        note.className = 'skill-note';
+        note.dataset.progress = '1';
+        note.textContent = msg;
+        row.after(note);
+      });
+    }
+    document.body.addEventListener('htmx:afterSettle', (e) => {
+      if (e.target && e.target.id === 'skills-list') skillPaintAuditMsgs();
+    });
+
+    // The audit report is an ordinary project file — open it the ordinary way.
+    function skillOpenReport(path) {
+      if (!path) return;
+      openReadEdit(path, { size: 'full', face: 'read' });
+    }
+    window.skillOpenReport = skillOpenReport;
+
+    async function skillEnableAnyway(name) {
+      const row = document.querySelector('#skills-list li[data-skill="' + name + '"]');
+      const report = row ? (row.dataset.auditReport || '') : '';
+      const ok = await confirmOverlay({
+        title: 'Enable it anyway?',
+        message: `the audit didn't clear "${name}". enabling it puts its ` +
+          'instructions into your agent\'s head on every single message. ' +
+          (report ? 'read the report first if you haven\'t. ' : '') +
+          'this is recorded as your call, and you can turn it off again any time.',
+        confirmLabel: 'enable anyway',
+        cancelLabel: 'never mind',
+      });
+      if (!ok) return;
+      try {
+        const r = await fetch('/api/skills/' + encodeURIComponent(name) + '/trust',
+          { method: 'POST' });
+        if (!r.ok) {
+          const js = await r.json().catch(() => ({}));
+          throw new Error(js.detail || `could not enable (${r.status})`);
+        }
+      } catch (e) {
+        alert(String(e.message || e));
+      }
+      skillsRefresh();
+    }
+    window.skillEnableAnyway = skillEnableAnyway;
+
+    es.addEventListener('skill-audit', (e) => {
+      let d;
+      try { d = JSON.parse(e.data); } catch (_) { return; }
+      if (d.status === 'running') {
+        SKILL_AUDIT_MSG[d.skill] = (d.summary || 'auditing…');
+      } else {
+        delete SKILL_AUDIT_MSG[d.skill];
+      }
+      skillsRefresh();
+    });
+
     es.addEventListener('model-dl', (e) => {
       let d;
       try { d = JSON.parse(e.data); } catch (_) { return; }
@@ -10091,16 +10269,29 @@
     }
     window.wikiForgetInstall = wikiForgetInstall;
 
-    function wikiStartReplace() {
+    // Arm the in-place upgrade: point WIKI_CHOSEN / WIKI_REPLACE_ID / the
+    // storage field at "the newer snapshot of the active install". Shared by
+    // the manage list's "update →" button and the reader's newer-snapshot
+    // badge, so both run the identical flow through POST /api/wiki/setup.
+    // `ns` defaults to the status payload's newer_snapshot; the reader passes
+    // the one its own (throttled) check found.
+    function wikiPrepReplace(nsOpt) {
       const s = WIKI_STATUS || {};
-      const ns = s.newer_snapshot;
+      const ns = nsOpt || s.newer_snapshot;
       const active = (s.installs || []).find(i => i.active);
-      if (!ns || !active) return;
+      if (!ns || !active) return null;
       const label = (WIKI_FLAVORS.find(f => f.flavor === ns.flavor) || {}).label
         || ns.flavor;
       WIKI_CHOSEN = { ...ns, label, size_human: ns.size_human || '' };
       WIKI_REPLACE_ID = active.id;
       document.getElementById('wiki-storage-input').value = active.storage_dir || '';
+      return { ns, active, label };
+    }
+
+    function wikiStartReplace() {
+      const armed = wikiPrepReplace();
+      if (!armed) return;
+      const { ns, active, label } = armed;
       document.getElementById('wiki-confirm-text').textContent =
         `update this install? this downloads ${WIKI_CHOSEN.size_human} ` +
         `(${label}, snapshot ${ns.date}) into ${active.storage_dir} and swaps ` +
@@ -10211,8 +10402,10 @@
         setWikiSetupState('downloading');
         document.getElementById('wiki-progress-label').textContent =
           `downloading ${WIKI_CHOSEN.filename}…`;
+        return true;
       } catch (e) {
         wikiSetupError(String(e.message || e));
+        return false;
       }
     }
     window.startWikiDownload = startWikiDownload;
@@ -10269,6 +10462,97 @@
     let WIKI_HISTORY_IDX = -1;
     let LAST_WIKI_SELECTION = null;  // sticky selection snapshot (chat pill)
 
+    // ---------- Newer-snapshot badge (reader chrome) ----------
+    //
+    // The 🚰 manage list has always been able to offer an in-place upgrade,
+    // but only if you went looking for it. This surfaces the same offer where
+    // you actually read: a small pill in the reader toolbar. The check is
+    // server-throttled to once per 24 h, fired AFTER the reader renders, and
+    // silent on failure — being offline is the normal state of an offline
+    // Wikipedia.
+    let WIKI_NEWER = null;      // the newer listing entry, once we know of one
+
+    async function wikiCheckNewerSnapshot() {
+      if (!(WIKI_STATUS && WIKI_STATUS.installed)) { WIKI_NEWER = null; return; }
+      try {
+        const js = await (await fetch('/api/wiki/newer-snapshot')).json();
+        WIKI_NEWER = (js && js.newer) || null;
+      } catch (_) {
+        WIKI_NEWER = null;      // offline is normal here; say nothing
+      }
+      renderWikiNewerBadge();
+    }
+
+    function renderWikiNewerBadge() {
+      const el = document.getElementById('wiki-newer-badge');
+      if (!el) return;
+      const active = ((WIKI_STATUS || {}).installs || []).find(i => i.active);
+      const ns = WIKI_NEWER;
+      // Only for the flavor that's actually being served right now.
+      if (!ns || !active || (ns.flavor && active.flavor && ns.flavor !== active.flavor)) {
+        el.hidden = true;
+        el.classList.remove('busy');
+        return;
+      }
+      el.hidden = false;
+      el.classList.remove('busy');
+      el.textContent = `newer snapshot: ${ns.date}` +
+        (ns.size_human ? ` · ${ns.size_human}` : '');
+      el.title = `download the ${ns.date} snapshot into the same place as your ` +
+        `${active.snapshot || 'current'} archive and swap it in when it's done`;
+    }
+
+    // Progress face. Speaks only for an update we know about — a first-ever
+    // archive download shouldn't light this up.
+    function wikiNewerBadgeProgress(d) {
+      const el = document.getElementById('wiki-newer-badge');
+      if (!el) return;
+      if (!WIKI_NEWER && !el.classList.contains('busy')) return;
+      if (d.status === 'downloading' || d.status === 'paused') {
+        el.hidden = false;
+        el.classList.add('busy');
+        el.textContent = (d.status === 'paused' ? 'update paused' : 'updating') +
+          (d.pct != null ? ` · ${d.pct}%` : '');
+        el.title = 'the newer snapshot is downloading — it swaps in when done';
+      } else if (d.status === 'done') {
+        WIKI_NEWER = null;
+        el.classList.remove('busy');
+        el.hidden = true;
+      } else {
+        el.classList.remove('busy');
+        renderWikiNewerBadge();
+      }
+    }
+
+    document.getElementById('wiki-newer-badge').addEventListener('click', async () => {
+      const el = document.getElementById('wiki-newer-badge');
+      if (el.classList.contains('busy')) return;
+      const ns = WIKI_NEWER;
+      const active = ((WIKI_STATUS || {}).installs || []).find(i => i.active);
+      if (!ns || !active) return;
+      const ok = await confirmOverlay({
+        title: 'Update your Wikipedia?',
+        message: `this downloads ${ns.size_human || 'the newer snapshot'} ` +
+          `(snapshot ${ns.date}) into ${active.storage_dir} — the same place ` +
+          `your ${active.snapshot || 'current'} archive lives — and swaps it in ` +
+          `when done. the old file is deleted then, not before. your comments, ` +
+          `saves, and overrides all carry over, and reading keeps working while ` +
+          `it runs.`,
+        confirmLabel: 'download it',
+        cancelLabel: 'not now',
+      });
+      if (!ok) return;
+      if (!wikiPrepReplace(ns)) return;
+      el.classList.add('busy');
+      el.textContent = 'starting…';
+      const started = await startWikiDownload();
+      if (!started) {
+        el.classList.remove('busy');
+        renderWikiNewerBadge();
+        wikiToast('could not start the update — open 🚰 settings for the reason', true);
+      }
+    });
+
     async function enterWikiMode() {
       // Stacks on top of whatever is open. (Topbar-button re-entry while
       // already stacked is handled by onWikisinkClick, which raises instead
@@ -10284,6 +10568,9 @@
         exitTitle: 'exit wikisink',
       });
       if (typeof refreshWikiChatTail === 'function') refreshWikiChatTail();
+      // Never blocks the render: paint whatever we already know, then ask.
+      renderWikiNewerBadge();
+      wikiCheckNewerSnapshot();
       if (!WIKI_PATH) {
         const last = WIKI_STATUS && WIKI_STATUS.last_viewed;
         if (last && last.path) {
@@ -11184,6 +11471,9 @@
         fetchWikiStatus().then(s => { WIKI_STATUS = s; updateWikisinkBtnIcon(s); });
         if (modalOpen) setWikiSetupState('done');
       }
+      // The reader's newer-snapshot pill doubles as the progress readout for
+      // an in-place upgrade, and disappears when the swap lands.
+      wikiNewerBadgeProgress(d);
     });
 
     // ---------- Review mode ----------

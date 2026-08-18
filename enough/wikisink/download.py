@@ -19,6 +19,7 @@ import re
 import shutil
 import time
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Awaitable, Callable
 
@@ -185,6 +186,58 @@ def newer_snapshot_available(cfg: dict[str, Any] | None = None,
         return {**entry, "flavor": flavor,
                 "size_human": bytes_to_human(entry["size_bytes"])}
     return None
+
+
+# How often the reader is allowed to ask kiwix about newer snapshots.
+LISTING_CHECK_INTERVAL = 24 * 3600.0
+
+
+def newer_snapshot_throttled(cfg: dict[str, Any] | None = None,
+                             *, max_age_s: float = LISTING_CHECK_INTERVAL,
+                             ) -> dict[str, Any]:
+    """The reader's newer-snapshot check: at most one live listing fetch per
+    `max_age_s`, timestamp persisted in `wikisink.json` as
+    `listing_checked_at` so it survives page reloads and restarts.
+
+    Inside the window (or with no archive installed) it answers from the
+    in-process listing cache and never touches the network. Failures are
+    silent — offline is the normal state of an offline-Wikipedia feature —
+    and still stamp the clock, so a machine with no connectivity retries
+    tomorrow rather than on every reader open.
+
+    Returns `{"newer": <entry|None>, "checked_at": <iso|None>,
+    "checked": <bool — did we go to the network this call>}`.
+    """
+    cfg = cfg or wconfig.load_config()
+    if not wconfig.installed(cfg):
+        return {"newer": None, "checked_at": cfg.get("listing_checked_at"),
+                "checked": False}
+    last = cfg.get("listing_checked_at")
+    age = None
+    if last:
+        try:
+            when = datetime.fromisoformat(str(last))
+            if when.tzinfo is None:
+                when = when.replace(tzinfo=timezone.utc)
+            age = (datetime.now(timezone.utc) - when).total_seconds()
+        except (TypeError, ValueError):
+            age = None
+    if age is not None and age < max_age_s:
+        return {"newer": newer_snapshot_available(cfg, cached_only=True),
+                "checked_at": last, "checked": False}
+    stamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    newer = None
+    try:
+        newer = newer_snapshot_available(cfg)
+    except Exception as e:  # noqa: BLE001 — an update hint must never break the reader
+        log.warning("newer-snapshot check failed (%s)", e)
+    try:
+        fresh = wconfig.load_config()
+        fresh["listing_checked_at"] = stamp
+        wconfig.save_config(fresh)
+    except OSError as e:
+        log.warning("could not persist listing_checked_at (%s)", e)
+    return {"newer": newer, "checked_at": stamp, "checked": True}
 
 
 # ---------------------------------------------------------------------------

@@ -54,7 +54,6 @@ from .prompt import (
     set_active_paradigm,
     set_help_bubbles,
     set_role_enabled,
-    set_skill_enabled,
 )
 from .supervisor import LlamaSupervisor
 from .tools import (
@@ -1231,6 +1230,76 @@ def create_app(
         set_active_paradigm(rness, name)
         return await api_paradigm()  # type: ignore[return-value]
 
+    # ------------------------------------------------------------------
+    # Skills — the sidebar list, the guarded toggle, and the first-use
+    # audit of untrusted skills (docs/skills-round-plan.md §3). Trusted =
+    # a symlink into this install's defaults/skills; everything else gets
+    # read before it's allowed into the system prompt. Audit progress
+    # streams on the `skill-audit` SSE event.
+    # ------------------------------------------------------------------
+
+    from . import skillaudit as _skillaudit
+
+    # State labels the sidebar renders. Terse, lowercase, house voice.
+    _SKILL_MARKS = {
+        "unverified": ("unverified", "not shipped with enough — enabling it "
+                                     "runs a first-use audit first"),
+        "auditing": ("auditing…", "reading this skill before it goes into "
+                                  "your agent's head"),
+        "pass": ("audited", "audited and clean"),
+        "flag": ("flagged", "the audit wants a human to look at this"),
+        "fail": ("failed", "the audit says don't"),
+    }
+
+    def _skill_rows(items: list[tuple[str, bool, str]]) -> str:
+        rows: list[str] = []
+        for name, enabled, tooltip in items:
+            st = _skillaudit.skill_state(project_dir, name)
+            state = st["state"]
+            cls = "on" if enabled else "off"
+            next_val = "0" if enabled else "1"
+            tip = _escape_html(tooltip) if tooltip else ""
+            title_attr = f' title="{tip}"' if tip else ""
+            esc_name = _escape_html(name)
+            js_name = json.dumps(name)[1:-1].replace("'", "\\'")
+            auditing = state == "auditing"
+            mark = ""
+            if state != "trusted":
+                label, why = _SKILL_MARKS.get(state, (state, ""))
+                if st.get("override"):
+                    label, why = "trusted by you", "you enabled this over the audit"
+                extra = f" · {st['summary']}" if st.get("summary") else ""
+                mark = (f'<span class="skill-mark m-{state}" '
+                        f'title="{_escape_html(why + extra)}">{_escape_html(label)}</span>')
+            rows.append(
+                f'<li class="skill-row {cls} st-{state}" data-skill="{esc_name}"'
+                f' data-audit-state="{state}"'
+                f' data-audit-report="{_escape_html(st.get("report") or "")}"'
+                f'{title_attr}>'
+                f'  <button class="skill-toggle" '
+                + ("disabled " if auditing else
+                   f'hx-post="/api/skills/toggle" '
+                   f'hx-vals=\'{{"name": "{esc_name}", "enabled": "{next_val}"}}\' '
+                   f'hx-target="#skills-list" hx-swap="innerHTML" ')
+                + f'>{"◐" if auditing else ("●" if enabled else "○")}</button>'
+                f'  <span class="skill-name">{esc_name}</span>'
+                f'  {mark}'
+                f'</li>'
+            )
+            if state in ("flag", "fail") and not enabled:
+                verb = "flagged" if state == "flag" else "failed"
+                report = st.get("report") or ""
+                read_btn = (
+                    f'<button type="button" class="skill-link" '
+                    f'onclick="skillOpenReport(\'{_escape_html(report)}\')">read report</button> · '
+                ) if report else ""
+                rows.append(
+                    f'<li class="skill-note">audit {verb} this — {read_btn}'
+                    f'<button type="button" class="skill-link" '
+                    f'onclick="skillEnableAnyway(\'{js_name}\')">enable anyway</button></li>'
+                )
+        return "".join(rows)
+
     @app.get("/api/skills", response_class=HTMLResponse)
     async def api_skills() -> HTMLResponse:
         from .skeleton import resync_globals
@@ -1238,24 +1307,28 @@ def create_app(
         items = list_skills(project_dir / "rness")
         if not items:
             return HTMLResponse('<div class="empty-note">no skills in rness/skills/</div>')
-        rows = []
-        for name, enabled, tooltip in items:
-            cls = "on" if enabled else "off"
-            next_val = "0" if enabled else "1"
-            tip = _escape_html(tooltip) if tooltip else ""
-            title_attr = f' title="{tip}"' if tip else ""
-            rows.append(
-                f'<li class="skill-row {cls}"{title_attr}>'
-                f'  <button class="skill-toggle" '
-                f'    hx-post="/api/skills/toggle" '
-                f'    hx-vals=\'{{"name": "{_escape_html(name)}", "enabled": "{next_val}"}}\' '
-                f'    hx-target="#skills-list" hx-swap="innerHTML">'
-                f'    {"●" if enabled else "○"}'
-                f'  </button>'
-                f'  <span class="skill-name">{_escape_html(name)}</span>'
-                f'</li>'
-            )
-        return HTMLResponse('<ul class="skills">' + "".join(rows) + "</ul>")
+        return HTMLResponse('<ul class="skills">' + _skill_rows(items) + "</ul>")
+
+    def _schedule_skill_audit(name: str) -> bool:
+        """Run the first-use audit off the request path. Claims the slot
+        synchronously so a double-click can't start two scans."""
+        if not _skillaudit.try_claim(project_dir, name):
+            return False
+        loop = asyncio.get_running_loop()
+
+        def _emit_sync(event: str, data: dict[str, Any]) -> None:
+            asyncio.run_coroutine_threadsafe(session.emit(event, data), loop)
+
+        async def _go() -> None:
+            try:
+                await asyncio.to_thread(
+                    _skillaudit.audit_and_enable, project_dir, name,
+                    emit=_emit_sync, llm_url=llm_url)
+            finally:
+                _skillaudit.release(project_dir, name)
+
+        asyncio.create_task(_go())
+        return True
 
     @app.post("/api/skills/toggle", response_class=HTMLResponse)
     async def api_skills_toggle(request: Request) -> HTMLResponse:
@@ -1264,8 +1337,41 @@ def create_app(
         enabled_raw = (form.get("enabled") or "").strip()
         if not name:
             raise HTTPException(400, "missing name")
-        set_skill_enabled(project_dir / "rness", name, enabled_raw == "1")
+        want_on = enabled_raw == "1"
+        try:
+            res = _skillaudit.set_skill_enabled_guarded(project_dir, name, want_on)
+        except _skillaudit.SkillAuditRefused as refusal:
+            # Blocked until reviewed. Answer 200 with the re-rendered list so
+            # htmx swaps in the row carrying the refusal and its affordances
+            # ("read report · enable anyway"); the structured payload also
+            # goes out on the event stream for anything else listening.
+            await session.emit("skill-audit", {
+                "skill": name, "phase": "protocol", "status": refusal.verdict,
+                "report": refusal.report, "summary": refusal.summary,
+                "fingerprint": refusal.fingerprint, "enabled": False,
+            })
+            return await api_skills()  # type: ignore[return-value]
+        if res.get("state") == "needs_audit":
+            _schedule_skill_audit(name)
         return await api_skills()  # type: ignore[return-value]
+
+    @app.post("/api/skills/{name}/trust")
+    async def api_skills_trust(name: str) -> dict[str, Any]:
+        """User override: record a pass verdict for the skill as it stands
+        right now and enable it. The report path is preserved — overriding a
+        finding doesn't erase it. Change the skill's files afterwards and the
+        fingerprint moves, so the next toggle-on audits it again."""
+        try:
+            record = await asyncio.to_thread(_skillaudit.trust_override,
+                                             project_dir, name)
+        except FileNotFoundError as e:
+            raise HTTPException(404, str(e)) from None
+        await session.emit("skill-audit", {
+            "skill": name, "phase": "protocol", "status": "pass",
+            "report": record.get("report"), "summary": record.get("summary") or "",
+            "fingerprint": record.get("fingerprint"), "enabled": True,
+        })
+        return {"ok": True, "skill": name, "verdict": record}
 
     @app.get("/api/roles", response_class=HTMLResponse)
     async def api_roles() -> HTMLResponse:
@@ -2368,6 +2474,17 @@ def create_app(
     @app.get("/api/wiki/flavors")
     async def api_wiki_flavors(force: bool = Query(False)) -> dict[str, Any]:
         return await asyncio.to_thread(_wiki_download.list_flavors, force)
+
+    @app.get("/api/wiki/newer-snapshot")
+    async def api_wiki_newer_snapshot() -> dict[str, Any]:
+        """The reader's newer-snapshot check (docs/skills-round-plan.md §5).
+
+        Deliberately NOT folded into `/api/wiki/status`, which is documented
+        as instant and network-free — this one is allowed to go to
+        download.kiwix.org, but at most once per 24 h (the clock is persisted
+        as `listing_checked_at` in wikisink.json). Silent on failure; the
+        reader fires it in the background after it renders."""
+        return await asyncio.to_thread(_wiki_download.newer_snapshot_throttled)
 
     @app.get("/api/wiki/diskspace")
     async def api_wiki_diskspace(dir: str = Query(...)) -> dict[str, Any]:

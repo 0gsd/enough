@@ -195,18 +195,23 @@ linked above. They power the `translator` skill and live at
 
 ## Skills shipped under `defaults/skills/`
 
-Four skills ship with enough as "first-party" defaults:
+Five skills ship with enough as "first-party" defaults:
 
 | Skill | Purpose | Author |
 |---|---|---|
-| analyzer | Three-mode analytical workbench: summarize, proofread, decide | Graham Smith |
+| analyzer | Four-mode analytical workbench: summarize, proofread, decide, audit | Graham Smith |
+| anything-finder | Deep-search retrieval, patent prior-art search, and business-viability reads | Graham Smith |
+| girraph-merirmaid | Authoring discipline for the `.girraph` (IBIS) and `.merirmaid` diagram primitives | Graham Smith |
 | memoir-dialectic | Patient multi-session memoir collaborator | Graham Smith |
-| skill-scanner | Plain-English explainer and security/epistemic auditor for skill packages | Graham Smith |
 | translator | Offline machine translation across ~419 languages | Graham Smith |
 
 These are authored for the enough project and fall under the
-repository's Apache 2.0 license (see [LICENSE](LICENSE)). Users may add
-their own skills at `~/enough/defaults/skills/` or in any project's
+repository's Apache 2.0 license (see [LICENSE](LICENSE)). Two of them
+absorbed earlier skills by the same author in 0.2.2 — `analyzer`'s `audit`
+mode took over the standalone package auditor, and `anything-finder` merges
+`find-anything` with `prior-art` — so the attribution and the license are
+unchanged and no third-party code is involved. Users may
+add their own skills at `~/enough/defaults/skills/` or in any project's
 `rness/skills/` directory; those skills are governed by whatever terms
 the skill author chooses.
 

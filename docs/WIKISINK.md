@@ -73,6 +73,14 @@ article the first time). Toolbar, left to right:
 - **save** — one button with a two-choice flyout: this project's `wiki/`
   folder (created on first save), or the global `~/enough/cacheawl/wiki/`
   cachebox (shared across all projects)
+- **newer-snapshot pill** — `newer snapshot: <date> · <size>`, shown only
+  when Kiwix has a newer build of the flavor you have installed. Click →
+  confirm → the same in-place upgrade the ⚙ installs list offers (same
+  storage folder; the old `.zim` is deleted only after the new one lands;
+  comments, saves and overrides carry across). The pill becomes the
+  download's progress readout, then disappears. The check runs at most
+  once every 24 h, never blocks the reader, and fails silently when
+  you're offline
 - **🛡** deletion override (see below) · **🗨** comments panel · **⚙** settings
 
 Internal links stay in-app; external links open in your browser. The
@@ -137,7 +145,8 @@ cachebox) or **commented on** is *watched*. A run:
 5. checks for **deletions** of watched or recently-viewed articles and
    scores how suspicious each one looks (see below);
 6. notes when a **newer base snapshot** is available (replacing the
-   multi-GB base is always your call, via ⚙).
+   multi-GB base is always your call — the reader's newer-snapshot pill
+   or the ⚙ installs list; no agent tool swaps an archive).
 
 The report arrives in chat as markdown — copy it from there; it is not
 saved into your project unless you ask. The full uncapped version lands

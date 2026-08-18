@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.2.0)
+# enough — Agent Guide (v0.2.2)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -54,8 +54,9 @@ Every Python module in `enough/`:
 
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
-| [enough/server.py](../enough/server.py) | ~3300 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, and the desktop-gated `POST /api/shutdown` — see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). | `create_app()`, `_drive_message()`, `request_process_exit()` (module-level so tests can swap it), all `@app.{get,post}` handlers |
-| [enough/prompt.py](../enough/prompt.py) | ~890 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/role/paradigm enumeration + toggle-state helpers. | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
+| [enough/server.py](../enough/server.py) | ~3300 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — and the desktop-gated `POST /api/shutdown`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). | `create_app()`, `_drive_message()`, `request_process_exit()` (module-level so tests can swap it), all `@app.{get,post}` handlers |
+| [enough/prompt.py](../enough/prompt.py) | ~890 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/role/paradigm enumeration + toggle-state helpers. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
+| [enough/skillaudit.py](../enough/skillaudit.py) | ~900 | First-use audit of untrusted skills (0.2.2). Trust classification (symlink into the install's `defaults/skills/` = trusted), the content fingerprint, the `verdict.json` sidecar, both audit passes (deterministic `payload_scanner.py` + a single non-streaming LLM completion), the in-flight registry, and the guarded toggle. Progress on the `skill-audit` SSE event. | `is_trusted()`, `fingerprint()` / `skill_fingerprint()`, `skill_state()`, `set_skill_enabled_guarded()`, `SkillAuditRefused`, `audit_skill()` / `audit_and_enable()`, `run_llm_audit()` (module-level test hook), `quarantine_untrusted()`, `trust_override()`, `read_verdict()` / `write_verdict()` |
 | [enough/broker.py](../enough/broker.py) | ~380 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
 | [enough/tools.py](../enough/tools.py) | ~1360 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers), the tool-call XML parser, the dispatch table. | `_DISPATCH`, `_TRACE_TOGGLE`, `execute()`, `parse_tool_calls()`, `_CLOUD_KEY_EXFIL_PATTERNS` |
 | [enough/wikisink/](../enough/wikisink/) | ~2500 (pkg) | Local offline Wikipedia. `config.py` (install registry, schema v2 multi-install, data paths), `zim.py` (libzim reader, search, sanitize/rewrite), `download.py` (Kiwix flavor listing + resumable downloads), `overlay.py` (live-refreshed + preserved article stores), `comments.py` (per-article threads), `save.py` (save/read/unsave article folders + the clean HTML→markdown text pipeline), `update.py` (the "wikisink" update run), `rankings.py` (pageview snapshots), `report.py` (run report), `agent.py` (the four agent tool runners). | `config.load_config()` / `installs()` / `active_install()` / `unavailable_reason()`, `zim.get_article()` / `search()`, `download.DownloadManager`, `update.run_wikisink()` |
@@ -64,7 +65,7 @@ Every Python module in `enough/`:
 | [enough/supervisor.py](../enough/supervisor.py) | ~400 | Manages the local llama-server subprocess. Adopts an existing process if one's already up; spawns its own otherwise. Skips spawning entirely when the active model is `opro-api`. | `LlamaSupervisor`, `_resolve_startup_choice()` |
 | [enough/models.py](../enough/models.py) | ~550 | Local-model registry (7 cute-named local models, defined in `defaults/models.json`; two carry separate MTP draft GGUFs, two carry a `llama_cpp_min_release` gate). Feasibility verdicts (RAM + free disk), `install-menu` CLI for bootstrap.sh. Selection state in `~/enough/config/models.json`. | `load_registry()`, `load_state()`, `save_state()`, `resolve()`, `all_models_view()`, `feasibility()`, `release_gate()`, `install_menu_rows()` |
 | [enough/model_download.py](../enough/model_download.py) | ~330 | Resumable GGUF downloads for the in-app model manager: main file then optional MTP draft, ranged-GET resume off a `.part`, one active download per process, cancel-keeps-partial, delete. Backs `/api/models/{download,delete}/*`; progress on the `model-dl` SSE event. | `ModelDownloadManager` (`start` / `cancel` / `delete` / `state`), `pending_phases()`, `partials()` |
-| [enough/skeleton.py](../enough/skeleton.py) | ~560 | Creates `rness/` for new projects (copies from `defaults/`), syncs global skills/roles/paradigms on every launch via dedicated populators, runs migrations. | `ensure_skeleton()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS`, `_populate_skill_symlinks` / `_populate_role_symlinks` / `_populate_paradigm_symlinks` |
+| [enough/skeleton.py](../enough/skeleton.py) | ~560 | Creates `rness/` for new projects (copies from `defaults/`), syncs global skills/roles/paradigms on every launch via dedicated populators, runs migrations. `_populate_skill_symlinks` also calls `skillaudit.quarantine_untrusted()` — untrusted skills default OFF. | `ensure_skeleton()`, `resync_globals()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS`, `_populate_skill_symlinks` / `_populate_role_symlinks` / `_populate_paradigm_symlinks` |
 | [enough/highlights.py](../enough/highlights.py) | ~250 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
 | [enough/girraph.py](../enough/girraph.py) | ~695 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
 | [enough/cacheawl.py](../enough/cacheawl.py) | ~1340 | The cacheawl store: cachebox CRUD, path/URL/wikisink **ingest**, the `_cachebox.merirmaid` mirror generator + reconcile, the mirror/sidecar write-guards, transfer (copy/move), and the launch-time `infoworld` migration. Root is `~/enough/cacheawl/` (or `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store; nothing else writes there. | `root()`, `create_cachebox()` / `list_cacheboxes()` / `cachebox_tree()`, `run_ingest()`, `regenerate_mirror()` / `reconcile()` / `reconcile_all()`, `mirror_write_denial()`, `migrate_infoworld()` |
@@ -238,7 +239,8 @@ cache.
 | Motivation | `rness/MOTIVATION.md` (copied) | `defaults/MOTIVATION.md` | yes |
 | Active paradigm | `rness/active-paradigm` (multipurpose markdown: paradigm name + help-bubbles state — see "What NOT to touch") | seeded by `prompt.seed_multipurpose_file()` | the active paradigm's full file, yes |
 | Paradigms | `rness/paradigms/<name>.md` (symlink) | `defaults/paradigms/<name>.md` | the active one, yes |
-| Skills | `rness/skills/<name>/SKILL.md` (symlink) | `defaults/skills/<name>/SKILL.md` | the toggled-on ones, yes |
+| Skills | `rness/skills/<name>/SKILL.md` (symlink = shipped/trusted; a real dir = untrusted) | `defaults/skills/<name>/SKILL.md` | the toggled-on ones, yes |
+| Skill audits | `rness/io/output/analyzer/audits/<skill>/<YYYY-MM-DD>-audit.md` + `verdict.json` | none — written by `skillaudit.py` or by analyzer's `audit` mode | no |
 | Roles | `rness/roles/<name>/AGENT.md`+`MOTIVATION.md` (symlink) | `defaults/roles/<name>/` | the toggled-on ones, yes |
 | Policies | `rness/policies/*.md` (symlink) | `defaults/policies/*.md` | yes, all of them |
 | Project profile | `rness/knowledge/project-profile.md` | seeded empty | yes |
@@ -260,7 +262,13 @@ text file: `rness/skills/.disabled` and `rness/roles/.disabled`. Read/
 written via `prompt._read_disabled_skills()` / `set_skill_enabled()` (and
 the role-side equivalents). New globals appear in every project with
 their name added to `.disabled` on first sync — i.e. defaulted off.
-Paradigms are different — exactly one is active, named in
+**Untrusted skills also default off**, by a second route:
+`skillaudit.quarantine_untrusted()` (called from
+`skeleton._populate_skill_symlinks`, so every launch and every
+`/api/skills`) names any untrusted skill without a matching `pass`
+verdict into `.disabled`. Without it a hand-dropped or agent-written
+directory would be live in the system prompt having never passed a
+toggle. Paradigms are different — exactly one is active, named in
 `rness/active-paradigm`.
 
 ---
@@ -836,7 +844,36 @@ Architecture notes:
   `replace_id`; 409s on duplicate target),
   `download/{pause,resume,cancel}`, `installs/activate`, `installs`
   (DELETE = forget), `overrides`, `override`, `wikisink` (the update
-  run).
+  run), `newer-snapshot` (0.2.2 — the reader's throttled check; see
+  below).
+- **The reader's newer-snapshot check (0.2.2).**
+  `download.newer_snapshot_throttled(cfg, max_age_s=86400)` →
+  `{"newer": entry|None, "checked_at": iso|None, "checked": bool}`. No
+  install → answers `None` without asking anything. Inside the window →
+  cached-only, never network. Outside → one live listing fetch, then it
+  stamps the clock **even on failure**, so an offline machine retries
+  tomorrow rather than on every reader open. Exceptions are swallowed and
+  logged. The clock is `listing_checked_at` (ISO8601 UTC), a top-level key
+  in `~/enough/config/wikisink.json` declared in `config._defaults()` —
+  `save_config` drops unrecognised keys, so a new key has to be declared
+  there or it silently evaporates. Exposed as `GET /api/wiki/newer-snapshot`;
+  this could **not** fold into `/api/wiki/status` (documented instant and
+  network-free) or `/api/wiki/flavors` (unthrottled, and the setup wizard
+  wants a forced live fetch). The reader paints what it already knows on
+  `enterWikiMode()`, then fires the check in the background — never blocking
+  render, silent on failure.
+- **The reader badge shares the manage list's upgrade path.** The badge
+  (`#wiki-newer-badge` in `.wiki-toolbar`) is visible only when the entry's
+  flavor matches the *active* install's. Click → `confirmOverlay` → the
+  existing `POST /api/wiki/setup` with `replace_id`, i.e. the identical
+  in-place swap the 🚰 manage list arms (`wikiStartReplace()` was split into
+  `wikiPrepReplace(nsOpt)` + confirm copy so both callers can't drift).
+  During the download the badge is the progress readout off the existing
+  **`wiki_download`** event — note `wiki_sink` is the update-*run* event, not
+  the download one — and hides on `done`. It stays silent for a first-ever
+  archive download. There is deliberately **no agent tool** that swaps a base
+  archive; the agent's `wikisink` run only *reports* that a newer snapshot
+  exists (same rule as install switching and deletion overrides).
 - **Save targets, two of them.** A save goes either to the project
   (`<project>/wiki/<slug>/`) or to the machine-global wiki cachebox
   (`~/enough/cacheawl/wiki/<slug>/`) — the reader's single save button
@@ -961,6 +998,144 @@ article then expands crosslinks `depth` layers.
 
 ---
 
+## Skill trust and the first-use audit
+
+All of it lives in [enough/skillaudit.py](../enough/skillaudit.py) (0.2.2).
+`prompt.set_skill_enabled()` stays a dumb `.disabled` writer; the guarded
+door is `skillaudit.set_skill_enabled_guarded()`. There is **no agent tool
+for skill toggling** — `tools.py` has no skill path — so the HTTP endpoint
+is the only door, and the choke point is complete.
+
+**Trust classification** — `is_trusted(project_dir, name)`: the entry under
+`rness/skills/` is a symlink whose `resolve(strict=True)` lands inside
+`skeleton._install_defaults_root() / "skills"`. Real directories and
+symlinks pointing anywhere else are untrusted — including a `SKILL.md` the
+agent wrote itself, which is intended (the agent audits its own output).
+Both the folder (`<name>/`) and flat (`<name>.md`) layouts are handled.
+
+**Fingerprint** — `fingerprint(target)` is sha256 over, for every regular
+file under the skill root sorted by POSIX relative path,
+`<relpath>\0<sha256(filebytes)>\n`, returned as `"sha256:<hex>"`. Skips
+`SKIP_DIR_PARTS` (`__pycache__ .git node_modules .pytest_cache .mypy_cache
+.ruff_cache`) and `SKIP_FILE_NAMES` (`.DS_Store`). Names *and* contents
+count (a rename moves it); mtimes, permissions and absolute paths do not (a
+copy or re-clone doesn't). `_FP_CACHE` is keyed on a stat signature so the
+10 s sidebar poll doesn't re-hash whole trees — **mtimes gate the cache
+only, never the recipe.**
+
+**Toggle-on decision table** (`set_skill_enabled_guarded`):
+
+| Condition | Result |
+|---|---|
+| trusted | enable |
+| verdict matches fingerprint, `pass` | enable |
+| verdict matches fingerprint, `flag`/`fail` | raise `SkillAuditRefused` (`.skill/.verdict/.summary/.report/.fingerprint`, `.as_dict()`); skill written OFF |
+| no verdict, or fingerprint moved | `{"ok": False, "state": "needs_audit"}`; skill written OFF; caller schedules `audit_skill()` |
+
+Refusal and `needs_audit` both write the skill **off explicitly** rather
+than merely declining to write. Toggle-*off* never audits.
+
+**Two passes.** (1) `run_payload_scan()` imports `payload_scanner.py`
+resolved through the project's own skills dir — `SCANNER_HOSTS` names
+`analyzer` first and the pre-0.2.2 host it was merged from second, for
+installs that predate the merge; `LEGACY_REFS` does the same for the two
+protocol documents — and
+only from a host skill that is itself trusted, else it falls back to the
+install's `defaults/skills/` (a rogue `analyzer` directory can't supply the
+scanner). `scan_floor()` maps the script's own vocabulary onto ours:
+`CLEAN`→`pass`, `FINDINGS PRESENT`→`flag`, `DO NOT INSTALL`→`fail`. That
+verdict is a **floor**; a `fail` floor short-circuits before spending a
+model. A missing or broken scanner is not a failed audit — the LLM pass
+still runs. **Read that floor for what it is:** the deterministic pass is a
+floor for *code* payloads (py/sh/js) plus a light markdown-injection check
+(P9: credential names next to a way off the machine, base64 blobs in prose,
+"ignore previous instructions" phrasing — all MEDIUM, never HIGH), and
+prose *intent* is judged by the LLM pass — so a `CLEAN` scan means "no
+payload shape matched", not "safe", and the scanner is never the safety net
+on its own. (2) `run_llm_audit()` — a dedicated server-side runner, *not* a
+synthetic agent turn: it assembles analyzer's `references/audit.md`
+(+ `audit-threat-model.md` when present; `LEGACY_REFS` for pre-merge
+installs) plus the skill's own files (`MAX_PROMPT_CHARS` 24k,
+`MAX_FILE_CHARS` 6k) and makes ONE non-streaming completion call — local
+llama-server, or `cloud.chat_completion()` when `opro-api` is active. No
+history, no generation lock, worker thread; the user keeps chatting. The
+model answers `VERDICT: pass|flag|fail` / `SUMMARY:` / `NOTES:`, and an
+**unparsable reply is a `flag`, never a `pass`**. **Transport failure →
+`flag`** (`phase: "protocol", status: "error"`), not a pass and not a hard
+error. Final verdict = worst of (scanner floor, LLM verdict).
+
+**Decode parameters are measured, not taste** (`AUDIT_TEMPERATURE` 0.7,
+`AUDIT_MAX_TOKENS` 12000, bounded by `_completion_budget()` against the
+`n_ctx` llama-server reports on `/props`): at temperature 0 a reasoning
+model loops in its own reasoning channel, and 1200 tokens is below the floor
+for a 17k-token audit prompt — see the Wave D table in
+[docs/skills-round-plan.md](skills-round-plan.md). When `content` comes back
+empty but `reasoning_content` doesn't, the verdict is read out of the
+reasoning; a `pass` found there is downgraded to `flag` (an answer that
+never arrived is not an endorsement), and `parse_audit_reply()` takes the
+*last* verdict line and ignores a restated `VERDICT: pass|flag|fail`
+template.
+
+**`run_llm_audit` is the test hook.** Module-level, looked up at call time,
+swapped in tests exactly like `server.request_process_exit`. Every test in
+`tests/test_skill_audit.py` uses it; no test may reach a model.
+
+**Outputs** — `AUDITS_REL = "rness/io/output/analyzer/audits"`, then
+`<skill>/verdict.json` and `<skill>/<YYYY-MM-DD>-audit.md`. Same folder and
+filename convention analyzer's `audit` mode writes to, so both doors
+produce the same document in the same place. `verdict.json` is exactly six
+keys — `{"skill", "fingerprint", "verdict", "summary", "report", "at"}` —
+plus `"override": true` on a user override; `report` is
+**project-root-relative**. Read `verdict.json` by name: the folder may also
+hold dated reports, an optional `<date>-payload-scan.json`, and an
+`unpacked/` dir. A re-audit overwrites the sidecar and drops any
+`"override"` key (an override describes one set of files at one moment).
+
+**Concurrency** — `try_claim()` / `release()` guard one audit per (project,
+skill); the endpoint claims synchronously before handing work to a thread,
+so a double-click can't start two scans. `is_auditing()` backs the
+`auditing` row state.
+
+**Not re-audited mid-session (v1).** An already-enabled skill whose files
+change is not re-audited or disabled live; `quarantine_untrusted()`
+deliberately leaves a *stale* `pass` alone. It re-audits on the next
+toggle-on, when the fingerprint mismatch is noticed.
+
+### Endpoints and the SSE event
+
+| Endpoint | Method | Shape |
+|---|---|---|
+| `/api/skills` | GET | Unchanged contract (HTML `<ul class="skills">`). Rows now carry `data-skill`, `data-audit-state`, `data-audit-report`, and a `.skill-mark` pill; a blocked row is followed by `<li class="skill-note">` with *read report* / *enable anyway*. Calls `resync_globals()` first, so every render also re-quarantines. |
+| `/api/skills/toggle` | POST | Unchanged form (`name`, `enabled`) and unchanged 200-HTML response, now guarded. A refusal answers **200 with the re-rendered list** (htmx swaps in the flagged row and its affordances) and mirrors the structured payload onto the event stream. |
+| `/api/skills/{name}/trust` | POST | **New (0.2.2).** Records `{"verdict":"pass","override":true,…}` preserving the existing `report`, enables the skill, returns `{"ok":true,"skill":…,"verdict":{…}}`. 404 when no such skill. |
+
+Row states rendered by `_SKILL_MARKS` in server.py: `unverified`,
+`auditing…`, `audited` (pass), `flagged`, `failed`, and `trusted by you`
+when `override` is set. A trusted (shipped) row renders byte-identically to
+pre-0.2.2 — no mark at all.
+
+SSE event **`skill-audit`**, one payload shape throughout:
+
+```json
+{"skill": "keysnoop", "phase": "scan"|"protocol",
+ "status": "running"|"pass"|"flag"|"fail"|"error",
+ "report": "rness/io/output/analyzer/audits/keysnoop/2026-08-17-audit.md",
+ "summary": "it asks for your ssh keys…",
+ "fingerprint": "sha256:…"}
+```
+
+Sequence: `scan/running` → `scan/<floor>` → `protocol/running` →
+`protocol/<final>`. The two server-emitted terminal cases (a refused
+toggle, and the trust override) add `"enabled": <bool>` — a superset,
+harmless to a consumer that ignores it.
+
+**Two override routes**, both supported and both documented for users:
+the *enable anyway* button (`POST /api/skills/{name}/trust`), and
+hand-editing `verdict.json` to `{"verdict": "pass"}` — the fingerprint must
+match the files as they stand.
+
+---
+
 ## The help system
 
 Three layers, all markdown (design formerly in docs/help-system-plan.md):
@@ -982,9 +1157,12 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
 - **The manual.** `docs/HELP_CENTER.md` is the complete end-user manual
   (voice-matched to the project; edit it like documentation, verify
   claims against the code first). `GET /api/help-center` serves it raw;
-  the **reference mode** (`#ref-mode`, the `hxc` button at the top of
-  the UI modal) renders it read-only in-app. See the mode-stack notes
-  under "Change the UI".
+  the **reference mode** (`#ref-mode`) renders it read-only in-app,
+  launched from `#ui-help-center-btn` — since 0.2.2 a normal small
+  **help** button inline in the UI modal's header row, right-aligned
+  beside the ×, rather than the old full-width banner. It kept its
+  `.help-center-launch` class name, its `hxc` icon, and its `onclick`;
+  only the CSS shrank. See the mode-stack notes under "Change the UI".
 - **Cheat sheets.** Keyboard shortcuts + markdown reference live inline
   in the UI modal markup (`.ui-cols` in index.html). The esc row reads
   "close the topmost open mode (modes stack)" — keep it true to
@@ -999,10 +1177,31 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
 1. Create `defaults/skills/<name>/SKILL.md` with YAML frontmatter
    (`name`, `description`). Optionally add `references/`, `scripts/`,
    `assets/` subfolders.
-2. The user runs `/update-enough` in their chat (or restarts enough) and
+2. `description:` **must be a single line.** `prompt._parse_paradigm_frontmatter`
+   splits on the first `:`, so a YAML folded block (`description: >`)
+   silently degrades to the string `">"` and the agent never learns when to
+   engage the skill. `tests/test_skills_defaults.py` rejects it explicitly.
+   Same file pins the other two conventions: frontmatter `name:` must equal
+   the directory name, and `enough-tooltip-text:` must be present and be the
+   **last non-empty line** of the file (it is not frontmatter; it feeds
+   `{{skills-list}}` via `GET /api/help/defaults`).
+3. Bundled `scripts/` must run on stdlib plus what `pyproject.toml` already
+   pins. If a script needs a dep enough doesn't ship, make it degrade with a
+   clear message rather than adding a dependency. The suite `py_compile`s
+   every bundled script.
+4. The user runs `/update-enough` in their chat (or restarts enough) and
    the symlink lands in every project's `rness/skills/`.
-3. The skill is **off by default** — user toggles it in the sidebar.
+5. The skill is **off by default** — user toggles it in the sidebar.
    No other code changes needed.
+
+A skill added under `defaults/skills/` is **trusted** (it's a symlink into
+the install) and never audited. A skill created anywhere else — dropped
+into a project's `rness/skills/` by hand, or written there by the agent
+under the workflow-design paradigm — is **untrusted**: it is quarantined off
+on the next sync and gets a first-use audit the first time it's toggled on.
+See "Skill trust and the first-use audit". Don't work around that by
+writing a new skill into `defaults/skills/` on the user's behalf when they
+asked for a project-local one; the audit is the feature.
 
 ### Add a new paradigm
 
@@ -1224,6 +1423,14 @@ A list of things that will confuse you if you don't see them coming:
 - **Skills are off by default; paradigms are exactly one active at a
   time; roles are individually toggleable.** Three different
   on/off patterns for three concepts — don't conflate them.
+- **`prompt.set_skill_enabled()` is not the door for a skill toggle.**
+  It's the raw `.disabled` writer. Every toggle-on must go through
+  `skillaudit.set_skill_enabled_guarded()`, which can raise
+  `SkillAuditRefused` or return `needs_audit`. If you add a second route
+  that enables a skill (a new endpoint, a tool runner, a migration), route
+  it through the guard or you've reopened the hole
+  `quarantine_untrusted()` exists to close. Roles have no equivalent —
+  only skills are audited.
 - **Wikisink state is user-global, not per-project.** One
   `~/enough/config/wikisink.json` for the whole machine. Comments and
   watches attach to *articles* (stable slug+hash keys via
@@ -1260,7 +1467,12 @@ A list of things that will confuse you if you don't see them coming:
   `uv run pytest tests/ -q` before declaring done; it covers girraphs,
   project metadata, the cacheawl store + `/api/cacheawl/*` + the
   `cacheawl:` scheme, the ui-config theme-key merge, the models
-  registry/feasibility/downloads, and the desktop shutdown gate. Suites
+  registry/feasibility/downloads, the desktop shutdown gate, the shipped
+  skills' conventions (`test_skills_defaults.py`), the skill trust model +
+  first-use audit + `/api/skills*` (`test_skill_audit.py`), and the
+  throttled newer-snapshot check (`test_wikisink_newer_snapshot.py` —
+  which, like every other suite, can never reach kiwix.org or a model).
+  Suites
   isolate global state via env hooks — `ENOUGH_WIKISINK_CONFIG`,
   `ENOUGH_CACHEAWL_ROOT`, `ENOUGH_INFOWORLD_ROOT`, `ENOUGH_UI_CONFIG`,
   `ENOUGH_WEIGHTS_DIR`, `ENOUGH_LIVE_STATE`, `ENOUGH_MODELS_REGISTRY`
@@ -1402,11 +1614,14 @@ harper have no distro package and are built from their own repos.
 A pytest suite lives in `tests/` (girraphs, project metadata, the cacheawl
 store + endpoints + `cacheawl:` scheme, the ui-config theme-key merge, the
 models registry/feasibility/downloads, the llama-server lookup, the desktop
-shutdown gate, the platform seams) — **tracked since the seven-models
-round**, so a fresh clone has it. Before declaring anything done:
+shutdown gate, the platform seams, the shipped skills' frontmatter/tooltip/
+script conventions, the skill trust model + first-use audit + `/api/skills*`,
+and the throttled wikisink newer-snapshot check) — **tracked since the
+seven-models round**, so a fresh clone has it. Before declaring anything
+done:
 
 ```bash
-uv run pytest -q                        # 231 tests
+uv run pytest -q                        # 297 tests
 uv run python scripts/smoke_boot.py     # real boot, scratch dir
 bash tests/bootstrap_linux_harness.sh   # only if you touched bootstrap.sh
 ```

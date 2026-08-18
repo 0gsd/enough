@@ -75,6 +75,11 @@ def _defaults() -> dict[str, Any]:
             "bytes_total": 0,
             "error": None,
         },
+        # When the reader last asked download.kiwix.org whether a newer
+        # snapshot exists (ISO8601 UTC). Throttles that check to once a day
+        # so opening the reader never hammers kiwix — see
+        # download.newer_snapshot_throttled().
+        "listing_checked_at": None,
         "last_viewed": None,      # {"path": ..., "title": ...}
         "viewed_ring": [],        # [{"path", "title"}] capped at VIEWED_RING_MAX
         "last_wikisink_at": None, # ISO timestamp of last completed update run

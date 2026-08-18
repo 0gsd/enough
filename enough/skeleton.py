@@ -23,9 +23,12 @@ this package's install path.
 
 from __future__ import annotations
 
+import logging
 import os
 import shutil
 from pathlib import Path
+
+log = logging.getLogger("enough.skeleton")
 
 # ---------------------------------------------------------------------------
 # Locations
@@ -281,6 +284,17 @@ def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
             }
         existing.update(disabled_names)
         disabled_file.write_text("\n".join(sorted(existing)) + "\n", encoding="utf-8")
+
+    # 3. Untrusted skills (real dirs, or symlinks pointing outside defaults —
+    #    a 3P import, or one the agent wrote itself) also default OFF. Skills
+    #    are "enabled unless named in .disabled", so without this an
+    #    unaudited stranger would be live in the system prompt without ever
+    #    passing through the toggle. See skillaudit.quarantine_untrusted.
+    try:
+        from . import skillaudit
+        skillaudit.quarantine_untrusted(project_dir)
+    except Exception:  # noqa: BLE001 — never let this break a launch
+        log.exception("untrusted-skill quarantine failed")
 
 
 def _populate_role_symlinks(project_dir: Path, defaults_root: Path) -> None:

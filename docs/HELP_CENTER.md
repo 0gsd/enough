@@ -2,7 +2,7 @@ Hi, this is Graham, the creator of enough. This document -- except this part, I 
 
 # the enough help center
 
-> Everything you can do with enough, in one place. Written against enough **0.2.0**, including the August 2026 round (seven local models with feasibility-checked installs, and **enough.app** — the signed, notarized desktop application) and the July 2026 interface round (the mode stack, per-folder help bubbles, girraph→merirmaid mirrors). Where this document and the app in front of you disagree, the app is right and this document has a bug — corrections welcome at [enough.support](https://enough.support).
+> Everything you can do with enough, in one place. Written against enough **0.2.2**, including the skills round (analyzer's new audit mode, the `anything-finder` skill, and the first-use audit that reads any skill enough didn't ship before it's allowed in), the August 2026 round (seven local models with feasibility-checked installs, and **enough.app** — the signed, notarized desktop application) and the July 2026 interface round (the mode stack, per-folder help bubbles, girraph→merirmaid mirrors). Where this document and the app in front of you disagree, the app is right and this document has a bug — corrections welcome at [enough.support](https://enough.support).
 
 enough is a personal language system that runs on your own machine. You point it at a folder, talk to it, and it helps you plan, write, review, research, and translate. The models are local by default. Your files stay yours. And nearly everything you'll see it do is defined in plain markdown files that you can open, read, and change.
 
@@ -99,7 +99,7 @@ Everything customizable follows one pattern: **defaults live in `~/enough/defaul
 
 Edit a file in `~/enough/defaults/` and every project still linked to it picks up the change. In a project, open a linked file and click **customize** — the link becomes a project-local copy, and from then on that project goes its own way while the others keep following the global default. The file tree tells you which is which at a glance: linked files render *italic and muted*, local copies render normally.
 
-New skills, roles, and paradigms dropped into `~/enough/defaults/` appear in every project on next launch. Skills and roles arrive toggled off, so nothing changes behind your back; you enable them per project when you want them.
+New skills, roles, and paradigms dropped into `~/enough/defaults/` appear in every project on next launch. Skills and roles arrive toggled off, so nothing changes behind your back; you enable them per project when you want them. A skill that enough didn't ship — one you downloaded, one a friend sent, one your own agent wrote for you — gets read before it's allowed in. Section 14.6 covers that.
 
 ### 2.2 The three component types
 
@@ -108,7 +108,7 @@ New skills, roles, and paradigms dropped into `~/enough/defaults/` appear in eve
 | What it is | A reasoning framework — how the agent approaches work | A focused capability — vocabulary, recipes, procedures | A second persona you can summon — its own AGENT.md + MOTIVATION.md |
 | How many active | Exactly one at a time | Any number toggled on | Any number toggled on |
 | Lives at | `rness/paradigms/<name>.md` | `rness/skills/<name>/SKILL.md` | `rness/roles/<name>/` |
-| Shipped examples | default, text-planning, translation, workflow-design | analyzer, girraph-merirmaid, memoir-dialectic, skill-scanner, translator | block-breaker, open-skeptic |
+| Shipped examples | default, text-planning, translation, workflow-design | analyzer, anything-finder, girraph-merirmaid, memoir-dialectic, translator | block-breaker, open-skeptic |
 
 ### 2.3 Building your own
 
@@ -273,7 +273,7 @@ Notice the design principle in that table: toggles that gate the agent's tools n
 
 ## 7. The UI window and help docs
 
-The ⚙ UI button opens display preferences and the reference material.
+The ⚙ UI button opens display preferences and the reference material. A small **help** button sits at the top right of that window, beside the ×: it opens this manual read-only, in the app, as a full-frame mode like any other (section 10).
 
 ### 7.1 Themes
 
@@ -341,6 +341,8 @@ The archive is a single `.zim` file read in place. It is never extracted, and it
 
 Once installed, 🚰 opens the reader: back and forward, live title suggestions in the search box (Enter runs full-text search over the whole archive), a 🎲 random-article die, and a source badge that tells you whether you're reading the archive snapshot (`ZIM <date>`), a fresher copy from an update run (`live <date>`), or a preserved copy (`preserved`). Internal links stay in-app; external links open in your browser. The chat pill at the bottom hands the current article — or your selected passage — straight to the agent.
 
+**The newer-snapshot pill.** Kiwix rebuilds these archives periodically, and you shouldn't have to go looking. When a newer build of *your* flavor exists, a small pill appears in the reader toolbar — `newer snapshot: <date> · <size>`. Click it, confirm the size, and the upgrade runs in place: same storage folder, downloaded first and swapped in only when it's finished, the old file deleted after that and not before. Your comments, saves, and 🛡 overrides carry across untouched, because none of them live inside the archive. The pill becomes the progress readout while it downloads, then disappears. enough checks for this at most once a day, never while the reader is rendering, and stays quiet when you're offline — which is the normal state of an offline-Wikipedia feature. The same upgrade is available the long way round, in the ⚙ installs list, and the agent's wikisink runs report it too (section 8.3) — but pressing the button is always yours.
+
 ### 8.2 Saving and locking articles
 
 **Saving.** The save button offers two destinations: this project's `wiki/` folder, or the machine-global wiki cachebox (`~/enough/cacheawl/wiki/`) shared by every project. Either way, a save is a folder — `article.html`, the article byte-for-byte as the archive had it, plus `_manifest.md` carrying the title, source URL, retrieval date, and the CC BY-SA license line. Every saved article is self-describing, which means that if its text ever ends up in something you publish, the attribution you need is already sitting next to it. Click a saved `article.html` in the tree and it opens in the reader at full fidelity — infoboxes, tables and all — even when no archive is reachable. To unsave, hover over the saved folder in the tree and click the 🗑 that appears.
@@ -359,7 +361,7 @@ Saving is for *you*: offline-offline copies, publishing attribution. The agent d
 2. flags **edit spikes** — watched articles suddenly being edited dozens of times a day, plus Wikipedia-wide surge candidates;
 3. diffs the daily **top-1000 pageview rankings** against the last run: climbers, fallers, new entries, dropouts, and view trends for your watched articles;
 4. checks for **deletions** of watched or recently-viewed articles, scored for suspicion (section 8.2);
-5. notes when a **newer base snapshot** is available. Replacing the multi-GB base archive is always your call, made in ⚙.
+5. notes when a **newer base snapshot** is available. Replacing the multi-GB base archive is always your call — press the pill in the reader toolbar (section 8.1) or use the ⚙ installs list. There is no agent tool that swaps it.
 
 The report arrives in chat as markdown; the full uncapped version is kept under the wikisink state folder. Runs are polite to Wikipedia — batched, honest User-Agent — and resumable if interrupted, and a `report-only` run skips the refresh step. Two broker toggles govern all of it: one gates the agent's wiki tools entirely, the other can force runs fully offline.
 
@@ -485,11 +487,11 @@ Two examples, one pattern — instructions plus motivation, in two markdown file
 
 ## 14. Skills
 
-A skill is a focused capability package: a folder with a `SKILL.md` (plus optional reference docs and scripts) that teaches the agent a procedure, a vocabulary, or a discipline. Toggle skills per project in the sidebar. Off means truly off — not in the prompt at all — and new skills arrive disabled, so nothing changes behind your back. Turning everything off is legitimate too: pure conversation, no scaffolding, sometimes more room for the model to surprise you.
+A skill is a focused capability package: a folder with a `SKILL.md` (plus optional reference docs and scripts) that teaches the agent a procedure, a vocabulary, or a discipline. Toggle skills per project in the sidebar. Off means truly off — not in the prompt at all — and new skills arrive disabled, so nothing changes behind your back. A skill enough didn't ship gets read before it can be enabled at all (section 14.6). Turning everything off is legitimate too: pure conversation, no scaffolding, sometimes more room for the model to surprise you.
 
 ### 14.1 analyzer
 
-Three analytical modes in one skill.
+Four analytical modes in one skill.
 
 **Summarize** produces a one-page, even-handed digest of any text: what it's saying, who it's for, the author's motivation and biases, tone, key quotes.
 
@@ -497,25 +499,50 @@ Three analytical modes in one skill.
 
 **Decide** hands your dilemma to three archetypal personas from a built-in roster of ten, who debate it on the record. You get a recommendation *and* the transcript, so you can weigh the reasoning rather than trust a verdict.
 
-### 14.2 girraph-merirmaid
+**Audit** reads something you haven't decided to trust yet — a skill someone sent you, a role, a paradigm — and tells you what it is. First a plain-English explanation of what the thing actually does and why you'd want it, then a safety pass: prompt-injection attempts, instructions that quietly widen the agent's reach, epistemic red flags, and any bundled code, which also gets a deterministic scan that doesn't involve a model at all. The verdict is one of three words — **pass**, **flag**, **fail** — backed by named findings, never a score. It's read-only: audit never runs, edits, installs, or enables the thing it's reading.
+
+Reports land in `rness/io/output/analyzer/audits/<skill-name>/`: a dated `.md` you can read like any other file, plus a small `verdict.json` beside it. Ask for an audit by name any time — "vet this before I enable it", "what does this skill actually do" — and enough also runs this mode for you, unasked, the first time you switch on a skill it didn't ship. Both doors write the same report to the same folder. Section 14.6 has that story.
+
+### 14.2 anything-finder
+
+A search party for the things that don't come up on the first page. Three faces, one skill.
+
+**find** is the default, and it carries a playbook for each of ten kinds of hard-to-find thing, plus an eleventh for missions that stall. **Texts** — public-domain books, poems, historical documents. **Video** — rare, lost, and out-of-print film and TV, with watch links and their legality stated. **Images** cleared for a cover or a zine. **Products** — obscure gear, synths, instruments, and where to actually buy one. **Articles** — the paper stuck behind a paywall, found as its legitimate open copy: preprint, repository, archive. **Code** — permissively licensed repos, including libraries that never touched GitHub. **Books** — read-alikes from what you already loved. **Audio** — sheet music, MIDI, samples, gear manuals. **Assets** — fonts, textures, 3D models, stock footage. **Data** — datasets, public APIs, government documents, newspaper archives.
+
+Results come back as *find cards*: the link, why it's the right item, and — for anything copyright-sensitive — why it's clear to use, with the publication date or the explicit license spelled out. Ask it "find me a public-domain edition of *The Moonstone* clean enough to typeset", "where can I legally watch the 1974 version", "is there an MIT-licensed library that does this". The honest answers are part of the deal: "this exists but isn't legally available" and "three candidates, I'm 70% on the second" are real results here, and where the only route is a piracy site it will say so and hand you the library, the lending system, or the storefront instead.
+
+**patents** is the prior-art face. Give it an invention and it runs a structured novelty search across granted patents, published applications, and the non-patent literature, then reports what it found and what that means for novelty and non-obviousness — with a not-legal-advice disclaimer that stays in every report, because that's what it is. "Has this been patented?" "Prior art on a magnetic bike lock that…" "Is my idea patentable?" Databases it couldn't reach come back labeled *unchecked*, never quietly as *empty*.
+
+**venture** is the "is this a business?" face, and it composes the other two. A market sweep for what already exists, a prior-art check, and a competitive-landscape pass over companies, open-source alternatives, adjacent products, and the graveyard of the ones that tried and shut down. What you get is an even-handed read — what's crowded, what's adjacent, what's genuinely open, and the wedge the evidence actually supports — followed by the strongest case *for* and the strongest case *against*, every point anchored to a link, and a short list of questions only you can go answer. Ask it "should I build this", "does this exist as a product", "where's the market gap here". It will not score your idea, write your business plan, or tell you to raise money. And it treats an empty field as a question, not a green light.
+
+Output goes to `rness/io/output/anything-finder/`. Everything it fetches goes through the broker like any other web access, so an off-allowlist domain routes through Tor — and when a source refuses to answer, the report names the host and tells you what to add to `allowlists.md`, instead of leaving a silent hole in the results.
+
+### 14.3 girraph-merirmaid
 
 The discipline skill for enough's two diagram primitives (sections 15 and 16). The girraph half teaches proper IBIS mapping: one question per turn, no solution-jumping, your confirmation as the stopping rule. The merirmaid half carries the Mermaid-authoring rules, like keeping node labels short enough that you can comfortably edit them. The modes work without the skill; with it, the agent becomes a genuinely disciplined mapping partner.
 
-### 14.3 memoir-dialectic
+### 14.4 memoir-dialectic
 
 A patient, multi-session memoir collaborator. It interviews you — one or two questions at a time, never a flood — and files everything: numbered plan documents in conversation order, an index for fast resumption, a notes file for messy brain-dumps, and eventually an outline synthesis and, only if you want it, drafts. The folder is the memory. You can disappear for weeks or years and it picks up where you left off. Built for the full range from complete life story to a single milestone, with explicit handling of sensitive topics and no-go zones, and careful preservation of your own phrasing — voice matters, especially if a draft is coming.
-
-### 14.4 skill-scanner
-
-The trust tool for an open ecosystem. Skills are files, which means skills from the internet can contain anything. Before you install one, skill-scanner reads the package and reports: first a plain-English explanation of what the skill actually does and why you'd want it, then a safety audit covering prompt-injection attempts, privilege escalation, epistemic red flags, and bundled-code risk, ending in a verdict — clean, findings present, or do not install.
 
 ### 14.5 translator
 
 Offline translation across ~419 languages via MADLAD-400 — a ~3 GB one-time download that runs on CPU or Apple Silicon and never phones home. Short phrases to whole documents, major languages to low-resource and indigenous ones. Translate a letter, localize a README, check what a passage means, roundtrip a phrase through a third language as a meaning-preservation test — all with the network unplugged. For certain low-resource languages, an optional NLLB-200 engine offers higher quality; it carries a non-commercial license, so it's opt-in via the translation paradigm.
 
-### 14.6 Writing your own
+### 14.6 Writing your own, and trusting other people's
 
-The five above are demonstrations. The skill *mechanism* — markdown instructions, loaded when toggled on, with a `description:` that tells the agent when to engage — is the actual feature. House style guides, domain checklists, recurring report formats, data-handling procedures: if you can describe a competence in prose, you can hand it to your agent as a skill. And the loop is safe at both ends — build your own with workflow-design, vet gifts from strangers with skill-scanner.
+The five above are demonstrations. The skill *mechanism* — markdown instructions, loaded when toggled on, with a `description:` that tells the agent when to engage — is the actual feature. House style guides, domain checklists, recurring report formats, data-handling procedures: if you can describe a competence in prose, you can hand it to your agent as a skill. Build your own with workflow-design (section 12.4), or fork one of the five and make it yours.
+
+The other end of that loop is the skills that arrive from somewhere else. A skill is instructions your agent will follow, which means a skill from the internet deserves exactly as much suspicion as any other file from the internet. So enough reads them for you:
+
+- **What enough ships is trusted, and looks like it always has.** The five above arrive as links into the install's own defaults. They toggle instantly. Nothing audits them.
+- **Everything else is off until it's been read.** Drop a skill folder into `rness/skills/` — downloaded, sent by a friend, unzipped from a `.skill` — and it sits there disabled, marked *unverified* in the sidebar. The first time you switch it on, enough runs analyzer's audit mode over it (section 14.1) before a word of it reaches the agent. You watch it happen in the row: *unverified* → *auditing…* → *audited*.
+- **Flagged means not enabled.** If the audit finds something, the row says *flagged* (or *failed*), the skill stays off, and you get two buttons: **read report** opens the full report in the reading view, and **enable anyway** asks you to confirm and then records the decision as yours — the finding isn't erased, it's overruled, and the row from then on reads *trusted by you*. The audit advises. You decide. (If you'd rather work in the file, editing that skill's `verdict.json` to `"verdict": "pass"` does the same thing.)
+- **Edit a skill and it gets re-read.** The audit is tied to the exact bytes it read — file names and contents both. Change anything and the next time you toggle that skill on, it's audited again. That includes one you'd previously enabled anyway: an override describes one particular set of files at one particular moment, and it doesn't survive an edit.
+- **Skills your agent writes for you count as untrusted too.** That's deliberate, not an oversight. When workflow-design writes a new `SKILL.md` into `rness/skills/`, the agent audits its own homework on first enable. It's near-instant when there's nothing to find.
+- **With no model running, an audit can't finish** — and it says so, flagging with "the llm half of the audit couldn't run" rather than waving the skill through. Turn a model on and toggle again, or use *enable anyway* if you already know what's in there.
+
+Reports live in `rness/io/output/analyzer/audits/<skill-name>/` — the same folder analyzer writes to when you ask for an audit in conversation. Two doors, one document, and it's an ordinary markdown file you can open, keep, or delete.
 
 ---
 
@@ -566,7 +593,7 @@ Two modalities, declared in the header:
 
 Diagrams link. A node can point at another `.merirmaid`, a `.girraph`, or a markdown document, and clicking it navigates there, breadcrumbs marking the way back — so a set of diagrams becomes a navigable atlas of your project. And when a diagram has a syntax error, merirmaid mode shows the error plus the raw source rather than a blank pane. There is always something to fix from.
 
-The girraph-merirmaid skill (section 14.2) carries the authoring discipline for both file types. One rule of thumb from it is worth repeating here: if the honest first move is asking a question, you want a girraph; if it's drawing a box and an arrow, you want a merirmaid.
+The girraph-merirmaid skill (section 14.3) carries the authoring discipline for both file types. One rule of thumb from it is worth repeating here: if the honest first move is asking a question, you want a girraph; if it's drawing a box and an arrow, you want a merirmaid.
 
 ---
 

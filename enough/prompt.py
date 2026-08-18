@@ -495,7 +495,14 @@ def list_skills(rness: Path) -> list[tuple[str, bool, str]]:
 
 
 def set_skill_enabled(rness: Path, name: str, enabled: bool) -> None:
-    """Add or remove `name` from rness/skills/.disabled."""
+    """Add or remove `name` from rness/skills/.disabled.
+
+    This is the low-level write. **Toggling a skill ON goes through
+    `skillaudit.set_skill_enabled_guarded()`**, not here: untrusted skills
+    (anything under `rness/skills/` that isn't a symlink into
+    `defaults/skills/`) get a first-use audit before they're allowed into the
+    system prompt. Call this directly only when the trust question is already
+    settled — the guard itself does, and so does turning a skill off."""
     f = rness / "skills" / ".disabled"
     current = _read_disabled_skills(rness)
     if enabled:
