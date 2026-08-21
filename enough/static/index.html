@@ -460,6 +460,84 @@
       color: var(--accent-user);
     }
 
+    /* ---------- convert §5.1: the twin badge on a file row ----------
+       ONE glyph, six states. `twin-on` marks an original that has a
+       markdown twin beside it; `twin-off` (hollow) marks a convertible
+       original that has none yet, or whose engine isn't installed.
+       Everything else is CSS on the SAME glyph: a tinted glow plus a
+       corner dot — accent-user "you changed the twin", accent-tool
+       "the world changed the original", accent-error "both". The dot is
+       what survives a light theme and a colourblind reading, where the
+       glow alone nearly vanishes; the tooltip names the state in words.
+
+       The twin art is deliberately short and wide (visible bbox
+       59.9x31.3 inside a 72x72 viewBox — scripts/icons-bbox.json), so
+       the badge box uses the same object-fit:cover crop the topbar's
+       wide pill toggles use: scale to the box WIDTH, crop the empty
+       top/bottom. */
+    .convert-badge {
+      position: relative;
+      display: inline-flex;
+      width: 24px;
+      height: 12px;
+      flex: 0 0 auto;
+      line-height: 0;
+      cursor: pointer;
+    }
+
+    .convert-badge img.svg-icon {
+      object-fit: cover;
+    }
+
+    .convert-badge.state-fresh img.svg-icon {
+      opacity: 0.82;
+    }
+
+    .convert-badge.state-unconverted img.svg-icon,
+    .convert-badge.state-engine-missing img.svg-icon {
+      opacity: 0.42;
+    }
+
+    .convert-badge.state-unconverted:hover img.svg-icon,
+    .convert-badge.state-engine-missing:hover img.svg-icon,
+    .convert-badge.state-fresh:hover img.svg-icon {
+      opacity: 1;
+    }
+
+    .convert-badge.state-edited img.svg-icon {
+      filter: drop-shadow(0 0 3px var(--accent-user));
+    }
+
+    .convert-badge.state-stale img.svg-icon {
+      filter: drop-shadow(0 0 3px var(--accent-tool));
+    }
+
+    .convert-badge.state-conflict img.svg-icon {
+      filter: drop-shadow(0 0 4px var(--accent-error));
+    }
+
+    .convert-badge.state-edited::after,
+    .convert-badge.state-stale::after,
+    .convert-badge.state-conflict::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      top: -3px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      border: 1px solid var(--bg);
+      background: var(--accent-user);
+    }
+
+    .convert-badge.state-stale::after {
+      background: var(--accent-tool);
+    }
+
+    .convert-badge.state-conflict::after {
+      background: var(--accent-error);
+    }
+
     ul.skills {
       list-style: none;
       margin: 0 0 12px 0;
@@ -1076,6 +1154,32 @@
       background: transparent;
       font-family: var(--font-mono);
       font-size: 12px;
+    }
+
+    /* The {{convert-formats}} token's table (convert-plan §9). Narrow
+       panel, five columns: small type, no vertical rules, top-aligned
+       cells so a long note doesn't push its row's other cells down. */
+    #help-body table.help-formats {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0 0 10px;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    #help-body table.help-formats th,
+    #help-body table.help-formats td {
+      border-bottom: 1px solid var(--border);
+      padding: 3px 8px 3px 0;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    #help-body table.help-formats th {
+      color: var(--accent-tool);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
 
     /* ---------- Preview pane ---------- */
@@ -6024,6 +6128,639 @@
       filter: drop-shadow(0 0 5px color-mix(in oklab, var(--accent-user) 55%, transparent));
     }
 
+    /* ================================================================
+       convert (0.2.3) — twin chrome, modals, toasts, blob viewers
+       ================================================================
+       The tree badge lives up with the tree rules; everything the
+       feature adds below the sidebar lives here. Modal chrome mirrors
+       #ui-modal's (same panel/head/body/foot skeleton) rather than
+       inventing a second modal language. Colours are theme variables
+       only: accent-user = "your edit", accent-tool = "changed on disk",
+       accent-error = "conflict / failure". */
+
+    /* ---- shared modal skeleton (§5.3 export, §5.4 intro, §5.5 conflict) ---- */
+    .convert-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .convert-modal.hidden {
+      display: none;
+    }
+
+    .convert-modal .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+
+    .convert-modal .modal-panel {
+      position: relative;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 380px;
+      max-width: 520px;
+      width: calc(100% - 48px);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .convert-modal .modal-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .convert-modal .modal-head h3 {
+      margin: 0;
+      color: var(--fg);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .convert-modal .modal-head img.svg-icon {
+      width: 26px;
+      height: 14px;
+      object-fit: cover;
+      flex: 0 0 auto;
+    }
+
+    .convert-modal .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--fg-muted);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 4px;
+      margin-left: auto;
+    }
+
+    .convert-modal .modal-close:hover {
+      color: var(--fg);
+    }
+
+    .convert-modal .modal-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--fg-muted);
+      max-height: 62vh;
+      overflow: auto;
+    }
+
+    .convert-modal .modal-body p {
+      margin: 0;
+    }
+
+    .convert-modal .modal-body strong {
+      color: var(--fg);
+      font-weight: 600;
+    }
+
+    .convert-modal code {
+      color: var(--fg);
+      background: var(--bg-raise);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      word-break: break-all;
+    }
+
+    .convert-modal .modal-foot {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .convert-modal .modal-foot button,
+    .convert-modal .cv-install-row button {
+      background: var(--btn-bg, var(--bg-raise));
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    .convert-modal .modal-foot button:hover,
+    .convert-modal .cv-install-row button:hover {
+      filter: brightness(1.18);
+      border-color: var(--fg-faint);
+    }
+
+    .convert-modal .modal-foot button.primary,
+    .convert-modal .cv-install-row button.primary {
+      border-color: var(--accent-user);
+      color: var(--accent-user);
+    }
+
+    .convert-modal .modal-foot button[disabled] {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .convert-modal .cv-label {
+      font-size: 11px;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 4px;
+    }
+
+    .convert-modal select {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .convert-modal select:focus {
+      outline: none;
+      border-color: var(--fg-faint);
+    }
+
+    .convert-modal .cv-radio,
+    .convert-modal .cv-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      cursor: pointer;
+      color: var(--fg);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+
+    .convert-modal .cv-radio input,
+    .convert-modal .cv-check input {
+      margin: 2px 0 0 0;
+      accent-color: var(--accent-user);
+      flex: 0 0 auto;
+    }
+
+    .convert-modal .cv-modes {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* These rows carry `display:flex`, which outranks the UA's
+       [hidden]{display:none} — restate it at matching specificity or the
+       "hidden" halves of the export and intro modals show anyway. */
+    .convert-modal .cv-radio[hidden],
+    .convert-modal .cv-check[hidden],
+    .convert-modal .cv-install-row[hidden],
+    .convert-modal .cv-choices[hidden] {
+      display: none;
+    }
+
+    /* The registry's honest one-liner about what this round trip loses. */
+    .convert-modal .cv-note {
+      font-size: 12px;
+      color: var(--fg-faint);
+      border-left: 2px solid var(--border);
+      padding-left: 9px;
+    }
+
+    .convert-modal .cv-error {
+      font-size: 12px;
+      color: var(--accent-error);
+      border-left: 2px solid var(--accent-error);
+      padding-left: 9px;
+    }
+
+    .convert-modal .cv-install-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Conflict modal (§5.5): three stacked choices, each with its
+       consequence spelled out under the verb. */
+    .convert-modal .cv-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .convert-modal .cv-choice {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--bg-raise);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 12px;
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    .convert-modal .cv-choice:hover {
+      border-color: var(--accent-user);
+      filter: brightness(1.1);
+    }
+
+    .convert-modal .cv-choice .cv-choice-sub {
+      display: block;
+      margin-top: 3px;
+      color: var(--fg-faint);
+      font-size: 11.5px;
+    }
+
+    /* ---- progress toasts (§5.8) ---- */
+    .convert-toasts {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 1200;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+
+    .convert-toast {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 250px;
+      max-width: 360px;
+      background: var(--bg-raise);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--fg-faint);
+      border-radius: 6px;
+      padding: 8px 10px;
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
+      font-size: 12px;
+      color: var(--fg);
+    }
+
+    .convert-toast.state-running {
+      border-left-color: var(--accent-user);
+    }
+
+    .convert-toast.state-done {
+      border-left-color: var(--accent-agent);
+    }
+
+    .convert-toast.state-failed {
+      border-left-color: var(--accent-error);
+    }
+
+    .convert-toast.state-conflict {
+      border-left-color: var(--accent-tool);
+    }
+
+    .convert-toast .ct-icon {
+      width: 26px;
+      height: 14px;
+      flex: 0 0 auto;
+    }
+
+    .convert-toast .ct-icon img.svg-icon {
+      object-fit: cover;
+    }
+
+    .convert-toast .ct-body {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .convert-toast .ct-title {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .convert-toast .ct-msg {
+      color: var(--fg-muted);
+      font-size: 11.5px;
+      margin-top: 1px;
+      overflow-wrap: anywhere;
+    }
+
+    .convert-toast .ct-bar {
+      height: 3px;
+      margin-top: 5px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .convert-toast .ct-bar > span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--accent-user);
+      transition: width 200ms ease;
+    }
+
+    .convert-toast .ct-icon.square {
+      width: 18px;
+      height: 18px;
+    }
+
+    .convert-toast .ct-icon.square img.svg-icon {
+      object-fit: contain;
+    }
+
+    .convert-toast .ct-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 0 0 auto;
+    }
+
+    .convert-toast .ct-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--fg-muted);
+      font-family: inherit;
+      font-size: 11px;
+      padding: 2px 7px;
+      cursor: pointer;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    .convert-toast .ct-btn:hover {
+      color: var(--fg);
+      border-color: var(--fg-faint);
+    }
+
+    /* ---- twin chrome in the read/edit chrome (§5.2, §5.3, §5.11) ----
+       ONE component, three homes: the mini preview header, the full
+       read toolbar, the full edit toolbar. It names the ORIGINAL (the
+       thing the user thinks they opened) and, muted, the twin that is
+       actually on screen. */
+    .convert-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      font-size: 11.5px;
+      color: var(--fg-muted);
+    }
+
+    .convert-chip[hidden] {
+      display: none;
+    }
+
+    .convert-chip .cc-name {
+      color: var(--fg);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 190px;
+    }
+
+    .convert-chip .cc-twin {
+      color: var(--fg-faint);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 190px;
+    }
+
+    .convert-chip .cc-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding: 3px;
+      background: var(--btn-bg, var(--bg-raise));
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      cursor: pointer;
+      line-height: 1;
+      flex: 0 0 auto;
+    }
+
+    .convert-chip .cc-btn:hover {
+      filter: brightness(1.18);
+      border-color: var(--fg-faint);
+    }
+
+    .convert-chip .cc-btn[hidden] {
+      display: none;
+    }
+
+    /* The mini header is a tight row; let the chip take the leftover
+       width and keep the title from being pushed off. */
+    #preview .preview-header .convert-chip {
+      margin-left: auto;
+      max-width: 62%;
+    }
+
+    #preview .preview-header .title {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #edit-mode .edit-toolbar .convert-chip .cc-name,
+    #edit-mode .edit-toolbar .convert-chip .cc-twin,
+    #review-mode .review-toolbar .convert-chip .cc-name,
+    #review-mode .review-toolbar .convert-chip .cc-twin {
+      max-width: 150px;
+    }
+
+    /* ---- image viewer (§5.10) + view original (§5.11) ---- */
+    .blob-view {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+      gap: 8px;
+    }
+
+    .blob-view .bv-head {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 11.5px;
+      color: var(--fg-faint);
+      flex: 0 0 auto;
+    }
+
+    .blob-view .bv-head .bv-name {
+      color: var(--fg);
+      font-size: 12.5px;
+      overflow-wrap: anywhere;
+    }
+
+    .blob-view .bv-stage {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      /* Checkerboard so transparency reads as transparency and not as
+         "the theme's background is part of the picture". */
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(45deg, var(--bg-raise) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--bg-raise) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--bg-raise) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--bg-raise) 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+      cursor: zoom-in;
+    }
+
+    .blob-view .bv-stage img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* 1:1 face — the image keeps its natural pixels and the stage
+       scrolls. Clicking toggles back to fit-to-width. */
+    .blob-view.actual .bv-stage {
+      cursor: zoom-out;
+    }
+
+    .blob-view.actual .bv-stage img {
+      width: auto;
+      max-width: none;
+    }
+
+    .blob-view .bv-hint {
+      flex: 0 0 auto;
+      font-size: 11px;
+      color: var(--fg-faint);
+    }
+
+    .blob-view iframe.bv-frame {
+      flex: 1 1 auto;
+      min-height: 0;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--bg);
+    }
+
+    /* ---- extras row in the UI-prefs modal (§5.7) ---- */
+    #ui-modal .cv-extras {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+
+    #ui-modal .cv-extras .cv-extras-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #ui-modal .cv-extras .cv-extras-title {
+      color: var(--fg);
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    #ui-modal .cv-extras .cv-extras-state {
+      font-size: 11.5px;
+      color: var(--fg-muted);
+    }
+
+    #ui-modal .cv-extras .cv-extras-state.ok {
+      color: var(--accent-agent);
+    }
+
+    #ui-modal .cv-extras .cv-extras-state.bad {
+      color: var(--accent-error);
+    }
+
+    #ui-modal .cv-extras .cv-extras-state.busy {
+      color: var(--accent-tool);
+    }
+
+    #ui-modal .cv-extras button {
+      margin-left: auto;
+      background: var(--btn-bg, var(--bg-raise));
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 12px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    #ui-modal .cv-extras button:hover {
+      filter: brightness(1.18);
+      border-color: var(--fg-faint);
+    }
+
+    #ui-modal .cv-extras button[disabled] {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    #ui-modal .cv-extras .cv-extras-note {
+      font-size: 11px;
+      color: var(--fg-faint);
+      line-height: 1.5;
+    }
+
+    /* uv's output, streamed line by line off the convert-install SSE. */
+    #ui-modal .cv-extras .cv-extras-log {
+      display: none;
+      max-height: 130px;
+      overflow: auto;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      line-height: 1.45;
+      color: var(--fg-muted);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    #ui-modal .cv-extras.showing-log .cv-extras-log {
+      display: block;
+    }
+
     .wiki-search-wrap {
       position: relative;
       flex: 0 1 320px;
@@ -6473,6 +7210,477 @@
     #wiki-sel-popup button:hover {
       filter: brightness(1.2);
     }
+
+    /* ================================================================
+       enough home (0.2.5) — the launch screen  (docs/home-plan.md §4)
+       ================================================================
+       The SAME page in a different mode: a server started with
+       `enough --home` templates `data-mode="home"` onto the body tag
+       (project servers template `data-mode="project"`), and everything
+       below keys off that attribute. NOTE: the backend does that by
+       replacing the FIRST literal body-open tag in this file — so never
+       write one in prose above it. CSS does the hiding; the JS gate (search
+       "IS_HOME") only skips project-scoped bootstrapping so the console
+       stays free of 404s.
+
+       What survives in home mode: the version badge, the UI button, the
+       mode-stack indicators (the project mirror is a normal merirmaid
+       mode), the confirm overlay and the toast stack. Everything else in
+       the top bar belongs to a project, and a home server runs none of
+       it. */
+
+    body[data-mode="home"] #toggle-sidebar,
+    body[data-mode="home"] #broker-btn,
+    body[data-mode="home"] #wikisink-btn,
+    body[data-mode="home"] #cacheawl-btn,
+    body[data-mode="home"] #model-badge,
+    body[data-mode="home"] .topbar .doc-counters,
+    body[data-mode="home"] .topbar .project-title,
+    body[data-mode="home"] .conversation,
+    body[data-mode="home"] .input-dock {
+      display: none !important;
+    }
+
+    /* The sidebar collapses the way the ⌘\ toggle collapses it — a
+       zero-width grid column, NOT display:none, because a display:none
+       grid item stops being an item and the main pane would slide left
+       into the 0fr column. */
+    body[data-mode="home"] .layout {
+      grid-template-columns: 0 1fr;
+    }
+
+    body[data-mode="home"] .sidebar {
+      visibility: hidden;
+      overflow: hidden;
+      border-right: none;
+    }
+
+    /* UI modal, home mode: theme + font + the help center stay; every
+       row that talks to a project API goes. (The close-project row is
+       the mirror image — project mode only.) */
+    body[data-mode="home"] #ui-help-bubbles-row,
+    body[data-mode="home"] #cv-extras-row,
+    body[data-mode="home"] #ui-close-project-row,
+    body[data-mode="project"] #home-frame {
+      display: none !important;
+    }
+
+    /* ---------- the frame ---------- */
+    #home-frame {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--fg);
+    }
+
+    body[data-mode="home"] #home-frame {
+      display: flex;
+    }
+
+    /* Head bar: title, count, view toggle. Same geometry as the
+       merirmaid/wiki mode toolbars so the app looks like one app. */
+    #home-frame .home-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: var(--bg-raise);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    #home-frame .home-head .home-title {
+      font-weight: 600;
+    }
+
+    #home-frame .home-head .home-count {
+      color: var(--fg-faint);
+    }
+
+    #home-frame .home-head .spacer {
+      flex: 1;
+    }
+
+    #home-frame .home-viewtoggle {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    #home-frame .hv-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 3px 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      opacity: 0.55;
+    }
+
+    #home-frame .hv-btn:hover {
+      opacity: 1;
+      border-color: var(--fg-faint);
+    }
+
+    #home-frame .hv-btn.on {
+      opacity: 1;
+      border-color: var(--accent-tool);
+    }
+
+    #home-frame .hv-btn .svg-icon {
+      width: 17px;
+      height: 17px;
+    }
+
+    /* "show hidden projects" — a text chip beside the view pair. */
+    #home-frame .hv-chip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--fg-muted);
+      font: inherit;
+      font-size: 11px;
+      padding: 4px 9px;
+      cursor: pointer;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    #home-frame .hv-chip:hover {
+      opacity: 1;
+      color: var(--fg);
+      border-color: var(--fg-faint);
+    }
+
+    #home-frame .hv-chip.on {
+      opacity: 1;
+      color: var(--accent-tool);
+      border-color: var(--accent-tool);
+    }
+
+    #home-frame .home-body {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+      padding: 16px 18px 48px;
+    }
+
+    #home-frame .home-empty {
+      color: var(--fg-muted);
+      font-size: 12.5px;
+      font-style: italic;
+      padding: 10px 4px 18px;
+    }
+
+    /* ---------- icons view ---------- */
+    #home-frame .home-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+      gap: 8px;
+      align-content: start;
+    }
+
+    #home-frame .home-tile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 12px 6px 10px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      text-align: center;
+      position: relative;
+    }
+
+    #home-frame .home-tile:hover {
+      background: var(--bg-raise);
+      border-color: var(--border);
+    }
+
+    #home-frame .home-tile .ht-icon {
+      width: 58px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    #home-frame .home-tile .ht-icon > img.svg-icon {
+      width: 56px;
+      height: 56px;
+    }
+
+    #home-frame .home-tile .ht-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #home-frame .home-tile .ht-when {
+      font-size: 10.5px;
+      color: var(--fg-faint);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    /* A project whose folder isn't on disk right now (unplugged drive,
+       moved folder). Never dropped from the registry — greyed, with the
+       stored path in the tooltip and option-click to hide it. Hidden
+       projects (§1.10) get the same treatment while "show hidden" is on. */
+    #home-frame .home-tile.missing,
+    #home-frame .hl-row.missing,
+    #home-frame .home-tile.is-hidden,
+    #home-frame .hl-row.is-hidden {
+      opacity: 0.42;
+    }
+
+    #home-frame .home-tile.missing .ht-when,
+    #home-frame .hl-row.missing .hl-when,
+    #home-frame .home-tile.is-hidden .ht-when,
+    #home-frame .hl-row.is-hidden .hl-when {
+      font-style: italic;
+    }
+
+    /* The add tile / add row. Dashed so it reads as "not a project". */
+    #home-frame .home-tile.add {
+      border: 1px dashed var(--border);
+    }
+
+    #home-frame .home-tile.add:hover {
+      border-color: var(--accent-tool);
+      border-style: dashed;
+    }
+
+    #home-frame .home-tile.busy {
+      cursor: progress;
+      opacity: 0.6;
+    }
+
+    /* ---------- list view ---------- */
+    #home-frame .home-list {
+      --home-cols: minmax(160px, 2.4fr) 74px 92px 104px 132px 132px;
+      display: flex;
+      flex-direction: column;
+      font-size: 12px;
+    }
+
+    #home-frame .hl-head,
+    #home-frame .hl-row {
+      display: grid;
+      grid-template-columns: var(--home-cols);
+      align-items: center;
+      gap: 8px;
+      padding: 5px 8px;
+    }
+
+    #home-frame .hl-head {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      z-index: 1;
+    }
+
+    #home-frame .hl-head button {
+      background: none;
+      border: none;
+      color: var(--fg-muted);
+      font: inherit;
+      font-size: 11px;
+      padding: 2px 0;
+      cursor: pointer;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #home-frame .hl-head button:hover {
+      color: var(--fg);
+    }
+
+    #home-frame .hl-head button.sorted {
+      color: var(--accent-tool);
+    }
+
+    #home-frame .hl-head button.num,
+    #home-frame .hl-row .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #home-frame .hl-row {
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    #home-frame .hl-row:hover {
+      background: var(--bg-raise);
+    }
+
+    #home-frame .hl-row .hl-name {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      font-weight: 600;
+    }
+
+    #home-frame .hl-row .hl-name img.svg-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    #home-frame .hl-row .hl-name span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #home-frame .hl-row .num,
+    #home-frame .hl-row .hl-when {
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Add row: the list-view twin of the add tile, pinned under the last
+       project. */
+    #home-frame .hl-add {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px;
+      margin-top: 2px;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      background: none;
+      color: var(--fg-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    #home-frame .hl-add:hover {
+      color: var(--fg);
+      border-color: var(--accent-tool);
+    }
+
+    #home-frame .hl-add img.svg-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* The merirmaid chat pill mirrors the live conversation — there
+       isn't one on the home screen, so the project mirror shows the
+       diagram alone. */
+    body[data-mode="home"] #merirmaid-chat {
+      display: none !important;
+    }
+
+    /* ---------- Open Project (merirmaid toolbar, home mode only) ----- */
+    #merirmaid-mode .mm-act.mm-open-project {
+      border-color: var(--accent-tool);
+      color: var(--fg);
+      font-weight: 600;
+    }
+
+    /* ---------- the waiting state (open / close handoffs) ------------
+       Deliberately the same picture as static/loader.html — the pulsing
+       enough mark — because it IS the same wait: a backend swapping out
+       from under the page. Sits above the modals (1000+) since it
+       outlives whatever was open when the handoff started. */
+    #home-wait {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 22px;
+      background: var(--bg);
+    }
+
+    #home-wait:not([hidden]) {
+      display: flex;
+    }
+
+    #home-wait img.hw-mark {
+      width: min(46vw, 62vmin);
+      max-width: 460px;
+      height: auto;
+      user-select: none;
+      animation: home-wait-pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes home-wait-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.08; }
+    }
+
+    #home-wait .hw-msg {
+      color: var(--fg-muted);
+      font-size: 12.5px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ---------- typed-path fallback modal ---------- */
+    #home-add-modal .home-add-note {
+      color: var(--fg-muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin: 0 0 10px;
+    }
+
+    #home-add-modal input {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 8px 10px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+    }
+
+    #home-add-modal .home-add-error {
+      color: var(--accent-error);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+
+    /* The close-project row in the UI modal (project mode). */
+    #ui-close-project-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #ui-close-project-row .ui-row-note {
+      color: var(--fg-faint);
+      font-size: 11.5px;
+    }
   </style>
 </head>
 
@@ -6615,6 +7823,23 @@
             <img class="svg-icon" data-icon="readedit-switch" alt="switch face" draggable="false">
           </button>
           <span class="title" id="preview-title">preview</span>
+          <!-- convert §5.2/§5.3: twin chrome. Names the ORIGINAL the user
+               thinks they opened, then muted, the twin actually on screen,
+               then the export / view-original buttons. Populated and
+               shown/hidden by convertPaintChips(); identical markup in the
+               two full toolbars below. -->
+          <span class="convert-chip" id="convert-chip-mini" hidden>
+            <span class="convert-badge state-fresh" data-cc="badge"
+              ><img class="svg-icon" data-icon="twin-on" alt="" draggable="false"></span>
+            <span class="cc-name" data-cc="name"></span>
+            <span class="cc-twin" data-cc="twin"></span>
+            <button type="button" class="cc-btn" data-cc="export" title="export changes">
+              <img class="svg-icon" data-icon="export-doc" alt="export changes" draggable="false">
+            </button>
+            <button type="button" class="cc-btn" data-cc="original" title="view the original PDF" hidden>
+              <img class="svg-icon" data-icon="view-original" alt="view original" draggable="false">
+            </button>
+          </span>
         </div>
         <div id="preview-body"></div>
       </div>
@@ -6644,6 +7869,19 @@
               title="switch to edit face" aria-label="switch to edit face">
               <img class="svg-icon" data-icon="readedit-switch" alt="switch face" draggable="false">
             </button>
+            <!-- convert §5.2/§5.3: twin chrome (see #convert-chip-mini). -->
+            <span class="convert-chip" id="convert-chip-review" hidden>
+              <span class="convert-badge state-fresh" data-cc="badge"
+                ><img class="svg-icon" data-icon="twin-on" alt="" draggable="false"></span>
+              <span class="cc-name" data-cc="name"></span>
+              <span class="cc-twin" data-cc="twin"></span>
+              <button type="button" class="cc-btn" data-cc="export" title="export changes">
+                <img class="svg-icon" data-icon="export-doc" alt="export changes" draggable="false">
+              </button>
+              <button type="button" class="cc-btn" data-cc="original" title="view the original PDF" hidden>
+                <img class="svg-icon" data-icon="view-original" alt="view original" draggable="false">
+              </button>
+            </span>
           </div>
           <div class="rt-group rt-format" role="group" aria-label="format">
             <button type="button" data-fmt="bold" title="bold (wrap selection in **…**)"><b>B</b></button>
@@ -6685,7 +7923,8 @@
                from Phase 4 — the file is already saved on disk; the
                .undo sidecar is what makes "undo" possible. -->
           <div class="review-undo-bar" id="review-undo-bar" hidden>
-            <span class="lbl">agent edited <code id="review-undo-path"></code> — keep it?</span>
+            <span class="lbl"><span id="review-undo-lead">agent edited</span>
+              <code id="review-undo-path"></code> — keep it?</span>
             <button type="button" id="review-undo-keep">✓ save</button>
             <button type="button" id="review-undo-revert">↶ undo</button>
           </div>
@@ -6728,6 +7967,19 @@
               title="switch to read face" aria-label="switch to read face">
               <img class="svg-icon" data-icon="readedit-switch" alt="switch face" draggable="false">
             </button>
+            <!-- convert §5.2/§5.3: twin chrome (see #convert-chip-mini). -->
+            <span class="convert-chip" id="convert-chip-edit" hidden>
+              <span class="convert-badge state-fresh" data-cc="badge"
+                ><img class="svg-icon" data-icon="twin-on" alt="" draggable="false"></span>
+              <span class="cc-name" data-cc="name"></span>
+              <span class="cc-twin" data-cc="twin"></span>
+              <button type="button" class="cc-btn" data-cc="export" title="export changes">
+                <img class="svg-icon" data-icon="export-doc" alt="export changes" draggable="false">
+              </button>
+              <button type="button" class="cc-btn" data-cc="original" title="view the original PDF" hidden>
+                <img class="svg-icon" data-icon="view-original" alt="view original" draggable="false">
+              </button>
+            </span>
             <button type="button" id="edit-save-btn" class="primary">save</button>
             <button type="button" id="edit-revert-btn">revert</button>
           </div>
@@ -6785,6 +8037,11 @@
           <span class="mm-title" id="merirmaid-title"></span>
           <span class="mm-badge" id="merirmaid-badge" hidden></span>
           <nav class="mm-crumbs" id="mm-crumbs" aria-label="merirmaid navigation"></nav>
+          <!-- home only: the project mirror's launch button. Shown by
+               renderMerirmaidTop() when the top of the stack is a
+               `homeproj` entry, hidden for every other diagram. -->
+          <button type="button" class="mm-act mm-open-project" id="mm-open-project" hidden
+            title="open this project — the server hands off and reloads into it">open project</button>
           <button type="button" class="mm-act" id="mm-refresh" title="re-read the file (pick up agent edits)">↻</button>
         </div>
         <div class="merirmaid-body" id="merirmaid-body"></div>
@@ -7029,6 +8286,36 @@
           <button class="close" onclick="closeHelp()" aria-label="close help">×</button>
         </div>
         <div id="help-body"></div>
+      </div>
+
+      <!-- enough home (0.2.5) — the launch screen's one big frame.
+           Visible only under body[data-mode="home"] (CSS); filled by
+           homeRender() from GET /api/home/projects. Two views, icons and
+           list, toggled top-right and remembered in ui-config
+           (`home_view`). Clicking a project opens its merirmaid mirror
+           read-only with an "open project" button in that toolbar;
+           double-click opens it straight away. The persistent add tile /
+           row raises the backend's native folder dialog. -->
+      <div id="home-frame">
+        <div class="home-head">
+          <span class="home-title">projects</span>
+          <span class="home-count" id="home-count"></span>
+          <span class="spacer"></span>
+          <!-- §1.10: hidden projects stay in the registry and stay off the
+               screen until this is on. The desktop View menu drives the
+               same state through window.homeSetShowHidden(). -->
+          <button type="button" class="hv-chip" id="home-show-hidden"
+            aria-pressed="false" title="show the projects you've hidden">hidden</button>
+          <div class="home-viewtoggle" role="group" aria-label="view">
+            <button type="button" class="hv-btn" id="home-view-icons" title="icons view"
+              aria-label="icons view"><img class="svg-icon" data-icon="view-icons" alt="icons"
+                draggable="false"></button>
+            <button type="button" class="hv-btn" id="home-view-list" title="list view"
+              aria-label="list view"><img class="svg-icon" data-icon="view-list" alt="list"
+                draggable="false"></button>
+          </div>
+        </div>
+        <div class="home-body" id="home-body"></div>
       </div>
     </main>
   </div>
@@ -7360,12 +8647,42 @@
             <select id="ui-font"></select>
           </label>
         </div>
+        <!-- Close project → home (home-plan §1.7). Project mode only —
+             hidden by CSS under body[data-mode="home"], where there is no
+             project to close. Same handoff the desktop's ⌘W runs: the
+             backend re-execs (CLI) or exits 42 (desktop) and we land on
+             the home screen. -->
+        <div class="ui-prefs-row" id="ui-close-project-row">
+          <button type="button" class="help-center-launch" id="ui-close-project-btn"
+            title="close this project and go back to the enough home screen">
+            <img class="svg-icon" data-icon="folder" alt="" draggable="false">
+            <span>close project → home</span>
+          </button>
+          <span class="ui-row-note">the folder on disk is untouched</span>
+        </div>
         <!-- Global help-bubble setting. -->
-        <div class="ui-prefs-row">
+        <div class="ui-prefs-row" id="ui-help-bubbles-row">
           <label class="ui-check-label" title="show (?) help bubbles in the sidebar (saved per folder)">
             <input type="checkbox" id="ui-help-bubbles">
             <span>help <strong>(?)</strong> bubbles</span>
           </label>
+        </div>
+        <!-- convert §5.7: extras. One row per optional dependency group;
+             "PDF reading" is the only one in 0.2.3. State comes from
+             GET /api/convert/install/status + the engines object from
+             GET /api/convert/formats; the install button runs the same
+             `uv sync` the onboarding wizard runs and streams uv's output
+             into the log below on the `convert-install` SSE event. -->
+        <div class="ui-prefs-row" id="cv-extras-row">
+          <div class="cv-extras" id="cv-extras-pdf">
+            <div class="cv-extras-head">
+              <span class="cv-extras-title">PDF reading</span>
+              <span class="cv-extras-state" id="cv-extras-state">checking…</span>
+              <button type="button" id="cv-extras-btn" disabled>install</button>
+            </div>
+            <div class="cv-extras-note" id="cv-extras-note"></div>
+            <div class="cv-extras-log" id="cv-extras-log"></div>
+          </div>
         </div>
         <!-- Two-column reference: keyboard shortcuts | markdown cheat sheet -->
         <div class="ui-cols">
@@ -7481,7 +8798,194 @@
     </div>
   </div>
 
+  <!-- home (0.2.5) — the handoff waiting state. Shown while a backend is
+       being swapped underneath us: opening a project from home, or
+       closing one back to home. On the CLI the server re-execs on the
+       same port and we poll `/` until it answers in the other mode; on
+       the desktop the shell relaunches the backend and tears this page
+       down, so there is nothing to poll. Same pulsing mark as
+       static/loader.html, because it is the same wait. -->
+  <div id="home-wait" hidden role="status" aria-live="polite">
+    <img class="hw-mark" src="/static/enough-loader_1-2.svg" alt="" draggable="false">
+    <div class="hw-msg" id="home-wait-msg">starting…</div>
+  </div>
+
+  <!-- home §1.8 — typed-path fallback. Only ever opened when the backend
+       answers `dialog_unavailable` (non-macOS, or osascript refused): the
+       native folder chooser is the normal path. Wears `convert-modal`
+       for its skeleton — that class is the house's shared modal
+       (backdrop / panel / head / body / foot), named after the wave that
+       first factored it out. -->
+  <div id="home-add-modal" class="convert-modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="homeCloseAdd()"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="home-add-title">
+      <div class="modal-head">
+        <h3 id="home-add-title">add a project folder</h3>
+        <button class="modal-close" onclick="homeCloseAdd()" aria-label="close">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="home-add-note" id="home-add-note"></p>
+        <input type="text" id="home-add-input" spellcheck="false" autocomplete="off"
+          placeholder="/full/path/to/the/folder">
+        <div class="home-add-error" id="home-add-error" hidden></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" onclick="homeCloseAdd()">cancel</button>
+        <button type="button" class="primary" id="home-add-go">add &amp; open</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       convert (0.2.3) — intro / export / conflict modals + toast stack
+       ================================================================
+       All three reuse the #ui-modal panel skeleton (head / body / foot)
+       through the .convert-modal class. Bodies are filled by JS; the
+       markup here is the skeleton and the fixed copy. -->
+
+  <!-- §5.4 — shown once per file TYPE, OK only. Explains what a twin is
+       before the first conversion of that type ever runs. The
+       engine-missing variant swaps in an install button instead. -->
+  <div id="convert-intro-modal" class="convert-modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="convertCloseIntro()"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="convert-intro-title">
+      <div class="modal-head">
+        <img class="svg-icon" id="convert-intro-icon" data-icon="twin-on" alt="" draggable="false">
+        <h3 id="convert-intro-title">markdown twins</h3>
+        <button class="modal-close" onclick="convertCloseIntro()" aria-label="close">×</button>
+      </div>
+      <div class="modal-body">
+        <p id="convert-intro-body"></p>
+        <p class="cv-note" id="convert-intro-note" hidden></p>
+        <div class="cv-install-row" id="convert-intro-install" hidden>
+          <button type="button" class="primary" id="convert-intro-install-btn">install the PDF extra</button>
+          <span class="cv-note" style="border:none;padding:0">or open the UI window → extras</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="primary" id="convert-intro-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- §5.3 — export changes. Target format, then the two modes
+       (datestamped copy is the default; overwrite only when the format
+       can be written back and the target matches the original), the
+       registry's honest note about the round trip, and the per-file
+       "keep in sync" opt-in for the formats that support it. -->
+  <div id="convert-export-modal" class="convert-modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="convertCloseExport()"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="convert-export-title">
+      <div class="modal-head">
+        <img class="svg-icon" data-icon="export-doc" alt="" draggable="false"
+          style="width:22px;height:22px;object-fit:contain">
+        <h3 id="convert-export-title">export changes</h3>
+        <button class="modal-close" onclick="convertCloseExport()" aria-label="close">×</button>
+      </div>
+      <div class="modal-body">
+        <p id="convert-export-lead"></p>
+        <div>
+          <div class="cv-label">format</div>
+          <select id="convert-export-target"></select>
+        </div>
+        <div class="cv-modes">
+          <label class="cv-radio">
+            <input type="radio" name="cv-export-mode" value="copy" checked>
+            <span>new file, datestamped — <code id="convert-export-copyname"></code></span>
+          </label>
+          <label class="cv-radio" id="convert-export-overwrite-row" hidden>
+            <input type="radio" name="cv-export-mode" value="overwrite">
+            <span>overwrite <code id="convert-export-origname"></code> — undo available afterwards</span>
+          </label>
+        </div>
+        <p class="cv-note" id="convert-export-note" hidden></p>
+        <label class="cv-check" id="convert-export-sync-row" hidden>
+          <input type="checkbox" id="convert-export-sync">
+          <span>keep <code id="convert-export-syncname"></code> in sync with my edits from now on</span>
+        </label>
+        <div class="cv-error" id="convert-export-error" hidden></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" id="convert-export-cancel">cancel</button>
+        <button type="button" class="primary" id="convert-export-go">export</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- §5.5 — the conflict modal. Opened when a converted original is
+       `conflict` on open, when a sync-on-save is refused, and on a 409
+       from an overwrite export. Three choices, each naming its cost. -->
+  <div id="convert-conflict-modal" class="convert-modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="convertCloseConflict()"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="convert-conflict-title">
+      <div class="modal-head">
+        <img class="svg-icon" data-icon="ribbon-alert" alt="" draggable="false"
+          style="width:22px;height:22px;object-fit:contain">
+        <h3 id="convert-conflict-title">changed on both sides</h3>
+        <button class="modal-close" onclick="convertCloseConflict()" aria-label="close">×</button>
+      </div>
+      <div class="modal-body">
+        <p id="convert-conflict-body"></p>
+        <div class="cv-choices">
+          <button type="button" class="cv-choice" data-choice="reconvert">
+            re-convert from the new original
+            <span class="cv-choice-sub">the original wins; your twin is stashed to undo first</span>
+          </button>
+          <button type="button" class="cv-choice" data-choice="keep">
+            keep my twin
+            <span class="cv-choice-sub">accept the change on disk without re-reading it; nobody's text moves</span>
+          </button>
+          <button type="button" class="cv-choice" data-choice="export">
+            export mine over it
+            <span class="cv-choice-sub" id="convert-conflict-export-sub">write the twin over the original; undo available afterwards</span>
+          </button>
+        </div>
+        <div class="cv-error" id="convert-conflict-error" hidden></div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" onclick="convertCloseConflict()">decide later</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- §5.8 — conversion / export / sync toasts. Stacked bottom-right;
+       running jobs carry a progress bar and a cancel button. -->
+  <div class="convert-toasts" id="convert-toasts" aria-live="polite"></div>
+
   <script>
+    // ================================================================
+    // enough home (0.2.5) — the mode gate   (docs/home-plan.md §4)
+    // ================================================================
+    // One page, two modes. The backend templates data-mode="home" or
+    // data-mode="project" onto the body tag before serving it (by
+    // replacing the first literal one in the file — don't write another
+    // in a comment), and everything home-related keys off that: the CSS block at the end of <style>
+    // hides the project chrome, and this constant gates the JS.
+    //
+    // A home server has no project, no Session, no llama, no broker — the
+    // project-scoped routes 404 by design — so the page must not ASK for
+    // them. Every project-scoped bootstrap below is wrapped in
+    // `if (!IS_HOME)`; grep IS_HOME to see the full set (SSE stream,
+    // models + llm-status poll, usage, orchestrator, help docs/bubbles,
+    // wikisink status). The sidebar's four htmx partials are handled
+    // here, by stripping their attributes before htmx wires them: htmx
+    // binds on DOMContentLoaded, which is strictly after this inline
+    // script runs, so removing hx-get now means they never fire.
+    const IS_HOME = document.body.dataset.mode === 'home';
+    window.IS_HOME = IS_HOME;
+    if (IS_HOME) {
+      // #broker-toggles is in the (hidden) broker modal but still carries
+      // hx-trigger="load" — htmx doesn't care that nobody can see it.
+      ['paradigm-list', 'roles-list', 'skills-list', 'tree', 'broker-toggles'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.removeAttribute('hx-get');
+        el.removeAttribute('hx-trigger');
+        el.innerHTML = '';
+      });
+      document.title = 'enough';
+    }
+
     // ---------- Help affordance: persistent [?] bubbles, click for full panel ----------
     // Bubbles show/hide per the project-wide help-bubbles toggle (see
     // "Help bubbles on/off" below) — no hover reveal, no timers, no fade.
@@ -7490,12 +8994,96 @@
     // Help content is authored in /static/help-docs.md (one `## <id>` section
     // per bubble) and loaded at startup into this map, replacing the old
     // inline object. The {{skills-list}} / {{roles-list}} / {{paradigms-list}}
-    // tokens expand from /api/help/defaults so the default lists track what's
-    // actually installed. Populated by loadHelpDocs().
+    // tokens expand from /api/help/defaults, and {{convert-formats}} from
+    // /api/convert/formats, so the default lists and the supported-file-type
+    // table track what's actually installed. Populated by loadHelpDocs().
     let HELP_DOCS = {};
     let HELP_DOCS_READY = null;
 
-    function _helpExpandTokens(text, defaults) {
+    // ---------- {{convert-formats}} — the generated formats table ----------
+    // GET /api/convert/formats (convert.FORMATS) is the ONE source for
+    // "which file types can enough open, and what can it write back". Both
+    // help surfaces render the same rows through one builder, so no help
+    // text ever hand-lists an extension: the (?) bubbles take inline HTML,
+    // the help-center manual takes markdown that renderMarkdown() draws as
+    // a pipe table. Availability is per-machine, so the marks are too.
+    // See convert-plan §9.
+    const CONVERT_FORMATS_HEAD = ['type', 'opens as', 'export back', 'keep in sync', 'notes'];
+
+    function convertFormatsHelpRows(data) {
+      const rows = (data && data.formats) || [];
+      return rows.map((f) => {
+        const opens = f.available
+          ? 'a markdown twin'
+          : (f.reader === 'docling'
+            ? 'a markdown twin — needs the PDF extra'
+            : 'a markdown twin — the converter is missing from this install');
+        let back;
+        if (!f.writer) back = 'no — export as .docx or .pdf instead';
+        else if (f.writer === 'typst') back = 'yes, re-typeset from the markdown';
+        else back = 'yes — overwrite, or a datestamped copy';
+        if (f.writer && !f.writer_available) back += ' (engine missing)';
+        return [
+          f.label + ' (' + f.ext + ')',
+          opens,
+          back,
+          f.sync_ok ? 'yes' : 'no',
+          f.notes || '—',
+        ];
+      });
+    }
+
+    // One honest sentence under the table: what a twin can be exported to,
+    // and where the PDF extra stands on THIS machine (the two engine-missing
+    // causes read differently — see convert.engine_missing_message()).
+    function convertFormatsHelpFoot(data) {
+      const eng = (data && data.engines) || {};
+      const d = eng.docling || {};
+      const targets = ((data && data.export_targets) || []).join(', ');
+      let pdf;
+      if (d.wired === false) pdf = 'this build cannot read PDFs at all';
+      else if (d.available) pdf = 'the PDF extra is installed and ready';
+      else if (d.installed && d.models === false)
+        pdf = 'the PDF extra is installed, but its document models have not downloaded yet';
+      else if (d.installed) pdf = 'the PDF extra is installed but not active yet';
+      else pdf = 'the PDF extra is not installed yet — the ⚙ UI window installs it';
+      return 'A twin exports to ' + (targets || 'markdown') +
+        ' on any install (writing PDFs needs nothing extra). On this machine: ' +
+        pdf + '.';
+    }
+
+    function convertFormatsHelpHtml(data) {
+      const rows = convertFormatsHelpRows(data);
+      if (!rows.length) {
+        return '<p>the formats table comes from the app itself — it could not ' +
+          'be read just now.</p>';
+      }
+      const head = '<tr>' + CONVERT_FORMATS_HEAD.map((h) =>
+        '<th>' + escapeHtml(h) + '</th>').join('') + '</tr>';
+      const body = rows.map((cells) => '<tr>' + cells.map((c) =>
+        '<td>' + escapeHtml(c) + '</td>').join('') + '</tr>').join('');
+      return '<table class="help-formats"><thead>' + head + '</thead><tbody>' +
+        body + '</tbody></table><p>' +
+        escapeHtml(convertFormatsHelpFoot(data)) + '</p>';
+    }
+
+    function convertFormatsHelpMarkdown(data) {
+      const rows = convertFormatsHelpRows(data);
+      if (!rows.length) {
+        return '*(this table is generated by the app from its own format ' +
+          'registry — open the help center inside enough to see it filled in.)*';
+      }
+      const cell = (c) => String(c).replace(/\|/g, '\\|');
+      const line = (cells) => '| ' + cells.map(cell).join(' | ') + ' |';
+      return [
+        line(CONVERT_FORMATS_HEAD),
+        '|' + CONVERT_FORMATS_HEAD.map(() => '---').join('|') + '|',
+      ].concat(rows.map(line))
+        .concat(['', convertFormatsHelpFoot(data)])
+        .join('\n');
+    }
+
+    function _helpExpandTokens(text, defaults, formats) {
       if (!text || text.indexOf('{{') === -1) return text;
       const mk = (items) => {
         if (!items || !items.length) return '<ul></ul>';
@@ -7506,7 +9094,10 @@
       return text
         .replace(/\{\{skills-list\}\}/g, mk(defaults.skills))
         .replace(/\{\{roles-list\}\}/g, mk(defaults.roles))
-        .replace(/\{\{paradigms-list\}\}/g, mk(defaults.paradigms));
+        .replace(/\{\{paradigms-list\}\}/g, mk(defaults.paradigms))
+        // Function replacement: the registry's `notes` are user-facing prose
+        // and a stray `$&` in one must not become a replacement pattern.
+        .replace(/\{\{convert-formats\}\}/g, () => convertFormatsHelpHtml(formats));
     }
 
     // Parse the combined help-docs.md into {id: {name, path, what, how,
@@ -7514,7 +9105,7 @@
     // at `## <id>`; `name:`/`path:` lines head the section; `### what|how|
     // ideas` bodies follow (what/how kept as raw inline HTML; ideas split on
     // `- ` bullet lines).
-    function _parseHelpDocs(md, defaults) {
+    function _parseHelpDocs(md, defaults, formats) {
       const docs = {};
       let cur = null, section = null, buf = [];
       const flushBody = () => {
@@ -7523,9 +9114,9 @@
             cur.ideas = buf.join('\n').split(/\r?\n/)
               .map((l) => l.replace(/^\s*-\s+/, '').trim())
               .filter((l) => l.length)
-              .map((l) => _helpExpandTokens(l, defaults));
+              .map((l) => _helpExpandTokens(l, defaults, formats));
           } else {
-            cur[section] = _helpExpandTokens(buf.join('\n').trim(), defaults);
+            cur[section] = _helpExpandTokens(buf.join('\n').trim(), defaults, formats);
           }
         }
         buf = [];
@@ -7565,12 +9156,23 @@
           if (mdR.ok) md = await mdR.text();
           if (defR.ok) defaults = await defR.json();
         } catch (_e) { /* leave HELP_DOCS empty; bubbles just no-op */ }
-        HELP_DOCS = _parseHelpDocs(md, defaults);
+        // Reuse the convert module's cached registry rather than opening a
+        // second one. Safe to call here even though `CONVERT_FORMATS` is
+        // declared much further down the file: this line runs in a
+        // microtask, long after the script has finished evaluating. Bubble
+        // text is parsed once per page load, so its availability marks are
+        // as of load; the manual (reference mode) re-expands on every open.
+        const formats = await convertFormats();
+        HELP_DOCS = _parseHelpDocs(md, defaults, formats);
         return HELP_DOCS;
       })();
       return HELP_DOCS_READY;
     }
-    loadHelpDocs();
+    // Home mode: the (?) bubbles live in the sidebar, which isn't there,
+    // and /api/help/defaults is project-scoped. (The help CENTER — the
+    // manual in reference mode — is served in both modes and doesn't go
+    // through here.)
+    if (!IS_HOME) loadHelpDocs();
 
     function helpDocToHtml(doc) {
       const liItems = (doc.ideas || []).map(s => `<li>${s}</li>`).join('');
@@ -7668,7 +9270,7 @@
     // their own timers and wipe injected buttons — re-apply after each settle.
     document.body.addEventListener('htmx:afterSettle', () => applyHelpBubbles());
 
-    loadHelpBubbles();
+    if (!IS_HOME) loadHelpBubbles();   // per-project setting; no project in home mode
 
     // ---------- Unsave affordance: 🗑 on saved-article folder rows ----------
     //
@@ -7993,6 +9595,10 @@
       girraph: 'girraph-mode', merirmaid: 'merirmaid-mode',
       wikisink: 'wiki-mode', cacheawl: 'cacheawl-mode',
       ref: 'ref-mode',
+      // convert §5.10/§5.11 — the image viewer and "view original" render
+      // into the mini panel, which readedit also owns. They are mutually
+      // exclusive (opening either closes the other), so both can name it.
+      blobview: 'preview',
     };
     // Every root the manager may touch — cleared to the CSS default (30) each
     // pass before the live entries get their z = 30 + index.
@@ -8191,7 +9797,16 @@
           try { detail = (await r.json()).detail || detail; } catch (_e) { /* noop */ }
           throw new Error(detail);
         }
-        const src = await r.text();
+        let src = await r.text();
+        // The manual carries {{convert-formats}} where it lists the file
+        // types enough can open. Expand it here, before rendering, so the
+        // table is drawn from the live registry (and this machine's engine
+        // availability) instead of prose that could drift — convert-plan §9.
+        if (src.indexOf('{{convert-formats}}') !== -1) {
+          const fmts = await convertFormats();
+          src = src.replace(/\{\{convert-formats\}\}/g,
+            () => convertFormatsHelpMarkdown(fmts));
+        }
         body.innerHTML = renderMarkdown(src).html;
       } catch (err) {
         body.innerHTML = '<p class="ref-error">could not load the help center: '
@@ -8338,7 +9953,10 @@
       }
     });
 
-    loadUIConfig();
+    // Kept as a promise so the home screen can wait for it: `home_view`
+    // rides in ui-config, and the grid should paint in the remembered
+    // view rather than flipping after the fact.
+    const UI_CONFIG_READY = loadUIConfig();
 
     // ---------- Broker modal ----------
     function openBrokerModal() {
@@ -9441,14 +11059,19 @@
       const interval = (LLM_STATUS && LLM_STATUS.ready) ? 8000 : 2000;
       setTimeout(pollLoop, interval);
     }
-    loadModels().then(pollLoop);
-    // Prime the gauge with whatever the server last recorded (e.g. after a
-    // page reload mid-conversation, this restores the bar without waiting
-    // for the next turn). Subsequent updates flow in via SSE.
-    refreshUsage();
-    // Also prime the auto-reset toggle from disk so the modal renders the
-    // saved state the first time it's opened.
-    refreshOrchestrator();
+    // A home server supervises no llama-server and holds no session:
+    // /api/models, /api/llm-status, /api/usage and /api/orchestrator all
+    // 404 there, and the model badge is hidden anyway.
+    if (!IS_HOME) {
+      loadModels().then(pollLoop);
+      // Prime the gauge with whatever the server last recorded (e.g. after a
+      // page reload mid-conversation, this restores the bar without waiting
+      // for the next turn). Subsequent updates flow in via SSE.
+      refreshUsage();
+      // Also prime the auto-reset toggle from disk so the modal renders the
+      // saved state the first time it's opened.
+      refreshOrchestrator();
+    }
 
     // ---------- Voice input (whisper.cpp) ----------
     const micBtn = document.getElementById('mic-btn');
@@ -9659,6 +11282,29 @@
     // saved-article anchors carry no hx-get so they fall through to
     // their own openSavedWikiArticle handler.
     document.getElementById('tree').addEventListener('click', (e) => {
+      // convert §5.2 — convertible originals, converted originals, and
+      // images route AWAY from the server's binary-file preview, before
+      // the anchor's hx-get can fire. (The anchor itself is deliberately
+      // unchanged server-side: anyone who reaches /api/file directly
+      // still gets the honest "binary file — N bytes" answer.) The badge
+      // sits in the row but OUTSIDE the <a>, so it is matched too —
+      // clicking the glyph does what clicking the name does. Option-click
+      // belongs to the tree context menu (its own capture listener on
+      // #tree runs right after this one), so it is swallowed here rather
+      // than starting a conversion nobody asked for.
+      const convHit = e.target.closest('.convert-badge')
+        || e.target.closest('.file-row a[hx-get]');
+      const convLi = convHit
+        ? e.target.closest('li.file[data-convertible], li.file[data-image]') : null;
+      if (convLi) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.altKey) return;
+        closeHelp();
+        if (convLi.hasAttribute('data-image')) convertOpenImage(convLi.dataset.path);
+        else convertOpenTreeRow(convLi);
+        return;
+      }
       const a = e.target.closest('.file-row a[hx-get]');
       if (!a) return;
       e.preventDefault();
@@ -9708,7 +11354,14 @@
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    const es = new EventSource('/api/stream');
+    // The conversation stream. In home mode there is no Session and
+    // /api/stream 404s — and an EventSource would retry that 404 forever,
+    // which is exactly the console spam the gate exists to prevent. A
+    // silent stand-in keeps every `es.addEventListener(...)` below (and
+    // convert's, further down) working unchanged.
+    const es = IS_HOME
+      ? { addEventListener() { }, close() { } }
+      : new EventSource('/api/stream');
 
     es.addEventListener('token', (e) => {
       const { text } = JSON.parse(e.data);
@@ -10068,7 +11721,10 @@
     document.getElementById('wikisink-btn').addEventListener('click', onWikisinkClick);
     // One-shot status fetch on load so the 🚰 button shows its off variant
     // immediately when wikisink isn't reachable (no ongoing poll).
-    fetchWikiStatus().then((s) => { WIKI_STATUS = s || WIKI_STATUS; updateWikisinkBtnIcon(s); });
+    // Home mode: no wikisink button to paint, and /api/wiki/status 404s.
+    if (!IS_HOME) {
+      fetchWikiStatus().then((s) => { WIKI_STATUS = s || WIKI_STATUS; updateWikisinkBtnIcon(s); });
+    }
 
     function setWikiSetupState(state) {
       WIKI_SETUP_STATE = state;
@@ -11498,7 +13154,48 @@
     // Order matters: code blocks first (they swallow other syntax),
     // then escaping, then block-level (headings/lists/quotes/hr),
     // then inline (bold/italic/underline/code/links).
-    function renderMarkdown(src) {
+    // convert §5.6 — image srcs. The directory of the document currently
+    // being rendered, so a relative `![](report.pdf.assets/img-3.png)`
+    // can be pointed at /api/file/blob. Set by renderMarkdown() for the
+    // duration of ONE render and restored afterwards: threading a doc
+    // path as an argument through every block renderer down to
+    // renderInline would have touched a dozen call sites to carry one
+    // string, and the renderer is synchronous, so a scoped module
+    // variable is exactly as safe and far less invasive. null (the
+    // default for callers that don't know their path — e.g. the bundled
+    // help-center manual) leaves every src alone.
+    let MD_DOC_DIR = null;
+
+    function mdResolveImageSrc(url) {
+      if (MD_DOC_DIR === null) return url;
+      // Anything that is already an address — http(s):, data:, mailto:,
+      // //host, /route — is left exactly as authored. Only a
+      // project-relative path needs the blob route.
+      if (/^([a-z][a-z0-9+.-]*:|\/\/|\/)/i.test(url)) return url;
+      const joined = MD_DOC_DIR ? MD_DOC_DIR + '/' + url : url;
+      // Normalize ./ and ../ the way the browser would have, so an image
+      // beside the doc resolves to the same file the twin means.
+      const parts = [];
+      for (const seg of joined.split('/')) {
+        if (!seg || seg === '.') continue;
+        if (seg === '..') { parts.pop(); continue; }
+        parts.push(seg);
+      }
+      if (!parts.length) return url;
+      return '/api/file/blob?path=' + encodeURIComponent(parts.join('/'));
+    }
+
+    // Public entry point. `docPath` is the project-relative path of the
+    // document being rendered (optional — see MD_DOC_DIR above).
+    function renderMarkdown(src, docPath) {
+      const prev = MD_DOC_DIR;
+      MD_DOC_DIR = (docPath == null || docPath === '')
+        ? null : String(docPath).split('/').slice(0, -1).join('/');
+      try { return _renderMarkdownBody(src); }
+      finally { MD_DOC_DIR = prev; }
+    }
+
+    function _renderMarkdownBody(src) {
       // Phase 2 changed this function to ALSO track where each rendered
       // block came from in the source. Returns {html, blocks} where
       // `blocks` is an aligned array of {start, end, raw, type} — the
@@ -11703,8 +13400,9 @@
         return ` CS${i} `;
       });
       // Images: ![alt](url) — render before links so the ! isn't lost.
+      // Relative srcs go through the /api/file/blob route (convert §5.6).
       s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g,
-        (_m, alt, url) => `<img src="${url}" alt="${alt}">`);
+        (_m, alt, url) => `<img src="${mdResolveImageSrc(url)}" alt="${alt}">`);
       // Links: [text](url)
       s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g,
         (_m, text, url) => `<a href="${url}">${text}</a>`);
@@ -11905,7 +13603,7 @@
       const root = document.getElementById('review-mode');
       const body = document.getElementById('review-body');
       body.dataset.path = path;
-      const rendered = renderMarkdown(raw);
+      const rendered = renderMarkdown(raw, path);
       REVIEW_BLOCKS = rendered.blocks;
       body.innerHTML = rendered.html;
       await loadHighlightsForReview();
@@ -11942,7 +13640,7 @@
       const wrap = document.createElement('div');
       wrap.className = 'mini-read';
       try {
-        wrap.innerHTML = renderMarkdown(raw).html;
+        wrap.innerHTML = renderMarkdown(raw, path).html;
       } catch (_) {
         wrap.innerHTML = '<pre></pre>';
         wrap.querySelector('pre').textContent = raw;
@@ -12097,6 +13795,9 @@
     async function openReadEdit(path, opts = {}) {
       const size = opts.size || 'mini';
       const face = opts.face || 'read';
+      // convert §5.10/§5.11: the image viewer and "view original" render
+      // into the same mini panel, so a document opening evicts them.
+      convertCloseBlobView({ silent: true });
       let raw;
       try { raw = await _reLoadDisk(path); }
       catch (e) {
@@ -12128,6 +13829,11 @@
         else _showMiniEdit(path, raw);
       }
       _reRegisterMode();
+      // convert §5.2/§5.3: is this document a twin? The answer drives the
+      // badge + "→ twin.md" line in the header and the export button in
+      // both toolbars. Fire-and-forget — the chrome fills in a beat later
+      // and stays hidden for ordinary markdown.
+      convertOnDocOpen(path);
     }
     window.openReadEdit = openReadEdit;
 
@@ -12188,6 +13894,7 @@
         else _showMiniEdit(path, raw);
       }
       _reUpdateModeIcon();
+      convertPaintChips();   // the chrome lives in all three headers
     }
     window.reSetFace = reSetFace;
 
@@ -12213,6 +13920,7 @@
         else _showMiniEdit(path, carry);
       }
       _reApplyView(view);
+      convertPaintChips();   // the chrome lives in all three headers
     }
     window.reSetSize = reSetSize;
 
@@ -12225,6 +13933,8 @@
       RE_SIZE = null; RE_FACE = 'read'; RE_PATH = null;
       RE_PRISTINE = ''; RE_EDIT_BUFFER = null;
       REVIEW_PATH = null; EDIT_PATH = null; LAST_REVIEW_SELECTION = null;
+      CONVERT_DOC = null;            // convert §5.2 — twin chrome is per-document
+      convertPaintChips();
       modeRemove('readedit');
       if (typeof updateReviewChatChip === 'function') updateReviewChatChip();
       updateDocCounters();
@@ -12361,7 +14071,7 @@
         body.innerHTML =
           '<div class="gp-doc-note">read-only · ' + escapeHtml(top.path)
           + ' · click a breadcrumb to go back</div>'
-          + '<div class="gp-doc">' + renderMarkdown(raw).html + '</div>';
+          + '<div class="gp-doc">' + renderMarkdown(raw, top.path).html + '</div>';
         body.scrollTop = 0;
         return true;
       }
@@ -12811,6 +14521,50 @@
     }
     window.enterMerirmaidMirror = enterMerirmaidMirror;
 
+    // home (0.2.5): open a REGISTERED PROJECT's mirror, generated on
+    // demand by GET /api/home/mirror. Same read-only viewer as a cachebox
+    // mirror (the backend marks it `modality: mirror`, which is what makes
+    // the node editor stand down) — the only difference is the "open
+    // project" button renderMerirmaidTop() reveals in the toolbar. Home
+    // mode only; there is no such route on a project server.
+    async function enterMerirmaidHomeProject(path, name) {
+      MERIRMAID_STACK = [{ kind: 'homeproj', path, name: name || '' }];
+      const root = document.getElementById('merirmaid-mode');
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      modePush('merirmaid', {
+        icon: 'merirmaidmode',
+        onExit: exitMerirmaidMode,
+        iconTitle: 'project mirror',
+        exitTitle: 'back to the home screen',
+      });
+      await renderMerirmaidTop();
+    }
+    window.enterMerirmaidHomeProject = enterMerirmaidHomeProject;
+
+    // Fetch a project mirror. Answers {path, name, text}; 404 when the
+    // path isn't registered or the folder has gone away.
+    async function mmFetchProjectMirror(path) {
+      const r = await fetch('/api/home/mirror?path=' + encodeURIComponent(path));
+      if (!r.ok) {
+        let detail = r.statusText;
+        try { detail = (await r.json()).detail || detail; } catch (_e) { /* keep */ }
+        throw new Error(detail);
+      }
+      return r.json();
+    }
+
+    // The toolbar's "open project" button belongs to exactly one kind of
+    // entry. Called on every render so a crumb click can't strand it.
+    function mmSyncOpenProjectBtn() {
+      const btn = document.getElementById('mm-open-project');
+      if (!btn) return;
+      const top = mmTop();
+      const on = !!(IS_HOME && top && top.kind === 'homeproj');
+      btn.hidden = !on;
+      if (on) btn.dataset.path = top.path;
+    }
+
     function exitMerirmaidMode() {
       mmCloseLabelEditor();
       mmHideNodeMenu();
@@ -12820,6 +14574,7 @@
       modeRemove('merirmaid');
       MERIRMAID_STACK = [];
       MM_CURRENT = null; MM_LINKS = {}; MM_PATH = null; MM_TITLE = null;
+      mmSyncOpenProjectBtn();   // home: the project-mirror button leaves with it
     }
     window.exitMerirmaidMode = exitMerirmaidMode;
 
@@ -12929,6 +14684,7 @@
       const top = mmTop();
       if (!top) return;
       renderMmCrumbs();
+      mmSyncOpenProjectBtn();
       const body = document.getElementById('merirmaid-body');
       const badge = document.getElementById('merirmaid-badge');
       const titleEl = document.getElementById('merirmaid-title');
@@ -12947,15 +14703,27 @@
         body.innerHTML =
           '<div class="mm-doc-note">read-only · ' + escapeHtml(top.path)
           + ' · click a breadcrumb to go back</div>'
-          + '<div class="gp-doc">' + renderMarkdown(raw).html + '</div>';
+          + '<div class="gp-doc">' + renderMarkdown(raw, top.path).html + '</div>';
         body.scrollTop = 0;
         return;
       }
 
-      // merirmaid (disk file) or mirror (on-demand virtual) kind
+      // merirmaid (disk file) / mirror (cachebox, virtual) / homeproj
+      // (a registered project, virtual — home mode)
       let raw = null;
       let nodeMap = null, boxPath = null, boxName = null, subpath = '';
-      if (top.kind === 'mirror') {
+      if (top.kind === 'homeproj') {
+        let payload;
+        try { payload = await mmFetchProjectMirror(top.path); }
+        catch (e) {
+          badge.hidden = true;
+          titleEl.textContent = top.name || top.path.split('/').pop();
+          body.innerHTML = '<div class="mm-warnings">could not draw '
+            + escapeHtml(top.path) + ': ' + escapeHtml(e.message) + '</div>';
+          return;
+        }
+        raw = payload.text;
+      } else if (top.kind === 'mirror') {
         let payload;
         try { payload = await mmFetchMirror(top.box, top.subpath); }
         catch (e) {
@@ -14663,7 +16431,7 @@
       const body = document.getElementById('review-body');
       const scrollY = body.scrollTop;
       REVIEW_SOURCE = newSource;
-      const rendered = renderMarkdown(newSource);
+      const rendered = renderMarkdown(newSource, REVIEW_PATH);
       REVIEW_BLOCKS = rendered.blocks;
       body.innerHTML = rendered.html;
       // Re-paint saved highlights (the body.innerHTML rewrite wiped
@@ -15924,14 +17692,29 @@
 
     let REVIEW_LAST_AGENT_WRITE = null;     // path of the most recent write_file in this turn
 
-    function showReviewUndoBar(path) {
+    // `path` is the file the one-deep `.undo` stash now covers — usually
+    // the document on screen, but not always: an export-overwrite writes
+    // the ORIGINAL (convert §5.3), which is a different file from the twin
+    // the user is reading. Hence the two options:
+    //   opts.lead    replaces "agent edited" — an export is a write the
+    //                USER asked for, and saying the agent did it would be
+    //                a small lie in the one place the user is deciding
+    //                whether to trust a write.
+    //   opts.reload  re-render the review body (default true). Only right
+    //                when `path` IS the document being read; re-rendering
+    //                the twin because its original was overwritten would
+    //                throw away the user's scroll position for nothing.
+    function showReviewUndoBar(path, opts = {}) {
       const bar = document.getElementById('review-undo-bar');
+      REVIEW_LAST_AGENT_WRITE = path;
+      const lead = document.getElementById('review-undo-lead');
+      if (lead) lead.textContent = opts.lead || 'agent edited';
       document.getElementById('review-undo-path').textContent = path;
       bar.hidden = false;
       // Re-render the document so the user can see the agent's edit.
       // We pass through the same load+render path as enterReviewMode,
       // minus the wholesale state reset.
-      reloadReviewBody();
+      if (opts.reload !== false) reloadReviewBody();
     }
 
     function hideReviewUndoBar() {
@@ -15952,7 +17735,7 @@
         REVIEW_SOURCE = raw;
         const body = document.getElementById('review-body');
         const scrollY = body.scrollTop;
-        const rendered = renderMarkdown(raw);
+        const rendered = renderMarkdown(raw, REVIEW_PATH);
         REVIEW_BLOCKS = rendered.blocks;
         body.innerHTML = rendered.html;
         await loadHighlightsForReview();
@@ -16065,9 +17848,10 @@
       const fd = new FormData();
       fd.append('path', RE_PATH);
       fd.append('content', content);
+      const savedPath = RE_PATH;
       const r = await fetch('/api/file', { method: 'POST', body: fd });
       if (!r.ok) { alert('save failed: ' + r.status + ' ' + r.statusText); return; }
-      await r.text();
+      const fragment = await r.text();
       RE_PRISTINE = content;
       RE_EDIT_BUFFER = content;
       EDIT_PRISTINE = content;
@@ -16075,6 +17859,12 @@
       updateDocCounters();
       // Refresh the file tree (a new file / size change should show).
       htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+      // convert §4: saving a twin whose manifest says "keep in sync"
+      // exported it over the original. The answer rides back on a hidden
+      // .convert-sync div prepended to the preview fragment.
+      convertHandleSyncFragment(fragment, savedPath);
+      // The twin just moved from `fresh` to `edited` — repaint the chrome.
+      convertRefreshDoc();
     }
 
     async function revertEdit() {
@@ -16330,6 +18120,1208 @@
     window.markRequestDone = markRequestDone;
     window.customizeForProject = customizeForProject;
 
+    // ================================================================
+    // convert (0.2.3) — PDFs, Word documents, and friends as twins
+    // ================================================================
+    //
+    // Plan: docs/convert-plan.md §5. The whole feature, front to back:
+    //
+    //   §5.1  tree badges          decorateConvertRows()
+    //   §5.2  click routing        convertOpenTreeRow / convertOpenConverted
+    //   §5.3  export modal         convertOpenExport / convertRunExport
+    //   §5.4  intro modal          convertShowIntro (once per file TYPE)
+    //   §5.5  conflict modal       convertShowConflict / convertResolve
+    //   §5.6  image srcs           renderMarkdown(src, docPath) — up above
+    //   §5.7  extras row           convertExtras* (UI window → extras)
+    //   §5.8  progress toasts      convertToast / the `convert` SSE event
+    //   §5.10 image viewer         convertOpenImage
+    //   §5.11 view original        convertViewOriginal
+    //
+    // The vocabulary is the plan's: an ORIGINAL (memo.docx) converts to a
+    // TWIN (memo.docx.md) with ASSETS beside it and a hidden MANIFEST
+    // recording the pairing. The tree shows one row — the original — and
+    // every API call may name either end of the pair; the backend's
+    // `pair_for()` sorts out which handle it was given, so this code
+    // passes whichever it happens to hold.
+
+    // ---- registry + module state -----------------------------------
+
+    let CONVERT_FORMATS = null;        // GET /api/convert/formats payload
+    let CONVERT_DOC = null;            // twin chrome for the open document
+    let CONVERT_INSTALL_STATUS = null; // GET /api/convert/install/status
+    let CONVERT_INSTALL_JOB = null;    // latest `convert-install` SSE payload
+    let CONVERT_BLOB = null;           // {kind:'image'|'pdf', path, back}
+    const CONVERT_JOBS = new Map();    // job id -> {kind, waiters, poll, terminal}
+    const CONVERT_TOASTS = new Map();  // toast id -> element
+    const CONVERT_TOAST_TIMERS = new Map();
+    // (twin|outcome) -> when it was last reported, so the response
+    // fragment and the SSE don't both toast the same sync. See
+    // convertReportSync().
+    const CONVERT_SYNC_ANSWERED = new Map();
+
+    function cvBase(p) { return String(p || '').split('/').pop(); }
+    function cvExt(p) {
+      const b = cvBase(p);
+      const i = b.lastIndexOf('.');
+      return i <= 0 ? '' : b.slice(i).toLowerCase();
+    }
+    function cvBytes(n) {
+      if (n == null) return '';
+      if (n < 1024) return n + ' B';
+      if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+      return (n / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+    // "a Word document" / "an EPUB ebook" — the plain vowel rule is right
+    // for all seven registry labels (PDF, Word, Rich Text, PowerPoint,
+    // OpenDocument, Excel, EPUB), so nothing fancier is warranted.
+    function cvArticle(label) {
+      return /^[aeiou]/i.test(String(label || '')) ? 'an ' : 'a ';
+    }
+
+    async function convertDetail(r) {
+      try {
+        const j = await r.json();
+        if (j && j.detail) return String(j.detail);
+      } catch (_e) { /* not json — fall through */ }
+      return 'HTTP ' + r.status + ' ' + (r.statusText || '');
+    }
+
+    async function convertApi(url, body) {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body || {}),
+      });
+      if (!r.ok) {
+        const err = new Error(await convertDetail(r));
+        err.status = r.status;
+        throw err;
+      }
+      return await r.json();
+    }
+
+    async function convertStatus(path) {
+      const r = await fetch('/api/convert/status?path=' + encodeURIComponent(path));
+      if (!r.ok) {
+        const err = new Error(await convertDetail(r));
+        err.status = r.status;
+        throw err;
+      }
+      return await r.json();
+    }
+
+    async function convertFormats() {
+      if (CONVERT_FORMATS) return CONVERT_FORMATS;
+      try {
+        const r = await fetch('/api/convert/formats');
+        if (r.ok) CONVERT_FORMATS = await r.json();
+      } catch (_e) { /* offline-ish; callers degrade */ }
+      return CONVERT_FORMATS;
+    }
+
+    function convertSpecFor(ext) {
+      const rows = (CONVERT_FORMATS && CONVERT_FORMATS.formats) || [];
+      return rows.find((f) => f.ext === ext) || null;
+    }
+
+    // Which engine writes a given export target, and is it here? `.pdf`
+    // goes out through typst; everything else through pandoc. Both are
+    // base dependencies, so "missing" means a broken environment, and the
+    // disabled reason says exactly that rather than naming an extra the
+    // user cannot install.
+    function convertTargetEngine(ext) { return ext === '.pdf' ? 'typst' : 'pandoc'; }
+    function convertTargetAvailable(ext) {
+      const eng = (CONVERT_FORMATS && CONVERT_FORMATS.engines) || {};
+      const e = eng[convertTargetEngine(ext)];
+      return !!(e && e.available);
+    }
+    function convertTargetReason(ext) {
+      return 'needs ' + convertTargetEngine(ext) +
+        ', which ships with enough — re-run update-enough to repair this environment';
+    }
+
+    // ---- §5.1 tree badges ------------------------------------------
+
+    // The tooltip is the state, in words. It is the only place the six
+    // states are spelled out for a user who has never read the manual.
+    function convertBadgeTitle(state, name, twin) {
+      switch (state) {
+        case 'fresh':
+          return name + ' — converted; you are reading ' + twin +
+            ' and the original is untouched';
+        case 'edited':
+          return name + ' — edited: the twin has changes the original doesn’t. ' +
+            'Export changes to write them back.';
+        case 'stale':
+          return name + ' — changed outside enough since the conversion';
+        case 'conflict':
+          return name + ' — conflict: both ' + name + ' and its twin changed ' +
+            'since the conversion';
+        case 'engine-missing':
+          return name + ' — enough can’t read this format yet; install the PDF extra ' +
+            '(UI window → extras)';
+        default:
+          return name + ' — click to open as markdown; enough writes an editable ' +
+            'twin beside it';
+      }
+    }
+
+    // The tree re-renders every 3s (htmx), so this runs on every settle and
+    // rebuilds nothing it doesn't have to: the badge element is reused and
+    // only its state class, icon and tooltip are re-applied.
+    function decorateConvertRows() {
+      const tree = document.getElementById('tree');
+      if (!tree) return;
+      tree.querySelectorAll('li.file[data-convertible]').forEach((li) => {
+        const row = li.querySelector('.file-row');
+        if (!row) return;
+        const state = li.dataset.convertState || 'unconverted';
+        const converted = li.hasAttribute('data-converted');
+        let badge = row.querySelector('.convert-badge');
+        if (!badge) {
+          badge = document.createElement('span');
+          const img = document.createElement('img');
+          img.className = 'svg-icon';
+          img.alt = '';
+          img.draggable = false;
+          badge.appendChild(img);
+          row.appendChild(badge);
+        }
+        badge.className = 'convert-badge state-' + state;
+        setIcon(badge.querySelector('img'), converted ? 'twin-on' : 'twin-off');
+        badge.title = convertBadgeTitle(
+          state, li.dataset.name || cvBase(li.dataset.path),
+          cvBase(li.dataset.twin || (li.dataset.path + '.md')));
+      });
+    }
+
+    // ---- §5.4 the intro modal (once per file TYPE) ------------------
+    //
+    // Persistence, per plan decision 10, belongs in the ui-config JSON
+    // (`seen_convert_intro`) so a desktop webview and a browser tab agree.
+    // POST /api/ui-config currently validates only {theme, font} and drops
+    // everything else, so the write is attempted (it will start sticking
+    // the moment the server keeps the key) and mirrored into localStorage
+    // so "once per type" actually holds today. Read merges both.
+    const CONVERT_SEEN_KEY = 'enough.seen_convert_intro';
+
+    function convertSeenIntro() {
+      const cfg = (UI_CONFIG && (UI_CONFIG.seen_convert_intro
+        || (UI_CONFIG.current && UI_CONFIG.current.seen_convert_intro))) || [];
+      let local = [];
+      try { local = JSON.parse(localStorage.getItem(CONVERT_SEEN_KEY) || '[]'); }
+      catch (_e) { local = []; }
+      const out = [];
+      [].concat(cfg, local).forEach((k) => {
+        const s = String(k || '').replace(/^\./, '');
+        if (s && out.indexOf(s) === -1) out.push(s);
+      });
+      return out;
+    }
+
+    async function convertMarkIntroSeen(ext) {
+      const key = String(ext || '').replace(/^\./, '');
+      if (!key) return;
+      const all = convertSeenIntro();
+      if (all.indexOf(key) !== -1) return;
+      all.push(key);
+      try { localStorage.setItem(CONVERT_SEEN_KEY, JSON.stringify(all)); }
+      catch (_e) { /* private mode; the modal just shows again */ }
+      try { await saveUIConfig({ seen_convert_intro: all }); }
+      catch (_e) { /* best effort — localStorage carries it meanwhile */ }
+    }
+
+    let _convertIntroOk = null;   // what OK does, per opening
+
+    function convertShowIntro(path, spec, opts = {}) {
+      const name = cvBase(path);
+      const label = (spec && spec.label) || 'this kind of file';
+      const modal = document.getElementById('convert-intro-modal');
+      const titleEl = document.getElementById('convert-intro-title');
+      const bodyEl = document.getElementById('convert-intro-body');
+      const noteEl = document.getElementById('convert-intro-note');
+      const installRow = document.getElementById('convert-intro-install');
+      setIcon(document.getElementById('convert-intro-icon'),
+        opts.engineMissing ? 'twin-off' : 'twin-on');
+      if (opts.engineMissing) {
+        titleEl.textContent = 'opening ' + cvArticle(label) + label + ' needs an extra';
+        bodyEl.innerHTML =
+          'enough can’t read ' + escapeHtml(cvArticle(label) + label) +
+          ' yet — that takes the <strong>PDF extra</strong>: the document ' +
+          'reader plus its layout and table models. Budget about 250 MB to ' +
+          'download and about 1 GB on disk, plus about 0.7 GB of ' +
+          'model weights the first time. <em>Writing</em> PDFs already ships ' +
+          'with enough; this extra is only for reading them (and PowerPoint ' +
+          'decks and Excel workbooks).';
+        noteEl.hidden = true;
+        installRow.hidden = false;
+        _convertIntroOk = null;
+      } else {
+        titleEl.textContent = 'opening ' + cvArticle(label) + label;
+        bodyEl.innerHTML =
+          'enough doesn’t display ' + escapeHtml(cvArticle(label) + label) +
+          ' directly. When you open <code>' + escapeHtml(name) + '</code>, ' +
+          'enough writes a markdown <strong>twin</strong> beside it — ' +
+          '<code>' + escapeHtml(name) + '.md</code> — and the twin is what ' +
+          'you read and edit here. Your original is never touched until you ' +
+          'choose <strong>export changes</strong>, which either overwrites ' +
+          'it (with undo) or writes a new datestamped copy next to it.';
+        const notes = spec && spec.notes;
+        noteEl.textContent = notes || '';
+        noteEl.hidden = !notes;
+        installRow.hidden = true;
+        _convertIntroOk = opts.onOk || null;
+      }
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      setTimeout(() => { document.getElementById('convert-intro-ok').focus(); }, 0);
+    }
+
+    function convertCloseIntro() {
+      const modal = document.getElementById('convert-intro-modal');
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+      _convertIntroOk = null;
+    }
+    window.convertCloseIntro = convertCloseIntro;
+
+    // ---- §5.2 click routing ----------------------------------------
+
+    async function convertOpenTreeRow(li) {
+      const path = li.dataset.path;
+      if (!path) return;
+      const state = li.dataset.convertState || 'unconverted';
+      if (li.hasAttribute('data-converted')) {
+        return convertOpenConverted(path, li.dataset.twin || (path + '.md'), state);
+      }
+      await convertFormats();
+      const ext = cvExt(path);
+      const spec = convertSpecFor(ext);
+      if (state === 'engine-missing' || (spec && !spec.available)) {
+        // Always explained, every time: the user can't act on it yet, so
+        // "you've seen this once" would just be a dead click.
+        convertShowIntro(path, spec, { engineMissing: true });
+        return;
+      }
+      if (convertSeenIntro().indexOf(ext.replace(/^\./, '')) === -1) {
+        convertShowIntro(path, spec, {
+          onOk: () => { convertMarkIntroSeen(ext); convertStartConversion(path); },
+        });
+        return;
+      }
+      convertStartConversion(path);
+    }
+
+    // A converted original: open its twin. But answer the two questions
+    // the tree row (up to 3s old) can't — is it in conflict, and has the
+    // original moved on — before putting text on screen.
+    async function convertOpenConverted(original, twin, stateHint) {
+      let st = null;
+      try { st = await convertStatus(original); } catch (_e) { /* use the row */ }
+      const state = (st && st.state) || stateHint;
+      if (state === 'conflict') {
+        convertShowConflict(original, twin);
+        return;
+      }
+      if (state === 'stale') {
+        // §5.5: the original moved and the twin has no edits to lose, so
+        // re-read it and say so. `resolve → reconvert` is the endpoint for
+        // this: a plain POST /api/convert refuses over an existing twin,
+        // and resolve stashes the old twin to .undo on the way past.
+        const snap = await convertStartJob(original, { kind: 'reconvert' });
+        if (snap && snap.job) {
+          const done = await convertAwaitJob(snap.job);
+          if (!done || done.state !== 'done') return;   // failed → its own toast
+        }
+      }
+      await openReadEdit(twin, { size: 'mini', face: 'read' });
+    }
+
+    function convertStartConversion(path) {
+      return convertStartJob(path, { kind: 'convert', openWhenDone: true });
+    }
+
+    // ---- §5.8 jobs + progress toasts -------------------------------
+
+    function convertJobEntry(id) {
+      let e = CONVERT_JOBS.get(id);
+      if (!e) {
+        e = { id, kind: 'convert', waiters: [], poll: null, terminal: false, snap: null };
+        CONVERT_JOBS.set(id, e);
+      }
+      return e;
+    }
+
+    function convertAwaitJob(id) {
+      const e = convertJobEntry(id);
+      if (e.terminal) return Promise.resolve(e.snap);
+      return new Promise((resolve) => { e.waiters.push(resolve); });
+    }
+
+    async function convertStartJob(path, opts = {}) {
+      const kind = opts.kind || 'convert';
+      let snap;
+      try {
+        snap = kind === 'reconvert'
+          ? await convertApi('/api/convert/resolve', { path, choice: 'reconvert' })
+          : await convertApi('/api/convert', { path });
+      } catch (e) {
+        convertNotice(cvBase(path), String(e.message || e), 'failed', { ttl: 14000 });
+        return null;
+      }
+      if (!snap || !snap.job) return snap;
+      const entry = convertJobEntry(snap.job);
+      entry.kind = kind;
+      entry.openWhenDone = !!opts.openWhenDone;
+      convertHandleJobSnap(snap);
+      convertPollJob(snap.job);
+      return snap;
+    }
+
+    // The SSE is the primary channel; this is the backstop for a dropped
+    // stream, and it stops itself the moment a terminal snapshot lands
+    // (from either source).
+    function convertPollJob(id) {
+      const e = convertJobEntry(id);
+      if (e.poll || e.terminal) return;
+      e.poll = setInterval(async () => {
+        try {
+          const r = await fetch('/api/convert/job/' + encodeURIComponent(id));
+          if (r.ok) convertHandleJobSnap(await r.json());
+          else if (r.status === 404) { clearInterval(e.poll); e.poll = null; }
+        } catch (_err) { /* keep trying; the SSE may still deliver */ }
+      }, 2500);
+    }
+
+    async function convertCancelJob(id) {
+      try {
+        await convertApi('/api/convert/job/' + encodeURIComponent(id) + '/cancel', {});
+      } catch (e) {
+        convertNotice('cancel failed', String(e.message || e), 'failed', { ttl: 9000 });
+      }
+    }
+
+    function convertHandleJobSnap(snap) {
+      if (!snap || !snap.job) return;
+      const e = convertJobEntry(snap.job);
+      e.snap = snap;
+      convertPaintJobToast(snap, e);
+      if (['done', 'failed', 'cancelled'].indexOf(snap.state) === -1) return;
+      if (e.terminal) return;
+      e.terminal = true;
+      if (e.poll) { clearInterval(e.poll); e.poll = null; }
+      const waiters = e.waiters;
+      e.waiters = [];
+      waiters.forEach((fn) => { try { fn(snap); } catch (_err) { /* noop */ } });
+      // The badge on that row changed no matter how the job ended.
+      htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+      if (snap.state === 'done') convertAfterJobDone(snap, e);
+      setTimeout(() => CONVERT_JOBS.delete(snap.job), 60000);
+    }
+
+    function convertPaintJobToast(snap, entry) {
+      const id = 'job:' + snap.job;
+      const name = cvBase(snap.path || '');
+      const reconv = (entry && entry.kind) === 'reconvert';
+      if (snap.state === 'running') {
+        convertToast(id, {
+          state: 'running', icon: 'twin-off', title: name,
+          message: snap.message || (reconv ? 're-converting…' : 'converting…'),
+          progress: snap.progress == null ? 0 : snap.progress,
+          actions: [{ label: 'cancel', run: () => convertCancelJob(snap.job) }],
+        });
+        return;
+      }
+      if (snap.state === 'done') {
+        convertToast(id, {
+          state: 'done', icon: 'twin-on', title: name,
+          message: reconv ? 're-converted from the updated original'
+            : 'converted — ' + name + '.md is ready',
+          ttl: 6000,
+        });
+        return;
+      }
+      convertToast(id, {
+        state: 'failed', icon: 'twin-off', title: name,
+        message: snap.state === 'cancelled'
+          ? 'cancelled' : (snap.error || snap.message || 'conversion failed'),
+        ttl: snap.state === 'cancelled' ? 5000 : 15000,
+      });
+    }
+
+    async function convertAfterJobDone(snap, entry) {
+      const original = String(snap.path || '');
+      const twin = original + '.md';
+      if (entry && entry.openWhenDone) {
+        await openReadEdit(twin, { size: 'mini', face: 'read' });
+        return;
+      }
+      // Not ours to open, but if that twin happens to be on screen its
+      // bytes just changed underneath the reader.
+      if (reIsActive() && RE_PATH === twin) {
+        if (RE_FACE === 'edit' && reIsDirty()) {
+          convertNotice(cvBase(twin),
+            'was re-converted on disk — your unsaved edits are still in the editor',
+            'conflict', { ttl: 15000 });
+        } else {
+          await openReadEdit(twin, { size: RE_SIZE, face: RE_FACE });
+        }
+      }
+      convertRefreshDoc();
+    }
+
+    // One toast component. `actions` is a list of {label, run}; with none,
+    // a single "dismiss" is offered. `ttl` 0/absent means it stays.
+    function convertToast(id, o) {
+      const wrap = document.getElementById('convert-toasts');
+      if (!wrap) return;
+      let el = CONVERT_TOASTS.get(id);
+      if (!el) {
+        el = document.createElement('div');
+        el.innerHTML =
+          '<span class="ct-icon"><img class="svg-icon" alt="" draggable="false"></span>' +
+          '<div class="ct-body"><div class="ct-title"></div><div class="ct-msg"></div>' +
+          '<div class="ct-bar" hidden><span></span></div></div>' +
+          '<div class="ct-actions"></div>';
+        CONVERT_TOASTS.set(id, el);
+        wrap.appendChild(el);
+      }
+      el.className = 'convert-toast state-' + (o.state || 'running');
+      const icon = el.querySelector('.ct-icon');
+      icon.className = 'ct-icon' + (o.square ? ' square' : '');
+      setIcon(icon.querySelector('img'), o.icon || 'twin-on');
+      el.querySelector('.ct-title').textContent = o.title || '';
+      el.querySelector('.ct-msg').textContent = o.message || '';
+      const bar = el.querySelector('.ct-bar');
+      if (o.progress == null) {
+        bar.hidden = true;
+      } else {
+        bar.hidden = false;
+        bar.firstElementChild.style.width =
+          Math.max(0, Math.min(100, Number(o.progress) || 0)) + '%';
+      }
+      const acts = el.querySelector('.ct-actions');
+      acts.innerHTML = '';
+      const list = (o.actions && o.actions.length)
+        ? o.actions : [{ label: 'dismiss', run: () => convertToastClose(id) }];
+      list.forEach((a) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'ct-btn';
+        b.textContent = a.label;
+        b.addEventListener('click', () => a.run());
+        acts.appendChild(b);
+      });
+      clearTimeout(CONVERT_TOAST_TIMERS.get(id));
+      if (o.ttl) {
+        CONVERT_TOAST_TIMERS.set(id, setTimeout(() => convertToastClose(id), o.ttl));
+      }
+    }
+
+    function convertToastClose(id) {
+      const el = CONVERT_TOASTS.get(id);
+      if (el) el.remove();
+      CONVERT_TOASTS.delete(id);
+      clearTimeout(CONVERT_TOAST_TIMERS.get(id));
+      CONVERT_TOAST_TIMERS.delete(id);
+    }
+
+    let _convertNoticeSeq = 0;
+    function convertNotice(title, message, state, opts = {}) {
+      const id = 'note:' + (++_convertNoticeSeq);
+      convertToast(id, Object.assign({
+        state: state || 'done', title, message,
+        ttl: opts.ttl == null ? 5000 : opts.ttl,
+      }, opts));
+      return id;
+    }
+
+    // ---- §5.2/§5.3 twin chrome in the read/edit headers -------------
+
+    // Is this path shaped like a twin? Asking the server about every
+    // ordinary markdown file the user opens would be a request per click
+    // for an answer that is almost always "no".
+    function convertLooksLikeTwin(path) {
+      if (!path || !/\.md$/i.test(path)) return false;
+      const stem = path.slice(0, -3);
+      const dot = stem.lastIndexOf('.');
+      if (dot < 0) return false;
+      return !!convertSpecFor(stem.slice(dot).toLowerCase());
+    }
+
+    async function convertOnDocOpen(path) {
+      CONVERT_DOC = null;
+      convertPaintChips();
+      await convertFormats();
+      if (!convertLooksLikeTwin(path)) return;
+      let st;
+      try { st = await convertStatus(path); } catch (_e) { return; }
+      if (!st || !st.spec || RE_PATH !== path) return;
+      CONVERT_DOC = {
+        twin: path, original: st.path, state: st.state, spec: st.spec,
+        sync: !!st.sync, targets: st.export_targets || [], manifest: st.manifest || null,
+      };
+      convertPaintChips();
+      if (st.state === 'conflict') convertShowConflict(st.path, path);
+    }
+
+    async function convertRefreshDoc() {
+      if (!CONVERT_DOC) return;
+      const twin = CONVERT_DOC.twin;
+      let st;
+      try { st = await convertStatus(twin); } catch (_e) { return; }
+      if (!CONVERT_DOC || CONVERT_DOC.twin !== twin || !st || !st.spec) return;
+      CONVERT_DOC.state = st.state;
+      CONVERT_DOC.spec = st.spec;
+      CONVERT_DOC.sync = !!st.sync;
+      CONVERT_DOC.targets = st.export_targets || CONVERT_DOC.targets;
+      CONVERT_DOC.manifest = st.manifest || null;
+      convertPaintChips();
+    }
+
+    const CONVERT_CHIP_IDS = ['convert-chip-mini', 'convert-chip-review', 'convert-chip-edit'];
+
+    function convertPaintChips() {
+      const d = CONVERT_DOC;
+      CONVERT_CHIP_IDS.forEach((id) => {
+        const chip = document.getElementById(id);
+        if (!chip) return;
+        if (!d) { chip.hidden = true; return; }
+        chip.hidden = false;
+        const badge = chip.querySelector('[data-cc="badge"]');
+        badge.className = 'convert-badge state-' + (d.state || 'fresh');
+        badge.title = convertBadgeTitle(d.state, cvBase(d.original), cvBase(d.twin));
+        setIcon(badge.querySelector('img'), 'twin-on');
+        chip.querySelector('[data-cc="name"]').textContent = cvBase(d.original);
+        chip.querySelector('[data-cc="twin"]').textContent = '→ ' + cvBase(d.twin);
+        // §5.11: the browser renders PDFs natively and nothing else, so
+        // "view original" exists for PDFs and is hidden everywhere else.
+        chip.querySelector('[data-cc="original"]').hidden = cvExt(d.original) !== '.pdf';
+      });
+    }
+
+    // ---- §5.3 the export modal --------------------------------------
+
+    function convertStampPreview(base, ext) {
+      const d = new Date();
+      const p = (n) => String(n).padStart(2, '0');
+      const stem = cvBase(base).replace(/\.[^.]*$/, '');
+      return stem + '-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' +
+        p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + ext;
+    }
+
+    async function convertOpenExport() {
+      const d = CONVERT_DOC;
+      if (!d) return;
+      await convertFormats();
+      const sel = document.getElementById('convert-export-target');
+      sel.innerHTML = '';
+      const targets = d.targets && d.targets.length ? d.targets : ['.docx', '.pdf'];
+      const own = (d.spec && d.spec.ext) || cvExt(d.original);
+      let chosen = null;
+      targets.forEach((t) => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        const ok = convertTargetAvailable(t);
+        opt.textContent = t + (ok ? '' : ' — ' + convertTargetReason(t));
+        opt.disabled = !ok;
+        sel.appendChild(opt);
+        if (ok && chosen === null) chosen = t;
+        if (ok && t === own) chosen = t;
+      });
+      sel.value = chosen || targets[0];
+      document.getElementById('convert-export-lead').innerHTML =
+        'Writing <code>' + escapeHtml(cvBase(d.twin)) + '</code> back out. ' +
+        'Your original is only touched if you pick overwrite.';
+      const syncRow = document.getElementById('convert-export-sync-row');
+      const syncOk = !!(d.spec && d.spec.sync_ok);
+      syncRow.hidden = !syncOk;
+      if (syncOk) {
+        document.getElementById('convert-export-syncname').textContent = cvBase(d.original);
+        document.getElementById('convert-export-sync').checked = !!d.sync;
+      }
+      document.getElementById('convert-export-error').hidden = true;
+      const copyRadio = document.querySelector('input[name="cv-export-mode"][value="copy"]');
+      if (copyRadio) copyRadio.checked = true;   // the mode that can't destroy anything
+      convertPaintExportModes();
+      const modal = document.getElementById('convert-export-modal');
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+
+    // Re-derived whenever the target changes: overwrite only exists when
+    // the original's format can be written back AND the chosen target IS
+    // that format — otherwise "overwrite" would mean "replace my .docx
+    // with a .pdf", which the backend refuses and the user didn't mean.
+    function convertPaintExportModes() {
+      const d = CONVERT_DOC;
+      if (!d) return;
+      const target = document.getElementById('convert-export-target').value;
+      const own = (d.spec && d.spec.ext) || cvExt(d.original);
+      const writable = !!(d.spec && d.spec.writer) && !!d.original;
+      const canOverwrite = writable && target === own;
+      const row = document.getElementById('convert-export-overwrite-row');
+      row.hidden = !canOverwrite;
+      document.getElementById('convert-export-origname').textContent = cvBase(d.original || '');
+      document.getElementById('convert-export-copyname').textContent =
+        convertStampPreview(d.original || d.twin, target);
+      if (!canOverwrite) {
+        const copyRadio = document.querySelector('input[name="cv-export-mode"][value="copy"]');
+        if (copyRadio) copyRadio.checked = true;
+      }
+      const note = document.getElementById('convert-export-note');
+      const parts = [];
+      if (d.spec && d.spec.notes) parts.push(d.spec.notes);
+      if (target === '.pdf') parts.push('PDF export re-typesets from markdown with typst');
+      if (canOverwrite && (target === '.docx' || target === '.odt')) {
+        parts.push('styles, page size and any headers/footers are taken from the original');
+      }
+      note.textContent = parts.join(' · ');
+      note.hidden = !parts.length;
+    }
+
+    function convertCloseExport() {
+      const modal = document.getElementById('convert-export-modal');
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+    window.convertCloseExport = convertCloseExport;
+
+    async function convertRunExport() {
+      const d = CONVERT_DOC;
+      if (!d) return;
+      const target = document.getElementById('convert-export-target').value;
+      const modeEl = document.querySelector('input[name="cv-export-mode"]:checked');
+      const mode = modeEl ? modeEl.value : 'copy';
+      const go = document.getElementById('convert-export-go');
+      const err = document.getElementById('convert-export-error');
+      go.disabled = true;
+      try {
+        const out = await convertApi('/api/convert/export',
+          { path: d.twin, target, mode });
+        convertCloseExport();
+        convertNotice(out.written,
+          mode === 'overwrite'
+            ? 'overwrote ' + cvBase(d.original) +
+              (out.reference_doc ? ' — styles kept from the original' : '')
+            : 'written beside ' + cvBase(d.original || d.twin),
+          'done', { icon: 'export-doc', square: true, ttl: 7000 });
+        if (mode === 'overwrite' && out.undo) convertShowUndoFor(d.original);
+        htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+        convertRefreshDoc();
+      } catch (e) {
+        if (e.status === 409) {
+          convertCloseExport();
+          convertShowConflict(d.original, d.twin, { reason: String(e.message || e) });
+          return;
+        }
+        err.textContent = String(e.message || e);
+        err.hidden = false;
+      } finally {
+        go.disabled = false;
+      }
+    }
+
+    // An overwrite stashed the ORIGINAL through the same one-deep `.undo`
+    // every other write in enough uses, so it gets the same save/undo
+    // affordance. The bar itself lives inside the full read face; when
+    // that face isn't on screen the identical pair of actions rides on a
+    // toast, so the offer is never silently unavailable.
+    function convertShowUndoFor(path) {
+      if (!path) return;
+      const reviewRoot = document.getElementById('review-mode');
+      if (reviewRoot && reviewRoot.classList.contains('open')
+        && typeof showReviewUndoBar === 'function') {
+        showReviewUndoBar(path, { lead: 'enough wrote', reload: false });
+        return;
+      }
+      const id = 'undo:' + path;
+      convertToast(id, {
+        state: 'done', icon: 'export-doc', square: true,
+        title: cvBase(path), message: 'overwritten — keep it, or undo?',
+        actions: [
+          {
+            label: '✓ keep', run: async () => {
+              try {
+                const fd = new FormData();
+                fd.append('path', path);
+                await fetch('/api/file/dismiss-undo', { method: 'POST', body: fd });
+              } catch (_e) { /* the bar dismisses either way */ }
+              convertToastClose(id);
+            },
+          },
+          {
+            label: '↶ undo', run: async () => {
+              try {
+                const fd = new FormData();
+                fd.append('path', path);
+                const r = await fetch('/api/file/undo', { method: 'POST', body: fd });
+                if (!r.ok) throw new Error(await convertDetail(r));
+                convertToastClose(id);
+                convertNotice(cvBase(path), 'restored from the undo stash', 'done');
+                htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+                convertRefreshDoc();
+              } catch (e) {
+                convertNotice(cvBase(path), 'undo failed: ' + String(e.message || e),
+                  'failed', { ttl: 12000 });
+              }
+            },
+          },
+        ],
+      });
+    }
+
+    // ---- §5.5 the conflict modal ------------------------------------
+
+    let _convertConflict = null;   // {original, twin}
+
+    function convertShowConflict(original, twin, opts = {}) {
+      _convertConflict = { original, twin };
+      const modal = document.getElementById('convert-conflict-modal');
+      document.getElementById('convert-conflict-title').textContent =
+        opts.title || 'changed on both sides';
+      document.getElementById('convert-conflict-body').innerHTML =
+        opts.reason
+          ? escapeHtml(String(opts.reason)) + ' Pick which copy wins:'
+          : '<code>' + escapeHtml(cvBase(original)) + '</code> changed outside ' +
+            'enough, and your twin <code>' + escapeHtml(cvBase(twin)) + '</code> ' +
+            'has changes of its own. Pick which copy wins:';
+      document.getElementById('convert-conflict-export-sub').textContent =
+        'write the twin over ' + cvBase(original) + '; undo available afterwards';
+      document.getElementById('convert-conflict-error').hidden = true;
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+    }
+
+    function convertCloseConflict() {
+      const modal = document.getElementById('convert-conflict-modal');
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+      _convertConflict = null;
+    }
+    window.convertCloseConflict = convertCloseConflict;
+
+    async function convertResolveChoice(choice) {
+      const c = _convertConflict;
+      if (!c) return;
+      const err = document.getElementById('convert-conflict-error');
+      try {
+        if (choice === 'reconvert') {
+          convertCloseConflict();
+          const snap = await convertStartJob(c.original, {
+            kind: 'reconvert',
+            openWhenDone: !(reIsActive() && RE_PATH === c.twin),
+          });
+          if (snap && snap.job) await convertAwaitJob(snap.job);
+          return;
+        }
+        const out = await convertApi('/api/convert/resolve',
+          { path: c.original, choice });
+        convertCloseConflict();
+        if (choice === 'keep') {
+          convertNotice(cvBase(c.original),
+            'kept your twin — the change on disk is accepted without re-reading it',
+            'done', { ttl: 7000 });
+        } else {
+          convertNotice(out.written || cvBase(c.original),
+            'overwrote ' + cvBase(c.original) + ' with your twin',
+            'done', { icon: 'export-doc', square: true, ttl: 7000 });
+          if (out && out.undo) convertShowUndoFor(c.original);
+        }
+        htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+        convertRefreshDoc();
+      } catch (e) {
+        err.textContent = String(e.message || e);
+        err.hidden = false;
+      }
+    }
+
+    // ---- §4 the .convert-sync marker on a save ----------------------
+
+    // POST /api/file prepends a hidden <div class="convert-sync"> when the
+    // saved file was a twin with "keep in sync" on. Three outcomes: the
+    // original was rewritten, the original had moved on (conflict), or
+    // the export failed outright. The twin is always saved first, so none
+    // of these ever means "your text is gone".
+    function convertHandleSyncFragment(html, savedPath) {
+      if (!html || html.indexOf('convert-sync') === -1) return;
+      const holder = document.createElement('div');
+      holder.innerHTML = html;
+      const div = holder.querySelector('.convert-sync');
+      if (!div) return;
+      convertReportSync({
+        state: div.dataset.syncState,
+        // `data-original` is a BASENAME (Wave A) — right for display,
+        // wrong as an API argument for a twin in a subfolder. The twin's
+        // own path minus `.md` IS the original's project-relative path.
+        name: div.dataset.original || cvBase(savedPath).replace(/\.md$/i, ''),
+        original: savedPath.replace(/\.md$/i, ''),
+        detail: div.dataset.detail || '',
+        twin: savedPath,
+      });
+    }
+
+    function convertReportSync(s) {
+      // A syncing save answers TWICE — once in the POST /api/file response
+      // fragment, once on the SSE — and the server emits the event before
+      // it returns the body, so neither side can be relied on to arrive
+      // first. Collapse them here, on (twin, outcome) inside a short
+      // window, so the user is told once whichever way round they land.
+      const key = s.twin + '|' + s.state;
+      const last = CONVERT_SYNC_ANSWERED.get(key);
+      const now = Date.now();
+      if (last && now - last < 3000) return;
+      CONVERT_SYNC_ANSWERED.set(key, now);
+      const name = s.name || cvBase(s.original);
+      if (s.state === 'synced') {
+        convertNotice(cvBase(s.twin), 'also updated ' + name, 'done',
+          { icon: 'export-doc', square: true, ttl: 5000 });
+      } else if (s.state === 'conflict') {
+        convertShowConflict(s.original, s.twin, {
+          title: name + ' moved on',
+          reason: 'Your twin was saved, but ' + name + ' changed outside enough ' +
+            'since the conversion, so enough did not overwrite it.',
+        });
+      } else {
+        convertNotice(name, s.detail || 'could not update the original', 'failed',
+          { icon: 'export-doc', square: true, ttl: 15000 });
+      }
+    }
+
+    // ---- §5.10 image viewer / §5.11 view original -------------------
+
+    // Both render into the mini panel, which read/edit also owns — so the
+    // document has to let go of it first (with its own dirty guard).
+    async function convertReleasePreview() {
+      if (typeof reIsActive === 'function' && reIsActive()) {
+        await closeReadEdit();
+        if (reIsActive()) return false;   // user chose "keep editing"
+      }
+      convertCloseBlobView({ silent: true });
+      return true;
+    }
+
+    async function convertOpenImage(path) {
+      if (!(await convertReleasePreview())) return;
+      CONVERT_BLOB = { kind: 'image', path, back: null };
+      convertPaintBlobView();
+      modePush('blobview', {
+        icon: 'file', onExit: () => convertCloseBlobView(),
+        iconTitle: 'image · ' + cvBase(path),
+        exitTitle: 'close the image viewer',
+      });
+    }
+
+    async function convertViewOriginal() {
+      const d = CONVERT_DOC;
+      if (!d || !d.original) return;
+      const original = d.original, twin = d.twin;
+      if (!(await convertReleasePreview())) return;
+      CONVERT_BLOB = { kind: 'pdf', path: original, back: twin };
+      convertPaintBlobView();
+      modePush('blobview', {
+        icon: 'view-original', onExit: () => convertCloseBlobView(),
+        iconTitle: 'the original · ' + cvBase(original),
+        exitTitle: 'back to the twin',
+      });
+    }
+
+    function convertPaintBlobView() {
+      const b = CONVERT_BLOB;
+      if (!b) return;
+      const body = document.getElementById('preview-body');
+      if (!body) return;
+      const url = '/api/file/blob?path=' + encodeURIComponent(b.path);
+      body.innerHTML = '';
+      const wrap = document.createElement('div');
+      wrap.className = 'blob-view';
+      const head = document.createElement('div');
+      head.className = 'bv-head';
+      const nameEl = document.createElement('span');
+      nameEl.className = 'bv-name';
+      nameEl.textContent = cvBase(b.path);
+      const dimEl = document.createElement('span');
+      const sizeEl = document.createElement('span');
+      head.appendChild(nameEl);
+      head.appendChild(dimEl);
+      head.appendChild(sizeEl);
+      wrap.appendChild(head);
+      const hint = document.createElement('div');
+      hint.className = 'bv-hint';
+      if (b.kind === 'pdf') {
+        // §5.11: the ONE place enough "renders" a PDF — and it's the
+        // browser doing it, in an iframe, read-only.
+        const frame = document.createElement('iframe');
+        frame.className = 'bv-frame';
+        frame.src = url;
+        frame.title = cvBase(b.path);
+        wrap.appendChild(frame);
+        hint.textContent = 'the original, rendered by your browser — read-only';
+      } else {
+        const stage = document.createElement('div');
+        stage.className = 'bv-stage';
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = cvBase(b.path);
+        // Wave A answers `meta=1` with width/height null on purpose: the
+        // loaded <img> knows, for free, and is right about SVG too.
+        img.addEventListener('load', () => {
+          dimEl.textContent = '· ' + img.naturalWidth + '×' + img.naturalHeight;
+        });
+        img.addEventListener('error', () => { dimEl.textContent = '· could not be displayed'; });
+        stage.appendChild(img);
+        stage.addEventListener('click', () => {
+          const actual = wrap.classList.toggle('actual');
+          hint.textContent = actual
+            ? 'actual size — click to fit the panel'
+            : 'fit to width — click for actual size';
+        });
+        wrap.appendChild(stage);
+        hint.textContent = 'fit to width — click for actual size';
+      }
+      wrap.appendChild(hint);
+      body.appendChild(wrap);
+      fetch(url + '&meta=1')
+        .then((r) => (r.ok ? r.json() : null))
+        .then((j) => { if (j) sizeEl.textContent = '· ' + cvBytes(j.size); })
+        .catch(() => { /* the header just carries less */ });
+      document.getElementById('preview-title').textContent =
+        (b.kind === 'pdf' ? 'original · ' : 'image · ') + cvBase(b.path);
+      document.getElementById('preview').classList.add('open');
+    }
+
+    // `silent` is for the eviction path (a document is opening into the
+    // same panel); otherwise closing "view original" walks back to the
+    // twin the user came from.
+    function convertCloseBlobView(opts = {}) {
+      if (!CONVERT_BLOB) return;
+      const back = CONVERT_BLOB.back;
+      CONVERT_BLOB = null;
+      modeRemove('blobview');
+      const body = document.getElementById('preview-body');
+      if (body) body.innerHTML = '';
+      const panel = document.getElementById('preview');
+      if (panel) panel.classList.remove('open');
+      const title = document.getElementById('preview-title');
+      if (title) title.textContent = 'preview';
+      if (!opts.silent && back) openReadEdit(back, { size: 'mini', face: 'read' });
+    }
+
+    // ---- §5.7 the extras row (UI window → extras) -------------------
+
+    async function convertExtrasRefresh() {
+      try {
+        const r = await fetch('/api/convert/install/status');
+        if (r.ok) CONVERT_INSTALL_STATUS = await r.json();
+      } catch (_e) { /* paint what we have */ }
+      CONVERT_FORMATS = null;          // engines can flip without a restart
+      await convertFormats();
+      convertExtrasPaint();
+    }
+
+    function convertExtrasLog(line) {
+      const log = document.getElementById('cv-extras-log');
+      if (!log) return;
+      log.textContent += (log.textContent ? '\n' : '') + line;
+      // Keep the tail bounded — a full uv sync is thousands of lines.
+      const lines = log.textContent.split('\n');
+      if (lines.length > 300) log.textContent = lines.slice(-300).join('\n');
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function convertExtrasPaint() {
+      const box = document.getElementById('cv-extras-pdf');
+      if (!box) return;
+      const stateEl = document.getElementById('cv-extras-state');
+      const btn = document.getElementById('cv-extras-btn');
+      const note = document.getElementById('cv-extras-note');
+      const st = CONVERT_INSTALL_STATUS || {};
+      const job = CONVERT_INSTALL_JOB || st.job || null;
+      const running = !!(job && job.state === 'running');
+      const docling = ((CONVERT_FORMATS && CONVERT_FORMATS.engines) || {}).docling || {};
+      const sizes = 'docling plus its layout and table models: about 250 MB to ' +
+        'download, about 1 GB on disk, and about 0.7 GB of model ' +
+        'weights on first install. Writing PDFs already ships with enough — ' +
+        'this extra is for reading PDFs, PowerPoint decks and Excel workbooks.';
+      btn.disabled = false;
+      box.classList.toggle('showing-log', running || !!(job && job.state === 'failed'));
+      if (running) {
+        stateEl.textContent = 'installing… ' + (job.message || '');
+        stateEl.className = 'cv-extras-state busy';
+        btn.textContent = 'installing…';
+        btn.disabled = true;
+        note.textContent = 'uv is resolving and downloading; this can take a while ' +
+          'on a slow link. A dropped connection resumes.';
+        return;
+      }
+      const failed = (job && job.state === 'failed') ? (job.error || 'install failed')
+        : (st.last_error || null);
+      if (st.installed) {
+        const ready = !!docling.available;
+        stateEl.textContent = ready ? 'installed' : 'installed — not active yet';
+        stateEl.className = 'cv-extras-state ' + (ready ? 'ok' : 'busy');
+        btn.textContent = 'reinstall';
+        note.textContent = ready
+          ? sizes
+          : (docling.models === false
+            ? 'the layout and table model weights aren’t on disk yet — reinstall to fetch them.'
+            : 'the reader is installed; this build has not switched the engine on yet.');
+        return;
+      }
+      if (failed) {
+        stateEl.textContent = 'failed';
+        stateEl.className = 'cv-extras-state bad';
+        btn.textContent = 'retry';
+        note.textContent = String(failed);
+        return;
+      }
+      stateEl.textContent = 'not installed';
+      stateEl.className = 'cv-extras-state';
+      btn.textContent = 'install';
+      note.textContent = sizes;
+    }
+
+    async function convertStartInstall() {
+      const log = document.getElementById('cv-extras-log');
+      if (log) log.textContent = '';
+      try {
+        CONVERT_INSTALL_JOB = await convertApi('/api/convert/install', { extra: 'pdf' });
+        convertExtrasPaint();
+      } catch (e) {
+        CONVERT_INSTALL_JOB = null;
+        convertNotice('PDF extra', String(e.message || e), 'failed', { ttl: 15000 });
+        convertExtrasPaint();
+      }
+    }
+
+    // ---- wiring ------------------------------------------------------
+
+    document.getElementById('convert-intro-ok').addEventListener('click', () => {
+      const run = _convertIntroOk;
+      convertCloseIntro();
+      if (run) run();
+    });
+    document.getElementById('convert-intro-install-btn').addEventListener('click', () => {
+      convertCloseIntro();
+      if (typeof openUIModal === 'function') openUIModal();   // the log lives there
+      convertStartInstall();
+    });
+    document.getElementById('convert-export-cancel')
+      .addEventListener('click', convertCloseExport);
+    document.getElementById('convert-export-go')
+      .addEventListener('click', convertRunExport);
+    document.getElementById('convert-export-target')
+      .addEventListener('change', convertPaintExportModes);
+    // "keep in sync" is a per-file SETTING, not part of the export
+    // transaction — it applies the moment it is ticked, and the modal is
+    // the only place it lives.
+    document.getElementById('convert-export-sync').addEventListener('change', async (e) => {
+      const d = CONVERT_DOC;
+      if (!d) return;
+      const on = e.target.checked;
+      try {
+        await convertApi('/api/convert/sync', { path: d.original, enabled: on });
+        d.sync = on;
+        convertNotice(cvBase(d.original), on
+          ? 'will be rewritten from the twin after every save'
+          : 'no longer kept in sync', 'done', { icon: 'export-doc', square: true });
+      } catch (err) {
+        e.target.checked = !on;
+        const box = document.getElementById('convert-export-error');
+        box.textContent = String(err.message || err);
+        box.hidden = false;
+      }
+    });
+    document.querySelectorAll('#convert-conflict-modal .cv-choice').forEach((b) => {
+      b.addEventListener('click', () => convertResolveChoice(b.dataset.choice));
+    });
+    CONVERT_CHIP_IDS.forEach((id) => {
+      const chip = document.getElementById(id);
+      if (!chip) return;
+      chip.querySelector('[data-cc="export"]').addEventListener('click', convertOpenExport);
+      chip.querySelector('[data-cc="original"]').addEventListener('click', convertViewOriginal);
+    });
+    document.getElementById('cv-extras-btn').addEventListener('click', convertStartInstall);
+    // The UI modal is where the extras row lives; re-read its state each
+    // time it opens (a separate listener so openUIModal stays untouched).
+    // Not in home mode: the extras row is hidden there and
+    // /api/convert/install/status is one of the project-scoped routes.
+    if (!IS_HOME) {
+      document.getElementById('ui-btn').addEventListener('click', convertExtrasRefresh);
+    }
+
+    // Escape closes the topmost open convert modal. Capture phase, like
+    // the confirm overlay's, so it wins over the mode-stack esc handler;
+    // the confirm overlay is registered earlier and stops propagation
+    // while it is open, so it still outranks this.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const open = ['convert-conflict-modal', 'convert-export-modal', 'convert-intro-modal']
+        .map((id) => document.getElementById(id))
+        .find((el) => el && !el.classList.contains('hidden'));
+      if (!open) return;
+      e.stopPropagation();
+      if (open.id === 'convert-intro-modal') convertCloseIntro();
+      else if (open.id === 'convert-export-modal') convertCloseExport();
+      else convertCloseConflict();
+    }, true);
+
+    // ---- SSE ---------------------------------------------------------
+
+    es.addEventListener('convert', (e) => {
+      let d;
+      try { d = JSON.parse(e.data); } catch (_err) { return; }
+      if (d.op === 'sync') {
+        // For op:"sync" the event's `path` is the TWIN that was saved
+        // (that is what POST /api/file was asked to write); `original` is
+        // a basename, for display only.
+        const twin = String(d.path || '');
+        convertReportSync({
+          state: d.state,
+          name: d.original || cvBase(twin).replace(/\.md$/i, ''),
+          original: twin.replace(/\.md$/i, ''),
+          detail: d.error || d.message || '', twin,
+        });
+        return;
+      }
+      if (d.op === 'export') {
+        // Exports are synchronous — whoever asked for one has already been
+        // told. This is only here so a second tab's export still moves
+        // this one's tree and badge.
+        htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+        convertRefreshDoc();
+        return;
+      }
+      if (d.job) convertHandleJobSnap(d);
+    });
+
+    es.addEventListener('convert-install', (e) => {
+      let d;
+      try { d = JSON.parse(e.data); } catch (_err) { return; }
+      CONVERT_INSTALL_JOB = d;
+      if (d.line) convertExtrasLog(d.line);
+      convertExtrasPaint();
+      if (d.state === 'done' || d.state === 'failed') {
+        convertNotice('PDF extra',
+          d.state === 'done' ? 'installed' : (d.error || 'install failed'),
+          d.state === 'done' ? 'done' : 'failed',
+          { ttl: d.state === 'done' ? 8000 : 20000 });
+        convertExtrasRefresh();
+      }
+    });
+
+    // ---- boot --------------------------------------------------------
+
+    // afterSwap (not just afterSettle) so the badge is drawn in the same
+    // frame the rows are: the tree re-renders every 3s, and decorating a
+    // settle later makes the whole column blink.
+    document.body.addEventListener('htmx:afterSwap', (e) => {
+      if (e.target && e.target.id === 'tree') decorateConvertRows();
+    });
+    document.body.addEventListener('htmx:afterSettle', () => decorateConvertRows());
+    convertFormats().then(() => { decorateConvertRows(); convertExtrasPaint(); });
+    decorateConvertRows();
+
     // Disable the input while a turn is in flight.
     form.addEventListener('htmx:beforeRequest', () => {
       sendBtn.disabled = true;
@@ -16341,6 +19333,670 @@
     });
 
     autoscroll();
+
+    // ================================================================
+    // enough home (0.2.5) — the launch screen   (docs/home-plan.md §4)
+    // ================================================================
+    //
+    // Everything below runs on BOTH modes' pages but only DOES anything
+    // under `data-mode="home"` — except the close-project row, which is
+    // the project-mode half of the same handoff (§1.7).
+    //
+    // Shape of the data (GET /api/home/projects), exactly nine keys per
+    // row: path, name, description, created_at, last_opened, last_edited,
+    // counts {p,w,c}, missing, hidden. `counts` is never null; the date
+    // fields can be. The server hands them back newest-first and always
+    // sends EVERY entry, hidden included — the filtering and the re-sort
+    // on a header click are both ours.
+
+    const HOME_VIEWS = ['icons', 'list'];
+    let HOME_PROJECTS = [];
+    let HOME_VIEW = 'icons';           // the default the frontend owns
+    let HOME_SHOW_HIDDEN = false;      // §1.10 — off until asked
+    // Default sort = "last updated, newest first" (§4). Nulls always sink.
+    let HOME_SORT = { key: 'last_edited', dir: -1 };
+    let HOME_BUSY = false;             // a handoff / dialog is in flight
+    let HOME_CLICK_TIMER = null;       // single-click mirror, cancelled by dblclick
+
+    // ---- small formatters -------------------------------------------
+
+    function homeMs(iso) {
+      if (!iso) return null;
+      const t = Date.parse(iso);
+      return Number.isFinite(t) ? t : null;
+    }
+
+    // Compact absolute stamp for the list columns: `2026-08-20 21:31`,
+    // local time, tabular — the same year-month-day order the export
+    // datestamps use, which is the only date convention the app had.
+    function homeStamp(iso) {
+      const t = homeMs(iso);
+      if (t == null) return '—';
+      const d = new Date(t);
+      const p = (n) => String(n).padStart(2, '0');
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate())
+        + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+    }
+
+    // Relative phrasing for the icon tiles' one small line. Falls back to
+    // the absolute date past a week, where "37 days ago" stops helping.
+    function homeAgo(iso) {
+      const t = homeMs(iso);
+      if (t == null) return 'never edited';
+      const secs = Math.max(0, (Date.now() - t) / 1000);
+      if (secs < 90) return 'edited just now';
+      const mins = secs / 60;
+      if (mins < 60) return 'edited ' + Math.round(mins) + ' min ago';
+      const hrs = mins / 60;
+      if (hrs < 24) return 'edited ' + Math.round(hrs) + (Math.round(hrs) === 1 ? ' hour ago' : ' hours ago');
+      const days = hrs / 24;
+      if (days < 7) return 'edited ' + Math.round(days) + (Math.round(days) === 1 ? ' day ago' : ' days ago');
+      return 'edited ' + homeStamp(iso).slice(0, 10);
+    }
+
+    function homeNum(n) { return (Number(n) || 0).toLocaleString(); }
+
+    function homeFind(path) {
+      return HOME_PROJECTS.find((p) => p.path === path) || null;
+    }
+
+    // House toast stack (the `convert-` prefix is just where it was
+    // factored out; the component knows nothing about conversions).
+    function homeNotice(title, message, opts = {}) {
+      convertNotice(title, message, opts.state || 'failed',
+        Object.assign({ icon: 'ribbon-alert', ttl: 12000 }, opts));
+    }
+
+    // ---- the waiting state ------------------------------------------
+
+    function homeShowWait(msg) {
+      const el = document.getElementById('home-wait');
+      if (!el) return;
+      document.getElementById('home-wait-msg').textContent = msg || 'starting…';
+      el.hidden = false;
+    }
+    function homeWaitMsg(msg) {
+      const el = document.getElementById('home-wait-msg');
+      if (el) el.textContent = msg;
+    }
+    function homeHideWait() {
+      const el = document.getElementById('home-wait');
+      if (el) el.hidden = true;
+    }
+
+    // Poll `/` until the server on this port answers in the mode we're
+    // waiting for, then reload into it. This is the CLI half of the
+    // handoff: the backend re-execs itself on the same port, so the
+    // socket refuses connections for a moment (fetch rejects — keep
+    // going) and then starts answering as the other mode. On the desktop
+    // there is nothing to poll: the shell tears this page down.
+    async function homeAwaitMode(mode) {
+      const want = 'data-mode="' + mode + '"';
+      const deadline = Date.now() + 120000;
+      while (Date.now() < deadline) {
+        await new Promise((r) => setTimeout(r, 400));
+        try {
+          const r = await fetch('/?home-probe=' + Date.now(), { cache: 'no-store' });
+          if (r.ok && (await r.text()).indexOf(want) !== -1) {
+            location.reload();
+            return;
+          }
+        } catch (_e) { /* mid-restart: the port is between servers */ }
+      }
+      homeWaitMsg('the server is taking longer than expected — reloading anyway…');
+      location.reload();
+    }
+
+    // ---- open / close handoffs --------------------------------------
+
+    async function homeOpenProject(path) {
+      if (HOME_BUSY) return;
+      const p = homeFind(path);
+      HOME_BUSY = true;
+      homeShowWait('opening ' + ((p && p.name) || path.split('/').pop()) + '…');
+      let js = {}, status = 0;
+      try {
+        const r = await fetch('/api/home/open', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path }),
+        });
+        status = r.status;
+        js = await r.json().catch(() => ({}));
+      } catch (e) {
+        js = { detail: String((e && e.message) || e) };
+        status = 0;
+      }
+      if (status !== 200) {
+        HOME_BUSY = false;
+        homeHideWait();
+        homeNotice('could not open that project', js.detail || ('HTTP ' + status));
+        homeRefresh();
+        return;
+      }
+      if (js.handoff === 'exec') {
+        homeWaitMsg('the server is restarting into the project…');
+        homeAwaitMode('project');
+      } else {
+        // handoff: "desktop" — the backend exits 42 and the shell spawns
+        // the project one; this page goes away with it.
+        homeWaitMsg('handing the project to the app…');
+      }
+    }
+    window.homeOpenProject = homeOpenProject;
+
+    // Project mode: the reverse trip (UI window → "close project → home").
+    // ⌘W is the desktop shell's, deliberately not bound here.
+    async function homeCloseProject() {
+      closeUIModal();
+      const ok = await confirmOverlay({
+        title: 'close this project?',
+        message: 'the agent stops and the window goes back to the enough home '
+          + 'screen. the folder on disk is untouched, and you can reopen it '
+          + 'from there.',
+        confirmLabel: 'close project',
+      });
+      if (!ok) return;
+      HOME_BUSY = true;
+      homeShowWait('closing the project…');
+      try {
+        const r = await fetch('/api/close-project', { method: 'POST' });
+        const js = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(js.detail || ('HTTP ' + r.status));
+        if (js.handoff === 'exec') {
+          homeWaitMsg('the server is restarting into the home screen…');
+          homeAwaitMode('home');
+        } else {
+          homeWaitMsg('handing off to the app…');
+        }
+      } catch (e) {
+        HOME_BUSY = false;
+        homeHideWait();
+        homeNotice('could not close the project', String((e && e.message) || e));
+      }
+    }
+    window.homeCloseProject = homeCloseProject;
+
+    // ---- add a project folder ---------------------------------------
+
+    async function homePostAdd(body) {
+      const r = await fetch('/api/home/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body || {}),
+      });
+      const js = await r.json().catch(() => ({}));
+      return { status: r.status, js };
+    }
+
+    // The + tile. The backend raises the native folder chooser (macOS
+    // osascript); we spin until it answers. Four answers matter:
+    // cancelled (silence), dialog_unavailable (typed-path fallback), a
+    // guard refusal (400 — show the reason verbatim, it explains itself),
+    // and 409 already-registered (which just means: open it).
+    async function homeAddClick() {
+      if (HOME_BUSY) return;
+      HOME_BUSY = true;
+      homeSetAddBusy(true, 'waiting for the folder chooser…');
+      let out;
+      try {
+        out = await homePostAdd({});
+      } catch (e) {
+        HOME_BUSY = false; homeSetAddBusy(false);
+        homeNotice('could not open the folder chooser', String((e && e.message) || e));
+        return;
+      }
+      HOME_BUSY = false;
+      homeSetAddBusy(false);
+      homeHandleAdd(out, { from: 'dialog' });
+    }
+
+    function homeHandleAdd(out, opts = {}) {
+      const { status, js } = out;
+      if (status === 200 && js.cancelled) return;               // user closed it
+      if (status === 200 && js.dialog_unavailable) {
+        homeOpenAdd(js.detail || '');
+        return;
+      }
+      if (status === 200 && js.project) {                       // enough-ified
+        homeCloseAdd();
+        homeOpenProject(js.project.path);
+        return;
+      }
+      if (status === 409 && js.project) {                       // already listed
+        homeCloseAdd();
+        homeOpenProject(js.project.path);
+        return;
+      }
+      const detail = js.detail || ('the server answered ' + status + '.');
+      if (opts.from === 'typed') homeAddError(detail);
+      else homeNotice('that folder can’t be added', detail);
+    }
+
+    // Typed-path fallback modal (only reached via `dialog_unavailable`,
+    // or by calling homeOpenAdd() by hand).
+    function homeOpenAdd(note) {
+      const modal = document.getElementById('home-add-modal');
+      if (!modal) return;
+      document.getElementById('home-add-note').textContent = note
+        || 'type the full path of the folder you want to work in. it will be '
+        + 'enough-ified (an rness/ folder appears inside it) and then opened.';
+      homeAddError('');
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      const input = document.getElementById('home-add-input');
+      input.value = '';
+      setTimeout(() => input.focus(), 0);
+    }
+    window.homeOpenAdd = homeOpenAdd;
+
+    function homeCloseAdd() {
+      const modal = document.getElementById('home-add-modal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+    window.homeCloseAdd = homeCloseAdd;
+
+    function homeAddError(msg) {
+      const el = document.getElementById('home-add-error');
+      if (!el) return;
+      el.textContent = msg || '';
+      el.hidden = !msg;
+    }
+
+    async function homeAddTyped() {
+      const input = document.getElementById('home-add-input');
+      const path = (input.value || '').trim();
+      if (!path) { homeAddError('type a folder path first.'); return; }
+      const btn = document.getElementById('home-add-go');
+      btn.disabled = true;
+      homeAddError('');
+      let out;
+      try {
+        out = await homePostAdd({ path });
+      } catch (e) {
+        btn.disabled = false;
+        homeAddError(String((e && e.message) || e));
+        return;
+      }
+      btn.disabled = false;
+      homeHandleAdd(out, { from: 'typed' });
+    }
+
+    // Spin the add tile / row in place rather than blanking the grid —
+    // the native chooser can sit there for as long as the user browses.
+    function homeSetAddBusy(on, label) {
+      document.querySelectorAll('#home-body .home-tile.add, #home-body .hl-add')
+        .forEach((el) => {
+          el.classList.toggle('busy', !!on);
+          const cap = el.querySelector('.ht-name, .hl-add-label');
+          if (cap) cap.textContent = on ? (label || 'choosing…') : 'add a project';
+        });
+    }
+
+    // ---- hide / unhide (registry flag only; nothing on disk moves) ---
+    //
+    // §1.10 chose hiding over forgetting: the entry, its metadata and its
+    // counts all stay, so unhiding is free and a project can never be lost
+    // by a mis-click. Hiding asks first (something leaves the screen);
+    // unhiding doesn't (the result is visible and reversible).
+
+    async function homeSetHidden(p, hidden) {
+      if (hidden) {
+        const ok = await confirmOverlay({
+          title: 'hide this project?',
+          message: '“' + (p.name || p.path.split('/').pop()) + '” comes off the '
+            + 'home screen until you turn on "hidden" up there. the folder on '
+            + 'disk (' + p.path + ') is not touched, and nothing in it changes.',
+          confirmLabel: 'hide it',
+        });
+        if (!ok) return;
+      }
+      try {
+        const r = await fetch('/api/home/hide', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ path: p.path, hidden: !!hidden }),
+        });
+        if (!r.ok) {
+          const js = await r.json().catch(() => ({}));
+          throw new Error(js.detail || ('HTTP ' + r.status));
+        }
+      } catch (e) {
+        homeNotice(hidden ? 'could not hide that project' : 'could not unhide that project',
+          String((e && e.message) || e));
+      }
+      await homeRefresh();
+    }
+
+    // ---- the project mirror -----------------------------------------
+
+    function homeShowMirror(p) {
+      if (p.missing) {
+        homeNotice('that folder isn’t there right now',
+          p.path + ' — if it lives on a drive, plug it back in. option-click '
+          + 'the tile to hide it instead.', { ttl: 14000 });
+        return;
+      }
+      enterMerirmaidHomeProject(p.path, p.name);
+    }
+
+    // ---- rendering ---------------------------------------------------
+
+    function homeSortValue(p, key) {
+      if (key === 'name') return (p.name || '').toLowerCase();
+      if (key === 'p' || key === 'w' || key === 'c') return (p.counts || {})[key] || 0;
+      return homeMs(p[key]);          // last_edited / created_at → ms or null
+    }
+
+    // What the grid actually draws: the server always sends every entry
+    // (hidden included) and the filtering is ours.
+    function homeVisible() {
+      return HOME_SHOW_HIDDEN
+        ? HOME_PROJECTS.slice()
+        : HOME_PROJECTS.filter((p) => !p.hidden);
+    }
+
+    function homeSorted() {
+      const key = HOME_SORT.key, dir = HOME_SORT.dir;
+      return homeVisible().sort((a, b) => {
+        const va = homeSortValue(a, key), vb = homeSortValue(b, key);
+        // Never-edited / never-created rows sink, whichever way the
+        // column is pointing — a null is not "oldest", it's "unknown".
+        if (va == null && vb == null) return (a.name || '').localeCompare(b.name || '');
+        if (va == null) return 1;
+        if (vb == null) return -1;
+        if (va < vb) return -1 * dir;
+        if (va > vb) return 1 * dir;
+        return (a.name || '').localeCompare(b.name || '');
+      });
+    }
+
+    function homeIconEl(name) {
+      const img = document.createElement('img');
+      img.className = 'svg-icon';
+      img.alt = '';
+      img.draggable = false;
+      setIcon(img, name);
+      return img;
+    }
+
+    function homeTileTitle(p) {
+      const hide = p.hidden ? 'option-click to unhide' : 'option-click to hide';
+      if (p.missing) {
+        return p.path + '\n\nnot on disk right now — ' + hide + '.';
+      }
+      const counts = p.counts || {};
+      return p.path + '\n\n' + homeNum(counts.p) + ' ¶ · ' + homeNum(counts.w)
+        + ' words · ' + homeNum(counts.c) + ' characters'
+        + (p.description ? '\n\n' + p.description : '')
+        + '\n\nclick for a map of the folder · double-click to open · ' + hide;
+    }
+
+    // The one small line under a tile name / in the "last updated" cell.
+    function homeWhenText(p, absolute) {
+      const base = p.missing
+        ? 'not on disk'
+        : (absolute ? homeStamp(p.last_edited) : homeAgo(p.last_edited));
+      return p.hidden ? 'hidden · ' + base : base;
+    }
+
+    function homeBuildGrid(rows) {
+      const grid = document.createElement('div');
+      grid.className = 'home-grid';
+      rows.forEach((p) => {
+        const el = document.createElement('div');
+        el.className = 'home-tile' + (p.missing ? ' missing' : '')
+          + (p.hidden ? ' is-hidden' : '');
+        el.dataset.path = p.path;
+        el.title = homeTileTitle(p);
+        const ic = document.createElement('div');
+        ic.className = 'ht-icon';
+        ic.appendChild(homeIconEl('folder'));
+        const nm = document.createElement('div');
+        nm.className = 'ht-name';
+        nm.textContent = p.name || p.path.split('/').pop();
+        const wh = document.createElement('div');
+        wh.className = 'ht-when';
+        wh.textContent = homeWhenText(p, false);
+        el.append(ic, nm, wh);
+        grid.appendChild(el);
+      });
+      // The add tile is a permanent member of the grid, last.
+      const add = document.createElement('div');
+      add.className = 'home-tile add';
+      add.dataset.add = '1';
+      add.title = 'enough-ify a new folder and open it';
+      const aic = document.createElement('div');
+      aic.className = 'ht-icon';
+      aic.appendChild(homeIconEl('project-add'));
+      const anm = document.createElement('div');
+      anm.className = 'ht-name';
+      anm.textContent = 'add a project';
+      add.append(aic, anm);
+      grid.appendChild(add);
+      return grid;
+    }
+
+    const HOME_COLS = [
+      { key: 'name', label: 'name', num: false },
+      { key: 'p', label: '¶', num: true, title: 'paragraphs' },
+      { key: 'w', label: 'W', num: true, title: 'words' },
+      { key: 'c', label: 'C', num: true, title: 'characters' },
+      { key: 'last_edited', label: 'last updated', num: false },
+      { key: 'created_at', label: 'created', num: false },
+    ];
+
+    function homeBuildList(rows) {
+      const list = document.createElement('div');
+      list.className = 'home-list';
+      const head = document.createElement('div');
+      head.className = 'hl-head';
+      HOME_COLS.forEach((col) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.dataset.sort = col.key;
+        b.className = (col.num ? 'num' : '') + (HOME_SORT.key === col.key ? ' sorted' : '');
+        b.textContent = col.label
+          + (HOME_SORT.key === col.key ? (HOME_SORT.dir < 0 ? ' ▾' : ' ▴') : '');
+        b.title = (col.title ? col.title + ' — ' : '') + 'sort by ' + col.label;
+        head.appendChild(b);
+      });
+      list.appendChild(head);
+      rows.forEach((p) => {
+        const row = document.createElement('div');
+        row.className = 'hl-row' + (p.missing ? ' missing' : '')
+          + (p.hidden ? ' is-hidden' : '');
+        row.dataset.path = p.path;
+        row.title = homeTileTitle(p);
+        const nameCell = document.createElement('div');
+        nameCell.className = 'hl-name';
+        nameCell.appendChild(homeIconEl('folder'));
+        const nameText = document.createElement('span');
+        nameText.textContent = p.name || p.path.split('/').pop();
+        nameCell.appendChild(nameText);
+        row.appendChild(nameCell);
+        const counts = p.counts || {};
+        ['p', 'w', 'c'].forEach((k) => {
+          const cell = document.createElement('div');
+          cell.className = 'num';
+          cell.textContent = homeNum(counts[k]);
+          row.appendChild(cell);
+        });
+        const upd = document.createElement('div');
+        upd.className = 'hl-when';
+        upd.textContent = homeWhenText(p, true);
+        row.appendChild(upd);
+        const made = document.createElement('div');
+        made.className = 'hl-when';
+        made.textContent = homeStamp(p.created_at);
+        row.appendChild(made);
+        list.appendChild(row);
+      });
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'hl-add';
+      add.dataset.add = '1';
+      add.title = 'enough-ify a new folder and open it';
+      add.appendChild(homeIconEl('project-add'));
+      const lbl = document.createElement('span');
+      lbl.className = 'hl-add-label';
+      lbl.textContent = 'add a project';
+      add.appendChild(lbl);
+      list.appendChild(add);
+      return list;
+    }
+
+    function homeRender() {
+      const body = document.getElementById('home-body');
+      if (!body) return;
+      const rows = homeSorted();
+      const n = rows.length;
+      const missing = rows.filter((p) => p.missing).length;
+      const hiddenCount = HOME_PROJECTS.filter((p) => p.hidden).length;
+      document.getElementById('home-count').textContent =
+        n === 0 ? '' : (n + (n === 1 ? ' folder' : ' folders')
+          + (missing ? ' · ' + missing + ' not on disk' : '')
+          + (hiddenCount && !HOME_SHOW_HIDDEN ? ' · ' + hiddenCount + ' hidden' : ''));
+      document.getElementById('home-view-icons').classList.toggle('on', HOME_VIEW === 'icons');
+      document.getElementById('home-view-list').classList.toggle('on', HOME_VIEW === 'list');
+      const chip = document.getElementById('home-show-hidden');
+      chip.classList.toggle('on', HOME_SHOW_HIDDEN);
+      chip.setAttribute('aria-pressed', HOME_SHOW_HIDDEN ? 'true' : 'false');
+      chip.textContent = hiddenCount ? ('hidden · ' + hiddenCount) : 'hidden';
+      chip.title = HOME_SHOW_HIDDEN
+        ? 'hide the hidden projects again'
+        : 'show the projects you’ve hidden (option-click a tile to hide one)';
+      body.innerHTML = '';
+      if (!n) {
+        const empty = document.createElement('div');
+        empty.className = 'home-empty';
+        empty.textContent = HOME_PROJECTS.length
+          ? ('every project you have is hidden — the “hidden” chip up there '
+            + 'brings them back.')
+          : ('no projects yet — add a folder to start one. anything you '
+            + 'enough-ify from the command line shows up here too.');
+        body.appendChild(empty);
+      }
+      body.appendChild(HOME_VIEW === 'list' ? homeBuildList(rows) : homeBuildGrid(rows));
+    }
+
+    async function homeRefresh() {
+      try {
+        const r = await fetch('/api/home/projects', { cache: 'no-store' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const js = await r.json();
+        HOME_PROJECTS = Array.isArray(js.projects) ? js.projects : [];
+      } catch (e) {
+        HOME_PROJECTS = [];
+        homeNotice('could not read your projects', String((e && e.message) || e));
+      }
+      homeRender();
+    }
+    window.homeRefresh = homeRefresh;
+
+    function homeSetView(view, { save = true } = {}) {
+      if (!HOME_VIEWS.includes(view) || view === HOME_VIEW) {
+        if (view === HOME_VIEW) homeRender();
+        return;
+      }
+      HOME_VIEW = view;
+      homeRender();
+      if (save) saveUIConfig({ home_view: view });
+    }
+
+    // Show / hide the hidden projects. Named and exported on purpose: the
+    // desktop shell's View menu (Wave C) drives this by evaluating
+    // `homeSetShowHidden(true|false)` in the webview, and reads the state
+    // back with `homeGetShowHidden()`. Both return the resulting boolean.
+    function homeSetShowHidden(on, { save = true } = {}) {
+      const next = !!on;
+      if (next !== HOME_SHOW_HIDDEN) {
+        HOME_SHOW_HIDDEN = next;
+        homeRender();
+        if (save) saveUIConfig({ home_show_hidden: next });
+      }
+      return HOME_SHOW_HIDDEN;
+    }
+    function homeGetShowHidden() { return HOME_SHOW_HIDDEN; }
+    function homeToggleShowHidden() { return homeSetShowHidden(!HOME_SHOW_HIDDEN); }
+    window.homeSetShowHidden = homeSetShowHidden;
+    window.homeGetShowHidden = homeGetShowHidden;
+    window.homeToggleShowHidden = homeToggleShowHidden;
+
+    // ---- wiring ------------------------------------------------------
+
+    // The toolbar button belongs to the merirmaid mode but only ever
+    // appears for a homeproj entry (see mmSyncOpenProjectBtn).
+    document.getElementById('mm-open-project')?.addEventListener('click', (e) => {
+      const path = e.currentTarget.dataset.path;
+      if (path) homeOpenProject(path);
+    });
+    document.getElementById('ui-close-project-btn')?.addEventListener('click', homeCloseProject);
+
+    if (IS_HOME) {
+      document.getElementById('home-view-icons').addEventListener(
+        'click', () => homeSetView('icons'));
+      document.getElementById('home-view-list').addEventListener(
+        'click', () => homeSetView('list'));
+      document.getElementById('home-show-hidden').addEventListener(
+        'click', () => homeToggleShowHidden());
+
+      const homeBody = document.getElementById('home-body');
+      // One delegated listener for both views. Single click = the folder
+      // map (deferred a beat so a double click can overtake it), double
+      // click = open, option-click = hide.
+      homeBody.addEventListener('click', (e) => {
+        const addEl = e.target.closest('[data-add]');
+        if (addEl) { homeAddClick(); return; }
+        const sortBtn = e.target.closest('.hl-head button[data-sort]');
+        if (sortBtn) {
+          const key = sortBtn.dataset.sort;
+          if (HOME_SORT.key === key) HOME_SORT.dir *= -1;
+          // Text sorts want A→Z first; everything else wants newest/most
+          // first, which is what the default view already shows.
+          else HOME_SORT = { key, dir: key === 'name' ? 1 : -1 };
+          homeRender();
+          return;
+        }
+        const item = e.target.closest('[data-path]');
+        if (!item) return;
+        const p = homeFind(item.dataset.path);
+        if (!p) return;
+        if (e.altKey) { homeSetHidden(p, !p.hidden); return; }
+        clearTimeout(HOME_CLICK_TIMER);
+        HOME_CLICK_TIMER = setTimeout(() => homeShowMirror(p), 220);
+      });
+      homeBody.addEventListener('dblclick', (e) => {
+        const item = e.target.closest('[data-path]');
+        if (!item || e.altKey) return;
+        clearTimeout(HOME_CLICK_TIMER);
+        const p = homeFind(item.dataset.path);
+        if (!p) return;
+        if (p.missing) { homeShowMirror(p); return; }   // says why, doesn't open
+        homeOpenProject(p.path);
+      });
+
+      document.getElementById('home-add-go').addEventListener('click', homeAddTyped);
+      document.getElementById('home-add-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); homeAddTyped(); }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape'
+          && !document.getElementById('home-add-modal').classList.contains('hidden')) {
+          homeCloseAdd();
+        }
+      });
+
+      // Paint in the remembered view, not in the default and then a
+      // flicker: ui-config is already in flight from the top of the file.
+      UI_CONFIG_READY.then(() => {
+        const saved = UI_CONFIG && UI_CONFIG.home_view;
+        if (HOME_VIEWS.includes(saved)) HOME_VIEW = saved;
+        if (UI_CONFIG && UI_CONFIG.home_show_hidden === true) HOME_SHOW_HIDDEN = true;
+      }).finally(() => homeRefresh());
+    }
   </script>
 
 </body>

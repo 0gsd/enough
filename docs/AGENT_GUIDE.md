@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.2.2)
+# enough — Agent Guide (v0.2.5)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -14,7 +14,9 @@
 `enough` is a paradigmless personal computer harness powered by a local
 LLM. It runs on the user's machine, exposes a chat UI at
 `http://127.0.0.1:3456`, and lets the user shape the agent's behavior by
-editing markdown files. A fifth optional model slot routes through
+editing markdown files. Started with `--home` instead of a project it
+serves the **home screen** — the project list every launch begins at (see
+its own section below). A fifth optional model slot routes through
 OpenRouter when the user has explicitly enabled it; everything else stays
 local. An optional **wikisink** subsystem puts an offline copy of
 Wikipedia on the machine (see its own section below and
@@ -33,7 +35,7 @@ Three locations that matter:
 | Path | What it is | Authority |
 |---|---|---|
 | `~/enough/` | The global install. Cloned from the repo by `bootstrap.sh`. Contains `defaults/` (templates that get copied / symlinked into every project), `cacheawl/` (the machine-global file store — see below), and the Python source. (The old `infoworld/` library is dissolved into `cacheawl/` on first 0.1.6 launch.) | Edit these to affect every project. |
-| `~/enough/config/` | User-global JSON config. `broker.json` (toggle states), `models.json` (active local model), `openrouter.json` (cloud-slot metadata, **no api key**), `ui.json` (theme/font), `orchestrator.json` (auto-reset config), `wikisink.json` (wikisink install registry + watch/override registries + reading state), `desktop.json` (desktop-shell launch prefs: reopen toggle, last/known projects, onboarding state — shared-visible with the CLI, written by `desktop/src-tauri/src/config.rs`). | Edit per-machine settings. |
+| `~/enough/config/` | User-global JSON config. `broker.json` (toggle states), `models.json` (active local model), `openrouter.json` (cloud-slot metadata, **no api key**), `ui.json` (theme/font), `orchestrator.json` (auto-reset config), `wikisink.json` (wikisink install registry + watch/override registries + reading state), `desktop.json` (desktop-shell launch prefs: reopen toggle, last/known projects, onboarding state — shared-visible with the CLI, written by `desktop/src-tauri/src/config.rs`), `extras.json` (which optional dependency groups are installed — read by Python, bash **and** Rust; see "Document conversion"), `projects.json` (the home screen's project registry — see "The home screen"), and the transient `.home-open` handoff file. | Edit per-machine settings. |
 | `~/enough/wikisink/` | Default wikisink location: the user's wikisink *data* (comments, overlays, preserved articles, rankings, run state) and — unless pointed elsewhere — the base `.zim` archive(s). Archives can live anywhere, external drives included; several installs can be registered at once. Hidden from the file-manager tree. | Managed via the 🚰 UI; don't hand-edit. |
 | `~/enough/cacheawl/` | The machine-global **cacheawl** store: root-level folders are *cacheboxes* (plain kept-forever text, or cached replicas ingested from a path/URL/wikisink). Global wiki saves land in the `wiki/` box; the dissolved infoworld folders become the `personal`/`public`/`wiki` boxes. Overridable via `ENOUGH_CACHEAWL_ROOT`. Hidden from every project's file tree. | Managed via the cacheawl mode UI + agent tools; sidecars are backend-owned. |
 | `<project>/rness/` | The agent's per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/roles; per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`; per-project state in `io/`, `requests/`, `knowledge/`. | Edit to affect just this project. |
@@ -54,23 +56,26 @@ Every Python module in `enough/`:
 
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
-| [enough/server.py](../enough/server.py) | ~3300 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — and the desktop-gated `POST /api/shutdown`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). | `create_app()`, `_drive_message()`, `request_process_exit()` (module-level so tests can swap it), all `@app.{get,post}` handlers |
-| [enough/prompt.py](../enough/prompt.py) | ~890 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/role/paradigm enumeration + toggle-state helpers. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
+| [enough/server.py](../enough/server.py) | ~4180 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. | `create_app()`, `_drive_message()`, `ModeGate`, `HOME_PATHS`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
+| [enough/prompt.py](../enough/prompt.py) | ~890 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/role/paradigm enumeration + toggle-state helpers. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
 | [enough/skillaudit.py](../enough/skillaudit.py) | ~900 | First-use audit of untrusted skills (0.2.2). Trust classification (symlink into the install's `defaults/skills/` = trusted), the content fingerprint, the `verdict.json` sidecar, both audit passes (deterministic `payload_scanner.py` + a single non-streaming LLM completion), the in-flight registry, and the guarded toggle. Progress on the `skill-audit` SSE event. | `is_trusted()`, `fingerprint()` / `skill_fingerprint()`, `skill_state()`, `set_skill_enabled_guarded()`, `SkillAuditRefused`, `audit_skill()` / `audit_and_enable()`, `run_llm_audit()` (module-level test hook), `quarantine_untrusted()`, `trust_override()`, `read_verdict()` / `write_verdict()` |
 | [enough/broker.py](../enough/broker.py) | ~380 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
 | [enough/tools.py](../enough/tools.py) | ~1360 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers), the tool-call XML parser, the dispatch table. | `_DISPATCH`, `_TRACE_TOGGLE`, `execute()`, `parse_tool_calls()`, `_CLOUD_KEY_EXFIL_PATTERNS` |
+| [enough/convert.py](../enough/convert.py) | ~1365 | Document conversion (0.2.5): the format **registry** (`FORMATS`), engine probing + caching, twin/assets/manifest naming, the state machine, the job runner that drives the worker, export/sync/resolve, and the `pdf`-extra installer. Imports nothing heavy — docling and pandoc are only ever reached through `convert_worker`. See "Document conversion" below. | `FORMATS` / `formats_view()` / `engines()`, `pandoc_path()` / `typst_path()` / `docling_available()`, `twin_path()` / `assets_dir()` / `manifest_path()` / `pair_for()`, `state()` / `has_twin()`, `read_manifest()` / `write_manifest()`, `ConvertJobs`, `do_export()` / `sync_after_save()` / `resolve()`, `ExtraInstaller`, `installed_extras()` / `record_extra()`, `reset_engines()` |
+| [enough/convert_worker.py](../enough/convert_worker.py) | ~620 | The out-of-process worker: `python -m enough.convert_worker`, one JSON job on stdin, NDJSON records on stdout, exit. pandoc is shelled out to; **docling runs in this process** — which is the whole reason the worker exists (torch must never be imported into the server). | `main()`, `_OPS` (`convert` / `export` / `prefetch`), `do_convert()` / `do_export()` / `do_prefetch()`, `_convert_docling()`, `_flatten_media()` / `_relink_docling_assets()` / `_normalize_images()`, `_Heartbeat`, `TWIN_FORMAT` |
 | [enough/wikisink/](../enough/wikisink/) | ~2500 (pkg) | Local offline Wikipedia. `config.py` (install registry, schema v2 multi-install, data paths), `zim.py` (libzim reader, search, sanitize/rewrite), `download.py` (Kiwix flavor listing + resumable downloads), `overlay.py` (live-refreshed + preserved article stores), `comments.py` (per-article threads), `save.py` (save/read/unsave article folders + the clean HTML→markdown text pipeline), `update.py` (the "wikisink" update run), `rankings.py` (pageview snapshots), `report.py` (run report), `agent.py` (the four agent tool runners). | `config.load_config()` / `installs()` / `active_install()` / `unavailable_reason()`, `zim.get_article()` / `search()`, `download.DownloadManager`, `update.run_wikisink()` |
 | [enough/cloud.py](../enough/cloud.py) | ~1000 | OpenRouter integration: keyring read/write, in-memory key cache, OpenAI-compatible streaming + non-streaming clients, health check, response caching to `rness/io/cloud-cache/`, the broker-driven `pipeline_run()`. | `set_api_key()` / `clear_api_key()` / `has_api_key()`, `_get_api_key_for_broker()`, `health_check()`, `chat_completion()`, `stream_chat_completion()`, `cache_completion()`, `pipeline_run()` |
 | [enough/llm.py](../enough/llm.py) | ~125 | OpenAI-compatible client for the local llama-server. Streaming-only path for chat. | `stream_chat()`, `check_llm_reachable()` |
 | [enough/supervisor.py](../enough/supervisor.py) | ~400 | Manages the local llama-server subprocess. Adopts an existing process if one's already up; spawns its own otherwise. Skips spawning entirely when the active model is `opro-api`. | `LlamaSupervisor`, `_resolve_startup_choice()` |
 | [enough/models.py](../enough/models.py) | ~550 | Local-model registry (7 cute-named local models, defined in `defaults/models.json`; two carry separate MTP draft GGUFs, two carry a `llama_cpp_min_release` gate). Feasibility verdicts (RAM + free disk), `install-menu` CLI for bootstrap.sh. Selection state in `~/enough/config/models.json`. | `load_registry()`, `load_state()`, `save_state()`, `resolve()`, `all_models_view()`, `feasibility()`, `release_gate()`, `install_menu_rows()` |
 | [enough/model_download.py](../enough/model_download.py) | ~330 | Resumable GGUF downloads for the in-app model manager: main file then optional MTP draft, ranged-GET resume off a `.part`, one active download per process, cancel-keeps-partial, delete. Backs `/api/models/{download,delete}/*`; progress on the `model-dl` SSE event. | `ModelDownloadManager` (`start` / `cancel` / `delete` / `state`), `pending_phases()`, `partials()` |
-| [enough/skeleton.py](../enough/skeleton.py) | ~560 | Creates `rness/` for new projects (copies from `defaults/`), syncs global skills/roles/paradigms on every launch via dedicated populators, runs migrations. `_populate_skill_symlinks` also calls `skillaudit.quarantine_untrusted()` — untrusted skills default OFF. | `ensure_skeleton()`, `resync_globals()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS`, `_populate_skill_symlinks` / `_populate_role_symlinks` / `_populate_paradigm_symlinks` |
+| [enough/skeleton.py](../enough/skeleton.py) | ~710 | Creates `rness/` for new projects (copies from `defaults/`), syncs global skills/roles/paradigms on every launch via dedicated populators, runs migrations. `_populate_skill_symlinks` also calls `skillaudit.quarantine_untrusted()` — untrusted skills default OFF. | `ensure_skeleton()`, `resync_globals()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS`, `_populate_skill_symlinks` / `_populate_role_symlinks` / `_populate_paradigm_symlinks` |
 | [enough/highlights.py](../enough/highlights.py) | ~250 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
 | [enough/girraph.py](../enough/girraph.py) | ~695 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
-| [enough/cacheawl.py](../enough/cacheawl.py) | ~1340 | The cacheawl store: cachebox CRUD, path/URL/wikisink **ingest**, the `_cachebox.merirmaid` mirror generator + reconcile, the mirror/sidecar write-guards, transfer (copy/move), and the launch-time `infoworld` migration. Root is `~/enough/cacheawl/` (or `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store; nothing else writes there. | `root()`, `create_cachebox()` / `list_cacheboxes()` / `cachebox_tree()`, `run_ingest()`, `regenerate_mirror()` / `reconcile()` / `reconcile_all()`, `mirror_write_denial()`, `migrate_infoworld()` |
+| [enough/cacheawl.py](../enough/cacheawl.py) | ~1470 | The cacheawl store: cachebox CRUD, path/URL/wikisink **ingest**, the `_cachebox.merirmaid` mirror generator + reconcile, the mirror/sidecar write-guards, transfer (copy/move), and the launch-time `infoworld` migration. Root is `~/enough/cacheawl/` (or `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store; nothing else writes there. Since 0.2.5 it also exports the generic folder→flowchart walker `home.py` builds project maps with. | `root()`, `create_cachebox()` / `list_cacheboxes()` / `cachebox_tree()`, `run_ingest()`, `regenerate_mirror()` / `reconcile()` / `reconcile_all()`, `folder_flowchart()`, `mirror_write_denial()`, `migrate_infoworld()` |
+| [enough/home.py](../enough/home.py) | ~740 | The home screen (0.2.5): the project **registry** (`~/enough/config/projects.json`, seam `ENOUGH_PROJECTS_STATE`), the ¶/W/C counters ported from the top bar, the fingerprint cache, seeding from the shell's `desktop.json` MRU, the project map (via `cacheawl.folder_flowchart`), the add-guards + the osascript folder chooser, and both halves of the open/close handoff. Imports `server` **lazily, inside functions** — `server` imports `home` at module level, and that is the cycle-breaker. | `projects_state_path()` / `config_dir()` / `handoff_path()`, `read_registry()` / `save_registry()` / `register()` / `touch_opened()` / `set_hidden()`, `seed_from_desktop()`, `count_text()` / `fingerprint_of()` / `refresh_entry()` / `list_projects()`, `build_project_mirror()`, `check_addable()` / `add_project()` / `choose_folder()`, `write_handoff()` / `read_handoff()`, `exec_argv()` |
 | [enough/logger.py](../enough/logger.py) | small | Stdlib logging setup. | — |
-| [enough/static/index.html](../enough/static/index.html) | ~14800 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), chat pane, SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode, cacheawl split-view mode, SVG icon pipeline (`data-icon`/`iconSrc`), `setActiveMode` registry, confirmOverlay |
+| [enough/static/index.html](../enough/static/index.html) | ~20000 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), chat pane, SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode, cacheawl split-view mode, the home frame + project map + handoff overlays (gated on `IS_HOME` / `body[data-mode]`), SVG icon pipeline (`data-icon`/`iconSrc`), `setActiveMode` registry, confirmOverlay |
 
 `defaults/` ships templates that get copied or symlinked into project
 skeletons by `skeleton.py`:
@@ -96,10 +101,10 @@ unit tests: `cargo test` in `desktop/src-tauri/`.
 
 | File | Role |
 |---|---|
-| [desktop/src-tauri/src/main.rs](../desktop/src-tauri/src/main.rs) | window, native menu (Settings `CheckMenuItem` + Edit submenu), both quit paths, signal traps |
-| [desktop/src-tauri/src/launch.rs](../desktop/src-tauri/src/launch.rs) | the launch flow: reopen-or-pick, `known_projects` MRU upkeep |
-| [desktop/src-tauri/src/backend.rs](../desktop/src-tauri/src/backend.rs) | spawn / health-probe / stop the uvicorn child (`POST /api/shutdown` → SIGTERM → SIGKILL ladder; child in its own process group) |
-| [desktop/src-tauri/src/config.rs](../desktop/src-tauri/src/config.rs) | `~/enough/config/desktop.json` — tmp+rename writes, unknown-key round-trip |
+| [desktop/src-tauri/src/main.rs](../desktop/src-tauri/src/main.rs) | window, native menu (five submenus: app · File · Edit · View · Window — `Reopen Last Project on Launch`, **File → Close Project ⌘W**, **View → Show Hidden Projects**), both quit paths, signal traps |
+| [desktop/src-tauri/src/launch.rs](../desktop/src-tauri/src/launch.rs) | the launch **state machine** (0.2.5): boot a backend → park on it → decide what its exit meant → boot the next one, forever. Two pure, unit-tested decisions: `initial_target()` (home vs. the remembered project) and `after_exit()` (the exit-42 handshake). `known_projects` MRU upkeep; the folder picker survives only as the `home_broken` fallback |
+| [desktop/src-tauri/src/backend.rs](../desktop/src-tauri/src/backend.rs) | spawn / health-probe / stop the uvicorn child (`POST /api/shutdown` → SIGTERM → SIGKILL ladder; child in its own process group). Carries `Mode {Home, Project}` — set by the spawn that wrote the argv, and the single source of truth for menu enablement. `enough_args()` is extracted so a test can look at it; the readiness probe is **mode-dependent** (home probes `/api/home/projects`, because a home server 404s `/api/project`) |
+| [desktop/src-tauri/src/config.rs](../desktop/src-tauri/src/config.rs) | `~/enough/config/desktop.json` — tmp+rename writes, unknown-key round-trip. Also `enough_config_dir()` (follows `ENOUGH_PROJECTS_STATE`'s parent, mirroring `home.config_dir()`) and `ui_flag()`, the read-only peek at `ui.json` the View checkbox uses |
 | [desktop/src-tauri/src/guards.rs](../desktop/src-tauri/src/guards.rs) | pre-flight refusals. **Deliberately mirrors** `enough/skeleton.py`'s `cloud_sync_provider` path list and the `~/enough` refusal in `enough/__main__.py` — touch one, touch the other (unit tests pin the list) |
 | [desktop/src-tauri/src/http.rs](../desktop/src-tauri/src/http.rs) | ~60-line loopback-only HTTP/1.1 client (no client crate) |
 | [desktop/src-tauri/src/bundled.rs](../desktop/src-tauri/src/bundled.rs) | where the bundle's payload lives (uv sidecar, llama.cpp, source snapshot), derived from `current_exe()` |
@@ -254,6 +259,7 @@ cache.
 | Cacheboxes | `~/enough/cacheawl/<box>/…` — root-level box folders + backend-owned `.cachebox.json` + `_cachebox.merirmaid` sidecars | none — created via UI/agent/migration | no (agent reaches via cachebox tools) |
 | Wikisink registry/state | `~/enough/config/wikisink.json` (user-global, **not** per-project) | none | no |
 | Wiki comments/overlays | `<wikisink data dir>/comments/`, `overlay/`, `preserved/` | none | no |
+| Converted documents | `<dir>/<name>.<ext>.md` (the twin — a user file), `<name>.<ext>.assets/` + hidden `.<name>.<ext>.convert.json` (both backend-owned) | none — written by `convert.py` on first open | no (the agent gets the twin through `read_file`; the *registry* is rendered into the prompt by `prompt.convert_instructions()`) |
 
 **Active vs available**: skills and roles ship as files but only become
 part of the system prompt when toggled on in the sidebar. The
@@ -538,7 +544,7 @@ The current toggle catalog (11 toggles, all default `True`):
 | `shell_brokered` | shell | Trace-logging for `shell` (no allowlist for shell by design) |
 | `fetch_url_enabled` | fetch_url | Whether `fetch_url` works at all (otherwise agent falls back to `curl` via shell) |
 | `fetch_url_tor_for_offlist` | fetch_url | Off-allowlist fetches via Tor (vs outright denial) |
-| `fetch_url_cache_and_convert` | fetch_url | Pandoc HTML→markdown + cache in `rness/io/input/` |
+| `fetch_url_cache_and_convert` | fetch_url | HTML→markdown (pandoc, a base dep since 0.2.5) + cache in `rness/io/input/` |
 | `wikisink_enabled` | wikisink | Whether the agent's four wiki tools work at all (the 🚰 browser UI is ungated) |
 | `wikisink_live_updates` | wikisink | Whether wikisink update runs may call the Wikipedia/Wikimedia APIs (off = report from local state only) |
 | `cacheawl_enabled` | cacheawl | Whether the agent's three cachebox tools work at all (the cacheawl browser UI is ungated; URL ingests still additionally honor the `fetch_url_*` toggles) |
@@ -549,8 +555,9 @@ The current toggle catalog (11 toggles, all default `True`):
 
 | Tool | Runner | Gating |
 |---|---|---|
-| `read_file` | `tools.run_read_file` | path under project OR on file-read allowlist |
-| `write_file` | `tools.run_write_file` | path under project OR on file-rw allowlist; not in `rness/requests/done/` |
+| `read_file` | `tools.run_read_file` | path under project OR on file-read allowlist. A convertible original returns its **twin** (converting first, on a daemon thread joined for `tools.CONVERT_BLOCKING_SECONDS` = 120) — see "Document conversion" |
+| `write_file` | `tools.run_write_file` | path under project OR on file-rw allowlist; not in `rness/requests/done/`. A refused sync-on-save of a syncing twin comes back as `ok=False` whose body says the twin *was* written |
+| `export_document` | `tools.run_export_document` | path under project OR on the file-**rw** allowlist (it writes a real document); `<target>` from `convert.EXPORT_TARGETS`, `<mode>` `copy` (default) or `overwrite` |
 | `shell` | `tools.run_shell` | exfiltration patterns denied; otherwise no path constraint |
 | `fetch_url` | `tools.run_fetch_url` | `fetch_url_enabled` toggle; host on allowlist OR Tor toggle on |
 | `read_highlights` | `tools.run_read_highlights` | path under project |
@@ -590,7 +597,7 @@ one-per-line with stable broker-assigned IDs, `< parent` tree edges,
 `[-> id]` cross-edges, `ref:<path>` transclusions (markdown doc or
 another `.girraph` — that's the recursion), `by:<slug>` attribution,
 and optional indented detail blocks collected at the end of the file.
-User-facing explainer: [docs/HELP_CENTER.md](HELP_CENTER.md) §15.
+User-facing explainer: [docs/HELP_CENTER.md](HELP_CENTER.md) §16.
 
 Format spec (formerly docs/girraph-plan.md, folded in here):
 
@@ -998,6 +1005,464 @@ article then expands crosslinks `depth` layers.
 
 ---
 
+## Document conversion (twins, engines, the `pdf` extra)
+
+0.2.5. enough does not render PDFs or lay out Word files; it converts them
+to markdown you can edit and exports the edits back.
+[enough/convert.py](../enough/convert.py) owns the policy,
+[enough/convert_worker.py](../enough/convert_worker.py) does the work in a
+child process. Design record: `docs/convert-plan.md` (local planning doc,
+untracked) — its four "landed" blocks are the final word where the earlier
+sections disagree.
+
+**Vocabulary, used identically in code, UI, and help:** *original*
+(`memo.docx`, never rewritten except by an explicit overwrite-export),
+*twin* (`memo.docx.md`, the editable markdown), *assets*
+(`memo.docx.assets/`, pictures lifted out), *manifest*
+(`.memo.docx.convert.json`, the hidden sidecar), *engine* (`pandoc` |
+`docling`, plus `typst` for PDF export).
+
+**Naming is the pairing** — there is no database and no watcher. `twin =
+<original name> + ".md"`, so it can never collide with a real `report.md`;
+assets and manifest derive the same way (`convert.twin_path()` /
+`assets_dir()` / `manifest_path()`). `pair_for()` accepts *either* end of the
+pair (or a plain `.md`), so no caller has to know which handle it holds.
+`_walk_tree` hides the twin, the assets dir and the manifest and hangs the
+attributes below on the original's row.
+
+### The registry
+
+`convert.FORMATS: dict[str, FormatSpec]` — seven extensions, each with
+`label`, `reader`, `writer`, `sync_ok`, `notes`. It is the **single** source
+for the file-type question, rendered by `formats_view()` into
+`GET /api/convert/formats`, and from there into (a) the export modal, (b) the
+`{{convert-formats}}` help token, and (c) `prompt.convert_instructions()`'s
+generated system-prompt section. **Never hand-list extensions anywhere** —
+not in help text, not in the prompt, not in a modal.
+
+pandoc owns the round-trippable office/ebook family in **both** directions
+(`.docx .odt .rtf .epub`); docling owns `.pdf .pptx .xlsx` **read-only**;
+PDF *export* is pandoc `-t typst` → `typst.compile()`. A docx never goes
+through docling — one tool both ways is what keeps the round trip
+self-consistent. `notes` is user-facing copy, not a comment.
+
+### Engines and their probes
+
+| Engine | Probe | Notes |
+|---|---|---|
+| pandoc | `pandoc_path()`: `shutil.which("pandoc")` → `pypandoc.get_pandoc_path()` → `None` | Base dependency (`pypandoc-binary`). A Homebrew pandoc the user chose wins; the wheel's copy is the floor. `engines()["pandoc"]["where"]` is `"path"` or `"bundled"` — never `"brew"`, which would be a guess. **"pandoc unavailable" is an anomaly (a broken venv), never a normal state** — help text must not describe it as one |
+| typst | `typst_path()` (CLI) or the `typst` wheel | Base dependency. The wheel installs a Python module and **no console script**, so `--pdf-engine=typst` is unavailable; only the wheel route is implemented |
+| docling | `docling_available()` = `DOCLING_ENGINE_WIRED and docling_installed() and docling_models_present()` | The `pdf` extra. `docling_installed()` (packages) and `docling_models_present()` (weights on disk) are reported separately so the UI can say which half is missing |
+
+All three are cached in one module-level `_engine_cache`; **`reset_engines()`
+after an extras install** is what makes the engines flip without a server
+restart. `DOCLING_ENGINE_WIRED` is a deliberate constant, not dead code: it
+is the one lever that turns PDF reading off in a build, and `engines()`
+reports it as `wired` so the UI can distinguish "no engine in this build"
+from "engine present, models missing". `engine_missing_message()` therefore
+has **two branches** — extra absent, and extra present but weights absent —
+and any copy that only says "install the PDF extra" is wrong for the second.
+
+### States and the manifest
+
+`convert.STATES` = `fresh` · `edited` · `stale` · `conflict` ·
+`unconverted` · `engine-missing`. `state(original)` compares the original's
+and the twin's `(size, mtime_ns)` against the manifest and hashes only when
+those moved. One self-heal write: when a stat moved but the sha256 didn't (a
+Finder touch, a `cp -p`) the cached stat is rewritten and the file counts as
+unchanged — so `state()` is *almost* pure, and the write is wrapped so a
+read-only volume degrades to "right answer, cache didn't stick".
+
+`has_twin()` requires **original + twin + manifest**, all three. A
+hand-written `notes.pdf.md` with no manifest is an ordinary visible markdown
+file, not a hidden twin.
+
+Manifest (`schema: 1`, tmp+rename, unknown schema reads as *absent* →
+re-convert rather than raise):
+
+```jsonc
+{"schema": 1, "original": "memo.docx", "twin": "memo.docx.md",
+ "assets": "memo.docx.assets" | null, "engine": {"name": "pandoc", "version": "3.9",
+ "ocr": "ocrmac" | "rapidocr" | null},          // ocr is recorded for .pdf only
+ "converted_at": "…Z",
+ "source": {"sha256": "…", "size": 0, "mtime_ns": 0},
+ "twin_sha256": "…", "twin_size": 0, "twin_mtime_ns": 0,
+ "sync": false, "last_export": {…} | null}
+```
+
+### The worker protocol
+
+`sys.executable -m enough.convert_worker`, one job in as JSON on **stdin**,
+newline-delimited JSON out on **stdout**, exit. Nothing in the worker is
+imported by the server process — that is the point (torch is heavy, a
+converter crash must not take the server down, a fresh install needs no
+restart, and cancel is a `kill` rather than a cooperative flag nobody could
+honour mid-pandoc). stderr is folded in as a diagnostic tail only, because
+torch and transformers narrate their warm-up there.
+
+```jsonc
+// in  (one line, on stdin) — ops in convert_worker._OPS
+{"op": "convert", "original": "…", "twin": "…", "assets": "…", "engine": "pandoc"}
+{"op": "export",  "twin": "…", "out": "…", "target": ".docx",
+ "resource_path": "…", "reference_doc": "…"|null}   // reference_doc: .docx/.odt overwrite only
+{"op": "prefetch", "artifacts_dir": "…"}      // the pdf extra's model download
+// out (NDJSON, on stdout)
+{"event": "progress", "pct": 0-100|null, "message": "…"}
+{"event": "done", "result": {…}}
+{"event": "error", "error": "…"}
+```
+
+Twins are written as **`TWIN_FORMAT = "gfm-raw_html+footnotes"`**: the gfm
+writer otherwise emits raw HTML for anything markdown can't express
+(`<figure>` around captioned images, odt's empty anchor spans) and
+`renderMarkdown` escapes raw HTML, so those would render as literal angle
+brackets. Readers are untouched. Both engines land on **one** asset layout —
+flat, relative, `![alt](memo.docx.assets/img-1.png)` — via `_flatten_media`
+(pandoc mirrors the container's folders) and `_relink_docling_assets`
+(docling writes absolute paths and 80-char content-hash filenames). Docling
+runs in-process with `generate_picture_images=True`, `images_scale=2.0`,
+`image_placeholder=""`, and a `_Heartbeat` thread for progress, since
+`DocumentConverter.convert()` takes no callback.
+
+### Endpoints
+
+| Endpoint | Method | Shape |
+|---|---|---|
+| `/api/convert/formats` | GET | `formats_view()`: `{formats: [...], export_targets, image_exts, engines}` — the one source described above |
+| `/api/convert/status` | GET | `?path=` either end of the pair → `{state, manifest, spec, …}` |
+| `/api/convert` | POST | start a job (`{path, force?}`) → `{job}`. **Per-path**, not one-at-a-time: 409 only when a job for *that* path is running (claimed under a lock, so a double-click can't start two) |
+| `/api/convert/job/{id}` | GET | snapshot — the polling backstop for the SSE |
+| `/api/convert/job/{id}/cancel` | POST | kills the worker; leaves nothing behind |
+| `/api/convert/export` | POST | `{path, target, mode: "copy"\|"overwrite"}`. A failed overwrite restores the original from its `.undo` stash before re-raising |
+| `/api/convert/sync` | POST | flip "keep the original in sync" (pandoc-family formats only) |
+| `/api/convert/resolve` | POST | `{choice: "keep"\|"export"\|"reconvert"}` for a `conflict`/`stale`; `reconvert` stashes the old twin to `.undo` first |
+| `/api/convert/install` + `/install/status` | POST/GET | the `pdf` extra installer (single-slot) |
+| `/api/file/blob` | GET | raw bytes for the image viewer / view-original, from an explicit extension→type table (`convert.BLOB_MEDIA_TYPES`), **not** `mimetypes.guess_type`. Always `X-Content-Type-Options: nosniff`; SVG additionally carries `convert.SVG_CSP`; `text/html` is unreachable by construction (415). `&meta=1` returns `{path, size, media_type, width: null, height: null}` — the frontend reads dimensions off the loaded `<img>` |
+
+`cacheawl:` paths are refused (400) by every convert route: v1 is scoped to
+the project tree, and the store's write-guards have no opinion about twins.
+
+### The two SSE events
+
+```jsonc
+// event: "convert" — job progress, exports, and sync-on-save
+{"job": "cv3"|null, "path": "memo.docx", "op": "convert"|"export"|"sync",
+ "state": "running"|"done"|"failed"|"cancelled"|"synced"|"conflict",
+ "progress": 0-100|null, "message": "…", "result": {…}|null, "error": "…"|null,
+ "original": "memo.docx"}          // op:"sync" only, project-relative
+// event: "convert-install" — uv's output, line by line, then the prefetch's
+{"job": "ix1", "extra": "pdf", "state": "running"|"done"|"failed",
+ "message": "<latest line>", "error": "…"|null, "line": "<this line>"}
+```
+
+`path` is always the **original's** project-relative path, even when the twin
+was the thing saved — one tree row is the identity for everything.
+
+### Tree attributes (the frontend's contract)
+
+`_walk_tree` / `_tree_to_html` emit these on a file row's `<li>`:
+`data-convertible="1"`, `data-convert-state="<state>"`, `data-converted="1"`,
+`data-twin="memo.docx.md"`, `data-image="1"`, and
+`data-help="converted-file"` (on the inner `.file-row`). The `<a>`'s
+`hx-get` is deliberately unchanged — the frontend intercepts the click in the
+existing capture-phase `#tree` listener; the backend still answers the plain
+binary-file preview for anyone who reaches it directly.
+
+### The `pdf` extra: `extras.json`, and the uv gotcha
+
+`~/enough/config/extras.json` — `{"pdf": {"installed_at": "…Z",
+"lock_sha256": "…"}}` — records what was installed *out of band*, because an
+optional-dependency group is **not** in uv's default set: a later plain
+`uv sync` removes it. Every path that syncs therefore re-asks for it with
+`--extra <name>`. **Three readers, and they must stay in step:**
+
+| Reader | Where | Seam |
+|---|---|---|
+| Python | `convert.extras_state_path()` / `installed_extras()` / `ExtraInstaller.sync_argv()` | `$ENOUGH_EXTRAS_STATE` → `~/enough/config/extras.json` |
+| bash | `update-enough.command` (inline `python3` heredoc) | same variable, same default |
+| Rust | `desktop/src-tauri/src/onboarding.rs` `extras_state_path()` / `env_sync_blocking()` | same variable → `config::state_home()/config/extras.json` |
+
+All three validate each key against `[a-z0-9][a-z0-9._-]*` before it becomes
+an argv element — a key beginning with `-` must never reach uv as a flag —
+and a missing, malformed, or unreadable file reads as "no extras", never as a
+failed launch. `sync_argv()` also appends `--frozen` when `ENOUGH_DESKTOP` is
+set: the .app runs a sealed snapshot against a committed lockfile, where
+re-resolving would defeat the `exclude-newer` cooldown.
+
+**Model weights** live in `weights_dir()` = `$ENOUGH_WEIGHTS_DIR/docling`
+(default `~/enough/weights/docling`), fetched by the worker's `prefetch` op —
+in the worker, not in-process, because importing docling means importing
+torch into the server. `record_extra()` runs **before** the prefetch
+deliberately: the packages really are installed by then, and a network drop
+mid-download must not leave the extra unrecorded and liable to be uninstalled
+by the next update. Measured: 52 packages, ~1 GB in `.venv`, 669 MiB / 701 MB
+of weights, ~0.9 s/page for a digital PDF plus a ~10 s model load.
+
+`tests/test_convert_docling.py` reads `ENOUGH_WEIGHTS_DIR` **at import
+time**, before any fixture redirects it, and skips the whole file when
+`<that>/docling` is empty — so a bare `uv run pytest` (and CI) skips its 11
+tests rather than downloading 670 MB, while a scratch QA run with the seam
+pointed at a populated dir runs them all.
+
+---
+
+## The home screen (registry, mode gate, exit-42 handoff)
+
+0.2.5. Before a project is open, enough runs the **home screen**: the same
+server and the same `index.html`, with no project attached.
+[enough/home.py](../enough/home.py) owns the state and the policy,
+[enough/server.py](../enough/server.py) owns the mode boundary and the
+routes, and `desktop/src-tauri/src/launch.rs` owns the state machine on the
+shell side. Design record: `docs/home-plan.md` (local planning doc,
+untracked) — its three "landed" blocks are the final word where the earlier
+sections disagree.
+
+### One app factory, two modes
+
+`create_app(project_dir, …, home: bool = False)`. With `home=True` the
+lifespan builds **no Session, no supervisor, no broker, no wikisink** and
+seeds no project state; `__main__.py` grows a `--home` flag that is mutually
+exclusive with `--dir` (the shell has never passed `--dir` — it uses `cwd` —
+which is exactly what makes `--home` legal there).
+
+The boundary is **`server.ModeGate`**, a raw-ASGI middleware class.
+Deliberately *not* `@app.middleware("http")`: Starlette's
+`BaseHTTPMiddleware` proxies the receive channel, and a long-lived
+`/api/stream` response needs that untouched. What a home server answers is
+one frozenset plus one prefix tuple:
+
+```python
+HOME_PATHS     = {"/", "/favicon.ico", "/api/ui-config", "/api/help-center",
+                  "/api/convert/formats", "/api/shutdown"}
+HOME_PREFIXES  = ("/api/home/", "/static/")
+```
+
+Two of those look surprising and both earn their place: the **formats
+table** is a static registry the help center's `{{convert-formats}}` token
+expands (and the help center works in home mode), and **`/api/shutdown`** is
+how the shell quits a backend — a home backend is still a backend. Anything
+else 404s with a JSON `detail` in the house voice. In project mode the gate
+inverts: `/api/home/*` 404s and everything else passes. `/api/close-project`
+is the one route that crosses — it lives on the project side, so it 404s in
+home mode like everything else off the list. Note for anyone adding a home
+feature: `/api/help/defaults`, `/api/help/bubbles` and `/api/stream` are
+project-scoped and **do** 404 on a home server, which is why the frontend
+gates `loadHelpDocs()`, `loadHelpBubbles()` and the EventSource on
+`IS_HOME`.
+
+The frontend learns the mode from **`<body data-mode="home|project">`**,
+templated by the `/` route. See the `<body>` invariant under "What NOT to
+touch" before you edit `index.html`.
+
+### The registry
+
+`~/enough/config/projects.json`, schema 1, backend-owned, one writer,
+tmp+rename. Every folder enough has ever put an `rness/` into, plus cached
+metadata:
+
+```jsonc
+{"schema": 1, "seeded": true, "projects": [
+  {"path": "/Users/g/writing/novel",          // canonical abs path — the key
+   "created_at": "…Z", "last_opened": "…Z", "last_edited": "…Z",
+   "counts": {"p": 812, "w": 54210, "c": 331904},
+   "fingerprint": {"files": 37, "max_mtime_ns": 175…, "bytes": 401223},
+   "hidden": false}]}
+```
+
+Rules that are load-bearing:
+
+- **The seam is `ENOUGH_PROJECTS_STATE`, and it names the *file*.**
+  Everything else home touches derives from its **directory** —
+  `home.config_dir()` is `projects_state_path().parent`, and both the
+  handoff file and the `desktop.json` the seed reads hang off it. That is
+  what makes a scratch QA run airtight: redirect the registry and you cannot
+  then read the developer's real MRU or drop a handoff file in their real
+  config dir. **This seam has a second reader in another language** —
+  `config::enough_config_dir()` in the Rust shell does the same `parent`
+  derivation so the shell looks for `.home-open` where Python put it.
+  (`config::config_path()`, desktop.json, deliberately does *not* follow the
+  seam — it's the shell's own file, and leaving it on `$HOME` is what makes
+  a registry-only seam produce an empty scratch seed. `update-enough.command`
+  does not read the seam at all.)
+- **Corrupt / unreadable / foreign-`schema` reads as an empty registry and
+  is never rewritten until a real save** — the desktop.json rule. Unknown
+  top-level keys survive a save (pinned by a test).
+- **Registration happens in exactly two places**: `skeleton.ensure_skeleton()`
+  (so every enough-ification registers, however triggered) and project-server
+  boot in the lifespan (which also stamps `last_opened`, and picks up
+  pre-registry projects on their first open). Both are wrapped so a
+  read-only or full `~/enough` logs a warning and never stops a project
+  opening.
+- **Seeding from the shell's `known_projects` MRU is once-only**, gated by a
+  `seeded: true` flag rather than add-if-absent — otherwise a hidden project
+  the shell still lists would resurrect on the next home boot. It runs
+  off-thread in the home lifespan, and takes an entry only if the folder
+  still exists *and* still has an `rness/`.
+- **A missing project is never dropped and never zeroed.** It keeps its last
+  known counts and renders `missing: true`; a project on an unmounted drive
+  shows what it had when you last saw it.
+- **There is no delete and no "forget".** `POST /api/home/hide` sets a
+  registry-only `hidden` flag; the listing always returns every entry and the
+  frontend filters. Un-enough-ification is out of scope, on purpose (user
+  call: "forget" reads like deleting `rness/`).
+
+### The counters (a second implementation of the top bar's rules)
+
+`home.count_text()` is the three lines of `updateDocCounters()` in
+index.html, quoted in its docstring and ported straight across:
+paragraphs = `re.split(r"\n\s*\n", src)` filtered on `.strip()`, words =
+`len(src.strip().split())`, chars = `len(src)`. The named agreement test is
+`test_count_text_agrees_with_the_top_bar_rules` — same fixture text, the
+three numbers computed by hand from the JS and written in as constants, so
+the JS is not ported twice. **One knowing difference**: `len()` counts code
+points, JS `.length` counts UTF-16 units, so astral emoji disagree on `c`
+alone.
+
+The counted file set is `server._walk_tree`'s visibility rules —
+**imported from `server`, not copied**, so they cannot drift — with two
+deliberate departures: **twins are counted** (a `report.pdf.md` is the
+user's text; hiding it behind the original is a display decision) and
+**`rness/` is not**, wherever it appears in the tree.
+
+Stats are cached behind a cheap `fingerprint_of()`
+(`{files, max_mtime_ns, bytes}`, one `stat` per markdown file, no file
+opened unless it moved). `GET /api/home/projects` refreshes only the entries
+whose fingerprint changed, in a thread, and writes the registry back **at
+most once** per request. `last_edited` is derived from `max_mtime_ns`, not
+stored separately.
+
+### The project map
+
+`home.build_project_mirror()` calls `cacheawl.folder_flowchart(base,
+root_label, *, start, meta_lines, skip, max_depth)` — the node/edge/depth-cap
+walker that was extracted out of `_mirror_body` for this. Frontmatter is
+`merirmaid: 1` / `modality: mirror`, and **`modality: mirror` is what makes
+the viewer read-only** (`mmRenderDiagram`'s `editable` flag is already
+`modality === 'wip' && …`), so nothing had to be hidden. The `skip`
+predicate is the *tree's* rule set, so the map shows what the sidebar would;
+the `🛈` node reads entirely from the **cached** registry entry, so clicking
+a tile costs one directory walk and no re-counting.
+
+### Endpoints
+
+| Route | Mode | Notes |
+|---|---|---|
+| `GET /api/home/projects` | home | `{"projects": [row, …]}` — nine keys, always: `path, name, description, created_at, last_opened, last_edited, counts, missing, hidden`. `name`/`description` are read **live** from `rness/project.json`; `counts` is never null. Stats refresh first. Server-side order is `last_opened → last_edited → created_at`, newest first — the frontend's default sort |
+| `GET /api/home/mirror?path=` | home | `{path, name, text}`; 404 when the path isn't registered |
+| `POST /api/home/add` | home | `{"path": …}` or `{}` (empty ⇒ raise the osascript chooser). `200 {project, created}` · `200 {cancelled:true}` · `200 {dialog_unavailable, detail}` · `409 {detail, project}` (already listed — the frontend just opens it) · `400 {detail}` (a guard refusal; surface it **verbatim**) |
+| `POST /api/home/open` | home | `{"path": …}` → `{"handoff": …}`, either `"desktop"` or `"exec"`; 404 unregistered · 409 no `rness/` · 400 no path |
+| `POST /api/home/hide` | home | `{"path", "hidden": bool}` → `{path, hidden}`; registry only |
+| `POST /api/close-project` | **project** | the reverse of `/api/home/open`; same `{"handoff": …}` shape |
+
+**Add guards** (`home.check_addable()`): refuse `~/enough` and anything
+inside it (reusing `__main__`'s wording so both front doors say the same
+thing), refuse a cloud-synced path, refuse a path that doesn't exist or
+isn't a directory. The cloud-sync check **reuses
+`skeleton.cloud_sync_provider()`** rather than porting `guards.rs` back —
+the Rust is the copy, and says so in its own docstring. The asymmetry is
+deliberate: skeleton's caller *warns*, home's *refuses*, with the reason
+spelled out for the modal.
+
+**The folder chooser** is `osascript -e 'POSIX path of (choose folder …)'`,
+three statements (`try/activate/end try`, then `choose folder`, then `POSIX
+path of`), run off-thread with a 180 s timeout. The `activate` is wrapped
+because a sandbox that refuses it must not take the script down; without it
+the dialog can open *behind* the enough window. Cancel is `-128` (or
+"cancel" in stderr) and answers `None`, not an error. Non-macOS or any
+failure ⇒ `dialog_unavailable`, and the frontend shows a typed-path field.
+
+### The handoff: exit code 42 and `.home-open`
+
+The contract the Rust rests on is two lines long:
+
+| flow | exit code | `<config dir>/.home-open` |
+|---|---|---|
+| home + `POST /api/home/open`, `ENOUGH_DESKTOP=1` | **42** | present, `<abs path>\n` |
+| project + `POST /api/close-project` (or ⌘W) | **42** | absent |
+
+**The shell's rule: exit 42 → read *and delete* `.home-open` → open what it
+names, or home when it isn't there.** Deletion is unconditional once the
+file exists — including when it's empty or unparsable — so a stale handoff
+can never strand the shell reopening the same project. `home.write_handoff()`
+is tmp+rename; `home.read_handoff(consume=True)` is the Python half (tests
+use it); `launch::consume_handoff()` is the Rust half, with 4 retries 40 ms
+apart for a rename not yet observed on a network-backed home.
+
+Two mechanics worth knowing before you touch `run()` in server.py:
+
+- **`run()` drives `uvicorn.Server` itself and returns an exit status.**
+  It has to: `request_process_exit()`'s SIGTERM-to-self *cannot* produce an
+  exit code, because uvicorn's `capture_signals` re-raises the captured
+  signal after its graceful shutdown and the process dies **by the signal**.
+  `request_process_exit(delay, code=None)` keeps the old SIGTERM behavior
+  exactly (so `/api/shutdown` and `smoke_boot` are unchanged); with a `code`
+  it records the status and sets `Server.should_exit` directly — the same
+  graceful drain without the signal, and **open SSE streams still drain**
+  (sse-starlette polls uvicorn's `should_exit`).
+- **CLI (no `ENOUGH_DESKTOP`) re-execs instead**, via
+  `request_process_exec(home.exec_argv(...))`. `exec_argv` is canonical, not
+  a copy of `sys.argv`: `[sys.executable, "-m", "enough", "--port", …,
+  "--no-browser", "--llm-url", …, "--max-tool-iters", …, ("--no-supervise")?,
+  ("--home" | "--dir", …)]`. `-m enough` runs the same install whether this
+  process came from the console script, `python -m`, or `uv run`, and
+  **every flag rides in both directions, `--llm-url` included** — a QA run
+  pointed at a scratch llama-server must not come back from
+  project → home → project pointed at the machine's real one. Both handoffs
+  stop an **owned** llama-server first (`only_if_owned=True`), same as
+  `/api/shutdown`.
+
+### The launch state machine (Rust)
+
+`launch::run` used to end in one of three terminal states. It is now a loop:
+**bring a backend up, park until it goes away, work out what the exit meant,
+bring up the next one.** There was no backend-exit watcher before 0.2.5 —
+`watch()` (200 ms poll) is new code, not a new branch.
+
+- **`initial_target(reopen, last, is_project)`** — `reopen_last_project` on
+  **and** a `last_active_project` that still holds an `rness/` → that
+  project; everything else → `Home`. It takes the filesystem as a closure,
+  which is how `cargo test` covers the routing without a window.
+- **`after_exit(code, handoff)`** — the table above, as a pure function.
+- **`home_broken`** — set when `boot(Home)` fails, or when a home backend
+  exits non-42 on its own. While set, a `Home` target opens the 2a folder
+  picker instead. This is the picker's only remaining life, and it is also
+  the loop-breaker: without it a home screen that dies at startup is an
+  unbounded dialog loop. **Cancelling the picker still exits the app, but
+  only on that path** (see `docs/tauri-plan.md` §2's superseded note).
+- **⌘W** (`request_close_project`) is the same graceful door as quit —
+  `POST /api/shutdown` with the per-launch token, then the SIGTERM/SIGKILL
+  ladder — then a `--home` spawn. The backend moves into a **third
+  `AppState` slot, `closing_backend`**, so the watcher doesn't read a clean
+  exit as a crash and a quit arriving mid-close doesn't orphan a uvicorn;
+  the worker also **discards any handoff file** the backend managed to write
+  on its way out. ⌘W's answer is home whatever else happened.
+- **`View → Show Hidden Projects`** reads the *persisted* value
+  (`config::ui_flag("home_show_hidden")` off `ui.json`), computes
+  `next = !persisted`, and evals `window.homeSetShowHidden(next)` — the
+  frontend setter, which re-renders and POSTs to `/api/ui-config` itself.
+  `WebviewWindow::eval` returns `Result<()>`, not a value, and a
+  `#[tauri::command]` was rejected outright because
+  `capabilities/default.json` lists no `remote` origin — the enough UI on
+  127.0.0.1 has no IPC surface at all, and opening one for a check mark
+  would be a bad trade. Consequence, stated plainly: the check mark can be
+  one flip stale between a click on the page's own `hidden` chip and the
+  next time the menu acts.
+- **The window goes back to `loading.html` between backends via a real
+  `navigate` to `tauri://localhost/loading.html`**, not `location.replace` —
+  the window may be showing a page on 127.0.0.1, where a relative URL would
+  resolve against the backend.
+
+### ui-config keys home owns
+
+`home_view` (`"icons"|"list"`) and `home_show_hidden` (bool) round-trip
+through `/api/ui-config` beside `seen_convert_intro`, top-level, in the
+machine-global `~/enough/config/ui.json` — which is also why the theme is
+the same on home and in the project. **No default is injected** for
+`home_view`: the key is simply absent until someone POSTs one, so the
+frontend owns the default.
+
+---
+
 ## Skill trust and the first-use audit
 
 All of it lives in [enough/skillaudit.py](../enough/skillaudit.py) (0.2.2).
@@ -1146,8 +1611,14 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   `### ideas` bodies (inline HTML allowed; rendered through the existing
   `renderMarkdown()`). The tokens `{{skills-list}}` / `{{roles-list}}` /
   `{{paradigms-list}}` expand client-side into the *actually installed*
-  set via `GET /api/help/defaults` (name + description from frontmatter)
-  — never hand-maintain those lists in prose. Bubbles are governed by
+  set via `GET /api/help/defaults` (name + description from frontmatter),
+  and `{{convert-formats}}` into the file-type table via
+  `GET /api/convert/formats` — never hand-maintain those lists in prose.
+  All four are expanded by `_helpExpandTokens()` in index.html;
+  `{{convert-formats}}` is the one token that also appears in the
+  **manual**, where `enterRefMode()` expands it to a markdown pipe table
+  before rendering (one row-builder, two renderings — see
+  `convertFormatsHelpRows()` / `…Html()` / `…Markdown()`). Bubbles are governed by
   one per-project boolean (`GET`/`POST /api/help/bubbles`, stored in the
   multipurpose `rness/active-paradigm` file, default on, surfaced as the
   "help (?) bubbles" checkbox in the UI modal): on = every `[data-help]`
@@ -1235,6 +1706,31 @@ asked for a project-local one; the audit is the feature.
 5. If the tool needs a broker toggle (kill switch), add to
    `broker.TOGGLES` — UI updates itself.
 
+### Add a convertible file format
+
+The registry is the whole recipe; resist the urge to special-case anywhere
+else.
+
+1. Add one row to `convert.FORMATS` in
+   [convert.py](../enough/convert.py): `label` (user-facing, used verbatim
+   by the intro modal's a/an rule and by every generated table), `reader`
+   (`"pandoc"` | `"docling"`), `writer` (`"pandoc"` | `"typst"` | `None`),
+   `sync_ok` (only true when the writer can rewrite the original in place),
+   and one honest `notes` sentence — it is copy, and it ships to users.
+2. Teach the worker the format name: `convert_worker.PANDOC_READERS` (and
+   `PANDOC_WRITERS` / `NEEDS_STANDALONE` if it is also an export target), or
+   `DOCLING_FORMATS`.
+3. If it is a new **export** target, add the extension to
+   `convert.EXPORT_TARGETS` too.
+4. Stop. `GET /api/convert/formats`, the export modal, the
+   `{{convert-formats}}` help token (help-docs.md + HELP_CENTER.md §5.2),
+   and `prompt.convert_instructions()`'s system-prompt section all render
+   the registry — none of them needs an edit, and none of them may
+   hand-list an extension.
+5. Tests: `tests/test_convert.py` asserts registry shape and the round
+   trip; add a fixture generated at test time (never checked in — see
+   `tests/conftest.py`) rather than a binary in the repo.
+
 ### Add a broker toggle
 
 Append a `Toggle(...)` to the `TOGGLES` tuple in
@@ -1250,10 +1746,36 @@ Define an async handler inside `create_app()` in
 imports late (inside the function) where possible to avoid circular
 imports — `cloud`, `models`, `tools` are typical late imports.
 
+### Add a column to the home list view
+
+The list view's columns are `name · ¶ · W · C · last updated · created`.
+Adding one is a four-step change, and the order matters:
+
+1. **Is the value already in the registry entry?** If not, it belongs in
+   `home.refresh_entry()` — computed during the fingerprint-gated refresh, so
+   it costs nothing on an unchanged project — and in the `~/enough/config/projects.json`
+   schema. Do not add a per-render walk; the whole point of the fingerprint
+   is that `GET /api/home/projects` opens no files when nothing moved.
+2. **Add it to `home.row()`.** That function is the payload contract and the
+   API test asserts its exact key set, so the test fails until you do —
+   which is the intended order.
+3. **Render it in index.html's home module**: the `.hl-head` header button
+   (with a sort key) and the `.hl-row` cell. Numbers go through
+   `toLocaleString` and carry the `.num` class; dates use the compact
+   `YYYY-MM-DD HH:MM` stamp, not the tiles' relative phrasing.
+4. **Sorting**: nulls sink in *both* directions (a never-edited project is
+   "unknown", not "oldest") and ties break on name. Text columns open A→Z,
+   everything else opens newest/most-first.
+
+Six columns already crowd a ~700px window, so a seventh wants a reason.
+Counting-rule changes are a different job — see the counters subsection of
+"The home screen", and remember the numbers are asserted to agree with the
+top bar's.
+
 ### Change the UI
 
 [enough/static/index.html](../enough/static/index.html) is a single
-~14800-line file with inline CSS and JS. Conventions:
+~18,700-line file with inline CSS and JS. Conventions:
 
 - All modals follow the same `#<name>-modal` pattern with `.hidden`
   class and a `.modal-backdrop` for click-outside dismissal.
@@ -1444,6 +1966,55 @@ A list of things that will confuse you if you don't see them coming:
   the setup wizard.
 - **Never `mkdir` under a `/Volumes/...` path without
   `config.volume_mounted()`.** See the Wikisink section for why.
+- **The `pdf` extra's third requirement line is load-bearing.**
+  `pyproject.toml`'s `pdf` extra lists `docling-ibm-models[opencv-python-headless]`
+  *in addition to* the two `docling-slim[...]` lines, and it is not a
+  duplicate: TableFormer's predictor imports `cv2` at module scope, but
+  `docling-slim`'s `models-local` asks for `docling-ibm-models` with **no**
+  extras and opencv is optional there — so `do_table_structure=True` raises
+  `ModuleNotFoundError: No module named 'cv2'` without it. The same hole is
+  in `docling-slim[standard]` and in the full `docling` distribution, so
+  swapping distributions does not fix it. Don't tidy the line away, and
+  don't "simplify" the comment above it. (Headless because a conversion
+  worker has no display and the GUI build drags in Qt.)
+- **Twin manifests and assets dirs are backend-owned.**
+  `.<original>.convert.json` and `<original>.assets/` are written only by
+  `convert.py` / `convert_worker.py`, and `_walk_tree` hides both. A
+  re-convert *clears* the assets dir before extracting, which is what keeps
+  `img-1.png` stable across re-converts — so nothing user-authored may ever
+  be stored there. The twin itself is the opposite: it is the user's file,
+  edited freely, and every code path writes it **first and
+  unconditionally** — a refused sync is a flag on the response, never a lost
+  edit.
+- **`index.html` must contain exactly one `<body`.** The `/` route marks the
+  mode with `html.replace("<body>", '<body data-mode="home">', 1)`, so the
+  *first* occurrence of the literal string wins. Wave B broke this within
+  the hour by writing `<body>` in a CSS comment above the real tag: the
+  replace hit the comment, the page came up unmarked, and a home server
+  rendered in full project chrome. There are warnings at both comment sites
+  and a regression test — `test_mode_marker_lands_on_the_real_body_tag` —
+  that pins `html.count("<body") == 1` on the *served* page rather than
+  merely checking that the attribute string appears. If you need to write the tag
+  in a comment, spell it `<body` without the `>`, or don't.
+- **`~/enough/config/.home-open` is a transient handoff file, not state.**
+  Written tmp+rename by `home.write_handoff()` (one absolute path plus a
+  newline), read **and deleted** by whoever consumes it — `launch::consume_handoff()`
+  in the shell, `home.read_handoff(consume=True)` in Python. Never read it
+  without consuming, never leave one behind: a stale file opens a stale
+  project at the *next* exit 42. Its directory follows
+  `ENOUGH_PROJECTS_STATE`'s parent on both sides.
+- **Close Project does not clear `last_active_project`.** With
+  `reopen_last_project` **on**, quitting from the home screen after a ⌘W
+  still reopens that project next launch. That is deliberate: the toggle is
+  the user's control for "start me on home", and clearing the key would be a
+  silent new rule. Documented in HELP_CENTER §2.5; don't "fix" it without
+  changing both.
+- **⌘W belongs to Close Project now, and the Window menu lost
+  `PredefinedMenuItem::close_window`.** The predefined item carries ⌘W on
+  macOS and passing `None` there overrides the *text*, not the accelerator —
+  two items on ⌘W is a conflict. The app is one window and closing it quits,
+  so ⌘Q and the red button cover the ground. ⌘W is also unbound in the page,
+  by agreement, so a browser tab keeps the browser's meaning.
 - **Cachebox sidecars are backend-owned.** `_cachebox.merirmaid` and
   `.cachebox.json` are written only by `cacheawl.py`. Both write endpoints
   (`write_file`, `POST /api/file`) already refuse them; don't add a path
@@ -1469,16 +2040,35 @@ A list of things that will confuse you if you don't see them coming:
   `cacheawl:` scheme, the ui-config theme-key merge, the models
   registry/feasibility/downloads, the desktop shutdown gate, the shipped
   skills' conventions (`test_skills_defaults.py`), the skill trust model +
-  first-use audit + `/api/skills*` (`test_skill_audit.py`), and the
+  first-use audit + `/api/skills*` (`test_skill_audit.py`), document
+  conversion (`test_convert.py` — registry, naming, the state machine, the
+  docx round trip, exports; `test_convert_api.py` — every `/api/convert/*`
+  route, `/api/file/blob`, tree hiding, the SSE shapes;
+  `test_convert_docling.py` — the docling engine, skipped without prefetched
+  weights; `conftest.py` builds the `.docx` fixture with pandoc at test
+  time rather than checking a binary into the repo), the home screen
+  (`test_home.py` — the counting agreement with the top bar, the counted
+  file set, the registry round trip + corrupt-read + unknown-key survival,
+  the fingerprint short-circuit, seeding, the add guards, the handoff file,
+  `exec_argv`, the project map, the `ModeGate` both ways, every
+  `/api/home/*` payload, and the `<body>` marker), and the
   throttled newer-snapshot check (`test_wikisink_newer_snapshot.py` —
   which, like every other suite, can never reach kiwix.org or a model).
   Suites
   isolate global state via env hooks — `ENOUGH_WIKISINK_CONFIG`,
   `ENOUGH_CACHEAWL_ROOT`, `ENOUGH_INFOWORLD_ROOT`, `ENOUGH_UI_CONFIG`,
-  `ENOUGH_WEIGHTS_DIR`, `ENOUGH_LIVE_STATE`, `ENOUGH_MODELS_REGISTRY`
+  `ENOUGH_WEIGHTS_DIR`, `ENOUGH_EXTRAS_STATE`, `ENOUGH_LIVE_STATE`,
+  `ENOUGH_MODELS_REGISTRY`, `ENOUGH_PROJECTS_STATE`
   (plus `ENOUGH_MODELS_URL_BASE`, which rebases the model download URLs
   onto a local stub server, keyed by local gguf_filename) — all
-  pointed at `tmp_path`; **never run against real `~/enough` state.** The
+  pointed at `tmp_path`; **never run against real `~/enough` state.**
+  `ENOUGH_PROJECTS_STATE` is the one that is **autouse for the whole suite**
+  (`tests/conftest.py`): half the suite calls `ensure_skeleton()`, which now
+  registers, so without it a test run would file the developer's tmp dirs on
+  their real home screen. That seam has to be closed by default, not by
+  remembering — and note it is also read by the **Rust shell**
+  (`config::enough_config_dir()`), which is where the `.home-open` handoff
+  lands. The
   rest of the web layer is exercised via TestClient against `create_app()`.
   **The `ENOUGH_*` list is not sufficient on its own**: `broker.json`,
   `openrouter.json`, `orchestrator.json`, `~/enough/.llama-server/server.pid`
@@ -1587,6 +2177,7 @@ git clone https://github.com/0gsd/enough.git
 cd enough
 uv sync                    # installs all deps including keyring
 uv run enough --help
+uv run enough --home       # the launch screen; no project, no llm, no broker
 ```
 
 Dependencies of note (Python, via `uv sync`):
@@ -1594,20 +2185,31 @@ Dependencies of note (Python, via `uv sync`):
 - `httpx[socks]` — outbound HTTP, with SOCKS support for Tor routing
 - `keyring>=24` — OS keyring for the OpenRouter api key
 - `ctranslate2`, `sentencepiece`, `huggingface_hub` — translator skill
+- `pypandoc-binary`, `typst` — the document converters (0.2.5). **Base
+  deps, not extras**: every install, DMG included, ships a pandoc and a
+  typst, so HTML→markdown, the docx/odt/rtf/epub round trip, and
+  markdown→PDF all work with no Homebrew and no extra step. A user's own
+  `pandoc` on PATH still wins (`convert.pandoc_path()`)
+- optional extra `pdf` (`uv sync --extra pdf`, normally installed from the
+  UI) — docling + torch for PDF/deck/workbook *reading*. See "Document
+  conversion"
 
 Plus external binaries installed by `bootstrap.sh` via Homebrew:
 - `llama.cpp` — local LLM inference server (backs everything except OPRO-API)
 - `whisper-cpp` — local speech-to-text for the chat mic button
 - `tor` — anonymized off-allowlist web fetch via the broker
-- `pandoc` — HTML → markdown conversion for fetched documents
 - `harper` — local grammar/spell checker (Automattic, Apache-2.0).
   The analyzer skill's proofread mode shells out to `harper-cli`
   for the silent-fix pass; absence is handled gracefully (skill falls
   back to LLM-only scanning).
 
+(pandoc left that list in 0.2.5 — it comes from the venv now. `bootstrap.sh`
+no longer offers to install it on either platform, and
+`tests/bootstrap_linux_harness.sh` has two `check_no_grep`s defending that.)
+
 Plus, on Linux, the same roles filled differently (see "Platforms, and
 CI"): llama.cpp is a checksum-pinned prebuilt release in `~/enough/bin/`
-rather than a formula; pandoc and tor come from apt/dnf; whisper.cpp and
+rather than a formula; tor comes from apt/dnf; whisper.cpp and
 harper have no distro package and are built from their own repos.
 `bootstrap.sh` prints those commands and installs none of them.
 
@@ -1616,15 +2218,21 @@ store + endpoints + `cacheawl:` scheme, the ui-config theme-key merge, the
 models registry/feasibility/downloads, the llama-server lookup, the desktop
 shutdown gate, the platform seams, the shipped skills' frontmatter/tooltip/
 script conventions, the skill trust model + first-use audit + `/api/skills*`,
+document conversion + `/api/convert/*` + `/api/file/blob`,
+the home screen + registry + handoff + `/api/home/*`,
 and the throttled wikisink newer-snapshot check) — **tracked since the
 seven-models round**, so a fresh clone has it. Before declaring anything
 done:
 
 ```bash
-uv run pytest -q                        # 297 tests
+uv run pytest -q                        # 422 tests (+12 docling skips)
 uv run python scripts/smoke_boot.py     # real boot, scratch dir
 bash tests/bootstrap_linux_harness.sh   # only if you touched bootstrap.sh
 ```
+
+Rust, if you touched the shell: `cargo test` in `desktop/src-tauri/`
+(37 tests — the launch routing and the exit-42 handshake are pure functions
+precisely so they're covered here).
 
 CI runs exactly those three on ubuntu-latest and macos-latest. Anything
 not covered by them is smoke-tested via ad-hoc Python scripts that

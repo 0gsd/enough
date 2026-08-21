@@ -59,8 +59,9 @@ slower, anonymized."
   approval.
 - For internet fetching, **use `fetch_url`** — not `shell` + curl. The
   broker handles routing (direct for allowlisted hosts, Tor for
-  everything else), converts HTML to markdown via pandoc, caches the
-  result under `rness/io/input/<timestamp>-<hash>-<slug>.md`, and
+  everything else), converts HTML to markdown via pandoc (bundled with
+  enough), caches the result under
+  `rness/io/input/<timestamp>-<hash>-<slug>.md`, and
   indexes it in `rness/io/input/_broker-index.md`. The tool result is
   a short preview + cache path; read the full content via `read_file`
   if needed. This keeps fetched documents out of your context window.

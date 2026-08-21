@@ -39,6 +39,7 @@ echo
 info "this script runs:"
 info "    git pull --ff-only    in $HERE"
 info "    uv sync               to pick up any new Python deps"
+info "                          (keeping any optional extras you installed)"
 echo
 
 # ---------------------------------------------------------------------------
@@ -109,18 +110,51 @@ if [[ "$PULL_OUTPUT" == *"Already up to date"* ]]; then
 fi
 
 # ---------------------------------------------------------------------------
+# Optional extras
+#
+# `uv sync` is EXACT by default: left to itself it would UNINSTALL any
+# optional dependency group the user added from the app (the PDF reader,
+# say), because the group isn't in the default set. ~/enough/config/extras.json
+# records what's installed, and every sync path — this script, the desktop
+# shell, and the in-app installer — re-asks for each one. python3 does the
+# JSON reading; names are validated so nothing from that file can become a
+# stray flag.
+# ---------------------------------------------------------------------------
+EXTRAS_STATE="${ENOUGH_EXTRAS_STATE:-$HOME/enough/config/extras.json}"
+EXTRA_FLAGS=""
+if [[ -f "$EXTRAS_STATE" ]] && command -v python3 >/dev/null 2>&1; then
+  EXTRA_FLAGS="$(python3 - "$EXTRAS_STATE" <<'PYEXTRAS'
+import json, re, sys
+try:
+    with open(sys.argv[1]) as fh:
+        data = json.load(fh)
+except Exception:
+    raise SystemExit(0)
+if isinstance(data, dict):
+    for name in sorted(data):
+        if re.fullmatch(r"[a-z0-9][a-z0-9._-]*", str(name)):
+            print("--extra")
+            print(name)
+PYEXTRAS
+)"
+fi
+if [[ -n "$EXTRA_FLAGS" ]]; then
+  info "keeping installed extras:$(printf ' %s' $EXTRA_FLAGS | sed 's/ --extra//g')"
+fi
+
+# ---------------------------------------------------------------------------
 # uv sync
 # ---------------------------------------------------------------------------
 echo
 info "running 'uv sync' to pick up any new Python deps..."
-if uv sync; then
+if uv sync $EXTRA_FLAGS; then
   echo
   ok "Python environment synced"
 else
   err "uv sync failed."
   info "the git pull succeeded, but Python deps may be out of date."
   info "try running 'uv sync' manually from this directory:"
-  info "    cd \"$HERE\" && uv sync"
+  info "    cd \"$HERE\" && uv sync $EXTRA_FLAGS"
   pause
   exit 1
 fi

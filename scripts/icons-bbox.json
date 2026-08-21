@@ -3,325 +3,388 @@
   "broker.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 9,
-      "y": 12.4,
+      "h": 47.3,
       "w": 54,
-      "h": 47.3
-    }
-  },
-  "cacheawl.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 7.4,
-      "y": 11.8,
-      "w": 59.1,
-      "h": 48.3
+      "x": 9,
+      "y": 12.4
     }
   },
   "cacheawl-settings.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 9.1,
-      "y": 9.1,
+      "h": 53.8,
       "w": 53.8,
-      "h": 53.8
+      "x": 9.1,
+      "y": 9.1
     }
   },
-  "cachebox.svg": {
+  "cacheawl.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 9,
-      "y": 9.2,
-      "w": 53.8,
-      "h": 53.8
+      "h": 48.3,
+      "w": 59.1,
+      "x": 7.4,
+      "y": 11.8
     }
   },
   "cachebox-update.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 9.5,
-      "y": 6.5,
+      "h": 59,
       "w": 53.1,
-      "h": 59
+      "x": 9.5,
+      "y": 6.5
+    }
+  },
+  "cachebox.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 53.8,
+      "w": 53.8,
+      "x": 9,
+      "y": 9.2
     }
   },
   "comment.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": -9.6,
-      "y": -6.2,
-      "w": 91.2,
-      "h": 77.8
+      "h": 50.62,
+      "w": 54.0,
+      "x": 9.0,
+      "y": 10.69
     }
   },
   "commentsright-off.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 9,
-      "y": 24.2,
+      "h": 23.6,
       "w": 54,
-      "h": 23.6
+      "x": 9,
+      "y": 24.2
     }
   },
   "commentsright-on.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 9,
-      "y": 24.2,
+      "h": 23.6,
       "w": 54,
-      "h": 23.6
+      "x": 9,
+      "y": 24.2
     }
   },
   "d6.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 13.3,
-      "y": 9,
+      "h": 54,
       "w": 45.4,
-      "h": 54
+      "x": 13.3,
+      "y": 9
     }
   },
   "edit-pencil.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 7.2,
-      "y": 20.8,
+      "h": 30.5,
       "w": 57.5,
-      "h": 30.5
+      "x": 7.2,
+      "y": 20.8
+    }
+  },
+  "export-doc.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54.01,
+      "w": 53.89,
+      "x": 9.06,
+      "y": 8.99
     }
   },
   "file.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 14.1,
-      "y": 9,
+      "h": 54,
       "w": 43.9,
-      "h": 54
-    }
-  },
-  "folder.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 9,
-      "y": 14.1,
-      "w": 54,
-      "h": 43.9
+      "x": 14.1,
+      "y": 9
     }
   },
   "folder-project.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": -9.4,
-      "y": -8.2,
-      "w": 96.7,
-      "h": 96.7
+      "h": 43.87,
+      "w": 54.0,
+      "x": 9.0,
+      "y": 14.07
+    }
+  },
+  "folder.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 43.9,
+      "w": 54,
+      "x": 9,
+      "y": 14.1
     }
   },
   "full2mini.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 10.3,
-      "y": 10.8,
+      "h": 50.4,
       "w": 51.4,
-      "h": 50.4
+      "x": 10.3,
+      "y": 10.8
     }
   },
   "girraphmode.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": -3.6,
-      "y": -22.1,
-      "w": 79.2,
-      "h": 116.2
-    }
-  },
-  "merirmaidmode.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 9,
-      "y": 9,
-      "w": 54,
-      "h": 54
-    }
-  },
-  "mini2full.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 10.3,
-      "y": 10.8,
-      "w": 51.4,
-      "h": 50.4
-    }
-  },
-  "projectnav-off.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 9,
-      "y": 24.2,
-      "w": 54,
-      "h": 23.6
-    }
-  },
-  "projectnav-on.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 6.2,
-      "y": -9.1,
-      "w": 90,
-      "h": 90.2
-    }
-  },
-  "read-eye.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 9.1,
-      "y": 18.8,
-      "w": 53.9,
-      "h": 34.5
-    }
-  },
-  "readedit-switch.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 3.5,
-      "y": 10.3,
-      "w": 65,
-      "h": 51.3
-    }
-  },
-  "ribbon-alert.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 17.3,
-      "y": 9,
-      "w": 37.3,
-      "h": 54
-    }
-  },
-  "ribbon-check.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 17.3,
-      "y": 9,
-      "w": 37.3,
-      "h": 54
-    }
-  },
-  "ribbon-redx.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 17.3,
-      "y": 9,
-      "w": 37.3,
-      "h": 54
-    }
-  },
-  "savewiki.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 13.4,
-      "y": 9,
-      "w": 45.2,
-      "h": 54
-    }
-  },
-  "savewiki-cacheawl.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 7.4,
-      "y": 6.5,
-      "w": 59.1,
-      "h": 56.5
-    }
-  },
-  "savewiki-project.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": -9.4,
-      "y": -13.7,
-      "w": 96.7,
-      "h": 96.7
-    }
-  },
-  "send-chat.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 5.6,
-      "y": 17.4,
-      "w": 60.8,
-      "h": 37.1
-    }
-  },
-  "speak.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 10,
-      "y": 9.1,
-      "w": 52,
-      "h": 53.8
-    }
-  },
-  "uiq.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 12.4,
-      "y": 9,
-      "w": 47.3,
-      "h": 54
-    }
-  },
-  "wiki-locked.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 15.8,
-      "y": 9,
-      "w": 40.5,
-      "h": 54
-    }
-  },
-  "wiki-unlocked.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 15.8,
-      "y": 9,
-      "w": 40.5,
-      "h": 54
-    }
-  },
-  "wikisink.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 9,
-      "y": 9,
-      "w": 54,
-      "h": 54
-    }
-  },
-  "wikisink-off.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 9,
-      "y": 9,
-      "w": 54,
-      "h": 54
-    }
-  },
-  "wikisink-settings.svg": {
-    "viewBox": "0 0 72 72",
-    "visBBox": {
-      "x": 9.1,
-      "y": 5.2,
-      "w": 53.8,
-      "h": 61.6
+      "h": 50.62,
+      "w": 54.0,
+      "x": 9.0,
+      "y": 10.69
     }
   },
   "hxc.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 8.8,
-      "y": 8.4,
+      "h": 56.9,
       "w": 54.7,
-      "h": 56.9
+      "x": 8.8,
+      "y": 8.4
+    }
+  },
+  "merirmaidmode.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 54,
+      "x": 9,
+      "y": 9
+    }
+  },
+  "mini2full.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 50.4,
+      "w": 51.4,
+      "x": 10.3,
+      "y": 10.8
+    }
+  },
+  "project-add.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 50.63,
+      "w": 54.0,
+      "x": 9.0,
+      "y": 10.69
+    }
+  },
+  "projectnav-off.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 23.6,
+      "w": 54,
+      "x": 9,
+      "y": 24.2
+    }
+  },
+  "projectnav-on.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 23.62,
+      "w": 54.0,
+      "x": 9.0,
+      "y": 24.19
+    }
+  },
+  "read-eye.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 34.5,
+      "w": 53.9,
+      "x": 9.1,
+      "y": 18.8
+    }
+  },
+  "readedit-switch.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 51.3,
+      "w": 65,
+      "x": 3.5,
+      "y": 10.3
+    }
+  },
+  "ribbon-alert.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 37.3,
+      "x": 17.3,
+      "y": 9
+    }
+  },
+  "ribbon-check.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 37.3,
+      "x": 17.3,
+      "y": 9
+    }
+  },
+  "ribbon-redx.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 37.3,
+      "x": 17.3,
+      "y": 9
+    }
+  },
+  "savewiki-cacheawl.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 56.5,
+      "w": 59.1,
+      "x": 7.4,
+      "y": 6.5
+    }
+  },
+  "savewiki-project.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54.28,
+      "w": 54.0,
+      "x": 9.0,
+      "y": 8.59
+    }
+  },
+  "savewiki.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 45.2,
+      "x": 13.4,
+      "y": 9
+    }
+  },
+  "send-chat.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 37.1,
+      "w": 60.8,
+      "x": 5.6,
+      "y": 17.4
+    }
+  },
+  "speak.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 53.8,
+      "w": 52,
+      "x": 10,
+      "y": 9.1
+    }
+  },
+  "twin-off.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 31.3,
+      "w": 59.86,
+      "x": 6.07,
+      "y": 20.35
+    }
+  },
+  "twin-on.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 31.3,
+      "w": 59.86,
+      "x": 6.07,
+      "y": 20.35
+    }
+  },
+  "uiq.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 47.3,
+      "x": 12.4,
+      "y": 9
+    }
+  },
+  "view-icons.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54.0,
+      "w": 54.0,
+      "x": 9.0,
+      "y": 9.0
+    }
+  },
+  "view-list.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 53.1,
+      "w": 57.73,
+      "x": 7.14,
+      "y": 9.45
+    }
+  },
+  "view-original.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54.01,
+      "w": 60.49,
+      "x": 3.75,
+      "y": 9.0
+    }
+  },
+  "wiki-locked.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 40.5,
+      "x": 15.8,
+      "y": 9
+    }
+  },
+  "wiki-unlocked.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 40.5,
+      "x": 15.8,
+      "y": 9
+    }
+  },
+  "wikisink-off.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 54,
+      "x": 9,
+      "y": 9
+    }
+  },
+  "wikisink-settings.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 61.6,
+      "w": 53.8,
+      "x": 9.1,
+      "y": 5.2
+    }
+  },
+  "wikisink.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 54,
+      "x": 9,
+      "y": 9
     }
   }
 }

@@ -333,7 +333,10 @@ check_file "$HOME_DIR/enough/config/models.json" "live model state is seeded"
 check "$([[ -d "$HOME_DIR/enough/weights" ]] && echo 1)" "the weights dir exists"
 check "$([[ -z "$(ls -A "$HOME_DIR/enough/weights" 2>/dev/null | grep -c gguf | sed 's/^0$//')" ]] && echo 1)" \
       "…and no model was downloaded (every prompt answered no)"
-check_grep "sudo apt install pandoc" "$OUT" "prints the pandoc install one-liner"
+# No pandoc one-liner any more: pypandoc-binary ships pandoc as a base wheel,
+# so `uv sync` installs it and offering a distro package would be advice to
+# install a second copy (convert-plan §8).
+check_no_grep "install pandoc" "$OUT" "no longer offers pandoc as an install"
 check_grep "sudo apt install tor" "$OUT" "prints the tor install one-liner"
 check_grep "whisper.cpp" "$OUT" "names whisper.cpp as a build-it-yourself extra"
 check_grep "harper" "$OUT" "names harper as an optional extra"
@@ -464,9 +467,11 @@ else
   bad "step sequence drifted:"
   diff <(printf '%s\n' "$EXPECTED_STEPS") <(printf '%s\n' "$STEPS") || true
 fi
-for f in llama.cpp uv tor whisper-cpp pandoc harper; do
+for f in llama.cpp uv tor whisper-cpp harper; do
   check_grep "brew install $f" "$WORK/G-macos/cmds.txt" "still brew-installs $f"
 done
+check_no_grep "brew install pandoc" "$WORK/G-macos/cmds.txt" \
+      "no longer brew-installs pandoc (it ships in the venv)"
 check_no_grep "sudo apt" "$OUT" "no Linux package-manager hints leak into the Mac run"
 check_no_grep "~/enough/bin" "$OUT" "no Linux llama.cpp prose leaks into the Mac run"
 check_grep "macOS Keychain" "$OUT" "keyring copy is still the macOS one"

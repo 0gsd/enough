@@ -115,6 +115,12 @@ file contents here
 <scope>watched</scope>
 </tool>
 
+<tool name="export_document">
+<path>reports/q3.docx</path>
+<target>.docx</target>
+<mode>copy</mode>
+</tool>
+
 <tool name="cachebox_list">
 <box>research-notes</box>
 </tool>
@@ -139,7 +145,8 @@ Rules:
 - `fetch_url` is the canonical way to read from the web — prefer it over
   `shell` + `curl`. It handles internet-allowlist routing (direct fetch
   for allowlisted domains; transparent Tor anonymization for off-allowlist
-  ones), converts HTML to markdown via pandoc, caches the result under
+  ones), converts HTML to markdown via pandoc — which ships with enough,
+  so the conversion is always available — caches the result under
   `rness/io/input/<timestamp>-<hash>-<slug>.md`, and indexes it in
   `rness/io/input/_broker-index.md`. The tool result is just a short
   preview + the cache path — read the full content with `read_file` if
@@ -452,6 +459,46 @@ def _section(title: str, body: str) -> str:
     if not body:
         return ""
     return f"# {title}\n\n{body}\n"
+
+
+def convert_instructions() -> str:
+    """The twin paragraph for the system prompt, with its formats table
+    rendered from `convert.FORMATS`.
+
+    Generated, not written: the plan makes the registry the one source of
+    truth for which file types are supported, precisely so the prompt, the
+    help center, and the export modal can't drift apart from the code."""
+    from . import convert as _convert
+    rows = ["| type | opens as | export back | keep in sync |",
+            "|---|---|---|---|"]
+    for ext, spec in _convert.FORMATS.items():
+        reads = "markdown twin" if _convert.engine_available(spec.reader) \
+            else f"needs the {spec.reader} engine (not installed)"
+        writes = ext if spec.writer else "other formats only"
+        rows.append(f"| `{ext}` ({spec.label}) | {reads} | {writes} | "
+                    f"{'yes' if spec.sync_ok else 'no'} |")
+    targets = ", ".join(f"`{t}`" for t in _convert.EXPORT_TARGETS)
+    return (
+        "enough does not display PDFs, Word documents, or ebooks directly.\n"
+        "When one is opened, enough writes an editable markdown **twin** next\n"
+        "to it — `report.pdf` becomes `report.pdf.md`, with any images in\n"
+        "`report.pdf.assets/` — and a hidden manifest records the pairing.\n"
+        "\n"
+        "- `read_file` on `report.pdf` returns the twin's text (converting one\n"
+        "  first if there isn't one yet), prefaced with a line naming it.\n"
+        "- **Edit the twin, never the original.** `write_file` to\n"
+        "  `report.pdf.md` is an ordinary write. Writing to the original\n"
+        "  itself would destroy it.\n"
+        "- The user turns edits back into a real document with the \"export\n"
+        "  changes\" button. You can do it on request with `export_document`:\n"
+        f"  `<target>` is one of {targets}, `<mode>` is `copy` (a datestamped\n"
+        "  file beside the original — the safe default) or `overwrite` (the\n"
+        "  original itself, stashed for undo first).\n"
+        "- If the user edited the original outside enough since the twin was\n"
+        "  made, an overwrite is refused and you should say so rather than\n"
+        "  working around it.\n"
+        "\n" + "\n".join(rows) + "\n"
+    )
 
 
 def _read_disabled_skills(rness: Path) -> set[str]:
@@ -1051,6 +1098,7 @@ def assemble_system_prompt(project_dir: Path) -> str:
     if intention:
         parts.append(_section("Current Intention", intention))
     parts.append(_section("Tools", TOOL_INSTRUCTIONS))
+    parts.append(_section("Converted documents (twins)", convert_instructions()))
     parts.append(_section("Context", HARNESS_CONTEXT_TMPL.format(project_dir=project_dir)))
 
     drift_note = _drift_notice(project_dir)

@@ -211,7 +211,7 @@ function paint() {
 function setBusy(on, label) {
   busy = on;
   go.disabled = on;
-  go.textContent = on ? (label || "working…") : (step === "extras" ? "Choose project folder" : "Continue");
+  go.textContent = on ? (label || "working…") : (step === "extras" ? "Open enough" : "Continue");
 }
 
 function fail(pane, msg) {
@@ -456,7 +456,7 @@ async function enterExtras() {
         <div class="lose">${x.found ? "available" : esc(x.lose)}</div>
       </div>
     </li>`).join("");
-  hint.textContent = "You can install any of these later. Next: pick the folder you want to work in — any folder of notes or drafts, not an install location.";
+  hint.textContent = "You can install any of these later. Next: the home screen, where you add the folder you want to work in — any folder of notes or drafts, not an install location.";
 }
 
 // --- driver ----------------------------------------------------------------

@@ -74,10 +74,21 @@ who has not opened it can decide whether to engage with it themselves.
 
 Determine the input and read it through, end to end. Do not skip sections.
 
-- **Uploaded file** (`.txt`, `.md`, `.docx`, `.pdf`, `.epub`, `.html`):
-  read from `rness/io/input/` (or wherever the user pointed you). Use the
-  appropriate extractor for the format (`pandoc` for docx, `pdftotext` for
-  pdf, etc.) if reading the raw bytes would be lossy.
+- **Uploaded file** (plain text, markdown, or any document enough can
+  convert — Word files, PDFs, ebooks, decks, workbooks): read from
+  `rness/io/input/` (or wherever the user pointed you). Do **not** shell out
+  to an extractor of your own. enough converts documents to markdown
+  **twins** and the twin is the thing to read:
+  - if a twin already exists beside the file (`report.pdf` →
+    `report.pdf.md`), `read_file` that;
+  - otherwise `read_file` the original by name — enough converts it and
+    hands you the twin, so one call is usually all it takes;
+  - reading PDFs, PowerPoint decks and Excel workbooks needs the optional
+    **PDF extra**. If it isn't installed, `read_file` says so in words —
+    pass that on to the user (the ⚙ UI window installs it) rather than
+    trying to extract the text another way.
+
+  Quote and cite from the twin; it is what the user is reading too.
 - **Pasted text:** work from the message.
 - **URL:** fetch the page. If the page is paginated or has a "read more,"
   follow it.

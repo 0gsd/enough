@@ -1,6 +1,6 @@
 [project]
 name = "enough"
-version = "0.2.2"
+version = "0.2.5"
 description = "A paradigmless personal computer harness powered by a local LLM."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -36,6 +36,33 @@ dependencies = [
     # on-demand and injects it into outbound requests.
     "keyring>=24",
     "libzim>=3.10",
+    # document conversion (convert-plan §6): pandoc + typst ship as wheels so
+    # every install — DMG included — reads/writes docx/odt/rtf/epub and can
+    # export any markdown to PDF, with no Homebrew and no extra step. GPL
+    # pandoc is invoked as a separate process (see THIRD_PARTY_LICENSES.md).
+    "pypandoc-binary>=1.17",          # ≈26 MB; wheels for all targets
+    "typst>=0.15",                    # ≈31 MB; abi3 wheels for all targets
+]
+
+[project.optional-dependencies]
+# PDF *reading* (plus decks/workbooks): docling + its layout/table models.
+# The floor reads >=2.119 rather than the plan's >=2.120 because the
+# exclude-newer cooldown below hides releases younger than a week —
+# 2.120.x was three days old at lock time and the resolver refused. The
+# extras named here exist unchanged in 2.119.
+# `docling-ibm-models[opencv-python-headless]` is ours to add, not a
+# duplicate: TableFormer's predictor imports `cv2` at module scope, but
+# docling-slim's `models-local` asks for docling-ibm-models with *no*
+# extras and opencv is optional there — so `do_table_structure=True`
+# raises ModuleNotFoundError on the combination the plan locked (Spike A,
+# convert-plan §6; the same hole is in `docling-slim[standard]` and in the
+# full `docling` distribution, so the plan's fallback would not have fixed
+# it). Headless because a conversion worker has no display and the GUI
+# build drags in Qt.
+pdf = [
+    "docling-slim[format-pdf,format-pptx,format-xlsx,convert-core,models-local,feat-ocr-mac]>=2.119; sys_platform == 'darwin'",
+    "docling-slim[format-pdf,format-pptx,format-xlsx,convert-core,models-local,feat-ocr-rapidocr-onnx]>=2.119; sys_platform != 'darwin'",
+    "docling-ibm-models[opencv-python-headless]>=3.13",
 ]
 
 [project.scripts]

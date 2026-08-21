@@ -132,6 +132,36 @@ to run the MADLAD-400 translation model offline:
 | SentencePiece | Apache-2.0 | Subword tokenizer for the MADLAD model | <https://github.com/google/sentencepiece> |
 | huggingface_hub | Apache-2.0 | Downloads model weights from Hugging Face on first use | <https://github.com/huggingface/huggingface_hub> |
 
+### Document conversion (0.2.5)
+
+enough converts documents (Word files, PDFs, ebooks, decks, workbooks)
+into markdown "twins" and exports edits back. Two of these are **base**
+dependencies installed by `uv sync` on every install, including the
+signed .app; the rest arrive only if the user installs the optional
+`pdf` extra from the UI.
+
+| Project | License | Role | Source |
+|---|---|---|---|
+| Pandoc | GPL-2.0-or-later | The document converter: HTML→markdown for fetched pages, and the docx/odt/rtf/epub round trip. Distributed as a **binary inside the `pypandoc-binary` wheel** since 0.2.5 (previously a Homebrew install) and **invoked as a separate process** — enough links against none of it. A pandoc the user installed themselves is preferred when one is on `PATH`. | <https://pandoc.org> |
+| pypandoc-binary | MIT | The thin Python wrapper that ships the pandoc binary above (the wrapper's own license; pandoc's GPL governs the bundled binary) | <https://github.com/JessicaTegner/pypandoc> |
+| Typst | Apache-2.0 | Typesetter used for markdown→PDF export (`typst` Python wheel) | <https://github.com/typst/typst> |
+
+Installed only with the optional `pdf` extra (PDF / deck / workbook
+*reading*), via `uv sync --extra pdf` from the app's extras row:
+
+| Project | License | Role | Source |
+|---|---|---|---|
+| Docling (`docling-slim`, `docling-core`, `docling-parse`) | MIT | Document reader: layout analysis, table structure, OCR orchestration | <https://github.com/docling-project/docling> |
+| docling-ibm-models | MIT | The layout + TableFormer model code | <https://github.com/docling-project/docling-ibm-models> |
+| PyTorch (`torch`) | BSD-3-Clause | Inference runtime for the layout and table models | <https://github.com/pytorch/pytorch> |
+| torchvision | BSD-3-Clause | Vision ops required by the model code above | <https://github.com/pytorch/vision> |
+| Transformers | Apache-2.0 | Model loading for the layout model | <https://github.com/huggingface/transformers> |
+| OpenCV (`opencv-python-headless`) | Apache-2.0 | Image ops inside TableFormer's predictor (headless build — no GUI, no Qt) | <https://github.com/opencv/opencv-python> |
+| pypdfium2 (PDFium) | Apache-2.0 OR BSD-3-Clause (PDFium: BSD-3-Clause) | PDF page rendering and page counts | <https://github.com/pypdfium2-team/pypdfium2> |
+| ocrmac | MIT | macOS OCR via Apple's Vision framework (the OCR engine on macOS) | <https://github.com/straussmaximilian/ocrmac> |
+| RapidOCR + onnxruntime | Apache-2.0 / MIT | OCR engine on non-macOS platforms | <https://github.com/RapidAI/RapidOCR> |
+| python-pptx, openpyxl | MIT | Deck and workbook readers | <https://github.com/scanny/python-pptx> |
+
 ### Front-end
 
 | Project | License | Role | Source |
@@ -151,7 +181,6 @@ to run the MADLAD-400 translation model offline:
 | Project | License | Role | Source |
 |---|---|---|---|
 | Tor | BSD-3-Clause | Anonymized web fetch for off-allowlist domains (used by the broker's `fetch_url` tool) | <https://www.torproject.org> |
-| Pandoc | GPL-2.0-or-later | HTML→markdown conversion for fetched documents (invoked as an external binary; not bundled with this package) | <https://pandoc.org> |
 | Harper | Apache-2.0 | Local grammar/spell checker (Automattic). Installed via `brew install harper`, which provides `harper-cli` (used by the `analyzer` skill's proofread mode) and `harper-ls` (a language server, unused by enough). Not bundled with this package. | <https://github.com/Automattic/harper> |
 
 ### System fonts (referenced, not bundled)
@@ -190,6 +219,25 @@ MADLAD-400 weights (3B and 7B) are released by Google under Apache 2.0
 linked above. They power the `translator` skill and live at
 `~/.local/share/translator/` after first download (override with the
 `TRANSLATOR_HOME` env var).
+
+### Document-reading models (the `pdf` extra)
+
+Also **not bundled**, and fetched only if the user installs the optional
+`pdf` extra: the layout and table models docling loads to read a PDF, a
+deck, or a workbook. They are downloaded once at install time (about
+0.7 GB) into `~/enough/weights/docling/` and never leave the machine.
+They are separate artifacts from the Python packages above and carry
+their own terms — check the model card before commercial use.
+
+| Model | Source license | Weights repo |
+|---|---|---|
+| docling-layout-heron (layout analysis) | Apache-2.0 | <https://huggingface.co/docling-project/docling-layout-heron> |
+| docling-layout-heron-onnx (ONNX build of the same; the downloader fetches every engine variant of the layout spec) | Apache-2.0 | <https://huggingface.co/docling-project/docling-layout-heron-onnx> |
+| docling-models (TableFormer, fast + accurate) | CDLA-Permissive-2.0 and Apache-2.0, per the model card | <https://huggingface.co/docling-project/docling-models> |
+
+On macOS the OCR stage is Apple's own Vision framework (via `ocrmac`), so
+no OCR weights are downloaded there; elsewhere RapidOCR's ONNX models are
+fetched alongside the two above.
 
 ---
 

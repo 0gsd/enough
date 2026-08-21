@@ -45,13 +45,28 @@ const SIGKILL_WAIT: Duration = Duration::from_secs(2);
 /// much of that a native alert gets — a whole Python traceback in an NSAlert
 /// is a wall the user scrolls past; the full buffer still goes to stderr.
 const LOG_TAIL_LINES: usize = 60;
-const DIALOG_TAIL_LINES: usize = 16;
+pub const DIALOG_TAIL_LINES: usize = 16;
+
+/// Which of the backend's two shapes a child is (home-plan §1.1).
+///
+/// The shell knows because it wrote the argv — there is no probe and no
+/// second source of truth. Everything mode-dependent hangs off this: the
+/// readiness probe below (a home server 404s `/api/project`), the File and
+/// View menus' enablement, and what an exit 42 with no handoff file means.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Mode {
+    /// `enough --home` — the launch screen. No project, no session, no llm.
+    Home,
+    /// `enough` in a project directory — everything the app has always been.
+    Project,
+}
 
 pub struct Backend {
     child: Child,
     pub port: u16,
     pub token: String,
     pub project: PathBuf,
+    pub mode: Mode,
     log: Arc<Mutex<VecDeque<String>>>,
 }
 
@@ -254,6 +269,9 @@ pub fn which_for_child(home: &Path, name: &str) -> Option<PathBuf> {
 /// * `PATH` — Finder gives a GUI app `/usr/bin:/bin:/usr/sbin:/sbin`.
 /// * `ENOUGH_LLAMA_SERVER` — the sidecar. `models.find_llama_server()` reads
 ///   it first, ahead of `~/enough/bin` and PATH.
+/// * `ENOUGH_DESKTOP_UV` — the uv we spawned the child with. The backend's
+///   extras installer shells out to `uv sync --extra …` and has no other way
+///   to find the sidecar, which is inside the .app and never on PATH.
 /// * `UV_PROJECT_ENVIRONMENT` / `PYTHONPYCACHEPREFIX` — keep every write out
 ///   of the signed bundle. See `venv_dir` / `pycache_dir`.
 pub fn apply_child_env(cmd: &mut Command, home: &Path, root: &Path) {
@@ -262,6 +280,14 @@ pub fn apply_child_env(cmd: &mut Command, home: &Path, root: &Path) {
     if std::env::var_os("ENOUGH_LLAMA_SERVER").is_none() {
         if let Some(llama) = bundled::locate().llama_server {
             cmd.env("ENOUGH_LLAMA_SERVER", llama);
+        }
+    }
+    if std::env::var_os("ENOUGH_DESKTOP_UV").is_none() {
+        // `find_uv` reads this variable first, so it can only resolve to the
+        // sidecar (or PATH) here — passing the answer down costs one lookup
+        // and saves the backend from guessing.
+        if let Ok(uv) = find_uv(home) {
+            cmd.env("ENOUGH_DESKTOP_UV", uv);
         }
     }
     if std::env::var_os("UV_PROJECT_ENVIRONMENT").is_none() {
@@ -297,6 +323,37 @@ fn uv_run_args(root: &Path) -> Vec<String> {
     v
 }
 
+/// The backend's own argv, after `uv run --project <root>`.
+///
+/// Pulled out of [`Backend::spawn_in`] because it is the *only* thing the two
+/// modes differ by, and because it is the one part of the spawn a unit test
+/// can look at. `--home` and `--dir` are mutually exclusive in `__main__.py`;
+/// the shell has never passed `--dir` (it uses `cwd` instead), so a home
+/// spawn is simply the same line plus the flag.
+fn enough_args(mode: Mode, port: u16, llm_url: Option<&str>) -> Vec<String> {
+    let mut v = vec![
+        "enough".to_string(),
+        "--port".to_string(),
+        port.to_string(),
+        "--no-browser".to_string(),
+    ];
+    // `--llm-url` is normally never passed (tauri-plan 2a: 8080 and the
+    // supervisor's adopt-or-launch behave exactly as they do from the CLI).
+    // The override exists for QA: a scratch run must be able to stay off the
+    // machine's real llama-server, which is shared state the ENOUGH_* hooks
+    // can't isolate. It rides into home mode too — home has no llm, but it
+    // re-execs *into* projects, and `home.exec_argv` passes the flag straight
+    // back out (home-plan §1.7).
+    if let Some(url) = llm_url.filter(|u| !u.is_empty()) {
+        v.push("--llm-url".to_string());
+        v.push(url.to_string());
+    }
+    if mode == Mode::Home {
+        v.push("--home".to_string());
+    }
+    v
+}
+
 fn mint_token() -> String {
     let nanos = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
@@ -310,7 +367,23 @@ fn mint_token() -> String {
 // ---------------------------------------------------------------------------
 
 impl Backend {
+    /// Spawn a project backend in `project` — the flow the shell has always
+    /// had, unchanged.
     pub fn spawn(project: &Path, home: &Path, port: u16) -> Result<Backend, String> {
+        Backend::spawn_in(Mode::Project, project, home, port)
+    }
+
+    /// Spawn the home screen (home-plan §5).
+    ///
+    /// `cwd` is the user's home directory rather than a project: `--home`
+    /// refuses `--dir`, and `__main__.py` hands `Path.cwd()` to a
+    /// `create_app(home=True)` that never reads it. `$HOME` is simply the
+    /// most boring directory guaranteed to exist.
+    pub fn spawn_home(home: &Path, port: u16) -> Result<Backend, String> {
+        Backend::spawn_in(Mode::Home, home, home, port)
+    }
+
+    fn spawn_in(mode: Mode, project: &Path, home: &Path, port: u16) -> Result<Backend, String> {
         let uv = find_uv(home)?;
         let root = code_root(home);
         if !root.join("pyproject.toml").is_file() {
@@ -323,22 +396,10 @@ impl Backend {
         let token = mint_token();
         let log: Arc<Mutex<VecDeque<String>>> = Arc::new(Mutex::new(VecDeque::new()));
 
+        let llm_url = std::env::var("ENOUGH_DESKTOP_LLM_URL").unwrap_or_default();
         let mut cmd = Command::new(&uv);
         cmd.args(uv_run_args(&root))
-            .arg("enough")
-            .arg("--port")
-            .arg(port.to_string())
-            .arg("--no-browser");
-        // `--llm-url` is normally never passed (tauri-plan 2a: 8080 and the
-        // supervisor's adopt-or-launch behave exactly as they do from the
-        // CLI). The override exists for QA: a scratch run must be able to
-        // stay off the machine's real llama-server, which is shared state the
-        // ENOUGH_* hooks can't isolate.
-        if let Ok(url) = std::env::var("ENOUGH_DESKTOP_LLM_URL") {
-            if !url.is_empty() {
-                cmd.arg("--llm-url").arg(url);
-            }
-        }
+            .args(enough_args(mode, port, Some(llm_url.as_str())));
         cmd.current_dir(project)
             // The parent environment is inherited wholesale — that's both the
             // ENOUGH_DESKTOP_CODE dev path and the seam a QA harness uses to
@@ -356,7 +417,7 @@ impl Backend {
         apply_child_env(&mut cmd, home, &root);
 
         eprintln!(
-            "[enough-desktop] backend code={} (snapshot {}) uv={}",
+            "[enough-desktop] backend mode={mode:?} code={} (snapshot {}) uv={}",
             root.display(),
             bundled::snapshot_stamp(&root),
             uv.display()
@@ -392,12 +453,28 @@ impl Backend {
             port,
             token,
             project: project.to_path_buf(),
+            mode,
             log,
         })
     }
 
     pub fn url(&self) -> String {
         format!("http://127.0.0.1:{}", self.port)
+    }
+
+    /// Has the child gone? `Some(code)` is its exit status (`None` inside the
+    /// `Some` when a signal took it); the outer `None` means it's still up.
+    ///
+    /// This is the exit-42 watcher's whole interface to the child — the
+    /// launch thread polls it rather than blocking on `wait()`, because the
+    /// same `Backend` has to stay reachable by the quit path's `shutdown()`.
+    pub fn exited(&mut self) -> Option<Option<i32>> {
+        match self.child.try_wait() {
+            Ok(Some(status)) => Some(status.code()),
+            Ok(None) => None,
+            // Already reaped by someone else — treat it as gone, with no code.
+            Err(_) => Some(None),
+        }
     }
 
     /// The last `n` lines the backend printed.
@@ -411,12 +488,24 @@ impl Backend {
             .unwrap_or_default()
     }
 
-    /// Poll `/api/project` until the backend answers. Returns early with the
-    /// child's own output if it dies first — that's how the ~/enough refusal
-    /// and any other startup error reach the user as a readable message.
+    /// The route that says "this backend is up", and a substring of the answer
+    /// only that backend gives. Mode-dependent because `ModeGate` 404s the
+    /// other mode's routes: a home server has no `/api/project` to answer.
+    fn ready_probe(&self) -> (&'static str, &'static str) {
+        match self.mode {
+            Mode::Project => ("/api/project", "\"folder\""),
+            Mode::Home => ("/api/home/projects", "\"projects\""),
+        }
+    }
+
+    /// Poll the mode's readiness route until the backend answers. Returns
+    /// early with the child's own output if it dies first — that's how the
+    /// ~/enough refusal and any other startup error reach the user as a
+    /// readable message.
     pub fn wait_ready(&mut self, mut on_progress: impl FnMut(&str)) -> Result<(), String> {
         let started = Instant::now();
         let mut announced_slow = false;
+        let (route, marker) = self.ready_probe();
         loop {
             if let Ok(Some(status)) = self.child.try_wait() {
                 let tail = self.log_tail(DIALOG_TAIL_LINES);
@@ -429,8 +518,8 @@ impl Backend {
                     "The enough backend stopped while starting up ({status}).{detail}"
                 ));
             }
-            if let Some(r) = http::get(self.port, "/api/project", Duration::from_millis(1200)) {
-                if r.status == 200 && r.body.contains("\"folder\"") {
+            if let Some(r) = http::get(self.port, route, Duration::from_millis(1200)) {
+                if r.status == 200 && r.body.contains(marker) {
                     return Ok(());
                 }
             }
@@ -517,5 +606,44 @@ impl Backend {
         self.signal_group(libc::SIGKILL);
         self.wait_for_exit(SIGKILL_WAIT);
         "SIGKILL"
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_project_spawn_is_the_line_it_always_was() {
+        let v = enough_args(Mode::Project, 3456, None);
+        assert_eq!(v, vec!["enough", "--port", "3456", "--no-browser"]);
+        assert!(!v.iter().any(|a| a == "--home"));
+        // The shell has never passed `--dir`; `cwd` is the project. That is
+        // what makes a home spawn legal (`--home` refuses `--dir`).
+        assert!(!v.iter().any(|a| a == "--dir"));
+    }
+
+    #[test]
+    fn a_home_spawn_adds_exactly_one_flag() {
+        let project = enough_args(Mode::Project, 51234, None);
+        let mut expected = project.clone();
+        expected.push("--home".to_string());
+        assert_eq!(enough_args(Mode::Home, 51234, None), expected);
+    }
+
+    #[test]
+    fn the_qa_llm_override_rides_in_both_modes() {
+        // A scratch run must not come back from a project → home → project
+        // round trip pointed at the machine's real llama-server, so the flag
+        // goes to a home server too even though it has no llm.
+        for mode in [Mode::Project, Mode::Home] {
+            let v = enough_args(mode, 3456, Some("http://127.0.0.1:9999"));
+            let i = v.iter().position(|a| a == "--llm-url").expect("passed through");
+            assert_eq!(v[i + 1], "http://127.0.0.1:9999");
+        }
+        // An unset (empty) override adds nothing.
+        assert!(!enough_args(Mode::Project, 3456, Some(""))
+            .iter()
+            .any(|a| a == "--llm-url"));
     }
 }

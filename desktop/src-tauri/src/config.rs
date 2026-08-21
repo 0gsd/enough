@@ -165,6 +165,76 @@ pub fn config_path() -> PathBuf {
     state_home().join("config").join("desktop.json")
 }
 
+/// Python's `Path.expanduser()`, for the two env seams below — both of which
+/// are read on the Python side with `.expanduser()`, so a `~/…` value has to
+/// mean the same thing on both sides of the handoff.
+fn expand_user(raw: &str) -> PathBuf {
+    match raw.strip_prefix('~') {
+        Some("") => home_dir(),
+        Some(rest) if rest.starts_with('/') => home_dir().join(&rest[1..]),
+        _ => PathBuf::from(raw),
+    }
+}
+
+/// The directory the backend keeps *its* shared files in — the project
+/// registry, and the `.home-open` handoff file the shell reads after an
+/// exit 42 (home-plan §1.7).
+///
+/// `enough/home.py` derives that whole set from `ENOUGH_PROJECTS_STATE`'s
+/// **parent directory**, so the shell has to read the same seam: a QA run
+/// that redirects the registry drops its handoff file beside it, and a shell
+/// that only knew `$HOME` would look in the wrong place. Note that
+/// [`config_path`] deliberately does *not* follow this seam — desktop.json is
+/// the shell's own file and stays on `$HOME`, which is what makes a
+/// registry-only seam produce an empty (scratch) seed rather than the
+/// developer's real MRU.
+pub fn enough_config_dir() -> PathBuf {
+    if let Ok(p) = std::env::var("ENOUGH_PROJECTS_STATE") {
+        if !p.is_empty() {
+            if let Some(parent) = expand_user(&p).parent() {
+                return parent.to_path_buf();
+            }
+        }
+    }
+    state_home().join("config")
+}
+
+/// `~/enough/config/ui.json`, honoring the same `ENOUGH_UI_CONFIG` hook
+/// `server.py::_ui_config_live_path` reads.
+///
+/// The shell only ever *reads* this file, and only for one key — see
+/// [`ui_flag`].
+pub fn ui_config_path() -> PathBuf {
+    if let Ok(p) = std::env::var("ENOUGH_UI_CONFIG") {
+        if !p.is_empty() {
+            return expand_user(&p);
+        }
+    }
+    state_home().join("config").join("ui.json")
+}
+
+/// The ui-config key behind the View menu's checkbox (home-plan §1.10).
+pub const SHOW_HIDDEN_KEY: &str = "home_show_hidden";
+
+/// Read one top-level boolean out of ui.json, defaulting to `false`.
+///
+/// This is how the native check mark stays honest without an IPC surface:
+/// the webview owns the toggle and persists it through `/api/ui-config`, and
+/// the shell re-reads the persisted value at the moment it acts. A missing,
+/// unparsable, or non-boolean value is `false` — the frontend's own default.
+pub fn ui_flag(key: &str) -> bool {
+    read_ui_flag_at(&ui_config_path(), key)
+}
+
+/// [`ui_flag`] with the path injected, so the tests never need `$HOME`.
+fn read_ui_flag_at(path: &Path, key: &str) -> bool {
+    std::fs::read_to_string(path)
+        .ok()
+        .and_then(|t| serde_json::from_str::<serde_json::Value>(&t).ok())
+        .and_then(|v| v.get(key).and_then(|b| b.as_bool()))
+        .unwrap_or(false)
+}
+
 /// Read desktop.json, creating it with defaults when it's missing.
 ///
 /// A corrupt file is treated as absent but is *not* overwritten until the
@@ -218,6 +288,26 @@ impl DesktopConfig {
 /// folder — the same test tauri-plan §2 gates the reopen path on.
 pub fn is_enough_project(dir: &Path) -> bool {
     dir.join("rness").is_dir()
+}
+
+/// A throwaway directory for the unit tests.
+///
+/// `tempfile` is not a dependency — three crates for one `mkdir`, in a shell
+/// whose short dependency list is a stated feature — and the pid plus a
+/// counter is unique enough for a test binary that only runs on this machine.
+/// Every caller cleans up; a leftover under `$TMPDIR` is harmless either way.
+#[cfg(test)]
+pub(crate) fn scratch_dir(tag: &str) -> PathBuf {
+    use std::sync::atomic::{AtomicU32, Ordering};
+    static N: AtomicU32 = AtomicU32::new(0);
+    let dir = std::env::temp_dir().join(format!(
+        "enough-desktop-test-{}-{tag}-{}",
+        std::process::id(),
+        N.fetch_add(1, Ordering::SeqCst)
+    ));
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).expect("scratch dir");
+    dir
 }
 
 #[cfg(test)]
@@ -340,6 +430,49 @@ mod tests {
         let back: DesktopConfig =
             serde_json::from_str(&serde_json::to_string(&cfg).unwrap()).unwrap();
         assert!(back.onboarding_complete());
+    }
+
+    // -----------------------------------------------------------------------
+    // The files the shell shares with the backend (home-plan §5)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn expanduser_matches_the_python_side() {
+        let home = home_dir();
+        assert_eq!(expand_user("~"), home);
+        assert_eq!(expand_user("~/enough/config/x.json"), home.join("enough/config/x.json"));
+        // Only a leading `~` on its own path segment expands — `~foo` is
+        // another user's home to Python too, and we don't resolve those.
+        assert_eq!(expand_user("~scratch/x"), PathBuf::from("~scratch/x"));
+        assert_eq!(expand_user("/tmp/x.json"), PathBuf::from("/tmp/x.json"));
+    }
+
+    #[test]
+    fn the_show_hidden_flag_reads_out_of_ui_json() {
+        let dir = scratch_dir("uiflag");
+        let path = dir.join("ui.json");
+
+        // Absent file → the frontend's own default.
+        assert!(!read_ui_flag_at(&path, SHOW_HIDDEN_KEY));
+
+        std::fs::write(&path, r#"{"theme":"darknest","home_show_hidden":true}"#).unwrap();
+        assert!(read_ui_flag_at(&path, SHOW_HIDDEN_KEY));
+
+        std::fs::write(&path, r#"{"home_show_hidden":false}"#).unwrap();
+        assert!(!read_ui_flag_at(&path, SHOW_HIDDEN_KEY));
+
+        // A non-boolean (or a key we don't recognise) is false, not a panic.
+        std::fs::write(&path, r#"{"home_show_hidden":"yes"}"#).unwrap();
+        assert!(!read_ui_flag_at(&path, SHOW_HIDDEN_KEY));
+        std::fs::write(&path, r#"{"home_view":"list"}"#).unwrap();
+        assert!(!read_ui_flag_at(&path, SHOW_HIDDEN_KEY));
+
+        // ui.json is the backend's file; a half-written one must not take the
+        // menu down.
+        std::fs::write(&path, "{not json at all").unwrap();
+        assert!(!read_ui_flag_at(&path, SHOW_HIDDEN_KEY));
+
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

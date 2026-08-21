@@ -57,3 +57,8 @@ docs/girraphs.md
 docs/help-system-plan.md
 docs/merirmaid-plan.md
 docs/mode-stack-plan.md
+
+# Local planning docs for in-flight rounds (the "landed blocks" convention).
+# AGENT_GUIDE.md is the durable record; these two stay on the dev machine.
+docs/convert-plan.md
+docs/home-plan.md

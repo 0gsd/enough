@@ -105,7 +105,7 @@ an archive.org item, etc.:
    content unless the user explicitly approves it.
 2. Call `fetch_url` with the URL. The broker:
    - fetches directly for allowlisted hosts, via Tor otherwise
-   - converts HTML to markdown via pandoc
+   - converts HTML to markdown via pandoc (bundled with enough)
    - caches the result under
      `rness/io/input/<timestamp>-<hash>-<slug>.md`
    - appends a row to `rness/io/input/_broker-index.md` (a queryable

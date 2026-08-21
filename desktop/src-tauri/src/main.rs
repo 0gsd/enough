@@ -26,6 +26,11 @@ use tauri::{Manager, RunEvent, WebviewUrl, WebviewWindowBuilder, WindowEvent, Wr
 
 /// Menu id for the one setting the shell owns.
 const REOPEN_ITEM_ID: &str = "toggle-reopen-last-project";
+/// File → Close Project (⌘W), home-plan §5. Enabled only while a *project*
+/// backend is running.
+const CLOSE_PROJECT_ITEM_ID: &str = "close-project";
+/// View → Show Hidden Projects, home-plan §1.10. Enabled only in home mode.
+const SHOW_HIDDEN_ITEM_ID: &str = "toggle-show-hidden-projects";
 
 /// Set by the SIGTERM/SIGINT handler; drained by a polling thread.
 static SIGNALLED: AtomicBool = AtomicBool::new(false);
@@ -61,15 +66,28 @@ fn watch_for_signals(app: tauri::AppHandle) {
 
 #[derive(Default)]
 pub struct AppState {
+    /// The backend the window is pointing at. Its `mode` is how the shell
+    /// knows whether it is showing a project or the home screen — it spawned
+    /// the child, so it knows the argv (home-plan §5).
     pub backend: Mutex<Option<backend::Backend>>,
     /// The throwaway backend the onboarding wizard's model step runs against
     /// (onboarding.rs). Separate from `backend` because it is stopped at a
     /// different moment and never becomes the window's destination.
     pub wizard_backend: Mutex<Option<backend::Backend>>,
+    /// A project backend that ⌘W is in the middle of stopping. Its own slot
+    /// so the launch thread's watcher doesn't read the exit as a crash, and
+    /// so a quit arriving mid-close still finds something to wait for rather
+    /// than orphaning a uvicorn.
+    pub closing_backend: Mutex<Option<backend::Backend>>,
+    /// What the launch thread should bring up next, when a menu action rather
+    /// than an exit code decided it.
+    pub next_target: Mutex<Option<launch::LaunchTarget>>,
     /// Flipped by `ob_advance` when the last step lands; the launch thread is
     /// parked on it.
     pub onboarding_done: AtomicBool,
     pub reopen_item: Mutex<Option<CheckMenuItem<Wry>>>,
+    pub close_project_item: Mutex<Option<MenuItem<Wry>>>,
+    pub show_hidden_item: Mutex<Option<CheckMenuItem<Wry>>>,
     pub quitting: AtomicBool,
 }
 
@@ -110,7 +128,8 @@ fn main() {
             Ok(())
         })
         .on_menu_event(|app, event| {
-            if event.id() == REOPEN_ITEM_ID {
+            let id = event.id();
+            if id == REOPEN_ITEM_ID {
                 let mut cfg = config::load();
                 cfg.reopen_last_project = !cfg.reopen_last_project;
                 if let Err(e) = config::save(&cfg) {
@@ -121,6 +140,12 @@ fn main() {
                 if let Some(item) = item {
                     let _ = item.set_checked(cfg.reopen_last_project);
                 }
+            } else if id == CLOSE_PROJECT_ITEM_ID {
+                // Returns immediately; the graceful shutdown and the home
+                // spawn happen off the menu thread.
+                launch::request_close_project(app);
+            } else if id == SHOW_HIDDEN_ITEM_ID {
+                launch::toggle_show_hidden(app);
             }
         })
         .on_window_event(|window, event| {
@@ -170,8 +195,14 @@ fn begin_quit(app: &tauri::AppHandle) {
     });
 }
 
-/// The whole native surface: an app menu carrying the one desktop setting,
-/// and an Edit menu — without which copy/paste is dead in the WKWebView.
+/// The whole native surface: an app menu carrying the one desktop setting, a
+/// File menu with Close Project, a View menu with the home screen's one
+/// toggle, and an Edit menu — without which copy/paste is dead in the
+/// WKWebView.
+///
+/// The two new items start **disabled**: nothing is running when the menu is
+/// built, and `launch::sync_mode_menus` turns exactly one of them on each
+/// time a backend comes up.
 fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<Wry>> {
     let cfg = config::load();
 
@@ -183,11 +214,35 @@ fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<Wry>> {
         cfg.reopen_last_project,
         None::<&str>,
     )?;
-    app.state::<Arc<AppState>>()
-        .reopen_item
-        .lock()
-        .unwrap()
-        .replace(reopen.clone());
+    let close_project = MenuItem::with_id(
+        app,
+        CLOSE_PROJECT_ITEM_ID,
+        "Close Project",
+        false,
+        Some("CmdOrCtrl+W"),
+    )?;
+    let show_hidden = CheckMenuItem::with_id(
+        app,
+        SHOW_HIDDEN_ITEM_ID,
+        "Show Hidden Projects",
+        false,
+        config::ui_flag(config::SHOW_HIDDEN_KEY),
+        None::<&str>,
+    )?;
+    {
+        let state = app.state::<Arc<AppState>>();
+        state.reopen_item.lock().unwrap().replace(reopen.clone());
+        state
+            .close_project_item
+            .lock()
+            .unwrap()
+            .replace(close_project.clone());
+        state
+            .show_hidden_item
+            .lock()
+            .unwrap()
+            .replace(show_hidden.clone());
+    }
 
     let app_menu = Submenu::with_items(
         app,
@@ -209,6 +264,11 @@ fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<Wry>> {
         ],
     )?;
 
+    // home-plan §5. One item, because closing a project is the only file-ish
+    // thing the shell does — everything else about a project lives in the web
+    // UI, which has its own affordances.
+    let file_menu = Submenu::with_items(app, "File", true, &[&close_project])?;
+
     let edit_menu = Submenu::with_items(
         app,
         "Edit",
@@ -224,6 +284,11 @@ fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<Wry>> {
         ],
     )?;
 
+    let view_menu = Submenu::with_items(app, "View", true, &[&show_hidden])?;
+
+    // No `close_window` item: on macOS the predefined one carries ⌘W, which
+    // now belongs to Close Project. The app is one window and closing it
+    // quits, so ⌘Q and the red button already cover it.
     let window_menu = Submenu::with_items(
         app,
         "Window",
@@ -231,10 +296,12 @@ fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<Wry>> {
         &[
             &PredefinedMenuItem::minimize(app, None)?,
             &PredefinedMenuItem::fullscreen(app, None)?,
-            &PredefinedMenuItem::separator(app)?,
-            &PredefinedMenuItem::close_window(app, None)?,
         ],
     )?;
 
-    Menu::with_items(app, &[&app_menu, &edit_menu, &window_menu])
+    // On macOS the first submenu is the app menu, whatever it is called.
+    Menu::with_items(
+        app,
+        &[&app_menu, &file_menu, &edit_menu, &view_menu, &window_menu],
+    )
 }

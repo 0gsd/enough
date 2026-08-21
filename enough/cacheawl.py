@@ -373,28 +373,97 @@ def _safe_subrel(box: Path, subpath: str) -> tuple[str, ...]:
     return p.parts
 
 
+def folder_flowchart(
+    base: Path,
+    root_label: str,
+    *,
+    start: tuple[str, ...] = (),
+    meta_lines: list[str] | None = None,
+    skip: Callable[[Path], bool] | None = None,
+    max_depth: int = MIRROR_MAX_DEPTH,
+) -> tuple[str, dict[str, dict[str, Any]]]:
+    """A Mermaid ``flowchart TD`` mirroring a folder tree. **Shared** — the
+    cachebox mirrors below and the home screen's project mirrors
+    (``home.build_project_mirror``) are the same diagram with different
+    labels, so they are the same code.
+
+    - ``base`` roots the relative paths and node ids; ``start`` is the
+      subtree to actually draw (``()`` = all of ``base``).
+    - ``root_label`` and ``meta_lines`` are raw text — escaping is ours.
+      ``meta_lines`` of ``None`` omits the ``🛈`` node entirely.
+    - ``skip(p)`` hides an entry from the diagram; the depth-cap's
+      "… N items" node counts exactly the files that were *not* skipped.
+
+    Returns ``(body, node_map)`` where ``node_map`` is ``{node_id: {"path":
+    <base-relative path>, "is_dir": bool}}`` — the viewer's shift-click menu
+    resolves a rendered node back to its on-disk location through it.
+    """
+    lines = ["flowchart TD"]
+    edges: list[str] = []
+    node_map: dict[str, dict[str, Any]] = {}
+    hidden = skip or (lambda _p: False)
+
+    root_id = "root"
+    lines.append(f'  {root_id}["{_mm_label(root_label)}"]')
+    node_map[root_id] = {"path": "/".join(start), "is_dir": True}
+
+    if meta_lines:
+        lines.append(f'  meta["🛈 {_mm_label("<br/>".join(meta_lines))}"]')
+        edges.append(f"  {root_id} -.-> meta")
+
+    def walk(rel_parts: tuple[str, ...], parent_id: str, level: int) -> None:
+        here = base.joinpath(*rel_parts)
+        try:
+            entries = sorted(
+                here.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower())
+            )
+        except OSError:
+            return
+        entries = [e for e in entries if not hidden(e)]
+        # Depth cap: collapse everything below the cap into one count node.
+        if level >= max_depth and entries:
+            descendants = [p for p in here.rglob("*") if p.is_file() and not hidden(p)]
+            cid = _node_id("/".join(rel_parts) + "/…")
+            lines.append(f'  {cid}["… {len(descendants)} items"]')
+            edges.append(f"  {parent_id} --> {cid}")
+            # The collapse node stands in for its (uncollapsed) folder.
+            node_map[cid] = {"path": "/".join(rel_parts), "is_dir": True}
+            return
+        for e in entries:
+            rel = "/".join(rel_parts + (e.name,))
+            nid = _node_id(rel)
+            node_map[nid] = {"path": rel, "is_dir": e.is_dir()}
+            if e.is_dir():
+                lines.append(f'  {nid}["📁 {_mm_label(e.name)}"]')
+                edges.append(f"  {parent_id} --> {nid}")
+                walk(rel_parts + (e.name,), nid, level + 1)
+            else:
+                lines.append(f'  {nid}["📄 {_mm_label(e.name)}"]')
+                edges.append(f"  {parent_id} --> {nid}")
+
+    walk(start, root_id, 0)
+    return "\n".join(lines + edges) + "\n", node_map
+
+
+def _cachebox_skip(p: Path) -> bool:
+    """What a cachebox mirror never draws: its own metadata and mirror files,
+    and any dotfile (the same set ``_content_files`` calls "not content")."""
+    return p.name in (META_NAME, MIRROR_NAME) or p.name.startswith(".")
+
+
 def _mirror_body(name: str, meta: dict[str, Any], box: Path,
                  subpath: str = "") -> tuple[str, dict[str, dict[str, Any]]]:
     """The Mermaid ``flowchart TD`` for a cachebox (``subpath=""``) or a
     subfolder within it: a root node, folder and file nodes mirroring the
     tree (depth-capped), and a metadata node.
 
-    Returns ``(body, node_map)`` where ``node_map`` is ``{node_id: {"path":
-    <box-relative path>, "is_dir": bool}}`` — the viewer's shift-click menu
-    resolves a rendered node back to its on-disk location through it. Paths
-    are relative to the **box root** regardless of ``subpath`` (join with
-    the box dir for the absolute path)."""
+    Node/edge generation is `folder_flowchart`; what's cachebox-specific is
+    the two labels."""
     subrel = _safe_subrel(box, subpath)
     base = box.joinpath(*subrel)
-    lines = ["flowchart TD"]
-    edges: list[str] = []
-    node_map: dict[str, dict[str, Any]] = {}
     stats = _stats(base)
 
-    root_id = "root"
-    root_label = f"📁 {_mm_label(subrel[-1])}" if subrel else f"📦 {_mm_label(name)}"
-    lines.append(f'  {root_id}["{root_label}"]')
-    node_map[root_id] = {"path": "/".join(subrel), "is_dir": True}
+    root_label = f"📁 {subrel[-1]}" if subrel else f"📦 {name}"
 
     # Metadata node — full origin for a box root; a lighter folder header
     # for a subfolder (origin is box-level, not per-folder).
@@ -421,45 +490,8 @@ def _mirror_body(name: str, meta: dict[str, Any], box: Path,
             f"created: {meta.get('created_at', '?')}",
             f"updated: {meta.get('updated_at', '?')}",
         ]
-    meta_label = _mm_label("<br/>".join(meta_lines))
-    lines.append(f'  meta["🛈 {meta_label}"]')
-    edges.append(f"  {root_id} -.-> meta")
-
-    def walk(rel_parts: tuple[str, ...], parent_id: str, level: int) -> None:
-        here = box.joinpath(*rel_parts)
-        try:
-            entries = sorted(
-                here.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower())
-            )
-        except OSError:
-            return
-        entries = [e for e in entries
-                   if e.name != META_NAME and e.name != MIRROR_NAME
-                   and not e.name.startswith(".")]
-        # Depth cap: collapse everything below the cap into one count node.
-        if level >= MIRROR_MAX_DEPTH and entries:
-            descendants = [p for p in here.rglob("*") if p.is_file()
-                           and p.name not in (META_NAME, MIRROR_NAME)]
-            cid = _node_id("/".join(rel_parts) + "/…")
-            lines.append(f'  {cid}["… {len(descendants)} items"]')
-            edges.append(f"  {parent_id} --> {cid}")
-            # The collapse node stands in for its (uncollapsed) folder.
-            node_map[cid] = {"path": "/".join(rel_parts), "is_dir": True}
-            return
-        for e in entries:
-            rel = "/".join(rel_parts + (e.name,))
-            nid = _node_id(rel)
-            node_map[nid] = {"path": rel, "is_dir": e.is_dir()}
-            if e.is_dir():
-                lines.append(f'  {nid}["📁 {_mm_label(e.name)}"]')
-                edges.append(f"  {parent_id} --> {nid}")
-                walk(rel_parts + (e.name,), nid, level + 1)
-            else:
-                lines.append(f'  {nid}["📄 {_mm_label(e.name)}"]')
-                edges.append(f"  {parent_id} --> {nid}")
-
-    walk(subrel, root_id, 0)
-    return "\n".join(lines + edges) + "\n", node_map
+    return folder_flowchart(box, root_label, start=subrel,
+                            meta_lines=meta_lines, skip=_cachebox_skip)
 
 
 def _mirror_frontmatter(name: str, subpath: str = "") -> str:

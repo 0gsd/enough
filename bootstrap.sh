@@ -9,7 +9,7 @@
 #   1. platform check                 1. platform check (+ arch, distro)
 #   2. Homebrew present?              2. prerequisites: git, curl, tar, uv
 #   3. brew install llama.cpp uv         (uv via its official installer if
-#      tor whisper-cpp pandoc harper     missing); optional extras printed
+#      tor whisper-cpp harper            missing); optional extras printed
 #   4. clone/pull ~/enough            3. clone/pull ~/enough
 #   5. uv sync                        4. uv sync
 #                                     5. llama.cpp: pinned prebuilt release
@@ -130,7 +130,7 @@ BANNER
 if [[ "$PLATFORM" == "darwin" ]]; then
   note "This script sets up everything you need to run enough on a Mac:"
   note "  • Homebrew (package manager, if you don't have it)"
-  note "  • llama.cpp, uv, tor, whisper-cpp, pandoc, harper via Homebrew"
+  note "  • llama.cpp, uv, tor, whisper-cpp, harper via Homebrew"
   note "  • a clone of the enough repo at ~/enough"
   note "  • a GGUF model file in ~/enough/weights/"
   note "  • a whisper model for voice input in ~/enough/weights/whisper/"
@@ -147,7 +147,7 @@ else
   note "  • an \`enough\` command on your PATH (~/.local/bin)"
   note ""
   note "Nothing is installed system-wide and nothing needs sudo. Optional"
-  note "extras (pandoc, tor, whisper.cpp, harper) are printed with the"
+  note "extras (tor, whisper.cpp, harper) are printed with the"
   note "command to install them, never installed behind your back."
 fi
 note ""
@@ -163,7 +163,7 @@ fi
 # 1. Platform check
 # ---------------------------------------------------------------------------
 platform_darwin() {
-  note "enough v0.2.2 runs on macOS (the platform it grew up on) and Linux."
+  note "enough v0.2.5 runs on macOS (the platform it grew up on) and Linux."
   ok "macOS detected ($(sw_vers -productVersion))"
 }
 
@@ -206,7 +206,7 @@ deps_darwin() {
   step "checking for Homebrew"
   note "Homebrew is the standard package manager for macOS. We use it to install"
   note "llama.cpp (the LLM server), uv (fast Python env tool), tor (used by the"
-  note "broker to anonymize off-allowlist web fetches), and pandoc (HTML→markdown)."
+  note "broker to anonymize off-allowlist web fetches), and a couple of others."
   if command -v brew >/dev/null 2>&1; then
     ok "Homebrew is installed ($(brew --version | head -1))"
   else
@@ -216,15 +216,14 @@ deps_darwin() {
   fi
 
   step "installing Homebrew packages"
-  note "six utilities go on this pass:"
+  note "five utilities go on this pass:"
   note "  • llama.cpp   — the local LLM server that backs enough"
   note "  • uv          — manages the Python environment that runs enough itself"
   note "  • tor         — anonymization proxy used by the broker for off-allowlist web fetches"
   note "  • whisper-cpp — local speech-to-text for the mic button in chat"
-  note "  • pandoc      — universal document converter; used by the broker to convert fetched HTML to markdown"
   note "  • harper      — local grammar/spell checker (Apache 2.0, by Automattic) used by the analyzer skill's proofread mode"
 
-  for pkg in llama.cpp uv tor whisper-cpp pandoc harper; do
+  for pkg in llama.cpp uv tor whisper-cpp harper; do
     install_brew_pkg "$pkg"
   done
 }
@@ -303,9 +302,6 @@ deps_linux() {
   note "optional extras — enough degrades gracefully without every one of"
   note "these, and says so in the UI when it hits one. install what you want:"
   note ""
-  note "  • pandoc      — HTML→markdown for fetched pages (the broker falls"
-  note "                  back to raw HTML without it)"
-  note "                    $PKG_INSTALL pandoc"
   note "  • tor         — anonymizes off-allowlist web fetches (without it,"
   note "                  off-allowlist fetches are simply denied)"
   note "                    $PKG_INSTALL tor"
@@ -360,6 +356,12 @@ note "installs every Python dependency enough needs. No global pip pollution."
 note "this also includes:"
 note "  • ctranslate2, sentencepiece, huggingface_hub — for the offline"
 note "    \`translator\` skill (used by step 8 below)"
+note "  • pypandoc-binary + typst — the document converters. both ship as"
+note "    python wheels, so every install can open word/opendocument/rtf/"
+note "    epub files as markdown and export any markdown to PDF, with no"
+note "    separate package to chase. (reading PDFs, powerpoint decks and"
+note "    excel workbooks is a bigger optional extra, installed later from"
+note "    inside enough — see step 10.)"
 if [[ "$PLATFORM" == "darwin" ]]; then
   note "  • keyring — the cross-platform binding to the OS credential store"
   note "    (macOS Keychain on this machine). Used by the optional OpenRouter"
@@ -902,6 +904,19 @@ note "     enough"
 note ""
 note "  4. open http://127.0.0.1:3456 and say hi to your fresh agent."
 note ""
+note "  (from then on, \`enough --home\` opens the home screen from anywhere:"
+note "   every folder you've made into a project, in one list, with a button"
+note "   for adding another. \`enough\` in a project folder still opens that"
+note "   project directly, exactly as above.)"
+note ""
+note "optional, and installed from inside enough rather than from here:"
+note ""
+note "  • PDF reading (the \`pdf\` extra) — opens PDFs, powerpoint decks and"
+note "    excel workbooks as editable markdown. ⚙ UI window → extras."
+note "    about 250 MB to download, about 1 GB on disk, plus about 0.7 GB"
+note "    of document models in ~/enough/weights/docling/. writing PDFs out"
+note "    of markdown already works without it."
+note ""
 note "optional: enable the OpenRouter cloud-model slot (OPRO-API)"
 note ""
 note "  enough is local-first by default — whichever local models you just"
@@ -929,7 +944,7 @@ note "  than the marginal electricity of local inference. the choice is yours."
 note ""
 if [[ "$PLATFORM" == "linux" ]]; then
   note "optional extras you may still want (nothing here installed them):"
-  note "    $PKG_INSTALL pandoc tor"
+  note "    $PKG_INSTALL tor"
   note "  plus whisper.cpp and harper, built from their own repos. enough"
   note "  degrades gracefully without each of them and says which is missing."
   note ""

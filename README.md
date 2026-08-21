@@ -12,7 +12,9 @@ it's built upon GGML, llama.cpp, and whisper.cpp by Georgi Gerganov, the superb 
 
 enough is designed for people who want to enjoy the many benefits of LLMs *without* giving up control of their data or being bound to hosted or otherwise restrictive inference providers. it's designed to be useful for private local work right now, but to remain available and be updated to take advantage of whatever new models and capabilities emerge over the next 5, 10, or 50 years (provided a community continues to want and support it).
 
-in its current form, enough is best suited for text-based knowledge work: creative writing, journaling, synthesis, exegesis, research, etc.
+in its current form, enough is best suited for text-based knowledge work: creative writing, journaling, synthesis, exegesis, research, etc. documents you're handed rather than wrote -- word files, PDFs, ebooks, slide decks, spreadsheets -- open as editable markdown beside your own notes, and your edits can be written back out to the original format.
+
+a project is just a folder. enough starts on a home screen listing every folder you've made into one -- with paragraph, word and character counts, a map of what's inside, and a button for adding another -- so opening yesterday's work, or starting tomorrow's, is one click. ⌘W closes a project and puts you back there.
 
 however, the only *actual* limitations are what the supported models can do on your machine ... and your imagination.
 

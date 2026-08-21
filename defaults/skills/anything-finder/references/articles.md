@@ -71,4 +71,5 @@ legal options are the archive/repository/library/author-request routes above.
 ```
 
 If you retrieve a PDF, save it to `rness/io/output/anything-finder/` and tell the user the
-path. If only a library-gated copy exists, give the exact steps to reach it with a card.
+path — they can click it in the tree and read it as markdown (enough converts it, given the
+PDF extra). If only a library-gated copy exists, give the exact steps to reach it with a card.

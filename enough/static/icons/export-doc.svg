@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="export-doc" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 72 72">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #80bcbc;
+      }
+
+      .cls-2 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-3 {
+        fill: #009a4e;
+      }
+
+      .cls-4 {
+        fill: #fff;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="11.65" y1="18.25" x2="53.84" y2="60.44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#59c6d1"/>
+      <stop offset=".04" stop-color="#5fc8d3" stop-opacity=".93"/>
+      <stop offset=".24" stop-color="#78d0df" stop-opacity=".65"/>
+      <stop offset=".42" stop-color="#8dd7e8" stop-opacity=".42"/>
+      <stop offset=".59" stop-color="#9ddcf0" stop-opacity=".24"/>
+      <stop offset=".75" stop-color="#a9e0f5" stop-opacity=".11"/>
+      <stop offset=".89" stop-color="#b0e3f8" stop-opacity=".03"/>
+      <stop offset="1" stop-color="#b3e4fa" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <polygon class="cls-1" points="52.31 22.47 44.56 22.47 44.56 14.72 52.31 22.47"/>
+  <polygon class="cls-2" points="54.68 59.6 17.56 59.6 17.56 12.35 41.18 12.35 41.18 25.85 54.68 25.85 54.68 59.6"/>
+  <rect class="cls-4" x="12.43" y="19.12" width="20.25" height="23.62"/>
+  <path d="M14.12,46.12h-5.06V15.74h5.06v-6.75h29.37l14.5,14.5v9.12h-3.38v-6.75h-13.5v-13.5h-23.62v3.38h18.56v30.37h-18.56v13.5h18.56v3.38H14.12v-16.88ZM32.68,42.74v-23.62H12.43v23.62h20.25ZM14.12,22.49h16.88v6.75h-3.38v-3.38h-3.38v10.12h3.38v3.37h-10.12v-3.37h3.38v-10.12h-3.38v3.38h-3.38v-6.75ZM44.49,22.49h7.75l-7.75-7.75v7.75Z"/>
+  <path class="cls-3" d="M51.08,42.74c-1.09,0-2.14.23-3.14.69-1,.46-1.92,1.07-2.77,1.85-1.69,1.69-2.53,3.68-2.53,5.99s.84,4.3,2.53,5.99l-2.37,2.37c-1.02-1.02-1.84-2.24-2.45-3.67-.62-1.42-.92-2.91-.92-4.46-.04-1.62.24-3.15.82-4.59.58-1.44,1.4-2.7,2.45-3.77,1.05-1.07,2.3-1.93,3.74-2.58,1.44-.65,2.99-.99,4.64-1.03h5.38l-3.69,7.44-3.06-1.53,1.37-2.69Z"/>
+  <path class="cls-3" d="M45.49,62.99l4.22-7.28,2.9,1.69-1.21,2.21c1.02.07,2.04-.08,3.06-.45,1.02-.37,1.92-.89,2.69-1.56,1.69-1.69,2.51-3.71,2.48-6.06-.04-2.35-.86-4.34-2.48-5.96l2.37-2.32c1.12,1.16,1.98,2.47,2.56,3.93.58,1.46.87,2.95.87,4.46s-.29,2.99-.87,4.43c-.58,1.44-1.43,2.73-2.56,3.85-1.09,1.02-2.34,1.8-3.74,2.35-1.41.54-2.87.78-4.38.71h-5.91Z"/>
+</svg>

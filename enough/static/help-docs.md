@@ -1,8 +1,14 @@
 <!-- enough help content. One `## <id>` section per (?) bubble.
      Edit freely: `name:`/`path:` head the section; `### what`,
      `### how`, `### ideas` bodies may contain inline HTML.
-     {{skills-list}} / {{roles-list}} / {{paradigms-list}} expand to
-     the live installed set (see /api/help/defaults). -->
+     Four expansion tokens, all resolved client-side so nothing here
+     drifts from what's actually installed:
+       {{skills-list}} {{roles-list}} {{paradigms-list}}
+         → the live installed set (see /api/help/defaults)
+       {{convert-formats}}
+         → the convertible-file-type table, with this machine's engine
+           availability (see /api/convert/formats). Never hand-list
+           file extensions in help text; use the token. -->
 
 ## wikisink
 name: wikisink
@@ -207,10 +213,11 @@ path: rness/io/
 a project-level space for files the agent reads from (<code>input/</code>) or writes to (<code>output/</code>). useful when you want the agent to process a file without polluting the project root.
 
 ### how
-drop files into <code>rness/io/input/</code> and the agent will see them. anything the agent generates lands in <code>rness/io/output/</code> — review and move what you want to keep, then clear the rest.
+drop files into <code>rness/io/input/</code> and the agent will see them. anything the agent generates lands in <code>rness/io/output/</code> — review and move what you want to keep, then clear the rest. documents count: a word file or a pdf dropped in here opens as a markdown twin and reads like any other file, to you and to the agent.
 
 ### ideas
 - drop a CSV or transcript into <code>input/</code> and ask the agent to summarize.
+- drop the pdf someone emailed you into <code>input/</code>, click it, and read it as markdown — the original stays exactly as it arrived.
 - collect multiple draft outputs in <code>output/</code> and pick the best one (or have the model cross-evaluate them).
 - clear both periodically — the agent doesn't need yesterday's scratch work in its context.
 
@@ -234,7 +241,7 @@ name: read / edit mode
 path: the file viewer
 
 ### what
-clicking a file opens it in one unified <strong>read/edit mode</strong> with two faces — a read face (eye) and an edit face (pencil). it lives either as a mini side panel next to the chat or expanded to a full frame; use the mini↔full toggle to switch. edits are dirty-guarded, so you won't lose unsaved changes by navigating away by accident.
+clicking a file opens it in one unified <strong>read/edit mode</strong> with two faces — a read face (eye) and an edit face (pencil). it lives either as a mini side panel next to the chat or expanded to a full frame; use the mini↔full toggle to switch. edits are dirty-guarded, so you won't lose unsaved changes by navigating away by accident. files enough doesn't display natively still open: a word file, pdf, deck or workbook opens as its markdown <em>twin</em> (see the <em>converted document</em> bubble on any such row), and an image opens in a plain viewer with fit and 1:1 sizes.
 
 ### how
 single-click a file in the tree to open it in the mini panel; expand it to a full frame when you want room. flip between the read (eye) and edit (pencil) faces with the dedicated face-toggle buttons in the read/edit chrome. every open mode shows a square indicator top-right (newest on the left) with a little red-x ribbon to close it — modes <em>stack</em>, so closing one reveals the mode beneath exactly as you left it. click a buried indicator to bring that mode forward; press <code>esc</code> to close the topmost mode. the same indicator + ribbon pattern covers every full-frame mode (wikisink, girraph, merirmaid, cacheawl, and the read-only <strong>help center</strong> reference mode, launched from the small <strong>help</strong> button at the top right of the ui window).
@@ -242,6 +249,21 @@ single-click a file in the tree to open it in the mini panel; expand it to a ful
 ### ideas
 - keep a file open in the mini panel while you chat — reference and conversation side by side.
 - go full-frame for long documents or when editing, back to mini when you just need a peek.
+
+## converted-file
+name: converted document
+path: the original, plus its markdown twin
+
+### what
+a document enough doesn't display natively — a word file, a pdf, a deck, a workbook — shown as <em>one</em> row that opens as markdown. click it and you get its <strong>twin</strong>: a markdown copy written beside the original (<code>memo.docx</code> → <code>memo.docx.md</code>) that reads, highlights and edits like any other markdown file. the twin, any images lifted out of the document (<code>memo.docx.assets/</code>) and a small hidden manifest are folded into that single row, so the tree stays as tidy as your folder looks in finder. the badge at the right edge of the row says where things stand: quiet means the twin matches the original; a highlighted badge with a dot means either you've edited the twin (and can export those changes back) or the original changed outside enough — and red means both, which is the one case enough asks you about. a hollow badge means "not converted yet", or, for pdfs, that the pdf extra isn't installed.
+
+### how
+click once. the first time you open each <em>type</em> of document a short modal explains what's about to happen; after that it just opens. edit the twin like any file, then use <strong>export</strong> in the document's chrome: the default writes a datestamped copy beside the original (<code>memo-2026-08-19-1042.docx</code>), and "overwrite the original" is one radio below it, with an undo offer afterwards. the same modal carries <em>keep the original in sync</em> — every save of the twin rewrites the original for you — offered only for the formats that can be written back. if the original changed underneath you (edited in word, re-exported from somewhere), enough notices on open or on save and asks which side wins: keep your twin, export over the original, or re-convert from the original — and the twin it replaces is stashed for undo either way. <strong>originals are never rewritten unless you ask</strong>, and every overwrite leaves an undo.
+
+### ideas
+- what enough can open this way, and what it can write back: {{convert-formats}}
+- ask the agent to read a document by name — <code>read_file</code> on <code>report.pdf</code> hands it the twin, converting one first if there isn't one yet.
+- reading pdfs, powerpoint decks and excel workbooks needs the <strong>pdf extra</strong> (⚙ ui window → extras): about 250 MB to download, about 1 GB installed, plus about 0.7 GB of document models in <code>~/enough/weights/docling/</code>. <em>writing</em> pdfs out of markdown works on every install, no extra.
 
 ## merirmaid
 name: merirmaid

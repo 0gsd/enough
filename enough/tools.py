@@ -23,6 +23,7 @@ import logging
 import os
 import re
 import subprocess
+import threading
 import urllib.parse
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -82,7 +83,7 @@ class ToolResult:
 
     def render(self) -> str:
         """Format for injection into the conversation as a user message."""
-        if self.name in ('read_file', 'write_file'):
+        if self.name in ('read_file', 'write_file', 'export_document'):
             attr = 'path'
         elif self.name == 'fetch_url':
             attr = 'url'
@@ -397,6 +398,65 @@ def _duplicate_request_reason(project_dir: Path, target: Path) -> str | None:
     return None
 
 
+# How long `read_file` waits on a conversion before telling the agent to come
+# back for the twin. The conversion is NOT killed at the deadline — it finishes
+# on its own and writes the twin, which is exactly what that answer promises.
+CONVERT_BLOCKING_SECONDS = 120.0
+
+
+def _convert_blocking(original: Path) -> tuple[bool, str | None]:
+    """Convert `original` on a daemon thread, waiting up to
+    CONVERT_BLOCKING_SECONDS. Returns `(finished, error)`; `(False, None)`
+    means it's still going."""
+    from . import convert as _convert
+    box: dict[str, Any] = {}
+
+    def _go() -> None:
+        try:
+            box["result"] = _convert.run_convert(original)
+        except Exception as e:  # noqa: BLE001 — reported to the agent, not raised
+            box["error"] = str(e)
+
+    t = threading.Thread(target=_go, daemon=True, name=f"convert:{original.name}")
+    t.start()
+    t.join(CONVERT_BLOCKING_SECONDS)
+    if t.is_alive():
+        return False, None
+    return True, box.get("error")
+
+
+def _read_convertible(call: ToolCall, original: Path) -> ToolResult:
+    """`read_file` on a PDF / Word document / ebook hands back the markdown
+    twin, converting one first if there isn't one.
+
+    The agent edits the twin and never the original; exporting the twin back
+    over the original is the user's decision (or an explicit
+    `export_document` call), because the round trip is lossy in ways only a
+    human can weigh."""
+    from . import convert as _convert
+    twin = _convert.twin_path(original)
+    if not twin.is_file():
+        spec = _convert.spec_for(original)
+        if spec is None or not _convert.engine_available(spec.reader):
+            return ToolResult(
+                "read_file", call.path, False,
+                f"error: {_convert.engine_missing_message(spec) if spec else 'unsupported format'}")
+        finished, err = _convert_blocking(original)
+        if err:
+            return ToolResult("read_file", call.path, False, f"error: {err}")
+        if not finished:
+            return ToolResult(
+                "read_file", call.path, True,
+                f"conversion started; read {twin.name} shortly")
+    try:
+        text = twin.read_text(encoding="utf-8")
+    except OSError as e:
+        return ToolResult("read_file", call.path, False, f"error: {e}")
+    preface = (f"[twin of {original.name} — edit {twin.name}; "
+               f"the user exports changes]")
+    return ToolResult("read_file", call.path, True, f"{preface}\n{text}")
+
+
 def run_read_file(project_dir: Path, call: ToolCall) -> ToolResult:
     if not call.path:
         return ToolResult("read_file", "", False, "error: missing <path>")
@@ -408,6 +468,9 @@ def run_read_file(project_dir: Path, call: ToolCall) -> ToolResult:
         return ToolResult("read_file", call.path, False, "error: file does not exist")
     if target.is_dir():
         return ToolResult("read_file", call.path, False, "error: path is a directory")
+    from . import convert as _convert
+    if _convert.is_convertible(target):
+        return _read_convertible(call, target)
     try:
         text = target.read_text(encoding="utf-8")
     except UnicodeDecodeError:
@@ -501,9 +564,25 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
         target.write_text(body, encoding="utf-8")
     except OSError as e:
         return ToolResult("write_file", call.path, False, f"error: {e}")
+    # convert §4/§7: writing a twin that opted into "keep the original in
+    # sync" exports it back over the original. The write itself already
+    # landed, so a refusal is reported as a tool error the agent can act on
+    # rather than as a lost edit.
+    from . import convert as _convert
+    sync = _convert.sync_after_save(target)
+    if sync and sync["state"] != "synced":
+        return ToolResult(
+            "write_file", call.path, False,
+            f"wrote {len(body)} bytes to {call.path}, but keeping "
+            f"{sync['original']} in sync failed: {sync['detail']}. the twin is "
+            f"saved; tell the user to resolve the conflict (re-convert, keep "
+            f"the twin, or export over the original) before the original can "
+            f"be updated again.",
+        )
+    note = f" — and exported it over {sync['original']}" if sync else ""
     return ToolResult(
         "write_file", call.path, True,
-        f"ok — wrote {len(body)} bytes to {call.path}",
+        f"ok — wrote {len(body)} bytes to {call.path}{note}",
     )
 
 
@@ -714,9 +793,19 @@ def _markdownify_via_pandoc(html: str, *, strip_raw_html: bool = False) -> tuple
     wikisink saves, where structural page chrome would otherwise litter
     the markdown."""
     target = "gfm-raw_html" if strip_raw_html else "gfm"
+    # One resolver for the whole codebase (convert-plan §2): a Homebrew pandoc
+    # the user chose wins, else the copy `pypandoc-binary` ships. Since pandoc
+    # became a base dependency the None branch below is defensive only — it
+    # firing at all means the venv is broken, which is why the journal note it
+    # writes now reads as an anomaly rather than as a normal state.
+    from . import convert as _convert          # late: convert imports tools back
+    exe = _convert.pandoc_path()
+    if not exe:
+        log.warning("pandoc unavailable (broken environment); returning raw HTML")
+        return html, False
     try:
         proc = subprocess.run(
-            ["pandoc", "-f", "html", "-t", target, "--wrap=none"],
+            [exe, "-f", "html", "-t", target, "--wrap=none"],
             input=html,
             text=True,
             capture_output=True,
@@ -1444,9 +1533,48 @@ def run_cachebox_ingest(project_dir: Path, call: ToolCall) -> ToolResult:
     )
 
 
+
+def run_export_document(project_dir: Path, call: ToolCall) -> ToolResult:
+    """Write a markdown twin (or any markdown file) out as a real document.
+
+    `<path>` may name either end of a converted pair, or a plain `.md`.
+    `<target>` is an extension from the registry's export targets;
+    `<mode>` is `copy` (a datestamped file beside the original — the default,
+    because it can't destroy anything) or `overwrite`. Overwrite stashes the
+    original first, so the user gets the same save/undo bar as any other
+    write, and refuses outright when the original changed outside enough."""
+    from . import convert as _convert
+    if not call.path:
+        return ToolResult("export_document", "", False, "error: missing <path>")
+    target_ext = (call.extra.get("target") or "").strip().lower()
+    mode = (call.extra.get("mode") or "copy").strip().lower()
+    if not target_ext:
+        return ToolResult(
+            "export_document", call.path, False,
+            f"error: missing <target> — one of {', '.join(_convert.EXPORT_TARGETS)}")
+    if not target_ext.startswith("."):
+        target_ext = "." + target_ext
+    try:
+        # Writing, so the stricter file-rw allowlist governs absolute paths.
+        resolved = _safe_join(project_dir, call.path, allow_outside_write=True)
+    except ValueError as e:
+        return ToolResult("export_document", call.path, False, f"error: {e}")
+    try:
+        original, twin = _convert.pair_for(resolved)
+        out = _convert.export(twin=twin, original=original,
+                              target=target_ext, mode=mode)
+    except _convert.ConvertError as e:
+        return ToolResult("export_document", call.path, False, f"error: {e}")
+    undo = " (the previous version is stashed for undo)" if out["undo"] else ""
+    return ToolResult(
+        "export_document", call.path, True,
+        f"ok — wrote {out['written']}{undo}")
+
+
 _DISPATCH = {
     "read_file": run_read_file,
     "write_file": run_write_file,
+    "export_document": run_export_document,
     "shell": run_shell,
     "fetch_url": run_fetch_url,
     "read_highlights": run_read_highlights,
@@ -1475,6 +1603,9 @@ _DISPATCH = {
 _TRACE_TOGGLE = {
     "read_file": "read_file_brokered",
     "write_file": "write_file_brokered",
+    # An export writes a real document into the project — journal it under
+    # the same toggle as any other write.
+    "export_document": "write_file_brokered",
     "shell": "shell_brokered",
     "fetch_url": "fetch_url_enabled",
     "read_highlights": "trace_log_enabled",

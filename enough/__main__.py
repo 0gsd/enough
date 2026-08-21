@@ -1,4 +1,4 @@
-"""CLI entry point: `enough [--dir PATH] [--port N] [--llm-url URL]`."""
+"""CLI entry point: `enough [--dir PATH | --home] [--port N] [--llm-url URL]`."""
 
 from __future__ import annotations
 
@@ -16,11 +16,21 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         prog="enough",
         description="A paradigmless personal computer harness powered by a local LLM.",
     )
+    # Default None, not `Path.cwd()`, so `main()` can tell "the user asked
+    # for this folder" from "nobody said" — which is the whole of the --home
+    # exclusivity check. The cwd default is applied in main() instead.
     parser.add_argument(
         "--dir",
         type=Path,
-        default=Path.cwd(),
+        default=None,
         help="Project directory (default: current working directory).",
+    )
+    parser.add_argument(
+        "--home",
+        action="store_true",
+        help="Open the enough home screen instead of a project: the list of "
+             "every folder enough has ever set up, with no project loaded. "
+             "Mutually exclusive with --dir.",
     )
     parser.add_argument(
         "--port",
@@ -60,6 +70,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def _open_loader(url: str) -> None:
+    """Open a local file:// loader page that polls `url` and redirects when
+    uvicorn is listening. Without this, the browser hits the port before
+    uvicorn binds and shows its native "can't reach this site" page until the
+    user manually refreshes."""
+    loader_path = Path(__file__).parent / "static" / "loader.html"
+    loader_url = (
+        loader_path.resolve().as_uri()
+        + "?target=" + urllib.parse.quote(url, safe="")
+    )
+    try:
+        webbrowser.open(loader_url)
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
 
@@ -68,7 +94,33 @@ def main(argv: list[str] | None = None) -> int:
     from .server import run
     from .skeleton import ensure_skeleton
 
-    project_dir = args.dir.resolve()
+    if args.home:
+        if args.dir is not None:
+            print("error: --home and --dir are mutually exclusive.", file=sys.stderr)
+            print("       --home opens the launch screen, which has no project; "
+                  "--dir opens one.", file=sys.stderr)
+            return 2
+        url = f"http://127.0.0.1:{args.port}"
+        print(f"enough {__version__} — home (no project open)")
+        print(f"  web:   {url}")
+        print("  ctrl-c to stop")
+        if not args.no_browser:
+            _open_loader(url)
+        # No project, so no llama supervision, no broker, no session — that
+        # part `create_app(home=True)` enforces for itself. `supervise` and
+        # `--llm-url` are still passed through as the *user's* intent, so that
+        # opening a project from here re-execs with the flags they launched
+        # with rather than with home's own emptiness.
+        return run(
+            project_dir=Path.cwd(),
+            port=args.port,
+            llm_url=args.llm_url,
+            max_tool_iters=args.max_tool_iters,
+            supervise=not args.no_supervise,
+            home=True,
+        )
+
+    project_dir = (args.dir or Path.cwd()).resolve()
     project_dir.mkdir(parents=True, exist_ok=True)
 
     # Refuse to launch inside the install directory (~/enough) or anywhere
@@ -133,28 +185,18 @@ def main(argv: list[str] | None = None) -> int:
     print("  ctrl-c to stop")
 
     if not args.no_browser:
-        # Open a local file:// loader page that polls `url` and redirects
-        # when uvicorn is listening. Without this, the browser hits the
-        # port before uvicorn binds and shows its native "can't reach
-        # this site" page until the user manually refreshes.
-        loader_path = Path(__file__).parent / "static" / "loader.html"
-        loader_url = (
-            loader_path.resolve().as_uri()
-            + "?target=" + urllib.parse.quote(url, safe="")
-        )
-        try:
-            webbrowser.open(loader_url)
-        except Exception:
-            pass
+        _open_loader(url)
 
-    run(
+    # The return value is the process's exit status: 42 means "the user asked
+    # for another project (or for home) — the handoff file says which", which
+    # is what the desktop shell watches for. Every other exit is unchanged.
+    return run(
         project_dir=project_dir,
         port=args.port,
         llm_url=args.llm_url,
         max_tool_iters=args.max_tool_iters,
         supervise=not args.no_supervise,
     )
-    return 0
 
 
 if __name__ == "__main__":

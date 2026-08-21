@@ -118,8 +118,9 @@ TOGGLES: tuple[Toggle, ...] = (
         key="fetch_url_cache_and_convert",
         label="fetch_url: cache + markdown convert",
         description=(
-            "convert fetched html to markdown via pandoc and store the "
-            "result in rness/io/input/<timestamp>-<hash>-<slug>.md, plus "
+            "convert fetched html to markdown via pandoc (bundled with "
+            "enough) and store the result in "
+            "rness/io/input/<timestamp>-<hash>-<slug>.md, plus "
             "a row in _broker-index.md. the agent gets a short preview "
             "instead of the full body — saves context window space."
         ),

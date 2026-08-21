@@ -245,6 +245,17 @@ fn env_sync_blocking(app: &AppHandle) -> Result<String, String> {
     if crate::bundled::locate().code.as_deref() == Some(root.as_path()) {
         cmd.arg("--frozen");
     }
+    // `uv sync` is exact and would uninstall anything the lockfile's default
+    // set doesn't name — including an optional extra the user installed from
+    // the UI. Every sync path re-asks for the recorded ones; this is the
+    // desktop's copy of that rule (convert-plan §6, gotcha 1).
+    let extras = recorded_extras();
+    if !extras.is_empty() {
+        log_line(app, "env", &format!("keeping extras: {}", extras.join(", ")));
+        for name in &extras {
+            cmd.arg("--extra").arg(name);
+        }
+    }
     cmd.arg("--project")
         .arg(&root)
         .current_dir(std::env::temp_dir())
@@ -287,6 +298,55 @@ fn env_sync_blocking(app: &AppHandle) -> Result<String, String> {
     }
     save_step("environment")?;
     Ok("ready".into())
+}
+
+/// `~/enough/config/extras.json`, or `$ENOUGH_EXTRAS_STATE` when it's set.
+///
+/// The env seam is honoured here as well as in the backend and
+/// `update-enough.command` because "every `ENOUGH_*` points into the scratch
+/// dir" is a QA rule with no exceptions — an install path that read the real
+/// file anyway would sync the real venv from a scratch harness.
+fn extras_state_path() -> PathBuf {
+    if let Ok(p) = std::env::var("ENOUGH_EXTRAS_STATE") {
+        if !p.is_empty() {
+            return PathBuf::from(p);
+        }
+    }
+    config::state_home().join("config").join("extras.json")
+}
+
+/// The optional dependency groups this install has, as `uv sync --extra`
+/// names, sorted.
+///
+/// Names are validated rather than trusted. The file is plain JSON beside a
+/// user-editable config and its keys end up in an argv, so anything that
+/// doesn't look like an extra is dropped — the same `[a-z0-9][a-z0-9._-]*`
+/// rule `update-enough.command` applies, which is what stops a key beginning
+/// with `-` from arriving at uv as a flag.
+fn recorded_extras() -> Vec<String> {
+    let Ok(text) = std::fs::read_to_string(extras_state_path()) else {
+        return Vec::new();
+    };
+    let Ok(parsed) = serde_json::from_str::<serde_json::Value>(&text) else {
+        return Vec::new();
+    };
+    let Some(map) = parsed.as_object() else {
+        return Vec::new();
+    };
+    let mut names: Vec<String> = map.keys().filter(|n| is_extra_name(n)).cloned().collect();
+    names.sort();
+    names
+}
+
+fn is_extra_name(name: &str) -> bool {
+    if name.is_empty() || name.len() > 64 {
+        return false;
+    }
+    let mut chars = name.chars();
+    matches!(chars.next(), Some(c) if c.is_ascii_lowercase() || c.is_ascii_digit())
+        && chars.all(|c| {
+            c.is_ascii_lowercase() || c.is_ascii_digit() || matches!(c, '.' | '_' | '-')
+        })
 }
 
 /// Step 3a — bring up the throwaway backend the model picker talks to.
@@ -399,10 +459,14 @@ pub fn ob_extras() -> Vec<Extra> {
             "brew install whisper-cpp",
             &home,
         ),
-        Extra::binary(
-            "pandoc", "pandoc", "Readable web fetches",
-            "Fetched pages arrive as raw HTML instead of markdown.",
-            "brew install pandoc",
+        // No pandoc row: `pypandoc-binary` is a base dependency now, so every
+        // install has pandoc in its venv and a Homebrew one is an
+        // optimisation rather than an extra (convert-plan §8).
+        Extra::python_extra(
+            "pdf", "PDF reading",
+            "PDFs, PowerPoint decks and Excel workbooks stay unreadable — \
+             everything else converts to an editable markdown twin.",
+            "install from the UI window → extras after setup, or ask the agent",
             &home,
         ),
         Extra::binary(
@@ -456,6 +520,33 @@ impl Extra {
             how,
             found: found.is_some(),
             where_: found.map(|p| p.display().to_string()).unwrap_or_default(),
+        }
+    }
+
+    /// An optional Python dependency group, installed by uv rather than by a
+    /// package manager. There is no binary on PATH to look for — the packages
+    /// live inside `~/enough/.venv-desktop` — so `found` reads the same
+    /// `extras.json` every `uv sync` path re-asks for, which is also the only
+    /// record that survives an update.
+    fn python_extra(
+        id: &'static str,
+        label: &'static str,
+        lose: &'static str,
+        how: &'static str,
+        home: &Path,
+    ) -> Extra {
+        let found = recorded_extras().iter().any(|n| n == id);
+        Extra {
+            id,
+            label,
+            lose,
+            how,
+            found,
+            where_: if found {
+                backend::venv_dir(home).display().to_string()
+            } else {
+                String::new()
+            },
         }
     }
 
@@ -513,6 +604,46 @@ mod tests {
         assert!(!path_allowed("POST", "/api/models/download/../../shutdown"));
         // GET is exact, not a prefix.
         assert!(!path_allowed("GET", "/api/models/download/x"));
+    }
+
+    #[test]
+    fn only_things_shaped_like_an_extra_can_reach_uvs_argv() {
+        assert!(is_extra_name("pdf"));
+        assert!(is_extra_name("ocr-fast"));
+        assert!(is_extra_name("x2.1_b"));
+
+        // A key that would arrive at uv as a flag, or as a second argument.
+        assert!(!is_extra_name("-extra"));
+        assert!(!is_extra_name("--frozen"));
+        assert!(!is_extra_name("pdf extra"));
+        assert!(!is_extra_name("pdf;rm -rf /"));
+        assert!(!is_extra_name("PDF"));
+        assert!(!is_extra_name(""));
+        assert!(!is_extra_name(&"p".repeat(65)));
+    }
+
+    #[test]
+    fn a_missing_or_broken_extras_file_reads_as_no_extras() {
+        // The reader is best-effort by design: an unreadable extras.json must
+        // degrade to "sync the base set", never to a failed launch.
+        let dir = std::env::temp_dir().join(format!("enough-extras-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("extras.json");
+        std::env::set_var("ENOUGH_EXTRAS_STATE", &path);
+
+        assert!(recorded_extras().is_empty(), "absent file");
+
+        std::fs::write(&path, "{ not json").unwrap();
+        assert!(recorded_extras().is_empty(), "malformed file");
+
+        std::fs::write(&path, "[\"pdf\"]").unwrap();
+        assert!(recorded_extras().is_empty(), "top level is not an object");
+
+        std::fs::write(&path, r#"{"pdf": {"installed_at": "x"}, "--bad": {}}"#).unwrap();
+        assert_eq!(recorded_extras(), vec!["pdf".to_string()]);
+
+        std::env::remove_var("ENOUGH_EXTRAS_STATE");
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     #[test]

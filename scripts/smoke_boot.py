@@ -155,6 +155,11 @@ def build_env(scratch: Path) -> dict[str, str]:
         "ENOUGH_INFOWORLD_ROOT": str(scratch / "no-infoworld"),
         "ENOUGH_WIKISINK_CONFIG": str(scratch / "wikisink.json"),
         "ENOUGH_UI_CONFIG": str(scratch / "ui.json"),
+        "ENOUGH_EXTRAS_STATE": str(scratch / "extras.json"),
+        # The home screen's project registry. $HOME already points here, so
+        # this is belt and braces — but the rule is "every ENOUGH_* seam", and
+        # the handoff file and desktop.json are derived from this one's dir.
+        "ENOUGH_PROJECTS_STATE": str(scratch / "config" / "projects.json"),
         # Desktop capability gate — so the shutdown route exists and its
         # token check is exercised. Not an isolation hook; see AGENT_GUIDE.
         "ENOUGH_DESKTOP": "1",
@@ -185,6 +190,23 @@ def check_project(base: str, project: Path) -> None:
 
     status, body = request(f"{base}/")
     need(status == 200 and "<html" in body.lower(), "GET / serves the UI shell")
+    need('data-mode="project"' in body,
+         "…in project mode (the home screen's gate marker is templated in)")
+
+    # A project server registers itself and stamps last_opened on boot
+    # (home-plan §6), which is how pre-registry projects reach the home
+    # screen. The registry is the scratch one; the real ~/enough is untouched.
+    registry = json.loads(
+        (project.parent / "config" / "projects.json").read_text(encoding="utf-8"))
+    paths = [Path(e["path"]).resolve() for e in registry.get("projects", [])]
+    need(project.resolve() in paths, "boot registered the project on the home screen")
+    opened = [e.get("last_opened") for e in registry["projects"]
+              if Path(e["path"]).resolve() == project.resolve()]
+    need(opened and opened[0], "…with last_opened stamped")
+
+    # /api/home/* belongs to a home-mode server; a project one must not serve it.
+    status, _ = request(f"{base}/api/home/projects")
+    need(status == 404, "/api/home/projects 404s on a project server")
 
 
 def check_models(base: str) -> None:

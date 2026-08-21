@@ -33,7 +33,7 @@ from typing import Any
 import httpx
 import uvicorn
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 
@@ -42,6 +42,8 @@ from . import broker as _broker
 from .wikisink import config as _wikisink_config
 from .llm import LLMError, stream_chat
 from . import cloud as _cloud
+from . import convert as _convert
+from . import home as _home
 from . import models as _models
 from .logger import ExchangeLog, log_exchange
 from .prompt import (
@@ -96,19 +98,75 @@ DESKTOP_TOKEN_ENV = "ENOUGH_DESKTOP_TOKEN"
 DESKTOP_TOKEN_HEADER = "x-enough-desktop-token"
 
 
-def request_process_exit(delay: float = 0.25) -> None:
+# The exit status this process should leave behind, and the live uvicorn
+# Server that `run()` is driving. Both exist for the home handoff (home-plan
+# §1.7): the desktop shell distinguishes **exit code 42** ("I wrote
+# .home-open — open what it names, or home if it's absent") from every other
+# exit, which keeps today's behavior.
+_EXIT_CODE: dict[str, int] = {}
+_UVICORN: dict[str, Any] = {}
+
+
+def request_process_exit(delay: float = 0.25, code: int | None = None) -> None:
     """Ask this uvicorn process to exit shortly after the current response.
 
-    SIGTERM to ourselves is uvicorn's own graceful-shutdown path: it drains
-    connections and runs the lifespan teardown, which is what stops an
-    *owned* llama-server and closes the httpx client. The small delay lets
-    the shutdown response actually reach the shell first.
+    With no `code`, SIGTERM to ourselves is uvicorn's own graceful-shutdown
+    path: it drains connections and runs the lifespan teardown, which is what
+    stops an *owned* llama-server and closes the httpx client. The small delay
+    lets the shutdown response actually reach the shell first.
+
+    With a `code`, SIGTERM is no good: uvicorn's `capture_signals` re-raises
+    the captured signal once it has shut down, so the process dies *by the
+    signal* and there is no exit status left to set. Instead we set
+    `Server.should_exit` directly — the same graceful path, minus the signal
+    (sse-starlette watches that flag too, so open SSE streams still drain) —
+    and `run()` returns the code afterwards.
 
     Module-level (rather than inline in the handler) so tests can swap it
     out — the real thing would take the test runner down with it.
     """
     loop = asyncio.get_running_loop()
-    loop.call_later(delay, lambda: os.kill(os.getpid(), signal.SIGTERM))
+    if code is None:
+        loop.call_later(delay, lambda: os.kill(os.getpid(), signal.SIGTERM))
+        return
+    _EXIT_CODE["code"] = code
+    server = _UVICORN.get("server")
+    if server is None:
+        # No `run()` around us (a TestClient, say) — fall back to the signal
+        # so the process still stops; the code is simply not observable.
+        loop.call_later(delay, lambda: os.kill(os.getpid(), signal.SIGTERM))
+        return
+    loop.call_later(delay, lambda: setattr(server, "should_exit", True))
+
+
+# What a home handoff exits with. Any other status keeps today's meaning, so
+# the shell's existing "the backend died" handling is untouched.
+HANDOFF_EXIT_CODE = 42
+
+
+def request_process_exec(argv: list[str], delay: float = 0.25) -> None:
+    """Replace this process with `argv` shortly after the current response.
+
+    The CLI half of the home handoff (home-plan §1.7): the browser tab stays
+    open on the same port and reconnects once the new server binds, with the
+    loader page in between — the update flow's restart pattern. `execv`
+    rather than spawn-and-exit so the port is never held by two processes and
+    the shell (if any) still has exactly one child.
+
+    Module-level for the same reason as `request_process_exit`: a test that
+    ran the real thing would replace the test runner.
+    """
+    loop = asyncio.get_running_loop()
+
+    def _go() -> None:
+        try:
+            sys.stdout.flush()
+            sys.stderr.flush()
+        except (OSError, ValueError):
+            pass
+        os.execv(argv[0], argv)
+
+    loop.call_later(delay, _go)
 
 
 ORCHESTRATOR_CONFIG = Path.home() / "enough" / "config" / "orchestrator.json"
@@ -245,6 +303,16 @@ def _walk_tree(
                     continue
             except OSError:
                 pass
+        # A converted document renders as ONE row — the original — so the
+        # twin and its assets folder are hidden. `has_twin` insists on the
+        # manifest as well as the twin, which is what keeps a `notes.pdf.md`
+        # somebody wrote by hand from vanishing out of their tree.
+        if p.is_dir() and p.name.endswith(".assets"):
+            if _convert.has_twin(p.parent / p.name[: -len(".assets")]):
+                continue
+        elif not p.is_dir() and p.name.endswith(".md"):
+            if _convert.has_twin(p.parent / p.name[: -len(".md")]):
+                continue
         node = {
             "name": p.name,
             "path": rel,
@@ -267,6 +335,22 @@ def _walk_tree(
                     node["wiki_article"] = True
             except OSError:
                 pass
+        elif _convert.is_convertible(p):
+            # Both the converted and the not-yet-converted case: the tree
+            # draws a badge from `convert_state` and routes the click into
+            # the twin (or the intro modal) instead of the binary preview.
+            try:
+                st = _convert.state(p)
+            except (OSError, _convert.ConvertError):
+                st = None
+            if st:
+                node["convertible"] = True
+                node["convert_state"] = st
+                if st in ("fresh", "edited", "stale", "conflict"):
+                    node["converted"] = True
+                    node["twin"] = f"{rel}.md"
+        elif _convert.is_image(p):
+            node["image"] = True        # opens in the viewer, not the preview
         out.append(node)
     return out
 
@@ -313,7 +397,24 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
         name_attr = n["name"].replace('"', "&quot;")
         sym_cls = " symlink" if n.get("is_symlink") else ""
         help_id = _HELP_IDS.get(n["path"])
+        # `_HELP_IDS` is path-keyed, but a converted document's help bubble
+        # belongs to its state, not its name — any converted row gets it.
+        if not help_id and n.get("converted"):
+            help_id = "converted-file"
         help_attr = f' data-help="{help_id}"' if help_id else ""
+        # Convert-mode data attributes, read by the tree's click routing and
+        # the badge CSS (frontend wave). `data-convert-state` is one of
+        # convert.STATES; `data-twin` is the markdown file the click opens.
+        conv_attr = ""
+        if n.get("convertible"):
+            conv_attr = (f' data-convertible="1"'
+                         f' data-convert-state="{n.get("convert_state", "")}"')
+            if n.get("converted"):
+                twin_attr = str(n.get("twin", "")).replace('"', "&quot;")
+                conv_attr += f' data-converted="1" data-twin="{twin_attr}"'
+        elif n.get("image"):
+            conv_attr = ' data-image="1"'
+
         # `data-path` + `data-name` on the row's <li> are read by the
         # tree context menu (option-click) so the JS can identify the
         # target without parsing the inner DOM. Folder rows already
@@ -347,7 +448,7 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
         else:
             out.append(
                 f'<li class="file{sym_cls}" '
-                f'data-path="{path}" data-name="{name_attr}" data-kind="file">'
+                f'data-path="{path}" data-name="{name_attr}" data-kind="file"{conv_attr}>'
                 f'<span class="file-row"{help_attr}><span class="zippy-spacer"></span>'
                 f'<a href="#" '
                 f'hx-get="/api/file?path={path}" hx-target="#preview-body" '
@@ -1076,6 +1177,61 @@ async def _handle_tool(session: Session, call: ToolCall, sink: list[tuple[str, s
 
 
 # ---------------------------------------------------------------------------
+# The mode boundary (home-plan §3)
+# ---------------------------------------------------------------------------
+
+# Everything a home-mode server answers. One page, one set of prefs, the help
+# center (project-independent), the formats table its {{convert-formats}}
+# token expands, the desktop shell's graceful-quit route (a home backend is
+# still a backend the shell has to be able to stop), and /api/home/*.
+# Everything else is project-scoped, and a home server has no project to scope
+# it to.
+HOME_PATHS: frozenset[str] = frozenset({
+    "/", "/favicon.ico", "/api/ui-config", "/api/help-center",
+    "/api/convert/formats", "/api/shutdown",
+})
+HOME_PREFIXES: tuple[str, ...] = ("/api/home/", "/static/")
+
+
+class ModeGate:
+    """404 everything that belongs to the other mode.
+
+    One gate instead of a flag on eighty routes: a home server hides the
+    project routes, a project server hides `/api/home/*`. `/api/close-project`
+    is the one route that crosses — it's the reverse of `/api/home/open`, so
+    it lives on the project side and 404s in home mode like everything else
+    not on the list.
+
+    Raw ASGI rather than `@app.middleware("http")` on purpose: Starlette's
+    `BaseHTTPMiddleware` proxies the receive channel, which is exactly what a
+    long-lived SSE response (`/api/stream`) needs untouched.
+    """
+
+    def __init__(self, app: Any, *, home: bool) -> None:
+        self.app = app
+        self.home = home
+
+    def _blocked(self, path: str) -> str | None:
+        if self.home:
+            if path in HOME_PATHS or path.startswith(HOME_PREFIXES):
+                return None
+            return ("not available on the enough home screen — open a project "
+                    "first")
+        if path.startswith("/api/home/"):
+            return "this is a project server; the home screen runs its own"
+        return None
+
+    async def __call__(self, scope: dict[str, Any], receive: Any, send: Any) -> None:
+        if scope.get("type") == "http":
+            why = self._blocked(scope.get("path", ""))
+            if why:
+                await JSONResponse({"detail": why}, status_code=404)(
+                    scope, receive, send)
+                return
+        await self.app(scope, receive, send)
+
+
+# ---------------------------------------------------------------------------
 # App factory
 # ---------------------------------------------------------------------------
 
@@ -1085,19 +1241,63 @@ def create_app(
     max_tool_iters: int = DEFAULT_MAX_TOOL_ITERS,
     *,
     supervise: bool = True,
+    home: bool = False,
+    port: int | None = None,
 ) -> FastAPI:
+    """The app, in one of two modes.
+
+    `home=True` is the launch screen (home-plan §1.1): no project, no llama
+    supervision, no broker, no wikisink hook — the lifespan skips all of it,
+    `/` serves index.html with `data-mode="home"`, and every project-scoped
+    route 404s (`_mode_gate` below). `project_dir` is still required by the
+    Session dataclass but nothing in home mode reads it; the CLI passes the
+    cwd. `port` is remembered only so the CLI handoff can re-exec on the same
+    URL the open browser tab is already pointing at.
+    """
     session = Session(project_dir=project_dir, llm_url=llm_url, max_tool_iters=max_tool_iters)
-    supervisor = LlamaSupervisor(llm_url=llm_url) if supervise else None
+    supervisor = LlamaSupervisor(llm_url=llm_url) if (supervise and not home) else None
+    # The running loop, captured at startup so background *threads* (the
+    # convert worker's progress callbacks, uv's output pump) can fan events
+    # out over SSE. Same trick the wikisink progress emitter uses, hoisted
+    # here because two managers now need it.
+    _loop: dict[str, Any] = {}
+
+    def _emit_threadsafe(event: str, data: dict[str, Any]) -> None:
+        loop = _loop.get("loop")
+        if loop is None:
+            return
+        asyncio.run_coroutine_threadsafe(session.emit(event, data), loop)
     session.supervisor = supervisor  # so _run_turn can read current ctx for the usage gauge
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
+        loop = asyncio.get_running_loop()
+        _loop["loop"] = loop
+        if home:
+            # The launch screen runs none of the below: no llm client, no
+            # supervisor, no broker, no wikisink, no cacheawl migration.
+            # It seeds the registry from the shell's MRU (once — the flag
+            # lives in the registry) and gets out of the way.
+            try:
+                added = await asyncio.to_thread(_home.seed_from_desktop)
+                if added:
+                    log.info("home: seeded %d project(s) from desktop.json", added)
+            except Exception:  # noqa: BLE001 — never block the launch screen
+                log.exception("home: seeding from desktop.json failed")
+            yield
+            return
         session.client = httpx.AsyncClient()
+        # Opening a project is what stamps `last_opened` — and registers it
+        # if it predates the registry, which is how an old project first
+        # appears on the home screen (home-plan §6).
+        try:
+            await asyncio.to_thread(_home.touch_opened, session.project_dir)
+        except Exception:  # noqa: BLE001 — never block startup on the registry
+            log.exception("home: could not record this project's open")
         # Wikisink update runs execute in worker threads (agent tool /
         # endpoint); this hook lets them fan wiki_sink progress events
         # out over SSE without touching the loop directly.
         from .wikisink import update as _wiki_update
-        loop = asyncio.get_running_loop()
 
         def _wiki_progress(data: dict[str, Any]) -> None:
             asyncio.run_coroutine_threadsafe(session.emit("wiki_sink", data), loop)
@@ -1130,19 +1330,27 @@ def create_app(
     app = FastAPI(title="enough", lifespan=lifespan)
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
+    app.add_middleware(ModeGate, home=home)
+
     @app.get("/", response_class=HTMLResponse)
     async def index() -> HTMLResponse:
         html = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
-        # Render any existing history so a page refresh doesn't lose the transcript.
+        # The mode marker the frontend gates on (home-plan §4). Templated into
+        # the one `<body>` tag rather than checked into index.html, so the
+        # static file stays a project page and home is a server decision.
+        html = html.replace(
+            "<body>", f'<body data-mode="{"home" if home else "project"}">', 1)
+        # Render any existing history so a page refresh doesn't lose the
+        # transcript. Home has neither a transcript nor a project.
         html = html.replace(
             "<!-- HISTORY -->",
-            _render_turn_from_history(session.history),
+            "" if home else _render_turn_from_history(session.history),
         )
         # State-aware empty-hint (drift notice, etc.). Empty-when-history-
         # exists semantics are still handled by the post-send htmx hook.
         html = html.replace(
             "<!-- EMPTY_HINT -->",
-            _render_empty_hint(session.project_dir),
+            "" if home else _render_empty_hint(session.project_dir),
         )
         html = html.replace("<!-- VERSION -->", f"v{__version__}")
         # Project display name in the header (folder basename unless the user
@@ -1150,7 +1358,7 @@ def create_app(
         from . import project_meta
         html = html.replace(
             "<!-- PROJECT_NAME -->",
-            _escape_html(project_meta.load(session.project_dir)["name"]),
+            "" if home else _escape_html(project_meta.load(session.project_dir)["name"]),
         )
         # No-cache so edits-in-place don't require force-reload during dev.
         return HTMLResponse(html, headers={"Cache-Control": "no-store, must-revalidate"})
@@ -1773,6 +1981,227 @@ def create_app(
         except UnicodeDecodeError:
             raise HTTPException(415, "not utf-8 text") from None
         return PlainTextResponse(text)
+
+    # ------------------------------------------------------------------
+    # convert — editable markdown twins for PDFs, Word documents, and
+    # friends. The registry, the state machine, and the manifest live in
+    # convert.py; conversions and exports run in `enough.convert_worker`
+    # subprocesses. Job progress streams on the `convert` SSE event and
+    # extras installs on `convert-install`. Contract: docs/convert-plan.md §4.
+    # ------------------------------------------------------------------
+
+    convert_jobs = _convert.ConvertJobs(emit=_emit_threadsafe)
+    extra_installer = _convert.ExtraInstaller(emit=_emit_threadsafe)
+
+    def _convert_http(e: _convert.ConvertError) -> HTTPException:
+        return HTTPException(e.status, str(e))
+
+    def _convert_pair(path: str) -> tuple[Path | None, Path, str, str]:
+        """`(original, twin, rel_original, rel_twin)` for a convert request.
+
+        Every convert endpoint takes either end of the pair: the tree holds
+        the original, the save hook and the agent hold the twin. `original` is
+        None for a plain markdown file, which can still be exported (md → PDF
+        works on every install) but has nothing to overwrite.
+
+        cacheawl paths are refused here on purpose — plan decision 9 scopes v1
+        to the project tree, and the store's mirror/sidecar write-guards have
+        no opinion about twins."""
+        if path.startswith("cacheawl:"):
+            raise HTTPException(400, "conversion works on project files only")
+        target = _resolve_project_path(path)
+        try:
+            original, twin = _convert.pair_for(target)
+        except _convert.ConvertError as e:
+            raise _convert_http(e) from None
+        if original is not None and target != original:
+            rel_original = path[: -len(".md")]
+        else:
+            rel_original = path
+        return original, twin, rel_original, f"{rel_original}.md"
+
+    @app.get("/api/convert/formats")
+    async def api_convert_formats() -> dict[str, Any]:
+        """The format registry plus what each engine can do on this machine.
+        ONE source of truth: the export modal, the `{{convert-formats}}` help
+        token, and the system prompt all render this payload, so the supported
+        types can't drift between the code and the documentation."""
+        return await asyncio.to_thread(_convert.formats_view)
+
+    @app.get("/api/convert/status")
+    async def api_convert_status(path: str = Query(...)) -> dict[str, Any]:
+        """State of one document: `fresh`, `edited`, `stale`, `conflict`,
+        `unconverted`, or `engine-missing`, plus the manifest and the spec."""
+        original, twin, rel_original, rel_twin = _convert_pair(path)
+        if original is None:
+            # Plain markdown: no pairing, but exportable all the same.
+            return {"path": rel_twin, "state": None, "twin": None,
+                    "manifest": None, "spec": None, "sync": False,
+                    "export_targets": _convert.export_targets_for(None)}
+        try:
+            out = await asyncio.to_thread(_convert.status, original, rel=rel_original)
+        except _convert.ConvertError as e:
+            raise _convert_http(e) from None
+        out["twin_path"] = rel_twin if twin.is_file() else None
+        return out
+
+    @app.post("/api/convert")
+    async def api_convert_start(request: Request) -> dict[str, Any]:
+        """Start a conversion. 409 when one is already running for this path,
+        or when a twin exists and `force` wasn't set. A forced re-convert
+        stashes the existing twin to its `.undo` first, so "re-convert from
+        the new original" is undoable like any other write."""
+        body = await request.json()
+        path = (body.get("path") or "").strip()
+        if not path:
+            raise HTTPException(400, "missing path")
+        original, _twin, rel_original, _rel_twin = _convert_pair(path)
+        if original is None:
+            raise HTTPException(400, f"{path} is not a convertible document")
+        try:
+            return convert_jobs.start(rel=rel_original, original=original,
+                                      force=bool(body.get("force")))
+        except _convert.ConvertError as e:
+            raise _convert_http(e) from None
+
+    @app.get("/api/convert/job/{job_id}")
+    async def api_convert_job(job_id: str) -> dict[str, Any]:
+        try:
+            return convert_jobs.snapshot(job_id)
+        except _convert.ConvertError as e:
+            raise _convert_http(e) from None
+
+    @app.post("/api/convert/job/{job_id}/cancel")
+    async def api_convert_job_cancel(job_id: str) -> dict[str, Any]:
+        """Kill the worker. Cancellation is a `kill` because most of a
+        conversion happens inside pandoc (and, later, torch), where no
+        cooperative flag would be noticed."""
+        try:
+            return convert_jobs.cancel(job_id)
+        except _convert.ConvertError as e:
+            raise _convert_http(e) from None
+
+    @app.post("/api/convert/export")
+    async def api_convert_export(request: Request) -> dict[str, Any]:
+        """Write the twin out — over the original, or as a datestamped copy
+        beside it. Overwrite stashes the original through the ordinary
+        `stash_for_undo`, so the save/undo bar covers it like any other write;
+        409 when the original changed outside enough since conversion."""
+        body = await request.json()
+        path = (body.get("path") or "").strip()
+        target = (body.get("target") or "").strip().lower()
+        mode = (body.get("mode") or "copy").strip().lower()
+        if not path or not target:
+            raise HTTPException(400, "missing path or target")
+        original, twin, rel_original, rel_twin = _convert_pair(path)
+        try:
+            out = await asyncio.to_thread(
+                _convert.export, twin=twin, original=original,
+                target=target, mode=mode)
+        except _convert.ConvertError as e:
+            raise _convert_http(e) from None
+        await session.emit(_convert.EVENT, {
+            "job": None, "path": rel_original, "op": "export", "state": "done",
+            "progress": 100, "message": f"exported {out['written']}",
+            "result": out, "error": None})
+        return out
+
+    @app.post("/api/convert/sync")
+    async def api_convert_sync(request: Request) -> dict[str, Any]:
+        """Flip "keep the original in sync with my edits". pandoc-family
+        originals only — a PDF's export is a re-typeset, not a round trip."""
+        body = await request.json()
+        path = (body.get("path") or "").strip()
+        if not path:
+            raise HTTPException(400, "missing path")
+        original, _twin, rel_original, _rel_twin = _convert_pair(path)
+        if original is None:
+            raise HTTPException(400, f"{path} is not a converted document")
+        try:
+            out = await asyncio.to_thread(_convert.set_sync, original,
+                                          bool(body.get("enabled")))
+        except _convert.ConvertError as e:
+            raise _convert_http(e) from None
+        out["path"] = rel_original
+        return out
+
+    @app.post("/api/convert/resolve")
+    async def api_convert_resolve(request: Request) -> dict[str, Any]:
+        """Conflict resolution, one of three ways:
+
+        `reconvert` — the original wins; the twin is stashed to `.undo` and
+        the conversion re-runs. `keep` — the twin wins; the manifest records
+        the original as it now stands, so `stale` clears without touching
+        anybody's text. `export` — my twin over their original, the one call
+        that bypasses the stale 409."""
+        body = await request.json()
+        path = (body.get("path") or "").strip()
+        choice = (body.get("choice") or "").strip().lower()
+        if not path:
+            raise HTTPException(400, "missing path")
+        original, twin, rel_original, _rel_twin = _convert_pair(path)
+        if original is None:
+            raise HTTPException(400, f"{path} is not a converted document")
+        try:
+            if choice == "reconvert":
+                return convert_jobs.start(rel=rel_original, original=original, force=True)
+            if choice == "keep":
+                out = await asyncio.to_thread(_convert.accept_external_change, original)
+                out["path"] = rel_original
+                return out
+            if choice == "export":
+                return await asyncio.to_thread(
+                    _convert.export, twin=twin, original=original,
+                    target=original.suffix.lower(), mode="overwrite",
+                    allow_stale=True)
+        except _convert.ConvertError as e:
+            raise _convert_http(e) from None
+        raise HTTPException(400, "choice must be reconvert, keep, or export")
+
+    @app.get("/api/file/blob")
+    async def api_file_blob(path: str = Query(...), meta: int = Query(0)):
+        """Raw bytes for the twin's images, the image viewer, and "view
+        original". Same path guard as `/api/file`, plus an explicit media-type
+        allowlist — never `text/html`, because a same-origin HTML document
+        served from here would run script with the app's own origin.
+
+        `&meta=1` answers with size and media type only. Width and height are
+        deliberately null: Pillow is not a base dependency, and the viewer
+        reads `naturalWidth`/`naturalHeight` off the loaded <img> anyway,
+        which is both free and always right."""
+        target = _resolve_project_path(path)
+        if not target.exists():
+            raise HTTPException(404, "not found")
+        if target.is_dir():
+            raise HTTPException(400, "is a directory")
+        media = _convert.BLOB_MEDIA_TYPES.get(target.suffix.lower())
+        if media is None:
+            raise HTTPException(
+                415, f"{target.suffix or 'this file type'} is not served as a blob")
+        if meta:
+            return {"path": path, "size": target.stat().st_size,
+                    "media_type": media, "width": None, "height": None}
+        headers = {"X-Content-Type-Options": "nosniff"}
+        if media == "image/svg+xml":
+            headers["Content-Security-Policy"] = _convert.SVG_CSP
+        return FileResponse(target, media_type=media, headers=headers)
+
+    @app.post("/api/convert/install")
+    async def api_convert_install(request: Request) -> dict[str, Any]:
+        """Install an optional dependency group with the same `uv sync` the
+        onboarding wizard runs, streaming uv's output on the `convert-install`
+        SSE event. Idempotent; a dropped connection resumes (uv's own
+        behaviour). The installed set is recorded in `extras.json` so the next
+        `uv sync` — which is exact by default — is told to keep it."""
+        body = await request.json()
+        try:
+            return extra_installer.start((body.get("extra") or "pdf").strip())
+        except _convert.ConvertError as e:
+            raise _convert_http(e) from None
+
+    @app.get("/api/convert/install/status")
+    async def api_convert_install_status() -> dict[str, Any]:
+        return await asyncio.to_thread(extra_installer.status)
 
     # ---------- Tree create operations (new folder / new file) ----------
     #
@@ -2848,8 +3277,36 @@ def create_app(
         from . import tools as _tools
         _tools.stash_for_undo(target)
         target.write_text(str(content), encoding="utf-8")
+        # convert §4: a twin whose manifest opted into "keep the original in
+        # sync" exports itself over the original right after every save. The
+        # twin is written FIRST and unconditionally — a stale original refuses
+        # the export, and losing the user's text to that refusal would be the
+        # worst possible answer. The refusal comes back as a flag for the UI
+        # to open the conflict modal with.
+        sync = await asyncio.to_thread(_convert.sync_after_save, target)
         # Return the re-rendered preview fragment so the UI can swap it in.
-        return await api_file(path=path)  # type: ignore[return-value]
+        resp = await api_file(path=path)  # type: ignore[misc]
+        if sync is None:
+            return resp
+        # convert.sync_after_save reports the original's BASENAME (right for
+        # prose); the SSE + marker need something resolvable, and here the
+        # twin's project-relative `path` is in hand — the original is that
+        # path minus the twin's `.md` (the pairing rule, convert-plan §3).
+        rel_original = path[:-3] if path.lower().endswith(".md") else sync.get("original")
+        await session.emit(_convert.EVENT, {
+            "job": None, "path": path, "op": "sync", "state": sync["state"],
+            "progress": None, "original": rel_original,
+            "message": sync.get("detail") or f"exported {sync.get('written', '')}",
+            "result": sync if sync["state"] == "synced" else None,
+            "error": sync.get("detail") if sync["state"] != "synced" else None,
+        })
+        marker = (
+            f'<div class="convert-sync" hidden '
+            f'data-sync-state="{sync["state"]}" '
+            f'data-original="{_escape_html(rel_original or "")}" '
+            f'data-detail="{_escape_html(sync.get("detail") or "")}"></div>'
+        )
+        return HTMLResponse(marker + resp.body.decode("utf-8"))
 
     @app.post("/api/file/undo", response_class=HTMLResponse)
     async def api_file_undo(request: Request) -> HTMLResponse:
@@ -3086,6 +3543,29 @@ def create_app(
             raise HTTPException(400, "expected json body") from None
         cfg = _read_ui_config()
         cfg["current"] = _validate_current(cfg, body or {})
+        # The convert intro modal's "once per file type" flag (convert-plan
+        # §1 decision 10) lives here — top-level, beside `current`, never
+        # inside it (current is the theme/font *selection*). Union-merge so
+        # two browser profiles can't un-see each other's types, and cap the
+        # list so a hostile POST can't grow the config file unboundedly.
+        seen = (body or {}).get("seen_convert_intro")
+        if isinstance(seen, list):
+            merged = list(dict.fromkeys(
+                [*(cfg.get("seen_convert_intro") or []),
+                 *(str(k).lstrip(".").lower() for k in seen
+                   if isinstance(k, str) and k.strip())]))
+            cfg["seen_convert_intro"] = merged[:32]
+        # The home screen's icons/list choice (home-plan §4) — same top-level
+        # round-trip as the flag above, and the same reason: the desktop
+        # webview and a browser tab must agree. Two legal values, so an
+        # unknown one is dropped rather than stored.
+        view = (body or {}).get("home_view")
+        if isinstance(view, str) and view in ("icons", "list"):
+            cfg["home_view"] = view
+        # The View-menu / home-screen "show hidden projects" toggle (§1.10).
+        show_hidden = (body or {}).get("home_show_hidden")
+        if isinstance(show_hidden, bool):
+            cfg["home_show_hidden"] = show_hidden
         _write_ui_config(cfg)
         return cfg
 
@@ -3478,6 +3958,160 @@ def create_app(
         finally:
             in_path.unlink(missing_ok=True)
 
+    # -----------------------------------------------------------------------
+    # enough home (home-plan §3). Registered in both modes; `ModeGate`
+    # above is what makes `/api/home/*` home-only and `/api/close-project`
+    # project-only — the one route that crosses the line, because closing a
+    # project is the reverse of opening one.
+    # -----------------------------------------------------------------------
+
+    async def _json_body(request: Request) -> dict[str, Any]:
+        """The request's JSON object, or `{}`. An empty body is meaningful
+        here (`POST /api/home/add` with none raises the folder dialog), so a
+        missing body is not an error the way it is elsewhere."""
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            return {}
+        return body if isinstance(body, dict) else {}
+
+    async def _handoff(target: Path | None) -> dict[str, Any]:
+        """Hand this browser tab over to another mode (home-plan §1.7).
+
+        Desktop: name the project in `.home-open` (nothing to name when we're
+        closing one) and exit **42**; the shell's watcher reads the file,
+        deletes it, and spawns that project — or home, when the file isn't
+        there. CLI: re-exec ourselves on the same port, so the tab that is
+        already open reconnects to the same URL after the loader page.
+        """
+        if supervisor is not None:
+            # Same ordering as /api/shutdown: an *adopted* llama-server has to
+            # survive us; an owned one goes with us.
+            try:
+                await supervisor.stop(only_if_owned=True)
+            except Exception:  # noqa: BLE001 — never block the handoff
+                log.exception("supervisor stop during the home handoff failed")
+        if os.environ.get(DESKTOP_ENV) == "1":
+            if target is not None:
+                await asyncio.to_thread(_home.write_handoff, target)
+            request_process_exit(code=HANDOFF_EXIT_CODE)
+            log.info("home handoff → desktop (%s)", target or "home")
+            return {"handoff": "desktop"}
+        argv = _home.exec_argv(
+            project_dir=target, port=port or 3456, llm_url=llm_url,
+            max_tool_iters=max_tool_iters, supervise=supervise)
+        request_process_exec(argv)
+        log.info("home handoff → exec (%s)", target or "home")
+        return {"handoff": "exec"}
+
+    @app.get("/api/home/projects")
+    async def api_home_projects() -> dict[str, Any]:
+        """Every registered project, newest-opened first, with stats
+        refreshed for the ones whose fingerprint moved (§1.5). Off the loop:
+        an unchanged project costs one stat per markdown file, a changed one
+        costs a read."""
+        projects = await asyncio.to_thread(_home.list_projects)
+        return {"projects": projects}
+
+    @app.get("/api/home/mirror")
+    async def api_home_mirror(path: str = Query(...)) -> dict[str, Any]:
+        """The merirmaid source for a registered project's visible contents.
+        Registered only: this is a launch screen, not a filesystem browser."""
+        entry = await asyncio.to_thread(_home.entry_for, path)
+        if entry is None:
+            raise HTTPException(404, "that folder isn't on your home screen.")
+        project_dir = Path(entry["path"])
+        try:
+            text = await asyncio.to_thread(_home.build_project_mirror, project_dir)
+        except _home.HomeError as exc:
+            raise HTTPException(404, str(exc)) from None
+        from . import project_meta
+        return {"path": entry["path"],
+                "name": project_meta.load(project_dir)["name"],
+                "text": text}
+
+    @app.post("/api/home/add")
+    async def api_home_add(request: Request):
+        """Enough-ify a folder and put it on the home screen.
+
+        Body `{"path": "/abs/path"}`, or `{}` to raise the native folder
+        chooser on the server side (§1.8 — the shell's webview can't open a
+        Tauri dialog, and this way the CLI gets the same button). Answers:
+        `{"project": …, "created": true}`, `{"cancelled": true}`,
+        `{"dialog_unavailable": true, "detail": …}` (show the typed-path
+        field), 409 + the existing entry when it's already listed, or 400 with
+        the guard's reason.
+        """
+        body = await _json_body(request)
+        raw = str(body.get("path") or "").strip()
+        if not raw:
+            try:
+                chosen = await asyncio.to_thread(_home.choose_folder)
+            except _home.DialogUnavailable as exc:
+                return {"dialog_unavailable": True, "detail": str(exc)}
+            if not chosen:
+                return {"cancelled": True}
+            raw = chosen
+        try:
+            project_dir = await asyncio.to_thread(_home.check_addable, raw)
+        except _home.HomeError as exc:
+            raise HTTPException(400, str(exc)) from None
+        existing = await asyncio.to_thread(_home.entry_for, project_dir)
+        if existing is not None and _home.is_project(project_dir):
+            return JSONResponse(
+                {"detail": f"{project_dir} is already on your home screen.",
+                 "project": _home.row(existing)},
+                status_code=409)
+        try:
+            project = await asyncio.to_thread(_home.add_project, project_dir)
+        except _home.HomeError as exc:
+            raise HTTPException(400, str(exc)) from None
+        except OSError as exc:
+            raise HTTPException(400, f"couldn't set that folder up: {exc}") from None
+        return {"project": project, "created": True}
+
+    @app.post("/api/home/open")
+    async def api_home_open(request: Request) -> dict[str, Any]:
+        """Open a registered project: stamp `last_opened`, then hand off."""
+        body = await _json_body(request)
+        raw = str(body.get("path") or "").strip()
+        if not raw:
+            raise HTTPException(400, "which project? send {\"path\": \"…\"}.")
+        project_dir = _home.canonical(raw)
+        if await asyncio.to_thread(_home.entry_for, project_dir) is None:
+            raise HTTPException(404, "that folder isn't on your home screen.")
+        if not _home.is_project(project_dir):
+            raise HTTPException(
+                409, f"{project_dir} isn't there any more (no rness/ folder). "
+                     f"If the drive is unplugged, plug it back in; otherwise "
+                     f"hide the project, or add it again.")
+        await asyncio.to_thread(_home.touch_opened, project_dir)
+        return await _handoff(project_dir)
+
+    @app.post("/api/home/hide")
+    async def api_home_hide(request: Request) -> dict[str, Any]:
+        """Hide or unhide a project on the home screen. Registry only — the
+        folder, its rness/ and every word in it are untouched (§1.10)."""
+        body = await _json_body(request)
+        raw = str(body.get("path") or "").strip()
+        if not raw:
+            raise HTTPException(400, "which project? send {\"path\": \"…\"}.")
+        hidden = body.get("hidden")
+        if not isinstance(hidden, bool):
+            raise HTTPException(400, "hidden must be a boolean")
+        project_dir = _home.canonical(raw)
+        changed = await asyncio.to_thread(_home.set_hidden, project_dir, hidden)
+        if not changed:
+            raise HTTPException(404, "that project isn't registered")
+        return {"path": str(project_dir), "hidden": hidden}
+
+    @app.post("/api/close-project")
+    async def api_close_project() -> dict[str, Any]:
+        """Close this project and go back to home — the reverse of
+        `/api/home/open`. Desktop ⌘W does the same thing from the shell
+        side; this is the in-window row, and the only path a browser has."""
+        return await _handoff(None)
+
     @app.post("/api/shutdown")
     async def api_shutdown(request: Request) -> dict[str, Any]:
         """Graceful stop — the desktop shell's quit path.
@@ -3522,6 +4156,21 @@ def run(
     llm_url: str,
     max_tool_iters: int = DEFAULT_MAX_TOOL_ITERS,
     supervise: bool = True,
-) -> None:
-    app = create_app(project_dir, llm_url, max_tool_iters=max_tool_iters, supervise=supervise)
-    uvicorn.run(app, host="127.0.0.1", port=port, log_level="info")
+    home: bool = False,
+) -> int:
+    """Serve until asked to stop; return the process's exit status.
+
+    Driving `uvicorn.Server` ourselves (rather than `uvicorn.run`, which is
+    the same three lines plus the worker/reload machinery we don't use) is
+    what lets a home handoff exit **42** — see `request_process_exit`.
+    """
+    app = create_app(project_dir, llm_url, max_tool_iters=max_tool_iters,
+                     supervise=supervise, home=home, port=port)
+    server = uvicorn.Server(
+        uvicorn.Config(app, host="127.0.0.1", port=port, log_level="info"))
+    _UVICORN["server"] = server
+    try:
+        server.run()
+    finally:
+        _UVICORN.pop("server", None)
+    return int(_EXIT_CODE.pop("code", 0))

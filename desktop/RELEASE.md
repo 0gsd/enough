@@ -236,10 +236,13 @@ Add User; log in as them — a fresh account has no Homebrew on PATH, no
    Python environment; a few minutes on first run) → models (pick the
    smallest ✓ model and let it download) → extras (a clean account should show
    every extra as missing, which is correct and must read as informative, not
-   alarming) → folder picker → the enough UI, and a chat round-trip.
+   alarming) → **the home screen** (not the folder picker — 0.2.5 made home
+   the front door) → add a folder from it → the enough UI, and a chat
+   round-trip. Then ⌘W: **expected: back to the home screen**, with the
+   project you just used listed on it.
 5. Quit with ⌘Q. In *your* account: `pgrep -fl "llama-server|uvicorn"` should
    show nothing that the test account started.
-6. Relaunch. **Expected: straight to the folder picker, no wizard.**
+6. Relaunch. **Expected: straight to the home screen, no wizard.**
 7. App menu → "Reopen Last Project on Launch", quit, relaunch. **Expected:
    the project opens directly.**
 

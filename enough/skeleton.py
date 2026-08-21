@@ -630,6 +630,19 @@ def ensure_skeleton(project_dir: Path) -> bool:
     # a renamed-but-otherwise-untouched project-local copy keeps working.
     _migrate_allowlist(project_dir, defaults)
 
+    # ALWAYS run (idempotent): put this project on the home screen. This is
+    # one of the registry's exactly two write points (home-plan §1.3) and it
+    # covers every way a folder becomes a project — the home screen's add
+    # button, `enough --dir` on a fresh folder, and the desktop picker alike.
+    # Never fatal: a project must still open when the registry can't be
+    # written (a read-only ~/enough, a full disk).
+    try:
+        from .home import register
+        register(project_dir)
+    except Exception:  # noqa: BLE001
+        log.warning("could not add %s to the project registry", project_dir,
+                    exc_info=True)
+
     return new_project
 
 
