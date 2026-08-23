@@ -21,7 +21,10 @@ Everything here is arm64-only (tauri-plan §4). One machine, one architecture.
 so the UI badge, the bundle's Info.plist, and the DMG filename all agree.
 `desktop/src-tauri/Cargo.lock` is the silent sixth: it records the crate's
 own version and only updates when cargo next runs — so bump, **build**,
-*then* commit, or the lockfile trails the release by one commit.
+*then* commit, or the lockfile trails the release by one commit. The repo's
+`uv.lock` is the silent seventh, for the same reason (it records `enough`'s
+own version): run `uv lock` after the bump and expect exactly two changed
+lines — the version, and the rolling `exclude-newer` timestamp.
 Any bump (or any bundle change at all) means re-running §4 and §6: a new
 Info.plist is a new bundle is a new signature is a new notarization.
 

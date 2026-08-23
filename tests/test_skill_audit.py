@@ -152,6 +152,66 @@ def test_symlink_elsewhere_is_untrusted(project: Path, tmp_path: Path):
     assert skillaudit.is_trusted(project, "sneaky") is False
 
 
+def make_sibling_install(root: Path, *names: str, package: bool = True) -> Path:
+    """A second enough install — the shape `~/enough` and the desktop
+    bundle's `enough-src` snapshot share: `<root>/enough/__init__.py` beside
+    `<root>/defaults/skills/<name>/SKILL.md`. `package=False` builds the
+    look-alike: right path words, no enough package next to them."""
+    if package:
+        (root / "enough").mkdir(parents=True)
+        (root / "enough" / "__init__.py").write_text('__version__ = "0.0.0"\n',
+                                                     encoding="utf-8")
+    for name in names:
+        d = root / "defaults" / "skills" / name
+        (d / "scripts").mkdir(parents=True)
+        (d / "SKILL.md").write_text(f"---\nname: {name}\n---\nshipped\n",
+                                    encoding="utf-8")
+        (d / "scripts" / "run.py").write_text("print('hi')\n", encoding="utf-8")
+    return root / "defaults" / "skills"
+
+
+def test_symlink_into_sibling_install_is_trusted(project: Path, tmp_path: Path):
+    """The 0.2.7 case: a project whose links were made by the CLI install
+    (`~/enough/defaults/skills/...`) opened by the .app, which runs from its
+    own bundle. Same shipped skill, different install root — still trusted,
+    so the five bundled skills are never audited or badged."""
+    sibling = make_sibling_install(tmp_path / "Applications" / "enough-src",
+                                   "analyzer", "memoir-dialectic")
+    for name in ("analyzer", "memoir-dialectic"):
+        (project / "rness" / "skills" / name).symlink_to(sibling / name)
+        assert skillaudit.is_trusted(project, name) is True
+        assert skillaudit.skill_state(project, name)["state"] == "trusted"
+
+
+def test_flat_symlink_into_sibling_install_is_trusted(project: Path, tmp_path: Path):
+    sibling = make_sibling_install(tmp_path / "other-enough")
+    flat = sibling / "notes.md"
+    flat.parent.mkdir(parents=True, exist_ok=True)
+    flat.write_text("---\nname: notes\n---\n", encoding="utf-8")
+    (project / "rness" / "skills" / "notes.md").symlink_to(flat)
+    assert skillaudit.is_trusted(project, "notes") is True
+
+
+def test_defaults_skills_lookalike_without_package_is_untrusted(project: Path,
+                                                                 tmp_path: Path):
+    """`/anything/defaults/skills/<name>` with no enough package beside it is
+    just a path that happens to contain those words."""
+    fake = make_sibling_install(tmp_path / "dropbox" / "stuff", "analyzer",
+                                package=False)
+    (project / "rness" / "skills" / "analyzer").symlink_to(fake / "analyzer")
+    assert skillaudit.is_trusted(project, "analyzer") is False
+    assert skillaudit.skill_state(project, "analyzer")["state"] == "unverified"
+
+
+def test_symlink_inside_a_sibling_shipped_skill_is_untrusted(project: Path,
+                                                             tmp_path: Path):
+    """Trust is exactly one level below a sibling install's defaults/skills —
+    a link to a folder *within* a shipped skill is not a shipped skill."""
+    sibling = make_sibling_install(tmp_path / "other-enough", "analyzer")
+    (project / "rness" / "skills" / "scripts").symlink_to(sibling / "analyzer" / "scripts")
+    assert skillaudit.is_trusted(project, "scripts") is False
+
+
 # ---------------------------------------------------------------------------
 # The choke point
 # ---------------------------------------------------------------------------

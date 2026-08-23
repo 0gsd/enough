@@ -1,3 +1,6 @@
 # Download cache for fetch-sidecars.sh (archives + extraction scratch).
 /vendor-dl
 .DS_Store
+# Staged by src-tauri/build.rs from enough/static/ on every build (the
+# loading screen's graphic — one home in the package, a copy here).
+/ui/enough-loader_1-2.svg

@@ -26,6 +26,7 @@ whole reason the worker exists.
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -396,13 +397,53 @@ def _convert_docling(original: Path, twin: Path, assets: Path,
                        "ocr": ocr_name if ext == ".pdf" else None}}
 
 
+def _unpack_pdf(original: Path, twin: Path, assets: Path) -> dict[str, Any]:
+    """A PDF enough itself paginated, read back through its own attachment.
+
+    No docling, no layout model, no OCR: the exact markdown that produced the
+    typeset pages is inside the file (paginate-plan §2.6), so the twin is a
+    copy of it and the footnotes are correct by construction. Foreign PDFs
+    never reach here — `convert.reader_for` only picks this engine when the
+    attachment is present."""
+    from . import paginate
+
+    progress(10, f"unpacking {original.name}")
+    found = paginate.embedded_source(original)
+    if found is None:
+        raise WorkerError(
+            f"{original.name} does not carry an enough source to unpack")
+    text, _meta = found
+    twin.write_text(text, encoding="utf-8")
+    if assets.is_dir():
+        try:
+            assets.rmdir()               # nothing to extract from our own PDF
+        except OSError:
+            pass
+    progress(100, "done")
+    return {"twin": twin.name, "assets": None, "images": 0,
+            "engine": {"name": "unpack", "version": _pypdf_version(), "ocr": None}}
+
+
+def _pypdf_version() -> str | None:
+    try:
+        from importlib.metadata import version as _dist_version
+        return _dist_version("pypdf")
+    except Exception:  # noqa: BLE001 — a broken dist-info is just "no version"
+        return None
+
+
 def do_convert(job: dict[str, Any]) -> dict[str, Any]:
     original = Path(job["original"])
     twin = Path(job["twin"])
     assets = Path(job["assets"])
     engine = job.get("engine")
-    if engine not in ("pandoc", "docling"):
+    if engine not in ("pandoc", "docling", "unpack"):
         raise WorkerError(f"unknown engine {engine!r}")
+
+    # Dispatched before anything below could import docling — unpacking one of
+    # our own PDFs must not pay for (or require) the reader.
+    if engine == "unpack":
+        return _unpack_pdf(original, twin, assets)
 
     if assets.is_dir():
         # A re-convert regenerates the assets dir from the original, and
@@ -529,6 +570,185 @@ def do_export(job: dict[str, Any]) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# paginate (paginate-plan §2.5)
+# ---------------------------------------------------------------------------
+
+def _typst() -> Any:
+    try:
+        import typst
+    except ImportError as e:
+        raise WorkerError(f"typst is not available in this environment: {e}") from None
+    return typst
+
+
+def _render_svg_pages(typst: Any, typ: Path, dest: Path, root: Path,
+                      font_kw: dict[str, Any]) -> int:
+    """The viewer's pages, one SVG per LOGICAL page — rendered from the same
+    `.typ` as the PDF and before any imposition, because a reader turning
+    pages wants page 3, not the right half of sheet 2."""
+    from . import paginate
+
+    try:
+        svgs = typst.compile(str(typ), format="svg", root=str(root), **font_kw)
+    except Exception as e:  # noqa: BLE001 — typst raises its own error class
+        raise WorkerError(f"typst could not render the viewer pages: {e}") from None
+    if isinstance(svgs, bytes):
+        svgs = [svgs]
+    if dest.is_dir():
+        for stale in dest.iterdir():
+            try:
+                stale.unlink()
+            except OSError:
+                pass
+    dest.mkdir(parents=True, exist_ok=True)
+    for n, data in enumerate(svgs, 1):
+        (dest / paginate.page_svg_name(n)).write_bytes(data)
+    return len(svgs)
+
+
+def _impose(pdf: Path, layout: str) -> int:
+    """Rewrite `pdf` as printed sheets. Page geometry is read off the file
+    rather than recomputed from the options — the compiled page is the one
+    that has to fit."""
+    from pypdf import PdfReader, PdfWriter, Transformation
+
+    from . import paginate
+
+    reader = PdfReader(str(pdf))
+    if not reader.pages:
+        raise WorkerError("the typeset document has no pages to impose")
+    box = reader.pages[0].mediabox
+    w, h = float(box.width), float(box.height)
+    order = paginate.sheet_order(len(reader.pages), layout)
+    scale = paginate.slot_scale(w, h)
+    sheet_w, sheet_h = paginate.sheet_size(w, h)
+
+    writer = PdfWriter()
+    for left, right in order:
+        sheet = writer.add_blank_page(width=sheet_w, height=sheet_h)
+        for slot, number in ((0, left), (1, right)):
+            if not number:
+                continue
+            x, y, _pw, _ph = paginate.slot_rect(slot, w, h)
+            sheet.merge_transformed_page(
+                reader.pages[number - 1],
+                Transformation().scale(scale).translate(x, y))
+    _rewrite(pdf, writer)
+    return len(order)
+
+
+def _attach_source(pdf: Path, source_md: str, options: dict[str, Any]) -> None:
+    """The round trip (plan §2.4): the renumbered markdown and the options go
+    into the PDF as file attachments, so re-importing this file restores the
+    text byte-exactly instead of guessing at it with a layout model."""
+    from pypdf import PdfReader, PdfWriter
+
+    from . import paginate
+
+    writer = PdfWriter(clone_from=PdfReader(str(pdf)))
+    writer.add_attachment(paginate.ATTACH_SOURCE, source_md.encode("utf-8"))
+    writer.add_attachment(
+        paginate.ATTACH_OPTIONS,
+        (json.dumps({**options, "version": paginate.SCHEMA}, indent=2) + "\n")
+        .encode("utf-8"))
+    _rewrite(pdf, writer)
+
+
+def _rewrite(pdf: Path, writer: Any) -> None:
+    """tmp + rename: a half-written PDF where the finished one was would be
+    the one artifact of this whole pipeline the user can't get back."""
+    tmp = pdf.parent / f".{pdf.name}.tmp"
+    try:
+        with tmp.open("wb") as fh:
+            writer.write(fh)
+        os.replace(tmp, pdf)
+    finally:
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+
+
+def do_paginate(job: dict[str, Any]) -> dict[str, Any]:
+    """markdown → typeset PDF, per paginate-plan §2.5.
+
+    The intermediate `.md` and `.typ` are hidden dotfiles beside the source so
+    the relative image paths pandoc emits resolve for typst too (typst roots
+    itself at the source file's directory), and both are deleted in `finally`.
+    """
+    from . import paginate
+
+    source = Path(job["source"])
+    out = Path(job["out"])
+    options = job["options"]
+    font_paths = list(job.get("font_paths") or [])
+    workdir = source.parent
+
+    progress(5, f"reading {source.name}")
+    renumbered = paginate.renumber_source(source.read_text(encoding="utf-8"))
+
+    md = workdir / f".{source.name}.paginate.md"
+    typ = workdir / f".{source.name}.paginate.typ"
+    font_kw: dict[str, Any] = {}
+    if font_paths:
+        font_kw = {"font_paths": font_paths, "ignore_system_fonts": True}
+    else:
+        # Dev-tree grace: without the bundled families typst must be allowed
+        # its own fallbacks, or every glyph comes out blank.
+        progress(None, "no bundled fonts found — typesetting with this "
+                       "machine's fonts")
+    try:
+        md.write_text(renumbered, encoding="utf-8")
+        progress(20, "converting to typst")
+        _run([_pandoc(), "-f", "gfm+footnotes", "-t", "typst",
+              f"--resource-path={workdir}", "--standalone",
+              "-o", typ.name, md.name], workdir)
+
+        built, moved = paginate.build_typ(typ.read_text(encoding="utf-8"), options)
+        typ.write_text(built, encoding="utf-8")
+
+        progress(45, f"typesetting {out.name}")
+        typst = _typst()
+        try:
+            typst.compile(str(typ), output=str(out), root=str(workdir), **font_kw)
+        except Exception as e:  # noqa: BLE001 — typst raises its own error class
+            raise WorkerError(f"typst could not typeset the document: {e}") from None
+        if not out.is_file():
+            raise WorkerError(f"the typesetter produced no {out.name}")
+
+        from pypdf import PdfReader
+        pages = len(PdfReader(str(out)).pages)
+
+        viewer: str | None = None
+        if options.get("bring_in"):
+            progress(70, "rendering the viewer pages")
+            dest = paginate.pages_dir(out)
+            rendered = _render_svg_pages(typst, typ, dest, workdir, font_kw)
+            manifest = paginate.write_viewer_manifest(
+                out, pages=rendered, source=source.name, options=options)
+            viewer = str(manifest)
+            pages = rendered
+    finally:
+        for scratch in (md, typ):
+            try:
+                scratch.unlink()
+            except OSError:
+                pass
+
+    sheets = pages
+    if options.get("layout") != "single":
+        progress(85, f"imposing {options['layout']}")
+        sheets = _impose(out, options["layout"])
+
+    progress(95, "embedding the source")
+    _attach_source(out, renumbered, options)
+
+    progress(100, "done")
+    return {"pdf": out.name, "path": str(out), "pages": pages, "sheets": sheets,
+            "bytes": out.stat().st_size, "viewer": viewer, "endnotes": moved}
+
+
+# ---------------------------------------------------------------------------
 # model prefetch (the tail of the `pdf` extra's install)
 # ---------------------------------------------------------------------------
 
@@ -591,7 +811,8 @@ def do_prefetch(job: dict[str, Any]) -> dict[str, Any]:
 
 # ---------------------------------------------------------------------------
 
-_OPS = {"convert": do_convert, "export": do_export, "prefetch": do_prefetch}
+_OPS = {"convert": do_convert, "export": do_export, "paginate": do_paginate,
+        "prefetch": do_prefetch}
 
 
 def main(argv: list[str] | None = None) -> int:

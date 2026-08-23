@@ -5,9 +5,10 @@
 <title>enough — starting…</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-  /* Deliberately a plain-text echo of enough/static/loader.html's aesthetic
-     (black field, 2.4s opacity pulse) rather than a copy of its 450 KB
-     wordmark SVG — one asset, one home, no drift. */
+  /* The same picture for the same wait: enough/static/loader.html's black
+     field, 2.4s opacity pulse and mascot-and-wordmark SVG. The SVG's one
+     home is the package; build.rs stages a copy into ui/ (gitignored) so
+     it's embedded here too — see stage_ui_assets(). */
   html, body {
     margin: 0; padding: 0; height: 100%; width: 100%;
     background: #000; overflow: hidden;
@@ -21,10 +22,11 @@
     cursor: default;
   }
   #mark {
-    color: #747072;
-    font-size: min(14vw, 5.5rem);
-    letter-spacing: -0.04em;
+    width: min(60vw, 80vmin);
+    max-width: 720px;
+    height: auto;
     animation: pulse 2.4s ease-in-out infinite;
+    -webkit-user-drag: none;
   }
   #status {
     color: #4a4749;
@@ -44,7 +46,7 @@
 </style>
 </head>
 <body>
-  <div id="mark">enough</div>
+  <img id="mark" src="enough-loader_1-2.svg" alt="enough" draggable="false">
   <!-- Updated from Rust via WebviewWindow::eval(); no IPC, no polling. -->
   <div id="status">starting…</div>
 </body>

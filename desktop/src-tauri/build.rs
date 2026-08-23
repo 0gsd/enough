@@ -10,6 +10,13 @@
 //! `cargo:rerun-if-changed` lines below are what makes it track — cargo walks
 //! those paths recursively and re-runs this script when any file under them
 //! changes.
+//!
+//! The same mechanism, in miniature, gives the shell's own loading screen
+//! the real loader graphic: `ui/loading.html` shows the mascot-and-wordmark
+//! SVG that `enough/static/loader.html` shows, staged here into `ui/`
+//! (gitignored) from its one home in the package, rather than committed
+//! twice. `ui/` is `frontendDist`, so whatever is in it at compile time is
+//! embedded in the binary and served at `tauri://localhost/`.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -105,7 +112,30 @@ fn stage_snapshot() {
     let _ = fs::write(out.join(".snapshot-version"), stamp);
 }
 
+/// Static assets the shell's own pages (`ui/*.html`) need, relative to the
+/// repo root, staged into `ui/` under the same basename. One home each.
+const UI_ASSETS: &[&str] = &["enough/static/enough-loader_1-2.svg"];
+
+fn stage_ui_assets() {
+    let manifest = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap());
+    let repo = manifest.parent().unwrap().parent().unwrap().to_path_buf();
+    let ui = manifest.parent().unwrap().join("ui");
+
+    for rel in UI_ASSETS {
+        let src = repo.join(rel);
+        println!("cargo:rerun-if-changed={}", src.display());
+        if !src.is_file() {
+            panic!("ui asset is missing {} — expected it at {}", rel, src.display());
+        }
+        let name = src.file_name().unwrap();
+        fs::copy(&src, ui.join(name)).unwrap_or_else(|e| {
+            panic!("could not stage {} into ui/: {e}", rel);
+        });
+    }
+}
+
 fn main() {
     stage_snapshot();
+    stage_ui_assets();
     tauri_build::build()
 }

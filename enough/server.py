@@ -45,6 +45,7 @@ from . import cloud as _cloud
 from . import convert as _convert
 from . import home as _home
 from . import models as _models
+from . import paginate as _paginate
 from .logger import ExchangeLog, log_exchange
 from .prompt import (
     assemble_system_prompt,
@@ -313,6 +314,13 @@ def _walk_tree(
         elif not p.is_dir() and p.name.endswith(".md"):
             if _convert.has_twin(p.parent / p.name[: -len(".md")]):
                 continue
+        # Same rule for a paginated PDF: the artifact is the PDF, so its
+        # viewer pages are hidden (the `.…paginate.json` manifest beside
+        # them is a dotfile and never made it this far). `is_pages_dir`
+        # insists on the manifest for the same reason `has_twin` insists on
+        # its own — somebody's folder named `notes.pdf.pages` is theirs.
+        if p.is_dir() and _paginate.is_pages_dir(p):
+            continue
         node = {
             "name": p.name,
             "path": rel,
@@ -349,6 +357,14 @@ def _walk_tree(
                 if st in ("fresh", "edited", "stale", "conflict"):
                     node["converted"] = True
                     node["twin"] = f"{rel}.md"
+            # A PDF enough paginated with "bring it in": the click opens the
+            # paged viewer instead of the blob preview, and the manifest names
+            # its SVG pages.
+            man = _paginate.read_viewer_manifest(p)
+            if man:
+                node["paginated"] = "/".join(
+                    rel_parts + (_paginate.viewer_manifest_path(p).name,))
+                node["pages"] = man.get("pages", 0)
         elif _convert.is_image(p):
             node["image"] = True        # opens in the viewer, not the preview
         out.append(node)
@@ -414,6 +430,13 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
                 conv_attr += f' data-converted="1" data-twin="{twin_attr}"'
         elif n.get("image"):
             conv_attr = ' data-image="1"'
+        if n.get("paginated"):
+            # A PDF enough paginated with its pages brought in: the click
+            # opens the paged viewer, and `data-paginated` is the manifest
+            # that names them.
+            man_attr = str(n["paginated"]).replace('"', "&quot;")
+            conv_attr += (f' data-paginated="{man_attr}"'
+                          f' data-pages="{n.get("pages", 0)}"')
 
         # `data-path` + `data-name` on the row's <li> are read by the
         # tree context menu (option-click) so the JS can identify the
@@ -2186,6 +2209,56 @@ def create_app(
             headers["Content-Security-Policy"] = _convert.SVG_CSP
         return FileResponse(target, media_type=media, headers=headers)
 
+    # ------------------------------------------------------------------
+    # paginate — a finished markdown document typeset into a PDF. The
+    # options schema, the size table, the imposition arithmetic and the
+    # `.typ` surgery live in paginate.py; the pipeline runs in the same
+    # `enough.convert_worker` subprocess as export, synchronously, and
+    # emits the `convert` SSE event so the tree picks the PDF up.
+    # Contract: docs/paginate-plan.md §2.3.
+    # ------------------------------------------------------------------
+
+    def _paginate_http(e: _paginate.PaginateError) -> HTTPException:
+        return HTTPException(e.status, str(e))
+
+    @app.get("/api/paginate/status")
+    async def api_paginate_status(path: str = Query(...)) -> dict[str, Any]:
+        """What the modal draws itself from: the font list, the size table,
+        the default export name, and whether the two engines are here. The
+        frontend hardcodes none of it."""
+        if path.startswith("cacheawl:"):
+            raise HTTPException(400, "pagination works on project files only")
+        _resolve_project_path(path)          # traversal guard, same as /api/file
+        try:
+            return await asyncio.to_thread(_paginate.status, project_dir, path)
+        except _paginate.PaginateError as e:
+            raise _paginate_http(e) from None
+
+    @app.post("/api/paginate")
+    async def api_paginate(request: Request) -> dict[str, Any]:
+        """Typeset one document. Body is the §2.2 options object; `path` is
+        the only key in it that isn't an option. Runs the worker
+        synchronously like export — a paginate is one document, not a queue —
+        and answers `{ok, pdf, pages, viewer}`."""
+        body = await request.json()
+        if not isinstance(body, dict):
+            raise HTTPException(400, "expected a paginate options object")
+        path = (body.get("path") or "").strip()
+        if not path:
+            raise HTTPException(400, "missing path")
+        if path.startswith("cacheawl:"):
+            raise HTTPException(400, "pagination works on project files only")
+        _resolve_project_path(path)
+        try:
+            out = await asyncio.to_thread(_paginate.run_paginate, project_dir, body)
+        except _paginate.PaginateError as e:
+            raise _paginate_http(e) from None
+        await session.emit(_convert.EVENT, {
+            "job": None, "path": path, "op": "paginate", "state": "done",
+            "progress": 100, "message": f"paginated {out['pdf']}",
+            "result": out, "error": None})
+        return out
+
     @app.post("/api/convert/install")
     async def api_convert_install(request: Request) -> dict[str, Any]:
         """Install an optional dependency group with the same `uv sync` the
@@ -3229,6 +3302,11 @@ def create_app(
         content = form.get("content")
         if content is None:
             raise HTTPException(400, "missing content")
+        # Browsers CRLF-normalize multipart field values, so every UI save
+        # would silently rewrite a file's line endings. Normalize back to LF
+        # — offset-based tooling (footnotes, highlights) and the paginate
+        # round-trip all assume the file matches what the UI measured.
+        content = content.replace("\r\n", "\n")
         if not path:
             raise HTTPException(400, "missing path")
         if _is_skill_file(path):

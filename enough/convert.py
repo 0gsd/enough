@@ -111,6 +111,9 @@ BLOB_MEDIA_TYPES: dict[str, str] = {
     ".svg": "image/svg+xml", ".avif": "image/avif", ".ico": "image/x-icon",
     ".tif": "image/tiff", ".tiff": "image/tiff",
     ".pdf": "application/pdf",
+    # The paginated viewer reads its page manifest through this route
+    # (paginate-plan §2.4). JSON, unlike text/html, has no script vector.
+    ".json": "application/json",
     ".woff": "font/woff", ".woff2": "font/woff2",
     ".ttf": "font/ttf", ".otf": "font/otf",
 }
@@ -147,6 +150,8 @@ def reset_engines() -> None:
     """Drop the probe cache. Called after `/api/convert/install` finishes so
     the engines flip available without restarting the server."""
     _engine_cache.clear()
+    from . import paginate
+    paginate.reset_embed_cache()
 
 
 def pandoc_path() -> str | None:
@@ -337,7 +342,27 @@ def engine_available(name: str | None) -> bool:
         return typst_available()
     if name == "docling":
         return docling_available()
+    if name == "unpack":
+        return True          # pypdf is a base dependency
     return False
+
+
+def reader_for(original: Path) -> str | None:
+    """Which engine reads this file — the registry's, except for a PDF enough
+    itself paginated.
+
+    Such a file carries the markdown that produced it as an attachment
+    (paginate-plan §2.6), so reading it back is an unzip, not a document
+    understanding problem: no docling, no models, no OCR, and the text comes
+    back byte-exact. Foreign PDFs are unaffected and still need the reader."""
+    spec = spec_for(original)
+    if spec is None:
+        return None
+    if spec.reader == "docling" and Path(original).suffix.lower() == ".pdf":
+        from . import paginate
+        if paginate.has_embedded_source(Path(original)):
+            return "unpack"
+    return spec.reader
 
 
 def engines() -> dict[str, dict[str, Any]]:
@@ -561,7 +586,8 @@ def state(original: Path) -> str:
             # Manifest without a twin is garbage — the user deleted the twin
             # in Finder. Drop it lazily rather than resurrecting a ghost.
             delete_manifest(original)
-        return "unconverted" if engine_available(spec.reader) else "engine-missing"
+        return ("unconverted" if engine_available(reader_for(original))
+                else "engine-missing")
 
     dirty = False
     stale = False
@@ -613,15 +639,16 @@ def status(original: Path, *, rel: str | None = None) -> dict[str, Any]:
     st = state(original)
     man = read_manifest(original)
     twin = twin_path(original)
+    reader = reader_for(original)
     return {
         "path": rel if rel is not None else original.name,
         "state": st,
         "twin": twin.name if twin.is_file() else None,
         "manifest": man,
         "spec": {"ext": original.suffix.lower(), "label": spec.label,
-                 "reader": spec.reader, "writer": spec.writer,
+                 "reader": reader, "writer": spec.writer,
                  "sync_ok": spec.sync_ok, "notes": spec.notes,
-                 "available": engine_available(spec.reader),
+                 "available": engine_available(reader),
                  "writer_available": engine_available(spec.writer) if spec.writer else False},
         "export_targets": export_targets_for(original),
         "sync": bool((man or {}).get("sync")),
@@ -753,14 +780,15 @@ def convert_job(original: Path, *, force: bool = False) -> dict[str, Any]:
         raise ConvertError(f"{original.name} is not a convertible document", status=400)
     if not original.is_file():
         raise ConvertError(f"{original.name} does not exist", status=404)
-    if not engine_available(spec.reader):
+    reader = reader_for(original)
+    if not engine_available(reader):
         raise ConvertError(engine_missing_message(spec), status=503)
     twin = twin_path(original)
     if twin.is_file() and not force:
         raise ConvertError(
             f"{twin.name} already exists — pass force to re-convert over it", status=409)
     return {
-        "op": "convert", "engine": spec.reader,
+        "op": "convert", "engine": reader,
         "original": str(original), "twin": str(twin),
         "assets": str(assets_dir(original)),
         "artifacts_dir": str(weights_dir()),

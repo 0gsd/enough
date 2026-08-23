@@ -1,6 +1,6 @@
 [project]
 name = "enough"
-version = "0.2.5"
+version = "0.2.7"
 description = "A paradigmless personal computer harness powered by a local LLM."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -42,6 +42,12 @@ dependencies = [
     # pandoc is invoked as a separate process (see THIRD_PARTY_LICENSES.md).
     "pypandoc-binary>=1.17",          # ≈26 MB; wheels for all targets
     "typst>=0.15",                    # ≈31 MB; abi3 wheels for all targets
+    # pagination (paginate-plan §1): pure-python PDF surgery — imposition for
+    # 2-up/booklet, the `enough-source.md` + `enough-paginate.json` attachments
+    # every exported PDF carries, and the unpack that reads them back without
+    # docling. Base, not an extra: re-importing our own PDF must work on every
+    # install.
+    "pypdf>=5",
 ]
 
 [project.optional-dependencies]

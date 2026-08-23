@@ -1,11 +1,17 @@
 """First-use audit of untrusted skills (0.2.2).
 
 Skills that ship with enough are symlinks from `rness/skills/<name>` into
-`<install>/defaults/skills/` — the harness put them there, so they're
-**trusted** and never audited. Anything else under `rness/skills/` (a real
-directory a user dropped in, a symlink to somewhere else, or a SKILL.md the
-agent wrote itself) is **untrusted**: it arrived from outside and nobody has
-read it yet.
+an enough install's `defaults/skills/` — the harness put them there, so
+they're **trusted** and never audited. "An" install, not "this" one: the
+CLI install (`~/enough`) and the desktop bundle's source snapshot coexist
+on one Mac, and a project's links point at whichever install created them.
+Trust is therefore structural — the destination is `<root>/defaults/skills/
+<name>` with the `enough` package at `<root>/enough/` — rather than a
+comparison against the running install's own path (0.2.7; before that,
+opening a CLI-made project in the .app audited every shipped skill).
+Anything else under `rness/skills/` (a real directory a user dropped in, a
+symlink to somewhere else, or a SKILL.md the agent wrote itself) is
+**untrusted**: it arrived from outside and nobody has read it yet.
 
 Toggling an untrusted skill ON is therefore not a one-line write to
 `.disabled`. It goes through `set_skill_enabled_guarded()`, which is the
@@ -156,13 +162,31 @@ def _defaults_skills_root() -> Path:
     return (_install_defaults_root() / "skills").resolve()
 
 
+def _is_install_skills_root(p: Path) -> bool:
+    """True when `p` is the `defaults/skills/` directory of *some* enough
+    install: literally `<root>/defaults/skills`, with the package itself at
+    `<root>/enough/`. That is the one shape bootstrap.sh's `~/enough`, a dev
+    clone, and the desktop bundle's `enough-src` snapshot all share — and
+    the shape nothing a user (or the agent) drops into `rness/skills/` has.
+    """
+    return (p.name == "skills" and p.parent.name == "defaults"
+            and (p.parent.parent / "enough" / "__init__.py").is_file())
+
+
 def is_trusted(project_dir: Path, name: str) -> bool:
-    """True when `rness/skills/<name>` is a symlink resolving into this
+    """True when `rness/skills/<name>` is a symlink resolving into an enough
     install's `defaults/skills/` — i.e. enough shipped it.
 
+    "An" install, deliberately: the running one (`_defaults_skills_root()`)
+    is the common case, but a Mac with both the CLI install and the .app has
+    two, and a project made by one is opened by the other. The link is not
+    the trust, the destination is — and the destination has to be the
+    `defaults/skills/` of a real enough install (`_is_install_skills_root`),
+    not merely a path that happens to contain those words.
+
     A real directory is untrusted (a 3P import, or something the agent wrote
-    itself). A symlink pointing anywhere *other* than defaults/skills is
-    untrusted too — the link is not the trust, the destination is.
+    itself). A symlink pointing anywhere *other* than an install's
+    defaults/skills is untrusted too.
     """
     base = skills_dir(project_dir)
     for candidate in (base / name, base / f"{name}.md"):
@@ -174,9 +198,14 @@ def is_trusted(project_dir: Path, name: str) -> bool:
             continue
         try:
             real.relative_to(_defaults_skills_root())
+            return True
         except ValueError:
-            continue
-        return True
+            pass
+        # A sibling install's shipped skill: `<root>/defaults/skills/<entry>`.
+        # Exactly one level down — a link to a file or folder *inside* a
+        # shipped skill is not a shipped skill.
+        if _is_install_skills_root(real.parent):
+            return True
     return False
 
 

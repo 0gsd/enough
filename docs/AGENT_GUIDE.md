@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.2.5)
+# enough — Agent Guide (v0.2.7)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -58,7 +58,7 @@ Every Python module in `enough/`:
 |---|---:|---|---|
 | [enough/server.py](../enough/server.py) | ~4180 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. | `create_app()`, `_drive_message()`, `ModeGate`, `HOME_PATHS`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
 | [enough/prompt.py](../enough/prompt.py) | ~890 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/role/paradigm enumeration + toggle-state helpers. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
-| [enough/skillaudit.py](../enough/skillaudit.py) | ~900 | First-use audit of untrusted skills (0.2.2). Trust classification (symlink into the install's `defaults/skills/` = trusted), the content fingerprint, the `verdict.json` sidecar, both audit passes (deterministic `payload_scanner.py` + a single non-streaming LLM completion), the in-flight registry, and the guarded toggle. Progress on the `skill-audit` SSE event. | `is_trusted()`, `fingerprint()` / `skill_fingerprint()`, `skill_state()`, `set_skill_enabled_guarded()`, `SkillAuditRefused`, `audit_skill()` / `audit_and_enable()`, `run_llm_audit()` (module-level test hook), `quarantine_untrusted()`, `trust_override()`, `read_verdict()` / `write_verdict()` |
+| [enough/skillaudit.py](../enough/skillaudit.py) | ~900 | First-use audit of untrusted skills (0.2.2). Trust classification (symlink into *an* enough install's `defaults/skills/` = trusted — this install or a sibling one, since 0.2.7), the content fingerprint, the `verdict.json` sidecar, both audit passes (deterministic `payload_scanner.py` + a single non-streaming LLM completion), the in-flight registry, and the guarded toggle. Progress on the `skill-audit` SSE event. | `is_trusted()`, `fingerprint()` / `skill_fingerprint()`, `skill_state()`, `set_skill_enabled_guarded()`, `SkillAuditRefused`, `audit_skill()` / `audit_and_enable()`, `run_llm_audit()` (module-level test hook), `quarantine_untrusted()`, `trust_override()`, `read_verdict()` / `write_verdict()` |
 | [enough/broker.py](../enough/broker.py) | ~380 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
 | [enough/tools.py](../enough/tools.py) | ~1360 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers), the tool-call XML parser, the dispatch table. | `_DISPATCH`, `_TRACE_TOGGLE`, `execute()`, `parse_tool_calls()`, `_CLOUD_KEY_EXFIL_PATTERNS` |
 | [enough/convert.py](../enough/convert.py) | ~1365 | Document conversion (0.2.5): the format **registry** (`FORMATS`), engine probing + caching, twin/assets/manifest naming, the state machine, the job runner that drives the worker, export/sync/resolve, and the `pdf`-extra installer. Imports nothing heavy — docling and pandoc are only ever reached through `convert_worker`. See "Document conversion" below. | `FORMATS` / `formats_view()` / `engines()`, `pandoc_path()` / `typst_path()` / `docling_available()`, `twin_path()` / `assets_dir()` / `manifest_path()` / `pair_for()`, `state()` / `has_twin()`, `read_manifest()` / `write_manifest()`, `ConvertJobs`, `do_export()` / `sync_after_save()` / `resolve()`, `ExtraInstaller`, `installed_extras()` / `record_extra()`, `reset_engines()` |
@@ -70,6 +70,8 @@ Every Python module in `enough/`:
 | [enough/models.py](../enough/models.py) | ~550 | Local-model registry (7 cute-named local models, defined in `defaults/models.json`; two carry separate MTP draft GGUFs, two carry a `llama_cpp_min_release` gate). Feasibility verdicts (RAM + free disk), `install-menu` CLI for bootstrap.sh. Selection state in `~/enough/config/models.json`. | `load_registry()`, `load_state()`, `save_state()`, `resolve()`, `all_models_view()`, `feasibility()`, `release_gate()`, `install_menu_rows()` |
 | [enough/model_download.py](../enough/model_download.py) | ~330 | Resumable GGUF downloads for the in-app model manager: main file then optional MTP draft, ranged-GET resume off a `.part`, one active download per process, cancel-keeps-partial, delete. Backs `/api/models/{download,delete}/*`; progress on the `model-dl` SSE event. | `ModelDownloadManager` (`start` / `cancel` / `delete` / `state`), `pending_phases()`, `partials()` |
 | [enough/skeleton.py](../enough/skeleton.py) | ~710 | Creates `rness/` for new projects (copies from `defaults/`), syncs global skills/roles/paradigms on every launch via dedicated populators, runs migrations. `_populate_skill_symlinks` also calls `skillaudit.quarantine_untrusted()` — untrusted skills default OFF. | `ensure_skeleton()`, `resync_globals()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS`, `_populate_skill_symlinks` / `_populate_role_symlinks` / `_populate_paradigm_symlinks` |
+| [enough/footnotes.py](../enough/footnotes.py) | ~330 | Footnote surgery for in-progress markdown (0.2.7): parse/renumber/insert over standard `[^n]` refs + a terminal definitions block. Pure functions, offset-stable code-masking (fences + inline spans blanked to NULs), numeric labels managed, named tolerated, orphan defs never touched. `tests/test_footnotes.py` doubles as the spec for the `fn*` JS mirror in index.html. | `parse()`, `renumber()`, `next_number()`, `insert_at()`, `definitions_span()`, `REF_RE` / `DEF_RE` |
+| [enough/paginate.py](../enough/paginate.py) | ~920 | Pagination (0.2.7): options schema + named size table, output naming (`name-YYYY-MM-DD.pdf` + `-1`/`-2`), the `.typ` surgery (pandoc-template split, balanced-bracket `#footnote[...]` extraction, endnote reflow, option preamble), pure 2-up/booklet imposition math, bundled-fonts lookup, and the PDF source-attachment probe that powers unpack-on-import. Heavy lifting (pandoc/typst/pypdf compile) runs in `convert_worker.do_paginate`. See "Pagination" below. | `validate()`, `sizes_view()` / `page_size_mm()`, `output_pdf()` / `pages_dir()` / `viewer_manifest_path()`, `fonts_dir()` / `font_paths()`, `embedded_source()` / `has_embedded_source()`, `sheet_order()` / `slot_rect()`, `split_template()` / `extract_footnotes()` / `place_endnotes()` / `preamble()` / `build_typ()`, `status()` / `run_paginate()`, `PaginateError` |
 | [enough/highlights.py](../enough/highlights.py) | ~250 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
 | [enough/girraph.py](../enough/girraph.py) | ~695 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
 | [enough/cacheawl.py](../enough/cacheawl.py) | ~1470 | The cacheawl store: cachebox CRUD, path/URL/wikisink **ingest**, the `_cachebox.merirmaid` mirror generator + reconcile, the mirror/sidecar write-guards, transfer (copy/move), and the launch-time `infoworld` migration. Root is `~/enough/cacheawl/` (or `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store; nothing else writes there. Since 0.2.5 it also exports the generic folder→flowchart walker `home.py` builds project maps with. | `root()`, `create_cachebox()` / `list_cacheboxes()` / `cachebox_tree()`, `run_ingest()`, `regenerate_mirror()` / `reconcile()` / `reconcile_all()`, `folder_flowchart()`, `mirror_write_denial()`, `migrate_infoworld()` |
@@ -109,8 +111,8 @@ unit tests: `cargo test` in `desktop/src-tauri/`.
 | [desktop/src-tauri/src/http.rs](../desktop/src-tauri/src/http.rs) | ~60-line loopback-only HTTP/1.1 client (no client crate) |
 | [desktop/src-tauri/src/bundled.rs](../desktop/src-tauri/src/bundled.rs) | where the bundle's payload lives (uv sidecar, llama.cpp, source snapshot), derived from `current_exe()` |
 | [desktop/src-tauri/src/onboarding.rs](../desktop/src-tauri/src/onboarding.rs) | the first-run wizard's six IPC commands + the launch thread's wait loop |
-| [desktop/src-tauri/build.rs](../desktop/src-tauri/build.rs) | stages the source snapshot (pyproject, uv.lock, `enough/`, `defaults/`, licenses) into the bundle on every `cargo build` |
-| [desktop/ui/loading.html](../desktop/ui/loading.html) | the shell's only page; static, zero Tauri IPC exposed to the enough UI |
+| [desktop/src-tauri/build.rs](../desktop/src-tauri/build.rs) | stages the source snapshot (pyproject, uv.lock, `enough/`, `defaults/`, licenses) into the bundle on every `cargo build`; since 0.2.7 also stages `enough/static/enough-loader_1-2.svg` into `desktop/ui/` (gitignored there) so the loading screen can show it |
+| [desktop/ui/loading.html](../desktop/ui/loading.html) | the shell's own page; static, zero Tauri IPC exposed to the enough UI. Since 0.2.7 it shows the real loader graphic (mascot + wordmark, the same SVG `enough/static/loader.html` uses) instead of the wordmark set in type |
 | [desktop/ui/onboarding.html](../desktop/ui/onboarding.html) | the first-run wizard: welcome → environment → models → extras. Drives the *existing* `/api/models*` endpoints through the Rust proxy; shares nothing with `index.html` |
 | [desktop/fetch-sidecars.sh](../desktop/fetch-sidecars.sh) | checksum-pinned fetch of the `uv` and `llama.cpp` release binaries (they are gitignored, not vendored) |
 | [desktop/RELEASE.md](../desktop/RELEASE.md) | the user-executed sign / notarize / staple / verify checklist |
@@ -1206,6 +1208,73 @@ pointed at a populated dir runs them all.
 
 ---
 
+## Pagination (footnotes, the paginate modal, the paged viewer)
+
+0.2.7. Two halves sharing one engine.
+
+**Footnotes in progress.** Storage is deliberately boring: standard `[^1]`
+refs with a `[^1]: body` definitions block at the end of the file, so every
+pandoc/typst path keeps working and the file stands alone. `footnotes.py`
+owns the surgery; the same rules are mirrored in index.html as `fnParse` /
+`fnRenumber` / `fnNextNumber` / `fnInsertAt` (tests/test_footnotes.py is the
+contract for both — change one side, run the other's spec). The full read
+face renders each definition as a margin card aligned with its ref
+(positioning modeled on `positionReviewMarks`); each card has its own
+read/edit face with Save/Cancel (toggle-while-dirty saves; cancel reverts).
+The edit face inserts via a toolbar button or by typing `[^]`, which expands
+to the next number and renumbers everything after it. Only numeric labels
+are managed; named ones (`[^intro]`) render and paginate but are never
+renumbered. Refs inside code fences or inline code are not footnotes.
+
+**Paginate.** The read-face toolbar's `paginate` button opens
+`#paginate-modal` (options schema pinned in `paginate.validate()`): footnote
+placement (page / chapter end / book end), nine named page sizes + custom
+(ratio + mm/in), portrait/landscape, single / 2-up / booklet, one of four
+bundled OFL font families (`defaults/fonts/` — EB Garamond, Source Serif 4,
+Source Sans 3, Inter; `ignore_system_fonts=True` keeps output identical
+across machines), a single margin value, centered page numbers, running
+headers (free text or chapter name; left/right pages differ only in 2-up /
+booklet), the export name, and "bring pdf into enough".
+
+The worker op (`convert_worker.do_paginate`) runs: `footnotes.renumber` →
+pandoc `-t typst --standalone` → `paginate.build_typ` → `typst.compile`
+(PDF, plus per-page SVGs when bringing in) → pypdf imposition when 2-up /
+booklet → pypdf attachment embed, always. **The `.typ` surgery cuts
+pandoc's `#show: doc => conf(...)` wrapper out** (keeping its helper
+definitions) and substitutes our preamble — injecting *after* the wrapper
+leaves page 1 at US-letter; `test_split_template_against_real_pandoc` pins
+the marker against the installed pandoc. Chapters = the smallest heading
+level present (H1 if any, else H2, …); chapter headings get
+`#pagebreak(weak: true)`. Endnote placements replace `#footnote[...]`
+(balanced-bracket, escape-aware) with `#super[n]` and emit numbered note
+lists per chapter or as a final `= Footnotes` section — no hyperlinks, by
+design (print-correct).
+
+**Round trip.** Every exported PDF carries `enough-source.md` (the
+renumbered source) and `enough-paginate.json` as PDF attachments. A PDF
+with those attachments is convertible with engine `"unpack"` — no docling,
+no `pdf` extra — and its twin is the embedded markdown verbatim, so
+footnotes survive re-import exactly. Foreign PDFs keep the docling path
+unchanged. `has_embedded_source()` is `(size, mtime)`-cached because the
+tree walk asks it per PDF per build.
+
+**The paged viewer.** `bring_in` writes `<pdf>.pages/page-NNNN.svg` + a
+hidden `.<pdf>.paginate.json` manifest (both hidden from the tree; the PDF
+row carries `data-paginated` / `data-pages`). `#paginated-mode` is a
+mode-stack full-frame surface: prev/next, arrow keys, page N/M, fullscreen.
+It always shows *logical* pages — an imposed (2-up/booklet) PDF prints as
+sheets but reads as pages.
+
+### Endpoints
+
+| Route | Method | Notes |
+|---|---|---|
+| `/api/paginate/status?path=` | GET | fonts, size table, engine booleans, default name + options, prior paginations of this source — the modal never hardcodes any of it |
+| `/api/paginate` | POST | §schema in `paginate.validate()`; synchronous like export (`run_worker`, 600s); emits the `convert` SSE event on success |
+
+Viewer pages and the manifest are served by the existing
+`GET /api/file/blob` (`.json` joined the allowed blob types for this).
+
 ## The home screen (registry, mode gate, exit-42 handoff)
 
 0.2.5. Before a project is open, enough runs the **home screen**: the same
@@ -1473,10 +1542,19 @@ is the only door, and the choke point is complete.
 
 **Trust classification** — `is_trusted(project_dir, name)`: the entry under
 `rness/skills/` is a symlink whose `resolve(strict=True)` lands inside
-`skeleton._install_defaults_root() / "skills"`. Real directories and
-symlinks pointing anywhere else are untrusted — including a `SKILL.md` the
-agent wrote itself, which is intended (the agent audits its own output).
-Both the folder (`<name>/`) and flat (`<name>.md`) layouts are handled.
+`skeleton._install_defaults_root() / "skills"` **or** directly inside the
+`defaults/skills/` of any other enough install — structurally,
+`<root>/defaults/skills/<entry>` with the package at `<root>/enough/`
+(`_is_install_skills_root()`). The second clause is 0.2.7: the CLI install
+(`~/enough`) and the .app's `enough-src` snapshot coexist on one Mac, and a
+project's links point at whichever install created them, so before it the
+.app audited — and badged, and flagged — every shipped skill in a project
+the CLI had made. A look-alike path with no `enough/__init__.py` beside it
+is not an install; a link to a file or folder *inside* a sibling's shipped
+skill is not a shipped skill. Real directories and symlinks pointing
+anywhere else are untrusted — including a `SKILL.md` the agent wrote
+itself, which is intended (the agent audits its own output). Both the
+folder (`<name>/`) and flat (`<name>.md`) layouts are handled.
 
 **Fingerprint** — `fingerprint(target)` is sha256 over, for every regular
 file under the skill root sorted by POSIX relative path,
@@ -1666,7 +1744,7 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
    No other code changes needed.
 
 A skill added under `defaults/skills/` is **trusted** (it's a symlink into
-the install) and never audited. A skill created anywhere else — dropped
+an enough install — this one or a sibling) and never audited. A skill created anywhere else — dropped
 into a project's `rness/skills/` by hand, or written there by the agent
 under the workflow-design paradigm — is **untrusted**: it is quarantined off
 on the next sync and gets a first-use audit the first time it's toggled on.

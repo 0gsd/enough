@@ -62,3 +62,4 @@ docs/mode-stack-plan.md
 # AGENT_GUIDE.md is the durable record; these two stay on the dev machine.
 docs/convert-plan.md
 docs/home-plan.md
+docs/paginate-plan.md

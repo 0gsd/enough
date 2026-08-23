@@ -294,3 +294,32 @@ open cacheawl mode from the topbar for the two-pane view (project ↔ cacheboxes
 - ingest a docs site or a folder of notes so the agent can work from it offline.
 - move a finished artifact into a cachebox to keep it out of the working project but still reachable everywhere.
 - double-click a box's diagram to see its shape at a glance in the merirmaid viewer.
+
+## footnotes
+name: footnotes
+path: (inside your markdown files)
+
+### what
+real footnotes for texts in progress. write <code>[^1]</code> in the prose and put <code>[^1]: the note itself</code> at the bottom of the file — in the reading view each note appears as a small card in the margin, aligned with its marker. cards are editable in place: flip one to edit, save or cancel, done. the file on disk stays plain, portable markdown.
+
+### how
+in the editor, type <code>[^]</code> and it becomes the next footnote number automatically, or use the toolbar's insert-footnote button at the cursor. drop a new footnote between two existing ones and everything after it renumbers itself, definitions included. named footnotes like <code>[^aside]</code> are left exactly as you wrote them. a marker with no definition yet shows an empty card — type into it and saving writes the definition for you.
+
+### ideas
+- draft with quick <code>[^]</code> markers and fill the bodies later from the margin cards.
+- footnote numbering stays clean no matter what order you write in — paginate relies on this, so a "prose complete" text needs no cleanup pass.
+
+## paginate
+name: paginate
+path: (next to the markdown it came from)
+
+### what
+turns a completed text into a cleanly typeset pdf — real pages, chapters starting fresh, footnotes reconciled to wherever you want them (on the page, at each chapter's end, or gathered in a final footnotes section). the markdown stays the editable original; the pdf is a dated snapshot beside it, e.g. <code>book-2026-08-23.pdf</code>.
+
+### how
+open a markdown file in the reading view and hit the paginate button in the toolbar. pick a page size (letter, a4, trade paperback… or custom), portrait or landscape, one of the bundled fonts, a margin, and optionally page numbers and running headers (your text, or the chapter name). 2-up puts two pages per sheet; booklet interleaves them so a double-sided print folds into a stapleable book. "bring pdf into enough" adds a page-by-page view with arrow-key turning and fullscreen. every exported pdf secretly carries its own source markdown, so importing one back into a project restores the text — footnotes and all — exactly.
+
+### ideas
+- proof a draft in trade size with chapter-end notes before deciding the final shape.
+- print a booklet of a short piece: booklet layout, half letter, staple the result.
+- send someone the pdf; if it ever comes back without the original, importing it recovers the markdown perfectly.

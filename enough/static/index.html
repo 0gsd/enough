@@ -7212,6 +7212,644 @@
     }
 
     /* ================================================================
+       footnotes + pagination (0.2.7)  (docs/paginate-plan.md §2.8)
+       ================================================================
+       Three surfaces, one section: the footnote markers and their margin
+       cards inside the read face, the paginate modal (on the shared
+       .convert-modal skeleton, so only its own widgets are here), and the
+       full-frame paged viewer.
+
+       Everything inside .review-body uses the --review-* custom
+       properties — that pane runs a max-contrast palette computed at
+       runtime from the theme's luminance (applyReviewContrast), and a
+       card painted in --bg-raise would be the one thing on the page that
+       ignores it. Everything OUTSIDE it uses the ordinary theme vars. */
+
+    /* ---- the marker ---- */
+    :is(#review-mode, #ref-mode) .review-body sup.fn-ref {
+      font-family: var(--font-sans, system-ui, sans-serif);
+      font-size: 0.62em;
+      font-weight: 700;
+      line-height: 0;
+      vertical-align: super;
+      padding: 0 1px 0 2px;
+      color: var(--accent-user);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    :is(#review-mode, #ref-mode) .review-body sup.fn-ref:hover {
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* A named label (`[^intro]`) is never renumbered, so its marker shows
+       its position among the refs rather than a number of its own — and
+       is set in italics, because in a document that mixes the two series
+       the same numeral can honestly appear twice. */
+    :is(#review-mode, #ref-mode) .review-body sup.fn-ref.fn-named,
+    .fn-card .fn-card-num.fn-named {
+      font-style: italic;
+    }
+
+    /* The definitions block. In the full read face the margin cards ARE
+       this block's face, so it is hidden there and nowhere else — the
+       mini panel and the help-centre reader have no gutter to put cards
+       in, and a document whose notes simply vanished would be worse than
+       one that lists them at the end like every other markdown reader. */
+    #review-mode .review-body .fn-defs {
+      display: none;
+    }
+
+    .fn-defs {
+      margin: 2em 0 0;
+      padding-top: 0.8em;
+      border-top: 1px solid var(--review-fg-faint, var(--border));
+      font-size: 0.78em;
+      line-height: 1.5;
+      color: var(--review-fg-muted, var(--fg-muted));
+    }
+
+    .fn-defs .fn-def {
+      display: flex;
+      gap: 0.6em;
+      margin-bottom: 0.35em;
+    }
+
+    .fn-defs .fn-def-num {
+      flex: 0 0 auto;
+      min-width: 1.2em;
+      color: var(--accent-user);
+      font-weight: 700;
+    }
+
+    /* ---- the margin cards ----
+       The layer is absolutely positioned inside .review-body's PADDING
+       box — which is why the body needs a positioning context of its own
+       (below): an absolute child of the scroll container scrolls with the
+       content, so a card stays beside its marker without a scroll
+       listener. Cards are placed by positionFootnoteCards() in the same
+       measured-pixel space positionReviewMarks() uses; the layer itself
+       is inert so a click between two cards still lands on the prose. */
+    :is(#review-mode, #ref-mode) .review-body {
+      position: relative;
+    }
+
+    .review-body .fn-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 8;
+    }
+
+    /* The card itself is unscoped — the same element is drawn in the
+       margin and, when there is no margin to draw it in, inside
+       #fn-popup. Only where it SITS differs (the two rules below). */
+    .fn-card {
+      box-sizing: border-box;
+      /* The code tint, not the page colour: it is the one --review-* value
+         that is a step away from the background in BOTH contrasts, which
+         is exactly what an aside in the margin wants. */
+      background: var(--review-code-bg, var(--bg-raise));
+      color: var(--review-fg, var(--fg));
+      border: 1px solid var(--review-fg-faint, var(--border));
+      border-left: 2px solid var(--accent-user);
+      border-radius: 5px;
+      padding: 6px 8px 7px;
+      font-family: var(--font-sans, system-ui, sans-serif);
+      font-size: 12.5px;
+      line-height: 1.5;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.18);
+      transition: box-shadow 120ms ease, border-color 120ms ease;
+    }
+
+    .review-body .fn-card {
+      position: absolute;
+      /* The right gutter, inside the 16px line-nav rail that overlays the
+         pane's right wall. `top` and `width` are set per card by
+         positionFootnoteCards; this is the one edge they share. */
+      right: 24px;
+      pointer-events: auto;
+    }
+
+    .review-body .fn-card.fn-pulse {
+      border-color: var(--accent-user);
+      box-shadow: 0 0 0 2px var(--accent-user), 0 1px 6px rgba(0, 0, 0, 0.18);
+    }
+
+    .fn-card .fn-card-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+
+    .fn-card .fn-card-num {
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--accent-user);
+      min-width: 14px;
+    }
+
+    .fn-card .fn-card-spacer {
+      flex: 1;
+    }
+
+    .fn-card .fn-card-btn {
+      width: 20px;
+      height: 20px;
+      padding: 2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      cursor: pointer;
+      opacity: 0.65;
+    }
+
+    .fn-card .fn-card-btn:hover {
+      opacity: 1;
+      border-color: var(--review-fg-faint, var(--border));
+    }
+
+    .fn-card .fn-card-btn img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .fn-card .fn-card-body {
+      color: var(--review-fg-muted, var(--fg-muted));
+      word-wrap: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .fn-card .fn-card-body.fn-empty {
+      color: var(--review-fg-faint, var(--fg-faint));
+      font-style: italic;
+    }
+
+    .fn-card .fn-card-body code {
+      font-size: 0.9em;
+    }
+
+    .fn-card textarea {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      min-height: 58px;
+      resize: vertical;
+      background: var(--review-bg, var(--input-bg));
+      color: var(--review-fg, var(--fg));
+      border: 1px solid var(--review-fg-faint, var(--border));
+      border-radius: 3px;
+      padding: 5px 6px;
+      font-family: var(--font-mono, monospace);
+      font-size: 11.5px;
+      line-height: 1.45;
+    }
+
+    .fn-card textarea:focus {
+      outline: none;
+      border-color: var(--accent-user);
+    }
+
+    /* display:block above outranks the UA's [hidden]{display:none} —
+       restate it or the card shows both of its faces at once. */
+    .fn-card textarea[hidden] {
+      display: none;
+    }
+
+    .fn-card .fn-card-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 5px;
+    }
+
+    .fn-card .fn-card-actions[hidden] {
+      display: none;
+    }
+
+    .fn-card .fn-card-actions button {
+      background: transparent;
+      color: var(--review-fg-muted, var(--fg-muted));
+      border: 1px solid var(--review-fg-faint, var(--border));
+      border-radius: 3px;
+      padding: 2px 9px;
+      font-family: inherit;
+      font-size: 11.5px;
+      cursor: pointer;
+    }
+
+    .fn-card .fn-card-actions button.primary {
+      color: var(--accent-user);
+      border-color: var(--accent-user);
+    }
+
+    .fn-card .fn-card-actions button:hover {
+      filter: brightness(1.25);
+    }
+
+    /* The narrow-gutter fallback: the same card, floated over the page
+       next to the marker (the highlight popup's gutter-or-flip
+       placement). Fixed, so it is measured against the viewport. */
+    #fn-popup {
+      position: fixed;
+      display: none;
+      z-index: 60;
+      width: 300px;
+      max-width: calc(100vw - 24px);
+    }
+
+    #fn-popup.open {
+      display: block;
+    }
+
+    #fn-popup .fn-card {
+      position: static;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ---- the paginate button ----
+       .rt-mini-btn is inline-flex, which outranks the UA's
+       [hidden]{display:none} — restate it or a button hidden for a
+       non-markdown document shows anyway. */
+    .rt-mini-btn[hidden] {
+      display: none;
+    }
+
+    /* ---- the paginate modal ----
+       Wider than the convert modals because it carries a preview beside
+       its controls; below 720px the two stack and the preview leads. */
+    #paginate-modal .modal-panel {
+      max-width: 840px;
+    }
+
+    #paginate-modal .modal-body {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 18px;
+      align-items: start;
+      max-height: 74vh;
+    }
+
+    @media (max-width: 720px) {
+      #paginate-modal .modal-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    #paginate-modal .pg-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      min-width: 0;
+    }
+
+    #paginate-modal .pg-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    #paginate-modal .pg-row[hidden],
+    #paginate-modal .pg-block[hidden] {
+      display: none;
+    }
+
+    #paginate-modal .pg-row select,
+    #paginate-modal .pg-row input[type="text"],
+    #paginate-modal .pg-row input[type="number"] {
+      background: var(--input-bg);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 7px;
+      font-family: inherit;
+      font-size: 12.5px;
+    }
+
+    #paginate-modal .pg-row input[type="number"] {
+      width: 82px;
+    }
+
+    #paginate-modal .pg-row input[type="text"] {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    #paginate-modal .pg-row select:focus,
+    #paginate-modal .pg-row input:focus {
+      outline: none;
+      border-color: var(--fg-faint);
+    }
+
+    #paginate-modal .pg-units {
+      width: auto;
+      flex: 0 0 auto;
+    }
+
+    #paginate-modal .pg-choices {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #paginate-modal .pg-choices .cv-radio span {
+      display: block;
+    }
+
+    #paginate-modal .pg-choices .cv-choice-sub {
+      display: block;
+      margin-top: 1px;
+      color: var(--fg-faint);
+      font-size: 11.5px;
+    }
+
+    #paginate-modal .pg-inline {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #paginate-modal .pg-headers {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      border-left: 2px solid var(--border);
+      padding-left: 9px;
+    }
+
+    #paginate-modal .pg-headers[hidden] {
+      display: none;
+    }
+
+    #paginate-modal .pg-stamp {
+      font-size: 11.5px;
+      color: var(--fg-faint);
+    }
+
+    #paginate-modal .pg-progress {
+      margin-right: auto;
+      font-size: 12px;
+      color: var(--fg-muted);
+    }
+
+    /* ---- the live preview ----
+       CSS only, no round trip: a blank page drawn to the chosen ratio
+       with its margin outline and the ticks that stand in for a running
+       head and a page number. Schematic on purpose — it answers "what
+       shape, how much air, what goes at the edges", which is what the
+       six controls beside it are actually asking. */
+    #paginate-modal .pg-preview {
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #paginate-modal .pg-stage {
+      position: relative;
+      width: 100%;
+      height: 270px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #paginate-modal .pg-sheet {
+      position: relative;
+      background: #fdfdfb;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+      display: flex;
+    }
+
+    #paginate-modal .pg-sheet.pg-stacked {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #paginate-modal .pg-page {
+      position: relative;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    #paginate-modal .pg-page + .pg-page {
+      border-left: 1px dashed rgba(0, 0, 0, 0.28);
+    }
+
+    #paginate-modal .pg-margin {
+      position: absolute;
+      border: 1px dashed rgba(0, 0, 0, 0.30);
+    }
+
+    #paginate-modal .pg-tick {
+      position: absolute;
+      height: 2px;
+      background: rgba(0, 0, 0, 0.42);
+    }
+
+    #paginate-modal .pg-num {
+      position: absolute;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 15px;
+      color: rgba(0, 0, 0, 0.32);
+      font-family: var(--font-serif, Georgia, serif);
+    }
+
+    #paginate-modal .pg-cap {
+      font-size: 11.5px;
+      color: var(--fg-faint);
+      text-align: center;
+      line-height: 1.45;
+      min-height: 2.9em;
+    }
+
+    /* The booklet is the one option whose answer is a motion: the same
+       sheet, two faces, alternating — which is the whole point of the
+       fold. Two frames, opposite phases, no library. */
+    #paginate-modal .pg-flip {
+      animation: pg-flip-a 3.2s steps(1, end) infinite;
+    }
+
+    #paginate-modal .pg-flip.pg-flip-b {
+      animation-name: pg-flip-b;
+    }
+
+    @keyframes pg-flip-a {
+      0%, 49.9% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    @keyframes pg-flip-b {
+      0%, 49.9% { opacity: 0; }
+      50%, 100% { opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #paginate-modal .pg-flip,
+      #paginate-modal .pg-flip.pg-flip-b {
+        animation: none;
+      }
+
+      #paginate-modal .pg-flip.pg-flip-b {
+        opacity: 0;
+      }
+    }
+
+    /* ---- the paged viewer ----
+       Same shape as #ref-mode: a full-frame overlay the mode stack owns
+       (position/inset/.open/z-index), a thin toolbar, and one thing on
+       screen — the page. */
+    #paginated-mode {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--fg);
+      z-index: 30;
+    }
+
+    #paginated-mode.open {
+      display: flex;
+    }
+
+    #paginated-mode:fullscreen {
+      background: var(--bg);
+    }
+
+    #paginated-mode .pv-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: var(--bg-raise);
+      border-bottom: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+
+    #paginated-mode .pv-toolbar .pv-mode-icon {
+      width: 26px;
+      height: 14px;
+      object-fit: cover;
+    }
+
+    #paginated-mode .pv-title {
+      font-size: 12.5px;
+      color: var(--fg);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #paginated-mode .pv-badge {
+      font-size: 11px;
+      color: var(--fg-faint);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 6px;
+      white-space: nowrap;
+    }
+
+    #paginated-mode .pv-toolbar .spacer {
+      flex: 1;
+    }
+
+    #paginated-mode .pv-toolbar button {
+      background: var(--btn-bg, var(--bg));
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 26px;
+    }
+
+    #paginated-mode .pv-toolbar button:hover {
+      border-color: var(--fg-faint);
+    }
+
+    #paginated-mode .pv-toolbar button img {
+      width: 18px;
+      height: 18px;
+    }
+
+    #paginated-mode .pv-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 18px;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    #paginated-mode .pv-page {
+      max-width: min(100%, 900px);
+      max-height: 100%;
+      object-fit: contain;
+      background: #fff;
+      box-shadow: 0 3px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    #paginated-mode .pv-nav {
+      flex: 0 0 auto;
+      width: 40px;
+      height: 64px;
+      background: transparent;
+      color: var(--fg-muted);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      font-size: 22px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    #paginated-mode .pv-nav:hover:not(:disabled) {
+      color: var(--fg);
+      border-color: var(--fg-faint);
+    }
+
+    #paginated-mode .pv-nav:disabled {
+      opacity: 0.25;
+      cursor: default;
+    }
+
+    #paginated-mode .pv-foot {
+      flex: 0 0 auto;
+      padding: 8px 14px 12px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--fg-muted);
+    }
+
+    #paginated-mode .pv-hint {
+      color: var(--fg-faint);
+      font-size: 11px;
+      margin-left: 10px;
+    }
+
+    /* ================================================================
        enough home (0.2.5) — the launch screen  (docs/home-plan.md §4)
        ================================================================
        The SAME page in a different mode: a server started with
@@ -7869,6 +8507,14 @@
               title="switch to edit face" aria-label="switch to edit face">
               <img class="svg-icon" data-icon="readedit-switch" alt="switch face" draggable="false">
             </button>
+            <!-- paginate (0.2.7): typeset the finished document into a PDF.
+                 Markdown only — shown by _showFullRead, which is also the
+                 only face it makes sense from (you paginate what you have
+                 just read through). -->
+            <button type="button" id="paginate-btn" class="rt-mini-btn" hidden
+              title="paginate" aria-label="paginate">
+              <img class="svg-icon" data-icon="paginate" alt="paginate" draggable="false">
+            </button>
             <!-- convert §5.2/§5.3: twin chrome (see #convert-chip-mini). -->
             <span class="convert-chip" id="convert-chip-review" hidden>
               <span class="convert-badge state-fresh" data-cc="badge"
@@ -7966,6 +8612,13 @@
             <button type="button" id="edit-face-btn" class="rt-mini-btn"
               title="switch to read face" aria-label="switch to read face">
               <img class="svg-icon" data-icon="readedit-switch" alt="switch face" draggable="false">
+            </button>
+            <!-- footnotes (0.2.7): insert `[^n]` at the caret, renumbering
+                 whatever follows. Typing `[^]` does the same thing — this
+                 is the button for people who don't know that yet. -->
+            <button type="button" id="edit-footnote-btn" class="rt-mini-btn" hidden
+              title="insert footnote" aria-label="insert footnote">
+              <img class="svg-icon" data-icon="comment" alt="insert footnote" draggable="false">
             </button>
             <!-- convert §5.2/§5.3: twin chrome (see #convert-chip-mini). -->
             <span class="convert-chip" id="convert-chip-edit" hidden>
@@ -8075,6 +8728,36 @@
           </button>
         </div>
         <div class="review-body ref-body" id="ref-body"></div>
+      </div>
+
+      <!-- Paged viewer (0.2.7): a PDF enough typeset, read page by page
+           from the per-page SVGs typst emitted beside it
+           (paginate-plan §2.4). Not a PDF renderer — the pages are
+           pictures, one <img> at a time, and the markdown they came from
+           is still the editable document. Entered from a paginate that
+           brought its pages in, or from a tree row carrying
+           data-paginated. A normal mode-stack citizen: the stack owns the
+           .open class and z-index, esc exits, and the ribbon closes it. -->
+      <div id="paginated-mode" aria-hidden="true">
+        <div class="pv-toolbar">
+          <img class="svg-icon pv-mode-icon" data-icon="paginate" alt="" draggable="false">
+          <span class="pv-title" id="pv-title"></span>
+          <span class="pv-badge" id="pv-badge"></span>
+          <span class="spacer"></span>
+          <button type="button" id="pv-full-btn" title="fullscreen" aria-label="fullscreen">
+            <img class="svg-icon" data-icon="mini2full" alt="" draggable="false">
+          </button>
+          <button type="button" id="pv-close-btn" title="close the viewer" aria-label="close">×</button>
+        </div>
+        <div class="pv-stage">
+          <button type="button" class="pv-nav" id="pv-prev" title="previous page" aria-label="previous page">‹</button>
+          <img class="pv-page" id="pv-page" alt="" draggable="false">
+          <button type="button" class="pv-nav" id="pv-next" title="next page" aria-label="next page">›</button>
+        </div>
+        <div class="pv-foot">
+          <span id="pv-count"></span>
+          <span class="pv-hint">← → to turn pages</span>
+        </div>
       </div>
 
       <!-- In-place merirmaid node-label editor (fixed-positioned; moved
@@ -8279,6 +8962,12 @@
           <button type="button" class="edit-btn">edit text in editor</button>
         </div>
       </div>
+
+      <!-- footnotes (0.2.7): the narrow-gutter fallback. When there isn't
+           room in the margin for cards, clicking a marker floats the SAME
+           card here instead (built by the same fnBuildCard), placed beside
+           the marker with the highlight popup's gutter-or-flip rule. -->
+      <div id="fn-popup" role="dialog" aria-hidden="true"></div>
 
       <div id="help-viewer" aria-hidden="true">
         <div class="help-header">
@@ -8952,6 +9641,168 @@
        running jobs carry a progress bar and a cancel button. -->
   <div class="convert-toasts" id="convert-toasts" aria-live="polite"></div>
 
+  <!-- ================================================================
+       paginate (0.2.7) — the typesetting modal (paginate-plan §2.2/§2.8)
+       ================================================================
+       Wears .convert-modal like the others (the `-modal` id suffix plus
+       the .hidden toggle is also what wires esc, via _escModalOpen). The
+       controls are the §2.2 option object one for one; the font list and
+       the size table come from GET /api/paginate/status, never from here.
+       The preview beside them is drawn in CSS from the same values, so
+       every control answers itself before the compile runs. -->
+  <div id="paginate-modal" class="convert-modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="paginateClose()"></div>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="paginate-title">
+      <div class="modal-head">
+        <img class="svg-icon" data-icon="paginate" alt="" draggable="false">
+        <h3 id="paginate-title">paginate</h3>
+        <button class="modal-close" onclick="paginateClose()" aria-label="close">×</button>
+      </div>
+      <div class="modal-body">
+        <!-- Preview column: the page, then whatever the layout needs said
+             in words underneath it. -->
+        <div class="pg-preview">
+          <div class="pg-stage" id="pg-stage"></div>
+          <div class="pg-cap" id="pg-cap"></div>
+        </div>
+
+        <div class="pg-controls">
+          <p id="paginate-lead">pagination typesets a completed text into a cleanly formatted pdf —
+            footnotes reconciled, chapters honored — for export, and optionally a page-by-page
+            view inside enough. the markdown stays the editable original; the pdf is a snapshot
+            beside it. proceed when the prose feels complete.</p>
+          <p class="cv-note" id="paginate-engines" hidden></p>
+
+          <div class="pg-block">
+            <div class="cv-label">footnotes</div>
+            <div class="pg-choices">
+              <label class="cv-radio">
+                <input type="radio" name="pg-footnotes" value="page" checked>
+                <span>at the foot of the page
+                  <span class="cv-choice-sub">where the eye already is; typst sets them live</span></span>
+              </label>
+              <label class="cv-radio">
+                <input type="radio" name="pg-footnotes" value="chapter">
+                <span>at the end of each chapter
+                  <span class="cv-choice-sub">notes gathered per chapter, markers stay superscript</span></span>
+              </label>
+              <label class="cv-radio">
+                <input type="radio" name="pg-footnotes" value="book">
+                <span>at the end of the book
+                  <span class="cv-choice-sub">one notes section at the back, grouped by chapter</span></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="pg-block">
+            <div class="cv-label">page size</div>
+            <div class="pg-row">
+              <select id="pg-size"></select>
+            </div>
+            <div class="pg-row" id="pg-custom-row" hidden style="margin-top:7px">
+              <input type="number" id="pg-custom-w" min="1" step="0.25" aria-label="custom width">
+              <span class="pg-stamp">×</span>
+              <input type="number" id="pg-custom-h" min="1" step="0.25" aria-label="custom height">
+              <select id="pg-custom-unit" class="pg-units" aria-label="units">
+                <option value="mm">mm</option>
+                <option value="in">in</option>
+              </select>
+            </div>
+            <div class="pg-row pg-inline" style="margin-top:7px">
+              <label class="cv-radio"><input type="radio" name="pg-orient" value="portrait" checked>
+                <span>portrait</span></label>
+              <label class="cv-radio"><input type="radio" name="pg-orient" value="landscape">
+                <span>landscape</span></label>
+            </div>
+          </div>
+
+          <div class="pg-block">
+            <div class="cv-label">layout</div>
+            <div class="pg-choices">
+              <label class="cv-radio">
+                <input type="radio" name="pg-layout" value="single" checked>
+                <span>single pages
+                  <span class="cv-choice-sub">one page per sheet — read on screen, print as is</span></span>
+              </label>
+              <label class="cv-radio">
+                <input type="radio" name="pg-layout" value="twoup">
+                <span>2-up
+                  <span class="cv-choice-sub">two pages side by side on a landscape sheet, in order</span></span>
+              </label>
+              <label class="cv-radio">
+                <input type="radio" name="pg-layout" value="booklet">
+                <span>booklet
+                  <span class="cv-choice-sub">imposed to fold and staple — print double-sided, flip on the short edge</span></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="pg-block">
+            <div class="cv-label">type</div>
+            <div class="pg-row">
+              <select id="pg-font" style="flex:1"></select>
+            </div>
+            <div class="pg-row" style="margin-top:7px">
+              <span class="pg-stamp">margin</span>
+              <input type="number" id="pg-margin" min="5" max="60" step="1" aria-label="margin in millimetres">
+              <span class="pg-stamp">mm, all four sides</span>
+            </div>
+          </div>
+
+          <label class="cv-check">
+            <input type="checkbox" id="pg-page-numbers" checked>
+            <span>page numbers, centered at the foot</span>
+          </label>
+
+          <div class="pg-block">
+            <label class="cv-check">
+              <input type="checkbox" id="pg-headers">
+              <span>running heads</span>
+            </label>
+            <div class="pg-headers" id="pg-headers-fields" hidden style="margin-top:7px">
+              <div class="pg-row" id="pg-header-left-row">
+                <span class="pg-stamp" id="pg-header-left-label">head</span>
+                <input type="text" id="pg-header-left" placeholder="left as it stands" maxlength="120">
+              </div>
+              <label class="cv-check">
+                <input type="checkbox" id="pg-header-left-chapter">
+                <span id="pg-header-left-chapter-label">use the chapter name</span>
+              </label>
+              <div class="pg-row" id="pg-header-right-row" hidden>
+                <span class="pg-stamp">right page</span>
+                <input type="text" id="pg-header-right" placeholder="left as it stands" maxlength="120">
+              </div>
+              <label class="cv-check" id="pg-header-right-chapter-row" hidden>
+                <input type="checkbox" id="pg-header-right-chapter">
+                <span>use the chapter name on the right page</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="pg-block">
+            <div class="cv-label">export as</div>
+            <div class="pg-row">
+              <input type="text" id="pg-name" spellcheck="false" autocomplete="off" maxlength="80">
+            </div>
+            <div class="pg-stamp" id="pg-stamp" style="margin-top:5px"></div>
+          </div>
+
+          <label class="cv-check">
+            <input type="checkbox" id="pg-bring-in">
+            <span>bring it into enough — render the pages so the pdf can be read here</span>
+          </label>
+
+          <div class="cv-error" id="paginate-error" hidden></div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <span class="pg-progress" id="paginate-progress" hidden></span>
+        <button type="button" onclick="paginateClose()" id="paginate-cancel">cancel</button>
+        <button type="button" class="primary" id="paginate-go">paginate</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ================================================================
     // enough home (0.2.5) — the mode gate   (docs/home-plan.md §4)
@@ -9595,6 +10446,8 @@
       girraph: 'girraph-mode', merirmaid: 'merirmaid-mode',
       wikisink: 'wiki-mode', cacheawl: 'cacheawl-mode',
       ref: 'ref-mode',
+      // paginate (0.2.7) — the paged viewer over a typeset PDF.
+      paginated: 'paginated-mode',
       // convert §5.10/§5.11 — the image viewer and "view original" render
       // into the mini panel, which readedit also owns. They are mutually
       // exclusive (opening either closes the other), so both can name it.
@@ -9603,7 +10456,8 @@
     // Every root the manager may touch — cleared to the CSS default (30) each
     // pass before the live entries get their z = 30 + index.
     const _ALL_MODE_ROOTS = ['review-mode', 'edit-mode', 'girraph-mode',
-      'merirmaid-mode', 'wiki-mode', 'cacheawl-mode', 'ref-mode', 'preview'];
+      'merirmaid-mode', 'wiki-mode', 'cacheawl-mode', 'ref-mode', 'preview',
+      'paginated-mode'];
 
     function _modeIndex(name) { return MODE_STACK.findIndex((e) => e.name === name); }
     function modeTop() { return MODE_STACK.length ? MODE_STACK[MODE_STACK.length - 1] : null; }
@@ -11301,7 +12155,13 @@
         e.stopPropagation();
         if (e.altKey) return;
         closeHelp();
-        if (convLi.hasAttribute('data-image')) convertOpenImage(convLi.dataset.path);
+        // paginate (0.2.7): a PDF enough typeset AND brought in has pages
+        // of its own, so it opens in the paged viewer rather than as a
+        // twin to convert or a blob for the browser to render. Every other
+        // PDF still takes the convert route below.
+        if (convLi.hasAttribute('data-paginated')) {
+          openPaginatedViewer(convLi.dataset.paginated);
+        } else if (convLi.hasAttribute('data-image')) convertOpenImage(convLi.dataset.path);
         else convertOpenTreeRow(convLi);
         return;
       }
@@ -13165,6 +14025,14 @@
     // default for callers that don't know their path — e.g. the bundled
     // help-center manual) leaves every src alone.
     let MD_DOC_DIR = null;
+    // footnotes (0.2.7) — label → the text its marker shows, for the whole
+    // document being rendered. Same scoping argument as MD_DOC_DIR:
+    // renderInline runs per block and the numbering is a property of the
+    // document, so threading it through every block renderer would have
+    // touched a dozen call sites to carry one map. Rebuilt by
+    // _renderMarkdownBody; the card renderer reads the same map, which is
+    // why it survives the render rather than being scoped to it.
+    let MD_FN_LABELS = new Map();
 
     function mdResolveImageSrc(url) {
       if (MD_DOC_DIR === null) return url;
@@ -13202,6 +14070,14 @@
       // selection toolbar uses block.start/end to translate a DOM
       // selection back into a source-position rewrite.
       //
+      // footnotes (0.2.7): two things the renderer needs from the WHOLE
+      // source before it starts on blocks — where the terminal
+      // definitions block is (that block renders to nothing in the read
+      // face; the margin cards are its face) and what number each ref
+      // shows. Both are per-render, like MD_DOC_DIR above, because
+      // renderInline sees one block at a time and cannot count refs.
+      const fnSpan = fnDefinitionsSpan(src);
+      MD_FN_LABELS = fnMarkerLabels(src);
       // 1. Walk the source, identifying block boundaries (blank-line
       //    delimited, except fenced code blocks which capture across
       //    blank lines) and recording each block's source span.
@@ -13241,7 +14117,13 @@
         const raw = src.slice(start, end).replace(/\s+$/, '');
         if (raw) {
           let type = 'p';
-          if (raw.startsWith('```')) type = 'code';
+          // The terminal definitions block runs to the end of the file, so
+          // "starts inside it" is the whole test. A block that merely
+          // CONTAINS a definition (notes filed under prose with no blank
+          // line between) starts before the span and renders as prose —
+          // the writer's bytes stay visible either way.
+          if (fnSpan && start >= fnSpan[0]) type = 'fndef';
+          else if (raw.startsWith('```')) type = 'code';
           else if (/^#{1,6}\s+/.test(raw)) type = 'heading';
           else if (/^>\s?/.test(raw)) type = 'blockquote';
           else if (looksLikePipeTable(raw)) type = 'table';
@@ -13285,6 +14167,25 @@
           case 'hr':
             out.push(`<hr data-block-idx="${idx}">`);
             break;
+          case 'fndef': {
+            // The notes, rendered as the list a reader of any other
+            // markdown tool would see. In the FULL read face the CSS hides
+            // this block, because there the notes have a better face —
+            // a card in the margin beside the marker. In the mini panel
+            // and the help-centre reader, which have no margin to put
+            // cards in, this is the only face they get.
+            const items = fnParse(b.raw).defs.map((d) => {
+              const mark = MD_FN_LABELS.get(d.label);
+              const num = mark ? mark.shown : d.label;
+              const named = mark && mark.named ? ' fn-named' : '';
+              const body = d.body.split('\n').map((l) => l.trim())
+                .filter((l) => l).join(' ');
+              return `<div class="fn-def"><span class="fn-def-num${named}">${num}</span>` +
+                `<span>${renderInline(escapeMarkdownInline(body))}</span></div>`;
+            }).join('');
+            out.push(`<div class="fn-defs" data-block-idx="${idx}">${items}</div>`);
+            break;
+          }
           case 'table': {
             const lines = b.raw.split('\n').map(l => l.trim()).filter(Boolean);
             const sepIdx = lines.findIndex((l, i) => i > 0 && isTableSeparatorRow(l));
@@ -13398,6 +14299,19 @@
         const i = codeSpans.length;
         codeSpans.push(c);
         return ` CS${i} `;
+      });
+      // Footnote refs: [^label] becomes a superscript marker (0.2.7).
+      // BEFORE the link rule, which would otherwise claim `[^1](…)`;
+      // AFTER the code spans, which is what excludes a ref written inside
+      // backticks here for the same reason fnParse's mask excludes it
+      // there. What the marker SHOWS comes from MD_FN_LABELS: a numeric
+      // label shows its own number, a named one shows its position among
+      // the refs, because "the third note" is the only thing a reader can
+      // do with `[^intro-note]`.
+      s = s.replace(/\[\^([^\]\s]+)\]/g, (_m, label) => {
+        const seen = MD_FN_LABELS && MD_FN_LABELS.get(label);
+        const cls = seen && seen.named ? 'fn-ref fn-named' : 'fn-ref';
+        return `<sup class="${cls}" data-fn="${label}">${seen ? seen.shown : label}</sup>`;
       });
       // Images: ![alt](url) — render before links so the ! isn't lost.
       // Relative srcs go through the /api/file/blob route (convert §5.6).
@@ -13609,12 +14523,20 @@
       await loadHighlightsForReview();
       renderHighlights();
       applyReviewContrast();
+      // paginate (0.2.7): the button belongs to markdown, which is the
+      // only thing there is to typeset.
+      paginateSyncButton(path);
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
+      // footnotes (0.2.7): built once the pane is OPEN — the gutter it
+      // measures itself against is a display:none nothing until then —
+      // and placed a frame later, with the marks.
+      renderFootnoteCards();
       body.scrollTop = 0;
       requestAnimationFrame(() => requestAnimationFrame(() => {
         positionReviewMarks();
         updateLineNavCursor();
+        positionFootnoteCards();
       }));
       refreshReviewChatTail();
       updateReviewChatChip();
@@ -13625,6 +14547,7 @@
       const root = document.getElementById('review-mode');
       root.classList.remove('open');
       root.setAttribute('aria-hidden', 'true');
+      fnClosePopup();
     }
 
     // Mini READ face — compact prettified markdown into #preview.
@@ -13694,6 +14617,9 @@
       const ta = document.getElementById('edit-textarea');
       document.getElementById('edit-title').textContent = path;
       ta.value = text;
+      // footnotes (0.2.7): markdown only — `[^1]` in a .txt is text.
+      const fnBtn = document.getElementById('edit-footnote-btn');
+      if (fnBtn) fnBtn.hidden = !/\.(md|markdown)$/i.test(path);
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
       // Highlights sidecar for the rail (best-effort, non-blocking).
@@ -16440,6 +17366,11 @@
       // text doesn't unanchor the highlight — the visible snippet is
       // unchanged.
       renderHighlights();
+      // footnotes (0.2.7): the innerHTML rewrite took the card layer with
+      // it — rebuild from the new source, then place once the new blocks
+      // have been laid out.
+      renderFootnoteCards();
+      requestAnimationFrame(() => requestAnimationFrame(positionFootnoteCards));
       body.scrollTop = scrollY;
       // Refresh topbar doc counters since REVIEW_SOURCE just changed.
       if (typeof updateDocCounters === 'function') updateDocCounters();
@@ -17273,6 +18204,7 @@
       if (document.getElementById('review-mode')?.classList.contains('open')) {
         positionReviewMarks();
         updateLineNavCursor();
+        fnRefreshOnResize();
       }
       if (document.getElementById('edit-mode')?.classList.contains('open')) {
         positionEditMarks();
@@ -17349,7 +18281,15 @@
       const nodes = [];
       const offsets = [];
       let plain = '';
-      const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT);
+      // footnotes (0.2.7): the margin cards live INSIDE the review body
+      // (they have to, to scroll with it), so the walker has to be told
+      // they are not the document — their text would otherwise join the
+      // string this search runs against and a highlight could anchor
+      // inside a footnote card.
+      const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) => (n.parentElement && n.parentElement.closest('.fn-layer'))
+          ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+      });
       while (true) {
         const n = walker.nextNode();
         if (!n) break;
@@ -19016,6 +19956,12 @@
       const d = CONVERT_DOC;
       if (!d || !d.original) return;
       const original = d.original, twin = d.twin;
+      // paginate (0.2.7): if THIS pdf is one enough typeset with its pages
+      // brought in, the honest way to look at it is the paged viewer, not
+      // the browser's iframe. The tree row carries the manifest that says
+      // so; a pdf without one takes the iframe below, unchanged.
+      const man = paginateManifestFor(original);
+      if (man) { openPaginatedViewer(man); return; }
       if (!(await convertReleasePreview())) return;
       CONVERT_BLOB = { kind: 'pdf', path: original, back: twin };
       convertPaintBlobView();
@@ -19284,6 +20230,13 @@
         });
         return;
       }
+      if (d.op === 'paginate') {
+        // Pagination is synchronous too, and whoever asked for one has
+        // already been toasted by the modal. This is the second tab's
+        // copy: a new PDF appeared in the folder.
+        htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+        return;
+      }
       if (d.op === 'export') {
         // Exports are synchronous — whoever asked for one has already been
         // told. This is only here so a second tab's export still moves
@@ -19333,6 +20286,1281 @@
     });
 
     autoscroll();
+
+    // ================================================================
+    // Footnotes (0.2.7) — the JS mirror of enough/footnotes.py
+    // ================================================================
+    //
+    // Two implementations of the same rules, because both faces need
+    // them: python renumbers at paginate time, and the read face needs
+    // the same answer without a round trip. `tests/test_footnotes.py` is
+    // the reference spec for BOTH — every rule below is the python one
+    // transliterated, including the places where python resolved an
+    // ambiguity, and the comments say why rather than what:
+    //
+    //   - **Code is not prose.** A `[^1]` inside a fence or an inline
+    //     span is an EXAMPLE of a footnote; renumbering it would rewrite
+    //     the documentation of the syntax while somebody was reading it.
+    //     Code is MASKED (blanked to NULs, newlines kept) rather than
+    //     filtered, so every offset a match reports indexes straight back
+    //     into the original string.
+    //   - **Only digits are managed.** `[^intro]` is recognised and then
+    //     left exactly where it is — a named label is how a writer pins a
+    //     footnote that must not move.
+    //   - **An orphan definition is left alone**, byte for byte.
+    //   - **A ref inside a definition body is not a ref** — definitions
+    //     live at the end of the file and renumbering goes by order of
+    //     appearance, so honouring them would sort the tail first.
+    //
+    // Offsets index the string handed in. A ref's start/end bracket its
+    // `[^label]` token; a definition's bracket the whole entry (its lead
+    // line plus continuation lines) up to but not including the newline
+    // that ends it — so `text.slice(end - body.length, end)` is its body,
+    // which is the span a margin card writes back into.
+
+    // A label carries no whitespace and no `]`. That is also what keeps
+    // the `[^]` sentinel the edit face types out of both patterns.
+    const FN_REF_RE = /\[\^([^\]\s]+)\]/g;
+    // A definition line starts with its label, indented at most three
+    // spaces (four would be an indented code block — and four is also the
+    // continuation indent, so the limit is load-bearing in both
+    // directions). The match covers the lead only: its end is the body.
+    const FN_DEF_RE = /^ {0,3}\[\^([^\]\s]+)\]:[ \t]*/gm;
+    // `[0-9]` and not `\d`: `\d` says yes to Arabic-Indic digits, and a
+    // label renumbered into something the user cannot type back is worse
+    // than one left alone.
+    const FN_NUM_RE = /^[0-9]+$/;
+    const FN_FENCE_RE = /^ {0,3}(`{3,}|~{3,})(.*)$/;
+    const FN_BACKTICKS_RE = /`+/g;
+    const FN_BLANK_LINE_RE = /\n[ \t]*\n/g;
+
+    function fnIsNumeric(label) { return FN_NUM_RE.test(label); }
+
+    // python's `Pattern.search(text, pos, endpos)`: the string is searched
+    // as if it ended at `end`, so a run straddling the bound comes back
+    // clipped rather than long. Nothing in a real document straddles one,
+    // but the two implementations have to agree on the degenerate case
+    // too, or a document that renumbers one way here renumbers another
+    // way at paginate time.
+    function _fnSearch(re, text, from, end) {
+      re.lastIndex = Math.max(0, from);
+      const m = re.exec(text);
+      if (!m || m.index >= end) return null;
+      return { start: m.index, end: m.index + Math.min(m[0].length, end - m.index) };
+    }
+
+    // Half-open spans of every fenced code block, fence lines included. An
+    // unclosed fence runs to the end of the document: that is what a
+    // renderer does with it, and a footnote inside a block somebody is
+    // still typing is still an example.
+    function _fnFenceRanges(text) {
+      const ranges = [];
+      let opened = null, marker = '', pos = 0;
+      const lines = text.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i] + (i === lines.length - 1 ? '' : '\n');
+        const m = FN_FENCE_RE.exec(lines[i].replace(/\r$/, ''));
+        if (opened === null) {
+          // A backtick fence's info string may not contain a backtick
+          // (CommonMark); a tilde fence has no such restriction.
+          if (m && !(m[1][0] === '`' && m[2].indexOf('`') !== -1)) {
+            opened = pos; marker = m[1];
+          }
+        } else if (m && m[1][0] === marker[0] && m[1].length >= marker.length
+          && !m[2].trim()) {
+          ranges.push([opened, pos + line.length]);
+          opened = null;
+        }
+        pos += line.length;
+      }
+      if (opened !== null) ranges.push([opened, text.length]);
+      return ranges;
+    }
+
+    // Inline code spans within text[start:end], as absolute offsets.
+    // CommonMark's rule: a run of N backticks opens and the next run of
+    // exactly N closes. A span cannot cross a blank line — the paragraph
+    // ends there — and that bound is what stops one stray backtick from
+    // swallowing the rest of the file.
+    function _fnSpanRanges(text, start, end) {
+      const out = [];
+      let at = start;
+      for (; ;) {
+        const opener = _fnSearch(FN_BACKTICKS_RE, text, at, end);
+        if (!opener) return out;
+        const blank = _fnSearch(FN_BLANK_LINE_RE, text, opener.end, end);
+        const limit = blank ? blank.start : end;
+        const width = opener.end - opener.start;
+        let closer = null, probe = opener.end;
+        for (; ;) {
+          const cand = _fnSearch(FN_BACKTICKS_RE, text, probe, limit);
+          if (!cand) break;
+          if (cand.end - cand.start === width) { closer = cand; break; }
+          probe = cand.end;
+        }
+        if (!closer) { at = opener.end; continue; }   // an unmatched run is just backticks
+        out.push([opener.start, closer.end]);
+        at = closer.end;
+      }
+    }
+
+    // `text` with every code region blanked to NULs, newlines preserved —
+    // so a match found in the mask indexes back into the original and the
+    // `^`-anchored definition pattern still sees the same lines.
+    function _fnMaskCode(text) {
+      if (text.indexOf('`') === -1 && text.indexOf('~') === -1) return text;
+      const fences = _fnFenceRanges(text);
+      const spans = fences.slice();
+      let cursor = 0;
+      for (const [fs, fe] of fences) {
+        for (const s of _fnSpanRanges(text, cursor, fs)) spans.push(s);
+        cursor = fe;
+      }
+      for (const s of _fnSpanRanges(text, cursor, text.length)) spans.push(s);
+      const chars = text.split('');
+      for (const [s, e] of spans) {
+        for (let i = s; i < e; i++) if (chars[i] !== '\n') chars[i] = '\x00';
+      }
+      return chars.join('');
+    }
+
+    function _fnLineEnd(text, pos) {
+      const nl = text.indexOf('\n', pos);
+      return nl < 0 ? text.length : nl;
+    }
+
+    // A body continues onto lines indented four spaces or a tab. A blank
+    // line ends the definition — and therefore ends the terminal block,
+    // which is what keeps fnDefinitionsSpan from swallowing whatever
+    // indented thing happens to follow the notes.
+    function _fnIsContinuation(line) {
+      return (line.startsWith('\t') || line.startsWith('    ')) && !!line.trim();
+    }
+
+    function _fnDefinitionEnd(text, bodyStart) {
+      let end = _fnLineEnd(text, bodyStart);
+      while (end < text.length) {
+        const nxt = _fnLineEnd(text, end + 1);
+        if (!_fnIsContinuation(text.slice(end + 1, nxt))) break;
+        end = nxt;
+      }
+      return end;
+    }
+
+    // Every ref and definition in `text`, each in document order:
+    //   {refs: [{label, numeric, start, end}],
+    //    defs: [{label, numeric, start, end, body}]}
+    function fnParse(text) {
+      const masked = _fnMaskCode(text);
+      const defs = [];
+      FN_DEF_RE.lastIndex = 0;
+      let m;
+      while ((m = FN_DEF_RE.exec(masked)) !== null) {
+        const bodyStart = m.index + m[0].length;
+        const end = _fnDefinitionEnd(text, bodyStart);
+        defs.push({
+          label: m[1], numeric: fnIsNumeric(m[1]), start: m.index, end,
+          body: text.slice(bodyStart, end),
+        });
+      }
+      const refs = [];
+      FN_REF_RE.lastIndex = 0;
+      while ((m = FN_REF_RE.exec(masked)) !== null) {
+        const at = m.index;
+        if (defs.some((d) => d.start <= at && at < d.end)) continue;
+        refs.push({ label: m[1], numeric: fnIsNumeric(m[1]), start: at, end: at + m[0].length });
+      }
+      return { refs, defs };
+    }
+
+    // The terminal definitions block as [start, end], or null. The block
+    // is the last run of CONSECUTIVE definitions and it only counts as
+    // terminal when nothing but whitespace follows it: a document whose
+    // notes sit in the middle with prose after them has no terminal block,
+    // and fnInsertAt starts one at the end rather than file a new note
+    // under a heading it cannot see.
+    function fnDefinitionsSpan(text) {
+      const defs = fnParse(text).defs;
+      if (!defs.length) return null;
+      const last = defs[defs.length - 1];
+      if (text.slice(last.end).trim()) return null;
+      let first = defs.length - 1;
+      while (first > 0 && text.slice(defs[first - 1].end, defs[first].start) === '\n') first--;
+      return [defs[first].start, last.end];
+    }
+
+    // The number a footnote inserted at `offset` should carry: one more
+    // than the managed refs before it. In a renumbered document that is
+    // exactly the number a reader expects to see next.
+    function fnNextNumber(text, offset) {
+      return 1 + fnParse(text).refs.filter((r) => r.numeric && r.start < offset).length;
+    }
+
+    // Apply non-overlapping [start, end, replacement] edits in one pass.
+    // Sorted by (start, end), so a zero-length insertion lands BEFORE a
+    // replacement starting at the same offset — which is what puts a new
+    // ref in front of the ref it displaces.
+    function _fnApplyEdits(text, edits) {
+      if (!edits.length) return text;
+      const sorted = edits.slice().sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));
+      const out = [];
+      let at = 0;
+      for (const [start, end, repl] of sorted) {
+        out.push(text.slice(at, start), repl);
+        at = end;
+      }
+      out.push(text.slice(at));
+      return out.join('');
+    }
+
+    // Edits rewriting every `[^label]` token — ref or definition lead —
+    // whose label the mapping moves. A label that maps to itself produces
+    // no edit, so an already-ordered document comes back byte-identical.
+    function _fnRelabelEdits(text, doc, mapping) {
+      const edits = [];
+      for (const ref of doc.refs) {
+        const next = ref.numeric ? mapping[ref.label] : undefined;
+        if (next !== undefined && next !== ref.label) {
+          edits.push([ref.start, ref.end, '[^' + next + ']']);
+        }
+      }
+      for (const entry of doc.defs) {
+        const next = entry.numeric ? mapping[entry.label] : undefined;
+        if (next === undefined || next === entry.label) continue;
+        // The lead may be indented; the token itself starts at the bracket.
+        const start = text.indexOf('[', entry.start);
+        edits.push([start, start + entry.label.length + 3, '[^' + next + ']']);
+      }
+      return edits;
+    }
+
+    function _fnBlockItems(doc, span) {
+      return doc.defs.filter((d) => span[0] <= d.start && d.start < span[1]);
+    }
+
+    // Managed labels in order of first appearance — the order the
+    // definitions block is supposed to read in.
+    function _fnRefRank(doc) {
+      const rank = new Map();
+      for (const ref of doc.refs) {
+        if (ref.numeric && !rank.has(ref.label)) rank.set(ref.label, rank.size);
+      }
+      return rank;
+    }
+
+    // Permute the managed definitions inside the terminal block into label
+    // order, leaving every other line where it was: a named definition or
+    // an orphan keeps its slot, so a writer who parked `[^intro]` at the
+    // top of the block still finds it there.
+    function _fnReorderDefinitions(text, managed) {
+      const span = fnDefinitionsSpan(text);
+      if (!span) return text;
+      const items = _fnBlockItems(fnParse(text), span);
+      const slots = [];
+      items.forEach((d, i) => { if (d.numeric && managed.has(d.label)) slots.push(i); });
+      if (slots.length < 2) return text;
+      const chunks = items.map((d) => text.slice(d.start, d.end));
+      const ordered = slots.map((i) => items[i])
+        .sort((a, b) => parseInt(a.label, 10) - parseInt(b.label, 10));
+      slots.forEach((slot, i) => { chunks[slot] = text.slice(ordered[i].start, ordered[i].end); });
+      return text.slice(0, span[0]) + chunks.join('\n') + text.slice(span[1]);
+    }
+
+    // Renumber the managed footnotes 1..N in order of first appearance.
+    // Returns [newText, {old: new}] including labels that happened not to
+    // move — the map is the managed set, not a diff. A label used twice is
+    // ONE footnote: it takes its number at first appearance and keeps it
+    // everywhere, which is also the only reading a {old: new} map can
+    // express.
+    function fnRenumber(text) {
+      const doc = fnParse(text);
+      const mapping = {};
+      let n = 0;
+      for (const ref of doc.refs) {
+        if (ref.numeric && mapping[ref.label] === undefined) {
+          mapping[ref.label] = String(++n);
+        }
+      }
+      if (!n) return [text, {}];
+      const out = _fnApplyEdits(text, _fnRelabelEdits(text, doc, mapping));
+      return [_fnReorderDefinitions(out, new Set(Object.values(mapping))), mapping];
+    }
+
+    // `[^label]: body`, with any further lines indented to the
+    // continuation depth so the entry stays ONE definition. Blank lines
+    // inside a body are dropped for the same reason: one would end the
+    // definition, and silently splitting a note in half is worse than
+    // closing the gap.
+    function _fnDefLine(label, body) {
+      const lines = String(body == null ? '' : body).split('\n');
+      const head = '[^' + label + ']:' + (lines[0].trim() ? ' ' + lines[0].trim() : '');
+      const rest = lines.slice(1).filter((l) => l.trim()).map((l) => '    ' + l.trim());
+      return [head].concat(rest).join('\n');
+    }
+
+    // File `[^label]: body` into the terminal definitions block in ref
+    // order, starting the block one blank line below the prose when there
+    // isn't one.
+    function _fnPlaceDefinition(text, label, body) {
+      const line = _fnDefLine(label, body);
+      const span = fnDefinitionsSpan(text);
+      if (!span) {
+        const prose = text.replace(/\s+$/, '');
+        return prose ? prose + '\n\n' + line + '\n' : line + '\n';
+      }
+      const doc = fnParse(text);
+      const items = _fnBlockItems(doc, span);
+      const rank = _fnRefRank(doc);
+      const mine = rank.has(label) ? rank.get(label) : rank.size;
+      // Before the first managed entry that belongs after us; failing
+      // that, at the end of the block.
+      let at = items.length;
+      for (let i = 0; i < items.length; i++) {
+        const e = items[i];
+        const r = e.numeric && rank.has(e.label) ? rank.get(e.label) : -1;
+        if (e.numeric && r > mine) { at = i; break; }
+      }
+      const chunks = items.map((d) => text.slice(d.start, d.end));
+      chunks.splice(at, 0, line);
+      return text.slice(0, span[0]) + chunks.join('\n') + text.slice(span[1]);
+    }
+
+    // Insert a footnote at `offset`; returns [newText, number]. The new
+    // ref takes fnNextNumber; every managed ref from that number up that
+    // sits at or after the insertion point shifts by one, each definition
+    // follows its label, and `[^k]: body` is filed into the terminal block
+    // in ref order. Only refs at or after the caret move: a document whose
+    // numbers already run out of order is fnRenumber's job, not something
+    // to quietly rewrite around a caret.
+    function fnInsertAt(text, offset, body) {
+      offset = Math.max(0, Math.min(text.length, offset));
+      const doc = fnParse(text);
+      const k = 1 + doc.refs.filter((r) => r.numeric && r.start < offset).length;
+      const mapping = {};
+      for (const r of doc.refs) {
+        if (r.numeric && r.start >= offset && parseInt(r.label, 10) >= k) {
+          mapping[r.label] = String(parseInt(r.label, 10) + 1);
+        }
+      }
+      const edits = _fnRelabelEdits(text, doc, mapping);
+      edits.push([offset, offset, '[^' + k + ']']);
+      return [_fnPlaceDefinition(_fnApplyEdits(text, edits), String(k), body || ''), k];
+    }
+
+    // ================================================================
+    // Footnotes — the read face: markers, margin cards, one popup
+    // ================================================================
+    //
+    // The definitions block is not shown as text (renderMarkdown gives it
+    // the `fndef` type and emits nothing visible); its face is a card per
+    // footnote in the right gutter, aligned with the marker it belongs
+    // to. Cards are absolutely positioned INSIDE #review-body, which the
+    // CSS makes a positioning context, so they scroll with the prose for
+    // free — the same trick, and the same measured-pixel arithmetic, as
+    // positionReviewMarks.
+    //
+    // A card has two faces of its own: the note as read, and a textarea
+    // over the source bytes. Saving splices the body back into the
+    // definition and goes through saveAndRerender, so the file on disk
+    // and the rendered page can never disagree. Toggling back to the read
+    // face while dirty SAVES rather than asking — the note is three lines
+    // long and a confirm for it would be noise.
+    //
+    // When the gutter is too narrow to hold a card, no cards are drawn
+    // and clicking a marker floats the same card beside it instead.
+
+    const FN_CARD_MIN = 240;   // px of usable gutter a card needs
+    const FN_CARD_MAX = 340;   // and the widest one worth drawing
+    let FN_INLINE = false;     // are the cards in the gutter right now?
+    let FN_POPUP_LABEL = null; // label the floating card is bound to
+
+    // label → {shown, named}: the text its marker carries, and whether it
+    // is one of the named labels the numbering never touches. A numeric
+    // label shows its own number; a named one shows where it falls among
+    // the refs, because "the fourth note" is the only thing a reader can
+    // do with `[^intro-note]`. The two series can therefore both produce
+    // a "4" in one document — which is honest (pandoc numbers all of them
+    // in document order) but needs saying, so a named marker is set in
+    // italics. Keyed by the escaped label as well: renderInline sees text
+    // that has already been through escapeHtml, so a label with an `&` in
+    // it arrives there in its entity form.
+    function fnMarkerLabels(src) {
+      const map = new Map();
+      let order = 0;
+      for (const ref of fnParse(src).refs) {
+        if (map.has(ref.label)) continue;
+        order += 1;
+        const entry = { shown: ref.numeric ? ref.label : String(order), named: !ref.numeric };
+        map.set(ref.label, entry);
+        const esc = escapeHtml(ref.label);
+        if (esc !== ref.label) map.set(esc, entry);
+      }
+      return map;
+    }
+
+    // One entry per footnote — that is, per unique ref label, in the order
+    // the reader meets them. An orphan REF (no definition) gets a card
+    // with an empty body, ready to write into; an orphan DEFINITION gets
+    // no card at all, because nothing in the prose points at it and
+    // renumbering leaves it alone (plan §1).
+    function fnFootnotes(src) {
+      const doc = fnParse(src);
+      const byLabel = new Map();
+      for (const d of doc.defs) if (!byLabel.has(d.label)) byLabel.set(d.label, d);
+      const labels = fnMarkerLabels(src);
+      const seen = new Set();
+      const out = [];
+      for (const r of doc.refs) {
+        if (seen.has(r.label)) continue;
+        seen.add(r.label);
+        const def = byLabel.get(r.label) || null;
+        const mark = labels.get(r.label);
+        out.push({
+          label: r.label, shown: mark ? mark.shown : r.label,
+          named: !!(mark && mark.named), body: def ? def.body : '', orphan: !def,
+        });
+      }
+      return out;
+    }
+
+    function fnCssEscape(s) {
+      return (window.CSS && CSS.escape) ? CSS.escape(String(s)) : String(s);
+    }
+
+    function fnMarkerFor(body, label) {
+      return body.querySelector('sup.fn-ref[data-fn="' + fnCssEscape(label) + '"]');
+    }
+
+    // Usable gutter: the body's right padding, less the 16px line-nav rail
+    // that overlays it and a little air on each side of the card.
+    function fnGutterWidth(body) {
+      const pad = parseFloat(getComputedStyle(body).paddingRight) || 0;
+      return Math.max(0, pad - 32);
+    }
+
+    // Build (or rebuild) the card layer for the document currently in the
+    // full read face. Cheap enough to run on resize — a document's notes
+    // are counted in tens, not thousands.
+    function renderFootnoteCards() {
+      const body = document.getElementById('review-body');
+      if (!body) return;
+      const old = body.querySelector('.fn-layer');
+      if (old) old.remove();
+      const root = document.getElementById('review-mode');
+      if (!root || !root.classList.contains('open') || !REVIEW_PATH) {
+        FN_INLINE = false;
+        return;
+      }
+      FN_INLINE = fnGutterWidth(body) >= FN_CARD_MIN;
+      const notes = fnFootnotes(REVIEW_SOURCE);
+      if (!notes.length) { FN_INLINE = false; return; }
+      // Whichever way it goes, the markers say what they do.
+      body.querySelectorAll('sup.fn-ref').forEach((sup) => {
+        if (sup.closest('.fn-layer')) return;
+        sup.title = FN_INLINE ? 'footnote — the card is in the margin'
+          : 'footnote — click to read it';
+      });
+      if (!FN_INLINE) return;
+      const layer = document.createElement('div');
+      layer.className = 'fn-layer';
+      for (const note of notes) layer.appendChild(fnBuildCard(note));
+      body.appendChild(layer);
+      // Place them now as well as in the caller's rAF pass: measuring
+      // forces the layout we need anyway, and a pane opened in a
+      // background tab never gets a frame to be refined in.
+      positionFootnoteCards();
+    }
+
+    // Place every card beside its marker, in the body's own scroll
+    // coordinates (measured, like positionReviewMarks, because wrapping
+    // decides where a marker actually lands). Cards that would overlap
+    // stack downwards from the one above: the reading order of the notes
+    // matches the reading order of the markers, so pushing down never
+    // puts a note above its own marker's neighbour.
+    function positionFootnoteCards() {
+      const body = document.getElementById('review-body');
+      const layer = body && body.querySelector('.fn-layer');
+      if (!body || !layer) return;
+      const width = Math.min(FN_CARD_MAX, fnGutterWidth(body));
+      const bodyRect = body.getBoundingClientRect();
+      let floor = 0;
+      layer.querySelectorAll('.fn-card').forEach((card) => {
+        card.style.width = width + 'px';
+        const marker = fnMarkerFor(body, card.dataset.fn);
+        if (!marker) { card.hidden = true; return; }
+        card.hidden = false;
+        const r = marker.getBoundingClientRect();
+        const want = (r.top - bodyRect.top) + body.scrollTop - 4;
+        const top = Math.max(want, floor);
+        card.style.top = Math.round(top) + 'px';
+        floor = top + card.offsetHeight + 10;
+      });
+    }
+
+    // Resize: re-place always, rebuild only when the answer to "is there
+    // room for cards at all" has changed. A rebuild throws away a card
+    // somebody is in the middle of writing, and a window drag of three
+    // pixels is not a reason to lose a sentence.
+    function fnRefreshOnResize() {
+      const body = document.getElementById('review-body');
+      if (!body) return;
+      if ((fnGutterWidth(body) >= FN_CARD_MIN) !== FN_INLINE) renderFootnoteCards();
+      positionFootnoteCards();
+    }
+
+    // The note as prose. Continuation lines are markdown soft wraps, so
+    // they join with a space rather than a <br> nobody typed.
+    function fnRenderBody(text) {
+      const joined = String(text || '').split('\n').map((l) => l.trim())
+        .filter((l) => l).join(' ');
+      return renderInline(escapeMarkdownInline(joined));
+    }
+
+    function fnCardDirty(card) {
+      const ta = card.querySelector('textarea');
+      return !!ta && ta.value !== (card.dataset.saved || '');
+    }
+
+    function fnShowFace(card, face) {
+      const ta = card.querySelector('textarea');
+      const view = card.querySelector('.fn-card-body');
+      const acts = card.querySelector('.fn-card-actions');
+      const img = card.querySelector('.fn-card-btn img');
+      const editing = face === 'edit';
+      ta.hidden = !editing;
+      view.hidden = editing;
+      acts.hidden = !editing || !fnCardDirty(card);
+      setIcon(img, editing ? 'read-eye' : 'edit-pencil');
+      const btn = card.querySelector('.fn-card-btn');
+      btn.title = editing ? 'done — save and read it' : 'edit this note';
+      card.dataset.face = face;
+      if (editing) ta.focus();
+      if (FN_INLINE) positionFootnoteCards();
+    }
+
+    function fnBuildCard(note) {
+      const card = document.createElement('div');
+      card.className = 'fn-card';
+      card.dataset.fn = note.label;
+      card.dataset.saved = note.body || '';
+      card.dataset.face = 'read';
+
+      const top = document.createElement('div');
+      top.className = 'fn-card-top';
+      const num = document.createElement('span');
+      num.className = 'fn-card-num' + (note.named ? ' fn-named' : '');
+      num.textContent = note.shown;
+      if (note.named) num.title = '[^' + note.label + '] — a named note, never renumbered';
+      const spacer = document.createElement('span');
+      spacer.className = 'fn-card-spacer';
+      const faceBtn = document.createElement('button');
+      faceBtn.type = 'button';
+      faceBtn.className = 'fn-card-btn';
+      faceBtn.title = 'edit this note';
+      const faceImg = document.createElement('img');
+      faceImg.className = 'svg-icon';
+      faceImg.alt = '';
+      faceImg.draggable = false;
+      setIcon(faceImg, 'edit-pencil');
+      faceBtn.appendChild(faceImg);
+      top.appendChild(num);
+      top.appendChild(spacer);
+      top.appendChild(faceBtn);
+
+      const view = document.createElement('div');
+      view.className = 'fn-card-body' + (note.body ? '' : ' fn-empty');
+      if (note.body) view.innerHTML = fnRenderBody(note.body);
+      else view.textContent = 'no note yet — click the pencil to write one';
+
+      const ta = document.createElement('textarea');
+      ta.hidden = true;
+      ta.spellcheck = false;
+      ta.value = note.body || '';
+      ta.setAttribute('aria-label', 'footnote ' + note.shown);
+
+      const acts = document.createElement('div');
+      acts.className = 'fn-card-actions';
+      acts.hidden = true;
+      const save = document.createElement('button');
+      save.type = 'button';
+      save.className = 'primary';
+      save.textContent = 'save';
+      const cancel = document.createElement('button');
+      cancel.type = 'button';
+      cancel.textContent = 'cancel';
+      acts.appendChild(save);
+      acts.appendChild(cancel);
+
+      // Toggling back to the read face while dirty means save: the button
+      // says "done", and a note this short does not deserve a dialog.
+      faceBtn.addEventListener('click', () => {
+        if (card.dataset.face === 'edit') {
+          if (fnCardDirty(card)) { fnSaveCard(card); return; }
+          fnShowFace(card, 'read');
+        } else {
+          fnShowFace(card, 'edit');
+        }
+      });
+      ta.addEventListener('input', () => {
+        acts.hidden = !fnCardDirty(card);
+        if (FN_INLINE) positionFootnoteCards();
+      });
+      save.addEventListener('click', () => fnSaveCard(card));
+      cancel.addEventListener('click', () => {
+        ta.value = card.dataset.saved || '';
+        fnShowFace(card, 'read');
+      });
+
+      card.appendChild(top);
+      card.appendChild(view);
+      card.appendChild(ta);
+      card.appendChild(acts);
+      return card;
+    }
+
+    // Write the card's body back into the source and re-render. The
+    // definition's own bytes are rebuilt rather than patched in place:
+    // emptying a body has to take the space after the colon with it, and
+    // a body that grew a second line has to pick up the continuation
+    // indent, or the entry stops being one definition. The indent in
+    // front of the label (up to three spaces) is preserved as found.
+    async function fnSaveCard(card) {
+      const label = card.dataset.fn;
+      const ta = card.querySelector('textarea');
+      if (!ta || !REVIEW_PATH) return;
+      const body = ta.value;
+      const src = REVIEW_SOURCE;
+      const entry = fnParse(src).defs.find((d) => d.label === label);
+      let out;
+      if (entry) {
+        const lead = src.slice(entry.start, src.indexOf('[', entry.start));
+        out = src.slice(0, entry.start) + lead + _fnDefLine(label, body) + src.slice(entry.end);
+      } else {
+        // An orphan ref: the note is being written for the first time, so
+        // the definition is created — keeping the number the prose
+        // already carries. Only the definition is written; nothing in the
+        // prose moves.
+        out = _fnPlaceDefinition(src, label, body);
+      }
+      fnClosePopup();
+      await saveAndRerender(out);
+    }
+
+    // ---- the narrow-gutter fallback --------------------------------
+
+    function fnClosePopup() {
+      const popup = document.getElementById('fn-popup');
+      if (!popup) return;
+      popup.classList.remove('open');
+      popup.setAttribute('aria-hidden', 'true');
+      popup.innerHTML = '';
+      FN_POPUP_LABEL = null;
+    }
+
+    function fnOpenPopup(marker) {
+      const label = marker.dataset.fn;
+      if (FN_POPUP_LABEL === label) { fnClosePopup(); return; }
+      const note = fnFootnotes(REVIEW_SOURCE).find((n) => n.label === label);
+      if (!note) return;
+      const popup = document.getElementById('fn-popup');
+      popup.innerHTML = '';
+      popup.appendChild(fnBuildCard(note));
+      FN_POPUP_LABEL = label;
+      // Same placement rule as the highlight popup: prefer the gutter
+      // side, flip when it would run off, and never leave the viewport.
+      popup.style.left = '0px';
+      popup.style.top = '0px';
+      popup.classList.add('open');
+      popup.setAttribute('aria-hidden', 'false');
+      const anchor = marker.getBoundingClientRect();
+      const rect = popup.getBoundingClientRect();
+      const margin = 8;
+      let left = anchor.right + margin;
+      if (left + rect.width > window.innerWidth - margin) {
+        left = anchor.left - rect.width - margin;
+        if (left < margin) left = margin;
+      }
+      let top = anchor.top;
+      if (top + rect.height > window.innerHeight - margin) {
+        top = window.innerHeight - rect.height - margin;
+      }
+      if (top < margin) top = margin;
+      popup.style.left = left + 'px';
+      popup.style.top = top + 'px';
+    }
+
+    // Clicking a marker: with cards in the margin, take the reader to the
+    // one that belongs to it; without, float it right here.
+    document.getElementById('review-body')?.addEventListener('click', (e) => {
+      const marker = e.target.closest && e.target.closest('sup.fn-ref');
+      if (!marker || marker.closest('.fn-layer')) return;
+      e.preventDefault();
+      const body = document.getElementById('review-body');
+      const card = FN_INLINE && body
+        ? body.querySelector('.fn-card[data-fn="' + fnCssEscape(marker.dataset.fn) + '"]')
+        : null;
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        card.classList.add('fn-pulse');
+        setTimeout(() => card.classList.remove('fn-pulse'), 900);
+        return;
+      }
+      fnOpenPopup(marker);
+    });
+
+    // Click outside the floating card closes it — mousedown, like every
+    // other popup here, so it fires before focus moves.
+    document.addEventListener('mousedown', (e) => {
+      const popup = document.getElementById('fn-popup');
+      if (!popup || !popup.classList.contains('open')) return;
+      if (popup.contains(e.target)) return;
+      if (e.target.closest && e.target.closest('sup.fn-ref')) return;
+      fnClosePopup();
+    });
+
+    // ================================================================
+    // Footnotes — the edit face: the button and the `[^]` shorthand
+    // ================================================================
+    //
+    // Both routes are one call to fnInsertAt: the number falls out of how
+    // many managed refs precede the caret, and everything after it —
+    // refs and their definitions — shifts up by one. Setting .value
+    // resets the textarea's native undo stack, which is what every other
+    // programmatic edit in this file already does; the shorthand does it
+    // once per footnote, at the moment the user typed a token that was
+    // never meant to survive.
+
+    let FN_EDIT_GUARD = false;   // re-entrance guard for our own input event
+
+    function fnEditIsMarkdown() {
+      return /\.(md|markdown)$/i.test(RE_PATH || '');
+    }
+
+    function fnApplyEditorText(ta, text, caret) {
+      const scroll = ta.scrollTop;
+      ta.value = text;
+      ta.setSelectionRange(caret, caret);
+      ta.scrollTop = scroll;
+      // Back through the app's own input path, so the preserved edit
+      // buffer, the dirty flag and the topbar counters all update the way
+      // they would for a keystroke.
+      FN_EDIT_GUARD = true;
+      try { ta.dispatchEvent(new Event('input', { bubbles: true })); }
+      finally { FN_EDIT_GUARD = false; }
+      ta.setSelectionRange(caret, caret);
+      if (RE_SIZE === 'full' && typeof renderEditLineNav === 'function') {
+        renderEditLineNav();
+        if (typeof updateEditLineNavCursor === 'function') updateEditLineNavCursor();
+      }
+      ta.focus();
+    }
+
+    function fnInsertFootnoteAtCaret() {
+      const ta = document.getElementById('edit-textarea');
+      if (!ta || RE_FACE !== 'edit' || !fnEditIsMarkdown()) return;
+      const at = ta.selectionStart;
+      const [out, k] = fnInsertAt(ta.value, at, '');
+      fnApplyEditorText(ta, out, at + ('[^' + k + ']').length);
+    }
+
+    document.getElementById('edit-footnote-btn')
+      ?.addEventListener('click', fnInsertFootnoteAtCaret);
+
+    // `[^]` — the sentinel. It is not a footnote to any parser (an empty
+    // label matches nothing), which is exactly why it is safe to type:
+    // whatever happens next, the document never held a half-made
+    // reference.
+    document.addEventListener('input', (e) => {
+      if (FN_EDIT_GUARD || e.isComposing) return;
+      const ta = e.target;
+      if (!ta || ta.id !== 'edit-textarea' || !fnEditIsMarkdown()) return;
+      const at = ta.selectionStart;
+      if (at < 3 || ta.value.slice(at - 3, at) !== '[^]') return;
+      const base = ta.value.slice(0, at - 3) + ta.value.slice(at);
+      const [out, k] = fnInsertAt(base, at - 3, '');
+      fnApplyEditorText(ta, out, (at - 3) + ('[^' + k + ']').length);
+    });
+
+    // ================================================================
+    // Paginate (0.2.7) — the modal   (docs/paginate-plan.md §2.2/§2.8)
+    // ================================================================
+    //
+    // The controls ARE the §2.2 option object; paginateOptions() is the
+    // only place that shape is written, and nothing here knows a font
+    // name or a page size that did not come from
+    // GET /api/paginate/status. The preview is drawn from the same
+    // values in the same pass, so it cannot drift from what will be
+    // compiled.
+
+    let PG_STATUS = null;    // the last /api/paginate/status answer
+    let PG_PATH = null;      // the document the modal is bound to
+    let PG_RUNNING = false;
+    let PG_LAST_NAMED = null; // the named size to seed "custom…" from
+
+    function paginateSyncButton(path) {
+      const btn = document.getElementById('paginate-btn');
+      if (btn) btn.hidden = !/\.(md|markdown)$/i.test(path || '');
+    }
+
+    function pgEl(id) { return document.getElementById(id); }
+    function pgRadio(name) {
+      const el = document.querySelector('input[name="' + name + '"]:checked');
+      return el ? el.value : null;
+    }
+
+    async function paginateOpen() {
+      const path = REVIEW_PATH || RE_PATH;
+      if (!path) return;
+      PG_PATH = path;
+      const err = pgEl('paginate-error');
+      err.hidden = true;
+      try {
+        const r = await fetch('/api/paginate/status?path=' + encodeURIComponent(path));
+        if (!r.ok) throw new Error(await convertDetail(r));
+        PG_STATUS = await r.json();
+      } catch (e) {
+        convertNotice(cvBase(path), 'could not open paginate: ' + String(e.message || e),
+          'failed', { icon: 'paginate', ttl: 12000 });
+        return;
+      }
+      const defaults = PG_STATUS.defaults || {};
+
+      // Sizes: labelled with the numbers the user recognises, in the
+      // order the backend lists them.
+      const size = pgEl('pg-size');
+      size.innerHTML = '';
+      Object.entries(PG_STATUS.sizes || {}).forEach(([key, s]) => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = key + ' — ' + s.w + '×' + s.h + ' ' + s.unit;
+        size.appendChild(opt);
+      });
+      const custom = document.createElement('option');
+      custom.value = 'custom';
+      custom.textContent = 'custom…';
+      size.appendChild(custom);
+      size.value = defaults.size || 'letter';
+
+      const font = pgEl('pg-font');
+      font.innerHTML = '';
+      (PG_STATUS.fonts || []).forEach((f) => {
+        const opt = document.createElement('option');
+        opt.value = f;
+        opt.textContent = f;
+        font.appendChild(opt);
+      });
+      font.value = defaults.font || (PG_STATUS.fonts || [])[0] || '';
+
+      document.querySelectorAll('input[name="pg-footnotes"]').forEach((el) => {
+        el.checked = el.value === (defaults.footnotes || 'page');
+      });
+      document.querySelectorAll('input[name="pg-orient"]').forEach((el) => {
+        el.checked = el.value === (defaults.orientation || 'portrait');
+      });
+      document.querySelectorAll('input[name="pg-layout"]').forEach((el) => {
+        el.checked = el.value === (defaults.layout || 'single');
+      });
+      pgEl('pg-margin').value = defaults.margin_mm == null ? 20 : defaults.margin_mm;
+      pgEl('pg-page-numbers').checked = defaults.page_numbers !== false;
+      pgEl('pg-bring-in').checked = !!defaults.bring_in;
+      pgEl('pg-headers').checked = false;
+      pgEl('pg-header-left').value = '';
+      pgEl('pg-header-right').value = '';
+      pgEl('pg-header-left-chapter').checked = false;
+      pgEl('pg-header-right-chapter').checked = false;
+      pgEl('pg-name').value = PG_STATUS.name || cvBase(path).replace(/\.[^.]*$/, '');
+      PG_LAST_NAMED = pgEl('pg-size').value;
+      const first = PG_STATUS.sizes[PG_LAST_NAMED];
+      pgEl('pg-custom-w').value = first ? first.w : 140;
+      pgEl('pg-custom-h').value = first ? first.h : 216;
+      pgEl('pg-custom-unit').value = first ? first.unit : 'mm';
+
+      // What this machine can actually do. typst ships with enough;
+      // pandoc does not, and saying so before the button is pressed is
+      // cheaper than a 503.
+      const engines = pgEl('paginate-engines');
+      const missing = [];
+      if (!PG_STATUS.pandoc) missing.push('pandoc is not installed — pagination reads markdown through it');
+      if (!PG_STATUS.typst) missing.push('typst is missing from this environment');
+      if (!PG_STATUS.fonts_bundled) missing.push('the bundled fonts are not installed, so typst will set this in whatever the machine has');
+      engines.textContent = missing.join(' · ');
+      engines.hidden = !missing.length;
+
+      const modal = pgEl('paginate-modal');
+      modal.classList.remove('hidden');
+      modal.setAttribute('aria-hidden', 'false');
+      // Painted once it is on screen: the preview sizes itself to the
+      // stage, and a display:none stage has no width to size to.
+      paginatePaint();
+    }
+
+    function paginateClose() {
+      const modal = pgEl('paginate-modal');
+      modal.classList.add('hidden');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+    window.paginateClose = paginateClose;
+
+    // Page size in millimetres, orientation applied — the one number the
+    // preview needs and the one thing the modal computes for itself
+    // (from the backend's own table).
+    function paginatePageMm() {
+      let w, h;
+      if (pgEl('pg-size').value === 'custom') {
+        const unit = pgEl('pg-custom-unit').value;
+        const k = unit === 'in' ? 25.4 : 1;
+        w = (parseFloat(pgEl('pg-custom-w').value) || 0) * k;
+        h = (parseFloat(pgEl('pg-custom-h').value) || 0) * k;
+      } else {
+        const s = (PG_STATUS && PG_STATUS.sizes) ? PG_STATUS.sizes[pgEl('pg-size').value] : null;
+        w = s ? s.w_mm : 215.9;
+        h = s ? s.h_mm : 279.4;
+      }
+      if (!(w > 0) || !(h > 0)) { w = 215.9; h = 279.4; }
+      if (pgRadio('pg-orient') === 'landscape') { const t = w; w = h; h = t; }
+      return { w, h };
+    }
+
+    function paginateStampName() {
+      const d = new Date();
+      const p = (n) => String(n).padStart(2, '0');
+      const name = (pgEl('pg-name').value || '').trim() || 'document';
+      return name + '-' + d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + '.pdf';
+    }
+
+    // Repaint everything that depends on a control: the rows that only
+    // exist for some choices, the filename, and the page.
+    function paginatePaint() {
+      const layout = pgRadio('pg-layout');
+      const size = pgEl('pg-size').value;
+      // Switching to "custom…" starts from the size the user was looking
+      // at a moment ago, not from whatever the modal opened on: the
+      // custom row is almost always "that, but a bit narrower".
+      if (size === 'custom') {
+        if (PG_LAST_NAMED && PG_STATUS && PG_STATUS.sizes[PG_LAST_NAMED]) {
+          const s = PG_STATUS.sizes[PG_LAST_NAMED];
+          pgEl('pg-custom-w').value = s.w;
+          pgEl('pg-custom-h').value = s.h;
+          pgEl('pg-custom-unit').value = s.unit;
+          PG_LAST_NAMED = null;
+        }
+      } else {
+        PG_LAST_NAMED = size;
+      }
+      pgEl('pg-custom-row').hidden = size !== 'custom';
+      const headersOn = pgEl('pg-headers').checked;
+      pgEl('pg-headers-fields').hidden = !headersOn;
+      const pair = layout !== 'single';
+      pgEl('pg-header-left-label').textContent = pair ? 'left page' : 'head';
+      pgEl('pg-header-left-chapter-label').textContent = pair
+        ? 'use the chapter name on the left page' : 'use the chapter name';
+      pgEl('pg-header-right-row').hidden = !pair;
+      pgEl('pg-header-right-chapter-row').hidden = !pair;
+      // "use the chapter name" is the same slot as free text, so it owns
+      // the field while it is on.
+      pgEl('pg-header-left').disabled = pgEl('pg-header-left-chapter').checked;
+      pgEl('pg-header-right').disabled = pgEl('pg-header-right-chapter').checked;
+      pgEl('pg-stamp').textContent = 'writes ' + paginateStampName() +
+        ' beside the document — enough adds -1, -2 if that name is already taken today';
+      paginatePaintPreview();
+    }
+
+    // ---- the live preview ------------------------------------------
+    //
+    // A blank page at the chosen ratio, its margin outline, a tick where
+    // a running head would sit and the page number where it lands. For
+    // 2-up, the landscape sheet with its two panels and the flow. For a
+    // booklet, the same sheet twice — front and back — alternating,
+    // because the fold is the only way to say what the imposition does.
+
+    function pgPageInner(dims, o, numeral) {
+      const mx = Math.min(45, (o.margin / dims.w) * 100);
+      const my = Math.min(45, (o.margin / dims.h) * 100);
+      const parts = [];
+      parts.push('<div class="pg-margin" style="left:' + mx + '%;right:' + mx +
+        '%;top:' + my + '%;bottom:' + my + '%"></div>');
+      if (o.headers) {
+        parts.push('<div class="pg-tick" style="left:' + mx + '%;width:' +
+          ((100 - 2 * mx) * 0.42) + '%;top:' + (my * 0.5) + '%"></div>');
+      }
+      if (o.numbers) {
+        parts.push('<div class="pg-num" style="bottom:' + (my * 0.12) + '%">' +
+          numeral + '</div>');
+      }
+      return parts.join('');
+    }
+
+    function pgSheet(w, h, pages, dims, o, cls) {
+      const panels = pages.map((n) =>
+        '<div class="pg-page">' + pgPageInner(dims, o, n === null ? '' : n) + '</div>').join('');
+      return '<div class="pg-sheet ' + (cls || '') + '" style="width:' +
+        Math.round(w) + 'px;height:' + Math.round(h) + 'px">' + panels + '</div>';
+    }
+
+    function paginatePaintPreview() {
+      const stage = pgEl('pg-stage');
+      const cap = pgEl('pg-cap');
+      if (!stage) return;
+      const dims = paginatePageMm();
+      const layout = pgRadio('pg-layout');
+      const o = {
+        margin: Math.max(0, parseFloat(pgEl('pg-margin').value) || 0),
+        headers: pgEl('pg-headers').checked,
+        numbers: pgEl('pg-page-numbers').checked,
+      };
+      const sizeLabel = pgEl('pg-size').value === 'custom'
+        ? 'custom ' + pgEl('pg-custom-w').value + '×' + pgEl('pg-custom-h').value + ' ' +
+          pgEl('pg-custom-unit').value
+        : pgEl('pg-size').value;
+      const orient = pgRadio('pg-orient');
+      // Fit the sheet into the stage, whatever shape it is.
+      const box = { w: Math.max(120, stage.clientWidth - 8), h: 230 };
+      const fit = (ratioW, ratioH) => {
+        let h = box.h, w = h * (ratioW / ratioH);
+        if (w > box.w) { w = box.w; h = w * (ratioH / ratioW); }
+        return { w, h };
+      };
+      if (layout === 'single') {
+        const s = fit(dims.w, dims.h);
+        stage.innerHTML = pgSheet(s.w, s.h, [1], dims, o, '');
+        cap.textContent = sizeLabel + ', ' + orient + ' — one page per sheet, ' +
+          o.margin + 'mm margins.';
+        return;
+      }
+      // Sheet = the page rotated to landscape of itself; each half holds
+      // one logical page (plan §2.5).
+      const s = fit(dims.h, dims.w);
+      if (layout === 'twoup') {
+        stage.innerHTML =
+          pgSheet(s.w, s.h, [1, 2], dims, o, 'pg-stacked pg-flip') +
+          pgSheet(s.w, s.h, [3, 4], dims, o, 'pg-stacked pg-flip pg-flip-b');
+        cap.textContent = sizeLabel + ' pages, two to a landscape sheet in reading ' +
+          'order: 1 2, then 3 4.';
+        return;
+      }
+      stage.innerHTML =
+        pgSheet(s.w, s.h, [8, 1], dims, o, 'pg-stacked pg-flip') +
+        pgSheet(s.w, s.h, [2, 7], dims, o, 'pg-stacked pg-flip pg-flip-b');
+      cap.textContent = 'imposed for folding: on an 8-page example the first sheet ' +
+        'carries 8 and 1, its back 2 and 7. printed double-sided, folded and ' +
+        'stapled, it reads 1 to 8.';
+    }
+
+    // ---- run --------------------------------------------------------
+
+    function paginateOptions() {
+      const layout = pgRadio('pg-layout');
+      const headersOn = pgEl('pg-headers').checked;
+      const opts = {
+        path: PG_PATH,
+        footnotes: pgRadio('pg-footnotes'),
+        size: pgEl('pg-size').value,
+        orientation: pgRadio('pg-orient'),
+        layout,
+        font: pgEl('pg-font').value,
+        margin_mm: parseFloat(pgEl('pg-margin').value) || 20,
+        page_numbers: pgEl('pg-page-numbers').checked,
+        headers: {
+          enabled: headersOn,
+          left: {
+            text: pgEl('pg-header-left').value || '',
+            chapter: pgEl('pg-header-left-chapter').checked,
+          },
+          right: {
+            // Single layout uses `left` only, but the object always
+            // carries both halves — the backend validates the shape, not
+            // the layout's use of it.
+            text: layout === 'single' ? '' : (pgEl('pg-header-right').value || ''),
+            chapter: layout === 'single' ? false : pgEl('pg-header-right-chapter').checked,
+          },
+        },
+        name: (pgEl('pg-name').value || '').trim(),
+        bring_in: pgEl('pg-bring-in').checked,
+      };
+      if (opts.size === 'custom') {
+        opts.custom_size = {
+          w: parseFloat(pgEl('pg-custom-w').value) || 0,
+          h: parseFloat(pgEl('pg-custom-h').value) || 0,
+          unit: pgEl('pg-custom-unit').value,
+        };
+      }
+      return opts;
+    }
+
+    async function paginateRun() {
+      if (PG_RUNNING || !PG_PATH) return;
+      const go = pgEl('paginate-go');
+      const cancel = pgEl('paginate-cancel');
+      const err = pgEl('paginate-error');
+      const progress = pgEl('paginate-progress');
+      PG_RUNNING = true;
+      go.disabled = true;
+      cancel.disabled = true;
+      err.hidden = true;
+      progress.hidden = false;
+      progress.textContent = 'typesetting…';
+      try {
+        const out = await convertApi('/api/paginate', paginateOptions());
+        paginateClose();
+        const pages = out.pages || 0;
+        convertToast('paginate:' + out.pdf, {
+          state: 'done', icon: 'paginate', square: true, title: cvBase(out.pdf),
+          message: pages + (pages === 1 ? ' page' : ' pages') + ' typeset' +
+            (out.viewer ? ' — opening it here' : ' — beside the document'),
+          ttl: 9000,
+        });
+        htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
+        if (out.viewer) openPaginatedViewer(out.viewer);
+      } catch (e) {
+        err.textContent = String((e && e.message) || e);
+        err.hidden = false;
+      } finally {
+        PG_RUNNING = false;
+        go.disabled = false;
+        cancel.disabled = false;
+        progress.hidden = true;
+      }
+    }
+
+    document.getElementById('paginate-btn')?.addEventListener('click', paginateOpen);
+    pgEl('paginate-go')?.addEventListener('click', paginateRun);
+    // One repaint path for every control — the preview is a function of
+    // the whole form, not of the thing that changed.
+    ['change', 'input'].forEach((ev) => {
+      pgEl('paginate-modal')?.addEventListener(ev, (e) => {
+        if (e.target && e.target.closest('.modal-body')) paginatePaint();
+      });
+    });
+
+    // ================================================================
+    // Paginate — the paged viewer   (docs/paginate-plan.md §2.8)
+    // ================================================================
+    //
+    // Typst rendered the pages as SVG when the paginate asked for them to
+    // be brought in; this shows one at a time. Not a PDF renderer, on
+    // purpose (plan §1): the pages are pictures of the artifact, and the
+    // markdown they came from is still the document you edit.
+
+    let PV = null;   // {dir, pdf, pages, page, source}
+
+    function pvEl(id) { return document.getElementById(id); }
+    function pvPageUrl(n) {
+      const name = 'page-' + String(n).padStart(4, '0') + '.svg';
+      return '/api/file/blob?path=' + encodeURIComponent(PV.pdf + '.pages/' + name);
+    }
+
+    // The tree row for a path, if the tree currently shows one — the row
+    // is also where the paginate manifest is advertised (server.py writes
+    // data-paginated on it), so this doubles as "is this PDF one of ours".
+    function paginateManifestFor(path) {
+      if (!path) return null;
+      const li = document.querySelector(
+        '#tree li.file[data-path="' + fnCssEscape(path) + '"]');
+      return li && li.hasAttribute('data-paginated') ? li.dataset.paginated : null;
+    }
+
+    async function openPaginatedViewer(manifestRel) {
+      if (!manifestRel) return;
+      let man;
+      try {
+        const r = await fetch('/api/file/blob?path=' + encodeURIComponent(manifestRel));
+        if (!r.ok) throw new Error(await convertDetail(r));
+        man = await r.json();
+      } catch (e) {
+        convertNotice(cvBase(manifestRel),
+          'could not read the page manifest: ' + String((e && e.message) || e),
+          'failed', { icon: 'paginate', ttl: 12000 });
+        return;
+      }
+      // `.book-2026-08-23.pdf.paginate.json` names the PDF it belongs to.
+      const dir = manifestRel.split('/').slice(0, -1).join('/');
+      const pdfName = cvBase(manifestRel).replace(/^\./, '').replace(/\.paginate\.json$/, '');
+      PV = {
+        dir, pdf: dir ? dir + '/' + pdfName : pdfName,
+        pages: Math.max(1, man.pages || 1), page: 1, source: man.source || '',
+      };
+      const root = pvEl('paginated-mode');
+      root.classList.add('open');
+      root.setAttribute('aria-hidden', 'false');
+      modePush('paginated', {
+        icon: 'paginate',
+        onExit: closePaginatedViewer,
+        iconTitle: 'paginated · ' + pdfName,
+        exitTitle: 'close the paged viewer',
+      });
+      pvPaint();
+    }
+    window.openPaginatedViewer = openPaginatedViewer;
+
+    function closePaginatedViewer() {
+      const root = pvEl('paginated-mode');
+      // Esc in fullscreen is the browser's to answer first; if we are
+      // still fullscreen when this runs, leaving it IS the exit the user
+      // asked for.
+      if (document.fullscreenElement === root) {
+        document.exitFullscreen?.();
+        return;
+      }
+      root.classList.remove('open');
+      root.setAttribute('aria-hidden', 'true');
+      pvEl('pv-page').removeAttribute('src');
+      PV = null;
+      modeRemove('paginated');
+    }
+    window.closePaginatedViewer = closePaginatedViewer;
+
+    function pvPaint() {
+      if (!PV) return;
+      const img = pvEl('pv-page');
+      img.src = pvPageUrl(PV.page);
+      img.alt = 'page ' + PV.page + ' of ' + cvBase(PV.pdf);
+      pvEl('pv-title').textContent = cvBase(PV.pdf);
+      pvEl('pv-badge').textContent = PV.source ? 'from ' + cvBase(PV.source) : '';
+      pvEl('pv-badge').hidden = !PV.source;
+      pvEl('pv-count').textContent = 'page ' + PV.page + ' / ' + PV.pages;
+      pvEl('pv-prev').disabled = PV.page <= 1;
+      pvEl('pv-next').disabled = PV.page >= PV.pages;
+      // The next page is the one the reader is about to ask for.
+      if (PV.page < PV.pages) { const pre = new Image(); pre.src = pvPageUrl(PV.page + 1); }
+    }
+
+    function pvGo(n) {
+      if (!PV) return;
+      const page = Math.max(1, Math.min(PV.pages, n));
+      if (page === PV.page) return;
+      PV.page = page;
+      pvPaint();
+    }
+
+    function pvToggleFullscreen() {
+      const root = pvEl('paginated-mode');
+      if (document.fullscreenElement === root) document.exitFullscreen?.();
+      else root.requestFullscreen?.();
+    }
+
+    pvEl('pv-prev')?.addEventListener('click', () => pvGo(PV ? PV.page - 1 : 1));
+    pvEl('pv-next')?.addEventListener('click', () => pvGo(PV ? PV.page + 1 : 1));
+    pvEl('pv-close-btn')?.addEventListener('click', closePaginatedViewer);
+    pvEl('pv-full-btn')?.addEventListener('click', pvToggleFullscreen);
+
+    document.addEventListener('fullscreenchange', () => {
+      const root = pvEl('paginated-mode');
+      const btn = pvEl('pv-full-btn');
+      if (!root || !btn) return;
+      const full = document.fullscreenElement === root;
+      setIcon(btn.querySelector('img'), full ? 'full2mini' : 'mini2full');
+      btn.title = full ? 'leave fullscreen' : 'fullscreen';
+    });
+
+    // Arrow keys turn pages while the viewer is the top of the stack —
+    // esc still belongs to the stack's own handler.
+    document.addEventListener('keydown', (e) => {
+      if (!PV) return;
+      const top = modeTop();
+      if (!top || top.name !== 'paginated') return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); pvGo(PV.page - 1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); pvGo(PV.page + 1); }
+    });
 
     // ================================================================
     // enough home (0.2.5) — the launch screen   (docs/home-plan.md §4)

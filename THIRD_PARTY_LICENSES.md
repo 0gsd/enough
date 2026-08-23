@@ -91,6 +91,57 @@ SOFTWARE.
 
 ---
 
+## Bundled fonts
+
+`defaults/fonts/` ships four font families as static (non-variable)
+Regular/Italic/Bold/BoldItalic files, used by the pagination feature to
+typeset markdown into PDF (`typst.compile(..., font_paths=
+["defaults/fonts"], ignore_system_fonts=True)`). All four are licensed
+under the **SIL Open Font License, Version 1.1**
+(<https://scripts.sil.org/OFL>); each family's directory carries its
+upstream license file verbatim alongside the four style files.
+
+### EB Garamond
+
+Copyright 2017 The EB Garamond Project Authors
+(<https://github.com/octaviopardo/EBGaramond12>); RCS citation glyphs
+Copyright 2025 Deborah Khodanovich. License: SIL OFL 1.1. Source:
+<https://github.com/octaviopardo/EBGaramond12>, commit
+`106a4a6d377987459ae5e68673a4570f13b957fb` on `master` (this repo has no
+tagged releases). Bundled as OTF — `fonts/otf/` in that commit — rather
+than the repo's TTF build, which is materially larger for the same static
+outlines; `defaults/fonts/eb-garamond/OFL.txt` is copied from the repo
+root.
+
+### Source Serif 4
+
+Copyright 2014-2023 Adobe (<http://www.adobe.com/>), with Reserved Font
+Name 'Source'. All Rights Reserved. License: SIL OFL 1.1. Source:
+<https://github.com/adobe-fonts/source-serif>, release `4.005R`
+(`source-serif-4.005_Desktop.zip`, `TTF/` directory — the base "Source
+Serif 4" family only, not the Caption/Display/SmText/Subhead optical-size
+variants also in that release); `LICENSE.md` copied from the release
+archive root.
+
+### Source Sans 3
+
+Copyright 2010-2022 Adobe (<http://www.adobe.com/>), with Reserved Font
+Name 'Source'. All Rights Reserved. License: SIL OFL 1.1. Source:
+<https://github.com/adobe-fonts/source-sans>, release `3.052R`
+(`TTF-source-sans-3.052R.zip`); `LICENSE.md` copied from the repository
+root at the same tag (the TTF-only release archive doesn't include it).
+
+### Inter
+
+Copyright (c) 2016 The Inter Project Authors
+(<https://github.com/rsms/inter>). License: SIL OFL 1.1. Source:
+<https://github.com/rsms/inter>, release `v4.1` (`Inter-4.1.zip`,
+`extras/ttf/` — the static per-weight build, not the root
+`InterVariable*.ttf` variable fonts or the `InterDisplay` optical-size
+family); `LICENSE.txt` copied from the archive root.
+
+---
+
 ## Runtime dependencies
 
 These projects are installed on the user's machine by `bootstrap.sh`,
@@ -188,6 +239,8 @@ Installed only with the optional `pdf` extra (PDF / deck / workbook
 The default theme uses macOS system fonts (SF Mono, Georgia, the
 system sans stack, Courier New). These are licensed by their respective
 vendors (Apple, Microsoft, etc.) and are not redistributed by enough.
+(Separate from these: the four PDF-pagination font families actually
+bundled in this repo are covered under "Bundled fonts" above.)
 
 ---
 

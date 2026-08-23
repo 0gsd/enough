@@ -171,6 +171,15 @@
       "y": 10.8
     }
   },
+  "paginate.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54.0,
+      "w": 48.3,
+      "x": 11.9,
+      "y": 9.0
+    }
+  },
   "project-add.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
