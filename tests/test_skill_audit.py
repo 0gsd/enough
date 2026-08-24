@@ -213,6 +213,85 @@ def test_symlink_inside_a_sibling_shipped_skill_is_untrusted(project: Path,
 
 
 # ---------------------------------------------------------------------------
+# The 0.2.8 heal: materialized copies of shipped skills
+# ---------------------------------------------------------------------------
+
+def _disabled_names(project: Path) -> set[str]:
+    f = project / "rness" / "skills" / ".disabled"
+    if not f.is_file():
+        return set()
+    return {ln.strip() for ln in f.read_text(encoding="utf-8").splitlines()
+            if ln.strip() and not ln.startswith("#")}
+
+
+def test_materialized_copy_of_a_shipped_skill_is_healed(project: Path, tmp_path: Path):
+    """A cloud-sync filesystem (or a link-dereferencing copy) turns the skill
+    symlinks into real directories when a project travels between machines.
+    A byte-identical copy provably IS the shipped skill: the launch sync
+    swaps it back to a symlink, so it's trusted again — no audit, no badge,
+    no quarantine."""
+    import shutil
+    from enough import skeleton
+    sk = make_sibling_install(tmp_path / "install", "analyzer")
+    shutil.copytree(sk / "analyzer", project / "rness" / "skills" / "analyzer")
+    (project / "rness" / "skills" / "analyzer" / ".DS_Store").write_bytes(b"junk")
+
+    skeleton._populate_skill_symlinks(project, sk.parent)
+
+    entry = project / "rness" / "skills" / "analyzer"
+    assert entry.is_symlink()
+    assert entry.resolve() == (sk / "analyzer").resolve()
+    assert skillaudit.is_trusted(project, "analyzer") is True
+    # it existed before the sync, so it is NOT a "new global": stays enabled
+    assert "analyzer" not in _disabled_names(project)
+
+
+def test_modified_copy_is_not_healed(project: Path, tmp_path: Path):
+    """One byte of difference and the copy is the user's — left a real dir,
+    untrusted, quarantined off like any stranger."""
+    import shutil
+    from enough import skeleton
+    sk = make_sibling_install(tmp_path / "install", "analyzer")
+    dst = project / "rness" / "skills" / "analyzer"
+    shutil.copytree(sk / "analyzer", dst)
+    (dst / "SKILL.md").write_text("---\nname: analyzer\n---\nforked\n",
+                                  encoding="utf-8")
+
+    skeleton._populate_skill_symlinks(project, sk.parent)
+
+    assert dst.is_dir() and not dst.is_symlink()
+    assert skillaudit.is_trusted(project, "analyzer") is False
+    assert "analyzer" in _disabled_names(project)
+
+
+def test_materialized_flat_skill_is_healed(project: Path, tmp_path: Path):
+    from enough import skeleton
+    sk = make_sibling_install(tmp_path / "install")
+    flat = sk / "notes.md"
+    flat.parent.mkdir(parents=True, exist_ok=True)
+    flat.write_text("---\nname: notes\n---\nshipped\n", encoding="utf-8")
+    dst = project / "rness" / "skills" / "notes.md"
+    dst.write_text(flat.read_text(encoding="utf-8"), encoding="utf-8")
+
+    skeleton._populate_skill_symlinks(project, sk.parent)
+
+    assert dst.is_symlink()
+    assert skillaudit.is_trusted(project, "notes") is True
+
+
+def test_project_local_original_skill_is_never_touched(project: Path, tmp_path: Path):
+    """A real dir with no same-named global is project-local by definition —
+    the heal pass must not consider it at all."""
+    from enough import skeleton
+    sk = make_sibling_install(tmp_path / "install", "analyzer")
+    mine = plant_untrusted(project, "my-own-thing")
+
+    skeleton._populate_skill_symlinks(project, sk.parent)
+
+    assert mine.is_dir() and not mine.is_symlink()
+
+
+# ---------------------------------------------------------------------------
 # The choke point
 # ---------------------------------------------------------------------------
 

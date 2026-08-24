@@ -33,12 +33,18 @@ use std::path::{Path, PathBuf};
 ///   running from it.
 /// - `THIRD_PARTY_LICENSES.md` — the bundled defaults/skills carry their own
 ///   licenses and shipping them without it would be wrong.
+/// - `docs/HELP_CENTER.md` — the in-app help center reads it from
+///   `<package parent>/docs/` (server.py `api_help_center`), which is this
+///   snapshot once the app runs from it. The single file, NOT `docs/` — the
+///   dev tree keeps gitignored local planning docs there that must never
+///   ship (0.2.8; before this the .app's help center 404'd).
 const SNAPSHOT: &[&str] = &[
     "pyproject.toml",
     "uv.lock",
     "README.md",
     "LICENSE",
     "THIRD_PARTY_LICENSES.md",
+    "docs/HELP_CENTER.md",
     "enough",
     "defaults",
 ];

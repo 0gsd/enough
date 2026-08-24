@@ -672,3 +672,121 @@ def test_mode_marker_lands_on_the_real_body_tag(home_client: TestClient):
     html = home_client.get("/").text
     assert html.count('<body data-mode="home">') == 1
     assert html.count("<body") == 1
+
+
+# ---------------------------------------------------------------------------
+# Ephemeral (temp-dir) projects — the wizard-scratch leak (0.2.8)
+# ---------------------------------------------------------------------------
+
+def _fake_temp_world(tmp_path, monkeypatch):
+    """A pretend $TMPDIR *inside* the test sandbox, with the registry OUTSIDE
+    it — i.e. the durable-registry shape a real install has (the suite's own
+    tmp_path lives under the real $TMPDIR, which is exactly why the leak rule
+    compares against the registry's home rather than refusing temp paths
+    outright)."""
+    faketmp = tmp_path / "faketmp"
+    faketmp.mkdir()
+    monkeypatch.setattr(home.tempfile, "gettempdir", lambda: str(faketmp))
+    return faketmp
+
+
+def test_wizard_scratch_project_never_enters_a_durable_registry(
+        scratch_env: Path, tmp_path: Path, monkeypatch):
+    faketmp = _fake_temp_world(tmp_path, monkeypatch)
+    scratch = faketmp / "enough-onboarding"
+    (scratch / "rness").mkdir(parents=True)
+
+    entry = home.register(scratch)
+    assert entry["path"]  # caller still gets a usable row
+    assert home.read_registry()["projects"] == []
+
+    home.touch_opened(scratch)
+    assert home.read_registry()["projects"] == []
+
+
+def test_temp_rows_a_prior_install_leaked_are_pruned_on_listing(
+        scratch_env: Path, tmp_path: Path, monkeypatch):
+    faketmp = _fake_temp_world(tmp_path, monkeypatch)
+    keeper = tmp_path / "real-project"
+    (keeper / "rness").mkdir(parents=True)
+    home.register(keeper)
+    # simulate the pre-0.2.8 leak: a temp row already in the registry
+    reg = home.read_registry()
+    reg["projects"].append(home._new_entry(str(faketmp / "enough-onboarding"),
+                                           home._utc_now()))
+    home.save_registry(reg)
+
+    rows = home.list_projects()
+    assert [r["path"] for r in rows] == [str(home.canonical(keeper))]
+    assert len(home.read_registry()["projects"]) == 1  # prune persisted
+
+
+def test_seed_skips_temp_paths_from_the_shell_mru(
+        scratch_env: Path, tmp_path: Path, monkeypatch):
+    faketmp = _fake_temp_world(tmp_path, monkeypatch)
+    scratch = faketmp / "enough-onboarding"
+    (scratch / "rness").mkdir(parents=True)
+    keeper = tmp_path / "kept"
+    (keeper / "rness").mkdir(parents=True)
+    desktop = tmp_path / "desktop.json"
+    desktop.write_text(json.dumps(
+        {"known_projects": [str(scratch), str(keeper)]}), encoding="utf-8")
+
+    added = home.seed_from_desktop(desktop)
+    assert added == 1
+    assert [e["path"] for e in home.read_registry()["projects"]] == [
+        str(home.canonical(keeper))]
+
+
+def test_scratch_installs_keep_their_temp_projects(scratch_env: Path, tmp_path: Path):
+    """When the registry itself lives under the temp root (tests, scratch-QA
+    servers) the whole world is ephemeral — temp projects are legitimate."""
+    proj = tmp_path / "throwaway"
+    (proj / "rness").mkdir(parents=True)
+    home.register(proj)
+    assert len(home.read_registry()["projects"]) == 1
+
+
+# ---------------------------------------------------------------------------
+# Display-name travel + cache (0.2.8)
+# ---------------------------------------------------------------------------
+
+def test_a_folder_named_on_another_machine_shows_its_nice_name(scratch_env: Path):
+    """The Obsidian-folder use case: `rness/project.json` travels with the
+    folder, so a machine that has never seen the project before shows the
+    name the user gave it elsewhere — not the raw basename."""
+    project = make_project(scratch_env / "__-cryptic")
+    (project / "rness" / "project.json").write_text(
+        json.dumps({"name": "Industrial Identity", "description": ""}),
+        encoding="utf-8")
+    home.register(project)   # first contact on "machine B"
+    assert home.list_projects()[0]["name"] == "Industrial Identity"
+
+
+def test_an_unreachable_project_keeps_its_cached_nice_name(scratch_env: Path):
+    project = make_project(scratch_env / "__-cryptic")
+    (project / "rness" / "project.json").write_text(
+        json.dumps({"name": "Industrial Identity", "description": "a memoir"}),
+        encoding="utf-8")
+    home.register(project)
+    home.list_projects()  # refresh caches the metadata
+
+    project.rename(scratch_env / "unmounted")  # the drive walks away
+    row = home.list_projects()[0]
+    assert row["missing"] is True
+    assert row["name"] == "Industrial Identity"
+    assert row["description"] == "a memoir"
+
+
+def test_a_rename_updates_the_cache_even_when_counts_do_not_move(scratch_env: Path):
+    """`rness/project.json` isn't part of the ¶/W/C scan, so a rename may not
+    move the fingerprint — the cache check runs outside that gate."""
+    project = make_project(scratch_env / "novel")
+    home.register(project)
+    home.list_projects()
+    (project / "rness" / "project.json").write_text(
+        json.dumps({"name": "The Book", "description": ""}), encoding="utf-8")
+    home.list_projects()  # re-cache
+
+    project.rename(scratch_env / "gone")
+    assert home.list_projects()[0]["name"] == "The Book"

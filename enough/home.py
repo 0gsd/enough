@@ -38,6 +38,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -195,6 +196,31 @@ def _new_entry(key: str, created_at: str) -> dict[str, Any]:
     }
 
 
+def _is_ephemeral(path: Path | str) -> bool:
+    """True for paths under the user's temp root ($TMPDIR). Resolved on both
+    sides because macOS's $TMPDIR lives behind the /var -> /private/var
+    symlink."""
+    try:
+        tmp = Path(tempfile.gettempdir()).resolve()
+        Path(path).resolve().relative_to(tmp)
+        return True
+    except (ValueError, OSError):
+        return False
+
+
+def _ephemeral_leak(path: Path | str) -> bool:
+    """A temp-dir project headed for a DURABLE registry — throwaway by
+    definition, so it never belongs on the home screen. The one recurring
+    offender is the desktop wizard's `$TMPDIR/enough-onboarding` scratch
+    project (onboarding.rs): its backend boots the ordinary skeleton, whose
+    register hook would otherwise file it in the real registry, and the
+    wizard then deletes the folder — leaving a permanent "not on disk" row
+    (0.2.8). When the registry itself lives under the temp root (a test's
+    tmp_path, a scratch-QA install) the whole world is ephemeral and
+    temp projects are legitimate — no leak, no refusal."""
+    return _is_ephemeral(path) and not _is_ephemeral(projects_state_path())
+
+
 def register(project_dir: Path | str, *, created_at: str | None = None) -> dict[str, Any]:
     """Create-or-touch the entry for `project_dir`. Returns it.
 
@@ -203,6 +229,8 @@ def register(project_dir: Path | str, *, created_at: str | None = None) -> dict[
     never match, so the refresh picks it up on its own).
     """
     key = str(canonical(project_dir))
+    if _ephemeral_leak(key):
+        return _new_entry(key, created_at or _utc_now())  # never persisted
     reg = read_registry()
     existing = _find(reg, key)
     if existing is not None:
@@ -218,6 +246,10 @@ def touch_opened(project_dir: Path | str) -> dict[str, Any]:
     This is the project-server boot hook (§6): projects that predate the
     registry show up in home after their first open."""
     key = str(canonical(project_dir))
+    if _ephemeral_leak(key):
+        entry = _new_entry(key, _utc_now())  # never persisted
+        entry["last_opened"] = _utc_now()
+        return entry
     reg = read_registry()
     entry = _find(reg, key)
     if entry is None:
@@ -287,6 +319,8 @@ def seed_from_desktop(path: Path | None = None) -> int:
             continue
         project_dir = canonical(raw)
         if not project_dir.is_dir() or not is_project(project_dir):
+            continue
+        if _ephemeral_leak(project_dir):
             continue
         key = str(project_dir)
         if _find(reg, key) is not None:
@@ -425,10 +459,24 @@ def refresh_entry(entry: dict[str, Any]) -> bool:
     project_dir = Path(entry["path"])
     if not project_dir.is_dir() or not is_project(project_dir):
         return False
+    changed = False
+    # Snapshot the display metadata into the registry while the folder is
+    # readable, so `row()` can still show the user's nice name once it
+    # isn't (the other machine's copy of a synced folder, an ejected
+    # drive). Checked outside the fingerprint gate: a rename edits only
+    # `rness/project.json`, which the ¶/W/C scan doesn't count, so the
+    # fingerprint may not move (0.2.8). Live reads still win in row() —
+    # this is the fallback copy, not the source of truth.
+    from . import project_meta
+    meta = project_meta.load(project_dir)
+    if (entry.get("name"), entry.get("description")) != (meta["name"], meta["description"]):
+        entry["name"] = meta["name"]
+        entry["description"] = meta["description"]
+        changed = True
     scanned = _counted_files(project_dir)
     fp = fingerprint_of(scanned)
     if entry.get("fingerprint") == fp and entry.get("counts"):
-        return False
+        return changed
     entry["fingerprint"] = fp
     entry["counts"] = counts_of(scanned)
     entry["last_edited"] = _iso_from_ns(fp["max_mtime_ns"]) if fp["max_mtime_ns"] else None
@@ -444,17 +492,26 @@ def row(entry: dict[str, Any]) -> dict[str, Any]:
 
     Display name and description are read **live** from `rness/project.json`
     (§2) rather than cached, so a rename shows up the instant the user makes
-    it. Counts are always a dict — a never-scanned or missing project reads
-    as zeroes rather than making the frontend branch."""
+    it; only a project whose folder is unreachable falls back to the copy
+    `refresh_entry()` cached while it could still read it. Counts are always
+    a dict — a never-scanned or missing project reads as zeroes rather than
+    making the frontend branch."""
     from . import project_meta
 
     project_dir = Path(entry["path"])
     missing = not (project_dir.is_dir() and is_project(project_dir))
     meta = project_meta.load(project_dir)
+    # A reachable project reads live; an unreachable one falls back to the
+    # metadata cached by refresh_entry() — the nice name the user gave it,
+    # not the raw basename load() degrades to (0.2.8).
+    name, description = meta["name"], meta["description"]
+    if missing:
+        name = entry.get("name") or name
+        description = entry.get("description") or description
     return {
         "path": entry["path"],
-        "name": meta["name"],
-        "description": meta["description"],
+        "name": name,
+        "description": description,
         "created_at": entry.get("created_at"),
         "last_opened": entry.get("last_opened"),
         "last_edited": entry.get("last_edited"),
@@ -469,6 +526,12 @@ def list_projects() -> list[dict[str, Any]]:
     newest-opened first. Blocking (it walks); callers run it in a thread."""
     reg = read_registry()
     dirty = False
+    # Drop rows a pre-0.2.8 install leaked for temp-dir projects (the
+    # wizard's scratch, chiefly) — they can only ever show "not on disk".
+    kept = [e for e in reg["projects"] if not _ephemeral_leak(e.get("path") or "")]
+    if len(kept) != len(reg["projects"]):
+        reg["projects"] = kept
+        dirty = True
     for entry in reg["projects"]:
         try:
             dirty |= refresh_entry(entry)

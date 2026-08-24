@@ -261,6 +261,48 @@ def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
             except OSError:
                 pass
 
+    # 1.5 Heal materialized copies of shipped skills. Cloud-sync filesystems
+    #     and link-dereferencing copies (zip, cp -RL) turn the skill symlinks
+    #     into real directories when a project travels between machines — and
+    #     a real dir is untrusted by design, so the other Mac's install then
+    #     audits (and quarantines) skills enough itself shipped. When the
+    #     copy's bytes are IDENTICAL to this install's global of the same
+    #     name it provably is the shipped skill, so swap it back to a
+    #     symlink. One byte of difference and it's left alone: a fork or a
+    #     3P import is the user's, not ours to repair (0.2.8; the fingerprint
+    #     ignores mtimes/permissions precisely so a faithful copy matches).
+    if src_skills.is_dir():
+        try:
+            from . import skillaudit
+            for entry in sorted(dst_skills.iterdir()):
+                if entry.is_symlink() or entry.name.startswith("."):
+                    continue
+                src = src_skills / entry.name
+                if entry.is_dir() != src.is_dir() or not (src.is_dir() or src.is_file()):
+                    continue
+                if skillaudit.fingerprint(entry) != skillaudit.fingerprint(src):
+                    continue
+                # Swap via a rename so a crash can't lose the skill: the
+                # worst interruption leaves `<name>.healing` beside a
+                # missing entry, and the next launch's step 2 resyncs.
+                stash = entry.with_name(entry.name + ".healing")
+                try:
+                    entry.rename(stash)
+                    entry.symlink_to(src.resolve())
+                    if stash.is_dir() and not stash.is_symlink():
+                        shutil.rmtree(stash)
+                    else:
+                        stash.unlink()
+                    log.info("healed materialized skill %s -> symlink", entry.name)
+                except OSError:
+                    try:  # roll back so the project keeps a working copy
+                        if not entry.exists() and stash.exists():
+                            stash.rename(entry)
+                    except OSError:
+                        pass
+        except Exception:  # noqa: BLE001 — healing must never break a launch
+            log.exception("skill heal pass failed")
+
     # 2. Sync in any new globals (default-off).
     if not src_skills.is_dir():
         return
