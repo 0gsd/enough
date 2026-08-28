@@ -67,6 +67,41 @@ def test_corrupt_metadata_is_non_fatal(project: Path):
     (project / "rness" / "project.json").write_text("{not json", encoding="utf-8")
     m = project_meta.load(project)
     assert m["name"] == "MyBook"  # falls back instead of raising
+    assert m["ui"] == {"ui_scale": 1.0, "text_scale": 1.0}
+
+
+# --------------------------------------------------------------------------
+# per-project display scales (uiscale round)
+# --------------------------------------------------------------------------
+
+def test_ui_defaults_when_unset(project: Path):
+    assert project_meta.load(project)["ui"] == {"ui_scale": 1.0, "text_scale": 1.0}
+
+
+def test_save_ui_round_trip_grid_and_clamp(project: Path):
+    m = project_meta.save_ui(project, 1.2500001, 9.7)
+    assert m["ui"]["ui_scale"] == 1.3          # rounded to the 0.1 grid
+    assert m["ui"]["text_scale"] == 4.0        # hard-clamped
+    m = project_meta.save_ui(project, 0.01, "nonsense")
+    assert m["ui"]["ui_scale"] == 0.3          # clamped up to the floor
+    assert m["ui"]["text_scale"] == 1.0        # unparseable resets to 1.0
+
+
+def test_save_ui_preserves_name_and_vice_versa(project: Path):
+    project_meta.save(project, "Winter Bees", "A beekeeping memoir.")
+    project_meta.save_ui(project, 1.5, 0.9)
+    m = project_meta.load(project)
+    assert m["name"] == "Winter Bees"          # save_ui kept the editor's half
+    assert m["ui"] == {"ui_scale": 1.5, "text_scale": 0.9}
+    project_meta.save(project, "Winter Bees II", "Still bees.")
+    m = project_meta.load(project)
+    assert m["ui"] == {"ui_scale": 1.5, "text_scale": 0.9}  # save() kept ours
+
+
+def test_corrupt_ui_block_is_non_fatal(project: Path):
+    (project / "rness" / "project.json").write_text(
+        '{"name": "x", "description": "", "ui": "garbage"}', encoding="utf-8")
+    assert project_meta.load(project)["ui"] == {"ui_scale": 1.0, "text_scale": 1.0}
 
 
 # --------------------------------------------------------------------------
@@ -104,6 +139,20 @@ def test_project_name_templated_into_index(client: TestClient):
     html = client.get("/").text
     assert "Tab Title Test" in html
     assert "<!-- PROJECT_NAME -->" not in html  # placeholder was replaced
+
+
+def test_api_project_ui_persists_and_cleans(client: TestClient, project: Path):
+    r = client.post("/api/project/ui", json={"ui_scale": 1.45, "text_scale": 0.9})
+    assert r.status_code == 200
+    assert r.json()["ui"] == {"ui_scale": 1.4, "text_scale": 0.9}
+    assert project_meta.load(project)["ui"]["ui_scale"] == 1.4
+
+
+def test_boot_ui_state_templated_into_index(client: TestClient):
+    client.post("/api/project/ui", json={"ui_scale": 1.4, "text_scale": 0.9})
+    html = client.get("/").text
+    assert "/*UI_STATE_JSON*/null" not in html  # placeholder was replaced
+    assert '"ui_scale": 1.4' in html or '"ui_scale":1.4' in html
 
 
 # --------------------------------------------------------------------------

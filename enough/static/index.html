@@ -6,6 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>enough</title>
   <link rel="icon" type="image/png" href="/static/enoughavi.png">
+  <script>
+    // Server-templated boot state (server.py index()): the per-project
+    // display scales (uiscale round). Applied to the zoom CSS vars right
+    // here in <head>, before first paint — same no-flash contract as the
+    // PROJECT_NAME token. Stays null when served statically or on the
+    // home screen (home:true), where both vars keep their 1 default.
+    const BOOT_UI_STATE = /*UI_STATE_JSON*/null;
+    if (BOOT_UI_STATE && !BOOT_UI_STATE.home) {
+      const _de = document.documentElement;
+      if (BOOT_UI_STATE.ui_scale > 0 && BOOT_UI_STATE.ui_scale !== 1)
+        _de.style.setProperty('--uiz', BOOT_UI_STATE.ui_scale);
+      if (BOOT_UI_STATE.text_scale > 0 && BOOT_UI_STATE.text_scale !== 1)
+        _de.style.setProperty('--txz', BOOT_UI_STATE.text_scale);
+    }
+  </script>
   <script src="/static/htmx.min.js"></script>
   <style>
     :root {
@@ -51,6 +66,28 @@
     body {
       height: 100vh;
       margin: 0;
+    }
+
+    /* ---------- display scales (uiscale round) ----------
+       --uiz: whole-UI zoom (everything, uniformly). --txz: content-only
+       zoom for the mode document surfaces, multiplicative with --uiz.
+       Both are set on <html> by the head boot script / the prefs-modal
+       steppers, persisted per project in rness/project.json. Every
+       viewport-unit length below divides by --uiz so the real viewport
+       keeps fitting (zoom scales CSS px; vh/vw don't follow it). */
+    body {
+      height: calc(100vh / var(--uiz, 1));
+      zoom: var(--uiz, 1);
+    }
+
+    /* "Content" = text being viewed/edited in a mode — not chrome, not
+       the chat, not modals or bubbles (those follow --uiz alone).
+       Extending text scale to another surface = one selector here. */
+    :is(#review-mode, #ref-mode) .review-body,
+    #edit-mode .edit-textarea,
+    #wiki-body,
+    #preview-body {
+      zoom: var(--txz, 1);
     }
 
     body {
@@ -1284,7 +1321,7 @@
     #preview textarea.file-edit {
       width: calc(100% - 24px);
       margin: 8px 12px;
-      min-height: calc(100vh - 180px);
+      min-height: calc(100vh / var(--uiz, 1) - 180px);
       background: var(--input-bg);
       color: var(--fg);
       border: 1px solid var(--border);
@@ -2646,7 +2683,7 @@
        content — geometry only. */
     #ref-mode.ref-mini {
       left: auto;
-      width: min(520px, 92vw);
+      width: min(520px, calc(92vw / var(--uiz, 1)));
       border-left: 1px solid var(--border);
       box-shadow: -6px 0 18px rgba(0, 0, 0, 0.25);
     }
@@ -3413,7 +3450,7 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
-      width: min(90vw, 400px);
+      width: min(calc(90vw / var(--uiz, 1)), 400px);
       padding: 16px 18px;
     }
 
@@ -3858,6 +3895,10 @@
     #ui-modal .ui-panel-wide {
       min-width: 640px;
       max-width: 760px;
+      /* Cap + scroll so the panel stays reachable when --uiz shrinks the
+         effective viewport under it (uiscale round). */
+      max-height: calc(94vh / var(--uiz, 1));
+      overflow: auto;
     }
 
     #ui-modal .ui-modal-body-wide {
@@ -3868,6 +3909,97 @@
       display: flex;
       gap: 14px;
       align-items: flex-end;
+    }
+
+    /* The close-project note sits under the head row, right-aligned —
+       tied to the head button the reshuffle moved up there. */
+    #ui-modal .ui-head-note {
+      padding: 4px 16px 0;
+      text-align: right;
+      font-size: 11px;
+      color: var(--fg-faint);
+    }
+
+    /* ---- the one-line controls row (uiscale round) ---- */
+    #ui-modal #ui-controls-row {
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+    }
+
+    #ui-modal #ui-controls-row .ui-check-label {
+      flex: 0 0 auto;
+    }
+
+    #ui-modal .ui-scale-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex: 0 0 auto;
+    }
+
+    #ui-modal .ui-scale-name {
+      font-size: 13px;
+      color: var(--fg-muted);
+      margin-right: 4px;
+    }
+
+    #ui-modal .ui-scale-btn {
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--btn-bg, var(--bg-raise));
+      color: var(--fg);
+      font: inherit;
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    #ui-modal .ui-scale-btn:hover {
+      border-color: var(--fg-faint);
+    }
+
+    #ui-modal .ui-scale-value {
+      min-width: 40px;
+      padding: 2px 4px;
+      border: none;
+      background: none;
+      color: var(--fg);
+      font: inherit;
+      font-size: 13px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    #ui-modal .ui-scale-value:hover {
+      color: var(--accent-user);
+    }
+
+    /* Limit feedback: a denied step wiggles the button that was clicked
+       and pulses the value red. Classes are removed on animationend. */
+    @keyframes ui-limit-wiggle {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-3px); }
+      40% { transform: translateX(3px); }
+      60% { transform: translateX(-2px); }
+      80% { transform: translateX(2px); }
+    }
+
+    @keyframes ui-limit-pulse {
+      0%, 100% { color: var(--fg); }
+      30%, 70% { color: var(--accent-error); }
+    }
+
+    #ui-modal .ui-scale-btn.limit-wiggle {
+      animation: ui-limit-wiggle 0.32s ease-in-out;
+      border-color: var(--accent-error);
+    }
+
+    #ui-modal .ui-scale-value.limit-pulse {
+      animation: ui-limit-pulse 0.6s ease-in-out;
     }
 
     #ui-modal .ui-prefs-row label {
@@ -3967,7 +4099,9 @@
       font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.5px;
-      text-transform: uppercase;
+      /* lowercase on purpose (uiscale round) — the title reads
+         "ui preferences", not shouting */
+      text-transform: none;
     }
 
     #ui-modal .modal-close {
@@ -4083,7 +4217,7 @@
       border-radius: 8px;
       min-width: 480px;
       max-width: 560px;
-      max-height: 86vh;
+      max-height: calc(86vh / var(--uiz, 1));
       display: flex;
       flex-direction: column;
       box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
@@ -4226,7 +4360,7 @@
       border-radius: 8px;
       min-width: 480px;
       max-width: 560px;
-      max-height: 86vh;
+      max-height: calc(86vh / var(--uiz, 1));
       display: flex;
       flex-direction: column;
       box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
@@ -5208,8 +5342,8 @@
 
     #opro-wizard-modal .modal-panel {
       position: relative;
-      width: min(560px, 92vw);
-      max-height: 92vh;
+      width: min(560px, calc(92vw / var(--uiz, 1)));
+      max-height: calc(92vh / var(--uiz, 1));
       /* Flex column so head/dots/foot stay pinned and only the step body
          scrolls — the primary button must always be visible. */
       display: flex;
@@ -5609,7 +5743,7 @@
       border-radius: 8px;
       min-width: 480px;
       max-width: 580px;
-      max-height: 86vh;
+      max-height: calc(86vh / var(--uiz, 1));
       display: flex;
       flex-direction: column;
       box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
@@ -6217,7 +6351,7 @@
       font-size: 13px;
       line-height: 1.55;
       color: var(--fg-muted);
-      max-height: 62vh;
+      max-height: calc(62vh / var(--uiz, 1));
       overflow: auto;
     }
 
@@ -7460,7 +7594,7 @@
       display: none;
       z-index: 60;
       width: 300px;
-      max-width: calc(100vw - 24px);
+      max-width: calc(100vw / var(--uiz, 1) - 24px);
     }
 
     #fn-popup.open {
@@ -7493,7 +7627,7 @@
       grid-template-columns: 260px 1fr;
       gap: 18px;
       align-items: start;
-      max-height: 74vh;
+      max-height: calc(74vh / var(--uiz, 1));
     }
 
     @media (max-width: 720px) {
@@ -7896,9 +8030,11 @@
     /* UI modal, home mode: theme + font + the help center stay; every
        row that talks to a project API goes. (The close-project row is
        the mirror image — project mode only.) */
-    body[data-mode="home"] #ui-help-bubbles-row,
+    body[data-mode="home"] #ui-help-bubbles-item,
     body[data-mode="home"] #cv-extras-row,
-    body[data-mode="home"] #ui-close-project-row,
+    body[data-mode="home"] #ui-close-project-btn,
+    body[data-mode="home"] #ui-close-project-note,
+    body[data-mode="home"] .ui-scale-group,
     body[data-mode="project"] #home-frame {
       display: none !important;
     }
@@ -8262,7 +8398,7 @@
     }
 
     #home-wait img.hw-mark {
-      width: min(46vw, 62vmin);
+      width: min(calc(46vw / var(--uiz, 1)), calc(62vmin / var(--uiz, 1)));
       max-width: 460px;
       height: auto;
       user-select: none;
@@ -9313,7 +9449,17 @@
     <div class="modal-backdrop" onclick="closeUIModal()"></div>
     <div class="modal-panel ui-panel-wide" role="dialog" aria-labelledby="ui-modal-title">
       <div class="modal-head">
-        <h3 id="ui-modal-title">ui preferences · shortcuts · markdown</h3>
+        <h3 id="ui-modal-title">ui preferences</h3>
+        <!-- Close project → home (home-plan §1.7), promoted into the head
+             (uiscale round). Project mode only — hidden by CSS under
+             body[data-mode="home"], where there is no project to close.
+             Same handoff the desktop's ⌘W runs: the backend re-execs (CLI)
+             or exits 42 (desktop) and we land on the home screen. -->
+        <button type="button" class="help-center-launch" id="ui-close-project-btn"
+          title="close this project and go back to the enough home screen">
+          <img class="svg-icon" data-icon="folder" alt="" draggable="false">
+          <span>close project → home</span>
+        </button>
         <!-- Opens the bundled manual in the read-only reference mode
              (see #ref-mode). Small, inline in the header row. -->
         <button type="button" class="help-center-launch" id="ui-help-center-btn"
@@ -9324,6 +9470,7 @@
         </button>
         <button class="modal-close" onclick="closeUIModal()" aria-label="close">×</button>
       </div>
+      <div class="ui-head-note" id="ui-close-project-note">the folder on disk is untouched</div>
       <div class="modal-body ui-modal-body-wide">
         <!-- Top row: theme + font selectors stay narrow and inline. -->
         <div class="ui-prefs-row">
@@ -9336,25 +9483,31 @@
             <select id="ui-font"></select>
           </label>
         </div>
-        <!-- Close project → home (home-plan §1.7). Project mode only —
-             hidden by CSS under body[data-mode="home"], where there is no
-             project to close. Same handoff the desktop's ⌘W runs: the
-             backend re-execs (CLI) or exits 42 (desktop) and we land on
-             the home screen. -->
-        <div class="ui-prefs-row" id="ui-close-project-row">
-          <button type="button" class="help-center-launch" id="ui-close-project-btn"
-            title="close this project and go back to the enough home screen">
-            <img class="svg-icon" data-icon="folder" alt="" draggable="false">
-            <span>close project → home</span>
-          </button>
-          <span class="ui-row-note">the folder on disk is untouched</span>
-        </div>
-        <!-- Global help-bubble setting. -->
-        <div class="ui-prefs-row" id="ui-help-bubbles-row">
-          <label class="ui-check-label" title="show (?) help bubbles in the sidebar (saved per folder)">
+        <!-- One-line controls (uiscale round): the help-bubble toggle
+             (formerly its own row), the two per-project display scales,
+             and the ui-language selector's future slot (0.3.0). The scale
+             groups are per-project state, hidden on the home screen like
+             the close-project button above. Steppers move in 0.1 steps
+             within resolution-aware limits (see uiScaleLimits()); a step
+             past a limit wiggles the button and pulses the value red.
+             Clicking the value resets that scale to 1.0x. -->
+        <div class="ui-prefs-row" id="ui-controls-row">
+          <label class="ui-check-label" id="ui-help-bubbles-item" title="show (?) help bubbles in the sidebar (saved per folder)">
             <input type="checkbox" id="ui-help-bubbles">
             <span>help <strong>(?)</strong> bubbles</span>
           </label>
+          <div class="ui-scale-group" id="ui-scale-group">
+            <span class="ui-scale-name">ui scale</span>
+            <button type="button" class="ui-scale-btn" id="ui-scale-minus" title="shrink the whole UI (0.1 steps)">−</button>
+            <button type="button" class="ui-scale-value" id="ui-scale-value" title="click to reset to 1.0x">1.0x</button>
+            <button type="button" class="ui-scale-btn" id="ui-scale-plus" title="grow the whole UI (0.1 steps)">+</button>
+          </div>
+          <div class="ui-scale-group" id="text-scale-group">
+            <span class="ui-scale-name">text scale</span>
+            <button type="button" class="ui-scale-btn" id="text-scale-minus" title="shrink the document text (0.1 steps)">−</button>
+            <button type="button" class="ui-scale-value" id="text-scale-value" title="click to reset to 1.0x">1.0x</button>
+            <button type="button" class="ui-scale-btn" id="text-scale-plus" title="grow the document text (0.1 steps)">+</button>
+          </div>
         </div>
         <!-- convert §5.7: extras. One row per optional dependency group;
              "PDF reading" is the only one in 0.2.3. State comes from
@@ -10730,6 +10883,143 @@
         mmOnThemeChange();
       }
     }
+
+    // ---------- display scales (uiscale round) ----------
+    //
+    // Two per-project zooms, persisted in rness/project.json via
+    // POST /api/project/ui and templated back at boot (BOOT_UI_STATE, set
+    // in <head> before first paint):
+    //   --uiz  whole-UI zoom on the body element — everything, uniformly.
+    //   --txz  content-only zoom on the mode document surfaces,
+    //          multiplicative with --uiz.
+    // Steps are 0.1 within resolution-aware limits; a denied step wiggles
+    // the clicked button and pulses the value red instead of applying.
+    // The home screen has no project, so no scales (controls hidden by
+    // CSS; IS_HOME_MODE guards persistence).
+    const IS_HOME_MODE = document.body.dataset.mode === 'home';
+    const UI_SCALES = {
+      ui_scale: (BOOT_UI_STATE && !BOOT_UI_STATE.home && BOOT_UI_STATE.ui_scale > 0)
+        ? BOOT_UI_STATE.ui_scale : 1.0,
+      text_scale: (BOOT_UI_STATE && !BOOT_UI_STATE.home && BOOT_UI_STATE.text_scale > 0)
+        ? BOOT_UI_STATE.text_scale : 1.0,
+    };
+
+    // Current whole-UI zoom factor. JS that positions fixed/absolute
+    // chrome from viewport coordinates (getBoundingClientRect, clientX/Y,
+    // innerWidth/Height — all top-level CSS px) must divide through by
+    // this, because style.left/top on an element inside the zoomed body
+    // is interpreted in zoomed px.
+    function UIZ() { return UI_SCALES.ui_scale || 1; }
+    // Content zoom factor: sites inside a --txz surface (review-body
+    // footnote/linenav geometry) divide by UIZ()*TXZ(), their effective
+    // zoom, when converting rect differences to scrollTop-space px.
+    function TXZ() { return UI_SCALES.text_scale || 1; }
+
+    // Resolution/DPI-aware step limits, recomputed at every attempted
+    // step so a window resize or monitor move is picked up for free:
+    //  - the ceiling loosens on truly huge displays (the "8K in 2046"
+    //    clause: ≥5120 physical px across → 3.0x, else 2.0x);
+    //  - ui max keeps a usable ≥640 real-px layout at the chosen zoom;
+    //  - ui min floors legibility (looser on retina, where 0.5x is
+    //    still crisp);
+    //  - text max is aware of ui scale: the content column keeps ≥480
+    //    real px, so ui 2.0x tightens how far text can also grow.
+    function uiScaleLimits() {
+      const dpr = window.devicePixelRatio || 1;
+      const ceil = ((window.screen && window.screen.width) || 0) * dpr >= 5120 ? 3.0 : 2.0;
+      const iw = window.innerWidth || 1200;
+      return {
+        uiMin: dpr >= 2 ? 0.5 : 0.6,
+        uiMax: Math.max(0.6, Math.min(ceil, Math.floor((iw / 640) * 10) / 10)),
+        txMin: 0.5,
+        txMax: Math.max(0.6, Math.min(ceil, Math.floor((iw / UIZ() / 480) * 10) / 10)),
+      };
+    }
+
+    function renderUIScaleControls() {
+      const u = document.getElementById('ui-scale-value');
+      const t = document.getElementById('text-scale-value');
+      if (u) u.textContent = UI_SCALES.ui_scale.toFixed(1) + 'x';
+      if (t) t.textContent = UI_SCALES.text_scale.toFixed(1) + 'x';
+    }
+
+    function applyUIScales() {
+      const de = document.documentElement;
+      if (UI_SCALES.ui_scale !== 1) de.style.setProperty('--uiz', UI_SCALES.ui_scale);
+      else de.style.removeProperty('--uiz');
+      if (UI_SCALES.text_scale !== 1) de.style.setProperty('--txz', UI_SCALES.text_scale);
+      else de.style.removeProperty('--txz');
+      renderUIScaleControls();
+    }
+
+    async function persistUIScales() {
+      if (IS_HOME_MODE) return;
+      try {
+        const r = await fetch('/api/project/ui', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(UI_SCALES),
+        });
+        if (r.ok) {
+          const meta = await r.json();
+          if (meta && meta.ui) {
+            // Server echoes the cleaned values (0.1 grid, hard clamp).
+            UI_SCALES.ui_scale = meta.ui.ui_scale;
+            UI_SCALES.text_scale = meta.ui.text_scale;
+            renderUIScaleControls();
+          }
+        }
+      } catch (_e) { /* best-effort persistence, like the bubble toggle */ }
+    }
+
+    function _denyUIScaleStep(btn, valueEl) {
+      // restart the animations even on rapid re-clicks
+      if (btn) { btn.classList.remove('limit-wiggle'); void btn.offsetWidth; btn.classList.add('limit-wiggle'); }
+      if (valueEl) { valueEl.classList.remove('limit-pulse'); void valueEl.offsetWidth; valueEl.classList.add('limit-pulse'); }
+    }
+
+    function stepUIScale(which, dir, btn) {
+      const lim = uiScaleLimits();
+      const next = Math.round((UI_SCALES[which] + dir * 0.1) * 10) / 10;
+      const lo = which === 'ui_scale' ? lim.uiMin : lim.txMin;
+      const hi = which === 'ui_scale' ? lim.uiMax : lim.txMax;
+      const valueEl = document.getElementById(which === 'ui_scale' ? 'ui-scale-value' : 'text-scale-value');
+      // Deny only steps that move AWAY from the allowed range, so a value
+      // stranded out of range by a window shrink can always walk back in.
+      if ((dir > 0 && next > hi + 1e-9) || (dir < 0 && next < lo - 1e-9)) {
+        _denyUIScaleStep(btn, valueEl);
+        return;
+      }
+      UI_SCALES[which] = next;
+      applyUIScales();
+      persistUIScales();
+    }
+
+    function resetUIScale(which) {
+      if (UI_SCALES[which] === 1) return;
+      UI_SCALES[which] = 1;
+      applyUIScales();
+      persistUIScales();
+    }
+
+    (function wireUIScaleControls() {
+      const row = document.getElementById('ui-controls-row');
+      if (!row) return;
+      row.addEventListener('animationend', (e) => {
+        e.target.classList.remove('limit-wiggle', 'limit-pulse');
+      });
+      const wire = (id, fn) => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('click', (e) => fn(e.currentTarget));
+      };
+      wire('ui-scale-minus', (b) => stepUIScale('ui_scale', -1, b));
+      wire('ui-scale-plus', (b) => stepUIScale('ui_scale', +1, b));
+      wire('ui-scale-value', () => resetUIScale('ui_scale'));
+      wire('text-scale-minus', (b) => stepUIScale('text_scale', -1, b));
+      wire('text-scale-plus', (b) => stepUIScale('text_scale', +1, b));
+      wire('text-scale-value', () => resetUIScale('text_scale'));
+      renderUIScaleControls();
+    })();
 
     function populateUIControls() {
       if (!UI_CONFIG) return;
@@ -13786,7 +14076,11 @@
     document.getElementById('wiki-comment-here').addEventListener('click', () => {
       if (!WIKI_PATH) { wikiToast('no article loaded', true); return; }
       const bodyEl = document.getElementById('wiki-body');
-      const mid = bodyEl.getBoundingClientRect().top + bodyEl.clientHeight / 2;
+      // rect height, not clientHeight: rects are top-level CSS px while
+      // clientHeight is the element's own zoomed px (uiscale round) —
+      // mixing them puts "the middle" somewhere else at any --uiz ≠ 1.
+      const bodyElRect = bodyEl.getBoundingClientRect();
+      const mid = bodyElRect.top + bodyElRect.height / 2;
       let best = null, bestDist = Infinity;
       const blocks = wikiBlocks();
       blocks.forEach((b, i) => {
@@ -13822,8 +14116,10 @@
         LAST_WIKI_SELECTION = { text };
         const rect = sel.getRangeAt(0).getBoundingClientRect();
         const modeRect = document.getElementById('wiki-mode').getBoundingClientRect();
-        popup.style.left = Math.max(8, rect.left - modeRect.left) + 'px';
-        popup.style.top = Math.max(8, rect.bottom - modeRect.top + 8) + 'px';
+        // rect differences are top-level px; the popup positions in
+        // #wiki-mode's zoomed px, hence the UIZ() division.
+        popup.style.left = Math.max(8, (rect.left - modeRect.left) / UIZ()) + 'px';
+        popup.style.top = Math.max(8, (rect.bottom - modeRect.top) / UIZ() + 8) + 'px';
         popup.classList.add('show');
       }, 180);
     });
@@ -15796,13 +16092,13 @@
       menu.innerHTML = items.join('');
       menu.classList.remove('hidden');
       menu.setAttribute('aria-hidden', 'false');
-      menu.style.left = x + 'px';
-      menu.style.top = y + 'px';
+      menu.style.left = (x / UIZ()) + 'px';
+      menu.style.top = (y / UIZ()) + 'px';
       requestAnimationFrame(() => {
         const rect = menu.getBoundingClientRect();
         const vw = window.innerWidth, vh = window.innerHeight;
-        if (rect.right > vw - 6) menu.style.left = Math.max(6, vw - rect.width - 6) + 'px';
-        if (rect.bottom > vh - 6) menu.style.top = Math.max(6, vh - rect.height - 6) + 'px';
+        if (rect.right > vw - 6) menu.style.left = Math.max(6, (vw - rect.width - 6) / UIZ()) + 'px';
+        if (rect.bottom > vh - 6) menu.style.top = Math.max(6, (vh - rect.height - 6) / UIZ()) + 'px';
       });
     }
 
@@ -16135,9 +16431,10 @@
       updateCount();
       // Position over the clicked node.
       const rect = g.getBoundingClientRect();
-      box.style.left = Math.max(6, rect.left) + 'px';
-      box.style.top = (rect.top - 4) + 'px';
-      box.style.minWidth = Math.max(120, rect.width) + 'px';
+      // top-level rect px → the fixed editor's zoomed px (uiscale round)
+      box.style.left = Math.max(6, rect.left / UIZ()) + 'px';
+      box.style.top = (rect.top / UIZ() - 4) + 'px';
+      box.style.minWidth = Math.max(120, rect.width / UIZ()) + 'px';
       box.classList.add('open');
       input.focus();
       input.select();
@@ -16783,13 +17080,13 @@
       menu.innerHTML = items.join('');
       menu.classList.remove('hidden');
       menu.setAttribute('aria-hidden', 'false');
-      menu.style.left = x + 'px';
-      menu.style.top = y + 'px';
+      menu.style.left = (x / UIZ()) + 'px';
+      menu.style.top = (y / UIZ()) + 'px';
       requestAnimationFrame(() => {
         const rect = menu.getBoundingClientRect();
         const vw = window.innerWidth, vh = window.innerHeight;
-        if (rect.right > vw - 6) menu.style.left = Math.max(6, vw - rect.width - 6) + 'px';
-        if (rect.bottom > vh - 6) menu.style.top = Math.max(6, vh - rect.height - 6) + 'px';
+        if (rect.right > vw - 6) menu.style.left = Math.max(6, (vw - rect.width - 6) / UIZ()) + 'px';
+        if (rect.bottom > vh - 6) menu.style.top = Math.max(6, (vh - rect.height - 6) / UIZ()) + 'px';
       });
     }
 
@@ -17709,13 +18006,13 @@
       menu.setAttribute('aria-hidden', 'false');
       // Position. Defer to next frame so we can read the rendered size
       // and clamp inside the viewport.
-      menu.style.left = x + 'px';
-      menu.style.top = y + 'px';
+      menu.style.left = (x / UIZ()) + 'px';
+      menu.style.top = (y / UIZ()) + 'px';
       requestAnimationFrame(() => {
         const rect = menu.getBoundingClientRect();
         const vw = window.innerWidth, vh = window.innerHeight;
-        if (rect.right > vw - 6) menu.style.left = Math.max(6, vw - rect.width - 6) + 'px';
-        if (rect.bottom > vh - 6) menu.style.top = Math.max(6, vh - rect.height - 6) + 'px';
+        if (rect.right > vw - 6) menu.style.left = Math.max(6, (vw - rect.width - 6) / UIZ()) + 'px';
+        if (rect.bottom > vh - 6) menu.style.top = Math.max(6, (vh - rect.height - 6) / UIZ()) + 'px';
       });
     }
 
@@ -18145,8 +18442,8 @@
             `span.hl[data-hl-id="${CSS.escape(id)}"]`);
           spans.forEach((s) => {
             const r = s.getBoundingClientRect();
-            const t = (r.top - bodyRect.top) + body.scrollTop;
-            const b = (r.bottom - bodyRect.top) + body.scrollTop;
+            const t = (r.top - bodyRect.top) / (UIZ() * TXZ()) + body.scrollTop;
+            const b = (r.bottom - bodyRect.top) / (UIZ() * TXZ()) + body.scrollTop;
             if (top === null || t < top) top = t;
             if (bot === null || b > bot) bot = b;
           });
@@ -18158,7 +18455,7 @@
             ? body.querySelector(`[data-block-idx="${idx}"]`) : null;
           if (el) {
             const r = el.getBoundingClientRect();
-            top = (r.top - bodyRect.top) + body.scrollTop;
+            top = (r.top - bodyRect.top) / (UIZ() * TXZ()) + body.scrollTop;
             bot = top + el.offsetHeight;
           }
         }
@@ -18538,8 +18835,8 @@
       if (top + popupRect.height > window.innerHeight - margin) {
         top = window.innerHeight - popupRect.height - margin;
       }
-      popup.style.left = left + 'px';
-      popup.style.top = top + 'px';
+      popup.style.left = (left / UIZ()) + 'px';
+      popup.style.top = (top / UIZ()) + 'px';
       popup.setAttribute('aria-hidden', 'false');
     }
 
@@ -20790,7 +21087,9 @@
         if (!marker) { card.hidden = true; return; }
         card.hidden = false;
         const r = marker.getBoundingClientRect();
-        const want = (r.top - bodyRect.top) + body.scrollTop - 4;
+        // rect diff (top-level px) → review-body scrollTop-space px: the
+        // body's effective zoom is --uiz × --txz (uiscale round).
+        const want = (r.top - bodyRect.top) / (UIZ() * TXZ()) + body.scrollTop - 4;
         const top = Math.max(want, floor);
         card.style.top = Math.round(top) + 'px';
         floor = top + card.offsetHeight + 10;
@@ -20985,8 +21284,8 @@
         top = window.innerHeight - rect.height - margin;
       }
       if (top < margin) top = margin;
-      popup.style.left = left + 'px';
-      popup.style.top = top + 'px';
+      popup.style.left = (left / UIZ()) + 'px';
+      popup.style.top = (top / UIZ()) + 'px';
     }
 
     // Clicking a marker: with cards in the margin, take the reader to the

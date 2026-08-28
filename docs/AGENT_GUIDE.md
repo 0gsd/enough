@@ -1719,6 +1719,52 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
 
 ---
 
+## Display scales (ui scale / text scale, 0.2.9)
+
+Two per-project zooms, set from the steppers in the UI modal
+(`#ui-controls-row`) and persisted in `rness/project.json` under `"ui"`
+(`project_meta.save_ui`, `POST /api/project/ui`; `load()` always returns
+the block, defaults 1.0/1.0). The `/` route templates them into the
+inline `BOOT_UI_STATE` literal (`/*UI_STATE_JSON*/null` — replaced the
+same way as `<!-- PROJECT_NAME -->`) so a head script applies them
+before first paint. Home mode templates `{"home": true}`: no project,
+no scales, controls hidden by the `body[data-mode="home"]` CSS block.
+
+Mechanism, all CSS custom properties on `<html>`:
+
+- `--uiz` — whole-UI zoom: `body { zoom: var(--uiz, 1) }`.
+- `--txz` — content-only zoom, multiplicative, applied to the **mode
+  document surfaces** only (one selector list next to the body rule:
+  review/ref `.review-body`, `#edit-mode .edit-textarea`, `#wiki-body`,
+  `#preview-body`). Extending text scale to a new surface = adding one
+  selector there. Chat, sidebar, modals, girraph/merirmaid canvases
+  follow `--uiz` alone, on purpose (diagram layout would distort).
+
+Step limits live in `uiScaleLimits()` — resolution-aware (≥640 real px
+of layout, legibility floor looser on retina, text max tightens as ui
+grows, ceiling 2.0 → 3.0 on ≥5120-physical-px displays), recomputed per
+attempted step, and they gate *changes only* (a value stranded out of
+range by a window shrink can always step back toward range). A denied
+step wiggles the button + pulses the value red (`.limit-wiggle` /
+`.limit-pulse`, removed on animationend). Clicking a value resets that
+scale to 1.0.
+
+**The coordinate contract — read before touching positioning code.**
+CSS zoom means `getBoundingClientRect()`, `clientX/Y`,
+`innerWidth/Height` return *top-level* CSS px, while `style.left/top`,
+`scrollTop`, `offsetHeight`, `clientHeight` on elements inside the
+zoomed body are in *zoomed-local* px. Converting between them divides
+by the effective zoom: `UIZ()` for chrome (context menus, the
+highlight/footnote popups, `#mm-label-editor`, `#wiki-sel-popup`), and
+`UIZ() * TXZ()` inside a `--txz` surface (footnote cards, linenav
+marks). Never mix a rect with `clientHeight` (rect height instead), and
+never assign a raw `clientX` to a positioned element's style. Same
+deal in CSS for viewport units: every `vh/vw/vmin` length divides by
+`var(--uiz, 1)` (grep `/ var(--uiz` for the pattern) so real-viewport
+fits keep fitting.
+
+---
+
 ## Tasks you might be asked to do
 
 ### Add a new skill

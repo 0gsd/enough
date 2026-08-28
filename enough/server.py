@@ -1383,6 +1383,20 @@ def create_app(
             "<!-- PROJECT_NAME -->",
             "" if home else _escape_html(project_meta.load(session.project_dir)["name"]),
         )
+        # Boot UI state (uiscale round): the saved per-project display scales,
+        # templated into the inline BOOT_UI_STATE literal so the zoom vars
+        # apply before first paint — same no-flash reasoning as PROJECT_NAME.
+        # Home has no project, hence no scales to apply (home:true tells the
+        # frontend to leave the vars at 1). <-escape so no JSON string
+        # can ever close the script element.
+        boot_ui: dict[str, Any] = {"home": home}
+        if not home:
+            boot_ui.update(project_meta.load(session.project_dir)["ui"])
+        html = html.replace(
+            "/*UI_STATE_JSON*/null",
+            json.dumps(boot_ui).replace("<", "\\u003c"),
+            1,
+        )
         # No-cache so edits-in-place don't require force-reload during dev.
         return HTMLResponse(html, headers={"Cache-Control": "no-store, must-revalidate"})
 
@@ -1408,6 +1422,24 @@ def create_app(
             session.project_dir,
             (body or {}).get("name"),
             (body or {}).get("description"),
+        )
+
+    @app.post("/api/project/ui")
+    async def api_project_ui_set(request: Request) -> dict[str, Any]:
+        """Persist the per-project display scales (uiscale round). Body:
+        {"ui_scale": 1.2, "text_scale": 1.0}. Separate from POST /api/project
+        so the name/description editor and the scale steppers can't clobber
+        each other's half of rness/project.json. Returns the refreshed
+        metadata (the cleaned scales the frontend should display)."""
+        from . import project_meta
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        return project_meta.save_ui(
+            session.project_dir,
+            (body or {}).get("ui_scale"),
+            (body or {}).get("text_scale"),
         )
 
     @app.get("/api/files", response_class=HTMLResponse)

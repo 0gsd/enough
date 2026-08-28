@@ -83,8 +83,8 @@ If you'd rather never type the command, two launchers ship in `~/enough/shortcut
 
 This file is the long-form manual. You also have:
 
-- **In-harness help** — the `(?)` bubbles throughout the interface, each explaining the thing it's attached to: a *what*, a *how*, and an *ideas* list. See section 9.4.
-- **The cheat sheets** — keyboard shortcuts and markdown syntax, one click away in the UI window. See section 9.3.
+- **In-harness help** — the `(?)` bubbles throughout the interface, each explaining the thing it's attached to: a *what*, a *how*, and an *ideas* list. See section 9.5.
+- **The cheat sheets** — keyboard shortcuts and markdown syntax, one click away in the UI window. See section 9.4.
 - **[enough.support](https://enough.support)** — the community forum: install help, workflow show-and-tell, and people who will happily help you build the customizations this manual keeps nudging you toward.
 
 ---
@@ -164,7 +164,7 @@ Two doors, same room.
 
 **In the app:** **File → Close Project**, or **⌘W**. The project's backend shuts down gracefully and the home screen comes up in its place, a second or so later.
 
-**Anywhere, app or browser:** the **close project → home** row at the top of the ⚙ UI window (section 9). It asks first, because closing ends the session — the conversation in front of you is over, the same as it would be on a quit — and then lands you in exactly the same place ⌘W would.
+**Anywhere, app or browser:** the **close project → home** button at the top of the ⚙ UI window (section 9). It asks first, because closing ends the session — the conversation in front of you is over, the same as it would be on a quit — and then lands you in exactly the same place ⌘W would.
 
 Neither one touches your folder. Your files, your `rness/`, your request files, and your session logs are all exactly where you left them; only the running conversation ends.
 
@@ -495,7 +495,7 @@ Notice the design principle in that table: toggles that gate the agent's tools n
 
 The ⚙ UI button opens display preferences and the reference material. A small **help** button sits at the top right of that window, beside the ×: it opens this manual read-only, in the app, as a full-frame mode like any other (section 12).
 
-The first row inside is the way out: **close project → home**, which ends this session and returns you to the home screen (section 2.5). It asks before it does it, and it notes what it doesn't do — the folder on disk is untouched. In the app you'd more likely reach for ⌘W; this row is the same thing, and it's the *only* one if you're running enough in a browser. (It isn't there on the home screen itself, where there's no project to close.)
+The way out rides the title bar now: **close project → home**, up beside the help button, which ends this session and returns you to the home screen (section 2.5). It asks before it does it, and it notes what it doesn't do — the folder on disk is untouched. In the app you'd more likely reach for ⌘W; this button is the same thing, and it's the *only* one if you're running enough in a browser. (It isn't there on the home screen itself, where there's no project to close.)
 
 It also holds the one thing in enough you can install from inside enough: the **extras** row for **PDF reading** (section 6.8). The row says where you stand — not installed, installing, installed, or installed-but-not-finished — and the install button streams its whole log into the window as it runs, so a long download is something you can watch rather than something you wait out. When it finishes, PDFs start opening; nothing needs restarting.
 
@@ -507,9 +507,19 @@ Themes aren't hardcoded. They live in `~/enough/config/ui.json` as named blocks 
 
 ### 9.2 Fonts
 
-Same pattern. Four shipped stacks — SF Mono, system sans-serif, Georgia serif, Courier — and your own additions welcome in the same `ui.json`. For text size, use your browser's zoom (⌘+ / ⌘−); enough deliberately doesn't reinvent zoom.
+Same pattern. Four shipped stacks — SF Mono, system sans-serif, Georgia serif, Courier — and your own additions welcome in the same `ui.json`. For size, see the two dials below (section 9.3) — and in a browser tab, plain old browser zoom (⌘+ / ⌘−) still works fine on top of them.
 
-### 9.3 Cheat sheets
+### 9.3 Sizing — ui scale and text scale
+
+Browser zoom was always the answer here, until the desktop app arrived without a browser wrapped around it. So enough grew its own, and took the chance to do one better: two dials instead of one, on the row under the theme.
+
+**ui scale** resizes *everything* — icons, labels, the sidebar, the chat, this very window — in steps of 0.1×. **text scale** resizes only the document in front of you: the page in read/edit, a wikisink article, the file preview, this manual in its reference mode. They multiply, and they don't interfere: a 0.9× interface around 1.5× text is a perfectly good way to read a manuscript, and the reverse is a perfectly good way to shrink one out of the way of your afternoon. Click either number to snap that dial back to 1.0× and leave the other alone.
+
+Both are remembered **per project folder** — the manuscript you read from across the room and the notes you keep at the desk each hold their own sizes, and neither drags the other along. The home screen stays at plain size, so the dials don't appear there.
+
+The limits breathe with your screen: roughly 0.5× to 2× on today's displays, tightening in a small window so the interface always keeps enough room to be itself, loosening on very large, very dense screens (the 8K wall of 2046 gets 3×). When a step would cross the line, the button wiggles, the number pulses red, and nothing changes — that's the whole error message.
+
+### 9.4 Cheat sheets
 
 Two columns of reference, right in the UI window.
 
@@ -532,7 +542,7 @@ Those are the shortcuts the interface itself handles, so they work in the app an
 
 **The markdown cheat sheet:** headings, lists, links, code, quotes — the whole quick reference, for anyone still getting fluent in markdown. Which is worth doing, since enough speaks it natively everywhere.
 
-### 9.4 In-harness help (IHH)
+### 9.5 In-harness help (IHH)
 
 The `(?)` bubbles scattered through the interface are the built-in help system: one bubble per concept — skills, roles, the paradigm selector, rness, io, knowledge, cacheawl, wikisink, the mode system, converted documents, and so on — each with a **what**, a **how**, and an **ideas** list. The skills, roles, and paradigms bubbles list what's actually installed in *your* project, and the converted-document bubble draws its table of file types from the app's own format registry — all generated live, so that help never drifts out of sync with reality. (The same table appears in section 6.2 of this manual, from the same source.)
 
