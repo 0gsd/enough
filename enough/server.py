@@ -763,6 +763,20 @@ def _merge_shipped_theme_keys(cfg: dict[str, Any]) -> dict[str, Any]:
     return cfg
 
 
+# The UI languages that ship translated chrome + help content (i18n
+# round). Keys are the folder names under enough/static/i18n/; "en" is
+# the source language baked into index.html and docs/HELP_CENTER.md, so
+# it has no folder of its own (only the canonical string catalog).
+# docs/I18N.md documents the update process across all of them.
+UI_LANGUAGES: frozenset[str] = frozenset({"en", "fr", "es", "de", "zh", "ja"})
+
+
+def _ui_language(cfg: dict[str, Any] | None = None) -> str:
+    """The validated UI language from the live config; absent/unknown ⇒ en."""
+    lang = (cfg if cfg is not None else _read_ui_config()).get("ui_language")
+    return lang if isinstance(lang, str) and lang in UI_LANGUAGES else "en"
+
+
 def _read_ui_config() -> dict[str, Any]:
     path = _ensure_live_ui_config()
     try:
@@ -1389,7 +1403,7 @@ def create_app(
         # Home has no project, hence no scales to apply (home:true tells the
         # frontend to leave the vars at 1). <-escape so no JSON string
         # can ever close the script element.
-        boot_ui: dict[str, Any] = {"home": home}
+        boot_ui: dict[str, Any] = {"home": home, "lang": _ui_language()}
         if not home:
             boot_ui.update(project_meta.load(session.project_dir)["ui"])
         html = html.replace(
@@ -1714,10 +1728,19 @@ def create_app(
         return {"enabled": enabled}
 
     @app.get("/api/help-center", response_class=PlainTextResponse)
-    async def api_help_center() -> PlainTextResponse:
-        """The full help-center manual (docs/HELP_CENTER.md in the install
-        checkout), served as raw markdown for the read-only reference mode."""
+    async def api_help_center(lang: str = "en") -> PlainTextResponse:
+        """The full help-center manual, served as raw markdown for the
+        read-only reference mode. `lang` (i18n round) picks a translated
+        manual from static/i18n/<lang>/help-center.md when one exists;
+        anything else — unknown code, missing translation, en itself —
+        falls back to the English docs/HELP_CENTER.md. The whitelist
+        check doubles as the path guard: `lang` is never used as a path
+        unless it's one of ours."""
         doc = Path(__file__).resolve().parent.parent / "docs" / "HELP_CENTER.md"
+        if lang in UI_LANGUAGES and lang != "en":
+            translated = STATIC_DIR / "i18n" / lang / "help-center.md"
+            if translated.is_file():
+                doc = translated
         text = await asyncio.to_thread(
             lambda: doc.read_text(encoding="utf-8") if doc.is_file() else None)
         if text is None:
@@ -3676,6 +3699,12 @@ def create_app(
         show_hidden = (body or {}).get("home_show_hidden")
         if isinstance(show_hidden, bool):
             cfg["home_show_hidden"] = show_hidden
+        # The UI language (i18n round) — global like the theme, top-level
+        # like the other flags. Whitelisted: an unknown code is dropped
+        # rather than stored (same posture as home_view).
+        lang = (body or {}).get("ui_language")
+        if isinstance(lang, str) and lang in UI_LANGUAGES:
+            cfg["ui_language"] = lang
         _write_ui_config(cfg)
         return cfg
 

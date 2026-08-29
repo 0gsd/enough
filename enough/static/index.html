@@ -20,6 +20,14 @@
       if (BOOT_UI_STATE.text_scale > 0 && BOOT_UI_STATE.text_scale !== 1)
         _de.style.setProperty('--txz', BOOT_UI_STATE.text_scale);
     }
+    // i18n round: start the string-catalog fetch this early so the main
+    // script usually finds it settled and can apply translations in the
+    // same frame it wires the UI (English needs no catalog at all).
+    window.__I18N_PREFETCH =
+      (BOOT_UI_STATE && BOOT_UI_STATE.lang && BOOT_UI_STATE.lang !== 'en')
+        ? fetch('/static/i18n/' + BOOT_UI_STATE.lang + '/ui.json')
+            .then((r) => (r.ok ? r.json() : null)).catch(() => null)
+        : Promise.resolve(null);
   </script>
   <script src="/static/htmx.min.js"></script>
   <style>
@@ -3976,6 +3984,19 @@
 
     #ui-modal .ui-scale-value:hover {
       color: var(--accent-user);
+    }
+
+    #ui-modal .ui-lang-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+
+    #ui-modal .ui-lang-item select {
+      width: auto;
+      min-width: 96px;
     }
 
     /* Limit feedback: a denied step wiggles the button that was clicked
@@ -8463,15 +8484,20 @@
   <div class="topbar">
     <div class="brand">enough<span class="dim"><!-- VERSION --></span></div>
     <!-- Left half: file toggle → broker → UI prefs → model+gauge -->
-    <button id="toggle-sidebar" class="bare-toggle on" title="Show/hide the file sidebar (cmd+\\)"
+    <button id="toggle-sidebar" class="bare-toggle on" title="Show/hide the file sidebar (cmd+\)"
+      data-i18n-title="topbar.sidebar.title" data-i18n-aria="topbar.sidebar.aria"
       aria-label="files"><img class="svg-icon" data-icon="projectnav-on" alt="files" draggable="false"></button>
     <button id="broker-btn" class="icon-btn" title="Broker — tool routing, logging, and per-tool toggles"
+      data-i18n-title="topbar.broker.title" data-i18n-aria="topbar.broker.aria"
       aria-label="broker"><img class="svg-icon" data-icon="broker" alt="broker" draggable="false"></button>
     <button id="ui-btn" class="icon-btn" title="UI preferences + help center + keyboard shortcuts + markdown cheat sheet"
+      data-i18n-title="topbar.ui.title" data-i18n-aria="topbar.ui.aria"
       aria-label="ui preferences"><img class="svg-icon" data-icon="uiq" alt="ui preferences" draggable="false"></button>
     <button id="wikisink-btn" class="icon-btn" title="Wikisink — your local offline Wikipedia: browse, save, comment, update"
+      data-i18n-title="topbar.wikisink.title" data-i18n-aria="topbar.wikisink.aria"
       aria-label="wikisink"><img class="svg-icon" data-icon="wikisink" alt="wikisink" draggable="false"></button>
     <button id="cacheawl-btn" class="icon-btn" title="Cacheawl — the global cachebox store: two-pane file manager"
+      data-i18n-title="topbar.cacheawl.title" data-i18n-aria="topbar.cacheawl.aria"
       aria-label="cacheawl"><img class="svg-icon" data-icon="cacheawl" alt="cacheawl" draggable="false"></button>
     <button id="model-badge" class="model-badge off"
       title="Model &amp; context window — bottom bar shows live token-pressure">
@@ -8486,13 +8512,13 @@
          or review mode). The three readouts are ¶ (paragraphs), W (words),
          C (characters). -->
     <div class="doc-counters" id="doc-counters" hidden>
-      <span class="dc" title="paragraphs (blank-line separated blocks)">
+      <span class="dc" title="paragraphs (blank-line separated blocks)" data-i18n-title="topbar.docCounters.paras.title">
         <span class="dc-glyph">¶</span><span class="dc-val" id="doc-paras">0</span>
       </span>
-      <span class="dc" title="words (whitespace separated)">
+      <span class="dc" title="words (whitespace separated)" data-i18n-title="topbar.docCounters.words.title">
         <span class="dc-glyph">W</span><span class="dc-val" id="doc-words">0</span>
       </span>
-      <span class="dc" title="characters (including spaces and newlines)">
+      <span class="dc" title="characters (including spaces and newlines)" data-i18n-title="topbar.docCounters.chars.title">
         <span class="dc-glyph">C</span><span class="dc-val" id="doc-chars">0</span>
       </span>
     </div>
@@ -8502,6 +8528,7 @@
     <div class="project-title" id="project-title">
       <span class="proj-name" id="project-name"><!-- PROJECT_NAME --></span>
       <button class="proj-edit" id="project-edit" type="button" title="Edit project name &amp; description"
+        data-i18n-title="topbar.projectEdit.title" data-i18n-aria="topbar.projectEdit.aria"
         aria-label="edit project">✎</button>
     </div>
     <!-- Right half: the mode STACK indicators (see the mode-stack JS). -->
@@ -8520,37 +8547,37 @@
   <div class="layout" id="layout">
     <aside class="sidebar" tabindex="0">
       <section class="sidebar-section" data-section="paradigm">
-        <h3 class="section-head" data-help="paradigm-active"><span class="zippy">▾</span>paradigm</h3>
+        <h3 class="section-head" data-help="paradigm-active"><span class="zippy">▾</span><span data-i18n="sidebar.paradigm">paradigm</span></h3>
         <div class="section-body">
           <div id="paradigm-list" hx-get="/api/paradigm" hx-trigger="load, every 10s" hx-swap="innerHTML">
-            <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+            <div style="color: var(--fg-faint); padding: 8px" data-i18n="misc.loading">loading…</div>
           </div>
         </div>
       </section>
 
       <section class="sidebar-section collapsed" data-section="roles">
-        <h3 class="section-head" data-help="roles"><span class="zippy">▾</span>roles</h3>
+        <h3 class="section-head" data-help="roles"><span class="zippy">▾</span><span data-i18n="sidebar.roles">roles</span></h3>
         <div class="section-body">
           <div id="roles-list" hx-get="/api/roles" hx-trigger="load, every 10s" hx-swap="innerHTML">
-            <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+            <div style="color: var(--fg-faint); padding: 8px" data-i18n="misc.loading">loading…</div>
           </div>
         </div>
       </section>
 
       <section class="sidebar-section" data-section="skills">
-        <h3 class="section-head" data-help="skills"><span class="zippy">▾</span>skills</h3>
+        <h3 class="section-head" data-help="skills"><span class="zippy">▾</span><span data-i18n="sidebar.skills">skills</span></h3>
         <div class="section-body">
           <div id="skills-list" hx-get="/api/skills" hx-trigger="load, every 10s" hx-swap="innerHTML">
-            <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+            <div style="color: var(--fg-faint); padding: 8px" data-i18n="misc.loading">loading…</div>
           </div>
         </div>
       </section>
 
       <section class="sidebar-section" data-section="project">
-        <h3 class="section-head"><span class="zippy">▾</span>project</h3>
+        <h3 class="section-head"><span class="zippy">▾</span><span data-i18n="sidebar.project">project</span></h3>
         <div class="section-body">
           <div id="tree" hx-get="/api/files" hx-trigger="load, every 3s" hx-swap="innerHTML">
-            <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+            <div style="color: var(--fg-faint); padding: 8px" data-i18n="misc.loading">loading…</div>
           </div>
         </div>
       </section>
@@ -8566,10 +8593,13 @@
         <form id="chat-form" class="input-form" hx-post="/api/chat" hx-target="#conversation" hx-swap="beforeend"
           hx-on::after-request="document.getElementById('message').value=''; document.getElementById('empty-hint')?.remove(); autoscroll();">
           <button type="button" id="mic-btn" class="mic-btn icon-chip" title="voice input (local whisper.cpp)"
+            data-i18n-title="chat.mic.title" data-i18n-aria="chat.mic.aria"
             aria-label="voice input"><img class="svg-icon" data-icon="speak" alt="speak" draggable="false"></button>
           <textarea id="message" name="message" placeholder="message… (shift+enter for newline)" rows="1"
+            data-i18n-placeholder="chat.input.placeholder"
             autofocus></textarea>
-          <button type="submit" id="send-btn" class="icon-chip" aria-label="send"><img class="svg-icon"
+          <button type="submit" id="send-btn" class="icon-chip" aria-label="send"
+            data-i18n-aria="chat.send.aria"><img class="svg-icon"
               data-icon="send-chat" alt="send" draggable="false"></button>
         </form>
       </div>
@@ -8588,6 +8618,7 @@
              steal clicks from) anything placed there. -->
         <div class="preview-header">
           <button type="button" class="mini-full-btn" id="mini-full-btn"
+            data-i18n-title="review.miniFull.title" data-i18n-aria="review.miniFull.aria"
             title="expand to full size" aria-label="expand to full size">
             <img class="svg-icon" data-icon="mini2full" alt="full size" draggable="false">
           </button>
@@ -8607,10 +8638,10 @@
               ><img class="svg-icon" data-icon="twin-on" alt="" draggable="false"></span>
             <span class="cc-name" data-cc="name"></span>
             <span class="cc-twin" data-cc="twin"></span>
-            <button type="button" class="cc-btn" data-cc="export" title="export changes">
+            <button type="button" class="cc-btn" data-cc="export" title="export changes" data-i18n-title="convert.exportChanges.title">
               <img class="svg-icon" data-icon="export-doc" alt="export changes" draggable="false">
             </button>
-            <button type="button" class="cc-btn" data-cc="original" title="view the original PDF" hidden>
+            <button type="button" class="cc-btn" data-cc="original" title="view the original PDF" data-i18n-title="convert.viewOriginal.title" hidden>
               <img class="svg-icon" data-icon="view-original" alt="view original" draggable="false">
             </button>
           </span>
@@ -8634,6 +8665,7 @@
         <div class="review-toolbar" id="review-toolbar">
           <div class="rt-group rt-size">
             <button type="button" id="review-mini-btn" class="rt-mini-btn"
+              data-i18n-title="review.miniPanel.title" data-i18n-aria="review.miniPanel.aria"
               title="shrink to mini panel" aria-label="shrink to mini panel">
               <img class="svg-icon" data-icon="full2mini" alt="mini panel" draggable="false">
             </button>
@@ -8648,6 +8680,7 @@
                  only face it makes sense from (you paginate what you have
                  just read through). -->
             <button type="button" id="paginate-btn" class="rt-mini-btn" hidden
+              data-i18n-title="review.paginate.title" data-i18n-aria="review.paginate.aria"
               title="paginate" aria-label="paginate">
               <img class="svg-icon" data-icon="paginate" alt="paginate" draggable="false">
             </button>
@@ -8657,34 +8690,34 @@
                 ><img class="svg-icon" data-icon="twin-on" alt="" draggable="false"></span>
               <span class="cc-name" data-cc="name"></span>
               <span class="cc-twin" data-cc="twin"></span>
-              <button type="button" class="cc-btn" data-cc="export" title="export changes">
+              <button type="button" class="cc-btn" data-cc="export" title="export changes" data-i18n-title="convert.exportChanges.title">
                 <img class="svg-icon" data-icon="export-doc" alt="export changes" draggable="false">
               </button>
-              <button type="button" class="cc-btn" data-cc="original" title="view the original PDF" hidden>
+              <button type="button" class="cc-btn" data-cc="original" title="view the original PDF" data-i18n-title="convert.viewOriginal.title" hidden>
                 <img class="svg-icon" data-icon="view-original" alt="view original" draggable="false">
               </button>
             </span>
           </div>
-          <div class="rt-group rt-format" role="group" aria-label="format">
-            <button type="button" data-fmt="bold" title="bold (wrap selection in **…**)"><b>B</b></button>
-            <button type="button" data-fmt="italic" title="italic (wrap selection in *…*)"><i>I</i></button>
-            <button type="button" data-fmt="underline" title="underline (wrap selection in <u>…</u>)"><u>U</u></button>
-            <select id="rt-heading" title="heading level for the selection's block">
-              <option value="">heading…</option>
-              <option value="0">¶ paragraph</option>
+          <div class="rt-group rt-format" role="group" aria-label="format" data-i18n-aria="review.format.aria">
+            <button type="button" data-fmt="bold" title="bold (wrap selection in **…**)" data-i18n-title="review.fmt.bold.title"><b>B</b></button>
+            <button type="button" data-fmt="italic" title="italic (wrap selection in *…*)" data-i18n-title="review.fmt.italic.title"><i>I</i></button>
+            <button type="button" data-fmt="underline" title="underline (wrap selection in <u>…</u>)" data-i18n-title="review.fmt.underline.title"><u>U</u></button>
+            <select id="rt-heading" title="heading level for the selection's block" data-i18n-title="review.headingSelect.title">
+              <option value="" data-i18n="review.heading.none">heading…</option>
+              <option value="0" data-i18n="review.heading.paragraph">¶ paragraph</option>
               <option value="1"># H1</option>
               <option value="2">## H2</option>
               <option value="3">### H3</option>
             </select>
           </div>
-          <div class="rt-group rt-highlights" aria-label="highlight colors">
+          <div class="rt-group rt-highlights" aria-label="highlight colors" data-i18n-aria="review.highlights.aria">
             <!-- Click a circle to apply that color to the selection;
                  click again on an already-active color to remove it.
                  Multiple colors can be stacked on the same span. -->
-            <button type="button" class="rt-color" data-color="yellow" title="highlight yellow"></button>
-            <button type="button" class="rt-color" data-color="green" title="highlight green"></button>
-            <button type="button" class="rt-color" data-color="blue" title="highlight blue"></button>
-            <button type="button" class="rt-color" data-color="pink" title="highlight pink"></button>
+            <button type="button" class="rt-color" data-color="yellow" title="highlight yellow" data-i18n-title="review.hl.yellow.title"></button>
+            <button type="button" class="rt-color" data-color="green" title="highlight green" data-i18n-title="review.hl.green.title"></button>
+            <button type="button" class="rt-color" data-color="blue" title="highlight blue" data-i18n-title="review.hl.blue.title"></button>
+            <button type="button" class="rt-color" data-color="pink" title="highlight pink" data-i18n-title="review.hl.pink.title"></button>
           </div>
         </div>
         <div class="review-body" id="review-body" data-path=""></div>
@@ -8692,10 +8725,10 @@
              #review-mode; populated by JS after each highlight
              render with one row per source line. Clicking a row
              scrolls the body to that line's block. -->
-        <div class="review-linenav" id="review-linenav" aria-label="line navigation"></div>
+        <div class="review-linenav" id="review-linenav" aria-label="line navigation" data-i18n-aria="review.linenav.aria"></div>
         <div class="review-chat" id="review-chat">
           <div class="review-chat-head" onclick="toggleReviewChat()">
-            <span>chat</span>
+            <span data-i18n="misc.chat">chat</span>
             <span class="toggle" id="review-chat-toggle">▾</span>
           </div>
           <div class="review-chat-tail" id="review-chat-tail"></div>
@@ -8707,8 +8740,8 @@
           <div class="review-undo-bar" id="review-undo-bar" hidden>
             <span class="lbl"><span id="review-undo-lead">agent edited</span>
               <code id="review-undo-path"></code> — keep it?</span>
-            <button type="button" id="review-undo-keep">✓ save</button>
-            <button type="button" id="review-undo-revert">↶ undo</button>
+            <button type="button" id="review-undo-keep" data-i18n="review.undo.keep">✓ save</button>
+            <button type="button" id="review-undo-revert" data-i18n="review.undo.revert">↶ undo</button>
           </div>
           <!-- Context chip (Phase 5d quirk fix): when a review-mode
                selection (live or snapshotted via an "i" handle click)
@@ -8717,13 +8750,13 @@
                The × button clears the queue. Hidden when nothing's
                queued. -->
           <div class="review-chat-chip" id="review-chat-chip" hidden>
-            <span class="lbl">↪ context:</span>
+            <span class="lbl" data-i18n="review.chip.label">↪ context:</span>
             <span class="text" id="review-chat-chip-text"></span>
-            <button type="button" id="review-chat-chip-clear" title="clear queued selection">×</button>
+            <button type="button" id="review-chat-chip-clear" title="clear queued selection" data-i18n-title="review.chip.clear.title">×</button>
           </div>
           <form class="review-chat-form" id="review-chat-form" onsubmit="event.preventDefault(); sendFromReviewChat();">
-            <textarea id="review-chat-input" rows="2" placeholder="message the agent about this document…"></textarea>
-            <button type="submit">send</button>
+            <textarea id="review-chat-input" rows="2" placeholder="message the agent about this document…" data-i18n-placeholder="review.chat.placeholder"></textarea>
+            <button type="submit" data-i18n="misc.send">send</button>
           </form>
         </div>
       </div>
@@ -8741,6 +8774,7 @@
           <span class="title" id="edit-title"></span>
           <div class="edit-actions">
             <button type="button" id="edit-mini-btn" class="rt-mini-btn"
+              data-i18n-title="review.miniPanel.title" data-i18n-aria="review.miniPanel.aria"
               title="shrink to mini panel" aria-label="shrink to mini panel">
               <img class="svg-icon" data-icon="full2mini" alt="mini panel" draggable="false">
             </button>
@@ -8753,6 +8787,7 @@
                  whatever follows. Typing `[^]` does the same thing — this
                  is the button for people who don't know that yet. -->
             <button type="button" id="edit-footnote-btn" class="rt-mini-btn" hidden
+              data-i18n-title="edit.footnote.title" data-i18n-aria="edit.footnote.aria"
               title="insert footnote" aria-label="insert footnote">
               <img class="svg-icon" data-icon="comment" alt="insert footnote" draggable="false">
             </button>
@@ -8762,28 +8797,28 @@
                 ><img class="svg-icon" data-icon="twin-on" alt="" draggable="false"></span>
               <span class="cc-name" data-cc="name"></span>
               <span class="cc-twin" data-cc="twin"></span>
-              <button type="button" class="cc-btn" data-cc="export" title="export changes">
+              <button type="button" class="cc-btn" data-cc="export" title="export changes" data-i18n-title="convert.exportChanges.title">
                 <img class="svg-icon" data-icon="export-doc" alt="export changes" draggable="false">
               </button>
-              <button type="button" class="cc-btn" data-cc="original" title="view the original PDF" hidden>
+              <button type="button" class="cc-btn" data-cc="original" title="view the original PDF" data-i18n-title="convert.viewOriginal.title" hidden>
                 <img class="svg-icon" data-icon="view-original" alt="view original" draggable="false">
               </button>
             </span>
-            <button type="button" id="edit-save-btn" class="primary">save</button>
-            <button type="button" id="edit-revert-btn">revert</button>
+            <button type="button" id="edit-save-btn" class="primary" data-i18n="edit.save">save</button>
+            <button type="button" id="edit-revert-btn" data-i18n="edit.revert">revert</button>
           </div>
         </div>
         <textarea id="edit-textarea" class="edit-textarea" spellcheck="false"></textarea>
-        <div class="review-linenav" id="edit-linenav" aria-label="line navigation"></div>
+        <div class="review-linenav" id="edit-linenav" aria-label="line navigation" data-i18n-aria="review.linenav.aria"></div>
         <div class="review-chat" id="edit-chat">
           <div class="review-chat-head" onclick="toggleEditChat()">
-            <span>chat</span>
+            <span data-i18n="misc.chat">chat</span>
             <span class="toggle" id="edit-chat-toggle">▾</span>
           </div>
           <div class="review-chat-tail" id="edit-chat-tail"></div>
           <form class="review-chat-form" id="edit-chat-form" onsubmit="event.preventDefault(); sendFromEditChat();">
-            <textarea id="edit-chat-input" rows="2" placeholder="message the agent about this document…"></textarea>
-            <button type="submit">send</button>
+            <textarea id="edit-chat-input" rows="2" placeholder="message the agent about this document…" data-i18n-placeholder="review.chat.placeholder"></textarea>
+            <button type="submit" data-i18n="misc.send">send</button>
           </form>
         </div>
       </div>
@@ -8806,9 +8841,9 @@
         <div class="girraph-toolbar">
           <img class="svg-icon gp-mode-icon" data-icon="girraphmode" alt="" draggable="false">
           <button type="button" class="gp-merirmaid icon-btn-like" id="gp-merirmaid" hidden><img class="svg-icon" data-icon="merirmaidmode" alt="" draggable="false"></button>
-          <nav class="gp-crumbs" id="gp-crumbs" aria-label="girraph navigation"></nav>
-          <button type="button" class="gp-act" id="gp-refresh" title="re-read the file (pick up agent edits)">↻</button>
-          <button type="button" class="gp-act" id="gp-add-root" title="add a top-level node">+ root node</button>
+          <nav class="gp-crumbs" id="gp-crumbs" aria-label="girraph navigation" data-i18n-aria="gr.crumbs.aria"></nav>
+          <button type="button" class="gp-act" id="gp-refresh" title="re-read the file (pick up agent edits)" data-i18n-title="gr.refresh.title">↻</button>
+          <button type="button" class="gp-act" id="gp-add-root" title="add a top-level node" data-i18n-title="gr.addRoot.title" data-i18n="gr.addRoot.label">+ root node</button>
         </div>
         <div class="girraph-body" id="girraph-body"></div>
       </div>
@@ -8825,24 +8860,25 @@
           <img class="svg-icon mm-mode-icon" data-icon="merirmaidmode" alt="" draggable="false">
           <span class="mm-title" id="merirmaid-title"></span>
           <span class="mm-badge" id="merirmaid-badge" hidden></span>
-          <nav class="mm-crumbs" id="mm-crumbs" aria-label="merirmaid navigation"></nav>
+          <nav class="mm-crumbs" id="mm-crumbs" aria-label="merirmaid navigation" data-i18n-aria="mm.crumbs.aria"></nav>
           <!-- home only: the project mirror's launch button. Shown by
                renderMerirmaidTop() when the top of the stack is a
                `homeproj` entry, hidden for every other diagram. -->
           <button type="button" class="mm-act mm-open-project" id="mm-open-project" hidden
+            data-i18n-title="mm.openProject.title" data-i18n="mm.openProject.label"
             title="open this project — the server hands off and reloads into it">open project</button>
-          <button type="button" class="mm-act" id="mm-refresh" title="re-read the file (pick up agent edits)">↻</button>
+          <button type="button" class="mm-act" id="mm-refresh" title="re-read the file (pick up agent edits)" data-i18n-title="mm.refresh.title">↻</button>
         </div>
         <div class="merirmaid-body" id="merirmaid-body"></div>
         <div class="review-chat" id="merirmaid-chat">
           <div class="review-chat-head" onclick="toggleMerirmaidChat()">
-            <span>chat</span>
+            <span data-i18n="misc.chat">chat</span>
             <span class="toggle" id="merirmaid-chat-toggle">▾</span>
           </div>
           <div class="review-chat-tail" id="merirmaid-chat-tail"></div>
           <form class="review-chat-form" id="merirmaid-chat-form" onsubmit="event.preventDefault(); sendFromMerirmaidChat();">
-            <textarea id="merirmaid-chat-input" rows="2" placeholder="ask the agent to change this diagram…"></textarea>
-            <button type="submit">send</button>
+            <textarea id="merirmaid-chat-input" rows="2" placeholder="ask the agent to change this diagram…" data-i18n-placeholder="mm.chat.placeholder"></textarea>
+            <button type="submit" data-i18n="misc.send">send</button>
           </form>
         </div>
       </div>
@@ -8856,8 +8892,8 @@
       <div id="ref-mode" aria-hidden="true">
         <div class="ref-toolbar">
           <img class="svg-icon ref-mode-icon" data-icon="hxc" alt="" draggable="false">
-          <span class="ref-title">help center</span>
-          <span class="ref-badge">reference · read-only</span>
+          <span class="ref-title" data-i18n="ref.title">help center</span>
+          <span class="ref-badge" data-i18n="ref.badge">reference · read-only</span>
           <span class="spacer"></span>
           <button type="button" id="ref-size-btn" title="shrink to a side panel" onclick="refToggleSize()">
             <img class="svg-icon" data-icon="full2mini" alt="" draggable="false">
@@ -8880,19 +8916,22 @@
           <span class="pv-title" id="pv-title"></span>
           <span class="pv-badge" id="pv-badge"></span>
           <span class="spacer"></span>
-          <button type="button" id="pv-full-btn" title="fullscreen" aria-label="fullscreen">
+          <button type="button" id="pv-full-btn" title="fullscreen" aria-label="fullscreen" data-i18n-aria="pv.full.aria">
             <img class="svg-icon" data-icon="mini2full" alt="" draggable="false">
           </button>
-          <button type="button" id="pv-close-btn" title="close the viewer" aria-label="close">×</button>
+          <button type="button" id="pv-close-btn" title="close the viewer" aria-label="close"
+            data-i18n-title="pv.close.title" data-i18n-aria="misc.close.aria">×</button>
         </div>
         <div class="pv-stage">
-          <button type="button" class="pv-nav" id="pv-prev" title="previous page" aria-label="previous page">‹</button>
+          <button type="button" class="pv-nav" id="pv-prev" title="previous page" aria-label="previous page"
+            data-i18n-title="pv.prev.title" data-i18n-aria="pv.prev.aria">‹</button>
           <img class="pv-page" id="pv-page" alt="" draggable="false">
-          <button type="button" class="pv-nav" id="pv-next" title="next page" aria-label="next page">›</button>
+          <button type="button" class="pv-nav" id="pv-next" title="next page" aria-label="next page"
+            data-i18n-title="pv.next.title" data-i18n-aria="pv.next.aria">›</button>
         </div>
         <div class="pv-foot">
           <span id="pv-count"></span>
-          <span class="pv-hint">← → to turn pages</span>
+          <span class="pv-hint" data-i18n="pv.hint">← → to turn pages</span>
         </div>
       </div>
 
@@ -8900,7 +8939,7 @@
            over the clicked node at edit time). Lives outside
            #merirmaid-mode so its fixed position isn't clipped. -->
       <div id="mm-label-editor">
-        <input type="text" id="mm-label-input" spellcheck="false" autocomplete="off" aria-label="node label">
+        <input type="text" id="mm-label-input" spellcheck="false" autocomplete="off" aria-label="node label" data-i18n-aria="mm.labelInput.aria">
         <span class="mm-count" id="mm-label-count"></span>
       </div>
 
@@ -8917,33 +8956,38 @@
            classes wholesale. -->
       <div id="wiki-mode" aria-hidden="true">
         <div class="wiki-toolbar" id="wiki-toolbar">
-          <button type="button" id="wiki-back" title="back" disabled>←</button>
-          <button type="button" id="wiki-fwd" title="forward" disabled>→</button>
+          <button type="button" id="wiki-back" title="back" data-i18n-title="wiki.back.title" disabled>←</button>
+          <button type="button" id="wiki-fwd" title="forward" data-i18n-title="wiki.fwd.title" disabled>→</button>
           <div class="wiki-search-wrap">
-            <input id="wiki-search" placeholder="search wikipedia…" autocomplete="off" spellcheck="false">
+            <input id="wiki-search" placeholder="search wikipedia…" data-i18n-placeholder="wiki.search.placeholder" autocomplete="off" spellcheck="false">
             <div id="wiki-suggest" hidden></div>
           </div>
           <button type="button" id="wiki-random" class="wt-icon" title="random article"
+            data-i18n-title="wiki.random.title" data-i18n-aria="wiki.random.aria"
             aria-label="random article"><img class="svg-icon" data-icon="d6" alt="random" draggable="false"></button>
           <span class="wiki-title-span" id="wiki-article-title"></span>
           <span class="wiki-source-badge" id="wiki-source-badge" hidden></span>
           <span class="spacer"></span>
           <button type="button" id="wiki-comment-here" class="wt-icon"
             title="add a comment anchored to the paragraph nearest the middle of the view"
+            data-i18n-title="wiki.commentHere.title" data-i18n-aria="wiki.commentHere.aria"
             aria-label="comment here"><img class="svg-icon" data-icon="comment" alt="comment" draggable="false"></button>
           <!-- Save flyout: one button, two free-floating overlay choices. -->
           <div class="wiki-save-wrap" id="wiki-save-wrap">
             <button type="button" id="wiki-save-btn" class="wt-icon"
               title="save this article — choose project or infoworld"
+              data-i18n-title="wiki.save.title" data-i18n-aria="wiki.save.aria"
               aria-label="save article"><img class="svg-icon" data-icon="savewiki" alt="save" draggable="false"></button>
             <div id="wiki-save-flyout" class="save-flyout" hidden role="menu">
               <button type="button" class="save-choice" id="wiki-save-project" role="menuitem"
                 aria-label="save to project"
+                data-i18n-title="wiki.saveProject.title" data-i18n-aria="wiki.saveProject.aria"
                 title="save this article to the project's wiki/ folder (full fidelity — opens back in this reader)">
                 <img class="svg-icon" data-icon="savewiki-project" alt="save to project" draggable="false">
               </button>
               <button type="button" class="save-choice" id="wiki-save-infoworld" role="menuitem"
                 aria-label="save to cacheawl (shared across projects)"
+                data-i18n-title="wiki.saveCacheawl.title" data-i18n-aria="wiki.saveCacheawl.aria"
                 title="save this article to ~/enough/cacheawl/wiki (shared across all projects)">
                 <img class="svg-icon" data-icon="savewiki-cacheawl" alt="save to cacheawl" draggable="false">
               </button>
@@ -8951,8 +8995,10 @@
           </div>
           <button type="button" id="wiki-cachebox-update" class="wt-icon" hidden
             title="update this saved article by running a wikisink refresh"
+            data-i18n-aria="wiki.cacheboxUpdate.aria"
             aria-label="update saved article"><img class="svg-icon" data-icon="cachebox-update" alt="update" draggable="false"></button>
           <button type="button" id="wiki-override" class="wt-icon" hidden
+            data-i18n-aria="wiki.override.aria"
             aria-label="deletion override"
             title="deletion override — keep this article's local copy forever and stop updating it"><img
               class="svg-icon" data-icon="wiki-unlocked" alt="deletion override" draggable="false"></button>
@@ -8964,18 +9010,21 @@
           <button type="button" id="wiki-newer-badge" class="wt-badge" hidden></button>
           <button type="button" id="wiki-settings" class="wt-icon"
             title="wikisink settings — archive info, updates, storage"
+            data-i18n-title="wiki.settings.title" data-i18n-aria="wiki.settings.aria"
             aria-label="wikisink settings"><img class="svg-icon" data-icon="wikisink-settings" alt="settings" draggable="false"></button>
           <!-- Comments panel toggle: bare two-state, far-right, mirrors the
                projectnav treatment (on = panel visible, with dark-theme glow). -->
           <button type="button" id="wiki-comments-toggle" class="bare-toggle"
+            data-i18n-aria="wiki.commentsToggle.aria"
             title="show/hide the comments panel" aria-label="toggle comments panel"><img class="svg-icon"
               data-icon="commentsright-off" alt="comments" draggable="false"></button>
         </div>
         <div class="wiki-body" id="wiki-body" data-path=""></div>
         <div id="wiki-comments-panel" hidden>
           <div class="panel-head">
-            <span>comments</span>
+            <span data-i18n="wiki.comments.title">comments</span>
             <button type="button" class="modal-close" onclick="toggleWikiCommentsPanel(false)"
+              data-i18n-aria="wiki.comments.close.aria"
               aria-label="close comments">×</button>
           </div>
           <div id="wiki-composer-slot"></div>
@@ -8983,23 +9032,23 @@
         </div>
         <div id="wiki-sel-popup" role="dialog" aria-hidden="true">
           <button type="button" id="wsp-comment"><img class="svg-icon inline" data-icon="comment" alt="" draggable="false"> comment</button>
-          <button type="button" id="wsp-ask">🤖 ask agent</button>
+          <button type="button" id="wsp-ask" data-i18n="wiki.sel.ask">🤖 ask agent</button>
           <button type="button" id="wsp-save"><img class="svg-icon inline" data-icon="savewiki-project" alt="" draggable="false"> save article</button>
         </div>
         <div class="review-chat" id="wiki-chat">
           <div class="review-chat-head" onclick="toggleWikiChat()">
-            <span>chat</span>
+            <span data-i18n="misc.chat">chat</span>
             <span class="toggle" id="wiki-chat-toggle">▾</span>
           </div>
           <div class="review-chat-tail" id="wiki-chat-tail"></div>
           <div class="review-chat-chip" id="wiki-chat-chip" hidden>
-            <span class="lbl">↪ context:</span>
+            <span class="lbl" data-i18n="review.chip.label">↪ context:</span>
             <span class="text" id="wiki-chat-chip-text"></span>
-            <button type="button" id="wiki-chat-chip-clear" title="clear queued selection">×</button>
+            <button type="button" id="wiki-chat-chip-clear" title="clear queued selection" data-i18n-title="review.chip.clear.title">×</button>
           </div>
           <form class="review-chat-form" id="wiki-chat-form" onsubmit="event.preventDefault(); sendFromWikiChat();">
-            <textarea id="wiki-chat-input" rows="2" placeholder="ask the agent about this article…"></textarea>
-            <button type="submit">send</button>
+            <textarea id="wiki-chat-input" rows="2" placeholder="ask the agent about this article…" data-i18n-placeholder="wiki.chat.placeholder"></textarea>
+            <button type="submit" data-i18n="misc.send">send</button>
           </form>
         </div>
       </div>
@@ -9018,48 +9067,50 @@
           <div class="ca-pane-head">
             <img class="svg-icon" data-icon="folder-project" alt="" draggable="false">
             <span class="ca-pane-title" id="ca-project-name">project</span>
-            <nav class="ca-crumbs" id="ca-project-crumbs" aria-label="project navigation"></nav>
+            <nav class="ca-crumbs" id="ca-project-crumbs" aria-label="project navigation" data-i18n-aria="ca.projectCrumbs.aria"></nav>
           </div>
           <div class="ca-grid" id="ca-project-grid" data-pane="project"></div>
         </div>
         <div class="ca-pane ca-store" id="ca-store-pane">
           <div class="ca-pane-head">
             <img class="svg-icon" data-icon="cacheawl" alt="" draggable="false">
-            <span class="ca-pane-title">cacheawl</span>
-            <nav class="ca-crumbs" id="ca-store-crumbs" aria-label="cacheawl navigation"></nav>
+            <span class="ca-pane-title" data-i18n="ca.storeTitle">cacheawl</span>
+            <nav class="ca-crumbs" id="ca-store-crumbs" aria-label="cacheawl navigation" data-i18n-aria="ca.storeCrumbs.aria"></nav>
           </div>
           <div class="ca-grid" id="ca-store-grid" data-pane="cachebox"></div>
           <form class="ca-ingest" id="ca-ingest-form"
                 onsubmit="event.preventDefault(); submitCacheawlIngest();">
-            <select id="ca-ingest-type" title="ingest source type"
+            <select id="ca-ingest-type" title="ingest source type" data-i18n-title="ca.ingestType.title"
                     onchange="caIngestTypeChanged()">
               <option value="path">path:</option>
               <option value="url">url:</option>
               <option value="wikisink">wikisink:</option>
             </select>
             <input type="text" id="ca-ingest-value" autocomplete="off" spellcheck="false"
+                   data-i18n-placeholder="ca.ingest.placeholder"
                    placeholder="source to ingest (folder path, url, or article title)…">
-            <select id="ca-ingest-depth" title="crawl/copy depth">
+            <select id="ca-ingest-depth" title="crawl/copy depth" data-i18n-title="ca.ingestDepth.title">
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
             </select>
-            <label class="ca-all" id="ca-ingest-all-label" title="unlimited subdirectory depth (path/url only)">
+            <label class="ca-all" id="ca-ingest-all-label" title="unlimited subdirectory depth (path/url only)"
+                   data-i18n-title="ca.ingestAll.title">
               <input type="checkbox" id="ca-ingest-all"> all
             </label>
-            <button type="submit" class="ca-ingest-go">ingest</button>
+            <button type="submit" class="ca-ingest-go" data-i18n="ca.ingest.go">ingest</button>
           </form>
         </div>
         <div class="review-chat collapsed" id="cacheawl-chat">
           <div class="review-chat-head" onclick="toggleCacheawlChat()">
-            <span>chat</span>
+            <span data-i18n="misc.chat">chat</span>
             <span class="toggle" id="cacheawl-chat-toggle">▴</span>
           </div>
           <div class="review-chat-tail" id="cacheawl-chat-tail"></div>
           <form class="review-chat-form" id="cacheawl-chat-form"
                 onsubmit="event.preventDefault(); sendFromCacheawlChat();">
-            <textarea id="cacheawl-chat-input" rows="2" placeholder="message the agent about the cachebox store…"></textarea>
-            <button type="submit">send</button>
+            <textarea id="cacheawl-chat-input" rows="2" placeholder="message the agent about the cachebox store…" data-i18n-placeholder="ca.chat.placeholder"></textarea>
+            <button type="submit" data-i18n="misc.send">send</button>
           </form>
         </div>
       </div>
@@ -9075,8 +9126,8 @@
           <input type="text" id="ca-prompt-input" autocomplete="off" spellcheck="false">
           <div class="ca-prompt-err" id="ca-prompt-err"></div>
           <div class="ca-prompt-actions">
-            <button type="button" onclick="closeCaPrompt()">cancel</button>
-            <button type="button" class="primary" id="ca-prompt-ok" onclick="submitCaPrompt()">create</button>
+            <button type="button" onclick="closeCaPrompt()" data-i18n="misc.cancel">cancel</button>
+            <button type="button" class="primary" id="ca-prompt-ok" onclick="submitCaPrompt()" data-i18n="ca.prompt.create">create</button>
           </div>
         </div>
       </div>
@@ -9086,16 +9137,16 @@
            One element reused across all handles to avoid DOM bloat
            on docs with lots of highlights. -->
       <div id="review-hl-popup" role="dialog" aria-hidden="true">
-        <div class="lbl">change color</div>
+        <div class="lbl" data-i18n="review.hlPopup.changeColor">change color</div>
         <div class="row colors">
-          <button type="button" class="rt-color" data-color="yellow" title="yellow"></button>
-          <button type="button" class="rt-color" data-color="green" title="green"></button>
-          <button type="button" class="rt-color" data-color="blue" title="blue"></button>
-          <button type="button" class="rt-color" data-color="pink" title="pink"></button>
+          <button type="button" class="rt-color" data-color="yellow" title="yellow" data-i18n-title="review.color.yellow"></button>
+          <button type="button" class="rt-color" data-color="green" title="green" data-i18n-title="review.color.green"></button>
+          <button type="button" class="rt-color" data-color="blue" title="blue" data-i18n-title="review.color.blue"></button>
+          <button type="button" class="rt-color" data-color="pink" title="pink" data-i18n-title="review.color.pink"></button>
         </div>
-        <div class="lbl">click the active color to remove this highlight</div>
+        <div class="lbl" data-i18n="review.hlPopup.remove">click the active color to remove this highlight</div>
         <div class="row">
-          <button type="button" class="edit-btn">edit text in editor</button>
+          <button type="button" class="edit-btn" data-i18n="review.hlPopup.editText">edit text in editor</button>
         </div>
       </div>
 
@@ -9107,8 +9158,8 @@
 
       <div id="help-viewer" aria-hidden="true">
         <div class="help-header">
-          <span class="title">help</span>
-          <button class="close" onclick="closeHelp()" aria-label="close help">×</button>
+          <span class="title" data-i18n="help.title">help</span>
+          <button class="close" onclick="closeHelp()" aria-label="close help" data-i18n-aria="help.close.aria">×</button>
         </div>
         <div id="help-body"></div>
       </div>
@@ -9123,7 +9174,7 @@
            row raises the backend's native folder dialog. -->
       <div id="home-frame">
         <div class="home-head">
-          <span class="home-title">projects</span>
+          <span class="home-title" data-i18n="home.title">projects</span>
           <span class="home-count" id="home-count"></span>
           <span class="spacer"></span>
           <!-- §1.10: hidden projects stay in the registry and stay off the
@@ -9131,11 +9182,13 @@
                same state through window.homeSetShowHidden(). -->
           <button type="button" class="hv-chip" id="home-show-hidden"
             aria-pressed="false" title="show the projects you've hidden">hidden</button>
-          <div class="home-viewtoggle" role="group" aria-label="view">
+          <div class="home-viewtoggle" role="group" aria-label="view" data-i18n-aria="home.viewToggle.aria">
             <button type="button" class="hv-btn" id="home-view-icons" title="icons view"
+              data-i18n-title="home.viewIcons.title" data-i18n-aria="home.viewIcons.aria"
               aria-label="icons view"><img class="svg-icon" data-icon="view-icons" alt="icons"
                 draggable="false"></button>
             <button type="button" class="hv-btn" id="home-view-list" title="list view"
+              data-i18n-title="home.viewList.title" data-i18n-aria="home.viewList.aria"
               aria-label="list view"><img class="svg-icon" data-icon="view-list" alt="list"
                 draggable="false"></button>
           </div>
@@ -9151,31 +9204,33 @@
     <div class="modal-backdrop" onclick="closeProjectModal()"></div>
     <div class="modal-panel" role="dialog" aria-labelledby="project-modal-title">
       <div class="modal-head">
-        <h3 id="project-modal-title">project</h3>
-        <button class="modal-close" onclick="closeProjectModal()" aria-label="close">×</button>
+        <h3 id="project-modal-title" data-i18n="project.modalTitle">project</h3>
+        <button class="modal-close" onclick="closeProjectModal()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
       </div>
       <div class="modal-body">
         <label class="proj-field">
-          <span class="proj-label">name</span>
+          <span class="proj-label" data-i18n="project.nameLabel">name</span>
           <input type="text" id="project-name-input" class="proj-input" maxlength="120" placeholder="project name"
+            data-i18n-placeholder="project.name.placeholder"
             autocomplete="off">
         </label>
         <div class="proj-field">
-          <span class="proj-label">folder on disk (not editable)</span>
+          <span class="proj-label" data-i18n="project.folderLabel">folder on disk (not editable)</span>
           <code class="proj-path" id="project-path"></code>
         </div>
         <label class="proj-field">
-          <span class="proj-label">description</span>
+          <span class="proj-label" data-i18n="project.descLabel">description</span>
           <textarea id="project-desc-input" class="proj-textarea" rows="8" maxlength="8000"
+            data-i18n-placeholder="project.desc.placeholder"
             placeholder="What is this project? Its purpose, scope, who it's for, how you want to work on it…"></textarea>
         </label>
-        <div class="proj-desc-hint">
+        <div class="proj-desc-hint" data-i18n="project.descHint">
           the agent reads this description as project context on every turn —
           a good place to brief it before your first message.
         </div>
       </div>
       <div class="modal-foot">
-        <button class="proj-save-btn" onclick="saveProjectModal()">save</button>
+        <button class="proj-save-btn" onclick="saveProjectModal()" data-i18n="misc.save">save</button>
       </div>
     </div>
   </div>
@@ -9184,13 +9239,13 @@
     <div class="modal-backdrop" onclick="wikiBackdropClose()"></div>
     <div class="modal-panel" role="dialog" aria-labelledby="wiki-setup-title">
       <div class="modal-head">
-        <h3 id="wiki-setup-title">🚰 wikisink — local wikipedia</h3>
-        <button class="modal-close" onclick="closeWikiSetup()" aria-label="close">×</button>
+        <h3 id="wiki-setup-title" data-i18n="wiki.setup.title">🚰 wikisink — local wikipedia</h3>
+        <button class="modal-close" onclick="closeWikiSetup()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
       </div>
       <div class="modal-body">
         <div id="wiki-setup-manage" hidden>
           <div class="wiki-manage-note" id="wiki-manage-note" hidden></div>
-          <p class="wiki-setup-intro">
+          <p class="wiki-setup-intro" data-i18n="wiki.setup.manageIntro">
             your archives. each install lives wherever you put it —
             internal disk, external drives — and you can switch between
             them anytime. an unreachable one just means its drive isn't
@@ -9198,16 +9253,16 @@
           <div id="wiki-install-list"></div>
         </div>
         <div id="wiki-setup-choose">
-          <p class="wiki-setup-intro">
+          <p class="wiki-setup-intro" data-i18n="wiki.setup.chooseIntro">
             wikisink puts an offline copy of english wikipedia on your
             machine — browsable and searchable in-app, readable by the
             agent, no internet needed once installed. pick a size:
           </p>
           <div id="wiki-flavor-list">
-            <div class="wiki-dim">loading current sizes from download.kiwix.org…</div>
+            <div class="wiki-dim" data-i18n="wiki.setup.loadingSizes">loading current sizes from download.kiwix.org…</div>
           </div>
           <label class="wiki-storage-field">
-            <span class="lbl">store it at (any folder works — external drives too)</span>
+            <span class="lbl" data-i18n="wiki.setup.storageLabel">store it at (any folder works — external drives too)</span>
             <input type="text" id="wiki-storage-input" value="~/enough/wikisink"
               spellcheck="false" autocomplete="off">
           </label>
@@ -9222,7 +9277,7 @@
           <div class="wiki-progress-stats" id="wiki-progress-stats"></div>
         </div>
         <div id="wiki-setup-done" hidden>
-          <p>✅ the archive is installed and ready. the 🚰 button now opens
+          <p data-i18n="wiki.setup.done">✅ the archive is installed and ready. the 🚰 button now opens
             wikisink view — enjoy the rabbit holes.</p>
         </div>
         <div class="wiki-setup-error" id="wiki-setup-error" hidden></div>
@@ -9235,8 +9290,8 @@
     <div class="modal-backdrop" onclick="closeBrokerModal()"></div>
     <div class="modal-panel broker-panel" role="dialog" aria-labelledby="broker-modal-title">
       <div class="modal-head">
-        <h3 id="broker-modal-title">broker</h3>
-        <button class="modal-close" onclick="closeBrokerModal()" aria-label="close">×</button>
+        <h3 id="broker-modal-title" data-i18n="broker.modalTitle">broker</h3>
+        <button class="modal-close" onclick="closeBrokerModal()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
       </div>
       <div class="modal-body">
         <p class="broker-intro">
@@ -9251,9 +9306,9 @@
           what you're doing, leave these on.
         </p>
         <div id="broker-toggles" hx-get="/api/broker" hx-trigger="load" hx-swap="innerHTML">
-          <div style="color: var(--fg-faint); padding: 8px">loading…</div>
+          <div style="color: var(--fg-faint); padding: 8px" data-i18n="misc.loading">loading…</div>
         </div>
-        <button class="broker-journal-btn" onclick="openBrokerJournal()">
+        <button class="broker-journal-btn" onclick="openBrokerJournal()" data-i18n="broker.journalBtn">
           open today's broker journal
         </button>
       </div>
@@ -9264,18 +9319,18 @@
     <div class="modal-backdrop" onclick="closeModelModal()"></div>
     <div class="modal-panel" role="dialog" aria-labelledby="model-modal-title">
       <div class="modal-head">
-        <h3 id="model-modal-title">model &amp; context</h3>
-        <button class="modal-close" onclick="closeModelModal()" aria-label="close">×</button>
+        <h3 id="model-modal-title" data-i18n="models.modalTitle">model &amp; context</h3>
+        <button class="modal-close" onclick="closeModelModal()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
       </div>
       <div class="modal-body">
         <div class="usage-row" id="modal-usage-row">
           <div class="label">
-            <span>token pressure (last completion)</span>
+            <span data-i18n="models.tokenPressure">token pressure (last completion)</span>
             <span class="pct" id="modal-usage-pct">—</span>
           </div>
           <div class="bar"><span class="fill" id="modal-usage-fill"></span></div>
           <div class="breakdown" id="modal-usage-breakdown">
-            <span class="none">no data yet — send a message first.</span>
+            <span class="none" data-i18n="models.noData">no data yet — send a message first.</span>
           </div>
         </div>
         <label class="auto-reset-row">
@@ -9283,7 +9338,7 @@
           <span class="text">
             <span class="label">auto-reset at <span class="threshold-pct" id="auto-reset-threshold">75</span>%
               pressure</span>
-            <span class="hint">when the gauge crosses the threshold, the agent writes a Continuation block to its active
+            <span class="hint" data-i18n="models.autoReset.hint">when the gauge crosses the threshold, the agent writes a Continuation block to its active
               request file, the conversation clears, and it resumes from the checkpoint. experimental — leave off if you
               want full manual control.</span>
           </span>
@@ -9304,23 +9359,24 @@
             <code>deepseek/deepseek-r1</code>) if you'd rather decide yourself.
           </p>
           <div class="opro-row">
-            <span class="label">model id</span>
+            <span class="label" data-i18n="models.opro.modelId">model id</span>
             <input type="text" id="opro-model-input" placeholder="openrouter/auto">
-            <button class="opro-btn" onclick="oproUseAuto()" title="reset to openrouter/auto and save">use auto</button>
+            <button class="opro-btn" onclick="oproUseAuto()" title="reset to openrouter/auto and save"
+              data-i18n-title="models.opro.useAuto.title" data-i18n="models.opro.useAuto">use auto</button>
             <button class="opro-btn" id="opro-model-save" onclick="oproSaveModel()">save</button>
           </div>
           <div class="opro-row">
-            <span class="label">last verified</span>
+            <span class="label" data-i18n="models.opro.lastVerified">last verified</span>
             <span class="value" id="opro-verified-line">—</span>
           </div>
           <div class="opro-row" id="opro-error-row" style="display:none">
-            <span class="label">last error</span>
+            <span class="label" data-i18n="models.opro.lastError">last error</span>
             <span class="value error" id="opro-error-line">—</span>
           </div>
           <div class="opro-actions">
-            <button class="opro-btn" onclick="oproHealthCheck()">re-test key</button>
-            <button class="opro-btn" onclick="oproOpenWizardForUpdate()">update key</button>
-            <button class="opro-btn danger" onclick="oproClearKey()">remove key</button>
+            <button class="opro-btn" onclick="oproHealthCheck()" data-i18n="models.opro.retest">re-test key</button>
+            <button class="opro-btn" onclick="oproOpenWizardForUpdate()" data-i18n="models.opro.updateKey">update key</button>
+            <button class="opro-btn danger" onclick="oproClearKey()" data-i18n="models.opro.removeKey">remove key</button>
           </div>
         </div>
         <div class="ctx-row">
@@ -9331,10 +9387,10 @@
         </div>
         <div class="apply-row">
           <span class="switch-status" id="switch-status"></span>
-          <button class="apply-btn" id="apply-model-btn" onclick="applyModel()">apply &amp; restart</button>
+          <button class="apply-btn" id="apply-model-btn" onclick="applyModel()" data-i18n="models.applyBtn">apply &amp; restart</button>
         </div>
       </div>
-      <div class="modal-foot">
+      <div class="modal-foot" data-i18n="models.foot">
         switching unloads the current model from RAM, loads the new one, and
         clears the in-memory conversation. request history on disk (session
         logs, requests) is preserved.
@@ -9449,37 +9505,39 @@
     <div class="modal-backdrop" onclick="closeUIModal()"></div>
     <div class="modal-panel ui-panel-wide" role="dialog" aria-labelledby="ui-modal-title">
       <div class="modal-head">
-        <h3 id="ui-modal-title">ui preferences</h3>
+        <h3 id="ui-modal-title" data-i18n="prefs.title">ui preferences</h3>
         <!-- Close project → home (home-plan §1.7), promoted into the head
              (uiscale round). Project mode only — hidden by CSS under
              body[data-mode="home"], where there is no project to close.
              Same handoff the desktop's ⌘W runs: the backend re-execs (CLI)
              or exits 42 (desktop) and we land on the home screen. -->
         <button type="button" class="help-center-launch" id="ui-close-project-btn"
+          data-i18n-title="prefs.closeProject.title"
           title="close this project and go back to the enough home screen">
           <img class="svg-icon" data-icon="folder" alt="" draggable="false">
-          <span>close project → home</span>
+          <span data-i18n="prefs.closeProject.label">close project → home</span>
         </button>
         <!-- Opens the bundled manual in the read-only reference mode
              (see #ref-mode). Small, inline in the header row. -->
         <button type="button" class="help-center-launch" id="ui-help-center-btn"
+          data-i18n-title="prefs.help.title"
           title="open the enough manual in a read-only reference view"
           onclick="closeUIModal(); enterRefMode();">
           <img class="svg-icon" data-icon="hxc" alt="" draggable="false">
-          <span>help</span>
+          <span data-i18n="prefs.help.label">help</span>
         </button>
-        <button class="modal-close" onclick="closeUIModal()" aria-label="close">×</button>
+        <button class="modal-close" onclick="closeUIModal()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
       </div>
-      <div class="ui-head-note" id="ui-close-project-note">the folder on disk is untouched</div>
+      <div class="ui-head-note" id="ui-close-project-note" data-i18n="prefs.closeProject.note">the folder on disk is untouched</div>
       <div class="modal-body ui-modal-body-wide">
         <!-- Top row: theme + font selectors stay narrow and inline. -->
         <div class="ui-prefs-row">
           <label>
-            <div class="label">theme</div>
+            <div class="label" data-i18n="prefs.theme">theme</div>
             <select id="ui-theme"></select>
           </label>
           <label>
-            <div class="label">font</div>
+            <div class="label" data-i18n="prefs.font">font</div>
             <select id="ui-font"></select>
           </label>
         </div>
@@ -9492,22 +9550,36 @@
              past a limit wiggles the button and pulses the value red.
              Clicking the value resets that scale to 1.0x. -->
         <div class="ui-prefs-row" id="ui-controls-row">
-          <label class="ui-check-label" id="ui-help-bubbles-item" title="show (?) help bubbles in the sidebar (saved per folder)">
+          <label class="ui-check-label" id="ui-help-bubbles-item" title="show (?) help bubbles in the sidebar (saved per folder)"
+            data-i18n-title="prefs.helpBubbles.title">
             <input type="checkbox" id="ui-help-bubbles">
-            <span>help <strong>(?)</strong> bubbles</span>
+            <!-- Plain text on purpose (i18n round): a single translatable
+                 string beats en-order fragments around a <strong>, and
+                 "(?)" reads emphasized enough on its own. -->
+            <span data-i18n="prefs.helpBubbles">help (?) bubbles</span>
           </label>
           <div class="ui-scale-group" id="ui-scale-group">
-            <span class="ui-scale-name">ui scale</span>
-            <button type="button" class="ui-scale-btn" id="ui-scale-minus" title="shrink the whole UI (0.1 steps)">−</button>
-            <button type="button" class="ui-scale-value" id="ui-scale-value" title="click to reset to 1.0x">1.0x</button>
-            <button type="button" class="ui-scale-btn" id="ui-scale-plus" title="grow the whole UI (0.1 steps)">+</button>
+            <span class="ui-scale-name" data-i18n="prefs.uiScale">ui scale</span>
+            <button type="button" class="ui-scale-btn" id="ui-scale-minus" title="shrink the whole UI (0.1 steps)" data-i18n-title="prefs.uiScale.minus.title">−</button>
+            <button type="button" class="ui-scale-value" id="ui-scale-value" title="click to reset to 1.0x" data-i18n-title="prefs.scaleReset.title">1.0x</button>
+            <button type="button" class="ui-scale-btn" id="ui-scale-plus" title="grow the whole UI (0.1 steps)" data-i18n-title="prefs.uiScale.plus.title">+</button>
           </div>
           <div class="ui-scale-group" id="text-scale-group">
-            <span class="ui-scale-name">text scale</span>
-            <button type="button" class="ui-scale-btn" id="text-scale-minus" title="shrink the document text (0.1 steps)">−</button>
-            <button type="button" class="ui-scale-value" id="text-scale-value" title="click to reset to 1.0x">1.0x</button>
-            <button type="button" class="ui-scale-btn" id="text-scale-plus" title="grow the document text (0.1 steps)">+</button>
+            <span class="ui-scale-name" data-i18n="prefs.textScale">text scale</span>
+            <button type="button" class="ui-scale-btn" id="text-scale-minus" title="shrink the document text (0.1 steps)" data-i18n-title="prefs.textScale.minus.title">−</button>
+            <button type="button" class="ui-scale-value" id="text-scale-value" title="click to reset to 1.0x" data-i18n-title="prefs.scaleReset.title">1.0x</button>
+            <button type="button" class="ui-scale-btn" id="text-scale-plus" title="grow the document text (0.1 steps)" data-i18n-title="prefs.textScale.plus.title">+</button>
           </div>
+          <!-- Global, unlike the scales — so it stays visible on the home
+               screen too. Options are populated from UI_LANGUAGES with
+               native-name labels; the label/title translate like any
+               other chrome string. -->
+          <label class="ui-lang-item" id="ui-language-item"
+            title="language for the interface and help content — your files and the agent's replies stay in whatever language you two use"
+            data-i18n-title="prefs.uiLanguage.title">
+            <span class="ui-scale-name" data-i18n="prefs.uiLanguage">ui language</span>
+            <select id="ui-language"></select>
+          </label>
         </div>
         <!-- convert §5.7: extras. One row per optional dependency group;
              "PDF reading" is the only one in 0.2.3. State comes from
@@ -9518,7 +9590,7 @@
         <div class="ui-prefs-row" id="cv-extras-row">
           <div class="cv-extras" id="cv-extras-pdf">
             <div class="cv-extras-head">
-              <span class="cv-extras-title">PDF reading</span>
+              <span class="cv-extras-title" data-i18n="prefs.extras.pdf.title">PDF reading</span>
               <span class="cv-extras-state" id="cv-extras-state">checking…</span>
               <button type="button" id="cv-extras-btn" disabled>install</button>
             </div>
@@ -9529,24 +9601,24 @@
         <!-- Two-column reference: keyboard shortcuts | markdown cheat sheet -->
         <div class="ui-cols">
           <section class="ui-col">
-            <h4>keyboard shortcuts</h4>
+            <h4 data-i18n="prefs.kb.title">keyboard shortcuts</h4>
             <dl class="kb-table">
               <dt><kbd>esc</kbd></dt>
-              <dd>close the topmost open mode (modes stack)</dd>
-              <dt><kbd>⌘</kbd>+<kbd>\\</kbd></dt>
-              <dd>show / hide the file sidebar</dd>
+              <dd data-i18n="prefs.kb.esc">close the topmost open mode (modes stack)</dd>
+              <dt><kbd>⌘</kbd>+<kbd>\</kbd></dt>
+              <dd data-i18n="prefs.kb.sidebar">show / hide the file sidebar</dd>
               <dt><kbd>⌘</kbd>+<kbd>k</kbd></dt>
-              <dd>focus the chat input</dd>
+              <dd data-i18n="prefs.kb.focusChat">focus the chat input</dd>
               <dt><kbd>⌘</kbd>+<kbd>enter</kbd></dt>
-              <dd>send the chat message</dd>
+              <dd data-i18n="prefs.kb.send">send the chat message</dd>
               <dt><kbd>shift</kbd>+<kbd>enter</kbd></dt>
-              <dd>newline in the chat input (instead of send)</dd>
+              <dd data-i18n="prefs.kb.newline">newline in the chat input (instead of send)</dd>
               <dt><kbd>⌘</kbd>+<kbd>b</kbd> / <kbd>i</kbd> / <kbd>u</kbd></dt>
-              <dd>bold / italic / underline the current selection (review mode)</dd>
+              <dd data-i18n="prefs.kb.format">bold / italic / underline the current selection (review mode)</dd>
               <dt><kbd>⌘</kbd>+<kbd>s</kbd></dt>
-              <dd>save the current edit (edit mode)</dd>
+              <dd data-i18n="prefs.kb.save">save the current edit (edit mode)</dd>
               <dt><kbd>⌥</kbd>+click</dt>
-              <dd>file-tree context menu (new file / folder, copy path / name)</dd>
+              <dd data-i18n="prefs.kb.treeMenu">file-tree context menu (new file / folder, copy path / name)</dd>
             </dl>
             <p class="ui-col-note">
               on a non-mac keyboard, use <kbd>ctrl</kbd> instead of
@@ -9554,34 +9626,34 @@
             </p>
           </section>
           <section class="ui-col">
-            <h4>markdown cheat sheet</h4>
+            <h4 data-i18n="prefs.md.title">markdown cheat sheet</h4>
             <dl class="md-table">
               <dt><code>**bold**</code></dt>
-              <dd><strong>bold</strong></dd>
+              <dd><strong data-i18n="prefs.md.bold">bold</strong></dd>
               <dt><code>*italic*</code></dt>
-              <dd><em>italic</em></dd>
+              <dd><em data-i18n="prefs.md.italic">italic</em></dd>
               <dt><code>&lt;u&gt;underline&lt;/u&gt;</code></dt>
-              <dd><u>underline</u></dd>
+              <dd><u data-i18n="prefs.md.underline">underline</u></dd>
               <dt><code># heading 1</code></dt>
-              <dd>biggest heading</dd>
+              <dd data-i18n="prefs.md.h1">biggest heading</dd>
               <dt><code>## heading 2</code></dt>
-              <dd>sub-heading</dd>
+              <dd data-i18n="prefs.md.h2">sub-heading</dd>
               <dt><code>### heading 3</code></dt>
-              <dd>sub-sub-heading</dd>
+              <dd data-i18n="prefs.md.h3">sub-sub-heading</dd>
               <dt><code>- item</code></dt>
-              <dd>unordered list item</dd>
+              <dd data-i18n="prefs.md.ul">unordered list item</dd>
               <dt><code>1. item</code></dt>
-              <dd>ordered list item</dd>
+              <dd data-i18n="prefs.md.ol">ordered list item</dd>
               <dt><code>&gt; quote</code></dt>
-              <dd>blockquote</dd>
+              <dd data-i18n="prefs.md.quote">blockquote</dd>
               <dt><code>`code`</code></dt>
-              <dd>inline code</dd>
+              <dd data-i18n="prefs.md.code">inline code</dd>
               <dt><code>```<br>block<br>```</code></dt>
-              <dd>fenced code block</dd>
+              <dd data-i18n="prefs.md.fence">fenced code block</dd>
               <dt><code>[text](url)</code></dt>
-              <dd>link</dd>
+              <dd data-i18n="prefs.md.link">link</dd>
               <dt><code>---</code></dt>
-              <dd>horizontal rule</dd>
+              <dd data-i18n="prefs.md.hr">horizontal rule</dd>
             </dl>
           </section>
         </div>
@@ -9611,8 +9683,8 @@
       <input type="text" id="tree-prompt-input" autocomplete="off" spellcheck="false" placeholder="">
       <div class="prompt-error" id="tree-prompt-error"></div>
       <div class="prompt-actions">
-        <button type="button" onclick="closeTreePrompt()">Cancel</button>
-        <button type="button" class="primary" id="tree-prompt-submit" onclick="submitTreePrompt()">Create</button>
+        <button type="button" onclick="closeTreePrompt()" data-i18n="tree.prompt.cancel">Cancel</button>
+        <button type="button" class="primary" id="tree-prompt-submit" onclick="submitTreePrompt()" data-i18n="tree.prompt.create">Create</button>
       </div>
     </div>
   </div>
@@ -9662,8 +9734,8 @@
     <div class="modal-backdrop" onclick="homeCloseAdd()"></div>
     <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="home-add-title">
       <div class="modal-head">
-        <h3 id="home-add-title">add a project folder</h3>
-        <button class="modal-close" onclick="homeCloseAdd()" aria-label="close">×</button>
+        <h3 id="home-add-title" data-i18n="home.add.title">add a project folder</h3>
+        <button class="modal-close" onclick="homeCloseAdd()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
       </div>
       <div class="modal-body">
         <p class="home-add-note" id="home-add-note"></p>
@@ -9672,8 +9744,8 @@
         <div class="home-add-error" id="home-add-error" hidden></div>
       </div>
       <div class="modal-foot">
-        <button type="button" onclick="homeCloseAdd()">cancel</button>
-        <button type="button" class="primary" id="home-add-go">add &amp; open</button>
+        <button type="button" onclick="homeCloseAdd()" data-i18n="misc.cancel">cancel</button>
+        <button type="button" class="primary" id="home-add-go" data-i18n="home.add.go">add &amp; open</button>
       </div>
     </div>
   </div>
@@ -9693,19 +9765,19 @@
     <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="convert-intro-title">
       <div class="modal-head">
         <img class="svg-icon" id="convert-intro-icon" data-icon="twin-on" alt="" draggable="false">
-        <h3 id="convert-intro-title">markdown twins</h3>
-        <button class="modal-close" onclick="convertCloseIntro()" aria-label="close">×</button>
+        <h3 id="convert-intro-title" data-i18n="convert.intro.title">markdown twins</h3>
+        <button class="modal-close" onclick="convertCloseIntro()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
       </div>
       <div class="modal-body">
         <p id="convert-intro-body"></p>
         <p class="cv-note" id="convert-intro-note" hidden></p>
         <div class="cv-install-row" id="convert-intro-install" hidden>
-          <button type="button" class="primary" id="convert-intro-install-btn">install the PDF extra</button>
-          <span class="cv-note" style="border:none;padding:0">or open the UI window → extras</span>
+          <button type="button" class="primary" id="convert-intro-install-btn" data-i18n="convert.intro.installBtn">install the PDF extra</button>
+          <span class="cv-note" style="border:none;padding:0" data-i18n="convert.intro.installHint">or open the UI window → extras</span>
         </div>
       </div>
       <div class="modal-foot">
-        <button type="button" class="primary" id="convert-intro-ok">OK</button>
+        <button type="button" class="primary" id="convert-intro-ok" data-i18n="convert.intro.ok">OK</button>
       </div>
     </div>
   </div>
@@ -9721,13 +9793,13 @@
       <div class="modal-head">
         <img class="svg-icon" data-icon="export-doc" alt="" draggable="false"
           style="width:22px;height:22px;object-fit:contain">
-        <h3 id="convert-export-title">export changes</h3>
-        <button class="modal-close" onclick="convertCloseExport()" aria-label="close">×</button>
+        <h3 id="convert-export-title" data-i18n="convert.export.title">export changes</h3>
+        <button class="modal-close" onclick="convertCloseExport()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
       </div>
       <div class="modal-body">
         <p id="convert-export-lead"></p>
         <div>
-          <div class="cv-label">format</div>
+          <div class="cv-label" data-i18n="convert.export.formatLabel">format</div>
           <select id="convert-export-target"></select>
         </div>
         <div class="cv-modes">
@@ -9748,8 +9820,8 @@
         <div class="cv-error" id="convert-export-error" hidden></div>
       </div>
       <div class="modal-foot">
-        <button type="button" id="convert-export-cancel">cancel</button>
-        <button type="button" class="primary" id="convert-export-go">export</button>
+        <button type="button" id="convert-export-cancel" data-i18n="misc.cancel">cancel</button>
+        <button type="button" class="primary" id="convert-export-go" data-i18n="convert.export.go">export</button>
       </div>
     </div>
   </div>
@@ -9763,19 +9835,19 @@
       <div class="modal-head">
         <img class="svg-icon" data-icon="ribbon-alert" alt="" draggable="false"
           style="width:22px;height:22px;object-fit:contain">
-        <h3 id="convert-conflict-title">changed on both sides</h3>
-        <button class="modal-close" onclick="convertCloseConflict()" aria-label="close">×</button>
+        <h3 id="convert-conflict-title" data-i18n="convert.conflict.title">changed on both sides</h3>
+        <button class="modal-close" onclick="convertCloseConflict()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
       </div>
       <div class="modal-body">
         <p id="convert-conflict-body"></p>
         <div class="cv-choices">
           <button type="button" class="cv-choice" data-choice="reconvert">
             re-convert from the new original
-            <span class="cv-choice-sub">the original wins; your twin is stashed to undo first</span>
+            <span class="cv-choice-sub" data-i18n="convert.conflict.reconvert.sub">the original wins; your twin is stashed to undo first</span>
           </button>
           <button type="button" class="cv-choice" data-choice="keep">
             keep my twin
-            <span class="cv-choice-sub">accept the change on disk without re-reading it; nobody's text moves</span>
+            <span class="cv-choice-sub" data-i18n="convert.conflict.keep.sub">accept the change on disk without re-reading it; nobody's text moves</span>
           </button>
           <button type="button" class="cv-choice" data-choice="export">
             export mine over it
@@ -9785,7 +9857,7 @@
         <div class="cv-error" id="convert-conflict-error" hidden></div>
       </div>
       <div class="modal-foot">
-        <button type="button" onclick="convertCloseConflict()">decide later</button>
+        <button type="button" onclick="convertCloseConflict()" data-i18n="convert.conflict.later">decide later</button>
       </div>
     </div>
   </div>
@@ -9808,8 +9880,8 @@
     <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="paginate-title">
       <div class="modal-head">
         <img class="svg-icon" data-icon="paginate" alt="" draggable="false">
-        <h3 id="paginate-title">paginate</h3>
-        <button class="modal-close" onclick="paginateClose()" aria-label="close">×</button>
+        <h3 id="paginate-title" data-i18n="paginate.title">paginate</h3>
+        <button class="modal-close" onclick="paginateClose()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
       </div>
       <div class="modal-body">
         <!-- Preview column: the page, then whatever the layout needs said
@@ -9820,120 +9892,120 @@
         </div>
 
         <div class="pg-controls">
-          <p id="paginate-lead">pagination typesets a completed text into a cleanly formatted pdf —
+          <p id="paginate-lead" data-i18n="paginate.lead">pagination typesets a completed text into a cleanly formatted pdf —
             footnotes reconciled, chapters honored — for export, and optionally a page-by-page
             view inside enough. the markdown stays the editable original; the pdf is a snapshot
             beside it. proceed when the prose feels complete.</p>
           <p class="cv-note" id="paginate-engines" hidden></p>
 
           <div class="pg-block">
-            <div class="cv-label">footnotes</div>
+            <div class="cv-label" data-i18n="paginate.footnotes.label">footnotes</div>
             <div class="pg-choices">
               <label class="cv-radio">
                 <input type="radio" name="pg-footnotes" value="page" checked>
                 <span>at the foot of the page
-                  <span class="cv-choice-sub">where the eye already is; typst sets them live</span></span>
+                  <span class="cv-choice-sub" data-i18n="paginate.fn.page.sub">where the eye already is; typst sets them live</span></span>
               </label>
               <label class="cv-radio">
                 <input type="radio" name="pg-footnotes" value="chapter">
                 <span>at the end of each chapter
-                  <span class="cv-choice-sub">notes gathered per chapter, markers stay superscript</span></span>
+                  <span class="cv-choice-sub" data-i18n="paginate.fn.chapter.sub">notes gathered per chapter, markers stay superscript</span></span>
               </label>
               <label class="cv-radio">
                 <input type="radio" name="pg-footnotes" value="book">
                 <span>at the end of the book
-                  <span class="cv-choice-sub">one notes section at the back, grouped by chapter</span></span>
+                  <span class="cv-choice-sub" data-i18n="paginate.fn.book.sub">one notes section at the back, grouped by chapter</span></span>
               </label>
             </div>
           </div>
 
           <div class="pg-block">
-            <div class="cv-label">page size</div>
+            <div class="cv-label" data-i18n="paginate.pageSize.label">page size</div>
             <div class="pg-row">
               <select id="pg-size"></select>
             </div>
             <div class="pg-row" id="pg-custom-row" hidden style="margin-top:7px">
-              <input type="number" id="pg-custom-w" min="1" step="0.25" aria-label="custom width">
+              <input type="number" id="pg-custom-w" min="1" step="0.25" aria-label="custom width" data-i18n-aria="paginate.customW.aria">
               <span class="pg-stamp">×</span>
-              <input type="number" id="pg-custom-h" min="1" step="0.25" aria-label="custom height">
-              <select id="pg-custom-unit" class="pg-units" aria-label="units">
+              <input type="number" id="pg-custom-h" min="1" step="0.25" aria-label="custom height" data-i18n-aria="paginate.customH.aria">
+              <select id="pg-custom-unit" class="pg-units" aria-label="units" data-i18n-aria="paginate.units.aria">
                 <option value="mm">mm</option>
                 <option value="in">in</option>
               </select>
             </div>
             <div class="pg-row pg-inline" style="margin-top:7px">
               <label class="cv-radio"><input type="radio" name="pg-orient" value="portrait" checked>
-                <span>portrait</span></label>
+                <span data-i18n="paginate.portrait">portrait</span></label>
               <label class="cv-radio"><input type="radio" name="pg-orient" value="landscape">
-                <span>landscape</span></label>
+                <span data-i18n="paginate.landscape">landscape</span></label>
             </div>
           </div>
 
           <div class="pg-block">
-            <div class="cv-label">layout</div>
+            <div class="cv-label" data-i18n="paginate.layout.label">layout</div>
             <div class="pg-choices">
               <label class="cv-radio">
                 <input type="radio" name="pg-layout" value="single" checked>
                 <span>single pages
-                  <span class="cv-choice-sub">one page per sheet — read on screen, print as is</span></span>
+                  <span class="cv-choice-sub" data-i18n="paginate.layout.single.sub">one page per sheet — read on screen, print as is</span></span>
               </label>
               <label class="cv-radio">
                 <input type="radio" name="pg-layout" value="twoup">
                 <span>2-up
-                  <span class="cv-choice-sub">two pages side by side on a landscape sheet, in order</span></span>
+                  <span class="cv-choice-sub" data-i18n="paginate.layout.twoup.sub">two pages side by side on a landscape sheet, in order</span></span>
               </label>
               <label class="cv-radio">
                 <input type="radio" name="pg-layout" value="booklet">
                 <span>booklet
-                  <span class="cv-choice-sub">imposed to fold and staple — print double-sided, flip on the short edge</span></span>
+                  <span class="cv-choice-sub" data-i18n="paginate.layout.booklet.sub">imposed to fold and staple — print double-sided, flip on the short edge</span></span>
               </label>
             </div>
           </div>
 
           <div class="pg-block">
-            <div class="cv-label">type</div>
+            <div class="cv-label" data-i18n="paginate.type.label">type</div>
             <div class="pg-row">
               <select id="pg-font" style="flex:1"></select>
             </div>
             <div class="pg-row" style="margin-top:7px">
-              <span class="pg-stamp">margin</span>
-              <input type="number" id="pg-margin" min="5" max="60" step="1" aria-label="margin in millimetres">
-              <span class="pg-stamp">mm, all four sides</span>
+              <span class="pg-stamp" data-i18n="paginate.marginLabel">margin</span>
+              <input type="number" id="pg-margin" min="5" max="60" step="1" aria-label="margin in millimetres" data-i18n-aria="paginate.margin.aria">
+              <span class="pg-stamp" data-i18n="paginate.marginUnits">mm, all four sides</span>
             </div>
           </div>
 
           <label class="cv-check">
             <input type="checkbox" id="pg-page-numbers" checked>
-            <span>page numbers, centered at the foot</span>
+            <span data-i18n="paginate.pageNumbers">page numbers, centered at the foot</span>
           </label>
 
           <div class="pg-block">
             <label class="cv-check">
               <input type="checkbox" id="pg-headers">
-              <span>running heads</span>
+              <span data-i18n="paginate.runningHeads">running heads</span>
             </label>
             <div class="pg-headers" id="pg-headers-fields" hidden style="margin-top:7px">
               <div class="pg-row" id="pg-header-left-row">
                 <span class="pg-stamp" id="pg-header-left-label">head</span>
-                <input type="text" id="pg-header-left" placeholder="left as it stands" maxlength="120">
+                <input type="text" id="pg-header-left" placeholder="left as it stands" data-i18n-placeholder="paginate.head.placeholder" maxlength="120">
               </div>
               <label class="cv-check">
                 <input type="checkbox" id="pg-header-left-chapter">
                 <span id="pg-header-left-chapter-label">use the chapter name</span>
               </label>
               <div class="pg-row" id="pg-header-right-row" hidden>
-                <span class="pg-stamp">right page</span>
-                <input type="text" id="pg-header-right" placeholder="left as it stands" maxlength="120">
+                <span class="pg-stamp" data-i18n="paginate.rightPage">right page</span>
+                <input type="text" id="pg-header-right" placeholder="left as it stands" data-i18n-placeholder="paginate.head.placeholder" maxlength="120">
               </div>
               <label class="cv-check" id="pg-header-right-chapter-row" hidden>
                 <input type="checkbox" id="pg-header-right-chapter">
-                <span>use the chapter name on the right page</span>
+                <span data-i18n="paginate.useChapterRight">use the chapter name on the right page</span>
               </label>
             </div>
           </div>
 
           <div class="pg-block">
-            <div class="cv-label">export as</div>
+            <div class="cv-label" data-i18n="paginate.exportAs.label">export as</div>
             <div class="pg-row">
               <input type="text" id="pg-name" spellcheck="false" autocomplete="off" maxlength="80">
             </div>
@@ -9942,7 +10014,7 @@
 
           <label class="cv-check">
             <input type="checkbox" id="pg-bring-in">
-            <span>bring it into enough — render the pages so the pdf can be read here</span>
+            <span data-i18n="paginate.bringIn">bring it into enough — render the pages so the pdf can be read here</span>
           </label>
 
           <div class="cv-error" id="paginate-error" hidden></div>
@@ -9950,8 +10022,8 @@
       </div>
       <div class="modal-foot">
         <span class="pg-progress" id="paginate-progress" hidden></span>
-        <button type="button" onclick="paginateClose()" id="paginate-cancel">cancel</button>
-        <button type="button" class="primary" id="paginate-go">paginate</button>
+        <button type="button" onclick="paginateClose()" id="paginate-cancel" data-i18n="misc.cancel">cancel</button>
+        <button type="button" class="primary" id="paginate-go" data-i18n="paginate.go">paginate</button>
       </div>
     </div>
   </div>
@@ -9977,6 +10049,94 @@
     // script runs, so removing hx-get now means they never fire.
     const IS_HOME = document.body.dataset.mode === 'home';
     window.IS_HOME = IS_HOME;
+
+    // ---------- UI language (i18n round) ----------
+    //
+    // Chrome + help content only — project files, prompts, and everything
+    // the agent reads stay English on purpose (docs/I18N.md is the
+    // process doc). English is baked into the markup as the permanent
+    // fallback; a non-en catalog (/static/i18n/<lang>/ui.json, prefetched
+    // from <head> when the boot language isn't en) overlays it through
+    // the data-i18n* attributes and through t() for strings built in JS.
+    // The English original of every translated target is captured into a
+    // data-i18n-src* memo on first application, so en ⇄ xx switches
+    // round-trip losslessly with no reload.
+    const UI_LANGUAGES = {
+      en: 'English', fr: 'Français', es: 'Español',
+      de: 'Deutsch', zh: '中文', ja: '日本語',
+    };
+    const I18N = {
+      lang: (BOOT_UI_STATE && UI_LANGUAGES[BOOT_UI_STATE.lang]) ? BOOT_UI_STATE.lang : 'en',
+      strings: {},
+    };
+
+    // The one lookup: catalog string for `key`, else the English fallback
+    // the call site carries inline. Dynamic JS strings use this directly;
+    // markup goes through applyI18n() below.
+    function t(key, fallback) {
+      const v = I18N.strings[key];
+      return typeof v === 'string' && v !== '' ? v : fallback;
+    }
+
+    // data-i18n → textContent (plain-text elements ONLY — an element with
+    // inline markup gets the attribute on its text-only children instead),
+    // data-i18n-title → title, data-i18n-placeholder → placeholder,
+    // data-i18n-aria → aria-label.
+    function applyI18n(root) {
+      const scope = root || document;
+      const put = (el, key, memo, get, set) => {
+        if (!key) return;
+        if (!(memo in el.dataset)) el.dataset[memo] = get() || '';
+        set(t(key, el.dataset[memo]));
+      };
+      scope.querySelectorAll('[data-i18n]').forEach((el) => put(
+        el, el.getAttribute('data-i18n'), 'i18nSrc',
+        () => el.textContent, (v) => { el.textContent = v; }));
+      scope.querySelectorAll('[data-i18n-title]').forEach((el) => put(
+        el, el.getAttribute('data-i18n-title'), 'i18nSrcTitle',
+        () => el.getAttribute('title'), (v) => el.setAttribute('title', v)));
+      scope.querySelectorAll('[data-i18n-placeholder]').forEach((el) => put(
+        el, el.getAttribute('data-i18n-placeholder'), 'i18nSrcPlaceholder',
+        () => el.getAttribute('placeholder'), (v) => el.setAttribute('placeholder', v)));
+      scope.querySelectorAll('[data-i18n-aria]').forEach((el) => put(
+        el, el.getAttribute('data-i18n-aria'), 'i18nSrcAria',
+        () => el.getAttribute('aria-label'), (v) => el.setAttribute('aria-label', v)));
+      if (!root) document.documentElement.lang = I18N.lang;
+    }
+
+    async function loadI18n(lang) {
+      if (lang === 'en') { I18N.lang = 'en'; I18N.strings = {}; return; }
+      let data = null;
+      // The head prefetch covers the boot language; it's one-shot so a
+      // later switch back re-fetches a fresh copy instead.
+      if (window.__I18N_PREFETCH && BOOT_UI_STATE && lang === BOOT_UI_STATE.lang) {
+        data = await window.__I18N_PREFETCH;
+        window.__I18N_PREFETCH = null;
+      }
+      if (!data) {
+        try {
+          const r = await fetch('/static/i18n/' + lang + '/ui.json');
+          if (r.ok) data = await r.json();
+        } catch (_e) { /* missing catalog ⇒ English strings via fallback */ }
+      }
+      I18N.lang = lang;
+      I18N.strings = (data && data.strings) || {};
+    }
+
+    // Full switch: catalog → chrome re-apply → help-bubble cache reset
+    // (their file is per-language) → persist in ui.json. `skipSave` is
+    // the boot path, where the value came FROM ui.json.
+    async function setUILanguage(lang, opts) {
+      if (!UI_LANGUAGES[lang]) return;
+      await loadI18n(lang);
+      applyI18n();
+      const sel = document.getElementById('ui-language');
+      if (sel) sel.value = I18N.lang;
+      if (typeof _resetHelpDocs === 'function') _resetHelpDocs();
+      if (!(opts && opts.skipSave)) saveUIConfig({ ui_language: lang });
+    }
+
+    if (I18N.lang !== 'en') setUILanguage(I18N.lang, { skipSave: true });
     if (IS_HOME) {
       // #broker-toggles is in the (hidden) broker modal but still carries
       // hx-trigger="load" — htmx doesn't care that nobody can see it.
@@ -10153,8 +10313,18 @@
       HELP_DOCS_READY = (async () => {
         let md = '', defaults = { skills: [], roles: [], paradigms: [] };
         try {
+          // i18n round: a translated bubble file wins when the UI language
+          // ships one; a missing/failed translation falls back to the
+          // English original rather than to empty bubbles.
+          let mdT = null;
+          if (I18N.lang !== 'en') {
+            try {
+              mdT = await fetch('/static/i18n/' + I18N.lang + '/help-docs.md');
+            } catch (_e) { mdT = null; }
+            if (mdT && !mdT.ok) mdT = null;
+          }
           const [mdR, defR] = await Promise.all([
-            fetch('/static/help-docs.md'),
+            mdT || fetch('/static/help-docs.md'),
             fetch('/api/help/defaults'),
           ]);
           if (mdR.ok) md = await mdR.text();
@@ -10172,6 +10342,14 @@
       })();
       return HELP_DOCS_READY;
     }
+    // Language switch hook (i18n round): the parsed bubble cache is
+    // per-language, so a switch drops it and re-primes in the new one.
+    function _resetHelpDocs() {
+      HELP_DOCS_READY = null;
+      HELP_DOCS = {};
+      if (!IS_HOME) loadHelpDocs();
+    }
+
     // Home mode: the (?) bubbles live in the sidebar, which isn't there,
     // and /api/help/defaults is project-scoped. (The help CENTER — the
     // manual in reference mode — is served in both modes and doesn't go
@@ -10218,7 +10396,7 @@
       btn.type = 'button';
       btn.className = 'help-trigger';
       btn.textContent = '?';
-      btn.setAttribute('aria-label', 'help');
+      btn.setAttribute('aria-label', t('help.bubble.aria', 'help'));
       btn.addEventListener('click', (ev) => {
         ev.stopPropagation();
         ev.preventDefault();
@@ -10320,8 +10498,8 @@
             btn.type = 'button';
             btn.className = 'trash-trigger';
             btn.textContent = '🗑';
-            btn.title = 'unsave — delete this saved copy (the archive keeps the article)';
-            btn.setAttribute('aria-label', 'unsave article');
+            btn.title = t('wiki.unsave.title', 'unsave — delete this saved copy (the archive keeps the article)');
+            btn.setAttribute('aria-label', t('wiki.unsave.aria', 'unsave article'));
             btn.addEventListener('click', (ev) => {
               ev.stopPropagation();
               ev.preventDefault();
@@ -10520,10 +10698,13 @@
     // A small self-contained component so later waves can reuse it.
     let _confirmResolve = null;
     function confirmOverlay(opts = {}) {
-      document.getElementById('confirm-title').textContent = opts.title || 'Are you sure?';
+      document.getElementById('confirm-title').textContent =
+        opts.title || t('confirm.defaultTitle', 'Are you sure?');
       document.getElementById('confirm-message-text').textContent = opts.message || '';
-      document.getElementById('confirm-ok-label').textContent = opts.confirmLabel || 'confirm';
-      document.getElementById('confirm-cancel-label').textContent = opts.cancelLabel || 'cancel';
+      document.getElementById('confirm-ok-label').textContent =
+        opts.confirmLabel || t('confirm.defaultOk', 'confirm');
+      document.getElementById('confirm-cancel-label').textContent =
+        opts.cancelLabel || t('misc.cancel', 'cancel');
       document.getElementById('confirm-overlay').hidden = false;
       return new Promise((resolve) => { _confirmResolve = resolve; });
     }
@@ -10790,15 +10971,17 @@
       modePush('ref', {
         icon: 'hxc',
         onExit: exitRefMode,
-        iconTitle: 'help center (reference)',
-        exitTitle: 'close the help center',
+        iconTitle: t('modes.ref.icon', 'help center (reference)'),
+        exitTitle: t('modes.ref.exit', 'close the help center'),
       });
       applyReviewContrast();
       // Re-fetched on every open so hand-edits to the manual show up
       // without a reload. ~tens of KB, local — cheap.
       const body = document.getElementById('ref-body');
       try {
-        const r = await fetch('/api/help-center');
+        // i18n round: the server swaps in static/i18n/<lang>/help-center.md
+        // when the UI language ships a translated manual (English else).
+        const r = await fetch('/api/help-center?lang=' + encodeURIComponent(I18N.lang));
         if (!r.ok) {
           let detail = 'HTTP ' + r.status;
           try { detail = (await r.json()).detail || detail; } catch (_e) { /* noop */ }
@@ -10829,7 +11012,7 @@
       const btn = document.getElementById('ref-size-btn');
       if (btn) {
         setIcon(btn.querySelector('img'), 'full2mini');
-        btn.title = 'shrink to a side panel';
+        btn.title = t('ref.size.toMini', 'shrink to a side panel');
       }
       modeRemove('ref');
     }
@@ -10840,7 +11023,9 @@
       const mini = root.classList.toggle('ref-mini');
       const btn = document.getElementById('ref-size-btn');
       setIcon(btn.querySelector('img'), mini ? 'mini2full' : 'full2mini');
-      btn.title = mini ? 'expand to full frame' : 'shrink to a side panel';
+      btn.title = mini
+        ? t('ref.size.toFull', 'expand to full frame')
+        : t('ref.size.toMini', 'shrink to a side panel');
     }
     window.refToggleSize = refToggleSize;
 
@@ -10895,8 +11080,7 @@
     // Steps are 0.1 within resolution-aware limits; a denied step wiggles
     // the clicked button and pulses the value red instead of applying.
     // The home screen has no project, so no scales (controls hidden by
-    // CSS; IS_HOME_MODE guards persistence).
-    const IS_HOME_MODE = document.body.dataset.mode === 'home';
+    // CSS; the IS_HOME guard skips persistence).
     const UI_SCALES = {
       ui_scale: (BOOT_UI_STATE && !BOOT_UI_STATE.home && BOOT_UI_STATE.ui_scale > 0)
         ? BOOT_UI_STATE.ui_scale : 1.0,
@@ -10953,7 +11137,7 @@
     }
 
     async function persistUIScales() {
-      if (IS_HOME_MODE) return;
+      if (IS_HOME) return;
       try {
         const r = await fetch('/api/project/ui', {
           method: 'POST',
@@ -11044,6 +11228,18 @@
       }
       const hb = document.getElementById('ui-help-bubbles');
       if (hb) hb.checked = HELP_BUBBLES_ON;
+      // Language dropdown (i18n round): native-name labels, current from
+      // the runtime language (booted from ui.json's ui_language).
+      const langSel = document.getElementById('ui-language');
+      if (langSel && !langSel.options.length) {
+        for (const [code, label] of Object.entries(UI_LANGUAGES)) {
+          const opt = document.createElement('option');
+          opt.value = code;
+          opt.textContent = label;
+          langSel.appendChild(opt);
+        }
+      }
+      if (langSel) langSel.value = I18N.lang;
     }
 
     async function saveUIConfig(partial) {
@@ -11077,6 +11273,9 @@
     });
     document.getElementById('ui-font').addEventListener('change', (e) => {
       saveUIConfig({ font: e.target.value });
+    });
+    document.getElementById('ui-language')?.addEventListener('change', (e) => {
+      setUILanguage(e.target.value);
     });
     document.getElementById('ui-help-bubbles')?.addEventListener('change', async (e) => {
       const enabled = e.target.checked;
@@ -11518,12 +11717,12 @@
       // confirmation.) Only ✗ confirms; ~ is just a note on the row.
       if (verdict === 'no' && !m.installed) {
         const ok = await confirmOverlay({
-          title: 'Download it anyway?',
-          message: `this machine probably can't run ${m.label}: ${reasons}. ` +
-            'the download will work fine — it\'s the loading that may not. ' +
-            'you can delete it again afterwards.',
-          confirmLabel: 'download anyway',
-          cancelLabel: 'never mind',
+          title: t('confirm.modelDownload.title', 'Download it anyway?'),
+          message: t('confirm.modelDownload.message',
+            "this machine probably can't run {model}: {reasons}. the download will work fine — it's the loading that may not. you can delete it again afterwards.")
+            .replace('{model}', () => m.label).replace('{reasons}', () => reasons),
+          confirmLabel: t('confirm.modelDownload.ok', 'download anyway'),
+          cancelLabel: t('confirm.neverMind', 'never mind'),
         });
         if (!ok) return;
       }
@@ -11559,11 +11758,12 @@
       if (modelPartialBytes(m.cute)) extra.push('the partial download');
       if (extra.length) what += ` (plus ${extra.join(' and ')})`;
       const ok = await confirmOverlay({
-        title: `Delete ${m.label}?`,
-        message: `this removes ${what} from disk. nothing else changes, and ` +
-          'you can download it again later — at full size, from scratch.',
-        confirmLabel: 'delete',
-        cancelLabel: 'keep it',
+        title: t('confirm.modelDelete.title', 'Delete {model}?').replace('{model}', () => m.label),
+        message: t('confirm.modelDelete.message',
+          'this removes {what} from disk. nothing else changes, and you can download it again later — at full size, from scratch.')
+          .replace('{what}', () => what),
+        confirmLabel: t('confirm.modelDelete.ok', 'delete'),
+        cancelLabel: t('confirm.modelDelete.cancel', 'keep it'),
       });
       if (!ok) return;
       try {
@@ -12264,7 +12464,7 @@
       mic.recording = true;
       micBtn.classList.add('recording');
       // Icon stays put; the .recording pulse glow is the active affordance.
-      micBtn.title = 'click to stop + transcribe';
+      micBtn.title = t('chat.mic.recording', 'click to stop + transcribe');
     }
 
     async function stopMicAndTranscribe() {
@@ -12326,7 +12526,7 @@
       } finally {
         mic.chunks = [];
         micBtn.classList.remove('transcribing');
-        micBtn.title = 'voice input (local whisper.cpp)';
+        micBtn.title = t('chat.mic.title', 'voice input (local whisper.cpp)');
         textarea.focus();
       }
     }
@@ -12710,13 +12910,14 @@
       const row = document.querySelector('#skills-list li[data-skill="' + name + '"]');
       const report = row ? (row.dataset.auditReport || '') : '';
       const ok = await confirmOverlay({
-        title: 'Enable it anyway?',
-        message: `the audit didn't clear "${name}". enabling it puts its ` +
-          'instructions into your agent\'s head on every single message. ' +
-          (report ? 'read the report first if you haven\'t. ' : '') +
-          'this is recorded as your call, and you can turn it off again any time.',
-        confirmLabel: 'enable anyway',
-        cancelLabel: 'never mind',
+        title: t('confirm.skillTrust.title', 'Enable it anyway?'),
+        message: t('confirm.skillTrust.message',
+          'the audit didn\'t clear "{name}". enabling it puts its instructions into your agent\'s head on every single message. ')
+          .replace('{name}', () => name) +
+          (report ? t('confirm.skillTrust.report', 'read the report first if you haven\'t. ') : '') +
+          t('confirm.skillTrust.tail', 'this is recorded as your call, and you can turn it off again any time.'),
+        confirmLabel: t('confirm.skillTrust.ok', 'enable anyway'),
+        cancelLabel: t('confirm.neverMind', 'never mind'),
       });
       if (!ok) return;
       try {
@@ -13043,8 +13244,9 @@
         if (js.available) {
           closeWikiSetup();
           if (typeof enterWikiMode === 'function') enterWikiMode();
-          wikiToast('switched — reading from ' +
-            ((js.active || {}).filename || 'the new archive'));
+          wikiToast(t('wiki.toast.switched', 'switched — reading from {archive}')
+            .replace('{archive}', () => (js.active || {}).filename
+              || t('wiki.toast.newArchive', 'the new archive')));
         } else {
           renderWikiManage();
         }
@@ -13337,15 +13539,15 @@
       const active = ((WIKI_STATUS || {}).installs || []).find(i => i.active);
       if (!ns || !active) return;
       const ok = await confirmOverlay({
-        title: 'Update your Wikipedia?',
-        message: `this downloads ${ns.size_human || 'the newer snapshot'} ` +
-          `(snapshot ${ns.date}) into ${active.storage_dir} — the same place ` +
-          `your ${active.snapshot || 'current'} archive lives — and swaps it in ` +
-          `when done. the old file is deleted then, not before. your comments, ` +
-          `saves, and overrides all carry over, and reading keeps working while ` +
-          `it runs.`,
-        confirmLabel: 'download it',
-        cancelLabel: 'not now',
+        title: t('confirm.wikiUpdate.title', 'Update your Wikipedia?'),
+        message: t('confirm.wikiUpdate.message',
+          'this downloads {size} (snapshot {date}) into {dir} — the same place your {current} archive lives — and swaps it in when done. the old file is deleted then, not before. your comments, saves, and overrides all carry over, and reading keeps working while it runs.')
+          .replace('{size}', () => ns.size_human || t('confirm.wikiUpdate.newerSnapshot', 'the newer snapshot'))
+          .replace('{date}', () => ns.date)
+          .replace('{dir}', () => active.storage_dir)
+          .replace('{current}', () => active.snapshot || t('confirm.wikiUpdate.current', 'current')),
+        confirmLabel: t('confirm.wikiUpdate.ok', 'download it'),
+        cancelLabel: t('confirm.wikiUpdate.cancel', 'not now'),
       });
       if (!ok) return;
       if (!wikiPrepReplace(ns)) return;
@@ -13355,7 +13557,7 @@
       if (!started) {
         el.classList.remove('busy');
         renderWikiNewerBadge();
-        wikiToast('could not start the update — open 🚰 settings for the reason', true);
+        wikiToast(t('wiki.toast.updateFailed', 'could not start the update — open 🚰 settings for the reason'), true);
       }
     });
 
@@ -13370,8 +13572,8 @@
       modePush('wikisink', {
         icon: 'wikisink',
         onExit: exitWikiMode,
-        iconTitle: 'wikisink',
-        exitTitle: 'exit wikisink',
+        iconTitle: t('modes.wiki.icon', 'wikisink'),
+        exitTitle: t('modes.wiki.exit', 'exit wikisink'),
       });
       if (typeof refreshWikiChatTail === 'function') refreshWikiChatTail();
       // Never blocks the render: paint whatever we already know, then ask.
@@ -13387,7 +13589,8 @@
           // a random article instead.
           loadWikiArticle(last.path).then((ok) => {
             if (!ok) {
-              wikiToast(`“${last.title || last.path}” isn't in this archive — rolled a random article instead`, true);
+              wikiToast(t('wiki.toast.missingRolled', '“{title}” isn\'t in this archive — rolled a random article instead')
+                .replace('{title}', () => last.title || last.path), true);
               wikiRandom();
             }
           });
@@ -13415,21 +13618,23 @@
       if (art.source === 'overlay') {
         badge.classList.add('live');
         const when = (art.meta && art.meta.fetched_at || '').slice(0, 10);
-        badge.textContent = 'live' + (when ? ' ' + when : '');
-        badge.title = 'refreshed from live Wikipedia by a wikisink run' +
-          (art.meta && art.meta.revid ? ` (revision ${art.meta.revid})` : '');
+        badge.textContent = t('wiki.badge.live', 'live') + (when ? ' ' + when : '');
+        badge.title = t('wiki.badge.live.title', 'refreshed from live Wikipedia by a wikisink run') +
+          (art.meta && art.meta.revid
+            ? t('wiki.badge.revision', ' (revision {rev})').replace('{rev}', () => String(art.meta.revid))
+            : '');
       } else if (art.source === 'preserved') {
         badge.classList.add('preserved');
-        badge.textContent = 'preserved';
-        badge.title = 'deletion override — kept locally and excluded from updates';
+        badge.textContent = t('wiki.badge.preserved', 'preserved');
+        badge.title = t('wiki.badge.preserved.title', 'deletion override — kept locally and excluded from updates');
       } else if (art.source === 'saved') {
         badge.classList.add('saved');
         const when = (art.meta && art.meta.retrieved) || '';
-        badge.textContent = 'saved' + (when ? ' ' + when : '');
-        badge.title = 'your saved copy, served from its folder — re-save (the save button) to refresh it; links go to the archive';
+        badge.textContent = t('wiki.badge.saved', 'saved') + (when ? ' ' + when : '');
+        badge.title = t('wiki.badge.saved.title', 'your saved copy, served from its folder — re-save (the save button) to refresh it; links go to the archive');
       } else {
         badge.textContent = 'ZIM ' + (art.snapshot || '');
-        badge.title = 'served from the local archive snapshot';
+        badge.title = t('wiki.badge.zim.title', 'served from the local archive snapshot');
       }
     }
 
@@ -13447,13 +13652,12 @@
       const img = btn.querySelector('.svg-icon');
       if (art.overridden) {
         if (img) setIcon(img, 'wiki-locked');
-        btn.title = 'deletion override active — this article is preserved locally ' +
-          'and never refreshed. click to lift the override (the preserved copy stays on disk).';
+        btn.title = t('wiki.override.active',
+          'deletion override active — this article is preserved locally and never refreshed. click to lift the override (the preserved copy stays on disk).');
       } else {
         if (img) setIcon(img, 'wiki-unlocked');
-        btn.title = 'deletion override — keep this article\'s local copy forever and ' +
-          'stop updating it. use when Wikipedia deletes something you consider ' +
-          'valuable (wikisink reports flag suspicious deletions).';
+        btn.title = t('wiki.override.inactive',
+          'deletion override — keep this article\'s local copy forever and stop updating it. use when Wikipedia deletes something you consider valuable (wikisink reports flag suspicious deletions).');
       }
       btn.dataset.overridden = art.overridden ? '1' : '';
     }
@@ -13646,7 +13850,7 @@
     }
 
     async function wikiSaveArticle(dest) {
-      if (!WIKI_PATH) { wikiToast('no article loaded', true); return; }
+      if (!WIKI_PATH) { wikiToast(t('wiki.toast.noArticle', 'no article loaded'), true); return; }
       try {
         const r = await fetch('/api/wiki/save', {
           method: 'POST',
@@ -13655,7 +13859,7 @@
         });
         const js = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(js.detail || `save failed (${r.status})`);
-        wikiToast(`saved to ${js.saved_path}`);
+        wikiToast(t('wiki.toast.saved', 'saved to {path}').replace('{path}', () => js.saved_path));
         if (dest === 'project') {
           htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
         }
@@ -13694,12 +13898,11 @@
     // the reusable overlay, then POSTs the existing wikisink update run.
     document.getElementById('wiki-cachebox-update').addEventListener('click', async () => {
       const ok = await confirmOverlay({
-        title: 'Update this saved article?',
-        message: 'This starts a wikisink update run against live Wikipedia to ' +
-          'refresh watched articles, including saved copies. It may take a while ' +
-          'and needs the archive reachable. Continue?',
-        confirmLabel: 'run update',
-        cancelLabel: 'cancel',
+        title: t('confirm.wikiSavedUpdate.title', 'Update this saved article?'),
+        message: t('confirm.wikiSavedUpdate.message',
+          'This starts a wikisink update run against live Wikipedia to refresh watched articles, including saved copies. It may take a while and needs the archive reachable. Continue?'),
+        confirmLabel: t('confirm.wikiSavedUpdate.ok', 'run update'),
+        cancelLabel: t('misc.cancel', 'cancel'),
       });
       if (!ok) return;
       try {
@@ -13710,7 +13913,7 @@
         });
         const js = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(js.detail || `update failed (${r.status})`);
-        wikiToast('wikisink update started — see the report in chat');
+        wikiToast(t('wiki.toast.updateStarted', 'wikisink update started — see the report in chat'));
       } catch (e) {
         wikiToast(String(e.message || e), true);
       }
@@ -13907,7 +14110,8 @@
       renderWikiCommentsPanel();
       if (WIKI_COMMENTS.length) {
         document.getElementById('wiki-comments-toggle').title =
-          `show/hide the comments panel (${WIKI_COMMENTS.length})`;
+          t('wiki.commentsToggle.titleCount', 'show/hide the comments panel ({n})')
+            .replace('{n}', () => String(WIKI_COMMENTS.length));
       }
     }
 
@@ -13991,7 +14195,7 @@
       if (act === 'jump') {
         const mark = document.querySelector(`#wiki-body [data-cid="${cid}"]`);
         if (mark) mark.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        else wikiToast('this comment is orphaned — no spot to jump to', true);
+        else wikiToast(t('wiki.toast.orphanComment', 'this comment is orphaned — no spot to jump to'), true);
       } else if (act === 'resolve') {
         await fetch('/api/wiki/comments', {
           method: 'PATCH',
@@ -14063,10 +14267,10 @@
         });
         if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.status);
         closeWikiComposer();
-        wikiToast('comment added');
+        wikiToast(t('wiki.toast.commentAdded', 'comment added'));
         renderWikiComments();
       } catch (e) {
-        wikiToast('comment failed: ' + String(e.message || e), true);
+        wikiToast(t('wiki.toast.commentFailed', 'comment failed: ') + String(e.message || e), true);
       }
     }
     window.submitWikiComposer = submitWikiComposer;
@@ -14074,7 +14278,7 @@
     // Toolbar 💬 "add comment here": paragraph anchor on the block
     // nearest the vertical middle of the viewport.
     document.getElementById('wiki-comment-here').addEventListener('click', () => {
-      if (!WIKI_PATH) { wikiToast('no article loaded', true); return; }
+      if (!WIKI_PATH) { wikiToast(t('wiki.toast.noArticle', 'no article loaded'), true); return; }
       const bodyEl = document.getElementById('wiki-body');
       // rect height, not clientHeight: rects are top-level CSS px while
       // clientHeight is the element's own zoomed px (uiscale round) —
@@ -14243,7 +14447,9 @@
           });
         }
         if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.status);
-        wikiToast(active ? 'override lifted — updates resume' : 'preserved — this copy is yours now');
+        wikiToast(active
+          ? t('wiki.toast.overrideLifted', 'override lifted — updates resume')
+          : t('wiki.toast.preserved', 'preserved — this copy is yours now'));
         loadWikiArticle(WIKI_PATH, { push: false });
       } catch (e) {
         wikiToast(String(e.message || e), true);
@@ -14262,8 +14468,9 @@
       try { d = JSON.parse(e.data); } catch (_) { return; }
       const btn = document.getElementById('wikisink-btn');
       btn.title = d.status === 'downloading'
-        ? `Wikisink — downloading… ${d.pct != null ? d.pct + '%' : ''}`
-        : 'Wikisink — your local offline Wikipedia: browse, save, comment, update';
+        ? t('topbar.wikisink.downloading', 'Wikisink — downloading… {pct}')
+          .replace('{pct}', () => (d.pct != null ? d.pct + '%' : ''))
+        : t('topbar.wikisink.title', 'Wikisink — your local offline Wikipedia: browse, save, comment, update');
       const modalOpen = !document.getElementById('wiki-setup-modal').classList.contains('hidden');
       if (d.status === 'downloading') {
         if (modalOpen) {
@@ -14771,14 +14978,18 @@
     }
     function _reModeIcon() { return RE_FACE === 'read' ? 'read-eye' : 'edit-pencil'; }
     function _reModeTitle() {
-      return RE_FACE === 'read' ? 'read/edit — reading' : 'read/edit — editing';
+      return RE_FACE === 'read'
+        ? t('modes.readedit.reading', 'read/edit — reading')
+        : t('modes.readedit.editing', 'read/edit — editing');
     }
     // Keep the three relocated face-toggle buttons' titles in sync with the
     // current face: they always advertise the face they switch TO. Updated
     // wherever the indicator icon updates (registration + face change).
     function _reUpdateFaceButtons() {
       const toRead = RE_FACE === 'edit';   // editing now → button goes to read
-      const title = toRead ? 'switch to read face' : 'switch to edit face';
+      const title = toRead
+        ? t('review.face.toRead', 'switch to read face')
+        : t('review.face.toEdit', 'switch to edit face');
       ['review-face-btn', 'edit-face-btn', 'mini-face-btn'].forEach((id) => {
         const b = document.getElementById(id);
         if (b) { b.title = title; b.setAttribute('aria-label', title); }
@@ -14789,7 +15000,7 @@
         icon: _reModeIcon(),
         onExit: closeReadEdit,
         iconTitle: _reModeTitle(),
-        exitTitle: 'exit read/edit',
+        exitTitle: t('modes.readedit.exit', 'exit read/edit'),
       });
       _reUpdateFaceButtons();
     }
@@ -14866,7 +15077,8 @@
       }
       body.appendChild(wrap);
       body.scrollTop = 0;
-      document.getElementById('preview-title').textContent = 'read · ' + path.split('/').pop();
+      document.getElementById('preview-title').textContent =
+        t('review.previewTitle.read', 'read · ') + path.split('/').pop();
       document.getElementById('preview').classList.add('open');
       updateDocCounters();
     }
@@ -14886,7 +15098,7 @@
       let any = false;
       if (_isRequestPath(path)) {
         const b = document.createElement('button');
-        b.type = 'button'; b.className = 'mark-done'; b.textContent = 'mark done';
+        b.type = 'button'; b.className = 'mark-done'; b.textContent = t('review.markDone', 'mark done');
         b.addEventListener('click', () => markRequestDone(path));
         row.appendChild(b); any = true;
       }
@@ -14897,7 +15109,7 @@
       if (isSym && !path.startsWith('rness/skills/') && !path.startsWith('rness/roles/')) {
         const b = document.createElement('button');
         b.type = 'button'; b.className = 'customize-btn';
-        b.textContent = 'customize for this project';
+        b.textContent = t('review.customize', 'customize for this project');
         b.addEventListener('click', () => customizeForProject(path));
         row.appendChild(b); any = true;
       }
@@ -14959,7 +15171,8 @@
       ta.spellcheck = false;
       ta.value = text;
       body.appendChild(ta);
-      document.getElementById('preview-title').textContent = 'edit · ' + path.split('/').pop();
+      document.getElementById('preview-title').textContent =
+        t('review.previewTitle.edit', 'edit · ') + path.split('/').pop();
       document.getElementById('preview').classList.add('open');
       ta.focus();
       updateDocCounters();
@@ -14969,7 +15182,7 @@
       const p = document.getElementById('preview');
       p.classList.remove('open');
       document.getElementById('preview-body').innerHTML = '';
-      document.getElementById('preview-title').textContent = 'preview';
+      document.getElementById('preview-title').textContent = t('review.previewTitle', 'preview');
     }
 
     // Hide whichever container is currently showing (no state reset).
@@ -15030,10 +15243,12 @@
       // Leaving a dirty editor for a different file → confirm.
       if (reIsActive() && reIsDirty() && RE_PATH !== path) {
         const ok = await confirmOverlay({
-          title: 'Discard unsaved edits?',
-          message: 'You have unsaved changes in “' + (RE_PATH || '') +
-            '”. Open a different document and discard them?',
-          confirmLabel: 'discard', cancelLabel: 'keep editing',
+          title: t('confirm.discard.title', 'Discard unsaved edits?'),
+          message: t('confirm.discard.openOther',
+            'You have unsaved changes in “{path}”. Open a different document and discard them?')
+            .replace('{path}', () => RE_PATH || ''),
+          confirmLabel: t('confirm.discard.ok', 'discard'),
+          cancelLabel: t('confirm.discard.cancel', 'keep editing'),
         });
         if (!ok) return;
       }
@@ -15068,9 +15283,10 @@
         RE_EDIT_BUFFER = reCurrentEditValue();
         if (reIsDirty()) {
           const ok = await confirmOverlay({
-            title: 'Discard unsaved edits?',
-            message: 'Switch to reading and discard your unsaved changes?',
-            confirmLabel: 'discard', cancelLabel: 'keep editing',
+            title: t('confirm.discard.title', 'Discard unsaved edits?'),
+            message: t('confirm.discard.toRead', 'Switch to reading and discard your unsaved changes?'),
+            confirmLabel: t('confirm.discard.ok', 'discard'),
+            cancelLabel: t('confirm.discard.cancel', 'keep editing'),
           });
           if (!ok) return;
         }
@@ -15170,10 +15386,12 @@
       if (RE_FACE === 'edit') RE_EDIT_BUFFER = reCurrentEditValue();
       if (reIsDirty()) {
         const ok = await confirmOverlay({
-          title: 'Discard unsaved edits?',
-          message: 'You have unsaved changes in “' + (RE_PATH || '') +
-            '”. Close and discard them?',
-          confirmLabel: 'discard', cancelLabel: 'keep editing',
+          title: t('confirm.discard.title', 'Discard unsaved edits?'),
+          message: t('confirm.discard.close',
+            'You have unsaved changes in “{path}”. Close and discard them?')
+            .replace('{path}', () => RE_PATH || ''),
+          confirmLabel: t('confirm.discard.ok', 'discard'),
+          cancelLabel: t('confirm.discard.cancel', 'keep editing'),
         });
         if (!ok) return;
       }
@@ -15220,8 +15438,8 @@
       modePush('girraph', {
         icon: 'girraphmode',
         onExit: exitGirraphMode,
-        iconTitle: 'girraph',
-        exitTitle: 'exit girraph',
+        iconTitle: t('modes.girraph.icon', 'girraph'),
+        exitTitle: t('modes.girraph.exit', 'exit girraph'),
       });
     }
 
@@ -15348,7 +15566,7 @@
       if (!data.nodes.length) {
         const empty = document.createElement('div');
         empty.className = 'gp-doc-note';
-        empty.textContent = 'empty girraph — use “+ root node” to start the map.';
+        empty.textContent = t('gr.empty', 'empty girraph — use “+ root node” to start the map.');
         body.appendChild(empty);
       }
       return true;
@@ -15396,27 +15614,28 @@
       row.appendChild(em);
       const label = document.createElement('span');
       label.className = 'gp-label';
-      label.textContent = n.label || '(unlabeled)';
-      label.title = 'click to edit';
+      label.textContent = n.label || t('gr.unlabeled', '(unlabeled)');
+      label.title = t('gr.clickToEdit', 'click to edit');
       label.onclick = () => gpEditLabel(n, label);
       row.appendChild(label);
-      n.cross.forEach((t) => {
-        const c = gpChip('→ ' + t);
-        c.title = 'cross-edge — click to jump (shift-click to remove)';
-        c.onclick = (ev) => (ev.shiftKey ? gpRemoveCross(n, t) : gpJumpTo(t));
+      // `ce`, not `t` — `t()` is the i18n lookup and must stay reachable here.
+      n.cross.forEach((ce) => {
+        const c = gpChip('→ ' + ce);
+        c.title = t('gr.crossEdge', 'cross-edge — click to jump (shift-click to remove)');
+        c.onclick = (ev) => (ev.shiftKey ? gpRemoveCross(n, ce) : gpJumpTo(ce));
         row.appendChild(c);
       });
       if (n.ref) {
         const c = gpChip((n.ref_broken ? '⚠ ' : (n.ref_kind === 'girraph' ? '🦒 ' : '📄 ')) + n.ref);
         if (n.ref_broken) {
           c.classList.add('broken');
-          c.title = 'broken ref — click to repair';
+          c.title = t('gr.brokenRef', 'broken ref — click to repair');
           c.onclick = () => gpRepairRef(n);
         } else if (n.ref_kind === 'girraph') {
-          c.title = 'open the nested girraph';
+          c.title = t('gr.openNested', 'open the nested girraph');
           c.onclick = () => gpPush({ kind: 'girraph', path: n.ref });
         } else {
-          c.title = 'render this doc here (read-only)';
+          c.title = t('gr.renderDoc', 'render this doc here (read-only)');
           c.onclick = () => gpPush({ kind: 'doc', path: n.ref });
         }
         row.appendChild(c);
@@ -15424,22 +15643,24 @@
       if (n.by) {
         const c = gpChip('by:' + n.by);
         c.classList.add('gp-by');
-        c.title = 'attribution';
+        c.title = t('gr.attribution', 'attribution');
         row.appendChild(c);
       }
       const acts = document.createElement('span');
       acts.className = 'gp-acts';
-      gpActBtn(acts, '＋', 'add child node', () => gpShowAddForm(wrap, n.id));
-      gpActBtn(acts, '⤳', 'add cross-edge from this node', () => gpAddCross(n));
-      gpActBtn(acts, '≡', n.detail ? 'edit detail block' : 'add detail block', () => gpEditDetail(wrap, n));
-      gpActBtn(acts, '✕', 'remove node…', () => gpRemove(n, (kidsOf[n.id] || []).length));
+      gpActBtn(acts, '＋', t('gr.act.addChild', 'add child node'), () => gpShowAddForm(wrap, n.id));
+      gpActBtn(acts, '⤳', t('gr.act.addCross', 'add cross-edge from this node'), () => gpAddCross(n));
+      gpActBtn(acts, '≡', n.detail
+        ? t('gr.act.editDetail', 'edit detail block')
+        : t('gr.act.addDetail', 'add detail block'), () => gpEditDetail(wrap, n));
+      gpActBtn(acts, '✕', t('gr.act.remove', 'remove node…'), () => gpRemove(n, (kidsOf[n.id] || []).length));
       row.appendChild(acts);
       wrap.appendChild(row);
       if (n.detail) {
         const d = document.createElement('div');
         d.className = 'gp-detail';
         d.textContent = n.detail;
-        d.title = 'click to edit';
+        d.title = t('gr.clickToEdit', 'click to edit');
         d.onclick = () => gpEditDetail(wrap, n);
         wrap.appendChild(d);
       }
@@ -15513,7 +15734,8 @@
       const ta = document.createElement('textarea');
       ta.className = 'gp-detail-input';
       ta.value = n.detail || '';
-      ta.placeholder = 'detail block (markdown) — empty clears it. esc to cancel, ctrl/cmd-enter to save.';
+      ta.placeholder = t('gr.detailPlaceholder',
+        'detail block (markdown) — empty clears it. esc to cancel, ctrl/cmd-enter to save.');
       const existing = wrap.querySelector('.gp-detail');
       if (existing) existing.replaceWith(ta); else wrap.querySelector('.gp-row').after(ta);
       ta.focus();
@@ -15546,14 +15768,14 @@
           sel.appendChild(o);
         });
       const labelIn = document.createElement('input');
-      labelIn.placeholder = 'label…';
+      labelIn.placeholder = t('gr.labelPlaceholder', 'label…');
       const refIn = document.createElement('input');
-      refIn.placeholder = 'ref: path (optional; required for 🦒)';
+      refIn.placeholder = t('gr.refPlaceholder', 'ref: path (optional; required for 🦒)');
       refIn.style.maxWidth = '220px';
       const add = document.createElement('button');
       add.type = 'submit';
       add.className = 'gp-act';
-      add.textContent = 'add';
+      add.textContent = t('gr.act.add', 'add');
       form.append(sel, labelIn, refIn, add);
       form.onsubmit = async (e) => {
         e.preventDefault();
@@ -15645,12 +15867,12 @@
       const btn = document.getElementById('gp-merirmaid');
       if (!btn) return;
       if (GP_MERIRMAID) {
-        btn.title = 'open the linked merirmaid diagram';
-        btn.setAttribute('aria-label', 'open the linked merirmaid diagram');
+        btn.title = t('gr.merirmaid.open', 'open the linked merirmaid diagram');
+        btn.setAttribute('aria-label', t('gr.merirmaid.open', 'open the linked merirmaid diagram'));
         btn.classList.remove('gp-merirmaid-add');
       } else {
-        btn.title = 'add merirmaid — create a linked merirmaid diagram of this girraph';
-        btn.setAttribute('aria-label', 'add merirmaid — create a linked merirmaid diagram of this girraph');
+        btn.title = t('gr.merirmaid.add', 'add merirmaid — create a linked merirmaid diagram of this girraph');
+        btn.setAttribute('aria-label', t('gr.merirmaid.add', 'add merirmaid — create a linked merirmaid diagram of this girraph'));
         btn.classList.add('gp-merirmaid-add');
       }
     }
@@ -15713,8 +15935,8 @@
       modePush('merirmaid', {
         icon: 'merirmaidmode',
         onExit: exitMerirmaidMode,
-        iconTitle: 'merirmaid',
-        exitTitle: 'exit merirmaid',
+        iconTitle: t('modes.merirmaid.icon', 'merirmaid'),
+        exitTitle: t('modes.merirmaid.exit', 'exit merirmaid'),
       });
       await renderMerirmaidTop();
       refreshMerirmaidChatTail();
@@ -15735,8 +15957,8 @@
       modePush('merirmaid', {
         icon: 'merirmaidmode',
         onExit: exitMerirmaidMode,
-        iconTitle: 'merirmaid',
-        exitTitle: 'exit merirmaid',
+        iconTitle: t('modes.merirmaid.icon', 'merirmaid'),
+        exitTitle: t('modes.merirmaid.exit', 'exit merirmaid'),
       });
       await renderMerirmaidTop();
       refreshMerirmaidChatTail();
@@ -15757,8 +15979,8 @@
       modePush('merirmaid', {
         icon: 'merirmaidmode',
         onExit: exitMerirmaidMode,
-        iconTitle: 'project mirror',
-        exitTitle: 'back to the home screen',
+        iconTitle: t('modes.projectMirror.icon', 'project mirror'),
+        exitTitle: t('modes.projectMirror.exit', 'back to the home screen'),
       });
       await renderMerirmaidTop();
     }
@@ -15992,10 +16214,12 @@
       titleEl.textContent = MM_TITLE;
       badge.hidden = false;
       badge.className = 'mm-badge ' + parsed.modality;
-      badge.textContent = parsed.modality === 'mirror' ? 'mirror · source of truth' : 'wip · editable';
+      badge.textContent = parsed.modality === 'mirror'
+        ? t('mm.badge.mirror', 'mirror · source of truth')
+        : t('mm.badge.wip', 'wip · editable');
       badge.title = parsed.modality === 'mirror'
-        ? 'read-only mirror of an external structure — edit the source it mirrors, not this file'
-        : 'work-in-progress diagram — click a node label to edit its text';
+        ? t('mm.badge.mirror.title', 'read-only mirror of an external structure — edit the source it mirrors, not this file')
+        : t('mm.badge.wip.title', 'work-in-progress diagram — click a node label to edit its text');
       mmApplyModalityChrome(parsed.modality);
       await mmRenderDiagram(top.path, parsed, body);
     }
@@ -16076,18 +16300,19 @@
       items.push('<div class="ctx-target" title="' + escapeHtml(targetName) + '">'
         + glyph + ' ' + escapeHtml(targetName) + '</div>');
       if (info && box) {
-        items.push('<button type="button" class="ctx-item" data-act="copy-disk-path">copy path on disk</button>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-disk-path">' + t('menu.mm.copyDiskPath', 'copy path on disk') + '</button>');
         if (info.is_dir) {
-          items.push('<button type="button" class="ctx-item" data-act="open-folder">open folder in cacheawl</button>');
+          items.push('<button type="button" class="ctx-item" data-act="open-folder">' + t('menu.mm.openFolder', 'open folder in cacheawl') + '</button>');
         } else {
-          items.push('<button type="button" class="ctx-item" data-act="copy-file">copy file to clipboard</button>');
-          items.push('<button type="button" class="ctx-item" data-act="open-file">open in '
-            + escapeHtml(mmModeLabel(targetName)) + ' mode</button>');
+          items.push('<button type="button" class="ctx-item" data-act="copy-file">' + t('menu.mm.copyFile', 'copy file to clipboard') + '</button>');
+          items.push('<button type="button" class="ctx-item" data-act="open-file">'
+            + t('menu.mm.openIn', 'open in {mode} mode')
+              .replace('{mode}', () => escapeHtml(mmModeLabel(targetName))) + '</button>');
         }
       } else {
         // Non-mirror node (wip diagram, or a node with no mapping): the hook
         // is here per the split's contract, filtered to what's meaningful.
-        items.push('<button type="button" class="ctx-item" data-act="copy-label">copy node label</button>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-label">' + t('menu.mm.copyLabel', 'copy node label') + '</button>');
       }
       menu.innerHTML = items.join('');
       menu.classList.remove('hidden');
@@ -16147,7 +16372,7 @@
             throw new Error(d);
           }
           copyToClipboard(await r.text());
-        } catch (err) { mmFlash('could not copy file: ' + (err.message || String(err))); }
+        } catch (err) { mmFlash(t('mm.flash.copyFailed', 'could not copy file: ') + (err.message || String(err))); }
         return;
       }
       if (act === 'open-file') { mmOpenNodeFile(box, rel, rel.split('/').pop()); return; }
@@ -16232,7 +16457,8 @@
         }
         const err = document.createElement('div');
         err.className = 'mm-error';
-        err.textContent = 'mermaid could not render this diagram:\n' + (e && e.message ? e.message : String(e));
+        err.textContent = t('mm.renderFailed', 'mermaid could not render this diagram:\n')
+          + (e && e.message ? e.message : String(e));
         const pre = document.createElement('pre');
         pre.className = 'mm-source';
         pre.textContent = parsed.body;
@@ -16334,14 +16560,16 @@
     function mmFollowLink(target, fromPath) {
       const resolved = mmResolvePath(fromPath, target);
       if (!resolved) {
-        mmFlash('cannot follow "' + target + '" — it escapes the project or is an absolute/external link');
+        mmFlash(t('mm.flash.escapes', 'cannot follow "{target}" — it escapes the project or is an absolute/external link')
+          .replace('{target}', () => target));
         return;
       }
       const low = resolved.toLowerCase();
       if (low.endsWith('.merirmaid')) mmPush({ kind: 'merirmaid', path: resolved });
       else if (low.endsWith('.md')) mmPush({ kind: 'doc', path: resolved });
       else if (low.endsWith('.girraph')) enterGirraphMode(resolved);   // stacks over this diagram
-      else mmFlash('unsupported link target: ' + resolved + ' (expected .merirmaid, .md, or .girraph)');
+      else mmFlash(t('mm.flash.unsupported', 'unsupported link target: {target} (expected .merirmaid, .md, or .girraph)')
+        .replace('{target}', () => resolved));
     }
 
     // ----- node-label editing (wip flowcharts only) -----
@@ -16413,7 +16641,8 @@
       if (!MM_CURRENT) return;
       const loc = mmLocateNode(MM_CURRENT.parsed.body, id);
       if (!loc) {
-        mmFlash('couldn\'t locate node "' + id + '" in the source — ask the agent to edit it via chat');
+        mmFlash(t('mm.flash.noNode', 'couldn\'t locate node "{id}" in the source — ask the agent to edit it via chat')
+          .replace('{id}', () => id));
         return;
       }
       mmCloseLabelEditor();
@@ -16452,7 +16681,8 @@
         if (newText === loc.currentText) return;
         const patched = mmPatchLabel(MM_CURRENT.parsed.body, id, newText);
         if (patched == null) {
-          mmFlash('couldn\'t patch node "' + id + '" — ask the agent to edit it via chat');
+          mmFlash(t('mm.flash.noPatch', 'couldn\'t patch node "{id}" — ask the agent to edit it via chat')
+            .replace('{id}', () => id));
           return;
         }
         const newRaw = MM_CURRENT.parsed.header + patched;
@@ -16467,7 +16697,7 @@
             throw new Error(detail);
           }
         } catch (e) {
-          mmFlash('save failed: ' + e.message);
+          mmFlash(t('mm.flash.saveFailed', 'save failed: ') + e.message);
           return;
         }
         MM_CURRENT.parsed.body = patched;
@@ -16561,14 +16791,17 @@
       // Reflect the current project name in the project-pane header.
       const pn = document.getElementById('project-name');
       const nameEl = document.getElementById('ca-project-name');
-      if (pn && nameEl) nameEl.textContent = (pn.textContent || 'project').trim() || 'project';
+      if (pn && nameEl) {
+        nameEl.textContent = (pn.textContent || t('ca.projectPane', 'project')).trim()
+          || t('ca.projectPane', 'project');
+      }
       modePush('cacheawl', {
         icon: 'cacheawl',
         onExit: exitCacheawlMode,
         // Raising a buried cacheawl refreshes its (possibly stale) tree.
         onRaise: caLoadTree,
-        iconTitle: 'cacheawl',
-        exitTitle: 'exit cacheawl',
+        iconTitle: t('modes.cacheawl.icon', 'cacheawl'),
+        exitTitle: t('modes.cacheawl.exit', 'exit cacheawl'),
       });
       caIngestTypeChanged();
       refreshCacheawlChatTail();
@@ -17018,9 +17251,10 @@
           // Conflict → confirm overwrite and retry.
           if (!overwrite && /already exists/i.test(detail)) {
             const ok = await confirmOverlay({
-              title: 'Overwrite?',
-              message: detail + '  Replace it?',
-              confirmLabel: 'overwrite', cancelLabel: 'cancel',
+              title: t('confirm.overwrite.title', 'Overwrite?'),
+              message: detail + t('confirm.overwrite.replace', '  Replace it?'),
+              confirmLabel: t('confirm.overwrite.ok', 'overwrite'),
+              cancelLabel: t('misc.cancel', 'cancel'),
             });
             if (ok) return caTransfer(src, dst, op, true);
             return;
@@ -17060,22 +17294,22 @@
       CA_CTX = d;
       const items = [];
       if (d.background) {
-        items.push('<div class="ctx-target">cacheawl store</div>');
-        items.push('<button type="button" class="ctx-item" data-act="new-cachebox">new cachebox</button>');
+        items.push('<div class="ctx-target">' + t('menu.ca.store', 'cacheawl store') + '</div>');
+        items.push('<button type="button" class="ctx-item" data-act="new-cachebox">' + t('menu.ca.newCachebox', 'new cachebox') + '</button>');
       } else {
         const glyph = (d.is_box ? '📦' : (d.is_dir ? '📁' : '📄'));
         items.push('<div class="ctx-target" title="' + (d.name || '') + '">' + glyph + ' ' + (d.name || '') + '</div>');
         // "new folder" applies where a create endpoint exists: project dirs
         // (POST /api/file/new-folder) and cachebox roots (a new cachebox).
         if (d.pane === 'project' && d.is_dir) {
-          items.push('<button type="button" class="ctx-item" data-act="new-folder">new subfolder</button>');
+          items.push('<button type="button" class="ctx-item" data-act="new-folder">' + t('menu.tree.newFolder', 'new subfolder') + '</button>');
           items.push('<div class="ctx-sep"></div>');
         } else if (d.is_box) {
-          items.push('<button type="button" class="ctx-item" data-act="new-cachebox">new cachebox</button>');
+          items.push('<button type="button" class="ctx-item" data-act="new-cachebox">' + t('menu.ca.newCachebox', 'new cachebox') + '</button>');
           items.push('<div class="ctx-sep"></div>');
         }
-        items.push('<button type="button" class="ctx-item" data-act="copy-path">copy path</button>');
-        items.push('<button type="button" class="ctx-item" data-act="copy-name">copy name</button>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-path">' + t('menu.tree.copyPath', 'copy path') + '</button>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-name">' + t('menu.ca.copyName', 'copy name') + '</button>');
       }
       menu.innerHTML = items.join('');
       menu.classList.remove('hidden');
@@ -17172,8 +17406,8 @@
       const inp = document.getElementById('ca-prompt-input');
       const name = (inp.value || '').trim();
       const err = document.getElementById('ca-prompt-err');
-      if (!name) { err.textContent = 'name is required'; inp.focus(); return; }
-      if (name.includes('/') || name.includes('\\')) { err.textContent = 'no path separators'; return; }
+      if (!name) { err.textContent = t('tree.prompt.nameRequired', 'name is required'); inp.focus(); return; }
+      if (name.includes('/') || name.includes('\\')) { err.textContent = t('ca.prompt.noSeparators', 'no path separators'); return; }
       const ov = document.getElementById('ca-prompt');
       ov.classList.remove('open');
       ov.setAttribute('aria-hidden', 'true');
@@ -17992,14 +18226,14 @@
         `<div class="ctx-target" title="${target.path}">${target.kind === 'dir' ? '📁' : '📄'} ${target.name}</div>`
       );
       if (target.kind === 'dir') {
-        items.push('<button type="button" class="ctx-item" data-act="new-folder">new subfolder</button>');
-        items.push('<button type="button" class="ctx-item" data-act="new-file">new md file</button>');
+        items.push('<button type="button" class="ctx-item" data-act="new-folder">' + t('menu.tree.newFolder', 'new subfolder') + '</button>');
+        items.push('<button type="button" class="ctx-item" data-act="new-file">' + t('menu.tree.newFile', 'new md file') + '</button>');
         items.push('<div class="ctx-sep"></div>');
-        items.push('<button type="button" class="ctx-item" data-act="copy-path">copy path</button>');
-        items.push('<button type="button" class="ctx-item" data-act="copy-name">copy folder name</button>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-path">' + t('menu.tree.copyPath', 'copy path') + '</button>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-name">' + t('menu.tree.copyFolderName', 'copy folder name') + '</button>');
       } else {
-        items.push('<button type="button" class="ctx-item" data-act="copy-path">copy path</button>');
-        items.push('<button type="button" class="ctx-item" data-act="copy-name">copy file name</button>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-path">' + t('menu.tree.copyPath', 'copy path') + '</button>');
+        items.push('<button type="button" class="ctx-item" data-act="copy-name">' + t('menu.tree.copyFileName', 'copy file name') + '</button>');
       }
       menu.innerHTML = items.join('');
       menu.classList.remove('hidden');
@@ -18071,7 +18305,9 @@
       document.getElementById('tree-prompt-kind').textContent = kind;
       document.getElementById('tree-prompt-target').textContent = parentName + '/';
       const input = document.getElementById('tree-prompt-input');
-      input.placeholder = kind === 'folder' ? 'subfolder-name' : 'note (.md appended if omitted)';
+      input.placeholder = kind === 'folder'
+        ? t('tree.prompt.folderPlaceholder', 'subfolder-name')
+        : t('tree.prompt.filePlaceholder', 'note (.md appended if omitted)');
       input.value = '';
       document.getElementById('tree-prompt-error').textContent = '';
       const modal = document.getElementById('tree-prompt-modal');
@@ -18097,18 +18333,18 @@
       const errBox = document.getElementById('tree-prompt-error');
       const name = (input.value || '').trim();
       if (!name) {
-        errBox.textContent = 'name is required';
+        errBox.textContent = t('tree.prompt.nameRequired', 'name is required');
         input.focus();
         return;
       }
       if (name.includes('/') || name.includes('\\')) {
-        errBox.textContent = 'name may not contain path separators';
+        errBox.textContent = t('tree.prompt.noSeparators', 'name may not contain path separators');
         return;
       }
       const endpoint = kind === 'folder' ? '/api/file/new-folder' : '/api/file/new-file';
       const submitBtn = document.getElementById('tree-prompt-submit');
       submitBtn.disabled = true;
-      submitBtn.textContent = 'creating…';
+      submitBtn.textContent = t('tree.prompt.creating', 'creating…');
       try {
         const r = await fetch(endpoint, {
           method: 'POST',
@@ -18132,7 +18368,7 @@
         errBox.textContent = e.message || String(e);
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Create';
+        submitBtn.textContent = t('tree.prompt.create', 'Create');
       }
     }
     window.submitTreePrompt = submitTreePrompt;
@@ -18552,7 +18788,8 @@
         handle.className = 'hl-handle hl-handle-' + h.color;
         handle.dataset.hlId = id;
         handle.textContent = 'i';
-        handle.title = `${h.color} highlight — click to manage`;
+        handle.title = t('review.hl.handle', '{color} highlight — click to manage')
+          .replace('{color}', () => h.color);
         handle.addEventListener('mousedown', (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -18945,7 +19182,7 @@
       const bar = document.getElementById('review-undo-bar');
       REVIEW_LAST_AGENT_WRITE = path;
       const lead = document.getElementById('review-undo-lead');
-      if (lead) lead.textContent = opts.lead || 'agent edited';
+      if (lead) lead.textContent = opts.lead || t('review.undo.lead', 'agent edited');
       document.getElementById('review-undo-path').textContent = path;
       bar.hidden = false;
       // Re-render the document so the user can see the agent's edit.
@@ -19110,9 +19347,11 @@
       if (!ta) return;
       if (ta.value !== RE_PRISTINE) {
         const ok = await confirmOverlay({
-          title: 'Revert changes?',
-          message: 'Discard all unsaved changes and revert to the file’s contents on disk?',
-          confirmLabel: 'revert', cancelLabel: 'keep editing',
+          title: t('confirm.revert.title', 'Revert changes?'),
+          message: t('confirm.revert.message',
+            'Discard all unsaved changes and revert to the file’s contents on disk?'),
+          confirmLabel: t('confirm.revert.ok', 'revert'),
+          cancelLabel: t('confirm.discard.cancel', 'keep editing'),
         });
         if (!ok) return;
       }
@@ -19316,9 +19555,12 @@
 
     async function customizeForProject(path) {
       const ok = await confirmOverlay({
-        title: 'Customize for this project?',
-        message: 'Break the symlink and create an editable project-local copy of “' + path + '”?',
-        confirmLabel: 'customize', cancelLabel: 'cancel',
+        title: t('confirm.customize.title', 'Customize for this project?'),
+        message: t('confirm.customize.message',
+          'Break the symlink and create an editable project-local copy of “{path}”?')
+          .replace('{path}', () => path),
+        confirmLabel: t('confirm.customize.ok', 'customize'),
+        cancelLabel: t('misc.cancel', 'cancel'),
       });
       if (!ok) return;
       const fd = new FormData();
@@ -19334,9 +19576,11 @@
 
     async function markRequestDone(path) {
       const ok = await confirmOverlay({
-        title: 'Mark request done?',
-        message: 'Mark this request complete and move it to rness/requests/done/?',
-        confirmLabel: 'mark done', cancelLabel: 'cancel',
+        title: t('confirm.markDone.title', 'Mark request done?'),
+        message: t('confirm.markDone.message',
+          'Mark this request complete and move it to rness/requests/done/?'),
+        confirmLabel: t('confirm.markDone.ok', 'mark done'),
+        cancelLabel: t('misc.cancel', 'cancel'),
       });
       if (!ok) return;
       const fd = new FormData();
@@ -19473,8 +19717,9 @@
       return !!(e && e.available);
     }
     function convertTargetReason(ext) {
-      return 'needs ' + convertTargetEngine(ext) +
-        ', which ships with enough — re-run update-enough to repair this environment';
+      return t('convert.targetReason',
+        'needs {engine}, which ships with enough — re-run update-enough to repair this environment')
+        .replace('{engine}', () => convertTargetEngine(ext));
     }
 
     // ---- §5.1 tree badges ------------------------------------------
@@ -19484,22 +19729,22 @@
     function convertBadgeTitle(state, name, twin) {
       switch (state) {
         case 'fresh':
-          return name + ' — converted; you are reading ' + twin +
-            ' and the original is untouched';
+          return name + t('convert.badge.fresh', ' — converted; you are reading {twin} and the original is untouched')
+            .replace('{twin}', () => twin);
         case 'edited':
-          return name + ' — edited: the twin has changes the original doesn’t. ' +
-            'Export changes to write them back.';
+          return name + t('convert.badge.edited',
+            ' — edited: the twin has changes the original doesn’t. Export changes to write them back.');
         case 'stale':
-          return name + ' — changed outside enough since the conversion';
+          return name + t('convert.badge.stale', ' — changed outside enough since the conversion');
         case 'conflict':
-          return name + ' — conflict: both ' + name + ' and its twin changed ' +
-            'since the conversion';
+          return name + t('convert.badge.conflict', ' — conflict: both {name} and its twin changed since the conversion')
+            .replace('{name}', () => name);
         case 'engine-missing':
-          return name + ' — enough can’t read this format yet; install the PDF extra ' +
-            '(UI window → extras)';
+          return name + t('convert.badge.engineMissing',
+            ' — enough can’t read this format yet; install the PDF extra (UI window → extras)');
         default:
-          return name + ' — click to open as markdown; enough writes an editable ' +
-            'twin beside it';
+          return name + t('convert.badge.unconverted',
+            ' — click to open as markdown; enough writes an editable twin beside it');
       }
     }
 
@@ -19572,7 +19817,7 @@
 
     function convertShowIntro(path, spec, opts = {}) {
       const name = cvBase(path);
-      const label = (spec && spec.label) || 'this kind of file';
+      const label = (spec && spec.label) || t('convert.thisKindOfFile', 'this kind of file');
       const modal = document.getElementById('convert-intro-modal');
       const titleEl = document.getElementById('convert-intro-title');
       const bodyEl = document.getElementById('convert-intro-body');
@@ -19581,28 +19826,23 @@
       setIcon(document.getElementById('convert-intro-icon'),
         opts.engineMissing ? 'twin-off' : 'twin-on');
       if (opts.engineMissing) {
-        titleEl.textContent = 'opening ' + cvArticle(label) + label + ' needs an extra';
+        titleEl.textContent = t('convert.intro.needsExtra', 'opening {kind} needs an extra')
+          .replace('{kind}', () => cvArticle(label) + label);
         bodyEl.innerHTML =
-          'enough can’t read ' + escapeHtml(cvArticle(label) + label) +
-          ' yet — that takes the <strong>PDF extra</strong>: the document ' +
-          'reader plus its layout and table models. Budget about 250 MB to ' +
-          'download and about 1 GB on disk, plus about 0.7 GB of ' +
-          'model weights the first time. <em>Writing</em> PDFs already ships ' +
-          'with enough; this extra is only for reading them (and PowerPoint ' +
-          'decks and Excel workbooks).';
+          t('convert.intro.engineMissingBody',
+            'enough can’t read {kind} yet — that takes the <strong>PDF extra</strong>: the document reader plus its layout and table models. Budget about 250 MB to download and about 1 GB on disk, plus about 0.7 GB of model weights the first time. <em>Writing</em> PDFs already ships with enough; this extra is only for reading them (and PowerPoint decks and Excel workbooks).')
+            .replace('{kind}', () => escapeHtml(cvArticle(label) + label));
         noteEl.hidden = true;
         installRow.hidden = false;
         _convertIntroOk = null;
       } else {
-        titleEl.textContent = 'opening ' + cvArticle(label) + label;
+        titleEl.textContent = t('convert.intro.opening', 'opening {kind}')
+          .replace('{kind}', () => cvArticle(label) + label);
         bodyEl.innerHTML =
-          'enough doesn’t display ' + escapeHtml(cvArticle(label) + label) +
-          ' directly. When you open <code>' + escapeHtml(name) + '</code>, ' +
-          'enough writes a markdown <strong>twin</strong> beside it — ' +
-          '<code>' + escapeHtml(name) + '.md</code> — and the twin is what ' +
-          'you read and edit here. Your original is never touched until you ' +
-          'choose <strong>export changes</strong>, which either overwrites ' +
-          'it (with undo) or writes a new datestamped copy next to it.';
+          t('convert.intro.body',
+            'enough doesn’t display {kind} directly. When you open <code>{name}</code>, enough writes a markdown <strong>twin</strong> beside it — <code>{name}.md</code> — and the twin is what you read and edit here. Your original is never touched until you choose <strong>export changes</strong>, which either overwrites it (with undo) or writes a new datestamped copy next to it.')
+            .replace('{kind}', () => escapeHtml(cvArticle(label) + label))
+            .split('{name}').join(escapeHtml(name));
         const notes = spec && spec.notes;
         noteEl.textContent = notes || '';
         noteEl.hidden = !notes;
@@ -19968,8 +20208,9 @@
       });
       sel.value = chosen || targets[0];
       document.getElementById('convert-export-lead').innerHTML =
-        'Writing <code>' + escapeHtml(cvBase(d.twin)) + '</code> back out. ' +
-        'Your original is only touched if you pick overwrite.';
+        t('convert.export.lead',
+          'Writing <code>{twin}</code> back out. Your original is only touched if you pick overwrite.')
+          .replace('{twin}', () => escapeHtml(cvBase(d.twin)));
       const syncRow = document.getElementById('convert-export-sync-row');
       const syncOk = !!(d.spec && d.spec.sync_ok);
       syncRow.hidden = !syncOk;
@@ -20009,9 +20250,9 @@
       const note = document.getElementById('convert-export-note');
       const parts = [];
       if (d.spec && d.spec.notes) parts.push(d.spec.notes);
-      if (target === '.pdf') parts.push('PDF export re-typesets from markdown with typst');
+      if (target === '.pdf') parts.push(t('convert.export.pdfNote', 'PDF export re-typesets from markdown with typst'));
       if (canOverwrite && (target === '.docx' || target === '.odt')) {
-        parts.push('styles, page size and any headers/footers are taken from the original');
+        parts.push(t('convert.export.styleNote', 'styles, page size and any headers/footers are taken from the original'));
       }
       note.textContent = parts.join(' · ');
       note.hidden = !parts.length;
@@ -20116,15 +20357,17 @@
       _convertConflict = { original, twin };
       const modal = document.getElementById('convert-conflict-modal');
       document.getElementById('convert-conflict-title').textContent =
-        opts.title || 'changed on both sides';
+        opts.title || t('convert.conflict.title', 'changed on both sides');
       document.getElementById('convert-conflict-body').innerHTML =
         opts.reason
-          ? escapeHtml(String(opts.reason)) + ' Pick which copy wins:'
-          : '<code>' + escapeHtml(cvBase(original)) + '</code> changed outside ' +
-            'enough, and your twin <code>' + escapeHtml(cvBase(twin)) + '</code> ' +
-            'has changes of its own. Pick which copy wins:';
+          ? escapeHtml(String(opts.reason)) + t('convert.conflict.pick', ' Pick which copy wins:')
+          : t('convert.conflict.body',
+            '<code>{original}</code> changed outside enough, and your twin <code>{twin}</code> has changes of its own. Pick which copy wins:')
+            .replace('{original}', () => escapeHtml(cvBase(original)))
+            .replace('{twin}', () => escapeHtml(cvBase(twin)));
       document.getElementById('convert-conflict-export-sub').textContent =
-        'write the twin over ' + cvBase(original) + '; undo available afterwards';
+        t('convert.conflict.exportSub', 'write the twin over {original}; undo available afterwards')
+          .replace('{original}', () => cvBase(original));
       document.getElementById('convert-conflict-error').hidden = true;
       modal.classList.remove('hidden');
       modal.setAttribute('aria-hidden', 'false');
@@ -20244,8 +20487,8 @@
       convertPaintBlobView();
       modePush('blobview', {
         icon: 'file', onExit: () => convertCloseBlobView(),
-        iconTitle: 'image · ' + cvBase(path),
-        exitTitle: 'close the image viewer',
+        iconTitle: t('modes.image.icon', 'image · {name}').replace('{name}', () => cvBase(path)),
+        exitTitle: t('modes.image.exit', 'close the image viewer'),
       });
     }
 
@@ -20264,8 +20507,8 @@
       convertPaintBlobView();
       modePush('blobview', {
         icon: 'view-original', onExit: () => convertCloseBlobView(),
-        iconTitle: 'the original · ' + cvBase(original),
-        exitTitle: 'back to the twin',
+        iconTitle: t('modes.original.icon', 'the original · {name}').replace('{name}', () => cvBase(original)),
+        exitTitle: t('modes.original.exit', 'back to the twin'),
       });
     }
 
@@ -20299,7 +20542,7 @@
         frame.src = url;
         frame.title = cvBase(b.path);
         wrap.appendChild(frame);
-        hint.textContent = 'the original, rendered by your browser — read-only';
+        hint.textContent = t('convert.blob.readOnly', 'the original, rendered by your browser — read-only');
       } else {
         const stage = document.createElement('div');
         stage.className = 'bv-stage';
@@ -20311,16 +20554,16 @@
         img.addEventListener('load', () => {
           dimEl.textContent = '· ' + img.naturalWidth + '×' + img.naturalHeight;
         });
-        img.addEventListener('error', () => { dimEl.textContent = '· could not be displayed'; });
+        img.addEventListener('error', () => { dimEl.textContent = t('convert.blob.undisplayable', '· could not be displayed'); });
         stage.appendChild(img);
         stage.addEventListener('click', () => {
           const actual = wrap.classList.toggle('actual');
           hint.textContent = actual
-            ? 'actual size — click to fit the panel'
-            : 'fit to width — click for actual size';
+            ? t('convert.blob.actualSize', 'actual size — click to fit the panel')
+            : t('convert.blob.fitWidth', 'fit to width — click for actual size');
         });
         wrap.appendChild(stage);
-        hint.textContent = 'fit to width — click for actual size';
+        hint.textContent = t('convert.blob.fitWidth', 'fit to width — click for actual size');
       }
       wrap.appendChild(hint);
       body.appendChild(wrap);
@@ -20346,7 +20589,7 @@
       const panel = document.getElementById('preview');
       if (panel) panel.classList.remove('open');
       const title = document.getElementById('preview-title');
-      if (title) title.textContent = 'preview';
+      if (title) title.textContent = t('review.previewTitle', 'preview');
       if (!opts.silent && back) openReadEdit(back, { size: 'mini', face: 'read' });
     }
 
@@ -20382,45 +20625,46 @@
       const job = CONVERT_INSTALL_JOB || st.job || null;
       const running = !!(job && job.state === 'running');
       const docling = ((CONVERT_FORMATS && CONVERT_FORMATS.engines) || {}).docling || {};
-      const sizes = 'docling plus its layout and table models: about 250 MB to ' +
-        'download, about 1 GB on disk, and about 0.7 GB of model ' +
-        'weights on first install. Writing PDFs already ships with enough — ' +
-        'this extra is for reading PDFs, PowerPoint decks and Excel workbooks.';
+      const sizes = t('prefs.extras.sizes',
+        'docling plus its layout and table models: about 250 MB to download, about 1 GB on disk, and about 0.7 GB of model weights on first install. Writing PDFs already ships with enough — this extra is for reading PDFs, PowerPoint decks and Excel workbooks.');
       btn.disabled = false;
       box.classList.toggle('showing-log', running || !!(job && job.state === 'failed'));
       if (running) {
-        stateEl.textContent = 'installing… ' + (job.message || '');
+        stateEl.textContent = t('prefs.extras.installing', 'installing… ') + (job.message || '');
         stateEl.className = 'cv-extras-state busy';
-        btn.textContent = 'installing…';
+        btn.textContent = t('prefs.extras.btn.installing', 'installing…');
         btn.disabled = true;
-        note.textContent = 'uv is resolving and downloading; this can take a while ' +
-          'on a slow link. A dropped connection resumes.';
+        note.textContent = t('prefs.extras.note.installing',
+          'uv is resolving and downloading; this can take a while on a slow link. A dropped connection resumes.');
         return;
       }
-      const failed = (job && job.state === 'failed') ? (job.error || 'install failed')
+      const failed = (job && job.state === 'failed')
+        ? (job.error || t('prefs.extras.installFailed', 'install failed'))
         : (st.last_error || null);
       if (st.installed) {
         const ready = !!docling.available;
-        stateEl.textContent = ready ? 'installed' : 'installed — not active yet';
+        stateEl.textContent = ready
+          ? t('prefs.extras.state.installed', 'installed')
+          : t('prefs.extras.state.notActive', 'installed — not active yet');
         stateEl.className = 'cv-extras-state ' + (ready ? 'ok' : 'busy');
-        btn.textContent = 'reinstall';
+        btn.textContent = t('prefs.extras.btn.reinstall', 'reinstall');
         note.textContent = ready
           ? sizes
           : (docling.models === false
-            ? 'the layout and table model weights aren’t on disk yet — reinstall to fetch them.'
-            : 'the reader is installed; this build has not switched the engine on yet.');
+            ? t('prefs.extras.note.noModels', 'the layout and table model weights aren’t on disk yet — reinstall to fetch them.')
+            : t('prefs.extras.note.notSwitchedOn', 'the reader is installed; this build has not switched the engine on yet.'));
         return;
       }
       if (failed) {
-        stateEl.textContent = 'failed';
+        stateEl.textContent = t('prefs.extras.state.failed', 'failed');
         stateEl.className = 'cv-extras-state bad';
-        btn.textContent = 'retry';
+        btn.textContent = t('prefs.extras.btn.retry', 'retry');
         note.textContent = String(failed);
         return;
       }
-      stateEl.textContent = 'not installed';
+      stateEl.textContent = t('prefs.extras.state.notInstalled', 'not installed');
       stateEl.className = 'cv-extras-state';
-      btn.textContent = 'install';
+      btn.textContent = t('prefs.extras.btn.install', 'install');
       note.textContent = sizes;
     }
 
@@ -21054,8 +21298,9 @@
       // Whichever way it goes, the markers say what they do.
       body.querySelectorAll('sup.fn-ref').forEach((sup) => {
         if (sup.closest('.fn-layer')) return;
-        sup.title = FN_INLINE ? 'footnote — the card is in the margin'
-          : 'footnote — click to read it';
+        sup.title = FN_INLINE
+          ? t('fn.marker.margin', 'footnote — the card is in the margin')
+          : t('fn.marker.click', 'footnote — click to read it');
       });
       if (!FN_INLINE) return;
       const layer = document.createElement('div');
@@ -21131,7 +21376,9 @@
       acts.hidden = !editing || !fnCardDirty(card);
       setIcon(img, editing ? 'read-eye' : 'edit-pencil');
       const btn = card.querySelector('.fn-card-btn');
-      btn.title = editing ? 'done — save and read it' : 'edit this note';
+      btn.title = editing
+        ? t('fn.card.done', 'done — save and read it')
+        : t('fn.card.edit', 'edit this note');
       card.dataset.face = face;
       if (editing) ta.focus();
       if (FN_INLINE) positionFootnoteCards();
@@ -21149,13 +21396,16 @@
       const num = document.createElement('span');
       num.className = 'fn-card-num' + (note.named ? ' fn-named' : '');
       num.textContent = note.shown;
-      if (note.named) num.title = '[^' + note.label + '] — a named note, never renumbered';
+      if (note.named) {
+        num.title = t('fn.card.named', '[^{label}] — a named note, never renumbered')
+          .replace('{label}', () => note.label);
+      }
       const spacer = document.createElement('span');
       spacer.className = 'fn-card-spacer';
       const faceBtn = document.createElement('button');
       faceBtn.type = 'button';
       faceBtn.className = 'fn-card-btn';
-      faceBtn.title = 'edit this note';
+      faceBtn.title = t('fn.card.edit', 'edit this note');
       const faceImg = document.createElement('img');
       faceImg.className = 'svg-icon';
       faceImg.alt = '';
@@ -21169,13 +21419,14 @@
       const view = document.createElement('div');
       view.className = 'fn-card-body' + (note.body ? '' : ' fn-empty');
       if (note.body) view.innerHTML = fnRenderBody(note.body);
-      else view.textContent = 'no note yet — click the pencil to write one';
+      else view.textContent = t('fn.card.empty', 'no note yet — click the pencil to write one');
 
       const ta = document.createElement('textarea');
       ta.hidden = true;
       ta.spellcheck = false;
       ta.value = note.body || '';
-      ta.setAttribute('aria-label', 'footnote ' + note.shown);
+      ta.setAttribute('aria-label', t('fn.card.aria', 'footnote {n}')
+        .replace('{n}', () => String(note.shown)));
 
       const acts = document.createElement('div');
       acts.className = 'fn-card-actions';
@@ -21183,10 +21434,10 @@
       const save = document.createElement('button');
       save.type = 'button';
       save.className = 'primary';
-      save.textContent = 'save';
+      save.textContent = t('misc.save', 'save');
       const cancel = document.createElement('button');
       cancel.type = 'button';
-      cancel.textContent = 'cancel';
+      cancel.textContent = t('misc.cancel', 'cancel');
       acts.appendChild(save);
       acts.appendChild(cancel);
 
@@ -21436,7 +21687,7 @@
       });
       const custom = document.createElement('option');
       custom.value = 'custom';
-      custom.textContent = 'custom…';
+      custom.textContent = t('paginate.customSize', 'custom…');
       size.appendChild(custom);
       size.value = defaults.size || 'letter';
 
@@ -21550,17 +21801,20 @@
       const headersOn = pgEl('pg-headers').checked;
       pgEl('pg-headers-fields').hidden = !headersOn;
       const pair = layout !== 'single';
-      pgEl('pg-header-left-label').textContent = pair ? 'left page' : 'head';
+      pgEl('pg-header-left-label').textContent = pair
+        ? t('paginate.leftPage', 'left page') : t('paginate.head', 'head');
       pgEl('pg-header-left-chapter-label').textContent = pair
-        ? 'use the chapter name on the left page' : 'use the chapter name';
+        ? t('paginate.useChapterLeft', 'use the chapter name on the left page')
+        : t('paginate.useChapter', 'use the chapter name');
       pgEl('pg-header-right-row').hidden = !pair;
       pgEl('pg-header-right-chapter-row').hidden = !pair;
       // "use the chapter name" is the same slot as free text, so it owns
       // the field while it is on.
       pgEl('pg-header-left').disabled = pgEl('pg-header-left-chapter').checked;
       pgEl('pg-header-right').disabled = pgEl('pg-header-right-chapter').checked;
-      pgEl('pg-stamp').textContent = 'writes ' + paginateStampName() +
-        ' beside the document — enough adds -1, -2 if that name is already taken today';
+      pgEl('pg-stamp').textContent =
+        t('paginate.stamp', 'writes {name} beside the document — enough adds -1, -2 if that name is already taken today')
+          .replace('{name}', () => paginateStampName());
       paginatePaintPreview();
     }
 
@@ -21622,8 +21876,9 @@
       if (layout === 'single') {
         const s = fit(dims.w, dims.h);
         stage.innerHTML = pgSheet(s.w, s.h, [1], dims, o, '');
-        cap.textContent = sizeLabel + ', ' + orient + ' — one page per sheet, ' +
-          o.margin + 'mm margins.';
+        cap.textContent = sizeLabel + ', ' + orient
+          + t('paginate.cap.single', ' — one page per sheet, {margin}mm margins.')
+            .replace('{margin}', () => String(o.margin));
         return;
       }
       // Sheet = the page rotated to landscape of itself; each half holds
@@ -21633,16 +21888,15 @@
         stage.innerHTML =
           pgSheet(s.w, s.h, [1, 2], dims, o, 'pg-stacked pg-flip') +
           pgSheet(s.w, s.h, [3, 4], dims, o, 'pg-stacked pg-flip pg-flip-b');
-        cap.textContent = sizeLabel + ' pages, two to a landscape sheet in reading ' +
-          'order: 1 2, then 3 4.';
+        cap.textContent = sizeLabel
+          + t('paginate.cap.twoup', ' pages, two to a landscape sheet in reading order: 1 2, then 3 4.');
         return;
       }
       stage.innerHTML =
         pgSheet(s.w, s.h, [8, 1], dims, o, 'pg-stacked pg-flip') +
         pgSheet(s.w, s.h, [2, 7], dims, o, 'pg-stacked pg-flip pg-flip-b');
-      cap.textContent = 'imposed for folding: on an 8-page example the first sheet ' +
-        'carries 8 and 1, its back 2 and 7. printed double-sided, folded and ' +
-        'stapled, it reads 1 to 8.';
+      cap.textContent = t('paginate.cap.booklet',
+        'imposed for folding: on an 8-page example the first sheet carries 8 and 1, its back 2 and 7. printed double-sided, folded and stapled, it reads 1 to 8.');
     }
 
     // ---- run --------------------------------------------------------
@@ -21697,15 +21951,18 @@
       cancel.disabled = true;
       err.hidden = true;
       progress.hidden = false;
-      progress.textContent = 'typesetting…';
+      progress.textContent = t('paginate.progress', 'typesetting…');
       try {
         const out = await convertApi('/api/paginate', paginateOptions());
         paginateClose();
         const pages = out.pages || 0;
         convertToast('paginate:' + out.pdf, {
           state: 'done', icon: 'paginate', square: true, title: cvBase(out.pdf),
-          message: pages + (pages === 1 ? ' page' : ' pages') + ' typeset' +
-            (out.viewer ? ' — opening it here' : ' — beside the document'),
+          message: pages + (pages === 1 ? t('paginate.toast.page', ' page') : t('paginate.toast.pages', ' pages'))
+            + t('paginate.toast.typeset', ' typeset')
+            + (out.viewer
+              ? t('paginate.toast.opening', ' — opening it here')
+              : t('paginate.toast.beside', ' — beside the document')),
           ttl: 9000,
         });
         htmx.ajax('GET', '/api/files', { target: '#tree', swap: 'innerHTML' });
@@ -21784,8 +22041,8 @@
       modePush('paginated', {
         icon: 'paginate',
         onExit: closePaginatedViewer,
-        iconTitle: 'paginated · ' + pdfName,
-        exitTitle: 'close the paged viewer',
+        iconTitle: t('modes.paginated.icon', 'paginated · {name}').replace('{name}', () => pdfName),
+        exitTitle: t('modes.paginated.exit', 'close the paged viewer'),
       });
       pvPaint();
     }
@@ -21814,9 +22071,11 @@
       img.src = pvPageUrl(PV.page);
       img.alt = 'page ' + PV.page + ' of ' + cvBase(PV.pdf);
       pvEl('pv-title').textContent = cvBase(PV.pdf);
-      pvEl('pv-badge').textContent = PV.source ? 'from ' + cvBase(PV.source) : '';
+      pvEl('pv-badge').textContent = PV.source
+        ? t('pv.from', 'from {name}').replace('{name}', () => cvBase(PV.source)) : '';
       pvEl('pv-badge').hidden = !PV.source;
-      pvEl('pv-count').textContent = 'page ' + PV.page + ' / ' + PV.pages;
+      pvEl('pv-count').textContent = t('pv.count', 'page {n} / {total}')
+        .replace('{n}', () => String(PV.page)).replace('{total}', () => String(PV.pages));
       pvEl('pv-prev').disabled = PV.page <= 1;
       pvEl('pv-next').disabled = PV.page >= PV.pages;
       // The next page is the one the reader is about to ask for.
@@ -21848,7 +22107,9 @@
       if (!root || !btn) return;
       const full = document.fullscreenElement === root;
       setIcon(btn.querySelector('img'), full ? 'full2mini' : 'mini2full');
-      btn.title = full ? 'leave fullscreen' : 'fullscreen';
+      btn.title = full
+        ? t('pv.full.leave', 'leave fullscreen')
+        : t('pv.full.enter', 'fullscreen');
     });
 
     // Arrow keys turn pages while the viewer is the top of the stack —
@@ -21908,17 +22169,26 @@
     // Relative phrasing for the icon tiles' one small line. Falls back to
     // the absolute date past a week, where "37 days ago" stops helping.
     function homeAgo(iso) {
-      const t = homeMs(iso);
-      if (t == null) return 'never edited';
-      const secs = Math.max(0, (Date.now() - t) / 1000);
-      if (secs < 90) return 'edited just now';
+      // `ms`, not `t` — `t()` is the i18n lookup and must stay reachable here.
+      const ms = homeMs(iso);
+      if (ms == null) return t('home.ago.never', 'never edited');
+      const secs = Math.max(0, (Date.now() - ms) / 1000);
+      if (secs < 90) return t('home.ago.justNow', 'edited just now');
       const mins = secs / 60;
-      if (mins < 60) return 'edited ' + Math.round(mins) + ' min ago';
+      if (mins < 60) return t('home.ago.mins', 'edited {n} min ago').replace('{n}', () => String(Math.round(mins)));
       const hrs = mins / 60;
-      if (hrs < 24) return 'edited ' + Math.round(hrs) + (Math.round(hrs) === 1 ? ' hour ago' : ' hours ago');
+      if (hrs < 24) {
+        return (Math.round(hrs) === 1
+          ? t('home.ago.hour', 'edited {n} hour ago')
+          : t('home.ago.hours', 'edited {n} hours ago')).replace('{n}', () => String(Math.round(hrs)));
+      }
       const days = hrs / 24;
-      if (days < 7) return 'edited ' + Math.round(days) + (Math.round(days) === 1 ? ' day ago' : ' days ago');
-      return 'edited ' + homeStamp(iso).slice(0, 10);
+      if (days < 7) {
+        return (Math.round(days) === 1
+          ? t('home.ago.day', 'edited {n} day ago')
+          : t('home.ago.days', 'edited {n} days ago')).replace('{n}', () => String(Math.round(days)));
+      }
+      return t('home.ago.on', 'edited {date}').replace('{date}', () => homeStamp(iso).slice(0, 10));
     }
 
     function homeNum(n) { return (Number(n) || 0).toLocaleString(); }
@@ -21939,7 +22209,7 @@
     function homeShowWait(msg) {
       const el = document.getElementById('home-wait');
       if (!el) return;
-      document.getElementById('home-wait-msg').textContent = msg || 'starting…';
+      document.getElementById('home-wait-msg').textContent = msg || t('home.wait.starting', 'starting…');
       el.hidden = false;
     }
     function homeWaitMsg(msg) {
@@ -21980,7 +22250,8 @@
       if (HOME_BUSY) return;
       const p = homeFind(path);
       HOME_BUSY = true;
-      homeShowWait('opening ' + ((p && p.name) || path.split('/').pop()) + '…');
+      homeShowWait(t('home.wait.opening', 'opening {name}…')
+        .replace('{name}', () => (p && p.name) || path.split('/').pop()));
       let js = {}, status = 0;
       try {
         const r = await fetch('/api/home/open', {
@@ -22017,15 +22288,14 @@
     async function homeCloseProject() {
       closeUIModal();
       const ok = await confirmOverlay({
-        title: 'close this project?',
-        message: 'the agent stops and the window goes back to the enough home '
-          + 'screen. the folder on disk is untouched, and you can reopen it '
-          + 'from there.',
-        confirmLabel: 'close project',
+        title: t('confirm.closeProject.title', 'close this project?'),
+        message: t('confirm.closeProject.message',
+          'the agent stops and the window goes back to the enough home screen. the folder on disk is untouched, and you can reopen it from there.'),
+        confirmLabel: t('confirm.closeProject.ok', 'close project'),
       });
       if (!ok) return;
       HOME_BUSY = true;
-      homeShowWait('closing the project…');
+      homeShowWait(t('home.wait.closing', 'closing the project…'));
       try {
         const r = await fetch('/api/close-project', { method: 'POST' });
         const js = await r.json().catch(() => ({}));
@@ -22158,7 +22428,9 @@
         .forEach((el) => {
           el.classList.toggle('busy', !!on);
           const cap = el.querySelector('.ht-name, .hl-add-label');
-          if (cap) cap.textContent = on ? (label || 'choosing…') : 'add a project';
+          if (cap) cap.textContent = on
+            ? (label || t('home.choosing', 'choosing…'))
+            : t('home.addProject', 'add a project');
         });
     }
 
@@ -22172,11 +22444,12 @@
     async function homeSetHidden(p, hidden) {
       if (hidden) {
         const ok = await confirmOverlay({
-          title: 'hide this project?',
-          message: '“' + (p.name || p.path.split('/').pop()) + '” comes off the '
-            + 'home screen until you turn on "hidden" up there. the folder on '
-            + 'disk (' + p.path + ') is not touched, and nothing in it changes.',
-          confirmLabel: 'hide it',
+          title: t('confirm.hideProject.title', 'hide this project?'),
+          message: t('confirm.hideProject.message',
+            '“{name}” comes off the home screen until you turn on "hidden" up there. the folder on disk ({path}) is not touched, and nothing in it changes.')
+            .replace('{name}', () => p.name || p.path.split('/').pop())
+            .replace('{path}', () => p.path),
+          confirmLabel: t('confirm.hideProject.ok', 'hide it'),
         });
         if (!ok) return;
       }
@@ -22250,23 +22523,25 @@
     }
 
     function homeTileTitle(p) {
-      const hide = p.hidden ? 'option-click to unhide' : 'option-click to hide';
+      const hide = p.hidden
+        ? t('home.tile.unhide', 'option-click to unhide')
+        : t('home.tile.hide', 'option-click to hide');
       if (p.missing) {
-        return p.path + '\n\nnot on disk right now — ' + hide + '.';
+        return p.path + '\n\n' + t('home.tile.missing', 'not on disk right now — ') + hide + '.';
       }
       const counts = p.counts || {};
       return p.path + '\n\n' + homeNum(counts.p) + ' ¶ · ' + homeNum(counts.w)
-        + ' words · ' + homeNum(counts.c) + ' characters'
+        + t('home.tile.words', ' words · ') + homeNum(counts.c) + t('home.tile.characters', ' characters')
         + (p.description ? '\n\n' + p.description : '')
-        + '\n\nclick for a map of the folder · double-click to open · ' + hide;
+        + '\n\n' + t('home.tile.actions', 'click for a map of the folder · double-click to open · ') + hide;
     }
 
     // The one small line under a tile name / in the "last updated" cell.
     function homeWhenText(p, absolute) {
       const base = p.missing
-        ? 'not on disk'
+        ? t('home.when.missing', 'not on disk')
         : (absolute ? homeStamp(p.last_edited) : homeAgo(p.last_edited));
-      return p.hidden ? 'hidden · ' + base : base;
+      return p.hidden ? t('home.hiddenChip', 'hidden') + ' · ' + base : base;
     }
 
     function homeBuildGrid(rows) {
@@ -22294,40 +22569,45 @@
       const add = document.createElement('div');
       add.className = 'home-tile add';
       add.dataset.add = '1';
-      add.title = 'enough-ify a new folder and open it';
+      add.title = t('home.addProject.title', 'enough-ify a new folder and open it');
       const aic = document.createElement('div');
       aic.className = 'ht-icon';
       aic.appendChild(homeIconEl('project-add'));
       const anm = document.createElement('div');
       anm.className = 'ht-name';
-      anm.textContent = 'add a project';
+      anm.textContent = t('home.addProject', 'add a project');
       add.append(aic, anm);
       grid.appendChild(add);
       return grid;
     }
 
-    const HOME_COLS = [
-      { key: 'name', label: 'name', num: false },
-      { key: 'p', label: '¶', num: true, title: 'paragraphs' },
-      { key: 'w', label: 'W', num: true, title: 'words' },
-      { key: 'c', label: 'C', num: true, title: 'characters' },
-      { key: 'last_edited', label: 'last updated', num: false },
-      { key: 'created_at', label: 'created', num: false },
-    ];
+    // Built per render, not once: t() has to run AFTER the catalog lands and
+    // again after a live language switch.
+    function homeCols() {
+      return [
+        { key: 'name', label: t('home.col.name', 'name'), num: false },
+        { key: 'p', label: '¶', num: true, title: t('home.col.paragraphs', 'paragraphs') },
+        { key: 'w', label: 'W', num: true, title: t('home.col.words', 'words') },
+        { key: 'c', label: 'C', num: true, title: t('home.col.characters', 'characters') },
+        { key: 'last_edited', label: t('home.col.lastUpdated', 'last updated'), num: false },
+        { key: 'created_at', label: t('home.col.created', 'created'), num: false },
+      ];
+    }
 
     function homeBuildList(rows) {
       const list = document.createElement('div');
       list.className = 'home-list';
       const head = document.createElement('div');
       head.className = 'hl-head';
-      HOME_COLS.forEach((col) => {
+      homeCols().forEach((col) => {
         const b = document.createElement('button');
         b.type = 'button';
         b.dataset.sort = col.key;
         b.className = (col.num ? 'num' : '') + (HOME_SORT.key === col.key ? ' sorted' : '');
         b.textContent = col.label
           + (HOME_SORT.key === col.key ? (HOME_SORT.dir < 0 ? ' ▾' : ' ▴') : '');
-        b.title = (col.title ? col.title + ' — ' : '') + 'sort by ' + col.label;
+        b.title = (col.title ? col.title + ' — ' : '')
+          + t('home.col.sortBy', 'sort by {col}').replace('{col}', () => col.label);
         head.appendChild(b);
       });
       list.appendChild(head);
@@ -22365,11 +22645,11 @@
       add.type = 'button';
       add.className = 'hl-add';
       add.dataset.add = '1';
-      add.title = 'enough-ify a new folder and open it';
+      add.title = t('home.addProject.title', 'enough-ify a new folder and open it');
       add.appendChild(homeIconEl('project-add'));
       const lbl = document.createElement('span');
       lbl.className = 'hl-add-label';
-      lbl.textContent = 'add a project';
+      lbl.textContent = t('home.addProject', 'add a project');
       add.appendChild(lbl);
       list.appendChild(add);
       return list;
@@ -22383,27 +22663,27 @@
       const missing = rows.filter((p) => p.missing).length;
       const hiddenCount = HOME_PROJECTS.filter((p) => p.hidden).length;
       document.getElementById('home-count').textContent =
-        n === 0 ? '' : (n + (n === 1 ? ' folder' : ' folders')
-          + (missing ? ' · ' + missing + ' not on disk' : '')
-          + (hiddenCount && !HOME_SHOW_HIDDEN ? ' · ' + hiddenCount + ' hidden' : ''));
+        n === 0 ? '' : (n + (n === 1 ? t('home.count.folder', ' folder') : t('home.count.folders', ' folders'))
+          + (missing ? ' · ' + missing + t('home.count.notOnDisk', ' not on disk') : '')
+          + (hiddenCount && !HOME_SHOW_HIDDEN ? ' · ' + hiddenCount + t('home.count.hidden', ' hidden') : ''));
       document.getElementById('home-view-icons').classList.toggle('on', HOME_VIEW === 'icons');
       document.getElementById('home-view-list').classList.toggle('on', HOME_VIEW === 'list');
       const chip = document.getElementById('home-show-hidden');
       chip.classList.toggle('on', HOME_SHOW_HIDDEN);
       chip.setAttribute('aria-pressed', HOME_SHOW_HIDDEN ? 'true' : 'false');
-      chip.textContent = hiddenCount ? ('hidden · ' + hiddenCount) : 'hidden';
+      chip.textContent = hiddenCount
+        ? (t('home.hiddenChip', 'hidden') + ' · ' + hiddenCount)
+        : t('home.hiddenChip', 'hidden');
       chip.title = HOME_SHOW_HIDDEN
-        ? 'hide the hidden projects again'
-        : 'show the projects you’ve hidden (option-click a tile to hide one)';
+        ? t('home.hiddenChip.on', 'hide the hidden projects again')
+        : t('home.hiddenChip.off', 'show the projects you’ve hidden (option-click a tile to hide one)');
       body.innerHTML = '';
       if (!n) {
         const empty = document.createElement('div');
         empty.className = 'home-empty';
         empty.textContent = HOME_PROJECTS.length
-          ? ('every project you have is hidden — the “hidden” chip up there '
-            + 'brings them back.')
-          : ('no projects yet — add a folder to start one. anything you '
-            + 'enough-ify from the command line shows up here too.');
+          ? t('home.empty.allHidden', 'every project you have is hidden — the “hidden” chip up there brings them back.')
+          : t('home.empty.none', 'no projects yet — add a folder to start one. anything you enough-ify from the command line shows up here too.');
         body.appendChild(empty);
       }
       body.appendChild(HOME_VIEW === 'list' ? homeBuildList(rows) : homeBuildGrid(rows));

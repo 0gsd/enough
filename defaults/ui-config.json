@@ -8,9 +8,12 @@
     "preserved across upstream git pulls; edits to this template file",
     "affect only future installs.",
     "",
-    "Two knobs users can change:",
+    "Knobs users can change:",
     "  current.theme  \u2014 name of an entry under 'themes' below",
     "  current.font   \u2014 name of an entry under 'fonts' below",
+    "  ui_language    \u2014 UI + help language: en, fr, es, de, zh, ja",
+    "    (chrome and help only; project files and agent traffic stay",
+    "    in whatever language you write \u2014 the agent reads English best)",
     "  help_highlight_on_new_project \u2014 light up the (?) help",
     "    bubbles on a project's first launch until each is viewed (default true)",
     "",
@@ -30,6 +33,7 @@
     "font": "mono"
   },
   "help_highlight_on_new_project": true,
+  "ui_language": "en",
   "fonts": {
     "mono": {
       "label": "Monospace (SF Mono)",

@@ -2,7 +2,7 @@ Hi, this is Graham, the creator of enough. This document -- except this part, I 
 
 # the enough help center
 
-> Everything you can do with enough, in one place. Written against enough **0.2.5**, including the home screen (every project you've ever started, in one list, with a way in and a way back out — section 2), the convert round (PDFs, Word documents, ebooks, decks and workbooks open as editable markdown twins, with export, sync, and an image viewer — section 6), the skills round (analyzer's new audit mode, the `anything-finder` skill, and the first-use audit that reads any skill enough didn't ship before it's allowed in), the August 2026 round (seven local models with feasibility-checked installs, and **enough.app** — the signed, notarized desktop application) and the July 2026 interface round (the mode stack, per-folder help bubbles, girraph→merirmaid mirrors). Where this document and the app in front of you disagree, the app is right and this document has a bug — corrections welcome at [enough.support](https://enough.support).
+> Everything you can do with enough, in one place. Written against enough **0.3.0**, including the home screen (every project you've ever started, in one list, with a way in and a way back out — section 2), the convert round (PDFs, Word documents, ebooks, decks and workbooks open as editable markdown twins, with export, sync, and an image viewer — section 6), the skills round (analyzer's new audit mode, the `anything-finder` skill, and the first-use audit that reads any skill enough didn't ship before it's allowed in), the August 2026 round (seven local models with feasibility-checked installs, and **enough.app** — the signed, notarized desktop application), the July 2026 interface round (the mode stack, per-folder help bubbles, girraph→merirmaid mirrors), and the 0.3.0 preferences round (per-project ui and text scaling, and the interface + help in six languages — section 9). Where this document and the app in front of you disagree, the app is right and this document has a bug — corrections welcome at [enough.support](https://enough.support).
 
 enough is a personal language system that runs on your own machine. You point it at a folder, talk to it, and it helps you plan, write, review, research, and translate. The models are local by default. Your files stay yours. And nearly everything you'll see it do is defined in plain markdown files that you can open, read, and change.
 
@@ -83,9 +83,11 @@ If you'd rather never type the command, two launchers ship in `~/enough/shortcut
 
 This file is the long-form manual. You also have:
 
-- **In-harness help** — the `(?)` bubbles throughout the interface, each explaining the thing it's attached to: a *what*, a *how*, and an *ideas* list. See section 9.5.
-- **The cheat sheets** — keyboard shortcuts and markdown syntax, one click away in the UI window. See section 9.4.
+- **In-harness help** — the `(?)` bubbles throughout the interface, each explaining the thing it's attached to: a *what*, a *how*, and an *ideas* list. See section 9.6.
+- **The cheat sheets** — keyboard shortcuts and markdown syntax, one click away in the UI window. See section 9.5.
 - **[enough.support](https://enough.support)** — the community forum: install help, workflow show-and-tell, and people who will happily help you build the customizations this manual keeps nudging you toward.
+
+And all of it — this manual, the bubbles, the interface around them — reads in six languages: English, French, Spanish, German, Chinese, and Japanese. Section 9.4 has the dropdown and the fine print.
 
 ---
 
@@ -519,7 +521,13 @@ Both are remembered **per project folder** — the manuscript you read from acro
 
 The limits breathe with your screen: roughly 0.5× to 2× on today's displays, tightening in a small window so the interface always keeps enough room to be itself, loosening on very large, very dense screens (the 8K wall of 2046 gets 3×). When a step would cross the line, the button wiggles, the number pulses red, and nothing changes — that's the whole error message.
 
-### 9.4 Cheat sheets
+### 9.4 Languages
+
+The interface speaks six: English, French, Spanish, German, Chinese, and Japanese. The **ui language** dropdown on the same row switches everything you're looking at — labels, tooltips, the `(?)` bubbles, this manual — live, no restart. The choice is machine-wide, riding `ui.json` the way the theme does, so home and every project agree on it.
+
+What it deliberately does *not* touch: your files, your chat, your agent. Talk to the agent in whatever language suits you — the local models are comfortable in all six of these — but enough keeps its own scaffolding (skills, paradigms, prompts, project files) in English, because that's the language the models read most reliably. A few generated things stay English too — lists drawn live from what's installed on *your* machine, like the skills in a bubble or the file-format table. And anywhere a translation hasn't caught up with a new English label, you'll see the English rather than a blank: less pretty, never broken. Spot one? That's a bug — [enough.support](https://enough.support) welcomes it.
+
+### 9.5 Cheat sheets
 
 Two columns of reference, right in the UI window.
 
@@ -542,7 +550,7 @@ Those are the shortcuts the interface itself handles, so they work in the app an
 
 **The markdown cheat sheet:** headings, lists, links, code, quotes — the whole quick reference, for anyone still getting fluent in markdown. Which is worth doing, since enough speaks it natively everywhere.
 
-### 9.5 In-harness help (IHH)
+### 9.6 In-harness help (IHH)
 
 The `(?)` bubbles scattered through the interface are the built-in help system: one bubble per concept — skills, roles, the paradigm selector, rness, io, knowledge, cacheawl, wikisink, the mode system, converted documents, and so on — each with a **what**, a **how**, and an **ideas** list. The skills, roles, and paradigms bubbles list what's actually installed in *your* project, and the converted-document bubble draws its table of file types from the app's own format registry — all generated live, so that help never drifts out of sync with reality. (The same table appears in section 6.2 of this manual, from the same source.)
 

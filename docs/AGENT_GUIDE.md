@@ -1684,7 +1684,9 @@ match the files as they stand.
 Three layers, all markdown (design formerly in docs/help-system-plan.md):
 
 - **`(?)` bubbles.** Content lives in one combined file,
-  `enough/static/help-docs.md` — one `## <id>` section per bubble, with
+  `enough/static/help-docs.md` (English; translations mirror it at
+  `static/i18n/<lang>/help-docs.md` — see docs/I18N.md before editing
+  either side) — one `## <id>` section per bubble, with
   `name:` / `path:` lines under the heading and `### what` / `### how` /
   `### ideas` bodies (inline HTML allowed; rendered through the existing
   `renderMarkdown()`). The tokens `{{skills-list}}` / `{{roles-list}}` /
@@ -1762,6 +1764,31 @@ never assign a raw `clientX` to a positioned element's style. Same
 deal in CSS for viewport units: every `vh/vw/vmin` length divides by
 `var(--uiz, 1)` (grep `/ var(--uiz` for the pattern) so real-viewport
 fits keep fitting.
+
+---
+
+## UI languages (i18n, 0.3.0)
+
+Chrome + help content ship in en/fr/es/de/zh/ja; everything the agent
+reads or writes stays English on purpose. **docs/I18N.md is the process
+doc — read it before touching any translated surface or any English
+string that has a `data-i18n*` key.** The short version:
+
+- Engine at the top of index.html's main script ("UI language (i18n
+  round)"): `t(key, english)`, `applyI18n()` over `data-i18n` /
+  `-title` / `-placeholder` / `-aria`, `setUILanguage()`; inline
+  English is the permanent fallback and gets memoized into
+  `data-i18n-src*` so switches round-trip live.
+- `enough/static/i18n/<lang>/{ui.json,help-docs.md,help-center.md}`;
+  `en/ui.json` is the canonical catalog and must stay byte-identical
+  to the inline English. The server (`UI_LANGUAGES`, `_ui_language()`)
+  whitelists codes, templates the boot language into `BOOT_UI_STATE`,
+  and serves translated manuals via `GET /api/help-center?lang=`.
+- `ui_language` is a top-level ui.json key (POST /api/ui-config,
+  validated like `home_view`).
+- **Every English string change must keep the catalogs in lockstep:**
+  `uv run python scripts/i18n_check.py` prints the exact per-language
+  to-do list, and `tests/test_i18n.py` fails CI until it's empty.
 
 ---
 
