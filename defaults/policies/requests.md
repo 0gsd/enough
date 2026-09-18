@@ -1,7 +1,7 @@
 # Policy: Request Tracking
 
-Long, multi-step jobs get tracked as plain-markdown files the agent
-maintains across turns. Simple single-turn Q&A does NOT need this.
+Long, multi-step jobs get tracked as plain-markdown files you maintain
+across turns. Simple single-turn Q&A does NOT need this.
 
 The request file doubles as the **durable state** across conversation
 resets — see `context-management.md` for how it's used to recover when

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" id="comp-eraser" viewBox="0 0 72 72">
+  <path d="M25 52 L12 39 L38 13 L59 34 L41 52 Z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round" />
+  <line x1="23" y1="28" x2="44" y2="49" stroke="#fff" stroke-width="3" fill="#fff" />
+  <line x1="12" y1="59" x2="60" y2="59" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="#fff" />
+</svg>

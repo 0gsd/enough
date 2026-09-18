@@ -2,11 +2,11 @@ Bonjour, ici Graham, le créateur d'enough. Ce document -- à part ce passage-ci
 
 # le centre d'aide d'enough
 
-> Tout ce que vous pouvez faire avec enough, en un seul endroit. Rédigé pour enough **0.3.0**, incluant l'écran d'accueil (tous les projets que vous avez jamais démarrés, dans une seule liste, avec une porte d'entrée et une porte de sortie — section 2), la passe de conversion (PDF, documents Word, ebooks, présentations et classeurs qui s'ouvrent comme des jumeaux markdown modifiables, avec export, synchronisation, et une visionneuse d'image — section 6), la passe des compétences (le nouveau mode audit d'analyzer, la compétence `anything-finder`, et l'audit au premier usage qui lit toute compétence non fournie par enough avant de l'autoriser), la passe d'août 2026 (sept modèles locaux avec des installations à faisabilité vérifiée, et **enough.app** — l'application de bureau signée et notariée), la passe d'interface de juillet 2026 (la pile de modes, les bulles d'aide par dossier, les reflets girraph→merirmaid), et la passe de préférences 0.3.0 (mise à l'échelle de l'ui et du texte par projet, et l'interface + l'aide en six langues — section 9). Là où ce document et l'application devant vous ne sont pas d'accord, c'est l'application qui a raison et ce document qui a un bug — les corrections sont bienvenues sur [enough.support](https://enough.support).
+> Tout ce que vous pouvez faire avec enough, en un seul endroit. Rédigé pour enough **0.3.5**, incluant la passe composure — le canevas qui est désormais le plancher de chaque projet, avec la conversation déplacée dans un panneau à côté (sections 4 et 5) ; les **readvisors**, c'est-à-dire le nouveau nom des rôles, menés par un readvisor en chef appelé Ed (section 16) ; les **conseils**, où plusieurs readvisors réfléchissent à une seule chose chacun leur tour, par écrit, pendant que vous regardez (section 17) ; et deux nouvelles compétences, `readvisory` et `scaffold` (section 18). Un projet que vous avez créé avant cette passe voit son dossier `rness/roles/` renommé en `rness/readvisors/` la prochaine fois que vous l'ouvrez, avec vos réglages activé/désactivé intacts (section 8). Également là, venu des passes précédentes : l'écran d'accueil (tous les projets que vous avez jamais démarrés, dans une seule liste, avec une porte d'entrée et une porte de sortie — section 2), la passe de conversion (PDF, documents Word, ebooks, présentations et classeurs qui s'ouvrent comme des jumeaux markdown modifiables, avec export, synchronisation, et une visionneuse d'image — section 7), la passe des compétences (le nouveau mode audit d'analyzer, la compétence `anything-finder`, et l'audit au premier usage qui lit toute compétence non fournie par enough avant de l'autoriser), la passe d'août 2026 (sept modèles locaux avec des installations à faisabilité vérifiée, et **enough.app** — l'application de bureau signée et notariée), la passe d'interface de juillet 2026 (la pile de modes, les bulles d'aide par dossier, les reflets girraph→merirmaid), et la passe de préférences 0.3.0 (mise à l'échelle de l'ui et du texte par projet, et l'interface + l'aide en six langues — section 10). Là où ce document et l'application devant vous ne sont pas d'accord, c'est l'application qui a raison et ce document qui a un bug — les corrections sont bienvenues sur [enough.support](https://enough.support).
 
 enough est un système de langage personnel qui tourne sur votre propre machine. Vous le pointez vers un dossier, vous lui parlez, et il vous aide à planifier, écrire, réviser, chercher, et traduire. Les modèles sont locaux par défaut. Vos fichiers restent les vôtres. Et presque tout ce que vous le verrez faire est défini dans de simples fichiers markdown que vous pouvez ouvrir, lire, et modifier.
 
-Gardez une idée en tête pendant votre lecture : **les fonctionnalités intégrées de ce manuel ne sont qu'une fraction de ce qu'enough peut faire.** Les paradigmes, rôles et compétences fournis d'origine sont un kit de démarrage — des exemples fonctionnels de trois mécanismes de personnalisation, pas leurs limites. Le but ultime, c'est que vous écriviez les vôtres, ou que vous les fassiez écrire par l'agent avec vous : un paradigme pour votre façon de planifier des essais, un rôle qui argumente comme votre lecteur le plus coriace, une compétence qui code votre style maison. La section 3 explique comment. C'est la section la plus importante de ce document, et le manuel n'arrêtera pas de vous y renvoyer.
+Gardez une idée en tête pendant votre lecture : **les fonctionnalités intégrées de ce manuel ne sont qu'une fraction de ce qu'enough peut faire.** Les paradigmes, readvisors et compétences fournis d'origine sont un kit de démarrage — des exemples fonctionnels de trois mécanismes de personnalisation, pas leurs limites. Le but ultime, c'est que vous écriviez les vôtres, ou que vous les fassiez écrire par votre readvisor en chef avec vous : un paradigme pour votre façon de planifier des essais, un readvisor qui argumente comme votre lecteur le plus coriace, une compétence qui code votre style maison. La section 3 explique comment. C'est la section la plus importante de ce document, et le manuel n'arrêtera pas de vous y renvoyer.
 
 ---
 
@@ -16,15 +16,15 @@ Gardez une idée en tête pendant votre lecture : **les fonctionnalités intégr
 
 - Un Mac avec Apple Silicon. (enough est construit et testé sur macOS. Le support Linux est prévu ; Windows est envisageable.)
 - De l'espace disque pour au moins un modèle — le plus petit fait environ 5 Go.
-- Aucun compte, aucune clé API, aucun abonnement. À moins que vous n'optiez plus tard pour l'emplacement de modèle cloud (section 13.2), tout tourne en local.
+- Aucun compte, aucune clé API, aucun abonnement. À moins que vous n'optiez plus tard pour l'emplacement de modèle cloud (section 14.2), tout tourne en local.
 
 ### 1.2 Installation
 
 Deux portes, une seule maison.
 
-**L'application — la voie courte.** Téléchargez le DMG `enough` depuis la page des releases, ouvrez-le, glissez **enough** dans Applications, et lancez. macOS signalera qu'il s'agit d'une application venue d'internet — elle est signée et notariée, donc c'est la sympathique boîte de dialogue bleue avec un bouton **Ouvrir**, une seule fois, pas un avertissement à contourner. Un guide de premier lancement prend le relais : il construit son propre environnement Python, vous montre la liste des modèles avec un verdict honnête sur ce qui tient sur *cette* machine (section 13.1), liste les extras optionnels que vous avez déjà, et vous remet à l'écran d'accueil pour choisir le dossier dans lequel vous voulez travailler (section 2). L'essentiel de l'attente, c'est le téléchargement des modèles. Pas de Terminal, pas de Homebrew, pas de git.
+**L'application — la voie courte.** Téléchargez le DMG `enough` depuis la page des releases, ouvrez-le, glissez **enough** dans Applications, et lancez. macOS signalera qu'il s'agit d'une application venue d'internet — elle est signée et notariée, donc c'est la sympathique boîte de dialogue bleue avec un bouton **Ouvrir**, une seule fois, pas un avertissement à contourner. Un guide de premier lancement prend le relais : il construit son propre environnement Python, vous montre la liste des modèles avec un verdict honnête sur ce qui tient sur *cette* machine (section 14.1), liste les extras optionnels que vous avez déjà, et vous remet à l'écran d'accueil pour choisir le dossier dans lequel vous voulez travailler (section 2). L'essentiel de l'attente, c'est le téléchargement des modèles. Pas de Terminal, pas de Homebrew, pas de git.
 
-L'application embarque son propre moteur d'inférence et Python. Les extras optionnels — saisie vocale, récupération de pages web, vérification grammaticale, traduction — restent des programmes séparés ; la page Extras du guide nomme chacun d'eux, ce qui se désactive sans lui, et comment l'obtenir. Rien n'est obligatoire, et rien ne s'installe dans votre dos. Un extra n'est même pas un programme séparé du tout : la **lecture de PDF** s'installe depuis l'intérieur d'enough quand vous le voulez (section 6.8).
+L'application embarque son propre moteur d'inférence et Python. Les extras optionnels — saisie vocale, récupération de pages web, vérification grammaticale, traduction — restent des programmes séparés ; la page Extras du guide nomme chacun d'eux, ce qui se désactive sans lui, et comment l'obtenir. Rien n'est obligatoire, et rien ne s'installe dans votre dos. Un extra n'est même pas un programme séparé du tout : la **lecture de PDF** s'installe depuis l'intérieur d'enough quand vous le voulez (section 7.8).
 
 **Le terminal — la voie longue, avec plus de leviers.** Clonez le dépôt, puis double-cliquez sur `install-enough.command` à l'intérieur du clone :
 
@@ -42,7 +42,7 @@ Le lanceur exécute `bootstrap.sh`, un installeur interactif en dix étapes qui 
 3. Installer les programmes auxiliaires sur lesquels s'appuie enough : `llama.cpp` (inférence de modèle locale), `whisper-cpp` (saisie vocale), `tor` (récupérations web anonymisées), et `harper` (vérification grammaticale locale, utilisée par la compétence analyzer). Les convertisseurs de documents — pandoc, pour transformer les pages web récupérées et les fichiers Word en markdown, et typst, pour écrire des PDF — ne sont plus sur cette liste : ils sont fournis à l'intérieur de l'environnement Python propre à enough, installé à l'étape 5, sur toutes les plateformes. Si vous avez par hasard votre propre pandoc installé via Homebrew, enough utilise celui-là à la place.
 4. Mettre en place `~/enough/`, le répertoire d'installation global.
 5. Préparer l'environnement Python (via `uv`).
-6. Télécharger les poids des modèles. Chaque modèle pris en charge est proposé un par un, avec sa taille et une vérification de faisabilité par rapport à la mémoire et à l'espace disque libre de votre machine — ✓ veut dire confortable, ~ veut dire juste, ✗ veut dire cherchez ailleurs. Dites oui à autant ou aussi peu que vous voulez ; la section 13.1 les décrit tous, et tout ce que vous sautez reste une installation en un clic plus tard.
+6. Télécharger les poids des modèles. Chaque modèle pris en charge est proposé un par un, avec sa taille et une vérification de faisabilité par rapport à la mémoire et à l'espace disque libre de votre machine — ✓ veut dire confortable, ~ veut dire juste, ✗ veut dire cherchez ailleurs. Dites oui à autant ou aussi peu que vous voulez ; la section 14.1 les décrit tous, et tout ce que vous sautez reste une installation en un clic plus tard.
 7. Placer le modèle de saisie vocale (whisper).
 8. Placer le modèle de traduction hors ligne, utilisé par la compétence `translator`.
 9. Mettre la commande `enough` sur votre PATH.
@@ -64,7 +64,7 @@ Il reste un simple sélecteur de dossier là-dedans, mais vous ne le croiserez p
 enough
 ```
 
-puis rendez-vous sur `http://127.0.0.1:3456` (enough l'ouvre pour vous). Dossier différent, projet différent, mémoire d'agent différente. Le seul dossier depuis lequel vous ne pouvez pas lancer, c'est `~/enough/` lui-même — la CLI refuse, parce que c'est l'installation, pas un projet.
+puis rendez-vous sur `http://127.0.0.1:3456` (enough l'ouvre pour vous). Dossier différent, projet différent, mémoire différente. Le seul dossier depuis lequel vous ne pouvez pas lancer, c'est `~/enough/` lui-même — la CLI refuse, parce que c'est l'installation, pas un projet.
 
 Vous obtenez aussi l'écran d'accueil, depuis n'importe où :
 
@@ -83,17 +83,17 @@ Si vous préférez ne jamais taper la commande, deux lanceurs sont fournis dans 
 
 Ce fichier est le manuel long format. Vous avez aussi :
 
-- **L'aide intégrée** — les bulles `(?)` disséminées dans l'interface, chacune expliquant ce à quoi elle est attachée : un *what*, un *how*, et une liste *ideas*. Voir la section 9.6.
-- **Les aide-mémoires** — raccourcis clavier et syntaxe markdown, à un clic dans la fenêtre UI. Voir la section 9.5.
+- **L'aide intégrée** — les bulles `(?)` disséminées dans l'interface, chacune expliquant ce à quoi elle est attachée : un *what*, un *how*, et une liste *ideas*. Voir la section 10.6.
+- **Les aide-mémoires** — raccourcis clavier et syntaxe markdown, à un clic dans la fenêtre UI. Voir la section 10.5.
 - **[enough.support](https://enough.support)** — le forum communautaire : aide à l'installation, partage de flux de travail, et des gens qui vous aideront volontiers à construire les personnalisations vers lesquelles ce manuel n'arrête pas de vous pousser.
 
-Et tout ça — ce manuel, les bulles, l'interface qui les entoure — se lit en six langues : anglais, français, espagnol, allemand, chinois, et japonais. La section 9.4 présente le menu déroulant et les petits caractères.
+Et tout ça — ce manuel, les bulles, l'interface qui les entoure — se lit en six langues : anglais, français, espagnol, allemand, chinois, et japonais. La section 10.4 présente le menu déroulant et les petits caractères.
 
 ---
 
 ## 2. L'écran d'accueil
 
-Avant d'être dans un projet, vous êtes sur **l'accueil** : un seul cadre listant tous les dossiers que vous avez jamais transformés en projet enough, plus une tuile pour en ajouter un autre. C'est délibérément l'écran le plus tranquille de l'application. Pas de discussion, pas de barre latérale, pas de modèle, pas d'agent — rien ne tourne encore et rien n'est en train d'être pensé. Juste vos projets, et le bouton UI ⚙ dans la barre supérieure pour le thème et ce manuel.
+Avant d'être dans un projet, vous êtes sur **l'accueil** : un seul cadre listant tous les dossiers que vous avez jamais transformés en projet enough, plus une tuile pour en ajouter un autre. C'est délibérément l'écran le plus tranquille de l'application. Pas de discussion, pas de barre latérale, pas de modèle, pas de readvisor — rien ne tourne encore et rien n'est en train d'être pensé. Juste vos projets, et le bouton UI ⚙ dans la barre supérieure pour le thème et ce manuel.
 
 Vous le verrez :
 
@@ -121,7 +121,7 @@ Deux vues, basculées par la paire de boutons en haut à droite du cadre, et eno
 | mis à jour | le changement le plus récent parmi les fichiers que ces comptes couvrent |
 | créé | quand le dossier est devenu un projet enough |
 
-Ces trois colonnes du milieu sont les trois mêmes indicateurs qu'enough affiche dans la barre supérieure quand vous avez un document ouvert — ¶ pour les paragraphes (blocs séparés par une ligne vide), W pour les mots, C pour les caractères, espaces et sauts de ligne compris — additionnés sur tout le projet. La règle sur *quels* fichiers sont comptés vaut une phrase, parce que c'est elle qui donne du sens aux chiffres : tout fichier markdown que l'arborescence du projet vous montrerait elle-même, **y compris les jumeaux des documents convertis** (un `.docx` que vous éditez ici, c'est votre écriture), et **rien** de ce qui est à l'intérieur de `rness/` (l'échafaudage de l'agent n'est pas votre livre). Donc le chiffre dans la colonne W, c'est assez précisément la quantité de ce que vous avez écrit.
+Ces trois colonnes du milieu sont les trois mêmes indicateurs qu'enough affiche dans la barre supérieure quand vous avez un document ouvert — ¶ pour les paragraphes (blocs séparés par une ligne vide), W pour les mots, C pour les caractères, espaces et sauts de ligne compris — additionnés sur tout le projet. La règle sur *quels* fichiers sont comptés vaut une phrase, parce que c'est elle qui donne du sens aux chiffres : tout fichier markdown que l'arborescence du projet vous montrerait elle-même, **y compris les jumeaux des documents convertis** (un `.docx` que vous éditez ici, c'est votre écriture), et **rien** de ce qui est à l'intérieur de `rness/` (l'échafaudage propre à enough n'est pas votre livre). Donc le chiffre dans la colonne W, c'est assez précisément la quantité de ce que vous avez écrit.
 
 Cliquez sur n'importe quel en-tête de colonne pour trier selon elle ; cliquez à nouveau sur le même pour inverser. Les projets qui n'ont rien à rapporter — jamais ouverts, jamais comptés — coulent vers le bas dans tous les cas plutôt que de se faire passer pour les plus anciens. L'ordre par défaut est du plus récemment modifié au moins récent.
 
@@ -129,7 +129,7 @@ Un projet dont le dossier n'est pas là en ce moment — un disque externe débr
 
 ### 2.2 Cliquer sur un projet : la carte
 
-Un simple clic n'ouvre pas un projet. Il vous dessine une **carte** de celui-ci : un diagramme merirmaid en lecture seule (section 18) du contenu visible du dossier, avec un petit nœud d'information en haut portant le chemin, le nombre de fichiers, les totaux ¶ et W, et les dates de création, dernière ouverture et dernière modification du projet. C'est le même genre d'image que cacheawl dessine pour un cachebox (section 11.1), pointée sur un projet à la place.
+Un simple clic n'ouvre pas un projet. Il vous dessine une **carte** de celui-ci : un diagramme merirmaid en lecture seule (section 20) du contenu visible du dossier, avec un petit nœud d'information en haut portant le chemin, le nombre de fichiers, les totaux ¶ et W, et les dates de création, dernière ouverture et dernière modification du projet. C'est le même genre d'image que cacheawl dessine pour un cachebox (section 12.1), pointée sur un projet à la place.
 
 La carte sert pour le moment où vous avez quatre dossiers aux noms plausibles et voulez savoir lequel contient les chapitres. Regardez, puis décidez.
 
@@ -141,7 +141,7 @@ L'ouverture se ressemble dans les deux cas : le chargeur apparaît une seconde o
 
 La dernière tuile de la grille — celle avec le plus — c'est comme ça qu'un dossier devient un projet.
 
-Cliquez dessus et macOS ouvre son propre sélecteur de dossier. Choisissez n'importe quel dossier de notes, de brouillons, ou de documents ; enough y ajoute `rness/` (section 7), l'enregistre sur votre écran d'accueil, et l'ouvre. La tuile affiche *en attente du sélecteur de dossier…* pendant que la boîte de dialogue est ouverte, alors prenez tout le temps que vous voulez pour naviguer.
+Cliquez dessus et macOS ouvre son propre sélecteur de dossier. Choisissez n'importe quel dossier de notes, de brouillons, ou de documents ; enough y ajoute `rness/` (section 8), l'enregistre sur votre écran d'accueil, et l'ouvre. La tuile affiche *en attente du sélecteur de dossier…* pendant que la boîte de dialogue est ouverte, alors prenez tout le temps que vous voulez pour naviguer.
 
 Deux types de dossiers sont refusés, et enough vous dit lequel et pourquoi plutôt que d'échouer vaguement :
 
@@ -166,7 +166,7 @@ Deux portes, une seule pièce.
 
 **Dans l'application :** **Fichier → Fermer le projet**, ou **⌘W**. Le backend du projet s'arrête proprement et l'écran d'accueil apparaît à sa place, une seconde ou deux plus tard.
 
-**Partout, application ou navigateur :** le bouton **fermer le projet → accueil** en haut de la fenêtre UI ⚙ (section 9). Il demande d'abord, parce que fermer met fin à la session — la conversation devant vous est terminée, comme elle le serait en quittant — et vous dépose ensuite exactement au même endroit que le ferait ⌘W.
+**Partout, application ou navigateur :** le bouton **fermer le projet → accueil** en haut de la fenêtre UI ⚙ (section 10). Il demande d'abord, parce que fermer met fin à la session — la conversation devant vous est terminée, comme elle le serait en quittant — et vous dépose ensuite exactement au même endroit que le ferait ⌘W.
 
 Ni l'un ni l'autre ne touche votre dossier. Vos fichiers, votre `rness/`, vos fichiers de requête, et vos journaux de session sont tous exactement là où vous les avez laissés ; seule la conversation en cours se termine.
 
@@ -178,7 +178,7 @@ Et une interaction entre ceci et le réglage de réouverture, parce que sinon ç
 
 Trois petites choses, toutes globales à la machine — elles vous suivent de projet en projet et retour à l'accueil, et elles ne sont stockées dans aucun dossier de projet :
 
-- **Le thème et la police** (section 9.1). L'accueil porte ce que vous avez choisi en dernier, et un thème vers lequel vous basculez *sur* l'écran d'accueil est le thème dans lequel votre projet s'ouvre. C'est celui qui avait l'habitude d'agacer les gens : l'écran de lancement et l'écran de travail sont désormais d'accord, toujours.
+- **Le thème et la police** (section 10.1). L'accueil porte ce que vous avez choisi en dernier, et un thème vers lequel vous basculez *sur* l'écran d'accueil est le thème dans lequel votre projet s'ouvre. C'est celui qui avait l'habitude d'agacer les gens : l'écran de lancement et l'écran de travail sont désormais d'accord, toujours.
 - **Icônes ou liste**, de la section 2.1.
 - **Si les projets masqués sont affichés**, de la section 2.4.
 
@@ -190,17 +190,17 @@ Tout le reste à propos d'un projet vit dans le dossier de ce projet, où vous p
 
 Si vous ne lisez qu'une section, lisez celle-ci.
 
-La plupart des logiciels vous donnent des fonctionnalités. enough vous donne des mécanismes. La personnalité, la méthode et le jeu de compétences de l'agent sont assemblés à neuf à chaque message à partir de fichiers markdown posés sur votre disque :
+La plupart des logiciels vous donnent des fonctionnalités. enough vous donne des mécanismes. La personnalité, la méthode et le jeu de compétences de votre readvisor en chef sont assemblés à neuf à chaque message à partir de fichiers markdown posés sur votre disque :
 
-- **`AGENT.md`** — qui est l'agent et comment il opère (section 4.1)
+- **`AGENT.md`** — qui est votre readvisor en chef et comment il opère (section 5.3)
 - **`MOTIVATION.md`** — le pourquoi : valeurs, priorités, ce à quoi ressemble « terminé »
-- **Les politiques** — des règles strictes sur ce qu'il peut lire, écrire, et récupérer (section 4.2)
-- **Le paradigme actif** — le cadre de raisonnement en vigueur en ce moment (section 14)
-- **Les compétences activées** — des capacités auxquelles il peut faire appel (section 16)
-- **Les rôles activés** — d'autres personnages que vous pouvez convoquer (section 15)
-- **Le profil du projet** — ce qu'il a appris sur ce projet (section 7.1)
+- **Les politiques** — des règles strictes sur ce qui peut être lu, écrit, et récupéré (section 5.4)
+- **Le paradigme actif** — le cadre de raisonnement en vigueur en ce moment (section 15)
+- **Les compétences activées** — des capacités auxquelles il peut faire appel (section 18)
+- **Les readvisors activés** — d'autres jugements fondus dans la voix, ou assis à un conseil (section 16)
+- **Le profil du projet** — ce qui a été appris sur ce projet (section 8.1)
 
-Modifiez n'importe lequel de ces éléments, dans l'application ou dans n'importe quel éditeur de texte, et le changement prend effet au message suivant. Pas de recompilation, pas de redémarrage, pas d'API de plugin. Si vous savez écrire un fichier markdown, vous savez reprogrammer votre agent.
+Modifiez n'importe lequel de ces éléments, dans l'application ou dans n'importe quel éditeur de texte, et le changement prend effet au message suivant. Pas de recompilation, pas de redémarrage, pas d'API de plugin. Si vous savez écrire un fichier markdown, vous savez reprogrammer vos readvisors.
 
 ### 3.1 Global contre local au projet
 
@@ -208,146 +208,275 @@ Tout ce qui est personnalisable suit un seul motif : **les défauts vivent dans 
 
 Modifiez un fichier dans `~/enough/defaults/` et tout projet encore lié à lui récupère le changement. Dans un projet, ouvrez un fichier lié et cliquez sur **personnaliser** — le lien devient une copie locale au projet, et à partir de là ce projet fait sa propre route pendant que les autres continuent de suivre le défaut global. L'arborescence des fichiers vous dit lequel est lequel d'un coup d'œil : les fichiers liés s'affichent *en italique et atténués*, les copies locales s'affichent normalement.
 
-Les nouvelles compétences, nouveaux rôles et nouveaux paradigmes déposés dans `~/enough/defaults/` apparaissent dans tous les projets au lancement suivant. Les compétences et les rôles arrivent désactivés, donc rien ne change dans votre dos ; vous les activez par projet quand vous les voulez. Une compétence qu'enough n'a pas fournie — une que vous avez téléchargée, une qu'un ami vous a envoyée, une que votre propre agent a écrite pour vous — est lue avant d'être autorisée à entrer. La section 16.6 couvre ce sujet.
+Les nouvelles compétences et les nouveaux paradigmes déposés dans `~/enough/defaults/` apparaissent dans tous les projets au lancement suivant ; les readvisors ont en plus un foyer inscriptible bien à eux, `~/enough/readvisors/` (section 16). Compétences et readvisors arrivent désactivés, donc rien ne change dans votre dos ; vous les activez par projet quand vous les voulez. Une compétence qu'enough n'a pas fournie — une que vous avez téléchargée, une qu'un ami vous a envoyée, une écrite pour vous au cours d'une séance — est lue avant d'être autorisée à entrer. La section 18.8 couvre ce sujet.
 
 ### 3.2 Les trois types de composants
 
-| | Paradigme | Compétence | Rôle |
+| | Paradigme | Compétence | Readvisor |
 |---|---|---|---|
-| Ce que c'est | Un cadre de raisonnement — comment l'agent aborde le travail | Une capacité ciblée — vocabulaire, recettes, procédures | Un second personnage que vous pouvez convoquer — son propre AGENT.md + MOTIVATION.md |
+| Ce que c'est | Un cadre de raisonnement — comment le travail est abordé | Une capacité ciblée — vocabulaire, recettes, procédures | Un second jugement — son propre AGENT.md + MOTIVATION.md |
 | Combien actifs | Exactement un à la fois | N'importe quel nombre activé | N'importe quel nombre activé |
-| Vit à | `rness/paradigms/<nom>.md` | `rness/skills/<nom>/SKILL.md` | `rness/roles/<nom>/` |
-| Exemples fournis | default, text-planning, translation, workflow-design | analyzer, anything-finder, girraph-merirmaid, memoir-dialectic, translator | block-breaker, open-skeptic |
+| Vit à | `rness/paradigms/<nom>.md` | `rness/skills/<nom>/SKILL.md` | `rness/readvisors/<nom>/` |
+| Exemples fournis | default, text-planning, translation, workflow-design | analyzer, anything-finder, girraph-merirmaid, memoir-dialectic, readvisory, scaffold, translator | block-breaker, open-skeptic |
 
 ### 3.3 Construire les vôtres
 
-Vous pouvez écrire ces fichiers à la main — ce sont du markdown avec un petit bloc YAML en tête — mais vous n'êtes pas obligé. Le **paradigme workflow-design** fourni d'origine (section 14.4) existe pour que l'agent puisse les construire avec vous. Dites « construis-moi une compétence qui… » ou « crée un rôle qui… » ou « fais-moi un paradigme pour… » et l'agent bascule vers workflow-design, pose ses questions de clarification (périmètre ? nom ? conditions de déclenchement ? fichiers compagnons ?), et écrit le composant correctement, frontmatter `description:` comprise, celle qui indique aux tours futurs quand y faire appel.
+Vous pouvez écrire ces fichiers à la main — ce sont du markdown avec un petit bloc YAML en tête — mais vous n'êtes pas obligé. Le **paradigme workflow-design** fourni d'origine (section 15.4) existe pour que votre readvisor en chef puisse les construire avec vous. Dites « construis-moi une compétence qui… » ou « fais-moi un paradigme pour… » et il bascule vers workflow-design, pose ses questions de clarification (périmètre ? nom ? conditions de déclenchement ? fichiers compagnons ?), et écrit le composant correctement, frontmatter `description:` comprise, celle qui indique aux tours futurs quand y faire appel. Les readvisors ont leur propre porte d'entrée — la compétence `readvisory` (section 18.5), qui interroge une personne plutôt qu'une spécification.
 
 Ce que les gens construisent réellement :
 
 - Un **paradigme** pour chaque mode distinct de leur travail — recherche, rédaction, révision — avec des règles explicites pour savoir quand changer.
 - Une **compétence** qui code la voix d'une newsletter, un format de citation, la terminologie d'une thèse.
-- Un **rôle** qui est un canard en plastique posant des questions socratiques, ou un relecteur sceptique, ou un expert du domaine construit à partir de vos propres fichiers de connaissance.
+- Un **readvisor** qui est un canard en plastique posant des questions socratiques, ou un relecteur sceptique, ou l'ami dont ils apprécient le plus le goût, interrogé une fois et gardé.
 
 Le reste de ce manuel décrit les composants intégrés. Lisez chacun d'eux comme un exemple travaillé que vous avez le droit de copier, forker, et améliorer.
 
 ---
 
-## 4. Discussion avec l'agent — la base de la pile
+## 4. Composure — la base de la pile
 
-Ouvrez un projet et vous atterrissez dans la vue de discussion : la conversation avec votre agent, plus la barre latérale montrant votre projet. C'est le rez-de-chaussée. Chaque autre mode s'empile par-dessus et finit par se refermer jusqu'à lui. (L'*écran d'accueil* de la section 2 est une tout autre chose — c'est là que vous êtes avant qu'un projet soit ouvert ; ici, c'est là que vous êtes une fois qu'il l'est.)
+Ouvrez un projet et vous atterrissez sur une **composure** : un canevas qui remplit la fenêtre, avec la conversation dans un panneau à côté (section 5). C'est le rez-de-chaussée. Ce n'est pas un mode qu'on ouvre et qu'on quitte — tous les autres modes s'empilent par-dessus et finissent par se refermer dessus, et il n'y a aucun moyen de le fermer, parce qu'il n'y aurait rien en dessous. (L'*écran d'accueil* de la section 2 est tout autre chose : c'est là que vous êtes avant qu'un projet soit ouvert ; ici, c'est là que vous êtes une fois qu'il l'est.)
 
-Ce qu'on trouve ici :
+Une composure est un fichier `.comp` : des boîtes de texte, et de l'encre à main levée, sur un plan de travail sans bord que vous faites glisser et que vous zoomez. Les boîtes s'appellent des **modules**. Il n'y a pas de bouton enregistrer — tout s'écrit au fil de l'eau — et le fichier lui-même est du HTML ordinaire : un `.comp` s'ouvre donc comme une page simple et lisible dans n'importe quel navigateur, sur une machine où enough n'est pas installé du tout. Ce n'est pas un effet de bord. Un document que vous ne pouvez lire que dans le programme qui l'a fabriqué est un document que vous avez prêté à quelqu'un.
 
-- **La discussion.** Tapez un message, appuyez sur ⌘Enter (ou le bouton envoyer). Les réponses arrivent en direct, et l'agent peut agir pendant qu'il parle — lire et écrire des fichiers, exécuter des commandes shell, récupérer des pages — chaque appel d'outil apparaissant dans la transcription au fur et à mesure.
-- **Le bouton micro.** Cliquez dessus et dictez. La parole est transcrite localement par whisper.cpp ; votre voix ne quitte jamais la machine. Le bouton pulse pendant l'enregistrement. Cliquez à nouveau pour arrêter.
-- **La barre latérale.** L'arborescence de fichiers du projet, plus les sections de contrôle : le **paradigme** actif, les interrupteurs pour les **compétences** et les **rôles**, et vos **requêtes**. Option-cliquez sur n'importe quel fichier ou dossier pour un menu contextuel (nouveau fichier, nouveau dossier, copier le chemin, copier le nom). ⌘\ masque et affiche toute la barre latérale.
-- **La barre supérieure.** Des boutons pour la fenêtre de modèle, le broker, la fenêtre UI, wikisink (🚰), et cacheawl — et au bord droit, les indicateurs pour les modes actuellement empilés et ouverts (section 12).
+Ce qu'il y a autour :
 
-### 4.1 AGENT.md et MOTIVATION.md
+- **La barre d'outils**, en haut du canevas : le titre de la composure (tapez dedans, cliquez ailleurs, c'est renommé), le sélecteur lecture/édition, les outils, **ajouter un module**, annuler et rétablir, le groupe de zoom, la recherche, l'interrupteur des commentaires, et le menu **composures** — nouvelle à partir d'un form…, ouvrir…, enregistrer comme form….
+- **La barre latérale.** L'arborescence des fichiers du projet, plus les sections de contrôle : le **paradigme** actif, les interrupteurs des **compétences** et des **readvisors**, et vos **requêtes**. Option-cliquez n'importe quel fichier ou dossier pour un menu contextuel (nouveau fichier, nouveau dossier, copier le chemin, copier le nom). ⌘\ masque et affiche toute la barre latérale.
+- **La barre du haut.** Les boutons de la fenêtre de modèle, du broker, de la fenêtre UI, de wikisink (🚰), et de cacheawl ; les indicateurs des modes actuellement empilés (section 13) ; et, tout à droite, l'interrupteur du panneau readvisor.
 
-Chaque projet porte sa propre copie de ces deux fichiers dans `rness/`. Ils sont la racine de l'identité de l'agent, et tous deux sont chargés à chaque tour.
+### 4.1 Se déplacer
 
-**`AGENT.md`** est le *how* (comment) : les instructions de travail. Ton, garde-fous, conventions, consignes permanentes. « Gardez la prose en minuscules. » « Ne touchez jamais aux fichiers dans `archive/`. » « Demandez avant d'exécuter des commandes shell de plus d'une ligne. »
+**Faites glisser** avec un défilement à deux doigts, en maintenant la barre d'espace, ou avec le bouton du milieu de la souris. **Zoomez** par pincement, avec ⌘-molette autour du pointeur, avec ⌘+ / ⌘− / ⌘0, ou avec **ajuster** — qui recule juste assez pour montrer tout ce que vous avez. L'affichage du zoom dans la barre d'outils est un bouton : cliquez-le pour revenir à 100 %.
 
-**`MOTIVATION.md`** est le *why* (pourquoi) : les valeurs et priorités au-delà de la tâche qui se présente. À quoi sert le projet, qui il sert, quels compromis comptent (l'exactitude plutôt que la vitesse ? la concision plutôt que l'exhaustivité ?), à quoi ressemble « terminé ».
+Deux choses zooment toutes seules, et les deux essaient de vous aider.
 
-Cliquez sur l'un ou l'autre fichier dans la barre latérale pour le lire ; appuyez sur **personnaliser** pour forker votre copie locale au projet, ou modifiez-le dans n'importe quel éditeur de votre choix. Les changements arrivent au message suivant. Les rôles utilisent le même motif à deux fichiers (section 15) — l'agent principal n'est pas spécial, juste premier.
+**Les paliers de panneau.** Masquer un panneau latéral ne fait pas qu'élargir le canevas, ça l'*agrandit* : le texte d'une page se lit vers 12 points avec la barre latérale et le panneau readvisor ouverts, vers 14 avec l'un des deux masqué, et vers 16 avec les deux. Le changement s'anime sur un cinquième de seconde, ancré sur votre curseur si vous êtes en train de taper et sur le milieu de la vue sinon, pour que vous ne perdiez pas votre place. C'est le bon comportement neuf fois sur dix, et la dixième vous zoomez à la main et il cesse d'intervenir pour ce document-là.
 
-### 4.2 Le dossier des politiques et les listes blanches
+**L'ajustement de page.** Une composure en forme de page — vierge, journal, conseil — est centrée et tenue au zoom qui fait tenir toute sa largeur, avec une marge confortable, jusqu'à la première fois que vous zoomez à la main. Une fenêtre plus large montre plus de plan de travail autour de la feuille plutôt qu'une feuille plus grande. Seule la largeur est ajustée : une page est plus haute que la plupart des fenêtres, donc le bas d'une page est toujours à un glissement de distance.
 
-`rness/policies/` contient les règles strictes de l'agent. Pas de la personnalité — de la loi. Quatre politiques sont fournies par défaut :
+**Les faces.** Dézoomez assez loin et chaque module se replie sur sa **face** : son titre, composé aussi grand que la boîte le permet, avec le corps en faux-texte. Soixante cartes se lisent donc comme soixante titres au lieu de soixante rectangles gris, et un tableau que vous avez construit à taille de lecture reste un tableau d'un coup d'œil. Donnez un titre à un module et c'est vous qui décidez ce que dit cette face. L'encre, de son côté, s'amincit plus lentement que tout le reste ne rétrécit : un croquis vu de loin se lit encore comme un croquis.
 
-- **`allowlists.md`** — les règles de portée. Trois listes :
-  1. *Préfixes de lecture de fichiers :* les chemins absolus que l'agent peut lire hors du projet (par défaut : `~/enough/`).
-  2. *Préfixes de lecture-écriture de fichiers :* les chemins où il peut aussi écrire hors du projet. Cette liste est fournie **vide** : d'origine, l'agent n'écrit qu'à l'intérieur de votre projet, et ça reste ainsi jusqu'à ce que vous ajoutiez délibérément un chemin.
-  3. *Domaines internet :* les hôtes récupérés directement (les défauts incluent `gutenberg.org`, `en.wikipedia.org`, `en.wikisource.org`, `archive.org`, `standardebooks.org`, et l'hôte de téléchargement de Kiwix). Un domaine qui n'est pas sur la liste n'est pas bloqué — la récupération est plutôt routée à travers un proxy Tor local, pour qu'une recherche ponctuelle ne laisse pas votre adresse dans les journaux d'un serveur. Un interrupteur du broker peut désactiver ce repli, faisant échouer purement et simplement les récupérations hors liste.
-- **`context-management.md`** — comment l'agent détecte une fenêtre de contexte qui se remplit et se remet à zéro en douceur sans perdre son état (section 7.3).
-- **`requests.md`** — quand et comment l'agent suit le travail de longue durée sous forme de fichiers de requête (section 7.3).
-- **`profile-maintenance.md`** — ce qui a sa place dans le profil du projet et ce qui ne l'a pas (section 7.1).
+### 4.2 Les quatre outils
 
-Les politiques sont liées par symlink depuis les défauts comme tout le reste, donc vous pouvez resserrer la liste blanche globalement ou la personnaliser pour un projet qui a besoin d'une portée plus large (ou plus stricte). Modifier `allowlists.md` est en pratique la personnalisation la plus courante de toutes : ajoutez les sites de documentation en qui vous avez confiance, ajoutez un dossier partagé dans lequel l'agent devrait pouvoir écrire, et continuez votre journée.
+Le sélecteur lecture/édition fonctionne comme partout ailleurs dans enough : un œil pour lire, un crayon pour modifier. Les outils n'existent que dans la face édition, et chacun a sa lettre.
+
+- Le **pointeur (V)** sélectionne. Cliquez un module, glissez-le pour le déplacer, glissez une poignée pour le redimensionner, tracez un rectangle sur le plan de travail vide pour en attraper plusieurs. Maj-clic en ajoute ou en retire un. Les flèches décalent finement ; maintenez maj pour un pas plus grand. Suppr retire — avec un avertissement d'abord s'il y a du texte dedans, et ⌘Z pour revenir en arrière. Double-cliquez un module texte et vous voilà dans l'outil texte à l'intérieur.
+- Le **texte (T)** place le curseur dans un module texte. Il ne sait pas fabriquer de boîtes, et cliquer sur le plan de travail vide ne fait rien ; c'est le travail du bouton d'ajout de module. Dans une page, vous avez le gras et l'italique, les niveaux de titre, les listes, les listes à cocher, les citations, le code, les liens et les quatre couleurs de surlignage — avec le markdown que vous tapez déjà : `# `, `- `, `1. `, `[] `, `> ` et un bloc encadré se transforment en la vraie chose à mesure que vous les tapez. Tout ce que vous collez est d'abord ramené à une structure simple.
+- Le **crayon (P)** dessine. Dessinez, tout simplement ; le trait est lissé et simplifié quand vous relâchez. Maintenez **maj** pendant que vous glissez et vous obtenez un segment droit terminé par une pointe de flèche, ce qui est la façon de dire *ceci, puis cela*.
+- La **gomme (E)** efface. C'est un cercle qui garde la même taille à l'écran quel que soit le zoom. Faites-la passer sur un trait et la partie sous le cercle disparaît, laissant les deux bouts derrière comme deux traits séparés ; ⌘Z remet le trait d'un seul tenant.
+
+L'encre est posée sur le plan de travail, *sous* les modules : une note peut donc traverser trois cartes et une flèche en relier deux. Attrapez un trait avec le pointeur en cliquant juste à côté, et l'inspecteur propose les cinq couleurs d'encre — encre, rouge, bleu, vert, jaune — et une suppression.
+
+### 4.3 Les modules : les six types
+
+Un module **texte**, c'est de l'écriture, avec autant de pages à l'intérieur que vous voulez. Les cinq autres pointent vers quelque chose, vous en montrent un aperçu en direct pendant que vous lisez, et ouvrent la vraie chose quand vous cliquez :
+
+- **un fichier de ce projet** — ses premières lignes, et un clic l'ouvre exactement comme le clic dans l'arborescence l'aurait fait (documents convertis compris). Pointez-en un vers un `.comp` et le clic échange le canevas sous vos pieds, ce qui est précisément ce qui transforme un tableau en descente par paliers.
+- **un article wikisink** — les paragraphes d'introduction, et un clic ouvre le lecteur wikisink à cet endroit (section 11). Sur une machine sans archive, la carte le dit, garde le nom de l'article, et se remplit toute seule dès qu'une archive est installée.
+- **un lien vers le web** — le titre et l'hôte. Un clic l'ouvre dans votre navigateur, comme tout autre lien externe de l'application.
+- **une page web en cache** — le texte de la page tel qu'à la dernière récupération, avec la date et un bouton **actualiser**. L'actualisation passe par le broker exactement comme n'importe quelle autre lecture web : vos interrupteurs de récupération, vos listes blanches et votre routage Tor s'appliquent tous — et si le broker refuse, la carte vous montre son refus dans les mots mêmes du broker, pour que vous sachiez quel interrupteur aller regarder.
+- **une image** — l'image, mise à l'échelle de la boîte. Un clic ouvre la visionneuse d'image (section 7.9).
+
+**ajouter un module** ouvre une courte liste des six. enough place et dimensionne le nouveau pour vous, près de ce que vous regardiez, et le sélectionne.
+
+### 4.4 L'inspecteur
+
+Sélectionnez quelque chose dans la face édition et un petit panneau apparaît à côté — jamais par-dessus — avec tout ce qui s'applique :
+
+- **Dix pastilles de fond** : papier, jaune, rose, bleu, vert, orangé, lilas et gris, plus **encre**, qui est une carte sombre, et **transparent**, qui n'est pas une carte du tout. Les deux dernières servent à la structure : une carte sombre pour une ligne de titre, une transparente pour une étiquette qui ne doit pas ressembler à une note.
+- **La taille du texte**, plus petit et plus grand, pour ce module seulement.
+- **Les pages** : en ajouter une, en retirer une. Un module de plus d'une page porte des boutons de changement de page et une étiquette `n / N`, et un texte qui déborde d'une page propose **continuer sur une nouvelle page →** plutôt que de grandir indéfiniment en silence.
+- **L'ordre** : mettre au premier plan, mettre à l'arrière-plan.
+- **Le champ propre au type**, quand il y en a un — un sélecteur de fichier qui cherche dans l'arborescence du projet à mesure que vous tapez, une zone de recherche wikisink, un champ d'adresse, une politique d'actualisation.
+- **Commenter ce module**, et **supprimer**.
+
+Sélectionnez plusieurs modules et l'inspecteur dit combien il y en a et propose ce qui a encore du sens.
+
+### 4.5 Les forms, et enregistrer les vôtres
+
+Un **form** est un modèle de composure. Cinq sont fournis :
+
+- **blank** — une seule feuille en forme de page, qui s'ouvre dans la face édition avec le curseur déjà en train de clignoter dedans.
+- **cards** — un tableau de cartes de texte en grille, qui s'ouvre dézoomé pour tout montrer.
+- **scaffold** — un tableau disposé en colonnes de temps forts, avec un bandeau en haut pour la prémisse et une rangée en bas pour les fins. C'est ce que la compétence `scaffold` (section 18.6) remplit quand elle transforme un tas de notes en structure.
+- **journal** — un registre daté. Un module, une entrée par page. Ouvrir un journal vous pose sur la page d'*aujourd'hui*, curseur dedans, et cette page n'existe qu'en mémoire jusqu'à ce que vous tapiez quelque chose : ouvrir le journal puis se raviser ne laisse donc rien derrière. L'entrée s'enregistre au fil de l'eau ; partez sans la classer et le journal rouvre sur ce même brouillon inachevé. **classer cette entrée** l'estampille de la date et la rend définitivement en lecture seule — enough refusera de la modifier ensuite et le curseur n'y entrera plus — et vous fait passer à une page neuve. Refeuilleter les entrées classées ne risque rien : tourner une page où vous n'avez pas écrit n'enregistre rien du tout. Vous pouvez toujours commenter un texte classé, ce qui est bien tout l'intérêt de le classer.
+- **council** — une salle de readvisors qui réfléchissent à une seule chose chacun leur tour. C'est la section 17.
+
+**enregistrer comme form…**, dans le menu des composures, garde la composure que vous regardez comme un form à vous. Il atterrit dans `rness/composure-forms/` et rejoint la liste à partir de là, dans ce projet. Un form à vous qui porte le nom d'un form fourni l'emporte.
+
+### 4.6 Recherche, commentaires, et revenir en arrière
+
+**La recherche** lit le texte brut de chaque module et de chaque page — ou d'un seul module, quand exactement un est sélectionné. Entrée et maj-Entrée parcourent les résultats, avec un compteur à côté du champ. Un résultat est un *endroit*, pas un surlignage : le canevas glisse jusqu'à lui, tourne à sa page si elle est ailleurs, et clignote brièvement sur les mots. Rien dans votre texte n'est touché pour vous montrer où il est. Échap efface la requête.
+
+**Les commentaires** fonctionnent comme ceux de wikisink (section 11.2), sur les mêmes cartes. Sélectionnez du texte dans un module et commentez-le, ou commentez un module entier depuis l'inspecteur ou le menu option-clic ; le bouton des commentaires dans la barre d'outils ouvre le panneau. Répondre, résoudre, rouvrir, sauter. Un texte que vous modifiez ensuite est ré-épinglé à son module ; un module carrément supprimé laisse le commentaire **orphelin** dans le panneau, étiqueté comme tel, jamais discrètement jeté. Les commentaires vivent dans un fichier caché à côté du `.comp` plutôt que dedans, pour que la composure elle-même reste propre — et ils fonctionnent sur des choses que vous ne pouvez pas modifier du tout, comme une page de journal classée ou une intervention de conseil.
+
+**Annuler** est ⌘Z, rétablir ⇧⌘Z, jusqu'à cent pas par composure ouverte. À l'intérieur d'une page de texte, c'est l'annulation de votre navigateur qui prend le relais, et c'est la bonne à cet endroit.
+
+### 4.7 Où vivent les composures, et ce qui s’ouvre au lancement
+
+Les nouvelles composures atterrissent dans `rness/io/composure/`, nommées d'après leur titre et la date. Ce sont des fichiers ordinaires : copiez-les, mettez-les sous git, envoyez-en un à quelqu'un qui n'a jamais entendu parler d'enough.
+
+Rien n'est écrit tant que rien n'a été écrit *dedans*. Une composure que vous ouvrez sans jamais y toucher ne laisse aucun fichier derrière — pas même un fichier vide. Dès qu'il y a quelque chose à enregistrer, l'état d'enregistrement dans la barre d'outils vous tient au courant : *enregistrement…*, puis *enregistré*, ou *pas enregistré — nouvelle tentative* si le serveur est brièvement injoignable, ce qui est le message honnête plutôt qu'un mensonge silencieux.
+
+La composure sur laquelle vous atterrissez, c'est à vous de la régler. La fenêtre **projet** — celle avec le nom, la description et le dossier du projet — porte une ligne **au lancement, ouvrir** avec quatre réponses : *une nouvelle page vierge*, *la dernière composure utilisée*, *une composure précise…*, ou *une nouvelle à partir d'un form…*. Si la chose que vous aviez désignée a depuis été renommée ou supprimée, enough ouvre une page vierge et le dit en une ligne, plutôt que de vous claquer la porte au nez à l'entrée.
+
+Et n'importe quel `.comp` de l'arborescence s'ouvre d'un clic. Il ne s'empile pas par-dessus ce que vous faites — il *devient* ce que le canevas affiche, parce qu'il n'y a jamais qu'un seul plancher.
+
+### 4.8 Jeter un œil sous la pile
+
+Les indicateurs de la pile de modes dans la barre du haut (section 13) se terminent par un carré permanent pour la composure. Il n'a pas de ruban de fermeture, parce qu'il n'y a rien à fermer.
+
+Cliquez-le pendant que des modes sont empilés et tous se masquent, vous montrant le canevas en dessous avec leur état exactement tel qu'il était — votre position de défilement, vos modifications non enregistrées, votre descente dans un girraph imbriqué. Cliquez-le de nouveau, ou cliquez n'importe quel autre indicateur, et ils reviennent aussitôt. Échap pendant le coup d'œil restaure d'abord la pile, et ne la dépile qu'ensuite.
+
+C'est pour le moment où la chose que vous devez vérifier est sur le tableau et où vous n'avez pas envie de démonter trois modes pour la voir.
+
+### 4.9 Ce que vos readvisors peuvent faire à une composure
+
+Ils peuvent en lire une, en fabriquer une à partir d'un form, ajouter, restyler et réorganiser des modules, écrire une page, enregistrer une composure comme form, et — avec la compétence `scaffold` (section 18.6) — transformer tout un plan en tableau disposé, d'un seul geste. Tout cela est conditionné par l'interrupteur **composure tools** du broker (section 9) ; votre propre canevas n'est jamais conditionné, de la même façon que votre propre navigation dans wikisink et cacheawl ne l'est jamais.
+
+Ce qu'ils ne peuvent pas faire, c'est écrire un `.comp` comme fichier. Les deux portes ordinaires d'écriture de fichier refusent l'extension tout net : chaque changement qu'un readvisor apporte passe donc par le même petit jeu d'opérations que vous utilisez, une à la fois, par la même porte, dans le registre. Ça veut dire qu'un modèle qui s'embrouille ne peut pas corrompre un document — le pire qu'il puisse faire est d'ajouter une carte dont vous ne vouliez pas, et ⌘Z est juste là.
+
+Quand un readvisor modifie un module pendant que vous regardez la composure, il se rafraîchit sur place avec un bref clignotement. Le seul module qui n'est jamais rafraîchi sous vos yeux est celui dans lequel vous êtes en train de taper.
 
 ---
 
-## 5. Mode lecture/édition
+
+## 5. Le panneau readvisor
+
+La conversation vit dans une colonne le long du bord droit, à côté de ce sur quoi vous travaillez plutôt qu'à sa place. Votre **readvisor en chef** est nommé en haut — **Ed**, jusqu'à ce que vous le renommiez (section 16) — avec les autres readvisors que vous avez activés listés à côté de lui. En conversation ordinaire, ils répondent d'une seule voix, nourrie de toutes ces perspectives ; un conseil (section 17), c'est là qu'ils parlent séparément.
+
+Tapez un message et faites ⌘Entrée, ou cliquez le bouton d'envoi. Les réponses arrivent en flux continu, et enough peut agir pendant que votre readvisor parle — lire et écrire des fichiers, lancer des commandes shell, récupérer des pages — chaque appel d'outil apparaissant dans la transcription au fur et à mesure. Le **bouton micro** dicte : la parole est transcrite localement par whisper.cpp, votre voix ne quitte jamais la machine, et le bouton pulse pendant l'enregistrement. Cliquez de nouveau pour arrêter.
+
+### 5.1 Ancré, plein écran, fermé
+
+Trois états, un seul interrupteur tout à droite de la barre du haut.
+
+**Ancré** est l'état par défaut, et celui dans lequel vivre. C'est une vraie colonne à côté du canevas — ou à côté de n'importe quel mode que vous avez empilé par-dessus — vous n'avez donc jamais à fermer ce que vous lisez pour poser une question dessus. Sur une fenêtre trop étroite pour ça, où l'ancrage réduirait la scène en dessous d'environ 480 pixels, le panneau flotte au-dessus du bord droit de la scène au lieu de la comprimer davantage.
+
+**Plein écran** donne toute la fenêtre au panneau, avec la conversation centrée dans une colonne lisible. C'est le clin d'œil au passé : l'ancienne vue Discussion, pour quand la réponse est longue et que vous voulez vous asseoir avec.
+
+**Fermé** est une colonne de largeur nulle. Un tour qui se termine alors que le panneau est fermé pose un point sur son bouton dans la barre du haut — *quelque chose est arrivé pendant que vous regardiez ailleurs*, et non *voici une bonne réponse* — et ouvrir le panneau l'efface.
+
+⌘/ ouvre et ferme. ⇧⌘/ lui donne toute la fenêtre, et ⌘/ le ramène. ⌘K met toujours le focus sur la zone de message, en ouvrant le panneau au passage s'il était fermé. Échap fait retomber un panneau plein écran en panneau ancré — mais Échap est inerte tant que le curseur est dans la zone de message, et ouvrir le panneau l'y place, donc cliquez ailleurs d'abord. **Échap ne ferme jamais un panneau ancré**, délibérément : ce serait la seule touche que tout le monde appuie par accident.
+
+Ouvert ou fermé est retenu par projet, dans les fichiers de ce projet, et appliqué avant le premier rendu de la fenêtre, pour que rien ne sursaute au lancement. Le plein écran est un geste plutôt qu'un réglage, et n'est jamais retenu.
+
+**Une exception, et c'est un conseil.** Tant qu'un conseil est sur le canevas (section 17), le panneau est tenu fermé et son interrupteur est désactivé, avec une infobulle qui dit pourquoi : les conseils et la discussion partagent un seul modèle, et il n'y en a qu'un. Quitter le conseil vous rend le panneau exactement comme vous l'aviez — votre propre préférence est retenue, pas écrasée.
+
+### 5.2 Envoyer une sélection
+
+Sélectionnez du texte partout où le panneau peut le voir — un document en lecture/édition, un article wikisink, un module sur une composure — et une pastille apparaît au-dessus de la zone de message, nommant sa provenance et en citant le début. Envoyez, et ce passage part avec votre message, encadré, étiqueté avec exactement ce que disait la pastille. Le × de la pastille la retire.
+
+Joindre vaut mieux que décrire. Les mots exacts traversent, et on dit à votre readvisor d'où ils viennent plutôt que de le laisser aller chercher. Et rien d'*autre* n'est joint : un mode resté ouvert derrière le panneau ne s'appose pas discrètement sur chaque message que vous envoyez. Ce que vous avez choisi est ce qui part.
+
+### 5.3 AGENT.md et MOTIVATION.md
+
+Chaque projet porte sa propre copie de ces deux fichiers dans `rness/`. Ils sont la racine de l'identité de votre readvisor en chef ici, et tous deux sont chargés à chaque tour.
+
+**`AGENT.md`**, c'est le *comment* : les instructions de travail. Ton, garde-fous, conventions, consignes permanentes. « Garde la prose en minuscules. » « Ne touche jamais aux fichiers de `archive/`. » « Demande avant de lancer une commande shell de plus d'une ligne. »
+
+**`MOTIVATION.md`**, c'est le *pourquoi* : les valeurs et les priorités au-delà de la tâche du moment. À quoi sert le projet, qui il sert, quels arbitrages comptent (la justesse avant la vitesse ? la brièveté avant l'exhaustivité ?), à quoi ressemble « terminé ».
+
+Cliquez sur l'un ou l'autre fichier dans la barre latérale pour le lire ; appuyez sur **personnaliser** pour forker votre copie locale au projet, ou modifiez-le dans l'éditeur de votre choix. Les changements prennent effet au message suivant. Tous les autres readvisors utilisent ces deux mêmes fichiers (section 16) — le chef n'est pas d'une autre nature, il est seulement celui qui parle par défaut.
+
+### 5.4 Le dossier des politiques et les listes blanches
+
+`rness/policies/` contient les règles strictes. Pas de la personnalité — de la loi. Quatre politiques sont fournies d'origine :
+
+- **`allowlists.md`** — les règles de portée. Trois listes :
+  1. *Préfixes de lecture de fichiers :* les chemins absolus que vos readvisors peuvent lire en dehors du projet (par défaut : `~/enough/`).
+  2. *Préfixes de lecture-écriture :* les chemins où ils peuvent aussi écrire en dehors du projet. Cette liste est fournie **vide** : d'origine, rien n'est écrit en dehors de votre projet, et ça le reste tant que vous n'ajoutez pas délibérément un chemin.
+  3. *Domaines internet :* les hôtes récupérés directement (les défauts incluent `gutenberg.org`, `en.wikipedia.org`, `en.wikisource.org`, `archive.org`, `standardebooks.org`, et l'hôte de téléchargement de Kiwix). Un domaine absent de la liste n'est pas bloqué — la récupération est routée par un proxy Tor local à la place, pour qu'une recherche ponctuelle ne laisse pas votre adresse dans les journaux d'un serveur. Un interrupteur du broker peut désactiver ce repli, et les récupérations hors liste échouent alors franchement.
+- **`context-management.md`** — comment une fenêtre de contexte qui se remplit est repérée, et comment en sortir proprement sans perdre l'état (section 8.3).
+- **`requests.md`** — quand et comment le travail de longue haleine est suivi sous forme de fichiers de requête (section 8.3).
+- **`profile-maintenance.md`** — ce qui a sa place dans le profil du projet et ce qui n'y en a pas (section 8.1).
+
+Les politiques sont liées par symlink depuis les défauts comme tout le reste : vous pouvez donc resserrer la liste blanche globalement, ou la personnaliser pour un projet qui a besoin d'une portée plus large (ou plus étroite). Modifier `allowlists.md` est en pratique la personnalisation la plus courante : ajoutez les sites de documentation auxquels vous faites confiance, ajoutez un dossier partagé où vos readvisors devraient pouvoir écrire, et vaquez à vos occupations.
+
+---
+
+
+
+
+## 6. Mode lecture/édition
 
 Cliquez sur n'importe quel fichier dans l'arborescence et il s'ouvre dans le mode lecture/édition unifié : un mode à deux *faces* — une **face lecture** (l'œil) pour relire, une **face édition** (le crayon) pour changer le texte.
 
-### 5.1 Plein contre mini, et basculer entre tout
+### 6.1 Plein contre mini, et basculer entre tout
 
 Lecture/édition existe en deux tailles. **Mini** est un panneau latéral à côté de la discussion : gardez un document de référence sous le coude pendant que vous conversez. (Le mini panneau omet délibérément la barre d'outils de révision — il est fait pour la lecture et les modifications rapides, pas le balisage.) **Plein** prend tout le cadre, pour les documents longs et l'édition sérieuse.
 
-Changez de taille avec le bouton mini↔plein dans l'habillage du panneau. Changez de face avec le bouton de bascule de face juste à côté. ⌘S enregistre dans la face édition. Quand ce que vous regardez est le jumeau d'un document converti, l'habillage nomme aussi l'original et porte un bouton **exporter** pour réécrire vos changements dedans (section 6.5). Et tout est protégé contre la perte : si vous avez des modifications non enregistrées, enough vous prévient avant de laisser quoi que ce soit les abandonner — naviguer vers un autre fichier, fermer le mode, rebondir vers un autre document. Vous ne perdrez pas une heure de travail à cause d'un clic malheureux.
+Changez de taille avec le bouton mini↔plein dans l'habillage du panneau. Changez de face avec le bouton de bascule de face juste à côté. ⌘S enregistre dans la face édition. Quand ce que vous regardez est le jumeau d'un document converti, l'habillage nomme aussi l'original et porte un bouton **exporter** pour réécrire vos changements dedans (section 7.5). Et tout est protégé contre la perte : si vous avez des modifications non enregistrées, enough vous prévient avant de laisser quoi que ce soit les abandonner — naviguer vers un autre fichier, fermer le mode, rebondir vers un autre document. Vous ne perdrez pas une heure de travail à cause d'un clic malheureux.
 
 Pendant qu'un document est ouvert, trois compteurs apparaissent dans la barre supérieure et suivent votre frappe : **¶** paragraphes, **W** mots, **C** caractères. (La vue liste de l'écran d'accueil vous montre les trois mêmes totaux pour tout un projet — section 2.1.)
 
-Comme chaque mode plein cadre, lecture/édition affiche son icône dans la zone d'indicateurs en haut à droite, avec un petit ruban croix-rouge accroché pour fermer (section 12).
+Comme chaque mode plein cadre, lecture/édition affiche son icône dans la zone d'indicateurs en haut à droite, avec un petit ruban croix-rouge accroché pour fermer (section 13).
 
-### 5.2 Surlignage
+### 6.2 Surlignage
 
 Dans la face lecture de n'importe quel document markdown, sélectionnez du texte et peignez-le d'une des quatre couleurs — **jaune, vert, bleu, rose** — depuis la barre d'outils ou le popup qui apparaît au-dessus d'une sélection. La même barre d'outils propose une mise en forme légère : gras, italique, souligné (⌘B / ⌘I / ⌘U).
 
 Les surlignages sont durables, et ils vivent hors bande : chaque document reçoit un fichier annexe caché (`.<nomdufichier>.highlights.json`) plutôt que du balisage épissé dans votre texte, si bien que le document lui-même reste propre. Une bande colorée dans la marge marque chaque ligne surlignée. Les surlignages persistent d'une session à l'autre, et les couleurs superposées s'empilent.
 
-Voici la partie qui change votre façon de travailler : l'agent peut les voir. Son outil `read_highlights` liste chaque surlignage d'un document par couleur, et `navigate_to_highlight` fait sauter la vue vers l'un d'eux. Ça transforme le surlignage en canal de communication. Peignez en jaune les quatre paragraphes que vous voulez réécrits et en vert les deux que vous adorez, puis dites « réécris les parties jaunes ; garde le ton des vertes ». Quand vous mentionnez une couleur, l'agent comprend que vous parlez de vos surlignages.
+Voici la partie qui change votre façon de travailler : vos readvisors peuvent les voir. L'outil `read_highlights` liste chaque surlignage d'un document par couleur, et `navigate_to_highlight` fait sauter la vue vers l'un d'eux. Ça transforme le surlignage en canal de communication. Peignez en jaune les quatre paragraphes que vous voulez réécrits et en vert les deux que vous adorez, puis dites « réécris les parties jaunes ; garde le ton des vertes ». Quand vous mentionnez une couleur, votre readvisor comprend que vous parlez de vos surlignages.
 
-### 5.3 Types de fichiers pris en charge
+### 6.3 Types de fichiers pris en charge
 
 - **Markdown (`.md`)** s'affiche mis en forme dans la face lecture et comme source dans la face édition. Markdown est la langue maternelle d'enough — presque tout ce que le système lui-même écrit est du markdown.
 - **Le texte brut**, et tout ce qui y ressemble, s'ouvre en lecture/édition comme du texte.
-- Les fichiers **`.girraph`** s'ouvrent en mode girraph à la place (section 17).
-- Les fichiers **`.merirmaid`** s'ouvrent en mode merirmaid à la place (section 18).
-- Les **articles Wikipédia enregistrés** (`article.html` à l'intérieur d'un dossier `wiki/`) s'ouvrent dans le lecteur wikisink en fidélité complète (section 10.2).
-- **Documents Word, PDF, ebooks, présentations, classeurs** s'ouvrent comme un **jumeau** markdown modifiable — une ligne dans l'arborescence, un clic, et un bouton **exporter** dans l'habillage pour réécrire vos changements en retour. C'est la section 6, et c'est toute l'histoire.
-- Les **images** (`.png`, `.jpg`, `.gif`, `.webp`, `.bmp`, `.svg`) s'ouvrent dans une visionneuse simple (section 6.9). Les images *à l'intérieur* d'un document s'affichent dans la face lecture comme n'importe quelle autre image en markdown.
+- Les fichiers **`.girraph`** s'ouvrent en mode girraph à la place (section 19).
+- Les fichiers **`.merirmaid`** s'ouvrent en mode merirmaid à la place (section 20).
+- Les **articles Wikipédia enregistrés** (`article.html` à l'intérieur d'un dossier `wiki/`) s'ouvrent dans le lecteur wikisink en fidélité complète (section 11.2).
+- **Documents Word, PDF, ebooks, présentations, classeurs** s'ouvrent comme un **jumeau** markdown modifiable — une ligne dans l'arborescence, un clic, et un bouton **exporter** dans l'habillage pour réécrire vos changements en retour. C'est la section 7, et c'est toute l'histoire.
+- Les **images** (`.png`, `.jpg`, `.gif`, `.webp`, `.bmp`, `.svg`) s'ouvrent dans une visionneuse simple (section 7.9). Les images *à l'intérieur* d'un document s'affichent dans la face lecture comme n'importe quelle autre image en markdown.
 
 enough reste un système de texte, et le restera : il affiche du markdown, pas de la mise en page. Ce qu'il fait avec tout le reste, c'est le convertir — assez sans perte pour qu'on puisse y travailler, assez honnêtement pour vous dire ce qui n'a pas survécu.
 
 ---
 
-## 6. Travailler avec des PDF, documents Word, et autres fichiers
+## 7. Travailler avec des PDF, documents Word, et autres fichiers
 
-enough n'affiche pas un PDF, ne met pas en page un document Word, ne dessine pas un tableur, et ne prétend pas le faire. Ce qu'il fait à la place est plus discret et, pour le genre de travail que vous faites ici, plus utile : il convertit le document en markdown que vous pouvez réellement lire, modifier, surligner, et remettre à votre agent — et il garde ce markdown lié à l'original, pour que vos changements puissent y retourner.
+enough n'affiche pas un PDF, ne met pas en page un document Word, ne dessine pas un tableur, et ne prétend pas le faire. Ce qu'il fait à la place est plus discret et, pour le genre de travail que vous faites ici, plus utile : il convertit le document en markdown que vous pouvez réellement lire, modifier, surligner, et remettre à vos readvisors — et il garde ce markdown lié à l'original, pour que vos changements puissent y retourner.
 
 Rien de tout ça n'est un mode séparé ni une application séparée. Vous cliquez sur le fichier. Il s'ouvre.
 
-### 6.1 Le jumeau
+### 7.1 Le jumeau
 
 Ouvrez `memo.docx` et enough écrit `memo.docx.md` à côté. Ce second fichier est le **jumeau** : une simple copie markdown du document, posée dans votre dossier de projet, à vous de la modifier comme n'importe quoi d'autre. La créer ne modifie jamais l'original.
 
-Dans l'arborescence de fichiers, vous voyez toujours une seule ligne — `memo.docx`. Le jumeau, le dossier d'images extraites du document (`memo.docx.assets/`), et un petit fichier caché enregistrant ce qui a été converti depuis quoi sont tous repliés dans cette ligne unique, si bien que votre projet continue de ressembler à ce qu'il est dans Finder. Cliquez sur la ligne et le jumeau s'ouvre en mode lecture/édition (section 5) avec tout ce que ce mode offre : deux faces, ⌘S, la protection contre la perte — et, une fois en plein cadre, les surlignages.
+Dans l'arborescence de fichiers, vous voyez toujours une seule ligne — `memo.docx`. Le jumeau, le dossier d'images extraites du document (`memo.docx.assets/`), et un petit fichier caché enregistrant ce qui a été converti depuis quoi sont tous repliés dans cette ligne unique, si bien que votre projet continue de ressembler à ce qu'il est dans Finder. Cliquez sur la ligne et le jumeau s'ouvre en mode lecture/édition (section 6) avec tout ce que ce mode offre : deux faces, ⌘S, la protection contre la perte — et, une fois en plein cadre, les surlignages.
 
 Deux conséquences à connaître. Le nommage ne peut pas entrer en collision : un `memo.md` que vous avez écrit vous-même est un fichier différent de `memo.docx.md`, et enough ne les confond jamais. Et si vous supprimez `memo.docx` dans Finder, rien ne casse — le jumeau devient discrètement un fichier markdown ordinaire dans votre arborescence, ce qu'il a toujours été de toute façon.
 
-Votre agent voit la même chose que vous. Demandez-lui de lire `report.pdf` et il obtient le jumeau, en en convertissant un d'abord s'il n'y en a pas encore ; demandez-lui de changer quelque chose et il modifie le jumeau, exactement là où vont vos propres modifications.
+Vos readvisors voient la même chose que vous. Demandez que `report.pdf` soit lu et ils obtiennent le jumeau, en en convertissant un d'abord s'il n'y en a pas encore ; demandez que quelque chose soit changé et ils modifient le jumeau, exactement là où vont vos propres modifications.
 
-### 6.2 Ce qu'enough peut ouvrir de cette façon
+### 7.2 Ce qu'enough peut ouvrir de cette façon
 
-Cette liste vient de l'application elle-même plutôt que d'un texte que quelqu'un doit penser à mettre à jour — si vous lisez ceci en dehors d'enough, ouvrez le centre d'aide dans l'application (section 9) pour la voir remplie :
+Cette liste vient de l'application elle-même plutôt que d'un texte que quelqu'un doit penser à mettre à jour — si vous lisez ceci en dehors d'enough, ouvrez le centre d'aide dans l'application (section 10) pour la voir remplie :
 
 {{convert-formats}}
 
-### 6.3 Le badge dans l'arborescence
+### 7.3 Le badge dans l'arborescence
 
 Chaque document convertible porte un petit badge au bord droit de sa ligne, et ce badge a exactement un travail : vous dire si les deux moitiés sont toujours d'accord.
 
 - **Discret** — converti, et les deux côtés correspondent. Rien à faire.
-- **Allumé, dans votre couleur** — vous avez modifié le jumeau. Ces changements sont dans le markdown et pas encore dans l'original ; exportez quand vous êtes prêt (section 6.5).
-- **Allumé, dans la couleur de l'agent** — l'original a changé hors d'enough depuis sa conversion. Quelqu'un l'a modifié dans Word ; une nouvelle copie a atterri par-dessus ; il est arrivé depuis un disque partagé.
-- **Allumé, dans la couleur d'erreur** — les deux à la fois. C'est le seul cas où enough vous pose la question, et il la pose (section 6.7).
+- **Allumé, dans votre couleur** — vous avez modifié le jumeau. Ces changements sont dans le markdown et pas encore dans l'original ; exportez quand vous êtes prêt (section 7.5).
+- **Allumé, dans la couleur de votre readvisor** — l'original a changé hors d'enough depuis sa conversion. Quelqu'un l'a modifié dans Word ; une nouvelle copie a atterri par-dessus ; il est arrivé depuis un disque partagé.
+- **Allumé, dans la couleur d'erreur** — les deux à la fois. C'est le seul cas où enough vous pose la question, et il la pose (section 7.7).
 - **Creux** — convertible, pas encore converti. Cliquez dessus et il se convertit.
-- **Creux, et cliquer explique un extra** — un PDF, une présentation, ou un classeur sur une installation qui ne sait pas encore les lire (section 6.8).
+- **Creux, et cliquer explique un extra** — un PDF, une présentation, ou un classeur sur une installation qui ne sait pas encore les lire (section 7.8).
 
 Survolez le badge pour la même chose en une phrase. Cliquer sur le badge fait exactement ce que fait cliquer sur le nom du fichier.
 
-### 6.4 La première fois que vous en ouvrez un
+### 7.4 La première fois que vous en ouvrez un
 
 La première fois que vous ouvrez chaque *type* de document, une courte modale explique ce qui va se passer — ce qu'est un jumeau, où il va, que l'original reste en place. Un seul bouton OK. C'est une fois par type, pas une fois par fichier : votre deuxième document Word s'ouvre simplement.
 
-La conversion d'un document bureautique est rapide, bien en dessous d'une seconde pour tout ce qui est typique. Vous verrez un petit toast dans le coin pendant qu'elle tourne, avec un bouton **annuler** sur les plus lentes. Les PDF prennent plus de temps et ont droit à une barre de progression honnête (section 6.8).
+La conversion d'un document bureautique est rapide, bien en dessous d'une seconde pour tout ce qui est typique. Vous verrez un petit toast dans le coin pendant qu'elle tourne, avec un bouton **annuler** sur les plus lentes. Les PDF prennent plus de temps et ont droit à une barre de progression honnête (section 7.8).
 
-### 6.5 Exporter vos changements en retour
+### 7.5 Exporter vos changements en retour
 
 Un jumeau ouvert porte un bouton **exporter** dans son habillage. Une modale, trois décisions :
 
@@ -355,17 +484,17 @@ Un jumeau ouvert porte un bouton **exporter** dans son habillage. Une modale, tr
 
 **Une copie, ou l'original.** Le défaut est une **copie datée** écrite à côté de l'original — `memo-2026-08-19-1042.docx` — et le nom de fichier exact est prévisualisé dans la modale avant que vous ne validiez. Rien n'est en jeu : vous obtenez un nouveau fichier, l'ancien n'est pas touché. La seconde option écrase l'original sur place, et elle n'est proposée que quand le format vers lequel vous exportez est celui de l'original. Choisissez-la et enough vous propose une **annulation** ensuite : garder le nouveau fichier, ou remettre les anciens octets, octet pour octet.
 
-**Si vous voulez le garder synchronisé** à partir de maintenant — section 6.6.
+**Si vous voulez le garder synchronisé** à partir de maintenant — section 7.6.
 
 Un mot sur ce qui survit au voyage. Écraser un `.docx` ou un `.odt` utilise l'original comme référence de style, donc la taille de page, les polices, et les éventuels en-têtes et pieds de page courants reviennent avec votre texte — des choses que markdown n'a aucun moyen d'exprimer et qui seraient sinon perdues. Ce que markdown ne peut vraiment pas transporter ne revient pas : suivi des modifications et commentaires (acceptés puis abandonnés à l'entrée), zones de texte, champs, dimensionnement précis des images. Cette asymétrie explique pourquoi la copie datée est le défaut, et pourquoi enough ne réécrit jamais un original de sa propre initiative.
 
-### 6.6 Garder l'original synchronisé
+### 7.6 Garder l'original synchronisé
 
 Cochez **garder l'original synchronisé** dans la modale d'export et chaque enregistrement du jumeau réécrit discrètement l'original aussi. Modifiez dans enough, et le `.docx` sur votre disque est à jour dès qu'un collègue le demande. C'est un réglage par fichier, il s'applique dès l'instant où vous le cochez, et une petite confirmation apparaît chaque fois qu'un enregistrement se propage.
 
-C'est proposé pour les formats qui peuvent être réécrits — Word, OpenDocument, Rich Text, EPUB ; la colonne « garder synchronisé » de la section 6.2 fait autorité. Les PDF ne peuvent pas participer, et la raison mérite d'être dite clairement : enough peut *écrire* un PDF à partir de markdown, mais il recompose le document depuis zéro. Un PDF synchronisé remplacerait votre original soigneusement mis en page par une simple recomposition de ses mots, à chaque enregistrement. Ce n'est pas une synchronisation, c'est une démolition, donc ce n'est pas proposé.
+C'est proposé pour les formats qui peuvent être réécrits — Word, OpenDocument, Rich Text, EPUB ; la colonne « garder synchronisé » de la section 7.2 fait autorité. Les PDF ne peuvent pas participer, et la raison mérite d'être dite clairement : enough peut *écrire* un PDF à partir de markdown, mais il recompose le document depuis zéro. Un PDF synchronisé remplacerait votre original soigneusement mis en page par une simple recomposition de ses mots, à chaque enregistrement. Ce n'est pas une synchronisation, c'est une démolition, donc ce n'est pas proposé.
 
-### 6.7 Quand les deux côtés ont changé
+### 7.7 Quand les deux côtés ont changé
 
 L'original peut évoluer sans vous. Vous modifiez le jumeau ici ; quelqu'un modifie le `.docx` dans Word ; il y a maintenant deux versions de la vérité.
 
@@ -379,7 +508,7 @@ Quand les deux côtés ont vraiment changé, vous obtenez une modale avec trois 
 
 Aucun choix dans cette modale ne détruit quelque chose que vous ne pouvez pas récupérer. C'est la règle de conception sur laquelle toute la fonctionnalité est construite.
 
-### 6.8 Lire des PDF, présentations, et classeurs : l'extra PDF
+### 7.8 Lire des PDF, présentations, et classeurs : l'extra PDF
 
 Lire un PDF est un problème plus dur que lire un fichier Word. Un `.docx` sait encore ce qu'est un titre ; un PDF sait seulement où l'encre est allée, et en extraire un tableau, une mise en page à deux colonnes, ou un scan demande de vrais modèles de document. Ces modèles sont volumineux, donc ils ne sont pas dans l'installation de base — ils sont à un clic de distance à la place : **⚙ fenêtre UI → extras → installer l'extra PDF**.
 
@@ -397,7 +526,7 @@ Deux choses vous épargneront un moment de perplexité plus tard. D'abord : **é
 
 Les mises à jour gardent l'extra. `update-enough.command` (et `/update-enough`) se souviennent de ce que vous avez installé et le redemandent à chaque synchronisation, donc une mise à jour de routine ne vous retire jamais discrètement la lecture de PDF.
 
-### 6.9 Images, et regarder l'original
+### 7.9 Images, et regarder l'original
 
 Cliquez sur une image et elle s'ouvre dans une visionneuse simple : ajustée à la largeur par défaut, cliquez pour passer à la taille réelle et faire défiler autour, un damier derrière tout ce qui est transparent, et le nom, les dimensions en pixels, et la taille du fichier dans l'en-tête. C'est en lecture seule. enough n'est pas un éditeur d'image et n'a aucune ambition dans ce domaine.
 
@@ -405,7 +534,7 @@ Les images *à l'intérieur* d'un document, c'est une autre affaire, et elles pa
 
 Et quand le jumeau ne suffit pas, l'habillage d'un PDF porte **voir l'original** : ça ouvre le vrai PDF dans le panneau, pour que vous puissiez vérifier le jumeau par rapport à la vraie page. Fermez-le et vous êtes de retour dans le jumeau, là où vous l'aviez laissé.
 
-### 6.10 Ce que la conversion vous coûte, en deux phrases
+### 7.10 Ce que la conversion vous coûte, en deux phrases
 
 Deux limites méritent d'être nommées à voix haute plutôt que de vous laisser les découvrir. Les feuilles d'un classeur arrivent comme des tableaux mis bout à bout **sans titres de nom de feuille** — le lecteur ne les émet pas, et enough préfère laisser un vide plutôt qu'inventer une étiquette. Et une image extraite d'un PDF reçoit le texte alternatif « Image », à chaque fois : il n'y a pas de légende dans le fichier pour lui en donner une meilleure.
 
@@ -413,105 +542,118 @@ Au-delà de ça, la promesse permanente : **vos originaux ne sont jamais modifi�
 
 ---
 
-## 7. Le dossier de projet et `rness/`
+## 8. Le dossier de projet et `rness/`
 
-Un projet est un dossier. N'importe quel dossier. enough y ajoute exactement une chose : `rness/`, le cerveau externalisé de l'agent pour ce projet. Tout ce que l'agent est, sait, et retient ici vit dans ce dossier sous forme de fichiers ordinaires. Vous pouvez tout lire, tout modifier, et le mettre sous git si c'est votre habitude.
+Un projet est un dossier. N'importe quel dossier. enough y ajoute exactement une chose : `rness/`, le cerveau externalisé de ce projet. Tout ce que vos readvisors sont, savent, et retiennent ici vit dans ce dossier sous forme de fichiers ordinaires. Vous pouvez tout lire, tout modifier, et le mettre sous git si c'est votre habitude.
 
 L'agencement :
 
 ```
 your-project/
   rness/
-    AGENT.md            who the agent is here          (4.1)
-    MOTIVATION.md       why it works                   (4.1)
-    active-paradigm     which paradigm is in force     (14)
-    paradigms/          available reasoning frameworks (14)
-    skills/             available skills               (16)
-    roles/              available personas             (15)
-    policies/           the hard rules                 (4.2)
-    knowledge/          project memory                 (7.1)
-    io/                 input/output workspace          (7.2)
-    requests/           long-running work tracking      (7.3)
+    AGENT.md            who your chief readvisor is    (5.3)
+    MOTIVATION.md       why they work                  (5.3)
+    active-paradigm     which paradigm is in force     (15)
+    paradigms/          available reasoning frameworks (15)
+    skills/             available skills               (18)
+    readvisors/         the readvisors you can turn on (16)
+    policies/           the hard rules                 (5.4)
+    composure-forms/    composure forms you saved      (4.5)
+    knowledge/          project memory                 (8.1)
+      councils/         exported council transcripts   (17)
+    io/                 input/output workspace          (8.2)
+      composure/        where new composures land       (4.7)
+    requests/           long-running work tracking      (8.3)
   ...your actual files...
 ```
 
-Les entrées liées par symlink (en italique dans l'arborescence) suivent les défauts globaux ; personnalisez n'importe laquelle d'entre elles pour en forker une copie locale (section 3.1). Les fichiers que vous déposez dans le projet par n'importe quel moyen — Finder, un autre éditeur, l'agent — sont également visibles pour tout le monde au tour suivant.
+Deux de ces dossiers n'arrivent que quand vous en avez besoin : `composure-forms/` la première fois que vous enregistrez une composure comme form, `knowledge/councils/` la première fois qu'un conseil conclut. Un dossier vide qui ne s'explique jamais est un dossier sur lequel vous finissez par poser des questions.
 
-Un document converti (section 6) ajoute lui aussi des fichiers ici, toujours à côté de l'original et toujours nommés d'après lui : `memo.docx` obtient un jumeau à `memo.docx.md`, ses images dans `memo.docx.assets/`, et un `.memo.docx.convert.json` caché qui enregistre ce qui a été converti depuis quoi et quand. L'arborescence replie les trois dans la ligne de l'original, mais ce sont des fichiers ordinaires sur votre disque — vous pouvez copier la paire vers une autre machine, la mettre sous git, ou supprimer le jumeau et recliquer sur l'original pour en obtenir un tout frais. Le manifeste caché est la comptabilité d'enough ; laissez-le tranquille et il reste exact. Supprimez-le et enough traite simplement le document comme jamais converti.
+**Si ce projet est antérieur à la 0.3.5**, il porte un dossier `rness/roles/` plutôt que `rness/readvisors/`. enough le renomme la prochaine fois que vous ouvrez le projet, en un seul geste, en transportant intacts vos readvisors locaux au projet et vos réglages activé/désactivé. S'il n'y arrive pas — disque en lecture seule, dossier que quelque chose d'autre tient — rien ne casse : tout continue de fonctionner sous l'ancien nom, et le renommage est retenté au lancement suivant.
 
-### 7.1 Le dossier knowledge
+Les entrées liées par symlink (en italique dans l'arborescence) suivent les défauts globaux ; personnalisez n'importe laquelle d'entre elles pour en forker une copie locale (section 3.1). Les fichiers que vous déposez dans le projet par n'importe quel moyen — Finder, un autre éditeur, un readvisor — sont également visibles pour tout le monde au tour suivant.
+
+Un document converti (section 7) ajoute lui aussi des fichiers ici, toujours à côté de l'original et toujours nommés d'après lui : `memo.docx` obtient un jumeau à `memo.docx.md`, ses images dans `memo.docx.assets/`, et un `.memo.docx.convert.json` caché qui enregistre ce qui a été converti depuis quoi et quand. L'arborescence replie les trois dans la ligne de l'original, mais ce sont des fichiers ordinaires sur votre disque — vous pouvez copier la paire vers une autre machine, la mettre sous git, ou supprimer le jumeau et recliquer sur l'original pour en obtenir un tout frais. Le manifeste caché est la comptabilité d'enough ; laissez-le tranquille et il reste exact. Supprimez-le et enough traite simplement le document comme jamais converti.
+
+### 8.1 Le dossier knowledge
 
 `rness/knowledge/` est la mémoire propre à chaque projet.
 
-**`project-profile.md`** est le fichier le plus utile du dossier. Son contenu est injecté dans le prompt système de l'agent à chaque tour : tout ce qui est écrit ici est dans la mémoire de travail de l'agent, sans recherche nécessaire. L'agent le tient à jour au fil de votre travail — préférences observées, fichiers et personnes récurrents, conventions que vous avez adoptées, fils laissés ouverts — et vous pouvez le modifier directement. Énoncez une préférence permanente une fois dans le profil plutôt que de la répéter à chaque session. La politique profile-maintenance garde le fichier discipliné : des observations concrètes plutôt que des étiquettes vagues, de la distillation plutôt que de l'archive.
+**`project-profile.md`** est le fichier le plus utile du dossier. Son contenu est injecté dans le prompt système à chaque tour : tout ce qui est écrit ici est dans la mémoire de travail de votre readvisor en chef, sans recherche nécessaire. Il le tient à jour au fil de votre travail — préférences observées, fichiers et personnes récurrents, conventions que vous avez adoptées, fils laissés ouverts — et vous pouvez le modifier directement. Énoncez une préférence permanente une fois dans le profil plutôt que de la répéter à chaque séance. La politique profile-maintenance garde le fichier discipliné : des observations concrètes plutôt que des étiquettes vagues, de la distillation plutôt que de l'archive.
 
-**`session-logs/`** contient un journal markdown daté des tours de chaque session, plus le journal du broker (section 8). Un historique en ajout seul. Parcourez-le, ou grep-ez-le, quand vous devez reconstituer ce qui s'est passé mardi dernier.
+**`session-logs/`** contient un journal markdown daté des tours de chaque session, plus le journal du broker (section 9). Un historique en ajout seul. Parcourez-le, ou grep-ez-le, quand vous devez reconstituer ce qui s'est passé mardi dernier.
 
-Au-delà de ces deux-là, le dossier est à vous. Ajoutez un sous-dossier `glossary/`, un fichier de leçons apprises, des notes de contexte — l'agent peut consulter tout ce que vous mettez ici.
+Au-delà de ces deux-là, le dossier est à vous. Ajoutez un sous-dossier `glossary/`, un fichier de leçons apprises, des notes de contexte — vos readvisors peuvent consulter tout ce que vous mettez ici.
 
-### 7.2 Le dossier io
+### 8.2 Le dossier io
 
 `rness/io/` est l'espace de travail de passage :
 
-- **`input/`** — déposez des fichiers ici pour que l'agent les traite. Les pages web récupérées atterrissent aussi ici automatiquement, converties en markdown et mises en cache, si bien qu'une page récupérée une fois reste ancrée pour toujours.
+- **`input/`** — déposez des fichiers ici pour qu'ils soient traités. Les pages web récupérées atterrissent aussi ici automatiquement, converties en markdown et mises en cache, si bien qu'une page récupérée une fois reste ancrée pour toujours.
 - **`output/`** — là où atterrissent les artefacts générés. Passez en revue, gardez ce qui est bon, videz le reste.
-- **`cloud-cache/`** — si vous utilisez l'emplacement de modèle cloud, chaque échange cloud est enregistré ici (section 13.2). Même le travail dans le cloud laisse une trace papier locale et grep-able.
+- **`cloud-cache/`** — si vous utilisez l'emplacement de modèle cloud, chaque échange cloud est enregistré ici (section 14.2). Même le travail dans le cloud laisse une trace papier locale et grep-able.
 
-### 7.3 Requêtes : comment les travaux longs survivent
+### 8.3 Requêtes : comment les travaux longs survivent
 
 Celle-ci figure rarement dans les visites express de démarrage, mais c'est le mécanisme qui rend possible le travail sur plusieurs sessions, alors ça vaut deux minutes.
 
-Quand vous demandez quelque chose qui prendra plus d'un tour ou deux, l'agent ouvre un **fichier de requête** dans `rness/requests/` : un enregistrement markdown de l'objectif, des points de contrôle de progression, et des décisions prises en chemin. Vous n'avez pas à le demander. Reconnaître la forme d'une tâche, c'est le travail de l'agent.
+Quand vous demandez quelque chose qui prendra plus d'un tour ou deux, un **fichier de requête** s'ouvre dans `rness/requests/` : un enregistrement markdown de l'objectif, des points de contrôle de progression, et des décisions prises en chemin. Vous n'avez pas à le demander. Reconnaître la forme d'une tâche, c'est le travail de votre readvisor en chef.
 
-Le fichier de requête compte parce que les fenêtres de contexte se remplissent. enough surveille la pression conversationnelle, et — selon la politique context-management — l'agent enregistre son état dans le fichier de requête actif avant que ça déborde. Selon votre réglage d'orchestrateur, enough se remet ensuite automatiquement à zéro (effaçant la conversation en mémoire et reprenant à neuf depuis le point de contrôle) ou fait une pause avec une bannière pour que vous remettiez à zéro quand vous êtes prêt. Dans tous les cas, c'est le système de fichiers qui est la vraie mémoire, pas la conversation : une session neuve lit le bloc Continuation du fichier de requête et reprend là où les choses en étaient.
+Le fichier de requête compte parce que les fenêtres de contexte se remplissent. enough surveille la pression conversationnelle, et — selon la politique context-management — votre readvisor en chef enregistre son état dans le fichier de requête actif avant que ça déborde. Selon votre réglage d'orchestrateur, enough se remet ensuite automatiquement à zéro (effaçant la conversation en mémoire et reprenant à neuf depuis le point de contrôle) ou fait une pause avec une bannière pour que vous remettiez à zéro quand vous êtes prêt. Dans tous les cas, c'est le système de fichiers qui est la vraie mémoire, pas la conversation : une session neuve lit le bloc Continuation du fichier de requête et reprend là où les choses en étaient.
 
-Les requêtes terminées se déplacent vers `rness/requests/done/` — cliquez sur **marquer comme terminé** sur une requête ouverte, ou dites-le à l'agent. Le dossier done est protégé en écriture pour l'agent, et il fait aussi office de journal honnête de tout ce que vous avez réellement livré tous les deux.
+Les requêtes terminées se déplacent vers `rness/requests/done/` — cliquez sur **marquer comme terminé** sur une requête ouverte, ou dites-le dans le panneau. Le dossier done est protégé en écriture vis-à-vis de vos readvisors, et il fait aussi office de journal honnête de tout ce que vous avez réellement livré tous les deux.
 
 ---
 
-## 8. La fenêtre broker
 
-Le broker est l'ancre de confiance d'enough. Chaque appel d'outil que fait l'agent — chaque lecture de fichier, écriture de fichier, commande shell, et récupération web — passe par lui. La fenêtre broker 🔀 est l'endroit où vous observez et ajustez tout ça.
+## 9. La fenêtre broker
 
-Onze interrupteurs, en groupes :
+Le broker est l'ancre de confiance d'enough. Chaque appel d'outil que font vos readvisors — chaque lecture de fichier, écriture de fichier, commande shell, et récupération web — passe par lui. La fenêtre broker 🔀 est l'endroit où vous observez et ajustez tout ça.
+
+Treize interrupteurs, en groupes :
 
 | Interrupteur | Ce qu'il contrôle |
 |---|---|
 | trace log | Si le broker écrit ou non son journal |
-| local models only | Si l'emplacement cloud (OPRO-API) est même proposé dans le sélecteur de modèle |
+| local models only | Si l'emplacement cloud (OPRO-API) est seulement proposé dans le sélecteur de modèle |
 | read_file / write_file / shell brokered | Journalisation de trace par outil, un interrupteur chacun — trois en tout (les listes blanches sont *toujours* appliquées quoi qu'il arrive) |
-| fetch_url enabled | Si l'outil de récupération web de l'agent fonctionne du tout |
+| fetch_url enabled | Si l'outil de récupération web fonctionne du tout |
 | Tor for off-list fetches | Domaines hors liste blanche : router via Tor (activé) ou refuser (désactivé) |
 | cache & convert fetches | Convertir les pages récupérées en markdown et les mettre en cache dans `rness/io/input/` |
-| wikisink tools | Si les quatre outils wiki de l'agent fonctionnent (votre propre navigation 🚰 n'est jamais soumise à contrôle) |
+| wikisink tools | Si les quatre outils wiki de vos readvisors fonctionnent (votre propre navigation 🚰 n'est jamais soumise à contrôle) |
 | wikisink live updates | Si les passes de mise à jour peuvent contacter Wikipédia du tout (désactivé = rapport depuis l'état local uniquement) |
-| cacheawl tools | Si les outils de cachebox de l'agent fonctionnent (votre propre mode cacheawl n'est jamais soumis à contrôle) |
+| cacheawl tools | Si les outils de cachebox de vos readvisors fonctionnent (votre propre mode cacheawl n'est jamais soumis à contrôle) |
+| composure tools | Si vos readvisors peuvent lire et modifier des composures (votre propre canevas n'est jamais soumis à contrôle — section 4.9) |
+| forge new readvisors | Si la compétence `readvisory` peut installer pour vous un readvisor terminé (section 18.5). Désactivé, l'entretien et la rédaction ont quand même lieu, et le classement vous revient |
 
-Tout est activé par défaut : les défauts font confiance à l'agent avec le projet et le gardent honnête grâce à une trace papier. Cette trace — le **journal de trace** — atterrit dans `rness/knowledge/session-logs/<date>-broker.md` : horodatage, outil, décision, arguments, résultat, pour chaque appel passé par le broker. Et quand un interrupteur ou une liste blanche bloque quelque chose, l'agent reçoit un message de refus clair disant ce qui a été bloqué et pourquoi, pour qu'il puisse vous le dire plutôt que d'échouer en silence.
+L'en-tête de la fenêtre porte aussi le seul bouton d'enough qui change le nom de quelqu'un : **renommer votre readvisor en chef**. Il ouvre un petit champ, accepte de un à vingt-quatre caractères, et le nouveau nom est dans la signature de la prochaine chose que dit votre chef. C'est un réglage à l'échelle de la machine, comme le thème — un chef, un nom, partout. Il n'a pas d'historique : la signature est toujours le nom actuel, parce qu'un renommage qui remonterait dans votre transcription se lirait comme deux personnes différentes présentes dans la pièce.
 
-Remarquez le principe de conception dans ce tableau : les interrupteurs qui contrôlent les outils de l'agent ne contrôlent jamais *votre* interface. Désactiver cacheawl tools ne vous exclut pas du mode cacheawl. Ça veut dire que l'agent ne peut pas accéder au dépôt de sa propre initiative.
+Tout est activé par défaut : les défauts font confiance à vos readvisors avec le projet et les gardent honnêtes grâce à une trace papier. Cette trace — le **journal de trace** — atterrit dans `rness/knowledge/session-logs/<date>-broker.md` : horodatage, outil, décision, arguments, résultat, pour chaque appel passé par le broker. Et quand un interrupteur ou une liste blanche bloque quelque chose, le readvisor reçoit un message de refus clair disant ce qui a été bloqué et pourquoi, pour qu'il puisse vous le dire plutôt que d'échouer en silence.
+
+Remarquez le principe de conception dans ce tableau : les interrupteurs qui contrôlent les outils de vos readvisors ne contrôlent jamais *votre* interface. Désactiver cacheawl tools ne vous exclut pas du mode cacheawl. Ça veut dire que rien ne peut aller puiser dans le dépôt en votre nom.
 
 ---
 
-## 9. La fenêtre UI et les docs d'aide
 
-Le bouton UI ⚙ ouvre les préférences d'affichage et le matériel de référence. Un petit bouton **aide** se trouve en haut à droite de cette fenêtre, à côté du × : il ouvre ce manuel en lecture seule, dans l'application, comme un mode plein cadre comme les autres (section 12).
+## 10. La fenêtre UI et les docs d'aide
+
+Le bouton UI ⚙ ouvre les préférences d'affichage et le matériel de référence. Un petit bouton **aide** se trouve en haut à droite de cette fenêtre, à côté du × : il ouvre ce manuel en lecture seule, dans l'application, comme un mode plein cadre comme les autres (section 13).
 
 La sortie voyage désormais sur la barre de titre : **fermer le projet → accueil**, là-haut à côté du bouton aide, qui met fin à cette session et vous ramène à l'écran d'accueil (section 2.5). Elle demande avant de le faire, et elle précise ce qu'elle ne fait pas — le dossier sur le disque n'est pas touché. Dans l'application, vous auriez plus probablement recours à ⌘W ; ce bouton, c'est la même chose, et c'est le *seul* moyen si vous faites tourner enough dans un navigateur. (Il n'est pas là sur l'écran d'accueil lui-même, où il n'y a pas de projet à fermer.)
 
-Elle contient aussi la seule chose dans enough que vous pouvez installer depuis l'intérieur d'enough : la ligne **extras** pour la **lecture de PDF** (section 6.8). La ligne dit où vous en êtes — non installé, en cours d'installation, installé, ou installé mais pas terminé — et le bouton d'installation diffuse tout son journal dans la fenêtre pendant qu'il tourne, si bien qu'un long téléchargement devient quelque chose que vous pouvez regarder plutôt que quelque chose que vous subissez. Une fois terminé, les PDF commencent à s'ouvrir ; rien n'a besoin de redémarrer.
+Elle contient aussi la seule chose dans enough que vous pouvez installer depuis l'intérieur d'enough : la ligne **extras** pour la **lecture de PDF** (section 7.8). La ligne dit où vous en êtes — non installé, en cours d'installation, installé, ou installé mais pas terminé — et le bouton d'installation diffuse tout son journal dans la fenêtre pendant qu'il tourne, si bien qu'un long téléchargement devient quelque chose que vous pouvez regarder plutôt que quelque chose que vous subissez. Une fois terminé, les PDF commencent à s'ouvrir ; rien n'a besoin de redémarrer.
 
-### 9.1 Thèmes
+### 10.1 Thèmes
 
 Quatre sont fournis avec enough : **Enough Default** (violet-bleu profond et sombre), **Pastel** (papier pâle, dans l'esprit du thème « Man Page » du Terminal), **Wireframe**, et **Darknest**. Le changement est instantané, et chaque icône de l'interface redérive sa variante claire ou sombre à la volée.
 
 Les thèmes ne sont pas codés en dur. Ils vivent dans `~/enough/config/ui.json` comme des blocs nommés de valeurs de couleur, chacun appliqué comme une propriété CSS personnalisée. Copiez un bloc existant, renommez-le, changez les couleurs, rechargez : votre thème est dans le menu déroulant. Le bloc `_doc` en tête du fichier explique chaque clé.
 
-### 9.2 Polices
+### 10.2 Polices
 
-Même motif. Quatre familles fournies — SF Mono, sans-serif système, Georgia serif, Courier — et vos propres ajouts sont bienvenus dans le même `ui.json`. Pour la taille, voyez les deux molettes ci-dessous (section 9.3) — et dans un onglet de navigateur, le bon vieux zoom du navigateur (⌘+ / ⌘−) fonctionne toujours très bien par-dessus.
+Même motif. Quatre familles fournies — SF Mono, sans-serif système, Georgia serif, Courier — et vos propres ajouts sont bienvenus dans le même `ui.json`. Pour la taille, voyez les deux molettes ci-dessous (section 10.3) — et dans un onglet de navigateur, le bon vieux zoom du navigateur (⌘+ / ⌘−) fonctionne toujours très bien par-dessus.
 
-### 9.3 Dimensionnement — échelle de l'ui et échelle du texte
+### 10.3 Dimensionnement — échelle de l'ui et échelle du texte
 
 Le zoom du navigateur avait toujours été la réponse ici, jusqu'à ce que l'application de bureau arrive sans navigateur enroulé autour d'elle. Alors enough s'est développé le sien, et en a profité pour faire encore mieux : deux molettes au lieu d'une, sur la ligne sous le thème.
 
@@ -521,13 +663,13 @@ Les deux sont mémorisées **par dossier de projet** — le manuscrit que vous l
 
 Les limites respirent avec votre écran : environ 0,5× à 2× sur les écrans d'aujourd'hui, se resserrant sur une petite fenêtre pour que l'interface garde toujours assez de place pour être elle-même, se desserrant sur des écrans très grands et très denses (le mur 8K de 2046 a droit à 3×). Quand un pas franchirait la limite, le bouton frétille, le chiffre pulse en rouge, et rien ne change — c'est tout le message d'erreur.
 
-### 9.4 Langues
+### 10.4 Langues
 
 L'interface parle six langues : anglais, français, espagnol, allemand, chinois, et japonais. Le menu déroulant **langue de l'interface** sur la même ligne change tout ce que vous regardez — étiquettes, infobulles, bulles `(?)`, ce manuel — en direct, sans redémarrage. Le choix est global à la machine, voyageant dans `ui.json` comme le thème, donc l'accueil et chaque projet sont d'accord là-dessus.
 
-Ce qu'elle ne touche délibérément *pas* : vos fichiers, votre discussion, votre agent. Parlez à l'agent dans la langue qui vous convient — les modèles locaux sont à l'aise dans ces six langues — mais enough garde son propre échafaudage (compétences, paradigmes, prompts, fichiers de projet) en anglais, parce que c'est la langue que les modèles lisent le plus fidèlement. Quelques éléments générés restent en anglais aussi — les listes tirées en direct de ce qui est installé sur *votre* machine, comme les compétences dans une bulle ou le tableau des formats de fichier. Et partout où une traduction n'a pas encore rattrapé une nouvelle étiquette anglaise, vous verrez l'anglais plutôt qu'un vide : moins joli, jamais cassé. Vous en repérez une ? C'est un bug — [enough.support](https://enough.support) l'accueille volontiers.
+Ce qu'elle ne touche délibérément *pas* : vos fichiers, votre discussion, vos readvisors. Parlez-leur dans la langue qui vous convient — les modèles locaux sont à l'aise dans ces six langues — mais enough garde son propre échafaudage (compétences, paradigmes, prompts, fichiers de projet) en anglais, parce que c'est la langue que les modèles lisent le plus fidèlement. Quelques éléments générés restent en anglais aussi — les listes tirées en direct de ce qui est installé sur *votre* machine, comme les compétences dans une bulle ou le tableau des formats de fichier. Et partout où une traduction n'a pas encore rattrapé une nouvelle étiquette anglaise, vous verrez l'anglais plutôt qu'un vide : moins joli, jamais cassé. Vous en repérez une ? C'est un bug — [enough.support](https://enough.support) l'accueille volontiers.
 
-### 9.5 Aide-mémoires
+### 10.5 Aide-mémoires
 
 Deux colonnes de référence, juste dans la fenêtre UI.
 
@@ -537,6 +679,8 @@ Deux colonnes de référence, juste dans la fenêtre UI.
 |---|---|
 | esc | ferme le mode ouvert le plus au-dessus |
 | ⌘ \ | affiche / masque la barre latérale |
+| ⌘ / | affiche / masque le panneau readvisor |
+| ⇧ ⌘ / | donne toute la fenêtre au panneau readvisor |
 | ⌘ K | place le curseur dans le champ de discussion |
 | ⌘ Enter | envoie le message |
 | shift Enter | saut de ligne au lieu d'envoyer |
@@ -550,9 +694,9 @@ Ce sont les raccourcis que l'interface elle-même gère, donc ils fonctionnent a
 
 **L'aide-mémoire markdown :** titres, listes, liens, code, citations — toute la référence rapide, pour quiconque est encore en train de devenir couramment bilingue en markdown. Ce qui vaut la peine, puisqu'enough le parle nativement partout.
 
-### 9.6 Aide intégrée (IHH)
+### 10.6 Aide intégrée (IHH)
 
-Les bulles `(?)` disséminées dans l'interface sont le système d'aide intégré : une bulle par concept — compétences, rôles, le sélecteur de paradigme, rness, io, knowledge, cacheawl, wikisink, le système de modes, les documents convertis, et ainsi de suite — chacune avec un **what**, un **how**, et une liste **ideas**. Les bulles compétences, rôles, et paradigmes listent ce qui est réellement installé dans *votre* projet, et la bulle document-converti tire son tableau de types de fichiers du registre de formats propre à l'application — tout généré en direct, si bien que l'aide ne dérive jamais de la réalité. (Le même tableau apparaît à la section 6.2 de ce manuel, depuis la même source.)
+Les bulles `(?)` disséminées dans l'interface sont le système d'aide intégré : une bulle par concept — compétences, readvisors, le panneau readvisor, le sélecteur de paradigme, la composure avec ses modules et ses outils, le journal, rness, io, knowledge, cacheawl, wikisink, le système de modes, les documents convertis, et ainsi de suite — chacune avec un **what**, un **how**, et une liste **ideas**. Les bulles compétences, readvisors, et paradigmes listent ce qui est réellement installé dans *votre* projet, et la bulle document-converti tire son tableau de types de fichiers du registre de formats propre à l'application — tout généré en direct, si bien que l'aide ne dérive jamais de la réalité. (Le même tableau apparaît à la section 7.2 de ce manuel, depuis la même source.)
 
 Les bulles sont contrôlées par dossier de projet via la case à cocher « bulles d'aide (?) » dans la fenêtre UI. Activée par défaut pour un nouveau dossier, et le réglage colle par dossier — donc votre projet chevronné du quotidien peut se faire discret pendant qu'une expérience toute fraîche garde ses petites roues.
 
@@ -560,11 +704,11 @@ Même l'aide est personnalisable. Le contenu vit dans un seul fichier markdown (
 
 ---
 
-## 10. Wikisink
+## 11. Wikisink
 
-Wikisink (🚰) met une copie hors ligne de Wikipédia anglais sur votre machine : consultable dans l'application, cherchable en texte intégral, lisible par l'agent, annotable, et rafraîchissable à la demande avec un rapport de changements. Une fois configuré, il n'a besoin d'aucun internet du tout.
+Wikisink (🚰) met une copie hors ligne de Wikipédia anglais sur votre machine : consultable dans l'application, cherchable en texte intégral, lisible par vos readvisors, annotable, et rafraîchissable à la demande avec un rapport de changements. Une fois configuré, il n'a besoin d'aucun internet du tout.
 
-### 10.1 Configuration
+### 11.1 Configuration
 
 Cliquez sur 🚰 pour la première fois et l'assistant demande trois choses.
 
@@ -583,39 +727,39 @@ Cliquez sur 🚰 pour la première fois et l'assistant demande trois choses.
 
 L'archive est un unique fichier `.zim` lu sur place. Il n'est jamais extrait, et il n'encombre jamais votre gestionnaire de fichiers. Vous pouvez enregistrer **plusieurs installations** — disons, l'archive complète sur un disque externe plus une petite sur le disque interne — et basculer entre elles dans la liste des installations ⚙. Un disque débranché ne casse rien : cette installation s'affiche comme inaccessible jusqu'au retour du disque, et vos commentaires et dérogations vivent indépendamment de toute archive particulière.
 
-Une fois installé, 🚰 ouvre le lecteur : précédent et suivant, des suggestions de titre en direct dans le champ de recherche (Entrée lance une recherche en texte intégral sur toute l'archive), un dé à article aléatoire 🎲, et un badge de source qui vous dit si vous lisez l'instantané de l'archive (`ZIM <date>`), une copie plus fraîche issue d'une passe de mise à jour (`en direct <date>`), ou une copie préservée (`préservé`). Les liens internes restent dans l'application ; les liens externes s'ouvrent dans votre navigateur. La pastille de discussion en bas remet l'article actuel — ou votre passage sélectionné — directement à l'agent.
+Une fois installé, 🚰 ouvre le lecteur : précédent et suivant, des suggestions de titre en direct dans le champ de recherche (Entrée lance une recherche en texte intégral sur toute l'archive), un dé à article aléatoire 🎲, et un badge de source qui vous dit si vous lisez l'instantané de l'archive (`ZIM <date>`), une copie plus fraîche issue d'une passe de mise à jour (`en direct <date>`), ou une copie préservée (`préservé`). Les liens internes restent dans l'application ; les liens externes s'ouvrent dans votre navigateur. Sélectionnez un passage et il apparaît comme une pastille au-dessus de la zone de message dans le panneau readvisor, prêt à partir avec votre prochain message (section 5.2).
 
-**La pastille de nouvel instantané.** Kiwix reconstruit ces archives périodiquement, et vous ne devriez pas avoir à aller le chercher. Quand une version plus récente de *votre* variante existe, une petite pastille apparaît dans la barre d'outils du lecteur — `nouvel instantané : <date> · <taille>`. Cliquez dessus, confirmez la taille, et la mise à niveau s'exécute sur place : même dossier de stockage, téléchargée d'abord et substituée seulement une fois terminée, l'ancien fichier supprimé après coup et pas avant. Vos commentaires, enregistrements, et dérogations 🛡 traversent intacts, parce qu'aucun d'eux ne vit à l'intérieur de l'archive. La pastille devient l'indicateur de progression pendant le téléchargement, puis disparaît. enough vérifie ça au plus une fois par jour, jamais pendant que le lecteur affiche quelque chose, et reste silencieux quand vous êtes hors ligne — ce qui est l'état normal d'une fonctionnalité Wikipédia hors ligne. La même mise à niveau est disponible par le chemin long, dans la liste des installations ⚙, et les passes wikisink de l'agent la signalent aussi (section 10.3) — mais appuyer sur le bouton reste toujours votre décision.
+**La pastille de nouvel instantané.** Kiwix reconstruit ces archives périodiquement, et vous ne devriez pas avoir à aller le chercher. Quand une version plus récente de *votre* variante existe, une petite pastille apparaît dans la barre d'outils du lecteur — `nouvel instantané : <date> · <taille>`. Cliquez dessus, confirmez la taille, et la mise à niveau s'exécute sur place : même dossier de stockage, téléchargée d'abord et substituée seulement une fois terminée, l'ancien fichier supprimé après coup et pas avant. Vos commentaires, enregistrements, et dérogations 🛡 traversent intacts, parce qu'aucun d'eux ne vit à l'intérieur de l'archive. La pastille devient l'indicateur de progression pendant le téléchargement, puis disparaît. enough vérifie ça au plus une fois par jour, jamais pendant que le lecteur affiche quelque chose, et reste silencieux quand vous êtes hors ligne — ce qui est l'état normal d'une fonctionnalité Wikipédia hors ligne. La même mise à niveau est disponible par le chemin long, dans la liste des installations ⚙, et les passes wikisink le signalent aussi (section 11.3) — mais appuyer sur le bouton reste toujours votre décision.
 
-### 10.2 Enregistrer et verrouiller des articles
+### 11.2 Enregistrer et verrouiller des articles
 
 **Enregistrer.** Le bouton enregistrer propose deux destinations : le dossier `wiki/` de ce projet, ou le cachebox wiki global à la machine (`~/enough/cacheawl/wiki/`) partagé par tous les projets. Dans les deux cas, un enregistrement est un dossier — `article.html`, l'article octet pour octet tel que l'archive l'avait, plus `_manifest.md` portant le titre, l'url source, la date de récupération, et la ligne de licence CC BY-SA. Chaque article enregistré est autodescriptif, ce qui veut dire que si son texte finit un jour dans quelque chose que vous publiez, l'attribution dont vous avez besoin est déjà posée juste à côté. Cliquez sur un `article.html` enregistré dans l'arborescence et il s'ouvre dans le lecteur en fidélité complète — infobox, tableaux, tout — même quand aucune archive n'est accessible. Pour désenregistrer, survolez le dossier enregistré dans l'arborescence et cliquez sur le 🗑 qui apparaît.
 
-Enregistrer, c'est pour *vous* : des copies hors-ligne-de-l'hors-ligne, l'attribution pour publication. L'agent n'a pas besoin des enregistrements — ses outils lisent n'importe quel article de l'archive en texte propre à la demande.
+Enregistrer, c'est pour *vous* : des copies hors-ligne-de-l'hors-ligne, l'attribution pour publication. Vos readvisors n'ont pas besoin des enregistrements — leurs outils lisent n'importe quel article de l'archive en texte propre à la demande.
 
 **Commentaires.** Sélectionnez du texte et appuyez sur 💬, ou utilisez le 💬 de la barre d'outils pour une note au niveau du paragraphe. Les fils vivent dans le panneau 🗨 : répondre, résoudre, rouvrir, sauter. Les commentaires s'attachent à l'*article*, pas à un fichier, et ils survivent aux mises à jour d'article en se dégradant en douceur. Le texte encore présent reste **ancré**. Le texte retiré par une édition est **repositionné** sur son paragraphe. Un paragraphe purement supprimé laisse le commentaire **orphelin** dans le panneau — étiqueté, mais jamais supprimé automatiquement.
 
-**Verrouillage (dérogations de suppression).** Il arrive que Wikipédia en direct supprime un article dont vous dépendiez ; le cas classique est un sujet de niche coupé pour « notoriété » plutôt que pour sa qualité. Le bouton 🛡 préserve votre copie locale pour toujours — servie dès lors avec un badge `préservé`, exclue des futurs rafraîchissements, toujours cherchable. Les rapports de passe de mise à jour notent en fait les suppressions détectées (les justifications à la « notoriété » sont notées suspectes ; celles pour violation de droit d'auteur sont notées bénignes), pour que vous sachiez quelles suppressions méritent un coup d'œil. Et déroger reste délibérément votre décision à vous seul : l'agent peut recommander 🛡, mais il ne peut jamais l'appuyer.
+**Verrouillage (dérogations de suppression).** Il arrive que Wikipédia en direct supprime un article dont vous dépendiez ; le cas classique est un sujet de niche coupé pour « notoriété » plutôt que pour sa qualité. Le bouton 🛡 préserve votre copie locale pour toujours — servie dès lors avec un badge `préservé`, exclue des futurs rafraîchissements, toujours cherchable. Les rapports de passe de mise à jour notent en fait les suppressions détectées (les justifications à la « notoriété » sont notées suspectes ; celles pour violation de droit d'auteur sont notées bénignes), pour que vous sachiez quelles suppressions méritent un coup d'œil. Et déroger reste délibérément votre décision à vous seul : un readvisor peut recommander 🛡, mais il ne peut jamais l'appuyer.
 
-### 10.3 La mise à jour wikisink, avec rapport de changements
+### 11.3 La mise à jour wikisink, avec rapport de changements
 
-« Wikisink » est aussi un verbe. Chaque article que vous avez enregistré ou commenté est *surveillé*, et demander à l'agent de « lancer un wikisink » (ou le laisser invoquer son outil `wikisink`) vérifie l'ensemble surveillé par rapport à Wikipédia en direct et fait un rapport. Une passe :
+« Wikisink » est aussi un verbe. Chaque article que vous avez enregistré ou commenté est *surveillé*, et demander à votre readvisor de « lancer un wikisink » (ou le laisser saisir l'outil `wikisink`) vérifie l'ensemble surveillé par rapport à Wikipédia en direct et fait un rapport. Une passe :
 
 1. rafraîchit les articles surveillés qui ont changé dans une surcouche locale (leur badge bascule vers `en direct`) ;
 2. signale les **pics d'édition** — des articles surveillés soudainement édités des dizaines de fois par jour, plus des candidats à la poussée à l'échelle de tout Wikipédia ;
 3. compare le **classement quotidien des 1000 articles les plus vus** à la dernière passe : ceux qui montent, ceux qui descendent, les nouvelles entrées, les sorties, et les tendances de vues pour vos articles surveillés ;
-4. vérifie les **suppressions** d'articles surveillés ou récemment vus, notées pour leur degré de suspicion (section 10.2) ;
-5. note quand un **nouvel instantané de base** est disponible. Remplacer l'archive de base de plusieurs Go reste toujours votre décision — appuyez sur la pastille dans la barre d'outils du lecteur (section 10.1) ou utilisez la liste des installations ⚙. Il n'existe aucun outil agent qui la substitue.
+4. vérifie les **suppressions** d'articles surveillés ou récemment vus, notées pour leur degré de suspicion (section 11.2) ;
+5. note quand un **nouvel instantané de base** est disponible. Remplacer l'archive de base de plusieurs Go reste toujours votre décision — appuyez sur la pastille dans la barre d'outils du lecteur (section 11.1) ou utilisez la liste des installations ⚙. Il n'existe aucun outil qui la substitue.
 
-Le rapport arrive dans la discussion en markdown ; la version complète sans plafond est gardée sous le dossier d'état de wikisink. Les passes sont polies envers Wikipédia — groupées par lots, User-Agent honnête — et reprenables si interrompues, et une passe `report-only` saute l'étape de rafraîchissement. Deux interrupteurs du broker gouvernent tout ça : l'un contrôle entièrement les outils wiki de l'agent, l'autre peut forcer les passes entièrement hors ligne.
+Le rapport arrive dans la discussion en markdown ; la version complète sans plafond est gardée sous le dossier d'état de wikisink. Les passes sont polies envers Wikipédia — groupées par lots, User-Agent honnête — et reprenables si interrompues, et une passe `report-only` saute l'étape de rafraîchissement. Deux interrupteurs du broker gouvernent tout ça : l'un contrôle entièrement les outils wiki de vos readvisors, l'autre peut forcer les passes entièrement hors ligne.
 
 ---
 
-## 11. Cacheawl
+## 12. Cacheawl
 
 Cacheawl est le dépôt de texte global à la machine : l'endroit pour les choses que vous voulez garder pour toujours et atteindre depuis chaque projet. Il vit dans `~/enough/cacheawl/`, caché de l'arborescence de chaque projet, partagé entre toutes vos instances d'enough. (Si vous faisiez tourner une version antérieure d'enough, votre ancienne bibliothèque `infoworld/` a été dissoute dans cacheawl au premier lancement de la 0.1.6 — `personal/`, `public/`, et `wiki/` sont devenus vos trois premiers cacheboxes. Rien n'a été perdu.)
 
-### 11.1 Les cacheboxes et leurs cartes merirmaid
+### 12.1 Les cacheboxes et leurs cartes merirmaid
 
 Un **cachebox** est un dossier de premier niveau dans le dépôt, et il existe en deux variantes. Les **box simples** contiennent du texte gardé pour toujours que vous organisez vous-même : une box `personal` de notes de référence, une box `press` de textes publiés, n'importe quelle structure qui vous sert. Les **répliques mises en cache** sont des box *ingérées* depuis une source — un dossier local, un site web, ou un ensemble d'articles Wikipédia — qui se souviennent d'où elles viennent.
 
@@ -623,7 +767,7 @@ Chaque box porte une **carte merirmaid** : `_cachebox.merirmaid`, un diagramme e
 
 Ouvrez le **mode cacheawl** depuis la barre supérieure pour une vue à deux volets, projet d'un côté, dépôt de l'autre. Glissez un fichier d'un côté à l'autre pour le copier. Shift-glissez pour le déplacer. Shift-cliquez pour un menu contextuel, et double-cliquez pour ouvrir n'importe quel fichier dans son mode naturel — girraph, merirmaid, lecture/édition, ou le lecteur wiki — directement depuis le dépôt.
 
-### 11.2 Le cachebox et la capture de documents locaux ou web
+### 12.2 Le cachebox et la capture de documents locaux ou web
 
 La **barre d'ingestion** en mode cacheawl (ou une simple demande en conversation) capture du matériel extérieur dans une box :
 
@@ -631,17 +775,31 @@ La **barre d'ingestion** en mode cacheawl (ou une simple demande en conversation
 - **Un site web** — explore un site de documentation ou de référence jusqu'à une profondeur choisie (plafonnée autour de 500 pages) et le garde en markdown local. Les ingestions web respectent vos interrupteurs de récupération et vos listes blanches, routage Tor compris.
 - **Wikipédia** — tire les articles d'un sujet (plafonnés autour de 200) de votre archive wikisink vers du texte permanent, indépendant de tout projet.
 
-Les ingestions tournent en arrière-plan. La box apparaît immédiatement avec un statut « en cours d'ingestion » que vous pouvez observer, et une ingestion échouée le dit plutôt que de prétendre avoir fini. Les outils de cachebox de l'agent (lister, créer, ingérer) sont soumis à l'interrupteur broker cacheawl ; votre propre usage du mode cacheawl ne l'est jamais.
+Les ingestions tournent en arrière-plan. La box apparaît immédiatement avec un statut « en cours d'ingestion » que vous pouvez observer, et une ingestion échouée le dit plutôt que de prétendre avoir fini. Les outils de cachebox de vos readvisors (lister, créer, ingérer) sont soumis à l'interrupteur broker cacheawl ; votre propre usage du mode cacheawl ne l'est jamais.
 
-Pourquoi s'en donner la peine ? Parce que les dossiers de projet sont un espace de travail et cacheawl un espace de bibliothèque. Ingérez une fois la documentation d'un framework, et chaque futur projet peut s'appuyer dessus hors ligne. Gardez vos notes de référence pérennes dans une box, et chaque agent à qui vous parlerez jamais peut les atteindre. Terminez un artefact et déplacez-le dans une box, où il survit à son projet.
+Pourquoi s'en donner la peine ? Parce que les dossiers de projet sont un espace de travail et cacheawl un espace de bibliothèque. Ingérez une fois la documentation d'un framework, et chaque futur projet peut s'appuyer dessus hors ligne. Gardez vos notes de référence pérennes dans une box, et chaque readvisor à qui vous parlerez un jour peut les atteindre. Terminez un artefact et déplacez-le dans une box, où il survit à son projet.
 
 ---
 
-## 12. Empilement de plusieurs modes actifs
+## 13. Empilement de plusieurs modes actifs
 
 Les modes plein cadre d'enough — lecture/édition, girraph, merirmaid, wikisink, cacheawl — ne se remplacent pas les uns les autres. Ils **s'empilent**, comme des feuilles de papier. Ouvrez cacheawl, ouvrez un girraph depuis l'intérieur d'une box, ouvrez un fichier de notes par-dessus : trois modes de profondeur, et fermer chacun révèle celui en dessous exactement comme vous l'aviez laissé. Même position de défilement, même descente, mêmes modifications non enregistrées.
 
-La barre supérieure montre un indicateur carré par mode ouvert, le plus récent à gauche. Chacun porte un petit ruban croix-rouge qui ferme ce mode précis, même un enseveli. Cliquez sur l'indicateur d'un mode enseveli pour le remonter au sommet sans déranger le reste. Esc ferme toujours le mode le plus au-dessus. Quand le dernier se ferme, vous voilà de retour à la vue de discussion — la pile vide (section 4).
+La barre supérieure montre un indicateur carré par mode ouvert, le plus récent à gauche. Chacun porte un petit ruban croix-rouge qui ferme ce mode précis, même un enseveli. Cliquez sur l'indicateur d'un mode enseveli pour le remonter au sommet sans déranger le reste. Quand le dernier se ferme, vous voilà de retour sur la composure — la pile vide (section 4).
+
+**Le carré de base.** À l'extrémité droite de ces indicateurs s'en trouve un qui est toujours là et n'a pas de ruban : la composure. Il n'y a rien à fermer, parce que c'est le plancher. Cliquer dessus, c'est le geste du **coup d'œil** de la section 4.8 — chaque mode empilé se masque, vous regardez le canevas, et un nouveau clic dessus (ou sur n'importe quel autre indicateur) les ramène tous intacts.
+
+**Le panneau readvisor n'est pas du tout dans la pile.** C'est une colonne à côté (section 5) : un panneau ancré et trois modes empilés coexistent donc sans se gêner mutuellement, et Échap ne ferme jamais le panneau quand il est ancré.
+
+**Échap, dans l'ordre.** Échap veut dire *sortir de la chose la plus intérieure*, et la chose la plus intérieure n'est pas toujours un mode :
+
+1. une fenêtre modale ouverte, qui gère son propre Échap ;
+2. une surcouche de confirmation ;
+3. un champ de texte où vous êtes en train de taper — où Échap est délibérément inerte, pour qu'une pression involontaire ne puisse pas jeter un message que vous étiez en train de composer (un champ de recherche fait exception : là, Échap efface d'abord la recherche, puis lâche prise) ;
+4. un menu de composure ouvert ;
+5. un panneau readvisor en plein écran, qui retombe en panneau ancré ;
+6. un coup d'œil, qui remet les modes empilés en place ;
+7. et seulement alors, le mode le plus au-dessus.
 
 Deux commodités à connaître :
 
@@ -650,11 +808,11 @@ Deux commodités à connaître :
 
 ---
 
-## 13. La fenêtre de modèle
+## 14. La fenêtre de modèle
 
 Le badge de modèle dans la barre supérieure ouvre la fenêtre de modèle : quel cerveau vous répond, ce qui est disponible d'autre, et — si vous le choisissez — l'emplacement cloud.
 
-### 13.1 Modèles locaux : vue d'ensemble et recommandations d'usage
+### 14.1 Modèles locaux : vue d'ensemble et recommandations d'usage
 
 Sept modèles locaux pris en charge — et la fenêtre est maintenant aussi l'endroit où vous les installez. Chaque ligne que vous n'avez pas encore montre sa taille de téléchargement et un verdict de faisabilité calculé par rapport à la mémoire et à l'espace disque libre de *cette machine* : ✓ confortable, ~ juste, ✗ non recommandé. Les téléchargements tournent avec une barre de progression en direct, survivent à une fermeture (ils reprennent là où ils se sont arrêtés), et peuvent être annulés sans perdre la partie que vous avez déjà. Les modèles installés changent en un clic, et n'importe quel modèle sauf l'actif peut être supprimé depuis sa ligne quand vous voulez récupérer l'espace disque.
 
@@ -676,64 +834,144 @@ Encore une note pour les installations terminal : un modèle peut être *téléc
 
 Changer de modèle redémarre le serveur d'inférence local et vide la conversation en mémoire. Vos fichiers, journaux, et état de requêtes persistent tous ; un changement vous coûte l'historique de discussion, pas le travail.
 
-### 13.2 Support OpenRouter (l'emplacement OPRO-API)
+### 14.2 Support OpenRouter (l'emplacement OPRO-API)
 
 enough est local-d'abord, pas local-seulement. Un cinquième emplacement de modèle, **OPRO-API**, route à travers OpenRouter vers des modèles cloud. Il est désactivé par défaut, délibérément laborieux à activer, et honnête sur le compromis : vos prompts et sorties quittent la machine, en échange d'une capacité de modèle de pointe et, parfois, d'un coût plus bas que ce que le matériel et l'électricité d'un modèle local comparable exigeraient.
 
-Pour l'activer : désactivez **local models only** dans le broker, puis cliquez sur OPRO-API dans la fenêtre de modèle. Un assistant en trois écrans vous guide — trois cases de confirmation explicites (vous avez un compte, vous comprenez la facturation, vous comprenez le compromis de confidentialité), puis votre clé API, puis une vérification de santé en direct. La clé est stockée dans le Trousseau macOS. Elle n'est jamais écrite dans aucun fichier, l'agent n'a aucun moyen de la lire, et le broker refuse les commandes shell qui ressemblent même de loin à des tentatives d'y accéder. Une fois vérifiée, OPRO-API devient sélectionnable comme n'importe quel autre modèle, et son panneau de réglages propose retester, mettre à jour la clé, supprimer la clé, et votre choix de n'importe quel id de modèle OpenRouter.
+Pour l'activer : désactivez **local models only** dans le broker, puis cliquez sur OPRO-API dans la fenêtre de modèle. Un assistant en trois écrans vous guide — trois cases de confirmation explicites (vous avez un compte, vous comprenez la facturation, vous comprenez le compromis de confidentialité), puis votre clé API, puis une vérification de santé en direct. La clé est stockée dans le Trousseau macOS. Elle n'est jamais écrite dans aucun fichier, vos readvisors n'ont aucun moyen de la lire, et le broker refuse les commandes shell qui ressemblent même de loin à des tentatives d'y accéder. Une fois vérifiée, OPRO-API devient sélectionnable comme n'importe quel autre modèle, et son panneau de réglages propose retester, mettre à jour la clé, supprimer la clé, et votre choix de n'importe quel id de modèle OpenRouter.
 
 Deux choses gardent l'usage du cloud responsable :
 
-- **Tout est mis en cache localement.** Chaque échange cloud est écrit dans `rness/io/cloud-cache/` avec les comptes de tokens et un index — une trace papier locale que votre agent local peut lire plus tard.
-- **`cloud_pipeline`** laisse l'agent traiter par lots de gros travaux à travers l'emplacement cloud — jusqu'à 200 étapes, avec mise en cache par étape, résumé optionnel par étape, et une passe de compilation finale — en écrivant les résultats sur le disque plutôt qu'en inondant la conversation. Demandez « un cloud pipeline qui rédige les douze résumés de chapitre » et le gros du travail se passe hors bande, entièrement journalisé.
+- **Tout est mis en cache localement.** Chaque échange cloud est écrit dans `rness/io/cloud-cache/` avec les comptes de tokens et un index — une trace papier locale que vos readvisors locaux peuvent lire plus tard.
+- **`cloud_pipeline`** laisse vos readvisors traiter par lots de gros travaux à travers l'emplacement cloud — jusqu'à 200 étapes, avec mise en cache par étape, résumé optionnel par étape, et une passe de compilation finale — en écrivant les résultats sur le disque plutôt qu'en inondant la conversation. Demandez « un cloud pipeline qui rédige les douze résumés de chapitre » et le gros du travail se passe hors bande, entièrement journalisé.
 
 ---
 
-## 14. Paradigmes
+## 15. Paradigmes
 
-Un paradigme est le cadre de raisonnement de l'agent — les règles d'engagement pour la façon dont le travail se déroule. Un seul est actif à la fois (affiché en haut de la barre latérale ; cliquez sur ● pour changer), et le texte complet du paradigme actif voyage dans le prompt système à chaque tour. L'agent voit aussi un catalogue d'une ligne des autres, pour pouvoir suggérer un changement — ou en faire un — quand votre demande serait mieux servie ailleurs. Un changement initié par l'agent n'a rien d'exotique : il écrit le nom du paradigme dans `rness/active-paradigm` et vous dit qu'il l'a fait.
+Un paradigme est le cadre de raisonnement dans lequel travaillent vos readvisors — les règles d'engagement pour la façon dont le travail se déroule. Un seul est actif à la fois (affiché en haut de la barre latérale ; cliquez sur ● pour changer), et le texte complet du paradigme actif voyage dans le prompt système à chaque tour. Votre readvisor en chef voit aussi un catalogue d'une ligne des autres, pour pouvoir suggérer un changement — ou en faire un — quand votre demande serait mieux servie ailleurs. Un changement fait pour vous n'a rien d'exotique : le nom du paradigme est écrit dans `rness/active-paradigm` et on vous dit que c'est arrivé.
 
-### 14.1 default
+### 15.1 default
 
-Conversation libre à agent unique. Le paradigme pour la plupart du travail, et l'aiguilleur qui guette les moments où un autre paradigme conviendrait mieux. Il porte aussi les conventions permanentes — comme savoir que « les parties jaunes » veut dire vos surlignages.
+Conversation libre, une seule voix. Le paradigme pour la plupart du travail, et l'aiguilleur qui guette les moments où un autre paradigme conviendrait mieux. Il porte aussi les conventions permanentes — comme savoir que « les parties jaunes » veut dire vos surlignages.
 
-### 14.2 text-planning
+### 15.2 text-planning
 
-Pour la longue piste d'élan avant la prose : faire passer un roman, un recueil d'essais, un livre non-fictionnel, ou un manifeste de « je crois que je veux écrire quelque chose » à un plan utilisable. L'agent construit un document de plan avec vous à la racine du projet — patiemment, itérativement, sur autant de sessions qu'il faut — puis, sur demande, génère par section des *échafaudages* : des guides structurels (beats, en-têtes, rappels de voix, budgets de mots) que vous développez vous-même en prose. La règle qui définit ce paradigme : **il n'écrit jamais votre prose.** Les échafaudages ne contiennent que de la structure. Votre voix reste votre voix. (Il s'active aux côtés de la compétence `analyzer` ou `memoir-dialectic` ; les mémoires sont confiées à memoir-dialectic, construite spécifiquement pour elles.)
+Pour la longue piste d'élan avant la prose : faire passer un roman, un recueil d'essais, un livre non-fictionnel, ou un manifeste de « je crois que je veux écrire quelque chose » à un plan utilisable. Votre readvisor en chef construit un document de plan avec vous à la racine du projet — patiemment, itérativement, sur autant de sessions qu'il faut — puis, sur demande, génère par section des *échafaudages* : des guides structurels (beats, en-têtes, rappels de voix, budgets de mots) que vous développez vous-même en prose. La règle qui définit ce paradigme : **il n'écrit jamais votre prose.** Les échafaudages ne contiennent que de la structure. Votre voix reste votre voix. (Il s'active aux côtés de la compétence `analyzer` ou `memoir-dialectic` ; les mémoires sont confiées à memoir-dialectic, construite spécifiquement pour elles.)
 
-### 14.3 translation
+### 15.3 translation
 
-Déclare la traduction hors ligne comme une capacité de premier ordre. Il se marie avec la compétence `translator` (section 16.5) : quand une demande implique de faire passer du texte d'une langue humaine à une autre, l'agent bascule ici, et si la compétence est désactivée, il vous dit ce que vous manquez — et continue de le dire jusqu'à ce que vous l'activiez. Compétence activée, vous avez un traducteur local d'environ 419 langues, sans compte, sans limite de débit, et sans dépendance réseau.
+Déclare la traduction hors ligne comme une capacité de premier ordre. Il se marie avec la compétence `translator` (section 18.7) : quand une demande implique de faire passer du texte d'une langue humaine à une autre, votre readvisor bascule ici, et si la compétence est désactivée, il vous dit ce que vous manquez — et continue de le dire jusqu'à ce que vous l'activiez. Compétence activée, vous avez un traducteur local d'environ 419 langues, sans compte, sans limite de débit, et sans dépendance réseau.
 
-### 14.4 workflow-design
+### 15.4 workflow-design
 
-Le paradigme à propos d'enough lui-même, actif chaque fois que vous créez ou changez le flux de travail plutôt que de travailler à l'intérieur : nouvelles compétences, nouveaux rôles, nouveaux paradigmes, modifications d'AGENT.md ou de MOTIVATION.md. Ici l'agent se comporte comme un collaborateur de conception réfléchi — des questions de clarification avant de construire (périmètre ? nom ? conditions de déclenchement ?), des alternatives quand votre premier instinct pourrait être plus affûté, et un fichier de requête suivi pour chaque construction, puisque les changements de flux de travail survivent aux conversations qui les produisent. C'est le paradigme qui rend la section 3 réelle.
+Le paradigme à propos d'enough lui-même, actif chaque fois que vous créez ou changez le flux de travail plutôt que de travailler à l'intérieur : nouvelles compétences, nouveaux readvisors, nouveaux paradigmes, modifications d'AGENT.md ou de MOTIVATION.md. Ici votre readvisor en chef se comporte comme un collaborateur de conception réfléchi — des questions de clarification avant de construire (périmètre ? nom ? conditions de déclenchement ?), des alternatives quand votre premier instinct pourrait être plus affûté, et un fichier de requête suivi pour chaque construction, puisque les changements de flux de travail survivent aux conversations qui les produisent. C'est le paradigme qui rend la section 3 réelle.
 
 ---
 
-## 15. Rôles
+## 16. Readvisors
 
-Un rôle est un second personnage que vous pouvez convoquer dans la conversation : son propre `AGENT.md` et `MOTIVATION.md`, le même motif à deux fichiers qui définit votre agent principal, circonscrit à un caractère complémentaire — ou délibérément contradicteur. Activez les rôles par projet dans la barre latérale. Les rôles activés voyagent dans le prompt système, et vous faites appel à eux par leur nom (« que dirait open-skeptic de ce plan ? »).
+Un **readvisor** est un jugement que vous pouvez garder : son propre `AGENT.md` et son propre `MOTIVATION.md`, les deux mêmes fichiers qui définissent votre readvisor en chef, circonscrits à une manière particulière de lire un problème. Activez-les par projet dans la section **readvisors** de la barre latérale.
 
-### 15.1 block-breaker
+Celui en haut du panneau readvisor est votre **readvisor en chef**, et d'origine il s'appelle **Ed**. Ce nom est à vous et vous pouvez le changer — **renommer votre readvisor en chef**, dans l'en-tête de la fenêtre broker (section 9). Le chef n'est pas d'une autre nature que les autres ; c'est simplement celui qui répond quand vous n'avez demandé personne en particulier.
 
-Un spécialiste du blocage d'écriture, distillé à partir des réponses d'un vrai écrivain sur la façon dont il dissout le fait d'être coincé. Il diagnostique avant de prescrire — à court d'idées, à court de cran, à court de structure, et à court de permission sont quatre problèmes différents — puis fait appel à des contraintes, du brainstorming par répétitions (« dix variations, puis on taille »), des recadrages étranges, et, quand on le veut, de vraies phrases suivantes. Implacablement anti-défaitiste. Sa croyance centrale : pour quiconque écrit volontairement, le blocage se résout toujours, parce que les règles ont été inventées et que le remède peut l'être aussi.
+**Plusieurs readvisors, une seule voix.** Activez-en trois et vous n'obtenez pas trois réponses. En conversation ordinaire, leurs perspectives, leur expertise et leurs mises en garde sont fondues dans ce que dit votre chef — une seule voix, parfois faite de plusieurs. Quand une perspective particulière porte un argument, on vous dira en général laquelle. Si vous les voulez parlant séparément, sous leurs propres noms, chacun leur tour, c'est exactement ce qu'est un **conseil** (section 17).
 
-### 15.2 open-skeptic
+**Trois provenances**, et la ligne de la barre latérale dit laquelle :
+
+- **fourni** — les deux ci-dessous, qui arrivent comme des liens vers les défauts d'enough, comme tout autre composant fourni.
+- **global** — tout ce qui se trouve dans `~/enough/readvisors/`, qui est à vous et que tous les projets de cette machine voient. Ce dossier n'est jamais créé pour vous : il apparaît la première fois que quelque chose y dépose un readvisor. (C'est celui où l'on peut écrire. Le dossier des défauts à l'intérieur d'une installation de bureau est scellé.)
+- **projet** — un vrai dossier dans le `rness/readvisors/` de ce projet, appartenant à ce projet seul.
+
+Un readvisor global et un readvisor fourni portant le même nom perdent face à un readvisor local au projet ; la copie propre à un projet l'emporte toujours, et c'est ce qui donne du sens à « personnaliser ».
+
+**En retirer un.** Les lignes non fournies portent un ×. Il demande d'abord, parce qu'il supprime des fichiers : le dossier d'un readvisor de projet s'en va, un readvisor global s'en va de `~/enough/readvisors/` et de la liste de ce projet. Ce qu'enough a fourni ne peut pas être retiré de cette façon — il n'y a rien là à supprimer qu'une mise à jour ne remettrait pas. Et un nom retiré est aussi effacé de la liste des désactivés du projet, pour qu'un readvisor du même nom arrivant plus tard ne se retrouve pas mystérieusement éteint.
+
+### 16.1 block-breaker
+
+Un spécialiste du blocage d'écriture, distillé à partir des réponses d'un vrai écrivain sur la façon dont il dissout le fait d'être coincé — ce qui est exactement ce que fait la compétence `readvisory` (section 18.5), et voici à quoi ressemble ce qu'elle produit. Il diagnostique avant de prescrire — à court d'idées, à court de cran, à court de structure, et à court de permission sont quatre problèmes différents — puis fait appel à des contraintes, du brainstorming par répétitions (« dix variations, puis on taille »), des recadrages étranges, et, quand on le veut, de vraies phrases suivantes. Implacablement anti-défaitiste. Sa croyance centrale : pour quiconque écrit volontairement, le blocage se résout toujours, parce que les règles ont été inventées et que le remède peut l'être aussi.
+
+### 16.2 open-skeptic
 
 Un « oiseau de mauvais augure éclairable » : sincèrement enthousiaste pour l'IA là où elle est forte, professionnellement méfiant là où elle est survendue. Convoquez-le quand vous êtes sur le point de construire un flux de travail et voulez que les modes d'échec soient nommés tôt. Il résiste à l'idée de demander à l'IA de répliquer l'expérience humaine, aux chaînes d'erreurs qui s'accumulent sans relecture humaine, et à la confiance fluide qui fait le travail de l'expertise — tout en applaudissant l'IA comme moteur de collation, prothèse de connaissance, et partenaire de répétition. Il change d'avis face aux preuves : montrez-lui un flux de travail qui marche et il le dit, tout simplement.
 
-### 15.3 Construire le vôtre
+### 16.3 Construire le vôtre
 
-Deux exemples, un seul motif — des instructions plus une motivation, dans deux fichiers markdown. Les rôles sont le moyen le moins coûteux d'ajouter une voix qui vous manque : un canard en plastique socratique, un relecteur de conformité, un personnage lecteur pour votre public cible, un expert du domaine nourri par vos propres fichiers de connaissance. Demandez-en un dans le paradigme workflow-design et l'agent vous interviewera et écrira les deux fichiers.
+Deux exemples, une seule forme. Chaque readvisor est la même paire de fichiers markdown avec les mêmes intertitres : `AGENT.md`, qui s'ouvre sur le nom d'affichage que vous voyez dans la barre latérale puis décrit comment cette personne pense, et `MOTIVATION.md`, qui dit ce à quoi elle tient, ce contre quoi elle protège, et où elle se trompe. Cette forme est vérifiée à l'installation — pas au chargement, si bien qu'un readvisor que vous avez écrit à la main il y a des années fonctionne encore exactement comme avant.
+
+Vous pouvez écrire les deux fichiers vous-même. La voie prise en charge est la **compétence `readvisory`** (section 18.5), qui en construit un à partir du jugement d'une vraie personne en lui posant des questions — vous, en direct, ou quelqu'un dont vous aimeriez avoir l'avis sous la main, via un questionnaire que vous lui envoyez. Les readvisors sont le moyen le moins coûteux d'ajouter une lecture qui vous manque : un canard en plastique socratique, un relecteur de conformité, votre lecteur cible, le rédacteur qui attrapait toujours la chose que vous ne pouviez pas voir.
 
 ---
 
-## 16. Compétences
 
-Une compétence est un paquet de capacité ciblée : un dossier avec un `SKILL.md` (plus des docs de référence et scripts optionnels) qui enseigne à l'agent une procédure, un vocabulaire, ou une discipline. Activez les compétences par projet dans la barre latérale. Désactivé veut dire vraiment désactivé — pas du tout dans le prompt — et les nouvelles compétences arrivent désactivées, donc rien ne change dans votre dos. Une compétence non fournie par enough est lue avant même de pouvoir être activée (section 16.6). Tout désactiver est légitime aussi : conversation pure, aucun échafaudage, parfois plus de place pour que le modèle vous surprenne.
+## 17. Conseils
 
-### 16.1 analyzer
+Un **conseil** est une composure où vos readvisors réfléchissent à une seule chose chacun leur tour, par écrit, sous leurs propres noms, pendant que vous regardez ça se produire. C'est l'autre moitié de la section 16 : les mêmes readvisors qui sont d'ordinaire fondus en une seule voix, dépliés, en désaccord et pour de bon.
+
+C'est une composure ordinaire, donc tout ce que dit la section 4 s'applique encore. Le **brief** est en haut ; chaque intervention atterrit en dessous sous forme de carte titrée de qui a parlé et de quel tour c'était, teintée à la couleur de cette personne — votre chef sur papier, vous en bleu, chaque readvisor dans sa propre couleur pour toute la durée du conseil, la conclusion en encre. La colonne se remet d'aplomb à mesure qu'elle grandit, même si vous avez beaucoup déplacé les choses.
+
+Les interventions appartiennent au conseil, pas à vous. Vous pouvez les déplacer, les restyler, les commenter, et dézoomer pour lire l'ensemble comme une colonne de faces — mais vous ne pouvez pas en réécrire une, et aucun readvisor ne le peut non plus. Une transcription que vous pouvez modifier est une suggestion, pas un compte rendu. Le brief, lui, reste un module ordinaire et reste modifiable.
+
+### 17.1 En mettre un en place
+
+Nouvelle composure à partir du form **council** et vous obtenez une carte de préparation avec quatre champs pour le brief :
+
+- **entrée** — la chose à trancher. Une seule question, aussi nette que vous pouvez la faire.
+- **paramètres** — comment vous voulez que ça se passe. « Deux tours, puis on décide. »
+- **contraintes** — ce qui est hors de propos. « Ne réécrivez pas la prose. »
+- **sortie souhaitée** — voir 17.3.
+
+Ensuite, la salle. La liste à cocher commence par votre readvisor en chef, chaque readvisor que vous avez activé dans ce projet, et **vous** ; décochez qui vous ne voulez pas. Douze au maximum, et deux participants ne peuvent pas porter le même nom, parce qu'une intervention est attribuée par nom et que deux Nadia, ce n'est pas un conseil, c'est un quiproquo. **tours max** est à 3 par défaut et peut aller de 1 à 20.
+
+**convoquer** lance la séance.
+
+### 17.2 Le faire tourner
+
+Six commandes, et elles font exactement ce qu'elles disent.
+
+- **tour suivant** — une intervention, de celui dont c'est le tour.
+- **faire un tour** — des tours jusqu'à ce que la rotation revienne à son point de départ. Appuyée juste après avoir convoqué, ça veut dire tout le monde ; appuyée quand il reste un créneau, ça veut dire un.
+- **aller jusqu'au bout** — des tours de table jusqu'à votre maximum, en arrière-plan, avec un compte rendu au fil de l'eau.
+- **mettre en pause** — s'arrête après l'intervention en cours de rédaction. Une intervention à moitié écrite et jetée est une plus mauvaise surprise qu'un paragraphe de trop.
+- **le brief** — retour à la carte de préparation, pour relire ce sur quoi tout le monde travaille ou pour changer la sortie avant de conclure.
+- **conclure** — le dernier tour. C'est la 17.3.
+
+Les tours arrivent en flux continu. Une carte apparaît au pied de la colonne avec le nom de l'orateur et le numéro de tour dessus, se remplit à mesure que les mots arrivent, et se fixe en vrai module quand l'intervention est finie. La rotation, c'est le chef puis les readvisors dans l'ordre où ils sont listés ; ça tourne, et un tour de table se referme quand la boucle est bouclée.
+
+**Vous pouvez dire quelque chose à tout moment.** La zone de saisie au pied du conseil prend votre propre intervention et elle entre comme une carte au même titre que celle de n'importe qui d'autre, teintée en bleu. Si personne ne parle, elle atterrit tout de suite ; si un tour est en cours, elle prend le créneau juste après et s'affiche en attente jusque-là. Dans les deux cas c'est une *interjection*, pas un remaniement : le readvisor dont c'était le tour parle quand même ensuite.
+
+**Le panneau readvisor est fermé pour la durée**, son interrupteur désactivé et une infobulle expliquant pourquoi (section 5.1). Les conseils et la discussion partagent un seul modèle et il n'y en a qu'un : un tour de discussion ferait donc la queue derrière le conseil ou se battrait avec lui. C'est vrai dans l'autre sens aussi : une commande de conseil pressée pendant que votre chef est en train de répondre dans la discussion revient avec une phrase qui le dit, plutôt que d'attendre en silence.
+
+### 17.3 Conclure : la réponse, le document, la transcription
+
+**conclure** lance un dernier tour où votre readvisor en chef dit où ça atterrit — en créditant les arguments qui l'ont emporté, en nommant le désaccord qui ne s'est pas résolu plutôt qu'en l'aplanissant, et en disant ce qui reste ouvert. Cette intervention est versée au dossier comme n'importe quelle autre, teintée en encre.
+
+Ce qui se passe ensuite dépend de la **sortie souhaitée** que vous avez choisie à la préparation :
+
+- **une réponse tranchée** — rien de plus. Cette dernière carte est la sortie, et elle est sur le canevas, là où est le conseil.
+- **un document dans ce projet** — la conclusion est écrite comme fichier markdown à un chemin de votre projet que vous nommez. Ça passe par la même porte que toute autre écriture de fichier, avec les mêmes listes blanches et la même annulation, et ça n'écrasera pas un fichier existant tant que vous n'avez pas vu la confirmation et dit oui. Ensuite, un module de lien est ajouté sous la conclusion et pointe vers lui, pour que le document soit à un clic du conseil qui l'a produit.
+- **une composure** — prévue pour la 0.4.0. Choisissez-la aujourd'hui et conclure déclinera, avant de dépenser un tour, et vous dira d'en choisir une autre.
+
+Dans tous les cas, l'ensemble est aussi exporté en markdown brut vers `rness/knowledge/councils/<date>-<titre>.md` : le brief, qui était dans la salle et ce que chacun y faisait, le nombre de tours, et chaque intervention dans l'ordre. Ça n'écrase jamais un export antérieur. Un conseil qui a eu lieu est une chose que vous pouvez grep-er, citer, et donner à quelqu'un, des mois après que la composure a été traînée ailleurs.
+
+Un conseil conclu est terminé. Les commandes s'en vont, et le chemin de la transcription et la sortie sont ce qu'il vous montre à partir de là.
+
+### 17.4 Ce que ça coûte, honnêtement
+
+**C'est lent, et c'est fait pour.** Chaque intervention est un tour de modèle complet — le participant lit le brief et tout ce qui a été dit jusque-là, et écrit. Quatre participants sur trois tours de table, ça fait douze tours, l'un après l'autre, sur un seul modèle local. Il n'y a pas d'astuce qui rende ça plus rapide, et un conseil vaut la peine d'être convoqué exactement quand la réflexion vaut douze tours.
+
+**La fenêtre est partagée équitablement.** Chaque participant qui parle reçoit une part égale de la fenêtre de contexte du modèle — la moitié chacun à deux, le quart chacun à quatre. Cette part doit contenir l'identité propre du participant plus autant du conseil qu'il y rentre. Quand ça approche du plein, enough replie les plus anciennes interventions en une seule ligne chacune, un souvenir d'une ligne de qui a dit quoi : *Plus tôt dans ce conseil : Ed (tour 1) : …*. Le brief n'est jamais replié, et l'intervention à laquelle quelqu'un est en train de répondre non plus — un participant qui ne voit pas la chose à laquelle il répond n'a rien à dire.
+
+Ce repliage est mécanique — il prend la première phrase, il ne demande pas à un modèle de résumer, parce qu'un conseil qui dépense des complétions à se résumer lui-même paie deux fois pour la même fenêtre. Chaque tour signale s'il a replié quelque chose. Quand ça se met à replier tôt et souvent, le remède honnête n'est pas un conseil plus petit, c'est une fenêtre de contexte plus grande dans la fenêtre de modèle (section 14.1) ou un modèle qui a de la place pour ça.
+
+---
+
+
+## 18. Compétences
+
+Une compétence est un paquet de capacité ciblée : un dossier avec un `SKILL.md` (plus des docs de référence et scripts optionnels) qui enseigne à vos readvisors une procédure, un vocabulaire, ou une discipline. Activez les compétences par projet dans la barre latérale. Désactivé veut dire vraiment désactivé — pas du tout dans le prompt — et les nouvelles compétences arrivent désactivées, donc rien ne change dans votre dos. Une compétence non fournie par enough est lue avant même de pouvoir être activée (section 18.8). Tout désactiver est légitime aussi : conversation pure, aucun échafaudage, parfois plus de place pour que le modèle vous surprenne.
+
+### 18.1 analyzer
 
 Quatre modes d'analyse dans une seule compétence.
 
@@ -743,11 +981,11 @@ Quatre modes d'analyse dans une seule compétence.
 
 **Decide** remet votre dilemme à trois personnages archétypaux tirés d'une liste intégrée de dix, qui en débattent pour le compte-rendu. Vous obtenez une recommandation *et* la transcription, pour que vous puissiez peser le raisonnement plutôt que de faire confiance à un verdict.
 
-**Audit** lit quelque chose que vous n'avez pas encore décidé de croire — une compétence que quelqu'un vous a envoyée, un rôle, un paradigme — et vous dit ce que c'est. D'abord une explication en langage clair de ce que la chose fait réellement et pourquoi vous en voudriez, puis une passe de sécurité : tentatives d'injection de prompt, instructions qui élargissent discrètement la portée de l'agent, signaux d'alerte épistémiques, et tout code embarqué, qui reçoit aussi un scan déterministe qui n'implique aucun modèle du tout. Le verdict est l'un de trois mots — **pass**, **flag**, **fail** — appuyé par des constats nommés, jamais un score. C'est en lecture seule : l'audit n'exécute, ne modifie, n'installe, ni n'active jamais la chose qu'il lit.
+**Audit** lit quelque chose que vous n'avez pas encore décidé de croire — une compétence que quelqu'un vous a envoyée, un readvisor, un paradigme — et vous dit ce que c'est. D'abord une explication en langage clair de ce que la chose fait réellement et pourquoi vous en voudriez, puis une passe de sécurité : tentatives d'injection de prompt, instructions qui élargissent discrètement la portée d'un readvisor, signaux d'alerte épistémiques, et tout code embarqué, qui reçoit aussi un scan déterministe qui n'implique aucun modèle du tout. Le verdict est l'un de trois mots — **pass**, **flag**, **fail** — appuyé par des constats nommés, jamais un score. C'est en lecture seule : l'audit n'exécute, ne modifie, n'installe, ni n'active jamais la chose qu'il lit.
 
-Les rapports atterrissent dans `rness/io/output/analyzer/audits/<nom-compétence>/` : un `.md` daté que vous pouvez lire comme n'importe quel autre fichier, plus un petit `verdict.json` à côté. Demandez un audit par son nom à tout moment — « vérifie ça avant que je l'active », « qu'est-ce que cette compétence fait vraiment » — et enough exécute aussi ce mode pour vous, sans qu'on le demande, la première fois que vous activez une compétence qu'il n'a pas fournie. Les deux portes écrivent le même rapport dans le même dossier. La section 16.6 raconte cette histoire.
+Les rapports atterrissent dans `rness/io/output/analyzer/audits/<nom-compétence>/` : un `.md` daté que vous pouvez lire comme n'importe quel autre fichier, plus un petit `verdict.json` à côté. Demandez un audit par son nom à tout moment — « vérifie ça avant que je l'active », « qu'est-ce que cette compétence fait vraiment » — et enough exécute aussi ce mode pour vous, sans qu'on le demande, la première fois que vous activez une compétence qu'il n'a pas fournie. Les deux portes écrivent le même rapport dans le même dossier. La section 18.8 raconte cette histoire.
 
-### 16.2 anything-finder
+### 18.2 anything-finder
 
 Une équipe de recherche pour les choses qui n'apparaissent pas sur la première page. Trois visages, une seule compétence.
 
@@ -761,36 +999,58 @@ Les résultats reviennent sous forme de *fiches find* : le lien, pourquoi c'est 
 
 La sortie va dans `rness/io/output/anything-finder/`. Tout ce qu'il récupère passe par le broker comme n'importe quel autre accès web, donc un domaine hors liste blanche est routé via Tor — et quand une source refuse de répondre, le rapport nomme l'hôte et vous dit quoi ajouter à `allowlists.md`, plutôt que de laisser un trou silencieux dans les résultats.
 
-### 16.3 girraph-merirmaid
+### 18.3 girraph-merirmaid
 
-La compétence de discipline pour les deux primitives de diagramme d'enough (sections 17 et 18). La moitié girraph enseigne une cartographie IBIS correcte : une question par tour, pas de saut aux solutions, votre confirmation comme règle d'arrêt. La moitié merirmaid porte les règles de rédaction Mermaid, comme garder des étiquettes de nœud assez courtes pour que vous puissiez les modifier confortablement. Les modes fonctionnent sans la compétence ; avec elle, l'agent devient un partenaire de cartographie véritablement discipliné.
+La compétence de discipline pour les deux primitives de diagramme d'enough (sections 19 et 20). La moitié girraph enseigne une cartographie IBIS correcte : une question par tour, pas de saut aux solutions, votre confirmation comme règle d'arrêt. La moitié merirmaid porte les règles de rédaction Mermaid, comme garder des étiquettes de nœud assez courtes pour que vous puissiez les modifier confortablement. Les modes fonctionnent sans la compétence ; avec elle, votre readvisor devient un partenaire de cartographie véritablement discipliné.
 
-### 16.4 memoir-dialectic
+### 18.4 memoir-dialectic
 
 Un collaborateur de mémoires patient, sur plusieurs sessions. Il vous interroge — une ou deux questions à la fois, jamais un déluge — et classe tout : des documents de plan numérotés dans l'ordre de la conversation, un index pour reprendre rapidement, un fichier de notes pour les vidages de cerveau désordonnés, et finalement une synthèse de plan et, seulement si vous le voulez, des brouillons. Le dossier, c'est la mémoire. Vous pouvez disparaître pendant des semaines ou des années et il reprend là où vous vous étiez arrêté. Construit pour toute la gamme, de l'histoire de vie complète à un seul jalon, avec une gestion explicite des sujets sensibles et des zones interdites, et une préservation soigneuse de votre propre façon de vous exprimer — la voix compte, surtout si un brouillon approche.
 
-### 16.5 translator
+### 18.5 readvisory
+
+La compétence qui fabrique un readvisor (section 16), en interrogeant une personne plutôt qu'en rédigeant une spécification.
+
+Deux façons de récolter. **En direct** : elle vous interroge *vous*, patiemment, une ou deux questions à la fois, douze à dix-huit en tout, sur la façon dont vous décidez réellement le genre de chose qu'on va demander à ce readvisor. **Par questionnaire** : elle écrit un fichier simple, prêt à envoyer par courriel, que vous adressez à quelqu'un dont vous aimeriez avoir le jugement sous la main — un ami, un mentor, un ancien rédacteur en chef, un parent — qui y répond à son rythme, et vous recollez les réponses quand elles arrivent. Un questionnaire peut dormir une semaine dans une boîte de réception : tout le travail est donc suivi dans un fichier de requête (section 8.3) qu'une séance des semaines plus tard peut reprendre à froid.
+
+Les deux voies se terminent de la même manière : une courte passe de relance vers *vous* (l'étape qui rend un readvisor meilleur qu'une transcription), puis les deux documents rédigés et soumis à votre correction ligne par ligne, et alors seulement, avec votre feu vert, installés — dans ce projet, ou dans `~/enough/readvisors/` où tous les projets de la machine les voient. Les deux documents sont lus par le même scan de sécurité qu'une compétence téléchargée subit avant que quoi que ce soit ne soit écrit, et l'interrupteur **forge new readvisors** du broker (section 9) décide si la dernière étape revient à enough ou à vous.
+
+Elle a une idée claire de ce à quoi elle ne sert pas. Elle ne renommera pas votre readvisor en chef et ne convoquera pas de conseil : elle fabrique les participants, elle ne tient pas la réunion.
+
+### 18.6 scaffold
+
+Transforme un tas de réflexion en une structure que vous pouvez regarder.
+
+Donnez-lui un vidage de cerveau — collé dans le panneau, un fichier du projet, ou une composure qui existe déjà — et elle lit pour la forme plutôt que pour les phrases. Elle connaît les formes de récit (arcs, temps forts, fils de continuité, dénouements, fins), les formes d'argumentation (thèse, fondements, garantie, contre-thèse, chute) et les formes de plan (objectif, phases, dépendances, risques, critères de fin). Elle pose deux questions de clarification au maximum, souvent aucune, puis passe le résultat à enough, qui le dispose en composure : une carte par temps fort, par section ou par phase, groupées en colonnes ou en rangées, sur le canevas devant vous (section 4.5).
+
+La règle qui la rend précieuse : **elle n'invente jamais de matière pour boucher un trou.** Là où la structure a besoin de quelque chose que vous n'avez pas écrit, elle écrit une carte `[gap: …]` à la place — teintée en orangé, gardant la question — pour que la forme vous montre ce que vous lui devez encore. Une histoire dont vous connaissez la fin mais pas le retournement reçoit une carte de trou qui dit exactement ça, et c'est en général la carte la plus utile du tableau.
+
+Elle n'écrit pas le texte. Elle écrit la structure, et chaque carte posée dessus est à vous dès l'instant où elle atterrit.
+
+(Un seul nom, deux choses, et ça vaut le coup de les séparer une bonne fois : les *scaffolds* que génère le paradigme text-planning — section 15.2 — sont des guides structurels par section, écrits en markdown, que vous étoffez ensuite en prose. Cette compétence-ci produit une composure entière. Les deux s'entendent bien ; un plan construit en text-planning fait un bon vidage de cerveau à donner à celle-ci.)
+
+### 18.7 translator
 
 Traduction hors ligne à travers environ 419 langues via MADLAD-400 — un téléchargement unique d'environ 3 Go qui tourne sur CPU ou Apple Silicon et ne rentre jamais téléphoner à la maison. De courtes phrases à des documents entiers, des langues majeures aux langues à faibles ressources et indigènes. Traduisez une lettre, localisez un README, vérifiez ce que veut dire un passage, faites l'aller-retour d'une phrase à travers une troisième langue comme test de préservation du sens — tout ça avec le réseau débranché. Pour certaines langues à faibles ressources, un moteur optionnel NLLB-200 offre une meilleure qualité ; il porte une licence non commerciale, donc c'est optionnel via le paradigme translation.
 
-### 16.6 Écrire les vôtres, et faire confiance à celles des autres
+### 18.8 Écrire les vôtres, et faire confiance à celles des autres
 
-Les cinq ci-dessus sont des démonstrations. Le *mécanisme* de compétence — des instructions markdown, chargées quand activées, avec une `description:` qui dit à l'agent quand s'engager — est la vraie fonctionnalité. Guides de style maison, checklists de domaine, formats de rapport récurrents, procédures de traitement de données : si vous pouvez décrire une compétence en prose, vous pouvez la remettre à votre agent comme une compétence. Construisez la vôtre avec workflow-design (section 14.4), ou forkez l'une des cinq et faites-la vôtre.
+Les sept ci-dessus sont des démonstrations. Le *mécanisme* de compétence — des instructions markdown, chargées quand activées, avec une `description:` qui dit à un readvisor quand s'engager — est la vraie fonctionnalité. Guides de style maison, checklists de domaine, formats de rapport récurrents, procédures de traitement de données : si vous pouvez décrire une compétence en prose, vous pouvez la remettre à vos readvisors comme une compétence. Construisez la vôtre avec workflow-design (section 15.4), ou forkez l'une des sept et faites-la vôtre.
 
-L'autre bout de cette boucle, ce sont les compétences qui arrivent d'ailleurs. Une compétence, ce sont des instructions que votre agent va suivre, ce qui veut dire qu'une compétence venue d'internet mérite exactement autant de méfiance que n'importe quel autre fichier venu d'internet. Alors enough les lit pour vous :
+L'autre bout de cette boucle, ce sont les compétences qui arrivent d'ailleurs. Une compétence, ce sont des instructions que vos readvisors vont suivre, ce qui veut dire qu'une compétence venue d'internet mérite exactement autant de méfiance que n'importe quel autre fichier venu d'internet. Alors enough les lit pour vous :
 
 - **Ce qu'enough fournit d'origine est de confiance, et ça se voit comme toujours.** Les cinq ci-dessus arrivent comme des liens vers les défauts propres de l'installation. Elles s'activent instantanément. Rien ne les audite.
-- **Tout le reste est désactivé tant que ça n'a pas été lu.** Déposez un dossier de compétence dans `rness/skills/` — téléchargé, envoyé par un ami, décompressé d'un `.skill` — et il reste là désactivé, marqué *unverified* dans la barre latérale. La première fois que vous l'activez, enough fait tourner le mode audit d'analyzer dessus (section 16.1) avant qu'un seul mot n'atteigne l'agent. Vous voyez ça se passer dans la ligne : *unverified* → *auditing…* → *audited*.
+- **Tout le reste est désactivé tant que ça n'a pas été lu.** Déposez un dossier de compétence dans `rness/skills/` — téléchargé, envoyé par un ami, décompressé d'un `.skill` — et il reste là désactivé, marqué *unverified* dans la barre latérale. La première fois que vous l'activez, enough fait tourner le mode audit d'analyzer dessus (section 18.1) avant qu'un seul mot n'atteigne un readvisor. Vous voyez ça se passer dans la ligne : *unverified* → *auditing…* → *audited*.
 - ***Flagged* veut dire pas activé.** Si l'audit trouve quelque chose, la ligne dit *flagged* (ou *failed*), la compétence reste désactivée, et vous obtenez deux boutons : **read report** ouvre le rapport complet dans la vue de lecture, et **activer quand même** vous demande de confirmer puis enregistre la décision comme étant la vôtre — le constat n'est pas effacé, il est outrepassé, et la ligne affiche dès lors *trusted by you*. L'audit conseille. Vous décidez. (Si vous préférez travailler dans le fichier, modifier le `verdict.json` de cette compétence en `"verdict": "pass"` fait la même chose.)
 - **Modifiez une compétence et elle est relue.** L'audit est lié aux octets exacts qu'il a lus — noms de fichiers et contenus, les deux. Changez n'importe quoi et la prochaine fois que vous activez cette compétence, elle est réauditée. Ça inclut une que vous auriez précédemment activée quand même : une dérogation décrit un ensemble particulier de fichiers à un moment particulier, et elle ne survit pas à une modification.
-- **Les compétences que votre agent écrit pour vous comptent aussi comme non vérifiées.** C'est délibéré, pas un oubli. Quand workflow-design écrit un nouveau `SKILL.md` dans `rness/skills/`, l'agent audite ses propres devoirs à la première activation. C'est quasi instantané quand il n'y a rien à trouver.
+- **Une compétence écrite pour vous au cours d'une séance compte aussi comme non vérifiée.** C'est délibéré, pas un oubli. Quand workflow-design écrit un nouveau `SKILL.md` dans `rness/skills/`, enough audite ce devoir à la première activation. C'est quasi instantané quand il n'y a rien à trouver.
 - **Sans modèle en cours d'exécution, un audit ne peut pas se terminer** — et il le dit, en signalant que « the llm half of the audit couldn't run » plutôt que de laisser passer la compétence. Activez un modèle et réactivez-la, ou utilisez **activer quand même** si vous savez déjà ce qu'il y a dedans.
 
 Les rapports vivent dans `rness/io/output/analyzer/audits/<nom-compétence>/` — le même dossier où analyzer écrit quand vous demandez un audit en conversation. Deux portes, un document, et c'est un fichier markdown ordinaire que vous pouvez ouvrir, garder, ou supprimer.
 
 ---
 
-## 17. Le mode girraph et l'extension `.girraph`
+## 19. Le mode girraph et l'extension `.girraph`
 
 Ça se prononce comme *graph*. Le « ir » est silencieux — il représente *iterative* et *recursive* (itératif et récursif). L'animal est un 🦒, et l'animal aussi est silencieux.
 
@@ -818,30 +1078,30 @@ a2 - API surface = forever maintenance < p1 by:open-skeptic
 
 `< q1` veut dire « ceci répond à q1 » ; `by:` retient à qui appartient l'affirmation. Aucune base de données, rien de caché. Le fichier, c'est la carte.
 
-Dans l'application, cliquer sur un `.girraph` ouvre le mode girraph : un arbre repliable que vous modifiez directement. Cliquez sur une étiquette pour la réécrire. Survolez une ligne pour les boutons ajouter, lier, et supprimer. Cliquez sur une puce 🦒 pour descendre dans une carte imbriquée — un fil d'ariane vous ramène — et cliquez sur une puce 📄 pour lire un document référencé sur place. En discussion, dites « girraph-moi ça » ou « cartographie ça », et l'agent modifie le même fichier à travers les mêmes opérations au niveau du nœud que vous utilisez, si bien que vous pouvez travailler la carte tous les deux à la fois. Supprimer des nœuds exige toujours votre confirmation, et les enfants ne sont jamais orphelins en silence.
+Dans l'application, cliquer sur un `.girraph` ouvre le mode girraph : un arbre repliable que vous modifiez directement. Cliquez sur une étiquette pour la réécrire. Survolez une ligne pour les boutons ajouter, lier, et supprimer. Cliquez sur une puce 🦒 pour descendre dans une carte imbriquée — un fil d'ariane vous ramène — et cliquez sur une puce 📄 pour lire un document référencé sur place. En discussion, dites « girraph-moi ça » ou « cartographie ça », et votre readvisor modifie le même fichier à travers les mêmes opérations au niveau du nœud que vous utilisez, si bien que vous pouvez travailler la carte tous les deux à la fois. Supprimer des nœuds exige toujours votre confirmation, et les enfants ne sont jamais orphelins en silence.
 
 Un girraph peut aussi faire pousser un **mirror merirmaid** : un clic sur le bouton merirmaid dans la barre d'outils du girraph crée un diagramme Mermaid lié, à régénération automatique, de la carte — les issues en hexagones, les positions en stades, les soutiens et objections tracés dans leurs couleurs — qui se garde à jour tout seul à mesure que le girraph change. Cartographiez en girraph, jetez un œil en merirmaid.
 
-Trois habitudes font marcher les girraphs. Formulez les issues comme des questions (« Comment finance-t-on l'année deux ? », pas « le problème d'argent »). Attachez les arguments aux positions, pas aux issues — les raisons sont des raisons pour ou contre une *réponse*. Et séparez une branche dans son propre fichier avant qu'elle ne s'étale. Activez la compétence girraph-merirmaid et l'agent vous tiendra aux trois.
+Trois habitudes font marcher les girraphs. Formulez les issues comme des questions (« Comment finance-t-on l'année deux ? », pas « le problème d'argent »). Attachez les arguments aux positions, pas aux issues — les raisons sont des raisons pour ou contre une *réponse*. Et séparez une branche dans son propre fichier avant qu'elle ne s'étale. Activez la compétence girraph-merirmaid et votre readvisor vous tiendra aux trois.
 
 ---
 
-## 18. Le mode merirmaid et l'extension `.merirmaid`
+## 20. Le mode merirmaid et l'extension `.merirmaid`
 
 Là où un girraph cartographie un argument, un **merirmaid** dépeint une structure. Un fichier `.merirmaid` est un diagramme [Mermaid](https://mermaid.js.org/) — organigramme, diagramme de séquence, machine à états, diagramme ER, tout ce que Mermaid dessine — avec un petit en-tête de frontmatter, rendu en direct dans le navigateur. En local, bien sûr ; pas de CDN, comme tout dans enough.
 
 Deux modalités, déclarées dans l'en-tête :
 
-- **wip** — un tableau blanc de travail. Cliquez sur le texte de n'importe quel nœud et modifiez l'étiquette sur place, avec un compteur de caractères en direct ; les changements structurels (ajouter une boîte, recâbler une flèche) passent par l'agent via la pastille de discussion. Demandez un diagramme de votre pipeline, de votre intrigue, de votre organisation, et l'agent écrit la source, le navigateur le dessine, et vous ajustez les mots.
-- **mirror** — un reflet en lecture seule d'une structure qui vit ailleurs : le contenu d'un cachebox (section 11.1) ou un girraph (section 17). Les mirrors se régénèrent quand leur source change. Pour changer l'image, changez la chose.
+- **wip** — un tableau blanc de travail. Cliquez sur le texte de n'importe quel nœud et modifiez l'étiquette sur place, avec un compteur de caractères en direct ; les changements structurels (ajouter une boîte, recâbler une flèche) passent par votre readvisor — demandez dans le panneau. Demandez un diagramme de votre pipeline, de votre intrigue, de votre organisation, et votre readvisor écrit la source, le navigateur le dessine, et vous ajustez les mots.
+- **mirror** — un reflet en lecture seule d'une structure qui vit ailleurs : le contenu d'un cachebox (section 12.1) ou un girraph (section 19). Les mirrors se régénèrent quand leur source change. Pour changer l'image, changez la chose.
 
 Les diagrammes se relient. Un nœud peut pointer vers un autre `.merirmaid`, un `.girraph`, ou un document markdown, et cliquer dessus vous y emmène, un fil d'ariane marquant le chemin du retour — si bien qu'un ensemble de diagrammes devient un atlas navigable de votre projet. Et quand un diagramme a une erreur de syntaxe, le mode merirmaid montre l'erreur plus la source brute plutôt qu'un panneau vide. Il y a toujours quelque chose à partir de quoi corriger.
 
-La compétence girraph-merirmaid (section 16.3) porte la discipline de rédaction pour les deux types de fichier. Une règle de base qui en vient mérite d'être répétée ici : si le premier geste honnête est de poser une question, vous voulez un girraph ; si c'est de dessiner une boîte et une flèche, vous voulez un merirmaid.
+La compétence girraph-merirmaid (section 18.3) porte la discipline de rédaction pour les deux types de fichier. Une règle de base qui en vient mérite d'être répétée ici : si le premier geste honnête est de poser une question, vous voulez un girraph ; si c'est de dessiner une boîte et une flèche, vous voulez un merirmaid.
 
 ---
 
-## 19. Où aller à partir d'ici
+## 21. Où aller à partir d'ici
 
 Le moyen le plus rapide de faire d'enough le vôtre :
 
@@ -849,7 +1109,7 @@ Le moyen le plus rapide de faire d'enough le vôtre :
 2. Passez une session à discuter, et laissez le profil du projet commencer à s'accumuler.
 3. Modifiez `MOTIVATION.md` pour dire à quoi sert réellement le projet.
 4. La première fois que vous répétez une instruction, arrêtez-vous. Mettez-la plutôt dans `AGENT.md`.
-5. La première fois que votre travail prend une forme que les défauts ne couvrent pas, dites « concevons un paradigme pour ça » — ou une compétence, ou un rôle — et laissez workflow-design vous guider.
+5. La première fois que votre travail prend une forme que les défauts ne couvrent pas, dites « concevons un paradigme pour ça » — ou une compétence, ou un readvisor — et laissez workflow-design vous guider.
 
 Cette boucle — remarquer la friction, coder le correctif, continuer à travailler — c'est tout le jeu. Les composants intégrés vous font démarrer. Le système avec lequel vous finissez, personne ne le fournit. Vous l'écrivez.
 

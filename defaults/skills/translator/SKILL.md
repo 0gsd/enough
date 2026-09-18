@@ -180,8 +180,7 @@ manually first.
 
 ## Integration
 
-This skill is invoked directly by the orchestrator agent (you) via the
-`shell` tool. It does NOT call other skills, and is NOT called by other
+This skill is invoked directly by you via the `shell` tool. It does NOT call other skills, and is NOT called by other
 skills as a library. The contract is:
 
 1. The user expresses a translation need (in any phrasing).
@@ -210,7 +209,7 @@ dependency, no SDK lock-in" principle for a high-stakes capability:
   any RNESS install and it works after `pip install -r requirements.txt
   && python bootstrap.py --install`.
 - No filesystem state outside `~/.local/share/translator/` (the model
-  cache) and the project's own session logs (the agent's choice).
+  cache) and the project's own session logs (your choice).
 
 If the user wants higher-quality translation for low-resource languages
 and is willing to accept a non-commercial license for personal use, the

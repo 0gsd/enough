@@ -6,6 +6,8 @@ next message. No caching.
 
 from __future__ import annotations
 
+import json
+import os
 import re
 from pathlib import Path
 
@@ -215,8 +217,10 @@ Rules:
   or re-read a whole deep tree — expand only the branch you're working
   on. Girraphs are your checkpoint-native map: after a context reset,
   re-orient by reading the working branch, not the world.
-- `by:` records whose claim a node is — `user`, `agent`, or a role
-  name. Keep it honest; don't relabel the user's claims as your own.
+- `by:` records whose claim a node is — `user`, `agent` (the on-disk
+  literal for yours; the files predate the readvisor vocabulary), or a
+  readvisor name. Keep it honest; don't relabel the user's claims as
+  your own.
 - `remove_node` requires the user's explicit confirmation in their own
   words this turn (`<confirmed>yes</confirmed>` — never pre-fill it),
   and refuses to orphan: removing a node with children needs
@@ -383,6 +387,185 @@ large to finish in one turn, say so explicitly in your final reply and
 write a request-tracking file (see the requests policy) — don't just
 stop silently.
 """
+
+# ---------------------------------------------------------------------------
+# Gated tool documentation
+#
+# `TOOL_INSTRUCTIONS` above is the ALWAYS-ON core: the tools every project
+# has, in every turn. Everything below it is paid for only when it can
+# actually be used.
+#
+# The reason is arithmetic. A local model re-reads the whole system prompt on
+# every turn of every tool loop, so a kilobyte of documentation for a tool the
+# broker has switched off is a kilobyte of the user's context window, and of
+# their prefill time, spent on nothing. Two blocks earn their gate:
+#
+# - the composure tools, behind the `composure_enabled` broker toggle (the
+#   canvas UI is ungated, exactly as before — this gates the *docs* along with
+#   the tools they document); and
+# - `install_readvisor`, behind the `readvisory` skill being switched on in
+#   this project. It is the last step of that skill's interview and nothing
+#   else; with the skill off, its documentation is unreachable advice.
+#
+# `tool_instructions(project_dir)` assembles them. Both blocks are written to
+# stand alone, so they read correctly wherever they land in the order.
+# ---------------------------------------------------------------------------
+
+COMPOSURE_TOOL_INSTRUCTIONS = """\
+## Composures
+
+A **composure** is a canvas document in a `.comp` file: an unbounded plane of
+**modules** (boxes) and ink. A module is a text card, a full page, or a link
+to a project file, a wiki article or a web page, and holds one or more
+**pages**. A **form** is a template — `blank`, `cards`, `scaffold`, `journal`,
+`council`, plus any the user saved. The user is looking at the canvas while
+you work: a composure is shared ground with them and, in a council, with
+the other readvisors — never a file you own.
+
+Reach for one when the material has a shape rather than a sequence: a chapter
+map, a board of options, a five-act scaffold. For linear prose, markdown is
+still the right tool.
+
+Every composure tool has this shape:
+
+<tool name="comp_add_module">
+<path>rness/io/composure/chapter-map-2026-09-17.comp</path>
+<type>text</type>
+<title>Act two</title>
+<bg>yellow</bg>
+<content>
+The middle goes slack here. Two candidate fixes:
+
+- [ ] move the confession earlier
+- [ ] cut the second dinner scene
+</content>
+</tool>
+
+The rest take the same `<path>` plus the tags below — except `new_composure`
+and `composure_from_outline`, which make the file and return its path.
+
+- `read_composure` `[<module>m3</module>] [<page>1</page>]` — the outline,
+  one line per module, or that module's text as markdown. Quote the ids it
+  gives you back in every other call.
+- `new_composure` `<form>scaffold</form>` `<title>Chapter map</title>` — a
+  new, empty composure from a form.
+- `comp_add_module` — as shown above. `<type>` is `text`, `doc`, `wiki`,
+  `weblink`, `webframe` or `image`; `<bg>` is a named swatch (`paper`,
+  `yellow`, `pink`, `blue`, `green`, `orange`, `lilac`, `gray`, `ink`,
+  `clear`), never a color code. **Leave the geometry out** unless the user
+  asked for an arrangement — enough places and sizes it, never overlapping.
+- `comp_update_module` `<module>m3</module>` + any of `<title>` `<bg>`
+  `<scale>` `<x>` `<y>` `<w>` `<h>` `<z>` `<type>` `<href>` `<url>` — a
+  patch; it never touches text.
+- `comp_set_page` `<module>m3</module>` `<page>1</page>` `<content>` — new
+  markdown for that page; `<append>true</append>` adds a page instead.
+- `comp_remove_module` `<module>m7</module>` `<confirmed>yes</confirmed>` —
+  the confirmation must be the user's own words this turn; never pre-fill it.
+- `comp_arrange` `<modules>m2 m3 m4</modules>` `<mode>column</mode>` (or
+  `grid`) — the order you pass is the order they end up in.
+- `comp_save_as_form` `<name>chapter-map</name>` — save it as a reusable form.
+- `composure_from_outline` `<title>` `<form>` `<content>` — a WHOLE composure
+  from one markdown outline, in one call. Reach for it whenever you are about
+  to add more than three modules in a row.
+
+The outline grammar, entire:
+- one `# ` line is the composure's title;
+- each `## ` is a group;
+- each `### `, and each top-level list item under a group, is a card;
+- the text under a card, until the next heading or item, is its body;
+- a card starting `[gap` is tinted orange and titled "gap" — write
+  `### [gap: the question you cannot answer yet]` instead of inventing
+  material to fill a hole;
+- `####`, tables and nested lists are not structure, just text.
+`<form>`: `scaffold` (groups become columns; a group named premise, logline or
+thesis spans the top, one named ending/denouement/resolution/close is the
+bottom row), `cards` (groups become rows), `blank` (one full page).
+
+Rules:
+- Edit composures ONLY through these tools. `write_file` on a `.comp` is
+  refused — module-level ops are what keep you and the user from clobbering
+  each other on the same canvas.
+- **One module, one idea.** A composure whose first module holds a whole
+  document is a document, not a composure. Five points, five modules.
+- Write in markdown; enough converts it. Headings, lists, `[ ]` / `[x]`
+  checklists, quotes, code, bold, italic and links all survive.
+- **Filed journal pages** and **council statements** are permanently
+  read-only and refuse every content op. You can still move, restyle and
+  comment on both.
+- Caps, refused with a message naming the fix: 200 modules per composure, 500
+  pages per module, 400 KB per page.
+"""
+
+READVISORY_TOOL_INSTRUCTIONS = """\
+## Readvisors
+
+A **readvisor** is a voice the user can switch on for a project: a folder
+holding an `AGENT.md` (who they are, how they decide) and a `MOTIVATION.md`
+(what they care about and protect against). The ones switched on here are
+part of who you are this conversation.
+
+`install_readvisor` files a NEW one. It is the last step of the `readvisory`
+skill, never a thing to do on your own initiative: a readvisor built from a
+guess about someone is worse than no readvisor, because the user will
+mistake it for their actual judgment. Run the interview first.
+
+```
+<tool>install_readvisor
+<name>hard-questions</name>
+<scope>project</scope>
+<display>Hard Questions</display>
+<agent_md># Hard Questions
+...the full AGENT.md, in the shape the readvisory skill's template gives...
+</agent_md>
+<motivation_md># Motivational Substrate — Hard Questions
+...the full MOTIVATION.md, in the same way...
+</motivation_md>
+</tool>
+```
+
+- `<scope>` is `project` (this project only) or `global` (every project on
+  this machine). **Ask the user which** — don't choose for them.
+- Both documents must follow the shape in the readvisory skill's
+  `assets/*.template`. The install is refused, with the list of problems,
+  if they don't: every readvisor works roughly the same way, however
+  different they sound.
+- Both documents are scanned first. They become part of a system prompt, so
+  a passage that reads as an instruction to the machine rather than a
+  description of a person is refused — show the user the finding and rewrite
+  it.
+- A name that already exists is refused unless you pass
+  `<replace>yes</replace>`, which needs the user's say-so in this turn.
+- It arrives switched ON here; at global scope it arrives OFF in the user's
+  other projects. Say so, rather than leaving them to wonder where it went.
+"""
+
+
+def _skill_enabled(rness: Path, name: str) -> bool:
+    try:
+        return any(n == name and on for n, on, _tip in list_skills(rness))
+    except OSError:  # pragma: no cover — an unreadable skills dir
+        return False
+
+
+def tool_instructions(project_dir: Path) -> str:
+    """The always-on core plus whichever gated blocks this project can use.
+
+    Ordered core → composures → readvisors, which is also cheapest-to-
+    dearest: a project with neither pays exactly what it paid before any of
+    this landed."""
+    parts = [TOOL_INSTRUCTIONS]
+    rness = project_dir / "rness"
+    try:
+        from . import broker
+        composures = broker.is_enabled("composure_enabled")
+    except Exception:  # noqa: BLE001 — an unreadable broker config is not a gate
+        composures = True
+    if composures:
+        parts.append(COMPOSURE_TOOL_INSTRUCTIONS)
+    if _skill_enabled(rness, "readvisory"):
+        parts.append(READVISORY_TOOL_INSTRUCTIONS)
+    return "\n".join(p.rstrip() + "\n" for p in parts)
+
 
 HARNESS_CONTEXT_TMPL = """\
 You are running inside an "enough" harness — a paradigmless personal computer
@@ -613,14 +796,40 @@ def _load_skills(rness: Path) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Roles — toggleable consultant personas the orchestrator can confer with.
+# Readvisors — the toggleable voices the chief readvisor speaks with.
 # Same on/off file model as skills, different placement in the prompt:
-# roles aren't capabilities you stack, they're voices you can summon.
+# readvisors aren't capabilities you stack, they're perspectives you are
+# made of for the length of a conversation.
+#
+# The python identifiers below still say "role" (`list_roles`,
+# `set_role_enabled`, `_load_roles`) and so does the wire (`/api/roles*`).
+# That is deliberate — see docs/composure-plan.md, "Shared vocabulary":
+# the word the *user* reads changed, the names the code is addressed by
+# did not, because renaming those buys nothing and breaks every caller.
 # ---------------------------------------------------------------------------
 
+def _readvisors_dir(rness: Path) -> Path:
+    """The project's readvisors folder.
+
+    `rness/readvisors/` since 0.3.5, `rness/roles/` before it. The rename is
+    performed at launch by `skeleton._migrate_roles_to_readvisors`, but that
+    migration is allowed to fail soft (a read-only parent), so every reader
+    goes through here and keeps working under whichever name is actually on
+    disk. A project with neither folder gets the new name back, so writers
+    create the right thing."""
+    new = rness / "readvisors"
+    if new.is_dir():
+        return new
+    old = rness / "roles"
+    if old.is_dir():
+        return old
+    return new
+
+
 def _read_disabled_roles(rness: Path) -> set[str]:
-    """Names listed (one per line) in rness/roles/.disabled are skipped."""
-    f = rness / "roles" / ".disabled"
+    """Names listed (one per line) in the readvisors folder's `.disabled`
+    file are skipped."""
+    f = _readvisors_dir(rness) / ".disabled"
     if not f.is_file():
         return set()
     try:
@@ -631,10 +840,10 @@ def _read_disabled_roles(rness: Path) -> set[str]:
 
 
 def list_roles(rness: Path) -> list[tuple[str, bool, str]]:
-    """Return [(name, enabled, tooltip), ...] for every role present, in
+    """Return [(name, enabled, tooltip), ...] for every readvisor present, in
     stable order. `tooltip` is the user-facing UI tooltip from the bottom
-    `enough-tooltip-text:` field of the role's AGENT.md; "" if not set."""
-    roles_dir = rness / "roles"
+    `enough-tooltip-text:` field of the readvisor's AGENT.md; "" if not set."""
+    roles_dir = _readvisors_dir(rness)
     if not roles_dir.is_dir():
         return []
     entries: list[tuple[str, Path]] = []
@@ -654,8 +863,8 @@ def list_roles(rness: Path) -> list[tuple[str, bool, str]]:
 
 
 def set_role_enabled(rness: Path, name: str, enabled: bool) -> None:
-    """Add or remove `name` from rness/roles/.disabled."""
-    f = rness / "roles" / ".disabled"
+    """Add or remove `name` from the readvisors folder's `.disabled`."""
+    f = _readvisors_dir(rness) / ".disabled"
     current = _read_disabled_roles(rness)
     if enabled:
         current.discard(name)
@@ -669,32 +878,80 @@ def set_role_enabled(rness: Path, name: str, enabled: bool) -> None:
             f.unlink()
 
 
-_ROLES_FRAMING = (
-    "You have access to the following Role agents as **consultants**, not "
-    "as facets of yourself. They are voices with their own values, blind "
-    "spots, and ways of pushing back. You — the core agent defined above — "
-    "remain the orchestrator: you make the decisions, you talk to the "
-    "user, you do the work. Roles are advisors you can summon when a "
-    "decision deserves a second perspective.\n\n"
-    "Ways to use them:\n"
-    "- Solicit input: \"Let me check this with <role>...\" then answer in "
-    "their voice, citing what they'd flag.\n"
-    "- Stage a debate: when two enabled roles would disagree, sketch the "
-    "exchange briefly before resolving as yourself.\n"
-    "- Spot-check decisions: at meaningful inflection points (committing to "
-    "an approach, finalizing a plan), ask whether any active role would "
-    "object.\n\n"
-    "Do not *become* a role unless explicitly asked to roleplay. Default "
-    "to channeling them as quoted advisors. Final decisions, tool calls, "
-    "and direct address to the user are always yours."
+#: The **voltron** framing (composure round, P2). It replaces the old
+#: consultant framing, and the difference is the whole point of the rename:
+#: readvisors used to be people you phoned, and are now people you are made
+#: of. A small local model handles "be all of these at once" far better than
+#: "decide which of these to quote", and the user gets one answer instead of
+#: a transcript of a meeting they did not ask for.
+_READVISORS_FRAMING = (
+    "These readvisors are switched on for this project. They are not "
+    "consultants you phone and they are not characters you play — for the "
+    "length of this conversation they are **you**. Their perspectives, "
+    "expertise and cautions combine into the single voice the user hears.\n\n"
+    "How to hold them:\n"
+    "- Integrate, don't poll. Let each one shape what you notice, what you "
+    "warn about and what you propose, then answer as one person who happens "
+    "to know all of it.\n"
+    "- Name the perspective driving a point when the name earns its place — "
+    "\"the skeptic in me wants the counter-example first\" — because it tells "
+    "the user where a push is coming from. Don't announce every readvisor "
+    "you drew on; that is bookkeeping, not help.\n"
+    "- Stage an explicit exchange between readvisors only when the user asks "
+    "for one, or when two of them genuinely conflict and showing the conflict "
+    "IS the answer. Then resolve it and move on.\n"
+    "- Disagreement is signal, not deadlock. When they pull in different "
+    "directions, say plainly what the trade is and make the call.\n\n"
+    "In a council composure this rule is suspended: there each readvisor "
+    "speaks separately, under its own name, and you are only the chief."
 )
+
+#: Kept as an alias because the old name is the one that appears in
+#: docs/AGENT_GUIDE.md and in a couple of test scripts. Same object.
+_ROLES_FRAMING = _READVISORS_FRAMING
+
+
+def _display_name(agent_md: str, fallback: str) -> str:
+    """A readvisor's display name: the `# <Display Name>` H1 of its AGENT.md,
+    falling back to the folder name.
+
+    The canonical shape (P2d) puts the display name in that H1 and nowhere
+    else, so this is the one place the pretty name comes from. A hand-made
+    readvisor with no H1 simply shows as its folder name, which is what it
+    has always shown as."""
+    for line in agent_md.splitlines():
+        s = line.strip()
+        if not s:
+            continue
+        if s.startswith("# "):
+            title = s[2:].strip()
+            # The MOTIVATION template's H1 is "Motivational Substrate — X";
+            # an AGENT.md that copied that form still names itself after the
+            # em dash, so take the tail when one is present.
+            if title:
+                return title
+        break  # only the FIRST non-empty line counts as the title
+    return fallback
+
+
+def _readvisor_section(name: str, agent_md: str, motiv_md: str) -> str:
+    """One readvisor, rendered the uniform way (P2d): a `## Readvisor:` head
+    carrying the display name, then its two documents under identical
+    sub-headings. The council engine renders its participants from the same
+    two documents, so a readvisor reads the same whichever mode it is in."""
+    body_parts: list[str] = []
+    if agent_md:
+        body_parts.append(f"### Identity\n\n{agent_md}")
+    if motiv_md:
+        body_parts.append(f"### Motivation\n\n{motiv_md}")
+    head = _display_name(agent_md, name)
+    return f"## Readvisor: {head}\n\n" + "\n\n".join(body_parts)
 
 
 def _load_roles(rness: Path) -> str:
-    """Concatenate every ENABLED role's AGENT.md + MOTIVATION.md into one
-    block, framed as the consultant model above. Each role gets a `## Role:
-    <name>` heading so the model can address them by name."""
-    roles_dir = rness / "roles"
+    """Concatenate every ENABLED readvisor's AGENT.md + MOTIVATION.md into
+    one block under the voltron framing above."""
+    roles_dir = _readvisors_dir(rness)
     if not roles_dir.is_dir():
         return ""
     disabled = _read_disabled_roles(rness)
@@ -711,15 +968,206 @@ def _load_roles(rness: Path) -> str:
         motiv_md = _read_or_empty(entry / "MOTIVATION.md")
         if not agent_md and not motiv_md:
             continue
-        body_parts: list[str] = []
-        if agent_md:
-            body_parts.append(f"### Identity\n\n{agent_md}")
-        if motiv_md:
-            body_parts.append(f"### Motivation\n\n{motiv_md}")
-        sections.append(f"## Role: {name}\n\n" + "\n\n".join(body_parts))
+        sections.append(_readvisor_section(name, agent_md, motiv_md))
     if not sections:
         return ""
-    return _ROLES_FRAMING + "\n\n" + "\n\n".join(sections)
+    return _READVISORS_FRAMING + "\n\n" + "\n\n".join(sections)
+
+
+def readvisor_identity(project_dir: Path, name: str) -> str:
+    """ONE readvisor's two documents, rendered as a standalone identity.
+
+    This is the council engine's door (P5): in a council each participant
+    gets its OWN system prompt, and a readvisor's is its AGENT.md +
+    MOTIVATION.md — no voltron framing, because in a council it is not part
+    of a combined voice, it is itself.
+
+    Returns "" when the readvisor does not exist or carries no content, so
+    a caller can treat "no identity" as "not a participant". Enabled/
+    disabled is deliberately NOT consulted: the sidebar toggle governs the
+    combined voice of ordinary conversation, while a council's participant
+    list is chosen in its own setup card."""
+    rness = project_dir / "rness"
+    entry = _readvisors_dir(rness) / name
+    if not entry.is_dir():
+        return ""
+    agent_md = _read_or_empty(entry / "AGENT.md")
+    motiv_md = _read_or_empty(entry / "MOTIVATION.md")
+    if not agent_md and not motiv_md:
+        return ""
+    return _readvisor_section(name, agent_md, motiv_md).strip() + "\n"
+
+
+# ---------------------------------------------------------------------------
+# The chief readvisor's name
+# ---------------------------------------------------------------------------
+#
+# One name per machine, stored beside the theme and the UI language in
+# `~/enough/config/ui.json`. It is global rather than per-project because a
+# user who renamed their chief to "Mo" means Mo everywhere — a different
+# name in every folder would read as a different person in every folder.
+
+CHIEF_NAME_DEFAULT = "Ed"
+CHIEF_NAME_MAX = 24
+
+#: Letters, digits, space, hyphen, apostrophe, dot. Deliberately permissive
+#: about alphabet (a user may well name their readvisor in their own script)
+#: and deliberately strict about punctuation, because this string is
+#: templated into HTML bylines and into the system prompt.
+_CHIEF_NAME_RE = re.compile(r"^[^\W_]([^\W_]|[ \-'.])*$", re.UNICODE)
+
+
+def valid_chief_name(raw: object) -> str | None:
+    """The trimmed name if `raw` is an acceptable chief-readvisor name, else
+    None. Callers treat None as "drop it and keep what you had" — the same
+    posture `/api/ui-config` takes for an unknown language code."""
+    if not isinstance(raw, str):
+        return None
+    name = raw.strip()
+    if not name or len(name) > CHIEF_NAME_MAX:
+        return None
+    return name if _CHIEF_NAME_RE.match(name) else None
+
+
+def _ui_config_path() -> Path:
+    """Live `ui.json`, honoring `ENOUGH_UI_CONFIG`.
+
+    Deliberately a second copy of `server._ui_config_live_path()` rather
+    than an import of it: the prompt layer is the one place in enough that
+    must stay loadable without the web layer (the council engine and the
+    tests both build prompts with no app running), and six lines of path
+    logic is a cheaper dependency than FastAPI."""
+    raw = os.environ.get("ENOUGH_UI_CONFIG")
+    if raw and raw.strip():
+        return Path(raw).expanduser()
+    return Path.home() / "enough" / "config" / "ui.json"
+
+
+def chief_name() -> str:
+    """The chief readvisor's display name, or "Ed".
+
+    Every failure mode — no file, unreadable file, bad json, absent key, a
+    value that does not validate — lands on the default, because a missing
+    name must never be the reason a turn cannot start."""
+    try:
+        cfg = json.loads(_ui_config_path().read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return CHIEF_NAME_DEFAULT
+    if not isinstance(cfg, dict):
+        return CHIEF_NAME_DEFAULT
+    return valid_chief_name(cfg.get("chief_readvisor_name")) or CHIEF_NAME_DEFAULT
+
+
+# ---------------------------------------------------------------------------
+# One readvisor shape (P2d)
+# ---------------------------------------------------------------------------
+#
+# "All readvisors work in roughly the same way, despite their unique
+# personalities and quirks." The shape is not hard-coded here: it is READ
+# from the `readvisory` skill's two templates at call time, so the skill
+# that forges readvisors and the validator that admits them can never drift
+# apart — editing the template IS editing the contract.
+
+_SHAPE_TEMPLATES = {
+    "agent": "AGENT.md.template",
+    "motivation": "MOTIVATION.md.template",
+}
+
+
+def _readvisory_assets_dir() -> Path:
+    from .skeleton import _install_defaults_root
+    return _install_defaults_root() / "skills" / "readvisory" / "assets"
+
+
+def _template_headings(which: str) -> list[str]:
+    """The ordered H2 headings of one shape template, or [] when the
+    template is missing (a partial install — shape then has nothing to
+    enforce, which beats refusing every install)."""
+    p = _readvisory_assets_dir() / _SHAPE_TEMPLATES[which]
+    text = _read_or_empty(p)
+    return [m.group(1).strip()
+            for m in re.finditer(r"^##[ \t]+(.+?)[ \t]*$", text, re.M)]
+
+
+def _sections(text: str) -> list[tuple[str, str]]:
+    """[(h2 heading, body), ...] for a markdown document, in document
+    order. Body runs to the next H2 or to a horizontal rule."""
+    out: list[tuple[str, str]] = []
+    current: str | None = None
+    body: list[str] = []
+    for line in text.splitlines():
+        m = re.match(r"^##[ \t]+(.+?)[ \t]*$", line)
+        if m:
+            if current is not None:
+                out.append((current, "\n".join(body)))
+            current = m.group(1).strip()
+            body = []
+            continue
+        if current is not None:
+            if line.strip() == "---":
+                out.append((current, "\n".join(body)))
+                current = None
+                body = []
+                continue
+            body.append(line)
+    if current is not None:
+        out.append((current, "\n".join(body)))
+    return out
+
+
+def readvisor_shape(agent_md: str, motivation_md: str) -> list[str]:
+    """Human-readable problems with a readvisor's two documents; [] is a
+    pass.
+
+    Enforced at the install door (`install_readvisor`) and over the shipped
+    readvisors by the suite — NOT by the loader. A hand-made readvisor that
+    predates the shape, or one the user wrote in a text editor at 2am, still
+    loads and still works: the shape is a standard for what enough itself
+    admits, not a licence to stop reading the user's files."""
+    problems: list[str] = []
+
+    for label, text, which, want_tooltip in (
+        ("AGENT.md", agent_md, "agent", True),
+        ("MOTIVATION.md", motivation_md, "motivation", False),
+    ):
+        body = (text or "").strip()
+        if not body:
+            problems.append(f"{label} is empty.")
+            continue
+        if which == "agent":
+            first = next((ln.strip() for ln in body.splitlines() if ln.strip()), "")
+            if not first.startswith("# ") or len(first) < 3:
+                problems.append(
+                    "AGENT.md must open with `# <Display Name>` — the display "
+                    "name is read from that heading and nowhere else.")
+        required = _template_headings(which)
+        if not required:
+            continue
+        found = [h for h, _b in _sections(body)]
+        present = [h for h in found if h in required]
+        missing = [h for h in required if h not in present]
+        if missing:
+            problems.append(
+                f"{label} is missing these sections: "
+                + ", ".join(f"`## {h}`" for h in missing))
+        ordered = [h for h in required if h in present]
+        if present != ordered:
+            problems.append(
+                f"{label} has its sections out of order — the shape is: "
+                + " · ".join(required))
+        empties = [h for h, b in _sections(body)
+                   if h in required and not b.strip()]
+        if empties:
+            problems.append(
+                f"{label} has empty sections: "
+                + ", ".join(f"`## {h}`" for h in empties)
+                + ". A section with genuinely nothing to say gets one honest "
+                  "sentence, never filler.")
+        if want_tooltip and not _extract_enough_tooltip(body):
+            problems.append(
+                "AGENT.md needs a trailing `enough-tooltip-text: \"…\"` line — "
+                "it is what the user sees when they hover the toggle.")
+    return problems
 
 
 def _load_policies(rness: Path) -> str:
@@ -1034,8 +1482,74 @@ def _load_paradigm_catalog(rness: Path, active: str) -> str:
     return "\n".join(lines)
 
 
-def assemble_system_prompt(project_dir: Path) -> str:
+#: The generated identity preface that opens every system prompt (P2).
+#:
+#: It is generated rather than shipped in `defaults/AGENT.md` for one
+#: reason: a project's `rness/AGENT.md` is a COPY the user owns and may have
+#: edited years ago, so nothing written into the shipped default reaches an
+#: existing project. This paragraph does, on the very next turn, which is
+#: how a rename and a change of vocabulary land everywhere at once.
+_IDENTITY_PREFACE_TMPL = (
+    "You are {name}, the user's **chief readvisor** in enough — a personal "
+    "language system that lives on the user's own machine, for planning, "
+    "writing, revising and translating. The user's own files are the point "
+    "of the place; you are who they think out loud with about them.\n\n"
+    "Two things follow, and they hold for every turn:\n\n"
+    "- **enough acts; readvisors speak.** Reading, writing, converting, "
+    "fetching, searching — those are things *enough* does when you call a "
+    "tool, and that is how to say them: \"enough saved the file\", \"enough "
+    "couldn't reach that page\". What is yours is judgment, in your own "
+    "voice: what you noticed, what you'd try, what worries you. Never "
+    "narrate the machinery as though it were your body.\n"
+    "- **You are one voice, sometimes made of several.** Any readvisors the "
+    "user has switched on are part of who you are in this conversation, not "
+    "a panel you report from. If a section below lists them, it says how to "
+    "hold them.\n\n"
+    "Everything after this paragraph is the identity, memory and working "
+    "context the user has assembled for you in this project."
+)
+
+
+def identity_preface(name: str | None = None) -> str:
+    """The preface text for `name` (default: the configured chief name)."""
+    return _IDENTITY_PREFACE_TMPL.format(name=name or chief_name())
+
+
+def assemble_system_prompt(
+    project_dir: Path,
+    readvisors: str = "voltron",
+    profile: str = "chat",
+) -> str:
     """Build the system prompt fresh from rness/ files.
+
+    `readvisors` selects how the project's switched-on readvisors enter the
+    prompt:
+
+    - `"voltron"` (default) — the ordinary conversation case: they are
+      combined into one voice under the "Active Readvisors" section.
+    - `"none"` — leave the section out entirely. A council's chief speaks as
+      the chief while every other readvisor is a separate participant with
+      its own prompt built from `readvisor_identity()`, so folding them into
+      the chief's voice as well would put each of them in the room twice.
+
+    `profile` selects how much of the harness comes with it:
+
+    - `"chat"` (default) — everything: identity, memory, paradigm, policies,
+      skills, tools, the converted-documents note and the harness context.
+    - `"council"` — **who the chief is, and nothing else**: the identity
+      preface, Identity, Motivation, the project description and the project
+      profile. No readvisors, no paradigm or catalog, no policies, no skills,
+      no current intention, no tool instructions, no twins section, no
+      harness context, no drift notice.
+
+      A council turn calls no tools, reads no files, switches no paradigm and
+      files no request, so every one of those sections is instruction for
+      something that cannot happen — and the chief pays for all of it on
+      every turn, inside a share of the window it is already too big for.
+      Cutting them takes the chief's council prompt from roughly 21 000
+      tokens to under 2 000, which is the difference between a council with a
+      memory and a council reading first sentences. A readvisor participant
+      never had any of it: its identity is its own two documents.
 
     The active paradigm is read from `rness/active-paradigm` on every call,
     so an agent-initiated paradigm switch takes effect on the very next
@@ -1045,6 +1559,9 @@ def assemble_system_prompt(project_dir: Path) -> str:
     working memory), active paradigm + catalog, optional INTENTION.md,
     tool instructions, and the rness-context block.
     """
+    if profile not in ("chat", "council"):
+        raise ValueError(
+            f"unknown system-prompt profile {profile!r}; one of chat, council")
     rness = project_dir / "rness"
 
     from . import project_meta
@@ -1059,6 +1576,7 @@ def assemble_system_prompt(project_dir: Path) -> str:
     intention = _read_or_empty(rness / "INTENTION.md")
 
     parts = [
+        identity_preface(),
         _section("Identity", agent),
         _section("Motivation", motivation),
     ]
@@ -1080,12 +1598,15 @@ def assemble_system_prompt(project_dir: Path) -> str:
     # waste tokens on placeholder prose every turn.
     if project_profile and not _is_stock_project_profile(project_profile):
         parts.append(_section("Project Profile", project_profile))
-    roles_block = _load_roles(rness)
+    if profile == "council":
+        # Who the chief is, and nothing else. See the docstring.
+        return "\n".join(p for p in parts if p).strip() + "\n"
+    roles_block = _load_roles(rness) if readvisors != "none" else ""
     if roles_block:
-        # Sit between Motivation and Paradigm — close to identity (these
-        # are voices you have access to) but distinct from it (you aren't
-        # them; you can consult them).
-        parts.append(_section("Active Role Consultants", roles_block))
+        # Sits between Motivation and Paradigm — adjacent to identity,
+        # because since 0.3.5 that is what it is: not advisors you may
+        # consult, but the rest of who you are this conversation.
+        parts.append(_section("Active Readvisors", roles_block))
     parts.append(_section(f"Paradigm: {active_paradigm}", paradigm))
     if catalog:
         parts.append(_section("Paradigm Catalog", catalog))
@@ -1097,7 +1618,7 @@ def assemble_system_prompt(project_dir: Path) -> str:
         parts.append(_section("Skills", skills_block))
     if intention:
         parts.append(_section("Current Intention", intention))
-    parts.append(_section("Tools", TOOL_INSTRUCTIONS))
+    parts.append(_section("Tools", tool_instructions(project_dir)))
     parts.append(_section("Converted documents (twins)", convert_instructions()))
     parts.append(_section("Context", HARNESS_CONTEXT_TMPL.format(project_dir=project_dir)))
 

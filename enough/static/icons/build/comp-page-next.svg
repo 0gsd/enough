@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" id="comp-page-next" viewBox="0 0 72 72">
+  <g transform="translate(72,0) scale(-1,1)">
+    <rect x="26" y="11" width="34" height="50" rx="3" ry="3" fill="none" stroke="#000" stroke-width="3" />
+    <polyline points="22,24 10,36 22,48" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

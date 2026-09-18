@@ -113,6 +113,60 @@ pub fn after_exit(code: Option<i32>, handoff: Option<PathBuf>) -> AfterExit {
     }
 }
 
+// ---------------------------------------------------------------------------
+// The window title (composure round, P1)
+// ---------------------------------------------------------------------------
+
+/// The OS window title for a project: `enough 📁 <folder> 🖊️ <nice name>`.
+///
+/// The page builds the same string in `applyProjectName()` (index.html) — the
+/// two must agree, because the webview's document title flows into the window
+/// once the page has loaded (see `boot`). This is the *first paint* of it,
+/// before the backend has served anything.
+///
+/// The `🖊️ …` half is dropped when the nice name adds nothing: absent, blank,
+/// or byte-equal to the folder after trimming. Emoji in either half are just
+/// characters — nothing is escaped or stripped.
+pub fn window_title(folder: &str, nice_name: Option<&str>) -> String {
+    let nice = nice_name.map(str::trim).unwrap_or("");
+    if nice.is_empty() || nice == folder.trim() {
+        format!("enough 📁 {folder}")
+    } else {
+        format!("enough 📁 {folder} 🖊️ {nice}")
+    }
+}
+
+/// The project's display name from `rness/project.json`, or `None`.
+///
+/// Tolerant by design: a missing file, unreadable bytes, invalid JSON, a
+/// non-object top level, a non-string `name`, or a name that trims to nothing
+/// all read as "no nice name" — the title then falls back to the folder alone.
+/// The shell never blocks a launch on cosmetic metadata.
+fn project_nice_name(project: &Path) -> Option<String> {
+    let text = std::fs::read_to_string(project.join("rness/project.json")).ok()?;
+    let value: serde_json::Value = serde_json::from_str(&text).ok()?;
+    let name = value.get("name")?.as_str()?.trim();
+    if name.is_empty() {
+        None
+    } else {
+        Some(name.to_string())
+    }
+}
+
+/// The title for a launch target, reading the project's metadata off disk.
+fn title_for(target: &LaunchTarget) -> String {
+    match target {
+        LaunchTarget::Home => "enough".to_string(),
+        LaunchTarget::Project(project) => {
+            let folder = project
+                .file_name()
+                .map(|s| s.to_string_lossy().into_owned())
+                .unwrap_or_else(|| project.display().to_string());
+            window_title(&folder, project_nice_name(project).as_deref())
+        }
+    }
+}
+
 /// Read and delete `<enough config dir>/.home-open`.
 ///
 /// Deleting is unconditional once the file exists — including when its
@@ -477,17 +531,11 @@ fn boot(app: &AppHandle, target: &LaunchTarget, home: &Path) -> Result<(), Strin
     window
         .navigate(parsed)
         .map_err(|e| format!("couldn't open {url}: {e}"))?;
-    let title = match target {
-        LaunchTarget::Home => "enough".to_string(),
-        LaunchTarget::Project(project) => {
-            let label = project
-                .file_name()
-                .map(|s| s.to_string_lossy().into_owned())
-                .unwrap_or_else(|| project.display().to_string());
-            format!("enough — {label}")
-        }
-    };
-    let _ = window.set_title(&title);
+    // First paint of the title, from disk. The page then owns it: an in-app
+    // rename updates `document.title`, which the webview's
+    // `on_document_title_changed` hook (see lib.rs) mirrors onto the window,
+    // so the OS title stays true without a relaunch.
+    let _ = window.set_title(&title_for(target));
     Ok(())
 }
 
@@ -835,5 +883,88 @@ mod tests {
             AfterExit::Home
         );
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // -----------------------------------------------------------------------
+    // The window title (composure round, P1)
+    // -----------------------------------------------------------------------
+
+    #[test]
+    fn a_project_with_no_nice_name_is_titled_by_its_folder() {
+        assert_eq!(window_title("novel", None), "enough 📁 novel");
+        assert_eq!(window_title("novel", Some("")), "enough 📁 novel");
+        assert_eq!(window_title("novel", Some("   ")), "enough 📁 novel");
+    }
+
+    #[test]
+    fn a_nice_name_gets_the_pen_half() {
+        assert_eq!(
+            window_title("novel", Some("Winter Bees")),
+            "enough 📁 novel 🖊️ Winter Bees"
+        );
+        // Surrounding whitespace in the metadata never reaches the title bar.
+        assert_eq!(
+            window_title("novel", Some("  Winter Bees  ")),
+            "enough 📁 novel 🖊️ Winter Bees"
+        );
+    }
+
+    #[test]
+    fn a_nice_name_equal_to_the_folder_adds_nothing() {
+        assert_eq!(window_title("novel", Some("novel")), "enough 📁 novel");
+        assert_eq!(window_title("novel", Some(" novel ")), "enough 📁 novel");
+    }
+
+    #[test]
+    fn emoji_in_either_half_survive_verbatim() {
+        assert_eq!(
+            window_title("🌲 woods", Some("Field Notes 🐦")),
+            "enough 📁 🌲 woods 🖊️ Field Notes 🐦"
+        );
+    }
+
+    /// Cosmetic metadata never breaks a launch: every broken shape reads as
+    /// "no nice name" and the title falls back to the folder.
+    #[test]
+    fn a_missing_or_invalid_project_json_reads_as_no_nice_name() {
+        let dir = config::scratch_dir("title-meta");
+        let project = dir.join("novel");
+        std::fs::create_dir_all(project.join("rness")).unwrap();
+        let meta = project.join("rness/project.json");
+
+        // Missing file.
+        assert_eq!(project_nice_name(&project), None);
+        assert_eq!(title_for(&LaunchTarget::Project(project.clone())), "enough 📁 novel");
+
+        // Invalid JSON.
+        std::fs::write(&meta, "{not json").unwrap();
+        assert_eq!(project_nice_name(&project), None);
+
+        // Valid JSON, wrong shape.
+        std::fs::write(&meta, "[1, 2, 3]").unwrap();
+        assert_eq!(project_nice_name(&project), None);
+
+        // Object without a name, with a non-string name, with a blank name.
+        std::fs::write(&meta, r#"{"description": "x"}"#).unwrap();
+        assert_eq!(project_nice_name(&project), None);
+        std::fs::write(&meta, r#"{"name": 7}"#).unwrap();
+        assert_eq!(project_nice_name(&project), None);
+        std::fs::write(&meta, r#"{"name": "   "}"#).unwrap();
+        assert_eq!(project_nice_name(&project), None);
+
+        // And the happy path, end to end.
+        std::fs::write(&meta, r#"{"name": "Winter Bees"}"#).unwrap();
+        assert_eq!(project_nice_name(&project).as_deref(), Some("Winter Bees"));
+        assert_eq!(
+            title_for(&LaunchTarget::Project(project.clone())),
+            "enough 📁 novel 🖊️ Winter Bees"
+        );
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn home_keeps_the_bare_name() {
+        assert_eq!(title_for(&LaunchTarget::Home), "enough");
     }
 }

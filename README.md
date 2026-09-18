@@ -20,11 +20,11 @@ however, the only *actual* limitations are what the supported models can do on y
 
 this is because enough imposes very few paradigms on your wordflows -- in a world of exponential possibility, most people have as many things they want to do as ways they prefer to do them.
 
-enough's core design principles make it easy and fun for *anyone* to build out their own "knowledge operating system" with global- and project-level agent paradigms, skills, roles, and knowledge stores.
+enough's core design principles make it easy and fun for *anyone* to build out their own "knowledge operating system" with global- and project-level paradigms, skills, readvisors, and knowledge stores.
 
 [enough.support](https://enough.support) is also a forum where users can get help with anything they want to build into their setups, provide assistance to others, and/or just show off the "thought-enhancing prosthetics" they've cooked up.
 
-enough is built and tested on MacOS & Apple Silicon. Linux support is planned; Windows support is totally feasible. the feature set may also eventually expand beyond this single-viewport agent harness.
+enough is built and tested on MacOS & Apple Silicon. Linux support is planned; Windows support is totally feasible. the feature set may also eventually expand beyond this single-viewport personal language system.
 
 for now, the idea is that this might be enough for quite a while.
 

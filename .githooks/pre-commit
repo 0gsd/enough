@@ -1,0 +1,47 @@
+#!/bin/sh
+# enough's pre-commit gate — see "Pre-commit suite" in docs/AGENT_GUIDE.md.
+#
+# Install it once, per clone (git does not enable a committed hooks dir by
+# itself, and nothing in this repo may run `git config` on your behalf):
+#
+#     git config core.hooksPath .githooks
+#
+# It runs scripts/precommit.py in --quick mode: everything CI runs, plus the
+# content-drift guards and a three-viewport, three-language pass of the
+# browser harness. Full matrix before a release:
+#
+#     uv run python scripts/precommit.py
+#
+# Bypass is the ordinary one — `git commit --no-verify` — and it is there for
+# the case where the suite itself is what you are fixing. Using it for
+# anything else just moves the failure to CI.
+#
+# POSIX sh on purpose: this has to run under whatever /bin/sh the machine
+# has, including macOS's bash 3.2.
+
+set -e
+
+# Hooks run with the repo root as cwd, but be explicit: a `cd` here costs
+# nothing and makes the script runnable by hand.
+repo_root=$(git rev-parse --show-toplevel) || exit 1
+cd "$repo_root" || exit 1
+
+if ! command -v uv >/dev/null 2>&1; then
+    echo "pre-commit: uv is not on PATH — skipping the suite." >&2
+    echo "            Install uv, or run the checks yourself before pushing." >&2
+    exit 0
+fi
+
+ENOUGH_PRECOMMIT=quick
+export ENOUGH_PRECOMMIT
+
+if uv run python scripts/precommit.py --quick; then
+    exit 0
+fi
+
+echo >&2
+echo "pre-commit: the suite is red — the commit was not made." >&2
+echo "            Re-run a single stage with:" >&2
+echo "              uv run python scripts/precommit.py --only pytest -v" >&2
+echo "            Deliberate bypass: git commit --no-verify" >&2
+exit 1

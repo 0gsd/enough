@@ -84,7 +84,7 @@ TOGGLES: tuple[Toggle, ...] = (
         key="shell_brokered",
         label="shell: brokered",
         description=(
-            "trace-log shell commands (the agent's nuclear option). doesn't "
+            "trace-log shell commands (your readvisors' nuclear option). doesn't "
             "restrict what shell can do — there's no path allowlist for "
             "shell by design — but the journal entry is your accountability."
         ),
@@ -95,8 +95,8 @@ TOGGLES: tuple[Toggle, ...] = (
         key="fetch_url_enabled",
         label="fetch_url: enabled",
         description=(
-            "allow the agent to use the fetch_url tool. when off, the agent "
-            "falls back to curl-via-shell for web reads — no tor, no "
+            "let your readvisors use the fetch_url tool. when off, they fall "
+            "back to curl-via-shell for web reads — no tor, no "
             "markdown conversion, no caching."
         ),
         default=True,
@@ -121,7 +121,7 @@ TOGGLES: tuple[Toggle, ...] = (
             "convert fetched html to markdown via pandoc (bundled with "
             "enough) and store the result in "
             "rness/io/input/<timestamp>-<hash>-<slug>.md, plus "
-            "a row in _broker-index.md. the agent gets a short preview "
+            "a row in _broker-index.md. your readvisors get a short preview "
             "instead of the full body — saves context window space."
         ),
         default=True,
@@ -147,9 +147,9 @@ TOGGLES: tuple[Toggle, ...] = (
         key="wikisink_enabled",
         label="wikisink tools",
         description=(
-            "let the agent use the local wikipedia archive: wiki_search, "
+            "let your readvisors use the local wikipedia archive: wiki_search, "
             "read_wiki_article, wiki_status, and wikisink (the update run). "
-            "turn off to hide the whole subsystem from the agent — the 🚰 "
+            "turn off to hide the whole subsystem from them — the 🚰 "
             "browser UI keeps working either way."
         ),
         default=True,
@@ -171,14 +171,44 @@ TOGGLES: tuple[Toggle, ...] = (
         key="cacheawl_enabled",
         label="cacheawl tools",
         description=(
-            "let the agent use the global file store at ~/enough/cacheawl/: "
+            "let your readvisors use the global file store at ~/enough/cacheawl/: "
             "cachebox_list, cachebox_create, and cachebox_ingest. turn off to "
-            "hide cacheboxes from the agent — the cacheawl browser UI keeps "
+            "hide cacheboxes from them — the cacheawl browser UI keeps "
             "working either way. url ingests still honor the fetch_url "
             "toggles on top of this one."
         ),
         default=True,
         group="cacheawl",
+    ),
+    Toggle(
+        key="composure_enabled",
+        label="composure tools",
+        description=(
+            "let your readvisors read and edit composures — the canvas "
+            "documents in .comp files: read_composure, new_composure, "
+            "comp_add_module, comp_update_module, comp_set_page, "
+            "comp_remove_module, comp_arrange, comp_save_as_form, "
+            "composure_from_outline. turn off "
+            "to keep composures a place only you write — the canvas keeps "
+            "working either way."
+        ),
+        default=True,
+        group="composure",
+    ),
+    Toggle(
+        key="readvisory_install",
+        label="forge new readvisors",
+        description=(
+            "let the readvisory skill install a finished readvisor with "
+            "install_readvisor — writing its AGENT.md and MOTIVATION.md "
+            "either into this project or into ~/enough/readvisors/, where "
+            "every project can see it. turn off to keep the interview and "
+            "the drafting but do the filing yourself. installed readvisors "
+            "always arrive switched off in other projects, and both "
+            "documents are scanned before anything is written."
+        ),
+        default=True,
+        group="readvisors",
     ),
 )
 
@@ -372,8 +402,28 @@ def denial_cacheawl_disabled() -> str:
     return (
         "error: the cacheawl tools are disabled in the broker config. "
         "re-enable 'cacheawl tools' in the broker pane (top-nav 'broker' "
-        "button) to let the agent list, create, and ingest into cacheboxes "
+        "button) to let your readvisors list, create, and ingest into cacheboxes "
         "under ~/enough/cacheawl/."
+    )
+
+
+def denial_composure_disabled() -> str:
+    return (
+        "error: the composure tools are disabled in the broker config. "
+        "re-enable 'composure tools' in the broker pane (top-nav 'broker' "
+        "button) to let your readvisors read and edit .comp canvases. the "
+        "composure canvas in the app keeps working either way, so you can "
+        "still make the change yourself."
+    )
+
+
+def denial_readvisory_install_disabled() -> str:
+    return (
+        "error: installing readvisors is disabled in the broker config. "
+        "re-enable 'forge new readvisors' in the broker pane (top-nav "
+        "'broker' button) to let install_readvisor write the folder. the "
+        "interview and the two drafted documents are unaffected — show them "
+        "to the user and they can save the files themselves."
     )
 
 

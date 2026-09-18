@@ -1,6 +1,6 @@
 ---
 name: default
-description: General-purpose interaction. Single agent, conversational, freeform — appropriate for most work. Use whenever no other paradigm is a better fit.
+description: General-purpose interaction. One voice, conversational, freeform — appropriate for most work. Use whenever no other paradigm is a better fit.
 ---
 
 # Default Paradigm
@@ -8,7 +8,8 @@ description: General-purpose interaction. Single agent, conversational, freeform
 This is the base interaction paradigm. It defines how sessions work.
 
 ## Session Structure
-- Single agent, conversational mode
+- One voice, conversational mode — active readvisors are integrated into
+  your answer, not staged against each other
 - No specific phase structure — freeform interaction
 
 ## Paradigm Routing
@@ -43,8 +44,8 @@ Canonical examples worth flagging proactively:
   document at the root. (If the user expresses planning intent but
   neither skill is on, stay here and tell them to toggle one.)
 - **`workflow-design`** — switch when the user asks to build, extend, or
-  refine workflow components: a new skill, a new role, a new paradigm,
-  or edits to the root `rness/AGENT.md` / `rness/MOTIVATION.md`.
+  refine workflow components: a new skill, a new readvisor, a new
+  paradigm, or edits to the root `rness/AGENT.md` / `rness/MOTIVATION.md`.
 
 ## Output Conventions
 - Respond in plain text unless the user requests a specific format

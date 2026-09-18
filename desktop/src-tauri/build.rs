@@ -27,7 +27,9 @@ use std::path::{Path, PathBuf};
 /// - `README.md` + `LICENSE` — pyproject's `readme` and `license-files`; the
 ///   wheel build fails without them, so they are not optional niceties.
 /// - `enough/` — the package (static/ included; it's the UI).
-/// - `defaults/` — skills, roles, paradigms, policies, models.json. Read at
+/// - `defaults/` — skills, readvisors, paradigms, policies, models.json. The
+///   whole folder is staged by name, so the 0.3.5 `roles/` → `readvisors/`
+///   rename needed no change here. Read at
 ///   runtime via `skeleton._install_defaults_root()`, which is
 ///   `<the package's parent>/defaults` — i.e. this snapshot, once the app is
 ///   running from it.

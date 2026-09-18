@@ -4,6 +4,7 @@ symlink self-heal."""
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 
@@ -13,6 +14,11 @@ from starlette.testclient import TestClient
 from enough import project_meta, prompt, skeleton
 from enough import server as server_mod
 from enough.server import create_app
+
+# The `ui` block every project reads back when nothing has been set. Spelled
+# out here rather than imported so a change to the shipped defaults has to be
+# a deliberate two-file edit.
+DEFAULT_UI = {"ui_scale": 1.0, "text_scale": 1.0, "readvisor_panel": "open"}
 
 
 @pytest.fixture()
@@ -67,7 +73,7 @@ def test_corrupt_metadata_is_non_fatal(project: Path):
     (project / "rness" / "project.json").write_text("{not json", encoding="utf-8")
     m = project_meta.load(project)
     assert m["name"] == "MyBook"  # falls back instead of raising
-    assert m["ui"] == {"ui_scale": 1.0, "text_scale": 1.0}
+    assert m["ui"] == DEFAULT_UI
 
 
 # --------------------------------------------------------------------------
@@ -75,7 +81,7 @@ def test_corrupt_metadata_is_non_fatal(project: Path):
 # --------------------------------------------------------------------------
 
 def test_ui_defaults_when_unset(project: Path):
-    assert project_meta.load(project)["ui"] == {"ui_scale": 1.0, "text_scale": 1.0}
+    assert project_meta.load(project)["ui"] == DEFAULT_UI
 
 
 def test_save_ui_round_trip_grid_and_clamp(project: Path):
@@ -92,16 +98,55 @@ def test_save_ui_preserves_name_and_vice_versa(project: Path):
     project_meta.save_ui(project, 1.5, 0.9)
     m = project_meta.load(project)
     assert m["name"] == "Winter Bees"          # save_ui kept the editor's half
-    assert m["ui"] == {"ui_scale": 1.5, "text_scale": 0.9}
+    assert m["ui"] == {**DEFAULT_UI, "ui_scale": 1.5, "text_scale": 0.9}
     project_meta.save(project, "Winter Bees II", "Still bees.")
     m = project_meta.load(project)
-    assert m["ui"] == {"ui_scale": 1.5, "text_scale": 0.9}  # save() kept ours
+    # save() kept ours
+    assert m["ui"] == {**DEFAULT_UI, "ui_scale": 1.5, "text_scale": 0.9}
 
 
 def test_corrupt_ui_block_is_non_fatal(project: Path):
     (project / "rness" / "project.json").write_text(
         '{"name": "x", "description": "", "ui": "garbage"}', encoding="utf-8")
-    assert project_meta.load(project)["ui"] == {"ui_scale": 1.0, "text_scale": 1.0}
+    assert project_meta.load(project)["ui"] == DEFAULT_UI
+
+
+# --------------------------------------------------------------------------
+# The readvisor panel state (composure round, P3)
+# --------------------------------------------------------------------------
+
+def test_readvisor_panel_defaults_to_open(project: Path):
+    assert project_meta.load(project)["ui"]["readvisor_panel"] == "open"
+
+
+def test_readvisor_panel_round_trips(project: Path):
+    m = project_meta.save_ui(project, 1.0, 1.0, "closed")
+    assert m["ui"]["readvisor_panel"] == "closed"
+    assert project_meta.load(project)["ui"]["readvisor_panel"] == "closed"
+    m = project_meta.save_ui(project, 1.0, 1.0, "open")
+    assert m["ui"]["readvisor_panel"] == "open"
+
+
+@pytest.mark.parametrize("bad", ["full", "OPEN", "", None, 1, True, ["closed"]])
+def test_readvisor_panel_rejects_garbage(project: Path, bad):
+    """Anything that isn't one of the two stored states reads as the
+    default. `full` is deliberately in that list: it is a transient gesture,
+    never something a project reopens into."""
+    (project / "rness" / "project.json").write_text(
+        json.dumps({"ui": {"readvisor_panel": bad}}), encoding="utf-8")
+    assert project_meta.load(project)["ui"]["readvisor_panel"] == "open"
+
+
+def test_panel_and_scales_do_not_clobber_each_other(project: Path):
+    project_meta.save_ui(project, 1.5, 0.9, "closed")
+    # A scale write with no panel argument keeps the stored panel state…
+    m = project_meta.save_ui(project, 1.2, 1.1)
+    assert m["ui"] == {"ui_scale": 1.2, "text_scale": 1.1,
+                       "readvisor_panel": "closed"}
+    # …and a panel write carries the scales through.
+    m = project_meta.save_ui(project, 1.2, 1.1, "open")
+    assert m["ui"] == {"ui_scale": 1.2, "text_scale": 1.1,
+                       "readvisor_panel": "open"}
 
 
 # --------------------------------------------------------------------------
@@ -144,15 +189,31 @@ def test_project_name_templated_into_index(client: TestClient):
 def test_api_project_ui_persists_and_cleans(client: TestClient, project: Path):
     r = client.post("/api/project/ui", json={"ui_scale": 1.45, "text_scale": 0.9})
     assert r.status_code == 200
-    assert r.json()["ui"] == {"ui_scale": 1.4, "text_scale": 0.9}
+    assert r.json()["ui"] == {**DEFAULT_UI, "ui_scale": 1.4, "text_scale": 0.9}
     assert project_meta.load(project)["ui"]["ui_scale"] == 1.4
 
 
+def test_api_project_ui_persists_the_readvisor_panel(client: TestClient, project: Path):
+    r = client.post("/api/project/ui", json={"ui_scale": 1.0, "text_scale": 1.0,
+                                             "readvisor_panel": "closed"})
+    assert r.status_code == 200
+    assert r.json()["ui"]["readvisor_panel"] == "closed"
+    assert project_meta.load(project)["ui"]["readvisor_panel"] == "closed"
+    # A body without the key leaves the stored state alone.
+    r = client.post("/api/project/ui", json={"ui_scale": 1.2, "text_scale": 1.0})
+    assert r.json()["ui"]["readvisor_panel"] == "closed"
+
+
 def test_boot_ui_state_templated_into_index(client: TestClient):
-    client.post("/api/project/ui", json={"ui_scale": 1.4, "text_scale": 0.9})
+    client.post("/api/project/ui", json={"ui_scale": 1.4, "text_scale": 0.9,
+                                         "readvisor_panel": "closed"})
     html = client.get("/").text
     assert "/*UI_STATE_JSON*/null" not in html  # placeholder was replaced
     assert '"ui_scale": 1.4' in html or '"ui_scale":1.4' in html
+    # The panel state has to be in the boot literal or the layout reflows
+    # visibly on first paint; the folder basename rides along for the title.
+    assert '"readvisor_panel": "closed"' in html or '"readvisor_panel":"closed"' in html
+    assert '"folder": "MyBook"' in html or '"folder":"MyBook"' in html
 
 
 # --------------------------------------------------------------------------

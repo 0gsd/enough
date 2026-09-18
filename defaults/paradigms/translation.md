@@ -6,7 +6,7 @@ description: Offline multi-language translation as a first-class capability. Swi
 # Translation Paradigm
 
 This paradigm declares offline machine translation as a first-class
-capability of this enough instance. When it's in scope, the agent has a
+capability of this enough instance. When it's in scope, you have a
 permanent, locally-hosted, ~419-language translator at hand — no cloud
 dependency, no account, no rate limit.
 
@@ -16,8 +16,8 @@ reach for it.
 
 ## Activation rule
 
-This paradigm is paired with the `translator` skill, but the agent
-cannot toggle skills itself (there is no tool for it), so the paradigm
+This paradigm is paired with the `translator` skill, but you cannot
+toggle skills yourself (there is no tool for it), so the paradigm
 engages on translation intent regardless of skill state and the
 skill-off case is surfaced as a user-actionable warning.
 
@@ -148,11 +148,11 @@ the enough core, NOT served through llama-server, and NOT mediated by
 the LLM at the inference layer. The flow is:
 
     user request
-      → orchestrator LLM decides "this is a translation request"
-      → orchestrator invokes the `translator` skill via the shell tool
+      → you decide "this is a translation request"
+      → you invoke the `translator` skill via the shell tool
       → translator runs ct2 + sentencepiece directly
-      → result returned to orchestrator
-      → orchestrator presents to user, with caveats if any
+      → result returned to you
+      → you present it to the user, with caveats if any
 
 The LLM is the *router*, MADLAD is the *translator*. Don't try to
 translate via prompt engineering if the skill is available — it'll be
@@ -187,8 +187,8 @@ This paradigm currently exposes one explicit user-toggleable flag:
     nllb_optin: false    # set to true to enable CC-BY-NC NLLB-200 fallback
                          # (personal, non-commercial use only)
 
-The rest is convention: the agent reads this file, knows the routing
-rules above, and decides per-request which engine to invoke.
+The rest is convention: you read this file, know the routing rules
+above, and decide per-request which engine to invoke.
 
 ---
 enough-tooltip-text: "use the translator skill and the translation paradigm to translate any text into another language."

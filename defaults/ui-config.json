@@ -12,8 +12,10 @@
     "  current.theme  \u2014 name of an entry under 'themes' below",
     "  current.font   \u2014 name of an entry under 'fonts' below",
     "  ui_language    \u2014 UI + help language: en, fr, es, de, zh, ja",
-    "    (chrome and help only; project files and agent traffic stay",
-    "    in whatever language you write \u2014 the agent reads English best)",
+    "  chief_readvisor_name \u2014 what you call your chief readvisor",
+    "    (default Ed; one name per machine, renamable in the broker pane)",
+    "    (chrome and help only; project files and readvisor conversation",
+    "    stay in whatever language you write \u2014 local models read English best)",
     "  help_highlight_on_new_project \u2014 light up the (?) help",
     "    bubbles on a project's first launch until each is viewed (default true)",
     "",
@@ -34,6 +36,7 @@
   },
   "help_highlight_on_new_project": true,
   "ui_language": "en",
+  "chief_readvisor_name": "Ed",
   "fonts": {
     "mono": {
       "label": "Monospace (SF Mono)",

@@ -15,10 +15,10 @@ name: wikisink
 path: ~/enough/wikisink/
 
 ### what
-your local, offline copy of (a slice of) english wikipedia — a single Kiwix ZIM archive read in place, never extracted, so the file manager only ever shows articles you explicitly save. the 🚰 button opens a browser-style reader with full-text search, cross-links, a random-article die, an agent chat pill, comments, and a single <strong>save button</strong> whose flyout offers two destinations (this project's <code>wiki/</code>, or the global <code>~/enough/cacheawl/wiki/</code> cachebox shared across projects). the agent can search and read the whole archive via its wiki tools.
+your local, offline copy of (a slice of) english wikipedia — a single Kiwix ZIM archive read in place, never extracted, so the file manager only ever shows articles you explicitly save. the 🚰 button opens a browser-style reader with full-text search, cross-links, a random-article die, a readvisor chat pill, comments, and a single <strong>save button</strong> whose flyout offers two destinations (this project's <code>wiki/</code>, or the global <code>~/enough/cacheawl/wiki/</code> cachebox shared across projects). your readvisors can search and read the whole archive through their wiki tools.
 
 ### how
-first click of 🚰 runs the setup wizard: pick a size (top-1M-articles no-images ≈ 16 GB is the default; full english ≈ 49 GB; smaller options too), pick a storage folder (external drives work), confirm, and let the resumable download run — pause, quit, resume anytime. you can keep <em>several installs</em> in different places (say, the full archive on an external drive plus a small one on the internal disk) and switch between them in the ⚙ installs list; if a drive is detached, its install just shows as unreachable until the drive returns. once installed, ask the agent to run a <strong>wikisink</strong> to refresh your saved/commented ("watched") articles from live wikipedia and get a report: watched-article changes, edit spikes, pageview movers &amp; losers, and suspicious deletions. the 🛡 button on any article is the <em>deletion override</em>: keep your local copy forever, excluded from updates. ⚙ opens the installs manager, including base-archive replacement when a newer snapshot ships. you don't have to go looking for that: when a newer build of your flavor exists, a small pill appears in the reader toolbar (<code>newer snapshot: date · size</code>) — click it, confirm the size, and the same in-place upgrade runs, downloading first and swapping in only when it's done. the check happens at most once a day, never blocks the reader, and stays silent when you're offline.
+first click of 🚰 runs the setup wizard: pick a size (top-1M-articles no-images ≈ 16 GB is the default; full english ≈ 49 GB; smaller options too), pick a storage folder (external drives work), confirm, and let the resumable download run — pause, quit, resume anytime. you can keep <em>several installs</em> in different places (say, the full archive on an external drive plus a small one on the internal disk) and switch between them in the ⚙ installs list; if a drive is detached, its install just shows as unreachable until the drive returns. once installed, ask your chief readvisor to run a <strong>wikisink</strong> to refresh your saved/commented ("watched") articles from live wikipedia and get a report: watched-article changes, edit spikes, pageview movers &amp; losers, and suspicious deletions. the 🛡 button on any article is the <em>deletion override</em>: keep your local copy forever, excluded from updates. ⚙ opens the installs manager, including base-archive replacement when a newer snapshot ships. you don't have to go looking for that: when a newer build of your flavor exists, a small pill appears in the reader toolbar (<code>newer snapshot: date · size</code>) — click it, confirm the size, and the same in-place upgrade runs, downloading first and swapping in only when it's done. the check happens at most once a day, never blocks the reader, and stays silent when you're offline.
 
 ### ideas
 - save the articles a project leans on into its <code>wiki/</code> folder — full-fidelity copies that open back in the reader, each with a CC BY-SA attribution manifest built in.
@@ -37,7 +37,7 @@ created automatically on your first project-level save — no setup. wikisink up
 
 ### ideas
 - saved articles open in the reader even when the archive's drive is detached — they're your offline-offline copies.
-- the agent reads articles through its wiki tools (clean text extraction), so it can ground itself on saved and archived articles alike.
+- your readvisors read articles through their wiki tools (clean text extraction), so they can ground themselves on saved and archived articles alike.
 - wikipedia text is CC BY-SA: if part of an article ends up in something you publish, the manifest has everything you need for attribution.
 
 ## wiki-comments
@@ -52,44 +52,44 @@ select text in the wikisink reader → 💬 comment. anchoring degrades graceful
 
 ### ideas
 - comment on statistics or claims likely to change — after a wikisink run, re-pinned comments are a signal that exact spot was edited.
-- ask the agent about a highlighted passage via 🤖 in the selection popup — the passage is quoted into the chat automatically.
+- ask your chief readvisor about a highlighted passage via 🤖 in the selection popup — the passage is quoted into the chat automatically.
 
 ## paradigm-active
 name: paradigm
 path: rness/active-paradigm
 
 ### what
-the reasoning framework the agent is currently using. exactly one paradigm is active at any time; click another to switch. the active paradigm is loaded in full into the system prompt every turn, and the agent also sees a brief catalog of the other available paradigms so it can suggest (or initiate) a switch when the work would benefit from one.
+the reasoning framework your readvisors are currently working in. exactly one paradigm is active at any time; click another to switch. the active paradigm is loaded in full into the system prompt every turn, and your chief readvisor also sees a brief catalog of the other available paradigms, so they can suggest (or initiate) a switch when the work would benefit from one.
 
 ### how
-click ● next to a paradigm to make it active for this project. the choice is recorded in <code>rness/active-paradigm</code>. agent-initiated switches happen by writing that file too, and take effect on the next turn. add new paradigms by dropping a markdown file into <code>~/enough/defaults/paradigms/</code> (or into your project's <code>rness/paradigms/</code> for project-local ones). a YAML frontmatter block at the top — <code>name:</code> and <code>description:</code> — tells the agent what the paradigm is for.
+click ● next to a paradigm to make it active for this project. the choice is recorded in <code>rness/active-paradigm</code>. a switch your chief readvisor initiates happens by writing that file too, and takes effect on the next turn. add new paradigms by dropping a markdown file into <code>~/enough/defaults/paradigms/</code> (or into your project's <code>rness/paradigms/</code> for project-local ones). a YAML frontmatter block at the top — <code>name:</code> and <code>description:</code> — tells your readvisors what the paradigm is for.
 
 ### ideas
 - Paradigms available in this project: {{paradigms-list}}
 - write a paradigm for a distinct mode of work (research vs. writing, exploration vs. execution) and switch between them as the day unfolds.
-- a paradigm description is essentially "when should I use this" — write it for the agent's benefit, since that's the signal it reads to recommend switching.
+- a paradigm description is essentially "when should I use this" — write it for your chief readvisor's benefit, since that's the signal they read to recommend switching.
 
 ## requests
 name: requests/
 path: rness/requests/
 
 ### what
-persistent task and sub-task containers. each request is a markdown file capturing the goal of your request, the agent's reasoning so far, and a continuation block so work can resume across context resets — these are the unit of long-running effort in enough. they are also helpful to continue work if you hit a context window. completed requests live alongside the active ones in <code>rness/requests/done/</code>.
+persistent task and sub-task containers. each request is a markdown file capturing the goal of your request, your chief readvisor's reasoning so far, and a continuation block so work can resume across context resets — these are the unit of long-running effort in enough. they are also helpful to continue work if you hit a context window. completed requests live alongside the active ones in <code>rness/requests/done/</code>.
 
 ### how
-new requests appear in <code>rness/requests/</code> automatically as you and the agent work — click any file in the project tree to view it in the file panel. from there you can <em>mark done</em> (the file moves to <code>rness/requests/done/</code>) or <em>customize</em>. to start a request manually, drop a markdown file into <code>rness/requests/</code> with a brief goal at the top.
+new requests appear in <code>rness/requests/</code> automatically as you and your chief readvisor work — click any file in the project tree to view it in the file panel. from there you can <em>mark done</em> (the file moves to <code>rness/requests/done/</code>) or <em>customize</em>. to start a request manually, drop a markdown file into <code>rness/requests/</code> with a brief goal at the top.
 
 ### ideas
-- treat a request as a long-running project — break a vague intent into one and let the agent flesh it out across multiple sessions.
-- browse <code>rness/requests/done/</code> as a journal of what you've actually completed — it's the most honest record of your work with this agent.
-- at context window auto-reset checkpoints, the agent writes a Continuation block to the active request — read it before resuming if you want to redirect.
+- treat a request as a long-running project — break a vague intent into one and let your chief readvisor flesh it out across multiple sessions.
+- browse <code>rness/requests/done/</code> as a journal of what you've actually completed — it's the most honest record of the work you and your chief readvisor have actually shipped.
+- at context window auto-reset checkpoints, your chief readvisor writes a Continuation block to the active request — read it before resuming if you want to redirect.
 
 ## skills
 name: skills
 path: rness/skills/
 
 ### what
-per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. active skills add vocabulary, recipes, or behaviors the agent will reach for during conversation. skills enough ships are <em>trusted</em> and toggle instantly; anything else under <code>rness/skills/</code> — downloaded, gifted, or written for you by your own agent — is <em>untrusted</em> until it's been read, and the first time you switch it on, enough audits it before a word of it reaches the agent.
+per-project toggle switches for skills — units of focused capability symlinked from <code>~/enough/defaults/skills/</code>. active skills add vocabulary, recipes, or behaviors your readvisors will reach for during conversation. skills enough ships are <em>trusted</em> and toggle instantly; anything else under <code>rness/skills/</code> — downloaded, gifted, or written for you by your own chief readvisor — is <em>untrusted</em> until it's been read, and the first time you switch it on, enough audits it before a word of it reaches your readvisors.
 
 ### how
 click ● / ○ to toggle a skill on or off for this project. you can add project-level skills to <code>rness/skills/</code> — skill statuses are saved per project. to install new skills globally, drop a folder into <code>~/enough/defaults/skills/</code>; it appears in every project (off by default). edit a global skill at the source and the change propagates everywhere it's symlinked. an untrusted skill shows a small mark beside its name that walks <em>unverified</em> → <em>auditing…</em> → <em>audited</em>; if the audit finds something the row reads <em>flagged</em>, the skill stays off, and you get two buttons — <em>read report</em> (opens the full report) and <em>enable anyway</em> (confirms, then records the call as yours). reports land in <code>rness/io/output/analyzer/audits/&lt;skill&gt;/</code>. edit a skill's files afterwards and it's re-read on the next toggle-on.
@@ -98,51 +98,52 @@ click ● / ○ to toggle a skill on or off for this project. you can add projec
 - Skills available in this project: {{skills-list}}
 - build global or project-local skills to capture your house style or domain conventions.
 - turn everything off for "pure conversation" — sometimes the model has more breathing room for emergent epiphanies with no scaffolding.
-- ask the agent to <em>audit</em> a skill before you enable it (analyzer's fourth mode) — same report the first-use audit writes, just on your schedule.
+- ask your chief readvisor to <em>audit</em> a skill before you enable it (analyzer's fourth mode) — same report the first-use audit writes, just on your schedule.
 
 ## roles
-name: roles
-path: rness/roles/
+name: readvisors
+path: rness/readvisors/
 
 ### what
-consultant agents you can summon in conversation, sourced from <code>~/enough/defaults/roles/</code>. each role is a folder containing AGENT.md (instructions) and MOTIVATION.md (drives) — the same pair of files that defines the main agent, but scoped to a complementary (or adversarial) persona.
+the other readers in the room. a readvisor is a folder holding AGENT.md (who they are) and MOTIVATION.md (what they care about) — one shape, fixed headings, so every readvisor works the same way despite its own voice and quirks. switched on here, they are folded into your chief readvisor's single voice in ordinary conversation; in a council composure each one speaks separately, under its own name.
 
 ### how
-click ● / ○ to enable a role for this project. add new roles globally by creating <code>~/enough/defaults/roles/&lt;name&gt;/</code> with AGENT.md and MOTIVATION.md inside; project-level works and edits propagate, just like skills.
+click ● / ○ to switch one on or off for this project. each row's tooltip names its origin: <em>shipped</em> ones come with enough (<code>defaults/readvisors/</code>) and have no remove button; <em>global</em> ones are yours, live in <code>~/enough/readvisors/</code> and show up in every project on this machine; <em>project</em> ones belong to this folder alone (<code>rness/readvisors/&lt;name&gt;/</code>). the × on a global or project row deletes it, after a confirm. the <em>readvisory</em> skill interviews you and writes a new one.
 
 ### ideas
-- Roles available in this project: {{roles-list}}
+- Readvisors available in this project: {{roles-list}}
 - build a "rubber duck" that asks Socratic questions instead of answering.
-- use your knowledge base's files with the <em>workflow-design</em> paradigm to craft a domain expert (legal, design, copy) role.
+- use your knowledge base's files with the <em>workflow-design</em> paradigm to make a domain expert (legal, design, copy).
+- switch on two who disagree, then hold a council and let them argue it out on the canvas.
 
 ## rness
 name: rness/
 path: rness/
 
 ### what
-the project's externalized system. rness/ is where each project's config, instructions, knowledge files, and history logs live — everything the agent uses for this project. it sits at the top of the project so you can edit it directly with any file manager or editor; the enough UI also surfaces its contents in the sidebar.
+the project's externalized system. rness/ is where each project's config, instructions, knowledge files, and history logs live — everything your readvisors use for this project. it sits at the top of the project so you can edit it directly with any file manager or editor; the enough UI also surfaces its contents in the sidebar.
 
 ### how
-some contents are symlinks to <code>~/enough/defaults/</code> and update centrally. to diverge for a project, open a file and click <em>customize</em> — it becomes a project-local copy. add new files freely via conversations or your system's file manager; the agent will discover any files added locally on its next turn.
+some contents are symlinks to <code>~/enough/defaults/</code> and update centrally. to diverge for a project, open a file and click <em>customize</em> — it becomes a project-local copy. add new files freely via conversations or your system's file manager; your readvisors will see any files added locally on the next turn.
 
 ### ideas
 - get to know the components that drive your enough workflow and edit them wherever you like.
-- treat it as living documentation — what would a new teammate or agent or role need to know?
-- periodically prune stale knowledge so the agent doesn't cite obsolete decisions.
+- treat it as living documentation — what would a new teammate, or a new readvisor, need to know?
+- periodically prune stale knowledge so your readvisors don't cite obsolete decisions.
 
 ## agent-md
 name: AGENT.md
 path: rness/AGENT.md
 
 ### what
-the agent's working instructions for this project. used for every turn alongside MOTIVATION.md. everything in here shapes how the agent talks, what it does, and what it avoids.
+who your chief readvisor is and how they operate here: their working instructions for this project, used on every turn alongside MOTIVATION.md. everything in here shapes how they talk, what they do, and what they avoid.
 
 ### how
 click the file to view it; hit <em>customize</em> to fork a project-local copy and edit. or open <code>rness/AGENT.md</code> in any editor — saved changes take effect on the next message.
 
 ### ideas
 - add project-specific guardrails (e.g., "always double-check both spelling and factuality before finalzing an edit").
-- list the naming conventions of your project so the agent doesn't have to guess (or hallucinnovate).
+- list the naming conventions of your project so your chief readvisor doesn't have to guess (or hallucinnovate).
 - encode the collaboration style you want — terse, exploratory, deferential, blunt.
 
 ## motivation-md
@@ -150,7 +151,7 @@ name: MOTIVATION.md
 path: rness/MOTIVATION.md
 
 ### what
-the agent's "why" for this project — values, priorities, and goals beyond the literal task list. used alongside AGENT.md every turn.
+your chief readvisor's "why" for this project — values, priorities, and goals beyond the literal task list. used alongside AGENT.md every turn.
 
 ### how
 same as AGENT.md — click to preview, customize for a project-local copy, or edit the file directly.
@@ -158,7 +159,7 @@ same as AGENT.md — click to preview, customize for a project-local copy, or ed
 ### ideas
 - spell out tradeoffs you care about: correctness over speed, brevity over thoroughness, etc.
 - name the user-facing experience the project aims for, in your own words.
-- describe what "done" feels like — the agent will calibrate its sense of progress against that.
+- describe what "done" feels like — your chief readvisor will calibrate their sense of progress against that.
 
 ## paradigms
 name: paradigms/
@@ -168,19 +169,19 @@ path: rness/paradigms/
 the full set of reasoning frameworks available in this project. each paradigm is a markdown file with a YAML frontmatter block (<code>name</code> + <code>description</code>) and a body describing how to approach work — heuristics, decision criteria, when to ask vs. act. exactly one is active at any time (see the <strong>paradigm</strong> section at the top of the sidebar to switch).
 
 ### how
-symlinked from <code>~/enough/defaults/paradigms/</code>. edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. new paradigms can be added simply by dropping a markdown file into the defaults folder — give it a frontmatter <code>name:</code> and <code>description:</code> so the agent knows when to recommend it.
+symlinked from <code>~/enough/defaults/paradigms/</code>. edit globally to update behavior across every project; click <em>customize</em> on any file to fork it just for this project. new paradigms can be added simply by dropping a markdown file into the defaults folder — give it a frontmatter <code>name:</code> and <code>description:</code> so your chief readvisor knows when to recommend it.
 
 ### ideas
 - Paradigms available in this project: {{paradigms-list}}
 - write a paradigm for a distinct mode of work (research vs. writing, exploration vs. execution) and switch between them as the day unfolds.
-- a paradigm description is essentially "when should I use this" — write it for the agent's benefit, since that's the signal it reads to recommend switching.
+- a paradigm description is essentially "when should I use this" — write it for your chief readvisor's benefit, since that's the signal they read to recommend switching.
 
 ## policies
 name: policies/
 path: rness/policies/
 
 ### what
-hard rules the agent must follow — what tools to use, which files it can read or write, how to format requests, how to handle context-window pressure, and which paths are allowlisted.
+hard rules your readvisors must follow — what tools to use, which files they can read or write, how to format requests, how to handle context-window pressure, and which paths are allowlisted.
 
 ### how
 symlinked from <code>~/enough/defaults/policies/</code>. edit globally to update the rules for every project, or customize per-project. allowlists in particular are the most common thing to tune, as both local paths and web URLs need to be explicitly listed.
@@ -195,44 +196,44 @@ name: knowledge/
 path: rness/knowledge/
 
 ### what
-project-specific knowledge that doesn't belong in <code>rness/io/</code> or <code>~/enough/infoworld/</code>: always contains <code>project-profile.md</code> (living notes the agent keeps about this project — your preferences and working style as observed here, recurring people / files, conventions adopted) and <code>session-logs/</code> (each turn's prompt and response, saved as markdown).
+project-specific knowledge that doesn't belong in <code>rness/io/</code> or <code>~/enough/infoworld/</code>: always contains <code>project-profile.md</code> (living notes your chief readvisor keeps about this project — your preferences and working style as observed here, recurring people / files, conventions adopted) and <code>session-logs/</code> (each turn's prompt and response, saved as markdown).
 
 ### how
-<code>project-profile.md</code> is piped into the system prompt on every turn — both the agent and you can edit it. session logs are append-only. add new subfolders for any project-local memory you want the agent to consult.
+<code>project-profile.md</code> is piped into the system prompt on every turn — both you and your chief readvisor can edit it. session logs are append-only. add new subfolders for any project-local memory you want your readvisors to consult.
 
 ### ideas
 - maintain a glossary subfolder for project-specific jargon.
-- let the agent write a "lessons learned" file as you iterate together.
-- archive old session logs periodically so agent searches stay fast.
+- let your chief readvisor write a "lessons learned" file as you iterate together.
+- archive old session logs periodically so your readvisors' searches stay fast.
 
 ## io
 name: io/
 path: rness/io/
 
 ### what
-a project-level space for files the agent reads from (<code>input/</code>) or writes to (<code>output/</code>). useful when you want the agent to process a file without polluting the project root.
+a project-level space for files your readvisors read from (<code>input/</code>) or write to (<code>output/</code>). useful when you want a file worked on without polluting the project root.
 
 ### how
-drop files into <code>rness/io/input/</code> and the agent will see them. anything the agent generates lands in <code>rness/io/output/</code> — review and move what you want to keep, then clear the rest. documents count: a word file or a pdf dropped in here opens as a markdown twin and reads like any other file, to you and to the agent.
+drop files into <code>rness/io/input/</code> and your readvisors will see them. anything they generate lands in <code>rness/io/output/</code> — review and move what you want to keep, then clear the rest. documents count: a word file or a pdf dropped in here opens as a markdown twin and reads like any other file, to you and to them.
 
 ### ideas
-- drop a CSV or transcript into <code>input/</code> and ask the agent to summarize.
+- drop a CSV or transcript into <code>input/</code> and ask your chief readvisor to summarize it.
 - drop the pdf someone emailed you into <code>input/</code>, click it, and read it as markdown — the original stays exactly as it arrived.
 - collect multiple draft outputs in <code>output/</code> and pick the best one (or have the model cross-evaluate them).
-- clear both periodically — the agent doesn't need yesterday's scratch work in its context.
+- clear both periodically — your readvisors don't need yesterday's scratch work in their context.
 
 ## infoworld
 name: cacheawl
 path: ~/enough/cacheawl/
 
 ### what
-the machine-global file store, shared across every enough project. (this replaces the old <code>infoworld/</code> library — on your first launch of this version, your <code>personal/</code>, <code>public/</code>, and <code>wiki/</code> folders were moved here, each becoming a cachebox.) a <em>cachebox</em> is a top-level folder in the store: either plain text you want to keep forever, or a "cached replica" ingested from a local path, a website, or a set of wikipedia articles. the store is hidden from every project's file tree and managed through cacheawl mode + the agent's cachebox tools.
+the machine-global file store, shared across every enough project. (this replaces the old <code>infoworld/</code> library — on your first launch of this version, your <code>personal/</code>, <code>public/</code>, and <code>wiki/</code> folders were moved here, each becoming a cachebox.) a <em>cachebox</em> is a top-level folder in the store: either plain text you want to keep forever, or a "cached replica" ingested from a local path, a website, or a set of wikipedia articles. the store is hidden from every project's file tree and managed through cacheawl mode + your readvisors' cachebox tools.
 
 ### how
-open cacheawl mode (the topbar cacheawl button) for a two-pane view: your project on one side, the cacheboxes on the other. drag a file across to copy it, shift-drag to move; the ingest bar composes a request to the agent to pull in a path/site/wiki topic. or just ask the agent — it can list, create, and ingest into cacheboxes (gated by the "cacheawl tools" broker toggle). each box carries an auto-generated <code>_cachebox.merirmaid</code> diagram of its contents (read-only — it regenerates from the files) and hidden metadata; you never edit those directly.
+open cacheawl mode (the topbar cacheawl button) for a two-pane view: your project on one side, the cacheboxes on the other. drag a file across to copy it, shift-drag to move; the ingest bar composes a request to your chief readvisor to pull in a path/site/wiki topic. or just ask in the panel — your readvisors can list, create, and ingest into cacheboxes (gated by the "cacheawl tools" broker toggle). each box carries an auto-generated <code>_cachebox.merirmaid</code> diagram of its contents (read-only — it regenerates from the files) and hidden metadata; you never edit those directly.
 
 ### ideas
-- ingest a documentation site to a shallow depth so the agent can ground on it fully offline.
+- ingest a documentation site to a shallow depth so your readvisors can ground on it fully offline.
 - keep a <code>personal</code> cachebox of reference material queryable from any project.
 - save wikipedia articles you rely on to the global <code>wiki</code> cachebox — shared everywhere, not tied to one project.
 
@@ -262,7 +263,7 @@ click once. the first time you open each <em>type</em> of document a short modal
 
 ### ideas
 - what enough can open this way, and what it can write back: {{convert-formats}}
-- ask the agent to read a document by name — <code>read_file</code> on <code>report.pdf</code> hands it the twin, converting one first if there isn't one yet.
+- ask your chief readvisor to read a document by name — <code>read_file</code> on <code>report.pdf</code> hands them the twin, converting one first if there isn't one yet.
 - reading pdfs, powerpoint decks and excel workbooks needs the <strong>pdf extra</strong> (⚙ ui window → extras): about 250 MB to download, about 1 GB installed, plus about 0.7 GB of document models in <code>~/enough/weights/docling/</code>. <em>writing</em> pdfs out of markdown works on every install, no extra.
 
 ## merirmaid
@@ -273,10 +274,10 @@ path: *.merirmaid
 enough's flavor of a <a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid</a> diagram: plain-text diagram source with a small header, rendered live to a picture in the browser (flowcharts, sequence diagrams, state machines, ER diagrams — anything Mermaid supports). two kinds: a <em>wip</em> diagram you can tweak, and a <em>mirror</em> that reflects some structure (like a cachebox's contents) and is read-only.
 
 ### how
-ask the agent to draw or revise a diagram — it writes the <code>.merirmaid</code> source; opening the file renders it. in a wip diagram you can click a node's text to edit the label in place (with a live character count); structural changes go through the agent via the chat pill. nodes can link to other diagrams or docs — click them to follow, with breadcrumbs to step back. a bad diagram shows the error plus the raw source, never a blank pane. mirror diagrams show a "mirror" badge instead of edit handles.
+ask your chief readvisor to draw or revise a diagram — they write the <code>.merirmaid</code> source; opening the file renders it. in a wip diagram you can click a node's text to edit the label in place (with a live character count); structural changes go through your chief readvisor via the chat pill. nodes can link to other diagrams or docs — click them to follow, with breadcrumbs to step back. a bad diagram shows the error plus the raw source, never a blank pane. mirror diagrams show a "mirror" badge instead of edit handles.
 
 ### ideas
-- have the agent diagram a process or architecture you're reasoning about, then refine it in conversation.
+- have your chief readvisor diagram a process or architecture you're reasoning about, then refine it in conversation.
 - link a set of diagrams together with clickable nodes to build a navigable map.
 - pair it with girraphs: a girraph for the argument, a merirmaid for the flow.
 
@@ -288,10 +289,10 @@ path: ~/enough/cacheawl/
 the machine-global store of <em>cacheboxes</em> — top-level folders holding text you want to keep forever, or cached replicas ingested from a local path, a website, or wikipedia articles. shared across every project and hidden from project file trees. this is where the old <code>infoworld</code> library now lives.
 
 ### how
-open cacheawl mode from the topbar for the two-pane view (project ↔ cacheboxes): drag to copy a file between them, shift-drag to move, and use the ingest bar to ask the agent to pull a source into a box. or talk to the agent directly — it can list, create, and ingest into boxes when the "cacheawl tools" broker toggle is on (url ingests also respect your fetch_url toggles). every box shows an auto-generated diagram of its contents (<code>_cachebox.merirmaid</code>, read-only) and keeps hidden metadata you don't touch.
+open cacheawl mode from the topbar for the two-pane view (project ↔ cacheboxes): drag to copy a file between them, shift-drag to move, and use the ingest bar to ask your chief readvisor to pull a source into a box. or just say so in the panel — your readvisors can list, create, and ingest into boxes when the "cacheawl tools" broker toggle is on (url ingests also respect your fetch_url toggles). every box shows an auto-generated diagram of its contents (<code>_cachebox.merirmaid</code>, read-only) and keeps hidden metadata you don't touch.
 
 ### ideas
-- ingest a docs site or a folder of notes so the agent can work from it offline.
+- ingest a docs site or a folder of notes so your readvisors can work from it offline.
 - move a finished artifact into a cachebox to keep it out of the working project but still reachable everywhere.
 - double-click a box's diagram to see its shape at a glance in the merirmaid viewer.
 
@@ -323,3 +324,107 @@ open a markdown file in the reading view and hit the paginate button in the tool
 - proof a draft in trade size with chapter-end notes before deciding the final shape.
 - print a booklet of a short piece: booklet layout, half letter, staple the result.
 - send someone the pdf; if it ever comes back without the original, importing it recovers the markdown perfectly.
+
+## composure
+name: composure
+path: rness/io/composure/
+
+### what
+the canvas that is always there behind everything else — the base layer of the window, not a mode you enter or leave. a <strong>composure</strong> is a <code>.comp</code> file: boxes of writing (<em>modules</em>) and freehand ink on an unbounded desk you pan and zoom. it opens in any browser as a plain page, with no enough installed, because the file itself is ordinary html.
+
+### how
+the toolbar runs along the top: the title (rename by typing and clicking away), the read/edit switch, the tools, undo/redo, the zoom group, search, the comments panel and the composures menu. pan with two fingers, space-drag or the middle button; zoom with pinch, ⌘-scroll, ⌘+ / ⌘− / ⌘0, or "fit". there is no save button — everything is written as you go, and a composure you open and never touch writes no file at all. zoom far enough out and each module folds down to its <em>face</em>: its title, as large as fits, with the body greeked, so sixty cards read as sixty titles.
+
+### ideas
+- keep one board per project as the map you look at before you start writing.
+- a <code>.comp</code> module that points at another <code>.comp</code> turns a board into a drill-down: clicking it swaps the canvas underneath you.
+- select a passage inside a module and it rides along with your next message to your readvisor, fenced and labelled.
+
+## composure-modules
+name: modules
+path: (inside a .comp file)
+
+### what
+the boxes on a composure. a <strong>text</strong> module is writing — headings, lists, checklists, quotes, links, highlights — with as many pages as you want inside it. the other five point at something: a <strong>file</strong> in this project, a <strong>wikisink</strong> article, a <strong>web link</strong>, a cached <strong>web page</strong>, or an <strong>image</strong>. a pointing module shows a live preview while you are reading, and clicking it opens the real thing.
+
+### how
+the add-module button opens a short list of the six types. with a module selected in edit mode the inspector appears beside it: background swatch, text size, pages, front/back, the type's own field (a file picker, an article search, an address), and a comment button. drag to move, drag a handle to resize, arrow keys to nudge (hold shift for a bigger step), delete to remove — with a warning first if there is writing in it, and ⌘Z to take it back. text that outgrows its box offers you a new page rather than silently growing.
+
+### ideas
+- give a module a title and it keeps its name when you zoom out past reading size.
+- the <code>ink</code> and <code>clear</code> swatches are for structure — a dark card for a heading row, a clear one for a label that is not a card at all.
+- point a module at a file you keep re-opening; the board becomes a desk with the right papers already on it.
+
+## composure-tools
+name: tools
+path: (the composure toolbar)
+
+### what
+four tools, and they only exist while you are editing: <strong>pointer</strong> (V) selects, moves, resizes and rubber-bands; <strong>text</strong> (T) puts the caret inside a module; <strong>pencil</strong> (P) draws; <strong>eraser</strong> (E) rubs out. ink is freehand polylines lying on the desk, under the modules, so a note can cross three cards and an arrow can join two.
+
+### how
+with the pencil, just draw — the line is smoothed and simplified when you let go. hold <strong>shift</strong> while you drag and you get a straight segment with an arrowhead on the end. the eraser is a circle that stays the same size on screen however far you zoom; dragging it through a line removes the part under the circle and leaves the two ends as separate strokes, and ⌘Z puts the line back in one piece. pick a stroke up with the pointer tool by clicking near it — the inspector then offers the five ink colours, and delete removes it. lines thin more slowly than the drawing shrinks, so a zoomed-out sketch still reads as a sketch.
+
+### ideas
+- circle the three cards that belong together before you decide what the group is called.
+- shift-drag arrows between modules to show what follows what, then move the modules; the arrow stays where you drew it, which is usually the honest answer.
+- draw in red over a board you are reviewing and erase the marks when you have dealt with them.
+
+## journal
+name: journal
+path: rness/io/composure/
+
+### what
+a composure form for keeping a dated record. one module, one entry per page. opening a journal lands you on <em>today's</em> page with the caret already in it — and that page exists only in memory until you type something, so opening the journal and thinking better of it leaves nothing behind.
+
+### how
+write. the entry saves itself as you go, and if you leave without filing it the journal reopens on that same unfinished draft. when the entry is done, hit <strong>file this entry</strong>: the page is stamped with the date and becomes permanently read-only — enough will refuse to change it afterwards, and the caret will not go into it. filing moves you on to a fresh page for next time. flipping back through filed entries is safe: turning a page you did not write in saves nothing at all. you can still comment on filed text, which is the point of filing it.
+
+### ideas
+- file at the end of a working session rather than the end of a day; the date is a fact, not a deadline.
+- comment on an old filed entry when it turns out to have been wrong — the record stays, and the second thought sits beside it.
+- ask your readvisor to read the journal when you want a summary of where a long piece of work actually went.
+
+## readvisor-panel
+name: readvisor panel
+path: (the right-hand panel)
+
+### what
+the conversation, in a column of its own beside whatever you are working on. your <strong>chief readvisor</strong> is named at the top, with any other readvisors you have switched on listed next to them — in ordinary conversation they answer as one voice, drawing on all of those perspectives.
+
+### how
+⌘/ opens and closes it; ⇧⌘/ gives it the whole window and ⌘/ again brings it back. it sits beside the canvas or beside any open mode, so you never have to close what you are reading in order to ask about it. select text — in a document, in a wikisink article, in a composure module — and a chip appears above the message box showing exactly what is about to be attached; × drops it. when a turn finishes while the panel is closed, a dot appears on its button in the top bar.
+
+### ideas
+- leave it docked while you write and ask in passing; it is a colleague at the next desk, not a window you open.
+- attach a selection rather than describing it — the exact words go across, fenced, with where they came from.
+- give it the whole window when you want to read a long answer properly, then dock it again to act on it.
+
+## council
+name: council
+path: (a composure whose form is council)
+
+### what
+several readvisors and you, thinking about one thing in turn, in writing, on the canvas. a council is an ordinary composure with the brief at the top and one card per statement below it, tinted per speaker and headed with a name and a turn number. the statements belong to the engine: you can move them, restyle them, ink over them and comment on them, but not rewrite them.
+
+### how
+fill in the brief — input, parameters, constraints, desired output — tick who is in the room, set the max rounds, and press convene. then drive it: <em>next turn</em> takes one statement, <em>run a round</em> goes all the way around, <em>run to the end</em> runs to the round cap, <em>pause</em> stops it, <em>conclude</em> asks the chief for the decision. the composer at the bottom is yours: whatever you say takes the next slot without costing anybody their turn. concluding writes the answer as a highlighted card — or as a markdown file at the path you chose — and exports the whole transcript to <code>rness/knowledge/councils/</code>.
+
+### ideas
+- give one readvisor the counter-case and find out whether it survives contact with the others.
+- set the output to a document when the decision should leave the canvas as a file you can cite.
+- say something yourself the moment a council starts circling; an interjection is cheaper than another round.
+
+## chief-readvisor
+name: chief readvisor
+path: (the name on every reply)
+
+### what
+the one readvisor you are always talking to. it has a name — Ed out of the box — and that name signs every reply in the conversation, heads the readvisor panel, and speaks first in a council. the name is global: one per machine, kept beside your theme and your interface language rather than inside any one project.
+
+### how
+press the rename button beside the × in this header, type a new name and save. 1 to 24 characters: letters and digits, plus space, hyphen, apostrophe and full stop, in whatever script you like. every surface showing the name catches up straight away, with no reload. a council that has already spoken keeps the name its statements were signed with — statements are attributed by name, and a rename part-way through would read as two people.
+
+### ideas
+- pick something you would say out loud; you are going to be reading it all day.
+- rename before you convene a council, not during one.

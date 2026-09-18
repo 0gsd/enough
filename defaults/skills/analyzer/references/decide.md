@@ -8,7 +8,7 @@ answer and check its work.
 
 This mode is in-process and local: a single model voicing three personas in
 turn. It is designed for laptops and quick deliberations; the user does not
-need an API key or a multi-agent harness.
+need an API key or a multi-model harness.
 
 (If they want a heavier-weight debate via the Anthropic API, the `wattba`
 skill handles that.)

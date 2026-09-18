@@ -108,13 +108,14 @@ in whatever paradigm fits.
 
 ## Attribution (`by:`) — cheap now, load-bearing later
 
-Every position and argument gets a `by:`: `user`, `agent`, or a role
-slug. This is what keeps "whose claim is this?" answerable months
-later, and it's the hook for stakeholder-role workflows — when roles
-(or future synthesized stakeholders) weigh in, their nodes carry their
-name, and a glance shows which voices have and haven't been heard on
-each position. Never relabel someone else's claim as your own; if you
-sharpen the user's wording, the node is still `by:user`.
+Every position and argument gets a `by:`: `user`, `agent`, or a
+readvisor slug. This is what keeps "whose claim is this?" answerable
+months later, and it's the hook for stakeholder workflows — when
+readvisors (or future synthesized stakeholders) weigh in, their nodes
+carry their name, and a glance shows which voices have and haven't
+been heard on each position. Never relabel someone else's claim as
+your own; if you sharpen the user's wording, the node is still
+`by:user`.
 
 ## Starting a map
 

@@ -117,6 +117,19 @@ fn main() {
                 .inner_size(1180.0, 820.0)
                 .min_inner_size(720.0, 520.0)
                 .center()
+                // The page owns its own title (`applyProjectName()` builds
+                // "enough 📁 folder 🖊️ nice name"), so let it own the OS
+                // title too — a rename in the project modal then updates the
+                // window and the ⌘-tab label live, with no relaunch. `boot`
+                // still sets the title from disk first, because this only
+                // fires once a document with a <title> has loaded.
+                // Empty titles are ignored: `loading.html` and a navigation
+                // in flight would otherwise blank the window.
+                .on_document_title_changed(|window, title| {
+                    if !title.trim().is_empty() {
+                        let _ = window.set_title(&title);
+                    }
+                })
                 .build()?;
 
             app.set_menu(build_menu(&handle)?)?;

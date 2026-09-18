@@ -47,6 +47,7 @@ from . import home as _home
 from . import models as _models
 from . import paginate as _paginate
 from .logger import ExchangeLog, log_exchange
+from . import prompt as prompt_mod
 from .prompt import (
     assemble_system_prompt,
     get_active_paradigm,
@@ -187,9 +188,13 @@ IGNORE_DIRS = {
 # tree-rendering filter to keep the sidebar focused on user content.
 HIDDEN_TREE_PATHS: frozenset[str] = frozenset({
     # Surfaced via dedicated sidebar sections at the top (paradigm
-    # picker, skills toggle, roles toggle) — hidden here to avoid
-    # duplicating UI affordances.
+    # picker, skills toggle, readvisors toggle) — hidden here to avoid
+    # duplicating UI affordances. Both readvisor folder names are listed:
+    # the 0.3.5 rename fails soft, so a project on a read-only parent can
+    # still be sitting on `rness/roles/` and shouldn't suddenly sprout a
+    # duplicate tree section for it.
     "rness/paradigms",
+    "rness/readvisors",
     "rness/roles",
     "rness/skills",
     # Internal machinery the user shouldn't need to touch directly: the
@@ -200,6 +205,35 @@ HIDDEN_TREE_PATHS: frozenset[str] = frozenset({
     "rness/active-paradigm",
     "rness/project.json",
 })
+
+
+def _readvisor_origin(project_dir: Path, name: str) -> str:
+    """Where a readvisor visible in this project actually lives:
+    `"project"`, `"global"` or `"shipped"` (P7).
+
+    The sidebar needs it to decide whether to offer a remove control, and
+    the remove endpoint needs it to decide what to delete. Read from the
+    filesystem rather than recorded anywhere, because the filesystem is the
+    record: a real directory is this project's, a link into
+    `~/enough/readvisors/` is the user's own global one, and anything else
+    resolves into an install's `defaults/` and is ours. An unreadable or
+    missing entry reads as `shipped`, the one origin with no destructive
+    affordance attached."""
+    from . import prompt as _prompt
+    from . import skeleton as _skeleton
+    entry = _prompt._readvisors_dir(project_dir / "rness") / name
+    try:
+        if not entry.is_symlink():
+            return "project" if entry.is_dir() else "shipped"
+        target = entry.resolve(strict=False)
+        user_root = _skeleton.user_readvisors_root().resolve(strict=False)
+        if target.parent == user_root:
+            return "global"
+    except OSError:
+        return "shipped"
+    return "shipped"
+
+
 DEFAULT_MAX_TOOL_ITERS = 50
 
 # How long we'll wait between streamed tokens before assuming llama-server
@@ -343,6 +377,11 @@ def _walk_tree(
                     node["wiki_article"] = True
             except OSError:
                 pass
+        elif p.suffix == ".comp":
+            # A composure opens in the base layer, not in read/edit mode —
+            # the tree marks it so the click routes there. Its comments
+            # sidecar is a dotfile and never reached this far.
+            node["composure"] = True
         elif _convert.is_convertible(p):
             # Both the converted and the not-yet-converted case: the tree
             # draws a badge from `convert_state` and routes the click into
@@ -575,7 +614,13 @@ def _current_ctx_size(session: "Session") -> int | None:
 
 
 def _render_turn_from_history(history: list[dict[str, str]]) -> str:
-    """Render the saved history as HTML for initial page load."""
+    """Render the saved history as HTML for initial page load.
+
+    The assistant byline is the chief readvisor's CURRENT name, not whatever
+    it was when the turn was spoken. That is the deliberate choice: the name
+    is what the user calls this readvisor, and a history where a rename
+    makes the same voice answer under two names would read as two people."""
+    speaker = _escape_html(prompt_mod.chief_name())
     out: list[str] = []
     for msg in history:
         role = msg.get("role")
@@ -587,7 +632,7 @@ def _render_turn_from_history(history: list[dict[str, str]]) -> str:
             out.append(f'<div class="msg user"><div class="role">user</div>'
                        f'<div class="body">{_escape_html(text)}</div></div>')
         elif role == "assistant":
-            out.append(f'<div class="msg assistant"><div class="role">agent</div>'
+            out.append(f'<div class="msg assistant"><div class="role">{speaker}</div>'
                        f'<div class="body">{_escape_html(text)}</div></div>')
     return "".join(out)
 
@@ -616,12 +661,23 @@ def _escape_html(s: str) -> str:
 # rendering. Add new branches as new launch states emerge (first-launch
 # onboarding, model-not-running advisory, etc.).
 
-_DEFAULT_EMPTY_HINT = (
-    '<div class="empty-hint" id="empty-hint">'
-    'awaiting your first message.<br>'
-    'say hi, or ask me what i can do.'
-    '</div>'
-)
+def _default_empty_hint() -> str:
+    """The plain hint, addressed to whoever the chief readvisor is right
+    now. Built per call rather than held in a constant: the name is a
+    global setting a user can change in the broker pane, and a hint that
+    still greeted the old name would be the one place in the app that
+    disagreed with the byline above it."""
+    from .prompt import chief_name
+    try:
+        who = _escape_html(chief_name())
+    except Exception:  # noqa: BLE001 — a hint must never stop a page
+        who = "Ed"
+    return (
+        '<div class="empty-hint" id="empty-hint">'
+        'awaiting your first message.<br>'
+        f'say hi to {who}, or ask what they can do.'
+        '</div>'
+    )
 
 
 def _render_empty_hint(project_dir: Path) -> str:
@@ -677,7 +733,7 @@ def _render_empty_hint(project_dir: Path) -> str:
             '</div>'
         )
 
-    return _DEFAULT_EMPTY_HINT
+    return _default_empty_hint()
 
 
 # ---------------------------------------------------------------------------
@@ -875,7 +931,10 @@ async def _drive_message(
 
     for _iter in range(session.max_tool_iters):
         messages = [{"role": "system", "content": system_prompt}] + session.history
-        await session.emit("turn_start", {})
+        # `speaker` is the chief readvisor's name: the live bubble gets the
+        # byline the server-rendered ones already carry, without the frontend
+        # having to hold a copy of the name and keep it fresh across renames.
+        await session.emit("turn_start", {"speaker": prompt_mod.chief_name()})
         buffer = ""
         usage_sink: dict[str, int] = {}
         # Routing: when the active model is OPRO-API (the OpenRouter cloud
@@ -1095,7 +1154,7 @@ async def _run_turn(session: Session, user_message: str) -> None:
       - event: user           { "text": <user msg> }  (ack to all listeners)
       - event: system_prompt  { "text": <synthetic harness-driven prompt> }
       - event: system         { "kind": ..., "message": ... }  (auto-reset chrome)
-      - event: turn_start     { }
+      - event: turn_start     { "speaker": <chief readvisor name> }
       - event: token          { "text": <chunk> }
       - event: tool           { "name": ..., "key": ..., "ok": ... }
       - event: turn_end       { }
@@ -1365,6 +1424,11 @@ def create_app(
             await session.client.aclose()
 
     app = FastAPI(title="enough", lifespan=lifespan)
+    # The one `Session` this app was built around, reachable from the app
+    # object. Everything in here closes over `session` directly and does not
+    # need it; a test that has to reason about the generation lock (the
+    # council exclusion, P5) has no other way to reach it.
+    app.state.session = session
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
     app.add_middleware(ModeGate, home=home)
@@ -1403,9 +1467,25 @@ def create_app(
         # Home has no project, hence no scales to apply (home:true tells the
         # frontend to leave the vars at 1). <-escape so no JSON string
         # can ever close the script element.
-        boot_ui: dict[str, Any] = {"home": home, "lang": _ui_language()}
+        # `chief_readvisor_name` rides along for the same no-flash reason as
+        # the scales: it is in the byline of every history bubble the server
+        # just rendered, and the panel header, so the page must not first
+        # paint someone else's name.
+        boot_ui: dict[str, Any] = {
+            "home": home,
+            "lang": _ui_language(),
+            "chief_readvisor_name": prompt_mod.chief_name(),
+        }
         if not home:
-            boot_ui.update(project_meta.load(session.project_dir)["ui"])
+            meta = project_meta.load(session.project_dir)
+            # The whole `ui` block: the two zoom vars plus the readvisor
+            # panel's docked/closed state (composure round, P3) — the panel
+            # has to be sized before first paint or the layout visibly
+            # reflows. `folder` rides along for the window title, which is
+            # "enough 📁 <folder> 🖊️ <nice name>" (P1) and would otherwise
+            # need a round trip to /api/project to know the basename.
+            boot_ui.update(meta["ui"])
+            boot_ui["folder"] = meta["folder"]
         html = html.replace(
             "/*UI_STATE_JSON*/null",
             json.dumps(boot_ui).replace("<", "\\u003c"),
@@ -1440,11 +1520,13 @@ def create_app(
 
     @app.post("/api/project/ui")
     async def api_project_ui_set(request: Request) -> dict[str, Any]:
-        """Persist the per-project display scales (uiscale round). Body:
-        {"ui_scale": 1.2, "text_scale": 1.0}. Separate from POST /api/project
-        so the name/description editor and the scale steppers can't clobber
-        each other's half of rness/project.json. Returns the refreshed
-        metadata (the cleaned scales the frontend should display)."""
+        """Persist the per-project display block (uiscale round; the panel
+        state joined it in the composure round). Body: {"ui_scale": 1.2,
+        "text_scale": 1.0, "readvisor_panel": "open"|"closed"}. Separate from
+        POST /api/project so the name/description editor and the display
+        controls can't clobber each other's half of rness/project.json. An
+        omitted `readvisor_panel` keeps the stored one. Returns the refreshed
+        metadata (the cleaned values the frontend should display)."""
         from . import project_meta
         try:
             body = await request.json()
@@ -1454,7 +1536,31 @@ def create_app(
             session.project_dir,
             (body or {}).get("ui_scale"),
             (body or {}).get("text_scale"),
+            (body or {}).get("readvisor_panel"),
         )
+
+    @app.post("/api/project/composure")
+    async def api_project_composure_set(request: Request) -> dict[str, Any]:
+        """Persist what the base-layer canvas opens with (composure round,
+        P4d). Body: {"launch": "blank"|"last"|"file"|"form", "path": "…",
+        "form": "…"}. Its own endpoint for the same reason /api/project/ui
+        is: three independent controls write three independent halves of
+        rness/project.json. `last` is bookkeeping and is never accepted
+        here — it is stamped by GET /api/composure. Returns the refreshed
+        metadata; GET /api/composure/launch resolves it against disk."""
+        from . import project_meta
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        body = body or {}
+        launch = body.get("launch")
+        if launch not in project_meta.COMPOSURE_LAUNCH_MODES:
+            raise HTTPException(
+                400, "launch must be one of "
+                     + ", ".join(project_meta.COMPOSURE_LAUNCH_MODES))
+        return project_meta.save_composure(
+            session.project_dir, launch, body.get("path"), body.get("form"))
 
     @app.get("/api/files", response_class=HTMLResponse)
     async def api_files() -> HTMLResponse:
@@ -1522,7 +1628,7 @@ def create_app(
         "unverified": ("unverified", "not shipped with enough — enabling it "
                                      "runs a first-use audit first"),
         "auditing": ("auditing…", "reading this skill before it goes into "
-                                  "your agent's head"),
+                                  "your readvisor's head"),
         "pass": ("audited", "audited and clean"),
         "flag": ("flagged", "the audit wants a human to look at this"),
         "fail": ("failed", "the audit says don't"),
@@ -1656,22 +1762,36 @@ def create_app(
         resync_globals(project_dir)  # pick up globals added since launch
         items = list_roles(project_dir / "rness")
         if not items:
-            return HTMLResponse('<div class="empty-note">no roles in rness/roles/</div>')
+            return HTMLResponse(
+                '<div class="empty-note">no readvisors in rness/readvisors/</div>')
         rows = []
         for name, enabled, tooltip in items:
             cls = "on" if enabled else "off"
             next_val = "0" if enabled else "1"
             tip = _escape_html(tooltip) if tooltip else ""
             title_attr = f' title="{tip}"' if tip else ""
+            origin = _readvisor_origin(project_dir, name)
+            esc = _escape_html(name)
+            # The remove affordance carries no hx-* of its own: removing a
+            # readvisor deletes files, so it goes through the frontend's
+            # confirm overlay and only then POSTs /api/readvisors/remove.
+            # A shipped readvisor has no button at all — the user didn't put
+            # it there and can't be given a control that would fail.
+            remove_btn = "" if origin == "shipped" else (
+                f'  <button class="role-remove" data-name="{esc}" '
+                f'data-origin="{origin}" title="remove">×</button>'
+            )
             rows.append(
-                f'<li class="role-row {cls}"{title_attr}>'
+                f'<li class="role-row {cls}" data-name="{esc}" '
+                f'data-origin="{origin}"{title_attr}>'
                 f'  <button class="role-toggle" '
                 f'    hx-post="/api/roles/toggle" '
-                f'    hx-vals=\'{{"name": "{_escape_html(name)}", "enabled": "{next_val}"}}\' '
+                f'    hx-vals=\'{{"name": "{esc}", "enabled": "{next_val}"}}\' '
                 f'    hx-target="#roles-list" hx-swap="innerHTML">'
                 f'    {"●" if enabled else "○"}'
                 f'  </button>'
-                f'  <span class="role-name">{_escape_html(name)}</span>'
+                f'  <span class="role-name">{esc}</span>'
+                f'{remove_btn}'
                 f'</li>'
             )
         return HTMLResponse('<ul class="roles">' + "".join(rows) + "</ul>")
@@ -1686,9 +1806,58 @@ def create_app(
         set_role_enabled(project_dir / "rness", name, enabled_raw == "1")
         return await api_roles()  # type: ignore[return-value]
 
+    @app.post("/api/readvisors/remove")
+    async def api_readvisors_remove(request: Request) -> dict[str, Any]:
+        """Delete a user-made readvisor. Body: `{"name": "..."}`.
+
+        Three outcomes by origin: a `project` one deletes the real folder
+        under `rness/readvisors/`; a `global` one deletes it from
+        `~/enough/readvisors/` (and the link here goes with it); a `shipped`
+        one is refused, because the user cannot put back what they did not
+        install. The confirm step belongs to the UI — by the time a request
+        reaches here the user has said yes."""
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        name = str((body or {}).get("name") or "").strip()
+        if not name or "/" in name or name.startswith("."):
+            raise HTTPException(400, "bad name")
+        origin = _readvisor_origin(project_dir, name)
+        if origin == "shipped":
+            raise HTTPException(
+                403, "readvisors that ship with enough cannot be removed — "
+                     "switch it off instead")
+
+        from . import prompt as _prompt
+        from . import skeleton as _skeleton
+        local = _prompt._readvisors_dir(project_dir / "rness") / name
+        if origin == "project":
+            if not local.is_dir() or local.is_symlink():
+                raise HTTPException(404, f"no readvisor named {name!r} here")
+            await asyncio.to_thread(shutil.rmtree, local)
+        else:  # global
+            target = _skeleton.user_readvisors_root() / name
+            if not target.is_dir():
+                raise HTTPException(404, f"no readvisor named {name!r} here")
+            await asyncio.to_thread(shutil.rmtree, target)
+            # The project's link is now dangling; the populator prunes it.
+            if local.is_symlink():
+                try:
+                    local.unlink()
+                except OSError:
+                    pass
+        # Leave no orphan entry behind in `.disabled`, or a later readvisor
+        # of the same name would arrive switched off for no visible reason.
+        try:
+            set_role_enabled(project_dir / "rness", name, True)
+        except OSError:
+            pass
+        return {"ok": True, "name": name, "origin": origin}
+
     @app.get("/api/help/defaults")
     async def api_help_defaults() -> dict[str, Any]:
-        """Installed skills / roles / paradigms (name + description) for the
+        """Installed skills / readvisors / paradigms (name + description) for the
         help viewer's {{skills-list}} / {{roles-list}} / {{paradigms-list}}
         tokens, so the default lists in help stay in sync with what's actually
         present instead of drifting hand-maintained prose."""
@@ -1821,8 +1990,11 @@ def create_app(
         return len(parts) >= 2 and parts[0] == "rness" and parts[1] == "skills"
 
     def _is_role_file(path: str) -> bool:
+        # Both folder names: `readvisors` since 0.3.5, `roles` on a project
+        # whose rename could not run. See skeleton._migrate_roles_to_readvisors.
         parts = Path(path).parts
-        return len(parts) >= 2 and parts[0] == "rness" and parts[1] == "roles"
+        return (len(parts) >= 2 and parts[0] == "rness"
+                and parts[1] in ("readvisors", "roles"))
 
     def _is_external_symlink(path_str: str) -> tuple[bool, Path | None]:
         """Is `path` a symlink whose resolved target lives outside the project?
@@ -1963,11 +2135,14 @@ def create_app(
             )
             action_btn = ""
         elif _is_role_file(path):
-            # Same pattern as skills — roles are global, edited at source.
+            # Same pattern as skills — readvisors are global, edited at
+            # source. (A readvisor the user forged themselves lives in
+            # ~/enough/readvisors/ instead; the note names the shipped case
+            # because that is the one a user is most likely looking at.)
             sym_note = (
                 '<div class="symlink-note">'
-                'role file — edit globally at '
-                '<code>~/enough/defaults/roles/</code>; '
+                'readvisor file — edit globally at '
+                '<code>~/enough/defaults/readvisors/</code>; '
                 'toggle on/off for this project in the sidebar.'
                 '</div>'
             )
@@ -2498,6 +2673,34 @@ def create_app(
         if updated is None:
             raise HTTPException(404, "no such highlight id")
         return {"path": path, "highlight": updated}
+
+    # ---------- Composure (the .comp canvas) ----------
+    #
+    # One line, because the whole surface lives in `enough/composure_api.py`
+    # over the pure core in `enough/composure.py`. The router closes over
+    # exactly three things this factory owns: the project dir, the shared
+    # path-safety helper, and the SSE emitter. Home mode registers it too
+    # and ModeGate 404s it, like every other project route.
+    from . import composure_api as _composure_api
+    app.include_router(_composure_api.build_router(
+        project_dir=project_dir,
+        resolve_path=_resolve_project_path,
+        emit=session.emit,
+    ))
+
+    # ---------- Councils (the multi-readvisor composure form, P5) ----------
+    #
+    # Same one line, same reason: `enough/council.py` is the engine and
+    # `enough/council_api.py` the HTTP translation. It takes the session as
+    # well, because a council turn holds `generation_lock` and reads the
+    # supervisor's live ctx-size to divide the window.
+    from . import council_api as _council_api
+    app.include_router(_council_api.build_router(
+        project_dir=project_dir,
+        resolve_path=_resolve_project_path,
+        emit=session.emit,
+        session=session,
+    ))
 
     # ---------- Girraph (plain-text IBIS map) node ops ----------
     #
@@ -3373,8 +3576,8 @@ def create_app(
         if _is_role_file(path):
             raise HTTPException(
                 403,
-                "role files are not editable from the project UI — "
-                "edit globally at ~/enough/defaults/roles/",
+                "readvisor files are not editable from the project UI — "
+                "edit globally at ~/enough/defaults/readvisors/",
             )
         if path.endswith(".girraph"):
             # Same rule as the agent's write_file: girraphs change via
@@ -3388,6 +3591,12 @@ def create_app(
                 "(node ops), not whole-file writes",
             )
         target = _resolve_project_path(path)
+        # Composure guard: the same rule again for `.comp` files and their
+        # comments sidecar — module-level ops only, so canvas edits and
+        # readvisor edits interleave without clobbering.
+        from . import composure as _composure
+        if (why := _composure.write_denial(target)):
+            raise HTTPException(403, why)
         # Cachebox mirror guard: the same rule as the agent's write_file —
         # a modality:mirror file under ~/enough/cacheawl/ is backend-owned
         # and regenerated from the box contents, so whole-file edits are
@@ -3497,6 +3706,25 @@ def create_app(
         message = (form.get("message") or "").strip()
         if not message:
             return HTMLResponse("")
+        # A council turn is streaming. Councils and the chat share one model
+        # and one `generation_lock`, so starting the turn here would queue it
+        # silently behind the council and answer minutes later, against a
+        # question the user has long since stopped waiting on. Say so instead
+        # — and keep their message on screen, so it is one copy-paste away
+        # rather than gone.
+        from . import council as _council
+        if _council.turn_in_flight():
+            return HTMLResponse(
+                f'<div class="msg user"><div class="role">user</div>'
+                f'<div class="body">{_escape_html(message)}</div></div>'
+                f'<div class="msg system"><div class="role">enough</div>'
+                f'<div class="body">a council is speaking right now, and it '
+                f'uses the same model this chat does. your message was not '
+                f'sent — wait for the turn to finish (or press pause on the '
+                f'council) and send it again. to say something to the council '
+                f'itself, use the composer at the foot of the canvas.</div>'
+                f'</div>'
+            )
         # Fire-and-forget generation. The SSE stream delivers output.
         asyncio.create_task(_run_turn(session, message))
         # Return an HTML fragment htmx will swap into the conversation:
@@ -3505,7 +3733,7 @@ def create_app(
             f'<div class="msg user"><div class="role">user</div>'
             f'<div class="body">{_escape_html(message)}</div></div>'
             f'<div class="msg assistant pending" id="current-response">'
-            f'<div class="role">agent</div>'
+            f'<div class="role">{_escape_html(prompt_mod.chief_name())}</div>'
             f'<div class="body"></div>'
             f'<div class="tool-indicators"></div>'
             f'</div>'
@@ -3705,8 +3933,53 @@ def create_app(
         lang = (body or {}).get("ui_language")
         if isinstance(lang, str) and lang in UI_LANGUAGES:
             cfg["ui_language"] = lang
+        # The chief readvisor's name (P2) — global like the theme and the
+        # language, and for the same reason: a user who renamed their chief
+        # to "Mo" means Mo in every folder. Validated, not stored raw; an
+        # unacceptable value is dropped rather than saved, matching the
+        # posture above.
+        chief = prompt_mod.valid_chief_name((body or {}).get("chief_readvisor_name"))
+        if chief:
+            cfg["chief_readvisor_name"] = chief
         _write_ui_config(cfg)
         return cfg
+
+    @app.get("/api/readvisor/chief")
+    async def api_readvisor_chief_get() -> dict[str, Any]:
+        """The chief readvisor's name, on its own.
+
+        It lives in ui.json and so could be read through `/api/ui-config`,
+        but that endpoint returns the entire theme catalog — several
+        kilobytes of colors — and the rename button in the broker modal
+        wants one string. The write side is the more useful half: POSTing
+        the whole ui-config to change a name means a client has to send back
+        every theme it was given, and a stale client would then overwrite a
+        theme change made in another window."""
+        return {"name": prompt_mod.chief_name(), "default": prompt_mod.CHIEF_NAME_DEFAULT,
+                "max_length": prompt_mod.CHIEF_NAME_MAX}
+
+    @app.post("/api/readvisor/chief")
+    async def api_readvisor_chief_set(request: Request) -> dict[str, Any]:
+        """Rename the chief readvisor. Body: `{"name": "..."}`.
+
+        Unlike `/api/ui-config`, a name that doesn't validate is an ERROR
+        here, not a silent drop: the user typed it into a box and pressed
+        enter, so they are owed an answer about why it didn't take."""
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            raise HTTPException(400, "expected json body") from None
+        name = prompt_mod.valid_chief_name((body or {}).get("name"))
+        if not name:
+            raise HTTPException(
+                400,
+                f"a readvisor's name is 1–{prompt_mod.CHIEF_NAME_MAX} "
+                f"characters of letters, digits, spaces, hyphens, "
+                f"apostrophes and dots")
+        cfg = _read_ui_config()
+        cfg["chief_readvisor_name"] = name
+        _write_ui_config(cfg)
+        return {"ok": True, "name": name}
 
     # ---------------------- OpenRouter (OPRO-API) ------------------------
     # The fifth model slot. Gated by the `local_models_only` broker toggle
@@ -3948,7 +4221,7 @@ def create_app(
                 "cute": "opro-api",
                 "cloud_model_id": status["model_id"],
                 "note": (
-                    "OPRO-API selected. agent routing to OpenRouter is "
+                    "OPRO-API selected. routing to OpenRouter is "
                     "wired in the next update — until then, the model "
                     "badge reflects the selection but chat completions "
                     "still use the local model in the background."

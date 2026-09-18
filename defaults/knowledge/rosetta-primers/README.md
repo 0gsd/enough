@@ -5,8 +5,8 @@ covers — useful as a sanity check, a few-shot grounding source, and a
 fallback when the offline translator struggles.
 
 Currently empty. This directory is a placeholder; populate it (or ask
-the agent to populate it) from the **Long Now Rosetta Project** on the
-Internet Archive:
+your readvisor to populate it) from the **Long Now Rosetta Project** on
+the Internet Archive:
 
   https://archive.org/details/rosettaproject
 
@@ -26,10 +26,10 @@ Recommended first-pass material per language:
 ## How the translator skill uses these
 
 The skill itself does NOT read this directory automatically — these
-are reference materials *for the agent*. When MADLAD output looks
-suspect, the orchestrator can grep here for the target language,
-quote relevant Swadesh entries or grammar notes, and use them to
-verify or repair the translation.
+are reference materials *for the readvisor*. When MADLAD output looks
+suspect, you can grep here for the target language, quote relevant
+Swadesh entries or grammar notes, and use them to verify or repair
+the translation.
 
 ## License hygiene
 
@@ -60,4 +60,4 @@ Same convention as `rness/io/input/` web caches — see
         └── ...
 
 One subfolder per ISO/BCP-47 language code. Keep it flat; depth here
-just makes grep slower without helping the agent.
+just makes grep slower without helping the readvisor.

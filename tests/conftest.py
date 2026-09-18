@@ -1,5 +1,5 @@
-"""Shared fixtures: the project-registry isolation every test gets, and the
-convert suite's generated `.docx`.
+"""Shared fixtures: the state isolation every test gets, and the convert
+suite's generated `.docx`.
 
 The `.docx` fixture is **built at test time**, not checked in as bytes.
 pandoc is a base dependency now, so any machine that can run the suite can
@@ -17,12 +17,16 @@ this fixture the test of plan Decision 4.
 from __future__ import annotations
 
 import base64
+import os
 import re
+import shutil
 import subprocess
 import zipfile
 from pathlib import Path
 
 import pytest
+
+REPO = Path(__file__).resolve().parent.parent
 
 # 4x4 PNG. Small enough to inline, real enough for pandoc to extract.
 FIXTURE_PNG = base64.b64decode(
@@ -44,18 +48,106 @@ _FTR_XML = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
             f'<w:ftr xmlns:w="{_W}"><w:p><w:r><w:t>{FIXTURE_FOOTER}</w:t>'
             f'</w:r></w:p></w:ftr>')
 
-@pytest.fixture(autouse=True)
-def isolated_project_registry(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
-    """Point `ENOUGH_PROJECTS_STATE` at tmp_path for **every** test.
+# Every `ENOUGH_*` seam that names a path into the developer's real state,
+# mapped to its home under tmp_path. Mirrors `scripts/smoke_boot.py`'s
+# `build_env()` — keep the two in step; that script is the other half of the
+# same rule, for the subprocess servers the pre-commit suite boots.
+_STATE_SEAMS = {
+    "ENOUGH_WEIGHTS_DIR": "weights",
+    "ENOUGH_LIVE_STATE": "live-models.json",
+    "ENOUGH_CACHEAWL_ROOT": "cacheawl",
+    "ENOUGH_INFOWORLD_ROOT": "no-infoworld",
+    "ENOUGH_WIKISINK_CONFIG": "wikisink.json",
+    "ENOUGH_UI_CONFIG": "ui.json",
+    "ENOUGH_EXTRAS_STATE": "extras.json",
+    "ENOUGH_PROJECTS_STATE": "config/projects.json",
+    # The user-global readvisors dir (P7): a test that installs one at
+    # global scope would otherwise file it in the developer's real
+    # ~/enough/readvisors/ and symlink it into every project they open.
+    "ENOUGH_READVISORS_ROOT": "readvisors",
+}
 
-    `ensure_skeleton()` registers the project it just built (home-plan §6),
-    and half the suite calls it — so without this the test run would file the
-    developer's tmp dirs on their real home screen. Autouse rather than
-    opt-in for exactly that reason: the seam has to be closed by default, not
-    by remembering.
+# Seams that must be *absent*, not redirected. Each of these changes
+# behaviour rather than location — a developer who happens to export one in
+# their shell would otherwise get a different test run than CI, and tests
+# that need them (the desktop-shutdown gate, the llama-server lookup ladder)
+# set them for themselves.
+_BEHAVIOUR_SEAMS = (
+    "ENOUGH_LLAMA_SERVER", "ENOUGH_DESKTOP", "ENOUGH_DESKTOP_TOKEN",
+    "ENOUGH_DESKTOP_CODE", "ENOUGH_DESKTOP_UV", "ENOUGH_DESKTOP_LLM_URL",
+    "ENOUGH_VULKAN_ICD_DIRS", "ENOUGH_TOOLTIP_RE", "ENOUGH_REPO_URL",
+)
+
+
+# The environment as the *process* found it, captured at import time —
+# before any fixture has run. `_still_pristine()` below is the difference
+# between "the developer exported this" (isolate it) and "another fixture
+# moved it on purpose" (leave it alone); see the docstring.
+_ENV_AT_START = dict(os.environ)
+
+
+def _still_pristine(var: str) -> bool:
+    return os.environ.get(var) == _ENV_AT_START.get(var)
+
+
+@pytest.fixture(autouse=True)
+def isolated_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    """Redirect `$HOME` and every `ENOUGH_*` state seam into `tmp_path`.
+
+    Two layers, for the same reason `smoke_boot.build_env()` needs two:
+    about half of enough's state has an env hook, and the other half —
+    `~/enough/config/broker.json`, `openrouter.json`, `orchestrator.json`,
+    `~/enough/.llama-server/server.pid` — is reachable only through `$HOME`.
+    `ensure_skeleton()` registers the project it just built (home-plan §6)
+    and half the suite calls it, so without this a test run files the
+    developer's tmp dirs on their real home screen and can, on a bad day,
+    write into `~/enough`.
+
+    Autouse rather than opt-in precisely because that has to be true by
+    default and not by remembering. Individual tests still set whichever
+    seam they are actually asserting on — this fixture is function-scoped
+    autouse, so it runs before their own fixtures and a test-local
+    `monkeypatch.setenv` always wins.
+
+    The one subtlety is `_still_pristine()`. A *session*-scoped fixture
+    runs before this one and cannot be overridden by it, so blindly
+    redirecting would silently undo a deliberate choice —
+    `tests/test_convert_docling.py` pins `ENOUGH_WEIGHTS_DIR` at the real
+    weights dir for the whole session because the docling models are the
+    one thing those tests cannot fabricate. So a seam is redirected only
+    while it still holds the value the *process* started with; anything
+    already moved was moved for a reason this fixture cannot see.
+
+    Nothing here creates `$HOME`. Every writer in enough builds its own
+    parents, and a pre-made directory would collide with the several test
+    modules that do `(tmp_path / "home").mkdir()` for themselves.
     """
-    monkeypatch.setenv("ENOUGH_PROJECTS_STATE",
-                       str(tmp_path / "state" / "projects.json"))
+    if _still_pristine("HOME"):
+        monkeypatch.setenv("HOME", str(tmp_path / "home"))
+
+    state = tmp_path / "state"
+    for var, rel in _STATE_SEAMS.items():
+        if _still_pristine(var):
+            monkeypatch.setenv(var, str(state / rel))
+
+    # A read-only file, but "every ENOUGH_* points inside tmp_path" is a rule
+    # worth being able to state without exceptions — and a copy also means a
+    # test that rewrites the registry cannot corrupt the checkout.
+    if _still_pristine("ENOUGH_MODELS_REGISTRY"):
+        registry = state / "models.json"
+        registry.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(REPO / "defaults" / "models.json", registry)
+        monkeypatch.setenv("ENOUGH_MODELS_REGISTRY", str(registry))
+
+    # Nothing in the suite may reach huggingface.co. Port 1 is never
+    # listening, so a stray download fails instantly and loudly instead of
+    # quietly pulling gigabytes.
+    if _still_pristine("ENOUGH_MODELS_URL_BASE"):
+        monkeypatch.setenv("ENOUGH_MODELS_URL_BASE", "http://127.0.0.1:1/weights")
+
+    for var in _BEHAVIOUR_SEAMS:
+        if _still_pristine(var):
+            monkeypatch.delenv(var, raising=False)
 
 
 FIXTURE_MD = (

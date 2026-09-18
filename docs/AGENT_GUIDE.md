@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.2.8)
+# enough — Agent Guide (v0.3.5)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -10,11 +10,26 @@
 > cacheawl-plan, mode-stack-plan, help-system-plan) were folded into
 > this guide and removed from the repo — don't go looking for them; the
 > load-bearing content is in the sections below.
+>
+> **A word about the word "agent".** Inside enough the assistant is the
+> **chief readvisor** and the personas the user switches on are
+> **readvisors** — "agent" is not the product's vocabulary any more
+> (0.3.5; see "Readvisors" below). This guide keeps saying *agent* for
+> exactly one thing: **you**, the external coding agent reading it. Where
+> a sentence below means the thing that answers in the chat, it says
+> readvisor. Identifiers do not move: `AGENT.md`, `MOTIVATION.md`,
+> `AGENT_GUIDE.md`, `--accent-agent`, `/api/roles*`, `#roles-list`,
+> `{{roles-list}}` and every `*_role*` Python name are unchanged on
+> purpose — only folder names migrated (`roles/` → `readvisors/`).
 
-`enough` is a paradigmless personal computer harness powered by a local
-LLM. It runs on the user's machine, exposes a chat UI at
-`http://127.0.0.1:3456`, and lets the user shape the agent's behavior by
-editing markdown files. Started with `--home` instead of a project it
+`enough` is a **personal language system** powered by a local LLM. It runs
+on the user's machine, exposes its UI at `http://127.0.0.1:3456`, and lets
+the user shape their readvisors' behavior by editing markdown files. The
+home surface of a project is a **composure** — the canvas at the base
+layer (see "Composures" below) — with the conversation alongside it in the
+**readvisor panel**, a third grid column on the right. The assistant in
+that panel is the **chief readvisor**, named `Ed` out of the box and
+renamable per machine. Started with `--home` instead of a project enough
 serves the **home screen** — the project list every launch begins at (see
 its own section below). A fifth optional model slot routes through
 OpenRouter when the user has explicitly enabled it; everything else stays
@@ -34,11 +49,13 @@ Three locations that matter:
 
 | Path | What it is | Authority |
 |---|---|---|
-| `~/enough/` | The global install. Cloned from the repo by `bootstrap.sh`. Contains `defaults/` (templates that get copied / symlinked into every project), `cacheawl/` (the machine-global file store — see below), and the Python source. (The old `infoworld/` library is dissolved into `cacheawl/` on first 0.1.6 launch.) | Edit these to affect every project. |
-| `~/enough/config/` | User-global JSON config. `broker.json` (toggle states), `models.json` (active local model), `openrouter.json` (cloud-slot metadata, **no api key**), `ui.json` (theme/font), `orchestrator.json` (auto-reset config), `wikisink.json` (wikisink install registry + watch/override registries + reading state), `desktop.json` (desktop-shell launch prefs: reopen toggle, last/known projects, onboarding state — shared-visible with the CLI, written by `desktop/src-tauri/src/config.rs`), `extras.json` (which optional dependency groups are installed — read by Python, bash **and** Rust; see "Document conversion"), `projects.json` (the home screen's project registry — see "The home screen"), and the transient `.home-open` handoff file. | Edit per-machine settings. |
+| `~/enough/` | The global install. Cloned from the repo by `bootstrap.sh`. Contains `defaults/` (templates that get copied / symlinked into every project), `cacheawl/` (the machine-global file store — see below), `readvisors/` (the user's own readvisors — see the row below), and the Python source. (The old `infoworld/` library is dissolved into `cacheawl/` on first 0.1.6 launch.) | Edit these to affect every project. |
+| `~/enough/config/` | User-global JSON config. `broker.json` (toggle states), `models.json` (active local model), `openrouter.json` (cloud-slot metadata, **no api key**), `ui.json` (theme/font/`ui_language`/**`chief_readvisor_name`** — the chief readvisor's name is one per machine, like the theme), `orchestrator.json` (auto-reset config), `wikisink.json` (wikisink install registry + watch/override registries + reading state), `desktop.json` (desktop-shell launch prefs: reopen toggle, last/known projects, onboarding state — shared-visible with the CLI, written by `desktop/src-tauri/src/config.rs`), `extras.json` (which optional dependency groups are installed — read by Python, bash **and** Rust; see "Document conversion"), `projects.json` (the home screen's project registry — see "The home screen"), and the transient `.home-open` handoff file. | Edit per-machine settings. |
+| `~/enough/readvisors/` | The **user-global** readvisors source (0.3.5), seam **`ENOUGH_READVISORS_ROOT`**, resolved by `skeleton.user_readvisors_root()`. **Never auto-created** — a machine that never forged a readvisor carries no empty folder. It exists because a desktop build's `defaults/` is sealed inside the `.app` and is not writable, so the `readvisory` skill's `install_readvisor` needs somewhere to put a global one. Each entry is `<name>/AGENT.md` + `MOTIVATION.md`, symlinked into every project by the populator. | Edit to affect every project on this machine, including .app installs. |
 | `~/enough/wikisink/` | Default wikisink location: the user's wikisink *data* (comments, overlays, preserved articles, rankings, run state) and — unless pointed elsewhere — the base `.zim` archive(s). Archives can live anywhere, external drives included; several installs can be registered at once. Hidden from the file-manager tree. | Managed via the 🚰 UI; don't hand-edit. |
-| `~/enough/cacheawl/` | The machine-global **cacheawl** store: root-level folders are *cacheboxes* (plain kept-forever text, or cached replicas ingested from a path/URL/wikisink). Global wiki saves land in the `wiki/` box; the dissolved infoworld folders become the `personal`/`public`/`wiki` boxes. Overridable via `ENOUGH_CACHEAWL_ROOT`. Hidden from every project's file tree. | Managed via the cacheawl mode UI + agent tools; sidecars are backend-owned. |
-| `<project>/rness/` | The agent's per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/roles; per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`; per-project state in `io/`, `requests/`, `knowledge/`. | Edit to affect just this project. |
+| `~/enough/cacheawl/` | The machine-global **cacheawl** store: root-level folders are *cacheboxes* (plain kept-forever text, or cached replicas ingested from a path/URL/wikisink). Global wiki saves land in the `wiki/` box; the dissolved infoworld folders become the `personal`/`public`/`wiki` boxes. Overridable via `ENOUGH_CACHEAWL_ROOT`. Hidden from every project's file tree. | Managed via the cacheawl mode UI + the readvisors' cachebox tools; sidecars are backend-owned. |
+| `<project>/rness/` | The per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/**readvisors** (and into `~/enough/readvisors/` for the user's own); per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`, `project.json`; per-project state in `io/`, `requests/`, `knowledge/`. Composure-round additions: **`rness/readvisors/`** (was `roles/`, migrated by `skeleton._migrate_roles_to_readvisors`), **`rness/io/composure/`** (where new `.comp` files land — in `_EMPTY_DIRS`, so it is back-filled on every launch), **`rness/composure-forms/`** (project forms; **not** in `_EMPTY_DIRS` — created on the first save-as-form) and **`rness/knowledge/councils/`** (exported council transcripts, created by `council.py` on the first conclude). | Edit to affect just this project. |
+| `<dir>/.<name>.comp.comments.json` | A composure's comments sidecar, beside the `.comp` it belongs to. Backend-owned, hidden from the tree by the leading dot, carried along by `composure.move_sidecars()` on a rename. Both write doors refuse it by name. | Managed via the composure comment endpoints; don't hand-edit. |
 
 Plus one **off-disk** location: the **OS keyring** (macOS Keychain /
 Linux Secret Service / Windows Credential Manager), service
@@ -56,28 +73,35 @@ Every Python module in `enough/`:
 
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
-| [enough/server.py](../enough/server.py) | ~4180 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. | `create_app()`, `_drive_message()`, `ModeGate`, `HOME_PATHS`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
-| [enough/prompt.py](../enough/prompt.py) | ~890 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/role/paradigm enumeration + toggle-state helpers. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt()`, `TOOL_INSTRUCTIONS`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
-| [enough/skillaudit.py](../enough/skillaudit.py) | ~900 | First-use audit of untrusted skills (0.2.2). Trust classification (symlink into *an* enough install's `defaults/skills/` = trusted — this install or a sibling one, since 0.2.7), the content fingerprint, the `verdict.json` sidecar, both audit passes (deterministic `payload_scanner.py` + a single non-streaming LLM completion), the in-flight registry, and the guarded toggle. Progress on the `skill-audit` SSE event. | `is_trusted()`, `fingerprint()` / `skill_fingerprint()`, `skill_state()`, `set_skill_enabled_guarded()`, `SkillAuditRefused`, `audit_skill()` / `audit_and_enable()`, `run_llm_audit()` (module-level test hook), `quarantine_untrusted()`, `trust_override()`, `read_verdict()` / `write_verdict()` |
-| [enough/broker.py](../enough/broker.py) | ~380 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
-| [enough/tools.py](../enough/tools.py) | ~1360 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers), the tool-call XML parser, the dispatch table. | `_DISPATCH`, `_TRACE_TOGGLE`, `execute()`, `parse_tool_calls()`, `_CLOUD_KEY_EXFIL_PATTERNS` |
-| [enough/convert.py](../enough/convert.py) | ~1365 | Document conversion (0.2.5): the format **registry** (`FORMATS`), engine probing + caching, twin/assets/manifest naming, the state machine, the job runner that drives the worker, export/sync/resolve, and the `pdf`-extra installer. Imports nothing heavy — docling and pandoc are only ever reached through `convert_worker`. See "Document conversion" below. | `FORMATS` / `formats_view()` / `engines()`, `pandoc_path()` / `typst_path()` / `docling_available()`, `twin_path()` / `assets_dir()` / `manifest_path()` / `pair_for()`, `state()` / `has_twin()`, `read_manifest()` / `write_manifest()`, `ConvertJobs`, `do_export()` / `sync_after_save()` / `resolve()`, `ExtraInstaller`, `installed_extras()` / `record_extra()`, `reset_engines()` |
-| [enough/convert_worker.py](../enough/convert_worker.py) | ~620 | The out-of-process worker: `python -m enough.convert_worker`, one JSON job on stdin, NDJSON records on stdout, exit. pandoc is shelled out to; **docling runs in this process** — which is the whole reason the worker exists (torch must never be imported into the server). | `main()`, `_OPS` (`convert` / `export` / `prefetch`), `do_convert()` / `do_export()` / `do_prefetch()`, `_convert_docling()`, `_flatten_media()` / `_relink_docling_assets()` / `_normalize_images()`, `_Heartbeat`, `TWIN_FORMAT` |
-| [enough/wikisink/](../enough/wikisink/) | ~2500 (pkg) | Local offline Wikipedia. `config.py` (install registry, schema v2 multi-install, data paths), `zim.py` (libzim reader, search, sanitize/rewrite), `download.py` (Kiwix flavor listing + resumable downloads), `overlay.py` (live-refreshed + preserved article stores), `comments.py` (per-article threads), `save.py` (save/read/unsave article folders + the clean HTML→markdown text pipeline), `update.py` (the "wikisink" update run), `rankings.py` (pageview snapshots), `report.py` (run report), `agent.py` (the four agent tool runners). | `config.load_config()` / `installs()` / `active_install()` / `unavailable_reason()`, `zim.get_article()` / `search()`, `download.DownloadManager`, `update.run_wikisink()` |
-| [enough/cloud.py](../enough/cloud.py) | ~1000 | OpenRouter integration: keyring read/write, in-memory key cache, OpenAI-compatible streaming + non-streaming clients, health check, response caching to `rness/io/cloud-cache/`, the broker-driven `pipeline_run()`. | `set_api_key()` / `clear_api_key()` / `has_api_key()`, `_get_api_key_for_broker()`, `health_check()`, `chat_completion()`, `stream_chat_completion()`, `cache_completion()`, `pipeline_run()` |
-| [enough/llm.py](../enough/llm.py) | ~125 | OpenAI-compatible client for the local llama-server. Streaming-only path for chat. | `stream_chat()`, `check_llm_reachable()` |
-| [enough/supervisor.py](../enough/supervisor.py) | ~400 | Manages the local llama-server subprocess. Adopts an existing process if one's already up; spawns its own otherwise. Skips spawning entirely when the active model is `opro-api`. | `LlamaSupervisor`, `_resolve_startup_choice()` |
-| [enough/models.py](../enough/models.py) | ~550 | Local-model registry (7 cute-named local models, defined in `defaults/models.json`; two carry separate MTP draft GGUFs, two carry a `llama_cpp_min_release` gate). Feasibility verdicts (RAM + free disk), `install-menu` CLI for bootstrap.sh. Selection state in `~/enough/config/models.json`. | `load_registry()`, `load_state()`, `save_state()`, `resolve()`, `all_models_view()`, `feasibility()`, `release_gate()`, `install_menu_rows()` |
-| [enough/model_download.py](../enough/model_download.py) | ~330 | Resumable GGUF downloads for the in-app model manager: main file then optional MTP draft, ranged-GET resume off a `.part`, one active download per process, cancel-keeps-partial, delete. Backs `/api/models/{download,delete}/*`; progress on the `model-dl` SSE event. | `ModelDownloadManager` (`start` / `cancel` / `delete` / `state`), `pending_phases()`, `partials()` |
-| [enough/skeleton.py](../enough/skeleton.py) | ~710 | Creates `rness/` for new projects (copies from `defaults/`), syncs global skills/roles/paradigms on every launch via dedicated populators, runs migrations. `_populate_skill_symlinks` also heals materialized copies of shipped skills (a byte-identical real dir left by a cloud-sync/dereferencing copy is swapped back to a symlink — 0.2.8) and calls `skillaudit.quarantine_untrusted()` — untrusted skills default OFF. | `ensure_skeleton()`, `resync_globals()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS`, `_populate_skill_symlinks` / `_populate_role_symlinks` / `_populate_paradigm_symlinks` |
-| [enough/footnotes.py](../enough/footnotes.py) | ~330 | Footnote surgery for in-progress markdown (0.2.7): parse/renumber/insert over standard `[^n]` refs + a terminal definitions block. Pure functions, offset-stable code-masking (fences + inline spans blanked to NULs), numeric labels managed, named tolerated, orphan defs never touched. `tests/test_footnotes.py` doubles as the spec for the `fn*` JS mirror in index.html. | `parse()`, `renumber()`, `next_number()`, `insert_at()`, `definitions_span()`, `REF_RE` / `DEF_RE` |
+| [enough/server.py](../enough/server.py) | ~4580 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Mounts the composure and council routers in one `include_router` call each. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. | `create_app()`, `_drive_message()`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
+| [enough/prompt.py](../enough/prompt.py) | ~1660 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/readvisor/paradigm enumeration + toggle-state helpers, the generated identity preface, the chief readvisor's name, and the gated tool-doc blocks. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt(project_dir, readvisors=, profile=)`, `readvisor_identity()`, `identity_preface()`, `chief_name()` / `valid_chief_name()` / `CHIEF_NAME_DEFAULT` / `CHIEF_NAME_MAX`, `readvisor_shape()`, `tool_instructions()`, `TOOL_INSTRUCTIONS` / `COMPOSURE_TOOL_INSTRUCTIONS` / `READVISORY_TOOL_INSTRUCTIONS`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()` / `_readvisors_dir()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
+| [enough/composure.py](../enough/composure.py) | ~3060 | The composure core (0.3.5): the `.comp` HTML5 parser/serializer, the sanitizer, markdown ⇄ rich text, the node-level op vocabulary (the only way content changes), `place_module`/`arrange`/`estimate_height`, the JSON document model the canvas renders from, the comments sidecar, the forms registry, the outline→composure converter, and the write-door denial. **No FastAPI import** — exercisable with no web layer. See "Composures". | `loads()` / `dumps()`, `model()`, `apply_ops()`, `path_lock()`, `OP_NAMES` / `SOURCES` / `MODULE_TYPES` / `BG_SWATCHES` / `SHIPPED_FORMS` / `CAPS`, `place_module()`, `estimate_height()`, `write_denial()`, `comments_path()` / `load_comments()` / `move_sidecars()`, `parse_outline()` / `outline_ops()` / `from_outline()`, `ComposureError` |
+| [enough/composure_api.py](../enough/composure_api.py) | ~520 | HTTP translation only: `build_router(project_dir, resolve_path, emit)` → the `APIRouter` `create_app` mounts. Every `/api/composure*` route, the comments CRUD, `link-preview`, `webframe/refresh`, and the `composure` SSE event. | `build_router()`, `EVENT` |
+| [enough/composure_tools.py](../enough/composure_tools.py) | ~490 | The nine readvisor composure tools; `register()` adds them to `tools._DISPATCH` / `_TRACE_TOGGLE` at `tools` import time. Gated by `composure_enabled`. | `TOOL_NAMES`, `register()`, `run_read_composure()` … `run_composure_from_outline()`, `CACHE_OVER_CHARS` |
+| [enough/council.py](../enough/council.py) | ~1340 | The council engine (0.3.5): the `composure:council` meta schema, participants + tints, the rotation, the per-participant token budget and the mechanical fold, the framing texts, statement cleaning, transcript export, and the `Council` class. **No FastAPI import.** One seam (`run_council_turn`) is where every test swaps the model out. | `Council`, `validate_meta()` / `validate_participants()` / `validate_output()`, `speakers()` / `next_speaker()` / `advance()`, `build_messages()` / `identity_for()` / `fold_summary()`, `share_for()` / `resolve_n_ctx()` / `probe_n_ctx()`, `run_council_turn()`, `turn_in_flight()` / `busy_paths()` / `reset_runtime()`, `CTX_CLOUD` / `FOLD_AT` / `MIN_TRANSCRIPT_TOKENS` / `MAX_PARTICIPANTS` / `MAX_ROUNDS_CAP`, `CouncilError` |
+| [enough/council_api.py](../enough/council_api.py) | ~530 | `build_router(project_dir, resolve_path, emit, session)` → the `/api/council/*` router. HTTP translation, the two lock exclusions, and the `council` SSE event. | `build_router()` |
+| [enough/readvisor_tools.py](../enough/readvisor_tools.py) | ~325 | `install_readvisor` (P7): the nine ordered refusals, the payload scan through a tempdir, the `.<name>.installing/` stage-then-rename write, and the `readvisors_changed` side effect. `register()` wires it into `tools._DISPATCH` at import time; gated by `readvisory_install`. | `TOOL_NAMES`, `register()`, `run_install_readvisor()`, `scan_documents()`, `shipped_names()` |
+| [enough/skillaudit.py](../enough/skillaudit.py) | ~1040 | First-use audit of untrusted skills (0.2.2). Trust classification (symlink into *an* enough install's `defaults/skills/` = trusted — this install or a sibling one, since 0.2.7), the content fingerprint, the `verdict.json` sidecar, both audit passes (deterministic `payload_scanner.py` + a single non-streaming LLM completion), the in-flight registry, and the guarded toggle. Progress on the `skill-audit` SSE event. | `is_trusted()`, `fingerprint()` / `skill_fingerprint()`, `skill_state()`, `set_skill_enabled_guarded()`, `SkillAuditRefused`, `audit_skill()` / `audit_and_enable()`, `run_llm_audit()` (module-level test hook), `quarantine_untrusted()`, `trust_override()`, `read_verdict()` / `write_verdict()` |
+| [enough/broker.py](../enough/broker.py) | ~440 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
+| [enough/tools.py](../enough/tools.py) | ~1745 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers), the tool-call XML parser, the dispatch table. Two import-time `register()` calls at the bottom fold in the composure and readvisor tools. `fetch_and_cache()` is the shared fetch pipeline `run_fetch_url` and the webframe refresh both render. | `_DISPATCH` (~line 1627), `_TRACE_TOGGLE` (~line 1656), `execute()`, `parse_tool_calls()`, `fetch_and_cache()`, `ToolResult.side_effects`, `_CLOUD_KEY_EXFIL_PATTERNS` |
+| [enough/project_meta.py](../enough/project_meta.py) | ~300 | `rness/project.json`: the project's nice name + description, the `ui` block (`ui_scale`, `text_scale`, `readvisor_panel`) and the `composure` block (`launch`, `path`, `form`, `last`). Every reader gets a fully populated, validated view; a garbage value reads as the default rather than raising. | `load()`, `save()`, `save_ui()`, `save_composure()`, `touch_composure()` |
+| [enough/convert.py](../enough/convert.py) | ~1395 | Document conversion (0.2.5): the format **registry** (`FORMATS`), engine probing + caching, twin/assets/manifest naming, the state machine, the job runner that drives the worker, export/sync/resolve, and the `pdf`-extra installer. Imports nothing heavy — docling and pandoc are only ever reached through `convert_worker`. See "Document conversion" below. | `FORMATS` / `formats_view()` / `engines()`, `pandoc_path()` / `typst_path()` / `docling_available()`, `twin_path()` / `assets_dir()` / `manifest_path()` / `pair_for()`, `state()` / `has_twin()`, `read_manifest()` / `write_manifest()`, `ConvertJobs`, `do_export()` / `sync_after_save()` / `resolve()`, `ExtraInstaller`, `installed_extras()` / `record_extra()`, `reset_engines()` |
+| [enough/convert_worker.py](../enough/convert_worker.py) | ~840 | The out-of-process worker: `python -m enough.convert_worker`, one JSON job on stdin, NDJSON records on stdout, exit. pandoc is shelled out to; **docling runs in this process** — which is the whole reason the worker exists (torch must never be imported into the server). | `main()`, `_OPS` (`convert` / `export` / `prefetch`), `do_convert()` / `do_export()` / `do_prefetch()`, `_convert_docling()`, `_flatten_media()` / `_relink_docling_assets()` / `_normalize_images()`, `_Heartbeat`, `TWIN_FORMAT` |
+| [enough/wikisink/](../enough/wikisink/) | ~2840 (pkg) | Local offline Wikipedia. `config.py` (install registry, schema v2 multi-install, data paths), `zim.py` (libzim reader, search, sanitize/rewrite), `download.py` (Kiwix flavor listing + resumable downloads), `overlay.py` (live-refreshed + preserved article stores), `comments.py` (per-article threads), `save.py` (save/read/unsave article folders + the clean HTML→markdown text pipeline), `update.py` (the "wikisink" update run), `rankings.py` (pageview snapshots), `report.py` (run report), `agent.py` (the four readvisor tool runners). | `config.load_config()` / `installs()` / `active_install()` / `unavailable_reason()`, `zim.get_article()` / `search()`, `download.DownloadManager`, `update.run_wikisink()` |
+| [enough/cloud.py](../enough/cloud.py) | ~1030 | OpenRouter integration: keyring read/write, in-memory key cache, OpenAI-compatible streaming + non-streaming clients, health check, response caching to `rness/io/cloud-cache/`, the broker-driven `pipeline_run()`. | `set_api_key()` / `clear_api_key()` / `has_api_key()`, `_get_api_key_for_broker()`, `health_check()`, `chat_completion()`, `stream_chat_completion()`, `cache_completion()`, `pipeline_run()` |
+| [enough/llm.py](../enough/llm.py) | ~120 | OpenAI-compatible client for the local llama-server. Streaming-only path for chat. | `stream_chat()`, `check_llm_reachable()` |
+| [enough/supervisor.py](../enough/supervisor.py) | ~470 | Manages the local llama-server subprocess. Adopts an existing process if one's already up; spawns its own otherwise. Skips spawning entirely when the active model is `opro-api`. | `LlamaSupervisor`, `_resolve_startup_choice()` |
+| [enough/models.py](../enough/models.py) | ~680 | Local-model registry (7 cute-named local models, defined in `defaults/models.json`; two carry separate MTP draft GGUFs, two carry a `llama_cpp_min_release` gate). Feasibility verdicts (RAM + free disk), `install-menu` CLI for bootstrap.sh. Selection state in `~/enough/config/models.json`. | `load_registry()`, `load_state()`, `save_state()`, `resolve()`, `all_models_view()`, `feasibility()`, `release_gate()`, `install_menu_rows()` |
+| [enough/model_download.py](../enough/model_download.py) | ~395 | Resumable GGUF downloads for the in-app model manager: main file then optional MTP draft, ranged-GET resume off a `.part`, one active download per process, cancel-keeps-partial, delete. Backs `/api/models/{download,delete}/*`; progress on the `model-dl` SSE event. | `ModelDownloadManager` (`start` / `cancel` / `delete` / `state`), `pending_phases()`, `partials()` |
+| [enough/skeleton.py](../enough/skeleton.py) | ~1015 | Creates `rness/` for new projects (copies from `defaults/`), syncs global skills/**readvisors**/paradigms on every launch via dedicated populators, runs migrations. `_populate_skill_symlinks` also heals materialized copies of shipped skills (a byte-identical real dir left by a cloud-sync/dereferencing copy is swapped back to a symlink — 0.2.8) and calls `skillaudit.quarantine_untrusted()` — untrusted skills default OFF. `_populate_role_symlinks` walks **two** global sources (user-global then shipped) and re-aims managed links; `_migrate_roles_to_readvisors` renames `rness/roles/` in place (0.3.5). | `ensure_skeleton()`, `resync_globals()`, `_SKELETON_PLAN`, `_PROJECT_LOCAL_FILES`, `_EMPTY_DIRS`, `_populate_skill_symlinks` / `_populate_role_symlinks` / `_populate_paradigm_symlinks`, `user_readvisors_root()` / `shipped_readvisors_root()` / `_readvisor_sources()`, `_migrate_roles_to_readvisors()`, `cloud_sync_provider()` |
+| [enough/footnotes.py](../enough/footnotes.py) | ~420 | Footnote surgery for in-progress markdown (0.2.7): parse/renumber/insert over standard `[^n]` refs + a terminal definitions block. Pure functions, offset-stable code-masking (fences + inline spans blanked to NULs), numeric labels managed, named tolerated, orphan defs never touched. `tests/test_footnotes.py` doubles as the spec for the `fn*` JS mirror in index.html. | `parse()`, `renumber()`, `next_number()`, `insert_at()`, `definitions_span()`, `REF_RE` / `DEF_RE` |
 | [enough/paginate.py](../enough/paginate.py) | ~920 | Pagination (0.2.7): options schema + named size table, output naming (`name-YYYY-MM-DD.pdf` + `-1`/`-2`), the `.typ` surgery (pandoc-template split, balanced-bracket `#footnote[...]` extraction, endnote reflow, option preamble), pure 2-up/booklet imposition math, bundled-fonts lookup, and the PDF source-attachment probe that powers unpack-on-import. Heavy lifting (pandoc/typst/pypdf compile) runs in `convert_worker.do_paginate`. See "Pagination" below. | `validate()`, `sizes_view()` / `page_size_mm()`, `output_pdf()` / `pages_dir()` / `viewer_manifest_path()`, `fonts_dir()` / `font_paths()`, `embedded_source()` / `has_embedded_source()`, `sheet_order()` / `slot_rect()`, `split_template()` / `extract_footnotes()` / `place_endnotes()` / `preamble()` / `build_typ()`, `status()` / `run_paginate()`, `PaginateError` |
-| [enough/highlights.py](../enough/highlights.py) | ~250 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
-| [enough/girraph.py](../enough/girraph.py) | ~695 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
+| [enough/highlights.py](../enough/highlights.py) | ~280 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
+| [enough/girraph.py](../enough/girraph.py) | ~885 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
 | [enough/cacheawl.py](../enough/cacheawl.py) | ~1470 | The cacheawl store: cachebox CRUD, path/URL/wikisink **ingest**, the `_cachebox.merirmaid` mirror generator + reconcile, the mirror/sidecar write-guards, transfer (copy/move), and the launch-time `infoworld` migration. Root is `~/enough/cacheawl/` (or `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store; nothing else writes there. Since 0.2.5 it also exports the generic folder→flowchart walker `home.py` builds project maps with. | `root()`, `create_cachebox()` / `list_cacheboxes()` / `cachebox_tree()`, `run_ingest()`, `regenerate_mirror()` / `reconcile()` / `reconcile_all()`, `folder_flowchart()`, `mirror_write_denial()`, `migrate_infoworld()` |
-| [enough/home.py](../enough/home.py) | ~740 | The home screen (0.2.5): the project **registry** (`~/enough/config/projects.json`, seam `ENOUGH_PROJECTS_STATE`), the ¶/W/C counters ported from the top bar, the fingerprint cache (which since 0.2.8 also snapshots the `rness/project.json` display name/description so an unreachable folder's row keeps its nice name — live reads still win), seeding from the shell's `desktop.json` MRU (temp-dir paths — chiefly the wizard's `$TMPDIR/enough-onboarding` scratch — are refused, skipped, and pruned when the registry is durable, 0.2.8), the project map (via `cacheawl.folder_flowchart`), the add-guards + the osascript folder chooser, and both halves of the open/close handoff. Imports `server` **lazily, inside functions** — `server` imports `home` at module level, and that is the cycle-breaker. | `projects_state_path()` / `config_dir()` / `handoff_path()`, `read_registry()` / `save_registry()` / `register()` / `touch_opened()` / `set_hidden()`, `seed_from_desktop()`, `count_text()` / `fingerprint_of()` / `refresh_entry()` / `list_projects()`, `build_project_mirror()`, `check_addable()` / `add_project()` / `choose_folder()`, `write_handoff()` / `read_handoff()`, `exec_argv()` |
+| [enough/home.py](../enough/home.py) | ~805 | The home screen (0.2.5): the project **registry** (`~/enough/config/projects.json`, seam `ENOUGH_PROJECTS_STATE`), the ¶/W/C counters ported from the top bar, the fingerprint cache (which since 0.2.8 also snapshots the `rness/project.json` display name/description so an unreachable folder's row keeps its nice name — live reads still win), seeding from the shell's `desktop.json` MRU (temp-dir paths — chiefly the wizard's `$TMPDIR/enough-onboarding` scratch — are refused, skipped, and pruned when the registry is durable, 0.2.8), the project map (via `cacheawl.folder_flowchart`), the add-guards + the osascript folder chooser, and both halves of the open/close handoff. Imports `server` **lazily, inside functions** — `server` imports `home` at module level, and that is the cycle-breaker. | `projects_state_path()` / `config_dir()` / `handoff_path()`, `read_registry()` / `save_registry()` / `register()` / `touch_opened()` / `set_hidden()`, `seed_from_desktop()`, `count_text()` / `fingerprint_of()` / `refresh_entry()` / `list_projects()`, `build_project_mirror()`, `check_addable()` / `add_project()` / `choose_folder()`, `write_handoff()` / `read_handoff()`, `exec_argv()` |
 | [enough/logger.py](../enough/logger.py) | small | Stdlib logging setup. | — |
-| [enough/static/index.html](../enough/static/index.html) | ~20000 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), chat pane, SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode, cacheawl split-view mode, the home frame + project map + handoff overlays (gated on `IS_HOME` / `body[data-mode]`), SVG icon pipeline (`data-icon`/`iconSrc`), `setActiveMode` registry, confirmOverlay |
+| [enough/static/index.html](../enough/static/index.html) | ~30200 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), **the readvisor panel** (`#readvisor-panel`, the third `.layout` column — the conversation lives here now, not in a chat home pane), **the composure canvas** (`#composure` at the base layer: `COMP`, `COMP_TOOLS`, `COMP_MODULE_RENDERERS`, `COMP_FORM_BEHAVIORS`, ~126 `comp*` functions), **the composure base indicator + peek** (`html[data-comp-peek]`), SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode, cacheawl split-view mode, the home frame + project map + handoff overlays (gated on `IS_HOME` / `body[data-mode]`), SVG icon pipeline (`data-icon`/`iconSrc`), MODE STACK registry, confirmOverlay. **The five per-mode chat pills are gone** (review / edit / merirmaid / wiki / cacheawl) — there is one composer now, `#message` in the panel |
 
 `defaults/` ships templates that get copied or symlinked into project
 skeletons by `skeleton.py`:
@@ -85,11 +109,18 @@ skeletons by `skeleton.py`:
 - `defaults/AGENT.md`, `defaults/MOTIVATION.md` — root identity files (copied)
 - `defaults/skills/<name>/SKILL.md` — bundled skills (symlinked)
 - `defaults/paradigms/<name>.md` — bundled paradigms (symlinked)
-- `defaults/roles/<name>/` — bundled consultant personas (symlinked)
+- `defaults/readvisors/<name>/` — bundled readvisors, `AGENT.md` +
+  `MOTIVATION.md` each (symlinked). Renamed from `defaults/roles/` in 0.3.5.
+  They are not consultants you report from — every switched-on readvisor is
+  part of one voice (see "Readvisors")
+- `defaults/composure-forms/*.comp` — the five shipped composure forms
+  (`blank` `cards` `scaffold` `journal` `council`). **Generated**, not
+  hand-written — `scripts/gen_composure_forms.py` (`--check` verifies)
 - `defaults/policies/*.md` — operating policies (symlinked)
 - `defaults/models.json` — local-model registry template
 - `defaults/openrouter-config.json` — cloud-slot metadata template
-- `defaults/ui-config.json` — UI prefs template
+- `defaults/ui-config.json` — UI prefs template (theme, font, `ui_language`,
+  `chief_readvisor_name` default `"Ed"`)
 
 ## The desktop shell
 
@@ -160,7 +191,7 @@ compatibility floor, so that job is the bash-3.2 linter for free.
 Two of those steps are scripts you can and should run locally:
 
 ```bash
-uv run python scripts/smoke_boot.py     # ~1.4s, 17 assertions
+uv run python scripts/smoke_boot.py     # ~1.5s, 21 checks
 bash tests/bootstrap_linux_harness.sh   # ~5s, 66 assertions (-v to watch)
 ```
 
@@ -199,16 +230,57 @@ to accept both.
 
 When a user message arrives at `POST /api/chat`:
 
+0. **The council exclusion, first.** If `council.turn_in_flight()` is true,
+   `/api/chat` does **not** start a turn: it echoes the user's own bubble
+   plus a `msg system` bubble explaining that a council is speaking, and
+   returns. Queueing behind `session.generation_lock` would answer minutes
+   later against a question the user stopped waiting on; the message text
+   stays on screen, one copy-paste from being re-sent. (The mirror rule —
+   a council control refused while a *chat* turn streams — is a 409 from
+   the council router. See "Councils".)
 1. The handler appends `{role: "user", content: ...}` to `session.history`
-   and emits the bubble via SSE.
+   and emits the bubble via SSE. The `turn_start` SSE event carries
+   **`{"speaker": "<chief readvisor name>"}`** (`prompt.chief_name()`,
+   read live) — the live bubble's byline comes from there, and the history
+   renderer (`_render_turn_from_history`) uses the same value. The byline
+   is always the *current* name, never the name at the time of the turn:
+   one voice, one name, or a rename reads as two people.
 2. `_drive_message` (in [server.py](../enough/server.py)) starts the tool
    loop, capped at `session.max_tool_iters` iterations.
 3. On each iteration:
    - `assemble_system_prompt(project_dir)` rebuilds the system prompt
-     **from disk** — `rness/AGENT.md`, `rness/MOTIVATION.md`, the active
-     paradigm, active skills, active roles, the project profile, the
-     tool instructions, the paradigm catalog. No caching; edits to any
-     of these files land on the next message.
+     **from disk** — a generated **identity preface**, `rness/AGENT.md`,
+     `rness/MOTIVATION.md`, the project description + profile, the active
+     readvisors, the active paradigm, policies, active skills, the tool
+     instructions, the paradigm catalog. No caching; edits to any of these
+     files land on the next message. Section order is: identity preface →
+     Identity → Motivation → [Project Description] → [Project Profile] →
+     [Active Readvisors] → Paradigm → [Paradigm Catalog] → [Policies] →
+     [Skills] → [Current Intention] → Tools → Converted documents →
+     Context → [Available Updates].
+   - **The preface is generated, not shipped** (`prompt.identity_preface()`,
+     template `_IDENTITY_PREFACE_TMPL`). It has to be: `rness/AGENT.md` is a
+     *copy* the user owns, so nothing written into `defaults/AGENT.md` ever
+     reaches an existing project. It names the chief readvisor and states
+     the two standing rules — **"enough acts; readvisors speak"** (tool
+     effects are narrated as things *enough* did) and **"you are one voice,
+     sometimes made of several"** (switched-on readvisors are part of who
+     the chief is this turn, not a panel to report from).
+   - **The tool docs are gated** (`prompt.tool_instructions(project_dir)`):
+     the always-on `TOOL_INSTRUCTIONS` core, plus
+     `COMPOSURE_TOOL_INSTRUCTIONS` when `broker.is_enabled("composure_enabled")`,
+     plus `READVISORY_TOOL_INSTRUCTIONS` when the `readvisory` skill is
+     switched on in this project. Both gates **fail open** — an unreadable
+     broker config leaves the composure block in, because a gate that hid
+     working tools would be worse than a gate that costs a kilobyte. A
+     project using neither pays what it paid before the composure round.
+     `tests/test_prompt_weight.py` pins the budgets (core ≤ 17 500 chars,
+     fully enabled ≤ 22 000) **and both directions of the coverage
+     question**: every name in `tools._DISPATCH` is documented somewhere in
+     the fully-enabled prompt, and every `<tool name="x">` example names
+     something dispatchable. Headroom under the full budget is deliberately
+     tiny, so the next round that adds a tool has to raise the number on
+     purpose.
    - **Routing decision**: read `current` from `models.load_state()`. If
      `opro-api`, dispatch to `cloud.stream_chat_completion()`. Otherwise
      dispatch to `llm.stream_chat()` (the local llama-server). Both
@@ -242,39 +314,49 @@ cache.
 
 | Concept | Per-project file(s) | Defaults template | Lives in system prompt? |
 |---|---|---|---|
-| Agent identity | `rness/AGENT.md` (copied) | `defaults/AGENT.md` | yes — top of prompt |
+| Chief readvisor identity | `rness/AGENT.md` (copied) | `defaults/AGENT.md` | yes — under the generated identity preface |
+| The chief's **name** | — (machine-global) | `defaults/ui-config.json` → `chief_readvisor_name`, default `"Ed"` | yes — interpolated into the preface |
 | Motivation | `rness/MOTIVATION.md` (copied) | `defaults/MOTIVATION.md` | yes |
 | Active paradigm | `rness/active-paradigm` (multipurpose markdown: paradigm name + help-bubbles state — see "What NOT to touch") | seeded by `prompt.seed_multipurpose_file()` | the active paradigm's full file, yes |
 | Paradigms | `rness/paradigms/<name>.md` (symlink) | `defaults/paradigms/<name>.md` | the active one, yes |
 | Skills | `rness/skills/<name>/SKILL.md` (symlink = shipped/trusted; a real dir = untrusted) | `defaults/skills/<name>/SKILL.md` | the toggled-on ones, yes |
 | Skill audits | `rness/io/output/analyzer/audits/<skill>/<YYYY-MM-DD>-audit.md` + `verdict.json` | none — written by `skillaudit.py` or by analyzer's `audit` mode | no |
-| Roles | `rness/roles/<name>/AGENT.md`+`MOTIVATION.md` (symlink) | `defaults/roles/<name>/` | the toggled-on ones, yes |
+| Readvisors | `rness/readvisors/<name>/AGENT.md`+`MOTIVATION.md` — a **symlink** when it came from a global source, a **real dir** when it is this project's own | `defaults/readvisors/<name>/` (shipped) or `~/enough/readvisors/<name>/` (user-global) | the toggled-on ones, yes — combined into one voice under "Active Readvisors" |
+| Composures | `<anywhere>/<name>.comp` (new ones land in `rness/io/composure/`) | `defaults/composure-forms/<form>.comp` + `rness/composure-forms/` | no — reached through the composure tools |
+| Composure comments | `<dir>/.<name>.comp.comments.json` | none — written by `composure.py` | no |
+| Council transcripts | `rness/knowledge/councils/<YYYY-MM-DD>-<slug>.md` | none — written on conclude | no (readable on demand) |
+| Council outputs | whatever `output.path` names, through `tools.run_write_file` | none | no |
 | Policies | `rness/policies/*.md` (symlink) | `defaults/policies/*.md` | yes, all of them |
 | Project profile | `rness/knowledge/project-profile.md` | seeded empty | yes |
-| Requests | `rness/requests/*.md` | none — agent creates | no (but agent reads on demand) |
+| Requests | `rness/requests/*.md` | none — a readvisor creates them | no (but readvisors read on demand) |
 | Highlights | `<dirname>/.<filename>.highlights.json` | none | no — read via tools |
 | Session logs | `rness/knowledge/session-logs/<date>.md` | none | no |
 | Broker journal | `rness/knowledge/session-logs/<date>-broker.md` | none | no |
 | Fetched web cache | `rness/io/input/<timestamp>-<hash>-<slug>.md` | none | no |
 | Cloud cache | `rness/io/cloud-cache/<timestamp>-<slug>.md` + `_cloud-index.md` | none | no |
-| Saved wiki articles | `<project>/wiki/<slug>/` or `~/enough/cacheawl/wiki/<slug>/` (the global wiki cachebox; `"infoworld"` accepted as a legacy alias) — folder of `article.html` (verbatim archive copy) + `_manifest.md` + hidden `.meta.json` | none — created on first save | no (agent reads on demand) |
-| Cacheboxes | `~/enough/cacheawl/<box>/…` — root-level box folders + backend-owned `.cachebox.json` + `_cachebox.merirmaid` sidecars | none — created via UI/agent/migration | no (agent reaches via cachebox tools) |
+| Saved wiki articles | `<project>/wiki/<slug>/` or `~/enough/cacheawl/wiki/<slug>/` (the global wiki cachebox; `"infoworld"` accepted as a legacy alias) — folder of `article.html` (verbatim archive copy) + `_manifest.md` + hidden `.meta.json` | none — created on first save | no (readvisors read on demand) |
+| Cacheboxes | `~/enough/cacheawl/<box>/…` — root-level box folders + backend-owned `.cachebox.json` + `_cachebox.merirmaid` sidecars | none — created via UI/readvisor/migration | no (readvisors reach it via the cachebox tools) |
 | Wikisink registry/state | `~/enough/config/wikisink.json` (user-global, **not** per-project) | none | no |
 | Wiki comments/overlays | `<wikisink data dir>/comments/`, `overlay/`, `preserved/` | none | no |
-| Converted documents | `<dir>/<name>.<ext>.md` (the twin — a user file), `<name>.<ext>.assets/` + hidden `.<name>.<ext>.convert.json` (both backend-owned) | none — written by `convert.py` on first open | no (the agent gets the twin through `read_file`; the *registry* is rendered into the prompt by `prompt.convert_instructions()`) |
+| Converted documents | `<dir>/<name>.<ext>.md` (the twin — a user file), `<name>.<ext>.assets/` + hidden `.<name>.<ext>.convert.json` (both backend-owned) | none — written by `convert.py` on first open | no (a readvisor gets the twin through `read_file`; the *registry* is rendered into the prompt by `prompt.convert_instructions()`) |
 
-**Active vs available**: skills and roles ship as files but only become
+**Active vs available**: skills and readvisors ship as files but only become
 part of the system prompt when toggled on in the sidebar. The
 *disabled* set is persisted per-project as a plain newline-delimited
-text file: `rness/skills/.disabled` and `rness/roles/.disabled`. Read/
+text file: `rness/skills/.disabled` and `rness/readvisors/.disabled`. Read/
 written via `prompt._read_disabled_skills()` / `set_skill_enabled()` (and
-the role-side equivalents). New globals appear in every project with
-their name added to `.disabled` on first sync — i.e. defaulted off.
+the readvisor-side equivalents, still named `_read_disabled_roles()` /
+`set_role_enabled()` — see the note on identifiers at the top). New globals
+appear in every project with their name added to `.disabled` on first sync
+— i.e. defaulted off. **One exception, and it is load-bearing:** a link the
+populator pruned as dangling in step 1 and re-created in step 2 is a *heal*,
+not an arrival, and keeps its toggle. Without it the 0.3.5 folder rename
+would have switched every readvisor the user had switched on back off.
 **Untrusted skills also default off**, by a second route:
 `skillaudit.quarantine_untrusted()` (called from
 `skeleton._populate_skill_symlinks`, so every launch and every
 `/api/skills`) names any untrusted skill without a matching `pass`
-verdict into `.disabled`. Without it a hand-dropped or agent-written
+verdict into `.disabled`. Without it a hand-dropped or readvisor-written
 directory would be live in the system prompt having never passed a
 toggle. Paradigms are different — exactly one is active, named in
 `rness/active-paradigm`.
@@ -365,8 +447,8 @@ through enough's interface. Three reasons that matters as design context:
 3. **Trust boundary.** The api key is the user's; we treat it as a
    liability, not an asset. We store it in the OS keyring, never on
    disk in plaintext. We construct outbound headers in exactly one
-   place ([`cloud._auth_headers()`](../enough/cloud.py)). The agent has
-   no callable path to the key.
+   place ([`cloud._auth_headers()`](../enough/cloud.py)). No readvisor has
+   a callable path to the key.
 
 ### Storage
 
@@ -427,7 +509,7 @@ OPRO-API is selected) exposes:
 
 ### Defense-in-depth
 
-The agent and broker run in the **same Python process** — there is no
+The readvisors and the broker run in the **same Python process** — there is no
 process-level sandbox. The strongest defenses are:
 
 1. **Key never in a user-readable file.** Keychain access by a process
@@ -444,7 +526,7 @@ process-level sandbox. The strongest defenses are:
 3. **Response wrapping.** `cloud.wrap_untrusted_cloud_text()` exists for
    any path where cloud-produced text becomes tool-result content. (Not
    used for ordinary chat completions in Architecture A, where the
-   cloud IS the agent; meant for `cloud_pipeline` output and any future
+   cloud IS the readvisor; meant for `cloud_pipeline` output and any future
    path where cloud content gets passed back as data.)
 4. **Cache-write redaction.** Before writing a cache file,
    `cloud._redact()` scrubs anything matching the OpenRouter key
@@ -462,7 +544,7 @@ response. A queryable summary table lives at
 `rness/io/cloud-cache/_cloud-index.md`.
 
 `source` values:
-- `chat` — an interactive agent turn (one per `_drive_message` iteration)
+- `chat` — an interactive readvisor turn (one per `_drive_message` iteration)
 - `pipeline-step` — one step of a `cloud_pipeline` run
 - `pipeline-summary` — a follow-up summary call (only when
   `compile.method == "summarize_each"`); includes a
@@ -508,7 +590,7 @@ delegating.
 
 The tool returns a small summary body (steps run, totals, output path,
 cache counts); the actual prose lives on disk for `read_file` retrieval.
-This keeps multi-hundred-thousand-token batches out of the agent's
+This keeps multi-hundred-thousand-token batches out of the readvisor's
 context window.
 
 200-step ceiling per pipeline; output_path is constrained to inside the
@@ -519,7 +601,7 @@ project directory (path-traversal protection).
 ## The broker
 
 A single Python module — [enough/broker.py](../enough/broker.py) — in
-the same process as the agent. Three jobs:
+the same process as the readvisors. Three jobs:
 
 1. **Configure.** Toggles live in `broker.TOGGLES` (a tuple of `Toggle`
    dataclasses). Each has `key`, `label`, `description`, `default`, and
@@ -532,10 +614,10 @@ the same process as the agent. Three jobs:
    tool name, decision, args summary, outcome. Gated by
    `trace_log_enabled`.
 3. **Deny.** `broker.denial_*()` functions return canned, actionable
-   error strings for the agent. The runner returns one of these as the
+   error strings for the readvisor. The runner returns one of these as the
    tool body when a precondition fails.
 
-The current toggle catalog (11 toggles, all default `True`):
+The current toggle catalog (13 toggles, all default `True`):
 
 | Key | Group | Affects |
 |---|---|---|
@@ -544,12 +626,14 @@ The current toggle catalog (11 toggles, all default `True`):
 | `read_file_brokered` | read_file | Trace-logging for `read_file` (allowlist always enforced) |
 | `write_file_brokered` | write_file | Trace-logging for `write_file` (allowlist always enforced) |
 | `shell_brokered` | shell | Trace-logging for `shell` (no allowlist for shell by design) |
-| `fetch_url_enabled` | fetch_url | Whether `fetch_url` works at all (otherwise agent falls back to `curl` via shell) |
+| `fetch_url_enabled` | fetch_url | Whether `fetch_url` works at all (otherwise a readvisor falls back to `curl` via shell) |
 | `fetch_url_tor_for_offlist` | fetch_url | Off-allowlist fetches via Tor (vs outright denial) |
 | `fetch_url_cache_and_convert` | fetch_url | HTML→markdown (pandoc, a base dep since 0.2.5) + cache in `rness/io/input/` |
-| `wikisink_enabled` | wikisink | Whether the agent's four wiki tools work at all (the 🚰 browser UI is ungated) |
+| `wikisink_enabled` | wikisink | Whether the readvisors' four wiki tools work at all (the 🚰 browser UI is ungated) |
 | `wikisink_live_updates` | wikisink | Whether wikisink update runs may call the Wikipedia/Wikimedia APIs (off = report from local state only) |
-| `cacheawl_enabled` | cacheawl | Whether the agent's three cachebox tools work at all (the cacheawl browser UI is ungated; URL ingests still additionally honor the `fetch_url_*` toggles) |
+| `cacheawl_enabled` | cacheawl | Whether the readvisors' three cachebox tools work at all (the cacheawl browser UI is ungated; URL ingests still additionally honor the `fetch_url_*` toggles) |
+| `composure_enabled` | composure | Whether the readvisors' nine composure tools work at all — **and** whether `COMPOSURE_TOOL_INSTRUCTIONS` is in the prompt (this is the one toggle that gates *docs* alongside the *tools* they describe; the gate fails open on an unreadable config). The canvas UI stays ungated, like wikisink and cacheawl |
+| `readvisory_install` | readvisors | Whether `install_readvisor` may write a readvisor to disk. Off keeps the `readvisory` skill's interview and drafting and leaves the filing to the user. A new group — `/api/broker` renders whatever is in `TOGGLES`, so a new group needs no code |
 
 ---
 
@@ -558,7 +642,7 @@ The current toggle catalog (11 toggles, all default `True`):
 | Tool | Runner | Gating |
 |---|---|---|
 | `read_file` | `tools.run_read_file` | path under project OR on file-read allowlist. A convertible original returns its **twin** (converting first, on a daemon thread joined for `tools.CONVERT_BLOCKING_SECONDS` = 120) — see "Document conversion" |
-| `write_file` | `tools.run_write_file` | path under project OR on file-rw allowlist; not in `rness/requests/done/`. A refused sync-on-save of a syncing twin comes back as `ok=False` whose body says the twin *was* written |
+| `write_file` | `tools.run_write_file` | path under project OR on file-rw allowlist; not in `rness/requests/done/`. **`.girraph` and `.comp` are refused whole-file** (`composure.write_denial()` covers `.comp` *and* its `.<name>.comp.comments.json` sidecar, and the message names the composure tools to use instead). A refused sync-on-save of a syncing twin comes back as `ok=False` whose body says the twin *was* written |
 | `export_document` | `tools.run_export_document` | path under project OR on the file-**rw** allowlist (it writes a real document); `<target>` from `convert.EXPORT_TARGETS`, `<mode>` `copy` (default) or `overwrite` |
 | `shell` | `tools.run_shell` | exfiltration patterns denied; otherwise no path constraint |
 | `fetch_url` | `tools.run_fetch_url` | `fetch_url_enabled` toggle; host on allowlist OR Tor toggle on |
@@ -577,16 +661,855 @@ The current toggle catalog (11 toggles, all default `True`):
 | `cachebox_list` | `tools.run_cachebox_list` → `cacheawl.py` | `cacheawl_enabled` toggle; no arg = list boxes, `<box>` = its contents tree (reconciles first) |
 | `cachebox_create` | `tools.run_cachebox_create` → `cacheawl.py` | `cacheawl_enabled` toggle; creates an empty box (name-validated) + its mirror |
 | `cachebox_ingest` | `tools.run_cachebox_ingest` → `cacheawl.py` | `cacheawl_enabled` toggle; `path`/`url`/`wikisink` source to a depth. URL ingests also honor the `fetch_url_*` toggles; runs in the background, box registered `ingesting` up front |
+| `read_composure` | `composure_tools.run_read_composure` | `composure_enabled`; `.comp` path. No `<module>` → the outline (three header lines + one line per module). With `<module>` → that module as markdown, cached to `rness/io/input/` over `CACHE_OVER_CHARS` = 4000 |
+| `new_composure` | `composure_tools.run_new_composure` | `composure_enabled`; `<form>` from `SHIPPED_FORMS` + project forms. Writes the file **immediately** (unlike the canvas's lazy create) |
+| `comp_add_module` | `composure_tools.run_comp_add_module` | `composure_enabled`; omit geometry and let `place_module` choose |
+| `comp_update_module` | `composure_tools.run_comp_update_module` | `composure_enabled`; a patch — only keys present are touched, **never** page text |
+| `comp_set_page` | `composure_tools.run_comp_set_page` | `composure_enabled`; `<append>true</append>` adds a page instead of replacing |
+| `comp_remove_module` | `composure_tools.run_comp_remove_module` | `composure_enabled`; `<confirmed>yes</confirmed>` required, like `remove_node` |
+| `comp_arrange` | `composure_tools.run_comp_arrange` | `composure_enabled`; `<mode>` `grid` \| `column`; the order of `<modules>` is the resulting reading order |
+| `comp_save_as_form` | `composure_tools.run_comp_save_as_form` | `composure_enabled`; writes a reusable form into `rness/composure-forms/` |
+| `composure_from_outline` | `composure_tools.run_composure_from_outline` | `composure_enabled`; one markdown outline → a whole composure, deterministically. The `scaffold` skill teaches the grammar — see "Composures" |
+| `install_readvisor` | `readvisor_tools.run_install_readvisor` | **`readvisory_install`** toggle; kebab-case `<name>` ≤ 40 chars, `<scope>` `project`\|`global`, both documents non-empty and ≤ 40 KB, `prompt.readvisor_shape()` clean, the payload scan clean, destination not a symlink, `<replace>yes</replace>` to overwrite |
 
-All registered in `_DISPATCH` (~line 1447 in tools.py) and
-`_TRACE_TOGGLE` (~line 1475). The tool-call XML parser
-(`parse_tool_calls`) handles arbitrary tool names — extra inner tags
+All registered in `_DISPATCH` (~line 1627 in tools.py) and
+`_TRACE_TOGGLE` (~line 1656) — the last twelve add themselves through the
+two import-time `register()` calls at the bottom of tools.py
+(`composure_tools.register()`, `readvisor_tools.register()`), which is the
+pattern to copy for any future tool family: the op vocabulary stays in one
+module instead of spreading runners through tools.py. The tool-call XML
+parser (`parse_tool_calls`) handles arbitrary tool names — extra inner tags
 (beyond `<path>`, `<content>`, `<command>`, `<url>`) end up in
 `ToolCall.extra` so new tools don't need parser changes.
 
-Tool documentation that the agent reads is in
-[enough/prompt.py](../enough/prompt.py) under `TOOL_INSTRUCTIONS`.
-Every new tool needs an example block + prose explanation there.
+A runner that changes something the frontend has open returns a
+**`ToolResult.side_effects`** dict; `server._handle_tool` fans each key out
+as an SSE event of that name. That is how a composure tool fires the
+`composure` event and `install_readvisor` fires `readvisors_changed`.
+
+Tool documentation that the readvisors read is in
+[enough/prompt.py](../enough/prompt.py) under `TOOL_INSTRUCTIONS`,
+`COMPOSURE_TOOL_INSTRUCTIONS` and `READVISORY_TOOL_INSTRUCTIONS`, assembled
+by `tool_instructions(project_dir)` (see "The request lifecycle" for the
+gates). Every new tool needs an example block + prose explanation in the
+right one of the three — and `tests/test_prompt_weight.py` will fail until
+it has one.
+
+---
+
+## Readvisors (the chief, voltron, install, the folder migration)
+
+A **readvisor** is a persona: a folder holding `AGENT.md` (its identity,
+with a `# <Display Name>` H1) and `MOTIVATION.md` (its drive). The one that
+always speaks is the **chief readvisor** — named `Ed` out of the box. The
+ones the user switches on in the sidebar are folded into the chief's own
+voice; they are not consultants the chief reports from. That is the
+"voltron" rule, and `prompt._READVISORS_FRAMING` is where it is said to the
+model. `_ROLES_FRAMING` survives as an alias of the same string.
+
+Renamed from *roles* in 0.3.5. **Identifiers did not move** — `AGENT.md`,
+`MOTIVATION.md`, `/api/roles`, `/api/roles/toggle`, `#roles-list`,
+`{{roles-list}}`, `.role-row` / `.role-toggle` / `.role-name`, and every
+Python name (`list_roles`, `set_role_enabled`, `_load_roles`,
+`_populate_role_symlinks`, `_read_disabled_roles`, `_is_role_file`). Folder
+names did.
+
+### Three origins, three ranks
+
+| rank | where | how it looks in `rness/readvisors/` |
+|---|---|---|
+| 1 · project | `rness/readvisors/<name>/` | a **real directory** — wins by existing; the populator never replaces one with a link |
+| 2 · user-global | `~/enough/readvisors/<name>/` (seam `ENOUGH_READVISORS_ROOT`) | a symlink |
+| 3 · shipped | `<install>/defaults/readvisors/<name>/` | a symlink |
+
+`skeleton._readvisor_sources(defaults_root)` returns 2 then 3 in precedence
+order; rank 1 is not in the list at all because it wins by not being
+overwritten. `GET /api/roles` renders each row with `data-name` and
+**`data-origin`** ∈ `shipped | global | project` (`server._readvisor_origin`,
+read from the filesystem; an unreadable entry reads as `shipped`, the one
+origin with no destructive affordance). Non-shipped rows also carry a
+`<button class="role-remove">` with **no `hx-*` of its own** — removing
+deletes files, so the frontend wires it through `confirmOverlay` first.
+
+The populator also **re-aims** links, which is what heals a project moved
+between machines or installs. A link is re-aimable ("managed") when its
+resolved target's *parent directory* is named `roles` or `readvisors`
+(`_is_managed_readvisor_link`); a link the user pointed anywhere else is
+left where it points.
+
+### The folder migration
+
+`skeleton._migrate_roles_to_readvisors(project_dir)`, called from
+`ensure_skeleton` right after `_migrate_undot` and **before** the
+populators, so a project still on `rness/.roles/` gets undotted and then
+renamed in one launch.
+
+| on disk | what happens |
+|---|---|
+| only `roles/` | one atomic `rename()` — carries `.disabled`, `.gitkeep`, real dirs and symlinks alike |
+| both | merge INTO `readvisors/`, which is authoritative: real directories missing from it are moved, the two `.disabled` files are **unioned** (off under either name stays off), symlinks and `.gitkeep` are deleted because the populator re-creates them, then `rmdir` — which declines if anything survived |
+| only `readvisors/`, or neither | no-op |
+| `readvisors` is a file or symlink | left strictly alone — someone did that on purpose |
+| read-only parent | logged, no raise; the project keeps using `roles/` |
+
+**Every reader and writer of the folder goes through
+`prompt._readvisors_dir(rness)`** — `readvisors` if it is a dir, else
+`roles` if that is, else `readvisors` — so a project whose migration could
+not run keeps working. `server.HIDDEN_TREE_PATHS` and `server._is_role_file`
+name **both** folders for the same reason.
+`skeleton.shipped_readvisors_root(defaults_root)` does the same one level
+up, which is also what a *sibling older install* looks like from here.
+
+### The chief's name
+
+Machine-global, beside the theme and the UI language:
+`chief_readvisor_name` in `~/enough/config/ui.json`, seeded from
+`defaults/ui-config.json` with `"Ed"`.
+
+- `prompt.CHIEF_NAME_DEFAULT` / `CHIEF_NAME_MAX` (24).
+- `prompt.valid_chief_name(raw) -> str | None` — trimmed; 1–24 chars;
+  a letter or digit first, then letters, digits, space, `-`, `'`, `.`.
+  Unicode-aware (`エド` validates), so a user can name their readvisor in
+  their own script.
+- `prompt.chief_name()` reads ui.json through `ENOUGH_UI_CONFIG` and lands
+  on `"Ed"` for **every** failure (missing, unreadable, bad json, absent
+  key, invalid value). A missing name must never stop a turn.
+- `prompt._ui_config_path()` is a deliberate ~6-line copy of
+  `server._ui_config_live_path()`. **The prompt layer must stay importable
+  without FastAPI** — the council engine and the tests build prompts with
+  no app running. Don't "deduplicate" it by importing `server`.
+
+Two write doors, deliberately different:
+
+| Route | Method | Shape |
+|---|---|---|
+| `/api/readvisor/chief` | GET | `{name, default, max_length}` |
+| `/api/readvisor/chief` | POST | `{name}` → `{ok, name}`; **400 on an invalid name** — the user typed it into a box and is owed an answer |
+| `/api/ui-config` | POST | also accepts `chief_readvisor_name`, validated the same way, but an invalid value is silently **dropped** (matching `ui_language`) |
+
+`/api/ui-config` returns the entire theme catalog, so POSTing a name back
+through it would make a stale client overwrite a theme change made in
+another window. That is why the dedicated pair exists.
+
+### The prompt API
+
+```python
+prompt.assemble_system_prompt(project_dir, readvisors="voltron"|"none",
+                              profile="chat"|"council") -> str
+prompt.readvisor_identity(project_dir, folder_name) -> str
+prompt.identity_preface(name=None) -> str
+```
+
+- `readvisors="none"` drops the Active Readvisors section **and nothing
+  else**. A council's chief needs it: every other readvisor is a separate
+  participant with its own prompt, so folding them into the chief as well
+  would put each of them in the room twice.
+- `readvisor_identity` returns ONE readvisor's two documents under the same
+  `## Readvisor:` / `### Identity` / `### Motivation` headings, with **no**
+  voltron framing. It **ignores the enabled/disabled toggle on purpose**:
+  the sidebar toggle governs the combined voice of ordinary conversation,
+  while a council picks its participants in its own setup card. Returns
+  `""` for a missing or empty readvisor — "no identity" means "not a
+  participant".
+- `profile="council"` is the lean prompt; see "Councils".
+- Both default to the pre-0.3.5 behaviour, byte for byte.
+
+### `install_readvisor` and the shape contract
+
+`prompt.readvisor_shape(agent_md, motivation_md) -> list[str]` (`[]` is a
+pass) reads its required headings from
+`defaults/skills/readvisory/assets/AGENT.md.template` and
+`MOTIVATION.md.template` **at call time** — editing a template IS editing
+the contract. It reports missing headings, misordered headings, empty
+sections, a missing `# <Display Name>` H1, and a missing trailing
+`enough-tooltip-text:` line. Missing templates ⇒ `[]` (a partial install
+has no shape to enforce; better than refusing every install).
+
+It is enforced at the **install door** and over the shipped readvisors by
+`tests/test_readvisors_defaults.py`. **The loader never enforces it** — a
+hand-made readvisor that predates the shape still loads and still works.
+
+[enough/readvisor_tools.py](../enough/readvisor_tools.py) refuses in this
+order, each refusal phrased so the readvisor can act without making the
+user read an error:
+
+1. `readvisory_install` toggle off → `broker.denial_readvisory_install_disabled()`
+2. missing name / not kebab-case / > 40 chars
+3. scope not `project` or `global`
+4. the name is a **shipped** readvisor's
+5. either document empty, or over 40 KB
+6. `readvisor_shape` problems, quoted in full
+7. **payload scan** findings, quoted (pattern id, confidence, file, line)
+8. the destination is a **symlink** — a global readvisor visible here;
+   writing through it would edit it for every project at once
+9. the destination exists and `<replace>yes</replace>` was not given
+
+`scan_documents()` writes the two documents to a `tempfile` directory —
+**never inside the project**, or the scan's own input would one day be read
+back as a readvisor — and calls `skillaudit.run_payload_scan()`, i.e. the
+same bundled `payload_scanner.py` the skill audit uses. **Unlike a skill
+audit, this door treats `flag` and `fail` alike**: a skill is code whose
+findings need judging; a readvisor is prose about a person, and prose about
+a person has no legitimate reason to look like an exfiltration pattern.
+
+Writes stage into `.<name>.installing/` and `rename()` into place, so a
+crash never leaves half a readvisor where the loader will find it. On
+success the readvisor is switched ON here (and at global scope also linked
+into this project immediately; elsewhere it arrives default-off on the next
+launch), and the runner returns the side effect
+`{"readvisors_changed": {name, scope, action: "install"}}`, which
+`server._handle_tool` emits as an SSE event of that name.
+
+`POST /api/readvisors/remove {name}` → `{ok, name, origin}`; **403** for a
+shipped readvisor, 400 for a bad name, 404 when it is not here. `project`
+deletes the real folder, `global` deletes it from `~/enough/readvisors/`
+and unlinks the local link. **Either way the name is cleared from
+`.disabled`** — otherwise a later readvisor of that name would arrive
+switched off for no visible reason.
+
+---
+
+## The readvisor panel
+
+The conversation. It is the third column of `.layout`, not an overlay:
+`grid-template-columns: var(--sb-w) 1fr var(--rv-w)`, so a docked panel
+sits side by side with whatever is in `main.content` and "click back to the
+doc without collapsing chat" is free. `--rv-dock-w` is
+`clamp(340px, calc(27vw / var(--uiz, 1)), 480px)` — **the `/ var(--uiz)` is
+the coordinate contract, not decoration** (see "Display scales").
+
+It keeps the existing ids — `#conversation`, `#chat-form`, `#message`,
+`#send-btn`, `#mic-btn` — so nothing about the chat wire changed.
+
+**Neither side column is ever `display: none`.** A `display:none` grid item
+stops being an item and the stage slides sideways; closed means 0 width
+plus `visibility: hidden`, which also takes the panel out of the tab order.
+
+### State
+
+One attribute on `<html>`, not a class on `#layout`:
+
+| `data-rv` | `data-rv-overlay` | meaning |
+|---|---|---|
+| `closed` | — | third column 0 wide, panel invisible |
+| `open` | absent | a real third grid column |
+| `open` | `"1"` | floats over main's right edge |
+| `full` | — | panel covers the stage |
+
+An attribute because the `<head>` `BOOT_UI_STATE` block sets it **before
+first paint** — a column that starts wrong and animates to right is a
+visible lurch on every launch. The head block pre-computes the overlay
+decision from the same numbers the CSS clamp uses.
+
+- `RV_STATE` is the JS mirror; **`rvSetState(next, {skipSave, focus})` is
+  the one door.** It fires a `readvisor-panel` `CustomEvent` on `document`
+  (`detail: {state, overlay}`) whenever the state actually changes — that
+  is the hook anything laying out the stage listens on, and **the grid is
+  still resizing for ~180 ms after it** (the composure canvas also waits on
+  `#layout`'s `transitionend`).
+- `rvToggle()` closed ↔ open (from full it collapses to closed);
+  `rvToggleFull()` open ↔ full; **`rvAsk()`** opens docked + focuses the
+  composer — that is what every "ask your readvisor about this" affordance
+  calls.
+- `rvApplyOverlay()` recomputes push-vs-float on state change, on `resize`
+  and from the ⌘\ sidebar handler; threshold `RV_MIN_STAGE = 480` CSS px of
+  remaining stage. `rvDockWidth()` mirrors the CSS clamp.
+- `rvForceClosed(on, reasonText)` closes without persisting, disables the
+  toggle with `reasonText` as its tooltip, and restores the prior state on
+  `false`. Built, not yet called.
+- Persisted per project as `ui.readvisor_panel` ∈ `"open" | "closed"`
+  (`project_meta._clean_panel`, default `"open"`). **`"full"` is a gesture
+  and is never persisted.** `save_ui`'s 4th argument left at `None` keeps
+  what is on disk, so the scale steppers and the panel toggle cannot
+  clobber each other.
+
+**`rv-full` does not collapse main to 0**, though the spec said it should: a
+0-width `main.content` gives the edit textarea a 0-width scroll box, and the
+mode stack requires a buried mode's buffer, scroll and dirty state to
+survive. `full` positions the panel absolutely over main instead
+(`left: var(--sb-w)`, `z-index: 60`, opaque) — pixel-identical on screen,
+main's geometry untouched.
+
+### Esc, keyboard, and selection context
+
+Esc order as implemented (extended by composure — see below):
+
+1. any open modal — owns esc itself
+2. the confirm overlay — stops esc in its own capture listener
+3. a focused composer / search / inline-edit field — **inert**
+4. an open composure menu — closes it
+5. `rv-full` — drops to docked
+6. composure peek — puts the stacked modes back
+7. the top of the mode stack
+
+**A docked panel is never closed by esc.** `_escComposerFocused()` lists
+`message`, `wiki-search`, `mm-label-input`, `ca-ingest-value`,
+`ca-prompt-input`, `comp-title`, `comp-search`. Note rung 3 outranks rung 5
+and the panel focuses the composer whenever it opens, so esc in `rv-full`
+does nothing until the caret leaves the composer — known, recorded, and the
+one-line fix (make esc in `#message` blur) is parked.
+
+`⌘/` toggles docked, `⇧⌘/` toggles full (matched on `key === '/' || '?' ||
+e.code === 'Slash'`, because several layouts report a different `key` with
+shift held). `⌘K` focuses the one composer and opens the panel on the way.
+
+**There is one form and one composer**, so a selection preamble is
+prepended **once**, in a capture-phase `submit` listener on `document` —
+capture always beats htmx's bubble-phase listener on the form, so the value
+htmx serializes already carries it and the user sees exactly what was
+attached in their own bubble. `rvPendingSelection()` returns
+`{where, text, preamble, clear}` for readedit, wikisink and composure (via
+`compPendingSelection()`, consulted both at the top when nothing is stacked
+or while peeking, **and** at the marked end — composure is the base layer,
+so the original early `return null` would have made the extension point
+unreachable). The chip is `#rv-chip`.
+
+**Behaviour change worth knowing:** the five old pills also stamped a
+*bare* context line on every message (`[wikisink article: …]`,
+`[merirmaid diagram: …]`, `[cacheawl store]`) whether or not anything was
+selected. Those did not survive, by owner decision — context stays empty
+until something is selected. Restoring one would go in the same submit
+hook.
+
+---
+
+## Composures (the `.comp` format, the one door, the canvas)
+
+0.3.5. A **composure** is a canvas document: a `.comp` file holding
+**modules** (boxes) laid out in world coordinates, each with one or more
+**pages** of rich text, plus an ink layer. A **form** is a template
+(`blank` `cards` `scaffold` `journal` `council`). The canvas is the
+project's **base layer** — it lives where `#conversation` lived, below the
+mode stack (z < 30), and it is not a stack citizen: you cannot close it,
+you peek past it.
+
+[enough/composure.py](../enough/composure.py) owns the format and the ops;
+[enough/composure_api.py](../enough/composure_api.py) is HTTP translation
+only; [enough/composure_tools.py](../enough/composure_tools.py) is the
+readvisors' door. The frontend is one CSS block and one JS block in
+index.html under `COMPOSURE` banner comments, every identifier prefixed
+`comp` / `COMP_`.
+
+### The format
+
+HTML5, complete, human-readable, and renderable by any browser with no
+enough installed — the serializer writes a generated `<style>` block for
+exactly that. It **never** contains `<script>`, event-handler attributes,
+`<iframe>`, `<object>`, `<embed>`, `<form>`, `<link>`, external `<img>`, or
+`javascript:` / `data:` URLs.
+
+```html
+<!doctype html>
+<html lang="en" data-composure="1">
+<head>
+<meta charset="utf-8">
+<title>Chapter map</title>
+<meta name="generator" content="enough 0.3.0">
+<meta name="composure:version" content="1">
+<meta name="composure:form" content="cards">
+<meta name="composure:kind" content="board">       <!-- page | board -->
+<meta name="composure:rev" content="12">
+<meta name="composure:created" content="2026-09-17T14:03:00Z">
+<meta name="composure:modified" content="2026-09-17T15:10:00Z">
+<meta name="composure:view" content='{"x":0,"y":0,"zoom":1}'>
+<meta name="composure:council" content='{…}'>      <!-- council form only -->
+<style>/* generated on every write, never parsed back */</style>
+</head>
+<body>
+<main class="comp-canvas">
+<svg class="comp-ink" xmlns="http://www.w3.org/2000/svg">
+<polyline data-id="s1" data-w="2" data-color="ink" points="10,10 14,12"/>
+</svg>
+<section class="comp-module" data-id="m1" data-type="text" data-x="0"
+         data-y="0" data-w="816" data-h="1056" data-z="1" data-bg="paper"
+         data-scale="1" data-title="" data-cur="1" style="…">
+  <div class="comp-page" data-n="1">…sanitized rich text…</div>
+</section>
+</main>
+</body>
+</html>
+```
+
+Guarantees, all pinned by `tests/test_composure.py`:
+
+- **`dumps(loads(x)) == x`** for anything `dumps` produced. Attribute order,
+  module order, number formatting and JSON key order are fixed.
+- Geometry rounds to 2 decimals on write; ink points to 1.
+- **Unknown `composure:*` meta keys and unknown `data-*` on modules and
+  pages round-trip**, capped at `MAX_EXTRA_ATTRS` = 24 each. Non-`data-*`
+  attributes (`class`, `style`, `id`) are regenerated and never preserved.
+- **`loads()` sanitizes every page as it parses.** There is no window in
+  which unsanitized markup exists in memory.
+- Every module has at least one page; a module serialized with zero pages
+  reads back with one empty page (that is how the `journal` form expresses
+  "no pages yet").
+- `data-n` is renumbered 1..N on read — a convenience for a human reading
+  the file, not an identity.
+
+World units: 1 unit = 1 CSS px at zoom 1. `FULLPORT` = 816×1056 (US Letter
+at 96 dpi), `FULLPORT_PAD` = 72, 16-unit base text, `GRID` 24 / `GUTTER` 48.
+Coordinates may be negative. Vocabulary constants all live in
+`enough.composure`: `MODULE_TYPES` (`text doc wiki weblink webframe image`),
+`BG_SWATCHES` (ten, `paper`…`clear`), `INK_COLORS`, `KINDS`,
+`REFRESH_MODES`, `SHIPPED_FORMS`, `SOURCES`, `OP_NAMES`, `COMMENT_STATES`,
+`BASE_SIZE`, and `SCALE_MIN`/`MAX`/`STEP` — **the scale ladder is anchored
+at 1.0**, not built upward from 0.5 (a ladder from the minimum misses 1.0 by
+1.4 % and every new module would save at `scale=1.0136`); use
+`scale_ladder()` for the rungs.
+
+### One door — node-level ops, exactly like girraph
+
+**Content changes ONLY through node-level ops applied by
+`composure.apply_ops()` under `composure.path_lock()`.** The canvas and the
+readvisor tools use the same op vocabulary; the server parses → mutates →
+sanitizes → serializes, and nothing a client or a model sends is ever
+written through verbatim. **Whole-file writes to `*.comp` are refused at
+both existing write doors** (`POST /api/file`, the `write_file` tool) via
+`composure.write_denial()`, whose message names the tools to use instead.
+There is deliberately **no endpoint that accepts `.comp` HTML**. Same
+reasoning as the girraph section below: a file is the source of truth, a
+small model can patch one node safely and cannot rewrite a document safely,
+and a user typing in one module while a readvisor edits another must not
+clobber each other.
+
+| op | Required | Optional | Notes |
+|---|---|---|---|
+| `add_module` | `type` | `id` `x` `y` `w` `h` `z` `bg` `scale` `title` `fullport` `near` `href` `url` `article` `install` `refresh` `speaker` `speaker_kind` `turn` `markdown`\|`rich` `pages[]` | Omit `x`/`y` → `place_module`. Omit `w`/`h` → median of same-type modules, else `BASE_SIZE × scale`. Omit `z` → max+1. `fullport: true` forces 816×1056 |
+| `update_module` | `id` | `type` `x` `y` `w` `h` `z` `cur` `bg` `scale` `title` `href` `url` `article` `install` `refresh` `cache` `speaker` `speaker_kind` `turn` | A patch: only keys present are touched. **Never** page text |
+| `remove_module` | `id` | — | Refused on a locked (council) module |
+| `set_page` | `module` `n` | `markdown` \| `rich` | Replaces the page |
+| `add_page` | `module` | `n` `markdown`\|`rich` `date` | Appends by default; renumbers; sets `cur` |
+| `remove_page` | `module` `n` | — | Refuses the last page ("remove the module instead") |
+| `file_page` | `module` `n` | `date` (default today) | The journal's one-way door |
+| `add_strokes` | `strokes[]` | — | `{id?, color, width, points}`; points as `[[x,y],…]` or an SVG points string |
+| `remove_strokes` | `ids[]` | — | Silent about ids already gone |
+| `replace_strokes` | — | `remove[]` `add[]` | The eraser's split, atomic |
+| `set_meta` | — | `title` `kind` `view` | Nothing else — `form` and `council` are **not** settable here |
+| `arrange` | `ids[]` | `mode` (`grid`\|`column`) `pack` `x` `y` `gutter` `cols` | The order of `ids` is the resulting reading order. `pack` (column only) stacks each module under the previous using its **own** height |
+| `set_council` | `council` | — | **Refused for every source but `"council"`** — see "Councils" |
+
+`markdown` and `rich` are mutually exclusive; sending both is refused.
+`rich` is sanitized, `markdown` is converted and then sanitized. A batch is
+**atomic**: the whole batch is validated and applied against a copy, then
+written tmp+rename, so a failing op leaves the file byte-identical.
+
+Caps (`composure.CAPS`, returned in the model so the frontend can draw
+gauges): **200 modules**, **500 pages per module**, **400 KB per page**
+(`MAX_PAGE_CHARS`), **5 000 strokes**, **2 000 points per stroke**, **8 MB
+per file**, rich-text nesting depth 32, title 200 chars. Internal ceilings
+you will meet if you feed it something hostile: `MAX_RICH_INPUT_CHARS`
+2 000 000 (what the sanitizer will even look at) and `MAX_TAGS_PER_PAGE`
+20 000 (the nested-formatting-bomb ceiling).
+
+Every refusal is a `ComposureError` whose message is written to be read —
+the API turns it into a 400 `detail`, the tools return it as the tool body,
+and the frontend surfaces it verbatim in `#comp-notice`. Unknown names list
+the allowed set; `no module 'mX' on this composure` lists the ids.
+
+### The JSON document model
+
+`composure.model(comp)` is the contract the canvas renders from — returned
+under `model` by `GET /api/composure`, and by an ops reply when `stale` is
+true or `want_model` was set. Top level: `version title form kind rev
+created modified view council bounds modules strokes meta warnings caps`.
+One module carries `id type known_type x y w h z bg known_bg scale title
+cur fields speaker speaker_kind turn locked page_count pages data`; one
+page carries `n rich first_line chars date filed locked data`.
+
+Three fields decide behaviour:
+
+- **`known_type` / `known_bg` false** mean a *newer* enough wrote something
+  this one does not understand. Render as a text card / paper and **do not
+  normalize the value** — round-tripping it is the promise.
+- **`module.locked`** is `bool(speaker)`: a council statement, whose text
+  the engine owns. **`page.locked` == `page.filed`**: a filed journal page,
+  permanently read-only. Both still accept moves, restyles and comments.
+- **`modules` is in FILE order, never z order.** `z` is a field;
+  bring-forward / send-back is an `update_module` with a new `z`.
+
+### Endpoints
+
+All project-mode (home 404s them via `ModeGate`). Every `path` goes through
+`create_app`'s `_resolve_project_path`, so `cacheawl:` works and traversal
+is a 400; a path that does not end in `.comp` is a 400 that says so.
+
+| Route | Method | Notes |
+|---|---|---|
+| `/api/composure?path=` | GET | `{path, rev, model}`. **Side effect:** stamps `rness/project.json`'s `composure.last`. That is the *only* place `last` is written |
+| `/api/composure/ops` | POST | **The single write door.** `{path, base_rev?, source, create?, form?, title?, want_model?, ops[]}` → `{path, rev, changed[], stale, stale_changed, created, model?}` |
+| `/api/composure/new` | POST | Describes a composure **without writing it**: `{path: null, pending_path, form, title, rev: 0, model}` |
+| `/api/composure/list` | GET | `{composures: [...]}`, newest first |
+| `/api/composure/forms` | GET | Shipped first, then `rness/composure-forms/`; a project form with a shipped name **wins** and is listed once with `origin: "project"` |
+| `/api/composure/save-as-form` | POST | `{path, name}` → `{form, path, forms}` |
+| `/api/composure/rename` | POST | Retitles, renames the file to match, and **carries the comments sidecar**; `keep_filename: true` retitles only; 409 on a collision |
+| `/api/composure/link-preview` | GET | `?path=&module=` — per type; **never raises** for a missing target, answers `{ok: false, detail}` |
+| `/api/composure/webframe/refresh` | POST | Goes through `tools.fetch_and_cache` — the **same** gated pipeline as `fetch_url` — then writes `data-cache` and page 1 through ordinary ops with `source: "enough"`. A broker refusal comes back `200 {ok: false, denied: true, detail}` with the denial text verbatim |
+| `/api/composure/comments` | GET/POST/PATCH/DELETE | Mirrors `/api/wiki/comments*`. Deleting the last comment removes the sidecar rather than leaving `{"comments": []}` |
+| `/api/composure/launch` | GET | Resolved against what is actually on disk: `{launch, path, form, notice}` |
+| `/api/project/composure` | POST | `{launch: "blank"\|"last"\|"file"\|"form", path?, form?}`. **`last` is never accepted here** — it is stamped by opening a composure |
+
+**A stale `base_rev` is not an error.** Ops are last-writer-wins per module,
+so the batch still lands; the reply says what moved underneath you in
+`stale_changed` (`[]` when fresh, `null` when the history window no longer
+covers `base_rev` — then refresh everything).
+
+### The `composure` SSE event
+
+```jsonc
+// event: composure
+{"path": "rness/io/composure/board.comp", "rev": 12,
+ "changed": ["m4f2a91c", "ink"],        // "ink" = the stroke layer moved
+ "source": "ui" | "readvisor" | "council" | "enough",
+ "created": false}
+```
+
+Fired after **every** applied batch — from the API router, and from the
+readvisor tools via `ToolResult.side_effects` fanned out by
+`server._handle_tool`.
+
+### The canvas
+
+Three coordinate spaces, and this is the part to hold in your head before
+touching any positioning code:
+
+```
+TOP-LEVEL px   what clientX/clientY and getBoundingClientRect() speak,
+               because `body { zoom: var(--uiz) }` sits above them
+STAGE px       viewport-local, inside the zoomed body — what clientWidth and
+               style.left/top speak.  stage = (top-level − viewportRect) / UIZ()
+WORLD units    the format's own units, 1 unit = 1 CSS px at Z = 1
+               stage = (world − origin) × Z
+```
+
+`compEventToStage(ev)` is where the `/ UIZ()` happens; `compEventToWorld`,
+`compStageToWorld` / `compWorldToStage`, `compZ()`, `compOrigin(Z)` and
+`compApplyView(eased)` are the rest of the set. **Composure ignores
+`--txz`**, like the diagram canvases. Screen-constant chrome uses two
+mechanisms on purpose: *inside* the world, anything that must stay one size
+divides by `var(--comp-z)` (borders, radii, shadows); *outside* the world,
+`#comp-overlay` is screen space and needs no counter-scaling at all (resize
+handles, marquee, refresh flash).
+
+`compPanelFactor()` reads `data-rv` on `<html>` and `sidebar-collapsed` on
+`#layout` — **not measured widths**, because the grid is still animating
+when it is asked. `compClampZ` applies the hard 0.05–8 range and then the
+page-fit rule for `kind=page` while `!COMP.zoomed`, computed at read time
+rather than written into `userZoom` so it cannot ratchet down as panels come
+and go.
+
+**Saving is ops, not a save button.** `compQueue(op, key)` coalesces by key
+(`geo:<id>`, `bg:<id>`, `z:<id>`, `scale:<id>`, `cur:<id>`,
+`page:<id>:<n>`, `meta:view`), so a five-second drag produces exactly one
+`update_module`. Flush points: a 1.2 s debounce, leaving the caret, a tool
+or face change, **before any chat send**, and `pagehide`/`beforeunload` via
+`sendBeacon` (Starlette's `request.json()` parses the body regardless of
+content type, so no backend accommodation was needed). Undo is a client
+op-inverse stack capped at 100 — the server never learns anything special
+happened.
+
+**Lazy create.** `POST /api/composure/new` writes nothing; the client
+carries `pending_path` and puts `create: true` + `form` + `title` on the
+first op batch. A composure the user opens and never touches writes no
+file. After a create the client fires one throwaway
+`GET /api/composure?path=` purely to stamp `composure.last`.
+
+Three registries are the extension points, and **P4c-2 / the council UI
+plug into them** without touching anything else:
+
+```js
+COMP_MODULE_RENDERERS   type  -> function (module, page, hostEl)
+COMP_TOOLS              tool  -> {edit: true}
+COMP_FORM_BEHAVIORS     form  -> function ({fresh})
+```
+
+**Landing in P4c-2 / the council UI** (seams exist, drawn and disabled
+today): the pencil and eraser (`COMP_TOOLS` entries + dropping `disabled`
+from `#comp-tool-pencil` / `#comp-tool-eraser`; the stroke layer already
+renders read-only), the five **link-in module renderers** (`doc` `wiki`
+`weblink` `webframe` `image` — until one exists the type falls through to
+`compRenderPlaceholder`), **comments** (`#comp-insp-slot`,
+`#comp-comments-btn`), **search** (`#comp-search`), the **journal's** filing
+behaviour, and the **council setup card**
+(`COMP_FORM_BEHAVIORS.journal` / `.council` both carry a `TODO` naming their
+phase; `_default` handles any form with no entry, including project forms).
+The backend contracts for all of them are final and documented above.
+
+The base layer also owns the **peek**: `html[data-comp-peek="1"]` hides the
+nine stacked mode roots so the canvas shows through, and Esc restores them
+before it starts popping the stack. `_modeRender()` appends a permanent
+base square to `#mode-stack`, rightmost, **with no exit ribbon** (see "What
+NOT to touch").
+
+---
+
+## Councils (the engine, the budget, the lean profile)
+
+A **council** is the multi-readvisor composure form: several readvisors and
+the user speak in turn on one canvas, each statement a locked module, and
+the whole thing concludes into an answer, a document, or (0.4.0) a new
+composure. [enough/council.py](../enough/council.py) is the engine,
+[enough/council_api.py](../enough/council_api.py) the HTTP translation.
+**The council UI is landing with the council setup card** — the backend
+contract below is final.
+
+### The file is the state
+
+One JSON object in `<meta name="composure:council">`. It **is** the state
+machine; there is no council state anywhere else, in memory or otherwise.
+`council.validate_meta()` normalizes it and **drops unknown keys on
+purpose** — a key nobody validates is a key that will one day contradict one
+that is. `Council` holds a path and three handles and nothing else, so two
+instances over the same path behave identically. That is the whole of "a
+restart mid-council loses nothing", and it is why `_RUNS`, `_IN_FLIGHT` and
+`_LOCKS` are runtime-only and `reset_runtime()` is safe.
+
+Keys: `input parameters constraints output participants order max_rounds
+status round turn cursor next queue brief_module transcript reconvene`.
+`status` ∈ `setup | ready | running | paused | concluded`; `order` is
+`round-robin`, the only one. Participant kinds are `chief`, `readvisor`,
+`user` and **`pal`** — `pal` is reserved for 0.4.0: it validates,
+round-trips, and is **ignored everywhere else** (never speaks, never enters
+the rotation, never counts toward the budget). `charge` and `reconvene` are
+likewise 0.4.0 hooks that validate and round-trip **now**, and `charge` is
+already injected into that participant's identity, so a council saved by a
+later enough behaves correctly here instead of silently dropping somebody's
+accountability.
+
+Refusals are `CouncilError` → 400 with the sentence verbatim: unknown
+status / kind / output kind / order; `max_rounds` outside 1–`MAX_ROUNDS_CAP`
+(20); more than `MAX_PARTICIPANTS` (12); a participant with no name;
+duplicate ids; **two participants with the same name** (statements are
+attributed by name); more than one chief; nobody who can speak; a `document`
+output with no path or with a `.comp` path.
+
+**Tints** are assigned once at setup and **stored on the participant**, so a
+readvisor keeps its colour for the life of the council even when another is
+added later: chief `paper`, user `blue`, readvisors
+`yellow → green → pink → lilac → orange` cycling in participant order, pal
+`gray`, the conclusion `ink`.
+
+### The rotation
+
+`speakers(meta)` is the chief plus the readvisors, in list order — the user
+writes its own statements and the pal is reserved, so neither is in the
+rotation. A round closes when the cursor wraps to 0, so `/round` means
+**finish the current round**.
+
+**A queued user statement takes the next slot**, and committing it does
+**not** move the cursor — so after the user speaks, the participant whose
+turn it was still speaks next. That is what makes "say something at any
+time" an interjection rather than a reshuffle.
+
+`ready` is runnable: pressing *next turn* on a freshly set-up council speaks
+rather than lecturing. Only `setup` (a meta written by hand) and
+`concluded` (terminal) refuse.
+
+### The budget, and the lean profile
+
+```
+n_ctx  = supervisor.current_ctx → llama-server /props → 8192
+         (cloud slot: CTX_CLOUD = 32768, a documented constant)
+share  = max(512, floor(n_ctx / N))          N = speaking participants
+fold when   estimate(messages) > FOLD_AT (0.80) × share
+estimate    len(content) // 3                (server.py's own ratio)
+```
+
+`CTX_CLOUD = 32768` because the OpenRouter slot has no `/props` and its
+models range from 8K to a million: 32 768 is at or under every model the
+slot ships a preset for, so a council that fits here fits everywhere, and
+being wrong costs a fold that was not needed rather than a hard overflow
+mid-turn. The `/props` probe is cached for 60 s (a model switch relaunches
+llama-server with a new window).
+
+**The fold is mechanical** — no second LLM call, because a council that
+spends a completion summarizing itself pays twice for the same window.
+While the estimate is over budget, one more of the oldest statements moves
+into a single `user` message (`Earlier in this council: - Name (turn n):
+<first sentence>`). **The brief is pinned and never folds, and the most
+recent statement is never folded** — a participant that cannot see the thing
+it is answering has nothing to say. `MIN_TRANSCRIPT_TOKENS = 1024` is the
+floor: once the transcript is down to about two statements the fold stops
+even if the total is still over budget, because at that point the *head* is
+what is over budget and the head is not foldable. The honest answer there is
+a bigger `n_ctx`, and every turn says so on the SSE `end` phase
+(`folded`, `tokens`, `head`, `budget`).
+
+**`assemble_system_prompt(project_dir, readvisors="none", profile="council")`
+emits who the chief is and nothing else**: the identity preface, Identity,
+Motivation, the project description, and the project profile when it is not
+the stock template. It omits Active Readvisors, the paradigm and paradigm
+catalog, all policies, skills, Current Intention, the tool instructions, the
+converted-documents section, the harness context and the drift notice.
+
+That is not thrift, it is correctness: **a council turn calls no tools,
+reads no files, switches no paradigm and files no request.** Every omitted
+section is instruction for something that cannot happen in the room. The
+chief's head went from the whole chat prompt (~21 000 tokens — *larger than
+its entire share* at `n_ctx = 32768` with two speakers, so every council
+folded to the floor on its third statement) to ~2 400. A readvisor
+participant's head is ~575, because its identity has always been just its
+own two documents. `profile` defaults to `"chat"`, byte-identical to what
+`assemble_system_prompt` has always returned, and `readvisors=` still works
+independently.
+
+### Message lists, and cleaning what a model emits
+
+Built **from the transcript in the `.comp`, every turn, from scratch** — a
+new `Council` over the same path produces byte-identical message lists. The
+perspective flips per participant: **my** statements are `assistant` turns,
+everyone else's are `user` turns prefixed `Name: `, so a model reads a
+conversation it has been part of rather than a transcript it is being asked
+to comment on.
+
+Identities: chief = the lean profile + `chief_framing(chief)`; readvisor =
+`readvisor_identity(project_dir, folder)` + the project description +
+`readvisor_framing(name, chief)`. **`folder` is why participants carry it** —
+a readvisor whose `AGENT.md` has a prettier H1 than its directory name would
+otherwise be looked up by display name and find nothing. A participant whose
+folder is missing gets an honest one-paragraph stand-in rather than an empty
+prompt. Neither path contains a `<tool name=` example or a `# Tools`
+section, and `tests/test_prompt_weight.py` pins that.
+
+`strip_tool_calls()` removes complete `<tool …>…</tool>` blocks **and** a
+dangling `<tool …>` at the end of a truncated stream, and logs how many —
+stripping rather than refusing, because the statement around the call is
+usually fine and a council that dies because one participant typed XML is
+worse than a council with one thin statement. `clean_statement()` also drops
+a self-signature (`Ed: …` from Ed) — the card already carries the name.
+
+### Transcript IO
+
+Every statement lands through `composure.apply_ops(..., source="council")`.
+One batch, two ops, one rev, one SSE:
+
+1. `add_module` — `type: text`, `w: 816` (fullport width, so a council reads
+   as minutes rather than a board), `h` from `composure.estimate_height`,
+   `bg` = the speaker's tint, `title` = `"<name> · turn <n>"`, plus
+   `speaker` / `speaker_kind` / `turn`. **Setting `speaker` is what makes
+   the module `locked`.**
+2. `arrange` — `mode: "column"`, **`pack: true`**, over
+   `[brief, …every statement…, the new one]`, anchored at the brief's own
+   `x`/`y`. So the transcript is a single column top to bottom however the
+   user has been dragging things around, and it re-tidies after a restart.
+
+**The frontend corrects a statement's height with an ordinary
+`update_module` geometry op from `source: "ui"`, and nothing special was
+needed to allow it.** The council lock (`_check_writable`) is only on the
+*content* ops — `set_page`, `add_page`, `remove_page`, `remove_module` — so
+`update_module` already accepted geometry, background, scale, title and z on
+a locked module. That is the promise: *you can move it, restyle it and
+comment on it, but not rewrite it.* One hole was closed to make it safe —
+see the `update_module` trap under "What NOT to touch".
+
+`composure.estimate_height(text, width, scale=, pad=, title=)` is the
+server's guess: wrap each paragraph at `(width − 2·pad) / (16·scale·0.5)`
+chars, blank line between paragraphs, ×1.5 line box, add the static sheet's
+padding (72 for a fullport-width module, 16 otherwise), clamp to 120–2400,
+round **up** to the 24-unit grid. Deliberately generous — a box slightly too
+tall reads as a margin, one slightly too short reads as a bug. Deterministic
+and monotone, and `from_outline` uses the same function, so a card and a
+statement are wrong in the same direction by the same amount.
+
+### Endpoints
+
+| Route | Method | Notes |
+|---|---|---|
+| `/api/council/setup` | POST | Creates the composure from the `council` form when the path does not exist, **in the same atomic batch as the meta** — a refused setup writes nothing at all. 409 when the output document exists and `overwrite` was not sent, or when already concluded |
+| `/api/council/state?path=` | GET | The same body `/setup` returns. Cheap — reads the file and at most the cached `/props` probe, assembles no prompt, **safe to poll** |
+| `/api/council/participants` | GET | The setup card's starting checklist: the chief, every **enabled** readvisor (display name from its `AGENT.md` H1, `folder` for the engine), and the user, tints already assigned |
+| `/api/council/convene` · `/pause` | POST | `pause` cancels a background `/run`; **the turn already streaming finishes and is committed** — a half-written statement thrown away is a worse surprise than one extra paragraph |
+| `/api/council/next` · `/round` · `/run` | POST | one turn · to the end of the round · a background task to `max_rounds` (returns at once, reports over SSE). 409 when this council is already running |
+| `/api/council/say` | POST | Always queued first, then drained immediately when no turn is streaming. So the common case is "it appears now", the racy one is "it appears next", and neither is "it is lost" |
+| `/api/council/conclude` | POST | One chief turn under `conclusion_framing`, committed tinted **`ink`**. Then: `answer` → that module *is* the output; `document` → written through **`tools.run_write_file`**, the same door and guards as the tool, then a `doc` link-in module under the conclusion; `composure` → **501 before the turn runs**, so nothing is spent and the council stays runnable |
+
+Setting a council meta on an existing non-council composure is allowed; its
+`form` stays whatever it was, and **the frontend keys off `council` being
+non-null, not off `form == "council"`**.
+
+### The `council` SSE event, and the exclusions
+
+```jsonc
+// event: council
+{"path": "…", "phase": "start"|"token"|"end"|"error"|"status",
+ "turn": 3, "speaker": "Nadia", "speaker_kind": "readvisor",
+ "text": "…",                                        // token | end | error
+ "module": "m5", "rev": 7,                            // end
+ "folded": 2, "tokens": 15012, "head": 14180, "budget": 13107,  // end
+ "status": "running", "round": 1, "next": "chief", "next_name": "Ed"}
+```
+
+Every committed batch **also** fires the ordinary `composure` event with
+`source: "council"`, so the canvas refreshes the new module exactly the way
+it refreshes any other batch. The `council` channel is for the streaming
+text and the controls; the `composure` channel is for the document.
+
+- **A council turn holds `session.generation_lock`** for the whole streamed
+  completion, so an ordinary chat turn cannot overlap it.
+- **`/api/chat` while a council turn streams** refuses politely — see step 0
+  of "The request lifecycle".
+- **A council control while a chat turn streams** is 409 ("your readvisor is
+  answering in the chat right now — councils and the chat share one
+  model…"). `/say` and `/state` are exempt: queueing a statement and reading
+  state cost no model time. A second council control while a council turn
+  streams is also 409, and turns on one path are additionally serialized by
+  a per-path `asyncio.Lock`.
+- **The auto-reset / context-pressure machinery never sees council
+  traffic.** It reads `session.history` and `session.last_usage`; council
+  turns touch neither.
+
+Transcripts export to `rness/knowledge/councils/<YYYY-MM-DD>-<slug>.md`,
+never overwriting (a second export the same day gets `-2`).
+
+### `composure_from_outline` and the `scaffold` skill
+
+Small local models are unreliable at long chains of module tool calls — ask
+for fourteen cards and you get nine, two in the wrong group and one a
+duplicate. Ask for one markdown outline and they do fine. So structure is
+produced as markdown, in one shot, and converted **deterministically**: ids
+are `m1…mN` in creation order and every coordinate is a function of the
+text, so the same outline always produces the same document.
+
+```
+# The title of the composure        one line, the title
+## A group                          a column (scaffold) or a row (cards)
+### A card                          a card; the text beneath it is its body
+- A top-level list item             also a card; indented lines are its body
+### [gap: what is missing?]         tinted orange, titled "gap"
+```
+
+`####` and deeper, tables, nested list items and front matter are **not**
+structure — they stay in the body as the text they are. A `###` before any
+`##` opens an implicit group named `Cards`. Text before the first card is
+preamble and is dropped. A gap card keeps its bracketed question as the
+**first line of its body** — losing the question would make the most useful
+card on the canvas the only blank one.
+
+The grammar is exactly what `defaults/skills/scaffold/SKILL.md` teaches, and
+**the skill's two worked examples in `references/structure.md` are lifted at
+test time and used as fixtures**, so the skill cannot drift away from the
+parser without `tests/test_composure_outline.py` going red. Layout
+constants (`CARD_W` 320, `HEADER_H` 96, `CARD_GAP` 24, `COL_GAP` 48,
+`BAND_GAP` 72, `MAX_CARDS_PER_COLUMN` 12, `CARD_H_MAX` 600) live in
+`composure.py`; a `scaffold` puts `premise`/`logline`/`thesis` in a top band
+and `ending(s)`/`denouement(s)`/`resolution(s)`/`close` in a bottom row, and
+wraps a group over 12 cards into a continuation column with its own
+`<name> (cont.)` header.
+
+**The form supplies the kind and the styling, not its placeholder modules** —
+every shipped form ships content, and `from_outline` removes it in the same
+atomic batch, because a scaffold of somebody's actual story should not
+arrive with "Act one goes here" still sitting on it.
+
+```python
+composure.parse_outline(markdown) -> OutlineDoc              # pure parse
+composure.outline_ops(doc, form, clear_ids=[]) -> list[dict] # the op batch
+composure.from_outline(title, form, markdown) -> Composure   # both, in memory
+```
+
+`from_outline` is the pure half — a `Composure` you can render, diff or
+assert about, with no file and no project. The tool applies the same
+`outline_ops` through `apply_ops`, so the write goes through the one door
+like everything else.
 
 ---
 
@@ -635,7 +1558,8 @@ q1 >
   cross-edge (repeatable; ASCII canonical, `[→ id]` accepted),
   `ref:<path>` transclusion (project-root-relative; markdown doc or
   another `.girraph` — same mechanism, that's the recursion),
-  `by:<slug>` attribution (`user`, `agent`, or a role name).
+  `by:<slug>` attribution (`user`, `agent` — the on-disk literal, unchanged
+  because it is data — or a readvisor name).
   Canonical order: `id sigil label < parent [-> x] ref:… by:…`. A label
   *ending* in modifier-shaped text will be misparsed as metadata —
   known plain-text tradeoff; tools always serialize canonically.
@@ -658,11 +1582,11 @@ q1 >
 Architecture notes:
 
 - **`enough/girraph.py` owns the format.** Nothing else parses or
-  writes `.girraph` content. The agent's five tools (`tools.py`) and
+  writes `.girraph` content. The readvisors' five tools (`tools.py`) and
   the UI's `/api/girraph*` endpoints (`server.py`) both call its
   node-level ops under `girraph.path_lock()` — that's the concurrency
   story (last-write-wins at node granularity) for simultaneous
-  user-panel and agent edits.
+  user-panel and readvisor edits.
 - **Whole-file writes are denied** for `.girraph` paths in both
   `run_write_file` and `POST /api/file`. Files remain the source of
   truth (a text editor outside the harness can still edit them);
@@ -718,7 +1642,7 @@ A `.merirmaid` file is a Mermaid diagram with a small frontmatter header,
 rendered to SVG live in the browser by a **vendored** (local, no CDN)
 `enough/static/mermaid.min.js` (v11.16.0, MIT — shipped like
 `htmx.min.js`). The paradigm-shift from girraph: there is no owning
-Python module for the *format* — the source is plain text the agent
+Python module for the *format* — the source is plain text a readvisor
 writes with `write_file` and the frontend renders. The backend code that
 touches `.merirmaid` content is the cachebox mirror generator in
 `cacheawl.py` and the girraph-mirror generator in `girraph.py`.
@@ -744,7 +1668,7 @@ source, any diagram type. Diagrams link via Mermaid `click` interactions
 with a relative path (`click A "other.merirmaid"`); targets may be
 `.merirmaid`, `.girraph`, or `.md` — the viewer intercepts and pushes
 onto its breadcrumb stack. `node-char-limit` is soft: the in-node editor
-shows a live count and warns past it but doesn't block; agent-authored
+shows a live count and warns past it but doesn't block; readvisor-authored
 diagrams should stay well under it (leave room for user edits).
 
 Architecture notes:
@@ -752,7 +1676,8 @@ Architecture notes:
 - **Two modalities, in the frontmatter.** `modality: wip` is a working
   whiteboard — node *label* text is user-editable in merirmaid mode (with a
   live char count vs the soft `node-char-limit`); structure edits are
-  agent-only, via the chat pill. `modality: mirror` is a source-of-truth
+  readvisor-only, asked for in the readvisor panel (the per-mode chat pills
+  are gone — see "The readvisor panel"). `modality: mirror` is a source-of-truth
   diagram of some external structure (the launch case: a cachebox's
   contents) — **read-only** in the UI, regenerated only by the system that
   owns the mirrored structure.
@@ -791,7 +1716,7 @@ Architecture notes:
 
 The 🚰 subsystem: a Kiwix `.zim` archive of (a slice of) English
 Wikipedia, read in place via `libzim`, browsable in-app, searchable and
-readable by the agent, annotatable with comments, and refreshable
+readable by the readvisors, annotatable with comments, and refreshable
 against live Wikipedia. User-facing doc: [docs/WIKISINK.md](WIKISINK.md).
 All code lives in the [enough/wikisink/](../enough/wikisink/) package;
 `server.py` mounts the `/api/wiki/*` endpoints and hides wikisink dirs
@@ -840,9 +1765,9 @@ Architecture notes:
   compat shim for provenance strings.
 - **Switching installs is deliberately UI-only** (like deletion
   overrides): `POST /api/wiki/installs/activate`, driven from the
-  installs manager in the 🚰 modal. The agent's `wiki_status` reports
-  install availability and tells the agent to *suggest* the modal —
-  there is intentionally no agent tool for switching, forgetting, or
+  installs manager in the 🚰 modal. The `wiki_status` tool reports
+  install availability and tells the readvisor to *suggest* the modal —
+  there is intentionally no readvisor tool for switching, forgetting, or
   overriding.
 - **`/api/wiki/*` endpoint map**: `status` (installs + availability +
   counts; must stay instant — no network), `article`, `search`,
@@ -880,8 +1805,8 @@ Architecture notes:
   During the download the badge is the progress readout off the existing
   **`wiki_download`** event — note `wiki_sink` is the update-*run* event, not
   the download one — and hides on `done`. It stays silent for a first-ever
-  archive download. There is deliberately **no agent tool** that swaps a base
-  archive; the agent's `wikisink` run only *reports* that a newer snapshot
+  archive download. There is deliberately **no readvisor tool** that swaps a base
+  archive; the `wikisink` run only *reports* that a newer snapshot
   exists (same rule as install switching and deletion overrides).
 - **Save targets, two of them.** A save goes either to the project
   (`<project>/wiki/<slug>/`) or to the machine-global wiki cachebox
@@ -898,7 +1823,7 @@ Architecture notes:
   via `GET /api/wiki/saved`, so saved articles render identically to
   live browsing. Don't convert saves to markdown — that loses complex
   tables and invites hand-edits that drift from the archive. Markdown
-  exists only as the agent-facing text pipeline
+  exists only as the readvisor-facing text pipeline
   (`save.article_markdown()`, used by `read_wiki_article`'s cache).
 - **The reader caches one `Archive` handle** (`zim.py` module singleton
   under a lock). It is dropped whenever the file goes missing and on
@@ -959,7 +1884,7 @@ article then expands crosslinks `depth` layers.
   `.cachebox.json` is hidden metadata (origin, status, timestamps, a tree
   fingerprint used by reconcile). `_cachebox.merirmaid` is an
   auto-generated `modality: mirror` diagram of the box, regenerated on every
-  backend mutation. **Both the agent's `write_file` and `POST /api/file`
+  backend mutation. **Both the readvisors' `write_file` and `POST /api/file`
   refuse to modify them** — the mirror via `mirror_write_denial()` (`403` /
   tool error telling the caller to change the box contents instead), the
   `.cachebox.json` by name. Don't add a code path that writes them from
@@ -1001,7 +1926,7 @@ article then expands crosslinks `depth` layers.
 - **The UI** is a full-frame split-view mode (`#cacheawl-mode` in
   index.html): a project pane and a cachebox pane, drag-to-copy /
   shift-drag-to-move (both mapping to `transfer`), an ingest bar that
-  composes an agent chat request, and per-file open into the natural mode
+  composes a chat request into the readvisor panel, and per-file open into the natural mode
   via the `cacheawl:` scheme. Ingest progress is **polled**
   (`ingest-status`), not streamed, in v1.
 
@@ -1536,7 +2461,7 @@ frontend owns the default.
 
 All of it lives in [enough/skillaudit.py](../enough/skillaudit.py) (0.2.2).
 `prompt.set_skill_enabled()` stays a dumb `.disabled` writer; the guarded
-door is `skillaudit.set_skill_enabled_guarded()`. There is **no agent tool
+door is `skillaudit.set_skill_enabled_guarded()`. There is **no readvisor tool
 for skill toggling** — `tools.py` has no skill path — so the HTTP endpoint
 is the only door, and the choke point is complete.
 
@@ -1552,8 +2477,8 @@ project's links point at whichever install created them, so before it the
 the CLI had made. A look-alike path with no `enough/__init__.py` beside it
 is not an install; a link to a file or folder *inside* a sibling's shipped
 skill is not a shipped skill. Real directories and symlinks pointing
-anywhere else are untrusted — including a `SKILL.md` the agent wrote
-itself, which is intended (the agent audits its own output). Both the
+anywhere else are untrusted — including a `SKILL.md` a readvisor wrote
+itself, which is intended (the readvisors audit their own output). Both the
 folder (`<name>/`) and flat (`<name>.md`) layouts are handled.
 
 **Fingerprint** — `fingerprint(target)` is sha256 over, for every regular
@@ -1596,7 +2521,7 @@ floor for *code* payloads (py/sh/js) plus a light markdown-injection check
 prose *intent* is judged by the LLM pass — so a `CLEAN` scan means "no
 payload shape matched", not "safe", and the scanner is never the safety net
 on its own. (2) `run_llm_audit()` — a dedicated server-side runner, *not* a
-synthetic agent turn: it assembles analyzer's `references/audit.md`
+synthetic readvisor turn: it assembles analyzer's `references/audit.md`
 (+ `audit-threat-model.md` when present; `LEGACY_REFS` for pre-merge
 installs) plus the skill's own files (`MAX_PROMPT_CHARS` 24k,
 `MAX_FILE_CHARS` 6k) and makes ONE non-streaming completion call — local
@@ -1689,7 +2614,8 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   either side) — one `## <id>` section per bubble, with
   `name:` / `path:` lines under the heading and `### what` / `### how` /
   `### ideas` bodies (inline HTML allowed; rendered through the existing
-  `renderMarkdown()`). The tokens `{{skills-list}}` / `{{roles-list}}` /
+  `renderMarkdown()`). The tokens `{{skills-list}}` / `{{roles-list}}`
+  (the token name is unchanged; it expands the **readvisors**) /
   `{{paradigms-list}}` expand client-side into the *actually installed*
   set via `GET /api/help/defaults` (name + description from frontmatter),
   and `{{convert-formats}}` into the file-type table via
@@ -1739,8 +2665,9 @@ Mechanism, all CSS custom properties on `<html>`:
   document surfaces** only (one selector list next to the body rule:
   review/ref `.review-body`, `#edit-mode .edit-textarea`, `#wiki-body`,
   `#preview-body`). Extending text scale to a new surface = adding one
-  selector there. Chat, sidebar, modals, girraph/merirmaid canvases
-  follow `--uiz` alone, on purpose (diagram layout would distort).
+  selector there. The readvisor panel, sidebar, modals and the
+  girraph/merirmaid/**composure** canvases follow `--uiz` alone, on
+  purpose (diagram and canvas layout would distort).
 
 Step limits live in `uiScaleLimits()` — resolution-aware (≥640 real px
 of layout, legibility floor looser on retina, text max tightens as ui
@@ -1760,7 +2687,11 @@ by the effective zoom: `UIZ()` for chrome (context menus, the
 highlight/footnote popups, `#mm-label-editor`, `#wiki-sel-popup`), and
 `UIZ() * TXZ()` inside a `--txz` surface (footnote cards, linenav
 marks). Never mix a rect with `clientHeight` (rect height instead), and
-never assign a raw `clientX` to a positioned element's style. Same
+never assign a raw `clientX` to a positioned element's style. The
+composure canvas adds a third space on top of this — see its own
+section; `compEventToStage()` is the one place its `/ UIZ()` happens,
+and `--rv-dock-w`'s `calc(27vw / var(--uiz, 1))` is the same rule in
+CSS. Same
 deal in CSS for viewport units: every `vh/vw/vmin` length divides by
 `var(--uiz, 1)` (grep `/ var(--uiz` for the pattern) so real-viewport
 fits keep fitting.
@@ -1769,8 +2700,8 @@ fits keep fitting.
 
 ## UI languages (i18n, 0.3.0)
 
-Chrome + help content ship in en/fr/es/de/zh/ja; everything the agent
-reads or writes stays English on purpose. **docs/I18N.md is the process
+Chrome + help content ship in en/fr/es/de/zh/ja; everything the readvisors
+read or write stays English on purpose. **docs/I18N.md is the process
 doc — read it before touching any translated surface or any English
 string that has a `data-i18n*` key.** The short version:
 
@@ -1801,7 +2732,7 @@ string that has a `data-i18n*` key.** The short version:
    `assets/` subfolders.
 2. `description:` **must be a single line.** `prompt._parse_paradigm_frontmatter`
    splits on the first `:`, so a YAML folded block (`description: >`)
-   silently degrades to the string `">"` and the agent never learns when to
+   silently degrades to the string `">"` and the readvisor never learns when to
    engage the skill. `tests/test_skills_defaults.py` rejects it explicitly.
    Same file pins the other two conventions: frontmatter `name:` must equal
    the directory name, and `enough-tooltip-text:` must be present and be the
@@ -1818,7 +2749,7 @@ string that has a `data-i18n*` key.** The short version:
 
 A skill added under `defaults/skills/` is **trusted** (it's a symlink into
 an enough install — this one or a sibling) and never audited. A skill created anywhere else — dropped
-into a project's `rness/skills/` by hand, or written there by the agent
+into a project's `rness/skills/` by hand, or written there by a readvisor
 under the workflow-design paradigm — is **untrusted**: it is quarantined off
 on the next sync and gets a first-use audit the first time it's toggled on.
 See "Skill trust and the first-use audit". Don't work around that by
@@ -1831,18 +2762,126 @@ asked for a project-local one; the audit is the feature.
    `description`).
 2. Optionally update [defaults/paradigms/default.md](../defaults/paradigms/default.md)
    to mention the new paradigm under "Canonical examples worth flagging
-   proactively" (the `default` paradigm's prompt tells the agent when
+   proactively" (the `default` paradigm's prompt tells the readvisor when
    to switch).
 3. Document the activation rule in the paradigm itself — when to switch
    in, when to switch out, what skill (if any) it pairs with.
 4. No code changes; paradigm catalog is read from `rness/paradigms/`
    directly.
 
-### Add a new role
+### Add a new readvisor
 
-1. Create `defaults/roles/<name>/AGENT.md` and `MOTIVATION.md`.
-2. `skeleton.py` symlinks the directory on next launch / update.
-3. User toggles in the sidebar.
+Three places it can live, and the choice is the interesting part — see
+"Readvisors" for the ranks.
+
+**By hand, shipped with enough** (a readvisor everybody gets):
+
+1. Create `defaults/readvisors/<name>/AGENT.md` and `MOTIVATION.md`.
+   `AGENT.md` needs a `# <Display Name>` H1 (that is what the sidebar and
+   a council's participant list show) and a trailing `enough-tooltip-text:`
+   line.
+2. Match the shape the `readvisory` skill's templates define —
+   `defaults/skills/readvisory/assets/{AGENT.md,MOTIVATION.md}.template`.
+   `prompt.readvisor_shape()` reads them **at call time**, and
+   `tests/test_readvisors_defaults.py` runs it over every shipped
+   readvisor, so a new one has to conform or the suite goes red.
+3. `skeleton._populate_role_symlinks` symlinks the directory on the next
+   launch / `/update-enough`.
+4. It arrives **switched off** in every project (its name goes into
+   `rness/readvisors/.disabled` on first sync) — the user toggles it.
+
+**By hand, for one machine** (no repo edit, works on a sealed .app install):
+the same two files under `~/enough/readvisors/<name>/`. Nothing creates
+that directory for you; `mkdir -p` it. It outranks a shipped readvisor of
+the same name, and arrives off in every project the same way.
+
+**Through the `readvisory` skill** — the supported route, and the one to
+suggest when a user asks for "a new readvisor". The skill interviews the
+user, drafts both documents, and finishes with `install_readvisor`
+(`<scope>project</scope>` or `global`). That door enforces the shape, runs
+the payload scan, refuses to write through a symlink, and stages into
+`.<name>.installing/` before renaming into place. It needs the
+`readvisory_install` broker toggle on, and the skill itself switched on —
+which is also what puts `READVISORY_TOOL_INSTRUCTIONS` in the prompt, so
+with the skill off the tool's documentation is unreachable advice and is
+correctly absent.
+
+Removal for the user-made cases is `POST /api/readvisors/remove {name}`
+behind the confirm overlay; shipped readvisors answer 403 ("switch it off
+instead").
+
+### Add a composure module type
+
+The type vocabulary is small on purpose and round-tripping an unknown type
+is a promise the format makes — so read `known_type` in the model before
+you decide you need a new one.
+
+1. Add the name to `composure.MODULE_TYPES` and a `(w, h)` row to
+   `composure.BASE_SIZE`.
+2. If it carries a target, add its field to the module's `fields` dict and
+   to the `add_module` / `update_module` optional-key lists, with a
+   validator beside the existing `href` (project-relative path) and `url`
+   (http(s)) checks. Refusals name the allowed shape; keep that.
+3. Teach `GET /api/composure/link-preview` how to preview it in
+   [composure_api.py](../enough/composure_api.py) — and keep the rule that
+   it **never raises**: a missing target is `{ok: false, detail: "<a
+   sentence>"}`.
+4. Frontend: one entry in `COMP_MODULE_RENDERERS`, keyed by the type name.
+   A renderer owns everything inside `hostEl` and gets the module and its
+   current page. Until it exists the type falls through to
+   `compRenderPlaceholder`, which is a working state, not a broken one.
+5. Tests: `tests/test_composure.py` for the round trip and the op
+   validation, `tests/test_composure_api.py` for the preview.
+
+Do **not** add a type by teaching a renderer a string the backend has never
+heard of — `known_type: false` is for a *newer* enough's types, not for
+skipping step 1.
+
+### Add a composure form
+
+A form is a `.comp` like any other; the only thing that makes it a form is
+where it lives.
+
+- **A project form** is `POST /api/composure/save-as-form` (or the
+  `comp_save_as_form` tool) over an existing composure. It lands in
+  `rness/composure-forms/<slug>.comp` and shows up in
+  `GET /api/composure/forms` with `origin: "project"`. A project form whose
+  name collides with a shipped one **wins**, and is listed once. No code.
+- **A shipped form** is a row in `scripts/gen_composure_forms.py` plus a
+  name in `composure.SHIPPED_FORMS`. **The five in
+  `defaults/composure-forms/` are generated, never hand-written** — after
+  any change to `dumps`, the style block or `md_to_rich`, run
+  `uv run python scripts/gen_composure_forms.py` and commit the result
+  (`--check` is the CI-shaped assertion).
+- A form with behaviour beyond its content gets an entry in
+  `COMP_FORM_BEHAVIORS` in index.html; `_default` handles every form
+  without one, which is what makes project forms work for free.
+- **The form supplies the kind and the styling, not its placeholder
+  modules** where a generator is involved: `from_outline` clears the form's
+  own content in the same atomic batch it adds the outline's.
+
+### Add a council output kind (the 0.4.0 hook)
+
+Today `output.kind` ∈ `answer | document | composure`, and `composure`
+answers **501 before the conclusion turn runs**, so nothing is spent and
+the council stays runnable. Adding a kind:
+
+1. Accept the name in `council.validate_output()`, with whatever companion
+   key it needs (`path` for `document`, `form` for `composure`) and a
+   refusal sentence for the missing case. Unknown keys are dropped on
+   purpose — validate it or it will not survive a round trip.
+2. Handle it in `POST /api/council/conclude` *after* the chief's
+   conclusion statement is committed, alongside the `document` branch.
+   **Write through `tools.run_write_file`**, not `Path.write_text` — that
+   is what keeps the allowlists, the `rness/requests/done/` prefix rule,
+   the cachebox mirror guard, the `.comp`/`.girraph` refusals, the undo
+   stash and the convert-twin sync applying to a council's output.
+3. Add a `doc` link-in module under the conclusion so the artifact is one
+   click from the council that produced it, the way `document` does.
+4. Refuse *before* the turn when the kind cannot land (the 501 pattern):
+   spending a completion and then failing is the one outcome to avoid.
+5. `tests/test_council.py` for the validation, `tests/test_council_api.py`
+   for the conclude path.
 
 ### Add a tool runner
 
@@ -1926,7 +2965,7 @@ top bar's.
 ### Change the UI
 
 [enough/static/index.html](../enough/static/index.html) is a single
-~18,700-line file with inline CSS and JS. Conventions:
+~30,200-line file with inline CSS and JS. Conventions:
 
 - All modals follow the same `#<name>-modal` pattern with `.hidden`
   class and a `.modal-backdrop` for click-outside dismissal.
@@ -1970,9 +3009,17 @@ than reinvent:
     is already stacked, its opts update and it **raises** in place (the
     caller has already re-targeted content — e.g. `enterGirraphMode` on a
     new file resets `GIRRAPH_STACK` itself). One live instance per name
-    (`readedit`, `girraph`, `merirmaid`, `wikisink`, `cacheawl`, `ref`).
+    (`readedit`, `girraph`, `merirmaid`, `wikisink`, `cacheawl`, `ref`,
+    `paginated`). **Composure is not one of them** — it is the base layer
+    below the stack (z < 30), permanent and uncloseable; see "Composures".
   - `modeRemove(name)` — splice at any depth, re-apply z-order, re-render
-    indicators. Empty stack = the chat home.
+    indicators. **Bookkeeping only**: it does not run `onExit` and does not
+    hide the mode's root, so callers tear the mode down first (see "What
+    NOT to touch", and the block comment at its definition, which names all
+    eight callers and the one legacy wrapper that is the exception). A mode
+    "closed" with this alone leaves its render loop spinning behind an
+    element that is still in the DOM. Empty stack = the bare composure
+    canvas.
   - `modeRaise(name)` — z-order + indicators only, plus the optional
     `onRaise` hook (cacheawl wires `caLoadTree()` to refresh stale data);
     **never** a re-enter.
@@ -1989,11 +3036,20 @@ than reinvent:
     1px 50%-gray left/right edge lines, no chip/gradient (deliberately
     not buttons). Each carries its own `ribbon-redx` off its left edge
     (closes that entry, even buried); clicking a buried square raises it;
-    the top square is inert.
+    the top square is inert — **except while `rv-full`, where clicking any
+    indicator drops the panel to docked and raises that mode**. The
+    rightmost square is composure's permanent **base indicator** and is the
+    one square with **no ribbon**, by design; clicking it toggles the peek.
   - **Esc** targets `modeTop()` only, guarded so it doesn't fire while
     the confirm overlay is up, while a chat composer / search / inline
     edit field is focused, or while ANY modal is open (`_escModalOpen` —
-    modals own esc for themselves).
+    modals own esc for themselves). **A modal with no esc listener of its
+    own therefore makes esc do nothing at all** — every modal needs one.
+    **Esc in the chat composer (`#message`) BLURS it** (0.3.5): the rungs
+    below a focused field are otherwise unreachable, because the readvisor
+    panel focuses the composer whenever it opens. A second esc then follows
+    the normal order. Only `#message` — the search and inline-edit fields
+    handle esc themselves, for their own "never mind".
   - `setActiveMode` / `clearActiveMode` survive only as thin compat
     wrappers (push / remove-top). Wire new modes through the stack, not
     ad-hoc show/hide.
@@ -2015,7 +3071,7 @@ than reinvent:
   `.review-body`-styled frame (the pretty-markdown CSS is shared via
   `:is(#review-mode, #ref-mode) .review-body` selectors, and
   `applyReviewContrast()` covers `ref-mode` alongside review/wiki). View
-  only by design: no edit face, no highlighting, no chat pill. The
+  only by design: no edit face, no highlighting, no chat affordance. The
   `ref-mini` class docks it to the right edge for side-by-side reading
   (`refToggleSize()`); launched from the big `hxc`-icon button at the top
   of the UI modal. The 3D icon-button gradient used on square chips is
@@ -2043,7 +3099,7 @@ Read the Wikisink section above first, then
 thumb: all state changes go through `wikisink/config.py` helpers (never
 hand-roll JSON edits or mkdirs); anything that could remove or replace
 user-visible data (archives, preserved articles, comments) must be
-user-confirmed in the UI — the agent gets read/search/update-run tools
+user-confirmed in the UI — the readvisors get read/search/update-run tools
 only; test against a scratch config via `ENOUGH_WIKISINK_CONFIG` and a
 tiny real ZIM (openzim's `zim-testing-suite` has ~40 KB ones) rather
 than mocking libzim. Adding a wikisink flavor = append to
@@ -2094,16 +3150,22 @@ A list of things that will confuse you if you don't see them coming:
   `output=` for cloud_pipeline. If you add a tool, decide what the
   attribute should be and add a branch.
 - **Skills are off by default; paradigms are exactly one active at a
-  time; roles are individually toggleable.** Three different
-  on/off patterns for three concepts — don't conflate them.
+  time; readvisors are individually toggleable.** Three different
+  on/off patterns for three concepts — don't conflate them. And a
+  readvisor's sidebar toggle governs only the *combined* voice of ordinary
+  conversation: `prompt.readvisor_identity()` ignores it on purpose,
+  because a council picks its participants in its own setup card.
 - **`prompt.set_skill_enabled()` is not the door for a skill toggle.**
   It's the raw `.disabled` writer. Every toggle-on must go through
   `skillaudit.set_skill_enabled_guarded()`, which can raise
   `SkillAuditRefused` or return `needs_audit`. If you add a second route
   that enables a skill (a new endpoint, a tool runner, a migration), route
   it through the guard or you've reopened the hole
-  `quarantine_untrusted()` exists to close. Roles have no equivalent —
-  only skills are audited.
+  `quarantine_untrusted()` exists to close. Readvisors have no equivalent
+  toggle guard — only skills are audited. Their door is different:
+  `install_readvisor` scans **before** writing and treats `flag` and `fail`
+  alike, because prose about a person has no legitimate reason to look like
+  an exfiltration pattern.
 - **Wikisink state is user-global, not per-project.** One
   `~/enough/config/wikisink.json` for the whole machine. Comments and
   watches attach to *articles* (stable slug+hash keys via
@@ -2172,6 +3234,74 @@ A list of things that will confuse you if you don't see them coming:
   that edits a mirror from anywhere else — it would drift from the box it
   mirrors and get clobbered on the next regeneration. To change what a
   mirror shows, change the box contents.
+- **Never whole-file-write a `.comp`.** Both write doors already refuse it
+  (`composure.write_denial()`, called from `run_write_file` and
+  `POST /api/file`), and the refusal also covers the
+  `.<name>.comp.comments.json` sidecar. There is deliberately **no endpoint
+  that accepts `.comp` HTML** and no client may construct it. Content
+  changes only through node-level ops on `POST /api/composure/ops` under
+  `composure.path_lock()` — that is what lets the user type in one module
+  while a readvisor edits another. If you find yourself wanting a
+  whole-file door "just for a migration", write the migration as a batch
+  of ops.
+- **`update_module` refuses to change `speaker` / `speaker_kind` / `turn`
+  from any source but `"council"`.** Those three fields *are* the lock
+  (`Module.locked` is `bool(speaker)`), so without the guard a `ui` batch
+  could blank `speaker`, unlock a council statement, and rewrite it on the
+  next op — which would make the transcript a suggestion rather than a
+  record. `add_module` **with** a `speaker` is still open to any source
+  (forging a card in your own file is not an attack), and so is every
+  non-speaker field on a locked module: geometry, background, scale, title
+  and z all still apply, which is exactly how the frontend corrects a
+  statement's height. The content ops (`set_page`, `add_page`,
+  `remove_page`, `remove_module`) are where `_check_writable` lives.
+  Likewise **`set_meta` refuses `form` and `council`** — the engine's own
+  door is `set_council`, and that op is refused for every source but
+  `"council"`.
+- **The composure base indicator has no exit ribbon, by design.** Every
+  other square in `#mode-stack` carries its own `ribbon-redx`; the base
+  square (rightmost, `data-mode="composure"`) does not, because composure
+  cannot be closed — you peek past it. A harness scenario that asserts
+  "every indicator has a ribbon" is wrong, not the UI: the correct
+  assertion is exactly one ribbonless square, rightmost, and ribbons on all
+  the others.
+- **`modeRemove(name)` is bookkeeping only.** It splices the stack entry,
+  re-applies z-order and re-renders the indicators — it does **not** run
+  `onExit` and does **not** hide the mode's root. Callers must tear the
+  mode down first; the public door for "close this mode" is its own
+  `onExit` (`modeTop().onExit()`), which is what the ribbon path calls.
+  Calling `modeRemove` on its own leaves a visible, unreachable mode.
+- **The coordinate contract applies to the composure canvas too, and it has
+  three spaces rather than two.** Pointer coordinates are top-level CSS px
+  and must be divided by `UIZ()` before they become stage px, and by `Z`
+  again before they become world units — `compEventToStage()` is the one
+  place that division happens, so route through it rather than doing the
+  arithmetic inline. **Composure ignores `--txz`**, like the diagram
+  canvases. Inside `#comp-world`, anything that must stay one size on
+  screen divides by `var(--comp-z)`; anything that can live in
+  `#comp-overlay` (screen space) should, because it then needs no
+  counter-scaling at all. See "Display scales" for the general rule.
+- **Inside a composure page, Esc belongs to the user only if the user
+  placed the caret.** `COMP.caretAuto` records whether the *canvas* put the
+  caret there (the blank form's opening blink) or the user did. Esc in a
+  focused page leaves the text tool and **consumes the press only when
+  `caretAuto` is false**; a caret the canvas placed is not something the
+  user chose, so Esc keeps travelling and means what it always means.
+  Typing into it makes the caret the user's. The other half is
+  `compMayTakeFocus()`: the canvas never takes the caret from a modal, from
+  a contenteditable, or from a composer with a draft in it — it *will* take
+  it from an **empty** `#message`, which holds focus at boot only because
+  the textarea carries `autofocus`.
+- **Every new global-state location needs a seam, in both harnesses, in
+  the same change.** The rule is not "add an `ENOUGH_*` variable"; it is
+  add it *and* wire it into **`scripts/smoke_boot.build_env()`** and
+  **`tests/conftest.py`'s `_STATE_SEAMS`** (autouse for the whole suite).
+  `ENOUGH_READVISORS_ROOT` is the current example of why: without it an
+  `install_readvisor` at global scope during a test or a scratch QA run
+  writes into the developer's real `~/enough/readvisors/` and is then
+  symlinked into every project they open afterwards — a leak that survives
+  the run that caused it. Anything a test can reach that is not under
+  `tmp_path` is a bug in the seam list, not in the test.
 - **Don't put `--btn-bg` in `:root`.** Button chips use `var(--btn-bg,
   var(--bg-raise))`, and the fallback is load-bearing: old user configs that
   predate the `btn-bg` theme color rely on `--btn-bg` being *undefined* so
@@ -2209,17 +3339,27 @@ A list of things that will confuse you if you don't see them coming:
   isolate global state via env hooks — `ENOUGH_WIKISINK_CONFIG`,
   `ENOUGH_CACHEAWL_ROOT`, `ENOUGH_INFOWORLD_ROOT`, `ENOUGH_UI_CONFIG`,
   `ENOUGH_WEIGHTS_DIR`, `ENOUGH_EXTRAS_STATE`, `ENOUGH_LIVE_STATE`,
-  `ENOUGH_MODELS_REGISTRY`, `ENOUGH_PROJECTS_STATE`
+  `ENOUGH_MODELS_REGISTRY`, `ENOUGH_PROJECTS_STATE`,
+  **`ENOUGH_READVISORS_ROOT`**
   (plus `ENOUGH_MODELS_URL_BASE`, which rebases the model download URLs
   onto a local stub server, keyed by local gguf_filename) — all
   pointed at `tmp_path`; **never run against real `~/enough` state.**
-  `ENOUGH_PROJECTS_STATE` is the one that is **autouse for the whole suite**
-  (`tests/conftest.py`): half the suite calls `ensure_skeleton()`, which now
-  registers, so without it a test run would file the developer's tmp dirs on
-  their real home screen. That seam has to be closed by default, not by
-  remembering — and note it is also read by the **Rust shell**
-  (`config::enough_config_dir()`), which is where the `.home-open` handoff
-  lands. The
+  `tests/conftest.py`'s `_STATE_SEAMS` is **autouse for the whole suite**,
+  which is how `ENOUGH_PROJECTS_STATE` and `ENOUGH_READVISORS_ROOT` are
+  closed by default rather than by remembering: half the suite calls
+  `ensure_skeleton()`, which registers the project, so without the first a
+  test run would file the developer's tmp dirs on their real home screen —
+  and the second is what stops a global-scope `install_readvisor` test
+  writing into their real `~/enough/readvisors/`. Note the projects seam is
+  also read by the **Rust shell** (`config::enough_config_dir()`), which is
+  where the `.home-open` handoff lands. The composure round's suites
+  (`test_composure.py`, `test_composure_api.py`, `test_composure_tools.py`,
+  `test_composure_outline.py`, `test_project_meta_composure.py`,
+  `test_council.py`, `test_council_api.py`, `test_prompt_weight.py`,
+  `test_readvisors.py`, `test_readvisors_defaults.py`,
+  `test_fetch_and_cache.py`) never reach a model or the network:
+  `council.run_council_turn` is the one seam every council test replaces,
+  and a council test that needs a model has bypassed it. The
   rest of the web layer is exercised via TestClient against `create_app()`.
   **The `ENOUGH_*` list is not sufficient on its own**: `broker.json`,
   `openrouter.json`, `orchestrator.json`, `~/enough/.llama-server/server.pid`
@@ -2280,19 +3420,26 @@ normally.
 1. Creates `rness/` if missing
 2. Copies `_PROJECT_LOCAL_FILES` (AGENT.md, MOTIVATION.md, profile,
    active-paradigm seed) only if absent — preserves user edits
-3. Symlinks `_SKELETON_PLAN` entries (policies, AGENT/MOTIVATION,
-   `knowledge/rosetta-primers`) from `~/enough/defaults/...` on
-   first-time `rness/` creation
+3. Applies `_SKELETON_PLAN` on first-time `rness/` creation —
+   `AGENT.md`/`MOTIVATION.md` are **copied**, the four policies and
+   `knowledge/rosetta-primers` are **symlinked** from `~/enough/defaults/...`
 4. Runs three populators on **every** launch — `_populate_skill_symlinks`,
    `_populate_role_symlinks`, `_populate_paradigm_symlinks` — so newly
-   shipped skills/roles/paradigms appear in existing projects without
+   shipped skills/readvisors/paradigms appear in existing projects without
    the user running `/update-enough`. Each populator globs
    `~/enough/defaults/<kind>/`, symlinks anything new, prunes dangling
-   symlinks left over from removed globals. Skills/roles default-off
-   (added to `.disabled`); paradigms have no off concept — exactly one
-   is active at a time.
-5. Creates `_EMPTY_DIRS` (requests, session-logs, io, etc.) as needed
-6. Runs migrations for older project layouts
+   symlinks left over from removed globals. Skills and readvisors
+   default-off (added to `.disabled`) — **except a name pruned as dangling
+   and re-created in the same pass, which is a heal and keeps its toggle**;
+   paradigms have no off concept, exactly one is active at a time. The
+   readvisor populator additionally walks **two** global sources
+   (`~/enough/readvisors/` then the install's `defaults/readvisors/`) and
+   re-aims managed links — see "Readvisors".
+5. Creates `_EMPTY_DIRS` (requests, session-logs, io, `rness/readvisors`,
+   `rness/io/composure`, etc.) as needed
+6. Runs migrations for older project layouts — including
+   `_migrate_roles_to_readvisors`, which runs after `_migrate_undot` and
+   **before** the populators
 
 ---
 
@@ -2313,11 +3460,14 @@ modifications:
    Allowlists, toggles, denials, journal. When you're tempted to bypass
    the broker for "simplicity," you're proposing to take a permission
    decision out of the user's hands. Don't.
-3. **One folder, one agent.** No multi-agent orchestration; no shared
-   state across projects. Different folder → different agent →
-   different memory. This is a discipline, not a limitation. Users
+3. **One folder, one chief readvisor.** No cross-project orchestration and
+   no shared state across projects: different folder → different readvisor
+   → different memory. This is a discipline, not a limitation. Users
    running multiple `enough` instances coordinate through the
-   filesystem (e.g. a shared cachebox in `~/enough/cacheawl/`).
+   filesystem (e.g. a shared cachebox in `~/enough/cacheawl/`). A
+   **council** does not break the rule — it is several readvisors *of this
+   project* speaking in turn on one canvas, sharing one model and one
+   window, not several enoughs talking to each other.
 
 ---
 
@@ -2371,25 +3521,135 @@ shutdown gate, the platform seams, the shipped skills' frontmatter/tooltip/
 script conventions, the skill trust model + first-use audit + `/api/skills*`,
 document conversion + `/api/convert/*` + `/api/file/blob`,
 the home screen + registry + handoff + `/api/home/*`,
-and the throttled wikisink newer-snapshot check) — **tracked since the
+the throttled wikisink newer-snapshot check, and — since 0.3.5 — the
+composure format/ops/API/tools + the outline converter, the council engine
++ `/api/council/*`, the readvisors' migration/sources/install/removal, and
+the prompt-weight budgets) — **tracked since the
 seven-models round**, so a fresh clone has it. Before declaring anything
 done:
 
 ```bash
-uv run pytest -q                        # 422 tests (+12 docling skips)
+uv run pytest -q                        # 1065 tests (+docling skips)
 uv run python scripts/smoke_boot.py     # real boot, scratch dir
 bash tests/bootstrap_linux_harness.sh   # only if you touched bootstrap.sh
 ```
 
 Rust, if you touched the shell: `cargo test` in `desktop/src-tauri/`
-(37 tests — the launch routing and the exit-42 handshake are pure functions
-precisely so they're covered here).
+(43 tests — the launch routing, `window_title` and the exit-42 handshake are
+pure functions precisely so they're covered here).
 
 CI runs exactly those three on ubuntu-latest and macos-latest. Anything
 not covered by them is smoke-tested via ad-hoc Python scripts that
 exercise the modules directly (sometimes via FastAPI's TestClient against
 `create_app()`) — examples are in git history under recent commits
 touching `cloud.py`, `tools.py`, and `server.py`.
+
+### The pre-commit suite
+
+One command has to be green before every commit:
+
+```bash
+uv run python scripts/precommit.py            # everything (~6 min)
+uv run python scripts/precommit.py --quick    # what the hook runs (~90 s)
+uv run python scripts/precommit.py --list
+uv run python scripts/precommit.py --only ui -v
+```
+
+Install the hook once per clone — nothing in the repo runs `git config`
+for you:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+`.githooks/pre-commit` runs the suite in `--quick` mode. The bypass is the
+ordinary `git commit --no-verify`, and it is there for the case where the
+suite itself is what you are fixing.
+
+**Six stages**, each timed, each one PASS/FAIL/SKIP line. The first five
+are what CI already runs (`bash -n`, `pytest -q`, `i18n_check.py`,
+`smoke_boot.py`, `bootstrap_linux_harness.sh`); the sixth is new.
+
+- **`tests/test_content_integrity.py`** (inside `pytest`, so CI gets it
+  free) is the *content* half. `i18n_check.py` compares key **sets**;
+  this compares the things sets cannot see. Every `en/ui.json` value is
+  byte-identical to the inline English in index.html (docs/I18N.md has
+  always claimed that; nothing enforced it until now), including
+  `t('key', 'English')` call sites. A key used at several sites carries
+  the same English everywhere. `{placeholders}` and inline HTML survive
+  into all five translations. A translated value byte-equal to its
+  English is flagged unless it is a brand word or a listed cognate. The
+  reachable help ids (static `data-help` ∪ `server._HELP_IDS` ∪
+  `converted-file`) and the `## <id>` sections of `help-docs.md` are a
+  bijection, modulo an explicit `UNREACHED_SECTIONS` list. Every help
+  section has `name:`/`path:` and `### what`/`### how`/`### ideas` in
+  order, and every `{{token}}` is one `_helpExpandTokens()` actually
+  implements (scraped from index.html, not hard-coded). HELP_CENTER.md's
+  `## N.` / `### N.M` numbering is contiguous and its "section N"
+  cross-references resolve. Every icon name the frontend asks for has
+  both built SVG variants. All seven places that name the version agree.
+- **`scripts/ui_check.py`** is the *layout and behaviour* half: a real
+  headless Chrome over the DevTools Protocol, driving two scratch enough
+  servers (project + home). **Zero new dependencies** — CDP is JSON over
+  one WebSocket and `websockets` already ships as a transitive of
+  `uvicorn[standard]`. For every (screen × viewport × language) it asks
+  the page to measure itself: clickables that something in their own
+  layer covers, rects that overlap where the overlap costs a click, text
+  clipped under `overflow:hidden`, controls outside the viewport with no
+  scroller, targets under 16px. Then it runs the MODE STACK scenarios
+  once per language. No Chrome anywhere → one SKIPPED line and a green
+  run; CI has no guarantee of a browser.
+
+**The rule that keeps it alive: every UI change adds or updates its
+screen(s) and scenario(s) in the same change.** A new modal, mode or
+panel gets a `Screen` in `scripts/uicheck/screens.py`; a new interaction
+contract gets a scenario in `scripts/uicheck/interactions.py`. A harness
+that describes a UI that no longer exists is worse than no harness,
+because it is still green.
+
+Extending the registry is meant to be cheap. A `Screen` is a name, a mode
+(`project` or `home`), and two lists of tiny declarative steps — `click
+#id`, `key Escape`, `eval openUIModal()`, `wait_for <selector>`,
+`wait_gone <selector>`, `wait_idle`. Steps drive the product's own entry
+points rather than poking the DOM, and an `eval` step is a *trigger*: the
+`wait_for` after it is the wait (several `enter*Mode()` functions are
+async, and `confirmOverlay()` returns a promise that only settles when a
+user answers). `--list` prints the registry; `--screens`, `--langs` and
+`--viewports` narrow a run while you are writing one.
+
+Nothing here touches your real state. Both servers boot through
+`smoke_boot.build_env()` — every `ENOUGH_*` seam and `$HOME` inside a temp
+dir — and `tests/conftest.py` does the same for every test via an autouse
+fixture. The UI language is flipped with `POST /api/ui-config`, which
+lands in the scratch `$HOME`, never in your `~/enough/config/ui.json`.
+
+**Two lists of accepted failures**, and they work the same way on
+purpose: both are green today, both go red when something NEW appears,
+and both go red when a listed item is fixed and its entry is left behind.
+
+- `KNOWN_FINDINGS` in `tests/test_content_integrity.py` — content drift
+  that exists in today's tree and belongs to a later lane. Keep it tiny;
+  an entry that survives a release is an entry nobody will ever action.
+- `scripts/uicheck/baseline.json` — accepted layout findings, keyed by
+  `(screen | class | selector-path)` and deliberately **not** by pixel
+  values, viewport or language, so an entry survives a re-layout and dies
+  with the element it names. `--update-baseline` rewrites it; read the
+  diff, because a key that disappears means something got fixed. It is a
+  to-do list, not an amnesty — and **every entry is justified by family in
+  `scripts/uicheck/baseline-notes.md`**, which says what each one is, why
+  it is accepted and which lane should fix it. Add an entry, add a
+  paragraph; fix one, delete both.
+
+One thing the harness will not do, and it is deliberate: **Escape is
+dispatched from inside the page, not through `Input.dispatchKeyEvent`.** On
+a tab the browser has activated, an Escape input event deadlocks headless
+Chrome's *browser* process — every tab and the DevTools HTTP endpoint with
+it — which is what made `--quick` stop dead for three phases. See
+`_SYNTHETIC_KEYS` in `scripts/uicheck/driver.py` for the measurements and
+for what a synthetic event does and does not still prove. Every step and
+every scenario also has a hard wall-clock budget backed by a watchdog that
+cuts the socket, because the pre-commit hook runs this and a hook that can
+hang is a hook that gets uninstalled.
 
 ---
 

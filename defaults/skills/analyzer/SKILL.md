@@ -1,6 +1,6 @@
 ---
 name: analyzer
-description: "Four-mode analytical toolkit for documents, books, web pages, decisions, and untrusted skills. SUMMARIZE produces an even-handed one-page digest of any text (author motivation, intended audience, tone, key quotes). PROOFREAD makes light spelling/typo corrections on full-length documents (including entire books, chapter by chapter), driven by the Harper grammar checker (local, offline, rule-named findings), and produces a separate proof report with suggestions and repeated-phrase findings. DECIDE picks three archetypal personas from a built-in roster and runs a transcripted debate over a question, complex decision, or 'what should I do next' — returning a recommendation plus the full debate. AUDIT vets a third-party skill, role, or paradigm before the user trusts it: a deterministic payload scan of the bundled scripts plus an LLM audit protocol against a threat model (prompt injection, privilege escalation, epistemic contamination, executable payload, audit evasion), producing a plain-English explainer, a pass/flag/fail verdict, and a report. Use for 'analyze this', 'summarize this', 'one-pager', 'tl;dr but smart', 'read this for me', 'proofread this', 'copy-edit this book', 'fix typos in', 'spot repetition', 'help me decide', 'pros and cons', 'what should I do about', 'three perspectives on', 'debate this', 'scan this skill', 'is this skill safe', 'audit this', 'vet this', 'check this before I enable it', 'what does this skill actually do'. Works with plain text, markdown, html, pasted text, web pages, free-form questions, skill folders or .skill zips, and any document enough converts to a markdown twin — Word documents, PDFs, EPUB ebooks, PowerPoint decks, Excel workbooks (read the twin, or read_file the original and enough converts it; PDFs, decks and workbooks need the PDF extra)."
+description: "Four-mode analytical toolkit for documents, books, web pages, decisions, and untrusted skills. SUMMARIZE produces an even-handed one-page digest of any text (author motivation, intended audience, tone, key quotes). PROOFREAD makes light spelling/typo corrections on full-length documents (including entire books, chapter by chapter), driven by the Harper grammar checker (local, offline, rule-named findings), and produces a separate proof report with suggestions and repeated-phrase findings. DECIDE picks three archetypal personas from a built-in roster and runs a transcripted debate over a question, complex decision, or 'what should I do next' — returning a recommendation plus the full debate. AUDIT vets a third-party skill, readvisor, or paradigm before the user trusts it: a deterministic payload scan of the bundled scripts plus an LLM audit protocol against a threat model (prompt injection, privilege escalation, epistemic contamination, executable payload, audit evasion), producing a plain-English explainer, a pass/flag/fail verdict, and a report. Use for 'analyze this', 'summarize this', 'one-pager', 'tl;dr but smart', 'read this for me', 'proofread this', 'copy-edit this book', 'fix typos in', 'spot repetition', 'help me decide', 'pros and cons', 'what should I do about', 'three perspectives on', 'debate this', 'scan this skill', 'is this skill safe', 'audit this', 'vet this', 'check this before I enable it', 'what does this skill actually do'. Works with plain text, markdown, html, pasted text, web pages, free-form questions, skill folders or .skill zips, and any document enough converts to a markdown twin — Word documents, PDFs, EPUB ebooks, PowerPoint decks, Excel workbooks (read the twin, or read_file the original and enough converts it; PDFs, decks and workbooks need the PDF extra)."
 ---
 
 # analyzer
@@ -19,7 +19,7 @@ and is loaded only when a mode fires.
 | `summarize` | One-page even-handed digest of any text — author motivation, biases, intended audience, tone/lexicon, the point, key quotes.  | `references/summarize.md`        |
 | `proofread` | Full-document copy-editing pass (typos/spelling) driven by Harper (optional; see `references/proofread.md`), with a separate proof report covering suggestions and repeated-phrase notes. | `references/proofread.md`        |
 | `decide`    | Three archetypes from the roster below debate the user's question; output is a recommendation plus the full debate.           | `references/decide.md`           |
-| `audit`     | Vets a third-party skill, role, or paradigm before you trust it: deterministic payload scan (`scripts/payload_scanner.py`) + the LLM audit protocol against the threat model; verdict + report. | `references/audit.md`            |
+| `audit`     | Vets a third-party skill, readvisor, or paradigm before you trust it: deterministic payload scan (`scripts/payload_scanner.py`) + the LLM audit protocol against the threat model; verdict + report. | `references/audit.md`            |
 
 ---
 
@@ -29,7 +29,7 @@ and is loaded only when a mode fires.
    - **Text in, "what is this saying / give me a summary / break this down" → `summarize`.**
    - **Text in, "proofread / copy-edit / fix typos / clean this up" → `proofread`.**
    - **Question or dilemma in, "help me decide / debate this / pros and cons / what should I do" → `decide`.**
-   - **A skill folder, `.skill` zip, role, or paradigm in — "scan this skill",
+   - **A skill folder, `.skill` zip, readvisor, or paradigm in — "scan this skill",
      "is this skill safe", "audit this", "vet this", "check this before I
      enable it", "what does this skill actually do" → `audit`.**
 2. Read the matching `references/*.md` file completely. Do not improvise the
@@ -43,7 +43,7 @@ decision/debate on something in the text, or a safety audit?"* Don't guess.
 
 One exception to the ask-first rule: when the user is about to **enable,
 install, or trust** something that came from outside — a downloaded skill, a
-shared role, a paradigm someone sent them — `audit` is the right mode even if
+shared readvisor, a paradigm someone sent them — `audit` is the right mode even if
 they didn't use the word. Say which mode you picked and why, then run it.
 
 ---

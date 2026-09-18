@@ -1,4 +1,4 @@
-<!-- Source: https://github.com/mermaid-js/mermaid/blob/develop/packages/mermaid/src/docs/syntax/mindmap.md — Mermaid (https://mermaid.js.org), MIT License. Vendored for offline agent reference; syntax content only. -->
+<!-- Source: https://github.com/mermaid-js/mermaid/blob/develop/packages/mermaid/src/docs/syntax/mindmap.md — Mermaid (https://mermaid.js.org), MIT License. Vendored for offline reference; syntax content only. -->
 
 # Mindmap
 

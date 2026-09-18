@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" id="comp-pencil" viewBox="0 0 72 72">
+  <path d="M12 60 L17 45 L47 15 L57 25 L27 55 Z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round" />
+  <line x1="17" y1="45" x2="27" y2="55" stroke="#fff" stroke-width="3" fill="#fff" />
+  <line x1="42" y1="20" x2="52" y2="30" stroke="#fff" stroke-width="3" fill="#fff" />
+</svg>

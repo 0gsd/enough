@@ -7,7 +7,7 @@ v0.0.3+ layout:
 - On first run in a project, `rness/` is populated with a mix of:
     - **symlinks** into `~/enough/defaults/...` — for files whose
       semantics are "global convention, upgradable centrally" (paradigms,
-      policies, skills, roles).
+      policies, skills, readvisors).
     - **copies** — for files that diverge per project from the start
       (AGENT.md, MOTIVATION.md, knowledge/project-profile.md).
 The old per-project `infoworld` symlink (into `~/enough/infoworld/`) is
@@ -86,7 +86,7 @@ _SKELETON_PLAN: tuple[tuple[str, str, str], ...] = (
     # NOTE: paradigms are no longer in this plan. They're synced dynamically
     # on every launch by `_populate_paradigm_symlinks` so newly-shipped
     # paradigm files appear in existing projects automatically — same
-    # lifecycle as skills and roles. See ensure_skeleton() below.
+    # lifecycle as skills and readvisors. See ensure_skeleton() below.
     ("policies/requests.md",            "rness/policies/requests.md",            "symlink"),
     ("policies/context-management.md",  "rness/policies/context-management.md",  "symlink"),
     ("policies/allowlists.md",          "rness/policies/allowlists.md",          "symlink"),
@@ -114,7 +114,7 @@ _PROJECT_LOCAL_FILES: dict[str, str] = {
 }
 
 # Empty dirs to create in every project.
-# `skills/`, `requests/`, and `roles/` are surfaced through dedicated
+# `skills/`, `requests/`, and `readvisors/` are surfaced through dedicated
 # sidebar sections (since they're configuration rather than artifacts) but
 # still live in the file tree so they're easy to discover.
 _EMPTY_DIRS: tuple[str, ...] = (
@@ -122,9 +122,13 @@ _EMPTY_DIRS: tuple[str, ...] = (
     "rness/knowledge/session-logs",
     "rness/requests",
     "rness/requests/done",
-    "rness/roles",
+    "rness/readvisors",
     "rness/io/input",
     "rness/io/output",
+    # Where new composures land (composure round, P4b). `rness/composure-forms`
+    # is NOT here — it is created on the first save-as-form, so a project that
+    # never made a form has no empty folder to explain.
+    "rness/io/composure",
 )
 
 
@@ -339,35 +343,176 @@ def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
         log.exception("untrusted-skill quarantine failed")
 
 
+# ---------------------------------------------------------------------------
+# Readvisors — two global sources, one project folder
+# ---------------------------------------------------------------------------
+#
+# Shipped readvisors live in the install's `defaults/readvisors/`. On a
+# desktop build that folder is inside the sealed .app bundle and is NOT
+# writable, so the `readvisory` skill (P7) cannot install anything there.
+# Hence a second, user-owned global source: `~/enough/readvisors/`. Both are
+# symlinked into every project exactly the same way; the only difference is
+# who may write to them.
+
+#: Test/dev hook, mirroring ENOUGH_CACHEAWL_ROOT / ENOUGH_UI_CONFIG, so a
+#: suite (or a scratch server) never installs into the developer's real
+#: `~/enough/readvisors/`.
+_READVISORS_ROOT_ENV = "ENOUGH_READVISORS_ROOT"
+
+
+def user_readvisors_root() -> Path:
+    """The user-global readvisors dir, honoring `ENOUGH_READVISORS_ROOT`.
+
+    NOT created here — a machine that has never installed a readvisor has
+    no reason to carry an empty folder, and every writer (the install tool)
+    builds its own parents."""
+    raw = os.environ.get(_READVISORS_ROOT_ENV)
+    if raw and raw.strip():
+        return Path(raw).expanduser()
+    return Path.home() / "enough" / "readvisors"
+
+
+def shipped_readvisors_root(defaults_root: Path) -> Path:
+    """The install's shipped readvisors dir.
+
+    Falls back to the pre-0.3.5 `defaults/roles/` when the new name is
+    absent, which is what a *sibling* older install looks like from here —
+    the same "an install, not this install" reasoning skillaudit uses for
+    trust. Returns the new path when neither exists, so callers can use it
+    as a plain `is_dir()` probe."""
+    new = defaults_root / "readvisors"
+    if new.is_dir():
+        return new
+    old = defaults_root / "roles"
+    if old.is_dir():
+        return old
+    return new
+
+
+def _readvisor_sources(defaults_root: Path) -> list[tuple[str, Path, str]]:
+    """Every global readvisor available to a project, as
+    `[(name, source_dir, origin), ...]` in **precedence order**.
+
+    Precedence is user-global before shipped, so a readvisor the user forged
+    with the `readvisory` skill shadows a shipped one of the same name
+    rather than the other way round — they asked for theirs by name. The
+    third rank, a project-local real directory, is not listed here at all:
+    it wins by simply existing, because the populator never overwrites a
+    real dir with a symlink."""
+    out: list[tuple[str, Path, str]] = []
+    seen: set[str] = set()
+    for root, origin in ((user_readvisors_root(), "global"),
+                         (shipped_readvisors_root(defaults_root), "shipped")):
+        if not root.is_dir():
+            continue
+        try:
+            entries = sorted(root.iterdir())
+        except OSError:
+            continue
+        for entry in entries:
+            if entry.name.startswith(".") or not entry.is_dir():
+                continue
+            if entry.name in seen:
+                continue
+            seen.add(entry.name)
+            out.append((entry.name, entry, origin))
+    return out
+
+
+def _is_managed_readvisor_link(link: Path) -> bool:
+    """True when `link` is a symlink this populator is entitled to re-point.
+
+    "Managed" means it resolves into *some* install's readvisors folder (or
+    the pre-rename `roles/` one, or a user-global root): the parent
+    directory is named `roles` or `readvisors`. A link the user aimed
+    somewhere else entirely is theirs, and we leave it exactly where it
+    points — the same posture `_symlink_is_broken` takes."""
+    if not link.is_symlink():
+        return False
+    try:
+        target = link.resolve(strict=False)
+    except OSError:
+        return False
+    return target.parent.name in ("roles", "readvisors")
+
+
 def _populate_role_symlinks(project_dir: Path, defaults_root: Path) -> None:
-    """Sync global Role agents into `rness/roles/` and prune dangling
-    symlinks. Same shape and lifecycle as skills: each role is a folder
+    """Sync global readvisors into `rness/readvisors/` and prune dangling
+    symlinks. Same shape and lifecycle as skills: each readvisor is a folder
     containing AGENT.md + MOTIVATION.md, default-off (added to .disabled
-    on first sync), togglable per-project via the sidebar."""
-    src_roles = defaults_root / "roles"
-    dst_roles = project_dir / "rness" / "roles"
-    dst_roles.mkdir(parents=True, exist_ok=True)
+    on first sync), togglable per-project via the sidebar.
+
+    Two global sources feed it (see `_readvisor_sources`), and three ranks
+    resolve a name clash: a project-local **real** directory beats the
+    user-global `~/enough/readvisors/`, which beats the shipped defaults.
+
+    Re-pointing, not just creating, is what heals a project carried between
+    machines or installs: a link into a sibling install's `defaults/roles/`
+    still names the right readvisor, so it is aimed at this install's copy
+    instead of being left dangling."""
+    dst_roles = project_dir / "rness" / "readvisors"
+    try:
+        dst_roles.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        # Read-only parent (a locked project, a permissions accident). The
+        # migration below fails soft in the same situation and the project
+        # keeps reading its old `roles/` folder; refusing to launch over it
+        # would be worse than launching without the sync.
+        return
 
     # 1. Prune dangling symlinks (target removed globally).
+    #
+    # Remember their names. A name pruned here and re-created below is the
+    # SAME readvisor arriving through a new path — the 0.3.5 rename, or a
+    # project carried from another install — and re-creating it must not
+    # reset the user's toggle. Without this, every shipped readvisor a user
+    # had switched ON came back switched OFF the first time they launched
+    # after the rename, which is the one thing a migration must not do.
+    pruned: set[str] = set()
     for entry in sorted(dst_roles.iterdir()):
         if entry.is_symlink() and not entry.exists():
             try:
                 entry.unlink()
+                pruned.add(entry.name)
             except OSError:
                 pass
 
-    # 2. Sync in any new globals (default-off).
-    if not src_roles.is_dir():
-        return
+    # 2. Sync in any new globals (default-off), and re-aim managed links
+    #    that point at the wrong source.
     disabled_names: list[str] = []
-    for entry in sorted(src_roles.iterdir()):
-        if entry.name.startswith(".") or not entry.is_dir():
+    for name, src, _origin in _readvisor_sources(defaults_root):
+        dst = dst_roles / name
+        target = src.resolve()
+        if dst.is_symlink():
+            try:
+                if dst.resolve(strict=False) == target:
+                    continue
+            except OSError:
+                pass
+            if not _is_managed_readvisor_link(dst):
+                continue  # the user aimed this one somewhere on purpose
+            try:
+                dst.unlink()
+            except OSError:
+                continue
+            # A heal, not an arrival: the project already had an opinion
+            # about this name, so its .disabled entry is left alone.
+            try:
+                dst.symlink_to(target)
+            except OSError:
+                pass
             continue
-        dst = dst_roles / entry.name
-        if dst.exists() or dst.is_symlink():
+        if dst.exists():
+            continue  # project-local real dir — rank 1, never touched
+        try:
+            dst.symlink_to(target)
+        except OSError:
             continue
-        dst.symlink_to(entry.resolve())
-        disabled_names.append(entry.name)
+        if name not in pruned:
+            # Genuinely new here, so it arrives switched off, per the
+            # standing rule for new globals. A name we pruned a moment ago
+            # is a re-aim, and keeps whatever the user already decided.
+            disabled_names.append(name)
 
     if disabled_names:
         disabled_file = dst_roles / ".disabled"
@@ -385,7 +530,7 @@ def _populate_paradigm_symlinks(project_dir: Path, defaults_root: Path) -> None:
     """Sync global paradigms into `rness/paradigms/` and prune dangling
     symlinks.
 
-    Paradigms differ from skills/roles in two ways:
+    Paradigms differ from skills/readvisors in two ways:
       - they're single files (`paradigms/*.md`), not folders.
       - they're always selectable — there is no `.disabled` notion.
         Exactly one is active at a time, named in `rness/active-paradigm`.
@@ -428,7 +573,7 @@ def _migrate_undot(project_dir: Path) -> None:
       - `rness/.requests/` → `rness/requests/`
       - `rness/.roles/`    → `rness/roles/`
 
-    Symlinks survive a rename of their parent dir, so global skill/role
+    Symlinks survive a rename of their parent dir, so global skill/readvisor
     targets stay valid. Run BEFORE any populator/skeleton step so the
     rest of the launch sees the new paths."""
     pairs = (
@@ -481,6 +626,123 @@ def _migrate_user_profile_to_project_profile(project_dir: Path) -> None:
         pass  # different fs / permissions / etc. — leave manual cleanup to user
 
 
+def _read_disabled_file(f: Path) -> set[str]:
+    """The names in a `.disabled` file, comments and blanks dropped."""
+    if not f.is_file():
+        return set()
+    try:
+        text = f.read_text(encoding="utf-8")
+    except OSError:
+        return set()
+    return {ln.strip() for ln in text.splitlines()
+            if ln.strip() and not ln.startswith("#")}
+
+
+def _migrate_roles_to_readvisors(project_dir: Path) -> None:
+    """0.3.5 migration: `rness/roles/` → `rness/readvisors/`.
+
+    The rename is the visible half of the readvisor vocabulary change: the
+    folder a user opens in Finder should say what the thing is called. Run
+    from `ensure_skeleton` BEFORE the populators, so the rest of the launch
+    only ever sees the new path.
+
+    Three shapes, in order of how common they are:
+
+    - **Only `roles/`** — the ordinary upgrade. One atomic `rename()`, which
+      carries `.disabled`, `.gitkeep`, project-local real readvisor dirs and
+      the symlinks alike. The symlinks now point into the old
+      `defaults/roles/` and are dangling; `_populate_role_symlinks` prunes
+      and re-creates them a moment later, which is exactly the path a
+      sibling-install link takes too.
+    - **Both** — an older install re-created `roles/` after a first
+      migration (they share a project folder; this really happens). Merge
+      *into* `readvisors/`, which is authoritative: project-local real dirs
+      that the new folder lacks are moved over, the two `.disabled` files
+      are unioned (a readvisor switched off under either name stays off —
+      the safe direction), leftover symlinks and `.gitkeep` are dropped
+      because the populator re-creates them, and `roles/` is then removed
+      with `rmdir`, which **refuses** if anything unexpected is still in
+      there. Nothing non-empty is ever deleted.
+    - **Neither, or only `readvisors/`** — nothing to do.
+
+    Idempotent and fail-soft throughout: a read-only parent leaves `roles/`
+    in place and every reader falls back to it (see
+    `prompt._readvisors_dir`), so the worst case is a project that keeps
+    working under the old name until the permissions are fixed."""
+    rness = project_dir / "rness"
+    old = rness / "roles"
+    new = rness / "readvisors"
+
+    old_is_dir = old.is_dir() and not old.is_symlink()
+    if not old_is_dir:
+        return
+
+    if not (new.exists() or new.is_symlink()):
+        try:
+            old.rename(new)
+        except OSError:
+            log.warning("could not rename %s to %s — the project keeps using "
+                        "the old folder", old, new, exc_info=True)
+        return
+
+    if not (new.is_dir() and not new.is_symlink()):
+        # `readvisors` exists but is a file or a symlink — someone did
+        # something deliberate. Don't guess; leave both alone.
+        return
+
+    # Both are real directories: merge old into new.
+    try:
+        entries = sorted(old.iterdir())
+    except OSError:
+        return
+    for entry in entries:
+        if entry.name == ".disabled":
+            continue
+        if entry.is_symlink():
+            # Never moved: the populator re-creates global links against
+            # the current defaults path a few lines later.
+            try:
+                entry.unlink()
+            except OSError:
+                pass
+            continue
+        if entry.name == ".gitkeep":
+            try:
+                entry.unlink()
+            except OSError:
+                pass
+            continue
+        if not entry.is_dir():
+            # A readvisor is a directory. Anything else in here is something
+            # the user put there, and moving a stray file into a folder they
+            # did not choose is worse than leaving it — `rmdir` will then
+            # decline, which is the honest outcome.
+            continue
+        dest = new / entry.name
+        if dest.exists() or dest.is_symlink():
+            continue  # the new folder already has this one — it wins
+        try:
+            entry.rename(dest)
+        except OSError:
+            pass  # leave it behind; rmdir below will decline, which is right
+
+    union = _read_disabled_file(old / ".disabled") | _read_disabled_file(new / ".disabled")
+    if union:
+        try:
+            (new / ".disabled").write_text("\n".join(sorted(union)) + "\n",
+                                           encoding="utf-8")
+        except OSError:
+            pass
+    try:
+        (old / ".disabled").unlink()
+    except OSError:
+        pass
+    try:
+        old.rmdir()  # refuses when anything survived the loop above
+    except OSError:
+        pass
+
+
 def _symlink_is_broken(link: Path) -> bool:
     """True iff `link` is a symlink that doesn't usefully resolve — i.e.
     dangling (target missing, e.g. an absolute path into another machine's
@@ -504,7 +766,7 @@ def _heal_skeleton_symlinks(project_dir: Path, defaults: Path) -> list[str]:
     """Repair skeleton symlinks broken by a cloud-sync filesystem (Google
     Drive, Dropbox, iCloud) syncing them between machines.
 
-    The per-launch `_populate_*` pass already self-heals skills/roles/
+    The per-launch `_populate_*` pass already self-heals skills/readvisors/
     paradigms (it prunes dangling links and resyncs). The surface it does
     NOT cover is `_SKELETON_PLAN` symlink entries (policies/*, knowledge
     primers): `_is_skeleton_item_present()` counts a *broken* symlink as
@@ -560,10 +822,10 @@ def _prune_infoworld_link(project_dir: Path) -> bool:
 
 def ensure_skeleton(project_dir: Path) -> bool:
     """Create `rness/` if missing, prune the dead `infoworld` link, AND
-    sync global skills/roles on every call (idempotent). Returns True on
+    sync global skills/readvisors on every call (idempotent). Returns True on
     first-time `rness/` creation, False if it already existed.
 
-    The skill/role sync runs on every launch so newly-installed globals
+    The skill/readvisor sync runs on every launch so newly-installed globals
     appear in existing projects too — with default-off status, per the
     policy. It's idempotent: already-symlinked entries and already-
     disabled names are left alone."""
@@ -573,6 +835,11 @@ def ensure_skeleton(project_dir: Path) -> bool:
     # would be invisible to the `rness.exists()` check below and we'd
     # spuriously re-run first-time setup.
     _migrate_undot(project_dir)
+    # Then the readvisor rename, still BEFORE the populators: everything
+    # downstream (the populators, the prompt loader, the tree filter) is
+    # written against `rness/readvisors/` and only falls back to the old
+    # name when this could not run.
+    _migrate_roles_to_readvisors(project_dir)
 
     rness = project_dir / "rness"
     new_project = not rness.exists()
@@ -609,7 +876,7 @@ def ensure_skeleton(project_dir: Path) -> bool:
     # once at server startup (cacheawl.migrate_infoworld).
     _prune_infoworld_link(project_dir)
 
-    # ALWAYS run (idempotent): sync global skills/roles/paradigms into the
+    # ALWAYS run (idempotent): sync global skills/readvisors/paradigms into the
     # project. Picks up any new globals added after this project was first
     # created.
     _populate_skill_symlinks(project_dir, defaults)
@@ -623,7 +890,7 @@ def ensure_skeleton(project_dir: Path) -> bool:
 
     # ALWAYS ensure the io/ scratch dirs exist — back-fills into projects
     # created before these were added to the skeleton.
-    for rel in ("rness/io/input", "rness/io/output"):
+    for rel in ("rness/io/input", "rness/io/output", "rness/io/composure"):
         d = project_dir / rel
         if not d.exists():
             d.mkdir(parents=True, exist_ok=True)
@@ -689,16 +956,16 @@ def ensure_skeleton(project_dir: Path) -> bool:
 
 
 def resync_globals(project_dir: Path) -> None:
-    """Re-run the global skill/role/paradigm sync for an existing project,
+    """Re-run the global skill/readvisor/paradigm sync for an existing project,
     without the rest of the first-launch skeleton pass.
 
     `ensure_skeleton()` only runs at launch, so a global dropped into
-    `~/enough/defaults/{skills,roles,paradigms}/` while a project is already
+    `~/enough/defaults/{skills,readvisors,paradigms}/` while a project is already
     open wouldn't appear until the next restart. The sidebar list endpoints
     call this first so a plain refresh picks up newly-added globals live.
 
     Identical semantics to the launch-time sync: idempotent, cheap (symlink
-    existence checks only), and new skills/roles still arrive default-off
+    existence checks only), and new skills/readvisors still arrive default-off
     (added to `.disabled`). No-op if `rness/` doesn't exist yet (nothing to
     sync into) or the install defaults are missing."""
     rness = project_dir / "rness"

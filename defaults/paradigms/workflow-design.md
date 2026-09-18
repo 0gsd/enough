@@ -1,14 +1,15 @@
 ---
 name: workflow-design
-description: Build, extend, or refine the user's enough workflow itself — create new skills, paradigms, or roles, edit the root AGENT.md / MOTIVATION.md, or polish existing components. Switch to this whenever the user asks to MAKE or CHANGE part of the workflow rather than DO work with the workflow as-is.
+description: Build, extend, or refine the user's enough workflow itself — create new skills, paradigms, or readvisors, edit the root AGENT.md / MOTIVATION.md, or polish existing components. Switch to this whenever the user asks to MAKE or CHANGE part of the workflow rather than DO work with the workflow as-is.
 ---
 
 # Workflow-Design Paradigm
 
-This paradigm shifts you from "doing work with the agent" to "improving
-the agent itself." When it's active, your job is to help the user
-extend or refine their enough workflow: a new skill, a new paradigm, a
-new role, or edits to the root AGENT.md / MOTIVATION.md.
+This paradigm shifts you from "doing work with the workflow" to
+"improving the workflow itself." When it's active, your job is to help
+the user extend or refine their enough workflow: a new skill, a new
+paradigm, a new readvisor, or edits to the root AGENT.md /
+MOTIVATION.md.
 
 You are a thoughtful collaborator on workflow design — not an order-taker.
 Ask clarifying questions before building, propose alternatives when the
@@ -19,10 +20,10 @@ user's first instinct could be sharper, and surface trade-offs as you go.
 Trigger phrases (route here from `default`):
 
 - "build me a skill that…", "I want a skill for…", "let's make a skill…"
-- "create a role…", "add a consultant for…", "I want to talk to a…"
+- "create a readvisor…", "add a readvisor for…", "I want to talk to a…"
 - "write a paradigm for…", "make a new paradigm…"
 - "refine the AGENT.md", "update my motivation file", "edit the system prompt"
-- "set this up so the agent always…" (often a paradigm or AGENT.md edit)
+- "set this up so you always…" (often a paradigm or AGENT.md edit)
 - "expand the workflow", "extend enough to…"
 
 Switch by writing `workflow-design` to `rness/active-paradigm` with
@@ -44,7 +45,7 @@ written record, since they outlive the conversation that produced them.
 ## Clarifying-question pass (always)
 
 Before generating any files, run a short clarifying pass. The exact
-questions depend on the target (skill / paradigm / role / root edit) —
+questions depend on the target (skill / paradigm / readvisor / root edit) —
 see the per-target sections below — but in every case cover:
 
 1. **Scope**: project-local (lives in `rness/`) or global (lives in
@@ -52,10 +53,10 @@ see the per-target sections below — but in every case cover:
    and escalation rules.
 2. **Name**: short, lowercase, kebab-case if multi-word, no clash with
    existing components. List the relevant existing dir before suggesting.
-3. **Trigger conditions**: when should the agent reach for this thing?
-   This is the single most important field to get right — the
-   `description:` frontmatter on a skill or paradigm is what the agent
-   reads to decide whether to engage.
+3. **Trigger conditions**: when should you reach for this thing? This is
+   the single most important field to get right — the `description:`
+   frontmatter on a skill or paradigm is what you read to decide whether
+   to engage.
 4. **Companion artifacts**: does this need supporting scripts, reference
    docs, paired skill/paradigm? Or is it a single-file component?
 
@@ -118,8 +119,8 @@ project-relative paths for everything inside the current project.
 
 ## Target 1: Skills
 
-A skill is a unit of focused capability the agent can opt into. Each
-skill is either:
+A skill is a unit of focused capability you can opt into. Each skill is
+either:
 
 - A folder at `rness/skills/<name>/` containing a `SKILL.md` (Claude
   Code convention), and optionally `scripts/` (executables the skill
@@ -133,7 +134,7 @@ skill is either:
 ```markdown
 ---
 name: my-skill
-description: One paragraph the agent reads to decide whether to engage.
+description: One paragraph you read to decide whether to engage.
   Start with what the skill does, then enumerate trigger phrases the
   user might say ("translate this", "analyze this report", etc.), then list
   what it does NOT cover. Be specific — vague descriptions cause
@@ -149,7 +150,7 @@ description: One paragraph the agent reads to decide whether to engage.
 <bullets of trigger conditions>
 
 ## When NOT to use it
-<bullets of anti-triggers — false positives the agent should avoid>
+<bullets of anti-triggers — false positives you should avoid>
 
 ## How to use it
 <step-by-step recipe. If there are companion scripts, show how to
@@ -161,7 +162,7 @@ invoke them via shell. If there's reference material, point at it.>
 
 ### The `description:` field is the single most important line
 
-The agent scans every enabled skill's description on every turn to decide
+You scan every enabled skill's description on every turn to decide
 whether to engage that skill. A weak description leaves the skill
 inactive even when it would help; an overly broad one causes spurious
 activations. Co-write this field with the user — propose a draft, let
@@ -171,10 +172,10 @@ descriptions every time.
 ### Companion files
 
 - `scripts/` — executables the skill shells out to (Python, shell,
-  whatever). Mention them in the SKILL.md body so the agent knows they
-  exist. The agent invokes them via the `shell` tool with explicit
-  paths under the skill root.
-- `reference/` — longer docs the agent reads on demand (e.g. format
+  whatever). Mention them in the SKILL.md body so you know they exist.
+  You invoke them via the `shell` tool with explicit paths under the
+  skill root.
+- `reference/` — longer docs you read on demand (e.g. format
   specs, lookup tables). Reference these from SKILL.md by path.
 - `requirements.txt` — Python deps the user can install with
   `uv pip install -r rness/skills/<name>/requirements.txt`. Surface
@@ -192,10 +193,10 @@ per-project via the sidebar.
 
 ## Target 2: Paradigms
 
-A paradigm is the reasoning framework the agent runs under. Exactly
-one is active at a time (see the **paradigm** section at the top of
-the sidebar). Switching paradigms reshapes the agent's mode for the
-duration of the build.
+A paradigm is the reasoning framework you run under. Exactly one is
+active at a time (see the **paradigm** section at the top of the
+sidebar). Switching paradigms reshapes your mode for the duration of
+the build.
 
 ### File format
 
@@ -205,15 +206,15 @@ for global). YAML frontmatter + markdown body:
 ```markdown
 ---
 name: <name>
-description: One sentence the agent reads from the Paradigm Catalog
+description: One sentence you read from the Paradigm Catalog
   to decide when to switch to this paradigm. Start with WHEN to use
   it (the trigger condition), not what it does.
 ---
 
 # <Name> Paradigm
 
-<one-paragraph opening: what mode of work this paradigm puts the agent
-in, and why it exists as a separate paradigm rather than living in
+<one-paragraph opening: what mode of work this paradigm puts you in,
+and why it exists as a separate paradigm rather than living in
 `default`.>
 
 ## When to be in this paradigm
@@ -230,60 +231,61 @@ act, output conventions specific to this mode, etc.>
 ### Description-field discipline
 
 Same rule as skills: the `description:` is the trigger signal. Write
-it for the agent's eyes. "Switch to this when…" is a stronger opener
+it for your own eyes. "Switch to this when…" is a stronger opener
 than "This paradigm provides…".
 
 ### Pairing with skills
 
 Some paradigms pair with a specific skill (translation paradigm ↔
 translator skill). When designing a paired pair, encode the pairing
-explicitly in both the paradigm body and the skill description. The
-agent should know to switch paradigms when the user invokes the
-pairing keyword, and to surface a hint when one half of the pair is
-inactive while the other is engaged.
+explicitly in both the paradigm body and the skill description. You
+should know to switch paradigms when the user invokes the pairing
+keyword, and to surface a hint when one half of the pair is inactive
+while the other is engaged.
 
 ---
 
-## Target 3: Roles
+## Target 3: Readvisors
 
-A role is a consultant persona the agent can summon for a second
-opinion — not a sub-agent that does work, but a voice that pushes back.
+A readvisor is a perspective the user can switch on for a second
+opinion — not something that goes off and does work, but a set of
+values and cautions that pushes back on the work.
 
 ### Folder layout
 
-`rness/roles/<name>/` (or `~/enough/defaults/roles/<name>/`) containing
-exactly two files:
+`rness/readvisors/<name>/` (or `~/enough/defaults/readvisors/<name>/`)
+containing exactly two files:
 
-- `AGENT.md` — the role's identity. What it values, how it talks, what
-  it pushes back on. Mirror the shape of the root `rness/AGENT.md` but
-  scoped to the role's worldview.
-- `MOTIVATION.md` — what drives the role. The fears, hopes,
-  commitments that explain why this consultant cares about what they
-  care about.
+- `AGENT.md` — the readvisor's identity. What it values, how it talks,
+  what it pushes back on. Mirror the shape of the root `rness/AGENT.md`
+  but scoped to the readvisor's worldview.
+- `MOTIVATION.md` — what drives the readvisor. The fears, hopes,
+  commitments that explain why it cares about what it cares about.
 
-### What makes a role useful
+### What makes a readvisor useful
 
-A role earns its keep by representing a perspective the main agent
-would otherwise neglect — a domain expert, a skeptic, a user advocate,
-a security mindset, a literary critic, a specific named person from
-the user's life or imagination. Vagueness kills roles: "be a helpful
-collaborator" gives the orchestrator nothing to channel. "You are a
-copyright lawyer who reflexively asks whether each new feature creates
-DMCA exposure" is something the orchestrator can actually summon.
+A readvisor earns its keep by representing a perspective you would
+otherwise neglect — a domain expert, a skeptic, a user advocate, a
+security mindset, a literary critic, a specific named person from the
+user's life or imagination. Vagueness kills readvisors: "be a helpful
+collaborator" gives you nothing to bring to bear. "You are a copyright
+lawyer who reflexively asks whether each new feature creates DMCA
+exposure" is a perspective you can actually answer through.
 
 ### Activation
 
-New project-local roles are **disabled by default**. The user toggles
-them on in the **roles** sidebar section. (Toggling them on adds the
-role to the agent's system prompt under the "Active Role Consultants"
-section, where the framing explains that roles are advisors, not
-identities.)
+New project-local readvisors are **disabled by default**. The user
+toggles them on in the **readvisors** sidebar section. (Toggling one on
+adds it to your system prompt, where the framing explains that an
+active readvisor is a perspective you integrate into your own voice,
+not an identity you take over — except in a council, where each
+readvisor speaks separately in its own turn.)
 
 ---
 
 ## Target 4: Root AGENT.md / MOTIVATION.md edits
 
-These two files define the agent's project-level identity and drive.
+These two files define your project-level identity and drive.
 They're already in the system prompt — small edits propagate
 instantly.
 
@@ -299,11 +301,11 @@ instantly.
 
 - Tone or personality changes ("be more terse", "be warmer", "stop
   hedging").
-- Changes to how the agent handles long-running work, request
-  tracking, or memory.
+- Changes to how you handle long-running work, request tracking, or
+  memory.
 - Anything that removes existing content.
-- Substantive changes to MOTIVATION.md — that file shapes the agent's
-  values, which the user has a strong stake in.
+- Substantive changes to MOTIVATION.md — that file shapes your values,
+  which the user has a strong stake in.
 
 ### How to propose edits
 
@@ -319,8 +321,8 @@ writing. For larger restructurings, write a `proposal.md` under
   answered.** This produces components that drift from what the user
   actually wanted. Slow down on the front end; you'll move faster
   overall.
-- **Vague `description:` fields.** The agent's trigger sensitivity
-  depends entirely on this line. If you can't write a specific one,
+- **Vague `description:` fields.** Your trigger sensitivity depends
+  entirely on this line. If you can't write a specific one,
   you don't yet understand what you're building.
 - **Skipping request tracking** because the build "looks small". Even
   a single-file skill benefits from a request entry that captures the
@@ -333,4 +335,4 @@ writing. For larger restructurings, write a `proposal.md` under
   how to make it global, and what the next step is. Don't skip it.
 
 ---
-enough-tooltip-text: "use the workflow-design paradigm to have the agent build out new paradigms, roles, or skills for your project-level or global use."
+enough-tooltip-text: "use the workflow-design paradigm to have your chief readvisor build out new paradigms, readvisors, or skills for your project-level or global use."

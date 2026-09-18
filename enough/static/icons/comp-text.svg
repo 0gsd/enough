@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PLACEHOLDER (composure round, P4c). Original line art on the house
+     72x72 artboard, drawn inside the ~54 art box. Pure #000 so
+     build_icons.py's black<->white swap produces the dark variant.
+     Overwrite this file and re-run scripts/build_icons.py to replace it. -->
+<svg id="comp-text" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <line x1="36" y1="12" x2="36" y2="60" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+  <line x1="25" y1="12" x2="47" y2="12" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+  <line x1="25" y1="60" x2="47" y2="60" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+  <line x1="14" y1="22" x2="14" y2="50" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+  <line x1="58" y1="22" x2="58" y2="50" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+</svg>

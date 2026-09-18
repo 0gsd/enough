@@ -1,6 +1,6 @@
 ---
 name: text-planning
-description: Long-horizon planning paradigm for any structured text — novel, novella, short-story collection, non-fiction book, academic paper, long essay, blog post, manifesto. Switch to this whenever the user expresses intent to plan, outline, or structure a piece of writing they intend to author themselves (with or without later agent assistance), and either the `analyzer` or `memoir-dialectic` skill is enabled. Treats the project folder as the heart of a single writing project. Produces a `<project>-text-plan.md` at the project root via patient, iterative collaboration with the user, then optionally generates per-section `<section>-scaffold.md` files on request — purely structural guidance that the user expands into prose themselves.
+description: Long-horizon planning paradigm for any structured text — novel, novella, short-story collection, non-fiction book, academic paper, long essay, blog post, manifesto. Switch to this whenever the user expresses intent to plan, outline, or structure a piece of writing they intend to author themselves (with or without later drafting help), and either the `analyzer` or `memoir-dialectic` skill is enabled. Treats the project folder as the heart of a single writing project. Produces a `<project>-text-plan.md` at the project root via patient, iterative collaboration with the user, then optionally generates per-section `<section>-scaffold.md` files on request — purely structural guidance that the user expands into prose themselves.
 ---
 
 # Text-Planning Paradigm
@@ -11,7 +11,7 @@ section scaffolds I can sit down and draft from."
 
 Two things happen here:
 
-1. **Plan.** The agent and user build a single plan document together,
+1. **Plan.** You and the user build a single plan document together,
    iteratively, across one or many sessions. The plan lives at the
    project root as `<project>-text-plan.md` and is the heart of the
    project folder while planning is active.
@@ -24,7 +24,7 @@ Two things happen here:
 
 What this paradigm explicitly does *not* do:
 
-- Write prose from the plan or scaffold. (If the user wants the agent to
+- Write prose from the plan or scaffold. (If the user wants you to
   draft, they invoke that outside this paradigm — usually by switching to
   `default` and asking directly.)
 - Plan memoirs. The `memoir-dialectic` skill is purpose-built for that
@@ -83,9 +83,9 @@ without offering the handoff.
 
 | Artifact | Path | When created | Owner |
 |----------|------|--------------|-------|
-| Request file | `rness/requests/develop-plan-for-<slug>_<ts>.md` | Once, at the start | Agent writes, user marks Done |
-| Plan document | `<project>-text-plan.md` (project root) | Once, after intake | Co-authored; agent re-reads every turn |
-| Scaffold(s) | `<section-slug>-scaffold.md` (project root) | On demand, per section | Agent writes; user expands into prose |
+| Request file | `rness/requests/develop-plan-for-<slug>_<ts>.md` | Once, at the start | You write, user marks Done |
+| Plan document | `<project>-text-plan.md` (project root) | Once, after intake | Co-authored; you re-read every turn |
+| Scaffold(s) | `<section-slug>-scaffold.md` (project root) | On demand, per section | You write; user expands into prose |
 
 The plan document deliberately lives at the project root, not inside a
 subfolder — text-planning treats the project folder as the heart of one
@@ -185,8 +185,8 @@ The user decides what counts as done.
 ## Plan document — generic skeleton
 
 Every `<project>-text-plan.md` opens with a self-describing header so a
-future agent (or a different conversation, or a collaborator) can read it
-cold and know what it is.
+future readvisor (or a different conversation, or a collaborator) can read
+it cold and know what it is.
 
 ```markdown
 # <Project Name> — Text Plan
@@ -195,7 +195,7 @@ cold and know what it is.
 > `text-planning` paradigm of an enough workflow. It captures the
 > overview, intent, audience, voice, structure, and per-section beats
 > for a writing project the user intends to author. When the plan is in
-> a usable state, the user may ask the agent to generate per-section
+> a usable state, the user may ask their readvisor to generate per-section
 > *scaffolds* — purely structural guides for individual sections — which
 > appear next to this file as `<section-slug>-scaffold.md`. The plan
 > itself contains no prose to be lifted; it is a blueprint.
@@ -406,8 +406,8 @@ Per `policies/requests.md`:
 3. The user fills in the End Output section when they mark the request
    Done. Don't preempt them.
 4. Scaffold generation does *not* open a new request — it's an action
-   the agent takes inside the existing planning request, logged as a
-   Progress Checkpoint entry.
+   you take inside the existing planning request, logged as a Progress
+   Checkpoint entry.
 
 ## Quick reference
 
@@ -426,4 +426,4 @@ Per `policies/requests.md`:
 scaffold is the frame. The prose is yours.*
 
 ---
-enough-tooltip-text: "use the text-planning paradigm to plan and create tracking documents for you and agents to use across sessions."
+enough-tooltip-text: "use the text-planning paradigm to plan and create tracking documents for you and your readvisors to use across sessions."

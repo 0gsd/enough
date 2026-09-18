@@ -62,7 +62,7 @@ about…"):
 ## 6. Access mechanics — legitimate, and used freely
 
 - **Custom `User-Agent` / headers / cookies** are ordinary, legal parts of HTTP; the
-  bundled `fetch_asset.py` sets a normal browser UA so sites that reject blank/botty agents
+  bundled `fetch_asset.py` sets a normal browser UA so sites that reject blank/botty user agents
   serve the public file they'd serve any visitor. This is for reaching *public* content,
   not defeating access controls on content the user has no right to.
 - **`fetch_url` is the default and the only content transport.** It handles the

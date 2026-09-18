@@ -1,6 +1,6 @@
 # Policy: Allowlists
 
-Three lists govern what the agent can reach beyond the project directory:
+Three lists govern what enough can reach beyond the project directory:
 
 1. **File-read prefixes** — absolute paths the `read_file` tool may read.
 2. **File-read-write prefixes** — absolute paths `write_file` may also write to.
@@ -18,13 +18,13 @@ lists are rejected.
 
 ## File-read-write prefixes
 
-(empty by default — add a prefix here only when you intentionally want the
-agent to be able to write outside the project. paths on the file-read list
+(empty by default — add a prefix here only when you intentionally want
+enough to be able to write outside the project. paths on the file-read list
 above are read-only.)
 
 ## Internet domains
 
-These are domains the broker fetches **directly** when the agent uses
+These are domains the broker fetches **directly** when you use
 the `fetch_url` tool. Off-list domains aren't rejected — they're routed
 through the local Tor proxy (127.0.0.1:9050) for anonymity. The
 allowlist is the boundary between "fetch fast, identifiable" and "fetch
@@ -41,7 +41,7 @@ slower, anonymized."
 - `dumps.wikimedia.org`
 - `wikimedia.org`
 
-## Notes for the agent
+## Notes for the readvisor
 
 - To read a file inside `~/enough/`, use `read_file` with the absolute
   path (e.g. `read_file ~/enough/defaults/paradigms/default.md`). The

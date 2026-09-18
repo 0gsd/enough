@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PLACEHOLDER (composure round, P2c). Original line art on the house
+     72x72 artboard, drawn inside the ~54 art box: a name badge with a
+     pencil across it — "rename your chief readvisor". Pure #000 so
+     build_icons.py's black<->white swap produces the dark variant.
+     Overwrite this file and re-run scripts/build_icons.py to replace it. -->
+<svg id="readvisor-rename" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <rect x="10" y="18" width="38" height="26" rx="3" ry="3" fill="none" stroke="#000" stroke-width="3"/>
+  <line x1="17" y1="28" x2="41" y2="28" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+  <line x1="17" y1="35" x2="33" y2="35" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+  <path d="M40 52 L58 34 L64 40 L46 58 L36 62 Z" fill="none" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+  <line x1="40" y1="52" x2="46" y2="58" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+</svg>

@@ -156,6 +156,11 @@ def build_env(scratch: Path) -> dict[str, str]:
         "ENOUGH_WIKISINK_CONFIG": str(scratch / "wikisink.json"),
         "ENOUGH_UI_CONFIG": str(scratch / "ui.json"),
         "ENOUGH_EXTRAS_STATE": str(scratch / "extras.json"),
+        # The user-global readvisors dir (P7). Without this seam an
+        # `install_readvisor` at global scope writes into the developer's
+        # real ~/enough/readvisors/ and is then symlinked into every
+        # project they open afterwards.
+        "ENOUGH_READVISORS_ROOT": str(scratch / "readvisors"),
         # The home screen's project registry. $HOME already points here, so
         # this is belt and braces — but the rule is "every ENOUGH_* seam", and
         # the handoff file and desktop.json are derived from this one's dir.

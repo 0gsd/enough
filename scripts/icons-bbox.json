@@ -72,6 +72,123 @@
       "y": 24.2
     }
   },
+  "comp-add-module.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 10,
+      "y": 14,
+      "w": 48,
+      "h": 47
+    }
+  },
+  "comp-eraser.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 12,
+      "y": 13,
+      "w": 48,
+      "h": 46
+    }
+  },
+  "comp-file-entry.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 12,
+      "y": 10,
+      "w": 48,
+      "h": 50
+    }
+  },
+  "comp-fit.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 10,
+      "y": 14,
+      "w": 52,
+      "h": 44
+    }
+  },
+  "comp-new.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 14,
+      "y": 11,
+      "w": 42,
+      "h": 50
+    }
+  },
+  "comp-page-next.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 12,
+      "y": 11,
+      "w": 50,
+      "h": 50
+    }
+  },
+  "comp-page-prev.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 10,
+      "y": 11,
+      "w": 50,
+      "h": 50
+    }
+  },
+  "comp-pencil.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 12,
+      "y": 15,
+      "w": 45,
+      "h": 45
+    }
+  },
+  "comp-pointer.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 20,
+      "y": 10,
+      "w": 33,
+      "h": 50
+    }
+  },
+  "comp-redo.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 13.6,
+      "y": 20.1,
+      "w": 44.4,
+      "h": 35.9
+    }
+  },
+  "comp-text.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 14,
+      "y": 12,
+      "w": 44,
+      "h": 48
+    }
+  },
+  "comp-undo.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 14,
+      "y": 20.1,
+      "w": 44.4,
+      "h": 35.9
+    }
+  },
+  "composure.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 9,
+      "y": 12,
+      "w": 54,
+      "h": 48
+    }
+  },
   "d6.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
@@ -223,6 +340,51 @@
       "w": 65,
       "x": 3.5,
       "y": 10.3
+    }
+  },
+  "readvisor-dock.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 9,
+      "y": 15,
+      "w": 54,
+      "h": 42
+    }
+  },
+  "readvisor-full.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 9,
+      "y": 15,
+      "w": 54,
+      "h": 42
+    }
+  },
+  "readvisor-rename.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 10,
+      "y": 18,
+      "w": 54,
+      "h": 44
+    }
+  },
+  "readvisornav-off.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 9,
+      "y": 24.2,
+      "w": 54,
+      "h": 23.6
+    }
+  },
+  "readvisornav-on.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "x": 9,
+      "y": 24.2,
+      "w": 54,
+      "h": 23.6
     }
   },
   "ribbon-alert.svg": {

@@ -1,11 +1,11 @@
 ---
 name: memoir-dialectic
-description: Multi-session memoir planning and (optionally) drafting via patient, iterative dialogue. Use whenever the user wants to plan, build, or write a memoir — full life, partial life, single milestone, professional thread, creative thread, or thematic slice. The agent interviews the user across many sessions, accumulates plan documents in a project folder, and optionally synthesizes a draft. Trigger on memoir-dialectic, "help me plan my memoir," "write my memoir with me," "memoir interview," "life story project," "autobiography help," or any long-horizon autobiographical writing collaboration.
+description: Multi-session memoir planning and (optionally) drafting via patient, iterative dialogue. Use whenever the user wants to plan, build, or write a memoir — full life, partial life, single milestone, professional thread, creative thread, or thematic slice. You interview the user across many sessions, accumulate plan documents in a project folder, and optionally synthesize a draft. Trigger on memoir-dialectic, "help me plan my memoir," "write my memoir with me," "memoir interview," "life story project," "autobiography help," or any long-horizon autobiographical writing collaboration.
 ---
 
 # memoir-dialectic
 
-Patient, multi-session collaborator for planning and (optionally) drafting a memoir. The skill is a loop, not a script — the agent asks, the user answers, the agent files. Over many sessions a memoir takes shape on disk. The folder is the memory; the user can disappear for weeks or years and pick up where they left off.
+Patient, multi-session collaborator for planning and (optionally) drafting a memoir. The skill is a loop, not a script — you ask, the user answers, you file. Over many sessions a memoir takes shape on disk. The folder is the memory; the user can disappear for weeks or years and pick up where they left off.
 
 ## Session start (every time)
 
@@ -18,7 +18,7 @@ Patient, multi-session collaborator for planning and (optionally) drafting a mem
 ## File conventions
 
 - `PLAN-NN.md` — numbered in **conversation order, not chronological order**. PLAN-01 is always the intake summary. PLAN-02 is whatever the user wanted to discuss first; PLAN-03 next; and so on.
-- `INDEX.md` — one-line summary per PLAN- doc, kept current. The agent's fast resumption map.
+- `INDEX.md` — one-line summary per PLAN- doc, kept current. Your fast resumption map.
 - `NOTES.md` — scratch capture for messy, unstructured user dumps. Redistributed into PLAN- docs later.
 - `MEMOIR-OUTLINE.md` — synthesis of all PLAN- docs into structural order. Created when planning is done (or for checkpoints).
 - `MEMOIR-DRAFT-NN.md` — only if scope (b). Numbered in draft order. May be 1:1, 1:many, or many:1 with PLAN- docs.

@@ -549,6 +549,10 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
             "girraph, call add_node with no <parent> — the file is created "
             "and your label becomes its title.",
         )
+    from . import composure as _composure  # late import: keeps tools cheap
+    if (why := _composure.write_denial(target)):
+        # Same rule, same reason as girraphs: one door, node-level ops.
+        return ToolResult("write_file", call.path, False, why)
     # The model's <content>...</content> typically has a leading newline from
     # formatting. Strip one leading newline to match expected conventions.
     body = call.content
@@ -868,21 +872,45 @@ def _append_broker_index(
         f.write(row)
 
 
-def run_fetch_url(project_dir: Path, call: ToolCall) -> ToolResult:
-    """Fetch a URL with broker semantics: allowlist routing, optional Tor
-    fallback, markdown conversion, and io/input caching.
+@dataclass
+class CachedFetch:
+    """One completed pass through the broker's fetch pipeline: gated GET,
+    optional HTML→markdown, cached under `rness/io/input/`, indexed.
 
-    The agent only ever sees a short preview + cache path in the result —
-    full content lives on disk, retrievable via `read_file` if needed."""
-    url = (call.url or "").strip()
-    if not url:
-        return ToolResult("fetch_url", "", False, "error: missing <url>")
-    try:
-        resp, use_tor, host = _fetch_http(project_dir, url)
-    except FetchDenied as e:
-        return ToolResult("fetch_url", url, False, str(e))
-    except FetchError as e:
-        return ToolResult("fetch_url", url, False, str(e))
+    `run_fetch_url` renders this for the agent; the composure webframe
+    refresh renders it as rich text for a module. Anything else that needs
+    "fetch a page the way the broker fetches pages" calls `fetch_and_cache`
+    rather than reimplementing the toggles."""
+    url: str
+    status: int
+    content_type: str          # main MIME type, lowercased, charset stripped
+    used_tor: bool
+    host: str
+    title: str
+    converted: bool            # HTML→markdown actually happened
+    cache_rel: str             # project-relative path of the cached file
+    cache_ext: str             # md | html | txt | bin
+    short_hash: str
+    timestamp: str             # "%Y-%m-%d %H:%M:%S"
+    raw_bytes: int
+    content: str | bytes       # exactly what was cached
+
+
+def fetch_and_cache(
+    project_dir: Path, url: str, *,
+    timeout: float = _FETCH_TIMEOUT_S, max_bytes: int = _FETCH_MAX_BYTES,
+) -> CachedFetch:
+    """The broker's fetch → convert → cache → index pipeline, shared.
+
+    Raises `FetchDenied` when the broker refuses (the message is the
+    agent-facing denial text, verbatim) and `FetchError` on a network,
+    size or cache failure. Every caller gets the same toggles: the
+    `fetch_url_enabled` kill switch, allowlist-vs-Tor routing, and
+    `fetch_url_cache_and_convert` for the markdown conversion and the
+    broker index row."""
+    url = (url or "").strip()
+    resp, use_tor, host = _fetch_http(project_dir, url, timeout=timeout,
+                                      max_bytes=max_bytes)
     ctype = (resp.headers.get("content-type") or "").lower()
     # Strip charset suffix; just want the MIME prefix.
     ctype_main = ctype.split(";", 1)[0].strip()
@@ -909,6 +937,7 @@ def run_fetch_url(project_dir: Path, call: ToolCall) -> ToolResult:
     now = dt.datetime.now()
     timestamp_full = now.strftime("%Y-%m-%d %H:%M:%S")
     timestamp_short = now.strftime("%Y-%m-%d-%H%M")
+    parsed = urllib.parse.urlparse(url)
     slug_seed = parsed.path.rstrip("/").rsplit("/", 1)[-1] or host
     slug = _slugify(slug_seed)
     short_hash = _short_hash(url + timestamp_full)
@@ -922,10 +951,9 @@ def run_fetch_url(project_dir: Path, call: ToolCall) -> ToolResult:
         else:
             cache_path.write_bytes(cache_content)
     except OSError as e:
-        return ToolResult(
-            "fetch_url", url, False,
-            f"error: fetched {len(resp.content)} bytes but could not cache: {e}",
-        )
+        raise FetchError(
+            f"error: fetched {len(resp.content)} bytes but could not cache: {e}"
+        ) from e
     if broker.is_enabled("fetch_url_cache_and_convert"):
         _append_broker_index(
             project_dir,
@@ -936,6 +964,31 @@ def run_fetch_url(project_dir: Path, call: ToolCall) -> ToolResult:
             title=title,
             status=resp.status_code,
         )
+    return CachedFetch(
+        url=url, status=resp.status_code, content_type=ctype_main,
+        used_tor=use_tor, host=host, title=title, converted=converted_ok,
+        cache_rel=cache_rel, cache_ext=cache_ext, short_hash=short_hash,
+        timestamp=timestamp_full, raw_bytes=len(resp.content),
+        content=cache_content,
+    )
+
+
+def run_fetch_url(project_dir: Path, call: ToolCall) -> ToolResult:
+    """Fetch a URL with broker semantics: allowlist routing, optional Tor
+    fallback, markdown conversion, and io/input caching.
+
+    The agent only ever sees a short preview + cache path in the result —
+    full content lives on disk, retrievable via `read_file` if needed."""
+    url = (call.url or "").strip()
+    if not url:
+        return ToolResult("fetch_url", "", False, "error: missing <url>")
+    try:
+        got = fetch_and_cache(project_dir, url)
+    except FetchDenied as e:
+        return ToolResult("fetch_url", url, False, str(e))
+    except FetchError as e:
+        return ToolResult("fetch_url", url, False, str(e))
+    cache_content, cache_rel = got.content, got.cache_rel
     # Preview: first N chars of text content; for binary, just a size note.
     if isinstance(cache_content, str):
         preview = cache_content[:_PREVIEW_CHARS]
@@ -943,10 +996,10 @@ def run_fetch_url(project_dir: Path, call: ToolCall) -> ToolResult:
             preview += f"\n… (+{len(cache_content) - _PREVIEW_CHARS} chars; full text at {cache_rel})"
     else:
         preview = f"(binary content — {len(cache_content)} bytes; cached at {cache_rel})"
-    routing = "via Tor" if use_tor else "direct"
+    routing = "via Tor" if got.used_tor else "direct"
     convert_note = ""
-    if ctype_main.startswith("text/html"):
-        if converted_ok:
+    if got.content_type.startswith("text/html"):
+        if got.converted:
             convert_note = " — converted HTML→markdown via pandoc"
         elif broker.is_enabled("fetch_url_cache_and_convert"):
             convert_note = " — HTML cached raw (pandoc unavailable or errored)"
@@ -955,28 +1008,28 @@ def run_fetch_url(project_dir: Path, call: ToolCall) -> ToolResult:
     # policy). Without this hint the agent will retry the same URL or
     # nearby variants and burn the context window on identical 429s.
     block_hint = ""
-    if use_tor and resp.status_code >= 400:
+    if got.used_tor and got.status >= 400:
         block_hint = (
-            f"\nhint: {host} returned HTTP {resp.status_code} via a Tor "
+            f"\nhint: {got.host} returned HTTP {got.status} via a Tor "
             f"exit node. many sites (google.com, cloudflare-fronted sites, "
             f"some news outlets) reject Tor traffic by policy. options: "
             f"(a) try an on-allowlist source for the same info — "
             f"en.wikipedia.org, en.wikisource.org, www.gutenberg.org, "
             f"archive.org all route direct and rarely block; "
-            f"(b) add {host} to rness/policies/allowlists.md under "
+            f"(b) add {got.host} to rness/policies/allowlists.md under "
             f"'## Internet domains' to fetch it directly without Tor "
             f"(only if you trust the site with your real IP); "
             f"(c) stop retrying — the block is likely persistent.\n"
         )
     body = (
-        f"ok — fetched {url} ({routing}, HTTP {resp.status_code}, "
-        f"{ctype_main}, {len(resp.content)} bytes){convert_note}.\n"
+        f"ok — fetched {url} ({routing}, HTTP {got.status}, "
+        f"{got.content_type}, {got.raw_bytes} bytes){convert_note}.\n"
         f"cached at: {cache_rel}\n"
-        f"hash: {short_hash} — grep rness/io/input/_broker-index.md to find later."
+        f"hash: {got.short_hash} — grep rness/io/input/_broker-index.md to find later."
         f"{block_hint}\n"
         f"--- preview ---\n{preview}\n"
     )
-    return ToolResult("fetch_url", url, resp.status_code < 400, body)
+    return ToolResult("fetch_url", url, got.status < 400, body)
 
 
 # ---------------------------------------------------------------------------
@@ -1633,6 +1686,19 @@ _TRACE_TOGGLE = {
     "cachebox_create": "trace_log_enabled",
     "cachebox_ingest": "trace_log_enabled",
 }
+
+# The nine composure tools add themselves to both tables above. One
+# import-time call keeps the canvas's op vocabulary in exactly one place
+# (`enough/composure.py`) instead of spreading eight runners through this
+# file. They are gated by `composure_enabled` inside the runners and traced
+# under the universal toggle, like the girraph ops.
+from . import composure_tools as _composure_tools  # noqa: E402
+_composure_tools.register()
+
+# `install_readvisor` does the same, for the same reason (P7). Its gate is
+# `readvisory_install`, checked inside the runner.
+from . import readvisor_tools as _readvisor_tools  # noqa: E402
+_readvisor_tools.register()
 
 
 def _trace_args_for(call: ToolCall) -> dict[str, object]:
