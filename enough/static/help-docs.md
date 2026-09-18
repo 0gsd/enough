@@ -408,12 +408,14 @@ path: (a composure whose form is council)
 several readvisors and you, thinking about one thing in turn, in writing, on the canvas. a council is an ordinary composure with the brief at the top and one card per statement below it, tinted per speaker and headed with a name and a turn number. the statements belong to the engine: you can move them, restyle them, ink over them and comment on them, but not rewrite them.
 
 ### how
-fill in the brief — input, parameters, constraints, desired output — tick who is in the room, set the max rounds, and press convene. then drive it: <em>next turn</em> takes one statement, <em>run a round</em> goes all the way around, <em>run to the end</em> runs to the round cap, <em>pause</em> stops it, <em>conclude</em> asks the chief for the decision. the composer at the bottom is yours: whatever you say takes the next slot without costing anybody their turn. concluding writes the answer as a highlighted card — or as a markdown file at the path you chose — and exports the whole transcript to <code>rness/knowledge/councils/</code>.
+fill in the brief — input, parameters, constraints, desired output — tick who is in the room, give anyone a one-line <em>charge</em> if they are here for something particular ("owns continuity", "argues the reader's side"), set the max rounds, and press convene. then drive it: <em>next turn</em> takes one statement, <em>run a round</em> goes all the way around, <em>run to the end</em> runs to the round cap, <em>pause</em> stops it, <em>conclude</em> asks the chief for the decision. the composer at the bottom is yours: whatever you say takes the next slot without costing anybody their turn, and <code>/pal</code> typed there sends one distilled question out to the cloud model and brings the answer back as a statement. concluding writes what the council decided in the shape you chose — a highlighted card, a markdown file at a path of your choosing, or a whole new composure of cards beside this one — and exports the transcript to <code>rness/knowledge/councils/</code>. a concluded council can be <em>reconvened</em>: a new council with the same room, the same charges and what this one decided as its starting point.
 
 ### ideas
 - give one readvisor the counter-case and find out whether it survives contact with the others.
-- set the output to a document when the decision should leave the canvas as a file you can cite.
+- a charge is the cheapest way to stop three readvisors saying the same thing three ways.
+- set the output to a document when the decision should leave the canvas as a file you can cite, or to a composure when what you want is the shape of the decision rather than its paragraphs.
 - say something yourself the moment a council starts circling; an interjection is cheaper than another round.
+- reconvene rather than starting over when the answer was right but not finished.
 
 ## chief-readvisor
 name: chief readvisor
@@ -428,3 +430,18 @@ press the rename button beside the × in this header, type a new name and save. 
 ### ideas
 - pick something you would say out loud; you are going to be reading it all day.
 - rename before you convene a council, not during one.
+
+## pal
+name: pal
+path: (the OPRO-API model slot)
+
+### what
+one question, sent out, in the open. a <strong>pal</strong> is the cloud model you already configured in the OPRO-API slot, reached once, by hand, from a turn that is otherwise entirely local. there is no pal setting, no pal account and no second switch: if the cloud slot works, a pal works, and if it does not, the broker's usual explanation is the whole story. typing <code>/pal</code> is the consent — there is no confirm step, because a confirm step that appears every time is a button people learn to click. what replaces it is that the prompt which leaves this machine is shown to you word for word, before the answer, every time, live and after a reload.
+
+### how
+start a message with <code>/pal</code> and the rest of it is the ask: <code>/pal what is the state of the art for on-device speech recognition?</code>. type <code>/</code> as the first character and a hint row appears above the composer naming the model that would be reached; tab or a click completes it, and when the cloud slot is shut the row greys itself and says why. your readvisor then thinks it through here first — its own knowledge, the files in this project, the wiki tools — works out what it genuinely cannot settle locally, sends <strong>one</strong> refined prompt, and answers you in its own voice saying which parts came from the pal. one call per <code>/pal</code> message. the same command works in a council's composer, where the chief distils the brief and the whole transcript into the prompt; the answer lands as a gray statement whose first line folds away what was sent.
+
+### ideas
+- put <code>:online</code> on the end of the model id in the OpenRouter settings — <code>anthropic/claude-sonnet-4.5:online</code> — and your pal answers with the web in front of it. it bills extra per search, and it is the fix for a model frozen at its training cutoff.
+- keep it for what a local model cannot have: this week's news, a library released last month, a second opinion on a judgement call you have already made.
+- read the outgoing bubble before you read the answer. it is the only place that shows exactly what left, and it is there on purpose.

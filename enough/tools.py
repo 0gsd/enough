@@ -1379,24 +1379,14 @@ def run_cloud_pipeline(project_dir: Path, call: ToolCall) -> ToolResult:
     import json as _json
 
     # Gating chain: local_models_only must be off, key must be present and
-    # healthy, spec must parse. Each failure returns a clear denial so the
-    # agent can either give up or surface the issue to the user.
-    if broker.is_enabled("local_models_only"):
-        return ToolResult(
-            "cloud_pipeline", "", False,
-            broker.denial_local_models_only(),
-        )
-    cloud_status = _cloud.status_snapshot()
-    if not cloud_status["key_present"]:
-        return ToolResult(
-            "cloud_pipeline", "", False,
-            broker.denial_cloud_key_missing(),
-        )
-    if not cloud_status["last_verified_ok"]:
-        return ToolResult(
-            "cloud_pipeline", "", False,
-            broker.denial_cloud_unhealthy(cloud_status["last_error"] or "unverified"),
-        )
+    # healthy, spec must parse. The first three live in `cloud.gate_status()`
+    # — the same three steps, in the same order, with the same denial copy,
+    # shared with `ask_pal` (P8) so the two doors out of this machine cannot
+    # drift apart. Each failure returns a clear denial so the agent can
+    # either give up or surface the issue to the user.
+    gate = _cloud.gate_status()
+    if not gate["open"]:
+        return ToolResult("cloud_pipeline", "", False, gate["denial"])
     if not call.content:
         return ToolResult(
             "cloud_pipeline", "", False,
@@ -1699,6 +1689,12 @@ _composure_tools.register()
 # `readvisory_install`, checked inside the runner.
 from . import readvisor_tools as _readvisor_tools  # noqa: E402
 _readvisor_tools.register()
+
+# `ask_pal` likewise (P8). Its gate is the cloud gate plus a pal turn the
+# user opened by typing `/pal`, both checked inside the runner. Its module
+# imports `enough.cloud` lazily, so registering it here costs nothing.
+from . import pal_tools as _pal_tools  # noqa: E402
+_pal_tools.register()
 
 
 def _trace_args_for(call: ToolCall) -> dict[str, object]:

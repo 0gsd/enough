@@ -1073,6 +1073,95 @@
       color: var(--accent-error);
     }
 
+    /* ================================================================
+       P8 — the `/pal` command hint row
+       ================================================================
+       Typing `/` as the first character of a composer reveals one line:
+       what the command does and — the part that is the difference
+       between a command and a surprise bill — which model it would
+       reach. Tab or a click completes it.
+
+       A greyed row is a HINT, not a gate. The message still posts, the
+       server still answers with the real denial, and there is no
+       client-side `/pal` handling at all: no stripping, no validation,
+       no confirm dialog. A frontend that pre-empts the backend is a
+       frontend that can be wrong about it.
+
+       One set of rules, two composers: the readvisor panel's and the
+       council footer's. */
+    .pal-hint {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 24px 4px;
+      padding: 3px 8px;
+      background: var(--bg-raise);
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--fg-muted);
+    }
+
+    .pal-hint[hidden] { display: none; }
+
+    /* Wrap rather than squeeze — the lesson `.rv-chip` learned in P6c, in
+       the same ~350px column. The gloss is a sentence and the model id is
+       a slug; ellipsizing either one to a third of itself says nothing,
+       and the whole point of the row is that it names the model. */
+    .pal-hint-row {
+      flex: 1 1 auto;
+      min-width: 0;
+      box-sizing: border-box;
+      min-height: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 2px 8px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .pal-hint-row .pal-cmd {
+      flex: 0 0 auto;
+      font-family: var(--font-mono, ui-monospace, monospace);
+      color: var(--accent-user);
+      font-weight: 600;
+    }
+
+    .pal-hint-row .pal-gloss {
+      flex: 1 1 10em;
+      min-width: 10em;
+      line-height: 1.35;
+    }
+
+    /* Its own line when the two will not share one. A truncated model id
+       is worse than no model id: `anthropic/claude-son…` and
+       `anthropic/claude-son…:online` cost different money. */
+    .pal-hint-row .pal-model {
+      flex: 1 1 100%;
+      min-width: 0;
+      word-break: break-all;
+      font-family: var(--font-mono, ui-monospace, monospace);
+      color: var(--fg-faint);
+    }
+
+    .pal-hint-row .pal-model:empty { display: none; }
+
+    /* Unavailable: the row stays, greyed, with the gate's own reason in
+       place of the gloss. Removing it would hide the one sentence that
+       says how to switch the cloud slot back on.
+       It still completes on Tab or a click — a hint that refused to
+       complete would be a gate wearing a hint's clothes. */
+    .pal-hint.pal-off { opacity: 0.6; }
+    .pal-hint.pal-off .pal-hint-row .pal-cmd { color: var(--fg-faint); }
+
     /* The composer in a ~350px column. The placeholder wrapped to three
        lines there (it fit on one across an 880px chat) and a textarea
        CLIPS rather than growing, so the hint read "message… (shift+enter
@@ -2715,20 +2804,54 @@
       overflow-y: auto;
     }
 
+    /* A participant row is now TWO lines: who is in the room, and what
+       they are here to do. `.cc-person` used to be the <label> itself;
+       with a charge field under it, it cannot be — a text input inside a
+       <label> whose control is a checkbox toggles that checkbox on every
+       click. So the label shrank to `.cc-who` and the row became its
+       container. (P9) */
     .cc-person {
       display: flex;
-      align-items: center;
-      gap: 6px;
+      flex-direction: column;
+      gap: 3px;
       padding: 4px 6px;
-      min-height: 24px;
       border-bottom: 1px solid var(--border);
     }
 
     .cc-person:last-child { border-bottom: none; }
 
     /* The checkbox is a little bigger than the platform default, but the
-       TARGET is the whole row: `.cc-person` is a <label>, so a click
-       anywhere on it toggles, and the row is ≥ 24px tall. */
+       TARGET is the whole line: `.cc-who` is the <label>, so a click
+       anywhere along it toggles, and it is ≥ 24px tall. */
+    .cc-who {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 24px;
+      cursor: pointer;
+    }
+
+    /* One line, ≤ 200 characters, the cap the engine refuses over. It is
+       indented under the name it belongs to so a column of them reads as
+       one charge per person rather than as a second list. */
+    .cc-charge {
+      box-sizing: border-box;
+      width: 100%;
+      margin-left: 22px;
+      max-width: calc(100% - 22px);
+      background: var(--bg-raise);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 2px 6px;
+      font: inherit;
+      font-size: 11px;
+      min-height: 22px;
+    }
+
+    .cc-charge::placeholder { color: var(--fg-faint); }
+    .cc-charge:focus { outline: 1px solid var(--accent-user); }
+
     .cc-person input[type="checkbox"] {
       accent-color: var(--accent-user);
       width: 16px;
@@ -2890,6 +3013,27 @@
 
     .cc-done[hidden] { display: none; }
 
+    /* The reconvene control sits in the concluded block, and it is the
+       one thing there that is not a path: give it the row to itself. */
+    .cc-done .cc-btn { margin-top: 6px; }
+
+    /* "carries on from …" — the lineage line on a reconvened council. */
+    .cc-from {
+      margin-top: 4px;
+      color: var(--fg-faint);
+      font-size: 11px;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+
+    .cc-from[hidden] { display: none; }
+
+    /* The footer's own copy of the `/pal` hint row. Same rules, tighter
+       margins — the footer has no 24px gutter to sit inside. */
+    #comp-council-footer .pal-hint {
+      margin: 6px 0 0;
+    }
+
     /* The jump-to-latest pill. It appears only when the user has panned
        away in the last few seconds — following the transcript is the
        default, and yanking the view out from under somebody who is reading
@@ -2946,6 +3090,78 @@
     .comp-module.comp-council-output {
       box-shadow: 0 0 0 calc(2px / var(--comp-z)) var(--accent-user),
         0 calc(2px / var(--comp-z)) calc(9px / var(--comp-z)) rgba(0, 0, 0, 0.42);
+    }
+
+    /* The outline would not parse twice and the conclusion was kept as
+       prose (`output_fallback: "answer"`). One line on the module that
+       IS the output, so a reader looking for the composure that is not
+       there finds out why on the card rather than nowhere. (P9) */
+    .comp-council-fallback {
+      margin-bottom: 0.6em;
+      padding: 0.25em 0.6em;
+      border-left: calc(2px / var(--comp-z)) solid var(--warn, #e0a458);
+      color: var(--warn, #e0a458);
+      font-size: 0.8em;
+      line-height: 1.4;
+    }
+
+    /* ---------- a pal's statement ---------- */
+    /* A pal answer is an interjection: it takes a turn number but not a
+       slot. Its first block is the exact prompt that left this machine,
+       quoted — the record — and a reader scrolling twenty statements
+       should not have to wade through it every time. So it collapses,
+       and it is NEVER hidden: the disclosure is always there, and it
+       says what it is holding. (P9) */
+    /* Inline-block, not a full-width bar: a disclosure is a word you
+       press, and a statement card is 816 world px wide — a control that
+       took all of that would hang off the side of a 1024px stage at the
+       page-fit zoom, which is exactly what the suite found it doing. */
+    .comp-council-pal-lead {
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+      box-sizing: border-box;
+      /* A card's text scales with the canvas zoom, and a control that
+         scaled with it would be 15px tall on a zoomed-out council. The
+         `/ var(--comp-z)` is the coordinate contract — the same idiom the
+         borders here use — and it holds the hit area open while the label
+         itself keeps shrinking with the card. 28 rather than 20 because
+         `--comp-z` and the world transform's own scale can disagree by
+         ~20% on a council (see the landed doc's known gaps), so the
+         constant carries the slack. */
+      min-height: calc(28px / var(--comp-z));
+      text-align: left;
+      background: transparent;
+      color: var(--fg-muted);
+      border: calc(1px / var(--comp-z)) dashed var(--comp-edge, var(--border));
+      border-radius: calc(4px / var(--comp-z));
+      font-family: var(--font-mono);
+      font-size: 0.78em;
+      padding: 0.3em 0.7em;
+      margin-bottom: 0.6em;
+      cursor: pointer;
+    }
+
+    .comp-council-pal-lead::before {
+      content: "▸ ";
+    }
+
+    .comp-council-pal-lead[aria-expanded="true"]::before {
+      content: "▾ ";
+    }
+
+    /* The blockquote itself, once the disclosure is open. */
+    .comp-module[data-speaker-kind="pal"] blockquote.comp-pal-prompt {
+      margin: 0 0 0.6em 0;
+      padding-left: 0.8em;
+      border-left: calc(2px / var(--comp-z)) solid var(--comp-edge, var(--border));
+      color: var(--fg-muted);
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+    }
+
+    .comp-module[data-speaker-kind="pal"] blockquote.comp-pal-prompt[hidden] {
+      display: none;
     }
       flex: 1 1 auto;
       overflow-y: auto;
@@ -6895,6 +7111,72 @@
 
     .msg.system .body,
     .msg.rness .body {
+      color: var(--fg-muted);
+    }
+
+    /* The two pal bubbles (P8). One exchange, always in this order:
+       what LEFT this machine, then what came back.
+
+       `.msg.pal-sent` is the whole of the consent model — typing `/pal`
+       is the consent, and what replaces a confirm step is that the
+       outgoing prompt is shown verbatim, every time, live and after a
+       reload, never summarized and never truncated. So it is quiet, but
+       it is not small print: the prompt is set in the mono face because
+       it is a thing that was sent, not a thing anybody said.
+
+       The class names are the SERVER's: `server._render_pal_bubbles`
+       rebuilds these two from the history on reload with the same
+       markup the `pal_exchange` event asks for, so one set of rules
+       has to serve both or a refresh reshuffles the conversation. */
+    .msg.pal-sent,
+    .msg.pal {
+      background: var(--bg-raise);
+      border-left: 3px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 0 4px 4px 0;
+      margin: 8px 0;
+      font-size: 12px;
+    }
+
+    .msg.pal-sent {
+      border-left-style: dashed;
+      border-left-color: var(--fg-faint);
+      background: color-mix(in oklab, var(--bg-raise) 55%, transparent);
+    }
+
+    .msg.pal {
+      border-left-color: var(--accent-agent);
+    }
+
+    .msg.pal-sent .role,
+    .msg.pal .role {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 10px;
+      text-transform: none;
+      letter-spacing: 0.4px;
+      margin-bottom: 2px;
+      font-family: var(--font-mono, ui-monospace, monospace);
+    }
+
+    .msg.pal-sent .role { color: var(--fg-faint); }
+    .msg.pal .role { color: var(--accent-agent); }
+
+    /* The marker: one leaving, one arriving. Decoration only — the
+       byline already says `→ pal · <model>` in words, which is what the
+       server writes and what a reader actually reads. */
+    .msg.pal-sent .role::after,
+    .msg.pal .role::after {
+      margin-left: auto;
+      opacity: 0.7;
+    }
+
+    .msg.pal-sent .role::after { content: "↗"; }
+    .msg.pal .role::after { content: "↙"; }
+
+    .msg.pal-sent .body {
+      font-family: var(--font-mono, ui-monospace, monospace);
       color: var(--fg-muted);
     }
 
@@ -10953,7 +11235,17 @@
               <select id="cc-output" class="cc-sel">
                 <option value="answer" data-i18n="comp.council.output.answer">a decided answer</option>
                 <option value="document" data-i18n="comp.council.output.document">a document in this project</option>
-                <option value="composure" disabled data-i18n="comp.council.output.composure">a composure — lands in 0.4.0</option>
+                <option value="composure" data-i18n="comp.council.output.composure">a composure beside this one</option>
+              </select>
+            </div>
+            <!-- A composure output takes no path — the file is made beside
+                 the council on conclude — but it does take a LAYOUT: each
+                 group a column (scaffold) or a row (cards). (P9) -->
+            <div class="cc-row" id="cc-form-row" hidden>
+              <label class="cc-label" for="cc-form" data-i18n="comp.council.form">laid out as</label>
+              <select id="cc-form" class="cc-sel">
+                <option value="scaffold" data-i18n="comp.council.form.scaffold">scaffold — each group a column</option>
+                <option value="cards" data-i18n="comp.council.form.cards">cards — each group a row</option>
               </select>
             </div>
             <input type="text" id="cc-output-path" class="cc-field" hidden
@@ -10970,7 +11262,20 @@
 
           <div id="comp-council-footer" hidden>
             <div class="cc-status" id="cc-status"><span class="cc-dot"></span><span id="cc-status-text"></span></div>
+            <!-- Where this council came from, when it was reconvened from
+                 another. The `doc` link-in the engine adds says the same
+                 thing, but it is down a column of statements. (P9) -->
+            <div class="cc-from" id="cc-from" hidden></div>
             <div class="cc-notice" id="cc-notice" hidden></div>
+            <!-- The same `/pal` hint row the readvisor panel's composer
+                 has, on the same rules. -->
+            <div class="pal-hint" id="cc-pal-hint" hidden>
+              <button type="button" class="pal-hint-row" id="cc-pal-hint-row">
+                <span class="pal-cmd">/pal</span>
+                <span class="pal-gloss"></span>
+                <span class="pal-model"></span>
+              </button>
+            </div>
             <div class="cc-composer" id="cc-composer">
               <textarea id="cc-say" rows="2"
                 placeholder="say something to the council — enter sends, shift+enter is a newline"
@@ -11587,6 +11892,23 @@
         <span class="text" id="rv-chip-text"></span>
         <button type="button" id="rv-chip-clear" title="drop the queued selection"
           data-i18n-title="rv.chip.clear.title">×</button>
+      </div>
+
+      <!-- The `/pal` command hint (P8). Revealed by `/` as the first
+           character of the composer, greyed with the gate's own reason
+           when the cloud slot is not usable. It is a hint: the message
+           still posts and the server still answers with the real
+           denial. -->
+      <div class="pal-hint" id="pal-hint" data-help="pal" hidden>
+        <button type="button" class="pal-hint-row" id="pal-hint-row">
+          <span class="pal-cmd">/pal</span>
+          <!-- The gloss is written by `palPaintHint`, not by `applyI18n`:
+               it carries either the description or the gate's reason, and
+               a memoized `data-i18n` original would put the description
+               back over the reason on the next language switch. -->
+          <span class="pal-gloss" id="pal-hint-gloss"></span>
+          <span class="pal-model" id="pal-hint-model"></span>
+        </button>
       </div>
 
       <div class="input-dock">
@@ -13091,6 +13413,122 @@
       }
     }, true);  // capture phase — run before htmx's submit handler
 
+    // ================================================================
+    // P8 — `/pal`, in the composer
+    // ================================================================
+    //
+    // There is NO client-side `/pal` handling here — no stripping, no
+    // validation, no confirm dialog. `POST /api/chat` owns the command
+    // and every one of its four outcomes; this is one row of chrome that
+    // says the command exists, what it costs and which model it reaches.
+    //
+    // The row greys itself when the gate is shut, and greyed it is still
+    // a hint: the message posts anyway and the server answers with the
+    // real denial as a `system` bubble. A frontend that pre-empted the
+    // backend here would be a second copy of the gate, and the gate is
+    // three checks in a deliberate order (see `cloud.gate_status`).
+    const PAL = {
+      status: null,     // the last GET /api/pal/status body
+      inflight: null,   // …or the promise that is fetching it
+    };
+
+    // `/api/pal/status` READS THE OS KEYRING when the cloud toggle is
+    // off, and on macOS a keyring read by a process the user has not
+    // blessed raises a system dialog. So it is asked ONCE — the first
+    // time a composer sees a `/` — and never per keystroke. (P8 §5)
+    async function palStatus() {
+      if (PAL.status) return PAL.status;
+      if (PAL.inflight) return PAL.inflight;
+      const shut = { available: false, reason: '', model_id: null };
+      PAL.inflight = (async () => {
+        try {
+          const r = await fetch('/api/pal/status');
+          PAL.status = r.ok ? await r.json() : shut;
+        } catch (_e) {
+          PAL.status = shut;
+        }
+        PAL.inflight = null;
+        return PAL.status;
+      })();
+      return PAL.inflight;
+    }
+
+    // Is what has been typed so far the start of `/pal`? `/`, `/p`,
+    // `/pa`, `/pal` — and `/pal <the question>`, so the row does not
+    // vanish the moment the question starts being typed.
+    function palTyping(value) {
+      const s = String(value || '');
+      if (s.charAt(0) !== '/') return false;
+      const head = s.split(/\s/)[0].toLowerCase();
+      return '/pal'.indexOf(head) === 0 || head === '/pal';
+    }
+
+    function palPaintHint(el, st) {
+      if (!el || !st) return;
+      const gloss = el.querySelector('.pal-gloss');
+      const model = el.querySelector('.pal-model');
+      el.classList.toggle('pal-off', !st.available);
+      if (gloss) {
+        gloss.textContent = st.available
+          ? t('pal.hint', 'think locally, then ask the configured cloud model one refined question')
+          : (st.reason || t('pal.shut', 'the cloud slot is not usable right now'));
+      }
+      if (model) {
+        // "asks anthropic/claude-sonnet-4.5" is the difference between a
+        // command and a surprise bill.
+        model.textContent = (st.available && st.model_id)
+          ? t('pal.asks', 'asks {model}').replace('{model}', st.model_id)
+          : '';
+      }
+    }
+
+    // One function, two composers: the panel's `#pal-hint` and the
+    // council footer's `#cc-pal-hint`.
+    function palSyncHint(hostId, value) {
+      const el = document.getElementById(hostId);
+      if (!el) return;
+      const on = palTyping(value);
+      el.hidden = !on;
+      if (!on) return;
+      if (PAL.status) { palPaintHint(el, PAL.status); return; }
+      palStatus().then((st) => { if (!el.hidden) palPaintHint(el, st); });
+    }
+
+    // Tab and a click both complete. Whatever was typed after the partial
+    // command is kept — somebody who typed `/pa how does X work` meant
+    // the question, not the typo.
+    function palComplete(ta, hostId) {
+      if (!ta) return;
+      const rest = String(ta.value || '').replace(/^\s*\/\S*\s*/, '');
+      ta.value = '/pal ' + rest;
+      ta.focus();
+      try { ta.setSelectionRange(ta.value.length, ta.value.length); }
+      catch (_e) { /* a textarea that will not take a caret still has text */ }
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+      if (hostId) palSyncHint(hostId, ta.value);
+    }
+
+    textarea.addEventListener('input', () => palSyncHint('pal-hint', textarea.value));
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab' || e.shiftKey) return;
+      const row = document.getElementById('pal-hint');
+      if (!row || row.hidden) return;
+      e.preventDefault();
+      palComplete(textarea, 'pal-hint');
+    });
+    document.getElementById('pal-hint-row')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      palComplete(textarea, 'pal-hint');
+    });
+    // The message just went; the row has nothing left to hint at.
+    form.addEventListener('htmx:afterRequest', () => palSyncHint('pal-hint', ''));
+
+    window.PAL = PAL;
+    window.palStatus = palStatus;
+    window.palSyncHint = palSyncHint;
+    window.palPaintHint = palPaintHint;
+    window.palComplete = palComplete;
+
     // Sidebar toggle — bare two-state icon: projectnav-on when the sidebar
     // is visible, projectnav-off when hidden. The .on class drives the CSS
     // glow. Icon + state swap together on every click.
@@ -13491,6 +13929,13 @@
         'cc-say', 'cc-input', 'cc-parameters', 'cc-constraints',
         'cc-output-path', 'cc-rounds', 'rename-chief-input'];
       if (composers.includes(el.id)) return true;
+      // The council's setup card grew a charge field PER PARTICIPANT in
+      // P9, and those have no ids to list — there are as many as there
+      // are readvisors. The rule is the card's, not the field's: any
+      // text field inside the setup card owns esc for its own "never
+      // mind", exactly as `cc-input` and the rest do by name.
+      if (el.closest && el.closest('#comp-council-setup')
+        && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) return true;
       if (el.closest && el.closest('.modal-panel')) return true;
       if (el.closest && el.closest('#girraph-body')
         && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) return true;
@@ -16233,6 +16678,41 @@
         autoscroll();
       } catch (_) { /* ignore */ }
     });
+
+    // A pal exchange (P8): one event, two bubbles, always in this order —
+    // what LEFT this machine, then what came back. It arrives the moment
+    // the tool result lands, which is BEFORE the readvisor's next tokens,
+    // so the bubbles go in ahead of the assistant bubble that is
+    // streaming rather than after it.
+    //
+    // The markup is byte-for-byte what `server._render_pal_bubbles` emits
+    // on reload. That is the whole reason this is written out by hand
+    // instead of being built from elements: a refresh must not reshuffle
+    // the conversation, and two renderers of the same two bubbles is how
+    // it would.
+    function palBubbles(modelId, prompt, reply) {
+      const model = escapeHtml(modelId || '');
+      return '<div class="msg pal-sent"><div class="role">'
+        + escapeHtml('→ pal · ') + model + '</div>'
+        + '<div class="body">' + escapeHtml(prompt || '') + '</div></div>'
+        + '<div class="msg pal"><div class="role">pal · ' + model + '</div>'
+        + '<div class="body">' + escapeHtml(reply || '') + '</div></div>';
+    }
+
+    function palOnExchange(d) {
+      const html = palBubbles(d.model_id, d.prompt, d.reply);
+      const cur = document.getElementById('current-response');
+      if (cur) cur.insertAdjacentHTML('beforebegin', html);
+      else conversation.insertAdjacentHTML('beforeend', html);
+      document.getElementById('empty-hint')?.remove();
+      autoscroll();
+    }
+
+    es.addEventListener('pal_exchange', (e) => {
+      try { palOnExchange(JSON.parse(e.data)); } catch (_) { /* ignore */ }
+    });
+    window.palBubbles = palBubbles;
+    window.palOnExchange = palOnExchange;
 
     // System bubbles — rness narrating what's happening (auto-reset
     // chrome). These don't go into the model's history; they're only for
@@ -26587,6 +27067,7 @@
       host.setAttribute('contenteditable', editingHere ? 'true' : 'false');
       host.dataset.state = compPageState(m, page, locked);
       compRendererFor(m)(m, page, host);
+      compCouncilDecorate(m, el, host);
       el.appendChild(host);
       compMarkPageComments(m, host);
 
@@ -26611,6 +27092,62 @@
       if ((m.page_count || 1) > 1) el.appendChild(compBuildPager(m));
       compBuildModulePin(m, el);
       return el;
+    }
+
+    // What a council statement gains over an ordinary module, applied on
+    // every repaint (so it survives a move, a restyle and a page turn):
+    //
+    // 1. `data-speaker-kind` on the module element, which is what the CSS
+    //    reads. The model has carried it since P5; nothing painted it.
+    // 2. A pal's leading blockquote — the exact prompt that left this
+    //    machine — COLLAPSED, behind a disclosure that says what it is
+    //    holding. Never hidden outright: it is the record. (P9)
+    // 3. The one-line notice on a conclusion that was kept as prose
+    //    because its outline would not parse twice.
+    function compCouncilDecorate(m, el, host) {
+      if (m.speaker_kind) el.dataset.speakerKind = m.speaker_kind;
+      else delete el.dataset.speakerKind;
+      if (m.speaker_kind === 'pal') compCouncilCollapsePal(host);
+      if (!(m.speaker && m.bg === 'ink')) return;
+      const meta = (typeof compCouncilMeta === 'function')
+        ? (compCouncilMeta() || {}) : {};
+      if (meta.output_fallback !== 'answer') return;
+      const note = document.createElement('div');
+      note.className = 'comp-council-fallback';
+      note.dataset.compChrome = '1';
+      note.setAttribute('contenteditable', 'false');
+      note.textContent = t('comp.council.outputFellBackCard',
+        'the outline would not parse, so this answer is the output — no composure was written');
+      host.insertBefore(note, host.firstChild);
+    }
+
+    // The disclosure. `data-comp-chrome` keeps it out of the serialized
+    // rich text (compWalkRich) the way the journal's date header is kept
+    // out — a button written into the file as prose would be a statement
+    // nobody made.
+    function compCouncilCollapsePal(host) {
+      const q = host.querySelector('blockquote');
+      // Only the leading `→ pal` quote collapses. A pal that quoted
+      // something in its answer keeps that quote where it is.
+      if (!q || (q.textContent || '').trim().indexOf('→ pal') !== 0) return;
+      q.classList.add('comp-pal-prompt');
+      q.hidden = true;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'comp-council-pal-lead';
+      btn.dataset.compChrome = '1';
+      btn.setAttribute('contenteditable', 'false');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.textContent = t('comp.council.palDisclosure',
+        'what left the machine');
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        ev.preventDefault();
+        const open = q.hidden;
+        q.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      host.insertBefore(btn, q);
     }
 
     // The face's source text and what is painted are two different things
@@ -31028,6 +31565,12 @@
       _settleT: 0,
     };
     const COMP_COUNCIL_OUTPUTS = ['answer', 'document', 'composure'];
+    const COMP_COUNCIL_FORMS = ['scaffold', 'cards'];
+    //: The engine refuses a charge over this with a sentence carrying the
+    //: number (`council.MAX_CHARGE_CHARS`), so the input caps itself: a
+    //: refusal you could have prevented by not letting it be typed is a
+    //: refusal nobody thanks you for.
+    const COMP_CHARGE_MAX = 200;
     const COMP_SAY_WORDS = 350;      // the framing's own ceiling
     const COMP_FOLLOW_MS = 5000;     // how long a hand-pan owns the view
     const COMP_STATEMENT_W = 816;    // fullport width: minutes, not a board
@@ -31172,8 +31715,14 @@
       if (!host) return;
       host.innerHTML = '';
       for (const p of (COMP_COUNCIL.people || [])) {
-        const row = document.createElement('label');
+        // Two lines: who is in the room, then what they are here to do.
+        // The <label> is the FIRST line only — a text input inside a
+        // label whose control is a checkbox toggles that checkbox on
+        // every click, which would make the charge field untypable.
+        const row = document.createElement('div');
         row.className = 'cc-person';
+        const who = document.createElement('label');
+        who.className = 'cc-who';
         const cb = document.createElement('input');
         cb.type = 'checkbox';
         cb.checked = !!p.on;
@@ -31181,7 +31730,7 @@
         // in is a council with no composer, and the composer is the point.
         cb.disabled = p.kind === 'user';
         if (cb.disabled) {
-          row.title = t('comp.council.userAlways', 'you are always in the room');
+          who.title = t('comp.council.userAlways', 'you are always in the room');
         }
         cb.addEventListener('change', () => { p.on = cb.checked; });
         const tint = document.createElement('span');
@@ -31193,10 +31742,29 @@
         const kind = document.createElement('span');
         kind.className = 'cc-kind';
         kind.textContent = compCouncilKindWord(p.kind);
-        row.appendChild(cb);
-        row.appendChild(tint);
-        row.appendChild(name);
-        row.appendChild(kind);
+        who.appendChild(cb);
+        who.appendChild(tint);
+        who.appendChild(name);
+        who.appendChild(kind);
+        row.appendChild(who);
+        // The charge: one optional line saying what THIS participant is
+        // for. It reaches only that participant's own prompt, as the last
+        // section of their identity, which is why it is a field per row
+        // rather than a paragraph in the brief. The user has no charge —
+        // you are not something the council was told to do. (P9)
+        if (p.kind !== 'user') {
+          const charge = document.createElement('input');
+          charge.type = 'text';
+          charge.className = 'cc-charge';
+          charge.maxLength = COMP_CHARGE_MAX;
+          charge.value = p.charge || '';
+          charge.placeholder = t('comp.council.charge.ph',
+            'what they are here to do — “owns continuity”, “argues the reader’s side”');
+          charge.setAttribute('aria-label', t('comp.council.charge.aria',
+            'this participant’s charge'));
+          charge.addEventListener('input', () => { p.charge = charge.value; });
+          row.appendChild(charge);
+        }
         host.appendChild(row);
       }
       if (!(COMP_COUNCIL.people || []).length) {
@@ -31208,11 +31776,17 @@
       }
     }
 
+    // Each output kind reveals exactly what it needs and nothing else: a
+    // `document` takes a path, a `composure` takes a layout (and no path
+    // — the file is made beside the council on conclude), an `answer`
+    // takes neither.
     function compCouncilSyncOutput() {
       const kind = compEl('cc-output');
       const path = compEl('cc-output-path');
+      const form = compEl('cc-form-row');
       if (!kind || !path) return;
       path.hidden = kind.value !== 'document';
+      if (form) form.hidden = kind.value !== 'composure';
     }
 
     async function compCouncilSeedSetup(seq) {
@@ -31225,6 +31799,8 @@
       const out = meta.output || {};
       set('cc-output', COMP_COUNCIL_OUTPUTS.indexOf(out.kind) !== -1 ? out.kind : 'answer');
       set('cc-output-path', out.path || '');
+      set('cc-form', COMP_COUNCIL_FORMS.indexOf(out.form) !== -1
+        ? out.form : 'scaffold');
       compCouncilSyncOutput();
       compCouncilError('');
       let roster = [];
@@ -31237,53 +31813,16 @@
       compCouncilRenderPeople();
     }
 
-    // The brief MODULE is not written by the engine — the brief the
-    // participants read is built from the meta — so the shipped form's
-    // placeholder would otherwise still be sitting on the canvas while the
-    // council argued about something else. It is an ordinary unlocked
-    // module, so this is an ordinary `set_page` from `source: "ui"`.
-    // Deliberately English: it is document content, and docs/I18N.md keeps
-    // what the readvisors read in English.
-    function compCouncilBriefRich(meta) {
-      const out = (meta && meta.output) || {};
-      const esc = (s) => escapeHtml(String(s || ''));
-      const bits = [];
-      const row = (label, value) => {
-        if (!value) return;
-        bits.push('<p><strong>' + label + '</strong> ' + esc(value) + '</p>');
-      };
-      row('Input.', meta && meta.input);
-      row('Parameters.', meta && meta.parameters);
-      row('Constraints.', meta && meta.constraints);
-      const want = out.kind === 'document'
-        ? 'a document at ' + (out.path || '(no path)')
-        : (out.kind === 'composure' ? 'a composure' : 'a decided answer');
-      bits.push('<p><strong>Desired output.</strong> ' + esc(want) + '</p>');
-      return bits.join('');
-    }
-
-    function compCouncilBriefModuleId(meta) {
-      const stated = meta && meta.brief_module;
-      if (stated && compModuleById(stated)) return stated;
-      for (const m of ((COMP.model && COMP.model.modules) || [])) {
-        if (!m.speaker && m.type === 'text') return m.id;
-      }
-      return null;
-    }
-
-    async function compCouncilWriteBrief(meta) {
-      const id = compCouncilBriefModuleId(meta);
-      if (!id) return;
-      const m = compModuleById(id);
-      if (!m) return;
-      const page = (m.pages || [])[0];
-      const n = page ? page.n : 1;
-      const rich = compCouncilBriefRich(meta);
-      if (page && (page.rich || '') === rich) return;
-      if (page) page.rich = rich;
-      compRefreshModule(id);
-      await compCommit([{ op: 'set_page', module: id, n, rich }]);
-    }
+    // The brief MODULE used to be written from here, because the engine
+    // wrote only the brief the PARTICIPANTS read and the shipped form's
+    // placeholder would otherwise sit on the canvas while the council
+    // argued about something else. P9 §5 closed that: `api_council_setup`
+    // writes it in its own op batch, from `council.brief_markdown(meta)`,
+    // for every caller — the setup card, a tool, a script. So the
+    // frontend's stopgap is gone rather than kept as a second writer of
+    // the same card with a slightly different sentence in it.
+    // (Retired here: compCouncilBriefRich, compCouncilBriefModuleId,
+    // compCouncilWriteBrief.)
 
     // `/api/council/setup` creates the file when the path does not exist,
     // so a council convened from the composures menu lands on disk here
@@ -31321,6 +31860,14 @@
       const val = (id) => { const el = compEl(id); return el ? el.value : ''; };
       const kind = val('cc-output') || 'answer';
       const outPath = String(val('cc-output-path') || '').trim();
+      // A `composure` output takes a form and no path; a `document` takes
+      // a path and no form; an `answer` takes neither. Sending the fields
+      // a kind does not own is how a 400 naming a field the user cannot
+      // see happens.
+      const out = kind === 'document' ? { kind, path: outPath }
+        : (kind === 'composure'
+          ? { kind, form: val('cc-form') || 'scaffold' }
+          : { kind });
       const body = {
         path,
         title: COMP.title || '',
@@ -31328,12 +31875,14 @@
         parameters: val('cc-parameters'),
         constraints: val('cc-constraints'),
         max_rounds: parseInt(val('cc-rounds'), 10) || 3,
-        output: kind === 'document' ? { kind, path: outPath } : { kind },
-        // The rows go back UNCHANGED apart from which are ticked: `folder`,
-        // `tint` and `charge` ride along and the engine needs all three.
+        output: out,
+        // The rows go back UNCHANGED apart from which are ticked and what
+        // was typed in the charge field: `folder`, `tint` and `charge`
+        // ride along and the engine needs all three.
         participants: (COMP_COUNCIL.people || []).filter((p) => p.on).map((p) => ({
           id: p.id, kind: p.kind, name: p.name,
-          folder: p.folder || '', charge: p.charge || '', tint: p.tint || '',
+          folder: p.folder || '',
+          charge: String(p.charge || '').trim(), tint: p.tint || '',
         })),
       };
       await compFlush();
@@ -31344,7 +31893,6 @@
       if (!st) return;
       await compCouncilAdoptCreated(st.path, st.rev);
       COMP_COUNCIL.state = st;
-      await compCouncilWriteBrief(st.council);
       const conv = await compCouncilPost('/api/council/convene', { path: st.path });
       if (conv) COMP_COUNCIL.state = conv;
       COMP_COUNCIL.showSetup = false;
@@ -31401,11 +31949,68 @@
       el.classList.toggle('cc-over', n > COMP_SAY_WORDS);
     }
 
+    // ---------- reconvene ----------
+
+    // A concluded council, sat again: a NEW composure with the same
+    // participants, charges, parameters, constraints, output and round
+    // cap, and a brief that carries the prior output forward as the thing
+    // on the table. The old one is not re-run and not re-statused — its
+    // transcript is the record — so this opens the new file rather than
+    // staying put. A council is reconvened ONCE: after that the footer
+    // shows where it went instead of the button.
+    async function compCouncilReconvene() {
+      if (!COMP.path) return;
+      const d = await compCouncilPost('/api/council/reconvene',
+        { path: COMP.path });
+      if (!d || !d.path) return;
+      COMP_COUNCIL.done = null;
+      await compOpenPath(d.path);
+    }
+
+    // ---------- `/pal` in the council ----------
+
+    //: `/pal` as the first token of a council statement, the same shape
+    //: the chat composer's command has. `/palette` is a word somebody
+    //: typed, not a command.
+    const COMP_PAL_RE = /^\s*\/pal(?:\s+([\s\S]*))?$/i;
+
+    // The chief distils the brief and the transcript into ONE
+    // self-contained prompt, that prompt leaves the machine, and the
+    // answer is committed as a gray statement whose first block is the
+    // prompt itself. Like the chat's `/pal`, there is no client-side
+    // handling: the ask goes as typed and the server owns the gate.
+    async function compCouncilPal(ask) {
+      if (!COMP.path) return;
+      const d = await compCouncilPost('/api/council/pal',
+        { path: COMP.path, ask });
+      if (!d) return;
+      const ta = compEl('cc-say');
+      if (ta) { ta.value = ''; compCouncilCount(); }
+      palSyncHint('cc-pal-hint', '');
+      COMP_COUNCIL.state = d;
+      compCouncilRender();
+      compCouncilFollowLatest();
+    }
+
     async function compCouncilSayIt() {
       const ta = compEl('cc-say');
       if (!ta || !COMP.path) return;
       const text = String(ta.value || '').trim();
       if (!text) return;
+      // `/pal <ask>` is a different endpoint, not a different statement:
+      // a pal answer is an interjection that takes a turn number and no
+      // slot, so it cannot go through `/say`.
+      const pal = COMP_PAL_RE.exec(text);
+      if (pal) {
+        const ask = (pal[1] || '').trim();
+        if (!ask) {
+          compCouncilNote(t('comp.council.palUsage',
+            '`/pal` needs a question after it — the council’s chief turns it into one prompt and sends that, and only that, out to the cloud model.'));
+          return;
+        }
+        await compCouncilPal(ask);
+        return;
+      }
       const d = await compCouncilPost('/api/council/say',
         { path: COMP.path, text });
       if (!d) return;
@@ -31494,6 +32099,10 @@
         if (p && p.name === speaker) return p.tint || 'paper';
       }
       if (kind === 'user') return 'blue';
+      // A pal is never in `participants` — it is invoked per ask, not
+      // enrolled — so its tint cannot come from the roster. `gray` is the
+      // engine's `PAL_TINT`, the one swatch nothing else uses.
+      if (kind === 'pal') return 'gray';
       if (kind === 'chief') return 'paper';
       return 'yellow';
     }
@@ -31563,7 +32172,18 @@
       // Plain text until `end`: a half-written statement is not markdown
       // yet, and running the input rules over a stream would rewrite it
       // under the reader's eyes.
-      body.textContent = p.error || p.text || '';
+      //
+      // A pal's card is the exception, and it has to be: the distillation
+      // streams with `quiet: true` (the user is not meant to read the
+      // chief thinking — what matters is the prompt, and that lands in
+      // the module), so there are no tokens at all between `start` and
+      // `end`. An empty body for the length of two model calls reads as a
+      // card that failed, so it says what is happening instead. (P9)
+      body.textContent = p.error || p.text
+        || (p.kind === 'pal'
+          ? t('comp.council.palWorking',
+            'working out what to ask, then asking…')
+          : '');
       page.appendChild(body);
       if (p.error) {
         const retry = document.createElement('button');
@@ -31780,13 +32400,53 @@
           };
           add(tr ? t('comp.council.transcriptAt', 'transcript: {path}')
             .replace('{path}', tr) : '');
-          const doc = (meta.output && meta.output.kind === 'document')
-            ? (meta.output.path || '') : '';
-          add(doc ? t('comp.council.documentAt', 'document: {path}')
-            .replace('{path}', doc) : '');
-          add(t('comp.council.reconvene', 'reconvene lands in 0.4.0'));
+          const out = meta.output || {};
+          const fell = meta.output_fallback === 'answer';
+          // The outline would not parse twice, so there is no composure to
+          // link to. Say that in one line rather than showing a path that
+          // does not exist. (P9)
+          if (fell) {
+            add(t('comp.council.outputFellBack',
+              'the outline would not parse, so the conclusion was kept as the answer above — no composure was written'));
+          } else if (out.kind === 'document' && out.path) {
+            add(t('comp.council.documentAt', 'document: {path}')
+              .replace('{path}', out.path));
+          } else if (out.kind === 'composure' && out.path) {
+            add(t('comp.council.composureAt', 'composure: {path}')
+              .replace('{path}', out.path));
+          }
+          // A council is reconvened ONCE. After that the footer says where
+          // it went instead of offering the button again.
+          if (meta.reconvened_to) {
+            add(t('comp.council.reconvenedTo', 'reconvened as {path}')
+              .replace('{path}', meta.reconvened_to));
+          } else {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'cc-btn';
+            btn.id = 'cc-reconvene';
+            btn.textContent = t('comp.council.reconvene', 'reconvene');
+            btn.title = t('comp.council.reconvene.title',
+              'sit this council again, with the same room and what it decided as the starting point');
+            btn.disabled = !!COMP_COUNCIL.busy;
+            btn.addEventListener('click', () => { void compCouncilReconvene(); });
+            done.appendChild(btn);
+          }
         }
       }
+      // Where this council came from, when it is one end of a chain.
+      const from = compEl('cc-from');
+      if (from) {
+        const src = meta.reconvened_from || '';
+        from.hidden = !src;
+        from.textContent = src
+          ? t('comp.council.reconvenedFrom', 'carries on from {path}')
+            .replace('{path}', src) : '';
+      }
+      // A concluded council has no composer, so it has no `/pal` either.
+      const palRow = compEl('cc-pal-hint');
+      if (palRow && (concluded || !compEl('cc-say')
+        || !palTyping(compEl('cc-say').value))) palRow.hidden = true;
       compCouncilCount();
       compCouncilFooterH();
     }
@@ -31832,6 +32492,10 @@
       compCouncilNote('');
       compCouncilError('');
       compCouncilJumpBtn(false);
+      const palRow = compEl('cc-pal-hint');
+      if (palRow) palRow.hidden = true;
+      const from = compEl('cc-from');
+      if (from) { from.hidden = true; from.textContent = ''; }
       // Hidden by hand, not through compCouncilRender: this runs from
       // compResetDoc, where COMP.model is still the document we are
       // LEAVING, so "is this a council?" would answer about the wrong one.
@@ -31875,6 +32539,8 @@
     window.compCouncilConclude = compCouncilConclude;
     window.compCouncilSayIt = compCouncilSayIt;
     window.compCouncilOnEvent = compCouncilOnEvent;
+    window.compCouncilReconvene = compCouncilReconvene;
+    window.compCouncilPal = compCouncilPal;
 
     // ================================================================
     // P4c-2 — the selection context, in ONE shape
@@ -32337,14 +33003,30 @@
       }
       compEl('cc-conclude').addEventListener('click', () => { void compCouncilConclude(); });
       compEl('cc-send').addEventListener('click', () => { void compCouncilSayIt(); });
-      compEl('cc-say').addEventListener('input', compCouncilCount);
+      compEl('cc-say').addEventListener('input', () => {
+        compCouncilCount();
+        palSyncHint('cc-pal-hint', compEl('cc-say').value);
+      });
       compEl('cc-say').addEventListener('keydown', (e) => {
         // Enter sends, shift+enter is a newline — the same bargain the
         // readvisor composer makes, because it is the same gesture.
         if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
           e.preventDefault();
           void compCouncilSayIt();
+          return;
         }
+        // Tab completes `/pal `, exactly as it does in the chat composer.
+        if (e.key === 'Tab' && !e.shiftKey) {
+          const row = compEl('cc-pal-hint');
+          if (row && !row.hidden) {
+            e.preventDefault();
+            palComplete(compEl('cc-say'), 'cc-pal-hint');
+          }
+        }
+      });
+      compEl('cc-pal-hint-row').addEventListener('click', (e) => {
+        e.preventDefault();
+        palComplete(compEl('cc-say'), 'cc-pal-hint');
       });
       compEl('comp-council-jump').addEventListener('click', compCouncilJump);
       compCouncilRender();

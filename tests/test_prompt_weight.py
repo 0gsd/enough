@@ -31,9 +31,16 @@ from enough import tools as T
 
 #: The always-on core: what every project pays on every turn.
 CORE_BUDGET = 17_500
-#: Core plus every gated block — the worst case, for a project using
-#: composures and forging readvisors.
+#: Core plus every gated block an ordinary turn can carry — the worst case,
+#: for a project using composures and forging readvisors. The pal block is
+#: deliberately NOT in here: it is carried by the one turn the user opened
+#: with `/pal` and by no other, so it is budgeted on its own below rather
+#: than inflating the number every turn is measured against.
 FULL_BUDGET = 22_000
+#: The `/pal` block, which rides along on a pal turn only. Small on purpose:
+#: a turn that is about to spend the user's money on a cloud call is not the
+#: turn to also spend a page of their context window.
+PAL_BUDGET = 1_200
 #: The chief's whole council system message (identity + framing), by the
 #: repo's own char-based estimator. See `docs/composure-landed-P5.md`.
 COUNCIL_HEAD_TOKENS = 2_500
@@ -83,9 +90,16 @@ def disable_skill(project: Path, name: str) -> None:
 
 
 def fully_enabled(project: Path) -> str:
+    """Everything an ordinary turn can carry — what FULL_BUDGET measures."""
     enable_skill(project, "readvisory")
     set_toggle("composure_enabled", True)
     return prompt.tool_instructions(project)
+
+
+def every_block(project: Path) -> str:
+    """...plus the per-turn ones. Drift is measured against this: a tool is
+    documented if the turn that can call it says so, not if every turn does."""
+    return fully_enabled(project) + prompt.tool_instructions(project, pal=True)
 
 
 # ---------------------------------------------------------------------------
@@ -95,7 +109,7 @@ def fully_enabled(project: Path) -> str:
 def test_every_dispatchable_tool_is_documented(project: Path):
     """The guard this file exists for. A tool in `_DISPATCH` that no prompt
     mentions can never be called, and nothing else in the suite notices."""
-    text = fully_enabled(project)
+    text = every_block(project)
     missing = [name for name in sorted(T._DISPATCH) if name not in text]
     assert not missing, f"undocumented tools: {', '.join(missing)}"
 
@@ -104,7 +118,7 @@ def test_every_documented_tool_is_dispatchable(project: Path):
     """...and the other direction, which is how a renamed tool is caught:
     every `<tool name="x">` example names something that can actually run."""
     import re
-    text = fully_enabled(project)
+    text = every_block(project)
     named = set(re.findall(r'<tool name="([a-z_]+)">', text))
     named |= set(re.findall(r"<tool>([a-z_]+)\n", text))
     assert named, "no tool examples found at all"
@@ -114,9 +128,16 @@ def test_every_documented_tool_is_dispatchable(project: Path):
 def test_the_assembled_prompt_carries_the_tools_it_documents(project: Path):
     enable_skill(project, "readvisory")
     set_toggle("composure_enabled", True)
-    text = prompt.assemble_system_prompt(project)
+    ordinary = prompt.assemble_system_prompt(project)
+    pal = prompt.assemble_system_prompt(project, pal=True)
     for name in sorted(T._DISPATCH):
-        assert name in text, name
+        assert name in pal, name
+        if name != "ask_pal":
+            assert name in ordinary, name
+    # ...and the one that is not in an ordinary turn is not in it by
+    # accident: a tool the model cannot call is a tool it must not be told
+    # about, or it will spend a turn trying.
+    assert "ask_pal" not in ordinary
 
 
 # ---------------------------------------------------------------------------
@@ -145,6 +166,28 @@ def test_the_readvisory_block_follows_its_skill(project: Path):
     enable_skill(project, "readvisory")
     on = prompt.tool_instructions(project)
     assert "install_readvisor" in on and "## Readvisors" in on
+
+
+def test_the_pal_block_follows_the_turn_and_not_the_project(project: Path):
+    """The narrowest gate in the file: not a project setting, not a toggle —
+    one turn, the one the user opened by typing `/pal`."""
+    set_toggle("composure_enabled", True)
+    off = prompt.tool_instructions(project)
+    on = prompt.tool_instructions(project, pal=True)
+    assert "## Pal" not in off and "ask_pal" not in off
+    assert "## Pal" in on and "ask_pal" in on
+    assert len(on) - len(off) == len(prompt.PAL_TOOL_INSTRUCTIONS) + 1
+    # The standing instruction rides with it, and only with it.
+    assert prompt.PAL_TURN_INSTRUCTION.strip() not in \
+        prompt.assemble_system_prompt(project)
+    assert prompt.PAL_TURN_INSTRUCTION.strip() in \
+        prompt.assemble_system_prompt(project, pal=True)
+
+
+def test_a_pal_turn_is_a_chat_turn(project: Path):
+    with pytest.raises(ValueError, match="pal turn is a chat turn"):
+        prompt.assemble_system_prompt(project, readvisors="none",
+                                      profile="council", pal=True)
 
 
 def test_a_project_using_neither_pays_only_the_core(project: Path):
@@ -186,6 +229,14 @@ def test_the_fully_enabled_tool_docs_stay_inside_their_budget(project: Path):
         f"core + every gated block is {size} chars, over the {FULL_BUDGET} "
         f"budget. Raising this number is a decision, not a formality: it is "
         f"context window and prefill time on every turn.")
+
+
+def test_the_pal_block_stays_inside_its_budget():
+    size = len(prompt.PAL_TOOL_INSTRUCTIONS)
+    assert size <= PAL_BUDGET, (
+        f"the pal tool docs are {size} chars, over the {PAL_BUDGET} budget. "
+        f"They are paid on a turn that is already about to pay a cloud bill; "
+        f"cut something rather than raise this.")
 
 
 def test_the_councils_chief_head_is_lean(project: Path):

@@ -42,6 +42,15 @@ def build_router(*, project_dir: Path, resolve_path: Resolve, emit: Emit,
     """Build the council router. One call in `create_app` wires it all."""
     router = APIRouter()
 
+    # The pal seam, wired here because here is where a project directory
+    # exists. `council.PAL_CALL` is the WHOLE of the contract between the
+    # council and `/pal` (P9 §6): the council distils the prompt, this sends
+    # it, and `pal_tools.ask_pal_once` is the same gate, the same caps, the
+    # same exfiltration patterns, the same cloud cache and the same broker
+    # journal entry the `ask_pal` tool gets. A second implementation is how
+    # one of the two ends up a check short.
+    engine.PAL_CALL = _pal_call_for(project_dir)
+
     # ---------------------------------------------------------------- paths
 
     def _target(path: str) -> Path:
@@ -161,6 +170,18 @@ def build_router(*, project_dir: Path, resolve_path: Resolve, emit: Emit,
         except ComposureError as e:
             raise _err(e) from None
         await _announce_composure(emit, c.rel, result)
+        # The brief MODULE, from the same four fields. Without this a council
+        # set up through the API alone — by a tool, by a script, by anything
+        # that is not the setup card — keeps the shipped form's placeholder
+        # while the participants argue about something else entirely.
+        try:
+            written = await asyncio.to_thread(_write_brief, c)
+        except (CouncilError, ComposureError):   # pragma: no cover — defensive
+            log.warning("council: could not write the brief module of %s",
+                        c.rel, exc_info=True)
+            written = None
+        if written is not None:
+            await _announce_composure(emit, c.rel, written)
         state = await asyncio.to_thread(c.state)
         await _status(emit, c.rel, state)
         return state
@@ -271,6 +292,51 @@ def build_router(*, project_dir: Path, resolve_path: Resolve, emit: Emit,
                 "module": out.module, "rev": out.rev,
                 **(await asyncio.to_thread(c.state))}
 
+    # ------------------------------------------------------------------ pal
+
+    @router.post("/api/council/pal")
+    async def api_council_pal(request: Request) -> dict[str, Any]:
+        """`/pal <ask>` from the council composer.
+
+        The chief distils one self-contained prompt out of the brief and the
+        transcript, `PAL_CALL` sends it, and the answer is committed as a
+        statement tinted gray whose first block is the exact outgoing prompt
+        (P9 §6). A pal is an interjection: it takes a turn number but not a
+        slot, so whoever was about to speak still speaks next.
+
+        The gate is checked HERE as well as inside the call, before a single
+        model token is spent: distilling a prompt that cannot be sent is a
+        window's worth of work and a paragraph the user did not ask for."""
+        from . import cloud as _cloud
+        body = await _body(request)
+        c = _council(str(body.get("path") or ""))
+        ask = str(body.get("ask") or "").strip()
+        if not ask:
+            raise HTTPException(400, (
+                "a pal needs a question — type it after `/pal`, and the "
+                "council's chief will turn it into one prompt to send out."))
+        gate = await asyncio.to_thread(_cloud.gate_status)
+        if not gate["open"]:
+            raise HTTPException(409, gate["denial"] or (
+                "the cloud slot is not usable right now, so there is no pal "
+                "to ask."))
+        _guard_chat()
+        _guard_council()
+        await _require_runnable(c)
+        async with engine._turn_lock(c.key):
+            try:
+                out = await c.ask_pal_turn(ask)
+            except NotImplementedError:   # pragma: no cover — wired at build
+                raise HTTPException(409, (
+                    "this enough was built without a pal — `/pal` is not "
+                    "wired up here.")) from None
+            except CouncilError as e:
+                raise _err(e) from None
+        return {"path": c.rel, "spoke": out.speaker, "turn": out.turn,
+                "module": out.module, "rev": out.rev, "pal": True,
+                "text": out.text,
+                **(await asyncio.to_thread(c.state))}
+
     # ------------------------------------------------------------- conclude
 
     @router.post("/api/council/conclude")
@@ -279,8 +345,9 @@ def build_router(*, project_dir: Path, resolve_path: Resolve, emit: Emit,
 
         `answer` → a final module tinted `ink`. `document` → a markdown file
         through the same write door `write_file` uses, guards and all.
-        `composure` validates at setup and is refused here, naming the
-        release it lands in."""
+        `composure` → an outline, parsed into a whole new composure beside
+        this one and linked from it; an outline that will not parse twice
+        falls back to `answer` and says so in `output_fallback`."""
         body = await _body(request)
         c = _council(str(body.get("path") or ""))
         _guard_chat()
@@ -290,38 +357,114 @@ def build_router(*, project_dir: Path, resolve_path: Resolve, emit: Emit,
             raise HTTPException(409, "this council has already concluded.")
         out_spec = dict(meta["output"])
         if out_spec["kind"] not in engine.OUTPUT_KINDS_LANDED:
-            raise HTTPException(501, (
-                f"the {out_spec['kind']!r} council output lands in 0.4.0 — "
-                f"conclude with 'answer' or 'document' for now, or change the "
-                f"output kind in the setup card."))
+            raise HTTPException(501, (   # pragma: no cover — no kind is unlanded
+                f"the {out_spec['kind']!r} council output is not built yet — "
+                f"conclude with one of "
+                f"{', '.join(sorted(engine.OUTPUT_KINDS_LANDED))}, or change "
+                f"the output kind in the setup card."))
         if bool(body.get("overwrite")):
             out_spec["overwrite"] = True
         if out_spec["kind"] == "document":
             _check_output_path({"output": out_spec}, resolve_path, project_dir,
                                bool(out_spec.get("overwrite")))
-        async with engine._turn_lock(c.key):
-            try:
-                turn = await c.take_turn(conclude=out_spec)
-            except CouncilError as e:
-                raise _err(e) from None
         written: str | None = None
         detail = ""
+        fallback: str | None = None
+        extra: dict[str, Any] = {}
+        async with engine._turn_lock(c.key):
+            try:
+                if out_spec["kind"] == "composure":
+                    made = await c.conclude_composure(out_spec)
+                    turn = made["turn"]
+                    written = made["path"]
+                    fallback = made["fallback"]
+                    extra = {"retried": made["retried"],
+                             "form": made["form"]}
+                    detail = (f"wrote {written}" if written else
+                              "the outline would not parse twice — the "
+                              "conclusion was kept as an answer.")
+                else:
+                    turn = await c.take_turn(conclude=out_spec)
+            except CouncilError as e:
+                raise _err(e) from None
+            except ComposureError as e:
+                raise _err(e) from None
         if out_spec["kind"] == "document":
             written, detail = await asyncio.to_thread(
                 _write_document, project_dir, out_spec, turn.text)
             if written:
                 result = await asyncio.to_thread(
-                    _link_document, c, written)
+                    _link_doc, c, written,
+                    f"The council's document, written to `{written}`.")
                 await _announce_composure(emit, c.rel, result)
         transcript = await asyncio.to_thread(
-            c.export_transcript, output_path=written or "")
-        await asyncio.to_thread(_finish, c, written, transcript)
+            c.export_transcript, output_path=written or "",
+            fallback=fallback or "")
+        await asyncio.to_thread(_finish, c, written, transcript,
+                                fallback=fallback)
         state = await asyncio.to_thread(c.state)
         await _status(emit, c.rel, state)
         return {"path": c.rel, "output": out_spec["kind"],
-                "document": written, "detail": detail,
+                "document": written, "composure": (
+                    written if out_spec["kind"] == "composure" else None),
+                "output_fallback": fallback, "detail": detail,
                 "transcript": transcript, "module": turn.module,
-                "text": turn.text, **state}
+                "text": turn.text, **extra, **state}
+
+    # ------------------------------------------------------------ reconvene
+
+    @router.post("/api/council/reconvene")
+    async def api_council_reconvene(request: Request) -> dict[str, Any]:
+        """A concluded council, sat again: a NEW composure with the same
+        participants, charges, parameters, constraints, output and round cap,
+        and a brief that carries the prior output forward as input.
+
+        The old council is not touched beyond the `doc` link-in that points
+        at its successor — it is concluded, its transcript is the record, and
+        a second run writing into it would destroy exactly the thing a
+        reconvene exists to build on."""
+        body = await _body(request)
+        c = _council(str(body.get("path") or ""))
+        _guard_chat()
+        prior_comp, prior = await asyncio.to_thread(_load, c)
+        if prior["status"] != "concluded":
+            raise HTTPException(409, (
+                "only a concluded council can be reconvened — this one is "
+                f"{prior['status']!r}. Conclude it first, so there is an "
+                f"output to carry forward."))
+        try:
+            meta, rel, title = await asyncio.to_thread(
+                _reconvene_meta, c, prior_comp, prior, project_dir,
+                str(body.get("title") or ""))
+        except (CouncilError, ComposureError) as e:
+            raise _err(e) from None
+        target = resolve_path(rel)
+        nxt = engine.Council(target, project_dir=project_dir, rel_path=rel,
+                             emit=emit, llm_url=getattr(session, "llm_url", ""),
+                             session=session)
+        try:
+            result = await asyncio.to_thread(
+                comp_core.apply_ops, target, None,
+                [{"op": "set_meta", "title": title, "kind": "page"},
+                 {"op": "set_council", "council": meta}],
+                source="council", create=True, form="council", title=title,
+                project_dir=project_dir, rel_path=rel)
+        except ComposureError as e:
+            raise _err(e) from None
+        await _announce_composure(emit, rel, result)
+        await asyncio.to_thread(_write_brief, nxt)
+        # Both ways: the new council links back to the one it came from, and
+        # the old one gains a link forward, so neither end is a dead end.
+        await asyncio.to_thread(
+            nxt.link_doc, c.rel,
+            f"The council this one carries on from: `{c.rel}`.")
+        back = await asyncio.to_thread(
+            c.link_doc, rel, f"This council was reconvened as `{rel}`.")
+        await asyncio.to_thread(_mark_reconvened, c, rel)
+        await _announce_composure(emit, c.rel, back)
+        state = await asyncio.to_thread(nxt.state)
+        await _status(emit, rel, state)
+        return {"path": rel, "from": c.rel, "title": title, **state}
 
     # ------------------------------------------------------------- helpers
 
@@ -432,6 +575,18 @@ def build_router(*, project_dir: Path, resolve_path: Resolve, emit: Emit,
 # Module-level helpers (no closure over the router's factory arguments)
 # ---------------------------------------------------------------------------
 
+def _pal_call_for(project_dir: Path) -> Callable[[str], tuple[str, str]]:
+    """`PAL_CALL(prompt) -> (model_id, reply)`, bound to one project.
+
+    `pal_tools` is imported lazily: it reaches `enough.cloud` for the gate,
+    which drags httpx and keyring in, and `council_api` is imported at app
+    build time on machines where the cloud slot is never used."""
+    def _call(prompt: str) -> tuple[str, str]:
+        from . import pal_tools as _pal
+        return _pal.ask_pal_once(project_dir, prompt)
+    return _call
+
+
 def _load(c: engine.Council) -> tuple[comp_core.Composure, dict[str, Any]]:
     return c.load()
 
@@ -507,21 +662,78 @@ def _write_document(project_dir: Path, out_spec: dict[str, Any],
     return rel, result.body
 
 
-def _link_document(c: engine.Council, rel: str) -> comp_core.OpsResult:
-    """A `doc` link-in module under the conclusion, so the document the
-    council produced is one click from the council that produced it."""
+def _link_doc(c: engine.Council, rel: str, blurb: str) -> comp_core.OpsResult:
+    return c.link_doc(rel, blurb)
+
+
+def _write_brief(c: engine.Council) -> comp_core.OpsResult | None:
+    """Write the brief MODULE's page from the four setup fields, and record
+    which module that is. The brief module is unlocked (it has no speaker),
+    so this is an ordinary `set_page` — the only new thing is that the
+    backend now does it instead of only the setup card."""
     comp, meta = c.load()
-    ops = [{"op": "add_module", "type": "doc", "href": rel,
-            "title": rel.rsplit("/", 1)[-1], "bg": "paper",
-            "markdown": f"The council's document, written to `{rel}`."}]
-    return c._commit(ops, meta)
+    mid = c.brief_module_id(comp, meta)
+    if not mid:
+        return None
+    text = engine.brief_markdown(meta)
+    if not text:
+        return None
+    meta["brief_module"] = mid
+    return c._commit([{"op": "set_page", "module": mid, "n": 1,
+                       "markdown": text}], meta)
 
 
-def _finish(c: engine.Council, written: str | None, transcript: str) -> None:
+def _reconvene_meta(c: engine.Council, comp: comp_core.Composure,
+                    prior: dict[str, Any], project_dir: Path,
+                    title: str) -> tuple[dict[str, Any], str, str]:
+    """The new council's meta, path and title. Reads the prior output —
+    the conclusion statement for an `answer`, the file itself for a
+    `document` or a `composure` — so the new brief carries something real
+    rather than a promise that there was an output."""
+    out = prior.get("output") or {}
+    kind = out.get("kind") or "answer"
+    answer = ""
+    excerpt = ""
+    if kind == "answer":
+        statements = engine.read_statements(comp)
+        answer = statements[-1].text if statements else ""
+    elif out.get("path"):
+        excerpt = _read_head(project_dir / str(out["path"]), kind)
+    meta = engine.reconvene_meta(prior, c.rel, answer=answer, excerpt=excerpt)
+    meta["reconvened_from"] = c.rel
+    name = (title or comp.title or "Council").strip()
+    if not name.lower().endswith("reconvened"):
+        name = f"{name} · reconvened"
+    rel = comp_core.new_path(project_dir, name)
+    return meta, rel, name
+
+
+def _read_head(target: Path, kind: str) -> str:
+    """The first of a prior output, as text. A `.comp` is read through the
+    composure outline rather than as HTML — the markup is not what the next
+    council needs to argue with."""
+    try:
+        if kind == "composure" and target.suffix == comp_core.SUFFIX:
+            return comp_core.outline(comp_core.load(target))
+        return target.read_text(encoding="utf-8")
+    except (OSError, ComposureError):
+        return ""
+
+
+def _mark_reconvened(c: engine.Council, rel: str) -> None:
+    """The one field the concluded council does gain: where it went next."""
+    _comp, meta = c.load()
+    meta["reconvened_to"] = rel
+    c._commit([{"op": "set_meta"}], meta)
+
+
+def _finish(c: engine.Council, written: str | None, transcript: str,
+            *, fallback: str | None = None) -> None:
     _comp, meta = c.load()
     meta["status"] = "concluded"
     meta["next"] = None
     meta["transcript"] = transcript or None
+    meta["output_fallback"] = fallback or None
     out = dict(meta.get("output") or {})
     if written:
         out["path"] = written

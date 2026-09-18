@@ -409,12 +409,14 @@ path: (a composure whose form is council)
 varios readvisors y tú, pensando en una sola cosa por turnos, por escrito, en el lienzo. un consejo es una composure normal con el encargo arriba y una tarjeta por intervención debajo, con un tinte por cada participante y encabezada con un nombre y un número de turno. las intervenciones pertenecen al motor: puedes moverlas, cambiarles el estilo, dibujar tinta encima y comentarlas, pero no reescribirlas.
 
 ### how
-rellena el encargo — entrada, parámetros, restricciones, salida deseada — marca quién está en la sala, fija el máximo de rondas, y pulsa convocar. a partir de ahí lo llevas tú: <em>siguiente turno</em> toma una intervención, <em>correr una ronda</em> da la vuelta entera, <em>correr hasta el final</em> llega al tope de rondas, <em>pausa</em> lo detiene, <em>concluir</em> le pide la decisión al jefe. el compositor de abajo es tuyo: lo que digas ocupa el siguiente hueco sin costarle el turno a nadie. al concluir, la respuesta se escribe como una tarjeta resaltada — o como un archivo markdown en la ruta que elijas — y toda la transcripción se exporta a <code>rness/knowledge/councils/</code>.
+rellena el encargo — entrada, parámetros, restricciones, salida deseada — marca quién está en la sala, dale a quien quieras un <em>cometido</em> de una línea si está ahí para algo concreto («cuida la continuidad», «defiende al lector»), fija el máximo de rondas, y pulsa convocar. a partir de ahí lo llevas tú: <em>siguiente turno</em> toma una intervención, <em>correr una ronda</em> da la vuelta entera, <em>correr hasta el final</em> llega al tope de rondas, <em>pausa</em> lo detiene, <em>concluir</em> le pide la decisión al jefe. el compositor de abajo es tuyo: lo que digas ocupa el siguiente hueco sin costarle el turno a nadie, y un <code>/pal</code> escrito ahí manda una sola pregunta destilada al modelo en la nube y trae la respuesta como una intervención. al concluir, lo que el consejo decidió se escribe con la forma que elegiste — una tarjeta resaltada, un archivo markdown en la ruta que tú quieras, o una composure nueva entera de tarjetas junto a esta — y la transcripción se exporta a <code>rness/knowledge/councils/</code>. un consejo concluido se puede <em>volver a convocar</em>: un consejo nuevo con la misma sala, los mismos cometidos y lo que este decidió como punto de partida.
 
 ### ideas
 - dale a un readvisor el argumento contrario y averigua si sobrevive al contacto con los demás.
-- elige un documento como salida cuando la decisión deba salir del lienzo convertida en un archivo que puedas citar.
+- un cometido es la forma más barata de evitar que tres readvisors digan lo mismo de tres maneras.
+- elige documento como salida cuando la decisión deba salir del lienzo convertida en un archivo que puedas citar, o composure cuando lo que quieras sea la forma de la decisión y no sus párrafos.
 - di algo tú en cuanto un consejo empiece a dar vueltas; una interrupción sale más barata que otra ronda.
+- vuelve a convocar en vez de empezar de cero cuando la respuesta era la buena pero no estaba terminada.
 
 ## chief-readvisor
 name: readvisor jefe
@@ -429,3 +431,18 @@ pulsa el botón de renombrar que hay junto a la × de esta cabecera, escribe un 
 ### ideas
 - elige algo que dirías en voz alta; vas a estar leyéndolo todo el día.
 - renombra antes de convocar un consejo, no durante uno.
+
+## pal
+name: pal
+path: (the OPRO-API model slot)
+
+### what
+una sola pregunta, enviada hacia fuera, a la vista. un <strong>pal</strong> es el modelo en la nube que ya configuraste en la ranura OPRO-API, alcanzado una vez, a mano, desde un turno que por lo demás es enteramente local. no hay ajuste de pal, ni cuenta de pal, ni un segundo interruptor: si la ranura de nube funciona, un pal funciona, y si no, la explicación de siempre del broker es toda la historia. escribir <code>/pal</code> es el consentimiento — no hay paso de confirmación, porque un paso de confirmación que aparece siempre es un botón que la gente aprende a pulsar. lo que lo sustituye es que el prompt que sale de esta máquina se te muestra palabra por palabra, antes de la respuesta, cada vez, en vivo y también después de recargar.
+
+### how
+empieza un mensaje con <code>/pal</code> y el resto es la pregunta: <code>/pal ¿cuál es el estado del arte en reconocimiento de voz en el dispositivo?</code>. escribe <code>/</code> como primer carácter y aparece una fila de sugerencia encima del compositor que nombra el modelo al que se llegaría; tab o un clic la completa, y cuando la ranura de nube está cerrada la fila se pone gris y dice por qué. tu readvisor lo piensa entonces aquí primero — su propio conocimiento, los archivos de este proyecto, las herramientas de wiki —, resuelve qué es lo que de verdad no puede zanjar en local, manda <strong>un</strong> solo prompt afinado, y te responde con su propia voz diciendo qué partes vinieron del pal. una llamada por cada mensaje con <code>/pal</code>. el mismo comando funciona en el compositor de un consejo, donde el jefe destila el encargo y toda la transcripción en el prompt; la respuesta cae como una intervención gris cuya primera línea pliega lo que se envió.
+
+### ideas
+- pon <code>:online</code> al final del id del modelo en los ajustes de OpenRouter — <code>anthropic/claude-sonnet-4.5:online</code> — y tu pal responde con la web delante. cobra un extra por cada búsqueda, y es el arreglo para un modelo congelado en su fecha de corte de entrenamiento.
+- resérvalo para lo que un modelo local no puede tener: las noticias de esta semana, una biblioteca publicada el mes pasado, una segunda opinión sobre un juicio que ya has hecho.
+- lee la burbuja de salida antes de leer la respuesta. es el único sitio que muestra exactamente qué salió, y está ahí a propósito.

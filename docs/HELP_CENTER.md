@@ -2,7 +2,7 @@ Hi, this is Graham, the creator of enough. This document -- except this part, I 
 
 # the enough help center
 
-> Everything you can do with enough, in one place. Written against enough **0.3.5**, including the composure round — the canvas that is now the floor of every project, with the conversation moved into a panel beside it (sections 4 and 5); **readvisors**, which is what roles are called now, led by a chief readvisor named Ed (section 16); **councils**, where several readvisors think about one thing in turn, in writing, while you watch (section 17); and two new skills, `readvisory` and `scaffold` (section 18). A project you made before this round has its `rness/roles/` folder renamed to `rness/readvisors/` the next time you open it, with your on/off settings intact (section 8). Also here, from the rounds before: the home screen (every project you've ever started, in one list, with a way in and a way back out — section 2), the convert round (PDFs, Word documents, ebooks, decks and workbooks open as editable markdown twins, with export, sync, and an image viewer — section 7), the skills round (analyzer's new audit mode, the `anything-finder` skill, and the first-use audit that reads any skill enough didn't ship before it's allowed in), the August 2026 round (seven local models with feasibility-checked installs, and **enough.app** — the signed, notarized desktop application), the July 2026 interface round (the mode stack, per-folder help bubbles, girraph→merirmaid mirrors), and the 0.3.0 preferences round (per-project ui and text scaling, and the interface + help in six languages — section 10). Where this document and the app in front of you disagree, the app is right and this document has a bug — corrections welcome at [enough.support](https://enough.support).
+> Everything you can do with enough, in one place. Written against enough **0.4.0**, including the composure round — the canvas that is now the floor of every project, with the conversation moved into a panel beside it (sections 4 and 5); **readvisors**, which is what roles are called now, led by a chief readvisor named Ed (section 16); **councils**, where several readvisors think about one thing in turn, in writing, while you watch (section 17); and two new skills, `readvisory` and `scaffold` (section 18). New in this round: **`/pal`**, where your chief readvisor thinks locally first and then sends one refined question to the cloud model you configured, showing you exactly what left the machine (section 14.3); and councils that finish into an answer, a document, or a whole new composure, with an optional one-line charge per readvisor and a way to reconvene a council that has already concluded (section 17). A project you made before this round has its `rness/roles/` folder renamed to `rness/readvisors/` the next time you open it, with your on/off settings intact (section 8). Also here, from the rounds before: the home screen (every project you've ever started, in one list, with a way in and a way back out — section 2), the convert round (PDFs, Word documents, ebooks, decks and workbooks open as editable markdown twins, with export, sync, and an image viewer — section 7), the skills round (analyzer's new audit mode, the `anything-finder` skill, and the first-use audit that reads any skill enough didn't ship before it's allowed in), the August 2026 round (seven local models with feasibility-checked installs, and **enough.app** — the signed, notarized desktop application), the July 2026 interface round (the mode stack, per-folder help bubbles, girraph→merirmaid mirrors), and the 0.3.0 preferences round (per-project ui and text scaling, and the interface + help in six languages — section 10). Where this document and the app in front of you disagree, the app is right and this document has a bug — corrections welcome at [enough.support](https://enough.support).
 
 enough is a personal language system that runs on your own machine. You point it at a folder, talk to it, and it helps you plan, write, review, research, and translate. The models are local by default. Your files stay yours. And nearly everything you'll see it do is defined in plain markdown files that you can open, read, and change.
 
@@ -839,6 +839,26 @@ Two things keep cloud use accountable:
 - **Everything is cached locally.** Every cloud exchange is written to `rness/io/cloud-cache/` with token counts and an index — a local paper trail your local readvisors can read later.
 - **`cloud_pipeline`** lets your readvisors batch big jobs through the cloud slot — up to 200 steps, with per-step caching, optional per-step summarization, and a final compilation pass — writing results to disk instead of flooding the conversation. Ask for "a cloud pipeline that drafts all twelve chapter summaries" and the heavy lifting happens out-of-band, fully logged.
 
+### 14.3 `/pal` — one question out
+
+Sometimes your local model is out of its depth and you'd like one outside opinion. A **pal** is that: not a new setting or a second account, just the cloud model you already configured in the OPRO-API slot, reached once, by hand, from an otherwise local turn.
+
+Start a message with `/pal` and the rest of it is the ask:
+
+`/pal what's the current state of the art for on-device speech recognition?`
+
+Three things then happen, in order. Your chief readvisor thinks about it here first, with what's already on the machine — its own knowledge, the files in your project, the wiki tools — and works out what it genuinely can't settle locally. It composes **one** prompt and sends that to the cloud model. Then it answers you in its own voice, saying plainly which parts came from the pal and which are its own.
+
+**You see what left.** Before the answer arrives, the exact text that went out appears as its own bubble, word for word — never shortened, never summarized on the way to the screen — with the reply under it. Both are still there after a reload, and both are written into your session log and the cloud cache. Typing `/pal` *is* the consent; there's no second confirm step, because a confirmation that appears every time is a button you learn to click without reading. What replaces it is that you can always see what went.
+
+**The gate is the cloud slot's gate, exactly the same one.** `/pal` works when **local models only** is off in the broker, a key is stored, and the last health check passed (14.2). If any of those isn't true, `/pal` tells you which one and how to fix it — and no turn runs, so nothing is spent and nothing leaves. Type `/` as the first character in the composer and a hint row tells you the same thing before you commit: greyed out with the reason when the slot isn't usable, and naming the model it would ask when it is, which is the difference between a command and a surprise on your bill.
+
+**One call per `/pal`.** Your readvisor gets exactly one question out per message you start that way. If the answer didn't cover it, it says so and you can send another. And nothing leaves this machine on any other turn: without `/pal` in front, the tool simply isn't there, and a readvisor who thinks an outside opinion would help has to say so and let you decide.
+
+If the model you're already talking to *is* OPRO-API, there's no pal to ask — the cloud model is who you're talking to. `/pal` says so, drops the token, and sends the rest of the message as usual.
+
+**A pal is frozen at its training cutoff unless you ask for the web.** OpenRouter documents a suffix for exactly this: put `:online` on the end of the model id in the OPRO-API settings panel — `anthropic/claude-sonnet-4.5:online` — and your question goes out with web search results attached. That's OpenRouter's own feature and there's no code of ours behind it; enough passes the model id through untouched, and the bubbles show it with the suffix on, because it costs extra per search and you should be able to see that you asked for it.
+
 ---
 
 ## 15. Paradigms
@@ -912,9 +932,11 @@ New from the **council** form and you get a setup card with four fields for the 
 - **input** — the thing being decided. One question, as sharp as you can make it.
 - **parameters** — how you want it run. "Two rounds, then decide."
 - **constraints** — what's off the table. "Do not rewrite the prose."
-- **desired output** — see 17.3.
+- **desired output** — one of three: **a decided answer**, written on the canvas at the end; **a document**, written to a path you name; or **a new composure**, a whole board of cards built out of what the council decided. Choose composure and a second control appears beside it for the layout — *scaffold*, where each group of cards is a column, or *cards*, where each group is a row. What each one actually does at the end is 17.3.
 
 Then the room. The checklist starts with your chief readvisor, every readvisor you have switched on in this project, and **you**; untick anyone you don't want. Up to twelve, and no two participants may share a name, because a statement is attributed by name and two Nadias is not a council, it's a mix-up. **max rounds** defaults to 3 and can be anything from 1 to 20.
+
+Every participant row also takes an optional **charge**: one line saying what that person is there to do. "owns continuity." "argues the reader's side." "second set of eyes." It goes into that participant's own instructions and nobody else's, last, after everything else they were told — it's the most specific thing they have, and the easiest thing for a long profile to bury. One line is the whole idea; 200 characters is the cap, and anything longer comes back refused rather than quietly trimmed, because half a charge is a different job. Charges also ride into the transcript export, next to the name, so a reader months later knows who was arguing what and why.
 
 **convene** starts it.
 
@@ -933,9 +955,11 @@ Turns stream. A card appears at the foot of the column with the speaker's name a
 
 **You can say something at any time.** The composer at the foot of the council takes your own statement and it goes in as a card like anyone else's, tinted blue. If nobody is speaking it lands immediately; if a turn is streaming it takes the very next slot and shows as pending until it does. Either way it's an *interjection*, not a reshuffle: the readvisor whose turn it was still speaks next.
 
+**You can put a question to a pal, too.** If the cloud slot is usable (14.3), type `/pal` and your ask into the council composer — `/pal is there a name for the pattern we're circling?` — and your chief distils the discussion so far and your question into one self-contained prompt, sends that out, and the reply lands as a statement in its own gray tint, spoken by `pal · <model id>`. The prompt that left the machine is folded into the top of that card: collapsed so twenty statements stay readable, never hidden, one click from open. Like your own statements it's an interjection — it takes a turn number but not a slot, so whoever was about to speak still speaks next, and the round doesn't move.
+
 **The readvisor panel is closed for the duration**, with its toggle disabled and a tooltip explaining why (section 5.1). Councils and the chat share one model and there is only one of it, so a chat turn would either queue behind the council or fight it. The same is true the other way: a council control pressed while your chief is mid-answer in the chat comes back with a sentence saying so rather than quietly waiting.
 
-### 17.3 Concluding: the answer, the document, the transcript
+### 17.3 Concluding: the answer, the document, the composure, the transcript
 
 **conclude** runs one final turn in which your chief readvisor says where it lands — crediting the arguments that carried it, naming the disagreement that didn't resolve rather than smoothing it over, and saying what's still open. That statement is committed like any other, tinted ink.
 
@@ -943,11 +967,13 @@ What happens next depends on the **desired output** you chose at setup:
 
 - **an answer** — nothing further. That final card is the output, and it's on the canvas where the council is.
 - **a document** — the conclusion is written as a markdown file at a path in your project that you name. It goes through the same door as every other file write, with the same allowlists and the same undo, and it will not overwrite an existing file until you've seen the confirmation and said yes. Then a link-in module is added under the conclusion pointing at it, so the document is one click from the council that produced it.
-- **a composure** — planned for 0.4.0. Choose it today and conclude will decline, before spending a turn, and tell you to pick another.
+- **a composure** — the conclusion comes back as an outline, and enough builds it into a new composure beside this one, at `rness/io/composure/<council>-output-<date>.comp`, in the layout you picked at setup. Each group is a column or a row, each card is one piece of what the council decided, and what it *didn't* settle can come through as an open question — a card titled `[gap: who owns the migration?]`, tinted so you can find them all at a glance. A link-in module goes under the conclusion pointing at the new file, so the board is one click from the council that produced it. It never overwrites an existing file: a second one gets `-2`.
 
-Either way the whole thing is also exported as plain markdown to `rness/knowledge/councils/<date>-<title>.md`: the brief, who was in the room and what each of them was there for, the round count, and every statement in order. It never overwrites an earlier export. A council that happened is a thing you can grep, cite, and hand to somebody, months after the composure has been dragged somewhere else.
+That last one asks a model to write headings in an exact shape, and not every model does it first time. If the outline doesn't parse, enough asks once more with the grammar spelled out. If the second try doesn't parse either, you get the conclusion as an ordinary answer card instead, with one line saying that's what happened, and no file is written. The council's decision is never thrown away because the headings came out wrong — and it's never retried a third time, because a council that has already decided shouldn't spend two more turns on formatting.
 
-A concluded council is finished. The controls go, and the transcript path and the output are what it shows you from then on.
+Whichever you chose, the whole thing is also exported as plain markdown to `rness/knowledge/councils/<date>-<title>.md`: the brief, who was in the room and what each of them was there for, the round count, and every statement in order. It never overwrites an earlier export. A council that happened is a thing you can grep, cite, and hand to somebody, months after the composure has been dragged somewhere else.
+
+A concluded council is finished. The controls go, and what it shows you from then on is the transcript path, the output, and the way to reconvene it (17.5).
 
 ### 17.4 What it costs, honestly
 
@@ -956,6 +982,12 @@ A concluded council is finished. The controls go, and the transcript path and th
 **The window is shared out evenly.** Every participant who speaks gets an equal share of the model's context window — half each for two, a quarter each for four. That share has to hold the participant's own identity plus as much of the council as will fit. When it gets close to full, enough folds the oldest statements down into a single line each, a one-line memory of who said what: *Earlier in this council: Ed (turn 1): …*. The brief is never folded, and neither is the statement somebody is answering right now — a participant who can't see the thing it's replying to has nothing to say.
 
 That folding is mechanical — it takes the first sentence, it doesn't ask a model to summarize, because a council that spends completions summarizing itself pays twice for the same window. Every turn reports whether it folded anything. When it starts folding early and often, the honest fix isn't a smaller council, it's a bigger context window in the model window (section 14.1) or a model with room for one.
+
+### 17.5 Reconvening
+
+A council concludes, and sometimes the question doesn't. **reconvene**, on a concluded council, starts a fresh one from it: the same room — the same participants with their names, tints and charges — the same parameters, constraints, desired output and round limit, and a brief that is the *old* brief plus what the council actually produced, set down as the thing now on the table. An answer comes across as the conclusion itself; a document or a composure comes across as a reference to the file and the first couple of thousand characters of it. The new council opens ready, at turn zero, with nobody having spoken yet.
+
+The old council isn't re-run or rewritten. Its status, its statements and its transcript stay exactly as they were; it gains a link-in pointing at its successor, and the new one gains a link-in pointing back, so the chain reads from either end and neither end is a dead end. A council is reconvened once — after that the button is a link to the council it became.
 
 ---
 

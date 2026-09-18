@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Scaffold</title>
-<meta name="generator" content="enough 0.3.5">
+<meta name="generator" content="enough 0.4.0">
 <meta name="composure:version" content="1">
 <meta name="composure:form" content="scaffold">
 <meta name="composure:kind" content="board">

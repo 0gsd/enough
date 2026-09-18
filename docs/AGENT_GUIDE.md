@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.3.5)
+# enough — Agent Guide (v0.4.0)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -33,8 +33,12 @@ renamable per machine. Started with `--home` instead of a project enough
 serves the **home screen** — the project list every launch begins at (see
 its own section below). A fifth optional model slot routes through
 OpenRouter when the user has explicitly enabled it; everything else stays
-local. An optional **wikisink** subsystem puts an offline copy of
-Wikipedia on the machine (see its own section below and
+local, and a message beginning **`/pal`** spends that slot once, by hand,
+from an otherwise local turn (0.4.0 — see "`/pal`" under OPRO-API). A
+**council** — several readvisors and the user speaking in turn on one
+canvas — concludes into an answer, a document or **a whole new composure**
+(0.4.0; see "Councils"). An optional **wikisink** subsystem puts an offline
+copy of Wikipedia on the machine (see its own section below and
 [docs/WIKISINK.md](WIKISINK.md)).
 
 This guide tells you what files are involved in what, how the runtime
@@ -73,14 +77,15 @@ Every Python module in `enough/`:
 
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
-| [enough/server.py](../enough/server.py) | ~4580 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Mounts the composure and council routers in one `include_router` call each. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. | `create_app()`, `_drive_message()`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
-| [enough/prompt.py](../enough/prompt.py) | ~1660 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/readvisor/paradigm enumeration + toggle-state helpers, the generated identity preface, the chief readvisor's name, and the gated tool-doc blocks. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt(project_dir, readvisors=, profile=)`, `readvisor_identity()`, `identity_preface()`, `chief_name()` / `valid_chief_name()` / `CHIEF_NAME_DEFAULT` / `CHIEF_NAME_MAX`, `readvisor_shape()`, `tool_instructions()`, `TOOL_INSTRUCTIONS` / `COMPOSURE_TOOL_INSTRUCTIONS` / `READVISORY_TOOL_INSTRUCTIONS`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()` / `_readvisors_dir()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
+| [enough/server.py](../enough/server.py) | ~4710 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, `GET /api/pal/status`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Mounts the composure and council routers in one `include_router` call each. Owns the `/pal` prefix branch in `POST /api/chat` and `_render_pal_bubbles`. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. | `create_app()`, `_drive_message()`, `_run_turn(session, message, pal=, log_user=)`, `_render_pal_bubbles()`, `Session.pal_turn`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
+| [enough/prompt.py](../enough/prompt.py) | ~1730 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/readvisor/paradigm enumeration + toggle-state helpers, the generated identity preface, the chief readvisor's name, and the gated tool-doc blocks. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt(project_dir, readvisors=, profile=, pal=)`, `readvisor_identity()`, `identity_preface()`, `chief_name()` / `valid_chief_name()` / `CHIEF_NAME_DEFAULT` / `CHIEF_NAME_MAX`, `readvisor_shape()`, `tool_instructions(project_dir, pal=)`, `TOOL_INSTRUCTIONS` / `COMPOSURE_TOOL_INSTRUCTIONS` / `READVISORY_TOOL_INSTRUCTIONS` / `PAL_TOOL_INSTRUCTIONS` / `PAL_TURN_INSTRUCTION`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()` / `_readvisors_dir()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
 | [enough/composure.py](../enough/composure.py) | ~3060 | The composure core (0.3.5): the `.comp` HTML5 parser/serializer, the sanitizer, markdown ⇄ rich text, the node-level op vocabulary (the only way content changes), `place_module`/`arrange`/`estimate_height`, the JSON document model the canvas renders from, the comments sidecar, the forms registry, the outline→composure converter, and the write-door denial. **No FastAPI import** — exercisable with no web layer. See "Composures". | `loads()` / `dumps()`, `model()`, `apply_ops()`, `path_lock()`, `OP_NAMES` / `SOURCES` / `MODULE_TYPES` / `BG_SWATCHES` / `SHIPPED_FORMS` / `CAPS`, `place_module()`, `estimate_height()`, `write_denial()`, `comments_path()` / `load_comments()` / `move_sidecars()`, `parse_outline()` / `outline_ops()` / `from_outline()`, `ComposureError` |
 | [enough/composure_api.py](../enough/composure_api.py) | ~520 | HTTP translation only: `build_router(project_dir, resolve_path, emit)` → the `APIRouter` `create_app` mounts. Every `/api/composure*` route, the comments CRUD, `link-preview`, `webframe/refresh`, and the `composure` SSE event. | `build_router()`, `EVENT` |
 | [enough/composure_tools.py](../enough/composure_tools.py) | ~490 | The nine readvisor composure tools; `register()` adds them to `tools._DISPATCH` / `_TRACE_TOGGLE` at `tools` import time. Gated by `composure_enabled`. | `TOOL_NAMES`, `register()`, `run_read_composure()` … `run_composure_from_outline()`, `CACHE_OVER_CHARS` |
-| [enough/council.py](../enough/council.py) | ~1340 | The council engine (0.3.5): the `composure:council` meta schema, participants + tints, the rotation, the per-participant token budget and the mechanical fold, the framing texts, statement cleaning, transcript export, and the `Council` class. **No FastAPI import.** One seam (`run_council_turn`) is where every test swaps the model out. | `Council`, `validate_meta()` / `validate_participants()` / `validate_output()`, `speakers()` / `next_speaker()` / `advance()`, `build_messages()` / `identity_for()` / `fold_summary()`, `share_for()` / `resolve_n_ctx()` / `probe_n_ctx()`, `run_council_turn()`, `turn_in_flight()` / `busy_paths()` / `reset_runtime()`, `CTX_CLOUD` / `FOLD_AT` / `MIN_TRANSCRIPT_TOKENS` / `MAX_PARTICIPANTS` / `MAX_ROUNDS_CAP`, `CouncilError` |
-| [enough/council_api.py](../enough/council_api.py) | ~530 | `build_router(project_dir, resolve_path, emit, session)` → the `/api/council/*` router. HTTP translation, the two lock exclusions, and the `council` SSE event. | `build_router()` |
+| [enough/council.py](../enough/council.py) | ~1890 | The council engine (0.3.5, extended 0.4.0): the `composure:council` meta schema, participants + tints + charges, the rotation, the per-participant token budget and the mechanical fold, the framing texts, statement cleaning, the three output kinds (incl. the outline→composure conclusion and its one retry), reconvening, the pal seam, transcript export, and the `Council` class. **No FastAPI import.** Two seams: `run_council_turn` (where every test swaps the model out) and `PAL_CALL` (where the `/pal` lane wires the cloud in). | `Council`, `validate_meta()` / `validate_participants()` / `validate_output()` / `_charge()`, `speakers()` / `next_speaker()` / `advance()`, `build_messages()` / `identity_for()` / `fold_summary()`, `brief_markdown()` / `output_sentence()` / `brief_text()`, `conclude_composure()` / `outline_composure()` / `output_composure_path()` / `strip_code_fence()` / `OUTLINE_RETRY`, `reconvene_meta()` / `reconvene_input()` / `link_doc()`, `PAL_CALL` / `ask_pal_turn()` / `pal_participant()` / `pal_statement()` / `PAL_DISTILL` / `PAL_TINT` / `PAL_PROMPT_CHARS`, `share_for()` / `resolve_n_ctx()` / `probe_n_ctx()`, `run_council_turn()`, `turn_in_flight()` / `busy_paths()` / `reset_runtime()`, `OUTPUT_KINDS` / `OUTPUT_KINDS_LANDED` / `RESERVED_KINDS` / `COMPOSURE_OUTPUT_FORMS` / `MAX_CHARGE_CHARS` / `RECONVENE_EXCERPT_CHARS` / `CTX_CLOUD` / `FOLD_AT` / `MIN_TRANSCRIPT_TOKENS` / `MAX_PARTICIPANTS` / `MAX_ROUNDS_CAP`, `CouncilError` |
+| [enough/council_api.py](../enough/council_api.py) | ~680 | `build_router(project_dir, resolve_path, emit, session)` → the `/api/council/*` router. HTTP translation, the two lock exclusions, the brief-module write at setup, `POST /api/council/reconvene`, and the `council` SSE event. | `build_router()` |
 | [enough/readvisor_tools.py](../enough/readvisor_tools.py) | ~325 | `install_readvisor` (P7): the nine ordered refusals, the payload scan through a tempdir, the `.<name>.installing/` stage-then-rename write, and the `readvisors_changed` side effect. `register()` wires it into `tools._DISPATCH` at import time; gated by `readvisory_install`. | `TOOL_NAMES`, `register()`, `run_install_readvisor()`, `scan_documents()`, `shipped_names()` |
+| [enough/pal_tools.py](../enough/pal_tools.py) | ~380 | `/pal` (0.4.0): the command parser, the turn window, the `ask_pal` tool runner and the result codec. **No cloud import at module level** (`enough.cloud` drags httpx + keyring in) — `run_ask_pal` imports it inside the function, and the untrusted-content markers are kept as literals that `tests/test_pal.py` pins to the real constants. `register()` wires `ask_pal` into `tools._DISPATCH` / `_TRACE_TOGGLE` at `tools` import time. Gated by nothing of its own: the cloud gate is the gate. | `TOOL_NAMES`, `register()`, `strip_command()`, `pal_turn()` / `turn_active()` / `reset_runtime()` / `PalTurn`, `run_ask_pal()`, `render_result_body()` / `parse_result_body()`, `USAGE_HINT` / `ALREADY_CLOUD_NOTE` / `denial_no_pal_turn()` / `denial_already_asked()` / `denial_too_long()`, `MAX_PROMPT_CHARS` / `MAX_TOKENS` / `CACHE_SOURCE` / `SIDE_EFFECT` / `RESULT_HEADER` |
 | [enough/skillaudit.py](../enough/skillaudit.py) | ~1040 | First-use audit of untrusted skills (0.2.2). Trust classification (symlink into *an* enough install's `defaults/skills/` = trusted — this install or a sibling one, since 0.2.7), the content fingerprint, the `verdict.json` sidecar, both audit passes (deterministic `payload_scanner.py` + a single non-streaming LLM completion), the in-flight registry, and the guarded toggle. Progress on the `skill-audit` SSE event. | `is_trusted()`, `fingerprint()` / `skill_fingerprint()`, `skill_state()`, `set_skill_enabled_guarded()`, `SkillAuditRefused`, `audit_skill()` / `audit_and_enable()`, `run_llm_audit()` (module-level test hook), `quarantine_untrusted()`, `trust_override()`, `read_verdict()` / `write_verdict()` |
 | [enough/broker.py](../enough/broker.py) | ~440 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
 | [enough/tools.py](../enough/tools.py) | ~1745 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers), the tool-call XML parser, the dispatch table. Two import-time `register()` calls at the bottom fold in the composure and readvisor tools. `fetch_and_cache()` is the shared fetch pipeline `run_fetch_url` and the webframe refresh both render. | `_DISPATCH` (~line 1627), `_TRACE_TOGGLE` (~line 1656), `execute()`, `parse_tool_calls()`, `fetch_and_cache()`, `ToolResult.side_effects`, `_CLOUD_KEY_EXFIL_PATTERNS` |
@@ -88,7 +93,7 @@ Every Python module in `enough/`:
 | [enough/convert.py](../enough/convert.py) | ~1395 | Document conversion (0.2.5): the format **registry** (`FORMATS`), engine probing + caching, twin/assets/manifest naming, the state machine, the job runner that drives the worker, export/sync/resolve, and the `pdf`-extra installer. Imports nothing heavy — docling and pandoc are only ever reached through `convert_worker`. See "Document conversion" below. | `FORMATS` / `formats_view()` / `engines()`, `pandoc_path()` / `typst_path()` / `docling_available()`, `twin_path()` / `assets_dir()` / `manifest_path()` / `pair_for()`, `state()` / `has_twin()`, `read_manifest()` / `write_manifest()`, `ConvertJobs`, `do_export()` / `sync_after_save()` / `resolve()`, `ExtraInstaller`, `installed_extras()` / `record_extra()`, `reset_engines()` |
 | [enough/convert_worker.py](../enough/convert_worker.py) | ~840 | The out-of-process worker: `python -m enough.convert_worker`, one JSON job on stdin, NDJSON records on stdout, exit. pandoc is shelled out to; **docling runs in this process** — which is the whole reason the worker exists (torch must never be imported into the server). | `main()`, `_OPS` (`convert` / `export` / `prefetch`), `do_convert()` / `do_export()` / `do_prefetch()`, `_convert_docling()`, `_flatten_media()` / `_relink_docling_assets()` / `_normalize_images()`, `_Heartbeat`, `TWIN_FORMAT` |
 | [enough/wikisink/](../enough/wikisink/) | ~2840 (pkg) | Local offline Wikipedia. `config.py` (install registry, schema v2 multi-install, data paths), `zim.py` (libzim reader, search, sanitize/rewrite), `download.py` (Kiwix flavor listing + resumable downloads), `overlay.py` (live-refreshed + preserved article stores), `comments.py` (per-article threads), `save.py` (save/read/unsave article folders + the clean HTML→markdown text pipeline), `update.py` (the "wikisink" update run), `rankings.py` (pageview snapshots), `report.py` (run report), `agent.py` (the four readvisor tool runners). | `config.load_config()` / `installs()` / `active_install()` / `unavailable_reason()`, `zim.get_article()` / `search()`, `download.DownloadManager`, `update.run_wikisink()` |
-| [enough/cloud.py](../enough/cloud.py) | ~1030 | OpenRouter integration: keyring read/write, in-memory key cache, OpenAI-compatible streaming + non-streaming clients, health check, response caching to `rness/io/cloud-cache/`, the broker-driven `pipeline_run()`. | `set_api_key()` / `clear_api_key()` / `has_api_key()`, `_get_api_key_for_broker()`, `health_check()`, `chat_completion()`, `stream_chat_completion()`, `cache_completion()`, `pipeline_run()` |
+| [enough/cloud.py](../enough/cloud.py) | ~1080 | OpenRouter integration: keyring read/write, in-memory key cache, OpenAI-compatible streaming + non-streaming clients, health check, response caching to `rness/io/cloud-cache/`, the broker-driven `pipeline_run()`, and **`gate_status()`** — the one three-step gate every door that sends a prompt off this machine asks (0.4.0). | `set_api_key()` / `clear_api_key()` / `has_api_key()`, `_get_api_key_for_broker()`, `gate_status()`, `health_check()`, `chat_completion()`, `stream_chat_completion()`, `cache_completion()`, `wrap_untrusted_cloud_text()`, `pipeline_run()` |
 | [enough/llm.py](../enough/llm.py) | ~120 | OpenAI-compatible client for the local llama-server. Streaming-only path for chat. | `stream_chat()`, `check_llm_reachable()` |
 | [enough/supervisor.py](../enough/supervisor.py) | ~470 | Manages the local llama-server subprocess. Adopts an existing process if one's already up; spawns its own otherwise. Skips spawning entirely when the active model is `opro-api`. | `LlamaSupervisor`, `_resolve_startup_choice()` |
 | [enough/models.py](../enough/models.py) | ~680 | Local-model registry (7 cute-named local models, defined in `defaults/models.json`; two carry separate MTP draft GGUFs, two carry a `llama_cpp_min_release` gate). Feasibility verdicts (RAM + free disk), `install-menu` CLI for bootstrap.sh. Selection state in `~/enough/config/models.json`. | `load_registry()`, `load_state()`, `save_state()`, `resolve()`, `all_models_view()`, `feasibility()`, `release_gate()`, `install_menu_rows()` |
@@ -238,16 +243,31 @@ When a user message arrives at `POST /api/chat`:
    stays on screen, one copy-paste from being re-sent. (The mirror rule —
    a council control refused while a *chat* turn streams — is a 409 from
    the council router. See "Councils".)
-1. The handler appends `{role: "user", content: ...}` to `session.history`
+1. **The `/pal` prefix, second** (0.4.0). `pal_tools.strip_command()` returns
+   `None` for an ordinary message and otherwise the message with the token
+   removed (`""` for a bare `/pal`). Four outcomes, and only one of them
+   starts a pal turn, in this order: **gate shut** (`cloud.gate_status()`) →
+   user bubble + a system bubble carrying the full `broker.denial_*` copy,
+   **no turn at all**; **nothing after `/pal`** → user bubble +
+   `pal_tools.USAGE_HINT`, no turn; **the active model is already
+   `opro-api`** → `pal_tools.ALREADY_CLOUD_NOTE` as a system bubble plus an
+   ordinary turn on the stripped text (`pal=False` — there is no pal to be a
+   pal to); otherwise an ordinary-looking turn on the stripped text with
+   `pal=True`. The gate is checked before the empty case on purpose: a user
+   whose cloud is off should learn that from a bare `/pal` too. `_run_turn`
+   is then called as `_run_turn(session, stripped, pal=…, log_user=typed)` —
+   **what was typed and what was sent differ**, and the user's bubble, the
+   history and the session log all keep the typed line.
+2. The handler appends `{role: "user", content: ...}` to `session.history`
    and emits the bubble via SSE. The `turn_start` SSE event carries
    **`{"speaker": "<chief readvisor name>"}`** (`prompt.chief_name()`,
    read live) — the live bubble's byline comes from there, and the history
    renderer (`_render_turn_from_history`) uses the same value. The byline
    is always the *current* name, never the name at the time of the turn:
    one voice, one name, or a rename reads as two people.
-2. `_drive_message` (in [server.py](../enough/server.py)) starts the tool
+3. `_drive_message` (in [server.py](../enough/server.py)) starts the tool
    loop, capped at `session.max_tool_iters` iterations.
-3. On each iteration:
+4. On each iteration:
    - `assemble_system_prompt(project_dir)` rebuilds the system prompt
      **from disk** — a generated **identity preface**, `rness/AGENT.md`,
      `rness/MOTIVATION.md`, the project description + profile, the active
@@ -257,7 +277,9 @@ When a user message arrives at `POST /api/chat`:
      Identity → Motivation → [Project Description] → [Project Profile] →
      [Active Readvisors] → Paradigm → [Paradigm Catalog] → [Policies] →
      [Skills] → [Current Intention] → Tools → Converted documents →
-     Context → [Available Updates].
+     Context → [Available Updates] → **[This turn]** (a pal turn only —
+     `PAL_TURN_INSTRUCTION`, last, so it is never in `session.history` and
+     never reads back as words the user typed).
    - **The preface is generated, not shipped** (`prompt.identity_preface()`,
      template `_IDENTITY_PREFACE_TMPL`). It has to be: `rness/AGENT.md` is a
      *copy* the user owns, so nothing written into `defaults/AGENT.md` ever
@@ -266,21 +288,32 @@ When a user message arrives at `POST /api/chat`:
      effects are narrated as things *enough* did) and **"you are one voice,
      sometimes made of several"** (switched-on readvisors are part of who
      the chief is this turn, not a panel to report from).
-   - **The tool docs are gated** (`prompt.tool_instructions(project_dir)`):
-     the always-on `TOOL_INSTRUCTIONS` core, plus
-     `COMPOSURE_TOOL_INSTRUCTIONS` when `broker.is_enabled("composure_enabled")`,
-     plus `READVISORY_TOOL_INSTRUCTIONS` when the `readvisory` skill is
-     switched on in this project. Both gates **fail open** — an unreadable
-     broker config leaves the composure block in, because a gate that hid
-     working tools would be worse than a gate that costs a kilobyte. A
-     project using neither pays what it paid before the composure round.
+   - **The tool docs are gated**
+     (`prompt.tool_instructions(project_dir, pal=False)`): the always-on
+     `TOOL_INSTRUCTIONS` core, plus `COMPOSURE_TOOL_INSTRUCTIONS` when
+     `broker.is_enabled("composure_enabled")`, plus
+     `READVISORY_TOOL_INSTRUCTIONS` when the `readvisory` skill is switched
+     on in this project, plus `PAL_TOOL_INSTRUCTIONS` when `pal=True`.
+     Ordered core → composures → readvisors → pal, cheapest gate first. The
+     first two gates **fail open** — an unreadable broker config leaves the
+     composure block in, because a gate that hid working tools would be
+     worse than a gate that costs a kilobyte. A project using neither pays
+     what it paid before the composure round. **The pal gate is the narrow
+     one**: the other two are switched on for a project and stay on, while
+     the pal block rides on the single turn the user opened with `/pal`, so
+     `ask_pal` costs an ordinary turn nothing.
      `tests/test_prompt_weight.py` pins the budgets (core ≤ 17 500 chars,
-     fully enabled ≤ 22 000) **and both directions of the coverage
-     question**: every name in `tools._DISPATCH` is documented somewhere in
-     the fully-enabled prompt, and every `<tool name="x">` example names
-     something dispatchable. Headroom under the full budget is deliberately
-     tiny, so the next round that adds a tool has to raise the number on
-     purpose.
+     fully enabled ≤ 22 000, `PAL_BUDGET` ≤ 1 200 for the pal block by
+     itself) **and both directions of the coverage question**: every name in
+     `tools._DISPATCH` is documented somewhere in
+     `fully_enabled(project) + tool_instructions(pal=True)`, and every
+     `<tool name="x">` example names something dispatchable — a tool is
+     documented if the turn that can call it says so, not if every turn
+     does. `CORE_BUDGET` and `FULL_BUDGET` are unchanged in value *and in
+     meaning*: `FULL_BUDGET` measures what an **ordinary** turn can carry,
+     and the pal block is not in it. Headroom under the full budget is
+     deliberately tiny — tens of characters — so the next round that adds a
+     tool has to raise the number on purpose.
    - **Routing decision**: read `current` from `models.load_state()`. If
      `opro-api`, dispatch to `cloud.stream_chat_completion()`. Otherwise
      dispatch to `llm.stream_chat()` (the local llama-server). Both
@@ -298,7 +331,7 @@ When a user message arrives at `POST /api/chat`:
      `ToolResult`, append its `render()` output as a user message
      (formatted as a `<tool_result>` XML tag), continue the loop.
    - If no tool call: end the turn.
-4. Mid-loop pressure check: after each tool result, if pressure ≥
+5. Mid-loop pressure check: after each tool result, if pressure ≥
    `orchestrator.json`'s threshold, either auto-reset (write a
    continuation checkpoint to the active request file → wipe history →
    resume) or pause with a banner — depending on the orchestrator
@@ -325,7 +358,7 @@ cache.
 | Composures | `<anywhere>/<name>.comp` (new ones land in `rness/io/composure/`) | `defaults/composure-forms/<form>.comp` + `rness/composure-forms/` | no — reached through the composure tools |
 | Composure comments | `<dir>/.<name>.comp.comments.json` | none — written by `composure.py` | no |
 | Council transcripts | `rness/knowledge/councils/<YYYY-MM-DD>-<slug>.md` | none — written on conclude | no (readable on demand) |
-| Council outputs | whatever `output.path` names, through `tools.run_write_file` | none | no |
+| Council outputs | `answer` → the ink-tinted conclusion module, no file; `document` → whatever `output.path` names, through `tools.run_write_file`; `composure` → `rness/io/composure/<council-slug>-output-<YYYY-MM-DD>.comp`, written whole at `rev 1` and linked back | none | no |
 | Policies | `rness/policies/*.md` (symlink) | `defaults/policies/*.md` | yes, all of them |
 | Project profile | `rness/knowledge/project-profile.md` | seeded empty | yes |
 | Requests | `rness/requests/*.md` | none — a readvisor creates them | no (but readvisors read on demand) |
@@ -507,6 +540,113 @@ OPRO-API is selected) exposes:
 | `/api/cloud/health-check` | POST | Re-pings `openrouter/free`. |
 | `/api/cloud/set-model` | POST | `{model_id}` → updates the active OpenRouter model id. |
 
+### The gate, in one place (0.4.0)
+
+`cloud.gate_status()` is the three-step chain that used to live inline in
+`tools.run_cloud_pipeline`: **`local_models_only` off, then a key present,
+then the last health check green.**
+
+```python
+{"open": bool, "reason": str | None, "denial": str | None, "model_id": str | None}
+```
+
+- `reason` — one short clause naming what is shut, for a UI with room for a
+  sentence.
+- `denial` — the full `broker.denial_*` copy, which says how to fix it. This
+  is what a tool hands the model and what the chat shows the user.
+- `model_id` — the configured model **only when the gate is open**; `None`
+  otherwise, rather than leaking the configured model from behind a shut
+  door. Falls back to `cloud.DEFAULT_CONFIG["model_id"]` when the config's is
+  blank.
+
+Three callers: `tools.run_cloud_pipeline`, `pal_tools.run_ask_pal`, and
+`GET /api/pal/status`. **The order of the checks is load-bearing**:
+`status_snapshot()` reads the OS keyring, and on macOS a keyring read by a
+process the user has not blessed raises a system dialog, so the toggle is
+checked first and a user who switched the cloud off never sees one.
+`tests/test_pal.py::test_the_toggle_is_checked_before_the_keyring` pins it.
+`cloud_pipeline`'s behaviour is unchanged by the refactor — same three
+denials, same order, same strings, and four tests say so.
+
+### `/pal` — one question out, in the open (0.4.0)
+
+A pal is **not a subsystem**. It is the OpenRouter endpoint already
+configured in this slot, reached once, by hand, from an otherwise local
+turn. No pal config, no pal modal, no pal model picker, **no broker toggle**:
+if the cloud slot is usable a pal is usable, and if it is not, the existing
+cloud denial is the whole explanation. The command branch lives in
+`POST /api/chat` (step 1 of "The request lifecycle"); the tool and the turn
+window live in [enough/pal_tools.py](../enough/pal_tools.py); the two prompt
+blocks live in [prompt.py](../enough/prompt.py).
+
+**Typing `/pal` is the consent.** There is no second confirm step, because a
+confirm step that appears every time is a button people learn to click. What
+replaces it is visibility: the outgoing prompt is rendered to the user
+verbatim, before the answer, every time, live and after a reload, and is
+never summarized or truncated on the way to the screen.
+
+The turn window is `pal_tools.pal_turn(session, active=)`, a context manager,
+and **the only thing that sets `session.pal_turn` or the module-level
+`_active`**. The flag is cleared in a `finally` so it survives every way a
+turn can end — clean return, LLM error, the auto-reset path, a cancelled
+`asyncio` task. `active=False` yields `None` and touches nothing, so
+`_drive_message` wraps an ordinary turn in the same statement.
+
+`ask_pal`'s checks run cheapest-first, with the one-call limit **last** so a
+model making a second call with a malformed prompt is told about the
+malformed prompt rather than scolded for the limit: no pal turn → gate shut →
+empty prompt → over `MAX_PROMPT_CHARS` (6 000, **refused, not truncated**) →
+`tools._CLOUD_KEY_EXFIL_PATTERNS` match → already spent. The call itself is
+`cloud.chat_completion` (non-streaming), `max_tokens = MAX_TOKENS` (1 200),
+messages **exactly** `[{"role": "user", "content": prompt}]` — no system
+message, no conversation, no project, which is what makes "the bubble shows
+exactly what left the machine" literally true. **A failed call does not spend
+the turn**: a network error, an empty answer and a malformed response all
+leave the one call intact, because `PalTurn.exchanges` is appended to only
+after a successful exchange.
+
+The record, four places, one codec: `pal_tools.render_result_body()` writes
+the tool-result body (`→ pal · <model id>`, the prompt, then the reply inside
+`cloud.wrap_untrusted_cloud_text`'s markers) and `parse_result_body()` reads
+it back. From it come the live bubbles (the `pal_exchange` SSE event, fired
+by the generic `ToolResult.side_effects` path in `server._handle_tool` the
+moment the result lands, so **before** the readvisor's next tokens), the
+reloaded history (`server._render_pal_bubbles`, called on every
+`<tool_result …>` message — every other tool result still renders as
+nothing), and the session log. Plus `cloud.cache_completion(source="pal")` in
+`rness/io/cloud-cache/`, and a broker-journal entry: the tool reads its
+prompt from a **`<prompt>` tag rather than `<content>`** precisely so that
+`tools._trace_args_for` carries the outgoing text into the journal verbatim
+instead of summarizing it as `<N chars>`. A cleared conversation is the
+normal case; the journal is what is left of it.
+
+```
+event: pal_exchange
+data: {"model_id": "…", "prompt": "<byte-for-byte what was sent>",
+       "reply": "<the model's text, unwrapped>"}
+```
+
+The two bubbles are `<div class="msg pal-sent">` (byline `→ pal · <model
+id>`) then `<div class="msg pal">` (byline `pal · <model id>`), in that
+order, identical live and on reload. **The CSS for them is landing with the
+0.4.0 UI lane**, along with the composer's command-hint row; the server emits
+the class names either way.
+
+| Route | Method | Notes |
+|---|---|---|
+| `/api/pal/status` | GET | `{"available", "reason", "model_id"}` straight off `gate_status()`. Project-mode only (`ModeGate` 404s it in home mode). **It reads the keyring when the toggle is off** — call it when the composer first sees a `/`, not on every keystroke |
+
+**The `:online` suffix costs zero code on our side.** OpenRouter documents
+appending `:online` to any model slug as exactly equivalent to
+`"plugins": [{"id": "web"}]`, giving the model web results and billing extra
+per search, free models included
+(<https://openrouter.ai/docs/features/web-search>, checked 2026-09-18 — the
+page carries no version stamp). Nothing here special-cases it: set the
+OPRO-API model id to e.g. `anthropic/claude-sonnet-4.5:online` in the
+settings panel and `gate_status()` returns it, `ask_pal` passes it straight
+through, and the bubbles show `pal · <model id>` with the suffix included —
+which is the honest thing, since the user is paying for the difference.
+
 ### Defense-in-depth
 
 The readvisors and the broker run in the **same Python process** — there is no
@@ -522,12 +662,19 @@ process-level sandbox. The strongest defenses are:
    `secret-tool {lookup,search,store}`. Match → return
    `broker.denial_cloud_key_exfiltration_attempt()` without executing.
    Patterns are intentionally narrow (false positives are rare on
-   identifiers we coined ourselves).
+   identifiers we coined ourselves). **The same list is scanned over an
+   `ask_pal` prompt** before it leaves the machine (0.4.0) — a model that
+   can be talked into asking a pal to exfiltrate is the same hole in a
+   different door.
 3. **Response wrapping.** `cloud.wrap_untrusted_cloud_text()` exists for
    any path where cloud-produced text becomes tool-result content. (Not
    used for ordinary chat completions in Architecture A, where the
    cloud IS the readvisor; meant for `cloud_pipeline` output and any future
-   path where cloud content gets passed back as data.)
+   path where cloud content gets passed back as data.) An `ask_pal` reply is
+   such a path: `pal_tools.render_result_body()` wraps it in the same
+   markers, held there as **literals** so importing `pal_tools` does not drag
+   httpx and keyring in with `enough.cloud` — `tests/test_pal.py` pins the
+   literals to the real constants.
 4. **Cache-write redaction.** Before writing a cache file,
    `cloud._redact()` scrubs anything matching the OpenRouter key
    pattern. The key shouldn't ever flow into cache content, but if it
@@ -545,6 +692,7 @@ response. A queryable summary table lives at
 
 `source` values:
 - `chat` — an interactive readvisor turn (one per `_drive_message` iteration)
+- `pal` — one `ask_pal` exchange (`pal_tools.CACHE_SOURCE`)
 - `pipeline-step` — one step of a `cloud_pipeline` run
 - `pipeline-summary` — a follow-up summary call (only when
   `compile.method == "summarize_each"`); includes a
@@ -635,6 +783,12 @@ The current toggle catalog (13 toggles, all default `True`):
 | `composure_enabled` | composure | Whether the readvisors' nine composure tools work at all — **and** whether `COMPOSURE_TOOL_INSTRUCTIONS` is in the prompt (this is the one toggle that gates *docs* alongside the *tools* they describe; the gate fails open on an unreadable config). The canvas UI stays ungated, like wikisink and cacheawl |
 | `readvisory_install` | readvisors | Whether `install_readvisor` may write a readvisor to disk. Off keeps the `readvisory` skill's interview and drafting and leaves the filing to the user. A new group — `/api/broker` renders whatever is in `TOGGLES`, so a new group needs no code |
 
+**`/pal` deliberately added none** (0.4.0). `local_models_only` plus a
+working key already decides whether a prompt may leave this machine; a
+second switch would be a second thing to get wrong and a second place for
+the two answers to disagree. Same reasoning for councils: they run on the
+same model the chat does and are gated by nothing extra.
+
 ---
 
 ## Tools
@@ -671,29 +825,37 @@ The current toggle catalog (13 toggles, all default `True`):
 | `comp_save_as_form` | `composure_tools.run_comp_save_as_form` | `composure_enabled`; writes a reusable form into `rness/composure-forms/` |
 | `composure_from_outline` | `composure_tools.run_composure_from_outline` | `composure_enabled`; one markdown outline → a whole composure, deterministically. The `scaffold` skill teaches the grammar — see "Composures" |
 | `install_readvisor` | `readvisor_tools.run_install_readvisor` | **`readvisory_install`** toggle; kebab-case `<name>` ≤ 40 chars, `<scope>` `project`\|`global`, both documents non-empty and ≤ 40 KB, `prompt.readvisor_shape()` clean, the payload scan clean, destination not a symlink, `<replace>yes</replace>` to overwrite |
+| `ask_pal` | `pal_tools.run_ask_pal` | **no toggle of its own** — the cloud gate is the gate. In order: a pal turn is open (the user typed `/pal`) → `cloud.gate_status()` open → a non-empty `<prompt>` (**not** `<content>`, though it is accepted as a fallback) → ≤ `MAX_PROMPT_CHARS` (6 000), refused not truncated → no `_CLOUD_KEY_EXFIL_PATTERNS` match → **one call per turn**, checked last. See "`/pal`" under OPRO-API |
 
-All registered in `_DISPATCH` (~line 1627 in tools.py) and
-`_TRACE_TOGGLE` (~line 1656) — the last twelve add themselves through the
-two import-time `register()` calls at the bottom of tools.py
-(`composure_tools.register()`, `readvisor_tools.register()`), which is the
-pattern to copy for any future tool family: the op vocabulary stays in one
-module instead of spreading runners through tools.py. The tool-call XML
-parser (`parse_tool_calls`) handles arbitrary tool names — extra inner tags
-(beyond `<path>`, `<content>`, `<command>`, `<url>`) end up in
-`ToolCall.extra` so new tools don't need parser changes.
+All registered in `_DISPATCH` (~line 1617 in tools.py) and
+`_TRACE_TOGGLE` (~line 1646) — the last eleven add themselves through the
+**three** import-time `register()` calls at the bottom of tools.py
+(`composure_tools.register()`, `readvisor_tools.register()`,
+`pal_tools.register()`), which is the pattern to copy for any future tool
+family: the op vocabulary stays in one module instead of spreading runners
+through tools.py. The tool-call XML parser (`parse_tool_calls`) handles
+arbitrary tool names — extra inner tags (beyond `<path>`, `<content>`,
+`<command>`, `<url>`) end up in `ToolCall.extra` so new tools don't need
+parser changes; `ask_pal`'s `<prompt>` is one of those, chosen because
+`_trace_args_for` carries an unknown inner tag into the broker journal
+verbatim and summarizes `<content>` as `<N chars>`.
 
 A runner that changes something the frontend has open returns a
 **`ToolResult.side_effects`** dict; `server._handle_tool` fans each key out
 as an SSE event of that name. That is how a composure tool fires the
-`composure` event and `install_readvisor` fires `readvisors_changed`.
+`composure` event, `install_readvisor` fires `readvisors_changed`, and
+`ask_pal` fires `pal_exchange`.
 
 Tool documentation that the readvisors read is in
 [enough/prompt.py](../enough/prompt.py) under `TOOL_INSTRUCTIONS`,
-`COMPOSURE_TOOL_INSTRUCTIONS` and `READVISORY_TOOL_INSTRUCTIONS`, assembled
-by `tool_instructions(project_dir)` (see "The request lifecycle" for the
-gates). Every new tool needs an example block + prose explanation in the
-right one of the three — and `tests/test_prompt_weight.py` will fail until
-it has one.
+`COMPOSURE_TOOL_INSTRUCTIONS`, `READVISORY_TOOL_INSTRUCTIONS` and
+`PAL_TOOL_INSTRUCTIONS`, assembled by
+`tool_instructions(project_dir, pal=False)` (see "The request lifecycle" for
+the gates). Every new tool needs an example block + prose explanation in the
+right one of the four — and `tests/test_prompt_weight.py` will fail until it
+has one. **A new tool whose docs ride in the always-on core must either gate
+its own block or raise `FULL_BUDGET` on purpose**; the headroom is tens of
+characters, which is the point.
 
 ---
 
@@ -1246,11 +1408,15 @@ NOT to touch").
 
 A **council** is the multi-readvisor composure form: several readvisors and
 the user speak in turn on one canvas, each statement a locked module, and
-the whole thing concludes into an answer, a document, or (0.4.0) a new
-composure. [enough/council.py](../enough/council.py) is the engine,
+the whole thing concludes into **an answer, a document, or a whole new
+composure** (all three land in 0.4.0).
+[enough/council.py](../enough/council.py) is the engine,
 [enough/council_api.py](../enough/council_api.py) the HTTP translation.
-**The council UI is landing with the council setup card** — the backend
-contract below is final.
+The backend contract below is final; the 0.4.0 **UI lane** is concurrently
+adding the setup card's output-form select and charge inputs, the reconvene
+control, the pal statement's collapsed prompt, and `POST /api/council/pal`
+(the route that wires `council.PAL_CALL` to the `/pal` machinery) — each
+marked below where it is not yet verifiable in code.
 
 ### The file is the state
 
@@ -1264,23 +1430,25 @@ restart mid-council loses nothing", and it is why `_RUNS`, `_IN_FLIGHT` and
 `_LOCKS` are runtime-only and `reset_runtime()` is safe.
 
 Keys: `input parameters constraints output participants order max_rounds
-status round turn cursor next queue brief_module transcript reconvene`.
-`status` ∈ `setup | ready | running | paused | concluded`; `order` is
-`round-robin`, the only one. Participant kinds are `chief`, `readvisor`,
-`user` and **`pal`** — `pal` is reserved for 0.4.0: it validates,
-round-trips, and is **ignored everywhere else** (never speaks, never enters
-the rotation, never counts toward the budget). `charge` and `reconvene` are
-likewise 0.4.0 hooks that validate and round-trip **now**, and `charge` is
-already injected into that participant's identity, so a council saved by a
-later enough behaves correctly here instead of silently dropping somebody's
-accountability.
+status round turn cursor next queue brief_module transcript reconvene
+reconvened_from reconvened_to output_fallback`. `status` ∈
+`setup | ready | running | paused | concluded`; `order` is `round-robin`,
+the only one. Participant kinds are `chief`, `readvisor`, `user` and
+**`pal`**. `RESERVED_KINDS` **is now `frozenset()`** — `pal` was its only
+member and 0.4.0 gave it a voice, so a pal is named in the brief's roster
+and in the export like anyone else. The name is kept rather than deleted
+because `brief_text`, the export and `state()["reserved"]` all read it, and
+the next reserved kind should cost one line instead of five call sites.
+`charge` is no longer a hook either (see "Charges"), and `reconvene` is now
+a fact about where this council came from rather than a placeholder.
 
 Refusals are `CouncilError` → 400 with the sentence verbatim: unknown
-status / kind / output kind / order; `max_rounds` outside 1–`MAX_ROUNDS_CAP`
-(20); more than `MAX_PARTICIPANTS` (12); a participant with no name;
-duplicate ids; **two participants with the same name** (statements are
-attributed by name); more than one chief; nobody who can speak; a `document`
-output with no path or with a `.comp` path.
+status / kind / output kind / order / composure form; `max_rounds` outside
+1–`MAX_ROUNDS_CAP` (20); more than `MAX_PARTICIPANTS` (12); a participant
+with no name; duplicate ids; **two participants with the same name**
+(statements are attributed by name); more than one chief; nobody who can
+speak; a `document` output with no path or with a `.comp` path; a `charge`
+over `MAX_CHARGE_CHARS` (200).
 
 **Tints** are assigned once at setup and **stored on the participant**, so a
 readvisor keeps its colour for the life of the council even when another is
@@ -1291,9 +1459,9 @@ added later: chief `paper`, user `blue`, readvisors
 ### The rotation
 
 `speakers(meta)` is the chief plus the readvisors, in list order — the user
-writes its own statements and the pal is reserved, so neither is in the
-rotation. A round closes when the cursor wraps to 0, so `/round` means
-**finish the current round**.
+writes its own statements and a pal speaks only when it is asked, so neither
+is in the rotation and neither takes a share of the window. A round closes
+when the cursor wraps to 0, so `/round` means **finish the current round**.
 
 **A queued user statement takes the next slot**, and committing it does
 **not** move the cursor — so after the user speaks, the participant whose
@@ -1414,13 +1582,15 @@ statement are wrong in the same direction by the same amount.
 
 | Route | Method | Notes |
 |---|---|---|
-| `/api/council/setup` | POST | Creates the composure from the `council` form when the path does not exist, **in the same atomic batch as the meta** — a refused setup writes nothing at all. 409 when the output document exists and `overwrite` was not sent, or when already concluded |
+| `/api/council/setup` | POST | Creates the composure from the `council` form when the path does not exist, **in the same atomic batch as the meta** — a refused setup writes nothing at all. 409 when the output document exists and `overwrite` was not sent, or when already concluded. Then, in a **second** batch, writes the brief module from `council.brief_markdown(meta)` (see "Setup writes the brief") |
 | `/api/council/state?path=` | GET | The same body `/setup` returns. Cheap — reads the file and at most the cached `/props` probe, assembles no prompt, **safe to poll** |
 | `/api/council/participants` | GET | The setup card's starting checklist: the chief, every **enabled** readvisor (display name from its `AGENT.md` H1, `folder` for the engine), and the user, tints already assigned |
 | `/api/council/convene` · `/pause` | POST | `pause` cancels a background `/run`; **the turn already streaming finishes and is committed** — a half-written statement thrown away is a worse surprise than one extra paragraph |
 | `/api/council/next` · `/round` · `/run` | POST | one turn · to the end of the round · a background task to `max_rounds` (returns at once, reports over SSE). 409 when this council is already running |
 | `/api/council/say` | POST | Always queued first, then drained immediately when no turn is streaming. So the common case is "it appears now", the racy one is "it appears next", and neither is "it is lost" |
-| `/api/council/conclude` | POST | One chief turn under `conclusion_framing`, committed tinted **`ink`**. Then: `answer` → that module *is* the output; `document` → written through **`tools.run_write_file`**, the same door and guards as the tool, then a `doc` link-in module under the conclusion; `composure` → **501 before the turn runs**, so nothing is spent and the council stays runnable |
+| `/api/council/conclude` | POST | One chief turn under `conclusion_framing`, committed tinted **`ink`**. Then: `answer` → that module *is* the output; `document` → written through **`tools.run_write_file`**, the same door and guards as the tool, then a `doc` link-in module under the conclusion; `composure` → the outline path below. Response carries `output`, `document`, `composure`, `output_fallback`, `retried`, `form`, `detail`, `transcript`, `module`, `text` + the full state. A kind outside `OUTPUT_KINDS_LANDED` is **501 before the turn runs** — today that set is all three, and the check stays because the next kind will land the way `composure` did |
+| `/api/council/reconvene` | POST | `{path, title?}` → a **new** council composure carrying the same participants (ids, kinds, names, folders, tints, charges), `parameters`, `constraints`, `output` **including its path**, `max_rounds` and `order`, with a fresh `input` built by `reconvene_input()`. 409 when the council has not concluded. `_guard_chat()` applies (it writes files and shares the model); `_guard_council()` does not, because a reconvene starts no turn |
+| `/api/council/pal` | POST | **Landing with the 0.4.0 UI lane**: the route that assigns `council.PAL_CALL` and calls `council.ask_pal_turn(path, user_ask)`. The engine seam exists and is tested; the route does not exist in `council_api.py` yet |
 
 Setting a council meta on an existing non-council composure is allowed; its
 `form` stays whatever it was, and **the frontend keys off `council` being
@@ -1431,12 +1601,21 @@ non-null, not off `form == "council"`**.
 ```jsonc
 // event: council
 {"path": "…", "phase": "start"|"token"|"end"|"error"|"status",
- "turn": 3, "speaker": "Nadia", "speaker_kind": "readvisor",
+ "turn": "3", "speaker": "Nadia", "speaker_kind": "readvisor",
  "text": "…",                                        // token | end | error
  "module": "m5", "rev": 7,                            // end
  "folded": 2, "tokens": 15012, "head": 14180, "budget": 13107,  // end
  "status": "running", "round": 1, "next": "chief", "next_name": "Ed"}
 ```
+
+**`turn` is a string on `start`/`token`/`end`/`error`** (0.4.0; it was an
+int). It is a *module's* turn, and `composure.Module.turn` is `str` because
+`data-turn` is text — so the event now matches the data model instead of the
+frontend having to coerce. Fixing it the other way would have changed
+`Module.turn`, the `.comp` attribute and `module_model`, which three other
+lanes read. **The `status` phase's `turn` is a different quantity and stays
+an int**: it is the council's statement counter off the meta, the same value
+and type as `council.turn` in `/api/council/state`.
 
 Every committed batch **also** fires the ordinary `composure` event with
 `source: "council"`, so the canvas refreshes the new module exactly the way
@@ -1459,6 +1638,202 @@ text and the controls; the `composure` channel is for the document.
 
 Transcripts export to `rness/knowledge/councils/<YYYY-MM-DD>-<slug>.md`,
 never overwriting (a second export the same day gets `-2`).
+
+### The three output kinds, and the composure fallback
+
+`OUTPUT_KINDS = ("answer", "document", "composure")` and
+`OUTPUT_KINDS_LANDED = frozenset(OUTPUT_KINDS)` — all three conclude.
+`validate_output()` takes `{kind, path?, form?, overwrite?}`: `document`
+needs a `path` and refuses a `.comp` one; **`composure` takes no path at all**
+(the file is made beside the council on conclude and its path is written
+*back* into `output.path`) but does take `form` ∈ `COMPOSURE_OUTPUT_FORMS`
+(`scaffold` — each group a column — or `cards` — each group a row),
+defaulting to `scaffold` and validated **at setup**.
+
+`conclusion_framing(output)` appends `_CONCLUSION_SHAPE[kind]` to
+`_CONCLUSION_FRAMING`. The composure shape asks for the outline grammar of
+"`composure_from_outline` and the `scaffold` skill" below and nothing else —
+no covering note, no code fence — and tells the chief to use `[gap: …]` cards
+for what the council did not settle.
+
+Then, in order, in `Council.conclude_composure()`:
+
+1. one concluding completion, asked for the outline;
+2. `outline_composure(title, form, markdown) -> Composure | None` decides
+   whether it parsed. `None` — "did not parse" — when **any** of: empty after
+   `strip_code_fence`, `parse_outline` raises, no groups or no cards in any
+   group, or `from_outline` refuses it (today: over `MAX_MODULES` cards). All
+   four mean the same thing to the retry. `strip_code_fence` unwraps a reply
+   that is *entirely* one fence, because models fence markdown they were
+   asked for far more often than they write markdown that is a fence;
+3. `None` → **exactly one** retry: `council.OUTLINE_RETRY` appended as a
+   final `user` message to the **same assembled prompt** (same speaker, one
+   more instruction — re-reading a dozen files to say it would be a second
+   prompt assembly for no gain). Two retries would be two more windows spent
+   on a council that has already decided;
+4. `None` again → the conclusion is committed as an ordinary `answer` module
+   (ink-tinted), `output_fallback: "answer"` goes into the meta *and* the
+   conclude response, `detail` says the outline would not parse twice, the
+   transcript header says so too, and **no file is written**. The *second*
+   attempt's prose is what is committed when it is non-empty (it is the
+   model's most recent answer to the brief), otherwise the first — the
+   council's decision is never thrown away because a small model would not
+   write headings.
+
+**Exactly one statement module is committed whichever way it goes**: the
+first attempt is streamed but not committed, and the second `start` phase
+replaces the pending card in the UI.
+
+The file lands at
+`rness/io/composure/<council-slug>-output-<YYYY-MM-DD>.comp` —
+`output_composure_path()`, the council file's own stem slugified, never
+overwriting (`-2`, `-3`, …), pure apart from the existence check. It is
+built **whole, in memory** by `from_outline` before anything is written, so
+a parse failure, a bad op or the module cap costs nothing on disk, and it is
+then written with `comp_core.save` at `rev = 1` rather than through
+`apply_ops`: there is no previous version to be stale against, no base rev
+and no other writer, and `from_outline` has already validated every op. **`apply_ops`
+is the door for *changing* a composure**, which this is not. The model's own
+`# ` line is the new composure's title; the council's title is the fallback
+for an outline that opened straight into `## `. Finally a `doc` link-in is
+added to the **council** pointing at the new file, and the transcript header
+gets `**Output.** composure (scaffold) → \`…\``.
+
+`_stream_one` is the shared primitive underneath (`take_turn` is built on
+it): one streamed completion, announced and committed by nobody, with three
+knobs — `append` (a final user message: the outline retry, the pal
+distillation), `quiet` (no `token` phase) and `announce_as` (the
+`(name, kind)` the phases carry when that is not who is running). `_land` is
+the shared tail: commit, `end`, `status`, `composure`. **Any future "one more
+completion" should use these** rather than growing `take_turn` a fourth mode.
+
+### Charges
+
+`participants[].charge` is one line of accountability — "argues the reader's
+side" — optional, `≤ MAX_CHARGE_CHARS` (200). `_charge()` collapses all
+whitespace including newlines (a textarea that wrapped is not a user error)
+and **refuses** anything over the cap with the length in the sentence, rather
+than truncating: a charge silently cut in half would change what a
+participant was told to do.
+
+`identity_for()` appends it **last**, after the council framing, as its own
+`## Your charge in this council` section — it is the most specific thing this
+participant was told and the thing a long identity is most likely to bury.
+**Only that participant's own charge reaches that participant's prompt.** It
+is also already in the transcript export header
+(`- **Nadia** (readvisor) — argues the reader's side`). The setup card's
+per-participant charge input is **landing with the 0.4.0 UI lane**; the
+server refuses the whole setup with a sentence carrying the number, so the
+input should cap at 200 itself.
+
+### Reconvene
+
+A concluded council, sat again. `POST /api/council/reconvene {path, title?}`
+returns the **new** council's full `/api/council/state` plus `path`, `from`
+and `title`; the default title is `<title> · reconvened`.
+
+What carries over unchanged: participants (ids, kinds, names, folders, tints,
+charges), `parameters`, `constraints`, `output` (kind, form **and path**),
+`max_rounds`, `order`. **The output path rides over whole**, including a
+`document` output's: a second council writing to a path that now exists is
+not silently overwritten — `_check_output_path` asks at setup and at conclude
+exactly as it did the first time. (Blanking it would have made
+`validate_output` refuse the meta outright.)
+
+What is new is `input`, built by `reconvene_input()`: the prior input, a rule
+("The council in `…` has already sat on this. What it produced is the
+starting point now."), then the prior output as the thing on the table — for
+`answer`, the last statement's text; for `document`/`composure`, a reference
+line plus the first `RECONVENE_EXCERPT_CHARS` (2 000) of the file suffixed
+` …(truncated)`. **A `.comp` is read through `comp_core.outline()`, not as
+HTML** — the markup is not what the next council needs to argue with. An
+unreadable file degrades to the reference line alone.
+
+What is reset: `status: "ready"`, `round`/`turn`/`cursor` to 0, `queue`
+empty, `transcript` null, `next` = the first speaker. `reconvene: true` and
+`reconvened_from` record the lineage.
+
+**The old council is not re-run, re-statused or re-written.** It gains
+exactly two things: a `doc` link-in pointing at its successor, and
+`reconvened_to`. Its status stays `concluded` and its transcript is
+untouched. The new council gains the mirror link-in, so a chain of any length
+is readable from either direction. The `#cc-done` reconvene button (and
+showing the link instead when `reconvened_to` is already set — a council is
+reconvened once) is **landing with the 0.4.0 UI lane**.
+
+### The pal seam
+
+**The council does not know how to reach a pal and must not learn.** The
+gate, the cache, the broker trace, the exfiltration patterns and the one-call
+limit all live with `/pal`. Two module attributes are the whole contract.
+
+```python
+council.PAL_CALL: Callable[[str], Any] = _pal_not_wired
+# PAL_CALL(prompt) -> (model_id, reply_text)
+```
+
+- **Unwired it raises `NotImplementedError("pal lane")`**, which propagates
+  to the caller untouched — `ask_pal_turn` re-raises rather than wrapping it,
+  so the lane can turn it into whatever the closed-gate answer should be.
+- It may be a plain function **or** a coroutine function; an awaitable return
+  is awaited.
+- Any *other* exception is wrapped as `CouncilError("the pal could not
+  answer: …")` after an `error` phase is announced, and nothing is committed.
+- To wire it: `council.PAL_CALL = my_pal_call`. Tests do exactly that, and so
+  will `POST /api/council/pal` when it lands with the UI lane.
+
+`council.ask_pal_turn(path, user_ask, *, project_dir=, rel_path=, llm_url=,
+session=, emit=)` (module-level, taking a path *or* a built `Council`) and
+`Council.ask_pal_turn(user_ask)` do, in order: refuse an empty ask; **one
+chief completion through `run_council_turn`** — the whole assembled chief
+prompt with `PAL_DISTILL` appended as a final `user` message carrying the
+user's ask, the reply cleaned by `clean_statement` and cut to
+`PAL_PROMPT_CHARS` (6 000), an empty result being a `CouncilError`; then
+`PAL_CALL(prompt)`; then **one statement committed** through
+`composure.apply_ops` with `source: "council"` exactly like every other
+statement — `speaker_kind="pal"`, `speaker="pal · <model id>"`,
+`bg=PAL_TINT` (`"gray"`, the one unused swatch). `PAL_DISTILL` tells the
+chief the pal has seen none of this and to write ONE self-contained prompt
+naming no file path, no project name, no participant's real name and no
+private detail the question does not require.
+
+The distillation streams with `quiet=True` — the user is not meant to read
+the chief thinking; what matters is the prompt, and it lands in the module —
+but **does** announce `start` and `error` as `speaker: "pal",
+speaker_kind: "pal"`, so the pending card says `pal` from the first frame.
+The module's page puts the outgoing prompt **first**, as a blockquote led by
+`PAL_PROMPT_LEAD` (`→ pal`), with the reply beneath: nothing leaves this
+machine without being written where the user can read it.
+
+**A pal answer is an interjection.** `pal_participant(model_id)` is shaped
+like a participant but is **never** in `meta["participants"]`, and `advance()`
+only moves the cursor for `chief`/`readvisor` — so a pal statement takes a
+turn *number* but not a slot. Whoever was about to speak still speaks next,
+the round does not move, and the budget's even split is unchanged. The next
+participant reads it as an ordinary `user`-role line prefixed
+`pal · <model id>: …`, like any other speaker's statement.
+
+### Setup writes the brief
+
+A council set up through the API alone — by a tool, by a script, by anything
+that is not the setup card — used to keep the shipped form's "What the
+council is working from…" placeholder while the participants argued about
+something else. `api_council_setup` now writes it from
+`council.brief_markdown(meta)`: the four setup fields in the shape the
+shipped form's placeholder has, empty ones skipped, `**Desired output.**`
+always present.
+
+The output clause comes from `output_sentence(meta)`, which the brief every
+*participant* reads (`brief_text`) also uses, **so the canvas and the prompt
+cannot drift**. It is an ordinary `set_page` from `source: "council"` — the
+brief module has no speaker, so it is unlocked and this needed nothing new —
+and the batch also records `brief_module` in the meta. It is a **second**
+batch, not part of the first, because on a create the module's id is not
+knowable until the form has been materialized; the frontend's own `set_page`
+from `source: "ui"` still works and still wins if it runs after. English,
+like every other document body (`docs/I18N.md` keeps what the readvisors read
+in English). **A failure here is logged and swallowed** — a council whose
+setup succeeded should not 500 because its cover page did not get written.
 
 ### `composure_from_outline` and the `scaffold` skill
 
@@ -2860,41 +3235,64 @@ where it lives.
   modules** where a generator is involved: `from_outline` clears the form's
   own content in the same atomic batch it adds the outline's.
 
-### Add a council output kind (the 0.4.0 hook)
+### Add a council output kind
 
-Today `output.kind` ∈ `answer | document | composure`, and `composure`
-answers **501 before the conclusion turn runs**, so nothing is spent and
-the council stays runnable. Adding a kind:
+`output.kind` ∈ `answer | document | composure`, and all three land — but
+`OUTPUT_KINDS_LANDED` stays, because the next kind should arrive the way
+`composure` did: **validated at setup from the first release, refused with a
+sentence at conclude until it is built.** Adding a kind:
 
-1. Accept the name in `council.validate_output()`, with whatever companion
-   key it needs (`path` for `document`, `form` for `composure`) and a
-   refusal sentence for the missing case. Unknown keys are dropped on
-   purpose — validate it or it will not survive a round trip.
-2. Handle it in `POST /api/council/conclude` *after* the chief's
-   conclusion statement is committed, alongside the `document` branch.
-   **Write through `tools.run_write_file`**, not `Path.write_text` — that
-   is what keeps the allowlists, the `rness/requests/done/` prefix rule,
-   the cachebox mirror guard, the `.comp`/`.girraph` refusals, the undo
-   stash and the convert-twin sync applying to a council's output.
-3. Add a `doc` link-in module under the conclusion so the artifact is one
-   click from the council that produced it, the way `document` does.
-4. Refuse *before* the turn when the kind cannot land (the 501 pattern):
-   spending a completion and then failing is the one outcome to avoid.
-5. `tests/test_council.py` for the validation, `tests/test_council_api.py`
-   for the conclude path.
+1. Add the name to `council.OUTPUT_KINDS` and accept it in
+   `council.validate_output()`, with whatever companion key it needs (`path`
+   for `document`, `form` for `composure`) and a refusal sentence for the
+   missing case. Unknown keys are dropped on purpose — validate it or it
+   will not survive a round trip.
+2. **Leave it out of `OUTPUT_KINDS_LANDED` until step 3 works.** That is the
+   501: `api_council_conclude` refuses *before* the turn runs, so nothing is
+   spent and the council stays runnable. Spending a completion and then
+   failing is the one outcome to avoid.
+3. Handle it in `POST /api/council/conclude` after the chief's conclusion
+   statement is committed, alongside the `document` and `composure`
+   branches. For a *file* output: **write through `tools.run_write_file`**,
+   not `Path.write_text` — that is what keeps the allowlists, the
+   `rness/requests/done/` prefix rule, the cachebox mirror guard, the
+   `.comp`/`.girraph` refusals, the undo stash and the convert-twin sync
+   applying to a council's output. For a *composure* output the door is
+   `comp_core.save` at `rev 1` on a document `from_outline` already built and
+   validated in memory — see "The three output kinds".
+4. If the kind needs the model to emit a shape, add it to
+   `_CONCLUSION_SHAPE` and give it a retry constant, a "did not parse"
+   predicate and **a fallback to `answer`** that commits the prose rather
+   than losing the council's decision. Use `_stream_one(append=…)` for the
+   retry; do not grow `take_turn` another mode.
+5. Add a `doc` link-in module (`Council.link_doc`) under the conclusion so
+   the artifact is one click from the council that produced it.
+6. `tests/test_council.py` for the validation, `tests/test_council_api.py`
+   for the conclude path, `tests/test_council_output.py` for the shape,
+   the retry and the fallback.
 
 ### Add a tool runner
 
 1. Define `run_<tool>(project_dir: Path, call: ToolCall) -> ToolResult`
    in [tools.py](../enough/tools.py).
-2. Register in `_DISPATCH` (~line 1447 in tools.py) and `_TRACE_TOGGLE`
-   (~line 1475). Both grep cleanly by name if line numbers drift again.
+2. Register in `_DISPATCH` (~line 1617 in tools.py) and `_TRACE_TOGGLE`
+   (~line 1646). Both grep cleanly by name if line numbers drift again. A
+   whole *family* of tools goes in its own module with a `register()` that
+   `setdefault`s into both, called at the bottom of tools.py — the three
+   existing ones are `composure_tools`, `readvisor_tools`, `pal_tools`.
 3. If `ToolResult.render()` needs a specific attribute (e.g. `output=`
    for `cloud_pipeline`), add a branch in `render()`.
 4. Add an XML example block + prose to `TOOL_INSTRUCTIONS` in
-   [prompt.py](../enough/prompt.py).
+   [prompt.py](../enough/prompt.py) — **or to a gated block**, if the tool
+   is not always available. `tests/test_prompt_weight.py` fails until it is
+   documented somewhere in `fully_enabled(project) +
+   tool_instructions(pal=True)`, and it fails again if the always-on core
+   grew past `CORE_BUDGET` or the full prompt past `FULL_BUDGET`. Raising
+   either number is a decision, not a fix.
 5. If the tool needs a broker toggle (kill switch), add to
-   `broker.TOGGLES` — UI updates itself.
+   `broker.TOGGLES` — UI updates itself. If it is gated by something that
+   already exists (`ask_pal` is gated by the cloud gate and by the pal
+   turn), do not add a second switch for the two answers to disagree over.
 
 ### Add a convertible file format
 
@@ -3258,6 +3656,39 @@ A list of things that will confuse you if you don't see them coming:
   Likewise **`set_meta` refuses `form` and `council`** — the engine's own
   door is `set_council`, and that op is refused for every source but
   `"council"`.
+- **`session.pal_turn` must be cleared on every exit path.** It is set only
+  by `pal_tools.pal_turn()`, a context manager that clears both it and the
+  module-level `_active` in a `finally` — clean return, LLM error, the
+  auto-reset path, a cancelled `asyncio` task. **A pal flag left set is a
+  turn in which the model can send whatever it likes to the cloud without
+  the user having asked for anything**, which is why `tests/test_pal.py`
+  tests the window five ways. Never assign `session.pal_turn` or
+  `pal_tools._active` by hand, and never open the window around anything
+  wider than one `_run_turn`. Note also that **the one-call limit is per
+  `_run_turn`**, so an auto-reset firing mid-pal-turn does *not* hand out a
+  second call: the checkpoint and continue turns run inside the same window.
+- **`council.PAL_CALL` defaults to a function that raises**
+  (`NotImplementedError("pal lane")`), and `ask_pal_turn` re-raises it
+  untouched rather than wrapping it in a `CouncilError` — that is how a
+  caller tells "nobody wired a pal in" apart from "the pal could not
+  answer", which *is* wrapped. Do not give it a silent no-op default, and do
+  not import `pal_tools` or `cloud` into `council.py` to save the wiring:
+  the gate, the cache, the trace, the exfil patterns and the one-call limit
+  live with `/pal`, and a second copy of any of them is how one of them ends
+  up a step short.
+- **`council.RESERVED_KINDS` is `frozenset()` now.** Code that reads it
+  still works and must keep working (`brief_text`, the transcript export and
+  `state()["reserved"]` all read it), so do not delete the name because it
+  is empty — the next reserved participant kind should cost one line instead
+  of five call sites. Emptiness is not deadness.
+- **The tool-doc budget is always on, and its headroom is tens of
+  characters.** `tests/test_prompt_weight.py` pins `CORE_BUDGET` (17 500),
+  `FULL_BUDGET` (22 000) and `PAL_BUDGET` (1 200). A new tool therefore
+  either **gates its documentation block** the way composures, readvisory
+  and pal do, or **raises the budget on purpose, in the same commit, with a
+  reason**. `FULL_BUDGET` measures what an *ordinary* turn can carry, which
+  is why the pal block is not counted in it — the per-turn gate is what
+  bought that exemption, not an argument that the block is small.
 - **The composure base indicator has no exit ribbon, by design.** Every
   other square in `#mode-stack` carries its own `ribbon-redx`; the base
   square (rightmost, `data-mode="composure"`) does not, because composure

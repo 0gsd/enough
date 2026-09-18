@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import asyncio
 import datetime as dt
+import inspect
 import logging
 import re
 import time
@@ -57,22 +58,36 @@ EVENT = "council"
 # ---------------------------------------------------------------------------
 
 STATUSES: tuple[str, ...] = ("setup", "ready", "running", "paused", "concluded")
-#: `pal` is reserved for 0.4.0 (P9, `/pal` in a council). It validates here so
-#: a council saved by a newer enough opens in this one, and it is ignored
-#: everywhere else: it never speaks, never counts toward the budget, and
-#: never appears in the rotation.
+#: `pal` got its meaning in P9 (0.4.0): a pal statement is committed by
+#: `ask_pal_turn` when the user asks for one. It is still never in the
+#: rotation — nobody's turn is ever the pal's — and it never counts toward the
+#: budget's even split, because it speaks only when asked.
 PARTICIPANT_KINDS: tuple[str, ...] = ("chief", "readvisor", "user", "pal")
-RESERVED_KINDS: frozenset[str] = frozenset({"pal"})
+#: Kinds that validate but can never speak. Empty since 0.4.0 — `pal` was the
+#: only member and P9 gave it a voice. Kept (rather than deleted) because the
+#: brief roster, the export and `state()["reserved"]` all read it, and the
+#: next reserved kind should cost one line, not five call sites.
+RESERVED_KINDS: frozenset[str] = frozenset()
 OUTPUT_KINDS: tuple[str, ...] = ("answer", "document", "composure")
-#: Output kinds this release can actually conclude with. `composure` lands in
-#: 0.4.0; it validates at setup and is refused (cleanly, with the version) at
-#: conclude, so a council set up on a newer enough is readable here.
-OUTPUT_KINDS_LANDED: frozenset[str] = frozenset({"answer", "document"})
+#: Output kinds this release can actually conclude with. All three, since
+#: 0.4.0. Kept as its own name because `api_council_conclude` reads it and a
+#: future kind will land the same way `composure` did.
+OUTPUT_KINDS_LANDED: frozenset[str] = frozenset(OUTPUT_KINDS)
+#: The two outline layouts a `composure` output may be built with. `blank` is
+#: an outline form too (`comp_core.OUTLINE_FORMS`) but it makes one full page
+#: of the raw text, which is what the `answer` output already is.
+COMPOSURE_OUTPUT_FORMS: tuple[str, ...] = ("scaffold", "cards")
 ORDERS: tuple[str, ...] = ("round-robin",)
 
 MAX_ROUNDS_CAP = 20
 MAX_PARTICIPANTS = 12
 MAX_BRIEF_FIELD_CHARS = 8_000
+#: A charge is one line of accountability, not a second brief.
+MAX_CHARGE_CHARS = 200
+#: How much of a `document`/`composure` output a reconvened council carries
+#: into its brief. Enough to argue with, not so much that the new council
+#: starts three quarters full.
+RECONVENE_EXCERPT_CHARS = 2_000
 
 #: The tint ladder. Chief speaks on paper (it is the house voice), the user
 #: on blue (it is the one voice that is not a model), and the readvisors
@@ -239,9 +254,87 @@ _CONCLUSION_SHAPE = {
         "title. Nothing but the document — no covering note."
     ),
     "composure": (
-        "- The output is a **composure** outline."
+        "- The output is a **composure**: a board of cards enough will lay "
+        "out from an outline. Write the outline and nothing else — no "
+        "covering note, no code fence, no explanation before or after it.\n"
+        "- The grammar is exactly four rules:\n"
+        "  - one `# ` line, the title of the board;\n"
+        "  - each `## ` line is a group (a column in the scaffold form, a "
+        "row in the cards form);\n"
+        "  - each `### ` line is a card, and its heading is the card's "
+        "title;\n"
+        "  - every line under a `### ` until the next heading is that "
+        "card's body.\n"
+        "- Nothing else is structure. `#### ` and deeper, tables and nested "
+        "lists stay in the body as the text they are, and anything written "
+        "before the first card is dropped.\n"
+        "- A card whose title starts with `[gap:` is an open question — "
+        "`### [gap: who owns the migration?]` — and enough tints it. Use "
+        "them for what the council did not settle instead of leaving it "
+        "out.\n"
+        "- Two to six groups, two to eight cards in each, a body of a "
+        "sentence or three per card. The whole board is what the council "
+        "decided, arranged so it can be read at a glance."
     ),
 }
+
+#: The one retry. Sent as a final user message when the first concluding turn
+#: did not parse — the same framing, plus a demonstration, because a model
+#: that ignored the grammar in prose usually follows it from an example.
+OUTLINE_RETRY = """\
+That did not parse as an outline, so nothing was made. Write it again, as \
+the outline and nothing else — no preamble, no code fence, no closing note. \
+This is the whole grammar:
+
+# The title of the board
+
+## The first group
+
+### The first card
+
+Its body, a sentence or three.
+
+### [gap: what the council did not settle]
+
+Why it is still open.
+
+## The second group
+
+### Another card
+
+Its body.
+
+Start your reply with the `# ` line."""
+
+#: What the chief is asked to do with the user's `/pal` question. One
+#: completion; the answer IS the prompt that leaves the machine, so it has to
+#: stand on its own — the pal has never seen this council.
+PAL_DISTILL = """\
+## Distil one question for the pal
+
+The user has asked this council to put a question to the **pal** — a cloud \
+model outside this machine, which has not seen this council, this project or \
+any of these documents. You are writing the prompt that will be sent to it. \
+Your reply is the prompt itself: it leaves exactly as you write it.
+
+The user's ask:
+
+{ask}
+
+Write ONE self-contained prompt that:
+
+- carries the little of the brief and the council the pal actually needs to \
+answer, in your own words, and nothing more;
+- names no file path, no project name, no participant's real name and no \
+private detail that the question does not require;
+- asks one thing, plainly, and says what shape of answer is wanted;
+- is under 300 words.
+
+Reply with the prompt and nothing else — no preamble, no quotation marks \
+around it, no note about what you left out."""
+
+#: The pal's statement, above the fold: the exact text that left the machine.
+PAL_PROMPT_LEAD = "→ pal"
 
 
 def chief_framing(chief: str) -> str:
@@ -282,8 +375,12 @@ def _slug_name(value: object) -> str:
 
 
 def validate_output(raw: object) -> dict[str, Any]:
-    """`{kind, path?, form?, overwrite?}`. `composure` validates and is
-    refused at conclude — see `OUTPUT_KINDS_LANDED`."""
+    """`{kind, path?, form?, overwrite?}`.
+
+    A `composure` output takes no path from the user — the file is made next
+    to the council when it concludes, and its path is written back here — but
+    it does take a `form`, which is the layout the outline is laid out in and
+    must be one of `COMPOSURE_OUTPUT_FORMS`."""
     data = raw if isinstance(raw, dict) else {}
     kind = _text(data.get("kind") or "answer", 32).lower()
     if kind not in OUTPUT_KINDS:
@@ -292,6 +389,7 @@ def validate_output(raw: object) -> dict[str, Any]:
             f"{', '.join(OUTPUT_KINDS)}.")
     out: dict[str, Any] = {"kind": kind}
     path = _text(data.get("path"), 512)
+    form = _text(data.get("form"), 64).lower()
     if kind == "document":
         if not path:
             raise CouncilError(
@@ -301,19 +399,40 @@ def validate_output(raw: object) -> dict[str, Any]:
         if path.endswith(comp_core.SUFFIX):
             raise CouncilError(
                 "a document output writes markdown, not a composure. Use the "
-                "'composure' output kind for that (it lands in 0.4.0), or "
-                "give a .md path.")
+                "'composure' output kind for that, or give a .md path.")
+    if kind == "composure":
+        form = form or COMPOSURE_OUTPUT_FORMS[0]
+        if form not in COMPOSURE_OUTPUT_FORMS:
+            raise CouncilError(
+                f"unknown composure form {form!r}. forms: "
+                f"{', '.join(COMPOSURE_OUTPUT_FORMS)} — scaffold puts each "
+                f"group in a column, cards puts each group in a row.")
     out["path"] = path or None
-    out["form"] = _text(data.get("form"), 64) or None
+    out["form"] = form or None
     out["overwrite"] = bool(data.get("overwrite"))
     return out
+
+
+def _charge(value: object) -> str:
+    """One line of accountability, or nothing. Newlines are collapsed rather
+    than refused (a textarea that wrapped is not a user error), and anything
+    over the cap is refused rather than truncated — a charge silently cut in
+    half would change what a participant was told to do."""
+    raw = " ".join(_text(value, MAX_CHARGE_CHARS * 4).split())
+    if len(raw) > MAX_CHARGE_CHARS:
+        raise CouncilError(
+            f"a charge is one line — at most {MAX_CHARGE_CHARS} characters "
+            f"(that one is {len(raw)}). It says what a participant is "
+            f"accountable for here, not what they should think.")
+    return raw
 
 
 def validate_participants(raw: object) -> list[dict[str, Any]]:
     """`[{id, kind, name, charge?}]`. Tints are assigned here, once, in list
     order, and stored — so a readvisor keeps its colour for the life of the
-    council. `charge` is P9's per-participant accountability line: it
-    validates and round-trips now, and is injected into the framing then."""
+    council. `charge` is the per-participant accountability line ("owns
+    continuity", "argues the reader's side"), injected into that
+    participant's council framing by `identity_for`."""
     rows = raw if isinstance(raw, list) else []
     if not rows:
         raise CouncilError(
@@ -357,7 +476,7 @@ def validate_participants(raw: object) -> list[dict[str, Any]]:
         if kind == "chief":
             chiefs += 1
         entry = {"id": pid, "kind": kind, "name": name,
-                 "charge": _text(row.get("charge"), 300),
+                 "charge": _charge(row.get("charge")),
                  # The on-disk readvisor directory. Kept because a readvisor
                  # whose AGENT.md has a prettier `# H1` than its folder name
                  # would otherwise be looked up by its display name and find
@@ -428,17 +547,23 @@ def validate_meta(raw: object) -> dict[str, Any]:
         "brief_module": _slug_name(data.get("brief_module")) or None,
         #: Where the transcript was exported on conclude, project-relative.
         "transcript": _text(data.get("transcript"), 512) or None,
-        # P9 reserves this: a concluded council can be reconvened with the
-        # same brief and its own output as input. Validated and round-tripped
-        # now so a 0.4.0 council opens here without losing the flag.
+        # True on a council made by `/api/council/reconvene`. It is a fact
+        # about where this council came from, not a control: the UI uses it
+        # to label the lineage, and `reconvened_from` carries the path.
         "reconvene": bool(data.get("reconvene")),
+        "reconvened_from": _text(data.get("reconvened_from"), 512) or None,
+        "reconvened_to": _text(data.get("reconvened_to"), 512) or None,
+        # Set when a `composure` output's outline would not parse twice and
+        # the conclusion was kept as prose instead: `"answer"`, or None.
+        "output_fallback": _text(data.get("output_fallback"), 32) or None,
     }
 
 
 def speakers(meta: dict[str, Any]) -> list[dict[str, Any]]:
-    """The participants that actually generate: chief and readvisors, in
-    list order. `user` writes its own statements and `pal` is reserved, so
-    neither is in the rotation and neither counts toward the budget."""
+    """The participants that actually generate in the rotation: chief and
+    readvisors, in list order. `user` writes its own statements and `pal`
+    answers only when it is asked, so neither is in the rotation and neither
+    takes a share of the window."""
     return [p for p in meta.get("participants") or []
             if p.get("kind") in ("chief", "readvisor")]
 
@@ -535,12 +660,7 @@ def brief_text(meta: dict[str, Any]) -> str:
         body = (meta.get(key) or "").strip()
         if body:
             lines.append(f"\n**{label}.** {body}")
-    out = meta.get("output") or {}
-    kind = out.get("kind") or "answer"
-    want = {"answer": "a decided answer, written on the canvas at the end",
-            "document": f"a document, written to {out.get('path') or '(a path)'}",
-            "composure": "a new composure"}.get(kind, "a decided answer")
-    lines.append(f"\n**Desired output.** {want}.")
+    lines.append(f"\n**Desired output.** {output_sentence(meta)}.")
     roster = ", ".join(
         f"{p['name']} ({p['kind']})"
         for p in meta.get("participants") or []
@@ -548,6 +668,34 @@ def brief_text(meta: dict[str, Any]) -> str:
     if roster:
         lines.append(f"\n**In the room.** {roster}.")
     return "\n".join(lines).strip()
+
+
+def output_sentence(meta: dict[str, Any]) -> str:
+    """What the council is for, in one clause. Shared by the brief every
+    participant reads and the brief module on the canvas, so the two can
+    never drift."""
+    out = meta.get("output") or {}
+    kind = out.get("kind") or "answer"
+    form = out.get("form") or COMPOSURE_OUTPUT_FORMS[0]
+    return {
+        "answer": "a decided answer, written on the canvas at the end",
+        "document": f"a document, written to {out.get('path') or '(a path)'}",
+        "composure": (f"a new composure — a board of cards in the {form} "
+                      f"layout, written beside this council"),
+    }.get(kind, "a decided answer")
+
+
+def brief_markdown(meta: dict[str, Any]) -> str:
+    """The brief MODULE's page: the four setup fields, in the shape the
+    shipped form's placeholder has. Written by `api_council_setup` in its own
+    batch so a council set up through the API alone — by a tool, by a script,
+    by anything that is not the setup card — still shows its real brief
+    instead of the form's "What the council is working from…" prompt."""
+    rows = [("Input", (meta.get("input") or "").strip()),
+            ("Parameters", (meta.get("parameters") or "").strip()),
+            ("Constraints", (meta.get("constraints") or "").strip()),
+            ("Desired output", output_sentence(meta) + ".")]
+    return "\n\n".join(f"**{label}.** {body}" for label, body in rows if body)
 
 
 # ---------------------------------------------------------------------------
@@ -686,10 +834,11 @@ def identity_for(project_dir: Path, participant: dict[str, Any], chief: str,
         parts.append(readvisor_framing(name, chief))
     charge = (participant.get("charge") or "").strip()
     if charge:
-        # P9's per-participant charge. It rides in now because the schema
-        # carries it; a council saved by 0.4.0 therefore behaves correctly
-        # here instead of silently dropping somebody's accountability.
-        parts.append(f"## Your charge in this council\n\n{charge}")
+        # One line, last, after the framing: it is the most specific thing
+        # this participant was told, and the thing a long identity is most
+        # likely to bury.
+        parts.append(f"## Your charge in this council\n\n"
+                     f"Your charge in this council: {charge}")
     if conclude is not None:
         parts.append(conclusion_framing(conclude))
     return "\n\n".join(p.strip() for p in parts if p and p.strip()) + "\n"
@@ -843,6 +992,33 @@ async def run_council_turn(messages: list[dict[str, str]],
         if owned is not None:
             await owned.aclose()
     return "".join(buffer)
+
+
+# ---------------------------------------------------------------------------
+# The pal seam — one call out of the machine
+# ---------------------------------------------------------------------------
+
+def _pal_not_wired(prompt: str) -> tuple[str, str]:
+    raise NotImplementedError("pal lane")
+
+
+#: `PAL_CALL(prompt) -> (model_id, reply_text)`.
+#:
+#: The council does not know how to reach a pal and must not learn: the gate,
+#: the cache, the broker trace, the exfiltration patterns and the one-call
+#: limit all live with `/pal` in `pal_tools.py`. This module attribute is the
+#: whole of the contract between them — `ask_pal_turn` distils the prompt,
+#: calls this, and commits what comes back. It may be a plain function or a
+#: coroutine function; the return is awaited when it is awaitable.
+#:
+#: Unwired (as here) it raises `NotImplementedError("pal lane")`. Whoever
+#: routes the council composer's `/pal` sets it, and turns that exception
+#: into whatever the closed-gate answer should be.
+PAL_CALL: Callable[[str], Any] = _pal_not_wired
+
+#: A prompt longer than this is not a distillation, and the pal's own caller
+#: caps it anyway. Cut here too so the record and the wire agree.
+PAL_PROMPT_CHARS = 6_000
 
 
 # ---------------------------------------------------------------------------
@@ -1061,11 +1237,77 @@ class Council:
         return build_messages(meta, statements, identity,
                               participant["name"], share=share, stats=stats)
 
+    def _chief(self, meta: dict[str, Any]) -> dict[str, Any]:
+        speaker = next((p for p in meta["participants"]
+                        if p["kind"] == "chief"), None)
+        if speaker is None:
+            raise CouncilError(
+                "a council concludes in the chief readvisor's voice, and "
+                "this one has no chief participant.")
+        return speaker
+
+    async def _stream_one(self, speaker: dict[str, Any], *, turn: int,
+                          conclude: dict[str, Any] | None = None,
+                          append: str = "", quiet: bool = False,
+                          stats: dict[str, int] | None = None,
+                          announce_as: tuple[str, str] | None = None,
+                          ) -> str:
+        """One streamed completion for one participant, announced on the
+        `council` channel and committed by nobody. Holds
+        `session.generation_lock` for the whole stream, so an ordinary chat
+        turn cannot overlap it.
+
+        `append` is an extra final user message — the outline retry and the
+        pal distillation are both "the same participant, one more
+        instruction", and neither is worth a second prompt assembly.
+        `quiet` suppresses the token phase for a completion the user is not
+        meant to read as a statement (the pal distillation: what matters is
+        the prompt that left, and it lands in the module). `announce_as` is
+        the `(name, kind)` the phases carry when that is not who is running:
+        the pal's pending card should say `pal` from the first frame, even
+        though the chief is the one writing the prompt."""
+        stats = {} if stats is None else stats
+        as_name, as_kind = announce_as or (speaker["name"], speaker["kind"])
+        # Assembling a prompt reads a dozen files and may probe `/props`;
+        # neither belongs on the event loop while an SSE stream is open.
+        messages = await asyncio.to_thread(self.messages_for, speaker,
+                                           conclude=conclude, stats=stats)
+        if append:
+            messages.append({"role": "user", "content": append})
+
+        async def on_token(chunk: str) -> None:
+            await self._announce({"phase": "token", "turn": str(turn),
+                                  "speaker": as_name, "speaker_kind": as_kind,
+                                  "text": chunk})
+
+        await self._announce({"phase": "start", "turn": str(turn),
+                              "speaker": as_name, "speaker_kind": as_kind})
+        _IN_FLIGHT.add(self.key)
+        lock = getattr(self.session, "generation_lock", None)
+        try:
+            if lock is not None:
+                async with lock:
+                    raw = await run_council_turn(
+                        messages, None if quiet else on_token,
+                        llm_url=self.llm_url,
+                        client=getattr(self.session, "client", None))
+            else:
+                raw = await run_council_turn(messages,
+                                             None if quiet else on_token,
+                                             llm_url=self.llm_url)
+        except Exception as e:  # noqa: BLE001 — every failure is one shape here
+            _IN_FLIGHT.discard(self.key)
+            await self._announce({"phase": "error", "turn": str(turn),
+                                  "speaker": as_name, "speaker_kind": as_kind,
+                                  "text": str(e)})
+            raise
+        finally:
+            _IN_FLIGHT.discard(self.key)
+        return raw
+
     async def take_turn(self, *, conclude: dict[str, Any] | None = None,
                         ) -> TurnResult:
-        """One participant speaks. Holds `session.generation_lock` for the
-        whole streamed completion, so an ordinary chat turn cannot overlap
-        it."""
+        """One participant speaks, and the statement is committed."""
         comp, meta = self.load()
         if conclude is None:
             speaker = next_speaker(meta)
@@ -1074,58 +1316,31 @@ class Council:
             if speaker.get("kind") == "user":
                 return await self._drain_user_statement()
         else:
-            speaker = next((p for p in meta["participants"]
-                            if p["kind"] == "chief"), None)
-            if speaker is None:
-                raise CouncilError(
-                    "a council concludes in the chief readvisor's voice, and "
-                    "this one has no chief participant.")
-        # Assembling a prompt reads a dozen files and may probe `/props`;
-        # neither belongs on the event loop while an SSE stream is open.
+            speaker = self._chief(meta)
         stats: dict[str, int] = {}
-        messages = await asyncio.to_thread(self.messages_for, speaker,
-                                           conclude=conclude, stats=stats)
         turn = int(meta.get("turn") or 0) + 1
-
-        async def on_token(chunk: str) -> None:
-            await self._announce({"phase": "token", "turn": turn,
-                                  "speaker": speaker["name"],
-                                  "speaker_kind": speaker["kind"],
-                                  "text": chunk})
-
-        await self._announce({"phase": "start", "turn": turn,
-                              "speaker": speaker["name"],
-                              "speaker_kind": speaker["kind"]})
-        _IN_FLIGHT.add(self.key)
-        lock = getattr(self.session, "generation_lock", None)
-        try:
-            if lock is not None:
-                async with lock:
-                    raw = await run_council_turn(
-                        messages, on_token, llm_url=self.llm_url,
-                        client=getattr(self.session, "client", None))
-            else:
-                raw = await run_council_turn(messages, on_token,
-                                             llm_url=self.llm_url)
-        except Exception as e:  # noqa: BLE001 — every failure is one shape here
-            _IN_FLIGHT.discard(self.key)
-            await self._announce({"phase": "error", "turn": turn,
-                                  "speaker": speaker["name"],
-                                  "speaker_kind": speaker["kind"],
-                                  "text": str(e)})
-            raise
-        finally:
-            _IN_FLIGHT.discard(self.key)
+        raw = await self._stream_one(speaker, turn=turn, conclude=conclude,
+                                     stats=stats)
         text = clean_statement(raw, speaker["name"])
         stripped = 1 if text != (raw or "").strip() else 0
-        out = await asyncio.to_thread(
-            self.commit_statement, speaker, text,
+        return await self._land(
+            comp, speaker, text, stats=stats, stripped=stripped,
             bg=CONCLUSION_TINT if conclude is not None else None,
             title=(f"{speaker['name']} · conclusion" if conclude is not None
                    else None))
+
+    async def _land(self, comp: comp_core.Composure, speaker: dict[str, Any],
+                    text: str, *, stats: dict[str, int] | None = None,
+                    stripped: int = 0, bg: str | None = None,
+                    title: str | None = None) -> TurnResult:
+        """Commit a statement and tell everybody. The tail of every turn —
+        an ordinary one, a conclusion, and a pal's answer."""
+        stats = stats or {}
+        out = await asyncio.to_thread(self.commit_statement, speaker, text,
+                                      bg=bg, title=title)
         out.stripped = stripped
         out.folded = int(stats.get("folded") or 0)
-        await self._announce({"phase": "end", "turn": out.turn,
+        await self._announce({"phase": "end", "turn": str(out.turn),
                               "speaker": out.speaker,
                               "speaker_kind": out.speaker_kind,
                               "module": out.module, "rev": out.rev,
@@ -1145,6 +1360,125 @@ class Council:
             path=self.rel, rev=out.rev, changed=[out.module], stale=False,
             stale_changed=[], created=False, composure=comp))
         return out
+
+    # -- the composure output ---------------------------------------------
+
+    async def conclude_composure(self, out_spec: dict[str, Any],
+                                 ) -> dict[str, Any]:
+        """The concluding chief turn for a `composure` output.
+
+        One completion asked for an OUTLINE. If it does not parse, **one**
+        retry with `OUTLINE_RETRY` appended. If that does not parse either,
+        the text is committed as an ordinary `answer` conclusion and the
+        result says `fallback: "answer"` — a council that got to a decision
+        should not lose it because a small model would not write headings.
+
+        The new composure is built entirely in memory first (`from_outline`),
+        so nothing is written unless the whole outline survives the parser,
+        the grammar and the module cap."""
+        comp, meta = self.load()
+        speaker = self._chief(meta)
+        form = str(out_spec.get("form") or COMPOSURE_OUTPUT_FORMS[0])
+        stats: dict[str, int] = {}
+        turn = int(meta.get("turn") or 0) + 1
+        raw = await self._stream_one(speaker, turn=turn, conclude=out_spec,
+                                     stats=stats)
+        text = clean_statement(raw, speaker["name"])
+        built = outline_composure(comp.title, form, text)
+        retried = False
+        if built is None:
+            retried = True
+            log.info("council: %s's outline did not parse — retrying once",
+                     self.rel)
+            raw2 = await self._stream_one(speaker, turn=turn,
+                                          conclude=out_spec,
+                                          append=OUTLINE_RETRY, stats=stats)
+            text2 = clean_statement(raw2, speaker["name"])
+            built2 = outline_composure(comp.title, form, text2)
+            if built2 is not None:
+                text, built = text2, built2
+            elif text2:
+                text = text2
+        out = await self._land(comp, speaker, text, stats=stats,
+                               bg=CONCLUSION_TINT,
+                               title=f"{speaker['name']} · conclusion")
+        if built is None:
+            log.warning("council: %s fell back to an answer output", self.rel)
+            return {"turn": out, "path": None, "fallback": "answer",
+                    "retried": retried, "form": form}
+        rel = output_composure_path(self.project_dir, self.rel)
+        await asyncio.to_thread(_write_composure, self.project_dir, rel, built)
+        link = await asyncio.to_thread(self.link_doc, rel, (
+            f"The council's composure, written to `{rel}`."))
+        await self._announce_composure(link)
+        return {"turn": out, "path": rel, "fallback": None,
+                "retried": retried, "form": form,
+                "modules": len(built.modules)}
+
+    def link_doc(self, rel: str, blurb: str) -> comp_core.OpsResult:
+        """A `doc` link-in module under whatever is on the canvas now, so the
+        thing the council produced is one click from the council that
+        produced it. Used for the output document, the output composure and
+        both ends of a reconvene."""
+        _comp, meta = self.load()
+        return self._commit([{
+            "op": "add_module", "type": "doc", "href": rel,
+            "title": rel.rsplit("/", 1)[-1], "bg": "paper",
+            "markdown": blurb}], meta)
+
+    # -- the pal -----------------------------------------------------------
+
+    async def ask_pal_turn(self, user_ask: str) -> TurnResult:
+        """The user's `/pal` question, answered in this council.
+
+        Two halves, and the seam between them is the point:
+
+        1. **the chief distils** — one completion through `run_council_turn`,
+           with the whole brief and transcript in front of it, whose answer
+           IS the prompt that will leave the machine; and
+        2. **`PAL_CALL(prompt)`** — the pal lane's business, not ours.
+
+        What lands on the canvas is one statement tinted `PAL_TINT`, spoken
+        by `pal · <model id>` with `speaker_kind="pal"`, whose first block is
+        the exact outgoing prompt as a blockquote (the UI collapses it) and
+        whose body is the reply. Nothing leaves this machine without being
+        written down where the user can read it.
+
+        A pal statement is an interjection, like the user's: it takes a turn
+        number but not a slot in the rotation, so whoever was about to speak
+        still speaks next."""
+        ask = " ".join((user_ask or "").split())
+        if not ask:
+            raise CouncilError(
+                "a pal turn needs a question — what should the council ask?")
+        comp, meta = self.load()
+        speaker = self._chief(meta)
+        turn = int(meta.get("turn") or 0) + 1
+        raw = await self._stream_one(
+            speaker, turn=turn, append=PAL_DISTILL.format(ask=ask),
+            quiet=True, announce_as=("pal", "pal"))
+        prompt = clean_statement(raw, speaker["name"])[:PAL_PROMPT_CHARS]
+        if not prompt:
+            raise CouncilError(
+                f"{speaker['name']} did not manage to write a prompt for the "
+                f"pal. Try asking again, or more specifically.")
+        try:
+            answer = PAL_CALL(prompt)
+            if inspect.isawaitable(answer):
+                answer = await answer
+            model_id, reply = answer
+        except NotImplementedError:
+            raise
+        except CouncilError:
+            raise
+        except Exception as e:  # noqa: BLE001 — one shape for every failure
+            await self._announce({"phase": "error", "turn": str(turn),
+                                  "speaker": "pal", "speaker_kind": "pal",
+                                  "text": str(e)})
+            raise CouncilError(f"the pal could not answer: {e}") from None
+        pal = pal_participant(str(model_id or "pal"))
+        return await self._land(comp, pal,
+                                pal_statement(prompt, str(reply or "")))
 
     def _commit_user_statement(self) -> tuple[TurnResult, comp_core.OpsResult]:
         comp, meta = self.load()
@@ -1169,7 +1503,7 @@ class Council:
         """Commit the oldest queued user statement. Not a completion — the
         user already wrote it."""
         out, result = await asyncio.to_thread(self._commit_user_statement)
-        await self._announce({"phase": "end", "turn": out.turn,
+        await self._announce({"phase": "end", "turn": str(out.turn),
                               "speaker": out.speaker, "speaker_kind": "user",
                               "module": out.module, "rev": out.rev,
                               "text": out.text})
@@ -1191,7 +1525,8 @@ class Council:
 
     # -- the transcript export -------------------------------------------
 
-    def export_transcript(self, *, output_path: str = "") -> str:
+    def export_transcript(self, *, output_path: str = "",
+                          fallback: str = "") -> str:
         """`rness/knowledge/councils/<YYYY-MM-DD>-<slug>.md`, with a header
         block (brief, participants and their charges, output path) so a later
         conversation can cite it the way it cites any other note."""
@@ -1215,8 +1550,19 @@ class Council:
             lines.append("")
         out = meta.get("output") or {}
         target = output_path or out.get("path") or ""
-        lines.append(f"**Output.** {out.get('kind') or 'answer'}"
-                     + (f" → `{target}`" if target else ""))
+        form = f" ({out.get('form')})" if out.get("kind") == "composure" \
+            and out.get("form") else ""
+        # The export is written before the meta is sealed, so the fallback
+        # comes in as an argument as well as off the meta (a re-export of an
+        # already-concluded council reads it from the file).
+        fell = fallback or meta.get("output_fallback")
+        lines.append(f"**Output.** {out.get('kind') or 'answer'}{form}"
+                     + (f" → `{target}`" if target else "")
+                     + (f" *(the outline would not parse; kept as "
+                        f"{fell})*" if fell else ""))
+        if meta.get("reconvened_from"):
+            lines.append("")
+            lines.append(f"**Reconvened from.** `{meta['reconvened_from']}`")
         lines += ["", "## Participants", ""]
         for p in meta.get("participants") or []:
             charge = (p.get("charge") or "").strip()
@@ -1239,6 +1585,202 @@ class Council:
 def _chief_name() -> str:
     from . import prompt as prompt_mod
     return prompt_mod.chief_name()
+
+
+# ---------------------------------------------------------------------------
+# The composure output
+# ---------------------------------------------------------------------------
+
+_FENCE_RE = re.compile(r"\A\s*```[a-zA-Z0-9_-]*\s*\n(.*?)\n?\s*```\s*\Z",
+                       re.DOTALL)
+
+
+def strip_code_fence(text: str) -> str:
+    """Unwrap a whole reply that is one code fence. Models fence markdown
+    they were asked for far more often than they write markdown that IS a
+    fence, and an outline nobody can parse because of three backticks is the
+    most annoying possible way to lose a council."""
+    m = _FENCE_RE.match(text or "")
+    return m.group(1) if m else (text or "")
+
+
+def outline_composure(title: str, form: str,
+                      markdown: str) -> comp_core.Composure | None:
+    """The chief's concluding text, laid out — or `None` when it is not an
+    outline at all.
+
+    Built in memory and never written here: the caller decides. `None` is the
+    single "did not parse" answer, whether the text had no groups, no cards,
+    or so many that it blew the module cap — all three mean the same thing to
+    the retry, which is "ask once more, then keep the prose"."""
+    body = strip_code_fence(markdown).strip()
+    if not body:
+        return None
+    try:
+        doc = comp_core.parse_outline(body)
+    except Exception:  # noqa: BLE001 — a parser that throws is a non-outline
+        return None
+    if not doc.groups or not doc.card_count():
+        return None
+    # The model's own `# ` line wins; the council's title is the fallback for
+    # an outline that opened straight into `## `.
+    fallback = "" if doc.title else (title or "Council output")
+    try:
+        return comp_core.from_outline(fallback, form, body)
+    except ComposureError:
+        return None
+
+
+def output_composure_path(project_dir: Path, council_rel: str,
+                          when: str = "") -> str:
+    """`rness/io/composure/<council-slug>-output-<date>.comp`, never
+    overwriting: a council concluded twice (it cannot be, today) or two
+    councils with the same name get `-2`."""
+    stem = council_rel.rsplit("/", 1)[-1]
+    if stem.endswith(comp_core.SUFFIX):
+        stem = stem[:-len(comp_core.SUFFIX)]
+    slug = comp_core.slugify(stem or "council", 48)
+    stamp = when or dt.date.today().isoformat()
+    folder = project_dir / comp_core.COMPOSURE_DIR_REL
+    base = f"{slug}-output-{stamp}"
+    candidate = folder / f"{base}{comp_core.SUFFIX}"
+    n = 2
+    while candidate.exists():
+        candidate = folder / f"{base}-{n}{comp_core.SUFFIX}"
+        n += 1
+        if n > 999:  # pragma: no cover
+            raise CouncilError("too many council outputs with that name.")
+    return f"{comp_core.COMPOSURE_DIR_REL}/{candidate.name}"
+
+
+def _write_composure(project_dir: Path, rel: str,
+                     comp: comp_core.Composure) -> None:
+    """Write a composure that was built whole in memory. `apply_ops` is the
+    door for *changing* a file; this one has no previous version to be stale
+    against, no base rev and no other writer, and `from_outline` has already
+    validated every op it is made of."""
+    comp.rev = 1
+    comp_core.save(project_dir / rel, comp)
+
+
+# ---------------------------------------------------------------------------
+# The pal
+# ---------------------------------------------------------------------------
+
+def pal_participant(model_id: str) -> dict[str, Any]:
+    """The speaker a pal answer is committed under. Not a member of the
+    council — it is never in `meta["participants"]`, never in the rotation,
+    and never in the budget — but it is shaped like one so
+    `commit_statement` does not need to know it exists."""
+    name = f"pal · {model_id}" if model_id else "pal"
+    return {"id": "pal", "kind": "pal", "name": _slug_name(name),
+            "tint": PAL_TINT, "charge": "", "folder": ""}
+
+
+def pal_statement(prompt: str, reply: str) -> str:
+    """The pal module's page: what left, then what came back.
+
+    The prompt is a blockquote led by `→ pal`, which is what the UI collapses
+    — the record has to show what was sent, and a reader scrolling the
+    transcript should not have to wade through it every time."""
+    quoted = "\n".join(f"> {line}" if line else ">"
+                       for line in (prompt or "").strip().splitlines())
+    head = f"> **{PAL_PROMPT_LEAD}** — the prompt this council sent:\n>\n{quoted}"
+    body = (reply or "").strip() or "(the pal said nothing)"
+    return f"{head}\n\n{body}"
+
+
+async def ask_pal_turn(path: "Path | str | Council", user_ask: str, *,
+                       project_dir: Path | None = None, rel_path: str = "",
+                       llm_url: str = "", session: Any = None,
+                       emit: Emit | None = None) -> TurnResult:
+    """`council.ask_pal_turn(path, user_ask)` — the whole seam the `/pal`
+    lane calls.
+
+    `path` is a council `.comp` (with `project_dir`, and `rel_path` when the
+    project-relative path is not derivable) or an already-built `Council`,
+    for a caller that has one. Everything else is
+    `Council.ask_pal_turn`'s docstring; the one thing to know from outside is
+    that `PAL_CALL` is the only line of this that talks to a pal, and it is
+    yours to set."""
+    if isinstance(path, Council):
+        return await path.ask_pal_turn(user_ask)
+    target = Path(path)
+    root = Path(project_dir) if project_dir else target.parent
+    rel = rel_path
+    if not rel:
+        try:
+            rel = str(target.resolve().relative_to(root.resolve())
+                      ).replace("\\", "/")
+        except ValueError:
+            rel = target.name
+    council = Council(target, project_dir=root, rel_path=rel, emit=emit,
+                      llm_url=llm_url, session=session)
+    return await council.ask_pal_turn(user_ask)
+
+
+# ---------------------------------------------------------------------------
+# Reconvening
+# ---------------------------------------------------------------------------
+
+def reconvene_input(meta: dict[str, Any], prior_rel: str, *,
+                    answer: str = "", excerpt: str = "") -> str:
+    """The new council's `input`: the old brief's input, then what the old
+    council actually produced.
+
+    The prior output is carried as INPUT rather than as a statement because
+    that is what it is to the new council — the thing on the table, not
+    something one of them said. For an `answer` output that is the
+    conclusion's text; for a `document` or a `composure` it is a reference
+    line plus the first `RECONVENE_EXCERPT_CHARS` of the file, because the
+    whole of a document would leave no window for the argument about it."""
+    out = meta.get("output") or {}
+    kind = out.get("kind") or "answer"
+    lines = [(meta.get("input") or "").strip()]
+    lines.append(f"\n---\n\nThe council in `{prior_rel}` has already sat on "
+                 f"this. What it produced is the starting point now.")
+    if kind == "answer":
+        body = (answer or "").strip()
+        lines.append(f"\nIts answer:\n\n{body}" if body
+                     else "\nIt reached no answer worth carrying.")
+    else:
+        where = out.get("path") or "(unrecorded)"
+        noun = "document" if kind == "document" else "composure"
+        lines.append(f"\nIts {noun}: `{where}`.")
+        body = (excerpt or "").strip()
+        if body:
+            cut = body[:RECONVENE_EXCERPT_CHARS]
+            more = " …(truncated)" if len(body) > RECONVENE_EXCERPT_CHARS \
+                else ""
+            lines.append(f"\nThe first of it:\n\n{cut}{more}")
+    return "\n".join(line for line in lines if line is not None).strip()
+
+
+def reconvene_meta(prior: dict[str, Any], prior_rel: str, *,
+                   answer: str = "", excerpt: str = "") -> dict[str, Any]:
+    """The meta a reconvened council starts from: the same participants with
+    the same charges and tints, the same parameters, constraints, output and
+    round cap, a brief that carries the prior output forward, and a state
+    machine wound back to `ready`."""
+    meta = validate_meta({
+        "input": reconvene_input(prior, prior_rel, answer=answer,
+                                 excerpt=excerpt),
+        "parameters": prior.get("parameters"),
+        "constraints": prior.get("constraints"),
+        # The output spec rides over whole, path included. A `document`
+        # output pointed at a path that now exists is not silently
+        # overwritten — `_check_output_path` asks, exactly as it did the
+        # first time.
+        "output": dict(prior.get("output") or {}),
+        "participants": [dict(p) for p in prior.get("participants") or []],
+        "order": prior.get("order"),
+        "max_rounds": prior.get("max_rounds"),
+        "status": "ready",
+        "reconvene": True,
+    })
+    nxt = next_speaker(meta)
+    meta["next"] = nxt["id"] if nxt else None
+    return meta
 
 
 # ---------------------------------------------------------------------------
@@ -1325,15 +1867,22 @@ def _carry_folders(rows: object, previous: object) -> list[dict[str, Any]]:
 
 __all__ = [
     "EVENT", "CouncilError", "Council", "STATUSES", "PARTICIPANT_KINDS",
-    "OUTPUT_KINDS", "OUTPUT_KINDS_LANDED", "MAX_ROUNDS_CAP",
+    "OUTPUT_KINDS", "OUTPUT_KINDS_LANDED", "COMPOSURE_OUTPUT_FORMS",
+    "MAX_ROUNDS_CAP", "MAX_CHARGE_CHARS", "RECONVENE_EXCERPT_CHARS",
     "CTX_FALLBACK", "CTX_CLOUD", "FOLD_AT", "MIN_SHARE", "MAX_TOKENS",
     "READVISOR_TINTS", "CHIEF_TINT", "USER_TINT", "CONCLUSION_TINT",
+    "PAL_TINT", "PAL_CALL", "PAL_DISTILL", "PAL_PROMPT_CHARS",
+    "OUTLINE_RETRY",
     "build_messages", "share_for", "fold_summary", "first_sentence",
-    "read_statements", "brief_text", "next_speaker", "advance", "speakers",
+    "read_statements", "brief_text", "brief_markdown", "output_sentence",
+    "next_speaker", "advance", "speakers",
     "validate_meta", "validate_output", "validate_participants",
     "setup_meta", "default_participants", "identity_for",
     "chief_framing", "readvisor_framing", "conclusion_framing",
     "strip_tool_calls", "clean_statement", "estimate_tokens",
     "resolve_n_ctx", "probe_n_ctx", "run_council_turn", "turn_in_flight",
     "busy_paths", "reset_runtime", "Statement", "TurnResult",
+    "outline_composure", "output_composure_path", "strip_code_fence",
+    "pal_participant", "pal_statement", "ask_pal_turn",
+    "reconvene_meta", "reconvene_input",
 ]

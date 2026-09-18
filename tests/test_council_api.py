@@ -407,17 +407,16 @@ def test_conclude_document_refuses_to_clobber_without_a_confirm(
     assert (project / "notes" / "out.md").read_text() != "written since setup\n"
 
 
-def test_conclude_refuses_the_composure_output_until_0_4_0(
-        client: TestClient, project: Path):
+def test_every_output_kind_is_landed(client: TestClient, project: Path):
+    """The 501 that stood in for the composure output through 0.3.5 is gone:
+    all three kinds conclude. (`tests/test_council_output.py` is where the
+    composure output is actually exercised.)"""
+    assert K.OUTPUT_KINDS_LANDED == frozenset(K.OUTPUT_KINDS)
     setup(client, output={"kind": "composure", "form": "scaffold"})
     convene(client)
     r = client.post("/api/council/conclude", json={"path": REL})
-    assert r.status_code == 501
-    assert "lands in 0.4.0" in r.json()["detail"]
-    # Nothing was spent: the council is still runnable.
-    state = client.get("/api/council/state", params={"path": REL}).json()
-    assert state["council"]["status"] == "running"
-    assert state["council"]["turn"] == 0
+    assert r.status_code == 200, r.text
+    assert r.json()["output"] == "composure"
 
 
 # ---------------------------------------------------------------------------

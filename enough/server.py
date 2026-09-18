@@ -46,6 +46,7 @@ from . import convert as _convert
 from . import home as _home
 from . import models as _models
 from . import paginate as _paginate
+from . import pal_tools as _pal
 from .logger import ExchangeLog, log_exchange
 from . import prompt as prompt_mod
 from .prompt import (
@@ -267,6 +268,11 @@ class Session:
     # of the live ctx-size at the time the usage was recorded).
     last_usage: dict[str, int] = field(default_factory=dict)
     supervisor: Any = None  # LlamaSupervisor; stays Any to avoid forward-ref churn
+    # True for exactly as long as a `/pal` turn is running (P8). Set and
+    # cleared by `pal_tools.pal_turn()`, never by hand: it is what stands
+    # between "the user asked for one outside opinion" and "the model may
+    # send whatever it likes off this machine".
+    pal_turn: bool = False
 
     async def emit(self, event: str, data: Any) -> None:
         payload = {"event": event, "data": json.dumps(data)}
@@ -613,6 +619,33 @@ def _current_ctx_size(session: "Session") -> int | None:
     return int(ctx) if ctx else None
 
 
+def _render_pal_bubbles(tool_result: str) -> list[str]:
+    """The two bubbles a pal exchange leaves behind, rebuilt from the
+    `ask_pal` tool result sitting in the history.
+
+    Same shape, same order and the same class names the live
+    `pal_exchange` SSE event asks the frontend for (P8): the sent prompt
+    first, under `→ pal · <model id>`, then the reply under
+    `pal · <model id>`. Anything that is not a pal result renders as
+    nothing, exactly as every other tool result does."""
+    body = tool_result.strip()
+    if not body.startswith('<tool_result name="ask_pal"'):
+        return []
+    _, _, rest = body.partition("\n")
+    inner = rest.rsplit("</tool_result>", 1)[0]
+    parsed = _pal.parse_result_body(inner.strip())
+    if parsed is None:
+        return []
+    model = _escape_html(parsed["model_id"])
+    return [
+        f'<div class="msg pal-sent"><div class="role">'
+        f'{_escape_html(_pal.RESULT_HEADER)}{model}</div>'
+        f'<div class="body">{_escape_html(parsed["prompt"])}</div></div>',
+        f'<div class="msg pal"><div class="role">pal · {model}</div>'
+        f'<div class="body">{_escape_html(parsed["reply"])}</div></div>',
+    ]
+
+
 def _render_turn_from_history(history: list[dict[str, str]]) -> str:
     """Render the saved history as HTML for initial page load.
 
@@ -626,8 +659,13 @@ def _render_turn_from_history(history: list[dict[str, str]]) -> str:
         role = msg.get("role")
         text = msg.get("content", "") or ""
         if role == "user":
-            # Strip tool_result wrappers for display
+            # Strip tool_result wrappers for display — except a pal's, which
+            # is the one tool result that is not plumbing. What left this
+            # machine and what came back are shown live, and a reload that
+            # quietly dropped them would make the record depend on whether
+            # the user had refreshed the page.
             if text.lstrip().startswith("<tool_result"):
+                out.extend(_render_pal_bubbles(text))
                 continue
             out.append(f'<div class="msg user"><div class="role">user</div>'
                        f'<div class="body">{_escape_html(text)}</div></div>')
@@ -643,6 +681,21 @@ def _escape_html(s: str) -> str:
          .replace("<", "&lt;")
          .replace(">", "&gt;")
     )
+
+
+def _user_bubble(text: str) -> str:
+    """The user's own message, as `/api/chat` hands it back for htmx to swap
+    in. What they typed, not what was sent — a `/pal` turn strips the token
+    on the way to the model and the conversation should still show it."""
+    return (f'<div class="msg user"><div class="role">user</div>'
+            f'<div class="body">{_escape_html(text)}</div></div>')
+
+
+def _system_bubble(text: str) -> str:
+    """enough speaking for itself: a refusal, a usage hint, a note about
+    what just happened to the message. Never a readvisor's voice."""
+    return (f'<div class="msg system"><div class="role">enough</div>'
+            f'<div class="body">{_escape_html(text)}</div></div>')
 
 
 # ---------------------------------------------------------------------------
@@ -1147,8 +1200,25 @@ async def _do_auto_reset(
         session._in_auto_reset = False
 
 
-async def _run_turn(session: Session, user_message: str) -> None:
+async def _run_turn(
+    session: Session,
+    user_message: str,
+    *,
+    pal: bool = False,
+    log_user: str | None = None,
+) -> None:
     """Drive one user turn: send to LLM, handle tool loop, emit SSE events.
+
+    `pal` opens a pal turn for the whole of this call (P8): the system prompt
+    gains the `ask_pal` documentation and `PAL_TURN_INSTRUCTION`, and the tool
+    is willing to run. The window is a context manager rather than a pair of
+    assignments so that it closes on every exit — a clean return, an LLM
+    error, an auto-reset that raised, a cancelled task.
+
+    `log_user` is what the session log records as the user's message, for the
+    case where what was typed (`/pal how does X work`) and what was sent to
+    the model (`how does X work`) differ. The log is a record of the
+    conversation, so it keeps the typed line.
 
     Emits:
       - event: user           { "text": <user msg> }  (ack to all listeners)
@@ -1161,33 +1231,36 @@ async def _run_turn(session: Session, user_message: str) -> None:
       - event: usage          { prompt_tokens, completion_tokens, total_tokens, ctx }
       - event: reset          { "reason": ... }
       - event: done           { }
+      - event: pal_exchange   { "model_id": ..., "prompt": ..., "reply": ... }
       - event: error          { "message": ... }
     """
     async with session.generation_lock:
         # Re-assemble system prompt fresh per spec.
-        system_prompt = assemble_system_prompt(session.project_dir)
+        system_prompt = assemble_system_prompt(session.project_dir, pal=pal)
 
         tool_calls_for_log: list[tuple[str, str]] = []
         assistant_text_for_log: list[str] = []
+        pal_state: _pal.PalTurn | None = None
 
         try:
-            await _drive_message(
-                session,
-                user_message,
-                system_prompt,
-                is_synthetic=False,
-                tool_calls_for_log=tool_calls_for_log,
-                assistant_text_for_log=assistant_text_for_log,
-            )
-            # Auto-reset only fires for real user turns (not when we're
-            # already in the middle of one) and only when the threshold
-            # is breached + the toggle is on.
-            if not getattr(session, "_in_auto_reset", False) and _should_auto_reset(session, system_prompt):
-                await _do_auto_reset(
-                    session, system_prompt,
+            with _pal.pal_turn(session, active=pal) as pal_state:
+                await _drive_message(
+                    session,
+                    user_message,
+                    system_prompt,
+                    is_synthetic=False,
                     tool_calls_for_log=tool_calls_for_log,
                     assistant_text_for_log=assistant_text_for_log,
                 )
+                # Auto-reset only fires for real user turns (not when we're
+                # already in the middle of one) and only when the threshold
+                # is breached + the toggle is on.
+                if not getattr(session, "_in_auto_reset", False) and _should_auto_reset(session, system_prompt):
+                    await _do_auto_reset(
+                        session, system_prompt,
+                        tool_calls_for_log=tool_calls_for_log,
+                        assistant_text_for_log=assistant_text_for_log,
+                    )
         except asyncio.TimeoutError:
             await session.emit("error", {"message": (
                 f"the model went silent for over "
@@ -1234,13 +1307,24 @@ async def _run_turn(session: Session, user_message: str) -> None:
         finally:
             await session.emit("done", {})
 
-        # Persist to session log.
+        # Persist to session log. A pal exchange is written out in full —
+        # the prompt that left this machine and the answer that came back —
+        # because the conversation it happened in is cleared on every reset
+        # and the log is what is left.
+        spoken = [t.strip() for t in assistant_text_for_log if t.strip()]
+        for exchange in (pal_state.exchanges if pal_state else []):
+            spoken.append(
+                f"{_pal.RESULT_HEADER}{exchange['model_id']}\n\n"
+                f"{exchange['prompt']}\n\n"
+                f"pal · {exchange['model_id']}\n\n"
+                f"{exchange['reply']}"
+            )
         try:
             log_exchange(
                 session.project_dir,
                 ExchangeLog(
-                    user=user_message,
-                    assistant="\n\n".join(t.strip() for t in assistant_text_for_log if t.strip()),
+                    user=log_user if log_user is not None else user_message,
+                    assistant="\n\n".join(spoken),
                     tool_calls=tool_calls_for_log,
                 ),
                 now=dt.datetime.now(),
@@ -3725,19 +3809,59 @@ def create_app(
                 f'itself, use the composer at the foot of the canvas.</div>'
                 f'</div>'
             )
+        # `/pal` (P8). Four outcomes, and only one of them starts a turn.
+        # The order is the order of the things the user needs told: what is
+        # shut before what is missing, and what is missing before what is
+        # pointless.
+        asked = _pal.strip_command(message)
+        pal = False
+        note = ""
+        typed = message   # what the user wrote; `message` becomes what is sent
+        if asked is not None:
+            gate = await asyncio.to_thread(_cloud.gate_status)
+            if not gate["open"]:
+                # No LLM turn at all: nothing to think about locally when
+                # the thing being thought toward cannot be reached.
+                return HTMLResponse(
+                    _user_bubble(message) + _system_bubble(gate["denial"]))
+            if not asked:
+                return HTMLResponse(
+                    _user_bubble(message) + _system_bubble(_pal.USAGE_HINT))
+            try:
+                active = await asyncio.to_thread(
+                    lambda: _models.load_state().get("current"))
+            except Exception:  # noqa: BLE001 — an unreadable state file is not a refusal
+                active = None
+            if active == "opro-api":
+                note = _system_bubble(_pal.ALREADY_CLOUD_NOTE)
+            else:
+                pal = True
+            message = asked
         # Fire-and-forget generation. The SSE stream delivers output.
-        asyncio.create_task(_run_turn(session, message))
+        asyncio.create_task(_run_turn(session, message, pal=pal, log_user=typed))
         # Return an HTML fragment htmx will swap into the conversation:
         # the user's message bubble + an empty assistant bubble the SSE will fill.
         return HTMLResponse(
-            f'<div class="msg user"><div class="role">user</div>'
-            f'<div class="body">{_escape_html(message)}</div></div>'
-            f'<div class="msg assistant pending" id="current-response">'
+            _user_bubble(typed)
+            + note
+            + f'<div class="msg assistant pending" id="current-response">'
             f'<div class="role">{_escape_html(prompt_mod.chief_name())}</div>'
             f'<div class="body"></div>'
             f'<div class="tool-indicators"></div>'
             f'</div>'
         )
+
+    @app.get("/api/pal/status")
+    async def api_pal_status() -> dict[str, Any]:
+        """Is `/pal` usable right now, and against which model.
+
+        The composer's command hint asks this so it can grey itself out with
+        the reason rather than offering a command that will only be refused.
+        Same gate, same answer, one helper: `cloud.gate_status`."""
+        gate = await asyncio.to_thread(_cloud.gate_status)
+        return {"available": bool(gate["open"]),
+                "reason": gate["reason"],
+                "model_id": gate["model_id"]}
 
     @app.get("/api/stream")
     async def api_stream(request: Request):

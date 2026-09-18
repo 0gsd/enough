@@ -586,6 +586,54 @@ def status_snapshot() -> dict[str, Any]:
     }
 
 
+def gate_status() -> dict[str, Any]:
+    """The cloud gate, in one place: `local_models_only` off, a key present,
+    and the last health check green.
+
+    Every door that sends a prompt off this machine asks this — the
+    `cloud_pipeline` tool, the `ask_pal` tool, and `/api/pal/status`, which
+    exists so the composer's command hint can grey itself out with the same
+    answer the tools would give. Three copies of a three-step chain is how
+    one of them ends up a step short.
+
+    Returns `{"open", "reason", "denial", "model_id"}`:
+
+    - `reason` — one short clause naming what is shut, for a UI that has
+      room for a sentence. `None` when the gate is open.
+    - `denial` — the full `broker.denial_*` copy, which says how to fix it.
+      This is what a tool returns to the model and what the chat shows the
+      user. `None` when the gate is open.
+    - `model_id` — the configured model, but only when the gate is open:
+      there is no model to name if you cannot reach one.
+
+    The toggle is checked before anything else, deliberately. `key_present`
+    reads the OS keyring, and on macOS a keyring read by a process the user
+    has not blessed yet raises a system dialog — asking for the key of a
+    service the user has switched off would be a prompt they cannot make
+    sense of.
+    """
+    from . import broker
+    if broker.is_enabled("local_models_only"):
+        return {"open": False,
+                "reason": "'local models only' is on in the broker",
+                "denial": broker.denial_local_models_only(),
+                "model_id": None}
+    snap = status_snapshot()
+    if not snap["key_present"]:
+        return {"open": False,
+                "reason": "no OpenRouter key is configured",
+                "denial": broker.denial_cloud_key_missing(),
+                "model_id": None}
+    if not snap["last_verified_ok"]:
+        why = snap["last_error"] or "unverified"
+        return {"open": False,
+                "reason": f"the OpenRouter health check last failed ({why})",
+                "denial": broker.denial_cloud_unhealthy(why),
+                "model_id": None}
+    model_id = (snap["model_id"] or "").strip() or DEFAULT_CONFIG["model_id"]
+    return {"open": True, "reason": None, "denial": None, "model_id": model_id}
+
+
 # ---------------------------------------------------------------------------
 # Caching — every cloud completion is durably recorded under
 # rness/io/cloud-cache/ so a future local-LLM agent can read the history

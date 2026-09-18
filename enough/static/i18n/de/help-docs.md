@@ -408,12 +408,14 @@ path: (a composure whose form is council)
 mehrere Readvisors und du, die reihum über eine Sache nachdenken, schriftlich, auf der Leinwand. ein Rat ist eine gewöhnliche Composure mit dem Auftrag oben und einer Karte je Beitrag darunter, je Sprecher eingefärbt und mit Namen und Zugnummer überschrieben. die Beiträge gehören dem Rat: du kannst sie verschieben, umfärben, übertuschen und kommentieren, aber nicht umschreiben.
 
 ### how
-füll den Auftrag aus — Eingabe, Parameter, Einschränkungen, gewünschtes Ergebnis —, hak ab, wer im Raum ist, setz die maximale Rundenzahl und drück einberufen. dann treib ihn an: <em>nächster Zug</em> nimmt einen Beitrag, <em>eine Runde laufen lassen</em> geht einmal herum, <em>bis zum Ende laufen lassen</em> läuft bis zur Rundengrenze, <em>anhalten</em> stoppt ihn, <em>abschließen</em> bittet den Chef um die Entscheidung. das Eingabefeld unten gehört dir: was du sagst, nimmt den nächsten Platz, ohne jemandem seinen Zug zu kosten. der Abschluss schreibt die Antwort als hervorgehobene Karte — oder als Markdown-Datei an den Pfad, den du gewählt hast — und exportiert das ganze Protokoll nach <code>rness/knowledge/councils/</code>.
+füll den Auftrag des Rates aus — Eingabe, Parameter, Einschränkungen, gewünschtes Ergebnis —, hak ab, wer im Raum ist, gib jedem einen einzeiligen eigenen <em>Auftrag</em>, wenn er für etwas Bestimmtes hier ist („hütet die Kontinuität“, „vertritt die Leserin“), setz die maximale Rundenzahl und drück einberufen. dann treib ihn an: <em>nächster Zug</em> nimmt einen Beitrag, <em>eine Runde laufen lassen</em> geht einmal herum, <em>bis zum Ende laufen lassen</em> läuft bis zur Rundengrenze, <em>anhalten</em> stoppt ihn, <em>abschließen</em> bittet den Chef um die Entscheidung. das Eingabefeld unten gehört dir: was du sagst, nimmt den nächsten Platz, ohne jemandem seinen Zug zu kosten, und ein dort getipptes <code>/pal</code> schickt eine einzige destillierte Frage hinaus zum Cloud-Modell und bringt die Antwort als Beitrag zurück. der Abschluss schreibt, was der Rat entschieden hat, in der Form, die du gewählt hast — als hervorgehobene Karte, als Markdown-Datei an einem Pfad deiner Wahl oder als ganze neue Composure aus Karten neben dieser — und exportiert das Protokoll nach <code>rness/knowledge/councils/</code>. ein abgeschlossener Rat lässt sich <em>erneut einberufen</em>: ein neuer Rat mit demselben Raum, denselben Aufträgen und dem, was dieser entschieden hat, als Ausgangspunkt.
 
 ### ideas
 - gib einem Readvisor den Gegenentwurf und finde heraus, ob er den Kontakt mit den anderen übersteht.
-- setz das Ergebnis auf ein Dokument, wenn die Entscheidung die Leinwand als zitierbare Datei verlassen soll.
+- ein Auftrag ist der billigste Weg, um zu verhindern, dass drei Readvisors dasselbe auf drei Arten sagen.
+- setz das Ergebnis auf ein Dokument, wenn die Entscheidung die Leinwand als zitierbare Datei verlassen soll, und auf eine Composure, wenn du die Gestalt der Entscheidung willst statt ihrer Absätze.
 - sag selbst etwas, sobald ein Rat anfängt, im Kreis zu gehen; ein Einwurf ist billiger als noch eine Runde.
+- beruf erneut ein, statt neu anzufangen, wenn die Antwort richtig war, aber noch nicht fertig.
 
 ## chief-readvisor
 name: Chef-Readvisor
@@ -428,3 +430,18 @@ drück den Umbenennen-Button neben dem × in dieser Kopfzeile, tipp einen neuen 
 ### ideas
 - nimm etwas, das du auch laut sagen würdest; du wirst es den ganzen Tag lesen.
 - benenn um, bevor du einen Rat einberufst, nicht währenddessen.
+
+## pal
+name: pal
+path: (the OPRO-API model slot)
+
+### what
+eine Frage, hinausgeschickt, offen sichtbar. ein <strong>pal</strong> ist das Cloud-Modell, das du im OPRO-API-Slot ohnehin schon eingerichtet hast, einmal erreicht, von Hand, aus einem Zug heraus, der sonst vollständig lokal ist. es gibt keine pal-Einstellung, kein pal-Konto und keinen zweiten Schalter: funktioniert der Cloud-Slot, funktioniert ein pal, und wenn nicht, ist die übliche Erklärung des Brokers die ganze Geschichte. <code>/pal</code> zu tippen <em>ist</em> die Zustimmung — es gibt keinen Bestätigungsschritt, denn ein Bestätigungsschritt, der jedes Mal erscheint, ist ein Knopf, den man zu klicken lernt. an seine Stelle tritt, dass dir der Prompt, der diesen Rechner verlässt, Wort für Wort gezeigt wird, vor der Antwort, jedes Mal, live und nach einem Neuladen.
+
+### how
+beginn eine Nachricht mit <code>/pal</code>, und der Rest davon ist die Frage: <code>/pal was ist der Stand der Technik bei Spracherkennung auf dem Gerät?</code>. tipp <code>/</code> als erstes Zeichen, und über dem Eingabefeld erscheint eine Hinweiszeile, die das Modell nennt, das erreicht würde; Tab oder ein Klick vervollständigt es, und wenn der Cloud-Slot zu ist, gräut sich die Zeile aus und sagt, warum. dein Readvisor denkt die Sache dann erst hier durch — sein eigenes Wissen, die Dateien in diesem Projekt, die Wiki-Werkzeuge —, arbeitet heraus, was er lokal wirklich nicht klären kann, schickt <strong>einen</strong> verfeinerten Prompt und antwortet dir mit seiner eigenen Stimme und sagt dabei, welche Teile vom pal kamen. ein Aufruf je <code>/pal</code>-Nachricht. derselbe Befehl funktioniert im Eingabefeld eines Rats, wo der Chef den Auftrag und das ganze Protokoll zum Prompt destilliert; die Antwort landet als grauer Beitrag, dessen erste Zeile wegfaltet, was hinausgegangen ist.
+
+### ideas
+- häng <code>:online</code> ans Ende der Modell-ID in den OpenRouter-Einstellungen — <code>anthropic/claude-sonnet-4.5:online</code> — und dein pal antwortet mit dem Web vor sich. das kostet extra je Suche, und es ist die Abhilfe für ein Modell, das auf seinem Trainingsstand eingefroren ist.
+- heb es für das auf, was ein lokales Modell nicht haben kann: die Nachrichten dieser Woche, eine letzten Monat veröffentlichte Bibliothek, eine zweite Meinung zu einer Ermessensfrage, die du schon entschieden hast.
+- lies die ausgehende Blase, bevor du die Antwort liest. sie ist der einzige Ort, der genau zeigt, was hinausgegangen ist, und sie ist mit Absicht da.

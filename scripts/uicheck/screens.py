@@ -141,7 +141,8 @@ COUNCIL_SETUP: Step = ("eval_await", f"""(async () => {{
 
 #: …and the same council shown as concluded. The status is flipped in the
 #: MODEL only, the way `composure-journal-filed` fakes a filed page: a real
-#: conclude wants a model, and this screen is about the collapsed footer.
+#: conclude wants a model, and this screen is about the collapsed footer —
+#: which since P9 carries the reconvene control as well as the two paths.
 COUNCIL_CONCLUDE: Step = ("eval", """(() => {
   const meta = (COMP_COUNCIL.state && COMP_COUNCIL.state.council)
     || (COMP.model && COMP.model.council);
@@ -151,6 +152,139 @@ COUNCIL_CONCLUDE: Step = ("eval", """(() => {
   meta.transcript = 'rness/knowledge/councils/2026-09-17-the-decision.md';
   compCouncilRender();
   return true; })()""")
+
+#: A council set up for a `composure` output: the form select is revealed
+#: and the path field is not, and every non-user row carries its charge.
+COUNCIL_COMPOSURE: Step = ("eval_await", f"""(async () => {{
+  await fetch('/api/council/setup', {{method: 'POST',
+    headers: {{'Content-Type': 'application/json'}},
+    body: JSON.stringify({{path: {COUNCIL_PATH!r},
+      title: 'The decision',
+      input: 'Should chapter four move to the front?',
+      output: {{kind: 'composure', form: 'scaffold'}}, max_rounds: 3}})}});
+  await compOpenPath({COUNCIL_PATH!r});
+  for (let i = 0; i < 200 && !(COMP_COUNCIL.state
+       && COMP_COUNCIL.state.council); i++) {{
+    await new Promise((r) => setTimeout(r, 50));
+  }}
+  COMP_COUNCIL.showSetup = true;
+  await compCouncilSeedSetup();
+  for (const p of (COMP_COUNCIL.people || [])) {{
+    if (p.kind !== 'user') p.charge = 'argues the reader\\u2019s side';
+  }}
+  compCouncilRenderPeople();
+  compCouncilRender();
+  return true; }})()""")
+
+#: A pal's statement, built in the MODEL only — the same treatment
+#: `composure-journal-filed` gives a filed page, and for the same reason:
+#: a real one wants two model calls and a cloud key. What is measured is
+#: what `compPaintModule` makes of a `speaker_kind="pal"` module: the gray
+#: tint, and the outgoing prompt collapsed behind its disclosure.
+#:
+#: It re-dresses the BRIEF module rather than adding a second one below it.
+#: A second module down the column is below the fold at 1024x640 — which is
+#: what a council canvas is for, you pan to it — but a screen that has to
+#: pan first is a screen whose measurements depend on where a 240ms ease
+#: happened to land. `composure-council-footer` already measures this exact
+#: box cleanly at every viewport in every language; this changes what is
+#: painted inside it and nothing about where it is.
+COUNCIL_PAL_STATEMENT: Step = ("eval", """(() => {
+  const m = ((COMP.model && COMP.model.modules) || [])[0];
+  if (!m) return false;
+  m.bg = 'gray';
+  m.known_bg = true;
+  m.locked = true;
+  m.title = 'pal \\u00b7 anthropic/claude-sonnet-4.5 \\u00b7 turn 4';
+  m.speaker = 'pal \\u00b7 anthropic/claude-sonnet-4.5';
+  m.speaker_kind = 'pal';
+  m.turn = '4';
+  m.pages[0].locked = true;
+  m.pages[0].rich =
+    '<blockquote><p><strong>\\u2192 pal</strong> \\u2014 the prompt this '
+    + 'council sent:</p><p>Does moving a reveal earlier cost tension in a '
+    + 'book whose second half depends on it?</p></blockquote>'
+    + '<p>Usually yes, unless the reveal is a setup rather than a payoff '
+    + '\\u2014 in which case moving it forward buys the second half its '
+    + 'room.</p>';
+  compRefreshModule(m.id);
+  // …and leave 120 world units of headroom above it. The composure
+  // toolbar FLOATS over the top of the stage, so anything in the first
+  // line of the topmost card is under it — true of a pager and a module
+  // pin too, and the reason the brief (which has no controls) never
+  // reported it. In a real council a pal statement is never the topmost
+  // card; the view is where that difference lives, so the fixture puts it
+  // where the product's own follow would. `compApplyView(false)` is
+  // deliberate: eased is a 240ms CSS transition, and a screen must not
+  // measure mid-ease. `kind: page` derives x from the sheet, so only y is
+  // ours to set.
+  COMP.origin.y = m.y - 120;
+  compApplyView(false);
+  return true; })()""")
+
+
+#: ---------------------------------------------------------------------
+#: `/pal` (P8)
+#:
+#: The hint row is revealed by `/` as the first character of the composer
+#: and painted from `GET /api/pal/status`. In the scratch world that route
+#: answers honestly — `local_models_only` is on and there is no OpenRouter
+#: key — so the GATE-CLOSED row is the real thing, reason and all.
+#:
+#: The gate-OPEN row cannot be reached honestly: opening it needs a key in
+#: the OS keyring, which is the developer's, not the harness's. So that
+#: one screen seeds `PAL.status` — the page's own cache of the route's
+#: answer — and calls the page's own `palSyncHint`. What is measured is
+#: the row the product paints from a status body; what is faked is only
+#: where the body came from.
+PAL_HINT: Step = ("eval_await", """(async () => {
+  const ta = document.getElementById('message');
+  ta.focus();
+  ta.value = '/';
+  ta.dispatchEvent(new Event('input', {bubbles: true}));
+  for (let i = 0; i < 100 && !PAL.status; i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  palSyncHint('pal-hint', ta.value);
+  return true; })()""")
+
+PAL_HINT_OPEN: Step = ("eval_await", """(async () => {
+  const ta = document.getElementById('message');
+  PAL.status = {available: true, reason: null,
+                model_id: 'anthropic/claude-sonnet-4.5'};
+  ta.focus();
+  ta.value = '/';
+  ta.dispatchEvent(new Event('input', {bubbles: true}));
+  palSyncHint('pal-hint', ta.value);
+  return true; })()""")
+
+PAL_HINT_BACK: tuple[Step, ...] = (
+    ("eval", """(() => {
+  PAL.status = null;
+  const ta = document.getElementById('message');
+  if (ta) { ta.value = ''; ta.blur(); }
+  palSyncHint('pal-hint', '');
+  return true; })()"""),
+    ("wait_idle", ""))
+
+#: The two bubbles, through the page's own `pal_exchange` handler. There
+#: is no model in the scratch world and there never will be, so the event
+#: is synthetic — but the renderer, the order and the markup are the
+#: product's, and the markup is the one the SERVER also emits when the
+#: same exchange is rebuilt from history on reload.
+PAL_BUBBLES: Step = ("eval", """(() => {
+  palOnExchange({
+    model_id: 'anthropic/claude-sonnet-4.5',
+    prompt: 'Which obligations under the EU AI Act took effect in August '
+      + '2026, and which were postponed?',
+    reply: 'Two of the high-risk obligations moved to 2027; the '
+      + 'transparency duties took effect on schedule.'});
+  return true; })()""")
+
+PAL_BUBBLES_BACK: tuple[Step, ...] = (
+    ("eval", "(() => { document.querySelectorAll('.msg.pal, .msg.pal-sent')"
+             ".forEach((el) => el.remove()); return true; })()"),
+    ("wait_idle", ""))
 
 
 def _open(form: str, ready: Step | None = None) -> Step:
@@ -368,7 +502,25 @@ PROJECT_SCREENS: list[Screen] = [
            setup=(COUNCIL_SETUP, COUNCIL_CONCLUDE, ("wait_idle", "")),
            teardown=COMP_RESET + (("eval", "rvForceClosed(false)"),
                                   ("wait_idle", "")),
-           note="the footer collapsed to the transcript line"),
+           note="the footer collapsed to the transcript line and the "
+                "reconvene control"),
+
+    Screen("composure-council-composure-output", "project",
+           setup=(COUNCIL_COMPOSURE, ("wait_idle", "")),
+           teardown=COMP_RESET + (("eval", "rvForceClosed(false)"),
+                                  ("wait_idle", "")),
+           note="the setup card with a `composure` output: the form select "
+                "revealed, no path field, and a charge under every "
+                "non-user row"),
+
+    Screen("composure-council-pal", "project",
+           setup=(COUNCIL_SETUP, COUNCIL_PAL_STATEMENT,
+                  ("wait_for", ".comp-module[data-speaker-kind='pal']"),
+                  ("wait_idle", "")),
+           teardown=COMP_RESET + (("eval", "rvForceClosed(false)"),
+                                  ("wait_idle", "")),
+           note="a pal's statement: gray, and the outgoing prompt collapsed "
+                "behind its disclosure"),
 
     Screen("composure-edit", "project",
            setup=(_open("cards", CARDS_READY),
@@ -595,6 +747,30 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_for", "#toggle-readvisor.rv-unread"), ("wait_idle", "")),
            teardown=RV_BACK,
            note="the unread dot on the topbar toggle"),
+
+    # --- `/pal` in the composer (P8) --------------------------------------
+
+    Screen("readvisor-pal-hint", "project",
+           setup=(("eval", "rvSetState('open')"), PAL_HINT, ("wait_idle", "")),
+           teardown=PAL_HINT_BACK + RV_BACK,
+           note="the `/pal` hint row, gate CLOSED — the scratch world has "
+                "`local models only` on and no key, so this is the real "
+                "greyed row carrying the real reason"),
+
+    Screen("readvisor-pal-hint-open", "project",
+           setup=(("eval", "rvSetState('open')"), PAL_HINT_OPEN,
+                  ("wait_idle", "")),
+           teardown=PAL_HINT_BACK + RV_BACK,
+           note="the same row with the gate open and a model named — the "
+                "status body is seeded (see PAL_HINT_OPEN); the row is the "
+                "product's"),
+
+    Screen("readvisor-pal-bubbles", "project",
+           setup=(("eval", "rvSetState('open')"), PAL_BUBBLES,
+                  ("wait_for", ".msg.pal"), ("wait_idle", "")),
+           teardown=PAL_BUBBLES_BACK + RV_BACK,
+           note="one pal exchange: what left this machine, then what came "
+                "back"),
 
     Screen("readvisor-and-minis", "project",
            setup=(("eval", "rvSetState('open')"),

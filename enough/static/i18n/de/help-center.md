@@ -2,7 +2,7 @@ Hi, hier ist Graham, der Erfinder von enough. Dieses Dokument – diesen Teil hi
 
 # das enough-Hilfe-Center
 
-> Alles, was du mit enough machen kannst, an einem Ort. Geschrieben für enough **0.3.5**, einschließlich der Composure-Runde — die Leinwand, die jetzt der Boden jedes Projekts ist, mit dem Gespräch in ein Panel daneben verlegt (Abschnitte 4 und 5); der **Readvisors**, wie die Rollen jetzt heißen, angeführt von einem Chef-Readvisor namens Ed (Abschnitt 16); der **Räte**, in denen mehrere Readvisors reihum über eine Sache nachdenken, schriftlich, während du zusiehst (Abschnitt 17); und zweier neuer Skills, `readvisory` und `scaffold` (Abschnitt 18). Ein Projekt, das du vor dieser Runde angelegt hast, bekommt seinen Ordner `rness/roles/` beim nächsten Öffnen in `rness/readvisors/` umbenannt, mit unversehrten Ein/Aus-Einstellungen (Abschnitt 8). Ebenfalls hier, aus den Runden davor: der Startbildschirm (jedes Projekt, das du je begonnen hast, in einer Liste, mit einem Weg hinein und einem Weg zurück hinaus — Abschnitt 2), die Konvertierungsrunde (PDFs, Word-Dokumente, E-Books, Präsentationen und Arbeitsmappen öffnen als bearbeitbare Markdown-Zwillinge, mit Export, Sync und einem Bildbetrachter — Abschnitt 7), die Skills-Runde (analyzers neuer Audit-Modus, der Skill `anything-finder`, und das Erstnutzungs-Audit, das jeden Skill liest, den enough nicht mitgeliefert hat, bevor er hereingelassen wird), der Runde vom August 2026 (sieben lokale Modelle mit machbarkeitsgeprüften Installationen, und **enough.app** — die signierte, notariell beglaubigte Desktop-Anwendung), der Interface-Runde vom Juli 2026 (der Modus-Stapel, Hilfeblasen pro Ordner, girraph→merirmaid-Spiegel), und der 0.3.0-Einstellungsrunde (UI- und Textgröße pro Projekt, und die Oberfläche + Hilfe in sechs Sprachen — Abschnitt 10). Wo dieses Dokument und die App vor dir sich widersprechen, hat die App recht und dieses Dokument einen Fehler — Korrekturen willkommen unter [enough.support](https://enough.support).
+> Alles, was du mit enough machen kannst, an einem Ort. Geschrieben für enough **0.4.0**, einschließlich der Composure-Runde — die Leinwand, die jetzt der Boden jedes Projekts ist, mit dem Gespräch in ein Panel daneben verlegt (Abschnitte 4 und 5); der **Readvisors**, wie die Rollen jetzt heißen, angeführt von einem Chef-Readvisor namens Ed (Abschnitt 16); der **Räte**, in denen mehrere Readvisors reihum über eine Sache nachdenken, schriftlich, während du zusiehst (Abschnitt 17); und zweier neuer Skills, `readvisory` und `scaffold` (Abschnitt 18). Ein Projekt, das du vor dieser Runde angelegt hast, bekommt seinen Ordner `rness/roles/` beim nächsten Öffnen in `rness/readvisors/` umbenannt, mit unversehrten Ein/Aus-Einstellungen (Abschnitt 8). Ebenfalls hier, aus den Runden davor: der Startbildschirm (jedes Projekt, das du je begonnen hast, in einer Liste, mit einem Weg hinein und einem Weg zurück hinaus — Abschnitt 2), die Konvertierungsrunde (PDFs, Word-Dokumente, E-Books, Präsentationen und Arbeitsmappen öffnen als bearbeitbare Markdown-Zwillinge, mit Export, Sync und einem Bildbetrachter — Abschnitt 7), die Skills-Runde (analyzers neuer Audit-Modus, der Skill `anything-finder`, und das Erstnutzungs-Audit, das jeden Skill liest, den enough nicht mitgeliefert hat, bevor er hereingelassen wird), der Runde vom August 2026 (sieben lokale Modelle mit machbarkeitsgeprüften Installationen, und **enough.app** — die signierte, notariell beglaubigte Desktop-Anwendung), der Interface-Runde vom Juli 2026 (der Modus-Stapel, Hilfeblasen pro Ordner, girraph→merirmaid-Spiegel), und der 0.3.0-Einstellungsrunde (UI- und Textgröße pro Projekt, und die Oberfläche + Hilfe in sechs Sprachen — Abschnitt 10). Neu in dieser Runde: **`/pal`**, wobei dein Chef-Readvisor erst hier, lokal, nachdenkt und dann eine einzige zugespitzte Frage an das von dir eingerichtete Cloud-Modell schickt und dir genau zeigt, was die Maschine verlassen hat (Abschnitt 14.3); und Räte, die als Antwort, als Dokument oder als neue Composure enden, mit einem einzeiligen Auftrag pro Readvisor und einem Weg, einen bereits abgeschlossenen Rat erneut einzuberufen (Abschnitt 17). Wo dieses Dokument und die App vor dir sich widersprechen, hat die App recht und dieses Dokument einen Fehler — Korrekturen willkommen unter [enough.support](https://enough.support).
 
 enough ist ein persönliches Sprachsystem, das auf deinem eigenen Rechner läuft. Du richtest es auf einen Ordner, sprichst mit ihm, und es hilft dir beim Planen, Schreiben, Überarbeiten, Recherchieren und Übersetzen. Die Modelle sind standardmäßig lokal. Deine Dateien bleiben deine. Und fast alles, was du es tun siehst, ist in schlichten Markdown-Dateien festgelegt, die du öffnen, lesen und ändern kannst.
 
@@ -839,6 +839,26 @@ Zwei Dinge halten Cloud-Nutzung rechenschaftspflichtig:
 - **Alles wird lokal zwischengespeichert.** Jeder Cloud-Austausch wird in `rness/io/cloud-cache/` geschrieben, mit Token-Zahlen und einem Index — eine lokale Papierspur, die deine lokalen Readvisors später lesen können.
 - **`cloud_pipeline`** lässt deine Readvisors große Jobs gebündelt durch den Cloud-Slot schicken — bis zu 200 Schritte, mit Zwischenspeicherung pro Schritt, optionaler Zusammenfassung pro Schritt, und einem abschließenden Kompilierungsdurchgang — Ergebnisse werden auf die Platte geschrieben, statt das Gespräch zu fluten. Bitte um „eine Cloud-Pipeline, die alle zwölf Kapitelzusammenfassungen entwirft“, und die Schwerarbeit passiert außerhalb des Gesprächs, vollständig protokolliert.
 
+### 14.3 `/pal` — eine Frage nach draußen
+
+Manchmal ist dein lokales Modell überfordert, und du hättest gern eine Meinung von außen. Ein **pal** ist genau das: keine neue Einstellung und kein zweites Konto, sondern schlicht das Cloud-Modell, das du im OPRO-API-Slot ohnehin schon eingerichtet hast, einmal erreicht, von Hand, aus einem sonst lokalen Zug heraus.
+
+Beginn eine Nachricht mit `/pal`, und der Rest davon ist die Frage:
+
+`/pal was ist gerade der Stand der Technik bei Spracherkennung auf dem Gerät?`
+
+Dann passieren drei Dinge, der Reihe nach. Dein Chef-Readvisor denkt zuerst hier darüber nach, mit dem, was schon auf dem Rechner ist — seinem eigenen Wissen, den Dateien in deinem Projekt, den Wiki-Werkzeugen — und arbeitet heraus, was er lokal wirklich nicht klären kann. Er verfasst **einen** Prompt und schickt den ans Cloud-Modell. Dann antwortet er dir mit seiner eigenen Stimme und sagt klar, welche Teile vom pal kamen und welche seine eigenen sind.
+
+**Du siehst, was hinausgegangen ist.** Bevor die Antwort eintrifft, erscheint der genaue Text, der hinausging, als eigene Blase, Wort für Wort — nie gekürzt, nie auf dem Weg zum Bildschirm zusammengefasst —, mit der Antwort darunter. Beides ist nach einem Neuladen immer noch da, und beides wird in dein Sitzungsprotokoll und in den Cloud-Cache geschrieben. `/pal` zu tippen *ist* die Zustimmung; es gibt keinen zweiten Bestätigungsschritt, denn eine Bestätigung, die jedes Mal erscheint, ist ein Knopf, den man zu klicken lernt, ohne ihn zu lesen. An ihre Stelle tritt, dass du immer sehen kannst, was hinausgegangen ist.
+
+**Das Tor ist das Tor des Cloud-Slots, genau dasselbe.** `/pal` funktioniert, wenn **local models only** im Broker aus ist, ein Schlüssel hinterlegt ist und die letzte Gesundheitsprüfung bestanden wurde (14.2). Trifft eines davon nicht zu, sagt dir `/pal`, welches, und wie du es behebst — und es läuft kein Zug, also wird nichts ausgegeben und nichts verlässt den Rechner. Tipp `/` als erstes Zeichen im Eingabefeld, und eine Hinweiszeile sagt dir dasselbe, bevor du dich festlegst: ausgegraut mit dem Grund, wenn der Slot nicht nutzbar ist, und mit dem Namen des Modells, das gefragt würde, wenn er es ist — das ist der Unterschied zwischen einem Befehl und einer Überraschung auf deiner Rechnung.
+
+**Ein Aufruf je `/pal`.** Dein Readvisor bekommt genau eine Frage nach draußen je Nachricht, die du so beginnst. Deckt die Antwort es nicht ab, sagt er das, und du kannst noch eine schicken. Und bei jedem anderen Zug verlässt nichts diesen Rechner: ohne `/pal` davor ist das Werkzeug schlicht nicht da, und ein Readvisor, der eine Meinung von außen für hilfreich hält, muss das sagen und dich entscheiden lassen.
+
+Ist das Modell, mit dem du ohnehin sprichst, *selbst* OPRO-API, gibt es keinen pal zu fragen — das Cloud-Modell ist der, mit dem du sprichst. `/pal` sagt das, lässt das Token fallen und schickt den Rest der Nachricht wie gewohnt.
+
+**Ein pal ist auf seinem Trainingsstand eingefroren, es sei denn, du bittest um das Web.** OpenRouter dokumentiert genau dafür ein Suffix: häng `:online` ans Ende der Modell-ID im OPRO-API-Einstellungspanel — `anthropic/claude-sonnet-4.5:online` — und deine Frage geht mit angehängten Websuch-Ergebnissen hinaus. Das ist OpenRouters eigene Funktion, und es steckt kein Code von uns dahinter; enough reicht die Modell-ID unverändert durch, und die Blasen zeigen sie mit dem Suffix, weil es je Suche extra kostet und du sehen können sollst, dass du darum gebeten hast.
+
 ---
 
 ## 15. Paradigmen
@@ -912,9 +932,11 @@ Neu aus dem **council**-Form, und du bekommst eine Einrichtungskarte mit vier Fe
 - **Eingabe** — worüber entschieden wird. Eine Frage, so scharf, wie du sie kriegst.
 - **Parameter** — wie du ihn laufen lassen willst. „Zwei Runden, dann entscheiden.“
 - **Einschränkungen** — was vom Tisch ist. „Die Prosa nicht umschreiben.“
-- **Gewünschtes Ergebnis** — siehe 17.3.
+- **Gewünschtes Ergebnis** — eines von dreien: **eine entschiedene Antwort**, am Ende auf die Leinwand geschrieben; **ein Dokument**, an einen Pfad geschrieben, den du benennst; oder **eine neue Composure**, ein ganzes Brett aus Karten, gebaut aus dem, was der Rat entschieden hat. Wähl Composure, und daneben erscheint ein zweites Bedienelement für die Anordnung — *scaffold*, wo jede Gruppe von Karten eine Spalte ist, oder *cards*, wo jede Gruppe eine Zeile ist. Was jedes davon am Ende tatsächlich tut, steht in 17.3.
 
 Dann der Raum. Die Liste beginnt mit deinem Chef-Readvisor, jedem Readvisor, den du in diesem Projekt eingeschaltet hast, und **dir**; hak ab, wen du nicht dabeihaben willst. Bis zu zwölf, und keine zwei Teilnehmer dürfen denselben Namen tragen, denn ein Beitrag wird namentlich zugeordnet, und zwei Nadias sind kein Rat, sondern eine Verwechslung. **Max. Runden** steht auf 3 und kann alles von 1 bis 20 sein.
+
+Jede Teilnehmerzeile nimmt außerdem einen optionalen **Auftrag**: eine Zeile, die sagt, wofür diese Person da ist. „hütet die Kontinuität.“ „vertritt die Leserin.“ „zweites Paar Augen.“ Er geht in die eigenen Anweisungen dieser Person und in sonst niemandes, als Letztes, nach allem anderen, was ihr gesagt wurde — er ist das Bestimmteste, was sie hat, und das, was ein langes Profil am leichtesten begräbt. Eine Zeile ist die ganze Idee; 200 Zeichen sind die Grenze, und alles Längere kommt abgelehnt zurück, statt stillschweigend gekürzt zu werden, denn ein halber Auftrag ist eine andere Aufgabe. Aufträge reisen außerdem in den Protokoll-Export mit, neben dem Namen, damit eine Leserin Monate später weiß, wer was wozu vertreten hat.
 
 **Einberufen** startet ihn.
 
@@ -933,9 +955,11 @@ Züge strömen herein. Eine Karte erscheint am Fuß der Spalte, mit Name und Zug
 
 **Du kannst jederzeit etwas sagen.** Das Eingabefeld am Fuß des Rats nimmt deinen eigenen Beitrag, und er geht als Karte hinein wie die von allen anderen, blau getönt. Spricht gerade niemand, landet er sofort; strömt gerade ein Zug, nimmt er den allernächsten Platz und zeigt sich bis dahin als ausstehend. So oder so ist er ein *Einwurf*, keine Umverteilung: der Readvisor, der an der Reihe war, spricht trotzdem als Nächster.
 
+**Du kannst auch einem pal eine Frage stellen.** Ist der Cloud-Slot nutzbar (14.3), tipp `/pal` und deine Frage in das Eingabefeld des Rats — `/pal gibt es einen Namen für das Muster, um das wir kreisen?` — und dein Chef destilliert die bisherige Diskussion und deine Frage zu einem einzigen, für sich stehenden Prompt, schickt den hinaus, und die Antwort landet als Beitrag in eigener grauer Tönung, gesprochen von `pal · <Modell-ID>`. Der Prompt, der den Rechner verlassen hat, ist oben in diese Karte eingefaltet: zusammengeklappt, damit zwanzig Beiträge lesbar bleiben, nie verborgen, einen Klick vom Öffnen entfernt. Wie deine eigenen Beiträge ist er ein Einwurf — er bekommt eine Zugnummer, aber keinen Platz, also spricht der, der gerade an der Reihe war, trotzdem als Nächster, und die Runde rückt nicht vor.
+
 **Das Readvisor-Panel bleibt für die Dauer geschlossen**, mit deaktiviertem Schalter und einem Tooltip, der erklärt, warum (Abschnitt 5.1). Räte und der Chat teilen sich ein Modell, und es gibt nur eines davon, ein Chat-Zug würde sich also entweder hinter dem Rat anstellen oder mit ihm kämpfen. Umgekehrt gilt dasselbe: drückst du ein Rats-Bedienelement, während dein Chef mitten in einer Chat-Antwort steckt, kommt ein Satz zurück, der das sagt, statt still zu warten.
 
-### 17.3 Abschließen: die Antwort, das Dokument, das Protokoll
+### 17.3 Abschließen: die Antwort, das Dokument, die Composure, das Protokoll
 
 **Abschließen** lässt einen letzten Zug laufen, in dem dein Chef-Readvisor sagt, wo es landet — mit Dank an die Argumente, die den Ausschlag gaben, mit Benennung der Uneinigkeit, die sich nicht aufgelöst hat, statt sie glattzubügeln, und mit dem, was noch offen ist. Dieser Beitrag wird wie jeder andere festgeschrieben, in Tinte getönt.
 
@@ -943,11 +967,13 @@ Was danach passiert, hängt vom **gewünschten Ergebnis** ab, das du bei der Ein
 
 - **Eine Antwort** — nichts weiter. Diese letzte Karte ist das Ergebnis, und sie liegt auf der Leinwand, wo der Rat ist.
 - **Ein Dokument** — der Abschluss wird als Markdown-Datei an einen Pfad in deinem Projekt geschrieben, den du benennst. Das läuft durch dieselbe Tür wie jedes andere Dateischreiben, mit denselben Positivlisten und demselben Rückgängig, und es überschreibt keine bestehende Datei, bevor du die Rückfrage gesehen und Ja gesagt hast. Danach wird unter dem Abschluss ein Link-Modul hinzugefügt, das darauf zeigt, sodass das Dokument einen Klick vom Rat entfernt ist, der es hervorgebracht hat.
-- **Eine Composure** — für 0.4.0 geplant. Wählst du sie heute, lehnt das Abschließen ab, bevor es einen Zug ausgibt, und sagt dir, du sollst etwas anderes nehmen.
+- **Eine Composure** — der Abschluss kommt als Gliederung zurück, und enough baut daraus eine neue Composure neben dieser, unter `rness/io/composure/<rat>-output-<datum>.comp`, in der Anordnung, die du bei der Einrichtung gewählt hast. Jede Gruppe ist eine Spalte oder eine Zeile, jede Karte ist ein Stück dessen, was der Rat entschieden hat, und was er *nicht* geklärt hat, kann als offene Frage durchkommen — eine Karte mit dem Titel `[gap: wer verantwortet die Migration?]`, getönt, damit du sie alle auf einen Blick findest. Unter dem Abschluss kommt ein Link-Modul, das auf die neue Datei zeigt, sodass das Brett einen Klick vom Rat entfernt ist, der es hervorgebracht hat. Eine bestehende Datei wird nie überschrieben: eine zweite bekommt `-2`.
+
+Das letzte davon verlangt von einem Modell Überschriften in einer exakten Form, und nicht jedes Modell trifft sie beim ersten Mal. Lässt sich die Gliederung nicht lesen, fragt enough noch einmal, mit ausbuchstabierter Grammatik. Lässt sich auch der zweite Versuch nicht lesen, bekommst du den Abschluss stattdessen als gewöhnliche Antwortkarte, mit einer Zeile, die sagt, dass genau das passiert ist, und es wird keine Datei geschrieben. Die Entscheidung des Rats wird nie weggeworfen, weil die Überschriften schiefgegangen sind — und ein drittes Mal wird nie versucht, denn ein Rat, der schon entschieden hat, sollte nicht zwei weitere Züge für Formatierung ausgeben.
 
 So oder so wird das Ganze außerdem als schlichtes Markdown nach `rness/knowledge/councils/<datum>-<titel>.md` exportiert: der Auftrag, wer im Raum war und wofür jeder da war, die Rundenzahl, und jeder Beitrag der Reihe nach. Ein früherer Export wird nie überschrieben. Ein Rat, der stattgefunden hat, ist etwas, das du durchsuchen, zitieren und jemandem in die Hand drücken kannst, Monate nachdem die Composure irgendwohin verschoben wurde.
 
-Ein abgeschlossener Rat ist fertig. Die Bedienelemente verschwinden, und von da an zeigt er dir den Protokollpfad und das Ergebnis.
+Ein abgeschlossener Rat ist fertig. Die Bedienelemente verschwinden, und von da an zeigt er dir den Protokollpfad, das Ergebnis und den Weg, ihn erneut einzuberufen (17.5).
 
 ### 17.4 Was es kostet, ehrlich
 
@@ -956,6 +982,12 @@ Ein abgeschlossener Rat ist fertig. Die Bedienelemente verschwinden, und von da 
 **Das Fenster wird gleichmäßig aufgeteilt.** Jeder Teilnehmer, der spricht, bekommt einen gleich großen Anteil am Kontextfenster des Modells — je die Hälfte bei zweien, je ein Viertel bei vieren. Dieser Anteil muss die eigene Identität des Teilnehmers tragen, plus so viel vom Rat, wie hineinpasst. Wird es eng, faltet enough die ältesten Beiträge auf je eine Zeile zusammen, eine Ein-Zeilen-Erinnerung daran, wer was gesagt hat: *Früher in diesem Rat: Ed (Zug 1): …*. Der Auftrag wird nie gefaltet, und der Beitrag, auf den gerade jemand antwortet, auch nicht — ein Teilnehmer, der nicht sehen kann, worauf er antwortet, hat nichts zu sagen.
 
 Dieses Falten ist mechanisch — es nimmt den ersten Satz, es bittet kein Modell um eine Zusammenfassung, denn ein Rat, der Antworten darauf verwendet, sich selbst zusammenzufassen, zahlt zweimal für dasselbe Fenster. Jeder Zug meldet, ob er etwas gefaltet hat. Fängt er früh und oft damit an, ist die ehrliche Abhilfe nicht ein kleinerer Rat, sondern ein größeres Kontextfenster im Modell-Fenster (Abschnitt 14.1) oder ein Modell, in dem Platz dafür ist.
+
+### 17.5 Erneut einberufen
+
+Ein Rat schließt ab, und manchmal die Frage nicht. **Erneut einberufen** startet aus einem abgeschlossenen Rat einen frischen: derselbe Raum — dieselben Teilnehmer mit ihren Namen, Tönungen und Aufträgen —, dieselben Parameter, dieselben Einschränkungen, dasselbe gewünschte Ergebnis und dieselbe Rundengrenze, und ein Auftrag, der der *alte* Auftrag ist plus dem, was der Rat tatsächlich hervorgebracht hat, hingelegt als das, was jetzt auf dem Tisch liegt. Eine Antwort kommt als der Abschluss selbst herüber; ein Dokument oder eine Composure kommt als Verweis auf die Datei und deren erste paar tausend Zeichen herüber. Der neue Rat öffnet sich bereit, bei Zug null, ohne dass jemand gesprochen hätte.
+
+Der alte Rat wird nicht neu gefahren und nicht umgeschrieben. Sein Status, seine Beiträge und sein Protokoll bleiben genau so, wie sie waren; er bekommt ein Link-Modul, das auf seinen Nachfolger zeigt, und der neue eines, das zurückzeigt, sodass sich die Kette von beiden Enden her liest und kein Ende eine Sackgasse ist. Ein Rat wird einmal erneut einberufen — danach ist der Knopf ein Link auf den Rat, der daraus geworden ist.
 
 ---
 
@@ -1108,5 +1140,3 @@ Diese Schleife — Reibung bemerken, die Lösung kodieren, weiterarbeiten — is
 ---
 
 *enough ist © 2026 Graham Smith, veröffentlicht unter der Apache License 2.0. Wikipedia-Inhalte, erreicht über wikisink, stehen unter CC BY-SA. Dieses Dokument: auch deins zum Bearbeiten.*
-
-

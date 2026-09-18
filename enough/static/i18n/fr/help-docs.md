@@ -409,12 +409,14 @@ path: (a composure whose form is council)
 plusieurs readvisors et vous, en train de réfléchir à une seule chose chacun son tour, par écrit, sur le canevas. un conseil est une composure ordinaire, avec le brief en haut et une carte par intervention en dessous, teintée selon qui parle et coiffée d'un nom et d'un numéro de tour. les interventions appartiennent au moteur : vous pouvez les déplacer, les restyler, dessiner par-dessus et les commenter, mais pas les réécrire.
 
 ### how
-remplissez le brief — entrée, paramètres, contraintes, sortie souhaitée — cochez qui est dans la salle, fixez les tours max, et appuyez sur convoquer. ensuite, pilotez : <em>tour suivant</em> prend une intervention, <em>faire un tour</em> fait le tour complet de la table, <em>aller jusqu'au bout</em> va jusqu'au plafond de tours, <em>mettre en pause</em> l'arrête, <em>conclure</em> demande la décision au chef. la zone de saisie en bas est à vous : ce que vous dites prend le créneau suivant sans coûter son tour à personne. conclure écrit la réponse sous forme de carte surlignée — ou de fichier markdown au chemin que vous avez choisi — et exporte toute la transcription vers <code>rness/knowledge/councils/</code>.
+remplissez le brief — entrée, paramètres, contraintes, sortie souhaitée — cochez qui est dans la salle, donnez à qui vous voulez une <em>charge</em> d'une ligne s'il est là pour quelque chose de précis (« garde la continuité », « défend le lecteur »), fixez les tours max, et appuyez sur convoquer. ensuite, pilotez : <em>tour suivant</em> prend une intervention, <em>faire un tour</em> fait le tour complet de la table, <em>aller jusqu'au bout</em> va jusqu'au plafond de tours, <em>mettre en pause</em> l'arrête, <em>conclure</em> demande la décision au chef. la zone de saisie en bas est à vous : ce que vous dites prend le créneau suivant sans coûter son tour à personne, et <code>/pal</code> tapé là envoie une seule question distillée au modèle cloud et en rapporte la réponse sous forme d'intervention. conclure écrit ce que le conseil a décidé dans la forme que vous avez choisie — une carte surlignée, un fichier markdown au chemin de votre choix, ou toute une nouvelle composure de cartes à côté de celle-ci — et exporte la transcription vers <code>rness/knowledge/councils/</code>. un conseil conclu peut être <em>reconvoqué</em> : un nouveau conseil avec la même assemblée, les mêmes charges et ce que celui-ci a décidé comme point de départ.
 
 ### ideas
 - confiez la thèse inverse à un readvisor et voyez si elle survit au contact des autres.
-- réglez la sortie sur un document quand la décision doit quitter le canevas sous forme de fichier citable.
+- une charge est le moyen le moins cher d'empêcher trois readvisors de dire la même chose de trois façons.
+- réglez la sortie sur un document quand la décision doit quitter le canevas sous forme de fichier citable, ou sur une composure quand ce que vous voulez est la forme de la décision plutôt que ses paragraphes.
 - dites quelque chose vous-même dès qu'un conseil se met à tourner en rond ; une interjection coûte moins cher qu'un tour de plus.
+- reconvoquez plutôt que de tout recommencer quand la réponse était juste mais pas finie.
 
 ## chief-readvisor
 name: readvisor en chef
@@ -429,3 +431,18 @@ appuyez sur le bouton de renommage à côté du × dans cet en-tête, tapez un n
 ### ideas
 - choisissez quelque chose que vous diriez à voix haute ; vous allez le lire toute la journée.
 - renommez avant de convoquer un conseil, pas pendant.
+
+## pal
+name: pal
+path: (the OPRO-API model slot)
+
+### what
+une seule question, envoyée dehors, à découvert. un <strong>pal</strong>, c'est le modèle cloud que vous avez déjà configuré dans l'emplacement OPRO-API, joint une fois, à la main, depuis un tour par ailleurs entièrement local. il n'y a pas de réglage pal, pas de compte pal et pas de second interrupteur : si l'emplacement cloud marche, un pal marche, et s'il ne marche pas, l'explication habituelle du broker est toute l'histoire. taper <code>/pal</code> est le consentement — il n'y a pas d'étape de confirmation, parce qu'une étape de confirmation qui apparaît à chaque fois est un bouton que les gens apprennent à cliquer. ce qui la remplace, c'est que l'invite qui quitte cette machine vous est montrée mot pour mot, avant la réponse, à chaque fois, en direct et après un rechargement.
+
+### how
+commencez un message par <code>/pal</code> et le reste est la demande : <code>/pal quel est l'état de l'art de la reconnaissance vocale sur l'appareil ?</code>. tapez <code>/</code> comme premier caractère et une ligne d'indice apparaît au-dessus de la zone de saisie, nommant le modèle qui serait joint ; tab ou un clic la complète, et quand l'emplacement cloud est fermé, la ligne se grise et dit pourquoi. votre readvisor y réfléchit alors ici d'abord — ses propres connaissances, les fichiers de ce projet, les outils wiki — détermine ce qu'il ne peut vraiment pas trancher en local, envoie <strong>une seule</strong> invite affinée, et vous répond de sa propre voix en disant quelles parties viennent du pal. un appel par message <code>/pal</code>. la même commande marche dans la zone de saisie d'un conseil, où le chef distille le brief et toute la transcription en une invite ; la réponse atterrit comme une intervention grise dont la première ligne replie ce qui a été envoyé.
+
+### ideas
+- mettez <code>:online</code> à la fin de l'id du modèle dans les réglages OpenRouter — <code>anthropic/claude-sonnet-4.5:online</code> — et votre pal répond avec le web sous les yeux. ça facture un supplément par recherche, et c'est le remède pour un modèle figé à sa date de coupure d'entraînement.
+- gardez-le pour ce qu'un modèle local ne peut pas avoir : l'actualité de cette semaine, une bibliothèque sortie le mois dernier, un deuxième avis sur un jugement que vous avez déjà rendu.
+- lisez la bulle sortante avant de lire la réponse. c'est le seul endroit qui montre exactement ce qui est parti, et il est là exprès.

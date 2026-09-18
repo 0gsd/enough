@@ -166,9 +166,10 @@ def test_a_document_output_needs_a_path_and_refuses_a_comp():
         K.validate_output({"kind": "podcast"})
 
 
-def test_pal_is_validated_and_then_ignored_everywhere():
-    """0.3.5 reserves the kind so a 0.4.0 council opens here. It must never
-    speak, never count toward the budget and never appear in the rotation."""
+def test_pal_is_in_the_room_but_never_in_the_rotation():
+    """P9 gave `pal` a voice (`ask_pal_turn`), so it is named in the brief's
+    roster now. It still never takes a turn on its own and still takes no
+    share of the window: it speaks only when it is asked."""
     meta = K.validate_meta({"participants": participants(
         ("chief", "chief", "Ed"), ("pal", "pal", "sonnet"),
         ("user", "user", "you"))})
@@ -178,7 +179,8 @@ def test_pal_is_validated_and_then_ignored_everywhere():
     K.advance(meta, meta["participants"][0])
     assert K.next_speaker(meta)["id"] == "chief"       # wrapped past the pal
     assert meta["round"] == 1
-    assert "sonnet" not in K.brief_text(meta)          # not "in the room"
+    assert "sonnet (pal)" in K.brief_text(meta)
+    assert K.RESERVED_KINDS == frozenset()
 
 
 def test_charge_and_reconvene_round_trip_for_p9():

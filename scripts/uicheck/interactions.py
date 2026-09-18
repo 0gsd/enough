@@ -31,7 +31,8 @@ import re
 from collections.abc import Callable
 
 from .driver import Driver, StepError
-from .screens import CARDS_READY, DOC, GIRRAPH, JOURNAL_READY
+from .screens import (CARDS_READY, COUNCIL_PAL_STATEMENT, DOC,
+                      GIRRAPH, JOURNAL_READY)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -1027,11 +1028,41 @@ def scenario_composure_council_setup(d: Driver) -> list[str]:
         fails.append(f"the roster has no chief ({kinds})")
     if "user" not in (kinds or []):
         fails.append(f"the roster has no user row ({kinds})")
+    # A pal is NOT in the roster, and P9 did not change that: it is
+    # invoked per ask (`/pal` in the composer), never enrolled. It takes a
+    # turn number but not a slot, takes no share of the budget, and
+    # `council.speakers()` still skips it — so a checkbox for it would be
+    # a promise the engine does not keep. Verified against the backend:
+    # `default_participants` returns chief/readvisor/user only.
     if "pal" in (kinds or []):
-        fails.append("a `pal` participant was offered — it is reserved for 0.4.0")
+        fails.append("a `pal` participant was offered — a pal is invoked per "
+                     "ask, not enrolled, so it has no roster row")
     if not d.js("Array.from(document.querySelectorAll("
-                "'#cc-participants input')).slice(-1)[0].disabled"):
+                "'#cc-participants input[type=\"checkbox\"]')).slice(-1)[0]"
+                ".disabled"):
         fails.append("the user's row could be unticked")
+    # Charges: one per NON-user row, capped at the engine's 200.
+    charges = d.js("Array.from(document.querySelectorAll('#cc-participants "
+                   ".cc-person')).map((r) => {"
+                   " const c = r.querySelector('.cc-charge');"
+                   " return c ? c.maxLength : null; })") or []
+    people = d.js("COMP_COUNCIL.people.map((p) => p.kind)") or []
+    for kind, cap in zip(people, charges):
+        if kind == "user" and cap is not None:
+            fails.append("the user's row has a charge field — you are not "
+                         "something the council was told to do")
+        if kind != "user" and cap != 200:
+            fails.append(f"a {kind} row's charge field caps at {cap!r}, not "
+                         f"the engine's 200")
+    # …and a charge typed into a row reaches that row's model entry, which
+    # is what convene sends back.
+    d.js("(() => { const c = document.querySelector('#cc-participants "
+         ".cc-charge'); c.value = 'owns continuity';"
+         " c.dispatchEvent(new Event('input', {bubbles: true}));"
+         " return true; })()")
+    if d.js("COMP_COUNCIL.people.filter((p) => p.charge === 'owns continuity')"
+            ".length") != 1:
+        fails.append("a typed charge did not reach the participant row")
     # the output kind reveals its path field, and only for `document`
     if not d.js("document.getElementById('cc-output-path').hidden"):
         fails.append("the output path field was visible for an `answer` output")
@@ -1042,9 +1073,28 @@ def scenario_composure_council_setup(d: Driver) -> list[str]:
     d.wait_idle()
     if d.js("document.getElementById('cc-output-path').hidden"):
         fails.append("choosing `document` did not reveal the path field")
-    if not d.js("document.querySelector('#cc-output option[value=\"composure\"]')"
-                ".disabled"):
-        fails.append("the `composure` output kind was selectable — it is 0.4.0's")
+    if not d.js("document.getElementById('cc-form-row').hidden"):
+        fails.append("a `document` output offered a composure form select")
+    # `composure` landed in P9: selectable, and it takes a FORM and no path.
+    if d.js("document.querySelector('#cc-output option[value=\"composure\"]')"
+            ".disabled"):
+        fails.append("the `composure` output kind is still disabled — it "
+                     "landed in P9")
+    d.js("(() => { const s = document.getElementById('cc-output');"
+         " s.value = 'composure';"
+         " s.dispatchEvent(new Event('change', {bubbles: true}));"
+         " return true; })()")
+    d.wait_idle()
+    if d.js("document.getElementById('cc-form-row').hidden"):
+        fails.append("choosing `composure` did not reveal the form select")
+    if not d.js("document.getElementById('cc-output-path').hidden"):
+        fails.append("a `composure` output asked for a path — the file is "
+                     "made beside the council")
+    forms = d.js("Array.from(document.querySelectorAll('#cc-form option'))"
+                 ".map((o) => o.value)")
+    if forms != ["scaffold", "cards"]:
+        fails.append(f"the form select offers {forms!r}, not the two forms "
+                     f"the engine validates")
     _comp_blank(d)
     d.js("rvForceClosed(false)")
     _reset(d)
@@ -1103,6 +1153,332 @@ def scenario_composure_council_controls(d: Driver) -> list[str]:
         note = d.js("document.getElementById('cc-notice').textContent") or ""
         if len(note.strip()) < 12:
             fails.append(f"the refusal was not the server's sentence ({note!r})")
+    _comp_blank(d)
+    d.js("rvForceClosed(false)")
+    _reset(d)
+    return fails
+
+
+def scenario_pal_hint_row(d: Driver) -> list[str]:
+    """`/` reveals the hint row; it greys itself with the gate's reason;
+    Tab completes `/pal `; clearing the composer takes it away again.
+
+    The scratch world's gate is genuinely shut — `smoke_boot.build_env()`
+    gives it its own `$HOME`, so `local_models_only` is on at its default
+    and there is no OpenRouter key — which makes the CLOSED row real here
+    rather than mocked. The open row is a screen (`readvisor-pal-hint-open`)
+    and is seeded, because opening the gate honestly would mean writing a
+    key into the developer's OS keyring.
+    """
+    fails: list[str] = []
+    _reset(d)
+    d.js("rvSetState('open')")
+    d.wait_idle()
+    if not d.js("document.getElementById('pal-hint').hidden"):
+        fails.append("the hint row was showing before anything was typed")
+    # Real typing, through the real input pipeline.
+    d.focus("#message")
+    d.type_text("/")
+    d.js_await("(async () => { for (let i = 0; i < 100 && !PAL.status; i++)"
+               " await new Promise((r) => setTimeout(r, 50));"
+               " palSyncHint('pal-hint', document.getElementById('message')"
+               ".value); return true; })()")
+    d.wait_idle()
+    if d.js("document.getElementById('pal-hint').hidden"):
+        fails.append("`/` did not reveal the hint row")
+    status = d.js("PAL.status") or {}
+    if status.get("available"):
+        fails.append("the scratch world's cloud gate answered OPEN — this "
+                     "run is not isolated from the developer's keyring")
+    else:
+        if not d.js("document.getElementById('pal-hint')"
+                    ".classList.contains('pal-off')"):
+            fails.append("a shut gate did not grey the row")
+        gloss = d.js("document.getElementById('pal-hint-gloss').textContent") or ""
+        if gloss.strip() != (status.get("reason") or "").strip():
+            fails.append(f"the greyed row does not carry the gate's own "
+                         f"reason: {gloss!r} vs {status.get('reason')!r}")
+        if (d.js("document.querySelector('#pal-hint .pal-model').textContent")
+                or "").strip():
+            fails.append("a shut gate named a model anyway — there is no "
+                         "model to name behind a shut door")
+    # Tab completes. A greyed row still completes: it is a hint, not a gate.
+    d.focus("#message")
+    d.key("Tab")
+    d.wait_idle()
+    typed = d.js("document.getElementById('message').value")
+    if typed != "/pal ":
+        fails.append(f"Tab did not complete the command: {typed!r}")
+    # …and it is still just text in the box. No client-side handling.
+    d.js("(() => { const ta = document.getElementById('message');"
+         " ta.value = ''; ta.dispatchEvent(new Event('input',"
+         " {bubbles: true})); return true; })()")
+    d.wait_idle()
+    if not d.js("document.getElementById('pal-hint').hidden"):
+        fails.append("clearing the composer left the hint row behind")
+    d.js("(() => { PAL.status = null; document.getElementById('message')"
+         ".blur(); return true; })()")
+    _reset(d)
+    return fails
+
+
+def scenario_pal_gate_closed(d: Driver) -> list[str]:
+    """`/pal <ask>` with the gate shut: the server's own denial as a system
+    bubble, and NO turn — not a pending assistant bubble, not a
+    `turn_start`, nothing that costs a window."""
+    fails: list[str] = []
+    _reset(d)
+    d.js("rvSetState('open')")
+    d.js("(() => { document.getElementById('conversation').innerHTML = '';"
+         " window.__uicheckTurns = 0;"
+         " return true; })()")
+    # Count `turn_start` the way the page does — on the same EventSource.
+    d.js("(() => { window.es && window.es.addEventListener"
+         " && window.es.addEventListener('turn_start',"
+         " () => { window.__uicheckTurns++; }); return true; })()")
+    d.focus("#message")
+    d.type_text("/pal which obligations slipped?")
+    d.key("Enter")
+    d.js_await("(async () => { for (let i = 0; i < 200 &&"
+               " !document.querySelector('#conversation .msg.system'); i++)"
+               " await new Promise((r) => setTimeout(r, 50)); return true; })()")
+    d.wait_idle()
+    said = d.js("(() => { const el = document.querySelector("
+                "'#conversation .msg.system .body');"
+                " return el ? el.textContent : ''; })()") or ""
+    if not said.strip():
+        fails.append("a `/pal` against a shut gate said nothing at all")
+    elif len(said.strip()) < 40:
+        fails.append(f"the denial was not the broker's sentence ({said!r})")
+    # The typed line is still the user's bubble — what they wrote, not what
+    # would have been sent.
+    user = d.js("(() => { const el = document.querySelector("
+                "'#conversation .msg.user .body');"
+                " return el ? el.textContent : ''; })()") or ""
+    if "/pal" not in user:
+        fails.append(f"the user's bubble lost the command they typed ({user!r})")
+    if d.js("!!document.getElementById('current-response')"):
+        fails.append("a refused `/pal` still opened an assistant bubble — no "
+                     "turn should have started")
+    if d.js("document.querySelectorAll('.msg.pal, .msg.pal-sent').length"):
+        fails.append("a refused `/pal` rendered pal bubbles — nothing left "
+                     "the machine")
+    d.js("(() => { document.getElementById('conversation').innerHTML = '';"
+         " const ta = document.getElementById('message'); ta.value = '';"
+         " ta.dispatchEvent(new Event('input', {bubbles: true}));"
+         " PAL.status = null; return true; })()")
+    _reset(d)
+    return fails
+
+
+def scenario_pal_bubbles(d: Driver) -> list[str]:
+    """One exchange renders as two bubbles, in this order, with the model
+    id in both bylines — and the outgoing prompt VERBATIM.
+
+    The event is synthetic (there is no model in the scratch world) but it
+    goes through the page's own `pal_exchange` handler, and the markup it
+    produces is the one `server._render_pal_bubbles` also emits when the
+    same exchange is rebuilt from history on reload."""
+    fails: list[str] = []
+    _reset(d)
+    d.js("rvSetState('open')")
+    prompt = ("Which obligations under the EU AI Act took effect in August "
+              "2026, and which were postponed?")
+    reply = "Two of the high-risk obligations moved to 2027."
+    d.js("(() => { document.getElementById('conversation').innerHTML = '';"
+         " palOnExchange(" + json.dumps({
+             "model_id": "anthropic/claude-sonnet-4.5",
+             "prompt": prompt, "reply": reply}) + "); return true; })()")
+    d.wait_idle()
+    order = d.js("Array.from(document.querySelectorAll('#conversation .msg'))"
+                 ".map((el) => el.className)") or []
+    if order != ["msg pal-sent", "msg pal"]:
+        fails.append(f"the two bubbles are not the sent-then-received pair: "
+                     f"{order!r}")
+    sent = d.js("(() => { const el = document.querySelector('.msg.pal-sent');"
+                " return el ? {role: el.querySelector('.role').textContent,"
+                " body: el.querySelector('.body').textContent} : null; })()")
+    got = d.js("(() => { const el = document.querySelector('.msg.pal');"
+               " return el ? {role: el.querySelector('.role').textContent,"
+               " body: el.querySelector('.body').textContent} : null; })()")
+    if not sent or sent["body"] != prompt:
+        fails.append("the outgoing prompt was not shown verbatim: "
+                     f"{(sent or {}).get('body')!r}")
+    if not sent or not sent["role"].startswith("→ pal · "):
+        fails.append(f"the outgoing byline is wrong: {(sent or {}).get('role')!r}")
+    if not sent or "anthropic/claude-sonnet-4.5" not in sent["role"]:
+        fails.append("the outgoing byline does not name the model")
+    if not got or got["body"] != reply:
+        fails.append(f"the reply bubble is wrong: {(got or {}).get('body')!r}")
+    if not got or got["role"] != "pal · anthropic/claude-sonnet-4.5":
+        fails.append(f"the reply byline is wrong: {(got or {}).get('role')!r}")
+    # A streaming assistant bubble is BELOW both, not above: the exchange
+    # happened before the readvisor's next token.
+    d.js("(() => { document.getElementById('conversation')"
+         ".insertAdjacentHTML('beforeend', '<div class=\"msg assistant "
+         "pending\" id=\"current-response\"><div class=\"role\">Ed</div>"
+         "<div class=\"body\"></div></div>');"
+         " palOnExchange({model_id: 'm', prompt: 'p', reply: 'r'});"
+         " return true; })()")
+    tail = d.js("Array.from(document.querySelectorAll('#conversation .msg'))"
+                ".map((el) => el.className)") or []
+    if tail[-1] != "msg assistant pending":
+        fails.append(f"a pal exchange landed AFTER the streaming bubble: "
+                     f"{tail!r}")
+    d.js("(() => { document.getElementById('conversation').innerHTML = '';"
+         " return true; })()")
+    _reset(d)
+    return fails
+
+
+def scenario_composure_council_pal(d: Driver) -> list[str]:
+    """`/pal` in the council composer: a different endpoint, and its refusal
+    is a sentence in the footer's notice.
+
+    The scratch world's gate is shut, so `POST /api/council/pal` answers
+    409 with the broker's copy before it spends a single model call — which
+    is the shape this asserts, and it needs no model to assert it."""
+    fails: list[str] = []
+    _reset(d)
+    _comp_blank(d)
+    _council_open(d)
+    before = d.js("COMP_COUNCIL.state.council.turn")
+    # The hint row appears in the footer too, on the same rules.
+    d.js("(() => { const ta = document.getElementById('cc-say');"
+         " ta.value = '/pal'; ta.dispatchEvent(new Event('input',"
+         " {bubbles: true})); return true; })()")
+    d.js_await("(async () => { for (let i = 0; i < 100 && !PAL.status; i++)"
+               " await new Promise((r) => setTimeout(r, 50));"
+               " palSyncHint('cc-pal-hint',"
+               " document.getElementById('cc-say').value); return true; })()")
+    d.wait_idle()
+    if d.js("document.getElementById('cc-pal-hint').hidden"):
+        fails.append("`/pal` in the council composer showed no hint row")
+    if not d.js("document.getElementById('cc-pal-hint')"
+                ".classList.contains('pal-off')"):
+        fails.append("the council's hint row did not grey itself on a shut gate")
+    # A bare `/pal` never reaches the server: it is a usage note, not a turn.
+    d.js("(() => { document.getElementById('cc-say').value = '/pal';"
+         " return true; })()")
+    d.js_await("(async () => { await compCouncilSayIt(); return true; })()")
+    note = d.js("document.getElementById('cc-notice').textContent") or ""
+    if "/pal" not in note:
+        fails.append(f"a bare `/pal` did not explain itself ({note!r})")
+    # …and with an ask, the server's own refusal reaches the same notice.
+    d.js("(() => { document.getElementById('cc-say').value ="
+         " '/pal what about the reveal?'; return true; })()")
+    d.js_await("(async () => { await compCouncilSayIt(); return true; })()",
+               timeout=30.0)
+    d.wait_idle()
+    note = d.js("document.getElementById('cc-notice').textContent") or ""
+    if len(note.strip()) < 40:
+        fails.append(f"the council's `/pal` refusal was not the server's "
+                     f"sentence ({note!r})")
+    after = d.js("COMP_COUNCIL.state.council.turn")
+    if after != before:
+        fails.append(f"a refused `/pal` still took a turn ({before} → {after})")
+    d.js("(() => { const ta = document.getElementById('cc-say');"
+         " ta.value = ''; ta.dispatchEvent(new Event('input',"
+         " {bubbles: true})); PAL.status = null; return true; })()")
+
+    # --- and what a pal's ANSWER looks like once it is committed ---------
+    #
+    # The statement is built in the MODEL only, the way
+    # `composure-journal-filed` fakes a filed page: a real one wants two
+    # model calls and a cloud key. What is asserted is what
+    # `compPaintModule` makes of it.
+    d.run_steps((COUNCIL_PAL_STATEMENT,), what="a pal statement")
+    d.wait_for(".comp-module[data-speaker-kind='pal']")
+    d.wait_idle()
+    cls = d.js("document.querySelector('.comp-module[data-speaker-kind=\"pal\"]')"
+               ".className") or ""
+    if "comp-bg-gray" not in cls:
+        fails.append(f"a pal statement is not gray-tinted ({cls!r})")
+    if "comp-locked" not in cls:
+        fails.append("a pal statement is not locked — statements belong to "
+                     "the engine")
+    quote = d.js("(() => { const q = document.querySelector("
+                 "'.comp-module[data-speaker-kind=\"pal\"] blockquote');"
+                 " return q ? {hidden: q.hidden, cls: q.className,"
+                 "  text: (q.textContent || '').slice(0, 8)} : null; })()")
+    if not quote:
+        fails.append("a pal statement lost its outgoing prompt entirely — "
+                     "that block IS the record of what left the machine")
+    else:
+        if not quote["hidden"]:
+            fails.append("the outgoing prompt was not collapsed by default")
+        if "comp-pal-prompt" not in quote["cls"]:
+            fails.append(f"the leading quote was not recognised ({quote!r})")
+    if not d.exists(".comp-module[data-speaker-kind='pal'] "
+                    ".comp-council-pal-lead"):
+        fails.append("there is no disclosure to open the outgoing prompt with")
+    # A real click opens it, and a second one closes it again.
+    d.click(".comp-module[data-speaker-kind='pal'] .comp-council-pal-lead")
+    d.wait_idle()
+    if d.js("document.querySelector('.comp-module[data-speaker-kind=\"pal\"] "
+            "blockquote').hidden"):
+        fails.append("the disclosure did not open the outgoing prompt")
+    if d.js("document.querySelector('.comp-module[data-speaker-kind=\"pal\"] "
+            ".comp-council-pal-lead').getAttribute('aria-expanded')") != "true":
+        fails.append("the disclosure did not say it was open")
+    d.click(".comp-module[data-speaker-kind='pal'] .comp-council-pal-lead")
+    d.wait_idle()
+    if not d.js("document.querySelector('.comp-module[data-speaker-kind=\"pal\"] "
+                "blockquote').hidden"):
+        fails.append("the disclosure would not close again")
+    # The disclosure is CHROME: a repaint must not write it into the file.
+    if not d.js("!!document.querySelector('.comp-module[data-speaker-kind="
+                "\"pal\"] .comp-council-pal-lead[data-comp-chrome]')"):
+        fails.append("the disclosure is not marked as chrome — it would be "
+                     "serialized into the statement as prose")
+    _comp_blank(d)
+    d.js("rvForceClosed(false)")
+    _reset(d)
+    return fails
+
+
+def scenario_composure_council_reconvene(d: Driver) -> list[str]:
+    """A concluded council's footer carries the reconvene control, and a
+    council that has already been reconvened shows where it went instead."""
+    fails: list[str] = []
+    _reset(d)
+    _comp_blank(d)
+    _council_open(d)
+    if d.js("!!document.getElementById('cc-reconvene')"):
+        fails.append("a running council offered reconvene")
+    # Concluded in the MODEL only — a real conclude wants a model, and this
+    # is about the collapsed footer. (`composure-council-concluded` does
+    # the same.)
+    d.js("(() => { const m = COMP_COUNCIL.state.council;"
+         " m.status = 'concluded'; m.round = m.max_rounds;"
+         " m.transcript = 'rness/knowledge/councils/x.md';"
+         " compCouncilRender(); return true; })()")
+    d.wait_idle()
+    if not d.js("!!document.getElementById('cc-reconvene')"):
+        fails.append("a concluded council has no reconvene control")
+    if not d.js("document.getElementById('cc-composer').hidden"):
+        fails.append("a concluded council still shows its composer")
+    # Once reconvened, the button is replaced by where it went.
+    d.js("(() => { const m = COMP_COUNCIL.state.council;"
+         " m.reconvened_to = 'rness/io/composure/again.comp';"
+         " compCouncilRender(); return true; })()")
+    d.wait_idle()
+    if d.js("!!document.getElementById('cc-reconvene')"):
+        fails.append("a council already reconvened offered to be again — a "
+                     "council is reconvened once")
+    done = d.js("document.getElementById('cc-done').textContent") or ""
+    if "again.comp" not in done:
+        fails.append(f"the footer does not say where it went ({done!r})")
+    # …and the other end of the chain says where it came from.
+    d.js("(() => { const m = COMP_COUNCIL.state.council;"
+         " m.reconvened_from = 'rness/io/composure/before.comp';"
+         " compCouncilRender(); return true; })()")
+    d.wait_idle()
+    frm = d.js("(() => { const el = document.getElementById('cc-from');"
+               " return el.hidden ? '' : el.textContent; })()") or ""
+    if "before.comp" not in frm:
+        fails.append(f"a reconvened council does not say what it carries on "
+                     f"from ({frm!r})")
     _comp_blank(d)
     d.js("rvForceClosed(false)")
     _reset(d)
@@ -1169,6 +1545,12 @@ SCENARIOS: dict[str, Scenario] = {
     "composure-council-pins-panel": scenario_composure_council_pins_panel,
     "composure-council-setup": scenario_composure_council_setup,
     "composure-council-controls": scenario_composure_council_controls,
+    "composure-council-pal": scenario_composure_council_pal,
+    "composure-council-reconvene": scenario_composure_council_reconvene,
+    # --- `/pal` (P8) ---
+    "pal-hint-row": scenario_pal_hint_row,
+    "pal-gate-closed": scenario_pal_gate_closed,
+    "pal-bubbles": scenario_pal_bubbles,
     "composure-inspector-is-clickable":
         scenario_composure_inspector_is_clickable,
 }
