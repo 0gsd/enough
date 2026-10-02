@@ -112,6 +112,33 @@ COUNCIL_READY: Step = ("eval_await", """(async () => {
   }
   return true; })()""")
 
+#: The sidebar's collapse/expand transition (180ms) has finished.
+SIDEBAR_SETTLED: Step = ("eval_await", "new Promise((r) => setTimeout(() => r(true), 260))")
+
+#: The dictionary has drawn a page. FEED builds its database in the
+#: background at boot (a few seconds on the real data), so the wait is long
+#: and done inside the page, for the reason COUNCIL_READY gives.
+DICT_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 360
+       && !document.querySelector('#dict-flow .dict-e'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: The WDL has a plate (not the "looking it up" line).
+WDL_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200
+       && !document.querySelector('#wdl-scroll .wdl-mast'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: Back to a known order, so a screen never inherits a sort or a search the
+#: previous one (or a persisted visit) left behind.
+DICT_PLAIN = ("eval", "(() => { try { localStorage.removeItem('enough.dict.v1'); } catch (e) {}"
+                      " Object.assign(DICT.view, {sort: 'alpha', dir: 'asc', then: '',"
+                      " thenDir: 'asc', q: ''}); DICT.view.filters = {domain: '', pos: '',"
+                      " band: '', origin: ''}; DICT.sel = null; DICT.start = null;"
+                      " document.getElementById('dict-q').value = ''; return true; })()")
+
 #: A CONVENED council, without a model. `POST /api/council/setup` only writes
 #: the meta — it runs no turn — so the footer's whole state machine can be
 #: driven here exactly as it is in the app, on a real file at a fixed path
@@ -340,9 +367,13 @@ PROJECT_SCREENS: list[Screen] = [
     Screen("project-base", "project",
            note="the ground floor: chat home, sidebar, top bar"),
 
+    # The column slides shut over 180ms and goes `visibility: hidden` at
+    # the end of it (0.4.1). `wait_idle` watches the body's size and node
+    # count, neither of which a grid-column transition changes, so on its
+    # own it measured the sidebar half-way through the slide.
     Screen("sidebar-hidden", "project",
-           setup=(("click", "#toggle-sidebar"), ("wait_idle", "")),
-           teardown=(("click", "#toggle-sidebar"), ("wait_idle", "")),
+           setup=(("click", "#toggle-sidebar"), SIDEBAR_SETTLED, ("wait_idle", "")),
+           teardown=(("click", "#toggle-sidebar"), SIDEBAR_SETTLED, ("wait_idle", "")),
            note="the layout the sidebar toggle leaves behind"),
 
     # --- modals -----------------------------------------------------------
@@ -440,6 +471,47 @@ PROJECT_SCREENS: list[Screen] = [
                   ("eval", "refToggleSize()"),
                   ("wait_idle", "")),
            teardown=EXIT_ALL_MODES),
+
+    # --- FEED: the dictionary, the word data lightbox (0.4.1) -------------
+    Screen("dict-mode", "project",
+           setup=(DICT_PLAIN, ("eval", "enterDictMode({word: 'lantern'})"),
+                  ("wait_for", "#dict-mode.open"), DICT_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES),
+
+    Screen("dict-sorted-filters", "project",
+           setup=(DICT_PLAIN, ("eval", "enterDictMode()"), ("wait_for", "#dict-mode.open"),
+                  DICT_READY,
+                  ("eval", "(() => { Object.assign(DICT.view, {sort: 'domain', then: 'era'});"
+                           " dictViewChanged(); dictOptsToggle(true); return true; })()"),
+                  DICT_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="domain, then era: margin keys, lettered group headings, the "
+                "presets + filters strip open under the toolbar"),
+
+    Screen("dict-search", "project",
+           setup=(DICT_PLAIN, ("eval", "enterDictMode()"), ("wait_for", "#dict-mode.open"),
+                  DICT_READY, ("eval", "dictSetQuery('twilight')"),
+                  ("wait_for", "#dict-flow mark"), ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES),
+
+    Screen("wdl-plate", "project",
+           setup=(DICT_PLAIN, ("eval", "enterDictMode()"), ("wait_for", "#dict-mode.open"),
+                  DICT_READY, ("eval", "wdlOpen('gloaming', {fromDict: true})"),
+                  ("wait_for", "#wdl-modal:not(.hidden)"), WDL_READY, ("wait_idle", "")),
+           teardown=(("eval", "wdlClose()"),) + EXIT_ALL_MODES),
+
+    Screen("wdl-over-read", "project",
+           setup=(("eval", f"openReadEdit('{DOC}', {{size:'full', face:'read'}})"),
+                  ("wait_for", "#review-mode.open"),
+                  ("eval", "(() => { wdlOpen('serendipity'); WDL.tab = 'languages'; return true; })()"),
+                  ("wait_for", "#wdl-modal:not(.hidden)"), WDL_READY, ("wait_idle", "")),
+           teardown=(("eval", "wdlClose()"),) + EXIT_ALL_MODES,
+           note="the lightbox over another mode, its languages tab"),
+
+    Screen("wdl-not-found", "project",
+           setup=(("eval", "wdlOpen('glomrify')"),
+                  ("wait_for", "#wdl-modal:not(.hidden)"), WDL_READY, ("wait_idle", "")),
+           teardown=(("eval", "wdlClose()"), ("wait_idle", ""))),
 
     # --- help --------------------------------------------------------------
     Screen("help-bubble", "project",

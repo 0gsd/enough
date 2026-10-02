@@ -91,9 +91,10 @@ SAME_IN_EVERY_LANGUAGE = frozenset(s.casefold() for s in (
     "enough", "wikisink", "cacheawl", "cachebox", "girraph", "merirmaid",
     "composure", "readvisor", "readvisors", "rness", "broker", "infoworld",
     "OpenRouter", "MADLAD", "Wikipedia", "markdown", "PDF", "HTML",
-    "URL", "AGENT.md", "MOTIVATION.md",
+    "URL", "AGENT.md", "MOTIVATION.md", "FEED",
     # Symbols, units and single glyphs used as labels.
     "OK", "×", "?", "+", "−", "-", "…", "¶", "W", "C", "⌘", "⇧",
+    "a–z", "z–a",       # the dictionary's sort-direction toggle
 ))
 
 # The second is per-language and much more interesting: a word that really

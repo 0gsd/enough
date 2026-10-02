@@ -255,14 +255,61 @@ def _under_any(target: Path, roots: list[Path]) -> bool:
     return False
 
 
+def _shipped_roots() -> list[Path]:
+    """Where a project's `rness/` symlinks legitimately lead: the install's
+    `defaults/` and the user-global readvisors dir. Both hold only material
+    that already reaches the prompt (skills, paradigms, policies, readvisors)."""
+    from . import skeleton
+    return [skeleton._install_defaults_root().resolve(strict=False),
+            skeleton.user_readvisors_root().resolve(strict=False)]
+
+
+def _shipped_read_target(project_dir: Path, p: Path) -> Path | None:
+    """The resolved target of a path that is written as living under the
+    project's `rness/` and leads, through the skeleton's symlinks, into a
+    shipped root. None for anything else.
+
+    A shipped skill is a symlink out of the project, so its SKILL.md and
+    `references/` resolve outside the project root and plain containment
+    refuses them. This is the one exception, and it is read-only: the caller
+    is `read_file`. Both halves must hold. The path as written has to sit
+    under `rness/` with no `..` in it (so the exception has one entry point),
+    and the fully resolved target has to sit inside a shipped root (so a
+    symlink planted in the project and aimed anywhere else is still refused)."""
+    if ".." in p.parts:
+        return None
+    lexical = None
+    if p.is_absolute():
+        for root in (project_dir, project_dir.resolve(strict=False)):
+            try:
+                lexical = p.relative_to(root)
+                break
+            except ValueError:
+                continue
+        if lexical is None:
+            return None
+    else:
+        lexical = p
+    if not lexical.parts or lexical.parts[0] != "rness":
+        return None
+    target = (project_dir / lexical).resolve(strict=False)
+    return target if _under_any(target, _shipped_roots()) else None
+
+
 def _safe_join(
     project_dir: Path,
     rel: str,
     *,
     allow_outside_read: bool = False,
     allow_outside_write: bool = False,
+    allow_shipped_read: bool = False,
 ) -> Path:
     """Resolve `rel` under `project_dir`. Raise ValueError on escape.
+
+    With `allow_shipped_read=True` (`read_file` only), a path under the
+    project's `rness/` that leads through a skeleton symlink into the
+    install's `defaults/` or the user's readvisors dir is permitted — see
+    `_shipped_read_target`. Never set it on a write path.
 
     With `allow_outside_read=True`, ABSOLUTE paths matching the file-read
     or file-rw allowlist are permitted.
@@ -277,6 +324,10 @@ def _safe_join(
     if not rel:
         raise ValueError("empty path")
     p = Path(rel).expanduser()
+    if allow_shipped_read and not allow_outside_write:
+        shipped = _shipped_read_target(project_dir, p)
+        if shipped is not None:
+            return shipped
     if p.is_absolute():
         target = p.resolve(strict=False)
         project_root = project_dir.resolve(strict=False)
@@ -461,7 +512,8 @@ def run_read_file(project_dir: Path, call: ToolCall) -> ToolResult:
     if not call.path:
         return ToolResult("read_file", "", False, "error: missing <path>")
     try:
-        target = _safe_join(project_dir, call.path, allow_outside_read=True)
+        target = _safe_join(project_dir, call.path, allow_outside_read=True,
+                            allow_shipped_read=True)
     except ValueError as e:
         return ToolResult("read_file", call.path, False, f"error: {e}")
     if not target.exists():
@@ -1695,6 +1747,17 @@ _readvisor_tools.register()
 # imports `enough.cloud` lazily, so registering it here costs nothing.
 from . import pal_tools as _pal_tools  # noqa: E402
 _pal_tools.register()
+
+# FEED's three tools (0.4.1). Ungated: they read the dictionary and write only
+# the user's own one. Their docs ride on the `lexicographer` skill. The module
+# imports `enough.dictionary` lazily.
+from . import dictionary_tools as _dictionary_tools  # noqa: E402
+_dictionary_tools.register()
+
+# `show_intro` (0.4.1): the brief introduction, on screen without a model
+# writing it. Always on and documented in the core.
+from . import intro as _intro  # noqa: E402
+_intro.register()
 
 
 def _trace_args_for(call: ToolCall) -> dict[str, object]:

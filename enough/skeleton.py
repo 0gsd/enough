@@ -110,7 +110,7 @@ _PROJECT_LOCAL_FILES: dict[str, str] = {
         "Update it via `write_file` per the `profile-maintenance` policy:\n"
         "concrete observations, not labels; pruned when stale; never bloated.\n"
     ),
-    "rness/active-paradigm": "default\n",
+    "rness/active-paradigm": "text-planning\n",
 }
 
 # Empty dirs to create in every project.
@@ -227,7 +227,9 @@ def _read_default(rel: str) -> str:
 
 AGENT_MD = _read_default("AGENT.md")
 MOTIVATION_MD = _read_default("MOTIVATION.md")
-PARADIGM_DEFAULT_MD = _read_default("paradigms/default.md")
+# `default` was folded into `text-planning` in 0.4.1; the name stays for
+# importers, the content is the home paradigm's.
+PARADIGM_DEFAULT_MD = _read_default("paradigms/text-planning.md")
 POLICY_REQUESTS_MD = _read_default("policies/requests.md")
 POLICY_CONTEXT_MGMT_MD = _read_default("policies/context-management.md")
 PROJECT_PROFILE_MD = _PROJECT_LOCAL_FILES["rness/knowledge/project-profile.md"]
@@ -537,7 +539,8 @@ def _populate_paradigm_symlinks(project_dir: Path, defaults_root: Path) -> None:
 
     If the currently-active paradigm gets removed from
     `defaults/paradigms/`, the dangling symlink is pruned here and
-    `get_active_paradigm()` falls back to 'default' on the next read.
+    `get_active_paradigm()` falls back to the home paradigm
+    (`text-planning`) on the next read.
     Project-local paradigm files (real files, not symlinks) are never
     touched."""
     src_paradigms = defaults_root / "paradigms"
@@ -865,7 +868,7 @@ def ensure_skeleton(project_dir: Path) -> bool:
             d.mkdir(parents=True, exist_ok=True)
             (d / ".gitkeep").touch()
 
-        # Seed the multipurpose active-paradigm file: paradigm=default,
+        # Seed the multipurpose active-paradigm file: the home paradigm,
         # help bubbles on (the sticky per-folder default for a first launch).
         from .prompt import seed_multipurpose_file
         seed_multipurpose_file(project_dir / "rness")

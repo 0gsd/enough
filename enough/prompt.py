@@ -138,6 +138,9 @@ file contents here
 <depth>2</depth>
 </tool>
 
+<tool name="show_intro">
+</tool>
+
 Rules:
 - All paths are relative to the project directory. Absolute paths and `../`
   traversal are rejected.
@@ -180,6 +183,10 @@ Rules:
     each chapter is 5k words. The `summary_prompt` field accepts a
     template containing the literal `{step}` placeholder, which is
     substituted with each step's full text before sending.
+- `show_intro` puts enough's brief introduction on the user's screen, in
+  your voice. If a conversation opens with a bare greeting, offer once:
+  "want a brief introduction to enough?" Call it on a yes, or when they ask
+  what enough is or does; then don't repeat it.
 - After a tool call, the harness will send back:
   <tool_result name="toolname" path="..." (or command="...", url="..."")>
   [result or error]
@@ -398,7 +405,7 @@ stop silently.
 # The reason is arithmetic. A local model re-reads the whole system prompt on
 # every turn of every tool loop, so a kilobyte of documentation for a tool the
 # broker has switched off is a kilobyte of the user's context window, and of
-# their prefill time, spent on nothing. Two blocks earn their gate:
+# their prefill time, spent on nothing. Three blocks earn their gate:
 #
 # - the composure tools, behind the `composure_enabled` broker toggle (the
 #   canvas UI is ungated, exactly as before — this gates the *docs* along with
@@ -406,6 +413,10 @@ stop silently.
 # - `install_readvisor`, behind the `readvisory` skill being switched on in
 #   this project. It is the last step of that skill's interview and nothing
 #   else; with the skill off, its documentation is unreachable advice.
+# - the FEED tools (`dict_*`), behind the dictionary shipping with this
+#   install (0.4.1). Short, because then every project pays for it: the
+#   column guide is the `lexicographer` skill, in the Skills section when it
+#   is on and one `dict_guide` call away when it is off.
 #
 # `tool_instructions(project_dir)` assembles them. Both blocks are written to
 # stand alone, so they read correctly wherever they land in the order.
@@ -538,6 +549,29 @@ mistake it for their actual judgment. Run the interview first.
 """
 
 
+DICTIONARY_TOOL_INSTRUCTIONS = """\
+## Dictionary
+
+FEED, enough's english dictionary, and the user's own beside it.
+
+<tool name="dict_lookup">
+<word>gloaming</word>
+</tool>
+
+<tool name="dict_add_entry">
+<word>zork</word>
+<pronunciation>/zɔrk/</pronunciation>
+<pos>noun</pos>
+<definition>A small brass key.</definition>
+</tool>
+
+`dict_update_entry` takes the same tags, only what changes. One tag per
+column; list columns one item per line. Look up first; add only once the
+user has confirmed the entry. Unless the lexicographer skill is in your
+Skills, call `dict_guide` (no tags) for the column guide before writing.
+"""
+
+
 PAL_TOOL_INSTRUCTIONS = """\
 ## Pal
 
@@ -592,14 +626,23 @@ def _skill_enabled(rness: Path, name: str) -> bool:
         return False
 
 
+def _dictionary_available() -> bool:
+    """FEED ships with this install (its source is present), built or not:
+    the tools answer "still being prepared" themselves while it builds."""
+    try:
+        from . import dictionary
+        return dictionary.available()
+    except Exception:  # noqa: BLE001 — no dictionary is not a broken prompt
+        return False
+
+
 def tool_instructions(project_dir: Path, *, pal: bool = False) -> str:
     """The always-on core plus whichever gated blocks this project can use.
 
-    Ordered core → composures → readvisors → pal, which is also cheapest-to-
-    dearest: a project with none of them pays exactly what it paid before any
-    of this landed.
+    Ordered core → composures → readvisors → dictionary → pal. A project
+    with none of them pays exactly what it paid before any of this landed.
 
-    `pal` is the narrowest gate of the three. The other two are switched on
+    `pal` is the narrowest gate of them all. The other two are switched on
     for a project and stay on; a pal block is carried by the one turn the
     user opened with `/pal` and by no other, so `ask_pal` costs an ordinary
     turn nothing at all."""
@@ -614,6 +657,8 @@ def tool_instructions(project_dir: Path, *, pal: bool = False) -> str:
         parts.append(COMPOSURE_TOOL_INSTRUCTIONS)
     if _skill_enabled(rness, "readvisory"):
         parts.append(READVISORY_TOOL_INSTRUCTIONS)
+    if _dictionary_available():
+        parts.append(DICTIONARY_TOOL_INSTRUCTIONS)
     if pal:
         parts.append(PAL_TOOL_INSTRUCTIONS)
     return "\n".join(p.rstrip() + "\n" for p in parts)
@@ -627,7 +672,9 @@ that the user configures through plain-text conventions.
 - Your own configuration files ALL live under `rness/`. Canonical paths:
     - `rness/AGENT.md`                    — your identity
     - `rness/MOTIVATION.md`               — evolving drive
-    - `rness/paradigms/default.md`        — active interaction paradigm
+    - `rness/paradigms/text-planning.md`  — home interaction paradigm
+                                             (the active one is whichever
+                                             `rness/active-paradigm` names)
     - `rness/knowledge/project-profile.md` — living notes about this project
                                              (piped into your prompt every
                                              turn; update per the
@@ -1335,7 +1382,7 @@ def list_paradigms(rness: Path) -> list[tuple[str, str, str]]:
 # As of 0.1.7 it is a small markdown file with two sections:
 #
 #     # Active paradigm
-#     default
+#     text-planning
 #
 #     # Help bubbles
 #     on
@@ -1352,6 +1399,13 @@ def list_paradigms(rness: Path) -> list[tuple[str, str, str]]:
 
 _MP_PARADIGM_HEAD = "Active paradigm"
 _MP_HIGHLIGHTS_HEAD = "Help bubbles"
+
+#: The home paradigm: what a new project starts in, and what every fallback
+#: lands on. Until 0.4.1 this was `default`, which `text-planning` absorbed;
+#: `ensure_multipurpose_file` migrates a stored `default` on launch.
+HOME_PARADIGM = "text-planning"
+#: The retired name. Still honoured where a user kept their own copy.
+_RETIRED_PARADIGM = "default"
 
 
 def _parse_multipurpose(text: str) -> tuple[str | None, bool]:
@@ -1401,17 +1455,19 @@ def _parse_multipurpose(text: str) -> tuple[str | None, bool]:
 def _render_multipurpose(name: str, bubbles_enabled: bool) -> str:
     """Render the multipurpose file from a paradigm name + the help-bubble
     on/off state."""
-    out = [f"# {_MP_PARADIGM_HEAD}", name or "default", "",
+    out = [f"# {_MP_PARADIGM_HEAD}", name or HOME_PARADIGM, "",
            f"# {_MP_HIGHLIGHTS_HEAD}", "on" if bubbles_enabled else "off"]
     return "\n".join(out).rstrip("\n") + "\n"
 
 
 def get_active_paradigm(rness: Path) -> str:
     """Read the active paradigm name from `rness/active-paradigm` (markdown or
-    legacy bare form). Falls back to 'default' when the file is missing OR
-    names a paradigm that doesn't exist on disk."""
+    legacy bare form). Falls back to the home paradigm when the file is
+    missing OR names a paradigm that doesn't exist on disk — and, should the
+    home paradigm itself be gone, to the first paradigm that does exist, so
+    the system prompt never silently loses its Paradigm section."""
     f = rness / _ACTIVE_PARADIGM_FILE
-    name = "default"
+    name = HOME_PARADIGM
     if f.is_file():
         try:
             parsed, _hl = _parse_multipurpose(f.read_text(encoding="utf-8"))
@@ -1419,9 +1475,14 @@ def get_active_paradigm(rness: Path) -> str:
                 name = parsed
         except OSError:
             pass
-    if not (rness / "paradigms" / f"{name}.md").is_file():
-        return "default"
-    return name
+    paradigms = rness / "paradigms"
+    if (paradigms / f"{name}.md").is_file():
+        return name
+    if (paradigms / f"{HOME_PARADIGM}.md").is_file():
+        return HOME_PARADIGM
+    present = sorted(p.stem for p in paradigms.glob("*.md") if p.is_file()) \
+        if paradigms.is_dir() else []
+    return present[0] if present else HOME_PARADIGM
 
 
 def set_active_paradigm(rness: Path, name: str) -> None:
@@ -1458,7 +1519,7 @@ def set_help_bubbles(rness: Path, enabled: bool) -> None:
     """Persist the help-bubble on/off state, preserving the active paradigm."""
     f = rness / _ACTIVE_PARADIGM_FILE
     f.parent.mkdir(parents=True, exist_ok=True)
-    name = "default"
+    name = HOME_PARADIGM
     if f.is_file():
         try:
             n, _b = _parse_multipurpose(f.read_text(encoding="utf-8"))
@@ -1470,31 +1531,55 @@ def set_help_bubbles(rness: Path, enabled: bool) -> None:
 
 
 def seed_multipurpose_file(rness: Path) -> None:
-    """Write a fresh multipurpose file for a NEW project: paradigm=default,
+    """Write a fresh multipurpose file for a NEW project: the home paradigm,
     help bubbles on (the default for a folder's first launch)."""
     f = rness / _ACTIVE_PARADIGM_FILE
     f.parent.mkdir(parents=True, exist_ok=True)
-    f.write_text(_render_multipurpose("default", True), encoding="utf-8")
+    f.write_text(_render_multipurpose(HOME_PARADIGM, True), encoding="utf-8")
+
+
+def _kept_retired_paradigm(rness: Path) -> bool:
+    """True when the user kept their own `default` paradigm: a real file at
+    `rness/paradigms/default.md`, not the symlink every project used to get.
+    A customised copy is theirs, and `default` keeps working for them."""
+    p = rness / "paradigms" / f"{_RETIRED_PARADIGM}.md"
+    return p.is_file() and not p.is_symlink()
 
 
 def ensure_multipurpose_file(rness: Path) -> None:
     """Idempotently ensure the file exists in markdown form (for existing
-    projects). Missing → create with bubbles on; legacy bare → upgrade
-    preserving the paradigm value (bubbles on); already markdown → leave
-    untouched."""
+    projects). Runs on every launch. Missing → create with bubbles on; legacy
+    bare → upgrade preserving the paradigm value (bubbles on); already
+    markdown → leave untouched.
+
+    One migration rides along (0.4.1): a stored `default` — the paradigm
+    `text-planning` absorbed — becomes `text-planning`, in either form,
+    unless `rness/paradigms/default.md` is a real file the user kept. The
+    help-bubble state is preserved either way."""
     f = rness / _ACTIVE_PARADIGM_FILE
     if not f.is_file():
         f.parent.mkdir(parents=True, exist_ok=True)
-        f.write_text(_render_multipurpose("default", True), encoding="utf-8")
+        f.write_text(_render_multipurpose(HOME_PARADIGM, True), encoding="utf-8")
         return
     try:
         text = f.read_text(encoding="utf-8")
     except OSError:
         return
-    if re.search(rf"^#\s+{re.escape(_MP_PARADIGM_HEAD)}\b", text, re.I | re.M):
-        return  # already in markdown form
-    name, _b = _parse_multipurpose(text)  # legacy bare → preserve the name
-    f.write_text(_render_multipurpose(name or "default", True), encoding="utf-8")
+    markdown = bool(re.search(rf"^#\s+{re.escape(_MP_PARADIGM_HEAD)}\b",
+                              text, re.I | re.M))
+    name, bubbles = _parse_multipurpose(text)
+    retired = name == _RETIRED_PARADIGM and not _kept_retired_paradigm(rness)
+    if markdown and not retired:
+        return  # already in markdown form, nothing to migrate
+    if retired:
+        name = HOME_PARADIGM
+    # A legacy bare file reads as bubbles-on; a markdown one keeps its state.
+    try:
+        f.write_text(_render_multipurpose(name or HOME_PARADIGM,
+                                          bubbles if markdown else True),
+                     encoding="utf-8")
+    except OSError:
+        pass
 
 
 def _load_active_paradigm_body(rness: Path, active: str) -> str:

@@ -40,6 +40,10 @@ use std::path::{Path, PathBuf};
 ///   snapshot once the app runs from it. The single file, NOT `docs/` — the
 ///   dev tree keeps gitignored local planning docs there that must never
 ///   ship (0.2.8; before this the .app's help center 404'd).
+/// - `reflib/dict` — FEED's shipped text form (~380 MB of JSON lines, plus
+///   its manifest and NOTICE), which `enough/dictionary.py` builds into
+///   `~/enough/dict/feed.sqlite` on first launch. That one subfolder only:
+///   the rest of `reflib/` is reference material, not runtime data (0.4.1).
 const SNAPSHOT: &[&str] = &[
     "pyproject.toml",
     "uv.lock",
@@ -49,6 +53,7 @@ const SNAPSHOT: &[&str] = &[
     "docs/HELP_CENTER.md",
     "enough",
     "defaults",
+    "reflib/dict",
 ];
 
 /// Junk that must not travel: compiled bytecode (stale, and it would make the
@@ -90,9 +95,9 @@ fn stage_snapshot() {
     let repo = manifest.parent().unwrap().parent().unwrap().to_path_buf();
     let out = manifest.join("snapshot").join("enough-src");
 
-    // Rebuild from scratch every time. The tree is ~8 MB and a stale file
-    // left behind by a rename is exactly the bug this whole mechanism exists
-    // to prevent.
+    // Rebuild from scratch every time. The tree is ~8 MB (plus FEED's
+    // ~380 MB) and a stale file left behind by a rename is exactly the bug
+    // this whole mechanism exists to prevent.
     let _ = fs::remove_dir_all(&out);
 
     for rel in SNAPSHOT {

@@ -167,6 +167,6 @@ update.
 
 ## Examples of requests that do NOT need tracking
 
-- "What does `rness/paradigms/default.md` say?"
+- "What does `rness/paradigms/text-planning.md` say?"
 - "Rename this file to foo.md."
 - "Add a comma to this sentence."

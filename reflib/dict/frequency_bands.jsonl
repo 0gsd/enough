@@ -1,0 +1,9 @@
+{"band": 0, "name": "Unrecorded", "examples": "too rare for the corpus to count: zorse, subitize"}
+{"band": 1, "name": "Very rare", "examples": "smoko, thrapple, aforetime"}
+{"band": 2, "name": "Rare", "examples": "honeypot, gloaming, subfolder"}
+{"band": 3, "name": "Uncommon", "examples": "procrastinate, gourd"}
+{"band": 4, "name": "Occasional", "examples": "lantern, tidy, frugal"}
+{"band": 5, "name": "Familiar", "examples": "window, borrow, gentle"}
+{"band": 6, "name": "Common", "examples": "house, water, happy"}
+{"band": 7, "name": "Very common", "examples": "have, time, people"}
+{"band": 8, "name": "Extremely common", "examples": "the, of, and"}

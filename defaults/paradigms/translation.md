@@ -21,13 +21,13 @@ toggle skills yourself (there is no tool for it), so the paradigm
 engages on translation intent regardless of skill state and the
 skill-off case is surfaced as a user-actionable warning.
 
-- **From `default` paradigm, skill enabled:** switch to this paradigm by
+- **From `text-planning` paradigm, skill enabled:** switch to this paradigm by
   writing `translation` to `rness/active-paradigm` with `write_file`.
   The switch takes effect next turn; for the current turn, tell the user
   you're switching and let them re-send (or, if the request is short,
-  do the translation immediately under default and switch for the
+  do the translation immediately under text-planning and switch for the
   follow-up).
-- **From `default` paradigm, skill OFF:** *still switch* (write
+- **From `text-planning` paradigm, skill OFF:** *still switch* (write
   `translation` to `rness/active-paradigm`). In the same turn, tell the
   user that the `translator` skill is currently disabled and they need
   to toggle it on in the **active skills** section of the sidebar for

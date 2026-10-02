@@ -65,6 +65,12 @@ _STATE_SEAMS = {
     # global scope would otherwise file it in the developer's real
     # ~/enough/readvisors/ and symlink it into every project they open.
     "ENOUGH_READVISORS_ROOT": "readvisors",
+    # FEED (0.4.1): the built dictionary + the user's own entries. And its
+    # source dir, pointed at nothing: every app a test boots would otherwise
+    # start a 380 MB background build from reflib/dict. Dictionary tests
+    # write a small fixture source and point the seam at it themselves.
+    "ENOUGH_DICT_ROOT": "dict",
+    "ENOUGH_DICT_SOURCE": "no-dict-source",
 }
 
 # Seams that must be *absent*, not redirected. Each of these changes

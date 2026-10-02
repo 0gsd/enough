@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.4.0)
+# enough — Agent Guide (v0.4.1)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -39,7 +39,12 @@ from an otherwise local turn (0.4.0 — see "`/pal`" under OPRO-API). A
 canvas — concludes into an answer, a document or **a whole new composure**
 (0.4.0; see "Councils"). An optional **wikisink** subsystem puts an offline
 copy of Wikipedia on the machine (see its own section below and
-[docs/WIKISINK.md](WIKISINK.md)).
+[docs/WIKISINK.md](WIKISINK.md)). **FEED**, the first-party enough english
+dictionary (0.4.1), ships as text in `reflib/dict/`, is built into a local
+SQLite file on first launch, and is read in its own full-frame mode, in a
+word lightbox, and from a right-click on any word (see "The dictionary
+(FEED)"). New projects start in the **text-planning** paradigm, which
+absorbed the retired `default` (see "Add a new paradigm").
 
 This guide tells you what files are involved in what, how the runtime
 flows, what to edit when the user asks you to do common things, and the
@@ -58,6 +63,7 @@ Three locations that matter:
 | `~/enough/readvisors/` | The **user-global** readvisors source (0.3.5), seam **`ENOUGH_READVISORS_ROOT`**, resolved by `skeleton.user_readvisors_root()`. **Never auto-created** — a machine that never forged a readvisor carries no empty folder. It exists because a desktop build's `defaults/` is sealed inside the `.app` and is not writable, so the `readvisory` skill's `install_readvisor` needs somewhere to put a global one. Each entry is `<name>/AGENT.md` + `MOTIVATION.md`, symlinked into every project by the populator. | Edit to affect every project on this machine, including .app installs. |
 | `~/enough/wikisink/` | Default wikisink location: the user's wikisink *data* (comments, overlays, preserved articles, rankings, run state) and — unless pointed elsewhere — the base `.zim` archive(s). Archives can live anywhere, external drives included; several installs can be registered at once. Hidden from the file-manager tree. | Managed via the 🚰 UI; don't hand-edit. |
 | `~/enough/cacheawl/` | The machine-global **cacheawl** store: root-level folders are *cacheboxes* (plain kept-forever text, or cached replicas ingested from a path/URL/wikisink). Global wiki saves land in the `wiki/` box; the dissolved infoworld folders become the `personal`/`public`/`wiki` boxes. Overridable via `ENOUGH_CACHEAWL_ROOT`. Hidden from every project's file tree. | Managed via the cacheawl mode UI + the readvisors' cachebox tools; sidecars are backend-owned. |
+| `~/enough/dict/` | FEED's state root (0.4.1), seam **`ENOUGH_DICT_ROOT`**: `feed.sqlite`, the official dictionary — **built** from the shipped `reflib/dict/` and disposable (rebuilt whenever the manifest digest moves) — and `user-dictionary.sqlite`, the user's own entries — **precious**: created on the first write, never rebuilt or deleted by code. Install-wide, not per project. See "The dictionary (FEED)". | `feed.sqlite` is the build's; the user DB changes only through the `dict_*` tools and `DELETE /api/dict/user/{word}`. Don't hand-edit either. |
 | `<project>/rness/` | The per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/**readvisors** (and into `~/enough/readvisors/` for the user's own); per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`, `project.json`; per-project state in `io/`, `requests/`, `knowledge/`. Composure-round additions: **`rness/readvisors/`** (was `roles/`, migrated by `skeleton._migrate_roles_to_readvisors`), **`rness/io/composure/`** (where new `.comp` files land — in `_EMPTY_DIRS`, so it is back-filled on every launch), **`rness/composure-forms/`** (project forms; **not** in `_EMPTY_DIRS` — created on the first save-as-form) and **`rness/knowledge/councils/`** (exported council transcripts, created by `council.py` on the first conclude). | Edit to affect just this project. |
 | `<dir>/.<name>.comp.comments.json` | A composure's comments sidecar, beside the `.comp` it belongs to. Backend-owned, hidden from the tree by the leading dot, carried along by `composure.move_sidecars()` on a rename. Both write doors refuse it by name. | Managed via the composure comment endpoints; don't hand-edit. |
 
@@ -77,8 +83,8 @@ Every Python module in `enough/`:
 
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
-| [enough/server.py](../enough/server.py) | ~4710 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, `GET /api/pal/status`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Mounts the composure and council routers in one `include_router` call each. Owns the `/pal` prefix branch in `POST /api/chat` and `_render_pal_bubbles`. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. | `create_app()`, `_drive_message()`, `_run_turn(session, message, pal=, log_user=)`, `_render_pal_bubbles()`, `Session.pal_turn`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
-| [enough/prompt.py](../enough/prompt.py) | ~1730 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/readvisor/paradigm enumeration + toggle-state helpers, the generated identity preface, the chief readvisor's name, and the gated tool-doc blocks. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt(project_dir, readvisors=, profile=, pal=)`, `readvisor_identity()`, `identity_preface()`, `chief_name()` / `valid_chief_name()` / `CHIEF_NAME_DEFAULT` / `CHIEF_NAME_MAX`, `readvisor_shape()`, `tool_instructions(project_dir, pal=)`, `TOOL_INSTRUCTIONS` / `COMPOSURE_TOOL_INSTRUCTIONS` / `READVISORY_TOOL_INSTRUCTIONS` / `PAL_TOOL_INSTRUCTIONS` / `PAL_TURN_INSTRUCTION`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()` / `_readvisors_dir()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()` |
+| [enough/server.py](../enough/server.py) | ~4780 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, `GET /api/pal/status`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Mounts the composure, council and dictionary routers in one `include_router` call each, and starts FEED's background build in the lifespan (`dictionary.ensure_built(background=True)`; `cancel_build()` on shutdown). Owns `GET /api/intro` and the intro match in `POST /api/chat` (see "The readvisor panel"). Owns the `/pal` prefix branch in `POST /api/chat` and `_render_pal_bubbles`. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. | `create_app()`, `_drive_message()`, `_run_turn(session, message, pal=, log_user=)`, `_render_pal_bubbles()`, `Session.pal_turn`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
+| [enough/prompt.py](../enough/prompt.py) | ~1815 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/readvisor/paradigm enumeration + toggle-state helpers, the generated identity preface, the chief readvisor's name, and the gated tool-doc blocks. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt(project_dir, readvisors=, profile=, pal=)`, `readvisor_identity()`, `identity_preface()`, `chief_name()` / `valid_chief_name()` / `CHIEF_NAME_DEFAULT` / `CHIEF_NAME_MAX`, `readvisor_shape()`, `tool_instructions(project_dir, pal=)`, `TOOL_INSTRUCTIONS` / `COMPOSURE_TOOL_INSTRUCTIONS` / `READVISORY_TOOL_INSTRUCTIONS` / `DICTIONARY_TOOL_INSTRUCTIONS` / `PAL_TOOL_INSTRUCTIONS` / `PAL_TURN_INSTRUCTION`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()` / `_readvisors_dir()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()`, `HOME_PARADIGM` / `ensure_multipurpose_file()` (the `default` → home migration) |
 | [enough/composure.py](../enough/composure.py) | ~3060 | The composure core (0.3.5): the `.comp` HTML5 parser/serializer, the sanitizer, markdown ⇄ rich text, the node-level op vocabulary (the only way content changes), `place_module`/`arrange`/`estimate_height`, the JSON document model the canvas renders from, the comments sidecar, the forms registry, the outline→composure converter, and the write-door denial. **No FastAPI import** — exercisable with no web layer. See "Composures". | `loads()` / `dumps()`, `model()`, `apply_ops()`, `path_lock()`, `OP_NAMES` / `SOURCES` / `MODULE_TYPES` / `BG_SWATCHES` / `SHIPPED_FORMS` / `CAPS`, `place_module()`, `estimate_height()`, `write_denial()`, `comments_path()` / `load_comments()` / `move_sidecars()`, `parse_outline()` / `outline_ops()` / `from_outline()`, `ComposureError` |
 | [enough/composure_api.py](../enough/composure_api.py) | ~520 | HTTP translation only: `build_router(project_dir, resolve_path, emit)` → the `APIRouter` `create_app` mounts. Every `/api/composure*` route, the comments CRUD, `link-preview`, `webframe/refresh`, and the `composure` SSE event. | `build_router()`, `EVENT` |
 | [enough/composure_tools.py](../enough/composure_tools.py) | ~490 | The nine readvisor composure tools; `register()` adds them to `tools._DISPATCH` / `_TRACE_TOGGLE` at `tools` import time. Gated by `composure_enabled`. | `TOOL_NAMES`, `register()`, `run_read_composure()` … `run_composure_from_outline()`, `CACHE_OVER_CHARS` |
@@ -86,9 +92,13 @@ Every Python module in `enough/`:
 | [enough/council_api.py](../enough/council_api.py) | ~680 | `build_router(project_dir, resolve_path, emit, session)` → the `/api/council/*` router. HTTP translation, the two lock exclusions, the brief-module write at setup, `POST /api/council/reconvene`, and the `council` SSE event. | `build_router()` |
 | [enough/readvisor_tools.py](../enough/readvisor_tools.py) | ~325 | `install_readvisor` (P7): the nine ordered refusals, the payload scan through a tempdir, the `.<name>.installing/` stage-then-rename write, and the `readvisors_changed` side effect. `register()` wires it into `tools._DISPATCH` at import time; gated by `readvisory_install`. | `TOOL_NAMES`, `register()`, `run_install_readvisor()`, `scan_documents()`, `shipped_names()` |
 | [enough/pal_tools.py](../enough/pal_tools.py) | ~380 | `/pal` (0.4.0): the command parser, the turn window, the `ask_pal` tool runner and the result codec. **No cloud import at module level** (`enough.cloud` drags httpx + keyring in) — `run_ask_pal` imports it inside the function, and the untrusted-content markers are kept as literals that `tests/test_pal.py` pins to the real constants. `register()` wires `ask_pal` into `tools._DISPATCH` / `_TRACE_TOGGLE` at `tools` import time. Gated by nothing of its own: the cloud gate is the gate. | `TOOL_NAMES`, `register()`, `strip_command()`, `pal_turn()` / `turn_active()` / `reset_runtime()` / `PalTurn`, `run_ask_pal()`, `render_result_body()` / `parse_result_body()`, `USAGE_HINT` / `ALREADY_CLOUD_NOTE` / `denial_no_pal_turn()` / `denial_already_asked()` / `denial_too_long()`, `MAX_PROMPT_CHARS` / `MAX_TOKENS` / `CACHE_SOURCE` / `SIDE_EFFECT` / `RESULT_HEADER` |
+| [enough/dictionary.py](../enough/dictionary.py) | ~1160 | FEED's engine (0.4.1): locations + seams, the background build of `feed.sqlite` from `reflib/dict` (digest-gated, temp file + `os.replace`, cancellable), the read API over both DBs (the user row wins; `origin` on every row), the nine sort keys and the SQL functions behind two of them, the in-process order cache, and the user-dictionary writes. **No FastAPI import.** See "The dictionary (FEED)". | `source_dir()` / `state_root()` / `available()`, `ensure_built(background=)` / `build()` / `cancel_build()` / `status()`, `lookup()` / `entry()` / `entries()` / `index()` / `position()` / `facets()`, `user_add()` / `user_update()` / `user_delete()`, `era_ord()` / `era_group_ord()` / `syllable_count()`, `normalize()`, `SORT_KEYS` / `FILTER_KEYS` / `JSON_COLUMNS` / `REQUIRED` / `REPORTED` / `MAX_LIMIT`, `DictionaryUnavailable` |
+| [enough/dictionary_api.py](../enough/dictionary_api.py) | ~100 | `build_router()` → the `/api/dict/*` router; closes over nothing (the dictionary is install-wide). Plain `def` handlers on the thread pool: 400 for a bad sort/filter, 503 while unbuilt, 404 for an unknown `/entry`. | `build_router()` |
+| [enough/dictionary_tools.py](../enough/dictionary_tools.py) | ~340 | The four readvisor FEED tools; `register()` wires them like `pal_tools`. Writes reach only the user DB and fire `dict_changed`. **No toggle** — the documentation is what is gated. | `TOOL_NAMES`, `SIDE_EFFECT`, `register()`, `run_dict_lookup()` / `run_dict_add_entry()` / `run_dict_update_entry()` / `run_dict_guide()`, `render_entry()`, `fields_from_call()` / `parse_form()`, `guide_text()` |
+| [enough/intro.py](../enough/intro.py) | ~205 | The brief introduction (0.4.1): the text (`defaults/intro.md`, translations at `static/i18n/<lang>/intro.md`), the whole-message match `/api/chat` answers with no model turn, the `show_intro` tool and its `intro` side effect, and the reload re-render. | `text_for()` / `path_for()` / `english_path()`, `is_intro_request()` / `INTRO_PHRASES` / `INTRO_COMMAND` / `normalize()`, `bubble()`, `run_show_intro()`, `render_tool_result()` / `is_intro_text()`, `set_language_source()`, `register()` |
 | [enough/skillaudit.py](../enough/skillaudit.py) | ~1040 | First-use audit of untrusted skills (0.2.2). Trust classification (symlink into *an* enough install's `defaults/skills/` = trusted — this install or a sibling one, since 0.2.7), the content fingerprint, the `verdict.json` sidecar, both audit passes (deterministic `payload_scanner.py` + a single non-streaming LLM completion), the in-flight registry, and the guarded toggle. Progress on the `skill-audit` SSE event. | `is_trusted()`, `fingerprint()` / `skill_fingerprint()`, `skill_state()`, `set_skill_enabled_guarded()`, `SkillAuditRefused`, `audit_skill()` / `audit_and_enable()`, `run_llm_audit()` (module-level test hook), `quarantine_untrusted()`, `trust_override()`, `read_verdict()` / `write_verdict()` |
 | [enough/broker.py](../enough/broker.py) | ~440 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
-| [enough/tools.py](../enough/tools.py) | ~1745 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers), the tool-call XML parser, the dispatch table. Two import-time `register()` calls at the bottom fold in the composure and readvisor tools. `fetch_and_cache()` is the shared fetch pipeline `run_fetch_url` and the webframe refresh both render. | `_DISPATCH` (~line 1627), `_TRACE_TOGGLE` (~line 1656), `execute()`, `parse_tool_calls()`, `fetch_and_cache()`, `ToolResult.side_effects`, `_CLOUD_KEY_EXFIL_PATTERNS` |
+| [enough/tools.py](../enough/tools.py) | ~1805 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers), the tool-call XML parser, the dispatch table. Five import-time `register()` calls at the bottom fold in the composure, readvisor, pal, dictionary and intro tools. `read_file` alone may follow a `rness/` symlink into a shipped root, read-only (`_shipped_read_target`, 0.4.1). `fetch_and_cache()` is the shared fetch pipeline `run_fetch_url` and the webframe refresh both render. | `_DISPATCH` (~line 1669), `_TRACE_TOGGLE` (~line 1698), `execute()`, `_safe_join()` / `_shipped_read_target()`, `parse_tool_calls()`, `fetch_and_cache()`, `ToolResult.side_effects`, `_CLOUD_KEY_EXFIL_PATTERNS` |
 | [enough/project_meta.py](../enough/project_meta.py) | ~300 | `rness/project.json`: the project's nice name + description, the `ui` block (`ui_scale`, `text_scale`, `readvisor_panel`) and the `composure` block (`launch`, `path`, `form`, `last`). Every reader gets a fully populated, validated view; a garbage value reads as the default rather than raising. | `load()`, `save()`, `save_ui()`, `save_composure()`, `touch_composure()` |
 | [enough/convert.py](../enough/convert.py) | ~1395 | Document conversion (0.2.5): the format **registry** (`FORMATS`), engine probing + caching, twin/assets/manifest naming, the state machine, the job runner that drives the worker, export/sync/resolve, and the `pdf`-extra installer. Imports nothing heavy — docling and pandoc are only ever reached through `convert_worker`. See "Document conversion" below. | `FORMATS` / `formats_view()` / `engines()`, `pandoc_path()` / `typst_path()` / `docling_available()`, `twin_path()` / `assets_dir()` / `manifest_path()` / `pair_for()`, `state()` / `has_twin()`, `read_manifest()` / `write_manifest()`, `ConvertJobs`, `do_export()` / `sync_after_save()` / `resolve()`, `ExtraInstaller`, `installed_extras()` / `record_extra()`, `reset_engines()` |
 | [enough/convert_worker.py](../enough/convert_worker.py) | ~840 | The out-of-process worker: `python -m enough.convert_worker`, one JSON job on stdin, NDJSON records on stdout, exit. pandoc is shelled out to; **docling runs in this process** — which is the whole reason the worker exists (torch must never be imported into the server). | `main()`, `_OPS` (`convert` / `export` / `prefetch`), `do_convert()` / `do_export()` / `do_prefetch()`, `_convert_docling()`, `_flatten_media()` / `_relink_docling_assets()` / `_normalize_images()`, `_Heartbeat`, `TWIN_FORMAT` |
@@ -106,14 +116,18 @@ Every Python module in `enough/`:
 | [enough/cacheawl.py](../enough/cacheawl.py) | ~1470 | The cacheawl store: cachebox CRUD, path/URL/wikisink **ingest**, the `_cachebox.merirmaid` mirror generator + reconcile, the mirror/sidecar write-guards, transfer (copy/move), and the launch-time `infoworld` migration. Root is `~/enough/cacheawl/` (or `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store; nothing else writes there. Since 0.2.5 it also exports the generic folder→flowchart walker `home.py` builds project maps with. | `root()`, `create_cachebox()` / `list_cacheboxes()` / `cachebox_tree()`, `run_ingest()`, `regenerate_mirror()` / `reconcile()` / `reconcile_all()`, `folder_flowchart()`, `mirror_write_denial()`, `migrate_infoworld()` |
 | [enough/home.py](../enough/home.py) | ~805 | The home screen (0.2.5): the project **registry** (`~/enough/config/projects.json`, seam `ENOUGH_PROJECTS_STATE`), the ¶/W/C counters ported from the top bar, the fingerprint cache (which since 0.2.8 also snapshots the `rness/project.json` display name/description so an unreachable folder's row keeps its nice name — live reads still win), seeding from the shell's `desktop.json` MRU (temp-dir paths — chiefly the wizard's `$TMPDIR/enough-onboarding` scratch — are refused, skipped, and pruned when the registry is durable, 0.2.8), the project map (via `cacheawl.folder_flowchart`), the add-guards + the osascript folder chooser, and both halves of the open/close handoff. Imports `server` **lazily, inside functions** — `server` imports `home` at module level, and that is the cycle-breaker. | `projects_state_path()` / `config_dir()` / `handoff_path()`, `read_registry()` / `save_registry()` / `register()` / `touch_opened()` / `set_hidden()`, `seed_from_desktop()`, `count_text()` / `fingerprint_of()` / `refresh_entry()` / `list_projects()`, `build_project_mirror()`, `check_addable()` / `add_project()` / `choose_folder()`, `write_handoff()` / `read_handoff()`, `exec_argv()` |
 | [enough/logger.py](../enough/logger.py) | small | Stdlib logging setup. | — |
-| [enough/static/index.html](../enough/static/index.html) | ~30200 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), **the readvisor panel** (`#readvisor-panel`, the third `.layout` column — the conversation lives here now, not in a chat home pane), **the composure canvas** (`#composure` at the base layer: `COMP`, `COMP_TOOLS`, `COMP_MODULE_RENDERERS`, `COMP_FORM_BEHAVIORS`, ~126 `comp*` functions), **the composure base indicator + peek** (`html[data-comp-peek]`), SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode, cacheawl split-view mode, the home frame + project map + handoff overlays (gated on `IS_HOME` / `body[data-mode]`), SVG icon pipeline (`data-icon`/`iconSrc`), MODE STACK registry, confirmOverlay. **The five per-mode chat pills are gone** (review / edit / merirmaid / wiki / cacheawl) — there is one composer now, `#message` in the panel |
+| [enough/static/index.html](../enough/static/index.html) | ~38150 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), **the readvisor panel** (`#readvisor-panel`, the third `.layout` column — the conversation lives here now, not in a chat home pane), **the composure canvas** (`#composure` at the base layer: `COMP`, `COMP_TOOLS`, `COMP_MODULE_RENDERERS`, `COMP_FORM_BEHAVIORS`, ~126 `comp*` functions), **the composure base indicator + peek** (`html[data-comp-peek]`), SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode, cacheawl split-view mode, the home frame + project map + handoff overlays (gated on `IS_HOME` / `body[data-mode]`), SVG icon pipeline (`data-icon`/`iconSrc`), MODE STACK registry, confirmOverlay, **the shared modal a11y helper** (`MODAL`, `modalSync()`), **the find bar** (`findBarAttach`, `FIND_BARS`), **dictionary mode** (`#dict-mode`, `DICT`, `dict*`), **the word data lightbox** (`#wdl-modal`, `WDL`, `wdl*`) and the **"dictionary entry" menu** (`#dict-ctx-menu`). **The five per-mode chat pills are gone** (review / edit / merirmaid / wiki / cacheawl) — there is one composer now, `#message` in the panel |
 
 `defaults/` ships templates that get copied or symlinked into project
 skeletons by `skeleton.py`:
 
 - `defaults/AGENT.md`, `defaults/MOTIVATION.md` — root identity files (copied)
 - `defaults/skills/<name>/SKILL.md` — bundled skills (symlinked)
-- `defaults/paradigms/<name>.md` — bundled paradigms (symlinked)
+- `defaults/paradigms/<name>.md` — bundled paradigms (symlinked);
+  `text-planning` is the home one (`prompt.HOME_PARADIGM`); `default` was
+  retired in 0.4.1
+- `defaults/intro.md` — the brief introduction (0.4.1). Read in place from
+  the install, never copied into a project: an edit reaches every project
 - `defaults/readvisors/<name>/` — bundled readvisors, `AGENT.md` +
   `MOTIVATION.md` each (symlinked). Renamed from `defaults/roles/` in 0.3.5.
   They are not consultants you report from — every switched-on readvisor is
@@ -147,11 +161,12 @@ unit tests: `cargo test` in `desktop/src-tauri/`.
 | [desktop/src-tauri/src/http.rs](../desktop/src-tauri/src/http.rs) | ~60-line loopback-only HTTP/1.1 client (no client crate) |
 | [desktop/src-tauri/src/bundled.rs](../desktop/src-tauri/src/bundled.rs) | where the bundle's payload lives (uv sidecar, llama.cpp, source snapshot), derived from `current_exe()` |
 | [desktop/src-tauri/src/onboarding.rs](../desktop/src-tauri/src/onboarding.rs) | the first-run wizard's six IPC commands + the launch thread's wait loop |
-| [desktop/src-tauri/build.rs](../desktop/src-tauri/build.rs) | stages the source snapshot (pyproject, uv.lock, `enough/`, `defaults/`, licenses, `docs/HELP_CENTER.md` — the single file, so gitignored plan docs never ship; without it the .app's help center 404'd pre-0.2.8) into the bundle on every `cargo build`; since 0.2.7 also stages `enough/static/enough-loader_1-2.svg` into `desktop/ui/` (gitignored there) so the loading screen can show it |
+| [desktop/src-tauri/build.rs](../desktop/src-tauri/build.rs) | stages the source snapshot (pyproject, uv.lock, `enough/`, `defaults/`, licenses, `docs/HELP_CENTER.md` — the single file, so gitignored plan docs never ship; without it the .app's help center 404'd pre-0.2.8 — and, since 0.4.1, `reflib/dict`, FEED's ~380 MB text form: that subfolder only, not `reflib/`) into the bundle on every `cargo build`; since 0.2.7 also stages `enough/static/enough-loader_1-2.svg` into `desktop/ui/` (gitignored there) so the loading screen can show it |
 | [desktop/ui/loading.html](../desktop/ui/loading.html) | the shell's own page; static, zero Tauri IPC exposed to the enough UI. Since 0.2.7 it shows the real loader graphic (mascot + wordmark, the same SVG `enough/static/loader.html` uses) instead of the wordmark set in type |
 | [desktop/ui/onboarding.html](../desktop/ui/onboarding.html) | the first-run wizard: welcome → environment → models → extras. Drives the *existing* `/api/models*` endpoints through the Rust proxy; shares nothing with `index.html` |
+| [desktop/src-tauri/tauri.conf.json](../desktop/src-tauri/tauri.conf.json) | `bundle.macOS.dmg` (0.4.1): a 660x400 window, enough.app at (180,170), Applications at (480,170), and a plain background PNG (`desktop/src-tauri/dmg/background.png`) — the background is what makes the bundler park hidden items off-window. [scripts/check_dmg_layout.py](../scripts/check_dmg_layout.py) `PATH.dmg` mounts a built image read-only, decodes its `.DS_Store` (stdlib only) and fails on a wrong position, a wrong window size, or any dotfile with an icon slot inside the window — the 0.4.0 DMG, built while Finder showed hidden files, gave `.VolumeIcon.icns` a slot and shoved both real icons |
 | [desktop/fetch-sidecars.sh](../desktop/fetch-sidecars.sh) | checksum-pinned fetch of the `uv` and `llama.cpp` release binaries (they are gitignored, not vendored) |
-| [desktop/RELEASE.md](../desktop/RELEASE.md) | the user-executed sign / notarize / staple / verify checklist |
+| [desktop/RELEASE.md](../desktop/RELEASE.md) | the user-executed release checklist: sync the dictionary before the bump, the Developer ID certificate (must be **G2**-issued; the original CA expires 2027-02-01), sign / notarize / staple / verify, the Finder hidden-files note for the DMG step, and `scripts/check_dmg_layout.py` (all 0.4.1 additions). The source of truth — reference it, don't restate it |
 
 The shell talks to the backend it spawned through the `ENOUGH_DESKTOP*`
 env gate (see "What NOT to touch"). The .app runs the source snapshot
@@ -243,6 +258,10 @@ When a user message arrives at `POST /api/chat`:
    stays on screen, one copy-paste from being re-sent. (The mirror rule —
    a council control refused while a *chat* turn streams — is a 409 from
    the council router. See "Councils".)
+   Right after it (0.4.1), **the brief introduction**: a whole-message
+   match (`intro.is_intro_request`) is answered on the spot with the
+   user's bubble plus the chief's intro bubble and **no model turn** —
+   history and session log still get both. See "The readvisor panel".
 1. **The `/pal` prefix, second** (0.4.0). `pal_tools.strip_command()` returns
    `None` for an ordinary message and otherwise the message with the token
    removed (`""` for a bare `/pal`). Four outcomes, and only one of them
@@ -293,8 +312,11 @@ When a user message arrives at `POST /api/chat`:
      `TOOL_INSTRUCTIONS` core, plus `COMPOSURE_TOOL_INSTRUCTIONS` when
      `broker.is_enabled("composure_enabled")`, plus
      `READVISORY_TOOL_INSTRUCTIONS` when the `readvisory` skill is switched
-     on in this project, plus `PAL_TOOL_INSTRUCTIONS` when `pal=True`.
-     Ordered core → composures → readvisors → pal, cheapest gate first. The
+     on in this project, plus `DICTIONARY_TOOL_INSTRUCTIONS` whenever FEED
+     ships with the install (`dictionary.available()` — a manifest and a
+     schema in the source dir, built or not), plus `PAL_TOOL_INSTRUCTIONS`
+     when `pal=True`. Ordered core → composures → readvisors → dictionary →
+     pal. The
      first two gates **fail open** — an unreadable broker config leaves the
      composure block in, because a gate that hid working tools would be
      worse than a gate that costs a kilobyte. A project using neither pays
@@ -302,18 +324,23 @@ When a user message arrives at `POST /api/chat`:
      one**: the other two are switched on for a project and stay on, while
      the pal block rides on the single turn the user opened with `/pal`, so
      `ask_pal` costs an ordinary turn nothing.
-     `tests/test_prompt_weight.py` pins the budgets (core ≤ 17 500 chars,
-     fully enabled ≤ 22 000, `PAL_BUDGET` ≤ 1 200 for the pal block by
-     itself) **and both directions of the coverage question**: every name in
-     `tools._DISPATCH` is documented somewhere in
-     `fully_enabled(project) + tool_instructions(pal=True)`, and every
-     `<tool name="x">` example names something dispatchable — a tool is
-     documented if the turn that can call it says so, not if every turn
-     does. `CORE_BUDGET` and `FULL_BUDGET` are unchanged in value *and in
-     meaning*: `FULL_BUDGET` measures what an **ordinary** turn can carry,
-     and the pal block is not in it. Headroom under the full budget is
-     deliberately tiny — tens of characters — so the next round that adds a
-     tool has to raise the number on purpose.
+     `tests/test_prompt_weight.py` pins the budgets — `CORE_BUDGET` 17 500
+     chars, which since 0.4.1 is the core **plus the dictionary block**,
+     because every install that ships FEED carries it (`show_intro` and its
+     one-time offer, ~300, and the block, ~580, both fitted inside the old
+     headroom); `FULL_BUDGET` 22 900, raised by 900 in 0.4.1 for those two
+     (the tree measured ~21 960 before, ~22 850 after); `PAL_BUDGET` 1 200
+     for the pal block by itself — **and both directions of the coverage
+     question**: every name in `tools._DISPATCH` is documented somewhere in
+     `fully_enabled(project) + tool_instructions(pal=True)`, every
+     `<tool name="x">` example names something dispatchable, no `<tool`
+     example lacks its `name="..."`, and every example block round-trips
+     through `tools.parse_tool_calls` — a tool is documented if the turn
+     that can call it says so, not if every turn does. `FULL_BUDGET`
+     measures what an **ordinary** turn can carry, and the pal block is not
+     in it. Headroom under the full budget is deliberately tiny — tens of
+     characters — so the next round that adds a tool has to raise the
+     number on purpose.
    - **Routing decision**: read `current` from `models.load_state()`. If
      `opro-api`, dispatch to `cloud.stream_chat_completion()`. Otherwise
      dispatch to `llm.stream_chat()` (the local llama-server). Both
@@ -371,6 +398,9 @@ cache.
 | Cacheboxes | `~/enough/cacheawl/<box>/…` — root-level box folders + backend-owned `.cachebox.json` + `_cachebox.merirmaid` sidecars | none — created via UI/readvisor/migration | no (readvisors reach it via the cachebox tools) |
 | Wikisink registry/state | `~/enough/config/wikisink.json` (user-global, **not** per-project) | none | no |
 | Wiki comments/overlays | `<wikisink data dir>/comments/`, `overlay/`, `preserved/` | none | no |
+| FEED (the dictionary) | — (install-wide) | `reflib/dict/` (shipped text form) → `~/enough/dict/feed.sqlite` (built) | only `DICTIONARY_TOOL_INSTRUCTIONS`; entries are read through `dict_lookup` |
+| The user's own dictionary | — (machine-global) `~/enough/dict/user-dictionary.sqlite` | created from `reflib/dict/schema.sql` on the first write | no — read through `dict_lookup`, where a user row wins |
+| The brief introduction | — | `defaults/intro.md` (+ `static/i18n/<lang>/intro.md`) | no — `show_intro` documents it; the text goes on screen, not into the prompt |
 | Converted documents | `<dir>/<name>.<ext>.md` (the twin — a user file), `<name>.<ext>.assets/` + hidden `.<name>.<ext>.convert.json` (both backend-owned) | none — written by `convert.py` on first open | no (a readvisor gets the twin through `read_file`; the *registry* is rendered into the prompt by `prompt.convert_instructions()`) |
 
 **Active vs available**: skills and readvisors ship as files but only become
@@ -795,7 +825,7 @@ same model the chat does and are gated by nothing extra.
 
 | Tool | Runner | Gating |
 |---|---|---|
-| `read_file` | `tools.run_read_file` | path under project OR on file-read allowlist. A convertible original returns its **twin** (converting first, on a daemon thread joined for `tools.CONVERT_BLOCKING_SECONDS` = 120) — see "Document conversion" |
+| `read_file` | `tools.run_read_file` | path under project OR on file-read allowlist — OR, read-only, a path under `rness/` that leads through a skeleton symlink into a shipped root (`_shipped_read_target`, 0.4.1; see "What NOT to touch"). A convertible original returns its **twin** (converting first, on a daemon thread joined for `tools.CONVERT_BLOCKING_SECONDS` = 120) — see "Document conversion" |
 | `write_file` | `tools.run_write_file` | path under project OR on file-rw allowlist; not in `rness/requests/done/`. **`.girraph` and `.comp` are refused whole-file** (`composure.write_denial()` covers `.comp` *and* its `.<name>.comp.comments.json` sidecar, and the message names the composure tools to use instead). A refused sync-on-save of a syncing twin comes back as `ok=False` whose body says the twin *was* written |
 | `export_document` | `tools.run_export_document` | path under project OR on the file-**rw** allowlist (it writes a real document); `<target>` from `convert.EXPORT_TARGETS`, `<mode>` `copy` (default) or `overwrite` |
 | `shell` | `tools.run_shell` | exfiltration patterns denied; otherwise no path constraint |
@@ -825,13 +855,19 @@ same model the chat does and are gated by nothing extra.
 | `comp_save_as_form` | `composure_tools.run_comp_save_as_form` | `composure_enabled`; writes a reusable form into `rness/composure-forms/` |
 | `composure_from_outline` | `composure_tools.run_composure_from_outline` | `composure_enabled`; one markdown outline → a whole composure, deterministically. The `scaffold` skill teaches the grammar — see "Composures" |
 | `install_readvisor` | `readvisor_tools.run_install_readvisor` | **`readvisory_install`** toggle; kebab-case `<name>` ≤ 40 chars, `<scope>` `project`\|`global`, both documents non-empty and ≤ 40 KB, `prompt.readvisor_shape()` clean, the payload scan clean, destination not a symlink, `<replace>yes</replace>` to overwrite |
+| `dict_lookup` | `dictionary_tools.run_dict_lookup` | **no toggle** (it reads). FEED shipped and built — otherwise a sentence saying which ("not bundled", "still being prepared (N%)", "could not be prepared"), never a raise |
+| `dict_add_entry` | `dictionary_tools.run_dict_add_entry` | no toggle; writes `user-dictionary.sqlite` only. `<word>` a–z + `pronunciation` / `pos` / `definition` required; refuses a word FEED already has as a headword; fires `dict_changed` |
+| `dict_update_entry` | `dictionary_tools.run_dict_update_entry` | no toggle; the user's entry, or the user's own version of a FEED word (which then overrides it everywhere). An empty tag clears a column; fires `dict_changed` |
+| `dict_guide` | `dictionary_tools.run_dict_guide` | none; no tags. The install's `lexicographer` SKILL.md, for a model whose skill is off |
+| `show_intro` | `intro.run_show_intro` | none; documented in the always-on core with its one-time offer. Fires `intro` |
 | `ask_pal` | `pal_tools.run_ask_pal` | **no toggle of its own** — the cloud gate is the gate. In order: a pal turn is open (the user typed `/pal`) → `cloud.gate_status()` open → a non-empty `<prompt>` (**not** `<content>`, though it is accepted as a fallback) → ≤ `MAX_PROMPT_CHARS` (6 000), refused not truncated → no `_CLOUD_KEY_EXFIL_PATTERNS` match → **one call per turn**, checked last. See "`/pal`" under OPRO-API |
 
-All registered in `_DISPATCH` (~line 1617 in tools.py) and
-`_TRACE_TOGGLE` (~line 1646) — the last eleven add themselves through the
-**three** import-time `register()` calls at the bottom of tools.py
+All registered in `_DISPATCH` (~line 1669 in tools.py) and
+`_TRACE_TOGGLE` (~line 1698) — the last sixteen add themselves through the
+**five** import-time `register()` calls at the bottom of tools.py
 (`composure_tools.register()`, `readvisor_tools.register()`,
-`pal_tools.register()`), which is the pattern to copy for any future tool
+`pal_tools.register()`, `dictionary_tools.register()`, `intro.register()`),
+which is the pattern to copy for any future tool
 family: the op vocabulary stays in one module instead of spreading runners
 through tools.py. The tool-call XML parser (`parse_tool_calls`) handles
 arbitrary tool names — extra inner tags (beyond `<path>`, `<content>`,
@@ -843,16 +879,17 @@ verbatim and summarizes `<content>` as `<N chars>`.
 A runner that changes something the frontend has open returns a
 **`ToolResult.side_effects`** dict; `server._handle_tool` fans each key out
 as an SSE event of that name. That is how a composure tool fires the
-`composure` event, `install_readvisor` fires `readvisors_changed`, and
-`ask_pal` fires `pal_exchange`.
+`composure` event, `install_readvisor` fires `readvisors_changed`,
+`ask_pal` fires `pal_exchange`, the two dictionary writes fire
+`dict_changed`, and `show_intro` fires `intro`.
 
 Tool documentation that the readvisors read is in
 [enough/prompt.py](../enough/prompt.py) under `TOOL_INSTRUCTIONS`,
-`COMPOSURE_TOOL_INSTRUCTIONS`, `READVISORY_TOOL_INSTRUCTIONS` and
-`PAL_TOOL_INSTRUCTIONS`, assembled by
+`COMPOSURE_TOOL_INSTRUCTIONS`, `READVISORY_TOOL_INSTRUCTIONS`,
+`DICTIONARY_TOOL_INSTRUCTIONS` and `PAL_TOOL_INSTRUCTIONS`, assembled by
 `tool_instructions(project_dir, pal=False)` (see "The request lifecycle" for
 the gates). Every new tool needs an example block + prose explanation in the
-right one of the four — and `tests/test_prompt_weight.py` will fail until it
+right one of the five — and `tests/test_prompt_weight.py` will fail until it
 has one. **A new tool whose docs ride in the always-on core must either gate
 its own block or raise `FULL_BUDGET` on purpose**; the headroom is tens of
 characters, which is the point.
@@ -1133,6 +1170,48 @@ selected. Those did not survive, by owner decision — context stays empty
 until something is selected. Restoring one would go in the same submit
 hook.
 
+### Two sides, and the brief introduction (0.4.1)
+
+- **Sides.** `.msg.user` hugs the left of `.conversation`
+  (`margin-right: auto`), `.msg.assistant` the right (`margin-left: auto`);
+  both `width: fit-content`, `max-width: 86%`, with a 2px accent rule on
+  the outer edge. Only the block moves — the text inside stays
+  left-aligned, because right-justified prose, code and tables are hard to
+  read. `system`, `rness` and pal bubbles are enough's own notes, not a
+  voice, and reset to full width. The `.conversation {` rule itself is back
+  after two releases missing (see `tests/test_css_integrity.py` under "The
+  pre-commit suite").
+- **The text.** One English file, `defaults/intro.md`, owner-editable;
+  translations at `enough/static/i18n/<lang>/intro.md` when they exist,
+  English otherwise (the `/api/help-center` rule). Not checked by
+  `i18n_check.py`, so a missing translation is a fallback, not a failure.
+- **Three doors, one text.** `GET /api/intro?lang=` → `{text, lang}`
+  (`lang` is what was actually served). The whole-message match in
+  `POST /api/chat`: after `intro.normalize()` (lowercase, punctuation
+  dropped, a leading `/` kept), `/intro` matches any time and
+  `INTRO_PHRASES` ("what can you do", "what can enough do", "what is
+  enough", "what is this", "help") only while `session.history` is empty —
+  later, "what is this?" is about something on screen — and never while a
+  turn holds the generation lock. It answers through `_reply_without_turn`
+  and still writes history and the session log. And the `show_intro` tool,
+  always on, documented in the core together with the one-time offer
+  after a bare greeting; its `intro` side effect `{html, text, speaker}`
+  draws the bubble and its result tells the model the text is already on
+  screen. Edit `INTRO_PHRASES` there and only there.
+- **The bubble** is the chief's: `.msg.assistant.intro` with
+  `data-markdown="intro"` and the escaped markdown source as its body;
+  `introRender()` renders it once, and `introReveal()` scrolls to its
+  *first* line. On reload `_render_turn_from_history` redraws it from either
+  form (`intro.is_intro_text`, `intro.render_tool_result`).
+- **The empty hint** is the plain *awaiting your first message.*
+  (`server._default_empty_hint`; the "ask what they can do" line is gone).
+  `introDecorateEmpty()` clones `#intro-link-tpl` — a button that sends
+  `/intro` through the normal chat path — into whatever `#empty-hint` is
+  showing, the server's, `/reset`'s or a model switch's alike.
+  `defaults/AGENT.md`'s "First conversation" carries the same offer, but
+  only into new projects (AGENT.md is a copy); the core tool doc reaches
+  every project.
+
 ---
 
 ## Composures (the `.comp` format, the one door, the canvas)
@@ -1359,6 +1438,24 @@ page-fit rule for `kind=page` while `!COMP.zoomed`, computed at read time
 rather than written into `userZoom` so it cannot ratchet down as panels come
 and go.
 
+**Auto fit (0.4.1).** One `ResizeObserver` on `#comp-viewport`
+(`compWatchViewport`): any size change — the sidebar, the readvisor panel
+docked / full / closed, the comments panel, a window resize, a ui-scale step
+— re-applies the view at once (so a page's width clamp tracks the 180 ms
+grid transition frame by frame) and re-arms a `COMP_AUTOFIT_SETTLE_MS`
+(160 ms) timer, so a transition ends in exactly **one** fit. A `board` gets
+`compFitAll(true)`, the fit button's own action; a `page` gets
+`compApplyView(true)`, because its page-fit clamp already *is*
+fit-and-centre for a sheet, and fit-all on a page is the bug the
+`compOpenFit` note records. It never fires before a document is adopted, on
+the observer's first report or out of a zero size (the stage appearing,
+not changing — the saved view adopted from the file must win), while a
+mode covers the canvas or it is only peeked at (`_compFitPending`, paid by
+`compAutoFitFlush()` from `_modeRender` when the stack empties), or while a
+drag, a pinch, a wheel burst (250 ms) or an eased move is under way —
+those defer it, up to 25 tries, then leave it pending. So a hand zoom on a
+board lasts until the next size change: that is the rule, not a bug.
+
 **Saving is ops, not a save button.** `compQueue(op, key)` coalesces by key
 (`geo:<id>`, `bg:<id>`, `z:<id>`, `scale:<id>`, `cur:<id>`,
 `page:<id>:<n>`, `meta:view`), so a five-second drag produces exactly one
@@ -1397,7 +1494,7 @@ phase; `_default` handles any form with no entry, including project forms).
 The backend contracts for all of them are final and documented above.
 
 The base layer also owns the **peek**: `html[data-comp-peek="1"]` hides the
-nine stacked mode roots so the canvas shows through, and Esc restores them
+ten stacked mode roots so the canvas shows through, and Esc restores them
 before it starts popping the stack. `_modeRender()` appends a permanent
 base square to `#mode-stack`, rightmost, **with no exit ribbon** (see "What
 NOT to touch").
@@ -2307,6 +2404,255 @@ article then expands crosslinks `depth` layers.
 
 ---
 
+## The dictionary (FEED)
+
+**FEED**, the **first-party enough english dictionary** (0.4.1): ~96,000
+headwords (~175,000 rows with their forms), an original work, read-only to
+the user and to the readvisors, with a second **user dictionary** beside it
+that only the user's own words go into. Names are fixed: product name
+lowercase in the UI ("feed", "first-party enough english dictionary"); code
+prefix `dict` (module `enough/dictionary.py`, routes `/api/dict/*`, DOM ids
+`dict-*`, mode-stack name `dict`, i18n keys `dict.*`); the lightbox is the
+**word data lightbox**, ids `wdl-*`. User-facing doc: HELP_CENTER §13.
+
+### Data flow
+
+```
+<lexicon checkout>/dictionary/          committed text form (JSON lines), private repo
+   │  scripts/sync_dictionary.py        public-edition filter, line by line
+   ▼
+reflib/dict/                            shipped in the repo AND in the .app (build.rs)
+   │  dictionary.ensure_built()         server lifespan, background thread
+   ▼
+$ENOUGH_DICT_ROOT/feed.sqlite           built, disposable   (default ~/enough/dict/)
+$ENOUGH_DICT_ROOT/user-dictionary.sqlite  the user's words, precious
+```
+
+- **`scripts/sync_dictionary.py [--lexicon DIR] [--check]`** only ever
+  *reads* the lexicon (default `../../enough-lexicon` from the repo root) and
+  mirrors its layout into `reflib/dict/`: `schema.sql`, `meta.jsonl`,
+  `labels.jsonl`, `frequency_bands.jsonl`, `words|forms|synonyms/<a-z>.jsonl`,
+  plus its own `manifest.json`. The **public-edition filter**: in `words`,
+  `notes` / `source` / `corrected_on` are nulled; rows whose `status` is
+  neither null nor `live` are dropped with every `forms`/`synonyms` row
+  naming them; `meta` keeps only `dictionary_version`, `languages`,
+  `schema_version`, `title`. Key order is preserved and lines re-serialise
+  exactly as the lexicon writes them, so a rerun over an unchanged lexicon
+  is byte-stable; only files whose filtered content changed are rewritten;
+  files with no source are removed. `manifest.json` is
+  `{dictionary_version, schema_version, headwords, words, files: {relpath:
+  sha256}, digest}` — `digest` is the sha256 of the sorted `relpath sha256`
+  lines, **no timestamps**. Exit 0 synced / nothing to do, 1 `--check` found
+  changes, 2 no lexicon. `NOTICE.md` is hand-written and never touched.
+- **`reflib/dict/` is not under the Apache licence.** Its `NOTICE.md`: ©
+  2026 Graham Smith, all rights reserved, bundled for use within enough
+  only, licence to be decided. Never hand-edit anything in it (rerun the
+  sync), never copy it elsewhere, and don't describe it as part of the
+  open-source tree. It is the only part of `reflib/` that ships:
+  `desktop/src-tauri/build.rs`'s `SNAPSHOT` names `reflib/dict` (~380 MB),
+  not `reflib`.
+- **The build** (`dictionary.build()`, via `ensure_built()`) runs when
+  `feed.sqlite` is missing or its `meta.manifest_digest` differs from the
+  manifest's `digest`. It executes `schema.sql`, bulk-inserts every JSONL
+  file in 5 000-row batches (progress = bytes done / bytes total), adds one
+  covering index the shipped schema doesn't have (`feed_sort`, over every
+  column a sort, group or filter reads — `feed.sqlite` is disposable, so
+  it may), stamps the digest and `user_version`, `ANALYZE`s, and
+  `os.replace`s a `.feed-*.sqlite.tmp` built in the same dir — a reader
+  never sees half a dictionary. Old temp files (> 1 h, so not a second
+  project's live build) are swept. `cancel_build()` is the lifespan's
+  shutdown hook. A missing source dir is `available: false`, never an
+  exception at boot; a failed build reports through `status()["error"]`.
+- **The user DB** is created lazily on the first write from the same
+  `schema.sql` (FTS and triggers included), and is **never rebuilt or
+  deleted by code**. Every write in the module goes there and nowhere else.
+
+### Reading
+
+Every read opens a fresh connection (tool runners and endpoints run on
+worker threads): `feed.sqlite` with `mode=ro`, the user DB `ATTACH`ed as
+`u` when it exists. `_merged()` is the one relation both halves are read
+through — headwords from both, `word NOT IN (SELECT word FROM u.words)` on
+the feed half, so **a word in both is the user's**, everywhere — and every
+row carries `origin: "feed" | "user"` (`entry()` adds `overrides_feed`).
+
+| Python | Route | Shape |
+|---|---|---|
+| `status()` | `GET /api/dict/status` | `{available, ready, building, progress, version, headwords, words, user_words, stale, error}` — cheap, polled by the UI while it builds |
+| `lookup(word)` | `GET /api/dict/lookup?word=` | `{found, query, entry, matched_form, suggestions}`. `normalize()` lowercases, folds diacritics, strips surrounding punctuation and a possessive `'s`; a form resolves to its headword with `matched_form` set; a miss suggests by prefix, FTS on the word, shortened stems, then FTS on definitions |
+| `entries(sort, then, dir, then_dir, offset, limit, letter, q, filters, grouped)` | `GET /api/dict/entries` | `{total, offset, rows, groups}`; rows are `SHORT_COLUMNS`, `limit` ≤ `MAX_LIMIT` (500); `groups` are the sections the page touches, each with its absolute offset |
+| `index(sort, dir, filters, q, letter)` | `GET /api/dict/index` | the jump rail / thumb index: `[{key, label, count, offset}]`, offsets matching `entries()` for the same view whatever the sub-sort |
+| `position(word, …view)` | `GET /api/dict/position` | where a word sits in one view, so a page can open at it; a miss in plain a–z still gets an `offset` plus `before`/`after` neighbours |
+| `entry(word)` | `GET /api/dict/entry/{word}` | every column, JSON parsed, band and form-label meanings resolved, plus `syllables`, `era`, `overrides_feed`; 404 when absent |
+| `facets()` | `GET /api/dict/facets` | sort keys, filter keys, domains / parts of speech / bands / origins with headword counts |
+| `user_delete(word)` | `DELETE /api/dict/user/{word}` | the only write over HTTP (the WDL's delete); adding and changing go through the readvisor tools |
+
+`dictionary_api.py` is HTTP translation only, the `composure_api.py` split:
+`ValueError` → 400 (a bad sort, direction or filter, with the engine's
+sentence), `DictionaryUnavailable` → 503 (not built yet; the UI reads
+`/status`). Handlers are plain `def`, so FastAPI runs them on its thread
+pool.
+
+**Sort keys** (`SORT_KEYS`, each asc/desc, primary and sub-sort): `alpha`
+(word), `length`, `domain`, `era`, `pos` (`pos_primary`), `frequency`
+(band 0–8), `syllables`, `added` (`added_on`), `origin`. Ties always fall
+back to `word`; NULLs sort last. Two of them have no column — **both DBs
+keep the exact shipped schema** — so they are SQL functions registered on
+every connection (`_register`): `era(first_use)` → `era_ord()`, a
+chronological ordinal over every `first_use` phrasing the data uses (Old
+English < late Old English < Middle English < late Middle English < 13th
+century…; early/mid/late inside a century; a decade like "1990s" at its
+middle; "by the 17th century" just after the bare one), and
+`syllables(hyphenation)` → the count of `·` plus one. `era_group()` orders
+whole groups. **`grouped=`** makes the sub-sort order the words *inside
+each group* of the primary (a letter, a century) rather than only breaking
+exact ties — the dictionary page always asks for it, since "alphabetical,
+then length" is otherwise a no-op. `test_dictionary.py` sweeps every key ×
+direction with a sub-sort and asserts every lexicon `first_use` string has
+an ordinal.
+
+**The order cache.** `_ordered()` sorts the whole headword list for one
+view once — key `(sort, then, dirs, letter, q, filters, grouped, versions)`,
+where `versions` is both files' `(mtime_ns, size, inode)` plus a write
+generation — and keeps the six most recent views (`_ORDER_CACHE_SIZE`), so
+paging and a deep jump are list slices. Every user write and every build
+calls `_invalidate()`. A new code path that changes either DB must too.
+
+**Filters** (`FILTER_KEYS`): `domain`, `pos`, `band`, `origin`;
+comma-separated values in the query string.
+
+### Writing (the user DB only)
+
+`user_add(fields)` / `user_update(word, fields)` / `user_delete(word)`,
+serialised by one lock. A word is lowercase a–z only (`WORD_RE`);
+`definition`, `pos` and `pronunciation` are `REQUIRED`; JSON columns
+accept lists (or one item per line); `frequency_rank` must be a band 0–8.
+enough derives `letter`, `length`, `is_headword=1`, `pos_primary`, `ipa`
+and stamps `source='user'`, `status='live'`, `added_on`/`updated_on`
+(`DERIVED` — a caller's values for those are ignored). `user_add` refuses
+a word FEED already has as a headword ("update it instead"); `user_update`
+of a FEED word copies FEED's row into the user DB first, so the user's
+version **overrides** it. Results are `{ok, word, missing, overrides_feed}`
+— `missing` is the `REPORTED` columns still empty, which the readvisor is
+told to mention once. Deleting an override brings FEED's entry back
+(`restored_feed`).
+
+### The readvisor's tools
+
+[enough/dictionary_tools.py](../enough/dictionary_tools.py), registered at
+`tools` import time like `pal_tools`:
+
+- `dict_lookup <word>` — a compact, column-labelled entry (labels are the
+  column names, so what the model reads is what it would write back), or
+  "not in feed" with near words.
+- `dict_add_entry` / `dict_update_entry` — one inner tag per column (they
+  land in `ToolCall.extra`); list columns one item per line, word lists also
+  one comma-separated line; `forms` lines parse as `word /ipa/ label, label`;
+  an empty tag clears a column. Success fires the **`dict_changed`** side
+  effect `{word, action}` — the frontend's `dictOnChanged()` drops every
+  cache and redraws an open page or lightbox (the WDL's own delete calls
+  it directly).
+- `dict_guide` — no tags; hands back the shipped `lexicographer` SKILL.md
+  minus frontmatter and tooltip line, **always from the install's own
+  `defaults/`**, never a project copy (a project-local `lexicographer`
+  folder would be an unaudited skill).
+
+**No broker toggle.** The other gates guard something leaving the machine
+or text entering the prompt; a word in the user's own dictionary is
+neither, and it can be deleted from the lightbox. What is gated is the
+*documentation*: `prompt.DICTIONARY_TOOL_INSTRUCTIONS` (~580 chars) rides in
+every turn **whenever FEED ships** (`dictionary.available()`: a manifest and
+a schema in the source dir, built or not — the tools say "still being
+prepared" themselves), and is deliberately short; the column-by-column
+guide is the **`lexicographer`** skill (off by default like every shipped
+skill), which carries it in the Skills section when on, and is one
+`dict_guide` call away when off. Every tool answer for an unavailable,
+unbuilt or failed dictionary is a sentence for the model, never a raise.
+
+### The frontend
+
+All in index.html under the "FEED — dictionary mode, the word data
+lightbox (WDL) and the "dictionary entry" context menu" banner.
+
+- **Dictionary mode** (`#dict-mode`, mode-stack name `dict`, state in
+  `DICT`). Launched by `enterDictMode({word?})` from `#ui-dict-btn`, beside
+  Help in the UI modal's header (project mode only — a home server has no
+  `/api/dict` routes). Pages are **measured, not scrolled**: `dictShow(start)`
+  renders a run of entries from an offset into a `column-fill: auto` flow,
+  counts what landed inside the frame and trims the rest; next = start +
+  fit, previous retraces history or searches for the fullest page ending
+  before `start`. So re-paginating on any resize, font, text-scale or panel
+  change is just `dictShow(DICT.start)` (a `ResizeObserver` on
+  `#dict-frame`). Rows come from `/api/dict/entries` in 100-row chunks, at
+  most 40 chunks per view and 4 views. Group headings and the fore-edge
+  thumb index (`dictEdge`, tabs sized by `--n` = the group's count) come
+  from `/api/dict/index`. Order, filters and the first word on the page
+  persist per viewer in `localStorage['enough.dict.v1']`. One column (B's
+  specimen layout) whenever the frame is narrow. Text scale is applied as
+  `font-size: calc(px * var(--txz))` rather than the `zoom` the other
+  document surfaces use, because pagination measures rects against the
+  frame and a second zoom layer would put them in different px.
+- **Part-of-speech marks**: `.dpos-n|v|a|d|o` set `--pc`/`--ink` from the
+  accent colours; `.dict-sh` draws the shape (square, triangle, diamond,
+  dot, hollow ring) so colour is never the only signal; `dictSpineHTML`
+  stacks one spine segment per part of speech.
+- **The WDL** (`#wdl-modal`, `WDL`, `wdlOpen(word, {fromDict})`,
+  `wdlRender()`). A `*-modal`, so it gets dialog semantics from the shared
+  helper for free (see "Change the UI"). `WDL.stack` is the walk (≤ 60,
+  the last six shown as the "your walk" trail); `wdlNav` pushes, `wdlBack`
+  pops. Prev/next walk the dictionary's current view when it is open (or
+  the plate came from it), else a–z, via `/api/dict/position` + a 3-row
+  `/entries`. Any word of the running text is a link through
+  `dictWordAtPoint`. A 200-entry lookup cache, cleared by `dictOnChanged`.
+- **The context menu** (`#dict-ctx-menu`, `dictCtxOpen`). The rule: a
+  right-click **on a word** — `dictCtxWhere()` names the surfaces: read
+  face, preview, both edit textareas, `#conversation`, `#wiki-body`,
+  `#ref-body`, `#help-body`, the dictionary, the WDL — opens "dictionary
+  entry" + "copy"; **anywhere else** (no word under the pointer, a link, an
+  image, a control, a find bar) the system menu is untouched; **⇧-right-click
+  is always the system menu**. The textarea's word comes from a transparent
+  mirror laid over it for one synchronous hit test (`dictWordInTextarea`),
+  so it follows the wrapping the user sees. Composure keeps its own module
+  menu, which gains the same item (`compOpenCtxMenu(id, ev, dictHit)`).
+  `dictEntryFor(word, where)` is the one dispatcher: WDL over the current
+  mode, a page turn inside dictionary mode, a walk inside the WDL.
+  **⌘⇧D / ctrl+⇧D** (`dictWordAtCaret`) goes to the same places for the
+  selection or the word at the caret. The menu is in `MODAL.KEEP_LIVE` so
+  it still works over an open WDL.
+- **⌘F in dictionary mode** means "search the dictionary": `FIND_BARS.dict`
+  is a duck-typed controller whose `open()` focuses `#dict-q` and whose
+  `onEsc()` peels the menu, the options row and the search before the esc
+  ladder closes the mode.
+
+### Seams and tests
+
+`ENOUGH_DICT_ROOT` (state root) and `ENOUGH_DICT_SOURCE` (source dir) are
+both in `tests/conftest.py`'s `_STATE_SEAMS`, and the source seam points at
+**nothing** (`no-dict-source`): otherwise every app a test boots would start
+a 380 MB background build. Dictionary tests write a few-dozen-row fixture
+lexicon, run it through the real `scripts/sync_dictionary.py` into a temp
+`reflib/dict`, and point `ENOUGH_DICT_SOURCE` at that
+(`tests/test_dictionary.py`'s `lexicon` / `source` / `built` fixtures;
+`test_dictionary_tools.py` imports the same fixtures). The shipped copy is exercised
+only by the opt-in `test_real_dictionary_build_and_timings`
+(`ENOUGH_FEED_REAL=1`). `test_prompt_weight.py` fakes availability with a
+one-line manifest and an empty schema. `scripts/smoke_boot.build_env()`
+redirects `ENOUGH_DICT_ROOT` into the scratch dir and **pops**
+`ENOUGH_DICT_SOURCE`, so the boot smoke builds the real `reflib/dict` and
+asserts `/api/dict/status` is building or built. The uicheck registry has
+`dict-mode`, `dict-sorted-filters`, `dict-search` and `wdl-plate` screens.
+
+### Releasing a new dictionary
+
+`desktop/RELEASE.md` owns the steps; don't duplicate them, follow them.
+In short: **sync before the bump** (`uv run python
+scripts/sync_dictionary.py`, then commit `reflib/dict` with the version
+bump — every install rebuilds its `feed.sqlite` when the manifest digest
+moves); everything after that is the ordinary release, including the DMG
+layout check (`scripts/check_dmg_layout.py`, below).
+
+---
+
 ## Document conversion (twins, engines, the `pdf` extra)
 
 0.2.5. enough does not render PDFs or lay out Word files; it converts them
@@ -3014,7 +3360,25 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   **help** button inline in the UI modal's header row, right-aligned
   beside the ×, rather than the old full-width banner. It kept its
   `.help-center-launch` class name, its `hxc` icon, and its `onclick`;
-  only the CSS shrank. See the mode-stack notes under "Change the UI".
+  only the CSS shrank; since 0.4.1 `#ui-dict-btn` (dictionary mode) sits
+  beside it with the same class. See the mode-stack notes under "Change
+  the UI".
+  **Contents, find, links, back (0.4.1).** After every render
+  `refAfterRender()` runs `slugifyHeadings(body, 'ref-')` — stable ids from
+  the manual's **own numbering** (`ref-sec-7-3`, identical in every
+  language; a text slug only for an unnumbered heading) — then
+  `refBuildToc()` (h2 + h3 into `#ref-toc`: a side column when there is
+  room, a sheet when not — a container query decides and `refTocIsSheet()`
+  reads the answer back; `refTocSync()` marks the current section),
+  `refLinkSections()` (`REF_XREF_RE`: "section 7.3", "§7.3" and the five
+  translations' words for it become links when the number names exactly
+  one heading; code, links and headings are left alone), and the find bar
+  (`REF_FIND = findBarAttach(#ref-find, …)`, ⌘F while `ref` is on top).
+  Every jump leaves a `#ref-back` pill (`refBackOffer`, skipped for a jump
+  that stays on screen). **So the manual's numbering is UI now**:
+  `test_content_integrity.py` keeps it contiguous and every cross-reference
+  resolvable, and the five translations mirror it — renumbering English is
+  a translation job too.
 - **Cheat sheets.** Keyboard shortcuts + markdown reference live inline
   in the UI modal markup (`.ui-cols` in index.html). The esc row reads
   "close the topmost open mode (modes stack)" — keep it true to
@@ -3135,14 +3499,33 @@ asked for a project-local one; the audit is the feature.
 
 1. Create `defaults/paradigms/<name>.md` with YAML frontmatter (`name`,
    `description`).
-2. Optionally update [defaults/paradigms/default.md](../defaults/paradigms/default.md)
-   to mention the new paradigm under "Canonical examples worth flagging
-   proactively" (the `default` paradigm's prompt tells the readvisor when
-   to switch).
+2. Optionally add it to the "Routing to other paradigms" list in
+   [defaults/paradigms/text-planning.md](../defaults/paradigms/text-planning.md)
+   — the home paradigm is the router that tells the readvisor when to
+   switch — and have the new paradigm switch back by writing
+   `text-planning` to `rness/active-paradigm` when its work is done.
 3. Document the activation rule in the paradigm itself — when to switch
    in, when to switch out, what skill (if any) it pairs with.
 4. No code changes; paradigm catalog is read from `rness/paradigms/`
    directly.
+
+**The home paradigm** is `prompt.HOME_PARADIGM = "text-planning"` (0.4.1).
+Until then it was `default`, which text-planning absorbed (routing, output
+conventions, colour references, archival policy, security posture,
+web-fetch rules); its skill-gated activation rule and its "switch to
+default to draft" lines went. Every fallback lands on the constant:
+`seed_multipurpose_file()` for a new project, `_render_multipurpose()`,
+`set_help_bubbles()`, and `get_active_paradigm()` when the file is missing
+or names a paradigm that isn't on disk — then the first paradigm that *is*,
+so the prompt never silently loses its Paradigm section.
+`ensure_multipurpose_file()` (every launch) migrates a stored `default`, in
+the markdown or the legacy bare form, to the home paradigm, keeping the
+help-bubble state — **unless** `rness/paradigms/default.md` is a real file
+(`_kept_retired_paradigm`: a customised copy is the user's, and `default`
+keeps working for them). The populator prunes the dangling `default.md`
+symlink in the same launch; `tests/test_help_highlights.py` covers both
+orders. Changing the home paradigm again means the constant **and** a
+migration of the same shape.
 
 ### Add a new readvisor
 
@@ -3275,11 +3658,12 @@ sentence at conclude until it is built.** Adding a kind:
 
 1. Define `run_<tool>(project_dir: Path, call: ToolCall) -> ToolResult`
    in [tools.py](../enough/tools.py).
-2. Register in `_DISPATCH` (~line 1617 in tools.py) and `_TRACE_TOGGLE`
-   (~line 1646). Both grep cleanly by name if line numbers drift again. A
+2. Register in `_DISPATCH` (~line 1669 in tools.py) and `_TRACE_TOGGLE`
+   (~line 1698). Both grep cleanly by name if line numbers drift again. A
    whole *family* of tools goes in its own module with a `register()` that
-   `setdefault`s into both, called at the bottom of tools.py — the three
-   existing ones are `composure_tools`, `readvisor_tools`, `pal_tools`.
+   `setdefault`s into both, called at the bottom of tools.py — the five
+   existing ones are `composure_tools`, `readvisor_tools`, `pal_tools`,
+   `dictionary_tools`, `intro`.
 3. If `ToolResult.render()` needs a specific attribute (e.g. `output=`
    for `cloud_pipeline`), add a branch in `render()`.
 4. Add an XML example block + prose to `TOOL_INSTRUCTIONS` in
@@ -3363,10 +3747,55 @@ top bar's.
 ### Change the UI
 
 [enough/static/index.html](../enough/static/index.html) is a single
-~30,200-line file with inline CSS and JS. Conventions:
+~38,150-line file with inline CSS and JS. Conventions:
 
 - All modals follow the same `#<name>-modal` pattern with `.hidden`
-  class and a `.modal-backdrop` for click-outside dismissal.
+  class and a `.modal-backdrop` for click-outside dismissal. **Since 0.4.1
+  the id suffix is also the accessibility contract.** The shared helper
+  (the "Modal a11y" section: `MODAL`, `modalSync()`, `modalStackTop()`)
+  *watches* every `[id$="-modal"]`, `#confirm-overlay` and `#ca-prompt`
+  with MutationObservers rather than rewriting anyone's open/close, and on
+  open gives the panel `role=dialog` + `aria-modal` + an accessible name
+  (its first heading or `[class*=title]`, via `aria-labelledby`), makes
+  everything outside the top-most dialog `inert` (descending only into
+  ancestors of what it keeps), remembers the opener and moves focus in —
+  `[data-autofocus]`, else the first control in `.modal-body`, **never** a
+  `.modal-head` button, so a reflexive Return can't "close project" —
+  wraps Tab at both ends, and on close restores focus to the opener (or
+  to the dialog underneath: the confirm overlay opens on top of other
+  modals, so it's a stack). A new `*-modal` gets all of that for free if
+  it provides: open/close by toggling `.hidden` (or `hidden`); a panel
+  (`.modal-panel` or an element with `role="dialog"`) holding a heading;
+  **its own Esc handler** (the helper leaves Esc alone, and a modal with
+  none makes Esc do nothing at all); optionally `data-autofocus`. Not
+  dialogs, on purpose: the popovers beside text (`#review-hl-popup`,
+  `#fn-popup`, `#wiki-sel-popup`), context menus, `#help-viewer`,
+  `#home-wait`. `MODAL.KEEP_LIVE` names what is never made inert (the help
+  panel, the convert toasts, `#home-wait`, `#dict-ctx-menu`). Global key
+  handlers check `modalStackTop()` to stay out of a dialog's way.
+- **`findBarAttach(bar, opts)`** (0.4.1) binds the generic `.find-bar`
+  markup (`.find-q`, `.find-count`, `.find-prev`, `.find-next`,
+  `.find-close`) to any read-only document. `opts`: `root()` (searched),
+  `scroller()`, `zoom()` (`UIZ() * TXZ()` on a `--txz` surface),
+  `host()`, `available()`, `onLeave(top)`, `onEsc()`. Register the
+  controller as `FIND_BARS[<mode-stack name>]` and ⌘F / ctrl+F (while that
+  mode is on top) and the esc ladder pick it up. Matches paint through the
+  CSS Custom Highlight API (`enough-find`, `enough-find-current`) where the
+  engine has it — nothing in the document changes — else as
+  `<mark class="find-hit">`, unwrapped on every rerun and close; at most
+  `FIND_MAX` (2 000). Users today: the help center (`REF_FIND`), and
+  dictionary mode's duck-typed controller, which turns ⌘F into "search the
+  dictionary".
+- **The top bar's fit** (`topbarFit()`, 0.4.1). The buttons and the mode
+  squares never give way; `#project-name` ellipsizes down to about ten
+  characters (fewer if the name is shorter); only then do the ¶ / W / C
+  readouts drop, right to left (`.topbar[data-dc-drop="0".."3"]`). Flex
+  cannot say "shrink this first, then hide that", so it measures — all in
+  one space (`scrollWidth` / `clientWidth`), so `--uiz` needs no
+  conversion — after every change that can move the balance
+  (`topbarFitSoon()`: the counters' update, a `ResizeObserver` on
+  `.topbar`). A new top-bar item belongs either in the never-give-way set
+  or on that ladder.
 - htmx is used for the broker toggle list (declarative) and the model
   list reload (fetch-based JS). New simple lists can use either.
 - Color variables (`--accent-agent`, `--accent-tool`, `--accent-error`,
@@ -3408,7 +3837,7 @@ than reinvent:
     caller has already re-targeted content — e.g. `enterGirraphMode` on a
     new file resets `GIRRAPH_STACK` itself). One live instance per name
     (`readedit`, `girraph`, `merirmaid`, `wikisink`, `cacheawl`, `ref`,
-    `paginated`). **Composure is not one of them** — it is the base layer
+    `paginated`, `dict`). **Composure is not one of them** — it is the base layer
     below the stack (z < 30), permanent and uncloseable; see "Composures".
   - `modeRemove(name)` — splice at any depth, re-apply z-order, re-render
     indicators. **Bookkeeping only**: it does not run `onExit` and does not
@@ -3471,10 +3900,61 @@ than reinvent:
   `applyReviewContrast()` covers `ref-mode` alongside review/wiki). View
   only by design: no edit face, no highlighting, no chat affordance. The
   `ref-mini` class docks it to the right edge for side-by-side reading
-  (`refToggleSize()`); launched from the big `hxc`-icon button at the top
-  of the UI modal. The 3D icon-button gradient used on square chips is
+  (`refToggleSize()`); launched from the small **help** button in the UI
+  modal's header (see "The help system" for its contents, find and
+  section links). The 3D icon-button gradient used on square chips is
   the shipped two-stop ramp `rgba(128,128,128,0.42) → 0.10 at 62% → 0`
   over `var(--btn-bg, var(--bg-raise))`.
+
+### Add a full-frame mode (the checklist, as dictionary mode ran it)
+
+Dictionary mode (0.4.1) was built from ref mode, and this is the list it
+actually had to tick. Grep `dict` beside each step for the worked example.
+
+1. **A root** `<div id="<name>-mode" aria-hidden="true">`, hidden by CSS
+   until `.open`.
+2. **Register the root**: `_MODE_ROOT_IDS` (name → id), `_ALL_MODE_ROOTS`
+   (z-order resets), and the `html[data-comp-peek="1"]` hide list in the
+   CSS — miss the last and the composure peek leaves your mode on screen.
+3. **`enter<Name>Mode(opts)`**: return on `IS_HOME` if it needs project
+   routes; add `.open`, `aria-hidden="false"`; `modePush(name, {icon,
+   onExit, iconTitle: t('modes.<name>.icon', …), exitTitle:
+   t('modes.<name>.exit', …)})`; idempotent — a second call re-targets and
+   raises. Export it on `window` for launchers and the uicheck steps.
+4. **`exit<Name>Mode()`**: tear down first (timers, menus, polling, DOM you
+   don't keep), remove `.open`, `aria-hidden="true"`, and only then
+   `modeRemove(name)` — it is bookkeeping only.
+5. **An icon**: the source SVG in `enough/static/icons/`, then
+   `scripts/build_icons.py` (both variants; the content-integrity test
+   checks every `data-icon` has them).
+6. **A launch point** (dict: `#ui-dict-btn` in the UI modal header,
+   `closeUIModal(); enterDictMode();`) and, if it takes a target, a
+   function to open it *at* something (`dictShowWord`) that raises an open
+   mode instead of re-entering it.
+7. **Keys**: one document `keydown` that acts only when
+   `modeTop().name === name`, `!modalStackTop()`, the panel isn't `full`,
+   the composure isn't peeked, the confirm overlay is hidden, and the caret
+   isn't in a field or the readvisor panel.
+8. **⌘F and extra Esc rungs** through a `FIND_BARS[name]` controller —
+   a real `findBarAttach` or a duck-typed one — rather than edits to the
+   esc ladder.
+9. **Scales and geometry**: text scale through the `--txz` selector list,
+   or `calc(px * var(--txz))` if the mode measures its own layout; pointer
+   coordinates through `UIZ()` before they touch a positioned element; a
+   `ResizeObserver` for relayout; a hook for font / text-scale changes that
+   don't resize anything (`dictOnUIChange`, called from `applyUIConfig` /
+   `applyUIScales`, guarded until the wiring exists).
+10. **Strings**: every one `data-i18n*` or `t()`, mirrored byte-for-byte
+    into `en/ui.json` (docs/I18N.md steps 1–3).
+11. **Themes**: colours from the theme variables only (`--accent-*`,
+    `--fg-*`, `--bg-*`, `--border`); look at all four themes.
+12. **Dialogs it opens** are `*-modal`s with their own Esc, so the shared
+    helper does the rest; a context menu it adds goes in `MODAL.KEEP_LIVE`
+    if it must work over one.
+13. **uicheck**: a `Screen` per state in `scripts/uicheck/screens.py` and a
+    scenario per interaction contract in `scripts/uicheck/interactions.py`.
+14. **Docs**: a HELP_CENTER section (and the renumbering that follows),
+    this guide, and help-docs.md sections only if it adds `data-help` rows.
 
 ### Add a new local model
 
@@ -3516,7 +3996,9 @@ A list of things that will confuse you if you don't see them coming:
   Read/write ONLY via `prompt.get_active_paradigm()` /
   `set_active_paradigm()` / `get_help_bubbles()` / `set_help_bubbles()`
   — `set_*` preserves the other section. Back-compatible: a legacy bare
-  `default\n` still parses, and every legacy help value (the old `all`
+  one-line file still parses (and a stored `default` is migrated to the
+  home paradigm on launch — see "Add a new paradigm"), and every legacy
+  help value (the old `all`
   sentinel, id lists, empty/missing) reads as bubbles-on. Don't add
   YAML or further sections.
 - **Adding to `broker.TOGGLES` is a UI change.** The `/api/broker`
@@ -3682,11 +4164,13 @@ A list of things that will confuse you if you don't see them coming:
   is empty — the next reserved participant kind should cost one line instead
   of five call sites. Emptiness is not deadness.
 - **The tool-doc budget is always on, and its headroom is tens of
-  characters.** `tests/test_prompt_weight.py` pins `CORE_BUDGET` (17 500),
-  `FULL_BUDGET` (22 000) and `PAL_BUDGET` (1 200). A new tool therefore
-  either **gates its documentation block** the way composures, readvisory
-  and pal do, or **raises the budget on purpose, in the same commit, with a
-  reason**. `FULL_BUDGET` measures what an *ordinary* turn can carry, which
+  characters.** `tests/test_prompt_weight.py` pins `CORE_BUDGET` (17 500 —
+  the core plus the dictionary block since 0.4.1), `FULL_BUDGET` (22 900
+  since 0.4.1) and `PAL_BUDGET` (1 200). A new tool therefore either
+  **gates its documentation block** the way composures, readvisory, the
+  dictionary and pal do, or **raises the budget on purpose, in the same
+  commit, with a reason** (0.4.1 did: +900, the comment beside the
+  constant says what for). `FULL_BUDGET` measures what an *ordinary* turn can carry, which
   is why the pal block is not counted in it — the per-turn gate is what
   bought that exemption, not an argument that the block is small.
 - **The composure base indicator has no exit ribbon, by design.** Every
@@ -3723,6 +4207,30 @@ A list of things that will confuse you if you don't see them coming:
   a contenteditable, or from a composer with a draft in it — it *will* take
   it from an **empty** `#message`, which holds focus at boot only because
   the textarea carries `autofocus`.
+- **`read_file` may read through `rness/` symlinks into shipped files —
+  and nothing else may (0.4.1).** A shipped skill, paradigm, policy or
+  readvisor in a project is a symlink out of it, so plain containment
+  refused `read_file("rness/skills/<name>/SKILL.md")`, and a model whose
+  skill was off could not read the very file the sidebar showed.
+  `tools._shipped_read_target(project_dir, p)` is the one exception, and
+  both halves must hold: the path **as written** sits under `rness/` with no
+  `..` (an absolute spelling of the same path counts), **and** its fully
+  resolved target sits inside a shipped root (`_shipped_roots()`: the
+  install's `defaults/` and `skeleton.user_readvisors_root()`), so a
+  symlink planted in the project and aimed anywhere else is still refused.
+  `_safe_join(…, allow_shipped_read=True)` is passed by `read_file` only and
+  ignored whenever `allow_outside_write` is set; writes through those
+  symlinks stay refused. `tests/test_shipped_read.py` pins all of it. Don't
+  widen the roots: everything under them already reaches the prompt, and a
+  new root would make `read_file` a door to something that doesn't.
+  (`dict_guide` predates this and still reads the install's copy itself.)
+- **`reflib/dict/` is not open-source, and `user-dictionary.sqlite` is not
+  disposable.** The first is FEED's shipped text form, all rights reserved
+  (its `NOTICE.md`), regenerated only by `scripts/sync_dictionary.py` —
+  never hand-edited, never copied into another repo or package. The second
+  is the user's own words: no code path may rebuild, migrate-by-recreate or
+  delete it; a schema change has to be an in-place migration. `feed.sqlite`
+  is the opposite — delete it and the next launch rebuilds it.
 - **Every new global-state location needs a seam, in both harnesses, in
   the same change.** The rule is not "add an `ENOUGH_*` variable"; it is
   add it *and* wire it into **`scripts/smoke_boot.build_env()`** and
@@ -3771,7 +4279,9 @@ A list of things that will confuse you if you don't see them coming:
   `ENOUGH_CACHEAWL_ROOT`, `ENOUGH_INFOWORLD_ROOT`, `ENOUGH_UI_CONFIG`,
   `ENOUGH_WEIGHTS_DIR`, `ENOUGH_EXTRAS_STATE`, `ENOUGH_LIVE_STATE`,
   `ENOUGH_MODELS_REGISTRY`, `ENOUGH_PROJECTS_STATE`,
-  **`ENOUGH_READVISORS_ROOT`**
+  **`ENOUGH_READVISORS_ROOT`**, **`ENOUGH_DICT_ROOT`** and
+  **`ENOUGH_DICT_SOURCE`** (the latter pointed at *nothing*, so no test
+  starts a 380 MB build — see "The dictionary (FEED)")
   (plus `ENOUGH_MODELS_URL_BASE`, which rebases the model download URLs
   onto a local stub server, keyed by local gguf_filename) — all
   pointed at `tmp_path`; **never run against real `~/enough` state.**
@@ -3850,7 +4360,8 @@ normally.
 `skeleton.ensure_skeleton()` runs on every launch and:
 1. Creates `rness/` if missing
 2. Copies `_PROJECT_LOCAL_FILES` (AGENT.md, MOTIVATION.md, profile,
-   active-paradigm seed) only if absent — preserves user edits
+   active-paradigm seed — the home paradigm, text-planning) only if
+   absent — preserves user edits
 3. Applies `_SKELETON_PLAN` on first-time `rness/` creation —
    `AGENT.md`/`MOTIVATION.md` are **copied**, the four policies and
    `knowledge/rosetta-primers` are **symlinked** from `~/enough/defaults/...`
@@ -3955,12 +4466,15 @@ the home screen + registry + handoff + `/api/home/*`,
 the throttled wikisink newer-snapshot check, and — since 0.3.5 — the
 composure format/ops/API/tools + the outline converter, the council engine
 + `/api/council/*`, the readvisors' migration/sources/install/removal, and
-the prompt-weight budgets) — **tracked since the
+the prompt-weight budgets; since 0.4.1 the dictionary's sync filter, build,
+reads, user entries and routes, its readvisor tools, the intro, the
+shipped-read exception, the home-paradigm migration, and the CSS structure
+of every page) — **tracked since the
 seven-models round**, so a fresh clone has it. Before declaring anything
 done:
 
 ```bash
-uv run pytest -q                        # 1065 tests (+docling skips)
+uv run pytest -q                        # ~1310 tests (+docling skips)
 uv run python scripts/smoke_boot.py     # real boot, scratch dir
 bash tests/bootstrap_linux_harness.sh   # only if you touched bootstrap.sh
 ```
@@ -4019,6 +4533,23 @@ are what CI already runs (`bash -n`, `pytest -q`, `i18n_check.py`,
   `## N.` / `### N.M` numbering is contiguous and its "section N"
   cross-references resolve. Every icon name the frontend asks for has
   both built SVG variants. All seven places that name the version agree.
+- **`tests/test_css_integrity.py`** (0.4.1, inside `pytest`) is the
+  *stylesheet* half. Browsers never report a CSS syntax error; they
+  recover, and the recovery can take a neighbour down with it. 0.3.5
+  inserted the composure block directly above `.conversation {` and the
+  selector line went with the edit: the declarations were left at
+  rule-list level, the parser swallowed them — and the closing brace, and
+  the `.empty-hint` selector after it — as one invalid prelude, and the
+  chat lost its padding, its scroller and its centred empty hint for two
+  releases while every test stayed green. So a small tokenizer (comments,
+  strings, `url()`/parens, the two at-rule shapes) walks every `<style>` of
+  every page under `enough/static` and fails, with page and line, on a
+  declaration run at rule-list level (a `;` before any `{`), a prelude that
+  runs into `}`, an empty selector, a `{` inside a declaration block (there
+  is no CSS nesting here — teach it `&` the day there is), a declaration
+  without a colon, and anything unclosed.
+  `test_catches_the_0_3_5_orphaned_conversation_rule` keeps the original
+  break as a fixture.
 - **`scripts/ui_check.py`** is the *layout and behaviour* half: a real
   headless Chrome over the DevTools Protocol, driving two scratch enough
   servers (project + home). **Zero new dependencies** — CDP is JSON over
@@ -4090,3 +4621,8 @@ Apache 2.0. See [LICENSE](../LICENSE).
 
 Third-party content (the bundled `defaults/skills/` packages) carries
 its own licenses — see [THIRD_PARTY_LICENSES.md](../THIRD_PARTY_LICENSES.md).
+
+**Not covered by the Apache licence:** `reflib/dict/`, FEED's dictionary
+data. © 2026 Graham Smith, all rights reserved, bundled for use within
+enough only; a licence is still to be decided. Its
+[NOTICE.md](../reflib/dict/NOTICE.md) is authoritative.

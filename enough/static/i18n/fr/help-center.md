@@ -2,7 +2,7 @@ Bonjour, ici Graham, le créateur d'enough. Ce document -- à part ce passage-ci
 
 # le centre d'aide d'enough
 
-> Tout ce que vous pouvez faire avec enough, en un seul endroit. Rédigé pour enough **0.4.0**, incluant la passe composure — le canevas qui est désormais le plancher de chaque projet, avec la conversation déplacée dans un panneau à côté (sections 4 et 5) ; les **readvisors**, c'est-à-dire le nouveau nom des rôles, menés par un readvisor en chef appelé Ed (section 16) ; les **conseils**, où plusieurs readvisors réfléchissent à une seule chose chacun leur tour, par écrit, pendant que vous regardez (section 17) ; et deux nouvelles compétences, `readvisory` et `scaffold` (section 18). Nouveau dans cette passe : **`/pal`**, où votre readvisor en chef réfléchit d'abord ici, en local, puis envoie une seule question affinée au modèle cloud que vous avez configuré, en vous montrant exactement ce qui a quitté la machine (section 14.3) ; et les conseils qui se terminent en réponse, en document ou en nouvelle composure, avec une charge d'une ligne facultative par readvisor et de quoi reconvoquer un conseil déjà conclu (section 17). Un projet que vous avez créé avant cette passe voit son dossier `rness/roles/` renommé en `rness/readvisors/` la prochaine fois que vous l'ouvrez, avec vos réglages activé/désactivé intacts (section 8). Également là, venu des passes précédentes : l'écran d'accueil (tous les projets que vous avez jamais démarrés, dans une seule liste, avec une porte d'entrée et une porte de sortie — section 2), la passe de conversion (PDF, documents Word, ebooks, présentations et classeurs qui s'ouvrent comme des jumeaux markdown modifiables, avec export, synchronisation, et une visionneuse d'image — section 7), la passe des compétences (le nouveau mode audit d'analyzer, la compétence `anything-finder`, et l'audit au premier usage qui lit toute compétence non fournie par enough avant de l'autoriser), la passe d'août 2026 (sept modèles locaux avec des installations à faisabilité vérifiée, et **enough.app** — l'application de bureau signée et notariée), la passe d'interface de juillet 2026 (la pile de modes, les bulles d'aide par dossier, les reflets girraph→merirmaid), et la passe de préférences 0.3.0 (mise à l'échelle de l'ui et du texte par projet, et l'interface + l'aide en six langues — section 10). Là où ce document et l'application devant vous ne sont pas d'accord, c'est l'application qui a raison et ce document qui a un bug — les corrections sont bienvenues sur [enough.support](https://enough.support).
+> Tout ce que vous pouvez faire avec enough, en un seul endroit. Rédigé pour enough **0.4.1**. Nouveau dans cette passe : **le dictionnaire** — FEED, le dictionnaire anglais maison d'enough : environ 96 000 mots avec leurs sons, leurs familles et leurs histoires, construit sur votre propre machine, à un clic droit de n'importe quel mot que vous lisez, avec de la place à côté pour vos propres mots (section 13) ; **text-planning** comme paradigme d'accueil dans lequel démarre chaque projet, l'ancien paradigme `default` y ayant été absorbé (section 16) ; une brève présentation d'enough, à un clic dans une conversation vide (section 5) ; et un sommaire, une recherche et des liens de section cliquables dans ce manuel (section 10). De la passe précédente : **`/pal`**, où votre readvisor en chef réfléchit d'abord ici, en local, puis envoie une seule question affinée au modèle cloud que vous avez configuré, en vous montrant exactement ce qui a quitté la machine (section 15.3) ; et les conseils qui se terminent en réponse, en document ou en nouvelle composure, avec une charge d'une ligne facultative par readvisor et de quoi reconvoquer un conseil déjà conclu (section 18). De la passe composure : le canevas qui est désormais le plancher de chaque projet, avec la conversation dans un panneau à côté (sections 4 et 5) ; les **readvisors**, c'est-à-dire le nouveau nom des rôles, menés par un readvisor en chef appelé Ed (section 17) ; les **conseils**, où plusieurs readvisors réfléchissent à une seule chose chacun leur tour, par écrit, pendant que vous regardez (section 18) ; et deux compétences, `readvisory` et `scaffold` (section 19). Un projet créé avant cela voit son dossier `rness/roles/` renommé en `rness/readvisors/` la prochaine fois que vous l'ouvrez, avec vos réglages activé/désactivé intacts (section 8). Également là, venu des passes précédentes : l'écran d'accueil (tous les projets que vous avez jamais démarrés, dans une seule liste, avec une porte d'entrée et une porte de sortie — section 2), la passe de conversion (PDF, documents Word, ebooks, présentations et classeurs qui s'ouvrent comme des jumeaux markdown modifiables, avec export, synchronisation, et une visionneuse d'image — section 7), la passe des compétences (le nouveau mode audit d'analyzer, la compétence `anything-finder`, et l'audit au premier usage qui lit toute compétence non fournie par enough avant de l'autoriser), la passe d'août 2026 (sept modèles locaux avec des installations à faisabilité vérifiée, et **enough.app** — l'application de bureau signée et notariée), la passe d'interface de juillet 2026 (la pile de modes, les bulles d'aide par dossier, les reflets girraph→merirmaid), et la passe de préférences 0.3.0 (mise à l'échelle de l'ui et du texte par projet, et l'interface + l'aide en six langues — section 10). Là où ce document et l'application devant vous ne sont pas d'accord, c'est l'application qui a raison et ce document qui a un bug — les corrections sont bienvenues sur [enough.support](https://enough.support).
 
 enough est un système de langage personnel qui tourne sur votre propre machine. Vous le pointez vers un dossier, vous lui parlez, et il vous aide à planifier, écrire, réviser, chercher, et traduire. Les modèles sont locaux par défaut. Vos fichiers restent les vôtres. Et presque tout ce que vous le verrez faire est défini dans de simples fichiers markdown que vous pouvez ouvrir, lire, et modifier.
 
@@ -16,13 +16,13 @@ Gardez une idée en tête pendant votre lecture : **les fonctionnalités intégr
 
 - Un Mac avec Apple Silicon. (enough est construit et testé sur macOS. Le support Linux est prévu ; Windows est envisageable.)
 - De l'espace disque pour au moins un modèle — le plus petit fait environ 5 Go.
-- Aucun compte, aucune clé API, aucun abonnement. À moins que vous n'optiez plus tard pour l'emplacement de modèle cloud (section 14.2), tout tourne en local.
+- Aucun compte, aucune clé API, aucun abonnement. À moins que vous n'optiez plus tard pour l'emplacement de modèle cloud (section 15.2), tout tourne en local.
 
 ### 1.2 Installation
 
 Deux portes, une seule maison.
 
-**L'application — la voie courte.** Téléchargez le DMG `enough` depuis la page des releases, ouvrez-le, glissez **enough** dans Applications, et lancez. macOS signalera qu'il s'agit d'une application venue d'internet — elle est signée et notariée, donc c'est la sympathique boîte de dialogue bleue avec un bouton **Ouvrir**, une seule fois, pas un avertissement à contourner. Un guide de premier lancement prend le relais : il construit son propre environnement Python, vous montre la liste des modèles avec un verdict honnête sur ce qui tient sur *cette* machine (section 14.1), liste les extras optionnels que vous avez déjà, et vous remet à l'écran d'accueil pour choisir le dossier dans lequel vous voulez travailler (section 2). L'essentiel de l'attente, c'est le téléchargement des modèles. Pas de Terminal, pas de Homebrew, pas de git.
+**L'application — la voie courte.** Téléchargez le DMG `enough` depuis la page des releases, ouvrez-le, glissez **enough** dans Applications, et lancez. macOS signalera qu'il s'agit d'une application venue d'internet — elle est signée et notariée, donc c'est la sympathique boîte de dialogue bleue avec un bouton **Ouvrir**, une seule fois, pas un avertissement à contourner. Un guide de premier lancement prend le relais : il construit son propre environnement Python, vous montre la liste des modèles avec un verdict honnête sur ce qui tient sur *cette* machine (section 15.1), liste les extras optionnels que vous avez déjà, et vous remet à l'écran d'accueil pour choisir le dossier dans lequel vous voulez travailler (section 2). L'essentiel de l'attente, c'est le téléchargement des modèles. Pas de Terminal, pas de Homebrew, pas de git.
 
 L'application embarque son propre moteur d'inférence et Python. Les extras optionnels — saisie vocale, récupération de pages web, vérification grammaticale, traduction — restent des programmes séparés ; la page Extras du guide nomme chacun d'eux, ce qui se désactive sans lui, et comment l'obtenir. Rien n'est obligatoire, et rien ne s'installe dans votre dos. Un extra n'est même pas un programme séparé du tout : la **lecture de PDF** s'installe depuis l'intérieur d'enough quand vous le voulez (section 7.8).
 
@@ -42,7 +42,7 @@ Le lanceur exécute `bootstrap.sh`, un installeur interactif en dix étapes qui 
 3. Installer les programmes auxiliaires sur lesquels s'appuie enough : `llama.cpp` (inférence de modèle locale), `whisper-cpp` (saisie vocale), `tor` (récupérations web anonymisées), et `harper` (vérification grammaticale locale, utilisée par la compétence analyzer). Les convertisseurs de documents — pandoc, pour transformer les pages web récupérées et les fichiers Word en markdown, et typst, pour écrire des PDF — ne sont plus sur cette liste : ils sont fournis à l'intérieur de l'environnement Python propre à enough, installé à l'étape 5, sur toutes les plateformes. Si vous avez par hasard votre propre pandoc installé via Homebrew, enough utilise celui-là à la place.
 4. Mettre en place `~/enough/`, le répertoire d'installation global.
 5. Préparer l'environnement Python (via `uv`).
-6. Télécharger les poids des modèles. Chaque modèle pris en charge est proposé un par un, avec sa taille et une vérification de faisabilité par rapport à la mémoire et à l'espace disque libre de votre machine — ✓ veut dire confortable, ~ veut dire juste, ✗ veut dire cherchez ailleurs. Dites oui à autant ou aussi peu que vous voulez ; la section 14.1 les décrit tous, et tout ce que vous sautez reste une installation en un clic plus tard.
+6. Télécharger les poids des modèles. Chaque modèle pris en charge est proposé un par un, avec sa taille et une vérification de faisabilité par rapport à la mémoire et à l'espace disque libre de votre machine — ✓ veut dire confortable, ~ veut dire juste, ✗ veut dire cherchez ailleurs. Dites oui à autant ou aussi peu que vous voulez ; la section 15.1 les décrit tous, et tout ce que vous sautez reste une installation en un clic plus tard.
 7. Placer le modèle de saisie vocale (whisper).
 8. Placer le modèle de traduction hors ligne, utilisé par la compétence `translator`.
 9. Mettre la commande `enough` sur votre PATH.
@@ -129,7 +129,7 @@ Un projet dont le dossier n'est pas là en ce moment — un disque externe débr
 
 ### 2.2 Cliquer sur un projet : la carte
 
-Un simple clic n'ouvre pas un projet. Il vous dessine une **carte** de celui-ci : un diagramme merirmaid en lecture seule (section 20) du contenu visible du dossier, avec un petit nœud d'information en haut portant le chemin, le nombre de fichiers, les totaux ¶ et W, et les dates de création, dernière ouverture et dernière modification du projet. C'est le même genre d'image que cacheawl dessine pour un cachebox (section 12.1), pointée sur un projet à la place.
+Un simple clic n'ouvre pas un projet. Il vous dessine une **carte** de celui-ci : un diagramme merirmaid en lecture seule (section 21) du contenu visible du dossier, avec un petit nœud d'information en haut portant le chemin, le nombre de fichiers, les totaux ¶ et W, et les dates de création, dernière ouverture et dernière modification du projet. C'est le même genre d'image que cacheawl dessine pour un cachebox (section 12.1), pointée sur un projet à la place.
 
 La carte sert pour le moment où vous avez quatre dossiers aux noms plausibles et voulez savoir lequel contient les chapitres. Regardez, puis décidez.
 
@@ -195,9 +195,9 @@ La plupart des logiciels vous donnent des fonctionnalités. enough vous donne de
 - **`AGENT.md`** — qui est votre readvisor en chef et comment il opère (section 5.3)
 - **`MOTIVATION.md`** — le pourquoi : valeurs, priorités, ce à quoi ressemble « terminé »
 - **Les politiques** — des règles strictes sur ce qui peut être lu, écrit, et récupéré (section 5.4)
-- **Le paradigme actif** — le cadre de raisonnement en vigueur en ce moment (section 15)
-- **Les compétences activées** — des capacités auxquelles il peut faire appel (section 18)
-- **Les readvisors activés** — d'autres jugements fondus dans la voix, ou assis à un conseil (section 16)
+- **Le paradigme actif** — le cadre de raisonnement en vigueur en ce moment (section 16)
+- **Les compétences activées** — des capacités auxquelles il peut faire appel (section 19)
+- **Les readvisors activés** — d'autres jugements fondus dans la voix, ou assis à un conseil (section 17)
 - **Le profil du projet** — ce qui a été appris sur ce projet (section 8.1)
 
 Modifiez n'importe lequel de ces éléments, dans l'application ou dans n'importe quel éditeur de texte, et le changement prend effet au message suivant. Pas de recompilation, pas de redémarrage, pas d'API de plugin. Si vous savez écrire un fichier markdown, vous savez reprogrammer vos readvisors.
@@ -208,7 +208,7 @@ Tout ce qui est personnalisable suit un seul motif : **les défauts vivent dans 
 
 Modifiez un fichier dans `~/enough/defaults/` et tout projet encore lié à lui récupère le changement. Dans un projet, ouvrez un fichier lié et cliquez sur **personnaliser** — le lien devient une copie locale au projet, et à partir de là ce projet fait sa propre route pendant que les autres continuent de suivre le défaut global. L'arborescence des fichiers vous dit lequel est lequel d'un coup d'œil : les fichiers liés s'affichent *en italique et atténués*, les copies locales s'affichent normalement.
 
-Les nouvelles compétences et les nouveaux paradigmes déposés dans `~/enough/defaults/` apparaissent dans tous les projets au lancement suivant ; les readvisors ont en plus un foyer inscriptible bien à eux, `~/enough/readvisors/` (section 16). Compétences et readvisors arrivent désactivés, donc rien ne change dans votre dos ; vous les activez par projet quand vous les voulez. Une compétence qu'enough n'a pas fournie — une que vous avez téléchargée, une qu'un ami vous a envoyée, une écrite pour vous au cours d'une séance — est lue avant d'être autorisée à entrer. La section 18.8 couvre ce sujet.
+Les nouvelles compétences et les nouveaux paradigmes déposés dans `~/enough/defaults/` apparaissent dans tous les projets au lancement suivant ; les readvisors ont en plus un foyer inscriptible bien à eux, `~/enough/readvisors/` (section 17). Compétences et readvisors arrivent désactivés, donc rien ne change dans votre dos ; vous les activez par projet quand vous les voulez. Une compétence qu'enough n'a pas fournie — une que vous avez téléchargée, une qu'un ami vous a envoyée, une écrite pour vous au cours d'une séance — est lue avant d'être autorisée à entrer. La section 19.9 couvre ce sujet.
 
 ### 3.2 Les trois types de composants
 
@@ -217,11 +217,11 @@ Les nouvelles compétences et les nouveaux paradigmes déposés dans `~/enough/d
 | Ce que c'est | Un cadre de raisonnement — comment le travail est abordé | Une capacité ciblée — vocabulaire, recettes, procédures | Un second jugement — son propre AGENT.md + MOTIVATION.md |
 | Combien actifs | Exactement un à la fois | N'importe quel nombre activé | N'importe quel nombre activé |
 | Vit à | `rness/paradigms/<nom>.md` | `rness/skills/<nom>/SKILL.md` | `rness/readvisors/<nom>/` |
-| Exemples fournis | default, text-planning, translation, workflow-design | analyzer, anything-finder, girraph-merirmaid, memoir-dialectic, readvisory, scaffold, translator | block-breaker, open-skeptic |
+| Exemples fournis | text-planning (l'accueil), translation, workflow-design | analyzer, anything-finder, girraph-merirmaid, lexicographer, memoir-dialectic, readvisory, scaffold, translator | block-breaker, open-skeptic |
 
 ### 3.3 Construire les vôtres
 
-Vous pouvez écrire ces fichiers à la main — ce sont du markdown avec un petit bloc YAML en tête — mais vous n'êtes pas obligé. Le **paradigme workflow-design** fourni d'origine (section 15.4) existe pour que votre readvisor en chef puisse les construire avec vous. Dites « construis-moi une compétence qui… » ou « fais-moi un paradigme pour… » et il bascule vers workflow-design, pose ses questions de clarification (périmètre ? nom ? conditions de déclenchement ? fichiers compagnons ?), et écrit le composant correctement, frontmatter `description:` comprise, celle qui indique aux tours futurs quand y faire appel. Les readvisors ont leur propre porte d'entrée — la compétence `readvisory` (section 18.5), qui interroge une personne plutôt qu'une spécification.
+Vous pouvez écrire ces fichiers à la main — ce sont du markdown avec un petit bloc YAML en tête — mais vous n'êtes pas obligé. Le **paradigme workflow-design** fourni d'origine (section 16.3) existe pour que votre readvisor en chef puisse les construire avec vous. Dites « construis-moi une compétence qui… » ou « fais-moi un paradigme pour… » et il bascule vers workflow-design, pose ses questions de clarification (périmètre ? nom ? conditions de déclenchement ? fichiers compagnons ?), et écrit le composant correctement, frontmatter `description:` comprise, celle qui indique aux tours futurs quand y faire appel. Les readvisors ont leur propre porte d'entrée — la compétence `readvisory` (section 19.6), qui interroge une personne plutôt qu'une spécification.
 
 Ce que les gens construisent réellement :
 
@@ -243,17 +243,19 @@ Ce qu'il y a autour :
 
 - **La barre d'outils**, en haut du canevas : le titre de la composure (tapez dedans, cliquez ailleurs, c'est renommé), le sélecteur lecture/édition, les outils, **ajouter un module**, annuler et rétablir, le groupe de zoom, la recherche, l'interrupteur des commentaires, et le menu **composures** — nouvelle à partir d'un form…, ouvrir…, enregistrer comme form….
 - **La barre latérale.** L'arborescence des fichiers du projet, plus les sections de contrôle : le **paradigme** actif, les interrupteurs des **compétences** et des **readvisors**, et vos **requêtes**. Option-cliquez n'importe quel fichier ou dossier pour un menu contextuel (nouveau fichier, nouveau dossier, copier le chemin, copier le nom). ⌘\ masque et affiche toute la barre latérale.
-- **La barre du haut.** Les boutons de la fenêtre de modèle, du broker, de la fenêtre UI, de wikisink (🚰), et de cacheawl ; les indicateurs des modes actuellement empilés (section 13) ; et, tout à droite, l'interrupteur du panneau readvisor.
+- **La barre du haut.** Les boutons de la fenêtre de modèle, du broker, de la fenêtre UI, de wikisink (🚰), et de cacheawl ; les indicateurs des modes actuellement empilés (section 14) ; et, tout à droite, l'interrupteur du panneau readvisor.
 
 ### 4.1 Se déplacer
 
-**Faites glisser** avec un défilement à deux doigts, en maintenant la barre d'espace, ou avec le bouton du milieu de la souris. **Zoomez** par pincement, avec ⌘-molette autour du pointeur, avec ⌘+ / ⌘− / ⌘0, ou avec **ajuster** — qui recule juste assez pour montrer tout ce que vous avez. L'affichage du zoom dans la barre d'outils est un bouton : cliquez-le pour revenir à 100 %.
+**Faites glisser** avec un défilement à deux doigts, en maintenant la barre d'espace, ou avec le bouton du milieu de la souris. **Zoomez** par pincement, avec ⌘-molette autour du pointeur, avec ⌘+ / ⌘− / ⌘0, ou avec **ajuster**, qui cadre tout ce que vous avez et le centre. L'affichage du zoom dans la barre d'outils est un bouton : cliquez-le pour revenir à 100 %.
 
-Deux choses zooment toutes seules, et les deux essaient de vous aider.
+Trois choses déplacent la vue toutes seules, et les trois essaient de vous aider.
 
-**Les paliers de panneau.** Masquer un panneau latéral ne fait pas qu'élargir le canevas, ça l'*agrandit* : le texte d'une page se lit vers 12 points avec la barre latérale et le panneau readvisor ouverts, vers 14 avec l'un des deux masqué, et vers 16 avec les deux. Le changement s'anime sur un cinquième de seconde, ancré sur votre curseur si vous êtes en train de taper et sur le milieu de la vue sinon, pour que vous ne perdiez pas votre place. C'est le bon comportement neuf fois sur dix, et la dixième vous zoomez à la main et il cesse d'intervenir pour ce document-là.
+**L'ajustement, chaque fois que la place change.** Sur un tableau — toute composure qui n'a pas la forme d'une page — un changement de l'espace dont dispose le canevas se termine exactement là où **ajuster** vous mettrait : tout en vue, centré. Masquez la barre latérale, ouvrez ou fermez le panneau readvisor, donnez-lui toute la fenêtre puis reprenez-la, ouvrez les commentaires, redimensionnez la fenêtre, changez l'échelle de l'ui : un instant après que le changement se stabilise, le tableau aussi. Il sait attendre, également. Il ne prend jamais la vue pendant que vous faites glisser, pincez ou défilez, et tant qu'un mode est empilé sur la composure il se retient jusqu'à ce que vous redescendiez jusqu'à elle. Zoomer à la main marche toujours comme avant ; cela dure jusqu'à la prochaine fois que la place change.
 
-**L'ajustement de page.** Une composure en forme de page — vierge, journal, conseil — est centrée et tenue au zoom qui fait tenir toute sa largeur, avec une marge confortable, jusqu'à la première fois que vous zoomez à la main. Une fenêtre plus large montre plus de plan de travail autour de la feuille plutôt qu'une feuille plus grande. Seule la largeur est ajustée : une page est plus haute que la plupart des fenêtres, donc le bas d'une page est toujours à un glissement de distance.
+**Les paliers de panneau.** Sur une page, masquer un panneau latéral ne fait pas qu'élargir le canevas, ça l'*agrandit* : le texte d'une page se lit vers 12 points avec la barre latérale et le panneau readvisor ouverts, vers 14 avec l'un des deux masqué, et vers 16 avec les deux. Le changement s'anime sur un cinquième de seconde, ancré sur votre curseur si vous êtes en train de taper et sur le milieu de la vue sinon, pour que vous ne perdiez pas votre place.
+
+**L'ajustement de page.** Une composure en forme de page — vierge, journal, conseil — est centrée et tenue au zoom qui fait tenir toute sa largeur, avec une marge confortable, jusqu'à la première fois que vous zoomez à la main. Une fenêtre plus large montre plus de plan de travail autour de la feuille plutôt qu'une feuille plus grande. Seule la largeur est ajustée : une page est plus haute que la plupart des fenêtres, donc le bas d'une page est toujours à un glissement de distance. Quand la place change, une page garde cet arrangement — largeur réajustée, feuille recentrée, position de lecture là où elle était — plutôt que d'être rétrécie pour montrer d'un coup toute une longue feuille.
 
 **Les faces.** Dézoomez assez loin et chaque module se replie sur sa **face** : son titre, composé aussi grand que la boîte le permet, avec le corps en faux-texte. Soixante cartes se lisent donc comme soixante titres au lieu de soixante rectangles gris, et un tableau que vous avez construit à taille de lecture reste un tableau d'un coup d'œil. Donnez un titre à un module et c'est vous qui décidez ce que dit cette face. L'encre, de son côté, s'amincit plus lentement que tout le reste ne rétrécit : un croquis vu de loin se lit encore comme un croquis.
 
@@ -299,9 +301,9 @@ Un **form** est un modèle de composure. Cinq sont fournis :
 
 - **blank** — une seule feuille en forme de page, qui s'ouvre dans la face édition avec le curseur déjà en train de clignoter dedans.
 - **cards** — un tableau de cartes de texte en grille, qui s'ouvre dézoomé pour tout montrer.
-- **scaffold** — un tableau disposé en colonnes de temps forts, avec un bandeau en haut pour la prémisse et une rangée en bas pour les fins. C'est ce que la compétence `scaffold` (section 18.6) remplit quand elle transforme un tas de notes en structure.
+- **scaffold** — un tableau disposé en colonnes de temps forts, avec un bandeau en haut pour la prémisse et une rangée en bas pour les fins. C'est ce que la compétence `scaffold` (section 19.7) remplit quand elle transforme un tas de notes en structure.
 - **journal** — un registre daté. Un module, une entrée par page. Ouvrir un journal vous pose sur la page d'*aujourd'hui*, curseur dedans, et cette page n'existe qu'en mémoire jusqu'à ce que vous tapiez quelque chose : ouvrir le journal puis se raviser ne laisse donc rien derrière. L'entrée s'enregistre au fil de l'eau ; partez sans la classer et le journal rouvre sur ce même brouillon inachevé. **classer cette entrée** l'estampille de la date et la rend définitivement en lecture seule — enough refusera de la modifier ensuite et le curseur n'y entrera plus — et vous fait passer à une page neuve. Refeuilleter les entrées classées ne risque rien : tourner une page où vous n'avez pas écrit n'enregistre rien du tout. Vous pouvez toujours commenter un texte classé, ce qui est bien tout l'intérêt de le classer.
-- **council** — une salle de readvisors qui réfléchissent à une seule chose chacun leur tour. C'est la section 17.
+- **council** — une salle de readvisors qui réfléchissent à une seule chose chacun leur tour. C'est la section 18.
 
 **enregistrer comme form…**, dans le menu des composures, garde la composure que vous regardez comme un form à vous. Il atterrit dans `rness/composure-forms/` et rejoint la liste à partir de là, dans ce projet. Un form à vous qui porte le nom d'un form fourni l'emporte.
 
@@ -309,7 +311,7 @@ Un **form** est un modèle de composure. Cinq sont fournis :
 
 **La recherche** lit le texte brut de chaque module et de chaque page — ou d'un seul module, quand exactement un est sélectionné. Entrée et maj-Entrée parcourent les résultats, avec un compteur à côté du champ. Un résultat est un *endroit*, pas un surlignage : le canevas glisse jusqu'à lui, tourne à sa page si elle est ailleurs, et clignote brièvement sur les mots. Rien dans votre texte n'est touché pour vous montrer où il est. Échap efface la requête.
 
-**Les commentaires** fonctionnent comme ceux de wikisink (section 11.2), sur les mêmes cartes. Sélectionnez du texte dans un module et commentez-le, ou commentez un module entier depuis l'inspecteur ou le menu option-clic ; le bouton des commentaires dans la barre d'outils ouvre le panneau. Répondre, résoudre, rouvrir, sauter. Un texte que vous modifiez ensuite est ré-épinglé à son module ; un module carrément supprimé laisse le commentaire **orphelin** dans le panneau, étiqueté comme tel, jamais discrètement jeté. Les commentaires vivent dans un fichier caché à côté du `.comp` plutôt que dedans, pour que la composure elle-même reste propre — et ils fonctionnent sur des choses que vous ne pouvez pas modifier du tout, comme une page de journal classée ou une intervention de conseil.
+**Les commentaires** fonctionnent comme ceux de wikisink (section 11.2), sur les mêmes cartes. Sélectionnez du texte dans un module et commentez-le, ou commentez un module entier depuis l'inspecteur ou le menu qu'ouvre un clic droit dessus ; le bouton des commentaires dans la barre d'outils ouvre le panneau. Répondre, résoudre, rouvrir, sauter. Un texte que vous modifiez ensuite est ré-épinglé à son module ; un module carrément supprimé laisse le commentaire **orphelin** dans le panneau, étiqueté comme tel, jamais discrètement jeté. Les commentaires vivent dans un fichier caché à côté du `.comp` plutôt que dedans, pour que la composure elle-même reste propre — et ils fonctionnent sur des choses que vous ne pouvez pas modifier du tout, comme une page de journal classée ou une intervention de conseil.
 
 **Annuler** est ⌘Z, rétablir ⇧⌘Z, jusqu'à cent pas par composure ouverte. À l'intérieur d'une page de texte, c'est l'annulation de votre navigateur qui prend le relais, et c'est la bonne à cet endroit.
 
@@ -325,7 +327,7 @@ Et n'importe quel `.comp` de l'arborescence s'ouvre d'un clic. Il ne s'empile pa
 
 ### 4.8 Jeter un œil sous la pile
 
-Les indicateurs de la pile de modes dans la barre du haut (section 13) se terminent par un carré permanent pour la composure. Il n'a pas de ruban de fermeture, parce qu'il n'y a rien à fermer.
+Les indicateurs de la pile de modes dans la barre du haut (section 14) se terminent par un carré permanent pour la composure. Il n'a pas de ruban de fermeture, parce qu'il n'y a rien à fermer.
 
 Cliquez-le pendant que des modes sont empilés et tous se masquent, vous montrant le canevas en dessous avec leur état exactement tel qu'il était — votre position de défilement, vos modifications non enregistrées, votre descente dans un girraph imbriqué. Cliquez-le de nouveau, ou cliquez n'importe quel autre indicateur, et ils reviennent aussitôt. Échap pendant le coup d'œil restaure d'abord la pile, et ne la dépile qu'ensuite.
 
@@ -333,7 +335,7 @@ C'est pour le moment où la chose que vous devez vérifier est sur le tableau et
 
 ### 4.9 Ce que vos readvisors peuvent faire à une composure
 
-Ils peuvent en lire une, en fabriquer une à partir d'un form, ajouter, restyler et réorganiser des modules, écrire une page, enregistrer une composure comme form, et — avec la compétence `scaffold` (section 18.6) — transformer tout un plan en tableau disposé, d'un seul geste. Tout cela est conditionné par l'interrupteur **composure tools** du broker (section 9) ; votre propre canevas n'est jamais conditionné, de la même façon que votre propre navigation dans wikisink et cacheawl ne l'est jamais.
+Ils peuvent en lire une, en fabriquer une à partir d'un form, ajouter, restyler et réorganiser des modules, écrire une page, enregistrer une composure comme form, et — avec la compétence `scaffold` (section 19.7) — transformer tout un plan en tableau disposé, d'un seul geste. Tout cela est conditionné par l'interrupteur **composure tools** du broker (section 9) ; votre propre canevas n'est jamais conditionné, de la même façon que votre propre navigation dans wikisink et cacheawl ne l'est jamais.
 
 Ce qu'ils ne peuvent pas faire, c'est écrire un `.comp` comme fichier. Les deux portes ordinaires d'écriture de fichier refusent l'extension tout net : chaque changement qu'un readvisor apporte passe donc par le même petit jeu d'opérations que vous utilisez, une à la fois, par la même porte, dans le registre. Ça veut dire qu'un modèle qui s'embrouille ne peut pas corrompre un document — le pire qu'il puisse faire est d'ajouter une carte dont vous ne vouliez pas, et ⌘Z est juste là.
 
@@ -344,9 +346,13 @@ Quand un readvisor modifie un module pendant que vous regardez la composure, il 
 
 ## 5. Le panneau readvisor
 
-La conversation vit dans une colonne le long du bord droit, à côté de ce sur quoi vous travaillez plutôt qu'à sa place. Votre **readvisor en chef** est nommé en haut — **Ed**, jusqu'à ce que vous le renommiez (section 16) — avec les autres readvisors que vous avez activés listés à côté de lui. En conversation ordinaire, ils répondent d'une seule voix, nourrie de toutes ces perspectives ; un conseil (section 17), c'est là qu'ils parlent séparément.
+La conversation vit dans une colonne le long du bord droit, à côté de ce sur quoi vous travaillez plutôt qu'à sa place. Votre **readvisor en chef** est nommé en haut — **Ed**, jusqu'à ce que vous le renommiez (section 17) — avec les autres readvisors que vous avez activés listés à côté de lui. En conversation ordinaire, ils répondent d'une seule voix, nourrie de toutes ces perspectives ; un conseil (section 18), c'est là qu'ils parlent séparément.
 
 Tapez un message et faites ⌘Entrée, ou cliquez le bouton d'envoi. Les réponses arrivent en flux continu, et enough peut agir pendant que votre readvisor parle — lire et écrire des fichiers, lancer des commandes shell, récupérer des pages — chaque appel d'outil apparaissant dans la transcription au fur et à mesure. Le **bouton micro** dicte : la parole est transcrite localement par whisper.cpp, votre voix ne quitte jamais la machine, et le bouton pulse pendant l'enregistrement. Cliquez de nouveau pour arrêter.
+
+Les deux voix restent chacune de leur côté de la colonne : vos messages se collent au bord gauche, ceux de votre readvisor en chef au bord droit, chacun avec un fin filet de sa propre couleur le long du bord extérieur, si bien qu'un long échange se lit encore comme un échange d'un coup d'œil. Seuls les blocs bougent — le texte à l'intérieur reste aligné à gauche, parce qu'une prose alignée à droite est pénible à lire. Les notes propres d'enough (un refus, une suggestion, la question qu'un `/pal` a envoyée) occupent toute la largeur, puisqu'elles ne sont la voix de personne.
+
+**Une brève présentation.** Une conversation vide en propose une : un petit lien, *une brève présentation d'enough*, sous la ligne d'attente. Cliquez dessus, ou tapez `/intro` à n'importe quel moment, et votre readvisor en chef affiche une courte visite — ce qu'est un projet, la composure, lecture/édition, les readvisors, les paradigmes, le dictionnaire et le reste de la référence locale, et où se trouve le manuel complet. Aucun modèle ne l'écrit : elle arrive donc d'un coup et dit chaque fois la même chose. Demandez « que sais-tu faire ? » ou « qu'est-ce qu'enough ? » comme tout premier message et vous obtenez la même présentation ; plus tard dans une conversation, ces questions vont à votre readvisor comme n'importe quelle autre, parce qu'alors « c'est quoi, ça ? » désigne en général quelque chose à l'écran. Et si vous ouvrez par un simple bonjour, votre readvisor en chef peut proposer la présentation avant toute autre chose. Elle suit la langue de votre interface quand une traduction existe, et elle est en anglais sinon.
 
 ### 5.1 Ancré, plein écran, fermé
 
@@ -362,7 +368,7 @@ Trois états, un seul interrupteur tout à droite de la barre du haut.
 
 Ouvert ou fermé est retenu par projet, dans les fichiers de ce projet, et appliqué avant le premier rendu de la fenêtre, pour que rien ne sursaute au lancement. Le plein écran est un geste plutôt qu'un réglage, et n'est jamais retenu.
 
-**Une exception, et c'est un conseil.** Tant qu'un conseil est sur le canevas (section 17), le panneau est tenu fermé et son interrupteur est désactivé, avec une infobulle qui dit pourquoi : les conseils et la discussion partagent un seul modèle, et il n'y en a qu'un. Quitter le conseil vous rend le panneau exactement comme vous l'aviez — votre propre préférence est retenue, pas écrasée.
+**Une exception, et c'est un conseil.** Tant qu'un conseil est sur le canevas (section 18), le panneau est tenu fermé et son interrupteur est désactivé, avec une infobulle qui dit pourquoi : les conseils et la discussion partagent un seul modèle, et il n'y en a qu'un. Quitter le conseil vous rend le panneau exactement comme vous l'aviez — votre propre préférence est retenue, pas écrasée.
 
 ### 5.2 Envoyer une sélection
 
@@ -378,7 +384,7 @@ Chaque projet porte sa propre copie de ces deux fichiers dans `rness/`. Ils sont
 
 **`MOTIVATION.md`**, c'est le *pourquoi* : les valeurs et les priorités au-delà de la tâche du moment. À quoi sert le projet, qui il sert, quels arbitrages comptent (la justesse avant la vitesse ? la brièveté avant l'exhaustivité ?), à quoi ressemble « terminé ».
 
-Cliquez sur l'un ou l'autre fichier dans la barre latérale pour le lire ; appuyez sur **personnaliser** pour forker votre copie locale au projet, ou modifiez-le dans l'éditeur de votre choix. Les changements prennent effet au message suivant. Tous les autres readvisors utilisent ces deux mêmes fichiers (section 16) — le chef n'est pas d'une autre nature, il est seulement celui qui parle par défaut.
+Cliquez sur l'un ou l'autre fichier dans la barre latérale pour le lire ; appuyez sur **personnaliser** pour forker votre copie locale au projet, ou modifiez-le dans l'éditeur de votre choix. Les changements prennent effet au message suivant. Tous les autres readvisors utilisent ces deux mêmes fichiers (section 17) — le chef n'est pas d'une autre nature, il est seulement celui qui parle par défaut.
 
 ### 5.4 Le dossier des politiques et les listes blanches
 
@@ -409,9 +415,9 @@ Lecture/édition existe en deux tailles. **Mini** est un panneau latéral à cô
 
 Changez de taille avec le bouton mini↔plein dans l'habillage du panneau. Changez de face avec le bouton de bascule de face juste à côté. ⌘S enregistre dans la face édition. Quand ce que vous regardez est le jumeau d'un document converti, l'habillage nomme aussi l'original et porte un bouton **exporter** pour réécrire vos changements dedans (section 7.5). Et tout est protégé contre la perte : si vous avez des modifications non enregistrées, enough vous prévient avant de laisser quoi que ce soit les abandonner — naviguer vers un autre fichier, fermer le mode, rebondir vers un autre document. Vous ne perdrez pas une heure de travail à cause d'un clic malheureux.
 
-Pendant qu'un document est ouvert, trois compteurs apparaissent dans la barre supérieure et suivent votre frappe : **¶** paragraphes, **W** mots, **C** caractères. (La vue liste de l'écran d'accueil vous montre les trois mêmes totaux pour tout un projet — section 2.1.)
+Pendant qu'un document est ouvert, trois compteurs apparaissent dans la barre supérieure et suivent votre frappe : **¶** paragraphes, **W** mots, **C** caractères. (La vue liste de l'écran d'accueil vous montre les trois mêmes totaux pour tout un projet — section 2.1.) Quand la fenêtre se rétrécit, les boutons et les indicateurs de mode gardent leur place : le nom du projet raccourcit d'abord, jusqu'à une dizaine de caractères environ, et ce n'est qu'ensuite que les compteurs s'effacent, de droite à gauche.
 
-Comme chaque mode plein cadre, lecture/édition affiche son icône dans la zone d'indicateurs en haut à droite, avec un petit ruban croix-rouge accroché pour fermer (section 13).
+Comme chaque mode plein cadre, lecture/édition affiche son icône dans la zone d'indicateurs en haut à droite, avec un petit ruban croix-rouge accroché pour fermer (section 14).
 
 ### 6.2 Surlignage
 
@@ -425,8 +431,8 @@ Voici la partie qui change votre façon de travailler : vos readvisors peuvent l
 
 - **Markdown (`.md`)** s'affiche mis en forme dans la face lecture et comme source dans la face édition. Markdown est la langue maternelle d'enough — presque tout ce que le système lui-même écrit est du markdown.
 - **Le texte brut**, et tout ce qui y ressemble, s'ouvre en lecture/édition comme du texte.
-- Les fichiers **`.girraph`** s'ouvrent en mode girraph à la place (section 19).
-- Les fichiers **`.merirmaid`** s'ouvrent en mode merirmaid à la place (section 20).
+- Les fichiers **`.girraph`** s'ouvrent en mode girraph à la place (section 20).
+- Les fichiers **`.merirmaid`** s'ouvrent en mode merirmaid à la place (section 21).
 - Les **articles Wikipédia enregistrés** (`article.html` à l'intérieur d'un dossier `wiki/`) s'ouvrent dans le lecteur wikisink en fidélité complète (section 11.2).
 - **Documents Word, PDF, ebooks, présentations, classeurs** s'ouvrent comme un **jumeau** markdown modifiable — une ligne dans l'arborescence, un clic, et un bouton **exporter** dans l'habillage pour réécrire vos changements en retour. C'est la section 7, et c'est toute l'histoire.
 - Les **images** (`.png`, `.jpg`, `.gif`, `.webp`, `.bmp`, `.svg`) s'ouvrent dans une visionneuse simple (section 7.9). Les images *à l'intérieur* d'un document s'affichent dans la face lecture comme n'importe quelle autre image en markdown.
@@ -553,14 +559,14 @@ your-project/
   rness/
     AGENT.md            who your chief readvisor is    (5.3)
     MOTIVATION.md       why they work                  (5.3)
-    active-paradigm     which paradigm is in force     (15)
-    paradigms/          available reasoning frameworks (15)
-    skills/             available skills               (18)
-    readvisors/         the readvisors you can turn on (16)
+    active-paradigm     which paradigm is in force     (16)
+    paradigms/          available reasoning frameworks (16)
+    skills/             available skills               (19)
+    readvisors/         the readvisors you can turn on (17)
     policies/           the hard rules                 (5.4)
     composure-forms/    composure forms you saved      (4.5)
     knowledge/          project memory                 (8.1)
-      councils/         exported council transcripts   (17)
+      councils/         exported council transcripts   (18)
     io/                 input/output workspace          (8.2)
       composure/        where new composures land       (4.7)
     requests/           long-running work tracking      (8.3)
@@ -591,7 +597,7 @@ Au-delà de ces deux-là, le dossier est à vous. Ajoutez un sous-dossier `gloss
 
 - **`input/`** — déposez des fichiers ici pour qu'ils soient traités. Les pages web récupérées atterrissent aussi ici automatiquement, converties en markdown et mises en cache, si bien qu'une page récupérée une fois reste ancrée pour toujours.
 - **`output/`** — là où atterrissent les artefacts générés. Passez en revue, gardez ce qui est bon, videz le reste.
-- **`cloud-cache/`** — si vous utilisez l'emplacement de modèle cloud, chaque échange cloud est enregistré ici (section 14.2). Même le travail dans le cloud laisse une trace papier locale et grep-able.
+- **`cloud-cache/`** — si vous utilisez l'emplacement de modèle cloud, chaque échange cloud est enregistré ici (section 15.2). Même le travail dans le cloud laisse une trace papier locale et grep-able.
 
 ### 8.3 Requêtes : comment les travaux longs survivent
 
@@ -624,7 +630,7 @@ Treize interrupteurs, en groupes :
 | wikisink live updates | Si les passes de mise à jour peuvent contacter Wikipédia du tout (désactivé = rapport depuis l'état local uniquement) |
 | cacheawl tools | Si les outils de cachebox de vos readvisors fonctionnent (votre propre mode cacheawl n'est jamais soumis à contrôle) |
 | composure tools | Si vos readvisors peuvent lire et modifier des composures (votre propre canevas n'est jamais soumis à contrôle — section 4.9) |
-| forge new readvisors | Si la compétence `readvisory` peut installer pour vous un readvisor terminé (section 18.5). Désactivé, l'entretien et la rédaction ont quand même lieu, et le classement vous revient |
+| forge new readvisors | Si la compétence `readvisory` peut installer pour vous un readvisor terminé (section 19.6). Désactivé, l'entretien et la rédaction ont quand même lieu, et le classement vous revient |
 
 L'en-tête de la fenêtre porte aussi le seul bouton d'enough qui change le nom de quelqu'un : **renommer votre readvisor en chef**. Il ouvre un petit champ, accepte de un à vingt-quatre caractères, et le nouveau nom est dans la signature de la prochaine chose que dit votre chef. C'est un réglage à l'échelle de la machine, comme le thème — un chef, un nom, partout. Il n'a pas d'historique : la signature est toujours le nom actuel, parce qu'un renommage qui remonterait dans votre transcription se lirait comme deux personnes différentes présentes dans la pièce.
 
@@ -637,7 +643,9 @@ Remarquez le principe de conception dans ce tableau : les interrupteurs qui cont
 
 ## 10. La fenêtre UI et les docs d'aide
 
-Le bouton UI ⚙ ouvre les préférences d'affichage et le matériel de référence. Un petit bouton **aide** se trouve en haut à droite de cette fenêtre, à côté du × : il ouvre ce manuel en lecture seule, dans l'application, comme un mode plein cadre comme les autres (section 13).
+Le bouton UI ⚙ ouvre les préférences d'affichage et le matériel de référence. Un petit bouton **aide** se trouve en haut à droite de cette fenêtre, à côté du × : il ouvre ce manuel en lecture seule, dans l'application, comme un mode plein cadre comme les autres (section 14). À côté se trouve **dictionnaire**, qui ouvre FEED, le dictionnaire anglais d'enough (section 13).
+
+**Lire le manuel.** La barre d'outils du manuel a un bouton **sommaire** : la liste de chaque section et sous-section numérotée, à côté du texte quand il y a la place et repliée quand il n'y en a pas (dans la taille étroite en panneau latéral, par exemple), avec la section que vous lisez marquée au fil du défilement. **chercher**, ou ⌘F quand le manuel est au premier plan, ouvre une barre de recherche : chaque occurrence est marquée sur place avec un compte à côté du champ, Entrée et maj-Entrée les parcourent, et Esc la ferme. Et partout où ce manuel dit « section 7.3 », ces mots sont un lien qui vous y emmène. Chaque saut — un clic dans le sommaire, un lien de section, une recherche qui vous a emporté loin — laisse derrière lui une petite pastille **↩ retour à l'endroit où vous étiez**, et un clic vous remet là où vous lisiez.
 
 La sortie voyage désormais sur la barre de titre : **fermer le projet → accueil**, là-haut à côté du bouton aide, qui met fin à cette session et vous ramène à l'écran d'accueil (section 2.5). Elle demande avant de le faire, et elle précise ce qu'elle ne fait pas — le dossier sur le disque n'est pas touché. Dans l'application, vous auriez plus probablement recours à ⌘W ; ce bouton, c'est la même chose, et c'est le *seul* moyen si vous faites tourner enough dans un navigateur. (Il n'est pas là sur l'écran d'accueil lui-même, où il n'y a pas de projet à fermer.)
 
@@ -687,6 +695,8 @@ Deux colonnes de référence, juste dans la fenêtre UI.
 | ⌘ B / I / U | gras / italique / souligné sur la sélection (face lecture) |
 | ⌘ S | enregistrer (face édition) |
 | ⌥ clic | menu contextuel de l'arborescence |
+| ⇧ ⌘ D | entrée du dictionnaire pour le mot sélectionné, ou le mot sous le curseur |
+| clic droit sur un mot | menu de l'entrée du dictionnaire (maintenez maj pour le menu système) |
 
 (Sur un clavier non-Mac : Ctrl pour ⌘, Alt pour ⌥.)
 
@@ -781,9 +791,87 @@ Pourquoi s'en donner la peine ? Parce que les dossiers de projet sont un espace 
 
 ---
 
-## 13. Empilement de plusieurs modes actifs
+## 13. Le dictionnaire (FEED)
 
-Les modes plein cadre d'enough — lecture/édition, girraph, merirmaid, wikisink, cacheawl — ne se remplacent pas les uns les autres. Ils **s'empilent**, comme des feuilles de papier. Ouvrez cacheawl, ouvrez un girraph depuis l'intérieur d'une box, ouvrez un fichier de notes par-dessus : trois modes de profondeur, et fermer chacun révèle celui en dessous exactement comme vous l'aviez laissé. Même position de défilement, même descente, mêmes modifications non enregistrées.
+enough vient avec un dictionnaire bien à lui : **FEED**, le **dictionnaire anglais maison d'enough**. C'est une œuvre originale, écrite pour enough plutôt que sous licence venue d'ailleurs — environ 96 000 mots-vedettes, chacun avec sa prononciation, sa catégorie grammaticale et une définition claire, et la plupart avec des exemples, des formes, une origine, une date de premier emploi, une mesure de sa fréquence, ses rimes, ses parents, et ses équivalents dans cinq autres langues.
+
+Il vit sur votre machine. enough livre le dictionnaire en texte brut et le construit en base de données la première fois qu'il tourne après une installation ou une mise à jour — `~/enough/dict/feed.sqlite` — en arrière-plan, pendant que vous vous occupez d'autre chose. Ouvrez le dictionnaire pendant que ça tourne encore et il affiche *on assemble les caractères…* avec un pourcentage, puis poursuit tout seul. Chercher un mot ne touche jamais le réseau : ce que vous lisez, et les mots dont vous vous êtes demandé le sens, restent sur la machine.
+
+### 13.1 L'ouvrir
+
+Depuis la fenêtre ⚙ UI : le bouton **dictionnaire** se trouve à côté de **aide**, en haut (section 10). Le dictionnaire s'ouvre comme un mode plein cadre, empilé comme les autres (section 14), si bien que ce que vous lisiez est toujours en dessous quand vous le fermez, et Esc vous y ramène.
+
+C'est une surface de lecture. Vous ne pouvez pas taper dans ses entrées ni les réarranger ; ajouter et changer des mots passe par votre readvisor en chef (section 13.7).
+
+### 13.2 Tourner les pages
+
+Il est composé comme un dictionnaire imprimé plutôt que comme une liste qu'on fait défiler : autant d'entrées que la fenêtre peut en contenir, sur deux à quatre colonnes quand il y a de la place, et une page qu'on tourne. → et ←, Page suivante et Page précédente, espace et maj-espace la tournent toutes ; un seul glissement sur le pavé tactile ou un seul cran de molette aussi — une page par geste — et les boutons en bas aussi, qui nomment le mot qui attend sur la page suivante et celui qu'on laisse sur la précédente. Début et Fin vont à la première page et à la dernière.
+
+Le long du haut de chaque page courent les **mots-repères**, comme dans tout dictionnaire imprimé : le premier mot de la page à gauche, le dernier à droite, et entre les deux un rappel de l'ordre dans lequel vous lisez. Un titre marque l'endroit où commence chaque nouveau groupe — une lettre, un domaine, un siècle. En pied de page, un compte de l'endroit où vous êtes — quelles entrées sont sur la page, sur combien au total (il n'y a pas de numéros de page, puisqu'une page contient autant d'entrées que votre fenêtre le permet) — et **ouvrir n'importe où**, qui ouvre le dictionnaire à une page au hasard et éclaire un mot dessus. C'est une bonne façon de perdre dix minutes.
+
+Le long du bord droit se trouve l'**index à onglets**, ces onglets entaillés dans la tranche d'un gros dictionnaire de bureau : un onglet par lettre, chacun aussi haut que sa part du livre, si bien qu'on voit d'un coup d'œil que le S est gras et le X maigre. Cliquez sur un onglet pour ouvrir le dictionnaire à cet endroit. Les onglets suivent l'ordre dans lequel vous lisez — des domaines sous un tri par domaine, des siècles sous un tri par époque — et celui où vous êtes est marqué.
+
+Chaque entrée est brève : le mot-vedette avec des points entre ses syllabes (*lan·tern*), sa prononciation, sa catégorie grammaticale, la définition, une étiquette d'usage quand il y en a une, et quelques mots apparentés, chacun un lien qui tourne à la page de ce mot. ↑ et ↓ déplacent une sélection à travers les entrées ; Entrée, ou un double-clic, ouvre l'entrée sélectionnée en entier (section 13.5). Quand le dictionnaire est étroit — une petite fenêtre, ou serré à côté d'un panneau readvisor ancré — la page devient une seule colonne d'entrées plus fournies, chacune avec une petite jauge de fréquence, une frise du moment où le mot est arrivé, et son domaine.
+
+**Les marques de catégorie grammaticale.** Chaque entrée porte une marque pour chaque catégorie grammaticale qu'elle a, d'une couleur et d'une forme, si bien que la couleur n'est jamais le seul signal : un **carré** pour un nom, un **triangle** pour un verbe, un **losange** pour un adjectif, un **point rond** pour un adverbe, et un **anneau creux** pour tout le reste. Dans les colonnes, la marque se place devant l'abréviation (*n.*, *v.*, *adj.*…) et en fine barre le long du bord de l'entrée ; un mot qui est à la fois nom et verbe porte les deux.
+
+### 13.3 Trier, et trier encore
+
+L'ordre alphabétique n'est que le point de départ. **trier** classe tout le dictionnaire selon l'une de neuf choses — alphabétique, longueur, domaine, époque, catégorie grammaticale, fréquence, syllabes, ajoutés récemment, et provenance — et le bouton à côté inverse l'ordre, en mots simples : *courts d'abord* ou *longs d'abord*, *les plus anciens d'abord* ou *les plus récents d'abord*, *les plus rares d'abord* ou *les plus courants d'abord*.
+
+**puis** est un second ordre à l'intérieur du premier, et c'est là qu'est le plaisir. Triez par domaine, puis par époque, et chaque champ du savoir aligne ses mots dans l'ordre où l'anglais les a ramassés — les plus vieux mots de la musique d'abord, les plus récents à la fin. Triez par longueur, puis par ordre alphabétique, et vous pouvez lire dans l'ordre tous les mots de cinq lettres du livre, ce qui est tout l'après-midi d'un faiseur de mots croisés. Triez par fréquence, les plus rares d'abord, et le dictionnaire s'ouvre sur les mots que presque personne n'emploie. Tant qu'un second ordre est actif, chaque entrée montre en marge sa valeur pour cet ordre.
+
+**plus** ouvre deux courtes rangées. **essayez** contient une poignée d'ordres en un clic — *domaine, puis époque* ; *longueur, puis ordre alphabétique* ; *les plus rares d'abord* ; *époque, puis ordre alphabétique* ; *les mots les plus récents d'abord* ; *les vôtres seulement*. **seulement** restreint le livre à un domaine, une catégorie grammaticale, une bande de fréquence, ou aux mots de FEED ou aux vôtres, et **effacer** lève le tout. Le compte en haut à droite dit combien d'entrées vous regardez, sur combien.
+
+Le dictionnaire se souvient de votre ordre, de vos filtres et de la page où vous étiez, et s'ouvre là la prochaine fois.
+
+### 13.4 Trouver un mot
+
+Tapez dans la boîte de recherche en haut — / ou ⌘F vous y mène — et la page devient les résultats : chaque entrée dont le mot-vedette ou la définition contient ce que vous avez tapé, avec les occurrences marquées. Appuyez sur Entrée sur un mot exact et la recherche s'efface, et le dictionnaire tourne à la page de ce mot à la place, dans l'ordre où vous lisiez. Esc efface la recherche et vous remet sur la page où vous étiez avant elle.
+
+Une forme d'un mot — *ran*, par exemple — vous mène au mot dont elle dépend, et la carte d'une forme que vous avez cherchée dit de quelle forme de quoi il s'agit. Un mot que FEED n'a pas ouvre sa carte (section 13.5) avec la nouvelle, quelques mots voisins qu'il a bel et bien, et l'endroit où le mot tomberait s'il y était.
+
+### 13.5 La carte d'un mot
+
+Double-cliquez sur une entrée, ou sélectionnez-la et appuyez sur Entrée, et elle s'ouvre en grand, comme une carte par-dessus ce que vous faisiez. Tout ce que FEED sait du mot y figure, et la plupart dès la première vue :
+
+- le mot-vedette, ses syllabes et sa prononciation, et ses catégories grammaticales avec leurs marques ;
+- sa fréquence, en jauge de 0 à 8 avec le nom de la bande à côté ;
+- une bande de faits — domaine (et combien de mots le partagent), premier emploi, syllabes, lettres, et si l'entrée est celle de FEED ou la vôtre ;
+- une frise de l'ancien anglais aux années 2020, avec l'arrivée du mot marquée dessus ;
+- le **sens**, toute **note d'usage**, des **exemples** où le mot est mis en évidence, ses **formes** (pluriels, temps et le reste, chacun avec sa propre prononciation), ce dont il est une **forme de** s'il en est une, et son **origine**.
+
+Trois onglets contiennent le reste, à un clic (ou 1, 2 et 3) : **mots** — synonymes, antonymes, mots apparentés et homophones ; **rimes** — parfaites et approchées ; et **langues** — le mot posé à côté de ses équivalents en français, espagnol, allemand, chinois et japonais, avec la définition traduite dans chacune. Quand FEED n'a rien enregistré pour un mot, la carte le dit, plutôt que de laisser un blanc là où vous iriez chercher.
+
+**Aller de mot en mot.** Chaque mot listé sur la carte est un lien, et chaque mot de la définition, des exemples et de l'origine aussi : cliquez sur l'un d'eux et la carte devient celle de ce mot. Le chemin parcouru s'affiche en haut sous le nom **votre parcours**, et **‹ retour** (ou ⌫) le refait à rebours, un pas à la fois. ← et → passent à l'entrée précédente et à la suivante dans l'ordre où vous lisez, avec *entrée n sur m* pour dire où vous en êtes. **montrer sur sa page** — **ouvrir dans le dictionnaire**, quand vous veniez d'ailleurs — ferme la carte et ouvre le dictionnaire sur le mot. Esc, la ×, ou un clic en dehors de la carte la ferme.
+
+### 13.6 « entrée du dictionnaire », partout où vous lisez
+
+Faites un clic droit sur un mot — dans la face lecture ou la face édition d'un document, dans la conversation, sur une page de composure, dans un article wikisink, dans ce manuel — et un petit menu propose **entrée du dictionnaire**, qui ouvre la carte de ce mot par-dessus ce que vous faites, et **copier**. Sélectionnez d'abord une courte expression et faites un clic droit à l'intérieur, et c'est l'expression qui est cherchée. Dans le dictionnaire, la même entrée de menu tourne à la page du mot ; dans la carte, elle y emmène la carte. ⇧⌘D fait de même pour le mot sélectionné, ou le mot sous le curseur, sans aucun menu. Sur une composure, le menu que vous obtenez déjà en faisant un clic droit sur un module gagne la même entrée dès que le pointeur est sur un mot.
+
+Le menu du système n'a pas disparu ; il s'est décalé d'une touche. Un clic droit qui n'est pas sur un mot — entre deux mots, au-delà de la fin d'une ligne, sur un lien, sur une image — donne le menu du système exactement comme toujours. Et un clic droit avec **maj** enfoncée donne à chaque fois le menu du système, mot ou pas : c'est le chemin vers les suggestions d'orthographe, la recherche propre au système, et coller dans un champ de texte. Le menu le dit sur sa dernière ligne, il n'y a donc rien à retenir.
+
+### 13.7 Votre propre dictionnaire
+
+FEED lui-même ne change jamais sous vos pieds, mais ce n'est pas le seul dictionnaire ici. À côté se trouve **le vôtre**, qui commence vide et ne contient que ce que vous y mettez : un mot que votre famille a inventé, un terme de votre métier, un nom que vous donnez à une chose, une création de votre cru — ou votre propre version d'un mot que FEED a déjà.
+
+Vous y ajoutez en le demandant à votre readvisor en chef. « Mets *glimmerwick* dans mon dictionnaire. » « Mon équipe appelle *dronefest* une réunion qui aurait dû être un e-mail — tu l'ajoutes ? » « Je voudrais ma propre définition de *draft*. » La conversation se déroule comme le ferait celle d'un lexicographe soigneux. Votre readvisor cherche d'abord le mot, et si FEED l'a, il le dit et propose de vous le montrer plutôt que d'en ajouter discrètement un second. S'il est nouveau, il rédige ce qui peut l'être — prononciation, catégorie grammaticale, syllabes, formes — et vous demande ce que vous seul savez : ce qu'il veut dire, comment et où vous l'employez, qui le dit, d'où il vient, une question ou deux à la fois. Puis il vous relit l'entrée en mots simples et attend un oui avant d'écrire quoi que ce soit. Ensuite il vous signalera, une fois, quelles parties sont encore vides ; les laisser vides est très bien.
+
+Vos mots sont entremêlés à ceux de FEED sur chaque page et dans chaque ordre, marqués **vôtre**, et *les vôtres seulement* sous **plus** les montre à part. Un mot présent dans les deux dictionnaires est le vôtre : votre version remplace celle de FEED partout dans enough — sur la page, sur la carte (marquée *remplace FEED*), et dans ce que votre readvisor trouve quand il cherche le mot.
+
+Ils vivent dans un seul fichier, `~/enough/dict/user-dictionary.sqlite`, à part de celui de FEED et valable pour toute la machine comme votre thème, de sorte que chaque projet voit les mêmes mots. Une mise à jour reconstruit le fichier de FEED de zéro et ne touche jamais au vôtre.
+
+Pour retirer une de vos entrées, ouvrez sa carte et appuyez sur **supprimer votre entrée** ; il demande d'abord. Supprimer votre version d'un mot de FEED ramène l'entrée propre de FEED. Modifier une entrée est une autre conversation — « change l'exemple de *glimmerwick* » — puisque le dictionnaire lui-même est fait pour la lecture seule.
+
+Votre readvisor a le dictionnaire sous la main dans chaque projet, avec ou sans compétence. La compétence `lexicographer` (section 19.4) est pour quand vous ajouterez souvent des mots : activée, elle emporte à chaque tour tout le style maison de FEED, de sorte que vos entrées sonnent comme le reste du livre sans que votre readvisor ait à aller chercher d'abord le guide de style.
+
+---
+
+---
+
+## 14. Empilement de plusieurs modes actifs
+
+Les modes plein cadre d'enough — lecture/édition, girraph, merirmaid, wikisink, cacheawl, le dictionnaire, ce manuel — ne se remplacent pas les uns les autres. Ils **s'empilent**, comme des feuilles de papier. Ouvrez cacheawl, ouvrez un girraph depuis l'intérieur d'une box, ouvrez un fichier de notes par-dessus : trois modes de profondeur, et fermer chacun révèle celui en dessous exactement comme vous l'aviez laissé. Même position de défilement, même descente, mêmes modifications non enregistrées.
 
 La barre supérieure montre un indicateur carré par mode ouvert, le plus récent à gauche. Chacun porte un petit ruban croix-rouge qui ferme ce mode précis, même un enseveli. Cliquez sur l'indicateur d'un mode enseveli pour le remonter au sommet sans déranger le reste. Quand le dernier se ferme, vous voilà de retour sur la composure — la pile vide (section 4).
 
@@ -808,11 +896,11 @@ Deux commodités à connaître :
 
 ---
 
-## 14. La fenêtre de modèle
+## 15. La fenêtre de modèle
 
 Le badge de modèle dans la barre supérieure ouvre la fenêtre de modèle : quel cerveau vous répond, ce qui est disponible d'autre, et — si vous le choisissez — l'emplacement cloud.
 
-### 14.1 Modèles locaux : vue d'ensemble et recommandations d'usage
+### 15.1 Modèles locaux : vue d'ensemble et recommandations d'usage
 
 Sept modèles locaux pris en charge — et la fenêtre est maintenant aussi l'endroit où vous les installez. Chaque ligne que vous n'avez pas encore montre sa taille de téléchargement et un verdict de faisabilité calculé par rapport à la mémoire et à l'espace disque libre de *cette machine* : ✓ confortable, ~ juste, ✗ non recommandé. Les téléchargements tournent avec une barre de progression en direct, survivent à une fermeture (ils reprennent là où ils se sont arrêtés), et peuvent être annulés sans perdre la partie que vous avez déjà. Les modèles installés changent en un clic, et n'importe quel modèle sauf l'actif peut être supprimé depuis sa ligne quand vous voulez récupérer l'espace disque.
 
@@ -834,7 +922,7 @@ Encore une note pour les installations terminal : un modèle peut être *téléc
 
 Changer de modèle redémarre le serveur d'inférence local et vide la conversation en mémoire. Vos fichiers, journaux, et état de requêtes persistent tous ; un changement vous coûte l'historique de discussion, pas le travail.
 
-### 14.2 Support OpenRouter (l'emplacement OPRO-API)
+### 15.2 Support OpenRouter (l'emplacement OPRO-API)
 
 enough est local-d'abord, pas local-seulement. Un cinquième emplacement de modèle, **OPRO-API**, route à travers OpenRouter vers des modèles cloud. Il est désactivé par défaut, délibérément laborieux à activer, et honnête sur le compromis : vos prompts et sorties quittent la machine, en échange d'une capacité de modèle de pointe et, parfois, d'un coût plus bas que ce que le matériel et l'électricité d'un modèle local comparable exigeraient.
 
@@ -846,7 +934,7 @@ Deux choses gardent l'usage du cloud responsable :
 - **`cloud_pipeline`** laisse vos readvisors traiter par lots de gros travaux à travers l'emplacement cloud — jusqu'à 200 étapes, avec mise en cache par étape, résumé optionnel par étape, et une passe de compilation finale — en écrivant les résultats sur le disque plutôt qu'en inondant la conversation. Demandez « un cloud pipeline qui rédige les douze résumés de chapitre » et le gros du travail se passe hors bande, entièrement journalisé.
 
 
-### 14.3 `/pal` — une seule question vers l'extérieur
+### 15.3 `/pal` — une seule question vers l'extérieur
 
 Parfois votre modèle local est dépassé et vous aimeriez un avis extérieur. Un **pal**, c'est ça : pas un nouveau réglage ni un second compte, juste le modèle cloud que vous avez déjà configuré dans l'emplacement OPRO-API, joint une fois, à la main, depuis un tour par ailleurs local.
 
@@ -858,7 +946,7 @@ Trois choses se produisent alors, dans l'ordre. Votre readvisor en chef y réfl�
 
 **Vous voyez ce qui est parti.** Avant que la réponse n'arrive, le texte exact qui est sorti apparaît dans sa propre bulle, mot pour mot — jamais raccourci, jamais résumé en chemin vers l'écran — avec la réponse en dessous. Les deux sont toujours là après un rechargement, et les deux sont écrits dans votre journal de session et dans le cache cloud. Taper `/pal` *est* le consentement ; il n'y a pas de seconde étape de confirmation, parce qu'une confirmation qui apparaît à chaque fois est un bouton qu'on apprend à cliquer sans lire. Ce qui la remplace, c'est que vous pouvez toujours voir ce qui est parti.
 
-**Le verrou est celui de l'emplacement cloud, exactement le même.** `/pal` marche quand **local models only** est désactivé dans le broker, qu'une clé est stockée, et que la dernière vérification de santé est passée (14.2). Si l'un de ces points n'est pas vrai, `/pal` vous dit lequel et comment le réparer — et aucun tour ne tourne, donc rien n'est dépensé et rien ne sort. Tapez `/` comme premier caractère dans la zone de saisie et une ligne d'indice vous dit la même chose avant que vous ne vous engagiez : grisée avec la raison quand l'emplacement n'est pas utilisable, et nommant le modèle qu'elle interrogerait quand il l'est, ce qui est toute la différence entre une commande et une surprise sur votre facture.
+**Le verrou est celui de l'emplacement cloud, exactement le même.** `/pal` marche quand **local models only** est désactivé dans le broker, qu'une clé est stockée, et que la dernière vérification de santé est passée (15.2). Si l'un de ces points n'est pas vrai, `/pal` vous dit lequel et comment le réparer — et aucun tour ne tourne, donc rien n'est dépensé et rien ne sort. Tapez `/` comme premier caractère dans la zone de saisie et une ligne d'indice vous dit la même chose avant que vous ne vous engagiez : grisée avec la raison quand l'emplacement n'est pas utilisable, et nommant le modèle qu'elle interrogerait quand il l'est, ce qui est toute la différence entre une commande et une surprise sur votre facture.
 
 **Un appel par `/pal`.** Votre readvisor obtient exactement une question vers l'extérieur par message que vous commencez ainsi. Si la réponse n'a pas fait le tour, il le dit et vous pouvez en envoyer une autre. Et rien ne quitte cette machine lors d'un autre tour : sans `/pal` devant, l'outil n'est tout simplement pas là, et un readvisor qui pense qu'un avis extérieur aiderait doit le dire et vous laisser décider.
 
@@ -868,35 +956,35 @@ Si le modèle à qui vous parlez déjà *est* OPRO-API, il n'y a pas de pal à i
 
 ---
 
-## 15. Paradigmes
+## 16. Paradigmes
 
 Un paradigme est le cadre de raisonnement dans lequel travaillent vos readvisors — les règles d'engagement pour la façon dont le travail se déroule. Un seul est actif à la fois (affiché en haut de la barre latérale ; cliquez sur ● pour changer), et le texte complet du paradigme actif voyage dans le prompt système à chaque tour. Votre readvisor en chef voit aussi un catalogue d'une ligne des autres, pour pouvoir suggérer un changement — ou en faire un — quand votre demande serait mieux servie ailleurs. Un changement fait pour vous n'a rien d'exotique : le nom du paradigme est écrit dans `rness/active-paradigm` et on vous dit que c'est arrivé.
 
-### 15.1 default
+### 16.1 text-planning
 
-Conversation libre, une seule voix. Le paradigme pour la plupart du travail, et l'aiguilleur qui guette les moments où un autre paradigme conviendrait mieux. Il porte aussi les conventions permanentes — comme savoir que « les parties jaunes » veut dire vos surlignages.
+**L'accueil.** Chaque nouveau projet démarre ici, et chaque autre paradigme y revient quand son travail est fait. La plupart du temps, ça ne ressemble pas du tout à un cadre : une conversation libre, une seule voix, pour les questions, la lecture, la recherche, la révision, le travail sur les fichiers, et la rédaction quand vous demandez de rédiger. Il porte les conventions permanentes — savoir que « les parties jaunes » veut dire vos surlignages, où vont les fichiers générés, comment les pages web sont récupérées — et c'est l'aiguilleur qui remarque quand un autre paradigme servirait mieux une demande, et bascule.
 
-### 15.2 text-planning
+C'est aussi là qu'un texte se planifie, et c'est la longue piste d'élan avant la prose : faire passer un roman, un recueil d'essais, un livre non-fictionnel, un article ou un manifeste de « je crois que je veux écrire quelque chose » à un plan utilisable. Rien de cette mécanique n'apparaît tant que vous n'avez pas montré une intention de planifier — « aide-moi à planifier un roman », « structurons mon recueil d'essais » — et aucune compétence n'a besoin d'être activée pour cela. Votre readvisor en chef construit alors un document de plan avec vous à la racine du projet — patiemment, itérativement, sur autant de sessions qu'il faut — et, sur demande, génère par section des *échafaudages* : des guides structurels (beats, en-têtes, rappels de voix, budgets de mots) que vous développez vous-même en prose. La règle qui le définit : **le plan et les échafaudages ne contiennent jamais de prose.** Ils ne tiennent que de la structure, et votre voix reste votre voix. La rédaction est une chose à part que vous pouvez demander en toutes lettres — « rédige le chapitre 1 d'après le plan » — et elle est écrite dans son propre fichier, jamais dans le plan ; votre readvisor ne la proposera pas de lui-même. Un projet qui se révèle être un mémoire est orienté vers `memoir-dialectic` (section 19.5), construite spécifiquement pour cela.
 
-Pour la longue piste d'élan avant la prose : faire passer un roman, un recueil d'essais, un livre non-fictionnel, ou un manifeste de « je crois que je veux écrire quelque chose » à un plan utilisable. Votre readvisor en chef construit un document de plan avec vous à la racine du projet — patiemment, itérativement, sur autant de sessions qu'il faut — puis, sur demande, génère par section des *échafaudages* : des guides structurels (beats, en-têtes, rappels de voix, budgets de mots) que vous développez vous-même en prose. La règle qui définit ce paradigme : **il n'écrit jamais votre prose.** Les échafaudages ne contiennent que de la structure. Votre voix reste votre voix. (Il s'active aux côtés de la compétence `analyzer` ou `memoir-dialectic` ; les mémoires sont confiées à memoir-dialectic, construite spécifiquement pour elles.)
+**Si un projet était sur `default`.** `default` était le paradigme d'accueil jusqu'à cette passe, et text-planning a absorbé tout ce qu'il faisait. Un projet qui avait `default` actif passe à text-planning la prochaine fois que vous l'ouvrez, votre réglage des bulles d'aide restant tel qu'il était. La seule exception est un projet où vous avez personnalisé `default.md` en un fichier à vous : cette copie est la vôtre, le projet la garde donc, et continue de s'en servir, jusqu'à ce que vous changiez.
 
-### 15.3 translation
+### 16.2 translation
 
-Déclare la traduction hors ligne comme une capacité de premier ordre. Il se marie avec la compétence `translator` (section 18.7) : quand une demande implique de faire passer du texte d'une langue humaine à une autre, votre readvisor bascule ici, et si la compétence est désactivée, il vous dit ce que vous manquez — et continue de le dire jusqu'à ce que vous l'activiez. Compétence activée, vous avez un traducteur local d'environ 419 langues, sans compte, sans limite de débit, et sans dépendance réseau.
+Déclare la traduction hors ligne comme une capacité de premier ordre. Il se marie avec la compétence `translator` (section 19.8) : quand une demande implique de faire passer du texte d'une langue humaine à une autre, votre readvisor bascule ici, et si la compétence est désactivée, il vous dit ce que vous manquez — et continue de le dire jusqu'à ce que vous l'activiez. Compétence activée, vous avez un traducteur local d'environ 419 langues, sans compte, sans limite de débit, et sans dépendance réseau.
 
-### 15.4 workflow-design
+### 16.3 workflow-design
 
 Le paradigme à propos d'enough lui-même, actif chaque fois que vous créez ou changez le flux de travail plutôt que de travailler à l'intérieur : nouvelles compétences, nouveaux readvisors, nouveaux paradigmes, modifications d'AGENT.md ou de MOTIVATION.md. Ici votre readvisor en chef se comporte comme un collaborateur de conception réfléchi — des questions de clarification avant de construire (périmètre ? nom ? conditions de déclenchement ?), des alternatives quand votre premier instinct pourrait être plus affûté, et un fichier de requête suivi pour chaque construction, puisque les changements de flux de travail survivent aux conversations qui les produisent. C'est le paradigme qui rend la section 3 réelle.
 
 ---
 
-## 16. Readvisors
+## 17. Readvisors
 
 Un **readvisor** est un jugement que vous pouvez garder : son propre `AGENT.md` et son propre `MOTIVATION.md`, les deux mêmes fichiers qui définissent votre readvisor en chef, circonscrits à une manière particulière de lire un problème. Activez-les par projet dans la section **readvisors** de la barre latérale.
 
 Celui en haut du panneau readvisor est votre **readvisor en chef**, et d'origine il s'appelle **Ed**. Ce nom est à vous et vous pouvez le changer — **renommer votre readvisor en chef**, dans l'en-tête de la fenêtre broker (section 9). Le chef n'est pas d'une autre nature que les autres ; c'est simplement celui qui répond quand vous n'avez demandé personne en particulier.
 
-**Plusieurs readvisors, une seule voix.** Activez-en trois et vous n'obtenez pas trois réponses. En conversation ordinaire, leurs perspectives, leur expertise et leurs mises en garde sont fondues dans ce que dit votre chef — une seule voix, parfois faite de plusieurs. Quand une perspective particulière porte un argument, on vous dira en général laquelle. Si vous les voulez parlant séparément, sous leurs propres noms, chacun leur tour, c'est exactement ce qu'est un **conseil** (section 17).
+**Plusieurs readvisors, une seule voix.** Activez-en trois et vous n'obtenez pas trois réponses. En conversation ordinaire, leurs perspectives, leur expertise et leurs mises en garde sont fondues dans ce que dit votre chef — une seule voix, parfois faite de plusieurs. Quand une perspective particulière porte un argument, on vous dira en général laquelle. Si vous les voulez parlant séparément, sous leurs propres noms, chacun leur tour, c'est exactement ce qu'est un **conseil** (section 18).
 
 **Trois provenances**, et la ligne de la barre latérale dit laquelle :
 
@@ -908,39 +996,39 @@ Un readvisor global et un readvisor fourni portant le même nom perdent face à 
 
 **En retirer un.** Les lignes non fournies portent un ×. Il demande d'abord, parce qu'il supprime des fichiers : le dossier d'un readvisor de projet s'en va, un readvisor global s'en va de `~/enough/readvisors/` et de la liste de ce projet. Ce qu'enough a fourni ne peut pas être retiré de cette façon — il n'y a rien là à supprimer qu'une mise à jour ne remettrait pas. Et un nom retiré est aussi effacé de la liste des désactivés du projet, pour qu'un readvisor du même nom arrivant plus tard ne se retrouve pas mystérieusement éteint.
 
-### 16.1 block-breaker
+### 17.1 block-breaker
 
-Un spécialiste du blocage d'écriture, distillé à partir des réponses d'un vrai écrivain sur la façon dont il dissout le fait d'être coincé — ce qui est exactement ce que fait la compétence `readvisory` (section 18.5), et voici à quoi ressemble ce qu'elle produit. Il diagnostique avant de prescrire — à court d'idées, à court de cran, à court de structure, et à court de permission sont quatre problèmes différents — puis fait appel à des contraintes, du brainstorming par répétitions (« dix variations, puis on taille »), des recadrages étranges, et, quand on le veut, de vraies phrases suivantes. Implacablement anti-défaitiste. Sa croyance centrale : pour quiconque écrit volontairement, le blocage se résout toujours, parce que les règles ont été inventées et que le remède peut l'être aussi.
+Un spécialiste du blocage d'écriture, distillé à partir des réponses d'un vrai écrivain sur la façon dont il dissout le fait d'être coincé — ce qui est exactement ce que fait la compétence `readvisory` (section 19.6), et voici à quoi ressemble ce qu'elle produit. Il diagnostique avant de prescrire — à court d'idées, à court de cran, à court de structure, et à court de permission sont quatre problèmes différents — puis fait appel à des contraintes, du brainstorming par répétitions (« dix variations, puis on taille »), des recadrages étranges, et, quand on le veut, de vraies phrases suivantes. Implacablement anti-défaitiste. Sa croyance centrale : pour quiconque écrit volontairement, le blocage se résout toujours, parce que les règles ont été inventées et que le remède peut l'être aussi.
 
-### 16.2 open-skeptic
+### 17.2 open-skeptic
 
 Un « oiseau de mauvais augure éclairable » : sincèrement enthousiaste pour l'IA là où elle est forte, professionnellement méfiant là où elle est survendue. Convoquez-le quand vous êtes sur le point de construire un flux de travail et voulez que les modes d'échec soient nommés tôt. Il résiste à l'idée de demander à l'IA de répliquer l'expérience humaine, aux chaînes d'erreurs qui s'accumulent sans relecture humaine, et à la confiance fluide qui fait le travail de l'expertise — tout en applaudissant l'IA comme moteur de collation, prothèse de connaissance, et partenaire de répétition. Il change d'avis face aux preuves : montrez-lui un flux de travail qui marche et il le dit, tout simplement.
 
-### 16.3 Construire le vôtre
+### 17.3 Construire le vôtre
 
 Deux exemples, une seule forme. Chaque readvisor est la même paire de fichiers markdown avec les mêmes intertitres : `AGENT.md`, qui s'ouvre sur le nom d'affichage que vous voyez dans la barre latérale puis décrit comment cette personne pense, et `MOTIVATION.md`, qui dit ce à quoi elle tient, ce contre quoi elle protège, et où elle se trompe. Cette forme est vérifiée à l'installation — pas au chargement, si bien qu'un readvisor que vous avez écrit à la main il y a des années fonctionne encore exactement comme avant.
 
-Vous pouvez écrire les deux fichiers vous-même. La voie prise en charge est la **compétence `readvisory`** (section 18.5), qui en construit un à partir du jugement d'une vraie personne en lui posant des questions — vous, en direct, ou quelqu'un dont vous aimeriez avoir l'avis sous la main, via un questionnaire que vous lui envoyez. Les readvisors sont le moyen le moins coûteux d'ajouter une lecture qui vous manque : un canard en plastique socratique, un relecteur de conformité, votre lecteur cible, le rédacteur qui attrapait toujours la chose que vous ne pouviez pas voir.
+Vous pouvez écrire les deux fichiers vous-même. La voie prise en charge est la **compétence `readvisory`** (section 19.6), qui en construit un à partir du jugement d'une vraie personne en lui posant des questions — vous, en direct, ou quelqu'un dont vous aimeriez avoir l'avis sous la main, via un questionnaire que vous lui envoyez. Les readvisors sont le moyen le moins coûteux d'ajouter une lecture qui vous manque : un canard en plastique socratique, un relecteur de conformité, votre lecteur cible, le rédacteur qui attrapait toujours la chose que vous ne pouviez pas voir.
 
 ---
 
 
-## 17. Conseils
+## 18. Conseils
 
-Un **conseil** est une composure où vos readvisors réfléchissent à une seule chose chacun leur tour, par écrit, sous leurs propres noms, pendant que vous regardez ça se produire. C'est l'autre moitié de la section 16 : les mêmes readvisors qui sont d'ordinaire fondus en une seule voix, dépliés, en désaccord et pour de bon.
+Un **conseil** est une composure où vos readvisors réfléchissent à une seule chose chacun leur tour, par écrit, sous leurs propres noms, pendant que vous regardez ça se produire. C'est l'autre moitié de la section 17 : les mêmes readvisors qui sont d'ordinaire fondus en une seule voix, dépliés, en désaccord et pour de bon.
 
 C'est une composure ordinaire, donc tout ce que dit la section 4 s'applique encore. Le **brief** est en haut ; chaque intervention atterrit en dessous sous forme de carte titrée de qui a parlé et de quel tour c'était, teintée à la couleur de cette personne — votre chef sur papier, vous en bleu, chaque readvisor dans sa propre couleur pour toute la durée du conseil, la conclusion en encre. La colonne se remet d'aplomb à mesure qu'elle grandit, même si vous avez beaucoup déplacé les choses.
 
 Les interventions appartiennent au conseil, pas à vous. Vous pouvez les déplacer, les restyler, les commenter, et dézoomer pour lire l'ensemble comme une colonne de faces — mais vous ne pouvez pas en réécrire une, et aucun readvisor ne le peut non plus. Une transcription que vous pouvez modifier est une suggestion, pas un compte rendu. Le brief, lui, reste un module ordinaire et reste modifiable.
 
-### 17.1 En mettre un en place
+### 18.1 En mettre un en place
 
 Nouvelle composure à partir du form **council** et vous obtenez une carte de préparation avec quatre champs pour le brief :
 
 - **entrée** — la chose à trancher. Une seule question, aussi nette que vous pouvez la faire.
 - **paramètres** — comment vous voulez que ça se passe. « Deux tours, puis on décide. »
 - **contraintes** — ce qui est hors de propos. « Ne réécrivez pas la prose. »
-- **sortie souhaitée** — l'une des trois : **une réponse tranchée**, écrite sur le canevas à la fin ; **un document**, écrit à un chemin que vous nommez ; ou **une nouvelle composure**, tout un tableau de cartes construit à partir de ce que le conseil a décidé. Choisissez composure et une seconde commande apparaît à côté pour la disposition — *scaffold*, où chaque groupe de cartes est une colonne, ou *cards*, où chaque groupe est une ligne. Ce que chacune fait réellement à la fin, c'est la 17.3.
+- **sortie souhaitée** — l'une des trois : **une réponse tranchée**, écrite sur le canevas à la fin ; **un document**, écrit à un chemin que vous nommez ; ou **une nouvelle composure**, tout un tableau de cartes construit à partir de ce que le conseil a décidé. Choisissez composure et une seconde commande apparaît à côté pour la disposition — *scaffold*, où chaque groupe de cartes est une colonne, ou *cards*, où chaque groupe est une ligne. Ce que chacune fait réellement à la fin, c'est la 18.3.
 
 Ensuite, la salle. La liste à cocher commence par votre readvisor en chef, chaque readvisor que vous avez activé dans ce projet, et **vous** ; décochez qui vous ne voulez pas. Douze au maximum, et deux participants ne peuvent pas porter le même nom, parce qu'une intervention est attribuée par nom et que deux Nadia, ce n'est pas un conseil, c'est un quiproquo. **tours max** est à 3 par défaut et peut aller de 1 à 20.
 
@@ -948,7 +1036,7 @@ Chaque ligne de participant accepte aussi une **charge** facultative : une ligne
 
 **convoquer** lance la séance.
 
-### 17.2 Le faire tourner
+### 18.2 Le faire tourner
 
 Six commandes, et elles font exactement ce qu'elles disent.
 
@@ -957,17 +1045,17 @@ Six commandes, et elles font exactement ce qu'elles disent.
 - **aller jusqu'au bout** — des tours de table jusqu'à votre maximum, en arrière-plan, avec un compte rendu au fil de l'eau.
 - **mettre en pause** — s'arrête après l'intervention en cours de rédaction. Une intervention à moitié écrite et jetée est une plus mauvaise surprise qu'un paragraphe de trop.
 - **le brief** — retour à la carte de préparation, pour relire ce sur quoi tout le monde travaille ou pour changer la sortie avant de conclure.
-- **conclure** — le dernier tour. C'est la 17.3.
+- **conclure** — le dernier tour. C'est la 18.3.
 
 Les tours arrivent en flux continu. Une carte apparaît au pied de la colonne avec le nom de l'orateur et le numéro de tour dessus, se remplit à mesure que les mots arrivent, et se fixe en vrai module quand l'intervention est finie. La rotation, c'est le chef puis les readvisors dans l'ordre où ils sont listés ; ça tourne, et un tour de table se referme quand la boucle est bouclée.
 
 **Vous pouvez dire quelque chose à tout moment.** La zone de saisie au pied du conseil prend votre propre intervention et elle entre comme une carte au même titre que celle de n'importe qui d'autre, teintée en bleu. Si personne ne parle, elle atterrit tout de suite ; si un tour est en cours, elle prend le créneau juste après et s'affiche en attente jusque-là. Dans les deux cas c'est une *interjection*, pas un remaniement : le readvisor dont c'était le tour parle quand même ensuite.
 
-**Vous pouvez aussi poser une question à un pal.** Si l'emplacement cloud est utilisable (14.3), tapez `/pal` et votre demande dans la zone de saisie du conseil — `/pal est-ce que le motif autour duquel on tourne a un nom ?` — et votre chef distille la discussion jusqu'ici et votre question en une seule invite autonome, l'envoie dehors, et la réponse atterrit comme une intervention dans sa propre teinte grise, dite par `pal · <id du modèle>`. L'invite qui a quitté la machine est repliée en haut de cette carte : refermée pour que vingt interventions restent lisibles, jamais cachée, à un clic de s'ouvrir. Comme vos propres interventions, c'est une interjection — elle prend un numéro de tour mais pas un créneau, donc celui qui allait parler parle quand même ensuite, et le tour de table n'avance pas.
+**Vous pouvez aussi poser une question à un pal.** Si l'emplacement cloud est utilisable (15.3), tapez `/pal` et votre demande dans la zone de saisie du conseil — `/pal est-ce que le motif autour duquel on tourne a un nom ?` — et votre chef distille la discussion jusqu'ici et votre question en une seule invite autonome, l'envoie dehors, et la réponse atterrit comme une intervention dans sa propre teinte grise, dite par `pal · <id du modèle>`. L'invite qui a quitté la machine est repliée en haut de cette carte : refermée pour que vingt interventions restent lisibles, jamais cachée, à un clic de s'ouvrir. Comme vos propres interventions, c'est une interjection — elle prend un numéro de tour mais pas un créneau, donc celui qui allait parler parle quand même ensuite, et le tour de table n'avance pas.
 
 **Le panneau readvisor est fermé pour la durée**, son interrupteur désactivé et une infobulle expliquant pourquoi (section 5.1). Les conseils et la discussion partagent un seul modèle et il n'y en a qu'un : un tour de discussion ferait donc la queue derrière le conseil ou se battrait avec lui. C'est vrai dans l'autre sens aussi : une commande de conseil pressée pendant que votre chef est en train de répondre dans la discussion revient avec une phrase qui le dit, plutôt que d'attendre en silence.
 
-### 17.3 Conclure : la réponse, le document, la composure, la transcription
+### 18.3 Conclure : la réponse, le document, la composure, la transcription
 
 **conclure** lance un dernier tour où votre readvisor en chef dit où ça atterrit — en créditant les arguments qui l'ont emporté, en nommant le désaccord qui ne s'est pas résolu plutôt qu'en l'aplanissant, et en disant ce qui reste ouvert. Cette intervention est versée au dossier comme n'importe quelle autre, teintée en encre.
 
@@ -981,18 +1069,18 @@ Cette dernière option demande à un modèle d'écrire des titres dans une forme
 
 Dans tous les cas, l'ensemble est aussi exporté en markdown brut vers `rness/knowledge/councils/<date>-<titre>.md` : le brief, qui était dans la salle et ce que chacun y faisait, le nombre de tours, et chaque intervention dans l'ordre. Ça n'écrase jamais un export antérieur. Un conseil qui a eu lieu est une chose que vous pouvez grep-er, citer, et donner à quelqu'un, des mois après que la composure a été traînée ailleurs.
 
-Un conseil conclu est terminé. Les commandes s'en vont, et ce qu'il vous montre à partir de là, c'est le chemin de la transcription, la sortie, et de quoi le reconvoquer (17.5).
+Un conseil conclu est terminé. Les commandes s'en vont, et ce qu'il vous montre à partir de là, c'est le chemin de la transcription, la sortie, et de quoi le reconvoquer (18.5).
 
-### 17.4 Ce que ça coûte, honnêtement
+### 18.4 Ce que ça coûte, honnêtement
 
 **C'est lent, et c'est fait pour.** Chaque intervention est un tour de modèle complet — le participant lit le brief et tout ce qui a été dit jusque-là, et écrit. Quatre participants sur trois tours de table, ça fait douze tours, l'un après l'autre, sur un seul modèle local. Il n'y a pas d'astuce qui rende ça plus rapide, et un conseil vaut la peine d'être convoqué exactement quand la réflexion vaut douze tours.
 
 **La fenêtre est partagée équitablement.** Chaque participant qui parle reçoit une part égale de la fenêtre de contexte du modèle — la moitié chacun à deux, le quart chacun à quatre. Cette part doit contenir l'identité propre du participant plus autant du conseil qu'il y rentre. Quand ça approche du plein, enough replie les plus anciennes interventions en une seule ligne chacune, un souvenir d'une ligne de qui a dit quoi : *Plus tôt dans ce conseil : Ed (tour 1) : …*. Le brief n'est jamais replié, et l'intervention à laquelle quelqu'un est en train de répondre non plus — un participant qui ne voit pas la chose à laquelle il répond n'a rien à dire.
 
-Ce repliage est mécanique — il prend la première phrase, il ne demande pas à un modèle de résumer, parce qu'un conseil qui dépense des complétions à se résumer lui-même paie deux fois pour la même fenêtre. Chaque tour signale s'il a replié quelque chose. Quand ça se met à replier tôt et souvent, le remède honnête n'est pas un conseil plus petit, c'est une fenêtre de contexte plus grande dans la fenêtre de modèle (section 14.1) ou un modèle qui a de la place pour ça.
+Ce repliage est mécanique — il prend la première phrase, il ne demande pas à un modèle de résumer, parce qu'un conseil qui dépense des complétions à se résumer lui-même paie deux fois pour la même fenêtre. Chaque tour signale s'il a replié quelque chose. Quand ça se met à replier tôt et souvent, le remède honnête n'est pas un conseil plus petit, c'est une fenêtre de contexte plus grande dans la fenêtre de modèle (section 15.1) ou un modèle qui a de la place pour ça.
 
 
-### 17.5 Reconvoquer
+### 18.5 Reconvoquer
 
 Un conseil se conclut, et parfois la question, elle, ne se conclut pas. **reconvoquer**, sur un conseil conclu, en démarre un nouveau à partir de lui : la même assemblée — les mêmes participants avec leurs noms, leurs teintes et leurs charges — les mêmes paramètres, contraintes, sortie souhaitée et plafond de tours, et un brief qui est l'*ancien* brief plus ce que le conseil a réellement produit, posé comme la chose désormais sur la table. Une réponse traverse telle quelle, comme la conclusion ; un document ou une composure traverse comme une référence au fichier et ses deux premiers milliers de caractères. Le nouveau conseil s'ouvre prêt, au tour zéro, sans que personne ait encore parlé.
 
@@ -1001,11 +1089,11 @@ L'ancien conseil n'est ni rejoué ni réécrit. Son état, ses interventions et 
 ---
 
 
-## 18. Compétences
+## 19. Compétences
 
-Une compétence est un paquet de capacité ciblée : un dossier avec un `SKILL.md` (plus des docs de référence et scripts optionnels) qui enseigne à vos readvisors une procédure, un vocabulaire, ou une discipline. Activez les compétences par projet dans la barre latérale. Désactivé veut dire vraiment désactivé — pas du tout dans le prompt — et les nouvelles compétences arrivent désactivées, donc rien ne change dans votre dos. Une compétence non fournie par enough est lue avant même de pouvoir être activée (section 18.8). Tout désactiver est légitime aussi : conversation pure, aucun échafaudage, parfois plus de place pour que le modèle vous surprenne.
+Une compétence est un paquet de capacité ciblée : un dossier avec un `SKILL.md` (plus des docs de référence et scripts optionnels) qui enseigne à vos readvisors une procédure, un vocabulaire, ou une discipline. Activez les compétences par projet dans la barre latérale. Désactivé veut dire vraiment désactivé — pas du tout dans le prompt — et les nouvelles compétences arrivent désactivées, donc rien ne change dans votre dos. Une compétence non fournie par enough est lue avant même de pouvoir être activée (section 19.9). Tout désactiver est légitime aussi : conversation pure, aucun échafaudage, parfois plus de place pour que le modèle vous surprenne.
 
-### 18.1 analyzer
+### 19.1 analyzer
 
 Quatre modes d'analyse dans une seule compétence.
 
@@ -1017,9 +1105,9 @@ Quatre modes d'analyse dans une seule compétence.
 
 **Audit** lit quelque chose que vous n'avez pas encore décidé de croire — une compétence que quelqu'un vous a envoyée, un readvisor, un paradigme — et vous dit ce que c'est. D'abord une explication en langage clair de ce que la chose fait réellement et pourquoi vous en voudriez, puis une passe de sécurité : tentatives d'injection de prompt, instructions qui élargissent discrètement la portée d'un readvisor, signaux d'alerte épistémiques, et tout code embarqué, qui reçoit aussi un scan déterministe qui n'implique aucun modèle du tout. Le verdict est l'un de trois mots — **pass**, **flag**, **fail** — appuyé par des constats nommés, jamais un score. C'est en lecture seule : l'audit n'exécute, ne modifie, n'installe, ni n'active jamais la chose qu'il lit.
 
-Les rapports atterrissent dans `rness/io/output/analyzer/audits/<nom-compétence>/` : un `.md` daté que vous pouvez lire comme n'importe quel autre fichier, plus un petit `verdict.json` à côté. Demandez un audit par son nom à tout moment — « vérifie ça avant que je l'active », « qu'est-ce que cette compétence fait vraiment » — et enough exécute aussi ce mode pour vous, sans qu'on le demande, la première fois que vous activez une compétence qu'il n'a pas fournie. Les deux portes écrivent le même rapport dans le même dossier. La section 18.8 raconte cette histoire.
+Les rapports atterrissent dans `rness/io/output/analyzer/audits/<nom-compétence>/` : un `.md` daté que vous pouvez lire comme n'importe quel autre fichier, plus un petit `verdict.json` à côté. Demandez un audit par son nom à tout moment — « vérifie ça avant que je l'active », « qu'est-ce que cette compétence fait vraiment » — et enough exécute aussi ce mode pour vous, sans qu'on le demande, la première fois que vous activez une compétence qu'il n'a pas fournie. Les deux portes écrivent le même rapport dans le même dossier. La section 19.9 raconte cette histoire.
 
-### 18.2 anything-finder
+### 19.2 anything-finder
 
 Une équipe de recherche pour les choses qui n'apparaissent pas sur la première page. Trois visages, une seule compétence.
 
@@ -1033,17 +1121,23 @@ Les résultats reviennent sous forme de *fiches find* : le lien, pourquoi c'est 
 
 La sortie va dans `rness/io/output/anything-finder/`. Tout ce qu'il récupère passe par le broker comme n'importe quel autre accès web, donc un domaine hors liste blanche est routé via Tor — et quand une source refuse de répondre, le rapport nomme l'hôte et vous dit quoi ajouter à `allowlists.md`, plutôt que de laisser un trou silencieux dans les résultats.
 
-### 18.3 girraph-merirmaid
+### 19.3 girraph-merirmaid
 
-La compétence de discipline pour les deux primitives de diagramme d'enough (sections 19 et 20). La moitié girraph enseigne une cartographie IBIS correcte : une question par tour, pas de saut aux solutions, votre confirmation comme règle d'arrêt. La moitié merirmaid porte les règles de rédaction Mermaid, comme garder des étiquettes de nœud assez courtes pour que vous puissiez les modifier confortablement. Les modes fonctionnent sans la compétence ; avec elle, votre readvisor devient un partenaire de cartographie véritablement discipliné.
+La compétence de discipline pour les deux primitives de diagramme d'enough (sections 20 et 21). La moitié girraph enseigne une cartographie IBIS correcte : une question par tour, pas de saut aux solutions, votre confirmation comme règle d'arrêt. La moitié merirmaid porte les règles de rédaction Mermaid, comme garder des étiquettes de nœud assez courtes pour que vous puissiez les modifier confortablement. Les modes fonctionnent sans la compétence ; avec elle, votre readvisor devient un partenaire de cartographie véritablement discipliné.
 
-### 18.4 memoir-dialectic
+### 19.4 lexicographer
+
+Le style maison du dictionnaire (section 13), remis à votre readvisor. Votre readvisor en chef peut chercher des mots et les ajouter à votre propre dictionnaire quand cette compétence est désactivée — le dictionnaire est toujours à portée — mais activée, tout le guide colonne par colonne voyage à chaque tour : comment s'écrit une prononciation (API américain large, accent marqué), auquel des 45 domaines de FEED appartient un mot, comment se formule un premier emploi (« late 18th century », « 2010s »), ce que signifient les bandes de fréquence, où vont les points de syllabes. Elle porte aussi la forme de la conversation — chercher d'abord, rédiger ce qui peut l'être, demander ce que vous seul pouvez répondre, relire, et n'ajouter qu'avec votre oui — de sorte qu'un mot que votre famille dit depuis vingt ans ressorte comme s'il avait toujours été dans le livre.
+
+Demandez-lui « *flumpet*, c'est un mot ? », « ajoute *glimmerwick* à mon dictionnaire », « ma version de *draft*, s'il te plaît ». Elle n'est pas faite pour traduire du texte — c'est `translator` — et ce n'est pas un correcteur ; ça, c'est analyzer.
+
+### 19.5 memoir-dialectic
 
 Un collaborateur de mémoires patient, sur plusieurs sessions. Il vous interroge — une ou deux questions à la fois, jamais un déluge — et classe tout : des documents de plan numérotés dans l'ordre de la conversation, un index pour reprendre rapidement, un fichier de notes pour les vidages de cerveau désordonnés, et finalement une synthèse de plan et, seulement si vous le voulez, des brouillons. Le dossier, c'est la mémoire. Vous pouvez disparaître pendant des semaines ou des années et il reprend là où vous vous étiez arrêté. Construit pour toute la gamme, de l'histoire de vie complète à un seul jalon, avec une gestion explicite des sujets sensibles et des zones interdites, et une préservation soigneuse de votre propre façon de vous exprimer — la voix compte, surtout si un brouillon approche.
 
-### 18.5 readvisory
+### 19.6 readvisory
 
-La compétence qui fabrique un readvisor (section 16), en interrogeant une personne plutôt qu'en rédigeant une spécification.
+La compétence qui fabrique un readvisor (section 17), en interrogeant une personne plutôt qu'en rédigeant une spécification.
 
 Deux façons de récolter. **En direct** : elle vous interroge *vous*, patiemment, une ou deux questions à la fois, douze à dix-huit en tout, sur la façon dont vous décidez réellement le genre de chose qu'on va demander à ce readvisor. **Par questionnaire** : elle écrit un fichier simple, prêt à envoyer par courriel, que vous adressez à quelqu'un dont vous aimeriez avoir le jugement sous la main — un ami, un mentor, un ancien rédacteur en chef, un parent — qui y répond à son rythme, et vous recollez les réponses quand elles arrivent. Un questionnaire peut dormir une semaine dans une boîte de réception : tout le travail est donc suivi dans un fichier de requête (section 8.3) qu'une séance des semaines plus tard peut reprendre à froid.
 
@@ -1051,7 +1145,7 @@ Les deux voies se terminent de la même manière : une courte passe de relance v
 
 Elle a une idée claire de ce à quoi elle ne sert pas. Elle ne renommera pas votre readvisor en chef et ne convoquera pas de conseil : elle fabrique les participants, elle ne tient pas la réunion.
 
-### 18.6 scaffold
+### 19.7 scaffold
 
 Transforme un tas de réflexion en une structure que vous pouvez regarder.
 
@@ -1061,20 +1155,20 @@ La règle qui la rend précieuse : **elle n'invente jamais de matière pour bouc
 
 Elle n'écrit pas le texte. Elle écrit la structure, et chaque carte posée dessus est à vous dès l'instant où elle atterrit.
 
-(Un seul nom, deux choses, et ça vaut le coup de les séparer une bonne fois : les *scaffolds* que génère le paradigme text-planning — section 15.2 — sont des guides structurels par section, écrits en markdown, que vous étoffez ensuite en prose. Cette compétence-ci produit une composure entière. Les deux s'entendent bien ; un plan construit en text-planning fait un bon vidage de cerveau à donner à celle-ci.)
+(Un seul nom, deux choses, et ça vaut le coup de les séparer une bonne fois : les *scaffolds* que génère le paradigme text-planning — section 16.1 — sont des guides structurels par section, écrits en markdown, que vous étoffez ensuite en prose. Cette compétence-ci produit une composure entière. Les deux s'entendent bien ; un plan construit en text-planning fait un bon vidage de cerveau à donner à celle-ci.)
 
-### 18.7 translator
+### 19.8 translator
 
 Traduction hors ligne à travers environ 419 langues via MADLAD-400 — un téléchargement unique d'environ 3 Go qui tourne sur CPU ou Apple Silicon et ne rentre jamais téléphoner à la maison. De courtes phrases à des documents entiers, des langues majeures aux langues à faibles ressources et indigènes. Traduisez une lettre, localisez un README, vérifiez ce que veut dire un passage, faites l'aller-retour d'une phrase à travers une troisième langue comme test de préservation du sens — tout ça avec le réseau débranché. Pour certaines langues à faibles ressources, un moteur optionnel NLLB-200 offre une meilleure qualité ; il porte une licence non commerciale, donc c'est optionnel via le paradigme translation.
 
-### 18.8 Écrire les vôtres, et faire confiance à celles des autres
+### 19.9 Écrire les vôtres, et faire confiance à celles des autres
 
-Les sept ci-dessus sont des démonstrations. Le *mécanisme* de compétence — des instructions markdown, chargées quand activées, avec une `description:` qui dit à un readvisor quand s'engager — est la vraie fonctionnalité. Guides de style maison, checklists de domaine, formats de rapport récurrents, procédures de traitement de données : si vous pouvez décrire une compétence en prose, vous pouvez la remettre à vos readvisors comme une compétence. Construisez la vôtre avec workflow-design (section 15.4), ou forkez l'une des sept et faites-la vôtre.
+Les huit ci-dessus sont des démonstrations. Le *mécanisme* de compétence — des instructions markdown, chargées quand activées, avec une `description:` qui dit à un readvisor quand s'engager — est la vraie fonctionnalité. Guides de style maison, checklists de domaine, formats de rapport récurrents, procédures de traitement de données : si vous pouvez décrire une compétence en prose, vous pouvez la remettre à vos readvisors comme une compétence. Construisez la vôtre avec workflow-design (section 16.3), ou forkez l'une des huit et faites-la vôtre.
 
 L'autre bout de cette boucle, ce sont les compétences qui arrivent d'ailleurs. Une compétence, ce sont des instructions que vos readvisors vont suivre, ce qui veut dire qu'une compétence venue d'internet mérite exactement autant de méfiance que n'importe quel autre fichier venu d'internet. Alors enough les lit pour vous :
 
-- **Ce qu'enough fournit d'origine est de confiance, et ça se voit comme toujours.** Les cinq ci-dessus arrivent comme des liens vers les défauts propres de l'installation. Elles s'activent instantanément. Rien ne les audite.
-- **Tout le reste est désactivé tant que ça n'a pas été lu.** Déposez un dossier de compétence dans `rness/skills/` — téléchargé, envoyé par un ami, décompressé d'un `.skill` — et il reste là désactivé, marqué *unverified* dans la barre latérale. La première fois que vous l'activez, enough fait tourner le mode audit d'analyzer dessus (section 18.1) avant qu'un seul mot n'atteigne un readvisor. Vous voyez ça se passer dans la ligne : *unverified* → *auditing…* → *audited*.
+- **Ce qu'enough fournit d'origine est de confiance, et ça se voit comme toujours.** Les huit ci-dessus arrivent comme des liens vers les défauts propres de l'installation. Elles s'activent instantanément. Rien ne les audite.
+- **Tout le reste est désactivé tant que ça n'a pas été lu.** Déposez un dossier de compétence dans `rness/skills/` — téléchargé, envoyé par un ami, décompressé d'un `.skill` — et il reste là désactivé, marqué *unverified* dans la barre latérale. La première fois que vous l'activez, enough fait tourner le mode audit d'analyzer dessus (section 19.1) avant qu'un seul mot n'atteigne un readvisor. Vous voyez ça se passer dans la ligne : *unverified* → *auditing…* → *audited*.
 - ***Flagged* veut dire pas activé.** Si l'audit trouve quelque chose, la ligne dit *flagged* (ou *failed*), la compétence reste désactivée, et vous obtenez deux boutons : **read report** ouvre le rapport complet dans la vue de lecture, et **activer quand même** vous demande de confirmer puis enregistre la décision comme étant la vôtre — le constat n'est pas effacé, il est outrepassé, et la ligne affiche dès lors *trusted by you*. L'audit conseille. Vous décidez. (Si vous préférez travailler dans le fichier, modifier le `verdict.json` de cette compétence en `"verdict": "pass"` fait la même chose.)
 - **Modifiez une compétence et elle est relue.** L'audit est lié aux octets exacts qu'il a lus — noms de fichiers et contenus, les deux. Changez n'importe quoi et la prochaine fois que vous activez cette compétence, elle est réauditée. Ça inclut une que vous auriez précédemment activée quand même : une dérogation décrit un ensemble particulier de fichiers à un moment particulier, et elle ne survit pas à une modification.
 - **Une compétence écrite pour vous au cours d'une séance compte aussi comme non vérifiée.** C'est délibéré, pas un oubli. Quand workflow-design écrit un nouveau `SKILL.md` dans `rness/skills/`, enough audite ce devoir à la première activation. C'est quasi instantané quand il n'y a rien à trouver.
@@ -1084,7 +1178,7 @@ Les rapports vivent dans `rness/io/output/analyzer/audits/<nom-compétence>/` �
 
 ---
 
-## 19. Le mode girraph et l'extension `.girraph`
+## 20. Le mode girraph et l'extension `.girraph`
 
 Ça se prononce comme *graph*. Le « ir » est silencieux — il représente *iterative* et *recursive* (itératif et récursif). L'animal est un 🦒, et l'animal aussi est silencieux.
 
@@ -1120,22 +1214,22 @@ Trois habitudes font marcher les girraphs. Formulez les issues comme des questio
 
 ---
 
-## 20. Le mode merirmaid et l'extension `.merirmaid`
+## 21. Le mode merirmaid et l'extension `.merirmaid`
 
 Là où un girraph cartographie un argument, un **merirmaid** dépeint une structure. Un fichier `.merirmaid` est un diagramme [Mermaid](https://mermaid.js.org/) — organigramme, diagramme de séquence, machine à états, diagramme ER, tout ce que Mermaid dessine — avec un petit en-tête de frontmatter, rendu en direct dans le navigateur. En local, bien sûr ; pas de CDN, comme tout dans enough.
 
 Deux modalités, déclarées dans l'en-tête :
 
 - **wip** — un tableau blanc de travail. Cliquez sur le texte de n'importe quel nœud et modifiez l'étiquette sur place, avec un compteur de caractères en direct ; les changements structurels (ajouter une boîte, recâbler une flèche) passent par votre readvisor — demandez dans le panneau. Demandez un diagramme de votre pipeline, de votre intrigue, de votre organisation, et votre readvisor écrit la source, le navigateur le dessine, et vous ajustez les mots.
-- **mirror** — un reflet en lecture seule d'une structure qui vit ailleurs : le contenu d'un cachebox (section 12.1) ou un girraph (section 19). Les mirrors se régénèrent quand leur source change. Pour changer l'image, changez la chose.
+- **mirror** — un reflet en lecture seule d'une structure qui vit ailleurs : le contenu d'un cachebox (section 12.1) ou un girraph (section 20). Les mirrors se régénèrent quand leur source change. Pour changer l'image, changez la chose.
 
 Les diagrammes se relient. Un nœud peut pointer vers un autre `.merirmaid`, un `.girraph`, ou un document markdown, et cliquer dessus vous y emmène, un fil d'ariane marquant le chemin du retour — si bien qu'un ensemble de diagrammes devient un atlas navigable de votre projet. Et quand un diagramme a une erreur de syntaxe, le mode merirmaid montre l'erreur plus la source brute plutôt qu'un panneau vide. Il y a toujours quelque chose à partir de quoi corriger.
 
-La compétence girraph-merirmaid (section 18.3) porte la discipline de rédaction pour les deux types de fichier. Une règle de base qui en vient mérite d'être répétée ici : si le premier geste honnête est de poser une question, vous voulez un girraph ; si c'est de dessiner une boîte et une flèche, vous voulez un merirmaid.
+La compétence girraph-merirmaid (section 19.3) porte la discipline de rédaction pour les deux types de fichier. Une règle de base qui en vient mérite d'être répétée ici : si le premier geste honnête est de poser une question, vous voulez un girraph ; si c'est de dessiner une boîte et une flèche, vous voulez un merirmaid.
 
 ---
 
-## 21. Où aller à partir d'ici
+## 22. Où aller à partir d'ici
 
 Le moyen le plus rapide de faire d'enough le vôtre :
 
@@ -1149,4 +1243,4 @@ Cette boucle — remarquer la friction, coder le correctif, continuer à travail
 
 ---
 
-*enough est © 2026 Graham Smith, distribué sous licence Apache License 2.0. Le contenu Wikipédia atteint via wikisink est en CC BY-SA. Ce document : à vous de le modifier aussi.*
+*enough est © 2026 Graham Smith, distribué sous licence Apache License 2.0. Le texte propre du dictionnaire — les mots de FEED, ses définitions et le reste — est © 2026 Graham Smith lui aussi, mais il n'est pas sous cette licence : il est livré pour être utilisé dans enough, tous droits réservés pour l'instant. Le contenu Wikipédia atteint via wikisink est en CC BY-SA. Ce document : à vous de le modifier aussi.*

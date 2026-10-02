@@ -28,6 +28,14 @@ lines — the version, and the rolling `exclude-newer` timestamp.
 Any bump (or any bundle change at all) means re-running §4 and §6: a new
 Info.plist is a new bundle is a new signature is a new notarization.
 
+**Sync the dictionary before bumping.** FEED ships from `reflib/dict/`, a
+filtered copy of the lexicon's `dictionary/` folder:
+`uv run python scripts/sync_dictionary.py` (default lexicon
+`../../enough-lexicon`; `--check` only reports), then commit `reflib/dict`
+with the bump. The snapshot in `build.rs` copies that folder into the bundle,
+and every install rebuilds its `~/enough/dict/feed.sqlite` when the manifest
+digest changes.
+
 ---
 
 ## 0. Once per machine
@@ -39,6 +47,18 @@ Info.plist is a new bundle is a new signature is a new notarization.
   ```
   You need the full string in the quotes, e.g.
   `Developer ID Application: Jane Smith (AB12CD34EF)`.
+  The certificate must come from the **G2** authority: the original
+  Developer ID Certification Authority, and every certificate it issued,
+  expires on February 1, 2027. Check the issuer and expiry with
+  ```sh
+  security find-certificate -c "Developer ID Application" -p | openssl x509 -noout -issuer -enddate
+  ```
+  (`CN=Developer ID Certification Authority (G2)` is the new one; G2
+  certificates are renewed yearly.) While an old and a new certificate with
+  the same name sit in the keychain together, the name is ambiguous to
+  `codesign`: export the new one's SHA-1 hash from `find-identity` as
+  `APPLE_SIGNING_IDENTITY` instead of the name, or delete the old one.
+  Releases already signed, timestamped and notarized keep working.
 - An **App Store Connect API key** for notarization: App Store Connect →
   Users and Access → Integrations → App Store Connect API → generate a key
   with the *Developer* role. You get a `.p8` (downloadable once), a Key ID,
@@ -131,6 +151,16 @@ cd desktop/src-tauri
 cargo tauri build
 ```
 
+**Before you start it:** make sure Finder is not showing hidden files
+(`defaults read com.apple.finder AppleShowAllFiles` should print nothing, an
+error, or `0`; press ⌘⇧. in a Finder window to toggle it off), and once the
+bundler mounts the DMG, leave its Finder window alone until it closes itself.
+The layout AppleScript positions whatever Finder is displaying, so in 0.4.0 —
+built with hidden files shown — `.VolumeIcon.icns` got its own icon slot and
+`enough.app` and `Applications` were shoved out of their slots.
+`tauri.conf.json` now pins the layout and a background image (which makes the
+bundler park hidden items off-window), but the check below is what proves it.
+
 The bundler signs `Contents/MacOS/uv` and then the .app (inside out, as Apple
 requires), reads `entitlements.plist`, applies the hardened runtime, and —
 because `APPLE_API_*` are exported — submits the result to `notarytool` and
@@ -145,6 +175,18 @@ target/release/bundle/dmg/enough_<version>_aarch64.dmg
 
 If notarization is not wanted in the same run, unset the `APPLE_API_*` trio;
 the build then signs only, and §6 has the manual commands.
+
+**Check the DMG layout before signing/shipping it.** From the repo root:
+
+```sh
+uv run python scripts/check_dmg_layout.py desktop/src-tauri/target/release/bundle/dmg/enough_<version>_aarch64.dmg
+```
+
+It mounts the image read-only, reads `.DS_Store`, and exits non-zero unless
+`enough.app` is at (180,170), `Applications` at (480,170), the window is
+660x400, and no dotfile has an icon slot inside the window.
+Expected: a table of OK rows and `PASS`. Any `FAIL` = rebuild (after
+re-checking the Finder note above); do not ship that DMG.
 
 ## 5. Verify the signature
 

@@ -119,7 +119,7 @@
   var LAYER_SEL = '#confirm-overlay, #help-viewer, #preview, [id$="-modal"],' +
     ' #readvisor-panel,' +
     ' #review-mode, #edit-mode, #girraph-mode, #merirmaid-mode, #wiki-mode,' +
-    ' #cacheawl-mode, #ref-mode, #paginated-mode';
+    ' #cacheawl-mode, #ref-mode, #paginated-mode, #dict-mode';
   /* `#readvisor-panel` joined the list in P6c, when the panel's own screens
    * were finally wired. Docked, it PUSHES — nothing is covered and the list
    * changes nothing. In `full` (and in the narrow-viewport overlay) it is

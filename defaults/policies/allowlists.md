@@ -44,7 +44,7 @@ slower, anonymized."
 ## Notes for the readvisor
 
 - To read a file inside `~/enough/`, use `read_file` with the absolute
-  path (e.g. `read_file ~/enough/defaults/paradigms/default.md`). The
+  path (e.g. `read_file ~/enough/defaults/paradigms/text-planning.md`). The
   harness expands `~` to the user's home directory.
 - To read a file inside an allowlisted location that is NOT under
   `~/enough/`, the user must first add its prefix to the file-read or

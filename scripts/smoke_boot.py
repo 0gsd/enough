@@ -19,7 +19,8 @@ hooks:
 
 1. every ``ENOUGH_*`` seam (weights dir, live model state, registry,
    download URL base, cacheawl root, infoworld root, wikisink config, ui
-   config, llama-server override) is pointed inside the scratch dir; and
+   config, llama-server override, FEED dictionary root) is pointed inside
+   the scratch dir; and
 2. ``$HOME`` is pointed there too, which is what actually isolates
    ``~/enough/config/broker.json``, ``openrouter.json``,
    ``orchestrator.json`` and ``~/enough/.llama-server/server.pid`` — none
@@ -161,6 +162,10 @@ def build_env(scratch: Path) -> dict[str, str]:
         # real ~/enough/readvisors/ and is then symlinked into every
         # project they open afterwards.
         "ENOUGH_READVISORS_ROOT": str(scratch / "readvisors"),
+        # FEED (0.4.1): feed.sqlite and the precious user-dictionary.sqlite.
+        # The source stays the checkout's reflib/dict (the shipping path), so
+        # the boot really starts a background build — into the scratch dir.
+        "ENOUGH_DICT_ROOT": str(scratch / "dict"),
         # The home screen's project registry. $HOME already points here, so
         # this is belt and braces — but the rule is "every ENOUGH_* seam", and
         # the handoff file and desktop.json are derived from this one's dir.
@@ -177,6 +182,8 @@ def build_env(scratch: Path) -> dict[str, str]:
     env.pop("ENOUGH_DESKTOP_CODE", None)
     env.pop("ENOUGH_DESKTOP_UV", None)
     env.pop("ENOUGH_DESKTOP_LLM_URL", None)
+    # A developer's own dictionary source would change what the boot builds.
+    env.pop("ENOUGH_DICT_SOURCE", None)
     return env
 
 
@@ -251,6 +258,12 @@ def check_degraded(base: str) -> None:
 
     status, _body = request(f"{base}/api/broker")
     need(status == 200, "/api/broker renders with a scratch config")
+
+    # FEED: the boot kicked off a background build from reflib/dict into the
+    # scratch ENOUGH_DICT_ROOT; status must answer while it runs.
+    payload = get_json(f"{base}/api/dict/status")
+    need(payload.get("available") is True and (payload.get("building") or payload.get("ready")),
+         f"/api/dict/status: the dictionary is building or built (progress={payload.get('progress')})")
 
 
 def check_shutdown(base: str, proc: subprocess.Popen) -> None:

@@ -46,6 +46,7 @@ from . import convert as _convert
 from . import home as _home
 from . import models as _models
 from . import paginate as _paginate
+from . import intro as _intro
 from . import pal_tools as _pal
 from .logger import ExchangeLog, log_exchange
 from . import prompt as prompt_mod
@@ -664,12 +665,19 @@ def _render_turn_from_history(history: list[dict[str, str]]) -> str:
             # machine and what came back are shown live, and a reload that
             # quietly dropped them would make the record depend on whether
             # the user had refreshed the page.
+            # `show_intro`'s result likewise stands for the intro bubble.
             if text.lstrip().startswith("<tool_result"):
                 out.extend(_render_pal_bubbles(text))
+                out.extend(_intro.render_tool_result(text))
                 continue
             out.append(f'<div class="msg user"><div class="role">user</div>'
                        f'<div class="body">{_escape_html(text)}</div></div>')
         elif role == "assistant":
+            if _intro.is_intro_text(text):
+                # Answered without a model call (`/api/chat`'s intro match):
+                # drawn as the same markdown bubble it was live.
+                out.append(_intro.bubble(text.strip(), prompt_mod.chief_name()))
+                continue
             out.append(f'<div class="msg assistant"><div class="role">{speaker}</div>'
                        f'<div class="body">{_escape_html(text)}</div></div>')
     return "".join(out)
@@ -689,6 +697,19 @@ def _user_bubble(text: str) -> str:
     on the way to the model and the conversation should still show it."""
     return (f'<div class="msg user"><div class="role">user</div>'
             f'<div class="body">{_escape_html(text)}</div></div>')
+
+
+async def _reply_without_turn(session: "Session", html: str) -> HTMLResponse:
+    """A `/api/chat` answer that starts no model turn (a refusal, a usage
+    hint, the intro). The composer disables itself when the form posts and
+    re-enables only on the `done` event a turn ends with, so a reply with no
+    turn has to send one itself — unless a chat turn really is running, whose
+    own `done` is the one that counts. (A council holds the same lock but
+    never sends `done`, so it does not count.)"""
+    from . import council as _council
+    if not session.generation_lock.locked() or _council.turn_in_flight():
+        await session.emit("done", {})
+    return HTMLResponse(html)
 
 
 def _system_bubble(text: str) -> str:
@@ -715,22 +736,10 @@ def _system_bubble(text: str) -> str:
 # onboarding, model-not-running advisory, etc.).
 
 def _default_empty_hint() -> str:
-    """The plain hint, addressed to whoever the chief readvisor is right
-    now. Built per call rather than held in a constant: the name is a
-    global setting a user can change in the broker pane, and a hint that
-    still greeted the old name would be the one place in the app that
-    disagreed with the byline above it."""
-    from .prompt import chief_name
-    try:
-        who = _escape_html(chief_name())
-    except Exception:  # noqa: BLE001 — a hint must never stop a page
-        who = "Ed"
-    return (
-        '<div class="empty-hint" id="empty-hint">'
-        'awaiting your first message.<br>'
-        f'say hi to {who}, or ask what they can do.'
-        '</div>'
-    )
+    """The plain, neutral hint (0.4.1: the "say hi, or ask what they can do"
+    line went). The chat adds its own "a brief introduction to enough"
+    affordance inside `#empty-hint`, which sends `/intro` through the chat."""
+    return '<div class="empty-hint" id="empty-hint">awaiting your first message.</div>'
 
 
 def _render_empty_hint(project_dir: Path) -> str:
@@ -1494,6 +1503,14 @@ def create_app(
                          report["migrated"])
         except Exception:  # noqa: BLE001 — never block startup on migration
             log.exception("cacheawl infoworld migration failed")
+        # FEED: build ~/enough/dict/feed.sqlite from reflib/dict when it is
+        # missing or its manifest digest moved. Background thread; progress
+        # is /api/dict/status. A missing source is "unavailable", not an error.
+        from . import dictionary as _dictionary
+        try:
+            await asyncio.to_thread(_dictionary.ensure_built, background=True)
+        except Exception:  # noqa: BLE001 — never block startup on the dictionary
+            log.exception("dictionary build could not start")
         if supervisor is not None:
             try:
                 await supervisor.bootstrap()
@@ -1503,6 +1520,7 @@ def create_app(
             yield
         finally:
             _wiki_update.PROGRESS_EMITTER = None
+            await asyncio.to_thread(_dictionary.cancel_build)
             if supervisor is not None:
                 await supervisor.stop(only_if_owned=True)
             await session.client.aclose()
@@ -2002,6 +2020,21 @@ def create_app(
                 "HELP_CENTER.md not found in this install — run /update-enough "
                 "to pick up the bundled manual.")
         return PlainTextResponse(text, media_type="text/markdown; charset=utf-8")
+
+    @app.get("/api/intro")
+    async def api_intro(lang: str = "en") -> dict[str, Any]:
+        """The brief introduction to enough, as markdown: `{text, lang}`.
+        `lang` picks `static/i18n/<lang>/intro.md` when one ships, else the
+        English `defaults/intro.md` — the `/api/help-center` rule, and the
+        same whitelist doubling as the path guard. `lang` in the answer is
+        the language actually served. No rendered html: the chat draws it
+        with the same markdown renderer as everything else."""
+        path = _intro.path_for(lang)
+        text = await asyncio.to_thread(_intro.text_for, lang)
+        if text is None:
+            raise HTTPException(404, "intro.md not found in this install")
+        served = lang if (lang in UI_LANGUAGES and path != _intro.english_path()) else "en"
+        return {"text": text, "lang": served}
 
     @app.post("/api/requests/done", response_class=HTMLResponse)
     async def api_requests_done(request: Request) -> HTMLResponse:
@@ -2785,6 +2818,18 @@ def create_app(
         emit=session.emit,
         session=session,
     ))
+
+    # ---------- FEED (the first-party enough english dictionary) ----------
+    #
+    # Install-wide, not per project: `enough/dictionary.py` is the engine,
+    # `enough/dictionary_api.py` the HTTP translation, and the router closes
+    # over nothing. Project mode only, like every route not on ModeGate's list.
+    from . import dictionary_api as _dictionary_api
+    app.include_router(_dictionary_api.build_router())
+
+    # The brief introduction (`show_intro`, the chat's intro match) is served
+    # in the UI language, which this module owns the config for.
+    _intro.set_language_source(_ui_language)
 
     # ---------- Girraph (plain-text IBIS map) node ops ----------
     #
@@ -3798,7 +3843,8 @@ def create_app(
         # rather than gone.
         from . import council as _council
         if _council.turn_in_flight():
-            return HTMLResponse(
+            return await _reply_without_turn(
+                session,
                 f'<div class="msg user"><div class="role">user</div>'
                 f'<div class="body">{_escape_html(message)}</div></div>'
                 f'<div class="msg system"><div class="role">enough</div>'
@@ -3813,6 +3859,26 @@ def create_app(
         # The order is the order of the things the user needs told: what is
         # shut before what is missing, and what is missing before what is
         # pointless.
+        # The brief introduction (0.4.1): a whole-message match on a short,
+        # explicit list (`intro.INTRO_PHRASES`, first message only; `/intro`
+        # any time) is answered on the spot, with no model turn. Not while a
+        # turn is running — the history is that turn's until it ends — so
+        # then it simply goes to the model like any other message.
+        if (not session.generation_lock.locked()
+                and _intro.is_intro_request(message,
+                                            conversation_empty=not session.history)):
+            text = await asyncio.to_thread(_intro.text_for)
+            if text:
+                session.history.append({"role": "user", "content": message})
+                session.history.append({"role": "assistant", "content": text})
+                try:
+                    log_exchange(session.project_dir,
+                                 ExchangeLog(user=message, assistant=text, tool_calls=[]),
+                                 now=dt.datetime.now())
+                except Exception:  # noqa: BLE001
+                    log.exception("failed to write session log")
+                return await _reply_without_turn(
+                    session, _user_bubble(message) + _intro.bubble(text, prompt_mod.chief_name()))
         asked = _pal.strip_command(message)
         pal = False
         note = ""
@@ -3822,11 +3888,11 @@ def create_app(
             if not gate["open"]:
                 # No LLM turn at all: nothing to think about locally when
                 # the thing being thought toward cannot be reached.
-                return HTMLResponse(
-                    _user_bubble(message) + _system_bubble(gate["denial"]))
+                return await _reply_without_turn(
+                    session, _user_bubble(message) + _system_bubble(gate["denial"]))
             if not asked:
-                return HTMLResponse(
-                    _user_bubble(message) + _system_bubble(_pal.USAGE_HINT))
+                return await _reply_without_turn(
+                    session, _user_bubble(message) + _system_bubble(_pal.USAGE_HINT))
             try:
                 active = await asyncio.to_thread(
                     lambda: _models.load_state().get("current"))

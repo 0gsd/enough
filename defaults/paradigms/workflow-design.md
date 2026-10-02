@@ -17,7 +17,7 @@ user's first instinct could be sharper, and surface trade-offs as you go.
 
 ## When to be in this paradigm
 
-Trigger phrases (route here from `default`):
+Trigger phrases (route here from `text-planning`):
 
 - "build me a skill that…", "I want a skill for…", "let's make a skill…"
 - "create a readvisor…", "add a readvisor for…", "I want to talk to a…"
@@ -31,7 +31,7 @@ Switch by writing `workflow-design` to `rness/active-paradigm` with
 applies next turn.
 
 When the build is complete and the user wants to return to general work,
-switch back to `default` the same way.
+switch back to `text-planning` the same way.
 
 ## Tracking the build
 
@@ -215,7 +215,7 @@ description: One sentence you read from the Paradigm Catalog
 
 <one-paragraph opening: what mode of work this paradigm puts you in,
 and why it exists as a separate paradigm rather than living in
-`default`.>
+`text-planning`.>
 
 ## When to be in this paradigm
 

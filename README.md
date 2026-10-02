@@ -30,4 +30,4 @@ for now, the idea is that this might be enough for quite a while.
 
 ---
 
-© 2026 Graham Smith — released under the [Apache License 2.0](LICENSE)
+© 2026 Graham Smith — released under the [Apache License 2.0](LICENSE), except the bundled dictionary data in `reflib/dict/`, which is all rights reserved (see its [NOTICE](reflib/dict/NOTICE.md))

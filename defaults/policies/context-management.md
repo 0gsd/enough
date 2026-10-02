@@ -106,9 +106,9 @@ sources — read them on demand, not pre-emptively:
   the current day's session, written by the harness.
 - `rness/MOTIVATION.md` — accumulated learnings about the user and the
   project. Terse; worth a skim at the start of any substantive turn.
-- `rness/AGENT.md`, `rness/paradigms/default.md` — your identity and
-  interaction rules. Always loaded into the system prompt; you don't need
-  to re-read them.
+- `rness/AGENT.md` and the active paradigm (`rness/paradigms/<name>.md`,
+  `text-planning` unless switched) — your identity and interaction rules.
+  Always loaded into the system prompt; you don't need to re-read them.
 - Any file you wrote in the project — `read_file` it when you need the
   specifics again, don't hold the contents in your head.
 

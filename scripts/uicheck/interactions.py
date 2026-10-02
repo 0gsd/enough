@@ -31,8 +31,8 @@ import re
 from collections.abc import Callable
 
 from .driver import Driver, StepError
-from .screens import (CARDS_READY, COUNCIL_PAL_STATEMENT, DOC,
-                      GIRRAPH, JOURNAL_READY)
+from .screens import (CARDS_READY, COUNCIL_PAL_STATEMENT, DICT_PLAIN,
+                      DICT_READY, DOC, GIRRAPH, JOURNAL_READY, WDL_READY)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -48,8 +48,9 @@ def _reset(d: Driver) -> None:
          "'#mode-stack .mode-indicator .mode-ribbon')).reverse()"
          ".forEach((b) => { try { b.click(); } catch (e) {} });"
          " ['readedit','girraph','merirmaid','wikisink','cacheawl','ref',"
-         "'paginated','blobview'].forEach((n) => { try { modeRemove(n); } "
+         "'paginated','blobview','dict'].forEach((n) => { try { modeRemove(n); } "
          "catch (e) {} }); return true; })()")
+    d.js("(() => { try { wdlClose(); dictCtxClose(); } catch (e) {} return true; })()")
     d.js("(() => { document.querySelectorAll('[id$=\"-modal\"]').forEach("
          "(m) => m.classList.add('hidden'));"
          " document.getElementById('confirm-cancel')?.click();"
@@ -337,6 +338,14 @@ def scenario_dirty_guard(d: Driver) -> list[str]:
                      "dirty guard is the only thing between a stray click and "
                      "an hour of lost work")
     else:
+        # 0.4.1 (U2): the overlay opens with the SAFE choice focused, so a
+        # reflexive Return keeps the work instead of throwing it away.
+        d.wait_idle()
+        if _active(d) != "#confirm-cancel":
+            fails.append(f"the discard confirm opened with focus on "
+                         f"{_active(d)}, not on 'keep editing' (#confirm-cancel)")
+        d.key("Enter")
+        d.wait_idle()
         d.js("document.getElementById('confirm-cancel')?.click()")
         d.wait_idle()
         if "readedit" not in _names(d):
@@ -1520,6 +1529,979 @@ def scenario_composure_inspector_is_clickable(d: Driver) -> list[str]:
     return fails
 
 
+# --- 0.4.1 polish (U1) -----------------------------------------------------
+
+def _sleep(d: Driver, ms: int) -> None:
+    d.js_await(f"new Promise((r) => setTimeout(() => r(true), {int(ms)}))")
+
+
+def scenario_chat_sides(d: Driver) -> list[str]:
+    """The user's turns hug the left of the chat column, the readvisor's the
+    right; enough's own notes keep the full width; the transcript scrolls
+    and is padded (its selector went missing once — see
+    tests/test_css_integrity.py); the composer never scrolls sideways,
+    at any ui scale."""
+    fails: list[str] = []
+    _reset(d)
+    d.js("rvSetState('open')")
+    long = "a turn long enough to wrap inside the docked panel " * 3
+    d.js("(() => { const c = document.getElementById('conversation');"
+         " c.innerHTML = "
+         + json.dumps(
+             f'<div class="msg user"><div class="role">user</div><div class="body">{long}</div></div>'
+             '<div class="msg assistant"><div class="role">Ed</div><div class="body">ok</div></div>'
+             '<div class="msg system"><div class="role">enough</div><div class="body">a note</div></div>')
+         + "; return true; })()")
+    d.wait_idle()
+    for state in ("open", "full"):
+        d.js(f"rvSetState('{state}')")
+        _sleep(d, 300)
+        g = d.js("(() => { const c = document.getElementById('conversation');"
+                 " const cs = getComputedStyle(c); const r = c.getBoundingClientRect();"
+                 " const z = UIZ(); const pl = parseFloat(cs.paddingLeft) * z,"
+                 " pr = parseFloat(cs.paddingRight) * z;"
+                 " const box = (s) => c.querySelector(s).getBoundingClientRect();"
+                 " const u = box('.msg.user'), a = box('.msg.assistant'), s = box('.msg.system');"
+                 " return {overflowY: cs.overflowY, pad: pl, inL: r.left + pl, inR: r.right - pr,"
+                 " uL: u.left, uR: u.right, aL: a.left, aR: a.right, sL: s.left, sR: s.right}; })()")
+        if g["overflowY"] != "auto" or g["pad"] < 8:
+            fails.append(f"[{state}] .conversation is not the padded scroller "
+                         f"(overflow-y {g['overflowY']}, padding {g['pad']:.0f}px)")
+        if abs(g["uL"] - g["inL"]) > 1.5 or g["uR"] > g["inR"] - 20:
+            fails.append(f"[{state}] the user's turn does not hug the left: {g}")
+        if abs(g["aR"] - g["inR"]) > 1.5 or g["aL"] < g["inL"] + 20:
+            fails.append(f"[{state}] the readvisor's turn does not hug the right: {g}")
+        if abs(g["sL"] - g["inL"]) > 1.5 or abs(g["sR"] - g["inR"]) > 1.5:
+            fails.append(f"[{state}] a system note is not full width: {g}")
+    d.js("rvSetState('open')")
+    d.js("document.getElementById('message').value = "
+         + json.dumps("x" * 400 + " https://example.invalid/" + "a/b/" * 60))
+    for z in (1, 1.1, 1.2):
+        d.js(f"(() => {{ UI_SCALES.ui_scale = {z}; applyUIScales(); return true; }})()")
+        _sleep(d, 150)
+        sw = d.js("(() => { const t = document.getElementById('message');"
+                  " return [t.scrollWidth, t.clientWidth]; })()")
+        if sw[0] > sw[1]:
+            fails.append(f"the composer scrolls sideways at ui {z}: "
+                         f"scrollWidth {sw[0]} > clientWidth {sw[1]}")
+    d.js("(() => { UI_SCALES.ui_scale = 1; applyUIScales();"
+         " document.getElementById('message').value = '';"
+         " document.getElementById('conversation').innerHTML = ''; return true; })()")
+    _reset(d)
+    return fails
+
+
+def scenario_chat_tool_chip(d: Driver) -> list[str]:
+    """A tool call gets its chip. The server ends the model's turn
+    (`turn_end`, which releases #current-response) BEFORE it runs the call,
+    so the chip has to land on the bubble that just finished; an assistant
+    bubble with no tool calls keeps no empty chip row under it."""
+    fails: list[str] = []
+    _reset(d)
+    d.js("rvSetState('open')")
+    r = d.js_await("(async () => { const c = document.getElementById('conversation'); c.innerHTML ="
+                   " '<div class=\"msg assistant\"><div class=\"role\">Ed</div><div class=\"body\">plain</div>'"
+                   " + '<div class=\"tool-indicators\"></div></div>'"
+                   " + '<div class=\"msg assistant\"><div class=\"role\">Ed</div><div class=\"body\">let me look.</div>'"
+                   " + '<div class=\"tool-indicators\"></div></div>';"
+                   " const ev = (status) => es.dispatchEvent(new MessageEvent('tool', {data: JSON.stringify("
+                   "{name: 'dict_lookup', key: '', status})}));"
+                   " ev('running'); ev('ok'); await new Promise((r) => setTimeout(r, 50));"
+                   " const ti = c.querySelectorAll('.tool-indicators');"
+                   " const chip = ti[1].querySelector('.tool-indicator');"
+                   " return {chip: chip && chip.className, text: chip && chip.textContent,"
+                   " emptyShown: getComputedStyle(ti[0]).display !== 'none'}; })()", timeout=10) or {}
+    if r.get("chip") != "tool-indicator ok" or r.get("text") != "dict_lookup":
+        fails.append(f"the tool chip did not land on the finished bubble: {r}")
+    if r.get("emptyShown"):
+        fails.append("an assistant bubble with no tool calls keeps an empty chip row")
+    d.js("(() => { document.getElementById('conversation').innerHTML = ''; return true; })()")
+    _reset(d)
+    return fails
+
+
+def scenario_topbar_no_collisions(d: Driver) -> list[str]:
+    """The project title is an in-flow item: with a long name, five stacked
+    modes and the doc counters showing, at ui 1.0-1.2, nothing in the top
+    bar paints over anything else and the bar never overflows."""
+    fails: list[str] = []
+    _reset(d)
+    d.js(f"enterGirraphMode('{GIRRAPH}')")
+    d.wait_for("#girraph-mode.open")
+    d.js("enterCacheawlMode()")
+    d.wait_for("#cacheawl-mode.open")
+    d.js("enterRefMode()")
+    d.wait_for("#ref-mode.open")
+    d.js(f"openReadEdit('{DOC}', {{size:'full', face:'read'}})")
+    d.wait_for("#review-mode.open")
+    d.wait_idle()
+    name0 = d.js("document.getElementById('project-name').textContent")
+    d.js("applyProjectName('a deliberately long project name that has to give way to the rest of the bar')")
+    for z in (1, 1.1, 1.2):
+        d.js(f"(() => {{ UI_SCALES.ui_scale = {z}; applyUIScales(); return true; }})()")
+        _sleep(d, 200)
+        g = d.js("""(() => {
+          const R = (el) => el.getBoundingClientRect();
+          const bar = document.querySelector('.topbar');
+          const items = [['title', document.getElementById('project-title')],
+            ['counters', document.getElementById('doc-counters')],
+            ['badge', document.getElementById('model-badge')],
+            ['rv', document.getElementById('toggle-readvisor')]];
+          document.querySelectorAll('#mode-stack .mode-indicator').forEach(
+            (s, i) => items.push(['square' + i, s]));
+          const vis = items.filter(([, el]) => el && R(el).width > 0);
+          const hits = [];
+          for (let i = 0; i < vis.length; i++) for (let j = i + 1; j < vis.length; j++) {
+            const a = R(vis[i][1]), b = R(vis[j][1]);
+            const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+            if (w > 0.5) hits.push(vis[i][0] + '/' + vis[j][0] + ' ' + w.toFixed(1));
+          }
+          return {hits, over: bar.scrollWidth - bar.clientWidth};
+        })()""")
+        if g["hits"]:
+            fails.append(f"top bar items overlap at ui {z}: {g['hits']}")
+        if g["over"] > 1:
+            fails.append(f"the top bar overflows by {g['over']}px at ui {z}")
+    d.js("(() => { UI_SCALES.ui_scale = 1; applyUIScales(); return true; })()")
+    d.js(f"applyProjectName({json.dumps(name0 or '')})")
+    _reset(d)
+    return fails
+
+
+def scenario_composure_autofit(d: Driver) -> list[str]:
+    """A board ends up fitted and centred after any viewport size change —
+    but not while a drag owns the view, and not while it is covered."""
+    fails: list[str] = []
+    _reset(d)
+    d.js_await("compOpenNew('cards')")
+    d.wait_for(CARDS_READY[1])
+    d.wait_idle()
+    off = ("(() => { const vp = compViewport(), b = compBounds();"
+           " const c = compWorldToStage(b.x + b.w / 2, b.y + b.h / 2);"
+           " return [Math.round(c.x - vp.clientWidth / 2),"
+           " Math.round(c.y - vp.clientHeight / 2)]; })()")
+    pan = ("(() => { COMP.origin = {x: COMP.origin.x + 260, y: COMP.origin.y + 90};"
+           " COMP.zoomed = true; compApplyView(false); return true; })()")
+    centred = lambda o: o and abs(o[0]) <= 2 and abs(o[1]) <= 2  # noqa: E731
+    d.js(pan)
+    d.click("#toggle-sidebar")
+    _sleep(d, 700)
+    if not centred(d.js(off)):
+        fails.append(f"hiding the sidebar did not refit the board: {d.js(off)}")
+    d.js(pan)
+    d.js("COMP.drag = {kind: 'pan'}")
+    d.click("#toggle-sidebar")
+    _sleep(d, 600)
+    if centred(d.js(off)):
+        fails.append("the board was refitted in the middle of a drag")
+    d.js("COMP.drag = null")
+    _sleep(d, 600)
+    if not centred(d.js(off)):
+        fails.append(f"the deferred fit never landed after the drag: {d.js(off)}")
+    d.js(pan)
+    d.js("rvSetState(RV_STATE === 'closed' ? 'open' : 'closed')")
+    _sleep(d, 700)
+    if not centred(d.js(off)):
+        fails.append(f"toggling the readvisor panel did not refit: {d.js(off)}")
+    d.js("rvSetState('open')")
+    _reset(d)
+    _comp_blank(d)
+    return fails
+
+
+# --- 0.4.1 modal a11y (U2) -------------------------------------------------
+#
+# One helper (index.html, "Modal a11y") watches every dialog's own open and
+# close. These hold it to its contract: the dialog is what assistive tech
+# and the keyboard can reach, nothing behind it is, focus goes in on open
+# and back to the opener on close, and a confirm raised over a modal stacks.
+
+_AX_INTERACTIVE = frozenset({
+    "button", "link", "textbox", "searchbox", "combobox", "checkbox",
+    "switch", "radio", "slider", "spinbutton", "menuitem", "tab",
+    "PopUpButton", "ListBox", "listbox"})
+
+
+def _active(d: Driver) -> str:
+    return d.js("(() => { const a = document.activeElement;"
+                " if (!a || a === document.body) return 'BODY';"
+                " if (a.id) return '#' + a.id;"
+                " return a.tagName.toLowerCase() + (a.className"
+                " ? '.' + String(a.className).split(' ')[0] : ''); })()")
+
+
+def _focus_inside(d: Driver, sel: str) -> bool:
+    return bool(d.js(f"!!document.querySelector({json.dumps(sel)})"
+                     f"?.contains(document.activeElement)"))
+
+
+def _shift_tab(d: Driver) -> None:
+    spec = {"key": "Tab", "code": "Tab", "windowsVirtualKeyCode": 9,
+            "nativeVirtualKeyCode": 9, "modifiers": 8}
+    d.page.send("Input.dispatchKeyEvent", {"type": "rawKeyDown", **spec})
+    d.page.send("Input.dispatchKeyEvent", {"type": "keyUp", **spec})
+
+
+def _ax_dialog(d: Driver, sel: str) -> list[str]:
+    """The accessibility tree, as a screen reader gets it: one named dialog,
+    its controls, and NO control from behind it."""
+    fails: list[str] = []
+    tree = d.page.send("Accessibility.getFullAXTree", {})
+    nodes = [n for n in tree.get("nodes", []) if not n.get("ignored")]
+    role = lambda n: (n.get("role") or {}).get("value")          # noqa: E731
+    name = lambda n: (n.get("name") or {}).get("value") or ""    # noqa: E731
+    dialogs = [n for n in nodes if role(n) == "dialog"]
+    if not dialogs:
+        fails.append(f"{sel}: no dialog in the accessibility tree")
+    elif not any(name(n).strip() for n in dialogs):
+        fails.append(f"{sel}: the dialog has no accessible name")
+    inside = 0
+    leaks: list[str] = []
+    for n in nodes:
+        if role(n) not in _AX_INTERACTIVE or not n.get("backendDOMNodeId"):
+            continue
+        obj = d.page.send("DOM.resolveNode",
+                          {"backendNodeId": n["backendDOMNodeId"]})
+        oid = (obj.get("object") or {}).get("objectId")
+        if not oid:
+            continue
+        r = d.page.send("Runtime.callFunctionOn", {
+            "objectId": oid, "returnByValue": True,
+            "functionDeclaration": "function (s) { const e = this.nodeType === 1"
+                                   " ? this : this.parentElement;"
+                                   " return !!(e && e.closest(s)); }",
+            "arguments": [{"value": sel}]})
+        if (r.get("result") or {}).get("value"):
+            inside += 1
+        else:
+            leaks.append(f"{role(n)} '{name(n)[:30]}'")
+    if not inside:
+        fails.append(f"{sel}: none of the dialog's controls are in the tree")
+    if leaks:
+        fails.append(f"{sel}: the background is exposed behind the dialog: "
+                     f"{leaks[:8]}")
+    return fails
+
+
+def _modal_contract(d: Driver, opener: str, sel: str) -> list[str]:
+    fails: list[str] = []
+    _reset(d)
+    d.focus(opener)
+    d.click(opener)
+    d.wait_for(f"{sel}:not(.hidden)")
+    d.wait_idle()
+    if d.js(f"document.querySelector({json.dumps(sel)}).getAttribute('aria-hidden')") != "false":
+        fails.append(f"{sel}: aria-hidden is not 'false' while it is open")
+    if not _focus_inside(d, sel):
+        fails.append(f"{sel}: focus stayed on {_active(d)} when it opened")
+    fails += _ax_dialog(d, sel)
+    left = []
+    for i in range(40):
+        d.key("Tab")
+        if not _focus_inside(d, sel):
+            left.append(f"Tab {i + 1} → {_active(d)}")
+    for i in range(10):
+        _shift_tab(d)
+        if not _focus_inside(d, sel):
+            left.append(f"shift-Tab {i + 1} → {_active(d)}")
+    if left:
+        fails.append(f"{sel}: focus left the dialog: {left[:5]}")
+    d.key("Escape")
+    d.wait_gone(f"{sel}:not(.hidden)")
+    d.wait_idle()
+    if _active(d) != opener:
+        fails.append(f"{sel}: closing it left focus on {_active(d)}, "
+                     f"not on the opener {opener}")
+    if d.js("document.querySelectorAll('[data-modal-inert]').length"):
+        fails.append(f"{sel}: the background is still inert after it closed")
+    _reset(d)
+    return fails
+
+
+def scenario_modal_prefs_a11y(d: Driver) -> list[str]:
+    """Preferences: named dialog, background out of the a11y tree and the
+    tab order, focus in on open and back on the ⚙ button on close."""
+    return _modal_contract(d, "#ui-btn", "#ui-modal")
+
+
+def scenario_modal_broker_a11y(d: Driver) -> list[str]:
+    """The broker: the same contract, through an htmx re-fetch of its body
+    that lands after the dialog opened."""
+    return _modal_contract(d, "#broker-btn", "#broker-modal")
+
+
+def scenario_modal_return_after_open(d: Driver) -> list[str]:
+    """The QA repro: open Preferences, Tab, Return. That used to open
+    wikisink BEHIND the dialog, because focus never left the top bar."""
+    fails: list[str] = []
+    _reset(d)
+    resident = _names(d)
+    d.focus("#ui-btn")
+    d.click("#ui-btn")
+    d.wait_for("#ui-modal:not(.hidden)")
+    d.wait_idle()
+    d.key("Tab")
+    d.key("Enter")
+    d.wait_idle()
+    if _mine(d, resident):
+        fails.append(f"Tab, Return in a fresh Preferences opened "
+                     f"{_mine(d, resident)} behind it")
+    if d.js("document.getElementById('wiki-mode').classList.contains('open')"):
+        fails.append("Tab, Return in a fresh Preferences opened wikisink")
+    _reset(d)
+    return fails
+
+
+def scenario_modal_confirm_stack(d: Driver) -> list[str]:
+    """A confirm raised over Preferences: the confirm is the dialog, the
+    prefs go inert UNDER it, esc peels one layer at a time, and focus walks
+    back down the stack to where it came from."""
+    fails: list[str] = []
+    _reset(d)
+    d.focus("#ui-btn")
+    d.click("#ui-btn")
+    d.wait_for("#ui-modal:not(.hidden)")
+    d.wait_idle()
+    under = _active(d)
+    d.js("(() => { window.__u2Confirm = confirmOverlay({title: 'stacked?',"
+         " message: 'a confirm over a modal'}); return true; })()")
+    d.wait_for("#confirm-overlay:not([hidden])")
+    d.wait_idle()
+    if _active(d) != "#confirm-cancel":
+        fails.append(f"the confirm opened with focus on {_active(d)}; the "
+                     f"default is cancel")
+    if not d.js("document.getElementById('ui-modal').inert"):
+        fails.append("Preferences stayed live under the confirm")
+    if d.js("document.getElementById('confirm-overlay').inert"):
+        fails.append("the confirm itself is inert")
+    fails += _ax_dialog(d, "#confirm-overlay")
+    for i in range(12):
+        d.key("Tab")
+        if not _focus_inside(d, "#confirm-overlay"):
+            fails.append(f"Tab {i + 1} left the confirm for {_active(d)}")
+            break
+    d.key("Escape")
+    d.wait_gone("#confirm-overlay:not([hidden])")
+    d.wait_idle()
+    if d.js("document.getElementById('ui-modal').classList.contains('hidden')"):
+        fails.append("esc on the confirm also closed Preferences under it")
+    if d.js("document.getElementById('ui-modal').inert"):
+        fails.append("Preferences stayed inert after the confirm closed")
+    if _active(d) != under:
+        fails.append(f"after the confirm, focus is on {_active(d)}, not back "
+                     f"on {under} inside Preferences")
+    d.js("(() => { window.__u2Confirm = confirmOverlay({title: 'ok?',"
+         " defaultButton: 'confirm'}); return true; })()")
+    d.wait_for("#confirm-overlay:not([hidden])")
+    d.wait_idle()
+    if _active(d) != "#confirm-ok":
+        fails.append(f"defaultButton:'confirm' put focus on {_active(d)}")
+    d.key("Escape")
+    d.wait_gone("#confirm-overlay:not([hidden])")
+    d.key("Escape")
+    d.wait_gone("#ui-modal:not(.hidden)")
+    d.wait_idle()
+    if _active(d) != "#ui-btn":
+        fails.append(f"closing the whole stack left focus on {_active(d)}")
+    if d.js("document.querySelectorAll('[data-modal-inert]').length"):
+        fails.append("something is still inert after the stack emptied")
+    _reset(d)
+    return fails
+
+
+# --- 0.4.1 help find + contents, the intro (U2) ----------------------------
+
+def _cmd_f(d: Driver) -> None:
+    spec = {"key": "f", "code": "KeyF", "windowsVirtualKeyCode": 70,
+            "nativeVirtualKeyCode": 70, "modifiers": 4}   # meta
+    d.page.send("Input.dispatchKeyEvent", {"type": "rawKeyDown", **spec})
+    d.page.send("Input.dispatchKeyEvent", {"type": "keyUp", **spec})
+
+
+def _scales(d: Driver, ui: float, txt: float) -> None:
+    d.js(f"(() => {{ UI_SCALES.ui_scale = {ui}; UI_SCALES.text_scale = {txt};"
+         " applyUIScales(); return true; })()")
+    _sleep(d, 200)
+
+
+_FIND_OPEN = "!document.getElementById('ref-find').hidden"
+_CUR_IN_VIEW = ("(() => { const h = window.CSS && CSS.highlights"
+                " && CSS.highlights.get('enough-find-current');"
+                " const m = document.querySelector('#ref-body mark.find-hit.current');"
+                " const r = h ? [...h][0].getBoundingClientRect()"
+                " : (m ? m.getBoundingClientRect() : null);"
+                " if (!r) return null;"
+                " const b = document.getElementById('ref-body').getBoundingClientRect();"
+                " return r.top >= b.top && r.bottom <= b.bottom; })()")
+
+
+def scenario_ref_find_contents(d: Driver) -> list[str]:
+    """Help: stable section ids, a contents list that jumps and tracks,
+    cross-references that link, ⌘F find that steps through matches and
+    keeps the current one on screen at any ui/text scale, esc closing the
+    bar before the mode, a way back after a jump — and ⌘F left alone while
+    the chat composer has the caret."""
+    fails: list[str] = []
+    _reset(d)
+    d.js("enterRefMode()")
+    d.wait_for("#ref-body h2[id]")
+    d.wait_idle()
+    g = d.js("(() => { const hs = Array.from(document.querySelectorAll("
+             "'#ref-body h1, #ref-body h2, #ref-body h3'));"
+             " const ids = hs.map((h) => h.id);"
+             " return {n: hs.length, uniq: new Set(ids).size, first: ids[1],"
+             " toc: document.querySelectorAll('#ref-toc a').length,"
+             " xref: document.querySelectorAll('#ref-body a.ref-xref').length,"
+             " bad: Array.from(document.querySelectorAll('#ref-body a.ref-xref'))"
+             ".filter((a) => !document.getElementById(a.dataset.target)).length}; })()")
+    if g["uniq"] != g["n"] or g["first"] != "ref-sec-1":
+        fails.append(f"heading ids are not unique/stable: {g}")
+    if g["toc"] < 10:
+        fails.append(f"the contents list has {g['toc']} entries")
+    if not g["xref"] or g["bad"]:
+        fails.append(f"section references: {g['xref']} linked, {g['bad']} dangling")
+
+    # The contents list: a jump lands the heading at the top of the frame,
+    # the list marks it, and the reader can go back.
+    for ui, txt in ((1, 1), (1.2, 1.3)):
+        _scales(d, ui, txt)
+        d.js("refTocToggle(true)")
+        j = d.js("(() => { const body = document.getElementById('ref-body');"
+                 " body.scrollTop = 0; const a = document.querySelectorAll('#ref-toc a')[25];"
+                 " a.click(); const h = document.getElementById(a.dataset.target);"
+                 " const off = h.getBoundingClientRect().top - body.getBoundingClientRect().top;"
+                 " refTocToggle(true);"
+                 " return {off, back: !document.getElementById('ref-back').hidden,"
+                 " cur: document.querySelector('#ref-toc a.current')?.dataset.target,"
+                 " want: a.dataset.target}; })()")
+        if not (0 <= j["off"] <= 40):
+            fails.append(f"[ui {ui}/text {txt}] a contents jump put the heading "
+                         f"{j['off']:.0f}px from the top of the frame")
+        if j["cur"] != j["want"]:
+            fails.append(f"[ui {ui}/text {txt}] the contents list marks "
+                         f"{j['cur']}, not {j['want']}")
+        if not j["back"]:
+            fails.append(f"[ui {ui}/text {txt}] no way back after a jump")
+        d.js("refBackGo()")
+        if d.js("document.getElementById('ref-body').scrollTop") > 2:
+            fails.append(f"[ui {ui}/text {txt}] 'back' did not return to the top")
+
+    # ⌘F, typing, Return/shift-Return stepping, the current match in view.
+    d.js("document.activeElement && document.activeElement.blur()")
+    _cmd_f(d)
+    if not d.js(_FIND_OPEN):
+        fails.append("⌘F in help did not open the find bar")
+    elif not d.js("document.activeElement.classList.contains('find-q')"):
+        fails.append(f"⌘F opened the bar but focus is on {_active(d)}")
+    d.type_text("composure")
+    _sleep(d, 350)
+    st = d.js("REF_FIND.state()")
+    if not st or st["n"] < 3:
+        fails.append(f"find 'composure' in the manual: {st}")
+    else:
+        for ui, txt in ((1, 1), (1.2, 1.3)):
+            _scales(d, ui, txt)
+            seen = []
+            for _ in range(4):
+                d.key("Enter")
+                seen.append(d.js(_CUR_IN_VIEW))
+            if not all(seen):
+                fails.append(f"[ui {ui}/text {txt}] a current match was off "
+                             f"screen after Return: {seen}")
+        i0 = d.js("REF_FIND.state().i")
+        _shift_enter = {"key": "Enter", "code": "Enter", "windowsVirtualKeyCode": 13,
+                        "nativeVirtualKeyCode": 13, "text": "\r", "modifiers": 8}
+        d.page.send("Input.dispatchKeyEvent", {"type": "keyDown", **_shift_enter})
+        d.page.send("Input.dispatchKeyEvent", {"type": "keyUp", **_shift_enter})
+        if d.js("REF_FIND.state().i") != i0 - 1:
+            fails.append("shift-Return did not step back one match")
+        cnt = d.js("document.querySelector('#ref-find .find-count').textContent")
+        if cnt != f"{i0} of {st['n']}" and d.js("I18N.lang") == "en":
+            fails.append(f"the count reads {cnt!r}, expected '{i0} of {st['n']}'")
+    d.key("Escape")
+    d.wait_idle()
+    if d.js(_FIND_OPEN):
+        fails.append("esc in the find field did not close the bar")
+    if not d.js("document.getElementById('ref-mode').classList.contains('open')"):
+        fails.append("esc in the find field closed help as well as the bar")
+    if d.js("window.CSS && CSS.highlights && CSS.highlights.size") or \
+            d.js("document.querySelectorAll('#ref-body mark.find-hit').length"):
+        fails.append("closing find left matches painted")
+    # Bar open but focus elsewhere: esc still takes the bar first.
+    _cmd_f(d)
+    d.js("document.activeElement.blur()")
+    d.key("Escape")
+    d.wait_idle()
+    if d.js(_FIND_OPEN) or not d.js(
+            "document.getElementById('ref-mode').classList.contains('open')"):
+        fails.append("with the bar open and unfocused, esc did not close the "
+                     "bar first (and only the bar)")
+    # The chat composer keeps ⌘F.
+    d.js("rvSetState('open')")
+    d.focus("#message")
+    _cmd_f(d)
+    if d.js(_FIND_OPEN):
+        fails.append("⌘F with the caret in the chat composer opened help's find")
+    # Mini: the contents list drops over the text and esc folds it first.
+    d.js("document.activeElement.blur(); refToggleSize(); refTocToggle(true)")
+    _sleep(d, 200)
+    sheet = d.js("getComputedStyle(document.getElementById('ref-toc')).position")
+    if sheet != "absolute":
+        fails.append(f"in mini the contents list is not a sheet ({sheet})")
+    d.key("Escape")
+    d.wait_idle()
+    if not d.js("document.getElementById('ref-toc').hidden"):
+        fails.append("esc did not fold the contents sheet")
+    if not d.js("document.getElementById('ref-mode').classList.contains('open')"):
+        fails.append("esc folded the contents sheet AND closed help")
+    _scales(d, 1, 1)
+    _reset(d)
+    return fails
+
+
+def scenario_chat_intro(d: Driver) -> list[str]:
+    """The empty conversation offers the intro; asking sends `/intro`
+    through the chat, the chief's bubble arrives RENDERED, the composer
+    comes back, the bubble is full-width on the right in docked and full
+    chat, and a reload renders it again from history."""
+    fails: list[str] = []
+    _reset(d)
+    d.js_await("fetch('/api/reset').then(() => true)")
+    d.reload()
+    d.wait_idle()
+    d.js("rvSetState('open')")
+    _sleep(d, 200)
+    if not d.exists("#empty-hint .intro-link"):
+        fails.append("the empty conversation has no 'a brief introduction' link")
+        return fails
+    d.click("#empty-hint .intro-link")
+    try:
+        d.wait_for(".msg.intro .body[data-md-rendered] p")
+    except StepError:
+        fails.append("asking for the intro produced no rendered intro bubble")
+        d.js_await("fetch('/api/reset').then(() => true)")
+        return fails
+    _sleep(d, 400)
+    g = d.js("(() => { const m = document.querySelector('.msg.intro');"
+             " const b = m.querySelector('.body');"
+             " return {user: !!document.querySelector('.msg.user'),"
+             " strong: b.querySelectorAll('strong').length,"
+             " ws: getComputedStyle(b).whiteSpace,"
+             " raw: b.textContent.includes('**'),"
+             " off: document.getElementById('message').disabled"
+             " || document.getElementById('send-btn').disabled}; })()")
+    if not g["user"]:
+        fails.append("the /intro request has no user bubble")
+    if g["raw"] or not g["strong"]:
+        fails.append(f"the intro body is not rendered markdown: {g}")
+    if g["ws"] == "pre-wrap":
+        fails.append("the intro body keeps pre-wrap (blank lines between paragraphs)")
+    if g["off"]:
+        fails.append("the composer stayed disabled after the intro")
+    for state in ("open", "full"):
+        d.js(f"rvSetState('{state}')")
+        _sleep(d, 300)
+        w = d.js("(() => { const c = document.getElementById('conversation');"
+                 " const cs = getComputedStyle(c), r = c.getBoundingClientRect(), z = UIZ();"
+                 " const inL = r.left + parseFloat(cs.paddingLeft) * z,"
+                 " inR = r.right - parseFloat(cs.paddingRight) * z;"
+                 " const m = document.querySelector('.msg.intro').getBoundingClientRect();"
+                 " return {inL, inR, mL: m.left, mR: m.right}; })()")
+        if abs(w["mR"] - w["inR"]) > 1.5 or abs(w["mL"] - w["inL"]) > 1.5:
+            fails.append(f"[{state}] the intro is not full-width on the right: {w}")
+    d.js("rvSetState('open')")
+    d.reload()
+    d.wait_idle()
+    _sleep(d, 300)
+    if not d.js("!!document.querySelector('.msg.intro .body[data-md-rendered] strong')"):
+        fails.append("after a reload the intro is not rendered from history")
+    d.js_await("fetch('/api/reset').then(() => true)")
+    d.reload()
+    d.wait_idle()
+    return fails
+
+
+# --- FEED: the dictionary, the WDL, the context menu (0.4.1, U3) -----------
+
+def _dict_open(d: Driver, word: str | None = None) -> None:
+    d.js(DICT_PLAIN[1])
+    d.js(f"enterDictMode({json.dumps({'word': word} if word else {})})")
+    d.wait_for("#dict-mode.open")
+    d.js_await(DICT_READY[1], timeout=25)
+    d.wait_idle()
+
+
+def _dict_page(d: Driver) -> dict:
+    return d.js("(() => { const els = Array.from(document.querySelectorAll('#dict-flow .dict-e'));"
+                " return {start: DICT.start, fit: DICT.fit, n: els.length,"
+                " first: els[0] && els[0].dataset.w, last: els.length ? els[els.length - 1].dataset.w : null,"
+                " gl: document.getElementById('dict-gw-l').textContent,"
+                " gr: document.getElementById('dict-gw-r').textContent,"
+                " next: (document.querySelector('#dict-next .cw') || {}).textContent,"
+                " overflowX: document.getElementById('dict-mode').scrollWidth"
+                " > document.getElementById('dict-mode').clientWidth + 1}; })()") or {}
+
+
+def _right_click(d: Driver, root_sel: str, word: str, *, shift: bool = False) -> dict | None:
+    """A real right-click (CDP mouse events) on `word` inside `root_sel`."""
+    pos = d.js("(() => { const root = document.querySelector(" + json.dumps(root_sel) + ");"
+               " if (!root) return null; const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);"
+               " const re = new RegExp('\\\\b' + " + json.dumps(word) + " + '\\\\b');"
+               " for (let n = w.nextNode(); n; n = w.nextNode()) { const m = re.exec(n.data); if (!m) continue;"
+               " const r = document.createRange(); r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length);"
+               " const b = r.getBoundingClientRect(); if (!b.width || b.top < 0 || b.bottom > innerHeight) continue;"
+               " return {x: b.left + b.width / 2, y: b.top + b.height / 2}; } return null; })()")
+    if not pos:
+        return None
+    mods = 8 if shift else 0
+    for typ, buttons in (("mousePressed", 2), ("mouseReleased", 0)):
+        d.page.send("Input.dispatchMouseEvent", {"type": typ, "x": pos["x"], "y": pos["y"],
+                                                 "button": "right", "buttons": buttons,
+                                                 "clickCount": 1, "modifiers": mods})
+    _sleep(d, 120)
+    return d.js("(() => { const m = document.getElementById('dict-ctx-menu');"
+                " return {open: !m.hidden, text: m.innerText}; })()")
+
+
+def scenario_dict_open_flip(d: Driver) -> list[str]:
+    """The launcher in Preferences opens dictionary mode on the stack; the
+    page holds whole entries with guide words that match them; → turns to
+    the page the foot named and ← comes back to the same page; a resize
+    re-paginates without moving the first entry; esc closes the mode."""
+    fails: list[str] = []
+    _reset(d)
+    d.js(DICT_PLAIN[1])
+    d.click("#ui-btn")
+    d.wait_for("#ui-modal:not(.hidden)")
+    d.click("#ui-dict-btn")
+    d.wait_for("#dict-mode.open")
+    d.js_await(DICT_READY[1], timeout=25)
+    d.wait_idle()
+    if d.js("modeTop() && modeTop().name") != "dict":
+        fails.append(f"the launcher did not push `dict`: {_names(d)}")
+    if not d.js("document.getElementById('ui-modal').classList.contains('hidden')"):
+        fails.append("Preferences stayed open over the dictionary")
+    if d.js("document.querySelector('#mode-stack .mode-indicator[data-mode=\"dict\"] > img.svg-icon:last-child')"
+            "?.dataset.icon") != "feed":
+        fails.append("the stack indicator is not the feed icon")
+    p0 = _dict_page(d)
+    if not p0.get("n"):
+        fails.append(f"no entries on the first page: {p0}")
+        _reset(d)
+        return fails
+    if p0["gl"] != p0["first"] or (p0["n"] > 1 and p0["gr"] != p0["last"]):
+        fails.append(f"guide words {p0['gl']!r}–{p0['gr']!r} are not the page's first/last "
+                     f"{p0['first']!r}–{p0['last']!r}")
+    if p0["overflowX"]:
+        fails.append("dictionary mode overflows horizontally")
+    d.focus("#dict-frame")
+    d.key("ArrowRight")
+    _sleep(d, 250)
+    p1 = _dict_page(d)
+    if p1.get("start") != p0["start"] + p0["fit"] or p1.get("first") != p0.get("next"):
+        fails.append(f"→ went to {p1.get('start')} ({p1.get('first')!r}), not "
+                     f"{p0['start'] + p0['fit']} ({p0.get('next')!r})")
+    d.key("ArrowLeft")
+    _sleep(d, 250)
+    if _dict_page(d).get("start") != p0["start"]:
+        fails.append(f"← did not come back to the first page: {_dict_page(d)}")
+    first = _dict_page(d).get("first")
+    d.js("rvSetState('open')")
+    _sleep(d, 500)
+    after = _dict_page(d)
+    if after.get("first") != first:
+        fails.append(f"docking the panel moved the page: first {first!r} → {after.get('first')!r}")
+    d.js("rvSetState('closed')")
+    _sleep(d, 300)
+    d.key("Escape")
+    d.wait_idle()
+    if "dict" in _names(d):
+        fails.append("esc did not close dictionary mode")
+    _reset(d)
+    return fails
+
+
+def scenario_dict_sorts_rail(d: Driver) -> list[str]:
+    """Every sort key (and a sub-sort) draws its group headings and a thumb
+    index whose tabs are the server's groups; a tab click turns to that
+    group's first entry."""
+    fails: list[str] = []
+    _reset(d)
+    _dict_open(d)
+    for sort in ("alpha", "length", "domain", "era", "pos", "frequency", "syllables", "added", "origin"):
+        r = d.js_await("(async () => { const s = document.getElementById('dict-s1'); s.value = " + json.dumps(sort) + ";"
+                       " s.dispatchEvent(new Event('change')); await new Promise((r) => setTimeout(r, 900));"
+                       " const st = dictStore(); return {sort: DICT.view.sort, total: st.total,"
+                       " groups: (st.groups || []).length, tabs: document.querySelectorAll('#dict-edge .dict-tab[data-off]').length,"
+                       " here: document.querySelectorAll('#dict-edge .dict-tab.here').length,"
+                       " n: document.querySelectorAll('#dict-flow .dict-e').length}; })()", timeout=25) or {}
+        if r.get("sort") != sort or not r.get("n"):
+            fails.append(f"sort {sort}: no page ({r})")
+            continue
+        if r.get("tabs") != r.get("groups"):
+            fails.append(f"sort {sort}: {r.get('tabs')} live tabs for {r.get('groups')} groups")
+        if not r.get("here"):
+            fails.append(f"sort {sort}: no tab marks the current page")
+    r = d.js_await("(async () => { const tabs = document.querySelectorAll('#dict-edge .dict-tab[data-off]');"
+                   " const t = tabs[Math.floor(tabs.length / 2)]; t.click(); await new Promise((r) => setTimeout(r, 700));"
+                   " return {want: +t.dataset.off, got: DICT.start, here: t.classList.contains('here'),"
+                   " gh: !!document.querySelector('#dict-flow .dict-gh')}; })()", timeout=20) or {}
+    if r.get("want") != r.get("got") or not r.get("here") or not r.get("gh"):
+        fails.append(f"a thumb tab did not open its group with a heading: {r}")
+    r = d.js_await("(async () => { Object.assign(DICT.view, {sort: 'domain', dir: 'asc', then: 'era', thenDir: 'asc'});"
+                   " dictViewChanged(); await new Promise((r) => setTimeout(r, 900));"
+                   " return {keys: document.querySelectorAll('#dict-flow .dict-key, #dict-flow .dict-key-n').length,"
+                   " d2: document.getElementById('dict-d2').disabled}; })()", timeout=20) or {}
+    if not r.get("keys") or r.get("d2"):
+        fails.append(f"domain, then era: no margin keys or the sub-sort direction is off: {r}")
+    # Both keys of a two-key order show on every entry (0.4.1, U4), so the
+    # order is legible: "length, then era" reads "7 · middle eng.".
+    r = d.js_await("(async () => { Object.assign(DICT.view, {sort: 'length', dir: 'asc', then: 'era', thenDir: 'asc'});"
+                   " dictViewChanged(); await new Promise((r) => setTimeout(r, 900));"
+                   " const es = Array.from(document.querySelectorAll('#dict-flow .dict-e'));"
+                   " const two = es.filter((e) => e.querySelector('.dict-key .dict-key-sep, .dict-key-n .dict-key-sep'));"
+                   " const k = two[0] && (two[0].querySelector('.dict-key, .dict-key-n') || {}).textContent;"
+                   " return {n: es.length, two: two.length, k, len: two[0] && two[0].dataset.w.length}; })()",
+                   timeout=20) or {}
+    if not r.get("n") or r.get("two", 0) < r.get("n", 1) * 0.8 or not str(r.get("k") or "").startswith(str(r.get("len"))):
+        fails.append(f"length, then era: the entries do not show both keys: {r}")
+    _reset(d)
+    return fails
+
+
+def scenario_dict_paging(d: Driver) -> list[str]:
+    """The folio counts entries, so paging forward never makes it go down;
+    ← after a jump (no forward history) draws a FULL page measured backwards
+    from the anchor, even when the running entries-per-page estimate is far
+    too small; ← near the top turns to the first page, full, from entry 1."""
+    fails: list[str] = []
+    _reset(d)
+    _dict_open(d, "lantern")
+    seen = []
+    d.focus("#dict-frame")
+    for _ in range(6):
+        seen.append(d.js("(() => { const n = document.querySelector('#dict-folio .num');"
+                         " return n ? +n.textContent.replace(/[^0-9]/g, '') : null; })()"))
+        d.key("ArrowRight")
+        _sleep(d, 250)
+    if None in seen or any(b <= a for a, b in zip(seen, seen[1:])):
+        fails.append(f"the folio did not count up while paging forward: {seen}")
+    for word in ("gloaming", "zymurgy"):
+        r = d.js_await("(async () => { DICT.avg = 4; await dictJumpTo(" + json.dumps(word) + ");"
+                       " await new Promise((r) => setTimeout(r, 400)); await dictPrev();"
+                       " await new Promise((r) => setTimeout(r, 600));"
+                       " const st = dictStore(), s = DICT.start, f = DICT.fit;"
+                       " const roomy = s > 0 && dictFitsAll(st, s - 1, s + f);"
+                       " await dictShow(s, {keepBack: true, limit: f});"
+                       " return {s, f, roomy}; })()", timeout=25) or {}
+        if r.get("roomy"):
+            fails.append(f"← after a jump to {word!r} left room for another entry: {r}")
+    r = d.js_await("(async () => { await dictShow(3); await new Promise((r) => setTimeout(r, 400));"
+                   " await dictPrev(); await new Promise((r) => setTimeout(r, 600));"
+                   " return {s: DICT.start, f: DICT.fit}; })()", timeout=20) or {}
+    if r.get("s") != 0 or (r.get("f") or 0) <= 3:
+        fails.append(f"← near the top did not turn to a full first page: {r}")
+    _reset(d)
+    return fails
+
+
+def scenario_dict_search_jump(d: Driver) -> list[str]:
+    """`/` and ⌘F focus the search; a query replaces the page with matches;
+    Return on an exact word turns to that word's page in the current order
+    and selects it; esc clears the search and goes back."""
+    fails: list[str] = []
+    _reset(d)
+    _dict_open(d, "lantern")
+    before = _dict_page(d).get("start")
+    _cmd_f(d)
+    _sleep(d, 100)
+    if _active(d) != "#dict-q":
+        fails.append(f"⌘F in dictionary mode focused {_active(d)}, not the search")
+    d.type_text("twilight")
+    _sleep(d, 900)
+    r = d.js("(() => ({q: DICT.view.q, total: dictStore().total,"
+             " hits: document.querySelectorAll('#dict-flow mark, #dict-flow .dict-hw.hit').length}))()") or {}
+    if r.get("q") != "twilight" or not r.get("total") or not r.get("hits"):
+        fails.append(f"searching did not show marked matches: {r}")
+    d.key("Escape")
+    _sleep(d, 500)
+    r = d.js("(() => ({q: DICT.view.q, start: DICT.start, value: document.getElementById('dict-q').value}))()") or {}
+    if r.get("q") or r.get("value") or r.get("start") != before:
+        fails.append(f"esc in the search did not clear it and go back: {r} (was at {before})")
+    d.focus("#dict-q")
+    d.type_text("gloaming")
+    d.key("Enter")
+    _sleep(d, 1200)
+    r = d.js("(() => ({q: DICT.view.q, sel: DICT.sel,"
+             " on: !!document.querySelector('#dict-flow .dict-e[data-w=\"gloaming\"]')}))()") or {}
+    if r.get("q") or r.get("sel") != "gloaming" or not r.get("on"):
+        fails.append(f"Return on an exact word did not turn to its page: {r}")
+    _reset(d)
+    return fails
+
+
+def scenario_dict_wdl_a11y(d: Driver) -> list[str]:
+    """The word data lightbox is a proper dialog: named, the background out
+    of the tree and the tab order, focus in on open, Tab wraps, esc closes
+    it (and only it), focus goes back to the page it came from."""
+    fails: list[str] = []
+    _reset(d)
+    _dict_open(d, "lantern")
+    d.focus("#dict-frame")
+    d.js("(() => { const e = document.querySelector('#dict-flow .dict-e[data-w=\"lantern\"]')"
+         " || document.querySelector('#dict-flow .dict-e');"
+         " e.dispatchEvent(new MouseEvent('dblclick', {bubbles: true})); return true; })()")
+    d.wait_for("#wdl-modal:not(.hidden)")
+    d.js_await(WDL_READY[1])
+    d.wait_idle()
+    if d.js("document.getElementById('wdl-modal').getAttribute('aria-hidden')") != "false":
+        fails.append("#wdl-modal: aria-hidden is not 'false' while it is open")
+    if not _focus_inside(d, "#wdl-modal"):
+        fails.append(f"#wdl-modal: focus stayed on {_active(d)} when it opened")
+    fails += _ax_dialog(d, "#wdl-modal")
+    left = []
+    for i in range(30):
+        d.key("Tab")
+        if not _focus_inside(d, "#wdl-modal"):
+            left.append(f"Tab {i + 1} → {_active(d)}")
+    for i in range(8):
+        _shift_tab(d)
+        if not _focus_inside(d, "#wdl-modal"):
+            left.append(f"shift-Tab {i + 1} → {_active(d)}")
+    if left:
+        fails.append(f"#wdl-modal: focus left the dialog: {left[:5]}")
+    d.key("Escape")
+    d.wait_gone("#wdl-modal:not(.hidden)")
+    d.wait_idle()
+    if "dict" not in _names(d):
+        fails.append("esc on the lightbox also closed dictionary mode under it")
+    if _active(d) != "#dict-frame":
+        fails.append(f"closing the lightbox left focus on {_active(d)}, not the page")
+    if d.js("document.querySelectorAll('[data-modal-inert]').length"):
+        fails.append("the background is still inert after the lightbox closed")
+    _reset(d)
+    return fails
+
+
+def scenario_dict_wdl_walk(d: Driver) -> list[str]:
+    """Every word in the plate walks it; the walk is kept (trail + back);
+    ←/→ step through the current order; a form resolves to its headword;
+    a word FEED lacks gets the not-found plate with where it would fall;
+    "show on its page" turns the dictionary to the word."""
+    fails: list[str] = []
+    _reset(d)
+    _dict_open(d)
+    d.js("wdlOpen('gloaming', {fromDict: true})")
+    d.wait_for("#wdl-modal:not(.hidden)")
+    d.js_await(WDL_READY[1])
+    _sleep(d, 400)
+    d.click("#wdl-scroll .wdl-w[data-go=\"twilight\"]")
+    d.js_await(WDL_READY[1])
+    _sleep(d, 300)
+    r = d.js("(() => ({hw: document.getElementById('wdl-hw').textContent, stack: WDL.stack.slice(),"
+             " crumbs: document.querySelectorAll('#wdl-trail [data-trail]').length,"
+             " back: !document.getElementById('wdl-back').disabled}))()") or {}
+    if r.get("hw") != "twilight" or r.get("stack") != ["gloaming", "twilight"] or not r.get("crumbs") or not r.get("back"):
+        fails.append(f"clicking a synonym did not walk the plate: {r}")
+    d.click("#wdl-back")
+    d.js_await(WDL_READY[1])
+    _sleep(d, 400)
+    if d.js("document.getElementById('wdl-hw').textContent") != "gloaming":
+        fails.append("back did not return to gloaming")
+    nxt = d.js("WDL.nb && WDL.nb.next")
+    d.focus("#wdl-scroll")
+    d.key("ArrowRight")
+    d.js_await(WDL_READY[1])
+    _sleep(d, 400)
+    if not nxt or d.js("document.getElementById('wdl-hw').textContent") != nxt:
+        fails.append(f"→ did not step to the next entry {nxt!r}")
+    d.js("wdlNav('gloamings')")
+    d.js_await(WDL_READY[1])
+    _sleep(d, 300)
+    r = d.js("(() => ({hw: document.getElementById('wdl-hw').textContent,"
+             " note: (document.querySelector('.wdl-matched') || {}).textContent || ''}))()") or {}
+    if r.get("hw") != "gloaming" or "gloamings" not in r.get("note", ""):
+        fails.append(f"a form did not resolve to its headword with a note: {r}")
+    d.js("wdlNav('glomrify')")
+    d.js_await(WDL_READY[1])
+    _sleep(d, 600)
+    r = d.js("(() => ({missing: !!document.querySelector('.wdl-hw.missing'),"
+             " where: (document.getElementById('wdl-where') || {}).textContent || ''}))()") or {}
+    # the sentence is translated; the neighbouring words (glom…) are not
+    if not r.get("missing") or "glom" not in r.get("where", ""):
+        fails.append(f"the not-found plate did not say where it would fall: {r}")
+    d.js("wdlNav('lantern')")
+    d.js_await(WDL_READY[1])
+    _sleep(d, 300)
+    d.click("#wdl-show")
+    _sleep(d, 900)
+    r = d.js("(() => ({wdl: wdlIsOpen(), top: modeTop() && modeTop().name, sel: DICT.sel,"
+             " on: !!document.querySelector('#dict-flow .dict-e[data-w=\"lantern\"]')}))()") or {}
+    if r.get("wdl") or r.get("top") != "dict" or r.get("sel") != "lantern" or not r.get("on"):
+        fails.append(f"show on its page did not turn the dictionary to the word: {r}")
+    _reset(d)
+    return fails
+
+
+def scenario_dict_context_menu(d: Driver) -> list[str]:
+    """Right-click on a word: the dictionary-entry menu (read face → WDL over
+    it; dictionary → turns to the word; WDL → walks there). Right-click with
+    shift, or off any word, leaves the system menu alone."""
+    fails: list[str] = []
+    _reset(d)
+    d.js(f"openReadEdit('{DOC}', {{size:'full', face:'read'}})")
+    d.wait_for("#review-mode.open")
+    d.wait_idle()
+    m = _right_click(d, "#review-body", "paragraph")
+    if not m or not m.get("open") or "paragraph" not in m.get("text", ""):
+        fails.append(f"no dictionary menu on a word in the read face: {m}")
+    else:
+        d.click("#dict-ctx-menu .ctx-item[data-act=\"entry\"]")
+        d.wait_for("#wdl-modal:not(.hidden)")
+        d.js_await(WDL_READY[1])
+        if d.js("document.getElementById('wdl-hw').textContent") != "paragraph":
+            fails.append("the menu did not open the lightbox on the word")
+        if d.js("modeTop() && modeTop().name") != "readedit":
+            fails.append("the lightbox changed the mode stack under it")
+        m = _right_click(d, "#wdl-scroll .wdl-def", "text")
+        if m and m.get("open"):
+            d.click("#dict-ctx-menu .ctx-item[data-act=\"entry\"]")
+            d.js_await(WDL_READY[1])
+            _sleep(d, 300)
+            if d.js("WDL.stack.slice(-1)[0]") != "text":
+                fails.append("the menu inside the lightbox did not walk it")
+        else:
+            fails.append(f"no dictionary menu on a word inside the lightbox: {m}")
+        d.js("wdlClose()")
+    m = _right_click(d, "#review-body", "paragraph", shift=True)
+    if m and m.get("open"):
+        fails.append("shift-right-click opened the dictionary menu instead of the system one")
+    off = d.js("(() => { const b = document.getElementById('review-body').getBoundingClientRect();"
+               " return {x: b.right - 6, y: b.bottom - 6}; })()")
+    for typ, buttons in (("mousePressed", 2), ("mouseReleased", 0)):
+        d.page.send("Input.dispatchMouseEvent", {"type": typ, "x": off["x"], "y": off["y"],
+                                                 "button": "right", "buttons": buttons, "clickCount": 1})
+    _sleep(d, 120)
+    if d.js("!document.getElementById('dict-ctx-menu').hidden"):
+        fails.append("a right-click off any word opened the dictionary menu")
+    d.js("dictCtxClose()")
+    _reset(d)
+    _dict_open(d, "lambent")
+    m = _right_click(d, "#dict-flow .dict-e[data-w=\"lambent\"]", "candlelight")
+    if not m or not m.get("open"):
+        fails.append(f"no dictionary menu on a word in the dictionary: {m} "
+                     f"(page {_dict_page(d)}, rv {_rv(d)})")
+    else:
+        d.click("#dict-ctx-menu .ctx-item[data-act=\"entry\"]")
+        _sleep(d, 900)
+        r = d.js("(() => ({sel: DICT.sel, on: !!document.querySelector('#dict-flow .dict-e[data-w=\"candlelight\"]'),"
+                 " wdl: wdlIsOpen()}))()") or {}
+        if r.get("sel") != "candlelight" or not r.get("on") or r.get("wdl"):
+            fails.append(f"the menu in the dictionary did not turn to the word: {r}")
+    _reset(d)
+    return fails
+
+
 SCENARIOS: dict[str, Scenario] = {
     "stack-order": scenario_stack_order,
     "raise-preserves-state": scenario_raise_preserves_state,
@@ -1553,4 +2535,24 @@ SCENARIOS: dict[str, Scenario] = {
     "pal-bubbles": scenario_pal_bubbles,
     "composure-inspector-is-clickable":
         scenario_composure_inspector_is_clickable,
+    # --- 0.4.1 polish (U1) ---
+    "chat-sides": scenario_chat_sides,
+    "chat-tool-chip": scenario_chat_tool_chip,
+    "topbar-no-collisions": scenario_topbar_no_collisions,
+    "composure-autofit": scenario_composure_autofit,
+    # --- 0.4.1 modal a11y + help find/contents + intro (U2) ---
+    "modal-prefs-a11y": scenario_modal_prefs_a11y,
+    "modal-broker-a11y": scenario_modal_broker_a11y,
+    "modal-return-after-open": scenario_modal_return_after_open,
+    "modal-confirm-stack": scenario_modal_confirm_stack,
+    "ref-find-contents": scenario_ref_find_contents,
+    "chat-intro": scenario_chat_intro,
+    # --- 0.4.1 FEED: dictionary mode, the WDL, the context menu (U3) ---
+    "dict-open-flip": scenario_dict_open_flip,
+    "dict-sorts-rail": scenario_dict_sorts_rail,
+    "dict-paging": scenario_dict_paging,
+    "dict-search-jump": scenario_dict_search_jump,
+    "dict-wdl-a11y": scenario_dict_wdl_a11y,
+    "dict-wdl-walk": scenario_dict_wdl_walk,
+    "dict-context-menu": scenario_dict_context_menu,
 }

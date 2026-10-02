@@ -134,6 +134,15 @@ _KEYS = {
               "nativeVirtualKeyCode": 13, "text": "\r"},
     "Tab": {"key": "Tab", "code": "Tab", "windowsVirtualKeyCode": 9,
             "nativeVirtualKeyCode": 9},
+    # FEED (0.4.1): the dictionary turns pages and the WDL walks entries.
+    "ArrowRight": {"key": "ArrowRight", "code": "ArrowRight",
+                   "windowsVirtualKeyCode": 39, "nativeVirtualKeyCode": 39},
+    "ArrowLeft": {"key": "ArrowLeft", "code": "ArrowLeft",
+                  "windowsVirtualKeyCode": 37, "nativeVirtualKeyCode": 37},
+    "ArrowDown": {"key": "ArrowDown", "code": "ArrowDown",
+                  "windowsVirtualKeyCode": 40, "nativeVirtualKeyCode": 40},
+    "Backspace": {"key": "Backspace", "code": "Backspace",
+                  "windowsVirtualKeyCode": 8, "nativeVirtualKeyCode": 8},
 }
 
 
@@ -402,8 +411,9 @@ class Driver:
       Array.from(document.querySelectorAll(
         '#mode-stack .mode-indicator .mode-ribbon')).reverse()
         .forEach(function (b) { try { b.click(); } catch (e) {} });
+      try { if (window.wdlClose) wdlClose(); } catch (e) {}
       ['readedit','girraph','merirmaid','wikisink','cacheawl','ref',
-       'paginated','blobview'].forEach(function (n) {
+       'paginated','blobview','dict'].forEach(function (n) {
         try { modeRemove(n); } catch (e) {}
       });
       document.querySelectorAll('[id$="-modal"]').forEach(function (m) {
@@ -422,7 +432,7 @@ class Driver:
       var p = document.getElementById('preview');
       if (p) p.classList.remove('open');
       ['review-mode','edit-mode','girraph-mode','merirmaid-mode','wiki-mode',
-       'cacheawl-mode','ref-mode','paginated-mode'].forEach(function (id) {
+       'cacheawl-mode','ref-mode','paginated-mode','dict-mode'].forEach(function (id) {
         var el = document.getElementById(id);
         if (el) el.classList.remove('open');
       });
