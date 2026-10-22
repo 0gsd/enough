@@ -123,7 +123,15 @@ def build_router(
 
     @router.get("/api/composure/list")
     async def api_composure_list() -> dict[str, Any]:
+        """Every composure, newest first. `startup` marks the one the
+        project is set to open with (launch mode `file`), which the
+        composures menu labels and a composure's settings modal ticks."""
+        from . import project_meta
         rows = await asyncio.to_thread(comp_core.list_composures, project_dir)
+        setting = project_meta.load(project_dir)["composure"]
+        startup = setting["path"] if setting["launch"] == "file" else ""
+        for row in rows:
+            row["startup"] = bool(startup) and row["path"] == startup
         return {"composures": rows}
 
     @router.get("/api/composure/forms")
@@ -133,34 +141,52 @@ def build_router(
     @router.get("/api/composure/launch")
     async def api_composure_launch() -> dict[str, Any]:
         """What this project opens with. Resolves the stored setting against
-        what is actually on disk: a missing target falls back to `blank` and
+        what is actually on disk: a missing target falls back to `auto` and
         says so in `notice`, rather than opening nothing."""
         from . import project_meta
         setting = project_meta.load(project_dir)["composure"]
-        return _resolve_launch(setting)
+        return await asyncio.to_thread(_resolve_launch, setting)
 
     def _resolve_launch(setting: dict[str, Any]) -> dict[str, Any]:
-        mode = setting.get("launch") or "blank"
-        notice = ""
+        mode = setting.get("launch") or "auto"
+        missing = ""
         if mode == "file":
             rel = setting.get("path") or ""
             if rel and (project_dir / rel).is_file():
                 return {"launch": "file", "path": rel, "form": None, "notice": ""}
-            notice = (f"the composure this project opened with ({rel or 'none'}) "
-                      f"is no longer there — opening a blank page instead.")
+            missing = f"the startup composure ({rel}) is no longer there" if rel else ""
         elif mode == "last":
             rel = setting.get("last") or ""
             if rel and (project_dir / rel).is_file():
                 return {"launch": "file", "path": rel, "form": None, "notice": ""}
-            notice = ("no previously-used composure is available — opening a "
-                      "blank page instead.") if rel else ""
+            missing = "no previously-used composure is available" if rel else ""
         elif mode == "form":
             name = setting.get("form") or ""
             if comp_core.form_path(name, project_dir) is not None:
                 return {"launch": "form", "path": None, "form": name, "notice": ""}
-            notice = (f"the form this project opened with ({name or 'none'}) is "
-                      f"no longer installed — opening a blank page instead.")
+            missing = (f"the form this project opened with ({name or 'none'}) "
+                       f"is no longer installed")
+        elif mode == "new":
+            return {"launch": "blank", "path": None, "form": "blank", "notice": ""}
+        # `auto`, and where every other mode lands when its target is gone.
+        rel = _auto_pick(setting.get("last") or "")
+        if rel:
+            notice = f"{missing} — opening {Path(rel).name} instead." if missing else ""
+            return {"launch": "file", "path": rel, "form": None, "notice": notice}
+        notice = f"{missing} — opening a blank page instead." if missing else ""
         return {"launch": "blank", "path": None, "form": "blank", "notice": notice}
+
+    def _auto_pick(last: str) -> str:
+        """`auto`'s answer: the only composure with anything in it, else the
+        last one used (when it still has something in it), else the newest.
+        "" when nothing has content — an empty file is no better than a new
+        page. Project forms are templates, not the user's composures."""
+        forms = comp_core.PROJECT_FORMS_REL + "/"
+        rows = [r for r in comp_core.list_composures(project_dir)
+                if r["content"] and not r["path"].startswith(forms)]
+        if len(rows) > 1 and any(r["path"] == last for r in rows):
+            return last
+        return rows[0]["path"] if rows else ""
 
     @router.get("/api/composure/link-preview")
     async def api_composure_link_preview(
@@ -369,6 +395,7 @@ def build_router(
                 f"-{(comp.created or '')[:10] or comp_core._today()}"
                 f"{comp_core.SUFFIX}")
             if dest != target:
+                old_rel = new_rel
                 if dest.exists():
                     raise HTTPException(
                         409, f"{dest.name} already exists — retitle without "
@@ -377,6 +404,11 @@ def build_router(
                     os.replace(target, dest)
                     comp_core.move_sidecars(target, dest)
                 new_rel = _rel(dest)
+                try:
+                    from . import project_meta
+                    project_meta.retarget_composure(project_dir, old_rel, new_rel)
+                except Exception:  # noqa: BLE001 — the rename itself succeeded
+                    log.exception("could not carry the launch setting across a rename")
         await _announce(result, "ui")
         return {"path": new_rel, "rev": result.rev,
                 "title": result.composure.title}

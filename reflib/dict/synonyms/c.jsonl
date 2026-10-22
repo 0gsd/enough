@@ -1,3 +1,4 @@
+{"word": "caa", "synonym": "call", "via": "caa", "position": 1}
 {"word": "cab", "synonym": "hack", "via": "cab", "position": 1}
 {"word": "cab", "synonym": "taxi", "via": "cab", "position": 2}
 {"word": "cab", "synonym": "taxicab", "via": "cab", "position": 3}
@@ -27,6 +28,7 @@
 {"word": "cabbage", "synonym": "lettuce", "via": "cabbage", "position": 8}
 {"word": "cabbage", "synonym": "lolly", "via": "cabbage", "position": 9}
 {"word": "cabbage", "synonym": "lucre", "via": "cabbage", "position": 10}
+{"word": "cabbagetown", "synonym": "slum", "via": "cabbagetown", "position": 1}
 {"word": "cabbala", "synonym": "kabbalah", "via": "cabbala", "position": 1}
 {"word": "cabbala", "synonym": "kabbala", "via": "cabbala", "position": 2}
 {"word": "cabbala", "synonym": "kabala", "via": "cabbala", "position": 3}
@@ -60,6 +62,7 @@
 {"word": "caboodle", "synonym": "lot", "via": "caboodle", "position": 2}
 {"word": "caboose", "synonym": "galley", "via": "caboose", "position": 1}
 {"word": "caboose", "synonym": "cookhouse", "via": "caboose", "position": 2}
+{"word": "cabrio", "synonym": "convertible", "via": "cabrio", "position": 1}
 {"word": "cabriolet", "synonym": "cab", "via": "cabriolet", "position": 1}
 {"word": "cache", "synonym": "hoard", "via": "cache", "position": 1}
 {"word": "cache", "synonym": "stash", "via": "cache", "position": 2}
@@ -71,12 +74,14 @@
 {"word": "cachexy", "synonym": "cachexia", "via": "cachexy", "position": 1}
 {"word": "cachexy", "synonym": "wasting", "via": "cachexy", "position": 2}
 {"word": "cacique", "synonym": "cazique", "via": "cacique", "position": 1}
+{"word": "cackermander", "synonym": "friend", "via": "cackermander", "position": 1}
 {"word": "cackle", "synonym": "yak", "via": "cackle", "position": 1}
 {"word": "cackle", "synonym": "yack", "via": "cackle", "position": 2}
 {"word": "cackle", "synonym": "chatter", "via": "cackle", "position": 3}
 {"word": "cackler", "synonym": "babbler", "via": "cackler", "position": 1}
 {"word": "cacoethes", "synonym": "mania", "via": "cacoethes", "position": 1}
 {"word": "cacoethes", "synonym": "passion", "via": "cacoethes", "position": 2}
+{"word": "cacogenics", "synonym": "dysgenics", "via": "cacogenics", "position": 1}
 {"word": "cacography", "synonym": "scribble", "via": "cacography", "position": 1}
 {"word": "cacography", "synonym": "scratch", "via": "cacography", "position": 2}
 {"word": "cacography", "synonym": "scrawl", "via": "cacography", "position": 3}
@@ -141,8 +146,12 @@
 {"word": "caesarian", "synonym": "cesarean", "via": "caesarian", "position": 1}
 {"word": "caesarian", "synonym": "cesarian", "via": "caesarian", "position": 2}
 {"word": "caesarian", "synonym": "caesarean", "via": "caesarian", "position": 3}
+{"word": "caesarism", "synonym": "autocracy", "via": "caesarism", "position": 1}
+{"word": "caesarism", "synonym": "dictatorship", "via": "caesarism", "position": 2}
+{"word": "caesious", "synonym": "glaucous", "via": "caesious", "position": 1}
 {"word": "caesium", "synonym": "cesium", "via": "caesium", "position": 1}
 {"word": "caespitose", "synonym": "tufted", "via": "caespitose", "position": 1}
+{"word": "cafard", "synonym": "melancholy", "via": "cafard", "position": 1}
 {"word": "cafe", "synonym": "coffeehouse", "via": "cafe", "position": 1}
 {"word": "caffein", "synonym": "caffeine", "via": "caffein", "position": 1}
 {"word": "caffeine", "synonym": "caffein", "via": "caffeine", "position": 1}
@@ -161,6 +170,8 @@
 {"word": "caisson", "synonym": "cofferdam", "via": "caisson", "position": 1}
 {"word": "caisson", "synonym": "coffer", "via": "caisson", "position": 2}
 {"word": "caisson", "synonym": "lacunar", "via": "caisson", "position": 3}
+{"word": "cajeputol", "synonym": "cineole", "via": "cajeputol", "position": 1}
+{"word": "cajeputol", "synonym": "eucalyptol", "via": "cajeputol", "position": 2}
 {"word": "cajole", "synonym": "wheedle", "via": "cajole", "position": 1}
 {"word": "cajole", "synonym": "palaver", "via": "cajole", "position": 2}
 {"word": "cajole", "synonym": "blarney", "via": "cajole", "position": 3}
@@ -171,7 +182,9 @@
 {"word": "cake", "synonym": "bar", "via": "cake", "position": 1}
 {"word": "cake", "synonym": "patty", "via": "cake", "position": 2}
 {"word": "cake", "synonym": "coat", "via": "cake", "position": 3}
+{"word": "cakehole", "synonym": "gob", "via": "cakehole", "position": 1}
 {"word": "calabash", "synonym": "gourd", "via": "calabash", "position": 1}
+{"word": "calabaza", "synonym": "calabash", "via": "calabaza", "position": 1}
 {"word": "calamari", "synonym": "squid", "via": "calamari", "position": 1}
 {"word": "calamari", "synonym": "calamary", "via": "calamari", "position": 2}
 {"word": "calamary", "synonym": "squid", "via": "calamary", "position": 1}
@@ -187,7 +200,12 @@
 {"word": "calamus", "synonym": "quill", "via": "calamus", "position": 1}
 {"word": "calamus", "synonym": "shaft", "via": "calamus", "position": 2}
 {"word": "calash", "synonym": "caleche", "via": "calash", "position": 1}
+{"word": "calcarate", "synonym": "spurred", "via": "calcarate", "position": 1}
 {"word": "calcareous", "synonym": "chalky", "via": "calcareous", "position": 1}
+{"word": "calciphile", "synonym": "calcicole", "via": "calciphile", "position": 1}
+{"word": "calciphobe", "synonym": "calcifuge", "via": "calciphobe", "position": 1}
+{"word": "calcrete", "synonym": "caliche", "via": "calcrete", "position": 1}
+{"word": "calcsinter", "synonym": "travertine", "via": "calcsinter", "position": 1}
 {"word": "calculate", "synonym": "cipher", "via": "calculate", "position": 1}
 {"word": "calculate", "synonym": "cypher", "via": "calculate", "position": 2}
 {"word": "calculate", "synonym": "compute", "via": "calculate", "position": 3}
@@ -222,6 +240,7 @@
 {"word": "calculus", "synonym": "tophus", "via": "calculus", "position": 3}
 {"word": "caldron", "synonym": "cauldron", "via": "cauldron", "position": 1}
 {"word": "caleche", "synonym": "calash", "via": "caleche", "position": 1}
+{"word": "calendarize", "synonym": "schedule", "via": "calendarize", "position": 1}
 {"word": "calendered", "synonym": "glossy", "via": "calender", "position": 1}
 {"word": "calendric", "synonym": "calendrical", "via": "calendric", "position": 1}
 {"word": "calendrical", "synonym": "calendric", "via": "calendrical", "position": 1}
@@ -335,6 +354,7 @@
 {"word": "caloric", "synonym": "thermal", "via": "caloric", "position": 1}
 {"word": "caloric", "synonym": "thermic", "via": "caloric", "position": 2}
 {"word": "calorie", "synonym": "kilocalorie", "via": "calorie", "position": 1}
+{"word": "calorifacient", "synonym": "calorific", "via": "calorifacient", "position": 1}
 {"word": "calpac", "synonym": "calpack", "via": "calpack", "position": 1}
 {"word": "calpack", "synonym": "calpac", "via": "calpack", "position": 1}
 {"word": "calumniate", "synonym": "defame", "via": "calumniate", "position": 1}
@@ -370,6 +390,8 @@
 {"word": "calvary", "synonym": "golgotha", "via": "calvary", "position": 2}
 {"word": "calvary", "synonym": "martyrdom", "via": "cavalry", "position": 1}
 {"word": "calvary", "synonym": "golgotha", "via": "cavalry", "position": 2}
+{"word": "calvities", "synonym": "baldness", "via": "calvities", "position": 1}
+{"word": "calvous", "synonym": "bald", "via": "calvous", "position": 1}
 {"word": "calx", "synonym": "quicklime", "via": "calx", "position": 1}
 {"word": "calx", "synonym": "lime", "via": "calx", "position": 2}
 {"word": "calyceal", "synonym": "calycine", "via": "calyceal", "position": 1}
@@ -402,6 +424,7 @@
 {"word": "camion", "synonym": "dray", "via": "camion", "position": 1}
 {"word": "camion", "synonym": "lorry", "via": "camion", "position": 2}
 {"word": "camomile", "synonym": "chamomile", "via": "camomile", "position": 1}
+{"word": "camoodi", "synonym": "anaconda", "via": "camoodi", "position": 1}
 {"word": "camouflage", "synonym": "disguise", "via": "camouflage", "position": 1}
 {"word": "camp", "synonym": "encampment", "via": "camp", "position": 1}
 {"word": "camp", "synonym": "cantonment", "via": "camp", "position": 2}
@@ -452,6 +475,7 @@
 {"word": "campground", "synonym": "campsite", "via": "campground", "position": 1}
 {"word": "campground", "synonym": "bivouac", "via": "campground", "position": 2}
 {"word": "campground", "synonym": "encampment", "via": "campground", "position": 3}
+{"word": "camphorweed", "synonym": "vinegarweed", "via": "camphorweed", "position": 1}
 {"word": "camping", "synonym": "encampment", "via": "camp", "position": 1}
 {"word": "camping", "synonym": "bivouacking", "via": "camp", "position": 2}
 {"word": "camping", "synonym": "tenting", "via": "camp", "position": 3}
@@ -495,6 +519,7 @@
 {"word": "cancel", "synonym": "scratch", "via": "cancel", "position": 3}
 {"word": "cancel", "synonym": "scrub", "via": "cancel", "position": 4}
 {"word": "cancel", "synonym": "offset", "via": "cancel", "position": 5}
+{"word": "cancellate", "synonym": "cancellous", "via": "cancellate", "position": 1}
 {"word": "cancelled", "synonym": "off", "via": "cancel", "position": 1}
 {"word": "cancelled", "synonym": "off", "via": "cancelled", "position": 1}
 {"word": "cancer", "synonym": "crab", "via": "cancer", "position": 1}
@@ -956,6 +981,7 @@
 {"word": "cardinal", "synonym": "primal", "via": "cardinal", "position": 5}
 {"word": "cardinalate", "synonym": "cardinalship", "via": "cardinalate", "position": 1}
 {"word": "cardinalship", "synonym": "cardinalate", "via": "cardinalship", "position": 1}
+{"word": "cardmember", "synonym": "cardholder", "via": "cardmember", "position": 1}
 {"word": "cardsharp", "synonym": "cardsharper", "via": "cardsharp", "position": 1}
 {"word": "cardsharp", "synonym": "sharper", "via": "cardsharp", "position": 2}
 {"word": "cardsharp", "synonym": "sharpie", "via": "cardsharp", "position": 3}
@@ -1084,14 +1110,17 @@
 {"word": "carnality", "synonym": "lubricity", "via": "carnality", "position": 4}
 {"word": "carnation", "synonym": "gillyflower", "via": "carnation", "position": 1}
 {"word": "carnelian", "synonym": "cornelian", "via": "carnelian", "position": 1}
+{"word": "carnifex", "synonym": "executioner", "via": "carnifex", "position": 1}
 {"word": "carnival", "synonym": "fair", "via": "carnival", "position": 1}
 {"word": "carnival", "synonym": "funfair", "via": "carnival", "position": 2}
 {"word": "carnival", "synonym": "circus", "via": "carnival", "position": 3}
+{"word": "carnose", "synonym": "fleshy", "via": "carnose", "position": 1}
 {"word": "carob", "synonym": "algarroba", "via": "carob", "position": 1}
 {"word": "caroler", "synonym": "caroller", "via": "caroler", "position": 1}
 {"word": "caroller", "synonym": "caroler", "via": "caroller", "position": 1}
 {"word": "carom", "synonym": "cannon", "via": "carom", "position": 1}
 {"word": "carom", "synonym": "ricochet", "via": "carom", "position": 2}
+{"word": "caron", "synonym": "hacek", "via": "caron", "position": 1}
 {"word": "carotene", "synonym": "carotin", "via": "carotene", "position": 1}
 {"word": "carotin", "synonym": "carotene", "via": "carotin", "position": 1}
 {"word": "carousal", "synonym": "carouse", "via": "carousal", "position": 1}
@@ -1130,6 +1159,7 @@
 {"word": "carpeting", "synonym": "carpet", "via": "carpeting", "position": 2}
 {"word": "carping", "synonym": "faultfinding", "via": "carp", "position": 1}
 {"word": "carping", "synonym": "faultfinding", "via": "carping", "position": 1}
+{"word": "carpophagous", "synonym": "frugivorous", "via": "carpophagous", "position": 1}
 {"word": "carpus", "synonym": "wrist", "via": "carpus", "position": 1}
 {"word": "carrack", "synonym": "carack", "via": "carrack", "position": 1}
 {"word": "carrageen", "synonym": "carageen", "via": "carrageen", "position": 1}
@@ -1395,6 +1425,8 @@
 {"word": "catastrophe", "synonym": "tragedy", "via": "catastrophe", "position": 3}
 {"word": "catastrophe", "synonym": "cataclysm", "via": "catastrophe", "position": 4}
 {"word": "catastrophic", "synonym": "ruinous", "via": "catastrophic", "position": 1}
+{"word": "catawampus", "synonym": "askew", "via": "catawampus", "position": 1}
+{"word": "catawampus", "synonym": "awry", "via": "catawampus", "position": 2}
 {"word": "catbird", "synonym": "bowerbird", "via": "catbird", "position": 1}
 {"word": "catbrier", "synonym": "greenbrier", "via": "catbrier", "position": 1}
 {"word": "catbrier", "synonym": "brier", "via": "catbrier", "position": 2}
@@ -1409,6 +1441,8 @@
 {"word": "catch", "synonym": "stop", "via": "catch", "position": 8}
 {"word": "catch", "synonym": "gimmick", "via": "catch", "position": 9}
 {"word": "catch", "synonym": "match", "via": "catch", "position": 10}
+{"word": "catchcry", "synonym": "slogan", "via": "catchcry", "position": 1}
+{"word": "catchcry", "synonym": "catchword", "via": "catchcry", "position": 2}
 {"word": "catcher", "synonym": "backstop", "via": "catcher", "position": 1}
 {"word": "catchfly", "synonym": "lychnis", "via": "catchfly", "position": 1}
 {"word": "catchfly", "synonym": "campion", "via": "catchfly", "position": 2}
@@ -1458,6 +1492,7 @@
 {"word": "caterwaul", "synonym": "yowl", "via": "caterwaul", "position": 1}
 {"word": "catfish", "synonym": "wolffish", "via": "catfish", "position": 1}
 {"word": "catfish", "synonym": "mudcat", "via": "catfish", "position": 2}
+{"word": "catfooted", "synonym": "stealthy", "via": "catfooted", "position": 1}
 {"word": "catgut", "synonym": "gut", "via": "catgut", "position": 1}
 {"word": "catharsis", "synonym": "katharsis", "via": "catharsis", "position": 1}
 {"word": "catharsis", "synonym": "abreaction", "via": "catharsis", "position": 2}
@@ -1483,6 +1518,8 @@
 {"word": "catnap", "synonym": "nap", "via": "catnap", "position": 1}
 {"word": "catnap", "synonym": "snooze", "via": "catnap", "position": 2}
 {"word": "catnip", "synonym": "catmint", "via": "catnip", "position": 1}
+{"word": "catouse", "synonym": "commotion", "via": "catouse", "position": 1}
+{"word": "catouse", "synonym": "uproar", "via": "catouse", "position": 2}
 {"word": "catsup", "synonym": "ketchup", "via": "ketchup", "position": 1}
 {"word": "cattalo", "synonym": "beefalo", "via": "cattalo", "position": 1}
 {"word": "cattie", "synonym": "catty", "via": "catty", "position": 1}
@@ -1495,6 +1532,7 @@
 {"word": "cattle", "synonym": "cows", "via": "cattle", "position": 1}
 {"word": "cattle", "synonym": "kine", "via": "cattle", "position": 2}
 {"word": "cattle", "synonym": "oxen", "via": "cattle", "position": 3}
+{"word": "cattleduffer", "synonym": "rustler", "via": "cattleduffer", "position": 1}
 {"word": "cattleman", "synonym": "cowboy", "via": "cattleman", "position": 1}
 {"word": "cattleman", "synonym": "cowpuncher", "via": "cattleman", "position": 2}
 {"word": "cattleman", "synonym": "puncher", "via": "cattleman", "position": 3}
@@ -1511,6 +1549,7 @@
 {"word": "caudated", "synonym": "caudate", "via": "caudated", "position": 1}
 {"word": "caudex", "synonym": "stock", "via": "caudex", "position": 1}
 {"word": "caul", "synonym": "veil", "via": "caul", "position": 1}
+{"word": "cauldrife", "synonym": "chilly", "via": "cauldrife", "position": 1}
 {"word": "cauldron", "synonym": "caldron", "via": "cauldron", "position": 1}
 {"word": "cauline", "synonym": "stemmed", "via": "cauline", "position": 1}
 {"word": "caulk", "synonym": "caulking", "via": "calk", "position": 1}
@@ -1612,6 +1651,7 @@
 {"word": "cay", "synonym": "key", "via": "cay", "position": 1}
 {"word": "cay", "synonym": "key", "via": "quay", "position": 1}
 {"word": "cayman", "synonym": "caiman", "via": "caiman", "position": 1}
+{"word": "caz", "synonym": "casual", "via": "caz", "position": 1}
 {"word": "cazique", "synonym": "cacique", "via": "cacique", "position": 1}
 {"word": "cease", "synonym": "end", "via": "cease", "position": 1}
 {"word": "cease", "synonym": "stop", "via": "cease", "position": 2}
@@ -1619,6 +1659,7 @@
 {"word": "cease", "synonym": "terminate", "via": "cease", "position": 4}
 {"word": "cease", "synonym": "discontinue", "via": "cease", "position": 5}
 {"word": "cease", "synonym": "quit", "via": "cease", "position": 6}
+{"word": "ceasefire", "synonym": "truce", "via": "ceasefire", "position": 1}
 {"word": "ceaseless", "synonym": "constant", "via": "ceaseless", "position": 1}
 {"word": "ceaseless", "synonym": "incessant", "via": "ceaseless", "position": 2}
 {"word": "ceaseless", "synonym": "perpetual", "via": "ceaseless", "position": 3}
@@ -1632,6 +1673,7 @@
 {"word": "ceaselessness", "synonym": "continuousness", "via": "ceaselessness", "position": 1}
 {"word": "ceaselessness", "synonym": "incessancy", "via": "ceaselessness", "position": 2}
 {"word": "cecal", "synonym": "caecal", "via": "caecal", "position": 1}
+{"word": "cecity", "synonym": "blindness", "via": "cecity", "position": 1}
 {"word": "cecum", "synonym": "caecum", "via": "caecum", "position": 1}
 {"word": "cedar", "synonym": "cedarwood", "via": "cedar", "position": 1}
 {"word": "cedarwood", "synonym": "cedar", "via": "cedarwood", "position": 1}
@@ -1691,11 +1733,13 @@
 {"word": "celluloid", "synonym": "cinema", "via": "celluloid", "position": 2}
 {"word": "celluloid", "synonym": "synthetic", "via": "celluloid", "position": 3}
 {"word": "celom", "synonym": "coelom", "via": "coelom", "position": 1}
+{"word": "celure", "synonym": "canopy", "via": "celure", "position": 1}
 {"word": "cembalo", "synonym": "harpsichord", "via": "cembalo", "position": 1}
 {"word": "cement", "synonym": "cementum", "via": "cement", "position": 1}
 {"word": "cementum", "synonym": "cement", "via": "cementum", "position": 1}
 {"word": "cemetery", "synonym": "graveyard", "via": "cemetery", "position": 1}
 {"word": "cemetery", "synonym": "necropolis", "via": "cemetery", "position": 2}
+{"word": "cenizo", "synonym": "chamiso", "via": "cenizo", "position": 1}
 {"word": "cenobite", "synonym": "coenobite", "via": "cenobite", "position": 1}
 {"word": "cense", "synonym": "incense", "via": "cense", "position": 1}
 {"word": "censer", "synonym": "thurible", "via": "censer", "position": 1}
@@ -1788,7 +1832,11 @@
 {"word": "centrifuge", "synonym": "separator", "via": "centrifuge", "position": 2}
 {"word": "centripetal", "synonym": "sensory", "via": "centripetal", "position": 1}
 {"word": "centrist", "synonym": "moderate", "via": "centrist", "position": 1}
+{"word": "centuried", "synonym": "ancient", "via": "centuried", "position": 1}
 {"word": "century", "synonym": "hundred", "via": "century", "position": 1}
+{"word": "cephalalgia", "synonym": "headache", "via": "cephalalgia", "position": 1}
+{"word": "cephalitis", "synonym": "encephalitis", "via": "cephalitis", "position": 1}
+{"word": "ceraceous", "synonym": "waxy", "via": "ceraceous", "position": 1}
 {"word": "ceramicist", "synonym": "potter", "via": "ceramicist", "position": 1}
 {"word": "ceramicist", "synonym": "thrower", "via": "ceramicist", "position": 2}
 {"word": "ceramicist", "synonym": "ceramist", "via": "ceramicist", "position": 3}
@@ -1873,6 +1921,7 @@
 {"word": "cesium", "synonym": "caesium", "via": "caesium", "position": 1}
 {"word": "cessation", "synonym": "surcease", "via": "cessation", "position": 1}
 {"word": "cession", "synonym": "ceding", "via": "cession", "position": 1}
+{"word": "cessionary", "synonym": "assignee", "via": "cessionary", "position": 1}
 {"word": "cesspit", "synonym": "cesspool", "via": "cesspit", "position": 1}
 {"word": "cesspit", "synonym": "sink", "via": "cesspit", "position": 2}
 {"word": "cesspit", "synonym": "sump", "via": "cesspit", "position": 3}
@@ -1883,6 +1932,9 @@
 {"word": "cetacean", "synonym": "blower", "via": "cetacean", "position": 1}
 {"word": "cetacean", "synonym": "cetaceous", "via": "cetacean", "position": 2}
 {"word": "cetaceous", "synonym": "cetacean", "via": "cetaceous", "position": 1}
+{"word": "cetaceum", "synonym": "spermaceti", "via": "cetaceum", "position": 1}
+{"word": "chackle", "synonym": "chatter", "via": "chackle", "position": 1}
+{"word": "chackle", "synonym": "jabber", "via": "chackle", "position": 2}
 {"word": "chadar", "synonym": "chador", "via": "chador", "position": 1}
 {"word": "chadar", "synonym": "chuddar", "via": "chador", "position": 2}
 {"word": "chador", "synonym": "chadar", "via": "chador", "position": 1}
@@ -1935,6 +1987,7 @@
 {"word": "chained", "synonym": "enchained", "via": "chain", "position": 1}
 {"word": "chained", "synonym": "enchained", "via": "chained", "position": 1}
 {"word": "chains", "synonym": "irons", "via": "chain", "position": 1}
+{"word": "chainsman", "synonym": "leadsman", "via": "chainsman", "position": 1}
 {"word": "chair", "synonym": "professorship", "via": "chair", "position": 1}
 {"word": "chair", "synonym": "president", "via": "chair", "position": 2}
 {"word": "chair", "synonym": "chairman", "via": "chair", "position": 3}
@@ -1970,6 +2023,8 @@
 {"word": "challah", "synonym": "hallah", "via": "challah", "position": 1}
 {"word": "challenge", "synonym": "dispute", "via": "challenge", "position": 1}
 {"word": "challenge", "synonym": "gainsay", "via": "challenge", "position": 2}
+{"word": "challengeable", "synonym": "disputable", "via": "challengeable", "position": 1}
+{"word": "challengeable", "synonym": "contestable", "via": "challengeable", "position": 2}
 {"word": "challenger", "synonym": "rival", "via": "challenger", "position": 1}
 {"word": "challenger", "synonym": "competitor", "via": "challenger", "position": 2}
 {"word": "challenger", "synonym": "competition", "via": "challenger", "position": 3}
@@ -1978,6 +2033,7 @@
 {"word": "challenging", "synonym": "intriguing", "via": "challenge", "position": 2}
 {"word": "challenging", "synonym": "ambitious", "via": "challenging", "position": 1}
 {"word": "challenging", "synonym": "intriguing", "via": "challenging", "position": 2}
+{"word": "chalybite", "synonym": "siderite", "via": "chalybite", "position": 1}
 {"word": "chamber", "synonym": "bedroom", "via": "chamber", "position": 1}
 {"word": "chamber", "synonym": "bedchamber", "via": "chamber", "position": 2}
 {"word": "chamfer", "synonym": "bevel", "via": "chamfer", "position": 1}
@@ -2058,6 +2114,7 @@
 {"word": "changeover", "synonym": "conversion", "via": "changeover", "position": 1}
 {"word": "changeover", "synonym": "transition", "via": "changeover", "position": 2}
 {"word": "changer", "synonym": "modifier", "via": "changer", "position": 1}
+{"word": "chank", "synonym": "munch", "via": "chank", "position": 1}
 {"word": "channel", "synonym": "duct", "via": "channel", "position": 1}
 {"word": "channel", "synonym": "canal", "via": "channel", "position": 2}
 {"word": "channel", "synonym": "line", "via": "channel", "position": 3}
@@ -2080,6 +2137,8 @@
 {"word": "chant", "synonym": "intonate", "via": "chant", "position": 2}
 {"word": "chant", "synonym": "cantillate", "via": "chant", "position": 3}
 {"word": "chant", "synonym": "tone", "via": "chant", "position": 4}
+{"word": "chantant", "synonym": "melodious", "via": "chantant", "position": 1}
+{"word": "chantant", "synonym": "tuneful", "via": "chantant", "position": 2}
 {"word": "chantey", "synonym": "chanty", "via": "shanty", "position": 1}
 {"word": "chantey", "synonym": "shanty", "via": "shanty", "position": 2}
 {"word": "chanting", "synonym": "intonation", "via": "chant", "position": 1}
@@ -2136,10 +2195,13 @@
 {"word": "chaplet", "synonym": "garland", "via": "chaplet", "position": 2}
 {"word": "chaplet", "synonym": "coronal", "via": "chaplet", "position": 3}
 {"word": "chaplet", "synonym": "lei", "via": "chaplet", "position": 4}
+{"word": "chappal", "synonym": "sandal", "via": "chappal", "position": 1}
 {"word": "chapped", "synonym": "cracked", "via": "chap", "position": 1}
 {"word": "chapped", "synonym": "roughened", "via": "chap", "position": 2}
 {"word": "chapped", "synonym": "cracked", "via": "chapped", "position": 1}
 {"word": "chapped", "synonym": "roughened", "via": "chapped", "position": 2}
+{"word": "chapper", "synonym": "cop", "via": "chapper", "position": 1}
+{"word": "chappie", "synonym": "fellow", "via": "chappie", "position": 1}
 {"word": "char", "synonym": "charr", "via": "char", "position": 1}
 {"word": "char", "synonym": "charwoman", "via": "char", "position": 2}
 {"word": "char", "synonym": "woman", "via": "char", "position": 3}
@@ -2169,6 +2231,7 @@
 {"word": "characterize", "synonym": "qualify", "via": "characterize", "position": 1}
 {"word": "characterless", "synonym": "nondescript", "via": "characterless", "position": 1}
 {"word": "charade", "synonym": "masquerade", "via": "charade", "position": 1}
+{"word": "charco", "synonym": "puddle", "via": "charco", "position": 1}
 {"word": "charcoal", "synonym": "fusain", "via": "charcoal", "position": 1}
 {"word": "charge", "synonym": "mission", "via": "charge", "position": 1}
 {"word": "charge", "synonym": "commission", "via": "charge", "position": 2}
@@ -2236,6 +2299,7 @@
 {"word": "charnel", "synonym": "sepulchral", "via": "charnel", "position": 2}
 {"word": "charr", "synonym": "char", "via": "char", "position": 1}
 {"word": "chart", "synonym": "graph", "via": "chart", "position": 1}
+{"word": "chartaceous", "synonym": "papery", "via": "chartaceous", "position": 1}
 {"word": "charter", "synonym": "lease", "via": "charter", "position": 1}
 {"word": "charter", "synonym": "rent", "via": "charter", "position": 2}
 {"word": "charter", "synonym": "hire", "via": "charter", "position": 3}
@@ -2517,6 +2581,7 @@
 {"word": "chelated", "synonym": "chelate", "via": "chelate", "position": 1}
 {"word": "chelated", "synonym": "chelate", "via": "chelated", "position": 1}
 {"word": "cheloid", "synonym": "keloid", "via": "keloid", "position": 1}
+{"word": "chelone", "synonym": "turtlehead", "via": "chelone", "position": 1}
 {"word": "chemic", "synonym": "chemical", "via": "chemic", "position": 1}
 {"word": "chemical", "synonym": "chemic", "via": "chemical", "position": 1}
 {"word": "chemise", "synonym": "sack", "via": "chemise", "position": 1}
@@ -2552,6 +2617,7 @@
 {"word": "cherry", "synonym": "crimson", "via": "cherry", "position": 6}
 {"word": "cherry", "synonym": "ruby", "via": "cherry", "position": 7}
 {"word": "cherry", "synonym": "scarlet", "via": "cherry", "position": 8}
+{"word": "chersonese", "synonym": "peninsula", "via": "chersonese", "position": 1}
 {"word": "cherubic", "synonym": "angelic", "via": "cherubic", "position": 1}
 {"word": "cherubic", "synonym": "angelical", "via": "cherubic", "position": 2}
 {"word": "cherubic", "synonym": "seraphic", "via": "cherubic", "position": 3}
@@ -2561,9 +2627,12 @@
 {"word": "chest", "synonym": "dresser", "via": "chest", "position": 2}
 {"word": "chest", "synonym": "thorax", "via": "chest", "position": 3}
 {"word": "chest", "synonym": "breast", "via": "chest", "position": 4}
+{"word": "chesterfieldian", "synonym": "urbane", "via": "chesterfieldian", "position": 1}
+{"word": "chesterfieldian", "synonym": "suave", "via": "chesterfieldian", "position": 2}
 {"word": "chesty", "synonym": "arrogant", "via": "chesty", "position": 1}
 {"word": "chetah", "synonym": "cheetah", "via": "cheetah", "position": 1}
 {"word": "chevalier", "synonym": "cavalier", "via": "chevalier", "position": 1}
+{"word": "chevaline", "synonym": "equine", "via": "chevaline", "position": 1}
 {"word": "chevron", "synonym": "stripe", "via": "chevron", "position": 1}
 {"word": "chevron", "synonym": "stripes", "via": "chevron", "position": 2}
 {"word": "chevy", "synonym": "harass", "via": "chevy", "position": 1}
@@ -2600,6 +2669,7 @@
 {"word": "chewing", "synonym": "mastication", "via": "chewing", "position": 2}
 {"word": "chi", "synonym": "khi", "via": "chi", "position": 1}
 {"word": "chi", "synonym": "khi", "via": "chihuahua", "position": 1}
+{"word": "chiack", "synonym": "tease", "via": "chiack", "position": 1}
 {"word": "chiasm", "synonym": "chiasma", "via": "chiasma", "position": 1}
 {"word": "chiasm", "synonym": "decussation", "via": "chiasma", "position": 2}
 {"word": "chiasm", "synonym": "chiasma", "via": "chiasmus", "position": 1}
@@ -2612,6 +2682,7 @@
 {"word": "chiasmatic", "synonym": "chiasmic", "via": "chiasmatic", "position": 2}
 {"word": "chiasmic", "synonym": "chiasmal", "via": "chiasmic", "position": 1}
 {"word": "chiasmic", "synonym": "chiasmatic", "via": "chiasmic", "position": 2}
+{"word": "chibol", "synonym": "scallion", "via": "chibol", "position": 1}
 {"word": "chic", "synonym": "chicness", "via": "chic", "position": 1}
 {"word": "chic", "synonym": "chichi", "via": "chic", "position": 2}
 {"word": "chic", "synonym": "modishness", "via": "chic", "position": 3}
@@ -2620,6 +2691,7 @@
 {"word": "chic", "synonym": "swank", "via": "chic", "position": 6}
 {"word": "chic", "synonym": "smart", "via": "chic", "position": 7}
 {"word": "chic", "synonym": "voguish", "via": "chic", "position": 8}
+{"word": "chica", "synonym": "girl", "via": "chica", "position": 1}
 {"word": "chicane", "synonym": "trickery", "via": "chicane", "position": 1}
 {"word": "chicane", "synonym": "chicanery", "via": "chicane", "position": 2}
 {"word": "chicane", "synonym": "guile", "via": "chicane", "position": 3}
@@ -2705,7 +2777,6 @@
 {"word": "chigoe", "synonym": "chigger", "via": "chigoe", "position": 1}
 {"word": "chilblain", "synonym": "chilblains", "via": "chilblain", "position": 1}
 {"word": "chilblains", "synonym": "chilblain", "via": "chilblain", "position": 1}
-{"word": "chilblains", "synonym": "chilblain", "via": "chilblains", "position": 1}
 {"word": "child", "synonym": "kid", "via": "child", "position": 1}
 {"word": "child", "synonym": "youngster", "via": "child", "position": 2}
 {"word": "child", "synonym": "minor", "via": "child", "position": 3}
@@ -2805,6 +2876,7 @@
 {"word": "chinch", "synonym": "bedbug", "via": "chinch", "position": 1}
 {"word": "chinchy", "synonym": "cheap", "via": "chintzy", "position": 1}
 {"word": "chinchy", "synonym": "chintzy", "via": "chintzy", "position": 2}
+{"word": "chinfest", "synonym": "gabfest", "via": "chinfest", "position": 1}
 {"word": "chink", "synonym": "click", "via": "chink", "position": 1}
 {"word": "chink", "synonym": "clink", "via": "chink", "position": 2}
 {"word": "chink", "synonym": "check", "via": "chink", "position": 3}
@@ -2823,6 +2895,7 @@
 {"word": "chintzy", "synonym": "punk", "via": "chintzy", "position": 6}
 {"word": "chintzy", "synonym": "sleazy", "via": "chintzy", "position": 7}
 {"word": "chintzy", "synonym": "tinny", "via": "chintzy", "position": 8}
+{"word": "chinwag", "synonym": "chat", "via": "chinwag", "position": 1}
 {"word": "chip", "synonym": "chipping", "via": "chip", "position": 1}
 {"word": "chip", "synonym": "splintering", "via": "chip", "position": 2}
 {"word": "chip", "synonym": "microchip", "via": "chip", "position": 3}
@@ -2840,13 +2913,13 @@
 {"word": "chipping", "synonym": "chip", "via": "chipping", "position": 1}
 {"word": "chipping", "synonym": "splintering", "via": "chipping", "position": 2}
 {"word": "chips", "synonym": "fries", "via": "chip", "position": 1}
-{"word": "chips", "synonym": "fries", "via": "chips", "position": 1}
 {"word": "chirography", "synonym": "calligraphy", "via": "chirography", "position": 1}
 {"word": "chirography", "synonym": "penmanship", "via": "chirography", "position": 2}
 {"word": "chiromancer", "synonym": "palmist", "via": "chiromancer", "position": 1}
 {"word": "chiromancy", "synonym": "palmistry", "via": "chiromancy", "position": 1}
 {"word": "chiropodist", "synonym": "podiatrist", "via": "chiropodist", "position": 1}
 {"word": "chiropody", "synonym": "podiatry", "via": "chiropody", "position": 1}
+{"word": "chiropter", "synonym": "bat", "via": "chiropter", "position": 1}
 {"word": "chiropteran", "synonym": "bat", "via": "chiropteran", "position": 1}
 {"word": "chirp", "synonym": "peep", "via": "chirp", "position": 1}
 {"word": "chirp", "synonym": "cheep", "via": "chirp", "position": 2}
@@ -2954,6 +3027,7 @@
 {"word": "choke", "synonym": "pass", "via": "choke", "position": 10}
 {"word": "choked", "synonym": "clogged", "via": "choke", "position": 1}
 {"word": "choked", "synonym": "clogged", "via": "choked", "position": 1}
+{"word": "chokepoint", "synonym": "bottleneck", "via": "chokepoint", "position": 1}
 {"word": "choker", "synonym": "ruff", "via": "choker", "position": 1}
 {"word": "choker", "synonym": "ruffle", "via": "choker", "position": 2}
 {"word": "choker", "synonym": "collar", "via": "choker", "position": 3}
@@ -2970,6 +3044,8 @@
 {"word": "choking", "synonym": "throttling", "via": "choking", "position": 3}
 {"word": "choko", "synonym": "chayote", "via": "choko", "position": 1}
 {"word": "choky", "synonym": "chokey", "via": "chokey", "position": 1}
+{"word": "cholecyst", "synonym": "gallbladder", "via": "cholecyst", "position": 1}
+{"word": "cholelith", "synonym": "gallstone", "via": "cholelith", "position": 1}
 {"word": "choler", "synonym": "anger", "via": "choler", "position": 1}
 {"word": "choler", "synonym": "ire", "via": "choler", "position": 2}
 {"word": "choler", "synonym": "irritability", "via": "choler", "position": 3}
@@ -2981,10 +3057,15 @@
 {"word": "choleric", "synonym": "irascible", "via": "choleric", "position": 1}
 {"word": "choleric", "synonym": "hotheaded", "via": "choleric", "position": 2}
 {"word": "cholestasis", "synonym": "acholia", "via": "cholestasis", "position": 1}
+{"word": "cholinolytic", "synonym": "anticholinergic", "via": "cholinolytic", "position": 1}
+{"word": "chommie", "synonym": "buddy", "via": "chommie", "position": 1}
+{"word": "chommie", "synonym": "chum", "via": "chommie", "position": 2}
 {"word": "chomp", "synonym": "bite", "via": "chomp", "position": 1}
 {"word": "chomp", "synonym": "champ", "via": "chomp", "position": 2}
 {"word": "chondriosome", "synonym": "mitochondrion", "via": "chondriosome", "position": 1}
 {"word": "chondritic", "synonym": "granular", "via": "chondritic", "position": 1}
+{"word": "choon", "synonym": "tune", "via": "choon", "position": 1}
+{"word": "choon", "synonym": "track", "via": "choon", "position": 2}
 {"word": "choose", "synonym": "take", "via": "choose", "position": 1}
 {"word": "choose", "synonym": "select", "via": "choose", "position": 2}
 {"word": "choose", "synonym": "prefer", "via": "choose", "position": 3}
@@ -3019,7 +3100,12 @@
 {"word": "chord", "synonym": "harmonise", "via": "chord", "position": 2}
 {"word": "chore", "synonym": "job", "via": "chore", "position": 1}
 {"word": "chore", "synonym": "task", "via": "chore", "position": 2}
+{"word": "choreutic", "synonym": "choral", "via": "choreutic", "position": 1}
+{"word": "chorie", "synonym": "thief", "via": "chorie", "position": 1}
 {"word": "chorine", "synonym": "showgirl", "via": "chorine", "position": 1}
+{"word": "choripetalous", "synonym": "polypetalous", "via": "choripetalous", "position": 1}
+{"word": "chorrie", "synonym": "jalopy", "via": "chorrie", "position": 1}
+{"word": "chorrie", "synonym": "clunker", "via": "chorrie", "position": 2}
 {"word": "chortle", "synonym": "chuckle", "via": "chortle", "position": 1}
 {"word": "chorus", "synonym": "refrain", "via": "chorus", "position": 1}
 {"word": "chorus", "synonym": "choir", "via": "chorus", "position": 2}
@@ -3037,16 +3123,22 @@
 {"word": "chrisom", "synonym": "chrism", "via": "chrisom", "position": 1}
 {"word": "christen", "synonym": "baptize", "via": "christen", "position": 1}
 {"word": "christen", "synonym": "baptise", "via": "christen", "position": 2}
+{"word": "christianism", "synonym": "christianity", "via": "christianism", "position": 1}
+{"word": "christless", "synonym": "unchristian", "via": "christless", "position": 1}
+{"word": "christophene", "synonym": "chayote", "via": "christophene", "position": 1}
 {"word": "chroma", "synonym": "saturation", "via": "chroma", "position": 1}
 {"word": "chroma", "synonym": "intensity", "via": "chroma", "position": 2}
 {"word": "chroma", "synonym": "vividness", "via": "chroma", "position": 3}
 {"word": "chromaticity", "synonym": "hue", "via": "chromaticity", "position": 1}
+{"word": "chromatophil", "synonym": "chromophil", "via": "chromatophil", "position": 1}
+{"word": "chromoplasm", "synonym": "chromatin", "via": "chromoplasm", "position": 1}
 {"word": "chronic", "synonym": "inveterate", "via": "chronic", "position": 1}
 {"word": "chronic", "synonym": "continuing", "via": "chronic", "position": 2}
 {"word": "chronically", "synonym": "inveterate", "via": "chronically", "position": 1}
 {"word": "chronicle", "synonym": "history", "via": "chronicle", "position": 1}
 {"word": "chronicle", "synonym": "account", "via": "chronicle", "position": 2}
 {"word": "chronicle", "synonym": "story", "via": "chronicle", "position": 3}
+{"word": "chrono", "synonym": "chronometer", "via": "chrono", "position": 1}
 {"word": "chrysarobin", "synonym": "araroba", "via": "chrysarobin", "position": 1}
 {"word": "chthonian", "synonym": "chthonic", "via": "chthonian", "position": 1}
 {"word": "chthonian", "synonym": "nether", "via": "chthonian", "position": 2}
@@ -3066,9 +3158,11 @@
 {"word": "chuck", "synonym": "disgorge", "via": "woodchuck", "position": 9}
 {"word": "chuck", "synonym": "regorge", "via": "woodchuck", "position": 10}
 {"word": "chuckhole", "synonym": "pothole", "via": "chuckhole", "position": 1}
+{"word": "chuckie", "synonym": "pebble", "via": "chuckie", "position": 1}
 {"word": "chuckle", "synonym": "chortle", "via": "chuckle", "position": 1}
 {"word": "chuddar", "synonym": "chador", "via": "chador", "position": 1}
 {"word": "chuddar", "synonym": "chadar", "via": "chador", "position": 2}
+{"word": "chuddies", "synonym": "underpants", "via": "chuddies", "position": 1}
 {"word": "chuff", "synonym": "puff", "via": "chuff", "position": 1}
 {"word": "chuff", "synonym": "huff", "via": "chuff", "position": 2}
 {"word": "chukka", "synonym": "chukker", "via": "chukka", "position": 1}
@@ -3157,6 +3251,7 @@
 {"word": "cigarette", "synonym": "cigaret", "via": "cigarette", "position": 1}
 {"word": "cigarette", "synonym": "butt", "via": "cigarette", "position": 2}
 {"word": "cigarette", "synonym": "fag", "via": "cigarette", "position": 3}
+{"word": "cigger", "synonym": "cig", "via": "cigger", "position": 1}
 {"word": "cilantro", "synonym": "coriander", "via": "cilantro", "position": 1}
 {"word": "ciliary", "synonym": "ciliate", "via": "ciliary", "position": 1}
 {"word": "ciliate", "synonym": "ciliated", "via": "ciliate", "position": 1}
@@ -3164,6 +3259,8 @@
 {"word": "ciliated", "synonym": "ciliate", "via": "ciliated", "position": 1}
 {"word": "cilium", "synonym": "eyelash", "via": "cilium", "position": 1}
 {"word": "cilium", "synonym": "lash", "via": "cilium", "position": 2}
+{"word": "cimarron", "synonym": "bighorn", "via": "cimarron", "position": 1}
+{"word": "cimmerian", "synonym": "gloomy", "via": "cimmerian", "position": 1}
 {"word": "cinch", "synonym": "breeze", "via": "cinch", "position": 1}
 {"word": "cinch", "synonym": "picnic", "via": "cinch", "position": 2}
 {"word": "cinch", "synonym": "snap", "via": "cinch", "position": 3}
@@ -3179,8 +3276,10 @@
 {"word": "cinematography", "synonym": "filming", "via": "cinematography", "position": 1}
 {"word": "cineplex", "synonym": "multiplex", "via": "cineplex", "position": 1}
 {"word": "cinerarium", "synonym": "columbarium", "via": "cinerarium", "position": 1}
+{"word": "cinerator", "synonym": "incinerator", "via": "cinerator", "position": 1}
 {"word": "cinnabar", "synonym": "vermilion", "via": "cinnabar", "position": 1}
 {"word": "cinnabar", "synonym": "vermillion", "via": "cinnabar", "position": 2}
+{"word": "cinnamene", "synonym": "styrene", "via": "cinnamene", "position": 1}
 {"word": "cinque", "synonym": "five", "via": "cinque", "position": 1}
 {"word": "cinque", "synonym": "quint", "via": "cinque", "position": 2}
 {"word": "cinque", "synonym": "quintet", "via": "cinque", "position": 3}
@@ -3265,12 +3364,14 @@
 {"word": "circulate", "synonym": "disperse", "via": "circulate", "position": 9}
 {"word": "circulative", "synonym": "circulatory", "via": "circulative", "position": 1}
 {"word": "circulatory", "synonym": "circulative", "via": "circulatory", "position": 1}
+{"word": "circumbendibus", "synonym": "circumlocution", "via": "circumbendibus", "position": 1}
 {"word": "circumference", "synonym": "perimeter", "via": "circumference", "position": 1}
 {"word": "circumference", "synonym": "circuit", "via": "circumference", "position": 2}
 {"word": "circumlocution", "synonym": "periphrasis", "via": "circumlocution", "position": 1}
 {"word": "circumlocution", "synonym": "ambage", "via": "circumlocution", "position": 2}
 {"word": "circumlocutory", "synonym": "periphrastic", "via": "circumlocutory", "position": 1}
 {"word": "circumnavigate", "synonym": "compass", "via": "circumnavigate", "position": 1}
+{"word": "circumrotate", "synonym": "revolve", "via": "circumrotate", "position": 1}
 {"word": "circumscribe", "synonym": "limit", "via": "circumscribe", "position": 1}
 {"word": "circumscribed", "synonym": "limited", "via": "circumscribe", "position": 1}
 {"word": "circumscribed", "synonym": "limited", "via": "circumscribed", "position": 1}
@@ -3279,6 +3380,8 @@
 {"word": "circumspection", "synonym": "discretion", "via": "circumspection", "position": 2}
 {"word": "circumspection", "synonym": "discreetness", "via": "circumspection", "position": 3}
 {"word": "circumspection", "synonym": "prudence", "via": "circumspection", "position": 4}
+{"word": "circumspective", "synonym": "cautious", "via": "circumspective", "position": 1}
+{"word": "circumspective", "synonym": "wary", "via": "circumspective", "position": 2}
 {"word": "circumspectly", "synonym": "cagily", "via": "circumspectly", "position": 1}
 {"word": "circumstance", "synonym": "condition", "via": "circumstance", "position": 1}
 {"word": "circumstance", "synonym": "consideration", "via": "circumstance", "position": 2}
@@ -3428,6 +3531,7 @@
 {"word": "clad", "synonym": "clothed", "via": "clothe", "position": 1}
 {"word": "cladding", "synonym": "facing", "via": "clad", "position": 1}
 {"word": "cladding", "synonym": "facing", "via": "cladding", "position": 1}
+{"word": "cladism", "synonym": "cladistics", "via": "cladism", "position": 1}
 {"word": "cladode", "synonym": "cladophyll", "via": "cladode", "position": 1}
 {"word": "cladode", "synonym": "phylloclade", "via": "cladode", "position": 2}
 {"word": "cladophyll", "synonym": "cladode", "via": "cladophyll", "position": 1}
@@ -3581,6 +3685,9 @@
 {"word": "clarity", "synonym": "lucidity", "via": "clarity", "position": 2}
 {"word": "clarity", "synonym": "lucidness", "via": "clarity", "position": 3}
 {"word": "clarity", "synonym": "limpidity", "via": "clarity", "position": 4}
+{"word": "clarthead", "synonym": "dolt", "via": "clarthead", "position": 1}
+{"word": "clarty", "synonym": "dirty", "via": "clarty", "position": 1}
+{"word": "clarty", "synonym": "filthy", "via": "clarty", "position": 2}
 {"word": "clash", "synonym": "brush", "via": "clash", "position": 1}
 {"word": "clash", "synonym": "encounter", "via": "clash", "position": 2}
 {"word": "clash", "synonym": "skirmish", "via": "clash", "position": 3}
@@ -3591,6 +3698,8 @@
 {"word": "clash", "synonym": "clank", "via": "clash", "position": 8}
 {"word": "clash", "synonym": "crash", "via": "clash", "position": 9}
 {"word": "clash", "synonym": "friction", "via": "clash", "position": 10}
+{"word": "clashbag", "synonym": "gossip", "via": "clashbag", "position": 1}
+{"word": "clashbag", "synonym": "tattletale", "via": "clashbag", "position": 2}
 {"word": "clasp", "synonym": "clench", "via": "clasp", "position": 1}
 {"word": "clasp", "synonym": "clutch", "via": "clasp", "position": 2}
 {"word": "clasp", "synonym": "clutches", "via": "clasp", "position": 3}
@@ -3625,12 +3734,14 @@
 {"word": "classroom", "synonym": "schoolroom", "via": "classroom", "position": 1}
 {"word": "classy", "synonym": "posh", "via": "classy", "position": 1}
 {"word": "classy", "synonym": "swish", "via": "classy", "position": 2}
+{"word": "clat", "synonym": "chore", "via": "clat", "position": 1}
 {"word": "clatter", "synonym": "clack", "via": "clatter", "position": 1}
 {"word": "clatter", "synonym": "brattle", "via": "clatter", "position": 2}
 {"word": "claudication", "synonym": "lameness", "via": "claudication", "position": 1}
 {"word": "claudication", "synonym": "limping", "via": "claudication", "position": 2}
 {"word": "claudication", "synonym": "gimp", "via": "claudication", "position": 3}
 {"word": "clause", "synonym": "article", "via": "clause", "position": 1}
+{"word": "clavacin", "synonym": "patulin", "via": "clavacin", "position": 1}
 {"word": "claver", "synonym": "chat", "via": "claver", "position": 1}
 {"word": "claver", "synonym": "confabulate", "via": "claver", "position": 2}
 {"word": "claver", "synonym": "confab", "via": "claver", "position": 3}
@@ -3651,6 +3762,8 @@
 {"word": "claver", "synonym": "gossip", "via": "clover", "position": 8}
 {"word": "claver", "synonym": "jaw", "via": "clover", "position": 9}
 {"word": "claver", "synonym": "visit", "via": "clover", "position": 10}
+{"word": "clavicembalo", "synonym": "harpsichord", "via": "clavicembalo", "position": 1}
+{"word": "clavicembalo", "synonym": "cembalo", "via": "clavicembalo", "position": 2}
 {"word": "clavicle", "synonym": "collarbone", "via": "clavicle", "position": 1}
 {"word": "clavier", "synonym": "fingerboard", "via": "clavier", "position": 1}
 {"word": "clavus", "synonym": "corn", "via": "clavus", "position": 1}
@@ -3755,6 +3868,7 @@
 {"word": "cleft", "synonym": "fissure", "via": "cleft", "position": 3}
 {"word": "cleft", "synonym": "scissure", "via": "cleft", "position": 4}
 {"word": "cleft", "synonym": "dissected", "via": "cleft", "position": 5}
+{"word": "cleistocarp", "synonym": "cleistothecium", "via": "cleistocarp", "position": 1}
 {"word": "cleistogamic", "synonym": "cleistogamous", "via": "cleistogamous", "position": 1}
 {"word": "cleistogamous", "synonym": "cleistogamic", "via": "cleistogamous", "position": 1}
 {"word": "clemency", "synonym": "mercifulness", "via": "clemency", "position": 1}
@@ -3828,6 +3942,7 @@
 {"word": "clientele", "synonym": "business", "via": "clientele", "position": 2}
 {"word": "cliff", "synonym": "drop", "via": "clef", "position": 1}
 {"word": "cliff", "synonym": "drop", "via": "cliff", "position": 1}
+{"word": "cliftie", "synonym": "steal", "via": "cliftie", "position": 1}
 {"word": "climacteric", "synonym": "menopause", "via": "climacteric", "position": 1}
 {"word": "climate", "synonym": "clime", "via": "climate", "position": 1}
 {"word": "climate", "synonym": "mood", "via": "climate", "position": 2}
@@ -3900,6 +4015,7 @@
 {"word": "clipping", "synonym": "trim", "via": "clipping", "position": 3}
 {"word": "clipping", "synonym": "trimming", "via": "clipping", "position": 4}
 {"word": "clipping", "synonym": "cutting", "via": "clipping", "position": 5}
+{"word": "clipshears", "synonym": "earwig", "via": "clipshears", "position": 1}
 {"word": "clique", "synonym": "coterie", "via": "clique", "position": 1}
 {"word": "clique", "synonym": "ingroup", "via": "clique", "position": 2}
 {"word": "clique", "synonym": "pack", "via": "clique", "position": 3}
@@ -3911,6 +4027,8 @@
 {"word": "cliquishly", "synonym": "clannishly", "via": "cliquishly", "position": 1}
 {"word": "cliquishness", "synonym": "clannishness", "via": "cliquishness", "position": 1}
 {"word": "cliquishness", "synonym": "exclusiveness", "via": "cliquishness", "position": 2}
+{"word": "clishmaclaver", "synonym": "gossip", "via": "clishmaclaver", "position": 1}
+{"word": "clishmaclaver", "synonym": "chatter", "via": "clishmaclaver", "position": 2}
 {"word": "clitoral", "synonym": "clitoric", "via": "clitoral", "position": 1}
 {"word": "clitoric", "synonym": "clitoral", "via": "clitoric", "position": 1}
 {"word": "clitoris", "synonym": "button", "via": "clitoris", "position": 1}
@@ -4251,6 +4369,7 @@
 {"word": "cluck", "synonym": "clack", "via": "cluck", "position": 3}
 {"word": "clucking", "synonym": "cluck", "via": "cluck", "position": 1}
 {"word": "clucking", "synonym": "cluck", "via": "clucking", "position": 1}
+{"word": "clucky", "synonym": "broody", "via": "clucky", "position": 1}
 {"word": "clue", "synonym": "clew", "via": "clew", "position": 1}
 {"word": "clue", "synonym": "cue", "via": "clew", "position": 2}
 {"word": "clue", "synonym": "hint", "via": "clew", "position": 3}
@@ -4296,6 +4415,8 @@
 {"word": "clunk", "synonym": "thud", "via": "clunk", "position": 4}
 {"word": "clunk", "synonym": "clop", "via": "clunk", "position": 5}
 {"word": "clunk", "synonym": "plunk", "via": "clunk", "position": 6}
+{"word": "clunkhead", "synonym": "lunkhead", "via": "clunkhead", "position": 1}
+{"word": "clunkhead", "synonym": "blockhead", "via": "clunkhead", "position": 2}
 {"word": "clunking", "synonym": "clop", "via": "clunk", "position": 1}
 {"word": "clunking", "synonym": "clopping", "via": "clunk", "position": 2}
 {"word": "clunking", "synonym": "clumping", "via": "clunk", "position": 3}
@@ -4358,6 +4479,7 @@
 {"word": "cluttered", "synonym": "littered", "via": "cluttered", "position": 1}
 {"word": "clyster", "synonym": "enema", "via": "clyster", "position": 1}
 {"word": "cnidarian", "synonym": "coelenterate", "via": "cnidarian", "position": 1}
+{"word": "cnidocyst", "synonym": "nematocyst", "via": "cnidocyst", "position": 1}
 {"word": "coach", "synonym": "bus", "via": "coach", "position": 1}
 {"word": "coach", "synonym": "autobus", "via": "coach", "position": 2}
 {"word": "coach", "synonym": "charabanc", "via": "coach", "position": 3}
@@ -4496,9 +4618,9 @@
 {"word": "cobwebby", "synonym": "transparent", "via": "cobwebby", "position": 6}
 {"word": "cobwebby", "synonym": "vaporous", "via": "cobwebby", "position": 7}
 {"word": "cocain", "synonym": "cocaine", "via": "cocaine", "position": 1}
-{"word": "cocci", "synonym": "coccus", "via": "cocci", "position": 1}
 {"word": "cocci", "synonym": "coccus", "via": "coccus", "position": 1}
 {"word": "coccus", "synonym": "cocci", "via": "coccus", "position": 1}
+{"word": "cocinero", "synonym": "cook", "via": "cocinero", "position": 1}
 {"word": "cock", "synonym": "rooster", "via": "cock", "position": 1}
 {"word": "cock", "synonym": "hammer", "via": "cock", "position": 2}
 {"word": "cock", "synonym": "stopcock", "via": "cock", "position": 3}
@@ -4510,6 +4632,8 @@
 {"word": "cock", "synonym": "putz", "via": "cock", "position": 9}
 {"word": "cockamamie", "synonym": "cockamamy", "via": "cockamamie", "position": 1}
 {"word": "cockamamy", "synonym": "cockamamie", "via": "cockamamy", "position": 1}
+{"word": "cockaty", "synonym": "affected", "via": "cockaty", "position": 1}
+{"word": "cockaty", "synonym": "pretentious", "via": "cockaty", "position": 2}
 {"word": "cockcrow", "synonym": "dawn", "via": "cockcrow", "position": 1}
 {"word": "cockcrow", "synonym": "dawning", "via": "cockcrow", "position": 2}
 {"word": "cockcrow", "synonym": "morning", "via": "cockcrow", "position": 3}
@@ -4546,6 +4670,7 @@
 {"word": "cockle", "synonym": "ruffle", "via": "cockle", "position": 6}
 {"word": "cockle", "synonym": "riffle", "via": "cockle", "position": 7}
 {"word": "cockle", "synonym": "undulate", "via": "cockle", "position": 8}
+{"word": "cocko", "synonym": "mate", "via": "cocko", "position": 1}
 {"word": "cockroach", "synonym": "roach", "via": "cockroach", "position": 1}
 {"word": "cockscomb", "synonym": "comb", "via": "cockscomb", "position": 1}
 {"word": "cockscomb", "synonym": "coxcomb", "via": "cockscomb", "position": 2}
@@ -4658,6 +4783,7 @@
 {"word": "cogency", "synonym": "rigour", "via": "cogency", "position": 3}
 {"word": "cogent", "synonym": "telling", "via": "cogent", "position": 1}
 {"word": "cogent", "synonym": "weighty", "via": "cogent", "position": 2}
+{"word": "coggle", "synonym": "wobble", "via": "coggle", "position": 1}
 {"word": "cogitable", "synonym": "ponderable", "via": "cogitable", "position": 1}
 {"word": "cogitate", "synonym": "think", "via": "cogitate", "position": 1}
 {"word": "cogitate", "synonym": "cerebrate", "via": "cogitate", "position": 2}
@@ -4694,6 +4820,7 @@
 {"word": "cognoscible", "synonym": "cognizable", "via": "cognoscible", "position": 2}
 {"word": "cogwheel", "synonym": "gear", "via": "cogwheel", "position": 1}
 {"word": "cohabit", "synonym": "coexist", "via": "cohabit", "position": 1}
+{"word": "cohabitate", "synonym": "cohabit", "via": "cohabitate", "position": 1}
 {"word": "cohere", "synonym": "cling", "via": "cohere", "position": 1}
 {"word": "cohere", "synonym": "cleave", "via": "cohere", "position": 2}
 {"word": "cohere", "synonym": "adhere", "via": "cohere", "position": 3}
@@ -4796,6 +4923,7 @@
 {"word": "coinciding", "synonym": "simultaneous", "via": "coinciding", "position": 4}
 {"word": "coiner", "synonym": "minter", "via": "coiner", "position": 1}
 {"word": "coiner", "synonym": "moneyer", "via": "coiner", "position": 2}
+{"word": "coinstantaneous", "synonym": "simultaneous", "via": "coinstantaneous", "position": 1}
 {"word": "coital", "synonym": "copulatory", "via": "coital", "position": 1}
 {"word": "coition", "synonym": "intercourse", "via": "coition", "position": 1}
 {"word": "coition", "synonym": "copulation", "via": "coition", "position": 2}
@@ -4829,6 +4957,7 @@
 {"word": "coldness", "synonym": "iciness", "via": "coldness", "position": 4}
 {"word": "coldness", "synonym": "chilliness", "via": "coldness", "position": 5}
 {"word": "coldness", "synonym": "cold", "via": "coldness", "position": 6}
+{"word": "coldrifed", "synonym": "timid", "via": "coldrifed", "position": 1}
 {"word": "cole", "synonym": "kale", "via": "coal", "position": 1}
 {"word": "cole", "synonym": "kail", "via": "coal", "position": 2}
 {"word": "cole", "synonym": "borecole", "via": "coal", "position": 3}
@@ -4963,6 +5092,7 @@
 {"word": "collude", "synonym": "conspire", "via": "collude", "position": 1}
 {"word": "collusion", "synonym": "connivance", "via": "collusion", "position": 1}
 {"word": "collusive", "synonym": "conniving", "via": "collusive", "position": 1}
+{"word": "collutory", "synonym": "mouthwash", "via": "collutory", "position": 1}
 {"word": "colly", "synonym": "dirty", "via": "collie", "position": 1}
 {"word": "colly", "synonym": "soil", "via": "collie", "position": 2}
 {"word": "colly", "synonym": "begrime", "via": "collie", "position": 3}
@@ -4980,6 +5110,7 @@
 {"word": "colonised", "synonym": "colonized", "via": "colonise", "position": 1}
 {"word": "colonised", "synonym": "settled", "via": "colonise", "position": 2}
 {"word": "colonist", "synonym": "settler", "via": "colonist", "position": 1}
+{"word": "colonitis", "synonym": "colitis", "via": "colonitis", "position": 1}
 {"word": "colonization", "synonym": "colonisation", "via": "colonization", "position": 1}
 {"word": "colonization", "synonym": "settlement", "via": "colonization", "position": 2}
 {"word": "colonize", "synonym": "colonise", "via": "colonize", "position": 1}
@@ -4988,6 +5119,7 @@
 {"word": "colonnade", "synonym": "arcade", "via": "colonnade", "position": 1}
 {"word": "colony", "synonym": "settlement", "via": "colony", "position": 1}
 {"word": "colony", "synonym": "dependency", "via": "colony", "position": 2}
+{"word": "coloquintida", "synonym": "colocynth", "via": "coloquintida", "position": 1}
 {"word": "color", "synonym": "colour", "via": "color", "position": 1}
 {"word": "color", "synonym": "semblance", "via": "color", "position": 2}
 {"word": "color", "synonym": "gloss", "via": "color", "position": 3}
@@ -5075,7 +5207,10 @@
 {"word": "coltish", "synonym": "sportive", "via": "coltish", "position": 4}
 {"word": "columbarium", "synonym": "cinerarium", "via": "columbarium", "position": 1}
 {"word": "columbarium", "synonym": "dovecote", "via": "columbarium", "position": 2}
+{"word": "columbary", "synonym": "dovecote", "via": "columbary", "position": 1}
+{"word": "columbate", "synonym": "niobate", "via": "columbate", "position": 1}
 {"word": "columbine", "synonym": "aquilegia", "via": "columbine", "position": 1}
+{"word": "columbous", "synonym": "niobous", "via": "columbous", "position": 1}
 {"word": "column", "synonym": "pillar", "via": "column", "position": 1}
 {"word": "column", "synonym": "editorial", "via": "column", "position": 2}
 {"word": "column", "synonym": "tower", "via": "column", "position": 3}
@@ -5193,6 +5328,7 @@
 {"word": "comestible", "synonym": "victuals", "via": "comestible", "position": 5}
 {"word": "cometary", "synonym": "cometic", "via": "cometary", "position": 1}
 {"word": "cometic", "synonym": "cometary", "via": "cometic", "position": 1}
+{"word": "cometical", "synonym": "cometary", "via": "cometical", "position": 1}
 {"word": "comfit", "synonym": "confect", "via": "comfit", "position": 1}
 {"word": "comfit", "synonym": "confection", "via": "comfit", "position": 2}
 {"word": "comfort", "synonym": "consolation", "via": "comfort", "position": 1}
@@ -5277,6 +5413,7 @@
 {"word": "commandment", "synonym": "teaching", "via": "commandment", "position": 1}
 {"word": "commandment", "synonym": "precept", "via": "commandment", "position": 2}
 {"word": "commando", "synonym": "ranger", "via": "commando", "position": 1}
+{"word": "commeasurable", "synonym": "commensurate", "via": "commeasurable", "position": 1}
 {"word": "commemorate", "synonym": "remember", "via": "commemorate", "position": 1}
 {"word": "commemorate", "synonym": "memorialize", "via": "commemorate", "position": 2}
 {"word": "commemorate", "synonym": "memorialise", "via": "commemorate", "position": 3}
@@ -5287,6 +5424,7 @@
 {"word": "commemoration", "synonym": "memorial", "via": "commemoration", "position": 1}
 {"word": "commemoration", "synonym": "remembrance", "via": "commemoration", "position": 2}
 {"word": "commemorative", "synonym": "commemorating", "via": "commemorative", "position": 1}
+{"word": "commemoratory", "synonym": "commemorative", "via": "commemoratory", "position": 1}
 {"word": "commence", "synonym": "begin", "via": "commence", "position": 1}
 {"word": "commence", "synonym": "get", "via": "commence", "position": 2}
 {"word": "commence", "synonym": "start", "via": "commence", "position": 3}
@@ -5319,6 +5457,7 @@
 {"word": "commentator", "synonym": "observer", "via": "commentator", "position": 2}
 {"word": "commerce", "synonym": "commercialism", "via": "commerce", "position": 1}
 {"word": "commerce", "synonym": "mercantilism", "via": "commerce", "position": 2}
+{"word": "commerciable", "synonym": "marketable", "via": "commerciable", "position": 1}
 {"word": "commercialise", "synonym": "commercialize", "via": "commercialize", "position": 1}
 {"word": "commercialise", "synonym": "market", "via": "commercialize", "position": 2}
 {"word": "commercialised", "synonym": "commercialized", "via": "commercialize", "position": 1}
@@ -5520,6 +5659,8 @@
 {"word": "commutation", "synonym": "commuting", "via": "commutation", "position": 3}
 {"word": "commuting", "synonym": "commutation", "via": "commute", "position": 1}
 {"word": "commuting", "synonym": "commutation", "via": "commuting", "position": 1}
+{"word": "commutual", "synonym": "mutual", "via": "commutual", "position": 1}
+{"word": "commutual", "synonym": "reciprocal", "via": "commutual", "position": 2}
 {"word": "comose", "synonym": "comate", "via": "comose", "position": 1}
 {"word": "comose", "synonym": "comal", "via": "comose", "position": 2}
 {"word": "comp", "synonym": "comprehensive", "via": "comparative", "position": 1}
@@ -5630,6 +5771,7 @@
 {"word": "competitor", "synonym": "challenger", "via": "competitor", "position": 2}
 {"word": "competitor", "synonym": "competition", "via": "competitor", "position": 3}
 {"word": "competitor", "synonym": "contender", "via": "competitor", "position": 4}
+{"word": "competitory", "synonym": "competitive", "via": "competitory", "position": 1}
 {"word": "compilation", "synonym": "compiling", "via": "compilation", "position": 1}
 {"word": "compilation", "synonym": "digest", "via": "compilation", "position": 2}
 {"word": "compile", "synonym": "compose", "via": "compile", "position": 1}
@@ -5697,8 +5839,11 @@
 {"word": "complex", "synonym": "composite", "via": "complex", "position": 1}
 {"word": "complex", "synonym": "complicated", "via": "complex", "position": 2}
 {"word": "complexify", "synonym": "ramify", "via": "complexify", "position": 1}
+{"word": "complexionless", "synonym": "pale", "via": "complexionless", "position": 1}
+{"word": "complexionless", "synonym": "wan", "via": "complexionless", "position": 2}
 {"word": "complexity", "synonym": "complexness", "via": "complexity", "position": 1}
 {"word": "complexness", "synonym": "complexity", "via": "complexness", "position": 1}
+{"word": "compliable", "synonym": "compliant", "via": "compliable", "position": 1}
 {"word": "compliance", "synonym": "submission", "via": "compliance", "position": 1}
 {"word": "compliance", "synonym": "conformity", "via": "compliance", "position": 2}
 {"word": "compliance", "synonym": "conformation", "via": "compliance", "position": 3}
@@ -6008,6 +6153,7 @@
 {"word": "concerned", "synonym": "implicated", "via": "concern", "position": 2}
 {"word": "concerned", "synonym": "interested", "via": "concerned", "position": 1}
 {"word": "concerned", "synonym": "implicated", "via": "concerned", "position": 2}
+{"word": "concertato", "synonym": "concertante", "via": "concertato", "position": 1}
 {"word": "concerted", "synonym": "conjunct", "via": "concert", "position": 1}
 {"word": "concerted", "synonym": "conjunctive", "via": "concert", "position": 2}
 {"word": "concerted", "synonym": "cooperative", "via": "concert", "position": 3}
@@ -6038,6 +6184,7 @@
 {"word": "conciliatory", "synonym": "conciliative", "via": "conciliatory", "position": 1}
 {"word": "conciliatory", "synonym": "compromising", "via": "conciliatory", "position": 2}
 {"word": "conciliatory", "synonym": "flexible", "via": "conciliatory", "position": 3}
+{"word": "concinnate", "synonym": "harmonize", "via": "concinnate", "position": 1}
 {"word": "concisely", "synonym": "briefly", "via": "concisely", "position": 1}
 {"word": "concisely", "synonym": "shortly", "via": "concisely", "position": 2}
 {"word": "conciseness", "synonym": "concision", "via": "conciseness", "position": 1}
@@ -6096,6 +6243,9 @@
 {"word": "concordant", "synonym": "consonant", "via": "concordant", "position": 5}
 {"word": "concordat", "synonym": "covenant", "via": "concordat", "position": 1}
 {"word": "concordat", "synonym": "compact", "via": "concordat", "position": 2}
+{"word": "concorporate", "synonym": "merge", "via": "concorporate", "position": 1}
+{"word": "concours", "synonym": "contest", "via": "concours", "position": 1}
+{"word": "concours", "synonym": "competition", "via": "concours", "position": 2}
 {"word": "concourse", "synonym": "confluence", "via": "concourse", "position": 1}
 {"word": "concourse", "synonym": "multitude", "via": "concourse", "position": 2}
 {"word": "concourse", "synonym": "throng", "via": "concourse", "position": 3}
@@ -6216,6 +6366,7 @@
 {"word": "cone", "synonym": "strobilus", "via": "cone", "position": 1}
 {"word": "cone", "synonym": "strobile", "via": "cone", "position": 2}
 {"word": "cone", "synonym": "conoid", "via": "cone", "position": 3}
+{"word": "coneroo", "synonym": "swindler", "via": "coneroo", "position": 1}
 {"word": "coney", "synonym": "rabbit", "via": "coney", "position": 1}
 {"word": "coney", "synonym": "cony", "via": "coney", "position": 2}
 {"word": "coney", "synonym": "pika", "via": "coney", "position": 3}
@@ -6339,6 +6490,7 @@
 {"word": "confined", "synonym": "captive", "via": "confined", "position": 1}
 {"word": "confined", "synonym": "imprisoned", "via": "confined", "position": 2}
 {"word": "confined", "synonym": "jailed", "via": "confined", "position": 3}
+{"word": "confinee", "synonym": "inmate", "via": "confinee", "position": 1}
 {"word": "confinement", "synonym": "restriction", "via": "confinement", "position": 1}
 {"word": "confinement", "synonym": "labor", "via": "confinement", "position": 2}
 {"word": "confinement", "synonym": "labour", "via": "confinement", "position": 3}
@@ -6382,15 +6534,6 @@
 {"word": "confirming", "synonym": "substantiative", "via": "confirm", "position": 7}
 {"word": "confirming", "synonym": "validating", "via": "confirm", "position": 8}
 {"word": "confirming", "synonym": "verifying", "via": "confirm", "position": 9}
-{"word": "confirming", "synonym": "positive", "via": "confirming", "position": 1}
-{"word": "confirming", "synonym": "collateral", "via": "confirming", "position": 2}
-{"word": "confirming", "synonym": "confirmatory", "via": "confirming", "position": 3}
-{"word": "confirming", "synonym": "corroborative", "via": "confirming", "position": 4}
-{"word": "confirming", "synonym": "corroboratory", "via": "confirming", "position": 5}
-{"word": "confirming", "synonym": "substantiating", "via": "confirming", "position": 6}
-{"word": "confirming", "synonym": "substantiative", "via": "confirming", "position": 7}
-{"word": "confirming", "synonym": "validating", "via": "confirming", "position": 8}
-{"word": "confirming", "synonym": "verifying", "via": "confirming", "position": 9}
 {"word": "confiscate", "synonym": "impound", "via": "confiscate", "position": 1}
 {"word": "confiscate", "synonym": "attach", "via": "confiscate", "position": 2}
 {"word": "confiscate", "synonym": "sequester", "via": "confiscate", "position": 3}
@@ -6785,9 +6928,6 @@
 {"word": "conquering", "synonym": "conquest", "via": "conquer", "position": 1}
 {"word": "conquering", "synonym": "subjection", "via": "conquer", "position": 2}
 {"word": "conquering", "synonym": "subjugation", "via": "conquer", "position": 3}
-{"word": "conquering", "synonym": "conquest", "via": "conquering", "position": 1}
-{"word": "conquering", "synonym": "subjection", "via": "conquering", "position": 2}
-{"word": "conquering", "synonym": "subjugation", "via": "conquering", "position": 3}
 {"word": "conqueror", "synonym": "vanquisher", "via": "conqueror", "position": 1}
 {"word": "conquest", "synonym": "conquering", "via": "conquest", "position": 1}
 {"word": "conquest", "synonym": "subjection", "via": "conquest", "position": 2}
@@ -6812,6 +6952,7 @@
 {"word": "consciousness", "synonym": "knowingness", "via": "consciousness", "position": 3}
 {"word": "conscript", "synonym": "draftee", "via": "conscript", "position": 1}
 {"word": "conscript", "synonym": "inductee", "via": "conscript", "position": 2}
+{"word": "conscriptee", "synonym": "draftee", "via": "conscriptee", "position": 1}
 {"word": "conscription", "synonym": "muster", "via": "conscription", "position": 1}
 {"word": "conscription", "synonym": "draft", "via": "conscription", "position": 2}
 {"word": "consecrate", "synonym": "bless", "via": "consecrate", "position": 1}
@@ -6836,6 +6977,7 @@
 {"word": "consecutive", "synonym": "sequentially", "via": "consecutive", "position": 6}
 {"word": "consent", "synonym": "accept", "via": "consent", "position": 1}
 {"word": "consentaneous", "synonym": "unanimous", "via": "consentaneous", "position": 1}
+{"word": "consentient", "synonym": "unanimous", "via": "consentient", "position": 1}
 {"word": "consequence", "synonym": "import", "via": "consequence", "position": 1}
 {"word": "consequence", "synonym": "moment", "via": "consequence", "position": 2}
 {"word": "consequence", "synonym": "aftermath", "via": "consequence", "position": 3}
@@ -6853,6 +6995,7 @@
 {"word": "consequent", "synonym": "sequent", "via": "consequent", "position": 6}
 {"word": "consequent", "synonym": "collateral", "via": "consequent", "position": 7}
 {"word": "consequential", "synonym": "eventful", "via": "consequential", "position": 1}
+{"word": "consequentially", "synonym": "consequently", "via": "consequentially", "position": 1}
 {"word": "consequently", "synonym": "accordingly", "via": "consequently", "position": 1}
 {"word": "consequently", "synonym": "therefore", "via": "consequently", "position": 2}
 {"word": "conservation", "synonym": "preservation", "via": "conservation", "position": 1}
@@ -6861,6 +7004,8 @@
 {"word": "conservatively", "synonym": "guardedly", "via": "conservatively", "position": 2}
 {"word": "conservatoire", "synonym": "conservatory", "via": "conservatoire", "position": 1}
 {"word": "conservator", "synonym": "curator", "via": "conservator", "position": 1}
+{"word": "conservatorium", "synonym": "conservatoire", "via": "conservatorium", "position": 1}
+{"word": "conservatorium", "synonym": "conservatory", "via": "conservatorium", "position": 2}
 {"word": "conservatorship", "synonym": "guardianship", "via": "conservatorship", "position": 1}
 {"word": "conservatory", "synonym": "hothouse", "via": "conservatory", "position": 1}
 {"word": "conservatory", "synonym": "conservatoire", "via": "conservatory", "position": 2}
@@ -6923,6 +7068,7 @@
 {"word": "console", "synonym": "comfort", "via": "console", "position": 2}
 {"word": "console", "synonym": "soothe", "via": "console", "position": 3}
 {"word": "console", "synonym": "solace", "via": "console", "position": 4}
+{"word": "consolement", "synonym": "consolation", "via": "consolement", "position": 1}
 {"word": "consolidated", "synonym": "amalgamate", "via": "consolidate", "position": 1}
 {"word": "consolidated", "synonym": "amalgamated", "via": "consolidate", "position": 2}
 {"word": "consolidated", "synonym": "coalesced", "via": "consolidate", "position": 3}
@@ -6937,6 +7083,7 @@
 {"word": "consoling", "synonym": "comforting", "via": "consoling", "position": 1}
 {"word": "consoling", "synonym": "consolatory", "via": "consoling", "position": 2}
 {"word": "consolingly", "synonym": "comfortingly", "via": "consolingly", "position": 1}
+{"word": "consolute", "synonym": "miscible", "via": "consolute", "position": 1}
 {"word": "consonance", "synonym": "harmoniousness", "via": "consonance", "position": 1}
 {"word": "consonant", "synonym": "accordant", "via": "consonant", "position": 1}
 {"word": "consonant", "synonym": "agreeable", "via": "consonant", "position": 2}
@@ -7131,6 +7278,7 @@
 {"word": "contact", "synonym": "reach", "via": "contact", "position": 8}
 {"word": "contact", "synonym": "adjoin", "via": "contact", "position": 9}
 {"word": "contact", "synonym": "meet", "via": "contact", "position": 10}
+{"word": "contactable", "synonym": "reachable", "via": "contactable", "position": 1}
 {"word": "contagion", "synonym": "infection", "via": "contagion", "position": 1}
 {"word": "contagion", "synonym": "transmission", "via": "contagion", "position": 2}
 {"word": "contagious", "synonym": "catching", "via": "contagious", "position": 1}
@@ -7185,6 +7333,8 @@
 {"word": "contemplative", "synonym": "pondering", "via": "contemplative", "position": 6}
 {"word": "contemplative", "synonym": "reflective", "via": "contemplative", "position": 7}
 {"word": "contemplative", "synonym": "ruminative", "via": "contemplative", "position": 8}
+{"word": "contempo", "synonym": "trendy", "via": "contempo", "position": 1}
+{"word": "contempo", "synonym": "modern", "via": "contempo", "position": 2}
 {"word": "contemporaries", "synonym": "coevals", "via": "contemporary", "position": 1}
 {"word": "contemporaries", "synonym": "generation", "via": "contemporary", "position": 2}
 {"word": "contemporary", "synonym": "coeval", "via": "contemporary", "position": 1}
@@ -7233,6 +7383,7 @@
 {"word": "contentious", "synonym": "combative", "via": "contentious", "position": 1}
 {"word": "contentious", "synonym": "disputatious", "via": "contentious", "position": 2}
 {"word": "contentious", "synonym": "litigious", "via": "contentious", "position": 3}
+{"word": "contently", "synonym": "contentedly", "via": "contently", "position": 1}
 {"word": "contents", "synonym": "content", "via": "content", "position": 1}
 {"word": "contents", "synonym": "content", "via": "contents", "position": 1}
 {"word": "conterminous", "synonym": "coextensive", "via": "coterminous", "position": 1}
@@ -7240,9 +7391,12 @@
 {"word": "conterminous", "synonym": "adjacent", "via": "coterminous", "position": 3}
 {"word": "conterminous", "synonym": "contiguous", "via": "coterminous", "position": 4}
 {"word": "conterminous", "synonym": "neighboring", "via": "coterminous", "position": 5}
+{"word": "contessa", "synonym": "countess", "via": "contessa", "position": 1}
 {"word": "contest", "synonym": "competition", "via": "contest", "position": 1}
 {"word": "contest", "synonym": "contend", "via": "contest", "position": 2}
 {"word": "contest", "synonym": "repugn", "via": "contest", "position": 3}
+{"word": "contestably", "synonym": "questionably", "via": "contestably", "position": 1}
+{"word": "contestably", "synonym": "debatably", "via": "contestably", "position": 2}
 {"word": "contestant", "synonym": "dissenter", "via": "contestant", "position": 1}
 {"word": "contestant", "synonym": "dissident", "via": "contestant", "position": 2}
 {"word": "contestant", "synonym": "protester", "via": "contestant", "position": 3}
@@ -7324,6 +7478,8 @@
 {"word": "contraceptive", "synonym": "preventative", "via": "contraceptive", "position": 2}
 {"word": "contraceptive", "synonym": "prophylactic", "via": "contraceptive", "position": 3}
 {"word": "contraceptive", "synonym": "antifertility", "via": "contraceptive", "position": 4}
+{"word": "contraclockwise", "synonym": "counterclockwise", "via": "contraclockwise", "position": 1}
+{"word": "contraclockwise", "synonym": "anticlockwise", "via": "contraclockwise", "position": 2}
 {"word": "contract", "synonym": "declaration", "via": "contract", "position": 1}
 {"word": "contract", "synonym": "take", "via": "contract", "position": 2}
 {"word": "contract", "synonym": "get", "via": "contract", "position": 3}
@@ -7339,11 +7495,15 @@
 {"word": "contraction", "synonym": "compression", "via": "contraction", "position": 1}
 {"word": "contraction", "synonym": "condensation", "via": "contraction", "position": 2}
 {"word": "contractor", "synonym": "declarer", "via": "contractor", "position": 1}
+{"word": "contractualism", "synonym": "contractarianism", "via": "contractualism", "position": 1}
+{"word": "contracyclical", "synonym": "countercyclical", "via": "contracyclical", "position": 1}
 {"word": "contradict", "synonym": "negate", "via": "contradict", "position": 1}
 {"word": "contradict", "synonym": "oppose", "via": "contradict", "position": 2}
 {"word": "contradict", "synonym": "controvert", "via": "contradict", "position": 3}
 {"word": "contradict", "synonym": "contravene", "via": "contradict", "position": 4}
 {"word": "contradict", "synonym": "belie", "via": "contradict", "position": 5}
+{"word": "contradictive", "synonym": "contradictory", "via": "contradictive", "position": 1}
+{"word": "contradictorily", "synonym": "inconsistently", "via": "contradictorily", "position": 1}
 {"word": "contradictory", "synonym": "conflicting", "via": "contradictory", "position": 1}
 {"word": "contradictory", "synonym": "confounding", "via": "contradictory", "position": 2}
 {"word": "contralto", "synonym": "alto", "via": "contralto", "position": 1}
@@ -7510,6 +7670,7 @@
 {"word": "conventional", "synonym": "established", "via": "conventional", "position": 2}
 {"word": "conventional", "synonym": "formal", "via": "conventional", "position": 3}
 {"word": "conventional", "synonym": "schematic", "via": "conventional", "position": 4}
+{"word": "conventioner", "synonym": "conventioneer", "via": "conventioner", "position": 1}
 {"word": "conventual", "synonym": "cloistered", "via": "conventual", "position": 1}
 {"word": "conventual", "synonym": "cloistral", "via": "conventual", "position": 2}
 {"word": "conventual", "synonym": "monastic", "via": "conventual", "position": 3}
@@ -7531,6 +7692,7 @@
 {"word": "conversancy", "synonym": "familiarity", "via": "conversancy", "position": 2}
 {"word": "conversancy", "synonym": "conversance", "via": "conversancy", "position": 3}
 {"word": "conversant", "synonym": "familiar", "via": "conversant", "position": 1}
+{"word": "conversate", "synonym": "converse", "via": "conversate", "position": 1}
 {"word": "conversational", "synonym": "colloquial", "via": "conversational", "position": 1}
 {"word": "converse", "synonym": "discourse", "via": "converse", "position": 1}
 {"word": "converse", "synonym": "reversed", "via": "converse", "position": 2}
@@ -7581,6 +7743,8 @@
 {"word": "convict", "synonym": "yardbird", "via": "convict", "position": 3}
 {"word": "conviction", "synonym": "condemnation", "via": "conviction", "position": 1}
 {"word": "conviction", "synonym": "sentence", "via": "conviction", "position": 2}
+{"word": "convictive", "synonym": "persuasive", "via": "convictive", "position": 1}
+{"word": "convictive", "synonym": "convincing", "via": "convictive", "position": 2}
 {"word": "convince", "synonym": "convert", "via": "convince", "position": 1}
 {"word": "convinced", "synonym": "positive", "via": "convince", "position": 1}
 {"word": "convinced", "synonym": "confident", "via": "convince", "position": 2}
@@ -7679,6 +7843,7 @@
 {"word": "coolness", "synonym": "nip", "via": "coolness", "position": 7}
 {"word": "cooly", "synonym": "coolie", "via": "coolie", "position": 1}
 {"word": "cooly", "synonym": "coolie", "via": "coolly", "position": 1}
+{"word": "coom", "synonym": "soot", "via": "coom", "position": 1}
 {"word": "coon", "synonym": "ringtail", "via": "coon", "position": 1}
 {"word": "coop", "synonym": "cage", "via": "coop", "position": 1}
 {"word": "coop", "synonym": "hencoop", "via": "coop", "position": 2}
@@ -7704,6 +7869,8 @@
 {"word": "coordinating", "synonym": "coordinative", "via": "coordinate", "position": 1}
 {"word": "coordinating", "synonym": "coordinative", "via": "coordinating", "position": 1}
 {"word": "coordinative", "synonym": "coordinating", "via": "coordinative", "position": 1}
+{"word": "coorie", "synonym": "nestle", "via": "coorie", "position": 1}
+{"word": "coorie", "synonym": "snuggle", "via": "coorie", "position": 2}
 {"word": "cop", "synonym": "bull", "via": "cop", "position": 1}
 {"word": "cop", "synonym": "copper", "via": "cop", "position": 2}
 {"word": "cop", "synonym": "fuzz", "via": "cop", "position": 3}
@@ -7743,6 +7910,7 @@
 {"word": "copiously", "synonym": "extravagantly", "via": "copiously", "position": 3}
 {"word": "copiousness", "synonym": "abundance", "via": "copiousness", "position": 1}
 {"word": "copiousness", "synonym": "teemingness", "via": "copiousness", "position": 2}
+{"word": "copman", "synonym": "cop", "via": "copman", "position": 1}
 {"word": "copper", "synonym": "bull", "via": "copper", "position": 1}
 {"word": "copper", "synonym": "cop", "via": "copper", "position": 2}
 {"word": "copper", "synonym": "fuzz", "via": "copper", "position": 3}
@@ -7774,6 +7942,7 @@
 {"word": "copycat", "synonym": "aper", "via": "copycat", "position": 4}
 {"word": "copyedit", "synonym": "copyread", "via": "copyedit", "position": 1}
 {"word": "copyedit", "synonym": "subedit", "via": "copyedit", "position": 2}
+{"word": "copygraph", "synonym": "hectograph", "via": "copygraph", "position": 1}
 {"word": "copyist", "synonym": "scribe", "via": "copyist", "position": 1}
 {"word": "copyist", "synonym": "scrivener", "via": "copyist", "position": 2}
 {"word": "copyread", "synonym": "subedit", "via": "copyread", "position": 1}
@@ -7809,6 +7978,7 @@
 {"word": "coquette", "synonym": "coquet", "via": "coquette", "position": 7}
 {"word": "coquettish", "synonym": "flirtatious", "via": "coquettish", "position": 1}
 {"word": "coquettishly", "synonym": "flirtatiously", "via": "coquettishly", "position": 1}
+{"word": "coraji", "synonym": "boyla", "via": "coraji", "position": 1}
 {"word": "corbel", "synonym": "truss", "via": "corbel", "position": 1}
 {"word": "cord", "synonym": "corduroy", "via": "chord", "position": 1}
 {"word": "cord", "synonym": "corduroy", "via": "cord", "position": 1}
@@ -7909,6 +8079,7 @@
 {"word": "cornet", "synonym": "trumpet", "via": "cornet", "position": 2}
 {"word": "cornet", "synonym": "trump", "via": "cornet", "position": 3}
 {"word": "cornetist", "synonym": "trumpeter", "via": "cornetist", "position": 1}
+{"word": "cornflour", "synonym": "cornstarch", "via": "cornflour", "position": 1}
 {"word": "cornflower", "synonym": "bluebottle", "via": "cornflower", "position": 1}
 {"word": "cornflower", "synonym": "strawflower", "via": "cornflower", "position": 2}
 {"word": "cornice", "synonym": "valance", "via": "cornice", "position": 1}
@@ -8133,6 +8304,7 @@
 {"word": "coruscate", "synonym": "scintillate", "via": "coruscate", "position": 2}
 {"word": "coruscation", "synonym": "glitter", "via": "coruscation", "position": 1}
 {"word": "coruscation", "synonym": "sparkle", "via": "coruscation", "position": 2}
+{"word": "corybungus", "synonym": "buttocks", "via": "corybungus", "position": 1}
 {"word": "coryza", "synonym": "rhinitis", "via": "coryza", "position": 1}
 {"word": "cos", "synonym": "romaine", "via": "cos", "position": 1}
 {"word": "cos", "synonym": "cosine", "via": "cos", "position": 2}
@@ -8186,6 +8358,7 @@
 {"word": "cosset", "synonym": "mollycoddle", "via": "cosset", "position": 6}
 {"word": "cosset", "synonym": "spoil", "via": "cosset", "position": 7}
 {"word": "cosset", "synonym": "indulge", "via": "cosset", "position": 8}
+{"word": "cossie", "synonym": "swimsuit", "via": "cossie", "position": 1}
 {"word": "cost", "synonym": "price", "via": "cost", "position": 1}
 {"word": "cost", "synonym": "toll", "via": "cost", "position": 2}
 {"word": "costa", "synonym": "rib", "via": "costa", "position": 1}
@@ -8349,6 +8522,7 @@
 {"word": "counterpane", "synonym": "spread", "via": "counterpane", "position": 3}
 {"word": "counterpart", "synonym": "similitude", "via": "counterpart", "position": 1}
 {"word": "counterpart", "synonym": "twin", "via": "counterpart", "position": 2}
+{"word": "counterpin", "synonym": "bedspread", "via": "counterpin", "position": 1}
 {"word": "counterplan", "synonym": "counterplot", "via": "counterplan", "position": 1}
 {"word": "counterplay", "synonym": "counterattack", "via": "counterplay", "position": 1}
 {"word": "counterplot", "synonym": "counterplan", "via": "counterplot", "position": 1}
@@ -8375,6 +8549,8 @@
 {"word": "countervail", "synonym": "neutralize", "via": "countervail", "position": 2}
 {"word": "countervail", "synonym": "counterbalance", "via": "countervail", "position": 3}
 {"word": "countervail", "synonym": "offset", "via": "countervail", "position": 4}
+{"word": "counterweigh", "synonym": "counterbalance", "via": "counterweigh", "position": 1}
+{"word": "counterweigh", "synonym": "offset", "via": "counterweigh", "position": 2}
 {"word": "counterweight", "synonym": "counterbalance", "via": "counterweight", "position": 1}
 {"word": "counterweight", "synonym": "counterpoise", "via": "counterweight", "position": 2}
 {"word": "counterweight", "synonym": "balance", "via": "counterweight", "position": 3}
@@ -8544,6 +8720,7 @@
 {"word": "cowardice", "synonym": "cowardliness", "via": "cowardice", "position": 1}
 {"word": "cowardliness", "synonym": "cowardice", "via": "cowardliness", "position": 1}
 {"word": "cowardly", "synonym": "fearful", "via": "cowardly", "position": 1}
+{"word": "cowardness", "synonym": "cowardice", "via": "cowardness", "position": 1}
 {"word": "cowberry", "synonym": "lingonberry", "via": "cowberry", "position": 1}
 {"word": "cowboy", "synonym": "cowpuncher", "via": "cowboy", "position": 1}
 {"word": "cowboy", "synonym": "puncher", "via": "cowboy", "position": 2}
@@ -8555,6 +8732,7 @@
 {"word": "cowcatcher", "synonym": "fender", "via": "cowcatcher", "position": 1}
 {"word": "cowcatcher", "synonym": "buffer", "via": "cowcatcher", "position": 2}
 {"word": "cowcatcher", "synonym": "pilot", "via": "cowcatcher", "position": 3}
+{"word": "cowclap", "synonym": "dung", "via": "cowclap", "position": 1}
 {"word": "cower", "synonym": "fawn", "via": "cower", "position": 1}
 {"word": "cower", "synonym": "crawl", "via": "cower", "position": 2}
 {"word": "cower", "synonym": "creep", "via": "cower", "position": 3}
@@ -8576,6 +8754,8 @@
 {"word": "cowherd", "synonym": "cowpoke", "via": "cowherd", "position": 6}
 {"word": "cowherd", "synonym": "cowhand", "via": "cowherd", "position": 7}
 {"word": "cowhide", "synonym": "cowskin", "via": "cowhide", "position": 1}
+{"word": "cowk", "synonym": "retch", "via": "cowk", "position": 1}
+{"word": "cowk", "synonym": "gag", "via": "cowk", "position": 2}
 {"word": "cowl", "synonym": "hood", "via": "cowl", "position": 1}
 {"word": "cowl", "synonym": "bonnet", "via": "cowl", "position": 2}
 {"word": "cowl", "synonym": "cowling", "via": "cowl", "position": 3}
@@ -8627,6 +8807,7 @@
 {"word": "coy", "synonym": "overmodest", "via": "coy", "position": 2}
 {"word": "coyness", "synonym": "demureness", "via": "coyness", "position": 1}
 {"word": "coypu", "synonym": "nutria", "via": "coypu", "position": 1}
+{"word": "coze", "synonym": "chat", "via": "coze", "position": 1}
 {"word": "cozen", "synonym": "deceive", "via": "cozen", "position": 1}
 {"word": "cozen", "synonym": "delude", "via": "cozen", "position": 2}
 {"word": "cozenage", "synonym": "scam", "via": "cozenage", "position": 1}
@@ -8851,6 +9032,7 @@
 {"word": "crankiness", "synonym": "crotchetiness", "via": "crankiness", "position": 1}
 {"word": "crankiness", "synonym": "contrariness", "via": "crankiness", "position": 2}
 {"word": "crankiness", "synonym": "grumpiness", "via": "crankiness", "position": 3}
+{"word": "crankpot", "synonym": "grouch", "via": "crankpot", "position": 1}
 {"word": "cranky", "synonym": "fractious", "via": "cranky", "position": 1}
 {"word": "cranky", "synonym": "irritable", "via": "cranky", "position": 2}
 {"word": "cranky", "synonym": "nettlesome", "via": "cranky", "position": 3}
@@ -8895,6 +9077,8 @@
 {"word": "crape", "synonym": "frizzle", "via": "crepe", "position": 3}
 {"word": "crape", "synonym": "frizz", "via": "crepe", "position": 4}
 {"word": "crape", "synonym": "kink", "via": "crepe", "position": 5}
+{"word": "crapehanger", "synonym": "killjoy", "via": "crapehanger", "position": 1}
+{"word": "crapola", "synonym": "nonsense", "via": "crapola", "position": 1}
 {"word": "crapper", "synonym": "toilet", "via": "crap", "position": 1}
 {"word": "crapper", "synonym": "can", "via": "crap", "position": 2}
 {"word": "crapper", "synonym": "commode", "via": "crap", "position": 3}
@@ -8915,6 +9099,7 @@
 {"word": "crappy", "synonym": "shitty", "via": "crappy", "position": 4}
 {"word": "crappy", "synonym": "stinking", "via": "crappy", "position": 5}
 {"word": "crappy", "synonym": "stinky", "via": "crappy", "position": 6}
+{"word": "crapulent", "synonym": "crapulous", "via": "crapulent", "position": 1}
 {"word": "crash", "synonym": "smash", "via": "crash", "position": 1}
 {"word": "crash", "synonym": "wreck", "via": "crash", "position": 2}
 {"word": "crash", "synonym": "clang", "via": "crash", "position": 3}
@@ -8936,6 +9121,7 @@
 {"word": "crashing", "synonym": "bloody", "via": "crashing", "position": 3}
 {"word": "crashing", "synonym": "blooming", "via": "crashing", "position": 4}
 {"word": "crashing", "synonym": "flaming", "via": "crashing", "position": 5}
+{"word": "crashproof", "synonym": "crashworthy", "via": "crashproof", "position": 1}
 {"word": "crassitude", "synonym": "crassness", "via": "crassitude", "position": 1}
 {"word": "crassness", "synonym": "crassitude", "via": "crassness", "position": 1}
 {"word": "craunch", "synonym": "crunch", "via": "craunch", "position": 1}
@@ -8978,6 +9164,7 @@
 {"word": "crawling", "synonym": "crawl", "via": "crawling", "position": 1}
 {"word": "crawling", "synonym": "creep", "via": "crawling", "position": 2}
 {"word": "crawling", "synonym": "creeping", "via": "crawling", "position": 3}
+{"word": "crawsick", "synonym": "hungover", "via": "crawsick", "position": 1}
 {"word": "cray", "synonym": "crazy", "via": "cray", "position": 1}
 {"word": "crayfish", "synonym": "langouste", "via": "crawfish", "position": 1}
 {"word": "crayfish", "synonym": "crawfish", "via": "crawfish", "position": 2}
@@ -9161,10 +9348,12 @@
 {"word": "crenelle", "synonym": "crenation", "via": "crenel", "position": 3}
 {"word": "crenulate", "synonym": "crenulated", "via": "crenulate", "position": 1}
 {"word": "crenulated", "synonym": "crenulate", "via": "crenulate", "position": 1}
+{"word": "creophagous", "synonym": "carnivorous", "via": "creophagous", "position": 1}
 {"word": "crepe", "synonym": "crape", "via": "crepe", "position": 1}
 {"word": "crepitate", "synonym": "crackle", "via": "crepitate", "position": 1}
 {"word": "crepitation", "synonym": "crackle", "via": "crepitation", "position": 1}
 {"word": "crepitation", "synonym": "crackling", "via": "crepitation", "position": 2}
+{"word": "creps", "synonym": "sneakers", "via": "creps", "position": 1}
 {"word": "crepuscle", "synonym": "twilight", "via": "crepuscule", "position": 1}
 {"word": "crepuscle", "synonym": "dusk", "via": "crepuscule", "position": 2}
 {"word": "crepuscle", "synonym": "gloaming", "via": "crepuscule", "position": 3}
@@ -9221,6 +9410,7 @@
 {"word": "crib", "synonym": "pony", "via": "crib", "position": 3}
 {"word": "crib", "synonym": "trot", "via": "crib", "position": 4}
 {"word": "cribbage", "synonym": "crib", "via": "cribbage", "position": 1}
+{"word": "cribnote", "synonym": "crib", "via": "cribnote", "position": 1}
 {"word": "crick", "synonym": "kink", "via": "creek", "position": 1}
 {"word": "crick", "synonym": "rick", "via": "creek", "position": 2}
 {"word": "crick", "synonym": "wrick", "via": "creek", "position": 3}
@@ -9228,6 +9418,7 @@
 {"word": "crick", "synonym": "rick", "via": "crick", "position": 2}
 {"word": "crick", "synonym": "wrick", "via": "crick", "position": 3}
 {"word": "crier", "synonym": "weeper", "via": "crier", "position": 1}
+{"word": "crimey", "synonym": "accomplice", "via": "crimey", "position": 1}
 {"word": "criminal", "synonym": "felon", "via": "criminal", "position": 1}
 {"word": "criminal", "synonym": "crook", "via": "criminal", "position": 2}
 {"word": "criminal", "synonym": "outlaw", "via": "criminal", "position": 3}
@@ -9244,6 +9435,7 @@
 {"word": "criminate", "synonym": "accuse", "via": "criminate", "position": 3}
 {"word": "criminate", "synonym": "impeach", "via": "criminate", "position": 4}
 {"word": "criminate", "synonym": "incriminate", "via": "criminate", "position": 5}
+{"word": "crimmo", "synonym": "criminal", "via": "crimmo", "position": 1}
 {"word": "crimp", "synonym": "crimper", "via": "crimp", "position": 1}
 {"word": "crimp", "synonym": "fold", "via": "crimp", "position": 2}
 {"word": "crimp", "synonym": "crease", "via": "crimp", "position": 3}
@@ -9312,6 +9504,7 @@
 {"word": "crinkly", "synonym": "wavy", "via": "crinkly", "position": 3}
 {"word": "crinkly", "synonym": "wavelike", "via": "crinkly", "position": 4}
 {"word": "crinoline", "synonym": "hoopskirt", "via": "crinoline", "position": 1}
+{"word": "crinose", "synonym": "hirsute", "via": "crinose", "position": 1}
 {"word": "cripple", "synonym": "lame", "via": "cripple", "position": 1}
 {"word": "crippled", "synonym": "halt", "via": "cripple", "position": 1}
 {"word": "crippled", "synonym": "halting", "via": "cripple", "position": 2}
@@ -9401,6 +9594,8 @@
 {"word": "crocked", "synonym": "sloshed", "via": "crocked", "position": 10}
 {"word": "crockery", "synonym": "dishware", "via": "crockery", "position": 1}
 {"word": "cromlech", "synonym": "dolmen", "via": "cromlech", "position": 1}
+{"word": "cromulent", "synonym": "acceptable", "via": "cromulent", "position": 1}
+{"word": "cromulent", "synonym": "satisfactory", "via": "cromulent", "position": 2}
 {"word": "crone", "synonym": "hag", "via": "crone", "position": 1}
 {"word": "crone", "synonym": "beldam", "via": "crone", "position": 2}
 {"word": "crone", "synonym": "beldame", "via": "crone", "position": 3}
@@ -9441,6 +9636,8 @@
 {"word": "crookedness", "synonym": "tortuousness", "via": "crookedness", "position": 3}
 {"word": "crookedness", "synonym": "torsion", "via": "crookedness", "position": 4}
 {"word": "crookedness", "synonym": "contortion", "via": "crookedness", "position": 5}
+{"word": "crool", "synonym": "spoil", "via": "crool", "position": 1}
+{"word": "crool", "synonym": "ruin", "via": "crool", "position": 2}
 {"word": "crooner", "synonym": "balladeer", "via": "crooner", "position": 1}
 {"word": "crop", "synonym": "craw", "via": "crop", "position": 1}
 {"word": "crop", "synonym": "harvest", "via": "crop", "position": 2}
@@ -9482,6 +9679,7 @@
 {"word": "crossbreeding", "synonym": "crossing", "via": "crossbreeding", "position": 3}
 {"word": "crossbreeding", "synonym": "cross", "via": "crossbreeding", "position": 4}
 {"word": "crossbreeding", "synonym": "hybridizing", "via": "crossbreeding", "position": 5}
+{"word": "crosscheck", "synonym": "verify", "via": "crosscheck", "position": 1}
 {"word": "crosscurrent", "synonym": "countercurrent", "via": "crosscurrent", "position": 1}
 {"word": "crosscurrent", "synonym": "rip", "via": "crosscurrent", "position": 2}
 {"word": "crosscurrent", "synonym": "riptide", "via": "crosscurrent", "position": 3}
@@ -9619,6 +9817,7 @@
 {"word": "crowing", "synonym": "braggart", "via": "crowing", "position": 7}
 {"word": "crowing", "synonym": "braggy", "via": "crowing", "position": 8}
 {"word": "crowing", "synonym": "big", "via": "crowing", "position": 9}
+{"word": "crowl", "synonym": "runt", "via": "crowl", "position": 1}
 {"word": "crown", "synonym": "diadem", "via": "crow", "position": 1}
 {"word": "crown", "synonym": "crest", "via": "crow", "position": 2}
 {"word": "crown", "synonym": "jacket", "via": "crow", "position": 3}
@@ -9645,6 +9844,7 @@
 {"word": "crowned", "synonym": "laurelled", "via": "crowned", "position": 2}
 {"word": "crownless", "synonym": "uncrowned", "via": "crownless", "position": 1}
 {"word": "crozier", "synonym": "crosier", "via": "crosier", "position": 1}
+{"word": "crozzled", "synonym": "charred", "via": "crozzled", "position": 1}
 {"word": "crucial", "synonym": "important", "via": "crucial", "position": 1}
 {"word": "crucial", "synonym": "essential", "via": "crucial", "position": 2}
 {"word": "cruciate", "synonym": "cruciform", "via": "cruciate", "position": 1}
@@ -9694,6 +9894,8 @@
 {"word": "cruel", "synonym": "roughshod", "via": "cruel", "position": 4}
 {"word": "cruel", "synonym": "savage", "via": "cruel", "position": 5}
 {"word": "cruel", "synonym": "vicious", "via": "cruel", "position": 6}
+{"word": "cruelhearted", "synonym": "heartless", "via": "cruelhearted", "position": 1}
+{"word": "cruelhearted", "synonym": "merciless", "via": "cruelhearted", "position": 2}
 {"word": "cruelness", "synonym": "cruelty", "via": "cruelness", "position": 1}
 {"word": "cruelness", "synonym": "harshness", "via": "cruelness", "position": 2}
 {"word": "cruelty", "synonym": "cruelness", "via": "cruelty", "position": 1}
@@ -9861,6 +10063,7 @@
 {"word": "cryptic", "synonym": "mystifying", "via": "cryptic", "position": 6}
 {"word": "cryptically", "synonym": "enigmatically", "via": "cryptically", "position": 1}
 {"word": "cryptically", "synonym": "mysteriously", "via": "cryptically", "position": 2}
+{"word": "cryptoclimate", "synonym": "microclimate", "via": "cryptoclimate", "position": 1}
 {"word": "cryptogamic", "synonym": "cryptogamous", "via": "cryptogamic", "position": 1}
 {"word": "cryptogamous", "synonym": "cryptogamic", "via": "cryptogamous", "position": 1}
 {"word": "cryptogram", "synonym": "cryptograph", "via": "cryptogram", "position": 1}
@@ -9871,6 +10074,7 @@
 {"word": "cryptographic", "synonym": "cryptologic", "via": "cryptographic", "position": 1}
 {"word": "cryptographic", "synonym": "cryptological", "via": "cryptographic", "position": 2}
 {"word": "cryptography", "synonym": "cryptology", "via": "cryptography", "position": 1}
+{"word": "cryptolect", "synonym": "argot", "via": "cryptolect", "position": 1}
 {"word": "cryptologic", "synonym": "cryptological", "via": "cryptologic", "position": 1}
 {"word": "cryptological", "synonym": "cryptanalytic", "via": "cryptological", "position": 1}
 {"word": "cryptological", "synonym": "cryptographic", "via": "cryptological", "position": 2}
@@ -9995,6 +10199,8 @@
 {"word": "cuff", "synonym": "manacle", "via": "cuff", "position": 3}
 {"word": "cuff", "synonym": "whomp", "via": "cuff", "position": 4}
 {"word": "cuke", "synonym": "cucumber", "via": "cuke", "position": 1}
+{"word": "culchie", "synonym": "bumpkin", "via": "culchie", "position": 1}
+{"word": "culchie", "synonym": "yokel", "via": "culchie", "position": 2}
 {"word": "cull", "synonym": "reject", "via": "cull", "position": 1}
 {"word": "cull", "synonym": "pick", "via": "cull", "position": 2}
 {"word": "cull", "synonym": "pluck", "via": "cull", "position": 3}
@@ -10055,6 +10261,7 @@
 {"word": "cultivator", "synonym": "agriculturist", "via": "cultivator", "position": 2}
 {"word": "cultivator", "synonym": "grower", "via": "cultivator", "position": 3}
 {"word": "cultivator", "synonym": "raiser", "via": "cultivator", "position": 4}
+{"word": "culturable", "synonym": "cultivable", "via": "culturable", "position": 1}
 {"word": "cultural", "synonym": "ethnic", "via": "cultural", "position": 1}
 {"word": "cultural", "synonym": "ethnical", "via": "cultural", "position": 2}
 {"word": "culture", "synonym": "acculturation", "via": "culture", "position": 1}
@@ -10098,6 +10305,8 @@
 {"word": "cumbersome", "synonym": "cumbrous", "via": "cumbersome", "position": 5}
 {"word": "cumbersomeness", "synonym": "awkwardness", "via": "cumbersomeness", "position": 1}
 {"word": "cumbersomeness", "synonym": "unwieldiness", "via": "cumbersomeness", "position": 2}
+{"word": "cumbrance", "synonym": "hindrance", "via": "cumbrance", "position": 1}
+{"word": "cumbrance", "synonym": "burden", "via": "cumbrance", "position": 2}
 {"word": "cumbrous", "synonym": "cumbersome", "via": "cumbrous", "position": 1}
 {"word": "cumquat", "synonym": "kumquat", "via": "kumquat", "position": 1}
 {"word": "cumulate", "synonym": "accumulate", "via": "cumulate", "position": 1}
@@ -10111,11 +10320,13 @@
 {"word": "cumulation", "synonym": "cumulus", "via": "cumulation", "position": 5}
 {"word": "cumulative", "synonym": "accumulative", "via": "cumulative", "position": 1}
 {"word": "cumulonimbus", "synonym": "thundercloud", "via": "cumulonimbus", "position": 1}
+{"word": "cumulostratus", "synonym": "stratocumulus", "via": "cumulostratus", "position": 1}
 {"word": "cumulus", "synonym": "pile", "via": "cumulus", "position": 1}
 {"word": "cumulus", "synonym": "heap", "via": "cumulus", "position": 2}
 {"word": "cumulus", "synonym": "mound", "via": "cumulus", "position": 3}
 {"word": "cumulus", "synonym": "agglomerate", "via": "cumulus", "position": 4}
 {"word": "cumulus", "synonym": "cumulation", "via": "cumulus", "position": 5}
+{"word": "cunctator", "synonym": "procrastinator", "via": "cunctator", "position": 1}
 {"word": "cuneal", "synonym": "cuneiform", "via": "cuneal", "position": 1}
 {"word": "cuneiform", "synonym": "cuneal", "via": "cuneiform", "position": 1}
 {"word": "cunnilinctus", "synonym": "cunnilingus", "via": "cunnilingus", "position": 1}
@@ -10279,6 +10490,7 @@
 {"word": "current", "synonym": "flow", "via": "current", "position": 2}
 {"word": "currently", "synonym": "presently", "via": "currently", "position": 1}
 {"word": "currentness", "synonym": "currency", "via": "currentness", "position": 1}
+{"word": "currick", "synonym": "cairn", "via": "currick", "position": 1}
 {"word": "curriculum", "synonym": "program", "via": "curriculum", "position": 1}
 {"word": "curriculum", "synonym": "programme", "via": "curriculum", "position": 2}
 {"word": "curriculum", "synonym": "syllabus", "via": "curriculum", "position": 3}
@@ -10452,6 +10664,7 @@
 {"word": "custom", "synonym": "tradition", "via": "custom", "position": 3}
 {"word": "custom", "synonym": "customs", "via": "custom", "position": 4}
 {"word": "custom", "synonym": "impost", "via": "custom", "position": 5}
+{"word": "customable", "synonym": "dutiable", "via": "customable", "position": 1}
 {"word": "customary", "synonym": "accustomed", "via": "customary", "position": 1}
 {"word": "customary", "synonym": "habitual", "via": "customary", "position": 2}
 {"word": "customary", "synonym": "wonted", "via": "customary", "position": 3}
@@ -10535,6 +10748,7 @@
 {"word": "cyanocobalamin", "synonym": "cobalamin", "via": "cyanocobalamin", "position": 1}
 {"word": "cyanogenetic", "synonym": "cyanogenic", "via": "cyanogenetic", "position": 1}
 {"word": "cyanogenic", "synonym": "cyanogenetic", "via": "cyanogenetic", "position": 1}
+{"word": "cybernate", "synonym": "automate", "via": "cybernate", "position": 1}
 {"word": "cyberspace", "synonym": "net", "via": "cyberspace", "position": 1}
 {"word": "cycle", "synonym": "bicycle", "via": "cycle", "position": 1}
 {"word": "cycle", "synonym": "bike", "via": "cycle", "position": 2}
@@ -10571,6 +10785,7 @@
 {"word": "cylix", "synonym": "kylix", "via": "kylix", "position": 1}
 {"word": "cyma", "synonym": "cymatium", "via": "cyma", "position": 1}
 {"word": "cymatium", "synonym": "cyma", "via": "cymatium", "position": 1}
+{"word": "cymbalo", "synonym": "dulcimer", "via": "cymbalo", "position": 1}
 {"word": "cynic", "synonym": "faultfinder", "via": "cynic", "position": 1}
 {"word": "cynical", "synonym": "misanthropic", "via": "cynical", "position": 1}
 {"word": "cypher", "synonym": "cipher", "via": "cipher", "position": 1}

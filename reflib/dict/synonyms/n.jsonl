@@ -4,6 +4,7 @@
 {"word": "nab", "synonym": "apprehend", "via": "nab", "position": 3}
 {"word": "nab", "synonym": "arrest", "via": "nab", "position": 4}
 {"word": "nab", "synonym": "cop", "via": "nab", "position": 5}
+{"word": "nabi", "synonym": "prophet", "via": "nabi", "position": 1}
 {"word": "nabob", "synonym": "nawab", "via": "nabob", "position": 1}
 {"word": "nacreous", "synonym": "iridescent", "via": "nacreous", "position": 1}
 {"word": "nacreous", "synonym": "opalescent", "via": "nacreous", "position": 2}
@@ -38,6 +39,7 @@
 {"word": "nagger", "synonym": "nag", "via": "nagger", "position": 3}
 {"word": "nagging", "synonym": "shrewish", "via": "nag", "position": 1}
 {"word": "nagging", "synonym": "shrewish", "via": "nagging", "position": 1}
+{"word": "nagor", "synonym": "reedbuck", "via": "nagor", "position": 1}
 {"word": "naif", "synonym": "naive", "via": "naif", "position": 1}
 {"word": "nail", "synonym": "complete", "via": "nail", "position": 1}
 {"word": "nail", "synonym": "collar", "via": "nail", "position": 2}
@@ -46,6 +48,7 @@
 {"word": "nail", "synonym": "nab", "via": "nail", "position": 5}
 {"word": "nail", "synonym": "cop", "via": "nail", "position": 6}
 {"word": "nail", "synonym": "pinpoint", "via": "nail", "position": 7}
+{"word": "naissance", "synonym": "birth", "via": "naissance", "position": 1}
 {"word": "naive", "synonym": "uninitiate", "via": "naive", "position": 1}
 {"word": "naive", "synonym": "uninitiated", "via": "naive", "position": 2}
 {"word": "naive", "synonym": "uninstructed", "via": "naive", "position": 3}
@@ -121,7 +124,9 @@
 {"word": "nance", "synonym": "poof", "via": "nancy", "position": 8}
 {"word": "nance", "synonym": "poove", "via": "nancy", "position": 9}
 {"word": "nance", "synonym": "pouf", "via": "nancy", "position": 10}
+{"word": "nang", "synonym": "cool", "via": "nang", "position": 1}
 {"word": "nanism", "synonym": "dwarfism", "via": "nanism", "position": 1}
+{"word": "nanite", "synonym": "nanobot", "via": "nanite", "position": 1}
 {"word": "nanny", "synonym": "nursemaid", "via": "nanny", "position": 1}
 {"word": "nanny", "synonym": "nurse", "via": "nanny", "position": 2}
 {"word": "nanometer", "synonym": "millimicron", "via": "nanometer", "position": 1}
@@ -136,6 +141,7 @@
 {"word": "napkin", "synonym": "serviette", "via": "napkin", "position": 3}
 {"word": "napoleon", "synonym": "nap", "via": "nap", "position": 1}
 {"word": "napoleon", "synonym": "nap", "via": "napoleon", "position": 1}
+{"word": "napoo", "synonym": "kaput", "via": "napoo", "position": 1}
 {"word": "napped", "synonym": "brushed", "via": "nap", "position": 1}
 {"word": "napped", "synonym": "fleecy", "via": "nap", "position": 2}
 {"word": "nappy", "synonym": "diaper", "via": "nappy", "position": 1}
@@ -152,6 +158,7 @@
 {"word": "narcissistic", "synonym": "egotistic", "via": "narcissistic", "position": 1}
 {"word": "narcissistic", "synonym": "egotistical", "via": "narcissistic", "position": 2}
 {"word": "narcist", "synonym": "narcissist", "via": "narcist", "position": 1}
+{"word": "narcoma", "synonym": "stupor", "via": "narcoma", "position": 1}
 {"word": "narcotic", "synonym": "soporiferous", "via": "narcotic", "position": 1}
 {"word": "narcotic", "synonym": "soporific", "via": "narcotic", "position": 2}
 {"word": "narcotic", "synonym": "narcotizing", "via": "narcotic", "position": 3}
@@ -233,6 +240,7 @@
 {"word": "nascency", "synonym": "birth", "via": "nascency", "position": 1}
 {"word": "nascency", "synonym": "nativity", "via": "nascency", "position": 2}
 {"word": "nascency", "synonym": "nascence", "via": "nascency", "position": 3}
+{"word": "nasho", "synonym": "conscription", "via": "nasho", "position": 1}
 {"word": "nastily", "synonym": "meanly", "via": "nastily", "position": 1}
 {"word": "nastiness", "synonym": "cattiness", "via": "nastiness", "position": 1}
 {"word": "nastiness", "synonym": "bitchiness", "via": "nastiness", "position": 2}
@@ -248,6 +256,7 @@
 {"word": "nasty", "synonym": "awful", "via": "nasty", "position": 5}
 {"word": "natality", "synonym": "birthrate", "via": "natality", "position": 1}
 {"word": "natality", "synonym": "fertility", "via": "natality", "position": 2}
+{"word": "natator", "synonym": "swimmer", "via": "natator", "position": 1}
 {"word": "nates", "synonym": "buttocks", "via": "nates", "position": 1}
 {"word": "nates", "synonym": "arse", "via": "nates", "position": 2}
 {"word": "nates", "synonym": "butt", "via": "nates", "position": 3}
@@ -323,6 +332,7 @@
 {"word": "naturalised", "synonym": "naturalized", "via": "naturalize", "position": 1}
 {"word": "naturalism", "synonym": "realism", "via": "naturalism", "position": 1}
 {"word": "naturalistic", "synonym": "realistic", "via": "naturalistic", "position": 1}
+{"word": "naturality", "synonym": "naturalness", "via": "naturality", "position": 1}
 {"word": "naturalize", "synonym": "domesticate", "via": "naturalize", "position": 1}
 {"word": "naturalize", "synonym": "cultivate", "via": "naturalize", "position": 2}
 {"word": "naturalize", "synonym": "naturalise", "via": "naturalize", "position": 3}
@@ -411,6 +421,7 @@
 {"word": "nautical", "synonym": "maritime", "via": "nautical", "position": 1}
 {"word": "nautical", "synonym": "marine", "via": "nautical", "position": 2}
 {"word": "nautilus", "synonym": "argonaut", "via": "nautilus", "position": 1}
+{"word": "nautophone", "synonym": "foghorn", "via": "nautophone", "position": 1}
 {"word": "navel", "synonym": "umbilicus", "via": "navel", "position": 1}
 {"word": "navel", "synonym": "bellybutton", "via": "navel", "position": 2}
 {"word": "navel", "synonym": "omphalos", "via": "navel", "position": 3}
@@ -499,6 +510,7 @@
 {"word": "nebulous", "synonym": "cloudy", "via": "nebulous", "position": 2}
 {"word": "nebulous", "synonym": "nebulose", "via": "nebulous", "position": 3}
 {"word": "nebulous", "synonym": "nebular", "via": "nebulous", "position": 4}
+{"word": "necessarian", "synonym": "necessitarian", "via": "necessarian", "position": 1}
 {"word": "necessarily", "synonym": "inevitably", "via": "necessarily", "position": 1}
 {"word": "necessarily", "synonym": "needs", "via": "necessarily", "position": 2}
 {"word": "necessarily", "synonym": "needfully", "via": "necessarily", "position": 3}
@@ -506,6 +518,7 @@
 {"word": "necessary", "synonym": "essential", "via": "necessary", "position": 2}
 {"word": "necessary", "synonym": "requirement", "via": "necessary", "position": 3}
 {"word": "necessary", "synonym": "requisite", "via": "necessary", "position": 4}
+{"word": "necessitarianism", "synonym": "determinism", "via": "necessitarianism", "position": 1}
 {"word": "necessitate", "synonym": "ask", "via": "necessitate", "position": 1}
 {"word": "necessitate", "synonym": "need", "via": "necessitate", "position": 2}
 {"word": "necessitate", "synonym": "require", "via": "necessitate", "position": 3}
@@ -523,6 +536,7 @@
 {"word": "neck", "synonym": "cervix", "via": "neck", "position": 1}
 {"word": "neckband", "synonym": "choker", "via": "neckband", "position": 1}
 {"word": "neckband", "synonym": "collar", "via": "neckband", "position": 2}
+{"word": "neckcloth", "synonym": "cravat", "via": "neckcloth", "position": 1}
 {"word": "necking", "synonym": "caressing", "via": "neck", "position": 1}
 {"word": "necking", "synonym": "cuddling", "via": "neck", "position": 2}
 {"word": "necking", "synonym": "fondling", "via": "neck", "position": 3}
@@ -549,17 +563,20 @@
 {"word": "necromancer", "synonym": "thaumaturge", "via": "necromancer", "position": 4}
 {"word": "necromancer", "synonym": "thaumaturgist", "via": "necromancer", "position": 5}
 {"word": "necromancy", "synonym": "sorcery", "via": "necromancy", "position": 1}
+{"word": "necromania", "synonym": "necrophilia", "via": "necromania", "position": 1}
 {"word": "necrophilia", "synonym": "necrophilism", "via": "necrophilia", "position": 1}
 {"word": "necrophilism", "synonym": "necrophilia", "via": "necrophilism", "position": 1}
 {"word": "necropolis", "synonym": "cemetery", "via": "necropolis", "position": 1}
 {"word": "necropolis", "synonym": "graveyard", "via": "necropolis", "position": 2}
 {"word": "necropsy", "synonym": "autopsy", "via": "necropsy", "position": 1}
 {"word": "necropsy", "synonym": "postmortem", "via": "necropsy", "position": 2}
+{"word": "necroscopy", "synonym": "autopsy", "via": "necroscopy", "position": 1}
 {"word": "necrose", "synonym": "gangrene", "via": "necrose", "position": 1}
 {"word": "necrose", "synonym": "mortify", "via": "necrose", "position": 2}
 {"word": "necrosis", "synonym": "mortification", "via": "necrosis", "position": 1}
 {"word": "necrosis", "synonym": "gangrene", "via": "necrosis", "position": 2}
 {"word": "nectar", "synonym": "ambrosia", "via": "nectar", "position": 1}
+{"word": "nectareous", "synonym": "nectarous", "via": "nectareous", "position": 1}
 {"word": "nectarous", "synonym": "ambrosial", "via": "nectarous", "position": 1}
 {"word": "neddy", "synonym": "donkey", "via": "neddy", "position": 1}
 {"word": "need", "synonym": "motivation", "via": "need", "position": 1}
@@ -691,13 +708,16 @@
 {"word": "nemesis", "synonym": "bane", "via": "nemesis", "position": 1}
 {"word": "nemesis", "synonym": "curse", "via": "nemesis", "position": 2}
 {"word": "nemesis", "synonym": "scourge", "via": "nemesis", "position": 3}
+{"word": "nemo", "synonym": "remote", "via": "nemo", "position": 1}
 {"word": "neoclassic", "synonym": "neoclassical", "via": "neoclassic", "position": 1}
 {"word": "neoclassical", "synonym": "neoclassic", "via": "neoclassical", "position": 1}
+{"word": "neoformation", "synonym": "tumor", "via": "neoformation", "position": 1}
 {"word": "neologism", "synonym": "neology", "via": "neologism", "position": 1}
 {"word": "neologism", "synonym": "coinage", "via": "neologism", "position": 2}
 {"word": "neology", "synonym": "neologism", "via": "neology", "position": 1}
 {"word": "neology", "synonym": "coinage", "via": "neology", "position": 2}
 {"word": "neonate", "synonym": "newborn", "via": "neonate", "position": 1}
+{"word": "neopallium", "synonym": "neocortex", "via": "neopallium", "position": 1}
 {"word": "neophyte", "synonym": "catechumen", "via": "neophyte", "position": 1}
 {"word": "neophyte", "synonym": "newcomer", "via": "neophyte", "position": 2}
 {"word": "neophyte", "synonym": "fledgling", "via": "neophyte", "position": 3}
@@ -706,6 +726,8 @@
 {"word": "neophyte", "synonym": "entrant", "via": "neophyte", "position": 6}
 {"word": "neoplasm", "synonym": "tumor", "via": "neoplasm", "position": 1}
 {"word": "neoplasm", "synonym": "tumour", "via": "neoplasm", "position": 2}
+{"word": "neoterize", "synonym": "neologize", "via": "neoterize", "position": 1}
+{"word": "neoytterbium", "synonym": "ytterbium", "via": "neoytterbium", "position": 1}
 {"word": "nepheline", "synonym": "nephelite", "via": "nepheline", "position": 1}
 {"word": "nephelite", "synonym": "nepheline", "via": "nephelite", "position": 1}
 {"word": "nephritic", "synonym": "renal", "via": "nephritic", "position": 1}
@@ -715,6 +737,7 @@
 {"word": "nerd", "synonym": "grind", "via": "nerd", "position": 2}
 {"word": "nerd", "synonym": "wonk", "via": "nerd", "position": 3}
 {"word": "nerd", "synonym": "dweeb", "via": "nerd", "position": 4}
+{"word": "nerval", "synonym": "neural", "via": "nerval", "position": 1}
 {"word": "nerve", "synonym": "boldness", "via": "nerve", "position": 1}
 {"word": "nerve", "synonym": "brass", "via": "nerve", "position": 2}
 {"word": "nerve", "synonym": "face", "via": "nerve", "position": 3}
@@ -819,6 +842,7 @@
 {"word": "netted", "synonym": "webbed", "via": "netted", "position": 3}
 {"word": "netted", "synonym": "weblike", "via": "netted", "position": 4}
 {"word": "netted", "synonym": "webby", "via": "netted", "position": 5}
+{"word": "nettie", "synonym": "netizen", "via": "nettie", "position": 1}
 {"word": "netting", "synonym": "gauze", "via": "net", "position": 1}
 {"word": "netting", "synonym": "veiling", "via": "net", "position": 2}
 {"word": "netting", "synonym": "gauze", "via": "netting", "position": 1}
@@ -851,6 +875,7 @@
 {"word": "nettled", "synonym": "roiled", "via": "nettled", "position": 7}
 {"word": "nettled", "synonym": "steamed", "via": "nettled", "position": 8}
 {"word": "nettled", "synonym": "stung", "via": "nettled", "position": 9}
+{"word": "nettlefish", "synonym": "jellyfish", "via": "nettlefish", "position": 1}
 {"word": "nettlesome", "synonym": "annoying", "via": "nettlesome", "position": 1}
 {"word": "nettlesome", "synonym": "bothersome", "via": "nettlesome", "position": 2}
 {"word": "nettlesome", "synonym": "galling", "via": "nettlesome", "position": 3}
@@ -869,10 +894,12 @@
 {"word": "neural", "synonym": "neuronal", "via": "neural", "position": 1}
 {"word": "neural", "synonym": "neuronic", "via": "neural", "position": 2}
 {"word": "neural", "synonym": "nervous", "via": "neural", "position": 3}
+{"word": "neurilemmoma", "synonym": "schwannoma", "via": "neurilemmoma", "position": 1}
 {"word": "neuroglia", "synonym": "glia", "via": "neuroglia", "position": 1}
 {"word": "neuroleptic", "synonym": "antipsychotic", "via": "neuroleptic", "position": 1}
 {"word": "neurologic", "synonym": "neurological", "via": "neurological", "position": 1}
 {"word": "neurological", "synonym": "neurologic", "via": "neurological", "position": 1}
+{"word": "neuromotor", "synonym": "neuromuscular", "via": "neuromotor", "position": 1}
 {"word": "neuronal", "synonym": "neural", "via": "neuronal", "position": 1}
 {"word": "neuronal", "synonym": "neuronic", "via": "neuronal", "position": 2}
 {"word": "neuronic", "synonym": "neural", "via": "neuronic", "position": 1}
@@ -911,6 +938,7 @@
 {"word": "neutralize", "synonym": "countervail", "via": "neutralize", "position": 7}
 {"word": "neutralize", "synonym": "counterbalance", "via": "neutralize", "position": 8}
 {"word": "neutralized", "synonym": "neutralised", "via": "neutralize", "position": 1}
+{"word": "nevermind", "synonym": "heed", "via": "nevermind", "position": 1}
 {"word": "nevertheless", "synonym": "however", "via": "nevertheless", "position": 1}
 {"word": "nevertheless", "synonym": "withal", "via": "nevertheless", "position": 2}
 {"word": "nevertheless", "synonym": "still", "via": "nevertheless", "position": 3}
@@ -965,6 +993,7 @@
 {"word": "newsy", "synonym": "chatty", "via": "newsy", "position": 1}
 {"word": "newsy", "synonym": "gossipy", "via": "newsy", "position": 2}
 {"word": "newt", "synonym": "triton", "via": "newt", "position": 1}
+{"word": "newted", "synonym": "drunk", "via": "newted", "position": 1}
 {"word": "next", "synonym": "following", "via": "next", "position": 1}
 {"word": "next", "synonym": "adjacent", "via": "next", "position": 2}
 {"word": "next", "synonym": "future", "via": "next", "position": 3}
@@ -995,6 +1024,7 @@
 {"word": "niche", "synonym": "recess", "via": "niche", "position": 1}
 {"word": "niche", "synonym": "recession", "via": "niche", "position": 2}
 {"word": "niche", "synonym": "corner", "via": "niche", "position": 3}
+{"word": "nicht", "synonym": "night", "via": "nicht", "position": 1}
 {"word": "nick", "synonym": "notch", "via": "nick", "position": 1}
 {"word": "nick", "synonym": "snick", "via": "nick", "position": 2}
 {"word": "nick", "synonym": "dent", "via": "nick", "position": 3}
@@ -1025,7 +1055,10 @@
 {"word": "nictitate", "synonym": "blink", "via": "nictitate", "position": 1}
 {"word": "nictitate", "synonym": "wink", "via": "nictitate", "position": 2}
 {"word": "nictitate", "synonym": "nictate", "via": "nictitate", "position": 3}
+{"word": "niddick", "synonym": "nape", "via": "niddick", "position": 1}
 {"word": "nidus", "synonym": "focus", "via": "nidus", "position": 1}
+{"word": "niffy", "synonym": "smelly", "via": "niffy", "position": 1}
+{"word": "niffy", "synonym": "stinky", "via": "niffy", "position": 2}
 {"word": "nifty", "synonym": "bully", "via": "nifty", "position": 1}
 {"word": "nifty", "synonym": "corking", "via": "nifty", "position": 2}
 {"word": "nifty", "synonym": "cracking", "via": "nifty", "position": 3}
@@ -1123,6 +1156,9 @@
 {"word": "nighttime", "synonym": "night", "via": "nighttime", "position": 1}
 {"word": "nighttime", "synonym": "dark", "via": "nighttime", "position": 2}
 {"word": "nightwear", "synonym": "sleepwear", "via": "nightwear", "position": 1}
+{"word": "nigrescent", "synonym": "blackish", "via": "nigrescent", "position": 1}
+{"word": "nigritude", "synonym": "blackness", "via": "nigritude", "position": 1}
+{"word": "nigritude", "synonym": "darkness", "via": "nigritude", "position": 2}
 {"word": "nihility", "synonym": "nothingness", "via": "nihility", "position": 1}
 {"word": "nihility", "synonym": "void", "via": "nihility", "position": 2}
 {"word": "nihility", "synonym": "nullity", "via": "nihility", "position": 3}
@@ -1154,6 +1190,7 @@
 {"word": "nimiety", "synonym": "excess", "via": "nimiety", "position": 1}
 {"word": "nimiety", "synonym": "surplus", "via": "nimiety", "position": 2}
 {"word": "nimiety", "synonym": "surplusage", "via": "nimiety", "position": 3}
+{"word": "nimps", "synonym": "easy", "via": "nimps", "position": 1}
 {"word": "nincompoop", "synonym": "poop", "via": "nincompoop", "position": 1}
 {"word": "nincompoop", "synonym": "ninny", "via": "nincompoop", "position": 2}
 {"word": "nine", "synonym": "club", "via": "nine", "position": 1}
@@ -1164,6 +1201,7 @@
 {"word": "ninepins", "synonym": "skittles", "via": "ninepins", "position": 1}
 {"word": "ninny", "synonym": "nincompoop", "via": "ninny", "position": 1}
 {"word": "ninny", "synonym": "poop", "via": "ninny", "position": 2}
+{"word": "niobite", "synonym": "columbite", "via": "niobite", "position": 1}
 {"word": "nip", "synonym": "pinch", "via": "nip", "position": 1}
 {"word": "nip", "synonym": "chilliness", "via": "nip", "position": 2}
 {"word": "nip", "synonym": "coolness", "via": "nip", "position": 3}
@@ -1207,6 +1245,8 @@
 {"word": "nisus", "synonym": "strain", "via": "nisus", "position": 3}
 {"word": "niter", "synonym": "saltpeter", "via": "niter", "position": 1}
 {"word": "niter", "synonym": "nitre", "via": "niter", "position": 2}
+{"word": "nither", "synonym": "shiver", "via": "nither", "position": 1}
+{"word": "nither", "synonym": "tremble", "via": "nither", "position": 2}
 {"word": "nitid", "synonym": "agleam", "via": "nitid", "position": 1}
 {"word": "nitid", "synonym": "gleaming", "via": "nitid", "position": 2}
 {"word": "nitre", "synonym": "saltpeter", "via": "nitre", "position": 1}
@@ -1222,6 +1262,8 @@
 {"word": "nitroglycerine", "synonym": "nitroglycerin", "via": "nitroglycerine", "position": 1}
 {"word": "nitwit", "synonym": "dimwit", "via": "nitwit", "position": 1}
 {"word": "nitwit", "synonym": "doofus", "via": "nitwit", "position": 2}
+{"word": "nitwitted", "synonym": "dimwitted", "via": "nitwitted", "position": 1}
+{"word": "nitwitted", "synonym": "foolish", "via": "nitwitted", "position": 2}
 {"word": "nix", "synonym": "nothing", "via": "nix", "position": 1}
 {"word": "nix", "synonym": "nil", "via": "nix", "position": 2}
 {"word": "nix", "synonym": "nada", "via": "nix", "position": 3}
@@ -1232,6 +1274,8 @@
 {"word": "nix", "synonym": "naught", "via": "nix", "position": 8}
 {"word": "nix", "synonym": "zero", "via": "nix", "position": 9}
 {"word": "nix", "synonym": "zilch", "via": "nix", "position": 10}
+{"word": "nixer", "synonym": "sideline", "via": "nixer", "position": 1}
+{"word": "nkosi", "synonym": "chief", "via": "nkosi", "position": 1}
 {"word": "nob", "synonym": "toff", "via": "knob", "position": 1}
 {"word": "nob", "synonym": "toff", "via": "nob", "position": 1}
 {"word": "nobble", "synonym": "snatch", "via": "nobble", "position": 1}
@@ -1242,6 +1286,8 @@
 {"word": "nobble", "synonym": "abstract", "via": "nobble", "position": 6}
 {"word": "nobble", "synonym": "swipe", "via": "nobble", "position": 7}
 {"word": "nobble", "synonym": "hook", "via": "nobble", "position": 8}
+{"word": "nobbut", "synonym": "only", "via": "nobbut", "position": 1}
+{"word": "nobbut", "synonym": "merely", "via": "nobbut", "position": 2}
 {"word": "nobility", "synonym": "nobleness", "via": "nobility", "position": 1}
 {"word": "nobility", "synonym": "grandeur", "via": "nobility", "position": 2}
 {"word": "nobility", "synonym": "aristocracy", "via": "nobility", "position": 3}
@@ -1265,8 +1311,10 @@
 {"word": "nock", "synonym": "mark", "via": "knock", "position": 2}
 {"word": "nock", "synonym": "score", "via": "nock", "position": 1}
 {"word": "nock", "synonym": "mark", "via": "nock", "position": 2}
+{"word": "noctambulism", "synonym": "somnambulism", "via": "noctambulism", "position": 1}
 {"word": "noctambulist", "synonym": "sleepwalker", "via": "noctambulist", "position": 1}
 {"word": "noctambulist", "synonym": "somnambulist", "via": "noctambulist", "position": 2}
+{"word": "noctambulous", "synonym": "somnambulant", "via": "noctambulous", "position": 1}
 {"word": "nocturne", "synonym": "notturno", "via": "nocturne", "position": 1}
 {"word": "nodding", "synonym": "cernuous", "via": "nod", "position": 1}
 {"word": "nodding", "synonym": "drooping", "via": "nod", "position": 2}
@@ -1296,6 +1344,7 @@
 {"word": "noggin", "synonym": "bean", "via": "nogging", "position": 2}
 {"word": "noggin", "synonym": "noodle", "via": "nogging", "position": 3}
 {"word": "noggin", "synonym": "dome", "via": "nogging", "position": 4}
+{"word": "nointer", "synonym": "scamp", "via": "nointer", "position": 1}
 {"word": "noise", "synonym": "randomness", "via": "noise", "position": 1}
 {"word": "noise", "synonym": "haphazardness", "via": "noise", "position": 2}
 {"word": "noise", "synonym": "dissonance", "via": "noise", "position": 3}
@@ -1304,6 +1353,7 @@
 {"word": "noise", "synonym": "disturbance", "via": "noise", "position": 6}
 {"word": "noise", "synonym": "resound", "via": "noise", "position": 7}
 {"word": "noiselessly", "synonym": "soundlessly", "via": "noiselessly", "position": 1}
+{"word": "noiseproof", "synonym": "soundproof", "via": "noiseproof", "position": 1}
 {"word": "noisome", "synonym": "fetid", "via": "noisome", "position": 1}
 {"word": "noisome", "synonym": "foetid", "via": "noisome", "position": 2}
 {"word": "noisome", "synonym": "foul", "via": "noisome", "position": 3}
@@ -1356,6 +1406,7 @@
 {"word": "noncitizen", "synonym": "alien", "via": "noncitizen", "position": 2}
 {"word": "noncitizen", "synonym": "outlander", "via": "noncitizen", "position": 3}
 {"word": "noncombustible", "synonym": "incombustible", "via": "noncombustible", "position": 1}
+{"word": "noncommunicative", "synonym": "uncommunicative", "via": "noncommunicative", "position": 1}
 {"word": "noncompliance", "synonym": "disobedience", "via": "noncompliance", "position": 1}
 {"word": "noncompliant", "synonym": "balker", "via": "noncompliant", "position": 1}
 {"word": "noncompliant", "synonym": "defiant", "via": "noncompliant", "position": 2}
@@ -1372,10 +1423,16 @@
 {"word": "nonconformist", "synonym": "nonconforming", "via": "nonconformist", "position": 2}
 {"word": "nonconformity", "synonym": "nonconformance", "via": "nonconformity", "position": 1}
 {"word": "nonconformity", "synonym": "nonconformism", "via": "nonconformity", "position": 2}
+{"word": "nonconsciously", "synonym": "unconsciously", "via": "nonconsciously", "position": 1}
+{"word": "nonconsequential", "synonym": "inconsequential", "via": "nonconsequential", "position": 1}
 {"word": "noncontinuous", "synonym": "discontinuous", "via": "noncontinuous", "position": 1}
+{"word": "nonconventional", "synonym": "unconventional", "via": "nonconventional", "position": 1}
 {"word": "noncritical", "synonym": "uncritical", "via": "noncritical", "position": 1}
 {"word": "noncyclic", "synonym": "noncyclical", "via": "noncyclic", "position": 1}
 {"word": "noncyclical", "synonym": "noncyclic", "via": "noncyclical", "position": 1}
+{"word": "nondefinable", "synonym": "undefinable", "via": "nondefinable", "position": 1}
+{"word": "nondefinable", "synonym": "indefinable", "via": "nondefinable", "position": 2}
+{"word": "nondefinite", "synonym": "indefinite", "via": "nondefinite", "position": 1}
 {"word": "nondescript", "synonym": "characterless", "via": "nondescript", "position": 1}
 {"word": "nondrinker", "synonym": "abstainer", "via": "nondrinker", "position": 1}
 {"word": "nondrinker", "synonym": "abstinent", "via": "nondrinker", "position": 2}
@@ -1414,6 +1471,7 @@
 {"word": "nonimmune", "synonym": "nonresistant", "via": "nonimmune", "position": 2}
 {"word": "nonimmune", "synonym": "unresistant", "via": "nonimmune", "position": 3}
 {"word": "nonintegrated", "synonym": "unintegrated", "via": "nonintegrated", "position": 1}
+{"word": "nonintrusively", "synonym": "unobtrusively", "via": "nonintrusively", "position": 1}
 {"word": "nonionic", "synonym": "unionized", "via": "nonionic", "position": 1}
 {"word": "nonionic", "synonym": "unionised", "via": "nonionic", "position": 2}
 {"word": "nonkosher", "synonym": "tref", "via": "nonkosher", "position": 1}
@@ -1429,12 +1487,15 @@
 {"word": "nonmetallic", "synonym": "nonmetal", "via": "nonmetallic", "position": 1}
 {"word": "nonmigratory", "synonym": "resident", "via": "nonmigratory", "position": 1}
 {"word": "nonmilitary", "synonym": "unmilitary", "via": "nonmilitary", "position": 1}
+{"word": "nonmiscible", "synonym": "immiscible", "via": "nonmiscible", "position": 1}
 {"word": "nonmotile", "synonym": "immotile", "via": "nonmotile", "position": 1}
 {"word": "nonmoving", "synonym": "unmoving", "via": "nonmoving", "position": 1}
 {"word": "nonmusical", "synonym": "unmusical", "via": "nonmusical", "position": 1}
+{"word": "nonnasal", "synonym": "oral", "via": "nonnasal", "position": 1}
 {"word": "nonnatural", "synonym": "otherworldly", "via": "nonnatural", "position": 1}
 {"word": "nonnatural", "synonym": "preternatural", "via": "nonnatural", "position": 2}
 {"word": "nonnatural", "synonym": "transcendental", "via": "nonnatural", "position": 3}
+{"word": "nonobedience", "synonym": "disobedience", "via": "nonobedience", "position": 1}
 {"word": "nonobjective", "synonym": "abstract", "via": "nonobjective", "position": 1}
 {"word": "nonobjective", "synonym": "abstractionist", "via": "nonobjective", "position": 2}
 {"word": "nonobjective", "synonym": "nonfigurative", "via": "nonobjective", "position": 3}
@@ -1453,6 +1514,7 @@
 {"word": "nonperformance", "synonym": "negligence", "via": "nonperformance", "position": 1}
 {"word": "nonperformance", "synonym": "carelessness", "via": "nonperformance", "position": 2}
 {"word": "nonperformance", "synonym": "neglect", "via": "nonperformance", "position": 3}
+{"word": "nonpermanent", "synonym": "temporary", "via": "nonpermanent", "position": 1}
 {"word": "nonperson", "synonym": "unperson", "via": "nonperson", "position": 1}
 {"word": "nonphysical", "synonym": "intangible", "via": "nonphysical", "position": 1}
 {"word": "nonplus", "synonym": "perplex", "via": "nonplus", "position": 1}
@@ -1475,11 +1537,13 @@
 {"word": "nonplussed", "synonym": "puzzled", "via": "nonplussed", "position": 2}
 {"word": "nonpoisonous", "synonym": "nontoxic", "via": "nonpoisonous", "position": 1}
 {"word": "nonpolar", "synonym": "nonionic", "via": "nonpolar", "position": 1}
+{"word": "nonpro", "synonym": "amateur", "via": "nonpro", "position": 1}
 {"word": "nonprogressive", "synonym": "fusty", "via": "nonprogressive", "position": 1}
 {"word": "nonprogressive", "synonym": "standpat", "via": "nonprogressive", "position": 2}
 {"word": "nonprogressive", "synonym": "unprogressive", "via": "nonprogressive", "position": 3}
 {"word": "nonrational", "synonym": "intuitive", "via": "nonrational", "position": 1}
 {"word": "nonrational", "synonym": "visceral", "via": "nonrational", "position": 2}
+{"word": "nonreadable", "synonym": "unreadable", "via": "nonreadable", "position": 1}
 {"word": "nonreader", "synonym": "illiterate", "via": "nonreader", "position": 1}
 {"word": "nonresistant", "synonym": "nonimmune", "via": "nonresistant", "position": 1}
 {"word": "nonresistant", "synonym": "unresistant", "via": "nonresistant", "position": 2}
@@ -1497,6 +1561,7 @@
 {"word": "nonsensical", "synonym": "preposterous", "via": "nonsensical", "position": 7}
 {"word": "nonsensical", "synonym": "ridiculous", "via": "nonsensical", "position": 8}
 {"word": "nonsexual", "synonym": "asexual", "via": "nonsexual", "position": 1}
+{"word": "nonsighted", "synonym": "blind", "via": "nonsighted", "position": 1}
 {"word": "nonsocial", "synonym": "nongregarious", "via": "nonsocial", "position": 1}
 {"word": "nonsocial", "synonym": "solitary", "via": "nonsocial", "position": 2}
 {"word": "nonstarter", "synonym": "failure", "via": "nonstarter", "position": 1}
@@ -1515,9 +1580,12 @@
 {"word": "nontechnical", "synonym": "untechnical", "via": "nontechnical", "position": 1}
 {"word": "nontoxic", "synonym": "nonpoisonous", "via": "nontoxic", "position": 1}
 {"word": "nontraditional", "synonym": "untraditional", "via": "nontraditional", "position": 1}
+{"word": "nontransparent", "synonym": "opaque", "via": "nontransparent", "position": 1}
+{"word": "nonunderstanding", "synonym": "uncomprehending", "via": "nonunderstanding", "position": 1}
 {"word": "nonuniform", "synonym": "inhomogeneous", "via": "nonuniform", "position": 1}
 {"word": "nonunionized", "synonym": "unorganized", "via": "nonunionized", "position": 1}
 {"word": "nonuple", "synonym": "ninefold", "via": "nonuple", "position": 1}
+{"word": "nonvariable", "synonym": "invariable", "via": "nonvariable", "position": 1}
 {"word": "nonverbal", "synonym": "gestural", "via": "nonverbal", "position": 1}
 {"word": "nonviolent", "synonym": "unbloody", "via": "nonviolent", "position": 1}
 {"word": "nonvoluntary", "synonym": "involuntary", "via": "nonvoluntary", "position": 1}
@@ -1543,6 +1611,7 @@
 {"word": "noontide", "synonym": "noonday", "via": "noontide", "position": 3}
 {"word": "noose", "synonym": "snare", "via": "noose", "position": 1}
 {"word": "noose", "synonym": "gin", "via": "noose", "position": 2}
+{"word": "noplace", "synonym": "nowhere", "via": "noplace", "position": 1}
 {"word": "noradrenaline", "synonym": "norepinephrine", "via": "noradrenaline", "position": 1}
 {"word": "norepinephrine", "synonym": "noradrenaline", "via": "norepinephrine", "position": 1}
 {"word": "norm", "synonym": "average", "via": "norm", "position": 1}
@@ -1579,6 +1648,8 @@
 {"word": "northerly", "synonym": "northwards", "via": "northerly", "position": 4}
 {"word": "northerly", "synonym": "northward", "via": "northerly", "position": 5}
 {"word": "northern", "synonym": "northerly", "via": "northern", "position": 1}
+{"word": "northmost", "synonym": "northernmost", "via": "northmost", "position": 1}
+{"word": "northpaw", "synonym": "righty", "via": "northpaw", "position": 1}
 {"word": "northward", "synonym": "north", "via": "northward", "position": 1}
 {"word": "northward", "synonym": "northbound", "via": "northward", "position": 2}
 {"word": "northward", "synonym": "northerly", "via": "northward", "position": 3}
@@ -1604,6 +1675,7 @@
 {"word": "nosebag", "synonym": "feedbag", "via": "nosebag", "position": 1}
 {"word": "noseband", "synonym": "nosepiece", "via": "noseband", "position": 1}
 {"word": "nosebleed", "synonym": "epistaxis", "via": "nosebleed", "position": 1}
+{"word": "nosecount", "synonym": "headcount", "via": "nosecount", "position": 1}
 {"word": "nosedive", "synonym": "dive", "via": "nosedive", "position": 1}
 {"word": "nosegay", "synonym": "bouquet", "via": "nosegay", "position": 1}
 {"word": "nosegay", "synonym": "corsage", "via": "nosegay", "position": 2}
@@ -1615,6 +1687,8 @@
 {"word": "nosey", "synonym": "snoopy", "via": "nosy", "position": 3}
 {"word": "nosh", "synonym": "snack", "via": "nosh", "position": 1}
 {"word": "nosiness", "synonym": "prying", "via": "nosiness", "position": 1}
+{"word": "nostology", "synonym": "gerontology", "via": "nostology", "position": 1}
+{"word": "nostology", "synonym": "geriatrics", "via": "nostology", "position": 2}
 {"word": "nostrum", "synonym": "panacea", "via": "nostrum", "position": 1}
 {"word": "nostrum", "synonym": "catholicon", "via": "nostrum", "position": 2}
 {"word": "nosy", "synonym": "nosey", "via": "nosy", "position": 1}
@@ -1635,6 +1709,7 @@
 {"word": "notably", "synonym": "unusually", "via": "notably", "position": 1}
 {"word": "notably", "synonym": "remarkably", "via": "notably", "position": 2}
 {"word": "notably", "synonym": "unco", "via": "notably", "position": 3}
+{"word": "notaire", "synonym": "notary", "via": "notaire", "position": 1}
 {"word": "notation", "synonym": "note", "via": "notation", "position": 1}
 {"word": "notation", "synonym": "annotation", "via": "notation", "position": 2}
 {"word": "notch", "synonym": "nick", "via": "notch", "position": 1}
@@ -1971,6 +2046,7 @@
 {"word": "nuptial", "synonym": "spousal", "via": "nuptial", "position": 2}
 {"word": "nuptials", "synonym": "wedding", "via": "nuptials", "position": 1}
 {"word": "nuptials", "synonym": "hymeneals", "via": "nuptials", "position": 2}
+{"word": "nuque", "synonym": "nape", "via": "nuque", "position": 1}
 {"word": "nurse", "synonym": "nanny", "via": "nurse", "position": 1}
 {"word": "nurse", "synonym": "nursemaid", "via": "nurse", "position": 2}
 {"word": "nurse", "synonym": "suckle", "via": "nurse", "position": 3}
@@ -2077,6 +2153,7 @@
 {"word": "nuzzle", "synonym": "snuggle", "via": "nuzzle", "position": 3}
 {"word": "nuzzle", "synonym": "nestle", "via": "nuzzle", "position": 4}
 {"word": "nuzzle", "synonym": "nest", "via": "nuzzle", "position": 5}
+{"word": "nycturia", "synonym": "nocturia", "via": "nycturia", "position": 1}
 {"word": "nylghai", "synonym": "nilgai", "via": "nilgai", "position": 1}
 {"word": "nylghai", "synonym": "nylghau", "via": "nilgai", "position": 2}
 {"word": "nylghau", "synonym": "nilgai", "via": "nilgai", "position": 1}

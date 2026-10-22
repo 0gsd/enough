@@ -4,6 +4,7 @@
 {"word": "gab", "synonym": "causerie", "via": "gab", "position": 4}
 {"word": "gab", "synonym": "yak", "via": "gab", "position": 5}
 {"word": "gabardine", "synonym": "gaberdine", "via": "gabardine", "position": 1}
+{"word": "gabba", "synonym": "pal", "via": "gabba", "position": 1}
 {"word": "gabble", "synonym": "jabber", "via": "gabble", "position": 1}
 {"word": "gabble", "synonym": "jabbering", "via": "gabble", "position": 2}
 {"word": "gabble", "synonym": "chatter", "via": "gabble", "position": 3}
@@ -20,6 +21,8 @@
 {"word": "gaberdine", "synonym": "duster", "via": "gabardine", "position": 1}
 {"word": "gaberdine", "synonym": "gabardine", "via": "gabardine", "position": 2}
 {"word": "gaberdine", "synonym": "smock", "via": "gabardine", "position": 3}
+{"word": "gaberlunzie", "synonym": "beggar", "via": "gaberlunzie", "position": 1}
+{"word": "gaberlunzie", "synonym": "mendicant", "via": "gaberlunzie", "position": 2}
 {"word": "gabfest", "synonym": "chitchat", "via": "gabfest", "position": 1}
 {"word": "gabfest", "synonym": "gab", "via": "gabfest", "position": 2}
 {"word": "gabfest", "synonym": "gossip", "via": "gabfest", "position": 3}
@@ -37,6 +40,8 @@
 {"word": "gadget", "synonym": "gizmo", "via": "gadget", "position": 5}
 {"word": "gadget", "synonym": "gismo", "via": "gadget", "position": 6}
 {"word": "gadget", "synonym": "widget", "via": "gadget", "position": 7}
+{"word": "gadgie", "synonym": "fellow", "via": "gadgie", "position": 1}
+{"word": "gadgie", "synonym": "bloke", "via": "gadgie", "position": 2}
 {"word": "gaffe", "synonym": "solecism", "via": "gaffe", "position": 1}
 {"word": "gaffe", "synonym": "slip", "via": "gaffe", "position": 2}
 {"word": "gaffe", "synonym": "gaucherie", "via": "gaffe", "position": 3}
@@ -45,6 +50,8 @@
 {"word": "gaffer", "synonym": "honcho", "via": "gaffer", "position": 3}
 {"word": "gaffer", "synonym": "boss", "via": "gaffer", "position": 4}
 {"word": "gaffer", "synonym": "antique", "via": "gaffer", "position": 5}
+{"word": "gaffle", "synonym": "seize", "via": "gaffle", "position": 1}
+{"word": "gaffle", "synonym": "grab", "via": "gaffle", "position": 2}
 {"word": "gag", "synonym": "muzzle", "via": "gag", "position": 1}
 {"word": "gag", "synonym": "joke", "via": "gag", "position": 2}
 {"word": "gag", "synonym": "laugh", "via": "gag", "position": 3}
@@ -110,9 +117,16 @@
 {"word": "gala", "synonym": "blowout", "via": "gala", "position": 2}
 {"word": "galactic", "synonym": "astronomic", "via": "galactic", "position": 1}
 {"word": "galactic", "synonym": "astronomical", "via": "galactic", "position": 2}
+{"word": "galactoid", "synonym": "milky", "via": "galactoid", "position": 1}
+{"word": "galactophorous", "synonym": "lactiferous", "via": "galactophorous", "position": 1}
+{"word": "galactopoietic", "synonym": "lactogenic", "via": "galactopoietic", "position": 1}
+{"word": "galactosan", "synonym": "galactan", "via": "galactosan", "position": 1}
+{"word": "galactoscope", "synonym": "lactoscope", "via": "galactoscope", "position": 1}
 {"word": "galangal", "synonym": "galingale", "via": "galangal", "position": 1}
-{"word": "galax", "synonym": "galaxy", "via": "galax", "position": 1}
-{"word": "galax", "synonym": "coltsfoot", "via": "galax", "position": 2}
+{"word": "galerie", "synonym": "porch", "via": "galerie", "position": 1}
+{"word": "galerie", "synonym": "veranda", "via": "galerie", "position": 2}
+{"word": "galimatias", "synonym": "gibberish", "via": "galimatias", "position": 1}
+{"word": "galimatias", "synonym": "nonsense", "via": "galimatias", "position": 2}
 {"word": "galingale", "synonym": "galangal", "via": "galangal", "position": 1}
 {"word": "galingale", "synonym": "galangal", "via": "galingale", "position": 1}
 {"word": "gall", "synonym": "crust", "via": "gall", "position": 1}
@@ -185,6 +199,7 @@
 {"word": "gallus", "synonym": "suspender", "via": "gallows", "position": 2}
 {"word": "gallus", "synonym": "brace", "via": "gallus", "position": 1}
 {"word": "gallus", "synonym": "suspender", "via": "gallus", "position": 2}
+{"word": "gallyhoot", "synonym": "gallivant", "via": "gallyhoot", "position": 1}
 {"word": "galore", "synonym": "abounding", "via": "galore", "position": 1}
 {"word": "galosh", "synonym": "arctic", "via": "galosh", "position": 1}
 {"word": "galosh", "synonym": "golosh", "via": "galosh", "position": 2}
@@ -257,6 +272,7 @@
 {"word": "gaming", "synonym": "play", "via": "game", "position": 2}
 {"word": "gaming", "synonym": "gambling", "via": "gaming", "position": 1}
 {"word": "gaming", "synonym": "play", "via": "gaming", "position": 2}
+{"word": "gammagram", "synonym": "scintigram", "via": "gammagram", "position": 1}
 {"word": "gammon", "synonym": "ham", "via": "gammon", "position": 1}
 {"word": "gamopetalous", "synonym": "sympetalous", "via": "gamopetalous", "position": 1}
 {"word": "gamp", "synonym": "brolly", "via": "gamp", "position": 1}
@@ -345,6 +361,8 @@
 {"word": "gape", "synonym": "yaw", "via": "gape", "position": 5}
 {"word": "gaping", "synonym": "agape", "via": "gape", "position": 1}
 {"word": "gaping", "synonym": "agape", "via": "gaping", "position": 1}
+{"word": "gapless", "synonym": "continuous", "via": "gapless", "position": 1}
+{"word": "gapless", "synonym": "unbroken", "via": "gapless", "position": 2}
 {"word": "gar", "synonym": "billfish", "via": "gar", "position": 1}
 {"word": "gar", "synonym": "garfish", "via": "gar", "position": 2}
 {"word": "gar", "synonym": "garpike", "via": "gar", "position": 3}
@@ -470,6 +488,7 @@
 {"word": "garrotte", "synonym": "garrote", "via": "garrote", "position": 1}
 {"word": "garrotte", "synonym": "garotte", "via": "garrote", "position": 2}
 {"word": "garrotte", "synonym": "scrag", "via": "garrote", "position": 3}
+{"word": "garrotty", "synonym": "insane", "via": "garrotty", "position": 1}
 {"word": "garrulity", "synonym": "garrulousness", "via": "garrulity", "position": 1}
 {"word": "garrulity", "synonym": "loquaciousness", "via": "garrulity", "position": 2}
 {"word": "garrulity", "synonym": "loquacity", "via": "garrulity", "position": 3}
@@ -531,7 +550,10 @@
 {"word": "gasp", "synonym": "heave", "via": "gasp", "position": 3}
 {"word": "gassy", "synonym": "colicky", "via": "gassy", "position": 1}
 {"word": "gassy", "synonym": "flatulent", "via": "gassy", "position": 2}
+{"word": "gasthaus", "synonym": "inn", "via": "gasthaus", "position": 1}
+{"word": "gasthaus", "synonym": "tavern", "via": "gasthaus", "position": 2}
 {"word": "gastric", "synonym": "stomachic", "via": "gastric", "position": 1}
+{"word": "gastroenteric", "synonym": "gastrointestinal", "via": "gastroenteric", "position": 1}
 {"word": "gastronome", "synonym": "epicure", "via": "gastronome", "position": 1}
 {"word": "gastronome", "synonym": "gourmet", "via": "gastronome", "position": 2}
 {"word": "gastronome", "synonym": "epicurean", "via": "gastronome", "position": 3}
@@ -568,6 +590,7 @@
 {"word": "gathering", "synonym": "assembly", "via": "gathering", "position": 2}
 {"word": "gathering", "synonym": "assemblage", "via": "gathering", "position": 3}
 {"word": "gator", "synonym": "alligator", "via": "gator", "position": 1}
+{"word": "gaubey", "synonym": "gawper", "via": "gaubey", "position": 1}
 {"word": "gauche", "synonym": "graceless", "via": "gauche", "position": 1}
 {"word": "gauche", "synonym": "unpolished", "via": "gauche", "position": 2}
 {"word": "gaucheness", "synonym": "crudeness", "via": "gaucheness", "position": 1}
@@ -691,11 +714,14 @@
 {"word": "geek", "synonym": "eccentric", "via": "geek", "position": 1}
 {"word": "geek", "synonym": "flake", "via": "geek", "position": 2}
 {"word": "geek", "synonym": "oddball", "via": "geek", "position": 3}
+{"word": "geetus", "synonym": "money", "via": "geetus", "position": 1}
+{"word": "geist", "synonym": "ethos", "via": "geist", "position": 1}
 {"word": "gel", "synonym": "gelatin", "via": "gel", "position": 1}
 {"word": "gel", "synonym": "mousse", "via": "gel", "position": 2}
 {"word": "gelatin", "synonym": "gel", "via": "gelatin", "position": 1}
 {"word": "gelatin", "synonym": "jelly", "via": "gelatin", "position": 2}
 {"word": "gelatin", "synonym": "gelatine", "via": "gelatin", "position": 3}
+{"word": "gelatinate", "synonym": "gelatinize", "via": "gelatinate", "position": 1}
 {"word": "gelatine", "synonym": "gelatin", "via": "gelatin", "position": 1}
 {"word": "gelatinous", "synonym": "jellylike", "via": "gelatinous", "position": 1}
 {"word": "geld", "synonym": "cut", "via": "geld", "position": 1}
@@ -750,6 +776,7 @@
 {"word": "gemmed", "synonym": "sequined", "via": "gemmed", "position": 4}
 {"word": "gemmed", "synonym": "spangled", "via": "gemmed", "position": 5}
 {"word": "gemmed", "synonym": "spangly", "via": "gemmed", "position": 6}
+{"word": "gemors", "synonym": "mess", "via": "gemors", "position": 1}
 {"word": "gemsbok", "synonym": "gemsbuck", "via": "gemsbok", "position": 1}
 {"word": "gemsbuck", "synonym": "gemsbok", "via": "gemsbok", "position": 1}
 {"word": "gemstone", "synonym": "gem", "via": "gemstone", "position": 1}
@@ -760,11 +787,13 @@
 {"word": "gender", "synonym": "sexuality", "via": "gender", "position": 2}
 {"word": "gene", "synonym": "cistron", "via": "gene", "position": 1}
 {"word": "gene", "synonym": "factor", "via": "gene", "position": 2}
+{"word": "genearch", "synonym": "patriarch", "via": "genearch", "position": 1}
 {"word": "general", "synonym": "cosmopolitan", "via": "general", "position": 1}
 {"word": "general", "synonym": "ecumenical", "via": "general", "position": 2}
 {"word": "general", "synonym": "oecumenical", "via": "general", "position": 3}
 {"word": "general", "synonym": "universal", "via": "general", "position": 4}
 {"word": "general", "synonym": "worldwide", "via": "general", "position": 5}
+{"word": "generalcy", "synonym": "generalship", "via": "generalcy", "position": 1}
 {"word": "generalisation", "synonym": "generalization", "via": "generalisation", "position": 1}
 {"word": "generalisation", "synonym": "induction", "via": "generalisation", "position": 2}
 {"word": "generalisation", "synonym": "abstraction", "via": "generalisation", "position": 3}
@@ -821,6 +850,7 @@
 {"word": "generously", "synonym": "liberally", "via": "generously", "position": 1}
 {"word": "generously", "synonym": "munificently", "via": "generously", "position": 2}
 {"word": "generousness", "synonym": "generosity", "via": "generousness", "position": 1}
+{"word": "genesic", "synonym": "genetic", "via": "genesic", "position": 1}
 {"word": "genesis", "synonym": "generation", "via": "genesis", "position": 1}
 {"word": "genetic", "synonym": "familial", "via": "genetic", "position": 1}
 {"word": "genetic", "synonym": "hereditary", "via": "genetic", "position": 2}
@@ -850,6 +880,8 @@
 {"word": "genie", "synonym": "djinni", "via": "genie", "position": 3}
 {"word": "genie", "synonym": "djinny", "via": "genie", "position": 4}
 {"word": "genie", "synonym": "djinn", "via": "genie", "position": 5}
+{"word": "genin", "synonym": "aglycone", "via": "genin", "position": 1}
+{"word": "genioplasty", "synonym": "mentoplasty", "via": "genioplasty", "position": 1}
 {"word": "genital", "synonym": "venereal", "via": "genital", "position": 1}
 {"word": "genitalia", "synonym": "genitals", "via": "genitalia", "position": 1}
 {"word": "genitalia", "synonym": "privates", "via": "genitalia", "position": 2}
@@ -899,6 +931,7 @@
 {"word": "gentile", "synonym": "heathen", "via": "gentile", "position": 2}
 {"word": "gentile", "synonym": "pagan", "via": "gentile", "position": 3}
 {"word": "gentile", "synonym": "infidel", "via": "gentile", "position": 4}
+{"word": "gentilism", "synonym": "heathenism", "via": "gentilism", "position": 1}
 {"word": "gentility", "synonym": "breeding", "via": "gentility", "position": 1}
 {"word": "gentility", "synonym": "genteelness", "via": "gentility", "position": 2}
 {"word": "gentle", "synonym": "pacify", "via": "gentle", "position": 1}
@@ -935,6 +968,7 @@
 {"word": "genuinely", "synonym": "authentically", "via": "genuinely", "position": 3}
 {"word": "genuineness", "synonym": "authenticity", "via": "genuineness", "position": 1}
 {"word": "genuineness", "synonym": "legitimacy", "via": "genuineness", "position": 2}
+{"word": "geocline", "synonym": "geosyncline", "via": "geocline", "position": 1}
 {"word": "geodesic", "synonym": "geodetic", "via": "geodesic", "position": 1}
 {"word": "geodetic", "synonym": "geodesic", "via": "geodetic", "position": 1}
 {"word": "geographic", "synonym": "geographical", "via": "geographic", "position": 1}
@@ -946,6 +980,7 @@
 {"word": "geometrical", "synonym": "geometric", "via": "geometrical", "position": 1}
 {"word": "geometrician", "synonym": "geometer", "via": "geometrician", "position": 1}
 {"word": "geomorphology", "synonym": "morphology", "via": "geomorphology", "position": 1}
+{"word": "geoponics", "synonym": "agriculture", "via": "geoponics", "position": 1}
 {"word": "gerbil", "synonym": "gerbille", "via": "gerbil", "position": 1}
 {"word": "gerbille", "synonym": "gerbil", "via": "gerbille", "position": 1}
 {"word": "gerfalcon", "synonym": "gyrfalcon", "via": "gyrfalcon", "position": 1}
@@ -1001,7 +1036,6 @@
 {"word": "gettable", "synonym": "obtainable", "via": "gettable", "position": 2}
 {"word": "gettable", "synonym": "procurable", "via": "gettable", "position": 3}
 {"word": "getting", "synonym": "acquiring", "via": "get", "position": 1}
-{"word": "getting", "synonym": "acquiring", "via": "getting", "position": 1}
 {"word": "getup", "synonym": "outfit", "via": "getup", "position": 1}
 {"word": "getup", "synonym": "rig", "via": "getup", "position": 2}
 {"word": "getup", "synonym": "turnout", "via": "getup", "position": 3}
@@ -1123,6 +1157,7 @@
 {"word": "gibingly", "synonym": "mockingly", "via": "gibingly", "position": 2}
 {"word": "giblet", "synonym": "giblets", "via": "giblet", "position": 1}
 {"word": "giblets", "synonym": "giblet", "via": "giblets", "position": 1}
+{"word": "gidday", "synonym": "hello", "via": "gidday", "position": 1}
 {"word": "giddily", "synonym": "dizzily", "via": "giddily", "position": 1}
 {"word": "giddiness", "synonym": "silliness", "via": "giddiness", "position": 1}
 {"word": "giddiness", "synonym": "dizziness", "via": "giddiness", "position": 2}
@@ -1150,12 +1185,15 @@
 {"word": "gig", "synonym": "fizgig", "via": "gigabyte", "position": 2}
 {"word": "gig", "synonym": "fishgig", "via": "gigabyte", "position": 3}
 {"word": "gig", "synonym": "lance", "via": "gigabyte", "position": 4}
+{"word": "gigacycle", "synonym": "gigahertz", "via": "gigacycle", "position": 1}
+{"word": "gigantean", "synonym": "gigantic", "via": "gigantean", "position": 1}
 {"word": "gigantic", "synonym": "mammoth", "via": "gigantic", "position": 1}
 {"word": "gigantism", "synonym": "giantism", "via": "gigantism", "position": 1}
 {"word": "gigantism", "synonym": "overgrowth", "via": "gigantism", "position": 2}
 {"word": "giggle", "synonym": "titter", "via": "giggle", "position": 1}
 {"word": "giggler", "synonym": "titterer", "via": "giggler", "position": 1}
 {"word": "gigue", "synonym": "jig", "via": "gigue", "position": 1}
+{"word": "gigunda", "synonym": "gigantic", "via": "gigunda", "position": 1}
 {"word": "gild", "synonym": "club", "via": "gild", "position": 1}
 {"word": "gild", "synonym": "society", "via": "gild", "position": 2}
 {"word": "gild", "synonym": "guild", "via": "gild", "position": 3}
@@ -1194,6 +1232,8 @@
 {"word": "gill", "synonym": "lamella", "via": "gill", "position": 2}
 {"word": "gill", "synonym": "branchia", "via": "jill", "position": 1}
 {"word": "gill", "synonym": "lamella", "via": "jill", "position": 2}
+{"word": "gillgadget", "synonym": "thingamajig", "via": "gillgadget", "position": 1}
+{"word": "gillgadget", "synonym": "doohickey", "via": "gillgadget", "position": 2}
 {"word": "gillie", "synonym": "ghillie", "via": "gillie", "position": 1}
 {"word": "gillyflower", "synonym": "carnation", "via": "gillyflower", "position": 1}
 {"word": "gillyflower", "synonym": "stock", "via": "gillyflower", "position": 2}
@@ -1248,6 +1288,7 @@
 {"word": "gimpy", "synonym": "game", "via": "gimpy", "position": 5}
 {"word": "gin", "synonym": "snare", "via": "gin", "position": 1}
 {"word": "gin", "synonym": "noose", "via": "gin", "position": 2}
+{"word": "ginchy", "synonym": "stylish", "via": "ginchy", "position": 1}
 {"word": "ginger", "synonym": "pep", "via": "ginger", "position": 1}
 {"word": "ginger", "synonym": "peppiness", "via": "ginger", "position": 2}
 {"word": "ginger", "synonym": "gingerroot", "via": "ginger", "position": 3}
@@ -1258,6 +1299,7 @@
 {"word": "gingiva", "synonym": "gum", "via": "gingiva", "position": 1}
 {"word": "gingko", "synonym": "ginkgo", "via": "ginkgo", "position": 1}
 {"word": "ginkgo", "synonym": "gingko", "via": "ginkgo", "position": 1}
+{"word": "ginnal", "synonym": "swindler", "via": "ginnal", "position": 1}
 {"word": "gip", "synonym": "gyp", "via": "gip", "position": 1}
 {"word": "gip", "synonym": "gyp", "via": "gyp", "position": 1}
 {"word": "gipsy", "synonym": "gypsy", "via": "gipsy", "position": 1}
@@ -1329,6 +1371,8 @@
 {"word": "git", "synonym": "puke", "via": "git", "position": 7}
 {"word": "git", "synonym": "crumb", "via": "git", "position": 8}
 {"word": "git", "synonym": "lowlife", "via": "git", "position": 9}
+{"word": "gitbox", "synonym": "guitar", "via": "gitbox", "position": 1}
+{"word": "gitfiddle", "synonym": "guitar", "via": "gitfiddle", "position": 1}
 {"word": "give", "synonym": "spring", "via": "give", "position": 1}
 {"word": "give", "synonym": "springiness", "via": "give", "position": 2}
 {"word": "give", "synonym": "pay", "via": "give", "position": 3}
@@ -1405,6 +1449,7 @@
 {"word": "glacial", "synonym": "frosty", "via": "glacial", "position": 6}
 {"word": "glacial", "synonym": "frozen", "via": "glacial", "position": 7}
 {"word": "glacial", "synonym": "wintry", "via": "glacial", "position": 8}
+{"word": "glacialist", "synonym": "glaciologist", "via": "glacialist", "position": 1}
 {"word": "glad", "synonym": "beaming", "via": "glad", "position": 1}
 {"word": "glad", "synonym": "happy", "via": "glad", "position": 2}
 {"word": "gladden", "synonym": "joy", "via": "gladden", "position": 1}
@@ -1442,6 +1487,7 @@
 {"word": "glance", "synonym": "glint", "via": "glance", "position": 3}
 {"word": "gland", "synonym": "secretor", "via": "gland", "position": 1}
 {"word": "gland", "synonym": "secreter", "via": "gland", "position": 2}
+{"word": "glandulous", "synonym": "glandular", "via": "glandulous", "position": 1}
 {"word": "glare", "synonym": "glower", "via": "glare", "position": 1}
 {"word": "glare", "synonym": "blaze", "via": "glare", "position": 2}
 {"word": "glare", "synonym": "brilliance", "via": "glare", "position": 3}
@@ -1503,12 +1549,15 @@
 {"word": "glassless", "synonym": "unglazed", "via": "glassless", "position": 1}
 {"word": "glassware", "synonym": "glasswork", "via": "glassware", "position": 1}
 {"word": "glasswork", "synonym": "glassware", "via": "glasswork", "position": 1}
+{"word": "glassworm", "synonym": "arrowworm", "via": "glassworm", "position": 1}
 {"word": "glasswort", "synonym": "samphire", "via": "glasswort", "position": 1}
 {"word": "glasswort", "synonym": "saltwort", "via": "glasswort", "position": 2}
 {"word": "glasswort", "synonym": "barilla", "via": "glasswort", "position": 3}
 {"word": "glassy", "synonym": "glazed", "via": "glassy", "position": 1}
 {"word": "glassy", "synonym": "vitreous", "via": "glassy", "position": 2}
 {"word": "glassy", "synonym": "vitrified", "via": "glassy", "position": 3}
+{"word": "glaur", "synonym": "mire", "via": "glaur", "position": 1}
+{"word": "glaur", "synonym": "mud", "via": "glaur", "position": 2}
 {"word": "glaze", "synonym": "glass", "via": "glaze", "position": 1}
 {"word": "glaze", "synonym": "sugarcoat", "via": "glaze", "position": 2}
 {"word": "glaze", "synonym": "candy", "via": "glaze", "position": 3}
@@ -1568,6 +1617,8 @@
 {"word": "glib", "synonym": "slick", "via": "glib", "position": 2}
 {"word": "glibly", "synonym": "slickly", "via": "glibly", "position": 1}
 {"word": "glibness", "synonym": "slickness", "via": "glibness", "position": 1}
+{"word": "glick", "synonym": "cunning", "via": "glick", "position": 1}
+{"word": "glick", "synonym": "clever", "via": "glick", "position": 2}
 {"word": "glide", "synonym": "gliding", "via": "glide", "position": 1}
 {"word": "glide", "synonym": "sailplaning", "via": "glide", "position": 2}
 {"word": "glide", "synonym": "soaring", "via": "glide", "position": 3}
@@ -1768,6 +1819,7 @@
 {"word": "globe", "synonym": "orb", "via": "globe", "position": 4}
 {"word": "globefish", "synonym": "puffer", "via": "globefish", "position": 1}
 {"word": "globefish", "synonym": "blowfish", "via": "globefish", "position": 2}
+{"word": "globelike", "synonym": "globular", "via": "globelike", "position": 1}
 {"word": "globose", "synonym": "global", "via": "globose", "position": 1}
 {"word": "globose", "synonym": "globular", "via": "globose", "position": 2}
 {"word": "globose", "synonym": "orbicular", "via": "globose", "position": 3}
@@ -1910,6 +1962,9 @@
 {"word": "glowing", "synonym": "glow", "via": "glow", "position": 2}
 {"word": "glowing", "synonym": "radiance", "via": "glowing", "position": 1}
 {"word": "glowing", "synonym": "glow", "via": "glowing", "position": 2}
+{"word": "glub", "synonym": "gurgle", "via": "glub", "position": 1}
+{"word": "glucochlorose", "synonym": "chloralose", "via": "glucochlorose", "position": 1}
+{"word": "glucoprotein", "synonym": "glycoprotein", "via": "glucoprotein", "position": 1}
 {"word": "glue", "synonym": "gum", "via": "glue", "position": 1}
 {"word": "glue", "synonym": "mucilage", "via": "glue", "position": 2}
 {"word": "glue", "synonym": "paste", "via": "glue", "position": 3}
@@ -1936,6 +1991,7 @@
 {"word": "glumness", "synonym": "sullenness", "via": "glumness", "position": 2}
 {"word": "glumness", "synonym": "gloom", "via": "glumness", "position": 3}
 {"word": "glumness", "synonym": "gloominess", "via": "glumness", "position": 4}
+{"word": "gluside", "synonym": "saccharin", "via": "gluside", "position": 1}
 {"word": "glut", "synonym": "oversupply", "via": "glut", "position": 1}
 {"word": "glut", "synonym": "surfeit", "via": "glut", "position": 2}
 {"word": "glut", "synonym": "gorge", "via": "glut", "position": 3}
@@ -1946,6 +2002,7 @@
 {"word": "glut", "synonym": "engorge", "via": "glut", "position": 8}
 {"word": "glut", "synonym": "overeat", "via": "glut", "position": 9}
 {"word": "glut", "synonym": "gormandize", "via": "glut", "position": 10}
+{"word": "glutch", "synonym": "swallow", "via": "glutch", "position": 1}
 {"word": "glutinous", "synonym": "gluey", "via": "glutinous", "position": 1}
 {"word": "glutinous", "synonym": "gummy", "via": "glutinous", "position": 2}
 {"word": "glutinous", "synonym": "mucilaginous", "via": "glutinous", "position": 3}
@@ -1957,6 +2014,7 @@
 {"word": "glutton", "synonym": "wolverine", "via": "glutton", "position": 1}
 {"word": "glutton", "synonym": "gourmand", "via": "glutton", "position": 2}
 {"word": "glutton", "synonym": "trencherman", "via": "glutton", "position": 3}
+{"word": "gluttonize", "synonym": "gorge", "via": "gluttonize", "position": 1}
 {"word": "gluttony", "synonym": "overeating", "via": "gluttony", "position": 1}
 {"word": "glycerin", "synonym": "glycerol", "via": "glycerine", "position": 1}
 {"word": "glycerin", "synonym": "glycerine", "via": "glycerine", "position": 2}
@@ -1965,6 +2023,8 @@
 {"word": "glycerol", "synonym": "glycerin", "via": "glycerol", "position": 1}
 {"word": "glycerol", "synonym": "glycerine", "via": "glycerol", "position": 2}
 {"word": "glycol", "synonym": "diol", "via": "glycol", "position": 1}
+{"word": "glycose", "synonym": "glucose", "via": "glycose", "position": 1}
+{"word": "glyoxaline", "synonym": "imidazole", "via": "glyoxaline", "position": 1}
 {"word": "gnarl", "synonym": "knot", "via": "gnarl", "position": 1}
 {"word": "gnarl", "synonym": "grumble", "via": "gnarl", "position": 2}
 {"word": "gnarled", "synonym": "gnarly", "via": "gnarl", "position": 1}
@@ -1979,6 +2039,9 @@
 {"word": "gnarly", "synonym": "knotted", "via": "gnarly", "position": 2}
 {"word": "gnarly", "synonym": "knotty", "via": "gnarly", "position": 3}
 {"word": "gnarly", "synonym": "knobbed", "via": "gnarly", "position": 4}
+{"word": "gnashers", "synonym": "teeth", "via": "gnashers", "position": 1}
+{"word": "gnathonic", "synonym": "sycophantic", "via": "gnathonic", "position": 1}
+{"word": "gnathonic", "synonym": "obsequious", "via": "gnathonic", "position": 2}
 {"word": "gnaw", "synonym": "erode", "via": "gnaw", "position": 1}
 {"word": "gnawer", "synonym": "rodent", "via": "gnawer", "position": 1}
 {"word": "gnome", "synonym": "dwarf", "via": "gnome", "position": 1}
@@ -2007,6 +2070,8 @@
 {"word": "goal", "synonym": "end", "via": "goal", "position": 1}
 {"word": "goal", "synonym": "finish", "via": "goal", "position": 2}
 {"word": "goal", "synonym": "destination", "via": "goal", "position": 3}
+{"word": "goaler", "synonym": "goalie", "via": "goaler", "position": 1}
+{"word": "goaler", "synonym": "goalkeeper", "via": "goaler", "position": 2}
 {"word": "goalie", "synonym": "goalkeeper", "via": "goalie", "position": 1}
 {"word": "goalie", "synonym": "goaltender", "via": "goalie", "position": 2}
 {"word": "goalie", "synonym": "netminder", "via": "goalie", "position": 3}
@@ -2047,6 +2112,7 @@
 {"word": "gobs", "synonym": "loads", "via": "gob", "position": 8}
 {"word": "gobs", "synonym": "rafts", "via": "gob", "position": 9}
 {"word": "gobs", "synonym": "slews", "via": "gob", "position": 10}
+{"word": "gobsmacking", "synonym": "astounding", "via": "gobsmacking", "position": 1}
 {"word": "goby", "synonym": "gudgeon", "via": "goby", "position": 1}
 {"word": "god", "synonym": "idol", "via": "god", "position": 1}
 {"word": "god", "synonym": "deity", "via": "god", "position": 2}
@@ -2125,6 +2191,7 @@
 {"word": "goggle", "synonym": "gape", "via": "goggle", "position": 1}
 {"word": "goggle", "synonym": "gawp", "via": "goggle", "position": 2}
 {"word": "goggle", "synonym": "gawk", "via": "goggle", "position": 3}
+{"word": "gogglebox", "synonym": "television", "via": "gogglebox", "position": 1}
 {"word": "going", "synonym": "departure", "via": "going", "position": 1}
 {"word": "going", "synonym": "leaving", "via": "going", "position": 2}
 {"word": "going", "synonym": "sledding", "via": "going", "position": 3}
@@ -2169,12 +2236,18 @@
 {"word": "golem", "synonym": "robot", "via": "golem", "position": 2}
 {"word": "golfer", "synonym": "linksman", "via": "golfer", "position": 1}
 {"word": "golgotha", "synonym": "calvary", "via": "golgotha", "position": 1}
+{"word": "goliathan", "synonym": "gigantic", "via": "goliathan", "position": 1}
+{"word": "goliathan", "synonym": "colossal", "via": "goliathan", "position": 2}
 {"word": "golliwog", "synonym": "golliwogg", "via": "golliwog", "position": 1}
 {"word": "golliwogg", "synonym": "golliwog", "via": "golliwog", "position": 1}
+{"word": "gollop", "synonym": "gobble", "via": "gollop", "position": 1}
+{"word": "gollop", "synonym": "gulp", "via": "gollop", "position": 2}
+{"word": "gollywhopper", "synonym": "whopper", "via": "gollywhopper", "position": 1}
 {"word": "golosh", "synonym": "arctic", "via": "galosh", "position": 1}
 {"word": "golosh", "synonym": "galosh", "via": "galosh", "position": 2}
 {"word": "golosh", "synonym": "rubber", "via": "galosh", "position": 3}
 {"word": "golosh", "synonym": "gumshoe", "via": "galosh", "position": 4}
+{"word": "gombeenism", "synonym": "usury", "via": "gombeenism", "position": 1}
 {"word": "gonadotrophic", "synonym": "gonadotropic", "via": "gonadotrophic", "position": 1}
 {"word": "gonadotrophin", "synonym": "gonadotropin", "via": "gonadotrophin", "position": 1}
 {"word": "gonadotropic", "synonym": "gonadotrophic", "via": "gonadotropic", "position": 1}
@@ -2219,6 +2292,8 @@
 {"word": "goober", "synonym": "peanut", "via": "goober", "position": 1}
 {"word": "goober", "synonym": "earthnut", "via": "goober", "position": 2}
 {"word": "goober", "synonym": "groundnut", "via": "goober", "position": 3}
+{"word": "gooby", "synonym": "spittle", "via": "gooby", "position": 1}
+{"word": "gooby", "synonym": "saliva", "via": "gooby", "position": 2}
 {"word": "good", "synonym": "commodity", "via": "good", "position": 1}
 {"word": "good", "synonym": "goodness", "via": "good", "position": 2}
 {"word": "good", "synonym": "beneficial", "via": "good", "position": 3}
@@ -2283,6 +2358,7 @@
 {"word": "goofy", "synonym": "wacky", "via": "goofy", "position": 2}
 {"word": "goofy", "synonym": "whacky", "via": "goofy", "position": 3}
 {"word": "goofy", "synonym": "zany", "via": "goofy", "position": 4}
+{"word": "goog", "synonym": "egg", "via": "goog", "position": 1}
 {"word": "gook", "synonym": "sludge", "via": "gook", "position": 1}
 {"word": "gook", "synonym": "slime", "via": "gook", "position": 2}
 {"word": "gook", "synonym": "goo", "via": "gook", "position": 3}
@@ -2328,6 +2404,7 @@
 {"word": "goosefish", "synonym": "anglerfish", "via": "goosefish", "position": 2}
 {"word": "goosefish", "synonym": "monkfish", "via": "goosefish", "position": 3}
 {"word": "goosefish", "synonym": "lotte", "via": "goosefish", "position": 4}
+{"word": "goosegog", "synonym": "gooseberry", "via": "goosegog", "position": 1}
 {"word": "goosey", "synonym": "anserine", "via": "goosy", "position": 1}
 {"word": "goosey", "synonym": "dopy", "via": "goosy", "position": 2}
 {"word": "goosey", "synonym": "dopey", "via": "goosy", "position": 3}
@@ -2344,6 +2421,7 @@
 {"word": "gopher", "synonym": "goffer", "via": "gofer", "position": 2}
 {"word": "gopher", "synonym": "spermophile", "via": "gopher", "position": 1}
 {"word": "gopher", "synonym": "goffer", "via": "gopher", "position": 2}
+{"word": "gopherwood", "synonym": "yellowwood", "via": "gopherwood", "position": 1}
 {"word": "gore", "synonym": "bloodshed", "via": "gore", "position": 1}
 {"word": "gore", "synonym": "panel", "via": "gore", "position": 2}
 {"word": "gorge", "synonym": "esophagus", "via": "gorge", "position": 1}
@@ -2361,6 +2439,7 @@
 {"word": "gorgeously", "synonym": "magnificently", "via": "gorgeously", "position": 3}
 {"word": "gorger", "synonym": "scoffer", "via": "gorger", "position": 1}
 {"word": "gorgerin", "synonym": "necking", "via": "gorgerin", "position": 1}
+{"word": "gorked", "synonym": "dazed", "via": "gorked", "position": 1}
 {"word": "gormandise", "synonym": "gorge", "via": "gourmandise", "position": 1}
 {"word": "gormandise", "synonym": "ingurgitate", "via": "gourmandise", "position": 2}
 {"word": "gormandise", "synonym": "overindulge", "via": "gourmandise", "position": 3}
@@ -2428,6 +2507,9 @@
 {"word": "gossipmonger", "synonym": "newsmonger", "via": "gossipmonger", "position": 4}
 {"word": "gossipy", "synonym": "chatty", "via": "gossipy", "position": 1}
 {"word": "gossipy", "synonym": "newsy", "via": "gossipy", "position": 2}
+{"word": "gossypose", "synonym": "raffinose", "via": "gossypose", "position": 1}
+{"word": "gote", "synonym": "ditch", "via": "gote", "position": 1}
+{"word": "gote", "synonym": "channel", "via": "gote", "position": 2}
 {"word": "gothic", "synonym": "medieval", "via": "gothic", "position": 1}
 {"word": "gothic", "synonym": "mediaeval", "via": "gothic", "position": 2}
 {"word": "gothite", "synonym": "goethite", "via": "goethite", "position": 1}
@@ -2461,6 +2543,7 @@
 {"word": "gourmet", "synonym": "gastronome", "via": "gourmet", "position": 2}
 {"word": "gourmet", "synonym": "epicurean", "via": "gourmet", "position": 3}
 {"word": "gourmet", "synonym": "foodie", "via": "gourmet", "position": 4}
+{"word": "goutish", "synonym": "gouty", "via": "goutish", "position": 1}
 {"word": "govern", "synonym": "regulate", "via": "govern", "position": 1}
 {"word": "govern", "synonym": "regularize", "via": "govern", "position": 2}
 {"word": "govern", "synonym": "order", "via": "govern", "position": 3}
@@ -2489,6 +2572,8 @@
 {"word": "gown", "synonym": "nightie", "via": "gown", "position": 4}
 {"word": "gown", "synonym": "nightdress", "via": "gown", "position": 5}
 {"word": "goy", "synonym": "gentile", "via": "goy", "position": 1}
+{"word": "gozzle", "synonym": "throat", "via": "gozzle", "position": 1}
+{"word": "gozzle", "synonym": "gullet", "via": "gozzle", "position": 2}
 {"word": "grab", "synonym": "catch", "via": "grab", "position": 1}
 {"word": "grab", "synonym": "snatch", "via": "grab", "position": 2}
 {"word": "grab", "synonym": "snap", "via": "grab", "position": 3}
@@ -2606,6 +2691,9 @@
 {"word": "grainy", "synonym": "mealy", "via": "grainy", "position": 5}
 {"word": "gram", "synonym": "gramme", "via": "graham", "position": 1}
 {"word": "gram", "synonym": "gramme", "via": "gram", "position": 1}
+{"word": "grame", "synonym": "wrath", "via": "grame", "position": 1}
+{"word": "grame", "synonym": "ire", "via": "grame", "position": 2}
+{"word": "graminology", "synonym": "agrostology", "via": "graminology", "position": 1}
 {"word": "gramme", "synonym": "gram", "via": "gram", "position": 1}
 {"word": "gramps", "synonym": "grandfather", "via": "gramp", "position": 1}
 {"word": "gramps", "synonym": "granddad", "via": "gramp", "position": 2}
@@ -2684,6 +2772,8 @@
 {"word": "grandma", "synonym": "grannie", "via": "grandma", "position": 3}
 {"word": "grandma", "synonym": "gran", "via": "grandma", "position": 4}
 {"word": "grandma", "synonym": "nan", "via": "grandma", "position": 5}
+{"word": "grandmamma", "synonym": "grandma", "via": "grandmamma", "position": 1}
+{"word": "grandmamma", "synonym": "grandmother", "via": "grandmamma", "position": 2}
 {"word": "grandmom", "synonym": "grandma", "via": "grandmom", "position": 1}
 {"word": "grandmother", "synonym": "grandma", "via": "grandmother", "position": 1}
 {"word": "grandmother", "synonym": "granny", "via": "grandmother", "position": 2}
@@ -2703,6 +2793,8 @@
 {"word": "grandpa", "synonym": "granddad", "via": "grandpa", "position": 3}
 {"word": "grandpa", "synonym": "grandad", "via": "grandpa", "position": 4}
 {"word": "grandpa", "synonym": "granddaddy", "via": "grandpa", "position": 5}
+{"word": "grandpapa", "synonym": "grandfather", "via": "grandpapa", "position": 1}
+{"word": "grandpappy", "synonym": "grandpa", "via": "grandpappy", "position": 1}
 {"word": "granger", "synonym": "farmer", "via": "granger", "position": 1}
 {"word": "granger", "synonym": "husbandman", "via": "granger", "position": 2}
 {"word": "granger", "synonym": "sodbuster", "via": "granger", "position": 3}
@@ -2754,7 +2846,9 @@
 {"word": "grape", "synonym": "grapevine", "via": "grape", "position": 1}
 {"word": "grape", "synonym": "grapeshot", "via": "grapeshot", "position": 1}
 {"word": "grape", "synonym": "grapevine", "via": "grapeshot", "position": 2}
+{"word": "grapeline", "synonym": "grapnel", "via": "grapeline", "position": 1}
 {"word": "grapeshot", "synonym": "grape", "via": "grapeshot", "position": 1}
+{"word": "grapestone", "synonym": "pip", "via": "grapestone", "position": 1}
 {"word": "grapevine", "synonym": "pipeline", "via": "grapevine", "position": 1}
 {"word": "grapevine", "synonym": "grape", "via": "grapevine", "position": 2}
 {"word": "grapey", "synonym": "grapy", "via": "grapey", "position": 1}
@@ -2831,6 +2925,8 @@
 {"word": "grass", "synonym": "forage", "via": "grass", "position": 8}
 {"word": "grass", "synonym": "pasture", "via": "grass", "position": 9}
 {"word": "grass", "synonym": "pasturage", "via": "grass", "position": 10}
+{"word": "grasser", "synonym": "informer", "via": "grasser", "position": 1}
+{"word": "grasser", "synonym": "informant", "via": "grasser", "position": 2}
 {"word": "grasshopper", "synonym": "hopper", "via": "grasshopper", "position": 1}
 {"word": "grate", "synonym": "grating", "via": "grate", "position": 1}
 {"word": "grate", "synonym": "scrape", "via": "grate", "position": 2}
@@ -2895,6 +2991,8 @@
 {"word": "gratuity", "synonym": "baksheesh", "via": "gratuity", "position": 3}
 {"word": "gratuity", "synonym": "bakshish", "via": "gratuity", "position": 4}
 {"word": "gratulatory", "synonym": "congratulatory", "via": "gratulatory", "position": 1}
+{"word": "graunch", "synonym": "crush", "via": "graunch", "position": 1}
+{"word": "gravalicious", "synonym": "covetous", "via": "gravalicious", "position": 1}
 {"word": "grave", "synonym": "tomb", "via": "grave", "position": 1}
 {"word": "grave", "synonym": "scratch", "via": "grave", "position": 2}
 {"word": "grave", "synonym": "engrave", "via": "grave", "position": 3}
@@ -2962,6 +3060,7 @@
 {"word": "gravitation", "synonym": "gravity", "via": "gravitation", "position": 1}
 {"word": "gravitational", "synonym": "gravitative", "via": "gravitational", "position": 1}
 {"word": "gravitative", "synonym": "gravitational", "via": "gravitative", "position": 1}
+{"word": "gravitropism", "synonym": "geotropism", "via": "gravitropism", "position": 1}
 {"word": "gravity", "synonym": "graveness", "via": "gravity", "position": 1}
 {"word": "gravity", "synonym": "sobriety", "via": "gravity", "position": 2}
 {"word": "gravity", "synonym": "soberness", "via": "gravity", "position": 3}
@@ -2991,6 +3090,7 @@
 {"word": "grayness", "synonym": "gray", "via": "greyness", "position": 1}
 {"word": "grayness", "synonym": "grey", "via": "greyness", "position": 2}
 {"word": "grayness", "synonym": "greyness", "via": "greyness", "position": 3}
+{"word": "graywether", "synonym": "sarsen", "via": "graywether", "position": 1}
 {"word": "graze", "synonym": "grazing", "via": "graze", "position": 1}
 {"word": "graze", "synonym": "browse", "via": "graze", "position": 2}
 {"word": "graze", "synonym": "crease", "via": "graze", "position": 3}
@@ -3128,10 +3228,12 @@
 {"word": "greyness", "synonym": "gray", "via": "greyness", "position": 1}
 {"word": "greyness", "synonym": "grayness", "via": "greyness", "position": 2}
 {"word": "greyness", "synonym": "grey", "via": "greyness", "position": 3}
+{"word": "greywether", "synonym": "sarsen", "via": "greywether", "position": 1}
 {"word": "grid", "synonym": "gridiron", "via": "grid", "position": 1}
 {"word": "griddlecake", "synonym": "pancake", "via": "griddlecake", "position": 1}
 {"word": "griddlecake", "synonym": "flapjack", "via": "griddlecake", "position": 2}
 {"word": "griddlecake", "synonym": "hotcake", "via": "griddlecake", "position": 3}
+{"word": "griddler", "synonym": "busker", "via": "griddler", "position": 1}
 {"word": "gridiron", "synonym": "grid", "via": "gridiron", "position": 1}
 {"word": "grief", "synonym": "sorrow", "via": "grief", "position": 1}
 {"word": "grief", "synonym": "heartache", "via": "grief", "position": 2}
@@ -3195,6 +3297,7 @@
 {"word": "grilling", "synonym": "broiling", "via": "grill", "position": 2}
 {"word": "grilling", "synonym": "broil", "via": "grilling", "position": 1}
 {"word": "grilling", "synonym": "broiling", "via": "grilling", "position": 2}
+{"word": "grillion", "synonym": "zillion", "via": "grillion", "position": 1}
 {"word": "grillroom", "synonym": "grill", "via": "grillroom", "position": 1}
 {"word": "grillwork", "synonym": "grill", "via": "grillwork", "position": 1}
 {"word": "grillwork", "synonym": "grille", "via": "grillwork", "position": 2}
@@ -3371,7 +3474,9 @@
 {"word": "groan", "synonym": "moan", "via": "groan", "position": 1}
 {"word": "grocery", "synonym": "foodstuff", "via": "grocery", "position": 1}
 {"word": "grocery", "synonym": "market", "via": "grocery", "position": 2}
+{"word": "groceryman", "synonym": "grocer", "via": "groceryman", "position": 1}
 {"word": "grody", "synonym": "gross", "via": "grody", "position": 1}
+{"word": "grogged", "synonym": "tipsy", "via": "grogged", "position": 1}
 {"word": "grogginess", "synonym": "stupor", "via": "grogginess", "position": 1}
 {"word": "grogginess", "synonym": "stupefaction", "via": "grogginess", "position": 2}
 {"word": "groggy", "synonym": "dazed", "via": "groggy", "position": 1}
@@ -3743,6 +3848,8 @@
 {"word": "grumpy", "synonym": "cross", "via": "grumpy", "position": 3}
 {"word": "grumpy", "synonym": "fussy", "via": "grumpy", "position": 4}
 {"word": "grumpy", "synonym": "grouchy", "via": "grumpy", "position": 5}
+{"word": "grundies", "synonym": "undies", "via": "grundies", "position": 1}
+{"word": "grundyism", "synonym": "prudery", "via": "grundyism", "position": 1}
 {"word": "grunge", "synonym": "dirt", "via": "grunge", "position": 1}
 {"word": "grunge", "synonym": "filth", "via": "grunge", "position": 2}
 {"word": "grunge", "synonym": "grime", "via": "grunge", "position": 3}
@@ -3770,6 +3877,7 @@
 {"word": "guacharo", "synonym": "oilbird", "via": "guacharo", "position": 1}
 {"word": "guaiac", "synonym": "guaiacum", "via": "guaiac", "position": 1}
 {"word": "guaiacum", "synonym": "guaiac", "via": "guaiacum", "position": 1}
+{"word": "guanabana", "synonym": "soursop", "via": "guanabana", "position": 1}
 {"word": "guarantee", "synonym": "warrant", "via": "guarantee", "position": 1}
 {"word": "guarantee", "synonym": "warrantee", "via": "guarantee", "position": 2}
 {"word": "guarantee", "synonym": "warranty", "via": "guarantee", "position": 3}
@@ -3804,6 +3912,7 @@
 {"word": "guardianship", "synonym": "care", "via": "guardianship", "position": 3}
 {"word": "guardianship", "synonym": "charge", "via": "guardianship", "position": 4}
 {"word": "guardianship", "synonym": "tutelage", "via": "guardianship", "position": 5}
+{"word": "gubbrow", "synonym": "bewilder", "via": "gubbrow", "position": 1}
 {"word": "guck", "synonym": "sludge", "via": "guck", "position": 1}
 {"word": "guck", "synonym": "slime", "via": "guck", "position": 2}
 {"word": "guck", "synonym": "goo", "via": "guck", "position": 3}
@@ -3865,6 +3974,7 @@
 {"word": "guide", "synonym": "draw", "via": "guide", "position": 8}
 {"word": "guide", "synonym": "pass", "via": "guide", "position": 9}
 {"word": "guide", "synonym": "steer", "via": "guide", "position": 10}
+{"word": "guideboard", "synonym": "signpost", "via": "guideboard", "position": 1}
 {"word": "guidebook", "synonym": "guide", "via": "guidebook", "position": 1}
 {"word": "guideline", "synonym": "guidepost", "via": "guideline", "position": 1}
 {"word": "guidepost", "synonym": "guideline", "via": "guidepost", "position": 1}
@@ -3926,6 +4036,7 @@
 {"word": "guinea", "synonym": "wop", "via": "guinea", "position": 1}
 {"word": "guinea", "synonym": "dago", "via": "guinea", "position": 2}
 {"word": "guinea", "synonym": "greaseball", "via": "guinea", "position": 3}
+{"word": "guino", "synonym": "money", "via": "guino", "position": 1}
 {"word": "guise", "synonym": "pretense", "via": "guise", "position": 1}
 {"word": "guise", "synonym": "pretence", "via": "guise", "position": 2}
 {"word": "guise", "synonym": "pretext", "via": "guise", "position": 3}
@@ -3935,6 +4046,7 @@
 {"word": "gulch", "synonym": "flume", "via": "gulch", "position": 1}
 {"word": "gulden", "synonym": "guilder", "via": "gulden", "position": 1}
 {"word": "gulden", "synonym": "florin", "via": "gulden", "position": 2}
+{"word": "gulder", "synonym": "shout", "via": "gulder", "position": 1}
 {"word": "gulf", "synonym": "disconnect", "via": "gulf", "position": 1}
 {"word": "gulf", "synonym": "disconnection", "via": "gulf", "position": 2}
 {"word": "gulfweed", "synonym": "sargassum", "via": "gulfweed", "position": 1}
@@ -3954,6 +4066,8 @@
 {"word": "gullet", "synonym": "gorge", "via": "gullet", "position": 3}
 {"word": "gullibility", "synonym": "credulousness", "via": "gullibility", "position": 1}
 {"word": "gullible", "synonym": "green", "via": "gullible", "position": 1}
+{"word": "gullywasher", "synonym": "downpour", "via": "gullywasher", "position": 1}
+{"word": "gullywasher", "synonym": "cloudburst", "via": "gullywasher", "position": 2}
 {"word": "gulp", "synonym": "draft", "via": "gulp", "position": 1}
 {"word": "gulp", "synonym": "draught", "via": "gulp", "position": 2}
 {"word": "gulp", "synonym": "swig", "via": "gulp", "position": 3}
@@ -3992,6 +4106,7 @@
 {"word": "gumption", "synonym": "moxie", "via": "gumption", "position": 4}
 {"word": "gumption", "synonym": "sand", "via": "gumption", "position": 5}
 {"word": "gumption", "synonym": "sense", "via": "gumption", "position": 6}
+{"word": "gumshield", "synonym": "mouthguard", "via": "gumshield", "position": 1}
 {"word": "gumshoe", "synonym": "arctic", "via": "gumshoe", "position": 1}
 {"word": "gumshoe", "synonym": "galosh", "via": "gumshoe", "position": 2}
 {"word": "gumshoe", "synonym": "golosh", "via": "gumshoe", "position": 3}
@@ -4048,6 +4163,9 @@
 {"word": "gurgle", "synonym": "babble", "via": "gurgle", "position": 3}
 {"word": "gurgle", "synonym": "burble", "via": "gurgle", "position": 4}
 {"word": "gurgle", "synonym": "bubble", "via": "gurgle", "position": 5}
+{"word": "gurgler", "synonym": "drain", "via": "gurgler", "position": 1}
+{"word": "gurk", "synonym": "belch", "via": "gurk", "position": 1}
+{"word": "gurk", "synonym": "burp", "via": "gurk", "position": 2}
 {"word": "gush", "synonym": "effusion", "via": "gush", "position": 1}
 {"word": "gush", "synonym": "outburst", "via": "gush", "position": 2}
 {"word": "gush", "synonym": "blowup", "via": "gush", "position": 3}
@@ -4075,6 +4193,7 @@
 {"word": "gust", "synonym": "blast", "via": "gust", "position": 1}
 {"word": "gust", "synonym": "blow", "via": "gust", "position": 2}
 {"word": "gustation", "synonym": "taste", "via": "gustation", "position": 1}
+{"word": "gustative", "synonym": "gustatory", "via": "gustative", "position": 1}
 {"word": "gusto", "synonym": "relish", "via": "gusto", "position": 1}
 {"word": "gusto", "synonym": "zest", "via": "gusto", "position": 2}
 {"word": "gusto", "synonym": "zestfulness", "via": "gusto", "position": 3}
@@ -4093,6 +4212,7 @@
 {"word": "guts", "synonym": "moxie", "via": "guts", "position": 3}
 {"word": "guts", "synonym": "sand", "via": "guts", "position": 4}
 {"word": "guts", "synonym": "gumption", "via": "guts", "position": 5}
+{"word": "gutser", "synonym": "glutton", "via": "gutser", "position": 1}
 {"word": "gutsiness", "synonym": "pluck", "via": "gutsiness", "position": 1}
 {"word": "gutsiness", "synonym": "pluckiness", "via": "gutsiness", "position": 2}
 {"word": "gutsy", "synonym": "plucky", "via": "gutsy", "position": 1}
@@ -4111,11 +4231,13 @@
 {"word": "guy", "synonym": "roast", "via": "guy", "position": 6}
 {"word": "guy", "synonym": "blackguard", "via": "guy", "position": 7}
 {"word": "guy", "synonym": "rib", "via": "guy", "position": 8}
+{"word": "guyabano", "synonym": "soursop", "via": "guyabano", "position": 1}
 {"word": "guzzler", "synonym": "gulper", "via": "guzzler", "position": 1}
 {"word": "guzzling", "synonym": "gulping", "via": "guzzle", "position": 1}
 {"word": "guzzling", "synonym": "swilling", "via": "guzzle", "position": 2}
 {"word": "guzzling", "synonym": "gulping", "via": "guzzling", "position": 1}
 {"word": "guzzling", "synonym": "swilling", "via": "guzzling", "position": 2}
+{"word": "gweva", "synonym": "bootlegger", "via": "gweva", "position": 1}
 {"word": "gybe", "synonym": "jibe", "via": "gybe", "position": 1}
 {"word": "gybe", "synonym": "jib", "via": "gybe", "position": 2}
 {"word": "gybe", "synonym": "jibe", "via": "jibe", "position": 1}
@@ -4135,6 +4257,7 @@
 {"word": "gynecologic", "synonym": "gynecological", "via": "gynecologic", "position": 1}
 {"word": "gynecological", "synonym": "gynecologic", "via": "gynecological", "position": 1}
 {"word": "gynecology", "synonym": "gynaecology", "via": "gynecology", "position": 1}
+{"word": "gyniatrics", "synonym": "gynecology", "via": "gyniatrics", "position": 1}
 {"word": "gyp", "synonym": "gip", "via": "gyp", "position": 1}
 {"word": "gypsy", "synonym": "gipsy", "via": "gypsy", "position": 1}
 {"word": "gypsy", "synonym": "bohemian", "via": "gypsy", "position": 2}
@@ -4157,6 +4280,7 @@
 {"word": "gyrfalcon", "synonym": "gerfalcon", "via": "gyrfalcon", "position": 1}
 {"word": "gyro", "synonym": "gyroscope", "via": "gyro", "position": 1}
 {"word": "gyrocopter", "synonym": "autogyro", "via": "gyrocopter", "position": 1}
+{"word": "gyropilot", "synonym": "autopilot", "via": "gyropilot", "position": 1}
 {"word": "gyroplane", "synonym": "autogiro", "via": "gyroplane", "position": 1}
 {"word": "gyroplane", "synonym": "autogyro", "via": "gyroplane", "position": 2}
 {"word": "gyroscope", "synonym": "gyro", "via": "gyroscope", "position": 1}

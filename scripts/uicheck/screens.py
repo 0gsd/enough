@@ -714,6 +714,17 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_idle", "")),
            teardown=(("eval", "compCloseMenus()"),) + COMP_RESET),
 
+    # 0.4.2: a composure's own settings, every <details> open so the
+    # longest labels and the facts grid are all measured at once.
+    Screen("composure-settings", "project",
+           setup=(("eval_await", "compOpenSettings()"),
+                  ("wait_for", "#comp-settings-modal:not(.hidden)"),
+                  ("eval", "document.querySelectorAll('#comp-settings-modal details')"
+                           ".forEach((d) => { d.open = true; })"),
+                  ("wait_idle", "")),
+           teardown=(("eval", "compCloseSettings()"),) + COMP_RESET,
+           note="a composure's settings modal, all sections open"),
+
     Screen("composure-faces", "project",
            setup=(_open("scaffold", SCAFFOLD_READY),
                   ("eval", "COMP.zoomed = true;"

@@ -18,10 +18,13 @@
 {"word": "quadrangle", "synonym": "quadrilateral", "via": "quadrangle", "position": 2}
 {"word": "quadrangle", "synonym": "tetragon", "via": "quadrangle", "position": 3}
 {"word": "quadraphonic", "synonym": "quadriphonic", "via": "quadraphonic", "position": 1}
+{"word": "quadriad", "synonym": "quartet", "via": "quadriad", "position": 1}
+{"word": "quadriad", "synonym": "foursome", "via": "quadriad", "position": 2}
 {"word": "quadriceps", "synonym": "quad", "via": "quadriceps", "position": 1}
 {"word": "quadrilateral", "synonym": "quadrangle", "via": "quadrilateral", "position": 1}
 {"word": "quadrilateral", "synonym": "tetragon", "via": "quadrilateral", "position": 2}
 {"word": "quadriphonic", "synonym": "quadraphonic", "via": "quadraphonic", "position": 1}
+{"word": "quadrotor", "synonym": "quadcopter", "via": "quadrotor", "position": 1}
 {"word": "quadruped", "synonym": "quadrupedal", "via": "quadruped", "position": 1}
 {"word": "quadrupedal", "synonym": "quadruped", "via": "quadrupedal", "position": 1}
 {"word": "quadruple", "synonym": "quartet", "via": "quadruple", "position": 1}
@@ -121,6 +124,7 @@
 {"word": "qualm", "synonym": "squeamishness", "via": "qualm", "position": 4}
 {"word": "quamash", "synonym": "camas", "via": "camas", "position": 1}
 {"word": "quamash", "synonym": "camass", "via": "camas", "position": 2}
+{"word": "quamish", "synonym": "queasy", "via": "quamish", "position": 1}
 {"word": "quandang", "synonym": "quandong", "via": "quandong", "position": 1}
 {"word": "quandang", "synonym": "quantong", "via": "quandong", "position": 2}
 {"word": "quandary", "synonym": "dilemma", "via": "quandary", "position": 1}
@@ -148,6 +152,7 @@
 {"word": "quarrel", "synonym": "altercate", "via": "quarrel", "position": 8}
 {"word": "quarreler", "synonym": "quarreller", "via": "quarreler", "position": 1}
 {"word": "quarreller", "synonym": "quarreler", "via": "quarreler", "position": 1}
+{"word": "quarrian", "synonym": "cockatiel", "via": "quarrian", "position": 1}
 {"word": "quarrier", "synonym": "quarryman", "via": "quarrier", "position": 1}
 {"word": "quarry", "synonym": "prey", "via": "quarry", "position": 1}
 {"word": "quarry", "synonym": "pit", "via": "quarry", "position": 2}
@@ -222,6 +227,9 @@
 {"word": "queasy", "synonym": "sickish", "via": "queasy", "position": 8}
 {"word": "queasy", "synonym": "nauseating", "via": "queasy", "position": 9}
 {"word": "queasy", "synonym": "noisome", "via": "queasy", "position": 10}
+{"word": "quebrada", "synonym": "ravine", "via": "quebrada", "position": 1}
+{"word": "quebrada", "synonym": "gully", "via": "quebrada", "position": 2}
+{"word": "queenlike", "synonym": "queenly", "via": "queenlike", "position": 1}
 {"word": "queer", "synonym": "fagot", "via": "queer", "position": 1}
 {"word": "queer", "synonym": "faggot", "via": "queer", "position": 2}
 {"word": "queer", "synonym": "fag", "via": "queer", "position": 3}
@@ -254,6 +262,7 @@
 {"word": "quelling", "synonym": "suppression", "via": "quelling", "position": 1}
 {"word": "quelling", "synonym": "crushing", "via": "quelling", "position": 2}
 {"word": "quelling", "synonym": "stifling", "via": "quelling", "position": 3}
+{"word": "quelquechose", "synonym": "trifle", "via": "quelquechose", "position": 1}
 {"word": "quench", "synonym": "squelch", "via": "quench", "position": 1}
 {"word": "quench", "synonym": "quell", "via": "quench", "position": 2}
 {"word": "quench", "synonym": "slake", "via": "quench", "position": 3}
@@ -321,6 +330,7 @@
 {"word": "questioning", "synonym": "doubting", "via": "questioning", "position": 6}
 {"word": "questioning", "synonym": "skeptical", "via": "questioning", "position": 7}
 {"word": "questioning", "synonym": "sceptical", "via": "questioning", "position": 8}
+{"word": "questionmaster", "synonym": "quizmaster", "via": "questionmaster", "position": 1}
 {"word": "quibble", "synonym": "quiddity", "via": "quibble", "position": 1}
 {"word": "quibble", "synonym": "cavil", "via": "quibble", "position": 2}
 {"word": "quibble", "synonym": "niggle", "via": "quibble", "position": 3}
@@ -358,6 +368,7 @@
 {"word": "quickening", "synonym": "speedup", "via": "quickening", "position": 2}
 {"word": "quicker", "synonym": "faster", "via": "quick", "position": 1}
 {"word": "quickest", "synonym": "fastest", "via": "quick", "position": 1}
+{"word": "quickhatch", "synonym": "wolverine", "via": "quickhatch", "position": 1}
 {"word": "quicklime", "synonym": "lime", "via": "quicklime", "position": 1}
 {"word": "quicklime", "synonym": "calx", "via": "quicklime", "position": 2}
 {"word": "quickly", "synonym": "rapidly", "via": "quickly", "position": 1}
@@ -378,6 +389,7 @@
 {"word": "quicksilver", "synonym": "erratic", "via": "quicksilver", "position": 2}
 {"word": "quicksilver", "synonym": "fickle", "via": "quicksilver", "position": 3}
 {"word": "quicksilver", "synonym": "mercurial", "via": "quicksilver", "position": 4}
+{"word": "quickthorn", "synonym": "hawthorn", "via": "quickthorn", "position": 1}
 {"word": "quid", "synonym": "chew", "via": "quid", "position": 1}
 {"word": "quid", "synonym": "chaw", "via": "quid", "position": 2}
 {"word": "quid", "synonym": "cud", "via": "quid", "position": 3}
@@ -429,6 +441,9 @@
 {"word": "quin", "synonym": "quint", "via": "quin", "position": 2}
 {"word": "quincentenary", "synonym": "quincentennial", "via": "quincentenary", "position": 1}
 {"word": "quincentennial", "synonym": "quincentenary", "via": "quincentennial", "position": 1}
+{"word": "quinquecentenary", "synonym": "quincentenary", "via": "quinquecentenary", "position": 1}
+{"word": "quinquefoil", "synonym": "cinquefoil", "via": "quinquefoil", "position": 1}
+{"word": "quinquevalent", "synonym": "pentavalent", "via": "quinquevalent", "position": 1}
 {"word": "quint", "synonym": "quintuplet", "via": "quint", "position": 1}
 {"word": "quint", "synonym": "quin", "via": "quint", "position": 2}
 {"word": "quint", "synonym": "five", "via": "quint", "position": 3}
@@ -473,6 +488,7 @@
 {"word": "quirky", "synonym": "offbeat", "via": "quirky", "position": 2}
 {"word": "quisling", "synonym": "collaborator", "via": "quisling", "position": 1}
 {"word": "quislingism", "synonym": "collaboration", "via": "quislingism", "position": 1}
+{"word": "quist", "synonym": "ringdove", "via": "quist", "position": 1}
 {"word": "quit", "synonym": "depart", "via": "quit", "position": 1}
 {"word": "quit", "synonym": "foreswear", "via": "quit", "position": 2}
 {"word": "quit", "synonym": "renounce", "via": "quit", "position": 3}
@@ -512,6 +528,8 @@
 {"word": "quizzical", "synonym": "questioning", "via": "quizzical", "position": 1}
 {"word": "quizzical", "synonym": "mocking", "via": "quizzical", "position": 2}
 {"word": "quizzical", "synonym": "teasing", "via": "quizzical", "position": 3}
+{"word": "quockerwodger", "synonym": "puppet", "via": "quockerwodger", "position": 1}
+{"word": "quockerwodger", "synonym": "stooge", "via": "quockerwodger", "position": 2}
 {"word": "quoin", "synonym": "corner", "via": "quoin", "position": 1}
 {"word": "quoin", "synonym": "coign", "via": "quoin", "position": 2}
 {"word": "quoin", "synonym": "coigne", "via": "quoin", "position": 3}
@@ -533,6 +551,7 @@
 {"word": "quote", "synonym": "quotation", "via": "quote", "position": 1}
 {"word": "quote", "synonym": "citation", "via": "quote", "position": 2}
 {"word": "quote", "synonym": "cite", "via": "quote", "position": 3}
+{"word": "quoteworthy", "synonym": "quotable", "via": "quoteworthy", "position": 1}
 {"word": "quotidian", "synonym": "everyday", "via": "quotidian", "position": 1}
 {"word": "quotidian", "synonym": "mundane", "via": "quotidian", "position": 2}
 {"word": "quotidian", "synonym": "routine", "via": "quotidian", "position": 3}

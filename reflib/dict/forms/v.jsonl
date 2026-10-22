@@ -1,9 +1,9 @@
 {"headword": "vac", "form": "vacs", "position": 1, "pronunciation": "/væks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vacancy", "form": "vacancies", "position": 1, "pronunciation": "/ˈveɪkənsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vacantness", "form": "vacantnesses", "position": 1, "pronunciation": "/ˈveɪkəntnɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vacate", "form": "vacated", "position": 1, "pronunciation": "/veɪˈkeɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "vacate", "form": "vacates", "position": 2, "pronunciation": "/veɪˈkeɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
-{"headword": "vacate", "form": "vacating", "position": 3, "pronunciation": "/veɪˈkeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vacate", "form": "vacated", "position": 1, "pronunciation": "/ˈveɪˌkeɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vacate", "form": "vacates", "position": 2, "pronunciation": "/ˈveɪˌkeɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vacate", "form": "vacating", "position": 3, "pronunciation": "/ˈveɪˌkeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vacation", "form": "vac", "position": 1, "pronunciation": "/væk/", "labels": "[\"abbr.\"]", "synonyms": null}
 {"headword": "vacation", "form": "vacationed", "position": 2, "pronunciation": "/veɪˈkeɪʃənd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vacation", "form": "vacationing", "position": 3, "pronunciation": "/veɪˈkeɪʃənɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -24,14 +24,14 @@
 {"headword": "vaccinia", "form": "vaccinas", "position": 2, "pronunciation": "/vækˈsinəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vaccinia", "form": "vaccinias", "position": 3, "pronunciation": "/vəkˈsɪniəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vaccinologist", "form": "vaccinologists", "position": 1, "pronunciation": "/ˌvæksəˈnɑlədʒɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vacillate", "form": "vacillated", "position": 1, "pronunciation": "/ˈvæsəleɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vacillate", "form": "vacillated", "position": 1, "pronunciation": "/ˈvæsəˌleɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vacillate", "form": "vacillates", "position": 2, "pronunciation": "/ˈvæsəˌleɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vacillate", "form": "vacillating", "position": 3, "pronunciation": "/ˈvæsəˌleɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"wavering\"]"}
 {"headword": "vacillation", "form": "vacillations", "position": 1, "pronunciation": "/ˌvæsəˈleɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vacillator", "form": "vacillators", "position": 1, "pronunciation": "/ˈvæsəˌleɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vacuity", "form": "vacuities", "position": 1, "pronunciation": "/vəˈkjuɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vacuolated", "form": "vacuolate", "position": 1, "pronunciation": "/ˈvækjuəleɪt/", "labels": "[\"var.\"]", "synonyms": "[\"vacuolated\"]"}
-{"headword": "vacuolation", "form": "vacuolations", "position": 1, "pronunciation": "/ˌvækjʊəˈleɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vacuolation", "form": "vacuolations", "position": 1, "pronunciation": "/ˌvækjuəˈleɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vacuole", "form": "vacuoles", "position": 1, "pronunciation": "/ˈvækjuˌoʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vacuousness", "form": "vacuousnesses", "position": 1, "pronunciation": "/ˈvækjuəsnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vacuum", "form": "vac", "position": 1, "pronunciation": "/væk/", "labels": "[\"abbr.\"]", "synonyms": null}
@@ -39,17 +39,23 @@
 {"headword": "vacuum", "form": "vacuumed", "position": 3, "pronunciation": "/ˈvækjumd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vacuum", "form": "vacuuming", "position": 4, "pronunciation": "/ˈvækjumɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vacuum", "form": "vacuums", "position": 5, "pronunciation": "/ˈvækjumz/", "labels": "[\"3rd sing.\", \"pl.\"]", "synonyms": null}
+{"headword": "vacuumize", "form": "vacuumized", "position": 1, "pronunciation": "/ˈvækjuˌmaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vacuumize", "form": "vacuumizes", "position": 2, "pronunciation": "/ˈvækjuˌmaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vacuumize", "form": "vacuumizing", "position": 3, "pronunciation": "/ˈvækjuˌmaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vagabond", "form": "vagabonded", "position": 1, "pronunciation": "/ˈvæɡəbɑndɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vagabond", "form": "vagabonding", "position": 2, "pronunciation": "/ˈvæɡəbɑndɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vagabond", "form": "vagabonds", "position": 3, "pronunciation": "/ˈvæɡəbɑndz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vagabondage", "form": "vagabondages", "position": 1, "pronunciation": "/ˈvæɡəbɑndɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vagabondism", "form": "vagabondisms", "position": 1, "pronunciation": "/ˈvæɡəbɑndɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vagary", "form": "vagaries", "position": 1, "pronunciation": "/ˈveɪɡəriz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vagility", "form": "vagilities", "position": 1, "pronunciation": "/vəˈdʒɪlɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vagility", "form": "vagilities", "position": 1, "pronunciation": "/vəˈdʒɪlətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vagina", "form": "vaginae", "position": 1, "pronunciation": "/vəˈdʒaɪˌni/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vagina", "form": "vaginas", "position": 2, "pronunciation": "/vəˈdʒaɪnəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vaginismus", "form": "vaginismuses", "position": 1, "pronunciation": "/vædʒɪˈnɪzməsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vaginitis", "form": "vaginitises", "position": 1, "pronunciation": "/vædʒɪˈnaɪtɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vaginoplasty", "form": "vaginoplasties", "position": 1, "pronunciation": "/ˈvædʒənoʊˌplæstiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vaginotomy", "form": "vaginotomies", "position": 1, "pronunciation": "/ˌvædʒəˈnɑtəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vagodepressor", "form": "vagodepressors", "position": 1, "pronunciation": "/ˌveɪɡoʊdɪˈprɛsərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vagotomy", "form": "vagotomies", "position": 1, "pronunciation": "/veɪˈɡɑtəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vagotonia", "form": "vagotonias", "position": 1, "pronunciation": "/veɪɡoʊˈtoʊniəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vagrancy", "form": "vagrancies", "position": 1, "pronunciation": "/ˈveɪɡrənsiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -58,7 +64,8 @@
 {"headword": "vague", "form": "vaguest", "position": 2, "pronunciation": "/ˈveɪɡɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "vagueness", "form": "vaguenesses", "position": 1, "pronunciation": "/ˈveɪɡnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vagus", "form": "vagi", "position": 1, "pronunciation": "/ˈveɪˌɡaɪ/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vahine", "form": "vahines", "position": 1, "pronunciation": "/vɑˈhɪniz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vahana", "form": "vahanas", "position": 1, "pronunciation": "/ˈvɑhənəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vahine", "form": "vahines", "position": 1, "pronunciation": "/vɑˈhiniz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vail", "form": "vailed", "position": 1, "pronunciation": "/veɪld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vail", "form": "vailing", "position": 2, "pronunciation": "/ˈveɪlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vail", "form": "vails", "position": 3, "pronunciation": "/veɪlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -67,6 +74,7 @@
 {"headword": "vainglory", "form": "vainglories", "position": 1, "pronunciation": "/ˈveɪnˌɡlɔriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vainness", "form": "vainnesses", "position": 1, "pronunciation": "/ˈveɪnnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vair", "form": "vairs", "position": 1, "pronunciation": "/vɛrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vajra", "form": "vajras", "position": 1, "pronunciation": "/ˈvɑdʒrəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vakeel", "form": "vakeels", "position": 1, "pronunciation": "/vəˈkilz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vakeel", "form": "vakil", "position": 2, "pronunciation": "/vəˈkil/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "vakeel", "form": "vakils", "position": 3, "pronunciation": "/vəˈkilz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -78,31 +86,31 @@
 {"headword": "valedictory", "form": "valedictories", "position": 1, "pronunciation": "/ˌvæləˈdɪktəriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valence", "form": "valences", "position": 1, "pronunciation": "/ˈveɪlənsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valence", "form": "valency", "position": 2, "pronunciation": "/ˈveɪlənsi/", "labels": "[\"var.\"]", "synonyms": "[\"valence\"]"}
-{"headword": "valencia", "form": "valencias", "position": 1, "pronunciation": "/vəˈlɛnʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "valencia", "form": "valencias", "position": 1, "pronunciation": "/vəˈlɛnsiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valency", "form": "valencies", "position": 1, "pronunciation": "/ˈveɪlənsiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "valentine", "form": "valentines", "position": 1, "pronunciation": "/ˈvælənˌtaɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "valerate", "form": "valerates", "position": 1, "pronunciation": "/ˈvæləˌreɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "valentine", "form": "valentines", "position": 1, "pronunciation": "/ˈvæləntaɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "valerate", "form": "valerates", "position": 1, "pronunciation": "/ˈvæləreɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valerian", "form": "valerians", "position": 1, "pronunciation": "/vəˈlɪriənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valet", "form": "valeted", "position": 1, "pronunciation": "/vəˈleɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "valet", "form": "valeting", "position": 2, "pronunciation": "/vəˈleɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "valet", "form": "valets", "position": 3, "pronunciation": "/vəˈleɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "valetudinary", "form": "valetudinaries", "position": 1, "pronunciation": "/ˌvæləˈtudənɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "valgus", "form": "valguses", "position": 1, "pronunciation": "/ˈvælɡəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "valetudinary", "form": "valetudinaries", "position": 1, "pronunciation": "/ˌvæləˈtudəˌnɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valiance", "form": "valiances", "position": 1, "pronunciation": "/ˈvæliənsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valiancy", "form": "valiancies", "position": 1, "pronunciation": "/ˈvæliənsiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "valiant", "form": "valiants", "position": 1, "pronunciation": "/ˈvæljənts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valiantness", "form": "valiantnesses", "position": 1, "pronunciation": "/ˈvæljəntnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "validate", "form": "validated", "position": 1, "pronunciation": "/ˈvæləˌdeɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "validate", "form": "validates", "position": 2, "pronunciation": "/ˈvæləˌdeɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
-{"headword": "validate", "form": "validating", "position": 3, "pronunciation": "/ˈvæləˌdeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"collateral\", \"confirming\", \"confirmatory\", \"corroborative\", \"corroboratory\", \"substantiating\", \"substantiative\", \"verifying\"]"}
-{"headword": "validation", "form": "validations", "position": 1, "pronunciation": "/ˌvæləˈdeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "validate", "form": "validated", "position": 1, "pronunciation": "/ˈvælɪˌdeɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "validate", "form": "validates", "position": 2, "pronunciation": "/ˈvælɪˌdeɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "validate", "form": "validating", "position": 3, "pronunciation": "/ˈvælɪˌdeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"collateral\", \"confirming\", \"confirmatory\", \"corroborative\", \"corroboratory\", \"substantiating\", \"substantiative\", \"verifying\"]"}
+{"headword": "validation", "form": "validations", "position": 1, "pronunciation": "/ˌvælɪˈdeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "validity", "form": "validities", "position": 1, "pronunciation": "/vəˈlɪdətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valine", "form": "valines", "position": 1, "pronunciation": "/ˈveɪlinz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valise", "form": "valises", "position": 1, "pronunciation": "/vəˈlizɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valkyr", "form": "valkyrs", "position": 1, "pronunciation": "/ˈvælkərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "valkyrie", "form": "valkyries", "position": 1, "pronunciation": "/ˈvælkɪriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "valkyrie", "form": "valkyries", "position": 1, "pronunciation": "/vælˈkɪriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vallecula", "form": "valleculae", "position": 1, "pronunciation": "/væˈlɛkjəˌli/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valley", "form": "valleys", "position": 1, "pronunciation": "/ˈvæliz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "vallum", "form": "valla", "position": 1, "pronunciation": "/ˈvælə/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vallum", "form": "vallums", "position": 2, "pronunciation": "/ˈvæləmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valonia", "form": "valonias", "position": 1, "pronunciation": "/vəˈloʊniəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valorization", "form": "valorizations", "position": 1, "pronunciation": "/ˌvæləraɪˈzeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valorize", "form": "valorise", "position": 1, "pronunciation": "/ˈvæləraɪz/", "labels": "[\"var.\"]", "synonyms": null}
@@ -115,7 +123,8 @@
 {"headword": "valour", "form": "valor", "position": 1, "pronunciation": "/ˈvælər/", "labels": "[\"var.\"]", "synonyms": "[\"heroism\", \"gallantry\", \"valour\", \"valiance\", \"valiancy\"]"}
 {"headword": "valour", "form": "valors", "position": 2, "pronunciation": "/ˈvælərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valour", "form": "valours", "position": 3, "pronunciation": "/ˈvæljərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "valpolicella", "form": "valpolicellas", "position": 1, "pronunciation": "/ˌvælpoʊləˈtʃɛləz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "valpolicella", "form": "valpolicellas", "position": 1, "pronunciation": "/ˌvælpoʊlɪˈtʃɛləz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "valproate", "form": "valproates", "position": 1, "pronunciation": "/vælˈproʊeɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valuableness", "form": "valuablenesses", "position": 1, "pronunciation": "/ˈvæljəbəlnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valuate", "form": "valuated", "position": 1, "pronunciation": "/ˈvæljueɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "valuate", "form": "valuates", "position": 2, "pronunciation": "/ˈvæljueɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -136,6 +145,7 @@
 {"headword": "valvule", "form": "valvules", "position": 2, "pronunciation": "/ˈvælvjulz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valvulitis", "form": "valvulitides", "position": 1, "pronunciation": "/ˌvælvjəˈlaɪtɪdiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "valvulitis", "form": "valvulitises", "position": 2, "pronunciation": "/ˌvælvjəˈlaɪtəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "valvulotomy", "form": "valvulotomies", "position": 1, "pronunciation": "/ˌvælvjəˈlɑtəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vambrace", "form": "vambraces", "position": 1, "pronunciation": "/ˈvæmbreɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vamoose", "form": "vamoosed", "position": 1, "pronunciation": "/væˈmust/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vamoose", "form": "vamooses", "position": 2, "pronunciation": "/væˈmuzəz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -148,12 +158,15 @@
 {"headword": "vamp", "form": "vamping", "position": 2, "pronunciation": "/ˈvæmpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vamp", "form": "vamps", "position": 3, "pronunciation": "/væmps/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vamper", "form": "vampers", "position": 1, "pronunciation": "/ˈvæmpərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vamphorn", "form": "vamphorns", "position": 1, "pronunciation": "/ˈvæmpˌhɔrnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vampire", "form": "vampires", "position": 1, "pronunciation": "/ˈvæmpaɪrz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vampirism", "form": "vampirisms", "position": 1, "pronunciation": "/ˈvæmpaɪrɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vamplate", "form": "vamplates", "position": 1, "pronunciation": "/ˈvæmˌpleɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "van", "form": "vanned", "position": 1, "pronunciation": "/vænd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "van", "form": "vanning", "position": 2, "pronunciation": "/ˈvænɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "van", "form": "vans", "position": 3, "pronunciation": "/vænz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vanadate", "form": "vanadates", "position": 1, "pronunciation": "/ˈvænədeɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vanadinite", "form": "vanadinites", "position": 1, "pronunciation": "/vəˈnædəˌnaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vanadium", "form": "vanadiums", "position": 1, "pronunciation": "/vəˈneɪdiəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vanaspati", "form": "vanaspatis", "position": 1, "pronunciation": "/vəˈnæspətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vanda", "form": "vandas", "position": 1, "pronunciation": "/ˈvændəz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -169,6 +182,7 @@
 {"headword": "vandyke", "form": "vandyked", "position": 1, "pronunciation": "/vænˈdaɪkt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vandyke", "form": "vandykes", "position": 2, "pronunciation": "/vænˈdaɪks/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vane", "form": "vanes", "position": 1, "pronunciation": "/veɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vanessid", "form": "vanessids", "position": 1, "pronunciation": "/vəˈnɛsɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vang", "form": "vangs", "position": 1, "pronunciation": "/væŋz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vanguard", "form": "van", "position": 1, "pronunciation": "/væn/", "labels": "[\"abbr.\"]", "synonyms": "[\"caravan\", \"vanguard\"]"}
 {"headword": "vanguard", "form": "vanguards", "position": 2, "pronunciation": "/ˈvænɡɑrdz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -181,8 +195,8 @@
 {"headword": "vanish", "form": "vanishing", "position": 3, "pronunciation": "/ˈvænɪʃɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vanisher", "form": "vanishers", "position": 1, "pronunciation": "/ˈvænɪʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vanitory", "form": "vanitories", "position": 1, "pronunciation": "/ˈvænətɔriz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vanity", "form": "vanitied", "position": 1, "pronunciation": "/ˈvænɪtid/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "vanity", "form": "vanities", "position": 2, "pronunciation": "/ˈvænətiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vanity", "form": "vanities", "position": 1, "pronunciation": "/ˈvænətiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vanload", "form": "vanloads", "position": 1, "pronunciation": "/ˈvænˌloʊdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vanman", "form": "vanmen", "position": 1, "pronunciation": "/ˈvænˌmɛn/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vanner", "form": "vanners", "position": 1, "pronunciation": "/ˈvænərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vanpool", "form": "vanpooling", "position": 1, "pronunciation": "/ˈvænˌpulɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -192,7 +206,8 @@
 {"headword": "vanquish", "form": "vanquishes", "position": 2, "pronunciation": "/ˈvæŋkwɪʃɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vanquish", "form": "vanquishing", "position": 3, "pronunciation": "/ˈvæŋkwɪʃɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vanquisher", "form": "vanquishers", "position": 1, "pronunciation": "/ˈvæŋkwɪʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vantage", "form": "vantages", "position": 1, "pronunciation": "/ˈvæntɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vantage", "form": "vantages", "position": 1, "pronunciation": "/ˈvæntədʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vap", "form": "vaps", "position": 1, "pronunciation": "/væps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vape", "form": "vaped", "position": 1, "pronunciation": "/veɪpt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vape", "form": "vapes", "position": 2, "pronunciation": "/veɪps/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vape", "form": "vaping", "position": 3, "pronunciation": "/ˈveɪpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -206,8 +221,9 @@
 {"headword": "vapored", "form": "vapoured", "position": 1, "pronunciation": "/ˈveɪpərd/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "vaporetto", "form": "vaporetti", "position": 1, "pronunciation": "/vɑpəˈrɛti/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vaporetto", "form": "vaporettos", "position": 2, "pronunciation": "/vɑpəˈrɛtoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vaporimeter", "form": "vaporimeters", "position": 1, "pronunciation": "/ˌveɪpəˈrɪmətərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vaporishness", "form": "vaporishnesses", "position": 1, "pronunciation": "/ˈveɪpərɪʃnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vaporization", "form": "vaporizations", "position": 1, "pronunciation": "/veɪpərəˈzeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vaporization", "form": "vaporizations", "position": 1, "pronunciation": "/ˌveɪpərəˈzeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vaporize", "form": "vaporise", "position": 1, "pronunciation": "/ˈveɪpəˌraɪz/", "labels": "[\"var.\"]", "synonyms": "[\"evaporate\", \"vaporize\", \"gasify\", \"aerify\"]"}
 {"headword": "vaporize", "form": "vaporised", "position": 2, "pronunciation": "/ˈveɪpəˌraɪzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vaporize", "form": "vaporises", "position": 3, "pronunciation": "/ˈveɪpəˌraɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -230,7 +246,13 @@
 {"headword": "var", "form": "vars", "position": 1, "pronunciation": "/vɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vara", "form": "varas", "position": 1, "pronunciation": "/ˈvɑrəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "varactor", "form": "varactors", "position": 1, "pronunciation": "/vəˈræktərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "variability", "form": "variabilities", "position": 1, "pronunciation": "/ˌvɛriəˈbɪlɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "varda", "form": "vardaed", "position": 1, "pronunciation": "/ˈvɑrdəd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "varda", "form": "vardaing", "position": 2, "pronunciation": "/ˈvɑrdəɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "varda", "form": "vardas", "position": 3, "pronunciation": "/ˈvɑrdəz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vare", "form": "vares", "position": 1, "pronunciation": "/vɛrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vargueno", "form": "varguenos", "position": 1, "pronunciation": "/vɑrˈɡeɪnjoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vari", "form": "varis", "position": 1, "pronunciation": "/ˈvɑriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "variability", "form": "variabilities", "position": 1, "pronunciation": "/ˌvɛriəˈbɪlətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "variable", "form": "var", "position": 1, "pronunciation": "/vɑr/", "labels": "[\"abbr.\"]", "synonyms": null}
 {"headword": "variable", "form": "variables", "position": 2, "pronunciation": "/ˈvɛriəbəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "variableness", "form": "variablenesses", "position": 1, "pronunciation": "/ˈvɛriəbəlnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -241,9 +263,11 @@
 {"headword": "variate", "form": "variates", "position": 2, "pronunciation": "/ˈvɛriˌeɪts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "variate", "form": "variating", "position": 3, "pronunciation": "/ˈvɛriˌeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "variation", "form": "variations", "position": 1, "pronunciation": "/ˌvɛriˈeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "varicella", "form": "varicellas", "position": 1, "pronunciation": "/ˌvɛriˈsɛləz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "varicocele", "form": "varicoceles", "position": 1, "pronunciation": "/ˈvɛrikoʊˌsilz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "varicella", "form": "varicellas", "position": 1, "pronunciation": "/ˌværɪˈsɛləz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "varicocele", "form": "varicoceles", "position": 1, "pronunciation": "/ˈvɛrəkoʊˌsilz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "varicocelectomy", "form": "varicocelectomies", "position": 1, "pronunciation": "/ˌvɛrəkoʊsəˈlɛktəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "varicosity", "form": "varicosities", "position": 1, "pronunciation": "/ˌvɛrɪˈkɑsɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "varicotomy", "form": "varicotomies", "position": 1, "pronunciation": "/ˌvɛrəˈkɑtəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "variegate", "form": "variegated", "position": 1, "pronunciation": "/ˈvɛrɪɡeɪtɪd/", "labels": "[\"past\"]", "synonyms": "[\"varicolored\"]"}
 {"headword": "variegate", "form": "variegates", "position": 2, "pronunciation": "/ˈvɛrɪɡeɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "variegate", "form": "variegating", "position": 3, "pronunciation": "/ˈvɛrɪɡeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -252,14 +276,21 @@
 {"headword": "varier", "form": "variers", "position": 1, "pronunciation": "/ˈvɛriərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "varietal", "form": "varietals", "position": 1, "pronunciation": "/vərˈaɪətəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "variety", "form": "varieties", "position": 1, "pronunciation": "/vərˈaɪətiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "variocoupler", "form": "variocouplers", "position": 1, "pronunciation": "/ˌvɛrioʊˈkʌplərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "variola", "form": "variolas", "position": 1, "pronunciation": "/vəˈraɪələz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "variola", "form": "variole", "position": 2, "pronunciation": "/ˈvɛərioʊl/", "labels": "[\"var.\"]", "synonyms": null}
-{"headword": "variole", "form": "varioles", "position": 1, "pronunciation": "/ˈvɛriˌoʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "variolate", "form": "variolated", "position": 1, "pronunciation": "/ˈvɛriəˌleɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "variolate", "form": "variolates", "position": 2, "pronunciation": "/ˈvɛriəˌleɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "variolate", "form": "variolating", "position": 3, "pronunciation": "/ˈvɛriəˌleɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "variole", "form": "varioles", "position": 1, "pronunciation": "/ˈvɛərioʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "variolite", "form": "variolites", "position": 1, "pronunciation": "/ˈvɛriəˌlaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "varioloid", "form": "varioloids", "position": 1, "pronunciation": "/ˈvɛriəˌlɔɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "variometer", "form": "variometers", "position": 1, "pronunciation": "/ˌvɛriˈɑmɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "variorum", "form": "variorums", "position": 1, "pronunciation": "/vɛrɪˈɔrəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "variousness", "form": "variousnesses", "position": 1, "pronunciation": "/ˈvɛriəsnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "variscite", "form": "variscites", "position": 1, "pronunciation": "/ˈvɛrəˌsaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "varistor", "form": "varistors", "position": 1, "pronunciation": "/vəˈrɪstərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "varix", "form": "varices", "position": 1, "pronunciation": "/ˈvɛrɪˌsiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "varix", "form": "varices", "position": 1, "pronunciation": "/ˈvɛərɪˌsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "varlet", "form": "varlets", "position": 1, "pronunciation": "/ˈvɑrlɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "varletry", "form": "varletries", "position": 1, "pronunciation": "/ˈvɑrlɪtriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "varmint", "form": "varment", "position": 1, "pronunciation": "/ˈvɑrmənt/", "labels": "[\"var.\"]", "synonyms": "[\"varmint\"]"}
@@ -278,15 +309,19 @@
 {"headword": "vary", "form": "varies", "position": 2, "pronunciation": "/ˈvɛriz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vary", "form": "varying", "position": 3, "pronunciation": "/ˈvɛriɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"variable\"]"}
 {"headword": "vas", "form": "vasa", "position": 1, "pronunciation": "/ˈvɑsə/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vasana", "form": "vasanas", "position": 1, "pronunciation": "/ˈvɑsənəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vascularity", "form": "vascularities", "position": 1, "pronunciation": "/ˌvæskjəˈlærɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vascularize", "form": "vascularized", "position": 1, "pronunciation": "/ˈvæskjələˌraɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vascularize", "form": "vascularizes", "position": 2, "pronunciation": "/ˈvæskjələˌraɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vascularize", "form": "vascularizing", "position": 3, "pronunciation": "/ˈvæskjələˌraɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vasculature", "form": "vasculatures", "position": 1, "pronunciation": "/ˈvæskjələtʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasculitis", "form": "vasculitides", "position": 1, "pronunciation": "/ˌvæskjəˈlɪtɪdiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasculum", "form": "vascula", "position": 1, "pronunciation": "/ˈvæskjələ/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasculum", "form": "vasculums", "position": 2, "pronunciation": "/ˈvæskjələmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vase", "form": "vases", "position": 1, "pronunciation": "/ˈveɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vasectomize", "form": "vasectomized", "position": 1, "pronunciation": "/vəˈzɛktəmaɪzd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "vasectomize", "form": "vasectomizes", "position": 2, "pronunciation": "/vəˈzɛktəmaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
-{"headword": "vasectomize", "form": "vasectomizing", "position": 3, "pronunciation": "/vəˈzɛktəmaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vasectomize", "form": "vasectomized", "position": 1, "pronunciation": "/vəˈsɛktəˌmaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vasectomize", "form": "vasectomizes", "position": 2, "pronunciation": "/vəˈsɛktəˌmaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vasectomize", "form": "vasectomizing", "position": 3, "pronunciation": "/vəˈsɛktəˌmaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vasectomy", "form": "vasectomies", "position": 1, "pronunciation": "/vəˈzɛktəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasoactivity", "form": "vasoactivities", "position": 1, "pronunciation": "/ˌveɪzoʊækˈtɪvɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasoconstrictor", "form": "vasoconstrictors", "position": 1, "pronunciation": "/ˌveɪzoʊkənˈstrɪktərz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -295,33 +330,46 @@
 {"headword": "vasodilate", "form": "vasodilating", "position": 3, "pronunciation": "/ˌveɪzoʊdaɪˈleɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vasodilation", "form": "vasodilations", "position": 1, "pronunciation": "/ˌveɪzoʊdaɪˈleɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasodilator", "form": "vasodilators", "position": 1, "pronunciation": "/ˌveɪzoʊˈdaɪleɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vasoinhibitor", "form": "vasoinhibitors", "position": 1, "pronunciation": "/ˌveɪzoʊɪnˈhɪbətərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vasoplegia", "form": "vasoplegias", "position": 1, "pronunciation": "/ˌveɪzoʊˈplidʒiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasopressin", "form": "vasopressins", "position": 1, "pronunciation": "/ˌveɪzoʊˈprɛsɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasopressor", "form": "vasopressors", "position": 1, "pronunciation": "/ˌveɪzoʊˈprɛsərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasospasm", "form": "vasospasms", "position": 1, "pronunciation": "/ˈveɪzoʊspæzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vasostimulant", "form": "vasostimulants", "position": 1, "pronunciation": "/ˌveɪzoʊˈstɪmjələnts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasotocin", "form": "vasotocins", "position": 1, "pronunciation": "/ˌveɪzoʊˈtoʊsɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasotomy", "form": "vasotomies", "position": 1, "pronunciation": "/vəˈsɑtəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vasovasostomy", "form": "vasovasostomies", "position": 1, "pronunciation": "/ˌveɪzoʊˌvæsəˈɑstəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vassal", "form": "vasal", "position": 1, "pronunciation": "/ˈveɪsəl/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "vassal", "form": "vassals", "position": 2, "pronunciation": "/ˈvæsəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vassalage", "form": "vassalages", "position": 1, "pronunciation": "/ˈvæsəlɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vassalize", "form": "vassalized", "position": 1, "pronunciation": "/ˈvæsəˌlaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vassalize", "form": "vassalizes", "position": 2, "pronunciation": "/ˈvæsəˌlaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vassalize", "form": "vassalizing", "position": 3, "pronunciation": "/ˈvæsəˌlaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vast", "form": "vaster", "position": 1, "pronunciation": "/ˈvæstər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "vast", "form": "vastest", "position": 2, "pronunciation": "/ˈvæstɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "vast", "form": "vasts", "position": 3, "pronunciation": "/væsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vastitude", "form": "vastitudes", "position": 1, "pronunciation": "/ˈvæstɪˌtudz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vastity", "form": "vastities", "position": 1, "pronunciation": "/ˈvæstɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vastness", "form": "vastnesses", "position": 1, "pronunciation": "/ˈvæstnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vastus", "form": "vasti", "position": 1, "pronunciation": "/ˈvæstaɪ/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vasty", "form": "vastier", "position": 1, "pronunciation": "/ˈvæstiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "vasty", "form": "vastiest", "position": 2, "pronunciation": "/ˈvæstiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "vat", "form": "vats", "position": 1, "pronunciation": "/væts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vat", "form": "vatted", "position": 2, "pronunciation": "/ˈvætɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vat", "form": "vatting", "position": 3, "pronunciation": "/ˈvætɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vatful", "form": "vatfuls", "position": 1, "pronunciation": "/ˈvætfʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vaticide", "form": "vaticides", "position": 1, "pronunciation": "/vəˈtɪsɪˌsaɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vaticide", "form": "vaticides", "position": 1, "pronunciation": "/ˈvætɪˌsaɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vaticinate", "form": "vaticinated", "position": 1, "pronunciation": "/vəˈtɪsɪˌneɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vaticinate", "form": "vaticinates", "position": 2, "pronunciation": "/vəˈtɪsɪˌneɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vaticinate", "form": "vaticinating", "position": 3, "pronunciation": "/vəˈtɪsɪˌneɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vaticination", "form": "vaticinations", "position": 1, "pronunciation": "/vəˌtɪsɪˈneɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vaticinator", "form": "vaticinators", "position": 1, "pronunciation": "/vəˈtɪsɪˌneɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vatman", "form": "vatmen", "position": 1, "pronunciation": "/ˈvætmən/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vato", "form": "vatos", "position": 1, "pronunciation": "/ˈvɑtoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vatu", "form": "vatus", "position": 1, "pronunciation": "/ˈvɑtuz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vauch", "form": "vauched", "position": 1, "pronunciation": "/vɑtʃt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vauch", "form": "vauches", "position": 2, "pronunciation": "/ˈvɑtʃɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vauch", "form": "vauching", "position": 3, "pronunciation": "/ˈvɑtʃɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vaudeville", "form": "vaudevilles", "position": 1, "pronunciation": "/ˈvɔdvɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vaudevillian", "form": "vaudevillians", "position": 1, "pronunciation": "/ˌvɔdəˈvɪljənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vault", "form": "vaulted", "position": 1, "pronunciation": "/ˈvɔltɪd/", "labels": "[\"past\"]", "synonyms": "[\"domed\"]"}
@@ -339,6 +387,7 @@
 {"headword": "vav", "form": "vaw", "position": 4, "pronunciation": "/vɔ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "vav", "form": "vaws", "position": 5, "pronunciation": "/vɔz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vav", "form": "waw", "position": 6, "pronunciation": "/wɔ/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "vavasory", "form": "vavasories", "position": 1, "pronunciation": "/ˈvævəˌsɔriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vavasour", "form": "vavasor", "position": 1, "pronunciation": "/ˈvævəsɔr/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "vavasour", "form": "vavasors", "position": 2, "pronunciation": "/ˈvævəsɔrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vavasour", "form": "vavasours", "position": 3, "pronunciation": "/ˈvævəsʊrz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -348,17 +397,22 @@
 {"headword": "vax", "form": "vaxxed", "position": 1, "pronunciation": "/vækst/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vax", "form": "vaxxes", "position": 2, "pronunciation": "/ˈvæksɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vax", "form": "vaxxing", "position": 3, "pronunciation": "/ˈvæksɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vaxxer", "form": "vaxxers", "position": 1, "pronunciation": "/ˈvæksərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veal", "form": "vealed", "position": 1, "pronunciation": "/vild/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "veal", "form": "vealing", "position": 2, "pronunciation": "/ˈvilɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "veal", "form": "veals", "position": 3, "pronunciation": "/vilz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vealer", "form": "vealers", "position": 1, "pronunciation": "/ˈvilərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vealy", "form": "vealiest", "position": 1, "pronunciation": "/ˈviliɪst/", "labels": "[\"superl.\"]", "synonyms": null}
+{"headword": "vealy", "form": "vealiest", "position": 1, "pronunciation": "/ˈviliəst/", "labels": "[\"superl.\"]", "synonyms": null}
+{"headword": "veblenian", "form": "veblenians", "position": 1, "pronunciation": "/vɛˈbliniənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vector", "form": "vectored", "position": 1, "pronunciation": "/ˈvɛktərd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vector", "form": "vectoring", "position": 2, "pronunciation": "/ˈvɛktərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vector", "form": "vectors", "position": 3, "pronunciation": "/ˈvɛktərz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "vectorcardiogram", "form": "vectorcardiograms", "position": 1, "pronunciation": "/ˌvɛktərˈkɑrdioʊˌɡræmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vectorize", "form": "vectorized", "position": 1, "pronunciation": "/ˈvɛktəˌraɪzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vectorize", "form": "vectorizes", "position": 2, "pronunciation": "/ˈvɛktəˌraɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vectorize", "form": "vectorizing", "position": 3, "pronunciation": "/ˈvɛktəˌraɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vecture", "form": "vectures", "position": 1, "pronunciation": "/ˈvɛktʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vecturist", "form": "vecturists", "position": 1, "pronunciation": "/ˈvɛktʃərɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vedalia", "form": "vedalias", "position": 1, "pronunciation": "/vɪˈdeɪliəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vedette", "form": "vedettes", "position": 1, "pronunciation": "/vɪˈdɛts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vedette", "form": "vidette", "position": 2, "pronunciation": "/vɪˈdɛt/", "labels": "[\"var.\"]", "synonyms": null}
@@ -373,8 +427,8 @@
 {"headword": "veer", "form": "veered", "position": 1, "pronunciation": "/vɪrd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "veer", "form": "veering", "position": 2, "pronunciation": "/ˈvɪrɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"swerve\", \"swerving\"]"}
 {"headword": "veer", "form": "veers", "position": 3, "pronunciation": "/vɪrz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
-{"headword": "veery", "form": "veeries", "position": 1, "pronunciation": "/ˈvɪriz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vegan", "form": "vegans", "position": 1, "pronunciation": "/ˈveɡənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "veery", "form": "veeries", "position": 1, "pronunciation": "/ˈvɪəriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vegan", "form": "vegans", "position": 1, "pronunciation": "/ˈviɡənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veganism", "form": "veganisms", "position": 1, "pronunciation": "/ˈviɡəˌnɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vegetable", "form": "vegetables", "position": 1, "pronunciation": "/ˈvɛdʒtəbəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vegetarian", "form": "vegetarians", "position": 1, "pronunciation": "/ˌvɛdʒəˈtɛriənz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -387,6 +441,7 @@
 {"headword": "veggie", "form": "veggies", "position": 1, "pronunciation": "/ˈvɛdʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veggie", "form": "vegie", "position": 2, "pronunciation": "/ˈvɛdʒi/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "veggie", "form": "vegies", "position": 3, "pronunciation": "/ˈvɛdʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vego", "form": "vegos", "position": 1, "pronunciation": "/ˈvɛdʒoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vehemence", "form": "vehemences", "position": 1, "pronunciation": "/ˈviəmənsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vehicle", "form": "vehicles", "position": 1, "pronunciation": "/ˈvihɪkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veil", "form": "vail", "position": 1, "pronunciation": "/veɪl/", "labels": "[\"arch. var.\", \"var.\"]", "synonyms": null}
@@ -413,18 +468,25 @@
 {"headword": "velarize", "form": "velarizes", "position": 2, "pronunciation": "/ˈviləraɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "velarize", "form": "velarizing", "position": 3, "pronunciation": "/ˈviləraɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "veld", "form": "velds", "position": 1, "pronunciation": "/vɛlts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "veldskoen", "form": "veldskoens", "position": 1, "pronunciation": "/ˈvɛltˌskʊnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veldt", "form": "veldts", "position": 1, "pronunciation": "/vɛlts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "velella", "form": "velellas", "position": 1, "pronunciation": "/vəˈlɛləz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veliger", "form": "veligers", "position": 1, "pronunciation": "/ˈvɛlɪdʒərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "velitation", "form": "velitations", "position": 1, "pronunciation": "/ˌvɛləˈteɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "velleity", "form": "velleities", "position": 1, "pronunciation": "/vɛˈliɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vellicate", "form": "vellicated", "position": 1, "pronunciation": "/ˈvɛləˌkeɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vellicate", "form": "vellicates", "position": 2, "pronunciation": "/ˈvɛləˌkeɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vellicate", "form": "vellicating", "position": 3, "pronunciation": "/ˈvɛləˌkeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vellum", "form": "vellums", "position": 1, "pronunciation": "/ˈvɛləmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "velocimeter", "form": "velocimeters", "position": 1, "pronunciation": "/ˌviloʊˈsɪmɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "velocipede", "form": "velocipedes", "position": 1, "pronunciation": "/vɪˈlɑsɪpidz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "velociraptor", "form": "velociraptors", "position": 1, "pronunciation": "/vəˈlɑsəˌræptərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "velocity", "form": "velocities", "position": 1, "pronunciation": "/vəˈlɑsətiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "velodrome", "form": "velodromes", "position": 1, "pronunciation": "/ˌvɛloʊˈdroʊmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "velodrome", "form": "velodromes", "position": 1, "pronunciation": "/ˈvɛloʊˌdroʊmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "velomobile", "form": "velomobiles", "position": 1, "pronunciation": "/ˈvɛləˌmoʊbilz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "velour", "form": "velours", "position": 1, "pronunciation": "/vəˈlʊrz/", "labels": "[\"pl.\"]", "synonyms": "[\"velour\"]"}
 {"headword": "veloute", "form": "veloutes", "position": 1, "pronunciation": "/vəˈluteɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "veltheimia", "form": "veltheimias", "position": 1, "pronunciation": "/vɛlˈθimiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "velum", "form": "vela", "position": 1, "pronunciation": "/ˈvɛlə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "velure", "form": "velured", "position": 1, "pronunciation": "/vəˈlʊrd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "velure", "form": "velures", "position": 2, "pronunciation": "/vəˈlʊrz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -438,9 +500,9 @@
 {"headword": "venation", "form": "venations", "position": 1, "pronunciation": "/vɪˈneɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vend", "form": "vended", "position": 1, "pronunciation": "/ˈvɛndɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vend", "form": "vending", "position": 2, "pronunciation": "/ˈvɛndɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"peddling\", \"hawking\"]"}
-{"headword": "vend", "form": "vends", "position": 3, "pronunciation": "/ˈvɛndz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vend", "form": "vends", "position": 3, "pronunciation": "/vɛndz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vendace", "form": "vendaces", "position": 1, "pronunciation": "/ˈvɛndɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vendee", "form": "vendees", "position": 1, "pronunciation": "/ˌvɛnˈdiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vendee", "form": "vendees", "position": 1, "pronunciation": "/vɛnˈdiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vender", "form": "venders", "position": 1, "pronunciation": "/ˈvɛndərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vendetta", "form": "vendettas", "position": 1, "pronunciation": "/vɛnˈdɛtəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vendeuse", "form": "vendeuses", "position": 1, "pronunciation": "/vɑnˈduzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -459,14 +521,15 @@
 {"headword": "venenate", "form": "venenates", "position": 2, "pronunciation": "/ˈvɛnɪneɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "venenate", "form": "venenating", "position": 3, "pronunciation": "/ˈvɛnɪneɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "venerability", "form": "venerabilities", "position": 1, "pronunciation": "/ˌvɛnərəˈbɪlɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "venerate", "form": "venerated", "position": 1, "pronunciation": "/ˈvɛnəreɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "venerate", "form": "venerates", "position": 2, "pronunciation": "/ˈvɛnərˌeɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
-{"headword": "venerate", "form": "venerating", "position": 3, "pronunciation": "/ˈvɛnərˌeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"respectful\", \"reverential\"]"}
+{"headword": "venerate", "form": "venerated", "position": 1, "pronunciation": "/ˈvɛnəˌreɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "venerate", "form": "venerates", "position": 2, "pronunciation": "/ˈvɛnəˌreɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "venerate", "form": "venerating", "position": 3, "pronunciation": "/ˈvɛnəˌreɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"respectful\", \"reverential\"]"}
 {"headword": "veneration", "form": "venerations", "position": 1, "pronunciation": "/ˌvɛnərˈeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "venerator", "form": "venerators", "position": 1, "pronunciation": "/ˈvɛnəˌreɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "venerer", "form": "venerers", "position": 1, "pronunciation": "/ˈvɛnərərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "venery", "form": "veneries", "position": 1, "pronunciation": "/ˈvɛnəriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "venesection", "form": "venesections", "position": 1, "pronunciation": "/ˌvɛnəˈsɛkʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "venetian", "form": "venetians", "position": 1, "pronunciation": "/vəˈnɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "venetian", "form": "venetians", "position": 1, "pronunciation": "/vəˈniʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "venge", "form": "venged", "position": 1, "pronunciation": "/vɛndʒd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "venge", "form": "venges", "position": 2, "pronunciation": "/ˈvɛndʒɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "venge", "form": "venging", "position": 3, "pronunciation": "/ˈvɛndʒɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -479,11 +542,10 @@
 {"headword": "venire", "form": "venires", "position": 1, "pronunciation": "/vɛˈnaɪriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "venireman", "form": "veniremen", "position": 1, "pronunciation": "/vɛˈnaɪrmɛn/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "venison", "form": "venisons", "position": 1, "pronunciation": "/ˈvɛnəsənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vennel", "form": "vennels", "position": 1, "pronunciation": "/ˈvɛnəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "venogram", "form": "venograms", "position": 1, "pronunciation": "/ˈvinəˌɡræmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "venography", "form": "venographies", "position": 1, "pronunciation": "/vɪˈnɑɡrəfiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "venom", "form": "venomed", "position": 1, "pronunciation": "/ˈvɛnəmd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "venom", "form": "venoming", "position": 2, "pronunciation": "/ˈvɛnəmɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "venom", "form": "venoms", "position": 3, "pronunciation": "/ˈvɛnəmz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "venom", "form": "venoms", "position": 3, "pronunciation": "/ˈvɛnəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "venomer", "form": "venomers", "position": 1, "pronunciation": "/ˈvɛnəmərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "venomousness", "form": "venomousnesses", "position": 1, "pronunciation": "/ˈvɛnəməsnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "venosity", "form": "venosities", "position": 1, "pronunciation": "/vɪˈnɑsɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -498,9 +560,12 @@
 {"headword": "ventilate", "form": "ventilates", "position": 2, "pronunciation": "/ˈvɛntəˌleɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "ventilate", "form": "ventilating", "position": 3, "pronunciation": "/ˈvɛntəˌleɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "ventilation", "form": "ventilations", "position": 1, "pronunciation": "/ˌvɛntəˈleɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ventilationist", "form": "ventilationists", "position": 1, "pronunciation": "/ˌvɛntəˈleɪʃənɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ventilator", "form": "ventilators", "position": 1, "pronunciation": "/ˈvɛntəˌleɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "ventral", "form": "ventrals", "position": 1, "pronunciation": "/ˈvɛntrəlz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "ventricle", "form": "ventricles", "position": 1, "pronunciation": "/ˈvɛnˌtrɪkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ventouse", "form": "ventouses", "position": 1, "pronunciation": "/vɛnˈtusɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ventricle", "form": "ventricles", "position": 1, "pronunciation": "/ˈvɛntrɪkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ventriculography", "form": "ventriculographies", "position": 1, "pronunciation": "/vɛnˌtrɪkjəˈlɑɡrəfiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ventriculostomy", "form": "ventriculostomies", "position": 1, "pronunciation": "/vɛnˌtrɪkjəˈlɑstəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ventriculus", "form": "ventriculi", "position": 1, "pronunciation": "/vɛnˈtrɪkjəˌli/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ventriloquism", "form": "ventriloquisms", "position": 1, "pronunciation": "/vɛnˈtrɪloʊˌkwɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ventriloquist", "form": "ventriloquists", "position": 1, "pronunciation": "/vɛnˈtrɪləkwɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -517,24 +582,26 @@
 {"headword": "veracity", "form": "veracities", "position": 1, "pronunciation": "/vərˈæsɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veranda", "form": "verandah", "position": 1, "pronunciation": "/vəˈrændə/", "labels": "[\"arch. var.\"]", "synonyms": "[\"veranda\", \"gallery\"]"}
 {"headword": "veranda", "form": "verandahs", "position": 2, "pronunciation": "/vəˈrændəz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "veranda", "form": "verandas", "position": 3, "pronunciation": "/vərˈændəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "veranda", "form": "verandas", "position": 3, "pronunciation": "/vəˈrændəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verandaed", "form": "verandahed", "position": 1, "pronunciation": "/vəˈrændəd/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "verapamil", "form": "verapamils", "position": 1, "pronunciation": "/vəˈræpəmɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veratria", "form": "veratrias", "position": 1, "pronunciation": "/vəˈreɪtriəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veratridine", "form": "veratridines", "position": 1, "pronunciation": "/vɛˈrætrɪdɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veratrine", "form": "veratrin", "position": 1, "pronunciation": "/ˈvɛrətrɪn/", "labels": "[\"var.\"]", "synonyms": null}
-{"headword": "veratrine", "form": "veratrines", "position": 2, "pronunciation": "/ˈvɛrətrɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "veratrine", "form": "veratrines", "position": 2, "pronunciation": "/ˈvɛrəˌtrinz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veratrine", "form": "veratrins", "position": 3, "pronunciation": "/ˈvɛrətrɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veratrum", "form": "veratrums", "position": 1, "pronunciation": "/vəˈrætrəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verb", "form": "verbs", "position": 1, "pronunciation": "/vɜrbz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "verbal", "form": "verbals", "position": 1, "pronunciation": "/ˈvɜrbəlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "verbalism", "form": "verbalisms", "position": 1, "pronunciation": "/ˈvɜrbəˌlɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "verbalism", "form": "verbalisms", "position": 1, "pronunciation": "/ˈvɜrbəlɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verbalist", "form": "verbalists", "position": 1, "pronunciation": "/ˈvɜrbələsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "verbality", "form": "verbalities", "position": 1, "pronunciation": "/vərˈbælɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verbalization", "form": "verbalizations", "position": 1, "pronunciation": "/ˌvɜrbələˈzeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verbalize", "form": "verbalized", "position": 1, "pronunciation": "/ˈvɜrbəˌlaɪzd/", "labels": "[\"past\"]", "synonyms": "[\"expressed\", \"uttered\"]"}
 {"headword": "verbalize", "form": "verbalizes", "position": 2, "pronunciation": "/ˈvɜrbəˌlaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "verbalize", "form": "verbalizing", "position": 3, "pronunciation": "/ˈvɜrbəˌlaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "verbalizer", "form": "verbalizers", "position": 1, "pronunciation": "/ˈvɜrbəˌlaɪzərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "verbascum", "form": "verbascums", "position": 1, "pronunciation": "/vərˈbæskəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verbena", "form": "verbenas", "position": 1, "pronunciation": "/vərˈbinəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verbiage", "form": "verbiages", "position": 1, "pronunciation": "/ˈvɜrbiɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verbicide", "form": "verbicides", "position": 1, "pronunciation": "/ˈvɜrbəˌsaɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -558,8 +625,10 @@
 {"headword": "verge", "form": "verged", "position": 1, "pronunciation": "/vɜrdʒd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "verge", "form": "verges", "position": 2, "pronunciation": "/ˈvɜrdʒɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "verge", "form": "verging", "position": 3, "pronunciation": "/ˈvɜrdʒɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vergeboard", "form": "vergeboards", "position": 1, "pronunciation": "/ˈvɜrdʒˌbɔrdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vergence", "form": "vergences", "position": 1, "pronunciation": "/ˈvɜrdʒənsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verger", "form": "vergers", "position": 1, "pronunciation": "/ˈvɜrdʒərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vergilian", "form": "virgilian", "position": 1, "pronunciation": "/vərˈdʒɪliən/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "verglas", "form": "verglases", "position": 1, "pronunciation": "/vɛərˈɡlɑzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "veridicality", "form": "veridicalities", "position": 1, "pronunciation": "/vəˌrɪdɪˈkælətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verification", "form": "verifications", "position": 1, "pronunciation": "/ˌvɛrəfəˈkeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -575,6 +644,8 @@
 {"headword": "verite", "form": "verites", "position": 1, "pronunciation": "/vɛrɪˈteɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verity", "form": "verities", "position": 1, "pronunciation": "/ˈvɛrətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verjuice", "form": "verjuices", "position": 1, "pronunciation": "/ˈvɜrdʒusɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "verkrampte", "form": "verkramptes", "position": 1, "pronunciation": "/fərˈkrɑmptəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "verligte", "form": "verligtes", "position": 1, "pronunciation": "/fərˈlɪxtəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vermeil", "form": "vermeils", "position": 1, "pronunciation": "/ˈvɜrmɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vermicelli", "form": "vermicellis", "position": 1, "pronunciation": "/vərməˈsɛliz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vermicide", "form": "vermicides", "position": 1, "pronunciation": "/ˈvɜrmɪˌsaɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -583,23 +654,33 @@
 {"headword": "vermicompost", "form": "vermicomposts", "position": 3, "pronunciation": "/ˈvɜrmiˌkɑmpoʊsts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vermiculate", "form": "vermiculated", "position": 1, "pronunciation": "/vərˈmɪkjəˌleɪtɪd/", "labels": "[\"past\"]", "synonyms": "[\"vermicular\", \"vermiculate\"]"}
 {"headword": "vermiculation", "form": "vermiculations", "position": 1, "pronunciation": "/vərˌmɪkjuˈleɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vermicule", "form": "vermicules", "position": 1, "pronunciation": "/ˈvɜrmɪˌkjulz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vermiculite", "form": "vermiculites", "position": 1, "pronunciation": "/vərˈmɪkjəˌlaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vermifuge", "form": "vermifuges", "position": 1, "pronunciation": "/ˈvɜrməˌfjudʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vermilion", "form": "vermilions", "position": 1, "pronunciation": "/vərˈmɪljənz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vermilion", "form": "vermillion", "position": 2, "pronunciation": "/vərˈmɪljən/", "labels": "[\"var.\", \"arch. var.\"]", "synonyms": "[\"vermilion\", \"cinnabar\"]"}
 {"headword": "vermilion", "form": "vermillions", "position": 3, "pronunciation": "/vərˈmɪljənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "verminate", "form": "verminated", "position": 1, "pronunciation": "/ˈvɜrməˌneɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "verminate", "form": "verminates", "position": 2, "pronunciation": "/ˈvɜrməˌneɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "verminate", "form": "verminating", "position": 3, "pronunciation": "/ˈvɜrməˌneɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vermis", "form": "vermes", "position": 1, "pronunciation": "/ˈvɜrmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vermouth", "form": "vermouths", "position": 1, "pronunciation": "/vərˈmuðz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vermouth", "form": "vermuth", "position": 2, "pronunciation": "/vərˈmuθ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "vermouth", "form": "vermuths", "position": 3, "pronunciation": "/vərˈmuθz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vernacle", "form": "vernacles", "position": 1, "pronunciation": "/ˈvɜrnəkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vernacular", "form": "vernaculars", "position": 1, "pronunciation": "/vərˈnækjələrz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vernacularism", "form": "vernacularisms", "position": 1, "pronunciation": "/vərˌnækjələˈrɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vernacularism", "form": "vernacularisms", "position": 1, "pronunciation": "/vərˈnækjələrɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vernacularize", "form": "vernacularized", "position": 1, "pronunciation": "/vərˈnækjələˌraɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vernacularize", "form": "vernacularizes", "position": 2, "pronunciation": "/vərˈnækjələˌraɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vernacularize", "form": "vernacularizing", "position": 3, "pronunciation": "/vərˈnækjələˌraɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vernalization", "form": "vernalizations", "position": 1, "pronunciation": "/ˌvɜrnəlɪˈzeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vernalize", "form": "vernalized", "position": 1, "pronunciation": "/ˈvɜrnəˌlaɪzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vernalize", "form": "vernalizes", "position": 2, "pronunciation": "/ˈvɜrnəˌlaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vernalize", "form": "vernalizing", "position": 3, "pronunciation": "/ˈvɜrnəˌlaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vernation", "form": "vernations", "position": 1, "pronunciation": "/vərˈneɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "verneuk", "form": "verneuked", "position": 1, "pronunciation": "/fərˈnjukt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "verneuk", "form": "verneuking", "position": 2, "pronunciation": "/fərˈnjukɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "verneuk", "form": "verneuks", "position": 3, "pronunciation": "/fərˈnjuks/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vernicle", "form": "vernicles", "position": 1, "pronunciation": "/ˈvɜrnɪkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vernier", "form": "verniers", "position": 1, "pronunciation": "/ˈvɜrniərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vernissage", "form": "vernissages", "position": 1, "pronunciation": "/ˌvɛrnəˈsɑʒəz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -620,15 +701,15 @@
 {"headword": "versify", "form": "versified", "position": 1, "pronunciation": "/ˈvɜrsɪˌfaɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "versify", "form": "versifies", "position": 2, "pronunciation": "/ˈvɜrsɪˌfaɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "versify", "form": "versifying", "position": 3, "pronunciation": "/ˈvɜrsɪˌfaɪɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "versine", "form": "versines", "position": 1, "pronunciation": "/ˈvɜrˌsaɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "versine", "form": "versines", "position": 1, "pronunciation": "/ˈvɜrsaɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "version", "form": "versions", "position": 1, "pronunciation": "/ˈvɜrʒənz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "verso", "form": "versos", "position": 1, "pronunciation": "/ˈvɜrˌsoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "verso", "form": "versos", "position": 1, "pronunciation": "/ˈvɜrsoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verst", "form": "verste", "position": 1, "pronunciation": "/vɜrst/", "labels": "[\"arch. var.\"]", "synonyms": null}
-{"headword": "verst", "form": "verstes", "position": 2, "pronunciation": "/ˈvɜrsts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "verst", "form": "versts", "position": 3, "pronunciation": "/ˈvɜrsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "verst", "form": "verstes", "position": 2, "pronunciation": "/vɜrsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "verst", "form": "versts", "position": 3, "pronunciation": "/vɜrsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vert", "form": "verts", "position": 1, "pronunciation": "/vɜrts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vertebra", "form": "vertebrae", "position": 1, "pronunciation": "/ˈvɜrtəˌbreɪ/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vertebra", "form": "vertebras", "position": 2, "pronunciation": "/ˈvɜrəˌbrəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vertebra", "form": "vertebras", "position": 2, "pronunciation": "/ˈvɜrtəbrəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vertebrate", "form": "vertebrates", "position": 1, "pronunciation": "/ˈvɜrtəˌbreɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vertebroplasty", "form": "vertebroplasties", "position": 1, "pronunciation": "/ˈvɜrtəbroʊˌplæstiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vertex", "form": "vertexes", "position": 1, "pronunciation": "/ˈvɜrˌtɛksəz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -638,28 +719,34 @@
 {"headword": "verticality", "form": "verticalities", "position": 1, "pronunciation": "/ˌvɜrtəˈkælətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verticalness", "form": "verticalnesses", "position": 1, "pronunciation": "/ˈvɜrtɪkəlnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verticil", "form": "verticils", "position": 1, "pronunciation": "/ˈvɜrtɪsɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "verticillaster", "form": "verticillasters", "position": 1, "pronunciation": "/ˌvɜrtɪsəˈlæstərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vertigo", "form": "vertigoes", "position": 1, "pronunciation": "/ˈvɜrtɪˌɡoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vertigo", "form": "vertigos", "position": 2, "pronunciation": "/ˈvɜrtɪˌɡoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vertiport", "form": "vertiports", "position": 1, "pronunciation": "/ˈvɜrtiˌpɔrts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vertisol", "form": "vertisols", "position": 1, "pronunciation": "/ˈvɜrtəˌsɔlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vertistop", "form": "vertistops", "position": 1, "pronunciation": "/ˈvɜrtɪˌstɑps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vertu", "form": "vertus", "position": 1, "pronunciation": "/vərˈtuz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vertu", "form": "virtu", "position": 2, "pronunciation": "/vərˈtu/", "labels": "[\"var.\"]", "synonyms": "[\"vertu\"]"}
 {"headword": "vertu", "form": "virtus", "position": 3, "pronunciation": "/vərˈtu/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vervain", "form": "vervains", "position": 1, "pronunciation": "/ˈvərveɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "verve", "form": "verves", "position": 1, "pronunciation": "/vɜrvz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vervelle", "form": "vervelles", "position": 1, "pronunciation": "/vɜrˈvɛlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vervet", "form": "vervets", "position": 1, "pronunciation": "/ˈvɜrvɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "very", "form": "verier", "position": 1, "pronunciation": "/ˈvɛriər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "very", "form": "veriest", "position": 2, "pronunciation": "/ˈvɛriɪst/", "labels": "[\"superl.\"]", "synonyms": null}
-{"headword": "vesica", "form": "vesicae", "position": 1, "pronunciation": "/vɛˈsaɪˌsi/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vesica", "form": "vesicae", "position": 1, "pronunciation": "/ˈvɛsɪˌki/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vesicant", "form": "vesicants", "position": 1, "pronunciation": "/ˈvɛsɪkənts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vesicate", "form": "vesicated", "position": 1, "pronunciation": "/ˈvɛsɪˌkeɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vesicate", "form": "vesicates", "position": 2, "pronunciation": "/ˈvɛsɪˌkeɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vesicate", "form": "vesicating", "position": 3, "pronunciation": "/ˈvɛsɪˌkeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vesicatory", "form": "vesicatories", "position": 1, "pronunciation": "/ˈvɛsɪkəˌtɔriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vesicle", "form": "vesicles", "position": 1, "pronunciation": "/ˈvɛzɪkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vesicula", "form": "vesiculae", "position": 1, "pronunciation": "/vɛˈsɪkjəˌli/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vesicularity", "form": "vesicularities", "position": 1, "pronunciation": "/vɛˌsɪkjəˈlærɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vesiculate", "form": "vesiculates", "position": 1, "pronunciation": "/vɛˈsɪkjəˌleɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vesiculate", "form": "vesiculating", "position": 2, "pronunciation": "/vɛˈsɪkjəˌleɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vesiculation", "form": "vesiculations", "position": 1, "pronunciation": "/vɛˌsɪkjəˈleɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vespa", "form": "vespas", "position": 1, "pronunciation": "/ˈvɛspəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vesper", "form": "vespers", "position": 1, "pronunciation": "/ˈvɛspɜrz/", "labels": "[\"pl.\"]", "synonyms": "[\"evensong\"]"}
 {"headword": "vesperal", "form": "vesperals", "position": 1, "pronunciation": "/ˈvɛspərəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vespiary", "form": "vespiaries", "position": 1, "pronunciation": "/ˈvɛspiˌɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -674,17 +761,19 @@
 {"headword": "vestee", "form": "vestees", "position": 1, "pronunciation": "/vɛˈstiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vestiary", "form": "vestiaries", "position": 1, "pronunciation": "/ˈvɛstiˌɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vestibule", "form": "vestibules", "position": 1, "pronunciation": "/ˈvɛstɪˌbjulz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vestibuloplasty", "form": "vestibuloplasties", "position": 1, "pronunciation": "/vɛˌstɪbjəloʊˈplæstiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vestige", "form": "vestiges", "position": 1, "pronunciation": "/ˈvɛstɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vestigium", "form": "vestigia", "position": 1, "pronunciation": "/vɛˈstɪdʒiə/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vestimentiferan", "form": "vestimentiferans", "position": 1, "pronunciation": "/ˌvɛstəmɛnˈtɪfərənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vesting", "form": "vestings", "position": 1, "pronunciation": "/ˈvɛstɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vestment", "form": "vestments", "position": 1, "pronunciation": "/ˈvɛstmɛnts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vestment", "form": "vestments", "position": 1, "pronunciation": "/ˈvɛstmənts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vestry", "form": "vestries", "position": 1, "pronunciation": "/ˈvɛstriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vestryman", "form": "vestrymen", "position": 1, "pronunciation": "/ˈvɛstriˌmɛn/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vesture", "form": "vestured", "position": 1, "pronunciation": "/ˈvɛstʃərd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vesture", "form": "vestures", "position": 2, "pronunciation": "/ˈvɛstʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vesture", "form": "vesturing", "position": 3, "pronunciation": "/ˈvɛstʃərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vesuvian", "form": "vesuvians", "position": 1, "pronunciation": "/vəˈsuviənz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vesuvianite", "form": "vesuvianites", "position": 1, "pronunciation": "/vəˌsuviəˈnaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vesuvianite", "form": "vesuvianites", "position": 1, "pronunciation": "/vəˈsuviəˌnaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vet", "form": "vets", "position": 1, "pronunciation": "/vɛts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vet", "form": "vetted", "position": 2, "pronunciation": "/ˈvɛtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vet", "form": "vetting", "position": 3, "pronunciation": "/ˈvɛtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -698,10 +787,10 @@
 {"headword": "vetiver", "form": "vetivert", "position": 2, "pronunciation": "/ˈvɛtɪvɜrt/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "vetiver", "form": "vetiverts", "position": 3, "pronunciation": "/ˈvɛtɪvɜrts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vetkoek", "form": "vetkoeks", "position": 1, "pronunciation": "/ˈfɛtˌkʊks/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "veto", "form": "vetoed", "position": 1, "pronunciation": "/ˈviˌtoʊd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "veto", "form": "vetoes", "position": 2, "pronunciation": "/ˈviˌtoʊz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "veto", "form": "vetoing", "position": 3, "pronunciation": "/ˈviˌtoʊɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "vetoer", "form": "vetoers", "position": 1, "pronunciation": "/ˈviˌtoʊərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "veto", "form": "vetoed", "position": 1, "pronunciation": "/ˈvitoʊd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "veto", "form": "vetoes", "position": 2, "pronunciation": "/ˈvitoʊz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "veto", "form": "vetoing", "position": 3, "pronunciation": "/ˈvitoʊɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vetoer", "form": "vetoers", "position": 1, "pronunciation": "/ˈvitoʊərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vex", "form": "vexed", "position": 1, "pronunciation": "/vɛkst/", "labels": "[\"past\"]", "synonyms": "[\"annoyed\", \"harassed\", \"harried\", \"pestered\"]"}
 {"headword": "vex", "form": "vexes", "position": 2, "pronunciation": "/ˈvɛksɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vex", "form": "vexing", "position": 3, "pronunciation": "/ˈvɛksɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"annoying\", \"bothersome\", \"galling\", \"irritating\", \"nettlesome\", \"pesky\", \"pestering\", \"pestiferous\", \"plaguy\", \"plaguey\"]"}
@@ -709,7 +798,9 @@
 {"headword": "vexation", "form": "vexations", "position": 1, "pronunciation": "/vɛkˈseɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vexer", "form": "vexers", "position": 1, "pronunciation": "/ˈvɛksərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vexil", "form": "vexils", "position": 1, "pronunciation": "/ˈvɛksɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vexillologist", "form": "vexillologists", "position": 1, "pronunciation": "/ˌvɛksəˈlɑlədʒɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vexillary", "form": "vexillaries", "position": 1, "pronunciation": "/ˈvɛksəˌlɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vexillographer", "form": "vexillographers", "position": 1, "pronunciation": "/ˌvɛksəˈlɑɡrəfərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vexillologist", "form": "vexillologists", "position": 1, "pronunciation": "/ˌvɛksɪˈlɑlədʒɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vexillology", "form": "vexillologies", "position": 1, "pronunciation": "/ˌvɛksəˈlɑlədʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vexillum", "form": "vexilla", "position": 1, "pronunciation": "/vɛkˈsɪlə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viability", "form": "viabilities", "position": 1, "pronunciation": "/ˌvaɪəˈbɪlətiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -726,13 +817,14 @@
 {"headword": "viator", "form": "viators", "position": 2, "pronunciation": "/vaɪˈeɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vibe", "form": "vibes", "position": 1, "pronunciation": "/vaɪbz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": "[\"vibraphone\", \"vibraharp\"]"}
 {"headword": "vibist", "form": "vibists", "position": 1, "pronunciation": "/ˈvaɪbɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vibraculum", "form": "vibracula", "position": 1, "pronunciation": "/vaɪˈbrækjələ/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vibraharp", "form": "vibraharps", "position": 1, "pronunciation": "/ˈvaɪbrəhɑrps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vibraharpist", "form": "vibraharpists", "position": 1, "pronunciation": "/ˈvaɪbrəhɑrpɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vibrance", "form": "vibrances", "position": 1, "pronunciation": "/ˈvaɪbrənsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vibrancy", "form": "vibrancies", "position": 1, "pronunciation": "/ˈvaɪbrənsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vibrant", "form": "vibrants", "position": 1, "pronunciation": "/ˈvaɪbrənts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vibraphone", "form": "vibraphones", "position": 1, "pronunciation": "/ˈvaɪbrəfoʊnz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vibraphonist", "form": "vibraphonists", "position": 1, "pronunciation": "/ˌvaɪbrəˈfoʊnɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vibraphonist", "form": "vibraphonists", "position": 1, "pronunciation": "/ˈvaɪbrəfoʊnɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vibrate", "form": "vibrated", "position": 1, "pronunciation": "/ˈvaɪbreɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vibrate", "form": "vibrates", "position": 2, "pronunciation": "/ˈvaɪbreɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vibrate", "form": "vibrating", "position": 3, "pronunciation": "/ˈvaɪbreɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -743,7 +835,12 @@
 {"headword": "vibrion", "form": "vibrions", "position": 1, "pronunciation": "/ˈvɪbriənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vibriosis", "form": "vibrioses", "position": 1, "pronunciation": "/ˌvɪbriˈoʊsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vibrissa", "form": "vibrissae", "position": 1, "pronunciation": "/vɪˈbrɪsaɪ/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vibrograph", "form": "vibrographs", "position": 1, "pronunciation": "/ˈvaɪbrəˌɡræfs/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vibrometer", "form": "vibrometers", "position": 1, "pronunciation": "/vaɪˈbrɑmətərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viburnum", "form": "viburnums", "position": 1, "pronunciation": "/vaɪˈbɜrnəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vic", "form": "vicked", "position": 1, "pronunciation": "/vɪkt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vic", "form": "vicking", "position": 2, "pronunciation": "/ˈvɪkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vic", "form": "vics", "position": 3, "pronunciation": "/vɪks/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vicar", "form": "vicars", "position": 1, "pronunciation": "/ˈvɪkərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vicarage", "form": "vicarages", "position": 1, "pronunciation": "/ˈvɪkərɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vicarate", "form": "vicarates", "position": 1, "pronunciation": "/ˈvɪkərəts/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -754,18 +851,22 @@
 {"headword": "vice", "form": "vices", "position": 1, "pronunciation": "/ˈvaɪsəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vicegerency", "form": "vicegerencies", "position": 1, "pronunciation": "/vaɪsˈdʒɪərənsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vicegerent", "form": "vicegerents", "position": 1, "pronunciation": "/vaɪsˈdʒɪərənts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vicer", "form": "vicers", "position": 1, "pronunciation": "/ˈvaɪsərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vicereine", "form": "vicereines", "position": 1, "pronunciation": "/ˈvaɪsreɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viceroy", "form": "viceroys", "position": 1, "pronunciation": "/ˈvaɪsrɔɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viceroyalty", "form": "viceroyalties", "position": 1, "pronunciation": "/vaɪsˈrɔɪəltiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viceroyship", "form": "viceroyships", "position": 1, "pronunciation": "/ˈvaɪsrɔɪʃɪps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vichy", "form": "vichies", "position": 1, "pronunciation": "/ˈvɪʃiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vichyite", "form": "vichyites", "position": 1, "pronunciation": "/ˈvɪʃiˌaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vichyssoise", "form": "vichyssoises", "position": 1, "pronunciation": "/ˌviʃɪˈswɑzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vicinage", "form": "vicinages", "position": 1, "pronunciation": "/ˈvɪsɪnɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vicinity", "form": "vicinities", "position": 1, "pronunciation": "/vəˈsɪnɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vicinity", "form": "vicinities", "position": 1, "pronunciation": "/vəˈsɪnətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viciousness", "form": "viciousnesses", "position": 1, "pronunciation": "/ˈvɪʃəsnɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vicissitude", "form": "vicissitudes", "position": 1, "pronunciation": "/vɪˈsɪsɪtudz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vicomte", "form": "vicomtes", "position": 1, "pronunciation": "/vɪˈkɑmtiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "victim", "form": "victims", "position": 1, "pronunciation": "/ˈvɪktəmz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "vicky", "form": "vickies", "position": 1, "pronunciation": "/ˈvɪkiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vicomte", "form": "vicomtes", "position": 1, "pronunciation": "/ˌvikoʊnˈteɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vicomtesse", "form": "vicomtesses", "position": 1, "pronunciation": "/ˌvikoʊnˈtɛsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "victim", "form": "victims", "position": 1, "pronunciation": "/ˈvɪktəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "victimhood", "form": "victimhoods", "position": 1, "pronunciation": "/ˈvɪktəmˌhʊdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "victimization", "form": "victimizations", "position": 1, "pronunciation": "/ˌvɪktəməˈzeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "victimize", "form": "victimise", "position": 1, "pronunciation": "/ˈvɪktəmaɪz/", "labels": "[\"var.\"]", "synonyms": "[\"victimize\"]"}
@@ -780,9 +881,12 @@
 {"headword": "victimology", "form": "victimologies", "position": 1, "pronunciation": "/ˌvɪktɪˈmɑlədʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "victor", "form": "victors", "position": 1, "pronunciation": "/ˈvɪktərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "victoria", "form": "victorias", "position": 1, "pronunciation": "/vɪkˈtɔriəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "victorianism", "form": "victorianisms", "position": 1, "pronunciation": "/vɪkˈtɔriəˌnɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "victoriate", "form": "victoriates", "position": 1, "pronunciation": "/vɪkˈtɔriˌeɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "victorine", "form": "victorines", "position": 1, "pronunciation": "/ˌvɪktəˈrinz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "victory", "form": "victories", "position": 1, "pronunciation": "/ˈvɪktəriz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "victory", "form": "victories", "position": 1, "pronunciation": "/ˈvɪktəriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "victress", "form": "victresses", "position": 1, "pronunciation": "/ˈvɪktrɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "victrix", "form": "victrices", "position": 1, "pronunciation": "/vɪkˈtraɪsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "victual", "form": "victualed", "position": 1, "pronunciation": "/ˈvɪtəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "victual", "form": "victualing", "position": 2, "pronunciation": "/ˈvɪtəlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "victual", "form": "victualled", "position": 3, "pronunciation": "/ˈvɪtəld/", "labels": "[\"past\"]", "synonyms": null}
@@ -798,8 +902,9 @@
 {"headword": "vicuna", "form": "vicugna", "position": 1, "pronunciation": "/vɪˈkuɡnə/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "vicuna", "form": "vicugnas", "position": 2, "pronunciation": "/vɪˈkuɡnəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vicuna", "form": "vicunas", "position": 3, "pronunciation": "/vɪˈkjunəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vid", "form": "vids", "position": 1, "pronunciation": "/vɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "video", "form": "videos", "position": 1, "pronunciation": "/ˈvɪdioʊz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "videocassette", "form": "videocassettes", "position": 1, "pronunciation": "/ˈvɪdioʊˌkæsəts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "videocassette", "form": "videocassettes", "position": 1, "pronunciation": "/ˌvɪdioʊkəˈsɛts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "videocast", "form": "videocast", "position": 1, "pronunciation": "/ˈvɪdioʊˌkæst/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "videocast", "form": "videocasting", "position": 2, "pronunciation": "/ˈvɪdioʊˌkæstɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "videocast", "form": "videocasts", "position": 3, "pronunciation": "/ˈvɪdioʊˌkæsts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -809,11 +914,13 @@
 {"headword": "videodisc", "form": "videodiscs", "position": 1, "pronunciation": "/ˈvɪdioʊˌdɪsks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "videodisc", "form": "videodisk", "position": 2, "pronunciation": "/ˈvɪdioʊˌdɪsk/", "labels": "[\"var.\"]", "synonyms": "[\"videodisc\"]"}
 {"headword": "videodisc", "form": "videodisks", "position": 3, "pronunciation": "/ˈvɪdioʊˌdɪsks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "videofit", "form": "videofits", "position": 1, "pronunciation": "/ˈvɪdioʊˌfɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "videographer", "form": "videographers", "position": 1, "pronunciation": "/ˌvɪdiˈɑɡrəfərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "videography", "form": "videographies", "position": 1, "pronunciation": "/ˌvɪdiˈɑɡrəfiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "videoland", "form": "videolands", "position": 1, "pronunciation": "/ˈvɪdioʊˌlændz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "videophile", "form": "videophiles", "position": 1, "pronunciation": "/ˈvɪdioʊˌfaɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "videophone", "form": "videophones", "position": 1, "pronunciation": "/ˈvɪdioʊˌfoʊnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "videoplay", "form": "videoplays", "position": 1, "pronunciation": "/ˈvɪdioʊˌpleɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "videorecord", "form": "videorecorded", "position": 1, "pronunciation": "/ˈvɪdioʊrɪˌkɔrdɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "videorecord", "form": "videorecording", "position": 2, "pronunciation": "/ˈvɪdioʊrɪˌkɔrdɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "videorecord", "form": "videorecords", "position": 3, "pronunciation": "/ˈvɪdioʊrɪˌkɔrdz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -830,6 +937,9 @@
 {"headword": "vie", "form": "vies", "position": 2, "pronunciation": "/vaɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vie", "form": "vying", "position": 3, "pronunciation": "/ˈvaɪɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vier", "form": "viers", "position": 1, "pronunciation": "/ˈvaɪərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vietnamize", "form": "vietnamized", "position": 1, "pronunciation": "/viˈɛtnəˌmaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vietnamize", "form": "vietnamizes", "position": 2, "pronunciation": "/viˈɛtnəˌmaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vietnamize", "form": "vietnamizing", "position": 3, "pronunciation": "/viˈɛtnəˌmaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "view", "form": "viewed", "position": 1, "pronunciation": "/vjud/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "view", "form": "viewing", "position": 2, "pronunciation": "/ˈvjuɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"wake\", \"screening\", \"showing\"]"}
 {"headword": "view", "form": "views", "position": 3, "pronunciation": "/vjuz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -844,12 +954,14 @@
 {"headword": "viewy", "form": "viewiest", "position": 2, "pronunciation": "/ˈvjuiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "vig", "form": "vigs", "position": 1, "pronunciation": "/vɪɡz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viga", "form": "vigas", "position": 1, "pronunciation": "/ˈviɡəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vigentennial", "form": "vigentennials", "position": 1, "pronunciation": "/ˌvaɪdʒənˈtɛniəlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vigia", "form": "vigias", "position": 1, "pronunciation": "/vɪˈdʒiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vigil", "form": "vigils", "position": 1, "pronunciation": "/ˈvɪdʒəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vigilance", "form": "vigilances", "position": 1, "pronunciation": "/ˈvɪdʒələnsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vigilante", "form": "vigilantes", "position": 1, "pronunciation": "/ˌvɪdʒəˈlæntiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vigilantism", "form": "vigilantisms", "position": 1, "pronunciation": "/ˌvɪdʒəˈlæntɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vigintillion", "form": "vigintillions", "position": 1, "pronunciation": "/ˌvɪdʒɪnˈtɪljənz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vigneron", "form": "vignerons", "position": 1, "pronunciation": "/ˌvɪnjəˈroʊnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vigneron", "form": "vignerons", "position": 1, "pronunciation": "/ˌvinjəˈroʊnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vignette", "form": "vignetted", "position": 1, "pronunciation": "/vɪnˈjɛtəd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vignette", "form": "vignettes", "position": 2, "pronunciation": "/vɪnˈjɛts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "vignette", "form": "vignetting", "position": 3, "pronunciation": "/vɪnˈjɛtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -860,25 +972,26 @@
 {"headword": "vigour", "form": "vigor", "position": 1, "pronunciation": "/ˈvɪɡər/", "labels": "[\"var.\"]", "synonyms": "[\"energy\", \"muscularity\", \"vigour\", \"vim\", \"dynamism\", \"heartiness\", \"zip\"]"}
 {"headword": "vigour", "form": "vigors", "position": 2, "pronunciation": "/ˈvɪɡərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vigour", "form": "vigours", "position": 3, "pronunciation": "/ˈvɪɡərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vihara", "form": "viharas", "position": 1, "pronunciation": "/vɪˈhɑrəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vihuela", "form": "vihuelas", "position": 1, "pronunciation": "/viˈweɪləz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viking", "form": "vikings", "position": 1, "pronunciation": "/ˈvaɪkɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vilayet", "form": "vilayets", "position": 1, "pronunciation": "/vɪˈlæjəts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vilayet", "form": "vilayets", "position": 1, "pronunciation": "/ˌvɪləˈjɛts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vile", "form": "viler", "position": 1, "pronunciation": "/ˈvaɪlər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "vile", "form": "vilest", "position": 2, "pronunciation": "/ˈvaɪləst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "vileness", "form": "vilenesses", "position": 1, "pronunciation": "/ˈvaɪlnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vilification", "form": "vilifications", "position": 1, "pronunciation": "/ˌvɪləfɪˈkeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vilifier", "form": "vilifiers", "position": 1, "pronunciation": "/ˈvɪləfaɪərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vilify", "form": "vilified", "position": 1, "pronunciation": "/ˈvɪləfaɪd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "vilify", "form": "vilifies", "position": 2, "pronunciation": "/ˈvɪləfaɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
-{"headword": "vilify", "form": "vilifying", "position": 3, "pronunciation": "/ˈvɪləfaɪɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "vilipend", "form": "vilipended", "position": 1, "pronunciation": "/ˈvɪləpɛndɪd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "vilipend", "form": "vilipending", "position": 2, "pronunciation": "/ˈvɪləpɛndɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "vilipend", "form": "vilipends", "position": 3, "pronunciation": "/ˈvɪləpɛndz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vilification", "form": "vilifications", "position": 1, "pronunciation": "/ˌvɪləfəˈkeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vilifier", "form": "vilifiers", "position": 1, "pronunciation": "/ˈvɪləˌfaɪərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vilify", "form": "vilified", "position": 1, "pronunciation": "/ˈvɪlɪˌfaɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vilify", "form": "vilifies", "position": 2, "pronunciation": "/ˈvɪlɪˌfaɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vilify", "form": "vilifying", "position": 3, "pronunciation": "/ˈvɪlɪˌfaɪɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vilipend", "form": "vilipended", "position": 1, "pronunciation": "/ˈvɪləˌpɛndɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vilipend", "form": "vilipending", "position": 2, "pronunciation": "/ˈvɪləˌpɛndɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vilipend", "form": "vilipends", "position": 3, "pronunciation": "/ˈvɪləˌpɛndz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vill", "form": "vills", "position": 1, "pronunciation": "/vɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "villa", "form": "villae", "position": 1, "pronunciation": "/ˈvɪli/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "villa", "form": "villas", "position": 2, "pronunciation": "/ˈvɪləz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "villadom", "form": "villadoms", "position": 1, "pronunciation": "/ˈvɪlədəmz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "village", "form": "villages", "position": 1, "pronunciation": "/ˈvɪlɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "village", "form": "villages", "position": 1, "pronunciation": "/ˈvɪlədʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "villager", "form": "villagers", "position": 1, "pronunciation": "/ˈvɪlɪdʒərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "villagery", "form": "villageries", "position": 1, "pronunciation": "/ˈvɪlɪdʒəriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "villain", "form": "villains", "position": 1, "pronunciation": "/ˈvɪlənz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -894,7 +1007,9 @@
 {"headword": "villous", "form": "villose", "position": 1, "pronunciation": "/ˈvɪloʊs/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "villus", "form": "villi", "position": 1, "pronunciation": "/ˈvɪli/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vim", "form": "vims", "position": 1, "pronunciation": "/vɪmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vimana", "form": "vimanas", "position": 1, "pronunciation": "/vɪˈmɑnəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vimen", "form": "vimina", "position": 1, "pronunciation": "/ˈvɪmɪnə/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vimpa", "form": "vimpas", "position": 1, "pronunciation": "/ˈvɪmpəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vinaigrette", "form": "vinaigrettes", "position": 1, "pronunciation": "/vɪnəˈɡrɛts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vinal", "form": "vinals", "position": 1, "pronunciation": "/ˈvaɪnəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vinasse", "form": "vinasses", "position": 1, "pronunciation": "/vɪˈnæsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -904,34 +1019,47 @@
 {"headword": "vinculum", "form": "vincula", "position": 1, "pronunciation": "/ˈvɪŋkjələ/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vinculum", "form": "vinculums", "position": 2, "pronunciation": "/ˈvɪŋkjələmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vindaloo", "form": "vindaloos", "position": 1, "pronunciation": "/vɪndəˈluz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vindicate", "form": "vindicated", "position": 1, "pronunciation": "/ˈvɪndɪkeɪtəd/", "labels": "[\"past\"]", "synonyms": "[\"absolved\", \"clear\", \"cleared\", \"exculpated\", \"exonerated\"]"}
-{"headword": "vindicate", "form": "vindicates", "position": 2, "pronunciation": "/ˈvɪndɪkeɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
-{"headword": "vindicate", "form": "vindicating", "position": 3, "pronunciation": "/ˈvɪndɪkeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "vindication", "form": "vindications", "position": 1, "pronunciation": "/vɪndɪˈkeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vindicator", "form": "vindicators", "position": 1, "pronunciation": "/ˈvɪndɪkeɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vindicate", "form": "vindicated", "position": 1, "pronunciation": "/ˈvɪndəˌkeɪtɪd/", "labels": "[\"past\"]", "synonyms": "[\"absolved\", \"clear\", \"cleared\", \"exculpated\", \"exonerated\"]"}
+{"headword": "vindicate", "form": "vindicates", "position": 2, "pronunciation": "/ˈvɪndəˌkeɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vindicate", "form": "vindicating", "position": 3, "pronunciation": "/ˈvɪndəˌkeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vindication", "form": "vindications", "position": 1, "pronunciation": "/ˌvɪndəˈkeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vindicator", "form": "vindicators", "position": 1, "pronunciation": "/ˈvɪndəˌkeɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vine", "form": "vines", "position": 1, "pronunciation": "/vaɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vinedresser", "form": "vinedressers", "position": 1, "pronunciation": "/ˈvaɪndrɛsərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vinegar", "form": "vinegars", "position": 1, "pronunciation": "/ˈvɪnɪɡərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vinegar", "form": "vinegars", "position": 1, "pronunciation": "/ˈvɪnəɡərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vinegaroon", "form": "vinegaroons", "position": 1, "pronunciation": "/ˌvɪnəɡəˈrunz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vinegarroon", "form": "vinegarroons", "position": 1, "pronunciation": "/ˌvɪnəɡəˈrunz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vinegarweed", "form": "vinegarweeds", "position": 1, "pronunciation": "/ˈvɪnəɡərˌwidz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vineland", "form": "vinelands", "position": 1, "pronunciation": "/ˈvaɪnˌlændz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "viner", "form": "viners", "position": 1, "pronunciation": "/ˈvaɪnərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vinery", "form": "vineries", "position": 1, "pronunciation": "/ˈvaɪnəriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vineyard", "form": "vineyards", "position": 1, "pronunciation": "/ˈvɪnjərdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vineyardist", "form": "vineyardists", "position": 1, "pronunciation": "/ˈvɪnjərdɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viniculture", "form": "vinicultures", "position": 1, "pronunciation": "/ˈvɪnɪkʌltʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vinifera", "form": "viniferas", "position": 1, "pronunciation": "/vɪˈnɪfərəz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vinification", "form": "vinifications", "position": 1, "pronunciation": "/ˌvɪnɪfɪˈkeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vinification", "form": "vinifications", "position": 1, "pronunciation": "/ˌvɪnəfəˈkeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vinificator", "form": "vinificators", "position": 1, "pronunciation": "/ˈvɪnəfəˌkeɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vinify", "form": "vinified", "position": 1, "pronunciation": "/ˈvɪnɪfaɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vinify", "form": "vinifies", "position": 2, "pronunciation": "/ˈvɪnɪfaɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vinify", "form": "vinifying", "position": 3, "pronunciation": "/ˈvɪnɪfaɪɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vino", "form": "vinos", "position": 1, "pronunciation": "/ˈvinoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vinometer", "form": "vinometers", "position": 1, "pronunciation": "/vaɪˈnɑmətərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vinosity", "form": "vinosities", "position": 1, "pronunciation": "/vɪˈnɑsɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vint", "form": "vinted", "position": 1, "pronunciation": "/ˈvɪntɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vint", "form": "vinting", "position": 2, "pronunciation": "/ˈvɪntɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vint", "form": "vints", "position": 3, "pronunciation": "/vɪnts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vintage", "form": "vintaged", "position": 1, "pronunciation": "/ˈvɪntɪdʒd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vintage", "form": "vintages", "position": 2, "pronunciation": "/ˈvɪntɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vintage", "form": "vintaging", "position": 3, "pronunciation": "/ˈvɪntɪdʒɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vintager", "form": "vintagers", "position": 1, "pronunciation": "/ˈvɪntɪdʒərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vintner", "form": "vintners", "position": 1, "pronunciation": "/ˈvɪntnərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vinum", "form": "vina", "position": 1, "pronunciation": "/ˈvaɪnə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viny", "form": "vinier", "position": 1, "pronunciation": "/ˈvaɪniər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "viny", "form": "viniest", "position": 2, "pronunciation": "/ˈvaɪniɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "vinyl", "form": "vinyls", "position": 1, "pronunciation": "/ˈvaɪnəlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vinylate", "form": "vinylated", "position": 1, "pronunciation": "/ˈvaɪnəˌleɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vinylate", "form": "vinylates", "position": 2, "pronunciation": "/ˈvaɪnəˌleɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vinylate", "form": "vinylating", "position": 3, "pronunciation": "/ˈvaɪnəˌleɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vinylidene", "form": "vinylidenes", "position": 1, "pronunciation": "/vaɪˈnɪlɪˌdinz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viol", "form": "viols", "position": 1, "pronunciation": "/ˈvaɪəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viola", "form": "violas", "position": 1, "pronunciation": "/viˈoʊləz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -944,22 +1072,29 @@
 {"headword": "violator", "form": "violater", "position": 1, "pronunciation": "/ˈvaɪəleɪtər/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "violator", "form": "violaters", "position": 2, "pronunciation": "/ˈvaɪəleɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "violator", "form": "violators", "position": 3, "pronunciation": "/ˈvaɪəleɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "violence", "form": "violences", "position": 1, "pronunciation": "/ˈvaɪələnsɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "violence", "form": "violences", "position": 1, "pronunciation": "/ˈvaɪələnsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "violet", "form": "violets", "position": 1, "pronunciation": "/ˈvaɪələts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "violin", "form": "violins", "position": 1, "pronunciation": "/ˌvaɪəˈlɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "violinist", "form": "violinists", "position": 1, "pronunciation": "/ˌvaɪəˈlɪnɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "violist", "form": "violists", "position": 1, "pronunciation": "/ˌviˈoʊləsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "violinmaker", "form": "violinmakers", "position": 1, "pronunciation": "/ˌvaɪəˈlɪnˌmeɪkərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "violist", "form": "violists", "position": 1, "pronunciation": "/viˈoʊlɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "violoncellist", "form": "violoncellists", "position": 1, "pronunciation": "/ˌvaɪələnˈtʃɛlɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "violoncello", "form": "violoncelli", "position": 1, "pronunciation": "/ˌvaɪələnˈtʃɛli/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "violoncello", "form": "violoncellos", "position": 2, "pronunciation": "/ˌvaɪələnˈtʃɛloʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "violone", "form": "violones", "position": 1, "pronunciation": "/ˌvaɪəˈloʊniz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viomycin", "form": "viomycins", "position": 1, "pronunciation": "/ˌvaɪoʊˈmaɪsɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vipe", "form": "viped", "position": 1, "pronunciation": "/vaɪpt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vipe", "form": "vipes", "position": 2, "pronunciation": "/vaɪps/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vipe", "form": "viping", "position": 3, "pronunciation": "/ˈvaɪpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "viper", "form": "vipers", "position": 1, "pronunciation": "/ˈvaɪpərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "viperfish", "form": "viperfishes", "position": 1, "pronunciation": "/ˈvaɪpərˌfɪʃɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vipoma", "form": "vipomas", "position": 1, "pronunciation": "/vɪˈpoʊməz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virago", "form": "viragoes", "position": 1, "pronunciation": "/vɪˈrɑɡoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virago", "form": "viragos", "position": 2, "pronunciation": "/vɪˈrɑɡoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virelai", "form": "virelais", "position": 1, "pronunciation": "/ˈvɪrəleɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virelai", "form": "virelay", "position": 2, "pronunciation": "/ˈvɪrəleɪ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "virelai", "form": "virelays", "position": 3, "pronunciation": "/ˈvɪrəleɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "virement", "form": "virements", "position": 1, "pronunciation": "/ˈvaɪərmənts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viremia", "form": "viremias", "position": 1, "pronunciation": "/vaɪˈrimiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vireo", "form": "vireos", "position": 1, "pronunciation": "/ˈvɪriˌoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virescence", "form": "virescences", "position": 1, "pronunciation": "/vɪˈrɛsənsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -969,7 +1104,8 @@
 {"headword": "virginal", "form": "virginals", "position": 1, "pronunciation": "/ˈvɜrdʒənəlz/", "labels": "[\"var.\", \"pl.\"]", "synonyms": null}
 {"headword": "virginalist", "form": "virginalists", "position": 1, "pronunciation": "/ˈvɜrdʒənəlɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virginity", "form": "virginities", "position": 1, "pronunciation": "/vərˈdʒɪnɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "virgule", "form": "virgules", "position": 1, "pronunciation": "/ˈvɪrɡˌjulz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "virgoan", "form": "virgoans", "position": 1, "pronunciation": "/ˈvɜrɡoʊənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "virgule", "form": "virgules", "position": 1, "pronunciation": "/ˈvɜrɡjulz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viricide", "form": "viricides", "position": 1, "pronunciation": "/ˈvɪrəsaɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viricide", "form": "virucide", "position": 2, "pronunciation": "/ˈvaɪrəsaɪd/", "labels": "[\"var.\"]", "synonyms": "[\"viricide\"]"}
 {"headword": "viricide", "form": "virucides", "position": 3, "pronunciation": "/ˈvaɪrəsaɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -977,6 +1113,7 @@
 {"headword": "viridity", "form": "viridities", "position": 1, "pronunciation": "/vɪˈrɪdɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virilism", "form": "virilisms", "position": 1, "pronunciation": "/ˈvɪrəlɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virility", "form": "virilities", "position": 1, "pronunciation": "/vərˈɪlɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "virino", "form": "virinos", "position": 1, "pronunciation": "/vɪˈrinoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virion", "form": "virions", "position": 1, "pronunciation": "/ˈvaɪriɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virl", "form": "virls", "position": 1, "pronunciation": "/vɪrlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viroid", "form": "viroids", "position": 1, "pronunciation": "/ˈvaɪrɔɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -993,30 +1130,33 @@
 {"headword": "virtuosa", "form": "virtuose", "position": 2, "pronunciation": "/ˌvɜrtʃuˈoʊsi/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virtuosity", "form": "virtuosities", "position": 1, "pronunciation": "/ˌvərtʃuˈɑsɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virtuoso", "form": "virtuosi", "position": 1, "pronunciation": "/ˌvɜrtʃuˈoʊsi/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "virtuoso", "form": "virtuosos", "position": 2, "pronunciation": "/ˌvərtʃuˈoʊsoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "virtuoso", "form": "virtuosos", "position": 2, "pronunciation": "/ˌvɜrtʃuˈoʊsoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virtuousness", "form": "virtuousnesses", "position": 1, "pronunciation": "/ˈvɜrtʃuəsnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virucidal", "form": "viricidal", "position": 1, "pronunciation": "/ˌvɪrəˈsaɪdəl/", "labels": "[\"var.\"]", "synonyms": "[\"virucidal\"]"}
 {"headword": "virulence", "form": "virulences", "position": 1, "pronunciation": "/ˈvɪrələnsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virulence", "form": "virulencies", "position": 2, "pronunciation": "/ˈvɪrələnˌsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "virulence", "form": "virulency", "position": 3, "pronunciation": "/ˈvɪrələnsi/", "labels": "[\"var.\"]", "synonyms": "[\"virulence\"]"}
 {"headword": "virus", "form": "viruses", "position": 1, "pronunciation": "/ˈvaɪrəsəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "virusoid", "form": "virusoids", "position": 1, "pronunciation": "/ˈvaɪrəˌsɔɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vis", "form": "vires", "position": 1, "pronunciation": "/ˈvaɪriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "visa", "form": "visaed", "position": 1, "pronunciation": "/ˈvizɑd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "visa", "form": "visaing", "position": 2, "pronunciation": "/ˈvizəɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "visa", "form": "visas", "position": 3, "pronunciation": "/ˈvizəz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "visage", "form": "visages", "position": 1, "pronunciation": "/ˈvɪzɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "visagiste", "form": "visagistes", "position": 1, "pronunciation": "/ˌvizɑˈʒists/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "visard", "form": "visards", "position": 1, "pronunciation": "/ˈvɪzərdz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "visard", "form": "vizard", "position": 2, "pronunciation": "/ˈvɪzəd/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "viscacha", "form": "viscachas", "position": 1, "pronunciation": "/vɪˈskɑtʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viscacha", "form": "vizcacha", "position": 2, "pronunciation": "/vɪzˈkɑtʃə/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "viscacha", "form": "vizcachas", "position": 3, "pronunciation": "/vɪzˈkɑtʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "viscaria", "form": "viscarias", "position": 1, "pronunciation": "/vɪˈskɛriəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viscidity", "form": "viscidities", "position": 1, "pronunciation": "/vɪˈsɪdɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viscometer", "form": "viscometers", "position": 1, "pronunciation": "/vɪsˈkɑmɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viscometric", "form": "viscosimetric", "position": 1, "pronunciation": "/ˌvɪskəsɪˈmɛtrɪk/", "labels": "[\"var.\"]", "synonyms": "[\"viscometric\"]"}
 {"headword": "viscometry", "form": "viscometries", "position": 1, "pronunciation": "/vɪˈskɑmɪtriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viscose", "form": "viscoses", "position": 1, "pronunciation": "/ˈvɪskoʊzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viscosimeter", "form": "viscosimeters", "position": 1, "pronunciation": "/ˌvɪskəˈsɪmɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "viscosity", "form": "viscosities", "position": 1, "pronunciation": "/vɪˈskɑsɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "viscosity", "form": "viscosities", "position": 1, "pronunciation": "/vɪˈskɑsətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viscount", "form": "vis", "position": 1, "pronunciation": "/vɪs/", "labels": "[\"abbr.\"]", "synonyms": null}
 {"headword": "viscount", "form": "viscounts", "position": 2, "pronunciation": "/ˈvaɪkaʊnts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viscountcy", "form": "viscountcies", "position": 1, "pronunciation": "/ˈvaɪkaʊntsiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1026,17 +1166,18 @@
 {"headword": "viscousness", "form": "viscousnesses", "position": 1, "pronunciation": "/ˈvɪskəsnɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viscus", "form": "viscera", "position": 1, "pronunciation": "/ˈvɪsərə/", "labels": "[\"pl.\"]", "synonyms": "[\"entrails\", \"innards\"]"}
 {"headword": "vise", "form": "vice", "position": 1, "pronunciation": "/vaɪs/", "labels": "[\"var.\"]", "synonyms": "[\"frailty\"]"}
-{"headword": "vise", "form": "vised", "position": 2, "pronunciation": "/ˈvɪzd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "vise", "form": "viseed", "position": 3, "pronunciation": "/vaɪzd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "vise", "form": "viseing", "position": 4, "pronunciation": "/ˈvaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "vise", "form": "vises", "position": 5, "pronunciation": "/ˈvaɪzɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "vise", "form": "vising", "position": 6, "pronunciation": "/ˈvɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vise", "form": "vised", "position": 2, "pronunciation": "/vaɪst/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vise", "form": "vises", "position": 3, "pronunciation": "/ˈvaɪsɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "vise", "form": "vising", "position": 4, "pronunciation": "/ˈvaɪsɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vish", "form": "vished", "position": 1, "pronunciation": "/vɪʃt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vish", "form": "vishes", "position": 2, "pronunciation": "/ˈvɪʃɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vish", "form": "vishing", "position": 3, "pronunciation": "/ˈvɪʃɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "visibility", "form": "visibilities", "position": 1, "pronunciation": "/ˌvɪzəˈbɪlɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "visibleness", "form": "visiblenesses", "position": 1, "pronunciation": "/ˈvɪzəbəlnɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vision", "form": "visioned", "position": 1, "pronunciation": "/ˈvɪʒənd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vision", "form": "visioning", "position": 2, "pronunciation": "/ˈvɪʒənɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vision", "form": "visions", "position": 3, "pronunciation": "/ˈvɪʒənz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "visionary", "form": "visionaries", "position": 1, "pronunciation": "/ˌvɪʒəˈnɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "visionary", "form": "visionaries", "position": 1, "pronunciation": "/ˈvɪʒəˌnɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "visit", "form": "visited", "position": 1, "pronunciation": "/ˈvɪzɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "visit", "form": "visiting", "position": 2, "pronunciation": "/ˈvɪzɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "visit", "form": "visits", "position": 3, "pronunciation": "/ˈvɪzɪts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -1053,8 +1194,8 @@
 {"headword": "visored", "form": "vizored", "position": 1, "pronunciation": "/ˈvaɪzərd/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "vista", "form": "vistaed", "position": 1, "pronunciation": "/ˈvɪstəd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vista", "form": "vistas", "position": 2, "pronunciation": "/ˈvɪstəz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "visual", "form": "vis", "position": 1, "pronunciation": "/vɪs/", "labels": "[\"abbr.\"]", "synonyms": null}
-{"headword": "visual", "form": "visuals", "position": 2, "pronunciation": "/ˈvɪʒwəlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vistadome", "form": "vistadomes", "position": 1, "pronunciation": "/ˈvɪstəˌdoʊmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "visual", "form": "visuals", "position": 1, "pronunciation": "/ˈvɪʒəwəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "visualise", "form": "visualised", "position": 1, "pronunciation": "/ˈvɪʒwəˌlaɪzd/", "labels": "[\"past\"]", "synonyms": "[\"envisioned\", \"pictured\", \"visualized\"]"}
 {"headword": "visualise", "form": "visualises", "position": 2, "pronunciation": "/ˈvɪʒwəˌlaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "visualise", "form": "visualising", "position": 3, "pronunciation": "/ˈvɪʒwəˌlaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -1078,7 +1219,9 @@
 {"headword": "vitamin", "form": "vitamine", "position": 1, "pronunciation": "/ˈvaɪtəmin/", "labels": "[\"arch. var.\"]", "synonyms": null}
 {"headword": "vitamin", "form": "vitamines", "position": 2, "pronunciation": "/ˈvaɪtəmənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vitamin", "form": "vitamins", "position": 3, "pronunciation": "/ˈvaɪtəmənz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "vitascope", "form": "vitascopes", "position": 1, "pronunciation": "/ˈvaɪtəˌskoʊps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vitellin", "form": "vitellins", "position": 1, "pronunciation": "/vaɪˈtɛlɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vitellogenesis", "form": "vitellogeneses", "position": 1, "pronunciation": "/vaɪˌtɛloʊˈdʒɛnəˌsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vitellus", "form": "vitelluses", "position": 1, "pronunciation": "/vɪˈtɛləsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vitesse", "form": "vitesses", "position": 1, "pronunciation": "/viˈtɛsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vitiate", "form": "vitiated", "position": 1, "pronunciation": "/ˈvɪʃiˌeɪtɪd/", "labels": "[\"past\"]", "synonyms": "[\"corrupted\", \"debased\", \"diminished\", \"lessened\", \"weakened\"]"}
@@ -1086,6 +1229,8 @@
 {"headword": "vitiate", "form": "vitiating", "position": 3, "pronunciation": "/ˈvɪʃiˌeɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vitiation", "form": "vitiations", "position": 1, "pronunciation": "/ˌvɪʃiˈeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vitiator", "form": "vitiators", "position": 1, "pronunciation": "/ˈvɪʃiˌeɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "viticetum", "form": "viticeta", "position": 1, "pronunciation": "/ˌvɪtəˈsitə/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "viticetum", "form": "viticetums", "position": 2, "pronunciation": "/ˌvɪtəˈsitəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viticulture", "form": "viticultures", "position": 1, "pronunciation": "/ˈvɪtɪˌkʌltʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viticulturist", "form": "viticulturists", "position": 1, "pronunciation": "/ˌvɪtɪˈkʌltʃərɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vitiligo", "form": "vitiligos", "position": 1, "pronunciation": "/ˌvɪtɪˈlaɪɡoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1102,6 +1247,9 @@
 {"headword": "vitriol", "form": "vitriolled", "position": 3, "pronunciation": "/ˈvɪtriəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vitriol", "form": "vitriolling", "position": 4, "pronunciation": "/ˈvɪtriəlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vitriol", "form": "vitriols", "position": 5, "pronunciation": "/ˈvɪtriəlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "vitriolize", "form": "vitriolized", "position": 1, "pronunciation": "/ˈvɪtriəˌlaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vitriolize", "form": "vitriolizes", "position": 2, "pronunciation": "/ˈvɪtriəˌlaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vitriolize", "form": "vitriolizing", "position": 3, "pronunciation": "/ˈvɪtriəˌlaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vitta", "form": "vittae", "position": 1, "pronunciation": "/ˈvɪti/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vituperate", "form": "vituperated", "position": 1, "pronunciation": "/vəˈtupəˌreɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vituperate", "form": "vituperates", "position": 2, "pronunciation": "/vəˈtupəˌreɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -1116,6 +1264,7 @@
 {"headword": "vivarium", "form": "vivariums", "position": 2, "pronunciation": "/vaɪˈvɛriəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vivary", "form": "vivaries", "position": 1, "pronunciation": "/ˈvaɪvərɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "viverrid", "form": "viverrids", "position": 1, "pronunciation": "/vaɪˈvɛrɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "viverrine", "form": "viverrines", "position": 1, "pronunciation": "/vaɪˈvɛraɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vivid", "form": "vivider", "position": 1, "pronunciation": "/ˈvɪvədər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "vivid", "form": "vividest", "position": 2, "pronunciation": "/ˈvɪvədəst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "vividness", "form": "vividnesses", "position": 1, "pronunciation": "/ˈvɪvədnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1141,6 +1290,7 @@
 {"headword": "vizierial", "form": "vizirial", "position": 1, "pronunciation": "/vɪˈzɪriəl/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "viziership", "form": "vizierships", "position": 1, "pronunciation": "/vɪˈzɪrʃɪps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vizsla", "form": "vizslas", "position": 1, "pronunciation": "/ˈvɪʒləz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vlei", "form": "vleis", "position": 1, "pronunciation": "/fleɪz/, /vleɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vlog", "form": "vlogged", "position": 1, "pronunciation": "/vlɑɡd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vlog", "form": "vlogging", "position": 2, "pronunciation": "/ˈvlɑɡɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vlog", "form": "vlogs", "position": 3, "pronunciation": "/vlɑɡz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -1148,16 +1298,15 @@
 {"headword": "vocable", "form": "vocables", "position": 1, "pronunciation": "/ˈvoʊkəbəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vocabulary", "form": "vocabularies", "position": 1, "pronunciation": "/voʊˈkæbjəˌlɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vocal", "form": "vocals", "position": 1, "pronunciation": "/ˈvoʊkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vocalise", "form": "vocalised", "position": 1, "pronunciation": "/ˈvoʊkəlaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vocalise", "form": "vocalised", "position": 1, "pronunciation": "/ˈvoʊkəˌlaɪzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vocalise", "form": "vocalises", "position": 2, "pronunciation": "/ˈvoʊkəˌlaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vocalise", "form": "vocalising", "position": 3, "pronunciation": "/ˈvoʊkəˌlaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "vocalise", "form": "vocalized", "position": 4, "pronunciation": "/ˈvoʊkəlaɪzd/", "labels": "[\"var.\"]", "synonyms": null}
-{"headword": "vocalism", "form": "vocalisms", "position": 1, "pronunciation": "/ˈvoʊkəˌlɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vocalism", "form": "vocalisms", "position": 1, "pronunciation": "/ˈvoʊkəlɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vocalist", "form": "vocalists", "position": 1, "pronunciation": "/ˈvoʊkəlɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vocality", "form": "vocalities", "position": 1, "pronunciation": "/voʊˈkælɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vocalization", "form": "vocalizations", "position": 1, "pronunciation": "/ˌvoʊkələˈzeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vocalize", "form": "vocalise", "position": 1, "pronunciation": "/ˈvoʊkəlaɪz/", "labels": "[\"var.\"]", "synonyms": "[\"vocalize\", \"phonate\", \"voice\", \"sound\", \"articulate\", \"enunciate\", \"vowelize\"]"}
-{"headword": "vocalize", "form": "vocalized", "position": 2, "pronunciation": "/ˈvoʊkəlaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vocalize", "form": "vocalise", "position": 1, "pronunciation": "/ˈvoʊkəˌlaɪz/", "labels": "[\"var.\"]", "synonyms": "[\"vocalize\", \"phonate\", \"voice\", \"sound\", \"articulate\", \"enunciate\", \"vowelize\"]"}
+{"headword": "vocalize", "form": "vocalized", "position": 2, "pronunciation": "/ˈvoʊkəˌlaɪzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vocalize", "form": "vocalizes", "position": 3, "pronunciation": "/ˈvoʊkəˌlaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vocalize", "form": "vocalizing", "position": 4, "pronunciation": "/ˈvoʊkəˌlaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"singing\"]"}
 {"headword": "vocalizer", "form": "vocalizers", "position": 1, "pronunciation": "/ˈvoʊkəˌlaɪzərz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1165,12 +1314,14 @@
 {"headword": "vocationalism", "form": "vocationalisms", "position": 1, "pronunciation": "/voʊˈkeɪʃənəˌlɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vocationalist", "form": "vocationalists", "position": 1, "pronunciation": "/voʊˈkeɪʃənəlɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vocative", "form": "vocatives", "position": 1, "pronunciation": "/ˈvɑkətɪvz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vociferate", "form": "vociferated", "position": 1, "pronunciation": "/vəˈsɪfəreɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "vociferate", "form": "vociferates", "position": 2, "pronunciation": "/voʊˈsɪfəreɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
-{"headword": "vociferate", "form": "vociferating", "position": 3, "pronunciation": "/voʊˈsɪfəreɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "voche", "form": "voches", "position": 1, "pronunciation": "/ˈvoʊtʃɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vociferate", "form": "vociferated", "position": 1, "pronunciation": "/voʊˈsɪfəˌreɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vociferate", "form": "vociferates", "position": 2, "pronunciation": "/voʊˈsɪfəˌreɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "vociferate", "form": "vociferating", "position": 3, "pronunciation": "/voʊˈsɪfəˌreɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vociferation", "form": "vociferations", "position": 1, "pronunciation": "/voʊˌsɪfəˈreɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vociferator", "form": "vociferators", "position": 1, "pronunciation": "/voʊˈsɪfəreɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vocoder", "form": "vocoders", "position": 1, "pronunciation": "/ˈvoʊkoʊdərz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "vocoid", "form": "vocoids", "position": 1, "pronunciation": "/ˈvoʊˌkɔɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vodcast", "form": "vodcasts", "position": 1, "pronunciation": "/ˈvɑdˌkæsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vodka", "form": "vodkas", "position": 1, "pronunciation": "/ˈvɑdkəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voe", "form": "voes", "position": 1, "pronunciation": "/voʊz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1193,6 +1344,12 @@
 {"headword": "voider", "form": "voiders", "position": 1, "pronunciation": "/ˈvɔɪdərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voidness", "form": "voidnesses", "position": 1, "pronunciation": "/ˈvɔɪdnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voile", "form": "voiles", "position": 1, "pronunciation": "/vɔɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "voiture", "form": "voitures", "position": 1, "pronunciation": "/vwɑˈtʊrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "voivode", "form": "voivodes", "position": 1, "pronunciation": "/ˈvɔɪˌvoʊdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "voker", "form": "vokered", "position": 1, "pronunciation": "/ˈvoʊkərd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "voker", "form": "vokering", "position": 2, "pronunciation": "/ˈvoʊkərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "voker", "form": "vokers", "position": 3, "pronunciation": "/ˈvoʊkərz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "volary", "form": "volaries", "position": 1, "pronunciation": "/ˈvoʊləriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volatile", "form": "volatiles", "position": 1, "pronunciation": "/ˈvɑlətəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volatileness", "form": "volatilenesses", "position": 1, "pronunciation": "/ˈvɑlətəlnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volatility", "form": "volatilities", "position": 1, "pronunciation": "/ˌvɑləˈtɪlətiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1208,9 +1365,12 @@
 {"headword": "volcanicity", "form": "volcanicities", "position": 1, "pronunciation": "/ˌvɑlkəˈnɪsətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volcanism", "form": "volcanisms", "position": 1, "pronunciation": "/ˈvɑlkəˌnɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volcanism", "form": "vulcanism", "position": 2, "pronunciation": "/ˈvʌlkənɪzəm/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "volcanize", "form": "volcanized", "position": 1, "pronunciation": "/ˈvɑlkəˌnaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "volcanize", "form": "volcanizes", "position": 2, "pronunciation": "/ˈvɑlkəˌnaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "volcanize", "form": "volcanizing", "position": 3, "pronunciation": "/ˈvɑlkəˌnaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "volcano", "form": "volcanoes", "position": 1, "pronunciation": "/vɑlˈkeɪnoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volcano", "form": "volcanos", "position": 2, "pronunciation": "/vɑlˈkeɪnoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "volcanologist", "form": "volcanologists", "position": 1, "pronunciation": "/ˌvɔlkəˈnɔlədʒɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "volcanologist", "form": "volcanologists", "position": 1, "pronunciation": "/ˌvɑlkəˈnɑlədʒɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volcanology", "form": "volcanologies", "position": 1, "pronunciation": "/ˌvɑlkəˈnɑlədʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vole", "form": "voled", "position": 1, "pronunciation": "/voʊld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vole", "form": "voles", "position": 2, "pronunciation": "/voʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1231,6 +1391,8 @@
 {"headword": "volta", "form": "voltes", "position": 2, "pronunciation": "/voʊlts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voltage", "form": "voltages", "position": 1, "pronunciation": "/ˈvoʊltɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voltaism", "form": "voltaisms", "position": 1, "pronunciation": "/ˈvoʊltˌeɪɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "voltameter", "form": "voltameters", "position": 1, "pronunciation": "/voʊlˈtæmətərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "voltammeter", "form": "voltammeters", "position": 1, "pronunciation": "/ˈvoʊltˌæmˌmitərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voltmeter", "form": "voltmeters", "position": 1, "pronunciation": "/ˈvoʊltˌmitərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volubility", "form": "volubilities", "position": 1, "pronunciation": "/ˌvɑljəˈbɪlətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volubleness", "form": "volublenesses", "position": 1, "pronunciation": "/ˈvɑljəbəlnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1247,16 +1409,24 @@
 {"headword": "volunteer", "form": "volunteered", "position": 1, "pronunciation": "/ˌvɑlənˈtɪrd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "volunteer", "form": "volunteering", "position": 2, "pronunciation": "/ˌvɑlənˈtɪrɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "volunteer", "form": "volunteers", "position": 3, "pronunciation": "/ˌvɑlənˈtɪrz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "volunteerism", "form": "volunteerisms", "position": 1, "pronunciation": "/ˌvɑlənˈtɪˌrɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "volunteerism", "form": "volunteerisms", "position": 1, "pronunciation": "/ˌvɑlənˈtɪrɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "voluntell", "form": "voluntelling", "position": 1, "pronunciation": "/ˌvɑlənˈtɛlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "voluntell", "form": "voluntells", "position": 2, "pronunciation": "/ˌvɑlənˈtɛlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "voluntell", "form": "voluntold", "position": 3, "pronunciation": "/ˌvɑlənˈtoʊld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "voluntourist", "form": "voluntourists", "position": 1, "pronunciation": "/ˌvɑlənˈtʊrɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voluptuary", "form": "voluptuaries", "position": 1, "pronunciation": "/vəˈlʌptʃʊˌɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volute", "form": "volutes", "position": 1, "pronunciation": "/vəˈluts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volutin", "form": "volutins", "position": 1, "pronunciation": "/ˈvɑljətɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volution", "form": "volutions", "position": 1, "pronunciation": "/voʊˈluʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volva", "form": "volvas", "position": 1, "pronunciation": "/ˈvɑlvəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "volvelle", "form": "volvelles", "position": 1, "pronunciation": "/ˈvɑlvɛlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "volvent", "form": "volvents", "position": 1, "pronunciation": "/ˈvɑlvənts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volvox", "form": "volvoxes", "position": 1, "pronunciation": "/ˈvɑlvɑksɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volvulus", "form": "volvuli", "position": 1, "pronunciation": "/ˈvɑlvjəlaɪ/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "volvulus", "form": "volvuluses", "position": 2, "pronunciation": "/ˈvɑlvjələsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vom", "form": "vommed", "position": 1, "pronunciation": "/vɑmd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vom", "form": "vomming", "position": 2, "pronunciation": "/ˈvɑmɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vom", "form": "voms", "position": 3, "pronunciation": "/vɑmz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vomer", "form": "vomers", "position": 1, "pronunciation": "/ˈvoʊmərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vomica", "form": "vomicae", "position": 1, "pronunciation": "/ˈvɑmɪˌsi/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vomit", "form": "vomited", "position": 1, "pronunciation": "/ˈvɑmɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
@@ -1265,6 +1435,8 @@
 {"headword": "vomiter", "form": "vomiters", "position": 1, "pronunciation": "/ˈvɑmətərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vomitive", "form": "vomitives", "position": 1, "pronunciation": "/ˈvɑmətɪvz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vomito", "form": "vomitos", "position": 1, "pronunciation": "/voʊˈmitoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vomitorium", "form": "vomitoria", "position": 1, "pronunciation": "/ˌvɑməˈtɔriə/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vomitorium", "form": "vomitoriums", "position": 2, "pronunciation": "/ˌvɑməˈtɔriəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vomitory", "form": "vomitories", "position": 1, "pronunciation": "/ˈvɑmɪˌtɔriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vomitus", "form": "vomituses", "position": 1, "pronunciation": "/ˈvɑmɪtəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voodoo", "form": "vodoun", "position": 1, "pronunciation": "/voʊˈdun/", "labels": "[\"var.\"]", "synonyms": "[\"voodoo\", \"voodooism\", \"hoodooism\"]"}
@@ -1276,9 +1448,12 @@
 {"headword": "voodoo", "form": "voodoos", "position": 7, "pronunciation": "/ˈvuˌduz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "voodooism", "form": "voodooisms", "position": 1, "pronunciation": "/ˈvuduˌɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voodooist", "form": "voodooists", "position": 1, "pronunciation": "/ˈvuduɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "voorkamer", "form": "voorkamers", "position": 1, "pronunciation": "/ˈfʊrˌkɑmərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "voorskot", "form": "voorskots", "position": 1, "pronunciation": "/ˈfʊrˌskɑts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voracity", "form": "voracities", "position": 1, "pronunciation": "/vərˈæsətiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vorlage", "form": "vorlages", "position": 1, "pronunciation": "/ˈfɔrˌlɑɡəz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vortex", "form": "vortexes", "position": 1, "pronunciation": "/ˈvɔrtɛkɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vorspiel", "form": "vorspiels", "position": 1, "pronunciation": "/ˈfɔrˌʃpilz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vortex", "form": "vortexes", "position": 1, "pronunciation": "/ˈvɔrtɛksɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vortex", "form": "vortices", "position": 2, "pronunciation": "/ˈvɔrtɪsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vorticella", "form": "vorticellae", "position": 1, "pronunciation": "/ˌvɔrtɪˈsɛli/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vorticella", "form": "vorticellas", "position": 2, "pronunciation": "/ˌvɔrtɪˈsɛləz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1297,7 +1472,7 @@
 {"headword": "votiveness", "form": "votivenesses", "position": 1, "pronunciation": "/ˈvoʊtɪvnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "votress", "form": "votresses", "position": 1, "pronunciation": "/ˈvoʊtrəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vouch", "form": "vouched", "position": 1, "pronunciation": "/vaʊtʃt/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "vouch", "form": "vouches", "position": 2, "pronunciation": "/ˈvaʊtʃɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "vouch", "form": "vouches", "position": 2, "pronunciation": "/ˈvaʊtʃɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vouch", "form": "vouching", "position": 3, "pronunciation": "/ˈvaʊtʃɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vouchee", "form": "vouchees", "position": 1, "pronunciation": "/vaʊˈtʃiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voucher", "form": "vouchers", "position": 1, "pronunciation": "/ˈvaʊtʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1305,6 +1480,7 @@
 {"headword": "vouchsafe", "form": "vouchsafes", "position": 2, "pronunciation": "/ˌvaʊtʃˈseɪfz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vouchsafe", "form": "vouchsafing", "position": 3, "pronunciation": "/ˌvaʊtʃˈseɪfɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vouchsafement", "form": "vouchsafements", "position": 1, "pronunciation": "/vaʊtʃˈseɪfmənts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vouge", "form": "vouges", "position": 1, "pronunciation": "/ˈvuʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voussoir", "form": "voussoirs", "position": 1, "pronunciation": "/vuˈswɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vouvray", "form": "vouvrays", "position": 1, "pronunciation": "/vuˈvreɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vow", "form": "vowed", "position": 1, "pronunciation": "/vaʊd/", "labels": "[\"past\"]", "synonyms": null}
@@ -1318,12 +1494,13 @@
 {"headword": "vox", "form": "voces", "position": 1, "pronunciation": "/ˈvoʊsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voxel", "form": "voxels", "position": 1, "pronunciation": "/ˈvɑksəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voyage", "form": "voyaged", "position": 1, "pronunciation": "/ˈvɔɪədʒd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "voyage", "form": "voyages", "position": 2, "pronunciation": "/ˈvɔɪədʒəz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "voyage", "form": "voyaging", "position": 3, "pronunciation": "/ˈvɔɪɪdʒɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "voyager", "form": "voyagers", "position": 1, "pronunciation": "/ˈvɔɪɪdʒərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "voyage", "form": "voyages", "position": 2, "pronunciation": "/ˈvɔɪədʒɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "voyage", "form": "voyaging", "position": 3, "pronunciation": "/ˈvɔɪədʒɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "voyager", "form": "voyagers", "position": 1, "pronunciation": "/ˈvɔɪədʒərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voyageur", "form": "voyageurs", "position": 1, "pronunciation": "/vwajaˈʒɜrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voyeur", "form": "voyeurs", "position": 1, "pronunciation": "/ˌvɔɪˈjurz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "voyeurism", "form": "voyeurisms", "position": 1, "pronunciation": "/ˌvɔɪˈjurɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vriesia", "form": "vriesias", "position": 1, "pronunciation": "/ˈvriziəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vroom", "form": "varoom", "position": 1, "pronunciation": "/vəˈrum/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "vroom", "form": "varoomed", "position": 2, "pronunciation": "/vəˈrumd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vroom", "form": "varooming", "position": 3, "pronunciation": "/vəˈrumɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -1331,7 +1508,7 @@
 {"headword": "vroom", "form": "vroomed", "position": 5, "pronunciation": "/vrumd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "vroom", "form": "vrooming", "position": 6, "pronunciation": "/ˈvrumɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "vroom", "form": "vrooms", "position": 7, "pronunciation": "/vrumz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "vrouw", "form": "vrouws", "position": 1, "pronunciation": "/fraʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vrouw", "form": "vrouws", "position": 1, "pronunciation": "/vraʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vrouw", "form": "vrow", "position": 2, "pronunciation": "/vraʊ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "vrouw", "form": "vrows", "position": 3, "pronunciation": "/vraʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vug", "form": "vugg", "position": 1, "pronunciation": "/vʌɡ/", "labels": "[\"var.\"]", "synonyms": null}
@@ -1360,7 +1537,7 @@
 {"headword": "vulgar", "form": "vulgarer", "position": 1, "pronunciation": "/ˈvʌlɡərər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "vulgar", "form": "vulgarest", "position": 2, "pronunciation": "/ˈvʌlɡərɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "vulgar", "form": "vulgars", "position": 3, "pronunciation": "/ˈvʌlɡərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vulgarian", "form": "vulgarians", "position": 1, "pronunciation": "/vʌlˈɡɛriənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vulgarian", "form": "vulgarians", "position": 1, "pronunciation": "/vʌlˈɡɛəriənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vulgarism", "form": "vulgarisms", "position": 1, "pronunciation": "/ˈvʌlɡərɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vulgarity", "form": "vulgarities", "position": 1, "pronunciation": "/vəlˈɡɛrɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vulgarization", "form": "vulgarizations", "position": 1, "pronunciation": "/ˌvʌlɡərɪˈzeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1374,10 +1551,17 @@
 {"headword": "vulgarizer", "form": "vulgarizers", "position": 1, "pronunciation": "/ˈvʌlɡəraɪzərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vulgate", "form": "vulgates", "position": 1, "pronunciation": "/ˈvʌlɡeɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vulgus", "form": "vulguses", "position": 1, "pronunciation": "/ˈvʌlɡəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vuln", "form": "vulned", "position": 1, "pronunciation": "/vʌlnd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vuln", "form": "vulning", "position": 2, "pronunciation": "/ˈvʌlnɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vuln", "form": "vulns", "position": 3, "pronunciation": "/vʌlnz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vulnerary", "form": "vulneraries", "position": 1, "pronunciation": "/ˈvʌlnəˌrɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vulpicide", "form": "vulpicides", "position": 1, "pronunciation": "/ˈvʌlpəˌsaɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vulture", "form": "vultures", "position": 1, "pronunciation": "/ˈvʌltʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vulva", "form": "vulvae", "position": 1, "pronunciation": "/ˈvʊlvi/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "vulva", "form": "vulvas", "position": 2, "pronunciation": "/ˈvʊlvəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vulva", "form": "vulvae", "position": 1, "pronunciation": "/ˈvʌlvi/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vulva", "form": "vulvas", "position": 2, "pronunciation": "/ˈvʌlvəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vulvectomy", "form": "vulvectomies", "position": 1, "pronunciation": "/vʌlˈvɛktəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "vulvitis", "form": "vulvitises", "position": 1, "pronunciation": "/vʊlˈvaɪtɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "vum", "form": "vummed", "position": 1, "pronunciation": "/vʌmd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "vum", "form": "vumming", "position": 2, "pronunciation": "/ˈvʌmɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "vum", "form": "vums", "position": 3, "pronunciation": "/vʌmz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "vuvuzela", "form": "vuvuzelas", "position": 1, "pronunciation": "/ˌvuvuˈzɛləz/", "labels": "[\"pl.\"]", "synonyms": null}

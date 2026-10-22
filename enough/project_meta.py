@@ -54,16 +54,25 @@ DEFAULT_UI = {
     "readvisor_panel": DEFAULT_READVISOR_PANEL,
 }
 
-# What the project's base-layer canvas opens with (composure round, P4d).
-#   blank — a new, unwritten blank page every time (the default)
-#   last  — the composure most recently opened in this project
-#   file  — one specific composure, named in `path`
-#   form  — a new composure from the form named in `form`
+# What the project's base-layer canvas opens with (composure round, P4d;
+# `auto` and `new` since 0.4.2).
+#   auto — the project's composure: the only one with anything in it, else
+#          the last one used, else a new blank page (the default)
+#   new  — a new, unwritten blank page every time
+#   last — the composure most recently opened in this project
+#   file — one specific composure, named in `path`: the "startup
+#          composure", which a composure's own settings modal ticks
+#   form — a new composure from the form named in `form`
 # `last` is bookkeeping, not a setting: `touch_composure` stamps it whenever
 # a composure with a real path is opened, whatever the launch mode is, so
-# switching TO "last" later has something to resolve.
-COMPOSURE_LAUNCH_MODES = ("blank", "last", "file", "form")
-DEFAULT_COMPOSURE_LAUNCH = "blank"
+# switching TO "last" (or resolving `auto`) later has something to go on.
+COMPOSURE_LAUNCH_MODES = ("auto", "new", "last", "file", "form")
+DEFAULT_COMPOSURE_LAUNCH = "auto"
+# 0.3.5–0.4.1 called the blank-page mode `blank` and made it the default, and
+# `touch_composure` wrote that default into every project that ever opened a
+# composure — so a stored `blank` is almost never a choice. It reads as the
+# new default; choosing a blank page on purpose now stores `new`.
+LEGACY_COMPOSURE_LAUNCH = {"blank": "auto"}
 DEFAULT_COMPOSURE = {
     "launch": DEFAULT_COMPOSURE_LAUNCH,
     "path": "",
@@ -128,6 +137,7 @@ def _clean_form_name(value: object) -> str:
 def _clean_composure(raw: object) -> dict:
     c = raw if isinstance(raw, dict) else {}
     launch = c.get("launch")
+    launch = LEGACY_COMPOSURE_LAUNCH.get(launch, launch) if isinstance(launch, str) else launch
     return {
         "launch": launch if launch in COMPOSURE_LAUNCH_MODES else DEFAULT_COMPOSURE_LAUNCH,
         "path": _clean_comp_rel(c.get("path")),
@@ -166,7 +176,7 @@ def load(project_dir: Path) -> dict:
                      "text_scale": 1.0, "readvisor_panel": "open"} when
                      unset)
       - composure:   what the base-layer canvas opens with, always populated
-                     ({"launch": "blank", "path": "", "form": "",
+                     ({"launch": "auto", "path": "", "form": "",
                      "last": ""} when unset)
     """
     # Corrupt/unreadable metadata is non-fatal: _read_raw falls back to
@@ -224,8 +234,8 @@ def save_composure(
     bookkeeping owned by `touch_composure`, so choosing "a specific
     composure" cannot erase the trail that "the last composure used" needs.
 
-    A `launch` this module does not recognize resolves to "blank" rather
-    than raising: a project must always open."""
+    A `launch` this module does not recognize resolves to the default
+    rather than raising: a project must always open."""
     data = _read_raw(project_dir)
     prior = _clean_composure(data.get("composure"))
     mode = launch if launch in COMPOSURE_LAUNCH_MODES else DEFAULT_COMPOSURE_LAUNCH
@@ -259,6 +269,29 @@ def touch_composure(project_dir: Path, path_rel: str) -> dict:
     if prior["last"] == rel:
         return load(project_dir)
     prior["last"] = rel
+    data["composure"] = prior
+
+    meta = _meta_path(project_dir)
+    meta.parent.mkdir(parents=True, exist_ok=True)
+    meta.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return load(project_dir)
+
+
+def retarget_composure(project_dir: Path, old_rel: str, new_rel: str) -> dict:
+    """A composure moved from `old_rel` to `new_rel` (a rename through the
+    app): carry the startup `path` and the `last` trail along with it, so
+    renaming the startup composure does not quietly unset it. No write when
+    neither key named the old path."""
+    old, new = _clean_comp_rel(old_rel), _clean_comp_rel(new_rel)
+    if not old or not new or old == new:
+        return load(project_dir)
+    data = _read_raw(project_dir)
+    prior = _clean_composure(data.get("composure"))
+    if old not in (prior["path"], prior["last"]):
+        return load(project_dir)
+    for key in ("path", "last"):
+        if prior[key] == old:
+            prior[key] = new
     data["composure"] = prior
 
     meta = _meta_path(project_dir)

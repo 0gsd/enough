@@ -1644,8 +1644,9 @@ def create_app(
     @app.post("/api/project/composure")
     async def api_project_composure_set(request: Request) -> dict[str, Any]:
         """Persist what the base-layer canvas opens with (composure round,
-        P4d). Body: {"launch": "blank"|"last"|"file"|"form", "path": "…",
-        "form": "…"}. Its own endpoint for the same reason /api/project/ui
+        P4d). Body: {"launch": "auto"|"new"|"last"|"file"|"form",
+        "path": "…", "form": "…"} (`file` + `path` is the startup composure a
+        composure's settings modal ticks; unticking it posts `auto`). Its own endpoint for the same reason /api/project/ui
         is: three independent controls write three independent halves of
         rness/project.json. `last` is bookkeeping and is never accepted
         here — it is stamped by GET /api/composure. Returns the refreshed

@@ -131,6 +131,7 @@
 {"word": "abjection", "synonym": "abasement", "via": "abjection", "position": 1}
 {"word": "abjection", "synonym": "degradation", "via": "abjection", "position": 2}
 {"word": "abjectly", "synonym": "resignedly", "via": "abjectly", "position": 1}
+{"word": "abjunction", "synonym": "abstriction", "via": "abjunction", "position": 1}
 {"word": "abjuration", "synonym": "retraction", "via": "abjuration", "position": 1}
 {"word": "abjuration", "synonym": "recantation", "via": "abjuration", "position": 2}
 {"word": "abjure", "synonym": "recant", "via": "abjure", "position": 1}
@@ -155,6 +156,7 @@
 {"word": "abnegate", "synonym": "deny", "via": "abnegate", "position": 1}
 {"word": "abnegation", "synonym": "denial", "via": "abnegation", "position": 1}
 {"word": "abnormal", "synonym": "unnatural", "via": "abnormal", "position": 1}
+{"word": "abnormalcy", "synonym": "abnormality", "via": "abnormalcy", "position": 1}
 {"word": "abnormality", "synonym": "irregularity", "via": "abnormality", "position": 1}
 {"word": "abnormality", "synonym": "freakishness", "via": "abnormality", "position": 2}
 {"word": "aboard", "synonym": "alongside", "via": "aboard", "position": 1}
@@ -168,6 +170,7 @@
 {"word": "abode", "synonym": "domicile", "via": "abode", "position": 3}
 {"word": "abode", "synonym": "habitation", "via": "abode", "position": 4}
 {"word": "abode", "synonym": "residence", "via": "abode", "position": 5}
+{"word": "abogado", "synonym": "lawyer", "via": "abogado", "position": 1}
 {"word": "abolishment", "synonym": "abolition", "via": "abolishment", "position": 1}
 {"word": "abolition", "synonym": "abolishment", "via": "abolition", "position": 1}
 {"word": "abominable", "synonym": "atrocious", "via": "abominable", "position": 1}
@@ -280,6 +283,7 @@
 {"word": "abruptness", "synonym": "precipitancy", "via": "abruptness", "position": 6}
 {"word": "abruptness", "synonym": "suddenness", "via": "abruptness", "position": 7}
 {"word": "abruptness", "synonym": "steepness", "via": "abruptness", "position": 8}
+{"word": "abscind", "synonym": "sever", "via": "abscind", "position": 1}
 {"word": "abscond", "synonym": "bolt", "via": "abscond", "position": 1}
 {"word": "abscond", "synonym": "absquatulate", "via": "abscond", "position": 2}
 {"word": "abscond", "synonym": "decamp", "via": "abscond", "position": 3}
@@ -498,6 +502,8 @@
 {"word": "academicism", "synonym": "academism", "via": "academicism", "position": 2}
 {"word": "academism", "synonym": "scholasticism", "via": "academicism", "position": 1}
 {"word": "academism", "synonym": "academicism", "via": "academicism", "position": 2}
+{"word": "acanthoid", "synonym": "spiny", "via": "acanthoid", "position": 1}
+{"word": "acanthous", "synonym": "spiny", "via": "acanthous", "position": 1}
 {"word": "acaudal", "synonym": "acaudate", "via": "acaudal", "position": 1}
 {"word": "acaudate", "synonym": "acaudal", "via": "acaudate", "position": 1}
 {"word": "acaulescent", "synonym": "stemless", "via": "acaulescent", "position": 1}
@@ -634,6 +640,7 @@
 {"word": "accommodate", "synonym": "admit", "via": "accommodate", "position": 9}
 {"word": "accommodating", "synonym": "accommodative", "via": "accommodate", "position": 1}
 {"word": "accommodating", "synonym": "accommodative", "via": "accommodating", "position": 1}
+{"word": "accommodatingly", "synonym": "obligingly", "via": "accommodatingly", "position": 1}
 {"word": "accommodation", "synonym": "adjustment", "via": "accommodation", "position": 1}
 {"word": "accommodation", "synonym": "fitting", "via": "accommodation", "position": 2}
 {"word": "accommodative", "synonym": "accommodating", "via": "accommodative", "position": 1}
@@ -717,6 +724,7 @@
 {"word": "accouchement", "synonym": "childbirth", "via": "accouchement", "position": 1}
 {"word": "accouchement", "synonym": "childbearing", "via": "accouchement", "position": 2}
 {"word": "accoucheur", "synonym": "obstetrician", "via": "accoucheur", "position": 1}
+{"word": "accoucheuse", "synonym": "midwife", "via": "accoucheuse", "position": 1}
 {"word": "account", "synonym": "history", "via": "account", "position": 1}
 {"word": "account", "synonym": "chronicle", "via": "account", "position": 2}
 {"word": "account", "synonym": "story", "via": "account", "position": 3}
@@ -824,6 +832,7 @@
 {"word": "acedia", "synonym": "sloth", "via": "acedia", "position": 1}
 {"word": "acedia", "synonym": "laziness", "via": "acedia", "position": 2}
 {"word": "acellular", "synonym": "noncellular", "via": "acellular", "position": 1}
+{"word": "acer", "synonym": "maple", "via": "acer", "position": 1}
 {"word": "acerate", "synonym": "acerose", "via": "acerate", "position": 1}
 {"word": "acerate", "synonym": "acicular", "via": "acerate", "position": 2}
 {"word": "acerb", "synonym": "acerbic", "via": "acerb", "position": 1}
@@ -855,12 +864,16 @@
 {"word": "acerbity", "synonym": "thorniness", "via": "acerbity", "position": 5}
 {"word": "acerose", "synonym": "acerate", "via": "acerose", "position": 1}
 {"word": "acerose", "synonym": "acicular", "via": "acerose", "position": 2}
+{"word": "acesodyne", "synonym": "analgesic", "via": "acesodyne", "position": 1}
+{"word": "acesodyne", "synonym": "anodyne", "via": "acesodyne", "position": 2}
 {"word": "acetabular", "synonym": "cotyloid", "via": "acetabular", "position": 1}
+{"word": "acetaldol", "synonym": "aldol", "via": "acetaldol", "position": 1}
 {"word": "acetanilid", "synonym": "acetanilide", "via": "acetanilide", "position": 1}
 {"word": "acetanilide", "synonym": "acetanilid", "via": "acetanilide", "position": 1}
 {"word": "acetify", "synonym": "acidify", "via": "acetify", "position": 1}
 {"word": "acetify", "synonym": "sour", "via": "acetify", "position": 2}
 {"word": "acetify", "synonym": "acidulate", "via": "acetify", "position": 3}
+{"word": "acetophenetidin", "synonym": "phenacetin", "via": "acetophenetidin", "position": 1}
 {"word": "acetose", "synonym": "acetous", "via": "acetose", "position": 1}
 {"word": "acetose", "synonym": "vinegary", "via": "acetose", "position": 2}
 {"word": "acetose", "synonym": "vinegarish", "via": "acetose", "position": 3}
@@ -868,8 +881,10 @@
 {"word": "acetous", "synonym": "vinegary", "via": "acetous", "position": 2}
 {"word": "acetous", "synonym": "vinegarish", "via": "acetous", "position": 3}
 {"word": "acetum", "synonym": "vinegar", "via": "acetum", "position": 1}
+{"word": "acetylaniline", "synonym": "acetanilide", "via": "acetylaniline", "position": 1}
 {"word": "acetylene", "synonym": "ethyne", "via": "acetylene", "position": 1}
 {"word": "acetylene", "synonym": "alkyne", "via": "acetylene", "position": 2}
+{"word": "acetylize", "synonym": "acetylate", "via": "acetylize", "position": 1}
 {"word": "ache", "synonym": "aching", "via": "ache", "position": 1}
 {"word": "ache", "synonym": "yearn", "via": "ache", "position": 2}
 {"word": "ache", "synonym": "yen", "via": "ache", "position": 3}
@@ -903,6 +918,7 @@
 {"word": "aching", "synonym": "achy", "via": "aching", "position": 2}
 {"word": "acholia", "synonym": "cholestasis", "via": "acholia", "position": 1}
 {"word": "achromatic", "synonym": "neutral", "via": "achromatic", "position": 1}
+{"word": "achromaticity", "synonym": "achromatism", "via": "achromaticity", "position": 1}
 {"word": "achromatism", "synonym": "colorlessness", "via": "achromatism", "position": 1}
 {"word": "achy", "synonym": "aching", "via": "achy", "position": 1}
 {"word": "acicular", "synonym": "acerate", "via": "acicular", "position": 1}
@@ -925,6 +941,7 @@
 {"word": "acidify", "synonym": "acidulate", "via": "acidify", "position": 3}
 {"word": "acidity", "synonym": "sourness", "via": "acidity", "position": 1}
 {"word": "acidity", "synonym": "sour", "via": "acidity", "position": 2}
+{"word": "acidize", "synonym": "acidify", "via": "acidize", "position": 1}
 {"word": "acidophil", "synonym": "acidophile", "via": "acidophil", "position": 1}
 {"word": "acidophile", "synonym": "acidophil", "via": "acidophile", "position": 1}
 {"word": "acidulate", "synonym": "sour", "via": "acidulate", "position": 1}
@@ -949,6 +966,10 @@
 {"word": "acinous", "synonym": "acinose", "via": "acinose", "position": 2}
 {"word": "acinous", "synonym": "acinic", "via": "acinose", "position": 3}
 {"word": "ackee", "synonym": "akee", "via": "ackee", "position": 1}
+{"word": "acker", "synonym": "zit", "via": "acker", "position": 1}
+{"word": "acker", "synonym": "pimple", "via": "acker", "position": 2}
+{"word": "acknickulous", "synonym": "wonderful", "via": "acknickulous", "position": 1}
+{"word": "acknickulous", "synonym": "marvelous", "via": "acknickulous", "position": 2}
 {"word": "acknowledge", "synonym": "recognize", "via": "acknowledge", "position": 1}
 {"word": "acknowledge", "synonym": "recognise", "via": "acknowledge", "position": 2}
 {"word": "acknowledge", "synonym": "know", "via": "acknowledge", "position": 3}
@@ -1041,6 +1062,7 @@
 {"word": "acrimony", "synonym": "jaundice", "via": "acrimony", "position": 3}
 {"word": "acrimony", "synonym": "tartness", "via": "acrimony", "position": 4}
 {"word": "acrimony", "synonym": "thorniness", "via": "acrimony", "position": 5}
+{"word": "acroamatic", "synonym": "esoteric", "via": "acroamatic", "position": 1}
 {"word": "acrobatic", "synonym": "athletic", "via": "acrobatic", "position": 1}
 {"word": "acrobatic", "synonym": "gymnastic", "via": "acrobatic", "position": 2}
 {"word": "acrobatics", "synonym": "aerobatics", "via": "acrobatics", "position": 1}
@@ -1049,6 +1071,7 @@
 {"word": "acronym", "synonym": "initialism", "via": "acronym", "position": 1}
 {"word": "across", "synonym": "crosswise", "via": "across", "position": 1}
 {"word": "across", "synonym": "crossways", "via": "across", "position": 2}
+{"word": "acroterion", "synonym": "acroter", "via": "acroterion", "position": 1}
 {"word": "act", "synonym": "deed", "via": "act", "position": 1}
 {"word": "act", "synonym": "enactment", "via": "act", "position": 2}
 {"word": "act", "synonym": "routine", "via": "act", "position": 3}
@@ -1079,8 +1102,11 @@
 {"word": "actinian", "synonym": "actinia", "via": "actinian", "position": 1}
 {"word": "actinide", "synonym": "actinoid", "via": "actinide", "position": 1}
 {"word": "actinide", "synonym": "actinon", "via": "actinide", "position": 2}
+{"word": "actinochemistry", "synonym": "photochemistry", "via": "actinochemistry", "position": 1}
 {"word": "actinoid", "synonym": "actinide", "via": "actinoid", "position": 1}
 {"word": "actinoid", "synonym": "actinon", "via": "actinoid", "position": 2}
+{"word": "actinomere", "synonym": "antimere", "via": "actinomere", "position": 1}
+{"word": "actinozoan", "synonym": "anthozoan", "via": "actinozoan", "position": 1}
 {"word": "action", "synonym": "activity", "via": "action", "position": 1}
 {"word": "action", "synonym": "activeness", "via": "action", "position": 2}
 {"word": "action", "synonym": "accomplish", "via": "action", "position": 3}
@@ -1185,6 +1211,7 @@
 {"word": "adaptation", "synonym": "version", "via": "adaptation", "position": 1}
 {"word": "adaptation", "synonym": "adaption", "via": "adaptation", "position": 2}
 {"word": "adaptation", "synonym": "adjustment", "via": "adaptation", "position": 3}
+{"word": "adaptative", "synonym": "adaptive", "via": "adaptative", "position": 1}
 {"word": "adapted", "synonym": "altered", "via": "adapt", "position": 1}
 {"word": "adapted", "synonym": "altered", "via": "adapted", "position": 1}
 {"word": "adapter", "synonym": "adaptor", "via": "adapter", "position": 1}
@@ -1194,6 +1221,8 @@
 {"word": "adaption", "synonym": "adjustment", "via": "adaptation", "position": 2}
 {"word": "adaptor", "synonym": "adapter", "via": "adapter", "position": 1}
 {"word": "adaxial", "synonym": "ventral", "via": "adaxial", "position": 1}
+{"word": "adazzle", "synonym": "dazzling", "via": "adazzle", "position": 1}
+{"word": "adazzle", "synonym": "glittering", "via": "adazzle", "position": 2}
 {"word": "add", "synonym": "total", "via": "add", "position": 1}
 {"word": "add", "synonym": "tot", "via": "add", "position": 2}
 {"word": "add", "synonym": "sum", "via": "add", "position": 3}
@@ -1297,6 +1326,8 @@
 {"word": "adhesiveness", "synonym": "adhesion", "via": "adhesiveness", "position": 1}
 {"word": "adhesiveness", "synonym": "adherence", "via": "adhesiveness", "position": 2}
 {"word": "adhesiveness", "synonym": "bond", "via": "adhesiveness", "position": 3}
+{"word": "adiaphoresis", "synonym": "anhidrosis", "via": "adiaphoresis", "position": 1}
+{"word": "adiathermancy", "synonym": "athermancy", "via": "adiathermancy", "position": 1}
 {"word": "adieu", "synonym": "adios", "via": "adieu", "position": 1}
 {"word": "adieu", "synonym": "bye", "via": "adieu", "position": 2}
 {"word": "adieu", "synonym": "cheerio", "via": "adieu", "position": 3}
@@ -1309,6 +1340,7 @@
 {"word": "adios", "synonym": "goodby", "via": "adios", "position": 4}
 {"word": "adios", "synonym": "goodbye", "via": "adios", "position": 5}
 {"word": "adios", "synonym": "sayonara", "via": "adios", "position": 6}
+{"word": "adipocerite", "synonym": "hatchettite", "via": "adipocerite", "position": 1}
 {"word": "adiposis", "synonym": "corpulence", "via": "adiposis", "position": 1}
 {"word": "adiposis", "synonym": "overweight", "via": "adiposis", "position": 2}
 {"word": "adiposis", "synonym": "stoutness", "via": "adiposis", "position": 3}
@@ -1319,6 +1351,8 @@
 {"word": "adjacent", "synonym": "conterminous", "via": "adjacent", "position": 2}
 {"word": "adjacent", "synonym": "contiguous", "via": "adjacent", "position": 3}
 {"word": "adjacent", "synonym": "neighboring", "via": "adjacent", "position": 4}
+{"word": "adject", "synonym": "add", "via": "adject", "position": 1}
+{"word": "adject", "synonym": "annex", "via": "adject", "position": 2}
 {"word": "adjectival", "synonym": "adjective", "via": "adjectival", "position": 1}
 {"word": "adjective", "synonym": "adjectival", "via": "adjective", "position": 1}
 {"word": "adjoin", "synonym": "touch", "via": "adjoin", "position": 1}
@@ -1387,6 +1421,7 @@
 {"word": "administer", "synonym": "lot", "via": "administer", "position": 4}
 {"word": "administer", "synonym": "allot", "via": "administer", "position": 5}
 {"word": "administer", "synonym": "administrate", "via": "administer", "position": 6}
+{"word": "administerial", "synonym": "administrative", "via": "administerial", "position": 1}
 {"word": "administrate", "synonym": "administer", "via": "administrate", "position": 1}
 {"word": "administration", "synonym": "judicature", "via": "administration", "position": 1}
 {"word": "administration", "synonym": "government", "via": "administration", "position": 2}
@@ -1459,6 +1494,7 @@
 {"word": "admonition", "synonym": "monition", "via": "admonition", "position": 1}
 {"word": "admonition", "synonym": "warning", "via": "admonition", "position": 2}
 {"word": "admonition", "synonym": "admonishment", "via": "admonition", "position": 3}
+{"word": "admonitor", "synonym": "admonisher", "via": "admonitor", "position": 1}
 {"word": "admonitory", "synonym": "admonishing", "via": "admonitory", "position": 1}
 {"word": "admonitory", "synonym": "reproachful", "via": "admonitory", "position": 2}
 {"word": "admonitory", "synonym": "reproving", "via": "admonitory", "position": 3}
@@ -1535,6 +1571,8 @@
 {"word": "adorned", "synonym": "decorated", "via": "adorned", "position": 1}
 {"word": "adrenaline", "synonym": "epinephrine", "via": "adrenaline", "position": 1}
 {"word": "adrenaline", "synonym": "epinephrin", "via": "adrenaline", "position": 2}
+{"word": "adrenalize", "synonym": "galvanize", "via": "adrenalize", "position": 1}
+{"word": "adrenocorticosteroid", "synonym": "corticosteroid", "via": "adrenocorticosteroid", "position": 1}
 {"word": "adrift", "synonym": "afloat", "via": "adrift", "position": 1}
 {"word": "adrift", "synonym": "aimless", "via": "adrift", "position": 2}
 {"word": "adrift", "synonym": "directionless", "via": "adrift", "position": 3}
@@ -1733,6 +1771,7 @@
 {"word": "aegis", "synonym": "breastplate", "via": "aegis", "position": 3}
 {"word": "aegis", "synonym": "egis", "via": "aegis", "position": 4}
 {"word": "aeolian", "synonym": "eolian", "via": "aeolian", "position": 1}
+{"word": "aeolotropic", "synonym": "anisotropic", "via": "aeolotropic", "position": 1}
 {"word": "aeon", "synonym": "eon", "via": "aeon", "position": 1}
 {"word": "aeonian", "synonym": "ageless", "via": "eonian", "position": 1}
 {"word": "aeonian", "synonym": "eonian", "via": "eonian", "position": 2}
@@ -1751,6 +1790,7 @@
 {"word": "aerial", "synonym": "airy", "via": "aerial", "position": 3}
 {"word": "aerial", "synonym": "aery", "via": "aerial", "position": 4}
 {"word": "aerial", "synonym": "ethereal", "via": "aerial", "position": 5}
+{"word": "aeriality", "synonym": "airiness", "via": "aeriality", "position": 1}
 {"word": "aerie", "synonym": "aery", "via": "aerie", "position": 1}
 {"word": "aerie", "synonym": "eyrie", "via": "aerie", "position": 2}
 {"word": "aerie", "synonym": "eyry", "via": "aerie", "position": 3}
@@ -1779,14 +1819,19 @@
 {"word": "aerogram", "synonym": "aerogramme", "via": "aerogram", "position": 1}
 {"word": "aerogramme", "synonym": "aerogram", "via": "aerogram", "position": 1}
 {"word": "aeromechanics", "synonym": "aerodynamics", "via": "aeromechanics", "position": 1}
+{"word": "aerometry", "synonym": "pneumatics", "via": "aerometry", "position": 1}
 {"word": "aeronaut", "synonym": "aviator", "via": "aeronaut", "position": 1}
 {"word": "aeronaut", "synonym": "airman", "via": "aeronaut", "position": 2}
 {"word": "aeronaut", "synonym": "flier", "via": "aeronaut", "position": 3}
 {"word": "aeronaut", "synonym": "flyer", "via": "aeronaut", "position": 4}
 {"word": "aeronautic", "synonym": "aeronautical", "via": "aeronautic", "position": 1}
 {"word": "aeronautical", "synonym": "aeronautic", "via": "aeronautical", "position": 1}
+{"word": "aerophagy", "synonym": "aerophagia", "via": "aerophagy", "position": 1}
+{"word": "aerophyte", "synonym": "epiphyte", "via": "aerophyte", "position": 1}
 {"word": "aeroplane", "synonym": "airplane", "via": "aeroplane", "position": 1}
 {"word": "aeroplane", "synonym": "plane", "via": "aeroplane", "position": 2}
+{"word": "aeropulse", "synonym": "pulsejet", "via": "aeropulse", "position": 1}
+{"word": "aerosphere", "synonym": "atmosphere", "via": "aerosphere", "position": 1}
 {"word": "aery", "synonym": "aerie", "via": "aery", "position": 1}
 {"word": "aery", "synonym": "eyrie", "via": "aery", "position": 2}
 {"word": "aery", "synonym": "eyry", "via": "aery", "position": 3}
@@ -1833,6 +1878,7 @@
 {"word": "affaire", "synonym": "liaison", "via": "affair", "position": 3}
 {"word": "affaire", "synonym": "involvement", "via": "affair", "position": 4}
 {"word": "affaire", "synonym": "amour", "via": "affair", "position": 5}
+{"word": "affairette", "synonym": "fling", "via": "affairette", "position": 1}
 {"word": "affect", "synonym": "impact", "via": "affect", "position": 1}
 {"word": "affect", "synonym": "touch", "via": "affect", "position": 2}
 {"word": "affect", "synonym": "feign", "via": "affect", "position": 3}
@@ -1907,6 +1953,7 @@
 {"word": "affirmative", "synonym": "approving", "via": "affirmative", "position": 1}
 {"word": "affirmative", "synonym": "approbatory", "via": "affirmative", "position": 2}
 {"word": "affirmative", "synonym": "plausive", "via": "affirmative", "position": 3}
+{"word": "affirmatory", "synonym": "affirmative", "via": "affirmatory", "position": 1}
 {"word": "affirmer", "synonym": "asserter", "via": "affirmer", "position": 1}
 {"word": "affirmer", "synonym": "declarer", "via": "affirmer", "position": 2}
 {"word": "affirmer", "synonym": "avower", "via": "affirmer", "position": 3}
@@ -1935,11 +1982,13 @@
 {"word": "afford", "synonym": "give", "via": "afford", "position": 2}
 {"word": "afford", "synonym": "open", "via": "afford", "position": 3}
 {"word": "afforest", "synonym": "forest", "via": "afforest", "position": 1}
+{"word": "affranchise", "synonym": "emancipate", "via": "affranchise", "position": 1}
 {"word": "affray", "synonym": "disturbance", "via": "affray", "position": 1}
 {"word": "affray", "synonym": "fray", "via": "affray", "position": 2}
 {"word": "affray", "synonym": "ruffle", "via": "affray", "position": 3}
 {"word": "affray", "synonym": "altercation", "via": "affray", "position": 4}
 {"word": "affray", "synonym": "fracas", "via": "affray", "position": 5}
+{"word": "affreight", "synonym": "charter", "via": "affreight", "position": 1}
 {"word": "affricate", "synonym": "affricative", "via": "affricate", "position": 1}
 {"word": "affricative", "synonym": "affricate", "via": "affricative", "position": 1}
 {"word": "affright", "synonym": "panic", "via": "affright", "position": 1}
@@ -1970,8 +2019,10 @@
 {"word": "afloat", "synonym": "undirected", "via": "afloat", "position": 10}
 {"word": "aflutter", "synonym": "nervous", "via": "aflutter", "position": 1}
 {"word": "afoot", "synonym": "underway", "via": "afoot", "position": 1}
+{"word": "aforehand", "synonym": "beforehand", "via": "aforehand", "position": 1}
 {"word": "aforementioned", "synonym": "aforesaid", "via": "aforementioned", "position": 1}
 {"word": "aforementioned", "synonym": "said", "via": "aforementioned", "position": 2}
+{"word": "aforenoted", "synonym": "aforementioned", "via": "aforenoted", "position": 1}
 {"word": "aforesaid", "synonym": "aforementioned", "via": "aforesaid", "position": 1}
 {"word": "aforesaid", "synonym": "said", "via": "aforesaid", "position": 2}
 {"word": "aforethought", "synonym": "planned", "via": "aforethought", "position": 1}
@@ -1989,6 +2040,7 @@
 {"word": "after", "synonym": "afterwards", "via": "after", "position": 3}
 {"word": "after", "synonym": "afterward", "via": "after", "position": 4}
 {"word": "afterlife", "synonym": "hereafter", "via": "afterlife", "position": 1}
+{"word": "afterlight", "synonym": "afterglow", "via": "afterlight", "position": 1}
 {"word": "aftermath", "synonym": "consequence", "via": "aftermath", "position": 1}
 {"word": "aftermath", "synonym": "wake", "via": "aftermath", "position": 2}
 {"word": "aftermath", "synonym": "backwash", "via": "aftermath", "position": 3}
@@ -2008,6 +2060,8 @@
 {"word": "aga", "synonym": "agha", "via": "agha", "position": 1}
 {"word": "agamic", "synonym": "agamous", "via": "agamic", "position": 1}
 {"word": "agamic", "synonym": "apomictic", "via": "agamic", "position": 2}
+{"word": "agamogony", "synonym": "schizogony", "via": "agamogony", "position": 1}
+{"word": "agamont", "synonym": "schizont", "via": "agamont", "position": 1}
 {"word": "agamous", "synonym": "agamic", "via": "agamous", "position": 1}
 {"word": "agamous", "synonym": "apomictic", "via": "agamous", "position": 2}
 {"word": "agape", "synonym": "gaping", "via": "agape", "position": 1}
@@ -2043,6 +2097,7 @@
 {"word": "ageless", "synonym": "perpetual", "via": "ageless", "position": 5}
 {"word": "ageless", "synonym": "unending", "via": "ageless", "position": 6}
 {"word": "ageless", "synonym": "unceasing", "via": "ageless", "position": 7}
+{"word": "agemate", "synonym": "peer", "via": "agemate", "position": 1}
 {"word": "agency", "synonym": "means", "via": "agency", "position": 1}
 {"word": "agency", "synonym": "way", "via": "agency", "position": 2}
 {"word": "agency", "synonym": "bureau", "via": "agency", "position": 3}
@@ -2097,6 +2152,7 @@
 {"word": "aggravating", "synonym": "exasperating", "via": "aggravate", "position": 2}
 {"word": "aggravating", "synonym": "exacerbating", "via": "aggravating", "position": 1}
 {"word": "aggravating", "synonym": "exasperating", "via": "aggravating", "position": 2}
+{"word": "aggravatingly", "synonym": "exasperatingly", "via": "aggravatingly", "position": 1}
 {"word": "aggravation", "synonym": "exacerbation", "via": "aggravation", "position": 1}
 {"word": "aggravation", "synonym": "irritation", "via": "aggravation", "position": 2}
 {"word": "aggravation", "synonym": "provocation", "via": "aggravation", "position": 3}
@@ -2133,10 +2189,13 @@
 {"word": "aggressor", "synonym": "assailant", "via": "aggressor", "position": 2}
 {"word": "aggressor", "synonym": "assaulter", "via": "aggressor", "position": 3}
 {"word": "aggrieve", "synonym": "grieve", "via": "aggrieve", "position": 1}
+{"word": "aggy", "synonym": "angry", "via": "aggy", "position": 1}
+{"word": "aggy", "synonym": "aggressive", "via": "aggy", "position": 2}
 {"word": "agha", "synonym": "aga", "via": "agha", "position": 1}
 {"word": "aghast", "synonym": "appalled", "via": "aghast", "position": 1}
 {"word": "aghast", "synonym": "dismayed", "via": "aghast", "position": 2}
 {"word": "aghast", "synonym": "shocked", "via": "aghast", "position": 3}
+{"word": "agilawood", "synonym": "agalloch", "via": "agilawood", "position": 1}
 {"word": "agile", "synonym": "nimble", "via": "agile", "position": 1}
 {"word": "agile", "synonym": "quick", "via": "agile", "position": 2}
 {"word": "agile", "synonym": "spry", "via": "agile", "position": 3}
@@ -2273,6 +2332,7 @@
 {"word": "agreeableness", "synonym": "amenity", "via": "agreeableness", "position": 2}
 {"word": "agreeably", "synonym": "pleasantly", "via": "agreeably", "position": 1}
 {"word": "agreeably", "synonym": "enjoyably", "via": "agreeably", "position": 2}
+{"word": "agreeance", "synonym": "agreement", "via": "agreeance", "position": 1}
 {"word": "agreement", "synonym": "correspondence", "via": "agreement", "position": 1}
 {"word": "agreement", "synonym": "arrangement", "via": "agreement", "position": 2}
 {"word": "agreement", "synonym": "understanding", "via": "agreement", "position": 3}
@@ -2299,7 +2359,9 @@
 {"word": "ahead", "synonym": "forwards", "via": "ahead", "position": 7}
 {"word": "ahead", "synonym": "forrader", "via": "ahead", "position": 8}
 {"word": "ahem", "synonym": "hem", "via": "ahem", "position": 1}
+{"word": "ahkio", "synonym": "pulka", "via": "ahkio", "position": 1}
 {"word": "ahorse", "synonym": "horseback", "via": "ahorse", "position": 1}
+{"word": "ahungered", "synonym": "famished", "via": "ahungered", "position": 1}
 {"word": "aid", "synonym": "care", "via": "aid", "position": 1}
 {"word": "aid", "synonym": "attention", "via": "aid", "position": 2}
 {"word": "aid", "synonym": "tending", "via": "aid", "position": 3}
@@ -2398,6 +2460,8 @@
 {"word": "airing", "synonym": "ventilation", "via": "airing", "position": 1}
 {"word": "airing", "synonym": "dissemination", "via": "airing", "position": 2}
 {"word": "airing", "synonym": "spreading", "via": "airing", "position": 3}
+{"word": "airish", "synonym": "haughty", "via": "airish", "position": 1}
+{"word": "airish", "synonym": "pretentious", "via": "airish", "position": 2}
 {"word": "airless", "synonym": "close", "via": "airless", "position": 1}
 {"word": "airless", "synonym": "stuffy", "via": "airless", "position": 2}
 {"word": "airless", "synonym": "unaired", "via": "airless", "position": 3}
@@ -2439,12 +2503,15 @@
 {"word": "airy", "synonym": "windy", "via": "airy", "position": 7}
 {"word": "airy", "synonym": "aired", "via": "airy", "position": 8}
 {"word": "aisle", "synonym": "gangway", "via": "aisle", "position": 1}
+{"word": "akamai", "synonym": "clever", "via": "akamai", "position": 1}
+{"word": "akamai", "synonym": "smart", "via": "akamai", "position": 2}
 {"word": "akee", "synonym": "ackee", "via": "ackee", "position": 1}
 {"word": "akin", "synonym": "cognate", "via": "akin", "position": 1}
 {"word": "akin", "synonym": "consanguine", "via": "akin", "position": 2}
 {"word": "akin", "synonym": "consanguineous", "via": "akin", "position": 3}
 {"word": "akin", "synonym": "kin", "via": "akin", "position": 4}
 {"word": "akin", "synonym": "kindred", "via": "akin", "position": 5}
+{"word": "akip", "synonym": "asleep", "via": "akip", "position": 1}
 {"word": "akvavit", "synonym": "aquavit", "via": "aquavit", "position": 1}
 {"word": "alabaster", "synonym": "alabastrine", "via": "alabaster", "position": 1}
 {"word": "alabastrine", "synonym": "alabaster", "via": "alabastrine", "position": 1}
@@ -2572,7 +2639,6 @@
 {"word": "align", "synonym": "coordinate", "via": "align", "position": 4}
 {"word": "align", "synonym": "array", "via": "align", "position": 5}
 {"word": "aligning", "synonym": "positioning", "via": "align", "position": 1}
-{"word": "aligning", "synonym": "positioning", "via": "aligning", "position": 1}
 {"word": "alignment", "synonym": "conjunction", "via": "alignment", "position": 1}
 {"word": "alignment", "synonym": "alliance", "via": "alignment", "position": 2}
 {"word": "alignment", "synonym": "coalition", "via": "alignment", "position": 3}
@@ -2600,6 +2666,8 @@
 {"word": "alimentation", "synonym": "sustenance", "via": "alimentation", "position": 5}
 {"word": "alimentation", "synonym": "aliment", "via": "alimentation", "position": 6}
 {"word": "alimentation", "synonym": "victuals", "via": "alimentation", "position": 7}
+{"word": "alimentative", "synonym": "nutritive", "via": "alimentative", "position": 1}
+{"word": "alimentative", "synonym": "nourishing", "via": "alimentative", "position": 2}
 {"word": "alimony", "synonym": "maintenance", "via": "alimony", "position": 1}
 {"word": "aline", "synonym": "align", "via": "align", "position": 1}
 {"word": "aline", "synonym": "adjust", "via": "align", "position": 2}
@@ -2678,6 +2746,7 @@
 {"word": "allergic", "synonym": "sensitized", "via": "allergic", "position": 2}
 {"word": "allergic", "synonym": "sensitised", "via": "allergic", "position": 3}
 {"word": "allergic", "synonym": "supersensitive", "via": "allergic", "position": 4}
+{"word": "alleviant", "synonym": "palliative", "via": "alleviant", "position": 1}
 {"word": "alleviate", "synonym": "relieve", "via": "alleviate", "position": 1}
 {"word": "alleviate", "synonym": "palliate", "via": "alleviate", "position": 2}
 {"word": "alleviate", "synonym": "assuage", "via": "alleviate", "position": 3}
@@ -2691,6 +2760,7 @@
 {"word": "alleviation", "synonym": "easement", "via": "alleviation", "position": 2}
 {"word": "alleviation", "synonym": "relief", "via": "alleviation", "position": 3}
 {"word": "alleviation", "synonym": "assuagement", "via": "alleviation", "position": 4}
+{"word": "alleviative", "synonym": "palliative", "via": "alleviative", "position": 1}
 {"word": "alleviator", "synonym": "palliative", "via": "alleviator", "position": 1}
 {"word": "alley", "synonym": "alleyway", "via": "alley", "position": 1}
 {"word": "alleyway", "synonym": "alley", "via": "alleyway", "position": 1}
@@ -2718,6 +2788,7 @@
 {"word": "allocation", "synonym": "assignation", "via": "allocation", "position": 6}
 {"word": "allocator", "synonym": "distributor", "via": "allocator", "position": 1}
 {"word": "allograft", "synonym": "homograft", "via": "allograft", "position": 1}
+{"word": "allophanamide", "synonym": "biuret", "via": "allophanamide", "position": 1}
 {"word": "allot", "synonym": "assign", "via": "allot", "position": 1}
 {"word": "allot", "synonym": "portion", "via": "allot", "position": 2}
 {"word": "allot", "synonym": "accord", "via": "allot", "position": 3}
@@ -2744,6 +2815,7 @@
 {"word": "allow", "synonym": "leave", "via": "allow", "position": 9}
 {"word": "allow", "synonym": "provide", "via": "allow", "position": 10}
 {"word": "allowable", "synonym": "permissible", "via": "allowable", "position": 1}
+{"word": "allowableness", "synonym": "permissibility", "via": "allowableness", "position": 1}
 {"word": "allowably", "synonym": "permissibly", "via": "allowably", "position": 1}
 {"word": "allowance", "synonym": "leeway", "via": "allowance", "position": 1}
 {"word": "allowance", "synonym": "margin", "via": "allowance", "position": 2}
@@ -2779,6 +2851,8 @@
 {"word": "almighty", "synonym": "maker", "via": "almighty", "position": 4}
 {"word": "almighty", "synonym": "divine", "via": "almighty", "position": 5}
 {"word": "almighty", "synonym": "omnipotent", "via": "almighty", "position": 6}
+{"word": "almirah", "synonym": "wardrobe", "via": "almirah", "position": 1}
+{"word": "almirah", "synonym": "cupboard", "via": "almirah", "position": 2}
 {"word": "almost", "synonym": "about", "via": "almost", "position": 1}
 {"word": "almost", "synonym": "most", "via": "almost", "position": 2}
 {"word": "almost", "synonym": "nearly", "via": "almost", "position": 3}
@@ -2808,6 +2882,7 @@
 {"word": "aloofness", "synonym": "distance", "via": "aloofness", "position": 3}
 {"word": "aloud", "synonym": "loudly", "via": "aloud", "position": 1}
 {"word": "aloud", "synonym": "loud", "via": "aloud", "position": 2}
+{"word": "alpestrine", "synonym": "alpine", "via": "alpestrine", "position": 1}
 {"word": "alphabet", "synonym": "rudiments", "via": "alphabet", "position": 1}
 {"word": "alphabetic", "synonym": "alphabetical", "via": "alphabetic", "position": 1}
 {"word": "alphabetical", "synonym": "alphabetic", "via": "alphabetical", "position": 1}
@@ -2861,6 +2936,7 @@
 {"word": "altering", "synonym": "fixing", "via": "alter", "position": 2}
 {"word": "altering", "synonym": "neutering", "via": "altering", "position": 1}
 {"word": "altering", "synonym": "fixing", "via": "altering", "position": 2}
+{"word": "altern", "synonym": "alternate", "via": "altern", "position": 1}
 {"word": "alternate", "synonym": "surrogate", "via": "alternate", "position": 1}
 {"word": "alternate", "synonym": "replacement", "via": "alternate", "position": 2}
 {"word": "alternate", "synonym": "interchange", "via": "alternate", "position": 3}
@@ -2879,6 +2955,7 @@
 {"word": "althaea", "synonym": "hollyhock", "via": "althaea", "position": 2}
 {"word": "althea", "synonym": "althaea", "via": "althea", "position": 1}
 {"word": "althea", "synonym": "hollyhock", "via": "althea", "position": 2}
+{"word": "altiloquent", "synonym": "grandiloquent", "via": "altiloquent", "position": 1}
 {"word": "altitude", "synonym": "height", "via": "altitude", "position": 1}
 {"word": "altitude", "synonym": "elevation", "via": "altitude", "position": 2}
 {"word": "altitude", "synonym": "alt", "via": "altitude", "position": 3}
@@ -2902,6 +2979,7 @@
 {"word": "alum", "synonym": "graduate", "via": "alum", "position": 3}
 {"word": "alum", "synonym": "grad", "via": "alum", "position": 4}
 {"word": "aluminium", "synonym": "aluminum", "via": "aluminium", "position": 1}
+{"word": "aluminography", "synonym": "algraphy", "via": "aluminography", "position": 1}
 {"word": "aluminum", "synonym": "aluminium", "via": "aluminum", "position": 1}
 {"word": "alumna", "synonym": "alum", "via": "alumna", "position": 1}
 {"word": "alumna", "synonym": "graduate", "via": "alumna", "position": 2}
@@ -2909,6 +2987,8 @@
 {"word": "alumnus", "synonym": "alum", "via": "alumnus", "position": 1}
 {"word": "alumnus", "synonym": "graduate", "via": "alumnus", "position": 2}
 {"word": "alumnus", "synonym": "grad", "via": "alumnus", "position": 3}
+{"word": "alveated", "synonym": "vaulted", "via": "alveated", "position": 1}
+{"word": "alveola", "synonym": "alveolus", "via": "alveola", "position": 1}
 {"word": "alveolate", "synonym": "cavitied", "via": "alveolate", "position": 1}
 {"word": "alveolate", "synonym": "honeycombed", "via": "alveolate", "position": 2}
 {"word": "alveolate", "synonym": "pitted", "via": "alveolate", "position": 3}
@@ -2920,6 +3000,7 @@
 {"word": "always", "synonym": "invariably", "via": "always", "position": 6}
 {"word": "alyssum", "synonym": "madwort", "via": "alyssum", "position": 1}
 {"word": "amadavat", "synonym": "avadavat", "via": "amadavat", "position": 1}
+{"word": "amadoda", "synonym": "men", "via": "amadoda", "position": 1}
 {"word": "amah", "synonym": "maid", "via": "amah", "position": 1}
 {"word": "amah", "synonym": "maidservant", "via": "amah", "position": 2}
 {"word": "amah", "synonym": "housemaid", "via": "amah", "position": 3}
@@ -2950,6 +3031,8 @@
 {"word": "amass", "synonym": "collect", "via": "amass", "position": 5}
 {"word": "amass", "synonym": "compile", "via": "amass", "position": 6}
 {"word": "amass", "synonym": "hoard", "via": "amass", "position": 7}
+{"word": "amate", "synonym": "dismay", "via": "amate", "position": 1}
+{"word": "amate", "synonym": "daunt", "via": "amate", "position": 2}
 {"word": "amateur", "synonym": "recreational", "via": "amateur", "position": 1}
 {"word": "amateur", "synonym": "unpaid", "via": "amateur", "position": 2}
 {"word": "amateur", "synonym": "amateurish", "via": "amateur", "position": 3}
@@ -3002,9 +3085,12 @@
 {"word": "amazon", "synonym": "virago", "via": "amazon", "position": 1}
 {"word": "ambage", "synonym": "circumlocution", "via": "ambage", "position": 1}
 {"word": "ambage", "synonym": "periphrasis", "via": "ambage", "position": 2}
+{"word": "ambagious", "synonym": "circuitous", "via": "ambagious", "position": 1}
+{"word": "ambagious", "synonym": "roundabout", "via": "ambagious", "position": 2}
 {"word": "amber", "synonym": "gold", "via": "amber", "position": 1}
 {"word": "ambiance", "synonym": "ambience", "via": "ambiance", "position": 1}
 {"word": "ambiance", "synonym": "atmosphere", "via": "ambiance", "position": 2}
+{"word": "ambidentate", "synonym": "amphidentate", "via": "ambidentate", "position": 1}
 {"word": "ambidexter", "synonym": "ambidextrous", "via": "ambidexter", "position": 1}
 {"word": "ambidextrous", "synonym": "deceitful", "via": "ambidextrous", "position": 1}
 {"word": "ambidextrous", "synonym": "duplicitous", "via": "ambidextrous", "position": 2}
@@ -3013,6 +3099,8 @@
 {"word": "ambiguity", "synonym": "equivocalness", "via": "ambiguity", "position": 1}
 {"word": "ambiguous", "synonym": "equivocal", "via": "ambiguous", "position": 1}
 {"word": "ambiguously", "synonym": "equivocally", "via": "ambiguously", "position": 1}
+{"word": "ambisextrous", "synonym": "bisexual", "via": "ambisextrous", "position": 1}
+{"word": "ambisextrous", "synonym": "unisex", "via": "ambisextrous", "position": 2}
 {"word": "ambit", "synonym": "scope", "via": "ambit", "position": 1}
 {"word": "ambit", "synonym": "range", "via": "ambit", "position": 2}
 {"word": "ambit", "synonym": "reach", "via": "ambit", "position": 3}
@@ -3040,6 +3128,7 @@
 {"word": "ambo", "synonym": "soapbox", "via": "ambo", "position": 6}
 {"word": "amboyna", "synonym": "padauk", "via": "amboyna", "position": 1}
 {"word": "amboyna", "synonym": "padouk", "via": "amboyna", "position": 2}
+{"word": "ambrette", "synonym": "abelmosk", "via": "ambrette", "position": 1}
 {"word": "ambrosia", "synonym": "nectar", "via": "ambrosia", "position": 1}
 {"word": "ambrosia", "synonym": "ragweed", "via": "ambrosia", "position": 2}
 {"word": "ambrosia", "synonym": "bitterweed", "via": "ambrosia", "position": 3}
@@ -3133,12 +3222,17 @@
 {"word": "amiably", "synonym": "genially", "via": "amiably", "position": 2}
 {"word": "amicability", "synonym": "amicableness", "via": "amicability", "position": 1}
 {"word": "amicableness", "synonym": "amicability", "via": "amicableness", "position": 1}
+{"word": "amical", "synonym": "friendly", "via": "amical", "position": 1}
 {"word": "amidship", "synonym": "amidships", "via": "amidship", "position": 1}
 {"word": "amidship", "synonym": "midships", "via": "amidship", "position": 2}
 {"word": "amidships", "synonym": "amidship", "via": "amidships", "position": 1}
 {"word": "amidships", "synonym": "midships", "via": "amidships", "position": 2}
 {"word": "aminic", "synonym": "amino", "via": "aminic", "position": 1}
 {"word": "amino", "synonym": "aminic", "via": "amino", "position": 1}
+{"word": "aminobenzene", "synonym": "aniline", "via": "aminobenzene", "position": 1}
+{"word": "aminocyclohexane", "synonym": "cyclohexylamine", "via": "aminocyclohexane", "position": 1}
+{"word": "aminophenazone", "synonym": "aminopyrine", "via": "aminophenazone", "position": 1}
+{"word": "aminotransferase", "synonym": "transaminase", "via": "aminotransferase", "position": 1}
 {"word": "amir", "synonym": "emir", "via": "emir", "position": 1}
 {"word": "amir", "synonym": "emeer", "via": "emir", "position": 2}
 {"word": "amir", "synonym": "ameer", "via": "emir", "position": 3}
@@ -3204,21 +3298,29 @@
 {"word": "amp", "synonym": "ampere", "via": "amp", "position": 1}
 {"word": "amp", "synonym": "ampere", "via": "ampere", "position": 1}
 {"word": "amp", "synonym": "ampere", "via": "amplifier", "position": 1}
+{"word": "amped", "synonym": "pumped", "via": "amped", "position": 1}
 {"word": "ampere", "synonym": "amp", "via": "ampere", "position": 1}
 {"word": "amphetamine", "synonym": "upper", "via": "amphetamine", "position": 1}
 {"word": "amphetamine", "synonym": "speed", "via": "amphetamine", "position": 2}
 {"word": "amphibian", "synonym": "amphibious", "via": "amphibian", "position": 1}
 {"word": "amphibious", "synonym": "amphibian", "via": "amphibious", "position": 1}
 {"word": "amphibology", "synonym": "amphiboly", "via": "amphibology", "position": 1}
+{"word": "amphibolous", "synonym": "ambiguous", "via": "amphibolous", "position": 1}
+{"word": "amphibolous", "synonym": "equivocal", "via": "amphibolous", "position": 2}
 {"word": "amphiboly", "synonym": "amphibology", "via": "amphiboly", "position": 1}
+{"word": "amphidentate", "synonym": "ambidentate", "via": "amphidentate", "position": 1}
 {"word": "amphioxus", "synonym": "lancelet", "via": "amphioxus", "position": 1}
+{"word": "amphiprotic", "synonym": "amphoteric", "via": "amphiprotic", "position": 1}
 {"word": "amphitheater", "synonym": "coliseum", "via": "amphitheater", "position": 1}
+{"word": "amphitheatrical", "synonym": "amphitheatric", "via": "amphitheatrical", "position": 1}
+{"word": "ampholytic", "synonym": "amphoteric", "via": "ampholytic", "position": 1}
 {"word": "ample", "synonym": "copious", "via": "ample", "position": 1}
 {"word": "ample", "synonym": "plenteous", "via": "ample", "position": 2}
 {"word": "ample", "synonym": "plentiful", "via": "ample", "position": 3}
 {"word": "ample", "synonym": "rich", "via": "ample", "position": 4}
 {"word": "ample", "synonym": "sizable", "via": "ample", "position": 5}
 {"word": "ample", "synonym": "sizeable", "via": "ample", "position": 6}
+{"word": "ampliation", "synonym": "enlargement", "via": "ampliation", "position": 1}
 {"word": "amplification", "synonym": "elaboration", "via": "amplification", "position": 1}
 {"word": "amplification", "synonym": "gain", "via": "amplification", "position": 2}
 {"word": "amplify", "synonym": "inflate", "via": "amplify", "position": 1}
@@ -3341,6 +3443,7 @@
 {"word": "analyzer", "synonym": "analyser", "via": "analyzer", "position": 1}
 {"word": "anamnesis", "synonym": "remembrance", "via": "anamnesis", "position": 1}
 {"word": "anamnesis", "synonym": "recollection", "via": "anamnesis", "position": 2}
+{"word": "ananas", "synonym": "pineapple", "via": "ananas", "position": 1}
 {"word": "anapaest", "synonym": "anapest", "via": "anapest", "position": 1}
 {"word": "anapest", "synonym": "anapaest", "via": "anapest", "position": 1}
 {"word": "anarchic", "synonym": "anarchical", "via": "anarchic", "position": 1}
@@ -3352,6 +3455,8 @@
 {"word": "anastomose", "synonym": "inosculate", "via": "anastomose", "position": 1}
 {"word": "anastomosis", "synonym": "inosculation", "via": "anastomosis", "position": 1}
 {"word": "anastrophe", "synonym": "inversion", "via": "anastrophe", "position": 1}
+{"word": "anathematic", "synonym": "loathsome", "via": "anathematic", "position": 1}
+{"word": "anathematic", "synonym": "odious", "via": "anathematic", "position": 2}
 {"word": "anathematize", "synonym": "execrate", "via": "anathematize", "position": 1}
 {"word": "anatomic", "synonym": "anatomical", "via": "anatomic", "position": 1}
 {"word": "anatomical", "synonym": "anatomic", "via": "anatomical", "position": 1}
@@ -3369,6 +3474,7 @@
 {"word": "anatomy", "synonym": "flesh", "via": "anatomy", "position": 10}
 {"word": "anatoxin", "synonym": "toxoid", "via": "anatoxin", "position": 1}
 {"word": "anatropous", "synonym": "inverted", "via": "anatropous", "position": 1}
+{"word": "anaxial", "synonym": "asymmetrical", "via": "anaxial", "position": 1}
 {"word": "ancestor", "synonym": "ascendant", "via": "ancestor", "position": 1}
 {"word": "ancestor", "synonym": "ascendent", "via": "ancestor", "position": 2}
 {"word": "ancestor", "synonym": "antecedent", "via": "ancestor", "position": 3}
@@ -3431,6 +3537,7 @@
 {"word": "anemone", "synonym": "windflower", "via": "anemone", "position": 1}
 {"word": "anesthesia", "synonym": "anaesthesia", "via": "anesthesia", "position": 1}
 {"word": "anesthetic", "synonym": "anaesthetic", "via": "anesthetic", "position": 1}
+{"word": "aneuria", "synonym": "neurasthenia", "via": "aneuria", "position": 1}
 {"word": "aneurin", "synonym": "thiamine", "via": "aneurin", "position": 1}
 {"word": "aneurin", "synonym": "thiamin", "via": "aneurin", "position": 2}
 {"word": "aneurism", "synonym": "aneurysm", "via": "aneurism", "position": 1}
@@ -3480,6 +3587,7 @@
 {"word": "angle", "synonym": "lean", "via": "angle", "position": 4}
 {"word": "angle", "synonym": "tilt", "via": "angle", "position": 5}
 {"word": "angle", "synonym": "tip", "via": "angle", "position": 6}
+{"word": "angledug", "synonym": "earthworm", "via": "angledug", "position": 1}
 {"word": "angler", "synonym": "goosefish", "via": "angler", "position": 1}
 {"word": "angler", "synonym": "anglerfish", "via": "angler", "position": 2}
 {"word": "angler", "synonym": "monkfish", "via": "angler", "position": 3}
@@ -3496,6 +3604,7 @@
 {"word": "angleworm", "synonym": "crawler", "via": "angleworm", "position": 5}
 {"word": "anglicise", "synonym": "anglicize", "via": "anglicise", "position": 1}
 {"word": "anglicize", "synonym": "anglicise", "via": "anglicize", "position": 1}
+{"word": "anglify", "synonym": "anglicize", "via": "anglify", "position": 1}
 {"word": "angriness", "synonym": "anger", "via": "angriness", "position": 1}
 {"word": "angry", "synonym": "furious", "via": "angry", "position": 1}
 {"word": "angry", "synonym": "raging", "via": "angry", "position": 2}
@@ -3562,6 +3671,7 @@
 {"word": "animus", "synonym": "animosity", "via": "animus", "position": 1}
 {"word": "anise", "synonym": "aniseed", "via": "anise", "position": 1}
 {"word": "aniseed", "synonym": "anise", "via": "aniseed", "position": 1}
+{"word": "anisogamete", "synonym": "heterogamete", "via": "anisogamete", "position": 1}
 {"word": "anklebone", "synonym": "astragal", "via": "anklebone", "position": 1}
 {"word": "anklebone", "synonym": "talus", "via": "anklebone", "position": 2}
 {"word": "anklets", "synonym": "anklet", "via": "anklet", "position": 1}
@@ -3702,6 +3812,7 @@
 {"word": "annulus", "synonym": "ring", "via": "annulus", "position": 2}
 {"word": "annulus", "synonym": "halo", "via": "annulus", "position": 3}
 {"word": "annulus", "synonym": "doughnut", "via": "annulus", "position": 4}
+{"word": "annum", "synonym": "year", "via": "annum", "position": 1}
 {"word": "annunciate", "synonym": "announce", "via": "annunciate", "position": 1}
 {"word": "annunciate", "synonym": "harbinger", "via": "annunciate", "position": 2}
 {"word": "annunciate", "synonym": "foretell", "via": "annunciate", "position": 3}
@@ -3788,6 +3899,7 @@
 {"word": "antechamber", "synonym": "foyer", "via": "antechamber", "position": 3}
 {"word": "antechamber", "synonym": "lobby", "via": "antechamber", "position": 4}
 {"word": "antechamber", "synonym": "vestibule", "via": "antechamber", "position": 5}
+{"word": "antecourt", "synonym": "forecourt", "via": "antecourt", "position": 1}
 {"word": "antedate", "synonym": "predate", "via": "antedate", "position": 1}
 {"word": "antedate", "synonym": "foredate", "via": "antedate", "position": 2}
 {"word": "antedate", "synonym": "precede", "via": "antedate", "position": 3}
@@ -3797,7 +3909,9 @@
 {"word": "antediluvian", "synonym": "ancient", "via": "antediluvian", "position": 1}
 {"word": "antediluvian", "synonym": "antiquated", "via": "antediluvian", "position": 2}
 {"word": "antediluvian", "synonym": "archaic", "via": "antediluvian", "position": 3}
+{"word": "antehall", "synonym": "anteroom", "via": "antehall", "position": 1}
 {"word": "antenatal", "synonym": "prenatal", "via": "antenatal", "position": 1}
+{"word": "antenave", "synonym": "narthex", "via": "antenave", "position": 1}
 {"word": "antenna", "synonym": "feeler", "via": "antenna", "position": 1}
 {"word": "antenna", "synonym": "aerial", "via": "antenna", "position": 2}
 {"word": "antenuptial", "synonym": "prenuptial", "via": "antenuptial", "position": 1}
@@ -3815,6 +3929,7 @@
 {"word": "anthelmintic", "synonym": "parasiticidal", "via": "anthelmintic", "position": 3}
 {"word": "anthem", "synonym": "hymn", "via": "anthem", "position": 1}
 {"word": "antheral", "synonym": "staminate", "via": "antheral", "position": 1}
+{"word": "antherozoid", "synonym": "spermatozoid", "via": "antherozoid", "position": 1}
 {"word": "anthesis", "synonym": "blossoming", "via": "anthesis", "position": 1}
 {"word": "anthesis", "synonym": "flowering", "via": "anthesis", "position": 2}
 {"word": "anthesis", "synonym": "florescence", "via": "anthesis", "position": 3}
@@ -3827,6 +3942,7 @@
 {"word": "anthropoid", "synonym": "manlike", "via": "anthropoid", "position": 2}
 {"word": "anthropoid", "synonym": "apelike", "via": "anthropoid", "position": 3}
 {"word": "anthropophagus", "synonym": "cannibal", "via": "anthropophagus", "position": 1}
+{"word": "anthroposcopy", "synonym": "physiognomy", "via": "anthroposcopy", "position": 1}
 {"word": "antiaircraft", "synonym": "flak", "via": "antiaircraft", "position": 1}
 {"word": "antiaircraft", "synonym": "flack", "via": "antiaircraft", "position": 2}
 {"word": "antibacterial", "synonym": "bactericide", "via": "antibacterial", "position": 1}
@@ -3867,21 +3983,28 @@
 {"word": "anticipation", "synonym": "prevision", "via": "anticipation", "position": 2}
 {"word": "anticipation", "synonym": "expectancy", "via": "anticipation", "position": 3}
 {"word": "anticipation", "synonym": "expectation", "via": "anticipation", "position": 4}
+{"word": "anticipative", "synonym": "expectant", "via": "anticipative", "position": 1}
 {"word": "anticipator", "synonym": "anticipant", "via": "anticipator", "position": 1}
 {"word": "anticipatory", "synonym": "prevenient", "via": "anticipatory", "position": 1}
 {"word": "anticlimax", "synonym": "bathos", "via": "anticlimax", "position": 1}
 {"word": "anticonvulsant", "synonym": "antiepileptic", "via": "anticonvulsant", "position": 1}
+{"word": "anticum", "synonym": "pronaos", "via": "anticum", "position": 1}
 {"word": "antielectron", "synonym": "positron", "via": "antielectron", "position": 1}
 {"word": "antiepileptic", "synonym": "anticonvulsant", "via": "antiepileptic", "position": 1}
 {"word": "antifeminism", "synonym": "chauvinism", "via": "antifeminism", "position": 1}
 {"word": "antifertility", "synonym": "contraceptive", "via": "antifertility", "position": 1}
+{"word": "antifogger", "synonym": "antifoggant", "via": "antifogger", "position": 1}
 {"word": "antifungal", "synonym": "fungicide", "via": "antifungal", "position": 1}
 {"word": "antifungal", "synonym": "fungicidal", "via": "antifungal", "position": 2}
+{"word": "antigodlin", "synonym": "askew", "via": "antigodlin", "position": 1}
+{"word": "antigodlin", "synonym": "lopsided", "via": "antigodlin", "position": 2}
+{"word": "antigrammatical", "synonym": "ungrammatical", "via": "antigrammatical", "position": 1}
 {"word": "antilog", "synonym": "antilogarithm", "via": "antilog", "position": 1}
 {"word": "antilogarithm", "synonym": "antilog", "via": "antilogarithm", "position": 1}
 {"word": "antimicrobial", "synonym": "disinfectant", "via": "antimicrobial", "position": 1}
 {"word": "antimicrobial", "synonym": "germicide", "via": "antimicrobial", "position": 2}
 {"word": "antimonopoly", "synonym": "antitrust", "via": "antimonopoly", "position": 1}
+{"word": "antimycotic", "synonym": "antifungal", "via": "antimycotic", "position": 1}
 {"word": "antineoplastic", "synonym": "anticancer", "via": "antineoplastic", "position": 1}
 {"word": "antineoplastic", "synonym": "antitumor", "via": "antineoplastic", "position": 2}
 {"word": "antipathetic", "synonym": "antagonistic", "via": "antipathetic", "position": 1}
@@ -3910,6 +4033,8 @@
 {"word": "antiquated", "synonym": "archaic", "via": "antiquated", "position": 2}
 {"word": "antique", "synonym": "antiquate", "via": "antique", "position": 1}
 {"word": "antiquity", "synonym": "ancientness", "via": "antiquity", "position": 1}
+{"word": "antireflexive", "synonym": "irreflexive", "via": "antireflexive", "position": 1}
+{"word": "antisepticize", "synonym": "disinfect", "via": "antisepticize", "position": 1}
 {"word": "antisocial", "synonym": "asocial", "via": "antisocial", "position": 1}
 {"word": "antispasmodic", "synonym": "spasmolytic", "via": "antispasmodic", "position": 1}
 {"word": "antithetic", "synonym": "antithetical", "via": "antithetic", "position": 1}
@@ -3917,11 +4042,13 @@
 {"word": "antitrust", "synonym": "antimonopoly", "via": "antitrust", "position": 1}
 {"word": "antitumor", "synonym": "anticancer", "via": "antitumor", "position": 1}
 {"word": "antitumor", "synonym": "antineoplastic", "via": "antitumor", "position": 2}
+{"word": "antiutopia", "synonym": "dystopia", "via": "antiutopia", "position": 1}
 {"word": "antlion", "synonym": "doodlebug", "via": "antlion", "position": 1}
 {"word": "antonym", "synonym": "opposite", "via": "antonym", "position": 1}
 {"word": "antsy", "synonym": "fidgety", "via": "antsy", "position": 1}
 {"word": "antsy", "synonym": "fretful", "via": "antsy", "position": 2}
 {"word": "antsy", "synonym": "itchy", "via": "antsy", "position": 3}
+{"word": "antwackie", "synonym": "outdated", "via": "antwackie", "position": 1}
 {"word": "anuran", "synonym": "frog", "via": "anuran", "position": 1}
 {"word": "anuran", "synonym": "toad", "via": "anuran", "position": 2}
 {"word": "anuran", "synonym": "batrachian", "via": "anuran", "position": 3}
@@ -3945,6 +4072,8 @@
 {"word": "anyhow", "synonym": "anyway", "via": "anyhow", "position": 1}
 {"word": "anyhow", "synonym": "anyways", "via": "anyhow", "position": 2}
 {"word": "anyplace", "synonym": "anywhere", "via": "anyplace", "position": 1}
+{"word": "anyroad", "synonym": "anyway", "via": "anyroad", "position": 1}
+{"word": "anyroad", "synonym": "anyhow", "via": "anyroad", "position": 2}
 {"word": "anyway", "synonym": "anyhow", "via": "anyway", "position": 1}
 {"word": "anyway", "synonym": "anyways", "via": "anyway", "position": 2}
 {"word": "anyways", "synonym": "anyhow", "via": "anyways", "position": 1}
@@ -4002,6 +4131,7 @@
 {"word": "aphrodisiac", "synonym": "sexy", "via": "aphrodisiac", "position": 2}
 {"word": "aphrodisiacal", "synonym": "aphrodisiac", "via": "aphrodisiacal", "position": 1}
 {"word": "aphrodisiacal", "synonym": "sexy", "via": "aphrodisiacal", "position": 2}
+{"word": "aphyllous", "synonym": "leafless", "via": "aphyllous", "position": 1}
 {"word": "apiarist", "synonym": "beekeeper", "via": "apiarist", "position": 1}
 {"word": "apiarist", "synonym": "apiculturist", "via": "apiarist", "position": 2}
 {"word": "apiculture", "synonym": "beekeeping", "via": "apiculture", "position": 1}
@@ -4046,6 +4176,7 @@
 {"word": "apology", "synonym": "apologia", "via": "apology", "position": 2}
 {"word": "apomictic", "synonym": "agamic", "via": "apomictic", "position": 1}
 {"word": "apomictic", "synonym": "agamous", "via": "apomictic", "position": 2}
+{"word": "apopemptic", "synonym": "valedictory", "via": "apopemptic", "position": 1}
 {"word": "apophthegm", "synonym": "aphorism", "via": "apothegm", "position": 1}
 {"word": "apophthegm", "synonym": "apothegm", "via": "apothegm", "position": 2}
 {"word": "apoplexy", "synonym": "stroke", "via": "apoplexy", "position": 1}
@@ -4148,6 +4279,7 @@
 {"word": "apparitional", "synonym": "ghostly", "via": "apparitional", "position": 2}
 {"word": "apparitional", "synonym": "phantasmal", "via": "apparitional", "position": 3}
 {"word": "apparitional", "synonym": "spectral", "via": "apparitional", "position": 4}
+{"word": "appassionato", "synonym": "impassioned", "via": "appassionato", "position": 1}
 {"word": "appeal", "synonym": "charm", "via": "appeal", "position": 1}
 {"word": "appeal", "synonym": "solicitation", "via": "appeal", "position": 2}
 {"word": "appeal", "synonym": "collection", "via": "appeal", "position": 3}
@@ -4225,6 +4357,9 @@
 {"word": "applaudable", "synonym": "praiseworthy", "via": "applaudable", "position": 3}
 {"word": "applauder", "synonym": "clapper", "via": "applauder", "position": 1}
 {"word": "applause", "synonym": "clapping", "via": "applause", "position": 1}
+{"word": "appledrain", "synonym": "wasp", "via": "appledrain", "position": 1}
+{"word": "appleknocker", "synonym": "hayseed", "via": "appleknocker", "position": 1}
+{"word": "appleknocker", "synonym": "yokel", "via": "appleknocker", "position": 2}
 {"word": "applesauce", "synonym": "folderol", "via": "applesauce", "position": 1}
 {"word": "applesauce", "synonym": "rubbish", "via": "applesauce", "position": 2}
 {"word": "applesauce", "synonym": "tripe", "via": "applesauce", "position": 3}
@@ -4439,6 +4574,8 @@
 {"word": "approving", "synonym": "affirmative", "via": "approving", "position": 1}
 {"word": "approving", "synonym": "approbatory", "via": "approving", "position": 2}
 {"word": "approving", "synonym": "plausive", "via": "approving", "position": 3}
+{"word": "approximal", "synonym": "adjacent", "via": "approximal", "position": 1}
+{"word": "approximal", "synonym": "contiguous", "via": "approximal", "position": 2}
 {"word": "approximate", "synonym": "estimate", "via": "approximate", "position": 1}
 {"word": "approximate", "synonym": "gauge", "via": "approximate", "position": 2}
 {"word": "approximate", "synonym": "guess", "via": "approximate", "position": 3}
@@ -4455,6 +4592,7 @@
 {"word": "approximation", "synonym": "idea", "via": "approximation", "position": 3}
 {"word": "approximative", "synonym": "approximate", "via": "approximative", "position": 1}
 {"word": "approximative", "synonym": "rough", "via": "approximative", "position": 2}
+{"word": "approximatively", "synonym": "roughly", "via": "approximatively", "position": 1}
 {"word": "appurtenance", "synonym": "accessory", "via": "appurtenance", "position": 1}
 {"word": "appurtenance", "synonym": "supplement", "via": "appurtenance", "position": 2}
 {"word": "appurtenance", "synonym": "gear", "via": "appurtenance", "position": 3}
@@ -4466,6 +4604,7 @@
 {"word": "appurtenant", "synonym": "auxiliary", "via": "appurtenant", "position": 5}
 {"word": "apractic", "synonym": "apraxic", "via": "apractic", "position": 1}
 {"word": "apraxic", "synonym": "apractic", "via": "apraxic", "position": 1}
+{"word": "apricate", "synonym": "bask", "via": "apricate", "position": 1}
 {"word": "apricot", "synonym": "peach", "via": "apricot", "position": 1}
 {"word": "apron", "synonym": "proscenium", "via": "apron", "position": 1}
 {"word": "apron", "synonym": "forestage", "via": "apron", "position": 2}
@@ -4509,6 +4648,7 @@
 {"word": "aquiculture", "synonym": "hydroponics", "via": "aquaculture", "position": 1}
 {"word": "aquilegia", "synonym": "columbine", "via": "aquilegia", "position": 1}
 {"word": "aquiline", "synonym": "hooked", "via": "aquiline", "position": 1}
+{"word": "arabber", "synonym": "peddler", "via": "arabber", "position": 1}
 {"word": "arable", "synonym": "cultivable", "via": "arable", "position": 1}
 {"word": "arable", "synonym": "cultivatable", "via": "arable", "position": 2}
 {"word": "arable", "synonym": "tillable", "via": "arable", "position": 3}
@@ -4611,6 +4751,7 @@
 {"word": "arch", "synonym": "puckish", "via": "arch", "position": 8}
 {"word": "arch", "synonym": "wicked", "via": "arch", "position": 9}
 {"word": "arch", "synonym": "condescending", "via": "arch", "position": 10}
+{"word": "archaebacterium", "synonym": "archaeon", "via": "archaebacterium", "position": 1}
 {"word": "archaeological", "synonym": "archeological", "via": "archaeological", "position": 1}
 {"word": "archaeologist", "synonym": "archeologist", "via": "archaeologist", "position": 1}
 {"word": "archaeology", "synonym": "archeology", "via": "archaeology", "position": 1}
@@ -4650,6 +4791,8 @@
 {"word": "archetypical", "synonym": "prototypical", "via": "archetypical", "position": 4}
 {"word": "archil", "synonym": "orchil", "via": "orchil", "position": 1}
 {"word": "archil", "synonym": "cudbear", "via": "orchil", "position": 2}
+{"word": "archimage", "synonym": "wizard", "via": "archimage", "position": 1}
+{"word": "archimage", "synonym": "sorcerer", "via": "archimage", "position": 2}
 {"word": "archimandrite", "synonym": "abbot", "via": "archimandrite", "position": 1}
 {"word": "arching", "synonym": "arced", "via": "arch", "position": 1}
 {"word": "arching", "synonym": "arched", "via": "arch", "position": 2}
@@ -4824,6 +4967,7 @@
 {"word": "aristocratic", "synonym": "blue", "via": "aristocratic", "position": 1}
 {"word": "aristocratic", "synonym": "gentle", "via": "aristocratic", "position": 2}
 {"word": "aristocratic", "synonym": "patrician", "via": "aristocratic", "position": 3}
+{"word": "arithmancy", "synonym": "numerology", "via": "arithmancy", "position": 1}
 {"word": "arithmetic", "synonym": "arithmetical", "via": "arithmetic", "position": 1}
 {"word": "arithmetical", "synonym": "arithmetic", "via": "arithmetical", "position": 1}
 {"word": "arm", "synonym": "branch", "via": "arm", "position": 1}
@@ -4835,12 +4979,14 @@
 {"word": "arm", "synonym": "gird", "via": "arm", "position": 7}
 {"word": "armament", "synonym": "arming", "via": "armament", "position": 1}
 {"word": "armament", "synonym": "equipping", "via": "armament", "position": 2}
+{"word": "armarium", "synonym": "ambry", "via": "armarium", "position": 1}
 {"word": "arming", "synonym": "armament", "via": "arm", "position": 1}
 {"word": "arming", "synonym": "equipping", "via": "arm", "position": 2}
 {"word": "arming", "synonym": "armament", "via": "arming", "position": 1}
 {"word": "arming", "synonym": "equipping", "via": "arming", "position": 2}
 {"word": "armistice", "synonym": "truce", "via": "armistice", "position": 1}
 {"word": "armor", "synonym": "armour", "via": "armor", "position": 1}
+{"word": "armorbearer", "synonym": "squire", "via": "armorbearer", "position": 1}
 {"word": "armored", "synonym": "armoured", "via": "armor", "position": 1}
 {"word": "armored", "synonym": "panoplied", "via": "armor", "position": 2}
 {"word": "armored", "synonym": "armoured", "via": "armored", "position": 1}
@@ -4867,6 +5013,7 @@
 {"word": "arms", "synonym": "blazonry", "via": "arms", "position": 2}
 {"word": "arms", "synonym": "weaponry", "via": "arms", "position": 3}
 {"word": "arms", "synonym": "munition", "via": "arms", "position": 4}
+{"word": "armscye", "synonym": "armhole", "via": "armscye", "position": 1}
 {"word": "aroid", "synonym": "arum", "via": "aroid", "position": 1}
 {"word": "aroid", "synonym": "araceous", "via": "aroid", "position": 2}
 {"word": "aroma", "synonym": "smell", "via": "aroma", "position": 1}
@@ -4877,6 +5024,7 @@
 {"word": "aroma", "synonym": "perfume", "via": "aroma", "position": 6}
 {"word": "aromatic", "synonym": "redolent", "via": "aromatic", "position": 1}
 {"word": "aromatize", "synonym": "perfume", "via": "aromatize", "position": 1}
+{"word": "aronia", "synonym": "chokeberry", "via": "aronia", "position": 1}
 {"word": "around", "synonym": "approximately", "via": "around", "position": 1}
 {"word": "around", "synonym": "about", "via": "around", "position": 2}
 {"word": "around", "synonym": "some", "via": "around", "position": 3}
@@ -4973,6 +5121,7 @@
 {"word": "array", "synonym": "align", "via": "array", "position": 1}
 {"word": "array", "synonym": "range", "via": "array", "position": 2}
 {"word": "arrayed", "synonym": "panoplied", "via": "array", "position": 1}
+{"word": "arrect", "synonym": "alert", "via": "arrect", "position": 1}
 {"word": "arrest", "synonym": "apprehension", "via": "arrest", "position": 1}
 {"word": "arrest", "synonym": "catch", "via": "arrest", "position": 2}
 {"word": "arrest", "synonym": "collar", "via": "arrest", "position": 3}
@@ -4987,6 +5136,7 @@
 {"word": "arresting", "synonym": "stunning", "via": "arrest", "position": 2}
 {"word": "arresting", "synonym": "sensational", "via": "arresting", "position": 1}
 {"word": "arresting", "synonym": "stunning", "via": "arresting", "position": 2}
+{"word": "arrestive", "synonym": "engrossing", "via": "arrestive", "position": 1}
 {"word": "arrhythmic", "synonym": "jerking", "via": "arrhythmic", "position": 1}
 {"word": "arrhythmic", "synonym": "jerky", "via": "arrhythmic", "position": 2}
 {"word": "arrival", "synonym": "reaching", "via": "arrival", "position": 1}
@@ -5109,6 +5259,7 @@
 {"word": "artlessness", "synonym": "innocence", "via": "artlessness", "position": 1}
 {"word": "artlessness", "synonym": "ingenuousness", "via": "artlessness", "position": 2}
 {"word": "artlessness", "synonym": "naturalness", "via": "artlessness", "position": 3}
+{"word": "artotype", "synonym": "collotype", "via": "artotype", "position": 1}
 {"word": "arts", "synonym": "humanities", "via": "art", "position": 1}
 {"word": "arts", "synonym": "humanities", "via": "arts", "position": 1}
 {"word": "artwork", "synonym": "art", "via": "artwork", "position": 1}
@@ -5117,6 +5268,7 @@
 {"word": "arum", "synonym": "aroid", "via": "arum", "position": 1}
 {"word": "asafetida", "synonym": "asafoetida", "via": "asafoetida", "position": 1}
 {"word": "asafoetida", "synonym": "asafetida", "via": "asafoetida", "position": 1}
+{"word": "ascared", "synonym": "afraid", "via": "ascared", "position": 1}
 {"word": "ascend", "synonym": "rise", "via": "ascend", "position": 1}
 {"word": "ascend", "synonym": "uprise", "via": "ascend", "position": 2}
 {"word": "ascendable", "synonym": "ascendible", "via": "ascendable", "position": 1}
@@ -5162,6 +5314,7 @@
 {"word": "ascension", "synonym": "ascent", "via": "ascension", "position": 2}
 {"word": "ascension", "synonym": "ascending", "via": "ascension", "position": 3}
 {"word": "ascension", "synonym": "rising", "via": "ascension", "position": 4}
+{"word": "ascensionist", "synonym": "climber", "via": "ascensionist", "position": 1}
 {"word": "ascensive", "synonym": "ascendant", "via": "ascensive", "position": 1}
 {"word": "ascensive", "synonym": "ascendent", "via": "ascensive", "position": 2}
 {"word": "ascent", "synonym": "rise", "via": "ascent", "position": 1}
@@ -5271,6 +5424,7 @@
 {"word": "aslope", "synonym": "sloped", "via": "aslope", "position": 5}
 {"word": "aslope", "synonym": "sloping", "via": "aslope", "position": 6}
 {"word": "asocial", "synonym": "antisocial", "via": "asocial", "position": 1}
+{"word": "asomatous", "synonym": "incorporeal", "via": "asomatous", "position": 1}
 {"word": "aspect", "synonym": "expression", "via": "aspect", "position": 1}
 {"word": "aspect", "synonym": "look", "via": "aspect", "position": 2}
 {"word": "aspect", "synonym": "face", "via": "aspect", "position": 3}
@@ -5393,6 +5547,8 @@
 {"word": "assent", "synonym": "acquiescence", "via": "assent", "position": 1}
 {"word": "assent", "synonym": "accede", "via": "assent", "position": 2}
 {"word": "assent", "synonym": "acquiesce", "via": "assent", "position": 3}
+{"word": "assentient", "synonym": "consenting", "via": "assentient", "position": 1}
+{"word": "assentient", "synonym": "acquiescent", "via": "assentient", "position": 2}
 {"word": "assenting", "synonym": "accession", "via": "assent", "position": 1}
 {"word": "assert", "synonym": "insist", "via": "assert", "position": 1}
 {"word": "assert", "synonym": "affirm", "via": "assert", "position": 2}
@@ -5426,6 +5582,8 @@
 {"word": "asseverate", "synonym": "maintain", "via": "asseverate", "position": 2}
 {"word": "asseveration", "synonym": "assertion", "via": "asseveration", "position": 1}
 {"word": "asseveration", "synonym": "averment", "via": "asseveration", "position": 2}
+{"word": "assez", "synonym": "fairly", "via": "assez", "position": 1}
+{"word": "assez", "synonym": "rather", "via": "assez", "position": 2}
 {"word": "asshole", "synonym": "arse", "via": "asshole", "position": 1}
 {"word": "asshole", "synonym": "bunghole", "via": "asshole", "position": 2}
 {"word": "asshole", "synonym": "bastard", "via": "asshole", "position": 3}
@@ -5609,6 +5767,7 @@
 {"word": "asthenic", "synonym": "adynamic", "via": "asthenic", "position": 1}
 {"word": "asthenic", "synonym": "debilitated", "via": "asthenic", "position": 2}
 {"word": "asthenic", "synonym": "enervated", "via": "asthenic", "position": 3}
+{"word": "asthenopia", "synonym": "eyestrain", "via": "asthenopia", "position": 1}
 {"word": "astheny", "synonym": "asthenia", "via": "asthenia", "position": 1}
 {"word": "asthmatic", "synonym": "wheezing", "via": "asthmatic", "position": 1}
 {"word": "asthmatic", "synonym": "wheezy", "via": "asthmatic", "position": 2}
@@ -5678,6 +5837,7 @@
 {"word": "astringent", "synonym": "acerb", "via": "astringent", "position": 2}
 {"word": "astringent", "synonym": "acerbic", "via": "astringent", "position": 3}
 {"word": "astrobiology", "synonym": "exobiology", "via": "astrobiology", "position": 1}
+{"word": "astrologist", "synonym": "astrologer", "via": "astrologist", "position": 1}
 {"word": "astronaut", "synonym": "spaceman", "via": "astronaut", "position": 1}
 {"word": "astronaut", "synonym": "cosmonaut", "via": "astronaut", "position": 2}
 {"word": "astronautic", "synonym": "astronautical", "via": "astronautic", "position": 1}
@@ -5730,6 +5890,7 @@
 {"word": "ataxia", "synonym": "ataxy", "via": "ataxia", "position": 1}
 {"word": "ataxic", "synonym": "atactic", "via": "ataxic", "position": 1}
 {"word": "ataxy", "synonym": "ataxia", "via": "ataxy", "position": 1}
+{"word": "athanasia", "synonym": "immortality", "via": "athanasia", "position": 1}
 {"word": "atheistic", "synonym": "atheistical", "via": "atheistic", "position": 1}
 {"word": "atheistic", "synonym": "unbelieving", "via": "atheistic", "position": 2}
 {"word": "atheistic", "synonym": "atheist", "via": "atheistic", "position": 3}
@@ -5747,6 +5908,7 @@
 {"word": "athletics", "synonym": "sport", "via": "athletic", "position": 1}
 {"word": "athletics", "synonym": "sport", "via": "athletics", "position": 1}
 {"word": "athodyd", "synonym": "ramjet", "via": "athodyd", "position": 1}
+{"word": "athrill", "synonym": "excited", "via": "athrill", "position": 1}
 {"word": "athwart", "synonym": "obliquely", "via": "athwart", "position": 1}
 {"word": "athwart", "synonym": "aslant", "via": "athwart", "position": 2}
 {"word": "atilt", "synonym": "canted", "via": "atilt", "position": 1}
@@ -5789,6 +5951,7 @@
 {"word": "atonement", "synonym": "satisfaction", "via": "atonement", "position": 3}
 {"word": "atonic", "synonym": "unaccented", "via": "atonic", "position": 1}
 {"word": "atony", "synonym": "amyotonia", "via": "atony", "position": 1}
+{"word": "atoxic", "synonym": "nontoxic", "via": "atoxic", "position": 1}
 {"word": "atrabilious", "synonym": "bilious", "via": "atrabilious", "position": 1}
 {"word": "atrabilious", "synonym": "dyspeptic", "via": "atrabilious", "position": 2}
 {"word": "atrabilious", "synonym": "liverish", "via": "atrabilious", "position": 3}
@@ -5987,6 +6150,7 @@
 {"word": "attrition", "synonym": "abrasion", "via": "attrition", "position": 4}
 {"word": "attrition", "synonym": "detrition", "via": "attrition", "position": 5}
 {"word": "attrition", "synonym": "corrasion", "via": "attrition", "position": 6}
+{"word": "atweel", "synonym": "indeed", "via": "atweel", "position": 1}
 {"word": "atypic", "synonym": "atypical", "via": "atypic", "position": 1}
 {"word": "atypic", "synonym": "untypical", "via": "atypic", "position": 2}
 {"word": "atypical", "synonym": "irregular", "via": "atypical", "position": 1}
@@ -6122,6 +6286,8 @@
 {"word": "auricle", "synonym": "pinna", "via": "auricle", "position": 1}
 {"word": "auricle", "synonym": "ear", "via": "auricle", "position": 2}
 {"word": "auricular", "synonym": "otic", "via": "auricular", "position": 1}
+{"word": "auriculoventricular", "synonym": "atrioventricular", "via": "auriculoventricular", "position": 1}
+{"word": "auriscope", "synonym": "otoscope", "via": "auriscope", "position": 1}
 {"word": "aurochs", "synonym": "urus", "via": "aurochs", "position": 1}
 {"word": "aurora", "synonym": "dawn", "via": "aurora", "position": 1}
 {"word": "aurora", "synonym": "dawning", "via": "aurora", "position": 2}
@@ -6150,6 +6316,8 @@
 {"word": "austereness", "synonym": "severeness", "via": "austereness", "position": 2}
 {"word": "austerity", "synonym": "asceticism", "via": "austerity", "position": 1}
 {"word": "autacoid", "synonym": "autocoid", "via": "autacoid", "position": 1}
+{"word": "autarch", "synonym": "autocrat", "via": "autarch", "position": 1}
+{"word": "autarch", "synonym": "despot", "via": "autarch", "position": 2}
 {"word": "autarchic", "synonym": "autarchical", "via": "autarchic", "position": 1}
 {"word": "autarchic", "synonym": "autarkical", "via": "autarchic", "position": 2}
 {"word": "autarchical", "synonym": "autarchic", "via": "autarchical", "position": 1}
@@ -6267,6 +6435,7 @@
 {"word": "autocratically", "synonym": "magisterially", "via": "autocratically", "position": 2}
 {"word": "autoeroticism", "synonym": "autoerotism", "via": "autoeroticism", "position": 1}
 {"word": "autoerotism", "synonym": "autoeroticism", "via": "autoerotism", "position": 1}
+{"word": "autogenesis", "synonym": "abiogenesis", "via": "autogenesis", "position": 1}
 {"word": "autogenic", "synonym": "autogenous", "via": "autogenic", "position": 1}
 {"word": "autogenous", "synonym": "autogenic", "via": "autogenous", "position": 1}
 {"word": "autogeny", "synonym": "abiogenesis", "via": "autogeny", "position": 1}
@@ -6275,6 +6444,7 @@
 {"word": "autograph", "synonym": "inscribe", "via": "autograph", "position": 1}
 {"word": "autogyro", "synonym": "autogiro", "via": "autogyro", "position": 1}
 {"word": "autogyro", "synonym": "gyroplane", "via": "autogyro", "position": 2}
+{"word": "autoist", "synonym": "motorist", "via": "autoist", "position": 1}
 {"word": "autoloading", "synonym": "semiautomatic", "via": "autoloading", "position": 1}
 {"word": "automaker", "synonym": "carmaker", "via": "automaker", "position": 1}
 {"word": "automate", "synonym": "automatize", "via": "automate", "position": 1}
@@ -6284,6 +6454,7 @@
 {"word": "automatic", "synonym": "reflexive", "via": "automatic", "position": 4}
 {"word": "automatically", "synonym": "mechanically", "via": "automatically", "position": 1}
 {"word": "automation", "synonym": "mechanization", "via": "automation", "position": 1}
+{"word": "automative", "synonym": "automated", "via": "automative", "position": 1}
 {"word": "automatize", "synonym": "automate", "via": "automatize", "position": 1}
 {"word": "automaton", "synonym": "robot", "via": "automaton", "position": 1}
 {"word": "automaton", "synonym": "golem", "via": "automaton", "position": 2}
@@ -6299,6 +6470,8 @@
 {"word": "autonomy", "synonym": "liberty", "via": "autonomy", "position": 1}
 {"word": "autopsy", "synonym": "necropsy", "via": "autopsy", "position": 1}
 {"word": "autopsy", "synonym": "postmortem", "via": "autopsy", "position": 2}
+{"word": "autoschediasm", "synonym": "improvisation", "via": "autoschediasm", "position": 1}
+{"word": "autotoxemia", "synonym": "autointoxication", "via": "autotoxemia", "position": 1}
 {"word": "autotype", "synonym": "facsimile", "via": "autotype", "position": 1}
 {"word": "autotype", "synonym": "autotypy", "via": "autotype", "position": 2}
 {"word": "autotypy", "synonym": "autotype", "via": "autotypy", "position": 1}

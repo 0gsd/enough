@@ -151,7 +151,9 @@ _PERIODS = {
 }
 _WITHIN = {None: 0.0, "early": 15.0, "mid": 50.0, "late": 85.0}
 _CENTURY_RE = re.compile(r"(?:(early|mid|late)[\s-]+)?(\d{1,2})(?:st|nd|rd|th)\s+century")
-_DECADE_RE = re.compile(r"(\d{3,4})s")
+_DECADE_RE = re.compile(r"(?:(early|mid|late)[\s-]+)?(\d{3,4})s")
+# Where in its decade a qualified decade ("late 1950s") sits; a bare one sits at its middle.
+_IN_DECADE = {None: 5.0, "early": 2.0, "mid": 5.0, "late": 8.0}
 _YEAR_RE = re.compile(r"(\d{3,4})")
 
 
@@ -173,12 +175,17 @@ def _era_parts(first_use: str | None) -> tuple[float, str, str] | None:
     if m:
         n = int(m.group(2))
         return (n - 1) * 100 + _WITHIN[m.group(1)] + by, f"c{n:02d}", _century(n)
-    m = _DECADE_RE.fullmatch(t) or _YEAR_RE.fullmatch(t)
+    m = _DECADE_RE.fullmatch(t)
+    if m:
+        year = int(m.group(2))
+        n = year // 100 + 1
+        # A decade sits at its middle (or its early/mid/late), among the century's early/mid/late.
+        return year + _IN_DECADE[m.group(1)] + by, f"c{n:02d}", _century(n)
+    m = _YEAR_RE.fullmatch(t)
     if m:
         year = int(m.group(1))
         n = year // 100 + 1
-        # A decade sits at its middle, among the century's early/mid/late.
-        return year + (5.0 if t.endswith("s") else 0.0), f"c{n:02d}", _century(n)
+        return year + by, f"c{n:02d}", _century(n)
     return None
 
 

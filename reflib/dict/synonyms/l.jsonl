@@ -15,6 +15,7 @@
 {"word": "labelled", "synonym": "tagged", "via": "labelled", "position": 2}
 {"word": "labialize", "synonym": "round", "via": "labialize", "position": 1}
 {"word": "labiate", "synonym": "liplike", "via": "labiate", "position": 1}
+{"word": "labilize", "synonym": "destabilize", "via": "labilize", "position": 1}
 {"word": "labor", "synonym": "labour", "via": "labour", "position": 1}
 {"word": "labor", "synonym": "toil", "via": "labour", "position": 2}
 {"word": "labor", "synonym": "undertaking", "via": "labour", "position": 3}
@@ -143,6 +144,7 @@
 {"word": "laconic", "synonym": "crisp", "via": "laconic", "position": 1}
 {"word": "laconic", "synonym": "curt", "via": "laconic", "position": 2}
 {"word": "laconic", "synonym": "terse", "via": "laconic", "position": 3}
+{"word": "laconical", "synonym": "terse", "via": "laconical", "position": 1}
 {"word": "laconically", "synonym": "dryly", "via": "laconically", "position": 1}
 {"word": "laconically", "synonym": "drily", "via": "laconically", "position": 2}
 {"word": "lacrimal", "synonym": "lachrymal", "via": "lachrymal", "position": 1}
@@ -156,6 +158,8 @@
 {"word": "lactate", "synonym": "nurse", "via": "lactate", "position": 3}
 {"word": "lactating", "synonym": "wet", "via": "lactate", "position": 1}
 {"word": "lactation", "synonym": "suckling", "via": "lactation", "position": 1}
+{"word": "lactescent", "synonym": "milky", "via": "lactescent", "position": 1}
+{"word": "lactoflavin", "synonym": "riboflavin", "via": "lactoflavin", "position": 1}
 {"word": "lacuna", "synonym": "blank", "via": "lacuna", "position": 1}
 {"word": "lacunar", "synonym": "coffer", "via": "lacunar", "position": 1}
 {"word": "lacunar", "synonym": "caisson", "via": "lacunar", "position": 2}
@@ -180,6 +184,7 @@
 {"word": "laddie", "synonym": "cub", "via": "laddie", "position": 1}
 {"word": "laddie", "synonym": "lad", "via": "laddie", "position": 2}
 {"word": "laddie", "synonym": "sonny", "via": "laddie", "position": 3}
+{"word": "laddo", "synonym": "lad", "via": "laddo", "position": 1}
 {"word": "lade", "synonym": "load", "via": "lade", "position": 1}
 {"word": "laden", "synonym": "load", "via": "lade", "position": 1}
 {"word": "laden", "synonym": "lade", "via": "lade", "position": 2}
@@ -218,10 +223,12 @@
 {"word": "lady", "synonym": "gentlewoman", "via": "lady", "position": 3}
 {"word": "lady", "synonym": "noblewoman", "via": "lady", "position": 4}
 {"word": "lady", "synonym": "peeress", "via": "lady", "position": 5}
+{"word": "ladybeetle", "synonym": "ladybug", "via": "ladybeetle", "position": 1}
 {"word": "ladybird", "synonym": "ladybug", "via": "ladybird", "position": 1}
 {"word": "ladybug", "synonym": "ladybird", "via": "ladybug", "position": 1}
 {"word": "ladyfish", "synonym": "tenpounder", "via": "ladyfish", "position": 1}
 {"word": "ladylove", "synonym": "dulcinea", "via": "ladylove", "position": 1}
+{"word": "laeotropic", "synonym": "sinistral", "via": "laeotropic", "position": 1}
 {"word": "lag", "synonym": "slowdown", "via": "lag", "position": 1}
 {"word": "lag", "synonym": "retardation", "via": "lag", "position": 2}
 {"word": "lag", "synonym": "stave", "via": "lag", "position": 3}
@@ -264,10 +271,14 @@
 {"word": "laid", "synonym": "set", "via": "laid", "position": 1}
 {"word": "laid", "synonym": "set", "via": "lay", "position": 1}
 {"word": "laid", "synonym": "set", "via": "lie", "position": 1}
+{"word": "laipse", "synonym": "thrash", "via": "laipse", "position": 1}
 {"word": "lair", "synonym": "den", "via": "lair", "position": 1}
 {"word": "lair", "synonym": "den", "via": "layer", "position": 1}
+{"word": "lairize", "synonym": "brag", "via": "lairize", "position": 1}
+{"word": "lairize", "synonym": "boast", "via": "lairize", "position": 2}
 {"word": "lakeshore", "synonym": "lakeside", "via": "lakeshore", "position": 1}
 {"word": "lakeside", "synonym": "lakeshore", "via": "lakeside", "position": 1}
+{"word": "lallie", "synonym": "leg", "via": "lallie", "position": 1}
 {"word": "lallygag", "synonym": "loiter", "via": "lallygag", "position": 1}
 {"word": "lallygag", "synonym": "lounge", "via": "lallygag", "position": 2}
 {"word": "lallygag", "synonym": "footle", "via": "lallygag", "position": 3}
@@ -387,6 +398,7 @@
 {"word": "lance", "synonym": "fishgig", "via": "lance", "position": 6}
 {"word": "lancelet", "synonym": "amphioxus", "via": "lancelet", "position": 1}
 {"word": "lancet", "synonym": "lance", "via": "lancet", "position": 1}
+{"word": "lancinate", "synonym": "pierce", "via": "lancinate", "position": 1}
 {"word": "lancinating", "synonym": "cutting", "via": "lancinating", "position": 1}
 {"word": "lancinating", "synonym": "keen", "via": "lancinating", "position": 2}
 {"word": "lancinating", "synonym": "knifelike", "via": "lancinating", "position": 3}
@@ -402,6 +414,8 @@
 {"word": "land", "synonym": "ground", "via": "land", "position": 8}
 {"word": "land", "synonym": "soil", "via": "land", "position": 9}
 {"word": "landholder", "synonym": "landowner", "via": "landholder", "position": 1}
+{"word": "landloper", "synonym": "vagabond", "via": "landloper", "position": 1}
+{"word": "landloper", "synonym": "vagrant", "via": "landloper", "position": 2}
 {"word": "landlubber", "synonym": "lubber", "via": "landlubber", "position": 1}
 {"word": "landlubber", "synonym": "landsman", "via": "landlubber", "position": 2}
 {"word": "landlubber", "synonym": "landman", "via": "landlubber", "position": 3}
@@ -410,6 +424,7 @@
 {"word": "landman", "synonym": "landsman", "via": "landman", "position": 2}
 {"word": "landmark", "synonym": "watershed", "via": "landmark", "position": 1}
 {"word": "landowner", "synonym": "landholder", "via": "landowner", "position": 1}
+{"word": "landprop", "synonym": "landlord", "via": "landprop", "position": 1}
 {"word": "landscaper", "synonym": "landscapist", "via": "landscaper", "position": 1}
 {"word": "landscapist", "synonym": "landscaper", "via": "landscapist", "position": 1}
 {"word": "landslide", "synonym": "landslip", "via": "landslide", "position": 1}
@@ -417,6 +432,9 @@
 {"word": "landsman", "synonym": "landlubber", "via": "landsman", "position": 1}
 {"word": "landsman", "synonym": "lubber", "via": "landsman", "position": 2}
 {"word": "landsman", "synonym": "landman", "via": "landsman", "position": 3}
+{"word": "landwash", "synonym": "foreshore", "via": "landwash", "position": 1}
+{"word": "langered", "synonym": "drunk", "via": "langered", "position": 1}
+{"word": "langers", "synonym": "drunk", "via": "langers", "position": 1}
 {"word": "langouste", "synonym": "crawfish", "via": "langouste", "position": 1}
 {"word": "langouste", "synonym": "crayfish", "via": "langouste", "position": 2}
 {"word": "language", "synonym": "speech", "via": "language", "position": 1}
@@ -444,6 +462,7 @@
 {"word": "languorous", "synonym": "languid", "via": "languorous", "position": 3}
 {"word": "laniard", "synonym": "lanyard", "via": "lanyard", "position": 1}
 {"word": "laniary", "synonym": "canine", "via": "laniary", "position": 1}
+{"word": "laniferous", "synonym": "woolly", "via": "laniferous", "position": 1}
 {"word": "lank", "synonym": "spindly", "via": "lank", "position": 1}
 {"word": "lanky", "synonym": "gangling", "via": "lanky", "position": 1}
 {"word": "lanky", "synonym": "gangly", "via": "lanky", "position": 2}
@@ -473,6 +492,7 @@
 {"word": "lap", "synonym": "wash", "via": "laparotomy", "position": 6}
 {"word": "lap", "synonym": "swish", "via": "laparotomy", "position": 7}
 {"word": "lap", "synonym": "swoosh", "via": "laparotomy", "position": 8}
+{"word": "lapactic", "synonym": "purgative", "via": "lapactic", "position": 1}
 {"word": "lapidary", "synonym": "lapidist", "via": "lapidary", "position": 1}
 {"word": "lapidate", "synonym": "stone", "via": "lapidate", "position": 1}
 {"word": "lapidify", "synonym": "petrify", "via": "lapidify", "position": 1}
@@ -500,6 +520,7 @@
 {"word": "lapsing", "synonym": "reversion", "via": "lapse", "position": 5}
 {"word": "lapsing", "synonym": "reverting", "via": "lapse", "position": 6}
 {"word": "lapsing", "synonym": "lapse", "via": "lapsing", "position": 1}
+{"word": "laputan", "synonym": "quixotic", "via": "laputan", "position": 1}
 {"word": "lapwing", "synonym": "peewit", "via": "lapwing", "position": 1}
 {"word": "lapwing", "synonym": "pewit", "via": "lapwing", "position": 2}
 {"word": "larboard", "synonym": "port", "via": "larboard", "position": 1}
@@ -678,6 +699,8 @@
 {"word": "latterly", "synonym": "recently", "via": "latterly", "position": 1}
 {"word": "latterly", "synonym": "late", "via": "latterly", "position": 2}
 {"word": "latterly", "synonym": "lately", "via": "latterly", "position": 3}
+{"word": "lattermost", "synonym": "last", "via": "lattermost", "position": 1}
+{"word": "lattermost", "synonym": "final", "via": "lattermost", "position": 2}
 {"word": "lattice", "synonym": "latticework", "via": "lattice", "position": 1}
 {"word": "lattice", "synonym": "fretwork", "via": "lattice", "position": 2}
 {"word": "lattice", "synonym": "wicket", "via": "lattice", "position": 3}
@@ -686,6 +709,7 @@
 {"word": "latticed", "synonym": "interlaced", "via": "lattice", "position": 2}
 {"word": "latticed", "synonym": "fretted", "via": "latticed", "position": 1}
 {"word": "latticed", "synonym": "interlaced", "via": "latticed", "position": 2}
+{"word": "latticeleaf", "synonym": "laceleaf", "via": "latticeleaf", "position": 1}
 {"word": "latticework", "synonym": "lattice", "via": "latticework", "position": 1}
 {"word": "latticework", "synonym": "fretwork", "via": "latticework", "position": 2}
 {"word": "laud", "synonym": "extol", "via": "laud", "position": 1}
@@ -747,6 +771,7 @@
 {"word": "launching", "synonym": "unveiling", "via": "launching", "position": 4}
 {"word": "launching", "synonym": "entry", "via": "launching", "position": 5}
 {"word": "launchpad", "synonym": "pad", "via": "launchpad", "position": 1}
+{"word": "laund", "synonym": "glade", "via": "laund", "position": 1}
 {"word": "launder", "synonym": "wash", "via": "launder", "position": 1}
 {"word": "laundress", "synonym": "washwoman", "via": "laundress", "position": 1}
 {"word": "laundress", "synonym": "washerwoman", "via": "laundress", "position": 2}
@@ -754,6 +779,8 @@
 {"word": "laundry", "synonym": "washing", "via": "laundry", "position": 2}
 {"word": "laundry", "synonym": "washables", "via": "laundry", "position": 3}
 {"word": "laundryman", "synonym": "washerman", "via": "laundryman", "position": 1}
+{"word": "laundrywoman", "synonym": "washerwoman", "via": "laundrywoman", "position": 1}
+{"word": "lauraldehyde", "synonym": "dodecanal", "via": "lauraldehyde", "position": 1}
 {"word": "laureled", "synonym": "laurelled", "via": "laurel", "position": 1}
 {"word": "laureled", "synonym": "crowned", "via": "laurel", "position": 2}
 {"word": "laureled", "synonym": "laurelled", "via": "laurelled", "position": 1}
@@ -794,6 +821,7 @@
 {"word": "lavalliere", "synonym": "lavalier", "via": "lavaliere", "position": 2}
 {"word": "lavation", "synonym": "wash", "via": "lavation", "position": 1}
 {"word": "lavation", "synonym": "washing", "via": "lavation", "position": 2}
+{"word": "lavatorial", "synonym": "scatological", "via": "lavatorial", "position": 1}
 {"word": "lavatory", "synonym": "toilet", "via": "lavatory", "position": 1}
 {"word": "lavatory", "synonym": "lav", "via": "lavatory", "position": 2}
 {"word": "lavatory", "synonym": "can", "via": "lavatory", "position": 3}
@@ -833,6 +861,8 @@
 {"word": "lawfully", "synonym": "legitimately", "via": "lawfully", "position": 2}
 {"word": "lawfully", "synonym": "licitly", "via": "lawfully", "position": 3}
 {"word": "lawgiver", "synonym": "lawmaker", "via": "lawgiver", "position": 1}
+{"word": "lawin", "synonym": "bill", "via": "lawin", "position": 1}
+{"word": "lawin", "synonym": "tab", "via": "lawin", "position": 2}
 {"word": "lawless", "synonym": "anarchic", "via": "lawless", "position": 1}
 {"word": "lawless", "synonym": "anarchical", "via": "lawless", "position": 2}
 {"word": "lawless", "synonym": "outlaw", "via": "lawless", "position": 3}
@@ -844,11 +874,11 @@
 {"word": "lawmaking", "synonym": "legislation", "via": "lawmaking", "position": 1}
 {"word": "lawmaking", "synonym": "legislating", "via": "lawmaking", "position": 2}
 {"word": "laws", "synonym": "torah", "via": "law", "position": 1}
-{"word": "laws", "synonym": "torah", "via": "laws", "position": 1}
 {"word": "lawsuit", "synonym": "suit", "via": "lawsuit", "position": 1}
 {"word": "lawsuit", "synonym": "case", "via": "lawsuit", "position": 2}
 {"word": "lawsuit", "synonym": "cause", "via": "lawsuit", "position": 3}
 {"word": "lawyer", "synonym": "attorney", "via": "lawyer", "position": 1}
+{"word": "lawyerese", "synonym": "legalese", "via": "lawyerese", "position": 1}
 {"word": "lax", "synonym": "loose", "via": "lax", "position": 1}
 {"word": "lax", "synonym": "slack", "via": "lax", "position": 2}
 {"word": "lax", "synonym": "loose", "via": "laxative", "position": 1}
@@ -944,6 +974,8 @@
 {"word": "leaders", "synonym": "leadership", "via": "leader", "position": 1}
 {"word": "leadership", "synonym": "leading", "via": "leadership", "position": 1}
 {"word": "leadership", "synonym": "leaders", "via": "leadership", "position": 2}
+{"word": "leadfoot", "synonym": "speeder", "via": "leadfoot", "position": 1}
+{"word": "leadfooted", "synonym": "clumsy", "via": "leadfooted", "position": 1}
 {"word": "leading", "synonym": "leadership", "via": "lead", "position": 1}
 {"word": "leading", "synonym": "lead", "via": "lead", "position": 2}
 {"word": "leading", "synonym": "prima", "via": "lead", "position": 3}
@@ -997,6 +1029,7 @@
 {"word": "lean", "synonym": "tend", "via": "lean", "position": 8}
 {"word": "lean", "synonym": "incline", "via": "lean", "position": 9}
 {"word": "lean", "synonym": "run", "via": "lean", "position": 10}
+{"word": "leangle", "synonym": "club", "via": "leangle", "position": 1}
 {"word": "leaning", "synonym": "tilt", "via": "lean", "position": 1}
 {"word": "leaning", "synonym": "list", "via": "lean", "position": 2}
 {"word": "leaning", "synonym": "inclination", "via": "lean", "position": 3}
@@ -1100,6 +1133,7 @@
 {"word": "leash", "synonym": "trine", "via": "leash", "position": 10}
 {"word": "leastways", "synonym": "leastwise", "via": "leastways", "position": 1}
 {"word": "leastwise", "synonym": "leastways", "via": "leastwise", "position": 1}
+{"word": "leat", "synonym": "millrace", "via": "leat", "position": 1}
 {"word": "leathered", "synonym": "coriaceous", "via": "leather", "position": 1}
 {"word": "leathered", "synonym": "leatherlike", "via": "leather", "position": 2}
 {"word": "leathered", "synonym": "leathery", "via": "leather", "position": 3}
@@ -1283,6 +1317,7 @@
 {"word": "legitimize", "synonym": "legitimise", "via": "legitimize", "position": 4}
 {"word": "legitimize", "synonym": "legitimate", "via": "legitimize", "position": 5}
 {"word": "legitimize", "synonym": "legitimatize", "via": "legitimize", "position": 6}
+{"word": "leglen", "synonym": "pail", "via": "leglen", "position": 1}
 {"word": "lei", "synonym": "wreath", "via": "lei", "position": 1}
 {"word": "lei", "synonym": "garland", "via": "lei", "position": 2}
 {"word": "lei", "synonym": "coronal", "via": "lei", "position": 3}
@@ -1361,12 +1396,14 @@
 {"word": "lense", "synonym": "lens", "via": "lens", "position": 1}
 {"word": "lensman", "synonym": "photographer", "via": "lensman", "position": 1}
 {"word": "lenticular", "synonym": "biconvex", "via": "lenticular", "position": 1}
+{"word": "lentiform", "synonym": "lenticular", "via": "lentiform", "position": 1}
 {"word": "lentigo", "synonym": "freckle", "via": "lentigo", "position": 1}
 {"word": "lentisk", "synonym": "mastic", "via": "lentisk", "position": 1}
 {"word": "lento", "synonym": "slowly", "via": "lento", "position": 1}
 {"word": "leotard", "synonym": "unitard", "via": "leotard", "position": 1}
 {"word": "leotards", "synonym": "tights", "via": "leotard", "position": 1}
 {"word": "leper", "synonym": "lazar", "via": "leper", "position": 1}
+{"word": "lepidopteron", "synonym": "lepidopteran", "via": "lepidopteron", "position": 1}
 {"word": "lepidote", "synonym": "leprose", "via": "lepidote", "position": 1}
 {"word": "lepidote", "synonym": "scabrous", "via": "lepidote", "position": 2}
 {"word": "lepidote", "synonym": "scaly", "via": "lepidote", "position": 3}
@@ -1375,6 +1412,7 @@
 {"word": "leprose", "synonym": "scabrous", "via": "leprose", "position": 2}
 {"word": "leprose", "synonym": "scaly", "via": "leprose", "position": 3}
 {"word": "leprose", "synonym": "scurfy", "via": "leprose", "position": 4}
+{"word": "lequear", "synonym": "lacunar", "via": "lequear", "position": 1}
 {"word": "lesbian", "synonym": "tribade", "via": "lesbian", "position": 1}
 {"word": "lesbian", "synonym": "sapphic", "via": "lesbian", "position": 2}
 {"word": "lesbianism", "synonym": "sapphism", "via": "lesbianism", "position": 1}
@@ -1414,6 +1452,7 @@
 {"word": "letdown", "synonym": "disappointment", "via": "letdown", "position": 1}
 {"word": "lethal", "synonym": "deadly", "via": "lethal", "position": 1}
 {"word": "lethality", "synonym": "deadliness", "via": "lethality", "position": 1}
+{"word": "lethargize", "synonym": "stupefy", "via": "lethargize", "position": 1}
 {"word": "lethargy", "synonym": "languor", "via": "lethargy", "position": 1}
 {"word": "lethargy", "synonym": "sluggishness", "via": "lethargy", "position": 2}
 {"word": "lethargy", "synonym": "phlegm", "via": "lethargy", "position": 3}
@@ -1421,6 +1460,8 @@
 {"word": "lethargy", "synonym": "inanition", "via": "lethargy", "position": 5}
 {"word": "lethargy", "synonym": "lassitude", "via": "lethargy", "position": 6}
 {"word": "lethargy", "synonym": "slackness", "via": "lethargy", "position": 7}
+{"word": "lethiferous", "synonym": "lethal", "via": "lethiferous", "position": 1}
+{"word": "lethiferous", "synonym": "deadly", "via": "lethiferous", "position": 2}
 {"word": "letter", "synonym": "missive", "via": "letter", "position": 1}
 {"word": "letter", "synonym": "missive", "via": "litter", "position": 1}
 {"word": "letterbox", "synonym": "mailbox", "via": "letterbox", "position": 1}
@@ -1432,6 +1473,7 @@
 {"word": "lettered", "synonym": "learned", "via": "lettered", "position": 3}
 {"word": "lettering", "synonym": "inscription", "via": "letter", "position": 1}
 {"word": "lettering", "synonym": "inscription", "via": "lettering", "position": 1}
+{"word": "letterwood", "synonym": "snakewood", "via": "letterwood", "position": 1}
 {"word": "letting", "synonym": "lease", "via": "let", "position": 1}
 {"word": "letting", "synonym": "rental", "via": "let", "position": 2}
 {"word": "letting", "synonym": "lease", "via": "letting", "position": 1}
@@ -1448,6 +1490,7 @@
 {"word": "lettuce", "synonym": "lucre", "via": "lettuce", "position": 10}
 {"word": "letup", "synonym": "lull", "via": "letup", "position": 1}
 {"word": "leucoma", "synonym": "leukoma", "via": "leucoma", "position": 1}
+{"word": "leucotomy", "synonym": "lobotomy", "via": "leucotomy", "position": 1}
 {"word": "leukaemia", "synonym": "leukemia", "via": "leukemia", "position": 1}
 {"word": "leukemia", "synonym": "leukaemia", "via": "leukemia", "position": 1}
 {"word": "leukoma", "synonym": "leucoma", "via": "leucoma", "position": 1}
@@ -1509,6 +1552,7 @@
 {"word": "lexicalisation", "synonym": "lexicalization", "via": "lexicalization", "position": 1}
 {"word": "lexicalization", "synonym": "lexicalisation", "via": "lexicalization", "position": 1}
 {"word": "lexicographer", "synonym": "lexicologist", "via": "lexicographer", "position": 1}
+{"word": "lexicographical", "synonym": "lexicographic", "via": "lexicographical", "position": 1}
 {"word": "lexicon", "synonym": "vocabulary", "via": "lexicon", "position": 1}
 {"word": "lexicon", "synonym": "dictionary", "via": "lexicon", "position": 2}
 {"word": "ley", "synonym": "pasture", "via": "lea", "position": 1}
@@ -1594,6 +1638,8 @@
 {"word": "liberation", "synonym": "release", "via": "liberation", "position": 1}
 {"word": "liberation", "synonym": "freeing", "via": "liberation", "position": 2}
 {"word": "liberation", "synonym": "discharge", "via": "liberation", "position": 3}
+{"word": "liberative", "synonym": "liberatory", "via": "liberative", "position": 1}
+{"word": "liberatory", "synonym": "liberating", "via": "liberatory", "position": 1}
 {"word": "libertine", "synonym": "debauchee", "via": "libertine", "position": 1}
 {"word": "libertine", "synonym": "rounder", "via": "libertine", "position": 2}
 {"word": "libertine", "synonym": "debauched", "via": "libertine", "position": 3}
@@ -1698,6 +1744,7 @@
 {"word": "lien", "synonym": "spleen", "via": "lain", "position": 1}
 {"word": "lienal", "synonym": "splenic", "via": "lienal", "position": 1}
 {"word": "lienal", "synonym": "splenetic", "via": "lienal", "position": 2}
+{"word": "lienectomy", "synonym": "splenectomy", "via": "lienectomy", "position": 1}
 {"word": "lieu", "synonym": "stead", "via": "lieu", "position": 1}
 {"word": "lieu", "synonym": "position", "via": "lieu", "position": 2}
 {"word": "lieu", "synonym": "place", "via": "lieu", "position": 3}
@@ -1729,6 +1776,7 @@
 {"word": "lift", "synonym": "elevation", "via": "lift", "position": 6}
 {"word": "lift", "synonym": "raising", "via": "lift", "position": 7}
 {"word": "lift", "synonym": "elevate", "via": "lift", "position": 8}
+{"word": "liftback", "synonym": "hatchback", "via": "liftback", "position": 1}
 {"word": "lifted", "synonym": "upraised", "via": "lift", "position": 1}
 {"word": "lifted", "synonym": "upraised", "via": "lifted", "position": 1}
 {"word": "lifter", "synonym": "booster", "via": "lifter", "position": 1}
@@ -1739,6 +1787,7 @@
 {"word": "ligan", "synonym": "lagend", "via": "lagan", "position": 2}
 {"word": "ligature", "synonym": "tying", "via": "ligature", "position": 1}
 {"word": "ligature", "synonym": "binder", "via": "ligature", "position": 2}
+{"word": "ligger", "synonym": "freeloader", "via": "ligger", "position": 1}
 {"word": "light", "synonym": "lighter", "via": "light", "position": 1}
 {"word": "light", "synonym": "igniter", "via": "light", "position": 2}
 {"word": "light", "synonym": "ignitor", "via": "light", "position": 3}
@@ -1749,6 +1798,8 @@
 {"word": "light", "synonym": "luminosity", "via": "light", "position": 8}
 {"word": "light", "synonym": "brightness", "via": "light", "position": 9}
 {"word": "light", "synonym": "luminance", "via": "light", "position": 10}
+{"word": "lightboard", "synonym": "switchboard", "via": "lightboard", "position": 1}
+{"word": "lightboat", "synonym": "lightship", "via": "lightboat", "position": 1}
 {"word": "lightbulb", "synonym": "bulb", "via": "lightbulb", "position": 1}
 {"word": "lighted", "synonym": "illuminated", "via": "light", "position": 1}
 {"word": "lighted", "synonym": "lit", "via": "light", "position": 2}
@@ -1819,6 +1870,10 @@
 {"word": "lightsomeness", "synonym": "insouciance", "via": "lightsomeness", "position": 5}
 {"word": "lightweight", "synonym": "whippersnapper", "via": "lightweight", "position": 1}
 {"word": "lightweight", "synonym": "jackanapes", "via": "lightweight", "position": 2}
+{"word": "lignaloes", "synonym": "agarwood", "via": "lignaloes", "position": 1}
+{"word": "lignivorous", "synonym": "xylophagous", "via": "lignivorous", "position": 1}
+{"word": "lignocaine", "synonym": "lidocaine", "via": "lignocaine", "position": 1}
+{"word": "ligustrum", "synonym": "privet", "via": "ligustrum", "position": 1}
 {"word": "likable", "synonym": "likeable", "via": "likable", "position": 1}
 {"word": "likable", "synonym": "sympathetic", "via": "likable", "position": 2}
 {"word": "likable", "synonym": "appealing", "via": "likable", "position": 3}
@@ -1830,6 +1885,7 @@
 {"word": "likeable", "synonym": "likable", "via": "likable", "position": 1}
 {"word": "likeable", "synonym": "sympathetic", "via": "likable", "position": 2}
 {"word": "likeable", "synonym": "appealing", "via": "likable", "position": 3}
+{"word": "likeliness", "synonym": "likelihood", "via": "likeliness", "position": 1}
 {"word": "likely", "synonym": "probable", "via": "likely", "position": 1}
 {"word": "likely", "synonym": "potential", "via": "likely", "position": 2}
 {"word": "likely", "synonym": "probably", "via": "likely", "position": 3}
@@ -1957,6 +2013,7 @@
 {"word": "limpness", "synonym": "flabbiness", "via": "limpness", "position": 1}
 {"word": "limpness", "synonym": "flaccidity", "via": "limpness", "position": 2}
 {"word": "linage", "synonym": "lineage", "via": "lineage", "position": 1}
+{"word": "linaria", "synonym": "toadflax", "via": "linaria", "position": 1}
 {"word": "linchpin", "synonym": "lynchpin", "via": "linchpin", "position": 1}
 {"word": "linchpin", "synonym": "anchor", "via": "linchpin", "position": 2}
 {"word": "linchpin", "synonym": "mainstay", "via": "linchpin", "position": 3}
@@ -2034,12 +2091,14 @@
 {"word": "lingua", "synonym": "glossa", "via": "lingua", "position": 2}
 {"word": "lingual", "synonym": "linguistic", "via": "lingual", "position": 1}
 {"word": "lingually", "synonym": "linguistically", "via": "lingually", "position": 1}
+{"word": "linguiform", "synonym": "lingulate", "via": "linguiform", "position": 1}
 {"word": "linguine", "synonym": "linguini", "via": "linguine", "position": 1}
 {"word": "linguini", "synonym": "linguine", "via": "linguine", "position": 1}
 {"word": "linguist", "synonym": "polyglot", "via": "linguist", "position": 1}
 {"word": "linguistic", "synonym": "lingual", "via": "linguistic", "position": 1}
 {"word": "linguistically", "synonym": "lingually", "via": "linguistically", "position": 1}
 {"word": "linguistics", "synonym": "philology", "via": "linguistics", "position": 1}
+{"word": "lingulate", "synonym": "linguiform", "via": "lingulate", "position": 1}
 {"word": "liniment", "synonym": "embrocation", "via": "liniment", "position": 1}
 {"word": "lining", "synonym": "facing", "via": "line", "position": 1}
 {"word": "lining", "synonym": "liner", "via": "line", "position": 2}
@@ -2070,6 +2129,7 @@
 {"word": "linoleum", "synonym": "lino", "via": "linoleum", "position": 1}
 {"word": "linseed", "synonym": "flaxseed", "via": "linseed", "position": 1}
 {"word": "lintel", "synonym": "header", "via": "lintel", "position": 1}
+{"word": "lintie", "synonym": "linnet", "via": "lintie", "position": 1}
 {"word": "lintwhite", "synonym": "linnet", "via": "lintwhite", "position": 1}
 {"word": "lionise", "synonym": "lionize", "via": "lionize", "position": 1}
 {"word": "lionise", "synonym": "celebrate", "via": "lionize", "position": 2}
@@ -2101,6 +2161,7 @@
 {"word": "liquefy", "synonym": "flux", "via": "liquefy", "position": 1}
 {"word": "liquefy", "synonym": "liquify", "via": "liquefy", "position": 2}
 {"word": "liquefy", "synonym": "liquidize", "via": "liquefy", "position": 3}
+{"word": "liquesce", "synonym": "melt", "via": "liquesce", "position": 1}
 {"word": "liquescent", "synonym": "melting", "via": "liquescent", "position": 1}
 {"word": "liqueur", "synonym": "cordial", "via": "liqueur", "position": 1}
 {"word": "liquid", "synonym": "liquidness", "via": "liquid", "position": 1}
@@ -2125,6 +2186,7 @@
 {"word": "liquidity", "synonym": "liquid", "via": "liquidity", "position": 4}
 {"word": "liquidize", "synonym": "liquefy", "via": "liquidize", "position": 1}
 {"word": "liquidize", "synonym": "liquify", "via": "liquidize", "position": 2}
+{"word": "liquidizer", "synonym": "blender", "via": "liquidizer", "position": 1}
 {"word": "liquidness", "synonym": "fluidity", "via": "liquidness", "position": 1}
 {"word": "liquidness", "synonym": "fluidness", "via": "liquidness", "position": 2}
 {"word": "liquidness", "synonym": "liquidity", "via": "liquidness", "position": 3}
@@ -2171,6 +2233,7 @@
 {"word": "listener", "synonym": "attender", "via": "listener", "position": 3}
 {"word": "listening", "synonym": "hearing", "via": "listen", "position": 1}
 {"word": "listening", "synonym": "hearing", "via": "listening", "position": 1}
+{"word": "listerellosis", "synonym": "listeriosis", "via": "listerellosis", "position": 1}
 {"word": "listing", "synonym": "itemization", "via": "list", "position": 1}
 {"word": "listing", "synonym": "list", "via": "list", "position": 2}
 {"word": "listing", "synonym": "itemization", "via": "listing", "position": 1}
@@ -2222,6 +2285,8 @@
 {"word": "lithesome", "synonym": "supple", "via": "lithesome", "position": 4}
 {"word": "lithesome", "synonym": "sinuous", "via": "lithesome", "position": 5}
 {"word": "lithology", "synonym": "petrology", "via": "lithology", "position": 1}
+{"word": "lithostatic", "synonym": "geostatic", "via": "lithostatic", "position": 1}
+{"word": "lithy", "synonym": "supple", "via": "lithy", "position": 1}
 {"word": "litigant", "synonym": "litigator", "via": "litigant", "position": 1}
 {"word": "litigate", "synonym": "action", "via": "litigate", "position": 1}
 {"word": "litigate", "synonym": "sue", "via": "litigate", "position": 2}
@@ -2336,6 +2401,7 @@
 {"word": "living", "synonym": "animation", "via": "living", "position": 6}
 {"word": "living", "synonym": "aliveness", "via": "living", "position": 7}
 {"word": "living", "synonym": "surviving", "via": "living", "position": 8}
+{"word": "lizzie", "synonym": "jalopy", "via": "lizzie", "position": 1}
 {"word": "load", "synonym": "cargo", "via": "load", "position": 1}
 {"word": "load", "synonym": "lading", "via": "load", "position": 2}
 {"word": "load", "synonym": "freight", "via": "load", "position": 3}
@@ -2504,6 +2570,7 @@
 {"word": "lobed", "synonym": "lobate", "via": "lobed", "position": 1}
 {"word": "lobotomy", "synonym": "leukotomy", "via": "lobotomy", "position": 1}
 {"word": "lobscouse", "synonym": "scouse", "via": "lobscouse", "position": 1}
+{"word": "lobsterback", "synonym": "redcoat", "via": "lobsterback", "position": 1}
 {"word": "lobworm", "synonym": "lugworm", "via": "lobworm", "position": 1}
 {"word": "lobworm", "synonym": "lug", "via": "lobworm", "position": 2}
 {"word": "locale", "synonym": "venue", "via": "locale", "position": 1}
@@ -2553,6 +2620,7 @@
 {"word": "location", "synonym": "positioning", "via": "location", "position": 6}
 {"word": "location", "synonym": "emplacement", "via": "location", "position": 7}
 {"word": "locator", "synonym": "locater", "via": "locator", "position": 1}
+{"word": "loche", "synonym": "burbot", "via": "loche", "position": 1}
 {"word": "lock", "synonym": "curl", "via": "lock", "position": 1}
 {"word": "lock", "synonym": "ringlet", "via": "lock", "position": 2}
 {"word": "lock", "synonym": "whorl", "via": "lock", "position": 3}
@@ -2849,6 +2917,8 @@
 {"word": "lookout", "synonym": "scout", "via": "lookout", "position": 7}
 {"word": "lookout", "synonym": "picket", "via": "lookout", "position": 8}
 {"word": "lookup", "synonym": "search", "via": "lookup", "position": 1}
+{"word": "looky", "synonym": "lo", "via": "looky", "position": 1}
+{"word": "loolah", "synonym": "crazy", "via": "loolah", "position": 1}
 {"word": "loom", "synonym": "tower", "via": "loom", "position": 1}
 {"word": "loom", "synonym": "predominate", "via": "loom", "position": 2}
 {"word": "loom", "synonym": "hulk", "via": "loom", "position": 3}
@@ -3005,6 +3075,7 @@
 {"word": "loquacity", "synonym": "garrulousness", "via": "loquacity", "position": 2}
 {"word": "loquacity", "synonym": "loquaciousness", "via": "loquacity", "position": 3}
 {"word": "loquacity", "synonym": "talkativeness", "via": "loquacity", "position": 4}
+{"word": "lor", "synonym": "gosh", "via": "lor", "position": 1}
 {"word": "lord", "synonym": "noble", "via": "lord", "position": 1}
 {"word": "lord", "synonym": "nobleman", "via": "lord", "position": 2}
 {"word": "lord", "synonym": "overlord", "via": "lord", "position": 3}
@@ -3104,16 +3175,6 @@
 {"word": "lots", "synonym": "rafts", "via": "lot", "position": 8}
 {"word": "lots", "synonym": "slews", "via": "lot", "position": 9}
 {"word": "lots", "synonym": "wads", "via": "lot", "position": 10}
-{"word": "lots", "synonym": "tons", "via": "lots", "position": 1}
-{"word": "lots", "synonym": "dozens", "via": "lots", "position": 2}
-{"word": "lots", "synonym": "heaps", "via": "lots", "position": 3}
-{"word": "lots", "synonym": "piles", "via": "lots", "position": 4}
-{"word": "lots", "synonym": "scores", "via": "lots", "position": 5}
-{"word": "lots", "synonym": "stacks", "via": "lots", "position": 6}
-{"word": "lots", "synonym": "loads", "via": "lots", "position": 7}
-{"word": "lots", "synonym": "rafts", "via": "lots", "position": 8}
-{"word": "lots", "synonym": "slews", "via": "lots", "position": 9}
-{"word": "lots", "synonym": "wads", "via": "lots", "position": 10}
 {"word": "lotte", "synonym": "goosefish", "via": "lotte", "position": 1}
 {"word": "lotte", "synonym": "angler", "via": "lotte", "position": 2}
 {"word": "lotte", "synonym": "anglerfish", "via": "lotte", "position": 3}
@@ -3157,6 +3218,7 @@
 {"word": "lounger", "synonym": "recliner", "via": "lounger", "position": 1}
 {"word": "lounger", "synonym": "dallier", "via": "lounger", "position": 2}
 {"word": "lounger", "synonym": "mope", "via": "lounger", "position": 3}
+{"word": "loupcervier", "synonym": "lynx", "via": "loupcervier", "position": 1}
 {"word": "lour", "synonym": "frown", "via": "lour", "position": 1}
 {"word": "lour", "synonym": "glower", "via": "lour", "position": 2}
 {"word": "lour", "synonym": "lower", "via": "lour", "position": 3}
@@ -3220,6 +3282,7 @@
 {"word": "lovesome", "synonym": "affectionate", "via": "lovesome", "position": 1}
 {"word": "lovesome", "synonym": "fond", "via": "lovesome", "position": 2}
 {"word": "lovesome", "synonym": "tender", "via": "lovesome", "position": 3}
+{"word": "lovey", "synonym": "darling", "via": "lovey", "position": 1}
 {"word": "lovingly", "synonym": "fondly", "via": "lovingly", "position": 1}
 {"word": "lovingness", "synonym": "fondness", "via": "lovingness", "position": 1}
 {"word": "lovingness", "synonym": "warmth", "via": "lovingness", "position": 2}
@@ -3309,6 +3372,7 @@
 {"word": "loyal", "synonym": "fast", "via": "loyal", "position": 3}
 {"word": "loyal", "synonym": "patriotic", "via": "loyal", "position": 4}
 {"word": "loyalist", "synonym": "stalwart", "via": "loyalist", "position": 1}
+{"word": "loyalness", "synonym": "loyalty", "via": "loyalness", "position": 1}
 {"word": "loyalty", "synonym": "commitment", "via": "loyalty", "position": 1}
 {"word": "loyalty", "synonym": "allegiance", "via": "loyalty", "position": 2}
 {"word": "loyalty", "synonym": "dedication", "via": "loyalty", "position": 3}
@@ -3470,6 +3534,7 @@
 {"word": "lumberman", "synonym": "logger", "via": "lumberman", "position": 2}
 {"word": "lumberman", "synonym": "feller", "via": "lumberman", "position": 3}
 {"word": "lumberman", "synonym": "faller", "via": "lumberman", "position": 4}
+{"word": "lumbermill", "synonym": "sawmill", "via": "lumbermill", "position": 1}
 {"word": "luminal", "synonym": "phenobarbital", "via": "luminal", "position": 1}
 {"word": "luminal", "synonym": "phenobarbitone", "via": "luminal", "position": 2}
 {"word": "luminance", "synonym": "luminosity", "via": "luminance", "position": 1}
@@ -3478,6 +3543,9 @@
 {"word": "luminance", "synonym": "light", "via": "luminance", "position": 4}
 {"word": "luminary", "synonym": "notable", "via": "luminary", "position": 1}
 {"word": "luminary", "synonym": "notability", "via": "luminary", "position": 2}
+{"word": "luminate", "synonym": "illuminate", "via": "luminate", "position": 1}
+{"word": "lumine", "synonym": "illumine", "via": "lumine", "position": 1}
+{"word": "lumine", "synonym": "illuminate", "via": "lumine", "position": 2}
 {"word": "luminescence", "synonym": "glow", "via": "luminescence", "position": 1}
 {"word": "luminosity", "synonym": "brightness", "via": "luminosity", "position": 1}
 {"word": "luminosity", "synonym": "luminance", "via": "luminosity", "position": 2}
@@ -3518,6 +3586,7 @@
 {"word": "lumper", "synonym": "dockworker", "via": "lumper", "position": 6}
 {"word": "lumpish", "synonym": "lumpen", "via": "lumpish", "position": 1}
 {"word": "lumpish", "synonym": "unthinking", "via": "lumpish", "position": 2}
+{"word": "lumpsucker", "synonym": "lumpfish", "via": "lumpsucker", "position": 1}
 {"word": "lumpy", "synonym": "chunky", "via": "lumpy", "position": 1}
 {"word": "lunacy", "synonym": "folly", "via": "lunacy", "position": 1}
 {"word": "lunacy", "synonym": "foolery", "via": "lunacy", "position": 2}
@@ -3525,6 +3594,7 @@
 {"word": "lunacy", "synonym": "craziness", "via": "lunacy", "position": 4}
 {"word": "lunacy", "synonym": "madness", "via": "lunacy", "position": 5}
 {"word": "lunacy", "synonym": "insaneness", "via": "lunacy", "position": 6}
+{"word": "lunarscape", "synonym": "moonscape", "via": "lunarscape", "position": 1}
 {"word": "lunate", "synonym": "crescent", "via": "lunate", "position": 1}
 {"word": "lunate", "synonym": "semilunar", "via": "lunate", "position": 2}
 {"word": "lunatic", "synonym": "daredevil", "via": "lunatic", "position": 1}
@@ -3541,9 +3611,11 @@
 {"word": "luncheon", "synonym": "lunch", "via": "luncheon", "position": 1}
 {"word": "luncheon", "synonym": "tiffin", "via": "luncheon", "position": 2}
 {"word": "luncheon", "synonym": "dejeuner", "via": "luncheon", "position": 3}
+{"word": "lunchpail", "synonym": "lunchbox", "via": "lunchpail", "position": 1}
 {"word": "lunge", "synonym": "lurch", "via": "lunge", "position": 1}
 {"word": "lunge", "synonym": "passado", "via": "lunge", "position": 2}
 {"word": "lunge", "synonym": "thrust", "via": "lunge", "position": 3}
+{"word": "lungeous", "synonym": "violent", "via": "lungeous", "position": 1}
 {"word": "lunger", "synonym": "consumptive", "via": "lunger", "position": 1}
 {"word": "lunger", "synonym": "tubercular", "via": "lunger", "position": 2}
 {"word": "lungi", "synonym": "lungyi", "via": "lungi", "position": 1}
@@ -3601,6 +3673,7 @@
 {"word": "lurk", "synonym": "loaf", "via": "lurk", "position": 10}
 {"word": "lurker", "synonym": "skulker", "via": "lurker", "position": 1}
 {"word": "lurker", "synonym": "lurcher", "via": "lurker", "position": 2}
+{"word": "lurry", "synonym": "lorry", "via": "lurry", "position": 1}
 {"word": "luscious", "synonym": "juicy", "via": "luscious", "position": 1}
 {"word": "luscious", "synonym": "toothsome", "via": "luscious", "position": 2}
 {"word": "luscious", "synonym": "voluptuous", "via": "luscious", "position": 3}
@@ -3624,6 +3697,7 @@
 {"word": "lush", "synonym": "luxuriant", "via": "lush", "position": 8}
 {"word": "lush", "synonym": "profuse", "via": "lush", "position": 9}
 {"word": "lush", "synonym": "riotous", "via": "lush", "position": 10}
+{"word": "lushhead", "synonym": "drunkard", "via": "lushhead", "position": 1}
 {"word": "lushness", "synonym": "luxuriance", "via": "lushness", "position": 1}
 {"word": "lushness", "synonym": "voluptuousness", "via": "lushness", "position": 2}
 {"word": "lust", "synonym": "lecherousness", "via": "lust", "position": 1}
@@ -3698,6 +3772,7 @@
 {"word": "luting", "synonym": "lute", "via": "luting", "position": 1}
 {"word": "lutist", "synonym": "lutanist", "via": "lutist", "position": 1}
 {"word": "lutist", "synonym": "lutenist", "via": "lutist", "position": 2}
+{"word": "lutite", "synonym": "pelite", "via": "lutite", "position": 1}
 {"word": "luxate", "synonym": "dislocate", "via": "luxate", "position": 1}
 {"word": "luxe", "synonym": "deluxe", "via": "luxe", "position": 1}
 {"word": "luxuriance", "synonym": "lushness", "via": "luxuriance", "position": 1}
@@ -3742,18 +3817,22 @@
 {"word": "lychee", "synonym": "lichi", "via": "lychee", "position": 2}
 {"word": "lychee", "synonym": "lichee", "via": "lychee", "position": 3}
 {"word": "lychnis", "synonym": "catchfly", "via": "lychnis", "position": 1}
+{"word": "lyefish", "synonym": "lutefisk", "via": "lyefish", "position": 1}
 {"word": "lying", "synonym": "prevarication", "via": "lie", "position": 1}
 {"word": "lying", "synonym": "fabrication", "via": "lie", "position": 2}
 {"word": "lying", "synonym": "prevarication", "via": "lye", "position": 1}
 {"word": "lying", "synonym": "fabrication", "via": "lye", "position": 2}
 {"word": "lying", "synonym": "prevarication", "via": "lying", "position": 1}
 {"word": "lying", "synonym": "fabrication", "via": "lying", "position": 2}
+{"word": "lymphocytopenia", "synonym": "lymphopenia", "via": "lymphocytopenia", "position": 1}
 {"word": "lynchpin", "synonym": "linchpin", "via": "linchpin", "position": 1}
 {"word": "lynchpin", "synonym": "anchor", "via": "linchpin", "position": 2}
 {"word": "lynchpin", "synonym": "mainstay", "via": "linchpin", "position": 3}
 {"word": "lynchpin", "synonym": "keystone", "via": "linchpin", "position": 4}
 {"word": "lynchpin", "synonym": "backbone", "via": "linchpin", "position": 5}
 {"word": "lynx", "synonym": "catamount", "via": "lynx", "position": 1}
+{"word": "lyocratic", "synonym": "lyophilic", "via": "lyocratic", "position": 1}
+{"word": "lyolysis", "synonym": "solvolysis", "via": "lyolysis", "position": 1}
 {"word": "lyophilise", "synonym": "lyophilize", "via": "lyophilize", "position": 1}
 {"word": "lyophilised", "synonym": "lyophilized", "via": "lyophilize", "position": 1}
 {"word": "lyophilize", "synonym": "lyophilise", "via": "lyophilize", "position": 1}

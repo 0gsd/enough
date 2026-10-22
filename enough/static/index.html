@@ -2219,6 +2219,116 @@
 
     #comp-launch-target[hidden] { display: none; }
 
+    /* ---------- a composure's settings (0.4.2) ---------- */
+    #comp-settings-modal.hidden { display: none; }
+    #comp-settings-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #comp-settings-modal .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+    }
+    #comp-settings-modal .modal-panel {
+      position: relative;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: min(480px, calc(100vw - 32px));
+      max-height: calc(86vh / var(--uiz, 1));
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+    #comp-settings-modal .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      flex: 0 0 auto;
+    }
+    #comp-settings-modal .modal-head h3 {
+      margin: 0;
+      color: var(--fg);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    #comp-settings-modal .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--fg-muted);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+    #comp-settings-modal .modal-close:hover { color: var(--fg); }
+    #comp-settings-modal .modal-body {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      min-height: 0;
+    }
+    #comp-settings-modal .cs-name {
+      color: var(--fg);
+      font-size: 14px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    #comp-settings-modal .cs-section {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0 12px;
+    }
+    #comp-settings-modal .cs-section > summary {
+      cursor: pointer;
+      padding: 9px 0;
+      color: var(--fg-muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+    }
+    #comp-settings-modal .cs-section[open] > summary { color: var(--fg); }
+    #comp-settings-modal .cs-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: var(--fg);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    #comp-settings-modal .cs-check input { margin: 2px 0 0; flex: 0 0 auto; }
+    #comp-settings-modal .cs-check input:disabled + span { color: var(--fg-muted); }
+    #comp-settings-modal .cs-hint {
+      color: var(--fg-muted);
+      font-size: 11px;
+      line-height: 1.5;
+      margin: 6px 0 12px 22px;
+    }
+    #comp-settings-modal .cs-facts {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 4px 12px;
+      margin: 0 0 12px;
+      font-size: 12px;
+    }
+    #comp-settings-modal .cs-facts dt { color: var(--fg-muted); }
+    #comp-settings-modal .cs-facts dd {
+      margin: 0;
+      color: var(--fg);
+      overflow-wrap: anywhere;
+    }
+
     /* ---------- swatches, theme-aware ----------
        Named swatches only ever reach the DOM as names (the format stores a
        name, never a colour), and the mapping lives here so a theme change
@@ -13723,11 +13833,14 @@
         <!-- P4d: what the canvas opens with. Saved through
              POST /api/project/composure; `last` is never written from here
              (GET /api/composure stamps it when you open one). The second
-             select appears only for the two settings that need a target. -->
+             select appears only for the two settings that need a target.
+             0.4.2: `auto` is the default, and "a specific composure" is
+             the startup composure a composure's own settings tick. -->
         <div class="proj-field" id="comp-launch-row">
           <span class="proj-label" data-i18n="comp.launch.label">on launch, open</span>
           <select id="comp-launch-select">
-            <option value="blank" data-i18n="comp.launch.blank">a new blank page</option>
+            <option value="auto" data-i18n="comp.launch.auto">automatic: your composure, or the last one used</option>
+            <option value="new" data-i18n="comp.launch.blank">a new blank page</option>
             <option value="last" data-i18n="comp.launch.last">the last composure used</option>
             <option value="file" data-i18n="comp.launch.file">a specific composure…</option>
             <option value="form" data-i18n="comp.launch.form">a new one from a form…</option>
@@ -13738,6 +13851,34 @@
       </div>
       <div class="modal-foot">
         <button class="proj-save-btn" onclick="saveProjectModal()" data-i18n="misc.save">save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- A composure's own settings (0.4.2), from the composures menu. One
+       collapsible section per concern, so a later per-composure setting is
+       another <details> rather than another dialog. -->
+  <div id="comp-settings-modal" class="hidden" aria-hidden="true">
+    <div class="modal-backdrop" onclick="compCloseSettings()"></div>
+    <div class="modal-panel" role="dialog" aria-labelledby="comp-settings-title">
+      <div class="modal-head">
+        <h3 id="comp-settings-title" data-i18n="comp.settings.title">composure settings</h3>
+        <button class="modal-close" onclick="compCloseSettings()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="cs-name" id="comp-settings-name"></div>
+        <details class="cs-section" open>
+          <summary data-i18n="comp.settings.startup">startup</summary>
+          <label class="cs-check">
+            <input type="checkbox" id="comp-settings-startup">
+            <span data-i18n="comp.settings.startupLabel">open this composure when the project launches</span>
+          </label>
+          <div class="cs-hint" id="comp-settings-hint"></div>
+        </details>
+        <details class="cs-section">
+          <summary data-i18n="comp.settings.about">about this composure</summary>
+          <dl class="cs-facts" id="comp-settings-facts"></dl>
+        </details>
       </div>
     </div>
   </div>
@@ -32706,6 +32847,12 @@
         if (lr.ok) list = (await lr.json()).composures || [];
       } catch (_e) { /* an empty menu still explains itself */ }
       menu.innerHTML = '';
+      const settings = document.createElement('button');
+      settings.type = 'button';
+      settings.dataset.settings = '1';
+      settings.textContent = t('comp.menu.settings', 'this composure’s settings…');
+      menu.appendChild(settings);
+      menu.appendChild(document.createElement('hr'));
       const head1 = document.createElement('div');
       head1.className = 'comp-menu-head';
       head1.textContent = t('comp.menu.newFrom', 'new from form…');
@@ -32741,7 +32888,8 @@
         b.textContent = c.title || c.path.split('/').pop();
         const sub = document.createElement('span');
         sub.className = 'comp-menu-sub';
-        sub.textContent = (c.form || '') + ' · ' + (c.modules || 0);
+        sub.textContent = (c.form || '') + ' · ' + (c.modules || 0)
+          + (c.startup ? ' · ' + t('comp.menu.startup', 'opens at launch') : '');
         b.appendChild(sub);
         menu.appendChild(b);
       }
@@ -32926,7 +33074,7 @@
       const sel = compEl('comp-launch-select');
       const target = compEl('comp-launch-target');
       if (!sel || !target || IS_HOME) return;
-      let block = { launch: 'blank', path: '', form: '' };
+      let block = { launch: 'auto', path: '', form: '' };
       try {
         const r = await fetch('/api/project');
         if (r.ok) {
@@ -32935,8 +33083,8 @@
         }
       } catch (_e) { /* the default is the right fallback */ }
       COMP_LAUNCH = block;
-      sel.value = ['blank', 'last', 'file', 'form'].includes(block.launch)
-        ? block.launch : 'blank';
+      sel.value = ['auto', 'new', 'last', 'file', 'form'].includes(block.launch)
+        ? block.launch : 'auto';
       await compFillLaunchTarget(sel.value, block);
     }
 
@@ -32979,6 +33127,123 @@
       } catch (_e) { /* best effort, like every other project preference */ }
     }
     window.compSaveLaunch = compSaveLaunch;
+
+    // ================================================================
+    // A composure's own settings (0.4.2)
+    // ================================================================
+    //
+    // Opened from the composures menu. The startup section is the
+    // PROJECT's launch setting seen from one composure: ticking posts
+    // `file` + this path, unticking posts `auto`. A project has one
+    // startup composure, so it lives in rness/project.json rather than in
+    // the .comp, and the project window's "on launch, open" row shows the
+    // same value.
+
+    async function compOpenSettings() {
+      const modal = compEl('comp-settings-modal');
+      if (!modal || IS_HOME) return;
+      compCloseMenus();
+      await compFlush();
+      await compFillSettings();
+      modal.classList.remove('hidden');
+    }
+    window.compOpenSettings = compOpenSettings;
+
+    function compCloseSettings() {
+      compEl('comp-settings-modal')?.classList.add('hidden');
+    }
+    window.compCloseSettings = compCloseSettings;
+
+    async function compFillSettings() {
+      let row = null;
+      let block = { launch: 'auto', path: '', form: '' };
+      try {
+        const [lr, pr] = await Promise.all([fetch('/api/composure/list'), fetch('/api/project')]);
+        if (lr.ok) row = ((await lr.json()).composures || []).find((c) => c.path === COMP.path) || null;
+        if (pr.ok) block = (await pr.json()).composure || block;
+      } catch (_e) { /* the modal still opens with what the canvas knows */ }
+      COMP_LAUNCH = block;
+      compEl('comp-settings-name').textContent = COMP.title
+        || (COMP.path || '').split('/').pop() || t('comp.settings.untitled', 'untitled');
+      compSyncStartup();
+      const dl = compEl('comp-settings-facts');
+      dl.innerHTML = '';
+      const facts = [
+        [t('comp.settings.file', 'file'), COMP.path || t('comp.settings.unsaved', 'not saved yet')],
+        [t('comp.settings.form', 'form'), COMP.form || 'blank'],
+        [t('comp.settings.kind', 'kind'), COMP.kind || 'page'],
+        [t('comp.settings.modules', 'modules'),
+          String(row ? row.modules : ((COMP.model && COMP.model.modules) || []).length)],
+        [t('comp.settings.modified', 'modified'), compSettingsWhen(row && row.modified)],
+      ];
+      for (const [label, value] of facts) {
+        const dt = document.createElement('dt');
+        dt.textContent = label;
+        const dd = document.createElement('dd');
+        dd.textContent = value;
+        dl.append(dt, dd);
+      }
+    }
+
+    // An ISO stamp as a local date and time, in the UI language.
+    function compSettingsWhen(iso) {
+      const d = iso ? new Date(iso) : null;
+      if (!d || isNaN(d)) return '—';
+      try {
+        return d.toLocaleString(document.documentElement.lang || undefined,
+          { dateStyle: 'medium', timeStyle: 'short' });
+      } catch (_e) { return iso; }
+    }
+
+    // The tick and the line under it, from COMP_LAUNCH.
+    function compSyncStartup() {
+      const box = compEl('comp-settings-startup');
+      const hint = compEl('comp-settings-hint');
+      if (!box || !hint) return;
+      const L = COMP_LAUNCH || { launch: 'auto' };
+      const mine = !!COMP.path && L.launch === 'file' && L.path === COMP.path;
+      box.checked = mine;
+      box.disabled = !COMP.path;
+      if (!COMP.path) {
+        hint.textContent = t('comp.settings.startupUnsaved',
+          'this page is not saved yet. once something is on it, it can be the one the project opens with.');
+        return;
+      }
+      if (mine) {
+        hint.textContent = t('comp.settings.startupOn',
+          'the project opens here every time. untick to go back to automatic.');
+        return;
+      }
+      let what;
+      if (L.launch === 'file' && L.path) what = L.path.split('/').pop();
+      else if (L.launch === 'form' && L.form) what = t('comp.settings.nowForm', 'a new one from the form “{name}”').replace('{name}', L.form);
+      else if (L.launch === 'new') what = t('comp.launch.blank', 'a new blank page');
+      else if (L.launch === 'last') what = t('comp.launch.last', 'the last composure used');
+      else {
+        hint.textContent = t('comp.settings.startupAuto',
+          'right now this project opens automatically: the only composure with anything in it, or else the last one used.');
+        return;
+      }
+      hint.textContent = t('comp.settings.startupNow', 'right now this project opens: {what}').replace('{what}', what);
+    }
+
+    async function compSaveStartup(on) {
+      if (!COMP.path || IS_HOME) return;
+      const body = on ? { launch: 'file', path: COMP.path } : { launch: 'auto' };
+      try {
+        const r = await fetch('/api/project/composure', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        if (!r.ok) throw new Error('save failed');
+        const d = await r.json();
+        if (d && d.composure) COMP_LAUNCH = d.composure;
+      } catch (_e) {
+        compNotice(t('comp.settings.saveFailed', 'could not save that setting'));
+      }
+      compSyncStartup();
+    }
 
     // ================================================================
     // P4c-2 — INK: the pencil and the eraser
@@ -35473,6 +35738,7 @@
         compAddModule(b.dataset.type);
       });
       compEl('comp-menu').addEventListener('click', (e) => {
+        if (e.target.closest('button[data-settings]')) { compOpenSettings(); return; }
         const save = e.target.closest('button[data-save-form]');
         if (save) { compSaveAsForm(); return; }
         const f = e.target.closest('button[data-form]');
@@ -35698,6 +35964,15 @@
         compSaveLaunch();
       });
       compEl('comp-launch-target')?.addEventListener('change', compSaveLaunch);
+
+      // ---- a composure's settings (0.4.2) ----
+      compEl('comp-settings-startup')?.addEventListener('change',
+        (e) => compSaveStartup(e.target.checked));
+      document.addEventListener('keydown', (e) => {
+        const modal = compEl('comp-settings-modal');
+        if (!modal || modal.classList.contains('hidden')) return;
+        if (e.key === 'Escape') { e.preventDefault(); compCloseSettings(); }
+      });
 
       // ================================================================
       // P4c-2 wiring
@@ -36202,8 +36477,13 @@
         if (m[1] && m[1].startsWith('early')) b = a + 34;
         if (m[1] && m[1].startsWith('late')) a += 66;
         if (m[1] && m[1].startsWith('mid')) { a += 33; b -= 33; }
-      } else if ((m = t0.match(/^(\d{4})s$/))) { a = +m[1]; b = a + 10; }
-      else return null;
+      } else if ((m = t0.match(/^(early |mid |mid-|late )?(\d{4})s$/))) {
+        // A decade, or (0.4.2) an early/mid/late part of one: "late 1950s".
+        a = +m[2]; b = a + 10;
+        if (m[1] && m[1].startsWith('early')) b = a + 4;
+        if (m[1] && m[1].startsWith('late')) a += 6;
+        if (m[1] && m[1].startsWith('mid')) { a += 3; b -= 3; }
+      } else return null;
       return { a, b, by };
     }
     function dictEx(y) {

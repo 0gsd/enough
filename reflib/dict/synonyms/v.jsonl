@@ -27,6 +27,7 @@
 {"word": "vaccinator", "synonym": "inoculator", "via": "vaccinator", "position": 1}
 {"word": "vaccinia", "synonym": "cowpox", "via": "vaccinia", "position": 1}
 {"word": "vaccinia", "synonym": "vaccina", "via": "vaccinia", "position": 2}
+{"word": "vaccinization", "synonym": "vaccination", "via": "vaccinization", "position": 1}
 {"word": "vacillate", "synonym": "fluctuate", "via": "vacillate", "position": 1}
 {"word": "vacillate", "synonym": "waver", "via": "vacillate", "position": 2}
 {"word": "vacillate", "synonym": "hover", "via": "vacillate", "position": 3}
@@ -40,6 +41,7 @@
 {"word": "vacillation", "synonym": "wavering", "via": "vacillation", "position": 4}
 {"word": "vacillator", "synonym": "waverer", "via": "vacillator", "position": 1}
 {"word": "vacillator", "synonym": "hesitater", "via": "vacillator", "position": 2}
+{"word": "vacillatory", "synonym": "irresolute", "via": "vacillatory", "position": 1}
 {"word": "vacuity", "synonym": "inanity", "via": "vacuity", "position": 1}
 {"word": "vacuity", "synonym": "senselessness", "via": "vacuity", "position": 2}
 {"word": "vacuity", "synonym": "mindlessness", "via": "vacuity", "position": 3}
@@ -284,6 +286,8 @@
 {"word": "vapours", "synonym": "vapors", "via": "vapour", "position": 3}
 {"word": "vaquero", "synonym": "buckaroo", "via": "vaquero", "position": 1}
 {"word": "vaquero", "synonym": "buckeroo", "via": "vaquero", "position": 2}
+{"word": "varda", "synonym": "look", "via": "varda", "position": 1}
+{"word": "varec", "synonym": "kelp", "via": "varec", "position": 1}
 {"word": "variability", "synonym": "variableness", "via": "variability", "position": 1}
 {"word": "variability", "synonym": "variance", "via": "variability", "position": 2}
 {"word": "variability", "synonym": "unevenness", "via": "variability", "position": 3}
@@ -401,6 +405,8 @@
 {"word": "vaticinator", "synonym": "prophesier", "via": "vaticinator", "position": 2}
 {"word": "vaticinator", "synonym": "oracle", "via": "vaticinator", "position": 3}
 {"word": "vaticinator", "synonym": "seer", "via": "vaticinator", "position": 4}
+{"word": "vauch", "synonym": "hurry", "via": "vauch", "position": 1}
+{"word": "vauch", "synonym": "rush", "via": "vauch", "position": 2}
 {"word": "vault", "synonym": "hurdle", "via": "vault", "position": 1}
 {"word": "vault", "synonym": "overleap", "via": "vault", "position": 2}
 {"word": "vaulted", "synonym": "domed", "via": "vault", "position": 1}
@@ -451,6 +457,7 @@
 {"word": "vegetive", "synonym": "vegetative", "via": "vegetive", "position": 1}
 {"word": "veggie", "synonym": "vegetable", "via": "veggie", "position": 1}
 {"word": "veggie", "synonym": "veg", "via": "veggie", "position": 2}
+{"word": "vego", "synonym": "vegetarian", "via": "vego", "position": 1}
 {"word": "vehemence", "synonym": "emphasis", "via": "vehemence", "position": 1}
 {"word": "vehemence", "synonym": "ferocity", "via": "vehemence", "position": 2}
 {"word": "vehemence", "synonym": "fierceness", "via": "vehemence", "position": 3}
@@ -478,14 +485,18 @@
 {"word": "veined", "synonym": "veinlike", "via": "veined", "position": 2}
 {"word": "veinlike", "synonym": "veined", "via": "veinlike", "position": 1}
 {"word": "veinlike", "synonym": "venose", "via": "veinlike", "position": 2}
+{"word": "veinstone", "synonym": "gangue", "via": "veinstone", "position": 1}
 {"word": "veld", "synonym": "veldt", "via": "veld", "position": 1}
 {"word": "veldt", "synonym": "veld", "via": "veldt", "position": 1}
+{"word": "velitation", "synonym": "skirmish", "via": "velitation", "position": 1}
+{"word": "velitation", "synonym": "quarrel", "via": "velitation", "position": 2}
 {"word": "velocipede", "synonym": "tricycle", "via": "velocipede", "position": 1}
 {"word": "velocipede", "synonym": "trike", "via": "velocipede", "position": 2}
 {"word": "velocity", "synonym": "speed", "via": "velocity", "position": 1}
 {"word": "velour", "synonym": "velours", "via": "velour", "position": 1}
 {"word": "velours", "synonym": "velour", "via": "velour", "position": 1}
 {"word": "velum", "synonym": "veil", "via": "velum", "position": 1}
+{"word": "velutinous", "synonym": "velvety", "via": "velutinous", "position": 1}
 {"word": "velvet", "synonym": "velvety", "via": "velvet", "position": 1}
 {"word": "velvety", "synonym": "velvet", "via": "velvety", "position": 1}
 {"word": "vena", "synonym": "vein", "via": "vena", "position": 1}
@@ -551,6 +562,7 @@
 {"word": "venial", "synonym": "minor", "via": "venial", "position": 3}
 {"word": "venire", "synonym": "panel", "via": "venire", "position": 1}
 {"word": "venogram", "synonym": "phlebogram", "via": "venogram", "position": 1}
+{"word": "venology", "synonym": "phlebology", "via": "venology", "position": 1}
 {"word": "venom", "synonym": "malice", "via": "venom", "position": 1}
 {"word": "venom", "synonym": "maliciousness", "via": "venom", "position": 2}
 {"word": "venom", "synonym": "spite", "via": "venom", "position": 3}
@@ -592,6 +604,7 @@
 {"word": "ventilation", "synonym": "respiration", "via": "ventilation", "position": 3}
 {"word": "venting", "synonym": "discharge", "via": "vent", "position": 1}
 {"word": "venting", "synonym": "discharge", "via": "venting", "position": 1}
+{"word": "ventose", "synonym": "windy", "via": "ventose", "position": 1}
 {"word": "ventriculus", "synonym": "gizzard", "via": "ventriculus", "position": 1}
 {"word": "ventriloquism", "synonym": "ventriloquy", "via": "ventriloquism", "position": 1}
 {"word": "ventriloquy", "synonym": "ventriloquism", "via": "ventriloquy", "position": 1}
@@ -618,6 +631,7 @@
 {"word": "verandah", "synonym": "gallery", "via": "veranda", "position": 2}
 {"word": "verbalism", "synonym": "verbiage", "via": "verbalism", "position": 1}
 {"word": "verbalism", "synonym": "expression", "via": "verbalism", "position": 2}
+{"word": "verbality", "synonym": "verbosity", "via": "verbality", "position": 1}
 {"word": "verbalize", "synonym": "express", "via": "verbalize", "position": 1}
 {"word": "verbalize", "synonym": "utter", "via": "verbalize", "position": 2}
 {"word": "verbalize", "synonym": "talk", "via": "verbalize", "position": 3}
@@ -712,6 +726,8 @@
 {"word": "vernacular", "synonym": "vulgar", "via": "vernacular", "position": 8}
 {"word": "vernal", "synonym": "youthful", "via": "vernal", "position": 1}
 {"word": "vernal", "synonym": "young", "via": "vernal", "position": 2}
+{"word": "verneuk", "synonym": "cheat", "via": "verneuk", "position": 1}
+{"word": "verneuk", "synonym": "swindle", "via": "verneuk", "position": 2}
 {"word": "veronica", "synonym": "speedwell", "via": "veronica", "position": 1}
 {"word": "verruca", "synonym": "wart", "via": "verruca", "position": 1}
 {"word": "verrucose", "synonym": "warty", "via": "verrucose", "position": 1}
@@ -1014,6 +1030,8 @@
 {"word": "video", "synonym": "picture", "via": "video", "position": 3}
 {"word": "videodisc", "synonym": "videodisk", "via": "videodisc", "position": 1}
 {"word": "videodisk", "synonym": "videodisc", "via": "videodisc", "position": 1}
+{"word": "videogenic", "synonym": "telegenic", "via": "videogenic", "position": 1}
+{"word": "videoplay", "synonym": "teleplay", "via": "videoplay", "position": 1}
 {"word": "videotape", "synonym": "tape", "via": "videotape", "position": 1}
 {"word": "vie", "synonym": "compete", "via": "vie", "position": 1}
 {"word": "vie", "synonym": "contend", "via": "vie", "position": 2}
@@ -1106,6 +1124,7 @@
 {"word": "villainy", "synonym": "villainousness", "via": "villainy", "position": 1}
 {"word": "villein", "synonym": "serf", "via": "villein", "position": 1}
 {"word": "villein", "synonym": "helot", "via": "villein", "position": 2}
+{"word": "villeinage", "synonym": "serfdom", "via": "villeinage", "position": 1}
 {"word": "vim", "synonym": "energy", "via": "vim", "position": 1}
 {"word": "vim", "synonym": "muscularity", "via": "vim", "position": 2}
 {"word": "vim", "synonym": "vigor", "via": "vim", "position": 3}
@@ -1156,6 +1175,7 @@
 {"word": "vino", "synonym": "wine", "via": "vino", "position": 1}
 {"word": "vinous", "synonym": "vinaceous", "via": "vinous", "position": 1}
 {"word": "vintner", "synonym": "winemaker", "via": "vintner", "position": 1}
+{"word": "vinylbenzene", "synonym": "styrene", "via": "vinylbenzene", "position": 1}
 {"word": "violate", "synonym": "rape", "via": "violate", "position": 1}
 {"word": "violate", "synonym": "spoil", "via": "violate", "position": 2}
 {"word": "violate", "synonym": "despoil", "via": "violate", "position": 3}
@@ -1225,6 +1245,7 @@
 {"word": "virile", "synonym": "potent", "via": "virile", "position": 5}
 {"word": "virility", "synonym": "manfulness", "via": "virility", "position": 1}
 {"word": "virility", "synonym": "manliness", "via": "virility", "position": 2}
+{"word": "virilocal", "synonym": "patrilocal", "via": "virilocal", "position": 1}
 {"word": "virtu", "synonym": "vertu", "via": "vertu", "position": 1}
 {"word": "virtual", "synonym": "practical", "via": "virtual", "position": 1}
 {"word": "virtually", "synonym": "about", "via": "virtually", "position": 1}
@@ -1398,10 +1419,12 @@
 {"word": "viticulture", "synonym": "viniculture", "via": "viticulture", "position": 1}
 {"word": "vitreous", "synonym": "glassy", "via": "vitreous", "position": 1}
 {"word": "vitreous", "synonym": "vitrified", "via": "vitreous", "position": 2}
+{"word": "vitrescible", "synonym": "vitrifiable", "via": "vitrescible", "position": 1}
 {"word": "vitrified", "synonym": "glassy", "via": "vitrified", "position": 1}
 {"word": "vitrified", "synonym": "vitreous", "via": "vitrified", "position": 2}
 {"word": "vitrified", "synonym": "glassy", "via": "vitrify", "position": 1}
 {"word": "vitrified", "synonym": "vitreous", "via": "vitrify", "position": 2}
+{"word": "vitriform", "synonym": "vitreous", "via": "vitriform", "position": 1}
 {"word": "vitrine", "synonym": "case", "via": "vitrine", "position": 1}
 {"word": "vitrine", "synonym": "showcase", "via": "vitrine", "position": 2}
 {"word": "vitriol", "synonym": "vituperation", "via": "vitriol", "position": 1}
@@ -1496,6 +1519,8 @@
 {"word": "vocalizing", "synonym": "singing", "via": "vocalizing", "position": 1}
 {"word": "vocation", "synonym": "career", "via": "vocation", "position": 1}
 {"word": "vocation", "synonym": "calling", "via": "vocation", "position": 2}
+{"word": "vociferance", "synonym": "clamor", "via": "vociferance", "position": 1}
+{"word": "vociferance", "synonym": "outcry", "via": "vociferance", "position": 2}
 {"word": "vociferation", "synonym": "cry", "via": "vociferation", "position": 1}
 {"word": "vociferation", "synonym": "outcry", "via": "vociferation", "position": 2}
 {"word": "vociferation", "synonym": "call", "via": "vociferation", "position": 3}
@@ -1508,6 +1533,8 @@
 {"word": "vodoun", "synonym": "voodoo", "via": "voodoo", "position": 1}
 {"word": "vodoun", "synonym": "voodooism", "via": "voodoo", "position": 2}
 {"word": "vodoun", "synonym": "hoodooism", "via": "voodoo", "position": 3}
+{"word": "voema", "synonym": "vim", "via": "voema", "position": 1}
+{"word": "voema", "synonym": "pep", "via": "voema", "position": 2}
 {"word": "vogue", "synonym": "trend", "via": "vogue", "position": 1}
 {"word": "vogue", "synonym": "style", "via": "vogue", "position": 2}
 {"word": "voguish", "synonym": "trendy", "via": "voguish", "position": 1}
@@ -1559,6 +1586,7 @@
 {"word": "voiding", "synonym": "excretion", "via": "voiding", "position": 3}
 {"word": "voiding", "synonym": "excreting", "via": "voiding", "position": 4}
 {"word": "volar", "synonym": "palmar", "via": "volar", "position": 1}
+{"word": "volary", "synonym": "aviary", "via": "volary", "position": 1}
 {"word": "volatile", "synonym": "fickle", "via": "volatile", "position": 1}
 {"word": "volatile", "synonym": "explosive", "via": "volatile", "position": 2}
 {"word": "volatilise", "synonym": "volatilize", "via": "volatilize", "position": 1}
@@ -1576,12 +1604,14 @@
 {"word": "volcanology", "synonym": "vulcanology", "via": "volcanology", "position": 1}
 {"word": "volition", "synonym": "willing", "via": "volition", "position": 1}
 {"word": "volition", "synonym": "will", "via": "volition", "position": 2}
+{"word": "volitionally", "synonym": "voluntarily", "via": "volitionally", "position": 1}
 {"word": "volley", "synonym": "fusillade", "via": "volley", "position": 1}
 {"word": "volley", "synonym": "salvo", "via": "volley", "position": 2}
 {"word": "volley", "synonym": "burst", "via": "volley", "position": 3}
 {"word": "voltage", "synonym": "potential", "via": "voltage", "position": 1}
 {"word": "voltage", "synonym": "emf", "via": "voltage", "position": 2}
 {"word": "voltaic", "synonym": "galvanic", "via": "voltaic", "position": 1}
+{"word": "voltameter", "synonym": "coulometer", "via": "voltameter", "position": 1}
 {"word": "volubility", "synonym": "fluency", "via": "volubility", "position": 1}
 {"word": "volubility", "synonym": "articulateness", "via": "volubility", "position": 2}
 {"word": "volubly", "synonym": "chattily", "via": "volubly", "position": 1}
@@ -1638,6 +1668,8 @@
 {"word": "voluted", "synonym": "volute", "via": "voluted", "position": 5}
 {"word": "voluted", "synonym": "whorled", "via": "voluted", "position": 6}
 {"word": "voluted", "synonym": "turbinate", "via": "voluted", "position": 7}
+{"word": "vom", "synonym": "puke", "via": "vom", "position": 1}
+{"word": "vom", "synonym": "barf", "via": "vom", "position": 2}
 {"word": "vomit", "synonym": "vomiting", "via": "vomit", "position": 1}
 {"word": "vomit", "synonym": "emesis", "via": "vomit", "position": 2}
 {"word": "vomit", "synonym": "regurgitation", "via": "vomit", "position": 3}
@@ -1697,6 +1729,7 @@
 {"word": "vortex", "synonym": "whirl", "via": "vortex", "position": 3}
 {"word": "vortex", "synonym": "swirl", "via": "vortex", "position": 4}
 {"word": "vortex", "synonym": "convolution", "via": "vortex", "position": 5}
+{"word": "vortiginous", "synonym": "vortical", "via": "vortiginous", "position": 1}
 {"word": "vote", "synonym": "ballot", "via": "vote", "position": 1}
 {"word": "vote", "synonym": "voting", "via": "vote", "position": 2}
 {"word": "vote", "synonym": "balloting", "via": "vote", "position": 3}
@@ -1723,6 +1756,7 @@
 {"word": "voyage", "synonym": "sail", "via": "voyage", "position": 1}
 {"word": "voyage", "synonym": "navigate", "via": "voyage", "position": 2}
 {"word": "voyeur", "synonym": "peeper", "via": "voyeur", "position": 1}
+{"word": "vraisemblance", "synonym": "verisimilitude", "via": "vraisemblance", "position": 1}
 {"word": "vulcanisation", "synonym": "vulcanization", "via": "vulcanization", "position": 1}
 {"word": "vulcanise", "synonym": "vulcanize", "via": "vulcanize", "position": 1}
 {"word": "vulcanised", "synonym": "cured", "via": "vulcanize", "position": 1}
@@ -1767,6 +1801,7 @@
 {"word": "vulgarize", "synonym": "generalise", "via": "vulgarize", "position": 5}
 {"word": "vulgarizer", "synonym": "popularizer", "via": "vulgarizer", "position": 1}
 {"word": "vulnerability", "synonym": "exposure", "via": "vulnerability", "position": 1}
+{"word": "vulpecular", "synonym": "vulpine", "via": "vulpecular", "position": 1}
 {"word": "vulture", "synonym": "marauder", "via": "vulture", "position": 1}
 {"word": "vulture", "synonym": "predator", "via": "vulture", "position": 2}
 {"word": "vulture", "synonym": "piranha", "via": "vulture", "position": 3}
@@ -1782,3 +1817,5 @@
 {"word": "vulturous", "synonym": "vulturine", "via": "vulturous", "position": 5}
 {"word": "vulval", "synonym": "vulvar", "via": "vulval", "position": 1}
 {"word": "vulvar", "synonym": "vulval", "via": "vulvar", "position": 1}
+{"word": "vutty", "synonym": "dirty", "via": "vutty", "position": 1}
+{"word": "vutty", "synonym": "grubby", "via": "vutty", "position": 2}

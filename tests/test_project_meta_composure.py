@@ -35,14 +35,25 @@ def raw(project: Path) -> dict:
 # Defaults and reads
 # ---------------------------------------------------------------------------
 
-def test_a_project_with_no_metadata_reads_as_blank(project: Path):
+def test_a_project_with_no_metadata_reads_as_auto(project: Path):
     assert project_meta.load(project)["composure"] == {
-        "launch": "blank", "path": "", "form": "", "last": ""}
+        "launch": "auto", "path": "", "form": "", "last": ""}
+
+
+def test_a_stored_legacy_blank_reads_as_auto(project: Path):
+    """0.3.5–0.4.1 wrote `blank` into every project that opened a
+    composure, as the default rather than a choice. 0.4.2 reads it as the
+    new default; a blank page on purpose is `new`."""
+    (project / project_meta.META_REL).write_text(json.dumps({
+        "composure": {"launch": "blank", "last": REL}}), encoding="utf-8")
+    loaded = project_meta.load(project)["composure"]
+    assert loaded["launch"] == "auto" and loaded["last"] == REL
+    assert project_meta.save_composure(project, "blank")["composure"]["launch"] == "auto"
 
 
 def test_load_is_always_populated_even_from_corrupt_json(project: Path):
     (project / project_meta.META_REL).write_text("{not json", encoding="utf-8")
-    assert project_meta.load(project)["composure"]["launch"] == "blank"
+    assert project_meta.load(project)["composure"]["launch"] == "auto"
 
 
 def test_unknown_keys_in_the_block_are_ignored_not_fatal(project: Path):
@@ -65,11 +76,11 @@ def test_every_launch_mode_round_trips(project: Path, mode: str):
     assert project_meta.load(project)["composure"]["launch"] == mode
 
 
-def test_an_unknown_launch_mode_resolves_to_blank(project: Path):
+def test_an_unknown_launch_mode_resolves_to_auto(project: Path):
     """A project must always open; a garbage setting is not a crash."""
     for bad in ("sideways", "", None, 7, True):
         assert project_meta.save_composure(
-            project, bad)["composure"]["launch"] == "blank"
+            project, bad)["composure"]["launch"] == "auto"
 
 
 def test_omitted_fields_keep_what_is_on_disk(project: Path):
@@ -174,6 +185,27 @@ def test_keys_this_module_does_not_own_survive_a_write(project: Path):
 
 def test_the_file_is_created_when_rness_does_not_exist_yet(tmp_path: Path):
     fresh = tmp_path / "brand-new"
-    saved = project_meta.save_composure(fresh, "blank")
+    saved = project_meta.save_composure(fresh, "new")
     assert (fresh / project_meta.META_REL).is_file()
-    assert saved["composure"]["launch"] == "blank"
+    assert saved["composure"]["launch"] == "new"
+
+
+# ---------------------------------------------------------------------------
+# retarget_composure
+# ---------------------------------------------------------------------------
+
+def test_a_rename_carries_the_startup_path_and_the_trail(project: Path):
+    project_meta.save_composure(project, "file", REL)
+    project_meta.touch_composure(project, REL)
+    moved = "rness/io/composure/chapter-map.comp"
+    after = project_meta.retarget_composure(project, REL, moved)["composure"]
+    assert after == {"launch": "file", "path": moved, "form": "", "last": moved}
+
+
+def test_retarget_leaves_other_composures_alone_and_writes_nothing(project: Path):
+    project_meta.save_composure(project, "file", REL)
+    before = (project / project_meta.META_REL).stat().st_mtime_ns
+    project_meta.retarget_composure(project, "rness/io/composure/x.comp",
+                                    "rness/io/composure/y.comp")
+    assert (project / project_meta.META_REL).stat().st_mtime_ns == before
+    assert project_meta.load(project)["composure"]["path"] == REL

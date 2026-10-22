@@ -9,6 +9,7 @@
 {"word": "oafish", "synonym": "boorish", "via": "oafish", "position": 1}
 {"word": "oafish", "synonym": "loutish", "via": "oafish", "position": 2}
 {"word": "oafish", "synonym": "swinish", "via": "oafish", "position": 3}
+{"word": "oaktag", "synonym": "tagboard", "via": "oaktag", "position": 1}
 {"word": "oarfish", "synonym": "ribbonfish", "via": "oarfish", "position": 1}
 {"word": "oarlock", "synonym": "peg", "via": "oarlock", "position": 1}
 {"word": "oarlock", "synonym": "pin", "via": "oarlock", "position": 2}
@@ -24,6 +25,7 @@
 {"word": "oath", "synonym": "cuss", "via": "oath", "position": 5}
 {"word": "oatmeal", "synonym": "burgoo", "via": "oatmeal", "position": 1}
 {"word": "obbligato", "synonym": "obligato", "via": "obbligato", "position": 1}
+{"word": "obconical", "synonym": "obconic", "via": "obconical", "position": 1}
 {"word": "obduracy", "synonym": "adamance", "via": "obduracy", "position": 1}
 {"word": "obdurate", "synonym": "flinty", "via": "obdurate", "position": 1}
 {"word": "obdurate", "synonym": "flint", "via": "obdurate", "position": 2}
@@ -78,6 +80,7 @@
 {"word": "objective", "synonym": "accusative", "via": "objective", "position": 5}
 {"word": "objectiveness", "synonym": "objectivity", "via": "objectiveness", "position": 1}
 {"word": "objectivity", "synonym": "objectiveness", "via": "objectivity", "position": 1}
+{"word": "objectivize", "synonym": "objectify", "via": "objectivize", "position": 1}
 {"word": "objector", "synonym": "dissenter", "via": "objector", "position": 1}
 {"word": "objector", "synonym": "dissident", "via": "objector", "position": 2}
 {"word": "objector", "synonym": "protester", "via": "objector", "position": 3}
@@ -101,6 +104,8 @@
 {"word": "obligation", "synonym": "duty", "via": "obligation", "position": 1}
 {"word": "obligation", "synonym": "responsibility", "via": "obligation", "position": 2}
 {"word": "obligation", "synonym": "indebtedness", "via": "obligation", "position": 3}
+{"word": "obligational", "synonym": "obligatory", "via": "obligational", "position": 1}
+{"word": "obligative", "synonym": "obligatory", "via": "obligative", "position": 1}
 {"word": "obligato", "synonym": "obbligato", "via": "obbligato", "position": 1}
 {"word": "obligatorily", "synonym": "compulsorily", "via": "obligatorily", "position": 1}
 {"word": "obligatorily", "synonym": "mandatorily", "via": "obligatorily", "position": 2}
@@ -191,6 +196,9 @@
 {"word": "obscurity", "synonym": "obscureness", "via": "obscurity", "position": 1}
 {"word": "obscurity", "synonym": "abstruseness", "via": "obscurity", "position": 2}
 {"word": "obscurity", "synonym": "reconditeness", "via": "obscurity", "position": 3}
+{"word": "obsecrate", "synonym": "beseech", "via": "obsecrate", "position": 1}
+{"word": "obsecrate", "synonym": "entreat", "via": "obsecrate", "position": 2}
+{"word": "obsequence", "synonym": "obsequiousness", "via": "obsequence", "position": 1}
 {"word": "obsequious", "synonym": "bootlicking", "via": "obsequious", "position": 1}
 {"word": "obsequious", "synonym": "fawning", "via": "obsequious", "position": 2}
 {"word": "obsequious", "synonym": "sycophantic", "via": "obsequious", "position": 3}
@@ -217,6 +225,7 @@
 {"word": "observation", "synonym": "notice", "via": "observation", "position": 3}
 {"word": "observation", "synonym": "reflection", "via": "observation", "position": 4}
 {"word": "observation", "synonym": "reflexion", "via": "observation", "position": 5}
+{"word": "observative", "synonym": "observant", "via": "observative", "position": 1}
 {"word": "observatory", "synonym": "lookout", "via": "observatory", "position": 1}
 {"word": "observe", "synonym": "keep", "via": "observe", "position": 1}
 {"word": "observe", "synonym": "maintain", "via": "observe", "position": 2}
@@ -267,6 +276,8 @@
 {"word": "obstinacy", "synonym": "bullheadedness", "via": "obstinacy", "position": 2}
 {"word": "obstinacy", "synonym": "pigheadedness", "via": "obstinacy", "position": 3}
 {"word": "obstinacy", "synonym": "mulishness", "via": "obstinacy", "position": 4}
+{"word": "obstinance", "synonym": "obstinacy", "via": "obstinance", "position": 1}
+{"word": "obstinance", "synonym": "stubbornness", "via": "obstinance", "position": 2}
 {"word": "obstinate", "synonym": "contrary", "via": "obstinate", "position": 1}
 {"word": "obstinate", "synonym": "perverse", "via": "obstinate", "position": 2}
 {"word": "obstinate", "synonym": "wayward", "via": "obstinate", "position": 3}
@@ -328,6 +339,10 @@
 {"word": "obtusely", "synonym": "dumbly", "via": "obtusely", "position": 1}
 {"word": "obtusely", "synonym": "densely", "via": "obtusely", "position": 2}
 {"word": "obtuseness", "synonym": "dullness", "via": "obtuseness", "position": 1}
+{"word": "obumbrant", "synonym": "overhanging", "via": "obumbrant", "position": 1}
+{"word": "obumbrant", "synonym": "projecting", "via": "obumbrant", "position": 2}
+{"word": "obumbrate", "synonym": "overshadow", "via": "obumbrate", "position": 1}
+{"word": "obumbrate", "synonym": "cloud", "via": "obumbrate", "position": 2}
 {"word": "obviate", "synonym": "forefend", "via": "obviate", "position": 1}
 {"word": "obviate", "synonym": "forfend", "via": "obviate", "position": 2}
 {"word": "obviate", "synonym": "avert", "via": "obviate", "position": 3}
@@ -412,7 +427,9 @@
 {"word": "oceangoing", "synonym": "seafaring", "via": "oceangoing", "position": 1}
 {"word": "oceangoing", "synonym": "seagoing", "via": "oceangoing", "position": 2}
 {"word": "oceanic", "synonym": "pelagic", "via": "oceanic", "position": 1}
+{"word": "oceanographical", "synonym": "oceanographic", "via": "oceanographical", "position": 1}
 {"word": "oceanography", "synonym": "oceanology", "via": "oceanography", "position": 1}
+{"word": "oceanologic", "synonym": "oceanographic", "via": "oceanologic", "position": 1}
 {"word": "oceanology", "synonym": "oceanography", "via": "oceanology", "position": 1}
 {"word": "ocellus", "synonym": "eyespot", "via": "ocellus", "position": 1}
 {"word": "ocellus", "synonym": "stemma", "via": "ocellus", "position": 2}
@@ -424,6 +441,8 @@
 {"word": "octad", "synonym": "ogdoad", "via": "octad", "position": 2}
 {"word": "octad", "synonym": "octonary", "via": "octad", "position": 3}
 {"word": "octad", "synonym": "octet", "via": "octad", "position": 4}
+{"word": "octahedrite", "synonym": "anatase", "via": "octahedrite", "position": 1}
+{"word": "octangular", "synonym": "octagonal", "via": "octangular", "position": 1}
 {"word": "octavo", "synonym": "eightvo", "via": "octavo", "position": 1}
 {"word": "octet", "synonym": "octette", "via": "octet", "position": 1}
 {"word": "octet", "synonym": "eight", "via": "octet", "position": 2}
@@ -509,6 +528,8 @@
 {"word": "odium", "synonym": "detestation", "via": "odium", "position": 3}
 {"word": "odium", "synonym": "execration", "via": "odium", "position": 4}
 {"word": "odium", "synonym": "loathing", "via": "odium", "position": 5}
+{"word": "odontalgia", "synonym": "toothache", "via": "odontalgia", "position": 1}
+{"word": "odontiasis", "synonym": "teething", "via": "odontiasis", "position": 1}
 {"word": "odor", "synonym": "smell", "via": "odor", "position": 1}
 {"word": "odor", "synonym": "aroma", "via": "odor", "position": 2}
 {"word": "odor", "synonym": "odour", "via": "odor", "position": 3}
@@ -676,6 +697,7 @@
 {"word": "offshoot", "synonym": "offset", "via": "offshoot", "position": 3}
 {"word": "offshore", "synonym": "seaward", "via": "offshore", "position": 1}
 {"word": "offside", "synonym": "offsides", "via": "offside", "position": 1}
+{"word": "offsider", "synonym": "sidekick", "via": "offsider", "position": 1}
 {"word": "offsides", "synonym": "offside", "via": "offside", "position": 1}
 {"word": "offspring", "synonym": "young", "via": "offspring", "position": 1}
 {"word": "offspring", "synonym": "progeny", "via": "offspring", "position": 2}
@@ -707,6 +729,8 @@
 {"word": "ogre", "synonym": "fiend", "via": "ogre", "position": 2}
 {"word": "ogre", "synonym": "devil", "via": "ogre", "position": 3}
 {"word": "ogre", "synonym": "demon", "via": "ogre", "position": 4}
+{"word": "ogygian", "synonym": "primeval", "via": "ogygian", "position": 1}
+{"word": "ogygian", "synonym": "ancient", "via": "ogygian", "position": 2}
 {"word": "oik", "synonym": "lout", "via": "oik", "position": 1}
 {"word": "oil", "synonym": "petroleum", "via": "oil", "position": 1}
 {"word": "oil", "synonym": "crude", "via": "oil", "position": 2}
@@ -793,9 +817,12 @@
 {"word": "olfaction", "synonym": "smell", "via": "olfaction", "position": 1}
 {"word": "olibanum", "synonym": "frankincense", "via": "olibanum", "position": 1}
 {"word": "olibanum", "synonym": "thus", "via": "olibanum", "position": 2}
+{"word": "olid", "synonym": "fetid", "via": "olid", "position": 1}
 {"word": "oligarchic", "synonym": "oligarchical", "via": "oligarchic", "position": 1}
 {"word": "oligarchical", "synonym": "oligarchic", "via": "oligarchical", "position": 1}
 {"word": "oligoclase", "synonym": "plagioclase", "via": "oligoclase", "position": 1}
+{"word": "oller", "synonym": "wasteland", "via": "oller", "position": 1}
+{"word": "olykoek", "synonym": "doughnut", "via": "olykoek", "position": 1}
 {"word": "omasum", "synonym": "psalterium", "via": "omasum", "position": 1}
 {"word": "ombuds", "synonym": "ombudsman", "via": "ombuds", "position": 1}
 {"word": "omelet", "synonym": "omelette", "via": "omelette", "position": 1}
@@ -833,6 +860,9 @@
 {"word": "omnipresence", "synonym": "ubiquity", "via": "omnipresence", "position": 1}
 {"word": "omnipresence", "synonym": "ubiquitousness", "via": "omnipresence", "position": 2}
 {"word": "omnipresent", "synonym": "ubiquitous", "via": "omnipresent", "position": 1}
+{"word": "omnisexual", "synonym": "pansexual", "via": "omnisexual", "position": 1}
+{"word": "omnishambles", "synonym": "shambles", "via": "omnishambles", "position": 1}
+{"word": "omnishambles", "synonym": "fiasco", "via": "omnishambles", "position": 2}
 {"word": "omphalos", "synonym": "navel", "via": "omphalos", "position": 1}
 {"word": "omphalos", "synonym": "umbilicus", "via": "omphalos", "position": 2}
 {"word": "omphalos", "synonym": "bellybutton", "via": "omphalos", "position": 3}
@@ -856,6 +886,7 @@
 {"word": "oncologic", "synonym": "oncological", "via": "oncologic", "position": 1}
 {"word": "oncological", "synonym": "oncologic", "via": "oncological", "position": 1}
 {"word": "oncoming", "synonym": "onset", "via": "oncoming", "position": 1}
+{"word": "onding", "synonym": "downpour", "via": "onding", "position": 1}
 {"word": "one", "synonym": "ace", "via": "one", "position": 1}
 {"word": "one", "synonym": "single", "via": "one", "position": 2}
 {"word": "one", "synonym": "unity", "via": "one", "position": 3}
@@ -870,6 +901,8 @@
 {"word": "onetime", "synonym": "quondam", "via": "onetime", "position": 4}
 {"word": "onetime", "synonym": "sometime", "via": "onetime", "position": 5}
 {"word": "onionskin", "synonym": "flimsy", "via": "onionskin", "position": 1}
+{"word": "onliest", "synonym": "sole", "via": "onliest", "position": 1}
+{"word": "onliest", "synonym": "lone", "via": "onliest", "position": 2}
 {"word": "only", "synonym": "alone", "via": "only", "position": 1}
 {"word": "only", "synonym": "lone", "via": "only", "position": 2}
 {"word": "only", "synonym": "sole", "via": "only", "position": 3}
@@ -940,11 +973,13 @@
 {"word": "oodles", "synonym": "rafts", "via": "oodles", "position": 9}
 {"word": "oodles", "synonym": "slews", "via": "oodles", "position": 10}
 {"word": "ooh", "synonym": "aah", "via": "ooh", "position": 1}
+{"word": "ooky", "synonym": "icky", "via": "ooky", "position": 1}
 {"word": "oomph", "synonym": "dynamism", "via": "oomph", "position": 1}
 {"word": "oomph", "synonym": "zing", "via": "oomph", "position": 2}
 {"word": "oomph", "synonym": "desirability", "via": "oomph", "position": 3}
 {"word": "oomph", "synonym": "desirableness", "via": "oomph", "position": 4}
 {"word": "oophorectomy", "synonym": "ovariectomy", "via": "oophorectomy", "position": 1}
+{"word": "oose", "synonym": "fluff", "via": "oose", "position": 1}
 {"word": "ooze", "synonym": "seepage", "via": "ooze", "position": 1}
 {"word": "ooze", "synonym": "oozing", "via": "ooze", "position": 2}
 {"word": "ooze", "synonym": "sludge", "via": "ooze", "position": 3}
@@ -1077,6 +1112,7 @@
 {"word": "ophthalmic", "synonym": "ocular", "via": "ophthalmic", "position": 1}
 {"word": "ophthalmic", "synonym": "optic", "via": "ophthalmic", "position": 2}
 {"word": "ophthalmic", "synonym": "optical", "via": "ophthalmic", "position": 3}
+{"word": "ophthalmitis", "synonym": "ophthalmia", "via": "ophthalmitis", "position": 1}
 {"word": "opine", "synonym": "think", "via": "opine", "position": 1}
 {"word": "opine", "synonym": "suppose", "via": "opine", "position": 2}
 {"word": "opine", "synonym": "imagine", "via": "opine", "position": 3}
@@ -1097,6 +1133,7 @@
 {"word": "opinionative", "synonym": "opinionated", "via": "opinionative", "position": 1}
 {"word": "opossum", "synonym": "possum", "via": "opossum", "position": 1}
 {"word": "opossum", "synonym": "phalanger", "via": "opossum", "position": 2}
+{"word": "opotherapy", "synonym": "organotherapy", "via": "opotherapy", "position": 1}
 {"word": "opponent", "synonym": "adversary", "via": "opponent", "position": 1}
 {"word": "opponent", "synonym": "antagonist", "via": "opponent", "position": 2}
 {"word": "opponent", "synonym": "opposer", "via": "opponent", "position": 3}
@@ -1167,6 +1204,8 @@
 {"word": "opprobrium", "synonym": "infamy", "via": "opprobrium", "position": 1}
 {"word": "opprobrium", "synonym": "obloquy", "via": "opprobrium", "position": 2}
 {"word": "oppugn", "synonym": "question", "via": "oppugn", "position": 1}
+{"word": "oppugnant", "synonym": "antagonistic", "via": "oppugnant", "position": 1}
+{"word": "oppugnant", "synonym": "hostile", "via": "oppugnant", "position": 2}
 {"word": "opt", "synonym": "choose", "via": "opt", "position": 1}
 {"word": "opt", "synonym": "prefer", "via": "opt", "position": 2}
 {"word": "optic", "synonym": "eye", "via": "optic", "position": 1}
@@ -1472,6 +1511,7 @@
 {"word": "orneriness", "synonym": "cussedness", "via": "orneriness", "position": 1}
 {"word": "ornery", "synonym": "cantankerous", "via": "ornery", "position": 1}
 {"word": "ornery", "synonym": "crotchety", "via": "ornery", "position": 2}
+{"word": "ornithoid", "synonym": "birdlike", "via": "ornithoid", "position": 1}
 {"word": "ornithosis", "synonym": "psittacosis", "via": "ornithosis", "position": 1}
 {"word": "orography", "synonym": "orology", "via": "orography", "position": 1}
 {"word": "oroide", "synonym": "oreide", "via": "oroide", "position": 1}
@@ -1503,11 +1543,13 @@
 {"word": "orthogonal", "synonym": "extraneous", "via": "orthogonal", "position": 2}
 {"word": "orthogonal", "synonym": "immaterial", "via": "orthogonal", "position": 3}
 {"word": "orthogonal", "synonym": "impertinent", "via": "orthogonal", "position": 4}
+{"word": "orthomorphic", "synonym": "conformal", "via": "orthomorphic", "position": 1}
 {"word": "orthopaedic", "synonym": "orthopedic", "via": "orthopedic", "position": 1}
 {"word": "orthopaedics", "synonym": "orthopedics", "via": "orthopedics", "position": 1}
 {"word": "orthopedic", "synonym": "orthopaedic", "via": "orthopedic", "position": 1}
 {"word": "orthopedics", "synonym": "orthopaedics", "via": "orthopedics", "position": 1}
 {"word": "orthophosphate", "synonym": "phosphate", "via": "orthophosphate", "position": 1}
+{"word": "orthopod", "synonym": "orthopedist", "via": "orthopod", "position": 1}
 {"word": "oscillate", "synonym": "vibrate", "via": "oscillate", "position": 1}
 {"word": "oscillate", "synonym": "hover", "via": "oscillate", "position": 2}
 {"word": "oscillate", "synonym": "vacillate", "via": "oscillate", "position": 3}
@@ -1524,6 +1566,7 @@
 {"word": "osculate", "synonym": "buss", "via": "osculate", "position": 3}
 {"word": "osculation", "synonym": "kiss", "via": "osculation", "position": 1}
 {"word": "osculation", "synonym": "buss", "via": "osculation", "position": 2}
+{"word": "osmidrosis", "synonym": "bromhidrosis", "via": "osmidrosis", "position": 1}
 {"word": "osmiridium", "synonym": "iridosmine", "via": "osmiridium", "position": 1}
 {"word": "osseous", "synonym": "osteal", "via": "osseous", "position": 1}
 {"word": "osseous", "synonym": "bony", "via": "osseous", "position": 2}
@@ -1543,6 +1586,7 @@
 {"word": "ostensibly", "synonym": "seemingly", "via": "ostensibly", "position": 2}
 {"word": "ostensive", "synonym": "ostensible", "via": "ostensive", "position": 1}
 {"word": "ostensorium", "synonym": "monstrance", "via": "ostensorium", "position": 1}
+{"word": "ostensory", "synonym": "monstrance", "via": "ostensory", "position": 1}
 {"word": "ostentation", "synonym": "pomposity", "via": "ostentation", "position": 1}
 {"word": "ostentation", "synonym": "pompousness", "via": "ostentation", "position": 2}
 {"word": "ostentation", "synonym": "puffiness", "via": "ostentation", "position": 3}
@@ -1552,6 +1596,7 @@
 {"word": "ostentation", "synonym": "flash", "via": "ostentation", "position": 7}
 {"word": "ostentatious", "synonym": "pretentious", "via": "ostentatious", "position": 1}
 {"word": "ostentatiously", "synonym": "showily", "via": "ostentatiously", "position": 1}
+{"word": "osteoarthrosis", "synonym": "osteoarthritis", "via": "osteoarthrosis", "position": 1}
 {"word": "ostiary", "synonym": "doorkeeper", "via": "ostiary", "position": 1}
 {"word": "ostiary", "synonym": "doorman", "via": "ostiary", "position": 2}
 {"word": "ostiary", "synonym": "porter", "via": "ostiary", "position": 3}
@@ -1588,6 +1633,7 @@
 {"word": "otiose", "synonym": "meaningless", "via": "otiose", "position": 8}
 {"word": "otiose", "synonym": "pointless", "via": "otiose", "position": 9}
 {"word": "otiose", "synonym": "purposeless", "via": "otiose", "position": 10}
+{"word": "otorhinolaryngology", "synonym": "otolaryngology", "via": "otorhinolaryngology", "position": 1}
 {"word": "ottar", "synonym": "attar", "via": "attar", "position": 1}
 {"word": "ottoman", "synonym": "footstool", "via": "ottoman", "position": 1}
 {"word": "ottoman", "synonym": "footrest", "via": "ottoman", "position": 2}
@@ -1606,6 +1652,8 @@
 {"word": "ousting", "synonym": "ouster", "via": "oust", "position": 1}
 {"word": "ousting", "synonym": "ouster", "via": "ousting", "position": 1}
 {"word": "out", "synonym": "away", "via": "out", "position": 1}
+{"word": "outasight", "synonym": "groovy", "via": "outasight", "position": 1}
+{"word": "outasight", "synonym": "cool", "via": "outasight", "position": 2}
 {"word": "outback", "synonym": "remote", "via": "outback", "position": 1}
 {"word": "outbalance", "synonym": "preponderate", "via": "outbalance", "position": 1}
 {"word": "outbalance", "synonym": "outweigh", "via": "outbalance", "position": 2}
@@ -1659,8 +1707,11 @@
 {"word": "outdoors", "synonym": "open", "via": "outdoors", "position": 1}
 {"word": "outdoors", "synonym": "outside", "via": "outdoors", "position": 2}
 {"word": "outdoors", "synonym": "alfresco", "via": "outdoors", "position": 3}
+{"word": "outen", "synonym": "extinguish", "via": "outen", "position": 1}
+{"word": "outen", "synonym": "douse", "via": "outen", "position": 2}
 {"word": "outermost", "synonym": "outmost", "via": "outer", "position": 1}
 {"word": "outermost", "synonym": "outmost", "via": "outermost", "position": 1}
+{"word": "outersole", "synonym": "outsole", "via": "outersole", "position": 1}
 {"word": "outface", "synonym": "outstare", "via": "outface", "position": 1}
 {"word": "outfit", "synonym": "kit", "via": "outfit", "position": 1}
 {"word": "outfit", "synonym": "getup", "via": "outfit", "position": 2}
@@ -1681,6 +1732,7 @@
 {"word": "outflow", "synonym": "effluence", "via": "outflow", "position": 7}
 {"word": "outflow", "synonym": "efflux", "via": "outflow", "position": 8}
 {"word": "outflowing", "synonym": "effluent", "via": "outflowing", "position": 1}
+{"word": "outflux", "synonym": "outflow", "via": "outflux", "position": 1}
 {"word": "outfox", "synonym": "outwit", "via": "outfox", "position": 1}
 {"word": "outfox", "synonym": "overreach", "via": "outfox", "position": 2}
 {"word": "outfox", "synonym": "outsmart", "via": "outfox", "position": 3}
@@ -1721,6 +1773,8 @@
 {"word": "outing", "synonym": "expedition", "via": "outing", "position": 4}
 {"word": "outing", "synonym": "sashay", "via": "outing", "position": 5}
 {"word": "outing", "synonym": "picnic", "via": "outing", "position": 6}
+{"word": "outjockey", "synonym": "outwit", "via": "outjockey", "position": 1}
+{"word": "outjockey", "synonym": "outmaneuver", "via": "outjockey", "position": 2}
 {"word": "outlander", "synonym": "foreigner", "via": "outlander", "position": 1}
 {"word": "outlander", "synonym": "alien", "via": "outlander", "position": 2}
 {"word": "outlander", "synonym": "noncitizen", "via": "outlander", "position": 3}
@@ -1858,6 +1912,7 @@
 {"word": "outright", "synonym": "unlimited", "via": "outright", "position": 1}
 {"word": "outright", "synonym": "instantly", "via": "outright", "position": 2}
 {"word": "outrival", "synonym": "outvie", "via": "outrival", "position": 1}
+{"word": "outrunner", "synonym": "forerunner", "via": "outrunner", "position": 1}
 {"word": "outscore", "synonym": "outpoint", "via": "outscore", "position": 1}
 {"word": "outset", "synonym": "beginning", "via": "outset", "position": 1}
 {"word": "outset", "synonym": "commencement", "via": "outset", "position": 2}
@@ -2030,6 +2085,8 @@
 {"word": "overbold", "synonym": "saucy", "via": "overbold", "position": 5}
 {"word": "overbold", "synonym": "sassy", "via": "overbold", "position": 6}
 {"word": "overbold", "synonym": "wise", "via": "overbold", "position": 7}
+{"word": "overboot", "synonym": "overshoe", "via": "overboot", "position": 1}
+{"word": "overbrave", "synonym": "foolhardy", "via": "overbrave", "position": 1}
 {"word": "overburden", "synonym": "overload", "via": "overburden", "position": 1}
 {"word": "overcall", "synonym": "overbid", "via": "overcall", "position": 1}
 {"word": "overcast", "synonym": "overcasting", "via": "overcast", "position": 1}
@@ -2088,6 +2145,8 @@
 {"word": "overeat", "synonym": "gourmandize", "via": "overeat", "position": 10}
 {"word": "overeating", "synonym": "gluttony", "via": "overeat", "position": 1}
 {"word": "overeating", "synonym": "gluttony", "via": "overeating", "position": 1}
+{"word": "overegg", "synonym": "overdo", "via": "overegg", "position": 1}
+{"word": "overegg", "synonym": "overstate", "via": "overegg", "position": 2}
 {"word": "overemotional", "synonym": "sloppy", "via": "overemotional", "position": 1}
 {"word": "overemphasize", "synonym": "overstress", "via": "overemphasize", "position": 1}
 {"word": "overestimate", "synonym": "overestimation", "via": "overestimate", "position": 1}
@@ -2193,6 +2252,7 @@
 {"word": "overlooked", "synonym": "unnoted", "via": "overlook", "position": 2}
 {"word": "overlooked", "synonym": "unmarked", "via": "overlooked", "position": 1}
 {"word": "overlooked", "synonym": "unnoted", "via": "overlooked", "position": 2}
+{"word": "overlooker", "synonym": "overseer", "via": "overlooker", "position": 1}
 {"word": "overlooking", "synonym": "commanding", "via": "overlook", "position": 1}
 {"word": "overlooking", "synonym": "dominating", "via": "overlook", "position": 2}
 {"word": "overlord", "synonym": "master", "via": "overlord", "position": 1}
@@ -2202,6 +2262,8 @@
 {"word": "overlying", "synonym": "superimposed", "via": "overlying", "position": 1}
 {"word": "overmaster", "synonym": "overpower", "via": "overmaster", "position": 1}
 {"word": "overmaster", "synonym": "overwhelm", "via": "overmaster", "position": 2}
+{"word": "overmatter", "synonym": "overset", "via": "overmatter", "position": 1}
+{"word": "overmeasure", "synonym": "surplus", "via": "overmeasure", "position": 1}
 {"word": "overmodest", "synonym": "coy", "via": "overmodest", "position": 1}
 {"word": "overmodest", "synonym": "demure", "via": "overmodest", "position": 2}
 {"word": "overmuch", "synonym": "overabundance", "via": "overmuch", "position": 1}
@@ -2211,6 +2273,7 @@
 {"word": "overnice", "synonym": "prissy", "via": "overnice", "position": 3}
 {"word": "overnice", "synonym": "squeamish", "via": "overnice", "position": 4}
 {"word": "overnight", "synonym": "nightlong", "via": "overnight", "position": 1}
+{"word": "overpage", "synonym": "overleaf", "via": "overpage", "position": 1}
 {"word": "overpass", "synonym": "flyover", "via": "overpass", "position": 1}
 {"word": "overplay", "synonym": "overact", "via": "overplay", "position": 1}
 {"word": "overplay", "synonym": "ham", "via": "overplay", "position": 2}
@@ -2274,6 +2337,8 @@
 {"word": "overshadow", "synonym": "dwarf", "via": "overshadow", "position": 2}
 {"word": "overshadow", "synonym": "dominate", "via": "overshadow", "position": 3}
 {"word": "overshadow", "synonym": "eclipse", "via": "overshadow", "position": 4}
+{"word": "overshine", "synonym": "outshine", "via": "overshine", "position": 1}
+{"word": "overshine", "synonym": "eclipse", "via": "overshine", "position": 2}
 {"word": "oversight", "synonym": "lapse", "via": "oversight", "position": 1}
 {"word": "oversight", "synonym": "supervision", "via": "oversight", "position": 2}
 {"word": "oversight", "synonym": "supervising", "via": "oversight", "position": 3}
@@ -2357,6 +2422,7 @@
 {"word": "overturned", "synonym": "upset", "via": "overturn", "position": 1}
 {"word": "overturned", "synonym": "upturned", "via": "overturn", "position": 2}
 {"word": "overuse", "synonym": "overdrive", "via": "overuse", "position": 1}
+{"word": "overutilization", "synonym": "overuse", "via": "overutilization", "position": 1}
 {"word": "overvaluation", "synonym": "overestimate", "via": "overvaluation", "position": 1}
 {"word": "overvaluation", "synonym": "overestimation", "via": "overvaluation", "position": 2}
 {"word": "overvalue", "synonym": "overestimate", "via": "overvalue", "position": 1}
@@ -2410,11 +2476,13 @@
 {"word": "ovoid", "synonym": "oviform", "via": "ovoid", "position": 5}
 {"word": "ovoid", "synonym": "prolate", "via": "ovoid", "position": 6}
 {"word": "ovolo", "synonym": "thumb", "via": "ovolo", "position": 1}
+{"word": "ovovitellin", "synonym": "vitellin", "via": "ovovitellin", "position": 1}
 {"word": "owing", "synonym": "outstanding", "via": "owe", "position": 1}
 {"word": "owing", "synonym": "undischarged", "via": "owe", "position": 2}
 {"word": "owing", "synonym": "outstanding", "via": "owing", "position": 1}
 {"word": "owing", "synonym": "undischarged", "via": "owing", "position": 2}
 {"word": "owl", "synonym": "hooter", "via": "owl", "position": 1}
+{"word": "owly", "synonym": "owlish", "via": "owly", "position": 1}
 {"word": "own", "synonym": "have", "via": "own", "position": 1}
 {"word": "own", "synonym": "possess", "via": "own", "position": 2}
 {"word": "own", "synonym": "ain", "via": "own", "position": 3}
@@ -2424,9 +2492,6 @@
 {"word": "oxalacetate", "synonym": "oxaloacetate", "via": "oxaloacetate", "position": 1}
 {"word": "oxalis", "synonym": "sorrel", "via": "oxalis", "position": 1}
 {"word": "oxaloacetate", "synonym": "oxalacetate", "via": "oxaloacetate", "position": 1}
-{"word": "oxen", "synonym": "cattle", "via": "oxen", "position": 1}
-{"word": "oxen", "synonym": "cows", "via": "oxen", "position": 2}
-{"word": "oxen", "synonym": "kine", "via": "oxen", "position": 3}
 {"word": "oxidant", "synonym": "oxidizer", "via": "oxidant", "position": 1}
 {"word": "oxidant", "synonym": "oxidiser", "via": "oxidant", "position": 2}
 {"word": "oxidate", "synonym": "oxidize", "via": "oxidate", "position": 1}
@@ -2437,6 +2502,7 @@
 {"word": "oxidised", "synonym": "oxidized", "via": "oxidized", "position": 1}
 {"word": "oxidiser", "synonym": "oxidant", "via": "oxidizer", "position": 1}
 {"word": "oxidiser", "synonym": "oxidizer", "via": "oxidizer", "position": 2}
+{"word": "oxidization", "synonym": "oxidation", "via": "oxidization", "position": 1}
 {"word": "oxidize", "synonym": "oxidise", "via": "oxidize", "position": 1}
 {"word": "oxidize", "synonym": "oxidate", "via": "oxidize", "position": 2}
 {"word": "oxidized", "synonym": "oxidised", "via": "oxidize", "position": 1}
@@ -2446,7 +2512,9 @@
 {"word": "oxtongue", "synonym": "bitterweed", "via": "oxtongue", "position": 1}
 {"word": "oxtongue", "synonym": "bugloss", "via": "oxtongue", "position": 2}
 {"word": "oxygenate", "synonym": "aerate", "via": "oxygenate", "position": 1}
+{"word": "oxygenize", "synonym": "oxygenate", "via": "oxygenize", "position": 1}
 {"word": "ozocerite", "synonym": "ozokerite", "via": "ozocerite", "position": 1}
 {"word": "ozokerite", "synonym": "ozocerite", "via": "ozocerite", "position": 1}
 {"word": "ozonise", "synonym": "ozonize", "via": "ozonize", "position": 1}
 {"word": "ozonize", "synonym": "ozonise", "via": "ozonize", "position": 1}
+{"word": "ozostomia", "synonym": "halitosis", "via": "ozostomia", "position": 1}

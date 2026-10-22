@@ -6,7 +6,7 @@ description: Looks words up in FEED, the first-party enough english dictionary, 
 # lexicographer
 
 FEED, the **first-party enough english dictionary**, ships with enough: about
-96,000 headwords, each a row of columns. Beside it sits the user's **own
+117,000 headwords, each a row of columns. Beside it sits the user's **own
 dictionary**, which starts empty and holds only what they add. A word in both
 is the user's: their version wins everywhere in enough.
 

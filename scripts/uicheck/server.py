@@ -231,12 +231,29 @@ class ScratchWorld:
         (second / "readme.md").write_text("# Second\n", encoding="utf-8")
         try:
             self.project_server.start()
+            self._pin_blank_launch()
             self._register(second)
             self.home_server.start()
         except BaseException:
             self.__exit__(None, None, None)
             raise
         return self
+
+    def _pin_blank_launch(self) -> None:
+        """Every page load opens a new blank composure, as the recipes assume.
+
+        Since 0.4.2 a project opens on its own composure (`auto`): the only
+        one with anything in it, else the last one used. Here that would be
+        whatever the previous screen or scenario left behind — a council, a
+        cards board — so a reload would land the next recipe on someone
+        else's document. `new` is the user-facing "a new blank page" choice,
+        set through the same endpoint the project window uses."""
+        req = urllib.request.Request(
+            self.project_server.base + "/api/project/composure",
+            data=json.dumps({"launch": "new"}).encode("utf-8"),
+            headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(req, timeout=10) as r:
+            r.read()
 
     def _register(self, project: Path) -> None:
         """Put a second project on the home screen.

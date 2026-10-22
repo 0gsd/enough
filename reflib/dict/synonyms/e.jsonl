@@ -8,6 +8,7 @@
 {"word": "eagerness", "synonym": "avidity", "via": "eagerness", "position": 4}
 {"word": "eagerness", "synonym": "avidness", "via": "eagerness", "position": 5}
 {"word": "eagerness", "synonym": "keenness", "via": "eagerness", "position": 6}
+{"word": "eaglewood", "synonym": "agarwood", "via": "eaglewood", "position": 1}
 {"word": "eagre", "synonym": "bore", "via": "eager", "position": 1}
 {"word": "eagre", "synonym": "eager", "via": "eager", "position": 2}
 {"word": "eagre", "synonym": "bore", "via": "eagre", "position": 1}
@@ -83,6 +84,7 @@
 {"word": "earpiece", "synonym": "earphone", "via": "earpiece", "position": 1}
 {"word": "earpiece", "synonym": "headphone", "via": "earpiece", "position": 2}
 {"word": "earpiece", "synonym": "phone", "via": "earpiece", "position": 3}
+{"word": "earreach", "synonym": "earshot", "via": "earreach", "position": 1}
 {"word": "earshot", "synonym": "hearing", "via": "earshot", "position": 1}
 {"word": "earsplitting", "synonym": "deafening", "via": "earsplitting", "position": 1}
 {"word": "earsplitting", "synonym": "thunderous", "via": "earsplitting", "position": 2}
@@ -115,6 +117,7 @@
 {"word": "earthy", "synonym": "gross", "via": "earthy", "position": 2}
 {"word": "earthy", "synonym": "vulgar", "via": "earthy", "position": 3}
 {"word": "earwax", "synonym": "cerumen", "via": "earwax", "position": 1}
+{"word": "earwigger", "synonym": "eavesdropper", "via": "earwigger", "position": 1}
 {"word": "ease", "synonym": "rest", "via": "ease", "position": 1}
 {"word": "ease", "synonym": "repose", "via": "ease", "position": 2}
 {"word": "ease", "synonym": "relaxation", "via": "ease", "position": 3}
@@ -154,6 +157,7 @@
 {"word": "easterly", "synonym": "easter", "via": "easterly", "position": 1}
 {"word": "easterly", "synonym": "eastern", "via": "easterly", "position": 2}
 {"word": "eastern", "synonym": "easterly", "via": "eastern", "position": 1}
+{"word": "eastmost", "synonym": "easternmost", "via": "eastmost", "position": 1}
 {"word": "eastward", "synonym": "east", "via": "eastward", "position": 1}
 {"word": "eastward", "synonym": "eastbound", "via": "eastward", "position": 2}
 {"word": "eastward", "synonym": "eastwards", "via": "eastward", "position": 3}
@@ -236,6 +240,8 @@
 {"word": "ecdysis", "synonym": "moulting", "via": "ecdysis", "position": 4}
 {"word": "ecesis", "synonym": "establishment", "via": "ecesis", "position": 1}
 {"word": "echidna", "synonym": "anteater", "via": "echidna", "position": 1}
+{"word": "echinulate", "synonym": "spiny", "via": "echinulate", "position": 1}
+{"word": "echinulate", "synonym": "prickly", "via": "echinulate", "position": 2}
 {"word": "echo", "synonym": "reverberation", "via": "echo", "position": 1}
 {"word": "echo", "synonym": "replication", "via": "echo", "position": 2}
 {"word": "echo", "synonym": "repeat", "via": "echo", "position": 3}
@@ -251,6 +257,7 @@
 {"word": "echo", "synonym": "reverberate", "via": "echocardiogram", "position": 6}
 {"word": "echo", "synonym": "recall", "via": "echocardiogram", "position": 7}
 {"word": "echogram", "synonym": "sonogram", "via": "echogram", "position": 1}
+{"word": "echography", "synonym": "ultrasonography", "via": "echography", "position": 1}
 {"word": "echoic", "synonym": "imitative", "via": "echoic", "position": 1}
 {"word": "echoic", "synonym": "onomatopoeic", "via": "echoic", "position": 2}
 {"word": "echoic", "synonym": "onomatopoetic", "via": "echoic", "position": 3}
@@ -302,10 +309,13 @@
 {"word": "ecstatic", "synonym": "rhapsodic", "via": "ecstatic", "position": 4}
 {"word": "ecstatically", "synonym": "rapturously", "via": "ecstatically", "position": 1}
 {"word": "ecstatically", "synonym": "rhapsodically", "via": "ecstatically", "position": 2}
+{"word": "ectal", "synonym": "external", "via": "ectal", "position": 1}
 {"word": "ectoderm", "synonym": "exoderm", "via": "ectoderm", "position": 1}
+{"word": "ectoenzyme", "synonym": "exoenzyme", "via": "ectoenzyme", "position": 1}
 {"word": "ectoparasite", "synonym": "ectozoan", "via": "ectoparasite", "position": 1}
 {"word": "ectoparasite", "synonym": "ectozoon", "via": "ectoparasite", "position": 2}
 {"word": "ectoparasite", "synonym": "epizoon", "via": "ectoparasite", "position": 3}
+{"word": "ectoproct", "synonym": "bryozoan", "via": "ectoproct", "position": 1}
 {"word": "ectotherm", "synonym": "poikilotherm", "via": "ectotherm", "position": 1}
 {"word": "ectothermic", "synonym": "poikilothermic", "via": "ectothermic", "position": 1}
 {"word": "ectozoan", "synonym": "ectoparasite", "via": "ectozoan", "position": 1}
@@ -413,6 +423,7 @@
 {"word": "educate", "synonym": "civilise", "via": "educate", "position": 7}
 {"word": "educated", "synonym": "enlightened", "via": "educate", "position": 1}
 {"word": "educated", "synonym": "enlightened", "via": "educated", "position": 1}
+{"word": "educatee", "synonym": "student", "via": "educatee", "position": 1}
 {"word": "education", "synonym": "instruction", "via": "education", "position": 1}
 {"word": "education", "synonym": "teaching", "via": "education", "position": 2}
 {"word": "education", "synonym": "pedagogy", "via": "education", "position": 3}
@@ -423,6 +434,8 @@
 {"word": "educationist", "synonym": "educationalist", "via": "educationist", "position": 1}
 {"word": "educator", "synonym": "pedagogue", "via": "educator", "position": 1}
 {"word": "educator", "synonym": "pedagog", "via": "educator", "position": 2}
+{"word": "educatory", "synonym": "educative", "via": "educatory", "position": 1}
+{"word": "educatory", "synonym": "educational", "via": "educatory", "position": 2}
 {"word": "educe", "synonym": "derive", "via": "educe", "position": 1}
 {"word": "educe", "synonym": "evoke", "via": "educe", "position": 2}
 {"word": "educe", "synonym": "elicit", "via": "educe", "position": 3}
@@ -468,6 +481,7 @@
 {"word": "effected", "synonym": "accomplished", "via": "effected", "position": 1}
 {"word": "effected", "synonym": "established", "via": "effected", "position": 2}
 {"word": "effecter", "synonym": "effector", "via": "effector", "position": 1}
+{"word": "effectful", "synonym": "effectual", "via": "effectful", "position": 1}
 {"word": "effective", "synonym": "efficient", "via": "effective", "position": 1}
 {"word": "effective", "synonym": "good", "via": "effective", "position": 2}
 {"word": "effective", "synonym": "effectual", "via": "effective", "position": 3}
@@ -656,6 +670,7 @@
 {"word": "eightfold", "synonym": "octuple", "via": "eightfold", "position": 1}
 {"word": "eightvo", "synonym": "octavo", "via": "eightvo", "position": 1}
 {"word": "eighty", "synonym": "fourscore", "via": "eighty", "position": 1}
+{"word": "eina", "synonym": "ouch", "via": "eina", "position": 1}
 {"word": "einstein", "synonym": "genius", "via": "einstein", "position": 1}
 {"word": "einstein", "synonym": "mastermind", "via": "einstein", "position": 2}
 {"word": "einstein", "synonym": "brain", "via": "einstein", "position": 3}
@@ -711,6 +726,7 @@
 {"word": "elastic", "synonym": "flexible", "via": "elastic", "position": 1}
 {"word": "elastic", "synonym": "pliable", "via": "elastic", "position": 2}
 {"word": "elastic", "synonym": "pliant", "via": "elastic", "position": 3}
+{"word": "elasticate", "synonym": "elasticize", "via": "elasticate", "position": 1}
 {"word": "elasticity", "synonym": "snap", "via": "elasticity", "position": 1}
 {"word": "elate", "synonym": "uplift", "via": "elate", "position": 1}
 {"word": "elate", "synonym": "intoxicate", "via": "elate", "position": 2}
@@ -766,8 +782,10 @@
 {"word": "electrifying", "synonym": "thrilling", "via": "electrify", "position": 1}
 {"word": "electrifying", "synonym": "thrilling", "via": "electrifying", "position": 1}
 {"word": "electrocute", "synonym": "fry", "via": "electrocute", "position": 1}
+{"word": "electroendosmosis", "synonym": "electroosmosis", "via": "electroendosmosis", "position": 1}
 {"word": "electron", "synonym": "negatron", "via": "electron", "position": 1}
 {"word": "electrostatic", "synonym": "static", "via": "electrostatic", "position": 1}
+{"word": "electrotechnics", "synonym": "electrotechnology", "via": "electrotechnics", "position": 1}
 {"word": "electrotherapy", "synonym": "galvanism", "via": "electrotherapy", "position": 1}
 {"word": "eleemosynary", "synonym": "beneficent", "via": "eleemosynary", "position": 1}
 {"word": "eleemosynary", "synonym": "benevolent", "via": "eleemosynary", "position": 2}
@@ -837,6 +855,7 @@
 {"word": "elfin", "synonym": "elvish", "via": "elfin", "position": 4}
 {"word": "elfish", "synonym": "elfin", "via": "elfish", "position": 1}
 {"word": "elfish", "synonym": "elvish", "via": "elfish", "position": 2}
+{"word": "elfland", "synonym": "fairyland", "via": "elfland", "position": 1}
 {"word": "elflike", "synonym": "elfin", "via": "elflike", "position": 1}
 {"word": "elicit", "synonym": "educe", "via": "elicit", "position": 1}
 {"word": "elicit", "synonym": "evoke", "via": "elicit", "position": 2}
@@ -891,6 +910,7 @@
 {"word": "elliptical", "synonym": "ovoid", "via": "elliptical", "position": 5}
 {"word": "elliptical", "synonym": "prolate", "via": "elliptical", "position": 6}
 {"word": "ellipticity", "synonym": "oblateness", "via": "ellipticity", "position": 1}
+{"word": "elocute", "synonym": "declaim", "via": "elocute", "position": 1}
 {"word": "elodea", "synonym": "pondweed", "via": "elodea", "position": 1}
 {"word": "elongate", "synonym": "stretch", "via": "elongate", "position": 1}
 {"word": "elongate", "synonym": "elongated", "via": "elongate", "position": 2}
@@ -910,6 +930,7 @@
 {"word": "eloquent", "synonym": "fluent", "via": "eloquent", "position": 2}
 {"word": "eloquent", "synonym": "silver", "via": "eloquent", "position": 3}
 {"word": "eloquently", "synonym": "articulately", "via": "eloquently", "position": 1}
+{"word": "elsewise", "synonym": "otherwise", "via": "elsewise", "position": 1}
 {"word": "elucidate", "synonym": "clear", "via": "elucidate", "position": 1}
 {"word": "elucidate", "synonym": "crystallize", "via": "elucidate", "position": 2}
 {"word": "elucidate", "synonym": "crystallise", "via": "elucidate", "position": 3}
@@ -1034,6 +1055,8 @@
 {"word": "embezzlement", "synonym": "misapplication", "via": "embezzlement", "position": 3}
 {"word": "embezzler", "synonym": "defalcator", "via": "embezzler", "position": 1}
 {"word": "embezzler", "synonym": "peculator", "via": "embezzler", "position": 2}
+{"word": "embiggen", "synonym": "enlarge", "via": "embiggen", "position": 1}
+{"word": "embiggen", "synonym": "expand", "via": "embiggen", "position": 2}
 {"word": "embitter", "synonym": "envenom", "via": "embitter", "position": 1}
 {"word": "embitter", "synonym": "acerbate", "via": "embitter", "position": 2}
 {"word": "emblazon", "synonym": "blazon", "via": "emblazon", "position": 1}
@@ -1048,6 +1071,7 @@
 {"word": "emblematical", "synonym": "emblematic", "via": "emblematical", "position": 1}
 {"word": "emblematical", "synonym": "symbolic", "via": "emblematical", "position": 2}
 {"word": "emblematical", "synonym": "symbolical", "via": "emblematical", "position": 3}
+{"word": "emblemize", "synonym": "symbolize", "via": "emblemize", "position": 1}
 {"word": "embodied", "synonym": "bodied", "via": "embodied", "position": 1}
 {"word": "embodied", "synonym": "corporal", "via": "embodied", "position": 2}
 {"word": "embodied", "synonym": "corporate", "via": "embodied", "position": 3}
@@ -1107,6 +1131,7 @@
 {"word": "embroider", "synonym": "dramatize", "via": "embroider", "position": 6}
 {"word": "embroider", "synonym": "dramatise", "via": "embroider", "position": 7}
 {"word": "embroider", "synonym": "broider", "via": "embroider", "position": 8}
+{"word": "embroideress", "synonym": "embroiderer", "via": "embroideress", "position": 1}
 {"word": "embroidery", "synonym": "fancywork", "via": "embroidery", "position": 1}
 {"word": "embroidery", "synonym": "embellishment", "via": "embroidery", "position": 2}
 {"word": "embroil", "synonym": "tangle", "via": "embroil", "position": 1}
@@ -1151,6 +1176,7 @@
 {"word": "emf", "synonym": "voltage", "via": "emf", "position": 1}
 {"word": "emigrant", "synonym": "emigre", "via": "emigrant", "position": 1}
 {"word": "emigration", "synonym": "expatriation", "via": "emigration", "position": 1}
+{"word": "emigratory", "synonym": "migratory", "via": "emigratory", "position": 1}
 {"word": "emigre", "synonym": "emigrant", "via": "emigre", "position": 1}
 {"word": "eminence", "synonym": "distinction", "via": "eminence", "position": 1}
 {"word": "eminence", "synonym": "preeminence", "via": "eminence", "position": 2}
@@ -1167,6 +1193,7 @@
 {"word": "emission", "synonym": "expelling", "via": "emission", "position": 3}
 {"word": "emit", "synonym": "breathe", "via": "emit", "position": 1}
 {"word": "emit", "synonym": "utter", "via": "emit", "position": 2}
+{"word": "emmenia", "synonym": "menses", "via": "emmenia", "position": 1}
 {"word": "emmet", "synonym": "ant", "via": "emmet", "position": 1}
 {"word": "emmet", "synonym": "pismire", "via": "emmet", "position": 2}
 {"word": "emollient", "synonym": "cream", "via": "emollient", "position": 1}
@@ -1275,10 +1302,13 @@
 {"word": "empowered", "synonym": "sceptered", "via": "empowered", "position": 1}
 {"word": "empowered", "synonym": "sceptred", "via": "empowered", "position": 2}
 {"word": "empowerment", "synonym": "authorization", "via": "empowerment", "position": 1}
+{"word": "empt", "synonym": "empty", "via": "empt", "position": 1}
 {"word": "emptiness", "synonym": "vanity", "via": "emptiness", "position": 1}
 {"word": "emptiness", "synonym": "void", "via": "emptiness", "position": 2}
 {"word": "emptiness", "synonym": "vacancy", "via": "emptiness", "position": 3}
 {"word": "emptiness", "synonym": "vacuum", "via": "emptiness", "position": 4}
+{"word": "emptor", "synonym": "buyer", "via": "emptor", "position": 1}
+{"word": "emptor", "synonym": "purchaser", "via": "emptor", "position": 2}
 {"word": "empty", "synonym": "evacuate", "via": "empty", "position": 1}
 {"word": "empty", "synonym": "void", "via": "empty", "position": 2}
 {"word": "empty", "synonym": "discharge", "via": "empty", "position": 3}
@@ -1308,6 +1338,7 @@
 {"word": "emulator", "synonym": "ape", "via": "emulator", "position": 3}
 {"word": "emulator", "synonym": "aper", "via": "emulator", "position": 4}
 {"word": "emulous", "synonym": "rivalrous", "via": "emulous", "position": 1}
+{"word": "emunctory", "synonym": "excretory", "via": "emunctory", "position": 1}
 {"word": "enact", "synonym": "reenact", "via": "enact", "position": 1}
 {"word": "enact", "synonym": "ordain", "via": "enact", "position": 2}
 {"word": "enactment", "synonym": "portrayal", "via": "enactment", "position": 1}
@@ -1358,6 +1389,7 @@
 {"word": "encampment", "synonym": "campground", "via": "encampment", "position": 8}
 {"word": "encapsulate", "synonym": "capsule", "via": "encapsulate", "position": 1}
 {"word": "encapsulate", "synonym": "capsulize", "via": "encapsulate", "position": 2}
+{"word": "encaptivate", "synonym": "captivate", "via": "encaptivate", "position": 1}
 {"word": "encase", "synonym": "incase", "via": "encase", "position": 1}
 {"word": "encase", "synonym": "case", "via": "encase", "position": 2}
 {"word": "encased", "synonym": "cased", "via": "encase", "position": 1}
@@ -1404,6 +1436,8 @@
 {"word": "enchantress", "synonym": "temptress", "via": "enchantress", "position": 2}
 {"word": "enchantress", "synonym": "siren", "via": "enchantress", "position": 3}
 {"word": "enchiridion", "synonym": "handbook", "via": "enchiridion", "position": 1}
+{"word": "encincture", "synonym": "encircle", "via": "encincture", "position": 1}
+{"word": "encincture", "synonym": "gird", "via": "encincture", "position": 2}
 {"word": "encipher", "synonym": "code", "via": "encipher", "position": 1}
 {"word": "encipher", "synonym": "cipher", "via": "encipher", "position": 2}
 {"word": "encipher", "synonym": "cypher", "via": "encipher", "position": 3}
@@ -1570,6 +1604,8 @@
 {"word": "endemic", "synonym": "autochthonous", "via": "endemic", "position": 1}
 {"word": "endemic", "synonym": "indigenous", "via": "endemic", "position": 2}
 {"word": "endemism", "synonym": "indigenousness", "via": "endemism", "position": 1}
+{"word": "endgate", "synonym": "tailboard", "via": "endgate", "position": 1}
+{"word": "endgate", "synonym": "tailgate", "via": "endgate", "position": 2}
 {"word": "ending", "synonym": "termination", "via": "end", "position": 1}
 {"word": "ending", "synonym": "conclusion", "via": "end", "position": 2}
 {"word": "ending", "synonym": "end", "via": "end", "position": 3}
@@ -1595,9 +1631,12 @@
 {"word": "endlessly", "synonym": "unendingly", "via": "endlessly", "position": 5}
 {"word": "endlessly", "synonym": "continuously", "via": "endlessly", "position": 6}
 {"word": "endlessly", "synonym": "interminably", "via": "endlessly", "position": 7}
+{"word": "endoblast", "synonym": "endoderm", "via": "endoblast", "position": 1}
+{"word": "endoblast", "synonym": "hypoblast", "via": "endoblast", "position": 2}
 {"word": "endocarp", "synonym": "stone", "via": "endocarp", "position": 1}
 {"word": "endocarp", "synonym": "pit", "via": "endocarp", "position": 2}
 {"word": "endocrine", "synonym": "hormone", "via": "endocrine", "position": 1}
+{"word": "endocrinous", "synonym": "endocrine", "via": "endocrinous", "position": 1}
 {"word": "endoderm", "synonym": "entoderm", "via": "endoderm", "position": 1}
 {"word": "endoderm", "synonym": "hypoblast", "via": "endoderm", "position": 2}
 {"word": "endogamy", "synonym": "intermarriage", "via": "endogamy", "position": 1}
@@ -1609,6 +1648,8 @@
 {"word": "endomorphic", "synonym": "pyknic", "via": "endomorphic", "position": 1}
 {"word": "endoparasite", "synonym": "entozoan", "via": "endoparasite", "position": 1}
 {"word": "endoparasite", "synonym": "entozoon", "via": "endoparasite", "position": 2}
+{"word": "endoproct", "synonym": "entoproct", "via": "endoproct", "position": 1}
+{"word": "endorsation", "synonym": "endorsement", "via": "endorsation", "position": 1}
 {"word": "endorse", "synonym": "indorse", "via": "endorse", "position": 1}
 {"word": "endorse", "synonym": "certify", "via": "endorse", "position": 2}
 {"word": "endorse", "synonym": "back", "via": "endorse", "position": 3}
@@ -1669,6 +1710,7 @@
 {"word": "enemy", "synonym": "foeman", "via": "enemy", "position": 2}
 {"word": "enemy", "synonym": "opposition", "via": "enemy", "position": 3}
 {"word": "energetic", "synonym": "industrious", "via": "energetic", "position": 1}
+{"word": "energic", "synonym": "energetic", "via": "energic", "position": 1}
 {"word": "energid", "synonym": "protoplast", "via": "energid", "position": 1}
 {"word": "energise", "synonym": "stimulate", "via": "energise", "position": 1}
 {"word": "energise", "synonym": "arouse", "via": "energise", "position": 2}
@@ -1867,6 +1909,7 @@
 {"word": "enhance", "synonym": "heighten", "via": "enhance", "position": 1}
 {"word": "enhance", "synonym": "raise", "via": "enhance", "position": 2}
 {"word": "enhancement", "synonym": "sweetening", "via": "enhancement", "position": 1}
+{"word": "enhearten", "synonym": "hearten", "via": "enhearten", "position": 1}
 {"word": "enigma", "synonym": "mystery", "via": "enigma", "position": 1}
 {"word": "enigma", "synonym": "secret", "via": "enigma", "position": 2}
 {"word": "enigma", "synonym": "riddle", "via": "enigma", "position": 3}
@@ -1883,6 +1926,7 @@
 {"word": "enjoin", "synonym": "order", "via": "enjoin", "position": 1}
 {"word": "enjoin", "synonym": "tell", "via": "enjoin", "position": 2}
 {"word": "enjoin", "synonym": "say", "via": "enjoin", "position": 3}
+{"word": "enjoinder", "synonym": "injunction", "via": "enjoinder", "position": 1}
 {"word": "enjoining", "synonym": "injunction", "via": "enjoin", "position": 1}
 {"word": "enjoy", "synonym": "delight", "via": "enjoy", "position": 1}
 {"word": "enjoy", "synonym": "revel", "via": "enjoy", "position": 2}
@@ -1975,6 +2019,7 @@
 {"word": "ennobling", "synonym": "dignifying", "via": "ennobling", "position": 2}
 {"word": "ennui", "synonym": "boredom", "via": "ennui", "position": 1}
 {"word": "ennui", "synonym": "tedium", "via": "ennui", "position": 2}
+{"word": "ennuied", "synonym": "bored", "via": "ennuied", "position": 1}
 {"word": "enology", "synonym": "oenology", "via": "oenology", "position": 1}
 {"word": "enormity", "synonym": "outrageousness", "via": "enormity", "position": 1}
 {"word": "enormous", "synonym": "tremendous", "via": "enormous", "position": 1}
@@ -2036,6 +2081,7 @@
 {"word": "enroll", "synonym": "recruit", "via": "enroll", "position": 4}
 {"word": "enrollment", "synonym": "registration", "via": "enrollment", "position": 1}
 {"word": "ensconce", "synonym": "settle", "via": "ensconce", "position": 1}
+{"word": "ensepulcher", "synonym": "entomb", "via": "ensepulcher", "position": 1}
 {"word": "enshrine", "synonym": "shrine", "via": "enshrine", "position": 1}
 {"word": "enshroud", "synonym": "shroud", "via": "enshroud", "position": 1}
 {"word": "enshroud", "synonym": "hide", "via": "enshroud", "position": 2}
@@ -2052,6 +2098,7 @@
 {"word": "ensnarl", "synonym": "enmesh", "via": "ensnarl", "position": 1}
 {"word": "ensnarl", "synonym": "mesh", "via": "ensnarl", "position": 2}
 {"word": "ensorcelled", "synonym": "bewitched", "via": "ensorcell", "position": 1}
+{"word": "enspell", "synonym": "bewitch", "via": "enspell", "position": 1}
 {"word": "ensue", "synonym": "result", "via": "ensue", "position": 1}
 {"word": "ensure", "synonym": "see", "via": "ensure", "position": 1}
 {"word": "ensure", "synonym": "check", "via": "ensure", "position": 2}
@@ -2395,6 +2442,7 @@
 {"word": "enwrapped", "synonym": "engrossed", "via": "enwrap", "position": 3}
 {"word": "enwrapped", "synonym": "intent", "via": "enwrap", "position": 4}
 {"word": "enwrapped", "synonym": "wrapped", "via": "enwrap", "position": 5}
+{"word": "enzygotic", "synonym": "monozygotic", "via": "enzygotic", "position": 1}
 {"word": "eolian", "synonym": "aeolian", "via": "aeolian", "position": 1}
 {"word": "eon", "synonym": "aeon", "via": "eon", "position": 1}
 {"word": "eonian", "synonym": "ageless", "via": "eonian", "position": 1}
@@ -2404,6 +2452,7 @@
 {"word": "eonian", "synonym": "perpetual", "via": "eonian", "position": 5}
 {"word": "eonian", "synonym": "unending", "via": "eonian", "position": 6}
 {"word": "eonian", "synonym": "unceasing", "via": "eonian", "position": 7}
+{"word": "epagoge", "synonym": "induction", "via": "epagoge", "position": 1}
 {"word": "eparchy", "synonym": "exarchate", "via": "eparchy", "position": 1}
 {"word": "epaulet", "synonym": "epaulette", "via": "epaulette", "position": 1}
 {"word": "epaulette", "synonym": "epaulet", "via": "epaulette", "position": 1}
@@ -2417,6 +2466,8 @@
 {"word": "ephemeral", "synonym": "fugacious", "via": "ephemeral", "position": 5}
 {"word": "ephemerality", "synonym": "fleetingness", "via": "ephemerality", "position": 1}
 {"word": "ephemeron", "synonym": "ephemeral", "via": "ephemeron", "position": 1}
+{"word": "ephemerous", "synonym": "ephemeral", "via": "ephemerous", "position": 1}
+{"word": "ephemerous", "synonym": "transient", "via": "ephemerous", "position": 2}
 {"word": "epic", "synonym": "epos", "via": "epic", "position": 1}
 {"word": "epic", "synonym": "heroic", "via": "epic", "position": 2}
 {"word": "epic", "synonym": "epical", "via": "epic", "position": 3}
@@ -2471,6 +2522,7 @@
 {"word": "episodic", "synonym": "occasional", "via": "episodic", "position": 1}
 {"word": "epistasis", "synonym": "hypostasis", "via": "epistasis", "position": 1}
 {"word": "epistaxis", "synonym": "nosebleed", "via": "epistaxis", "position": 1}
+{"word": "epistolic", "synonym": "epistolary", "via": "epistolic", "position": 1}
 {"word": "epithet", "synonym": "name", "via": "epithet", "position": 1}
 {"word": "epitome", "synonym": "prototype", "via": "epitome", "position": 1}
 {"word": "epitome", "synonym": "paradigm", "via": "epitome", "position": 2}
@@ -2504,7 +2556,10 @@
 {"word": "equaliser", "synonym": "counterpoise", "via": "equalizer", "position": 3}
 {"word": "equaliser", "synonym": "balance", "via": "equalizer", "position": 4}
 {"word": "equaliser", "synonym": "equalizer", "via": "equalizer", "position": 5}
+{"word": "equalism", "synonym": "egalitarianism", "via": "equalism", "position": 1}
+{"word": "equalist", "synonym": "egalitarian", "via": "equalist", "position": 1}
 {"word": "equalitarian", "synonym": "egalitarian", "via": "equalitarian", "position": 1}
+{"word": "equalitarianism", "synonym": "egalitarianism", "via": "equalitarianism", "position": 1}
 {"word": "equality", "synonym": "equivalence", "via": "equality", "position": 1}
 {"word": "equality", "synonym": "equation", "via": "equality", "position": 2}
 {"word": "equality", "synonym": "par", "via": "equality", "position": 3}
@@ -2550,6 +2605,8 @@
 {"word": "equipoise", "synonym": "balance", "via": "equipoise", "position": 1}
 {"word": "equipoise", "synonym": "equilibrium", "via": "equipoise", "position": 2}
 {"word": "equipoise", "synonym": "counterbalance", "via": "equipoise", "position": 3}
+{"word": "equiponderance", "synonym": "equipoise", "via": "equiponderance", "position": 1}
+{"word": "equiponderate", "synonym": "counterbalance", "via": "equiponderate", "position": 1}
 {"word": "equipped", "synonym": "weaponed", "via": "equip", "position": 1}
 {"word": "equipped", "synonym": "furnished", "via": "equip", "position": 2}
 {"word": "equipped", "synonym": "weaponed", "via": "equipped", "position": 1}
@@ -2719,12 +2776,15 @@
 {"word": "eruption", "synonym": "extravasation", "via": "eruption", "position": 8}
 {"word": "eruptive", "synonym": "igneous", "via": "eruptive", "position": 1}
 {"word": "eryngo", "synonym": "eringo", "via": "eryngo", "position": 1}
+{"word": "erythropsin", "synonym": "rhodopsin", "via": "erythropsin", "position": 1}
 {"word": "escalate", "synonym": "intensify", "via": "escalate", "position": 1}
 {"word": "escallop", "synonym": "scallop", "via": "escallop", "position": 1}
 {"word": "escallop", "synonym": "scollop", "via": "escallop", "position": 2}
 {"word": "escallop", "synonym": "scallop", "via": "scallop", "position": 1}
 {"word": "escallop", "synonym": "scollop", "via": "scallop", "position": 2}
 {"word": "escallop", "synonym": "cutlet", "via": "scallop", "position": 3}
+{"word": "escalope", "synonym": "cutlet", "via": "escalope", "position": 1}
+{"word": "escapable", "synonym": "avoidable", "via": "escapable", "position": 1}
 {"word": "escapade", "synonym": "lark", "via": "escapade", "position": 1}
 {"word": "escapade", "synonym": "adventure", "via": "escapade", "position": 2}
 {"word": "escape", "synonym": "flight", "via": "escape", "position": 1}
@@ -2758,6 +2818,8 @@
 {"word": "esophagus", "synonym": "oesophagus", "via": "oesophagus", "position": 1}
 {"word": "esophagus", "synonym": "gorge", "via": "oesophagus", "position": 2}
 {"word": "esophagus", "synonym": "gullet", "via": "oesophagus", "position": 3}
+{"word": "esoterism", "synonym": "esotericism", "via": "esoterism", "position": 1}
+{"word": "esotery", "synonym": "esotericism", "via": "esotery", "position": 1}
 {"word": "especial", "synonym": "exceptional", "via": "especial", "position": 1}
 {"word": "especial", "synonym": "particular", "via": "especial", "position": 2}
 {"word": "especial", "synonym": "special", "via": "especial", "position": 3}
@@ -2890,6 +2952,8 @@
 {"word": "estival", "synonym": "aestival", "via": "estival", "position": 1}
 {"word": "estivate", "synonym": "aestivate", "via": "estivate", "position": 1}
 {"word": "estivation", "synonym": "aestivation", "via": "aestivation", "position": 1}
+{"word": "estrade", "synonym": "dais", "via": "estrade", "position": 1}
+{"word": "estrade", "synonym": "platform", "via": "estrade", "position": 2}
 {"word": "estragon", "synonym": "tarragon", "via": "estragon", "position": 1}
 {"word": "estrange", "synonym": "alienate", "via": "estrange", "position": 1}
 {"word": "estrange", "synonym": "disaffect", "via": "estrange", "position": 2}
@@ -2960,6 +3024,9 @@
 {"word": "eternize", "synonym": "immortalise", "via": "eternize", "position": 2}
 {"word": "eternize", "synonym": "eternise", "via": "eternize", "position": 3}
 {"word": "eternize", "synonym": "eternalize", "via": "eternize", "position": 4}
+{"word": "ethamine", "synonym": "ethylamine", "via": "ethamine", "position": 1}
+{"word": "ethanal", "synonym": "acetaldehyde", "via": "ethanal", "position": 1}
+{"word": "ethanoyl", "synonym": "acetyl", "via": "ethanoyl", "position": 1}
 {"word": "ethene", "synonym": "ethylene", "via": "ethene", "position": 1}
 {"word": "ether", "synonym": "aether", "via": "ether", "position": 1}
 {"word": "ether", "synonym": "quintessence", "via": "ether", "position": 2}
@@ -2986,6 +3053,8 @@
 {"word": "ethnographical", "synonym": "ethnographic", "via": "ethnographical", "position": 1}
 {"word": "ethnologic", "synonym": "ethnological", "via": "ethnologic", "position": 1}
 {"word": "ethnological", "synonym": "ethnologic", "via": "ethnological", "position": 1}
+{"word": "ethonone", "synonym": "ketene", "via": "ethonone", "position": 1}
+{"word": "ethoxyethane", "synonym": "ether", "via": "ethoxyethane", "position": 1}
 {"word": "ethylene", "synonym": "ethene", "via": "ethylene", "position": 1}
 {"word": "ethyne", "synonym": "acetylene", "via": "ethyne", "position": 1}
 {"word": "ethyne", "synonym": "alkyne", "via": "ethyne", "position": 2}
@@ -3006,10 +3075,14 @@
 {"word": "eucalypt", "synonym": "eucalyptus", "via": "eucalypt", "position": 1}
 {"word": "eucalyptus", "synonym": "eucalypt", "via": "eucalyptus", "position": 1}
 {"word": "eucaryote", "synonym": "eukaryote", "via": "eukaryote", "position": 1}
+{"word": "eucharist", "synonym": "communion", "via": "eucharist", "position": 1}
+{"word": "euchromosome", "synonym": "autosome", "via": "euchromosome", "position": 1}
 {"word": "euclidean", "synonym": "euclidian", "via": "euclidean", "position": 1}
 {"word": "euclidian", "synonym": "euclidean", "via": "euclidian", "position": 1}
 {"word": "eudaemon", "synonym": "eudemon", "via": "eudaemon", "position": 1}
 {"word": "eudemon", "synonym": "eudaemon", "via": "eudaemon", "position": 1}
+{"word": "eugarie", "synonym": "pipi", "via": "eugarie", "position": 1}
+{"word": "euhedral", "synonym": "idiomorphic", "via": "euhedral", "position": 1}
 {"word": "eukaryote", "synonym": "eucaryote", "via": "eukaryote", "position": 1}
 {"word": "eulogise", "synonym": "eulogize", "via": "eulogise", "position": 1}
 {"word": "eulogist", "synonym": "panegyrist", "via": "eulogist", "position": 1}
@@ -3024,6 +3097,8 @@
 {"word": "eulogy", "synonym": "pean", "via": "eulogy", "position": 4}
 {"word": "eulogy", "synonym": "eulogium", "via": "eulogy", "position": 5}
 {"word": "eunuch", "synonym": "castrate", "via": "eunuch", "position": 1}
+{"word": "eunuchize", "synonym": "castrate", "via": "eunuchize", "position": 1}
+{"word": "eunuchize", "synonym": "emasculate", "via": "eunuchize", "position": 2}
 {"word": "euphemise", "synonym": "euphemize", "via": "euphemize", "position": 1}
 {"word": "euphemize", "synonym": "euphemise", "via": "euphemize", "position": 1}
 {"word": "euphony", "synonym": "music", "via": "euphony", "position": 1}
@@ -3094,6 +3169,7 @@
 {"word": "evaporation", "synonym": "vaporization", "via": "evaporation", "position": 3}
 {"word": "evaporation", "synonym": "vapor", "via": "evaporation", "position": 4}
 {"word": "evaporation", "synonym": "vapour", "via": "evaporation", "position": 5}
+{"word": "evaporimeter", "synonym": "atmometer", "via": "evaporimeter", "position": 1}
 {"word": "evasion", "synonym": "escape", "via": "evasion", "position": 1}
 {"word": "evasion", "synonym": "dodging", "via": "evasion", "position": 2}
 {"word": "evasion", "synonym": "nonpayment", "via": "evasion", "position": 3}
@@ -3228,9 +3304,12 @@
 {"word": "evoked", "synonym": "elicited", "via": "evoke", "position": 1}
 {"word": "evolution", "synonym": "development", "via": "evolution", "position": 1}
 {"word": "evolution", "synonym": "phylogeny", "via": "evolution", "position": 2}
+{"word": "evolutional", "synonym": "evolutionary", "via": "evolutional", "position": 1}
+{"word": "evolutive", "synonym": "evolutionary", "via": "evolutive", "position": 1}
 {"word": "evolve", "synonym": "develop", "via": "evolve", "position": 1}
 {"word": "evolve", "synonym": "acquire", "via": "evolve", "position": 2}
 {"word": "evolve", "synonym": "germinate", "via": "evolve", "position": 3}
+{"word": "evulse", "synonym": "extract", "via": "evulse", "position": 1}
 {"word": "ewer", "synonym": "pitcher", "via": "ewer", "position": 1}
 {"word": "exacerbate", "synonym": "worsen", "via": "exacerbate", "position": 1}
 {"word": "exacerbate", "synonym": "aggravate", "via": "exacerbate", "position": 2}
@@ -3308,7 +3387,6 @@
 {"word": "exalted", "synonym": "rarified", "via": "exalted", "position": 6}
 {"word": "exalted", "synonym": "idealistic", "via": "exalted", "position": 7}
 {"word": "exalting", "synonym": "ennobling", "via": "exalt", "position": 1}
-{"word": "exalting", "synonym": "ennobling", "via": "exalting", "position": 1}
 {"word": "exam", "synonym": "examination", "via": "exam", "position": 1}
 {"word": "exam", "synonym": "test", "via": "exam", "position": 2}
 {"word": "exam", "synonym": "examination", "via": "examination", "position": 1}
@@ -3362,6 +3440,7 @@
 {"word": "exasperating", "synonym": "maddening", "via": "exasperating", "position": 4}
 {"word": "exasperating", "synonym": "vexing", "via": "exasperating", "position": 5}
 {"word": "exasperation", "synonym": "aggravation", "via": "exasperation", "position": 1}
+{"word": "excaudate", "synonym": "tailless", "via": "excaudate", "position": 1}
 {"word": "excavate", "synonym": "dig", "via": "excavate", "position": 1}
 {"word": "excavate", "synonym": "hollow", "via": "excavate", "position": 2}
 {"word": "excavate", "synonym": "unearth", "via": "excavate", "position": 3}
@@ -3451,6 +3530,7 @@
 {"word": "exchangeable", "synonym": "standardized", "via": "exchangeable", "position": 3}
 {"word": "exchangeable", "synonym": "standardised", "via": "exchangeable", "position": 4}
 {"word": "exchequer", "synonym": "treasury", "via": "exchequer", "position": 1}
+{"word": "excipulum", "synonym": "exciple", "via": "excipulum", "position": 1}
 {"word": "excise", "synonym": "strike", "via": "excise", "position": 1}
 {"word": "excise", "synonym": "scratch", "via": "excise", "position": 2}
 {"word": "excise", "synonym": "expunge", "via": "excise", "position": 3}
@@ -3564,6 +3644,7 @@
 {"word": "excoriation", "synonym": "abrasion", "via": "excoriation", "position": 1}
 {"word": "excoriation", "synonym": "scratch", "via": "excoriation", "position": 2}
 {"word": "excoriation", "synonym": "scrape", "via": "excoriation", "position": 3}
+{"word": "excorticate", "synonym": "decorticate", "via": "excorticate", "position": 1}
 {"word": "excrement", "synonym": "excretion", "via": "excrement", "position": 1}
 {"word": "excrement", "synonym": "excreta", "via": "excrement", "position": 2}
 {"word": "excrescence", "synonym": "bulge", "via": "excrescence", "position": 1}
@@ -3848,6 +3929,7 @@
 {"word": "exit", "synonym": "release", "via": "exit", "position": 8}
 {"word": "exit", "synonym": "die", "via": "exit", "position": 9}
 {"word": "exit", "synonym": "decease", "via": "exit", "position": 10}
+{"word": "exo", "synonym": "excellent", "via": "exo", "position": 1}
 {"word": "exobiology", "synonym": "astrobiology", "via": "exobiology", "position": 1}
 {"word": "exocarp", "synonym": "epicarp", "via": "exocarp", "position": 1}
 {"word": "exoderm", "synonym": "ectoderm", "via": "exoderm", "position": 1}
@@ -3858,6 +3940,7 @@
 {"word": "exogamy", "synonym": "intermarriage", "via": "exogamy", "position": 1}
 {"word": "exogen", "synonym": "dicot", "via": "exogen", "position": 1}
 {"word": "exogen", "synonym": "dicotyledon", "via": "exogen", "position": 2}
+{"word": "exogenetic", "synonym": "exogenous", "via": "exogenetic", "position": 1}
 {"word": "exonerate", "synonym": "acquit", "via": "exonerate", "position": 1}
 {"word": "exonerate", "synonym": "assoil", "via": "exonerate", "position": 2}
 {"word": "exonerate", "synonym": "clear", "via": "exonerate", "position": 3}
@@ -3874,6 +3957,8 @@
 {"word": "exonerated", "synonym": "exculpated", "via": "exonerated", "position": 4}
 {"word": "exonerated", "synonym": "vindicated", "via": "exonerated", "position": 5}
 {"word": "exoneration", "synonym": "vindication", "via": "exoneration", "position": 1}
+{"word": "exoparasite", "synonym": "ectoparasite", "via": "exoparasite", "position": 1}
+{"word": "exoplasm", "synonym": "ectoplasm", "via": "exoplasm", "position": 1}
 {"word": "exorbitance", "synonym": "outrageousness", "via": "exorbitance", "position": 1}
 {"word": "exorbitant", "synonym": "extortionate", "via": "exorbitant", "position": 1}
 {"word": "exorbitant", "synonym": "outrageous", "via": "exorbitant", "position": 2}
@@ -4053,6 +4138,7 @@
 {"word": "explode", "synonym": "irrupt", "via": "explode", "position": 1}
 {"word": "explode", "synonym": "burst", "via": "explode", "position": 2}
 {"word": "explode", "synonym": "detonate", "via": "explode", "position": 3}
+{"word": "explodent", "synonym": "explosive", "via": "explodent", "position": 1}
 {"word": "exploit", "synonym": "feat", "via": "exploit", "position": 1}
 {"word": "exploit", "synonym": "effort", "via": "exploit", "position": 2}
 {"word": "exploit", "synonym": "work", "via": "exploit", "position": 3}
@@ -4189,6 +4275,7 @@
 {"word": "exquisitely", "synonym": "finely", "via": "exquisitely", "position": 1}
 {"word": "exquisitely", "synonym": "fine", "via": "exquisitely", "position": 2}
 {"word": "exquisitely", "synonym": "delicately", "via": "exquisitely", "position": 3}
+{"word": "exsanguine", "synonym": "bloodless", "via": "exsanguine", "position": 1}
 {"word": "exsert", "synonym": "extend", "via": "exsert", "position": 1}
 {"word": "exsiccate", "synonym": "dehydrate", "via": "exsiccate", "position": 1}
 {"word": "exsiccate", "synonym": "desiccate", "via": "exsiccate", "position": 2}
@@ -4329,6 +4416,7 @@
 {"word": "extoller", "synonym": "lauder", "via": "extoller", "position": 2}
 {"word": "extolment", "synonym": "praise", "via": "extolment", "position": 1}
 {"word": "extolment", "synonym": "kudos", "via": "extolment", "position": 2}
+{"word": "extorsive", "synonym": "extortionate", "via": "extorsive", "position": 1}
 {"word": "extort", "synonym": "squeeze", "via": "extort", "position": 1}
 {"word": "extort", "synonym": "rack", "via": "extort", "position": 2}
 {"word": "extort", "synonym": "gouge", "via": "extort", "position": 3}
@@ -4369,6 +4457,7 @@
 {"word": "extractor", "synonym": "centrifuge", "via": "extractor", "position": 1}
 {"word": "extractor", "synonym": "separator", "via": "extractor", "position": 2}
 {"word": "extradite", "synonym": "deliver", "via": "extradite", "position": 1}
+{"word": "extradural", "synonym": "epidural", "via": "extradural", "position": 1}
 {"word": "extralegal", "synonym": "nonlegal", "via": "extralegal", "position": 1}
 {"word": "extramarital", "synonym": "adulterous", "via": "extramarital", "position": 1}
 {"word": "extraneous", "synonym": "external", "via": "extraneous", "position": 1}
@@ -4380,6 +4469,7 @@
 {"word": "extrapolate", "synonym": "generalize", "via": "extrapolate", "position": 1}
 {"word": "extrapolate", "synonym": "generalise", "via": "extrapolate", "position": 2}
 {"word": "extrapolate", "synonym": "infer", "via": "extrapolate", "position": 3}
+{"word": "extrasensorial", "synonym": "extrasensory", "via": "extrasensorial", "position": 1}
 {"word": "extrasensory", "synonym": "paranormal", "via": "extrasensory", "position": 1}
 {"word": "extravagance", "synonym": "prodigality", "via": "extravagance", "position": 1}
 {"word": "extravagance", "synonym": "lavishness", "via": "extravagance", "position": 2}
@@ -4495,10 +4585,13 @@
 {"word": "exulting", "synonym": "triumphal", "via": "exulting", "position": 5}
 {"word": "exulting", "synonym": "triumphant", "via": "exulting", "position": 6}
 {"word": "exultingly", "synonym": "exultantly", "via": "exultingly", "position": 1}
+{"word": "exute", "synonym": "dispossess", "via": "exute", "position": 1}
+{"word": "exute", "synonym": "divest", "via": "exute", "position": 2}
 {"word": "exuviate", "synonym": "shed", "via": "exuviate", "position": 1}
 {"word": "exuviate", "synonym": "molt", "via": "exuviate", "position": 2}
 {"word": "exuviate", "synonym": "moult", "via": "exuviate", "position": 3}
 {"word": "exuviate", "synonym": "slough", "via": "exuviate", "position": 4}
+{"word": "exxy", "synonym": "pricey", "via": "exxy", "position": 1}
 {"word": "eye", "synonym": "oculus", "via": "eye", "position": 1}
 {"word": "eye", "synonym": "optic", "via": "eye", "position": 2}
 {"word": "eye", "synonym": "center", "via": "eye", "position": 3}

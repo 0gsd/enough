@@ -292,7 +292,8 @@ ERA_ORDER = [
     "mid-16th century", "late 16th century", "17th century", "By the 17th century", "early 17th century",
     "by the early 17th century", "mid 17th century", "late 17th century", "mid 18th century", "1750s",
     "late 18th century", "1790s", "19th century", "1830s", "mid-19th century", "1880s", "1890s",
-    "20th century", "1900s", "1920s", "mid 20th century", "by the mid 20th century", "1960s", "1990s",
+    "20th century", "1900s", "1920s", "mid 20th century", "by the mid 20th century", "early 1950s", "1950s",
+    "late 1950s", "1960s", "1990s",
     "21st century", "2000s", "2020s",
 ]
 
@@ -304,6 +305,7 @@ def test_era_orders_first_use_strings():
     assert D.era_ord("late Middle English") == D.era_ord("Late Middle English")
     assert D.era_ord("by the 17th century") == D.era_ord("By the 17th century")
     assert D.era_ord("mid-17th century") == D.era_ord("mid 17th century")
+    assert D.era_ord("late 1950s") == D.era_ord("Late 1950s") and D.era_group_ord("late 1950s") == D.era_group_ord("1950s")
     assert D.era_ord("Not well attested") is None and D.era_ord("Rare; date uncertain.") is None
     assert D.era_ord(None) is None
     assert D.syllable_count("ba·nan·a") == 3 and D.syllable_count("run") == 1 and D.syllable_count(None) is None

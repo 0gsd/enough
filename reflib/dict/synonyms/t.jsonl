@@ -1,4 +1,5 @@
 {"word": "ta", "synonym": "thanks", "via": "ta", "position": 1}
+{"word": "taata", "synonym": "daddy", "via": "taata", "position": 1}
 {"word": "tab", "synonym": "pill", "via": "tab", "position": 1}
 {"word": "tab", "synonym": "lozenge", "via": "tab", "position": 2}
 {"word": "tab", "synonym": "tablet", "via": "tab", "position": 3}
@@ -46,6 +47,7 @@
 {"word": "tabu", "synonym": "prohibited", "via": "taboo", "position": 4}
 {"word": "tabu", "synonym": "proscribed", "via": "taboo", "position": 5}
 {"word": "tabu", "synonym": "verboten", "via": "taboo", "position": 6}
+{"word": "tabularize", "synonym": "tabulate", "via": "tabularize", "position": 1}
 {"word": "tabulate", "synonym": "table", "via": "tabulate", "position": 1}
 {"word": "tabulator", "synonym": "counter", "via": "tabulator", "position": 1}
 {"word": "tacamahac", "synonym": "hackmatack", "via": "tacamahac", "position": 1}
@@ -154,6 +156,7 @@
 {"word": "tailor", "synonym": "orient", "via": "tailor", "position": 3}
 {"word": "tailor", "synonym": "sew", "via": "tailor", "position": 4}
 {"word": "tailor", "synonym": "cut", "via": "tailor", "position": 5}
+{"word": "tailorable", "synonym": "adaptable", "via": "tailorable", "position": 1}
 {"word": "tailored", "synonym": "bespoke", "via": "tailor", "position": 1}
 {"word": "tailored", "synonym": "bespoken", "via": "tailor", "position": 2}
 {"word": "tailored", "synonym": "trim", "via": "tailor", "position": 3}
@@ -234,6 +237,7 @@
 {"word": "talent", "synonym": "gift", "via": "talent", "position": 2}
 {"word": "talented", "synonym": "gifted", "via": "talented", "position": 1}
 {"word": "talentless", "synonym": "untalented", "via": "talentless", "position": 1}
+{"word": "taleteller", "synonym": "storyteller", "via": "taleteller", "position": 1}
 {"word": "taliped", "synonym": "clubfooted", "via": "taliped", "position": 1}
 {"word": "talipes", "synonym": "clubfoot", "via": "talipes", "position": 1}
 {"word": "talisman", "synonym": "amulet", "via": "talisman", "position": 1}
@@ -278,7 +282,9 @@
 {"word": "tall", "synonym": "marvellous", "via": "tall", "position": 3}
 {"word": "tall", "synonym": "grandiloquent", "via": "tall", "position": 4}
 {"word": "tall", "synonym": "magniloquent", "via": "tall", "position": 5}
+{"word": "tallawah", "synonym": "sturdy", "via": "tallawah", "position": 1}
 {"word": "tallboy", "synonym": "highboy", "via": "tallboy", "position": 1}
+{"word": "tallet", "synonym": "loft", "via": "tallet", "position": 1}
 {"word": "tallis", "synonym": "tallith", "via": "tallit", "position": 1}
 {"word": "tallith", "synonym": "tallis", "via": "tallit", "position": 1}
 {"word": "tallness", "synonym": "height", "via": "tallness", "position": 1}
@@ -576,8 +582,8 @@
 {"word": "tartan", "synonym": "plaid", "via": "tartan", "position": 1}
 {"word": "tartar", "synonym": "calculus", "via": "tartar", "position": 1}
 {"word": "tartar", "synonym": "tophus", "via": "tartar", "position": 2}
-{"word": "tartar", "synonym": "tatar", "via": "tartar", "position": 3}
 {"word": "tartar", "synonym": "dragon", "via": "tartar", "position": 4}
+{"word": "tartarean", "synonym": "infernal", "via": "tartarean", "position": 1}
 {"word": "tartness", "synonym": "bitterness", "via": "tartness", "position": 1}
 {"word": "tartness", "synonym": "acrimony", "via": "tartness", "position": 2}
 {"word": "tartness", "synonym": "acerbity", "via": "tartness", "position": 3}
@@ -644,7 +650,7 @@
 {"word": "tat", "synonym": "tackiness", "via": "tatty", "position": 2}
 {"word": "tat", "synonym": "sleaze", "via": "tatty", "position": 3}
 {"word": "tat", "synonym": "intertwine", "via": "tatty", "position": 4}
-{"word": "tatar", "synonym": "tartar", "via": "tatar", "position": 1}
+{"word": "tata", "synonym": "papa", "via": "tata", "position": 1}
 {"word": "tater", "synonym": "potato", "via": "tater", "position": 1}
 {"word": "tater", "synonym": "murphy", "via": "tater", "position": 2}
 {"word": "tater", "synonym": "spud", "via": "tater", "position": 3}
@@ -727,6 +733,7 @@
 {"word": "tauntingly", "synonym": "teasingly", "via": "tauntingly", "position": 1}
 {"word": "taupe", "synonym": "fuscous", "via": "taupe", "position": 1}
 {"word": "taut", "synonym": "tight", "via": "taut", "position": 1}
+{"word": "tauted", "synonym": "matted", "via": "tauted", "position": 1}
 {"word": "tauten", "synonym": "firm", "via": "tauten", "position": 1}
 {"word": "tautness", "synonym": "tightness", "via": "tautness", "position": 1}
 {"word": "tautness", "synonym": "tension", "via": "tautness", "position": 2}
@@ -735,6 +742,8 @@
 {"word": "tautog", "synonym": "blackfish", "via": "tautog", "position": 1}
 {"word": "tautological", "synonym": "pleonastic", "via": "tautological", "position": 1}
 {"word": "tautological", "synonym": "redundant", "via": "tautological", "position": 2}
+{"word": "tave", "synonym": "flail", "via": "tave", "position": 1}
+{"word": "tave", "synonym": "thrash", "via": "tave", "position": 2}
 {"word": "taw", "synonym": "shooter", "via": "taw", "position": 1}
 {"word": "tawdrily", "synonym": "garishly", "via": "tawdrily", "position": 1}
 {"word": "tawdrily", "synonym": "gaudily", "via": "tawdrily", "position": 2}
@@ -806,6 +815,7 @@
 {"word": "teal", "synonym": "cyan", "via": "teal", "position": 1}
 {"word": "team", "synonym": "squad", "via": "team", "position": 1}
 {"word": "team", "synonym": "squad", "via": "teem", "position": 1}
+{"word": "teamer", "synonym": "teamster", "via": "teamer", "position": 1}
 {"word": "teammate", "synonym": "mate", "via": "teammate", "position": 1}
 {"word": "teamster", "synonym": "trucker", "via": "teamster", "position": 1}
 {"word": "tear", "synonym": "bust", "via": "tear", "position": 1}
@@ -895,9 +905,11 @@
 {"word": "technical", "synonym": "technological", "via": "technical", "position": 3}
 {"word": "technical", "synonym": "mechanical", "via": "technical", "position": 4}
 {"word": "technique", "synonym": "proficiency", "via": "technique", "position": 1}
+{"word": "technofear", "synonym": "technophobia", "via": "technofear", "position": 1}
 {"word": "technological", "synonym": "technical", "via": "technological", "position": 1}
 {"word": "technologist", "synonym": "engineer", "via": "technologist", "position": 1}
 {"word": "technology", "synonym": "engineering", "via": "technology", "position": 1}
+{"word": "technopop", "synonym": "synthpop", "via": "technopop", "position": 1}
 {"word": "techy", "synonym": "cranky", "via": "techy", "position": 1}
 {"word": "techy", "synonym": "fractious", "via": "techy", "position": 2}
 {"word": "techy", "synonym": "irritable", "via": "techy", "position": 3}
@@ -987,6 +999,7 @@
 {"word": "teeter", "synonym": "totter", "via": "teeter", "position": 3}
 {"word": "teeterboard", "synonym": "seesaw", "via": "teeterboard", "position": 1}
 {"word": "teeterboard", "synonym": "teeter", "via": "teeterboard", "position": 2}
+{"word": "teetertotter", "synonym": "seesaw", "via": "teetertotter", "position": 1}
 {"word": "teeth", "synonym": "dentition", "via": "teeth", "position": 1}
 {"word": "teeth", "synonym": "dentition", "via": "tooth", "position": 1}
 {"word": "teething", "synonym": "dentition", "via": "teethe", "position": 1}
@@ -1003,6 +1016,8 @@
 {"word": "teetotaller", "synonym": "teetotalist", "via": "teetotaller", "position": 2}
 {"word": "teetotum", "synonym": "top", "via": "teetotum", "position": 1}
 {"word": "teetotum", "synonym": "whirligig", "via": "teetotum", "position": 2}
+{"word": "teevee", "synonym": "television", "via": "teevee", "position": 1}
+{"word": "tefillah", "synonym": "phylactery", "via": "tefillah", "position": 1}
 {"word": "tefillin", "synonym": "phylactery", "via": "tefillin", "position": 1}
 {"word": "tegument", "synonym": "skin", "via": "tegument", "position": 1}
 {"word": "tegument", "synonym": "cutis", "via": "tegument", "position": 2}
@@ -1010,7 +1025,9 @@
 {"word": "telecast", "synonym": "televise", "via": "telecast", "position": 1}
 {"word": "telecasting", "synonym": "television", "via": "telecast", "position": 1}
 {"word": "telecasting", "synonym": "video", "via": "telecast", "position": 2}
+{"word": "telegnosis", "synonym": "clairvoyance", "via": "telegnosis", "position": 1}
 {"word": "telegram", "synonym": "wire", "via": "telegram", "position": 1}
+{"word": "telegrammatic", "synonym": "telegraphic", "via": "telegrammatic", "position": 1}
 {"word": "telegraph", "synonym": "telegraphy", "via": "telegraph", "position": 1}
 {"word": "telegraph", "synonym": "cable", "via": "telegraph", "position": 2}
 {"word": "telegraph", "synonym": "wire", "via": "telegraph", "position": 3}
@@ -1018,16 +1035,19 @@
 {"word": "telegraphist", "synonym": "telegrapher", "via": "telegraphist", "position": 1}
 {"word": "telegraphy", "synonym": "telegraph", "via": "telegraphy", "position": 1}
 {"word": "telekinesis", "synonym": "psychokinesis", "via": "telekinesis", "position": 1}
+{"word": "telepathist", "synonym": "telepath", "via": "telepathist", "position": 1}
 {"word": "telephone", "synonym": "phone", "via": "telephone", "position": 1}
 {"word": "telephone", "synonym": "telephony", "via": "telephone", "position": 2}
 {"word": "telephone", "synonym": "call", "via": "telephone", "position": 3}
 {"word": "telephone", "synonym": "ring", "via": "telephone", "position": 4}
 {"word": "telephoner", "synonym": "caller", "via": "telephoner", "position": 1}
 {"word": "telephony", "synonym": "telephone", "via": "telephony", "position": 1}
+{"word": "teleplasm", "synonym": "ectoplasm", "via": "teleplasm", "position": 1}
 {"word": "teleprinter", "synonym": "teletypewriter", "via": "teleprinter", "position": 1}
 {"word": "teleprinter", "synonym": "telex", "via": "teleprinter", "position": 2}
 {"word": "telescope", "synonym": "scope", "via": "telescope", "position": 1}
 {"word": "telescoped", "synonym": "shortened", "via": "telescope", "position": 1}
+{"word": "telesthesia", "synonym": "clairvoyance", "via": "telesthesia", "position": 1}
 {"word": "teletypewriter", "synonym": "teleprinter", "via": "teletypewriter", "position": 1}
 {"word": "teletypewriter", "synonym": "telex", "via": "teletypewriter", "position": 2}
 {"word": "televise", "synonym": "telecast", "via": "televise", "position": 1}
@@ -1278,6 +1298,7 @@
 {"word": "tenuous", "synonym": "slight", "via": "tenuous", "position": 3}
 {"word": "tenuous", "synonym": "thin", "via": "tenuous", "position": 4}
 {"word": "tenure", "synonym": "incumbency", "via": "tenure", "position": 1}
+{"word": "tepe", "synonym": "tell", "via": "tepe", "position": 1}
 {"word": "tepee", "synonym": "tipi", "via": "teepee", "position": 1}
 {"word": "tepee", "synonym": "teepee", "via": "teepee", "position": 2}
 {"word": "tepid", "synonym": "halfhearted", "via": "tepid", "position": 1}
@@ -1287,6 +1308,7 @@
 {"word": "tepidly", "synonym": "lukewarmly", "via": "tepidly", "position": 1}
 {"word": "tepidness", "synonym": "lukewarmness", "via": "tepidness", "position": 1}
 {"word": "tepidness", "synonym": "tepidity", "via": "tepidness", "position": 2}
+{"word": "teratosis", "synonym": "teratism", "via": "teratosis", "position": 1}
 {"word": "terce", "synonym": "tierce", "via": "terce", "position": 1}
 {"word": "tercel", "synonym": "tiercel", "via": "tiercel", "position": 1}
 {"word": "tercel", "synonym": "tercelet", "via": "tiercel", "position": 2}
@@ -1449,6 +1471,7 @@
 {"word": "terse", "synonym": "curt", "via": "terse", "position": 2}
 {"word": "terse", "synonym": "laconic", "via": "terse", "position": 3}
 {"word": "tertiary", "synonym": "third", "via": "tertiary", "position": 1}
+{"word": "terzetto", "synonym": "trio", "via": "terzetto", "position": 1}
 {"word": "test", "synonym": "trial", "via": "test", "position": 1}
 {"word": "test", "synonym": "run", "via": "test", "position": 2}
 {"word": "test", "synonym": "tryout", "via": "test", "position": 3}
@@ -1526,6 +1549,7 @@
 {"word": "tetchy", "synonym": "testy", "via": "tetchy", "position": 10}
 {"word": "tether", "synonym": "leash", "via": "tether", "position": 1}
 {"word": "tether", "synonym": "lead", "via": "tether", "position": 2}
+{"word": "tetrabromofluorescein", "synonym": "eosin", "via": "tetrabromofluorescein", "position": 1}
 {"word": "tetrad", "synonym": "four", "via": "tetrad", "position": 1}
 {"word": "tetrad", "synonym": "quaternion", "via": "tetrad", "position": 2}
 {"word": "tetrad", "synonym": "quaternary", "via": "tetrad", "position": 3}
@@ -1535,7 +1559,9 @@
 {"word": "tetrad", "synonym": "foursome", "via": "tetrad", "position": 7}
 {"word": "tetragon", "synonym": "quadrilateral", "via": "tetragon", "position": 1}
 {"word": "tetragon", "synonym": "quadrangle", "via": "tetragon", "position": 2}
+{"word": "tetralite", "synonym": "tetryl", "via": "tetralite", "position": 1}
 {"word": "tetraplegia", "synonym": "quadriplegia", "via": "tetraplegia", "position": 1}
+{"word": "tetrastich", "synonym": "quatrain", "via": "tetrastich", "position": 1}
 {"word": "text", "synonym": "textbook", "via": "text", "position": 1}
 {"word": "text", "synonym": "schoolbook", "via": "text", "position": 2}
 {"word": "textbook", "synonym": "text", "via": "textbook", "position": 1}
@@ -1599,6 +1625,7 @@
 {"word": "theatrical", "synonym": "histrionics", "via": "theatrical", "position": 1}
 {"word": "theatricality", "synonym": "staginess", "via": "theatricality", "position": 1}
 {"word": "theatrically", "synonym": "stagily", "via": "theatrically", "position": 1}
+{"word": "theatricism", "synonym": "theatricality", "via": "theatricism", "position": 1}
 {"word": "theca", "synonym": "sac", "via": "theca", "position": 1}
 {"word": "theelin", "synonym": "estrone", "via": "theelin", "position": 1}
 {"word": "theelin", "synonym": "oestrone", "via": "theelin", "position": 2}
@@ -1606,6 +1633,8 @@
 {"word": "theft", "synonym": "thievery", "via": "theft", "position": 2}
 {"word": "theft", "synonym": "thieving", "via": "theft", "position": 3}
 {"word": "theft", "synonym": "stealing", "via": "theft", "position": 4}
+{"word": "theftproof", "synonym": "secure", "via": "theftproof", "position": 1}
+{"word": "theirn", "synonym": "theirs", "via": "theirn", "position": 1}
 {"word": "theist", "synonym": "theistical", "via": "theist", "position": 1}
 {"word": "theist", "synonym": "theistic", "via": "theist", "position": 2}
 {"word": "theistic", "synonym": "theist", "via": "theistic", "position": 1}
@@ -1624,9 +1653,11 @@
 {"word": "thence", "synonym": "therefrom", "via": "thence", "position": 4}
 {"word": "thence", "synonym": "thereof", "via": "thence", "position": 5}
 {"word": "thenceforth", "synonym": "thereafter", "via": "thenceforth", "position": 1}
+{"word": "theocrasy", "synonym": "syncretism", "via": "theocrasy", "position": 1}
 {"word": "theodolite", "synonym": "transit", "via": "theodolite", "position": 1}
 {"word": "theologian", "synonym": "theologizer", "via": "theologian", "position": 1}
 {"word": "theologise", "synonym": "theologize", "via": "theologize", "position": 1}
+{"word": "theologist", "synonym": "theologian", "via": "theologist", "position": 1}
 {"word": "theologize", "synonym": "theologise", "via": "theologize", "position": 1}
 {"word": "theologizer", "synonym": "theologian", "via": "theologizer", "position": 1}
 {"word": "theology", "synonym": "divinity", "via": "theology", "position": 1}
@@ -1664,6 +1695,7 @@
 {"word": "theorizer", "synonym": "theoretician", "via": "theorizer", "position": 2}
 {"word": "theory", "synonym": "hypothesis", "via": "theory", "position": 1}
 {"word": "theory", "synonym": "possibility", "via": "theory", "position": 2}
+{"word": "theosophic", "synonym": "theosophical", "via": "theosophic", "position": 1}
 {"word": "therapeutic", "synonym": "remedy", "via": "therapeutic", "position": 1}
 {"word": "therapeutic", "synonym": "curative", "via": "therapeutic", "position": 2}
 {"word": "therapeutic", "synonym": "cure", "via": "therapeutic", "position": 3}
@@ -1688,9 +1720,12 @@
 {"word": "thermal", "synonym": "caloric", "via": "thermal", "position": 2}
 {"word": "thermic", "synonym": "thermal", "via": "thermic", "position": 1}
 {"word": "thermic", "synonym": "caloric", "via": "thermic", "position": 2}
+{"word": "thermophosphorescence", "synonym": "thermoluminescence", "via": "thermophosphorescence", "position": 1}
 {"word": "thermoset", "synonym": "thermosetting", "via": "thermoset", "position": 1}
 {"word": "thermosetting", "synonym": "thermoset", "via": "thermosetting", "position": 1}
+{"word": "thersitical", "synonym": "scurrilous", "via": "thersitical", "position": 1}
 {"word": "thesis", "synonym": "dissertation", "via": "thesis", "position": 1}
+{"word": "thesp", "synonym": "actor", "via": "thesp", "position": 1}
 {"word": "thespian", "synonym": "actor", "via": "thespian", "position": 1}
 {"word": "thespian", "synonym": "player", "via": "thespian", "position": 2}
 {"word": "thiamin", "synonym": "thiamine", "via": "thiamine", "position": 1}
@@ -1852,6 +1887,9 @@
 {"word": "thinness", "synonym": "fineness", "via": "thinness", "position": 7}
 {"word": "thinning", "synonym": "cutting", "via": "thin", "position": 1}
 {"word": "thinning", "synonym": "cutting", "via": "thinning", "position": 1}
+{"word": "thioalcohol", "synonym": "thiol", "via": "thioalcohol", "position": 1}
+{"word": "thiocarbamide", "synonym": "thiourea", "via": "thiocarbamide", "position": 1}
+{"word": "thiofuran", "synonym": "thiophene", "via": "thiofuran", "position": 1}
 {"word": "third", "synonym": "tierce", "via": "third", "position": 1}
 {"word": "third", "synonym": "tertiary", "via": "third", "position": 2}
 {"word": "third", "synonym": "thirdly", "via": "third", "position": 3}
@@ -1883,6 +1921,7 @@
 {"word": "tholepin", "synonym": "thole", "via": "tholepin", "position": 3}
 {"word": "tholepin", "synonym": "rowlock", "via": "tholepin", "position": 4}
 {"word": "tholepin", "synonym": "oarlock", "via": "tholepin", "position": 5}
+{"word": "thonder", "synonym": "yonder", "via": "thonder", "position": 1}
 {"word": "thong", "synonym": "lash", "via": "thong", "position": 1}
 {"word": "thoracic", "synonym": "pectoral", "via": "thoracic", "position": 1}
 {"word": "thorax", "synonym": "chest", "via": "thorax", "position": 1}
@@ -1976,6 +2015,8 @@
 {"word": "thousand", "synonym": "grand", "via": "thousand", "position": 2}
 {"word": "thousand", "synonym": "thou", "via": "thousand", "position": 3}
 {"word": "thousand", "synonym": "yard", "via": "thousand", "position": 4}
+{"word": "thraiping", "synonym": "thrashing", "via": "thraiping", "position": 1}
+{"word": "thraiping", "synonym": "drubbing", "via": "thraiping", "position": 2}
 {"word": "thraldom", "synonym": "bondage", "via": "thraldom", "position": 1}
 {"word": "thraldom", "synonym": "slavery", "via": "thraldom", "position": 2}
 {"word": "thraldom", "synonym": "thrall", "via": "thraldom", "position": 3}
@@ -1988,6 +2029,7 @@
 {"word": "thralldom", "synonym": "slavery", "via": "thraldom", "position": 2}
 {"word": "thralldom", "synonym": "thrall", "via": "thraldom", "position": 3}
 {"word": "thralldom", "synonym": "thraldom", "via": "thraldom", "position": 4}
+{"word": "thrang", "synonym": "busy", "via": "thrang", "position": 1}
 {"word": "thrash", "synonym": "cream", "via": "thrash", "position": 1}
 {"word": "thrash", "synonym": "bat", "via": "thrash", "position": 2}
 {"word": "thrash", "synonym": "clobber", "via": "thrash", "position": 3}
@@ -2171,7 +2213,9 @@
 {"word": "throbbing", "synonym": "pounding", "via": "throb", "position": 2}
 {"word": "throbbing", "synonym": "throb", "via": "throbbing", "position": 1}
 {"word": "throbbing", "synonym": "pounding", "via": "throbbing", "position": 2}
+{"word": "thromboclasis", "synonym": "thrombolysis", "via": "thromboclasis", "position": 1}
 {"word": "thrombocyte", "synonym": "platelet", "via": "thrombocyte", "position": 1}
+{"word": "thrombogen", "synonym": "prothrombin", "via": "thrombogen", "position": 1}
 {"word": "thrombokinase", "synonym": "thromboplastin", "via": "thrombokinase", "position": 1}
 {"word": "thromboplastin", "synonym": "thrombokinase", "via": "thromboplastin", "position": 1}
 {"word": "throne", "synonym": "toilet", "via": "throne", "position": 1}
@@ -2248,6 +2292,7 @@
 {"word": "throwback", "synonym": "reversion", "via": "throwback", "position": 2}
 {"word": "throwback", "synonym": "atavist", "via": "throwback", "position": 3}
 {"word": "throwback", "synonym": "atavistic", "via": "throwback", "position": 4}
+{"word": "throwdown", "synonym": "showdown", "via": "throwdown", "position": 1}
 {"word": "thrower", "synonym": "potter", "via": "thrower", "position": 1}
 {"word": "thrower", "synonym": "ceramicist", "via": "thrower", "position": 2}
 {"word": "thrower", "synonym": "ceramist", "via": "thrower", "position": 3}
@@ -2273,11 +2318,6 @@
 {"word": "thrusting", "synonym": "poke", "via": "thrust", "position": 3}
 {"word": "thrusting", "synonym": "poking", "via": "thrust", "position": 4}
 {"word": "thrusting", "synonym": "thrust", "via": "thrust", "position": 5}
-{"word": "thrusting", "synonym": "jab", "via": "thrusting", "position": 1}
-{"word": "thrusting", "synonym": "jabbing", "via": "thrusting", "position": 2}
-{"word": "thrusting", "synonym": "poke", "via": "thrusting", "position": 3}
-{"word": "thrusting", "synonym": "poking", "via": "thrusting", "position": 4}
-{"word": "thrusting", "synonym": "thrust", "via": "thrusting", "position": 5}
 {"word": "thruway", "synonym": "expressway", "via": "throughway", "position": 1}
 {"word": "thruway", "synonym": "freeway", "via": "throughway", "position": 2}
 {"word": "thruway", "synonym": "motorway", "via": "throughway", "position": 3}
@@ -2327,6 +2367,7 @@
 {"word": "thumping", "synonym": "banging", "via": "thumping", "position": 6}
 {"word": "thumping", "synonym": "whopping", "via": "thumping", "position": 7}
 {"word": "thumping", "synonym": "walloping", "via": "thumping", "position": 8}
+{"word": "thumpingly", "synonym": "exceedingly", "via": "thumpingly", "position": 1}
 {"word": "thunder", "synonym": "smack", "via": "thunder", "position": 1}
 {"word": "thunder", "synonym": "skag", "via": "thunder", "position": 2}
 {"word": "thunder", "synonym": "scag", "via": "thunder", "position": 3}
@@ -2342,6 +2383,8 @@
 {"word": "thunderous", "synonym": "deafening", "via": "thunderous", "position": 1}
 {"word": "thunderous", "synonym": "earsplitting", "via": "thunderous", "position": 2}
 {"word": "thunderous", "synonym": "thundery", "via": "thunderous", "position": 3}
+{"word": "thunderpeal", "synonym": "thunderclap", "via": "thunderpeal", "position": 1}
+{"word": "thunderstick", "synonym": "bullroarer", "via": "thunderstick", "position": 1}
 {"word": "thunderstruck", "synonym": "dumbfounded", "via": "thunderstruck", "position": 1}
 {"word": "thunderstruck", "synonym": "dumfounded", "via": "thunderstruck", "position": 2}
 {"word": "thunderstruck", "synonym": "flabbergasted", "via": "thunderstruck", "position": 3}
@@ -2387,6 +2430,7 @@
 {"word": "thwartwise", "synonym": "cross", "via": "thwartwise", "position": 1}
 {"word": "thwartwise", "synonym": "transverse", "via": "thwartwise", "position": 2}
 {"word": "thwartwise", "synonym": "transversal", "via": "thwartwise", "position": 3}
+{"word": "thyrocalcitonin", "synonym": "calcitonin", "via": "thyrocalcitonin", "position": 1}
 {"word": "thyroid", "synonym": "thyroidal", "via": "thyroid", "position": 1}
 {"word": "thyroidal", "synonym": "thyroid", "via": "thyroidal", "position": 1}
 {"word": "thyrotrophin", "synonym": "thyrotropin", "via": "thyrotropin", "position": 1}
@@ -2437,6 +2481,7 @@
 {"word": "ticktock", "synonym": "ticktack", "via": "ticktock", "position": 3}
 {"word": "ticktock", "synonym": "beat", "via": "ticktock", "position": 4}
 {"word": "tictac", "synonym": "ticktock", "via": "tictac", "position": 1}
+{"word": "tid", "synonym": "drunkard", "via": "tid", "position": 1}
 {"word": "tidbit", "synonym": "titbit", "via": "tidbit", "position": 1}
 {"word": "tiddler", "synonym": "child", "via": "tiddler", "position": 1}
 {"word": "tiddler", "synonym": "kid", "via": "tiddler", "position": 2}
@@ -2503,6 +2548,7 @@
 {"word": "tiffin", "synonym": "lunch", "via": "tiffin", "position": 1}
 {"word": "tiffin", "synonym": "luncheon", "via": "tiffin", "position": 2}
 {"word": "tiffin", "synonym": "dejeuner", "via": "tiffin", "position": 3}
+{"word": "tift", "synonym": "tiff", "via": "tift", "position": 1}
 {"word": "tight", "synonym": "rigorous", "via": "tight", "position": 1}
 {"word": "tight", "synonym": "stringent", "via": "tight", "position": 2}
 {"word": "tight", "synonym": "nasty", "via": "tight", "position": 3}
@@ -2574,6 +2620,7 @@
 {"word": "tillage", "synonym": "tilth", "via": "tillage", "position": 3}
 {"word": "tiller", "synonym": "cultivator", "via": "tiller", "position": 1}
 {"word": "tiller", "synonym": "stool", "via": "tiller", "position": 2}
+{"word": "tillicum", "synonym": "friend", "via": "tillicum", "position": 1}
 {"word": "tilt", "synonym": "rock", "via": "tilt", "position": 1}
 {"word": "tilt", "synonym": "careen", "via": "tilt", "position": 2}
 {"word": "tilt", "synonym": "sway", "via": "tilt", "position": 3}
@@ -2599,6 +2646,9 @@
 {"word": "timber", "synonym": "woodland", "via": "timber", "position": 2}
 {"word": "timber", "synonym": "timberland", "via": "timber", "position": 3}
 {"word": "timber", "synonym": "lumber", "via": "timber", "position": 4}
+{"word": "timberbeast", "synonym": "lumberjack", "via": "timberbeast", "position": 1}
+{"word": "timberjack", "synonym": "lumberjack", "via": "timberjack", "position": 1}
+{"word": "timberjack", "synonym": "logger", "via": "timberjack", "position": 2}
 {"word": "timberland", "synonym": "forest", "via": "timberland", "position": 1}
 {"word": "timberland", "synonym": "woodland", "via": "timberland", "position": 2}
 {"word": "timberland", "synonym": "timber", "via": "timberland", "position": 3}
@@ -2616,6 +2666,7 @@
 {"word": "timely", "synonym": "seasonable", "via": "timely", "position": 1}
 {"word": "timely", "synonym": "seasonably", "via": "timely", "position": 2}
 {"word": "timely", "synonym": "apropos", "via": "timely", "position": 3}
+{"word": "timepass", "synonym": "pastime", "via": "timepass", "position": 1}
 {"word": "timepiece", "synonym": "timekeeper", "via": "timepiece", "position": 1}
 {"word": "timepiece", "synonym": "horologe", "via": "timepiece", "position": 2}
 {"word": "timer", "synonym": "timekeeper", "via": "timer", "position": 1}
@@ -2795,6 +2846,7 @@
 {"word": "tipsiness", "synonym": "inebriety", "via": "tipsiness", "position": 3}
 {"word": "tipsiness", "synonym": "intoxication", "via": "tipsiness", "position": 4}
 {"word": "tipsiness", "synonym": "insobriety", "via": "tipsiness", "position": 5}
+{"word": "tipslinger", "synonym": "tipster", "via": "tipslinger", "position": 1}
 {"word": "tipster", "synonym": "tout", "via": "tipster", "position": 1}
 {"word": "tipsy", "synonym": "potty", "via": "tipsy", "position": 1}
 {"word": "tipsy", "synonym": "tiddly", "via": "tipsy", "position": 2}
@@ -2876,6 +2928,7 @@
 {"word": "tiresomely", "synonym": "tediously", "via": "tiresomely", "position": 2}
 {"word": "tiresomeness", "synonym": "tediousness", "via": "tiresomeness", "position": 1}
 {"word": "tiresomeness", "synonym": "tedium", "via": "tiresomeness", "position": 2}
+{"word": "tirewoman", "synonym": "handmaid", "via": "tirewoman", "position": 1}
 {"word": "tiring", "synonym": "exhausting", "via": "tire", "position": 1}
 {"word": "tiring", "synonym": "wearing", "via": "tire", "position": 2}
 {"word": "tiring", "synonym": "wearying", "via": "tire", "position": 3}
@@ -2902,6 +2955,7 @@
 {"word": "titan", "synonym": "giant", "via": "titan", "position": 3}
 {"word": "titan", "synonym": "heavyweight", "via": "titan", "position": 4}
 {"word": "titbit", "synonym": "tidbit", "via": "tidbit", "position": 1}
+{"word": "titchy", "synonym": "tiny", "via": "titchy", "position": 1}
 {"word": "titer", "synonym": "titre", "via": "titer", "position": 1}
 {"word": "titillate", "synonym": "tickle", "via": "titillate", "position": 1}
 {"word": "titillated", "synonym": "teased", "via": "titillate", "position": 1}
@@ -2913,6 +2967,7 @@
 {"word": "titillating", "synonym": "erotic", "via": "titillating", "position": 3}
 {"word": "titillation", "synonym": "tickle", "via": "titillation", "position": 1}
 {"word": "titillation", "synonym": "tickling", "via": "titillation", "position": 2}
+{"word": "titipounamu", "synonym": "rifleman", "via": "titipounamu", "position": 1}
 {"word": "titivate", "synonym": "spruce", "via": "titivate", "position": 1}
 {"word": "titivate", "synonym": "tittivate", "via": "titivate", "position": 2}
 {"word": "titlark", "synonym": "pipit", "via": "titlark", "position": 1}
@@ -3006,9 +3061,12 @@
 {"word": "toddler", "synonym": "bambino", "via": "toddler", "position": 3}
 {"word": "toe", "synonym": "toenail", "via": "toe", "position": 1}
 {"word": "toenail", "synonym": "toe", "via": "toenail", "position": 1}
+{"word": "toey", "synonym": "jumpy", "via": "toey", "position": 1}
+{"word": "toey", "synonym": "edgy", "via": "toey", "position": 2}
 {"word": "toff", "synonym": "nob", "via": "toff", "position": 1}
 {"word": "toffee", "synonym": "brittle", "via": "toffee", "position": 1}
 {"word": "toffee", "synonym": "toffy", "via": "toffee", "position": 2}
+{"word": "toffish", "synonym": "posh", "via": "toffish", "position": 1}
 {"word": "toffy", "synonym": "brittle", "via": "toffee", "position": 1}
 {"word": "toffy", "synonym": "toffee", "via": "toffee", "position": 2}
 {"word": "toffy", "synonym": "brittle", "via": "toffy", "position": 1}
@@ -3032,6 +3090,8 @@
 {"word": "togs", "synonym": "duds", "via": "tog", "position": 2}
 {"word": "togs", "synonym": "threads", "via": "togs", "position": 1}
 {"word": "togs", "synonym": "duds", "via": "togs", "position": 2}
+{"word": "tohubohu", "synonym": "chaos", "via": "tohubohu", "position": 1}
+{"word": "tohubohu", "synonym": "confusion", "via": "tohubohu", "position": 2}
 {"word": "toil", "synonym": "labor", "via": "toil", "position": 1}
 {"word": "toil", "synonym": "labour", "via": "toil", "position": 2}
 {"word": "toil", "synonym": "fag", "via": "toil", "position": 3}
@@ -3136,6 +3196,7 @@
 {"word": "tomfool", "synonym": "muggins", "via": "tomfool", "position": 4}
 {"word": "tomfoolery", "synonym": "folly", "via": "tomfoolery", "position": 1}
 {"word": "tomfoolery", "synonym": "foolery", "via": "tomfoolery", "position": 2}
+{"word": "tommyaxe", "synonym": "tomahawk", "via": "tommyaxe", "position": 1}
 {"word": "tommyrot", "synonym": "baloney", "via": "tommyrot", "position": 1}
 {"word": "tommyrot", "synonym": "boloney", "via": "tommyrot", "position": 2}
 {"word": "tommyrot", "synonym": "bilgewater", "via": "tommyrot", "position": 3}
@@ -3191,16 +3252,6 @@
 {"word": "tons", "synonym": "rafts", "via": "ton", "position": 8}
 {"word": "tons", "synonym": "slews", "via": "ton", "position": 9}
 {"word": "tons", "synonym": "wads", "via": "ton", "position": 10}
-{"word": "tons", "synonym": "dozens", "via": "tons", "position": 1}
-{"word": "tons", "synonym": "heaps", "via": "tons", "position": 2}
-{"word": "tons", "synonym": "lots", "via": "tons", "position": 3}
-{"word": "tons", "synonym": "piles", "via": "tons", "position": 4}
-{"word": "tons", "synonym": "scores", "via": "tons", "position": 5}
-{"word": "tons", "synonym": "stacks", "via": "tons", "position": 6}
-{"word": "tons", "synonym": "loads", "via": "tons", "position": 7}
-{"word": "tons", "synonym": "rafts", "via": "tons", "position": 8}
-{"word": "tons", "synonym": "slews", "via": "tons", "position": 9}
-{"word": "tons", "synonym": "wads", "via": "tons", "position": 10}
 {"word": "tonus", "synonym": "tonicity", "via": "tonus", "position": 1}
 {"word": "tonus", "synonym": "tone", "via": "tonus", "position": 2}
 {"word": "too", "synonym": "excessively", "via": "too", "position": 1}
@@ -3208,6 +3259,7 @@
 {"word": "too", "synonym": "besides", "via": "too", "position": 3}
 {"word": "too", "synonym": "also", "via": "too", "position": 4}
 {"word": "too", "synonym": "likewise", "via": "too", "position": 5}
+{"word": "toodle", "synonym": "saunter", "via": "toodle", "position": 1}
 {"word": "tool", "synonym": "instrument", "via": "tool", "position": 1}
 {"word": "tool", "synonym": "creature", "via": "tool", "position": 2}
 {"word": "tool", "synonym": "puppet", "via": "tool", "position": 3}
@@ -3276,6 +3328,7 @@
 {"word": "topic", "synonym": "matter", "via": "topic", "position": 3}
 {"word": "topic", "synonym": "theme", "via": "topic", "position": 4}
 {"word": "topically", "synonym": "locally", "via": "topically", "position": 1}
+{"word": "topkhana", "synonym": "arsenal", "via": "topkhana", "position": 1}
 {"word": "topless", "synonym": "braless", "via": "topless", "position": 1}
 {"word": "topmost", "synonym": "uppermost", "via": "topmost", "position": 1}
 {"word": "topmost", "synonym": "upmost", "via": "topmost", "position": 2}
@@ -3352,6 +3405,7 @@
 {"word": "torpidly", "synonym": "dazedly", "via": "torpidly", "position": 1}
 {"word": "torpor", "synonym": "listlessness", "via": "torpor", "position": 1}
 {"word": "torpor", "synonym": "torpidity", "via": "torpor", "position": 2}
+{"word": "torporific", "synonym": "soporific", "via": "torporific", "position": 1}
 {"word": "torque", "synonym": "torsion", "via": "torque", "position": 1}
 {"word": "torrent", "synonym": "downpour", "via": "torrent", "position": 1}
 {"word": "torrent", "synonym": "cloudburst", "via": "torrent", "position": 2}
@@ -3439,6 +3493,7 @@
 {"word": "tosh", "synonym": "tarradiddle", "via": "tosh", "position": 8}
 {"word": "tosh", "synonym": "tommyrot", "via": "tosh", "position": 9}
 {"word": "tosh", "synonym": "twaddle", "via": "tosh", "position": 10}
+{"word": "tosher", "synonym": "painter", "via": "tosher", "position": 1}
 {"word": "toss", "synonym": "pass", "via": "toss", "position": 1}
 {"word": "toss", "synonym": "flip", "via": "toss", "position": 2}
 {"word": "toss", "synonym": "sky", "via": "toss", "position": 3}
@@ -3449,6 +3504,8 @@
 {"word": "toss", "synonym": "thrash", "via": "toss", "position": 8}
 {"word": "toss", "synonym": "slash", "via": "toss", "position": 9}
 {"word": "toss", "synonym": "discard", "via": "toss", "position": 10}
+{"word": "tossy", "synonym": "conceited", "via": "tossy", "position": 1}
+{"word": "tossy", "synonym": "supercilious", "via": "tossy", "position": 2}
 {"word": "tot", "synonym": "toddler", "via": "tot", "position": 1}
 {"word": "tot", "synonym": "yearling", "via": "tot", "position": 2}
 {"word": "tot", "synonym": "bambino", "via": "tot", "position": 3}
@@ -3497,6 +3554,7 @@
 {"word": "tote", "synonym": "tug", "via": "tote", "position": 4}
 {"word": "toter", "synonym": "carrier", "via": "toter", "position": 1}
 {"word": "toter", "synonym": "bearer", "via": "toter", "position": 2}
+{"word": "totsiens", "synonym": "goodbye", "via": "totsiens", "position": 1}
 {"word": "totter", "synonym": "teeter", "via": "totter", "position": 1}
 {"word": "totter", "synonym": "seesaw", "via": "totter", "position": 2}
 {"word": "totter", "synonym": "toddle", "via": "totter", "position": 3}
@@ -3508,6 +3566,8 @@
 {"word": "tottering", "synonym": "tottery", "via": "totter", "position": 1}
 {"word": "tottering", "synonym": "tottery", "via": "tottering", "position": 1}
 {"word": "tottery", "synonym": "tottering", "via": "tottery", "position": 1}
+{"word": "tottie", "synonym": "tiny", "via": "tottie", "position": 1}
+{"word": "tottie", "synonym": "wee", "via": "tottie", "position": 2}
 {"word": "touch", "synonym": "touching", "via": "touch", "position": 1}
 {"word": "touch", "synonym": "signature", "via": "touch", "position": 2}
 {"word": "touch", "synonym": "feeling", "via": "touch", "position": 3}
@@ -3586,6 +3646,7 @@
 {"word": "tourer", "synonym": "phaeton", "via": "tourer", "position": 1}
 {"word": "tourist", "synonym": "tourer", "via": "tourist", "position": 1}
 {"word": "tourist", "synonym": "holidaymaker", "via": "tourist", "position": 2}
+{"word": "touristry", "synonym": "tourism", "via": "touristry", "position": 1}
 {"word": "tournament", "synonym": "tourney", "via": "tournament", "position": 1}
 {"word": "tourney", "synonym": "tournament", "via": "tourney", "position": 1}
 {"word": "tousle", "synonym": "dishevel", "via": "tousle", "position": 1}
@@ -3637,6 +3698,7 @@
 {"word": "towny", "synonym": "townie", "via": "townie", "position": 1}
 {"word": "towny", "synonym": "townie", "via": "towny", "position": 1}
 {"word": "towrope", "synonym": "towline", "via": "towrope", "position": 1}
+{"word": "towsack", "synonym": "gunnysack", "via": "towsack", "position": 1}
 {"word": "toxaemia", "synonym": "toxemia", "via": "toxemia", "position": 1}
 {"word": "toxemia", "synonym": "toxaemia", "via": "toxemia", "position": 1}
 {"word": "toxicant", "synonym": "poison", "via": "toxicant", "position": 1}
@@ -3666,6 +3728,7 @@
 {"word": "trabeated", "synonym": "trabeate", "via": "trabeated", "position": 1}
 {"word": "trabecular", "synonym": "trabeculate", "via": "trabecular", "position": 1}
 {"word": "trabeculate", "synonym": "trabecular", "via": "trabeculate", "position": 1}
+{"word": "trabs", "synonym": "sneakers", "via": "trabs", "position": 1}
 {"word": "trace", "synonym": "tracing", "via": "trace", "position": 1}
 {"word": "trace", "synonym": "vestige", "via": "trace", "position": 2}
 {"word": "trace", "synonym": "tincture", "via": "trace", "position": 3}
@@ -3729,9 +3792,12 @@
 {"word": "trader", "synonym": "monger", "via": "trader", "position": 3}
 {"word": "tradesman", "synonym": "shopkeeper", "via": "tradesman", "position": 1}
 {"word": "tradesman", "synonym": "storekeeper", "via": "tradesman", "position": 2}
+{"word": "tradie", "synonym": "tradesman", "via": "tradie", "position": 1}
 {"word": "tradition", "synonym": "custom", "via": "tradition", "position": 1}
 {"word": "traditionalist", "synonym": "diehard", "via": "traditionalist", "position": 1}
 {"word": "traditionalist", "synonym": "hidebound", "via": "traditionalist", "position": 2}
+{"word": "traditionist", "synonym": "traditionalist", "via": "traditionist", "position": 1}
+{"word": "traditive", "synonym": "traditional", "via": "traditive", "position": 1}
 {"word": "traduce", "synonym": "badmouth", "via": "traduce", "position": 1}
 {"word": "traduce", "synonym": "malign", "via": "traduce", "position": 2}
 {"word": "traducement", "synonym": "defamation", "via": "traducement", "position": 1}
@@ -3749,6 +3815,7 @@
 {"word": "trafficker", "synonym": "marketer", "via": "trafficker", "position": 2}
 {"word": "trafficker", "synonym": "vender", "via": "trafficker", "position": 3}
 {"word": "trafficker", "synonym": "vendor", "via": "trafficker", "position": 4}
+{"word": "trafficky", "synonym": "busy", "via": "trafficky", "position": 1}
 {"word": "tragedy", "synonym": "calamity", "via": "tragedy", "position": 1}
 {"word": "tragedy", "synonym": "catastrophe", "via": "tragedy", "position": 2}
 {"word": "tragedy", "synonym": "disaster", "via": "tragedy", "position": 3}
@@ -3766,6 +3833,7 @@
 {"word": "trail", "synonym": "dog", "via": "trail", "position": 7}
 {"word": "trail", "synonym": "drag", "via": "trail", "position": 8}
 {"word": "trail", "synonym": "shack", "via": "trail", "position": 9}
+{"word": "trailable", "synonym": "towable", "via": "trailable", "position": 1}
 {"word": "trailblazer", "synonym": "pioneer", "via": "trailblazer", "position": 1}
 {"word": "trailblazer", "synonym": "innovator", "via": "trailblazer", "position": 2}
 {"word": "trailblazer", "synonym": "groundbreaker", "via": "trailblazer", "position": 3}
@@ -4028,6 +4096,7 @@
 {"word": "transistorized", "synonym": "transistorised", "via": "transistorized", "position": 1}
 {"word": "transit", "synonym": "passage", "via": "transit", "position": 1}
 {"word": "transit", "synonym": "transportation", "via": "transit", "position": 2}
+{"word": "transitable", "synonym": "passable", "via": "transitable", "position": 1}
 {"word": "transition", "synonym": "passage", "via": "transition", "position": 1}
 {"word": "transition", "synonym": "modulation", "via": "transition", "position": 2}
 {"word": "transition", "synonym": "conversion", "via": "transition", "position": 3}
@@ -4054,6 +4123,7 @@
 {"word": "transliterate", "synonym": "transcribe", "via": "transliterate", "position": 1}
 {"word": "translucence", "synonym": "translucency", "via": "translucence", "position": 1}
 {"word": "translucency", "synonym": "translucence", "via": "translucency", "position": 1}
+{"word": "translucid", "synonym": "translucent", "via": "translucid", "position": 1}
 {"word": "transmigrate", "synonym": "migrate", "via": "transmigrate", "position": 1}
 {"word": "transmigrate", "synonym": "reincarnate", "via": "transmigrate", "position": 2}
 {"word": "transmissible", "synonym": "catching", "via": "transmissible", "position": 1}
@@ -4102,6 +4172,7 @@
 {"word": "transmitting", "synonym": "transmittal", "via": "transmit", "position": 2}
 {"word": "transmitting", "synonym": "transmission", "via": "transmitting", "position": 1}
 {"word": "transmitting", "synonym": "transmittal", "via": "transmitting", "position": 2}
+{"word": "transmogrification", "synonym": "transformation", "via": "transmogrification", "position": 1}
 {"word": "transmogrify", "synonym": "metamorphose", "via": "transmogrify", "position": 1}
 {"word": "transmogrify", "synonym": "transfigure", "via": "transmogrify", "position": 2}
 {"word": "transmontane", "synonym": "tramontane", "via": "transmontane", "position": 1}
@@ -4129,6 +4200,7 @@
 {"word": "transparent", "synonym": "gauzy", "via": "transparent", "position": 8}
 {"word": "transparent", "synonym": "gossamer", "via": "transparent", "position": 9}
 {"word": "transparent", "synonym": "sheer", "via": "transparent", "position": 10}
+{"word": "transparentness", "synonym": "transparency", "via": "transparentness", "position": 1}
 {"word": "transplant", "synonym": "transplanting", "via": "transplant", "position": 1}
 {"word": "transplant", "synonym": "graft", "via": "transplant", "position": 2}
 {"word": "transplant", "synonym": "transfer", "via": "transplant", "position": 3}
@@ -4163,6 +4235,7 @@
 {"word": "transporter", "synonym": "conveyer", "via": "transporter", "position": 1}
 {"word": "transporter", "synonym": "conveyor", "via": "transporter", "position": 2}
 {"word": "transposable", "synonym": "permutable", "via": "transposable", "position": 1}
+{"word": "transposal", "synonym": "transposition", "via": "transposal", "position": 1}
 {"word": "transpose", "synonym": "counterchange", "via": "transpose", "position": 1}
 {"word": "transpose", "synonym": "interchange", "via": "transpose", "position": 2}
 {"word": "transpose", "synonym": "permute", "via": "transpose", "position": 3}
@@ -4187,6 +4260,8 @@
 {"word": "transverse", "synonym": "cross", "via": "transverse", "position": 1}
 {"word": "transverse", "synonym": "transversal", "via": "transverse", "position": 2}
 {"word": "transverse", "synonym": "thwartwise", "via": "transverse", "position": 3}
+{"word": "tranter", "synonym": "peddler", "via": "tranter", "position": 1}
+{"word": "tranter", "synonym": "hawker", "via": "tranter", "position": 2}
 {"word": "trap", "synonym": "ambush", "via": "trap", "position": 1}
 {"word": "trap", "synonym": "ambuscade", "via": "trap", "position": 2}
 {"word": "trap", "synonym": "snare", "via": "trap", "position": 3}
@@ -4487,6 +4562,8 @@
 {"word": "trephine", "synonym": "trepan", "via": "trephine", "position": 1}
 {"word": "trepid", "synonym": "fearful", "via": "trepid", "position": 1}
 {"word": "trepid", "synonym": "timorous", "via": "trepid", "position": 2}
+{"word": "trepidatious", "synonym": "apprehensive", "via": "trepidatious", "position": 1}
+{"word": "trepidatious", "synonym": "fearful", "via": "trepidatious", "position": 2}
 {"word": "trespass", "synonym": "encroachment", "via": "trespass", "position": 1}
 {"word": "trespass", "synonym": "violation", "via": "trespass", "position": 2}
 {"word": "trespass", "synonym": "intrusion", "via": "trespass", "position": 3}
@@ -4556,6 +4633,10 @@
 {"word": "trice", "synonym": "jiffy", "via": "trice", "position": 4}
 {"word": "trice", "synonym": "twinkling", "via": "trice", "position": 5}
 {"word": "trice", "synonym": "wink", "via": "trice", "position": 6}
+{"word": "tricentenary", "synonym": "tercentenary", "via": "tricentenary", "position": 1}
+{"word": "trichinellosis", "synonym": "trichinosis", "via": "trichinellosis", "position": 1}
+{"word": "trichloromethane", "synonym": "chloroform", "via": "trichloromethane", "position": 1}
+{"word": "trichloronitromethane", "synonym": "chloropicrin", "via": "trichloronitromethane", "position": 1}
 {"word": "trichromatic", "synonym": "tricolor", "via": "trichromatic", "position": 1}
 {"word": "trick", "synonym": "magic", "via": "trick", "position": 1}
 {"word": "trick", "synonym": "legerdemain", "via": "trick", "position": 2}
@@ -4590,6 +4671,7 @@
 {"word": "trickle", "synonym": "drip", "via": "trickle", "position": 1}
 {"word": "trickle", "synonym": "dribble", "via": "trickle", "position": 2}
 {"word": "trickle", "synonym": "filter", "via": "trickle", "position": 3}
+{"word": "tricksome", "synonym": "tricksy", "via": "tricksome", "position": 1}
 {"word": "trickster", "synonym": "deceiver", "via": "trickster", "position": 1}
 {"word": "trickster", "synonym": "cheat", "via": "trickster", "position": 2}
 {"word": "trickster", "synonym": "cheater", "via": "trickster", "position": 3}
@@ -4627,6 +4709,7 @@
 {"word": "tried", "synonym": "tested", "via": "tried", "position": 1}
 {"word": "tried", "synonym": "tested", "via": "try", "position": 1}
 {"word": "trier", "synonym": "essayer", "via": "trier", "position": 1}
+{"word": "trifacial", "synonym": "trigeminal", "via": "trifacial", "position": 1}
 {"word": "trifle", "synonym": "triviality", "via": "trifle", "position": 1}
 {"word": "trifle", "synonym": "trivia", "via": "trifle", "position": 2}
 {"word": "trifle", "synonym": "dally", "via": "trifle", "position": 3}
@@ -4665,7 +4748,9 @@
 {"word": "trigon", "synonym": "triangle", "via": "trigon", "position": 2}
 {"word": "trigon", "synonym": "trilateral", "via": "trigon", "position": 3}
 {"word": "trigonal", "synonym": "rhombohedral", "via": "trigonal", "position": 1}
+{"word": "trigonometrical", "synonym": "trigonometric", "via": "trigonometrical", "position": 1}
 {"word": "trigonometry", "synonym": "trig", "via": "trigonometry", "position": 1}
+{"word": "triiodomethane", "synonym": "iodoform", "via": "triiodomethane", "position": 1}
 {"word": "trike", "synonym": "tricycle", "via": "trike", "position": 1}
 {"word": "trike", "synonym": "velocipede", "via": "trike", "position": 2}
 {"word": "trilateral", "synonym": "triangle", "via": "trilateral", "position": 1}
@@ -4717,6 +4802,7 @@
 {"word": "trine", "synonym": "trinity", "via": "trine", "position": 8}
 {"word": "trine", "synonym": "ternary", "via": "trine", "position": 9}
 {"word": "trine", "synonym": "ternion", "via": "trine", "position": 10}
+{"word": "trinitrophenylmethylnitramine", "synonym": "tetryl", "via": "trinitrophenylmethylnitramine", "position": 1}
 {"word": "trinity", "synonym": "trio", "via": "trinity", "position": 1}
 {"word": "trinity", "synonym": "threesome", "via": "trinity", "position": 2}
 {"word": "trinity", "synonym": "triad", "via": "trinity", "position": 3}
@@ -4733,6 +4819,7 @@
 {"word": "trinket", "synonym": "gewgaw", "via": "trinket", "position": 4}
 {"word": "trinket", "synonym": "novelty", "via": "trinket", "position": 5}
 {"word": "trinket", "synonym": "fallal", "via": "trinket", "position": 6}
+{"word": "trinkle", "synonym": "trickle", "via": "trinkle", "position": 1}
 {"word": "trio", "synonym": "threesome", "via": "trio", "position": 1}
 {"word": "trio", "synonym": "triad", "via": "trio", "position": 2}
 {"word": "trio", "synonym": "trinity", "via": "trio", "position": 3}
@@ -4758,6 +4845,7 @@
 {"word": "tripe", "synonym": "trash", "via": "tripe", "position": 4}
 {"word": "tripe", "synonym": "applesauce", "via": "tripe", "position": 5}
 {"word": "tripe", "synonym": "codswallop", "via": "tripe", "position": 6}
+{"word": "tripey", "synonym": "shoddy", "via": "tripey", "position": 1}
 {"word": "triple", "synonym": "trio", "via": "triple", "position": 1}
 {"word": "triple", "synonym": "triad", "via": "triple", "position": 2}
 {"word": "triple", "synonym": "triplet", "via": "triple", "position": 3}
@@ -4796,7 +4884,6 @@
 {"word": "tripping", "synonym": "swingy", "via": "tripping", "position": 5}
 {"word": "trippingly", "synonym": "lightsomely", "via": "trippingly", "position": 1}
 {"word": "triskele", "synonym": "triskelion", "via": "triskele", "position": 1}
-{"word": "triskele", "synonym": "triskelion", "via": "triskeles", "position": 1}
 {"word": "triskelion", "synonym": "triskele", "via": "triskelion", "position": 1}
 {"word": "trite", "synonym": "banal", "via": "trite", "position": 1}
 {"word": "trite", "synonym": "commonplace", "via": "trite", "position": 2}
@@ -4881,6 +4968,8 @@
 {"word": "trollop", "synonym": "slut", "via": "trollop", "position": 4}
 {"word": "trollop", "synonym": "strumpet", "via": "trollop", "position": 5}
 {"word": "trollop", "synonym": "slattern", "via": "trollop", "position": 6}
+{"word": "tronk", "synonym": "jail", "via": "tronk", "position": 1}
+{"word": "tronk", "synonym": "prison", "via": "tronk", "position": 2}
 {"word": "troop", "synonym": "flock", "via": "troop", "position": 1}
 {"word": "troop", "synonym": "parade", "via": "troop", "position": 2}
 {"word": "troop", "synonym": "promenade", "via": "troop", "position": 3}
@@ -4888,6 +4977,7 @@
 {"word": "trooper", "synonym": "cavalryman", "via": "trouper", "position": 1}
 {"word": "troops", "synonym": "soldiery", "via": "troop", "position": 1}
 {"word": "troops", "synonym": "soldiery", "via": "troops", "position": 1}
+{"word": "tropaion", "synonym": "trophy", "via": "tropaion", "position": 1}
 {"word": "trope", "synonym": "figure", "via": "trope", "position": 1}
 {"word": "trope", "synonym": "image", "via": "trope", "position": 2}
 {"word": "trophy", "synonym": "prize", "via": "trophy", "position": 1}
@@ -4935,6 +5025,8 @@
 {"word": "troubling", "synonym": "perturbing", "via": "troubling", "position": 4}
 {"word": "troubling", "synonym": "worrisome", "via": "troubling", "position": 5}
 {"word": "troubling", "synonym": "worrying", "via": "troubling", "position": 6}
+{"word": "trouch", "synonym": "rubbish", "via": "trouch", "position": 1}
+{"word": "trouch", "synonym": "junk", "via": "trouch", "position": 2}
 {"word": "trough", "synonym": "gutter", "via": "trough", "position": 1}
 {"word": "trough", "synonym": "manger", "via": "trough", "position": 2}
 {"word": "trough", "synonym": "till", "via": "trough", "position": 3}
@@ -4970,7 +5062,9 @@
 {"word": "truck", "synonym": "motortruck", "via": "truck", "position": 1}
 {"word": "truckage", "synonym": "hauling", "via": "truckage", "position": 1}
 {"word": "truckage", "synonym": "trucking", "via": "truckage", "position": 2}
+{"word": "truckdriver", "synonym": "trucker", "via": "truckdriver", "position": 1}
 {"word": "trucker", "synonym": "teamster", "via": "trucker", "position": 1}
+{"word": "truckie", "synonym": "trucker", "via": "truckie", "position": 1}
 {"word": "trucking", "synonym": "hauling", "via": "truck", "position": 1}
 {"word": "trucking", "synonym": "truckage", "via": "truck", "position": 2}
 {"word": "trucking", "synonym": "hauling", "via": "trucking", "position": 1}
@@ -5126,6 +5220,7 @@
 {"word": "tsetse", "synonym": "tzetze", "via": "tsetse", "position": 1}
 {"word": "tsetse", "synonym": "glossina", "via": "tsetse", "position": 2}
 {"word": "tsk", "synonym": "tut", "via": "tsk", "position": 1}
+{"word": "tuan", "synonym": "sir", "via": "tuan", "position": 1}
 {"word": "tub", "synonym": "bathtub", "via": "tub", "position": 1}
 {"word": "tub", "synonym": "vat", "via": "tub", "position": 2}
 {"word": "tub", "synonym": "tubful", "via": "tub", "position": 3}
@@ -5138,6 +5233,7 @@
 {"word": "tube", "synonym": "subway", "via": "tube", "position": 3}
 {"word": "tube", "synonym": "tubing", "via": "tube", "position": 4}
 {"word": "tube", "synonym": "pipe", "via": "tube", "position": 5}
+{"word": "tubectomy", "synonym": "salpingectomy", "via": "tubectomy", "position": 1}
 {"word": "tubelike", "synonym": "tubular", "via": "tubelike", "position": 1}
 {"word": "tubelike", "synonym": "cannular", "via": "tubelike", "position": 2}
 {"word": "tubelike", "synonym": "vasiform", "via": "tubelike", "position": 3}
@@ -5147,6 +5243,7 @@
 {"word": "tubercular", "synonym": "consumptive", "via": "tubercular", "position": 1}
 {"word": "tubercular", "synonym": "lunger", "via": "tubercular", "position": 2}
 {"word": "tubercular", "synonym": "tuberculous", "via": "tubercular", "position": 3}
+{"word": "tuberculose", "synonym": "tuberculate", "via": "tuberculose", "position": 1}
 {"word": "tuberculous", "synonym": "tubercular", "via": "tuberculous", "position": 1}
 {"word": "tuberosity", "synonym": "tubercle", "via": "tuberosity", "position": 1}
 {"word": "tuberosity", "synonym": "eminence", "via": "tuberosity", "position": 2}
@@ -5154,6 +5251,7 @@
 {"word": "tubing", "synonym": "tube", "via": "tube", "position": 1}
 {"word": "tubing", "synonym": "tube", "via": "tubing", "position": 1}
 {"word": "tubocurarine", "synonym": "curare", "via": "tubocurarine", "position": 1}
+{"word": "tuboid", "synonym": "tubular", "via": "tuboid", "position": 1}
 {"word": "tubular", "synonym": "cannular", "via": "tubular", "position": 1}
 {"word": "tubular", "synonym": "tubelike", "via": "tubular", "position": 2}
 {"word": "tubular", "synonym": "vasiform", "via": "tubular", "position": 3}
@@ -5188,6 +5286,7 @@
 {"word": "tugrik", "synonym": "tughrik", "via": "tugrik", "position": 1}
 {"word": "tuition", "synonym": "tutelage", "via": "tuition", "position": 1}
 {"word": "tuition", "synonym": "tutorship", "via": "tuition", "position": 2}
+{"word": "tuktu", "synonym": "caribou", "via": "tuktu", "position": 1}
 {"word": "tulipwood", "synonym": "whitewood", "via": "tulipwood", "position": 1}
 {"word": "tumble", "synonym": "spill", "via": "tumble", "position": 1}
 {"word": "tumble", "synonym": "fall", "via": "tumble", "position": 2}
@@ -5203,6 +5302,7 @@
 {"word": "tumbrel", "synonym": "tumbril", "via": "tumbril", "position": 1}
 {"word": "tumbril", "synonym": "tumbrel", "via": "tumbril", "position": 1}
 {"word": "tumefy", "synonym": "swell", "via": "tumefy", "position": 1}
+{"word": "tumesce", "synonym": "swell", "via": "tumesce", "position": 1}
 {"word": "tumescent", "synonym": "puffy", "via": "tumescent", "position": 1}
 {"word": "tumescent", "synonym": "intumescent", "via": "tumescent", "position": 2}
 {"word": "tumescent", "synonym": "tumid", "via": "tumescent", "position": 3}
@@ -5378,6 +5478,7 @@
 {"word": "turps", "synonym": "turpentine", "via": "turps", "position": 1}
 {"word": "turquoise", "synonym": "aqua", "via": "turquoise", "position": 1}
 {"word": "turquoise", "synonym": "aquamarine", "via": "turquoise", "position": 2}
+{"word": "turriculate", "synonym": "turreted", "via": "turriculate", "position": 1}
 {"word": "turtle", "synonym": "turtleneck", "via": "turtle", "position": 1}
 {"word": "turtle", "synonym": "capsize", "via": "turtle", "position": 2}
 {"word": "turtleneck", "synonym": "turtle", "via": "turtleneck", "position": 1}
@@ -5443,6 +5544,7 @@
 {"word": "twaddle", "synonym": "tarradiddle", "via": "twaddle", "position": 8}
 {"word": "twaddle", "synonym": "tommyrot", "via": "twaddle", "position": 9}
 {"word": "twaddle", "synonym": "tosh", "via": "twaddle", "position": 10}
+{"word": "twag", "synonym": "skive", "via": "twag", "position": 1}
 {"word": "twain", "synonym": "couple", "via": "twain", "position": 1}
 {"word": "twain", "synonym": "pair", "via": "twain", "position": 2}
 {"word": "twain", "synonym": "twosome", "via": "twain", "position": 3}
@@ -5468,6 +5570,7 @@
 {"word": "twee", "synonym": "mincing", "via": "twee", "position": 1}
 {"word": "tweediness", "synonym": "coarseness", "via": "tweediness", "position": 1}
 {"word": "tweedle", "synonym": "chirp", "via": "tweedle", "position": 1}
+{"word": "tweedler", "synonym": "swindler", "via": "tweedler", "position": 1}
 {"word": "tweedy", "synonym": "homespun", "via": "tweedy", "position": 1}
 {"word": "tweedy", "synonym": "nubby", "via": "tweedy", "position": 2}
 {"word": "tweedy", "synonym": "nubbly", "via": "tweedy", "position": 3}
@@ -5661,8 +5764,11 @@
 {"word": "twitch", "synonym": "flip", "via": "twitch", "position": 8}
 {"word": "twitching", "synonym": "twitch", "via": "twitch", "position": 1}
 {"word": "twitching", "synonym": "twitch", "via": "twitching", "position": 1}
+{"word": "twitten", "synonym": "alley", "via": "twitten", "position": 1}
 {"word": "twitter", "synonym": "chirrup", "via": "twitter", "position": 1}
 {"word": "twitter", "synonym": "chitter", "via": "twitter", "position": 2}
+{"word": "twitterpated", "synonym": "smitten", "via": "twitterpated", "position": 1}
+{"word": "twitterpated", "synonym": "infatuated", "via": "twitterpated", "position": 2}
 {"word": "two", "synonym": "deuce", "via": "two", "position": 1}
 {"word": "twofold", "synonym": "double", "via": "twofold", "position": 1}
 {"word": "twofold", "synonym": "doubled", "via": "twofold", "position": 2}
@@ -5727,6 +5833,7 @@
 {"word": "typewrite", "synonym": "type", "via": "typewrite", "position": 1}
 {"word": "typewriting", "synonym": "typing", "via": "typewrite", "position": 1}
 {"word": "typewriting", "synonym": "typing", "via": "typewriting", "position": 1}
+{"word": "typhlosis", "synonym": "blindness", "via": "typhlosis", "position": 1}
 {"word": "typic", "synonym": "emblematic", "via": "typic", "position": 1}
 {"word": "typic", "synonym": "exemplary", "via": "typic", "position": 2}
 {"word": "typify", "synonym": "symbolize", "via": "typify", "position": 1}

@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.4.1)
+# enough — Agent Guide (v0.4.2)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -1379,15 +1379,15 @@ is a 400; a path that does not end in `.comp` is a 400 that says so.
 | `/api/composure?path=` | GET | `{path, rev, model}`. **Side effect:** stamps `rness/project.json`'s `composure.last`. That is the *only* place `last` is written |
 | `/api/composure/ops` | POST | **The single write door.** `{path, base_rev?, source, create?, form?, title?, want_model?, ops[]}` → `{path, rev, changed[], stale, stale_changed, created, model?}` |
 | `/api/composure/new` | POST | Describes a composure **without writing it**: `{path: null, pending_path, form, title, rev: 0, model}` |
-| `/api/composure/list` | GET | `{composures: [...]}`, newest first |
+| `/api/composure/list` | GET | `{composures: [...]}`, newest first; each row carries `content` (anything in it beyond an empty text box) and `startup` (the project opens with it) |
 | `/api/composure/forms` | GET | Shipped first, then `rness/composure-forms/`; a project form with a shipped name **wins** and is listed once with `origin: "project"` |
 | `/api/composure/save-as-form` | POST | `{path, name}` → `{form, path, forms}` |
 | `/api/composure/rename` | POST | Retitles, renames the file to match, and **carries the comments sidecar**; `keep_filename: true` retitles only; 409 on a collision |
 | `/api/composure/link-preview` | GET | `?path=&module=` — per type; **never raises** for a missing target, answers `{ok: false, detail}` |
 | `/api/composure/webframe/refresh` | POST | Goes through `tools.fetch_and_cache` — the **same** gated pipeline as `fetch_url` — then writes `data-cache` and page 1 through ordinary ops with `source: "enough"`. A broker refusal comes back `200 {ok: false, denied: true, detail}` with the denial text verbatim |
 | `/api/composure/comments` | GET/POST/PATCH/DELETE | Mirrors `/api/wiki/comments*`. Deleting the last comment removes the sidecar rather than leaving `{"comments": []}` |
-| `/api/composure/launch` | GET | Resolved against what is actually on disk: `{launch, path, form, notice}` |
-| `/api/project/composure` | POST | `{launch: "blank"\|"last"\|"file"\|"form", path?, form?}`. **`last` is never accepted here** — it is stamped by opening a composure |
+| `/api/composure/launch` | GET | Resolved against what is actually on disk: `{launch, path, form, notice}`. `auto` (the default) opens the only composure with content, else the last one used among several, else a blank page; a `file`/`last`/`form` target that is gone falls back to `auto` with a `notice` |
+| `/api/project/composure` | POST | `{launch: "auto"\|"new"\|"last"\|"file"\|"form", path?, form?}`. `file` + `path` is the startup composure (a composure's settings modal ticks it; unticking posts `auto`). A stored `blank` (0.3.5–0.4.1) reads as `auto`. **The `last` key is never accepted here** — it is stamped by opening a composure, and a rename through the app carries it and the startup `path` along |
 
 **A stale `base_rev` is not an error.** Ops are last-writer-wins per module,
 so the batch still lands; the reply says what moved underneath you in

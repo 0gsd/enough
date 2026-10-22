@@ -88,6 +88,7 @@
 {"word": "racking", "synonym": "wrenching", "via": "racking", "position": 1}
 {"word": "racking", "synonym": "wrenching", "via": "wrack", "position": 1}
 {"word": "raconteur", "synonym": "anecdotist", "via": "raconteur", "position": 1}
+{"word": "raconteuse", "synonym": "storyteller", "via": "raconteuse", "position": 1}
 {"word": "racoon", "synonym": "raccoon", "via": "raccoon", "position": 1}
 {"word": "racquet", "synonym": "racket", "via": "racket", "position": 1}
 {"word": "racquet", "synonym": "racket", "via": "racquet", "position": 1}
@@ -147,27 +148,36 @@
 {"word": "radical", "synonym": "revolutionary", "via": "radical", "position": 5}
 {"word": "radio", "synonym": "wireless", "via": "radio", "position": 1}
 {"word": "radioactivity", "synonym": "radiation", "via": "radioactivity", "position": 1}
+{"word": "radioautography", "synonym": "autoradiography", "via": "radioautography", "position": 1}
+{"word": "radiocast", "synonym": "broadcast", "via": "radiocast", "position": 1}
 {"word": "radiogram", "synonym": "radiograph", "via": "radiogram", "position": 1}
 {"word": "radiogram", "synonym": "shadowgraph", "via": "radiogram", "position": 2}
 {"word": "radiogram", "synonym": "skiagram", "via": "radiogram", "position": 3}
 {"word": "radiograph", "synonym": "radiogram", "via": "radiograph", "position": 1}
 {"word": "radiograph", "synonym": "shadowgraph", "via": "radiograph", "position": 2}
 {"word": "radiograph", "synonym": "skiagram", "via": "radiograph", "position": 3}
+{"word": "radiolocation", "synonym": "radar", "via": "radiolocation", "position": 1}
+{"word": "radiolocator", "synonym": "radar", "via": "radiolocator", "position": 1}
+{"word": "radiometeorograph", "synonym": "radiosonde", "via": "radiometeorograph", "position": 1}
 {"word": "radiophone", "synonym": "radiotelephone", "via": "radiophone", "position": 1}
+{"word": "radiosymmetrical", "synonym": "radial", "via": "radiosymmetrical", "position": 1}
 {"word": "radiotelephone", "synonym": "radiophone", "via": "radiotelephone", "position": 1}
 {"word": "radiotelephone", "synonym": "radiotelephony", "via": "radiotelephone", "position": 2}
 {"word": "radiotelephony", "synonym": "radiotelephone", "via": "radiotelephony", "position": 1}
 {"word": "radiotherapy", "synonym": "radiation", "via": "radiotherapy", "position": 1}
 {"word": "radiotherapy", "synonym": "irradiation", "via": "radiotherapy", "position": 2}
+{"word": "radiovision", "synonym": "television", "via": "radiovision", "position": 1}
 {"word": "radish", "synonym": "daikon", "via": "radish", "position": 1}
 {"word": "radius", "synonym": "spoke", "via": "radius", "position": 1}
 {"word": "radix", "synonym": "base", "via": "radix", "position": 1}
+{"word": "rafferty", "synonym": "chaotic", "via": "rafferty", "position": 1}
 {"word": "raffia", "synonym": "raphia", "via": "raffia", "position": 1}
 {"word": "raffish", "synonym": "rakish", "via": "raffish", "position": 1}
 {"word": "raffish", "synonym": "dashing", "via": "raffish", "position": 2}
 {"word": "raffish", "synonym": "jaunty", "via": "raffish", "position": 3}
 {"word": "raffishly", "synonym": "rakishly", "via": "raffishly", "position": 1}
 {"word": "raffishly", "synonym": "carelessly", "via": "raffishly", "position": 2}
+{"word": "rafiki", "synonym": "friend", "via": "rafiki", "position": 1}
 {"word": "raft", "synonym": "mat", "via": "raft", "position": 1}
 {"word": "raft", "synonym": "batch", "via": "raft", "position": 2}
 {"word": "raft", "synonym": "deal", "via": "raft", "position": 3}
@@ -251,6 +261,7 @@
 {"word": "ragweed", "synonym": "bitterweed", "via": "ragweed", "position": 2}
 {"word": "ragweed", "synonym": "ragwort", "via": "ragweed", "position": 3}
 {"word": "ragwort", "synonym": "butterweed", "via": "ragwort", "position": 1}
+{"word": "rahui", "synonym": "ban", "via": "rahui", "position": 1}
 {"word": "raid", "synonym": "foray", "via": "raid", "position": 1}
 {"word": "raid", "synonym": "maraud", "via": "raid", "position": 2}
 {"word": "raid", "synonym": "bust", "via": "raid", "position": 3}
@@ -402,6 +413,8 @@
 {"word": "ramate", "synonym": "branching", "via": "ramate", "position": 2}
 {"word": "ramate", "synonym": "ramose", "via": "ramate", "position": 3}
 {"word": "ramate", "synonym": "ramous", "via": "ramate", "position": 4}
+{"word": "rambla", "synonym": "gully", "via": "rambla", "position": 1}
+{"word": "rambla", "synonym": "ravine", "via": "rambla", "position": 2}
 {"word": "ramble", "synonym": "meander", "via": "ramble", "position": 1}
 {"word": "ramble", "synonym": "roll", "via": "ramble", "position": 2}
 {"word": "ramble", "synonym": "wander", "via": "ramble", "position": 3}
@@ -470,6 +483,8 @@
 {"word": "ramshackle", "synonym": "derelict", "via": "ramshackle", "position": 2}
 {"word": "ramshackle", "synonym": "dilapidated", "via": "ramshackle", "position": 3}
 {"word": "ramshackle", "synonym": "tatterdemalion", "via": "ramshackle", "position": 4}
+{"word": "ramstam", "synonym": "headlong", "via": "ramstam", "position": 1}
+{"word": "ramstam", "synonym": "hasty", "via": "ramstam", "position": 2}
 {"word": "ranch", "synonym": "spread", "via": "ranch", "position": 1}
 {"word": "rancid", "synonym": "sour", "via": "rancid", "position": 1}
 {"word": "rancor", "synonym": "resentment", "via": "rancor", "position": 1}
@@ -481,6 +496,7 @@
 {"word": "rancour", "synonym": "gall", "via": "rancor", "position": 3}
 {"word": "rancour", "synonym": "rancor", "via": "rancor", "position": 4}
 {"word": "rand", "synonym": "reef", "via": "rand", "position": 1}
+{"word": "randomer", "synonym": "stranger", "via": "randomer", "position": 1}
 {"word": "randomly", "synonym": "haphazardly", "via": "randomly", "position": 1}
 {"word": "randomly", "synonym": "arbitrarily", "via": "randomly", "position": 2}
 {"word": "randomness", "synonym": "haphazardness", "via": "randomness", "position": 1}
@@ -502,6 +518,7 @@
 {"word": "range", "synonym": "chain", "via": "range", "position": 9}
 {"word": "range", "synonym": "rate", "via": "range", "position": 10}
 {"word": "ranger", "synonym": "commando", "via": "ranger", "position": 1}
+{"word": "rangi", "synonym": "sky", "via": "rangi", "position": 1}
 {"word": "rangy", "synonym": "gangling", "via": "rangy", "position": 1}
 {"word": "rangy", "synonym": "gangly", "via": "rangy", "position": 2}
 {"word": "rangy", "synonym": "lanky", "via": "rangy", "position": 3}
@@ -530,6 +547,8 @@
 {"word": "rankness", "synonym": "richness", "via": "rankness", "position": 4}
 {"word": "rankness", "synonym": "prolificacy", "via": "rankness", "position": 5}
 {"word": "rankness", "synonym": "fertility", "via": "rankness", "position": 6}
+{"word": "rannygazoo", "synonym": "nonsense", "via": "rannygazoo", "position": 1}
+{"word": "rannygazoo", "synonym": "fuss", "via": "rannygazoo", "position": 2}
 {"word": "ransack", "synonym": "comb", "via": "ransack", "position": 1}
 {"word": "ransack", "synonym": "plunder", "via": "ransack", "position": 2}
 {"word": "ransack", "synonym": "despoil", "via": "ransack", "position": 3}
@@ -625,6 +644,7 @@
 {"word": "rapidness", "synonym": "speediness", "via": "rapidness", "position": 4}
 {"word": "rapier", "synonym": "tuck", "via": "rapier", "position": 1}
 {"word": "rapist", "synonym": "raper", "via": "rapist", "position": 1}
+{"word": "raploch", "synonym": "coarse", "via": "raploch", "position": 1}
 {"word": "rappel", "synonym": "abseil", "via": "rappel", "position": 1}
 {"word": "rapper", "synonym": "knocker", "via": "rapper", "position": 1}
 {"word": "rapport", "synonym": "resonance", "via": "rapport", "position": 1}
@@ -656,6 +676,8 @@
 {"word": "rapturous", "synonym": "rhapsodic", "via": "rapturous", "position": 4}
 {"word": "rapturously", "synonym": "ecstatically", "via": "rapturously", "position": 1}
 {"word": "rapturously", "synonym": "rhapsodically", "via": "rapturously", "position": 2}
+{"word": "raptus", "synonym": "rapture", "via": "raptus", "position": 1}
+{"word": "raptus", "synonym": "ecstasy", "via": "raptus", "position": 2}
 {"word": "rare", "synonym": "uncommon", "via": "rare", "position": 1}
 {"word": "rare", "synonym": "rarefied", "via": "rare", "position": 2}
 {"word": "rare", "synonym": "rarified", "via": "rare", "position": 3}
@@ -801,6 +823,7 @@
 {"word": "ratafia", "synonym": "ratafee", "via": "ratafia", "position": 1}
 {"word": "ratan", "synonym": "rattan", "via": "rattan", "position": 1}
 {"word": "rataplan", "synonym": "drumbeat", "via": "rataplan", "position": 1}
+{"word": "ratbaggery", "synonym": "nonsense", "via": "ratbaggery", "position": 1}
 {"word": "ratch", "synonym": "ratchet", "via": "ratch", "position": 1}
 {"word": "ratch", "synonym": "rachet", "via": "ratch", "position": 2}
 {"word": "ratch", "synonym": "ratchet", "via": "rotche", "position": 1}
@@ -1005,6 +1028,7 @@
 {"word": "raw", "synonym": "sensitive", "via": "raw", "position": 8}
 {"word": "raw", "synonym": "sore", "via": "raw", "position": 9}
 {"word": "raw", "synonym": "tender", "via": "raw", "position": 10}
+{"word": "rawmaish", "synonym": "nonsense", "via": "rawmaish", "position": 1}
 {"word": "rawness", "synonym": "inexperience", "via": "rawness", "position": 1}
 {"word": "rawness", "synonym": "tenderness", "via": "rawness", "position": 2}
 {"word": "rawness", "synonym": "soreness", "via": "rawness", "position": 3}
@@ -1398,6 +1422,7 @@
 {"word": "recalcitrancy", "synonym": "recalcitrance", "via": "recalcitrancy", "position": 2}
 {"word": "recalcitrant", "synonym": "fractious", "via": "recalcitrant", "position": 1}
 {"word": "recalcitrant", "synonym": "refractory", "via": "recalcitrant", "position": 2}
+{"word": "recalcitrate", "synonym": "resist", "via": "recalcitrate", "position": 1}
 {"word": "recall", "synonym": "recollection", "via": "recall", "position": 1}
 {"word": "recall", "synonym": "reminiscence", "via": "recall", "position": 2}
 {"word": "recall", "synonym": "callback", "via": "recall", "position": 3}
@@ -1643,6 +1668,7 @@
 {"word": "reconciler", "synonym": "conciliator", "via": "reconciler", "position": 1}
 {"word": "reconciler", "synonym": "pacifier", "via": "reconciler", "position": 2}
 {"word": "reconciler", "synonym": "peacemaker", "via": "reconciler", "position": 3}
+{"word": "reconciliate", "synonym": "reconcile", "via": "reconciliate", "position": 1}
 {"word": "reconciliation", "synonym": "balancing", "via": "reconciliation", "position": 1}
 {"word": "reconciliation", "synonym": "rapprochement", "via": "reconciliation", "position": 2}
 {"word": "reconciling", "synonym": "accommodative", "via": "reconcile", "position": 1}
@@ -1733,6 +1759,7 @@
 {"word": "recreation", "synonym": "refreshment", "via": "recreation", "position": 1}
 {"word": "recreation", "synonym": "diversion", "via": "recreation", "position": 2}
 {"word": "recreational", "synonym": "amateur", "via": "recreational", "position": 1}
+{"word": "recreationalist", "synonym": "recreationist", "via": "recreationalist", "position": 1}
 {"word": "recriminative", "synonym": "recriminatory", "via": "recriminative", "position": 1}
 {"word": "recriminatory", "synonym": "recriminative", "via": "recriminatory", "position": 1}
 {"word": "recrudesce", "synonym": "erupt", "via": "recrudesce", "position": 1}
@@ -1782,6 +1809,7 @@
 {"word": "recurrent", "synonym": "repeated", "via": "recurrent", "position": 2}
 {"word": "recurring", "synonym": "revenant", "via": "recur", "position": 1}
 {"word": "recurring", "synonym": "revenant", "via": "recurring", "position": 1}
+{"word": "recurvate", "synonym": "recurved", "via": "recurvate", "position": 1}
 {"word": "recusant", "synonym": "nonconformist", "via": "recusant", "position": 1}
 {"word": "recusant", "synonym": "dissentient", "via": "recusant", "position": 2}
 {"word": "recyclable", "synonym": "reclaimable", "via": "recyclable", "position": 1}
@@ -1847,6 +1875,7 @@
 {"word": "reddened", "synonym": "crimson", "via": "reddened", "position": 2}
 {"word": "reddened", "synonym": "red", "via": "reddened", "position": 3}
 {"word": "reddened", "synonym": "flushed", "via": "reddened", "position": 4}
+{"word": "reddener", "synonym": "blush", "via": "reddener", "position": 1}
 {"word": "reddish", "synonym": "red", "via": "reddish", "position": 1}
 {"word": "reddish", "synonym": "ruddy", "via": "reddish", "position": 2}
 {"word": "reddish", "synonym": "carmine", "via": "reddish", "position": 3}
@@ -1934,11 +1963,13 @@
 {"word": "reducer", "synonym": "reductant", "via": "reducer", "position": 1}
 {"word": "reducing", "synonym": "reduction", "via": "reduce", "position": 1}
 {"word": "reducing", "synonym": "reduction", "via": "reducing", "position": 1}
+{"word": "reduct", "synonym": "reduce", "via": "reduct", "position": 1}
 {"word": "reductant", "synonym": "reducer", "via": "reductant", "position": 1}
 {"word": "reduction", "synonym": "simplification", "via": "reduction", "position": 1}
 {"word": "reduction", "synonym": "decrease", "via": "reduction", "position": 2}
 {"word": "reduction", "synonym": "diminution", "via": "reduction", "position": 3}
 {"word": "reduction", "synonym": "reducing", "via": "reduction", "position": 4}
+{"word": "reductivism", "synonym": "reductionism", "via": "reductivism", "position": 1}
 {"word": "redundant", "synonym": "pleonastic", "via": "redundant", "position": 1}
 {"word": "redundant", "synonym": "tautological", "via": "redundant", "position": 2}
 {"word": "redundant", "synonym": "excess", "via": "redundant", "position": 3}
@@ -1990,16 +2021,22 @@
 {"word": "reelect", "synonym": "return", "via": "reelect", "position": 1}
 {"word": "reeler", "synonym": "staggerer", "via": "reeler", "position": 1}
 {"word": "reeler", "synonym": "totterer", "via": "reeler", "position": 2}
+{"word": "reem", "synonym": "cool", "via": "reem", "position": 1}
+{"word": "reem", "synonym": "great", "via": "reem", "position": 2}
+{"word": "reen", "synonym": "ditch", "via": "reen", "position": 1}
 {"word": "reenact", "synonym": "enact", "via": "reenact", "position": 1}
 {"word": "reenforce", "synonym": "reinforce", "via": "reenforce", "position": 1}
 {"word": "reestablish", "synonym": "restore", "via": "reestablish", "position": 1}
 {"word": "reestablish", "synonym": "reinstate", "via": "reestablish", "position": 2}
 {"word": "reevaluate", "synonym": "reassess", "via": "reevaluate", "position": 1}
+{"word": "reexam", "synonym": "retest", "via": "reexam", "position": 1}
 {"word": "reexamination", "synonym": "review", "via": "reexamination", "position": 1}
 {"word": "reexamine", "synonym": "review", "via": "reexamine", "position": 1}
 {"word": "ref", "synonym": "referee", "via": "ref", "position": 1}
 {"word": "ref", "synonym": "referee", "via": "referee", "position": 1}
 {"word": "ref", "synonym": "referee", "via": "reference", "position": 1}
+{"word": "refaction", "synonym": "reparation", "via": "refaction", "position": 1}
+{"word": "refaction", "synonym": "recompense", "via": "refaction", "position": 2}
 {"word": "refashion", "synonym": "remake", "via": "refashion", "position": 1}
 {"word": "refashion", "synonym": "redo", "via": "refashion", "position": 2}
 {"word": "refer", "synonym": "consult", "via": "refer", "position": 1}
@@ -2278,6 +2315,7 @@
 {"word": "registration", "synonym": "adjustment", "via": "registration", "position": 2}
 {"word": "registration", "synonym": "readjustment", "via": "registration", "position": 3}
 {"word": "registry", "synonym": "register", "via": "registry", "position": 1}
+{"word": "regle", "synonym": "groove", "via": "regle", "position": 1}
 {"word": "regnant", "synonym": "reigning", "via": "regnant", "position": 1}
 {"word": "regnant", "synonym": "ruling", "via": "regnant", "position": 2}
 {"word": "regorge", "synonym": "vomit", "via": "regorge", "position": 1}
@@ -2421,6 +2459,7 @@
 {"word": "rejoice", "synonym": "jubilate", "via": "rejoice", "position": 4}
 {"word": "rejoice", "synonym": "joy", "via": "rejoice", "position": 5}
 {"word": "rejoice", "synonym": "wallow", "via": "rejoice", "position": 6}
+{"word": "rejoicement", "synonym": "jubilation", "via": "rejoicement", "position": 1}
 {"word": "rejoicing", "synonym": "exultation", "via": "rejoice", "position": 1}
 {"word": "rejoicing", "synonym": "jubilation", "via": "rejoice", "position": 2}
 {"word": "rejoicing", "synonym": "exultant", "via": "rejoice", "position": 3}
@@ -2450,6 +2489,8 @@
 {"word": "rejuvenate", "synonym": "regenerate", "via": "rejuvenate", "position": 1}
 {"word": "rejuvenate", "synonym": "restore", "via": "rejuvenate", "position": 2}
 {"word": "rejuvenation", "synonym": "greening", "via": "rejuvenation", "position": 1}
+{"word": "rejuvenesce", "synonym": "rejuvenate", "via": "rejuvenesce", "position": 1}
+{"word": "rejuvenize", "synonym": "rejuvenate", "via": "rejuvenize", "position": 1}
 {"word": "relapse", "synonym": "backsliding", "via": "relapse", "position": 1}
 {"word": "relapse", "synonym": "lapse", "via": "relapse", "position": 2}
 {"word": "relapse", "synonym": "lapsing", "via": "relapse", "position": 3}
@@ -2637,6 +2678,8 @@
 {"word": "relishing", "synonym": "degustation", "via": "relish", "position": 4}
 {"word": "relishing", "synonym": "savoring", "via": "relishing", "position": 1}
 {"word": "relishing", "synonym": "savouring", "via": "relishing", "position": 2}
+{"word": "rellie", "synonym": "relative", "via": "rellie", "position": 1}
+{"word": "rellie", "synonym": "relation", "via": "rellie", "position": 2}
 {"word": "reload", "synonym": "recharge", "via": "reload", "position": 1}
 {"word": "relocated", "synonym": "resettled", "via": "relocate", "position": 1}
 {"word": "relocation", "synonym": "move", "via": "relocation", "position": 1}
@@ -2836,6 +2879,7 @@
 {"word": "remoteness", "synonym": "farness", "via": "remoteness", "position": 3}
 {"word": "remotion", "synonym": "removal", "via": "remotion", "position": 1}
 {"word": "removal", "synonym": "remotion", "via": "removal", "position": 1}
+{"word": "removalist", "synonym": "mover", "via": "removalist", "position": 1}
 {"word": "remove", "synonym": "take", "via": "remove", "position": 1}
 {"word": "remove", "synonym": "withdraw", "via": "remove", "position": 2}
 {"word": "remove", "synonym": "absent", "via": "remove", "position": 3}
@@ -2849,6 +2893,7 @@
 {"word": "removed", "synonym": "remote", "via": "remove", "position": 2}
 {"word": "removed", "synonym": "distant", "via": "removed", "position": 1}
 {"word": "removed", "synonym": "remote", "via": "removed", "position": 2}
+{"word": "removement", "synonym": "removal", "via": "removement", "position": 1}
 {"word": "remunerate", "synonym": "compensate", "via": "remunerate", "position": 1}
 {"word": "remunerate", "synonym": "recompense", "via": "remunerate", "position": 2}
 {"word": "remunerated", "synonym": "compensated", "via": "remunerate", "position": 1}
@@ -2867,6 +2912,7 @@
 {"word": "remunerator", "synonym": "payer", "via": "remunerator", "position": 1}
 {"word": "renaissance", "synonym": "rebirth", "via": "renaissance", "position": 1}
 {"word": "renaissance", "synonym": "renascence", "via": "renaissance", "position": 2}
+{"word": "renaissant", "synonym": "renascent", "via": "renaissant", "position": 1}
 {"word": "renal", "synonym": "nephritic", "via": "renal", "position": 1}
 {"word": "renascence", "synonym": "rebirth", "via": "renascence", "position": 1}
 {"word": "renascence", "synonym": "renaissance", "via": "renascence", "position": 2}
@@ -3185,6 +3231,7 @@
 {"word": "reply", "synonym": "answer", "via": "reply", "position": 1}
 {"word": "reply", "synonym": "response", "via": "reply", "position": 2}
 {"word": "reply", "synonym": "respond", "via": "reply", "position": 3}
+{"word": "repone", "synonym": "reinstate", "via": "repone", "position": 1}
 {"word": "report", "synonym": "reputation", "via": "report", "position": 1}
 {"word": "report", "synonym": "composition", "via": "report", "position": 2}
 {"word": "report", "synonym": "paper", "via": "report", "position": 3}
@@ -3218,6 +3265,7 @@
 {"word": "repositing", "synonym": "storage", "via": "reposit", "position": 2}
 {"word": "repositing", "synonym": "warehousing", "via": "reposit", "position": 3}
 {"word": "reposition", "synonym": "shift", "via": "reposition", "position": 1}
+{"word": "repositorium", "synonym": "depository", "via": "repositorium", "position": 1}
 {"word": "repository", "synonym": "depository", "via": "repository", "position": 1}
 {"word": "repository", "synonym": "deposit", "via": "repository", "position": 2}
 {"word": "repository", "synonym": "depositary", "via": "repository", "position": 3}
@@ -3256,6 +3304,7 @@
 {"word": "representative", "synonym": "voice", "via": "representative", "position": 8}
 {"word": "represented", "synonym": "delineated", "via": "represent", "position": 1}
 {"word": "represented", "synonym": "delineate", "via": "represent", "position": 2}
+{"word": "representor", "synonym": "representative", "via": "representor", "position": 1}
 {"word": "repress", "synonym": "suppress", "via": "repress", "position": 1}
 {"word": "repress", "synonym": "smother", "via": "repress", "position": 2}
 {"word": "repress", "synonym": "stifle", "via": "repress", "position": 3}
@@ -3635,6 +3684,7 @@
 {"word": "resolvent", "synonym": "dissolver", "via": "resolvent", "position": 3}
 {"word": "resolving", "synonym": "resolution", "via": "resolve", "position": 1}
 {"word": "resolving", "synonym": "resolution", "via": "resolving", "position": 1}
+{"word": "resomation", "synonym": "aquamation", "via": "resomation", "position": 1}
 {"word": "resonance", "synonym": "plangency", "via": "resonance", "position": 1}
 {"word": "resonance", "synonym": "ringing", "via": "resonance", "position": 2}
 {"word": "resonance", "synonym": "sonorousness", "via": "resonance", "position": 3}
@@ -3654,6 +3704,7 @@
 {"word": "resonating", "synonym": "resounding", "via": "resonate", "position": 2}
 {"word": "resonating", "synonym": "reverberating", "via": "resonate", "position": 3}
 {"word": "resonating", "synonym": "reverberative", "via": "resonate", "position": 4}
+{"word": "resonation", "synonym": "resonance", "via": "resonation", "position": 1}
 {"word": "resorb", "synonym": "reabsorb", "via": "resorb", "position": 1}
 {"word": "resort", "synonym": "recourse", "via": "resort", "position": 1}
 {"word": "resort", "synonym": "refuge", "via": "resort", "position": 2}
@@ -3742,6 +3793,7 @@
 {"word": "responsive", "synonym": "reactive", "via": "responsive", "position": 1}
 {"word": "responsive", "synonym": "antiphonal", "via": "responsive", "position": 2}
 {"word": "responsiveness", "synonym": "reactivity", "via": "responsiveness", "position": 1}
+{"word": "responsivity", "synonym": "responsiveness", "via": "responsivity", "position": 1}
 {"word": "rest", "synonym": "ease", "via": "rest", "position": 1}
 {"word": "rest", "synonym": "repose", "via": "rest", "position": 2}
 {"word": "rest", "synonym": "relaxation", "via": "rest", "position": 3}
@@ -3855,6 +3907,7 @@
 {"word": "restriction", "synonym": "confinement", "via": "restriction", "position": 2}
 {"word": "restroom", "synonym": "convenience", "via": "restroom", "position": 1}
 {"word": "restructure", "synonym": "reconstitute", "via": "restructure", "position": 1}
+{"word": "resty", "synonym": "restive", "via": "resty", "position": 1}
 {"word": "result", "synonym": "solution", "via": "result", "position": 1}
 {"word": "result", "synonym": "answer", "via": "result", "position": 2}
 {"word": "result", "synonym": "resolution", "via": "result", "position": 3}
@@ -3875,6 +3928,8 @@
 {"word": "resultant", "synonym": "incidental", "via": "resultant", "position": 8}
 {"word": "resultant", "synonym": "sequent", "via": "resultant", "position": 9}
 {"word": "resultant", "synonym": "collateral", "via": "resultant", "position": 10}
+{"word": "resultingly", "synonym": "consequently", "via": "resultingly", "position": 1}
+{"word": "resultingly", "synonym": "accordingly", "via": "resultingly", "position": 2}
 {"word": "resume", "synonym": "sketch", "via": "resume", "position": 1}
 {"word": "resume", "synonym": "survey", "via": "resume", "position": 2}
 {"word": "resume", "synonym": "restart", "via": "resume", "position": 3}
@@ -4013,6 +4068,7 @@
 {"word": "retort", "synonym": "counter", "via": "retort", "position": 6}
 {"word": "retort", "synonym": "repay", "via": "retort", "position": 7}
 {"word": "retort", "synonym": "rejoin", "via": "retort", "position": 8}
+{"word": "retortion", "synonym": "retaliation", "via": "retortion", "position": 1}
 {"word": "retrace", "synonym": "reconstruct", "via": "retrace", "position": 1}
 {"word": "retrace", "synonym": "construct", "via": "retrace", "position": 2}
 {"word": "retrace", "synonym": "trace", "via": "retrace", "position": 3}
@@ -4053,6 +4109,7 @@
 {"word": "retro", "synonym": "retroactive", "via": "retro", "position": 1}
 {"word": "retro", "synonym": "retroactive", "via": "retrospective", "position": 1}
 {"word": "retroactive", "synonym": "retro", "via": "retroactive", "position": 1}
+{"word": "retrodirective", "synonym": "retroreflective", "via": "retrodirective", "position": 1}
 {"word": "retroflection", "synonym": "retroflexion", "via": "retroflection", "position": 1}
 {"word": "retroflection", "synonym": "retroversion", "via": "retroflection", "position": 2}
 {"word": "retroflex", "synonym": "cacuminal", "via": "retroflex", "position": 1}
@@ -4419,6 +4476,7 @@
 {"word": "rework", "synonym": "retread", "via": "rework", "position": 1}
 {"word": "rewrite", "synonym": "revision", "via": "rewrite", "position": 1}
 {"word": "rewrite", "synonym": "rescript", "via": "rewrite", "position": 2}
+{"word": "rewriteperson", "synonym": "rewriteman", "via": "rewriteperson", "position": 1}
 {"word": "rewriter", "synonym": "redact", "via": "rewriter", "position": 1}
 {"word": "rewriter", "synonym": "redactor", "via": "rewriter", "position": 2}
 {"word": "rewriter", "synonym": "reviser", "via": "rewriter", "position": 3}
@@ -4428,6 +4486,7 @@
 {"word": "rhabdomancer", "synonym": "dowser", "via": "rhabdomancer", "position": 1}
 {"word": "rhabdomancy", "synonym": "dowse", "via": "rhabdomancy", "position": 1}
 {"word": "rhabdomancy", "synonym": "dowsing", "via": "rhabdomancy", "position": 2}
+{"word": "rhanja", "synonym": "beau", "via": "rhanja", "position": 1}
 {"word": "rhaphe", "synonym": "raphe", "via": "raphe", "position": 1}
 {"word": "rhapsodic", "synonym": "ecstatic", "via": "rhapsodic", "position": 1}
 {"word": "rhapsodic", "synonym": "enraptured", "via": "rhapsodic", "position": 2}
@@ -4451,11 +4510,14 @@
 {"word": "rhino", "synonym": "rhinoceros", "via": "rhino", "position": 1}
 {"word": "rhinoceros", "synonym": "rhino", "via": "rhinoceros", "position": 1}
 {"word": "rhizome", "synonym": "rootstock", "via": "rhizome", "position": 1}
+{"word": "rhizomorphous", "synonym": "rootlike", "via": "rhizomorphous", "position": 1}
+{"word": "rhodinal", "synonym": "citronellal", "via": "rhodinal", "position": 1}
 {"word": "rhodomontade", "synonym": "braggadocio", "via": "rhodomontade", "position": 1}
 {"word": "rhodomontade", "synonym": "bluster", "via": "rhodomontade", "position": 2}
 {"word": "rhodomontade", "synonym": "rodomontade", "via": "rhodomontade", "position": 3}
 {"word": "rhomb", "synonym": "rhombus", "via": "rhomb", "position": 1}
 {"word": "rhomb", "synonym": "diamond", "via": "rhomb", "position": 2}
+{"word": "rhombencephalon", "synonym": "hindbrain", "via": "rhombencephalon", "position": 1}
 {"word": "rhombohedral", "synonym": "trigonal", "via": "rhombohedral", "position": 1}
 {"word": "rhomboid", "synonym": "rhomboidal", "via": "rhomboid", "position": 1}
 {"word": "rhomboidal", "synonym": "rhomboid", "via": "rhomboidal", "position": 1}
@@ -4487,6 +4549,8 @@
 {"word": "rhythm", "synonym": "round", "via": "rhythm", "position": 3}
 {"word": "rhythmic", "synonym": "rhythmical", "via": "rhythmic", "position": 1}
 {"word": "rhythmical", "synonym": "rhythmic", "via": "rhythmical", "position": 1}
+{"word": "rhytidectomy", "synonym": "facelift", "via": "rhytidectomy", "position": 1}
+{"word": "rhytidoplasty", "synonym": "facelift", "via": "rhytidoplasty", "position": 1}
 {"word": "riant", "synonym": "laughing", "via": "riant", "position": 1}
 {"word": "riata", "synonym": "lasso", "via": "riata", "position": 1}
 {"word": "riata", "synonym": "lariat", "via": "riata", "position": 2}
@@ -4564,6 +4628,8 @@
 {"word": "rick", "synonym": "sprain", "via": "rick", "position": 7}
 {"word": "rick", "synonym": "wrench", "via": "rick", "position": 8}
 {"word": "rick", "synonym": "turn", "via": "rick", "position": 9}
+{"word": "ricket", "synonym": "blunder", "via": "ricket", "position": 1}
+{"word": "ricket", "synonym": "mistake", "via": "ricket", "position": 2}
 {"word": "rickets", "synonym": "rachitis", "via": "rickets", "position": 1}
 {"word": "rickety", "synonym": "decrepit", "via": "rickety", "position": 1}
 {"word": "rickety", "synonym": "feeble", "via": "rickety", "position": 2}
@@ -4636,6 +4702,7 @@
 {"word": "ridgling", "synonym": "ridgeling", "via": "ridgeling", "position": 1}
 {"word": "ridgling", "synonym": "ridgel", "via": "ridgeling", "position": 2}
 {"word": "ridgling", "synonym": "ridgil", "via": "ridgeling", "position": 3}
+{"word": "ridic", "synonym": "absurd", "via": "ridic", "position": 1}
 {"word": "ridicule", "synonym": "derision", "via": "ridicule", "position": 1}
 {"word": "ridicule", "synonym": "roast", "via": "ridicule", "position": 2}
 {"word": "ridicule", "synonym": "guy", "via": "ridicule", "position": 3}
@@ -4659,6 +4726,7 @@
 {"word": "ridiculousness", "synonym": "absurdness", "via": "ridiculousness", "position": 2}
 {"word": "riding", "synonym": "equitation", "via": "ride", "position": 1}
 {"word": "riding", "synonym": "equitation", "via": "riding", "position": 1}
+{"word": "rifacimento", "synonym": "adaptation", "via": "rifacimento", "position": 1}
 {"word": "rife", "synonym": "overabundant", "via": "rife", "position": 1}
 {"word": "rife", "synonym": "plethoric", "via": "rife", "position": 2}
 {"word": "rife", "synonym": "prevailing", "via": "rife", "position": 3}
@@ -4742,11 +4810,13 @@
 {"word": "rigidifying", "synonym": "rigidification", "via": "rigidify", "position": 2}
 {"word": "rigidity", "synonym": "inflexibility", "via": "rigidity", "position": 1}
 {"word": "rigidity", "synonym": "rigidness", "via": "rigidity", "position": 2}
+{"word": "rigidize", "synonym": "stiffen", "via": "rigidize", "position": 1}
 {"word": "rigidly", "synonym": "stiffly", "via": "rigidly", "position": 1}
 {"word": "rigidly", "synonym": "bolt", "via": "rigidly", "position": 2}
 {"word": "rigidness", "synonym": "inflexibility", "via": "rigidness", "position": 1}
 {"word": "rigidness", "synonym": "rigidity", "via": "rigidness", "position": 2}
 {"word": "rigmarole", "synonym": "rigamarole", "via": "rigmarole", "position": 1}
+{"word": "rigolet", "synonym": "rivulet", "via": "rigolet", "position": 1}
 {"word": "rigor", "synonym": "severity", "via": "rigor", "position": 1}
 {"word": "rigor", "synonym": "severeness", "via": "rigor", "position": 2}
 {"word": "rigor", "synonym": "harshness", "via": "rigor", "position": 3}
@@ -5119,7 +5189,6 @@
 {"word": "roadless", "synonym": "untrod", "via": "roadless", "position": 3}
 {"word": "roadless", "synonym": "untrodden", "via": "roadless", "position": 4}
 {"word": "roads", "synonym": "roadstead", "via": "road", "position": 1}
-{"word": "roads", "synonym": "roadstead", "via": "roads", "position": 1}
 {"word": "roadside", "synonym": "wayside", "via": "roadside", "position": 1}
 {"word": "roadstead", "synonym": "roads", "via": "roadstead", "position": 1}
 {"word": "roadster", "synonym": "buggy", "via": "roadster", "position": 1}
@@ -5210,6 +5279,7 @@
 {"word": "robot", "synonym": "golem", "via": "robot", "position": 2}
 {"word": "robotic", "synonym": "automatic", "via": "robotic", "position": 1}
 {"word": "robotic", "synonym": "machinelike", "via": "robotic", "position": 2}
+{"word": "robotlike", "synonym": "mechanical", "via": "robotlike", "position": 1}
 {"word": "robust", "synonym": "rich", "via": "robust", "position": 1}
 {"word": "robustious", "synonym": "boisterous", "via": "robustious", "position": 1}
 {"word": "robustious", "synonym": "rambunctious", "via": "robustious", "position": 2}
@@ -5253,6 +5323,8 @@
 {"word": "rodomontade", "synonym": "bluster", "via": "rodomontade", "position": 2}
 {"word": "rodomontade", "synonym": "rhodomontade", "via": "rodomontade", "position": 3}
 {"word": "roentgen", "synonym": "rontgen", "via": "roentgen", "position": 1}
+{"word": "roentgenograph", "synonym": "radiograph", "via": "roentgenograph", "position": 1}
+{"word": "roentgenotherapy", "synonym": "radiotherapy", "via": "roentgenotherapy", "position": 1}
 {"word": "rogue", "synonym": "knave", "via": "rogue", "position": 1}
 {"word": "rogue", "synonym": "rascal", "via": "rogue", "position": 2}
 {"word": "rogue", "synonym": "rapscallion", "via": "rogue", "position": 3}
@@ -5360,6 +5432,7 @@
 {"word": "rollicking", "synonym": "frolicsome", "via": "rollicking", "position": 2}
 {"word": "rollicking", "synonym": "frolicky", "via": "rollicking", "position": 3}
 {"word": "rollicking", "synonym": "sportive", "via": "rollicking", "position": 4}
+{"word": "rollicksome", "synonym": "frolicsome", "via": "rollicksome", "position": 1}
 {"word": "rolling", "synonym": "wheeling", "via": "roll", "position": 1}
 {"word": "rolling", "synonym": "peal", "via": "roll", "position": 2}
 {"word": "rolling", "synonym": "pealing", "via": "roll", "position": 3}
@@ -5383,6 +5456,7 @@
 {"word": "romance", "synonym": "mash", "via": "romance", "position": 8}
 {"word": "romance", "synonym": "woo", "via": "romance", "position": 9}
 {"word": "romance", "synonym": "court", "via": "romance", "position": 10}
+{"word": "romanicite", "synonym": "psilomelane", "via": "romanicite", "position": 1}
 {"word": "romanise", "synonym": "romanize", "via": "romanize", "position": 1}
 {"word": "romanise", "synonym": "latinize", "via": "romanize", "position": 2}
 {"word": "romanize", "synonym": "romanise", "via": "romanize", "position": 1}
@@ -5482,7 +5556,9 @@
 {"word": "rooted", "synonym": "frozen", "via": "root", "position": 1}
 {"word": "rooted", "synonym": "frozen", "via": "rooted", "position": 1}
 {"word": "rooter", "synonym": "fan", "via": "rooter", "position": 1}
+{"word": "rootle", "synonym": "rummage", "via": "rootle", "position": 1}
 {"word": "rootless", "synonym": "vagabond", "via": "rootless", "position": 1}
+{"word": "rootstalk", "synonym": "rhizome", "via": "rootstalk", "position": 1}
 {"word": "rope", "synonym": "lasso", "via": "rope", "position": 1}
 {"word": "ropedancer", "synonym": "ropewalker", "via": "ropedancer", "position": 1}
 {"word": "ropewalker", "synonym": "ropedancer", "via": "ropewalker", "position": 1}
@@ -5498,7 +5574,12 @@
 {"word": "ropy", "synonym": "ropey", "via": "ropy", "position": 1}
 {"word": "ropy", "synonym": "stringy", "via": "ropy", "position": 2}
 {"word": "ropy", "synonym": "thready", "via": "ropy", "position": 3}
+{"word": "roquette", "synonym": "arugula", "via": "roquette", "position": 1}
 {"word": "rorqual", "synonym": "razorback", "via": "rorqual", "position": 1}
+{"word": "rorter", "synonym": "swindler", "via": "rorter", "position": 1}
+{"word": "rorty", "synonym": "rowdy", "via": "rorty", "position": 1}
+{"word": "rorty", "synonym": "boisterous", "via": "rorty", "position": 2}
+{"word": "rosace", "synonym": "rosette", "via": "rosace", "position": 1}
 {"word": "rosaceous", "synonym": "rose", "via": "rosaceous", "position": 1}
 {"word": "rosaceous", "synonym": "roseate", "via": "rosaceous", "position": 2}
 {"word": "rose", "synonym": "rosiness", "via": "rise", "position": 1}
@@ -5517,6 +5598,7 @@
 {"word": "roseola", "synonym": "rash", "via": "roseola", "position": 1}
 {"word": "roseola", "synonym": "efflorescence", "via": "roseola", "position": 2}
 {"word": "rosin", "synonym": "resin", "via": "rosin", "position": 1}
+{"word": "rosiner", "synonym": "liquor", "via": "rosiner", "position": 1}
 {"word": "rosiness", "synonym": "rose", "via": "rosiness", "position": 1}
 {"word": "rosiness", "synonym": "ruddiness", "via": "rosiness", "position": 2}
 {"word": "rosiness", "synonym": "bloom", "via": "rosiness", "position": 3}
@@ -5593,6 +5675,7 @@
 {"word": "rotting", "synonym": "rot", "via": "rotting", "position": 2}
 {"word": "rotting", "synonym": "putrefaction", "via": "rotting", "position": 3}
 {"word": "rotting", "synonym": "breakdown", "via": "rotting", "position": 4}
+{"word": "rotto", "synonym": "drunk", "via": "rotto", "position": 1}
 {"word": "rotund", "synonym": "corpulent", "via": "rotund", "position": 1}
 {"word": "rotund", "synonym": "obese", "via": "rotund", "position": 2}
 {"word": "rotund", "synonym": "weighty", "via": "rotund", "position": 3}
@@ -5605,6 +5688,7 @@
 {"word": "rotundness", "synonym": "sphericity", "via": "rotundness", "position": 1}
 {"word": "rotundness", "synonym": "rotundity", "via": "rotundness", "position": 2}
 {"word": "rouble", "synonym": "ruble", "via": "ruble", "position": 1}
+{"word": "roucou", "synonym": "annatto", "via": "roucou", "position": 1}
 {"word": "roue", "synonym": "rake", "via": "roue", "position": 1}
 {"word": "roue", "synonym": "rakehell", "via": "roue", "position": 2}
 {"word": "roue", "synonym": "profligate", "via": "roue", "position": 3}
@@ -5652,6 +5736,8 @@
 {"word": "roughshod", "synonym": "fell", "via": "roughshod", "position": 4}
 {"word": "roughshod", "synonym": "savage", "via": "roughshod", "position": 5}
 {"word": "roughshod", "synonym": "vicious", "via": "roughshod", "position": 6}
+{"word": "rouk", "synonym": "mist", "via": "rouk", "position": 1}
+{"word": "rouk", "synonym": "fog", "via": "rouk", "position": 2}
 {"word": "round", "synonym": "circle", "via": "around", "position": 1}
 {"word": "round", "synonym": "rung", "via": "around", "position": 2}
 {"word": "round", "synonym": "stave", "via": "around", "position": 3}
@@ -5846,6 +5932,7 @@
 {"word": "rubbish", "synonym": "codswallop", "via": "rubbish", "position": 6}
 {"word": "rubbish", "synonym": "scrap", "via": "rubbish", "position": 7}
 {"word": "rubbishy", "synonym": "trashy", "via": "rubbishy", "position": 1}
+{"word": "rubbity", "synonym": "pub", "via": "rubbity", "position": 1}
 {"word": "rubble", "synonym": "debris", "via": "rubble", "position": 1}
 {"word": "rubble", "synonym": "dust", "via": "rubble", "position": 2}
 {"word": "rubble", "synonym": "junk", "via": "rubble", "position": 3}
@@ -5856,14 +5943,17 @@
 {"word": "rube", "synonym": "hayseed", "via": "rube", "position": 4}
 {"word": "rube", "synonym": "bumpkin", "via": "rube", "position": 5}
 {"word": "rube", "synonym": "chawbacon", "via": "rube", "position": 6}
+{"word": "rubefy", "synonym": "redden", "via": "rubefy", "position": 1}
 {"word": "rubeola", "synonym": "measles", "via": "rubeola", "position": 1}
 {"word": "rubeola", "synonym": "morbilli", "via": "rubeola", "position": 2}
 {"word": "rubicund", "synonym": "ruddy", "via": "rubicund", "position": 1}
 {"word": "rubicund", "synonym": "florid", "via": "rubicund", "position": 2}
 {"word": "rubicund", "synonym": "sanguine", "via": "rubicund", "position": 3}
+{"word": "rubify", "synonym": "redden", "via": "rubify", "position": 1}
 {"word": "ruble", "synonym": "rouble", "via": "ruble", "position": 1}
 {"word": "rubric", "synonym": "title", "via": "rubric", "position": 1}
 {"word": "rubric", "synonym": "gloss", "via": "rubric", "position": 2}
+{"word": "rubstone", "synonym": "whetstone", "via": "rubstone", "position": 1}
 {"word": "ruby", "synonym": "crimson", "via": "ruby", "position": 1}
 {"word": "ruby", "synonym": "red", "via": "ruby", "position": 2}
 {"word": "ruby", "synonym": "reddish", "via": "ruby", "position": 3}
@@ -5876,6 +5966,7 @@
 {"word": "ruck", "synonym": "pucker", "via": "roc", "position": 2}
 {"word": "ruck", "synonym": "herd", "via": "ruck", "position": 1}
 {"word": "ruck", "synonym": "pucker", "via": "ruck", "position": 2}
+{"word": "rucker", "synonym": "brawler", "via": "rucker", "position": 1}
 {"word": "ruckle", "synonym": "wrinkle", "via": "ruckle", "position": 1}
 {"word": "ruckle", "synonym": "crease", "via": "ruckle", "position": 2}
 {"word": "ruckle", "synonym": "crinkle", "via": "ruckle", "position": 3}
@@ -6166,12 +6257,14 @@
 {"word": "run", "synonym": "footrace", "via": "run", "position": 9}
 {"word": "run", "synonym": "campaign", "via": "run", "position": 10}
 {"word": "runabout", "synonym": "roadster", "via": "runabout", "position": 1}
+{"word": "runanga", "synonym": "council", "via": "runanga", "position": 1}
 {"word": "runaway", "synonym": "blowout", "via": "runaway", "position": 1}
 {"word": "runaway", "synonym": "romp", "via": "runaway", "position": 2}
 {"word": "runaway", "synonym": "laugher", "via": "runaway", "position": 3}
 {"word": "runaway", "synonym": "walkaway", "via": "runaway", "position": 4}
 {"word": "runaway", "synonym": "fugitive", "via": "runaway", "position": 5}
 {"word": "runaway", "synonym": "fleer", "via": "runaway", "position": 6}
+{"word": "rundale", "synonym": "runrig", "via": "rundale", "position": 1}
 {"word": "rundle", "synonym": "spoke", "via": "rundle", "position": 1}
 {"word": "rundle", "synonym": "rung", "via": "rundle", "position": 2}
 {"word": "rundown", "synonym": "summation", "via": "rundown", "position": 1}
@@ -6225,6 +6318,7 @@
 {"word": "ruralism", "synonym": "rurality", "via": "ruralism", "position": 1}
 {"word": "ruralist", "synonym": "countryman", "via": "ruralist", "position": 1}
 {"word": "rurality", "synonym": "ruralism", "via": "rurality", "position": 1}
+{"word": "ruru", "synonym": "morepork", "via": "ruru", "position": 1}
 {"word": "ruse", "synonym": "artifice", "via": "ruse", "position": 1}
 {"word": "rush", "synonym": "haste", "via": "rush", "position": 1}
 {"word": "rush", "synonym": "hurry", "via": "rush", "position": 2}
@@ -6245,6 +6339,7 @@
 {"word": "rushing", "synonym": "hurry", "via": "rushing", "position": 2}
 {"word": "rushing", "synonym": "rush", "via": "rushing", "position": 3}
 {"word": "rusk", "synonym": "zwieback", "via": "rusk", "position": 1}
+{"word": "russianize", "synonym": "russify", "via": "russianize", "position": 1}
 {"word": "rust", "synonym": "rusting", "via": "rust", "position": 1}
 {"word": "rust", "synonym": "corrode", "via": "rust", "position": 2}
 {"word": "rust", "synonym": "eat", "via": "rust", "position": 3}
@@ -6302,3 +6397,5 @@
 {"word": "ruttish", "synonym": "horny", "via": "ruttish", "position": 2}
 {"word": "ruttish", "synonym": "randy", "via": "ruttish", "position": 3}
 {"word": "rutty", "synonym": "rutted", "via": "rutty", "position": 1}
+{"word": "ryebuck", "synonym": "excellent", "via": "ryebuck", "position": 1}
+{"word": "ryebuck", "synonym": "splendid", "via": "ryebuck", "position": 2}

@@ -4,6 +4,7 @@
 {"headword": "zabaglione", "form": "zabajone", "position": 4, "pronunciation": "/ˌzɑbəˈdʒoʊni/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "zabaglione", "form": "zabajones", "position": 5, "pronunciation": "/ˌzɑbəˈdʒoʊniz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zabuton", "form": "zabutons", "position": 1, "pronunciation": "/zəˈbutɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zac", "form": "zacs", "position": 1, "pronunciation": "/zæks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zaddy", "form": "zaddies", "position": 1, "pronunciation": "/ˈzædiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zaffre", "form": "zaffar", "position": 1, "pronunciation": "/ˈzæfər/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "zaffre", "form": "zaffars", "position": 2, "pronunciation": "/ˈzæfərz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -13,14 +14,17 @@
 {"headword": "zaffre", "form": "zaffirs", "position": 6, "pronunciation": "/ˈzæfərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zaffre", "form": "zaffres", "position": 7, "pronunciation": "/ˈzæfərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zaftig", "form": "zoftig", "position": 1, "pronunciation": "/ˈzɑftɪɡ/", "labels": "[\"var.\"]", "synonyms": "[\"buxom\", \"zaftig\"]"}
+{"headword": "zafu", "form": "zafus", "position": 1, "pronunciation": "/ˈzɑfuz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zag", "form": "zagged", "position": 1, "pronunciation": "/zæɡd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "zag", "form": "zagging", "position": 2, "pronunciation": "/ˈzæɡɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "zag", "form": "zags", "position": 3, "pronunciation": "/zæɡz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zaikai", "form": "zaikais", "position": 1, "pronunciation": "/ˈzaɪkaɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zaire", "form": "zaires", "position": 1, "pronunciation": "/zaɪˈɪrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zakuska", "form": "zakuski", "position": 1, "pronunciation": "/zəˈkʊski/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zamarra", "form": "zamarras", "position": 1, "pronunciation": "/zəˈmɑrəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zamarra", "form": "zamarro", "position": 2, "pronunciation": "/zəˈmɑroʊ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "zamarra", "form": "zamarros", "position": 3, "pronunciation": "/zəˈmɑroʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zambuck", "form": "zambucks", "position": 1, "pronunciation": "/ˈzæmˌbʌks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zamia", "form": "zamias", "position": 1, "pronunciation": "/ˈzeɪmiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zamindar", "form": "zamindars", "position": 1, "pronunciation": "/zəˈmɪndɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zamindar", "form": "zemindar", "position": 2, "pronunciation": "/ˈzɛmɪndɑr/", "labels": "[\"var.\"]", "synonyms": null}
@@ -28,8 +32,10 @@
 {"headword": "zamindari", "form": "zamindaris", "position": 1, "pronunciation": "/zəˈmɪndəriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zamindari", "form": "zemindaries", "position": 2, "pronunciation": "/ˈzɛmɪndɑriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zamindari", "form": "zemindary", "position": 3, "pronunciation": "/ˈzɛmɪndɑri/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "zamorin", "form": "zamorins", "position": 1, "pronunciation": "/ˈzæməˌrinz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zander", "form": "zanders", "position": 1, "pronunciation": "/ˈzændərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zaniness", "form": "zaninesses", "position": 1, "pronunciation": "/ˈzeɪninɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zanthoxylum", "form": "zanthoxylums", "position": 1, "pronunciation": "/zænˈθɑksələmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zany", "form": "zanier", "position": 1, "pronunciation": "/ˈzeɪniər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "zany", "form": "zanies", "position": 2, "pronunciation": "/ˈzeɪniz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zany", "form": "zaniest", "position": 3, "pronunciation": "/ˈzeɪniəst/", "labels": "[\"superl.\"]", "synonyms": null}
@@ -62,8 +68,10 @@
 {"headword": "zeatin", "form": "zeatins", "position": 1, "pronunciation": "/ˈziətɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zebra", "form": "zebras", "position": 1, "pronunciation": "/ˈzibrəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zebrafish", "form": "zebrafish", "position": 1, "pronunciation": "/ˈzibrəˌfɪʃ/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "zebrass", "form": "zebrasses", "position": 1, "pronunciation": "/ˈzɛbrəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zebrass", "form": "zebrasses", "position": 1, "pronunciation": "/ˈzibræsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zebrawood", "form": "zebrawoods", "position": 1, "pronunciation": "/ˈzibrəˌwʊdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zebrina", "form": "zebrinas", "position": 1, "pronunciation": "/zəˈbraɪnəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zebrula", "form": "zebrulas", "position": 1, "pronunciation": "/ˈzibruləz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zebu", "form": "zebus", "position": 1, "pronunciation": "/ˈzibujz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zecchin", "form": "zecchins", "position": 1, "pronunciation": "/ˈzɛkɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zecchin", "form": "zechin", "position": 2, "pronunciation": "/ˈzɛkɪn/", "labels": "[\"var.\"]", "synonyms": null}
@@ -72,6 +80,7 @@
 {"headword": "zecchino", "form": "zecchinos", "position": 2, "pronunciation": "/zɛˈkinoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zed", "form": "zeds", "position": 1, "pronunciation": "/zɛdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zedoary", "form": "zedoaries", "position": 1, "pronunciation": "/ˈzɛdoʊˌɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zedonk", "form": "zedonks", "position": 1, "pronunciation": "/ˈzidɑŋks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zee", "form": "zees", "position": 1, "pronunciation": "/ziz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zeept", "form": "zeepts", "position": 1, "pronunciation": "/zipts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zein", "form": "zeins", "position": 1, "pronunciation": "/ˈziɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -86,8 +95,9 @@
 {"headword": "zenana", "form": "zananas", "position": 2, "pronunciation": "/zəˈnɑnəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zenana", "form": "zenanas", "position": 3, "pronunciation": "/zəˈnɑnəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zendo", "form": "zendos", "position": 1, "pronunciation": "/ˈzɛnˌdoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "zenith", "form": "zeniths", "position": 1, "pronunciation": "/ˈzɛnɪθz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zenith", "form": "zeniths", "position": 1, "pronunciation": "/ˈzinəθs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zeolite", "form": "zeolites", "position": 1, "pronunciation": "/ˈziəˌlaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zep", "form": "zeps", "position": 1, "pronunciation": "/zɛps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zephyr", "form": "zephyrs", "position": 1, "pronunciation": "/ˈzɛfərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zeppelin", "form": "zeppelins", "position": 1, "pronunciation": "/ˈzɛpɪlɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zeptosecond", "form": "zeptoseconds", "position": 1, "pronunciation": "/ˈzɛptoʊˌsɛkəndz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -106,17 +116,18 @@
 {"headword": "zesty", "form": "zestiest", "position": 2, "pronunciation": "/ˈzɛstiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "zeta", "form": "zetas", "position": 1, "pronunciation": "/ˈzeɪtəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zettabyte", "form": "zettabytes", "position": 1, "pronunciation": "/ˈzɛtəˌbaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "zeugma", "form": "zeugmas", "position": 1, "pronunciation": "/ˈzjuɡməz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zeugma", "form": "zeugmas", "position": 1, "pronunciation": "/ˈzuɡməz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zhuzh", "form": "zhuzhed", "position": 1, "pronunciation": "/ʒʊʒd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "zhuzh", "form": "zhuzhes", "position": 2, "pronunciation": "/ˈʒʊʒɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "zhuzh", "form": "zhuzhing", "position": 3, "pronunciation": "/ˈʒʊʒɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "zibeline", "form": "zibelines", "position": 1, "pronunciation": "/ˈzɪbəˌlinz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "zibelline", "form": "zibellines", "position": 1, "pronunciation": "/ˈzɪbəˌlinz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zibelline", "form": "zibellines", "position": 1, "pronunciation": "/ˈzɪbəlɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zibet", "form": "zibeth", "position": 1, "pronunciation": "/ˈzɪbəθ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "zibet", "form": "zibeths", "position": 2, "pronunciation": "/ˈzɪbəθz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zibet", "form": "zibets", "position": 3, "pronunciation": "/ˈzɪbɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zibula", "form": "zibulas", "position": 1, "pronunciation": "/ˈzɪbjələz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zidovudine", "form": "zidovudines", "position": 1, "pronunciation": "/zɪˈdoʊvjəˌdinz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ziff", "form": "ziffs", "position": 1, "pronunciation": "/zɪfs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zig", "form": "zigged", "position": 1, "pronunciation": "/zɪɡd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "zig", "form": "zigging", "position": 2, "pronunciation": "/ˈzɪɡɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "zig", "form": "zigs", "position": 3, "pronunciation": "/zɪɡz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -128,14 +139,18 @@
 {"headword": "zigzag", "form": "zigzagged", "position": 1, "pronunciation": "/ˈzɪɡzæɡd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "zigzag", "form": "zigzagging", "position": 2, "pronunciation": "/ˈzɪɡzæɡɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "zigzag", "form": "zigzags", "position": 3, "pronunciation": "/ˈzɪɡzæɡz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "zigzagger", "form": "zigzaggers", "position": 1, "pronunciation": "/ˈzɪɡzæɡərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zila", "form": "zilas", "position": 1, "pronunciation": "/ˈzɪləz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zilch", "form": "zilches", "position": 1, "pronunciation": "/ˈzɪltʃɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "zill", "form": "zills", "position": 1, "pronunciation": "/zɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zillah", "form": "zillahs", "position": 1, "pronunciation": "/ˈzɪləz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zillennial", "form": "zillennials", "position": 1, "pronunciation": "/zɪˈlɛniəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zillion", "form": "zillions", "position": 1, "pronunciation": "/ˈzɪljənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zillionaire", "form": "zillionaires", "position": 1, "pronunciation": "/ˈzɪljəˌnɛrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zimarra", "form": "zimarras", "position": 1, "pronunciation": "/zɪˈmɑrəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zimeter", "form": "zimeters", "position": 1, "pronunciation": "/ˈzɪmətərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zin", "form": "zins", "position": 1, "pronunciation": "/zɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "zinc", "form": "zinced", "position": 1, "pronunciation": "/ˈzɪŋkt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "zinc", "form": "zinced", "position": 1, "pronunciation": "/zɪŋkt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "zinc", "form": "zincing", "position": 2, "pronunciation": "/ˈzɪŋkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "zinc", "form": "zincked", "position": 3, "pronunciation": "/zɪŋkt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "zinc", "form": "zincking", "position": 4, "pronunciation": "/ˈzɪŋkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -145,6 +160,8 @@
 {"headword": "zincify", "form": "zincifies", "position": 2, "pronunciation": "/ˈzɪŋkɪˌfaɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "zincify", "form": "zincifying", "position": 3, "pronunciation": "/ˈzɪŋkɪˌfaɪɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "zincite", "form": "zincites", "position": 1, "pronunciation": "/ˈzɪŋˌkaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zinco", "form": "zincos", "position": 1, "pronunciation": "/ˈzɪŋkoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zincograph", "form": "zincographs", "position": 1, "pronunciation": "/ˈzɪŋkəˌɡræfs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zincy", "form": "zincky", "position": 1, "pronunciation": "/ˈzɪŋki/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "zincy", "form": "zinky", "position": 2, "pronunciation": "/ˈzɪŋki/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "zine", "form": "zines", "position": 1, "pronunciation": "/zaɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -165,6 +182,7 @@
 {"headword": "zinkify", "form": "zinkifies", "position": 2, "pronunciation": "/ˈzɪŋkɪˌfaɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "zinkify", "form": "zinkifying", "position": 3, "pronunciation": "/ˈzɪŋkɪˌfaɪɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "zinnia", "form": "zinnias", "position": 1, "pronunciation": "/ˈzɪniəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zionist", "form": "zionists", "position": 1, "pronunciation": "/ˈzaɪənəsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zip", "form": "zipped", "position": 1, "pronunciation": "/zɪpt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "zip", "form": "zipping", "position": 2, "pronunciation": "/ˈzɪpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "zip", "form": "zips", "position": 3, "pronunciation": "/zɪps/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -181,13 +199,18 @@
 {"headword": "zippy", "form": "zippiest", "position": 2, "pronunciation": "/ˈzɪpiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "ziram", "form": "zirams", "position": 1, "pronunciation": "/ˈzɪræmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zircon", "form": "zircons", "position": 1, "pronunciation": "/ˈzɜrkɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zirconate", "form": "zirconates", "position": 1, "pronunciation": "/ˈzɜrkəˌneɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zirconia", "form": "zirconias", "position": 1, "pronunciation": "/zɜrˈkoʊniəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zirconium", "form": "zirconiums", "position": 1, "pronunciation": "/zərˈkoʊniəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zirconyl", "form": "zirconyls", "position": 1, "pronunciation": "/ˈzɜrkənɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zit", "form": "zits", "position": 1, "pronunciation": "/zɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zither", "form": "zithers", "position": 1, "pronunciation": "/ˈzɪðərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zitherist", "form": "zitherists", "position": 1, "pronunciation": "/ˈzɪðərɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zithern", "form": "zitherns", "position": 1, "pronunciation": "/ˈzɪðərnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ziti", "form": "zitis", "position": 1, "pronunciation": "/ˈzitiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zizz", "form": "zizzed", "position": 1, "pronunciation": "/zɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "zizz", "form": "zizzes", "position": 2, "pronunciation": "/ˈzɪzɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "zizz", "form": "zizzing", "position": 3, "pronunciation": "/ˈzɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "zizzle", "form": "zizzled", "position": 1, "pronunciation": "/ˈzɪzəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "zizzle", "form": "zizzles", "position": 2, "pronunciation": "/ˈzɪzəlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "zizzle", "form": "zizzling", "position": 3, "pronunciation": "/ˈzɪzəlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -197,11 +220,14 @@
 {"headword": "zloty", "form": "zlotys", "position": 4, "pronunciation": "/ˈzlɔtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoantharian", "form": "zoantharians", "position": 1, "pronunciation": "/ˌzoʊænˈθɛriənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoarium", "form": "zoaria", "position": 1, "pronunciation": "/zoʊˈɛriə/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zocalo", "form": "zocalos", "position": 1, "pronunciation": "/ˈsoʊkəˌloʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zod", "form": "zods", "position": 1, "pronunciation": "/zɑdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zodiac", "form": "zodiacs", "position": 1, "pronunciation": "/ˈzoʊdiˌæks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoea", "form": "zoeae", "position": 1, "pronunciation": "/zoʊˈii/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoea", "form": "zoeas", "position": 2, "pronunciation": "/zoʊˈiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoetrope", "form": "zoetropes", "position": 1, "pronunciation": "/ˈzoʊəˌtroʊps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoisite", "form": "zoisites", "position": 1, "pronunciation": "/ˈzɔɪˌsaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zol", "form": "zols", "position": 1, "pronunciation": "/zɑlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zombie", "form": "zombi", "position": 1, "pronunciation": "/ˈzɑmbi/", "labels": "[\"var.\"]", "synonyms": "[\"zombie\", \"automaton\"]"}
 {"headword": "zombie", "form": "zombies", "position": 2, "pronunciation": "/ˈzɑmbiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zombie", "form": "zombis", "position": 3, "pronunciation": "/ˈzɑmbiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -216,6 +242,7 @@
 {"headword": "zone", "form": "zoning", "position": 3, "pronunciation": "/ˈzoʊnɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "zoner", "form": "zoners", "position": 1, "pronunciation": "/ˈzoʊnərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zonetime", "form": "zonetimes", "position": 1, "pronunciation": "/ˈzoʊnˌtaɪmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zonite", "form": "zonites", "position": 1, "pronunciation": "/ˈzoʊˌnaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zonk", "form": "zonking", "position": 1, "pronunciation": "/ˈzɑŋkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "zonk", "form": "zonks", "position": 2, "pronunciation": "/zɑŋks/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "zonkey", "form": "zonkeys", "position": 1, "pronunciation": "/ˈzɑŋkiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -223,10 +250,14 @@
 {"headword": "zonula", "form": "zonulas", "position": 2, "pronunciation": "/ˈzoʊnjələz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zonule", "form": "zonules", "position": 1, "pronunciation": "/ˈzoʊnjulz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoo", "form": "zoos", "position": 1, "pronunciation": "/zuz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zoochlorella", "form": "zoochlorellae", "position": 1, "pronunciation": "/ˌzoʊəklɔˈrɛli/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zoochlorella", "form": "zoochlorellas", "position": 2, "pronunciation": "/ˌzoʊəklɔˈrɛləz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoochore", "form": "zoochores", "position": 1, "pronunciation": "/ˈzoʊəˌkɔrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zooecium", "form": "zoecia", "position": 1, "pronunciation": "/zoʊˈiʃiə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zooecium", "form": "zoecium", "position": 2, "pronunciation": "/zoʊˈiʃiəm/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "zooecium", "form": "zooecia", "position": 3, "pronunciation": "/zoʊˈiʃiə/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zooflagellate", "form": "zooflagellates", "position": 1, "pronunciation": "/ˌzoʊəˈflædʒəˌleɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zoogamete", "form": "zoogametes", "position": 1, "pronunciation": "/ˌzoʊəˈɡæmits/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoogeographer", "form": "zoogeographers", "position": 1, "pronunciation": "/ˌzoʊoʊdʒiˈɑɡrəfərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoogeography", "form": "zoogeographies", "position": 1, "pronunciation": "/ˌzoʊoʊdʒiˈɑɡrəfiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoogloea", "form": "zooglea", "position": 1, "pronunciation": "/ˌzoʊəˈɡliə/", "labels": "[\"var.\"]", "synonyms": null}
@@ -235,6 +266,7 @@
 {"headword": "zoogloea", "form": "zoogloeae", "position": 4, "pronunciation": "/ˌzoʊəˈɡliˌi/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoogloea", "form": "zoogloeas", "position": 5, "pronunciation": "/ˌzoʊəˈɡliəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zooid", "form": "zooids", "position": 1, "pronunciation": "/ˈzoʊɔɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zooie", "form": "zooies", "position": 1, "pronunciation": "/ˈzuiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zookeeper", "form": "zookeepers", "position": 1, "pronunciation": "/ˈzukipərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoolater", "form": "zoolaters", "position": 1, "pronunciation": "/zoʊˈɑlətərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoolatry", "form": "zoolatries", "position": 1, "pronunciation": "/zoʊˈɑlətriz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -246,23 +278,30 @@
 {"headword": "zoomania", "form": "zoomanias", "position": 1, "pronunciation": "/ˌzoʊoʊˈmeɪniəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoometry", "form": "zoometries", "position": 1, "pronunciation": "/zoʊˈɑmətriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoomorph", "form": "zoomorphs", "position": 1, "pronunciation": "/ˈzoʊəˌmɔrfs/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zoomy", "form": "zoomier", "position": 1, "pronunciation": "/ˈzumiər/", "labels": "[\"comp.\"]", "synonyms": null}
+{"headword": "zoomy", "form": "zoomiest", "position": 2, "pronunciation": "/ˈzumiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "zoon", "form": "zoa", "position": 1, "pronunciation": "/ˈzoʊə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoon", "form": "zoons", "position": 2, "pronunciation": "/ˈzoʊɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoonosis", "form": "zoonoses", "position": 1, "pronunciation": "/ˌzoʊəˈnoʊsiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zooparasite", "form": "zooparasites", "position": 1, "pronunciation": "/ˌzoʊəˈpɛrəˌsaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoophile", "form": "zoophiles", "position": 1, "pronunciation": "/ˈzoʊəˌfaɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoophily", "form": "zoophilies", "position": 1, "pronunciation": "/zoʊˈɑfəliz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoophobe", "form": "zoophobes", "position": 1, "pronunciation": "/ˈzoʊəˌfoʊbz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoophyte", "form": "zoophytes", "position": 1, "pronunciation": "/ˈzoʊəˌfaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zooplankter", "form": "zooplankters", "position": 1, "pronunciation": "/ˌzoʊəˈplæŋktərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zooplankton", "form": "zooplanktons", "position": 1, "pronunciation": "/ˌzoʊəˈplæŋktənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zooplasty", "form": "zooplasties", "position": 1, "pronunciation": "/ˈzoʊəˌplæstiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zoopraxiscope", "form": "zoopraxiscopes", "position": 1, "pronunciation": "/ˌzoʊəˈpræksəˌskoʊps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoosperm", "form": "zoosperms", "position": 1, "pronunciation": "/ˈzoʊəspɜrmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoosporangium", "form": "zoosporangia", "position": 1, "pronunciation": "/ˌzoʊəspəˈrændʒiə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoospore", "form": "zoospores", "position": 1, "pronunciation": "/ˈzoʊəˌspɔrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoosterol", "form": "zoosterols", "position": 1, "pronunciation": "/zoʊˈɑstərɑlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zootomy", "form": "zootomies", "position": 1, "pronunciation": "/zoʊˈɑtəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zootoxin", "form": "zootoxins", "position": 1, "pronunciation": "/ˌzoʊəˈtɑksənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zooty", "form": "zootier", "position": 1, "pronunciation": "/ˈzutiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "zooty", "form": "zootiest", "position": 2, "pronunciation": "/ˈzutiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "zooxanthella", "form": "zooxanthellae", "position": 1, "pronunciation": "/ˌzoʊəzænˈθɛli/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zophorus", "form": "zophori", "position": 1, "pronunciation": "/ˈzoʊfəˌraɪ/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zori", "form": "zoris", "position": 1, "pronunciation": "/ˈzɔriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zorille", "form": "zoril", "position": 1, "pronunciation": "/ˈzɔrɪl/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "zorille", "form": "zorilla", "position": 2, "pronunciation": "/zɔˈrɪlə/", "labels": "[\"var.\"]", "synonyms": null}
@@ -270,21 +309,33 @@
 {"headword": "zorille", "form": "zorilles", "position": 4, "pronunciation": "/zɔˈrilz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zorille", "form": "zorils", "position": 5, "pronunciation": "/ˈzɔrilz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zorillo", "form": "zorillos", "position": 1, "pronunciation": "/zɔˈrijoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zoroastrian", "form": "zoroastrians", "position": 1, "pronunciation": "/ˌzɔroʊˈæstriənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zorse", "form": "zorses", "position": 1, "pronunciation": "/ˈzɔrsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoster", "form": "zosters", "position": 1, "pronunciation": "/ˈzɑstərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zouave", "form": "zouaves", "position": 1, "pronunciation": "/zuˈɑvz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zoysia", "form": "zoysias", "position": 1, "pronunciation": "/ˈzɔɪʒəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zucchetto", "form": "zucchettos", "position": 1, "pronunciation": "/tsuˈkɛtoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zucchini", "form": "zucchinis", "position": 1, "pronunciation": "/zuˈkiniz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zuch", "form": "zuches", "position": 1, "pronunciation": "/ˈzʌtʃɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zuz", "form": "zuzim", "position": 1, "pronunciation": "/ˈzuzɪm/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zwanziger", "form": "zwanzigers", "position": 1, "pronunciation": "/ˈtsvɑntsɪɡərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zwieback", "form": "zwiebacks", "position": 1, "pronunciation": "/ˈzwaɪbæks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zwinglian", "form": "zwinglians", "position": 1, "pronunciation": "/ˈzwɪŋɡliənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zwischenzug", "form": "zwischenzugs", "position": 1, "pronunciation": "/ˈtsvɪʃənˌtsuks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zwitterion", "form": "zwitterions", "position": 1, "pronunciation": "/ˈtsvɪtəraɪənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zydeco", "form": "zydecos", "position": 1, "pronunciation": "/ˈzaɪdəˌkoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zygapophysis", "form": "zygapophyses", "position": 1, "pronunciation": "/ˌzaɪɡəˈpɑfɪsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zygoma", "form": "zygomas", "position": 1, "pronunciation": "/zaɪˈɡoʊməz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zygoma", "form": "zygomata", "position": 2, "pronunciation": "/zaɪˈɡoʊmətə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zygomorphy", "form": "zygomorphies", "position": 1, "pronunciation": "/zaɪɡəˈmɔrfiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zygomycete", "form": "zygomycetes", "position": 1, "pronunciation": "/ˌzaɪɡoʊˈmaɪsits/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zygomycosis", "form": "zygomycoses", "position": 1, "pronunciation": "/ˌzaɪɡoʊmaɪˈkoʊsiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zygophore", "form": "zygophores", "position": 1, "pronunciation": "/ˈzaɪɡəˌfɔrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zygophyte", "form": "zygophytes", "position": 1, "pronunciation": "/ˈzaɪɡəˌfaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zygopteran", "form": "zygopterans", "position": 1, "pronunciation": "/zaɪˈɡɑptərənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zygosis", "form": "zygoses", "position": 1, "pronunciation": "/zaɪˈɡoʊsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zygosity", "form": "zygosities", "position": 1, "pronunciation": "/zaɪˈɡɑsɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zygosporangium", "form": "zygosporangia", "position": 1, "pronunciation": "/ˌzaɪɡoʊspəˈrændʒiə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zygospore", "form": "zygospores", "position": 1, "pronunciation": "/ˈzaɪɡəˌspɔrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zygote", "form": "zygotes", "position": 1, "pronunciation": "/ˈzaɪɡoʊts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zygotene", "form": "zygotenes", "position": 1, "pronunciation": "/ˈzaɪɡəˌtinz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -295,6 +346,7 @@
 {"headword": "zymogene", "form": "zymogenes", "position": 1, "pronunciation": "/ˈzaɪmədʒənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zymogram", "form": "zymograms", "position": 1, "pronunciation": "/ˈzaɪməˌɡræmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zymology", "form": "zymologies", "position": 1, "pronunciation": "/zaɪˈmɑlədʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "zymometer", "form": "zymometers", "position": 1, "pronunciation": "/zaɪˈmɑmətərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zymosan", "form": "zymosans", "position": 1, "pronunciation": "/ˈzaɪməsænz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zymosis", "form": "zymoses", "position": 1, "pronunciation": "/zaɪˈmoʊsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "zymurgy", "form": "zymurgies", "position": 1, "pronunciation": "/ˈzaɪˌmɜrdʒiz/", "labels": "[\"pl.\"]", "synonyms": null}

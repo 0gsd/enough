@@ -1,12 +1,16 @@
 {"headword": "ka", "form": "kas", "position": 1, "pronunciation": "/kɑz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kaartjie", "form": "kaartjies", "position": 1, "pronunciation": "/ˈkɑrkiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kabaka", "form": "kabakas", "position": 1, "pronunciation": "/kəˈbɑkəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kabala", "form": "kabalas", "position": 1, "pronunciation": "/kəˈbɑləz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kabar", "form": "kabars", "position": 1, "pronunciation": "/ˈkeɪbɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kabaragoya", "form": "kabaragoyas", "position": 1, "pronunciation": "/kəˌbɑrəˈɡoʊjəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kabaya", "form": "kabayas", "position": 1, "pronunciation": "/kəˈbɑjəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kabbala", "form": "kabbalas", "position": 1, "pronunciation": "/kəˈbɑləz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kabbalah", "form": "kabbalahs", "position": 1, "pronunciation": "/kəˈbɑləz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kabeezer", "form": "kabeezers", "position": 1, "pronunciation": "/kəˈbizərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kabeljou", "form": "kabeljous", "position": 1, "pronunciation": "/ˈkɑbəljaʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kabiki", "form": "kabikis", "position": 1, "pronunciation": "/kəˈbikiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kabillion", "form": "kabillions", "position": 1, "pronunciation": "/kəˈbɪljənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kabloona", "form": "kabloonas", "position": 1, "pronunciation": "/kəˈblunəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kabocha", "form": "kabochas", "position": 1, "pronunciation": "/kəˈboʊtʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kabuki", "form": "kabukis", "position": 1, "pronunciation": "/kəˈbukiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -16,16 +20,26 @@
 {"headword": "kachina", "form": "katcina", "position": 4, "pronunciation": "/kəˈtʃinə/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kachina", "form": "katcinas", "position": 5, "pronunciation": "/kəˈtʃinəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaddish", "form": "kaddishim", "position": 1, "pronunciation": "/kəˈdɪʃɪm/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kadoova", "form": "kadoovas", "position": 1, "pronunciation": "/kəˈduvəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kae", "form": "kaes", "position": 1, "pronunciation": "/keɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaf", "form": "kafs", "position": 1, "pronunciation": "/kɑfs/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kaffeeklatscher", "form": "kaffeeklatschers", "position": 1, "pronunciation": "/ˈkɑfiˌklɑtʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaffir", "form": "kaffirs", "position": 1, "pronunciation": "/ˈkæfərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kafir", "form": "kafirs", "position": 1, "pronunciation": "/ˈkæfərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaftan", "form": "caftan", "position": 1, "pronunciation": "/ˈkæftæn/", "labels": "[\"var.\"]", "synonyms": "[\"kaftan\"]"}
 {"headword": "kaftan", "form": "caftans", "position": 2, "pronunciation": "/ˈkæftænz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaftan", "form": "kaftans", "position": 3, "pronunciation": "/ˈkæftænz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kago", "form": "kagos", "position": 1, "pronunciation": "/ˈkɑɡoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kagu", "form": "kagus", "position": 1, "pronunciation": "/ˈkɑɡuz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kahawai", "form": "kahawais", "position": 1, "pronunciation": "/ˈkɑhəˌwaɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kahikatea", "form": "kahikateas", "position": 1, "pronunciation": "/ˌkaɪkəˈtiəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kahikatoa", "form": "kahikatoas", "position": 1, "pronunciation": "/ˌkɑhikəˈtoʊəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kahu", "form": "kahus", "position": 1, "pronunciation": "/ˈkɑhuz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kahuna", "form": "kahunas", "position": 1, "pronunciation": "/kəˈhunəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaiju", "form": "kaiju", "position": 1, "pronunciation": "/ˈkaɪdʒu/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kaik", "form": "kaiks", "position": 1, "pronunciation": "/kaɪks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kaikawaka", "form": "kaikawakas", "position": 1, "pronunciation": "/kaɪˈkɑwəkəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kaikomako", "form": "kaikomakos", "position": 1, "pronunciation": "/ˈkaɪkoʊˌmɑkoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kail", "form": "kails", "position": 1, "pronunciation": "/keɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kailyard", "form": "kailyards", "position": 1, "pronunciation": "/ˈkeɪlˌjɑrdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kailyard", "form": "kaleyard", "position": 2, "pronunciation": "/ˈkeɪlˌjɑrd/", "labels": "[\"var.\"]", "synonyms": null}
@@ -33,23 +47,28 @@
 {"headword": "kain", "form": "cain", "position": 1, "pronunciation": "/keɪn/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kain", "form": "cains", "position": 2, "pronunciation": "/keɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kain", "form": "kains", "position": 3, "pronunciation": "/keɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kainga", "form": "kaingas", "position": 1, "pronunciation": "/ˈkaɪŋəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kainit", "form": "kainits", "position": 1, "pronunciation": "/ˈkeɪnɪts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kainite", "form": "kainites", "position": 1, "pronunciation": "/ˈkeɪnɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kainite", "form": "kainites", "position": 1, "pronunciation": "/ˈkeɪnaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaiser", "form": "kaisers", "position": 1, "pronunciation": "/ˈkaɪzərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaiserdom", "form": "kaiserdoms", "position": 1, "pronunciation": "/ˈkaɪzərdəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaiserin", "form": "kaiserins", "position": 1, "pronunciation": "/ˈkaɪzərɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaiserism", "form": "kaiserisms", "position": 1, "pronunciation": "/ˈkaɪzərɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaka", "form": "kakas", "position": 1, "pronunciation": "/ˈkɑkɑz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kakapo", "form": "kakapos", "position": 1, "pronunciation": "/ˈkɑkəpoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kakariki", "form": "kakarikis", "position": 1, "pronunciation": "/ˈkɑkɑˌrikiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kakebuton", "form": "kakebutons", "position": 1, "pronunciation": "/ˌkɑkəˈbutɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kakemono", "form": "kakemonos", "position": 1, "pronunciation": "/ˌkɑkeɪˈmoʊnoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaki", "form": "kakis", "position": 1, "pronunciation": "/ˈkɑkiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kakiemon", "form": "kakiemons", "position": 1, "pronunciation": "/ˌkɑkiˈeɪmənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kakistocracy", "form": "kakistocracies", "position": 1, "pronunciation": "/ˌkækɪˈstɑkrəsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kalam", "form": "kalams", "position": 1, "pronunciation": "/kəˈlæmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kalanchoe", "form": "kalanchoes", "position": 1, "pronunciation": "/ˌkælənˈkoʊiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kalathos", "form": "kalathoi", "position": 1, "pronunciation": "/ˈkæləˌθɔɪ/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kale", "form": "kail", "position": 1, "pronunciation": "/keɪl/", "labels": "[\"var.\"]", "synonyms": "[\"kale\", \"cole\", \"borecole\", \"colewort\"]"}
 {"headword": "kale", "form": "kales", "position": 2, "pronunciation": "/keɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaleidoscope", "form": "kaleidoscopes", "position": 1, "pronunciation": "/kəˈlaɪdəˌskoʊpz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kalewife", "form": "kalewives", "position": 1, "pronunciation": "/ˈkeɪlˌwaɪvz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kalian", "form": "kalians", "position": 1, "pronunciation": "/kæˈliənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kalif", "form": "kalifs", "position": 1, "pronunciation": "/ˈkeɪlɪfs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kalimba", "form": "kalimbas", "position": 1, "pronunciation": "/kəˈlɪmbəz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -59,30 +78,45 @@
 {"headword": "kalmia", "form": "kalmias", "position": 1, "pronunciation": "/ˈkælmiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kalong", "form": "kalongs", "position": 1, "pronunciation": "/ˈkɑlɔŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kalpa", "form": "kalpas", "position": 1, "pronunciation": "/ˈkʌlpəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kalpis", "form": "kalpides", "position": 1, "pronunciation": "/ˈkælpɪˌdiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kalpis", "form": "kalpises", "position": 2, "pronunciation": "/ˈkælpɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kamaaina", "form": "kamaainas", "position": 1, "pronunciation": "/ˌkɑmɑˈaɪnəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kamacite", "form": "kamacites", "position": 1, "pronunciation": "/ˈkæməsaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kamahi", "form": "kamahis", "position": 1, "pronunciation": "/kəˈmɑhiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kamala", "form": "kamalas", "position": 1, "pronunciation": "/ˈkʌmələz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kambal", "form": "kambals", "position": 1, "pronunciation": "/ˈkʌmbəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kame", "form": "kames", "position": 1, "pronunciation": "/keɪmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kameez", "form": "kameezes", "position": 1, "pronunciation": "/kəˈmizɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kamelaukion", "form": "kamelaukia", "position": 1, "pronunciation": "/ˌkæməˈlɔkiə/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kamelaukion", "form": "kamelaukions", "position": 2, "pronunciation": "/ˌkæməˈlɔkiɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kamik", "form": "kamiks", "position": 1, "pronunciation": "/ˈkɑmɪks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kamikaze", "form": "kamikazes", "position": 1, "pronunciation": "/ˌkɑməˈkɑziz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "kamokamo", "form": "kamokamos", "position": 1, "pronunciation": "/ˈkɑmoʊˌkɑmoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kampong", "form": "kampongs", "position": 1, "pronunciation": "/ˈkɑmpɔŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kana", "form": "kanas", "position": 1, "pronunciation": "/ˈkænəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kanamycin", "form": "kanamycins", "position": 1, "pronunciation": "/ˌkænəˈmaɪsɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kanban", "form": "kanbans", "position": 1, "pronunciation": "/ˈkɑnbɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kane", "form": "kanes", "position": 1, "pronunciation": "/keɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kang", "form": "kangs", "position": 1, "pronunciation": "/kɑŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kanga", "form": "kangas", "position": 1, "pronunciation": "/ˈkɑŋɡəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kangaroo", "form": "kangarooed", "position": 1, "pronunciation": "/ˌkæŋɡəˈrud/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kangaroo", "form": "kangarooing", "position": 2, "pronunciation": "/ˌkæŋɡəˈruɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kangaroo", "form": "kangaroos", "position": 3, "pronunciation": "/ˌkæŋɡərˈuz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "kanji", "form": "kanjis", "position": 1, "pronunciation": "/ˈkændʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kanone", "form": "kanonen", "position": 1, "pronunciation": "/kəˈnoʊnən/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kantar", "form": "kantars", "position": 1, "pronunciation": "/kənˈtɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kantele", "form": "kanteles", "position": 1, "pronunciation": "/ˈkɑntəleɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kantian", "form": "kantians", "position": 1, "pronunciation": "/ˈkæntiənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kanuka", "form": "kanukas", "position": 1, "pronunciation": "/kəˈnukəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kanzu", "form": "kanzus", "position": 1, "pronunciation": "/ˈkænzuz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaoliang", "form": "kaoliangs", "position": 1, "pronunciation": "/ˌkaʊliˈæŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaolin", "form": "kaoline", "position": 1, "pronunciation": "/ˈkeɪəlɪn/", "labels": "[\"var.\"]", "synonyms": "[\"kaolin\"]"}
 {"headword": "kaolin", "form": "kaolines", "position": 2, "pronunciation": "/ˈkaʊlinz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaolin", "form": "kaolins", "position": 3, "pronunciation": "/ˈkaʊlɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaolinite", "form": "kaolinites", "position": 1, "pronunciation": "/ˈkeɪəlɪnaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kaolinize", "form": "kaolinized", "position": 1, "pronunciation": "/ˈkaʊləˌnaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kaolinize", "form": "kaolinizes", "position": 2, "pronunciation": "/ˈkaʊləˌnaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "kaolinize", "form": "kaolinizing", "position": 3, "pronunciation": "/ˈkaʊləˌnaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kaomoji", "form": "kaomojis", "position": 1, "pronunciation": "/ˌkaʊoʊˈmoʊdʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaon", "form": "kaons", "position": 1, "pronunciation": "/ˈkeɪˌɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kapellmeister", "form": "kapellmeisters", "position": 1, "pronunciation": "/kəˈpɛlmaɪstərz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -91,30 +125,48 @@
 {"headword": "kaph", "form": "kaf", "position": 3, "pronunciation": "/kɑf/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kaph", "form": "kaphs", "position": 4, "pronunciation": "/kɑfs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kapok", "form": "kapoks", "position": 1, "pronunciation": "/ˈkeɪpɑks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kapote", "form": "kapotes", "position": 1, "pronunciation": "/kəˈpɔtəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kappa", "form": "kappas", "position": 1, "pronunciation": "/ˈkæpəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kapuka", "form": "kapukas", "position": 1, "pronunciation": "/ˈkɑpəkəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaput", "form": "kaputt", "position": 1, "pronunciation": "/kəˈpʊt/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "karaka", "form": "karakas", "position": 1, "pronunciation": "/ˈkɑrəkəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karakia", "form": "karakias", "position": 1, "pronunciation": "/ˌkɑrəˈkiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karakul", "form": "caracul", "position": 1, "pronunciation": "/ˈkærəkəl/", "labels": "[\"var.\"]", "synonyms": "[\"broadtail\", \"karakul\"]"}
 {"headword": "karakul", "form": "caraculs", "position": 2, "pronunciation": "/ˈkærəkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karakul", "form": "karakuls", "position": 3, "pronunciation": "/ˈkærəkʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karamu", "form": "karamus", "position": 1, "pronunciation": "/ˌkɑrəˈmuz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karanda", "form": "karandas", "position": 1, "pronunciation": "/kəˈrʌndəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karanga", "form": "karangaed", "position": 1, "pronunciation": "/kəˈrɑŋəd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "karanga", "form": "karangaing", "position": 2, "pronunciation": "/kəˈrɑŋəɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "karanga", "form": "karangas", "position": 3, "pronunciation": "/kəˈrɑŋəz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "karaoke", "form": "karaokes", "position": 1, "pronunciation": "/ˌkɛriˈoʊkiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "karate", "form": "karates", "position": 1, "pronunciation": "/ˈkɛrəts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "karate", "form": "karates", "position": 1, "pronunciation": "/kəˈrɑtiz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "karateist", "form": "karateists", "position": 1, "pronunciation": "/kəˈrɑtiɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karateka", "form": "karatekas", "position": 1, "pronunciation": "/kəˈrɑtiˌkɑz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karearea", "form": "kareareas", "position": 1, "pronunciation": "/ˌkɑreɪˈɑreɪəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karma", "form": "karmas", "position": 1, "pronunciation": "/ˈkɑrməz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karmadharaya", "form": "karmadharayas", "position": 1, "pronunciation": "/ˌkɑrməˈdɑriəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karn", "form": "karns", "position": 1, "pronunciation": "/kɑrnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karo", "form": "karos", "position": 1, "pronunciation": "/ˈkɑroʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karoo", "form": "karoos", "position": 1, "pronunciation": "/kəˈruz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karoo", "form": "karroo", "position": 2, "pronunciation": "/kəˈru/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "karoo", "form": "karroos", "position": 3, "pronunciation": "/kəˈruz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karoro", "form": "karoros", "position": 1, "pronunciation": "/ˈkɑroʊˌroʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaross", "form": "karosses", "position": 1, "pronunciation": "/kəˈrɔsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karri", "form": "karris", "position": 1, "pronunciation": "/ˈkæriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karrusel", "form": "karrusels", "position": 1, "pronunciation": "/ˌkɛrəˈsɛlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karst", "form": "karsts", "position": 1, "pronunciation": "/kɑrsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kart", "form": "karted", "position": 1, "pronunciation": "/ˈkɑrtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kart", "form": "karting", "position": 2, "pronunciation": "/ˈkɑrtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kart", "form": "karts", "position": 3, "pronunciation": "/kɑrts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karting", "form": "kartings", "position": 1, "pronunciation": "/ˈkɑrtɪŋz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "karuhiruhi", "form": "karuhiruhis", "position": 1, "pronunciation": "/ˌkɑruˈhiruˌhiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karyogamy", "form": "karyogamies", "position": 1, "pronunciation": "/ˌkæriˈɑɡəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karyogram", "form": "karyograms", "position": 1, "pronunciation": "/ˈkæriəˌɡræmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karyokinesis", "form": "karyokineses", "position": 1, "pronunciation": "/ˌkæriəʊkaɪˈnisiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karyology", "form": "karyologies", "position": 1, "pronunciation": "/ˌkæriˈɑlədʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karyolymph", "form": "karyolymphs", "position": 1, "pronunciation": "/ˈkæriəˌlɪmfs/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "karyolysis", "form": "karyolyses", "position": 1, "pronunciation": "/ˌkæriˈɑləˌsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karyosome", "form": "karyosomes", "position": 1, "pronunciation": "/ˈkæriəˌsoʊmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "karyotin", "form": "caryotin", "position": 1, "pronunciation": "/ˈkɛriətɪn/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "karyotin", "form": "caryotins", "position": 2, "pronunciation": "/ˈkɛriətɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -124,27 +176,37 @@
 {"headword": "karyotype", "form": "karyotyping", "position": 3, "pronunciation": "/ˈkæriəˌtaɪpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kas", "form": "kaas", "position": 1, "pronunciation": "/kɑs/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kasha", "form": "kashas", "position": 1, "pronunciation": "/ˈkɑʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kasher", "form": "kashered", "position": 1, "pronunciation": "/ˈkæʃərd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "kasher", "form": "kashering", "position": 2, "pronunciation": "/ˈkæʃərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "kasher", "form": "kashers", "position": 3, "pronunciation": "/ˈkæʃərz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "kasher", "form": "kashered", "position": 1, "pronunciation": "/ˈkɑʃərd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kasher", "form": "kashering", "position": 2, "pronunciation": "/ˈkɑʃərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kasher", "form": "kashers", "position": 3, "pronunciation": "/ˈkɑʃərz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "kashim", "form": "kashims", "position": 1, "pronunciation": "/ˈkɑʃɪmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kashmir", "form": "kashmirs", "position": 1, "pronunciation": "/ˈkæʃmɪrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kashrut", "form": "kashruth", "position": 1, "pronunciation": "/ˈkɑʃrəs/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kashrut", "form": "kashruths", "position": 2, "pronunciation": "/ˈkɑʃrəs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kashrut", "form": "kashruts", "position": 3, "pronunciation": "/ˈkɑʃrəs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kat", "form": "kats", "position": 1, "pronunciation": "/kæts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kata", "form": "katas", "position": 1, "pronunciation": "/ˈkætəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "katabasis", "form": "katabases", "position": 1, "pronunciation": "/kəˈtæbəsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "katakana", "form": "katakanas", "position": 1, "pronunciation": "/ˌkætəˈkɑnəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "katana", "form": "katanas", "position": 1, "pronunciation": "/kəˈtɑnəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "katharometer", "form": "katharometers", "position": 1, "pronunciation": "/ˌkæθəˈrɑmətərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kathisma", "form": "kathismas", "position": 1, "pronunciation": "/kəˈθɪzməz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kathisma", "form": "kathismata", "position": 2, "pronunciation": "/kəˈθɪzmətə/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "katipo", "form": "katipos", "position": 1, "pronunciation": "/ˈkɑtɪˌpoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "katydid", "form": "katydids", "position": 1, "pronunciation": "/ˈkeɪtiˌdɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "katzenjammer", "form": "katzenjammers", "position": 1, "pronunciation": "/ˈkætsənˌdʒæmərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kaumatua", "form": "kaumatuas", "position": 1, "pronunciation": "/ˌkaʊməˈtuəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kauri", "form": "kauris", "position": 1, "pronunciation": "/ˈkaʊriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kaury", "form": "kauries", "position": 1, "pronunciation": "/ˈkaʊriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kava", "form": "ava", "position": 1, "pronunciation": "/ˈeɪvə/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kava", "form": "kavas", "position": 2, "pronunciation": "/ˈkɑvəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kavakava", "form": "kavakavas", "position": 1, "pronunciation": "/ˈkɑvəˌkɑvə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kavass", "form": "kavas", "position": 1, "pronunciation": "/ˈkɑvəz/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kavass", "form": "kavasses", "position": 2, "pronunciation": "/ˈkɑvəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kawakawa", "form": "kawakawas", "position": 1, "pronunciation": "/ˈkɑwəˌkɑwəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kawau", "form": "kawaus", "position": 1, "pronunciation": "/ˈkɑwaʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kay", "form": "kays", "position": 1, "pronunciation": "/keɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kaya", "form": "kayas", "position": 1, "pronunciation": "/ˈkaɪəz/, /ˈkɑjəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kayak", "form": "kaiak", "position": 1, "pronunciation": "/ˈkaɪæk/", "labels": "[\"arch. var.\"]", "synonyms": null}
 {"headword": "kayak", "form": "kaiaks", "position": 2, "pronunciation": "/ˈkaɪæks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kayak", "form": "kayaked", "position": 3, "pronunciation": "/ˈkaɪækt/", "labels": "[\"past\"]", "synonyms": null}
@@ -169,10 +231,10 @@
 {"headword": "kebab", "form": "kabab", "position": 3, "pronunciation": "/kəˈbɑb/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kebab", "form": "kababs", "position": 4, "pronunciation": "/kəˈbɑbz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kebab", "form": "kabob", "position": 5, "pronunciation": "/kəˈbɑb/", "labels": "[\"var.\"]", "synonyms": "[\"kebab\"]"}
-{"headword": "kebab", "form": "kabobs", "position": 6, "pronunciation": "/kəˈbɑbz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "kebab", "form": "kebabs", "position": 7, "pronunciation": "/kəˈbɑbz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "kebab", "form": "kabobs", "position": 6, "pronunciation": "/kəˈbɑbz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kebab", "form": "kebabs", "position": 7, "pronunciation": "/kəˈbɑbz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kebab", "form": "kebob", "position": 8, "pronunciation": "/kəˈbɑb/", "labels": "[\"var.\"]", "synonyms": null}
-{"headword": "kebab", "form": "kebobs", "position": 9, "pronunciation": "/kəˈbɑbz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "kebab", "form": "kebobs", "position": 9, "pronunciation": "/kəˈbɑbz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kebar", "form": "kebars", "position": 1, "pronunciation": "/ˈkibɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kebaya", "form": "kebayas", "position": 1, "pronunciation": "/kəˈbɑjəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kebbie", "form": "kebbies", "position": 1, "pronunciation": "/ˈkɛbiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -186,6 +248,7 @@
 {"headword": "keckle", "form": "keckles", "position": 2, "pronunciation": "/ˈkɛkəlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "keckle", "form": "keckling", "position": 3, "pronunciation": "/ˈkɛklɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kecks", "form": "kegs", "position": 1, "pronunciation": "/kɛɡz/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "ked", "form": "keds", "position": 1, "pronunciation": "/kɛdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keddah", "form": "keddahs", "position": 1, "pronunciation": "/ˈkɛdəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keddah", "form": "kheda", "position": 2, "pronunciation": "/ˈkeɪdə/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "keddah", "form": "khedah", "position": 3, "pronunciation": "/ˈkeɪdə/", "labels": "[\"var.\"]", "synonyms": null}
@@ -199,11 +262,13 @@
 {"headword": "keek", "form": "keeked", "position": 1, "pronunciation": "/kikt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "keek", "form": "keeking", "position": 2, "pronunciation": "/ˈkikɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "keek", "form": "keeks", "position": 3, "pronunciation": "/kiks/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "keel", "form": "keeled", "position": 1, "pronunciation": "/ˈkild/", "labels": "[\"past\"]", "synonyms": "[\"ridged\", \"carinate\", \"carinated\"]"}
+{"headword": "keel", "form": "keeled", "position": 1, "pronunciation": "/kild/", "labels": "[\"past\"]", "synonyms": "[\"ridged\", \"carinate\", \"carinated\"]"}
 {"headword": "keel", "form": "keeling", "position": 2, "pronunciation": "/ˈkilɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "keel", "form": "keels", "position": 3, "pronunciation": "/kilz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "keelage", "form": "keelages", "position": 1, "pronunciation": "/ˈkilɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keelback", "form": "keelbacks", "position": 1, "pronunciation": "/ˈkilˌbæks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keelboat", "form": "keelboats", "position": 1, "pronunciation": "/ˈkilboʊts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keelboatman", "form": "keelboatmen", "position": 1, "pronunciation": "/ˈkilˌboʊtmən/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keelhaul", "form": "keelhale", "position": 1, "pronunciation": "/ˈkilheɪl/", "labels": "[\"arch. var.\"]", "synonyms": null}
 {"headword": "keelhaul", "form": "keelhaled", "position": 2, "pronunciation": "/ˈkilheɪld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "keelhaul", "form": "keelhales", "position": 3, "pronunciation": "/ˈkilheɪlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -227,7 +292,7 @@
 {"headword": "keeper", "form": "keepers", "position": 1, "pronunciation": "/ˈkipərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keeping", "form": "keepings", "position": 1, "pronunciation": "/ˈkipɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keepsake", "form": "keepsakes", "position": 1, "pronunciation": "/ˈkipˌseɪks/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "keeshond", "form": "keeshonden", "position": 1, "pronunciation": "/ˈkeɪzhɑndən/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keeshond", "form": "keeshonden", "position": 1, "pronunciation": "/ˈkeɪzˌhɑndən/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keeshond", "form": "keeshonds", "position": 2, "pronunciation": "/ˈkeɪzˌhɑndz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keet", "form": "keets", "position": 1, "pronunciation": "/kits/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keeve", "form": "keeves", "position": 1, "pronunciation": "/kivz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -242,15 +307,21 @@
 {"headword": "kegler", "form": "kegelers", "position": 2, "pronunciation": "/ˈkɛɡlərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kegler", "form": "keglers", "position": 3, "pronunciation": "/ˈkɛɡlərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kegling", "form": "keglings", "position": 1, "pronunciation": "/ˈkɛɡlɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kehillah", "form": "kehillot", "position": 1, "pronunciation": "/kəhiˈloʊt/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kehua", "form": "kehuas", "position": 1, "pronunciation": "/ˈkɛhuəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keiretsu", "form": "keiretsus", "position": 1, "pronunciation": "/keɪˈrɛtsuz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keister", "form": "keester", "position": 1, "pronunciation": "/ˈkistər/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "keister", "form": "keesters", "position": 2, "pronunciation": "/ˈkistərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "keister", "form": "keisters", "position": 3, "pronunciation": "/ˈkɪstərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keister", "form": "keisters", "position": 3, "pronunciation": "/ˈkistərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keister", "form": "keyster", "position": 4, "pronunciation": "/ˈkistər/", "labels": "[\"var.\"]", "synonyms": null}
-{"headword": "keister", "form": "keysters", "position": 5, "pronunciation": "/ˈkɪstərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keister", "form": "keysters", "position": 5, "pronunciation": "/ˈkistərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keister", "form": "kiester", "position": 6, "pronunciation": "/ˈkaɪstər/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "keitloa", "form": "keitloas", "position": 1, "pronunciation": "/ˈkaɪtloʊəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kekeno", "form": "kekenos", "position": 1, "pronunciation": "/ˈkɛkənoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kelebe", "form": "kelebes", "position": 1, "pronunciation": "/ˈkɛləbiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kelek", "form": "keleks", "position": 1, "pronunciation": "/ˈkɛlɛks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kelep", "form": "keleps", "position": 1, "pronunciation": "/ˈkɛlɛpz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kellion", "form": "kellia", "position": 1, "pronunciation": "/kɛˈliə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kelly", "form": "kellies", "position": 1, "pronunciation": "/ˈkɛliz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keloid", "form": "cheloid", "position": 1, "pronunciation": "/ˈkilɔɪd/", "labels": "[\"var.\"]", "synonyms": "[\"keloid\"]"}
 {"headword": "keloid", "form": "cheloids", "position": 2, "pronunciation": "/ˈkilɔɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -258,6 +329,8 @@
 {"headword": "keloid", "form": "keloiding", "position": 4, "pronunciation": "/ˈkilɔɪdɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "keloid", "form": "keloids", "position": 5, "pronunciation": "/ˈkilɔɪdz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "kelp", "form": "kelps", "position": 1, "pronunciation": "/kɛlps/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kelper", "form": "kelpers", "position": 1, "pronunciation": "/ˈkɛlpərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kelpfish", "form": "kelpfishes", "position": 1, "pronunciation": "/ˈkɛlpˌfɪʃɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kelpie", "form": "kelpies", "position": 1, "pronunciation": "/ˈkɛlpiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kelpie", "form": "kelpy", "position": 2, "pronunciation": "/ˈkɛlpi/", "labels": "[\"var.\"]", "synonyms": "[\"kelpie\"]"}
 {"headword": "kelt", "form": "kelts", "position": 1, "pronunciation": "/kɛlts/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -276,6 +349,9 @@
 {"headword": "kennel", "form": "kennelled", "position": 3, "pronunciation": "/ˈkɛnəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kennel", "form": "kennelling", "position": 4, "pronunciation": "/ˈkɛnəlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kennel", "form": "kennels", "position": 5, "pronunciation": "/ˈkɛnəlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "kennett", "form": "kennetted", "position": 1, "pronunciation": "/ˈkɛnətɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kennett", "form": "kennetting", "position": 2, "pronunciation": "/ˈkɛnətɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kennett", "form": "kennetts", "position": 3, "pronunciation": "/ˈkɛnəts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "kenning", "form": "kennings", "position": 1, "pronunciation": "/ˈkɛnɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keno", "form": "kenos", "position": 1, "pronunciation": "/ˈkinoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kenosis", "form": "kenosises", "position": 1, "pronunciation": "/kɪˈnoʊsəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -283,22 +359,31 @@
 {"headword": "kent", "form": "kented", "position": 1, "pronunciation": "/ˈkɛntɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kent", "form": "kenting", "position": 2, "pronunciation": "/ˈkɛntɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kent", "form": "kents", "position": 3, "pronunciation": "/kɛnts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "kentia", "form": "kentias", "position": 1, "pronunciation": "/ˈkɛntiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kentledge", "form": "kentledges", "position": 1, "pronunciation": "/ˈkɛntlɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kep", "form": "kepped", "position": 1, "pronunciation": "/kɛpt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kep", "form": "kepping", "position": 2, "pronunciation": "/ˈkɛpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kep", "form": "keps", "position": 3, "pronunciation": "/kɛps/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "kepi", "form": "kepis", "position": 1, "pronunciation": "/ˈkɛpiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keptie", "form": "kepties", "position": 1, "pronunciation": "/ˈkɛptiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keratectomy", "form": "keratectomies", "position": 1, "pronunciation": "/ˌkɛrəˈtɛktəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keratin", "form": "ceratin", "position": 1, "pronunciation": "/ˈsɛrətɪn/", "labels": "[\"var.\"]", "synonyms": "[\"keratin\"]"}
 {"headword": "keratin", "form": "ceratins", "position": 2, "pronunciation": "/ˈsɛrətɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keratin", "form": "keratins", "position": 3, "pronunciation": "/ˈkɛrətənz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "keratinize", "form": "keratinized", "position": 1, "pronunciation": "/ˈkɛrətɪˌnaɪzd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "keratinize", "form": "keratinizes", "position": 2, "pronunciation": "/ˈkɛrətɪˌnaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
-{"headword": "keratinize", "form": "keratinizing", "position": 3, "pronunciation": "/ˈkɛrətɪˌnaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "keratinize", "form": "keratinized", "position": 1, "pronunciation": "/ˈkɛrətəˌnaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "keratinize", "form": "keratinizes", "position": 2, "pronunciation": "/ˈkɛrətəˌnaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "keratinize", "form": "keratinizing", "position": 3, "pronunciation": "/ˈkɛrətəˌnaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "keratinocyte", "form": "keratinocytes", "position": 1, "pronunciation": "/kəˈrætənəˌsaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keratitis", "form": "keratitides", "position": 1, "pronunciation": "/ˌkɛrəˈtɪtɪˌdiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keratoacanthoma", "form": "keratoacanthomas", "position": 1, "pronunciation": "/ˌkɛrətoʊˌækənˈθoʊməz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keratode", "form": "keratodes", "position": 1, "pronunciation": "/ˈkɛrəˌtoʊdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keratoderma", "form": "keratodermas", "position": 1, "pronunciation": "/ˌkɛrətoʊˈdɜrməz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keratolysis", "form": "keratolyses", "position": 1, "pronunciation": "/ˌkɛrəˈtɑləˌsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keratoma", "form": "keratomas", "position": 1, "pronunciation": "/ˌkɛrəˈtoʊməz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keratoma", "form": "keratomata", "position": 2, "pronunciation": "/ˌkɛrəˈtoʊmətə/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "keratoplasty", "form": "keratoplasties", "position": 1, "pronunciation": "/ˌkɛrətoʊˈplæstiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keratometer", "form": "keratometers", "position": 1, "pronunciation": "/ˌkɛrəˈtɑmətərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keratoplasty", "form": "keratoplasties", "position": 1, "pronunciation": "/ˈkɛrətoʊˌplæstiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keratoscope", "form": "keratoscopes", "position": 1, "pronunciation": "/ˈkɛrətəˌskoʊps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keratosis", "form": "keratoses", "position": 1, "pronunciation": "/ˌkɛrəˈtoʊsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keratotomy", "form": "keratotomies", "position": 1, "pronunciation": "/ˌkɛrəˈtɔtəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kerb", "form": "kerbed", "position": 1, "pronunciation": "/kɜrbd/", "labels": "[\"past\"]", "synonyms": null}
@@ -306,6 +391,7 @@
 {"headword": "kerb", "form": "kerbs", "position": 3, "pronunciation": "/kɜrbz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kerchief", "form": "kerchiefs", "position": 1, "pronunciation": "/ˈkɜrtʃəfs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kerchief", "form": "kerchieves", "position": 2, "pronunciation": "/ˈkɜrtʃivz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kerel", "form": "kerels", "position": 1, "pronunciation": "/ˈkɛrəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kerf", "form": "kerfed", "position": 1, "pronunciation": "/kɜrft/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kerf", "form": "kerfing", "position": 2, "pronunciation": "/ˈkɜrfɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kerf", "form": "kerfs", "position": 3, "pronunciation": "/kɜrfs/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -319,6 +405,8 @@
 {"headword": "kernel", "form": "kernels", "position": 1, "pronunciation": "/ˈkɜrnəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kernelled", "form": "kerneled", "position": 1, "pronunciation": "/ˈkɜrnəld/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kernite", "form": "kernites", "position": 1, "pronunciation": "/ˈkɜrnaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kernos", "form": "kernoi", "position": 1, "pronunciation": "/ˈkɜrnɔɪ/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kero", "form": "keros", "position": 1, "pronunciation": "/ˈkɛroʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kerogen", "form": "kerogens", "position": 1, "pronunciation": "/ˈkɛrədʒənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kerosene", "form": "kerosenes", "position": 1, "pronunciation": "/ˈkɛrəˌsinz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kerosene", "form": "kerosine", "position": 2, "pronunciation": "/ˈkɛrəˌsin/", "labels": "[\"var.\"]", "synonyms": "[\"kerosene\"]"}
@@ -337,18 +425,23 @@
 {"headword": "ketchup", "form": "catsup", "position": 2, "pronunciation": "/ˈkɛtʃəp/", "labels": "[\"var.\"]", "synonyms": "[\"ketchup\"]"}
 {"headword": "ketchup", "form": "catsups", "position": 3, "pronunciation": "/ˈkɛtʃəps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ketchup", "form": "ketchups", "position": 4, "pronunciation": "/ˈkɛtʃəps/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "ketene", "form": "ketenes", "position": 1, "pronunciation": "/ˈkiˌtinz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ketene", "form": "ketenes", "position": 1, "pronunciation": "/ˈkitinz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ketogenesis", "form": "ketogeneses", "position": 1, "pronunciation": "/ˌkitoʊˈdʒɛnəˌsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ketogenic", "form": "keto", "position": 1, "pronunciation": "/ˈkeɪtoʊ/", "labels": "[\"abbr.\"]", "synonyms": null}
+{"headword": "ketohexose", "form": "ketohexoses", "position": 1, "pronunciation": "/ˌkitoʊˈhɛksoʊsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ketol", "form": "ketols", "position": 1, "pronunciation": "/ˈkitɑlz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "ketone", "form": "ketones", "position": 1, "pronunciation": "/ˈkiˌtoʊnz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "ketose", "form": "ketoses", "position": 1, "pronunciation": "/ˈkiˌtoʊsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ketone", "form": "ketones", "position": 1, "pronunciation": "/ˈkitoʊnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ketose", "form": "ketoses", "position": 1, "pronunciation": "/ˈkitoʊsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ketosteroid", "form": "ketosteroids", "position": 1, "pronunciation": "/ˌkitoʊˈstɛrɔɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ketoxime", "form": "ketoximes", "position": 1, "pronunciation": "/kiˈtɑkˌsimz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kettle", "form": "kettled", "position": 1, "pronunciation": "/ˈkɛtəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kettle", "form": "kettles", "position": 2, "pronunciation": "/ˈkɛtəlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "kettle", "form": "kettling", "position": 3, "pronunciation": "/ˈkɛtəlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kettlebell", "form": "kettlebells", "position": 1, "pronunciation": "/ˈkɛtəlˌbɛlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kettledrum", "form": "kettledrums", "position": 1, "pronunciation": "/ˈkɛtəlˌdrʌmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "ketubah", "form": "ketubahs", "position": 1, "pronunciation": "/kəˈtubəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "ketupat", "form": "ketupats", "position": 1, "pronunciation": "/ˈkɛtuˌpɑts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kevalin", "form": "kevalins", "position": 1, "pronunciation": "/ˈkeɪvələnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kevel", "form": "kevels", "position": 1, "pronunciation": "/ˈkɛvəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kevil", "form": "kevils", "position": 1, "pronunciation": "/ˈkɛvəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kex", "form": "kexes", "position": 1, "pronunciation": "/ˈkɛksɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -365,8 +458,10 @@
 {"headword": "keycard", "form": "keycards", "position": 1, "pronunciation": "/ˈkiˌkɑrdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keychain", "form": "keychains", "position": 1, "pronunciation": "/ˈkiˌtʃeɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keyhole", "form": "keyholes", "position": 1, "pronunciation": "/ˈkiˌhoʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keylock", "form": "keylocks", "position": 1, "pronunciation": "/ˈkiˌlɑks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keylogger", "form": "keyloggers", "position": 1, "pronunciation": "/ˈkiˌlɑɡərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keyman", "form": "keymen", "position": 1, "pronunciation": "/ˈkiˌmɛn/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keynesian", "form": "keynesians", "position": 1, "pronunciation": "/ˈkeɪnziənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keynote", "form": "keynoted", "position": 1, "pronunciation": "/ˈkiˌnoʊtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "keynote", "form": "keynotes", "position": 2, "pronunciation": "/ˈkiˌnoʊts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keynote", "form": "keynoting", "position": 3, "pronunciation": "/ˈkiˌnoʊtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -378,19 +473,24 @@
 {"headword": "keypunch", "form": "keypunching", "position": 3, "pronunciation": "/ˈkiˌpʌntʃɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "keypuncher", "form": "keypunchers", "position": 1, "pronunciation": "/ˈkiˌpʌntʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keyset", "form": "keysets", "position": 1, "pronunciation": "/ˈkiˌsɛts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keyslot", "form": "keyslots", "position": 1, "pronunciation": "/ˈkiˌslɑts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keysmash", "form": "keysmashed", "position": 1, "pronunciation": "/ˈkiˌsmæʃt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "keysmash", "form": "keysmashes", "position": 2, "pronunciation": "/ˈkiˌsmæʃɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "keysmash", "form": "keysmashing", "position": 3, "pronunciation": "/ˈkiˌsmæʃɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "keystone", "form": "keystones", "position": 1, "pronunciation": "/ˈkiˌstoʊnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keystroke", "form": "keystroked", "position": 1, "pronunciation": "/ˈkiˌstroʊkt/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "keystroke", "form": "keystrokes", "position": 2, "pronunciation": "/ˈkiˌstoʊks/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "keystroke", "form": "keystroking", "position": 3, "pronunciation": "/ˈkiˌstoʊkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "keystroke", "form": "keystrokes", "position": 2, "pronunciation": "/ˈkiˌstroʊks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "keystroke", "form": "keystroking", "position": 3, "pronunciation": "/ˈkiˌstroʊkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "keytar", "form": "keytars", "position": 1, "pronunciation": "/ˈkiˌtɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keyway", "form": "keyways", "position": 1, "pronunciation": "/ˈkiˌweɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "keyword", "form": "keywords", "position": 1, "pronunciation": "/ˈkiˌwɜrdz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "khaddar", "form": "khaddars", "position": 1, "pronunciation": "/ˈkʌdərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "khaddar", "form": "khadi", "position": 2, "pronunciation": "/ˈkɑdi/", "labels": "[\"var.\"]", "synonyms": "[\"khaddar\"]"}
 {"headword": "khaddar", "form": "khadis", "position": 3, "pronunciation": "/ˈkɑdiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "khaf", "form": "khafs", "position": 1, "pronunciation": "/xɑfs/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "khaf", "form": "khafs", "position": 1, "pronunciation": "/kɑfs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "khaf", "form": "khaph", "position": 2, "pronunciation": "/kɑf/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "khaf", "form": "khaphs", "position": 3, "pronunciation": "/kɑfs/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "khagan", "form": "khagans", "position": 1, "pronunciation": "/kɑˈɡɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "khaki", "form": "kaki", "position": 1, "pronunciation": "/ˈkɑki/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "khamsin", "form": "kamseen", "position": 1, "pronunciation": "/kæmˈsin/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "khamsin", "form": "kamseens", "position": 2, "pronunciation": "/kæmˈsinz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -402,18 +502,30 @@
 {"headword": "khan", "form": "cham", "position": 1, "pronunciation": "/tʃæm/", "labels": "[\"arch. var.\"]", "synonyms": null}
 {"headword": "khan", "form": "khans", "position": 2, "pronunciation": "/kɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "khanate", "form": "khanates", "position": 1, "pronunciation": "/ˈkɑneɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "khanda", "form": "khandas", "position": 1, "pronunciation": "/ˈkɑndəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "khanjar", "form": "khanjars", "position": 1, "pronunciation": "/ˈkɑnˌdʒɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "khansamah", "form": "khansamahs", "position": 1, "pronunciation": "/ˈkɑnsəˌmɑz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kharijite", "form": "kharijites", "position": 1, "pronunciation": "/ˈkɑrəˌdʒaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "khat", "form": "gat", "position": 1, "pronunciation": "/ɡæt/", "labels": "[\"var.\"]", "synonyms": "[\"rod\"]"}
 {"headword": "khat", "form": "kat", "position": 2, "pronunciation": "/kæt/", "labels": "[\"var.\"]", "synonyms": "[\"khat\", \"qat\", \"cat\"]"}
 {"headword": "khat", "form": "khats", "position": 3, "pronunciation": "/kɑts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "khat", "form": "qat", "position": 4, "pronunciation": "/kæt/", "labels": "[\"var.\"]", "synonyms": "[\"kat\", \"khat\", \"cat\"]"}
 {"headword": "khat", "form": "qats", "position": 5, "pronunciation": "/kæts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "khazen", "form": "khazens", "position": 1, "pronunciation": "/xɑˈzɛnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "khazen", "form": "khazenim", "position": 2, "pronunciation": "/xɑzɛˈnim/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "khazi", "form": "khazis", "position": 1, "pronunciation": "/ˈkɑziz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "khedive", "form": "khedives", "position": 1, "pronunciation": "/kəˈdivz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "khedivial", "form": "khedival", "position": 1, "pronunciation": "/kəˈdaɪvəl/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "khidmatgar", "form": "khidmatgars", "position": 1, "pronunciation": "/ˈkɪdmətˌɡɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "khimar", "form": "khimars", "position": 1, "pronunciation": "/kɪˈmɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "khirkah", "form": "khirkahs", "position": 1, "pronunciation": "/ˈkɜrkəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "khoja", "form": "khojas", "position": 1, "pronunciation": "/ˈkoʊdʒəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "khoum", "form": "khoums", "position": 1, "pronunciation": "/kumz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kiaat", "form": "kiaats", "position": 1, "pronunciation": "/kiˈɑts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kiabooca", "form": "kiaboocas", "position": 1, "pronunciation": "/ˌkaɪəˈbukəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiang", "form": "kiangs", "position": 1, "pronunciation": "/kiˈɑŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiaugh", "form": "kiaughs", "position": 1, "pronunciation": "/kjɑxz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kiawe", "form": "kiawes", "position": 1, "pronunciation": "/kiˈɑveɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kibbeh", "form": "kibbe", "position": 1, "pronunciation": "/ˈkɪbi/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kibbeh", "form": "kibbehs", "position": 2, "pronunciation": "/ˈkɪbiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kibbeh", "form": "kibbes", "position": 3, "pronunciation": "/ˈkɪbiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -422,10 +534,11 @@
 {"headword": "kibble", "form": "kibbled", "position": 1, "pronunciation": "/ˈkɪbəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kibble", "form": "kibbles", "position": 2, "pronunciation": "/ˈkɪbəlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "kibble", "form": "kibbling", "position": 3, "pronunciation": "/ˈkɪbəlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "kibbutz", "form": "kibbutzim", "position": 1, "pronunciation": "/ˌkɪbʊtˈsɪm/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kibbutz", "form": "kibbutzim", "position": 1, "pronunciation": "/ˌkɪbʊtˈsim/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kibbutznik", "form": "kibbutzniks", "position": 1, "pronunciation": "/kɪˈbʊtsnɪks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kibe", "form": "kibes", "position": 1, "pronunciation": "/kaɪbz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kibei", "form": "kibeis", "position": 1, "pronunciation": "/ˈkibeɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kibitka", "form": "kibitkas", "position": 1, "pronunciation": "/kɪˈbɪtkəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kibitz", "form": "kibbitz", "position": 1, "pronunciation": "/ˈkɪbɪts/", "labels": "[\"var.\"]", "synonyms": "[\"kibitz\"]"}
 {"headword": "kibitz", "form": "kibbitzed", "position": 2, "pronunciation": "/ˈkɪbɪtst/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kibitz", "form": "kibbitzes", "position": 3, "pronunciation": "/ˈkɪbɪtsəz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -448,13 +561,17 @@
 {"headword": "kick", "form": "kicked", "position": 1, "pronunciation": "/kɪkt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kick", "form": "kicking", "position": 2, "pronunciation": "/ˈkɪkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"kick\", \"boot\"]"}
 {"headword": "kick", "form": "kicks", "position": 3, "pronunciation": "/kɪks/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "kickabout", "form": "kickabouts", "position": 1, "pronunciation": "/ˈkɪkəˌbaʊts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kickback", "form": "kickbacks", "position": 1, "pronunciation": "/ˈkɪkˌbæks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kickball", "form": "kickballs", "position": 1, "pronunciation": "/ˈkɪkˌbɔlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kickboard", "form": "kickboards", "position": 1, "pronunciation": "/ˈkɪkˌbɔrdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kickbox", "form": "kickboxed", "position": 1, "pronunciation": "/ˈkɪkˌbɑkst/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kickbox", "form": "kickboxes", "position": 2, "pronunciation": "/ˈkɪkˌbɑksəz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "kickbox", "form": "kickboxing", "position": 3, "pronunciation": "/ˈkɪkˌbɑksɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kickboxer", "form": "kickboxers", "position": 1, "pronunciation": "/ˈkɪkˌbɑksərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kickboxing", "form": "kickboxings", "position": 1, "pronunciation": "/ˈkɪkˌbɑksɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kicker", "form": "kickers", "position": 1, "pronunciation": "/ˈkɪkərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kickoff", "form": "kickoffs", "position": 1, "pronunciation": "/ˈkɪkˌɔfz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kickoff", "form": "kickoffs", "position": 1, "pronunciation": "/ˈkɪkˌɔfs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kickshaw", "form": "kickshaws", "position": 1, "pronunciation": "/ˈkɪkˌʃɔz/", "labels": "[\"pl.\", \"var.\"]", "synonyms": null}
 {"headword": "kickstand", "form": "kickstands", "position": 1, "pronunciation": "/ˈkɪkˌstændz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kickstart", "form": "kickstarted", "position": 1, "pronunciation": "/ˈkɪkˌstɑrtɪd/", "labels": "[\"past\"]", "synonyms": null}
@@ -470,11 +587,13 @@
 {"headword": "kidder", "form": "kidders", "position": 1, "pronunciation": "/ˈkɪdərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiddie", "form": "kiddies", "position": 1, "pronunciation": "/ˈkɪdiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiddie", "form": "kiddy", "position": 2, "pronunciation": "/ˈkɪdi/", "labels": "[\"var.\"]", "synonyms": "[\"kiddie\"]"}
+{"headword": "kiddle", "form": "kiddles", "position": 1, "pronunciation": "/ˈkɪdəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiddo", "form": "kiddoes", "position": 1, "pronunciation": "/ˈkɪdoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiddo", "form": "kiddos", "position": 2, "pronunciation": "/ˈkɪdoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiddush", "form": "kiddish", "position": 1, "pronunciation": "/ˈkɪdɪʃ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kiddush", "form": "kiddushes", "position": 2, "pronunciation": "/ˈkɪdʊʃɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiddy", "form": "kiddies", "position": 1, "pronunciation": "/ˈkɪdiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kideo", "form": "kideos", "position": 1, "pronunciation": "/ˈkɪdioʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kidnap", "form": "kidnaped", "position": 1, "pronunciation": "/ˈkɪdˌnæpt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kidnap", "form": "kidnaping", "position": 2, "pronunciation": "/ˈkɪdˌnæpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kidnap", "form": "kidnapped", "position": 3, "pronunciation": "/ˈkɪdˌnæpt/", "labels": "[\"past\"]", "synonyms": null}
@@ -489,9 +608,11 @@
 {"headword": "kidnapper", "form": "kidnappers", "position": 3, "pronunciation": "/ˈkɪdˌnæpərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kidnapping", "form": "kidnaping", "position": 1, "pronunciation": "/ˈkɪdˌnæpɪŋ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kidney", "form": "kidneys", "position": 1, "pronunciation": "/ˈkɪdniz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kidneywort", "form": "kidneyworts", "position": 1, "pronunciation": "/ˈkɪdniˌwɜrts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kidskin", "form": "kidskins", "position": 1, "pronunciation": "/ˈkɪdˌskɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kidult", "form": "kidults", "position": 1, "pronunciation": "/ˈkɪdˌʌlts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kidvid", "form": "kidvids", "position": 1, "pronunciation": "/ˈkɪdˌvɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kiekie", "form": "kiekies", "position": 1, "pronunciation": "/ˈkikiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kielbasa", "form": "kielbasas", "position": 1, "pronunciation": "/kilˈbɑsəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kielbasa", "form": "kielbasi", "position": 2, "pronunciation": "/kilˈbɑsi/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kielbasa", "form": "kielbasy", "position": 3, "pronunciation": "/kilˈbɑsi/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -502,6 +623,7 @@
 {"headword": "kier", "form": "keir", "position": 1, "pronunciation": "/kir/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kier", "form": "keirs", "position": 2, "pronunciation": "/kɪrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kier", "form": "kiers", "position": 3, "pronunciation": "/kɪrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kierkegaardian", "form": "kierkegaardians", "position": 1, "pronunciation": "/ˌkɪrkəˈɡɑrdiənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kieselguhr", "form": "kieselguhrs", "position": 1, "pronunciation": "/ˈkizəlˌɡʊrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kieserite", "form": "kieserites", "position": 1, "pronunciation": "/ˈkizəˌraɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiester", "form": "kiesters", "position": 1, "pronunciation": "/ˈkaɪstərz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -518,7 +640,10 @@
 {"headword": "kiki", "form": "kikied", "position": 1, "pronunciation": "/ˈkikid/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kiki", "form": "kikiing", "position": 2, "pronunciation": "/ˈkikiɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kiki", "form": "kikis", "position": 3, "pronunciation": "/ˈkikiz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "kikoi", "form": "kikois", "position": 1, "pronunciation": "/ˈkikɔɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kikumon", "form": "kikumons", "position": 1, "pronunciation": "/ˈkikuˌmɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilderkin", "form": "kilderkins", "position": 1, "pronunciation": "/ˈkɪldərkɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kilij", "form": "kilijes", "position": 1, "pronunciation": "/ˈkɪlɪʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilim", "form": "kelim", "position": 1, "pronunciation": "/ˈkilɪm/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kilim", "form": "kelims", "position": 2, "pronunciation": "/ˈkilɪmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilim", "form": "kilims", "position": 3, "pronunciation": "/kiˈlimz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -548,19 +673,23 @@
 {"headword": "kilobit", "form": "kilobits", "position": 1, "pronunciation": "/ˈkɪləˌbɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilobyte", "form": "kilobytes", "position": 1, "pronunciation": "/ˈkɪloʊˌbaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilocalorie", "form": "kilocalories", "position": 1, "pronunciation": "/ˈkɪloʊˌkæləriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kilocurie", "form": "kilocuries", "position": 1, "pronunciation": "/ˈkɪləˌkjʊriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilocycle", "form": "kilocycles", "position": 1, "pronunciation": "/ˈkɪloʊˌsaɪkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kiloflop", "form": "kiloflops", "position": 1, "pronunciation": "/ˈkɪloʊˌflɑps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilogauss", "form": "kilogausses", "position": 1, "pronunciation": "/ˈkɪloʊˌɡaʊsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilogram", "form": "kilo", "position": 1, "pronunciation": "/ˈkiloʊ/", "labels": "[\"abbr.\"]", "synonyms": "[\"kilogram\"]"}
 {"headword": "kilogram", "form": "kilograms", "position": 2, "pronunciation": "/ˈkɪləˌɡræmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilojoule", "form": "kilojoules", "position": 1, "pronunciation": "/ˈkɪləˌdʒulz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiloliter", "form": "kiloliters", "position": 1, "pronunciation": "/ˈkɪləˌlitərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kilomegacycle", "form": "kilomegacycles", "position": 1, "pronunciation": "/ˈkɪloʊˌmɛɡəˌsaɪkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilometer", "form": "kilometers", "position": 1, "pronunciation": "/kəˈlɑmətərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilomole", "form": "kilomoles", "position": 1, "pronunciation": "/ˈkɪloʊˌmoʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiloparsec", "form": "kiloparsecs", "position": 1, "pronunciation": "/ˈkɪloʊˌpɑrsɛks/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kilopascal", "form": "kilopascals", "position": 1, "pronunciation": "/ˈkɪloʊˌpæskəlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kilopascal", "form": "kilopascals", "position": 1, "pronunciation": "/ˈkɪloʊpæˌskælz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilorad", "form": "kilorads", "position": 1, "pronunciation": "/ˈkɪloʊˌrædz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiloton", "form": "kilotons", "position": 1, "pronunciation": "/ˈkɪləˌtʌnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilovolt", "form": "kilovolts", "position": 1, "pronunciation": "/ˈkɪloʊˌvoʊlts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kilovoltage", "form": "kilovoltages", "position": 1, "pronunciation": "/ˈkɪloʊˌvoʊltɪdʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilowatt", "form": "kilowatts", "position": 1, "pronunciation": "/ˈkɪləˌwɑts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilt", "form": "kilting", "position": 1, "pronunciation": "/ˈkɪltɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kilt", "form": "kilts", "position": 2, "pronunciation": "/kɪlts/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -569,6 +698,7 @@
 {"headword": "kiltie", "form": "kilties", "position": 1, "pronunciation": "/ˈkɪltiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilting", "form": "kiltings", "position": 1, "pronunciation": "/ˈkɪltɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kilty", "form": "kilties", "position": 1, "pronunciation": "/ˈkɪltiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kim", "form": "kims", "position": 1, "pronunciation": "/kɪmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kimberlite", "form": "kimberlites", "position": 1, "pronunciation": "/ˈkɪmbərˌlaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kimchi", "form": "kimchee", "position": 1, "pronunciation": "/ˈkɪmtʃi/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kimchi", "form": "kimchees", "position": 2, "pronunciation": "/ˈkɪmtʃiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -576,7 +706,10 @@
 {"headword": "kimono", "form": "kimonos", "position": 1, "pronunciation": "/kəˈmoʊnəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kin", "form": "kins", "position": 1, "pronunciation": "/kɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kina", "form": "kinas", "position": 1, "pronunciation": "/ˈkinəz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kinase", "form": "kinases", "position": 1, "pronunciation": "/ˈkɪneɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kinara", "form": "kinaras", "position": 1, "pronunciation": "/kɪˈnɑrəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kinase", "form": "kinases", "position": 1, "pronunciation": "/ˈkaɪˌneɪzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kinchin", "form": "kinchins", "position": 1, "pronunciation": "/ˈkɪntʃɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kincob", "form": "kincobs", "position": 1, "pronunciation": "/ˈkɪnˌkɑbz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kind", "form": "kinder", "position": 1, "pronunciation": "/ˈkaɪndər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "kind", "form": "kindest", "position": 2, "pronunciation": "/ˈkaɪndəst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "kind", "form": "kinds", "position": 3, "pronunciation": "/kaɪndz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -584,6 +717,7 @@
 {"headword": "kindergarten", "form": "kindergartens", "position": 2, "pronunciation": "/ˈkɪndərˌɡɑrtənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kindergartner", "form": "kindergartener", "position": 1, "pronunciation": "/ˈkɪndərˌɡɑrtnər/", "labels": "[\"var.\"]", "synonyms": "[\"preschooler\", \"kindergartner\"]"}
 {"headword": "kindergartner", "form": "kindergartners", "position": 2, "pronunciation": "/ˈkɪndərˌɡɑrtnərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kindjal", "form": "kindjals", "position": 1, "pronunciation": "/ˈkɪndʒɑlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kindle", "form": "kindled", "position": 1, "pronunciation": "/ˈkɪndəld/", "labels": "[\"past\"]", "synonyms": "[\"ignited\", \"enkindled\"]"}
 {"headword": "kindle", "form": "kindles", "position": 2, "pronunciation": "/ˈkɪndəlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "kindle", "form": "kindling", "position": 3, "pronunciation": "/ˈkɪndlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"ignition\", \"firing\", \"lighting\", \"inflammation\", \"tinder\", \"touchwood\", \"spunk\", \"punk\"]"}
@@ -594,21 +728,26 @@
 {"headword": "kindly", "form": "kindliest", "position": 2, "pronunciation": "/ˈkaɪndliɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "kindness", "form": "kindnesses", "position": 1, "pronunciation": "/ˈkaɪndnəsəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kindred", "form": "kindreds", "position": 1, "pronunciation": "/ˈkɪndrɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kindy", "form": "kindies", "position": 1, "pronunciation": "/ˈkɪndiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinema", "form": "kinemas", "position": 1, "pronunciation": "/ˈkɪnəməz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinescope", "form": "kine", "position": 1, "pronunciation": "/kaɪn/", "labels": "[\"abbr.\"]", "synonyms": "[\"cattle\", \"cows\", \"oxen\"]"}
 {"headword": "kinescope", "form": "kinescoped", "position": 2, "pronunciation": "/ˈkɪnəˌskoʊpt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kinescope", "form": "kinescopes", "position": 3, "pronunciation": "/ˈkɪnəˌskoʊps/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "kinescope", "form": "kinescoping", "position": 4, "pronunciation": "/ˈkɪnəˌskoʊpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kinesin", "form": "kinesins", "position": 1, "pronunciation": "/kaɪˈnisɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinesiologist", "form": "kinesiologists", "position": 1, "pronunciation": "/kɪˌnisiˈɑlədʒɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kinesiology", "form": "kinesiologies", "position": 1, "pronunciation": "/ˌkɪnɪˌsiˈɑlədʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kinesiology", "form": "kinesiologies", "position": 1, "pronunciation": "/kəˌnisiˈɑlədʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinesis", "form": "kineses", "position": 1, "pronunciation": "/kɪˈnisiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinesthesia", "form": "kinesthesias", "position": 1, "pronunciation": "/ˌkɪnɪsˈθiʒəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinesthesis", "form": "kinestheses", "position": 1, "pronunciation": "/ˌkɪnəsˈθisiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kinetheodolite", "form": "kinetheodolites", "position": 1, "pronunciation": "/ˌkɪnəθiˈɑdəˌlaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kineticist", "form": "kineticists", "position": 1, "pronunciation": "/kəˈnɛtɪsɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinetin", "form": "kinetins", "position": 1, "pronunciation": "/ˈkɪnətɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinetochore", "form": "kinetochores", "position": 1, "pronunciation": "/kəˈnitoʊkɔrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kinetograph", "form": "kinetographs", "position": 1, "pronunciation": "/kɪˈnɛtəˌɡræfs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinetoplast", "form": "kinetoplasts", "position": 1, "pronunciation": "/kɪˈnitəˌplæsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinetoscope", "form": "kinetoscopes", "position": 1, "pronunciation": "/kɪˈnɛtəˌskoʊps/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kinetosis", "form": "kinetoses", "position": 1, "pronunciation": "/ˌkɪnəˈtoʊsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinetosome", "form": "kinetosomes", "position": 1, "pronunciation": "/kɪˈnɛtəˌsoʊmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinfolk", "form": "kinfolks", "position": 1, "pronunciation": "/ˈkɪnˌfoʊks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinfolk", "form": "kinsfolk", "position": 2, "pronunciation": "/ˈkɪnzˌfoʊk/", "labels": "[\"var.\"]", "synonyms": "[\"family\", \"folk\", \"kinfolk\", \"sept\", \"phratry\"]"}
@@ -623,6 +762,7 @@
 {"headword": "kingfish", "form": "kingfishes", "position": 1, "pronunciation": "/ˈkɪŋˌfɪʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kingfisher", "form": "kingfishers", "position": 1, "pronunciation": "/ˈkɪŋˌfɪʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinghood", "form": "kinghoods", "position": 1, "pronunciation": "/ˈkɪŋˌhʊdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kingklip", "form": "kingklips", "position": 1, "pronunciation": "/ˈkɪŋˌklɪps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinglet", "form": "kinglets", "position": 1, "pronunciation": "/ˈkɪŋlɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kingliness", "form": "kinglinesses", "position": 1, "pronunciation": "/ˈkɪŋlinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kingly", "form": "kinglier", "position": 1, "pronunciation": "/ˈkɪŋliər/", "labels": "[\"comp.\"]", "synonyms": null}
@@ -638,9 +778,12 @@
 {"headword": "kink", "form": "kinked", "position": 2, "pronunciation": "/kɪŋkt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kink", "form": "kinking", "position": 3, "pronunciation": "/ˈkɪŋkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kink", "form": "kinks", "position": 4, "pronunciation": "/kɪŋks/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "kinkaider", "form": "kinkaiders", "position": 1, "pronunciation": "/kɪnˈkeɪdərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinkajou", "form": "kinkajous", "position": 1, "pronunciation": "/ˈkɪŋkəˌdʒuz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinkeeper", "form": "kinkeepers", "position": 1, "pronunciation": "/ˈkɪnˌkipərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinkiness", "form": "kinkinesses", "position": 1, "pronunciation": "/ˈkɪŋkinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kinkle", "form": "kinkles", "position": 1, "pronunciation": "/ˈkɪŋkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kinkster", "form": "kinksters", "position": 1, "pronunciation": "/ˈkɪŋkstərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinky", "form": "kinkier", "position": 1, "pronunciation": "/ˈkɪŋkiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "kinky", "form": "kinkiest", "position": 2, "pronunciation": "/ˈkɪŋkiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "kinnikinnick", "form": "kinnikinnicks", "position": 1, "pronunciation": "/ˌkɪnɪkɪˈnɪks/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -649,7 +792,7 @@
 {"headword": "kinsman", "form": "kinsmen", "position": 1, "pronunciation": "/ˈkɪnzˌmɛn/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kinswoman", "form": "kinswomen", "position": 1, "pronunciation": "/ˈkɪnzˌwɪmɪn/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiore", "form": "kiores", "position": 1, "pronunciation": "/kiˈɔriz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kiosk", "form": "kiosks", "position": 1, "pronunciation": "/ˈkiˌɑsks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kiosk", "form": "kiosks", "position": 1, "pronunciation": "/ˈkiˌɔsks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kip", "form": "kipped", "position": 1, "pronunciation": "/kɪpt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kip", "form": "kipping", "position": 2, "pronunciation": "/ˈkɪpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kip", "form": "kips", "position": 3, "pronunciation": "/kɪps/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -658,8 +801,12 @@
 {"headword": "kipper", "form": "kippering", "position": 2, "pronunciation": "/ˈkɪpərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kipper", "form": "kippers", "position": 3, "pronunciation": "/ˈkɪpərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kipperer", "form": "kipperers", "position": 1, "pronunciation": "/ˈkɪpərərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kippy", "form": "kippies", "position": 1, "pronunciation": "/ˈkɪpiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kipskin", "form": "kipskins", "position": 1, "pronunciation": "/ˈkɪpˌskɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kipuka", "form": "kipukas", "position": 1, "pronunciation": "/kiˈpukəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kir", "form": "kirs", "position": 1, "pronunciation": "/kɪrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kirana", "form": "kiranas", "position": 1, "pronunciation": "/kɪˈrɑnəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kirby", "form": "kirbies", "position": 1, "pronunciation": "/ˈkɜrbiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kirigami", "form": "kirigamis", "position": 1, "pronunciation": "/ˌkɪrɪˈɡɑmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kirk", "form": "kirks", "position": 1, "pronunciation": "/kɜrks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kirkman", "form": "kirkmen", "position": 1, "pronunciation": "/ˈkɜrkmɪn/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -674,9 +821,11 @@
 {"headword": "kirtan", "form": "kirtans", "position": 1, "pronunciation": "/ˈkɪrtənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kirtle", "form": "kirtled", "position": 1, "pronunciation": "/ˈkɜrtəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kirtle", "form": "kirtles", "position": 2, "pronunciation": "/ˈkɜrtəlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "kisan", "form": "kisans", "position": 1, "pronunciation": "/ˈkisɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kishke", "form": "kishka", "position": 1, "pronunciation": "/ˈkɪʃkə/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kishke", "form": "kishkas", "position": 2, "pronunciation": "/ˈkɪʃkəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kishke", "form": "kishkes", "position": 3, "pronunciation": "/ˈkɪʃkəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kiskadee", "form": "kiskadees", "position": 1, "pronunciation": "/ˈkɪskəˌdiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kismet", "form": "kismat", "position": 1, "pronunciation": "/ˈkɪzmət/", "labels": "[\"var.\"]", "synonyms": "[\"kismet\"]"}
 {"headword": "kismet", "form": "kismats", "position": 2, "pronunciation": "/ˈkɪzməts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kismet", "form": "kismets", "position": 3, "pronunciation": "/ˈkɪzmɪts/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -685,14 +834,21 @@
 {"headword": "kiss", "form": "kissing", "position": 3, "pronunciation": "/ˈkɪsɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"caressing\", \"cuddling\", \"fondling\", \"hugging\", \"necking\", \"petting\", \"smooching\", \"snuggling\"]"}
 {"headword": "kiss", "form": "kissy", "position": 4, "pronunciation": "/ˈkɪsi/", "labels": "[\"form\"]", "synonyms": null}
 {"headword": "kiss", "form": "kist", "position": 5, "pronunciation": "/kɪst/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kissel", "form": "kissels", "position": 1, "pronunciation": "/ˈkɪsəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kisser", "form": "kissers", "position": 1, "pronunciation": "/ˈkɪsərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kisspeptin", "form": "kisspeptins", "position": 1, "pronunciation": "/ˈkɪsˌpɛptɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kist", "form": "kists", "position": 1, "pronunciation": "/kɪsts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "kistful", "form": "kistfuls", "position": 1, "pronunciation": "/ˈkɪstfʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kistvaen", "form": "kistvaens", "position": 1, "pronunciation": "/ˈkɪstˌvaɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kiswah", "form": "kiswahs", "position": 1, "pronunciation": "/ˈkɪswɑz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kit", "form": "kits", "position": 1, "pronunciation": "/kɪts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "kit", "form": "kitted", "position": 2, "pronunciation": "/ˈkɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kit", "form": "kitting", "position": 3, "pronunciation": "/ˈkɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kitbag", "form": "kitbags", "position": 1, "pronunciation": "/ˈkɪtˌbæɡz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kitchen", "form": "kitchens", "position": 1, "pronunciation": "/ˈkɪtʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kitchener", "form": "kitcheners", "position": 1, "pronunciation": "/ˈkɪtʃənərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kitchenette", "form": "kitchenettes", "position": 1, "pronunciation": "/ˌkɪtʃəˈnɛts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kitchenmaid", "form": "kitchenmaids", "position": 1, "pronunciation": "/ˈkɪtʃənˌmeɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kitchenware", "form": "kitchenwares", "position": 1, "pronunciation": "/ˈkɪtʃənˌwɛrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kite", "form": "kited", "position": 1, "pronunciation": "/ˈkaɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kite", "form": "kites", "position": 2, "pronunciation": "/kaɪts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -703,14 +859,16 @@
 {"headword": "kiteboard", "form": "kiteboarding", "position": 2, "pronunciation": "/ˈkaɪtˌbɔrdɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kiteboard", "form": "kiteboards", "position": 3, "pronunciation": "/ˈkaɪtˌbɔrdz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "kiteboarder", "form": "kiteboarders", "position": 1, "pronunciation": "/ˈkaɪtˌbɔrdərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kitembilla", "form": "kitembillas", "position": 1, "pronunciation": "/ˌkɪtəmˈbɪləz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kitenge", "form": "kitenges", "position": 1, "pronunciation": "/kiˈtɛŋɡeɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiter", "form": "kiters", "position": 1, "pronunciation": "/ˈkaɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kitesurf", "form": "kitesurfed", "position": 1, "pronunciation": "/ˈkaɪtˌsɜrft/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kitesurf", "form": "kitesurfing", "position": 2, "pronunciation": "/ˈkaɪtˌsɜrfɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kitesurf", "form": "kitesurfs", "position": 3, "pronunciation": "/ˈkaɪtˌsɜrfs/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "kith", "form": "kiths", "position": 1, "pronunciation": "/kɪðz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kithe", "form": "kithed", "position": 1, "pronunciation": "/ˈkɪðd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "kithe", "form": "kithes", "position": 2, "pronunciation": "/ˈkɪðz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
-{"headword": "kithe", "form": "kithing", "position": 3, "pronunciation": "/ˈkɪðɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kithe", "form": "kithed", "position": 1, "pronunciation": "/kaɪðd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kithe", "form": "kithes", "position": 2, "pronunciation": "/kaɪðz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "kithe", "form": "kithing", "position": 3, "pronunciation": "/ˈkaɪðɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kithe", "form": "kythe", "position": 4, "pronunciation": "/kaɪð/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kithe", "form": "kythed", "position": 5, "pronunciation": "/kaɪðd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kithe", "form": "kythes", "position": 6, "pronunciation": "/kaɪðz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -718,6 +876,7 @@
 {"headword": "kitling", "form": "kitlings", "position": 1, "pronunciation": "/ˈkɪtlɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kitling", "form": "kittling", "position": 2, "pronunciation": "/ˈkɪtlɪŋ/", "labels": "[\"arch. var.\"]", "synonyms": null}
 {"headword": "kitsch", "form": "kitsches", "position": 1, "pronunciation": "/ˈkɪtʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kitset", "form": "kitsets", "position": 1, "pronunciation": "/ˈkɪtˌsɛts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kitten", "form": "kittened", "position": 1, "pronunciation": "/ˈkɪtənd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kitten", "form": "kittening", "position": 2, "pronunciation": "/ˈkɪtənɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kitten", "form": "kittens", "position": 3, "pronunciation": "/ˈkɪtənz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -729,8 +888,14 @@
 {"headword": "kittle", "form": "kittling", "position": 5, "pronunciation": "/ˈkɪtlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kitty", "form": "kitties", "position": 1, "pronunciation": "/ˈkɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiva", "form": "kivas", "position": 1, "pronunciation": "/ˈkivəz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kiwi", "form": "kiwis", "position": 1, "pronunciation": "/ˈkiwiz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "kiwi", "form": "kiwis", "position": 1, "pronunciation": "/ˈkiwiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kiwifruit", "form": "kiwifruits", "position": 1, "pronunciation": "/ˈkiwiˌfruts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kiyi", "form": "kiyis", "position": 1, "pronunciation": "/ˈkijiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kiyoodle", "form": "kiyoodles", "position": 1, "pronunciation": "/kaɪˈjudəlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "klansman", "form": "klansmen", "position": 1, "pronunciation": "/ˈklænzmən/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "klap", "form": "klapped", "position": 1, "pronunciation": "/klæpt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "klap", "form": "klapping", "position": 2, "pronunciation": "/ˈklæpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "klap", "form": "klaps", "position": 3, "pronunciation": "/klæps/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "klatch", "form": "klatches", "position": 1, "pronunciation": "/ˈklætʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "klatch", "form": "klatsch", "position": 2, "pronunciation": "/klætʃ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "klatch", "form": "klatsches", "position": 3, "pronunciation": "/ˈklætʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -740,15 +905,22 @@
 {"headword": "klaxon", "form": "klaxons", "position": 3, "pronunciation": "/ˈklæksənz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "kleagle", "form": "kleagles", "position": 1, "pronunciation": "/ˈkliɡəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "klebsiella", "form": "klebsiellas", "position": 1, "pronunciation": "/klɛbziˈɛləz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kleinhuisie", "form": "kleinhuisies", "position": 1, "pronunciation": "/ˈkleɪnˌheɪsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "klepht", "form": "klephts", "position": 1, "pronunciation": "/klɛfts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "klepto", "form": "kleptos", "position": 1, "pronunciation": "/ˈklɛptoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kleptocracy", "form": "kleptocracies", "position": 1, "pronunciation": "/klɛpˈtɑkrəsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kleptocrat", "form": "kleptocrats", "position": 1, "pronunciation": "/ˈklɛptəˌkræts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kleptomania", "form": "kleptomanias", "position": 1, "pronunciation": "/ˌklɛptəˈmeɪniəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kleptomaniac", "form": "kleptomaniacs", "position": 1, "pronunciation": "/ˌklɛptəˈmeɪniæks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "klesha", "form": "kleshas", "position": 1, "pronunciation": "/ˈklɛʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kletterschuh", "form": "kletterschuhe", "position": 1, "pronunciation": "/ˈklɛtərˌʃuə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "klezmer", "form": "klezmorim", "position": 1, "pronunciation": "/klɛzˈmɔrɪm/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "klippe", "form": "klippen", "position": 1, "pronunciation": "/ˈklɪpən/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "klippe", "form": "klippes", "position": 2, "pronunciation": "/ˈklɪpəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "klipspringer", "form": "klipspringers", "position": 1, "pronunciation": "/ˈklɪpˌsprɪŋərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "klismos", "form": "klismoi", "position": 1, "pronunciation": "/ˈklɪzmɔɪ/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "klister", "form": "klisters", "position": 1, "pronunciation": "/ˈklɪstərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "klondyker", "form": "klondykers", "position": 1, "pronunciation": "/ˈklɑnˌdaɪkərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "klong", "form": "klongs", "position": 1, "pronunciation": "/klɔŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kloof", "form": "kloofs", "position": 1, "pronunciation": "/klufs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kludge", "form": "kludged", "position": 1, "pronunciation": "/klʌdʒd/", "labels": "[\"past\"]", "synonyms": null}
@@ -761,15 +933,17 @@
 {"headword": "klutzy", "form": "klutzier", "position": 1, "pronunciation": "/ˈklʌtsiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "klutzy", "form": "klutziest", "position": 2, "pronunciation": "/ˈklʌtsiəst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "klystron", "form": "klystrons", "position": 1, "pronunciation": "/ˈklaɪstrɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "knack", "form": "knacked", "position": 1, "pronunciation": "/nækt/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "knack", "form": "knacking", "position": 2, "pronunciation": "/ˈnækɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "knack", "form": "knacks", "position": 3, "pronunciation": "/næks/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "knack", "form": "knacks", "position": 3, "pronunciation": "/næks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knacker", "form": "knackered", "position": 1, "pronunciation": "/ˈnækərd/", "labels": "[\"past\"]", "synonyms": "[\"drained\"]"}
 {"headword": "knacker", "form": "knackers", "position": 2, "pronunciation": "/ˈnækərz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "knackery", "form": "knackeries", "position": 1, "pronunciation": "/ˈnækərɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "knackwurst", "form": "knackwursts", "position": 1, "pronunciation": "/ˈnɑkˌwʊrsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "knackwurst", "form": "knackwursts", "position": 1, "pronunciation": "/ˈnɑkˌvʊrsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knackwurst", "form": "knockwurst", "position": 2, "pronunciation": "/ˈnɑkˌwɜrst/", "labels": "[\"var.\"]", "synonyms": "[\"knackwurst\"]"}
 {"headword": "knackwurst", "form": "knockwursts", "position": 3, "pronunciation": "/ˈnɑkˌwɜrsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "knag", "form": "knags", "position": 1, "pronunciation": "/næɡz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "knaggy", "form": "knaggier", "position": 1, "pronunciation": "/ˈnæɡiər/", "labels": "[\"comp.\"]", "synonyms": null}
+{"headword": "knaggy", "form": "knaggiest", "position": 2, "pronunciation": "/ˈnæɡiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
+{"headword": "knaidel", "form": "knaidlach", "position": 1, "pronunciation": "/ˈkneɪdləx/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knap", "form": "knapped", "position": 1, "pronunciation": "/næpt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "knap", "form": "knapping", "position": 2, "pronunciation": "/ˈnæpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "knap", "form": "knaps", "position": 3, "pronunciation": "/næps/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -789,36 +963,45 @@
 {"headword": "knee", "form": "kneed", "position": 1, "pronunciation": "/nid/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "knee", "form": "kneeing", "position": 2, "pronunciation": "/ˈniɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "knee", "form": "knees", "position": 3, "pronunciation": "/niz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "kneecap", "form": "kneecapped", "position": 1, "pronunciation": "/ˈnikæpt/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "kneecap", "form": "kneecapping", "position": 2, "pronunciation": "/ˈnikæpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kneeboard", "form": "kneeboarded", "position": 1, "pronunciation": "/ˈniˌbɔrdəd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kneeboard", "form": "kneeboarding", "position": 2, "pronunciation": "/ˈniˌbɔrdɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kneeboard", "form": "kneeboards", "position": 3, "pronunciation": "/ˈniˌbɔrdz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "kneecap", "form": "kneecapped", "position": 1, "pronunciation": "/ˈniˌkæpt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kneecap", "form": "kneecapping", "position": 2, "pronunciation": "/ˈniˌkæpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kneecap", "form": "kneecaps", "position": 3, "pronunciation": "/ˈniˌkæps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kneecapping", "form": "kneecappings", "position": 1, "pronunciation": "/ˈnikæpɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kneehole", "form": "kneeholes", "position": 1, "pronunciation": "/ˈnihəʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kneel", "form": "kneeled", "position": 1, "pronunciation": "/ˈnild/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kneehole", "form": "kneeholes", "position": 1, "pronunciation": "/ˈniˌhoʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kneel", "form": "kneeled", "position": 1, "pronunciation": "/nild/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kneel", "form": "kneeling", "position": 2, "pronunciation": "/ˈnilɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"kneel\"]"}
 {"headword": "kneel", "form": "kneels", "position": 3, "pronunciation": "/nilz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "kneel", "form": "knelt", "position": 4, "pronunciation": "/nɛlt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kneeler", "form": "kneelers", "position": 1, "pronunciation": "/ˈnilərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kneepad", "form": "kneepads", "position": 1, "pronunciation": "/ˈnipædz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kneepan", "form": "kneepans", "position": 1, "pronunciation": "/ˈnipænz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kneepiece", "form": "kneepieces", "position": 1, "pronunciation": "/ˈniˌpisəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kneesock", "form": "kneesocks", "position": 1, "pronunciation": "/ˈnisɑks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knell", "form": "knelled", "position": 1, "pronunciation": "/nɛld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "knell", "form": "knelling", "position": 2, "pronunciation": "/ˈnɛlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "knell", "form": "knells", "position": 3, "pronunciation": "/nɛlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "knesset", "form": "knessets", "position": 1, "pronunciation": "/ˈknɛsɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "knez", "form": "knezes", "position": 1, "pronunciation": "/kəˈnɛzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knickknack", "form": "knickknacks", "position": 1, "pronunciation": "/ˈnɪkˌnæks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "knickpoint", "form": "knickpoints", "position": 1, "pronunciation": "/ˈnɪkˌpɔɪnts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knife", "form": "knifed", "position": 1, "pronunciation": "/naɪft/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "knife", "form": "knifes", "position": 2, "pronunciation": "/naɪfs/", "labels": "[\"3rd sing.\", \"pl.\"]", "synonyms": null}
 {"headword": "knife", "form": "knifing", "position": 3, "pronunciation": "/ˈnaɪfɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "knife", "form": "knives", "position": 4, "pronunciation": "/naɪvz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "knifeman", "form": "knifemen", "position": 1, "pronunciation": "/ˈnaɪfmən/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knifepoint", "form": "knifepoints", "position": 1, "pronunciation": "/ˈnaɪfˌpɔɪnts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knifer", "form": "knifers", "position": 1, "pronunciation": "/ˈnaɪfərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knight", "form": "knighted", "position": 1, "pronunciation": "/ˈnaɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "knight", "form": "knighting", "position": 2, "pronunciation": "/ˈnaɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "knight", "form": "knights", "position": 3, "pronunciation": "/naɪts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "knighthead", "form": "knightheads", "position": 1, "pronunciation": "/ˈnaɪtˌhɛdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knighthood", "form": "knighthoods", "position": 1, "pronunciation": "/ˈnaɪtˌhʊdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knightliness", "form": "knightlinesses", "position": 1, "pronunciation": "/ˈnaɪtlinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knimpel", "form": "knimpels", "position": 1, "pronunciation": "/ˈnɪmpəlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kniphofia", "form": "kniphofias", "position": 1, "pronunciation": "/nɪpˈhoʊfiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knish", "form": "knishes", "position": 1, "pronunciation": "/kəˈnɪʃɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knit", "form": "knit", "position": 1, "pronunciation": "/nɪt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "knit", "form": "knits", "position": 2, "pronunciation": "/nɪts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -829,11 +1012,15 @@
 {"headword": "knob", "form": "knobbed", "position": 1, "pronunciation": "/nɑbd/", "labels": "[\"past\"]", "synonyms": "[\"gnarled\", \"gnarly\", \"knotted\", \"knotty\"]"}
 {"headword": "knob", "form": "knobbing", "position": 2, "pronunciation": "/ˈnɑbɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "knob", "form": "knobs", "position": 3, "pronunciation": "/nɑbz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "knobble", "form": "knobbled", "position": 1, "pronunciation": "/ˈnɑbəld/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "knobble", "form": "knobbles", "position": 2, "pronunciation": "/ˈnɑbəlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "knobble", "form": "knobbling", "position": 3, "pronunciation": "/ˈnɑblɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "knobbly", "form": "knobblier", "position": 1, "pronunciation": "/ˈnɑbliər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "knobbly", "form": "knobbliest", "position": 2, "pronunciation": "/ˈnɑbliɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "knobby", "form": "knobbier", "position": 1, "pronunciation": "/ˈnɑbiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "knobby", "form": "knobbiest", "position": 2, "pronunciation": "/ˈnɑbiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "knobkerrie", "form": "knobkerries", "position": 1, "pronunciation": "/ˈnɑbˌkɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "knobstick", "form": "knobsticks", "position": 1, "pronunciation": "/ˈnɑbˌstɪks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knock", "form": "knocked", "position": 1, "pronunciation": "/nɑkt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "knock", "form": "knocking", "position": 2, "pronunciation": "/ˈnɑkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"knock\"]"}
 {"headword": "knock", "form": "knocks", "position": 3, "pronunciation": "/nɑks/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -854,6 +1041,7 @@
 {"headword": "knot", "form": "knotting", "position": 3, "pronunciation": "/ˈnɑtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "knotgrass", "form": "knotgrasses", "position": 1, "pronunciation": "/ˈnɑtˌɡræsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knothole", "form": "knotholes", "position": 1, "pronunciation": "/ˈnɑtˌhoʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "knotroot", "form": "knotroots", "position": 1, "pronunciation": "/ˈnɑtˌruts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knotter", "form": "knotters", "position": 1, "pronunciation": "/ˈnɑtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knottiness", "form": "knottinesses", "position": 1, "pronunciation": "/ˈnɑtinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knotting", "form": "knottings", "position": 1, "pronunciation": "/ˈnɑtɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -868,10 +1056,12 @@
 {"headword": "know", "form": "knowing", "position": 3, "pronunciation": "/ˈnoʊɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"knowledgeable\", \"learned\", \"lettered\", \"wise\", \"intentional\", \"deliberate\"]"}
 {"headword": "know", "form": "known", "position": 4, "pronunciation": "/noʊn/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "know", "form": "knows", "position": 5, "pronunciation": "/noʊz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "knowe", "form": "knowes", "position": 1, "pronunciation": "/naʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knowing", "form": "knowings", "position": 1, "pronunciation": "/ˈnoʊɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knowingness", "form": "knowingnesses", "position": 1, "pronunciation": "/ˈnoʊɪŋnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "knowledge", "form": "knowledges", "position": 1, "pronunciation": "/ˈnɑlədʒɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "knowledge", "form": "knowledges", "position": 1, "pronunciation": "/ˈnɑlədʒɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "known", "form": "knowns", "position": 1, "pronunciation": "/noʊnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "knuck", "form": "knucks", "position": 1, "pronunciation": "/nʌks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knuckle", "form": "knuckled", "position": 1, "pronunciation": "/ˈnʌkəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "knuckle", "form": "knuckles", "position": 2, "pronunciation": "/ˈnʌkəlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "knuckle", "form": "knuckling", "position": 3, "pronunciation": "/ˈnʌkəlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -882,6 +1072,7 @@
 {"headword": "knuckler", "form": "knucklers", "position": 1, "pronunciation": "/ˈnʌklərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knuckly", "form": "knucklier", "position": 1, "pronunciation": "/ˈnʌkliər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "knuckly", "form": "knuckliest", "position": 2, "pronunciation": "/ˈnʌkliɪst/", "labels": "[\"superl.\"]", "synonyms": null}
+{"headword": "knulling", "form": "knullings", "position": 1, "pronunciation": "/ˈnʌlɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knur", "form": "knurs", "position": 1, "pronunciation": "/nɜrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "knurl", "form": "knurled", "position": 1, "pronunciation": "/nɜrld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "knurl", "form": "knurling", "position": 2, "pronunciation": "/ˈnɜrlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -899,64 +1090,110 @@
 {"headword": "koan", "form": "koans", "position": 1, "pronunciation": "/ˈkoʊɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kob", "form": "kobs", "position": 1, "pronunciation": "/kɑbz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kobold", "form": "kobolds", "position": 1, "pronunciation": "/ˈkoʊboʊldz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kochia", "form": "kochias", "position": 1, "pronunciation": "/ˈkoʊkiəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koekoea", "form": "koekoeas", "position": 1, "pronunciation": "/ˌkoʊəkoʊˈɑz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koeksister", "form": "koeksisters", "position": 1, "pronunciation": "/ˈkʊkˌsɪstərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "koel", "form": "koels", "position": 1, "pronunciation": "/ˈkoʊəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kofta", "form": "koftas", "position": 1, "pronunciation": "/ˈkoʊftəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koftgar", "form": "koftgars", "position": 1, "pronunciation": "/ˈkɑftˌɡɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kogal", "form": "kogals", "position": 1, "pronunciation": "/ˈkoʊɡælz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kohai", "form": "kohais", "position": 1, "pronunciation": "/ˈkoʊhaɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kohekohe", "form": "kohekohes", "position": 1, "pronunciation": "/ˈkoʊhɛˌkoʊhɛz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kohl", "form": "kohled", "position": 1, "pronunciation": "/koʊld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kohl", "form": "kohling", "position": 2, "pronunciation": "/ˈkoʊlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kohl", "form": "kohls", "position": 3, "pronunciation": "/koʊlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "kohlrabi", "form": "kohlrabies", "position": 1, "pronunciation": "/koʊlˈrɑbiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kohutuhutu", "form": "kohutuhutus", "position": 1, "pronunciation": "/ˈkoʊhuˌtuhuˌtuz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "koine", "form": "koines", "position": 1, "pronunciation": "/kɔɪˈneɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kokako", "form": "kokakos", "position": 1, "pronunciation": "/ˈkoʊˌkɑkoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kokanee", "form": "kokanees", "position": 1, "pronunciation": "/koʊˈkæniz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kokiri", "form": "kokiris", "position": 1, "pronunciation": "/ˈkoʊkiriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koko", "form": "kokos", "position": 1, "pronunciation": "/ˈkoʊkoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kola", "form": "kolas", "position": 1, "pronunciation": "/ˈkoʊləz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kolinsky", "form": "kolinski", "position": 1, "pronunciation": "/kəˈlɪnski/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kolinsky", "form": "kolinskies", "position": 2, "pronunciation": "/kəˈlɪnskiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kolkhoz", "form": "kolhoz", "position": 1, "pronunciation": "/kəlˈhɑz/", "labels": "[\"var.\"]", "synonyms": null}
-{"headword": "kolkhoz", "form": "kolhozes", "position": 2, "pronunciation": "/kəlˈhoʊzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kolkhoz", "form": "kolhozes", "position": 2, "pronunciation": "/kəlˈhɑzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kolkhoz", "form": "kolhozy", "position": 3, "pronunciation": "/kəlˈhɑzi/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kolkhoz", "form": "kolkhos", "position": 4, "pronunciation": "/kɑlˈkɑs/", "labels": "[\"var.\"]", "synonyms": null}
-{"headword": "kolkhoz", "form": "kolkhoses", "position": 5, "pronunciation": "/kəlˈkoʊsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kolkhoz", "form": "kolkhoses", "position": 5, "pronunciation": "/kɑlˈkɑsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kolkhoz", "form": "kolkhosy", "position": 6, "pronunciation": "/kɑlˈkɑsi/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kolkhoz", "form": "kolkhozes", "position": 7, "pronunciation": "/kəlˈhoʊzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kolkhoz", "form": "kolkhozy", "position": 8, "pronunciation": "/kəlˈkɑzɪ/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kolkhoz", "form": "kolkhozes", "position": 7, "pronunciation": "/kəlˈkɑzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kolkhoz", "form": "kolkhozy", "position": 8, "pronunciation": "/kəlˈkɑzi/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kolkhoz", "form": "kolkoz", "position": 9, "pronunciation": "/kɑlˈkɑz/", "labels": "[\"var.\"]", "synonyms": null}
-{"headword": "kolkhoz", "form": "kolkozes", "position": 10, "pronunciation": "/kəlˈkoʊzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kolkhoz", "form": "kolkozes", "position": 10, "pronunciation": "/kɑlˈkɑzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kolkhoz", "form": "kolkozy", "position": 11, "pronunciation": "/kɑlˈkɑzi/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kolkhoznik", "form": "kolkhozniki", "position": 1, "pronunciation": "/kəlˈkɑznɪki/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kolkhoznik", "form": "kolkhozniks", "position": 2, "pronunciation": "/kəlˈkɑznɪks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kolo", "form": "kolos", "position": 1, "pronunciation": "/ˈkoʊloʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koloa", "form": "koloas", "position": 1, "pronunciation": "/kəˈloʊəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "komatik", "form": "comatik", "position": 1, "pronunciation": "/ˈkoʊməˌtɪk/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "komatik", "form": "comatiks", "position": 2, "pronunciation": "/ˈkoʊməˌtɪks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "komatik", "form": "komatiks", "position": 3, "pronunciation": "/ˈkoʊmətɪks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kombi", "form": "kombis", "position": 1, "pronunciation": "/ˈkɑmbiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "komondor", "form": "komondors", "position": 1, "pronunciation": "/ˈkoʊmənˌdɔrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "komondor", "form": "komondorok", "position": 2, "pronunciation": "/ˈkoʊmənˌdɔrɑk/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kona", "form": "konas", "position": 1, "pronunciation": "/ˈkoʊnəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "konak", "form": "konaks", "position": 1, "pronunciation": "/koʊˈnɑks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "konditorei", "form": "konditoreis", "position": 1, "pronunciation": "/kənˈdɪtəˌraɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kondo", "form": "kondos", "position": 1, "pronunciation": "/ˈkɑndoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koneke", "form": "konekes", "position": 1, "pronunciation": "/ˈkoʊnɛkiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kongoni", "form": "kongonis", "position": 1, "pronunciation": "/kɑŋˈɡoʊniz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "konimeter", "form": "konimeters", "position": 1, "pronunciation": "/koʊˈnɪmətərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "konini", "form": "koninis", "position": 1, "pronunciation": "/ˈkoʊniniz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kontakion", "form": "kontakia", "position": 1, "pronunciation": "/kɑnˈtɑkiə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kook", "form": "kooks", "position": 1, "pronunciation": "/kuks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kookaburra", "form": "kookaburras", "position": 1, "pronunciation": "/ˈkʊkəˌbɜrəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kookie", "form": "kooky", "position": 1, "pronunciation": "/ˈkuki/", "labels": "[\"var.\"]", "synonyms": "[\"balmy\", \"barmy\", \"bats\", \"batty\", \"bonkers\", \"buggy\", \"cracked\", \"crackers\", \"daft\", \"dotty\"]"}
-{"headword": "kookiness", "form": "kookinesses", "position": 1, "pronunciation": "/ˈkʊkɪnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kookiness", "form": "kookinesses", "position": 1, "pronunciation": "/ˈkukinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kooky", "form": "cooky", "position": 1, "pronunciation": "/ˈkʊki/", "labels": "[\"var.\"]", "synonyms": "[\"cookie\", \"biscuit\"]"}
 {"headword": "kooky", "form": "kookie", "position": 2, "pronunciation": "/ˈkʊki/", "labels": "[\"var.\"]", "synonyms": "[\"balmy\", \"barmy\", \"bats\", \"batty\", \"bonkers\", \"buggy\", \"cracked\", \"crackers\", \"daft\", \"dotty\"]"}
 {"headword": "kooky", "form": "kookier", "position": 3, "pronunciation": "/ˈkukiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "kooky", "form": "kookiest", "position": 4, "pronunciation": "/ˈkukiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
+{"headword": "kootchar", "form": "kootchars", "position": 1, "pronunciation": "/ˈkutʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kop", "form": "kops", "position": 1, "pronunciation": "/kɑps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kopek", "form": "copeck", "position": 1, "pronunciation": "/ˈkoʊpɛk/", "labels": "[\"var.\"]", "synonyms": "[\"kopek\", \"kopeck\"]"}
 {"headword": "kopek", "form": "copecks", "position": 2, "pronunciation": "/ˈkoʊpɛks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kopek", "form": "kopeck", "position": 3, "pronunciation": "/ˈkoʊpɛk/", "labels": "[\"var.\"]", "synonyms": "[\"kopek\", \"copeck\"]"}
 {"headword": "kopek", "form": "kopecks", "position": 4, "pronunciation": "/ˈkoʊpɛks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kopek", "form": "kopeks", "position": 5, "pronunciation": "/ˈkoʊpəks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kopfring", "form": "kopfrings", "position": 1, "pronunciation": "/ˈkɔpfˌrɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kopiyka", "form": "kopiykas", "position": 1, "pronunciation": "/koʊˈpikəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kopje", "form": "kopjes", "position": 1, "pronunciation": "/ˈkɑpiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kopje", "form": "koppie", "position": 2, "pronunciation": "/ˈkɑpi/", "labels": "[\"var.\"]", "synonyms": "[\"kopje\"]"}
 {"headword": "kopje", "form": "koppies", "position": 3, "pronunciation": "/ˈkɑpiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "koppa", "form": "koppas", "position": 1, "pronunciation": "/ˈkɑpəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kora", "form": "koras", "position": 1, "pronunciation": "/ˈkɔrəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koradji", "form": "koradjis", "position": 1, "pronunciation": "/kəˈrɑdʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "korari", "form": "koraris", "position": 1, "pronunciation": "/ˈkoʊrɑriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "korat", "form": "korats", "position": 1, "pronunciation": "/ˈkɔræts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kore", "form": "korai", "position": 1, "pronunciation": "/ˈkoʊraɪ/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kore", "form": "korai", "position": 1, "pronunciation": "/ˈkɔraɪ/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "korero", "form": "koreroed", "position": 1, "pronunciation": "/ˈkɔrɛroʊd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "korero", "form": "koreroing", "position": 2, "pronunciation": "/ˈkɔrɛroʊɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "korero", "form": "koreros", "position": 3, "pronunciation": "/ˈkɔrɛroʊz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "korimako", "form": "korimakos", "position": 1, "pronunciation": "/ˈkoʊriˌmɑkoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koro", "form": "koros", "position": 1, "pronunciation": "/ˈkɔroʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koromiko", "form": "koromikos", "position": 1, "pronunciation": "/ˌkɔrəˈmikoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "korora", "form": "kororas", "position": 1, "pronunciation": "/ˌkoʊroʊˈrɑz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "korowai", "form": "korowais", "position": 1, "pronunciation": "/ˈkɔrəˌwaɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koru", "form": "korus", "position": 1, "pronunciation": "/ˈkɔruz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "koruna", "form": "korun", "position": 1, "pronunciation": "/kɔˈrun/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "koruna", "form": "korunas", "position": 2, "pronunciation": "/kɔˈrunəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "koruna", "form": "koruny", "position": 3, "pronunciation": "/kɔˈruni/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kosha", "form": "koshas", "position": 1, "pronunciation": "/ˈkoʊʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kosher", "form": "koshered", "position": 1, "pronunciation": "/ˈkoʊʃərd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kosher", "form": "koshering", "position": 2, "pronunciation": "/ˈkoʊʃərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kosher", "form": "koshers", "position": 3, "pronunciation": "/ˈkoʊʃərs/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "kotare", "form": "kotares", "position": 1, "pronunciation": "/ˈkoʊtɑriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kotch", "form": "kotched", "position": 1, "pronunciation": "/kɑtʃt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kotch", "form": "kotches", "position": 2, "pronunciation": "/ˈkɑtʃɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "kotch", "form": "kotching", "position": 3, "pronunciation": "/ˈkɑtʃɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "koto", "form": "kotos", "position": 1, "pronunciation": "/ˈkoʊtoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kotuku", "form": "kotukus", "position": 1, "pronunciation": "/ˈkoʊtukuz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kotukutuku", "form": "kotukutukus", "position": 1, "pronunciation": "/ˈkoʊtuˌkutukuz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kotwal", "form": "kotwals", "position": 1, "pronunciation": "/ˈkoʊtˌwɑlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kotwali", "form": "kotwalis", "position": 1, "pronunciation": "/ˈkoʊtˌwɑliz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koula", "form": "koulas", "position": 1, "pronunciation": "/ˈkoʊləz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "koumiss", "form": "koumis", "position": 1, "pronunciation": "/ˈkumɪs/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "koumiss", "form": "koumises", "position": 2, "pronunciation": "/ˈkumɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "koumiss", "form": "koumisses", "position": 3, "pronunciation": "/ˈkumɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -969,23 +1206,25 @@
 {"headword": "koumiss", "form": "kumys", "position": 10, "pronunciation": "/ˈkumɪs/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "koumiss", "form": "kumyses", "position": 11, "pronunciation": "/ˈkumɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kouprey", "form": "koupreys", "position": 1, "pronunciation": "/ˈkupreɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "koura", "form": "koura", "position": 1, "pronunciation": "/ˈkoʊrə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kouros", "form": "kouroi", "position": 1, "pronunciation": "/ˈkurɔɪ/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kousso", "form": "cusso", "position": 1, "pronunciation": "/ˈkʊsoʊ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kousso", "form": "cussos", "position": 2, "pronunciation": "/ˈkʊsoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kousso", "form": "koussos", "position": 3, "pronunciation": "/ˈkusoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kousso", "form": "kusso", "position": 4, "pronunciation": "/ˈkʌsoʊ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kousso", "form": "kussos", "position": 5, "pronunciation": "/ˈkʌsoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kowtow", "form": "kotow", "position": 1, "pronunciation": "/ˈkoʊˈtaʊ/", "labels": "[\"var.\"]", "synonyms": "[\"kowtow\", \"fawn\", \"toady\", \"truckle\", \"bootlick\"]"}
-{"headword": "kowtow", "form": "kotowed", "position": 2, "pronunciation": "/ˈkoʊˈtaʊd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "kowtow", "form": "kotowing", "position": 3, "pronunciation": "/ˈkoʊˈtaʊɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "kowtow", "form": "kotows", "position": 4, "pronunciation": "/ˈkoʊˈtaʊz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "kowtow", "form": "kowtowed", "position": 5, "pronunciation": "/ˈkaʊˈtaʊd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "kowtow", "form": "kowtowing", "position": 6, "pronunciation": "/ˈkaʊˈtaʊɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "kowtow", "form": "kowtows", "position": 7, "pronunciation": "/ˈkaʊˈtaʊz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kowtower", "form": "kotower", "position": 1, "pronunciation": "/ˈkoʊˈtaʊər/", "labels": "[\"var.\"]", "synonyms": null}
-{"headword": "kowtower", "form": "kotowers", "position": 2, "pronunciation": "/ˈkoʊˈtaʊərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kowtower", "form": "kowtowers", "position": 3, "pronunciation": "/ˈkaʊˈtaʊərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kowtowing", "form": "kotowing", "position": 1, "pronunciation": "/ˈkoʊˈtaʊɪŋ/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "kowhai", "form": "kowhais", "position": 1, "pronunciation": "/ˈkoʊwaɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kowtow", "form": "kotow", "position": 1, "pronunciation": "/ˈkoʊˌtaʊ/", "labels": "[\"var.\"]", "synonyms": "[\"kowtow\", \"fawn\", \"toady\", \"truckle\", \"bootlick\"]"}
+{"headword": "kowtow", "form": "kotowed", "position": 2, "pronunciation": "/ˈkoʊˌtaʊd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kowtow", "form": "kotowing", "position": 3, "pronunciation": "/ˈkoʊˌtaʊɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kowtow", "form": "kotows", "position": 4, "pronunciation": "/ˈkoʊˌtaʊz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "kowtow", "form": "kowtowed", "position": 5, "pronunciation": "/ˈkaʊˌtaʊd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kowtow", "form": "kowtowing", "position": 6, "pronunciation": "/ˈkaʊˌtaʊɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kowtow", "form": "kowtows", "position": 7, "pronunciation": "/ˈkaʊˌtaʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kowtower", "form": "kotower", "position": 1, "pronunciation": "/ˈkoʊˌtaʊər/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "kowtower", "form": "kotowers", "position": 2, "pronunciation": "/ˈkoʊˌtaʊərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kowtower", "form": "kowtowers", "position": 3, "pronunciation": "/ˈkaʊˌtaʊərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kowtowing", "form": "kotowing", "position": 1, "pronunciation": "/ˈkoʊˌtaʊɪŋ/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kraal", "form": "craal", "position": 1, "pronunciation": "/krɑl/", "labels": "[\"arch. var.\"]", "synonyms": null}
 {"headword": "kraal", "form": "craaled", "position": 2, "pronunciation": "/krɑld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kraal", "form": "craaling", "position": 3, "pronunciation": "/ˈkrɑlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -996,14 +1235,22 @@
 {"headword": "kraft", "form": "krafts", "position": 1, "pronunciation": "/kræfts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "krait", "form": "kraits", "position": 1, "pronunciation": "/kraɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kraken", "form": "krakens", "position": 1, "pronunciation": "/ˈkrɑkənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "krakowiak", "form": "krakowiaks", "position": 1, "pronunciation": "/krəˈkoʊviˌæks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "krameria", "form": "kramerias", "position": 1, "pronunciation": "/krəˈmɪriəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kran", "form": "krans", "position": 1, "pronunciation": "/krɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "krans", "form": "kranses", "position": 1, "pronunciation": "/ˈkrɑnsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "krater", "form": "crater", "position": 1, "pronunciation": "/ˈkreɪtər/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "krater", "form": "kraters", "position": 2, "pronunciation": "/ˈkreɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kraut", "form": "krauts", "position": 1, "pronunciation": "/kraʊts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kremlin", "form": "kremlins", "position": 1, "pronunciation": "/ˈkrɛmlənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kremlinology", "form": "kremlinologies", "position": 1, "pronunciation": "/ˌkrɛmlɪˈnɑlədʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kretek", "form": "kreteks", "position": 1, "pronunciation": "/ˈkritɛks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kreutzer", "form": "kreutzers", "position": 1, "pronunciation": "/ˈkrɔɪtsərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kreutzer", "form": "kreuzer", "position": 2, "pronunciation": "/ˈkrɔɪtsər/", "labels": "[\"var.\"]", "synonyms": null}
-{"headword": "kreuzer", "form": "kreuzers", "position": 1, "pronunciation": "/ˈkrɔɪzərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kreuzer", "form": "kreuzers", "position": 1, "pronunciation": "/ˈkrɔɪtsərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "krewe", "form": "krewes", "position": 1, "pronunciation": "/kruz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kriegie", "form": "kriegies", "position": 1, "pronunciation": "/ˈkriɡiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kriegspiel", "form": "kriegspiels", "position": 1, "pronunciation": "/ˈkriɡˌspilz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "krill", "form": "krills", "position": 1, "pronunciation": "/krɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "krimmer", "form": "krimmers", "position": 1, "pronunciation": "/ˈkrɪmərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kris", "form": "crease", "position": 1, "pronunciation": "/kris/", "labels": "[\"arch. var.\"]", "synonyms": "[\"kris\", \"creese\", \"wrinkle\", \"furrow\", \"crinkle\", \"seam\", \"line\", \"fold\", \"plication\", \"flexure\"]"}
@@ -1011,6 +1258,7 @@
 {"headword": "kris", "form": "creeses", "position": 3, "pronunciation": "/ˈkrisɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kris", "form": "cris", "position": 4, "pronunciation": "/krɪs/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kris", "form": "krises", "position": 5, "pronunciation": "/ˈkrɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kromesky", "form": "kromeskies", "position": 1, "pronunciation": "/krəˈmɛskiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "krona", "form": "kronor", "position": 1, "pronunciation": "/ˈkroʊnər/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "krona", "form": "kronur", "position": 2, "pronunciation": "/ˈkroʊnər/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "krone", "form": "kronen", "position": 1, "pronunciation": "/ˈkroʊnən/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1019,6 +1267,8 @@
 {"headword": "kroon", "form": "kroons", "position": 2, "pronunciation": "/krunz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "krubi", "form": "krubis", "position": 1, "pronunciation": "/ˈkrubiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "krubut", "form": "krubuts", "position": 1, "pronunciation": "/ˈkrubʌts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "krugerrand", "form": "krugerrands", "position": 1, "pronunciation": "/ˈkruɡəˌrændz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "krumkake", "form": "krumkakes", "position": 1, "pronunciation": "/ˈkrʊmˌkɑkəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "krummhorn", "form": "krumhorn", "position": 1, "pronunciation": "/ˈkrʌmhɔrn/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "krummhorn", "form": "krumhorns", "position": 2, "pronunciation": "/ˈkrʌmhɔrnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "krummhorn", "form": "krummhorns", "position": 3, "pronunciation": "/ˈkrʌmhɔrnz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1027,32 +1277,51 @@
 {"headword": "krump", "form": "krumps", "position": 3, "pronunciation": "/krʌmps/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "kryolith", "form": "kryoliths", "position": 1, "pronunciation": "/ˈkraɪəlɪθz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "krypton", "form": "kryptons", "position": 1, "pronunciation": "/ˈkrɪptɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "krytron", "form": "krytrons", "position": 1, "pronunciation": "/ˈkraɪˌtrɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kudlik", "form": "kudliks", "position": 1, "pronunciation": "/ˈkudlɪks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kudo", "form": "kudos", "position": 1, "pronunciation": "/ˈkudoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kudu", "form": "koodoo", "position": 1, "pronunciation": "/ˈkudu/", "labels": "[\"var.\"]", "synonyms": "[\"kudu\"]"}
 {"headword": "kudu", "form": "koodoos", "position": 2, "pronunciation": "/ˈkuduz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kudu", "form": "kudus", "position": 3, "pronunciation": "/ˈkuduz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kudzu", "form": "kudzus", "position": 1, "pronunciation": "/ˈkʌdzuz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kue", "form": "kues", "position": 1, "pronunciation": "/ˈkjuz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kue", "form": "kues", "position": 1, "pronunciation": "/kjuz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kueh", "form": "kueh", "position": 1, "pronunciation": "/kweɪ/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kugel", "form": "kugels", "position": 1, "pronunciation": "/ˈkuɡəlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kuia", "form": "kuias", "position": 1, "pronunciation": "/ˈkuiəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kukri", "form": "kukris", "position": 1, "pronunciation": "/ˈkʊkriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kuku", "form": "kukus", "position": 1, "pronunciation": "/ˈkukuz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kukui", "form": "kukuis", "position": 1, "pronunciation": "/kuˈkuiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kulak", "form": "kulaki", "position": 1, "pronunciation": "/ˈkulæki/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kulak", "form": "kulaks", "position": 2, "pronunciation": "/ˈkulæks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kulan", "form": "kulans", "position": 1, "pronunciation": "/ˈkuˌlɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kuletuk", "form": "kuletuks", "position": 1, "pronunciation": "/ˈkuləˌtʌks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kulich", "form": "kulichi", "position": 1, "pronunciation": "/kʊˈlitʃi/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kultur", "form": "kulturs", "position": 1, "pronunciation": "/kʊlˈtʊrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kumara", "form": "kumaras", "position": 1, "pronunciation": "/ˈkumərəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kumarahou", "form": "kumarahous", "position": 1, "pronunciation": "/ˈkumərəˌhoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kumikumi", "form": "kumikumis", "position": 1, "pronunciation": "/ˈkumiˌkumiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kummel", "form": "kummels", "position": 1, "pronunciation": "/ˈkʊməlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kumquat", "form": "cumquat", "position": 1, "pronunciation": "/ˈkʌmkwɑt/", "labels": "[\"var.\"]", "synonyms": "[\"kumquat\"]"}
 {"headword": "kumquat", "form": "cumquats", "position": 2, "pronunciation": "/ˈkʌmkwɑts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kumquat", "form": "kumquats", "position": 3, "pronunciation": "/ˈkʌmkwɑts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kundalini", "form": "kundalinis", "position": 1, "pronunciation": "/ˌkʊndəˈlɪniz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kuna", "form": "kunas", "position": 1, "pronunciation": "/ˈkunəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kuna", "form": "kune", "position": 2, "pronunciation": "/ˈkuneɪ/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kundalini", "form": "kundalinis", "position": 1, "pronunciation": "/ˌkʊndəˈliniz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kunekune", "form": "kunekunes", "position": 1, "pronunciation": "/ˈkuniˌkuniz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kunzite", "form": "kunzites", "position": 1, "pronunciation": "/ˈkʊnzaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kurbash", "form": "kurbashed", "position": 1, "pronunciation": "/ˈkʊrbæʃt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "kurbash", "form": "kurbashes", "position": 2, "pronunciation": "/ˈkʊrbæʃɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kurbash", "form": "kurbashing", "position": 3, "pronunciation": "/ˈkʊrbæʃɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kurdaitcha", "form": "kurdaitchas", "position": 1, "pronunciation": "/kərˈdaɪtʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kurgan", "form": "kurgans", "position": 1, "pronunciation": "/kʊərˈɡɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kuri", "form": "kuris", "position": 1, "pronunciation": "/ˈkuriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kurmi", "form": "kurmis", "position": 1, "pronunciation": "/ˈkʊrmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kurrajong", "form": "kurrajongs", "position": 1, "pronunciation": "/ˈkʌrəˌdʒɑŋz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kursaal", "form": "kursaals", "position": 1, "pronunciation": "/ˈkʊrˌzɑlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kurta", "form": "kurtas", "position": 1, "pronunciation": "/ˈkʊrtəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kurtosis", "form": "kurtosises", "position": 1, "pronunciation": "/kɜrˈtoʊsɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kuspuk", "form": "kuspuks", "position": 1, "pronunciation": "/ˈkʌsˌpʌks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kutu", "form": "kutus", "position": 1, "pronunciation": "/ˈkutuz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kuvasz", "form": "kuvaszok", "position": 1, "pronunciation": "/ˈkuvɑsɑk/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kvass", "form": "kvas", "position": 1, "pronunciation": "/kvɑs/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "kvass", "form": "kvases", "position": 2, "pronunciation": "/ˈkvɑsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1067,7 +1336,11 @@
 {"headword": "kvetchy", "form": "kvetchier", "position": 1, "pronunciation": "/ˈkvɛtʃiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "kvetchy", "form": "kvetchiest", "position": 2, "pronunciation": "/ˈkvɛtʃiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "kwanza", "form": "kwanzas", "position": 1, "pronunciation": "/ˈkwɑnzəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kwartje", "form": "kwartjes", "position": 1, "pronunciation": "/ˈkwɑrtʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kwashiorkor", "form": "kwashiorkors", "position": 1, "pronunciation": "/ˌkwɑʃiˈɔrkərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kweff", "form": "kweffed", "position": 1, "pronunciation": "/kwɛft/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kweff", "form": "kweffing", "position": 2, "pronunciation": "/ˈkwɛfɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kweff", "form": "kweffs", "position": 3, "pronunciation": "/kwɛfs/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "kyack", "form": "kyacks", "position": 1, "pronunciation": "/ˈkaɪæks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kyanite", "form": "cyanite", "position": 1, "pronunciation": "/ˈsaɪənaɪt/", "labels": "[\"var.\"]", "synonyms": "[\"kyanite\"]"}
 {"headword": "kyanite", "form": "cyanites", "position": 2, "pronunciation": "/ˈsaɪənaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -1081,13 +1354,25 @@
 {"headword": "kyanize", "form": "kyanizing", "position": 7, "pronunciation": "/ˈkaɪəˌnaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "kyar", "form": "kyars", "position": 1, "pronunciation": "/ˈkaɪərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kyat", "form": "kyats", "position": 1, "pronunciation": "/kiˈɑts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kyathos", "form": "kyathoi", "position": 1, "pronunciation": "/ˈkaɪəˌθɔɪ/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kybo", "form": "kybos", "position": 1, "pronunciation": "/ˈkaɪboʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kye", "form": "kyes", "position": 1, "pronunciation": "/keɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kyle", "form": "kyles", "position": 1, "pronunciation": "/kaɪlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kylie", "form": "kylies", "position": 1, "pronunciation": "/ˈkaɪliz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kylin", "form": "kylins", "position": 1, "pronunciation": "/ˈkilɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kylix", "form": "cylices", "position": 1, "pronunciation": "/ˈsɪlɪˌsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kylix", "form": "cylix", "position": 2, "pronunciation": "/ˈsaɪlɪks/", "labels": "[\"var.\"]", "synonyms": "[\"kylix\"]"}
 {"headword": "kylix", "form": "kylikes", "position": 3, "pronunciation": "/ˈkaɪlɪkiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kymogram", "form": "kymograms", "position": 1, "pronunciation": "/ˈkaɪməɡræmz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "kymograph", "form": "kymographs", "position": 1, "pronunciation": "/ˈkaɪməɡræfs/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kymogram", "form": "kymograms", "position": 1, "pronunciation": "/ˈkaɪməˌɡræmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kymograph", "form": "kymographs", "position": 1, "pronunciation": "/ˈkaɪməˌɡræfs/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kymography", "form": "kymographies", "position": 1, "pronunciation": "/kaɪˈmɑɡrəfiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kyoodle", "form": "kyoodled", "position": 1, "pronunciation": "/kaɪˈudəld/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "kyoodle", "form": "kyoodles", "position": 2, "pronunciation": "/kaɪˈudəlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "kyoodle", "form": "kyoodling", "position": 3, "pronunciation": "/kaɪˈudlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "kype", "form": "kypes", "position": 1, "pronunciation": "/kaɪps/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kyphoplasty", "form": "kyphoplasties", "position": 1, "pronunciation": "/ˈkaɪfoʊˌplæstiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kyphoscoliosis", "form": "kyphoscolioses", "position": 1, "pronunciation": "/ˌkaɪfoʊˌskoʊliˈoʊsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kyphosis", "form": "kyphoses", "position": 1, "pronunciation": "/kaɪˈfoʊsiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kyrie", "form": "kyries", "position": 1, "pronunciation": "/ˈkɪrieɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "kytoon", "form": "kytoons", "position": 1, "pronunciation": "/kaɪˈtunz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "kyu", "form": "kyus", "position": 1, "pronunciation": "/kjuz/", "labels": "[\"pl.\"]", "synonyms": null}

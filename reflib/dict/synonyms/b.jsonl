@@ -1,6 +1,7 @@
 {"word": "baa", "synonym": "bleat", "via": "baa", "position": 1}
 {"word": "baa", "synonym": "blate", "via": "baa", "position": 2}
 {"word": "baa", "synonym": "blat", "via": "baa", "position": 3}
+{"word": "baalebos", "synonym": "proprietor", "via": "baalebos", "position": 1}
 {"word": "babble", "synonym": "babbling", "via": "babble", "position": 1}
 {"word": "babble", "synonym": "talk", "via": "babble", "position": 2}
 {"word": "babble", "synonym": "tattle", "via": "babble", "position": 3}
@@ -120,6 +121,7 @@
 {"word": "backer", "synonym": "angel", "via": "backer", "position": 1}
 {"word": "backfire", "synonym": "boomerang", "via": "backfire", "position": 1}
 {"word": "backfire", "synonym": "recoil", "via": "backfire", "position": 2}
+{"word": "backflash", "synonym": "flashback", "via": "backflash", "position": 1}
 {"word": "background", "synonym": "backdrop", "via": "background", "position": 1}
 {"word": "background", "synonym": "backcloth", "via": "background", "position": 2}
 {"word": "background", "synonym": "desktop", "via": "background", "position": 3}
@@ -146,6 +148,7 @@
 {"word": "backlash", "synonym": "repercussion", "via": "backlash", "position": 2}
 {"word": "backlash", "synonym": "rebound", "via": "backlash", "position": 3}
 {"word": "backlash", "synonym": "backfire", "via": "backlash", "position": 4}
+{"word": "backlip", "synonym": "sass", "via": "backlip", "position": 1}
 {"word": "backlog", "synonym": "reserve", "via": "backlog", "position": 1}
 {"word": "backlog", "synonym": "stockpile", "via": "backlog", "position": 2}
 {"word": "backmost", "synonym": "hindmost", "via": "backmost", "position": 1}
@@ -183,6 +186,7 @@
 {"word": "backsliding", "synonym": "relapsing", "via": "backsliding", "position": 4}
 {"word": "backsliding", "synonym": "reversion", "via": "backsliding", "position": 5}
 {"word": "backsliding", "synonym": "reverting", "via": "backsliding", "position": 6}
+{"word": "backsource", "synonym": "insource", "via": "backsource", "position": 1}
 {"word": "backstage", "synonym": "wing", "via": "backstage", "position": 1}
 {"word": "backstage", "synonym": "offstage", "via": "backstage", "position": 2}
 {"word": "backstairs", "synonym": "furtive", "via": "backstairs", "position": 1}
@@ -220,7 +224,6 @@
 {"word": "backwoods", "synonym": "boondocks", "via": "backwoods", "position": 1}
 {"word": "backwoods", "synonym": "hinterland", "via": "backwoods", "position": 2}
 {"word": "backwoodsman", "synonym": "frontiersman", "via": "backwoodsman", "position": 1}
-{"word": "bacteria", "synonym": "bacterium", "via": "bacteria", "position": 1}
 {"word": "bacteria", "synonym": "bacterium", "via": "bacterium", "position": 1}
 {"word": "bactericidal", "synonym": "disinfectant", "via": "bactericidal", "position": 1}
 {"word": "bactericidal", "synonym": "germicidal", "via": "bactericidal", "position": 2}
@@ -330,6 +333,8 @@
 {"word": "bagging", "synonym": "sacking", "via": "bag", "position": 1}
 {"word": "bagging", "synonym": "sacking", "via": "bagging", "position": 1}
 {"word": "baggy", "synonym": "sloppy", "via": "baggy", "position": 1}
+{"word": "bagh", "synonym": "garden", "via": "bagh", "position": 1}
+{"word": "bagie", "synonym": "turnip", "via": "bagie", "position": 1}
 {"word": "bagnio", "synonym": "bathhouse", "via": "bagnio", "position": 1}
 {"word": "bagnio", "synonym": "whorehouse", "via": "bagnio", "position": 2}
 {"word": "bagnio", "synonym": "brothel", "via": "bagnio", "position": 3}
@@ -357,6 +362,7 @@
 {"word": "bait", "synonym": "tantalise", "via": "bait", "position": 10}
 {"word": "bajillion", "synonym": "zillion", "via": "bajillion", "position": 1}
 {"word": "bake", "synonym": "broil", "via": "bake", "position": 1}
+{"word": "bakeapple", "synonym": "cloudberry", "via": "bakeapple", "position": 1}
 {"word": "baked", "synonym": "adust", "via": "bake", "position": 1}
 {"word": "baked", "synonym": "parched", "via": "bake", "position": 2}
 {"word": "baked", "synonym": "scorched", "via": "bake", "position": 3}
@@ -367,6 +373,7 @@
 {"word": "baked", "synonym": "sunbaked", "via": "baked", "position": 4}
 {"word": "bakery", "synonym": "bakeshop", "via": "bakery", "position": 1}
 {"word": "bakeshop", "synonym": "bakery", "via": "bakeshop", "position": 1}
+{"word": "bakgat", "synonym": "excellent", "via": "bakgat", "position": 1}
 {"word": "baksheesh", "synonym": "gratuity", "via": "baksheesh", "position": 1}
 {"word": "baksheesh", "synonym": "tip", "via": "baksheesh", "position": 2}
 {"word": "baksheesh", "synonym": "pourboire", "via": "baksheesh", "position": 3}
@@ -375,6 +382,7 @@
 {"word": "bakshish", "synonym": "tip", "via": "baksheesh", "position": 2}
 {"word": "bakshish", "synonym": "pourboire", "via": "baksheesh", "position": 3}
 {"word": "bakshish", "synonym": "baksheesh", "via": "baksheesh", "position": 4}
+{"word": "bala", "synonym": "balaclava", "via": "bala", "position": 1}
 {"word": "balance", "synonym": "counterweight", "via": "balance", "position": 1}
 {"word": "balance", "synonym": "counterbalance", "via": "balance", "position": 2}
 {"word": "balance", "synonym": "counterpoise", "via": "balance", "position": 3}
@@ -449,6 +457,7 @@
 {"word": "balloting", "synonym": "ballot", "via": "balloting", "position": 2}
 {"word": "balloting", "synonym": "voting", "via": "balloting", "position": 3}
 {"word": "ballpark", "synonym": "park", "via": "ballpark", "position": 1}
+{"word": "ballup", "synonym": "mess", "via": "ballup", "position": 1}
 {"word": "bally", "synonym": "blinking", "via": "bally", "position": 1}
 {"word": "bally", "synonym": "bloody", "via": "bally", "position": 2}
 {"word": "bally", "synonym": "blooming", "via": "bally", "position": 3}
@@ -562,6 +571,7 @@
 {"word": "bandanna", "synonym": "bandana", "via": "bandana", "position": 1}
 {"word": "bandeau", "synonym": "brassiere", "via": "bandeau", "position": 1}
 {"word": "bandeau", "synonym": "bra", "via": "bandeau", "position": 2}
+{"word": "bandh", "synonym": "hartal", "via": "bandh", "position": 1}
 {"word": "banding", "synonym": "band", "via": "band", "position": 1}
 {"word": "banding", "synonym": "stripe", "via": "band", "position": 2}
 {"word": "banding", "synonym": "stria", "via": "band", "position": 3}
@@ -820,6 +830,7 @@
 {"word": "bare", "synonym": "unornamented", "via": "bear", "position": 10}
 {"word": "bareback", "synonym": "barebacked", "via": "bareback", "position": 1}
 {"word": "barebacked", "synonym": "bareback", "via": "barebacked", "position": 1}
+{"word": "bareboned", "synonym": "gaunt", "via": "bareboned", "position": 1}
 {"word": "bared", "synonym": "bareheaded", "via": "bare", "position": 1}
 {"word": "barefaced", "synonym": "audacious", "via": "barefaced", "position": 1}
 {"word": "barefaced", "synonym": "bodacious", "via": "barefaced", "position": 2}
@@ -864,6 +875,8 @@
 {"word": "barge", "synonym": "lighter", "via": "barge", "position": 3}
 {"word": "bargee", "synonym": "bargeman", "via": "bargee", "position": 1}
 {"word": "bargeman", "synonym": "bargee", "via": "bargeman", "position": 1}
+{"word": "bargoon", "synonym": "bargain", "via": "bargoon", "position": 1}
+{"word": "bargoon", "synonym": "steal", "via": "bargoon", "position": 2}
 {"word": "barilla", "synonym": "saltwort", "via": "barilla", "position": 1}
 {"word": "barilla", "synonym": "glasswort", "via": "barilla", "position": 2}
 {"word": "baring", "synonym": "denudation", "via": "bare", "position": 1}
@@ -908,7 +921,10 @@
 {"word": "barmy", "synonym": "dotty", "via": "barmy", "position": 9}
 {"word": "barmy", "synonym": "fruity", "via": "barmy", "position": 10}
 {"word": "barnacle", "synonym": "cirriped", "via": "barnacle", "position": 1}
+{"word": "barnlot", "synonym": "barnyard", "via": "barnlot", "position": 1}
 {"word": "barnstormer", "synonym": "trouper", "via": "barnstormer", "position": 1}
+{"word": "barnyardism", "synonym": "vulgarism", "via": "barnyardism", "position": 1}
+{"word": "barometrograph", "synonym": "barograph", "via": "barometrograph", "position": 1}
 {"word": "baron", "synonym": "king", "via": "baron", "position": 1}
 {"word": "baron", "synonym": "magnate", "via": "baron", "position": 2}
 {"word": "baron", "synonym": "mogul", "via": "baron", "position": 3}
@@ -919,6 +935,9 @@
 {"word": "baronial", "synonym": "imposing", "via": "baronial", "position": 1}
 {"word": "baronial", "synonym": "noble", "via": "baronial", "position": 2}
 {"word": "baronial", "synonym": "stately", "via": "baronial", "position": 3}
+{"word": "barosinusitis", "synonym": "aerosinusitis", "via": "barosinusitis", "position": 1}
+{"word": "barperson", "synonym": "bartender", "via": "barperson", "position": 1}
+{"word": "barperson", "synonym": "barkeeper", "via": "barperson", "position": 2}
 {"word": "barque", "synonym": "bark", "via": "barque", "position": 1}
 {"word": "barrack", "synonym": "jeer", "via": "barrack", "position": 1}
 {"word": "barrack", "synonym": "scoff", "via": "barrack", "position": 2}
@@ -968,6 +987,8 @@
 {"word": "barricaded", "synonym": "barred", "via": "barricade", "position": 1}
 {"word": "barricaded", "synonym": "blockaded", "via": "barricade", "position": 2}
 {"word": "barricado", "synonym": "barricade", "via": "barricado", "position": 1}
+{"word": "barrie", "synonym": "excellent", "via": "barrie", "position": 1}
+{"word": "barrie", "synonym": "great", "via": "barrie", "position": 2}
 {"word": "barrier", "synonym": "roadblock", "via": "barrier", "position": 1}
 {"word": "barring", "synonym": "blackball", "via": "bar", "position": 1}
 {"word": "barring", "synonym": "blackball", "via": "barring", "position": 1}
@@ -1023,6 +1044,7 @@
 {"word": "baseless", "synonym": "unfounded", "via": "baseless", "position": 3}
 {"word": "baseless", "synonym": "unwarranted", "via": "baseless", "position": 4}
 {"word": "baseless", "synonym": "wild", "via": "baseless", "position": 5}
+{"word": "baselessness", "synonym": "groundlessness", "via": "baselessness", "position": 1}
 {"word": "basely", "synonym": "meanly", "via": "basely", "position": 1}
 {"word": "basely", "synonym": "scurvily", "via": "basely", "position": 2}
 {"word": "basement", "synonym": "cellar", "via": "basement", "position": 1}
@@ -1051,6 +1073,7 @@
 {"word": "basics", "synonym": "fundamentals", "via": "basic", "position": 1}
 {"word": "basics", "synonym": "bedrock", "via": "basic", "position": 2}
 {"word": "basics", "synonym": "rudiments", "via": "basic", "position": 3}
+{"word": "basifugal", "synonym": "acropetal", "via": "basifugal", "position": 1}
 {"word": "basify", "synonym": "alkalize", "via": "basify", "position": 1}
 {"word": "basify", "synonym": "alkalise", "via": "basify", "position": 2}
 {"word": "basify", "synonym": "alkalify", "via": "basify", "position": 3}
@@ -1150,6 +1173,9 @@
 {"word": "batch", "synonym": "mess", "via": "batch", "position": 8}
 {"word": "batch", "synonym": "mickle", "via": "batch", "position": 9}
 {"word": "batch", "synonym": "mint", "via": "batch", "position": 10}
+{"word": "batchmate", "synonym": "classmate", "via": "batchmate", "position": 1}
+{"word": "batey", "synonym": "tetchy", "via": "batey", "position": 1}
+{"word": "batey", "synonym": "irritable", "via": "batey", "position": 2}
 {"word": "bather", "synonym": "swimmer", "via": "bather", "position": 1}
 {"word": "bathetic", "synonym": "drippy", "via": "bathetic", "position": 1}
 {"word": "bathetic", "synonym": "hokey", "via": "bathetic", "position": 2}
@@ -1197,16 +1223,6 @@
 {"word": "bats", "synonym": "daft", "via": "bat", "position": 8}
 {"word": "bats", "synonym": "dotty", "via": "bat", "position": 9}
 {"word": "bats", "synonym": "fruity", "via": "bat", "position": 10}
-{"word": "bats", "synonym": "balmy", "via": "bats", "position": 1}
-{"word": "bats", "synonym": "barmy", "via": "bats", "position": 2}
-{"word": "bats", "synonym": "batty", "via": "bats", "position": 3}
-{"word": "bats", "synonym": "bonkers", "via": "bats", "position": 4}
-{"word": "bats", "synonym": "buggy", "via": "bats", "position": 5}
-{"word": "bats", "synonym": "cracked", "via": "bats", "position": 6}
-{"word": "bats", "synonym": "crackers", "via": "bats", "position": 7}
-{"word": "bats", "synonym": "daft", "via": "bats", "position": 8}
-{"word": "bats", "synonym": "dotty", "via": "bats", "position": 9}
-{"word": "bats", "synonym": "fruity", "via": "bats", "position": 10}
 {"word": "batshit", "synonym": "crazy", "via": "batshit", "position": 1}
 {"word": "batsman", "synonym": "batter", "via": "batsman", "position": 1}
 {"word": "batsman", "synonym": "hitter", "via": "batsman", "position": 2}
@@ -1223,6 +1239,8 @@
 {"word": "batter", "synonym": "clobber", "via": "batter", "position": 5}
 {"word": "batter", "synonym": "baste", "via": "batter", "position": 6}
 {"word": "batter", "synonym": "buffet", "via": "batter", "position": 7}
+{"word": "battercake", "synonym": "pancake", "via": "battercake", "position": 1}
+{"word": "batterer", "synonym": "abuser", "via": "batterer", "position": 1}
 {"word": "battering", "synonym": "banging", "via": "batter", "position": 1}
 {"word": "battering", "synonym": "banging", "via": "battering", "position": 1}
 {"word": "battery", "synonym": "barrage", "via": "battery", "position": 1}
@@ -1245,11 +1263,14 @@
 {"word": "battlemented", "synonym": "embattled", "via": "battlemented", "position": 1}
 {"word": "battlemented", "synonym": "castled", "via": "battlemented", "position": 2}
 {"word": "battlemented", "synonym": "castellated", "via": "battlemented", "position": 3}
+{"word": "battleplane", "synonym": "warplane", "via": "battleplane", "position": 1}
 {"word": "battler", "synonym": "combatant", "via": "battler", "position": 1}
 {"word": "battler", "synonym": "belligerent", "via": "battler", "position": 2}
 {"word": "battler", "synonym": "fighter", "via": "battler", "position": 3}
 {"word": "battler", "synonym": "scrapper", "via": "battler", "position": 4}
 {"word": "battleship", "synonym": "battlewagon", "via": "battleship", "position": 1}
+{"word": "battlesome", "synonym": "quarrelsome", "via": "battlesome", "position": 1}
+{"word": "battlesome", "synonym": "argumentative", "via": "battlesome", "position": 2}
 {"word": "battlewagon", "synonym": "battleship", "via": "battlewagon", "position": 1}
 {"word": "battue", "synonym": "bloodbath", "via": "battue", "position": 1}
 {"word": "battue", "synonym": "bloodletting", "via": "battue", "position": 2}
@@ -1325,6 +1346,7 @@
 {"word": "bazaar", "synonym": "fair", "via": "bazaar", "position": 1}
 {"word": "bazaar", "synonym": "bazar", "via": "bazaar", "position": 2}
 {"word": "bazar", "synonym": "bazaar", "via": "bazaar", "position": 1}
+{"word": "beacher", "synonym": "breaker", "via": "beacher", "position": 1}
 {"word": "beachhead", "synonym": "foothold", "via": "beachhead", "position": 1}
 {"word": "beacon", "synonym": "lighthouse", "via": "beacon", "position": 1}
 {"word": "beacon", "synonym": "pharos", "via": "beacon", "position": 2}
@@ -1342,6 +1364,7 @@
 {"word": "beadlike", "synonym": "beady", "via": "beadlike", "position": 1}
 {"word": "beadlike", "synonym": "buttony", "via": "beadlike", "position": 2}
 {"word": "beadsman", "synonym": "bedesman", "via": "beadsman", "position": 1}
+{"word": "beadswoman", "synonym": "almswoman", "via": "beadswoman", "position": 1}
 {"word": "beadwork", "synonym": "beading", "via": "beadwork", "position": 1}
 {"word": "beadwork", "synonym": "bead", "via": "beadwork", "position": 2}
 {"word": "beady", "synonym": "beadlike", "via": "beady", "position": 1}
@@ -1415,6 +1438,7 @@
 {"word": "bearded", "synonym": "bewhiskered", "via": "bearded", "position": 2}
 {"word": "bearded", "synonym": "whiskered", "via": "bearded", "position": 3}
 {"word": "bearded", "synonym": "whiskery", "via": "bearded", "position": 4}
+{"word": "beardy", "synonym": "bearded", "via": "beardy", "position": 1}
 {"word": "bearer", "synonym": "carrier", "via": "bearer", "position": 1}
 {"word": "bearer", "synonym": "toter", "via": "bearer", "position": 2}
 {"word": "bearer", "synonym": "holder", "via": "bearer", "position": 3}
@@ -1492,7 +1516,6 @@
 {"word": "beatnik", "synonym": "beat", "via": "beatnik", "position": 1}
 {"word": "beatniks", "synonym": "beats", "via": "beatnik", "position": 1}
 {"word": "beats", "synonym": "beatniks", "via": "beat", "position": 1}
-{"word": "beats", "synonym": "beatniks", "via": "beats", "position": 1}
 {"word": "beau", "synonym": "boyfriend", "via": "beau", "position": 1}
 {"word": "beau", "synonym": "fellow", "via": "beau", "position": 2}
 {"word": "beau", "synonym": "swain", "via": "beau", "position": 3}
@@ -1597,6 +1620,8 @@
 {"word": "bedchamber", "synonym": "bedroom", "via": "bedchamber", "position": 1}
 {"word": "bedchamber", "synonym": "chamber", "via": "bedchamber", "position": 2}
 {"word": "bedclothes", "synonym": "bedding", "via": "bedclothes", "position": 1}
+{"word": "bedclothing", "synonym": "bedclothes", "via": "bedclothing", "position": 1}
+{"word": "bedclothing", "synonym": "bedding", "via": "bedclothing", "position": 2}
 {"word": "bedcover", "synonym": "bedspread", "via": "bedcover", "position": 1}
 {"word": "bedcover", "synonym": "counterpane", "via": "bedcover", "position": 2}
 {"word": "bedcover", "synonym": "spread", "via": "bedcover", "position": 3}
@@ -1635,7 +1660,10 @@
 {"word": "bedlam", "synonym": "madhouse", "via": "bedlam", "position": 1}
 {"word": "bedlam", "synonym": "chaos", "via": "bedlam", "position": 2}
 {"word": "bedlam", "synonym": "pandemonium", "via": "bedlam", "position": 3}
+{"word": "bedoozle", "synonym": "bewilder", "via": "bedoozle", "position": 1}
+{"word": "bedoozle", "synonym": "confuse", "via": "bedoozle", "position": 2}
 {"word": "bedouin", "synonym": "beduin", "via": "bedouin", "position": 1}
+{"word": "bedrabble", "synonym": "bedraggle", "via": "bedrabble", "position": 1}
 {"word": "bedraggle", "synonym": "draggle", "via": "bedraggle", "position": 1}
 {"word": "bedraggled", "synonym": "draggled", "via": "bedraggle", "position": 1}
 {"word": "bedraggled", "synonym": "derelict", "via": "bedraggle", "position": 2}
@@ -1652,11 +1680,13 @@
 {"word": "bedrock", "synonym": "basics", "via": "bedrock", "position": 2}
 {"word": "bedroom", "synonym": "chamber", "via": "bedroom", "position": 1}
 {"word": "bedroom", "synonym": "bedchamber", "via": "bedroom", "position": 2}
+{"word": "bedsitter", "synonym": "bedsit", "via": "bedsitter", "position": 1}
 {"word": "bedspread", "synonym": "bedcover", "via": "bedspread", "position": 1}
 {"word": "bedspread", "synonym": "counterpane", "via": "bedspread", "position": 2}
 {"word": "bedspread", "synonym": "spread", "via": "bedspread", "position": 3}
 {"word": "bedstead", "synonym": "bedframe", "via": "bedstead", "position": 1}
 {"word": "beduin", "synonym": "bedouin", "via": "beduin", "position": 1}
+{"word": "bedwear", "synonym": "nightwear", "via": "bedwear", "position": 1}
 {"word": "beebread", "synonym": "ambrosia", "via": "beebread", "position": 1}
 {"word": "beef", "synonym": "gripe", "via": "beef", "position": 1}
 {"word": "beef", "synonym": "kick", "via": "beef", "position": 2}
@@ -1768,6 +1798,8 @@
 {"word": "beg", "synonym": "pray", "via": "bey", "position": 2}
 {"word": "beg", "synonym": "solicit", "via": "bey", "position": 3}
 {"word": "beg", "synonym": "tap", "via": "bey", "position": 4}
+{"word": "begad", "synonym": "egad", "via": "begad", "position": 1}
+{"word": "begem", "synonym": "bejewel", "via": "begem", "position": 1}
 {"word": "beget", "synonym": "get", "via": "beget", "position": 1}
 {"word": "beget", "synonym": "engender", "via": "beget", "position": 2}
 {"word": "beget", "synonym": "father", "via": "beget", "position": 3}
@@ -1777,6 +1809,7 @@
 {"word": "begetter", "synonym": "father", "via": "begetter", "position": 1}
 {"word": "beggar", "synonym": "mendicant", "via": "beggar", "position": 1}
 {"word": "beggar", "synonym": "pauperize", "via": "beggar", "position": 2}
+{"word": "beggardom", "synonym": "beggary", "via": "beggardom", "position": 1}
 {"word": "beggarly", "synonym": "mean", "via": "beggarly", "position": 1}
 {"word": "beggary", "synonym": "begging", "via": "beggary", "position": 1}
 {"word": "beggary", "synonym": "mendicancy", "via": "beggary", "position": 2}
@@ -1881,8 +1914,11 @@
 {"word": "behaviour", "synonym": "deportment", "via": "behaviour", "position": 6}
 {"word": "behead", "synonym": "decapitate", "via": "behead", "position": 1}
 {"word": "behead", "synonym": "decollate", "via": "behead", "position": 2}
+{"word": "beheadal", "synonym": "beheading", "via": "beheadal", "position": 1}
+{"word": "beheadal", "synonym": "decapitation", "via": "beheadal", "position": 2}
 {"word": "beheaded", "synonym": "decapitated", "via": "behead", "position": 1}
 {"word": "beheaded", "synonym": "decapitated", "via": "beheaded", "position": 1}
+{"word": "beheader", "synonym": "headsman", "via": "beheader", "position": 1}
 {"word": "beheading", "synonym": "decapitation", "via": "behead", "position": 1}
 {"word": "beheading", "synonym": "decapitation", "via": "beheading", "position": 1}
 {"word": "behemoth", "synonym": "colossus", "via": "behemoth", "position": 1}
@@ -1906,7 +1942,6 @@
 {"word": "beholder", "synonym": "observer", "via": "beholder", "position": 3}
 {"word": "beholding", "synonym": "seeing", "via": "behold", "position": 1}
 {"word": "beholding", "synonym": "seeing", "via": "beholden", "position": 1}
-{"word": "beholding", "synonym": "seeing", "via": "beholding", "position": 1}
 {"word": "behoove", "synonym": "behove", "via": "behoove", "position": 1}
 {"word": "behove", "synonym": "behoove", "via": "behove", "position": 1}
 {"word": "beige", "synonym": "ecru", "via": "beige", "position": 1}
@@ -1915,6 +1950,7 @@
 {"word": "bejewel", "synonym": "jewel", "via": "bejewel", "position": 1}
 {"word": "belabor", "synonym": "belabour", "via": "belabour", "position": 1}
 {"word": "belabour", "synonym": "belabor", "via": "belabour", "position": 1}
+{"word": "belah", "synonym": "beefwood", "via": "belah", "position": 1}
 {"word": "belated", "synonym": "late", "via": "belated", "position": 1}
 {"word": "belated", "synonym": "tardy", "via": "belated", "position": 2}
 {"word": "belatedly", "synonym": "late", "via": "belatedly", "position": 1}
@@ -1932,6 +1968,8 @@
 {"word": "belching", "synonym": "burp", "via": "belching", "position": 2}
 {"word": "belching", "synonym": "burping", "via": "belching", "position": 3}
 {"word": "belching", "synonym": "eructation", "via": "belching", "position": 4}
+{"word": "beld", "synonym": "bald", "via": "beld", "position": 1}
+{"word": "beld", "synonym": "hairless", "via": "beld", "position": 2}
 {"word": "beldam", "synonym": "beldame", "via": "beldame", "position": 1}
 {"word": "beldam", "synonym": "hag", "via": "beldame", "position": 2}
 {"word": "beldam", "synonym": "witch", "via": "beldame", "position": 3}
@@ -2030,6 +2068,8 @@
 {"word": "belling", "synonym": "callithump", "via": "belling", "position": 4}
 {"word": "bellman", "synonym": "bellboy", "via": "bellman", "position": 1}
 {"word": "bellman", "synonym": "bellhop", "via": "bellman", "position": 2}
+{"word": "bellock", "synonym": "bellow", "via": "bellock", "position": 1}
+{"word": "bellock", "synonym": "roar", "via": "bellock", "position": 2}
 {"word": "bellow", "synonym": "bellowing", "via": "bellow", "position": 1}
 {"word": "bellow", "synonym": "holla", "via": "bellow", "position": 2}
 {"word": "bellow", "synonym": "holler", "via": "bellow", "position": 3}
@@ -2064,6 +2104,7 @@
 {"word": "bellowing", "synonym": "roar", "via": "bellowing", "position": 7}
 {"word": "bellowing", "synonym": "roaring", "via": "bellowing", "position": 8}
 {"word": "bellowing", "synonym": "yowl", "via": "bellowing", "position": 9}
+{"word": "bellperson", "synonym": "bellhop", "via": "bellperson", "position": 1}
 {"word": "belly", "synonym": "paunch", "via": "belly", "position": 1}
 {"word": "belly", "synonym": "abdomen", "via": "belly", "position": 2}
 {"word": "belly", "synonym": "venter", "via": "belly", "position": 3}
@@ -2097,6 +2138,7 @@
 {"word": "bellying", "synonym": "protuberant", "via": "bellying", "position": 5}
 {"word": "belongings", "synonym": "property", "via": "belonging", "position": 1}
 {"word": "belongings", "synonym": "holding", "via": "belonging", "position": 2}
+{"word": "belonoid", "synonym": "styloid", "via": "belonoid", "position": 1}
 {"word": "beloved", "synonym": "dear", "via": "beloved", "position": 1}
 {"word": "beloved", "synonym": "dearest", "via": "beloved", "position": 2}
 {"word": "beloved", "synonym": "honey", "via": "beloved", "position": 3}
@@ -2120,6 +2162,7 @@
 {"word": "beluga", "synonym": "hausen", "via": "beluga", "position": 1}
 {"word": "bema", "synonym": "chancel", "via": "bema", "position": 1}
 {"word": "bema", "synonym": "sanctuary", "via": "bema", "position": 2}
+{"word": "bemazed", "synonym": "bewildered", "via": "bemazed", "position": 1}
 {"word": "bemire", "synonym": "dirty", "via": "bemire", "position": 1}
 {"word": "bemire", "synonym": "soil", "via": "bemire", "position": 2}
 {"word": "bemire", "synonym": "begrime", "via": "bemire", "position": 3}
@@ -2154,6 +2197,7 @@
 {"word": "bemusement", "synonym": "befuddlement", "via": "bemusement", "position": 4}
 {"word": "bemusement", "synonym": "mystification", "via": "bemusement", "position": 5}
 {"word": "bemusement", "synonym": "bafflement", "via": "bemusement", "position": 6}
+{"word": "benachin", "synonym": "jollof", "via": "benachin", "position": 1}
 {"word": "bench", "synonym": "workbench", "via": "bench", "position": 1}
 {"word": "bench", "synonym": "judiciary", "via": "bench", "position": 2}
 {"word": "bench", "synonym": "terrace", "via": "bench", "position": 3}
@@ -2183,11 +2227,13 @@
 {"word": "bends", "synonym": "aeroembolism", "via": "bend", "position": 1}
 {"word": "bends", "synonym": "aeroembolism", "via": "bends", "position": 1}
 {"word": "beneath", "synonym": "below", "via": "beneath", "position": 1}
+{"word": "benedicite", "synonym": "benediction", "via": "benedicite", "position": 1}
 {"word": "benedick", "synonym": "benedict", "via": "benedick", "position": 1}
 {"word": "benedict", "synonym": "benedick", "via": "benedict", "position": 1}
 {"word": "benediction", "synonym": "blessing", "via": "benediction", "position": 1}
 {"word": "benefaction", "synonym": "benevolence", "via": "benefaction", "position": 1}
 {"word": "benefactor", "synonym": "helper", "via": "benefactor", "position": 1}
+{"word": "benefactrix", "synonym": "benefactress", "via": "benefactrix", "position": 1}
 {"word": "beneficent", "synonym": "benevolent", "via": "beneficent", "position": 1}
 {"word": "beneficent", "synonym": "eleemosynary", "via": "beneficent", "position": 2}
 {"word": "beneficent", "synonym": "philanthropic", "via": "beneficent", "position": 3}
@@ -2239,6 +2285,7 @@
 {"word": "benthal", "synonym": "benthonic", "via": "benthal", "position": 2}
 {"word": "benthic", "synonym": "benthal", "via": "benthic", "position": 1}
 {"word": "benthic", "synonym": "benthonic", "via": "benthic", "position": 2}
+{"word": "benthon", "synonym": "benthos", "via": "benthon", "position": 1}
 {"word": "benthonic", "synonym": "benthic", "via": "benthonic", "position": 1}
 {"word": "benthonic", "synonym": "benthal", "via": "benthonic", "position": 2}
 {"word": "benumb", "synonym": "numb", "via": "benumb", "position": 1}
@@ -2250,14 +2297,20 @@
 {"word": "benumbed", "synonym": "dulled", "via": "benumbed", "position": 1}
 {"word": "benumbed", "synonym": "asleep", "via": "benumbed", "position": 2}
 {"word": "benumbed", "synonym": "numb", "via": "benumbed", "position": 3}
+{"word": "benzamine", "synonym": "eucaine", "via": "benzamine", "position": 1}
 {"word": "benzene", "synonym": "benzine", "via": "benzene", "position": 1}
 {"word": "benzene", "synonym": "benzol", "via": "benzene", "position": 2}
+{"word": "benzeneazobenzene", "synonym": "azobenzene", "via": "benzeneazobenzene", "position": 1}
+{"word": "benzenecarbaldehyde", "synonym": "benzaldehyde", "via": "benzenecarbaldehyde", "position": 1}
+{"word": "benzenecarbonyl", "synonym": "benzoyl", "via": "benzenecarbonyl", "position": 1}
+{"word": "benzenecarboxylate", "synonym": "benzoate", "via": "benzenecarboxylate", "position": 1}
 {"word": "benzine", "synonym": "benzene", "via": "benzine", "position": 1}
 {"word": "benzine", "synonym": "benzol", "via": "benzine", "position": 2}
 {"word": "benzo", "synonym": "benzodiazepine", "via": "benzo", "position": 1}
 {"word": "benzoin", "synonym": "benjamin", "via": "benzoin", "position": 1}
 {"word": "benzol", "synonym": "benzene", "via": "benzol", "position": 1}
 {"word": "benzol", "synonym": "benzine", "via": "benzol", "position": 2}
+{"word": "benzosulfimide", "synonym": "saccharin", "via": "benzosulfimide", "position": 1}
 {"word": "bequeath", "synonym": "will", "via": "bequeath", "position": 1}
 {"word": "bequeath", "synonym": "leave", "via": "bequeath", "position": 2}
 {"word": "bequest", "synonym": "legacy", "via": "bequest", "position": 1}
@@ -2293,6 +2346,8 @@
 {"word": "bereft", "synonym": "mourning", "via": "bereft", "position": 3}
 {"word": "bereft", "synonym": "sorrowing", "via": "bereft", "position": 4}
 {"word": "berg", "synonym": "iceberg", "via": "berg", "position": 1}
+{"word": "berkeleianism", "synonym": "berkeleyism", "via": "berkeleianism", "position": 1}
+{"word": "berkeleyism", "synonym": "berkeleianism", "via": "berkeleyism", "position": 1}
 {"word": "berm", "synonym": "shoulder", "via": "berm", "position": 1}
 {"word": "berretta", "synonym": "biretta", "via": "biretta", "position": 1}
 {"word": "berretta", "synonym": "birretta", "via": "biretta", "position": 2}
@@ -2313,6 +2368,7 @@
 {"word": "berth", "synonym": "bunk", "via": "berth", "position": 8}
 {"word": "berth", "synonym": "mooring", "via": "berth", "position": 9}
 {"word": "berth", "synonym": "moorage", "via": "berth", "position": 10}
+{"word": "berthage", "synonym": "moorage", "via": "berthage", "position": 1}
 {"word": "beseech", "synonym": "bid", "via": "beseech", "position": 1}
 {"word": "beseech", "synonym": "entreat", "via": "beseech", "position": 2}
 {"word": "beseech", "synonym": "adjure", "via": "beseech", "position": 3}
@@ -2421,6 +2477,8 @@
 {"word": "best", "synonym": "trump", "via": "well", "position": 4}
 {"word": "best", "synonym": "scoop", "via": "well", "position": 5}
 {"word": "best", "synonym": "better", "via": "well", "position": 6}
+{"word": "besti", "synonym": "shame", "via": "besti", "position": 1}
+{"word": "besti", "synonym": "embarrassment", "via": "besti", "position": 2}
 {"word": "bestial", "synonym": "beastly", "via": "bestial", "position": 1}
 {"word": "bestial", "synonym": "brute", "via": "bestial", "position": 2}
 {"word": "bestial", "synonym": "brutish", "via": "bestial", "position": 3}
@@ -2436,6 +2494,7 @@
 {"word": "bestow", "synonym": "bring", "via": "bestow", "position": 6}
 {"word": "bestowal", "synonym": "conferral", "via": "bestowal", "position": 1}
 {"word": "bestowal", "synonym": "conferment", "via": "bestowal", "position": 2}
+{"word": "bestraddle", "synonym": "bestride", "via": "bestraddle", "position": 1}
 {"word": "bestride", "synonym": "mount", "via": "bestride", "position": 1}
 {"word": "bet", "synonym": "wager", "via": "bet", "position": 1}
 {"word": "bet", "synonym": "stake", "via": "bet", "position": 2}
@@ -2607,9 +2666,13 @@
 {"word": "bezant", "synonym": "bezzant", "via": "bezant", "position": 1}
 {"word": "bezant", "synonym": "byzant", "via": "bezant", "position": 2}
 {"word": "bezant", "synonym": "solidus", "via": "bezant", "position": 3}
+{"word": "bezonian", "synonym": "knave", "via": "bezonian", "position": 1}
+{"word": "bezonian", "synonym": "scoundrel", "via": "bezonian", "position": 2}
 {"word": "bezzant", "synonym": "bezant", "via": "bezant", "position": 1}
 {"word": "bezzant", "synonym": "byzant", "via": "bezant", "position": 2}
 {"word": "bezzant", "synonym": "solidus", "via": "bezant", "position": 3}
+{"word": "bhai", "synonym": "bro", "via": "bhai", "position": 1}
+{"word": "bhindi", "synonym": "okra", "via": "bhindi", "position": 1}
 {"word": "bi", "synonym": "bisexual", "via": "bi", "position": 1}
 {"word": "biannual", "synonym": "semiannual", "via": "biannual", "position": 1}
 {"word": "biannual", "synonym": "biyearly", "via": "biannual", "position": 2}
@@ -2630,6 +2693,8 @@
 {"word": "bible", "synonym": "scripture", "via": "bible", "position": 2}
 {"word": "bible", "synonym": "word", "via": "bible", "position": 3}
 {"word": "biblical", "synonym": "scriptural", "via": "biblical", "position": 1}
+{"word": "bibliographical", "synonym": "bibliographic", "via": "bibliographical", "position": 1}
+{"word": "bibliophage", "synonym": "bookworm", "via": "bibliophage", "position": 1}
 {"word": "bibliophilia", "synonym": "bibliophily", "via": "bibliophilia", "position": 1}
 {"word": "bibliopole", "synonym": "bibliopolist", "via": "bibliopole", "position": 1}
 {"word": "bibliopolist", "synonym": "bibliopole", "via": "bibliopolist", "position": 1}
@@ -2638,6 +2703,7 @@
 {"word": "bibulous", "synonym": "sottish", "via": "bibulous", "position": 3}
 {"word": "bicentenary", "synonym": "bicentennial", "via": "bicentenary", "position": 1}
 {"word": "bicentennial", "synonym": "bicentenary", "via": "bicentennial", "position": 1}
+{"word": "bichloride", "synonym": "dichloride", "via": "bichloride", "position": 1}
 {"word": "bichromate", "synonym": "dichromate", "via": "bichromate", "position": 1}
 {"word": "bichrome", "synonym": "bicolor", "via": "bichrome", "position": 1}
 {"word": "bichrome", "synonym": "bicolour", "via": "bichrome", "position": 2}
@@ -2665,6 +2731,7 @@
 {"word": "bickering", "synonym": "squabble", "via": "bickering", "position": 4}
 {"word": "bickering", "synonym": "pettifoggery", "via": "bickering", "position": 5}
 {"word": "bickering", "synonym": "fuss", "via": "bickering", "position": 6}
+{"word": "bickie", "synonym": "biscuit", "via": "bickie", "position": 1}
 {"word": "bicolor", "synonym": "bicolour", "via": "bicolour", "position": 1}
 {"word": "bicolor", "synonym": "bicolored", "via": "bicolour", "position": 2}
 {"word": "bicolor", "synonym": "bichrome", "via": "bicolour", "position": 3}
@@ -2729,6 +2796,7 @@
 {"word": "biff", "synonym": "slug", "via": "biff", "position": 5}
 {"word": "biff", "synonym": "pummel", "via": "biff", "position": 6}
 {"word": "biff", "synonym": "pommel", "via": "biff", "position": 7}
+{"word": "bifter", "synonym": "spliff", "via": "bifter", "position": 1}
 {"word": "bifurcate", "synonym": "biramous", "via": "bifurcate", "position": 1}
 {"word": "bifurcate", "synonym": "branched", "via": "bifurcate", "position": 2}
 {"word": "bifurcate", "synonym": "forked", "via": "bifurcate", "position": 3}
@@ -2786,6 +2854,7 @@
 {"word": "bilberry", "synonym": "blaeberry", "via": "bilberry", "position": 2}
 {"word": "bile", "synonym": "gall", "via": "bile", "position": 1}
 {"word": "bile", "synonym": "gall", "via": "boil", "position": 1}
+{"word": "bilestone", "synonym": "gallstone", "via": "bilestone", "position": 1}
 {"word": "bilgewater", "synonym": "baloney", "via": "bilgewater", "position": 1}
 {"word": "bilgewater", "synonym": "boloney", "via": "bilgewater", "position": 2}
 {"word": "bilgewater", "synonym": "bosh", "via": "bilgewater", "position": 3}
@@ -2826,6 +2895,8 @@
 {"word": "billfold", "synonym": "wallet", "via": "billfold", "position": 1}
 {"word": "billfold", "synonym": "notecase", "via": "billfold", "position": 2}
 {"word": "billfold", "synonym": "pocketbook", "via": "billfold", "position": 3}
+{"word": "billfolder", "synonym": "billfold", "via": "billfolder", "position": 1}
+{"word": "billfolder", "synonym": "wallet", "via": "billfolder", "position": 2}
 {"word": "billhook", "synonym": "bill", "via": "billhook", "position": 1}
 {"word": "billing", "synonym": "charge", "via": "bill", "position": 1}
 {"word": "billing", "synonym": "charge", "via": "billing", "position": 1}
@@ -2888,8 +2959,11 @@
 {"word": "bingo", "synonym": "lotto", "via": "bingo", "position": 1}
 {"word": "bingo", "synonym": "beano", "via": "bingo", "position": 2}
 {"word": "bingo", "synonym": "keno", "via": "bingo", "position": 3}
+{"word": "binman", "synonym": "dustman", "via": "binman", "position": 1}
+{"word": "binovular", "synonym": "dizygotic", "via": "binovular", "position": 1}
 {"word": "binucleate", "synonym": "binucleated", "via": "binucleate", "position": 1}
 {"word": "binucleated", "synonym": "binucleate", "via": "binucleated", "position": 1}
+{"word": "bioecology", "synonym": "ecology", "via": "bioecology", "position": 1}
 {"word": "bioengineering", "synonym": "biotechnology", "via": "bioengineering", "position": 1}
 {"word": "bioengineering", "synonym": "ergonomics", "via": "bioengineering", "position": 2}
 {"word": "biogenesis", "synonym": "biogeny", "via": "biogenesis", "position": 1}
@@ -2921,6 +2995,7 @@
 {"word": "biped", "synonym": "bipedal", "via": "biped", "position": 1}
 {"word": "bipedal", "synonym": "biped", "via": "bipedal", "position": 1}
 {"word": "biquadratic", "synonym": "quartic", "via": "biquadratic", "position": 1}
+{"word": "biradical", "synonym": "diradical", "via": "biradical", "position": 1}
 {"word": "biramous", "synonym": "bifurcate", "via": "biramous", "position": 1}
 {"word": "biramous", "synonym": "branched", "via": "biramous", "position": 2}
 {"word": "biramous", "synonym": "forked", "via": "biramous", "position": 3}
@@ -2995,8 +3070,10 @@
 {"word": "biscuit", "synonym": "cooky", "via": "biscuit", "position": 2}
 {"word": "bise", "synonym": "bize", "via": "bice", "position": 1}
 {"word": "bise", "synonym": "bize", "via": "bise", "position": 1}
+{"word": "bisectrix", "synonym": "bisector", "via": "bisectrix", "position": 1}
 {"word": "bisexual", "synonym": "epicene", "via": "bisexual", "position": 1}
 {"word": "bisexuality", "synonym": "androgyny", "via": "bisexuality", "position": 1}
+{"word": "bish", "synonym": "blunder", "via": "bish", "position": 1}
 {"word": "bishopric", "synonym": "diocese", "via": "bishopric", "position": 1}
 {"word": "bishopric", "synonym": "episcopate", "via": "bishopric", "position": 2}
 {"word": "bister", "synonym": "bistre", "via": "bistre", "position": 1}
@@ -3072,6 +3149,8 @@
 {"word": "bitingly", "synonym": "piercingly", "via": "bitingly", "position": 1}
 {"word": "bitingly", "synonym": "bitterly", "via": "bitingly", "position": 2}
 {"word": "bitingly", "synonym": "bitter", "via": "bitingly", "position": 3}
+{"word": "bitser", "synonym": "mongrel", "via": "bitser", "position": 1}
+{"word": "bitser", "synonym": "mutt", "via": "bitser", "position": 2}
 {"word": "bitstock", "synonym": "brace", "via": "bitstock", "position": 1}
 {"word": "bitt", "synonym": "bollard", "via": "bitt", "position": 1}
 {"word": "bitter", "synonym": "bitterness", "via": "bitter", "position": 1}
@@ -3084,6 +3163,7 @@
 {"word": "bitter", "synonym": "blistering", "via": "bitter", "position": 8}
 {"word": "bitter", "synonym": "caustic", "via": "bitter", "position": 9}
 {"word": "bitter", "synonym": "sulfurous", "via": "bitter", "position": 10}
+{"word": "bitterender", "synonym": "diehard", "via": "bitterender", "position": 1}
 {"word": "bitterly", "synonym": "piercingly", "via": "bitterly", "position": 1}
 {"word": "bitterly", "synonym": "bitingly", "via": "bitterly", "position": 2}
 {"word": "bitterly", "synonym": "bitter", "via": "bitterly", "position": 3}
@@ -3143,6 +3223,8 @@
 {"word": "bizarreness", "synonym": "outlandishness", "via": "bizarreness", "position": 1}
 {"word": "bizarreness", "synonym": "weirdness", "via": "bizarreness", "position": 2}
 {"word": "bize", "synonym": "bise", "via": "bize", "position": 1}
+{"word": "bizzo", "synonym": "nonsense", "via": "bizzo", "position": 1}
+{"word": "bizzo", "synonym": "rubbish", "via": "bizzo", "position": 2}
 {"word": "blab", "synonym": "talk", "via": "blab", "position": 1}
 {"word": "blab", "synonym": "tattle", "via": "blab", "position": 2}
 {"word": "blab", "synonym": "peach", "via": "blab", "position": 3}
@@ -3188,6 +3270,7 @@
 {"word": "blackbird", "synonym": "ousel", "via": "blackbird", "position": 4}
 {"word": "blackboard", "synonym": "chalkboard", "via": "blackboard", "position": 1}
 {"word": "blackcap", "synonym": "thimbleberry", "via": "blackcap", "position": 1}
+{"word": "blackcod", "synonym": "sablefish", "via": "blackcod", "position": 1}
 {"word": "blacken", "synonym": "melanize", "via": "blacken", "position": 1}
 {"word": "blacken", "synonym": "black", "via": "blacken", "position": 2}
 {"word": "blacken", "synonym": "char", "via": "blacken", "position": 3}
@@ -3230,7 +3313,12 @@
 {"word": "blackthorn", "synonym": "sloe", "via": "blackthorn", "position": 1}
 {"word": "blacktop", "synonym": "blacktopping", "via": "blacktop", "position": 1}
 {"word": "blacktopping", "synonym": "blacktop", "via": "blacktop", "position": 1}
+{"word": "blackweed", "synonym": "ragweed", "via": "blackweed", "position": 1}
+{"word": "blad", "synonym": "brochure", "via": "blad", "position": 1}
+{"word": "blad", "synonym": "leaflet", "via": "blad", "position": 2}
 {"word": "bladder", "synonym": "vesica", "via": "bladder", "position": 1}
+{"word": "bladdered", "synonym": "hammered", "via": "bladdered", "position": 1}
+{"word": "bladdered", "synonym": "plastered", "via": "bladdered", "position": 2}
 {"word": "bladderlike", "synonym": "bladdery", "via": "bladderlike", "position": 1}
 {"word": "bladdery", "synonym": "bladderlike", "via": "bladdery", "position": 1}
 {"word": "blade", "synonym": "vane", "via": "blade", "position": 1}
@@ -3241,6 +3329,7 @@
 {"word": "bladelike", "synonym": "swordlike", "via": "bladelike", "position": 2}
 {"word": "blaeberry", "synonym": "bilberry", "via": "blaeberry", "position": 1}
 {"word": "blaeberry", "synonym": "whortleberry", "via": "blaeberry", "position": 2}
+{"word": "blague", "synonym": "humbug", "via": "blague", "position": 1}
 {"word": "blah", "synonym": "bombast", "via": "blah", "position": 1}
 {"word": "blah", "synonym": "fustian", "via": "blah", "position": 2}
 {"word": "blah", "synonym": "rant", "via": "blah", "position": 3}
@@ -3284,6 +3373,7 @@
 {"word": "blameless", "synonym": "unimpeachable", "via": "blameless", "position": 3}
 {"word": "blamelessly", "synonym": "irreproachably", "via": "blamelessly", "position": 1}
 {"word": "blamelessness", "synonym": "guiltlessness", "via": "blamelessness", "position": 1}
+{"word": "blameworthiness", "synonym": "culpability", "via": "blameworthiness", "position": 1}
 {"word": "blameworthy", "synonym": "blamable", "via": "blameworthy", "position": 1}
 {"word": "blameworthy", "synonym": "blameful", "via": "blameworthy", "position": 2}
 {"word": "blameworthy", "synonym": "censurable", "via": "blameworthy", "position": 3}
@@ -3332,6 +3422,7 @@
 {"word": "blanket", "synonym": "extensive", "via": "blanket", "position": 5}
 {"word": "blanket", "synonym": "panoptic", "via": "blanket", "position": 6}
 {"word": "blanket", "synonym": "wide", "via": "blanket", "position": 7}
+{"word": "blaps", "synonym": "gaffe", "via": "blaps", "position": 1}
 {"word": "blare", "synonym": "blaring", "via": "blare", "position": 1}
 {"word": "blare", "synonym": "cacophony", "via": "blare", "position": 2}
 {"word": "blare", "synonym": "clamor", "via": "blare", "position": 3}
@@ -3412,6 +3503,7 @@
 {"word": "blastoderm", "synonym": "blastodisc", "via": "blastoderm", "position": 1}
 {"word": "blastodisc", "synonym": "blastoderm", "via": "blastodisc", "position": 1}
 {"word": "blastoff", "synonym": "shot", "via": "blastoff", "position": 1}
+{"word": "blastosphere", "synonym": "blastula", "via": "blastosphere", "position": 1}
 {"word": "blat", "synonym": "bleat", "via": "blat", "position": 1}
 {"word": "blat", "synonym": "blate", "via": "blat", "position": 2}
 {"word": "blat", "synonym": "baa", "via": "blat", "position": 3}
@@ -3511,6 +3603,7 @@
 {"word": "bleeding", "synonym": "hemorrhage", "via": "bleed", "position": 1}
 {"word": "bleeding", "synonym": "hemorrhage", "via": "bleeding", "position": 1}
 {"word": "bleep", "synonym": "beep", "via": "bleep", "position": 1}
+{"word": "bleeper", "synonym": "pager", "via": "bleeper", "position": 1}
 {"word": "blemish", "synonym": "defect", "via": "blemish", "position": 1}
 {"word": "blemish", "synonym": "mar", "via": "blemish", "position": 2}
 {"word": "blemish", "synonym": "flaw", "via": "blemish", "position": 3}
@@ -3536,6 +3629,9 @@
 {"word": "blending", "synonym": "shading", "via": "blend", "position": 2}
 {"word": "blending", "synonym": "blend", "via": "blending", "position": 1}
 {"word": "blending", "synonym": "shading", "via": "blending", "position": 2}
+{"word": "blepharoptosis", "synonym": "ptosis", "via": "blepharoptosis", "position": 1}
+{"word": "blert", "synonym": "dolt", "via": "blert", "position": 1}
+{"word": "blert", "synonym": "nitwit", "via": "blert", "position": 2}
 {"word": "bless", "synonym": "consecrate", "via": "bless", "position": 1}
 {"word": "bless", "synonym": "hallow", "via": "bless", "position": 2}
 {"word": "bless", "synonym": "sanctify", "via": "bless", "position": 3}
@@ -3616,6 +3712,8 @@
 {"word": "blinding", "synonym": "glary", "via": "blinding", "position": 5}
 {"word": "blindness", "synonym": "sightlessness", "via": "blindness", "position": 1}
 {"word": "blindworm", "synonym": "slowworm", "via": "blindworm", "position": 1}
+{"word": "blinging", "synonym": "flashy", "via": "blinging", "position": 1}
+{"word": "blinging", "synonym": "glitzy", "via": "blinging", "position": 2}
 {"word": "blink", "synonym": "blinking", "via": "blink", "position": 1}
 {"word": "blink", "synonym": "wink", "via": "blink", "position": 2}
 {"word": "blink", "synonym": "winking", "via": "blink", "position": 3}
@@ -3644,6 +3742,7 @@
 {"word": "blinking", "synonym": "blooming", "via": "blinking", "position": 6}
 {"word": "blinking", "synonym": "crashing", "via": "blinking", "position": 7}
 {"word": "blinking", "synonym": "flaming", "via": "blinking", "position": 8}
+{"word": "blinky", "synonym": "sour", "via": "blinky", "position": 1}
 {"word": "blintz", "synonym": "blintze", "via": "blintz", "position": 1}
 {"word": "blintze", "synonym": "blintz", "via": "blintz", "position": 1}
 {"word": "blip", "synonym": "pip", "via": "blip", "position": 1}
@@ -3869,6 +3968,7 @@
 {"word": "blooper", "synonym": "flub", "via": "blooper", "position": 6}
 {"word": "blooper", "synonym": "botch", "via": "blooper", "position": 7}
 {"word": "blooper", "synonym": "boner", "via": "blooper", "position": 8}
+{"word": "blootered", "synonym": "drunk", "via": "blootered", "position": 1}
 {"word": "blossom", "synonym": "flower", "via": "blossom", "position": 1}
 {"word": "blossom", "synonym": "bloom", "via": "blossom", "position": 2}
 {"word": "blossom", "synonym": "prime", "via": "blossom", "position": 3}
@@ -3935,6 +4035,7 @@
 {"word": "blowhard", "synonym": "boaster", "via": "blowhard", "position": 3}
 {"word": "blowhard", "synonym": "vaunter", "via": "blowhard", "position": 4}
 {"word": "blowhole", "synonym": "vent", "via": "blowhole", "position": 1}
+{"word": "blowlamp", "synonym": "blowtorch", "via": "blowlamp", "position": 1}
 {"word": "blown", "synonym": "pursy", "via": "blow", "position": 1}
 {"word": "blown", "synonym": "winded", "via": "blow", "position": 2}
 {"word": "blown", "synonym": "pursy", "via": "blown", "position": 1}
@@ -3977,6 +4078,7 @@
 {"word": "blubber", "synonym": "sniffle", "via": "blubber", "position": 5}
 {"word": "blubber", "synonym": "blub", "via": "blubber", "position": 6}
 {"word": "blubber", "synonym": "snuffle", "via": "blubber", "position": 7}
+{"word": "bludge", "synonym": "shirk", "via": "bludge", "position": 1}
 {"word": "bludgeon", "synonym": "club", "via": "bludgeon", "position": 1}
 {"word": "blue", "synonym": "blueness", "via": "blue", "position": 1}
 {"word": "blue", "synonym": "bluing", "via": "blue", "position": 2}
@@ -3988,6 +4090,7 @@
 {"word": "blue", "synonym": "gloomy", "via": "blue", "position": 8}
 {"word": "blue", "synonym": "grim", "via": "blue", "position": 9}
 {"word": "blue", "synonym": "sorry", "via": "blue", "position": 10}
+{"word": "bluebeat", "synonym": "ska", "via": "bluebeat", "position": 1}
 {"word": "bluebell", "synonym": "harebell", "via": "bluebell", "position": 1}
 {"word": "bluebill", "synonym": "scaup", "via": "bluebill", "position": 1}
 {"word": "bluebonnet", "synonym": "balmoral", "via": "bluebonnet", "position": 1}
@@ -3999,6 +4102,7 @@
 {"word": "blueish", "synonym": "blue", "via": "bluish", "position": 1}
 {"word": "blueish", "synonym": "bluish", "via": "bluish", "position": 2}
 {"word": "bluejacket", "synonym": "sailor", "via": "bluejacket", "position": 1}
+{"word": "blueliner", "synonym": "defenseman", "via": "blueliner", "position": 1}
 {"word": "blueness", "synonym": "blue", "via": "blueness", "position": 1}
 {"word": "blueprint", "synonym": "design", "via": "blueprint", "position": 1}
 {"word": "blueprint", "synonym": "pattern", "via": "blueprint", "position": 2}
@@ -4186,6 +4290,7 @@
 {"word": "boatman", "synonym": "boater", "via": "boatman", "position": 1}
 {"word": "boatman", "synonym": "waterman", "via": "boatman", "position": 2}
 {"word": "boatswain", "synonym": "bosun", "via": "boatswain", "position": 1}
+{"word": "boatwright", "synonym": "boatbuilder", "via": "boatwright", "position": 1}
 {"word": "bob", "synonym": "bobtail", "via": "bob", "position": 1}
 {"word": "bob", "synonym": "dock", "via": "bob", "position": 2}
 {"word": "bob", "synonym": "bobber", "via": "bob", "position": 3}
@@ -4226,6 +4331,8 @@
 {"word": "boche", "synonym": "kraut", "via": "boche", "position": 1}
 {"word": "boche", "synonym": "jerry", "via": "boche", "position": 2}
 {"word": "boche", "synonym": "hun", "via": "boche", "position": 3}
+{"word": "bockedy", "synonym": "rickety", "via": "bockedy", "position": 1}
+{"word": "bockedy", "synonym": "wobbly", "via": "bockedy", "position": 2}
 {"word": "bod", "synonym": "soma", "via": "bod", "position": 1}
 {"word": "bod", "synonym": "build", "via": "bod", "position": 2}
 {"word": "bod", "synonym": "figure", "via": "bod", "position": 3}
@@ -4290,6 +4397,7 @@
 {"word": "body", "synonym": "trunk", "via": "body", "position": 6}
 {"word": "body", "synonym": "personify", "via": "body", "position": 7}
 {"word": "bodyguard", "synonym": "escort", "via": "bodyguard", "position": 1}
+{"word": "boep", "synonym": "paunch", "via": "boep", "position": 1}
 {"word": "bogbean", "synonym": "buckbean", "via": "bogbean", "position": 1}
 {"word": "bogey", "synonym": "bogy", "via": "bogey", "position": 1}
 {"word": "bogey", "synonym": "bogie", "via": "bogey", "position": 2}
@@ -4298,6 +4406,7 @@
 {"word": "bogeyman", "synonym": "bugbear", "via": "bogeyman", "position": 1}
 {"word": "bogeyman", "synonym": "bugaboo", "via": "bogeyman", "position": 2}
 {"word": "bogeyman", "synonym": "boogeyman", "via": "bogeyman", "position": 3}
+{"word": "bogger", "synonym": "toilet", "via": "bogger", "position": 1}
 {"word": "boggle", "synonym": "flabbergast", "via": "boggle", "position": 1}
 {"word": "boggle", "synonym": "flabbergast", "via": "bogle", "position": 1}
 {"word": "boggy", "synonym": "marshy", "via": "boggy", "position": 1}
@@ -4342,11 +4451,15 @@
 {"word": "boisterous", "synonym": "rumbustious", "via": "boisterous", "position": 5}
 {"word": "boisterous", "synonym": "unruly", "via": "boisterous", "position": 6}
 {"word": "boisterous", "synonym": "knockabout", "via": "boisterous", "position": 7}
+{"word": "boke", "synonym": "vomit", "via": "boke", "position": 1}
+{"word": "boke", "synonym": "puke", "via": "boke", "position": 2}
 {"word": "bola", "synonym": "bolo", "via": "bola", "position": 1}
 {"word": "bold", "synonym": "boldface", "via": "bold", "position": 1}
 {"word": "bold", "synonym": "bluff", "via": "bold", "position": 2}
 {"word": "bold", "synonym": "sheer", "via": "bold", "position": 3}
 {"word": "boldface", "synonym": "bold", "via": "boldface", "position": 1}
+{"word": "boldhearted", "synonym": "courageous", "via": "boldhearted", "position": 1}
+{"word": "boldhearted", "synonym": "intrepid", "via": "boldhearted", "position": 2}
 {"word": "boldness", "synonym": "nerve", "via": "boldness", "position": 1}
 {"word": "boldness", "synonym": "brass", "via": "boldness", "position": 2}
 {"word": "boldness", "synonym": "face", "via": "boldness", "position": 3}
@@ -4454,6 +4567,7 @@
 {"word": "bombination", "synonym": "buzz", "via": "bombination", "position": 1}
 {"word": "bombing", "synonym": "bombardment", "via": "bomb", "position": 1}
 {"word": "bombing", "synonym": "bombardment", "via": "bombing", "position": 1}
+{"word": "bombous", "synonym": "globose", "via": "bombous", "position": 1}
 {"word": "bombproof", "synonym": "shellproof", "via": "bombproof", "position": 1}
 {"word": "bombshell", "synonym": "thunderbolt", "via": "bombshell", "position": 1}
 {"word": "bombshell", "synonym": "thunderclap", "via": "bombshell", "position": 2}
@@ -4480,6 +4594,7 @@
 {"word": "bonding", "synonym": "soldering", "via": "bonding", "position": 1}
 {"word": "bondmaid", "synonym": "bondwoman", "via": "bondmaid", "position": 1}
 {"word": "bondman", "synonym": "bondsman", "via": "bondman", "position": 1}
+{"word": "bondservant", "synonym": "serf", "via": "bondservant", "position": 1}
 {"word": "bondsman", "synonym": "bondman", "via": "bondsman", "position": 1}
 {"word": "bondwoman", "synonym": "bondmaid", "via": "bondwoman", "position": 1}
 {"word": "bone", "synonym": "ivory", "via": "bone", "position": 1}
@@ -4495,7 +4610,6 @@
 {"word": "bone", "synonym": "drum", "via": "trombone", "position": 5}
 {"word": "bone", "synonym": "swot", "via": "trombone", "position": 6}
 {"word": "boned", "synonym": "deboned", "via": "bone", "position": 1}
-{"word": "boned", "synonym": "deboned", "via": "boned", "position": 1}
 {"word": "bonehead", "synonym": "dunce", "via": "bonehead", "position": 1}
 {"word": "bonehead", "synonym": "dunderhead", "via": "bonehead", "position": 2}
 {"word": "bonehead", "synonym": "numskull", "via": "bonehead", "position": 3}
@@ -4571,6 +4685,8 @@
 {"word": "bonny", "synonym": "comely", "via": "bonnie", "position": 2}
 {"word": "bonny", "synonym": "fair", "via": "bonnie", "position": 3}
 {"word": "bonny", "synonym": "sightly", "via": "bonnie", "position": 4}
+{"word": "bonsela", "synonym": "tip", "via": "bonsela", "position": 1}
+{"word": "bonsela", "synonym": "gratuity", "via": "bonsela", "position": 2}
 {"word": "bonus", "synonym": "fillip", "via": "bonus", "position": 1}
 {"word": "bonus", "synonym": "incentive", "via": "bonus", "position": 2}
 {"word": "bony", "synonym": "boney", "via": "bony", "position": 1}
@@ -4599,6 +4715,7 @@
 {"word": "boob", "synonym": "dope", "via": "boob", "position": 8}
 {"word": "boob", "synonym": "booby", "via": "boob", "position": 9}
 {"word": "boob", "synonym": "pinhead", "via": "boob", "position": 10}
+{"word": "boobhead", "synonym": "recidivist", "via": "boobhead", "position": 1}
 {"word": "booby", "synonym": "dumbbell", "via": "booby", "position": 1}
 {"word": "booby", "synonym": "dummy", "via": "booby", "position": 2}
 {"word": "booby", "synonym": "dope", "via": "booby", "position": 3}
@@ -4612,6 +4729,7 @@
 {"word": "boodle", "synonym": "gelt", "via": "boodle", "position": 6}
 {"word": "boodle", "synonym": "kale", "via": "boodle", "position": 7}
 {"word": "boodle", "synonym": "lettuce", "via": "boodle", "position": 8}
+{"word": "boofhead", "synonym": "dolt", "via": "boofhead", "position": 1}
 {"word": "booger", "synonym": "bogeyman", "via": "booger", "position": 1}
 {"word": "booger", "synonym": "bugbear", "via": "booger", "position": 2}
 {"word": "booger", "synonym": "bugaboo", "via": "booger", "position": 3}
@@ -4769,6 +4887,8 @@
 {"word": "booty", "synonym": "plunder", "via": "booty", "position": 3}
 {"word": "booty", "synonym": "prize", "via": "booty", "position": 4}
 {"word": "booty", "synonym": "swag", "via": "booty", "position": 5}
+{"word": "booyah", "synonym": "yay", "via": "booyah", "position": 1}
+{"word": "booyah", "synonym": "hooray", "via": "booyah", "position": 2}
 {"word": "booze", "synonym": "liquor", "via": "booze", "position": 1}
 {"word": "booze", "synonym": "spirits", "via": "booze", "position": 2}
 {"word": "booze", "synonym": "drink", "via": "booze", "position": 3}
@@ -4795,6 +4915,7 @@
 {"word": "bop", "synonym": "bonk", "via": "bop", "position": 5}
 {"word": "bop", "synonym": "bash", "via": "bop", "position": 6}
 {"word": "bopeep", "synonym": "peekaboo", "via": "bopeep", "position": 1}
+{"word": "boppy", "synonym": "upbeat", "via": "boppy", "position": 1}
 {"word": "boracic", "synonym": "boric", "via": "boracic", "position": 1}
 {"word": "bordello", "synonym": "whorehouse", "via": "bordello", "position": 1}
 {"word": "bordello", "synonym": "brothel", "via": "bordello", "position": 2}
@@ -4869,6 +4990,7 @@
 {"word": "boringly", "synonym": "tiresomely", "via": "boringly", "position": 2}
 {"word": "boringness", "synonym": "dreariness", "via": "boringness", "position": 1}
 {"word": "boringness", "synonym": "insipidity", "via": "boringness", "position": 2}
+{"word": "borm", "synonym": "smear", "via": "borm", "position": 1}
 {"word": "born", "synonym": "natural", "via": "bear", "position": 1}
 {"word": "born", "synonym": "innate", "via": "bear", "position": 2}
 {"word": "born", "synonym": "natural", "via": "born", "position": 1}
@@ -4925,6 +5047,8 @@
 {"word": "bossy", "synonym": "dominating", "via": "bossy", "position": 2}
 {"word": "bossy", "synonym": "magisterial", "via": "bossy", "position": 3}
 {"word": "bossy", "synonym": "peremptory", "via": "bossy", "position": 4}
+{"word": "bosthoon", "synonym": "boor", "via": "bosthoon", "position": 1}
+{"word": "bosthoon", "synonym": "lout", "via": "bosthoon", "position": 2}
 {"word": "bosun", "synonym": "boatswain", "via": "boatswain", "position": 1}
 {"word": "botanic", "synonym": "botanical", "via": "botanic", "position": 1}
 {"word": "botanical", "synonym": "botanic", "via": "botanical", "position": 1}
@@ -5020,6 +5144,7 @@
 {"word": "boulevard", "synonym": "avenue", "via": "boulevard", "position": 1}
 {"word": "boulle", "synonym": "boule", "via": "buhl", "position": 1}
 {"word": "boulle", "synonym": "buhl", "via": "buhl", "position": 2}
+{"word": "boun", "synonym": "prepare", "via": "boun", "position": 1}
 {"word": "bounce", "synonym": "leap", "via": "bounce", "position": 1}
 {"word": "bounce", "synonym": "leaping", "via": "bounce", "position": 2}
 {"word": "bounce", "synonym": "spring", "via": "bounce", "position": 3}
@@ -5153,6 +5278,8 @@
 {"word": "bout", "synonym": "binge", "via": "bout", "position": 3}
 {"word": "bout", "synonym": "turn", "via": "bout", "position": 4}
 {"word": "bout", "synonym": "round", "via": "bout", "position": 5}
+{"word": "boutade", "synonym": "outburst", "via": "boutade", "position": 1}
+{"word": "bovarism", "synonym": "conceit", "via": "bovarism", "position": 1}
 {"word": "bovid", "synonym": "bovine", "via": "bovid", "position": 1}
 {"word": "bovine", "synonym": "bovid", "via": "bovine", "position": 1}
 {"word": "bow", "synonym": "fore", "via": "bough", "position": 1}
@@ -5213,9 +5340,6 @@
 {"word": "bowing", "synonym": "bow", "via": "bow", "position": 1}
 {"word": "bowing", "synonym": "obeisance", "via": "bow", "position": 2}
 {"word": "bowing", "synonym": "bowed", "via": "bow", "position": 3}
-{"word": "bowing", "synonym": "bow", "via": "bowing", "position": 1}
-{"word": "bowing", "synonym": "obeisance", "via": "bowing", "position": 2}
-{"word": "bowing", "synonym": "bowed", "via": "bowing", "position": 3}
 {"word": "bowknot", "synonym": "bow", "via": "bowknot", "position": 1}
 {"word": "bowl", "synonym": "roll", "via": "bowl", "position": 1}
 {"word": "bowl", "synonym": "stadium", "via": "bowl", "position": 2}
@@ -5272,10 +5396,13 @@
 {"word": "boxwood", "synonym": "box", "via": "boxwood", "position": 1}
 {"word": "boxy", "synonym": "boxlike", "via": "boxy", "position": 1}
 {"word": "boy", "synonym": "son", "via": "boy", "position": 1}
+{"word": "boyf", "synonym": "boyfriend", "via": "boyf", "position": 1}
 {"word": "boyfriend", "synonym": "fellow", "via": "boyfriend", "position": 1}
 {"word": "boyfriend", "synonym": "beau", "via": "boyfriend", "position": 2}
 {"word": "boyfriend", "synonym": "swain", "via": "boyfriend", "position": 3}
 {"word": "boyish", "synonym": "schoolboyish", "via": "boyish", "position": 1}
+{"word": "boykie", "synonym": "chap", "via": "boykie", "position": 1}
+{"word": "boykie", "synonym": "fellow", "via": "boykie", "position": 2}
 {"word": "bozo", "synonym": "guy", "via": "bozo", "position": 1}
 {"word": "bozo", "synonym": "cat", "via": "bozo", "position": 2}
 {"word": "bozo", "synonym": "hombre", "via": "bozo", "position": 3}
@@ -5290,6 +5417,7 @@
 {"word": "bra", "synonym": "bandeau", "via": "bra", "position": 2}
 {"word": "bra", "synonym": "brassiere", "via": "bro", "position": 1}
 {"word": "bra", "synonym": "bandeau", "via": "bro", "position": 2}
+{"word": "braaivleis", "synonym": "barbecue", "via": "braaivleis", "position": 1}
 {"word": "brabble", "synonym": "quibble", "via": "brabble", "position": 1}
 {"word": "brabble", "synonym": "niggle", "via": "brabble", "position": 2}
 {"word": "brabble", "synonym": "pettifog", "via": "brabble", "position": 3}
@@ -5313,6 +5441,7 @@
 {"word": "braces", "synonym": "brace", "via": "brace", "position": 1}
 {"word": "braces", "synonym": "brace", "via": "braces", "position": 1}
 {"word": "brachiopod", "synonym": "lampshell", "via": "brachiopod", "position": 1}
+{"word": "brachygraphy", "synonym": "shorthand", "via": "brachygraphy", "position": 1}
 {"word": "bracing", "synonym": "brace", "via": "brace", "position": 1}
 {"word": "bracing", "synonym": "brisk", "via": "brace", "position": 2}
 {"word": "bracing", "synonym": "fresh", "via": "brace", "position": 3}
@@ -5343,6 +5472,7 @@
 {"word": "braggadocio", "synonym": "bluster", "via": "braggadocio", "position": 1}
 {"word": "braggadocio", "synonym": "rodomontade", "via": "braggadocio", "position": 2}
 {"word": "braggadocio", "synonym": "rhodomontade", "via": "braggadocio", "position": 3}
+{"word": "braggadocious", "synonym": "boastful", "via": "braggadocious", "position": 1}
 {"word": "braggart", "synonym": "bragger", "via": "braggart", "position": 1}
 {"word": "braggart", "synonym": "boaster", "via": "braggart", "position": 2}
 {"word": "braggart", "synonym": "blowhard", "via": "braggart", "position": 3}
@@ -5424,6 +5554,8 @@
 {"word": "brainsick", "synonym": "unhinged", "via": "brainsick", "position": 7}
 {"word": "brainstorm", "synonym": "insight", "via": "brainstorm", "position": 1}
 {"word": "brainy", "synonym": "brilliant", "via": "brainy", "position": 1}
+{"word": "brak", "synonym": "brackish", "via": "brak", "position": 1}
+{"word": "brak", "synonym": "mongrel", "via": "brak", "position": 2}
 {"word": "brake", "synonym": "bracken", "via": "brake", "position": 1}
 {"word": "brake", "synonym": "bracken", "via": "break", "position": 1}
 {"word": "braky", "synonym": "brambly", "via": "braky", "position": 1}
@@ -5446,14 +5578,6 @@
 {"word": "branched", "synonym": "biramous", "via": "branch", "position": 6}
 {"word": "branched", "synonym": "forked", "via": "branch", "position": 7}
 {"word": "branched", "synonym": "pronged", "via": "branch", "position": 8}
-{"word": "branched", "synonym": "branching", "via": "branched", "position": 1}
-{"word": "branched", "synonym": "ramose", "via": "branched", "position": 2}
-{"word": "branched", "synonym": "ramous", "via": "branched", "position": 3}
-{"word": "branched", "synonym": "ramate", "via": "branched", "position": 4}
-{"word": "branched", "synonym": "bifurcate", "via": "branched", "position": 5}
-{"word": "branched", "synonym": "biramous", "via": "branched", "position": 6}
-{"word": "branched", "synonym": "forked", "via": "branched", "position": 7}
-{"word": "branched", "synonym": "pronged", "via": "branched", "position": 8}
 {"word": "branchia", "synonym": "gill", "via": "branchia", "position": 1}
 {"word": "branching", "synonym": "ramification", "via": "branch", "position": 1}
 {"word": "branching", "synonym": "fork", "via": "branch", "position": 2}
@@ -5508,6 +5632,7 @@
 {"word": "brass", "synonym": "establishment", "via": "brass", "position": 8}
 {"word": "brass", "synonym": "organization", "via": "brass", "position": 9}
 {"word": "brass", "synonym": "organisation", "via": "brass", "position": 10}
+{"word": "brassicaceous", "synonym": "cruciferous", "via": "brassicaceous", "position": 1}
 {"word": "brassiere", "synonym": "bra", "via": "brassiere", "position": 1}
 {"word": "brassiere", "synonym": "bandeau", "via": "brassiere", "position": 2}
 {"word": "brassy", "synonym": "audacious", "via": "brassie", "position": 1}
@@ -5550,6 +5675,8 @@
 {"word": "brave", "synonym": "braw", "via": "brave", "position": 9}
 {"word": "brave", "synonym": "gay", "via": "brave", "position": 10}
 {"word": "bravely", "synonym": "courageously", "via": "bravely", "position": 1}
+{"word": "braveness", "synonym": "bravery", "via": "braveness", "position": 1}
+{"word": "braveness", "synonym": "courage", "via": "braveness", "position": 2}
 {"word": "bravery", "synonym": "courage", "via": "bravery", "position": 1}
 {"word": "bravery", "synonym": "courageousness", "via": "bravery", "position": 2}
 {"word": "bravery", "synonym": "fearlessness", "via": "bravery", "position": 3}
@@ -5609,6 +5736,7 @@
 {"word": "breadstuff", "synonym": "bread", "via": "breadstuff", "position": 1}
 {"word": "breadth", "synonym": "width", "via": "breadth", "position": 1}
 {"word": "breadth", "synonym": "largeness", "via": "breadth", "position": 2}
+{"word": "breadthways", "synonym": "breadthwise", "via": "breadthways", "position": 1}
 {"word": "break", "synonym": "breakout", "via": "brake", "position": 1}
 {"word": "break", "synonym": "jailbreak", "via": "brake", "position": 2}
 {"word": "break", "synonym": "breakage", "via": "brake", "position": 3}
@@ -5640,8 +5768,6 @@
 {"word": "breaker", "synonym": "breakers", "via": "breaker", "position": 2}
 {"word": "breakers", "synonym": "surf", "via": "breaker", "position": 1}
 {"word": "breakers", "synonym": "breaker", "via": "breaker", "position": 2}
-{"word": "breakers", "synonym": "surf", "via": "breakers", "position": 1}
-{"word": "breakers", "synonym": "breaker", "via": "breakers", "position": 2}
 {"word": "breaking", "synonym": "breakage", "via": "break", "position": 1}
 {"word": "breaking", "synonym": "break", "via": "break", "position": 2}
 {"word": "breaking", "synonym": "breakage", "via": "breaking", "position": 1}
@@ -5653,16 +5779,19 @@
 {"word": "breakup", "synonym": "dissolution", "via": "breakup", "position": 1}
 {"word": "breakup", "synonym": "separation", "via": "breakup", "position": 2}
 {"word": "breakup", "synonym": "detachment", "via": "breakup", "position": 3}
+{"word": "breakwall", "synonym": "breakwater", "via": "breakwall", "position": 1}
 {"word": "breakwater", "synonym": "groin", "via": "breakwater", "position": 1}
 {"word": "breakwater", "synonym": "groyne", "via": "breakwater", "position": 2}
 {"word": "breakwater", "synonym": "mole", "via": "breakwater", "position": 3}
 {"word": "breakwater", "synonym": "bulwark", "via": "breakwater", "position": 4}
 {"word": "breakwater", "synonym": "seawall", "via": "breakwater", "position": 5}
 {"word": "breakwater", "synonym": "jetty", "via": "breakwater", "position": 6}
+{"word": "breakweather", "synonym": "shelter", "via": "breakweather", "position": 1}
 {"word": "breast", "synonym": "chest", "via": "breast", "position": 1}
 {"word": "breast", "synonym": "bosom", "via": "breast", "position": 2}
 {"word": "breast", "synonym": "summit", "via": "breast", "position": 3}
 {"word": "breastbone", "synonym": "sternum", "via": "breastbone", "position": 1}
+{"word": "breastpin", "synonym": "brooch", "via": "breastpin", "position": 1}
 {"word": "breastplate", "synonym": "aegis", "via": "breastplate", "position": 1}
 {"word": "breastplate", "synonym": "egis", "via": "breastplate", "position": 2}
 {"word": "breastwork", "synonym": "parapet", "via": "breastwork", "position": 1}
@@ -5735,13 +5864,18 @@
 {"word": "breeziness", "synonym": "windiness", "via": "breeziness", "position": 2}
 {"word": "breezy", "synonym": "blowy", "via": "breezy", "position": 1}
 {"word": "breezy", "synonym": "windy", "via": "breezy", "position": 2}
+{"word": "breid", "synonym": "bread", "via": "breid", "position": 1}
+{"word": "breist", "synonym": "breast", "via": "breist", "position": 1}
 {"word": "brekkie", "synonym": "breakfast", "via": "brekkie", "position": 1}
 {"word": "brent", "synonym": "brant", "via": "brant", "position": 1}
 {"word": "brent", "synonym": "brant", "via": "burnt", "position": 1}
+{"word": "breviloquent", "synonym": "terse", "via": "breviloquent", "position": 1}
+{"word": "breviloquent", "synonym": "laconic", "via": "breviloquent", "position": 2}
 {"word": "brevity", "synonym": "briefness", "via": "brevity", "position": 1}
 {"word": "brew", "synonym": "brewage", "via": "brew", "position": 1}
 {"word": "brewage", "synonym": "brew", "via": "brewage", "position": 1}
 {"word": "brewhouse", "synonym": "brewery", "via": "brewhouse", "position": 1}
+{"word": "brewski", "synonym": "beer", "via": "brewski", "position": 1}
 {"word": "briar", "synonym": "brier", "via": "briar", "position": 1}
 {"word": "briar", "synonym": "greenbrier", "via": "briar", "position": 2}
 {"word": "briar", "synonym": "catbrier", "via": "briar", "position": 3}
@@ -5769,6 +5903,7 @@
 {"word": "bribery", "synonym": "graft", "via": "bribery", "position": 1}
 {"word": "brickfield", "synonym": "brickyard", "via": "brickfield", "position": 1}
 {"word": "brickle", "synonym": "brittle", "via": "brickle", "position": 1}
+{"word": "bricktop", "synonym": "redhead", "via": "bricktop", "position": 1}
 {"word": "brickyard", "synonym": "brickfield", "via": "brickyard", "position": 1}
 {"word": "bricole", "synonym": "catapult", "via": "bricole", "position": 1}
 {"word": "bricole", "synonym": "arbalest", "via": "bricole", "position": 2}
@@ -5924,6 +6059,7 @@
 {"word": "brisk", "synonym": "bracing", "via": "brisk", "position": 8}
 {"word": "brisk", "synonym": "fresh", "via": "brisk", "position": 9}
 {"word": "brisk", "synonym": "refreshing", "via": "brisk", "position": 10}
+{"word": "brisken", "synonym": "quicken", "via": "brisken", "position": 1}
 {"word": "briskness", "synonym": "alacrity", "via": "briskness", "position": 1}
 {"word": "briskness", "synonym": "smartness", "via": "briskness", "position": 2}
 {"word": "brisling", "synonym": "sprat", "via": "brisling", "position": 1}
@@ -6023,6 +6159,8 @@
 {"word": "broadside", "synonym": "throwaway", "via": "broadside", "position": 9}
 {"word": "broadtail", "synonym": "caracul", "via": "broadtail", "position": 1}
 {"word": "broadtail", "synonym": "karakul", "via": "broadtail", "position": 2}
+{"word": "brobdingnagian", "synonym": "gigantic", "via": "brobdingnagian", "position": 1}
+{"word": "brobdingnagian", "synonym": "colossal", "via": "brobdingnagian", "position": 2}
 {"word": "brocaded", "synonym": "embossed", "via": "brocade", "position": 1}
 {"word": "brocaded", "synonym": "raised", "via": "brocade", "position": 2}
 {"word": "brocaded", "synonym": "embossed", "via": "brocaded", "position": 1}
@@ -6031,6 +6169,7 @@
 {"word": "brochure", "synonym": "folder", "via": "brochure", "position": 2}
 {"word": "brochure", "synonym": "leaflet", "via": "brochure", "position": 3}
 {"word": "brochure", "synonym": "pamphlet", "via": "brochure", "position": 4}
+{"word": "brog", "synonym": "awl", "via": "brog", "position": 1}
 {"word": "brogan", "synonym": "brogue", "via": "brogan", "position": 1}
 {"word": "brogan", "synonym": "clodhopper", "via": "brogan", "position": 2}
 {"word": "brogue", "synonym": "brogan", "via": "brogue", "position": 1}
@@ -6076,6 +6215,7 @@
 {"word": "brolly", "synonym": "gamp", "via": "brolly", "position": 1}
 {"word": "brome", "synonym": "bromegrass", "via": "brome", "position": 1}
 {"word": "bromegrass", "synonym": "brome", "via": "bromegrass", "position": 1}
+{"word": "bromeosin", "synonym": "eosin", "via": "bromeosin", "position": 1}
 {"word": "bromide", "synonym": "platitude", "via": "bromide", "position": 1}
 {"word": "bromide", "synonym": "cliche", "via": "bromide", "position": 2}
 {"word": "bromide", "synonym": "banality", "via": "bromide", "position": 3}
@@ -6244,6 +6384,7 @@
 {"word": "brushed", "synonym": "napped", "via": "brushed", "position": 2}
 {"word": "brushing", "synonym": "brush", "via": "brush", "position": 1}
 {"word": "brushing", "synonym": "brush", "via": "brushing", "position": 1}
+{"word": "brushpopper", "synonym": "cowboy", "via": "brushpopper", "position": 1}
 {"word": "brushup", "synonym": "review", "via": "brushup", "position": 1}
 {"word": "brushwood", "synonym": "brush", "via": "brushwood", "position": 1}
 {"word": "brushwood", "synonym": "coppice", "via": "brushwood", "position": 2}
@@ -6263,6 +6404,7 @@
 {"word": "brusqueness", "synonym": "curtness", "via": "brusqueness", "position": 2}
 {"word": "brusqueness", "synonym": "gruffness", "via": "brusqueness", "position": 3}
 {"word": "brusqueness", "synonym": "shortness", "via": "brusqueness", "position": 4}
+{"word": "brussen", "synonym": "bold", "via": "brussen", "position": 1}
 {"word": "brutal", "synonym": "barbarous", "via": "brutal", "position": 1}
 {"word": "brutal", "synonym": "cruel", "via": "brutal", "position": 2}
 {"word": "brutal", "synonym": "fell", "via": "brutal", "position": 3}
@@ -6384,6 +6526,7 @@
 {"word": "bucolic", "synonym": "provincial", "via": "bucolic", "position": 5}
 {"word": "bucolic", "synonym": "arcadian", "via": "bucolic", "position": 6}
 {"word": "bucolic", "synonym": "pastoral", "via": "bucolic", "position": 7}
+{"word": "buddhistic", "synonym": "buddhist", "via": "buddhistic", "position": 1}
 {"word": "buddy", "synonym": "brother", "via": "buddy", "position": 1}
 {"word": "buddy", "synonym": "chum", "via": "buddy", "position": 2}
 {"word": "buddy", "synonym": "crony", "via": "buddy", "position": 3}
@@ -6392,6 +6535,8 @@
 {"word": "budge", "synonym": "stir", "via": "budge", "position": 1}
 {"word": "budge", "synonym": "shift", "via": "budge", "position": 2}
 {"word": "budge", "synonym": "agitate", "via": "budge", "position": 3}
+{"word": "budgeree", "synonym": "good", "via": "budgeree", "position": 1}
+{"word": "budgeree", "synonym": "fine", "via": "budgeree", "position": 2}
 {"word": "budgerigar", "synonym": "budgie", "via": "budgerigar", "position": 1}
 {"word": "budgie", "synonym": "budgerigar", "via": "budgie", "position": 1}
 {"word": "buff", "synonym": "caramel", "via": "buff", "position": 1}
@@ -6539,7 +6684,9 @@
 {"word": "bulla", "synonym": "blister", "via": "bulla", "position": 1}
 {"word": "bulla", "synonym": "bleb", "via": "bulla", "position": 2}
 {"word": "bullbat", "synonym": "nighthawk", "via": "bullbat", "position": 1}
+{"word": "bullbrier", "synonym": "catbrier", "via": "bullbrier", "position": 1}
 {"word": "bulldozer", "synonym": "dozer", "via": "bulldozer", "position": 1}
+{"word": "bulldust", "synonym": "nonsense", "via": "bulldust", "position": 1}
 {"word": "bullet", "synonym": "slug", "via": "bullet", "position": 1}
 {"word": "bulletproof", "synonym": "unassailable", "via": "bulletproof", "position": 1}
 {"word": "bulletproof", "synonym": "unshakable", "via": "bulletproof", "position": 2}
@@ -6575,6 +6722,7 @@
 {"word": "bullyrag", "synonym": "browbeat", "via": "bullyrag", "position": 2}
 {"word": "bullyrag", "synonym": "ballyrag", "via": "bullyrag", "position": 3}
 {"word": "bullyrag", "synonym": "hector", "via": "bullyrag", "position": 4}
+{"word": "bulnbuln", "synonym": "lyrebird", "via": "bulnbuln", "position": 1}
 {"word": "bulrush", "synonym": "bullrush", "via": "bulrush", "position": 1}
 {"word": "bulwark", "synonym": "breakwater", "via": "bulwark", "position": 1}
 {"word": "bulwark", "synonym": "groin", "via": "bulwark", "position": 2}
@@ -6617,6 +6765,8 @@
 {"word": "bumbling", "synonym": "butterfingered", "via": "bumbling", "position": 2}
 {"word": "bumbling", "synonym": "handless", "via": "bumbling", "position": 3}
 {"word": "bumf", "synonym": "bumph", "via": "bumf", "position": 1}
+{"word": "bumfuzzle", "synonym": "bewilder", "via": "bumfuzzle", "position": 1}
+{"word": "bumfuzzle", "synonym": "befuddle", "via": "bumfuzzle", "position": 2}
 {"word": "bump", "synonym": "blow", "via": "bump", "position": 1}
 {"word": "bump", "synonym": "bulge", "via": "bump", "position": 2}
 {"word": "bump", "synonym": "hump", "via": "bump", "position": 3}
@@ -6634,6 +6784,7 @@
 {"word": "bumpkin", "synonym": "chawbacon", "via": "bumpkin", "position": 6}
 {"word": "bumpkinly", "synonym": "hick", "via": "bumpkinly", "position": 1}
 {"word": "bumpkinly", "synonym": "rustic", "via": "bumpkinly", "position": 2}
+{"word": "bumpoff", "synonym": "murder", "via": "bumpoff", "position": 1}
 {"word": "bumptiousness", "synonym": "cockiness", "via": "bumptiousness", "position": 1}
 {"word": "bumptiousness", "synonym": "pushiness", "via": "bumptiousness", "position": 2}
 {"word": "bumptiousness", "synonym": "forwardness", "via": "bumptiousness", "position": 3}
@@ -6678,10 +6829,12 @@
 {"word": "bundle", "synonym": "wad", "via": "bundle", "position": 8}
 {"word": "bundle", "synonym": "compact", "via": "bundle", "position": 9}
 {"word": "bundle", "synonym": "bunch", "via": "bundle", "position": 10}
+{"word": "bundobust", "synonym": "arrangement", "via": "bundobust", "position": 1}
 {"word": "bung", "synonym": "spile", "via": "bung", "position": 1}
 {"word": "bung", "synonym": "tip", "via": "bung", "position": 2}
 {"word": "bung", "synonym": "fee", "via": "bung", "position": 3}
 {"word": "bungalow", "synonym": "cottage", "via": "bungalow", "position": 1}
+{"word": "bunger", "synonym": "firecracker", "via": "bunger", "position": 1}
 {"word": "bunghole", "synonym": "arse", "via": "bunghole", "position": 1}
 {"word": "bunghole", "synonym": "asshole", "via": "bunghole", "position": 2}
 {"word": "bungle", "synonym": "blunder", "via": "bungle", "position": 1}
@@ -6956,6 +7109,7 @@
 {"word": "bush", "synonym": "scrub", "via": "bush", "position": 1}
 {"word": "bush", "synonym": "chaparral", "via": "bush", "position": 2}
 {"word": "bush", "synonym": "shrub", "via": "bush", "position": 3}
+{"word": "bushbeater", "synonym": "scout", "via": "bushbeater", "position": 1}
 {"word": "bushed", "synonym": "beat", "via": "bushed", "position": 1}
 {"word": "bushed", "synonym": "dead", "via": "bushed", "position": 2}
 {"word": "bushel", "synonym": "repair", "via": "bushel", "position": 1}
@@ -6963,6 +7117,7 @@
 {"word": "bushel", "synonym": "fix", "via": "bushel", "position": 3}
 {"word": "bushel", "synonym": "doctor", "via": "bushel", "position": 4}
 {"word": "bushel", "synonym": "restore", "via": "bushel", "position": 5}
+{"word": "bushwalk", "synonym": "hike", "via": "bushwalk", "position": 1}
 {"word": "bushwhack", "synonym": "ambush", "via": "bushwhack", "position": 1}
 {"word": "bushwhack", "synonym": "scupper", "via": "bushwhack", "position": 2}
 {"word": "bushwhack", "synonym": "waylay", "via": "bushwhack", "position": 3}
@@ -7000,6 +7155,8 @@
 {"word": "buster", "synonym": "broncobuster", "via": "buster", "position": 1}
 {"word": "buster", "synonym": "fellow", "via": "buster", "position": 2}
 {"word": "buster", "synonym": "dude", "via": "buster", "position": 3}
+{"word": "busticate", "synonym": "smash", "via": "busticate", "position": 1}
+{"word": "busticate", "synonym": "shatter", "via": "busticate", "position": 2}
 {"word": "bustle", "synonym": "hustle", "via": "bustle", "position": 1}
 {"word": "bustle", "synonym": "flurry", "via": "bustle", "position": 2}
 {"word": "bustle", "synonym": "ado", "via": "bustle", "position": 3}
@@ -7080,6 +7237,7 @@
 {"word": "butterfingered", "synonym": "bumbling", "via": "butterfingered", "position": 1}
 {"word": "butterfingered", "synonym": "bungling", "via": "butterfingered", "position": 2}
 {"word": "butterfingered", "synonym": "handless", "via": "butterfingered", "position": 3}
+{"word": "butterine", "synonym": "margarine", "via": "butterine", "position": 1}
 {"word": "butterweed", "synonym": "ragwort", "via": "butterweed", "position": 1}
 {"word": "buttery", "synonym": "pantry", "via": "buttery", "position": 1}
 {"word": "buttery", "synonym": "larder", "via": "buttery", "position": 2}

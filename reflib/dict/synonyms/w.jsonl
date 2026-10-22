@@ -1,3 +1,7 @@
+{"word": "wabbit", "synonym": "weary", "via": "wabbit", "position": 1}
+{"word": "wabbit", "synonym": "exhausted", "via": "wabbit", "position": 2}
+{"word": "wacker", "synonym": "excellent", "via": "wacker", "position": 1}
+{"word": "wacker", "synonym": "wonderful", "via": "wacker", "position": 2}
 {"word": "wackily", "synonym": "daftly", "via": "wackily", "position": 1}
 {"word": "wackily", "synonym": "dottily", "via": "wackily", "position": 2}
 {"word": "wackily", "synonym": "balmily", "via": "wackily", "position": 3}
@@ -130,6 +134,7 @@
 {"word": "wainscotting", "synonym": "wainscoting", "via": "wainscotting", "position": 2}
 {"word": "waist", "synonym": "shank", "via": "waist", "position": 1}
 {"word": "waist", "synonym": "waistline", "via": "waist", "position": 2}
+{"word": "waistcloth", "synonym": "loincloth", "via": "waistcloth", "position": 1}
 {"word": "waistcoat", "synonym": "vest", "via": "waistcoat", "position": 1}
 {"word": "waistline", "synonym": "waist", "via": "waistline", "position": 1}
 {"word": "wait", "synonym": "waiting", "via": "wait", "position": 1}
@@ -270,6 +275,7 @@
 {"word": "wan", "synonym": "pale", "via": "win", "position": 1}
 {"word": "wan", "synonym": "pallid", "via": "win", "position": 2}
 {"word": "wan", "synonym": "sick", "via": "win", "position": 3}
+{"word": "wanchancy", "synonym": "unlucky", "via": "wanchancy", "position": 1}
 {"word": "wand", "synonym": "baton", "via": "wand", "position": 1}
 {"word": "wand", "synonym": "scepter", "via": "wand", "position": 2}
 {"word": "wand", "synonym": "sceptre", "via": "wand", "position": 3}
@@ -326,6 +332,8 @@
 {"word": "wanness", "synonym": "paleness", "via": "wanness", "position": 4}
 {"word": "wanness", "synonym": "pallidness", "via": "wanness", "position": 5}
 {"word": "wanness", "synonym": "pallor", "via": "wanness", "position": 6}
+{"word": "wannish", "synonym": "pallid", "via": "wannish", "position": 1}
+{"word": "wannish", "synonym": "pale", "via": "wannish", "position": 2}
 {"word": "want", "synonym": "wish", "via": "want", "position": 1}
 {"word": "want", "synonym": "wishing", "via": "want", "position": 2}
 {"word": "want", "synonym": "need", "via": "want", "position": 3}
@@ -550,6 +558,7 @@
 {"word": "wassail", "synonym": "jollify", "via": "wassail", "position": 7}
 {"word": "wassailer", "synonym": "toaster", "via": "wassailer", "position": 1}
 {"word": "wassailer", "synonym": "carouser", "via": "wassailer", "position": 2}
+{"word": "wassup", "synonym": "sup", "via": "wassup", "position": 1}
 {"word": "waste", "synonym": "wastefulness", "via": "waste", "position": 1}
 {"word": "waste", "synonym": "dissipation", "via": "waste", "position": 2}
 {"word": "waste", "synonym": "thriftlessness", "via": "waste", "position": 3}
@@ -641,6 +650,7 @@
 {"word": "watered", "synonym": "moire", "via": "water", "position": 1}
 {"word": "watered", "synonym": "moire", "via": "watered", "position": 1}
 {"word": "waterfall", "synonym": "falls", "via": "waterfall", "position": 1}
+{"word": "waterfinder", "synonym": "dowser", "via": "waterfinder", "position": 1}
 {"word": "waterfowl", "synonym": "waterbird", "via": "waterfowl", "position": 1}
 {"word": "wateriness", "synonym": "muddiness", "via": "wateriness", "position": 1}
 {"word": "wateriness", "synonym": "sloppiness", "via": "wateriness", "position": 2}
@@ -820,6 +830,7 @@
 {"word": "weakening", "synonym": "enfeebling", "via": "weaken", "position": 2}
 {"word": "weakening", "synonym": "enervating", "via": "weakening", "position": 1}
 {"word": "weakening", "synonym": "enfeebling", "via": "weakening", "position": 2}
+{"word": "weakhanded", "synonym": "shorthanded", "via": "weakhanded", "position": 1}
 {"word": "weakling", "synonym": "doormat", "via": "weakling", "position": 1}
 {"word": "weakling", "synonym": "wuss", "via": "weakling", "position": 2}
 {"word": "weakly", "synonym": "decrepit", "via": "weakly", "position": 1}
@@ -895,6 +906,7 @@
 {"word": "wearisome", "synonym": "slow", "via": "wearisome", "position": 5}
 {"word": "wearisome", "synonym": "tedious", "via": "wearisome", "position": 6}
 {"word": "wearisome", "synonym": "tiresome", "via": "wearisome", "position": 7}
+{"word": "wearproof", "synonym": "durable", "via": "wearproof", "position": 1}
 {"word": "weary", "synonym": "tire", "via": "weary", "position": 1}
 {"word": "weary", "synonym": "wear", "via": "weary", "position": 2}
 {"word": "weary", "synonym": "jade", "via": "weary", "position": 3}
@@ -915,6 +927,7 @@
 {"word": "weatherboard", "synonym": "clapboard", "via": "weatherboard", "position": 1}
 {"word": "weathered", "synonym": "weatherworn", "via": "weather", "position": 1}
 {"word": "weathered", "synonym": "weatherworn", "via": "weathered", "position": 1}
+{"word": "weathertight", "synonym": "weatherproof", "via": "weathertight", "position": 1}
 {"word": "weatherworn", "synonym": "weathered", "via": "weatherworn", "position": 1}
 {"word": "weave", "synonym": "interweave", "via": "weave", "position": 1}
 {"word": "weave", "synonym": "tissue", "via": "weave", "position": 2}
@@ -1092,6 +1105,7 @@
 {"word": "weight", "synonym": "angle", "via": "weight", "position": 4}
 {"word": "weight", "synonym": "burden", "via": "weight", "position": 5}
 {"word": "weight", "synonym": "burthen", "via": "weight", "position": 6}
+{"word": "weightage", "synonym": "weighting", "via": "weightage", "position": 1}
 {"word": "weighted", "synonym": "leaden", "via": "weight", "position": 1}
 {"word": "weighted", "synonym": "leaden", "via": "weighted", "position": 1}
 {"word": "weightiness", "synonym": "heaviness", "via": "weightiness", "position": 1}
@@ -1155,6 +1169,7 @@
 {"word": "well", "synonym": "advantageously", "via": "well", "position": 6}
 {"word": "well", "synonym": "intimately", "via": "well", "position": 7}
 {"word": "wellhead", "synonym": "wellspring", "via": "wellhead", "position": 1}
+{"word": "wellied", "synonym": "drunk", "via": "wellied", "position": 1}
 {"word": "wellness", "synonym": "health", "via": "wellness", "position": 1}
 {"word": "wellspring", "synonym": "well", "via": "wellspring", "position": 1}
 {"word": "wellspring", "synonym": "fountainhead", "via": "wellspring", "position": 2}
@@ -1183,6 +1198,7 @@
 {"word": "wench", "synonym": "chick", "via": "wench", "position": 4}
 {"word": "wench", "synonym": "bird", "via": "wench", "position": 5}
 {"word": "werewolf", "synonym": "lycanthrope", "via": "werewolf", "position": 1}
+{"word": "wesleyan", "synonym": "methodist", "via": "wesleyan", "position": 1}
 {"word": "west", "synonym": "occident", "via": "west", "position": 1}
 {"word": "west", "synonym": "westward", "via": "west", "position": 2}
 {"word": "westbound", "synonym": "westerly", "via": "westbound", "position": 1}
@@ -1227,6 +1243,7 @@
 {"word": "wet", "synonym": "plastered", "via": "whet", "position": 10}
 {"word": "wetter", "synonym": "surfactant", "via": "wet", "position": 1}
 {"word": "wetter", "synonym": "surfactant", "via": "wetter", "position": 1}
+{"word": "wettie", "synonym": "wetsuit", "via": "wettie", "position": 1}
 {"word": "wetting", "synonym": "leak", "via": "wet", "position": 1}
 {"word": "wetting", "synonym": "leak", "via": "wetting", "position": 1}
 {"word": "whack", "synonym": "knock", "via": "wack", "position": 1}
@@ -1243,6 +1260,7 @@
 {"word": "whack", "synonym": "wham", "via": "whack", "position": 5}
 {"word": "whack", "synonym": "whop", "via": "whack", "position": 6}
 {"word": "whack", "synonym": "wallop", "via": "whack", "position": 7}
+{"word": "whackadoo", "synonym": "eccentric", "via": "whackadoo", "position": 1}
 {"word": "whacker", "synonym": "whopper", "via": "whacker", "position": 1}
 {"word": "whacking", "synonym": "beating", "via": "whack", "position": 1}
 {"word": "whacking", "synonym": "thrashing", "via": "whack", "position": 2}
@@ -1312,6 +1330,7 @@
 {"word": "whatsis", "synonym": "thingumajig", "via": "whatsis", "position": 8}
 {"word": "whatsis", "synonym": "thingummy", "via": "whatsis", "position": 9}
 {"word": "whatsis", "synonym": "widget", "via": "whatsis", "position": 10}
+{"word": "whatso", "synonym": "whatsoever", "via": "whatso", "position": 1}
 {"word": "whatsoever", "synonym": "any", "via": "whatsoever", "position": 1}
 {"word": "whatsoever", "synonym": "whatever", "via": "whatsoever", "position": 2}
 {"word": "wheal", "synonym": "wale", "via": "wheal", "position": 1}
@@ -1349,6 +1368,7 @@
 {"word": "wheezy", "synonym": "asthmatic", "via": "wheezy", "position": 1}
 {"word": "wheezy", "synonym": "wheezing", "via": "wheezy", "position": 2}
 {"word": "wheezy", "synonym": "reedy", "via": "wheezy", "position": 3}
+{"word": "whelked", "synonym": "ridged", "via": "whelked", "position": 1}
 {"word": "whelm", "synonym": "overwhelm", "via": "whelm", "position": 1}
 {"word": "whelm", "synonym": "overpower", "via": "whelm", "position": 2}
 {"word": "whelm", "synonym": "overcome", "via": "whelm", "position": 3}
@@ -1357,6 +1377,9 @@
 {"word": "wherefore", "synonym": "why", "via": "wherefore", "position": 1}
 {"word": "wheresoever", "synonym": "wherever", "via": "wheresoever", "position": 1}
 {"word": "wherever", "synonym": "wheresoever", "via": "wherever", "position": 1}
+{"word": "wherret", "synonym": "slap", "via": "wherret", "position": 1}
+{"word": "wherrit", "synonym": "worry", "via": "wherrit", "position": 1}
+{"word": "wherrit", "synonym": "fret", "via": "wherrit", "position": 2}
 {"word": "whet", "synonym": "quicken", "via": "whet", "position": 1}
 {"word": "whicker", "synonym": "neigh", "via": "whicker", "position": 1}
 {"word": "whicker", "synonym": "nicker", "via": "whicker", "position": 2}
@@ -1366,12 +1389,14 @@
 {"word": "whiff", "synonym": "sniff", "via": "whiff", "position": 2}
 {"word": "whiffletree", "synonym": "whippletree", "via": "whiffletree", "position": 1}
 {"word": "whiffletree", "synonym": "swingletree", "via": "whiffletree", "position": 2}
+{"word": "whiffy", "synonym": "smelly", "via": "whiffy", "position": 1}
 {"word": "while", "synonym": "piece", "via": "while", "position": 1}
 {"word": "while", "synonym": "spell", "via": "while", "position": 2}
 {"word": "while", "synonym": "patch", "via": "while", "position": 3}
 {"word": "while", "synonym": "piece", "via": "wile", "position": 1}
 {"word": "while", "synonym": "spell", "via": "wile", "position": 2}
 {"word": "while", "synonym": "patch", "via": "wile", "position": 3}
+{"word": "whillikers", "synonym": "gosh", "via": "whillikers", "position": 1}
 {"word": "whim", "synonym": "notion", "via": "whim", "position": 1}
 {"word": "whim", "synonym": "whimsy", "via": "whim", "position": 2}
 {"word": "whim", "synonym": "whimsey", "via": "whim", "position": 3}
@@ -1487,6 +1512,7 @@
 {"word": "whirl", "synonym": "twisting", "via": "whirl", "position": 4}
 {"word": "whirl", "synonym": "commotion", "via": "whirl", "position": 5}
 {"word": "whirl", "synonym": "swirl", "via": "whirl", "position": 6}
+{"word": "whirlabout", "synonym": "whirligig", "via": "whirlabout", "position": 1}
 {"word": "whirligig", "synonym": "carousel", "via": "whirligig", "position": 1}
 {"word": "whirligig", "synonym": "carrousel", "via": "whirligig", "position": 2}
 {"word": "whirligig", "synonym": "roundabout", "via": "whirligig", "position": 3}
@@ -1551,6 +1577,7 @@
 {"word": "whispering", "synonym": "rustling", "via": "whispering", "position": 5}
 {"word": "whispering", "synonym": "murmuring", "via": "whispering", "position": 6}
 {"word": "whispering", "synonym": "susurrant", "via": "whispering", "position": 7}
+{"word": "whisperous", "synonym": "whispery", "via": "whisperous", "position": 1}
 {"word": "whistle", "synonym": "pennywhistle", "via": "whistle", "position": 1}
 {"word": "whistle", "synonym": "whistling", "via": "whistle", "position": 2}
 {"word": "whistle", "synonym": "sing", "via": "whistle", "position": 3}
@@ -1595,6 +1622,7 @@
 {"word": "whiteness", "synonym": "innocence", "via": "whiteness", "position": 5}
 {"word": "whitening", "synonym": "lightening", "via": "whiten", "position": 1}
 {"word": "whitening", "synonym": "lightening", "via": "whitening", "position": 1}
+{"word": "whitethorn", "synonym": "hawthorn", "via": "whitethorn", "position": 1}
 {"word": "whitewood", "synonym": "tulipwood", "via": "whitewood", "position": 1}
 {"word": "whitey", "synonym": "honky", "via": "whitey", "position": 1}
 {"word": "whitey", "synonym": "honkey", "via": "whitey", "position": 2}
@@ -1637,6 +1665,7 @@
 {"word": "whizz", "synonym": "hotshot", "via": "whiz", "position": 9}
 {"word": "whizz", "synonym": "star", "via": "whiz", "position": 10}
 {"word": "whizzbang", "synonym": "whizbang", "via": "whizbang", "position": 1}
+{"word": "whodie", "synonym": "pal", "via": "whodie", "position": 1}
 {"word": "whodunit", "synonym": "mystery", "via": "whodunit", "position": 1}
 {"word": "whole", "synonym": "unit", "via": "whole", "position": 1}
 {"word": "whole", "synonym": "solid", "via": "whole", "position": 2}
@@ -1733,6 +1762,7 @@
 {"word": "why", "synonym": "wherefore", "via": "why", "position": 1}
 {"word": "why", "synonym": "wherefore", "via": "wye", "position": 1}
 {"word": "whydah", "synonym": "whidah", "via": "whydah", "position": 1}
+{"word": "wibble", "synonym": "wobble", "via": "wibble", "position": 1}
 {"word": "wick", "synonym": "taper", "via": "wick", "position": 1}
 {"word": "wicked", "synonym": "severe", "via": "wick", "position": 1}
 {"word": "wicked", "synonym": "terrible", "via": "wick", "position": 2}
@@ -2020,6 +2050,7 @@
 {"word": "winding", "synonym": "twisty", "via": "winding", "position": 8}
 {"word": "windlass", "synonym": "winch", "via": "windlass", "position": 1}
 {"word": "window", "synonym": "windowpane", "via": "window", "position": 1}
+{"word": "windowlight", "synonym": "windowpane", "via": "windowlight", "position": 1}
 {"word": "windowpane", "synonym": "window", "via": "windowpane", "position": 1}
 {"word": "windpipe", "synonym": "trachea", "via": "windpipe", "position": 1}
 {"word": "windscreen", "synonym": "windshield", "via": "windscreen", "position": 1}
@@ -2397,6 +2428,8 @@
 {"word": "wolfish", "synonym": "voracious", "via": "wolfish", "position": 6}
 {"word": "wolfish", "synonym": "wolflike", "via": "wolfish", "position": 7}
 {"word": "wolflike", "synonym": "wolfish", "via": "wolflike", "position": 1}
+{"word": "wolfman", "synonym": "werewolf", "via": "wolfman", "position": 1}
+{"word": "wolfman", "synonym": "lycanthrope", "via": "wolfman", "position": 2}
 {"word": "wolfram", "synonym": "tungsten", "via": "wolfram", "position": 1}
 {"word": "wolverine", "synonym": "carcajou", "via": "wolverine", "position": 1}
 {"word": "wolverine", "synonym": "glutton", "via": "wolverine", "position": 2}
@@ -2416,6 +2449,7 @@
 {"word": "womanliness", "synonym": "womanlike", "via": "womanliness", "position": 1}
 {"word": "womanly", "synonym": "feminine", "via": "womanly", "position": 1}
 {"word": "womb", "synonym": "uterus", "via": "womb", "position": 1}
+{"word": "wommit", "synonym": "fool", "via": "wommit", "position": 1}
 {"word": "womxn", "synonym": "women", "via": "womxn", "position": 1}
 {"word": "wonder", "synonym": "curiosity", "via": "wonder", "position": 1}
 {"word": "wonder", "synonym": "marvel", "via": "wonder", "position": 2}
@@ -2446,6 +2480,7 @@
 {"word": "wondering", "synonym": "inquisitive", "via": "wondering", "position": 1}
 {"word": "wondering", "synonym": "speculative", "via": "wondering", "position": 2}
 {"word": "wondering", "synonym": "questioning", "via": "wondering", "position": 3}
+{"word": "wonderkid", "synonym": "prodigy", "via": "wonderkid", "position": 1}
 {"word": "wonderment", "synonym": "wonder", "via": "wonderment", "position": 1}
 {"word": "wonderment", "synonym": "admiration", "via": "wonderment", "position": 2}
 {"word": "wondrous", "synonym": "fantastic", "via": "wondrous", "position": 1}
@@ -2488,6 +2523,7 @@
 {"word": "woodenly", "synonym": "ungraciously", "via": "woodenly", "position": 1}
 {"word": "woodenly", "synonym": "ungracefully", "via": "woodenly", "position": 2}
 {"word": "woodenly", "synonym": "gracelessly", "via": "woodenly", "position": 3}
+{"word": "woodhouse", "synonym": "woodshed", "via": "woodhouse", "position": 1}
 {"word": "woodland", "synonym": "forest", "via": "woodland", "position": 1}
 {"word": "woodland", "synonym": "timberland", "via": "woodland", "position": 2}
 {"word": "woodland", "synonym": "timber", "via": "woodland", "position": 3}
@@ -2495,11 +2531,13 @@
 {"word": "woodman", "synonym": "woodsman", "via": "woodman", "position": 2}
 {"word": "woodpecker", "synonym": "peckerwood", "via": "woodpecker", "position": 1}
 {"word": "woodpecker", "synonym": "pecker", "via": "woodpecker", "position": 2}
+{"word": "woodprint", "synonym": "woodcut", "via": "woodprint", "position": 1}
 {"word": "woods", "synonym": "forest", "via": "wood", "position": 1}
 {"word": "woods", "synonym": "wood", "via": "wood", "position": 2}
 {"word": "woods", "synonym": "forest", "via": "woods", "position": 1}
 {"word": "woods", "synonym": "wood", "via": "woods", "position": 2}
 {"word": "woodsman", "synonym": "woodman", "via": "woodsman", "position": 1}
+{"word": "woodsmanship", "synonym": "woodcraft", "via": "woodsmanship", "position": 1}
 {"word": "woodsy", "synonym": "arboreous", "via": "woodsy", "position": 1}
 {"word": "woodsy", "synonym": "woody", "via": "woodsy", "position": 2}
 {"word": "woodwind", "synonym": "wood", "via": "woodwind", "position": 1}
@@ -2531,6 +2569,7 @@
 {"word": "wool", "synonym": "woollen", "via": "wool", "position": 3}
 {"word": "woolen", "synonym": "wool", "via": "woolen", "position": 1}
 {"word": "woolen", "synonym": "woollen", "via": "woolen", "position": 2}
+{"word": "woolgather", "synonym": "daydream", "via": "woolgather", "position": 1}
 {"word": "woolgatherer", "synonym": "daydreamer", "via": "woolgatherer", "position": 1}
 {"word": "woollen", "synonym": "wool", "via": "woolen", "position": 1}
 {"word": "woollen", "synonym": "woolen", "via": "woolen", "position": 2}
@@ -2574,6 +2613,7 @@
 {"word": "word", "synonym": "watchword", "via": "worth", "position": 8}
 {"word": "word", "synonym": "parole", "via": "worth", "position": 9}
 {"word": "word", "synonym": "countersign", "via": "worth", "position": 10}
+{"word": "worder", "synonym": "wordsmith", "via": "worder", "position": 1}
 {"word": "wordily", "synonym": "verbosely", "via": "wordily", "position": 1}
 {"word": "wordily", "synonym": "windily", "via": "wordily", "position": 2}
 {"word": "wordiness", "synonym": "prolixity", "via": "wordiness", "position": 1}
@@ -2608,6 +2648,8 @@
 {"word": "words", "synonym": "wrangle", "via": "words", "position": 5}
 {"word": "words", "synonym": "row", "via": "words", "position": 6}
 {"word": "words", "synonym": "dustup", "via": "words", "position": 7}
+{"word": "wordstock", "synonym": "vocabulary", "via": "wordstock", "position": 1}
+{"word": "wordstock", "synonym": "lexicon", "via": "wordstock", "position": 2}
 {"word": "wordy", "synonym": "tedious", "via": "wordy", "position": 1}
 {"word": "wordy", "synonym": "verbose", "via": "wordy", "position": 2}
 {"word": "wordy", "synonym": "windy", "via": "wordy", "position": 3}
@@ -2670,6 +2712,8 @@
 {"word": "works", "synonym": "plant", "via": "works", "position": 2}
 {"word": "works", "synonym": "workings", "via": "works", "position": 3}
 {"word": "workshop", "synonym": "shop", "via": "workshop", "position": 1}
+{"word": "workshy", "synonym": "lazy", "via": "workshy", "position": 1}
+{"word": "workshy", "synonym": "idle", "via": "workshy", "position": 2}
 {"word": "workweek", "synonym": "week", "via": "workweek", "position": 1}
 {"word": "world", "synonym": "humanity", "via": "world", "position": 1}
 {"word": "world", "synonym": "humankind", "via": "world", "position": 2}
@@ -2758,6 +2802,7 @@
 {"word": "worrying", "synonym": "perturbing", "via": "worrying", "position": 4}
 {"word": "worrying", "synonym": "troubling", "via": "worrying", "position": 5}
 {"word": "worrying", "synonym": "worrisome", "via": "worrying", "position": 6}
+{"word": "worryingly", "synonym": "alarmingly", "via": "worryingly", "position": 1}
 {"word": "worrywart", "synonym": "worrier", "via": "worrywart", "position": 1}
 {"word": "worrywart", "synonym": "fusspot", "via": "worrywart", "position": 2}
 {"word": "worse", "synonym": "worsened", "via": "bad", "position": 1}
@@ -2815,6 +2860,7 @@
 {"word": "wound", "synonym": "bruise", "via": "wound", "position": 6}
 {"word": "wound", "synonym": "offend", "via": "wound", "position": 7}
 {"word": "wound", "synonym": "spite", "via": "wound", "position": 8}
+{"word": "woundable", "synonym": "vulnerable", "via": "woundable", "position": 1}
 {"word": "wounded", "synonym": "maimed", "via": "wound", "position": 1}
 {"word": "wounded", "synonym": "hurt", "via": "wound", "position": 2}
 {"word": "wounded", "synonym": "maimed", "via": "wounded", "position": 1}

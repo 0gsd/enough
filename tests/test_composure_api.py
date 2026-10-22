@@ -443,9 +443,20 @@ def test_the_tree_marks_comp_files_and_hides_the_sidecar(client: TestClient):
     assert ".board.comp.comments.json" not in html
 
 
+def write_something(client: TestClient, rel: str = REL) -> None:
+    rev = client.get("/api/composure", params={"path": rel}).json()["rev"]
+    r = client.post("/api/composure/ops", json={
+        "path": rel, "base_rev": rev,
+        "ops": [{"op": "add_module", "type": "weblink",
+                 "url": "https://example.com"}]})
+    assert r.status_code == 200, r.text
+
+
+BLANK = {"launch": "blank", "path": None, "form": "blank", "notice": ""}
+
+
 def test_launch_setting_round_trip(client: TestClient):
-    assert client.get("/api/composure/launch").json() == {
-        "launch": "blank", "path": None, "form": "blank", "notice": ""}
+    assert client.get("/api/composure/launch").json() == BLANK
 
     seed(client)
     # Opening a composure stamps `last`, whatever the launch mode is.
@@ -464,22 +475,84 @@ def test_launch_setting_round_trip(client: TestClient):
                                                 "form": "scaffold"})
     assert client.get("/api/composure/launch").json()["form"] == "scaffold"
 
-    r = client.post("/api/project/composure", json={"launch": "sideways"})
-    assert r.status_code == 400 and "launch must be one of" in r.json()["detail"]
+    client.post("/api/project/composure", json={"launch": "new"})
+    assert client.get("/api/composure/launch").json() == BLANK
+
+    for bad in ("sideways", "blank"):
+        r = client.post("/api/project/composure", json={"launch": bad})
+        assert r.status_code == 400 and "launch must be one of" in r.json()["detail"]
 
 
-def test_launch_falls_back_to_blank_with_a_notice(client: TestClient,
-                                                  project: Path):
+def test_auto_opens_the_only_composure_with_anything_in_it(client: TestClient):
+    seed(client)                          # on disk, but nothing in it
+    assert client.get("/api/composure/launch").json() == BLANK
+    write_something(client)
+    assert client.get("/api/composure/launch").json() == {
+        "launch": "file", "path": REL, "form": None, "notice": ""}
+    # A second, empty composure opened later does not take its place.
+    other = "rness/io/composure/other.comp"
+    seed(client, rel=other)
+    client.get("/api/composure", params={"path": other})
+    assert client.get("/api/composure/launch").json()["path"] == REL
+
+
+def test_auto_opens_the_last_used_of_several(client: TestClient):
+    other = "rness/io/composure/other.comp"
+    for rel in (REL, other):
+        seed(client, rel=rel)
+        write_something(client, rel)
+    client.get("/api/composure", params={"path": REL})
+    assert client.get("/api/composure/launch").json()["path"] == REL
+    client.get("/api/composure", params={"path": other})
+    assert client.get("/api/composure/launch").json()["path"] == other
+
+
+def test_auto_skips_project_forms(client: TestClient):
+    seed(client)
+    write_something(client)
+    r = client.post("/api/composure/save-as-form", json={"path": REL, "name": "cards"})
+    assert r.status_code == 200, r.text
+    assert client.get("/api/composure/launch").json()["path"] == REL
+
+
+def test_the_list_marks_the_startup_composure(client: TestClient):
+    seed(client)
+    rows = client.get("/api/composure/list").json()["composures"]
+    assert [r["startup"] for r in rows] == [False]
+    client.post("/api/project/composure", json={"launch": "file", "path": REL})
+    rows = client.get("/api/composure/list").json()["composures"]
+    assert [r["startup"] for r in rows] == [True]
+
+
+def test_renaming_the_startup_composure_keeps_it_the_startup(client: TestClient):
+    seed(client)
+    client.post("/api/project/composure", json={"launch": "file", "path": REL})
+    new_rel = client.post("/api/composure/rename", json={
+        "path": REL, "title": "Chapter map"}).json()["path"]
+    assert client.get("/api/composure/launch").json() == {
+        "launch": "file", "path": new_rel, "form": None, "notice": ""}
+
+
+def test_a_missing_target_falls_back_to_auto_with_a_notice(client: TestClient,
+                                                         project: Path):
     seed(client)
     client.post("/api/project/composure", json={"launch": "file", "path": REL})
     (project / REL).unlink()
     body = client.get("/api/composure/launch").json()
     assert body["launch"] == "blank" and "no longer there" in body["notice"]
+    assert "blank page" in body["notice"]
 
     client.post("/api/project/composure", json={"launch": "form",
                                                 "form": "gone-form"})
     body = client.get("/api/composure/launch").json()
     assert body["launch"] == "blank" and "no longer installed" in body["notice"]
+
+    other = "rness/io/composure/other.comp"
+    seed(client, rel=other)
+    write_something(client, other)
+    client.post("/api/project/composure", json={"launch": "file", "path": REL})
+    body = client.get("/api/composure/launch").json()
+    assert body["path"] == other and "opening other.comp instead" in body["notice"]
 
 
 def test_composure_routes_404_on_a_home_server(project: Path):
@@ -532,3 +605,20 @@ def test_model_is_json_serializable_end_to_end(client: TestClient):
     json.dumps(doc)
     assert len(doc["model"]["modules"]) == 29
     assert doc["model"]["caps"]["page_chars"] == C.MAX_PAGE_CHARS
+
+
+def test_has_content_tells_a_composure_from_an_untouched_page():
+    blank = C.load(C.form_path("blank"))
+    assert not C.has_content(blank)
+    blank.modules[0].pages[0].rich = "<p>&nbsp;</p><div><br></div>"
+    assert not C.has_content(blank)
+    blank.modules[0].pages[0].rich = "<p>a first line</p>"
+    assert C.has_content(blank)
+
+    titled = C.load(C.form_path("blank"))
+    titled.modules[0].title = "notes"
+    assert C.has_content(titled)
+
+    inked = C.load(C.form_path("blank"))
+    inked.strokes.append(C.Stroke(id="s1", points=[(0, 0), (4, 4)]))
+    assert C.has_content(inked)

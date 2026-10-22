@@ -143,6 +143,7 @@
 {"word": "faery", "synonym": "fairy", "via": "fairy", "position": 3}
 {"word": "faery", "synonym": "fay", "via": "fairy", "position": 4}
 {"word": "faery", "synonym": "sprite", "via": "fairy", "position": 5}
+{"word": "faffy", "synonym": "fiddly", "via": "faffy", "position": 1}
 {"word": "fag", "synonym": "cigarette", "via": "fag", "position": 1}
 {"word": "fag", "synonym": "cigaret", "via": "fag", "position": 2}
 {"word": "fag", "synonym": "butt", "via": "fag", "position": 3}
@@ -214,6 +215,7 @@
 {"word": "fain", "synonym": "prepared", "via": "fain", "position": 3}
 {"word": "fain", "synonym": "gladly", "via": "fain", "position": 4}
 {"word": "fain", "synonym": "lief", "via": "fain", "position": 5}
+{"word": "fainaigue", "synonym": "shirk", "via": "fainaigue", "position": 1}
 {"word": "faineant", "synonym": "indolent", "via": "faineant", "position": 1}
 {"word": "faineant", "synonym": "lazy", "via": "faineant", "position": 2}
 {"word": "faineant", "synonym": "otiose", "via": "faineant", "position": 3}
@@ -228,6 +230,7 @@
 {"word": "faint", "synonym": "vague", "via": "faint", "position": 8}
 {"word": "faint", "synonym": "wispy", "via": "faint", "position": 9}
 {"word": "faint", "synonym": "weak", "via": "faint", "position": 10}
+{"word": "faintheart", "synonym": "coward", "via": "faintheart", "position": 1}
 {"word": "fainthearted", "synonym": "faint", "via": "fainthearted", "position": 1}
 {"word": "fainthearted", "synonym": "timid", "via": "fainthearted", "position": 2}
 {"word": "faintness", "synonym": "dimness", "via": "faintness", "position": 1}
@@ -274,6 +277,7 @@
 {"word": "fairyland", "synonym": "faery", "via": "fairyland", "position": 2}
 {"word": "faith", "synonym": "trust", "via": "faith", "position": 1}
 {"word": "faith", "synonym": "religion", "via": "faith", "position": 2}
+{"word": "faither", "synonym": "father", "via": "faither", "position": 1}
 {"word": "faithful", "synonym": "congregation", "via": "faithful", "position": 1}
 {"word": "faithful", "synonym": "fold", "via": "faithful", "position": 2}
 {"word": "faithful", "synonym": "close", "via": "faithful", "position": 3}
@@ -366,7 +370,6 @@
 {"word": "falloff", "synonym": "slump", "via": "falloff", "position": 1}
 {"word": "falloff", "synonym": "slack", "via": "falloff", "position": 2}
 {"word": "falls", "synonym": "waterfall", "via": "fall", "position": 1}
-{"word": "falls", "synonym": "waterfall", "via": "falls", "position": 1}
 {"word": "false", "synonym": "untrue", "via": "false", "position": 1}
 {"word": "false", "synonym": "mistaken", "via": "false", "position": 2}
 {"word": "false", "synonym": "assumed", "via": "false", "position": 3}
@@ -430,6 +433,7 @@
 {"word": "faltering", "synonym": "falter", "via": "faltering", "position": 3}
 {"word": "falteringly", "synonym": "unsteadily", "via": "falteringly", "position": 1}
 {"word": "falteringly", "synonym": "uncertainly", "via": "falteringly", "position": 2}
+{"word": "famacide", "synonym": "slanderer", "via": "famacide", "position": 1}
 {"word": "fame", "synonym": "celebrity", "via": "fame", "position": 1}
 {"word": "fame", "synonym": "renown", "via": "fame", "position": 2}
 {"word": "famed", "synonym": "celebrated", "via": "famed", "position": 1}
@@ -586,6 +590,8 @@
 {"word": "fantasy", "synonym": "fancy", "via": "fantasy", "position": 3}
 {"word": "fantasy", "synonym": "fantasize", "via": "fantasy", "position": 4}
 {"word": "fantasy", "synonym": "fantasise", "via": "fantasy", "position": 5}
+{"word": "fantoosh", "synonym": "flashy", "via": "fantoosh", "position": 1}
+{"word": "fantoosh", "synonym": "showy", "via": "fantoosh", "position": 2}
 {"word": "faqir", "synonym": "fakir", "via": "fakir", "position": 1}
 {"word": "faqir", "synonym": "fakeer", "via": "fakir", "position": 2}
 {"word": "faqir", "synonym": "faquir", "via": "fakir", "position": 3}
@@ -614,6 +620,7 @@
 {"word": "farmer", "synonym": "husbandman", "via": "farmer", "position": 1}
 {"word": "farmer", "synonym": "granger", "via": "farmer", "position": 2}
 {"word": "farmer", "synonym": "sodbuster", "via": "farmer", "position": 3}
+{"word": "farmery", "synonym": "farmstead", "via": "farmery", "position": 1}
 {"word": "farming", "synonym": "land", "via": "farm", "position": 1}
 {"word": "farming", "synonym": "agriculture", "via": "farm", "position": 2}
 {"word": "farming", "synonym": "husbandry", "via": "farm", "position": 3}
@@ -735,6 +742,8 @@
 {"word": "fashioning", "synonym": "making", "via": "fashion", "position": 2}
 {"word": "fashioning", "synonym": "devising", "via": "fashioning", "position": 1}
 {"word": "fashioning", "synonym": "making", "via": "fashioning", "position": 2}
+{"word": "fashiony", "synonym": "stylish", "via": "fashiony", "position": 1}
+{"word": "fashiony", "synonym": "trendy", "via": "fashiony", "position": 2}
 {"word": "fast", "synonym": "fasting", "via": "fast", "position": 1}
 {"word": "fast", "synonym": "firm", "via": "fast", "position": 2}
 {"word": "fast", "synonym": "loyal", "via": "fast", "position": 3}
@@ -893,6 +902,7 @@
 {"word": "fatty", "synonym": "fatso", "via": "fatty", "position": 1}
 {"word": "fatty", "synonym": "butterball", "via": "fatty", "position": 2}
 {"word": "fatty", "synonym": "fat", "via": "fatty", "position": 3}
+{"word": "fatuitous", "synonym": "fatuous", "via": "fatuitous", "position": 1}
 {"word": "fatuity", "synonym": "absurdity", "via": "fatuity", "position": 1}
 {"word": "fatuity", "synonym": "fatuousness", "via": "fatuity", "position": 2}
 {"word": "fatuity", "synonym": "silliness", "via": "fatuity", "position": 3}
@@ -1343,6 +1353,7 @@
 {"word": "felt", "synonym": "mat", "via": "felt", "position": 2}
 {"word": "female", "synonym": "distaff", "via": "female", "position": 1}
 {"word": "femaleness", "synonym": "feminineness", "via": "femaleness", "position": 1}
+{"word": "femineity", "synonym": "femininity", "via": "femineity", "position": 1}
 {"word": "feminicide", "synonym": "femicide", "via": "feminicide", "position": 1}
 {"word": "feminine", "synonym": "womanly", "via": "feminine", "position": 1}
 {"word": "feminineness", "synonym": "femaleness", "via": "feminineness", "position": 1}
@@ -1351,6 +1362,7 @@
 {"word": "feminise", "synonym": "womanize", "via": "feminize", "position": 2}
 {"word": "feminist", "synonym": "libber", "via": "feminist", "position": 1}
 {"word": "feminize", "synonym": "feminise", "via": "feminize", "position": 1}
+{"word": "femtometer", "synonym": "fermi", "via": "femtometer", "position": 1}
 {"word": "femur", "synonym": "thighbone", "via": "femur", "position": 1}
 {"word": "fen", "synonym": "marsh", "via": "fen", "position": 1}
 {"word": "fen", "synonym": "marshland", "via": "fen", "position": 2}
@@ -1379,6 +1391,9 @@
 {"word": "feral", "synonym": "savage", "via": "feral", "position": 2}
 {"word": "feral", "synonym": "ferine", "via": "ferrule", "position": 1}
 {"word": "feral", "synonym": "savage", "via": "ferrule", "position": 2}
+{"word": "ferdutzt", "synonym": "bewildered", "via": "ferdutzt", "position": 1}
+{"word": "ferhoodle", "synonym": "muddle", "via": "ferhoodle", "position": 1}
+{"word": "ferhoodle", "synonym": "befuddle", "via": "ferhoodle", "position": 2}
 {"word": "ferine", "synonym": "feral", "via": "ferine", "position": 1}
 {"word": "ferine", "synonym": "savage", "via": "ferine", "position": 2}
 {"word": "ferment", "synonym": "zymosis", "via": "ferment", "position": 1}
@@ -1504,6 +1519,8 @@
 {"word": "festivity", "synonym": "celebration", "via": "festivity", "position": 1}
 {"word": "festoon", "synonym": "festoonery", "via": "festoon", "position": 1}
 {"word": "festoonery", "synonym": "festoon", "via": "festoonery", "position": 1}
+{"word": "festy", "synonym": "filthy", "via": "festy", "position": 1}
+{"word": "festy", "synonym": "grimy", "via": "festy", "position": 2}
 {"word": "fetal", "synonym": "foetal", "via": "fetal", "position": 1}
 {"word": "fetch", "synonym": "bring", "via": "fetch", "position": 1}
 {"word": "fetch", "synonym": "get", "via": "fetch", "position": 2}
@@ -1691,6 +1708,7 @@
 {"word": "field", "synonym": "theater", "via": "fielder", "position": 8}
 {"word": "field", "synonym": "theatre", "via": "fielder", "position": 9}
 {"word": "field", "synonym": "plain", "via": "fielder", "position": 10}
+{"word": "fieldsman", "synonym": "fielder", "via": "fieldsman", "position": 1}
 {"word": "fiend", "synonym": "devil", "via": "fiend", "position": 1}
 {"word": "fiend", "synonym": "demon", "via": "fiend", "position": 2}
 {"word": "fiend", "synonym": "daemon", "via": "fiend", "position": 3}
@@ -1746,6 +1764,7 @@
 {"word": "fight", "synonym": "struggle", "via": "fight", "position": 8}
 {"word": "fight", "synonym": "oppose", "via": "fight", "position": 9}
 {"word": "fight", "synonym": "defend", "via": "fight", "position": 10}
+{"word": "fightback", "synonym": "comeback", "via": "fightback", "position": 1}
 {"word": "fighter", "synonym": "combatant", "via": "fighter", "position": 1}
 {"word": "fighter", "synonym": "battler", "via": "fighter", "position": 2}
 {"word": "fighter", "synonym": "belligerent", "via": "fighter", "position": 3}
@@ -1783,6 +1802,7 @@
 {"word": "figuring", "synonym": "calculation", "via": "figuring", "position": 1}
 {"word": "figuring", "synonym": "computation", "via": "figuring", "position": 2}
 {"word": "figuring", "synonym": "reckoning", "via": "figuring", "position": 3}
+{"word": "fike", "synonym": "fidget", "via": "fike", "position": 1}
 {"word": "filagree", "synonym": "filigree", "via": "filigree", "position": 1}
 {"word": "filament", "synonym": "filum", "via": "filament", "position": 1}
 {"word": "filament", "synonym": "fibril", "via": "filament", "position": 2}
@@ -1895,6 +1915,7 @@
 {"word": "filtrate", "synonym": "filter", "via": "filtrate", "position": 1}
 {"word": "filtrate", "synonym": "strain", "via": "filtrate", "position": 2}
 {"word": "filum", "synonym": "filament", "via": "filum", "position": 1}
+{"word": "fimicolous", "synonym": "coprophilous", "via": "fimicolous", "position": 1}
 {"word": "fin", "synonym": "flipper", "via": "fin", "position": 1}
 {"word": "fin", "synonym": "louver", "via": "fin", "position": 2}
 {"word": "fin", "synonym": "louvre", "via": "fin", "position": 3}
@@ -1977,6 +1998,7 @@
 {"word": "finger", "synonym": "thumb", "via": "finger", "position": 3}
 {"word": "fingerboard", "synonym": "clavier", "via": "fingerboard", "position": 1}
 {"word": "fingerboard", "synonym": "fingerpost", "via": "fingerboard", "position": 2}
+{"word": "fingerflower", "synonym": "foxglove", "via": "fingerflower", "position": 1}
 {"word": "fingerlike", "synonym": "digitate", "via": "fingerlike", "position": 1}
 {"word": "fingerpost", "synonym": "fingerboard", "via": "fingerpost", "position": 1}
 {"word": "finical", "synonym": "finicky", "via": "finical", "position": 1}
@@ -2010,6 +2032,8 @@
 {"word": "finishing", "synonym": "coating", "via": "finishing", "position": 2}
 {"word": "finiteness", "synonym": "finitude", "via": "finiteness", "position": 1}
 {"word": "finiteness", "synonym": "boundedness", "via": "finiteness", "position": 2}
+{"word": "finito", "synonym": "finished", "via": "finito", "position": 1}
+{"word": "finito", "synonym": "done", "via": "finito", "position": 2}
 {"word": "finitude", "synonym": "finiteness", "via": "finitude", "position": 1}
 {"word": "finitude", "synonym": "boundedness", "via": "finitude", "position": 2}
 {"word": "fink", "synonym": "snitch", "via": "fink", "position": 1}
@@ -2154,6 +2178,8 @@
 {"word": "fishy", "synonym": "shady", "via": "fishy", "position": 2}
 {"word": "fishy", "synonym": "suspect", "via": "fishy", "position": 3}
 {"word": "fishy", "synonym": "suspicious", "via": "fishy", "position": 4}
+{"word": "fisk", "synonym": "rebut", "via": "fisk", "position": 1}
+{"word": "fisk", "synonym": "refute", "via": "fisk", "position": 2}
 {"word": "fissile", "synonym": "fissionable", "via": "fissile", "position": 1}
 {"word": "fissionable", "synonym": "fissile", "via": "fissionable", "position": 1}
 {"word": "fissiparous", "synonym": "breakaway", "via": "fissiparous", "position": 1}
@@ -2503,6 +2529,7 @@
 {"word": "flare", "synonym": "erupt", "via": "flare", "position": 2}
 {"word": "flare", "synonym": "irrupt", "via": "flare", "position": 3}
 {"word": "flare", "synonym": "flame", "via": "flare", "position": 4}
+{"word": "flareup", "synonym": "outburst", "via": "flareup", "position": 1}
 {"word": "flash", "synonym": "photoflash", "via": "flash", "position": 1}
 {"word": "flash", "synonym": "flashgun", "via": "flash", "position": 2}
 {"word": "flash", "synonym": "flashbulb", "via": "flash", "position": 3}
@@ -2575,6 +2602,7 @@
 {"word": "flatter", "synonym": "blandish", "via": "flat", "position": 1}
 {"word": "flatter", "synonym": "blandish", "via": "flatter", "position": 1}
 {"word": "flatterer", "synonym": "adulator", "via": "flatterer", "position": 1}
+{"word": "flattie", "synonym": "flatfish", "via": "flattie", "position": 1}
 {"word": "flattop", "synonym": "carrier", "via": "flattop", "position": 1}
 {"word": "flattop", "synonym": "butch", "via": "flattop", "position": 2}
 {"word": "flatulence", "synonym": "flatulency", "via": "flatulence", "position": 1}
@@ -2621,6 +2649,7 @@
 {"word": "flavorless", "synonym": "insipid", "via": "flavorless", "position": 3}
 {"word": "flavorless", "synonym": "savorless", "via": "flavorless", "position": 4}
 {"word": "flavorless", "synonym": "vapid", "via": "flavorless", "position": 5}
+{"word": "flavorous", "synonym": "flavorful", "via": "flavorous", "position": 1}
 {"word": "flavorsome", "synonym": "flavorful", "via": "flavorsome", "position": 1}
 {"word": "flavorsome", "synonym": "sapid", "via": "flavorsome", "position": 2}
 {"word": "flavorsome", "synonym": "saporous", "via": "flavorsome", "position": 3}
@@ -2646,6 +2675,7 @@
 {"word": "flaw", "synonym": "fault", "via": "flaw", "position": 2}
 {"word": "flaw", "synonym": "blemish", "via": "flaw", "position": 3}
 {"word": "flawed", "synonym": "blemished", "via": "flawed", "position": 1}
+{"word": "flawedness", "synonym": "imperfection", "via": "flawedness", "position": 1}
 {"word": "flawlessly", "synonym": "cleanly", "via": "flawlessly", "position": 1}
 {"word": "flawlessness", "synonym": "perfection", "via": "flawlessness", "position": 1}
 {"word": "flaxen", "synonym": "sandy", "via": "flaxen", "position": 1}
@@ -2753,6 +2783,8 @@
 {"word": "flexure", "synonym": "crimp", "via": "flexure", "position": 5}
 {"word": "flexure", "synonym": "bend", "via": "flexure", "position": 6}
 {"word": "flexure", "synonym": "flection", "via": "flexure", "position": 7}
+{"word": "flibbert", "synonym": "scrap", "via": "flibbert", "position": 1}
+{"word": "flibbert", "synonym": "fragment", "via": "flibbert", "position": 2}
 {"word": "flick", "synonym": "movie", "via": "flick", "position": 1}
 {"word": "flick", "synonym": "film", "via": "flick", "position": 2}
 {"word": "flick", "synonym": "picture", "via": "flick", "position": 3}
@@ -2983,6 +3015,7 @@
 {"word": "floor", "synonym": "coldcock", "via": "floor", "position": 7}
 {"word": "floor", "synonym": "dump", "via": "floor", "position": 8}
 {"word": "floor", "synonym": "shock", "via": "floor", "position": 9}
+{"word": "floorcover", "synonym": "flooring", "via": "floorcover", "position": 1}
 {"word": "flooring", "synonym": "floor", "via": "floor", "position": 1}
 {"word": "flooring", "synonym": "floor", "via": "flooring", "position": 1}
 {"word": "floozie", "synonym": "streetwalker", "via": "floozie", "position": 1}
@@ -3096,6 +3129,7 @@
 {"word": "flowering", "synonym": "efflorescence", "via": "flowering", "position": 5}
 {"word": "flowering", "synonym": "unfolding", "via": "flowering", "position": 6}
 {"word": "flowerless", "synonym": "nonflowering", "via": "flowerless", "position": 1}
+{"word": "flowerlet", "synonym": "floret", "via": "flowerlet", "position": 1}
 {"word": "flowerpot", "synonym": "pot", "via": "flowerpot", "position": 1}
 {"word": "flowery", "synonym": "ornate", "via": "flower", "position": 1}
 {"word": "flowery", "synonym": "ornate", "via": "flowery", "position": 1}
@@ -3167,6 +3201,7 @@
 {"word": "fluky", "synonym": "chancy", "via": "flukey", "position": 1}
 {"word": "fluky", "synonym": "flukey", "via": "flukey", "position": 2}
 {"word": "fluky", "synonym": "iffy", "via": "flukey", "position": 3}
+{"word": "flumadiddle", "synonym": "nonsense", "via": "flumadiddle", "position": 1}
 {"word": "flume", "synonym": "gulch", "via": "flume", "position": 1}
 {"word": "flummery", "synonym": "mummery", "via": "flummery", "position": 1}
 {"word": "flummox", "synonym": "perplex", "via": "flummox", "position": 1}
@@ -3198,6 +3233,7 @@
 {"word": "flunky", "synonym": "lackey", "via": "flunky", "position": 3}
 {"word": "fluor", "synonym": "fluorite", "via": "fluor", "position": 1}
 {"word": "fluor", "synonym": "fluorspar", "via": "fluor", "position": 2}
+{"word": "fluoridize", "synonym": "fluoridate", "via": "fluoridize", "position": 1}
 {"word": "fluorite", "synonym": "fluorspar", "via": "fluorite", "position": 1}
 {"word": "fluorite", "synonym": "fluor", "via": "fluorite", "position": 2}
 {"word": "fluorspar", "synonym": "fluorite", "via": "fluorspar", "position": 1}
@@ -3233,6 +3269,7 @@
 {"word": "flustered", "synonym": "perturbed", "via": "flustered", "position": 1}
 {"word": "flustered", "synonym": "rattled", "via": "flustered", "position": 2}
 {"word": "flute", "synonym": "fluting", "via": "flute", "position": 1}
+{"word": "fluthered", "synonym": "plastered", "via": "fluthered", "position": 1}
 {"word": "fluting", "synonym": "flute", "via": "flute", "position": 1}
 {"word": "fluting", "synonym": "flute", "via": "fluting", "position": 1}
 {"word": "flutist", "synonym": "flautist", "via": "flautist", "position": 1}
@@ -3436,6 +3473,7 @@
 {"word": "foggy", "synonym": "fuzzy", "via": "foggy", "position": 8}
 {"word": "foggy", "synonym": "muzzy", "via": "foggy", "position": 9}
 {"word": "foggy", "synonym": "dazed", "via": "foggy", "position": 10}
+{"word": "fogram", "synonym": "fogy", "via": "fogram", "position": 1}
 {"word": "fogy", "synonym": "dodo", "via": "fogey", "position": 1}
 {"word": "fogy", "synonym": "fogey", "via": "fogey", "position": 2}
 {"word": "fogy", "synonym": "fossil", "via": "fogey", "position": 3}
@@ -3512,6 +3550,8 @@
 {"word": "folding", "synonym": "foldable", "via": "folding", "position": 2}
 {"word": "folding", "synonym": "foldaway", "via": "folding", "position": 3}
 {"word": "foldout", "synonym": "gatefold", "via": "foldout", "position": 1}
+{"word": "foldup", "synonym": "collapsible", "via": "foldup", "position": 1}
+{"word": "foldup", "synonym": "folding", "via": "foldup", "position": 2}
 {"word": "foliaceous", "synonym": "foliate", "via": "foliaceous", "position": 1}
 {"word": "foliaceous", "synonym": "foliated", "via": "foliaceous", "position": 2}
 {"word": "foliaceous", "synonym": "foliose", "via": "foliaceous", "position": 3}
@@ -3531,6 +3571,7 @@
 {"word": "foliated", "synonym": "foliaceous", "via": "foliated", "position": 2}
 {"word": "foliation", "synonym": "foliage", "via": "foliation", "position": 1}
 {"word": "foliation", "synonym": "leafing", "via": "foliation", "position": 2}
+{"word": "foliature", "synonym": "foliage", "via": "foliature", "position": 1}
 {"word": "folio", "synonym": "leaf", "via": "folio", "position": 1}
 {"word": "folio", "synonym": "pagination", "via": "folio", "position": 2}
 {"word": "folio", "synonym": "paging", "via": "folio", "position": 3}
@@ -3544,7 +3585,6 @@
 {"word": "folk", "synonym": "phratry", "via": "folk", "position": 6}
 {"word": "folk", "synonym": "tribe", "via": "folk", "position": 7}
 {"word": "folks", "synonym": "folk", "via": "folk", "position": 1}
-{"word": "folks", "synonym": "folk", "via": "folks", "position": 1}
 {"word": "follow", "synonym": "trace", "via": "follow", "position": 1}
 {"word": "follow", "synonym": "accompany", "via": "follow", "position": 2}
 {"word": "follow", "synonym": "pursue", "via": "follow", "position": 3}
@@ -3758,6 +3798,7 @@
 {"word": "foraging", "synonym": "forage", "via": "foraging", "position": 1}
 {"word": "foram", "synonym": "foraminifer", "via": "foram", "position": 1}
 {"word": "foramen", "synonym": "hiatus", "via": "foramen", "position": 1}
+{"word": "foraminate", "synonym": "perforated", "via": "foraminate", "position": 1}
 {"word": "foraminifer", "synonym": "foram", "via": "foraminifer", "position": 1}
 {"word": "foray", "synonym": "raid", "via": "foray", "position": 1}
 {"word": "foray", "synonym": "maraud", "via": "foray", "position": 2}
@@ -3884,10 +3925,14 @@
 {"word": "forecasting", "synonym": "foretelling", "via": "forecast", "position": 2}
 {"word": "forecasting", "synonym": "prediction", "via": "forecasting", "position": 1}
 {"word": "forecasting", "synonym": "foretelling", "via": "forecasting", "position": 2}
+{"word": "forechoir", "synonym": "antechoir", "via": "forechoir", "position": 1}
+{"word": "forecited", "synonym": "aforementioned", "via": "forecited", "position": 1}
 {"word": "foreclose", "synonym": "prevent", "via": "foreclose", "position": 1}
 {"word": "foreclose", "synonym": "forestall", "via": "foreclose", "position": 2}
 {"word": "foreclose", "synonym": "preclude", "via": "foreclose", "position": 3}
 {"word": "foreclose", "synonym": "forbid", "via": "foreclose", "position": 4}
+{"word": "foreconscious", "synonym": "preconscious", "via": "foreconscious", "position": 1}
+{"word": "forecourse", "synonym": "foresail", "via": "forecourse", "position": 1}
 {"word": "foredate", "synonym": "predate", "via": "foredate", "position": 1}
 {"word": "foredate", "synonym": "antedate", "via": "foredate", "position": 2}
 {"word": "forefather", "synonym": "father", "via": "forefather", "position": 1}
@@ -3965,6 +4010,8 @@
 {"word": "foreordained", "synonym": "predestined", "via": "foreordain", "position": 2}
 {"word": "foreordained", "synonym": "predestinate", "via": "foreordained", "position": 1}
 {"word": "foreordained", "synonym": "predestined", "via": "foreordained", "position": 2}
+{"word": "foreordinate", "synonym": "foreordain", "via": "foreordinate", "position": 1}
+{"word": "foreordinate", "synonym": "predestine", "via": "foreordinate", "position": 2}
 {"word": "foreordination", "synonym": "predestination", "via": "foreordination", "position": 1}
 {"word": "foreordination", "synonym": "preordination", "via": "foreordination", "position": 2}
 {"word": "forepart", "synonym": "front", "via": "forepart", "position": 1}
@@ -4098,6 +4145,7 @@
 {"word": "forfend", "synonym": "deflect", "via": "forfend", "position": 4}
 {"word": "forfend", "synonym": "avert", "via": "forfend", "position": 5}
 {"word": "forfend", "synonym": "avoid", "via": "forfend", "position": 6}
+{"word": "forfochen", "synonym": "exhausted", "via": "forfochen", "position": 1}
 {"word": "forgather", "synonym": "meet", "via": "forgather", "position": 1}
 {"word": "forgather", "synonym": "gather", "via": "forgather", "position": 2}
 {"word": "forgather", "synonym": "assemble", "via": "forgather", "position": 3}
@@ -4233,7 +4281,10 @@
 {"word": "formerly", "synonym": "once", "via": "formerly", "position": 1}
 {"word": "formerly", "synonym": "erstwhile", "via": "formerly", "position": 2}
 {"word": "formerly", "synonym": "erst", "via": "formerly", "position": 3}
+{"word": "formicarium", "synonym": "formicary", "via": "formicarium", "position": 1}
 {"word": "formicary", "synonym": "anthill", "via": "formicary", "position": 1}
+{"word": "formicate", "synonym": "swarm", "via": "formicate", "position": 1}
+{"word": "formicate", "synonym": "teem", "via": "formicate", "position": 2}
 {"word": "formidability", "synonym": "toughness", "via": "formidability", "position": 1}
 {"word": "formidable", "synonym": "redoubtable", "via": "formidable", "position": 1}
 {"word": "formidable", "synonym": "unnerving", "via": "formidable", "position": 2}
@@ -4272,6 +4323,7 @@
 {"word": "forsaking", "synonym": "desertion", "via": "forsake", "position": 2}
 {"word": "forsaking", "synonym": "abandonment", "via": "forsaking", "position": 1}
 {"word": "forsaking", "synonym": "desertion", "via": "forsaking", "position": 2}
+{"word": "forspeak", "synonym": "bewitch", "via": "forspeak", "position": 1}
 {"word": "forswear", "synonym": "abjure", "via": "forswear", "position": 1}
 {"word": "forswear", "synonym": "recant", "via": "forswear", "position": 2}
 {"word": "forswear", "synonym": "retract", "via": "forswear", "position": 3}
@@ -4329,6 +4381,8 @@
 {"word": "fortify", "synonym": "arm", "via": "fortify", "position": 4}
 {"word": "fortify", "synonym": "gird", "via": "fortify", "position": 5}
 {"word": "fortify", "synonym": "fort", "via": "fortify", "position": 6}
+{"word": "fortitudinous", "synonym": "brave", "via": "fortitudinous", "position": 1}
+{"word": "fortitudinous", "synonym": "courageous", "via": "fortitudinous", "position": 2}
 {"word": "fortnightly", "synonym": "biweekly", "via": "fortnightly", "position": 1}
 {"word": "fortress", "synonym": "fort", "via": "fortress", "position": 1}
 {"word": "fortuitous", "synonym": "causeless", "via": "fortuitous", "position": 1}
@@ -4374,6 +4428,7 @@
 {"word": "forwarding", "synonym": "promotion", "via": "forward", "position": 2}
 {"word": "forwarding", "synonym": "furtherance", "via": "forwarding", "position": 1}
 {"word": "forwarding", "synonym": "promotion", "via": "forwarding", "position": 2}
+{"word": "forwardmost", "synonym": "foremost", "via": "forwardmost", "position": 1}
 {"word": "forwardness", "synonym": "readiness", "via": "forwardness", "position": 1}
 {"word": "forwardness", "synonym": "eagerness", "via": "forwardness", "position": 2}
 {"word": "forwardness", "synonym": "zeal", "via": "forwardness", "position": 3}
@@ -4395,6 +4450,7 @@
 {"word": "forwards", "synonym": "frontward", "via": "forwards", "position": 6}
 {"word": "forwards", "synonym": "frontwards", "via": "forwards", "position": 7}
 {"word": "fossa", "synonym": "pit", "via": "fossa", "position": 1}
+{"word": "fossarian", "synonym": "fossor", "via": "fossarian", "position": 1}
 {"word": "fosse", "synonym": "moat", "via": "fossa", "position": 1}
 {"word": "fosse", "synonym": "moat", "via": "fosse", "position": 1}
 {"word": "fossil", "synonym": "dodo", "via": "fossil", "position": 1}
@@ -4527,6 +4583,8 @@
 {"word": "four", "synonym": "quartet", "via": "four", "position": 5}
 {"word": "four", "synonym": "quadruplet", "via": "four", "position": 6}
 {"word": "four", "synonym": "foursome", "via": "four", "position": 7}
+{"word": "fourbagger", "synonym": "homer", "via": "fourbagger", "position": 1}
+{"word": "fourflusher", "synonym": "bluffer", "via": "fourflusher", "position": 1}
 {"word": "fourfold", "synonym": "quadruple", "via": "fourfold", "position": 1}
 {"word": "fourfold", "synonym": "quadruplicate", "via": "fourfold", "position": 2}
 {"word": "fourscore", "synonym": "eighty", "via": "fourscore", "position": 1}
@@ -4557,6 +4615,8 @@
 {"word": "fox", "synonym": "confound", "via": "fox", "position": 8}
 {"word": "fox", "synonym": "discombobulate", "via": "fox", "position": 9}
 {"word": "fox", "synonym": "trick", "via": "fox", "position": 10}
+{"word": "foxberry", "synonym": "cowberry", "via": "foxberry", "position": 1}
+{"word": "foxberry", "synonym": "lingonberry", "via": "foxberry", "position": 2}
 {"word": "foxglove", "synonym": "digitalis", "via": "foxglove", "position": 1}
 {"word": "foxily", "synonym": "craftily", "via": "foxily", "position": 1}
 {"word": "foxily", "synonym": "cunningly", "via": "foxily", "position": 2}
@@ -4670,6 +4730,7 @@
 {"word": "framework", "synonym": "model", "via": "framework", "position": 3}
 {"word": "framing", "synonym": "frame", "via": "frame", "position": 1}
 {"word": "framing", "synonym": "frame", "via": "framing", "position": 1}
+{"word": "frammis", "synonym": "thingamajig", "via": "frammis", "position": 1}
 {"word": "franchise", "synonym": "dealership", "via": "franchise", "position": 1}
 {"word": "frangibility", "synonym": "fragility", "via": "frangibility", "position": 1}
 {"word": "frangipani", "synonym": "frangipanni", "via": "frangipane", "position": 1}
@@ -4725,6 +4786,8 @@
 {"word": "fraternity", "synonym": "brotherhood", "via": "fraternity", "position": 1}
 {"word": "fraternity", "synonym": "sodality", "via": "fraternity", "position": 2}
 {"word": "fraternity", "synonym": "frat", "via": "fraternity", "position": 3}
+{"word": "fratry", "synonym": "refectory", "via": "fratry", "position": 1}
+{"word": "fratry", "synonym": "frater", "via": "fratry", "position": 2}
 {"word": "fraud", "synonym": "fraudulence", "via": "fraud", "position": 1}
 {"word": "fraud", "synonym": "dupery", "via": "fraud", "position": 2}
 {"word": "fraud", "synonym": "hoax", "via": "fraud", "position": 3}
@@ -4785,6 +4848,7 @@
 {"word": "freaky", "synonym": "gonzo", "via": "freaky", "position": 6}
 {"word": "freaky", "synonym": "outlandish", "via": "freaky", "position": 7}
 {"word": "freaky", "synonym": "outre", "via": "freaky", "position": 8}
+{"word": "freck", "synonym": "eager", "via": "freck", "position": 1}
 {"word": "freckle", "synonym": "lentigo", "via": "freckle", "position": 1}
 {"word": "free", "synonym": "unblock", "via": "free", "position": 1}
 {"word": "free", "synonym": "unfreeze", "via": "free", "position": 2}
@@ -4895,6 +4959,7 @@
 {"word": "freighter", "synonym": "bottom", "via": "freighter", "position": 1}
 {"word": "freighter", "synonym": "merchantman", "via": "freighter", "position": 2}
 {"word": "french", "synonym": "gallic", "via": "french", "position": 1}
+{"word": "frenchie", "synonym": "condom", "via": "frenchie", "position": 1}
 {"word": "frenetic", "synonym": "frantic", "via": "frenetic", "position": 1}
 {"word": "frenetic", "synonym": "phrenetic", "via": "frenetic", "position": 2}
 {"word": "frenetic", "synonym": "frenzied", "via": "frenetic", "position": 3}
@@ -5096,6 +5161,7 @@
 {"word": "fringe", "synonym": "periphery", "via": "fringe", "position": 3}
 {"word": "fringed", "synonym": "laciniate", "via": "fringe", "position": 1}
 {"word": "fringed", "synonym": "laciniate", "via": "fringed", "position": 1}
+{"word": "fringer", "synonym": "outcast", "via": "fringer", "position": 1}
 {"word": "fringy", "synonym": "marginal", "via": "fringy", "position": 1}
 {"word": "frippery", "synonym": "bagatelle", "via": "frippery", "position": 1}
 {"word": "frippery", "synonym": "fluff", "via": "frippery", "position": 2}
@@ -5186,8 +5252,10 @@
 {"word": "frontal", "synonym": "facade", "via": "frontal", "position": 1}
 {"word": "frontal", "synonym": "frontage", "via": "frontal", "position": 2}
 {"word": "frontal", "synonym": "frontlet", "via": "frontal", "position": 3}
+{"word": "frontierless", "synonym": "borderless", "via": "frontierless", "position": 1}
 {"word": "frontiersman", "synonym": "backwoodsman", "via": "frontiersman", "position": 1}
 {"word": "frontlet", "synonym": "frontal", "via": "frontlet", "position": 1}
+{"word": "frontstall", "synonym": "chamfron", "via": "frontstall", "position": 1}
 {"word": "frontward", "synonym": "forward", "via": "frontward", "position": 1}
 {"word": "frontward", "synonym": "forwards", "via": "frontward", "position": 2}
 {"word": "frontward", "synonym": "frontwards", "via": "frontward", "position": 3}
@@ -5263,6 +5331,7 @@
 {"word": "frozen", "synonym": "icy", "via": "frozen", "position": 5}
 {"word": "frozen", "synonym": "wintry", "via": "frozen", "position": 6}
 {"word": "frozen", "synonym": "rooted", "via": "frozen", "position": 7}
+{"word": "fructificative", "synonym": "fruitful", "via": "fructificative", "position": 1}
 {"word": "fructify", "synonym": "set", "via": "fructify", "position": 1}
 {"word": "fructose", "synonym": "levulose", "via": "fructose", "position": 1}
 {"word": "frugal", "synonym": "economical", "via": "frugal", "position": 1}
@@ -5524,6 +5593,7 @@
 {"word": "function", "synonym": "subprogram", "via": "function", "position": 8}
 {"word": "function", "synonym": "procedure", "via": "function", "position": 9}
 {"word": "function", "synonym": "affair", "via": "function", "position": 10}
+{"word": "functionable", "synonym": "functional", "via": "functionable", "position": 1}
 {"word": "functional", "synonym": "running", "via": "functional", "position": 1}
 {"word": "functional", "synonym": "operative", "via": "functional", "position": 2}
 {"word": "functional", "synonym": "working", "via": "functional", "position": 3}
@@ -5561,6 +5631,8 @@
 {"word": "fundamentals", "synonym": "bedrock", "via": "fundamental", "position": 2}
 {"word": "fundamentals", "synonym": "basics", "via": "fundamentals", "position": 1}
 {"word": "fundamentals", "synonym": "bedrock", "via": "fundamentals", "position": 2}
+{"word": "funder", "synonym": "sponsor", "via": "funder", "position": 1}
+{"word": "funder", "synonym": "backer", "via": "funder", "position": 2}
 {"word": "funding", "synonym": "financing", "via": "fund", "position": 1}
 {"word": "funding", "synonym": "support", "via": "fund", "position": 2}
 {"word": "funding", "synonym": "backing", "via": "fund", "position": 3}
@@ -5577,6 +5649,7 @@
 {"word": "fungal", "synonym": "fungous", "via": "fungal", "position": 1}
 {"word": "fungicidal", "synonym": "antifungal", "via": "fungicidal", "position": 1}
 {"word": "fungicide", "synonym": "antifungal", "via": "fungicide", "position": 1}
+{"word": "fungivorous", "synonym": "mycophagous", "via": "fungivorous", "position": 1}
 {"word": "fungous", "synonym": "fungal", "via": "fungous", "position": 1}
 {"word": "funicle", "synonym": "funiculus", "via": "funicle", "position": 1}
 {"word": "funiculus", "synonym": "funicle", "via": "funiculus", "position": 1}
@@ -5593,7 +5666,6 @@
 {"word": "funky", "synonym": "noisome", "via": "funky", "position": 4}
 {"word": "funky", "synonym": "smelly", "via": "funky", "position": 5}
 {"word": "funky", "synonym": "stinking", "via": "funky", "position": 6}
-{"word": "funnies", "synonym": "strip", "via": "funnies", "position": 1}
 {"word": "funnies", "synonym": "strip", "via": "funny", "position": 1}
 {"word": "funnily", "synonym": "queerly", "via": "funnily", "position": 1}
 {"word": "funnily", "synonym": "strangely", "via": "funnily", "position": 2}
@@ -5627,6 +5699,8 @@
 {"word": "furcate", "synonym": "fork", "via": "furcate", "position": 3}
 {"word": "furcate", "synonym": "separate", "via": "furcate", "position": 4}
 {"word": "furcation", "synonym": "forking", "via": "furcation", "position": 1}
+{"word": "furfuraceous", "synonym": "scurfy", "via": "furfuraceous", "position": 1}
+{"word": "furfuraldehyde", "synonym": "furfural", "via": "furfuraldehyde", "position": 1}
 {"word": "furfuran", "synonym": "furan", "via": "furfuran", "position": 1}
 {"word": "furfuran", "synonym": "furane", "via": "furfuran", "position": 2}
 {"word": "furious", "synonym": "angered", "via": "furious", "position": 1}
@@ -5764,6 +5838,8 @@
 {"word": "fuss", "synonym": "flurry", "via": "fuss", "position": 3}
 {"word": "fuss", "synonym": "ado", "via": "fuss", "position": 4}
 {"word": "fuss", "synonym": "stir", "via": "fuss", "position": 5}
+{"word": "fussbox", "synonym": "fusspot", "via": "fussbox", "position": 1}
+{"word": "fussbox", "synonym": "fussbudget", "via": "fussbox", "position": 2}
 {"word": "fussiness", "synonym": "irritability", "via": "fussiness", "position": 1}
 {"word": "fussiness", "synonym": "crossness", "via": "fussiness", "position": 2}
 {"word": "fussiness", "synonym": "fretfulness", "via": "fussiness", "position": 3}

@@ -15,11 +15,14 @@
 {"word": "macadam", "synonym": "tarmacadam", "via": "macadam", "position": 1}
 {"word": "macadam", "synonym": "tarmac", "via": "macadam", "position": 2}
 {"word": "macadamize", "synonym": "tarmac", "via": "macadamize", "position": 1}
+{"word": "macca", "synonym": "excellent", "via": "macca", "position": 1}
 {"word": "mace", "synonym": "macer", "via": "mace", "position": 1}
 {"word": "macer", "synonym": "mace", "via": "macer", "position": 1}
 {"word": "macerate", "synonym": "waste", "via": "macerate", "position": 1}
 {"word": "macerate", "synonym": "emaciate", "via": "macerate", "position": 2}
 {"word": "machete", "synonym": "panga", "via": "machete", "position": 1}
+{"word": "machiavellian", "synonym": "scheming", "via": "machiavellian", "position": 1}
+{"word": "machiavellian", "synonym": "devious", "via": "machiavellian", "position": 2}
 {"word": "machinate", "synonym": "conspire", "via": "machinate", "position": 1}
 {"word": "machinate", "synonym": "cabal", "via": "machinate", "position": 2}
 {"word": "machinate", "synonym": "complot", "via": "machinate", "position": 3}
@@ -46,14 +49,20 @@
 {"word": "mack", "synonym": "macintosh", "via": "mack", "position": 1}
 {"word": "mack", "synonym": "mackintosh", "via": "mack", "position": 2}
 {"word": "mack", "synonym": "mac", "via": "mack", "position": 3}
+{"word": "mackadocious", "synonym": "excellent", "via": "mackadocious", "position": 1}
 {"word": "mackintosh", "synonym": "macintosh", "via": "mackintosh", "position": 1}
 {"word": "mackintosh", "synonym": "mac", "via": "mackintosh", "position": 2}
 {"word": "mackintosh", "synonym": "mack", "via": "mackintosh", "position": 3}
+{"word": "macrobiosis", "synonym": "longevity", "via": "macrobiosis", "position": 1}
 {"word": "macrocosm", "synonym": "universe", "via": "macrocosm", "position": 1}
 {"word": "macrocosm", "synonym": "existence", "via": "macrocosm", "position": 2}
 {"word": "macrocosm", "synonym": "creation", "via": "macrocosm", "position": 3}
 {"word": "macrocosm", "synonym": "world", "via": "macrocosm", "position": 4}
 {"word": "macrocosm", "synonym": "cosmos", "via": "macrocosm", "position": 5}
+{"word": "macroinstruction", "synonym": "macro", "via": "macroinstruction", "position": 1}
+{"word": "macrophyll", "synonym": "megaphyll", "via": "macrophyll", "position": 1}
+{"word": "macrosporangium", "synonym": "megasporangium", "via": "macrosporangium", "position": 1}
+{"word": "macrospore", "synonym": "megaspore", "via": "macrospore", "position": 1}
 {"word": "macula", "synonym": "macule", "via": "macula", "position": 1}
 {"word": "macula", "synonym": "sunspot", "via": "macula", "position": 2}
 {"word": "maculate", "synonym": "foul", "via": "maculate", "position": 1}
@@ -71,6 +80,8 @@
 {"word": "maculation", "synonym": "patch", "via": "maculation", "position": 6}
 {"word": "maculation", "synonym": "fleck", "via": "maculation", "position": 7}
 {"word": "macule", "synonym": "macula", "via": "macule", "position": 1}
+{"word": "macushla", "synonym": "darling", "via": "macushla", "position": 1}
+{"word": "macushla", "synonym": "dear", "via": "macushla", "position": 2}
 {"word": "mad", "synonym": "huffy", "via": "mad", "position": 1}
 {"word": "mad", "synonym": "sore", "via": "mad", "position": 2}
 {"word": "mad", "synonym": "brainsick", "via": "mad", "position": 3}
@@ -84,6 +95,7 @@
 {"word": "madam", "synonym": "dame", "via": "madam", "position": 1}
 {"word": "madam", "synonym": "lady", "via": "madam", "position": 2}
 {"word": "madam", "synonym": "gentlewoman", "via": "madam", "position": 3}
+{"word": "madball", "synonym": "crazy", "via": "madball", "position": 1}
 {"word": "madcap", "synonym": "daredevil", "via": "madcap", "position": 1}
 {"word": "madcap", "synonym": "hothead", "via": "madcap", "position": 2}
 {"word": "madcap", "synonym": "swashbuckler", "via": "madcap", "position": 3}
@@ -131,6 +143,7 @@
 {"word": "madrono", "synonym": "madrona", "via": "madrone", "position": 1}
 {"word": "madrono", "synonym": "manzanita", "via": "madrone", "position": 2}
 {"word": "madwort", "synonym": "alyssum", "via": "madwort", "position": 1}
+{"word": "maecenas", "synonym": "patron", "via": "maecenas", "position": 1}
 {"word": "maelstrom", "synonym": "whirlpool", "via": "maelstrom", "position": 1}
 {"word": "maelstrom", "synonym": "vortex", "via": "maelstrom", "position": 2}
 {"word": "maestro", "synonym": "master", "via": "maestro", "position": 1}
@@ -139,9 +152,11 @@
 {"word": "mag", "synonym": "magazine", "via": "mag", "position": 1}
 {"word": "mag", "synonym": "magazine", "via": "magazine", "position": 1}
 {"word": "mag", "synonym": "magazine", "via": "magnet", "position": 1}
+{"word": "magageba", "synonym": "money", "via": "magageba", "position": 1}
 {"word": "magazine", "synonym": "clip", "via": "magazine", "position": 1}
 {"word": "magazine", "synonym": "cartridge", "via": "magazine", "position": 2}
 {"word": "magazine", "synonym": "mag", "via": "magazine", "position": 3}
+{"word": "maggieman", "synonym": "showman", "via": "maggieman", "position": 1}
 {"word": "maggoty", "synonym": "flyblown", "via": "maggoty", "position": 1}
 {"word": "magic", "synonym": "trick", "via": "magic", "position": 1}
 {"word": "magic", "synonym": "legerdemain", "via": "magic", "position": 2}
@@ -216,6 +231,8 @@
 {"word": "magnetized", "synonym": "magnetised", "via": "magnetize", "position": 2}
 {"word": "magnetized", "synonym": "magnetic", "via": "magnetized", "position": 1}
 {"word": "magnetized", "synonym": "magnetised", "via": "magnetized", "position": 2}
+{"word": "magnetogasdynamics", "synonym": "magnetohydrodynamics", "via": "magnetogasdynamics", "position": 1}
+{"word": "magnetogenerator", "synonym": "magneto", "via": "magnetogenerator", "position": 1}
 {"word": "magnification", "synonym": "enlargement", "via": "magnification", "position": 1}
 {"word": "magnification", "synonym": "blowup", "via": "magnification", "position": 2}
 {"word": "magnification", "synonym": "exaggeration", "via": "magnification", "position": 3}
@@ -251,6 +268,12 @@
 {"word": "magniloquence", "synonym": "rhetoric", "via": "magniloquence", "position": 4}
 {"word": "magniloquent", "synonym": "grandiloquent", "via": "magniloquent", "position": 1}
 {"word": "magniloquent", "synonym": "tall", "via": "magniloquent", "position": 2}
+{"word": "magnolious", "synonym": "splendid", "via": "magnolious", "position": 1}
+{"word": "magnolious", "synonym": "magnificent", "via": "magnolious", "position": 2}
+{"word": "magnoon", "synonym": "crazy", "via": "magnoon", "position": 1}
+{"word": "magnoon", "synonym": "eccentric", "via": "magnoon", "position": 2}
+{"word": "magoozlum", "synonym": "nonsense", "via": "magoozlum", "position": 1}
+{"word": "magoozlum", "synonym": "rubbish", "via": "magoozlum", "position": 2}
 {"word": "magpie", "synonym": "chatterer", "via": "magpie", "position": 1}
 {"word": "magpie", "synonym": "babbler", "via": "magpie", "position": 2}
 {"word": "magpie", "synonym": "prater", "via": "magpie", "position": 3}
@@ -266,6 +289,7 @@
 {"word": "mahimahi", "synonym": "dolphin", "via": "mahimahi", "position": 2}
 {"word": "mahlstick", "synonym": "maulstick", "via": "maulstick", "position": 1}
 {"word": "mahoe", "synonym": "majagua", "via": "mahoe", "position": 1}
+{"word": "mahog", "synonym": "brandy", "via": "mahog", "position": 1}
 {"word": "maid", "synonym": "maiden", "via": "maid", "position": 1}
 {"word": "maid", "synonym": "maidservant", "via": "maid", "position": 2}
 {"word": "maid", "synonym": "housemaid", "via": "maid", "position": 3}
@@ -360,6 +384,7 @@
 {"word": "majuscule", "synonym": "capital", "via": "majuscule", "position": 1}
 {"word": "majuscule", "synonym": "uppercase", "via": "majuscule", "position": 2}
 {"word": "majuscule", "synonym": "great", "via": "majuscule", "position": 3}
+{"word": "makai", "synonym": "seaward", "via": "makai", "position": 1}
 {"word": "make", "synonym": "brand", "via": "make", "position": 1}
 {"word": "maker", "synonym": "manufacturer", "via": "maker", "position": 1}
 {"word": "maker", "synonym": "godhead", "via": "maker", "position": 2}
@@ -379,6 +404,8 @@
 {"word": "making", "synonym": "devising", "via": "making", "position": 1}
 {"word": "making", "synonym": "fashioning", "via": "making", "position": 2}
 {"word": "making", "synonym": "qualification", "via": "making", "position": 3}
+{"word": "maladdress", "synonym": "tactlessness", "via": "maladdress", "position": 1}
+{"word": "maladdress", "synonym": "clumsiness", "via": "maladdress", "position": 2}
 {"word": "maladjusted", "synonym": "disturbed", "via": "maladjusted", "position": 1}
 {"word": "maladroitness", "synonym": "awkwardness", "via": "maladroitness", "position": 1}
 {"word": "maladroitness", "synonym": "clumsiness", "via": "maladroitness", "position": 2}
@@ -481,9 +508,11 @@
 {"word": "malleable", "synonym": "pliant", "via": "malleable", "position": 3}
 {"word": "malleable", "synonym": "tensile", "via": "malleable", "position": 4}
 {"word": "malleable", "synonym": "tractile", "via": "malleable", "position": 5}
+{"word": "malleate", "synonym": "hammer", "via": "malleate", "position": 1}
 {"word": "mallet", "synonym": "beetle", "via": "mallet", "position": 1}
 {"word": "mallet", "synonym": "hammer", "via": "mallet", "position": 2}
 {"word": "malleus", "synonym": "hammer", "via": "malleus", "position": 1}
+{"word": "malnourishment", "synonym": "malnutrition", "via": "malnourishment", "position": 1}
 {"word": "malodor", "synonym": "stench", "via": "malodor", "position": 1}
 {"word": "malodor", "synonym": "stink", "via": "malodor", "position": 2}
 {"word": "malodor", "synonym": "reek", "via": "malodor", "position": 3}
@@ -504,6 +533,7 @@
 {"word": "maltreated", "synonym": "mistreated", "via": "maltreat", "position": 2}
 {"word": "maltreater", "synonym": "abuser", "via": "maltreater", "position": 1}
 {"word": "maltreatment", "synonym": "abuse", "via": "maltreatment", "position": 1}
+{"word": "malvoisie", "synonym": "malmsey", "via": "malvoisie", "position": 1}
 {"word": "mam", "synonym": "mother", "via": "mam", "position": 1}
 {"word": "mama", "synonym": "mamma", "via": "mama", "position": 1}
 {"word": "mama", "synonym": "mom", "via": "mama", "position": 2}
@@ -512,6 +542,8 @@
 {"word": "mama", "synonym": "mammy", "via": "mama", "position": 5}
 {"word": "mama", "synonym": "mum", "via": "mama", "position": 6}
 {"word": "mama", "synonym": "mummy", "via": "mama", "position": 7}
+{"word": "mamelon", "synonym": "hillock", "via": "mamelon", "position": 1}
+{"word": "mamelon", "synonym": "knoll", "via": "mamelon", "position": 2}
 {"word": "mamey", "synonym": "mammee", "via": "mamey", "position": 1}
 {"word": "mamma", "synonym": "mama", "via": "mama", "position": 1}
 {"word": "mamma", "synonym": "mom", "via": "mama", "position": 2}
@@ -529,7 +561,9 @@
 {"word": "mamma", "synonym": "mummy", "via": "mamma", "position": 7}
 {"word": "mammal", "synonym": "mammalian", "via": "mammal", "position": 1}
 {"word": "mammalian", "synonym": "mammal", "via": "mammalian", "position": 1}
+{"word": "mammectomy", "synonym": "mastectomy", "via": "mammectomy", "position": 1}
 {"word": "mammee", "synonym": "mamey", "via": "mammee", "position": 1}
+{"word": "mammiferous", "synonym": "mammalian", "via": "mammiferous", "position": 1}
 {"word": "mammilla", "synonym": "nipple", "via": "mammilla", "position": 1}
 {"word": "mammilla", "synonym": "pap", "via": "mammilla", "position": 2}
 {"word": "mammilla", "synonym": "teat", "via": "mammilla", "position": 3}
@@ -599,6 +633,8 @@
 {"word": "mandril", "synonym": "spindle", "via": "mandrel", "position": 1}
 {"word": "mandril", "synonym": "mandrel", "via": "mandrel", "position": 2}
 {"word": "mandril", "synonym": "arbor", "via": "mandrel", "position": 3}
+{"word": "manducate", "synonym": "chew", "via": "manducate", "position": 1}
+{"word": "manducate", "synonym": "eat", "via": "manducate", "position": 2}
 {"word": "maneuver", "synonym": "manoeuvre", "via": "maneuver", "position": 1}
 {"word": "maneuver", "synonym": "play", "via": "maneuver", "position": 2}
 {"word": "maneuver", "synonym": "tactic", "via": "maneuver", "position": 3}
@@ -640,6 +676,7 @@
 {"word": "mangonel", "synonym": "onager", "via": "mangonel", "position": 6}
 {"word": "mangonel", "synonym": "trebuchet", "via": "mangonel", "position": 7}
 {"word": "mangonel", "synonym": "trebucket", "via": "mangonel", "position": 8}
+{"word": "mangulate", "synonym": "mangle", "via": "mangulate", "position": 1}
 {"word": "mangy", "synonym": "mangey", "via": "mangy", "position": 1}
 {"word": "manhood", "synonym": "humanness", "via": "manhood", "position": 1}
 {"word": "manhood", "synonym": "humanity", "via": "manhood", "position": 2}
@@ -687,6 +724,7 @@
 {"word": "manila", "synonym": "manilla", "via": "manila", "position": 1}
 {"word": "manilla", "synonym": "manila", "via": "manila", "position": 1}
 {"word": "manilla", "synonym": "manila", "via": "manilla", "position": 1}
+{"word": "manini", "synonym": "petty", "via": "manini", "position": 1}
 {"word": "manioc", "synonym": "mandioca", "via": "manioc", "position": 1}
 {"word": "manioc", "synonym": "cassava", "via": "manioc", "position": 2}
 {"word": "manioc", "synonym": "manioca", "via": "manioc", "position": 3}
@@ -768,6 +806,8 @@
 {"word": "mansion", "synonym": "residence", "via": "mansion", "position": 3}
 {"word": "mansion", "synonym": "house", "via": "mansion", "position": 4}
 {"word": "manslayer", "synonym": "murderer", "via": "manslayer", "position": 1}
+{"word": "manstealing", "synonym": "kidnapping", "via": "manstealing", "position": 1}
+{"word": "manstealing", "synonym": "abduction", "via": "manstealing", "position": 2}
 {"word": "manta", "synonym": "devilfish", "via": "manta", "position": 1}
 {"word": "mantel", "synonym": "mantelpiece", "via": "mantel", "position": 1}
 {"word": "mantel", "synonym": "mantle", "via": "mantel", "position": 2}
@@ -821,6 +861,7 @@
 {"word": "mantrap", "synonym": "lulu", "via": "mantrap", "position": 8}
 {"word": "mantrap", "synonym": "looker", "via": "mantrap", "position": 9}
 {"word": "mantrap", "synonym": "dish", "via": "mantrap", "position": 10}
+{"word": "manuduction", "synonym": "guidance", "via": "manuduction", "position": 1}
 {"word": "manufactory", "synonym": "factory", "via": "manufactory", "position": 1}
 {"word": "manufactory", "synonym": "mill", "via": "manufactory", "position": 2}
 {"word": "manufacture", "synonym": "industry", "via": "manufacture", "position": 1}
@@ -841,11 +882,14 @@
 {"word": "manus", "synonym": "mitt", "via": "manus", "position": 2}
 {"word": "manus", "synonym": "paw", "via": "manus", "position": 3}
 {"word": "manuscript", "synonym": "holograph", "via": "manuscript", "position": 1}
+{"word": "manyplies", "synonym": "omasum", "via": "manyplies", "position": 1}
+{"word": "manyplies", "synonym": "psalterium", "via": "manyplies", "position": 2}
 {"word": "manzanita", "synonym": "madrona", "via": "manzanita", "position": 1}
 {"word": "manzanita", "synonym": "madrono", "via": "manzanita", "position": 2}
 {"word": "map", "synonym": "function", "via": "map", "position": 1}
 {"word": "map", "synonym": "mapping", "via": "map", "position": 2}
 {"word": "map", "synonym": "represent", "via": "map", "position": 3}
+{"word": "maphepha", "synonym": "money", "via": "maphepha", "position": 1}
 {"word": "mapmaking", "synonym": "cartography", "via": "mapmaking", "position": 1}
 {"word": "mapper", "synonym": "plotter", "via": "mapper", "position": 1}
 {"word": "mapping", "synonym": "function", "via": "map", "position": 1}
@@ -907,7 +951,10 @@
 {"word": "marching", "synonym": "march", "via": "march", "position": 1}
 {"word": "marching", "synonym": "march", "via": "marching", "position": 1}
 {"word": "marchioness", "synonym": "marquise", "via": "marchioness", "position": 1}
+{"word": "marchland", "synonym": "borderland", "via": "marchland", "position": 1}
+{"word": "marchland", "synonym": "frontier", "via": "marchland", "position": 2}
 {"word": "marchpane", "synonym": "marzipan", "via": "marzipan", "position": 1}
+{"word": "marconigram", "synonym": "radiogram", "via": "marconigram", "position": 1}
 {"word": "mare", "synonym": "maria", "via": "mair", "position": 1}
 {"word": "mare", "synonym": "maria", "via": "mare", "position": 1}
 {"word": "mare", "synonym": "maria", "via": "mayor", "position": 1}
@@ -919,6 +966,8 @@
 {"word": "margarine", "synonym": "oleo", "via": "margarine", "position": 2}
 {"word": "margarine", "synonym": "oleomargarine", "via": "margarine", "position": 3}
 {"word": "margarine", "synonym": "marge", "via": "margarine", "position": 4}
+{"word": "margaritaceous", "synonym": "pearly", "via": "margaritaceous", "position": 1}
+{"word": "margaritaceous", "synonym": "nacreous", "via": "margaritaceous", "position": 2}
 {"word": "marge", "synonym": "margarine", "via": "margarine", "position": 1}
 {"word": "marge", "synonym": "margarin", "via": "margarine", "position": 2}
 {"word": "marge", "synonym": "oleo", "via": "margarine", "position": 3}
@@ -927,6 +976,7 @@
 {"word": "marge", "synonym": "margarin", "via": "marge", "position": 2}
 {"word": "marge", "synonym": "oleo", "via": "marge", "position": 3}
 {"word": "marge", "synonym": "oleomargarine", "via": "marge", "position": 4}
+{"word": "margie", "synonym": "marijuana", "via": "margie", "position": 1}
 {"word": "margin", "synonym": "allowance", "via": "margin", "position": 1}
 {"word": "margin", "synonym": "leeway", "via": "margin", "position": 2}
 {"word": "margin", "synonym": "tolerance", "via": "margin", "position": 3}
@@ -935,6 +985,7 @@
 {"word": "marginal", "synonym": "fringy", "via": "marginal", "position": 1}
 {"word": "marginal", "synonym": "borderline", "via": "marginal", "position": 2}
 {"word": "marginal", "synonym": "bare", "via": "marginal", "position": 3}
+{"word": "margosa", "synonym": "neem", "via": "margosa", "position": 1}
 {"word": "maria", "synonym": "mare", "via": "mare", "position": 1}
 {"word": "marihuana", "synonym": "cannabis", "via": "marihuana", "position": 1}
 {"word": "marihuana", "synonym": "marijuana", "via": "marihuana", "position": 2}
@@ -953,6 +1004,7 @@
 {"word": "mariner", "synonym": "jack", "via": "mariner", "position": 3}
 {"word": "mariner", "synonym": "seafarer", "via": "mariner", "position": 4}
 {"word": "mariner", "synonym": "gob", "via": "mariner", "position": 5}
+{"word": "maringouin", "synonym": "mosquito", "via": "maringouin", "position": 1}
 {"word": "marionette", "synonym": "puppet", "via": "marionette", "position": 1}
 {"word": "marital", "synonym": "matrimonial", "via": "marital", "position": 1}
 {"word": "marital", "synonym": "married", "via": "marital", "position": 2}
@@ -1012,6 +1064,7 @@
 {"word": "marking", "synonym": "marker", "via": "marking", "position": 3}
 {"word": "marking", "synonym": "mark", "via": "marking", "position": 4}
 {"word": "marksman", "synonym": "sharpshooter", "via": "marksman", "position": 1}
+{"word": "marley", "synonym": "marble", "via": "marley", "position": 1}
 {"word": "marlinespike", "synonym": "marlinspike", "via": "marlinspike", "position": 1}
 {"word": "marlinspike", "synonym": "marlinespike", "via": "marlinspike", "position": 1}
 {"word": "marlite", "synonym": "marlstone", "via": "marlite", "position": 1}
@@ -1064,6 +1117,7 @@
 {"word": "marshal", "synonym": "mobilise", "via": "marshal", "position": 3}
 {"word": "marshal", "synonym": "summon", "via": "marshal", "position": 4}
 {"word": "marshall", "synonym": "marshal", "via": "marshal", "position": 1}
+{"word": "marshbuck", "synonym": "sitatunga", "via": "marshbuck", "position": 1}
 {"word": "marshland", "synonym": "marsh", "via": "marshland", "position": 1}
 {"word": "marshland", "synonym": "fen", "via": "marshland", "position": 2}
 {"word": "marshland", "synonym": "fenland", "via": "marshland", "position": 3}
@@ -1077,6 +1131,7 @@
 {"word": "marshy", "synonym": "soggy", "via": "marshy", "position": 8}
 {"word": "marshy", "synonym": "squashy", "via": "marshy", "position": 9}
 {"word": "marshy", "synonym": "swampy", "via": "marshy", "position": 10}
+{"word": "marsipobranch", "synonym": "cyclostome", "via": "marsipobranch", "position": 1}
 {"word": "mart", "synonym": "marketplace", "via": "mart", "position": 1}
 {"word": "mart", "synonym": "market", "via": "mart", "position": 2}
 {"word": "martial", "synonym": "soldierly", "via": "martial", "position": 1}
@@ -1086,6 +1141,7 @@
 {"word": "martyr", "synonym": "martyrize", "via": "martyr", "position": 2}
 {"word": "martyrdom", "synonym": "calvary", "via": "martyrdom", "position": 1}
 {"word": "martyrize", "synonym": "martyr", "via": "martyrize", "position": 1}
+{"word": "marv", "synonym": "wonderful", "via": "marv", "position": 1}
 {"word": "marvel", "synonym": "wonder", "via": "marvel", "position": 1}
 {"word": "marvellous", "synonym": "marvelous", "via": "marvellous", "position": 1}
 {"word": "marvellous", "synonym": "miraculous", "via": "marvellous", "position": 2}
@@ -1111,6 +1167,8 @@
 {"word": "marvelously", "synonym": "superbly", "via": "marvelously", "position": 4}
 {"word": "marvelously", "synonym": "terrifically", "via": "marvelously", "position": 5}
 {"word": "marzipan", "synonym": "marchpane", "via": "marzipan", "position": 1}
+{"word": "masculineness", "synonym": "masculinity", "via": "masculineness", "position": 1}
+{"word": "masculineness", "synonym": "manliness", "via": "masculineness", "position": 2}
 {"word": "masculinise", "synonym": "masculinize", "via": "masculinize", "position": 1}
 {"word": "masculinity", "synonym": "maleness", "via": "masculinity", "position": 1}
 {"word": "masculinize", "synonym": "masculinise", "via": "masculinize", "position": 1}
@@ -1301,7 +1359,6 @@
 {"word": "mate", "synonym": "twin", "via": "mate", "position": 8}
 {"word": "mate", "synonym": "copulate", "via": "mate", "position": 9}
 {"word": "mated", "synonym": "paired", "via": "mate", "position": 1}
-{"word": "mated", "synonym": "paired", "via": "mated", "position": 1}
 {"word": "materfamilias", "synonym": "matriarch", "via": "materfamilias", "position": 1}
 {"word": "material", "synonym": "fabric", "via": "material", "position": 1}
 {"word": "material", "synonym": "cloth", "via": "material", "position": 2}
@@ -1334,8 +1391,6 @@
 {"word": "maternity", "synonym": "gestation", "via": "maternity", "position": 5}
 {"word": "mates", "synonym": "couple", "via": "mate", "position": 1}
 {"word": "mates", "synonym": "match", "via": "mate", "position": 2}
-{"word": "mates", "synonym": "couple", "via": "mates", "position": 1}
-{"word": "mates", "synonym": "match", "via": "mates", "position": 2}
 {"word": "matey", "synonym": "chummy", "via": "friend", "position": 1}
 {"word": "matey", "synonym": "pally", "via": "friend", "position": 2}
 {"word": "matey", "synonym": "chummy", "via": "mate", "position": 1}
@@ -1401,6 +1456,8 @@
 {"word": "matter", "synonym": "issue", "via": "matter", "position": 5}
 {"word": "matter", "synonym": "count", "via": "matter", "position": 6}
 {"word": "matter", "synonym": "weigh", "via": "matter", "position": 7}
+{"word": "matterate", "synonym": "fester", "via": "matterate", "position": 1}
+{"word": "matterate", "synonym": "suppurate", "via": "matterate", "position": 2}
 {"word": "matting", "synonym": "mat", "via": "mat", "position": 1}
 {"word": "matting", "synonym": "mat", "via": "matte", "position": 1}
 {"word": "matting", "synonym": "mat", "via": "matting", "position": 1}
@@ -1446,6 +1503,7 @@
 {"word": "maul", "synonym": "sledge", "via": "maul", "position": 1}
 {"word": "maul", "synonym": "sledgehammer", "via": "maul", "position": 2}
 {"word": "maul", "synonym": "mangle", "via": "maul", "position": 3}
+{"word": "mauldy", "synonym": "lefty", "via": "mauldy", "position": 1}
 {"word": "maulers", "synonym": "hooks", "via": "mauler", "position": 1}
 {"word": "maulstick", "synonym": "mahlstick", "via": "maulstick", "position": 1}
 {"word": "maunder", "synonym": "chatter", "via": "maunder", "position": 1}
@@ -1458,6 +1516,8 @@
 {"word": "maunder", "synonym": "blab", "via": "maunder", "position": 8}
 {"word": "maunder", "synonym": "gibber", "via": "maunder", "position": 9}
 {"word": "maunder", "synonym": "tattle", "via": "maunder", "position": 10}
+{"word": "maungy", "synonym": "sulky", "via": "maungy", "position": 1}
+{"word": "maungy", "synonym": "peevish", "via": "maungy", "position": 2}
 {"word": "maven", "synonym": "ace", "via": "maven", "position": 1}
 {"word": "maven", "synonym": "adept", "via": "maven", "position": 2}
 {"word": "maven", "synonym": "champion", "via": "maven", "position": 3}
@@ -1486,6 +1546,8 @@
 {"word": "maw", "synonym": "hole", "via": "maw", "position": 2}
 {"word": "maw", "synonym": "yap", "via": "maw", "position": 3}
 {"word": "maw", "synonym": "gob", "via": "maw", "position": 4}
+{"word": "mawger", "synonym": "lean", "via": "mawger", "position": 1}
+{"word": "mawger", "synonym": "gaunt", "via": "mawger", "position": 2}
 {"word": "mawkish", "synonym": "bathetic", "via": "mawkish", "position": 1}
 {"word": "mawkish", "synonym": "drippy", "via": "mawkish", "position": 2}
 {"word": "mawkish", "synonym": "hokey", "via": "mawkish", "position": 3}
@@ -1531,6 +1593,7 @@
 {"word": "mayhap", "synonym": "perhaps", "via": "mayhap", "position": 3}
 {"word": "mayhap", "synonym": "maybe", "via": "mayhap", "position": 4}
 {"word": "mayhap", "synonym": "peradventure", "via": "mayhap", "position": 5}
+{"word": "mayhappen", "synonym": "perhaps", "via": "mayhappen", "position": 1}
 {"word": "mayhem", "synonym": "havoc", "via": "mayhem", "position": 1}
 {"word": "mayo", "synonym": "mayonnaise", "via": "mayo", "position": 1}
 {"word": "mayo", "synonym": "mayonnaise", "via": "mayonnaise", "position": 1}
@@ -1552,6 +1615,7 @@
 {"word": "mazed", "synonym": "confounded", "via": "mazed", "position": 5}
 {"word": "mazed", "synonym": "confused", "via": "mazed", "position": 6}
 {"word": "mazed", "synonym": "lost", "via": "mazed", "position": 7}
+{"word": "mazey", "synonym": "dizzy", "via": "mazey", "position": 1}
 {"word": "mazy", "synonym": "labyrinthine", "via": "mazy", "position": 1}
 {"word": "mazy", "synonym": "labyrinthian", "via": "mazy", "position": 2}
 {"word": "meadow", "synonym": "hayfield", "via": "meadow", "position": 1}
@@ -1638,6 +1702,7 @@
 {"word": "means", "synonym": "agency", "via": "means", "position": 1}
 {"word": "means", "synonym": "way", "via": "means", "position": 2}
 {"word": "means", "synonym": "substance", "via": "means", "position": 3}
+{"word": "meanspirited", "synonym": "petty", "via": "meanspirited", "position": 1}
 {"word": "meantime", "synonym": "interim", "via": "meantime", "position": 1}
 {"word": "meantime", "synonym": "meanwhile", "via": "meantime", "position": 2}
 {"word": "meantime", "synonym": "lag", "via": "meantime", "position": 3}
@@ -1706,6 +1771,7 @@
 {"word": "mechanics", "synonym": "mechanism", "via": "mechanic", "position": 1}
 {"word": "mechanics", "synonym": "mechanism", "via": "mechanics", "position": 1}
 {"word": "mechanism", "synonym": "mechanics", "via": "mechanism", "position": 1}
+{"word": "mechanistically", "synonym": "mechanically", "via": "mechanistically", "position": 1}
 {"word": "mechanization", "synonym": "automation", "via": "mechanization", "position": 1}
 {"word": "mechanize", "synonym": "motorize", "via": "mechanize", "position": 1}
 {"word": "mechanize", "synonym": "motorise", "via": "mechanize", "position": 2}
@@ -1762,6 +1828,8 @@
 {"word": "medicate", "synonym": "medicine", "via": "medicate", "position": 1}
 {"word": "medication", "synonym": "medicine", "via": "medication", "position": 1}
 {"word": "medication", "synonym": "medicament", "via": "medication", "position": 2}
+{"word": "medicative", "synonym": "medicinal", "via": "medicative", "position": 1}
+{"word": "medicative", "synonym": "curative", "via": "medicative", "position": 2}
 {"word": "medicine", "synonym": "music", "via": "medicine", "position": 1}
 {"word": "medicine", "synonym": "medication", "via": "medicine", "position": 2}
 {"word": "medicine", "synonym": "medicament", "via": "medicine", "position": 3}
@@ -1844,10 +1912,15 @@
 {"word": "meeting", "synonym": "encounter", "via": "meeting", "position": 3}
 {"word": "meeting", "synonym": "confluence", "via": "meeting", "position": 4}
 {"word": "meetinghouse", "synonym": "conventicle", "via": "meetinghouse", "position": 1}
+{"word": "meg", "synonym": "megabyte", "via": "meg", "position": 1}
+{"word": "mega", "synonym": "huge", "via": "mega", "position": 1}
+{"word": "mega", "synonym": "massive", "via": "mega", "position": 2}
 {"word": "megabucks", "synonym": "pile", "via": "megabuck", "position": 1}
 {"word": "megabucks", "synonym": "bundle", "via": "megabuck", "position": 2}
 {"word": "megabucks", "synonym": "pile", "via": "megabucks", "position": 1}
 {"word": "megabucks", "synonym": "bundle", "via": "megabucks", "position": 2}
+{"word": "megacephalic", "synonym": "macrocephalic", "via": "megacephalic", "position": 1}
+{"word": "megacephalic", "synonym": "megalocephalic", "via": "megacephalic", "position": 2}
 {"word": "megacycle", "synonym": "megahertz", "via": "megacycle", "position": 1}
 {"word": "megahertz", "synonym": "megacycle", "via": "megahertz", "position": 1}
 {"word": "megahit", "synonym": "blockbuster", "via": "megahit", "position": 1}
@@ -1863,7 +1936,11 @@
 {"word": "megrims", "synonym": "blues", "via": "megrims", "position": 1}
 {"word": "megrims", "synonym": "vapors", "via": "megrims", "position": 2}
 {"word": "megrims", "synonym": "vapours", "via": "megrims", "position": 3}
+{"word": "meig", "synonym": "nickel", "via": "meig", "position": 1}
 {"word": "meiosis", "synonym": "litotes", "via": "meiosis", "position": 1}
+{"word": "meister", "synonym": "maven", "via": "meister", "position": 1}
+{"word": "mela", "synonym": "fair", "via": "mela", "position": 1}
+{"word": "mela", "synonym": "festival", "via": "mela", "position": 2}
 {"word": "melancholiac", "synonym": "melancholic", "via": "melancholiac", "position": 1}
 {"word": "melancholic", "synonym": "melancholiac", "via": "melancholic", "position": 1}
 {"word": "melancholic", "synonym": "melancholy", "via": "melancholic", "position": 2}
@@ -1889,6 +1966,7 @@
 {"word": "meld", "synonym": "coalesce", "via": "meld", "position": 8}
 {"word": "meld", "synonym": "combine", "via": "meld", "position": 9}
 {"word": "melee", "synonym": "scrimmage", "via": "melee", "position": 1}
+{"word": "meletin", "synonym": "quercetin", "via": "meletin", "position": 1}
 {"word": "meliorate", "synonym": "better", "via": "meliorate", "position": 1}
 {"word": "meliorate", "synonym": "improve", "via": "meliorate", "position": 2}
 {"word": "meliorate", "synonym": "ameliorate", "via": "meliorate", "position": 3}
@@ -1902,6 +1980,8 @@
 {"word": "meliorist", "synonym": "reformer", "via": "meliorist", "position": 1}
 {"word": "meliorist", "synonym": "reformist", "via": "meliorist", "position": 2}
 {"word": "meliorist", "synonym": "crusader", "via": "meliorist", "position": 3}
+{"word": "meliority", "synonym": "superiority", "via": "meliority", "position": 1}
+{"word": "melitose", "synonym": "raffinose", "via": "melitose", "position": 1}
 {"word": "mellifluous", "synonym": "dulcet", "via": "mellifluous", "position": 1}
 {"word": "mellifluous", "synonym": "honeyed", "via": "mellifluous", "position": 2}
 {"word": "mellifluous", "synonym": "sweet", "via": "mellifluous", "position": 3}
@@ -1928,6 +2008,9 @@
 {"word": "melody", "synonym": "air", "via": "melody", "position": 2}
 {"word": "melody", "synonym": "strain", "via": "melody", "position": 3}
 {"word": "melody", "synonym": "line", "via": "melody", "position": 4}
+{"word": "melongene", "synonym": "eggplant", "via": "melongene", "position": 1}
+{"word": "melongene", "synonym": "aubergine", "via": "melongene", "position": 2}
+{"word": "melos", "synonym": "melody", "via": "melos", "position": 1}
 {"word": "melt", "synonym": "thaw", "via": "melt", "position": 1}
 {"word": "melt", "synonym": "thawing", "via": "melt", "position": 2}
 {"word": "melt", "synonym": "melting", "via": "melt", "position": 3}
@@ -2003,9 +2086,6 @@
 {"word": "men", "synonym": "workforce", "via": "man", "position": 1}
 {"word": "men", "synonym": "manpower", "via": "man", "position": 2}
 {"word": "men", "synonym": "hands", "via": "man", "position": 3}
-{"word": "men", "synonym": "workforce", "via": "men", "position": 1}
-{"word": "men", "synonym": "manpower", "via": "men", "position": 2}
-{"word": "men", "synonym": "hands", "via": "men", "position": 3}
 {"word": "menace", "synonym": "threat", "via": "menace", "position": 1}
 {"word": "menace", "synonym": "endanger", "via": "menace", "position": 2}
 {"word": "menace", "synonym": "jeopardize", "via": "menace", "position": 3}
@@ -2031,6 +2111,7 @@
 {"word": "menage", "synonym": "house", "via": "menage", "position": 3}
 {"word": "menage", "synonym": "home", "via": "menage", "position": 4}
 {"word": "menagerie", "synonym": "zoo", "via": "menagerie", "position": 1}
+{"word": "menat", "synonym": "amulet", "via": "menat", "position": 1}
 {"word": "mend", "synonym": "repair", "via": "mend", "position": 1}
 {"word": "mend", "synonym": "fix", "via": "mend", "position": 2}
 {"word": "mend", "synonym": "fixing", "via": "mend", "position": 3}
@@ -2069,6 +2150,8 @@
 {"word": "meninges", "synonym": "meninx", "via": "meninx", "position": 1}
 {"word": "meninx", "synonym": "meninges", "via": "meninx", "position": 1}
 {"word": "menopause", "synonym": "climacteric", "via": "menopause", "position": 1}
+{"word": "menorrhea", "synonym": "menses", "via": "menorrhea", "position": 1}
+{"word": "menoschesis", "synonym": "amenorrhea", "via": "menoschesis", "position": 1}
 {"word": "menses", "synonym": "menstruation", "via": "menses", "position": 1}
 {"word": "menses", "synonym": "menstruum", "via": "menses", "position": 2}
 {"word": "menses", "synonym": "catamenia", "via": "menses", "position": 3}
@@ -2104,6 +2187,7 @@
 {"word": "mentation", "synonym": "thought", "via": "mentation", "position": 2}
 {"word": "mentation", "synonym": "cerebration", "via": "mentation", "position": 3}
 {"word": "mentation", "synonym": "intellection", "via": "mentation", "position": 4}
+{"word": "menticide", "synonym": "brainwashing", "via": "menticide", "position": 1}
 {"word": "mention", "synonym": "citation", "via": "mention", "position": 1}
 {"word": "mention", "synonym": "cite", "via": "mention", "position": 2}
 {"word": "mention", "synonym": "acknowledgment", "via": "mention", "position": 3}
@@ -2130,6 +2214,7 @@
 {"word": "mephitis", "synonym": "fetor", "via": "mephitis", "position": 5}
 {"word": "mephitis", "synonym": "foetor", "via": "mephitis", "position": 6}
 {"word": "merc", "synonym": "mercenary", "via": "merc", "position": 1}
+{"word": "mercat", "synonym": "market", "via": "mercat", "position": 1}
 {"word": "mercenary", "synonym": "mercantile", "via": "mercenary", "position": 1}
 {"word": "mercenary", "synonym": "moneymaking", "via": "mercenary", "position": 2}
 {"word": "mercenary", "synonym": "freelance", "via": "mercenary", "position": 3}
@@ -2165,9 +2250,11 @@
 {"word": "mercurial", "synonym": "erratic", "via": "mercurial", "position": 1}
 {"word": "mercurial", "synonym": "fickle", "via": "mercurial", "position": 2}
 {"word": "mercurial", "synonym": "quicksilver", "via": "mercurial", "position": 3}
+{"word": "mercurify", "synonym": "amalgamate", "via": "mercurify", "position": 1}
 {"word": "mercury", "synonym": "quicksilver", "via": "mercury", "position": 1}
 {"word": "mercy", "synonym": "clemency", "via": "mercy", "position": 1}
 {"word": "mercy", "synonym": "mercifulness", "via": "mercy", "position": 2}
+{"word": "merdivorous", "synonym": "coprophagous", "via": "merdivorous", "position": 1}
 {"word": "mere", "synonym": "bare", "via": "mere", "position": 1}
 {"word": "mere", "synonym": "simple", "via": "mere", "position": 2}
 {"word": "merely", "synonym": "simply", "via": "merely", "position": 1}
@@ -2231,6 +2318,7 @@
 {"word": "merit", "synonym": "deserve", "via": "merit", "position": 2}
 {"word": "merited", "synonym": "deserved", "via": "merit", "position": 1}
 {"word": "merited", "synonym": "deserved", "via": "merited", "position": 1}
+{"word": "meritedly", "synonym": "deservedly", "via": "meritedly", "position": 1}
 {"word": "merl", "synonym": "blackbird", "via": "merle", "position": 1}
 {"word": "merl", "synonym": "merle", "via": "merle", "position": 2}
 {"word": "merl", "synonym": "ouzel", "via": "merle", "position": 3}
@@ -2299,6 +2387,7 @@
 {"word": "meshuga", "synonym": "meshugge", "via": "meshugge", "position": 1}
 {"word": "meshuga", "synonym": "meshugga", "via": "meshugge", "position": 2}
 {"word": "meshuga", "synonym": "meshuggener", "via": "meshugge", "position": 3}
+{"word": "meshugaas", "synonym": "nonsense", "via": "meshugaas", "position": 1}
 {"word": "meshugga", "synonym": "meshugge", "via": "meshugge", "position": 1}
 {"word": "meshugga", "synonym": "meshuga", "via": "meshugge", "position": 2}
 {"word": "meshugga", "synonym": "meshuggener", "via": "meshugge", "position": 3}
@@ -2360,12 +2449,11 @@
 {"word": "mesmerizing", "synonym": "hypnotic", "via": "mesmerizing", "position": 1}
 {"word": "mesmerizing", "synonym": "mesmeric", "via": "mesmerizing", "position": 2}
 {"word": "mesmerizing", "synonym": "spellbinding", "via": "mesmerizing", "position": 3}
+{"word": "mesomerism", "synonym": "resonance", "via": "mesomerism", "position": 1}
 {"word": "mesomorphic", "synonym": "muscular", "via": "mesomorphic", "position": 1}
 {"word": "meson", "synonym": "mesotron", "via": "meson", "position": 1}
 {"word": "mesonic", "synonym": "mesic", "via": "mesonic", "position": 1}
 {"word": "mesotron", "synonym": "meson", "via": "mesotron", "position": 1}
-{"word": "mesquit", "synonym": "mesquite", "via": "mesquit", "position": 1}
-{"word": "mesquite", "synonym": "mesquit", "via": "mesquite", "position": 1}
 {"word": "mess", "synonym": "batch", "via": "mess", "position": 1}
 {"word": "mess", "synonym": "deal", "via": "mess", "position": 2}
 {"word": "mess", "synonym": "flock", "via": "mess", "position": 3}
@@ -2379,6 +2467,7 @@
 {"word": "message", "synonym": "content", "via": "message", "position": 1}
 {"word": "message", "synonym": "substance", "via": "message", "position": 2}
 {"word": "messenger", "synonym": "courier", "via": "messenger", "position": 1}
+{"word": "messer", "synonym": "bungler", "via": "messer", "position": 1}
 {"word": "messily", "synonym": "untidily", "via": "messily", "position": 1}
 {"word": "messiness", "synonym": "untidiness", "via": "messiness", "position": 1}
 {"word": "messiness", "synonym": "mess", "via": "messiness", "position": 2}
@@ -2386,11 +2475,14 @@
 {"word": "messiness", "synonym": "mussiness", "via": "messiness", "position": 4}
 {"word": "messy", "synonym": "mussy", "via": "messy", "position": 1}
 {"word": "metabolism", "synonym": "metamorphosis", "via": "metabolism", "position": 1}
+{"word": "metaboly", "synonym": "metamorphosis", "via": "metaboly", "position": 1}
 {"word": "metal", "synonym": "alloy", "via": "metal", "position": 1}
 {"word": "metal", "synonym": "metallic", "via": "metal", "position": 2}
+{"word": "metalcrafting", "synonym": "metalworking", "via": "metalcrafting", "position": 1}
 {"word": "metalize", "synonym": "metallize", "via": "metallize", "position": 1}
 {"word": "metallic", "synonym": "metal", "via": "metallic", "position": 1}
 {"word": "metallize", "synonym": "metalize", "via": "metallize", "position": 1}
+{"word": "metallurgic", "synonym": "metallurgical", "via": "metallurgic", "position": 1}
 {"word": "metalwork", "synonym": "metalworking", "via": "metalwork", "position": 1}
 {"word": "metalworker", "synonym": "smith", "via": "metalworker", "position": 1}
 {"word": "metalworking", "synonym": "metalwork", "via": "metalworking", "position": 1}
@@ -2405,6 +2497,7 @@
 {"word": "metamorphose", "synonym": "transmogrify", "via": "metamorphose", "position": 4}
 {"word": "metaphoric", "synonym": "metaphorical", "via": "metaphoric", "position": 1}
 {"word": "metaphorical", "synonym": "metaphoric", "via": "metaphorical", "position": 1}
+{"word": "metaphrast", "synonym": "translator", "via": "metaphrast", "position": 1}
 {"word": "mete", "synonym": "border", "via": "meet", "position": 1}
 {"word": "mete", "synonym": "borderline", "via": "meet", "position": 2}
 {"word": "mete", "synonym": "delimitation", "via": "meet", "position": 3}
@@ -2435,6 +2528,7 @@
 {"word": "methadon", "synonym": "methadone", "via": "methadone", "position": 1}
 {"word": "methadon", "synonym": "fixer", "via": "methadone", "position": 2}
 {"word": "methadone", "synonym": "methadon", "via": "methadone", "position": 1}
+{"word": "methanal", "synonym": "formaldehyde", "via": "methanal", "position": 1}
 {"word": "methaqualone", "synonym": "quaalude", "via": "methaqualone", "position": 1}
 {"word": "methedrine", "synonym": "meth", "via": "methedrine", "position": 1}
 {"word": "methedrine", "synonym": "chalk", "via": "methedrine", "position": 2}
@@ -2443,6 +2537,9 @@
 {"word": "methedrine", "synonym": "ice", "via": "methedrine", "position": 5}
 {"word": "methedrine", "synonym": "trash", "via": "methedrine", "position": 6}
 {"word": "methodicalness", "synonym": "orderliness", "via": "methodicalness", "position": 1}
+{"word": "methylcatechol", "synonym": "guaiacol", "via": "methylcatechol", "position": 1}
+{"word": "methyltheobromine", "synonym": "caffeine", "via": "methyltheobromine", "position": 1}
+{"word": "methyltrinitrobenzene", "synonym": "trinitrotoluene", "via": "methyltrinitrobenzene", "position": 1}
 {"word": "meticulosity", "synonym": "meticulousness", "via": "meticulosity", "position": 1}
 {"word": "meticulosity", "synonym": "scrupulousness", "via": "meticulosity", "position": 2}
 {"word": "meticulous", "synonym": "punctilious", "via": "meticulous", "position": 1}
@@ -2455,6 +2552,8 @@
 {"word": "metier", "synonym": "strength", "via": "metier", "position": 5}
 {"word": "metonymic", "synonym": "metonymical", "via": "metonymic", "position": 1}
 {"word": "metonymical", "synonym": "metonymic", "via": "metonymical", "position": 1}
+{"word": "metoo", "synonym": "derivative", "via": "metoo", "position": 1}
+{"word": "metoo", "synonym": "imitative", "via": "metoo", "position": 2}
 {"word": "metre", "synonym": "meter", "via": "meter", "position": 1}
 {"word": "metre", "synonym": "time", "via": "meter", "position": 2}
 {"word": "metre", "synonym": "measure", "via": "meter", "position": 3}
@@ -2469,6 +2568,7 @@
 {"word": "metric", "synonym": "metrical", "via": "metric", "position": 2}
 {"word": "metrical", "synonym": "measured", "via": "metrical", "position": 1}
 {"word": "metrical", "synonym": "metric", "via": "metrical", "position": 2}
+{"word": "metrician", "synonym": "metrist", "via": "metrician", "position": 1}
 {"word": "metricize", "synonym": "metrify", "via": "metricize", "position": 1}
 {"word": "metrics", "synonym": "prosody", "via": "metric", "position": 1}
 {"word": "metrics", "synonym": "prosody", "via": "metrics", "position": 1}
@@ -2490,6 +2590,7 @@
 {"word": "mettlesome", "synonym": "gritty", "via": "mettlesome", "position": 4}
 {"word": "mettlesome", "synonym": "spirited", "via": "mettlesome", "position": 5}
 {"word": "mettlesome", "synonym": "spunky", "via": "mettlesome", "position": 6}
+{"word": "mevrou", "synonym": "madam", "via": "mevrou", "position": 1}
 {"word": "mew", "synonym": "meow", "via": "mew", "position": 1}
 {"word": "mew", "synonym": "miaou", "via": "mew", "position": 2}
 {"word": "mew", "synonym": "miaow", "via": "mew", "position": 3}
@@ -2522,6 +2623,7 @@
 {"word": "miaul", "synonym": "mew", "via": "miaul", "position": 2}
 {"word": "miaul", "synonym": "miaou", "via": "miaul", "position": 3}
 {"word": "miaul", "synonym": "miaow", "via": "miaul", "position": 4}
+{"word": "miazine", "synonym": "pyrimidine", "via": "miazine", "position": 1}
 {"word": "mica", "synonym": "isinglass", "via": "mica", "position": 1}
 {"word": "mick", "synonym": "paddy", "via": "mick", "position": 1}
 {"word": "mick", "synonym": "mickey", "via": "mick", "position": 2}
@@ -2545,11 +2647,13 @@
 {"word": "micrometeorite", "synonym": "micrometeoroid", "via": "micrometeorite", "position": 1}
 {"word": "micrometeoroid", "synonym": "micrometeorite", "via": "micrometeoroid", "position": 1}
 {"word": "micrometer", "synonym": "micron", "via": "micrometer", "position": 1}
+{"word": "micromicrofarad", "synonym": "picofarad", "via": "micromicrofarad", "position": 1}
 {"word": "micron", "synonym": "micrometer", "via": "micron", "position": 1}
 {"word": "microphone", "synonym": "mike", "via": "microphone", "position": 1}
 {"word": "microscopic", "synonym": "microscopical", "via": "microscopic", "position": 1}
 {"word": "microscopical", "synonym": "microscopic", "via": "microscopical", "position": 1}
 {"word": "microseism", "synonym": "tremor", "via": "microseism", "position": 1}
+{"word": "microspecies", "synonym": "biotype", "via": "microspecies", "position": 1}
 {"word": "microwave", "synonym": "zap", "via": "microwave", "position": 1}
 {"word": "microwave", "synonym": "nuke", "via": "microwave", "position": 2}
 {"word": "micturate", "synonym": "make", "via": "micturate", "position": 1}
@@ -2683,6 +2787,7 @@
 {"word": "mildness", "synonym": "clemency", "via": "mildness", "position": 6}
 {"word": "mile", "synonym": "mil", "via": "mile", "position": 1}
 {"word": "mileage", "synonym": "milage", "via": "mileage", "position": 1}
+{"word": "mileometer", "synonym": "odometer", "via": "mileometer", "position": 1}
 {"word": "milepost", "synonym": "milestone", "via": "milepost", "position": 1}
 {"word": "milestone", "synonym": "milepost", "via": "milestone", "position": 1}
 {"word": "milfoil", "synonym": "yarrow", "via": "milfoil", "position": 1}
@@ -2746,6 +2851,7 @@
 {"word": "millrace", "synonym": "millrun", "via": "millrace", "position": 1}
 {"word": "millrun", "synonym": "millrace", "via": "millrun", "position": 1}
 {"word": "millstone", "synonym": "albatross", "via": "millstone", "position": 1}
+{"word": "milometer", "synonym": "odometer", "via": "milometer", "position": 1}
 {"word": "milquetoast", "synonym": "sissy", "via": "milquetoast", "position": 1}
 {"word": "milquetoast", "synonym": "pantywaist", "via": "milquetoast", "position": 2}
 {"word": "milquetoast", "synonym": "pansy", "via": "milquetoast", "position": 3}
@@ -2761,10 +2867,12 @@
 {"word": "mimer", "synonym": "mime", "via": "mimer", "position": 1}
 {"word": "mimer", "synonym": "mummer", "via": "mimer", "position": 2}
 {"word": "mimer", "synonym": "pantomimist", "via": "mimer", "position": 3}
+{"word": "mimetism", "synonym": "mimicry", "via": "mimetism", "position": 1}
 {"word": "mimic", "synonym": "mimicker", "via": "mimic", "position": 1}
 {"word": "mimic", "synonym": "mime", "via": "mimic", "position": 2}
 {"word": "mimicker", "synonym": "mimic", "via": "mimicker", "position": 1}
 {"word": "mimicry", "synonym": "apery", "via": "mimicry", "position": 1}
+{"word": "mimosis", "synonym": "mimesis", "via": "mimosis", "position": 1}
 {"word": "mina", "synonym": "myna", "via": "mina", "position": 1}
 {"word": "mina", "synonym": "mynah", "via": "mina", "position": 2}
 {"word": "mina", "synonym": "myna", "via": "myna", "position": 1}
@@ -2817,6 +2925,7 @@
 {"word": "mindlessness", "synonym": "pointlessness", "via": "mindlessness", "position": 6}
 {"word": "mindset", "synonym": "mentality", "via": "mindset", "position": 1}
 {"word": "mindset", "synonym": "outlook", "via": "mindset", "position": 2}
+{"word": "minecraft", "synonym": "minesweeper", "via": "minecraft", "position": 1}
 {"word": "mingle", "synonym": "mix", "via": "mingle", "position": 1}
 {"word": "mingle", "synonym": "commix", "via": "mingle", "position": 2}
 {"word": "mingle", "synonym": "unify", "via": "mingle", "position": 3}
@@ -2828,9 +2937,11 @@
 {"word": "mini", "synonym": "miniskirt", "via": "mini", "position": 1}
 {"word": "mini", "synonym": "miniskirt", "via": "minicomputer", "position": 1}
 {"word": "mini", "synonym": "miniskirt", "via": "miniskirt", "position": 1}
+{"word": "miniate", "synonym": "rubricate", "via": "miniate", "position": 1}
 {"word": "miniature", "synonym": "toy", "via": "miniature", "position": 1}
 {"word": "miniature", "synonym": "illumination", "via": "miniature", "position": 2}
 {"word": "minibike", "synonym": "motorbike", "via": "minibike", "position": 1}
+{"word": "minicycle", "synonym": "minibike", "via": "minicycle", "position": 1}
 {"word": "minify", "synonym": "decrease", "via": "minify", "position": 1}
 {"word": "minify", "synonym": "lessen", "via": "minify", "position": 2}
 {"word": "minimal", "synonym": "minimum", "via": "minimal", "position": 1}
@@ -2855,6 +2966,7 @@
 {"word": "ministration", "synonym": "relief", "via": "ministration", "position": 1}
 {"word": "ministration", "synonym": "succor", "via": "ministration", "position": 2}
 {"word": "ministration", "synonym": "succour", "via": "ministration", "position": 3}
+{"word": "minnie", "synonym": "mum", "via": "minnie", "position": 1}
 {"word": "minor", "synonym": "child", "via": "minor", "position": 1}
 {"word": "minor", "synonym": "kid", "via": "minor", "position": 2}
 {"word": "minor", "synonym": "youngster", "via": "minor", "position": 3}
@@ -2866,6 +2978,7 @@
 {"word": "minor", "synonym": "fry", "via": "minor", "position": 9}
 {"word": "minor", "synonym": "nestling", "via": "minor", "position": 10}
 {"word": "minority", "synonym": "nonage", "via": "minority", "position": 1}
+{"word": "minorly", "synonym": "slightly", "via": "minorly", "position": 1}
 {"word": "minstrel", "synonym": "jongleur", "via": "minstrel", "position": 1}
 {"word": "minstrel", "synonym": "troubadour", "via": "minstrel", "position": 2}
 {"word": "mint", "synonym": "batch", "via": "mint", "position": 1}
@@ -2900,8 +3013,6 @@
 {"word": "minuteness", "synonym": "tininess", "via": "minuteness", "position": 3}
 {"word": "minutes", "synonym": "proceedings", "via": "minute", "position": 1}
 {"word": "minutes", "synonym": "transactions", "via": "minute", "position": 2}
-{"word": "minutes", "synonym": "proceedings", "via": "minutes", "position": 1}
-{"word": "minutes", "synonym": "transactions", "via": "minutes", "position": 2}
 {"word": "minx", "synonym": "coquette", "via": "mink", "position": 1}
 {"word": "minx", "synonym": "flirt", "via": "mink", "position": 2}
 {"word": "minx", "synonym": "vamp", "via": "mink", "position": 3}
@@ -2920,6 +3031,7 @@
 {"word": "miraculous", "synonym": "providential", "via": "miraculous", "position": 1}
 {"word": "miraculous", "synonym": "marvelous", "via": "miraculous", "position": 2}
 {"word": "miraculous", "synonym": "marvellous", "via": "miraculous", "position": 3}
+{"word": "mirchi", "synonym": "spicy", "via": "mirchi", "position": 1}
 {"word": "mire", "synonym": "quagmire", "via": "mire", "position": 1}
 {"word": "mire", "synonym": "quag", "via": "mire", "position": 2}
 {"word": "mire", "synonym": "morass", "via": "mire", "position": 3}
@@ -3056,6 +3168,8 @@
 {"word": "misconduct", "synonym": "mismanage", "via": "misconduct", "position": 2}
 {"word": "misconduct", "synonym": "mishandle", "via": "misconduct", "position": 3}
 {"word": "misconduct", "synonym": "misbehave", "via": "misconduct", "position": 4}
+{"word": "misconstruction", "synonym": "misinterpretation", "via": "misconstruction", "position": 1}
+{"word": "misconstruction", "synonym": "misreading", "via": "misconstruction", "position": 2}
 {"word": "misconstrue", "synonym": "misinterpret", "via": "misconstrue", "position": 1}
 {"word": "misconstrue", "synonym": "misconceive", "via": "misconstrue", "position": 2}
 {"word": "misconstrue", "synonym": "misunderstand", "via": "misconstrue", "position": 3}
@@ -3066,6 +3180,7 @@
 {"word": "misdating", "synonym": "anachronism", "via": "misdate", "position": 1}
 {"word": "misdating", "synonym": "mistiming", "via": "misdate", "position": 2}
 {"word": "misdeed", "synonym": "misbehavior", "via": "misdeed", "position": 1}
+{"word": "misdemean", "synonym": "misbehave", "via": "misdemean", "position": 1}
 {"word": "misdemeanor", "synonym": "infraction", "via": "misdemeanor", "position": 1}
 {"word": "misdemeanor", "synonym": "violation", "via": "misdemeanor", "position": 2}
 {"word": "misdemeanor", "synonym": "infringement", "via": "misdemeanor", "position": 3}
@@ -3162,7 +3277,10 @@
 {"word": "mismated", "synonym": "incompatible", "via": "mismated", "position": 1}
 {"word": "mismated", "synonym": "unsuited", "via": "mismated", "position": 2}
 {"word": "misname", "synonym": "miscall", "via": "misname", "position": 1}
+{"word": "misocainea", "synonym": "neophobia", "via": "misocainea", "position": 1}
 {"word": "misogynism", "synonym": "misogyny", "via": "misogynism", "position": 1}
+{"word": "misogynous", "synonym": "misogynistic", "via": "misogynous", "position": 1}
+{"word": "misorientate", "synonym": "misorient", "via": "misorientate", "position": 1}
 {"word": "misplace", "synonym": "mislay", "via": "misplace", "position": 1}
 {"word": "misplaced", "synonym": "mislaid", "via": "misplace", "position": 1}
 {"word": "misplaced", "synonym": "mislaid", "via": "misplaced", "position": 1}
@@ -3299,6 +3417,7 @@
 {"word": "mite", "synonym": "soupcon", "via": "mite", "position": 7}
 {"word": "miter", "synonym": "mitre", "via": "mitre", "position": 1}
 {"word": "miterwort", "synonym": "mitrewort", "via": "miterwort", "position": 1}
+{"word": "mithan", "synonym": "gayal", "via": "mithan", "position": 1}
 {"word": "mitigate", "synonym": "extenuate", "via": "mitigate", "position": 1}
 {"word": "mitigate", "synonym": "palliate", "via": "mitigate", "position": 2}
 {"word": "mitigation", "synonym": "moderation", "via": "mitigation", "position": 1}
@@ -3392,6 +3511,7 @@
 {"word": "mob", "synonym": "throng", "via": "mob", "position": 8}
 {"word": "mob", "synonym": "pile", "via": "mob", "position": 9}
 {"word": "mob", "synonym": "jam", "via": "mob", "position": 10}
+{"word": "mobie", "synonym": "cellphone", "via": "mobie", "position": 1}
 {"word": "mobile", "synonym": "fluid", "via": "mobile", "position": 1}
 {"word": "mobile", "synonym": "nomadic", "via": "mobile", "position": 2}
 {"word": "mobile", "synonym": "peregrine", "via": "mobile", "position": 3}
@@ -3406,8 +3526,10 @@
 {"word": "mobilize", "synonym": "marshal", "via": "mobilize", "position": 2}
 {"word": "mobilize", "synonym": "summon", "via": "mobilize", "position": 3}
 {"word": "mobilize", "synonym": "rally", "via": "mobilize", "position": 4}
+{"word": "moble", "synonym": "muffle", "via": "moble", "position": 1}
 {"word": "mobocracy", "synonym": "ochlocracy", "via": "mobocracy", "position": 1}
 {"word": "mobster", "synonym": "gangster", "via": "mobster", "position": 1}
+{"word": "moby", "synonym": "mobe", "via": "moby", "position": 1}
 {"word": "mock", "synonym": "bemock", "via": "mock", "position": 1}
 {"word": "mocker", "synonym": "mockingbird", "via": "mocker", "position": 1}
 {"word": "mocker", "synonym": "scoffer", "via": "mocker", "position": 2}
@@ -3545,6 +3667,8 @@
 {"word": "modest", "synonym": "low", "via": "modest", "position": 6}
 {"word": "modest", "synonym": "lowly", "via": "modest", "position": 7}
 {"word": "modesty", "synonym": "reserve", "via": "modesty", "position": 1}
+{"word": "modge", "synonym": "botch", "via": "modge", "position": 1}
+{"word": "modge", "synonym": "bungle", "via": "modge", "position": 2}
 {"word": "modification", "synonym": "alteration", "via": "modification", "position": 1}
 {"word": "modification", "synonym": "adjustment", "via": "modification", "position": 2}
 {"word": "modification", "synonym": "change", "via": "modification", "position": 3}
@@ -3677,6 +3801,7 @@
 {"word": "molest", "synonym": "plague", "via": "molest", "position": 8}
 {"word": "molest", "synonym": "provoke", "via": "molest", "position": 9}
 {"word": "molestation", "synonym": "harassment", "via": "molestation", "position": 1}
+{"word": "molilalia", "synonym": "mogilalia", "via": "molilalia", "position": 1}
 {"word": "mollah", "synonym": "mullah", "via": "mullah", "position": 1}
 {"word": "mollah", "synonym": "mulla", "via": "mullah", "position": 2}
 {"word": "mollie", "synonym": "molly", "via": "mollie", "position": 1}
@@ -3779,6 +3904,7 @@
 {"word": "mommy", "synonym": "mum", "via": "mommy", "position": 6}
 {"word": "mommy", "synonym": "mummy", "via": "mommy", "position": 7}
 {"word": "monad", "synonym": "monas", "via": "monad", "position": 1}
+{"word": "monadical", "synonym": "monadic", "via": "monadical", "position": 1}
 {"word": "monarch", "synonym": "sovereign", "via": "monarch", "position": 1}
 {"word": "monarchal", "synonym": "monarchical", "via": "monarchal", "position": 1}
 {"word": "monarchal", "synonym": "monarchic", "via": "monarchal", "position": 2}
@@ -3792,6 +3918,8 @@
 {"word": "monastic", "synonym": "cloistered", "via": "monastic", "position": 2}
 {"word": "monastic", "synonym": "cloistral", "via": "monastic", "position": 3}
 {"word": "monastic", "synonym": "conventual", "via": "monastic", "position": 4}
+{"word": "mondial", "synonym": "worldwide", "via": "mondial", "position": 1}
+{"word": "mondial", "synonym": "global", "via": "mondial", "position": 2}
 {"word": "monecious", "synonym": "monoecious", "via": "monoecious", "position": 1}
 {"word": "monetary", "synonym": "pecuniary", "via": "monetary", "position": 1}
 {"word": "monetise", "synonym": "monetize", "via": "monetize", "position": 1}
@@ -3830,6 +3958,7 @@
 {"word": "mongrel", "synonym": "cur", "via": "mongrel", "position": 1}
 {"word": "mongrel", "synonym": "mutt", "via": "mongrel", "position": 2}
 {"word": "mongrel", "synonym": "bastard", "via": "mongrel", "position": 3}
+{"word": "monial", "synonym": "mullion", "via": "monial", "position": 1}
 {"word": "monied", "synonym": "moneyed", "via": "moneyed", "position": 1}
 {"word": "moniker", "synonym": "nickname", "via": "moniker", "position": 1}
 {"word": "moniker", "synonym": "cognomen", "via": "moniker", "position": 2}
@@ -3871,6 +4000,7 @@
 {"word": "mono", "synonym": "monophonic", "via": "monomorphism", "position": 2}
 {"word": "mono", "synonym": "mononucleosis", "via": "mononucleosis", "position": 1}
 {"word": "mono", "synonym": "monophonic", "via": "mononucleosis", "position": 2}
+{"word": "monochroic", "synonym": "monochromatic", "via": "monochroic", "position": 1}
 {"word": "monochromatic", "synonym": "monochrome", "via": "monochromatic", "position": 1}
 {"word": "monochromatic", "synonym": "monochromic", "via": "monochromatic", "position": 2}
 {"word": "monochrome", "synonym": "monochromatic", "via": "monochrome", "position": 1}
@@ -3886,14 +4016,18 @@
 {"word": "monocracy", "synonym": "absolutism", "via": "monocracy", "position": 2}
 {"word": "monocracy", "synonym": "despotism", "via": "monocracy", "position": 3}
 {"word": "monocracy", "synonym": "tyranny", "via": "monocracy", "position": 4}
+{"word": "monocycle", "synonym": "unicycle", "via": "monocycle", "position": 1}
 {"word": "monodic", "synonym": "monodical", "via": "monodic", "position": 1}
 {"word": "monodical", "synonym": "monodic", "via": "monodical", "position": 1}
 {"word": "monody", "synonym": "monophony", "via": "monody", "position": 1}
 {"word": "monoecious", "synonym": "monecious", "via": "monoecious", "position": 1}
+{"word": "monogenous", "synonym": "monogenetic", "via": "monogenous", "position": 1}
+{"word": "monolatry", "synonym": "henotheism", "via": "monolatry", "position": 1}
 {"word": "monolithic", "synonym": "massive", "via": "monolithic", "position": 1}
 {"word": "monolithic", "synonym": "monumental", "via": "monolithic", "position": 2}
 {"word": "monologue", "synonym": "soliloquy", "via": "monologue", "position": 1}
 {"word": "monomania", "synonym": "possession", "via": "monomania", "position": 1}
+{"word": "monomethylamine", "synonym": "methylamine", "via": "monomethylamine", "position": 1}
 {"word": "mononuclear", "synonym": "mononucleate", "via": "mononuclear", "position": 1}
 {"word": "mononucleate", "synonym": "mononuclear", "via": "mononucleate", "position": 1}
 {"word": "mononucleosis", "synonym": "mono", "via": "mononucleosis", "position": 1}
@@ -3904,6 +4038,7 @@
 {"word": "monopolist", "synonym": "monopolizer", "via": "monopolist", "position": 1}
 {"word": "monopolize", "synonym": "monopolise", "via": "monopolize", "position": 1}
 {"word": "monopolizer", "synonym": "monopolist", "via": "monopolizer", "position": 1}
+{"word": "monosymmetric", "synonym": "zygomorphic", "via": "monosymmetric", "position": 1}
 {"word": "monotone", "synonym": "drone", "via": "monotone", "position": 1}
 {"word": "monotone", "synonym": "droning", "via": "monotone", "position": 2}
 {"word": "monotone", "synonym": "flat", "via": "monotone", "position": 3}
@@ -3918,6 +4053,7 @@
 {"word": "monotonous", "synonym": "monotonic", "via": "monotonous", "position": 4}
 {"word": "monotony", "synonym": "humdrum", "via": "monotony", "position": 1}
 {"word": "monotony", "synonym": "sameness", "via": "monotony", "position": 2}
+{"word": "monotrichate", "synonym": "monotrichous", "via": "monotrichate", "position": 1}
 {"word": "monovalent", "synonym": "univalent", "via": "monovalent", "position": 1}
 {"word": "monovular", "synonym": "identical", "via": "monovular", "position": 1}
 {"word": "monster", "synonym": "freak", "via": "monster", "position": 1}
@@ -3997,6 +4133,7 @@
 {"word": "moolah", "synonym": "kale", "via": "mullah", "position": 8}
 {"word": "moolah", "synonym": "lettuce", "via": "mullah", "position": 9}
 {"word": "moolah", "synonym": "lolly", "via": "mullah", "position": 10}
+{"word": "mooli", "synonym": "daikon", "via": "mooli", "position": 1}
 {"word": "moon", "synonym": "moonlight", "via": "moon", "position": 1}
 {"word": "moon", "synonym": "moonshine", "via": "moon", "position": 2}
 {"word": "moon", "synonym": "lunation", "via": "moon", "position": 3}
@@ -4023,6 +4160,7 @@
 {"word": "moorage", "synonym": "mooring", "via": "moorage", "position": 3}
 {"word": "moorage", "synonym": "berth", "via": "moorage", "position": 4}
 {"word": "moorage", "synonym": "slip", "via": "moorage", "position": 5}
+{"word": "moorbird", "synonym": "moorfowl", "via": "moorbird", "position": 1}
 {"word": "mooring", "synonym": "moorage", "via": "moor", "position": 1}
 {"word": "mooring", "synonym": "berth", "via": "moor", "position": 2}
 {"word": "mooring", "synonym": "slip", "via": "moor", "position": 3}
@@ -4031,6 +4169,7 @@
 {"word": "mooring", "synonym": "slip", "via": "mooring", "position": 3}
 {"word": "moorland", "synonym": "moor", "via": "moorland", "position": 1}
 {"word": "moose", "synonym": "elk", "via": "moose", "position": 1}
+{"word": "moosemilk", "synonym": "moonshine", "via": "moosemilk", "position": 1}
 {"word": "moot", "synonym": "consider", "via": "moot", "position": 1}
 {"word": "moot", "synonym": "debate", "via": "moot", "position": 2}
 {"word": "moot", "synonym": "deliberate", "via": "moot", "position": 3}
@@ -4078,6 +4217,7 @@
 {"word": "morbific", "synonym": "pathogenic", "via": "morbific", "position": 2}
 {"word": "morbilli", "synonym": "measles", "via": "morbilli", "position": 1}
 {"word": "morbilli", "synonym": "rubeola", "via": "morbilli", "position": 2}
+{"word": "mordacious", "synonym": "caustic", "via": "mordacious", "position": 1}
 {"word": "mordant", "synonym": "caustic", "via": "mordant", "position": 1}
 {"word": "mordant", "synonym": "corrosive", "via": "mordant", "position": 2}
 {"word": "mordant", "synonym": "erosive", "via": "mordant", "position": 3}
@@ -4099,6 +4239,7 @@
 {"word": "morning", "synonym": "sunrise", "via": "morning", "position": 7}
 {"word": "morning", "synonym": "sunup", "via": "morning", "position": 8}
 {"word": "morning", "synonym": "cockcrow", "via": "morning", "position": 9}
+{"word": "moroculous", "synonym": "drunk", "via": "moroculous", "position": 1}
 {"word": "moron", "synonym": "idiot", "via": "moron", "position": 1}
 {"word": "moron", "synonym": "imbecile", "via": "moron", "position": 2}
 {"word": "moron", "synonym": "cretin", "via": "moron", "position": 3}
@@ -4122,6 +4263,7 @@
 {"word": "morphological", "synonym": "morphologic", "via": "morphological", "position": 1}
 {"word": "morphological", "synonym": "structural", "via": "morphological", "position": 2}
 {"word": "morphology", "synonym": "geomorphology", "via": "morphology", "position": 1}
+{"word": "morphonology", "synonym": "morphophonemics", "via": "morphonology", "position": 1}
 {"word": "morsel", "synonym": "bit", "via": "morsel", "position": 1}
 {"word": "morsel", "synonym": "bite", "via": "morsel", "position": 2}
 {"word": "mortal", "synonym": "person", "via": "mortal", "position": 1}
@@ -4163,9 +4305,12 @@
 {"word": "mortifying", "synonym": "humiliating", "via": "mortifying", "position": 3}
 {"word": "mortifying", "synonym": "embarrassing", "via": "mortifying", "position": 4}
 {"word": "mortise", "synonym": "mortice", "via": "mortise", "position": 1}
+{"word": "morto", "synonym": "mortified", "via": "morto", "position": 1}
 {"word": "mortuary", "synonym": "morgue", "via": "mortuary", "position": 1}
 {"word": "mosaic", "synonym": "photomosaic", "via": "mosaic", "position": 1}
 {"word": "mosey", "synonym": "amble", "via": "mosey", "position": 1}
+{"word": "mossbunker", "synonym": "menhaden", "via": "mossbunker", "position": 1}
+{"word": "mosstrooper", "synonym": "marauder", "via": "mosstrooper", "position": 1}
 {"word": "mossy", "synonym": "fogyish", "via": "mossy", "position": 1}
 {"word": "mossy", "synonym": "stodgy", "via": "mossy", "position": 2}
 {"word": "most", "synonym": "about", "via": "many", "position": 1}
@@ -4376,6 +4521,8 @@
 {"word": "mound", "synonym": "knoll", "via": "mound", "position": 4}
 {"word": "mound", "synonym": "hillock", "via": "mound", "position": 5}
 {"word": "mound", "synonym": "hummock", "via": "mound", "position": 6}
+{"word": "moundbird", "synonym": "megapode", "via": "moundbird", "position": 1}
+{"word": "moundsman", "synonym": "pitcher", "via": "moundsman", "position": 1}
 {"word": "mount", "synonym": "climb", "via": "mount", "position": 1}
 {"word": "mount", "synonym": "backing", "via": "mount", "position": 2}
 {"word": "mount", "synonym": "setting", "via": "mount", "position": 3}
@@ -4427,6 +4574,7 @@
 {"word": "mouse", "synonym": "sneak", "via": "mouse", "position": 2}
 {"word": "mouse", "synonym": "creep", "via": "mouse", "position": 3}
 {"word": "mouse", "synonym": "pussyfoot", "via": "mouse", "position": 4}
+{"word": "mousebird", "synonym": "coly", "via": "mousebird", "position": 1}
 {"word": "mousey", "synonym": "mousy", "via": "mousy", "position": 1}
 {"word": "mousse", "synonym": "gel", "via": "mousse", "position": 1}
 {"word": "moustache", "synonym": "mustache", "via": "moustache", "position": 1}
@@ -4502,6 +4650,9 @@
 {"word": "moxie", "synonym": "guts", "via": "moxie", "position": 3}
 {"word": "moxie", "synonym": "sand", "via": "moxie", "position": 4}
 {"word": "moxie", "synonym": "gumption", "via": "moxie", "position": 5}
+{"word": "moz", "synonym": "jinx", "via": "moz", "position": 1}
+{"word": "moz", "synonym": "hex", "via": "moz", "position": 2}
+{"word": "mozzle", "synonym": "luck", "via": "mozzle", "position": 1}
 {"word": "much", "synonym": "lots", "via": "much", "position": 1}
 {"word": "mucilage", "synonym": "glue", "via": "mucilage", "position": 1}
 {"word": "mucilage", "synonym": "gum", "via": "mucilage", "position": 2}
@@ -4592,6 +4743,9 @@
 {"word": "muddy", "synonym": "boggy", "via": "muddy", "position": 9}
 {"word": "muddy", "synonym": "marshy", "via": "muddy", "position": 10}
 {"word": "mudslinger", "synonym": "muckraker", "via": "mudslinger", "position": 1}
+{"word": "mudspate", "synonym": "mudslide", "via": "mudspate", "position": 1}
+{"word": "mudspate", "synonym": "mudflow", "via": "mudspate", "position": 2}
+{"word": "mudspringer", "synonym": "mudskipper", "via": "mudspringer", "position": 1}
 {"word": "muff", "synonym": "fumble", "via": "muff", "position": 1}
 {"word": "muff", "synonym": "botch", "via": "muff", "position": 2}
 {"word": "muff", "synonym": "bumble", "via": "muff", "position": 3}
@@ -4646,6 +4800,7 @@
 {"word": "mujik", "synonym": "muzhik", "via": "mujik", "position": 1}
 {"word": "mujik", "synonym": "moujik", "via": "mujik", "position": 2}
 {"word": "mujik", "synonym": "muzjik", "via": "mujik", "position": 3}
+{"word": "mukti", "synonym": "moksha", "via": "mukti", "position": 1}
 {"word": "mulct", "synonym": "fine", "via": "mulct", "position": 1}
 {"word": "mulct", "synonym": "amercement", "via": "mulct", "position": 2}
 {"word": "mulct", "synonym": "victimize", "via": "mulct", "position": 3}
@@ -4657,6 +4812,8 @@
 {"word": "mulct", "synonym": "bunco", "via": "mulct", "position": 9}
 {"word": "mulct", "synonym": "defraud", "via": "mulct", "position": 10}
 {"word": "mule", "synonym": "scuff", "via": "mule", "position": 1}
+{"word": "muleheaded", "synonym": "stubborn", "via": "muleheaded", "position": 1}
+{"word": "muleheaded", "synonym": "obstinate", "via": "muleheaded", "position": 2}
 {"word": "muleteer", "synonym": "skinner", "via": "muleteer", "position": 1}
 {"word": "muliebrity", "synonym": "femininity", "via": "muliebrity", "position": 1}
 {"word": "muliebrity", "synonym": "womanhood", "via": "muliebrity", "position": 2}
@@ -4683,6 +4840,8 @@
 {"word": "mullah", "synonym": "mulla", "via": "muller", "position": 2}
 {"word": "muller", "synonym": "pestle", "via": "muller", "position": 1}
 {"word": "muller", "synonym": "pounder", "via": "muller", "position": 2}
+{"word": "multangular", "synonym": "polygonal", "via": "multangular", "position": 1}
+{"word": "multeity", "synonym": "multiplicity", "via": "multeity", "position": 1}
 {"word": "multicolor", "synonym": "motley", "via": "multicolor", "position": 1}
 {"word": "multicolor", "synonym": "calico", "via": "multicolor", "position": 2}
 {"word": "multicolor", "synonym": "multicolored", "via": "multicolor", "position": 3}
@@ -4704,6 +4863,8 @@
 {"word": "multinomial", "synonym": "polynomial", "via": "multinomial", "position": 1}
 {"word": "multiphase", "synonym": "polyphase", "via": "multiphase", "position": 1}
 {"word": "multiplex", "synonym": "manifold", "via": "multiplex", "position": 1}
+{"word": "multiplicate", "synonym": "multiple", "via": "multiplicate", "position": 1}
+{"word": "multiplicate", "synonym": "manifold", "via": "multiplicate", "position": 2}
 {"word": "multiplication", "synonym": "generation", "via": "multiplication", "position": 1}
 {"word": "multiplication", "synonym": "propagation", "via": "multiplication", "position": 2}
 {"word": "multiplication", "synonym": "times", "via": "multiplication", "position": 3}
@@ -4713,6 +4874,7 @@
 {"word": "multiply", "synonym": "breed", "via": "multiply", "position": 3}
 {"word": "multistoried", "synonym": "multistory", "via": "multistoried", "position": 1}
 {"word": "multistory", "synonym": "multistoried", "via": "multistory", "position": 1}
+{"word": "multisyllable", "synonym": "polysyllable", "via": "multisyllable", "position": 1}
 {"word": "multitude", "synonym": "masses", "via": "multitude", "position": 1}
 {"word": "multitude", "synonym": "mass", "via": "multitude", "position": 2}
 {"word": "multitude", "synonym": "people", "via": "multitude", "position": 3}
@@ -4769,6 +4931,11 @@
 {"word": "mundaneness", "synonym": "worldliness", "via": "mundaneness", "position": 3}
 {"word": "mundanity", "synonym": "ordinariness", "via": "mundanity", "position": 1}
 {"word": "mundanity", "synonym": "mundaneness", "via": "mundanity", "position": 2}
+{"word": "mundify", "synonym": "cleanse", "via": "mundify", "position": 1}
+{"word": "mundify", "synonym": "purify", "via": "mundify", "position": 2}
+{"word": "mung", "synonym": "muck", "via": "mung", "position": 1}
+{"word": "mung", "synonym": "filth", "via": "mung", "position": 2}
+{"word": "munga", "synonym": "canteen", "via": "munga", "position": 1}
 {"word": "munificence", "synonym": "largess", "via": "munificence", "position": 1}
 {"word": "munificence", "synonym": "largesse", "via": "munificence", "position": 2}
 {"word": "munificence", "synonym": "magnanimity", "via": "munificence", "position": 3}
@@ -4783,6 +4950,7 @@
 {"word": "munition", "synonym": "ordnance", "via": "munition", "position": 1}
 {"word": "munition", "synonym": "weaponry", "via": "munition", "position": 2}
 {"word": "munition", "synonym": "arms", "via": "munition", "position": 3}
+{"word": "munted", "synonym": "wrecked", "via": "munted", "position": 1}
 {"word": "murder", "synonym": "slaying", "via": "murder", "position": 1}
 {"word": "murder", "synonym": "execution", "via": "murder", "position": 2}
 {"word": "murder", "synonym": "mangle", "via": "murder", "position": 3}
@@ -4848,6 +5016,7 @@
 {"word": "muscle", "synonym": "muscularity", "via": "muscle", "position": 3}
 {"word": "muscle", "synonym": "sinew", "via": "muscle", "position": 4}
 {"word": "muscle", "synonym": "heftiness", "via": "muscle", "position": 5}
+{"word": "muscler", "synonym": "thug", "via": "muscler", "position": 1}
 {"word": "muscular", "synonym": "mesomorphic", "via": "muscular", "position": 1}
 {"word": "muscular", "synonym": "brawny", "via": "muscular", "position": 2}
 {"word": "muscular", "synonym": "hefty", "via": "muscular", "position": 3}
@@ -4876,6 +5045,7 @@
 {"word": "mush", "synonym": "slop", "via": "mush", "position": 1}
 {"word": "mush", "synonym": "glop", "via": "mush", "position": 2}
 {"word": "mush", "synonym": "pulp", "via": "mush", "position": 3}
+{"word": "mushie", "synonym": "mushroom", "via": "mushie", "position": 1}
 {"word": "mushiness", "synonym": "mawkishness", "via": "mushiness", "position": 1}
 {"word": "mushiness", "synonym": "sentimentality", "via": "mushiness", "position": 2}
 {"word": "mushiness", "synonym": "sloppiness", "via": "mushiness", "position": 3}
@@ -5031,8 +5201,10 @@
 {"word": "muzzy", "synonym": "blurry", "via": "muzzy", "position": 8}
 {"word": "muzzy", "synonym": "foggy", "via": "muzzy", "position": 9}
 {"word": "muzzy", "synonym": "fuzzy", "via": "muzzy", "position": 10}
+{"word": "myatonia", "synonym": "hypotonia", "via": "myatonia", "position": 1}
 {"word": "mycobacteria", "synonym": "mycobacterium", "via": "mycobacterium", "position": 1}
 {"word": "mycobacterium", "synonym": "mycobacteria", "via": "mycobacterium", "position": 1}
+{"word": "mycostat", "synonym": "fungistat", "via": "mycostat", "position": 1}
 {"word": "myelin", "synonym": "myeline", "via": "myelin", "position": 1}
 {"word": "myelinated", "synonym": "medullated", "via": "myelinated", "position": 1}
 {"word": "myeline", "synonym": "myelin", "via": "myelin", "position": 1}
@@ -5041,6 +5213,7 @@
 {"word": "myna", "synonym": "mina", "via": "myna", "position": 2}
 {"word": "mynah", "synonym": "myna", "via": "myna", "position": 1}
 {"word": "mynah", "synonym": "mina", "via": "myna", "position": 2}
+{"word": "myoneuralgia", "synonym": "myalgia", "via": "myoneuralgia", "position": 1}
 {"word": "myopic", "synonym": "short", "via": "myopic", "position": 1}
 {"word": "myopic", "synonym": "shortsighted", "via": "myopic", "position": 2}
 {"word": "myopic", "synonym": "nearsighted", "via": "myopic", "position": 3}
@@ -5123,3 +5296,5 @@
 {"word": "mythological", "synonym": "mythical", "via": "mythological", "position": 3}
 {"word": "mythological", "synonym": "mythologic", "via": "mythological", "position": 4}
 {"word": "mythologize", "synonym": "mythicize", "via": "mythologize", "position": 1}
+{"word": "mythomane", "synonym": "mythomaniac", "via": "mythomane", "position": 1}
+{"word": "mzee", "synonym": "elder", "via": "mzee", "position": 1}

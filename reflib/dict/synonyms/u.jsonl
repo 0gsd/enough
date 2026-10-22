@@ -16,6 +16,8 @@
 {"word": "ugly", "synonym": "unworthy", "via": "ugly", "position": 8}
 {"word": "ugly", "synonym": "worthless", "via": "ugly", "position": 9}
 {"word": "ugly", "synonym": "wretched", "via": "ugly", "position": 10}
+{"word": "uhuru", "synonym": "independence", "via": "uhuru", "position": 1}
+{"word": "uhuru", "synonym": "freedom", "via": "uhuru", "position": 2}
 {"word": "uke", "synonym": "ukulele", "via": "uke", "position": 1}
 {"word": "uke", "synonym": "ukulele", "via": "ukulele", "position": 1}
 {"word": "ukulele", "synonym": "uke", "via": "ukulele", "position": 1}
@@ -39,6 +41,7 @@
 {"word": "ultra", "synonym": "radical", "via": "ultra", "position": 2}
 {"word": "ultramontane", "synonym": "cisalpine", "via": "ultramontane", "position": 1}
 {"word": "ultramontane", "synonym": "transalpine", "via": "ultramontane", "position": 2}
+{"word": "ultramundane", "synonym": "otherworldly", "via": "ultramundane", "position": 1}
 {"word": "ultrasonic", "synonym": "supersonic", "via": "ultrasonic", "position": 1}
 {"word": "ultrasound", "synonym": "sonography", "via": "ultrasound", "position": 1}
 {"word": "ululate", "synonym": "howl", "via": "ululate", "position": 1}
@@ -64,6 +67,7 @@
 {"word": "umbrageous", "synonym": "shadowed", "via": "umbrageous", "position": 5}
 {"word": "umbrageous", "synonym": "shadowy", "via": "umbrageous", "position": 6}
 {"word": "ump", "synonym": "umpire", "via": "ump", "position": 1}
+{"word": "umpie", "synonym": "umpire", "via": "umpie", "position": 1}
 {"word": "umpirage", "synonym": "officiation", "via": "umpirage", "position": 1}
 {"word": "umpirage", "synonym": "officiating", "via": "umpirage", "position": 2}
 {"word": "umpirage", "synonym": "refereeing", "via": "umpirage", "position": 3}
@@ -83,6 +87,8 @@
 {"word": "unacceptable", "synonym": "impossible", "via": "unacceptable", "position": 2}
 {"word": "unacceptably", "synonym": "intolerably", "via": "unacceptably", "position": 1}
 {"word": "unaccepted", "synonym": "unacceptable", "via": "unaccepted", "position": 1}
+{"word": "unaccessible", "synonym": "inaccessible", "via": "unaccessible", "position": 1}
+{"word": "unaccessible", "synonym": "unreachable", "via": "unaccessible", "position": 2}
 {"word": "unaccompanied", "synonym": "alone", "via": "unaccompanied", "position": 1}
 {"word": "unaccompanied", "synonym": "solo", "via": "unaccompanied", "position": 2}
 {"word": "unaccountable", "synonym": "unexplainable", "via": "unaccountable", "position": 1}
@@ -169,6 +175,7 @@
 {"word": "unassisted", "synonym": "unbacked", "via": "unassisted", "position": 1}
 {"word": "unassuming", "synonym": "retiring", "via": "unassuming", "position": 1}
 {"word": "unattached", "synonym": "uncommitted", "via": "unattached", "position": 1}
+{"word": "unattackable", "synonym": "unassailable", "via": "unattackable", "position": 1}
 {"word": "unattainable", "synonym": "undoable", "via": "unattainable", "position": 1}
 {"word": "unattainable", "synonym": "unrealizable", "via": "unattainable", "position": 2}
 {"word": "unattended", "synonym": "neglected", "via": "unattended", "position": 1}
@@ -228,6 +235,8 @@
 {"word": "unbecoming", "synonym": "unseemly", "via": "unbecoming", "position": 4}
 {"word": "unbecoming", "synonym": "untoward", "via": "unbecoming", "position": 5}
 {"word": "unbecomingly", "synonym": "indecorously", "via": "unbecomingly", "position": 1}
+{"word": "unbefitting", "synonym": "unseemly", "via": "unbefitting", "position": 1}
+{"word": "unbefitting", "synonym": "improper", "via": "unbefitting", "position": 2}
 {"word": "unbeknown", "synonym": "unbeknownst", "via": "unbeknown", "position": 1}
 {"word": "unbeknownst", "synonym": "unbeknown", "via": "unbeknownst", "position": 1}
 {"word": "unbelief", "synonym": "disbelief", "via": "unbelief", "position": 1}
@@ -267,6 +276,7 @@
 {"word": "unbent", "synonym": "straight", "via": "unbent", "position": 1}
 {"word": "unbent", "synonym": "unbowed", "via": "unbent", "position": 2}
 {"word": "unbiased", "synonym": "indifferent", "via": "unbiased", "position": 1}
+{"word": "unbiasedly", "synonym": "impartially", "via": "unbiasedly", "position": 1}
 {"word": "unbleached", "synonym": "uncolored", "via": "unbleached", "position": 1}
 {"word": "unbleached", "synonym": "undyed", "via": "unbleached", "position": 2}
 {"word": "unblemished", "synonym": "unmarred", "via": "unblemished", "position": 1}
@@ -298,6 +308,7 @@
 {"word": "unbowed", "synonym": "unbent", "via": "unbowed", "position": 2}
 {"word": "unbrace", "synonym": "untie", "via": "unbrace", "position": 1}
 {"word": "unbrace", "synonym": "unlace", "via": "unbrace", "position": 2}
+{"word": "unbrave", "synonym": "cowardly", "via": "unbrave", "position": 1}
 {"word": "unbridled", "synonym": "unchecked", "via": "unbridle", "position": 1}
 {"word": "unbridled", "synonym": "uncurbed", "via": "unbridle", "position": 2}
 {"word": "unbridled", "synonym": "unchecked", "via": "unbridled", "position": 1}
@@ -313,6 +324,7 @@
 {"word": "uncanny", "synonym": "weird", "via": "uncanny", "position": 2}
 {"word": "uncanny", "synonym": "unearthly", "via": "uncanny", "position": 3}
 {"word": "uncanny", "synonym": "preternatural", "via": "uncanny", "position": 4}
+{"word": "uncapable", "synonym": "incapable", "via": "uncapable", "position": 1}
 {"word": "uncaring", "synonym": "thoughtless", "via": "uncaring", "position": 1}
 {"word": "uncaring", "synonym": "unthinking", "via": "uncaring", "position": 2}
 {"word": "uncaring", "synonym": "detached", "via": "uncaring", "position": 3}
@@ -359,6 +371,8 @@
 {"word": "unchained", "synonym": "unfettered", "via": "unchained", "position": 1}
 {"word": "unchained", "synonym": "unshackled", "via": "unchained", "position": 2}
 {"word": "unchained", "synonym": "untied", "via": "unchained", "position": 3}
+{"word": "unchallengeable", "synonym": "indisputable", "via": "unchallengeable", "position": 1}
+{"word": "unchallengeable", "synonym": "unquestionable", "via": "unchallengeable", "position": 2}
 {"word": "unchallenged", "synonym": "undisputed", "via": "unchallenged", "position": 1}
 {"word": "unchallenged", "synonym": "unquestioned", "via": "unchallenged", "position": 2}
 {"word": "unchangeably", "synonym": "unalterably", "via": "unchangeably", "position": 1}
@@ -422,12 +436,16 @@
 {"word": "uncommitted", "synonym": "unattached", "via": "uncommitted", "position": 1}
 {"word": "uncommitted", "synonym": "available", "via": "uncommitted", "position": 2}
 {"word": "uncommon", "synonym": "rare", "via": "uncommon", "position": 1}
+{"word": "uncompassionate", "synonym": "callous", "via": "uncompassionate", "position": 1}
+{"word": "uncompassionate", "synonym": "heartless", "via": "uncompassionate", "position": 2}
 {"word": "uncompensated", "synonym": "unsalaried", "via": "uncompensated", "position": 1}
 {"word": "uncompleted", "synonym": "incomplete", "via": "uncompleted", "position": 1}
 {"word": "uncomplicated", "synonym": "elementary", "via": "uncomplicated", "position": 1}
 {"word": "uncomplicated", "synonym": "simple", "via": "uncomplicated", "position": 2}
 {"word": "uncomplicated", "synonym": "unproblematic", "via": "uncomplicated", "position": 3}
+{"word": "uncomplimentary", "synonym": "unflattering", "via": "uncomplimentary", "position": 1}
 {"word": "uncompounded", "synonym": "unmixed", "via": "uncompounded", "position": 1}
+{"word": "uncompromised", "synonym": "intact", "via": "uncompromised", "position": 1}
 {"word": "uncompromising", "synonym": "inflexible", "via": "uncompromising", "position": 1}
 {"word": "unconcern", "synonym": "nonchalance", "via": "unconcern", "position": 1}
 {"word": "unconcern", "synonym": "indifference", "via": "unconcern", "position": 2}
@@ -438,6 +456,7 @@
 {"word": "unconditioned", "synonym": "unconditional", "via": "unconditioned", "position": 1}
 {"word": "unconditioned", "synonym": "innate", "via": "unconditioned", "position": 2}
 {"word": "unconditioned", "synonym": "unlearned", "via": "unconditioned", "position": 3}
+{"word": "unconductive", "synonym": "nonconductive", "via": "unconductive", "position": 1}
 {"word": "uncongenial", "synonym": "incompatible", "via": "uncongenial", "position": 1}
 {"word": "uncongenial", "synonym": "hostile", "via": "uncongenial", "position": 2}
 {"word": "uncongenial", "synonym": "unfriendly", "via": "uncongenial", "position": 3}
@@ -457,6 +476,8 @@
 {"word": "unconstraint", "synonym": "abandon", "via": "unconstraint", "position": 1}
 {"word": "unconstraint", "synonym": "wantonness", "via": "unconstraint", "position": 2}
 {"word": "uncontaminated", "synonym": "unpolluted", "via": "uncontaminated", "position": 1}
+{"word": "uncontestably", "synonym": "indisputably", "via": "uncontestably", "position": 1}
+{"word": "uncontestably", "synonym": "undeniably", "via": "uncontestably", "position": 2}
 {"word": "uncontrived", "synonym": "unstudied", "via": "uncontrived", "position": 1}
 {"word": "uncontrollable", "synonym": "irrepressible", "via": "uncontrollable", "position": 1}
 {"word": "uncontrollable", "synonym": "uncorrectable", "via": "uncontrollable", "position": 2}
@@ -470,6 +491,8 @@
 {"word": "unconvincing", "synonym": "unbelievable", "via": "unconvincing", "position": 3}
 {"word": "unconvincing", "synonym": "unlikely", "via": "unconvincing", "position": 4}
 {"word": "uncooperative", "synonym": "disobliging", "via": "uncooperative", "position": 1}
+{"word": "uncordial", "synonym": "unfriendly", "via": "uncordial", "position": 1}
+{"word": "uncordial", "synonym": "cold", "via": "uncordial", "position": 2}
 {"word": "uncounted", "synonym": "countless", "via": "uncounted", "position": 1}
 {"word": "uncounted", "synonym": "infinite", "via": "uncounted", "position": 2}
 {"word": "uncounted", "synonym": "innumerable", "via": "uncounted", "position": 3}
@@ -479,6 +502,7 @@
 {"word": "uncounted", "synonym": "numberless", "via": "uncounted", "position": 7}
 {"word": "uncounted", "synonym": "unnumbered", "via": "uncounted", "position": 8}
 {"word": "uncouple", "synonym": "decouple", "via": "uncouple", "position": 1}
+{"word": "uncourteous", "synonym": "impolite", "via": "uncourteous", "position": 1}
 {"word": "uncouth", "synonym": "coarse", "via": "uncouth", "position": 1}
 {"word": "uncouth", "synonym": "common", "via": "uncouth", "position": 2}
 {"word": "uncouth", "synonym": "vulgar", "via": "uncouth", "position": 3}
@@ -537,6 +561,9 @@
 {"word": "uncultivated", "synonym": "uncultured", "via": "uncultivated", "position": 3}
 {"word": "uncultured", "synonym": "artless", "via": "uncultured", "position": 1}
 {"word": "uncultured", "synonym": "uncultivated", "via": "uncultured", "position": 2}
+{"word": "uncurable", "synonym": "incurable", "via": "uncurable", "position": 1}
+{"word": "uncurableness", "synonym": "incurability", "via": "uncurableness", "position": 1}
+{"word": "uncurably", "synonym": "incurably", "via": "uncurably", "position": 1}
 {"word": "uncurbed", "synonym": "unbridled", "via": "uncurbed", "position": 1}
 {"word": "uncurbed", "synonym": "unchecked", "via": "uncurbed", "position": 2}
 {"word": "uncurtained", "synonym": "curtainless", "via": "uncurtained", "position": 1}
@@ -561,6 +588,12 @@
 {"word": "undefiled", "synonym": "immaculate", "via": "undefiled", "position": 1}
 {"word": "undefinable", "synonym": "indefinable", "via": "undefinable", "position": 1}
 {"word": "undefined", "synonym": "vague", "via": "undefined", "position": 1}
+{"word": "undefinite", "synonym": "indefinite", "via": "undefinite", "position": 1}
+{"word": "undefinite", "synonym": "vague", "via": "undefinite", "position": 2}
+{"word": "undefinitely", "synonym": "vaguely", "via": "undefinitely", "position": 1}
+{"word": "undeliberately", "synonym": "inadvertently", "via": "undeliberately", "position": 1}
+{"word": "undeliberately", "synonym": "unintentionally", "via": "undeliberately", "position": 2}
+{"word": "undemonstrative", "synonym": "reserved", "via": "undemonstrative", "position": 1}
 {"word": "undependable", "synonym": "unreliable", "via": "undependable", "position": 1}
 {"word": "under", "synonym": "nether", "via": "under", "position": 1}
 {"word": "under", "synonym": "below", "via": "under", "position": 2}
@@ -568,6 +601,7 @@
 {"word": "underage", "synonym": "minor", "via": "underage", "position": 1}
 {"word": "underarm", "synonym": "underhand", "via": "underarm", "position": 1}
 {"word": "underarm", "synonym": "underhanded", "via": "underarm", "position": 2}
+{"word": "underbearer", "synonym": "pallbearer", "via": "underbearer", "position": 1}
 {"word": "underbelly", "synonym": "underbody", "via": "underbelly", "position": 1}
 {"word": "underbody", "synonym": "underbelly", "via": "underbody", "position": 1}
 {"word": "underbred", "synonym": "bounderish", "via": "underbred", "position": 1}
@@ -586,6 +620,7 @@
 {"word": "undercoat", "synonym": "primer", "via": "undercoat", "position": 3}
 {"word": "undercoat", "synonym": "priming", "via": "undercoat", "position": 4}
 {"word": "undercoat", "synonym": "prime", "via": "undercoat", "position": 5}
+{"word": "undercompensate", "synonym": "underpay", "via": "undercompensate", "position": 1}
 {"word": "undercover", "synonym": "clandestine", "via": "undercover", "position": 1}
 {"word": "undercover", "synonym": "secret", "via": "undercover", "position": 2}
 {"word": "undercover", "synonym": "surreptitious", "via": "undercover", "position": 3}
@@ -594,6 +629,7 @@
 {"word": "undercut", "synonym": "cut", "via": "undercut", "position": 1}
 {"word": "undercut", "synonym": "tenderloin", "via": "undercut", "position": 2}
 {"word": "undercut", "synonym": "undersell", "via": "undercut", "position": 3}
+{"word": "underdaks", "synonym": "underpants", "via": "underdaks", "position": 1}
 {"word": "underdeveloped", "synonym": "developing", "via": "underdeveloped", "position": 1}
 {"word": "underdrawers", "synonym": "drawers", "via": "underdrawers", "position": 1}
 {"word": "underdrawers", "synonym": "shorts", "via": "underdrawers", "position": 2}
@@ -604,6 +640,7 @@
 {"word": "underestimate", "synonym": "undervalue", "via": "underestimate", "position": 4}
 {"word": "underfed", "synonym": "undernourished", "via": "underfed", "position": 1}
 {"word": "underfed", "synonym": "undernourished", "via": "underfeed", "position": 1}
+{"word": "underflow", "synonym": "undercurrent", "via": "underflow", "position": 1}
 {"word": "underfur", "synonym": "undercoat", "via": "underfur", "position": 1}
 {"word": "undergarment", "synonym": "unmentionable", "via": "undergarment", "position": 1}
 {"word": "undergrad", "synonym": "undergraduate", "via": "undergrad", "position": 1}
@@ -617,8 +654,10 @@
 {"word": "underground", "synonym": "surreptitious", "via": "underground", "position": 7}
 {"word": "underground", "synonym": "undercover", "via": "underground", "position": 8}
 {"word": "underground", "synonym": "belowground", "via": "underground", "position": 9}
+{"word": "undergrown", "synonym": "stunted", "via": "undergrown", "position": 1}
 {"word": "undergrowth", "synonym": "underbrush", "via": "undergrowth", "position": 1}
 {"word": "undergrowth", "synonym": "underwood", "via": "undergrowth", "position": 2}
+{"word": "underhair", "synonym": "undercoat", "via": "underhair", "position": 1}
 {"word": "underhand", "synonym": "sneaky", "via": "underhand", "position": 1}
 {"word": "underhand", "synonym": "underhanded", "via": "underhand", "position": 2}
 {"word": "underhand", "synonym": "underarm", "via": "underhand", "position": 3}
@@ -658,6 +697,7 @@
 {"word": "underplay", "synonym": "underact", "via": "underplay", "position": 1}
 {"word": "underprice", "synonym": "dump", "via": "underprice", "position": 1}
 {"word": "underprivileged", "synonym": "disadvantaged", "via": "underprivileged", "position": 1}
+{"word": "underquote", "synonym": "undercut", "via": "underquote", "position": 1}
 {"word": "underrate", "synonym": "underestimate", "via": "underrate", "position": 1}
 {"word": "underrating", "synonym": "underestimate", "via": "underrate", "position": 1}
 {"word": "underscore", "synonym": "underline", "via": "underscore", "position": 1}
@@ -676,6 +716,7 @@
 {"word": "underskirt", "synonym": "petticoat", "via": "underskirt", "position": 1}
 {"word": "underslung", "synonym": "squat", "via": "underslung", "position": 1}
 {"word": "underslung", "synonym": "undershot", "via": "underslung", "position": 2}
+{"word": "undersoil", "synonym": "subsoil", "via": "undersoil", "position": 1}
 {"word": "understaffed", "synonym": "undermanned", "via": "understaffed", "position": 1}
 {"word": "understand", "synonym": "realize", "via": "understand", "position": 1}
 {"word": "understand", "synonym": "realise", "via": "understand", "position": 2}
@@ -718,6 +759,7 @@
 {"word": "understood", "synonym": "tacit", "via": "understand", "position": 2}
 {"word": "understood", "synonym": "silent", "via": "understood", "position": 1}
 {"word": "understood", "synonym": "tacit", "via": "understood", "position": 2}
+{"word": "understratum", "synonym": "substratum", "via": "understratum", "position": 1}
 {"word": "understudy", "synonym": "standby", "via": "understudy", "position": 1}
 {"word": "understudy", "synonym": "alternate", "via": "understudy", "position": 2}
 {"word": "undersurface", "synonym": "bottom", "via": "undersurface", "position": 1}
@@ -739,6 +781,7 @@
 {"word": "undervalue", "synonym": "devaluate", "via": "undervalue", "position": 2}
 {"word": "undervalue", "synonym": "devalue", "via": "undervalue", "position": 3}
 {"word": "undervalue", "synonym": "underestimate", "via": "undervalue", "position": 4}
+{"word": "undervest", "synonym": "undershirt", "via": "undervest", "position": 1}
 {"word": "underwater", "synonym": "subaqueous", "via": "underwater", "position": 1}
 {"word": "underwater", "synonym": "subaquatic", "via": "underwater", "position": 2}
 {"word": "underwater", "synonym": "submerged", "via": "underwater", "position": 3}
@@ -763,8 +806,11 @@
 {"word": "underwrite", "synonym": "insure", "via": "underwrite", "position": 3}
 {"word": "underwriter", "synonym": "insurer", "via": "underwriter", "position": 1}
 {"word": "undeserving", "synonym": "unworthy", "via": "undeserving", "position": 1}
+{"word": "undesigned", "synonym": "unintentional", "via": "undesigned", "position": 1}
+{"word": "undesigned", "synonym": "unplanned", "via": "undesigned", "position": 2}
 {"word": "undesirable", "synonym": "unwanted", "via": "undesirable", "position": 1}
 {"word": "undesirable", "synonym": "unsuitable", "via": "undesirable", "position": 2}
+{"word": "undesirableness", "synonym": "undesirability", "via": "undesirableness", "position": 1}
 {"word": "undesired", "synonym": "unsought", "via": "undesired", "position": 1}
 {"word": "undetectable", "synonym": "indiscernible", "via": "undetectable", "position": 1}
 {"word": "undetectable", "synonym": "insensible", "via": "undetectable", "position": 2}
@@ -791,6 +837,7 @@
 {"word": "undisclosed", "synonym": "unrevealed", "via": "undisclosed", "position": 1}
 {"word": "undiscouraged", "synonym": "undeterred", "via": "undiscouraged", "position": 1}
 {"word": "undiscovered", "synonym": "unexplored", "via": "undiscovered", "position": 1}
+{"word": "undiscriminating", "synonym": "indiscriminate", "via": "undiscriminating", "position": 1}
 {"word": "undismayed", "synonym": "undaunted", "via": "undismayed", "position": 1}
 {"word": "undismayed", "synonym": "unshaken", "via": "undismayed", "position": 2}
 {"word": "undisputable", "synonym": "incontestable", "via": "indisputable", "position": 1}
@@ -927,11 +974,14 @@
 {"word": "unequalled", "synonym": "unequaled", "via": "unequalled", "position": 3}
 {"word": "unequalled", "synonym": "unparalleled", "via": "unequalled", "position": 4}
 {"word": "unequally", "synonym": "unevenly", "via": "unequally", "position": 1}
+{"word": "unequitable", "synonym": "inequitable", "via": "unequitable", "position": 1}
 {"word": "unequivocal", "synonym": "univocal", "via": "unequivocal", "position": 1}
 {"word": "unequivocal", "synonym": "unambiguous", "via": "unequivocal", "position": 2}
 {"word": "unequivocal", "synonym": "definitive", "via": "unequivocal", "position": 3}
 {"word": "unequivocally", "synonym": "unambiguously", "via": "unequivocally", "position": 1}
 {"word": "unerring", "synonym": "inerrant", "via": "unerring", "position": 1}
+{"word": "unescapably", "synonym": "inescapably", "via": "unescapably", "position": 1}
+{"word": "unescorted", "synonym": "unaccompanied", "via": "unescorted", "position": 1}
 {"word": "unessential", "synonym": "inessential", "via": "unessential", "position": 1}
 {"word": "uneven", "synonym": "spotty", "via": "uneven", "position": 1}
 {"word": "uneven", "synonym": "scratchy", "via": "uneven", "position": 2}
@@ -942,6 +992,8 @@
 {"word": "unevenness", "synonym": "variability", "via": "unevenness", "position": 1}
 {"word": "unexampled", "synonym": "new", "via": "unexampled", "position": 1}
 {"word": "unexcelled", "synonym": "unsurpassed", "via": "unexcelled", "position": 1}
+{"word": "unexceptionable", "synonym": "blameless", "via": "unexceptionable", "position": 1}
+{"word": "unexceptionable", "synonym": "irreproachable", "via": "unexceptionable", "position": 2}
 {"word": "unexpectedly", "synonym": "accidentally", "via": "unexpectedly", "position": 1}
 {"word": "unexpended", "synonym": "leftover", "via": "unexpended", "position": 1}
 {"word": "unexpended", "synonym": "left", "via": "unexpended", "position": 2}
@@ -1033,6 +1085,7 @@
 {"word": "unflagging", "synonym": "indefatigable", "via": "unflagging", "position": 2}
 {"word": "unflagging", "synonym": "tireless", "via": "unflagging", "position": 3}
 {"word": "unflappable", "synonym": "imperturbable", "via": "unflappable", "position": 1}
+{"word": "unflavored", "synonym": "plain", "via": "unflavored", "position": 1}
 {"word": "unfledged", "synonym": "fledgling", "via": "unfledged", "position": 1}
 {"word": "unfledged", "synonym": "callow", "via": "unfledged", "position": 2}
 {"word": "unfledged", "synonym": "immature", "via": "unfledged", "position": 3}
@@ -1093,6 +1146,7 @@
 {"word": "ungallant", "synonym": "caddish", "via": "ungallant", "position": 1}
 {"word": "ungallant", "synonym": "unchivalrous", "via": "ungallant", "position": 2}
 {"word": "ungenerous", "synonym": "stingy", "via": "ungenerous", "position": 1}
+{"word": "ungenuine", "synonym": "fake", "via": "ungenuine", "position": 1}
 {"word": "unglamorous", "synonym": "commonplace", "via": "unglamorous", "position": 1}
 {"word": "unglamorous", "synonym": "humdrum", "via": "unglamorous", "position": 2}
 {"word": "unglamorous", "synonym": "prosaic", "via": "unglamorous", "position": 3}
@@ -1117,6 +1171,8 @@
 {"word": "unguent", "synonym": "unction", "via": "unguent", "position": 2}
 {"word": "unguent", "synonym": "balm", "via": "unguent", "position": 3}
 {"word": "unguent", "synonym": "salve", "via": "unguent", "position": 4}
+{"word": "unguinous", "synonym": "oily", "via": "unguinous", "position": 1}
+{"word": "unguinous", "synonym": "greasy", "via": "unguinous", "position": 2}
 {"word": "ungulate", "synonym": "hoofed", "via": "ungulate", "position": 1}
 {"word": "ungulate", "synonym": "hooved", "via": "ungulate", "position": 2}
 {"word": "unhallow", "synonym": "desecrate", "via": "unhallow", "position": 1}
@@ -1224,6 +1280,7 @@
 {"word": "unimaginative", "synonym": "sterile", "via": "unimaginative", "position": 4}
 {"word": "unimaginative", "synonym": "uninspired", "via": "unimaginative", "position": 5}
 {"word": "unimaginative", "synonym": "uninventive", "via": "unimaginative", "position": 6}
+{"word": "unimagined", "synonym": "unforeseen", "via": "unimagined", "position": 1}
 {"word": "unimpeachable", "synonym": "blameless", "via": "unimpeachable", "position": 1}
 {"word": "unimpeachable", "synonym": "inculpable", "via": "unimpeachable", "position": 2}
 {"word": "unimpeachable", "synonym": "irreproachable", "via": "unimpeachable", "position": 3}
@@ -1256,6 +1313,7 @@
 {"word": "uninventive", "synonym": "uninspired", "via": "uninventive", "position": 3}
 {"word": "uninvolved", "synonym": "degage", "via": "uninvolved", "position": 1}
 {"word": "uninvolved", "synonym": "detached", "via": "uninvolved", "position": 2}
+{"word": "uniocular", "synonym": "monocular", "via": "uniocular", "position": 1}
 {"word": "union", "synonym": "unification", "via": "union", "position": 1}
 {"word": "union", "synonym": "uniting", "via": "union", "position": 2}
 {"word": "union", "synonym": "conjugation", "via": "union", "position": 3}
@@ -1345,6 +1403,7 @@
 {"word": "universe", "synonym": "macrocosm", "via": "universe", "position": 6}
 {"word": "univocal", "synonym": "unequivocal", "via": "univocal", "position": 1}
 {"word": "univocal", "synonym": "unambiguous", "via": "univocal", "position": 2}
+{"word": "unjoin", "synonym": "separate", "via": "unjoin", "position": 1}
 {"word": "unjust", "synonym": "unfair", "via": "unjust", "position": 1}
 {"word": "unjust", "synonym": "inequitable", "via": "unjust", "position": 2}
 {"word": "unjustifiable", "synonym": "indefensible", "via": "unjustifiable", "position": 1}
@@ -1357,6 +1416,7 @@
 {"word": "unjustness", "synonym": "injustice", "via": "unjustness", "position": 1}
 {"word": "unkept", "synonym": "broken", "via": "unkempt", "position": 1}
 {"word": "unkept", "synonym": "broken", "via": "unkept", "position": 1}
+{"word": "unkie", "synonym": "morphine", "via": "unkie", "position": 1}
 {"word": "unkind", "synonym": "pitiless", "via": "unkind", "position": 1}
 {"word": "unkindly", "synonym": "unsympathetic", "via": "unkindly", "position": 1}
 {"word": "unknot", "synonym": "unravel", "via": "unknot", "position": 1}
@@ -1400,6 +1460,8 @@
 {"word": "unlawful", "synonym": "outlawed", "via": "unlawful", "position": 4}
 {"word": "unlawful", "synonym": "wrongful", "via": "unlawful", "position": 5}
 {"word": "unlawful", "synonym": "improper", "via": "unlawful", "position": 6}
+{"word": "unlax", "synonym": "relax", "via": "unlax", "position": 1}
+{"word": "unlax", "synonym": "unwind", "via": "unlax", "position": 2}
 {"word": "unleaded", "synonym": "leadless", "via": "unlead", "position": 1}
 {"word": "unleaded", "synonym": "leadless", "via": "unleaded", "position": 1}
 {"word": "unlearned", "synonym": "ignorant", "via": "unlearn", "position": 1}
@@ -1516,6 +1578,7 @@
 {"word": "unmercifully", "synonym": "mercilessly", "via": "unmercifully", "position": 1}
 {"word": "unmercifully", "synonym": "pitilessly", "via": "unmercifully", "position": 2}
 {"word": "unmercifully", "synonym": "remorselessly", "via": "unmercifully", "position": 3}
+{"word": "unmeritedly", "synonym": "undeservedly", "via": "unmeritedly", "position": 1}
 {"word": "unmilitary", "synonym": "nonmilitary", "via": "unmilitary", "position": 1}
 {"word": "unmindful", "synonym": "oblivious", "via": "unmindful", "position": 1}
 {"word": "unmindful", "synonym": "forgetful", "via": "unmindful", "position": 2}
@@ -1573,6 +1636,7 @@
 {"word": "unnumbered", "synonym": "myriad", "via": "unnumbered", "position": 6}
 {"word": "unnumbered", "synonym": "numberless", "via": "unnumbered", "position": 7}
 {"word": "unnumbered", "synonym": "uncounted", "via": "unnumbered", "position": 8}
+{"word": "unobjectionable", "synonym": "inoffensive", "via": "unobjectionable", "position": 1}
 {"word": "unobservant", "synonym": "unseeing", "via": "unobservant", "position": 1}
 {"word": "unobserved", "synonym": "unseen", "via": "unobserved", "position": 1}
 {"word": "unobtainable", "synonym": "inaccessible", "via": "unobtainable", "position": 1}
@@ -1582,6 +1646,7 @@
 {"word": "unopen", "synonym": "closed", "via": "unopen", "position": 2}
 {"word": "unordered", "synonym": "unranked", "via": "unordered", "position": 1}
 {"word": "unordered", "synonym": "disordered", "via": "unordered", "position": 2}
+{"word": "unordinary", "synonym": "unusual", "via": "unordinary", "position": 1}
 {"word": "unorganized", "synonym": "nonunionized", "via": "unorganized", "position": 1}
 {"word": "unornamented", "synonym": "plain", "via": "unornamented", "position": 1}
 {"word": "unornamented", "synonym": "bare", "via": "unornamented", "position": 2}
@@ -1608,6 +1673,7 @@
 {"word": "unpassable", "synonym": "impassable", "via": "unpassable", "position": 1}
 {"word": "unpatriotic", "synonym": "disloyal", "via": "unpatriotic", "position": 1}
 {"word": "unperceived", "synonym": "unremarked", "via": "unperceived", "position": 1}
+{"word": "unpermitted", "synonym": "unauthorized", "via": "unpermitted", "position": 1}
 {"word": "unperson", "synonym": "nonperson", "via": "unperson", "position": 1}
 {"word": "unpersuaded", "synonym": "unconverted", "via": "unpersuaded", "position": 1}
 {"word": "unperturbed", "synonym": "unruffled", "via": "unperturbed", "position": 1}
@@ -1624,8 +1690,14 @@
 {"word": "unplumbed", "synonym": "unsounded", "via": "unplumbed", "position": 2}
 {"word": "unpolished", "synonym": "gauche", "via": "unpolished", "position": 1}
 {"word": "unpolished", "synonym": "graceless", "via": "unpolished", "position": 2}
+{"word": "unpolitic", "synonym": "impolitic", "via": "unpolitic", "position": 1}
+{"word": "unpolitic", "synonym": "unwise", "via": "unpolitic", "position": 2}
 {"word": "unpolitical", "synonym": "apolitical", "via": "unpolitical", "position": 1}
 {"word": "unpolluted", "synonym": "uncontaminated", "via": "unpolluted", "position": 1}
+{"word": "unpopulated", "synonym": "uninhabited", "via": "unpopulated", "position": 1}
+{"word": "unpracticable", "synonym": "impracticable", "via": "unpracticable", "position": 1}
+{"word": "unpracticable", "synonym": "unworkable", "via": "unpracticable", "position": 2}
+{"word": "unpracticed", "synonym": "inexperienced", "via": "unpracticed", "position": 1}
 {"word": "unpredictable", "synonym": "irregular", "via": "unpredictable", "position": 1}
 {"word": "unpredictably", "synonym": "erratically", "via": "unpredictably", "position": 1}
 {"word": "unprejudiced", "synonym": "impartial", "via": "unprejudiced", "position": 1}
@@ -1634,6 +1706,9 @@
 {"word": "unpretentious", "synonym": "unostentatious", "via": "unpretentious", "position": 1}
 {"word": "unpretentious", "synonym": "unpretending", "via": "unpretentious", "position": 2}
 {"word": "unpretentious", "synonym": "understated", "via": "unpretentious", "position": 3}
+{"word": "unprison", "synonym": "free", "via": "unprison", "position": 1}
+{"word": "unprison", "synonym": "release", "via": "unprison", "position": 2}
+{"word": "unprizable", "synonym": "worthless", "via": "unprizable", "position": 1}
 {"word": "unproblematic", "synonym": "elementary", "via": "unproblematic", "position": 1}
 {"word": "unproblematic", "synonym": "simple", "via": "unproblematic", "position": 2}
 {"word": "unproblematic", "synonym": "uncomplicated", "via": "unproblematic", "position": 3}
@@ -1644,6 +1719,8 @@
 {"word": "unprogressive", "synonym": "standpat", "via": "unprogressive", "position": 2}
 {"word": "unprogressive", "synonym": "nonprogressive", "via": "unprogressive", "position": 3}
 {"word": "unprompted", "synonym": "impulsive", "via": "unprompted", "position": 1}
+{"word": "unprotesting", "synonym": "uncomplaining", "via": "unprotesting", "position": 1}
+{"word": "unproud", "synonym": "humble", "via": "unproud", "position": 1}
 {"word": "unproved", "synonym": "unproven", "via": "unproved", "position": 1}
 {"word": "unproven", "synonym": "unproved", "via": "unproven", "position": 1}
 {"word": "unprovoked", "synonym": "motiveless", "via": "unprovoked", "position": 1}
@@ -1674,6 +1751,7 @@
 {"word": "unravel", "synonym": "ravel", "via": "unravel", "position": 6}
 {"word": "unreachable", "synonym": "unapproachable", "via": "unreachable", "position": 1}
 {"word": "unreachable", "synonym": "unreached", "via": "unreachable", "position": 2}
+{"word": "unreactive", "synonym": "inert", "via": "unreactive", "position": 1}
 {"word": "unreadable", "synonym": "indecipherable", "via": "unreadable", "position": 1}
 {"word": "unreadable", "synonym": "unclear", "via": "unreadable", "position": 2}
 {"word": "unreadable", "synonym": "undecipherable", "via": "unreadable", "position": 3}
@@ -1691,6 +1769,8 @@
 {"word": "unreasonably", "synonym": "immoderately", "via": "unreasonably", "position": 1}
 {"word": "unreasoning", "synonym": "blind", "via": "unreasoning", "position": 1}
 {"word": "unreasoningly", "synonym": "viscerally", "via": "unreasoningly", "position": 1}
+{"word": "unreckonable", "synonym": "incalculable", "via": "unreckonable", "position": 1}
+{"word": "unreckonable", "synonym": "innumerable", "via": "unreckonable", "position": 2}
 {"word": "unreconcilable", "synonym": "irreconcilable", "via": "unreconcilable", "position": 1}
 {"word": "unrecoverable", "synonym": "irrecoverable", "via": "unrecoverable", "position": 1}
 {"word": "unredeemable", "synonym": "irreclaimable", "via": "unredeemable", "position": 1}
@@ -1701,7 +1781,12 @@
 {"word": "unredeemed", "synonym": "unsaved", "via": "unredeemed", "position": 4}
 {"word": "unrefined", "synonym": "unprocessed", "via": "unrefined", "position": 1}
 {"word": "unrefined", "synonym": "crude", "via": "unrefined", "position": 2}
+{"word": "unreflected", "synonym": "unconsidered", "via": "unreflected", "position": 1}
+{"word": "unreflecting", "synonym": "thoughtless", "via": "unreflecting", "position": 1}
 {"word": "unreflective", "synonym": "unthinking", "via": "unreflective", "position": 1}
+{"word": "unrefreshed", "synonym": "weary", "via": "unrefreshed", "position": 1}
+{"word": "unrefreshed", "synonym": "drained", "via": "unrefreshed", "position": 2}
+{"word": "unregarded", "synonym": "ignored", "via": "unregarded", "position": 1}
 {"word": "unregenerate", "synonym": "stubborn", "via": "unregenerate", "position": 1}
 {"word": "unregenerate", "synonym": "obstinate", "via": "unregenerate", "position": 2}
 {"word": "unrehearsed", "synonym": "extemporaneous", "via": "unrehearsed", "position": 1}
@@ -1710,6 +1795,8 @@
 {"word": "unrehearsed", "synonym": "impromptu", "via": "unrehearsed", "position": 4}
 {"word": "unrehearsed", "synonym": "offhand", "via": "unrehearsed", "position": 5}
 {"word": "unrehearsed", "synonym": "offhanded", "via": "unrehearsed", "position": 6}
+{"word": "unreined", "synonym": "unbridled", "via": "unreined", "position": 1}
+{"word": "unreined", "synonym": "unrestrained", "via": "unreined", "position": 2}
 {"word": "unrelenting", "synonym": "persistent", "via": "unrelenting", "position": 1}
 {"word": "unrelenting", "synonym": "relentless", "via": "unrelenting", "position": 2}
 {"word": "unrelenting", "synonym": "brutal", "via": "unrelenting", "position": 3}
@@ -1732,6 +1819,8 @@
 {"word": "unremarkably", "synonym": "commonly", "via": "unremarkably", "position": 3}
 {"word": "unremarkably", "synonym": "ordinarily", "via": "unremarkably", "position": 4}
 {"word": "unremarked", "synonym": "unperceived", "via": "unremarked", "position": 1}
+{"word": "unremittent", "synonym": "unremitting", "via": "unremittent", "position": 1}
+{"word": "unremittent", "synonym": "continuous", "via": "unremittent", "position": 2}
 {"word": "unremitting", "synonym": "ceaseless", "via": "unremitting", "position": 1}
 {"word": "unremitting", "synonym": "constant", "via": "unremitting", "position": 2}
 {"word": "unremitting", "synonym": "incessant", "via": "unremitting", "position": 3}
@@ -1824,6 +1913,7 @@
 {"word": "unsanitary", "synonym": "insanitary", "via": "unsanitary", "position": 1}
 {"word": "unsanitary", "synonym": "unhealthful", "via": "unsanitary", "position": 2}
 {"word": "unsated", "synonym": "unsatisfied", "via": "unsated", "position": 1}
+{"word": "unsatiated", "synonym": "unsated", "via": "unsatiated", "position": 1}
 {"word": "unsatisfied", "synonym": "restless", "via": "unsatisfied", "position": 1}
 {"word": "unsatisfied", "synonym": "unsated", "via": "unsatisfied", "position": 2}
 {"word": "unsatisfying", "synonym": "disappointing", "via": "unsatisfying", "position": 1}
@@ -1850,10 +1940,13 @@
 {"word": "unseamed", "synonym": "unlined", "via": "unseam", "position": 2}
 {"word": "unseasonable", "synonym": "untimely", "via": "unseasonable", "position": 1}
 {"word": "unseasonable", "synonym": "wrong", "via": "unseasonable", "position": 2}
+{"word": "unseasonal", "synonym": "unseasonable", "via": "unseasonal", "position": 1}
 {"word": "unseasoned", "synonym": "untested", "via": "unseasoned", "position": 1}
 {"word": "unseasoned", "synonym": "untried", "via": "unseasoned", "position": 2}
 {"word": "unseasoned", "synonym": "young", "via": "unseasoned", "position": 3}
 {"word": "unseasoned", "synonym": "unsalted", "via": "unseasoned", "position": 4}
+{"word": "unsecure", "synonym": "insecure", "via": "unsecure", "position": 1}
+{"word": "unsecure", "synonym": "unsafe", "via": "unsecure", "position": 2}
 {"word": "unsecured", "synonym": "unbarred", "via": "unsecured", "position": 1}
 {"word": "unsecured", "synonym": "unbolted", "via": "unsecured", "position": 2}
 {"word": "unsecured", "synonym": "unlatched", "via": "unsecured", "position": 3}
@@ -1871,6 +1964,7 @@
 {"word": "unseen", "synonym": "unforeseen", "via": "unseen", "position": 2}
 {"word": "unseen", "synonym": "unobserved", "via": "unseen", "position": 3}
 {"word": "unsegregated", "synonym": "nonsegregated", "via": "unsegregated", "position": 1}
+{"word": "unselect", "synonym": "deselect", "via": "unselect", "position": 1}
 {"word": "unselfishness", "synonym": "generosity", "via": "unselfishness", "position": 1}
 {"word": "unserviceable", "synonym": "unusable", "via": "unserviceable", "position": 1}
 {"word": "unsettle", "synonym": "faze", "via": "unsettle", "position": 1}
@@ -1906,6 +2000,8 @@
 {"word": "unshakably", "synonym": "unfalteringly", "via": "unshakably", "position": 2}
 {"word": "unshaken", "synonym": "undaunted", "via": "unshaken", "position": 1}
 {"word": "unshaken", "synonym": "undismayed", "via": "unshaken", "position": 2}
+{"word": "unshammed", "synonym": "unfeigned", "via": "unshammed", "position": 1}
+{"word": "unshammed", "synonym": "genuine", "via": "unshammed", "position": 2}
 {"word": "unshaped", "synonym": "unshapen", "via": "unshaped", "position": 1}
 {"word": "unshapen", "synonym": "unshaped", "via": "unshapen", "position": 1}
 {"word": "unshaved", "synonym": "unshaven", "via": "unshaved", "position": 1}
@@ -1914,6 +2010,7 @@
 {"word": "unsheathed", "synonym": "bare", "via": "unsheathed", "position": 1}
 {"word": "unshod", "synonym": "discalced", "via": "unshod", "position": 1}
 {"word": "unsighted", "synonym": "blind", "via": "unsighted", "position": 1}
+{"word": "unsignificant", "synonym": "insignificant", "via": "unsignificant", "position": 1}
 {"word": "unskilled", "synonym": "incompetent", "via": "unskilled", "position": 1}
 {"word": "unskilled", "synonym": "amateurish", "via": "unskilled", "position": 2}
 {"word": "unskilled", "synonym": "amateur", "via": "unskilled", "position": 3}
@@ -1981,6 +2078,7 @@
 {"word": "unspoken", "synonym": "unstated", "via": "unspoken", "position": 6}
 {"word": "unspoken", "synonym": "unverbalized", "via": "unspoken", "position": 7}
 {"word": "unspoken", "synonym": "unvoiced", "via": "unspoken", "position": 8}
+{"word": "unsporting", "synonym": "unsportsmanlike", "via": "unsporting", "position": 1}
 {"word": "unspotted", "synonym": "unsoiled", "via": "unspotted", "position": 1}
 {"word": "unspotted", "synonym": "unstained", "via": "unspotted", "position": 2}
 {"word": "unstable", "synonym": "fluid", "via": "unstable", "position": 1}
@@ -1994,6 +2092,7 @@
 {"word": "unstained", "synonym": "unsoiled", "via": "unstained", "position": 5}
 {"word": "unstained", "synonym": "unspotted", "via": "unstained", "position": 6}
 {"word": "unstained", "synonym": "unvarnished", "via": "unstained", "position": 7}
+{"word": "unstalked", "synonym": "sessile", "via": "unstalked", "position": 1}
 {"word": "unstated", "synonym": "unexpressed", "via": "unstated", "position": 1}
 {"word": "unstated", "synonym": "unsaid", "via": "unstated", "position": 2}
 {"word": "unstated", "synonym": "unverbalized", "via": "unstated", "position": 3}
@@ -2040,6 +2139,7 @@
 {"word": "unsure", "synonym": "uncertain", "via": "unsure", "position": 1}
 {"word": "unsure", "synonym": "diffident", "via": "unsure", "position": 2}
 {"word": "unsure", "synonym": "timid", "via": "unsure", "position": 3}
+{"word": "unsurmountable", "synonym": "insurmountable", "via": "unsurmountable", "position": 1}
 {"word": "unsurpassed", "synonym": "unexcelled", "via": "unsurpassed", "position": 1}
 {"word": "unsusceptible", "synonym": "insusceptible", "via": "unsusceptible", "position": 1}
 {"word": "unsuspecting", "synonym": "unsuspicious", "via": "unsuspecting", "position": 1}
@@ -2049,12 +2149,15 @@
 {"word": "unswerving", "synonym": "steadfast", "via": "unswerving", "position": 1}
 {"word": "unswerving", "synonym": "staunch", "via": "unswerving", "position": 2}
 {"word": "unswerving", "synonym": "undeviating", "via": "unswerving", "position": 3}
+{"word": "unswervingly", "synonym": "steadfastly", "via": "unswervingly", "position": 1}
+{"word": "unswervingly", "synonym": "resolutely", "via": "unswervingly", "position": 2}
 {"word": "unsympathetic", "synonym": "disagreeable", "via": "unsympathetic", "position": 1}
 {"word": "unsympathetic", "synonym": "unkindly", "via": "unsympathetic", "position": 2}
 {"word": "unsympathetic", "synonym": "closed", "via": "unsympathetic", "position": 3}
 {"word": "unsympathetic", "synonym": "unappealing", "via": "unsympathetic", "position": 4}
 {"word": "unsympathetic", "synonym": "unlikable", "via": "unsympathetic", "position": 5}
 {"word": "unsynchronized", "synonym": "nonsynchronous", "via": "unsynchronized", "position": 1}
+{"word": "unsystematical", "synonym": "unsystematic", "via": "unsystematical", "position": 1}
 {"word": "untactful", "synonym": "tactless", "via": "untactful", "position": 1}
 {"word": "untagged", "synonym": "unlabeled", "via": "untagged", "position": 1}
 {"word": "untainted", "synonym": "stainless", "via": "untainted", "position": 1}
@@ -2087,6 +2190,8 @@
 {"word": "untested", "synonym": "unseasoned", "via": "untested", "position": 1}
 {"word": "untested", "synonym": "untried", "via": "untested", "position": 2}
 {"word": "untested", "synonym": "young", "via": "untested", "position": 3}
+{"word": "unthankful", "synonym": "ungrateful", "via": "unthankful", "position": 1}
+{"word": "unthankful", "synonym": "thankless", "via": "unthankful", "position": 2}
 {"word": "unthinkably", "synonym": "unimaginably", "via": "unthinkably", "position": 1}
 {"word": "unthinking", "synonym": "lumpish", "via": "unthink", "position": 1}
 {"word": "unthinking", "synonym": "lumpen", "via": "unthink", "position": 2}
@@ -2104,6 +2209,7 @@
 {"word": "unthinkingly", "synonym": "unthinking", "via": "unthinkingly", "position": 2}
 {"word": "unthought", "synonym": "unhoped", "via": "unthink", "position": 1}
 {"word": "unthought", "synonym": "unhoped", "via": "unthought", "position": 1}
+{"word": "untick", "synonym": "uncheck", "via": "untick", "position": 1}
 {"word": "untidily", "synonym": "messily", "via": "untidily", "position": 1}
 {"word": "untidiness", "synonym": "messiness", "via": "untidiness", "position": 1}
 {"word": "untie", "synonym": "unbrace", "via": "untie", "position": 1}
@@ -2149,6 +2255,7 @@
 {"word": "untoward", "synonym": "uncomely", "via": "untoward", "position": 6}
 {"word": "untoward", "synonym": "unseemly", "via": "untoward", "position": 7}
 {"word": "untraditional", "synonym": "nontraditional", "via": "untraditional", "position": 1}
+{"word": "untransparent", "synonym": "opaque", "via": "untransparent", "position": 1}
 {"word": "untried", "synonym": "unseasoned", "via": "untried", "position": 1}
 {"word": "untried", "synonym": "untested", "via": "untried", "position": 2}
 {"word": "untried", "synonym": "young", "via": "untried", "position": 3}
@@ -2164,6 +2271,7 @@
 {"word": "untroubled", "synonym": "secure", "via": "untroubled", "position": 1}
 {"word": "untroubled", "synonym": "unafraid", "via": "untroubled", "position": 2}
 {"word": "untrue", "synonym": "false", "via": "untrue", "position": 1}
+{"word": "untrustable", "synonym": "unreliable", "via": "untrustable", "position": 1}
 {"word": "untrusting", "synonym": "leery", "via": "untrusting", "position": 1}
 {"word": "untrusting", "synonym": "mistrustful", "via": "untrusting", "position": 2}
 {"word": "untrusting", "synonym": "suspicious", "via": "untrusting", "position": 3}
@@ -2181,8 +2289,6 @@
 {"word": "untutored", "synonym": "untaught", "via": "untutored", "position": 2}
 {"word": "untying", "synonym": "undoing", "via": "untie", "position": 1}
 {"word": "untying", "synonym": "unfastening", "via": "untie", "position": 2}
-{"word": "untying", "synonym": "undoing", "via": "untying", "position": 1}
-{"word": "untying", "synonym": "unfastening", "via": "untying", "position": 2}
 {"word": "untypical", "synonym": "atypical", "via": "untypical", "position": 1}
 {"word": "untypical", "synonym": "atypic", "via": "untypical", "position": 2}
 {"word": "untypically", "synonym": "atypically", "via": "atypically", "position": 1}
@@ -2204,8 +2310,13 @@
 {"word": "unutterably", "synonym": "inexpressibly", "via": "unutterably", "position": 4}
 {"word": "unvalued", "synonym": "unappreciated", "via": "unvalued", "position": 1}
 {"word": "unvalued", "synonym": "unsung", "via": "unvalued", "position": 2}
+{"word": "unvanquishable", "synonym": "invincible", "via": "unvanquishable", "position": 1}
+{"word": "unvanquishable", "synonym": "unconquerable", "via": "unvanquishable", "position": 2}
 {"word": "unvanquished", "synonym": "unbeaten", "via": "unvanquished", "position": 1}
 {"word": "unvanquished", "synonym": "unconquered", "via": "unvanquished", "position": 2}
+{"word": "unvariable", "synonym": "invariable", "via": "unvariable", "position": 1}
+{"word": "unvariableness", "synonym": "invariability", "via": "unvariableness", "position": 1}
+{"word": "unvariably", "synonym": "invariably", "via": "unvariably", "position": 1}
 {"word": "unvaried", "synonym": "unvarying", "via": "unvaried", "position": 1}
 {"word": "unvarnished", "synonym": "plain", "via": "unvarnished", "position": 1}
 {"word": "unvarnished", "synonym": "unstained", "via": "unvarnished", "position": 2}
@@ -2228,6 +2339,7 @@
 {"word": "unverbalized", "synonym": "unstated", "via": "unverbalized", "position": 3}
 {"word": "unverbalized", "synonym": "unvoiced", "via": "unverbalized", "position": 4}
 {"word": "unverbalized", "synonym": "unspoken", "via": "unverbalized", "position": 5}
+{"word": "unviewed", "synonym": "unseen", "via": "unviewed", "position": 1}
 {"word": "unvoiced", "synonym": "unexpressed", "via": "unvoiced", "position": 1}
 {"word": "unvoiced", "synonym": "unsaid", "via": "unvoiced", "position": 2}
 {"word": "unvoiced", "synonym": "unstated", "via": "unvoiced", "position": 3}
@@ -2255,6 +2367,7 @@
 {"word": "unwashed", "synonym": "common", "via": "unwashed", "position": 1}
 {"word": "unwashed", "synonym": "plebeian", "via": "unwashed", "position": 2}
 {"word": "unwashed", "synonym": "vulgar", "via": "unwashed", "position": 3}
+{"word": "unwatched", "synonym": "unobserved", "via": "unwatched", "position": 1}
 {"word": "unwavering", "synonym": "firm", "via": "unwavering", "position": 1}
 {"word": "unwavering", "synonym": "steadfast", "via": "unwavering", "position": 2}
 {"word": "unwavering", "synonym": "steady", "via": "unwavering", "position": 3}
@@ -2287,11 +2400,13 @@
 {"word": "unwieldy", "synonym": "clunky", "via": "unwieldy", "position": 3}
 {"word": "unwieldy", "synonym": "ungainly", "via": "unwieldy", "position": 4}
 {"word": "unwieldy", "synonym": "unmanageable", "via": "unwieldy", "position": 5}
+{"word": "unwincing", "synonym": "unflinching", "via": "unwincing", "position": 1}
 {"word": "unwind", "synonym": "relax", "via": "unwind", "position": 1}
 {"word": "unwind", "synonym": "unbend", "via": "unwind", "position": 2}
 {"word": "unwind", "synonym": "decompress", "via": "unwind", "position": 3}
 {"word": "unwind", "synonym": "unroll", "via": "unwind", "position": 4}
 {"word": "unwind", "synonym": "disentangle", "via": "unwind", "position": 5}
+{"word": "unwinking", "synonym": "unblinking", "via": "unwinking", "position": 1}
 {"word": "unwise", "synonym": "inexpedient", "via": "unwise", "position": 1}
 {"word": "unwisely", "synonym": "foolishly", "via": "unwisely", "position": 1}
 {"word": "unwished", "synonym": "unwelcome", "via": "unwish", "position": 1}
@@ -2316,6 +2431,7 @@
 {"word": "unworthy", "synonym": "undeserving", "via": "unworthy", "position": 7}
 {"word": "unwrap", "synonym": "uncover", "via": "unwrap", "position": 1}
 {"word": "unwrap", "synonym": "undo", "via": "unwrap", "position": 2}
+{"word": "unwrinkle", "synonym": "smooth", "via": "unwrinkle", "position": 1}
 {"word": "unwritten", "synonym": "spontaneous", "via": "unwritten", "position": 1}
 {"word": "unwritten", "synonym": "oral", "via": "unwritten", "position": 2}
 {"word": "unyielding", "synonym": "dogged", "via": "unyielding", "position": 1}
@@ -2353,6 +2469,7 @@
 {"word": "upcoming", "synonym": "forthcoming", "via": "upcoming", "position": 3}
 {"word": "upcountry", "synonym": "interior", "via": "upcountry", "position": 1}
 {"word": "upcountry", "synonym": "midland", "via": "upcountry", "position": 2}
+{"word": "upcropping", "synonym": "emergence", "via": "upcropping", "position": 1}
 {"word": "upcycle", "synonym": "repurpose", "via": "upcycle", "position": 1}
 {"word": "upending", "synonym": "inversion", "via": "upend", "position": 1}
 {"word": "upending", "synonym": "inversion", "via": "upending", "position": 1}
@@ -2389,6 +2506,7 @@
 {"word": "uplift", "synonym": "upthrust", "via": "uplift", "position": 3}
 {"word": "uplift", "synonym": "elate", "via": "uplift", "position": 4}
 {"word": "uplift", "synonym": "intoxicate", "via": "uplift", "position": 5}
+{"word": "upliftment", "synonym": "betterment", "via": "upliftment", "position": 1}
 {"word": "upmost", "synonym": "topmost", "via": "upmost", "position": 1}
 {"word": "upmost", "synonym": "uppermost", "via": "upmost", "position": 2}
 {"word": "upper", "synonym": "amphetamine", "via": "upper", "position": 1}
@@ -2550,14 +2668,6 @@
 {"word": "urging", "synonym": "prodding", "via": "urge", "position": 6}
 {"word": "urging", "synonym": "spur", "via": "urge", "position": 7}
 {"word": "urging", "synonym": "spurring", "via": "urge", "position": 8}
-{"word": "urging", "synonym": "importunity", "via": "urging", "position": 1}
-{"word": "urging", "synonym": "urgency", "via": "urging", "position": 2}
-{"word": "urging", "synonym": "goad", "via": "urging", "position": 3}
-{"word": "urging", "synonym": "goading", "via": "urging", "position": 4}
-{"word": "urging", "synonym": "prod", "via": "urging", "position": 5}
-{"word": "urging", "synonym": "prodding", "via": "urging", "position": 6}
-{"word": "urging", "synonym": "spur", "via": "urging", "position": 7}
-{"word": "urging", "synonym": "spurring", "via": "urging", "position": 8}
 {"word": "urinate", "synonym": "piddle", "via": "urinate", "position": 1}
 {"word": "urinate", "synonym": "micturate", "via": "urinate", "position": 2}
 {"word": "urinate", "synonym": "piss", "via": "urinate", "position": 3}
@@ -2569,6 +2679,8 @@
 {"word": "urine", "synonym": "piddle", "via": "urine", "position": 3}
 {"word": "urine", "synonym": "weewee", "via": "urine", "position": 4}
 {"word": "urine", "synonym": "water", "via": "urine", "position": 5}
+{"word": "urinoscopy", "synonym": "uroscopy", "via": "urinoscopy", "position": 1}
+{"word": "urman", "synonym": "taiga", "via": "urman", "position": 1}
 {"word": "urochord", "synonym": "tunicate", "via": "urochord", "position": 1}
 {"word": "urochord", "synonym": "urochordate", "via": "urochord", "position": 2}
 {"word": "urochordate", "synonym": "tunicate", "via": "urochordate", "position": 1}
@@ -2737,3 +2849,4 @@
 {"word": "uveous", "synonym": "uveal", "via": "uveous", "position": 1}
 {"word": "uxorial", "synonym": "wifely", "via": "uxorial", "position": 1}
 {"word": "uxorial", "synonym": "wifelike", "via": "uxorial", "position": 2}
+{"word": "uxorilocal", "synonym": "matrilocal", "via": "uxorilocal", "position": 1}

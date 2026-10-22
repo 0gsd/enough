@@ -9,14 +9,12 @@
 {"word": "dabbled", "synonym": "spattered", "via": "dabble", "position": 1}
 {"word": "dabbled", "synonym": "splashed", "via": "dabble", "position": 2}
 {"word": "dabbled", "synonym": "splattered", "via": "dabble", "position": 3}
-{"word": "dabbled", "synonym": "spattered", "via": "dabbled", "position": 1}
-{"word": "dabbled", "synonym": "splashed", "via": "dabbled", "position": 2}
-{"word": "dabbled", "synonym": "splattered", "via": "dabbled", "position": 3}
 {"word": "dabbler", "synonym": "dilettante", "via": "dabbler", "position": 1}
 {"word": "dabbler", "synonym": "sciolist", "via": "dabbler", "position": 2}
 {"word": "dacoit", "synonym": "dakoit", "via": "dacoit", "position": 1}
 {"word": "dacoity", "synonym": "dakoity", "via": "dacoity", "position": 1}
 {"word": "dactyl", "synonym": "digit", "via": "dactyl", "position": 1}
+{"word": "dactylogram", "synonym": "fingerprint", "via": "dactylogram", "position": 1}
 {"word": "dad", "synonym": "dada", "via": "dad", "position": 1}
 {"word": "dad", "synonym": "daddy", "via": "dad", "position": 2}
 {"word": "dad", "synonym": "papa", "via": "dad", "position": 3}
@@ -27,6 +25,7 @@
 {"word": "dada", "synonym": "papa", "via": "dada", "position": 4}
 {"word": "dada", "synonym": "pop", "via": "dada", "position": 5}
 {"word": "dadaism", "synonym": "dada", "via": "dadaism", "position": 1}
+{"word": "daddler", "synonym": "farthing", "via": "daddler", "position": 1}
 {"word": "daddy", "synonym": "dad", "via": "daddy", "position": 1}
 {"word": "daddy", "synonym": "dada", "via": "daddy", "position": 2}
 {"word": "daddy", "synonym": "papa", "via": "daddy", "position": 3}
@@ -97,6 +96,7 @@
 {"word": "dak", "synonym": "dhak", "via": "dak", "position": 1}
 {"word": "dakoit", "synonym": "dacoit", "via": "dacoit", "position": 1}
 {"word": "dakoity", "synonym": "dacoity", "via": "dacoity", "position": 1}
+{"word": "dalgyte", "synonym": "bilby", "via": "dalgyte", "position": 1}
 {"word": "dalliance", "synonym": "flirt", "via": "dalliance", "position": 1}
 {"word": "dalliance", "synonym": "flirting", "via": "dalliance", "position": 2}
 {"word": "dalliance", "synonym": "flirtation", "via": "dalliance", "position": 3}
@@ -160,6 +160,7 @@
 {"word": "dame", "synonym": "madam", "via": "dame", "position": 6}
 {"word": "dame", "synonym": "lady", "via": "dame", "position": 7}
 {"word": "dame", "synonym": "gentlewoman", "via": "dame", "position": 8}
+{"word": "damfool", "synonym": "idiot", "via": "damfool", "position": 1}
 {"word": "dammar", "synonym": "damar", "via": "damar", "position": 1}
 {"word": "damn", "synonym": "darn", "via": "damn", "position": 1}
 {"word": "damn", "synonym": "hoot", "via": "damn", "position": 2}
@@ -243,6 +244,7 @@
 {"word": "dancing", "synonym": "saltation", "via": "dance", "position": 2}
 {"word": "dancing", "synonym": "dance", "via": "dancing", "position": 1}
 {"word": "dancing", "synonym": "saltation", "via": "dancing", "position": 2}
+{"word": "dancy", "synonym": "danceable", "via": "dancy", "position": 1}
 {"word": "dandelion", "synonym": "blowball", "via": "dandelion", "position": 1}
 {"word": "dander", "synonym": "hackles", "via": "dander", "position": 1}
 {"word": "dandified", "synonym": "dandyish", "via": "dandified", "position": 1}
@@ -439,6 +441,7 @@
 {"word": "data", "synonym": "information", "via": "data", "position": 1}
 {"word": "data", "synonym": "information", "via": "datum", "position": 1}
 {"word": "datable", "synonym": "dateable", "via": "dateable", "position": 1}
+{"word": "datal", "synonym": "dull", "via": "datal", "position": 1}
 {"word": "date", "synonym": "appointment", "via": "date", "position": 1}
 {"word": "date", "synonym": "engagement", "via": "date", "position": 2}
 {"word": "date", "synonym": "escort", "via": "date", "position": 3}
@@ -457,6 +460,8 @@
 {"word": "daub", "synonym": "plaster", "via": "daub", "position": 7}
 {"word": "daubing", "synonym": "plastering", "via": "daub", "position": 1}
 {"word": "daubing", "synonym": "plastering", "via": "daubing", "position": 1}
+{"word": "daud", "synonym": "lump", "via": "daud", "position": 1}
+{"word": "daud", "synonym": "chunk", "via": "daud", "position": 2}
 {"word": "daughter", "synonym": "girl", "via": "daughter", "position": 1}
 {"word": "daunt", "synonym": "dash", "via": "daunt", "position": 1}
 {"word": "daunt", "synonym": "pall", "via": "daunt", "position": 2}
@@ -475,6 +480,7 @@
 {"word": "dauntlessly", "synonym": "fearlessly", "via": "dauntlessly", "position": 1}
 {"word": "dauntlessly", "synonym": "intrepidly", "via": "dauntlessly", "position": 2}
 {"word": "dauntlessness", "synonym": "intrepidity", "via": "dauntlessness", "position": 1}
+{"word": "dauphiness", "synonym": "dauphine", "via": "dauphiness", "position": 1}
 {"word": "daw", "synonym": "jackdaw", "via": "daw", "position": 1}
 {"word": "dawdle", "synonym": "lag", "via": "dawdle", "position": 1}
 {"word": "dawdle", "synonym": "dally", "via": "dawdle", "position": 2}
@@ -521,6 +527,7 @@
 {"word": "daybreak", "synonym": "sunrise", "via": "daybreak", "position": 5}
 {"word": "daybreak", "synonym": "sunup", "via": "daybreak", "position": 6}
 {"word": "daybreak", "synonym": "cockcrow", "via": "daybreak", "position": 7}
+{"word": "daych", "synonym": "thatch", "via": "daych", "position": 1}
 {"word": "daydream", "synonym": "reverie", "via": "daydream", "position": 1}
 {"word": "daydream", "synonym": "revery", "via": "daydream", "position": 2}
 {"word": "daydream", "synonym": "daydreaming", "via": "daydream", "position": 3}
@@ -541,6 +548,9 @@
 {"word": "daylight", "synonym": "daytime", "via": "daylight", "position": 2}
 {"word": "days", "synonym": "years", "via": "day", "position": 1}
 {"word": "days", "synonym": "years", "via": "days", "position": 1}
+{"word": "dayshell", "synonym": "thistle", "via": "dayshell", "position": 1}
+{"word": "dayspring", "synonym": "dawn", "via": "dayspring", "position": 1}
+{"word": "dayspring", "synonym": "daybreak", "via": "dayspring", "position": 2}
 {"word": "daystar", "synonym": "phosphorus", "via": "daystar", "position": 1}
 {"word": "daystar", "synonym": "lucifer", "via": "daystar", "position": 2}
 {"word": "daytime", "synonym": "day", "via": "daytime", "position": 1}
@@ -606,6 +616,8 @@
 {"word": "dead", "synonym": "absolutely", "via": "deadlift", "position": 8}
 {"word": "dead", "synonym": "perfectly", "via": "deadlift", "position": 9}
 {"word": "dead", "synonym": "utterly", "via": "deadlift", "position": 10}
+{"word": "deadass", "synonym": "seriously", "via": "deadass", "position": 1}
+{"word": "deadass", "synonym": "legit", "via": "deadass", "position": 2}
 {"word": "deadbeat", "synonym": "defaulter", "via": "deadbeat", "position": 1}
 {"word": "deadbolt", "synonym": "bolt", "via": "deadbolt", "position": 1}
 {"word": "deaden", "synonym": "blunt", "via": "deaden", "position": 1}
@@ -680,6 +692,7 @@
 {"word": "dealings", "synonym": "transaction", "via": "dealings", "position": 2}
 {"word": "dealings", "synonym": "dealing", "via": "dealings", "position": 3}
 {"word": "dealings", "synonym": "relations", "via": "dealings", "position": 4}
+{"word": "deaminize", "synonym": "deaminate", "via": "deaminize", "position": 1}
 {"word": "dean", "synonym": "doyen", "via": "dean", "position": 1}
 {"word": "dean", "synonym": "doyen", "via": "dene", "position": 1}
 {"word": "deanery", "synonym": "deanship", "via": "deanery", "position": 1}
@@ -781,6 +794,7 @@
 {"word": "debatable", "synonym": "moot", "via": "debatable", "position": 3}
 {"word": "debatable", "synonym": "problematic", "via": "debatable", "position": 4}
 {"word": "debatable", "synonym": "problematical", "via": "debatable", "position": 5}
+{"word": "debatably", "synonym": "arguably", "via": "debatably", "position": 1}
 {"word": "debate", "synonym": "argument", "via": "debate", "position": 1}
 {"word": "debate", "synonym": "argumentation", "via": "debate", "position": 2}
 {"word": "debate", "synonym": "disputation", "via": "debate", "position": 3}
@@ -819,6 +833,8 @@
 {"word": "debauched", "synonym": "fast", "via": "debauched", "position": 8}
 {"word": "debauchee", "synonym": "libertine", "via": "debauchee", "position": 1}
 {"word": "debauchee", "synonym": "rounder", "via": "debauchee", "position": 2}
+{"word": "debaucherous", "synonym": "debauched", "via": "debaucherous", "position": 1}
+{"word": "debaucherous", "synonym": "dissolute", "via": "debaucherous", "position": 2}
 {"word": "debauchery", "synonym": "orgy", "via": "debauchery", "position": 1}
 {"word": "debauchery", "synonym": "debauch", "via": "debauchery", "position": 2}
 {"word": "debauchery", "synonym": "saturnalia", "via": "debauchery", "position": 3}
@@ -850,6 +866,7 @@
 {"word": "debris", "synonym": "junk", "via": "debris", "position": 2}
 {"word": "debris", "synonym": "rubble", "via": "debris", "position": 3}
 {"word": "debris", "synonym": "detritus", "via": "debris", "position": 4}
+{"word": "debud", "synonym": "disbud", "via": "debud", "position": 1}
 {"word": "debunk", "synonym": "expose", "via": "debunk", "position": 1}
 {"word": "debunking", "synonym": "repudiation", "via": "debunk", "position": 1}
 {"word": "debunking", "synonym": "repudiation", "via": "debunking", "position": 1}
@@ -1081,6 +1098,7 @@
 {"word": "decoding", "synonym": "decipherment", "via": "decode", "position": 2}
 {"word": "decoding", "synonym": "decryption", "via": "decoding", "position": 1}
 {"word": "decoding", "synonym": "decipherment", "via": "decoding", "position": 2}
+{"word": "decoke", "synonym": "decarbonize", "via": "decoke", "position": 1}
 {"word": "decollate", "synonym": "decapitate", "via": "decollate", "position": 1}
 {"word": "decollate", "synonym": "behead", "via": "decollate", "position": 2}
 {"word": "decolor", "synonym": "bleach", "via": "decolour", "position": 1}
@@ -1155,6 +1173,7 @@
 {"word": "decreed", "synonym": "appointed", "via": "decree", "position": 1}
 {"word": "decreed", "synonym": "ordained", "via": "decree", "position": 2}
 {"word": "decreed", "synonym": "prescribed", "via": "decree", "position": 3}
+{"word": "decreet", "synonym": "judgment", "via": "decreet", "position": 1}
 {"word": "decrement", "synonym": "decrease", "via": "decrement", "position": 1}
 {"word": "decrepit", "synonym": "feeble", "via": "decrepit", "position": 1}
 {"word": "decrepit", "synonym": "infirm", "via": "decrepit", "position": 2}
@@ -1181,6 +1200,8 @@
 {"word": "decrypt", "synonym": "decipher", "via": "decrypt", "position": 2}
 {"word": "decryption", "synonym": "decoding", "via": "decryption", "position": 1}
 {"word": "decryption", "synonym": "decipherment", "via": "decryption", "position": 2}
+{"word": "deculturate", "synonym": "deculture", "via": "deculturate", "position": 1}
+{"word": "deculture", "synonym": "deculturate", "via": "deculture", "position": 1}
 {"word": "decumbent", "synonym": "recumbent", "via": "decumbent", "position": 1}
 {"word": "decussate", "synonym": "intersecting", "via": "decussate", "position": 1}
 {"word": "decussation", "synonym": "chiasma", "via": "decussation", "position": 1}
@@ -1281,6 +1302,7 @@
 {"word": "defamer", "synonym": "traducer", "via": "defamer", "position": 6}
 {"word": "default", "synonym": "nonpayment", "via": "default", "position": 1}
 {"word": "defaulter", "synonym": "deadbeat", "via": "defaulter", "position": 1}
+{"word": "defease", "synonym": "annul", "via": "defease", "position": 1}
 {"word": "defeat", "synonym": "licking", "via": "defeat", "position": 1}
 {"word": "defeat", "synonym": "frustration", "via": "defeat", "position": 2}
 {"word": "defeat", "synonym": "overcome", "via": "defeat", "position": 3}
@@ -1371,6 +1393,7 @@
 {"word": "defiantly", "synonym": "contumaciously", "via": "defiantly", "position": 2}
 {"word": "defiantly", "synonym": "rebelliously", "via": "definitely", "position": 1}
 {"word": "defiantly", "synonym": "contumaciously", "via": "definitely", "position": 2}
+{"word": "defiberize", "synonym": "defibrate", "via": "defiberize", "position": 1}
 {"word": "deficiency", "synonym": "insufficiency", "via": "deficiency", "position": 1}
 {"word": "deficiency", "synonym": "inadequacy", "via": "deficiency", "position": 2}
 {"word": "deficiency", "synonym": "lack", "via": "deficiency", "position": 3}
@@ -1474,6 +1497,8 @@
 {"word": "defrauder", "synonym": "gouger", "via": "defrauder", "position": 4}
 {"word": "defrauder", "synonym": "grifter", "via": "defrauder", "position": 5}
 {"word": "defrayal", "synonym": "payment", "via": "defrayal", "position": 1}
+{"word": "defreeze", "synonym": "thaw", "via": "defreeze", "position": 1}
+{"word": "defreeze", "synonym": "defrost", "via": "defreeze", "position": 2}
 {"word": "defrock", "synonym": "unfrock", "via": "defrock", "position": 1}
 {"word": "defrost", "synonym": "deice", "via": "defrost", "position": 1}
 {"word": "defroster", "synonym": "deicer", "via": "defroster", "position": 1}
@@ -1515,6 +1540,7 @@
 {"word": "degeneration", "synonym": "degeneracy", "via": "degeneration", "position": 3}
 {"word": "degeneration", "synonym": "decadence", "via": "degeneration", "position": 4}
 {"word": "degeneration", "synonym": "decadency", "via": "degeneration", "position": 5}
+{"word": "degerminate", "synonym": "degerm", "via": "degerminate", "position": 1}
 {"word": "deglutition", "synonym": "swallow", "via": "deglutition", "position": 1}
 {"word": "degradation", "synonym": "debasement", "via": "degradation", "position": 1}
 {"word": "degradation", "synonym": "abasement", "via": "degradation", "position": 2}
@@ -1555,6 +1581,9 @@
 {"word": "degustation", "synonym": "savoring", "via": "degustation", "position": 2}
 {"word": "degustation", "synonym": "savouring", "via": "degustation", "position": 3}
 {"word": "degustation", "synonym": "relishing", "via": "degustation", "position": 4}
+{"word": "degut", "synonym": "eviscerate", "via": "degut", "position": 1}
+{"word": "dehire", "synonym": "dismiss", "via": "dehire", "position": 1}
+{"word": "dehire", "synonym": "fire", "via": "dehire", "position": 2}
 {"word": "dehumanized", "synonym": "unhuman", "via": "dehumanize", "position": 1}
 {"word": "dehydrate", "synonym": "exsiccate", "via": "dehydrate", "position": 1}
 {"word": "dehydrate", "synonym": "desiccate", "via": "dehydrate", "position": 2}
@@ -1610,6 +1639,8 @@
 {"word": "delectable", "synonym": "scrumptious", "via": "delectable", "position": 3}
 {"word": "delectable", "synonym": "toothsome", "via": "delectable", "position": 4}
 {"word": "delectable", "synonym": "yummy", "via": "delectable", "position": 5}
+{"word": "delectate", "synonym": "delight", "via": "delectate", "position": 1}
+{"word": "delectate", "synonym": "charm", "via": "delectate", "position": 2}
 {"word": "delectation", "synonym": "enjoyment", "via": "delectation", "position": 1}
 {"word": "delectation", "synonym": "delight", "via": "delectation", "position": 2}
 {"word": "delegacy", "synonym": "deputation", "via": "delegacy", "position": 1}
@@ -1632,6 +1663,7 @@
 {"word": "delegation", "synonym": "commission", "via": "delegation", "position": 5}
 {"word": "delegation", "synonym": "delegacy", "via": "delegation", "position": 6}
 {"word": "delegation", "synonym": "mission", "via": "delegation", "position": 7}
+{"word": "delegitimate", "synonym": "delegitimize", "via": "delegitimate", "position": 1}
 {"word": "delete", "synonym": "erase", "via": "delete", "position": 1}
 {"word": "delete", "synonym": "cancel", "via": "delete", "position": 2}
 {"word": "deleterious", "synonym": "hurtful", "via": "deleterious", "position": 1}
@@ -1718,6 +1750,8 @@
 {"word": "delimit", "synonym": "define", "via": "delimit", "position": 3}
 {"word": "delimit", "synonym": "delineate", "via": "delimit", "position": 4}
 {"word": "delimit", "synonym": "subtend", "via": "delimit", "position": 5}
+{"word": "delimitate", "synonym": "delimit", "via": "delimitate", "position": 1}
+{"word": "delimitate", "synonym": "demarcate", "via": "delimitate", "position": 2}
 {"word": "delimitation", "synonym": "border", "via": "delimitation", "position": 1}
 {"word": "delimitation", "synonym": "borderline", "via": "delimitation", "position": 2}
 {"word": "delimitation", "synonym": "mete", "via": "delimitation", "position": 3}
@@ -1739,11 +1773,13 @@
 {"word": "delineation", "synonym": "portrayal", "via": "delineation", "position": 2}
 {"word": "delineation", "synonym": "limning", "via": "delineation", "position": 3}
 {"word": "delineation", "synonym": "picture", "via": "delineation", "position": 4}
+{"word": "delinko", "synonym": "delinquent", "via": "delinko", "position": 1}
 {"word": "delinquency", "synonym": "dereliction", "via": "delinquency", "position": 1}
 {"word": "delinquent", "synonym": "overdue", "via": "delinquent", "position": 1}
 {"word": "delinquent", "synonym": "derelict", "via": "delinquent", "position": 2}
 {"word": "delinquent", "synonym": "neglectful", "via": "delinquent", "position": 3}
 {"word": "delinquent", "synonym": "remiss", "via": "delinquent", "position": 4}
+{"word": "deliration", "synonym": "delirium", "via": "deliration", "position": 1}
 {"word": "delirious", "synonym": "excited", "via": "delirious", "position": 1}
 {"word": "delirious", "synonym": "frantic", "via": "delirious", "position": 2}
 {"word": "delirious", "synonym": "mad", "via": "delirious", "position": 3}
@@ -1753,6 +1789,7 @@
 {"word": "delirium", "synonym": "frenzy", "via": "delirium", "position": 2}
 {"word": "delirium", "synonym": "fury", "via": "delirium", "position": 3}
 {"word": "delirium", "synonym": "hysteria", "via": "delirium", "position": 4}
+{"word": "delitescent", "synonym": "latent", "via": "delitescent", "position": 1}
 {"word": "deliver", "synonym": "bear", "via": "deliver", "position": 1}
 {"word": "deliver", "synonym": "birth", "via": "deliver", "position": 2}
 {"word": "deliver", "synonym": "have", "via": "deliver", "position": 3}
@@ -1771,6 +1808,8 @@
 {"word": "deliverer", "synonym": "saviour", "via": "deliverer", "position": 3}
 {"word": "deliverer", "synonym": "rescuer", "via": "deliverer", "position": 4}
 {"word": "deliverer", "synonym": "redeemer", "via": "deliverer", "position": 5}
+{"word": "deliverly", "synonym": "deftly", "via": "deliverly", "position": 1}
+{"word": "deliverly", "synonym": "nimbly", "via": "deliverly", "position": 2}
 {"word": "delivery", "synonym": "rescue", "via": "delivery", "position": 1}
 {"word": "delivery", "synonym": "deliverance", "via": "delivery", "position": 2}
 {"word": "delivery", "synonym": "saving", "via": "delivery", "position": 3}
@@ -1810,6 +1849,7 @@
 {"word": "demagog", "synonym": "demagogue", "via": "demagogue", "position": 1}
 {"word": "demagogue", "synonym": "demagog", "via": "demagogue", "position": 1}
 {"word": "demagoguery", "synonym": "demagogy", "via": "demagoguery", "position": 1}
+{"word": "demagoguism", "synonym": "demagoguery", "via": "demagoguism", "position": 1}
 {"word": "demagogy", "synonym": "demagoguery", "via": "demagogy", "position": 1}
 {"word": "demand", "synonym": "requirement", "via": "demand", "position": 1}
 {"word": "demand", "synonym": "need", "via": "demand", "position": 2}
@@ -1869,9 +1909,11 @@
 {"word": "demigod", "synonym": "daemon", "via": "demigod", "position": 1}
 {"word": "demigod", "synonym": "superman", "via": "demigod", "position": 2}
 {"word": "demilitarize", "synonym": "disarm", "via": "demilitarize", "position": 1}
+{"word": "demiquaver", "synonym": "semiquaver", "via": "demiquaver", "position": 1}
 {"word": "demise", "synonym": "death", "via": "demise", "position": 1}
 {"word": "demise", "synonym": "dying", "via": "demise", "position": 2}
 {"word": "demist", "synonym": "defog", "via": "demist", "position": 1}
+{"word": "demister", "synonym": "defroster", "via": "demister", "position": 1}
 {"word": "demo", "synonym": "demonstration", "via": "demo", "position": 1}
 {"word": "demo", "synonym": "show", "via": "demo", "position": 2}
 {"word": "demo", "synonym": "exhibit", "via": "demo", "position": 3}
@@ -1915,6 +1957,7 @@
 {"word": "demon", "synonym": "daimon", "via": "demon", "position": 4}
 {"word": "demon", "synonym": "monster", "via": "demon", "position": 5}
 {"word": "demon", "synonym": "ogre", "via": "demon", "position": 6}
+{"word": "demonetarize", "synonym": "demonetize", "via": "demonetarize", "position": 1}
 {"word": "demoniac", "synonym": "demoniacal", "via": "demoniac", "position": 1}
 {"word": "demoniac", "synonym": "possessed", "via": "demoniac", "position": 2}
 {"word": "demoniacal", "synonym": "demoniac", "via": "demoniacal", "position": 1}
@@ -1933,6 +1976,8 @@
 {"word": "demonize", "synonym": "demonise", "via": "demonize", "position": 1}
 {"word": "demonstrable", "synonym": "provable", "via": "demonstrable", "position": 1}
 {"word": "demonstrably", "synonym": "provably", "via": "demonstrably", "position": 1}
+{"word": "demonstrant", "synonym": "demonstrator", "via": "demonstrant", "position": 1}
+{"word": "demonstrant", "synonym": "protester", "via": "demonstrant", "position": 2}
 {"word": "demonstrate", "synonym": "prove", "via": "demonstrate", "position": 1}
 {"word": "demonstrate", "synonym": "establish", "via": "demonstrate", "position": 2}
 {"word": "demonstrate", "synonym": "show", "via": "demonstrate", "position": 3}
@@ -1992,6 +2037,7 @@
 {"word": "den", "synonym": "lair", "via": "denier", "position": 3}
 {"word": "denary", "synonym": "decimal", "via": "denary", "position": 1}
 {"word": "denary", "synonym": "tenfold", "via": "denary", "position": 2}
+{"word": "denaturize", "synonym": "denature", "via": "denaturize", "position": 1}
 {"word": "dendriform", "synonym": "arboreal", "via": "dendriform", "position": 1}
 {"word": "dendriform", "synonym": "arboreous", "via": "dendriform", "position": 2}
 {"word": "dendriform", "synonym": "arborescent", "via": "dendriform", "position": 3}
@@ -2002,6 +2048,7 @@
 {"word": "dendroid", "synonym": "arborescent", "via": "dendroid", "position": 3}
 {"word": "dendroid", "synonym": "dendriform", "via": "dendroid", "position": 4}
 {"word": "dendroid", "synonym": "treelike", "via": "dendroid", "position": 5}
+{"word": "dendrophilous", "synonym": "arboreal", "via": "dendrophilous", "position": 1}
 {"word": "denial", "synonym": "abnegation", "via": "denial", "position": 1}
 {"word": "denial", "synonym": "defense", "via": "denial", "position": 2}
 {"word": "denial", "synonym": "defence", "via": "denial", "position": 3}
@@ -2104,6 +2151,7 @@
 {"word": "dented", "synonym": "crumpled", "via": "dent", "position": 2}
 {"word": "dented", "synonym": "bent", "via": "dented", "position": 1}
 {"word": "dented", "synonym": "crumpled", "via": "dented", "position": 2}
+{"word": "dentilabial", "synonym": "labiodental", "via": "dentilabial", "position": 1}
 {"word": "dentin", "synonym": "dentine", "via": "dentin", "position": 1}
 {"word": "dentine", "synonym": "dentin", "via": "dentin", "position": 1}
 {"word": "dentition", "synonym": "teeth", "via": "dentition", "position": 1}
@@ -2128,6 +2176,8 @@
 {"word": "denumerable", "synonym": "countable", "via": "denumerable", "position": 1}
 {"word": "denumerable", "synonym": "enumerable", "via": "denumerable", "position": 2}
 {"word": "denumerable", "synonym": "numerable", "via": "denumerable", "position": 3}
+{"word": "denunciate", "synonym": "denounce", "via": "denunciate", "position": 1}
+{"word": "denunciate", "synonym": "condemn", "via": "denunciate", "position": 2}
 {"word": "denunciation", "synonym": "denouncement", "via": "denunciation", "position": 1}
 {"word": "denunciative", "synonym": "comminatory", "via": "denunciative", "position": 1}
 {"word": "denunciative", "synonym": "denunciatory", "via": "denunciative", "position": 2}
@@ -2135,7 +2185,9 @@
 {"word": "denunciatory", "synonym": "denunciative", "via": "denunciatory", "position": 2}
 {"word": "deny", "synonym": "refuse", "via": "deny", "position": 1}
 {"word": "deny", "synonym": "abnegate", "via": "deny", "position": 2}
+{"word": "deoxidant", "synonym": "deoxidizer", "via": "deoxidant", "position": 1}
 {"word": "deoxidize", "synonym": "reduce", "via": "deoxidize", "position": 1}
+{"word": "deoxygenize", "synonym": "deoxygenate", "via": "deoxygenize", "position": 1}
 {"word": "depart", "synonym": "quit", "via": "depart", "position": 1}
 {"word": "depart", "synonym": "part", "via": "depart", "position": 2}
 {"word": "depart", "synonym": "start", "via": "depart", "position": 3}
@@ -2171,6 +2223,7 @@
 {"word": "departure", "synonym": "deviation", "via": "departure", "position": 8}
 {"word": "departure", "synonym": "divergence", "via": "departure", "position": 9}
 {"word": "departure", "synonym": "difference", "via": "departure", "position": 10}
+{"word": "depasture", "synonym": "graze", "via": "depasture", "position": 1}
 {"word": "depend", "synonym": "count", "via": "depend", "position": 1}
 {"word": "depend", "synonym": "bet", "via": "depend", "position": 2}
 {"word": "depend", "synonym": "swear", "via": "depend", "position": 3}
@@ -2217,6 +2270,7 @@
 {"word": "dependent", "synonym": "subject", "via": "dependent", "position": 5}
 {"word": "dependent", "synonym": "pendent", "via": "dependent", "position": 6}
 {"word": "dependent", "synonym": "pendant", "via": "dependent", "position": 7}
+{"word": "depeople", "synonym": "depopulate", "via": "depeople", "position": 1}
 {"word": "depersonalize", "synonym": "objectify", "via": "depersonalize", "position": 1}
 {"word": "depict", "synonym": "describe", "via": "depict", "position": 1}
 {"word": "depict", "synonym": "draw", "via": "depict", "position": 2}
@@ -2426,6 +2480,7 @@
 {"word": "depth", "synonym": "astuteness", "via": "depth", "position": 2}
 {"word": "depth", "synonym": "profundity", "via": "depth", "position": 3}
 {"word": "depth", "synonym": "profoundness", "via": "depth", "position": 4}
+{"word": "depuration", "synonym": "purification", "via": "depuration", "position": 1}
 {"word": "deputation", "synonym": "delegating", "via": "deputation", "position": 1}
 {"word": "deputation", "synonym": "delegation", "via": "deputation", "position": 2}
 {"word": "deputation", "synonym": "commission", "via": "deputation", "position": 3}
@@ -2503,11 +2558,14 @@
 {"word": "dermal", "synonym": "cuticular", "via": "dermal", "position": 3}
 {"word": "dermal", "synonym": "epidermal", "via": "dermal", "position": 4}
 {"word": "dermal", "synonym": "epidermic", "via": "dermal", "position": 5}
+{"word": "dermapteran", "synonym": "earwig", "via": "dermapteran", "position": 1}
 {"word": "dermatologic", "synonym": "dermatological", "via": "dermatologic", "position": 1}
 {"word": "dermatological", "synonym": "dermatologic", "via": "dermatological", "position": 1}
 {"word": "dermic", "synonym": "dermal", "via": "dermic", "position": 1}
 {"word": "dermis", "synonym": "corium", "via": "dermis", "position": 1}
 {"word": "dermis", "synonym": "derma", "via": "dermis", "position": 2}
+{"word": "dermopteran", "synonym": "colugo", "via": "dermopteran", "position": 1}
+{"word": "dero", "synonym": "tramp", "via": "dero", "position": 1}
 {"word": "derogate", "synonym": "minimize", "via": "derogate", "position": 1}
 {"word": "derogate", "synonym": "belittle", "via": "derogate", "position": 2}
 {"word": "derogate", "synonym": "denigrate", "via": "derogate", "position": 3}
@@ -2527,6 +2585,7 @@
 {"word": "derriere", "synonym": "can", "via": "derriere", "position": 8}
 {"word": "derriere", "synonym": "fundament", "via": "derriere", "position": 9}
 {"word": "derriere", "synonym": "hindquarters", "via": "derriere", "position": 10}
+{"word": "derro", "synonym": "vagrant", "via": "derro", "position": 1}
 {"word": "desacralize", "synonym": "secularize", "via": "desacralize", "position": 1}
 {"word": "desalinate", "synonym": "desalt", "via": "desalinate", "position": 1}
 {"word": "desalinate", "synonym": "desalinize", "via": "desalinate", "position": 2}
@@ -2558,6 +2617,8 @@
 {"word": "descent", "synonym": "ancestry", "via": "descent", "position": 8}
 {"word": "descent", "synonym": "parentage", "via": "descent", "position": 9}
 {"word": "descent", "synonym": "stemma", "via": "descent", "position": 10}
+{"word": "descramble", "synonym": "unscramble", "via": "descramble", "position": 1}
+{"word": "descramble", "synonym": "decode", "via": "descramble", "position": 2}
 {"word": "describe", "synonym": "identify", "via": "describe", "position": 1}
 {"word": "describe", "synonym": "discover", "via": "describe", "position": 2}
 {"word": "describe", "synonym": "key", "via": "describe", "position": 3}
@@ -2631,6 +2692,8 @@
 {"word": "desiccated", "synonym": "dehydrated", "via": "desiccated", "position": 4}
 {"word": "desiccation", "synonym": "dehydration", "via": "desiccation", "position": 1}
 {"word": "desiccation", "synonym": "evaporation", "via": "desiccation", "position": 2}
+{"word": "desiderium", "synonym": "longing", "via": "desiderium", "position": 1}
+{"word": "desiderium", "synonym": "yearning", "via": "desiderium", "position": 2}
 {"word": "design", "synonym": "designing", "via": "design", "position": 1}
 {"word": "design", "synonym": "pattern", "via": "design", "position": 2}
 {"word": "design", "synonym": "figure", "via": "design", "position": 3}
@@ -2823,6 +2886,7 @@
 {"word": "destruction", "synonym": "wipeout", "via": "destruction", "position": 3}
 {"word": "destruction", "synonym": "end", "via": "destruction", "position": 4}
 {"word": "destruction", "synonym": "death", "via": "destruction", "position": 5}
+{"word": "desulfurate", "synonym": "desulfurize", "via": "desulfurate", "position": 1}
 {"word": "detached", "synonym": "degage", "via": "detach", "position": 1}
 {"word": "detached", "synonym": "uninvolved", "via": "detach", "position": 2}
 {"word": "detached", "synonym": "separated", "via": "detach", "position": 3}
@@ -2998,6 +3062,7 @@
 {"word": "detritus", "synonym": "dust", "via": "detritus", "position": 2}
 {"word": "detritus", "synonym": "junk", "via": "detritus", "position": 3}
 {"word": "detritus", "synonym": "rubble", "via": "detritus", "position": 4}
+{"word": "detruncate", "synonym": "truncate", "via": "detruncate", "position": 1}
 {"word": "deuce", "synonym": "two", "via": "deuce", "position": 1}
 {"word": "deuce", "synonym": "devil", "via": "deuce", "position": 2}
 {"word": "deuce", "synonym": "dickens", "via": "deuce", "position": 3}
@@ -3189,10 +3254,13 @@
 {"word": "devoutly", "synonym": "piously", "via": "devoutly", "position": 1}
 {"word": "devoutness", "synonym": "religiousness", "via": "devoutness", "position": 1}
 {"word": "dewy", "synonym": "bedewed", "via": "dewy", "position": 1}
+{"word": "dexiocardia", "synonym": "dextrocardia", "via": "dexiocardia", "position": 1}
+{"word": "dexiotropic", "synonym": "dextral", "via": "dexiotropic", "position": 1}
 {"word": "dexterity", "synonym": "sleight", "via": "dexterity", "position": 1}
 {"word": "dexterous", "synonym": "deft", "via": "dexterous", "position": 1}
 {"word": "dexterous", "synonym": "dextrous", "via": "dexterous", "position": 2}
 {"word": "dexterously", "synonym": "deftly", "via": "dexterously", "position": 1}
+{"word": "dextrogyrate", "synonym": "dextrorotatory", "via": "dextrogyrate", "position": 1}
 {"word": "dextrorotary", "synonym": "dextrorotatory", "via": "dextrorotary", "position": 1}
 {"word": "dextrorotatory", "synonym": "dextrorotary", "via": "dextrorotatory", "position": 1}
 {"word": "dextrous", "synonym": "deft", "via": "dexterous", "position": 1}
@@ -3229,6 +3297,7 @@
 {"word": "diagnosing", "synonym": "diagnosis", "via": "diagnose", "position": 1}
 {"word": "diagnosis", "synonym": "diagnosing", "via": "diagnosis", "position": 1}
 {"word": "diagnostic", "synonym": "symptomatic", "via": "diagnostic", "position": 1}
+{"word": "diagnosticate", "synonym": "diagnose", "via": "diagnosticate", "position": 1}
 {"word": "diagnostics", "synonym": "nosology", "via": "diagnostic", "position": 1}
 {"word": "diagnostics", "synonym": "nosology", "via": "diagnostics", "position": 1}
 {"word": "diagonal", "synonym": "solidus", "via": "diagonal", "position": 1}
@@ -3253,6 +3322,7 @@
 {"word": "dialog", "synonym": "duologue", "via": "dialog", "position": 2}
 {"word": "dialog", "synonym": "dialogue", "via": "dialogue", "position": 1}
 {"word": "dialog", "synonym": "duologue", "via": "dialogue", "position": 2}
+{"word": "dialogite", "synonym": "rhodochrosite", "via": "dialogite", "position": 1}
 {"word": "dialogue", "synonym": "dialog", "via": "dialog", "position": 1}
 {"word": "dialogue", "synonym": "duologue", "via": "dialog", "position": 2}
 {"word": "dialogue", "synonym": "negotiation", "via": "dialog", "position": 3}
@@ -3314,6 +3384,7 @@
 {"word": "dibber", "synonym": "dibble", "via": "dibber", "position": 1}
 {"word": "dibble", "synonym": "dibber", "via": "dibble", "position": 1}
 {"word": "dibbuk", "synonym": "dybbuk", "via": "dybbuk", "position": 1}
+{"word": "dibrach", "synonym": "pyrrhic", "via": "dibrach", "position": 1}
 {"word": "dice", "synonym": "die", "via": "dice", "position": 1}
 {"word": "dice", "synonym": "cube", "via": "dice", "position": 2}
 {"word": "dice", "synonym": "die", "via": "die", "position": 1}
@@ -3327,6 +3398,7 @@
 {"word": "dichromatic", "synonym": "bicolour", "via": "dichromatic", "position": 2}
 {"word": "dichromatic", "synonym": "bicolored", "via": "dichromatic", "position": 3}
 {"word": "dichromatic", "synonym": "bichrome", "via": "dichromatic", "position": 4}
+{"word": "dichromaticism", "synonym": "dichroism", "via": "dichromaticism", "position": 1}
 {"word": "dick", "synonym": "cock", "via": "dick", "position": 1}
 {"word": "dick", "synonym": "prick", "via": "dick", "position": 2}
 {"word": "dick", "synonym": "shaft", "via": "dick", "position": 3}
@@ -3359,6 +3431,7 @@
 {"word": "dictation", "synonym": "command", "via": "dictation", "position": 1}
 {"word": "dictation", "synonym": "bid", "via": "dictation", "position": 2}
 {"word": "dictation", "synonym": "bidding", "via": "dictation", "position": 3}
+{"word": "dictative", "synonym": "dictatorial", "via": "dictative", "position": 1}
 {"word": "dictator", "synonym": "authoritarian", "via": "dictator", "position": 1}
 {"word": "dictator", "synonym": "potentate", "via": "dictator", "position": 2}
 {"word": "dictatorial", "synonym": "authoritarian", "via": "dictatorial", "position": 1}
@@ -3381,6 +3454,7 @@
 {"word": "dictionary", "synonym": "lexicon", "via": "dictionary", "position": 1}
 {"word": "dictum", "synonym": "pronouncement", "via": "dictum", "position": 1}
 {"word": "dicumarol", "synonym": "dicoumarol", "via": "dicoumarol", "position": 1}
+{"word": "dicyclopentadienyliron", "synonym": "ferrocene", "via": "dicyclopentadienyliron", "position": 1}
 {"word": "didactic", "synonym": "didactical", "via": "didactic", "position": 1}
 {"word": "didactical", "synonym": "didactic", "via": "didactical", "position": 1}
 {"word": "didactically", "synonym": "pedagogically", "via": "didactically", "position": 1}
@@ -3417,6 +3491,7 @@
 {"word": "diddlysquat", "synonym": "diddley", "via": "diddlysquat", "position": 3}
 {"word": "diddlysquat", "synonym": "squat", "via": "diddlysquat", "position": 4}
 {"word": "diddlysquat", "synonym": "shit", "via": "diddlysquat", "position": 5}
+{"word": "diddy", "synonym": "teat", "via": "diddy", "position": 1}
 {"word": "die", "synonym": "dice", "via": "die", "position": 1}
 {"word": "die", "synonym": "decease", "via": "die", "position": 2}
 {"word": "die", "synonym": "perish", "via": "die", "position": 3}
@@ -3447,6 +3522,7 @@
 {"word": "diet", "synonym": "dieting", "via": "diet", "position": 1}
 {"word": "dietary", "synonym": "dietetic", "via": "dietary", "position": 1}
 {"word": "dietetic", "synonym": "dietary", "via": "dietetic", "position": 1}
+{"word": "diethylacetal", "synonym": "acetal", "via": "diethylacetal", "position": 1}
 {"word": "dietician", "synonym": "dietitian", "via": "dietitian", "position": 1}
 {"word": "dieting", "synonym": "diet", "via": "diet", "position": 1}
 {"word": "dieting", "synonym": "diet", "via": "dieting", "position": 1}
@@ -3509,6 +3585,7 @@
 {"word": "dig", "synonym": "gibe", "via": "dig", "position": 9}
 {"word": "dig", "synonym": "comprehend", "via": "dig", "position": 10}
 {"word": "digest", "synonym": "compilation", "via": "digest", "position": 1}
+{"word": "digestant", "synonym": "digestive", "via": "digestant", "position": 1}
 {"word": "digger", "synonym": "excavator", "via": "digger", "position": 1}
 {"word": "digger", "synonym": "shovel", "via": "digger", "position": 2}
 {"word": "digging", "synonym": "excavation", "via": "dig", "position": 1}
@@ -3560,6 +3637,7 @@
 {"word": "digs", "synonym": "domiciliation", "via": "digs", "position": 2}
 {"word": "digs", "synonym": "lodgings", "via": "digs", "position": 3}
 {"word": "digs", "synonym": "pad", "via": "digs", "position": 4}
+{"word": "dihydromorphinone", "synonym": "hydromorphone", "via": "dihydromorphinone", "position": 1}
 {"word": "dike", "synonym": "dam", "via": "deck", "position": 1}
 {"word": "dike", "synonym": "dyke", "via": "deck", "position": 2}
 {"word": "dike", "synonym": "butch", "via": "deck", "position": 3}
@@ -3568,6 +3646,7 @@
 {"word": "dike", "synonym": "dam", "via": "dyke", "position": 1}
 {"word": "dike", "synonym": "dyke", "via": "dyke", "position": 2}
 {"word": "dike", "synonym": "butch", "via": "dyke", "position": 3}
+{"word": "dilacerate", "synonym": "rend", "via": "dilacerate", "position": 1}
 {"word": "dilapidate", "synonym": "decay", "via": "dilapidate", "position": 1}
 {"word": "dilapidate", "synonym": "crumble", "via": "dilapidate", "position": 2}
 {"word": "dilapidated", "synonym": "bedraggled", "via": "dilapidate", "position": 1}
@@ -3639,6 +3718,11 @@
 {"word": "dimension", "synonym": "proportion", "via": "dimension", "position": 1}
 {"word": "dimension", "synonym": "property", "via": "dimension", "position": 2}
 {"word": "dimension", "synonym": "attribute", "via": "dimension", "position": 3}
+{"word": "dimethylbenzene", "synonym": "xylene", "via": "dimethylbenzene", "position": 1}
+{"word": "dimethylcarbinol", "synonym": "isopropanol", "via": "dimethylcarbinol", "position": 1}
+{"word": "dimethylketol", "synonym": "acetoin", "via": "dimethylketol", "position": 1}
+{"word": "dimethylketone", "synonym": "acetone", "via": "dimethylketone", "position": 1}
+{"word": "dimethylmethane", "synonym": "propane", "via": "dimethylmethane", "position": 1}
 {"word": "diminish", "synonym": "decrease", "via": "diminish", "position": 1}
 {"word": "diminish", "synonym": "lessen", "via": "diminish", "position": 2}
 {"word": "diminish", "synonym": "fall", "via": "diminish", "position": 3}
@@ -3681,6 +3765,7 @@
 {"word": "dimorphous", "synonym": "dimorphic", "via": "dimorphous", "position": 1}
 {"word": "dimout", "synonym": "blackout", "via": "dimout", "position": 1}
 {"word": "dimout", "synonym": "brownout", "via": "dimout", "position": 2}
+{"word": "dimpsy", "synonym": "twilight", "via": "dimpsy", "position": 1}
 {"word": "dimwit", "synonym": "nitwit", "via": "dimwit", "position": 1}
 {"word": "dimwit", "synonym": "doofus", "via": "dimwit", "position": 2}
 {"word": "din", "synonym": "commotion", "via": "din", "position": 1}
@@ -3711,6 +3796,7 @@
 {"word": "dingdong", "synonym": "ding", "via": "dingdong", "position": 1}
 {"word": "dingdong", "synonym": "dong", "via": "dingdong", "position": 2}
 {"word": "dinge", "synonym": "dinginess", "via": "dinge", "position": 1}
+{"word": "dinghizen", "synonym": "syringe", "via": "dinghizen", "position": 1}
 {"word": "dinghy", "synonym": "dory", "via": "dinghy", "position": 1}
 {"word": "dinghy", "synonym": "rowboat", "via": "dinghy", "position": 2}
 {"word": "dingily", "synonym": "grubbily", "via": "dingily", "position": 1}
@@ -3749,6 +3835,7 @@
 {"word": "dioptre", "synonym": "diopter", "via": "diopter", "position": 1}
 {"word": "diorama", "synonym": "panorama", "via": "diorama", "position": 1}
 {"word": "diorama", "synonym": "cyclorama", "via": "diorama", "position": 2}
+{"word": "diosmose", "synonym": "osmose", "via": "diosmose", "position": 1}
 {"word": "dip", "synonym": "plunge", "via": "dip", "position": 1}
 {"word": "dip", "synonym": "drop", "via": "dip", "position": 2}
 {"word": "dip", "synonym": "fall", "via": "dip", "position": 3}
@@ -3759,6 +3846,13 @@
 {"word": "dip", "synonym": "souse", "via": "dip", "position": 8}
 {"word": "dip", "synonym": "douse", "via": "dip", "position": 9}
 {"word": "dip", "synonym": "duck", "via": "dip", "position": 10}
+{"word": "diphenylacetylene", "synonym": "tolane", "via": "diphenylacetylene", "position": 1}
+{"word": "diphenylaminechlorarsine", "synonym": "adamsite", "via": "diphenylaminechlorarsine", "position": 1}
+{"word": "diphonia", "synonym": "diplophonia", "via": "diphonia", "position": 1}
+{"word": "diphonia", "synonym": "diphthongia", "via": "diphonia", "position": 2}
+{"word": "diphthongia", "synonym": "diplophonia", "via": "diphthongia", "position": 1}
+{"word": "diphthongia", "synonym": "diphonia", "via": "diphthongia", "position": 2}
+{"word": "diphthongic", "synonym": "diphthongal", "via": "diphthongic", "position": 1}
 {"word": "diploma", "synonym": "sheepskin", "via": "diploma", "position": 1}
 {"word": "diplomacy", "synonym": "delicacy", "via": "diplomacy", "position": 1}
 {"word": "diplomacy", "synonym": "discreetness", "via": "diplomacy", "position": 2}
@@ -3767,6 +3861,7 @@
 {"word": "diplomacy", "synonym": "statecraft", "via": "diplomacy", "position": 5}
 {"word": "diplomat", "synonym": "diplomatist", "via": "diplomat", "position": 1}
 {"word": "diplomatist", "synonym": "diplomat", "via": "diplomatist", "position": 1}
+{"word": "diplonema", "synonym": "diplotene", "via": "diplonema", "position": 1}
 {"word": "dipped", "synonym": "lordotic", "via": "dip", "position": 1}
 {"word": "dipped", "synonym": "swayback", "via": "dip", "position": 2}
 {"word": "dipped", "synonym": "swaybacked", "via": "dip", "position": 3}
@@ -3780,6 +3875,7 @@
 {"word": "dipsomaniac", "synonym": "souse", "via": "dipsomaniac", "position": 6}
 {"word": "dipteran", "synonym": "dipteron", "via": "dipteran", "position": 1}
 {"word": "dipteron", "synonym": "dipteran", "via": "dipteron", "position": 1}
+{"word": "dipyramid", "synonym": "bipyramid", "via": "dipyramid", "position": 1}
 {"word": "dire", "synonym": "awful", "via": "dire", "position": 1}
 {"word": "dire", "synonym": "direful", "via": "dire", "position": 2}
 {"word": "dire", "synonym": "dread", "via": "dire", "position": 3}
@@ -3823,6 +3919,7 @@
 {"word": "directionless", "synonym": "planless", "via": "directionless", "position": 4}
 {"word": "directionless", "synonym": "rudderless", "via": "directionless", "position": 5}
 {"word": "directionless", "synonym": "undirected", "via": "directionless", "position": 6}
+{"word": "directionlessness", "synonym": "aimlessness", "via": "directionlessness", "position": 1}
 {"word": "directive", "synonym": "directing", "via": "directive", "position": 1}
 {"word": "directive", "synonym": "directional", "via": "directive", "position": 2}
 {"word": "directive", "synonym": "guiding", "via": "directive", "position": 3}
@@ -3853,6 +3950,7 @@
 {"word": "direful", "synonym": "frightening", "via": "direful", "position": 8}
 {"word": "direful", "synonym": "horrendous", "via": "direful", "position": 9}
 {"word": "direful", "synonym": "horrific", "via": "direful", "position": 10}
+{"word": "diremption", "synonym": "rupture", "via": "diremption", "position": 1}
 {"word": "dirge", "synonym": "coronach", "via": "dirge", "position": 1}
 {"word": "dirge", "synonym": "lament", "via": "dirge", "position": 2}
 {"word": "dirge", "synonym": "requiem", "via": "dirge", "position": 3}
@@ -4048,6 +4146,8 @@
 {"word": "discernment", "synonym": "appreciation", "via": "discernment", "position": 8}
 {"word": "discernment", "synonym": "understanding", "via": "discernment", "position": 9}
 {"word": "discernment", "synonym": "apprehension", "via": "discernment", "position": 10}
+{"word": "discerptible", "synonym": "divisible", "via": "discerptible", "position": 1}
+{"word": "discerptible", "synonym": "separable", "via": "discerptible", "position": 2}
 {"word": "discharge", "synonym": "firing", "via": "discharge", "position": 1}
 {"word": "discharge", "synonym": "release", "via": "discharge", "position": 2}
 {"word": "discharge", "synonym": "waiver", "via": "discharge", "position": 3}
@@ -4139,6 +4239,7 @@
 {"word": "disconcert", "synonym": "flurry", "via": "disconcert", "position": 6}
 {"word": "disconcerting", "synonym": "upsetting", "via": "disconcert", "position": 1}
 {"word": "disconcerting", "synonym": "upsetting", "via": "disconcerting", "position": 1}
+{"word": "disconcertingly", "synonym": "unsettlingly", "via": "disconcertingly", "position": 1}
 {"word": "disconcertment", "synonym": "discomfiture", "via": "disconcertment", "position": 1}
 {"word": "disconcertment", "synonym": "discomposure", "via": "disconcertment", "position": 2}
 {"word": "disconfirming", "synonym": "negative", "via": "disconfirm", "position": 1}
@@ -4191,6 +4292,7 @@
 {"word": "discontinue", "synonym": "cease", "via": "discontinue", "position": 3}
 {"word": "discontinue", "synonym": "quit", "via": "discontinue", "position": 4}
 {"word": "discontinuous", "synonym": "noncontinuous", "via": "discontinuous", "position": 1}
+{"word": "discontinuously", "synonym": "intermittently", "via": "discontinuously", "position": 1}
 {"word": "discord", "synonym": "discordance", "via": "discord", "position": 1}
 {"word": "discord", "synonym": "dissension", "via": "discord", "position": 2}
 {"word": "discord", "synonym": "strife", "via": "discord", "position": 3}
@@ -4248,6 +4350,7 @@
 {"word": "discovery", "synonym": "find", "via": "discovery", "position": 1}
 {"word": "discovery", "synonym": "uncovering", "via": "discovery", "position": 2}
 {"word": "discovery", "synonym": "breakthrough", "via": "discovery", "position": 3}
+{"word": "discreate", "synonym": "annihilate", "via": "discreate", "position": 1}
 {"word": "discredit", "synonym": "disrepute", "via": "discredit", "position": 1}
 {"word": "discredit", "synonym": "disbelieve", "via": "discredit", "position": 2}
 {"word": "discredit", "synonym": "disgrace", "via": "discredit", "position": 3}
@@ -4289,6 +4392,7 @@
 {"word": "discretion", "synonym": "circumspection", "via": "discretion", "position": 3}
 {"word": "discretion", "synonym": "prudence", "via": "discretion", "position": 4}
 {"word": "discretion", "synonym": "delicacy", "via": "discretion", "position": 5}
+{"word": "discretional", "synonym": "discretionary", "via": "discretional", "position": 1}
 {"word": "discriminate", "synonym": "separate", "via": "discriminate", "position": 1}
 {"word": "discriminating", "synonym": "acute", "via": "discriminate", "position": 1}
 {"word": "discriminating", "synonym": "incisive", "via": "discriminate", "position": 2}
@@ -4357,9 +4461,15 @@
 {"word": "disembodied", "synonym": "unbodied", "via": "disembodied", "position": 2}
 {"word": "disembodied", "synonym": "bodiless", "via": "disembody", "position": 1}
 {"word": "disembodied", "synonym": "unbodied", "via": "disembody", "position": 2}
+{"word": "disembosom", "synonym": "divulge", "via": "disembosom", "position": 1}
+{"word": "disembosom", "synonym": "reveal", "via": "disembosom", "position": 2}
 {"word": "disembowel", "synonym": "eviscerate", "via": "disembowel", "position": 1}
 {"word": "disembowel", "synonym": "draw", "via": "disembowel", "position": 2}
 {"word": "disembowelment", "synonym": "evisceration", "via": "disembowelment", "position": 1}
+{"word": "disembroil", "synonym": "extricate", "via": "disembroil", "position": 1}
+{"word": "disembroil", "synonym": "untangle", "via": "disembroil", "position": 2}
+{"word": "disenamor", "synonym": "disenchant", "via": "disenamor", "position": 1}
+{"word": "disenamor", "synonym": "disillusion", "via": "disenamor", "position": 2}
 {"word": "disenchant", "synonym": "disillusion", "via": "disenchant", "position": 1}
 {"word": "disenchanting", "synonym": "disillusioning", "via": "disenchant", "position": 1}
 {"word": "disenchanting", "synonym": "disillusioning", "via": "disenchanting", "position": 1}
@@ -4381,9 +4491,15 @@
 {"word": "disentangle", "synonym": "disencumber", "via": "disentangle", "position": 6}
 {"word": "disentangled", "synonym": "loosened", "via": "disentangle", "position": 1}
 {"word": "disentangled", "synonym": "unsnarled", "via": "disentangle", "position": 2}
+{"word": "disenthrone", "synonym": "dethrone", "via": "disenthrone", "position": 1}
+{"word": "disenthrone", "synonym": "depose", "via": "disenthrone", "position": 2}
+{"word": "disentwine", "synonym": "untwine", "via": "disentwine", "position": 1}
+{"word": "disentwine", "synonym": "disentangle", "via": "disentwine", "position": 2}
 {"word": "disesteem", "synonym": "disrespect", "via": "disesteem", "position": 1}
 {"word": "disfavor", "synonym": "dislike", "via": "disfavor", "position": 1}
 {"word": "disfavor", "synonym": "disapproval", "via": "disfavor", "position": 2}
+{"word": "disfeature", "synonym": "disfigure", "via": "disfeature", "position": 1}
+{"word": "disfeature", "synonym": "deface", "via": "disfeature", "position": 2}
 {"word": "disfigure", "synonym": "deface", "via": "disfigure", "position": 1}
 {"word": "disfigure", "synonym": "blemish", "via": "disfigure", "position": 2}
 {"word": "disfigurement", "synonym": "defacement", "via": "disfigurement", "position": 1}
@@ -4392,6 +4508,7 @@
 {"word": "disfranchise", "synonym": "disenfranchise", "via": "disfranchise", "position": 1}
 {"word": "disfranchised", "synonym": "voiceless", "via": "disfranchise", "position": 1}
 {"word": "disfranchised", "synonym": "voteless", "via": "disfranchise", "position": 2}
+{"word": "disfranchisement", "synonym": "disenfranchisement", "via": "disfranchisement", "position": 1}
 {"word": "disfunction", "synonym": "dysfunction", "via": "dysfunction", "position": 1}
 {"word": "disgorge", "synonym": "vomit", "via": "disgorge", "position": 1}
 {"word": "disgorge", "synonym": "purge", "via": "disgorge", "position": 2}
@@ -4428,6 +4545,8 @@
 {"word": "disgracefully", "synonym": "discreditably", "via": "disgracefully", "position": 3}
 {"word": "disgracefully", "synonym": "shamefully", "via": "disgracefully", "position": 4}
 {"word": "disgracefully", "synonym": "dishonorably", "via": "disgracefully", "position": 5}
+{"word": "disgregate", "synonym": "scatter", "via": "disgregate", "position": 1}
+{"word": "disgregate", "synonym": "disperse", "via": "disgregate", "position": 2}
 {"word": "disgruntled", "synonym": "dissatisfied", "via": "disgruntle", "position": 1}
 {"word": "disgruntled", "synonym": "dissatisfied", "via": "disgruntled", "position": 1}
 {"word": "disguise", "synonym": "camouflage", "via": "disguise", "position": 1}
@@ -4485,6 +4604,8 @@
 {"word": "dish", "synonym": "peach", "via": "dish", "position": 8}
 {"word": "dish", "synonym": "lulu", "via": "dish", "position": 9}
 {"word": "dishabille", "synonym": "deshabille", "via": "dishabille", "position": 1}
+{"word": "dishallow", "synonym": "desecrate", "via": "dishallow", "position": 1}
+{"word": "dishallow", "synonym": "profane", "via": "dishallow", "position": 2}
 {"word": "disharmonious", "synonym": "discordant", "via": "disharmonious", "position": 1}
 {"word": "disharmonious", "synonym": "dissonant", "via": "disharmonious", "position": 2}
 {"word": "disharmonious", "synonym": "inharmonic", "via": "disharmonious", "position": 3}
@@ -4501,6 +4622,7 @@
 {"word": "disheartenment", "synonym": "dismay", "via": "disheartenment", "position": 2}
 {"word": "dished", "synonym": "patelliform", "via": "dish", "position": 1}
 {"word": "dished", "synonym": "patelliform", "via": "dished", "position": 1}
+{"word": "disherison", "synonym": "disinheritance", "via": "disherison", "position": 1}
 {"word": "dishevel", "synonym": "tousle", "via": "dishevel", "position": 1}
 {"word": "dishevel", "synonym": "tangle", "via": "dishevel", "position": 2}
 {"word": "disheveled", "synonym": "dishevelled", "via": "dishevel", "position": 1}
@@ -4543,6 +4665,8 @@
 {"word": "disillusion", "synonym": "disenchantment", "via": "disillusion", "position": 1}
 {"word": "disillusion", "synonym": "disenchant", "via": "disillusion", "position": 2}
 {"word": "disillusioning", "synonym": "disenchanting", "via": "disillusion", "position": 1}
+{"word": "disimpassioned", "synonym": "dispassionate", "via": "disimpassioned", "position": 1}
+{"word": "disimprison", "synonym": "release", "via": "disimprison", "position": 1}
 {"word": "disincentive", "synonym": "deterrence", "via": "disincentive", "position": 1}
 {"word": "disinclination", "synonym": "reluctance", "via": "disinclination", "position": 1}
 {"word": "disinclination", "synonym": "hesitancy", "via": "disinclination", "position": 2}
@@ -4556,6 +4680,7 @@
 {"word": "disingenuous", "synonym": "artful", "via": "disingenuous", "position": 1}
 {"word": "disingenuously", "synonym": "artfully", "via": "disingenuously", "position": 1}
 {"word": "disinherit", "synonym": "disown", "via": "disinherit", "position": 1}
+{"word": "disinhume", "synonym": "disinter", "via": "disinhume", "position": 1}
 {"word": "disintegrate", "synonym": "decay", "via": "disintegrate", "position": 1}
 {"word": "disintegrate", "synonym": "decompose", "via": "disintegrate", "position": 2}
 {"word": "disintegration", "synonym": "annihilation", "via": "disintegration", "position": 1}
@@ -4564,8 +4689,11 @@
 {"word": "disintegration", "synonym": "decomposition", "via": "disintegration", "position": 4}
 {"word": "disinter", "synonym": "exhume", "via": "disinter", "position": 1}
 {"word": "disinterest", "synonym": "neutrality", "via": "disinterest", "position": 1}
+{"word": "disinterestedly", "synonym": "impartially", "via": "disinterestedly", "position": 1}
 {"word": "disinterment", "synonym": "exhumation", "via": "disinterment", "position": 1}
+{"word": "disintoxication", "synonym": "detoxification", "via": "disintoxication", "position": 1}
 {"word": "disinvest", "synonym": "divest", "via": "disinvest", "position": 1}
+{"word": "disjasked", "synonym": "dilapidated", "via": "disjasked", "position": 1}
 {"word": "disjoin", "synonym": "disjoint", "via": "disjoin", "position": 1}
 {"word": "disjoined", "synonym": "separate", "via": "disjoin", "position": 1}
 {"word": "disjoined", "synonym": "separate", "via": "disjoined", "position": 1}
@@ -4853,6 +4981,7 @@
 {"word": "displume", "synonym": "pull", "via": "displume", "position": 2}
 {"word": "displume", "synonym": "tear", "via": "displume", "position": 3}
 {"word": "displume", "synonym": "deplume", "via": "displume", "position": 4}
+{"word": "disponible", "synonym": "available", "via": "disponible", "position": 1}
 {"word": "disport", "synonym": "frolic", "via": "disport", "position": 1}
 {"word": "disport", "synonym": "lark", "via": "disport", "position": 2}
 {"word": "disport", "synonym": "rollick", "via": "disport", "position": 3}
@@ -4899,6 +5028,9 @@
 {"word": "disproof", "synonym": "falsifying", "via": "disproof", "position": 2}
 {"word": "disproof", "synonym": "refutation", "via": "disproof", "position": 3}
 {"word": "disproof", "synonym": "refutal", "via": "disproof", "position": 4}
+{"word": "disproportional", "synonym": "disproportionate", "via": "disproportional", "position": 1}
+{"word": "disproportionally", "synonym": "disproportionately", "via": "disproportionally", "position": 1}
+{"word": "disproportionalness", "synonym": "disproportion", "via": "disproportionalness", "position": 1}
 {"word": "disprove", "synonym": "confute", "via": "disprove", "position": 1}
 {"word": "disputable", "synonym": "debatable", "via": "disputable", "position": 1}
 {"word": "disputable", "synonym": "arguable", "via": "disputable", "position": 2}
@@ -4956,6 +5088,7 @@
 {"word": "disregarded", "synonym": "forgotten", "via": "disregarded", "position": 1}
 {"word": "disregarding", "synonym": "regardless", "via": "disregard", "position": 1}
 {"word": "disregarding", "synonym": "irrespective", "via": "disregard", "position": 2}
+{"word": "disreputation", "synonym": "disrepute", "via": "disreputation", "position": 1}
 {"word": "disrepute", "synonym": "discredit", "via": "disrepute", "position": 1}
 {"word": "disrespect", "synonym": "contempt", "via": "disrespect", "position": 1}
 {"word": "disrespect", "synonym": "discourtesy", "via": "disrespect", "position": 2}
@@ -4980,9 +5113,12 @@
 {"word": "disruptive", "synonym": "troubled", "via": "disruptive", "position": 2}
 {"word": "disruptive", "synonym": "tumultuous", "via": "disruptive", "position": 3}
 {"word": "disruptive", "synonym": "turbulent", "via": "disruptive", "position": 4}
+{"word": "disrupture", "synonym": "disruption", "via": "disrupture", "position": 1}
+{"word": "disrupture", "synonym": "interruption", "via": "disrupture", "position": 2}
 {"word": "diss", "synonym": "insult", "via": "diss", "position": 1}
 {"word": "diss", "synonym": "affront", "via": "diss", "position": 2}
 {"word": "dissatisfaction", "synonym": "discontent", "via": "dissatisfaction", "position": 1}
+{"word": "dissatisfactory", "synonym": "unsatisfactory", "via": "dissatisfactory", "position": 1}
 {"word": "dissatisfied", "synonym": "disgruntled", "via": "dissatisfied", "position": 1}
 {"word": "dissatisfied", "synonym": "disgruntled", "via": "dissatisfy", "position": 1}
 {"word": "dissect", "synonym": "analyze", "via": "dissect", "position": 1}
@@ -5145,11 +5281,11 @@
 {"word": "dissolver", "synonym": "dissolvent", "via": "dissolver", "position": 2}
 {"word": "dissolver", "synonym": "resolvent", "via": "dissolver", "position": 3}
 {"word": "dissolving", "synonym": "dissolution", "via": "dissolve", "position": 1}
-{"word": "dissolving", "synonym": "dissolution", "via": "dissolving", "position": 1}
 {"word": "dissonance", "synonym": "noise", "via": "dissonance", "position": 1}
 {"word": "dissonance", "synonym": "racket", "via": "dissonance", "position": 2}
 {"word": "dissonance", "synonym": "disagreement", "via": "dissonance", "position": 3}
 {"word": "dissonance", "synonym": "dissension", "via": "dissonance", "position": 4}
+{"word": "dissonancy", "synonym": "dissonance", "via": "dissonancy", "position": 1}
 {"word": "dissonant", "synonym": "discrepant", "via": "dissonant", "position": 1}
 {"word": "dissonant", "synonym": "discordant", "via": "dissonant", "position": 2}
 {"word": "dissonant", "synonym": "disharmonious", "via": "dissonant", "position": 3}
@@ -5185,6 +5321,7 @@
 {"word": "distastefully", "synonym": "revoltingly", "via": "distastefully", "position": 2}
 {"word": "distastefully", "synonym": "sickeningly", "via": "distastefully", "position": 3}
 {"word": "distend", "synonym": "dilate", "via": "distend", "position": 1}
+{"word": "distensile", "synonym": "distensible", "via": "distensile", "position": 1}
 {"word": "distension", "synonym": "distention", "via": "distension", "position": 1}
 {"word": "distension", "synonym": "dilatation", "via": "distension", "position": 2}
 {"word": "distention", "synonym": "distension", "via": "distension", "position": 1}
@@ -5201,6 +5338,7 @@
 {"word": "distillate", "synonym": "distillation", "via": "distillate", "position": 1}
 {"word": "distillation", "synonym": "distillate", "via": "distillation", "position": 1}
 {"word": "distillery", "synonym": "still", "via": "distillery", "position": 1}
+{"word": "distillment", "synonym": "distillation", "via": "distillment", "position": 1}
 {"word": "distinct", "synonym": "trenchant", "via": "distinct", "position": 1}
 {"word": "distinct", "synonym": "decided", "via": "distinct", "position": 2}
 {"word": "distinct", "synonym": "discrete", "via": "distinct", "position": 3}
@@ -5231,6 +5369,7 @@
 {"word": "distinguished", "synonym": "grand", "via": "distinguished", "position": 1}
 {"word": "distinguished", "synonym": "imposing", "via": "distinguished", "position": 2}
 {"word": "distinguished", "synonym": "magisterial", "via": "distinguished", "position": 3}
+{"word": "distinguishment", "synonym": "distinction", "via": "distinguishment", "position": 1}
 {"word": "distort", "synonym": "deform", "via": "distort", "position": 1}
 {"word": "distort", "synonym": "strain", "via": "distort", "position": 2}
 {"word": "distort", "synonym": "falsify", "via": "distort", "position": 3}
@@ -5456,6 +5595,7 @@
 {"word": "diversely", "synonym": "variously", "via": "diversely", "position": 1}
 {"word": "diverseness", "synonym": "diversity", "via": "diverseness", "position": 1}
 {"word": "diverseness", "synonym": "variety", "via": "diverseness", "position": 2}
+{"word": "diversiform", "synonym": "variform", "via": "diversiform", "position": 1}
 {"word": "diversify", "synonym": "broaden", "via": "diversify", "position": 1}
 {"word": "diversify", "synonym": "radiate", "via": "diversify", "position": 2}
 {"word": "diversion", "synonym": "deviation", "via": "diversion", "position": 1}
@@ -5511,6 +5651,7 @@
 {"word": "divine", "synonym": "ecclesiastic", "via": "divine", "position": 8}
 {"word": "divine", "synonym": "elysian", "via": "divine", "position": 9}
 {"word": "divine", "synonym": "inspired", "via": "divine", "position": 10}
+{"word": "divineness", "synonym": "divinity", "via": "divineness", "position": 1}
 {"word": "diving", "synonym": "dive", "via": "dive", "position": 1}
 {"word": "diving", "synonym": "dive", "via": "diving", "position": 1}
 {"word": "divinity", "synonym": "theology", "via": "divinity", "position": 1}
@@ -5533,6 +5674,8 @@
 {"word": "divorce", "synonym": "disunite", "via": "divorce", "position": 4}
 {"word": "divorce", "synonym": "disjoint", "via": "divorce", "position": 5}
 {"word": "divorcement", "synonym": "divorce", "via": "divorcement", "position": 1}
+{"word": "divulgate", "synonym": "publish", "via": "divulgate", "position": 1}
+{"word": "divulgate", "synonym": "proclaim", "via": "divulgate", "position": 2}
 {"word": "divulge", "synonym": "unwrap", "via": "divulge", "position": 1}
 {"word": "divulge", "synonym": "disclose", "via": "divulge", "position": 2}
 {"word": "divulge", "synonym": "reveal", "via": "divulge", "position": 3}
@@ -5671,12 +5814,6 @@
 {"word": "dodging", "synonym": "escape", "via": "dodge", "position": 4}
 {"word": "dodging", "synonym": "dodge", "via": "dodge", "position": 5}
 {"word": "dodging", "synonym": "scheme", "via": "dodge", "position": 6}
-{"word": "dodging", "synonym": "avoidance", "via": "dodging", "position": 1}
-{"word": "dodging", "synonym": "shunning", "via": "dodging", "position": 2}
-{"word": "dodging", "synonym": "evasion", "via": "dodging", "position": 3}
-{"word": "dodging", "synonym": "escape", "via": "dodging", "position": 4}
-{"word": "dodging", "synonym": "dodge", "via": "dodging", "position": 5}
-{"word": "dodging", "synonym": "scheme", "via": "dodging", "position": 6}
 {"word": "dodgy", "synonym": "crafty", "via": "dodgy", "position": 1}
 {"word": "dodgy", "synonym": "cunning", "via": "dodgy", "position": 2}
 {"word": "dodgy", "synonym": "foxy", "via": "dodgy", "position": 3}
@@ -5693,6 +5830,8 @@
 {"word": "doe", "synonym": "energy", "via": "though", "position": 1}
 {"word": "doer", "synonym": "actor", "via": "doer", "position": 1}
 {"word": "doer", "synonym": "worker", "via": "doer", "position": 2}
+{"word": "dof", "synonym": "stupid", "via": "dof", "position": 1}
+{"word": "dof", "synonym": "daft", "via": "dof", "position": 2}
 {"word": "dog", "synonym": "andiron", "via": "dog", "position": 1}
 {"word": "dog", "synonym": "firedog", "via": "dog", "position": 2}
 {"word": "dog", "synonym": "pawl", "via": "dog", "position": 3}
@@ -5733,6 +5872,7 @@
 {"word": "doggy", "synonym": "pooch", "via": "doggy", "position": 1}
 {"word": "doggy", "synonym": "doggie", "via": "doggy", "position": 2}
 {"word": "doggy", "synonym": "barker", "via": "doggy", "position": 3}
+{"word": "doghanged", "synonym": "hangdog", "via": "doghanged", "position": 1}
 {"word": "doghouse", "synonym": "kennel", "via": "doghouse", "position": 1}
 {"word": "dogie", "synonym": "dogy", "via": "dogie", "position": 1}
 {"word": "dogma", "synonym": "tenet", "via": "dogma", "position": 1}
@@ -5762,6 +5902,7 @@
 {"word": "dole", "synonym": "pogey", "via": "dole", "position": 2}
 {"word": "doleful", "synonym": "mournful", "via": "doleful", "position": 1}
 {"word": "dolefully", "synonym": "sorrowfully", "via": "dolefully", "position": 1}
+{"word": "dolichocranic", "synonym": "dolichocephalic", "via": "dolichocranic", "position": 1}
 {"word": "doll", "synonym": "dolly", "via": "dal", "position": 1}
 {"word": "doll", "synonym": "dame", "via": "dal", "position": 2}
 {"word": "doll", "synonym": "wench", "via": "dal", "position": 3}
@@ -5815,6 +5956,7 @@
 {"word": "domesticated", "synonym": "domestic", "via": "domesticate", "position": 1}
 {"word": "domesticated", "synonym": "domestic", "via": "domesticated", "position": 1}
 {"word": "domestication", "synonym": "tameness", "via": "domestication", "position": 1}
+{"word": "domesticize", "synonym": "domesticate", "via": "domesticize", "position": 1}
 {"word": "domicile", "synonym": "dwelling", "via": "domicile", "position": 1}
 {"word": "domicile", "synonym": "home", "via": "domicile", "position": 2}
 {"word": "domicile", "synonym": "abode", "via": "domicile", "position": 3}
@@ -5868,9 +6010,9 @@
 {"word": "dominion", "synonym": "rule", "via": "dominion", "position": 3}
 {"word": "dominique", "synonym": "dominick", "via": "dominique", "position": 1}
 {"word": "dominoes", "synonym": "dominos", "via": "domino", "position": 1}
-{"word": "dominoes", "synonym": "dominos", "via": "dominoes", "position": 1}
 {"word": "dominos", "synonym": "dominoes", "via": "domino", "position": 1}
-{"word": "dominos", "synonym": "dominoes", "via": "dominoes", "position": 1}
+{"word": "domme", "synonym": "dominatrix", "via": "domme", "position": 1}
+{"word": "dommy", "synonym": "home", "via": "dommy", "position": 1}
 {"word": "don", "synonym": "father", "via": "don", "position": 1}
 {"word": "don", "synonym": "preceptor", "via": "don", "position": 2}
 {"word": "don", "synonym": "wear", "via": "don", "position": 3}
@@ -5881,11 +6023,15 @@
 {"word": "donee", "synonym": "beneficiary", "via": "donee", "position": 1}
 {"word": "dong", "synonym": "ding", "via": "dong", "position": 1}
 {"word": "dong", "synonym": "dingdong", "via": "dong", "position": 2}
+{"word": "donicker", "synonym": "toilet", "via": "donicker", "position": 1}
+{"word": "donicker", "synonym": "lavatory", "via": "donicker", "position": 2}
 {"word": "donjon", "synonym": "keep", "via": "donjon", "position": 1}
 {"word": "donjon", "synonym": "dungeon", "via": "donjon", "position": 2}
 {"word": "donkeywork", "synonym": "drudgery", "via": "donkeywork", "position": 1}
 {"word": "donkeywork", "synonym": "plodding", "via": "donkeywork", "position": 2}
 {"word": "donkeywork", "synonym": "grind", "via": "donkeywork", "position": 3}
+{"word": "donnard", "synonym": "dazed", "via": "donnard", "position": 1}
+{"word": "donnie", "synonym": "brawl", "via": "donnie", "position": 1}
 {"word": "donnish", "synonym": "academic", "via": "donnish", "position": 1}
 {"word": "donnish", "synonym": "pedantic", "via": "donnish", "position": 2}
 {"word": "donor", "synonym": "giver", "via": "donor", "position": 1}
@@ -5893,6 +6039,12 @@
 {"word": "donor", "synonym": "conferrer", "via": "donor", "position": 3}
 {"word": "donut", "synonym": "doughnut", "via": "doughnut", "position": 1}
 {"word": "donut", "synonym": "sinker", "via": "doughnut", "position": 2}
+{"word": "doo", "synonym": "dove", "via": "doo", "position": 1}
+{"word": "doo", "synonym": "pigeon", "via": "doo", "position": 2}
+{"word": "doob", "synonym": "joint", "via": "doob", "position": 1}
+{"word": "doob", "synonym": "spliff", "via": "doob", "position": 2}
+{"word": "doobie", "synonym": "joint", "via": "doobie", "position": 1}
+{"word": "doodackie", "synonym": "gadget", "via": "doodackie", "position": 1}
 {"word": "doodad", "synonym": "doohickey", "via": "doodad", "position": 1}
 {"word": "doodad", "synonym": "gimmick", "via": "doodad", "position": 2}
 {"word": "doodad", "synonym": "gizmo", "via": "doodad", "position": 3}
@@ -5906,6 +6058,8 @@
 {"word": "doodle", "synonym": "scribble", "via": "doodle", "position": 1}
 {"word": "doodle", "synonym": "scrabble", "via": "doodle", "position": 2}
 {"word": "doodlebug", "synonym": "antlion", "via": "doodlebug", "position": 1}
+{"word": "doodlesack", "synonym": "bagpipe", "via": "doodlesack", "position": 1}
+{"word": "dooflicker", "synonym": "gadget", "via": "dooflicker", "position": 1}
 {"word": "doofus", "synonym": "dimwit", "via": "doofus", "position": 1}
 {"word": "doofus", "synonym": "nitwit", "via": "doofus", "position": 2}
 {"word": "doohickey", "synonym": "doodad", "via": "doohickey", "position": 1}
@@ -5918,6 +6072,7 @@
 {"word": "doohickey", "synonym": "thingummy", "via": "doohickey", "position": 8}
 {"word": "doohickey", "synonym": "whatsis", "via": "doohickey", "position": 9}
 {"word": "doohickey", "synonym": "widget", "via": "doohickey", "position": 10}
+{"word": "dooket", "synonym": "dovecote", "via": "dooket", "position": 1}
 {"word": "doolally", "synonym": "crazy", "via": "doolally", "position": 1}
 {"word": "doom", "synonym": "doomsday", "via": "doom", "position": 1}
 {"word": "doom", "synonym": "destine", "via": "doom", "position": 2}
@@ -5940,6 +6095,8 @@
 {"word": "doomed", "synonym": "unredeemed", "via": "doomed", "position": 6}
 {"word": "doomed", "synonym": "unsaved", "via": "doomed", "position": 7}
 {"word": "doomsday", "synonym": "doom", "via": "doomsday", "position": 1}
+{"word": "doona", "synonym": "duvet", "via": "doona", "position": 1}
+{"word": "doona", "synonym": "comforter", "via": "doona", "position": 2}
 {"word": "door", "synonym": "doorway", "via": "door", "position": 1}
 {"word": "door", "synonym": "threshold", "via": "door", "position": 2}
 {"word": "doorbell", "synonym": "bell", "via": "doorbell", "position": 1}
@@ -5963,6 +6120,9 @@
 {"word": "doorstep", "synonym": "threshold", "via": "doorstep", "position": 2}
 {"word": "doorway", "synonym": "door", "via": "doorway", "position": 1}
 {"word": "doorway", "synonym": "threshold", "via": "doorway", "position": 2}
+{"word": "doover", "synonym": "thingamajig", "via": "doover", "position": 1}
+{"word": "doover", "synonym": "thingummy", "via": "doover", "position": 2}
+{"word": "doowhacker", "synonym": "gadget", "via": "doowhacker", "position": 1}
 {"word": "dope", "synonym": "pot", "via": "dope", "position": 1}
 {"word": "dope", "synonym": "grass", "via": "dope", "position": 2}
 {"word": "dope", "synonym": "weed", "via": "dope", "position": 3}
@@ -6001,6 +6161,7 @@
 {"word": "dormant", "synonym": "hibernating", "via": "dormant", "position": 3}
 {"word": "dormant", "synonym": "torpid", "via": "dormant", "position": 4}
 {"word": "dormant", "synonym": "sleeping", "via": "dormant", "position": 5}
+{"word": "dormeuse", "synonym": "mobcap", "via": "dormeuse", "position": 1}
 {"word": "dormie", "synonym": "dormy", "via": "dormie", "position": 1}
 {"word": "dormitory", "synonym": "dorm", "via": "dormitory", "position": 1}
 {"word": "dormitory", "synonym": "hall", "via": "dormitory", "position": 2}
@@ -6010,7 +6171,6 @@
 {"word": "dorsum", "synonym": "back", "via": "dorsum", "position": 1}
 {"word": "dory", "synonym": "dinghy", "via": "dory", "position": 1}
 {"word": "dory", "synonym": "rowboat", "via": "dory", "position": 2}
-{"word": "dos", "synonym": "state", "via": "dos", "position": 1}
 {"word": "dosage", "synonym": "dose", "via": "dosage", "position": 1}
 {"word": "dose", "synonym": "dosage", "via": "dose", "position": 1}
 {"word": "dose", "synonym": "drug", "via": "dose", "position": 2}
@@ -6021,6 +6181,7 @@
 {"word": "dose", "synonym": "dosage", "via": "doze", "position": 5}
 {"word": "dose", "synonym": "drug", "via": "doze", "position": 6}
 {"word": "doss", "synonym": "crash", "via": "doss", "position": 1}
+{"word": "dosshouse", "synonym": "flophouse", "via": "dosshouse", "position": 1}
 {"word": "dot", "synonym": "point", "via": "dot", "position": 1}
 {"word": "dot", "synonym": "scatter", "via": "dot", "position": 2}
 {"word": "dot", "synonym": "sprinkle", "via": "dot", "position": 3}
@@ -6036,6 +6197,7 @@
 {"word": "dot", "synonym": "sprinkle", "via": "dotty", "position": 9}
 {"word": "dot", "synonym": "dust", "via": "dotty", "position": 10}
 {"word": "dotage", "synonym": "senility", "via": "dotage", "position": 1}
+{"word": "dotey", "synonym": "cute", "via": "dotey", "position": 1}
 {"word": "doting", "synonym": "adoring", "via": "dote", "position": 1}
 {"word": "doting", "synonym": "fond", "via": "dote", "position": 2}
 {"word": "doting", "synonym": "adoring", "via": "doting", "position": 1}
@@ -6187,6 +6349,7 @@
 {"word": "dowery", "synonym": "dowry", "via": "dowry", "position": 1}
 {"word": "dowery", "synonym": "dower", "via": "dowry", "position": 2}
 {"word": "dowery", "synonym": "portion", "via": "dowry", "position": 3}
+{"word": "dowl", "synonym": "down", "via": "dowl", "position": 1}
 {"word": "down", "synonym": "pile", "via": "down", "position": 1}
 {"word": "down", "synonym": "polish", "via": "down", "position": 2}
 {"word": "down", "synonym": "refine", "via": "down", "position": 3}
@@ -6392,6 +6555,8 @@
 {"word": "draggle", "synonym": "bedraggle", "via": "draggle", "position": 1}
 {"word": "draggled", "synonym": "bedraggled", "via": "draggle", "position": 1}
 {"word": "draggled", "synonym": "bedraggled", "via": "draggled", "position": 1}
+{"word": "draggletailed", "synonym": "bedraggled", "via": "draggletailed", "position": 1}
+{"word": "draggletailed", "synonym": "unkempt", "via": "draggletailed", "position": 2}
 {"word": "dragnet", "synonym": "trawl", "via": "dragnet", "position": 1}
 {"word": "dragon", "synonym": "firedrake", "via": "dragon", "position": 1}
 {"word": "dragon", "synonym": "tartar", "via": "dragon", "position": 2}
@@ -6408,7 +6573,9 @@
 {"word": "drained", "synonym": "knackered", "via": "drained", "position": 2}
 {"word": "draining", "synonym": "exhausting", "via": "drain", "position": 1}
 {"word": "draining", "synonym": "exhausting", "via": "draining", "position": 1}
+{"word": "drainless", "synonym": "inexhaustible", "via": "drainless", "position": 1}
 {"word": "drainpipe", "synonym": "drain", "via": "drainpipe", "position": 1}
+{"word": "drainspout", "synonym": "downspout", "via": "drainspout", "position": 1}
 {"word": "dram", "synonym": "drachm", "via": "drachm", "position": 1}
 {"word": "dram", "synonym": "drachma", "via": "drachm", "position": 2}
 {"word": "dram", "synonym": "drachm", "via": "dram", "position": 1}
@@ -6441,6 +6608,8 @@
 {"word": "dramaturgic", "synonym": "dramaturgical", "via": "dramaturgic", "position": 1}
 {"word": "dramaturgical", "synonym": "dramaturgic", "via": "dramaturgical", "position": 1}
 {"word": "dramaturgy", "synonym": "dramatics", "via": "dramaturgy", "position": 1}
+{"word": "drangway", "synonym": "alley", "via": "drangway", "position": 1}
+{"word": "drangway", "synonym": "lane", "via": "drangway", "position": 2}
 {"word": "drape", "synonym": "curtain", "via": "drape", "position": 1}
 {"word": "drape", "synonym": "drapery", "via": "drape", "position": 2}
 {"word": "drape", "synonym": "mantle", "via": "drape", "position": 3}
@@ -6474,6 +6643,7 @@
 {"word": "draught", "synonym": "potation", "via": "draught", "position": 5}
 {"word": "draught", "synonym": "tipple", "via": "draught", "position": 6}
 {"word": "draught", "synonym": "blueprint", "via": "draught", "position": 7}
+{"word": "draughtboard", "synonym": "checkerboard", "via": "draughtboard", "position": 1}
 {"word": "draughts", "synonym": "checkers", "via": "draught", "position": 1}
 {"word": "draughts", "synonym": "checkers", "via": "draughts", "position": 1}
 {"word": "draughtsman", "synonym": "draftsman", "via": "draughtsman", "position": 1}
@@ -6639,6 +6809,7 @@
 {"word": "dreary", "synonym": "drear", "via": "dreary", "position": 10}
 {"word": "dreck", "synonym": "schlock", "via": "dreck", "position": 1}
 {"word": "dreck", "synonym": "shlock", "via": "dreck", "position": 2}
+{"word": "drecksill", "synonym": "doorstep", "via": "drecksill", "position": 1}
 {"word": "dredge", "synonym": "drag", "via": "dredge", "position": 1}
 {"word": "dregs", "synonym": "settlings", "via": "dregs", "position": 1}
 {"word": "drench", "synonym": "douse", "via": "drench", "position": 1}
@@ -6739,6 +6910,7 @@
 {"word": "drifting", "synonym": "floating", "via": "drifting", "position": 2}
 {"word": "drifting", "synonym": "vagabond", "via": "drifting", "position": 3}
 {"word": "drifting", "synonym": "vagrant", "via": "drifting", "position": 4}
+{"word": "driftless", "synonym": "aimless", "via": "driftless", "position": 1}
 {"word": "drill", "synonym": "exercise", "via": "drill", "position": 1}
 {"word": "drill", "synonym": "practice", "via": "drill", "position": 2}
 {"word": "drill", "synonym": "recitation", "via": "drill", "position": 3}
@@ -6765,6 +6937,7 @@
 {"word": "drinker", "synonym": "imbiber", "via": "drinker", "position": 1}
 {"word": "drinker", "synonym": "toper", "via": "drinker", "position": 2}
 {"word": "drinker", "synonym": "juicer", "via": "drinker", "position": 3}
+{"word": "drinkery", "synonym": "tavern", "via": "drinkery", "position": 1}
 {"word": "drinking", "synonym": "drink", "via": "drink", "position": 1}
 {"word": "drinking", "synonym": "boozing", "via": "drink", "position": 2}
 {"word": "drinking", "synonym": "drunkenness", "via": "drink", "position": 3}
@@ -6846,6 +7019,8 @@
 {"word": "droning", "synonym": "drone", "via": "drone", "position": 2}
 {"word": "droning", "synonym": "monotone", "via": "droning", "position": 1}
 {"word": "droning", "synonym": "drone", "via": "droning", "position": 2}
+{"word": "dronklap", "synonym": "drunkard", "via": "dronklap", "position": 1}
+{"word": "dronkverdriet", "synonym": "maudlin", "via": "dronkverdriet", "position": 1}
 {"word": "drookit", "synonym": "drenched", "via": "drookit", "position": 1}
 {"word": "drookit", "synonym": "soaked", "via": "drookit", "position": 2}
 {"word": "drool", "synonym": "dribble", "via": "drool", "position": 1}
@@ -6896,6 +7071,8 @@
 {"word": "dross", "synonym": "slag", "via": "dross", "position": 2}
 {"word": "dross", "synonym": "scoria", "via": "dross", "position": 3}
 {"word": "drought", "synonym": "drouth", "via": "drought", "position": 1}
+{"word": "droukit", "synonym": "drenched", "via": "droukit", "position": 1}
+{"word": "droukit", "synonym": "soaked", "via": "droukit", "position": 2}
 {"word": "drouth", "synonym": "drought", "via": "drought", "position": 1}
 {"word": "drove", "synonym": "horde", "via": "drive", "position": 1}
 {"word": "drove", "synonym": "swarm", "via": "drive", "position": 2}
@@ -6957,6 +7134,7 @@
 {"word": "drudgery", "synonym": "plodding", "via": "drudgery", "position": 1}
 {"word": "drudgery", "synonym": "grind", "via": "drudgery", "position": 2}
 {"word": "drudgery", "synonym": "donkeywork", "via": "drudgery", "position": 3}
+{"word": "drudgework", "synonym": "drudgery", "via": "drudgework", "position": 1}
 {"word": "drudging", "synonym": "laboring", "via": "drudge", "position": 1}
 {"word": "drudging", "synonym": "labouring", "via": "drudge", "position": 2}
 {"word": "drudging", "synonym": "toiling", "via": "drudge", "position": 3}
@@ -6975,6 +7153,7 @@
 {"word": "druggist", "synonym": "pharmacist", "via": "druggist", "position": 1}
 {"word": "druggist", "synonym": "chemist", "via": "druggist", "position": 2}
 {"word": "druggist", "synonym": "apothecary", "via": "druggist", "position": 3}
+{"word": "drugpusher", "synonym": "pusher", "via": "drugpusher", "position": 1}
 {"word": "drugstore", "synonym": "pharmacy", "via": "drugstore", "position": 1}
 {"word": "drum", "synonym": "tympan", "via": "drum", "position": 1}
 {"word": "drum", "synonym": "barrel", "via": "drum", "position": 2}
@@ -6987,6 +7166,7 @@
 {"word": "drumfish", "synonym": "drum", "via": "drumfish", "position": 1}
 {"word": "drumhead", "synonym": "head", "via": "drumhead", "position": 1}
 {"word": "drumhead", "synonym": "summary", "via": "drumhead", "position": 2}
+{"word": "drumskin", "synonym": "drumhead", "via": "drumskin", "position": 1}
 {"word": "drunk", "synonym": "drunkard", "via": "drink", "position": 1}
 {"word": "drunk", "synonym": "rummy", "via": "drink", "position": 2}
 {"word": "drunk", "synonym": "sot", "via": "drink", "position": 3}
@@ -7073,6 +7253,7 @@
 {"word": "dubiousness", "synonym": "dubiety", "via": "dubiousness", "position": 6}
 {"word": "dubitable", "synonym": "doubtful", "via": "dubitable", "position": 1}
 {"word": "dubitable", "synonym": "dubious", "via": "dubitable", "position": 2}
+{"word": "dubitative", "synonym": "doubtful", "via": "dubitative", "position": 1}
 {"word": "duchy", "synonym": "dukedom", "via": "duchy", "position": 1}
 {"word": "duck", "synonym": "hedge", "via": "duck", "position": 1}
 {"word": "duck", "synonym": "fudge", "via": "duck", "position": 2}
@@ -7085,6 +7266,7 @@
 {"word": "duck", "synonym": "sidestep", "via": "duck", "position": 9}
 {"word": "duck", "synonym": "dip", "via": "duck", "position": 10}
 {"word": "duckbill", "synonym": "platypus", "via": "duckbill", "position": 1}
+{"word": "duckfooted", "synonym": "splayfooted", "via": "duckfooted", "position": 1}
 {"word": "ducking", "synonym": "submersion", "via": "duck", "position": 1}
 {"word": "ducking", "synonym": "immersion", "via": "duck", "position": 2}
 {"word": "ducking", "synonym": "dousing", "via": "duck", "position": 3}
@@ -7153,6 +7335,9 @@
 {"word": "duffle", "synonym": "duffel", "via": "duffel", "position": 1}
 {"word": "dugout", "synonym": "bunker", "via": "dugout", "position": 1}
 {"word": "dugout", "synonym": "pirogue", "via": "dugout", "position": 2}
+{"word": "duikerbok", "synonym": "duiker", "via": "duikerbok", "position": 1}
+{"word": "duka", "synonym": "shop", "via": "duka", "position": 1}
+{"word": "duka", "synonym": "store", "via": "duka", "position": 2}
 {"word": "dukedom", "synonym": "duchy", "via": "dukedom", "position": 1}
 {"word": "dulcet", "synonym": "honeyed", "via": "dulcet", "position": 1}
 {"word": "dulcet", "synonym": "mellifluous", "via": "dulcet", "position": 2}
@@ -7250,6 +7435,7 @@
 {"word": "dumper", "synonym": "tipper", "via": "dumper", "position": 1}
 {"word": "dumplings", "synonym": "dumpling", "via": "dumpling", "position": 1}
 {"word": "dumps", "synonym": "mopes", "via": "dump", "position": 1}
+{"word": "dumpty", "synonym": "outhouse", "via": "dumpty", "position": 1}
 {"word": "dumpy", "synonym": "podgy", "via": "dumpy", "position": 1}
 {"word": "dumpy", "synonym": "pudgy", "via": "dumpy", "position": 2}
 {"word": "dumpy", "synonym": "tubby", "via": "dumpy", "position": 3}
@@ -7314,6 +7500,8 @@
 {"word": "dunk", "synonym": "plunge", "via": "dunk", "position": 3}
 {"word": "dunk", "synonym": "douse", "via": "dunk", "position": 4}
 {"word": "dunkers", "synonym": "dippers", "via": "dunker", "position": 1}
+{"word": "dunnaken", "synonym": "lavatory", "via": "dunnaken", "position": 1}
+{"word": "dunnakin", "synonym": "privy", "via": "dunnakin", "position": 1}
 {"word": "duo", "synonym": "duet", "via": "duo", "position": 1}
 {"word": "duo", "synonym": "couple", "via": "duo", "position": 2}
 {"word": "duo", "synonym": "twosome", "via": "duo", "position": 3}
@@ -7363,10 +7551,12 @@
 {"word": "duramen", "synonym": "heartwood", "via": "duramen", "position": 1}
 {"word": "duration", "synonym": "length", "via": "duration", "position": 1}
 {"word": "duration", "synonym": "continuance", "via": "duration", "position": 2}
+{"word": "duressor", "synonym": "coercer", "via": "duressor", "position": 1}
 {"word": "durian", "synonym": "durion", "via": "durian", "position": 1}
 {"word": "durion", "synonym": "durian", "via": "durian", "position": 1}
 {"word": "durra", "synonym": "doura", "via": "durra", "position": 1}
 {"word": "durra", "synonym": "dourah", "via": "durra", "position": 2}
+{"word": "durzi", "synonym": "tailor", "via": "durzi", "position": 1}
 {"word": "dusk", "synonym": "twilight", "via": "dusk", "position": 1}
 {"word": "dusk", "synonym": "gloaming", "via": "dusk", "position": 2}
 {"word": "dusk", "synonym": "gloam", "via": "dusk", "position": 3}
@@ -7409,6 +7599,7 @@
 {"word": "duty", "synonym": "obligation", "via": "duty", "position": 2}
 {"word": "duty", "synonym": "tariff", "via": "duty", "position": 3}
 {"word": "duvet", "synonym": "eiderdown", "via": "duvet", "position": 1}
+{"word": "dwaal", "synonym": "daze", "via": "dwaal", "position": 1}
 {"word": "dwarf", "synonym": "gnome", "via": "dwarf", "position": 1}
 {"word": "dwarf", "synonym": "midget", "via": "dwarf", "position": 2}
 {"word": "dwarf", "synonym": "shadow", "via": "dwarf", "position": 3}
@@ -7439,6 +7630,7 @@
 {"word": "dwelling", "synonym": "habitation", "via": "dwelling", "position": 4}
 {"word": "dwindling", "synonym": "tapering", "via": "dwindle", "position": 1}
 {"word": "dwindling", "synonym": "tapering", "via": "dwindling", "position": 1}
+{"word": "dwy", "synonym": "squall", "via": "dwy", "position": 1}
 {"word": "dyad", "synonym": "couple", "via": "dyad", "position": 1}
 {"word": "dyad", "synonym": "pair", "via": "dyad", "position": 2}
 {"word": "dyad", "synonym": "twosome", "via": "dyad", "position": 3}
@@ -7481,10 +7673,14 @@
 {"word": "dynamism", "synonym": "vigor", "via": "dynamism", "position": 3}
 {"word": "dynamism", "synonym": "vigour", "via": "dynamism", "position": 4}
 {"word": "dynamism", "synonym": "heartiness", "via": "dynamism", "position": 5}
+{"word": "dynamize", "synonym": "energize", "via": "dynamize", "position": 1}
+{"word": "dynamize", "synonym": "invigorate", "via": "dynamize", "position": 2}
 {"word": "dynamometer", "synonym": "ergometer", "via": "dynamometer", "position": 1}
 {"word": "dysfunction", "synonym": "disfunction", "via": "dysfunction", "position": 1}
 {"word": "dysfunctional", "synonym": "nonadaptive", "via": "dysfunctional", "position": 1}
 {"word": "dyslogistic", "synonym": "pejorative", "via": "dyslogistic", "position": 1}
+{"word": "dyspathy", "synonym": "antipathy", "via": "dyspathy", "position": 1}
+{"word": "dyspathy", "synonym": "aversion", "via": "dyspathy", "position": 2}
 {"word": "dyspepsia", "synonym": "indigestion", "via": "dyspepsia", "position": 1}
 {"word": "dyspeptic", "synonym": "atrabilious", "via": "dyspeptic", "position": 1}
 {"word": "dyspeptic", "synonym": "bilious", "via": "dyspeptic", "position": 2}

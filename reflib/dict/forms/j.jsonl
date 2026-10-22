@@ -10,6 +10,8 @@
 {"headword": "jaborandi", "form": "jaborandis", "position": 1, "pronunciation": "/dʒæbəˈrændiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jabot", "form": "jabots", "position": 1, "pronunciation": "/ʒæˈboʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jaboticaba", "form": "jaboticabas", "position": 1, "pronunciation": "/dʒæbɑtɪˈkɑbəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jabroni", "form": "jabronis", "position": 1, "pronunciation": "/dʒəˈbroʊniz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jac", "form": "jacs", "position": 1, "pronunciation": "/dʒæks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jacal", "form": "jacales", "position": 1, "pronunciation": "/həˈkɑlez/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jacal", "form": "jacals", "position": 2, "pronunciation": "/həˈkɑlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jacamar", "form": "jacamars", "position": 1, "pronunciation": "/ˈdʒækəmɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -23,6 +25,7 @@
 {"headword": "jack", "form": "jacks", "position": 3, "pronunciation": "/dʒæks/", "labels": "[\"pl.\"]", "synonyms": "[\"knucklebones\"]"}
 {"headword": "jackal", "form": "jackals", "position": 1, "pronunciation": "/ˈdʒækəlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jackanapes", "form": "jackanapeses", "position": 1, "pronunciation": "/ˈdʒækəneɪpsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jackanory", "form": "jackanories", "position": 1, "pronunciation": "/ˈdʒækəˌnɔriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jackaroo", "form": "jackaroos", "position": 1, "pronunciation": "/ˌdʒækəˈruz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jackaroo", "form": "jackeroo", "position": 2, "pronunciation": "/ˌdʒækəˈru/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "jackaroo", "form": "jackeroos", "position": 3, "pronunciation": "/ˌdʒækəˈruz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -41,25 +44,37 @@
 {"headword": "jackhammer", "form": "jackhammering", "position": 2, "pronunciation": "/ˈdʒækhæmərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jackhammer", "form": "jackhammers", "position": 3, "pronunciation": "/ˈdʒækhæmərz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jackknife", "form": "jackknifed", "position": 1, "pronunciation": "/ˈdʒækˌnaɪft/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "jackknife", "form": "jackknifes", "position": 2, "pronunciation": "/ˈdʒækˌnaɪfz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "jackknife", "form": "jackknifes", "position": 2, "pronunciation": "/ˈdʒækˌnaɪfs/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jackknife", "form": "jackknifing", "position": 3, "pronunciation": "/ˈdʒækˌnaɪfɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "jackknife", "form": "jackknives", "position": 4, "pronunciation": "/ˈdʒæknaɪvz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jackknife", "form": "jackknives", "position": 4, "pronunciation": "/ˈdʒækˌnaɪvz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jackleg", "form": "jacklegs", "position": 1, "pronunciation": "/ˈdʒækˌlɛɡz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jacklight", "form": "jacklights", "position": 1, "pronunciation": "/ˈdʒækˌlaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jacklighter", "form": "jacklighters", "position": 1, "pronunciation": "/ˈdʒækˌlaɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jackpot", "form": "jackpots", "position": 1, "pronunciation": "/ˈdʒækˌpɑts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jackrabbit", "form": "jackrabbits", "position": 1, "pronunciation": "/ˈdʒækˌræbɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jackroll", "form": "jackrolled", "position": 1, "pronunciation": "/ˈdʒækˌroʊld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jackroll", "form": "jackrolling", "position": 2, "pronunciation": "/ˈdʒækˌroʊlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jackroll", "form": "jackrolls", "position": 3, "pronunciation": "/ˈdʒækˌroʊlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jackscrew", "form": "jackscrews", "position": 1, "pronunciation": "/ˈdʒækˌskruz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jackshaft", "form": "jackshafts", "position": 1, "pronunciation": "/ˈdʒækˌʃæfts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jacksie", "form": "jacksies", "position": 1, "pronunciation": "/ˈdʒæksiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jacksmelt", "form": "jacksmelts", "position": 1, "pronunciation": "/ˈdʒækˌsmɛlts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jacksnipe", "form": "jacksnipes", "position": 1, "pronunciation": "/ˈdʒækˌsnaɪps/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jacksonian", "form": "jacksonians", "position": 1, "pronunciation": "/dʒækˈsoʊniənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jackstay", "form": "jackstays", "position": 1, "pronunciation": "/ˈdʒækˌsteɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jackstone", "form": "jackstones", "position": 1, "pronunciation": "/ˈdʒækˌstoʊnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jackstraw", "form": "jackstraws", "position": 1, "pronunciation": "/ˈdʒækˌstrɔz/", "labels": "[\"pl.\"]", "synonyms": "[\"spillikins\"]"}
 {"headword": "jacky", "form": "jackies", "position": 1, "pronunciation": "/ˈdʒækiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jackyard", "form": "jackyards", "position": 1, "pronunciation": "/ˈdʒækˌjɑrdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jacobian", "form": "jacobians", "position": 1, "pronunciation": "/dʒəˈkoʊbiənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jacobin", "form": "jacobins", "position": 1, "pronunciation": "/ˈdʒækəbɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jacobinize", "form": "jacobinized", "position": 1, "pronunciation": "/ˈdʒækəbəˌnaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "jacobinize", "form": "jacobinizes", "position": 2, "pronunciation": "/ˈdʒækəbəˌnaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "jacobinize", "form": "jacobinizing", "position": 3, "pronunciation": "/ˈdʒækəbəˌnaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "jacobite", "form": "jacobites", "position": 1, "pronunciation": "/ˈdʒækəˌbaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jacobus", "form": "jacobuses", "position": 1, "pronunciation": "/dʒəˈkoʊbəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jaconet", "form": "jaconets", "position": 1, "pronunciation": "/ˈdʒækənɪts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jacquard", "form": "jacquards", "position": 1, "pronunciation": "/dʒəˈkɑrdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jacquard", "form": "jacquards", "position": 1, "pronunciation": "/ˈdʒækɑrdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jacquerie", "form": "jacqueries", "position": 1, "pronunciation": "/ʒækəˈriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jactitation", "form": "jactitations", "position": 1, "pronunciation": "/dʒæktɪˈteɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jaculate", "form": "jaculated", "position": 1, "pronunciation": "/ˈdʒækjəˌleɪtɪd/", "labels": "[\"past\"]", "synonyms": null}
@@ -78,6 +93,9 @@
 {"headword": "jag", "form": "jagging", "position": 3, "pronunciation": "/ˈdʒæɡɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jag", "form": "jaggs", "position": 4, "pronunciation": "/dʒæɡz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jag", "form": "jags", "position": 5, "pronunciation": "/dʒæɡz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "jaga", "form": "jagaed", "position": 1, "pronunciation": "/ˈdʒɑɡəd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "jaga", "form": "jagaing", "position": 2, "pronunciation": "/ˈdʒɑɡəɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "jaga", "form": "jagas", "position": 3, "pronunciation": "/ˈdʒɑɡəz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jagged", "form": "jaggeder", "position": 1, "pronunciation": "/ˈdʒæɡɪdər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jagged", "form": "jaggedest", "position": 2, "pronunciation": "/ˈdʒæɡɪdɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "jaggedness", "form": "jaggednesses", "position": 1, "pronunciation": "/ˈdʒæɡɪdnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -107,17 +125,19 @@
 {"headword": "jailer", "form": "jailor", "position": 2, "pronunciation": "/ˈdʒeɪlər/", "labels": "[\"var.\"]", "synonyms": "[\"jailer\", \"gaoler\", \"screw\", \"turnkey\"]"}
 {"headword": "jailer", "form": "jailors", "position": 3, "pronunciation": "/ˈdʒeɪlərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jailhouse", "form": "jailhouses", "position": 1, "pronunciation": "/ˈdʒeɪlˌhaʊzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jake", "form": "jakes", "position": 1, "pronunciation": "/dʒeɪks/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": "[\"outhouse\", \"privy\"]"}
+{"headword": "jake", "form": "jakes", "position": 1, "pronunciation": "/dʒeɪks/", "labels": "[\"pl.\"]", "synonyms": "[\"outhouse\", \"privy\"]"}
 {"headword": "jakes", "form": "jacks", "position": 1, "pronunciation": "/dʒæks/", "labels": "[\"var.\"]", "synonyms": "[\"knucklebones\"]"}
 {"headword": "jalap", "form": "jalaps", "position": 1, "pronunciation": "/ˈdʒæləps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jalap", "form": "jalop", "position": 2, "pronunciation": "/dʒəˈlɑp/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "jalap", "form": "jalops", "position": 3, "pronunciation": "/dʒəˈlɑps/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jalapeno", "form": "jalapenos", "position": 1, "pronunciation": "/ˌhæləˈpɛɪnoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jalapeno", "form": "jalapenos", "position": 1, "pronunciation": "/ˌhɑləˈpeɪnjoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jalapin", "form": "jalapins", "position": 1, "pronunciation": "/ˈdʒæləpɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jalebi", "form": "jalebis", "position": 1, "pronunciation": "/dʒəˈleɪbiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jalee", "form": "jalees", "position": 1, "pronunciation": "/ˈdʒɑliz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jalopy", "form": "jalopies", "position": 1, "pronunciation": "/dʒəˈlɑpiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jalopy", "form": "jaloppies", "position": 2, "pronunciation": "/dʒəˈlɑpiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jalopy", "form": "jaloppy", "position": 3, "pronunciation": "/dʒəˈlɑpi/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "jalor", "form": "jalors", "position": 1, "pronunciation": "/ˈdʒɑlərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jalouse", "form": "jaloused", "position": 1, "pronunciation": "/dʒəˈluzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jalouse", "form": "jalouses", "position": 2, "pronunciation": "/dʒəˈluzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jalouse", "form": "jalousing", "position": 3, "pronunciation": "/dʒəˈluzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -125,6 +145,7 @@
 {"headword": "jam", "form": "jammed", "position": 1, "pronunciation": "/dʒæmd/", "labels": "[\"past\"]", "synonyms": "[\"packed\"]"}
 {"headword": "jam", "form": "jamming", "position": 2, "pronunciation": "/ˈdʒæmɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"jam\"]"}
 {"headword": "jam", "form": "jams", "position": 3, "pronunciation": "/dʒæmz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "jamaat", "form": "jamaats", "position": 1, "pronunciation": "/dʒəˈmɑts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jamb", "form": "jam", "position": 1, "pronunciation": "/dʒæm/", "labels": "[\"var.\"]", "synonyms": "[\"jamming\", \"crush\", \"press\", \"fix\", \"hole\", \"mess\", \"muddle\", \"pickle\", \"block\", \"obstruct\"]"}
 {"headword": "jamb", "form": "jambed", "position": 2, "pronunciation": "/dʒæmd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jamb", "form": "jambing", "position": 3, "pronunciation": "/ˈdʒæmɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -132,12 +153,16 @@
 {"headword": "jambalaya", "form": "jambalayas", "position": 1, "pronunciation": "/ˌdʒʌmbəˈlaɪəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jambe", "form": "jambes", "position": 1, "pronunciation": "/dʒæmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jambeau", "form": "jambeaux", "position": 1, "pronunciation": "/ˈdʒæmboʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jambiya", "form": "jambiyas", "position": 1, "pronunciation": "/dʒæmˈbijəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jamboree", "form": "jamborees", "position": 1, "pronunciation": "/ˌdʒæmbəˈriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jambstone", "form": "jambstones", "position": 1, "pronunciation": "/ˈdʒæmˌstoʊnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jamesian", "form": "jamesians", "position": 1, "pronunciation": "/ˈdʒeɪmziənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jammer", "form": "jammers", "position": 1, "pronunciation": "/ˈdʒæmərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jammy", "form": "jammier", "position": 1, "pronunciation": "/ˈdʒæmiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jammy", "form": "jammiest", "position": 2, "pronunciation": "/ˈdʒæmiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "jampan", "form": "jampans", "position": 1, "pronunciation": "/ˈdʒæmpænz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jane", "form": "janes", "position": 1, "pronunciation": "/dʒeɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "janeite", "form": "janeites", "position": 1, "pronunciation": "/ˈdʒeɪˌnaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jangle", "form": "jangled", "position": 1, "pronunciation": "/ˈdʒæŋɡəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jangle", "form": "jangles", "position": 2, "pronunciation": "/ˈdʒæŋɡəlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jangle", "form": "jangling", "position": 3, "pronunciation": "/ˈdʒæŋɡlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"jangly\"]"}
@@ -150,17 +175,24 @@
 {"headword": "janissary", "form": "janizaries", "position": 4, "pronunciation": "/ˈdʒænəˌzɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "janissary", "form": "janizary", "position": 5, "pronunciation": "/ˈdʒænəˌzɛri/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "janitor", "form": "janitors", "position": 1, "pronunciation": "/ˈdʒænətərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "janitress", "form": "janitresses", "position": 1, "pronunciation": "/ˈdʒænətrəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "janny", "form": "jannies", "position": 1, "pronunciation": "/ˈdʒæniz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jansenist", "form": "jansenists", "position": 1, "pronunciation": "/ˈdʒænsənɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jansky", "form": "janskys", "position": 1, "pronunciation": "/ˈdʒænskiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "japan", "form": "japanned", "position": 1, "pronunciation": "/dʒəˈpænd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "japan", "form": "japanning", "position": 2, "pronunciation": "/dʒəˈpænɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "japan", "form": "japans", "position": 3, "pronunciation": "/dʒəˈpænz/", "labels": "[\"3rd sing.\", \"pl.\"]", "synonyms": null}
+{"headword": "japanism", "form": "japanisms", "position": 1, "pronunciation": "/dʒəˈpænɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "japanner", "form": "japanners", "position": 1, "pronunciation": "/dʒəˈpænərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jape", "form": "japed", "position": 1, "pronunciation": "/dʒeɪpt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jape", "form": "japes", "position": 2, "pronunciation": "/dʒeɪps/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jape", "form": "japing", "position": 3, "pronunciation": "/ˈdʒeɪpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "japer", "form": "japers", "position": 1, "pronunciation": "/ˈdʒeɪpərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "japery", "form": "japeries", "position": 1, "pronunciation": "/ˈdʒeɪpəriz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "japonaiserie", "form": "japonaiseries", "position": 1, "pronunciation": "/ˌdʒæpəˌnɛzəˈriz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "japonica", "form": "japonicas", "position": 1, "pronunciation": "/dʒəˈpɑnɪkəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "japonaiserie", "form": "japonaiseries", "position": 1, "pronunciation": "/ʒəˌpɑnɛzəˈriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "japonica", "form": "japonicas", "position": 1, "pronunciation": "/dʒəˈpɑnəkəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "japonism", "form": "japonisms", "position": 1, "pronunciation": "/ˈdʒæpəˌnɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "japygid", "form": "japygids", "position": 1, "pronunciation": "/dʒəˈpɪdʒɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jar", "form": "jarred", "position": 1, "pronunciation": "/dʒɑrd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jar", "form": "jarring", "position": 2, "pronunciation": "/ˈdʒɑrɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jar", "form": "jars", "position": 3, "pronunciation": "/dʒɑrz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -168,7 +200,7 @@
 {"headword": "jarful", "form": "jarfuls", "position": 1, "pronunciation": "/ˈdʒɑrfʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jarful", "form": "jarsful", "position": 2, "pronunciation": "/ˈdʒɑrzfʊl/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jargon", "form": "jargons", "position": 1, "pronunciation": "/ˈdʒɑrɡənz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jargonel", "form": "jargonels", "position": 1, "pronunciation": "/ˈdʒɑrɡənɛlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jargonel", "form": "jargonels", "position": 1, "pronunciation": "/ˈdʒɑrɡəˌnɛlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jargonize", "form": "jargonized", "position": 1, "pronunciation": "/ˈdʒɑrɡənaɪzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jargonize", "form": "jargonizes", "position": 2, "pronunciation": "/ˈdʒɑrɡənaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jargonize", "form": "jargonizing", "position": 3, "pronunciation": "/ˈdʒɑrɡənaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -178,21 +210,30 @@
 {"headword": "jarina", "form": "jarinas", "position": 1, "pronunciation": "/hɑˈrinəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jarl", "form": "jarls", "position": 1, "pronunciation": "/jɑrlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jarldom", "form": "jarldoms", "position": 1, "pronunciation": "/ˈjɑrldəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jaro", "form": "jaros", "position": 1, "pronunciation": "/ˈdʒɑroʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jarosite", "form": "jarosites", "position": 1, "pronunciation": "/ˈdʒærəsaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jarovize", "form": "jarovized", "position": 1, "pronunciation": "/ˈjærəvaɪzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jarovize", "form": "jarovizes", "position": 2, "pronunciation": "/ˈjærəvaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jarovize", "form": "jarovizing", "position": 3, "pronunciation": "/ˈjærəvaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "jarp", "form": "jarped", "position": 1, "pronunciation": "/dʒɑrpt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "jarp", "form": "jarping", "position": 2, "pronunciation": "/ˈdʒɑrpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "jarp", "form": "jarps", "position": 3, "pronunciation": "/dʒɑrps/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jarrah", "form": "jarrahs", "position": 1, "pronunciation": "/ˈdʒærəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jarvey", "form": "jarveys", "position": 1, "pronunciation": "/ˈdʒɑrviz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jasey", "form": "jaseys", "position": 1, "pronunciation": "/ˈdʒeɪziz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jasmine", "form": "jasmin", "position": 1, "pronunciation": "/ˈdʒæzmɪn/", "labels": "[\"arch. var.\"]", "synonyms": null}
 {"headword": "jasmine", "form": "jasmines", "position": 2, "pronunciation": "/ˈdʒæzmɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jasmine", "form": "jasmins", "position": 3, "pronunciation": "/ˈdʒæzmɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jasmine", "form": "jessamine", "position": 4, "pronunciation": "/ˈdʒɛsəmɪn/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "jasmine", "form": "jessamines", "position": 5, "pronunciation": "/ˈdʒɛsəminz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jasmonate", "form": "jasmonates", "position": 1, "pronunciation": "/ˈdʒæzməˌneɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jasper", "form": "jaspers", "position": 1, "pronunciation": "/ˈdʒæspərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jasperware", "form": "jasperwares", "position": 1, "pronunciation": "/ˈdʒæspərwɛrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jassid", "form": "jassids", "position": 1, "pronunciation": "/ˈdʒæsɪdz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jati", "form": "jatis", "position": 1, "pronunciation": "/ˈdʒɑtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jato", "form": "jatos", "position": 1, "pronunciation": "/ˈdʒeɪtoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jatra", "form": "jatras", "position": 1, "pronunciation": "/ˈdʒɑtrəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jatropha", "form": "jatrophas", "position": 1, "pronunciation": "/ˈdʒætrəfəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jauk", "form": "jauked", "position": 1, "pronunciation": "/dʒɔkt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jauk", "form": "jauking", "position": 2, "pronunciation": "/ˈdʒɔkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jauk", "form": "jauks", "position": 3, "pronunciation": "/dʒɔks/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -205,7 +246,7 @@
 {"headword": "jaunt", "form": "jaunted", "position": 1, "pronunciation": "/ˈdʒɔntɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jaunt", "form": "jaunting", "position": 2, "pronunciation": "/ˈdʒɔntɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jaunt", "form": "jaunts", "position": 3, "pronunciation": "/dʒɔnts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "jauntiness", "form": "jauntinesses", "position": 1, "pronunciation": "/ˈdʒɔntɪnɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jauntiness", "form": "jauntinesses", "position": 1, "pronunciation": "/ˈdʒɔntinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jaunty", "form": "janty", "position": 1, "pronunciation": "/ˈdʒænti/", "labels": "[\"arch. var.\"]", "synonyms": null}
 {"headword": "jaunty", "form": "jauntier", "position": 2, "pronunciation": "/ˈdʒɔntiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jaunty", "form": "jauntiest", "position": 3, "pronunciation": "/ˈdʒɔntiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
@@ -221,16 +262,21 @@
 {"headword": "jaw", "form": "jawing", "position": 2, "pronunciation": "/ˈdʒɔɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jaw", "form": "jaws", "position": 3, "pronunciation": "/dʒɔz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jawan", "form": "jawans", "position": 1, "pronunciation": "/dʒəˈwɑnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jawblock", "form": "jawblocked", "position": 1, "pronunciation": "/ˈdʒɔˌblɑkt/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "jawblock", "form": "jawblocking", "position": 2, "pronunciation": "/ˈdʒɔˌblɑkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "jawblock", "form": "jawblocks", "position": 3, "pronunciation": "/ˈdʒɔˌblɑks/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jawbone", "form": "jawboned", "position": 1, "pronunciation": "/ˈdʒɔˌboʊnd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jawbone", "form": "jawbones", "position": 2, "pronunciation": "/ˈdʒɔˌboʊnz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jawbone", "form": "jawboning", "position": 3, "pronunciation": "/ˈdʒɔˌboʊnɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jawboner", "form": "jawboners", "position": 1, "pronunciation": "/ˈdʒɔˌboʊnərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jawboning", "form": "jawbonings", "position": 1, "pronunciation": "/ˈdʒɔˌboʊnɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jawbreaker", "form": "jawbreakers", "position": 1, "pronunciation": "/ˈdʒɔˌbreɪkərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jawfish", "form": "jawfishes", "position": 1, "pronunciation": "/ˈdʒɔˌfɪʃɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jawline", "form": "jawlines", "position": 1, "pronunciation": "/ˈdʒɔˌlaɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jawrope", "form": "jawropes", "position": 1, "pronunciation": "/ˈdʒɔˌroʊps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jay", "form": "jays", "position": 1, "pronunciation": "/dʒeɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jaybird", "form": "jaybirds", "position": 1, "pronunciation": "/ˈdʒeɪˌbɜrdz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jaygee", "form": "jaygees", "position": 1, "pronunciation": "/ˈdʒeɪˈdʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jaygee", "form": "jaygees", "position": 1, "pronunciation": "/ˈdʒeɪˌdʒiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jayhawker", "form": "jayhawkers", "position": 1, "pronunciation": "/ˈdʒeɪˌhɔkərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jayvee", "form": "jayvees", "position": 1, "pronunciation": "/ˈdʒeɪˌviz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jaywalk", "form": "jaywalked", "position": 1, "pronunciation": "/ˈdʒeɪˌwɔkt/", "labels": "[\"past\"]", "synonyms": null}
@@ -241,8 +287,9 @@
 {"headword": "jazz", "form": "jazzes", "position": 2, "pronunciation": "/ˈdʒæzɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jazz", "form": "jazzing", "position": 3, "pronunciation": "/ˈdʒæzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jazzer", "form": "jazzers", "position": 1, "pronunciation": "/ˈdʒæzərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jazziness", "form": "jazzinesses", "position": 1, "pronunciation": "/ˈdʒæzɪnɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jazziness", "form": "jazzinesses", "position": 1, "pronunciation": "/ˈdʒæzinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jazzman", "form": "jazzmen", "position": 1, "pronunciation": "/ˈdʒæzˌmɛn/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jazzwoman", "form": "jazzwomen", "position": 1, "pronunciation": "/ˈdʒæzˌwɪmən/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jazzy", "form": "jazzier", "position": 1, "pronunciation": "/ˈdʒæziər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jazzy", "form": "jazziest", "position": 2, "pronunciation": "/ˈdʒæziɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "jealousness", "form": "jealousnesses", "position": 1, "pronunciation": "/ˈdʒɛləsnɪsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -260,10 +307,18 @@
 {"headword": "jeer", "form": "jeering", "position": 2, "pronunciation": "/ˈdʒɪrɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"jeer\", \"mockery\", \"scoff\", \"scoffing\", \"derisive\", \"mocking\", \"taunting\"]"}
 {"headword": "jeer", "form": "jeers", "position": 3, "pronunciation": "/dʒɪrz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jeerer", "form": "jeerers", "position": 1, "pronunciation": "/ˈdʒɪrərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jeezy", "form": "jeezies", "position": 1, "pronunciation": "/ˈdʒiziz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jefe", "form": "jefes", "position": 1, "pronunciation": "/ˈheɪfeɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jeff", "form": "jeffed", "position": 1, "pronunciation": "/dʒɛft/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "jeff", "form": "jeffing", "position": 2, "pronunciation": "/ˈdʒɛfɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "jeff", "form": "jeffs", "position": 3, "pronunciation": "/dʒɛfs/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "jeffersonian", "form": "jeffersonians", "position": 1, "pronunciation": "/ˌdʒɛfərˈsoʊniənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jehovist", "form": "jehovists", "position": 1, "pronunciation": "/dʒəˈhoʊvɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jehu", "form": "jehus", "position": 1, "pronunciation": "/ˈdʒihjuz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jejunectomy", "form": "jejunectomies", "position": 1, "pronunciation": "/dʒɪˌdʒuˈnɛktəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jejuneness", "form": "jejunenesses", "position": 1, "pronunciation": "/dʒɪˈdʒunnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jejunity", "form": "jejunities", "position": 1, "pronunciation": "/dʒɪˈdʒunɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jejunostomy", "form": "jejunostomies", "position": 1, "pronunciation": "/dʒɪˌdʒuˈnɑstəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jejunum", "form": "jejuna", "position": 1, "pronunciation": "/dʒɪˈdʒunə/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jell", "form": "jelled", "position": 1, "pronunciation": "/dʒɛld/", "labels": "[\"past\"]", "synonyms": "[\"congealed\", \"jellied\"]"}
 {"headword": "jell", "form": "jelling", "position": 2, "pronunciation": "/ˈdʒɛlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -280,6 +335,7 @@
 {"headword": "jemadar", "form": "jemadars", "position": 1, "pronunciation": "/ˈdʒɛməˌdɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jemadar", "form": "jemidar", "position": 2, "pronunciation": "/ˈdʒɛmɪˌdɑr/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "jemadar", "form": "jemidars", "position": 3, "pronunciation": "/ˈdʒɛmɪˌdɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jembe", "form": "jembes", "position": 1, "pronunciation": "/ˈdʒɛmbeɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jemimite", "form": "jemimites", "position": 1, "pronunciation": "/dʒəˈmɪmaɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jemmy", "form": "jemmied", "position": 1, "pronunciation": "/ˈdʒɛmid/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jemmy", "form": "jemmies", "position": 2, "pronunciation": "/ˈdʒɛmiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -297,6 +353,8 @@
 {"headword": "jeopardize", "form": "jeopardizes", "position": 6, "pronunciation": "/ˈdʒɛpərˌdaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jeopardize", "form": "jeopardizing", "position": 7, "pronunciation": "/ˈdʒɛpərˌdaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jeopardy", "form": "jeopardies", "position": 1, "pronunciation": "/ˈdʒɛpərdiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jequirity", "form": "jequirities", "position": 1, "pronunciation": "/dʒəˈkwɪrɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jer", "form": "jers", "position": 1, "pronunciation": "/jɛrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jerboa", "form": "jerboas", "position": 1, "pronunciation": "/dʒərˈboʊəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jereed", "form": "jereeds", "position": 1, "pronunciation": "/dʒɪˈridz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jereed", "form": "jerid", "position": 2, "pronunciation": "/dʒɪˈrid/", "labels": "[\"var.\"]", "synonyms": null}
@@ -312,6 +370,7 @@
 {"headword": "jerker", "form": "jerkers", "position": 1, "pronunciation": "/ˈdʒɜrkərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jerkin", "form": "jerkins", "position": 1, "pronunciation": "/ˈdʒɜrkɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jerkiness", "form": "jerkinesses", "position": 1, "pronunciation": "/ˈdʒɜrkinəsəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jerkinhead", "form": "jerkinheads", "position": 1, "pronunciation": "/ˈdʒɜrkɪnˌhɛdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jerky", "form": "jerkier", "position": 1, "pronunciation": "/ˈdʒɜrkiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jerky", "form": "jerkies", "position": 2, "pronunciation": "/ˈdʒɜrkiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jerky", "form": "jerkiest", "position": 3, "pronunciation": "/ˈdʒɜrkiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
@@ -326,16 +385,22 @@
 {"headword": "jest", "form": "jested", "position": 1, "pronunciation": "/ˈdʒɛstɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jest", "form": "jesting", "position": 2, "pronunciation": "/ˈdʒɛstɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"jocose\", \"jocular\", \"joking\"]"}
 {"headword": "jest", "form": "jests", "position": 3, "pronunciation": "/dʒɛsts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "jestbook", "form": "jestbooks", "position": 1, "pronunciation": "/ˈdʒɛstˌbʊks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jester", "form": "jesters", "position": 1, "pronunciation": "/ˈdʒɛstərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jesting", "form": "jestings", "position": 1, "pronunciation": "/ˈdʒɛstɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jesuit", "form": "jesuits", "position": 1, "pronunciation": "/ˈdʒɛʒuɪts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jesuitism", "form": "jesuitisms", "position": 1, "pronunciation": "/ˈdʒɛʒuɪtɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jesuitize", "form": "jesuitized", "position": 1, "pronunciation": "/ˈdʒɛʒuɪˌtaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "jesuitize", "form": "jesuitizes", "position": 2, "pronunciation": "/ˈdʒɛʒuɪˌtaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "jesuitize", "form": "jesuitizing", "position": 3, "pronunciation": "/ˈdʒɛʒuɪˌtaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jesuitry", "form": "jesuitries", "position": 1, "pronunciation": "/ˈdʒɛʒuɪtriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jet", "form": "jets", "position": 1, "pronunciation": "/dʒɛts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jet", "form": "jetted", "position": 2, "pronunciation": "/ˈdʒɛtɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jet", "form": "jetting", "position": 3, "pronunciation": "/ˈdʒɛtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"spouting\", \"spurting\", \"squirting\"]"}
+{"headword": "jetavator", "form": "jetavators", "position": 1, "pronunciation": "/ˈdʒɛtəˌveɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jetbead", "form": "jetbeads", "position": 1, "pronunciation": "/ˈdʒɛtbidz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jete", "form": "jetes", "position": 1, "pronunciation": "/dʒəˈteɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jete", "form": "jetes", "position": 1, "pronunciation": "/ʒɛˈteɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jetfighter", "form": "jetfighters", "position": 1, "pronunciation": "/ˈdʒɛtˌfaɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jetliner", "form": "jetliners", "position": 1, "pronunciation": "/ˈdʒɛtˌlaɪnərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jeton", "form": "jetons", "position": 1, "pronunciation": "/ˈʒɛtɔnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jeton", "form": "jetton", "position": 2, "pronunciation": "/ˈdʒɛtən/", "labels": "[\"var.\"]", "synonyms": null}
@@ -350,11 +415,10 @@
 {"headword": "jettison", "form": "jettisoning", "position": 2, "pronunciation": "/ˈdʒɛtɪsənɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jettison", "form": "jettisons", "position": 3, "pronunciation": "/ˈdʒɛtɪsənz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jetty", "form": "jettied", "position": 1, "pronunciation": "/ˈdʒɛtid/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "jetty", "form": "jettier", "position": 2, "pronunciation": "/ˈdʒɛtiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jetty", "form": "jetties", "position": 3, "pronunciation": "/ˈdʒɛtiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jetty", "form": "jettiest", "position": 4, "pronunciation": "/ˈdʒɛtiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "jetty", "form": "jettying", "position": 5, "pronunciation": "/ˈdʒɛtiɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "jew", "form": "jewed", "position": 1, "pronunciation": "/ˈdʒud/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "jeu", "form": "jeux", "position": 1, "pronunciation": "/ʒø/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jew", "form": "jewed", "position": 1, "pronunciation": "/dʒud/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jew", "form": "jewing", "position": 2, "pronunciation": "/ˈdʒuɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jew", "form": "jews", "position": 3, "pronunciation": "/dʒuz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jewel", "form": "jeweled", "position": 1, "pronunciation": "/ˈdʒuəld/", "labels": "[\"past\"]", "synonyms": "[\"beady\", \"gemmed\", \"jewelled\", \"sequined\", \"spangled\", \"spangly\"]"}
@@ -378,6 +442,7 @@
 {"headword": "jib", "form": "jibbed", "position": 2, "pronunciation": "/dʒɪbd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jib", "form": "jibbs", "position": 3, "pronunciation": "/dʒɪbz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jib", "form": "jibs", "position": 4, "pronunciation": "/dʒɪbz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jibaro", "form": "jibaros", "position": 1, "pronunciation": "/ˈhibəˌroʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jibber", "form": "jibbers", "position": 1, "pronunciation": "/ˈdʒɪbərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jibboom", "form": "jibbooms", "position": 1, "pronunciation": "/ˈdʒɪbˌbumz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jibe", "form": "gibe", "position": 1, "pronunciation": "/dʒaɪb/", "labels": "[\"var.\"]", "synonyms": "[\"shot\", \"shaft\", \"slam\", \"dig\", \"barb\", \"jibe\", \"jeer\", \"scoff\", \"flout\", \"barrack\"]"}
@@ -399,11 +464,12 @@
 {"headword": "jigger", "form": "jiggered", "position": 1, "pronunciation": "/ˈdʒɪɡərd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jigger", "form": "jiggering", "position": 2, "pronunciation": "/ˈdʒɪɡərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jigger", "form": "jiggers", "position": 3, "pronunciation": "/ˈdʒɪɡərz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "jiggermast", "form": "jiggermasts", "position": 1, "pronunciation": "/ˈdʒɪɡərˌmæsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jiggle", "form": "jiggled", "position": 1, "pronunciation": "/ˈdʒɪɡəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jiggle", "form": "jiggles", "position": 2, "pronunciation": "/ˈdʒɪɡəlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jiggle", "form": "jiggling", "position": 3, "pronunciation": "/ˈdʒɪɡəlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "jiggly", "form": "jigglier", "position": 1, "pronunciation": "/ˈdʒɪɡliər/", "labels": "[\"comp.\"]", "synonyms": null}
-{"headword": "jiggly", "form": "jiggliest", "position": 2, "pronunciation": "/ˈdʒɪɡliɪst/", "labels": "[\"superl.\"]", "synonyms": null}
+{"headword": "jiggly", "form": "jigglier", "position": 1, "pronunciation": "/ˈdʒɪɡəliər/", "labels": "[\"comp.\"]", "synonyms": null}
+{"headword": "jiggly", "form": "jiggliest", "position": 2, "pronunciation": "/ˈdʒɪɡəliəst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "jigsaw", "form": "jigsawed", "position": 1, "pronunciation": "/ˈdʒɪɡˌsɔd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jigsaw", "form": "jigsawing", "position": 2, "pronunciation": "/ˈdʒɪɡˌsɔɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jigsaw", "form": "jigsawn", "position": 3, "pronunciation": "/ˈdʒɪɡˌsɔn/", "labels": "[\"past\"]", "synonyms": null}
@@ -416,6 +482,8 @@
 {"headword": "jilbab", "form": "jilbabs", "position": 1, "pronunciation": "/dʒɪlˈbɑbz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jill", "form": "gill", "position": 1, "pronunciation": "/ɡɪl/", "labels": "[\"var.\"]", "synonyms": "[\"branchia\", \"lamella\"]"}
 {"headword": "jill", "form": "jills", "position": 2, "pronunciation": "/dʒɪlz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "jillaroo", "form": "jillaroos", "position": 1, "pronunciation": "/ˌdʒɪləˈruz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jillet", "form": "jillets", "position": 1, "pronunciation": "/ˈdʒɪləts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jillion", "form": "jillions", "position": 1, "pronunciation": "/ˈdʒɪljənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jilt", "form": "jilted", "position": 1, "pronunciation": "/ˈdʒɪltɪd/", "labels": "[\"past\"]", "synonyms": "[\"rejected\", \"spurned\"]"}
 {"headword": "jilt", "form": "jilting", "position": 2, "pronunciation": "/ˈdʒɪltɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -429,12 +497,13 @@
 {"headword": "jimp", "form": "jimper", "position": 1, "pronunciation": "/ˈdʒɪmpər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jimp", "form": "jimpest", "position": 2, "pronunciation": "/ˈdʒɪmpɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "jimsonweed", "form": "jimsonweeds", "position": 1, "pronunciation": "/ˈdʒɪmsənˌwidz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jimswinger", "form": "jimswingers", "position": 1, "pronunciation": "/ˈdʒɪmˌswɪŋərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jin", "form": "jins", "position": 1, "pronunciation": "/dʒɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jingal", "form": "gingal", "position": 1, "pronunciation": "/ˈdʒɪŋɡəl/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "jingal", "form": "gingall", "position": 2, "pronunciation": "/ˈdʒɪŋɡəl/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "jingal", "form": "gingalls", "position": 3, "pronunciation": "/ˈdʒɪŋɡəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jingal", "form": "gingals", "position": 4, "pronunciation": "/ˈdʒɪŋɡəlz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jingal", "form": "jingall", "position": 5, "pronunciation": "/ˈdʒɪnɡɔl/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "jingal", "form": "jingall", "position": 5, "pronunciation": "/ˈdʒɪŋɡɔl/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "jingal", "form": "jingalls", "position": 6, "pronunciation": "/ˈdʒɪŋɡɔlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jingal", "form": "jingals", "position": 7, "pronunciation": "/ˈdʒɪŋɡɔlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jingle", "form": "jingled", "position": 1, "pronunciation": "/ˈdʒɪŋɡəld/", "labels": "[\"past\"]", "synonyms": null}
@@ -461,12 +530,14 @@
 {"headword": "jinn", "form": "jinnee", "position": 9, "pronunciation": "/ˈdʒɪni/", "labels": "[\"var.\"]", "synonyms": "[\"genie\", \"jinni\", \"djinni\", \"djinny\", \"djinn\"]"}
 {"headword": "jinn", "form": "jinni", "position": 10, "pronunciation": "/ˈdʒɪni/", "labels": "[\"var.\"]", "synonyms": "[\"genie\", \"jinnee\", \"djinni\", \"djinny\", \"djinn\"]"}
 {"headword": "jinn", "form": "jinns", "position": 11, "pronunciation": "/dʒɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jinny", "form": "jinnies", "position": 1, "pronunciation": "/ˈdʒɪniz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jinricksha", "form": "jinrickshas", "position": 1, "pronunciation": "/dʒɪnˈrɪkʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jinrikisha", "form": "jinrikishas", "position": 1, "pronunciation": "/dʒɪnˈrɪkɪʃəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jinx", "form": "jinxed", "position": 1, "pronunciation": "/dʒɪŋkst/", "labels": "[\"past\"]", "synonyms": "[\"hexed\"]"}
 {"headword": "jinx", "form": "jinxes", "position": 2, "pronunciation": "/ˈdʒɪŋksɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jinx", "form": "jinxing", "position": 3, "pronunciation": "/ˈdʒɪŋksɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jipijapa", "form": "jipijapas", "position": 1, "pronunciation": "/ˌhipiˈhɑpəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jird", "form": "jirds", "position": 1, "pronunciation": "/dʒɜrdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jirga", "form": "jirgas", "position": 1, "pronunciation": "/ˈdʒɜrɡəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jism", "form": "jisms", "position": 1, "pronunciation": "/ˈdʒɪzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jitney", "form": "jitneys", "position": 1, "pronunciation": "/ˈdʒɪtniz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -479,6 +550,7 @@
 {"headword": "jitteriness", "form": "jitterinesses", "position": 1, "pronunciation": "/ˈdʒɪtərinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jittery", "form": "jitterier", "position": 1, "pronunciation": "/ˈdʒɪtəriər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jittery", "form": "jitteriest", "position": 2, "pronunciation": "/ˈdʒɪtəriɪst/", "labels": "[\"superl.\"]", "synonyms": null}
+{"headword": "jiva", "form": "jivas", "position": 1, "pronunciation": "/ˈdʒivəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jive", "form": "jived", "position": 1, "pronunciation": "/dʒaɪvd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jive", "form": "jives", "position": 2, "pronunciation": "/dʒaɪvz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jive", "form": "jiving", "position": 3, "pronunciation": "/ˈdʒaɪvɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -492,6 +564,7 @@
 {"headword": "job", "form": "jobs", "position": 3, "pronunciation": "/dʒɑbz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jobber", "form": "jobbers", "position": 1, "pronunciation": "/ˈdʒɑbərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jobbery", "form": "jobberies", "position": 1, "pronunciation": "/ˈdʒɑbəriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jobbie", "form": "jobbies", "position": 1, "pronunciation": "/ˈdʒɑbiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jobholder", "form": "jobholders", "position": 1, "pronunciation": "/ˈdʒɑbˌhoʊldərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "joblessness", "form": "joblessnesses", "position": 1, "pronunciation": "/ˈdʒɑbləsnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jobname", "form": "jobnames", "position": 1, "pronunciation": "/ˈdʒɑbˌneɪmz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -503,6 +576,7 @@
 {"headword": "jockey", "form": "jockeys", "position": 3, "pronunciation": "/ˈdʒɑkiz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jocko", "form": "jockos", "position": 1, "pronunciation": "/ˈdʒɑkoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jockstrap", "form": "jockstraps", "position": 1, "pronunciation": "/ˈdʒɑkstræps/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jockteleg", "form": "jocktelegs", "position": 1, "pronunciation": "/ˈdʒɑktəˌlɛɡz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jocoseness", "form": "jocosenesses", "position": 1, "pronunciation": "/dʒoʊˈkoʊsnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jocosity", "form": "jocosities", "position": 1, "pronunciation": "/dʒəˈkɑsɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jocularity", "form": "jocularities", "position": 1, "pronunciation": "/ˌdʒɑkjəˈlærɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -513,7 +587,7 @@
 {"headword": "jog", "form": "jogged", "position": 1, "pronunciation": "/dʒɑɡd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jog", "form": "jogging", "position": 2, "pronunciation": "/ˈdʒɑɡɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jog", "form": "jogs", "position": 3, "pronunciation": "/dʒɑɡz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "jogger", "form": "joggers", "position": 1, "pronunciation": "/ˈdʒɑɡərz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "jogger", "form": "joggers", "position": 1, "pronunciation": "/ˈdʒɑɡərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jogging", "form": "joggings", "position": 1, "pronunciation": "/ˈdʒɑɡɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "joggle", "form": "joggled", "position": 1, "pronunciation": "/ˈdʒɑɡəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "joggle", "form": "joggles", "position": 2, "pronunciation": "/ˈdʒɑɡəlz/", "labels": "[\"3rd sing.\", \"pl.\"]", "synonyms": null}
@@ -524,6 +598,7 @@
 {"headword": "johnny", "form": "johnnies", "position": 1, "pronunciation": "/ˈdʒɑniz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "johnnycake", "form": "johnnycakes", "position": 1, "pronunciation": "/ˈdʒɑniˌkeɪks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "johnsongrass", "form": "johnsongrasses", "position": 1, "pronunciation": "/ˈdʒɑnsənˌɡræsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "johnsonian", "form": "johnsonians", "position": 1, "pronunciation": "/dʒɑnˈsoʊniənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "join", "form": "joined", "position": 1, "pronunciation": "/dʒɔɪnd/", "labels": "[\"past\"]", "synonyms": "[\"coupled\", \"linked\", \"united\"]"}
 {"headword": "join", "form": "joining", "position": 2, "pronunciation": "/ˈdʒɔɪnɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"connection\", \"connexion\"]"}
 {"headword": "join", "form": "joins", "position": 3, "pronunciation": "/dʒɔɪnz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -548,15 +623,22 @@
 {"headword": "joke", "form": "joked", "position": 1, "pronunciation": "/dʒoʊkt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "joke", "form": "jokes", "position": 2, "pronunciation": "/dʒoʊks/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "joke", "form": "joking", "position": 3, "pronunciation": "/ˈdʒoʊkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"jesting\", \"jocose\", \"jocular\"]"}
+{"headword": "jokebook", "form": "jokebooks", "position": 1, "pronunciation": "/ˈdʒoʊkˌbʊks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "joker", "form": "jokers", "position": 1, "pronunciation": "/ˈdʒoʊkərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jokester", "form": "jokesters", "position": 1, "pronunciation": "/ˈdʒoʊkstərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jokiness", "form": "jokinesses", "position": 1, "pronunciation": "/ˈdʒoʊkinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "joky", "form": "jokey", "position": 1, "pronunciation": "/ˈdʒoʊki/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "jol", "form": "jolled", "position": 1, "pronunciation": "/dʒɑld/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "jol", "form": "jolling", "position": 2, "pronunciation": "/ˈdʒɑlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "jol", "form": "jols", "position": 3, "pronunciation": "/dʒɑlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "joller", "form": "jollers", "position": 1, "pronunciation": "/ˈdʒɑlərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jollification", "form": "jollifications", "position": 1, "pronunciation": "/ˌdʒɑləfɪˈkeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jollify", "form": "jollified", "position": 1, "pronunciation": "/ˈdʒɑləfaɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jollify", "form": "jollifies", "position": 2, "pronunciation": "/ˈdʒɑləfaɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jollify", "form": "jollifying", "position": 3, "pronunciation": "/ˈdʒɑləfaɪɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jollity", "form": "jollities", "position": 1, "pronunciation": "/ˈdʒɑlətiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jollo", "form": "jollos", "position": 1, "pronunciation": "/ˈdʒɑloʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jollop", "form": "jollops", "position": 1, "pronunciation": "/ˈdʒɑləps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jolly", "form": "jollied", "position": 1, "pronunciation": "/ˈdʒɑlid/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jolly", "form": "jollier", "position": 2, "pronunciation": "/ˈdʒɑliər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jolly", "form": "jollies", "position": 3, "pronunciation": "/ˈdʒɑliz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -568,12 +650,18 @@
 {"headword": "jolter", "form": "jolters", "position": 1, "pronunciation": "/ˈdʒoʊltərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jolty", "form": "joltier", "position": 1, "pronunciation": "/ˈdʒoʊltiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jolty", "form": "joltiest", "position": 2, "pronunciation": "/ˈdʒoʊltiɪst/", "labels": "[\"superl.\"]", "synonyms": null}
+{"headword": "jone", "form": "joned", "position": 1, "pronunciation": "/dʒoʊnd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "jone", "form": "jones", "position": 2, "pronunciation": "/dʒoʊnz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "jone", "form": "joning", "position": 3, "pronunciation": "/ˈdʒoʊnɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jones", "form": "jonesed", "position": 1, "pronunciation": "/dʒoʊnzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jones", "form": "joneses", "position": 2, "pronunciation": "/ˈdʒoʊnzɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jones", "form": "jonesing", "position": 3, "pronunciation": "/ˈdʒoʊnzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "jong", "form": "jongs", "position": 1, "pronunciation": "/jɑŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jongleur", "form": "jongleurs", "position": 1, "pronunciation": "/ˈdʒɑŋɡlərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jonquil", "form": "jonquils", "position": 1, "pronunciation": "/ˈdʒɑŋkwəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jordan", "form": "jordans", "position": 1, "pronunciation": "/ˈdʒɔrdənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jornada", "form": "jornadas", "position": 1, "pronunciation": "/hɔrˈnɑdəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "joropo", "form": "joropos", "position": 1, "pronunciation": "/həˈroʊpoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jorum", "form": "joram", "position": 1, "pronunciation": "/ˈdʒɔrəm/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "jorum", "form": "jorams", "position": 2, "pronunciation": "/ˈdʒɔrəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jorum", "form": "jorums", "position": 3, "pronunciation": "/ˈdʒoʊrəmz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -582,6 +670,7 @@
 {"headword": "josh", "form": "joshes", "position": 2, "pronunciation": "/ˈdʒɑʃɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "josh", "form": "joshing", "position": 3, "pronunciation": "/ˈdʒɑʃɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "josher", "form": "joshers", "position": 1, "pronunciation": "/ˈdʒɑʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "joskin", "form": "joskins", "position": 1, "pronunciation": "/ˈdʒɑskɪnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "joss", "form": "josses", "position": 1, "pronunciation": "/ˈdʒɔsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "josser", "form": "jossers", "position": 1, "pronunciation": "/ˈdʒɑsərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jostle", "form": "jostled", "position": 1, "pronunciation": "/ˈdʒɑsəld/", "labels": "[\"past\"]", "synonyms": null}
@@ -623,7 +712,7 @@
 {"headword": "journeyman", "form": "journeymen", "position": 1, "pronunciation": "/ˈdʒɜrniˌmɛn/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "journeyperson", "form": "journeypeople", "position": 1, "pronunciation": "/ˈdʒɜrniˌpipəl/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "journeyperson", "form": "journeypersons", "position": 2, "pronunciation": "/ˈdʒɜrniˌpɜrsənz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "journeywork", "form": "journeyworks", "position": 1, "pronunciation": "/ˈdʒɜrnɪˌwɜrks/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "journeywork", "form": "journeyworks", "position": 1, "pronunciation": "/ˈdʒɜrniˌwɜrks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "joust", "form": "jousted", "position": 1, "pronunciation": "/ˈdʒaʊstəd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "joust", "form": "jousting", "position": 2, "pronunciation": "/ˈdʒaʊstɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "joust", "form": "jousts", "position": 3, "pronunciation": "/dʒaʊsts/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -639,7 +728,7 @@
 {"headword": "jow", "form": "jows", "position": 3, "pronunciation": "/dʒaʊz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jowar", "form": "jowars", "position": 1, "pronunciation": "/ˈdʒaʊɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jowl", "form": "jole", "position": 1, "pronunciation": "/dʒoʊl/", "labels": "[\"arch. var.\"]", "synonyms": null}
-{"headword": "jowl", "form": "joles", "position": 2, "pronunciation": "/dʒoʊlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "jowl", "form": "joles", "position": 2, "pronunciation": "/dʒoʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jowl", "form": "jowls", "position": 3, "pronunciation": "/dʒaʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jowly", "form": "jowlier", "position": 1, "pronunciation": "/ˈdʒaʊliər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jowly", "form": "jowliest", "position": 2, "pronunciation": "/ˈdʒaʊliɪst/", "labels": "[\"superl.\"]", "synonyms": null}
@@ -647,6 +736,7 @@
 {"headword": "joy", "form": "joying", "position": 2, "pronunciation": "/ˈdʒɔɪɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "joy", "form": "joys", "position": 3, "pronunciation": "/dʒɔɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "joyance", "form": "joyances", "position": 1, "pronunciation": "/ˈdʒɔɪənsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "joycean", "form": "joyceans", "position": 1, "pronunciation": "/ˈdʒɔɪsiənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "joyful", "form": "joyfuller", "position": 1, "pronunciation": "/ˈdʒɔɪfələr/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "joyful", "form": "joyfullest", "position": 2, "pronunciation": "/ˈdʒɔɪfəlɪst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "joyfulness", "form": "joyfulnesses", "position": 1, "pronunciation": "/ˈdʒɔɪfəlnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -672,10 +762,17 @@
 {"headword": "jubilate", "form": "jubilated", "position": 1, "pronunciation": "/ˈdʒubɪleɪtəd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jubilate", "form": "jubilates", "position": 2, "pronunciation": "/ˈdʒubɪleɪts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "jubilate", "form": "jubilating", "position": 3, "pronunciation": "/ˈdʒubɪleɪtɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "jubilatio", "form": "jubilatios", "position": 1, "pronunciation": "/ˌjubəˈlɑtsiˌoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jubilation", "form": "jubilations", "position": 1, "pronunciation": "/ˌdʒubəˈleɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jubilee", "form": "jubile", "position": 1, "pronunciation": "/ˈdʒubəli/", "labels": "[\"arch. var.\"]", "synonyms": null}
 {"headword": "jubilee", "form": "jubilees", "position": 2, "pronunciation": "/ˈdʒubəˌliz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jubilee", "form": "jubiles", "position": 3, "pronunciation": "/ˈdʒubəˌliz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jubilus", "form": "jubili", "position": 1, "pronunciation": "/ˈjubəˌlaɪ/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "juco", "form": "jucos", "position": 1, "pronunciation": "/ˈdʒuˌkoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "judaist", "form": "judaists", "position": 1, "pronunciation": "/ˈdʒudiɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "judaize", "form": "judaized", "position": 1, "pronunciation": "/ˈdʒudiˌaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "judaize", "form": "judaizes", "position": 2, "pronunciation": "/ˈdʒudiˌaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "judaize", "form": "judaizing", "position": 3, "pronunciation": "/ˈdʒudiˌaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "judas", "form": "judases", "position": 1, "pronunciation": "/ˈdʒudəsəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "judder", "form": "juddered", "position": 1, "pronunciation": "/ˈdʒʌdərd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "judder", "form": "juddering", "position": 2, "pronunciation": "/ˈdʒʌdərɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
@@ -688,27 +785,31 @@
 {"headword": "judgment", "form": "judgement", "position": 1, "pronunciation": "/ˈdʒʌdʒmənt/", "labels": "[\"var.\"]", "synonyms": "[\"judgment\", \"assessment\", \"perspicacity\", \"sagacity\", \"sagaciousness\", \"discernment\", \"judging\", \"mind\", \"opinion\"]"}
 {"headword": "judgment", "form": "judgements", "position": 2, "pronunciation": "/ˈdʒʌdʒmənts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "judgment", "form": "judgments", "position": 3, "pronunciation": "/ˈdʒʌdʒmənts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "judicatory", "form": "judicatories", "position": 1, "pronunciation": "/dʒuˈdɪkətɔriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "judicator", "form": "judicators", "position": 1, "pronunciation": "/ˈdʒudɪˌkeɪtərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "judicatory", "form": "judicatories", "position": 1, "pronunciation": "/dʒuˈdɪkəˌtɔriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "judicature", "form": "judicatures", "position": 1, "pronunciation": "/ˈdʒudɪˌkeɪtʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "judicialize", "form": "judicialized", "position": 1, "pronunciation": "/dʒuˈdɪʃəˌlaɪzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "judicialize", "form": "judicializes", "position": 2, "pronunciation": "/dʒuˈdɪʃəˌlaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "judicialize", "form": "judicializing", "position": 3, "pronunciation": "/dʒuˈdɪʃəˌlaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "judiciary", "form": "judiciaries", "position": 1, "pronunciation": "/dʒuˈdɪʃiˌɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "judo", "form": "judos", "position": 1, "pronunciation": "/ˈdʒudoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "judogi", "form": "judogis", "position": 1, "pronunciation": "/ˈdʒudoʊˌɡiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "judoist", "form": "judoists", "position": 1, "pronunciation": "/ˈdʒudoʊɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "judoka", "form": "judokas", "position": 1, "pronunciation": "/dʒuˈdoʊkəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jue", "form": "jues", "position": 1, "pronunciation": "/dʒuˈɛz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jug", "form": "jugged", "position": 1, "pronunciation": "/dʒʌɡd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jug", "form": "jugging", "position": 2, "pronunciation": "/ˈdʒʌɡɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jug", "form": "jugs", "position": 3, "pronunciation": "/dʒʌɡz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "jugaad", "form": "jugaads", "position": 1, "pronunciation": "/dʒʊˈɡɑdz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jugful", "form": "jugfuls", "position": 1, "pronunciation": "/ˈdʒʌɡˌfʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jugful", "form": "jugfuls", "position": 1, "pronunciation": "/ˈdʒʌɡfʊlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jugful", "form": "jugsful", "position": 2, "pronunciation": "/ˈdʒʌɡzfʊl/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "juggernaut", "form": "juggernauts", "position": 1, "pronunciation": "/ˈdʒʌɡərˌnɔts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "juggins", "form": "jugginses", "position": 1, "pronunciation": "/ˈdʒʌɡɪnzɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "juggle", "form": "juggled", "position": 1, "pronunciation": "/ˈdʒʌɡəld/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "juggle", "form": "juggler", "position": 2, "pronunciation": "/ˈdʒʌɡlər/", "labels": "[\"form\"]", "synonyms": null}
 {"headword": "juggle", "form": "juggles", "position": 3, "pronunciation": "/ˈdʒʌɡəlz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "juggle", "form": "juggling", "position": 4, "pronunciation": "/ˈdʒʌɡəlɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"juggle\"]"}
-{"headword": "juggler", "form": "jugglers", "position": 1, "pronunciation": "/ˈdʒʌɡələrz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "juggler", "form": "jugglers", "position": 1, "pronunciation": "/ˈdʒʌɡlərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jugglery", "form": "juggleries", "position": 1, "pronunciation": "/ˈdʒʌɡləriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "juggling", "form": "jugglings", "position": 1, "pronunciation": "/ˈdʒʌɡəlɪŋz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jughead", "form": "jugheads", "position": 1, "pronunciation": "/ˈdʒʌɡˌhɛdz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -724,7 +825,8 @@
 {"headword": "juice", "form": "juicing", "position": 3, "pronunciation": "/ˈdʒusɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "juicehead", "form": "juiceheads", "position": 1, "pronunciation": "/ˈdʒusˌhɛdz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "juicer", "form": "juicers", "position": 1, "pronunciation": "/ˈdʒusərz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "juiciness", "form": "juicinesses", "position": 1, "pronunciation": "/ˈdʒusɪnəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "juicery", "form": "juiceries", "position": 1, "pronunciation": "/ˈdʒusəriz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "juiciness", "form": "juicinesses", "position": 1, "pronunciation": "/ˈdʒusinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "juicy", "form": "juicier", "position": 1, "pronunciation": "/ˈdʒuɪsjər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "juicy", "form": "juiciest", "position": 2, "pronunciation": "/ˈdʒusiəst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "jujitsu", "form": "jiujitsu", "position": 1, "pronunciation": "/dʒuˈdʒɪtsu/", "labels": "[\"var.\"]", "synonyms": "[\"jujutsu\", \"jujitsu\"]"}
@@ -742,11 +844,17 @@
 {"headword": "juke", "form": "jukes", "position": 2, "pronunciation": "/dʒuks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "juke", "form": "juking", "position": 3, "pronunciation": "/ˈdʒukɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jukebox", "form": "juke", "position": 1, "pronunciation": "/dʒuk/", "labels": "[\"abbr.\"]", "synonyms": "[\"fake\"]"}
-{"headword": "jukebox", "form": "jukeboxes", "position": 2, "pronunciation": "/ˈdʒukˌbɑksɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "jukebox", "form": "jukeboxes", "position": 2, "pronunciation": "/ˈdʒukˌbɑksɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "juku", "form": "jukus", "position": 1, "pronunciation": "/ˈdʒukuz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "julep", "form": "juleps", "position": 1, "pronunciation": "/ˈdʒuləps/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "julienne", "form": "julienned", "position": 1, "pronunciation": "/ˌdʒuliˈɛnd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "julienne", "form": "juliennes", "position": 2, "pronunciation": "/ˌdʒuliˈɛnz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "julienne", "form": "julienning", "position": 3, "pronunciation": "/ˌdʒuliˈɛnɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "jum", "form": "jums", "position": 1, "pronunciation": "/dʒʌmz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jumar", "form": "jumared", "position": 1, "pronunciation": "/ˈdʒumɑrd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "jumar", "form": "jumaring", "position": 2, "pronunciation": "/ˈdʒumɑrɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "jumar", "form": "jumars", "position": 3, "pronunciation": "/ˈdʒumɑrz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "jumbie", "form": "jumbies", "position": 1, "pronunciation": "/ˈdʒʌmbiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jumble", "form": "jumbal", "position": 1, "pronunciation": "/ˈdʒʌmbəl/", "labels": "[\"arch. var.\"]", "synonyms": "[\"jumble\"]"}
 {"headword": "jumble", "form": "jumbals", "position": 2, "pronunciation": "/ˈdʒʌmbəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jumble", "form": "jumbled", "position": 3, "pronunciation": "/ˈdʒʌmbəld/", "labels": "[\"past\"]", "synonyms": "[\"disorderly\"]"}
@@ -754,13 +862,18 @@
 {"headword": "jumble", "form": "jumbling", "position": 5, "pronunciation": "/ˈdʒʌmblɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jumbler", "form": "jumblers", "position": 1, "pronunciation": "/ˈdʒʌmblərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jumbo", "form": "jumbos", "position": 1, "pronunciation": "/ˈdʒʌmboʊz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jumboize", "form": "jumboized", "position": 1, "pronunciation": "/ˈdʒʌmboʊˌaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "jumboize", "form": "jumboizes", "position": 2, "pronunciation": "/ˈdʒʌmboʊˌaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "jumboize", "form": "jumboizing", "position": 3, "pronunciation": "/ˈdʒʌmboʊˌaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "jumbuck", "form": "jumbucks", "position": 1, "pronunciation": "/ˈdʒʌmbʌks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jump", "form": "jumped", "position": 1, "pronunciation": "/dʒʌmpt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "jump", "form": "jumping", "position": 2, "pronunciation": "/ˈdʒʌmpɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": "[\"jump\"]"}
 {"headword": "jump", "form": "jumps", "position": 3, "pronunciation": "/dʒʌmps/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
-{"headword": "jumper", "form": "jumpers", "position": 1, "pronunciation": "/ˈdʒʌmpərz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "jumper", "form": "jumpers", "position": 1, "pronunciation": "/ˈdʒʌmpərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jumpiness", "form": "jumpinesses", "position": 1, "pronunciation": "/ˈdʒʌmpinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jumpmaster", "form": "jumpmasters", "position": 1, "pronunciation": "/ˈdʒʌmpˌmæstərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jumpoff", "form": "jumpoffs", "position": 1, "pronunciation": "/ˈdʒʌmpˌɔfs/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jumprock", "form": "jumprocks", "position": 1, "pronunciation": "/ˈdʒʌmpˌrɑks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jumpsuit", "form": "jumpsuits", "position": 1, "pronunciation": "/ˈdʒʌmpˌsuts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jumpy", "form": "jumpier", "position": 1, "pronunciation": "/ˈdʒʌmpiər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jumpy", "form": "jumpiest", "position": 2, "pronunciation": "/ˈdʒʌmpiəst/", "labels": "[\"superl.\"]", "synonyms": null}
@@ -770,12 +883,13 @@
 {"headword": "junco", "form": "juncos", "position": 2, "pronunciation": "/ˈdʒʌŋkoʊz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "junction", "form": "junctions", "position": 1, "pronunciation": "/ˈdʒʌŋkʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "juncture", "form": "junctures", "position": 1, "pronunciation": "/ˈdʒʌŋktʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jungian", "form": "jungians", "position": 1, "pronunciation": "/ˈjʊŋiənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jungle", "form": "jungles", "position": 1, "pronunciation": "/ˈdʒʌŋɡəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jungly", "form": "junglier", "position": 1, "pronunciation": "/ˈdʒʌŋɡliər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "jungly", "form": "jungliest", "position": 2, "pronunciation": "/ˈdʒʌŋɡliəst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "junior", "form": "juniors", "position": 1, "pronunciation": "/ˈdʒunjərz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "juniorate", "form": "juniorates", "position": 1, "pronunciation": "/ˈdʒunjərəts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "juniper", "form": "junipers", "position": 1, "pronunciation": "/ˈdʒunɪpərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "juniper", "form": "junipers", "position": 1, "pronunciation": "/ˈdʒunəpərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "junk", "form": "junked", "position": 1, "pronunciation": "/dʒʌŋkt/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "junk", "form": "junking", "position": 2, "pronunciation": "/ˈdʒʌŋkɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "junk", "form": "junks", "position": 3, "pronunciation": "/dʒʌŋks/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -800,21 +914,24 @@
 {"headword": "jurat", "form": "jurats", "position": 1, "pronunciation": "/ˈdʒʊræts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jurel", "form": "jurels", "position": 1, "pronunciation": "/dʒʊˈrɛlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jurisconsult", "form": "jurisconsults", "position": 1, "pronunciation": "/ˌdʒʊrɪskənˈsʌlts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jurisdiction", "form": "jurisdictions", "position": 1, "pronunciation": "/ˌdʒʊrɪsˈdɪkʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jurisdiction", "form": "jurisdictions", "position": 1, "pronunciation": "/ˌdʒʊrəsˈdɪkʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jurisprudence", "form": "jurisprudences", "position": 1, "pronunciation": "/ˌdʒʊrəˈsprudənsəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jurisprudent", "form": "jurisprudents", "position": 1, "pronunciation": "/ˌdʒʊrəˈsprudənts/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "jurist", "form": "jurists", "position": 1, "pronunciation": "/ˈdʒʊrɪsts/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jurist", "form": "jurists", "position": 1, "pronunciation": "/ˈdʒʊrəsts/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "juror", "form": "jurors", "position": 1, "pronunciation": "/ˈdʒʊrərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jury", "form": "juries", "position": 1, "pronunciation": "/ˈdʒʊriz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jury", "form": "jurying", "position": 2, "pronunciation": "/ˈdʒʊriɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "juryman", "form": "jurymen", "position": 1, "pronunciation": "/ˈdʒʊrimən/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "jurywoman", "form": "jurywomen", "position": 1, "pronunciation": "/ˈdʒʊriˌwɪmən/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "jussive", "form": "jussives", "position": 1, "pronunciation": "/ˈdʒʌsɪvz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "just", "form": "juster", "position": 1, "pronunciation": "/ˈdʒʌstər/", "labels": "[\"comp.\"]", "synonyms": null}
 {"headword": "just", "form": "justest", "position": 2, "pronunciation": "/ˈdʒʌstəst/", "labels": "[\"superl.\"]", "synonyms": null}
 {"headword": "justice", "form": "justices", "position": 1, "pronunciation": "/ˈdʒʌstəsəz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "justiciar", "form": "justiciars", "position": 1, "pronunciation": "/dʒʌˈstɪʃərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "justicer", "form": "justicers", "position": 1, "pronunciation": "/ˈdʒʌstəsərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "justicia", "form": "justicias", "position": 1, "pronunciation": "/dʒʌˈstɪʃiəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "justiciar", "form": "justiciars", "position": 1, "pronunciation": "/dʒəˈstɪsiɑrz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "justiciary", "form": "justiciaries", "position": 1, "pronunciation": "/dʒʌˈstɪʃiˌɛriz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "justification", "form": "justifications", "position": 1, "pronunciation": "/ˌdʒʌstɪfɪˈkeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "justification", "form": "justifications", "position": 1, "pronunciation": "/ˌdʒʌstəfəˈkeɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "justifier", "form": "justifiers", "position": 1, "pronunciation": "/ˈdʒʌstəˌfaɪərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "justify", "form": "justified", "position": 1, "pronunciation": "/ˈdʒʌstəˌfaɪd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "justify", "form": "justifies", "position": 2, "pronunciation": "/ˈdʒʌstəˌfaɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
@@ -831,6 +948,9 @@
 {"headword": "juvenescence", "form": "juvenescences", "position": 1, "pronunciation": "/ˌdʒuvəˈnɛsənsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "juvenile", "form": "juveniles", "position": 1, "pronunciation": "/ˈdʒuvənəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "juvenility", "form": "juvenilities", "position": 1, "pronunciation": "/ˌdʒuvəˈnɪlɪtiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "juvenilize", "form": "juvenilized", "position": 1, "pronunciation": "/ˈdʒuvənəˌlaɪzd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "juvenilize", "form": "juvenilizes", "position": 2, "pronunciation": "/ˈdʒuvənəˌlaɪzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
+{"headword": "juvenilize", "form": "juvenilizing", "position": 3, "pronunciation": "/ˈdʒuvənəˌlaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "juvie", "form": "juvies", "position": 1, "pronunciation": "/ˈdʒuviz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "juxtapose", "form": "juxtaposed", "position": 1, "pronunciation": "/ˌdʒʌkstəˈpoʊzd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "juxtapose", "form": "juxtaposes", "position": 2, "pronunciation": "/ˌdʒʌkstəˈpoʊzɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}

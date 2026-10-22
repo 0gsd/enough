@@ -25,6 +25,7 @@
 {"word": "jabbing", "synonym": "poking", "via": "jabbing", "position": 3}
 {"word": "jabbing", "synonym": "thrust", "via": "jabbing", "position": 4}
 {"word": "jabbing", "synonym": "thrusting", "via": "jabbing", "position": 5}
+{"word": "jabroni", "synonym": "loser", "via": "jabroni", "position": 1}
 {"word": "jacinth", "synonym": "hyacinth", "via": "jacinth", "position": 1}
 {"word": "jack", "synonym": "jackass", "via": "jack", "position": 1}
 {"word": "jack", "synonym": "knave", "via": "jack", "position": 2}
@@ -58,6 +59,8 @@
 {"word": "jacks", "synonym": "knucklebones", "via": "jakes", "position": 1}
 {"word": "jackstraw", "synonym": "spillikin", "via": "jackstraw", "position": 1}
 {"word": "jackstraws", "synonym": "spillikins", "via": "jackstraw", "position": 1}
+{"word": "jacobinic", "synonym": "jacobinical", "via": "jacobinic", "position": 1}
+{"word": "jacobinical", "synonym": "jacobinic", "via": "jacobinical", "position": 1}
 {"word": "jactitation", "synonym": "boast", "via": "jactitation", "position": 1}
 {"word": "jactitation", "synonym": "boasting", "via": "jactitation", "position": 2}
 {"word": "jade", "synonym": "hack", "via": "jade", "position": 1}
@@ -73,6 +76,7 @@
 {"word": "jaded", "synonym": "wearied", "via": "jade", "position": 1}
 {"word": "jaded", "synonym": "wearied", "via": "jaded", "position": 1}
 {"word": "jag", "synonym": "dag", "via": "jag", "position": 1}
+{"word": "jaga", "synonym": "sentry", "via": "jaga", "position": 1}
 {"word": "jaggary", "synonym": "jaggery", "via": "jaggery", "position": 1}
 {"word": "jaggary", "synonym": "jagghery", "via": "jaggery", "position": 2}
 {"word": "jagged", "synonym": "jaggy", "via": "jag", "position": 1}
@@ -129,6 +133,7 @@
 {"word": "jailor", "synonym": "gaoler", "via": "jailer", "position": 2}
 {"word": "jailor", "synonym": "screw", "via": "jailer", "position": 3}
 {"word": "jailor", "synonym": "turnkey", "via": "jailer", "position": 4}
+{"word": "jakeloo", "synonym": "excellent", "via": "jakeloo", "position": 1}
 {"word": "jakes", "synonym": "outhouse", "via": "jake", "position": 1}
 {"word": "jakes", "synonym": "privy", "via": "jake", "position": 2}
 {"word": "jakes", "synonym": "outhouse", "via": "jakes", "position": 1}
@@ -166,6 +171,7 @@
 {"word": "jangling", "synonym": "jangly", "via": "jangle", "position": 1}
 {"word": "jangling", "synonym": "jangly", "via": "jangling", "position": 1}
 {"word": "jangly", "synonym": "jangling", "via": "jangly", "position": 1}
+{"word": "jannock", "synonym": "honest", "via": "jannock", "position": 1}
 {"word": "jape", "synonym": "joke", "via": "jape", "position": 1}
 {"word": "jape", "synonym": "gag", "via": "jape", "position": 2}
 {"word": "jape", "synonym": "laugh", "via": "jape", "position": 3}
@@ -197,6 +203,8 @@
 {"word": "jargon", "synonym": "vernacular", "via": "jargoon", "position": 6}
 {"word": "jargon", "synonym": "jargoon", "via": "jargoon", "position": 7}
 {"word": "jargoon", "synonym": "jargon", "via": "jargoon", "position": 1}
+{"word": "jarp", "synonym": "smash", "via": "jarp", "position": 1}
+{"word": "jasey", "synonym": "wig", "via": "jasey", "position": 1}
 {"word": "jaundice", "synonym": "bitterness", "via": "jaundice", "position": 1}
 {"word": "jaundice", "synonym": "acrimony", "via": "jaundice", "position": 2}
 {"word": "jaundice", "synonym": "acerbity", "via": "jaundice", "position": 3}
@@ -237,6 +245,7 @@
 {"word": "jaw", "synonym": "berate", "via": "jaw", "position": 6}
 {"word": "jaw", "synonym": "remonstrate", "via": "jaw", "position": 7}
 {"word": "jaw", "synonym": "lambaste", "via": "jaw", "position": 8}
+{"word": "jawblock", "synonym": "chat", "via": "jawblock", "position": 1}
 {"word": "jawbone", "synonym": "mandible", "via": "jawbone", "position": 1}
 {"word": "jawbone", "synonym": "jowl", "via": "jawbone", "position": 2}
 {"word": "jawbone", "synonym": "shmooze", "via": "jawbone", "position": 3}
@@ -283,6 +292,7 @@
 {"word": "jeering", "synonym": "taunting", "via": "jeering", "position": 7}
 {"word": "jeeringly", "synonym": "mockingly", "via": "jeeringly", "position": 1}
 {"word": "jeeringly", "synonym": "gibingly", "via": "jeeringly", "position": 2}
+{"word": "jeezy", "synonym": "joint", "via": "jeezy", "position": 1}
 {"word": "jehad", "synonym": "jihad", "via": "jihad", "position": 1}
 {"word": "jejune", "synonym": "insipid", "via": "jejune", "position": 1}
 {"word": "jejune", "synonym": "adolescent", "via": "jejune", "position": 2}
@@ -311,6 +321,7 @@
 {"word": "jelly", "synonym": "gelatin", "via": "jelly", "position": 1}
 {"word": "jelly", "synonym": "jellify", "via": "jelly", "position": 2}
 {"word": "jellylike", "synonym": "gelatinous", "via": "jellylike", "position": 1}
+{"word": "jembe", "synonym": "hoe", "via": "jembe", "position": 1}
 {"word": "jemmy", "synonym": "jimmy", "via": "jemmy", "position": 1}
 {"word": "jemmy", "synonym": "jimmy", "via": "jimmy", "position": 1}
 {"word": "jennet", "synonym": "jenny", "via": "jennet", "position": 1}
@@ -331,6 +342,8 @@
 {"word": "jeopardize", "synonym": "threaten", "via": "jeopardize", "position": 8}
 {"word": "jeopardize", "synonym": "imperil", "via": "jeopardize", "position": 9}
 {"word": "jeopardize", "synonym": "peril", "via": "jeopardize", "position": 10}
+{"word": "jeopardous", "synonym": "perilous", "via": "jeopardous", "position": 1}
+{"word": "jeopardous", "synonym": "dangerous", "via": "jeopardous", "position": 2}
 {"word": "jeopardy", "synonym": "hazard", "via": "jeopardy", "position": 1}
 {"word": "jeopardy", "synonym": "peril", "via": "jeopardy", "position": 2}
 {"word": "jeopardy", "synonym": "risk", "via": "jeopardy", "position": 3}
@@ -444,6 +457,7 @@
 {"word": "jib", "synonym": "resist", "via": "jib", "position": 3}
 {"word": "jib", "synonym": "balk", "via": "jib", "position": 4}
 {"word": "jib", "synonym": "baulk", "via": "jib", "position": 5}
+{"word": "jibbons", "synonym": "scallion", "via": "jibbons", "position": 1}
 {"word": "jibe", "synonym": "shot", "via": "gybe", "position": 1}
 {"word": "jibe", "synonym": "shaft", "via": "gybe", "position": 2}
 {"word": "jibe", "synonym": "slam", "via": "gybe", "position": 3}
@@ -514,6 +528,7 @@
 {"word": "jinni", "synonym": "djinni", "via": "jinn", "position": 3}
 {"word": "jinni", "synonym": "djinny", "via": "jinn", "position": 4}
 {"word": "jinni", "synonym": "djinn", "via": "jinn", "position": 5}
+{"word": "jinny", "synonym": "speakeasy", "via": "jinny", "position": 1}
 {"word": "jinrikisha", "synonym": "ricksha", "via": "jinrikisha", "position": 1}
 {"word": "jinrikisha", "synonym": "rickshaw", "via": "jinrikisha", "position": 2}
 {"word": "jinx", "synonym": "hex", "via": "jinx", "position": 1}
@@ -553,6 +568,7 @@
 {"word": "job", "synonym": "subcontract", "via": "job", "position": 9}
 {"word": "jobber", "synonym": "middleman", "via": "jobber", "position": 1}
 {"word": "jobber", "synonym": "wholesaler", "via": "jobber", "position": 2}
+{"word": "jobbie", "synonym": "gadget", "via": "jobbie", "position": 1}
 {"word": "jobless", "synonym": "idle", "via": "jobless", "position": 1}
 {"word": "jock", "synonym": "supporter", "via": "jock", "position": 1}
 {"word": "jock", "synonym": "suspensor", "via": "jock", "position": 2}
@@ -566,6 +582,8 @@
 {"word": "jockstrap", "synonym": "supporter", "via": "jockstrap", "position": 1}
 {"word": "jockstrap", "synonym": "suspensor", "via": "jockstrap", "position": 2}
 {"word": "jockstrap", "synonym": "jock", "via": "jockstrap", "position": 3}
+{"word": "jockteleg", "synonym": "jackknife", "via": "jockteleg", "position": 1}
+{"word": "jockteleg", "synonym": "pocketknife", "via": "jockteleg", "position": 2}
 {"word": "jocose", "synonym": "jesting", "via": "jocose", "position": 1}
 {"word": "jocose", "synonym": "jocular", "via": "jocose", "position": 2}
 {"word": "jocose", "synonym": "joking", "via": "jocose", "position": 3}
@@ -664,12 +682,17 @@
 {"word": "joking", "synonym": "jocose", "via": "joking", "position": 2}
 {"word": "joking", "synonym": "jocular", "via": "joking", "position": 3}
 {"word": "jokingly", "synonym": "facetiously", "via": "jokingly", "position": 1}
+{"word": "jol", "synonym": "party", "via": "jol", "position": 1}
+{"word": "joller", "synonym": "hedonist", "via": "joller", "position": 1}
+{"word": "joller", "synonym": "partier", "via": "joller", "position": 2}
 {"word": "jollification", "synonym": "merrymaking", "via": "jollification", "position": 1}
 {"word": "jollification", "synonym": "conviviality", "via": "jollification", "position": 2}
 {"word": "jollify", "synonym": "revel", "via": "jollify", "position": 1}
 {"word": "jollify", "synonym": "racket", "via": "jollify", "position": 2}
 {"word": "jollify", "synonym": "wassail", "via": "jollify", "position": 3}
 {"word": "jollity", "synonym": "joviality", "via": "jollity", "position": 1}
+{"word": "jollop", "synonym": "ointment", "via": "jollop", "position": 1}
+{"word": "jollop", "synonym": "salve", "via": "jollop", "position": 2}
 {"word": "jolly", "synonym": "gay", "via": "jolly", "position": 1}
 {"word": "jolly", "synonym": "jocund", "via": "jolly", "position": 2}
 {"word": "jolly", "synonym": "jovial", "via": "jolly", "position": 3}
@@ -697,11 +720,17 @@
 {"word": "jolty", "synonym": "bumpy", "via": "jolty", "position": 3}
 {"word": "jolty", "synonym": "jolting", "via": "jolty", "position": 4}
 {"word": "jolty", "synonym": "jumpy", "via": "jolty", "position": 5}
+{"word": "jone", "synonym": "tease", "via": "jone", "position": 1}
+{"word": "jong", "synonym": "lad", "via": "jong", "position": 1}
 {"word": "jongleur", "synonym": "minstrel", "via": "jongleur", "position": 1}
+{"word": "jonnock", "synonym": "genuine", "via": "jonnock", "position": 1}
+{"word": "jonnock", "synonym": "real", "via": "jonnock", "position": 2}
 {"word": "josh", "synonym": "kid", "via": "josh", "position": 1}
 {"word": "josh", "synonym": "chaff", "via": "josh", "position": 2}
 {"word": "josh", "synonym": "jolly", "via": "josh", "position": 3}
 {"word": "josh", "synonym": "banter", "via": "josh", "position": 4}
+{"word": "joskin", "synonym": "bumpkin", "via": "joskin", "position": 1}
+{"word": "joskin", "synonym": "yokel", "via": "joskin", "position": 2}
 {"word": "jostle", "synonym": "jostling", "via": "jostle", "position": 1}
 {"word": "jostle", "synonym": "shove", "via": "jostle", "position": 2}
 {"word": "jostling", "synonym": "jostle", "via": "jostle", "position": 1}
@@ -760,6 +789,8 @@
 {"word": "joyousness", "synonym": "joyfulness", "via": "joyousness", "position": 2}
 {"word": "joyride", "synonym": "tool", "via": "joyride", "position": 1}
 {"word": "joystick", "synonym": "stick", "via": "joystick", "position": 1}
+{"word": "juberous", "synonym": "dubious", "via": "juberous", "position": 1}
+{"word": "juberous", "synonym": "doubtful", "via": "juberous", "position": 2}
 {"word": "jubilance", "synonym": "exultation", "via": "jubilance", "position": 1}
 {"word": "jubilance", "synonym": "jubilation", "via": "jubilance", "position": 2}
 {"word": "jubilant", "synonym": "exultant", "via": "jubilant", "position": 1}
@@ -818,6 +849,8 @@
 {"word": "judgment", "synonym": "judging", "via": "judgment", "position": 7}
 {"word": "judgment", "synonym": "mind", "via": "judgment", "position": 8}
 {"word": "judgment", "synonym": "opinion", "via": "judgment", "position": 9}
+{"word": "judgy", "synonym": "judgmental", "via": "judgy", "position": 1}
+{"word": "judicator", "synonym": "judge", "via": "judicator", "position": 1}
 {"word": "judicatory", "synonym": "judiciary", "via": "judicatory", "position": 1}
 {"word": "judicatory", "synonym": "judicature", "via": "judicatory", "position": 2}
 {"word": "judicature", "synonym": "judgeship", "via": "judicature", "position": 1}
@@ -845,6 +878,7 @@
 {"word": "jug", "synonym": "remand", "via": "jug", "position": 8}
 {"word": "jugful", "synonym": "jug", "via": "jugful", "position": 1}
 {"word": "juggernaut", "synonym": "steamroller", "via": "juggernaut", "position": 1}
+{"word": "juggins", "synonym": "simpleton", "via": "juggins", "position": 1}
 {"word": "juggling", "synonym": "juggle", "via": "juggle", "position": 1}
 {"word": "juggling", "synonym": "juggle", "via": "juggling", "position": 1}
 {"word": "juiceless", "synonym": "dry", "via": "juiceless", "position": 1}
@@ -954,6 +988,8 @@
 {"word": "junky", "synonym": "junkie", "via": "junkie", "position": 4}
 {"word": "junky", "synonym": "addict", "via": "junky", "position": 1}
 {"word": "junky", "synonym": "junkie", "via": "junky", "position": 2}
+{"word": "junoesque", "synonym": "statuesque", "via": "junoesque", "position": 1}
+{"word": "junoesque", "synonym": "regal", "via": "junoesque", "position": 2}
 {"word": "junto", "synonym": "cabal", "via": "junto", "position": 1}
 {"word": "junto", "synonym": "faction", "via": "junto", "position": 2}
 {"word": "junto", "synonym": "camarilla", "via": "junto", "position": 3}
@@ -982,6 +1018,8 @@
 {"word": "justice", "synonym": "justness", "via": "justice", "position": 1}
 {"word": "justice", "synonym": "judge", "via": "justice", "position": 2}
 {"word": "justice", "synonym": "jurist", "via": "justice", "position": 3}
+{"word": "justicer", "synonym": "judge", "via": "justicer", "position": 1}
+{"word": "justicer", "synonym": "magistrate", "via": "justicer", "position": 2}
 {"word": "justificative", "synonym": "justificatory", "via": "justificative", "position": 1}
 {"word": "justificative", "synonym": "vindicatory", "via": "justificative", "position": 2}
 {"word": "justificative", "synonym": "defensive", "via": "justificative", "position": 3}

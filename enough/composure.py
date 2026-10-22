@@ -2460,6 +2460,22 @@ def save_as_form(project_dir: Path, comp: Composure, name: str) -> Path:
     return dest
 
 
+def has_content(comp: Composure) -> bool:
+    """Whether anyone has put anything in this composure: ink, a module that
+    is not a text box, or a text box with a title or words in it. A blank
+    page (the `blank` form's one empty text box, perhaps moved or retitled at
+    the canvas level) has none — which is how the `auto` launch mode tells
+    a composure from a page that was opened and walked away from."""
+    if comp.strokes:
+        return True
+    for m in comp.modules:
+        if m.type != "text" or m.title.strip():
+            return True
+        if any(rich_to_md(p.rich).strip() for p in m.pages):
+            return True
+    return False
+
+
 def list_composures(project_dir: Path) -> list[dict[str, Any]]:
     """Every `.comp` in the project, newest first. Cheap: the head of each
     file carries everything the list needs, but the files are small enough
@@ -2482,6 +2498,7 @@ def list_composures(project_dir: Path) -> list[dict[str, Any]]:
             "kind": comp.kind,
             "rev": comp.rev,
             "modules": len(comp.modules),
+            "content": has_content(comp),
             "modified": comp.modified,
             "mtime": stat.st_mtime,
         })
