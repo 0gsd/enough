@@ -1,0 +1,76 @@
+# I — what the Foundation publishes about "inventory": the two kinds of Wikimedia Enterprise plan (the only things it sells), and the investment portfolio
+# the audited statements itemise by class. It holds no goods, no stock and no listings. Merchandise is sold in the Wikipedia store, whose stock is not published.
+nodes:
+  - id: I:sku/enterprise-free-tier
+    type: sku
+    name: Enterprise free tier
+    summary: Free access with limits on snapshot dumps, snapshot chunks and on-demand requests; also granted to volunteers through Wikimedia Cloud Services, to smaller commercial reusers, and, through partnerships, to non-profits and startups.
+    kind: subscription-plan
+    unit: account/year
+    billing: {model: free, value: 0, unit: USD/year, cadence: none}
+    entitles: [P:offering/wikimedia-enterprise]
+    priced-by: M:pricebook/enterprise
+    seller: self
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/", "https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/"], confidence: 0.85, state: known}
+
+  - id: I:sku/enterprise-paid-plans
+    type: sku
+    name: Enterprise paid plans
+    summary: Paid plans add more frequent snapshots, higher limits, the Realtime stream, contracts with an SLA and support; invoiced annually.
+    kind: subscription-plan
+    unit: account/year
+    billing: {model: tiered, value: {pending: "plan prices"}, unit: USD/year, cadence: annual}
+    entitles: [P:offering/wikimedia-enterprise]
+    priced-by: M:pricebook/enterprise
+    seller: self
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.8, state: known}
+
+  - id: I:position/corporate-bonds
+    type: position
+    name: Corporate bonds
+    summary: Corporate bonds held in the Foundation's investment portfolio, $123.6M at fair value on 30 June 2025.
+    asset-class: corporate-bonds
+    fair-value: {amount: 123551931, as-of: 2025-06-30, unit: USD}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+
+  - id: I:position/stocks-and-mutual-funds
+    type: position
+    name: Stocks and mutual funds
+    summary: Stocks and mutual funds in the portfolio, $48.5M at fair value on 30 June 2025; donated shares are sold as soon as possible.
+    asset-class: equities-and-funds
+    fair-value: {amount: 48536626, as-of: 2025-06-30, unit: USD}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+
+  - id: I:position/us-treasuries
+    type: position
+    name: U.S. Treasury securities
+    summary: U.S. Treasury securities in the portfolio, $35.9M at fair value on 30 June 2025.
+    asset-class: treasuries
+    fair-value: {amount: 35869280, as-of: 2025-06-30, unit: USD}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+
+  - id: I:position/mortgage-backed
+    type: position
+    name: Mortgage-backed securities
+    summary: Mortgage-backed securities in the portfolio, $5.4M at fair value on 30 June 2025. In all the portfolio was $213.3M.
+    asset-class: mortgage-backed-securities
+    fair-value: {amount: 5389615, as-of: 2025-06-30, unit: USD}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}

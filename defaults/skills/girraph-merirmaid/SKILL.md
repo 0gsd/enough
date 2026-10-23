@@ -191,13 +191,13 @@ any diagram type Mermaid v11 supports.
 - **`mirror`** — a source-of-truth diagram that mirrors some external
   structure. It is **read-only** and owned by whatever backend generates
   it. **Never hand-write or edit a `mirror` file.** The launch example is
-  the auto-generated `_cachebox.merirmaid` files that mirror a cachebox's
-  contents under `~/enough/cacheawl/`: a backend module owns those and
+  the auto-generated mirror diagrams of a canon volume's
+  contents under `~/enough/canon/`: a backend module owns those and
   regenerates them on every change. If a user asks you to "fix" or "tidy"
   a mirror diagram, don't — explain that it reflects the actual structure
   and the way to change the picture is to change the thing it mirrors
-  (e.g. the cachebox contents). `write_file` on a mirror file under
-  `~/enough/cacheawl/` is refused by the broker anyway; don't try to
+  (e.g. the volume's contents). `write_file` on a mirror file under
+  `~/enough/canon/` is refused by the broker anyway; don't try to
   route around it.
 
 Create `modality: wip` for everything you author. Only ever *read*

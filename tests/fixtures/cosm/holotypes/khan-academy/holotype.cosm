@@ -1,0 +1,54 @@
+oes: comprise/1
+
+# Khan Academy as a public sample Holotype, built only from public sources on 2026-10-18 (the nonprofit's own site and help pages, its Form 990 filings
+# on ProPublica's Nonprofit Explorer, press pages and reputable reporting). Every node cites its sources; a fact that could not be confirmed
+# from a current source is left pending. No person's name appears anywhere: roles and seats only, and the people file is never written.
+# Layout: atoms/<slug>/<Module>/*.cosm. atom/khan-academy is modelled in all eight modules; atom/schoolhouse-world is thin (one entity and the mirrored
+# bond). Khan Academy India and Brasil (controlled, per Form 990 Schedule R), Khan Lab School and Khan Schools Network (affiliated) are stubs in C.
+
+id: holotype/khan-academy
+name: Khan Academy
+summary: "The nonprofit behind the free learning platform, its Khanmigo AI tutor, district partnerships, the Khan Academy Kids app and programs abroad, with its public financials by fiscal year; two atoms (itself and the separate nonprofit Schoolhouse World) joined by an affiliation bond, and four more related nonprofits as stubs."
+sample: true
+alignment:
+  for: other
+  mode: research
+  by: "comprise-sample"
+  at: 2026-10-18
+atoms:
+  - atom/khan-academy
+  - atom/schoolhouse-world
+perspective: atom/khan-academy
+
+# Sources that nodes outside P cite are declared here; the sources P's own nodes cite are in atoms/khan-academy/P/doc.cosm.
+sources:
+  - {id: blog-new-hampshire, page: "Khan Academy blog: free Khanmigo for New Hampshire (posted 21 May 2024, updated 7 January 2026)", url: "https://blog.khanacademy.org/announcing-free-khanmigo-for-new-hampshire/", supports: "C:contract/new-hampshire", date: 2026-10-18}
+  - {id: blog-nwea-2019, page: "Khan Academy blog: new partnership with NWEA to accelerate student learning (MAP Accelerator, June 2019)", url: "https://blog.khanacademy.org/announcing-our-new-partnership-with-nwea-to", supports: "C:contract/nwea start", date: 2026-10-18}
+  - {id: charity-navigator, page: "Charity Navigator: rating for Khan Academy Inc.", url: "https://www.charitynavigator.org/ein/261544963", supports: "R:reflection/charity-navigator, audit committee", date: 2026-10-18}
+  - {id: csm-khanmigo, page: "Common Sense Media risk assessment of Khanmigo (last updated 8 August 2024)", url: "https://institute.commonsensemedia.org/risk-assessments/khanmigo", supports: "R:reflection/common-sense-khanmigo", date: 2026-10-18}
+  - {id: csm-kids, page: "Common Sense Media review of Khan Academy Kids", url: "https://www.commonsensemedia.org/app-reviews/khan-academy-kids", supports: "R:reflection/common-sense-kids", date: 2026-10-18}
+  - {id: eng-go-rewrite, page: "Khan Academy engineering blog: half a million lines of Go", url: "https://blog.khanacademy.org/half-a-million-lines-of-go/", supports: "S:system/backend-services", date: 2026-10-18}
+  - {id: f990-2018, page: "Form 990 for calendar 2018", url: "https://projects.propublica.org/nonprofits/organizations/261544963/201912279349301826/full", supports: "finance 2018", date: 2026-10-18}
+  - {id: f990-2019, page: "Form 990 for calendar 2019", url: "https://projects.propublica.org/nonprofits/organizations/261544963/202022319349301032/full", supports: "finance 2019", date: 2026-10-18}
+  - {id: f990-2020, page: "Form 990 for calendar 2020", url: "https://projects.propublica.org/nonprofits/organizations/261544963/202122719349300327/full", supports: "finance 2020", date: 2026-10-18}
+  - {id: f990-2021, page: "Form 990 for calendar 2021", url: "https://projects.propublica.org/nonprofits/organizations/261544963/202202439349301340/full", supports: "finance 2021", date: 2026-10-18}
+  - {id: f990-2022, page: "Form 990 for calendar 2022", url: "https://projects.propublica.org/nonprofits/organizations/261544963/202333139349303998/full", supports: "finance 2022", date: 2026-10-18}
+  - {id: f990-2023, page: "Form 990 for calendar 2023", url: "https://projects.propublica.org/nonprofits/organizations/261544963/202413199349306766/full", supports: "finance 2023", date: 2026-10-18}
+  - {id: f990-schoolhouse-2024, page: "Schoolhouse World Inc, Form 990 for calendar 2024", url: "https://projects.propublica.org/nonprofits/organizations/853101725/202512409349300891/full", supports: "atom/schoolhouse-world entity", date: 2026-10-18}
+  - {id: f990-tp2024, page: "Form 990 for the short year January to June 2024", url: "https://projects.propublica.org/nonprofits/organizations/261544963/202540789349301404/full", supports: "finance for the transition period", date: 2026-10-18}
+  - {id: ka-impact, page: "Khan Academy, Impact page: evidence tiers and district claims", url: "https://www.khanacademy.org/about/impact", supports: "R claims on mastery and districts", date: 2026-10-18}
+  - {id: ka-leadership, page: "Khan Academy, Leadership page: executive team, board and advisory bodies (titles only; no names are copied)", url: "https://www.khanacademy.org/about/leadership", supports: "O roles and positions", date: 2026-10-18}
+  - {id: ka-terms, page: "Khan Academy terms of use, updated 30 January 2026: operator, services, content licence", url: "https://www.khanacademy.org/about/docs/khan-academy-terms-of-service", supports: "C:entity, C:ip", date: 2026-10-18}
+  - {id: ksn-home, page: "Khan Schools Network home page", url: "https://www.khanschoolsnetwork.org/", supports: "C:counterparty/khan-schools-network", date: 2026-10-18}
+  - {id: pp-ka, page: "ProPublica Nonprofit Explorer: Khan Academy Inc, all filings (EIN 26-1544963)", url: "https://projects.propublica.org/nonprofits/organizations/261544963", supports: "identifiers, fiscal years, filings list", date: 2026-10-18}
+  - {id: pp-kls, page: "ProPublica Nonprofit Explorer: Khan Lab School (EIN 46-5742553)", url: "https://projects.propublica.org/nonprofits/organizations/465742553", supports: "C:counterparty/khan-lab-school", date: 2026-10-18}
+  - {id: pp-ksn, page: "ProPublica Nonprofit Explorer: Khan Schools Network (EIN 93-2673296)", url: "https://projects.propublica.org/nonprofits/organizations/932673296", supports: "C:counterparty/khan-schools-network", date: 2026-10-18}
+  - {id: pp-schoolhouse, page: "ProPublica Nonprofit Explorer: Schoolhouse World Inc (EIN 85-3101725)", url: "https://projects.propublica.org/nonprofits/organizations/853101725", supports: "atom/schoolhouse-world identifiers and finances", date: 2026-10-18}
+  - {id: schoolhouse-about, page: "Schoolhouse.world about page: free live peer-led tutoring, scale", url: "https://www.schoolhouse.world/about", supports: "atom/schoolhouse-world", date: 2026-10-18}
+  - {id: standtogether, page: "Stand Together Trust: Khan Academy and Stand Together Trust partner on education (25 January 2024)", url: "https://standtogether.org/newsroom/education/khan-academy-and-stand-together-trust-partner-on-education", supports: "C:contract/stand-together", date: 2026-10-18}
+  - {id: ka-giving, page: "Khan Academy, Giving page: Learners Fund, ways to give, corporate partnerships (read 2026-10-18)", url: "https://www.khanacademy.org/about/giving", supports: "C:aim/individual-gifts, C:aim/corporate-partnerships", date: 2026-10-18}
+  - {id: ka-careers, page: "Khan Academy, Careers page: open roles and internships (read 2026-10-18)", url: "https://www.khanacademy.org/about/careers", supports: "C:aim/content-and-research-hires", date: 2026-10-18}
+  - {id: ka-job-board, page: "Khan Academy public job board (Greenhouse board API), the open roles on 2026-10-18", url: "https://boards-api.greenhouse.io/v1/boards/khanacademy/jobs", supports: "C:aim/content-and-research-hires", date: 2026-10-18}
+
+attestations: []
+grants: []

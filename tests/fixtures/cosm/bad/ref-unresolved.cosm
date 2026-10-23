@@ -1,0 +1,11 @@
+oes: eml/1
+id: eml/bad-ref-unresolved
+name: bad ref-unresolved
+# ref-unresolved: a reference to an item that is not there
+nodes:
+  - id: K:concept/x
+    type: concept
+    name: x
+    summary: A concept defined by a term the twin does not hold.
+    defined-by: L:term/missing
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

@@ -1,0 +1,128 @@
+cosm: 0.3
+
+# Mozilla Ventures: one offering per pillar and a partner network.
+
+nodes:
+  - id: P:offering/trustworthy-ai
+    type: offering
+    name: Trustworthy AI
+    summary: Early-stage investment in founders whose products advance the Mozilla Manifesto in the theme "Trustworthy AI", one of three pillars on mozilla.vc; the portfolio page does not say which companies sit in which theme.
+    owner: O:role/Managing-Partner
+    confidence: 0.7
+    sources: ['https://mozilla.vc/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/']
+    visibility: public
+    substrate:
+      platforms:
+        - C:entity/mozilla-ventures-i-lp
+    economics:
+      price:
+        model: equity-investment
+        detail: {pending: check size and terms; not stated}
+    affect:
+      audience: M:audience/founders
+      elicits:
+        - {feeling: belief, when: a founder finding an investor who shares the mission}
+    mattering:
+      to-the-whole: One of the three pillars the fund invests in.
+      weight: major
+      inside:
+        - who: ['O:role/Managing-Partner']
+          because: The Managing Partner heads Mozilla Ventures, per the leadership page.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/founders']
+          because: The fund took part in seed rounds, for example a $9 million seed round, per its blog.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/founders']
+          because: Founders in the theme who contact the fund.
+          confidence: 0.5
+
+  - id: P:offering/healthy-communities
+    type: offering
+    name: Healthy communities
+    summary: Early-stage investment in founders whose products advance the Mozilla Manifesto in the theme "Healthy communities", one of three pillars on mozilla.vc; the portfolio page does not say which companies sit in which theme.
+    owner: O:role/Managing-Partner
+    confidence: 0.7
+    sources: ['https://mozilla.vc/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/']
+    visibility: public
+    substrate:
+      platforms:
+        - C:entity/mozilla-ventures-i-lp
+    economics:
+      price:
+        model: equity-investment
+        detail: {pending: check size and terms; not stated}
+    affect:
+      audience: M:audience/founders
+      elicits:
+        - {feeling: belief, when: a founder finding an investor who shares the mission}
+    mattering:
+      to-the-whole: One of the three pillars the fund invests in.
+      weight: major
+      inside:
+        - who: ['O:role/Managing-Partner']
+          because: The Managing Partner heads Mozilla Ventures, per the leadership page.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/founders']
+          because: The fund took part in seed rounds, for example a $9 million seed round, per its blog.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/founders']
+          because: Founders in the theme who contact the fund.
+          confidence: 0.5
+
+  - id: P:offering/security-and-privacy
+    type: offering
+    name: Security and privacy
+    summary: Early-stage investment in founders whose products advance the Mozilla Manifesto in the theme "Security and privacy", one of three pillars on mozilla.vc; the portfolio page does not say which companies sit in which theme.
+    owner: O:role/Managing-Partner
+    confidence: 0.7
+    sources: ['https://mozilla.vc/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/']
+    visibility: public
+    substrate:
+      platforms:
+        - C:entity/mozilla-ventures-i-lp
+    economics:
+      price:
+        model: equity-investment
+        detail: {pending: check size and terms; not stated}
+    affect:
+      audience: M:audience/founders
+      elicits:
+        - {feeling: belief, when: a founder finding an investor who shares the mission}
+    mattering:
+      to-the-whole: One of the three pillars the fund invests in.
+      weight: major
+      inside:
+        - who: ['O:role/Managing-Partner']
+          because: The Managing Partner heads Mozilla Ventures, per the leadership page.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/founders']
+          because: The fund took part in seed rounds, for example a $9 million seed round, per its blog.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/founders']
+          because: Founders in the theme who contact the fund.
+          confidence: 0.5
+
+  - id: P:service/partner-network
+    type: service
+    name: Partner network
+    summary: 'The partners the 2024 report names: Betaworks (AI accelerators), Mozilla Builders and the Mozilla Foundation.'
+    owner: O:role/Managing-Partner
+    confidence: 0.7
+    sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: introductions, to: 'M:audience/founders', unit: introductions/month}
+    mattering:
+      to-the-whole: The 2024 report names Betaworks, Mozilla Builders and the Mozilla Foundation as partners.
+      weight: supporting
+      inside:
+        - who: ['O:role/Managing-Partner']
+          because: This seat is accountable for it.
+          confidence: 0.5

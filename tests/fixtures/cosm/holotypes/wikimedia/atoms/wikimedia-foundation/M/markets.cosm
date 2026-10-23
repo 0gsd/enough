@@ -1,0 +1,115 @@
+# M — markets, geographies, sizing, the competitor that the Foundation itself names, and the positioning. Taxonomies are custom: no standard industry
+# code fits a free, volunteer-written encyclopedia, a data service for AI and search, and a charity that raises its budget from small gifts.
+nodes:
+  - id: M:market/free-knowledge
+    type: market
+    name: Free online knowledge and reference
+    summary: "Looking things up online: one of the ten most visited websites, with no advertising and no paywall."
+    taxonomy: custom
+    code: reference/free-knowledge
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://wikimediafoundation.org/give/"], confidence: 0.8, state: known}
+
+  - id: M:market/content-for-search-and-ai
+    type: market
+    name: Reusable content for search, assistants and AI
+    summary: Companies that need high-quality, human-curated, openly licensed content at volume. The Foundation calls Wikipedia, Wikidata and Wikimedia Commons attractive training sources and says bots now strain its servers.
+    taxonomy: custom
+    code: data/content-licensing-and-apis
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/", "https://enterprise.wikimedia.com/"], confidence: 0.8, state: known}
+
+  - id: M:market/online-giving
+    type: market
+    name: Online charitable giving
+    summary: Small, mostly one-time and recurring gifts from individuals in about 30 campaign countries a year, plus planned and legacy gifts. Ways to give include card, bank, donor-advised fund, stock, IRA distribution and bequest; gifts are tax-deductible in the United States.
+    taxonomy: custom
+    code: philanthropy/individual-giving
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/give/", "https://www.mediawiki.org/wiki/Fundraising_tech"], confidence: 0.75, state: known}
+
+  - id: M:geography/worldwide
+    type: geography
+    name: Worldwide
+    summary: The projects are read and edited everywhere, in more than 300 languages; the Foundation's own base is the United States.
+    scope: global
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://wikitech.wikimedia.org/wiki/Data_centers"], confidence: 0.8, state: known}
+
+  - id: M:geography/united-states
+    type: geography
+    name: United States
+    summary: "The Foundation's home: a Florida-chartered charity based in San Francisco, two core data centers (Virginia and Texas) and the legal base for tax-deductible gifts. Donations outside the United States are likely not tax-deductible."
+    scope: country
+    code: US
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikitech.wikimedia.org/wiki/Data_centers", "https://wikimediafoundation.org/give/"], confidence: 0.85, state: known}
+
+  - id: M:geography/funding-regions
+    type: geography
+    name: The eight Wikimedia regions
+    summary: "The regions the Foundation's funds and movement bodies use since June 2023: Middle East and North Africa; Sub-Saharan Africa; South Asia; East, Southeast Asia and Pacific; Latin America and Caribbean; United States and Canada; Northern and Western Europe; Central and Eastern Europe and Central Asia."
+    scope: regions
+    regions: [MENA, SSA, SA, ESEAP, LAC, USCA, NWE, CEECA]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_regions"], confidence: 0.9, state: known}
+
+  - id: M:sizing/readers
+    type: sizing
+    name: Reach of the projects
+    summary: Nearly 15 billion page views a month, 66 million Wikipedia articles, more than 300 Wikipedia languages, 135 million files on Commons (2024-25 annual report); about 123.6 million Wikidata items (the statistics page, October 2026).
+    market: M:market/free-knowledge
+    measure: page views per month
+    value: 15000000000
+    qualifier: nearly
+    as-of: 2025
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://www.wikidata.org/wiki/Wikidata:Statistics"], confidence: 0.75, state: known}
+
+  - id: M:sizing/volunteers
+    type: sizing
+    name: Volunteer base
+    summary: About 250,000 volunteer editors (2024-25 annual report); the Endowment's site gives more than 260,000 monthly volunteer editors, a different count.
+    market: M:market/free-knowledge
+    measure: volunteer editors
+    value: 250000
+    as-of: 2025
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://wikimediaendowment.org/"], confidence: 0.7, state: known}
+
+  - id: M:sizing/donors
+    type: sizing
+    name: Donor base
+    summary: About 8 million donors a year at an average gift of $11; banner appeals brought $62.4M (30% of revenue), email 15%, recurring giving 21% in 2024-25.
+    market: M:market/online-giving
+    measure: donors per year
+    value: 8000000
+    as-of: 2025
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions"], confidence: 0.8, state: known}
+
+  - id: M:competitor/ai-answers-and-social-video
+    type: competitor
+    name: Generative AI answers and social video
+    summary: "Not a rival encyclopedia but where people increasingly go: search engines that answer directly (often from Wikipedia content), AI assistants and social video platforms. The Foundation cites them for the 2025 fall in human page views."
+    kind: substitute
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/", "https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/"], confidence: 0.85, state: known}
+
+  - id: M:positioning/free-neutral-volunteer
+    type: positioning
+    name: Free, ad-free and written by volunteers
+    summary: Free to read and to reuse, no advertising, the personal data of readers not sold, content written and governed by volunteers under a neutral point of view; the Foundation hosts it and does not take content decisions.
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/give/", "https://wikimediafoundation.org/about/", "https://foundation.wikimedia.org/wiki/Policy:Privacy_policy", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027"], confidence: 0.85, state: known}

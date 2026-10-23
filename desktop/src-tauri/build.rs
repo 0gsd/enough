@@ -40,6 +40,9 @@ use std::path::{Path, PathBuf};
 ///   snapshot once the app runs from it. The single file, NOT `docs/` — the
 ///   dev tree keeps gitignored local planning docs there that must never
 ///   ship (0.2.8; before this the .app's help center 404'd).
+/// - `docs/MACROCOSM_OES.md` — the in-app spec viewer reads it from
+///   `<package parent>/docs/` the same way (0.4.3). The single file again,
+///   for the same reason as HELP_CENTER.
 /// - `reflib/dict` — FEED's shipped text form (~380 MB of JSON lines, plus
 ///   its manifest and NOTICE), which `enough/dictionary.py` builds into
 ///   `~/enough/dict/feed.sqlite` on first launch. That one subfolder only:
@@ -51,6 +54,7 @@ const SNAPSHOT: &[&str] = &[
     "LICENSE",
     "THIRD_PARTY_LICENSES.md",
     "docs/HELP_CENTER.md",
+    "docs/MACROCOSM_OES.md",
     "enough",
     "defaults",
     "reflib/dict",

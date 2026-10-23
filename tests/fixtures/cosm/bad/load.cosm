@@ -1,0 +1,15 @@
+oes: eml/1
+id: eml/bad-load
+name: bad load
+# load: an anchor and an alias, which the COSM subset forbids (the file still loads)
+nodes:
+  - id: K:concept/first
+    type: concept
+    name: first
+    summary: The first concept.
+    provenance: &shared {mode: manual, sources: [fixture], confidence: 1}
+  - id: K:concept/second
+    type: concept
+    name: second
+    summary: The second concept.
+    provenance: *shared

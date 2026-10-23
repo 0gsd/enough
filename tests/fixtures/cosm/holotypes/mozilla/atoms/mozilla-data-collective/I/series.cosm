@@ -1,0 +1,15 @@
+# I: the one count the site publishes.
+nodes:
+  - id: I:series/datasets-listed
+    type: series
+    name: Datasets listed
+    summary: The datasets page lists 1,200 datasets on 2026-10-18.
+    of: P:product/dataset-catalog
+    measure: datasets
+    unit: count
+    points:
+      - {at: 2026-10-18, value: 1200}
+    status: active
+    visibility: public
+    owner: O:role/Founder-and-Chief-Executive
+    provenance: {mode: net-scan, sources: ['https://mozilladatacollective.com/datasets'], confidence: 0.8, state: known}

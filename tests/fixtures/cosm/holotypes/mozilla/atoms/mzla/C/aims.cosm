@@ -1,0 +1,58 @@
+# C — aims: what MZLA says it is trying to achieve with outside help (seeking), from the Thunderbird donate and participate pages, the Thunderbird
+# blog, the State of Mozilla 2025/26 and the job listings, read on 2026-10-18. The words carry no figures: an isotype publishes statements, never
+# measurements. Owners are roles; no person is named. A fact no current source states is left out.
+nodes:
+  - id: C:aim/supporters
+    type: aim
+    name: Individual and corporate supporters
+    summary: "Donations from the people who use Thunderbird, and from organizations that deploy it at scale, to keep Thunderbird's core apps free for everyone."
+    kind: capital
+    stance: seeking
+    owner: O:role/Chief-Executive
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/donate/', 'https://stateof.mozilla.org/tools/'], confidence: 0.9, state: known}
+
+  - id: C:aim/thundermail-early-users
+    type: aim
+    name: Early users for Thundermail
+    summary: "Early users for Thundermail, the Thunderbird email service, who join the waitlist and the early beta and help shape it."
+    kind: customers
+    stance: seeking
+    owner: O:role/Product-management
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/', 'https://blog.thunderbird.net/2026/04/thunderbird-pro-april-2026-update/'], confidence: 0.75, state: known}
+
+  - id: C:aim/thunderbird-enterprise-organizations
+    type: aim
+    name: Organizations for Thunderbird Enterprise
+    summary: "Organizations that want to manage Thunderbird email, calendar and contacts centrally, for the Thunderbird Enterprise offering that is coming."
+    kind: customers
+    stance: seeking
+    owner: O:role/Product-management
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/enterprise/'], confidence: 0.65, state: known}
+
+  - id: C:aim/engineering-hires
+    type: aim
+    name: Engineers for mobile, web services and enterprise AI
+    summary: "Hire engineers for the Thunderbird mobile apps, web services and enterprise AI work."
+    kind: talent
+    stance: seeking
+    owner: O:role/People-operations
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/careers/listings/', 'https://blog.thunderbird.net/2026/10/thunderbird-for-ios-a-first-look-at-the-native-iphone-email-app-in-development/'], confidence: 0.75, state: known}
+
+  - id: C:aim/community-contributors
+    type: aim
+    name: Community developers, translators and testers
+    summary: "Community developers, translators, testers and writers to help build, translate, test and document Thunderbird."
+    kind: talent
+    stance: seeking
+    owner: O:role/Community-programs
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/participate/', 'https://blog.thunderbird.net/2026/10/thunderbird-for-ios-a-first-look-at-the-native-iphone-email-app-in-development/'], confidence: 0.85, state: known}

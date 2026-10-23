@@ -1,0 +1,10 @@
+oes: eml/1
+id: eml/bad-provenance
+name: bad provenance
+# provenance: a mode outside the closed list
+nodes:
+  - id: K:concept/x
+    type: concept
+    name: x
+    summary: A concept whose provenance mode is made up.
+    provenance: {mode: guessed, sources: [fixture], confidence: 1}

@@ -1,0 +1,17 @@
+# C — Corporation: the legal shell. One entity, the anchor. Finance is not modelled in this slice.
+nodes:
+  - id: C:entity/meadow-software-inc
+    type: entity
+    name: Meadow Software Inc.
+    summary: The operating company; a Delaware corporation headquartered in Portland, Oregon.
+    anchor: true
+    form: corporation
+    roles: [company]
+    jurisdiction: US-DE
+    registered-office: Portland, OR
+    fiscal-year: calendar
+    since: 2019-03-01
+    status: active
+    visibility: internal
+    owner: O:role/Founder
+    provenance: {mode: dialectic, sources: [session-1, session-3], confidence: 0.9, state: known}

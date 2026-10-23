@@ -1,0 +1,94 @@
+# M — channels: how the Foundation reaches readers, donors, volunteers and paying reusers. Nothing is sold to readers; the one commercial channel is
+# Wikimedia Enterprise. The two app stores are platforms the apps are distributed through, each with its counterparty.
+nodes:
+  - id: M:channel/project-sites
+    type: channel
+    name: The project websites
+    summary: Wikipedia and the other projects on their own domains, free to read and to edit, with no advertising.
+    model: free-access
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/our-work/wikimedia-projects/", "https://wikimediafoundation.org/give/"], confidence: 0.9, state: known}
+    tenders: none
+
+  - id: M:channel/apps-ios
+    type: channel
+    name: Wikipedia app for iOS
+    summary: The official Wikipedia app on Apple's App Store; free.
+    model: free-access
+    seller: self
+    counterparty: C:counterparty/apple
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/our-work/"], confidence: 0.8, state: known}
+    tenders: none
+
+  - id: M:channel/apps-android
+    type: channel
+    name: Wikipedia app for Android
+    summary: The official Wikipedia app on Google Play; free.
+    model: free-access
+    seller: self
+    counterparty: C:counterparty/google
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/our-work/"], confidence: 0.8, state: known}
+    tenders: none
+
+  - id: M:channel/donation-pages
+    type: channel
+    name: The donation pages
+    summary: Give once, monthly or yearly by card and other methods, by bank account, donor-advised fund, stock, IRA distribution, charitable gift annuity, workplace giving, legacy gift or a gift to the Endowment.
+    model: donation
+    seller: self
+    counterparty: none
+    payment-methods: [card, bank-account, donor-advised-fund, stock, ira-distribution, gift-annuity, workplace-giving, legacy-gift]
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/give/"], confidence: 0.85, state: known}
+    tenders: none
+
+  - id: M:channel/banners-email-sms
+    type: channel
+    name: Banner, email and SMS appeals
+    summary: The campaigns that reach donors in about 30 countries a year; banners brought $62.4M (30% of revenue) in 2024-25, email 15% and recurring giving 21%.
+    model: donation
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://www.mediawiki.org/wiki/Fundraising_tech"], confidence: 0.85, state: known}
+    tenders: none
+
+  - id: M:channel/enterprise-api
+    type: channel
+    name: Wikimedia Enterprise APIs
+    summary: The On-demand, Snapshot and Realtime APIs and the Structured Contents data, with a free tier and paid plans.
+    model: flat-licence
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/", "https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/"], confidence: 0.9, state: known}
+    tenders: none
+
+  - id: M:channel/dumps-and-public-apis
+    type: channel
+    name: Public dumps and APIs
+    summary: Free database dumps and public APIs for volunteers, researchers and small reusers; large-scale commercial use is rate-limited and pointed to Enterprise.
+    model: free-access
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/"], confidence: 0.8, state: known}
+    tenders: none

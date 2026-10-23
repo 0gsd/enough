@@ -1,0 +1,54 @@
+# R — claims: what the Endowment says in public, about which node, with what evidence. Wording is paraphrased; the source page holds the exact words.
+nodes:
+  - id: R:claim/separate-and-independent
+    type: claim
+    name: A separate and independent organization
+    summary: The Endowment's site describes it as a separate and independent entity from the Wikimedia Foundation, which runs Wikipedia day to day. The audited statements bear out the separate Board and tax status, and also show that Foundation staff manage it.
+    text: "The Wikimedia Endowment is a separate and independent organization."
+    about: [P:wikimedia-endowment]
+    on: [R:surface/endowment-site]
+    evidence: {state: partial, by: [P:offering/permanent-fund], measure: "its own Board and its own 501(c)(3) status (audit, Form 990); but no employees, Foundation-employed officers, and a cost-sharing agreement that has the Foundation manage it"}
+    finding: "True in law and governance, qualified in operations; the audit calls the Foundation a related party for that reason."
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.85, state: known}
+
+  - id: R:claim/permanent-fund
+    type: claim
+    name: A permanent fund for the projects
+    summary: The Endowment says it exists to support the Wikimedia projects in perpetuity; gifts are restricted to the endowment for ever, and $141.1M of perpetual restricted principal is held.
+    text: "A permanent fund that supports Wikimedia projects in perpetuity."
+    about: [P:offering/permanent-fund]
+    on: [R:surface/endowment-site]
+    evidence: {state: supported, by: [P:offering/permanent-fund], measure: "net assets with donor restrictions $169.1M at 30 June 2025, of which $141.1M perpetual principal"}
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}
+
+  - id: R:claim/cheap-to-raise
+    type: claim
+    name: Under ten cents to raise a dollar
+    summary: The Form 990 explanation says it cost less than 10 cents to raise each $1 in donations.
+    text: "It cost less than 10 cents to raise $1 in donations."
+    about: [P:offering/legacy-giving, P:offering/permanent-fund]
+    on: [R:surface/meta-reports]
+    evidence: {state: supported, by: [P:offering/permanent-fund], measure: "fundraising expenses of $1.1M against gifts of $11.9M in 2024-25 (audit): about 9.5 cents on the dollar"}
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.85, state: known}
+
+  - id: R:claim/spending-rate
+    type: claim
+    name: A spending rate of about 4%
+    summary: The Endowment states a spending policy of 4% of the three-year rolling average of the fund, adjustable between 2.5% and 4.0%; the 2026-27 budget spends at 4.0%.
+    text: "Spending is set at 4.0% of the rolling three-year average value."
+    about: [P:service/annual-appropriation]
+    on: [R:surface/endowment-site, R:surface/governance-pages]
+    evidence: {state: supported, by: [P:service/annual-appropriation], measure: "the audit's note on the spending policy and the FY2026-27 plan's 4.0% spending rate"}
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/"], confidence: 0.9, state: known}

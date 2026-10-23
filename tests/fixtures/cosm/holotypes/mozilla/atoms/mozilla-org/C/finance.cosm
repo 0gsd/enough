@@ -1,0 +1,18 @@
+# C: the one public figure set that is Mozilla.org's to give: the portfolio plan. The audited statements cover the whole group and sit in the Foundation atom.
+nodes:
+  - id: C:finance/portfolio-plan-2026
+    type: finance
+    name: Portfolio plan for 2026
+    summary: The State of Mozilla 2025/26 gives reserves of about $1.4 billion with no debt and planned portfolio spend for 2026 of about $650 million, about 80% on core products such as Firefox and Thunderbird and about 20% on trustworthy open-source AI. Mozilla.org allocates capital across the portfolio.
+    by: atom/mozilla-org
+    period: '2026'
+    currency: USD
+    basis: plan, approximate
+    figures:
+      planned-portfolio-spend: 650000000
+      planned-share-core-products: 0.8
+      planned-share-open-source-ai: 0.2
+      reserves: 1400000000
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/ledger/', 'https://wiki.mozilla.org/Mozilla_org'], confidence: 0.7, state: known}

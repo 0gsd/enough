@@ -1,0 +1,51 @@
+# R — brands: the faces the Foundation presents under. The marks belong to the Foundation (C:ip/marks); the trademark policy sets who may use them.
+nodes:
+  - id: R:brand/wikimedia
+    type: brand
+    name: Wikimedia
+    summary: "The name of the movement and of the Foundation's own brand: the community logo is free to use, the Foundation mark is licensed."
+    scope: [P:wikimedia-foundation]
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Trademark_policy", "https://wikimediafoundation.org/about/"], confidence: 0.85, state: known}
+
+  - id: R:brand/wikipedia
+    type: brand
+    name: Wikipedia
+    summary: The puzzle-globe mark and the name of the encyclopedia, the best known of the project names the Foundation holds.
+    scope: [P:offering/wikipedia]
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Trademark_policy"], confidence: 0.85, state: known}
+
+  - id: R:brand/project-names
+    type: brand
+    name: The project names
+    summary: Wiktionary, Wikimedia Commons, Wikidata and the other project names and trade dress of each site.
+    scope: [P:suite/projects]
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Trademark_policy", "https://wikimediafoundation.org/our-work/wikimedia-projects/"], confidence: 0.8, state: known}
+
+  - id: R:brand/wikimedia-enterprise
+    type: brand
+    name: Wikimedia Enterprise
+    summary: "The commercial service, presented as A Wikimedia Foundation Company."
+    scope: [P:offering/wikimedia-enterprise]
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/"], confidence: 0.85, state: known}
+
+  - id: R:brand/wikimania
+    type: brand
+    name: Wikimania
+    summary: The name and logo of the yearly conference, reserved for it under the trademark policy.
+    scope: [P:service/wikimania]
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Trademark_policy"], confidence: 0.9, state: known}

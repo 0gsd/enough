@@ -1,0 +1,11 @@
+oes: eml/1
+id: eml/bad-visibility
+name: bad visibility
+# visibility: a value outside the closed list
+nodes:
+  - id: K:concept/x
+    type: concept
+    name: x
+    summary: A concept with a made-up visibility.
+    visibility: secret
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

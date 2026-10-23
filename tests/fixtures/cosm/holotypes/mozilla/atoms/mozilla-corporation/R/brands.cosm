@@ -1,0 +1,21 @@
+# R: brands.
+nodes:
+  - id: R:brand/firefox
+    type: brand
+    name: Firefox
+    summary: 'The browser brand and its sub-brands: Firefox Focus, Firefox Relay, Firefox Enterprise, Firefox Add-ons.'
+    scope: ['P:suite/firefox']
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Product-Management
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/', 'https://www.mozilla.org/en-US/products/'], confidence: 0.9, state: known}
+
+  - id: R:brand/mdn
+    type: brand
+    name: MDN
+    summary: The developer documentation brand, MDN Web Docs and MDN Plus.
+    scope: ['P:suite/web-platform']
+    status: active
+    visibility: public
+    owner: O:role/MDN-Team
+    provenance: {mode: net-scan, sources: ['https://developer.mozilla.org/en-US/about'], confidence: 0.9, state: known}

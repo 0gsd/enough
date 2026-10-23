@@ -1,0 +1,54 @@
+oes: canon/1
+id: canon/~field-notes
+name: field-notes
+scope: project
+counts: {folders: 4, files: 4, articles: 0, twins: 1, emls: 1, atems: 1}
+nodes:
+  - id: V:folder/drafts
+    type: folder
+    name: drafts
+    path: drafts
+    parts: [V:file/drafts--orchard-md, V:file/drafts--letter-to-the-council-docx]
+  - id: V:file/drafts--orchard-md
+    type: file
+    name: orchard.md
+    path: drafts/orchard.md
+    parent: V:folder/drafts
+    kind: markdown
+    eml: {path: drafts/orchard.md.cosm, state: fresh}
+    atem: {line: "The orchard's juice rose this year, and mowing the meadow strip in July would starve its pollinators."}
+  - id: V:file/drafts--letter-to-the-council-docx
+    type: file
+    name: letter-to-the-council.docx
+    path: drafts/letter-to-the-council.docx
+    parent: V:folder/drafts
+    kind: document
+    twin: {path: drafts/letter-to-the-council.docx.md, state: edited}
+  - id: V:folder/research
+    type: folder
+    name: research
+    path: research
+    parts: [V:file/research--soil-survey-csv, V:folder/research--meadow-holotype]
+  - id: V:file/research--soil-survey-csv
+    type: file
+    name: soil-survey.csv
+    path: research/soil-survey.csv
+    parent: V:folder/research
+    kind: data
+  - id: V:folder/research--meadow-holotype
+    type: folder
+    name: meadow-holotype
+    path: research/meadow-holotype
+    parent: V:folder/research
+    holotype: true
+  - id: V:folder/archive
+    type: folder
+    name: archive
+    path: archive
+    counts: {folders: 41, files: 6210}
+    pending: too many files to enumerate here; open the folder in Canon
+  - id: V:file/readme-md
+    type: file
+    name: README.md
+    path: README.md
+    kind: markdown

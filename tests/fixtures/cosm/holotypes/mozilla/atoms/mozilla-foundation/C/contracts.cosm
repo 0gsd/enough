@@ -1,0 +1,98 @@
+# C: contracts and public partnerships. Amounts are given only where a filing states them.
+nodes:
+  - id: C:contract/trademark-license-corporation
+    type: contract
+    name: Trademark licence to Mozilla Corporation
+    summary: 'The Corporation pays the Foundation a royalty based on the Corporation''s annual royalties revenue: $22,622,178 in 2024 and $18,372,038 in 2023 (Form 990 Schedule R Part V), reported as $22.6 million and $18.4 million in the audited statements.'
+    between: [atom/mozilla-foundation, atom/mozilla-corporation]
+    terms: royalty on the Corporation's annual royalties revenue under a trademark license agreement
+    scope: ['atom/mozilla-org//C:ip/mozilla-trademarks']
+    counterparty: none
+    pending: 'Since June 2026 the Mozilla.org FAQ says Mozilla.org owns the trademarks, while the Mozilla trademark policy page still names the Foundation: which entity is the licensor today?'
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf', 'https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/foundation/trademarks/policy/'], confidence: 0.7, state: known}
+
+  - id: C:contract/trademark-license-mzla
+    type: contract
+    name: Trademark licence to MZLA
+    summary: 'MZLA pays the Foundation a royalty based on revenue from certain products: $415 thousand in 2024 and $267 thousand in 2023 (audited statements).'
+    between: [atom/mozilla-foundation, atom/mzla]
+    terms: royalty on revenue from certain products under a trademark license agreement
+    scope: ['atom/mozilla-org//C:ip/mozilla-trademarks']
+    counterparty: none
+    pending: Licensor after the 2026 transfer of the trademarks to Mozilla.org, as for the Corporation.
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://wiki.mozilla.org/Mozilla_org'], confidence: 0.7, state: known}
+
+  - id: C:contract/service-agreements
+    type: contract
+    name: Administrative, IT and legal services between the Mozilla organizations
+    summary: 'The Corporation provides basic administrative services, IT support and legal services to the Foundation; the Foundation and the Corporation provide the same to MZLA, Mozilla Ventures and MZL.AI under separate service agreements. 2024 amounts on Schedule R: $514,296 for services by the Corporation, $90,112 for services for the Mozilla Ventures fund.'
+    between: [atom/mozilla-foundation, atom/mozilla-corporation, atom/mzla, atom/mozilla-ventures, atom/mozilla-ai]
+    terms: cost-based service agreements
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}
+
+  - id: C:contract/artists-make-technology
+    type: contract
+    name: Artists Make Technology (with a US arts funder)
+    summary: A Creative Futures program run with the Doris Duke Foundation, listed as a current program on the Foundation's Imagine page.
+    between: [atom/mozilla-foundation, 'C:counterparty/doris-duke-foundation']
+    scope: ['P:service/artists-make-technology']
+    counterparty: C:counterparty/doris-duke-foundation
+    terms: {pending: funding amount and term are not published}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/'], confidence: 0.8, state: known}
+
+  - id: C:contract/counterstructures
+    type: contract
+    name: Counterstructures residencies (with an arts organization)
+    summary: Residencies run with Rhizome and a second partner, listed as a current Creative Futures program.
+    between: [atom/mozilla-foundation, 'C:counterparty/rhizome']
+    scope: ['P:service/counterstructures-residencies']
+    counterparty: C:counterparty/rhizome
+    terms: {pending: funding amount and term are not published}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/', 'https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.8, state: known}
+
+  - id: C:contract/imaginative-intelligences
+    type: contract
+    name: Imaginative Intelligences (with a research institute)
+    summary: A Creative Futures program run with the Berggruen Institute and a second partner.
+    between: [atom/mozilla-foundation, 'C:counterparty/berggruen-institute']
+    scope: ['P:service/imaginative-intelligences']
+    counterparty: C:counterparty/berggruen-institute
+    terms: {pending: funding amount and term are not published}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/'], confidence: 0.8, state: known}
+
+  - id: C:contract/nothing-personal-support
+    type: contract
+    name: Nothing Personal, supported by a media company
+    summary: The magazine is described as supported by The Onion.
+    between: [atom/mozilla-foundation, 'C:counterparty/the-onion']
+    scope: ['P:offering/nothing-personal']
+    counterparty: C:counterparty/the-onion
+    terms: {pending: what the support consists of is not published}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/'], confidence: 0.7, state: known}
+
+  - id: C:contract/mozfest-2026-barcelona
+    type: contract
+    name: Mozilla Festival 2026 in Barcelona
+    summary: MozFest 2026 takes place 2026-10-28 to 2026-10-30 at a former industrial complex in Barcelona, in partnership with the City of Barcelona and as part of the city's Open Tech Week.
+    between: [atom/mozilla-foundation, 'C:counterparty/city-of-barcelona']
+    scope: ['P:service/mozfest-2026']
+    counterparty: C:counterparty/city-of-barcelona
+    terms: {pending: financial terms are not published}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/', 'https://www.mozillafoundation.org/en/'], confidence: 0.8, state: known}

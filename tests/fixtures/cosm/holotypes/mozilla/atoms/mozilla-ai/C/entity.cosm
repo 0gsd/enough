@@ -1,0 +1,67 @@
+# C: the legal shell, its board and three events.
+nodes:
+  - id: C:entity/mzl-ai-pbc
+    type: entity
+    name: MZL.AI, PBC
+    summary: California public benefit corporation (a C corporation for US tax) that builds Mozilla.ai's open-source AI products and infrastructure; launched in March 2023 with $30 million committed by the Foundation and still pre-revenue in the 2024 report. Headquartered at 1875 Mission Street, San Francisco, with a team distributed across nine countries.
+    anchor: true
+    form: corporation
+    roles: [company, brand]
+    jurisdiction: US-CA
+    registered-office: 1875 Mission Street, San Francisco, CA 94103
+    domains: [mozilla.ai]
+    global-id: {ein: 35-2775450, domain: mozilla.ai}
+    tax-status: C corporation (taxable); public benefit corporation
+    fiscal-year: calendar
+    since: 2023-03
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://www.mozilla.ai/', 'https://mozilla.ai/company/about-us', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/'], confidence: 0.9, state: known}
+
+  - id: C:charter/articles-and-bylaws
+    type: charter
+    name: Articles of Incorporation and Bylaws of MZL.AI, PBC
+    summary: Listed under Mozilla.ai on the Foundation's public records page; the text is not summarised here.
+    kind: articles
+    entity: C:entity/mzl-ai-pbc
+    url: https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.8, state: known}
+
+  - id: C:governance/board
+    type: governance
+    name: Mozilla.ai Board
+    summary: One of the family boards named on the leadership page; its size, composition and committees are not published on the pages read.
+    voting-members: {pending: number of directors}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.6, state: known}
+
+  - id: C:event/launch
+    type: event
+    name: Mozilla.ai launched
+    summary: Launched in March 2023; the Foundation committed $30 million to create it.
+    kind: launch
+    period: 2023-03
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/'], confidence: 0.9, state: known}
+
+  - id: C:event/lumigator-archived
+    type: event
+    name: Lumigator repository archived
+    summary: The Lumigator repository is marked archived on the mozilla-ai GitHub organization; no announcement was read, so the date is not known.
+    kind: retirement
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-ai'], confidence: 0.8, state: known}
+
+  - id: C:event/otari-general-availability
+    type: event
+    name: Otari generally available
+    summary: Mozilla.ai's llms.txt (updated 2026-10-14) labels Otari as general availability; a third-party directory dates its release to 2026-07-06, which no Mozilla page confirms.
+    kind: launch
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.ai/llms.txt'], confidence: 0.7, state: known}

@@ -1,0 +1,49 @@
+cosm: 0.3
+
+# Mozilla Ventures. Portfolio facts are from mozilla.vc (October 2026) and the 2024 report; stakes are not published.
+
+brand:
+  id: P:mozilla-ventures
+  name: Mozilla Ventures
+  kind: company
+  summary: 'An impact-investing venture fund that backs early-stage startups pushing the internet and the tech industry in a better direction, in three themes: trustworthy AI, healthy communities, and security and privacy.'
+  since: 2022-11-02
+  legal-anchor: Mozilla Ventures Management, PBC, San Francisco CA; California public benefit corporation; EIN 38-4241278; manages Mozilla Ventures I, LP
+  owner: O:role/Managing-Partner
+  confidence: 0.8
+  sources: ['https://mozilla.vc/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf']
+  visibility: public
+  parts: ['P:offering/trustworthy-ai', 'P:offering/healthy-communities', 'P:offering/security-and-privacy', 'P:service/partner-network']
+  principles:
+    purpose: Invest in responsible tech startups whose products advance the Mozilla Manifesto, so more responsible tech companies succeed in the market (the money half of the double bottom line).
+    priorities:
+      - trustworthy AI
+      - healthy communities
+      - security and privacy
+    value:
+      - {to: 'M:audience/founders', proposition: capital and Mozilla's network for founders building products that advance the Manifesto}
+      - {to: 'M:audience/mozilla-sole-partner', proposition: portfolio companies that prove responsible tech can win in the market}
+    decides:
+      - which companies to back
+      - which themes to prefer
+  vocabulary:
+    terms:
+      - {term: pillar, means: 'One of Mozilla Ventures'' three investment themes: trustworthy AI, healthy communities, security and privacy.'}
+      - {term: responsible tech, means: Technology whose products advance the Mozilla Manifesto; the aim of the double bottom line is for more such companies to succeed in the market.}
+    assumes:
+      - Mozilla remains the sole partner of the first fund, size $35 million
+    boundary:
+      - the fund does not run companies; stakes are not published
+  mattering:
+    inside:
+      - who: ['O:role/Managing-Partner']
+        because: The fund is where Mozilla puts mission-aligned capital to work on companies it does not run.
+        confidence: 0.5
+    chosen:
+      - who: ['M:audience/founders']
+        because: The fund has invested in over 45 startups by the 2024 report; 40 are listed in 2026.
+        confidence: 0.5
+    prospective:
+      - who: ['M:audience/founders']
+        because: Founders building products that advance the Mozilla Manifesto, who can reach the fund through its contact page.
+        confidence: 0.5

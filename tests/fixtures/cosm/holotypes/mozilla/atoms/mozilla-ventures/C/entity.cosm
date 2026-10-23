@@ -1,0 +1,80 @@
+# C: the management company, the fund and its general partner (the last two are legal shells inside this atom).
+nodes:
+  - id: C:entity/mozilla-ventures-management
+    type: entity
+    name: Mozilla Ventures Management, PBC
+    summary: California public benefit corporation (a C corporation for US tax) that manages the Mozilla Ventures fund; 100% held by the Foundation in the 2024 Form 990 Schedule R, primary activity venture fund management. Its articles and bylaws are listed on the Foundation's public records page.
+    anchor: true
+    form: corporation
+    roles: [company, fund]
+    jurisdiction: US-CA
+    registered-office: 149 New Montgomery Street, 4th Floor, San Francisco, CA 94105
+    domains: [mozilla.vc]
+    global-id: {ein: 38-4241278, domain: mozilla.vc}
+    tax-status: C corporation (taxable); public benefit corporation
+    fiscal-year: calendar
+    since: {pending: formation date of the management company; the fund was announced on 2022-11-02}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf', 'https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.9, state: known}
+
+  - id: C:entity/mozilla-ventures-i-lp
+    type: entity
+    name: Mozilla Ventures I, LP
+    summary: 'The first Mozilla Ventures fund, a California limited partnership (Form 990 Schedule R: venture fund, income excluded from tax): size $35 million, with Mozilla as its sole partner. Total income $1,041,586 and end-of-year assets $32.3 million in 2024. A legal shell inside this atom.'
+    form: partnership
+    roles: [fund]
+    jurisdiction: US-CA
+    registered-office: 149 New Montgomery Street, 4th Floor, San Francisco, CA 94105
+    global-id:
+      ein: 38-4231846
+    fund-size: 35000000
+    since: 2022-11-02
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/'], confidence: 0.9, state: known}
+
+  - id: C:entity/mozilla-ventures-gp-i-lp
+    type: entity
+    name: Mozilla Ventures GP I, LP
+    summary: California limited partnership in the same Schedule R group, primary activity venture fund management; its role (general partner of the fund) is the modeller's reading of its name.
+    form: partnership
+    roles: [fund, shell]
+    jurisdiction: US-CA
+    registered-office: 149 New Montgomery Street, 4th Floor, San Francisco, CA 94105
+    global-id:
+      ein: 99-1774854
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.7, state: known}
+
+  - id: C:charter/articles-and-bylaws
+    type: charter
+    name: Articles of Incorporation and Bylaws of Mozilla Ventures Management, PBC
+    summary: Listed under Mozilla Ventures on the Foundation's public records page; the text is not summarised here.
+    kind: articles
+    entity: C:entity/mozilla-ventures-management
+    url: https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.8, state: known}
+
+  - id: C:event/fund-announced
+    type: event
+    name: Mozilla Ventures announced
+    summary: Announced on 2022-11-02 as an impact-investing venture fund backing early-stage startups, with an initial $35 million; Mozilla is the sole partner in the first fund.
+    kind: launch
+    at: 2022-11-02
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://en.wikipedia.org/wiki/Mozilla_Foundation', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/'], confidence: 0.8, state: known}
+
+  - id: C:event/foundation-capital-2023
+    type: event
+    name: Foundation capital contribution to the fund, 2023
+    summary: The 2023 Form 990 Schedule R Part V records a cash gift, grant or capital contribution of $24,963,716 to Mozilla Ventures I, LP, and a $165,851 service agreement.
+    kind: capital contribution
+    period: '2023'
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf'], confidence: 0.9, state: known}

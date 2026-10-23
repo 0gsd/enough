@@ -168,17 +168,17 @@ TOGGLES: tuple[Toggle, ...] = (
         group="wikisink",
     ),
     Toggle(
-        key="cacheawl_enabled",
-        label="cacheawl tools",
+        key="canon_enabled",
+        label="canon tools",
         description=(
-            "let your readvisors use the global file store at ~/enough/cacheawl/: "
-            "cachebox_list, cachebox_create, and cachebox_ingest. turn off to "
-            "hide cacheboxes from them — the cacheawl browser UI keeps "
+            "let your readvisors use canon, the global file store at ~/enough/canon/: "
+            "canon_list, canon_create, and canon_ingest. turn off to "
+            "hide its volumes from them — the canon browser UI keeps "
             "working either way. url ingests still honor the fetch_url "
             "toggles on top of this one."
         ),
         default=True,
-        group="cacheawl",
+        group="canon",
     ),
     Toggle(
         key="composure_enabled",
@@ -213,6 +213,13 @@ TOGGLES: tuple[Toggle, ...] = (
 )
 
 
+# Toggles that were renamed: {old stored key: new key}. A config written by
+# an older enough carries the old key; `load_config` carries its value over
+# to the new one and rewrites the file once (`save_config` then drops the old
+# key, being unrecognized).
+_RENAMED_TOGGLES = {"cacheawl_enabled": "canon_enabled"}   # 0.4.3: Cacheawl → Canon
+
+
 def _toggle_defaults() -> dict[str, bool]:
     return {t.key: t.default for t in TOGGLES}
 
@@ -221,17 +228,31 @@ def load_config() -> dict[str, bool]:
     """Return the merged broker config: defaults overlaid with any
     user-set values from disk. Missing file or missing keys fall through
     to defaults. Always returns a complete dict so callers don't have to
-    handle KeyError."""
+    handle KeyError. A renamed toggle's stored value moves to its new key,
+    and the file is rewritten once so the move sticks."""
     cfg = _toggle_defaults()
+    migrated = False
     if CONFIG_PATH.is_file():
         try:
             on_disk = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
             if isinstance(on_disk, dict):
+                for old, new in _RENAMED_TOGGLES.items():
+                    if old in on_disk:
+                        if new not in on_disk and isinstance(on_disk[old], bool):
+                            on_disk[new] = on_disk[old]
+                        migrated = True
                 for key, value in on_disk.items():
                     if key in cfg and isinstance(value, bool):
                         cfg[key] = value
         except (OSError, json.JSONDecodeError) as e:
             log.warning("broker config read failed (%s); using defaults", e)
+    if migrated:
+        try:
+            save_config(cfg)
+            log.info("broker: moved renamed toggles to their new keys (%s)",
+                     ", ".join(f"{o} → {n}" for o, n in _RENAMED_TOGGLES.items()))
+        except OSError as e:
+            log.warning("broker config migration not saved (%s)", e)
     return cfg
 
 
@@ -398,13 +419,17 @@ def denial_cloud_unhealthy(reason: str) -> str:
     )
 
 
-def denial_cacheawl_disabled() -> str:
+def denial_canon_disabled() -> str:
     return (
-        "error: the cacheawl tools are disabled in the broker config. "
-        "re-enable 'cacheawl tools' in the broker pane (top-nav 'broker' "
-        "button) to let your readvisors list, create, and ingest into cacheboxes "
-        "under ~/enough/cacheawl/."
+        "error: the canon tools are disabled in the broker config. "
+        "re-enable 'canon tools' in the broker pane (top-nav 'broker' "
+        "button) to let your readvisors list, create, and ingest into volumes "
+        "under ~/enough/canon/."
     )
+
+
+# The pre-0.4.3 name, kept one release for any caller still using it.
+denial_cacheawl_disabled = denial_canon_disabled
 
 
 def denial_composure_disabled() -> str:

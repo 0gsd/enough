@@ -1,0 +1,29 @@
+# C — counterparties: the index of every outsider a bond, contract, feed, vendor or surface names.
+# Each is a stub (named, not modelled). A global id (LEI, registry number, domain) goes in `global-id`.
+nodes:
+  - id: C:counterparty/banks
+    type: counterparty
+    name: Bank feed providers
+    summary: The aggregator that supplies transaction feeds for about 120 institutions.
+    kind: vendor
+    global-id: {state: not-disclosed}
+    status: active
+    visibility: internal
+    provenance: {mode: dialectic, sources: [session-2, session-3], confidence: 0.9, state: known}
+
+  - id: C:counterparty/stripe
+    type: counterparty
+    name: Stripe
+    summary: Payment platform that bills the two subscriptions; Meadow is the merchant of record and never holds card numbers.
+    kind: platform
+    global-id: {domain: stripe.com}
+    platform-terms:
+      take-rate: published card rate per successful charge
+      merchant-of-record: self
+      customer-relationship: self
+      review-gate: none
+      payout-cadence: rolling
+      imposed-rules: [PCI-DSS scope stays with the platform]
+    status: active
+    visibility: internal
+    provenance: {mode: net-scan, sources: [stripe-pricing, session-3], confidence: 0.8, state: known}

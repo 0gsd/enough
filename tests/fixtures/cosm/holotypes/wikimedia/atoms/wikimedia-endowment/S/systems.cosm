@@ -1,0 +1,19 @@
+# S — systems: the Endowment has no staff and publishes no stack. What can be seen is its website (the file paths under /wp-content/ show it runs on WordPress) and, behind the
+# giving flows, the Foundation's fundraising systems, which belong to atom/wikimedia-foundation.
+nodes:
+  - id: S:system/endowment-site
+    type: system
+    name: The Endowment's website
+    summary: wikimediaendowment.org, which the file paths of its uploads suggest runs on WordPress; maintained by Foundation staff under the cost-sharing agreement.
+    category: website
+    vendor: none
+    counterparty: none
+    regulatory-criticality: low
+    used-by: [P:offering/legacy-giving, P:offering/project-grants, P:offering/permanent-fund]
+    admin: O:position/president
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.5, state: known}
+    pending: "what the site runs on and who administers it (inferred from upload paths; not stated)"
+    replacement: none

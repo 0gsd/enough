@@ -1,0 +1,159 @@
+# COSM product trees: the MiniCOSM for a standalone product tree.
+#
+# What a program needs to know to open the product trees the COSM skills write outside a Holotype: a folder holding
+# brand.cosm (COSM 0.2: firm.cosm), nodes.cosm and doc.cosm, written with bare ids (offering/ledger, role/Founder,
+# ext/banks). Inside a Holotype the same tree is chapter P of Comprise OES and is read with comprise.manifest.cosm.
+# This manifest exists so those trees open in enough's cosm viewer; it adds nothing to COSM. The prose is
+# docs/MACROCOSM_OES.md; the reference reader is enough/macrocosm.py. Where this file and the reader disagree, the
+# reader wins and this file is corrected.
+#
+# Written in the COSM YAML subset: no anchors, no aliases, no tags, one document. Words that YAML 1.1 reads as
+# booleans (on, off, yes, no) are quoted.
+#
+# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
+
+manifest: minicosm/0
+macrocosm: 0.0.1
+name: cosm
+title: COSM product tree
+version: 0
+summary: One firm's product tree as the COSM 0.2 and 0.3 skills write it outside a Holotype, read so it opens in enough.
+spec: docs/MACROCOSM_OES.md
+reference: [enough/macrocosm.py]
+predecessor: OPI 0.1 (opi:, read as cosm/0); .opi files themselves are not read
+
+declaration:
+  key: oes
+  value: cosm/0
+  absent: refuse                  # a tree names its format: cosm: 0.2 or cosm: 0.3 (or the older opi:)
+  legacy:
+    - {key: cosm, value: ['0.2', '0.3'], reads-as: cosm/0}
+    - {key: opi, reads-as: cosm/0}
+  both: oes                       # when oes: and cosm: are both present, oes decides
+  unknown: refuse
+
+format:
+  extension: .cosm
+  syntax: the COSM YAML subset
+  forbidden: [anchors, aliases, tags, multiple documents]
+  booleans: ['true', 'false']
+  encoding: utf-8
+  byte-order-mark: tolerated
+  newlines: [lf, crlf]
+  shorthand: the sketch, one item per line (cosm.py expand)
+
+volume:
+  catalog: [brand.cosm, firm.cosm]
+  module-files: '*.cosm'          # every .cosm file in the folder, the catalog included; subfolders are not read
+  products: '{brand.cosm or firm.cosm, nodes.cosm, doc.cosm}'
+
+catalog:
+  keys: [oes, macrocosm, cosm, opi, brand, firm, nodes, roles, externals, contracts, history, sources, findings, reading]
+  id: cosm/<folder name>
+  id-absent: cosm/<folder name>   # a tree's catalog has no id of its own: the folder names the database
+  source-fields: [id, page, url, supports, date]
+
+module-file:
+  shapes:
+    - {key: nodes, holds: 'a list of items, each a mapping with a string id'}
+  items:                          # macrocosm 0.0.1: where a file's items are; kind is the kind of items written without a type
+    - {key: brand, one: true, kind: brand}
+    - {key: firm, one: true, kind: brand}
+    - {key: nodes}
+    - {key: roles, kind: role}
+    - {key: externals, kind: external}
+    - {key: contracts, kind: contract}
+  duplicate-id: load error, the first wins
+
+ids:
+  item-form: '<kind>/<slug>'
+  brand-form: '<slug>'
+  external-form: 'ext/<slug>'
+  contract-form: 'c/<slug>'
+  inside-own-tree: bare
+
+paths:
+  form: '<module>/<kind>/<slug>#<field>'
+  levels: [module, kind, item, field]
+  segments:
+    module: 'P'
+    kind: '[a-z][a-z0-9-]*'
+    slug: '[A-Za-z0-9](?:[A-Za-z0-9._@-]*[A-Za-z0-9_@-])?'
+    field: '[A-Za-z0-9][A-Za-z0-9_-]*(?:\.[A-Za-z0-9][A-Za-z0-9_-]*|\[[0-9]+\])*'
+  map:
+    - {path: 'P', id: none}
+    - {path: 'P/<kind>', id: none}
+    - {path: 'P/<kind>/<slug>', id: '<kind>/<slug>'}
+    - {path: 'P/brand/<slug>', id: '<slug>'}
+    - {path: 'P/external/<slug>', id: 'ext/<slug>'}
+    - {path: 'P/contract/<slug>', id: 'c/<slug>'}
+    - {path: '<item path>#<field>', id: none}
+  qualified: 'oes:cosm/<folder name>/<path>'
+  case: kept and significant
+  refused: [a leading slash, a trailing slash, an empty segment, '.', '..', percent-encoding, a backslash, whitespace, a colon,
+            non-ASCII or control characters, a segment ending in a dot, a second '#', a kind the module does not declare,
+            more than three segments, 'a Windows reserved name as any segment, in any case, alone or before a dot (con, con.txt, prn, aux, nul, com0-9, lpt0-9)']
+
+envelope:
+  fields: [id, type, name, summary, since, until, version, owner, confidence, consensus, sources, visibility, kind, parts,
+           pending, flow, substrate, rules, principles, economics, vocabulary, affect, mattering]
+  references: [owner]
+  required: [id, type, name, summary, owner]
+  visibility: [public, internal, restricted]
+  open-question: '{pending: "<the question>"}'
+  sentinels: [none, self]
+  unknown-fields: allowed and kept
+
+references:
+  forms:
+    - {form: bare, example: 'offering/ledger', names: a node of the tree}
+    - {form: brand, example: meadow, names: the brand}
+    - {form: role, example: 'role/Founder', names: a role}
+    - {form: external, example: 'ext/banks', names: an external}
+    - {form: open-question, example: '{pending: "<question>"}', names: an answer still owed}
+  dotted-fields: walk into lists and mappings (flow.outputs.to is the to of every output)
+  unresolved: error
+
+modules:
+  P:
+    name: Products
+    subtitle: What it offers, and why that matters
+    kinds:
+      brand: {refs: [parts], level: 4, id: '<slug>'}
+      suite: {refs: [parts, flow.inputs.from, flow.outputs.to, substrate.depends-on], level: 3}
+      offering: {refs: [parts, flow.inputs.from, flow.outputs.to, substrate.depends-on], level: 2}
+      function: {refs: [parts, flow.inputs.from, flow.outputs.to, substrate.depends-on], level: 1}
+      product: {refs: [flow.inputs.from, flow.outputs.to, substrate.depends-on], level: 0}
+      service: {refs: [flow.inputs.from, flow.outputs.to, substrate.depends-on], level: 0}
+      role: {refs: [governs, escalates-to], required: [id]}
+      external: {refs: [], required: [id], id: 'ext/<slug>'}
+      contract: {refs: [between], required: [id], id: 'c/<slug>'}
+    tree:
+      self-nesting: [suite, function]
+      aggregates: [brand, suite, offering, function]
+      units: [product, service]
+      legacy-kinds: {firm: brand, stack: function}
+      file-version-key: cosm
+      file-versions: ['0.2', '0.3']
+
+checks:
+  load: [load]
+  envelope: [duplicate-id, id-grammar, id-module, type, type-prefix, identity-min, visibility, ref-grammar, ref-unresolved,
+             pending-shape]
+  not-here: P's own checks (strata, flow, mattering, equilibrium) are cosm.py's; this manifest only opens the tree
+
+open-questions:
+  form: '{pending: "<the question>"}'
+  field-path: keys joined by ".", list positions as [n]
+  on-the-whole-item: field path node
+
+renderers:
+  - id: tree
+    makes: the product tree, brand to units
+    lens: {kind: mermaid, diagram: flowchart, include: [P], edges: [parts],
+           shape: {brand: '(( ))', suite: '{{ }}', offering: '([ ])', function: '[[ ]]', product: '[ ]', service: '( )',
+                   role: '> ]', external: '[/ /]'}}
+  - {id: text-tree, makes: the text tree, code: [python -m enough.macrocosm tree]}
+
+extension:
+  status: not built

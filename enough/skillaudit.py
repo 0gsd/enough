@@ -783,7 +783,8 @@ def run_llm_audit(project_dir: Path, name: str, target: Path,
 
 
 def _message_text(message: dict[str, Any]) -> tuple[str, bool]:
-    """`(text, came_from_reasoning)` for one completion message.
+    """`(text, came_from_reasoning)` for one completion message — now
+    `llm.message_text` (0.4.3), kept under this name for the audit's tests.
 
     Reasoning models put their thinking in `reasoning_content` and their
     answer in `content`. When the budget runs out one token before the
@@ -792,13 +793,8 @@ def _message_text(message: dict[str, Any]) -> tuple[str, bool]:
     those away and called them unparsable. Read it instead; the caller
     decides what a reasoning-only verdict is worth.
     """
-    content = (message.get("content") or "").strip()
-    if content:
-        return content, False
-    reasoning = (message.get("reasoning_content")
-                 or message.get("reasoning") or "")
-    reasoning = reasoning.strip() if isinstance(reasoning, str) else ""
-    return reasoning, bool(reasoning)
+    from . import llm as _llm
+    return _llm.message_text(message)
 
 
 def _completion_budget(messages: list[dict[str, str]], base: str) -> int:
@@ -810,22 +806,11 @@ def _completion_budget(messages: list[dict[str, str]], base: str) -> int:
     left. Never below `AUDIT_MIN_TOKENS`: if even that doesn't fit, the
     request fails loudly and the audit becomes a flag saying so, which is
     better than a silent truncation that reads as an unparsable reply.
+    The arithmetic is `llm.completion_budget` (0.4.3).
     """
-    ctx: int | None = None
-    try:
-        import httpx
-        r = httpx.get(f"{base}/props", timeout=5.0)
-        if r.status_code == 200:
-            n = (r.json().get("default_generation_settings") or {}).get("n_ctx")
-            ctx = int(n) if n else None
-    except Exception:  # noqa: BLE001 — a missing /props is not an error
-        ctx = None
-    if not ctx:
-        return AUDIT_MAX_TOKENS
-    chars = sum(len(m.get("content") or "") for m in messages)
-    prompt_tokens = chars // 3          # same rough estimator server.py uses
-    room = ctx - prompt_tokens - AUDIT_CTX_HEADROOM
-    return max(AUDIT_MIN_TOKENS, min(AUDIT_MAX_TOKENS, room))
+    from . import llm as _llm
+    return _llm.completion_budget(messages, base, cap=AUDIT_MAX_TOKENS,
+                                  floor=AUDIT_MIN_TOKENS, headroom=AUDIT_CTX_HEADROOM)
 
 
 def _complete(messages: list[dict[str, str]], *,
@@ -833,27 +818,20 @@ def _complete(messages: list[dict[str, str]], *,
     """One non-streaming completion, local llama-server or the cloud slot,
     whichever the user is actually running. Returns `(text, from_reasoning)`.
     Raises on transport failure — `audit_skill` turns that into a protocol
-    `error`."""
-    from . import models as _models
-    try:
-        current = _models.load_state().get("current")
-    except Exception:  # noqa: BLE001
-        current = None
-    if current == "opro-api":
-        from . import cloud as _cloud
-        resp = _cloud.chat_completion(messages, temperature=AUDIT_TEMPERATURE,
-                                      max_tokens=AUDIT_MAX_TOKENS)
-        return _message_text((resp.get("choices") or [{}])[0].get("message") or {})
-    import httpx
-    base = (llm_url or "http://127.0.0.1:8080").rstrip("/")
-    r = httpx.post(f"{base}/v1/chat/completions", timeout=600.0, json={
-        "messages": messages, "stream": False,
-        "temperature": AUDIT_TEMPERATURE,
-        "max_tokens": _completion_budget(messages, base),
-    })
-    r.raise_for_status()
-    data = r.json()
-    return _message_text((data.get("choices") or [{}])[0].get("message") or {})
+    `error`.
+
+    Since 0.4.3 this is `llm.complete` with the audit's decode parameters
+    (the derivation engine shares the door). `cloud_gate=False` keeps the
+    audit's routing exactly as it was: it never asked the cloud gate. The
+    local budget is `llm.completion_budget` with the same floor and headroom
+    as `_completion_budget` above (AUDIT_MIN_TOKENS == llm.MIN_TOKENS,
+    AUDIT_CTX_HEADROOM == llm.CTX_HEADROOM; a test pins it)."""
+    from . import llm as _llm
+    text, meta = _llm.complete(messages, llm_url=llm_url,
+                               max_tokens=AUDIT_MAX_TOKENS,
+                               temperature=AUDIT_TEMPERATURE,
+                               timeout=600.0, cloud_gate=False)
+    return text, bool(meta.get("from_reasoning"))
 
 
 # ---------------------------------------------------------------------------

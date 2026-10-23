@@ -1,0 +1,113 @@
+# C — the contracts and agreements the public sources describe. Terms are as far as they are published; amounts are by fiscal year (1 July to 30 June).
+nodes:
+  - id: C:contract/cost-sharing
+    type: contract
+    name: Cost-sharing agreement with the Endowment
+    summary: The Foundation's staff manage the Endowment and pay most of its operating costs; the Endowment reimburses staff time and costs plus a 15% administrative fee. The Foundation also passes on donations collected for the Endowment each month. Renews automatically for one-year periods.
+    between: [atom/wikimedia-foundation, atom/wikimedia-endowment]
+    terms: "reimbursement of staff time and endowment-related costs plus a 15% administrative fee; monthly transfer of donations collected for the Endowment; automatic one-year renewals"
+    amounts: {foundation-recognised-2024-25: 2066234, foundation-recognised-2023-24: 2063195, endowment-paid-2024-25: 1466361, endowment-paid-period-to-2024-06-30: 1319778, unit: USD}
+    scope: [P:service/endowment-management, P:service/recurring-and-planned-giving]
+    since: 2023-09-30
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.9, state: known}
+    pending: "the full text, and the reason the two sides' figures differ"
+
+  - id: C:contract/wikibase-collaboration
+    type: contract
+    name: Wikibase collaboration with Wikimedia Deutschland
+    summary: A collaborative arrangement to develop Wikibase, the software that supports Wikidata; the Foundation grants Wikimedia Deutschland funding for its share of the work.
+    between: [atom/wikimedia-foundation, C:counterparty/wikimedia-deutschland]
+    counterparty: C:counterparty/wikimedia-deutschland
+    terms: "joint development of Wikibase; Foundation funding recorded within awards and grants"
+    amounts: {foundation-grants-2024-25: 6191630, foundation-grants-2023-24: 6069415, unit: USD}
+    scope: [P:product/wikibase, P:offering/wikidata]
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+    pending: "the start date and term of the arrangement"
+
+  - id: C:contract/wikimedia-llc-agreements
+    type: contract
+    name: Agreements between the Foundation and Wikimedia, LLC
+    summary: An operating agreement dated 2020-07-01 (amended 2023-10-27), a cost-sharing agreement dated 2020-07-01 and an intercompany licence agreement dated 2021-07-01, published on the Foundation's wiki.
+    between: [atom/wikimedia-foundation, C:entity/wikimedia-llc]
+    terms: "operating agreement, cost-sharing agreement and licence agreement between the Foundation and its wholly owned LLC"
+    scope: [P:offering/wikimedia-enterprise]
+    since: 2020-07-01
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Wikimedia_Enterprise"], confidence: 0.9, state: known}
+
+  - id: C:contract/enterprise-agreements
+    type: contract
+    name: Wikimedia Enterprise customer agreements
+    summary: "A template for the paid agreements with commercial reusers: an API subscription with professional-service hours and an SLA, generally non-cancelable, invoiced annually, paid within 30 to 60 days, revenue recognised over the term. Individual terms and prices are not public."
+    between: [atom/wikimedia-foundation, C:counterparty/google, C:counterparty/internet-archive, C:counterparty/amazon, C:counterparty/meta, C:counterparty/microsoft, C:counterparty/mistral-ai, C:counterparty/perplexity, C:counterparty/enterprise-other-partners]
+    terms: "API subscription, professional service hours, SLA and support treated as one performance obligation; annual invoicing; payment within 30-60 days"
+    template: true
+    instances: [C:counterparty/google, C:counterparty/internet-archive, C:counterparty/amazon, C:counterparty/meta, C:counterparty/microsoft, C:counterparty/mistral-ai, C:counterparty/perplexity, C:counterparty/enterprise-other-partners]
+    scope: [P:offering/wikimedia-enterprise]
+    since: 2022-06-21
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediafoundation.org/news/2022/06/21/wikimedia-enterprise-announces-google-and-internet-archive-first-customers/", "https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/"], confidence: 0.8, state: known}
+    pending: "list prices, contract lengths and which partners pay (a free tier exists, and some partnerships are non-commercial)"
+
+  - id: C:contract/external-audit
+    type: contract
+    name: Annual audit engagement (KPMG)
+    summary: KPMG audits the Foundation's consolidated statements each year; the opinion for 2024-25 was clean, the twentieth in a row.
+    between: [atom/wikimedia-foundation, C:counterparty/kpmg]
+    counterparty: C:counterparty/kpmg
+    terms: "annual audit of the consolidated financial statements"
+    since: 2006
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://wikimediafoundation.org/about/financial-reports/"], confidence: 0.9, state: known}
+
+  - id: C:contract/affiliate-agreements
+    type: contract
+    name: Affiliate agreements
+    summary: Agreements under which recognised chapters, thematic organizations and user groups use the Wikimedia marks; the Foundation also grants them funds. Individual terms are on Meta-Wiki and the Foundation wiki; none was itemised here.
+    between: [atom/wikimedia-foundation, C:counterparty/affiliates]
+    counterparty: C:counterparty/affiliates
+    terms: "movement organizations use the marks under their agreements with the Foundation"
+    template: true
+    scope: [P:offering/grants]
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Trademark_policy", "https://meta.wikimedia.org/wiki/Wikimedia_movement_affiliates"], confidence: 0.7, state: known}
+    pending: "the standard agreement text and whether the agreements carry grant terms"
+
+  - id: C:contract/in-kind-bandwidth
+    type: contract
+    name: Donated hosting and bandwidth
+    summary: Six companies donate internet hosting and bandwidth; the Foundation books the value as contributed services ($52,735 in 2024-25, $56,100 in 2023-24).
+    between: [atom/wikimedia-foundation, C:counterparty/in-kind-bandwidth-providers]
+    counterparty: C:counterparty/in-kind-bandwidth-providers
+    terms: "donated services at fair value, booked as in-kind revenue and expense"
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+
+  - id: C:contract/employer-of-record
+    type: contract
+    name: Employer-of-record arrangement
+    summary: An employer of record administers pay and benefits for staff outside the United States; a standby letter of credit backs it (restricted cash $503,336 at 30 June 2025, unused).
+    between: [atom/wikimedia-foundation, C:counterparty/employer-of-record]
+    counterparty: C:counterparty/employer-of-record
+    terms: "administration of compensation and benefits for personnel outside the United States; standby letter of credit"
+    status: active
+    visibility: public
+    owner: O:role/chief-people-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.8, state: known}
+    pending: "which provider, and in how many countries"

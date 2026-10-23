@@ -1,0 +1,66 @@
+# C — finance, USD, accrual (US GAAP), fiscal year 1 July to 30 June. Audited statements for 2024-25 and for the first period (2023-09-30 to 2024-06-30, as restated in the
+# 2024-25 report, which moved all contributions to "with donor restrictions"). "net-income" is the change in net assets. The 2024 Form 990 differs a little from the audit
+# (revenue $33.3M, expenses $5.6M for 2024-25). Plans are budgets, not results.
+nodes:
+  - id: C:finance/2024-07-to-2025-06
+    type: finance
+    name: FY2024-25 (July 2024 to June 2025), audited
+    summary: Revenue $33.1M (gifts $11.9M, investment income $21.2M), expenses $5.3M (grants for projects $3.4M), net assets $169.4M, up $25.1M.
+    by: atom/wikimedia-endowment
+    period: 2024-07..2025-06
+    currency: USD
+    basis: accrual
+    figures: {revenue: 33081170, operating-expenses: 5333666, net-income: 25082191, assets: 170110244, liabilities: 702431, equity: 169407813}
+    detail: {gifts: 11863214, investment-income: 21224604, unrealized-losses: -2665313, project-funding: 3396880, donation-processing: 342239, professional-services: 1292150, other-operating: 277667, programs: 3679208, general-and-administrative: 528442, fundraising: 1126016, appropriated-for-spending: 5600000, investments: 169700423}
+    form-990: {revenue: 33300000, expenses: 5600000, grants-to-foundation: 3100000, grants-outside-us: 297000, filed: 2026-05-15}
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.9, state: known}
+
+  - id: C:finance/2023-09-to-2024-06
+    type: finance
+    name: First period (30 September 2023 to June 2024), audited as restated
+    summary: Revenue $132.0M including the $116.2M transfer from the Tides Foundation, expenses $5.0M, net assets $144.3M at 30 June 2024.
+    by: atom/wikimedia-endowment
+    period: 2023-09..2024-06
+    currency: USD
+    basis: accrual
+    figures: {revenue: 131986616, operating-expenses: 4953427, net-income: 144325622, assets: 144325622, liabilities: 0, equity: 144325622}
+    detail: {tides-transfer: 116189376, gifts: 13416423, investment-income: 2380817, unrealized-gains: 17292433, project-funding: 2878345, investments: 143620919}
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.9, state: known}
+
+  - id: C:finance/2025-07-to-2026-06
+    type: finance
+    name: FY2025-26 (July 2025 to June 2026), reported in the annual plan
+    summary: $3.5M disbursed to support technical innovation across Wikimedia projects (Abstract Wikipedia, Commons, Kiwix, machine-learning infrastructure, protection against scrapers); more than $2.2M from IRA distributions; 4,190 planned-giving commitments at 30 June 2026. Audited statements are not out yet.
+    by: atom/wikimedia-endowment
+    period: 2025-07..2026-06
+    currency: USD
+    basis: accrual
+    figures: {grants-disbursed: 3500000, revenue: {pending: "FY2025-26 audited revenue (the audit and Form 990 for 2024-25 came out in March and May 2026)"}}
+    detail: {ira-distributions-over: 2200000, planned-giving-commitments: 4190}
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.8, state: known}
+
+  - id: C:finance/2026-07-to-2027-06
+    type: finance
+    name: FY2026-27 (July 2026 to June 2027), budget
+    summary: A budget of $6.8M ($2.3M operations, $4.3M grants, about 23% more grants than in 2025-26), a 4.0% spending rate, and a plan to raise $10M; revenue targets total $13.7M with investment income of $3.7M.
+    by: atom/wikimedia-endowment
+    period: 2026-07..2027-06
+    currency: USD
+    basis: accrual
+    figures: {budget: 6800000, grants: 4317875}
+    targets: {fundraising: 10000000, investment-income-net-of-costs: 3732178, total-revenue: 13732178, spending-rate: 0.04}
+    status: planned
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.9, state: known}

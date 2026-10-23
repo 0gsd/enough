@@ -1,0 +1,19 @@
+# doc.cosm: reading, history and findings. Sources are declared in holotype.cosm.
+
+reading:
+  draft: Public sample 1
+  date: 2026-10-18
+  author: '@comprise-sample'
+  mode: research (public sources only, read 2026-10-18)
+  perspective: Mozilla.org as the umbrella the Foundation controls and the owner of the operating companies.
+  note: The ownership of the companies is stated differently by different Mozilla pages; see the Foundation atom's findings.
+
+history:
+  - {date: '2021', event: Initial proposals for Mozilla Ventures and Mozilla.ai, sources: ['https://wiki.mozilla.org/Mozilla_org']}
+  - {date: '2022', event: Mozilla Ventures launched in late 2022; four new Foundation board members added, sources: ['https://wiki.mozilla.org/Mozilla_org']}
+  - {date: '2024', event: Mozilla.org brand refreshed and website redesigned, sources: ['https://wiki.mozilla.org/Mozilla_org']}
+  - {date: '2025', event: New board and executive leadership model announced; Mozilla.org created; first portfolio strategy launched, sources: ['https://wiki.mozilla.org/Mozilla_org']}
+  - {date: '2026-06-23', event: 'Announcement of Mozilla.org as a 501(c)(3), fully operational', sources: ['https://blog.mozilla.org/en/mozilla/news/announcing-mozilla-org-new-non-profit/', 'https://www.mofo.com/resources/news/260706-mofo-advises-mozilla']}
+
+findings:
+  - {check: role coverage - unwritten seats, nodes: ['O:position/chief-operating-officer', 'O:position/chief-technology-officer'], finding: 'The Mozilla-wide executive team is employed through Mozilla Management Company, a public benefit corporation wholly owned by Mozilla.org, so the seats sit one level below the entity that governs them.', proposal: Publish the reporting line from the executive team to the board.}

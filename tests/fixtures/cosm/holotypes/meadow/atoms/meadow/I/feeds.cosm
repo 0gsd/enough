@@ -1,0 +1,18 @@
+# I — feeds (decisions Q4: "feed", never "connection"). Credentials never live in a file: the node holds
+# a keychain reference only. Stripe is a phase 6 feed (Q15), so this one is defined but planned.
+nodes:
+  - id: I:feed/stripe
+    type: feed
+    name: Stripe catalog
+    summary: Pulls products and prices from the Stripe account so the SKU table and the price books can be compared.
+    adapter: stripe
+    counterparty: C:counterparty/stripe
+    system: S:system/stripe
+    mapping: I:mapping/stripe-catalog
+    credentials: {keychain: comprise/meadow/stripe}
+    schedule: daily
+    max-age: 7d
+    status: planned
+    visibility: internal
+    owner: O:role/Founder
+    provenance: {mode: dialectic, sources: [session-3], confidence: 0.9, state: known}

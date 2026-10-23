@@ -1,0 +1,34 @@
+# M: audiences.
+nodes:
+  - id: M:audience/ai-developers
+    type: audience
+    name: Developers building with LLMs and agents
+    summary: 'Developers who use the open tools: llamafile has about 26,000 GitHub stars, any-llm about 2,200.'
+    relation: [beneficiary]
+    side: served
+    served-by: ['P:offering/choice-first-stack', 'P:offering/local-ai-tools', 'P:offering/cq']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-ai'], confidence: 0.8, state: known}
+
+  - id: M:audience/teams-and-organizations
+    type: audience
+    name: Teams and organizations running AI
+    summary: The people who route, budget and secure LLM traffic (Otari) or automate everyday work with agents (Octonous).
+    relation: [customer]
+    side: served
+    served-by: ['P:offering/otari', 'P:offering/octonous']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/product/otari', 'https://mozilla.ai/product/octonous'], confidence: 0.8, state: known}
+
+  - id: M:audience/blueprint-community
+    type: audience
+    name: The Blueprints community
+    summary: Contributors of reusable, community-led automation templates.
+    relation: [member]
+    side: supplying
+    served-by: ['P:offering/blueprints']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.ai/llms.txt'], confidence: 0.7, state: known}

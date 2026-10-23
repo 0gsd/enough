@@ -1,0 +1,72 @@
+# O: roles: the board, the chief executive seat and six team pools. Team names follow Mozilla's own pages where they name the team, and say so where they are the modeller's grouping.
+nodes:
+  - id: O:role/Board-of-Directors
+    type: role
+    name: Board of Directors
+    summary: The Corporation's board, named on the leadership page; nothing else about it is published.
+    governs: ['P:mozilla-corporation']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.7, state: known}
+
+  - id: O:role/Chief-Executive-Officer
+    type: role
+    name: Chief Executive Officer
+    summary: The Corporation's chief executive seat, named on the leadership page.
+    governs: ['P:suite/retired']
+    escalates-to: O:role/Board-of-Directors
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.9, state: known}
+
+  - id: O:role/Firefox-Engineering
+    type: role
+    name: Firefox Engineering
+    summary: The engineering teams for the browser, named in the State of Mozilla 2025/26.
+    governs: ['P:product/firefox-desktop', 'P:service/firefox-release-channels', 'P:product/firefox-smart-window', 'S:codebase/firefox']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/'], confidence: 0.6, state: known}
+
+  - id: O:role/Firefox-Product-Management
+    type: role
+    name: Firefox Product Management
+    summary: The product management teams for the browser, including desktop, named in the State of Mozilla 2025/26.
+    governs: ['P:suite/firefox', 'P:offering/firefox']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/'], confidence: 0.6, state: known}
+
+  - id: O:role/Privacy-Services-Team
+    type: role
+    name: Privacy services team
+    summary: The modeller's grouping of the people behind Mozilla VPN, Firefox Relay and Mozilla Monitor, which the 2024 annual report presents together as products built for people.
+    governs: ['P:suite/privacy-services']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/'], confidence: 0.6, state: known}
+
+  - id: O:role/MDN-Team
+    type: role
+    name: MDN team
+    summary: Mozilla's MDN team leads platform development, content strategy and the overall direction of MDN Web Docs.
+    governs: ['P:suite/web-platform']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://developer.mozilla.org/en-US/about'], confidence: 0.6, state: known}
+
+  - id: O:role/Advertising-Team
+    type: role
+    name: Mozilla Advertising team
+    summary: The team behind Mozilla Advertising and Anonym.
+    governs: ['P:suite/advertising']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/advertising/', 'https://blog.mozilla.org/en/advertising/anonym-reddit-partnership/'], confidence: 0.6, state: known}
+
+  - id: O:role/AI-Products-Team
+    type: role
+    name: AI products team
+    summary: The modeller's grouping of the people behind 0DIN and Tabstack, which Mozilla lists together as its AI products.
+    governs: ['P:suite/ai-products']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/'], confidence: 0.6, state: known}

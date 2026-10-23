@@ -1,0 +1,97 @@
+# M — audiences: the kinds of people and bodies the offerings serve, those who fund the work and those who supply it.
+# P's flows, affect and mattering point at these ids. Counts are as the sources state them, with their period.
+nodes:
+  - id: M:audience/students
+    type: audience
+    name: Learners on their own
+    summary: "Students of any age who learn on Khan Academy by themselves, for school, for tests or for interest. In school year 2024-25 the About page counts 104.9 million learners and 20.9 million new registered users; the Form 990 puts average monthly active learners at 8.5 million from July 2024 to June 2025, about 53% outside the United States."
+    relation: [student]
+    side: served
+    geography: global
+    served-by: [P:offering/courses-and-practice, P:offering/test-prep, P:offering/writing-coach, P:offering/learning-paths]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-about, f990-2025], confidence: 0.8, state: known}
+
+  - id: M:audience/teachers
+    type: audience
+    name: Teachers and educators
+    summary: "Classroom teachers who assign practice, track progress and plan lessons. Free for teachers: the content library, assignment tools and Khanmigo's teacher tools (free to US teachers; other eligible countries not listed on the page)."
+    relation: [beneficiary]
+    side: served
+    geography: global
+    served-by: [P:offering/teacher-tools, P:offering/khanmigo-teachers, P:offering/writing-coach, P:offering/courses-and-practice]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-home, khanmigo-home, blog-microsoft], confidence: 0.8, state: known}
+
+  - id: M:audience/families
+    type: audience
+    name: Parents and families
+    summary: "Parents and caregivers supporting a child's learning, and homeschoolers. A parent subscription activates Khanmigo for up to 10 children with chat history and safety alerts; for learners and parents the subscription is offered to US residents with a US billing address."
+    relation: [customer]
+    side: served
+    geography: US
+    served-by: [P:offering/khanmigo-families, P:offering/khan-kids, P:offering/courses-and-practice]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [khanmigo-parents, khanmigo-home], confidence: 0.8, state: known}
+
+  - id: M:audience/early-learners
+    type: audience
+    name: Children aged 2 to 8
+    summary: "Early learners from preschool to grade 2 and the parents and teachers who put the free Kids app in front of them, at home or in a classroom."
+    relation: [student]
+    side: served
+    geography: global
+    served-by: [P:offering/khan-kids, P:offering/kids-for-schools]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-kids, ka-about], confidence: 0.8, state: known}
+
+  - id: M:audience/districts
+    type: audience
+    name: School districts and their leaders
+    summary: "District and school leaders who buy district partnerships: more than 600 partner districts, as the districts page counts them. Also state education agencies that sponsor access (New Hampshire's statewide offer)."
+    relation: [customer]
+    side: served
+    geography: US
+    served-by: [P:offering/districts-partnership, P:offering/learning-paths, P:offering/kids-for-schools]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-districts, blog-new-hampshire], confidence: 0.7, state: known}
+
+  - id: M:audience/donors
+    type: audience
+    name: Donors and institutional funders
+    summary: "The nonprofit says less than 1% of its users give. Contributions and grants were $90.4M in the year to June 2025, including $7.6M of donated listed securities. The supporters page recognises giving of $1,000 a year and up and lists founding partners: Google and six foundations, alongside individuals. Funders are named there, not here."
+    relation: [donor]
+    side: funding
+    geography: global
+    status: active
+    visibility: public
+    owner: O:role/Chief-External-Relations-Officer
+    provenance: {mode: net-scan, sources: [ka-supporters, ka-donate-banner, f990-2025], confidence: 0.8, state: known}
+
+  - id: M:audience/international-partners
+    type: audience
+    name: International partner entities
+    summary: "Local entities, for example in the Philippines, Bangladesh, Pakistan and Vietnam, that since 2023 bring Khan Academy resources to school districts and government schools abroad. Independent of the nonprofit by its own account."
+    relation: {pending: "the legal basis on which each partner entity uses Khan Academy resources (licence, memorandum or other) is not public"}
+    side: served
+    geography: global
+    served-by: [P:offering/international-programs]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-help-partners], confidence: 0.8, state: known}
+
+  - id: M:audience/translators
+    type: audience
+    name: Volunteer translators
+    summary: "Many translators around the world translate the site for free; the nonprofit does not track their hours. The return counts about 600 volunteers in all, board and advisory board members included."
+    relation: [supplier]
+    side: supplying
+    geography: global
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [f990-2025], confidence: 0.8, state: known}

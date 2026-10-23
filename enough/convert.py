@@ -1022,7 +1022,7 @@ _DEFAULT_EXTRAS_STATE = Path.home() / "enough" / "config" / "extras.json"
 
 def extras_state_path() -> Path:
     """`~/enough/config/extras.json`, or `ENOUGH_EXTRAS_STATE` when set — the
-    same test/dev seam shape as `ENOUGH_UI_CONFIG` / `ENOUGH_CACHEAWL_ROOT`,
+    same test/dev seam shape as `ENOUGH_UI_CONFIG` / `ENOUGH_CANON_ROOT`,
     so a QA server can never mark the real install as having the extra."""
     env = os.environ.get("ENOUGH_EXTRAS_STATE")
     return Path(env).expanduser() if env else _DEFAULT_EXTRAS_STATE

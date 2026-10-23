@@ -1,0 +1,28 @@
+# O: the three councils the FAQ describes.
+nodes:
+  - id: O:unit/executive-leadership-council
+    type: unit
+    name: Executive Leadership Council
+    summary: Top leaders of each organization plus the Mozilla.org executive team; meets monthly on strategy alignment, major decisions and resource allocation, policy approval, common pain points and external representation.
+    meets: monthly
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.9, state: known}
+
+  - id: O:unit/tech-council
+    type: unit
+    name: Tech Council
+    summary: Senior technologists across the portfolio (Firefox, Mozilla.ai, MZLA, the Foundation, Mozilla Ventures, Mozilla.org); meets monthly to build a technology radar for the next 18 to 24 months.
+    meets: monthly
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.9, state: known}
+
+  - id: O:unit/communications-brand-council
+    type: unit
+    name: Communications and Brand Council
+    summary: Communications leads from each Mozilla organization; meets bi-weekly to align announcements, brand and marketing and avoid crossed wires.
+    meets: bi-weekly
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.9, state: known}

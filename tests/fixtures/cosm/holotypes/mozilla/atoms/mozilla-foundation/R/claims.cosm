@@ -1,0 +1,81 @@
+# R: claims the Foundation makes in public, about which node, with the evidence that is public.
+nodes:
+  - id: R:claim/mission
+    type: claim
+    name: Protect and improve the internet as a public resource
+    summary: The mission as the Form 990 states it.
+    text: Protect and improve the internet as a public resource, open and accessible to all.
+    about: ['P:mozilla-foundation']
+    'on': ['R:surface/public-records']
+    evidence:
+      state: supported
+      by: ['P:offering/grantmaking', 'P:offering/campaigns']
+      measure: 'program expenses of $27.4 million in 2024: leadership development $11.0 million, movement building $15.6 million, agenda setting $0.75 million'
+    status: active
+    visibility: public
+    owner: O:role/Executive-Director
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}
+
+  - id: R:claim/35-million
+    type: claim
+    name: Over $35 million invested in a better technology future
+    summary: 'Stated on the grantmaking page: over the last decade the Foundation has invested over $35 million.'
+    text: Over the last decade, Mozilla Foundation has invested over $35 million in building a better technology future.
+    about: ['P:offering/grantmaking']
+    'on': ['R:surface/website']
+    evidence:
+      state: partial
+      by: ['P:offering/grantmaking']
+      measure: the filings show grants paid of $2,336,028 in 2024; the decade total is not reconcilable from the filings read
+    status: active
+    visibility: public
+    owner: O:role/Director-Global-Grants
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/grantmaking/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.7, state: known}
+
+  - id: R:claim/200-fellows
+    type: claim
+    name: Over 200 Fellows supported
+    summary: Stated on the Mobilize page.
+    text: We've supported over 200 changemaking Fellows.
+    about: ['P:offering/fellowships']
+    'on': ['R:surface/website']
+    evidence:
+      state: unverified
+      by: ['P:offering/fellowships']
+      measure: the Foundation's own count; the cohorts are not recounted here
+    status: active
+    visibility: public
+    owner: O:role/Director-Global-Grants
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.7, state: known}
+
+  - id: R:claim/largest-voice-dataset
+    type: claim
+    name: The largest people-powered voice dataset in the world
+    summary: Stated on the Mobilize page.
+    text: Common Voice, now the largest people-powered voice dataset in the world.
+    about: ['P:offering/common-voice']
+    'on': ['R:surface/website']
+    evidence:
+      state: unverified
+      by: ['P:product/common-voice-platform']
+      measure: the Foundation's own description; not compared with other datasets here
+    status: active
+    visibility: public
+    owner: O:role/Executive-Director
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.6, state: known}
+
+  - id: R:claim/nonprofit-parent
+    type: claim
+    name: A global non-profit and the philanthropic mission-holder of the Mozilla Project
+    summary: The footer line on every page of the site.
+    text: Mozilla Foundation is a global non-profit and the philanthropic mission-holder of the Mozilla Project.
+    about: ['P:mozilla-foundation']
+    'on': ['R:surface/website']
+    evidence:
+      state: supported
+      by: ['P:function/governance-and-compliance']
+      measure: 501(c)(3) determination and the annual Form 990
+    status: active
+    visibility: public
+    owner: O:role/Executive-Director
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/', 'https://projects.propublica.org/nonprofits/organizations/200097189'], confidence: 0.9, state: known}

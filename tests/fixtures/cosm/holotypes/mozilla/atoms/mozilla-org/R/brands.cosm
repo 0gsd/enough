@@ -1,0 +1,11 @@
+# R: the brand.
+nodes:
+  - id: R:brand/mozilla
+    type: brand
+    name: Mozilla
+    summary: 'The family brand that Mozilla.org manages: Mozilla, Firefox, Thunderbird, Mozilla.ai, Mozilla Ventures and Mozilla Data Collective sit under it.'
+    scope: ['P:mozilla-org']
+    status: active
+    visibility: public
+    owner: O:role/Communications-Council-Lead
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/about/'], confidence: 0.8, state: known}

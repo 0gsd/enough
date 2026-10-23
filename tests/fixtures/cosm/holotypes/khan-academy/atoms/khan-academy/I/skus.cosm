@@ -1,0 +1,47 @@
+# I — what the nonprofit publishes about its inventories: the two Khanmigo subscription plans it sells and the size of its free content library.
+# No feed, no stock, no locations: nothing physical is held, and no catalogue export is public.
+nodes:
+  - id: I:sku/khanmigo-monthly
+    type: sku
+    name: Khanmigo subscription, monthly
+    summary: "The monthly plan for a learner or a parent account: $4 a month, sales tax not included."
+    kind: subscription-plan
+    unit: account/month
+    billing: {model: flat, value: 4, unit: USD/month, cadence: monthly}
+    entitles: [P:offering/khanmigo-families]
+    priced-by: M:pricebook/khanmigo
+    seller: self
+    status: active
+    visibility: public
+    owner: O:role/Chief-Learning-Officer
+    provenance: {mode: net-scan, sources: [khanmigo-learners, khanmigo-parents], confidence: 0.9, state: known}
+
+  - id: I:sku/khanmigo-annual
+    type: sku
+    name: Khanmigo subscription, annual
+    summary: "The annual plan: $44 a year, which the page says saves $4 against twelve months."
+    kind: subscription-plan
+    unit: account/year
+    billing: {model: flat, value: 44, unit: USD/year, cadence: yearly}
+    entitles: [P:offering/khanmigo-families]
+    priced-by: M:pricebook/khanmigo
+    seller: self
+    status: active
+    visibility: public
+    owner: O:role/Chief-Learning-Officer
+    provenance: {mode: net-scan, sources: [khanmigo-learners, khanmigo-parents], confidence: 0.9, state: known}
+
+  - id: I:sku/course-library
+    type: sku
+    name: Free course library
+    summary: "The published inventory of the free content: about 800 active courses, 20,000 videos, 12,500 sets of practice problems and 10,250 articles on 30 June 2025. Free to use; counted here as a digital stock, not a price."
+    kind: digital
+    unit: item
+    billing: {model: free}
+    quantities: {courses: 800, videos: 20000, practice-sets: 12500, articles: 10250, as-of: 2025-06-30}
+    entitles: [P:offering/courses-and-practice]
+    seller: self
+    status: active
+    visibility: public
+    owner: O:role/Chief-Learning-Officer
+    provenance: {mode: net-scan, sources: [f990-2025, ka-about], confidence: 0.8, state: known}

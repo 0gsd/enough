@@ -1,0 +1,36 @@
+# C — aims: what Mozilla.ai says it is trying to achieve with outside help (seeking) and what it says it is open to (open), from the State of Mozilla
+# 2025/26, its product pages and llms.txt, and the any-llm repository, read on 2026-10-18. Its careers page lists no open roles, so there is no hiring
+# aim. The words carry no figures: an isotype publishes statements, never measurements. Owners are roles; no person is named.
+nodes:
+  - id: C:aim/open-source-ai-stack-partners
+    type: aim
+    name: Partners and projects for the open source AI stack
+    summary: "Mozilla.ai is searching for new partners and projects to work with in making the open source AI stack easier to use."
+    kind: partners
+    stance: seeking
+    owner: O:role/Chief-Executive-Officer
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/roadmap/', 'https://stateof.mozilla.org/tools/'], confidence: 0.75, state: known}
+
+  - id: C:aim/octonous-teams
+    type: aim
+    name: Teams to try Octonous
+    summary: "Teams doing everyday work in operations, product, support, sales and marketing to try Mozilla.ai's Octonous agent platform while it is in beta, and help shape it."
+    kind: customers
+    stance: seeking
+    owner: O:role/Product-Team
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/product/octonous', 'https://www.mozilla.ai/llms.txt'], confidence: 0.75, state: known}
+
+  - id: C:aim/open-source-contributors
+    type: aim
+    name: Contributors to its open source libraries
+    summary: "Open to developers contributing to Mozilla.ai's open source libraries, including support for new model providers."
+    kind: technology
+    stance: open
+    owner: O:role/VP-Engineering
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-ai/any-llm', 'https://www.mozilla.ai/llms.txt'], confidence: 0.7, state: known}

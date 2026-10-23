@@ -1,0 +1,11 @@
+# R: the brand.
+nodes:
+  - id: R:brand/thunderbird
+    type: brand
+    name: Thunderbird
+    summary: The email brand; the marks are among those the Foundation licenses (and, per the June 2026 FAQ, Mozilla.org owns).
+    scope: ['P:thunderbird']
+    status: active
+    visibility: public
+    owner: O:role/Marketing
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://wiki.mozilla.org/Mozilla_org'], confidence: 0.8, state: known}

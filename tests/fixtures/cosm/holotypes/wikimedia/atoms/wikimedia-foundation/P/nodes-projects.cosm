@@ -1,0 +1,256 @@
+# P — the Wikimedia projects: the 13 the Foundation lists, as one suite with four offerings and one product (MediaWiki, the thirteenth, sits in the platform function). The content is the volunteers'; what the
+# Foundation offers is the hosted, free, ad-free place where it lives. Every figure is the Foundation's own, with its year. Affect and mattering: the modeller's reading.
+nodes:
+
+- id: P:suite/projects
+  type: suite
+  name: The Wikimedia projects
+  summary: The 13 projects the Foundation lists (twelve wikis and the MediaWiki software), led by Wikipedia; read by billions and written and governed by volunteers.
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://wikimediafoundation.org/our-work/wikimedia-projects/", "https://wikimediafoundation.org/about/", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/"]
+  parts: [P:offering/wikipedia, P:offering/commons, P:offering/wikidata, P:offering/other-projects, P:product/wikifunctions]
+  flow:
+    inputs:
+      - {resource: edit, from: M:audience/contributors, unit: edits/minute, rate: 324}
+    outputs:
+      - {resource: page-view, to: M:audience/readers, unit: views/month, rate: 15000000000}
+  mattering:
+    to-the-whole: "This is what the Foundation exists to keep running; every other part either hosts it, funds it, supports its volunteers or reaches readers with it."
+    weight: critical
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "The department's first job is that the projects load, anywhere, at any hour."
+        confidence: 0.5
+
+- id: P:offering/wikipedia
+  type: offering
+  name: Wikipedia
+  summary: "The free encyclopedia written by volunteers: more than 66 million articles in over 300 languages, with no advertising."
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.9
+  sources: ["https://wikimediafoundation.org/our-work/wikimedia-projects/", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://wikimediafoundation.org/about/"]
+  flow:
+    inputs:
+      - {resource: edit, from: M:audience/contributors, unit: edits/minute}
+    outputs:
+      - {resource: article-view, to: M:audience/readers, unit: views/month}
+  substrate:
+    platforms: [S:system/mediawiki, S:system/data-centers, S:system/cdn]
+    depends-on: [S:system/mediawiki, S:system/data-centers]
+    roles-required: [{role: O:role/chief-product-and-technology-officer, load: large}]
+  rules:
+    - must-not: "all-roles write, edit or take down articles for editorial reasons"
+      source: wmf-about
+      confidence: 0.8
+  principles:
+    purpose: "A free encyclopedia in every language that anyone can read and anyone can improve."
+    priorities: ["neutral point of view, kept by the volunteer community", "free to read and reuse over any revenue from readers"]
+    quality: [{goal: "readers get answers", measure: "page views per month (nearly 15 billion across the projects)"}]
+  economics:
+    price: none
+    cost: {model: internal, band: "technology is about 45% of 2024-25 spending (annual report)"}
+  affect:
+    audience: M:audience/readers
+    elicits:
+      - {feeling: trust, intensity: 0.8, when: "the answer is there, sourced, with nothing selling to the reader"}
+      - {feeling: curiosity, intensity: 0.7, when: "one article leads to the next"}
+    avoids: [advertising, paywalls, "silent editorial control by the host"]
+    probes: [satisfaction, trust]
+    tone: [plain, neutral, open]
+  mattering:
+    to-the-whole: "The reason the Foundation is known and trusted, and the audience every appeal and every reuser comes for."
+    weight: critical
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "Hosting something this large and this open means being always on while never touching the words."
+        stakes: "The most-read reference in the world, hosted by a team that does not write it."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/readers, M:audience/contributors]
+        because: "Readers get a reference with no advertising; volunteers get a place where their work stays free to reuse."
+        stakes: "A reference behind a paywall or full of ads, and work volunteers cannot keep free."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/readers]
+        because: "Many people now meet Wikipedia's words inside search answers and AI assistants instead of on the site."
+        barrier: "Human page views fell about 8% in recent months of 2025 against 2024; the Foundation points to generative AI and social video."
+        confidence: 0.6
+
+- id: P:offering/commons
+  type: offering
+  name: Wikimedia Commons
+  summary: "A free library of images, video, audio and other media: 135 million files (2024-25 annual report), used across the projects and by anyone."
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://wikimediafoundation.org/our-work/wikimedia-projects/", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"]
+  flow:
+    inputs:
+      - {resource: endowment-grant, from: atom/wikimedia-endowment, unit: USD/year, rate: 150000}
+      - {resource: upload, from: M:audience/contributors, unit: files/year}
+    outputs:
+      - {resource: media-file, to: M:audience/readers, unit: views/month}
+      - {resource: media-file, to: M:audience/partners-and-institutions, unit: files/year}
+  substrate:
+    platforms: [S:system/mediawiki, S:system/swift, S:system/data-centers]
+    depends-on: [S:system/swift]
+  principles:
+    purpose: "A shared library of free media so that every project and every reuser can illustrate knowledge."
+    priorities: ["free licences or public domain only", "the uploader keeps credit"]
+  economics:
+    price: none
+    cost: {model: internal, band: {pending: "storage and bandwidth cost of Commons"}}
+  affect:
+    audience: M:audience/contributors
+    elicits:
+      - {feeling: pride, intensity: 0.7, when: "a photograph is used in an article read by millions"}
+    avoids: ["unclear licensing", "files lost or deleted without notice"]
+    probes: [reward]
+    tone: [open, practical]
+  mattering:
+    to-the-whole: "Without a shared free media library each project would need its own, and the articles would be plain text."
+    weight: major
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "Billions of files to store and serve, funded in part by the Endowment ($150,000 in 2024-25)."
+        stakes: "Media that every other project depends on."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/contributors, M:audience/partners-and-institutions]
+        because: "A place to put photographs, scans and recordings so that they stay free and are found."
+        stakes: "Collections that stay on a shelf or behind a licence."
+        confidence: 0.5
+    prospective:
+      - who: [M:audience/partners-and-institutions]
+        because: "Libraries, archives and museums that have not yet shared their collections."
+        barrier: "Rights, effort and trust in an open licence."
+        confidence: 0.5
+
+- id: P:offering/wikidata
+  type: offering
+  name: Wikidata
+  summary: "The free, collaboratively edited database of structured data that feeds the other projects and many outside services: about 123.6 million items (statistics page, October 2026)."
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://wikimediafoundation.org/our-work/wikimedia-projects/", "https://www.wikidata.org/wiki/Wikidata:Statistics", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"]
+  flow:
+    inputs:
+      - {resource: endowment-grant, from: atom/wikimedia-endowment, unit: USD/year, rate: 1000000}
+      - {resource: development, from: C:counterparty/wikimedia-deutschland, unit: person-years/year}
+      - {resource: edit, from: M:audience/contributors, unit: edits/year}
+    outputs:
+      - {resource: structured-data, to: M:audience/commercial-reusers, unit: queries/day}
+      - {resource: structured-data, to: M:audience/readers, unit: views/month}
+  substrate:
+    platforms: [S:system/wikibase, S:system/mediawiki]
+    depends-on: [S:system/wikibase]
+  principles:
+    purpose: "Central, structured, freely reusable data for the sister projects and for anyone."
+    priorities: ["data under a free licence", "the community edits, the software is shared with Wikimedia Deutschland"]
+  economics:
+    price: none
+    cost: {model: grant, band: "about $6.2M a year to Wikimedia Deutschland for Wikibase work (2024-25), plus the Foundation's own staff"}
+  affect:
+    audience: M:audience/commercial-reusers
+    elicits:
+      - {feeling: reliability, intensity: 0.7, when: "a service gets the same fact, structured, from one source"}
+    avoids: ["inconsistent facts between language editions", "data that cannot be reused"]
+    probes: [reliability]
+    tone: [exact, open]
+  mattering:
+    to-the-whole: "Makes the projects' knowledge machine-readable, so the same fact is kept once and used everywhere, including by outside services."
+    weight: major
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "A shared data layer under every language edition, built with an affiliate."
+        stakes: "A project that other projects and many outside services depend on."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/commercial-reusers, M:audience/contributors]
+        because: "Structured facts that can be queried, edited by many and used for search, assistants and research."
+        stakes: "Facts rekeyed by every service, with different answers."
+        confidence: 0.5
+    prospective:
+      - who: [M:audience/commercial-reusers]
+        because: "AI and search services that need grounded, structured facts."
+        barrier: "Quality and attribution when the data is used without coming through Enterprise."
+        confidence: 0.5
+
+- id: P:offering/other-projects
+  type: offering
+  name: The other Wikimedia projects
+  summary: Wiktionary (a dictionary in over 170 languages), Wikibooks, Wikiquote (over 75 languages), Wikisource, Wikiversity, Wikivoyage, Wikispecies and Meta-Wiki, each free and volunteer-run.
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.8
+  sources: ["https://wikimediafoundation.org/our-work/wikimedia-projects/"]
+  flow:
+    inputs:
+      - {resource: edit, from: M:audience/contributors, unit: edits/year}
+    outputs:
+      - {resource: page-view, to: M:audience/readers, unit: views/month}
+  substrate:
+    platforms: [S:system/mediawiki, S:system/data-centers]
+    depends-on: [S:system/mediawiki]
+  principles:
+    purpose: "Free resources of many kinds beyond the encyclopedia: words, texts, textbooks, quotations, courses, travel guides, species and coordination."
+    priorities: ["one platform and one set of free licences for all"]
+  economics:
+    price: none
+    cost: {model: internal, band: {pending: "cost of hosting the sister projects, which the Foundation does not itemise"}}
+  affect:
+    audience: M:audience/readers
+    elicits:
+      - {feeling: usefulness, intensity: 0.6, when: "the right dictionary entry, source text or travel guide is there and free"}
+    avoids: [paywalls, advertising]
+    probes: [satisfaction]
+    tone: [practical, open]
+  mattering:
+    to-the-whole: "Shows that the Foundation hosts a family of free knowledge tools and not one website, and gives specialist volunteers a home."
+    weight: supporting
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "A long tail of wikis, each small on the Foundation's scale and important to the people who run it."
+        stakes: "Volunteer communities that have nowhere else to host."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/readers, M:audience/contributors]
+        because: "A dictionary, a library of source texts or a travel guide that is free and that anyone can improve."
+        stakes: "Commercial services that charge or advertise for the same thing."
+        confidence: 0.5
+    prospective:
+      - who: [M:audience/readers]
+        because: "Most readers know Wikipedia and have not met its siblings."
+        barrier: "Awareness; the sister projects are not what search sends people to."
+        confidence: 0.5
+
+- id: P:product/wikifunctions
+  type: product
+  name: Wikifunctions and Abstract Wikipedia
+  summary: A library of code functions anyone can create and maintain, and the Abstract Wikipedia project that would use it to write articles once for many languages; funded in part by the Endowment ($950,000 in 2024-25).
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.8
+  sources: ["https://wikimediafoundation.org/our-work/wikimedia-projects/", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"]
+  flow:
+    inputs:
+      - {resource: endowment-grant, from: atom/wikimedia-endowment, unit: USD/year, rate: 950000}
+    outputs:
+      - {resource: function, to: M:audience/contributors, unit: functions}
+  substrate:
+    platforms: [S:system/mediawiki]
+    depends-on: [S:system/mediawiki]
+  economics:
+    price: none
+    cost: {model: grant, band: "the Endowment gave $600,000 in the period to June 2024 and $950,000 in 2024-25"}
+  mattering:
+    to-the-whole: "A bet on how the projects write and share knowledge across languages as the way people find it changes."
+    weight: supporting
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "Long-horizon technical work that the annual fund alone would not pay for."
+        confidence: 0.5

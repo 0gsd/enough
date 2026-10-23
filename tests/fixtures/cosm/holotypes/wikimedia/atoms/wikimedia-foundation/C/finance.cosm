@@ -1,0 +1,139 @@
+# C — finance by fiscal year (1 July to 30 June), USD, accrual (US GAAP). The two latest years are the audited consolidated statements (the Foundation and
+# Wikimedia, LLC); earlier years are ProPublica's extraction of each Form 990, which classifies a little differently (2024-25: audited revenue $208.6M,
+# Form 990 $205.4M). "net-income" is the increase in net assets; "operating-expenses" is total expenses. Plans are budgets, not results.
+# The period id is the accounting reader's own (2024-07..2025-06), so a later books export lands on the same node.
+nodes:
+  - id: C:finance/2024-07-to-2025-06
+    type: finance
+    name: FY2024-25 (July 2024 to June 2025), audited
+    summary: Revenue $208.6M, expenses $190.9M (77.4% programs, 11.4% fundraising, 11.2% administration), net assets $296.6M, about 17 months of expenses; contributions $184.1M, Wikimedia Enterprise $8.3M, awards and grants $28.7M.
+    by: atom/wikimedia-foundation
+    period: 2024-07..2025-06
+    currency: USD
+    basis: accrual
+    figures: {revenue: 208567153, operating-expenses: 190938007, net-income: 24994640, cash: 72028717, assets: 310794417, liabilities: 14244387, equity: 296550030}
+    detail: {contributions-of-cash-and-financial-assets: 184053816, enterprise-revenue: 8297917, investment-income: 6862192, awards-and-grants: 28737437, salaries-and-benefits: 114039077, internet-hosting: 3474785, donation-processing: 8252081, investments-fair-value: 213347452, net-assets-with-donor-restrictions: 3815000}
+    form-990: {revenue: 205389744, expenses: 189748442, net-assets: 296550030, total-assets: 310794417}
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://projects.propublica.org/nonprofits/organizations/200049703"], confidence: 0.9, state: known}
+
+  - id: C:finance/2023-07-to-2024-06
+    type: finance
+    name: FY2023-24 (July 2023 to June 2024), audited
+    summary: Revenue $185.4M, expenses $178.5M, net assets $271.6M; contributions $168.2M, Wikimedia Enterprise $3.4M, awards and grants $26.8M.
+    by: atom/wikimedia-foundation
+    period: 2023-07..2024-06
+    currency: USD
+    basis: accrual
+    figures: {revenue: 185383511, operating-expenses: 178471109, net-income: 16584053, cash: 82845159, assets: 286759938, liabilities: 15204548, equity: 271555390}
+    detail: {contributions-of-cash-and-financial-assets: 168212977, enterprise-revenue: 3351250, investment-income: 5096842, awards-and-grants: 26820080, salaries-and-benefits: 106793960, investments-fair-value: 183365987}
+    form-990: {revenue: 185418243, expenses: 178588294, net-assets: 271555390, total-assets: 286759938}
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://projects.propublica.org/nonprofits/organizations/200049703"], confidence: 0.9, state: known}
+
+  - id: C:finance/2022-07-to-2023-06
+    type: finance
+    name: FY2022-23 (July 2022 to June 2023), Form 990
+    summary: Revenue $180.2M, expenses $168.3M, net assets $255.0M, from the Form 990.
+    by: atom/wikimedia-foundation
+    period: 2022-07..2023-06
+    currency: USD
+    basis: accrual
+    figures: {revenue: 180199672, operating-expenses: 168305333, assets: 274123369, equity: 254971336}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://projects.propublica.org/nonprofits/organizations/200049703", "https://wikimediafoundation.org/about/financial-reports/"], confidence: 0.85, state: known}
+
+  - id: C:finance/2021-07-to-2022-06
+    type: finance
+    name: FY2021-22 (July 2021 to June 2022), Form 990
+    summary: Revenue $167.9M, expenses $145.8M, net assets $239.4M, from the Form 990.
+    by: atom/wikimedia-foundation
+    period: 2021-07..2022-06
+    currency: USD
+    basis: accrual
+    figures: {revenue: 167911116, operating-expenses: 145835404, assets: 250965442, equity: 239351532}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://projects.propublica.org/nonprofits/organizations/200049703", "https://wikimediafoundation.org/about/financial-reports/"], confidence: 0.85, state: known}
+
+  - id: C:finance/2020-07-to-2021-06
+    type: finance
+    name: FY2020-21 (July 2020 to June 2021), Form 990
+    summary: Revenue $159.0M, expenses $111.7M, net assets $231.2M, from the Form 990.
+    by: atom/wikimedia-foundation
+    period: 2020-07..2021-06
+    currency: USD
+    basis: accrual
+    figures: {revenue: 158987065, operating-expenses: 111669959, assets: 240235101, equity: 231177537}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://projects.propublica.org/nonprofits/organizations/200049703", "https://wikimediafoundation.org/about/financial-reports/"], confidence: 0.85, state: known}
+
+  - id: C:finance/enterprise-2024-07-to-2025-06
+    type: finance
+    name: Wikimedia Enterprise revenue, FY2024-25
+    summary: Revenue from contracts with Enterprise customers, about 4% of the Foundation's total revenue, the first year it counted for much.
+    by: O:unit/wikimedia-enterprise
+    period: 2024-07..2025-06
+    currency: USD
+    basis: accrual
+    figures: {revenue: 8297917}
+    detail: {cash-collected: 7467500, deferred-revenue-end: 1298333}
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions"], confidence: 0.9, state: known}
+
+  - id: C:finance/enterprise-2023-07-to-2024-06
+    type: finance
+    name: Wikimedia Enterprise revenue, FY2023-24
+    summary: Revenue from contracts with Enterprise customers, $3.35M.
+    by: O:unit/wikimedia-enterprise
+    period: 2023-07..2024-06
+    currency: USD
+    basis: accrual
+    figures: {revenue: 3351250}
+    detail: {cash-collected: 3820000, deferred-revenue-end: 2128750}
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+
+  - id: C:finance/2025-07-to-2026-06
+    type: finance
+    name: FY2025-26 (July 2025 to June 2026), budget
+    summary: The annual budget was $208.5M. Audited results for the year are not out yet.
+    by: atom/wikimedia-foundation
+    period: 2025-07..2026-06
+    currency: USD
+    basis: accrual
+    figures: {budget: 208500000, revenue: {pending: "FY2025-26 audited revenue (statements usually publish in the autumn after the year ends)"}}
+    status: planned
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview"], confidence: 0.7, state: known}
+
+  - id: C:finance/2026-07-to-2027-06
+    type: finance
+    name: FY2026-27 (July 2026 to June 2027), budget
+    summary: An annual budget of $240.0M, up $31.5M (about 15%); fundraising targets of $230M for the annual fund and $10M for the Endowment; the Foundation will spend up to $10M (3%) of its reserve.
+    by: atom/wikimedia-foundation
+    period: 2026-07..2027-06
+    currency: USD
+    basis: accrual
+    figures: {budget: 240000000}
+    targets: {annual-fund: 230000000, endowment: 10000000, reserve-draw-up-to: 10000000}
+    status: planned
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027"], confidence: 0.8, state: known}

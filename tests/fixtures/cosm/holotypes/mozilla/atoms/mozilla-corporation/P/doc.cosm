@@ -1,0 +1,25 @@
+# doc.cosm: reading, history and findings.
+
+reading:
+  draft: Public sample 1
+  date: 2026-10-18
+  author: '@comprise-sample'
+  mode: research (public sources only, read 2026-10-18)
+  perspective: Mozilla Corporation as the company that makes Firefox, one of the operating companies of the Mozilla group.
+
+history:
+  - {date: '2005-08-03', event: Mozilla Corporation announced as the Foundation's taxable subsidiary, sources: ['https://en.wikipedia.org/wiki/Mozilla_Foundation']}
+  - {date: '2017-02-27', event: Pocket acquisition announced, sources: ['https://en.wikipedia.org/wiki/Pocket_(service)']}
+  - {date: 2019-10, event: Mullvad partners with Mozilla so Mozilla VPN can use its WireGuard servers (secondary source), sources: ['https://en.wikipedia.org/wiki/Mullvad']}
+  - {date: '2022', event: MDN Plus introduced, sources: ['https://developer.mozilla.org/en-US/about']}
+  - {date: '2023-04-26', event: Fakespot acquired, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf']}
+  - {date: 2023-05, event: Claims filed to wind down Mozilla Online in China, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf']}
+  - {date: '2024-06-14', event: Anonym acquired, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf']}
+  - {date: '2025-05-22', event: Pocket and Fakespot phase-out announced, sources: ['https://blog.mozilla.org/en/mozilla/building-whats-next/']}
+  - {date: '2025-09-08', event: Mozilla comments on the Google search remedies ruling, sources: ['https://blog.mozilla.org/en/mozilla/internet-policy/defending-an-open-web/']}
+  - {date: '2026-04-02', event: Anonym and Reddit move their measurement partnership to an open beta, sources: ['https://blog.mozilla.org/en/advertising/anonym-reddit-partnership/']}
+  - {date: '2026-06-16', event: Public Firefox roadmap launched with Firefox 152, sources: ['https://blog.mozilla.org/en/firefox/firefox-roadmap-152/']}
+
+findings:
+  - {check: value - concentration, nodes: ['C:contract/search-partnerships', 'P:offering/firefox'], finding: 'Royalties from search partners were $498.2 million of the group''s $680.4 million revenue and support in 2024; the Corporation''s own pages and the 2024 report describe diversification (VPN, advertising, enterprise, AI products) as the answer.', proposal: Add the Corporation's revenue by line when a filing separates it from the group's.}
+  - {check: flow fit - unpriced, nodes: ['P:offering/firefox-relay', 'P:offering/mozilla-monitor', 'P:service/mdn-plus'], finding: 'Three paid tiers show no price on the pages read: Relay Premium is waitlist-only, and Monitor''s paid tier and MDN Plus list none.', proposal: Read each product's checkout when public pricing exists.}

@@ -17,7 +17,10 @@ the developer's setting.
 The fixture project is deliberately a bit lumpy — nested folders, a long
 file name, a document with headings and footnotes, a `.girraph`, a
 `.merirmaid` — because the layout probes are looking for clipping and
-overlap, and an empty project has nothing to clip.
+overlap, and an empty project has nothing to clip. Since 0.4.3 it also holds
+the Canon round's volumes (copied from tests/fixtures/cosm/): a text with its
+EML twin, a Comprise Holotype, and — in the scratch Canon store, never the
+real one — a volume holding a text, its twin and a copy of the Holotype.
 """
 
 from __future__ import annotations
@@ -122,6 +125,40 @@ flowchart TD
 LONG_NAME = ("a-file-with-a-deliberately-very-long-name-that-the-sidebar-"
              "has-to-decide-how-to-truncate.md")
 
+# The Canon round's fixtures (0.4.3), copied — never written — from
+# tests/fixtures/cosm/. The EML pair lives in its own folder because
+# `notes.md` at the project root is FIXTURE_DOC, which half the screens read.
+COSM_FIXTURES = REPO / "tests" / "fixtures" / "cosm"
+EML_DIR = "orchard"            # orchard/notes.md + orchard/notes.md.cosm (a fresh twin)
+# A text with no twin (checkpoint B): the atem-pin scenario pins a passage's
+# atem into it, which writes its minimal twin — so the hand-made twin beside
+# it, which the cosm-viewer screens draw, never changes under them.
+LEDGER = "ledger.md"           # orchard/ledger.md
+FIXTURE_LEDGER = """# The pressing ledger
+
+We pressed apples on three Saturdays this autumn. The first press gave forty
+litres, the second sixty, and the third forty again, because the late Bramleys
+were small.
+
+Next year we want a second press, so that two teams can work at once and the
+juice spends less time waiting in the sun.
+"""
+HOLOTYPE_DIR = "meadow"        # a Comprise Holotype: holotype.cosm + atoms/
+CANON_VOLUME = "field-notes"   # in the scratch store: notes.md (+ twin), meadow/
+
+
+def _seed_cosm(dest: Path, eml_dir: str) -> None:
+    """A text with its EML twin (in `dest/eml_dir`), and the meadow Holotype,
+    under `dest`. A byte copy keeps the twin fresh: its recorded size still
+    matches, and its sha256 is what decides once the copy's mtime differs."""
+    eml = dest / eml_dir
+    eml.mkdir(parents=True, exist_ok=True)
+    for name in ("notes.md", "notes.md.cosm"):
+        shutil.copyfile(COSM_FIXTURES / "eml" / name, eml / name)
+    (eml / LEDGER).write_text(FIXTURE_LEDGER, encoding="utf-8")
+    shutil.copytree(COSM_FIXTURES / "holotypes" / "meadow", dest / HOLOTYPE_DIR,
+                    dirs_exist_ok=True)
+
 
 def seed_project(project: Path) -> None:
     """Write the fixture tree. Called before the server boots so the first
@@ -134,6 +171,19 @@ def seed_project(project: Path) -> None:
     nested = project / "drafts" / "chapter-one"
     nested.mkdir(parents=True, exist_ok=True)
     (nested / "draft.md").write_text("# Draft\n\nA nested file.\n", encoding="utf-8")
+    _seed_cosm(project, EML_DIR)
+
+
+def seed_canon(scratch: Path) -> None:
+    """One Canon volume in the SCRATCH store, before the server boots: a
+    text with its EML twin and a copy of the meadow Holotype. The store is
+    whatever `build_env(scratch)` points ENOUGH_CANON_ROOT at, and this
+    refuses to write anywhere that is not under `scratch` — a harness that
+    seeded the real ~/enough/canon would be writing into the owner's library."""
+    root = Path(build_env(scratch)["ENOUGH_CANON_ROOT"]).resolve()
+    if not root.is_relative_to(scratch.resolve()):
+        raise RuntimeError(f"refusing to seed a Canon store outside the scratch dir: {root}")
+    _seed_cosm(root / CANON_VOLUME, ".")
 
 
 # ---------------------------------------------------------------------------
@@ -226,6 +276,7 @@ class ScratchWorld:
 
     def __enter__(self) -> ScratchWorld:
         seed_project(self.project_server.project)
+        seed_canon(self.scratch)
         second = self.scratch / "second-project"
         second.mkdir(parents=True, exist_ok=True)
         (second / "readme.md").write_text("# Second\n", encoding="utf-8")

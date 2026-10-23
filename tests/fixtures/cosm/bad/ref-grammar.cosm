@@ -1,0 +1,11 @@
+oes: eml/1
+id: eml/bad-ref-grammar
+name: bad ref-grammar
+# ref-grammar: a reference field holding text instead of an id
+nodes:
+  - id: T:event/x
+    type: event
+    name: x
+    summary: An event whose agent is written as text.
+    agent: the volunteers
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

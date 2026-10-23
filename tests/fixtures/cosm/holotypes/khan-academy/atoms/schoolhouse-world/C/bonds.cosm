@@ -1,0 +1,16 @@
+# The bond this atom is party to, mirrored from atom/khan-academy/C/bonds.cosm (same id, same kinds, from and to).
+nodes:
+  - id: C:bond/affiliated-schoolhouse-world
+    type: bond
+    name: affiliated with Schoolhouse World
+    summary: "A separate 501(c)(3) co-founded in 2020 that Khan Academy lists among the nonprofits it works with. No ownership or control is disclosed, and the Form 990 Schedule R does not list it as a related organization. Both share a funder commitment (Stand Together Trust, 2024) and a technology partner (Google, 2026)."
+    kinds: [affiliated]
+    from: atom/khan-academy
+    to: atom/schoolhouse-world
+    economic: 0
+    control: none
+    basis: "Khan Academy Help Center, education organizations it works with; Form 990 Schedule R lists no relationship"
+    since: 2020
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-help-partners, f990-2025, pp-schoolhouse, standtogether, journal-google-2026], confidence: 0.8, state: known}

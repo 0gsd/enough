@@ -103,7 +103,7 @@ def test_endpoint(tmp_path: Path, monkeypatch, spy):
     _installed(monkeypatch)
     project = tmp_path / "project"
     project.mkdir()
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(tmp_path / "cacheawl"))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(tmp_path / "cacheawl"))
     monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(tmp_path / "no-infoworld"))
     app = create_app(project, "http://localhost:9", supervise=False)
     with TestClient(app) as c:

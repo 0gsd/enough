@@ -1,0 +1,37 @@
+# C: the Corporation's own public figures, from the Foundation's Schedule R. Group-level royalties and net assets are in the Foundation atom.
+nodes:
+  - id: C:finance/fy2024
+    type: finance
+    name: Corporation, 2024
+    summary: Total income $658.6 million (the State of Mozilla 2025/26 calls it Firefox-related income of $658.5 million) and end-of-year assets $1,455 million. It paid the Foundation $22.6 million in trademark licence fees, billed it $514 thousand for services, and paid it a $5 million dividend.
+    by: atom/mozilla-corporation
+    period: '2024'
+    currency: USD
+    basis: 'IRS Form 990 Schedule R of the Foundation: total income and end-of-year assets of a related C corporation'
+    figures:
+      total-income: 658550681
+      end-of-year-assets: 1455069380
+      trademark-licence-fees-paid: 22622178
+      services-billed-to-foundation: 514296
+      dividends-paid-to-foundation: 5000000
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://stateof.mozilla.org/ledger/'], confidence: 0.9, state: known}
+
+  - id: C:finance/fy2023
+    type: finance
+    name: Corporation, 2023
+    summary: Total income $603.9 million and end-of-year assets $1,339 million. It paid the Foundation $18.4 million in trademark licence fees, billed it $877 thousand for services, and paid it a $35 million dividend.
+    by: atom/mozilla-corporation
+    period: '2023'
+    currency: USD
+    basis: 'IRS Form 990 Schedule R of the Foundation: total income and end-of-year assets of a related C corporation'
+    figures:
+      total-income: 603903043
+      end-of-year-assets: 1339484033
+      trademark-licence-fees-paid: 18372038
+      services-billed-to-foundation: 877060
+      dividends-paid-to-foundation: 35000000
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf'], confidence: 0.9, state: known}

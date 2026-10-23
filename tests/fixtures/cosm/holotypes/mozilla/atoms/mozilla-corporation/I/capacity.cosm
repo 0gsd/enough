@@ -1,0 +1,17 @@
+# I: the capacity Mozilla states for the VPN.
+nodes:
+  - id: I:capacity/vpn-servers
+    type: capacity
+    name: Mozilla VPN servers and countries
+    summary: More than 500 servers in more than 30 countries, up to five devices per subscription.
+    of: P:offering/mozilla-vpn
+    unit: servers
+    value: 500
+    qualifier: more than
+    countries: 30
+    countries-qualifier: more than
+    devices-per-subscription: 5
+    status: active
+    visibility: public
+    owner: O:role/Privacy-Services-Team
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/vpn/'], confidence: 0.9, state: known}

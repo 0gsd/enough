@@ -68,7 +68,7 @@ def scratch_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     state = tmp_path / "state"
     monkeypatch.setenv("HOME", str(tmp_path / "home"))
     monkeypatch.setenv("ENOUGH_PROJECTS_STATE", str(state / "config" / "projects.json"))
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(state / "cacheawl"))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(state / "cacheawl"))
     monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(state / "no-infoworld"))
     monkeypatch.setenv("ENOUGH_WIKISINK_CONFIG", str(state / "wikisink.json"))
     monkeypatch.setenv("ENOUGH_UI_CONFIG", str(state / "ui.json"))

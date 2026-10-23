@@ -1,0 +1,6 @@
+oes: comprise/1
+# module-none: a module file that says module: none without a reason
+id: holotype/bad-module-none
+name: bad module-none
+atoms:
+  - atom/x

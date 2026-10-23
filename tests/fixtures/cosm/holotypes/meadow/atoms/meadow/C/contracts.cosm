@@ -1,0 +1,15 @@
+# C — the one contract, moved here from the COSM firm.cosm `contracts:` block (c/banks).
+nodes:
+  - id: C:contract/banks
+    type: contract
+    name: Bank feed agreement
+    summary: Per-connection monthly fee for aggregator feeds covering about 120 institutions, with a 99.5% availability commitment.
+    between: [atom/meadow, C:counterparty/banks]
+    counterparty: C:counterparty/banks
+    terms: "per-connection monthly fee; 99.5% feed availability"
+    scope: [P:service/bank-sync]
+    since: 2019-06
+    status: active
+    visibility: internal
+    owner: O:role/Founder
+    provenance: {mode: dialectic, sources: [session-2, session-3], confidence: 0.9, state: known}

@@ -160,7 +160,7 @@ class Driver:
     # -- page lifecycle -------------------------------------------------
     #: "enough's inline script has finished executing". A `const` is the only
     #: honest probe: function declarations are hoisted for the whole script
-    #: before its first statement runs, so `typeof enterCacheawlMode` is
+    #: before its first statement runs, so `typeof enterCanonMode` is
     #: already 'function' while the boot code is still halfway down the file.
     #: `UI_SCALES` is a top-level `const`, so reading it throws until
     #: execution actually reaches the declaration.
@@ -412,8 +412,9 @@ class Driver:
         '#mode-stack .mode-indicator .mode-ribbon')).reverse()
         .forEach(function (b) { try { b.click(); } catch (e) {} });
       try { if (window.wdlClose) wdlClose(); } catch (e) {}
-      ['readedit','girraph','merirmaid','wikisink','cacheawl','ref',
-       'paginated','blobview','dict'].forEach(function (n) {
+      try { if (window.atemCardClose) atemCardClose(); } catch (e) {}
+      ['readedit','girraph','merirmaid','wikisink','canon','ref',
+       'paginated','blobview','dict','cosm','cosmspec'].forEach(function (n) {
         try { modeRemove(n); } catch (e) {}
       });
       document.querySelectorAll('[id$="-modal"]').forEach(function (m) {
@@ -432,7 +433,8 @@ class Driver:
       var p = document.getElementById('preview');
       if (p) p.classList.remove('open');
       ['review-mode','edit-mode','girraph-mode','merirmaid-mode','wiki-mode',
-       'cacheawl-mode','ref-mode','paginated-mode','dict-mode'].forEach(function (id) {
+       'canon-mode','ref-mode','paginated-mode','dict-mode','cosm-mode',
+       'cosmspec-mode'].forEach(function (id) {
         var el = document.getElementById(id);
         if (el) el.classList.remove('open');
       });

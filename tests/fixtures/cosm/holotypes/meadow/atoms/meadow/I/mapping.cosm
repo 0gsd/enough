@@ -1,0 +1,15 @@
+# I — the mapping table: SKU -> P unit (rule 2). A subscription maps to the offering it entitles.
+nodes:
+  - id: I:mapping/stripe-catalog
+    type: mapping
+    name: Stripe catalog to offerings
+    summary: Every billable SKU and the offering it maps to; nothing excluded.
+    feed: I:feed/stripe
+    rows:
+      - {sku: I:sku/ledger-monthly, maps-to: P:offering/ledger}
+      - {sku: I:sku/payroll-per-run, maps-to: P:offering/payroll}
+    exclusions: []
+    status: active
+    visibility: internal
+    owner: O:role/Founder
+    provenance: {mode: manual, sources: [session-3], confidence: 0.9, state: known}

@@ -1,0 +1,89 @@
+# M: channels: the direct ones, the two app stores and the search placements that pay for the browser.
+nodes:
+  - id: M:channel/direct-download
+    type: channel
+    name: firefox.com downloads
+    summary: Firefox for Windows, macOS and Linux, plus the Beta and Nightly builds, downloaded directly.
+    model: free distribution
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/'], confidence: 0.8, state: known}
+
+  - id: M:channel/google-play
+    type: channel
+    name: Google Play
+    summary: Firefox and Firefox Focus for Android.
+    model: app-store distribution
+    seller: self
+    counterparty: C:counterparty/google-play
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/mobile/'], confidence: 0.8, state: known}
+
+  - id: M:channel/app-store
+    type: channel
+    name: Apple App Store
+    summary: Firefox and Firefox Focus for iOS.
+    model: app-store distribution
+    seller: self
+    counterparty: C:counterparty/apple-app-store
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/mobile/'], confidence: 0.8, state: known}
+
+  - id: M:channel/subscriptions
+    type: channel
+    name: Direct subscriptions
+    summary: Mozilla VPN is bought on mozilla.org with a 30-day money-back guarantee for first-time customers; Firefox Relay Premium is a waitlist.
+    model: subscription
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/vpn/', 'https://relay.firefox.com/'], confidence: 0.8, state: known}
+
+  - id: M:channel/enterprise-sales
+    type: channel
+    name: Firefox Enterprise sales
+    summary: Buyers contact sales; standard support is included and Professional Support is a paid upgrade.
+    model: negotiated sale
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/enterprise/'], confidence: 0.8, state: known}
+
+  - id: M:channel/advertising-sales
+    type: channel
+    name: Mozilla Advertising sales
+    summary: Ads on Firefox and MDN sold through a contact-sales route; Anonym sold to advertisers directly.
+    model: negotiated sale
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/advertising/'], confidence: 0.8, state: known}
+
+  - id: M:channel/search-placement
+    type: channel
+    name: Search placements in Firefox
+    summary: The default or optional search engine slots that partners pay royalties for; the partner is the payer, not the seller.
+    model: revshare
+    seller: counterparty
+    counterparty: C:counterparty/google
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://blog.mozilla.org/en/mozilla/internet-policy/defending-an-open-web/'], confidence: 0.7, state: known}
+
+  - id: M:channel/ai-platforms
+    type: channel
+    name: AI product accounts
+    summary: Tabstack accounts start with 10,000 free credits and no card; 0DIN offers a free first-pass assessment and a bug-bounty program.
+    model: self-serve and negotiated
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://tabstack.ai/', 'https://0din.ai/'], confidence: 0.8, state: known}

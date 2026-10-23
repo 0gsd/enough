@@ -1,0 +1,36 @@
+# C: bonds. Mozilla.org owns MZLA at 100% (Thunderbird's donate page); the Foundation licenses the marks. Both mirrored from their atoms.
+nodes:
+  - id: C:bond/foundation-licenses-mzla
+    type: bond
+    name: Foundation licenses the Thunderbird marks to MZLA
+    summary: 'MZLA pays the Foundation a royalty based on revenue from certain products: $415 thousand for 2024, $267 thousand for 2023.'
+    kinds: [licenses]
+    from: atom/mozilla-foundation
+    to: atom/mzla
+    control: none
+    scope: ['atom/mozilla-org//C:ip/mozilla-trademarks']
+    terms: royalty on revenue from certain products under a trademark license agreement
+    pending: After the 2026 transfer the FAQ says Mozilla.org owns the trademarks; which entity is the licensor now?
+    contract: atom/mozilla-foundation//C:contract/trademark-license-mzla
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://wiki.mozilla.org/Mozilla_org'], confidence: 0.7, state: known}
+
+  - id: C:bond/org-owns-mzla
+    type: bond
+    name: Mozilla.org owns MZLA
+    summary: Thunderbird's donate page says MZLA is a wholly owned for-profit subsidiary of the not-for-profit Mozilla.org, and its about page says Thunderbird operates in a separate for-profit subsidiary of Mozilla.org; the 2024 filings and the May 2025 privacy notice had MZLA wholly owned by the Foundation.
+    kinds: [owns]
+    from: atom/mozilla-org
+    to: atom/mzla
+    economic: 1.0
+    voting: 1.0
+    control: full
+    basis: 'Thunderbird donate page: a wholly owned for-profit subsidiary of the not-for-profit Mozilla.org; the Foundation held it at 100% in the 2024 filings'
+    accounting: consolidated
+    nci: 0
+    inherits: [principles]
+    since: {pending: 'date the shares moved to Mozilla.org: the FAQ says 2026, not when'}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/donate/', 'https://www.thunderbird.net/en-US/about/', 'https://wiki.mozilla.org/Mozilla_org', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}

@@ -155,7 +155,7 @@ def reveal_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     home = tmp_path / "home"
     (home / "enough" / "config").mkdir(parents=True)
     monkeypatch.setenv("HOME", str(home))
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(tmp_path / "cacheawl"))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(tmp_path / "cacheawl"))
     monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(tmp_path / "no-infoworld"))
     monkeypatch.setenv("ENOUGH_WIKISINK_CONFIG", str(tmp_path / "wikisink.json"))
     monkeypatch.setenv("ENOUGH_UI_CONFIG", str(tmp_path / "ui.json"))

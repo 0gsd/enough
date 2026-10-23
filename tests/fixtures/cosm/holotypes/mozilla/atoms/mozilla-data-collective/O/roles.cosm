@@ -1,0 +1,9 @@
+# O: one role.
+nodes:
+  - id: O:role/Founder-and-Chief-Executive
+    type: role
+    name: Founder and Chief Executive
+    summary: The seat the leadership page titles "Founder and CEO, Mozilla Data Collective".
+    governs: ['P:mozilla-data-collective']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/', 'https://wiki.mozilla.org/Mozilla_org'], confidence: 0.8, state: known}

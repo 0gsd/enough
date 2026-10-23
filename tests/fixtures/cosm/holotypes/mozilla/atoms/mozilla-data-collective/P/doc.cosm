@@ -1,0 +1,17 @@
+# doc.cosm.
+
+reading:
+  draft: Public sample 1
+  date: 2026-10-18
+  author: '@comprise-sample'
+  mode: research (public sources only, read 2026-10-18)
+  perspective: Mozilla Data Collective Limited as the newest company in the Mozilla group.
+
+history:
+  - {date: '2025-07-30', event: Announced as a sister platform to Common Voice, sources: ['https://discourse.mozilla.org/t/exciting-news-mozilla-data-collective/145191']}
+  - {date: 2025-10, event: Common Voice datasets become available only through the Data Collective, sources: ['https://huggingface.co/spaces/mozilla-foundation/README/blob/main/README.md']}
+  - {date: '2026-02-25', event: Mozilla Data Collective Limited incorporated in England and Wales, sources: ['https://find-and-update.company-information.service.gov.uk/company/17054959']}
+  - {date: '2026-05-06', event: Terms of service updated, sources: ['https://mozilladatacollective.com/terms']}
+
+findings:
+  - {check: ownership - unrecorded, nodes: ['C:bond/org-backs-mdc', 'C:bond/foundation-incubated-mdc'], finding: 'Two Mozilla organizations are affiliated with the company, and Companies House records no one with significant control: the model holds both affiliations and no ownership share.', proposal: Ask what "mission-locked" means in the articles when they are published.}

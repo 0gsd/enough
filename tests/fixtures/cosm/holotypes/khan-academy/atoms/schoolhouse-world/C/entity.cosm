@@ -1,0 +1,20 @@
+# Schoolhouse World Inc: a thin atom, one entity and the bond it mirrors; the other seven modules are `module: none` with a reason.
+# It is a separate legal entity with its own Form 990 filings and its own offerings, so it is an atom rather than a record inside Khan Academy.
+nodes:
+  - id: C:entity/schoolhouse-world-inc
+    type: entity
+    name: Schoolhouse World Inc
+    summary: "The nonprofit behind Schoolhouse.world, free live small-group tutoring over video, beginning with high school math and SAT preparation and led by trained volunteer tutors, plus a civil-dialogue program. A California corporation formed in 2020, a 501(c)(3) exempt since June 2021, with a calendar fiscal year. In 2024: revenue $4.2M, expenses $4.1M, net assets $7.6M."
+    anchor: true
+    form: nonprofit
+    roles: [company, brand]
+    jurisdiction: US-CA
+    registered-office: "Palo Alto, CA (the mailing address on Form 990)"
+    global-id: {ein: "85-3101725", domain: schoolhouse.world}
+    domains: [schoolhouse.world]
+    tax-status: "501(c)(3), exemption issued June 2021"
+    fiscal-year: calendar
+    since: "2020"
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [pp-schoolhouse, f990-schoolhouse-2024, schoolhouse-about, ka-help-partners], confidence: 0.9, state: known}

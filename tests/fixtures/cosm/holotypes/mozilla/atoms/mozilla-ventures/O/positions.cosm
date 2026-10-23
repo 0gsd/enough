@@ -1,0 +1,12 @@
+# O: the one seat; investment-team seats are not published.
+nodes:
+  - id: O:position/managing-partner
+    type: position
+    name: Managing Partner
+    summary: The head of Mozilla Ventures.
+    roles: ['O:role/Managing-Partner']
+    primary: O:role/Managing-Partner
+    reports-to: {pending: who the Managing Partner reports to is not published}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.8, state: known}

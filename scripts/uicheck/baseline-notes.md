@@ -12,7 +12,7 @@ that went away were not amnestied; they were fixed or they were never real:
 | `#help-viewer .close`, `#mini-face-btn`, `#mini-full-btn` offscreen | 64 | fixed — a CLOSED side panel now has no controls (`visibility: hidden`) |
 | the paradigm / skill toggle dots and `#project-edit` at 13×12 and 15×14 | 52 | fixed — 20×20 and 22×22 hit areas, same glyphs, same row heights |
 | the model modal's `×` and `#apply-model-btn` offscreen | 2 | fixed — `max-height` + an internal scroll |
-| the cacheawl tile name overflowing its tile | 1 | fixed — `text-overflow: ellipsis` |
+| the cacheawl (now canon) tile name overflowing its tile | 1 | fixed — `text-overflow: ellipsis` |
 | form controls in a height-capped modal "covered by the modal foot" | ~24 | never real — `find_covered`/`find_overlaps` now honour a scroller the way `find_offscreen` always has (`geometry.scrolled_past`) |
 | the composure toolbar "covered" by the readvisor panel in `rv-full` | ~30 | never real — `#readvisor-panel` joined `LAYER_SEL`; a panel that is *meant* to cover the stage is the design, like a modal |
 | everything else | the rest | the P3/P4c screens they were reported under now measure the state they name (see `Driver.BOOTED`), so a dozen screens stopped reporting a blank composure's findings under a form's name |
@@ -72,12 +72,14 @@ button is the one slot the fold never sheds, and at that size the toolbar's
 fixed part alone is wider than the stage. **The toolbar needs an overflow
 menu for its last slot at large scales.**
 
-## 3. Native checkboxes and radios at 13×13 — 10 entries — **a form-control pass**
+## 3. Native checkboxes and radios at 13×13 — 11 entries — **a form-control pass**
 
 `modal-paginate` ×5 (`#pg-bring-in`, `#pg-headers`, `#pg-page-numbers`, two
 `label.cv-radio>input`), `modal-ui` (`#ui-help-bubbles`), `modal-model`
 (`#auto-reset-toggle`), `modal-wikisink-setup`
-(`#wiki-flavor-list>label.wiki-flavor>input`), `cacheawl` (`#ca-ingest-all`),
+(`#wiki-flavor-list>label.wiki-flavor>input`), `canon` and `canon-volume`
+(`#cn-ingest-all` — the same ingest bar, once on the volume list and once
+inside a volume; the second screen joined in 0.4.3),
 `modal-broker` (`.broker-toggle`, 14×14).
 
 These are **the browser's own `<input type=checkbox|radio>` at its default
@@ -153,3 +155,16 @@ If you fix one of the families above, delete its entries in the same change.
 If you add an entry, add a paragraph here saying what it is, why it is
 accepted and who should fix it — an entry with no owner is an entry nobody
 will ever action.
+
+### The composures menu's 38th row at ultrawide, Japanese (accepted 0.4.3, owner: the composure lane)
+
+`composure-composures-menu | covered | #comp-menu>button:nth-of-type(38) | #comp-viewport`
+appears only when the quick run reaches its third language (ja) at 3440×1440:
+by then seven composure scenarios have each saved one composure per language,
+so the menu lists 38+ rows. `compPlaceMenu` caps the menu at the stage's
+height, yet its last row's centre still hit-tests to `#comp-viewport` there,
+most likely a UI-zoom unit mismatch between the stage's `clientHeight` and the
+menu's `top`. The 0.4.3 Canon round did not touch the composure menu (it only
+added screens, which is what let the list grow that long); recorded as a
+follow-up in that round's plan. Fix the placement, or reset the harness's
+composures between languages, and delete this entry.

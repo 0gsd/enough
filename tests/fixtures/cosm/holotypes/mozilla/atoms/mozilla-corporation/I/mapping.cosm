@@ -1,0 +1,14 @@
+# I: both plans map to the one VPN offering.
+nodes:
+  - id: I:mapping/vpn-plans
+    type: mapping
+    name: VPN plans to the VPN offering
+    summary: Both plans entitle a subscriber to Mozilla VPN.
+    rows:
+      - {sku: 'I:sku/vpn-monthly', maps-to: 'P:offering/mozilla-vpn'}
+      - {sku: 'I:sku/vpn-annual', maps-to: 'P:offering/mozilla-vpn'}
+    exclusions: []
+    status: active
+    visibility: public
+    owner: O:role/Privacy-Services-Team
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/vpn/'], confidence: 0.9, state: known}

@@ -1,0 +1,47 @@
+# O — roles of the Endowment's public governance shape. It has no employees: the President and the Treasurer are Foundation employees (Form 990 FAQ), so those seats are
+# marked shared-with the Foundation. Titles only; no holder is named anywhere.
+nodes:
+  - id: O:role/board-of-directors
+    type: role
+    name: Board of Directors
+    summary: "The Endowment's own governing body, separate from the Foundation's Board: elects its successors, appropriates the year's spending in July, sets the investment and spending policies, and oversees the audit."
+    decides: ["the annual appropriation for spending", "the investment policy and the spending policy", "election of directors"]
+    governs: [C:entity/wikimedia-endowment, C:charter/bylaws, C:governance/director-election, C:policy/investment, C:policy/spending, C:policy/gifts]
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Bylaws", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://foundation.wikimedia.org/wiki/Endowment:Main"], confidence: 0.85, state: known}
+    pool: false
+    status: active
+    visibility: public
+
+  - id: O:role/president
+    type: role
+    name: President
+    summary: The chief executive officer under the bylaws, managing the Endowment's business under Board control; a Foundation employee, listed on the site as interim.
+    governs: [P:wikimedia-endowment, P:offering/project-grants, P:offering/legacy-giving, P:service/grantmaking]
+    escalates-to: O:role/board-of-directors
+    pending: "whether the seat is filled or interim (the site lists an interim President)"
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Bylaws", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://wikimediaendowment.org/"], confidence: 0.8, state: known}
+    pool: false
+    status: active
+    visibility: public
+
+  - id: O:role/treasurer
+    type: role
+    name: Treasurer
+    summary: The chief financial officer under the bylaws, overseeing funds and accounts; a Foundation employee paid through the cost-sharing arrangement.
+    governs: [P:offering/permanent-fund, P:function/investment-management, C:asset/endowment-fund, C:finance/2024-07-to-2025-06]
+    escalates-to: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Bylaws", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.8, state: known}
+    pool: false
+    status: active
+    visibility: public
+
+  - id: O:role/secretary-and-legal-counsel
+    type: role
+    name: Secretary and Legal Counsel
+    summary: Oversees the Board's records, notices and minute books; the Form 990 reports no compensation for the Secretary.
+    governs: [O:chart/endowment, C:filing/form-990-2024]
+    escalates-to: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Bylaws", "https://wikimediaendowment.org/", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.75, state: known}
+    pool: false
+    status: active
+    visibility: public

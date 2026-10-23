@@ -12,7 +12,7 @@ enough est un système de langage personnel : un endroit pour planifier, lire, �
 
 **Text-planning est la maison.** Dites-moi ce que vous voulez écrire et nous bâtirons un plan ensemble, puis des échafaudages par section que vous remplirez de votre propre prose. D'autres paradigmes couvrent la traduction et la conception de vos propres flux de travail.
 
-**La référence est locale.** Le dictionnaire donne le sens, le son, l'histoire et la parenté de n'importe quel mot : faites un clic droit sur un mot, ou parcourez-le depuis les préférences ui. Wikisink est une Wikipédia hors ligne. Cacheawl garde les sources que vous rassemblez.
+**La référence est locale.** Le dictionnaire donne le sens, le son, l'histoire et la parenté de n'importe quel mot : faites un clic droit sur un mot, ou parcourez-le depuis les préférences ui. Wikisink est une Wikipédia hors ligne. Canon garde les sources que vous rassemblez.
 
 **Il grandit avec vous.** Les compétences, les readvisors et les paradigmes sont de simples fichiers que vous pouvez lire, modifier ou écrire vous-même, et je peux vous aider à les construire.
 

@@ -2,7 +2,7 @@ Hi, hier ist Graham, der Erfinder von enough. Dieses Dokument – diesen Teil hi
 
 # das enough-Hilfe-Center
 
-> Alles, was du mit enough machen kannst, an einem Ort. Geschrieben für enough **0.4.2**. Neu in dieser Runde: FEED wächst auf rund 117.000 Wörter, jedes mit frisch geschriebenen Beispielsätzen (Abschnitt 13); und ein Projekt öffnet jetzt mit seiner eigenen Composure statt mit einer leeren Seite: der einzigen, in der etwas steht, sonst der zuletzt benutzten, oder der, die du in ihren eigenen Einstellungen festlegst (Abschnitt 4.7). Aus der Wörterbuch-Runde: **das Wörterbuch** — FEED, das hauseigene englische Wörterbuch von enough: rund 117.000 Wörter mit ihrem Klang, ihren Familien und ihren Geschichten, auf deinem eigenen Rechner gebaut, einen Rechtsklick von jedem Wort entfernt, das du gerade liest, und mit Platz daneben für Wörter, die du selbst mitbringst (Abschnitt 13); **text-planning** als Heimat-Paradigma, in dem jedes Projekt beginnt, mit dem alten Paradigma `default` darin aufgegangen (Abschnitt 16); eine kurze Einführung in enough, einen Klick entfernt in einem leeren Gespräch (Abschnitt 5); und ein Inhaltsverzeichnis, eine Suche und lebendige Abschnittslinks in diesem Handbuch (Abschnitt 10). Aus der Runde davor davor: **`/pal`**, wobei dein Chef-Readvisor erst hier, lokal, nachdenkt und dann eine einzige zugespitzte Frage an das von dir eingerichtete Cloud-Modell schickt und dir genau zeigt, was die Maschine verlassen hat (Abschnitt 15.3); und Räte, die als Antwort, als Dokument oder als neue Composure enden, mit einem einzeiligen Auftrag pro Readvisor und einem Weg, einen bereits abgeschlossenen Rat erneut einzuberufen (Abschnitt 18). Aus der Composure-Runde: die Leinwand, die jetzt der Boden jedes Projekts ist, mit dem Gespräch in einem Panel daneben (Abschnitte 4 und 5); **Readvisors**, wie die Rollen jetzt heißen, angeführt von einem Chef-Readvisor namens Ed (Abschnitt 17); **Räte**, in denen mehrere Readvisors reihum über eine Sache nachdenken, schriftlich, während du zusiehst (Abschnitt 18); und zwei Skills, `readvisory` und `scaffold` (Abschnitt 19). Ein Projekt, das vor jener Runde angelegt wurde, bekommt seinen Ordner `rness/roles/` beim nächsten Öffnen in `rness/readvisors/` umbenannt, mit unversehrten Ein/Aus-Einstellungen (Abschnitt 8). Ebenfalls hier, aus den Runden davor: der Startbildschirm (jedes Projekt, das du je begonnen hast, in einer Liste, mit einem Weg hinein und einem Weg zurück hinaus — Abschnitt 2), die Konvertierungsrunde (PDFs, Word-Dokumente, E-Books, Präsentationen und Arbeitsmappen öffnen als bearbeitbare Markdown-Zwillinge, mit Export, Sync und einem Bildbetrachter — Abschnitt 7), die Skills-Runde (analyzers neuer Audit-Modus, der Skill `anything-finder`, und das Erstnutzungs-Audit, das jeden Skill liest, den enough nicht mitgeliefert hat, bevor er hereingelassen wird), der Runde vom August 2026 (sieben lokale Modelle mit machbarkeitsgeprüften Installationen, und **enough.app** — die signierte, notariell beglaubigte Desktop-Anwendung), der Interface-Runde vom Juli 2026 (der Modus-Stapel, Hilfeblasen pro Ordner, girraph→merirmaid-Spiegel), und der 0.3.0-Einstellungsrunde (UI- und Textgröße pro Projekt, und die Oberfläche + Hilfe in sechs Sprachen — Abschnitt 10). Wo dieses Dokument und die App vor dir sich widersprechen, hat die App recht und dieses Dokument einen Fehler — Korrekturen willkommen unter [enough.support](https://enough.support).
+> Alles, was du mit enough machen kannst, an einem Ort. Geschrieben für enough **0.4.3**. Neu in dieser Runde: **Canon**, die Bibliothek, zu der Cacheawl wurde, in der jeder Band einen Katalog über sich selbst führt und dein alter Speicher von allein umgezogen ist (Abschnitt 12); **MacroCOSM OES**, die Grammatik, in der jede `.cosm`-Datei geschrieben ist, mit einem Betrachter für ihre Spezifikation (Abschnitt 13); `.cosm`-Dateien und die Holotypes von Comprise, die im cosm-Betrachter öffnen (Abschnitt 12.3); und **EML-Zwillinge** und **atems** — ein Text, auseinandergenommen in das, was er sagt (Abschnitt 12.4), und das Ganze davon in einer Zeile (Abschnitt 12.5). Aus der letzten Runde: FEED wuchs auf rund 117.000 Wörter, jedes mit frisch geschriebenen Beispielsätzen (Abschnitt 14), und ein Projekt öffnete fortan mit seiner eigenen Composure statt mit einer leeren Seite (Abschnitt 4.7). Aus der Wörterbuch-Runde: **das Wörterbuch** — FEED, das hauseigene englische Wörterbuch von enough: rund 117.000 Wörter mit ihrem Klang, ihren Familien und ihren Geschichten, auf deinem eigenen Rechner gebaut, einen Rechtsklick von jedem Wort entfernt, das du gerade liest, und mit Platz daneben für Wörter, die du selbst mitbringst (Abschnitt 14); **text-planning** als Heimat-Paradigma, in dem jedes Projekt beginnt, mit dem alten Paradigma `default` darin aufgegangen (Abschnitt 17); eine kurze Einführung in enough, einen Klick entfernt in einem leeren Gespräch (Abschnitt 5); und ein Inhaltsverzeichnis, eine Suche und lebendige Abschnittslinks in diesem Handbuch (Abschnitt 10). Aus der Runde davor: **`/pal`**, wobei dein Chef-Readvisor erst hier, lokal, nachdenkt und dann eine einzige zugespitzte Frage an das von dir eingerichtete Cloud-Modell schickt und dir genau zeigt, was die Maschine verlassen hat (Abschnitt 16.3); und Räte, die als Antwort, als Dokument oder als neue Composure enden, mit einem einzeiligen Auftrag pro Readvisor und einem Weg, einen bereits abgeschlossenen Rat erneut einzuberufen (Abschnitt 19). Aus der Composure-Runde: die Leinwand, die jetzt der Boden jedes Projekts ist, mit dem Gespräch in einem Panel daneben (Abschnitte 4 und 5); **Readvisors**, wie die Rollen jetzt heißen, angeführt von einem Chef-Readvisor namens Ed (Abschnitt 18); **Räte**, in denen mehrere Readvisors reihum über eine Sache nachdenken, schriftlich, während du zusiehst (Abschnitt 19); und zwei Skills, `readvisory` und `scaffold` (Abschnitt 20). Ein Projekt, das vor jener Runde angelegt wurde, bekommt seinen Ordner `rness/roles/` beim nächsten Öffnen in `rness/readvisors/` umbenannt, mit unversehrten Ein/Aus-Einstellungen (Abschnitt 8). Ebenfalls hier, aus den Runden davor: der Startbildschirm (jedes Projekt, das du je begonnen hast, in einer Liste, mit einem Weg hinein und einem Weg zurück hinaus — Abschnitt 2), die Konvertierungsrunde (PDFs, Word-Dokumente, E-Books, Präsentationen und Arbeitsmappen öffnen als bearbeitbare Markdown-Zwillinge, mit Export, Sync und einem Bildbetrachter — Abschnitt 7), die Skills-Runde (analyzers neuer Audit-Modus, der Skill `anything-finder`, und das Erstnutzungs-Audit, das jeden Skill liest, den enough nicht mitgeliefert hat, bevor er hereingelassen wird), die Runde vom August 2026 (sieben lokale Modelle mit machbarkeitsgeprüften Installationen, und **enough.app** — die signierte, notariell beglaubigte Desktop-Anwendung), die Interface-Runde vom Juli 2026 (der Modus-Stapel, Hilfeblasen pro Ordner, girraph→merirmaid-Spiegel), und die 0.3.0-Einstellungsrunde (UI- und Textgröße pro Projekt, und die Oberfläche + Hilfe in sechs Sprachen — Abschnitt 10). Wo dieses Dokument und die App vor dir sich widersprechen, hat die App recht und dieses Dokument einen Fehler — Korrekturen willkommen unter [enough.support](https://enough.support).
 
 enough ist ein persönliches Sprachsystem, das auf deinem eigenen Rechner läuft. Du richtest es auf einen Ordner, sprichst mit ihm, und es hilft dir beim Planen, Schreiben, Überarbeiten, Recherchieren und Übersetzen. Die Modelle sind standardmäßig lokal. Deine Dateien bleiben deine. Und fast alles, was du es tun siehst, ist in schlichten Markdown-Dateien festgelegt, die du öffnen, lesen und ändern kannst.
 
@@ -16,13 +16,13 @@ Behalte beim Lesen einen Gedanken im Hinterkopf: **die eingebauten Funktionen in
 
 - Ein Mac mit Apple Silicon. (enough wird auf macOS gebaut und getestet. Linux-Unterstützung ist geplant; Windows ist machbar.)
 - Plattenplatz für mindestens ein Modell — das kleinste ist etwa 5 GB.
-- Keine Konten, keine API-Schlüssel, keine Abos. Sofern du dich nicht später für den Cloud-Modell-Slot entscheidest (Abschnitt 15.2), läuft alles lokal.
+- Keine Konten, keine API-Schlüssel, keine Abos. Sofern du dich nicht später für den Cloud-Modell-Slot entscheidest (Abschnitt 16.2), läuft alles lokal.
 
 ### 1.2 Installieren
 
 Zwei Türen, ein Haus.
 
-**Die App — der kurze Weg.** Lade das `enough`-DMG von der Releases-Seite herunter, öffne es, zieh **enough** in den Programme-Ordner und starte es. macOS wird anmerken, dass es sich um eine App aus dem Internet handelt — sie ist signiert und notariell beglaubigt, also ist das der freundliche blaue Dialog mit einem **Öffnen**-Button, einmal, keine Warnung, gegen die du ankämpfen musst. Ein Erststart-Assistent übernimmt von dort: er baut seine eigene Python-Umgebung, zeigt dir die Modellliste mit einem ehrlichen Urteil darüber, was auf *diesen* Rechner passt (Abschnitt 15.1), listet auf, welche optionalen Extras du schon hast, und übergibt dich an den Startbildschirm, um den Ordner zu wählen, in dem du arbeiten willst (Abschnitt 2). Der größte Teil der Wartezeit ist Modell-Download. Kein Terminal, kein Homebrew, kein git.
+**Die App — der kurze Weg.** Lade das `enough`-DMG von der Releases-Seite herunter, öffne es, zieh **enough** in den Programme-Ordner und starte es. macOS wird anmerken, dass es sich um eine App aus dem Internet handelt — sie ist signiert und notariell beglaubigt, also ist das der freundliche blaue Dialog mit einem **Öffnen**-Button, einmal, keine Warnung, gegen die du ankämpfen musst. Ein Erststart-Assistent übernimmt von dort: er baut seine eigene Python-Umgebung, zeigt dir die Modellliste mit einem ehrlichen Urteil darüber, was auf *diesen* Rechner passt (Abschnitt 16.1), listet auf, welche optionalen Extras du schon hast, und übergibt dich an den Startbildschirm, um den Ordner zu wählen, in dem du arbeiten willst (Abschnitt 2). Der größte Teil der Wartezeit ist Modell-Download. Kein Terminal, kein Homebrew, kein git.
 
 Die App bringt ihre eigene Inferenz-Engine und Python mit. Die optionalen Extras — Spracheingabe, Webseiten-Abruf, Grammatikprüfung, Übersetzung — sind weiterhin eigenständige Programme; die Extras-Seite des Assistenten nennt jedes einzelne, was ohne es abgeschaltet bleibt, und wie man es bekommt. Nichts ist erforderlich, und nichts installiert sich hinter deinem Rücken. Ein Extra ist gar kein eigenständiges Programm: **PDF-Lesen** installiert sich aus enough heraus, wann immer du willst (Abschnitt 7.8).
 
@@ -42,7 +42,7 @@ Der Launcher führt `bootstrap.sh` aus, einen zehnstufigen interaktiven Installe
 3. Die Helferprogramme installieren, auf die sich enough stützt: `llama.cpp` (lokale Modell-Inferenz), `whisper-cpp` (Spracheingabe), `tor` (anonymisierte Web-Abrufe) und `harper` (lokale Grammatikprüfung, vom analyzer-Skill genutzt). Die Dokumentkonverter — pandoc, um abgerufene Webseiten und Word-Dateien in Markdown zu verwandeln, und typst, zum Schreiben von PDFs — stehen nicht mehr auf dieser Liste: sie sind in enoughs eigener Python-Umgebung enthalten, installiert in Schritt 5, auf jeder Plattform. Falls du zufällig ein eigenes pandoc von Homebrew hast, nutzt enough stattdessen dieses.
 4. `~/enough/` einrichten, das globale Installationsverzeichnis.
 5. die Python-Umgebung vorbereiten (über `uv`).
-6. Modellgewichte herunterladen. Jedes unterstützte Modell wird einzeln angeboten, jeweils mit seiner Größe und einer Machbarkeitsprüfung gegen den Arbeitsspeicher und freien Plattenplatz deines Rechners — ✓ heißt komfortabel, ~ heißt knapp, ✗ heißt woanders suchen. Sag ja zu so vielen oder so wenigen, wie du willst; Abschnitt 15.1 beschreibt sie alle, und was du auslässt, ist später eine Ein-Klick-Installation.
+6. Modellgewichte herunterladen. Jedes unterstützte Modell wird einzeln angeboten, jeweils mit seiner Größe und einer Machbarkeitsprüfung gegen den Arbeitsspeicher und freien Plattenplatz deines Rechners — ✓ heißt komfortabel, ~ heißt knapp, ✗ heißt woanders suchen. Sag ja zu so vielen oder so wenigen, wie du willst; Abschnitt 16.1 beschreibt sie alle, und was du auslässt, ist später eine Ein-Klick-Installation.
 7. das Spracheingabe-Modell (whisper) platzieren.
 8. das Offline-Übersetzungsmodell platzieren, genutzt vom Skill `translator`.
 9. den Befehl `enough` in deinen PATH legen.
@@ -129,7 +129,7 @@ Ein Projekt, dessen Ordner gerade nicht da ist — ein abgestecktes externes Lau
 
 ### 2.2 Ein Projekt anklicken: die Karte
 
-Ein einzelner Klick öffnet kein Projekt. Er zeichnet dir eine **Karte** davon: ein nur lesbares merirmaid-Diagramm (Abschnitt 21) des sichtbaren Inhalts des Ordners, mit einem kleinen Info-Knoten oben, der den Pfad, die Dateizahl, die ¶- und W-Summen trägt, sowie wann das Projekt erstellt, zuletzt geöffnet und zuletzt bearbeitet wurde. Es ist dieselbe Art von Bild, die cacheawl für eine Cachebox zeichnet (Abschnitt 12.1), nur auf ein Projekt gerichtet.
+Ein einzelner Klick öffnet kein Projekt. Er zeichnet dir eine **Karte** davon: ein nur lesbares merirmaid-Diagramm (Abschnitt 22) des sichtbaren Inhalts des Ordners, mit einem kleinen Info-Knoten oben, der den Pfad, die Dateizahl, die ¶- und W-Summen trägt, sowie wann das Projekt erstellt, zuletzt geöffnet und zuletzt bearbeitet wurde. Es ist dieselbe Art von Bild, die Canon von einem Band zeichnet, wenn du auf seiner Kachel den kleinen Diagramm-Button anklickst (Abschnitt 12.1), nur auf ein Projekt gerichtet.
 
 Die Karte ist für den Moment gedacht, in dem du vier Ordner mit plausiblen Namen hast und wissen willst, in welchem die Kapitel stecken. Hinschauen, dann entscheiden.
 
@@ -195,9 +195,9 @@ Die meiste Software gibt dir Funktionen. enough gibt dir Mechanismen. Persönlic
 - **`AGENT.md`** — wer dein Chef-Readvisor ist und wie er arbeitet (Abschnitt 5.3)
 - **`MOTIVATION.md`** — warum: Werte, Prioritäten, wie sich „fertig“ anfühlt
 - **Richtlinien** — feste Regeln darüber, was gelesen, geschrieben und abgerufen werden darf (Abschnitt 5.4)
-- **Das aktive Paradigma** — das gerade geltende Denkgerüst (Abschnitt 16)
-- **Aktivierte Skills** — Fähigkeiten, auf die sie zurückgreifen können (Abschnitt 19)
-- **Aktivierte Readvisors** — andere Urteile, die in die Stimme eingefaltet oder in einen Rat gesetzt werden (Abschnitt 17)
+- **Das aktive Paradigma** — das gerade geltende Denkgerüst (Abschnitt 17)
+- **Aktivierte Skills** — Fähigkeiten, auf die sie zurückgreifen können (Abschnitt 20)
+- **Aktivierte Readvisors** — andere Urteile, die in die Stimme eingefaltet oder in einen Rat gesetzt werden (Abschnitt 18)
 - **Das Projektprofil** — was über dieses Projekt gelernt wurde (Abschnitt 8.1)
 
 Bearbeite eines davon, in der App oder in einem beliebigen Texteditor, und die Änderung wirkt ab der nächsten Nachricht. Kein Neubau, kein Neustart, keine Plugin-API. Wenn du eine Markdown-Datei schreiben kannst, kannst du deine Readvisors umprogrammieren.
@@ -208,7 +208,7 @@ Alles Anpassbare folgt einem Muster: **Defaults leben in `~/enough/defaults/`, P
 
 Bearbeite eine Datei in `~/enough/defaults/`, und jedes Projekt, das noch damit verlinkt ist, übernimmt die Änderung. In einem Projekt eine verlinkte Datei öffnen und auf **anpassen** klicken — der Link wird zu einer projektlokalen Kopie, und von da an geht dieses Projekt seinen eigenen Weg, während die anderen weiter dem globalen Default folgen. Der Dateibaum zeigt dir auf einen Blick, was was ist: verlinkte Dateien erscheinen *kursiv und gedämpft*, lokale Kopien normal.
 
-Neue Skills und Paradigmen, die in `~/enough/defaults/` abgelegt werden, erscheinen beim nächsten Start in jedem Projekt; Readvisors haben ein zweites, beschreibbares Zuhause für sich in `~/enough/readvisors/` (Abschnitt 17). Skills und Readvisors kommen ausgeschaltet an, sodass sich nichts hinter deinem Rücken ändert; du aktivierst sie pro Projekt, wenn du sie willst. Ein Skill, den enough nicht mitgeliefert hat — heruntergeladen, von einem Freund geschickt, während einer Sitzung für dich geschrieben — wird gelesen, bevor er hereingelassen wird. Abschnitt 19.9 behandelt das.
+Neue Skills und Paradigmen, die in `~/enough/defaults/` abgelegt werden, erscheinen beim nächsten Start in jedem Projekt; Readvisors haben ein zweites, beschreibbares Zuhause für sich in `~/enough/readvisors/` (Abschnitt 18). Skills und Readvisors kommen ausgeschaltet an, sodass sich nichts hinter deinem Rücken ändert; du aktivierst sie pro Projekt, wenn du sie willst. Ein Skill, den enough nicht mitgeliefert hat — heruntergeladen, von einem Freund geschickt, während einer Sitzung für dich geschrieben — wird gelesen, bevor er hereingelassen wird. Abschnitt 20.10 behandelt das.
 
 ### 3.2 Die drei Bausteinarten
 
@@ -217,11 +217,11 @@ Neue Skills und Paradigmen, die in `~/enough/defaults/` abgelegt werden, erschei
 | Was es ist | ein Denkgerüst — wie an Arbeit herangegangen wird | eine fokussierte Fähigkeit — Vokabular, Rezepte, Abläufe | ein zweites Urteil — mit eigener AGENT.md + MOTIVATION.md |
 | Wie viele aktiv | immer genau eines | beliebig viele eingeschaltet | beliebig viele eingeschaltet |
 | Liegt unter | `rness/paradigms/<name>.md` | `rness/skills/<name>/SKILL.md` | `rness/readvisors/<name>/` |
-| Mitgelieferte Beispiele | text-planning (Heimat), translation, workflow-design | analyzer, anything-finder, girraph-merirmaid, lexicographer, memoir-dialectic, readvisory, scaffold, translator | block-breaker, open-skeptic |
+| Mitgelieferte Beispiele | text-planning (Heimat), translation, workflow-design | analyzer, anything-finder, girraph-merirmaid, lexicographer, macrocosm-oes, memoir-dialectic, readvisory, scaffold, translator | block-breaker, open-skeptic |
 
 ### 3.3 Eigene bauen
 
-Du kannst diese Dateien von Hand schreiben — sie sind Markdown mit einem kleinen YAML-Block oben —, aber du musst nicht. Das mitgelieferte **workflow-design-Paradigma** (Abschnitt 16.3) existiert, damit dein Chef-Readvisor sie mit dir bauen kann. Sag „bau mir einen Skill, der…“ oder „mach ein Paradigma für…“, und er wechselt in workflow-design, stellt seine klärenden Fragen (Umfang? Name? Auslösebedingungen? Begleitdateien?), und schreibt den Baustein richtig, einschließlich des `description:`-Frontmatters, das künftigen Zügen sagt, wann sie darauf zurückgreifen sollen. Readvisors haben ihren eigenen Weg hinein — den `readvisory`-Skill (Abschnitt 19.6), der einen Menschen befragt statt eine Spezifikation.
+Du kannst diese Dateien von Hand schreiben — sie sind Markdown mit einem kleinen YAML-Block oben —, aber du musst nicht. Das mitgelieferte **workflow-design-Paradigma** (Abschnitt 17.3) existiert, damit dein Chef-Readvisor sie mit dir bauen kann. Sag „bau mir einen Skill, der…“ oder „mach ein Paradigma für…“, und er wechselt in workflow-design, stellt seine klärenden Fragen (Umfang? Name? Auslösebedingungen? Begleitdateien?), und schreibt den Baustein richtig, einschließlich des `description:`-Frontmatters, das künftigen Zügen sagt, wann sie darauf zurückgreifen sollen. Readvisors haben ihren eigenen Weg hinein — den `readvisory`-Skill (Abschnitt 20.7), der einen Menschen befragt statt eine Spezifikation.
 
 Was Leute tatsächlich bauen:
 
@@ -243,7 +243,7 @@ Was drumherum liegt:
 
 - **Die Werkzeugleiste**, quer über der Leinwand: der Titel der Composure (hineintippen, wegklicken, umbenannt), der Lese-/Bearbeiten-Schalter, die Werkzeuge, **ein Modul hinzufügen**, Rückgängig und Wiederherstellen, die Zoom-Gruppe, die Suche, der Kommentar-Schalter und das **Composures**-Menü — neu aus einem Form…, öffnen…, als Form speichern….
 - **Die Seitenleiste.** Der Dateibaum des Projekts, dazu die Steuerbereiche: das aktive **Paradigma**, die Schalter für **Skills** und **Readvisors**, und deine **Anfragen**. Option-Klick auf eine Datei oder einen Ordner öffnet ein Kontextmenü (neue Datei, neuer Ordner, Pfad kopieren, Namen kopieren). ⌘\ blendet die ganze Seitenleiste aus und wieder ein.
-- **Die obere Leiste.** Buttons für das Modell-Fenster, den Broker, das UI-Fenster, wikisink (🚰) und cacheawl; die Anzeigen für die gerade gestapelt offenen Modi (Abschnitt 14); und ganz rechts der Schalter für das Readvisor-Panel.
+- **Die obere Leiste.** Buttons für das Modell-Fenster, den Broker, das UI-Fenster, wikisink (🚰) und Canon; die Anzeigen für die gerade gestapelt offenen Modi (Abschnitt 15); und ganz rechts der Schalter für das Readvisor-Panel.
 
 ### 4.1 Sich bewegen
 
@@ -301,9 +301,9 @@ Ein **Form** ist eine Composure-Vorlage. Fünf werden mitgeliefert:
 
 - **blank** — ein seitenförmiges Blatt, das auf der Bearbeitungsseite öffnet, mit dem Cursor schon darin blinkend.
 - **cards** — eine Tafel aus Textkarten in einem Raster, die herausgezoomt und eingepasst öffnet.
-- **scaffold** — eine Tafel, angelegt als Spalten von Beats, mit einem Band über dem Kopf für die Prämisse und einer Reihe am Fuß für die Enden. Es ist das, was der `scaffold`-Skill (Abschnitt 19.7) füllt, wenn er aus einem Haufen Notizen eine Struktur macht.
+- **scaffold** — eine Tafel, angelegt als Spalten von Beats, mit einem Band über dem Kopf für die Prämisse und einer Reihe am Fuß für die Enden. Es ist das, was der `scaffold`-Skill (Abschnitt 20.8) füllt, wenn er aus einem Haufen Notizen eine Struktur macht.
 - **journal** — ein datiertes Protokoll. Ein Modul, ein Eintrag je Seite. Öffnest du ein Journal, landest du auf der *heutigen* Seite, mit dem Cursor darin, und diese Seite steht nur im Arbeitsspeicher, bis du etwas schreibst — das Journal zu öffnen und es sich dann anders zu überlegen hinterlässt also nichts. Der Eintrag speichert sich selbst, während du tippst; gehst du, ohne ihn abzulegen, öffnet das Journal wieder denselben unfertigen Entwurf. **Diesen Eintrag ablegen** stempelt ihn mit dem Datum und macht ihn dauerhaft schreibgeschützt — enough weigert sich danach, ihn zu ändern, und der Cursor geht nicht mehr hinein — und bringt dich weiter auf eine frische Seite. Durch abgelegte Einträge zurückzublättern ist gefahrlos: eine Seite umzublättern, in die du nichts geschrieben hast, speichert überhaupt nichts. Kommentieren kannst du abgelegten Text weiterhin, was ja gerade der Sinn des Ablegens ist.
-- **council** — ein Raum voller Readvisors, die reihum über eine Sache nachdenken. Das ist Abschnitt 18.
+- **council** — ein Raum voller Readvisors, die reihum über eine Sache nachdenken. Das ist Abschnitt 19.
 
 **Als Form speichern…**, im Composures-Menü, behält die Composure, die du gerade ansiehst, als dein eigenes Form. Es landet in `rness/composure-forms/` und gehört von da an in diesem Projekt zur Liste. Ein eigenes Form, das den Namen eines mitgelieferten trägt, gewinnt.
 
@@ -327,7 +327,7 @@ Und jede `.comp` im Dateibaum öffnet mit einem Klick. Sie stapelt sich nicht ü
 
 ### 4.8 Unter den Stapel schauen
 
-Die Modus-Stapel-Anzeigen in der oberen Leiste (Abschnitt 14) enden in einem dauerhaften Quadrat für die Composure. Es hat kein Schließen-Band, weil es nichts zu schließen gibt.
+Die Modus-Stapel-Anzeigen in der oberen Leiste (Abschnitt 15) enden in einem dauerhaften Quadrat für die Composure. Es hat kein Schließen-Band, weil es nichts zu schließen gibt.
 
 Klick es an, während Modi gestapelt sind, und jeder einzelne verschwindet und zeigt dir die Leinwand darunter, mit ihrem Zustand genau so, wie er war — deine Scroll-Position, deine ungespeicherten Änderungen, dein Abstieg in einen verschachtelten girraph. Klick es noch einmal an, oder klick irgendeine andere Anzeige, und sie kommen sofort zurück. Esc während des Blicks stellt erst den Stapel wieder her und räumt dann ab.
 
@@ -335,7 +335,7 @@ Es ist für den Moment, in dem das, was du nachsehen musst, auf der Tafel liegt 
 
 ### 4.9 Was deine Readvisors mit einer Composure machen können
 
-Sie können eine lesen, eine aus einem Form anlegen, Module hinzufügen, umfärben und umsortieren, eine Seite schreiben, eine Composure als Form speichern, und — mit dem `scaffold`-Skill (Abschnitt 19.7) — eine ganze Gliederung in einem Zug in eine ausgelegte Tafel verwandeln. Das alles hängt am Schalter **composure tools** im Broker (Abschnitt 9); deine eigene Leinwand hängt nie daran, genauso wenig wie dein eigenes wikisink- und cacheawl-Stöbern.
+Sie können eine lesen, eine aus einem Form anlegen, Module hinzufügen, umfärben und umsortieren, eine Seite schreiben, eine Composure als Form speichern, und — mit dem `scaffold`-Skill (Abschnitt 20.8) — eine ganze Gliederung in einem Zug in eine ausgelegte Tafel verwandeln. Das alles hängt am Schalter **composure tools** im Broker (Abschnitt 9); deine eigene Leinwand hängt nie daran, genauso wenig wie dein eigenes wikisink- und Canon-Stöbern.
 
 Was sie nicht können, ist eine `.comp` als Datei schreiben. Beide gewöhnlichen Türen zum Dateischreiben verweigern die Endung rundheraus, jede Änderung, die ein Readvisor macht, läuft also über dieselbe kleine Menge von Operationen, die du benutzt, eine nach der anderen, durch dieselbe Tür, aktenkundig. Das heißt: ein Modell, das durcheinanderkommt, kann kein Dokument beschädigen — das Schlimmste, was es anrichten kann, ist eine Karte, die du nicht wolltest, und ⌘Z liegt gleich daneben.
 
@@ -345,7 +345,7 @@ Was sie nicht können, ist eine `.comp` als Datei schreiben. Beide gewöhnlichen
 
 ## 5. Das Readvisor-Panel
 
-Das Gespräch wohnt in einer Spalte am rechten Rand, neben dem, woran du arbeitest, statt an seiner Stelle. Dein **Chef-Readvisor** steht namentlich oben — **Ed**, bis du ihn umbenennst (Abschnitt 17) —, daneben alle anderen Readvisors, die du eingeschaltet hast. Im gewöhnlichen Gespräch antworten sie als eine Stimme, die aus all diesen Blickwinkeln schöpft; in einem Rat (Abschnitt 18) sprechen sie einzeln.
+Das Gespräch wohnt in einer Spalte am rechten Rand, neben dem, woran du arbeitest, statt an seiner Stelle. Dein **Chef-Readvisor** steht namentlich oben — **Ed**, bis du ihn umbenennst (Abschnitt 18) —, daneben alle anderen Readvisors, die du eingeschaltet hast. Im gewöhnlichen Gespräch antworten sie als eine Stimme, die aus all diesen Blickwinkeln schöpft; in einem Rat (Abschnitt 19) sprechen sie einzeln.
 
 Tipp eine Nachricht und drück ⌘Enter, oder den Senden-Button. Antworten strömen live herein, und enough kann handeln, während dein Readvisor spricht — Dateien lesen und schreiben, Shell-Befehle ausführen, Seiten abrufen —, wobei jeder Tool-Aufruf im Protokoll erscheint, sobald er passiert. Der **Mikrofon-Button** diktiert: Sprache wird lokal von whisper.cpp transkribiert, deine Stimme verlässt den Rechner nie, und der Button pulsiert, während er aufnimmt. Noch einmal klicken stoppt.
 
@@ -367,7 +367,7 @@ Drei Zustände, ein Schalter ganz rechts in der oberen Leiste.
 
 Offen oder geschlossen wird je Projekt gemerkt, in den eigenen Dateien dieses Projekts, und angewandt, bevor das Fenster zum ersten Mal zeichnet, damit beim Start nichts ruckt. Ganz ist eine Geste statt einer Einstellung und wird nie gemerkt.
 
-**Eine Ausnahme, und das ist ein Rat.** Solange ein Rat auf der Leinwand läuft (Abschnitt 18), wird das Panel geschlossen gehalten und sein Schalter ist deaktiviert, mit einem Tooltip, der sagt, warum: Räte und der Chat teilen sich ein Modell, und es gibt nur eines davon. Verlässt du den Rat, bekommst du das Panel genau so zurück, wie du es hattest — deine eigene Vorliebe wird gemerkt, nicht überschrieben.
+**Eine Ausnahme, und das ist ein Rat.** Solange ein Rat auf der Leinwand läuft (Abschnitt 19), wird das Panel geschlossen gehalten und sein Schalter ist deaktiviert, mit einem Tooltip, der sagt, warum: Räte und der Chat teilen sich ein Modell, und es gibt nur eines davon. Verlässt du den Rat, bekommst du das Panel genau so zurück, wie du es hattest — deine eigene Vorliebe wird gemerkt, nicht überschrieben.
 
 ### 5.2 Eine Auswahl mitschicken
 
@@ -383,7 +383,7 @@ Jedes Projekt trägt seine eigene Kopie dieser beiden Dateien in `rness/`. Sie s
 
 **`MOTIVATION.md`** ist das *Warum*: Werte und Prioritäten jenseits der Aufgabe, die gerade ansteht. Wofür das Projekt da ist, wem es dient, welche Abwägungen zählen (Richtigkeit vor Tempo? Kürze vor Gründlichkeit?), wie sich „fertig“ anfühlt.
 
-Klick eine der beiden Dateien in der Seitenleiste an, um sie zu lesen; drück **anpassen**, um deine projektlokale Kopie abzuzweigen, oder bearbeite sie in einem beliebigen Editor. Änderungen wirken ab der nächsten Nachricht. Jeder andere Readvisor nutzt dieselben zwei Dateien (Abschnitt 17) — der Chef ist keine andere Art Ding, nur derjenige, der standardmäßig spricht.
+Klick eine der beiden Dateien in der Seitenleiste an, um sie zu lesen; drück **anpassen**, um deine projektlokale Kopie abzuzweigen, oder bearbeite sie in einem beliebigen Editor. Änderungen wirken ab der nächsten Nachricht. Jeder andere Readvisor nutzt dieselben zwei Dateien (Abschnitt 18) — der Chef ist keine andere Art Ding, nur derjenige, der standardmäßig spricht.
 
 ### 5.4 Der Richtlinien-Ordner und Positivlisten
 
@@ -411,9 +411,11 @@ Lesen/Bearbeiten kommt in zwei Größen. **Mini** ist ein Seitenpanel neben dem 
 
 Größe wechseln über den Mini↔Voll-Button im Panel-Rahmen. Seite wechseln über den Seiten-Umschalter daneben. ⌘S speichert auf der Bearbeitungsseite. Wenn das, was du ansiehst, der Zwilling eines konvertierten Dokuments ist, nennt der Rahmen auch das Original und trägt einen **Export**-Button, um deine Änderungen dorthin zurückzuschreiben (Abschnitt 7.5). Und alles ist schmutz-gesichert: hast du ungespeicherte Änderungen, fragt enough nach, bevor irgendetwas sie verwirft — zu einer anderen Datei navigieren, den Modus schließen, zu einem anderen Dokument springen. Du wirst keine Stunde Arbeit an einen verirrten Klick verlieren.
 
+**Der Canon-Chip.** Ein Text — Markdown oder reiner Text, auch der Zwilling eines konvertierten Dokuments — trägt in seiner Kopfzeile noch eine kleine Gruppe mehr, neben dem Konvertierungs-Chip, wenn es einen gibt. Ihr Abzeichen sagt, ob der Text einen **EML-Zwilling** hat: getönt, wenn er einen hat, hohl, wenn nicht, mit einem Punkt in der Ecke, wenn sich der Text geändert hat, seit der Zwilling geschrieben wurde. **Zwilling** dreht die Leseansicht zum Zwilling um, in derselben Größe, anstelle des Textes; **atem** gibt dir den ganzen Text in einer Zeile; **dekompilieren** legt den Zwilling an, und **Zwilling erneuern** legt ihn neu an. In einer schmalen Kopfzeile faltet sich der Chip auf sein Abzeichen zusammen und behält die Worte in seinen Tooltips. Nichts darin geschieht, bis du klickst, und Abschnitt 12.4 hat die ganze Geschichte.
+
 Während ein Dokument offen ist, erscheinen drei Zähler in der oberen Leiste und halten mit deinem Tippen Schritt: **¶** Absätze, **W** Wörter, **C** Zeichen. (Die Listenansicht des Startbildschirms zeigt dir dieselben drei Summen für ein ganzes Projekt — Abschnitt 2.1.) Wird das Fenster schmal, behalten die Buttons und die Modus-Anzeigen ihre Plätze: zuerst wird der Projektname kürzer, bis auf etwa zehn Zeichen, und erst dann treten die Zähler ab, von rechts nach links.
 
-Wie jeder Vollbild-Modus zeigt Lesen/Bearbeiten sein Symbol im Indikatorbereich oben rechts, mit einem kleinen rot-x-Band dran zum Schließen (Abschnitt 14).
+Wie jeder Vollbild-Modus zeigt Lesen/Bearbeiten sein Symbol im Indikatorbereich oben rechts, mit einem kleinen rot-x-Band dran zum Schließen (Abschnitt 15).
 
 ### 6.2 Markieren
 
@@ -427,8 +429,8 @@ Und hier kommt der Teil, der ändert, wie du arbeitest: deine Readvisors können
 
 - **Markdown (`.md`)** rendert formatiert in der Leseseite und als Quelltext in der Bearbeitungsseite. Markdown ist enoughs Muttersprache — fast alles, was das System selbst schreibt, ist Markdown.
 - **Klartext**, und alles Textartige, öffnet in Lesen/Bearbeiten als Text.
-- **`.girraph`**-Dateien öffnen stattdessen im girraph-Modus (Abschnitt 20).
-- **`.merirmaid`**-Dateien öffnen stattdessen im merirmaid-Modus (Abschnitt 21).
+- **`.girraph`**-Dateien öffnen stattdessen im girraph-Modus (Abschnitt 21).
+- **`.merirmaid`**-Dateien öffnen stattdessen im merirmaid-Modus (Abschnitt 22).
 - **Gespeicherte Wikipedia-Artikel** (`article.html` in einem `wiki/`-Ordner) öffnen im wikisink-Reader in voller Wiedergabetreue (Abschnitt 11.2).
 - **Word-Dokumente, PDFs, E-Books, Präsentationen, Arbeitsmappen** öffnen als bearbeitbarer Markdown-**Zwilling** — eine Zeile im Baum, ein Klick, und ein **Export**-Button im Rahmen, um deine Änderungen zurückzuschreiben. Das ist Abschnitt 7, und das ist die ganze Geschichte.
 - **Bilder** (`.png`, `.jpg`, `.gif`, `.webp`, `.bmp`, `.svg`) öffnen in einem schlichten Betrachter (Abschnitt 7.9). Bilder *innerhalb* eines Dokuments rendern in der Leseseite wie jedes andere Bild in Markdown.
@@ -452,6 +454,8 @@ Im Dateibaum siehst du weiterhin eine Zeile — `memo.docx`. Der Zwilling, der O
 Zwei Folgen, die zu kennen sich lohnt. Die Benennung kann nicht kollidieren: ein `memo.md`, das du selbst geschrieben hast, ist eine andere Datei als `memo.docx.md`, und enough verwechselt sie nie. Und löschst du `memo.docx` im Finder, bricht nichts — der Zwilling wird still zu einer gewöhnlichen Markdown-Datei in deinem Baum, was er ohnehin schon immer war.
 
 Deine Readvisors sehen dasselbe wie du. Bitte darum, `report.pdf` zu lesen, und sie bekommen den Zwilling, wobei nötigenfalls erst einer konvertiert wird; bitte darum, etwas zu ändern, und sie bearbeiten den Zwilling, genau dort, wo auch deine eigenen Änderungen hingehen.
+
+**Zwillinge, im Plural.** Ein Text kann jetzt eine zweite Art von Zwilling haben, und es lohnt sich, die beiden auseinanderzuhalten. Der in diesem Abschnitt ist ein *Markdown-Zwilling*: die Worte des Dokuments, konvertiert, damit du sie lesen und bearbeiten kannst. Ein *EML-Zwilling* (Abschnitt 12.4) ist die Bedeutung eines Textes, auseinandergenommen in Einträge — die Wörter, auf die er sich stützt, die Namen darin, seine Aussagen und woher er sie weiß — und als `.cosm`-Datei daneben geschrieben. Der eine ist zum Arbeiten da; der andere, um zu sehen, worauf die Worte hinauslaufen. Darunter dieselbe Idee — eine Geschwisterdatei, per Name gepaart, in die Zeile des Originals gefaltet — und doch verschiedene Aufgaben. Ein konvertiertes Dokument kann beide haben, nacheinander: `memo.docx` → `memo.docx.md` → `memo.docx.md.cosm`.
 
 ### 7.2 Was enough auf diese Weise öffnen kann
 
@@ -555,27 +559,28 @@ your-project/
   rness/
     AGENT.md            who your chief readvisor is    (5.3)
     MOTIVATION.md       why they work                  (5.3)
-    active-paradigm     which paradigm is in force     (16)
-    paradigms/          available reasoning frameworks (16)
-    skills/             available skills               (19)
-    readvisors/         the readvisors you can turn on (17)
+    active-paradigm     which paradigm is in force     (17)
+    canon.cosm          the project catalog            (12.1)
+    paradigms/          available reasoning frameworks (17)
+    skills/             available skills               (20)
+    readvisors/         the readvisors you can turn on (18)
     policies/           the hard rules                 (5.4)
     composure-forms/    composure forms you saved      (4.5)
     knowledge/          project memory                 (8.1)
-      councils/         exported council transcripts   (18)
+      councils/         exported council transcripts   (19)
     io/                 input/output workspace          (8.2)
       composure/        where new composures land       (4.7)
     requests/           long-running work tracking      (8.3)
   ...your actual files...
 ```
 
-Zwei davon kommen erst, wenn du sie brauchst: `composure-forms/` beim ersten Mal, wenn du eine Composure als Form speicherst, `knowledge/councils/` beim ersten Mal, wenn ein Rat abschließt. Ein leerer Ordner, der sich nie erklärt, ist ein Ordner, nach dem man am Ende fragt.
+Zwei davon kommen erst, wenn du sie brauchst: `composure-forms/` beim ersten Mal, wenn du eine Composure als Form speicherst, `knowledge/councils/` beim ersten Mal, wenn ein Rat abschließt. Ein leerer Ordner, der sich nie erklärt, ist ein Ordner, nach dem man am Ende fragt. Und `canon.cosm` ist enoughs eigener Katalog des Projekts, geschrieben, wenn das Projekt öffnet (Abschnitt 12.1): öffne ihn zum Durchsehen, aber er ist nicht zum Bearbeiten da, und enough sagt es dir, wenn du es versuchst.
 
 **Ist dieses Projekt älter als 0.3.5**, hat es einen Ordner `rness/roles/` statt `rness/readvisors/`. enough benennt ihn beim nächsten Öffnen des Projekts um, in einem Zug, und trägt deine projektlokalen Readvisors und deine Ein/Aus-Einstellungen unversehrt hinüber. Geht das nicht — eine schreibgeschützte Platte, ein Ordner, an dem etwas anderes hängt —, bricht nichts: alles läuft unter dem alten Namen weiter, und beim nächsten Start wird es erneut versucht.
 
 Verlinkte Einträge (kursiv im Baum) folgen den globalen Defaults; jeden davon anpassen, um eine lokale Kopie abzuzweigen (Abschnitt 3.1). Dateien, die du auf beliebige Weise ins Projekt legst — Finder, ein anderer Editor, ein Readvisor — sind beim nächsten Zug für alle gleichermaßen sichtbar.
 
-Ein konvertiertes Dokument (Abschnitt 7) fügt auch hier Dateien hinzu, immer neben dem Original und immer nach ihm benannt: `memo.docx` bekommt einen Zwilling unter `memo.docx.md`, seine Bilder in `memo.docx.assets/`, und eine verborgene `.memo.docx.convert.json`, die festhält, was wann aus was konvertiert wurde. Der Baum faltet alle drei in die Zeile des Originals, aber es sind gewöhnliche Dateien auf deiner Platte — du kannst das Paar auf einen anderen Rechner kopieren, unter git stellen, oder den Zwilling löschen und das Original nochmal anklicken, um einen frischen zu bekommen. Das verborgene Manifest ist enoughs Buchhaltung; lass es in Ruhe, und es bleibt korrekt. Lösch es, und enough behandelt das Dokument einfach so, als wäre es nie konvertiert worden.
+Ein konvertiertes Dokument (Abschnitt 7) fügt auch hier Dateien hinzu, immer neben dem Original und immer nach ihm benannt: `memo.docx` bekommt einen Zwilling unter `memo.docx.md`, seine Bilder in `memo.docx.assets/`, und eine verborgene `.memo.docx.convert.json`, die festhält, was wann aus was konvertiert wurde. Der Baum faltet alle drei in die Zeile des Originals, aber es sind gewöhnliche Dateien auf deiner Platte — du kannst das Paar auf einen anderen Rechner kopieren, unter git stellen, oder den Zwilling löschen und das Original nochmal anklicken, um einen frischen zu bekommen. Das verborgene Manifest ist enoughs Buchhaltung; lass es in Ruhe, und es bleibt korrekt. Lösch es, und enough behandelt das Dokument einfach so, als wäre es nie konvertiert worden. Ein EML-Zwilling (Abschnitt 12.4) folgt derselben Regel mit einer einzelnen Datei — `notes.md.cosm` neben `notes.md`, in die Zeile des Textes gefaltet — und er erscheint nur, wenn du um einen bittest.
 
 ### 8.1 Der Wissen-Ordner
 
@@ -593,7 +598,7 @@ Ein konvertiertes Dokument (Abschnitt 7) fügt auch hier Dateien hinzu, immer ne
 
 - **`input/`** — Dateien hier ablegen, damit sie verarbeitet werden. Abgerufene Webseiten landen auch automatisch hier, zu Markdown konvertiert und zwischengespeichert, sodass eine einmal abgerufene Seite für immer als Grundlage verfügbar bleibt.
 - **`output/`** — wo erzeugte Artefakte landen. Sichten, behalten, was gut ist, den Rest löschen.
-- **`cloud-cache/`** — nutzt du den Cloud-Modell-Slot, wird jeder Cloud-Austausch hier festgehalten (Abschnitt 15.2). Selbst Cloud-Arbeit hinterlässt eine lokale, mit grep durchsuchbare Papierspur.
+- **`cloud-cache/`** — nutzt du den Cloud-Modell-Slot, wird jeder Cloud-Austausch hier festgehalten (Abschnitt 16.2). Selbst Cloud-Arbeit hinterlässt eine lokale, mit grep durchsuchbare Papierspur.
 
 ### 8.3 Anfragen: wie lange Aufgaben überleben
 
@@ -623,21 +628,21 @@ Dreizehn Schalter, in Gruppen:
 | cache & convert fetches | abgerufene Seiten zu Markdown konvertieren und in `rness/io/input/` zwischenspeichern |
 | wikisink tools | ob die vier Wiki-Tools deiner Readvisors funktionieren (dein eigenes 🚰-Browsen wird nie gesperrt) |
 | wikisink live updates | ob Update-Läufe überhaupt Wikipedia kontaktieren dürfen (aus = Bericht nur aus lokalem Zustand) |
-| cacheawl tools | ob die Cachebox-Tools deiner Readvisors funktionieren (dein eigener cacheawl-Modus wird nie gesperrt) |
+| canon tools | ob deine Readvisors Canon-Bände auflisten, anlegen und befüllen dürfen und EML-Zwillinge und atems für die Texte darin schreiben (dein eigener Canon-Modus wird nie gesperrt) |
 | composure tools | ob deine Readvisors Composures lesen und bearbeiten dürfen (deine eigene Leinwand wird nie gesperrt — Abschnitt 4.9) |
-| forge new readvisors | ob der `readvisory`-Skill einen fertigen Readvisor für dich installieren darf (Abschnitt 19.6). Aus lässt das Befragen und das Entwerfen zu und überlässt dir das Ablegen |
+| forge new readvisors | ob der `readvisory`-Skill einen fertigen Readvisor für dich installieren darf (Abschnitt 20.7). Aus lässt das Befragen und das Entwerfen zu und überlässt dir das Ablegen |
 
 Die Kopfzeile des Fensters trägt außerdem den einen Button in enough, der ändert, wie jemand heißt: **Chef-Readvisor umbenennen**. Er öffnet ein kleines Feld, nimmt ein bis vierundzwanzig Zeichen, und der neue Name steht in der Signatur des nächsten Dings, das dein Chef sagt. Es ist eine rechnerweite Einstellung, wie das Thema — ein Chef, ein Name, überall. Eine Historie gibt es dazu nicht: die Signatur ist immer der aktuelle Name, denn eine Umbenennung, die durch dein Protokoll zurückgriffe, läse sich, als wären zwei verschiedene Personen im Raum gewesen.
 
 Standardmäßig ist alles an: die Defaults vertrauen deinen Readvisors das Projekt an und halten sie mit einer Papierspur ehrlich. Diese Spur — das **Trace-Journal** — landet in `rness/knowledge/session-logs/<datum>-broker.md`: Zeitstempel, Tool, Entscheidung, Argumente, Ergebnis, für jeden vermittelten Aufruf. Und blockiert ein Schalter oder eine Positivliste etwas, bekommt der Readvisor eine klare Ablehnungsmeldung, die sagt, was blockiert wurde und warum, sodass er es dir sagen kann, statt still zu scheitern.
 
-Beachte das Design-Prinzip in dieser Tabelle: Schalter, die die Tools deiner Readvisors sperren, sperren nie *deine* Oberfläche. cacheawl tools auszuschalten schließt dich nicht aus dem cacheawl-Modus aus. Es heißt, dass nichts in deinem Namen in den Speicher greifen kann.
+Beachte das Design-Prinzip in dieser Tabelle: Schalter, die die Tools deiner Readvisors sperren, sperren nie *deine* Oberfläche. canon tools auszuschalten schließt dich nicht aus Canon aus. Es heißt, dass nichts in deinem Namen in den Speicher greifen kann.
 
 ---
 
 ## 10. Das UI-Fenster und die Hilfedokumente
 
-Der ⚙-UI-Button öffnet die Anzeigeeinstellungen und das Referenzmaterial. Ein kleiner **Hilfe**-Button sitzt oben rechts in diesem Fenster, neben dem ×: er öffnet dieses Handbuch nur lesbar, in der App, als Vollbild-Modus wie jeder andere (Abschnitt 14). Daneben sitzt **Wörterbuch**, das FEED öffnet, enoughs eigenes englisches Wörterbuch (Abschnitt 13).
+Der ⚙-UI-Button öffnet die Anzeigeeinstellungen und das Referenzmaterial. Ein kleiner **Hilfe**-Button sitzt oben rechts in diesem Fenster, neben dem ×: er öffnet dieses Handbuch nur lesbar, in der App, als Vollbild-Modus wie jeder andere (Abschnitt 15). Daneben sitzt **Wörterbuch**, das FEED öffnet, enoughs eigenes englisches Wörterbuch (Abschnitt 14), und daneben **MacroCOSM**, das die Spezifikation der Grammatik öffnet, in der jede `.cosm`-Datei geschrieben ist (Abschnitt 13). Hilfe und MacroCOSM gibt es auch im UI-Fenster des Startbildschirms; das Wörterbuch wartet, bis ein Projekt offen ist.
 
 **Das Handbuch lesen.** Die Werkzeugleiste des Handbuchs hat einen **Inhalt**-Button: eine Liste aller nummerierten Abschnitte und Unterabschnitte, neben dem Text, wenn Platz dafür ist, und eingeklappt, wenn nicht (etwa in der schmalen Seitenpanel-Größe), wobei der Abschnitt, den du gerade liest, beim Scrollen markiert wird. **suchen**, oder ⌘F, solange das Handbuch oben liegt, öffnet eine Suchleiste: jeder Treffer wird an Ort und Stelle markiert, mit einer Zählung neben dem Feld, Return und shift-Return laufen sie ab, und Esc schließt sie. Und überall, wo dieses Handbuch „Abschnitt 7.3“ sagt, sind diese Worte ein Link, der dich dorthin bringt. Jeder Sprung — ein Klick im Inhalt, ein Abschnittslink, eine Suche, die dich weit weggetragen hat — hinterlässt eine kleine **↩ zurück, wo du warst**-Pille, und ein Klick bringt dich zurück an die Stelle, an der du gelesen hast.
 
@@ -700,7 +705,7 @@ Das sind die Tastenkürzel, die die Oberfläche selbst handhabt, sie funktionier
 
 ### 10.6 Eingebettete Hilfe (IHH)
 
-Die `(?)`-Blasen, verstreut über die Oberfläche, sind das eingebaute Hilfesystem: eine Blase pro Konzept — Skills, Readvisors, das Readvisor-Panel, der Paradigmen-Wähler, die Composure mit ihren Modulen und Werkzeugen, das Journal, rness, io, Wissen, cacheawl, wikisink, das Modus-System, konvertierte Dokumente, und so weiter — jede mit einem **Was**, einem **Wie** und einer **Ideen**-Liste. Die Skills-, Readvisors- und Paradigmen-Blasen listen, was tatsächlich in *deinem* Projekt installiert ist, und die Blase zu konvertierten Dokumenten zieht ihre Dateitypen-Tabelle aus der eigenen Format-Registry der App — alles live erzeugt, sodass Hilfe nie aus dem Takt mit der Wirklichkeit gerät. (Dieselbe Tabelle erscheint in Abschnitt 7.2 dieses Handbuchs, aus derselben Quelle.)
+Die `(?)`-Blasen, verstreut über die Oberfläche, sind das eingebaute Hilfesystem: eine Blase pro Konzept — Skills, Readvisors, das Readvisor-Panel, der Paradigmen-Wähler, die Composure mit ihren Modulen und Werkzeugen, das Journal, rness, io, Wissen, Canon und der cosm-Betrachter, der Canon-Chip und die atem-Karte, wikisink, das Modus-System, konvertierte Dokumente, und so weiter — jede mit einem **Was**, einem **Wie** und einer **Ideen**-Liste. Die Skills-, Readvisors- und Paradigmen-Blasen listen, was tatsächlich in *deinem* Projekt installiert ist, und die Blase zu konvertierten Dokumenten zieht ihre Dateitypen-Tabelle aus der eigenen Format-Registry der App — alles live erzeugt, sodass Hilfe nie aus dem Takt mit der Wirklichkeit gerät. (Dieselbe Tabelle erscheint in Abschnitt 7.2 dieses Handbuchs, aus derselben Quelle.)
 
 Blasen werden pro Projektordner über die Checkbox „Hilfeblasen (?)“ im UI-Fenster gesteuert. Standardmäßig an für einen neuen Ordner, und die Einstellung bleibt pro Ordner haften — sodass dein eingespieltes Alltagsprojekt still werden kann, während ein frisches Experiment seine Stützräder behält.
 
@@ -737,7 +742,7 @@ Einmal installiert, öffnet 🚰 den Reader: zurück und vor, live Titelvorschl�
 
 ### 11.2 Artikel speichern und sperren
 
-**Speichern.** Der Speichern-Button bietet zwei Ziele: den `wiki/`-Ordner dieses Projekts, oder die rechnerweite Wiki-Cachebox (`~/enough/cacheawl/wiki/`), geteilt von jedem Projekt. So oder so ist ein gespeicherter Artikel ein Ordner — `article.html`, der Artikel Byte für Byte, wie ihn das Archiv hatte, plus `_manifest.md` mit Titel, Quell-URL, Abrufdatum und der CC-BY-SA-Lizenzzeile. Jeder gespeicherte Artikel ist selbstbeschreibend, was heißt, dass die Zuordnung, die du brauchst, schon danebenliegt, falls sein Text je in etwas landet, das du veröffentlichst. Klick eine gespeicherte `article.html` im Baum an, und sie öffnet im Reader in voller Wiedergabetreue — Infoboxen, Tabellen, alles —, sogar wenn kein Archiv erreichbar ist. Zum Entfernen mit der Maus über den gespeicherten Ordner im Baum bleiben und auf das erscheinende 🗑 klicken.
+**Speichern.** Der Speichern-Button bietet zwei Ziele: den `wiki/`-Ordner dieses Projekts, oder den Band `wiki` in Canon (`~/enough/canon/wiki/`), geteilt von jedem Projekt. So oder so ist ein gespeicherter Artikel ein Ordner — `article.html`, der Artikel Byte für Byte, wie ihn das Archiv hatte, plus `_manifest.md` mit Titel, Quell-URL, Abrufdatum und der CC-BY-SA-Lizenzzeile. Jeder gespeicherte Artikel ist selbstbeschreibend, was heißt, dass die Zuordnung, die du brauchst, schon danebenliegt, falls sein Text je in etwas landet, das du veröffentlichst. Klick eine gespeicherte `article.html` im Baum an, und sie öffnet im Reader in voller Wiedergabetreue — Infoboxen, Tabellen, alles —, sogar wenn kein Archiv erreichbar ist. Zum Entfernen mit der Maus über den gespeicherten Ordner im Baum bleiben und auf das erscheinende 🗑 klicken.
 
 Speichern ist für *dich*: Offline-Offline-Kopien, Zuordnung für Veröffentlichungen. Deine Readvisors brauchen keine gespeicherten Artikel — ihre Tools lesen jeden Artikel im Archiv bei Bedarf als sauberen Text.
 
@@ -759,45 +764,166 @@ Der Bericht kommt als Markdown im Chat an; die vollständige, ungekappte Version
 
 ---
 
-## 12. Cacheawl
+## 12. Canon
 
-Cacheawl ist der rechnerweite Textspeicher: der Ort für Dinge, die du für immer behalten willst und aus jedem Projekt erreichen können sollst. Er lebt unter `~/enough/cacheawl/`, verborgen vor dem Dateibaum jedes Projekts, geteilt über alle deine enough-Instanzen. (Hast du ein früheres enough genutzt, wurde deine alte `infoworld/`-Bibliothek beim ersten Start von 0.1.6 in cacheawl aufgelöst — `personal/`, `public/` und `wiki/` wurden deine ersten drei Cacheboxen. Nichts ging verloren.)
+Canon ist enoughs Bibliothek: der rechnerweite Speicher für die Dinge, die du für immer behalten und aus jedem Projekt erreichen willst. Er liegt unter `~/enough/canon/`, verborgen vor dem Dateibaum jedes Projekts und geteilt von jedem Projekt auf dem Rechner. Du öffnest ihn über den Canon-Button in der oberen Leiste, der dasselbe Symbol trägt wie immer, denn Canon ist, wozu Cacheawl wurde.
 
-### 12.1 Cacheboxen und ihre merirmaid-Diagramme
+**Wenn du Cacheawl benutzt hast,** ist nichts verloren, und es gibt nichts zu tun. Beim ersten Start von 0.4.3 wird dein alter Speicher, `~/enough/cacheawl/`, in einem Zug in `~/enough/canon/` umbenannt, und jede Cachebox darin ist jetzt ein **Band**. Jeder Band vollzieht den Umzug zu Ende, sobald Canon ihn zum ersten Mal ansieht: Seine verborgene Buchhaltungsdatei bekommt den neuen Namen, das merirmaid-Diagramm, das enough früher darin führte, wird weggeräumt, und an seiner Stelle wird ein Katalog geschrieben (Abschnitt 12.1). Deine eigenen Dateien werden nicht angefasst. Landest du irgendwann mit beiden Ordnern — weil danach etwa ein älteres enough auf demselben Rechner geöffnet wurde —, nimmt Canon `~/enough/canon/` und lässt den anderen, wo er ist; die beiden führt Canon nie zusammen und löscht auch keinen davon. (Und reicht dein enough noch weiter zurück: Die `infoworld/`-Bibliothek jener Tage wurde vor langer Zeit in den Speicher aufgelöst, als seine ersten drei Bände: `personal/`, `public/` und `wiki/`.)
 
-Eine **Cachebox** ist ein Ordner oberster Ebene im Speicher, und es gibt sie in zwei Spielarten. **Schlichte Boxen** enthalten für immer behaltenen Text, den du selbst organisierst: eine `personal`-Box mit Referenznotizen, eine `press`-Box mit veröffentlichten Stücken, welche Struktur auch immer dir dient. **Cache-Kopien** sind Boxen, *importiert* aus einer Quelle — einem lokalen Ordner, einer Website, oder einer Reihe von Wikipedia-Artikeln —, die sich merken, woher sie kamen.
+**Der Canon-Modus** ist die zweigeteilte Ansicht: dieses Projekt auf der einen Seite, der Speicher auf der anderen. Eine Datei rüberziehen, um sie zu kopieren, shift-ziehen zum Verschieben, shift-klick für ein Menü, und Doppelklick, um alles in seinem natürlichen Modus zu öffnen — Lesen/Bearbeiten, girraph, merirmaid, der Wiki-Reader oder, für die `.cosm`-Dateien, die diese Runde mitgebracht hat, der cosm-Betrachter (Abschnitt 12.3) — direkt aus dem Speicher.
 
-Jede Box trägt ein **merirmaid-Diagramm**: `_cachebox.merirmaid`, eine live Darstellung der Struktur der Box, neu erzeugt, wann immer sich der Inhalt ändert. Doppelklick, um die Form einer Box auf einen Blick zu sehen. Das Diagramm ist ein *Spiegel*, per Design nur lesbar, weil es die Wirklichkeit widerspiegelt — um das Diagramm zu ändern, die Box ändern. Ein günstiger Abgleich-Durchlauf hält Spiegel ehrlich, selbst wenn du Dateien vom Finder aus hinter enoughs Rücken hineinlegst.
+Warum der Aufwand? Weil Projektordner Arbeitsraum sind und Canon Bibliotheksraum ist. Importier die Dokumentation eines Frameworks einmal, und jedes künftige Projekt kann sich offline darauf stützen. Halt deine zeitlosen Referenznotizen in einem Band, und jeder Readvisor, mit dem du je sprichst, kann sie erreichen. Ein Artefakt fertigstellen und in einen Band verschieben, wo es sein Projekt überlebt. Und seit dieser Runde ist eine Bibliothek auch ein Ort, an dem gelesen wird, nicht nur einer, an dem behalten wird: Canon kann einen Text auseinandernehmen und behält, was dabei herauskam, gleich daneben (Abschnitt 12.4).
 
-Öffne den **cacheawl-Modus** aus der oberen Leiste für eine zweigeteilte Ansicht, Projekt auf der einen Seite, Speicher auf der anderen. Eine Datei rüberziehen, um sie zu kopieren. Shift-ziehen zum Verschieben. Shift-klick für ein Kontextmenü, und Doppelklick, um jede Datei in ihrem natürlichen Modus zu öffnen — girraph, merirmaid, Lesen/Bearbeiten, oder der Wiki-Reader — direkt aus dem Speicher.
+### 12.1 Bände und ihre Kataloge
 
-### 12.2 Die Cachebox und lokale oder Web-Dokumente einfangen
+Ein **Band** ist ein Ordner oberster Ebene im Speicher — das, was früher eine Cachebox war — und es gibt ihn in denselben zwei Spielarten. **Schlichte Bände** enthalten für immer behaltenen Text, den du selbst organisierst: ein Band `personal` mit Referenznotizen, ein Band `press` mit veröffentlichten Stücken, welche Struktur auch immer dir dient. **Cache-Kopien** sind Bände, *importiert* aus einer Quelle — einem lokalen Ordner, einer Website oder einer Reihe von Wikipedia-Artikeln —, die sich merken, woher sie kamen (Abschnitt 12.2). Für einen leeren Band shift-klick auf die Speicherseite und wähl **neuer Band**.
 
-Die **Import-Leiste** im cacheawl-Modus (oder eine schlichte Bitte im Gespräch) fängt Material von außen in eine Box ein:
+Jeder Band trägt einen **Katalog**: `canon.cosm`, im Wurzelordner des Bandes, den enough für ihn führt. Der Katalog listet alles im Band auf — jeden Ordner, jede Datei, jeden gespeicherten Artikel — und zu jeder Datei, was aus ihr gemacht wurde: den Markdown-Zwilling eines konvertierten Dokuments (Abschnitt 7), den EML-Zwilling eines Textes (Abschnitt 12.4) und die atem-Zeile des Textes (Abschnitt 12.5), jeweils mit einer Zählung oben. Er wird neu geschrieben, sobald sich der Band ändert: etwas hinzugefügt, verschoben, umbenannt oder importiert, oder eine Datei, die du hinter enoughs Rücken vom Finder aus hineingelegt hast, was ein stiller Abgleich-Durchlauf auffängt.
 
-- **Ein lokaler Pfad** — einen Ordner mit Notizen oder Dokumenten in den Speicher replizieren.
-- **Eine Website** — eine Doku-Seite oder Referenzseite bis zu einer gewählten Tiefe crawlen (gedeckelt bei rund 500 Seiten) und als lokales Markdown behalten. Web-Importe respektieren deine Abruf-Schalter und Positivlisten, Tor-Routing eingeschlossen.
-- **Wikipedia** — die Artikel eines Themas (gedeckelt bei rund 200) aus deinem wikisink-Archiv in dauerhaften, projektunabhängigen Text holen.
+Der Katalog ist **nur lesbar**, wie es das alte Cachebox-Diagramm war, und aus demselben Grund: Er spiegelt den Band wider; um den Katalog zu ändern, ändere also den Band. Eine Bearbeitung aus dem Editor oder durch einen Readvisor wird mit einem Satz abgelehnt, der das sagt, und eine Änderung durch ein anderes Programm wird beim nächsten Hinsehen von enough schlicht überschrieben. Was du *kannst*, ist ihn lesen. Seine Kachel trägt ein **Katalog**-Etikett; Doppelklick darauf, und er öffnet im cosm-Betrachter (Abschnitt 12.3), eine Karte pro Eintrag, jede Datei ein Link, der die Datei öffnet. Und weil er eine `.cosm`-Datei ist — schlichter Text, in der Grammatik von Abschnitt 13 —, ist er außerhalb von enough so lesbar wie alles andere, was du aufbewahrst.
 
-Importe laufen im Hintergrund. Die Box erscheint sofort mit einem Status „wird importiert“, dem du zusehen kannst, und ein gescheiterter Import sagt das auch, statt so zu tun, als wäre er fertig. Die Cachebox-Tools deiner Readvisors (auflisten, anlegen, importieren) werden durch den cacheawl-Broker-Schalter gesperrt; deine eigene Nutzung des cacheawl-Modus nie.
+Für die Form eines Bandes auf einen Blick gibt es weiterhin ein Bild: Der **kleine Diagramm-Button** auf der Kachel eines Bandes zeichnet seine Ordner und Dateien als merirmaid-Diagramm (Abschnitt 22). Es wird jedes Mal frisch gezeichnet, wenn du fragst, statt als Datei aufbewahrt zu werden, ist also nie veraltet, und im Band gibt es nichts, was man hinterher aufräumen müsste.
 
-Warum der Aufwand? Weil Projektordner Arbeitsraum sind und cacheawl Bibliotheksraum ist. Importier die Dokumentation eines Frameworks einmal, und jedes künftige Projekt kann sich offline darauf stützen. Halt deine zeitlosen Referenznotizen in einer Box, und jeder Readvisor, mit dem du je sprichst, kann sie erreichen. Ein Artefakt fertigstellen und in eine Box verschieben, wo es sein Projekt überlebt.
+**Der Projektkatalog.** Auch ein Projekt bekommt einen Katalog: `rness/canon.cosm`, dieselbe Art Liste für alles, was der eigene Dateibaum des Projekts zeigt — `rness/` selbst ausgenommen —, mit demselben Vermerk zu den Zwillingen und dem atem jeder Datei. Er wird geschrieben, wenn das Projekt öffnet, und aktualisiert, wann immer Canon oder der cosm-Betrachter ihn ansieht, und er ist, wie der eines Bandes, nur lesbar. Er hält Struktur fest und sonst nichts: keine Größen, keine Daten, nichts, was sich bewegt, wenn du bloß eine Datei bearbeitest, sodass ein Projekt, das du unter git hältst, nicht bei jedem Speichern Unruhe in der Versionsgeschichte stiftet. Bei 5.000 Einträgen hört er auf; darüber hinaus werden die Ordner, für die kein Platz mehr ist, ohne ihren Inhalt aufgeführt, jeder mit einer offenen Frage, die dir sagt, diesen Ordner stattdessen in Canon zu öffnen. Zum Durchsehen nimm den Button **Projektkatalog** oben auf der Projektseite von Canon oder klick die Datei in der Seitenleiste unter `rness/` an.
+
+### 12.2 Dokumente einfangen
+
+Die **Import-Leiste** am Fuß des Canon-Modus holt Material von außen in einen Band. Wähl, was für eine Quelle es ist, und tipp sie ein:
+
+- **path:** — ein lokaler Ordner mit Notizen oder Dokumenten, in den Speicher repliziert.
+- **url:** — eine Doku-Seite oder Referenzseite, bis zu einer gewählten Tiefe gecrawlt (gedeckelt bei 500 Seiten) und als lokales Markdown behalten. Web-Importe respektieren deine Abruf-Schalter und Positivlisten, Tor-Routing eingeschlossen.
+- **wikisink:** — die Artikel eines Themas (gedeckelt bei 200), aus deinem wikisink-Archiv in dauerhaften, projektunabhängigen Text geholt.
+
+Absenden startet nichts hinter deinem Rücken. Es schreibt eine Anfrage ins Gespräch, und dein Chef-Readvisor prüft, ob sie machbar und uneingeschränkt ist — die Lizenzfrage, die robots-Regeln einer Seite —, fragt dich bei allem Zweifelhaften und führt sie dann aus. (Du kannst die Leiste überspringen und einfach im Panel fragen; es ist dieselbe Arbeit.) Importe laufen im Hintergrund: Der Band erscheint sofort mit einem Status *wird importiert*, dem du zusehen kannst, und ein gescheiterter Import sagt das, statt so zu tun, als wäre er fertig.
+
+**Holotypes behalten ihre private Seite.** Ein Holotype von Comprise (Abschnitt 12.3) hat in seinem Ordner Dinge, die ausdrücklich nicht Teil der Beschreibung sind: seine Personen, eine lokale Datenbank, Logos und Ordner voller Feeds, Scans, Bindings, Berichte und Snapshots. Bring einen Holotype nach Canon, wie du willst — importiere seinen Ordner per Pfad oder zieh ihn von der Projektseite hinüber —, und Canon lässt all das zurück, sodass die Personen darin Comprise nie verlassen; was ankommt, ist die Beschreibung selbst, bereit für den cosm-Betrachter. Ein Verschieben, das diese privaten Dateien zurücklassen würde, wird stattdessen zu einem Kopieren: Das Original bleibt ganz, wo es war, und eine Zeile sagt dir, warum. Nichts Privates wird dabei je gelöscht.
+
+Die Canon-Werkzeuge deiner Readvisors — Bände auflisten, einen anlegen, in einen importieren — werden vom Schalter **canon tools** im Broker gesperrt (Abschnitt 9). Deine eigene Nutzung des Canon-Modus nie.
+
+### 12.3 Holotypes und andere `.cosm`-Dateien
+
+Eine `.cosm`-Datei ist eine Beschreibung, geschrieben in der Grammatik von MacroCOSM (Abschnitt 13): schlichter Text, Eintrag für Eintrag, jeder Eintrag mit einer ID, und Verweisen zwischen ihnen, denen ein Leser folgen und die er prüfen kann. enough liest mehrere Arten und öffnet sie alle an einem Ort, dem **cosm-Betrachter**:
+
+- der Katalog eines Canon-Bandes oder der des Projekts (Abschnitt 12.1);
+- der EML-Zwilling eines Textes (Abschnitt 12.4);
+- ein **Holotype**: So hält Comprise — ein eigenständiges Programm, um Firmen in schlichten Dateien zu beschreiben — eine Firma zu einem Zeitpunkt fest, als Ordner mit `holotype.cosm` an der Wurzel, in acht Modulen, deren Anfangsbuchstaben den Namen buchstabieren, von Corporation bis Employees (und die Mitarbeiter werden gezählt, nie benannt);
+- und ein eigenständiger Produktbaum, die ältere Art von `.cosm`-Datei, die vor den Holotypes kam.
+
+Jedes davon öffnet per Doppelklick in Canon — auf der Kachel eines Katalogs steht **Katalog**, auf der eines Holotype **Holotype** —, oder per Klick auf eine `.cosm`-Zeile im Dateibaum. Ein Holotype-Ordner im Baum öffnet bei einem Klick weiterhin wie ein Ordner; option-klick ihn und wähl **im cosm-Betrachter öffnen**. Und in Canon: shift-klick auf einen Holotype für **Dateien durchsehen**, wenn du den Ordner willst statt der Beschreibung.
+
+**Die Gliederungsleiste.** Am linken Rand, von oben nach unten: der Name und die Zusammenfassung des Bandes, der Dialekt, in dem er geschrieben ist (`comprise/1`, `canon/1`, `eml/1` — das Abzeichen in der Werkzeugleiste sagt dasselbe), wie viele Einträge er enthält und seine Adresse, mit einem Button zum Kopieren. Darunter seine Module und die Arten darin, mit Zählungen; ein Klick darauf führt dorthin. Dann zwei kurze Listen, auf die du dich bald verlassen wirst.
+
+**Prüfungen** sagen, ob der Band zusammenhält: ob er lädt, ob jede ID eindeutig und wohlgeformt ist, ob jeder Eintrag hat, was seine Art verlangt, ob jeder Verweis auf etwas landet, das es gibt. Ein sauberer Band sagt *ok — keine Probleme*; sonst bekommst du die Zahl der Fehler, Warnungen und Hinweise, und zu jedem einen Link auf den Eintrag, um den es geht.
+
+**Offene Fragen** sind die Dinge, von denen der Band sagt, dass er sie noch nicht weiß. MacroCOSM lässt eine Beschreibung nie raten: Ein Unbekanntes wird als Frage aufgeschrieben, gerichtet an den, der sie beantworten kann. Die Gliederungsleiste sammelt sie, jede ein Link auf ihren Eintrag, und auf den Karten ist jede mit einem umringten **?** markiert, damit eine Lücke wie eine Lücke aussieht.
+
+**Die Karten.** Die Spalte neben der Gliederungsleiste ist der Band selbst, Modul für Modul und Art für Art, eine Karte pro Eintrag: eine Zeile mit seiner ID, Art, seinem Status und wer ihn sehen darf; sein Name und seine Zusammenfassung; dann jedes andere Feld. Eine ID, die auf einen anderen Eintrag zeigt, ist ein Link — klick darauf, und die Spalte trägt dich zu dieser Karte und lässt sie kurz aufleuchten, mit der Pille **↩ zurück, wo du warst**, die dich zurückbringt. Ein Pfad ist auch ein Link und öffnet die Sache in ihrem eigenen Modus: einen Ordner in Canon, einen Artikel im Wiki-Reader, einen Text in Lesen/Bearbeiten, einen anderen Band im Betrachter. Ein großer Band zeigt zunächst vierzig Karten pro Art, mit **alle zeigen** für den Rest; ⌘F sucht Wörter in den Karten auf dem Bildschirm, also zeig erst alle, bevor du eine zugeklappte Art durchsuchst.
+
+**Die Werkzeugleiste.** **Linse…** zeichnet den Band als Diagramm aus dem einen oder anderen Blickwinkel — als Baum, als Karte von allem und davon, wie es zusammenhängt, oder, bei einem EML-Zwilling, als Bild seiner Aussagen — und öffnet es im merirmaid-Modus (Abschnitt 22), wo dieselbe Auswahl den Blickwinkel an Ort und Stelle wechselt und ein Shift-Klick auf einen Knoten **Eintrag zeigen** anbietet, zurück zu seiner Karte. Mit **als Rohtext öffnen** siehst du die Datei selbst als reinen Text; bei einem Holotype, der ein ganzer Ordner voller Dateien ist, bekommst du zuerst die Liste dieser Dateien. Mit **über dieses Format** öffnest du die Spezifikation an der Stelle über den Dialekt dieses Bandes (Abschnitt 13.1). **Gliederung** blendet die Gliederungsleiste aus und ein, und der Größen-Button dockt den Betrachter neben deine Arbeit, so wie es die Mini-Größe von Lesen/Bearbeiten tut.
+
+**Was enough mit einem Holotype macht, und was es lässt.** Es liest ihn, durchstöbert ihn, zeichnet ihn, prüft ihn mit MacroCOSMs eigenen Prüfungen und öffnet jede seiner Dateien als Rohtext. Es dekompiliert keinen Holotype und schreibt kein atem dazu: Ein Holotype ist hier zum Durchsehen da. Und es führt Comprises eigene Regeln nicht aus. Eine Firmenbeschreibung hat Prüfungen, die nur Comprise zu machen versteht, und die Gliederungsleiste sagt unumwunden, wie viele sie Comprises eigenen Werkzeugen überlässt. Diese Zeile ist kein Fehlschlag; Comprises Regeln gehören Comprise. Lässt sich eine Datei gar nicht als Band lesen, sagt der Betrachter in einem Satz, warum, und bietet **als Rohtext öffnen** an, damit es immer etwas zu sehen gibt.
+
+### 12.4 EML-Zwillinge
+
+Einen Text zu dekompilieren nimmt ihn auseinander in das, was er sagt, Eintrag für Eintrag, und schreibt das Ergebnis daneben als seinen **EML-Zwilling** — EML für *enumerated meaning language*. `notes.md` bekommt `notes.md.cosm`, in die Zeile des Textes im Baum gefaltet, so wie es der Zwilling eines konvertierten Dokuments ist (Abschnitt 7.1). Ein Zwilling ist keine Zusammenfassung. Eine Zusammenfassung ist kürzer; ein Zwilling ist dieselbe Bedeutung, so ausgelegt, dass du sie prüfen, zeichnen und vergleichen kannst. Was er enthält:
+
+- **Die Wörter, auf die sich der Text stützt**, jedes in FEED verankert (Abschnitt 14): welches Wort es ist, welche Wortart der Text verwendet und welchen Sinn es *hier* hat. Ein Wort aus deinem eigenen Wörterbuch sagt das. Ein Wort, das FEED nicht hat, wird als offene Frage markiert — nie mit einer aus dem Stegreif erfundenen Definition versehen.
+- **Die Dinge und Ideen, die er nennt**: die einzelnen Personen, Organisationen, Orte, Werke und Dinge und die Begriffe, die er benutzt.
+- **Seine Aussagen, und woher er sie weiß.** Jede Aussage wird als Satz neu gefasst, der alle darin beim Namen nennt — kein *er*, kein *es*, nichts, was du im Text nachschlagen müsstest, um es zu entschlüsseln — mit einem Vermerk, wie viel sie zählt, und einer **Haltung**, einer von sechs: *axiom*, gegeben oder per Definition wahr und nicht begründet; *observed*, aus erster Hand gesehen, gemessen oder getan; *deduced*, aus den anderen Aussagen des Textes erschlossen; *opinion*, ein Urteil oder eine Vorliebe des Autors; *assumed*, vorausgesetzt oder um des Arguments willen unterstellt; *hearsay*, von jemand anderem berichtet. Auf den Karten hat jede Haltung ihre eigene Form und Tinte, und lässt du den Zeiger auf einer ruhen, bekommst du ihre Definition.
+- **Seine Ereignisse**, der Reihe nach: wer was getan hat, vor und nach was.
+- **Sein atem**: der ganze Text in einer Zeile, mit Fokus, Schub und Zug (Abschnitt 12.5).
+
+Jeder Eintrag zeigt auf die Zeilen zurück, aus denen er stammt, sodass sich ein Zwilling immer an seinem Text prüfen lässt.
+
+**Einen anlegen.** Öffne einen Text — Markdown oder reinen Text, im Projekt oder in Canon — und nimm den Canon-Chip in seiner Kopfzeile (Abschnitt 6.1). Mit **dekompilieren** legst du den Zwilling an. **Zwilling** zeigt ihn, und gibt es noch keinen, wird zuerst dekompiliert, und die Ansicht dreht um, sobald er fertig ist. Du findest **dekompilieren** auch im Shift-Klick-Menü von Canon und im Option-Klick-Menü des Dateibaums, und die Kachel eines Textes in Canon trägt ein kleines getöntes Abzeichen, sobald er einen Zwilling hat — klick das Abzeichen, und der Text öffnet mit bereits gezeigtem Zwilling. Ein konvertiertes Dokument wird über seinen Markdown-Zwilling dekompiliert. Nicht dekompilieren lässt sich alles, was schon eine Beschreibung ist: eine `.cosm`-Datei, ein Katalog oder ein Holotype und die Dateien darin.
+
+**Ihn lesen.** Der Zwilling erscheint in der Leseansicht anstelle des Textes, in derselben Größe, voll oder mini, mit Gliederungsleiste und Karten des cosm-Betrachters (Abschnitt 12.3) und einem eigenen Kopf: der Name des Zwillings, ein Etikett, wenn er **nicht mehr aktuell** oder ein Gerüst ist, **Linse…**, **Gliederung**, **als Rohtext öffnen**, **Text kompilieren** und **zurück zum Text**. Wechsel hin und her, so oft du magst; die Leseansicht merkt sich, welche Seite jeder Text gezeigt hat, bis du Lesen/Bearbeiten schließt.
+
+**Aktuell, und nicht mehr aktuell.** Ein Zwilling ist aktuell, solange sein Text unverändert ist. Bearbeite den Text, und der Zwilling ist nicht mehr aktuell: Das Abzeichen bekommt seinen Punkt, und die Seite sagt es, aber der Zwilling wird aufbewahrt und gezeigt, genau wie er war, denn eine alte Lesart ist immer noch eine Lesart. Er wird nie von allein neu gemacht. **Zwilling erneuern** dekompiliert den Text noch einmal; ist der Zwilling schon aktuell, fragt enough erst nach, denn das ist viel Arbeit, um sie umsonst zu wiederholen. So oder so kommen die atems, die du an ihn geheftet hast, mit durch (Abschnitt 12.5).
+
+**Zurückkompilieren.** **Text kompilieren** macht den Zwilling wieder zu Prosa — zuerst die atem-Zeile, dann die Aussagen, gruppiert nach den Ideen, auf die sie sich stützen, jede Haltung in schlichten Worten gesagt („the author holds that“, „it is assumed that“, „reportedly“), dann die Ereignisse der Reihe nach, dann die Ausdrücke — und schreibt sie als neue Markdown-Datei neben den Zwilling, benannt mit Datum und Uhrzeit: `notes-from-eml-2026-10-22-1042.md`. Ein Toast bietet an, sie zu **öffnen**. Das Original rührt es nie an, und überschrieben wird nie etwas. Es ist ein guter Weg zu sehen, was ein Text sagt, wenn die Sätze nicht im Weg stehen, und ein ehrlicher Weg zu sehen, was eine Dekompilierung übersehen hat.
+
+**Ohne laufendes Modell** bekommst du trotzdem einen Zwilling, und er sagt, was er ist: ein **Gerüst**. Regeln allein können die Wörter finden, sie in FEED verankern und die Namen herauspicken; auf Aussagen oder Ereignisse lesen können sie nicht, also gibt es noch keine, und jeder Eintrag sagt *a model has not read this passage*. Zeile und Fokus des atem stammen aus den ersten Sätzen des Textes, Schub und Zug bleiben offene Fragen, und die Seite sagt *Gerüst, kein Modell*. Dekompiliere noch einmal, sobald ein Modell läuft, und das Gerüst weicht einer Lesart.
+
+**Wie lange es dauert.** Dekompilieren ist echtes Lesen, und auf einem kleinen lokalen Modell geht es nicht schnell. Auf G40-04, dem kleinsten (Abschnitt 16.1), braucht eine Notiz von ein paar hundert Wörtern etwa anderthalb Minuten. Ein längerer Text wird Passage für Passage gelesen, jeweils bis zu etwa sechshundert Wörtern, die Zeit wächst also mit der Länge; ein Kapitel ist ein Auftrag zum Anstoßen und Teekochen. Alles läuft im Hintergrund. Ein Toast sagt, was gerade geschieht — *wartet auf das Modell*, *notes.md wird dekompiliert · Passage 3 von 7*, *die Passagen werden zusammengeführt* — mit einem Fortschrittsbalken und **abbrechen**. Mittendrin abzubrechen lässt das Modell die Passage zu Ende lesen, die es gerade liest, und dann wird gar nichts geschrieben. Das Gespräch und die Dekompilierung teilen sich ein Modell, eine Nachricht, die du sendest, während eine läuft, wartet also, bis sie dran ist, und eine Zeile über dem Nachrichtenfeld sagt dir das. Ein Gerüst dagegen ist ein Augenblick Arbeit.
+
+**Deine Readvisors können das auch.** Bitte darum — „dekompiliere notes.md“ —, und dein Chef tut es; nie ungefragt. Sie können auch jede `.cosm`-Datei für dich lesen und prüfen („was sagt dieser Holotype über Preise?“, „prüf diesen Zwilling auf Probleme“). In einem Gespräch dekompilieren sie nur Texte bis etwa 6.000 Zeichen mit dem Modell, grob tausend Wörter; bei einem längeren schreiben sie das Gerüst und verweisen dich auf **dekompilieren** in der Leseansicht, das sich im Hintergrund Zeit lassen kann. Über etwa 24.000 Zeichen lehnen sie ab und sagen, warum. Ein Zwilling, den sie anlegen, wird in einer leisen Zeile angekündigt — *Ed hat einen EML-Zwilling von notes.md angelegt* — und hält fest, dass er von ihnen war. Für Texte in einem Canon-Band brauchen sie den Broker-Schalter **canon tools** auf an; Texte in deinem Projekt fragen nicht danach.
+
+### 12.5 atems
+
+Ein **atem** ist die knappste faire, vollständige Reduktion eines Textes — oder einer Passage daraus — in schlichtem Englisch. Es hat vier Teile:
+
+- **die Zeile** — ein Satz, fünfzehn bis fünfundzwanzig Wörter, der sagt, was das Ganze sagt, und zwar so, dass der Autor ihn gelten ließe: *fair*, damit er sich darin wiedererkennt; *vollständig*, damit nichts fehlt, wovon der Text abhängt; *schlicht*, damit er Alltagswörter benutzt und keinen Begriff, den der Text nicht gebraucht hat. Wenn jemand „das atem“ sagt, ist dieser Teil gemeint.
+- **Fokus** — was geschieht: das, worauf der Autor dich hinweist. Höchstens zwei Sätze.
+- **Schub** — was der Autor dir mitgeben will.
+- **Zug** — was du tatsächlich mitnehmen solltest, einschließlich dessen, was der Text stillschweigend voraussetzt: eine verborgene Prämisse, eine als Tatsache dargestellte Meinung, etwas, worauf er sich stützt, ohne es zu sagen.
+
+Schub ist die Seite des Autors und Zug deine. Bei einem ehrlichen, vollständigen Text stimmen sie überein. Wo nicht, ist die Lücke zwischen ihnen meist das Nützlichste auf der Karte.
+
+**Der ganze Text.** **atem** im Canon-Chip (Abschnitt 6.1) gibt dir das atem des Textes, den du liest; es steht auch im Shift-Klick-Menü von Canon, im Option-Klick-Menü des Dateibaums und im Knotenmenü von merirmaid. Das atem eines ganzen Textes wird in seinem EML-Zwilling aufbewahrt. Hat der Text noch keinen Zwilling, wird ein kleiner angelegt, der nur das atem hält, und der Chip bietet dann an, den Rest hinein zu **dekompilieren**. Canons Katalog kopiert die Zeile neben die Datei, sodass du sie im cosm-Betrachter siehst, ohne den Zwilling zu öffnen.
+
+**Eine Passage.** Markier eine Passage und klick sie mit rechts an: **atem der Auswahl** steht im Menü überall, wo du lesen und markieren kannst — ein Dokument in Lesen/Bearbeiten, auf jeder Seite und in jeder Größe; ein wikisink-Artikel; dieses Handbuch; die Spezifikation; eine Textseite auf einer Composure. Ein Rechtsklick auf eine Markierung ruft das Menü auch dann auf, wenn du nicht auf einem Wort bist; überall sonst gelten die Rechtsklick-Regeln aus Abschnitt 14.6.
+
+**Die Karte.** So oder so erscheint das atem auf einer Karte, die sich über das legt, was du gerade tust: *ATEM* oben, mit dem, woher es kam (*Auswahl in notes.md*), die Zeile groß gesetzt, und Fokus, Schub und Zug darunter — lass den Zeiger auf einem der vier ruhen für seine Definition. Meldet das Modell, woher die Aussagen des Textes ihr Wissen haben, zeigt ein Streifen die sechs Haltungen aus Abschnitt 12.4 mit je einer Zählung. Solange die Karte noch liest, sagt sie das und bietet **abbrechen** an; schließt du sie dann, bringt ein Toast die Antwort mit **zeigen** zurück, sobald sie fertig ist. Dann:
+
+- **kopieren** kopiert die Zeile; shift-klick darauf, um alle vier Teile zu kopieren.
+- **an den Zwilling heften** bewahrt das atem einer Passage im EML-Zwilling des Textes auf, nummeriert (`X:atem/1`, `X:atem/2` …), zusammen mit den Zeilen, aus denen es stammt. Das geht bei einer Passage in einem Text, den du in Lesen/Bearbeiten offen hast, denn der hat einen Zwilling, in dem sich das atem aufbewahren lässt; ein Artikel, dieses Handbuch, die Spezifikation und eine Composure-Seite haben keinen, ihre atems sind also zum Kopieren da. Angeheftetes überlebt ein Erneuern des Zwillings.
+- **Zwilling öffnen** zeigt den Zwilling, in den das atem eines ganzen Textes gegangen ist.
+- **schließen**.
+
+Das atem einer Passage braucht auf einem kleinen Modell Sekunden; ein ganzer langer Text dauert länger, eine Minute oder mehr, sobald er über ein paar tausend Wörter hinausgeht. Läuft kein Modell, zeigt die Karte ein Gerüst: Zeile und Fokus stammen aus den ersten Sätzen des Textes, Schub und Zug bleiben offene Fragen, und die Karte sagt das.
+
+**Dein Readvisor kann sie auch machen.** „Gib mir das atem davon“, auf eine Datei bezogen, schreibt das atem in den Zwilling dieser Datei und sagt dir das; auf eine eingefügte Passage bezogen, schreibt es nichts und antwortet nur. Dieselben vier Teile, dieselben Definitionen und dieselbe Obergrenze wie beim Dekompilieren: Über etwa 24.000 Zeichen schicken sie dich stattdessen in die Leseansicht.
 
 ---
 
-## 13. Das Wörterbuch (FEED)
+## 13. MacroCOSM OES
+
+Jede `.cosm`-Datei in Abschnitt 12 — der Katalog eines Bandes, ein Holotype, ein EML-Zwilling — ist in einer gemeinsamen Grammatik geschrieben, und die Grammatik hat einen Namen: **MacroCOSM OES**. Es ist das Regelwerk unter ihnen allen: wie eine Datei aufgebaut ist, was ein Eintrag ist und die wenigen Dinge, die jeder Eintrag über sich selbst sagt, wie ein Eintrag auf einen anderen zeigt, wie alles adressiert wird, wie etwas aufgeschrieben wird, das noch niemand weiß, und an welchen Prüfungen sich jeder Band messen lassen kann.
+
+OES steht für *organizational enumeration system* — eine Art, eine Welt zu ordnen, indem man alles in ihr aufzählt, als Dateisystem, das zugleich eine Datenbank ist, gemacht, um dargestellt zu werden — und jeder Teil davon ist ein Versprechen. Es **zählt auf**: Es listet auf, was es gibt, Eintrag für Eintrag, jeden mit seinen Quellen, und was nicht bekannt ist, wird als offene Frage für den aufgeschrieben, der sie beantworten kann, nie als Vermutung. Es ist ein **Dateisystem**: schlichter Text in Ordnern, auf deinem eigenen Rechner, ohne enough lesbar, zufrieden unter git und deins zum Mitnehmen. Es ist eine **Datenbank**: Jeder Eintrag hat eine ID, die als sein Schlüssel dient, seine Felder sind Spalten, seine Verweise sind Links, die die Prüfungen verifizieren können, und dieselben Dateien lassen sich durchsuchen und abfragen. Und es ist **gemacht, um dargestellt zu werden**: Die Dateien sind das Ende von nichts. Sie sind da, um gezeichnet, durchgesehen, zurück in Prosa kompiliert und in andere Formen für andere Leser verwandelt zu werden — und weil sich nur darstellen lässt, was die Dateien wirklich enthalten, bleiben die Dateien ehrlich.
+
+**Die Dialekte.** MacroCOSM allein beschreibt nichts Bestimmtes. Jede Art von Welt bekommt einen eigenen Dialekt, ein **MiniCOSM**, erklärt durch ein kleines Manifest, das sagt, was seine Einträge sind und wie sie zusammenhängen, und jeder Band nennt seinen Dialekt in einer Zeile ganz oben (`oes: canon/1`), woran enough erkennt, wie er zu lesen ist. Seine ersten drei Dialekte sind die, die diese Runde in enough gebracht hat:
+
+- **Comprise OES** — eine Firma, wie Comprise sie beschreibt: die Holotypes aus Abschnitt 12.3;
+- **Canon** — eine Bibliothek und das, was aus ihrem Inhalt gemacht wurde: die Kataloge aus Abschnitt 12.1;
+- **EML** — ein Text, auseinandergenommen in das, was er sagt: die Zwillinge aus Abschnitt 12.4;
+
+und enough liest auch die Produktbäume, aus denen die ganze Familie herausgewachsen ist, die älteren eigenständigen `.cosm`-Dateien, auf dieselbe Weise.
+
+### 13.1 Der Spezifikations-Betrachter
+
+Die Spezifikation steckt in der App. Der Button **MacroCOSM** oben im ⚙-UI-Fenster, neben **Hilfe** und **Wörterbuch**, öffnet sie als Vollbild-Modus, gestapelt wie jeder andere (Abschnitt 15), und es gibt ihn auch auf dem Startbildschirm. Sie liest sich so wie dieses Handbuch (Abschnitt 10): **Inhalt** listet jeden Abschnitt auf und markiert den, in dem du bist; **suchen** oder ⌘F durchsucht sie; wo immer sie einen ihrer eigenen Abschnitte erwähnt, ist die Erwähnung ein Link; jeder Sprung hinterlässt eine Pille **↩ zurück, wo du warst**; und der Größen-Button dockt sie neben deine Arbeit. Das Abzeichen in ihrer Werkzeugleiste nennt die Version, die du liest.
+
+Der andere Weg hinein ist **über dieses Format** im cosm-Betrachter; es öffnet die Spezifikation an der Stelle über den Band vor dir, und dort wollen die meisten anfangen. Beginnst du lieber ganz oben: Ihr zweiter Abschnitt, *the model on one page*, ist die ganze Idee in einer Tabelle.
+
+Sie ist auf Englisch geschrieben und bleibt es vorerst, welche Sprache die Oberfläche auch spricht; der Betrachter sagt das in einer Zeile, wenn deine nicht Englisch ist. An manchen Stellen ist sie dicht, dafür sind Spezifikationen da. Entgleitet dir ein Absatz, markier ihn und bitte um sein atem (Abschnitt 12.5). Und dein Readvisor kann den eigenen Leitfaden des Formats lesen, wann immer er ihn braucht (Abschnitt 20.5).
+
+### 13.2 Woher die Wörter kommen
+
+- **COSM** kommt von *kosmos*, dem griechischen Wort für Ordnung und für die Welt als geordnetes Ganzes. Es begann als Akronym und ist daraus herausgewachsen; `.cosm` ist die einzige Dateiendung der Familie.
+- **MacroCOSM, MiniCOSM, MicroCOSM** sind die drei Maßstäbe der Familie: die ganze Grammatik; der Dialekt einer Welt davon; und die eigenen Ergänzungen einer Organisation zu einem Dialekt — Letzteres kartiert, nicht gebaut. Sie borgen eine alte Idee, von den Griechen bis zur Renaissance: dass die kleine Welt die Ordnung der großen widerspiegelt. Jeder kleinere Maßstab behält die Ordnung des größeren und fügt ihr etwas hinzu.
+- **Holotype** kommt aus der Taxonomie, wo es das eine Exemplar ist, nach dem eine Art benannt und gegen das sie beschrieben wird. Ein Holotype ist die vollständige, private Beschreibung eines Gegenstands, geführt von diesem Gegenstand selbst. (Sein kleines öffentliches Gegenstück heißt Isotype, und das ist Comprises Sache.)
+- **EML** steht für *enumerated meaning language*: die Bedeutung eines Textes, aufgezählt.
+- **atem** ist *meta* rückwärts, was ziemlich gut passt. *Meta* tritt von einem Text zurück, um über ihn zu reden; ein atem tritt in ihn hinein und sagt in einer Zeile, was er sagt.
+
+*Die MacroCOSM-OES-Spezifikation ist © 2026 Graham Smith, alle Rechte vorbehalten.*
+
+---
+
+## 14. Das Wörterbuch (FEED)
 
 enough bringt ein eigenes Wörterbuch mit: **FEED**, das **hauseigene englische Wörterbuch von enough**. Es ist ein Originalwerk, für enough geschrieben statt anderswo lizenziert — rund 117.000 Stichwörter, jedes mit seiner Aussprache, seiner Wortart und einer schlichten Definition, die meisten dazu mit Beispielen, Formen, einer Herkunft, einem Datum der ersten Verwendung, einem Maß dafür, wie gebräuchlich das Wort ist, seinen Reimen, seinen Verwandten und seinen Entsprechungen in fünf anderen Sprachen.
 
 Es lebt auf deinem Rechner. enough liefert das Wörterbuch als schlichten Text aus und baut daraus beim ersten Start nach einer Installation oder einem Update eine Datenbank — `~/enough/dict/feed.sqlite` —, im Hintergrund, während du dich um etwas anderes kümmerst. Öffnest du das Wörterbuch, solange das noch läuft, steht dort *der Satz wird gesetzt…* mit einer Prozentzahl, und es macht von allein weiter. Ein Wort nachzuschlagen berührt nie das Netzwerk: was du liest und über welche Wörter du dich gewundert hast, bleibt auf der Maschine.
 
-### 13.1 Es öffnen
+### 14.1 Es öffnen
 
-Im ⚙-UI-Fenster: Der **Wörterbuch**-Button sitzt oben neben **Hilfe** (Abschnitt 10). Das Wörterbuch öffnet als Vollbild-Modus, gestapelt wie jeder andere (Abschnitt 14); was du vorher gelesen hast, liegt beim Schließen also noch darunter, und Esc bringt dich zurück.
+Im ⚙-UI-Fenster: Der **Wörterbuch**-Button sitzt oben neben **Hilfe** (Abschnitt 10). Das Wörterbuch öffnet als Vollbild-Modus, gestapelt wie jeder andere (Abschnitt 15); was du vorher gelesen hast, liegt beim Schließen also noch darunter, und Esc bringt dich zurück.
 
-Es ist eine Leseoberfläche. In seine Einträge kannst du nicht tippen und sie auch nicht umordnen; Wörter hinzuzufügen und zu ändern läuft über deinen Chef-Readvisor (Abschnitt 13.7).
+Es ist eine Leseoberfläche. In seine Einträge kannst du nicht tippen und sie auch nicht umordnen; Wörter hinzuzufügen und zu ändern läuft über deinen Chef-Readvisor (Abschnitt 14.7).
 
-### 13.2 Seiten umblättern
+### 14.2 Seiten umblättern
 
 Es ist wie ein gedrucktes Wörterbuch angelegt, nicht wie eine Liste, durch die man scrollt: so viele Einträge, wie ins Fenster passen, in zwei bis vier Spalten, wenn Platz ist, und eine Seite, die du umblätterst. → und ←, Bild ab und Bild auf, Leertaste und shift-Leertaste blättern alle um; ebenso ein Wisch über das Trackpad oder eine Drehung am Rad — eine Seite pro Geste — und ebenso die Buttons am Fuß, die das Wort nennen, das auf der nächsten Seite wartet, und das, das auf der letzten zurückgeblieben ist. Pos1 und Ende gehen zur ersten und zur letzten Seite.
 
@@ -805,11 +931,11 @@ Am oberen Rand jeder Seite laufen die **Leitwörter**, wie in jedem gedruckten W
 
 Am rechten Rand entlang läuft das **Daumenregister**, die eingekerbten Reiter am Buchschnitt eines dicken Schreibtisch-Wörterbuchs: ein Reiter pro Buchstabe, jeder so hoch wie sein Anteil am Buch, sodass man auf einen Blick sieht, dass S dick ist und X dünn. Klick auf einen Reiter, und das Wörterbuch öffnet sich dort. Die Reiter folgen der Reihenfolge, in der du liest — Fachgebiete bei einer Sortierung nach Fachgebiet, Jahrhunderte bei einer nach Epoche —, und der, in dem du gerade bist, ist markiert.
 
-Jeder Eintrag ist kurz: das Stichwort mit Punkten zwischen den Silben (*lan·tern*), seine Aussprache, seine Wortart, die Definition, ein Gebrauchslabel, wo es eines gibt, und ein paar verwandte Wörter, jedes ein Link, der zur Seite dieses Wortes blättert. ↑ und ↓ bewegen eine Auswahl durch die Einträge; Return oder ein Doppelklick öffnet den ausgewählten in voller Länge (Abschnitt 13.5). Ist das Wörterbuch schmal — ein kleines Fenster, oder neben ein angedocktes Readvisor-Panel gequetscht —, wird die Seite zu einer einzigen Spalte ausführlicherer Einträge, jeder mit einer kleinen Häufigkeitsanzeige, einer Zeitleiste, wann das Wort aufkam, und seinem Fachgebiet.
+Jeder Eintrag ist kurz: das Stichwort mit Punkten zwischen den Silben (*lan·tern*), seine Aussprache, seine Wortart, die Definition, ein Gebrauchslabel, wo es eines gibt, und ein paar verwandte Wörter, jedes ein Link, der zur Seite dieses Wortes blättert. ↑ und ↓ bewegen eine Auswahl durch die Einträge; Return oder ein Doppelklick öffnet den ausgewählten in voller Länge (Abschnitt 14.5). Ist das Wörterbuch schmal — ein kleines Fenster, oder neben ein angedocktes Readvisor-Panel gequetscht —, wird die Seite zu einer einzigen Spalte ausführlicherer Einträge, jeder mit einer kleinen Häufigkeitsanzeige, einer Zeitleiste, wann das Wort aufkam, und seinem Fachgebiet.
 
 **Die Wortart-Zeichen.** Jeder Eintrag trägt für jede Wortart, die er hat, ein Zeichen in einer Farbe und einer Form, damit Farbe nie das einzige Signal ist: ein **Quadrat** für ein Substantiv, ein **Dreieck** für ein Verb, eine **Raute** für ein Adjektiv, ein **runder Punkt** für ein Adverb und ein **hohler Ring** für alles andere. In den Spalten sitzt das Zeichen vor der Abkürzung (*n.*, *v.*, *adj.* …) und als dünner Balken am Rand des Eintrags; ein Wort, das Substantiv und Verb zugleich ist, trägt beide.
 
-### 13.3 Sortieren, und noch einmal sortieren
+### 14.3 Sortieren, und noch einmal sortieren
 
 Alphabetisch ist nur der Anfang. **sortieren** ordnet das ganze Wörterbuch nach einem von neun Kriterien — alphabetisch, Länge, Fachgebiet, Epoche, Wortart, Häufigkeit, Silben, zuletzt hinzugefügt und Quelle —, und der Button daneben kehrt die Reihenfolge um, in schlichten Worten: *kurze zuerst* oder *lange zuerst*, *älteste zuerst* oder *neueste zuerst*, *seltenste zuerst* oder *häufigste zuerst*.
 
@@ -819,13 +945,13 @@ Alphabetisch ist nur der Anfang. **sortieren** ordnet das ganze Wörterbuch nach
 
 Das Wörterbuch merkt sich deine Ordnung, deine Filter und die Seite, auf der du warst, und öffnet beim nächsten Mal dort.
 
-### 13.4 Ein Wort finden
+### 14.4 Ein Wort finden
 
 Tipp ins Suchfeld oben — / oder ⌘F bringt dich dorthin —, und die Seite wird zu den Ergebnissen: jeder Eintrag, dessen Stichwort oder Definition enthält, was du getippt hast, mit markierten Treffern. Drückst du Return bei einem genauen Wort, tritt die Suche beiseite, und das Wörterbuch blättert stattdessen zur Seite dieses Wortes, in welcher Reihenfolge du auch liest. Esc leert die Suche und bringt dich zurück auf die Seite, auf der du davor warst.
 
-Eine Form eines Wortes — *ran*, zum Beispiel — führt dich zu dem Wort, zu dem sie gehört, und die Karte einer nachgeschlagenen Form sagt, welche Form wovon sie ist. Ein Wort, das FEED nicht hat, öffnet seine Karte (Abschnitt 13.5) mit der Nachricht, ein paar nahen Wörtern, die es hat, und der Stelle, an der das Wort stünde, wenn es dort wäre.
+Eine Form eines Wortes — *ran*, zum Beispiel — führt dich zu dem Wort, zu dem sie gehört, und die Karte einer nachgeschlagenen Form sagt, welche Form wovon sie ist. Ein Wort, das FEED nicht hat, öffnet seine Karte (Abschnitt 14.5) mit der Nachricht, ein paar nahen Wörtern, die es hat, und der Stelle, an der das Wort stünde, wenn es dort wäre.
 
-### 13.5 Die Wortkarte
+### 14.5 Die Wortkarte
 
 Doppelklick auf einen Eintrag, oder wähle ihn aus und drück Return, und er öffnet sich in voller Größe, als Karte über allem, was du gerade gemacht hast. Alles, was FEED über das Wort weiß, steht darauf, und das meiste schon in der ersten Ansicht:
 
@@ -839,13 +965,13 @@ Drei Reiter halten den Rest, einen Klick entfernt (oder 1, 2 und 3): **Wörter**
 
 **Von Wort zu Wort wandern.** Jedes Wort auf der Karte ist ein Link, ebenso jedes Wort der Definition, der Beispiele und der Herkunft: Klick eines an, und die Karte wird die dieses Wortes. Der Pfad, den du gegangen bist, läuft oben entlang als **dein Weg**, und **‹ zurück** (oder ⌫) geht ihn Schritt für Schritt zurück. ← und → springen zum vorherigen und zum nächsten Eintrag in der Reihenfolge, in der du liest, mit *Eintrag n von m*, das sagt, wo du bist. **auf seiner Seite zeigen** — **im Wörterbuch öffnen**, wenn du von woanders kamst — schließt die Karte und schlägt das Wörterbuch bei dem Wort auf. Esc, das × oder ein Klick außerhalb der Karte schließt sie.
 
-### 13.6 „Wörterbucheintrag“, überall, wo du liest
+### 14.6 „Wörterbucheintrag“, überall, wo du liest
 
 Klick mit der rechten Maustaste auf ein Wort — in der Leseseite oder der Bearbeitungsseite eines Dokuments, im Gespräch, auf einer Composure-Seite, in einem wikisink-Artikel, in diesem Handbuch —, und ein kleines Menü bietet **Wörterbucheintrag** an, der die Karte dieses Wortes über allem öffnet, was du gerade tust, und **kopieren**. Markier vorher eine kurze Wendung und klick mit rechts hinein, wird die Wendung nachgeschlagen. Im Wörterbuch selbst blättert derselbe Eintrag zur Seite des Wortes; auf der Karte führt er die Karte dorthin. ⇧⌘D tut dasselbe für das markierte Wort oder das Wort am Cursor, ganz ohne Menü. Auf einer Composure bekommt das Menü, das du ohnehin siehst, wenn du mit rechts auf ein Modul klickst, denselben Eintrag, sobald der Zeiger auf einem Wort steht.
 
 Das Systemmenü ist nicht verschwunden; es ist nur um eine Taste verrückt. Ein Rechtsklick, der nicht auf einem Wort liegt — zwischen Wörtern, hinter dem Ende einer Zeile, auf einem Link, auf einem Bild —, bekommt das Systemmenü genau wie immer. Und ein Rechtsklick mit gehaltener **Shift**-Taste bekommt jedes Mal das Systemmenü, ob Wort oder nicht: Das ist der Weg zu Rechtschreibvorschlägen, zum systemeigenen Nachschlagen und zum Einfügen in ein Textfeld. Das Menü sagt es in seiner letzten Zeile, du musst dir also nichts merken.
 
-### 13.7 Dein eigenes Wörterbuch
+### 14.7 Dein eigenes Wörterbuch
 
 FEED selbst ändert sich nie unter dir, aber es ist nicht das einzige Wörterbuch hier. Daneben steht **dein eigenes**, das leer beginnt und nur enthält, was du hineintust: ein Wort, das deine Familie erfunden hat, ein Begriff aus deinem Fach, ein Name, den du für etwas hast, eine eigene Wortschöpfung — oder deine eigene Fassung eines Wortes, das FEED schon hat.
 
@@ -857,13 +983,13 @@ Sie liegen in einer einzigen Datei, `~/enough/dict/user-dictionary.sqlite`, getr
 
 Um einen deiner Einträge zu entfernen, öffne seine Karte und drück **deinen Eintrag löschen**; es fragt vorher nach. Löschst du deine Version eines FEED-Wortes, kommt FEEDs eigener Eintrag zurück. Einen Eintrag zu ändern ist ein anderes Gespräch — „ändere das Beispiel für *glimmerwick*“ —, denn das Wörterbuch selbst ist nur zum Lesen da.
 
-Dein Readvisor hat das Wörterbuch in jedem Projekt zur Hand, mit Skill oder ohne. Der Skill `lexicographer` (Abschnitt 19.4) ist für die Zeit, in der du oft Wörter hinzufügst: Eingeschaltet, trägt er FEEDs ganzen Hausstil in jeden Zug, sodass deine Einträge so klingen wie der Rest des Buches, ohne dass dein Readvisor erst den Stilleitfaden holen gehen muss.
+Dein Readvisor hat das Wörterbuch in jedem Projekt zur Hand, mit Skill oder ohne. Der Skill `lexicographer` (Abschnitt 20.4) ist für die Zeit, in der du oft Wörter hinzufügst: Eingeschaltet, trägt er FEEDs ganzen Hausstil in jeden Zug, sodass deine Einträge so klingen wie der Rest des Buches, ohne dass dein Readvisor erst den Stilleitfaden holen gehen muss.
 
 ---
 
-## 14. Mehrfach aktiver Modus-Stapel
+## 15. Mehrfach aktiver Modus-Stapel
 
-enoughs Vollbild-Modi — Lesen/Bearbeiten, girraph, merirmaid, wikisink, cacheawl, das Wörterbuch, dieses Handbuch — ersetzen sich nicht gegenseitig. Sie **stapeln** sich, wie Blätter Papier. cacheawl öffnen, einen girraph von innerhalb einer Box öffnen, eine Notizdatei darüber öffnen: drei Modi tief, und jeden zu schließen legt den darunterliegenden genau so frei, wie du ihn verlassen hast. Dieselbe Scroll-Position, derselbe Abstieg, dieselben ungespeicherten Änderungen.
+enoughs Vollbild-Modi — Lesen/Bearbeiten, girraph, merirmaid, wikisink, Canon, der cosm-Betrachter, das Wörterbuch, dieses Handbuch, die MacroCOSM-Spezifikation — ersetzen sich nicht gegenseitig. Sie **stapeln** sich, wie Blätter Papier. Canon öffnen, einen girraph von innerhalb eines Bandes öffnen, eine Notizdatei darüber öffnen: drei Modi tief, und jeden zu schließen legt den darunterliegenden genau so frei, wie du ihn verlassen hast. Dieselbe Scroll-Position, derselbe Abstieg, dieselben ungespeicherten Änderungen.
 
 Die obere Leiste zeigt einen quadratischen Indikator pro offenem Modus, neuester links. Jeder trägt ein kleines rot-x-Band, das genau diesen Modus schließt, auch einen vergrabenen. Auf den Indikator eines vergrabenen Modus klicken, um ihn nach oben zu holen, ohne sonst etwas zu stören. Schließt der letzte, bist du zurück auf der Composure — dem leeren Stapel (Abschnitt 4).
 
@@ -888,11 +1014,11 @@ Zwei nützliche Dinge, die man kennen sollte:
 
 ---
 
-## 15. Das Modell-Fenster
+## 16. Das Modell-Fenster
 
 Das Modell-Abzeichen in der oberen Leiste öffnet das Modell-Fenster: welches Gehirn dir gerade antwortet, was sonst noch verfügbar ist, und — wenn du willst — der Cloud-Slot.
 
-### 15.1 Lokale Modelle: Überblick und Nutzungsempfehlungen
+### 16.1 Lokale Modelle: Überblick und Nutzungsempfehlungen
 
 Sieben unterstützte lokale Modelle — und das Fenster ist jetzt auch, wo du sie installierst. Jede Zeile, die du noch nicht hast, zeigt ihre Download-Größe und ein Machbarkeitsurteil, berechnet gegen den Arbeitsspeicher und freien Plattenplatz *dieses Rechners*: ✓ komfortabel, ~ knapp, ✗ nicht empfohlen. Downloads laufen mit einem Live-Fortschrittsbalken, überstehen ein Beenden (sie setzen dort fort, wo sie aufgehört haben), und lassen sich abbrechen, ohne den Teil zu verlieren, den du schon hast. Installierte Modelle wechseln mit einem Klick, und jedes Modell außer dem aktiven lässt sich aus seiner Zeile löschen, wenn du die Platte zurückhaben willst.
 
@@ -914,7 +1040,7 @@ Noch eine Anmerkung für Terminal-Installationen: ein Modell lässt sich auf jed
 
 Modell wechseln startet den lokalen Inferenz-Server neu und leert das Gespräch im Arbeitsspeicher. Deine Dateien, Protokolle und der Anfrage-Zustand bleiben alle erhalten; ein Wechsel kostet dich Chat-Verlauf, nicht Arbeit.
 
-### 15.2 OpenRouter-Unterstützung (der OPRO-API-Slot)
+### 16.2 OpenRouter-Unterstützung (der OPRO-API-Slot)
 
 enough ist local-first, nicht local-only. Ein fünfter Modell-Slot, **OPRO-API**, leitet über OpenRouter zu Cloud-Modellen. Er ist standardmäßig aus, bewusst aufwendig zu aktivieren, und ehrlich über den Tausch: deine Prompts und Outputs verlassen den Rechner, im Austausch für Frontier-Modell-Fähigkeiten und, manchmal, geringere Kosten als die Hardware und der Strom, die ein vergleichbares lokales Modell verlangen würden.
 
@@ -925,7 +1051,7 @@ Zwei Dinge halten Cloud-Nutzung rechenschaftspflichtig:
 - **Alles wird lokal zwischengespeichert.** Jeder Cloud-Austausch wird in `rness/io/cloud-cache/` geschrieben, mit Token-Zahlen und einem Index — eine lokale Papierspur, die deine lokalen Readvisors später lesen können.
 - **`cloud_pipeline`** lässt deine Readvisors große Jobs gebündelt durch den Cloud-Slot schicken — bis zu 200 Schritte, mit Zwischenspeicherung pro Schritt, optionaler Zusammenfassung pro Schritt, und einem abschließenden Kompilierungsdurchgang — Ergebnisse werden auf die Platte geschrieben, statt das Gespräch zu fluten. Bitte um „eine Cloud-Pipeline, die alle zwölf Kapitelzusammenfassungen entwirft“, und die Schwerarbeit passiert außerhalb des Gesprächs, vollständig protokolliert.
 
-### 15.3 `/pal` — eine Frage nach draußen
+### 16.3 `/pal` — eine Frage nach draußen
 
 Manchmal ist dein lokales Modell überfordert, und du hättest gern eine Meinung von außen. Ein **pal** ist genau das: keine neue Einstellung und kein zweites Konto, sondern schlicht das Cloud-Modell, das du im OPRO-API-Slot ohnehin schon eingerichtet hast, einmal erreicht, von Hand, aus einem sonst lokalen Zug heraus.
 
@@ -937,7 +1063,7 @@ Dann passieren drei Dinge, der Reihe nach. Dein Chef-Readvisor denkt zuerst hier
 
 **Du siehst, was hinausgegangen ist.** Bevor die Antwort eintrifft, erscheint der genaue Text, der hinausging, als eigene Blase, Wort für Wort — nie gekürzt, nie auf dem Weg zum Bildschirm zusammengefasst —, mit der Antwort darunter. Beides ist nach einem Neuladen immer noch da, und beides wird in dein Sitzungsprotokoll und in den Cloud-Cache geschrieben. `/pal` zu tippen *ist* die Zustimmung; es gibt keinen zweiten Bestätigungsschritt, denn eine Bestätigung, die jedes Mal erscheint, ist ein Knopf, den man zu klicken lernt, ohne ihn zu lesen. An ihre Stelle tritt, dass du immer sehen kannst, was hinausgegangen ist.
 
-**Das Tor ist das Tor des Cloud-Slots, genau dasselbe.** `/pal` funktioniert, wenn **local models only** im Broker aus ist, ein Schlüssel hinterlegt ist und die letzte Gesundheitsprüfung bestanden wurde (15.2). Trifft eines davon nicht zu, sagt dir `/pal`, welches, und wie du es behebst — und es läuft kein Zug, also wird nichts ausgegeben und nichts verlässt den Rechner. Tipp `/` als erstes Zeichen im Eingabefeld, und eine Hinweiszeile sagt dir dasselbe, bevor du dich festlegst: ausgegraut mit dem Grund, wenn der Slot nicht nutzbar ist, und mit dem Namen des Modells, das gefragt würde, wenn er es ist — das ist der Unterschied zwischen einem Befehl und einer Überraschung auf deiner Rechnung.
+**Das Tor ist das Tor des Cloud-Slots, genau dasselbe.** `/pal` funktioniert, wenn **local models only** im Broker aus ist, ein Schlüssel hinterlegt ist und die letzte Gesundheitsprüfung bestanden wurde (16.2). Trifft eines davon nicht zu, sagt dir `/pal`, welches, und wie du es behebst — und es läuft kein Zug, also wird nichts ausgegeben und nichts verlässt den Rechner. Tipp `/` als erstes Zeichen im Eingabefeld, und eine Hinweiszeile sagt dir dasselbe, bevor du dich festlegst: ausgegraut mit dem Grund, wenn der Slot nicht nutzbar ist, und mit dem Namen des Modells, das gefragt würde, wenn er es ist — das ist der Unterschied zwischen einem Befehl und einer Überraschung auf deiner Rechnung.
 
 **Ein Aufruf je `/pal`.** Dein Readvisor bekommt genau eine Frage nach draußen je Nachricht, die du so beginnst. Deckt die Antwort es nicht ab, sagt er das, und du kannst noch eine schicken. Und bei jedem anderen Zug verlässt nichts diesen Rechner: ohne `/pal` davor ist das Werkzeug schlicht nicht da, und ein Readvisor, der eine Meinung von außen für hilfreich hält, muss das sagen und dich entscheiden lassen.
 
@@ -947,35 +1073,35 @@ Ist das Modell, mit dem du ohnehin sprichst, *selbst* OPRO-API, gibt es keinen p
 
 ---
 
-## 16. Paradigmen
+## 17. Paradigmen
 
 Ein Paradigma ist das Denkgerüst, in dem deine Readvisors arbeiten — die Spielregeln dafür, wie Arbeit passiert. Immer genau eines ist aktiv (oben in der Seitenleiste angezeigt; auf ● klicken zum Wechseln), und der volle Text des aktiven Paradigmas reitet bei jedem Zug im System-Prompt mit. Dein Chef-Readvisor sieht auch einen einzeiligen Katalog der anderen, damit er einen Wechsel vorschlagen kann — oder selbst vollziehen —, wenn deiner Bitte anderswo besser gedient wäre. Ein Wechsel, der für dich gemacht wird, ist nichts Exotisches: der Name des Paradigmas wird nach `rness/active-paradigm` geschrieben, und dir wird gesagt, dass es passiert ist.
 
-### 16.1 text-planning
+### 17.1 text-planning
 
 **Heimat.** Jedes neue Projekt beginnt hier, und jedes andere Paradigma kehrt hierher zurück, wenn seine Arbeit getan ist. Meistens fühlt es sich gar nicht wie ein Denkgerüst an: freies Gespräch, eine Stimme, für Fragen, Lesen, Recherche, Lektorat, Dateiarbeit und Entwerfen, wenn du ums Entwerfen bittest. Es trägt die stehenden Konventionen — zu wissen, dass „die gelben Teile“ deine Markierungen meint, wohin erzeugte Dateien gehen, wie Webseiten abgerufen werden —, und es ist der Verteiler, der bemerkt, wenn eines der anderen Paradigmen einer Bitte besser dienen würde, und umschaltet.
 
-Es ist auch der Ort, an dem ein Text geplant wird, und das ist die lange Startbahn vor der Prosa: einen Roman, eine Essaysammlung, ein Sachbuch, eine Abhandlung oder ein Manifest von „ich glaube, ich will etwas schreiben“ zu einem brauchbaren Plan bringen. Nichts von dieser Maschinerie taucht auf, bevor du Planungsabsicht zeigst — „hilf mir, einen Roman zu planen“, „lass uns meine Essaysammlung gliedern“ —, und kein Skill muss dafür eingeschaltet werden. Dann baut dein Chef-Readvisor mit dir ein Plandokument im Projekt-Wurzelverzeichnis — geduldig, iterativ, über so viele Sitzungen, wie es braucht — und erzeugt auf Anfrage *Gerüste* pro Abschnitt: strukturelle Leitfäden (Beats, Überschriften, Ton-Erinnerungen, Wortbudgets), die du selbst zu Prosa ausbaust. Die Regel, die es ausmacht: **der Plan und die Gerüste enthalten nie Prosa.** Sie halten nur Struktur, und deine Stimme bleibt deine Stimme. Entwerfen ist eine eigene Sache, um die du mit so vielen Worten bitten kannst — „entwirf Kapitel 1 nach dem Plan“ —, und es wird in eine eigene Datei geschrieben, nie in den Plan; dein Readvisor bietet es nicht ungefragt an. Ein Projekt, das sich als Memoiren entpuppt, wird auf `memoir-dialectic` hingewiesen (Abschnitt 19.5), das eigens dafür gebaut ist.
+Es ist auch der Ort, an dem ein Text geplant wird, und das ist die lange Startbahn vor der Prosa: einen Roman, eine Essaysammlung, ein Sachbuch, eine Abhandlung oder ein Manifest von „ich glaube, ich will etwas schreiben“ zu einem brauchbaren Plan bringen. Nichts von dieser Maschinerie taucht auf, bevor du Planungsabsicht zeigst — „hilf mir, einen Roman zu planen“, „lass uns meine Essaysammlung gliedern“ —, und kein Skill muss dafür eingeschaltet werden. Dann baut dein Chef-Readvisor mit dir ein Plandokument im Projekt-Wurzelverzeichnis — geduldig, iterativ, über so viele Sitzungen, wie es braucht — und erzeugt auf Anfrage *Gerüste* pro Abschnitt: strukturelle Leitfäden (Beats, Überschriften, Ton-Erinnerungen, Wortbudgets), die du selbst zu Prosa ausbaust. Die Regel, die es ausmacht: **der Plan und die Gerüste enthalten nie Prosa.** Sie halten nur Struktur, und deine Stimme bleibt deine Stimme. Entwerfen ist eine eigene Sache, um die du mit so vielen Worten bitten kannst — „entwirf Kapitel 1 nach dem Plan“ —, und es wird in eine eigene Datei geschrieben, nie in den Plan; dein Readvisor bietet es nicht ungefragt an. Ein Projekt, das sich als Memoiren entpuppt, wird auf `memoir-dialectic` hingewiesen (Abschnitt 20.6), das eigens dafür gebaut ist.
 
 **Wenn ein Projekt auf `default` stand.** `default` war bis zu dieser Runde das Heimat-Paradigma, und text-planning hat alles übernommen, was es tat. Ein Projekt, in dem `default` aktiv war, wird beim nächsten Öffnen auf text-planning umgestellt, wobei deine Einstellung für Hilfeblasen unverändert bleibt. Die eine Ausnahme ist ein Projekt, in dem du `default.md` zu einer eigenen Datei umgebaut hast: Diese Kopie gehört dir, also behält das Projekt sie und benutzt sie weiter, bis du wechselst.
 
-### 16.2 translation
+### 17.2 translation
 
-Erklärt Offline-Übersetzung zu einer Fähigkeit erster Klasse. Es paart sich mit dem Skill `translator` (Abschnitt 19.8): geht es bei einer Bitte darum, Text zwischen menschlichen Sprachen zu bewegen, wechselt dein Readvisor hierher, und ist der Skill ausgeschaltet, sagt er dir, was dir fehlt — und sagt es dir weiter, bis du ihn einschaltest. Mit eingeschaltetem Skill hast du einen lokalen Übersetzer für ~419 Sprachen, ohne Konto, ohne Ratenlimit, ohne Netzwerkabhängigkeit.
+Erklärt Offline-Übersetzung zu einer Fähigkeit erster Klasse. Es paart sich mit dem Skill `translator` (Abschnitt 20.9): geht es bei einer Bitte darum, Text zwischen menschlichen Sprachen zu bewegen, wechselt dein Readvisor hierher, und ist der Skill ausgeschaltet, sagt er dir, was dir fehlt — und sagt es dir weiter, bis du ihn einschaltest. Mit eingeschaltetem Skill hast du einen lokalen Übersetzer für ~419 Sprachen, ohne Konto, ohne Ratenlimit, ohne Netzwerkabhängigkeit.
 
-### 16.3 workflow-design
+### 17.3 workflow-design
 
 Das Paradigma über enough selbst, aktiv, wann immer du den Workflow gestaltest oder änderst, statt in ihm zu arbeiten: neue Skills, neue Readvisors, neue Paradigmen, Änderungen an AGENT.md oder MOTIVATION.md. Hier verhält sich dein Chef-Readvisor wie ein nachdenklicher Mitgestalter — klärende Fragen vor dem Bauen (Umfang? Name? Auslösebedingungen?), Alternativen, wenn dein erster Instinkt schärfer sein könnte, und eine verfolgte Anfrage-Datei für jeden Bau, denn Workflow-Änderungen überleben die Gespräche, die sie hervorbringen. Das ist das Paradigma, das Abschnitt 3 wahr macht.
 
 ---
 
-## 17. Readvisors
+## 18. Readvisors
 
 Ein **Readvisor** ist ein Urteil, das du behalten kannst: mit eigener `AGENT.md` und `MOTIVATION.md`, denselben zwei Dateien, die auch deinen Chef-Readvisor definieren, zugeschnitten auf eine ganz bestimmte Art, ein Problem zu lesen. Pro Projekt im Bereich **Readvisors** der Seitenleiste ein- und ausschalten.
 
 Der oben im Readvisor-Panel ist dein **Chef-Readvisor**, und ab Werk heißt er **Ed**. Diesen Namen darfst du ändern — **Chef-Readvisor umbenennen**, in der Kopfzeile des Broker-Fensters (Abschnitt 9). Der Chef ist keine andere Art Ding als die übrigen; er ist nur derjenige, der antwortet, wenn du niemanden Bestimmten gefragt hast.
 
-**Mehrere Readvisors, eine Stimme.** Schalt drei ein, und du bekommst keine drei Antworten. Im gewöhnlichen Gespräch werden ihre Blickwinkel, ihr Fachwissen und ihre Warnungen in das eingefaltet, was dein Chef sagt — eine Stimme, manchmal aus mehreren gemacht. Treibt ein bestimmter Blickwinkel gerade einen Punkt an, erfährst du meistens, welcher. Willst du sie einzeln sprechen hören, unter eigenem Namen, reihum, dann ist das ein **Rat** (Abschnitt 18).
+**Mehrere Readvisors, eine Stimme.** Schalt drei ein, und du bekommst keine drei Antworten. Im gewöhnlichen Gespräch werden ihre Blickwinkel, ihr Fachwissen und ihre Warnungen in das eingefaltet, was dein Chef sagt — eine Stimme, manchmal aus mehreren gemacht. Treibt ein bestimmter Blickwinkel gerade einen Punkt an, erfährst du meistens, welcher. Willst du sie einzeln sprechen hören, unter eigenem Namen, reihum, dann ist das ein **Rat** (Abschnitt 19).
 
 **Drei Orte, aus denen sie kommen**, und die Zeile in der Seitenleiste sagt, welcher:
 
@@ -987,38 +1113,38 @@ Ein globaler und ein mitgelieferter Readvisor gleichen Namens verlieren gegen ei
 
 **Einen entfernen.** Nicht mitgelieferte Zeilen tragen ein ×. Es fragt vorher, denn es löscht Dateien: der Ordner eines Projekt-Readvisors verschwindet, ein globaler verschwindet aus `~/enough/readvisors/` und aus der Liste dieses Projekts. Was enough mitgeliefert hat, lässt sich so nicht entfernen — da ist nichts zu löschen, was ein Update nicht wieder hinlegen würde. Und ein entfernter Name wird auch aus der Aus-Liste des Projekts gestrichen, damit ein später eintreffender Readvisor gleichen Namens nicht rätselhafterweise ausgeschaltet ist.
 
-### 17.1 block-breaker
+### 18.1 block-breaker
 
-Ein Spezialist für Schreibblockaden, destilliert aus den Antworten einer echten Autorin darüber, wie sie das Feststecken auflöst — was genau das ist, was der `readvisory`-Skill (Abschnitt 19.6) tut, und so sieht sein Ergebnis aus. Er diagnostiziert, bevor er verschreibt — Ideenmangel, Mutmangel, Strukturmangel und Erlaubnismangel sind vier verschiedene Probleme —, und greift dann zu Beschränkungen, wiederholungsbasiertem Brainstorming („zehn Varianten, dann eindampfen“), seltsamen Umdeutungen, und, wenn gewünscht, echten nächsten Sätzen. Unnachgiebig anti-defätistisch. Seine Kernüberzeugung: für jeden, der freiwillig schreibt, ist eine Blockade immer lösbar, denn die Regeln wurden erfunden, und das Heilmittel kann genauso erfunden werden.
+Ein Spezialist für Schreibblockaden, destilliert aus den Antworten einer echten Autorin darüber, wie sie das Feststecken auflöst — was genau das ist, was der `readvisory`-Skill (Abschnitt 20.7) tut, und so sieht sein Ergebnis aus. Er diagnostiziert, bevor er verschreibt — Ideenmangel, Mutmangel, Strukturmangel und Erlaubnismangel sind vier verschiedene Probleme —, und greift dann zu Beschränkungen, wiederholungsbasiertem Brainstorming („zehn Varianten, dann eindampfen“), seltsamen Umdeutungen, und, wenn gewünscht, echten nächsten Sätzen. Unnachgiebig anti-defätistisch. Seine Kernüberzeugung: für jeden, der freiwillig schreibt, ist eine Blockade immer lösbar, denn die Regeln wurden erfunden, und das Heilmittel kann genauso erfunden werden.
 
-### 17.2 open-skeptic
+### 18.2 open-skeptic
 
 Ein „erleuchtbarer Schwarzseher“: echt begeistert von KI, wo sie stark ist, professionell misstrauisch, wo sie überverkauft wird. Herbeirufen, wenn du gerade einen Workflow bauen willst und die Fehlerarten früh benannt haben willst. Er wehrt sich dagegen, KI menschliche Erfahrung nachbilden zu lassen, gegen sich aufschaukelnde Fehlerketten ohne menschliche Prüfung, und gegen flüssige Zuversicht, die die Arbeit von Fachwissen übernimmt — während er KI als Zusammenstellungs-Maschine, Wissens-Prothese und Probepartner bejubelt. Er aktualisiert sich an Belegen: zeig ihm einen Workflow, der funktioniert, und er sagt das, unverblümt.
 
-### 17.3 Eigene bauen
+### 18.3 Eigene bauen
 
 Zwei Beispiele, eine Form. Jeder Readvisor ist dasselbe Paar Markdown-Dateien mit denselben Überschriften: `AGENT.md`, die mit dem Anzeigenamen beginnt, den du in der Seitenleiste siehst, und dann beschreibt, wie diese Person denkt, und `MOTIVATION.md`, die sagt, was ihr wichtig ist, wovor sie schützt, und wo sie danebenliegt. Diese Form wird geprüft, wenn einer installiert wird — nicht, wenn einer geladen wird, ein Readvisor, den du vor Jahren von Hand geschrieben hast, funktioniert also noch genau wie damals.
 
-Du kannst beide Dateien selbst schreiben. Der unterstützte Weg ist der **`readvisory`-Skill** (Abschnitt 19.6), der einen aus dem Urteil eines echten Menschen baut, indem er ihm Fragen stellt — dir, live, oder jemandem, dessen Rat du gern zur Hand hättest, über einen Fragebogen, den du ihm schickst. Readvisors sind der günstigste Weg, eine Lesart hinzuzufügen, die dir fehlt: eine sokratische Gummiente, ein Compliance-Prüfer, deine Zielleserin, die Lektorin, die immer das gefunden hat, was du selbst nicht sehen konntest.
+Du kannst beide Dateien selbst schreiben. Der unterstützte Weg ist der **`readvisory`-Skill** (Abschnitt 20.7), der einen aus dem Urteil eines echten Menschen baut, indem er ihm Fragen stellt — dir, live, oder jemandem, dessen Rat du gern zur Hand hättest, über einen Fragebogen, den du ihm schickst. Readvisors sind der günstigste Weg, eine Lesart hinzuzufügen, die dir fehlt: eine sokratische Gummiente, ein Compliance-Prüfer, deine Zielleserin, die Lektorin, die immer das gefunden hat, was du selbst nicht sehen konntest.
 
 ---
 
-## 18. Räte
+## 19. Räte
 
-Ein **Rat** ist eine Composure, auf der deine Readvisors reihum über eine Sache nachdenken, schriftlich, unter eigenem Namen, während du dabei zusiehst. Er ist die andere Hälfte von Abschnitt 17: dieselben Readvisors, die sonst in eine Stimme eingefaltet sind, aufgefaltet, aktenkundig uneinig.
+Ein **Rat** ist eine Composure, auf der deine Readvisors reihum über eine Sache nachdenken, schriftlich, unter eigenem Namen, während du dabei zusiehst. Er ist die andere Hälfte von Abschnitt 18: dieselben Readvisors, die sonst in eine Stimme eingefaltet sind, aufgefaltet, aktenkundig uneinig.
 
 Es ist eine gewöhnliche Composure, alles aus Abschnitt 4 gilt also weiterhin. Der **Auftrag** sitzt oben; jeder Beitrag landet darunter als Karte, überschrieben mit dem Namen des Sprechers und der Zugnummer, in dessen Farbe getönt — dein Chef auf Papier, du in Blau, jeder Readvisor in seiner eigenen Farbe für die Dauer des Rats, der Abschluss in Tinte. Die Spalte räumt sich beim Wachsen selbst auf, wie viel du auch herumgeschoben hast.
 
 Die Beiträge gehören dem Rat, nicht dir. Du kannst sie verschieben, umfärben, kommentieren und herauszoomen und das Ganze als Spalte von Schauseiten lesen — aber du kannst keinen umschreiben, und kein Readvisor kann es auch. Ein Protokoll, das man bearbeiten kann, ist ein Vorschlag, kein Protokoll. Der Auftrag bleibt ein gewöhnliches Modul und bleibt bearbeitbar.
 
-### 18.1 Einen aufsetzen
+### 19.1 Einen aufsetzen
 
 Neu aus dem **council**-Form, und du bekommst eine Einrichtungskarte mit vier Feldern für den Auftrag:
 
 - **Eingabe** — worüber entschieden wird. Eine Frage, so scharf, wie du sie kriegst.
 - **Parameter** — wie du ihn laufen lassen willst. „Zwei Runden, dann entscheiden.“
 - **Einschränkungen** — was vom Tisch ist. „Die Prosa nicht umschreiben.“
-- **Gewünschtes Ergebnis** — eines von dreien: **eine entschiedene Antwort**, am Ende auf die Leinwand geschrieben; **ein Dokument**, an einen Pfad geschrieben, den du benennst; oder **eine neue Composure**, ein ganzes Brett aus Karten, gebaut aus dem, was der Rat entschieden hat. Wähl Composure, und daneben erscheint ein zweites Bedienelement für die Anordnung — *scaffold*, wo jede Gruppe von Karten eine Spalte ist, oder *cards*, wo jede Gruppe eine Zeile ist. Was jedes davon am Ende tatsächlich tut, steht in 18.3.
+- **Gewünschtes Ergebnis** — eines von dreien: **eine entschiedene Antwort**, am Ende auf die Leinwand geschrieben; **ein Dokument**, an einen Pfad geschrieben, den du benennst; oder **eine neue Composure**, ein ganzes Brett aus Karten, gebaut aus dem, was der Rat entschieden hat. Wähl Composure, und daneben erscheint ein zweites Bedienelement für die Anordnung — *scaffold*, wo jede Gruppe von Karten eine Spalte ist, oder *cards*, wo jede Gruppe eine Zeile ist. Was jedes davon am Ende tatsächlich tut, steht in 19.3.
 
 Dann der Raum. Die Liste beginnt mit deinem Chef-Readvisor, jedem Readvisor, den du in diesem Projekt eingeschaltet hast, und **dir**; hak ab, wen du nicht dabeihaben willst. Bis zu zwölf, und keine zwei Teilnehmer dürfen denselben Namen tragen, denn ein Beitrag wird namentlich zugeordnet, und zwei Nadias sind kein Rat, sondern eine Verwechslung. **Max. Runden** steht auf 3 und kann alles von 1 bis 20 sein.
 
@@ -1026,7 +1152,7 @@ Jede Teilnehmerzeile nimmt außerdem einen optionalen **Auftrag**: eine Zeile, d
 
 **Einberufen** startet ihn.
 
-### 18.2 Ihn laufen lassen
+### 19.2 Ihn laufen lassen
 
 Sechs Bedienelemente, und sie tun genau das, was sie sagen.
 
@@ -1035,17 +1161,17 @@ Sechs Bedienelemente, und sie tun genau das, was sie sagen.
 - **Bis zum Ende laufen lassen** — Runden, bis dein Maximum erreicht ist, im Hintergrund, mit Zwischenmeldungen.
 - **Anhalten** — stoppt nach dem Beitrag, der gerade geschrieben wird. Ein halb fertiger, weggeworfener Beitrag ist die schlimmere Überraschung als ein Absatz zu viel.
 - **Der Auftrag** — zurück zur Einrichtungskarte, um zu lesen, woran alle arbeiten, oder um vor dem Abschluss das Ergebnis zu ändern.
-- **Abschließen** — der letzte Zug. Das ist 18.3.
+- **Abschließen** — der letzte Zug. Das ist 19.3.
 
 Züge strömen herein. Eine Karte erscheint am Fuß der Spalte, mit Name und Zugnummer des Sprechers darauf, füllt sich, während die Worte ankommen, und wird zu einem echten Modul, sobald der Beitrag fertig ist. Die Reihenfolge ist der Chef und dann die Readvisors, wie sie gelistet sind; sie geht herum, und eine Runde schließt, wenn sie sich schließt.
 
 **Du kannst jederzeit etwas sagen.** Das Eingabefeld am Fuß des Rats nimmt deinen eigenen Beitrag, und er geht als Karte hinein wie die von allen anderen, blau getönt. Spricht gerade niemand, landet er sofort; strömt gerade ein Zug, nimmt er den allernächsten Platz und zeigt sich bis dahin als ausstehend. So oder so ist er ein *Einwurf*, keine Umverteilung: der Readvisor, der an der Reihe war, spricht trotzdem als Nächster.
 
-**Du kannst auch einem pal eine Frage stellen.** Ist der Cloud-Slot nutzbar (15.3), tipp `/pal` und deine Frage in das Eingabefeld des Rats — `/pal gibt es einen Namen für das Muster, um das wir kreisen?` — und dein Chef destilliert die bisherige Diskussion und deine Frage zu einem einzigen, für sich stehenden Prompt, schickt den hinaus, und die Antwort landet als Beitrag in eigener grauer Tönung, gesprochen von `pal · <Modell-ID>`. Der Prompt, der den Rechner verlassen hat, ist oben in diese Karte eingefaltet: zusammengeklappt, damit zwanzig Beiträge lesbar bleiben, nie verborgen, einen Klick vom Öffnen entfernt. Wie deine eigenen Beiträge ist er ein Einwurf — er bekommt eine Zugnummer, aber keinen Platz, also spricht der, der gerade an der Reihe war, trotzdem als Nächster, und die Runde rückt nicht vor.
+**Du kannst auch einem pal eine Frage stellen.** Ist der Cloud-Slot nutzbar (16.3), tipp `/pal` und deine Frage in das Eingabefeld des Rats — `/pal gibt es einen Namen für das Muster, um das wir kreisen?` — und dein Chef destilliert die bisherige Diskussion und deine Frage zu einem einzigen, für sich stehenden Prompt, schickt den hinaus, und die Antwort landet als Beitrag in eigener grauer Tönung, gesprochen von `pal · <Modell-ID>`. Der Prompt, der den Rechner verlassen hat, ist oben in diese Karte eingefaltet: zusammengeklappt, damit zwanzig Beiträge lesbar bleiben, nie verborgen, einen Klick vom Öffnen entfernt. Wie deine eigenen Beiträge ist er ein Einwurf — er bekommt eine Zugnummer, aber keinen Platz, also spricht der, der gerade an der Reihe war, trotzdem als Nächster, und die Runde rückt nicht vor.
 
 **Das Readvisor-Panel bleibt für die Dauer geschlossen**, mit deaktiviertem Schalter und einem Tooltip, der erklärt, warum (Abschnitt 5.1). Räte und der Chat teilen sich ein Modell, und es gibt nur eines davon, ein Chat-Zug würde sich also entweder hinter dem Rat anstellen oder mit ihm kämpfen. Umgekehrt gilt dasselbe: drückst du ein Rats-Bedienelement, während dein Chef mitten in einer Chat-Antwort steckt, kommt ein Satz zurück, der das sagt, statt still zu warten.
 
-### 18.3 Abschließen: die Antwort, das Dokument, die Composure, das Protokoll
+### 19.3 Abschließen: die Antwort, das Dokument, die Composure, das Protokoll
 
 **Abschließen** lässt einen letzten Zug laufen, in dem dein Chef-Readvisor sagt, wo es landet — mit Dank an die Argumente, die den Ausschlag gaben, mit Benennung der Uneinigkeit, die sich nicht aufgelöst hat, statt sie glattzubügeln, und mit dem, was noch offen ist. Dieser Beitrag wird wie jeder andere festgeschrieben, in Tinte getönt.
 
@@ -1059,17 +1185,17 @@ Das letzte davon verlangt von einem Modell Überschriften in einer exakten Form,
 
 So oder so wird das Ganze außerdem als schlichtes Markdown nach `rness/knowledge/councils/<datum>-<titel>.md` exportiert: der Auftrag, wer im Raum war und wofür jeder da war, die Rundenzahl, und jeder Beitrag der Reihe nach. Ein früherer Export wird nie überschrieben. Ein Rat, der stattgefunden hat, ist etwas, das du durchsuchen, zitieren und jemandem in die Hand drücken kannst, Monate nachdem die Composure irgendwohin verschoben wurde.
 
-Ein abgeschlossener Rat ist fertig. Die Bedienelemente verschwinden, und von da an zeigt er dir den Protokollpfad, das Ergebnis und den Weg, ihn erneut einzuberufen (18.5).
+Ein abgeschlossener Rat ist fertig. Die Bedienelemente verschwinden, und von da an zeigt er dir den Protokollpfad, das Ergebnis und den Weg, ihn erneut einzuberufen (19.5).
 
-### 18.4 Was es kostet, ehrlich
+### 19.4 Was es kostet, ehrlich
 
 **Es ist langsam, und das soll es sein.** Jeder Beitrag ist ein vollständiger Modell-Zug — der Teilnehmer liest den Auftrag und alles bisher Gesagte, und schreibt. Vier Teilnehmer über drei Runden sind zwölf Züge, einer nach dem anderen, auf einem lokalen Modell. Es gibt keinen Trick, der das schneller macht, und ein Rat lohnt die Einberufung genau dann, wenn das Nachdenken zwölf Züge wert ist.
 
 **Das Fenster wird gleichmäßig aufgeteilt.** Jeder Teilnehmer, der spricht, bekommt einen gleich großen Anteil am Kontextfenster des Modells — je die Hälfte bei zweien, je ein Viertel bei vieren. Dieser Anteil muss die eigene Identität des Teilnehmers tragen, plus so viel vom Rat, wie hineinpasst. Wird es eng, faltet enough die ältesten Beiträge auf je eine Zeile zusammen, eine Ein-Zeilen-Erinnerung daran, wer was gesagt hat: *Früher in diesem Rat: Ed (Zug 1): …*. Der Auftrag wird nie gefaltet, und der Beitrag, auf den gerade jemand antwortet, auch nicht — ein Teilnehmer, der nicht sehen kann, worauf er antwortet, hat nichts zu sagen.
 
-Dieses Falten ist mechanisch — es nimmt den ersten Satz, es bittet kein Modell um eine Zusammenfassung, denn ein Rat, der Antworten darauf verwendet, sich selbst zusammenzufassen, zahlt zweimal für dasselbe Fenster. Jeder Zug meldet, ob er etwas gefaltet hat. Fängt er früh und oft damit an, ist die ehrliche Abhilfe nicht ein kleinerer Rat, sondern ein größeres Kontextfenster im Modell-Fenster (Abschnitt 15.1) oder ein Modell, in dem Platz dafür ist.
+Dieses Falten ist mechanisch — es nimmt den ersten Satz, es bittet kein Modell um eine Zusammenfassung, denn ein Rat, der Antworten darauf verwendet, sich selbst zusammenzufassen, zahlt zweimal für dasselbe Fenster. Jeder Zug meldet, ob er etwas gefaltet hat. Fängt er früh und oft damit an, ist die ehrliche Abhilfe nicht ein kleinerer Rat, sondern ein größeres Kontextfenster im Modell-Fenster (Abschnitt 16.1) oder ein Modell, in dem Platz dafür ist.
 
-### 18.5 Erneut einberufen
+### 19.5 Erneut einberufen
 
 Ein Rat schließt ab, und manchmal die Frage nicht. **Erneut einberufen** startet aus einem abgeschlossenen Rat einen frischen: derselbe Raum — dieselben Teilnehmer mit ihren Namen, Tönungen und Aufträgen —, dieselben Parameter, dieselben Einschränkungen, dasselbe gewünschte Ergebnis und dieselbe Rundengrenze, und ein Auftrag, der der *alte* Auftrag ist plus dem, was der Rat tatsächlich hervorgebracht hat, hingelegt als das, was jetzt auf dem Tisch liegt. Eine Antwort kommt als der Abschluss selbst herüber; ein Dokument oder eine Composure kommt als Verweis auf die Datei und deren erste paar tausend Zeichen herüber. Der neue Rat öffnet sich bereit, bei Zug null, ohne dass jemand gesprochen hätte.
 
@@ -1077,11 +1203,11 @@ Der alte Rat wird nicht neu gefahren und nicht umgeschrieben. Sein Status, seine
 
 ---
 
-## 19. Skills
+## 20. Skills
 
-Ein Skill ist ein fokussiertes Fähigkeitspaket: ein Ordner mit einer `SKILL.md` (plus optionalen Referenzdokumenten und Skripten), der deinen Readvisors einen Ablauf, ein Vokabular oder eine Disziplin beibringt. Skills pro Projekt in der Seitenleiste ein- und ausschalten. Aus heißt wirklich aus — überhaupt nicht im Prompt — und neue Skills kommen deaktiviert an, sodass sich nichts hinter deinem Rücken ändert. Ein Skill, den enough nicht mitgeliefert hat, wird gelesen, bevor er überhaupt aktiviert werden kann (Abschnitt 19.9). Alles auszuschalten ist auch legitim: reines Gespräch, kein Gerüst, manchmal mehr Raum, damit das Modell dich überrascht.
+Ein Skill ist ein fokussiertes Fähigkeitspaket: ein Ordner mit einer `SKILL.md` (plus optionalen Referenzdokumenten und Skripten), der deinen Readvisors einen Ablauf, ein Vokabular oder eine Disziplin beibringt. Skills pro Projekt in der Seitenleiste ein- und ausschalten. Aus heißt wirklich aus — überhaupt nicht im Prompt — und neue Skills kommen deaktiviert an, sodass sich nichts hinter deinem Rücken ändert. Ein Skill, den enough nicht mitgeliefert hat, wird gelesen, bevor er überhaupt aktiviert werden kann (Abschnitt 20.10). Alles auszuschalten ist auch legitim: reines Gespräch, kein Gerüst, manchmal mehr Raum, damit das Modell dich überrascht.
 
-### 19.1 analyzer
+### 20.1 analyzer
 
 Vier Analysemodi in einem Skill.
 
@@ -1093,9 +1219,9 @@ Vier Analysemodi in einem Skill.
 
 **Audit** liest etwas, dem du noch nicht zu vertrauen beschlossen hast — einen Skill, den dir jemand geschickt hat, einen Readvisor, ein Paradigma — und sagt dir, was es ist. Zuerst eine Erklärung in klarem Deutsch, was das Ding tatsächlich tut und warum du es wollen würdest, dann ein Sicherheitsdurchgang: Prompt-Injection-Versuche, Anweisungen, die die Reichweite eines Readvisors still erweitern, epistemische Warnzeichen, und jeglicher gebündelter Code, der zusätzlich einen deterministischen Scan bekommt, der gar kein Modell einbezieht. Das Urteil ist eines von drei Worten — **pass**, **flag**, **fail** — gestützt von benannten Funden, nie eine Punktzahl. Es ist nur lesend: Audit führt nie aus, bearbeitet, installiert oder aktiviert nie das, was es liest.
 
-Berichte landen in `rness/io/output/analyzer/audits/<skill-name>/`: eine datierte `.md`, die du wie jede andere Datei lesen kannst, plus eine kleine `verdict.json` daneben. Bitte jederzeit namentlich um ein Audit — „prüf das, bevor ich es aktiviere“, „was macht dieser Skill eigentlich“ — und enough lässt diesen Modus auch ungefragt für dich laufen, beim ersten Einschalten eines Skills, den es nicht mitgeliefert hat. Beide Türen schreiben denselben Bericht in denselben Ordner. Abschnitt 19.9 erzählt diese Geschichte.
+Berichte landen in `rness/io/output/analyzer/audits/<skill-name>/`: eine datierte `.md`, die du wie jede andere Datei lesen kannst, plus eine kleine `verdict.json` daneben. Bitte jederzeit namentlich um ein Audit — „prüf das, bevor ich es aktiviere“, „was macht dieser Skill eigentlich“ — und enough lässt diesen Modus auch ungefragt für dich laufen, beim ersten Einschalten eines Skills, den es nicht mitgeliefert hat. Beide Türen schreiben denselben Bericht in denselben Ordner. Abschnitt 20.10 erzählt diese Geschichte.
 
-### 19.2 anything-finder
+### 20.2 anything-finder
 
 Ein Suchtrupp für die Dinge, die nicht auf der ersten Seite auftauchen. Drei Gesichter, ein Skill.
 
@@ -1109,23 +1235,29 @@ Ergebnisse kommen als *Find-Karten* zurück: der Link, warum es der richtige Fun
 
 Output geht nach `rness/io/output/anything-finder/`. Alles, was es abruft, läuft wie jeder andere Web-Zugriff durch den Broker, eine Domain außerhalb der Positivliste wird also über Tor geleitet — und weigert sich eine Quelle zu antworten, nennt der Bericht den Host und sagt dir, was du zu `allowlists.md` hinzufügen sollst, statt ein stilles Loch in den Ergebnissen zu lassen.
 
-### 19.3 girraph-merirmaid
+### 20.3 girraph-merirmaid
 
-Der Disziplin-Skill für enoughs zwei Diagramm-Grundformen (Abschnitte 20 und 21). Die girraph-Hälfte lehrt richtiges IBIS-Mapping: eine Frage pro Zug, kein Lösungssprung, deine Bestätigung als Stopp-Regel. Die merirmaid-Hälfte trägt die Mermaid-Schreibregeln, etwa Knotenbezeichnungen kurz genug zu halten, dass du sie bequem bearbeiten kannst. Die Modi funktionieren ohne den Skill; mit ihm wird dein Readvisor zu einem wirklich disziplinierten Mapping-Partner.
+Der Disziplin-Skill für enoughs zwei Diagramm-Grundformen (Abschnitte 21 und 22). Die girraph-Hälfte lehrt richtiges IBIS-Mapping: eine Frage pro Zug, kein Lösungssprung, deine Bestätigung als Stopp-Regel. Die merirmaid-Hälfte trägt die Mermaid-Schreibregeln, etwa Knotenbezeichnungen kurz genug zu halten, dass du sie bequem bearbeiten kannst. Die Modi funktionieren ohne den Skill; mit ihm wird dein Readvisor zu einem wirklich disziplinierten Mapping-Partner.
 
-### 19.4 lexicographer
+### 20.4 lexicographer
 
-Der Hausstil des Wörterbuchs (Abschnitt 13), deinem Readvisor in die Hand gegeben. Dein Chef kann auch bei ausgeschaltetem Skill Wörter nachschlagen und in dein eigenes Wörterbuch aufnehmen — das Wörterbuch ist immer in Reichweite —, aber mit eingeschaltetem Skill reist der ganze Leitfaden, Spalte für Spalte, bei jedem Zug mit: wie eine Aussprache geschrieben wird (weites amerikanisches IPA, mit markierter Betonung), zu welchem von FEEDs 45 Fachgebieten ein Wort gehört, wie eine erste Verwendung formuliert wird („late 18th century“, „2010s“), was die Häufigkeitsstufen bedeuten, wohin die Silbenpunkte kommen. Er trägt auch die Form des Gesprächs — erst nachschlagen, entwerfen, was sich entwerfen lässt, fragen, was nur du beantworten kannst, vorlesen, und erst auf dein Ja aufnehmen —, sodass ein Wort, das deine Familie seit zwanzig Jahren sagt, am Ende aussieht, als hätte es schon immer im Buch gestanden.
+Der Hausstil des Wörterbuchs (Abschnitt 14), deinem Readvisor in die Hand gegeben. Dein Chef kann auch bei ausgeschaltetem Skill Wörter nachschlagen und in dein eigenes Wörterbuch aufnehmen — das Wörterbuch ist immer in Reichweite —, aber mit eingeschaltetem Skill reist der ganze Leitfaden, Spalte für Spalte, bei jedem Zug mit: wie eine Aussprache geschrieben wird (weites amerikanisches IPA, mit markierter Betonung), zu welchem von FEEDs 45 Fachgebieten ein Wort gehört, wie eine erste Verwendung formuliert wird („late 18th century“, „2010s“), was die Häufigkeitsstufen bedeuten, wohin die Silbenpunkte kommen. Er trägt auch die Form des Gesprächs — erst nachschlagen, entwerfen, was sich entwerfen lässt, fragen, was nur du beantworten kannst, vorlesen, und erst auf dein Ja aufnehmen —, sodass ein Wort, das deine Familie seit zwanzig Jahren sagt, am Ende aussieht, als hätte es schon immer im Buch gestanden.
 
 Frag ihn „Ist *flumpet* ein Wort?“, „nimm *glimmerwick* in mein Wörterbuch auf“, „meine Version von *draft*, bitte“. Zum Übersetzen von Text ist er nicht da — das ist `translator` —, und ein Korrekturleser ist er auch nicht; das ist analyzer.
 
-### 19.5 memoir-dialectic
+### 20.5 macrocosm-oes
+
+Der Leitfaden zu MacroCOSM (Abschnitt 13), deinem Readvisor in die Hand gegeben. Dein Chef kann `.cosm`-Dateien lesen und prüfen, einen Text dekompilieren und atems schreiben, auch wenn dieser Skill aus ist — die Werkzeuge sind in jedem Projekt da, mit Skill oder ohne (Abschnitte 12.4 und 12.5), und vor einer ersten Dekompilierung holt dein Chef sich den Leitfaden, um ihn selbst zu lesen. Ist er an, reist stattdessen der ganze Leitfaden bei jedem Zug mit: was das Format ist und welche Dialekte es hat, EMLs sechs Module und sechs Haltungen, die vier Teile eines atem und was jeder bedeutet, wann sich eine Dekompilierung das Warten lohnt und wann ein atem reicht, was ein Gerüst ist und was nicht, und wie man einen Holotype liest — ohne je bei seinen offenen Fragen zu raten, ohne je in seinen Dateien nach Personen zu suchen und ohne je Comprises eigene Prüfungen, die als nicht ausgeführt aufgelistet sind, für einen Fehler zu halten.
+
+Schalte ihn ein, wenn `.cosm`-Dateien zu deiner regelmäßigen Arbeit gehören — Holotypes lesen, Kapitel dekompilieren, atems sammeln — und lass ihn sonst aus; er kostet in jedem Zug ein paar tausend Zeichen Aufmerksamkeit. Frag ihn „Was sagt dieser Holotype über Preise?“, „prüf dieses .cosm auf Probleme“, „dekompiliere notes.md“, „sag diesen Absatz in einer Zeile“. Er dekompiliert und schreibt atems nur für das, worum du bittest, und er ist nicht für eine gewöhnliche Zusammenfassung in deinen eigenen Worten da (die beantwortet dein Chef einfach), nicht zum Bearbeiten eines Holotypes (das ist Comprises Arbeit) und nicht zum Schreiben neuer `.cosm`-Dateien von Hand. Standardmäßig aus, wie jeder mitgelieferte Skill.
+
+### 20.6 memoir-dialectic
 
 Ein geduldiger Memoiren-Mitgestalter über mehrere Sitzungen. Er befragt dich — ein, zwei Fragen zur Zeit, nie eine Flut — und legt alles ab: nummerierte Plandokumente in Gesprächsreihenfolge, ein Index für schnellen Wiedereinstieg, eine Notizdatei für unordentliche Gedanken-Dumps, und schließlich eine Gliederungs-Synthese und, nur wenn du es willst, Entwürfe. Der Ordner ist das Gedächtnis. Du kannst für Wochen oder Jahre verschwinden, und er macht dort weiter, wo du aufgehört hast. Gebaut für die volle Bandbreite von der kompletten Lebensgeschichte bis zu einem einzelnen Meilenstein, mit ausdrücklichem Umgang mit sensiblen Themen und Tabuzonen, und sorgfältiger Bewahrung deiner eigenen Formulierungen — Stimme zählt, besonders wenn ein Entwurf ansteht.
 
-### 19.6 readvisory
+### 20.7 readvisory
 
-Der Skill, der einen Readvisor macht (Abschnitt 17), indem er einen Menschen befragt, statt eine Spezifikation zu schreiben.
+Der Skill, der einen Readvisor macht (Abschnitt 18), indem er einen Menschen befragt, statt eine Spezifikation zu schreiben.
 
 Zwei Wege, das zu sammeln. **Live**: er befragt *dich*, geduldig, ein bis zwei Fragen auf einmal, zwölf bis achtzehn insgesamt, dazu, wie du die Art von Sache, um die es bei diesem Readvisor gehen wird, tatsächlich entscheidest. **Fragebogen**: er schreibt eine schlichte, mailfertige Datei, die du jemandem schickst, dessen Urteil du gern zur Hand hättest — einer Freundin, einem Mentor, einer früheren Lektorin, einem Elternteil —, der sie in Ruhe beantwortet, und du fügst die Antworten ein, wann immer sie ankommen. Ein Fragebogen kann eine Woche in einem Posteingang liegen, die ganze Sache wird deshalb in einer Anfrage-Datei verfolgt (Abschnitt 8.3), die eine Sitzung Wochen später kalt aufnehmen kann.
 
@@ -1133,7 +1265,7 @@ Beide Wege enden gleich: ein kurzer Nachfassdurchgang bei *dir* (der Schritt, de
 
 Er hat ein klares Gespür dafür, wofür er nicht da ist. Er benennt deinen Chef-Readvisor nicht um, und er beruft keinen Rat ein: er macht die Teilnehmer, er leitet nicht die Sitzung.
 
-### 19.7 scaffold
+### 20.8 scaffold
 
 Macht aus einem Haufen Denkarbeit eine Struktur, die man sich ansehen kann.
 
@@ -1143,20 +1275,20 @@ Die Regel, die ihn wertvoll macht: **er erfindet nie Material, um ein Loch zu st
 
 Er schreibt nicht das Stück. Er schreibt die Struktur, und jede Karte darauf gehört dir zum Bearbeiten, sobald sie landet.
 
-(Ein Name, zwei Dinge, und es lohnt sich, sie einmal auseinanderzuhalten: die *Gerüste*, die das text-planning-Paradigma erzeugt — Abschnitt 16.1 —, sind strukturelle Leitfäden je Abschnitt, als Markdown geschrieben, damit du sie zu Prosa ausbaust. Dieser Skill erzeugt eine ganze Composure. Die beiden verstehen sich gut; ein in text-planning gebauter Plan ist ein guter Gedankenauswurf für diesen hier.)
+(Ein Name, zwei Dinge, und es lohnt sich, sie einmal auseinanderzuhalten: die *Gerüste*, die das text-planning-Paradigma erzeugt — Abschnitt 17.1 —, sind strukturelle Leitfäden je Abschnitt, als Markdown geschrieben, damit du sie zu Prosa ausbaust. Dieser Skill erzeugt eine ganze Composure. Die beiden verstehen sich gut; ein in text-planning gebauter Plan ist ein guter Gedankenauswurf für diesen hier.)
 
-### 19.8 translator
+### 20.9 translator
 
 Offline-Übersetzung über ~419 Sprachen via MADLAD-400 — ein einmaliger ~3-GB-Download, der auf CPU oder Apple Silicon läuft und nie nach Hause telefoniert. Von kurzen Phrasen bis zu ganzen Dokumenten, von großen Sprachen bis zu ressourcenarmen und indigenen. Einen Brief übersetzen, ein README lokalisieren, prüfen, was eine Passage bedeutet, eine Phrase als Bedeutungs-Erhaltungstest durch eine dritte Sprache hin- und zurückschicken — alles bei abgestecktem Netzwerk. Für bestimmte ressourcenarme Sprachen bietet eine optionale NLLB-200-Engine höhere Qualität; sie trägt eine nichtkommerzielle Lizenz, ist also über das translation-Paradigma zum Zuschalten.
 
-### 19.9 Eigene schreiben, und fremden vertrauen
+### 20.10 Eigene schreiben, und fremden vertrauen
 
-Die acht oben sind Demonstrationen. Der Skill-*Mechanismus* — Markdown-Anweisungen, geladen beim Einschalten, mit einem `description:`, das einem Readvisor sagt, wann er zugreifen soll — ist die eigentliche Funktion. Hausstil-Leitfäden, Fach-Checklisten, wiederkehrende Berichtsformate, Datenverarbeitungs-Abläufe: kannst du eine Kompetenz in Prosa beschreiben, kannst du sie deinen Readvisors als Skill übergeben. Bau deine eigenen mit workflow-design (Abschnitt 16.3), oder zweig einen der acht ab und mach ihn zu deinem.
+Die neun oben sind Demonstrationen. Der Skill-*Mechanismus* — Markdown-Anweisungen, geladen beim Einschalten, mit einem `description:`, das einem Readvisor sagt, wann er zugreifen soll — ist die eigentliche Funktion. Hausstil-Leitfäden, Fach-Checklisten, wiederkehrende Berichtsformate, Datenverarbeitungs-Abläufe: kannst du eine Kompetenz in Prosa beschreiben, kannst du sie deinen Readvisors als Skill übergeben. Bau deine eigenen mit workflow-design (Abschnitt 17.3), oder zweig einen der neun ab und mach ihn zu deinem.
 
 Das andere Ende dieser Schleife sind die Skills, die von woanders herkommen. Ein Skill ist Anweisungen, denen deine Readvisors folgen werden, was heißt, dass ein Skill aus dem Internet genau so viel Misstrauen verdient wie jede andere Datei aus dem Internet. Also liest enough sie für dich:
 
-- **Was enough mitliefert, ist vertrauenswürdig, und sieht aus wie immer.** Die acht oben kommen als Links in die eigenen Defaults der Installation an. Sie schalten sofort um. Nichts auditiert sie.
-- **Alles andere ist aus, bis es gelesen wurde.** Einen Skill-Ordner in `rness/skills/` fallen lassen — heruntergeladen, von einem Freund geschickt, aus einer `.skill` entpackt — und er sitzt dort deaktiviert, in der Seitenleiste als *ungeprüft* markiert. Beim ersten Einschalten lässt enough analyzers Audit-Modus darüber laufen (Abschnitt 19.1), bevor auch nur ein Wort davon einen Readvisor erreicht. Du siehst es in der Zeile passieren: *ungeprüft* → *Audit läuft…* → *geprüft*.
+- **Was enough mitliefert, ist vertrauenswürdig, und sieht aus wie immer.** Die neun oben kommen als Links in die eigenen Defaults der Installation an. Sie schalten sofort um. Nichts auditiert sie.
+- **Alles andere ist aus, bis es gelesen wurde.** Einen Skill-Ordner in `rness/skills/` fallen lassen — heruntergeladen, von einem Freund geschickt, aus einer `.skill` entpackt — und er sitzt dort deaktiviert, in der Seitenleiste als *ungeprüft* markiert. Beim ersten Einschalten lässt enough analyzers Audit-Modus darüber laufen (Abschnitt 20.1), bevor auch nur ein Wort davon einen Readvisor erreicht. Du siehst es in der Zeile passieren: *ungeprüft* → *Audit läuft…* → *geprüft*.
 - **Markiert heißt nicht aktiviert.** Findet das Audit etwas, sagt die Zeile *markiert* (oder *fehlgeschlagen*), der Skill bleibt aus, und du bekommst zwei Buttons: **Bericht lesen** öffnet den vollständigen Bericht in der Leseansicht, und **trotzdem aktivieren** bittet um deine Bestätigung und vermerkt die Entscheidung dann als deine — der Fund wird nicht gelöscht, er wird überstimmt, und die Zeile liest von da an *von dir freigegeben*. Das Audit berät. Du entscheidest. (Arbeitest du lieber in der Datei, tut es dasselbe, die `verdict.json` dieses Skills auf `"verdict": "pass"` zu setzen.)
 - **Einen Skill bearbeiten, und er wird neu gelesen.** Das Audit ist an die genauen Bytes gebunden, die es gelesen hat — Dateinamen wie Inhalte. Änderst du irgendetwas, wird er beim nächsten Einschalten erneut auditiert. Das gilt auch für einen, den du zuvor trotzdem aktiviert hattest: ein Override beschreibt eine bestimmte Dateimenge zu einem bestimmten Moment, und es übersteht keine Bearbeitung.
 - **Ein Skill, der während einer Sitzung für dich geschrieben wurde, zählt auch als nicht vertrauenswürdig.** Das ist Absicht, kein Versehen. Wenn workflow-design eine neue `SKILL.md` nach `rness/skills/` schreibt, auditiert enough diese Hausaufgabe beim ersten Aktivieren. Das geht nahezu augenblicklich, wenn nichts zu finden ist.
@@ -1166,7 +1298,7 @@ Berichte leben in `rness/io/output/analyzer/audits/<skill-name>/` — derselbe O
 
 ---
 
-## 20. Girraph-Modus und die Dateiendung `.girraph`
+## 21. Girraph-Modus und die Dateiendung `.girraph`
 
 Es wird „graph“ ausgesprochen. Das *ir* ist stumm — es steht für *iterativ* und *rekursiv*. Das Tier ist eine 🦒, und das Tier ist auch stumm.
 
@@ -1202,22 +1334,24 @@ Drei Gewohnheiten lassen girraphs funktionieren. Fragen als Fragen formulieren (
 
 ---
 
-## 21. Merirmaid-Modus und die Dateiendung `.merirmaid`
+## 22. Merirmaid-Modus und die Dateiendung `.merirmaid`
 
 Wo ein girraph ein Argument kartiert, bildet ein **merirmaid** eine Struktur ab. Eine `.merirmaid`-Datei ist ein [Mermaid](https://mermaid.js.org/)-Diagramm — Flussdiagramm, Sequenzdiagramm, Zustandsautomat, ER-Diagramm, alles, was Mermaid zeichnet — mit einem kleinen Frontmatter-Header, live im Browser gerendert. Lokal, natürlich; kein CDN, wie alles in enough.
 
 Zwei Modalitäten, im Header deklariert:
 
 - **wip** — ein Arbeits-Whiteboard. Auf den Text eines Knotens klicken und die Bezeichnung direkt bearbeiten, mit laufender Zeichenzählung; strukturelle Änderungen (eine Box hinzufügen, einen Pfeil neu verdrahten) laufen über deinen Readvisor — frag im Panel. Bitte um ein Diagramm deiner Pipeline, deiner Handlung, deiner Organisation, und dein Readvisor schreibt die Quelle, der Browser zeichnet sie, und du feilst an den Worten.
-- **mirror** — ein nur lesbares Spiegelbild einer Struktur, die anderswo lebt: der Inhalt einer Cachebox (Abschnitt 12.1) oder ein girraph (Abschnitt 20). Spiegel erzeugen sich neu, wenn sich ihre Quelle ändert. Um das Bild zu ändern, das Ding ändern.
+- **mirror** — ein nur lesbares Spiegelbild einer Struktur, die anderswo lebt: die Ordner und Dateien eines Canon-Bandes (Abschnitt 12.1), ein girraph (Abschnitt 21) oder ein `.cosm`-Band, durch eine Linse gesehen (Abschnitt 12.3). Spiegel erzeugen sich neu, wenn sich ihre Quelle ändert. Um das Bild zu ändern, das Ding ändern.
+
+**Linsen.** **Linse…** im cosm-Betrachter schickt einen Band als Spiegel hierher, gezeichnet aus einem Blickwinkel — als Baum, als Karte davon, wie alles zusammenhängt, oder als die Aussagen eines EML-Zwillings, nach Haltung getönt —, mit einer Linsen-Auswahl in der Werkzeugleiste, um ihn an Ort und Stelle in einen anderen Blickwinkel zu drehen. Shift-klick auf einen Knoten öffnet sein Menü: **Eintrag zeigen** geht zurück zur Karte dieses Eintrags im cosm-Betrachter, **Datei öffnen** öffnet die Datei, für die er steht, und ein Knoten, der ein Text ist, bietet **atem** an (Abschnitt 12.5).
 
 Diagramme verlinken. Ein Knoten kann auf ein anderes `.merirmaid`, ein `.girraph`, oder ein Markdown-Dokument zeigen, und ihn anzuklicken navigiert dorthin, Breadcrumbs markieren den Weg zurück — sodass eine Reihe von Diagrammen zu einem navigierbaren Atlas deines Projekts wird. Und hat ein Diagramm einen Syntaxfehler, zeigt der merirmaid-Modus den Fehler plus die Rohquelle statt einer leeren Fläche. Es gibt immer etwas, wovon aus man reparieren kann.
 
-Der Skill girraph-merirmaid (Abschnitt 19.3) trägt die Schreibdisziplin für beide Dateitypen. Eine Faustregel daraus ist es wert, hier wiederholt zu werden: wenn der ehrliche erste Schritt eine Frage ist, willst du einen girraph; wenn es eine Box und ein Pfeil sind, willst du ein merirmaid.
+Der Skill girraph-merirmaid (Abschnitt 20.3) trägt die Schreibdisziplin für beide Dateitypen. Eine Faustregel daraus ist es wert, hier wiederholt zu werden: wenn der ehrliche erste Schritt eine Frage ist, willst du einen girraph; wenn es eine Box und ein Pfeil sind, willst du ein merirmaid.
 
 ---
 
-## 22. Wo es von hier aus weitergeht
+## 23. Wo es von hier aus weitergeht
 
 Der schnellste Weg, dir enough zu eigen zu machen:
 
@@ -1231,4 +1365,4 @@ Diese Schleife — Reibung bemerken, die Lösung kodieren, weiterarbeiten — is
 
 ---
 
-*enough ist © 2026 Graham Smith, veröffentlicht unter der Apache License 2.0. Der eigene Text des Wörterbuchs — FEEDs Wörter, Definitionen und alles Übrige — ist ebenfalls © 2026 Graham Smith, steht aber nicht unter dieser Lizenz: Er wird zur Verwendung innerhalb von enough mitgeliefert, mit allen Rechten, die vorerst vorbehalten bleiben. Wikipedia-Inhalte, erreicht über wikisink, stehen unter CC BY-SA. Dieses Dokument: auch deins zum Bearbeiten.*
+*enough ist © 2026 Graham Smith, veröffentlicht unter der Apache License 2.0. Der eigene Text des Wörterbuchs — FEEDs Wörter, Definitionen und alles Übrige — ist ebenfalls © 2026 Graham Smith, steht aber nicht unter dieser Lizenz: Er wird zur Verwendung innerhalb von enough mitgeliefert, mit allen Rechten, die vorerst vorbehalten bleiben. MacroCOSM OES — die Spezifikation, die mit enough ausgelieferten Manifeste der Dialekte und die Namen der Familie — ist ebenfalls © 2026 Graham Smith, und für sie gilt dasselbe: nicht unter dieser Lizenz, zur Verwendung innerhalb von enough mitgeliefert, alle Rechte vorerst vorbehalten. Wikipedia-Inhalte, erreicht über wikisink, stehen unter CC BY-SA. Dieses Dokument: auch deins zum Bearbeiten.*

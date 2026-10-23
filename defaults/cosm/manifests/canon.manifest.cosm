@@ -1,0 +1,136 @@
+# Canon 1: the MiniCOSM for one Canon volume, or one project.
+#
+# What a program needs to know to read a canon.cosm catalog: a Canon volume (a top-level folder of enough's store)
+# or a project enumerated as folders, files and saved articles, with what has been derived from each (its convert
+# twin, its EML twin, its atem). enough/canon.py writes the catalog and regenerates it on every reconcile; nobody
+# edits it by hand. A project's catalog is the same MiniCOSM with scope: project, and it carries no sizes, times or
+# timestamps, so it changes only when files are added, removed or renamed. The prose is docs/MACROCOSM_OES.md; the
+# reference reader is enough/macrocosm.py. Where this file and the reader disagree, the reader wins and this file is
+# corrected.
+#
+# Written in the COSM YAML subset: no anchors, no aliases, no tags, one document. Words that YAML 1.1 reads as
+# booleans (on, off, yes, no) are quoted.
+#
+# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
+
+manifest: minicosm/0
+macrocosm: 0.0.1
+name: canon
+title: Canon
+version: 1
+summary: One Canon volume (a top-level folder of the store), or one project, enumerated as folders, files and articles, with what has been derived from them.
+spec: docs/MACROCOSM_OES.md
+reference: [enough/macrocosm.py, enough/canon.py]
+
+declaration:
+  key: oes
+  value: canon/1
+  absent: refuse                  # a canon.cosm without oes: canon/1 is refused
+  legacy: []
+  both: oes
+  unknown: refuse
+
+format:
+  extension: .cosm
+  syntax: the COSM YAML subset
+  forbidden: [anchors, aliases, tags, multiple documents]
+  booleans: ['true', 'false']
+  encoding: utf-8
+  byte-order-mark: tolerated
+  newlines: [lf, crlf]
+
+volume:
+  catalog: canon.cosm
+  single-file: true               # the catalog is the whole volume: its items are under nodes:
+  outside-the-model: [.canon.json]
+
+catalog:
+  keys: [oes, macrocosm, id, name, scope, origin, status, created, updated, counts, nodes]
+  id: canon/<volume>              # a project's catalog: canon/~<project-slug> (~ is never in a volume name)
+  scope: [volume, project]
+  scope-absent: volume
+  status: [complete, ingesting, failed]
+  project-omits: [size, mtime, created, updated]   # a project catalog is byte-stable under git
+  origin-fields: [type, value, depth]
+  counts-fields: [folders, files, articles, twins, emls, atems]
+
+module-file:
+  shapes:
+    - {key: nodes, holds: 'a list of items, each a mapping with a string id'}
+  duplicate-id: load error, the first wins
+
+ids:
+  item-form: '<module>:<kind>/<slug>'
+  slug: "the relative path slugged ('/' -> '--', '.' -> '-', lowercase, anything outside [a-z0-9-] -> '-'), plus -<sha6> when two paths collide or the slug is a Windows reserved name"
+  inside-own-volume: bare
+
+paths:
+  form: '<module>/<kind>/<slug>#<field>'
+  levels: [module, kind, item, field]
+  segments:
+    module: 'V'
+    kind: '[a-z][a-z0-9-]*'
+    slug: '[A-Za-z0-9](?:[A-Za-z0-9._@-]*[A-Za-z0-9_@-])?'
+    field: '[A-Za-z0-9][A-Za-z0-9_-]*(?:\.[A-Za-z0-9][A-Za-z0-9_-]*|\[[0-9]+\])*'
+  map:
+    - {path: 'V', id: none}
+    - {path: 'V/<kind>', id: none}
+    - {path: 'V/<kind>/<slug>', id: 'V:<kind>/<slug>'}
+    - {path: '<item path>#<field>', id: none}
+  qualified: 'oes:canon/<volume>/<path>'
+  qualified-database: the catalog id without canon/ (a project's is ~<project-slug>)
+  case: kept and significant
+  refused: [a leading slash, a trailing slash, an empty segment, '.', '..', percent-encoding, a backslash, whitespace, a colon,
+            non-ASCII or control characters, a segment ending in a dot, a second '#', a kind the module does not declare,
+            more than three segments, 'a Windows reserved name as any segment, in any case, alone or before a dot (con, con.txt, prn, aux, nul, com0-9, lpt0-9)']
+
+envelope:
+  fields: [id, type, name, summary, path, parent, parts, size, mtime, kind, twin, eml, atem, holotype, counts, status,
+           visibility, provenance, pending, links]
+  references: [links]
+  required: [id, type, name, path]
+  status: [active, dormant, planned, retired]
+  visibility: [public, internal, restricted]
+  open-question: '{pending: "<the question>"}'
+  sentinels: [none, self]
+  unknown-fields: allowed and kept
+
+closed-lists:
+  twin.state: [fresh, edited, stale, conflict]     # a convert twin (X.ext.md) beside its original
+  eml.state: [fresh, stale]                         # an EML twin (X.cosm) beside its text
+
+references:
+  forms:
+    - {form: bare, example: 'V:folder/ch01-getting-started', names: an item of the volume}
+    - {form: typed-link, example: '{rel: <free text>, to: <id>}', names: its to}
+    - {form: open-question, example: '{pending: "<question>"}', names: an answer still owed}
+  unresolved: error
+
+modules:
+  V:
+    name: Volume
+    subtitle: What the volume holds
+    kinds:
+      folder: {refs: [parent, parts], checked: [path, holotype, counts]}
+      file: {refs: [parent], checked: [path, size, kind, twin, eml, atem]}
+      article: {refs: [parent], checked: [path, title, source]}     # a saved wiki article folder
+
+checks:
+  load: [load]
+  envelope: [duplicate-id, id-grammar, id-module, type, type-prefix, identity-min, status, visibility, ref-grammar,
+             ref-unresolved, closed-list, pending-shape, catalog-key]
+
+open-questions:
+  form: '{pending: "<the question>"}'
+  field-path: keys joined by ".", list positions as [n]
+  on-the-whole-item: field path node
+
+renderers:
+  - id: tree
+    makes: the volume's folders and files
+    lens: {kind: mermaid, diagram: flowchart, include: [V], edges: [parent],
+           shape: {folder: '[[ ]]', file: '[ ]', article: '([ ])'}}
+  - {id: text-tree, makes: the text tree, code: [python -m enough.macrocosm tree]}
+
+extension:
+  status: not built

@@ -1,0 +1,29 @@
+# C — the governing documents and how the board is chosen, as the Form 990 states them.
+nodes:
+  - id: C:charter/bylaws
+    type: charter
+    name: Bylaws of Khan Academy, Inc.
+    summary: "The governing document. Amended on 10 June 2025 to establish a classified board with three-year terms aligned to the fiscal year. The nonprofit has no members or stockholders and no one outside the board holds power to elect its directors."
+    kind: bylaws
+    entity: C:entity/khan-academy-inc
+    last-amended: 2025-06-10
+    status: active
+    visibility: public
+    owner: O:role/General-Counsel
+    provenance: {mode: net-scan, sources: [f990-2025], confidence: 0.9, state: known}
+    pending: "are the bylaws and the articles of incorporation published? Form 990 says governing documents are available upon request"
+
+  - id: C:governance/board
+    type: governance
+    name: The board of directors
+    summary: "A self-electing board: no members or stockholders. At the end of the year to June 2025 it had 12 voting seats, 11 of them independent, up from 7 seats in 2019. An audit oversight committee oversees the independent audit and a compensation committee sets chief executive pay. Written conflict-of-interest, whistleblower and document-retention policies are in place."
+    elected-by: self
+    voting-seats: 12
+    independent-seats: 11
+    seats-by-filing: {2018: [8, 7], 2019: [7, 6], 2020: [7, 6], 2021: [8, 7], 2022: [10, 9], 2023: [12, 11], 2024-H1: [12, 11], FY2025: [12, 11]}
+    seats-by-filing-note: "[voting, independent] as reported on Form 990 Part VI lines 1a and 1b"
+    committees: [O:role/Audit-Committee, O:role/Compensation-Committee]
+    status: active
+    visibility: public
+    owner: O:role/Board
+    provenance: {mode: net-scan, sources: [f990-2025, f990-tp2024, f990-2023, f990-2022, f990-2021, f990-2020, f990-2019, f990-2018, charity-navigator], confidence: 0.9, state: known}

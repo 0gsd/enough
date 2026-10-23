@@ -1,0 +1,52 @@
+cosm: 0.3
+
+# Mozilla.ai (MZL.AI, PBC). Statuses are from Mozilla.ai's llms.txt of 2026-10-14 and its GitHub organization; mattering is the modeller's reading at 0.5 to 0.8.
+
+brand:
+  id: P:mozilla-ai
+  name: Mozilla.ai
+  kind: company
+  summary: 'An open-source AI company that builds products and infrastructure giving people and organizations more choice, transparency and control over their AI use: Otari, Octonous and a set of open tools.'
+  since: 2023-03
+  legal-anchor: MZL.AI, PBC, 1875 Mission Street, San Francisco CA; California public benefit corporation; EIN 35-2775450
+  owner: O:role/Chief-Executive-Officer
+  confidence: 0.8
+  sources: ['https://www.mozilla.ai/', 'https://mozilla.ai/company/about-us', 'https://www.mozilla.ai/llms.txt']
+  visibility: public
+  parts: ['P:suite/products', 'P:suite/open-tools', 'P:suite/retired']
+  principles:
+    purpose: 'Build AI that is trustworthy, transparent and controllable: open-source products and infrastructure that give people and organizations more choice, transparency and control over their AI use.'
+    priorities:
+      - trust by design
+      - open foundations
+      - learning together
+      - agency
+      - focus
+    value:
+      - {to: 'M:audience/ai-developers', proposition: 'open tools that run on any provider and any model, with no lock-in'}
+      - {to: 'M:audience/teams-and-organizations', proposition: 'routing, budgets, guardrails and approvals around the AI in use'}
+      - {to: 'M:audience/blueprint-community', proposition: reusable templates anyone can contribute to}
+    decides:
+      - which open tools to maintain and which to archive
+      - whether a product is in beta or generally available
+  vocabulary:
+    terms:
+      - {term: control plane, means: 'Otari''s name for the layer that routes requests across LLM providers and applies budgets, keys and policies.'}
+      - {term: Choice-first Stack, means: 'Mozilla.ai''s unified open-source foundation for building, evaluating and guarding AI agents: any-agent, any-llm, mcpd and any-guardrail.'}
+    assumes:
+      - people and organizations want choice, transparency and control over their AI use, its stated purpose
+    boundary:
+      - Mozilla.ai does not run Firefox or Thunderbird; it describes itself as a focused SaaS company pursuing product-market fit
+  mattering:
+    inside:
+      - who: ['O:role/Chief-Executive-Officer', 'O:role/VP-Engineering', 'O:role/Product-Team']
+        because: A team of engineers, product thinkers, researchers and open-source builders in nine countries.
+        confidence: 0.5
+    chosen:
+      - who: ['M:audience/ai-developers', 'M:audience/teams-and-organizations']
+        because: llamafile has about 26,000 GitHub stars and any-llm about 2,200.
+        confidence: 0.5
+    prospective:
+      - who: ['M:audience/teams-and-organizations']
+        because: Otari is generally available and Octonous is in beta and free to use.
+        confidence: 0.5

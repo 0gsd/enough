@@ -1,0 +1,14 @@
+# R: surfaces.
+nodes:
+  - id: R:surface/website
+    type: surface
+    name: mozilla.vc
+    summary: 'The fund''s site: themes, portfolio, blog and contact.'
+    kind: website
+    url: https://mozilla.vc/
+    presents: ['P:offering/trustworthy-ai', 'P:offering/healthy-communities', 'P:offering/security-and-privacy']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Managing-Partner
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/'], confidence: 0.9, state: known}

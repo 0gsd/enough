@@ -1,0 +1,12 @@
+# C: counterparties.
+nodes:
+  - id: C:counterparty/github
+    type: counterparty
+    name: GitHub
+    summary: Code host of the mozilla-ai repositories, where the open tools live.
+    kind: platform
+    global-id:
+      domain: github.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-ai'], confidence: 0.9, state: known}

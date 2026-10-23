@@ -1,0 +1,91 @@
+# C — the major public partnerships and agreements, as the parties describe them. Money terms are left pending unless published.
+nodes:
+  - id: C:contract/college-board-sat
+    type: contract
+    name: Official Digital SAT Prep partnership
+    summary: "Free SAT preparation built with the College Board and offered to students at no charge: full-length adaptive practice tests in the Bluebook app link to personalised lessons on Khan Academy. Started in 2015 as Official SAT Practice; the College Board's October 2023 post describes the digital-SAT version as launched with the digital SAT."
+    between: [atom/khan-academy, C:counterparty/college-board]
+    counterparty: C:counterparty/college-board
+    scope: [P:offering/test-prep]
+    terms: "free to students; practice tests in Bluebook, lessons and practice questions on Khan Academy"
+    since: 2015
+    status: active
+    visibility: public
+    owner: O:role/Chief-of-Staff
+    provenance: {mode: net-scan, sources: [collegeboard-sat, ka-districts], confidence: 0.9, state: known}
+    pending: "financial terms, if any, and the term of the agreement are not public"
+
+  - id: C:contract/stand-together
+    type: contract
+    name: Stand Together Trust commitment
+    summary: "A five-year, $20 million commitment announced on 25 January 2024 across Khan Academy, Schoolhouse.world and Khan Lab School, to reach millions of new US students with new content and teacher resources, use AI for interactive personalised learning and strengthen the core courses."
+    between: [atom/khan-academy, C:counterparty/stand-together]
+    counterparty: C:counterparty/stand-together
+    scope: [P:offering/courses-and-practice, P:suite/khanmigo]
+    terms: "$20 million over five years, shared across three organizations"
+    since: 2024-01-25
+    status: active
+    visibility: public
+    owner: O:role/Chief-External-Relations-Officer
+    provenance: {mode: net-scan, sources: [standtogether], confidence: 0.8, state: known}
+    pending: "Khan Academy's share of the $20 million and its payment schedule"
+
+  - id: C:contract/microsoft
+    type: contract
+    name: Microsoft infrastructure partnership
+    summary: "Microsoft donated cloud infrastructure so that Khanmigo for Teachers is free to US teachers, announced at Microsoft Build in May 2024. The two also planned to explore small language models for math tutoring and more Khan Academy content in Microsoft's education products."
+    between: [atom/khan-academy, C:counterparty/microsoft]
+    counterparty: C:counterparty/microsoft
+    scope: [P:offering/khanmigo-teachers]
+    terms: "donated infrastructure; free Khanmigo for Teachers for US teachers"
+    since: 2024-05
+    status: active
+    visibility: public
+    owner: O:role/Chief-of-Staff
+    provenance: {mode: net-scan, sources: [blog-microsoft], confidence: 0.8, state: known}
+    pending: "the value and term of the donated infrastructure, and the countries where free teacher access now applies (a Khanmigo help link mentions 44)"
+
+  - id: C:contract/google-org
+    type: contract
+    name: Google.org grant and fellowship
+    summary: "A Google.org grant, a six-month fellowship placing six Google engineers with Khan Academy's product and engineering teams, and access to Gemini models, behind the interactive diagrams and teacher-reviewed practice in Khanmigo for the 2026 school year and the Gemini-assisted Writing Coach announced in February 2026."
+    between: [atom/khan-academy, C:counterparty/google]
+    counterparty: C:counterparty/google
+    scope: [P:suite/khanmigo, P:offering/writing-coach]
+    terms: "grant, fellowship and model access; amounts not stated"
+    since: 2026-02
+    status: active
+    visibility: public
+    owner: O:role/Chief-of-Staff
+    provenance: {mode: net-scan, sources: [blog-google-org, journal-google-2026, edtech-google-visual], confidence: 0.8, state: known}
+    pending: "the amount of the Google.org grant and whether the partnership has a stated end date"
+
+  - id: C:contract/nwea
+    type: contract
+    name: NWEA Learning Paths partnership
+    summary: "MAP Accelerator, announced with NWEA in June 2019, became Learning Paths informed by MAP Growth: an add-on to a Khan Academy Districts partnership that Khan Academy now sells directly, with NWEA a partner through its Instructional Connections Program. Needs Clever rostering for both products and at least 250 licences."
+    between: [atom/khan-academy, C:counterparty/nwea]
+    counterparty: C:counterparty/nwea
+    scope: [P:offering/learning-paths]
+    terms: "add-on to a districts partnership; Clever rostering for both products; minimum 250 licences; sold by Khan Academy"
+    since: 2019-06
+    status: active
+    visibility: public
+    owner: O:role/Chief-of-Staff
+    provenance: {mode: net-scan, sources: [blog-nwea-2019, blog-learning-paths, blog-map-transition], confidence: 0.8, state: known}
+    pending: "the price per licence and any revenue share with NWEA"
+
+  - id: C:contract/new-hampshire
+    type: contract
+    name: New Hampshire statewide Khanmigo offer
+    summary: "Free Khanmigo for students and educators in grades 5 to 12 across New Hampshire through the state's Department of Education, after a $2.3 million state pilot funded by federal COVID-relief money. First announced in May 2024; the post was updated in January 2026."
+    between: [atom/khan-academy, C:counterparty/nh-doe]
+    counterparty: C:counterparty/nh-doe
+    scope: [P:suite/khanmigo, P:offering/districts-partnership]
+    terms: "statewide access at no cost to schools; Learning Paths available to districts that use MAP Growth and Clever and sign a data sharing agreement"
+    since: 2024-05-21
+    status: active
+    visibility: public
+    owner: O:role/Chief-of-Staff
+    provenance: {mode: net-scan, sources: [blog-new-hampshire], confidence: 0.7, state: known}
+    pending: "the post says the pilot ran through 31 July 2025; is the statewide offer still running, and on whose funding?"

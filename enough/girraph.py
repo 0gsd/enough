@@ -412,7 +412,7 @@ def save(path: Path, g: Girraph) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(dumps(g), encoding="utf-8")
     # A user-initiated girraph→merirmaid link makes the sibling `.merirmaid`
-    # a live mirror (like the cachebox mirrors). Regenerate it on every save
+    # a live mirror (like Canon's volume mirrors). Regenerate it on every save
     # — a no-op unless the mirror-link sniff passes. Every save() call site
     # (the agent tools and the UI endpoints) already holds path_lock(path);
     # refresh_mirror does not re-acquire it, so this is the single choke
@@ -687,7 +687,7 @@ def new_girraph(title: str) -> Girraph:
 # Merirmaid mirror — a girraph rendered as a linked Mermaid diagram in a
 # sibling `.merirmaid` file. User-initiated once, then automatic: the
 # mirror is regenerated on every girraph save (mirror semantics, exactly
-# like the cachebox mirrors in cacheawl.py). The mirror is read-only in
+# like the volume mirrors in canon.py). The mirror is read-only in
 # the UI (`modality: mirror`); its `kind: girraph-mirror` frontmatter is
 # the cheap sniff that distinguishes "this .merirmaid is our generated
 # mirror" from "a hand-authored diagram that happens to share the name".

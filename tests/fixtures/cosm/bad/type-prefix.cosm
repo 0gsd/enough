@@ -1,0 +1,10 @@
+oes: eml/1
+id: eml/bad-type-prefix
+name: bad type-prefix
+# type-prefix: the id's kind and the type disagree
+nodes:
+  - id: E:person/x
+    type: org
+    name: x
+    summary: An org written with a person's id.
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

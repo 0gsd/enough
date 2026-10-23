@@ -1,0 +1,45 @@
+# M: channels: all direct. The Foundation sells nothing; the model word for how each reaches people is in `model`.
+nodes:
+  - id: M:channel/website
+    type: channel
+    name: mozillafoundation.org
+    summary: 'The Foundation''s website: programs, grant calls, newsletter sign-up, donate pages.'
+    model: content
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/'], confidence: 0.8, state: known}
+
+  - id: M:channel/mozfest
+    type: channel
+    name: Mozilla Festival
+    summary: The festival itself, an event channel.
+    model: event
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.8, state: known}
+
+  - id: M:channel/nothing-personal
+    type: channel
+    name: Nothing Personal
+    summary: The magazine and its product reviews.
+    model: content
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/'], confidence: 0.8, state: known}
+
+  - id: M:channel/grant-calls
+    type: channel
+    name: Grant and fellowship calls
+    summary: Open opportunities listed on the grantmaking page; 2026 Fellow nominations closed and appointments were due in June 2026.
+    model: grant
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/grantmaking/', 'https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.8, state: known}

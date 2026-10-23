@@ -1,0 +1,267 @@
+# C — public financial figures by fiscal year, from each year's Form 990 (Part I summary, Part IX and Part X), US dollars,
+# accrual basis. Exact numbers as filed; a figure the return does not give is left out, never estimated.
+# The nonprofit changed its fiscal year in 2024: calendar years to 2023, then a six-month short year (January to June 2024),
+# then July-to-June years. `employees` is the return's count of individuals employed in the calendar year it names;
+# `volunteers` is the return's own estimate. Both are counts, not people.
+nodes:
+  - id: C:finance/2018
+    type: finance
+    name: Calendar 2018
+    summary: "Revenue $42.7M against expenses $48.9M: a deficit of $6.1M. Net assets $85.6M at year end."
+    by: atom/khan-academy
+    period: "2018"
+    currency: USD
+    basis: accrual
+    figures:
+      revenue: 42742920
+      contributions-and-grants: 31433356
+      program-service-revenue: 10327301
+      investment-income: 964018
+      other-revenue: 18245
+      operating-expenses: 48863733
+      salaries-and-benefits: 35041887
+      grants-paid: 277150
+      fundraising-expenses: 1852100
+      net-income: -6120813
+      assets: 97940308
+      liabilities: 12370094
+      equity: 85570214
+      employees: 234
+      volunteers: 1200
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-2018, pp-ka], confidence: 0.9, state: known}
+
+  - id: C:finance/2019
+    type: finance
+    name: Calendar 2019
+    summary: "Revenue $46.2M against expenses $54.3M: a deficit of $8.1M. Program service revenue rose to $17.2M from $10.3M the year before. Net assets $77.9M."
+    by: atom/khan-academy
+    period: "2019"
+    currency: USD
+    basis: accrual
+    figures:
+      revenue: 46244725
+      contributions-and-grants: 27629684
+      program-service-revenue: 17240125
+      investment-income: 1323725
+      other-revenue: 51191
+      operating-expenses: 54324592
+      salaries-and-benefits: 38621891
+      grants-paid: 210405
+      fundraising-expenses: 2113921
+      net-income: -8079867
+      assets: 86675767
+      liabilities: 8822913
+      equity: 77852854
+      employees: 251
+      volunteers: 1200
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-2019, pp-ka], confidence: 0.9, state: known}
+
+  - id: C:finance/2020
+    type: finance
+    name: Calendar 2020
+    summary: "Revenue $79.3M, of which contributions and grants were $65.7M, against expenses of $56.8M: a surplus of $22.6M. Net assets $100.7M."
+    by: atom/khan-academy
+    period: "2020"
+    currency: USD
+    basis: accrual
+    figures:
+      revenue: 79340879
+      contributions-and-grants: 65711147
+      program-service-revenue: 12611627
+      investment-income: 902990
+      other-revenue: 115115
+      operating-expenses: 56776201
+      salaries-and-benefits: 41739807
+      grants-paid: 0
+      fundraising-expenses: 2654743
+      net-income: 22564678
+      assets: 115080607
+      liabilities: 14355478
+      equity: 100725129
+      employees: 197
+      volunteers: 1400
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-2020, pp-ka], confidence: 0.9, state: known}
+
+  - id: C:finance/2021
+    type: finance
+    name: Calendar 2021
+    summary: "Revenue $59.3M against expenses $53.9M: a surplus of $5.4M. Net assets $105.8M."
+    by: atom/khan-academy
+    period: "2021"
+    currency: USD
+    basis: accrual
+    figures:
+      revenue: 59263743
+      contributions-and-grants: 48693146
+      program-service-revenue: 9355361
+      investment-income: 1221511
+      other-revenue: -6275
+      operating-expenses: 53879015
+      salaries-and-benefits: 39378903
+      grants-paid: 0
+      fundraising-expenses: 2904553
+      net-income: 5384728
+      assets: 115035528
+      liabilities: 9272154
+      equity: 105763374
+      employees: 229
+      volunteers: 1400
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-2021, pp-ka], confidence: 0.9, state: known}
+
+  - id: C:finance/2022
+    type: finance
+    name: Calendar 2022
+    summary: "Revenue $53.2M against expenses $58.2M: a deficit of $4.9M. Net assets $93.7M."
+    by: atom/khan-academy
+    period: "2022"
+    currency: USD
+    basis: accrual
+    figures:
+      revenue: 53234817
+      contributions-and-grants: 39984004
+      program-service-revenue: 12923384
+      investment-income: 340623
+      other-revenue: -13194
+      operating-expenses: 58157502
+      salaries-and-benefits: 43486013
+      grants-paid: 0
+      fundraising-expenses: 3515896
+      net-income: -4922685
+      assets: 105255724
+      liabilities: 11532697
+      equity: 93723027
+      employees: 258
+      volunteers: 650
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-2022, pp-ka], confidence: 0.9, state: known}
+
+  - id: C:finance/2023
+    type: finance
+    name: Calendar 2023
+    summary: "Revenue $98.3M, of which contributions and grants were $84.2M, against expenses of $68.1M: a surplus of $30.1M in the year the AI tutor launched. Net assets $128.5M."
+    by: atom/khan-academy
+    period: "2023"
+    currency: USD
+    basis: accrual
+    figures:
+      revenue: 98267721
+      contributions-and-grants: 84189187
+      program-service-revenue: 12064239
+      investment-income: 1950682
+      other-revenue: 63613
+      operating-expenses: 68127201
+      salaries-and-benefits: 51557594
+      grants-paid: 0
+      fundraising-expenses: 3358294
+      net-income: 30140520
+      assets: 136250357
+      liabilities: 7728577
+      equity: 128521780
+      employees: 237
+      volunteers: 600
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-2023, pp-ka], confidence: 0.9, state: known}
+
+  - id: C:finance/2024-01-to-2024-06
+    type: finance
+    name: January to June 2024 (six-month short year)
+    summary: "The short year between calendar 2023 and the July-to-June year: revenue $28.1M against expenses $38.8M, a deficit of $10.7M over six months. Not comparable with a twelve-month year."
+    by: atom/khan-academy
+    period: 2024-01..2024-06
+    currency: USD
+    basis: accrual
+    figures:
+      revenue: 28054572
+      contributions-and-grants: 20748059
+      program-service-revenue: 5341231
+      investment-income: 1874351
+      other-revenue: 90931
+      operating-expenses: 38772419
+      program-service-expenses: 32940811
+      management-and-general-expenses: 3953536
+      salaries-and-benefits: 28565909
+      grants-paid: 0
+      fundraising-expenses: 1878072
+      net-income: -10717847
+      assets: 127337918
+      liabilities: 7747632
+      equity: 119590286
+      volunteers: 600
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-tp2024, f990-2025, pp-ka], confidence: 0.9, state: known}
+
+  - id: C:finance/2024-07-to-2025-06
+    type: finance
+    name: Year to 30 June 2025
+    summary: "The latest year on public record: revenue $117.5M, of which contributions and grants were $90.4M and program service revenue $22.2M, against expenses of $87.5M: a surplus of $30.0M. Net assets $152.2M, $47.7M of it donor-restricted; investments in publicly traded securities $139.6M."
+    by: atom/khan-academy
+    period: 2024-07..2025-06
+    currency: USD
+    basis: accrual
+    figures:
+      revenue: 117488956
+      contributions-and-grants: 90423383
+      program-service-revenue: 22164801
+      investment-income: 4814850
+      other-revenue: 85922
+      operating-expenses: 87533668
+      program-service-expenses: 75592351
+      management-and-general-expenses: 8240154
+      salaries-and-benefits: 68165164
+      grants-paid: 593100
+      fundraising-expenses: 3701163
+      net-income: 29955288
+      cash: 5517957
+      publicly-traded-investments: 139601353
+      assets: 158656292
+      liabilities: 6440948
+      equity: 152215344
+      net-assets-with-donor-restrictions: 47653311
+      net-assets-without-donor-restrictions: 104562033
+      employees: 337
+      volunteers: 600
+    consolidates: []
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-2025, pp-ka], confidence: 0.9, state: known}
+    pending: "the school-year 2024-25 annual report's financial summary was not readable (it is hosted on a document viewer); reconcile it with the return"
+
+  - id: C:finance/2025-07-to-2026-06
+    type: finance
+    name: Year to 30 June 2026
+    summary: "The year just closed. Its Form 990 and audited statements are not yet public."
+    by: atom/khan-academy
+    period: 2025-07..2026-06
+    currency: USD
+    basis: accrual
+    figures: {pending: "the year to 30 June 2026: revenue, expenses and net assets once its Form 990 is filed (the prior year's was filed on 12 February 2026)"}
+    status: planned
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [pp-ka], confidence: 0.5, state: pending}

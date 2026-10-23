@@ -1,0 +1,74 @@
+oes: comprise/1
+
+# Wikimedia as a two-atom public sample Holotype, built on 2026-10-18 from public sources only: the Foundation's and the
+# Endowment's audited statements, Forms 990, bylaws, annual plans and reports, official pages, and ProPublica's Nonprofit
+# Explorer. The Foundation is the perspective atom; the Endowment is its own entity, joined to it by three bonds (grants to
+# the Foundation, donations and estate gifts passed to the Endowment, and the cost-sharing agreement under which Foundation
+# staff manage it). No person is named anywhere: seats and bodies are roles; E is `none` in both atoms.
+# Every node's provenance names its source URLs. The mode is net-scan (what the schema calls learning from public pages); a fact that
+# no current source confirms is left pending with the question. Figures carry their fiscal year.
+
+id: holotype/wikimedia
+name: Wikimedia
+summary: The Wikimedia Foundation, which hosts Wikipedia and the other Wikimedia projects, and the Wikimedia Endowment, its separate permanent fund; two atoms, bonded, from public sources.
+sample: true
+alignment: {for: other, mode: research, by: comprise-sample, at: 2026-10-18}
+atoms:
+  - atom/wikimedia-foundation
+  - atom/wikimedia-endowment
+perspective: atom/wikimedia-foundation
+
+# Every source the nodes cite, by URL (the id is the URL). Declared once, Holotype-wide.
+sources:
+  - {id: "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", page: "Wikimedia Endowment audited financial statements, year ended 30 June 2025 and the period from 2023-09-30 (BDO)", url: "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", supports: "finance, related-party note, holdings, spending policy"}
+  - {id: "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", page: "Wikimedia Endowment Form 990 FY2024-25 frequently asked questions (Meta-Wiki)", url: "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", supports: "no employees, management by Foundation, grants, donors"}
+  - {id: "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", page: "Wikimedia Endowment annual plan FY2026-27", url: "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", supports: "plan, budget, planned giving"}
+  - {id: "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", page: "Wikimedia Foundation audited consolidated financial statements, years ended 30 June 2025 and 2024 (KPMG)", url: "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", supports: "C entity, finance, bonds, related-party notes, systems vendors, I positions"}
+  - {id: "https://foundation.wikimedia.org/wiki/Memory:Timeline", page: "Wikimedia Foundation official timeline", url: "https://foundation.wikimedia.org/wiki/Memory:Timeline", supports: "history, events"}
+  - {id: "https://foundation.wikimedia.org/wiki/Endowment:Main", page: "Wikimedia Endowment governance pages (Foundation wiki)", url: "https://foundation.wikimedia.org/wiki/Endowment:Main", supports: "committees, policies, plans, determination letter"}
+  - {id: "https://wikimediaendowment.org/wp-content/uploads/2026/05/2024-Form-990-WEND-Public.pdf", page: "Wikimedia Endowment Form 990 for tax year 2024 (fiscal year 2024-25), filed 2026-05-15", url: "https://wikimediaendowment.org/wp-content/uploads/2026/05/2024-Form-990-WEND-Public.pdf", supports: "filings"}
+  - {id: "https://wikimediaendowment.org/", page: "Wikimedia Endowment home page", url: "https://wikimediaendowment.org/", supports: "identity, board roles, purpose, funded initiatives"}
+  - {id: "https://foundation.wikimedia.org/wiki/Endowment:Bylaws", page: "Wikimedia Endowment bylaws", url: "https://foundation.wikimedia.org/wiki/Endowment:Bylaws", supports: "charter, directors, committees, officers"}
+  - {id: "https://projects.propublica.org/nonprofits/organizations/873024488", page: "ProPublica Nonprofit Explorer: Wikimedia Endowment (EIN 87-3024488)", url: "https://projects.propublica.org/nonprofits/organizations/873024488", supports: "identifiers"}
+  - {id: "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", page: "Wikimedia Endowment annual report 2024-2025", url: "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", supports: "donors, grants, history"}
+  - {id: "https://wikimediafoundation.org/give/", page: "Wikimedia Foundation: ways to give and how donations are used", url: "https://wikimediafoundation.org/give/", supports: "fundraising, claims"}
+  - {id: "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", page: "Wikimedia Foundation, FY2024-25 audit frequently asked questions (Meta-Wiki)", url: "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", supports: "finance, revenue mix, reserves, grants, Enterprise revenue"}
+  - {id: "https://meta.wikimedia.org/wiki/Wikimedia_movement_affiliates", page: "Wikimedia movement affiliates (Meta-Wiki)", url: "https://meta.wikimedia.org/wiki/Wikimedia_movement_affiliates", supports: "affiliates by type"}
+  - {id: "https://foundation.wikimedia.org/wiki/Wikimedia_Enterprise", page: "Wikimedia Enterprise governance page (Foundation wiki)", url: "https://foundation.wikimedia.org/wiki/Wikimedia_Enterprise", supports: "Wikimedia LLC agreements, launch, policy"}
+  - {id: "https://wikimediafoundation.org/news/2022/06/21/wikimedia-enterprise-announces-google-and-internet-archive-first-customers/", page: "Wikimedia Foundation news, 2022-06-21: Google and Internet Archive as the first Enterprise customers", url: "https://wikimediafoundation.org/news/2022/06/21/wikimedia-enterprise-announces-google-and-internet-archive-first-customers/", supports: "Enterprise accounts"}
+  - {id: "https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", page: "Wikimedia Enterprise blog, 2026-01-15: new partners on Wikipedia's 25th birthday", url: "https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", supports: "Enterprise partners"}
+  - {id: "https://wikimediafoundation.org/about/financial-reports/", page: "Wikimedia Foundation financial reports page: audit reports and Forms 990 by fiscal year", url: "https://wikimediafoundation.org/about/financial-reports/", supports: "filings"}
+  - {id: "https://foundation.wikimedia.org/wiki/Policy:Trademark_policy", page: "Wikimedia Foundation trademark policy", url: "https://foundation.wikimedia.org/wiki/Policy:Trademark_policy", supports: "marks, licensing of marks"}
+  - {id: "https://projects.propublica.org/nonprofits/organizations/200049703", page: "ProPublica Nonprofit Explorer: Wikimedia Foundation Inc (EIN 20-0049703), Form 990 summaries 2011-2025", url: "https://projects.propublica.org/nonprofits/organizations/200049703", supports: "identifiers, finance by fiscal year"}
+  - {id: "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", page: "Wikimedia Foundation annual report 2024-2025", url: "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", supports: "reach figures, spending split, ratings, programs"}
+  - {id: "https://wikimediafoundation.org/our-work/", page: "Wikimedia Foundation: our work (programs, apps, grants, library, policy)", url: "https://wikimediafoundation.org/our-work/", supports: "P community suite, apps"}
+  - {id: "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/", page: "Wikimedia Foundation news, 2026-01-15: Wikipedia celebrates 25 years", url: "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/", supports: "Enterprise partners"}
+  - {id: "https://enterprise.wikimedia.com/", page: "Wikimedia Enterprise: products, data, pricing model, named customers", url: "https://enterprise.wikimedia.com/", supports: "Enterprise offering, accounts"}
+  - {id: "https://www.mediawiki.org/wiki/Fundraising_tech", page: "MediaWiki.org: Fundraising tech", url: "https://www.mediawiki.org/wiki/Fundraising_tech", supports: "S fundraising stack"}
+  - {id: "https://wikitech.wikimedia.org/wiki/Data_centers", page: "Wikitech: Wikimedia data centers", url: "https://wikitech.wikimedia.org/wiki/Data_centers", supports: "S data centers"}
+  - {id: "https://foundation.wikimedia.org/wiki/Bylaws", page: "Wikimedia Foundation bylaws", url: "https://foundation.wikimedia.org/wiki/Bylaws", supports: "charter, board structure, officers, purpose"}
+  - {id: "https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use", page: "Wikimedia Terms of Use (in force from 2023-06-07)", url: "https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use", supports: "licences, host-not-publisher"}
+  - {id: "https://www.mediawiki.org/wiki/MediaWiki", page: "MediaWiki.org: MediaWiki", url: "https://www.mediawiki.org/wiki/MediaWiki", supports: "MediaWiki"}
+  - {id: "https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Board_of_Trustees", page: "Wikimedia Foundation Board of Trustees (Meta-Wiki)", url: "https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Board_of_Trustees", supports: "board composition, committees"}
+  - {id: "https://foundation.wikimedia.org/wiki/Policy:Privacy_policy", page: "Wikimedia Foundation privacy policy (approved 2025-09-03, in force 2025-10-06)", url: "https://foundation.wikimedia.org/wiki/Policy:Privacy_policy", supports: "privacy claims"}
+  - {id: "https://foundation.wikimedia.org/wiki/Policy:Universal_Code_of_Conduct", page: "Universal Code of Conduct", url: "https://foundation.wikimedia.org/wiki/Policy:Universal_Code_of_Conduct", supports: "conduct policy"}
+  - {id: "https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/", page: "Wikimedia Foundation news, 2026-07-16: the cost of 'free' and Enterprise", url: "https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/", supports: "Enterprise policy, 30% cap, AI scraping"}
+  - {id: "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview", page: "Wikimedia Foundation Annual Plan 2026-2027: budget overview", url: "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview", supports: "budget, headcount, fundraising targets"}
+  - {id: "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027", page: "Wikimedia Foundation Annual Plan 2026-2027", url: "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027", supports: "goals, plan"}
+  - {id: "https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/", page: "Diff, 2025-10-17: new user trends on Wikipedia", url: "https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/", supports: "traffic decline, AI and social video"}
+  - {id: "https://wikimediafoundation.org/about/", page: "Wikimedia Foundation: About", url: "https://wikimediafoundation.org/about/", supports: "mission, role, what the Foundation does not do"}
+  - {id: "https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", page: "Wikitech: Wikimedia infrastructure index", url: "https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", supports: "S systems"}
+  - {id: "https://wikipedialibrary.wmflabs.org/about/", page: "The Wikipedia Library: about and eligibility", url: "https://wikipedialibrary.wmflabs.org/about/", supports: "Wikipedia Library"}
+  - {id: "https://wikimediafoundation.org/our-work/wikimedia-projects/", page: "Wikimedia Foundation: the Wikimedia projects", url: "https://wikimediafoundation.org/our-work/wikimedia-projects/", supports: "P projects, R surfaces"}
+  - {id: "https://meta.wikimedia.org/wiki/Wikimedia_regions", page: "Wikimedia regions (Meta-Wiki)", url: "https://meta.wikimedia.org/wiki/Wikimedia_regions", supports: "funding regions"}
+  - {id: "https://www.wikidata.org/wiki/Wikidata:Statistics", page: "Wikidata statistics", url: "https://www.wikidata.org/wiki/Wikidata:Statistics", supports: "Wikidata size"}
+  - {id: "https://wikimediafoundation.org/role/staff/", page: "Wikimedia Foundation staff and departments (roles only)", url: "https://wikimediafoundation.org/role/staff/", supports: "departments, executive roles"}
+  - {id: "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing", page: "Wikitech: Lift Wing machine-learning model serving", url: "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing", supports: "S Lift Wing"}
+  - {id: "https://www.deeplearning.ai/the-batch/wikimedia-foundation-strikes-deals-with-amazon-meta-microsoft-mistral-ai-and-perplexity", page: "The Batch (DeepLearning.AI): Wikimedia Foundation strikes deals with Amazon, Meta, Microsoft, Mistral AI and Perplexity (headline and search summary only)", url: "https://www.deeplearning.ai/the-batch/wikimedia-foundation-strikes-deals-with-amazon-meta-microsoft-mistral-ai-and-perplexity", supports: "press reflection on Enterprise deals"}
+  - {id: "https://gigazine.net/gsc_news/en/20260116-wikipedia-enterprise", page: "Gigazine, 2026-01-16: Microsoft, Meta, Amazon, Perplexity and Mistral AI announced as paid program partners (headline and search summary only)", url: "https://gigazine.net/gsc_news/en/20260116-wikipedia-enterprise", supports: "press reflection on Enterprise deals"}
+  - {id: "https://wikitech.wikimedia.org/wiki/GitLab", page: "Wikitech: GitLab at Wikimedia", url: "https://wikitech.wikimedia.org/wiki/GitLab", supports: "S GitLab"}
+  - {id: "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Product_%26_Technology_OKRs", page: "Wikimedia Foundation Annual Plan 2026-2027: Product and Technology objectives and key results", url: "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Product_%26_Technology_OKRs", supports: "aims: reuse and attribution partners, Enterprise customers"}
+  - {id: "https://wikimediafoundation.org/about/jobs/", page: "Wikimedia Foundation: jobs and internships (read 2026-10-18)", url: "https://wikimediafoundation.org/about/jobs/", supports: "aims: engineering and data hires, interns"}
+
+attestations: []
+grants: []

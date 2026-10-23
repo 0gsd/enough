@@ -1,0 +1,54 @@
+cosm: 0.3
+
+# Thunderbird (MZLA Technologies Corporation). Statuses are as of the Thunderbird blog of 2026-10-01; mattering is the modeller's reading at 0.5 to 0.8.
+
+brand:
+  id: P:thunderbird
+  name: Thunderbird
+  kind: company
+  summary: 'Thunderbird: the free, open-source email, calendar and contacts app for desktop and Android (iOS in development), funded by user donations, and the Thunderbird Pro services being built around Thundermail.'
+  since: 2020-01-28
+  legal-anchor: MZLA Technologies Corporation, San Francisco CA; California C corporation; EIN 84-3352661
+  owner: O:role/Chief-Executive
+  confidence: 0.8
+  sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://www.thunderbird.net/en-US/privacy/', 'https://blog.thunderbird.net/']
+  visibility: public
+  parts: ['P:suite/apps', 'P:offering/thunderbird-pro', 'P:offering/thunderbird-enterprise', 'P:function/fundraising']
+  principles:
+    purpose: Make communication and collaboration better, guided by privacy, freedom and the voice of the community, as an ethical alternative to closed-off walled gardens.
+    priorities:
+      - privacy
+      - freedom
+      - community voice
+      - financial sustainability through donations and optional paid services
+    value:
+      - {to: 'M:audience/desktop-users', proposition: 'a free, open-source email client under the MPL 2.0 that is not funded by advertising'}
+      - {to: 'M:audience/android-users', proposition: the best Android email app available (the stated 2025 goal)}
+      - {to: 'M:audience/pro-prospects', proposition: an email service that will not use messages to train AI or show ads}
+    quality:
+      - {goal: sustain the project through user support, measure: 'user contributions: $8.6 million in 2023, $10.3 million in 2024'}
+    decides:
+      - the product roadmap
+      - which Thunderbird Pro services to build first (Thundermail first, April 2026)
+  vocabulary:
+    terms:
+      - {term: ESR, means: 'The annual Extended Support Release of Thunderbird desktop: 140 "Eclipse" in July 2025, 153 "Meadow" in July 2026.'}
+      - {term: Thunderbird Pro, means: 'Since June 2026: the email service from Thunderbird, with features like Appointment and Send included.'}
+      - {term: Early Bird, means: The beta channel through which waitlist members are invited to Thundermail in waves.}
+    assumes:
+      - 'user donations remain the main funding: $10.3 million in 2024'
+    boundary:
+      - MZLA does not make Firefox; Thunderbird is not charitable, so gifts are not tax deductible
+  mattering:
+    inside:
+      - who: ['O:role/Chief-Executive', 'O:role/Desktop-engineering', 'O:role/Mobile-engineering']
+        because: About 80% of the 43 full-time staff (end of 2024) work in technical roles such as product development and infrastructure; more than 335,000 people donated in 2024.
+        confidence: 0.5
+    chosen:
+      - who: ['M:audience/desktop-users', 'M:audience/android-users', 'M:audience/donors']
+        because: More than 335,000 individual donors gave $10.3 million in 2024.
+        confidence: 0.5
+    prospective:
+      - who: ['M:audience/pro-prospects', 'M:audience/enterprise-buyers']
+        because: Thundermail is for people who want an email service from Thunderbird; Thunderbird Enterprise is listed as coming soon.
+        confidence: 0.5

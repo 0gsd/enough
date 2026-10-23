@@ -147,7 +147,7 @@ def test_ensure_multipurpose_leaves_off_state_untouched(tmp_path: Path):
 @pytest.fixture
 def scratch_env(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("ENOUGH_UI_CONFIG", str(tmp_path / "ui.json"))
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(tmp_path / "cacheawl"))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(tmp_path / "cacheawl"))
     monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(tmp_path / "no-infoworld"))
     return tmp_path
 
@@ -290,7 +290,7 @@ def client(tmp_path: Path, monkeypatch):
     project = tmp_path / "project"
     project.mkdir()
     monkeypatch.setenv("ENOUGH_UI_CONFIG", str(tmp_path / "ui.json"))
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(tmp_path / "_store"))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(tmp_path / "_store"))
     monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(tmp_path / "no-infoworld"))
     skeleton.ensure_skeleton(project)   # the real launcher does this before create_app
     app = create_app(project, "http://localhost:9", supervise=False)

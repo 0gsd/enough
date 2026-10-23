@@ -5,14 +5,42 @@ enough itself is released under the Apache License, Version 2.0. See
 
 This file documents the licensing of
 
-1. third-party code **bundled** in this repository, and
-2. third-party projects that enough **depends on at runtime** (installed
+1. first-party material in this repository that is **not** under the
+   Apache License 2.0 (the dictionary data and MacroCOSM OES — see "First-party
+   material under separate terms" below),
+2. third-party code **bundled** in this repository, and
+3. third-party projects that enough **depends on at runtime** (installed
    by the user via Homebrew, uv, or `bootstrap.sh`, not included here).
 
 We're not lawyers. For anything commercial-facing, a real attorney should
 double-check the obligations. Links below point to each project's
 canonical license; that text governs in the case of any discrepancy
 with this summary.
+
+---
+
+## First-party material under separate terms
+
+Two parts of this repository are first-party, by enough's author, but are
+**not** released under the Apache License 2.0 with the rest of enough. Both
+are bundled for use within enough only; all rights are reserved until a
+licence is published beside them.
+
+### FEED, the first-party enough english dictionary
+
+`reflib/dict/` holds the public edition of the Enough Dictionary as JSON
+lines, which enough builds into its local dictionary database on first
+launch. Copyright © 2026 Graham Smith; see
+[reflib/dict/NOTICE.md](reflib/dict/NOTICE.md) for the terms.
+
+### MacroCOSM OES
+
+The MacroCOSM OES specification (`docs/MACROCOSM_OES.md`) and the MiniCOSM
+manifests under `defaults/cosm/` describe the `.cosm` family of formats that
+enough opens, checks and draws. Copyright © 2026 Graham Smith; see
+[defaults/cosm/NOTICE.md](defaults/cosm/NOTICE.md) for the terms, which also
+cover the names MacroCOSM, MiniCOSM, MicroCOSM, Canon, EML and atem. The
+reader, `enough/macrocosm.py`, is ordinary enough code under Apache 2.0.
 
 ---
 

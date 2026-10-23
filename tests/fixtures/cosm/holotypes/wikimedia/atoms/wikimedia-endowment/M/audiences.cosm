@@ -1,0 +1,112 @@
+# M — audiences, geographies and channels of the Endowment. Donors are counted, never named: six gave above the Form 990's Schedule B threshold ($237,264, 2% of contributions)
+# and are redacted in the public copy.
+nodes:
+  - id: M:audience/donors
+    type: audience
+    name: Donors to the Endowment
+    summary: 255,237 donors across 71 countries (2024-25 annual report, period not stated); $11.9M in gifts in 2024-25. Gifts are restricted to the endowment in perpetuity. A second multi-year campaign aims to raise $10M in 2026-27.
+    relation: [donor]
+    side: funding
+    geography: worldwide
+    served-by: [P:offering/permanent-fund, P:offering/legacy-giving]
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.85, state: known}
+
+  - id: M:audience/planned-givers
+    type: audience
+    name: Planned-giving donors (the Wikipedia Legacy Society)
+    summary: "Donors who name the Endowment in a will, trust or retirement account, or give through IRA distributions: 4,190 commitments at 30 June 2026 (aim: 540 more in 2026-27, and 25% more Legacy Society members), IRA distributions over $2.2M in 2025-26. Planned gifts could be its main source by 2050."
+    relation: [donor]
+    side: funding
+    geography: United States
+    served-by: [P:offering/legacy-giving]
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/"], confidence: 0.85, state: known}
+
+  - id: M:audience/foundation
+    type: audience
+    name: The Wikimedia Foundation as grantee
+    summary: "The Endowment's main grantee: $3.1M of the $3.4M of project funding in 2024-25 (Schedule I of the Form 990), for Abstract Wikipedia, machine learning, Commons and Wikidata."
+    relation: [beneficiary]
+    side: served
+    geography: worldwide
+    served-by: [P:offering/project-grants, P:offering/permanent-fund]
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}
+
+  - id: M:audience/other-grantees
+    type: audience
+    name: Other grantees
+    summary: "Organizations outside the Foundation that the Endowment funds for the Wikimedia projects: Kiwix, for offline Wikipedia ($297,000 in 2024-25, reported on the foreign-grants schedule)."
+    relation: [beneficiary]
+    side: served
+    geography: worldwide
+    served-by: [P:offering/project-grants]
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.85, state: known}
+
+  - id: M:geography/donor-countries
+    type: geography
+    name: Donors in 71 countries
+    summary: The Endowment says its donors come from 71 countries; its planned-giving partner, will tool and IRA distributions are specific to the United States.
+    scope: global
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.8, state: known}
+
+  - id: M:geography/united-states
+    type: geography
+    name: United States
+    summary: The Endowment is a San Francisco charity under US tax law; qualified charitable distributions from US IRAs and the FreeWill will tool are US-only.
+    scope: country
+    code: US
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.85, state: known}
+
+  - id: M:channel/endowment-site
+    type: channel
+    name: wikimediaendowment.org
+    summary: "The Endowment's own website: ways to give, impact, leadership, annual reports and financial documents."
+    model: donation
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/"], confidence: 0.9, state: known}
+    tenders: none
+
+  - id: M:channel/foundation-donation-pages
+    type: channel
+    name: The Foundation's giving pages
+    summary: The Foundation lists a gift to the Endowment among its ways to give, receives donations designated for it, and transfers them monthly under the cost-sharing agreement.
+    model: donation
+    seller: counterparty
+    counterparty: C:counterparty/foundation
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/give/", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.85, state: known}
+    tenders: none
+
+  - id: M:channel/freewill
+    type: channel
+    name: FreeWill will tool
+    summary: A free online will-writing tool for US residents that refers donors; the Endowment's largest source of planned-giving leads.
+    model: referral
+    seller: counterparty
+    counterparty: C:counterparty/freewill
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.8, state: known}
+    tenders: none

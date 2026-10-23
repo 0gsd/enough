@@ -1,0 +1,20 @@
+# M: the one market class the IRS gives, and where the work happens.
+nodes:
+  - id: M:market/ntee-u40
+    type: market
+    name: Science and technology research institutes
+    summary: The IRS class of the Foundation (NTEE U40).
+    taxonomy: custom
+    code: NTEE/U40
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://projects.propublica.org/nonprofits/api/v2/organizations/200097189.json'], confidence: 0.9, state: known}
+
+  - id: M:geography/operations
+    type: geography
+    name: Where the Foundation operates
+    summary: Offices in the United States, Canada, Germany and the United Kingdom; foreign activities in 2024 reported in Australia, Canada, China, France, Germany, Japan, Luxembourg, New Zealand, Spain and the United Kingdom; MozFest 2024 convened in the Netherlands and Zambia and MozFest 2026 is in Barcelona.
+    regions: [US, CA, DE, GB, NL, ZM, ES]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.8, state: known}

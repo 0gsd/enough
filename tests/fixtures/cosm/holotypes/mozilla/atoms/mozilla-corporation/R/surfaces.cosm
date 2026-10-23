@@ -1,0 +1,118 @@
+# R: surfaces. The platform listings carry a counterparty.
+nodes:
+  - id: R:surface/firefox-site
+    type: surface
+    name: firefox.com
+    summary: 'The Firefox home: downloads for every platform, Beta and Nightly, add-ons, release notes and the roadmap.'
+    kind: website
+    url: https://www.firefox.com/en-US/
+    presents: ['P:offering/firefox', 'P:offering/firefox-enterprise']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Product-Management
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/'], confidence: 0.9, state: known}
+
+  - id: R:surface/mozilla-site
+    type: surface
+    name: mozilla.org
+    summary: 'The Mozilla site: products, advertising, legal terms, leadership and the family of organizations.'
+    kind: website
+    url: https://www.mozilla.org/en-US/products/
+    presents: ['P:offering/mozilla-vpn', 'P:offering/mozilla-monitor', 'P:offering/mozilla-ads']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Chief-Executive-Officer
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/'], confidence: 0.9, state: known}
+
+  - id: R:surface/relay-site
+    type: surface
+    name: relay.firefox.com
+    summary: Firefox Relay's site.
+    kind: website
+    url: https://relay.firefox.com/
+    presents: ['P:offering/firefox-relay']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Privacy-Services-Team
+    provenance: {mode: net-scan, sources: ['https://relay.firefox.com/'], confidence: 0.9, state: known}
+
+  - id: R:surface/mdn-site
+    type: surface
+    name: developer.mozilla.org
+    summary: MDN Web Docs.
+    kind: website
+    url: https://developer.mozilla.org/en-US/
+    presents: ['P:offering/mdn']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/MDN-Team
+    provenance: {mode: net-scan, sources: ['https://developer.mozilla.org/en-US/about'], confidence: 0.9, state: known}
+
+  - id: R:surface/0din-site
+    type: surface
+    name: 0din.ai
+    summary: The 0DIN platform and bug bounty.
+    kind: website
+    url: https://0din.ai/
+    presents: ['P:offering/0din']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/AI-Products-Team
+    provenance: {mode: net-scan, sources: ['https://0din.ai/'], confidence: 0.9, state: known}
+
+  - id: R:surface/tabstack-site
+    type: surface
+    name: tabstack.ai
+    summary: Tabstack.
+    kind: website
+    url: https://tabstack.ai/
+    presents: ['P:offering/tabstack']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/AI-Products-Team
+    provenance: {mode: net-scan, sources: ['https://tabstack.ai/'], confidence: 0.9, state: known}
+
+  - id: R:surface/source-repository
+    type: surface
+    name: github.com/mozilla-firefox/firefox
+    summary: The official Firefox repository.
+    kind: repository
+    url: https://github.com/mozilla-firefox/firefox
+    presents: ['P:product/firefox-desktop']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-firefox/firefox'], confidence: 0.9, state: known}
+
+  - id: R:surface/google-play-listing
+    type: surface
+    name: Firefox on Google Play
+    summary: The Android listings of Firefox and Firefox Focus.
+    kind: platform
+    url: https://play.google.com/
+    presents: ['P:product/firefox-android', 'P:product/firefox-focus']
+    counterparty: C:counterparty/google-play
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Product-Management
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/mobile/'], confidence: 0.9, state: known}
+
+  - id: R:surface/app-store-listing
+    type: surface
+    name: Firefox in the App Store
+    summary: The iOS listings of Firefox and Firefox Focus.
+    kind: platform
+    url: https://apps.apple.com/
+    presents: ['P:product/firefox-ios', 'P:product/firefox-focus']
+    counterparty: C:counterparty/apple-app-store
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Product-Management
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/mobile/'], confidence: 0.9, state: known}

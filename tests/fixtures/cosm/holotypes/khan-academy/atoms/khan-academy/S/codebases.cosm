@@ -1,0 +1,33 @@
+# S — the open-source code, as the nonprofit's GitHub organization lists it. Licences are as the repositories show them.
+nodes:
+  - id: S:codebase/khan-github
+    type: codebase
+    name: Khan on GitHub
+    summary: "474 public repositories on 2026-10-18, mainly JavaScript, Python, Go, TypeScript and Objective-C; a style guide, a CSS-in-JS library, a type-safe Go GraphQL client, an AI batch-translation tool and the projects below."
+    runs: [S:system/learning-platform]
+    status: active
+    visibility: public
+    owner: O:role/Chief-Technology-Officer
+    provenance: {mode: net-scan, sources: [github-khan], confidence: 0.8, state: known}
+
+  - id: S:codebase/perseus
+    type: codebase
+    name: Perseus
+    summary: "The exercise question editor and renderer used for practice problems; MIT-licensed, TypeScript."
+    runs: [S:system/learning-platform]
+    license: MIT
+    status: active
+    visibility: public
+    owner: O:role/Chief-Technology-Officer
+    provenance: {mode: net-scan, sources: [github-khan], confidence: 0.8, state: known}
+
+  - id: S:codebase/wonder-blocks
+    type: codebase
+    name: Wonder Blocks
+    summary: "The React component library of the nonprofit's design system; MIT-licensed, TypeScript."
+    runs: [S:system/learning-platform]
+    license: MIT
+    status: active
+    visibility: public
+    owner: O:role/Chief-Technology-Officer
+    provenance: {mode: net-scan, sources: [github-khan], confidence: 0.8, state: known}

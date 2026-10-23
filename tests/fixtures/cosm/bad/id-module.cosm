@@ -1,0 +1,10 @@
+oes: eml/1
+id: eml/bad-id-module
+name: bad id-module
+# id-module: an id naming a module EML does not declare
+nodes:
+  - id: Z:concept/x
+    type: concept
+    name: x
+    summary: A concept in a module that does not exist.
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

@@ -1,0 +1,119 @@
+# R — claims: what the Foundation says in public, about which node, with what evidence. Wording is paraphrased; the source page holds the exact words.
+# A claim is "supported" when the audited statements or the policy text show it; "partial" when it rests on the Foundation's own statement alone.
+nodes:
+  - id: R:claim/no-advertising
+    type: claim
+    name: Wikipedia is not funded by advertising
+    summary: The giving page says Wikipedia carries no advertising and is funded by donations; the audited revenue lines show contributions, Enterprise contracts and investment income only.
+    text: "Wikipedia is not funded through advertising."
+    about: [P:offering/wikipedia, P:function/fundraising]
+    on: [R:surface/give-pages]
+    evidence: {state: supported, by: [P:function/fundraising], measure: "2024-25 revenue lines: contributions $184.1M, Enterprise $8.3M, investment income $6.9M, other $2.3M; no advertising line"}
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/give/", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+
+  - id: R:claim/no-sale-of-data
+    type: claim
+    name: Personal information is not sold or rented
+    summary: The privacy policy and the giving page say the Foundation does not sell or rent personal information and will not trade or rent donors' nonpublic details.
+    text: "We do not sell or rent your Personal Information."
+    about: [P:wikimedia-foundation]
+    on: [R:surface/governance-wiki, R:surface/give-pages]
+    evidence: {state: partial, by: [P:function/stewardship], measure: "the policy text, in force since 2025-10-06; no independent audit of the practice is cited"}
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Privacy_policy", "https://wikimediafoundation.org/give/"], confidence: 0.85, state: known}
+
+  - id: R:claim/volunteers-decide-content
+    type: claim
+    name: The Foundation does not make content decisions
+    summary: The Foundation says it has no editorial role on Wikipedia; volunteers decide what the articles say.
+    text: "The Foundation does not make content decisions on Wikipedia; volunteers do."
+    about: [P:offering/wikipedia]
+    on: [R:surface/foundation-site]
+    evidence: {state: supported, by: [P:offering/wikipedia], measure: "the Terms of Use say it acts only as a hosting service provider and does not monitor, edit or endorse community content"}
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/", "https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use"], confidence: 0.9, state: known}
+
+  - id: R:claim/free-licences
+    type: claim
+    name: Project content is freely licensed
+    summary: Text on the projects is under CC BY-SA 4.0 and the GFDL, and public-domain material is welcome; Wikimedia Enterprise says over 99.9% of its data carries a Creative Commons licence.
+    text: "Text is licensed under CC BY-SA 4.0 and the GFDL."
+    about: [P:suite/projects, P:offering/wikimedia-enterprise]
+    on: [R:surface/governance-wiki, R:surface/enterprise-site]
+    evidence: {state: supported, by: [P:suite/projects], measure: "the Terms of Use; each Enterprise payload includes licensing metadata"}
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use", "https://enterprise.wikimedia.com/"], confidence: 0.85, state: known}
+
+  - id: R:claim/languages
+    type: claim
+    name: Wikipedia is in more than 300 languages
+    summary: The Foundation says Wikipedia is available in over 300 languages; the 2024-25 annual report gives 66 million articles.
+    text: "Wikipedia is available in over 300 languages."
+    about: [P:offering/wikipedia]
+    on: [R:surface/foundation-site, R:surface/wikipedia]
+    evidence: {state: supported, by: [P:offering/wikipedia], measure: "the language editions listed on wikipedia.org; the annual report's article count"}
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/"], confidence: 0.85, state: known}
+
+  - id: R:claim/programs-share
+    type: claim
+    name: Most of the money goes to programs
+    summary: The annual report says 77.4% of 2024-25 expenses went to programs (technology 45%, volunteer support 32%), 11.4% to fundraising and 11.2% to administration.
+    text: "77.4% of expenses went to programs in 2024-25."
+    about: [P:function/stewardship]
+    on: [R:surface/foundation-site]
+    evidence: {state: supported, by: [P:service/financial-reporting], measure: "the audited functional allocation: programs $147.7M of $190.9M"}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/"], confidence: 0.9, state: known}
+
+  - id: R:claim/clean-audits
+    type: claim
+    name: Twenty clean audits in a row
+    summary: The Foundation says KPMG has given a clean opinion on its statements for twenty consecutive years, since the year ended 30 June 2006.
+    text: "A clean audit opinion for 20 consecutive years."
+    about: [P:service/financial-reporting]
+    on: [R:surface/governance-wiki]
+    evidence: {state: supported, by: [P:service/financial-reporting], measure: "the audit reports listed on the financial reports page, 2005-06 to 2024-25"}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://wikimediafoundation.org/about/financial-reports/"], confidence: 0.9, state: known}
+
+  - id: R:claim/enterprise-cap
+    type: claim
+    name: Enterprise income is capped at 30%
+    summary: The Foundation says income from Wikimedia Enterprise is capped at 30% of total annual revenue so that small donations stay its main funding; it was about 4% in 2024-25.
+    text: "Income from Wikimedia Enterprise is capped at 30% of total annual revenue."
+    about: [P:offering/wikimedia-enterprise]
+    on: [R:surface/foundation-site]
+    evidence: {state: supported, by: [P:offering/wikimedia-enterprise], measure: "Enterprise revenue $8.3M of $208.6M in 2024-25"}
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.85, state: known}
+
+  - id: R:claim/public-apis-stay-open
+    type: claim
+    name: Public API access will not be switched off
+    summary: The Foundation says it has begun rate-limiting large-scale reuse of the public APIs and will not switch off public API access; content stays free and open.
+    text: "Public API access will stay available; content stays free and open."
+    about: [P:product/public-apis-and-dumps]
+    on: [R:surface/foundation-site]
+    evidence: {state: partial, by: [P:product/public-apis-and-dumps], measure: "a forward-looking statement of July 2026; the rate limits are already in place"}
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/"], confidence: 0.8, state: known}

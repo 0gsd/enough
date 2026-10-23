@@ -3,7 +3,7 @@ stable ids), transfer ops incl. traversal rejection, infoworld-migration
 idempotence, the path: ingest on a fixture tree, and the mirror-write
 refusal on both write paths.
 
-All state goes through ENOUGH_CACHEAWL_ROOT / ENOUGH_INFOWORLD_ROOT
+All state goes through ENOUGH_CANON_ROOT / ENOUGH_INFOWORLD_ROOT
 overrides so the real ~/enough install is never touched.
 """
 
@@ -22,7 +22,7 @@ def caroot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Point cacheawl at a scratch store, and infoworld at a nonexistent
     scratch path so nothing ever migrates the live install by accident."""
     store = tmp_path / "cacheawl"
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(store))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(store))
     monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(tmp_path / "no-infoworld"))
     return store
 
@@ -47,10 +47,12 @@ def test_mirror_frontmatter_and_stable_ids(caroot: Path):
     (box / "sub" / "b.md").write_text("yo", encoding="utf-8")
     ca.regenerate_mirror("wiki")
 
-    text = (box / ca.MIRROR_NAME).read_text(encoding="utf-8")
+    # 0.4.3: the mirror is drawn on demand and never persisted.
+    assert not (box / ca.MIRROR_NAME).exists()
+    text = ca.build_mirror("wiki")[0]
     assert text.startswith("---")
-    for key in ("merirmaid: 1", "modality: mirror", "source: cachebox:wiki",
-                "title: cachebox: wiki", "generated:"):
+    for key in ("merirmaid: 1", "modality: mirror", "source: canon:wiki",
+                "title: volume: wiki", "generated:"):
         assert key in text, key
     assert "flowchart TD" in text
     # A metadata node with origin/items is present.
@@ -63,7 +65,7 @@ def test_mirror_frontmatter_and_stable_ids(caroot: Path):
     for nid in (id_a, id_sub, id_b):
         assert nid in text
     ca.regenerate_mirror("wiki")
-    text2 = (box / ca.MIRROR_NAME).read_text(encoding="utf-8")
+    text2 = ca.build_mirror("wiki")[0]
     for nid in (id_a, id_sub, id_b):
         assert nid in text2
     # The mirror file itself is recognized as a mirror.
@@ -76,7 +78,8 @@ def test_reconcile_catches_manual_drop(caroot: Path):
     # Manual drop the backend didn't perform.
     (box / "surprise.txt").write_text("dropped in", encoding="utf-8")
     assert ca.reconcile("box") is True
-    assert ca._node_id("surprise.txt") in (box / ca.MIRROR_NAME).read_text(encoding="utf-8")
+    assert not (box / ca.MIRROR_NAME).exists()
+    assert ca._node_id("surprise.txt") in ca.build_mirror("box")[0]
     # Second reconcile is a no-op (fingerprint now matches).
     assert ca.reconcile("box") is False
 
@@ -103,7 +106,7 @@ def test_transfer_copy_move_and_mirror_refresh(caroot: Path, tmp_path: Path):
     assert not (ca.box_dir("box") / "doc.txt").exists()
     assert (ca.box_dir("box") / "renamed.txt").exists()
     # Mirror reflects the rename.
-    mirror = (ca.box_dir("box") / ca.MIRROR_NAME).read_text(encoding="utf-8")
+    mirror = ca.build_mirror("box")[0]
     assert ca._node_id("renamed.txt") in mirror
 
 
@@ -157,7 +160,7 @@ def test_migration_moves_and_is_idempotent(caroot: Path, tmp_path: Path):
     assert not (iw / "wiki").exists()          # move-only: source gone
     meta = ca.load_meta("wiki")
     assert meta["origin"]["type"] == "infoworld-migration"
-    assert (caroot / "wiki" / ca.MIRROR_NAME).is_file()
+    assert not (caroot / "wiki" / ca.MIRROR_NAME).exists()
 
     # Idempotent: infoworld is gone now, second run is a clean no-op.
     r2 = ca.migrate_infoworld(iw)
@@ -253,7 +256,7 @@ def test_write_file_refuses_mirror(caroot: Path, tmp_path: Path):
     assert "modality: mirror" in res.body
     # File is untouched — still a valid mirror.
     assert ca.is_mirror_file(mirror)
-    assert "CLOBBER" not in mirror.read_text(encoding="utf-8")
+    assert not mirror.exists()
 
 
 # --------------------------------------------------------------------------
@@ -283,7 +286,7 @@ def test_build_mirror_node_map_and_subpath(caroot: Path):
     # Subfolder mirror: scoped to the subtree; node_map paths stay
     # box-relative; the root node points at the subfolder itself.
     text2, nmap2 = ca.build_mirror("box", "sub")
-    assert "source: cachebox:box/sub" in text2
+    assert "source: canon:box/sub" in text2
     assert "title: folder: sub" in text2
     assert nmap2["root"] == {"path": "sub", "is_dir": True}
     assert nmap2[ca._node_id("sub/b.md")]["path"] == "sub/b.md"

@@ -1,0 +1,148 @@
+# R — surfaces: where the Foundation and the projects show themselves. The project sites are run on MediaWiki; the two app listings are platform surfaces
+# whose counterparties are the stores. Social accounts are not itemised on the pages read.
+nodes:
+  - id: R:surface/wikipedia
+    type: surface
+    name: wikipedia.org
+    summary: Wikipedia in more than 300 languages, each edition on its own subdomain.
+    kind: website
+    url: https://www.wikipedia.org
+    hosted-on: S:system/mediawiki
+    presents: [P:offering/wikipedia]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/our-work/wikimedia-projects/", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/"], confidence: 0.9, state: known}
+
+  - id: R:surface/commons
+    type: surface
+    name: commons.wikimedia.org
+    summary: Wikimedia Commons, the free media library.
+    kind: website
+    url: https://commons.wikimedia.org
+    hosted-on: S:system/mediawiki
+    presents: [P:offering/commons]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/our-work/wikimedia-projects/"], confidence: 0.85, state: known}
+
+  - id: R:surface/wikidata
+    type: surface
+    name: wikidata.org
+    summary: Wikidata, the free knowledge base.
+    kind: website
+    url: https://www.wikidata.org
+    hosted-on: S:system/wikibase
+    presents: [P:offering/wikidata]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/our-work/wikimedia-projects/", "https://www.wikidata.org/wiki/Wikidata:Statistics"], confidence: 0.85, state: known}
+
+  - id: R:surface/other-project-sites
+    type: surface
+    name: The other project sites
+    summary: Wiktionary, Wikibooks, Wikiquote, Wikisource, Wikiversity, Wikivoyage, Wikispecies, Wikifunctions and Meta-Wiki, each on its own domain.
+    kind: website
+    hosted-on: S:system/mediawiki
+    presents: [P:offering/other-projects, P:product/wikifunctions]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/our-work/wikimedia-projects/"], confidence: 0.85, state: known}
+
+  - id: R:surface/mediawiki-site
+    type: surface
+    name: mediawiki.org
+    summary: "The software's home: documentation, releases and the fundraising and infrastructure pages volunteers read."
+    kind: website
+    url: https://www.mediawiki.org
+    hosted-on: S:system/mediawiki
+    presents: [P:product/mediawiki, P:product/public-apis-and-dumps]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://www.mediawiki.org/wiki/MediaWiki", "https://www.mediawiki.org/wiki/Fundraising_tech"], confidence: 0.85, state: known}
+
+  - id: R:surface/foundation-site
+    type: surface
+    name: wikimediafoundation.org
+    summary: "The Foundation's own site: what it does, news, annual reports, financial reports, the giving pages and the staff and role pages."
+    kind: website
+    url: https://wikimediafoundation.org
+    presents: [P:service/public-policy, P:offering/grants, P:service/financial-reporting]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/", "https://wikimediafoundation.org/our-work/", "https://wikimediafoundation.org/about/financial-reports/"], confidence: 0.9, state: known}
+
+  - id: R:surface/give-pages
+    type: surface
+    name: The giving pages
+    summary: Ways to give (once, monthly, yearly, by bank, donor-advised fund, stock, IRA, gift annuity, workplace, legacy, Endowment) and how donations are used.
+    kind: website
+    url: https://wikimediafoundation.org/give/
+    presents: [P:service/donation-campaigns, P:service/recurring-and-planned-giving]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/give/"], confidence: 0.9, state: known}
+
+  - id: R:surface/governance-wiki
+    type: surface
+    name: foundation.wikimedia.org
+    summary: "The Foundation wiki: bylaws, policies (privacy, terms, trademarks, conduct), Board minutes and resolutions, the Endowment's governance and the audit reports."
+    kind: website
+    url: https://foundation.wikimedia.org
+    hosted-on: S:system/mediawiki
+    presents: [P:service/financial-reporting, P:service/endowment-management]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Bylaws", "https://wikimediafoundation.org/about/financial-reports/", "https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use"], confidence: 0.9, state: known}
+
+  - id: R:surface/enterprise-site
+    type: surface
+    name: enterprise.wikimedia.com
+    summary: "Wikimedia Enterprise: the products, the datasets, the free tier, named customers and a blog."
+    kind: website
+    url: https://enterprise.wikimedia.com
+    presents: [P:offering/wikimedia-enterprise]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/"], confidence: 0.9, state: known}
+
+  - id: R:surface/app-store
+    type: surface
+    name: Wikipedia on the App Store
+    summary: The listing for the Wikipedia iOS app.
+    kind: platform
+    counterparty: C:counterparty/apple
+    presents: [P:product/mobile-apps]
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/our-work/"], confidence: 0.8, state: known}
+
+  - id: R:surface/google-play
+    type: surface
+    name: Wikipedia on Google Play
+    summary: The listing for the Wikipedia Android app (org.wikipedia).
+    kind: platform
+    counterparty: C:counterparty/google
+    presents: [P:product/mobile-apps]
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/our-work/"], confidence: 0.8, state: known}

@@ -1,0 +1,419 @@
+# Comprise OES 1: the first MiniCOSM manifest.
+#
+# What a program needs to know about the language a Holotype is written in: its name and version, its folders, its
+# modules and kinds with their reference fields, its reference forms, its checks by id, its renderers and the fields of
+# its public projection. The prose is oes/comprise-oes.md; the reference reader and writer is core/. Where this file and
+# core/schema.py disagree, the schema wins and this file is corrected.
+#
+# Written in the COSM YAML subset: no anchors, no aliases, no tags, one document. It loads with yaml.safe_load. Words
+# that YAML 1.1 reads as booleans (on, off, yes, no) are quoted.
+#
+# This file is not part of any Holotype. A Holotype names its MiniCOSM with one line in its catalog (`oes: comprise/1`)
+# and never embeds this file.
+
+manifest: minicosm/0              # the manifest's own format, version 0: mapped in oes/README.md, not built
+name: comprise
+title: Comprise OES
+version: 1
+summary: The MiniCOSM for companies, the eight modules C O M P R I S E per concern, and the relationships between concerns.
+spec: oes/comprise-oes.md
+reference: [core/schema.py, core/model.py, core/paths.py, core/lint.py, core/isotype.py, core/vendor/comprise-oes/scripts/cosm.py]
+predecessor: COSM 0.3 (plan/cosm/cosm-spec.md and decision Q29), now chapter P; core/vendor/comprise-oes/references/cosm-spec.md is a pointer
+
+declaration:
+  key: oes
+  value: comprise/1
+  absent: comprise/1              # a catalog without the key is read as Comprise OES 1, silently
+  legacy:
+    - {key: comprise, value: '0.1', reads-as: comprise/1}
+  both: oes                       # when both keys are present, oes decides
+  unknown: refuse                 # an unknown MiniCOSM, an unknown version (comprise/2) or an empty oes: is refused with a plain error
+  registered-and-changed: 409     # a registered Holotype whose catalog changes to a refused declaration answers 409
+  status: built (Q54, slice 30c; core/model.py declaration, core/align.py writes it)
+
+format:
+  extension: .cosm
+  syntax: the COSM YAML subset
+  forbidden: [anchors, aliases, tags, multiple documents]
+  booleans: ['true', 'false']     # YAML 1.2: yes, no, on and off are strings
+  encoding: utf-8
+  byte-order-mark: tolerated
+  newlines: [lf, crlf]
+  shorthand: the sketch, one item per line (chapter P.6)
+
+volume:
+  catalog: holotype.cosm
+  concerns: atoms/<concern>/
+  modules: atoms/<concern>/<module>/
+  module-files: '<module folder>/**/*.cosm'
+  module-folder-case: read either, write the capital
+  products: atoms/<concern>/P/{brand.cosm, nodes.cosm, doc.cosm}
+  people: atoms/<concern>/E/README, or E/none.cosm with module none; never items
+  vendors: vendors/<domain>/<slug>/
+  snapshots: snapshots/<stamp>/
+  database: store.sqlite
+  outside-the-model: [people.yaml, people.proposed.yaml, feeds/, scans/, bindings/, reports/, logo.svg, logo.png]
+
+catalog:
+  keys: [oes, comprise, id, name, summary, sample, alignment, atoms, perspective, sources, attestations, grants, groups, limits,
+         store-key]
+  id: holotype/<slug>
+  id-absent: holotype/<folder name>
+  sample: only the literal true
+  source-fields: [id, page, url, supports, date]
+  grant-kinds: [net-scan, reflections, system-scan, directory, accounting, mcp, vendor]
+  limits: {roles-per-person: 3}
+
+module-file:
+  shapes:
+    - {key: nodes, holds: 'a list of items, each a mapping with a string id'}
+    - {key: module, value: none, with: reason}
+  products-keys: [cosm, opi, brand, firm, nodes, reading, history, findings, sources, roles, externals, contracts]
+  products-legacy-keys: [opi, firm, roles, externals, contracts]
+  duplicate-id: load error, the first wins
+
+ids:
+  item: '^(?:atom/(?P<atom>[a-z0-9][a-z0-9.-]*)//)?(?P<module>[COMPRISE]):(?P<rest>\S+)$'
+  concern: '^atom/(?P<atom>[a-z0-9][a-z0-9.-]*)$'
+  vendor: '^vendor/(?P<domain>[a-z0-9][a-z0-9.-]*)/(?P<slug>[a-z0-9][a-z0-9.-]*)$'
+  item-form: '<module>:<kind>/<slug>'
+  brand-form: 'P:<slug>'
+  qualified-form: 'atom/<concern>//<module>:<kind>/<slug>'
+  inside-own-concern: bare
+
+paths:
+  status: built (slice 30c; core/paths.py, the CLI path command, MCP, the export, the app's /at/ route)
+  form: '<concern>/<module>/<kind>/<slug>#<field>'
+  levels: [concern, module, kind, item, field]
+  segments:
+    concern: '[a-z0-9][a-z0-9.-]*'
+    module: '[COMPRISE]'
+    kind: '[a-z][a-z0-9-]*'
+    slug: '[A-Za-z0-9](?:[A-Za-z0-9._@-]*[A-Za-z0-9_@-])?'
+    field: '[A-Za-z0-9][A-Za-z0-9_-]*(?:\.[A-Za-z0-9][A-Za-z0-9_-]*|\[[0-9]+\])*'
+  map:
+    - {path: '<concern>', id: 'atom/<concern>'}
+    - {path: '<concern>/<module>', id: none}
+    - {path: '<concern>/<module>/<kind>', id: none}
+    - {path: '<concern>/<module>/<kind>/<slug>', id: 'atom/<concern>//<module>:<kind>/<slug>'}
+    - {path: '<concern>/P/brand/<slug>', id: 'atom/<concern>//P:<slug>'}
+    - {path: '<item path>#<field>', id: none, field: the checks' own field path for open questions}
+    - {path: 'vendor/<domain>/<slug>', id: 'vendor/<domain>/<slug>', below: nothing}
+  qualified: 'oes:comprise/<holotype>/<path>'
+  qualified-holotype: the catalog id without holotype/
+  case: kept and significant
+  refused: [a leading slash, a trailing slash, an empty segment, '.', '..', percent-encoding, a backslash, whitespace, a colon,
+            non-ASCII or control characters, a segment ending in a dot, a second '#', a kind the module does not declare,
+            more than four segments, 'a Windows reserved name as any segment, in any case, alone or before a dot (con, con.txt, prn, aux, nul, com0-9, lpt0-9)']
+  scope: a hidden target answers exactly as its id would
+  accepted-by: [the CLI (python -m core path), MCP, the export, 'the app (/h/{key}/at/<path>)']
+
+envelope:
+  fields: [id, type, name, summary, owner, since, until, status, visibility, provenance, pending, links, mattering, body,
+           at, attributed-to, template, instances, counterparty, series, shared-with]
+  references: [owner, at, attributed-to, counterparty, shared-with, links]
+  required: [id, type, name, summary, provenance]
+  required-in-P: [id, type, name, summary, owner]
+  identity-in-P: [confidence, consensus, sources]          # P carries these instead of a provenance block
+  owner: an O:role, never a person; may be an open question
+  status: [active, dormant, planned, retired]
+  visibility: [public, internal, restricted]
+  visibility-absent: internal outside P; by level in P (chapter P.3.1)
+  provenance:
+    fields: [mode, sources, confidence, state, synced-from, synced-at, max-age]
+    modes: [dialectic, net-scan, system-scan, integration, structured-intake, manual, derived, asserted, archetype,
+            catalogue, directory, accounting]
+    states: [known, pending, not-disclosed, stale]
+    state-default: known
+    confidence: a number from 0 to 1
+    max-age: '<n>[d|h|w|m]'
+  open-question: '{pending: "<the question>"}'
+  sentinels: [none, self]
+  unknown-fields: allowed and kept
+
+references:
+  forms:
+    - {form: bare, example: 'O:role/Founder', names: an item in the same concern}
+    - {form: qualified, example: 'atom/mozilla-org//C:ip/mozilla-trademarks', names: an item in another concern}
+    - {form: concern, example: 'atom/mozilla-org', names: a concern}
+    - {form: brand, example: 'P:meadow', names: the brand item of P}
+    - {form: vendor, example: 'vendor/<domain>/<slug>', names: a fetched vendor-published atom}
+    - {form: typed-link, example: '{rel: <free text>, to: <id>}', names: its to (or id)}
+    - {form: sentinel, example: none, names: 'nothing, on purpose'}
+    - {form: sentinel, example: self, names: the concern itself}
+    - {form: open-question, example: '{pending: "<question>"}', names: an answer still owed}
+  dotted-fields: walk into lists and mappings (rows.sku is the sku of every row)
+  unresolved: error
+  exceptions:
+    - {case: a vendor id not yet fetched, gives: warning vendor-missing}
+    - {case: 'a synced SKU named by a mapping row, a rate or an exclusion, before any feed was pulled', gives: warning sku-unverified}
+    - {case: a synced SKU the feeds returned, gives: resolved against the local database}
+  person-pointer: an E:person may be named from outside E only by a restricted item
+  in-products: every id-like string in P that names something outside P is checked, and is an external
+
+relationships:
+  kind: 'C:bond'
+  kinds: [owns, controls, licenses, operates, makes-for, distributes-for, supplies, franchises, funds, guarantees,
+          shares-services-with, succeeded, affiliated, competes-with, member-of, hosts, manages, commits, pledges,
+          co-invests, sponsors, leases-to, regulated-by, accredited-by, builds-on, bargains-with, common-control]
+  shares: [economic, voting, nci]                           # numbers from 0 to 1
+  control: [full, joint, significant, de-facto, none]
+  accounting: [consolidated, equity, fair-value, cost, none]
+  ends: [a concern, 'a C:counterparty', a vendor-published atom, a declared group]
+  mirrored: in both concerns, with one id, when both are modelled
+  derived-tree: computed from owns every time, never stored
+
+aims:
+  kind: 'C:aim'
+  kinds: [customers, partners, suppliers, distribution, technology, talent, capital, other]
+  stances: [seeking, open]
+
+# The eight modules. `refs` are core/schema.py's reference fields, exactly. `checked` are the further fields a check
+# reads. Every other field is open: the schema allows unknown fields. `public: never` marks what no public rendering
+# shows; `stored: database` marks a kind that lives only in the local database, never in a file.
+modules:
+  C:
+    name: Corporation
+    subtitle: 'The legal body: ownership, contracts, filings, money'
+    kinds:
+      entity: {refs: [natural-person], checked: [anchor, owners, ownership, offerings]}
+      bond: {refs: [from, to, contract, scope], checked: [kinds, economic, voting, nci, control, accounting, provenance.sources]}
+      instrument: {refs: [holders.holder], public: never}
+      captable: {refs: [instruments], public: never}
+      contract: {refs: [between, scope, guarantors]}
+      filing: {refs: [entity]}
+      licence: {refs: [enables, regulator]}
+      certification: {refs: [issuer]}
+      charter: {refs: [entity]}
+      asset: {refs: [custodian, used-by, financed-by]}
+      segment: {refs: [members]}
+      counterparty: {refs: [atom]}
+      policy: {refs: []}
+      ip: {refs: [co-owners]}
+      governance: {refs: [elected-by]}
+      finance: {refs: [by], checked: [consolidates], public: never}
+      event: {refs: []}
+      aim: {refs: [prompted-by], checked: [kind, stance, horizon]}
+  O:
+    name: Organizations
+    subtitle: Roles, teams, seats and who decides
+    kinds:
+      role: {refs: [governs, escalates-to], checked: [pool]}
+      unit: {refs: [twin, covered-by, parent]}
+      position: {refs: [roles, primary, reports-to, dotted-to, unit], checked: [requires-credential]}
+      chart: {refs: [root]}
+      decision-right: {refs: [holder, over]}
+      decision: {refs: [by, about]}
+  M:
+    name: Markets
+    subtitle: Who it serves, through what, at what price
+    kinds:
+      audience: {refs: [served-by], checked: [geography]}
+      market: {refs: []}
+      geography: {refs: []}
+      channel: {refs: [tenders], checked: [seller]}
+      account: {refs: [contract, channel, pricebook]}
+      competitor: {refs: []}
+      positioning: {refs: [unit]}
+      pricebook: {refs: [for, rates.sku, rates.offering], checked: [rates.model, rates.value, rates.unit]}
+      sizing: {refs: [market]}
+  P:
+    name: Products
+    subtitle: What it offers, and why that matters
+    note: the product tree (chapter P); the schema checks only the P namespace here, and P's own checks (cosm.py) check its edges
+    kinds:
+      brand: {refs: [], level: 4, id: 'P:<slug>'}
+      suite: {refs: [], level: 3}
+      offering: {refs: [], level: 2, checked: [economics.price]}
+      function: {refs: [], level: 1}
+      product: {refs: [], level: 0}
+      service: {refs: [], level: 0}
+      release: {refs: [build, unit], note: declared in the schema; P's checks reject it as an unknown kind}
+    tree:
+      self-nesting: [suite, function]
+      aggregates: [brand, suite, offering, function]
+      units: [product, service]
+      brand-holds-nothing: [flow, substrate, economics, affect]
+      brand-kinds: [company, nonprofit, public-body, project, community, product-line, other]
+      legacy-kinds: {firm: brand, stack: function}
+      file-version-key: cosm
+      file-version: '0.3'
+    aspects:
+      identity: [id, name, type, summary, since, until, version, owner, confidence, consensus, sources, visibility, kind]
+      flow: [inputs, outputs, capacity, latency, errors, degradation, schedule]
+      substrate: [assets, platforms, tools, vendors, roles-required, budget, depends-on]
+      rules: [must, may, must-not, when, else, counts-as, source, scope]
+      principles: [purpose, value, priorities, quality, decides]
+      economics: [price, cost, margin, settles-with]
+      vocabulary: [terms, assumes, trusts, boundary]
+      affect: [audience, elicits, avoids, probes, tone]
+      mattering: [to-the-whole, weight, inside, chosen, prospective]
+    inherits: [rules, principles, vocabulary]
+    constituencies: [inside, chosen, prospective]
+    weights: [critical, major, supporting, peripheral]
+    price-models: [free, flat, usage, seat, tiered, internal]
+    degradation: [queue, shed, degrade, fail]
+    schedule: [continuous, batch, on-demand]
+    rule-actors: ['O:role/<Slug>', all-roles, an external]
+    probes: [satisfaction, motivation, anticipation, reward]
+    externals:                    # every reference out of P is an external, of the kind its target gives
+      'M:audience': market
+      'M:account': market
+      'M:market': market
+      'M:channel': channel
+      'S:vendor': vendor
+      'S:system': platform
+      'S:platform': platform
+      'C:counterparty': partner
+      concern: partner
+      other-concern: partner
+    public-by-default: [brand, suite, offering]
+    public-when-facing: {kinds: [product, service], externals: [market, channel]}
+    views: {built: [map, tree, flow, affect, mattering], not-built: [substrate, rules]}
+  R:
+    name: Representations
+    subtitle: What it says, and what others say back
+    kinds:
+      surface: {refs: [presents, hosted-on], checked: [kind, url, platform]}
+      brand: {refs: [scope]}
+      persona: {refs: []}
+      claim: {refs: [about, 'on', evidence.by], checked: [text, evidence.state]}
+      rendering: {refs: [audience, perspective]}
+      reflection: {refs: [about, surface]}
+  I:
+    name: Inventories
+    subtitle: What exists, is stocked or is listed
+    kinds:
+      feed: {refs: [system, mapping], checked: [adapter, max-age, status]}
+      sku: {refs: [entitles, requires, parent, priced-by], checked: [excluded]}
+      mapping: {refs: [feed, rows.sku, rows.maps-to, rows.entitles, exclusions.sku], checked: [exclusions.reason]}
+      location: {refs: [stock-owner]}
+      series: {refs: [of]}
+      listing: {refs: [sku, channel, version]}
+      position: {refs: [bond, instrument]}
+      capacity: {refs: [of]}
+      usage-stat: {refs: [of]}
+      order-stat: {refs: [of]}
+  S:
+    name: Stacks
+    subtitle: The systems and vendors it runs on
+    kinds:
+      system: {refs: [vendor, admin, used-by]}
+      platform: {refs: []}
+      vendor: {refs: [contract]}
+      integration: {refs: [from, to]}
+      datastore: {refs: [system]}
+      account: {refs: [system, holder]}
+      codebase: {refs: [runs]}
+  E:
+    name: Employees
+    subtitle: 'The people: counted here, never named'
+    note: people live only in the local database, sealed; the files hold a README or module none
+    kinds:
+      person: {refs: [], stored: database, table: persons}
+      assignment: {refs: [position, employer], stored: database, table: assignments}
+      membership: {refs: [audience], stored: database, table: memberships}
+      credential: {refs: [], stored: database, table: credentials}
+      intake: {refs: [], stored: database, table: persons.data}
+      continuity: {refs: [], stored: database, table: persons.data}
+      access: {refs: [], stored: database, table: access}
+      broadcast: {refs: [], stored: database, status: not built}
+
+checks:
+  command: python -m core lint <holotype>
+  severities: [error, warning, note]
+  verdicts: [pass, fail, unverifiable, finding]
+  ok: no error and no failed rule (the exit code)
+  attest: ok, and no rule unverifiable (ATTEST allowed); findings never block
+  load: [load]
+  envelope: [id-grammar, id-module, id-atom, type, type-prefix, identity-min, provenance, source-undeclared, status,
+             visibility, owner, ref, ref-grammar, ref-unresolved, vendor-missing, sku-unverified, no-humans, bond,
+             bond-mirror, aim, module-none]
+  products: [type, type-prefix, legacy, identity-min, visibility, strata, role-exists, brand-holds-nothing, flow-ends,
+             external-exists, units, rule-syntax, override-explicit, affect-on-offerings, mattering, mattering-declared,
+             mattering-weight, mattering-refs, mattering-because, mattering-on-offerings, mattering-inside, confidence,
+             no-humans, 'no-humans?', orphan, single-parent, acyclic, flow-mirror]
+  products-prefix: P
+  equilibrium: [flow-balance, rule-consistency, closure, vocabulary-closure, role-coverage, affect-declared, mattering-declared]
+  flow-balance-tolerance: 0.10
+  notes: [vendor, archetype]
+  rules:
+    - {id: 1, name: product tree in equilibrium, says: the product tree is in equilibrium and has no P error}
+    - {id: 2, name: SKUs map to P units, says: every stock item maps to a P unit or is excluded}
+    - {id: 3, name: offerings priced, says: 'every offering has a price or none, and price books agree'}
+    - {id: 4, name: systems owned and referred, says: every system has an owner and a referrer}
+    - {id: 5, name: 'positions, roles, owners', says: every position reports to one; every role governs something; every owner resolves}
+    - {id: 6, name: employed persons assigned, says: every employed person holds a seat}
+    - {id: 7, name: claims about real nodes, says: every claim is about something that exists and restates no must-not}
+    - {id: 8, name: bonds two-ended and sourced, says: 'every relationship has two ends, a mirror and sources'}
+    - {id: 9, name: no stale synced nodes, says: nothing synced is past its max-age}
+    - {id: 10, name: counterparties resolve, says: 'every channel, feed, vendor and platform surface names one C:counterparty'}
+    - {id: 11, name: no double-counted rollups, says: no finance consolidates a concern held at equity or cost}
+    - {id: 12, name: credentialed positions, says: a position that requires a credential is held by someone who has it}
+    - {id: 13, name: bus factor, says: a person holding more roles than the limit is a finding}
+    - {id: 14, name: shell records to promote, says: a shell with its own owners or offerings is a finding}
+  reads-the-database: [6, 12, 13]
+  not-verified:
+    - an item written into an E file
+    - exactly one anchor entity per concern; a brand with at least one part
+    - inherited must and must-not not weakened
+    - ids that differ only in case; slugs outside the path set
+    - an M:account being restricted
+
+open-questions:
+  form: '{pending: "<the question>"}'
+  answered-by: [the item's owner, the role itself (for a role), unassigned]
+  field-path: keys joined by ".", list positions as [n]
+  on-the-whole-item: field path node; addressed by the item path alone
+  effect: never an error; makes a rule unverifiable where the rule needs the value
+  command: python -m core pending <holotype>
+
+versions:
+  saved: {where: 'snapshots/<stamp>/', manifest: manifest.yaml, holds: [holotype.cosm, atoms/, bindings/, vendors/], never: [store.sqlite, people.yaml, feeds/, scans/]}
+  signed: {file: attestation.yaml, signature: Ed25519, requires: [ATTEST allowed, files match their hashes, a first-party perspective concern]}
+  content-hash: sha256 of a concern's module files in path order, first 16 hex characters
+  diff: item by item, with the field paths that moved
+
+renderers:
+  - {id: overview-3d, makes: the 3D Overview, code: [core/overview3d.py, app/static/overview3d/]}
+  - {id: circles, makes: the circles (V1), code: [core/overview.py, app/static/overview.js]}
+  - {id: field-guide, makes: 'the Summary, the eight chapters, the item pages', code: [app/fieldguide.py, app/fieldpages.py]}
+  - {id: text-tree, makes: the text tree and the derived tree, code: [python -m core ascii, python -m core tree]}
+  - {id: export, makes: CONTEXT.md for an audience, code: [core/pack.py], audiences: [internal, external, agent-for-support]}
+  - {id: reports, makes: columns and rows from a definition, code: [core/reports.py]}
+  - {id: diff, makes: the diff and the timeline, code: [core/snapshot.py]}
+  - {id: mark, makes: the company mark, code: [core/mark.py]}
+  - {id: published-atom, makes: a concern's public files for a vendor to serve, code: [core/publish.py]}
+  - {id: isotype, makes: the public projection, code: [core/isotype.py]}
+  - {id: products-card, makes: "one P item's nine aspects, and P's Mermaid views", code: [core/cosm_bridge.py]}
+  - {id: deck, makes: 'PDF, SVG and HTML pages of a product tree', code: [core/vendor/comprise-oes/scripts/cosm_deck.py], status: the skill's; the app does not call it}
+  - {id: style-profile, makes: a rendering in a reader's own style, status: not built}
+
+public-projection:
+  format: comprise-isotype/0
+  rule: default-deny; every field has one rule saying how it is derived
+  keys: [isotype, hid, epoch, cadence, sample, identity, shape, offers, seeks, open_to]
+  identity: [name, domains, jurisdiction, founded, kind]
+  shape: [employees, structure, markets]
+  employees: [some, none]
+  structure: [single, group]
+  offers: [name, summary, kind]
+  offer-kinds: [suite, offering, function, product, service, audience]
+  seeks: [kind, summary]
+  open_to: [kind, summary]
+  aim-kinds: [customers, partners, suppliers, distribution, technology, talent, capital, other]
+  group-kinds: [owns, controls, common-control]
+  cadences: [quarterly, monthly, weekly]
+  default-cadence: quarterly
+  band-days: 90
+  band-margin: 0.10
+  at-most: {audiences: 12, markets: 6, offers: 50}
+  verified: [identity, shape, offers]
+  stated: [seeks, open_to]
+  release: once per epoch, signed; a first-party concern, or a sample signed by the install's sample key
+
+extension:                        # what a MicroCOSM may do on top of this MiniCOSM: mapped in oes/README.md, not built
+  status: not built
+  may: [add kinds, add fields, add checks, make a check stricter, add renderers]
+  may-not: [remove anything, rename anything, loosen a closed list or a check, change what a path means, add to the public projection, weaken the split]
+  names: '<microcosm>.<kind> and <microcosm>.<field>'

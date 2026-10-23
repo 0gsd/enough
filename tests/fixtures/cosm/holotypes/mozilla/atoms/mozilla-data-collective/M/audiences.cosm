@@ -1,0 +1,34 @@
+# M: audiences.
+nodes:
+  - id: M:audience/dataset-contributors
+    type: audience
+    name: Dataset contributors
+    summary: Organisations and communities who upload datasets, keep ownership, and set licence, price and access.
+    relation: [supplier]
+    side: supplying
+    served-by: ['P:offering/dataset-platform']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilladatacollective.com/', 'https://mozilladatacollective.com/datasets'], confidence: 0.8, state: known}
+
+  - id: M:audience/dataset-users
+    type: audience
+    name: Dataset users
+    summary: Developers, researchers and organisations who browse datasets with clear provenance and licensing and download them.
+    relation: [customer]
+    side: served
+    served-by: ['P:offering/dataset-platform', 'P:offering/common-voice-distribution']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilladatacollective.com/', 'https://mozilladatacollective.com/datasets'], confidence: 0.8, state: known}
+
+  - id: M:audience/common-voice-community
+    type: audience
+    name: The Common Voice community
+    summary: Contributors of voices who get early access to the Data Collective and whose datasets are now released through it.
+    relation: [member]
+    side: supplying
+    served-by: ['P:offering/common-voice-distribution']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://discourse.mozilla.org/t/exciting-news-mozilla-data-collective/145191'], confidence: 0.8, state: known}

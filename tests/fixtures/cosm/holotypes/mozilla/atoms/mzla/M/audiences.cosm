@@ -1,0 +1,67 @@
+# M: audiences.
+nodes:
+  - id: M:audience/desktop-users
+    type: audience
+    name: Desktop users
+    summary: People who use Thunderbird for email, calendar and contacts on Windows, macOS and Linux; the monthly Release channel is the default for most users.
+    relation: [beneficiary]
+    side: served
+    served-by: ['P:offering/thunderbird-desktop']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://www.thunderbird.net/en-US/about/'], confidence: 0.8, state: known}
+
+  - id: M:audience/android-users
+    type: audience
+    name: Android users
+    summary: People who use Thunderbird for Android, the app built on K-9 Mail.
+    relation: [beneficiary]
+    side: served
+    served-by: ['P:offering/thunderbird-android']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.8, state: known}
+
+  - id: M:audience/donors
+    type: audience
+    name: Donors
+    summary: More than 335,000 individual donors in 2024 from over 200 countries; 25% of contributions were recurring monthly gifts; the median gift was $16.66.
+    relation: [donor]
+    side: funding
+    served-by: ['P:function/fundraising']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://www.thunderbird.net/en-US/donate/'], confidence: 0.9, state: known}
+
+  - id: M:audience/community-contributors
+    type: audience
+    name: Community contributors
+    summary: An estimated 20,000-plus contributors in 2024; translation locales grew from 58 to 70.
+    relation: [member]
+    side: supplying
+    served-by: ['P:offering/thunderbird-desktop']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://www.thunderbird.net/en-US/about/'], confidence: 0.7, state: known}
+
+  - id: M:audience/pro-prospects
+    type: audience
+    name: People waiting for Thundermail
+    summary: People on the tb.pro waitlist, invited in waves since June 2026.
+    relation: [customer]
+    side: served
+    served-by: ['P:offering/thunderbird-pro']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/'], confidence: 0.8, state: known}
+
+  - id: M:audience/enterprise-buyers
+    type: audience
+    name: Organizations that want a managed Thunderbird
+    summary: The buyers of Thunderbird Enterprise, listed as coming soon on the Firefox Enterprise page.
+    relation: [customer]
+    side: served
+    served-by: ['P:offering/thunderbird-enterprise']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/enterprise/'], confidence: 0.6, state: known}

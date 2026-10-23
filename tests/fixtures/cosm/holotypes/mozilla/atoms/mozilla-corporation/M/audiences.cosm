@@ -1,0 +1,90 @@
+# M: audiences: who the Corporation serves and who pays.
+nodes:
+  - id: M:audience/firefox-users
+    type: audience
+    name: Firefox users
+    summary: 'People who use Firefox on desktop and mobile: more than 210 million monthly active users on the Mozilla Advertising page (2026).'
+    relation: [beneficiary]
+    side: served
+    geography: global
+    served-by: ['P:offering/firefox', 'P:offering/mozilla-account', 'P:offering/firefox-add-ons']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/advertising/', 'https://www.firefox.com/en-US/'], confidence: 0.8, state: known}
+
+  - id: M:audience/privacy-subscribers
+    type: audience
+    name: People who pay for privacy services
+    summary: Subscribers to Mozilla VPN and, when they launch, Firefox Relay Premium and Mozilla Monitor's paid tier.
+    relation: [customer]
+    side: served
+    served-by: ['P:offering/mozilla-vpn', 'P:offering/firefox-relay', 'P:offering/mozilla-monitor']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/vpn/', 'https://relay.firefox.com/', 'https://www.mozilla.org/en-US/products/monitor/'], confidence: 0.8, state: known}
+
+  - id: M:audience/web-developers
+    type: audience
+    name: Web developers and learners
+    summary: 'The people who read MDN Web Docs: about 15 million monthly users by MDN''s count, 16.2 million monthly active users by the advertising page.'
+    relation: [beneficiary]
+    side: served
+    served-by: ['P:offering/mdn']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://developer.mozilla.org/en-US/about', 'https://www.mozilla.org/en-US/advertising/'], confidence: 0.8, state: known}
+
+  - id: M:audience/extension-developers
+    type: audience
+    name: Extension and theme developers
+    summary: The developers who publish the 30,000-plus extensions and themes on Firefox Add-ons.
+    relation: [supplier]
+    side: supplying
+    served-by: ['P:offering/firefox-add-ons']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/'], confidence: 0.7, state: known}
+
+  - id: M:audience/enterprise-it
+    type: audience
+    name: Enterprise IT and security teams
+    summary: Regulated and security-sensitive organizations that want a customer-controlled, on-premises browser.
+    relation: [customer]
+    side: served
+    served-by: ['P:offering/firefox-enterprise']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/enterprise/'], confidence: 0.8, state: known}
+
+  - id: M:audience/advertisers
+    type: audience
+    name: Advertisers
+    summary: Brands that buy ads on Firefox and MDN or use Anonym for measurement.
+    relation: [customer]
+    side: funding
+    served-by: ['P:offering/mozilla-ads']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/advertising/', 'https://blog.mozilla.org/en/advertising/anonym-reddit-partnership/'], confidence: 0.8, state: known}
+
+  - id: M:audience/search-partners
+    type: audience
+    name: Search partners
+    summary: Search engines built into Firefox as the default or an option, which pay royalties; the majority of recent revenue.
+    relation: [customer]
+    side: funding
+    served-by: ['P:offering/firefox']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/'], confidence: 0.8, state: known}
+
+  - id: M:audience/ai-builders
+    type: audience
+    name: AI builders and security teams
+    summary: Teams that test AI applications for vulnerabilities (0DIN) or give models access to the live web (Tabstack).
+    relation: [customer]
+    side: served
+    served-by: ['P:offering/0din', 'P:offering/tabstack']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://0din.ai/', 'https://tabstack.ai/'], confidence: 0.7, state: known}

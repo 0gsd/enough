@@ -1,0 +1,23 @@
+# M: channels.
+nodes:
+  - id: M:channel/get-in-touch
+    type: channel
+    name: Get in touch
+    summary: The contact route on mozilla.vc for developers, companies and researchers building AI differently.
+    model: inbound pitch
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/'], confidence: 0.8, state: known}
+
+  - id: M:channel/blog
+    type: channel
+    name: Mozilla Ventures blog
+    summary: Announcements of investments; the latest post read is dated 2026-08-10.
+    model: content
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/'], confidence: 0.8, state: known}

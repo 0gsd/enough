@@ -1,0 +1,23 @@
+# O: the two seats whose existence the leadership page states; nobody is named.
+nodes:
+  - id: O:position/board-of-directors
+    type: position
+    name: Board of Directors
+    summary: The governing body; the top of the chart.
+    roles: ['O:role/Board-of-Directors']
+    primary: O:role/Board-of-Directors
+    reports-to: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.7, state: known}
+
+  - id: O:position/chief-executive-officer
+    type: position
+    name: Chief Executive Officer
+    summary: The chief executive seat. Reporting to the board is the conventional line; the pages read do not state it.
+    roles: ['O:role/Chief-Executive-Officer']
+    primary: O:role/Chief-Executive-Officer
+    reports-to: O:position/board-of-directors
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.6, state: known}

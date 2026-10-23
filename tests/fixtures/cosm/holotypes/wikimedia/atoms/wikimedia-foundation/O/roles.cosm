@@ -1,0 +1,103 @@
+# O — roles: the accountabilities of the public governance shape (the Board and the executive team), named by title only. No holder is named anywhere;
+# the people who sit in these seats are not imported in a public sample. A role governs the nodes it is accountable for. The executive roles carry no
+# `decides` list: the Foundation publishes the Board's powers (bylaws) and the executive titles and departments, not the executive team's decision rights.
+nodes:
+  - id: O:role/board-of-trustees
+    type: role
+    name: Board of Trustees
+    summary: "The governing body: sets the bylaws, appoints the Chief Executive Officer, approves policies and the reserve, recognises movement affiliation models, and carries out topic-specific work in committees."
+    decides: ["bylaws and governing policies", "appointment of the Chief Executive Officer", "the reserve policy", "recognition of affiliation models"]
+    governs: [C:charter/bylaws, C:governance/board-selection, C:policy/reserves, C:policy/universal-code-of-conduct, C:policy/enterprise-revenue-cap]
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Bylaws", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Board_of_Trustees", "https://meta.wikimedia.org/wiki/Wikimedia_movement_affiliates"], confidence: 0.85, state: known}
+    pool: false
+    status: active
+    visibility: public
+
+  - id: O:role/chief-executive-officer
+    type: role
+    name: Chief Executive Officer
+    summary: Runs the Foundation's business affairs under the Board's direction; a non-Trustee officer appointed by the Board. The title became Chief Executive Officer and Executive Director on 2019-01-30.
+    governs: [P:wikimedia-foundation, O:unit/office-of-the-ceo]
+    escalates-to: O:role/board-of-trustees
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Bylaws", "https://foundation.wikimedia.org/wiki/Memory:Timeline", "https://wikimediafoundation.org/role/staff/"], confidence: 0.85, state: known}
+    pool: false
+    status: active
+    visibility: public
+
+  - id: O:role/chief-product-and-technology-officer
+    type: role
+    name: Chief Product and Technology Officer
+    summary: Heads Product and Technology, the department that builds and runs the software and infrastructure behind the projects.
+    governs: [P:suite/projects, P:suite/reach-and-reuse, P:function/platform, O:unit/product-and-technology]
+    escalates-to: O:role/chief-executive-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/", "https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure"], confidence: 0.75, state: known}
+    pool: false
+    status: active
+    visibility: public
+
+  - id: O:role/chief-advancement-officer
+    type: role
+    name: Chief Advancement Officer
+    summary: "Heads Advancement: fundraising, community resources and grants, community development and partnerships, content enablement and Wikimedia Enterprise."
+    governs: [P:suite/community-and-movement, P:function/fundraising, O:unit/advancement]
+    escalates-to: O:role/chief-executive-officer
+    pending: "whether the seat is filled or interim (the staff page lists it as interim)"
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.75, state: known}
+    pool: false
+    status: active
+    visibility: public
+
+  - id: O:role/president-of-wikimedia-enterprise
+    type: role
+    name: President of Wikimedia Enterprise
+    summary: Heads Wikimedia Enterprise, the commercial service for large reusers of Wikimedia content, run through Wikimedia, LLC.
+    governs: [P:offering/wikimedia-enterprise, O:unit/wikimedia-enterprise]
+    escalates-to: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/", "https://foundation.wikimedia.org/wiki/Wikimedia_Enterprise"], confidence: 0.7, state: known}
+    pool: false
+    status: active
+    visibility: public
+
+  - id: O:role/general-counsel
+    type: role
+    name: General Counsel
+    summary: Heads Legal; the Foundation's legal policies (trademarks, Terms of Use, privacy policy) are published from the Foundation wiki.
+    governs: [P:service/public-policy, C:entity/wikimedia-foundation, C:ip/marks, O:unit/legal]
+    escalates-to: O:role/chief-executive-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/", "https://foundation.wikimedia.org/wiki/Policy:Trademark_policy", "https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use"], confidence: 0.75, state: known}
+    pool: false
+    status: active
+    visibility: public
+
+  - id: O:role/chief-financial-officer
+    type: role
+    name: Chief Financial Officer
+    summary: Heads Finance and Administration; the Foundation publishes an audited annual report, a Form 990 and an annual plan with a budget.
+    governs: [P:function/stewardship, C:finance/2024-07-to-2025-06, O:unit/finance-and-administration]
+    escalates-to: O:role/chief-executive-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.75, state: known}
+    pool: false
+    status: active
+    visibility: public
+
+  - id: O:role/chief-communications-officer
+    type: role
+    name: Chief Communications Officer
+    summary: "Heads Communications: brand, external communications and movement communications."
+    governs: [R:surface/foundation-site, R:brand/wikimedia, O:unit/communications]
+    escalates-to: O:role/chief-executive-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.8, state: known}
+    pool: false
+    status: active
+    visibility: public
+
+  - id: O:role/chief-people-officer
+    type: role
+    name: Chief People Officer
+    summary: Heads People; some staff outside the United States are employed through an employer of record.
+    governs: [O:chart/foundation, O:unit/people]
+    escalates-to: O:role/chief-executive-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.75, state: known}
+    pool: false
+    status: active
+    visibility: public

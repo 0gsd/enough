@@ -1,0 +1,75 @@
+oes: canon/1
+id: canon/rust-book
+name: rust-book
+scope: volume
+origin: {type: url, value: "https://doc.rust-lang.org/book/", depth: 2}
+status: complete
+created: 2026-10-20T14:02:11Z
+updated: 2026-10-21T09:15:40Z
+counts: {folders: 3, files: 5, articles: 1, twins: 1, emls: 2, atems: 1}
+nodes:
+  - id: V:folder/ch01-getting-started
+    type: folder
+    name: ch01-getting-started
+    path: ch01-getting-started
+    parts: [V:file/ch01-getting-started--ch01-01-installation-md, V:file/ch01-getting-started--ch01-02-hello-world-md]
+  - id: V:file/ch01-getting-started--ch01-01-installation-md
+    type: file
+    name: ch01-01-installation.md
+    path: ch01-getting-started/ch01-01-installation.md
+    parent: V:folder/ch01-getting-started
+    size: 8123
+    mtime: 2026-10-20T14:02:13Z
+    kind: markdown
+    eml: {path: ch01-getting-started/ch01-01-installation.md.cosm, state: fresh}
+    atem: {line: "Install Rust with rustup, keep it current, and verify with cargo --version before anything else."}
+  - id: V:file/ch01-getting-started--ch01-02-hello-world-md
+    type: file
+    name: ch01-02-hello-world.md
+    path: ch01-getting-started/ch01-02-hello-world.md
+    parent: V:folder/ch01-getting-started
+    size: 6408
+    mtime: 2026-10-20T14:02:14Z
+    kind: markdown
+  - id: V:folder/ch02-guessing-game
+    type: folder
+    name: ch02-guessing-game
+    path: ch02-guessing-game
+    parts: [V:file/ch02-guessing-game--ch02-00-guessing-game-tutorial-md, V:folder/ch02-guessing-game--src]
+  - id: V:file/ch02-guessing-game--ch02-00-guessing-game-tutorial-md
+    type: file
+    name: ch02-00-guessing-game-tutorial.md
+    path: ch02-guessing-game/ch02-00-guessing-game-tutorial.md
+    parent: V:folder/ch02-guessing-game
+    size: 41877
+    mtime: 2026-10-20T14:02:16Z
+    kind: markdown
+    eml: {path: ch02-guessing-game/ch02-00-guessing-game-tutorial.md.cosm, state: stale}
+  - id: V:folder/ch02-guessing-game--src
+    type: folder
+    name: src
+    path: ch02-guessing-game/src
+    parent: V:folder/ch02-guessing-game
+    parts: [V:file/ch02-guessing-game--src--main-rs]
+  - id: V:file/ch02-guessing-game--src--main-rs
+    type: file
+    name: main.rs
+    path: ch02-guessing-game/src/main.rs
+    parent: V:folder/ch02-guessing-game--src
+    size: 912
+    mtime: 2026-10-20T14:02:16Z
+    kind: code
+  - id: V:file/foreword-pdf
+    type: file
+    name: foreword.pdf
+    path: foreword.pdf
+    size: 210334
+    mtime: 2026-10-20T14:02:12Z
+    kind: pdf
+    twin: {path: foreword.pdf.md, state: fresh}
+  - id: V:article/wiki--rust-programming-language
+    type: article
+    name: Rust (programming language)
+    path: wiki/rust-programming-language
+    title: Rust (programming language)
+    source: "https://en.wikipedia.org/wiki/Rust_(programming_language)"

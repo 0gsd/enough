@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" id="macrocosm" viewBox="0 0 72 72">
+  <circle cx="36" cy="36" r="27" fill="none" stroke="#000" stroke-width="3" />
+  <ellipse cx="36" cy="36" rx="19" ry="8" transform="rotate(-30 36 36)" fill="none" stroke="#000" stroke-width="3" />
+  <circle cx="47.2" cy="24.3" r="4.5" fill="#000" />
+  <circle cx="21.9" cy="47.3" r="3.5" fill="#000" />
+  <circle cx="48" cy="50" r="3" fill="#000" />
+</svg>

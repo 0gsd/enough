@@ -36,6 +36,18 @@ with the bump. The snapshot in `build.rs` copies that folder into the bundle,
 and every install rebuilds its `~/enough/dict/feed.sqlite` when the manifest
 digest changes.
 
+**Check the Comprise manifest before bumping, too.** enough reads Comprise
+Holotypes through a byte copy of Comprise's MiniCOSM manifest and tests its
+reader against Comprise's four public sample Holotypes. Run
+`uv run python scripts/sync_cosm.py --check` (default checkout
+`../../comprise-dev`; `--comprise DIR` for another). Exit 0 means nothing
+moved. Exit 1 means it changed: run `uv run python scripts/sync_cosm.py`,
+then `uv run pytest -q tests/test_macrocosm.py`, and commit
+`defaults/cosm/manifests/comprise.manifest.cosm` and `tests/fixtures/cosm/`
+with the bump. Exit 2 means no checkout was found: run it on the machine
+where comprise-dev is checked out. The script only reads comprise-dev, and
+copies the public samples by name only.
+
 ---
 
 ## 0. Once per machine

@@ -1,0 +1,394 @@
+cosm: 0.3
+
+# Mozilla.ai's tree: two products, the open tools behind them, and one archived tool.
+
+nodes:
+  - id: P:suite/products
+    type: suite
+    name: Products
+    summary: 'The two hosted or self-hosted products: Otari and Octonous.'
+    owner: O:role/Chief-Executive-Officer
+    confidence: 0.8
+    sources: ['https://www.mozilla.ai/', 'https://www.mozilla.ai/llms.txt']
+    visibility: public
+    parts: ['P:offering/otari', 'P:offering/octonous']
+    mattering:
+      to-the-whole: Mozilla.ai calls itself a focused SaaS company pursuing product-market fit; the 2024 report called it pre-revenue.
+      weight: major
+      inside:
+        - who: ['O:role/Chief-Executive-Officer']
+          because: The chief executive answers for what is sold.
+          confidence: 0.5
+
+  - id: P:offering/otari
+    type: offering
+    name: Otari
+    summary: 'An open-source LLM control plane: route requests across providers through one endpoint, set budgets, govern API keys, workspaces and access policies, fail over automatically, apply guardrail and fallback policies, and run agent harnesses with built-in tools. Hosted at otari.ai or self-hosted; generally available.'
+    owner: O:role/Product-Team
+    confidence: 0.8
+    sources: ['https://mozilla.ai/product/otari', 'https://www.mozilla.ai/llms.txt', 'https://github.com/mozilla-ai']
+    visibility: public
+    substrate:
+      platforms:
+        - S:codebase/otari
+        - S:system/otari-hosted
+    economics:
+      price:
+        model: open-source with hosted option
+        detail: {pending: hosted pricing; none stated}
+    affect:
+      audience: M:audience/teams-and-organizations
+      elicits:
+        - {feeling: control, when: seeing and capping what each key spends}
+        - {feeling: reliability, when: a provider fails and traffic moves}
+    mattering:
+      to-the-whole: 'Otari: the open source LLM control plane, generally available.'
+      weight: critical
+      inside:
+        - who: ['O:role/Product-Team']
+          because: The product team ships it hosted and self-hosted.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/teams-and-organizations']
+          because: Routing, budgets, key governance and failover through one endpoint, per the Otari page.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/teams-and-organizations']
+          because: Organizations that want to run it hosted or self-hosted.
+          confidence: 0.5
+
+  - id: P:offering/octonous
+    type: offering
+    name: Octonous
+    summary: 'A platform for generating AI agents that automate everyday work: describe a task in plain language and it runs across connected apps (Slack, Jira, Confluence, Notion, Google Workspace, Microsoft 365, GitHub, Linear and more), shows each action, requires approval before sending or changing anything and keeps reviewable logs. In beta and free to use.'
+    owner: O:role/Product-Team
+    confidence: 0.8
+    sources: ['https://mozilla.ai/product/octonous', 'https://www.mozilla.ai/llms.txt']
+    status: active
+    visibility: public
+    stage: beta
+    economics:
+      price:
+        model: free during beta
+        detail: {pending: paid plan after the beta; none stated}
+    affect:
+      audience: M:audience/teams-and-organizations
+      elicits:
+        - {feeling: trust, when: approving each action before it runs}
+        - {feeling: ease, when: describing a task in a sentence}
+      avoids: [actions taken without approval]
+    mattering:
+      to-the-whole: A platform that generates agents from plain-language tasks; in beta.
+      weight: major
+      inside:
+        - who: ['O:role/Product-Team']
+          because: The product team publishes it in beta.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/teams-and-organizations']
+          because: Octonous shows each action and keeps reviewable logs, per its page.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/teams-and-organizations']
+          because: Teams that use Slack, Jira, Confluence, Notion, Google Workspace and similar tools, the integrations it lists.
+          confidence: 0.5
+
+  - id: P:suite/open-tools
+    type: suite
+    name: Open tools
+    summary: 'The open-source libraries and templates behind the products: the Choice-first Stack, local AI runtimes, shared agent learning and community Blueprints.'
+    owner: O:role/VP-Engineering
+    confidence: 0.8
+    sources: ['https://www.mozilla.ai/', 'https://www.mozilla.ai/llms.txt', 'https://github.com/mozilla-ai']
+    visibility: public
+    parts: ['P:offering/choice-first-stack', 'P:offering/local-ai-tools', 'P:offering/cq', 'P:offering/blueprints']
+    mattering:
+      to-the-whole: Open Foundations is one of Mozilla.ai's five principles.
+      weight: critical
+      inside:
+        - who: ['O:role/VP-Engineering']
+          because: Engineering maintains them in public on GitHub.
+          confidence: 0.5
+
+  - id: P:offering/choice-first-stack
+    type: offering
+    name: Choice-first Stack
+    summary: 'A unified open-source foundation for building, evaluating and guarding AI agents: any-llm (one interface to LLM providers, built on official SDKs), any-agent (one interface to agent frameworks), mcpd (toolchain and runtime for managing MCP servers) and any-guardrail (one interface to guardrail models).'
+    owner: O:role/VP-Engineering
+    confidence: 0.8
+    sources: ['https://www.mozilla.ai/llms.txt', 'https://github.com/mozilla-ai']
+    visibility: public
+    parts: ['P:product/any-llm', 'P:product/any-agent', 'P:product/any-guardrail', 'P:product/mcpd']
+    economics:
+      price: none
+    affect:
+      audience: M:audience/ai-developers
+      elicits:
+        - {feeling: freedom, when: swapping a provider without rewriting}
+    mattering:
+      to-the-whole: Mozilla.ai describes it as a unified open-source foundation for building, evaluating and guarding AI agents.
+      weight: major
+      inside:
+        - who: ['O:role/VP-Engineering']
+          because: The engineering lead answers for the stack.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/ai-developers']
+          because: any-llm has about 2,200 and any-agent about 1,200 GitHub stars.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/ai-developers']
+          because: Developers who want one interface across providers and frameworks.
+          confidence: 0.5
+
+  - id: P:product/any-llm
+    type: product
+    name: any-llm
+    summary: One interface for communicating with LLM providers; Apache-2.0; about 2,200 GitHub stars.
+    owner: O:role/VP-Engineering
+    confidence: 0.8
+    sources: ['https://github.com/mozilla-ai', 'https://www.mozilla.ai/llms.txt']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: library, to: 'M:audience/ai-developers', unit: downloads/month}
+    substrate:
+      platforms:
+        - S:codebase/any-llm
+    mattering:
+      to-the-whole: The provider-neutral client.
+      weight: major
+      inside:
+        - who: ['O:role/VP-Engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:product/any-agent
+    type: product
+    name: any-agent
+    summary: A single interface to use and evaluate different agent frameworks; about 1,200 GitHub stars.
+    owner: O:role/VP-Engineering
+    confidence: 0.8
+    sources: ['https://github.com/mozilla-ai', 'https://www.mozilla.ai/llms.txt']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: library, to: 'M:audience/ai-developers', unit: downloads/month}
+    substrate:
+      platforms:
+        - S:codebase/any-agent
+    mattering:
+      to-the-whole: The framework-neutral agent layer.
+      weight: major
+      inside:
+        - who: ['O:role/VP-Engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:product/any-guardrail
+    type: product
+    name: any-guardrail
+    summary: 'A common interface for guardrail models: prompt-injection detection, content moderation and fine-tuned judges.'
+    owner: O:role/VP-Engineering
+    confidence: 0.7
+    sources: ['https://www.mozilla.ai/llms.txt']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: library, to: 'M:audience/ai-developers', unit: downloads/month}
+    mattering:
+      to-the-whole: The guardrail-neutral safety layer.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:product/mcpd
+    type: product
+    name: mcpd
+    summary: A toolchain and runtime for managing Model Context Protocol servers across environments.
+    owner: O:role/VP-Engineering
+    confidence: 0.7
+    sources: ['https://www.mozilla.ai/llms.txt']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: tool, to: 'M:audience/ai-developers', unit: installs/month}
+    mattering:
+      to-the-whole: The MCP management layer.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/local-ai-tools
+    type: offering
+    name: Local AI tools
+    summary: llamafile, which distributes and runs LLMs from a single file (about 26,000 GitHub stars, a Mozilla Builders project), and encoderfile, which packages transformer encoders into a single executable.
+    owner: O:role/VP-Engineering
+    confidence: 0.8
+    sources: ['https://github.com/mozilla-ai', 'https://www.mozilla.ai/llms.txt']
+    visibility: public
+    parts: ['P:product/llamafile', 'P:product/encoderfile']
+    economics:
+      price: none
+    affect:
+      audience: M:audience/ai-developers
+      elicits:
+        - {feeling: independence, when: running a model with nothing to install}
+    mattering:
+      to-the-whole: The most widely starred project Mozilla.ai maintains.
+      weight: major
+      inside:
+        - who: ['O:role/VP-Engineering']
+          because: Engineering maintains it.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/ai-developers']
+          because: Developers run models locally.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/ai-developers']
+          because: Anyone who wants to run an open model from a single file.
+          confidence: 0.5
+
+  - id: P:product/llamafile
+    type: product
+    name: llamafile
+    summary: Distributes and runs LLMs from a single file; C++; one of the projects supported by Mozilla Builders.
+    owner: O:role/VP-Engineering
+    confidence: 0.8
+    sources: ['https://github.com/mozilla-ai', 'https://www.mozilla.ai/llms.txt']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: executable, to: 'M:audience/ai-developers', unit: downloads/month}
+    substrate:
+      platforms:
+        - S:codebase/llamafile
+    mattering:
+      to-the-whole: Local models without installation.
+      weight: major
+      inside:
+        - who: ['O:role/VP-Engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:product/encoderfile
+    type: product
+    name: encoderfile
+    summary: Packages transformer-based encoders into a single executable binary.
+    owner: O:role/VP-Engineering
+    confidence: 0.7
+    sources: ['https://www.mozilla.ai/llms.txt']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: executable, to: 'M:audience/ai-developers', unit: downloads/month}
+    mattering:
+      to-the-whole: Small models as one file.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/cq
+    type: offering
+    name: cq
+    summary: 'An open standard for shared agent learning: a shared knowledge store that agents query before acting; about 1,300 GitHub stars.'
+    owner: O:role/VP-Engineering
+    confidence: 0.7
+    sources: ['https://github.com/mozilla-ai', 'https://www.mozilla.ai/llms.txt']
+    visibility: public
+    substrate:
+      platforms:
+        - S:codebase/cq
+    economics:
+      price: none
+    affect:
+      audience: M:audience/ai-developers
+      elicits:
+        - {feeling: confidence, when: an agent that checks what others learned}
+    mattering:
+      to-the-whole: An open standard for shared agent learning.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Engineering']
+          because: Engineering maintains it.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/ai-developers']
+          because: Agent builders reuse what others learned.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/ai-developers']
+          because: Builders whose agents repeat mistakes.
+          confidence: 0.5
+
+  - id: P:offering/blueprints
+    type: offering
+    name: Blueprints
+    summary: A community-led collection of reusable automation blueprints (blueprints.mozilla.ai), with documentation and cookbooks.
+    owner: O:role/VP-Engineering
+    confidence: 0.7
+    sources: ['https://www.mozilla.ai/llms.txt', 'https://www.mozilla.ai/']
+    visibility: public
+    economics:
+      price: none
+    affect:
+      audience: M:audience/blueprint-community
+      elicits:
+        - {feeling: belonging, when: adding a template others use}
+    mattering:
+      to-the-whole: Community-led reusable automation blueprints.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Engineering']
+          because: Engineering curates it.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/blueprint-community', 'M:audience/ai-developers']
+          because: Contributors share templates.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/ai-developers']
+          because: Newcomers who learn from a template.
+          confidence: 0.5
+
+  - id: P:suite/retired
+    type: suite
+    name: Retired tools
+    summary: Tools whose repository is archived.
+    owner: O:role/Chief-Executive-Officer
+    confidence: 0.8
+    sources: ['https://github.com/mozilla-ai']
+    status: retired
+    visibility: public
+    parts: ['P:product/lumigator']
+    mattering:
+      to-the-whole: Shows what Mozilla.ai stopped maintaining.
+      weight: peripheral
+      inside:
+        - who: ['O:role/Chief-Executive-Officer']
+          because: Focus is one of Mozilla.ai's five principles.
+          confidence: 0.5
+
+  - id: P:product/lumigator
+    type: product
+    name: Lumigator
+    summary: A platform for choosing and evaluating language models; its repository is marked archived on GitHub (about 280 stars).
+    owner: O:role/Chief-Executive-Officer
+    confidence: 0.8
+    sources: ['https://github.com/mozilla-ai']
+    status: retired
+    visibility: public
+    mattering:
+      to-the-whole: An earlier evaluation platform that is no longer developed.
+      weight: peripheral
+      inside:
+        - who: ['O:role/Chief-Executive-Officer']
+          because: This seat is accountable for it.
+          confidence: 0.5

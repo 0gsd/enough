@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PLACEHOLDER (Canon round, 0.4.3). Original line art on the house
+     72x72 artboard, drawn inside the ~54 art box: a large circle holding
+     a tilted orbit ellipse with small worlds on and inside it — the
+     MacroCOSM specification ("kosmos": order and world, worlds nested in
+     worlds). Pure #000 so build_icons.py's black<->white swap produces
+     the dark variant. Overwrite this file and re-run
+     scripts/build_icons.py to replace it. -->
+<svg id="macrocosm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <circle cx="36" cy="36" r="27" fill="none" stroke="#000" stroke-width="3"/>
+  <ellipse cx="36" cy="36" rx="19" ry="8" transform="rotate(-30 36 36)"
+           fill="none" stroke="#000" stroke-width="3"/>
+  <circle cx="47.2" cy="24.3" r="4.5" fill="#000"/>
+  <circle cx="21.9" cy="47.3" r="3.5" fill="#000"/>
+  <circle cx="48" cy="50" r="3" fill="#000"/>
+</svg>

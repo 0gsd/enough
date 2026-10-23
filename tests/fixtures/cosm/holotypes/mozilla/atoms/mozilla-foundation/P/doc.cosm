@@ -1,0 +1,29 @@
+# doc.cosm: the parts of the document that are not nodes. Sources are declared in holotype.cosm.
+
+reading:
+  draft: Public sample 1
+  date: 2026-10-18
+  author: '@comprise-sample'
+  mode: 'research (public sources only: filings, official pages, reputable reporting; read 2026-10-18)'
+  perspective: 'The Mozilla Foundation, with Mozilla.org and the Mozilla companies as bonded atoms. A third-party description: nobody at Mozilla has reviewed it.'
+  note: No person is named anywhere; seats are roles. E is none in every atom.
+
+history:
+  - {date: '1998', event: The Mozilla Project begins when the browser code is released to the public, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/']}
+  - {date: '2003-07-15', event: Mozilla Foundation formed as a California not-for-profit corporation, sources: ['https://en.wikipedia.org/wiki/Mozilla_Foundation', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf']}
+  - {date: 2004-06, event: IRS exempts the Foundation under section 501(c)(3), sources: ['https://projects.propublica.org/nonprofits/api/v2/organizations/200097189.json']}
+  - {date: '2005-08-03', event: Mozilla Corporation announced as the Foundation's taxable subsidiary, sources: ['https://en.wikipedia.org/wiki/Mozilla_Foundation']}
+  - {date: '2020-01-28', event: MZLA Technologies Corporation announced to run Thunderbird, sources: ['https://en.wikipedia.org/wiki/Mozilla_Foundation']}
+  - {date: '2022-11-02', event: Mozilla Ventures announced with $35 million, sources: ['https://en.wikipedia.org/wiki/Mozilla_Foundation', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/']}
+  - {date: 2023-03, event: Mozilla.ai launched with $30 million committed, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/']}
+  - {date: '2024-11-04', event: The Foundation cuts 30% of staff; advocacy and global programs end, sources: ['https://techcrunch.com/2024/11/09/mozilla-lays-off-30-of-its-nonprofit-arm']}
+  - {date: '2025-07-30', event: Mozilla Data Collective announced as a sister of Common Voice, sources: ['https://discourse.mozilla.org/t/exciting-news-mozilla-data-collective/145191']}
+  - {date: 2025-10, event: Common Voice datasets become available only through Mozilla Data Collective, sources: ['https://huggingface.co/spaces/mozilla-foundation/README/blob/main/README.md']}
+  - {date: 2026-06, event: 'Mozilla.org, controlled by the Foundation, is recognised as a 501(c)(3), becomes operational and takes ownership of the operating subsidiaries and the trademarks', sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://blog.mozilla.org/en/mozilla/news/announcing-mozilla-org-new-non-profit/', 'https://www.mofo.com/resources/news/260706-mofo-advises-mozilla']}
+  - {date: '2026-08-11', event: Privacy Not Included moves into Product Reviews at Nothing Personal, sources: ['https://www.mozillafoundation.org/en/nothing-personal/privacy-not-included-sunset/']}
+  - {date: '2026-10-28', event: Mozilla Festival 2026 opens in Barcelona, sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/']}
+
+findings:
+  - {check: ownership - sources disagree, nodes: ['C:bond/foundation-controls-org', 'C:bond/org-owns-corporation'], finding: 'The audited 2024 statements, the 2024 Form 990 and the 2025/26 State of Mozilla say the Foundation owns the operating companies; the June 2026 Mozilla.org FAQ and the Thunderbird donate and about pages say Mozilla.org owns them, and the Foundation controls Mozilla.org by appointing the majority of its board.', proposal: Read the 2025 Form 990 Schedule R when published; until then the model follows the newest source (Mozilla.org owns) and keeps the Foundation's control of Mozilla.org as its own bond.}
+  - {check: value - concentration, nodes: ['C:finance/fy2024-consolidated', 'C:finance/fy2024-form-990'], finding: 'Royalties were $498.2 million of $680.4 million consolidated revenue and support in 2024 (73%); at the Foundation alone, $23.0 million of $37.2 million revenue is trademark licence fees paid by the operating companies.', proposal: Track both ratios each year; the double bottom line is aimed at diversifying revenue.}
+  - {check: claims - trademark owner, nodes: ['C:contract/trademark-license-corporation'], finding: The Mozilla trademark policy page names the Foundation as owner of the marks; the Mozilla.org FAQ says Mozilla.org owns them., proposal: Confirm the licensor of the trademark licence agreements after the 2026 transfer.}

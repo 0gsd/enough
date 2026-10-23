@@ -1,0 +1,11 @@
+oes: eml/1
+id: eml/bad-status
+name: bad status
+# status: a value outside the closed list
+nodes:
+  - id: K:concept/x
+    type: concept
+    name: x
+    summary: A concept with a made-up status.
+    status: alive
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

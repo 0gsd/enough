@@ -1,0 +1,11 @@
+oes: eml/1
+id: eml/bad-closed-list
+name: bad closed-list
+# closed-list: a stance outside the closed list
+nodes:
+  - id: P:claim/x
+    type: claim
+    name: x
+    summary: A claim known by rumour, which is not a stance.
+    stance: rumour
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

@@ -1,0 +1,23 @@
+# S — vendors: the outside firms behind the stack. Each resolves to one C:counterparty (rule 10).
+nodes:
+  - id: S:vendor/banks
+    type: vendor
+    name: Bank feed providers
+    summary: The aggregator behind bank-sync, now a vendor with a contract.
+    counterparty: C:counterparty/banks
+    contract: C:contract/banks
+    status: active
+    visibility: internal
+    owner: O:role/Engineer
+    provenance: {mode: dialectic, sources: [session-2, session-3], confidence: 0.9, state: known}
+
+  - id: S:vendor/stripe
+    type: vendor
+    name: Stripe, Inc.
+    summary: Billing platform vendor; standard online terms, no negotiated contract.
+    counterparty: C:counterparty/stripe
+    contract: none
+    status: active
+    visibility: internal
+    owner: O:role/Founder
+    provenance: {mode: dialectic, sources: [session-3, stripe-pricing], confidence: 0.9, state: known}

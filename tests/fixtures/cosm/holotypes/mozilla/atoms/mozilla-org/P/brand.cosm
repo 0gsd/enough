@@ -1,0 +1,55 @@
+cosm: 0.3
+
+# Mozilla.org: the umbrella non-profit created in 2025 and operational in June 2026. Read from the Mozilla wiki FAQ and the announcement; mattering is the modeller's reading at confidence 0.5 to 0.7.
+
+brand:
+  id: P:mozilla-org
+  name: Mozilla.org
+  kind: nonprofit
+  summary: 'The non-profit that stewards the long-term success of the Mozilla Project: portfolio strategy, capital allocation and the Mozilla brand across the Foundation, the operating companies and the venture fund.'
+  since: 2025
+  legal-anchor: Mozilla.org, San Francisco CA; California non-profit corporation; EIN 33-3437202; 501(c)(3)
+  owner: O:role/President
+  confidence: 0.7
+  sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://blog.mozilla.org/en/mozilla/news/announcing-mozilla-org-new-non-profit/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://www.mozilla.org/en-US/about/manifesto/']
+  visibility: public
+  parts: ['P:offering/stewardship']
+  rules:
+    - must: O:role/Board-of-Directors ensure each part of Mozilla advances the Mozilla Manifesto
+      source: Mozilla wiki, Mozilla.org FAQ
+      scope: descendants
+  principles:
+    purpose: Steward the long-term success of the Mozilla Project and ensure that the different parts of Mozilla collectively advance the Mozilla Manifesto and mission.
+    priorities:
+      - non-profit ownership and control, always
+      - a double bottom line of mission and money
+      - do for AI what Mozilla did for the web
+    value:
+      - {to: 'M:audience/mozilla-family', proposition: 'strategy, capital and a shared brand so each organization is positioned to pursue the Manifesto'}
+      - {to: 'M:audience/mozilla-community', proposition: coordination of community initiatives behind the mission}
+    decides:
+      - portfolio and brand strategy
+      - allocation of funding and capital across the family
+      - investments of Mozilla's assets
+  vocabulary:
+    terms:
+      - {term: Mozilla Manifesto, means: 'The ten principles for the internet that every Mozilla organization is meant to advance, including that individuals'' security and privacy online are fundamental and that profit must be balanced with public benefit.'}
+      - {term: portfolio, means: 'The Mozilla organizations taken together: a philanthropic foundation, a browser company, an email company, an AI developer-tools company, a data platform and a venture fund.'}
+      - {term: strategic endowment, means: 'How the announcement describes Mozilla.org: it allocates funding, manages brands and shapes long-term strategy.'}
+    assumes:
+      - Mozilla will always remain non-profit owned and controlled
+    boundary:
+      - Mozilla.org does not make products; the operating organizations do
+  mattering:
+    inside:
+      - who: ['O:role/President', 'O:role/Chief-Operating-Officer', 'O:role/Chief-Technology-Officer']
+        because: A small Mozilla-wide team whose job is to make the pieces of Mozilla add up to more than their parts.
+        confidence: 0.5
+    chosen:
+      - who: ['M:audience/mozilla-family']
+        because: Each organization is positioned to pursue the Manifesto, with strategy, funding and brand set by Mozilla.org, the FAQ says.
+        confidence: 0.5
+    prospective:
+      - who: ['M:audience/mozilla-community']
+        because: The FAQ frames the mission as keeping the internet open and accessible to all in the AI era.
+        confidence: 0.5

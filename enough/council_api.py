@@ -647,7 +647,7 @@ def _check_output_path(meta: dict[str, Any], resolve_path: Resolve,
 def _write_document(project_dir: Path, out_spec: dict[str, Any],
                     text: str) -> tuple[str | None, str]:
     """Write the concluding document through `tools.run_write_file` — the
-    same door, the same guards (the cachebox mirror rule, the allowlists, the
+    same door, the same guards (the canon catalog rule, the allowlists, the
     protected prefixes, the `.comp`/`.girraph` refusals, the undo stash and
     the convert twin sync). A council does not get its own write path."""
     from . import tools as _tools

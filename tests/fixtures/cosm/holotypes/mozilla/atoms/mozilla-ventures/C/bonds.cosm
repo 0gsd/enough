@@ -1,0 +1,49 @@
+# C: bonds. The Foundation funds the fund; Mozilla.org owns the management company; the portfolio is one template bond.
+nodes:
+  - id: C:bond/foundation-funds-ventures
+    type: bond
+    name: Foundation funds the Mozilla Ventures fund
+    summary: The Foundation is the sole partner in the first fund, size $35 million, announced in November 2022; the 2023 Form 990 shows capital contributions of $24,963,716 to Mozilla Ventures I, LP in 2023.
+    kinds: [funds]
+    from: atom/mozilla-foundation
+    to: atom/mozilla-ventures
+    control: none
+    terms: sole partner in the first fund, Mozilla Ventures I, LP; fund size $35 million
+    since: 2022-11-02
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/', 'https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf', 'https://en.wikipedia.org/wiki/Mozilla_Foundation'], confidence: 0.8, state: known}
+
+  - id: C:bond/org-owns-ventures
+    type: bond
+    name: Mozilla.org owns Mozilla Ventures Management
+    summary: Mozilla Ventures Management, PBC, the fund's manager, was wholly owned by the Foundation in the 2024 filings; the fund itself is a limited partnership whose sole partner, in the first fund, is Mozilla.
+    kinds: [owns]
+    from: atom/mozilla-org
+    to: atom/mozilla-ventures
+    economic: 1.0
+    voting: 1.0
+    control: full
+    basis: Mozilla.org owns the Mozilla operating subsidiaries (Mozilla wiki, June 2026); the Foundation held them at 100% in the audited 2024 statements and the 2024 Form 990 Schedule R
+    accounting: consolidated
+    nci: 0
+    inherits: [principles]
+    pending: The audited 2024 statements and the 2024 Form 990 give 100% held by the Foundation; the June 2026 Mozilla.org FAQ says Mozilla.org owns the operating subsidiaries without restating the share or the date of transfer. 100% is carried over from the last filing.
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.6, state: known}
+
+  - id: C:bond/ventures-portfolio
+    type: bond
+    name: Mozilla Ventures co-invests in its portfolio
+    summary: 'A template bond for the whole portfolio: about 40 early-stage companies (mozilla.vc/portfolio, October 2026) in three themes. Stake sizes, instruments and rounds are not published, so only the class and five examples are written.'
+    kinds: [co-invests]
+    from: atom/mozilla-ventures
+    to: C:counterparty/ventures-portfolio
+    economic: {pending: stake sizes; not published}
+    control: none
+    template: true
+    instances: ['C:counterparty/hugging-face', 'C:counterparty/credo-ai', 'C:counterparty/flower', 'C:counterparty/truepic', 'C:counterparty/nous-research']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/portfolio', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/'], confidence: 0.8, state: known}

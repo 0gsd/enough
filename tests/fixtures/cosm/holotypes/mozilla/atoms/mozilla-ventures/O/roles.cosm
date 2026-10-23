@@ -1,0 +1,9 @@
+# O: one role: the seat the leadership page names.
+nodes:
+  - id: O:role/Managing-Partner
+    type: role
+    name: Managing Partner
+    summary: The head of Mozilla Ventures, as the leadership page titles the seat.
+    governs: ['P:mozilla-ventures', 'C:entity/mozilla-ventures-management']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.9, state: known}

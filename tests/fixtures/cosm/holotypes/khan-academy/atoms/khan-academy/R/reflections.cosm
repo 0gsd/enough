@@ -1,0 +1,38 @@
+# R — reflections: what independent parties say, read once from their own pages on 2026-10-18 (not a scheduled scan).
+nodes:
+  - id: R:reflection/charity-navigator
+    type: reflection
+    name: Charity Navigator rating
+    summary: "Listed as a four-star charity at 100%, from the year-to-June-2025 return: audited statements, an audit oversight committee, a retention policy and full website disclosure. One of the four beacons (accountability and finance) is completed; the other three are marked incomplete."
+    kind: rating
+    about: [P:khan-academy]
+    sentiment: positive
+    rating: {pending: "a rating series once the reflections scan runs; only the 2026-10-18 reading exists"}
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [charity-navigator], confidence: 0.8, state: known}
+
+  - id: R:reflection/common-sense-khanmigo
+    type: reflection
+    name: Common Sense Media on Khanmigo
+    summary: "A risk assessment (last updated 8 August 2024) rates Khanmigo low risk and labels it designed for kids, praising responsible AI guidelines, transparency and limited conversation scope. It flags speculative answers in the historical-figures activity and unreliable facts."
+    kind: assessment
+    about: [P:offering/khanmigo-families, P:offering/khanmigo-teachers]
+    sentiment: mixed
+    status: active
+    visibility: public
+    owner: O:role/Chief-Learning-Officer
+    provenance: {mode: net-scan, sources: [csm-khanmigo], confidence: 0.8, state: known}
+
+  - id: R:reflection/common-sense-kids
+    type: reflection
+    name: Common Sense Media on Khan Academy Kids
+    summary: "A review headed as creative early-learning activities that engage and inspire, rated suitable from age 3, with a large library across math, reading and social-emotional learning. The app listing was last updated in March 2026."
+    kind: review
+    about: [P:offering/khan-kids]
+    sentiment: positive
+    status: active
+    visibility: public
+    owner: O:role/Kids-Lead
+    provenance: {mode: net-scan, sources: [csm-kids], confidence: 0.7, state: known}

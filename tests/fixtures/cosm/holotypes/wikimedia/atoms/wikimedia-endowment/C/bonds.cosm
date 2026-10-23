@@ -1,0 +1,86 @@
+# C — the bonds, mirrored from atom/wikimedia-foundation/C/bonds.cosm (same id, kinds, from and to; references into the Foundation written as atom/wikimedia-foundation//...),
+# and the retired bond to the Tides Foundation, where the fund was held from 2016 to 2023. The Endowment is bound to the Foundation by gifts, grants and shared management,
+# not by ownership: control is none on every bond.
+nodes:
+  - id: C:bond/endowment-funds-foundation
+    type: bond
+    name: endowment funds foundation
+    summary: "The Endowment gives restricted grants for Wikimedia projects: $3.1M in 2024-25 (Abstract Wikipedia $950K, machine learning $1.0M, Commons $150K, Wikidata $1.0M) and $2.6M in the period to 30 June 2024 (MediaWiki $1.5M, Abstract Wikipedia $600K, new audiences $500K). Of $3.4M in project funding in 2024-25, $3.1M went to the Foundation."
+    kinds: [funds]
+    from: atom/wikimedia-endowment
+    to: atom/wikimedia-foundation
+    economic: 0
+    control: none
+    accounting: none
+    basis: "the Endowment supports projects approved by and advancing the purposes of the Foundation or its successor"
+    scope: [atom/wikimedia-foundation//P:product/wikifunctions, atom/wikimedia-foundation//P:offering/commons, atom/wikimedia-foundation//P:offering/wikidata, atom/wikimedia-foundation//P:service/machine-learning, atom/wikimedia-foundation//P:product/mediawiki]
+    since: 2023-09-30
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.9, state: known}
+    voting: 0
+    nci: 0
+
+  - id: C:bond/foundation-passes-gifts-to-endowment
+    type: bond
+    name: foundation passes gifts to endowment
+    summary: The Foundation receives donations designated for the Endowment and transfers them monthly, and gives it the undesignated estate gifts it receives ($1.49M in 2024-25).
+    kinds: [funds]
+    from: atom/wikimedia-foundation
+    to: atom/wikimedia-endowment
+    economic: 0
+    control: none
+    accounting: none
+    basis: "under the cost-sharing agreement; a payable of $187,674 was owed to the Endowment at 30 June 2025"
+    scope: [P:offering/legacy-giving, P:offering/permanent-fund]
+    contract: atom/wikimedia-foundation//C:contract/cost-sharing
+    since: 2023-09-30
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}
+    voting: 0
+    nci: 0
+
+  - id: C:bond/foundation-manages-endowment
+    type: bond
+    name: foundation manages endowment
+    summary: The Endowment has no employees; Foundation staff manage it and keep its books under a cost-sharing agreement that renews yearly. It reports $1.47M paid to the Foundation in 2024-25 (costs plus a 15% administrative fee); the Foundation reports $2.07M recognised.
+    kinds: [manages, shares-services-with, affiliated]
+    from: atom/wikimedia-foundation
+    to: atom/wikimedia-endowment
+    economic: 0
+    control: none
+    accounting: none
+    basis: "the Foundation has no control or controlling financial interest and the Endowment has a separate Board; the Foundation is a related party because its management also manages the Endowment"
+    scope: [P:function/investment-management, P:service/grantmaking]
+    contract: atom/wikimedia-foundation//C:contract/cost-sharing
+    since: 2023-09-30
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+    pending: "why the two sides report different cost-sharing amounts for 2024-25 ($1.47M paid by the Endowment, $2.07M recognised by the Foundation)"
+    voting: 0
+    nci: 0
+
+  - id: C:bond/endowment-held-by-tides
+    type: bond
+    name: endowment held by tides
+    summary: From 2016 to 2023 the Endowment's funds were held as a donor-advised fund at the Tides Foundation; on 2023-09-30 the Tides Foundation made a one-time contribution of the net assets it held for it, $116.2M.
+    kinds: [affiliated]
+    from: atom/wikimedia-endowment
+    to: C:counterparty/tides-foundation
+    economic: 0
+    control: none
+    accounting: none
+    basis: "a hosting relationship that ended when the Endowment became a standalone organization"
+    since: 2016-01
+    until: 2023-09-30
+    status: retired
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://foundation.wikimedia.org/wiki/Memory:Timeline"], confidence: 0.85, state: known}
+    voting: 0
+    nci: 0

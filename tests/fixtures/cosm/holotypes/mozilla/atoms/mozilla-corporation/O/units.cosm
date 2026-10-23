@@ -1,0 +1,46 @@
+# O: units, each twinned with the suite it runs.
+nodes:
+  - id: O:unit/firefox
+    type: unit
+    name: Firefox
+    summary: 'The browser organization: engineering and product management for desktop, mobile and enterprise.'
+    twin: P:suite/firefox
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/'], confidence: 0.6, state: known}
+
+  - id: O:unit/privacy-services
+    type: unit
+    name: Privacy services
+    summary: Mozilla VPN, Firefox Relay and Mozilla Monitor.
+    twin: P:suite/privacy-services
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/', 'https://www.mozilla.org/en-US/products/'], confidence: 0.5, state: known}
+
+  - id: O:unit/web-platform
+    type: unit
+    name: MDN
+    summary: MDN Web Docs and MDN Plus.
+    twin: P:suite/web-platform
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://developer.mozilla.org/en-US/about'], confidence: 0.8, state: known}
+
+  - id: O:unit/advertising
+    type: unit
+    name: Mozilla Advertising
+    summary: Ads on Firefox and MDN, and Anonym.
+    twin: P:suite/advertising
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/advertising/'], confidence: 0.8, state: known}
+
+  - id: O:unit/ai-products
+    type: unit
+    name: AI products
+    summary: 0DIN and Tabstack.
+    twin: P:suite/ai-products
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/', 'https://0din.ai/privacy', 'https://tabstack.ai/legal/terms'], confidence: 0.7, state: known}

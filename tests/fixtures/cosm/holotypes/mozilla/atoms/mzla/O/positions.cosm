@@ -1,0 +1,23 @@
+# O: the two seats named. Staff are modelled as team pools in roles.
+nodes:
+  - id: O:position/chief-executive
+    type: position
+    name: Chief Executive
+    summary: The chief executive seat; MZLA's board is not published, so the chart stops here.
+    roles: ['O:role/Chief-Executive']
+    primary: O:role/Chief-Executive
+    reports-to: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.8, state: known}
+
+  - id: O:position/thunderbird-council
+    type: position
+    name: Thunderbird Council
+    summary: Elected seats on the council; their number is not stated on the pages read.
+    roles: ['O:role/Thunderbird-Council']
+    primary: O:role/Thunderbird-Council
+    reports-to: {pending: who the council reports to is not stated; its operating agreement is not summarised}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/'], confidence: 0.6, state: known}

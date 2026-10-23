@@ -1,0 +1,3 @@
+module: none
+reason: Holdings are written as the portfolio bond; stakes, instruments, cost and value are not published.
+...

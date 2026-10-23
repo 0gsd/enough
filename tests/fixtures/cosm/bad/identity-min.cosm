@@ -1,0 +1,9 @@
+oes: eml/1
+id: eml/bad-identity-min
+name: bad identity-min
+# identity-min: no summary
+nodes:
+  - id: K:concept/x
+    type: concept
+    name: x
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

@@ -1,0 +1,27 @@
+# C: bonds. Incubated by the Foundation, backed by Mozilla.org: both affiliations, no recorded owner.
+nodes:
+  - id: C:bond/foundation-incubated-mdc
+    type: bond
+    name: Foundation incubated Mozilla Data Collective
+    summary: Mozilla Data Collective describes itself as incubated by the Mozilla Foundation; it was announced in July 2025 as a sister platform to Common Voice and registered as a UK company in February 2026.
+    kinds: [affiliated]
+    from: atom/mozilla-foundation
+    to: atom/mozilla-data-collective
+    control: none
+    since: 2025-07-30
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilladatacollective.com/', 'https://discourse.mozilla.org/t/exciting-news-mozilla-data-collective/145191'], confidence: 0.8, state: known}
+
+  - id: C:bond/org-backs-mdc
+    type: bond
+    name: Mozilla.org backs Mozilla Data Collective
+    summary: Mozilla Data Collective calls itself backed by the not-for-profit Mozilla.org. Companies House lists no registrable person or entity with significant control (statement of 2026-02-25), so no ownership share is recorded.
+    kinds: [affiliated]
+    from: atom/mozilla-org
+    to: atom/mozilla-data-collective
+    control: none
+    pending: How is Mozilla Data Collective Limited owned? "Mission-locked" is not defined on its pages and Companies House shows no controller.
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilladatacollective.com/', 'https://find-and-update.company-information.service.gov.uk/company/17054959', 'https://find-and-update.company-information.service.gov.uk/company/17054959/persons-with-significant-control', 'https://wiki.mozilla.org/Mozilla_org'], confidence: 0.7, state: known}

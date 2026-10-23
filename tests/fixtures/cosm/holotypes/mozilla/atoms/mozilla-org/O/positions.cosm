@@ -1,0 +1,47 @@
+# O: positions. The executive team is employed through Mozilla Management Company.
+nodes:
+  - id: O:position/board-of-directors
+    type: position
+    name: Board of Directors
+    summary: The governing body; the top of the chart.
+    roles: ['O:role/Board-of-Directors']
+    primary: O:role/Board-of-Directors
+    reports-to: none
+    template: true
+    instances: 9
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.9, state: known}
+
+  - id: O:position/president
+    type: position
+    name: President, Mozilla
+    summary: Seat on the Mozilla-wide executive team.
+    roles: ['O:role/President']
+    primary: O:role/President
+    reports-to: {pending: reporting lines are not published}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.6, state: known}
+
+  - id: O:position/chief-operating-officer
+    type: position
+    name: Chief Operating Officer, Mozilla
+    summary: Seat on the Mozilla-wide executive team.
+    roles: ['O:role/Chief-Operating-Officer']
+    primary: O:role/Chief-Operating-Officer
+    reports-to: {pending: reporting lines are not published}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.6, state: known}
+
+  - id: O:position/chief-technology-officer
+    type: position
+    name: Chief Technology Officer, Mozilla
+    summary: Seat on the Mozilla-wide executive team.
+    roles: ['O:role/Chief-Technology-Officer']
+    primary: O:role/Chief-Technology-Officer
+    reports-to: {pending: reporting lines are not published}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.6, state: known}

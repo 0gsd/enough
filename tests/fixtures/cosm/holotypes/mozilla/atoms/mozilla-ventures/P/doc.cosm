@@ -1,0 +1,17 @@
+# doc.cosm.
+
+reading:
+  draft: Public sample 1
+  date: 2026-10-18
+  author: '@comprise-sample'
+  mode: research (public sources only, read 2026-10-18)
+  perspective: The Mozilla Ventures management company and its fund.
+
+history:
+  - {date: '2022-11-02', event: Mozilla Ventures announced with $35 million, sources: ['https://en.wikipedia.org/wiki/Mozilla_Foundation', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/']}
+  - {date: '2023', event: 'The Foundation contributes $24,963,716 in cash to the fund', sources: ['https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf']}
+  - {date: '2024', event: 'The 2024 report: invested in over 45 startups', sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/']}
+  - {date: '2026-08-10', event: Latest post on mozilla.vc, sources: ['https://mozilla.vc/']}
+
+findings:
+  - {check: claims - count, nodes: ['R:claim/portfolio-of-forty'], finding: 'mozilla.vc lists 40 portfolio companies in October 2026, while the 2024 report said the fund had invested in 45 (over 45 on another page).', proposal: 'Reconcile the count: exits, write-offs or an incomplete page.'}

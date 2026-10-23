@@ -1,0 +1,53 @@
+# doc.cosm — the parts of the document that are not nodes. Rendered by the deck and the pack; nothing here is in the model proper.
+
+reading:
+  draft: "Public sample, draft 0"
+  date: 2026-10-18
+  author: "comprise-sample"
+  mode: "research (public sources only, in one working day); affect and mattering are the modeller's reading and carry a confidence of 0.5 unless stated"
+  perspective: "The firm is the Wikimedia Endowment. The Wikimedia Foundation is its manager, its main grantee and its fundraiser, but not its owner or controller: it is a modelled atom, bonded. The Tides Foundation is a former host. No person is named: seats are roles."
+  note: "Audited and Form 990 totals differ a little (2024-25 revenue $33.1M audited, $33.3M on the Form 990; expenses $5.3M and $5.6M)."
+
+history:
+  - {date: 2026-05-15, event: "The Form 990 for 2024-25 is filed", sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/05/2024-Form-990-WEND-Public.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"]}
+  - {date: 2026-03-06, event: "The auditor's report on 2024-25 is issued, with an emphasis-of-matter paragraph on the restatement of the first period", sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"]}
+  - {date: 2023-09-30, event: "The Endowment becomes a standalone 501(c)(3) with its own Board and receives $116.2M from the Tides Foundation", sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"]}
+  - {date: 2023, event: "Grantmaking begins, after the fund reaches $100 million", sources: ["https://wikimediaendowment.org/annualreports/2024-2025-annual-report/"]}
+  - {date: 2022-06-28, event: "The IRS recognises the Endowment as a 501(c)(3)", sources: ["https://foundation.wikimedia.org/wiki/Endowment:Main", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"]}
+  - {date: 2016-01, event: "The Endowment is announced, run first as a donor-advised fund at the Tides Foundation", sources: ["https://foundation.wikimedia.org/wiki/Memory:Timeline"]}
+
+findings:
+  - check: "boundary · independence"
+    nodes: [P:wikimedia-endowment, C:bond/foundation-manages-endowment, R:claim/separate-and-independent]
+    finding: "The Endowment calls itself separate and independent, with its own Board and no Foundation control. It also has no employees, its President and Treasurer are Foundation employees, and the Foundation raises and passes on its donations and is its main grantee ($3.1M of $3.4M)."
+    proposal: "Keep describing it as both: legally separate and operationally run by Foundation staff. The audit itself names it a related party for exactly this reason."
+  - check: "evidence · board size"
+    nodes: [O:position/director, O:chart/endowment]
+    finding: "The bylaws allow 7 to 15 directors; the Endowment's site says 13, its 2024-25 annual report lists 10 and the 2024 Form 990 counts 14 volunteers including officers."
+    proposal: "Ask the Endowment which number is current; the model leaves the seat count pending."
+  - check: "policy · return target"
+    nodes: [C:policy/investment, P:wikimedia-endowment]
+    finding: "The 2024-25 audit calls the 6.0% return target a real return net of fees; the FY2026-27 plan calls it nominal. The plan also lists alternative investments, while the audit shows only index funds and cash."
+    proposal: "Treat the target and the asset mix as pending until the investment policy text is read."
+  - check: "evidence · mislabelled year"
+    nodes: [C:finance/2025-07-to-2026-06]
+    finding: "The FY2026-27 plan says that in FY2025-26 the fund generated investment income of $21.2M including $3.7M of interest and dividends; those are the 2024-25 audited figures ($21.2M; $3.7M in the Form 990 FAQ)."
+    proposal: "Read it as a mislabelled year until the 2025-26 audit is published, and keep the figure out of 2025-26."
+  - check: "bond · two sides disagree"
+    nodes: [C:bond/foundation-manages-endowment]
+    finding: "The Endowment reports $1,466,361 paid to the Foundation under the cost-sharing agreement for 2024-25; the Foundation reports $2,066,234 of cost-sharing revenue."
+    proposal: "Ask what each counts before summing anything across the two atoms; the model keeps both."
+
+sources:
+  - {id: "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", page: "Wikimedia Endowment audited financial statements, year ended 30 June 2025 and the period from 2023-09-30 (BDO)", url: "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", supports: "finance, related-party note, holdings, spending policy"}
+  - {id: "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", page: "Wikimedia Endowment Form 990 FY2024-25 frequently asked questions (Meta-Wiki)", url: "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", supports: "no employees, management by Foundation, grants, donors"}
+  - {id: "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", page: "Wikimedia Endowment annual plan FY2026-27", url: "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", supports: "plan, budget, planned giving"}
+  - {id: "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", page: "Wikimedia Foundation audited consolidated financial statements, years ended 30 June 2025 and 2024 (KPMG)", url: "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", supports: "C entity, finance, bonds, related-party notes, systems vendors, I positions"}
+  - {id: "https://foundation.wikimedia.org/wiki/Memory:Timeline", page: "Wikimedia Foundation official timeline", url: "https://foundation.wikimedia.org/wiki/Memory:Timeline", supports: "history, events"}
+  - {id: "https://foundation.wikimedia.org/wiki/Endowment:Main", page: "Wikimedia Endowment governance pages (Foundation wiki)", url: "https://foundation.wikimedia.org/wiki/Endowment:Main", supports: "committees, policies, plans, determination letter"}
+  - {id: "https://wikimediaendowment.org/wp-content/uploads/2026/05/2024-Form-990-WEND-Public.pdf", page: "Wikimedia Endowment Form 990 for tax year 2024 (fiscal year 2024-25), filed 2026-05-15", url: "https://wikimediaendowment.org/wp-content/uploads/2026/05/2024-Form-990-WEND-Public.pdf", supports: "filings"}
+  - {id: "https://wikimediaendowment.org/", page: "Wikimedia Endowment home page", url: "https://wikimediaendowment.org/", supports: "identity, board roles, purpose, funded initiatives"}
+  - {id: "https://foundation.wikimedia.org/wiki/Endowment:Bylaws", page: "Wikimedia Endowment bylaws", url: "https://foundation.wikimedia.org/wiki/Endowment:Bylaws", supports: "charter, directors, committees, officers"}
+  - {id: "https://projects.propublica.org/nonprofits/organizations/873024488", page: "ProPublica Nonprofit Explorer: Wikimedia Endowment (EIN 87-3024488)", url: "https://projects.propublica.org/nonprofits/organizations/873024488", supports: "identifiers"}
+  - {id: "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", page: "Wikimedia Endowment annual report 2024-2025", url: "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", supports: "donors, grants, history"}
+  - {id: "https://wikimediafoundation.org/give/", page: "Wikimedia Foundation: ways to give and how donations are used", url: "https://wikimediafoundation.org/give/", supports: "fundraising, claims"}

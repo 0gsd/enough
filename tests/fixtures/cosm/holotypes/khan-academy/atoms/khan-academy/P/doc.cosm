@@ -1,0 +1,77 @@
+# doc.cosm: the parts of the document that are not nodes: how to read it, where the nonprofit came from, what the model already shows, and the
+# sources the P nodes cite. The deck and the pack render these; nothing is hand-assembled.
+
+reading:
+  draft: "State draft 0"
+  date: 2026-10-18
+  author: "@comprise-sample"
+  mode: "research (public sources only, one working session); mattering is the modeller's reading, confidence 0.5 unless a source is cited"
+  perspective: "The firm is Khan Academy, Inc., the nonprofit. Its sibling Schoolhouse World is a second atom; the related organizations abroad and the affiliated schools nonprofits are stubs; partners, funders and the app stores are outsiders named in C."
+  note: "A public sample: no person is named, and what could not be confirmed from a current public source is left pending. Facts change; every figure carries its period."
+
+history:
+  - {date: 2026-08, event: "New Khanmigo tools with interactive diagrams and teacher-reviewed practice, backed by a Google.org grant and a six-month fellowship", sources: [blog-google-org]}
+  - {date: 2026-02, event: "Gemini models announced for the Writing Coach, and a Reading Coach announced for later in 2026", sources: [journal-google-2026]}
+  - {date: 2025-10, event: "The districts experience is rebuilt with Khanmigo built into the platform; all district partners from the 2026-27 school year", sources: [blog-districts-2026]}
+  - {date: 2024-06, event: "The fiscal year moves from calendar to July-June, with a six-month short return for January to June 2024", sources: [f990-tp2024, f990-2025]}
+  - {date: 2024-05, event: "Khanmigo for Teachers becomes free for US teachers with Microsoft's donated infrastructure; New Hampshire offers Khanmigo statewide", sources: [blog-microsoft, blog-new-hampshire]}
+  - {date: 2024-01, event: "Stand Together Trust commits $20 million over five years across Khan Academy, Schoolhouse.world and Khan Lab School", sources: [standtogether]}
+  - {date: 2023-10, event: "The College Board describes Official Digital SAT Prep on Khan Academy as launched with the digital SAT", sources: [collegeboard-sat]}
+  - {date: 2023-03, event: "Khanmigo is announced as a pilot built on GPT-4", sources: [journal-khanmigo-2023]}
+  - {date: 2023, event: "The international partner model: independent local entities bring the offer to school systems", sources: [ka-help-partners]}
+  - {date: 2019, event: "The district program launches; MAP Accelerator is announced with NWEA", sources: [blog-districts-2026, blog-nwea-2019]}
+  - {date: 2018-07, event: "Khan Academy Kids launches as a free app", sources: [edweek-kids-2018]}
+  - {date: 2016-08, event: "Duck Duck Moose joins Khan Academy and its early-learning apps become free", sources: [techcrunch-ddm-2016]}
+  - {date: 2015, event: "Official SAT practice begins with the College Board", sources: [collegeboard-sat]}
+  - {date: 2008-05, event: "The IRS grants 501(c)(3) exemption to the corporation formed in 2007", sources: [pp-ka, f990-2025]}
+
+findings:
+  - check: "claims · evidence"
+    nodes: [R:claim/reach]
+    finding: "Three public counts of registered users differ by period and definition: 180 million-plus on the home page, 227 million on the About page and more than 185 million on the Form 990 at 30 June 2025."
+    proposal: "Publish one definition (accounts with a last-active date) and date every count; until then the model keeps all three and a pending question."
+  - check: "economics · price-dissonance"
+    nodes: [P:offering/districts-partnership, P:offering/kids-for-schools, P:offering/khanmigo-families]
+    finding: "The AI subscription has a public price ($4 a month), while the institutional offerings (districts, Learning Paths, Kids for Schools) have none; the return books $22.2 million of program service revenue and does not split it."
+    proposal: "Ask the finance and districts roles for the split of earned revenue and a price range for districts; the model leaves both pending."
+  - check: "substrate reuse · duplicate"
+    nodes: [P:product/khanmigo-ai, S:system/khanmigo-ai]
+    finding: "Khanmigo is described as using GPT-4 (pricing pages), Gemini models (2026 tools) and Microsoft's infrastructure and small models, with no single statement of which serves which feature."
+    proposal: "Declare one S node per model route and attach each to the features it serves; the engine's pending question names the gap."
+  - check: "role coverage · owner-gap"
+    nodes: [P:suite/districts, P:offering/learning-paths, P:service/district-implementation]
+    finding: "No public page names who runs district partnerships, although district partnerships are sold to institutions at a price."
+    proposal: "Name the owning role; the model gives the chief executive the nodes with a pending question until then."
+  - check: "capacity · risk"
+    nodes: [P:function/fundraising, C:finance/2022, C:finance/2023]
+    finding: "Gifts are 77% of revenue in the year to June 2025 and swing between years: $40.0 million in 2022, $84.2 million in 2023, $20.7 million in the six months to June 2024 and $90.4 million in the year to June 2025."
+    proposal: "Model the largest gifts and the donor-restricted share by year if the nonprofit's own reports give them; the model carries only what the returns state."
+
+sources:
+  - {id: blog-districts-2026, page: "Khan Academy blog: Khan Academy reimagined for districts (posted 8 October 2025, updated 7 January 2026)", url: "https://blog.khanacademy.org/khan-academy-reimagined-for-districts-2026/", supports: "districts redesign, history", date: 2026-10-18}
+  - {id: blog-google-org, page: "Khan Academy blog: new AI tools with Google.org (27 August 2026)", url: "https://blog.khanacademy.org/?p=22106", supports: "C:contract/google-org, Khanmigo diagrams", date: 2026-10-18}
+  - {id: blog-learning-paths, page: "Khan Academy blog: Learning Paths informed by MAP Growth", url: "https://blog.khanacademy.org/learning-paths-informed-by-map-growth", supports: "P:offering/learning-paths", date: 2026-10-18}
+  - {id: blog-map-transition, page: "Khan Academy blog: transition from MAP Accelerator to Learning Paths informed by MAP Growth", url: "https://blog.khanacademy.org/transition-your-district-from-map-accelerator-to-learning-paths-informed-by-map-growth/", supports: "C:contract/nwea", date: 2026-10-18}
+  - {id: blog-microsoft, page: "Khan Academy blog: Khanmigo for Teachers free for US teachers with Microsoft support (May 2024)", url: "https://blog.khanacademy.org/?p=16370", supports: "C:contract/microsoft, teacher access", date: 2026-10-18}
+  - {id: collegeboard-sat, page: "College Board blog: College Board and Khan Academy for better SAT prep (4 October 2023)", url: "https://blog.collegeboard.org/college-board-khan-academy-for-better-sat-prep", supports: "C:contract/college-board-sat", date: 2026-10-18}
+  - {id: edtech-google-visual, page: "EdTech Innovation Hub: Gemini-powered visual tutoring in Khanmigo for the 2026 school year", url: "https://www.edtechinnovationhub.com/news/khan-academy-brings-gemini-powered-visual-tutoring-into-classrooms-for-2026", supports: "Google.org fellowship and features", date: 2026-10-18}
+  - {id: edweek-kids-2018, page: "Education Week Market Brief: Khan Academy launches an education app for pre-K and kindergarten (12 July 2018)", url: "https://marketbrief.edweek.org/marketplace-k-12/khan-academy-launches-education-app-pre-k-kindergarten-crowd/", supports: "Kids launch", date: 2026-10-18}
+  - {id: f990-2025, page: "Form 990 for the year July 2024 to June 2025 (full text, Schedules A, B, D, F, J, M, O, R)", url: "https://projects.propublica.org/nonprofits/organizations/261544963/202640439349300549/full", supports: "finance FY2025, programs, governance, Schedule R and F, content counts", date: 2026-10-18}
+  - {id: github-khan, page: "GitHub organization Khan: repositories, languages and licences", url: "https://github.com/Khan", supports: "S:codebase nodes", date: 2026-10-18}
+  - {id: journal-google-2026, page: "THE Journal: Khan Academy partners with Google to integrate Gemini into writing and reading tools (9 February 2026)", url: "https://thejournal.com/articles/2026/02/09/khan-academy-partners-with-google-to-integrate-gemini-into-writing-and-reading-tools.aspx", supports: "Writing Coach, Reading Coach, Schoolhouse.world", date: 2026-10-18}
+  - {id: journal-khanmigo-2023, page: "THE Journal: Khan Academy pilots GPT-4 powered tool Khanmigo (14 March 2023)", url: "https://thejournal.com/articles/2023/03/14/khan-academy-pilots-gpt-4-powered-tool-khanmigo-for-teachers.aspx", supports: "Khanmigo launch, OpenAI", date: 2026-10-18}
+  - {id: ka-about, page: "Khan Academy, About us: mission, reach, products and programs", url: "https://www.khanacademy.org/about", supports: "reach figures, products, programs, student assessments", date: 2026-10-18}
+  - {id: ka-districts, page: "Khan Academy Districts page: services, SAT, partner districts, claims", url: "https://www.khanacademy.org/schools", supports: "P:offering/districts-partnership, M:audience/districts, claims", date: 2026-10-18}
+  - {id: ka-donate-banner, page: "Khan Academy site-wide donate banner: less than 1% of users give; each dollar is about 100 minutes of learning", url: "https://www.khanacademy.org/khan-for-educators", supports: "M:audience/donors, brand value", date: 2026-10-18}
+  - {id: ka-downloads, page: "Khan Academy app downloads page: apps, stores, the Kolibri offline route", url: "https://www.khanacademy.org/downloads", supports: "mobile apps, channels, offline route", date: 2026-10-18}
+  - {id: ka-help-languages, page: "Khan Academy Help Center: what languages Khan Academy is available in", url: "https://support.khanacademy.org/hc/en-us/articles/226457308", supports: "M:geography, P:function/localization", date: 2026-10-18}
+  - {id: ka-help-partners, page: "Khan Academy Help Center: education organizations it works with, and the international partner model", url: "https://support.khanacademy.org/hc/en-us/articles/39300876022029", supports: "bonds to sibling nonprofits, C:policy", date: 2026-10-18}
+  - {id: ka-home, page: "Khan Academy home page: audiences, what is free, impact claims, district pricing on request", url: "https://www.khanacademy.org/", supports: "audiences, free tiers, claims, country selector", date: 2026-10-18}
+  - {id: ka-kids, page: "Khan Academy Kids page: the free app for ages 2 to 8 and its school version", url: "https://www.khanacademy.org/kids", supports: "P:suite/early-learning and its offerings", date: 2026-10-18}
+  - {id: ka-partner-content, page: "Khan Academy, Partner content page: courses made with museums, science agencies and others", url: "https://www.khanacademy.org/partner-content", supports: "partner courses", date: 2026-10-18}
+  - {id: ka-supporters, page: "Khan Academy, Supporters page: founding partners and recognition levels (organizations only; individuals are not copied)", url: "https://www.khanacademy.org/about/supporters", supports: "M:audience/donors, funders", date: 2026-10-18}
+  - {id: ka-test-prep, page: "Khan Academy, Test prep page: SAT, MCAT, LSAT and PISA courses listed", url: "https://www.khanacademy.org/test-prep", supports: "P:offering/test-prep", date: 2026-10-18}
+  - {id: khanmigo-home, page: "khanmigo.ai home page: audiences, free teacher tools, eligibility", url: "https://www.khanmigo.ai/", supports: "P:suite/khanmigo", date: 2026-10-18}
+  - {id: khanmigo-learners, page: "khanmigo.ai for learners: price and the model named", url: "https://www.khanmigo.ai/learners", supports: "prices, GPT-4 statement", date: 2026-10-18}
+  - {id: khanmigo-parents, page: "khanmigo.ai for parents: price, up to 10 children, chat history and alerts", url: "https://www.khanmigo.ai/parents", supports: "prices, parent features", date: 2026-10-18}
+  - {id: techcrunch-ddm-2016, page: "TechCrunch: kids app maker Duck Duck Moose joins Khan Academy (26 August 2016)", url: "https://techcrunch.com/2016/08/26/kids-app-maker-duck-duck-moose-joins-khan-academy/", supports: "Duck Duck Moose, Kids history", date: 2026-10-18}

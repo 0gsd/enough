@@ -1,0 +1,14 @@
+# R — surfaces: where the firm shows itself. One self-hosted website; no platform surfaces.
+nodes:
+  - id: R:surface/website
+    type: surface
+    name: meadow.example
+    summary: The marketing site and sign-up, self-hosted; presents both offerings and their list prices.
+    kind: website
+    url: https://meadow.example
+    presents: [P:offering/ledger, P:offering/payroll]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Founder
+    provenance: {mode: net-scan, sources: [meadow-website], confidence: 0.9, state: known}

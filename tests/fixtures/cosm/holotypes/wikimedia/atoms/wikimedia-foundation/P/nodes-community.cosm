@@ -1,0 +1,209 @@
+# P — community and movement: what the Foundation does for the volunteers and the affiliates who write the projects: grants, access to paywalled sources, the yearly
+# conference, community health, hosting for community tools, and public policy and legal defence. All free to the people it serves.
+nodes:
+
+- id: P:suite/community-and-movement
+  type: suite
+  name: Community and movement
+  summary: Funding, tools, events and protection for the volunteers and affiliates who write and govern the projects.
+  owner: O:role/chief-advancement-officer
+  visibility: public
+  confidence: 0.8
+  sources: ["https://wikimediafoundation.org/our-work/", "https://wikimediafoundation.org/role/staff/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions"]
+  parts: [P:offering/grants, P:offering/wikipedia-library, P:service/wikimania, P:service/community-health, P:service/cloud-services, P:service/public-policy]
+  mattering:
+    to-the-whole: "The Foundation hosts but does not write; this suite is how it supports those who do. About a third of its spending goes to volunteer support (annual report 2024-25: 32%)."
+    weight: critical
+    inside:
+      - who: [O:role/chief-advancement-officer]
+        because: "The relationship with the volunteers is the Foundation's licence to operate."
+        confidence: 0.5
+
+- id: P:offering/grants
+  type: offering
+  name: Grants for the movement
+  summary: "Awards and grants to community members, affiliates and nonprofits for editathons, outreach, events and conferences, and the movement's direct funding: $28.7M in awards and grants in 2024-25, of which $18.2M from the Community Resources team."
+  owner: O:role/chief-advancement-officer
+  visibility: public
+  confidence: 0.8
+  sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://wikimediafoundation.org/our-work/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview"]
+  flow:
+    inputs:
+      - {resource: donation, from: M:audience/donors, unit: USD/year}
+    outputs:
+      - {resource: grant, to: M:audience/affiliates, unit: USD/year}
+      - {resource: grant, to: M:audience/contributors, unit: USD/year}
+      - {resource: grant, to: C:counterparty/wikimedia-deutschland, unit: USD/year, rate: 6191630}
+  rules:
+    - must: "O:role/chief-advancement-officer fund the movement through grants within the budget the Board approves"
+      source: wmf-budget-2627
+      confidence: 0.6
+  principles:
+    purpose: "Put money where the volunteers are, in every region, so that knowledge is not written only from a few countries."
+    priorities: ["funding organised in eight regions (Wikimedia regions, since June 2023)", "community-group grants growing faster than the total (9.2% against 7.3% in 2024-25)"]
+  economics:
+    price: none
+    cost: {model: grant, band: "awards and grants $28.7M in 2024-25; community and project grants $26.3M; about $2.9M for scholarships, Wikimania, hackathons and regional conferences planned for 2026-27"}
+  affect:
+    audience: M:audience/affiliates
+    elicits:
+      - {feeling: support, intensity: 0.7, when: "an event or project is funded without the volunteers having to ask a donor"}
+    avoids: ["slow or opaque decisions", "grants that tie volunteers' hands"]
+    probes: [satisfaction, reward]
+    tone: [practical, fair]
+  mattering:
+    to-the-whole: "The main way donations reach the volunteers beyond technology; it also makes the Foundation a funder, with the power that brings."
+    weight: major
+    inside:
+      - who: [O:role/chief-advancement-officer]
+        because: "Deciding who gets money inside a community that does not take orders."
+        stakes: "Trust of the affiliates and the volunteers."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/affiliates, M:audience/contributors]
+        because: "Money for events, outreach and projects from the organization that hosts the sites."
+        stakes: "Volunteer projects that stop for want of a small grant."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/contributors]
+        because: "Volunteers in regions with few affiliates and little funding."
+        barrier: "Applying, language, and the distance from the Foundation."
+        confidence: 0.5
+
+- id: P:offering/wikipedia-library
+  type: offering
+  name: The Wikipedia Library
+  summary: Free access for active editors to paywalled reliable sources from partner publishers; open to accounts at least six months old with 500 edits and 10 in the last month.
+  owner: O:role/chief-advancement-officer
+  visibility: public
+  confidence: 0.75
+  sources: ["https://wikipedialibrary.wmflabs.org/about/", "https://wikimediafoundation.org/our-work/"]
+  flow:
+    inputs:
+      - {resource: access, from: M:audience/partners-and-institutions, unit: collections}
+    outputs:
+      - {resource: access, to: M:audience/contributors, unit: accounts}
+  rules:
+    - must: "O:role/chief-advancement-officer keep access limited to editors who meet the published criteria"
+      source: wmf-library
+      confidence: 0.7
+  principles:
+    purpose: "Let volunteers cite good sources even when the sources are paywalled."
+    priorities: ["reliable sources for editors over wide public access"]
+  economics:
+    price: none
+    cost: {model: internal, band: {pending: "cost of the Library and its publisher agreements"}}
+  affect:
+    audience: M:audience/contributors
+    elicits:
+      - {feeling: capability, intensity: 0.7, when: "the paywalled source an article needs is one click away"}
+    avoids: ["access that depends on who you know", "publisher terms that restrict editing"]
+    probes: [satisfaction]
+    tone: [practical]
+  mattering:
+    to-the-whole: "Better sources in the articles make the whole encyclopedia more reliable, which is what readers and reusers pay for in trust."
+    weight: supporting
+    inside:
+      - who: [O:role/chief-advancement-officer]
+        because: "Publisher partnerships run by staff, with volunteer coordinators who sign nondisclosure agreements."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/contributors]
+        because: "Access to research they could not otherwise afford."
+        stakes: "Articles resting on whatever is free."
+        confidence: 0.5
+    prospective:
+      - who: [M:audience/partners-and-institutions]
+        because: "Publishers that have not joined."
+        barrier: "Terms and what they fear from open reuse."
+        confidence: 0.5
+
+- id: P:service/wikimania
+  type: service
+  name: Wikimania and movement events
+  summary: The yearly Wikimania conference (the name is reserved for it) and scholarships to attend, alongside regional conferences and hackathons.
+  owner: O:role/chief-advancement-officer
+  visibility: public
+  confidence: 0.6
+  sources: ["https://foundation.wikimedia.org/wiki/Policy:Trademark_policy", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview"]
+  flow:
+    outputs:
+      - {resource: event, to: M:audience/affiliates, unit: events/year}
+  economics:
+    price: none
+    cost: {model: grant, band: "about $2.9M for scholarships, Wikimania, hackathons and regional conferences planned for 2026-27"}
+  mattering:
+    to-the-whole: "The yearly place where volunteers, affiliates and staff meet in person."
+    weight: supporting
+    inside:
+      - who: [O:role/chief-advancement-officer]
+        because: "An event run for a community that is mostly online."
+        confidence: 0.5
+
+- id: P:service/community-health
+  type: service
+  name: Community health and conduct
+  summary: Work toward a healthy, inclusive editing community, including the Universal Code of Conduct, which sets a minimum standard on every project and at Foundation-run events.
+  owner: O:role/chief-advancement-officer
+  visibility: public
+  confidence: 0.55
+  sources: ["https://wikimediafoundation.org/our-work/", "https://foundation.wikimedia.org/wiki/Policy:Universal_Code_of_Conduct"]
+  pending: "which department runs the community-health and conduct-enforcement work (the staff page does not say)"
+  rules:
+    - must: "all-roles apply the Universal Code of Conduct as the minimum standard of behaviour"
+      source: wmf-ucoc
+      confidence: 0.8
+  flow:
+    outputs:
+      - {resource: safe-space, to: M:audience/contributors, unit: communities}
+  mattering:
+    to-the-whole: "Volunteers leave places where they are harassed; the encyclopedia is only as broad as the people who stay to write it."
+    weight: major
+    inside:
+      - who: [O:role/chief-advancement-officer]
+        because: "Sanctions can come from community functionaries, from the Foundation, or both."
+        confidence: 0.5
+
+- id: P:service/cloud-services
+  type: service
+  name: Wikimedia Cloud Services
+  summary: Free hosting and virtual servers for community-built tools and bots (Toolforge and Cloud VPS), and free access to Wikimedia Enterprise for volunteers.
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.8
+  sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", "https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/"]
+  flow:
+    outputs:
+      - {resource: hosting, to: M:audience/developers, unit: tools}
+  substrate:
+    platforms: [S:system/toolforge]
+    depends-on: [S:system/toolforge]
+  economics:
+    price: none
+    cost: {model: internal, band: {pending: "cost of Cloud Services"}}
+  mattering:
+    to-the-whole: "Much of how the projects are patrolled and improved is done by volunteer-built tools; this is where they run."
+    weight: major
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "Running shared servers for strangers' code."
+        confidence: 0.5
+
+- id: P:service/public-policy
+  type: service
+  name: Public policy and legal defence
+  summary: Work to protect Wikipedia, its contributors and everyone's right to knowledge before governments and courts.
+  owner: O:role/general-counsel
+  visibility: public
+  confidence: 0.7
+  sources: ["https://wikimediafoundation.org/our-work/", "https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use"]
+  flow:
+    outputs:
+      - {resource: protection, to: M:audience/contributors, unit: cases}
+  mattering:
+    to-the-whole: "The projects are hosted under US law and read under many others; a host that cannot defend them in court cannot promise they stay up."
+    weight: major
+    inside:
+      - who: [O:role/general-counsel]
+        because: "Defending volunteers' work against takedown demands without editing it."
+        confidence: 0.5

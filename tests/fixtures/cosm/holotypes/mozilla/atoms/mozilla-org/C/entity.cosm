@@ -1,0 +1,103 @@
+# C: Mozilla.org: its legal shell, the executive-team company it owns, the trademarks and three events.
+nodes:
+  - id: C:entity/mozilla-org
+    type: entity
+    name: Mozilla.org
+    summary: 'California non-profit corporation that stewards the Mozilla Project: it sets portfolio and brand strategy, allocates capital, owns the Mozilla operating subsidiaries and the Mozilla trademarks (Mozilla wiki, June 2026), and gives the Foundation an annual operating grant. It stays within the umbrella of the Foundation, which appoints the majority of its board.'
+    anchor: true
+    form: nonprofit
+    roles: [holding, brand]
+    jurisdiction: US-CA
+    registered-office: 149 New Montgomery Street, 4th Floor, San Francisco, CA 94105
+    domains: [mozilla.org]
+    global-id: {ein: 33-3437202, domain: mozilla.org}
+    tax-status: '501(c)(3): listed as such on the Foundation''s 2024 Form 990 Schedule R; the FAQ says IRS status was granted and Mozilla.org fully operational as of June 2026'
+    fiscal-year: calendar
+    since: {pending: 'formation date: the FAQ says created in 2025, the 2024 return already lists it'}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://wiki.mozilla.org/Mozilla_org', 'https://blog.mozilla.org/en/mozilla/news/announcing-mozilla-org-new-non-profit/', 'https://www.mofo.com/resources/news/260706-mofo-advises-mozilla'], confidence: 0.8, state: known}
+
+  - id: C:entity/mozilla-management-company
+    type: entity
+    name: Mozilla Management Company
+    summary: Public benefit corporation wholly owned by Mozilla.org; houses the Mozilla-wide executive team and supports organizations across the family. A legal shell inside this atom.
+    form: corporation
+    roles: [shell, company]
+    jurisdiction: {pending: state of incorporation}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.8, state: known}
+
+  - id: C:charter/articles-and-bylaws
+    type: charter
+    name: Articles of Incorporation and Bylaws of Mozilla.org
+    summary: Listed under Mozilla.org public records on the Foundation's public records page; the text is not summarised here.
+    kind: articles
+    entity: C:entity/mozilla-org
+    url: https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.8, state: known}
+
+  - id: C:filing/irs-determination-2026
+    type: filing
+    name: IRS determination letter for Mozilla.org
+    summary: Listed on the Foundation's public records page. The FAQ says 501(c)(3) status had been granted by June 2026.
+    kind: determination letter
+    entity: C:entity/mozilla-org
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/', 'https://wiki.mozilla.org/Mozilla_org', 'https://www.mofo.com/resources/news/260706-mofo-advises-mozilla'], confidence: 0.8, state: known}
+
+  - id: C:ip/mozilla-trademarks
+    type: ip
+    name: The Mozilla trademarks
+    summary: The Mozilla word mark and brand family, including the marks of the operating companies' products. The June 2026 FAQ says Mozilla.org owns the trademarks; the Mozilla trademark policy page still says they are marks of the Mozilla Foundation.
+    kind: trademark
+    licensed-to: [atom/mozilla-corporation, atom/mzla]
+    pending: 'Which entity owns the marks today: Mozilla.org (the FAQ, 2026-06) or the Foundation (the undated trademark policy page)?'
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/foundation/trademarks/policy/'], confidence: 0.6, state: known}
+
+  - id: C:contract/operating-grant-to-foundation
+    type: contract
+    name: Annual operating grant to the Foundation
+    summary: Mozilla.org provides the Foundation an annual operating grant and allocates capital to other Mozilla activities.
+    between: [atom/mozilla-org, atom/mozilla-foundation]
+    terms: {pending: amount of the grant; none published}
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.8, state: known}
+
+  - id: C:event/mozilla-org-created
+    type: event
+    name: Mozilla.org created, first portfolio strategy launched
+    summary: In 2025 Mozilla announced a new leadership model at board and executive levels; Mozilla.org was created, with a small team incubated in the Foundation, and the first Mozilla-wide portfolio strategy (2026 to 2028) was launched.
+    kind: formation
+    period: '2025'
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.8, state: known}
+
+  - id: C:event/mozilla-org-501c3
+    type: event
+    name: Mozilla.org recognised as a 501(c)(3), fully operational
+    summary: In June 2026 Mozilla.org was granted 501(c)(3) status and became fully operational; the team incubated at the Foundation moved to it, and the announcement is dated 2026-06-23.
+    kind: recognition
+    at: 2026-06-23
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://blog.mozilla.org/en/mozilla/news/announcing-mozilla-org-new-non-profit/', 'https://www.mofo.com/resources/news/260706-mofo-advises-mozilla'], confidence: 0.9, state: known}
+
+  - id: C:event/ownership-transfer-2026
+    type: event
+    name: Mozilla.org takes ownership of the companies and the trademarks
+    summary: In 2026 Mozilla.org took on the stewardship of the Mozilla Project and ownership of the companies and trademarks held by the Foundation.
+    kind: transfer
+    period: '2026'
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.7, state: known}

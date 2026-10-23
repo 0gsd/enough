@@ -1,0 +1,58 @@
+cosm: 0.3
+
+# Meadow Software — the spec's running example, as the P module of atom/meadow. Unchanged from the
+# skill's examples/meadow except that ids are namespaced (P: for this tree, O:role/ for owners,
+# M:audience/ and S:vendor/ for what were externals). The roles, externals and contract blocks moved
+# to O, M/S and C; see core/README.md.
+
+brand:
+  id: P:meadow
+  name: Meadow Software
+  kind: company
+  summary: Bookkeeping for small restaurants; daily reconciled books and payroll with tip-out explained line by line.
+  since: 2019-03-01
+  legal-anchor: "Meadow Software Inc., Portland OR; Delaware law"
+  owner: O:role/Founder
+  confidence: 0.9
+  sources: [session-1, session-2]
+  parts: [P:suite/books, P:offering/payroll]
+  rules:
+    - must-not: "all-roles store card numbers at rest"
+      source: PCI-DSS
+      scope: descendants
+    - must: "O:role/Support-Lead answer every ticket within 1 business day"
+      else: "ticket escalates to O:role/Founder"
+      source: local
+      scope: descendants
+  principles:
+    purpose: "Give small restaurants a true picture of their money every morning."
+    priorities: ["accuracy over speed", "clarity over features", "customer data stays theirs"]
+    value:
+      - {to: M:audience/restaurants, proposition: "books you can trust by 7am without hiring a bookkeeper"}
+      - {to: M:audience/accountants, proposition: "clean, categorised, reconciled exports at year end"}
+    quality:
+      - {goal: "every day closes", measure: "share of customer-days closed by 07:00 local"}
+    decides: ["pricing", "which banks to support next"]
+  vocabulary:
+    terms:
+      - {term: close, means: "Locking a period so no entry can change."}
+      - {term: tip-out, means: "Redistribution of pooled tips to staff by the house rule."}
+      - {term: morning summary, means: "The one-page daily statement a customer opens at 7am."}
+    assumes: ["customers bank with an institution that offers a feed or a CSV export"]
+    boundary: ["Meadow does not file taxes and does not advise on them"]
+  mattering:
+    inside:
+      - who: [O:role/Founder, O:role/Support-Lead, O:role/Payroll-Owner]
+        because: "The team came from restaurants and bookkeeping; the product is the job they wish they'd had tools for."
+        stakes: "Livelihood, and the pride of being the one piece of software a restaurant owner says they trust."
+    chosen:
+      - who: [M:audience/restaurants]
+        because: "An owner who knows the true cash position every morning sleeps, orders, and staffs differently."
+        stakes: "Back to spreadsheets at midnight and a bookkeeper they can't afford."
+      - who: [M:audience/accountants]
+        because: "A clean ledger at year end is a week of their life returned."
+        stakes: "Reconstructing a year from receipts."
+    prospective:
+      - who: [M:audience/restaurants]
+        because: "Every independent restaurant has this problem; most have never seen it solved for their size."
+        barrier: "Switching books mid-year feels dangerous; the first import has to be flawless."

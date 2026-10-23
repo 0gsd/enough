@@ -1,0 +1,154 @@
+# C: public figures by fiscal year. Foundation-only figures come from the Form 990 (the 2024 return itself; 2020 to 2023 from the filings ProPublica indexes); consolidated figures from the audited statements.
+nodes:
+  - id: C:finance/fy2024-form-990
+    type: finance
+    name: Foundation alone, 2024 (Form 990)
+    summary: 'The Foundation without its subsidiaries: revenue $37.2 million against expenses of $41.2 million; $23.0 million of program service revenue is trademark licence fees paid by the operating companies, $6.5 million is contributions and grants.'
+    by: atom/mozilla-foundation
+    period: '2024'
+    currency: USD
+    basis: IRS Form 990, Foundation only, accrual
+    figures:
+      revenue: 37165545
+      expenses: 41199350
+      net-assets: 117547596
+      total-assets: 123347649
+      total-liabilities: 5800053
+      contributions-and-grants: 6513893
+      program-service-revenue: 23896509
+      trademark-licence-fees: 23037218
+      investment-income: 6848710
+      grants-paid: 2336028
+      salaries-and-benefits: 18423412
+      fundraising-expenses: 3052246
+    employees: 73
+    volunteers-estimate: 10000
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}
+
+  - id: C:finance/fy2023-form-990
+    type: finance
+    name: Foundation alone, 2023 (Form 990)
+    summary: The Foundation without its subsidiaries, as filed for 2023.
+    by: atom/mozilla-foundation
+    period: '2023'
+    currency: USD
+    basis: IRS Form 990, Foundation only, accrual
+    figures:
+      revenue: 64660933
+      expenses: 39845284
+      net-assets: 117957756
+      total-assets: 124157331
+      total-liabilities: 6199575
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://projects.propublica.org/nonprofits/organizations/200097189', 'https://projects.propublica.org/nonprofits/api/v2/organizations/200097189.json'], confidence: 0.9, state: known}
+
+  - id: C:finance/fy2022-form-990
+    type: finance
+    name: Foundation alone, 2022 (Form 990)
+    summary: The Foundation without its subsidiaries, as filed for 2022.
+    by: atom/mozilla-foundation
+    period: '2022'
+    currency: USD
+    basis: IRS Form 990, Foundation only, accrual
+    figures:
+      revenue: 49747841
+      expenses: 30290560
+      net-assets: 89364442
+      total-assets: 95584687
+      total-liabilities: 6220245
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://projects.propublica.org/nonprofits/organizations/200097189', 'https://projects.propublica.org/nonprofits/api/v2/organizations/200097189.json'], confidence: 0.9, state: known}
+
+  - id: C:finance/fy2021-form-990
+    type: finance
+    name: Foundation alone, 2021 (Form 990)
+    summary: The Foundation without its subsidiaries, as filed for 2021.
+    by: atom/mozilla-foundation
+    period: '2021'
+    currency: USD
+    basis: IRS Form 990, Foundation only, accrual
+    figures:
+      revenue: 30686124
+      expenses: 23340264
+      net-assets: 74463329
+      total-assets: 76964143
+      total-liabilities: 2500814
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://projects.propublica.org/nonprofits/organizations/200097189', 'https://projects.propublica.org/nonprofits/api/v2/organizations/200097189.json'], confidence: 0.9, state: known}
+
+  - id: C:finance/fy2020-form-990
+    type: finance
+    name: Foundation alone, 2020 (Form 990)
+    summary: The Foundation without its subsidiaries, as filed for 2020.
+    by: atom/mozilla-foundation
+    period: '2020'
+    currency: USD
+    basis: IRS Form 990, Foundation only, accrual
+    figures:
+      revenue: 26523745
+      expenses: 18160777
+      net-assets: 64452680
+      total-assets: 66895760
+      total-liabilities: 2443080
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://projects.propublica.org/nonprofits/organizations/200097189', 'https://projects.propublica.org/nonprofits/api/v2/organizations/200097189.json'], confidence: 0.9, state: known}
+
+  - id: C:finance/fy2024-consolidated
+    type: finance
+    name: The Mozilla group, consolidated, 2024
+    summary: 'Mozilla Foundation and Subsidiaries (audited, US GAAP): royalties of $498.2 million are 73% of $680.4 million revenue and support; the source statements are in thousands of dollars, so figures here are rounded to the thousand.'
+    by: atom/mozilla-foundation
+    period: '2024'
+    currency: USD
+    basis: consolidated US GAAP, accrual (statements in thousands of USD)
+    figures:
+      consolidated-revenue-and-support: 680409000
+      royalties: 498218000
+      subscription-and-advertising-revenue: 66396000
+      consolidated-contributions: 15782000
+      interest-and-dividend-income: 95397000
+      consolidated-expenses: 588215000
+      income-tax-expense: 20127000
+      change-in-net-assets: 69553000
+      consolidated-net-assets: 1405539000
+      consolidated-total-assets: 1585100000
+      consolidated-total-liabilities: 179561000
+      cash-and-equivalents: 241840000
+      investments: 1089377000
+    scope: Foundation and subsidiaries, intercompany eliminated
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf'], confidence: 0.9, state: known}
+
+  - id: C:finance/fy2023-consolidated
+    type: finance
+    name: The Mozilla group, consolidated, 2023
+    summary: Mozilla Foundation and Subsidiaries (audited, US GAAP) for 2023 as reclassified for comparison in the 2024 statements; figures rounded to the thousand.
+    by: atom/mozilla-foundation
+    period: '2023'
+    currency: USD
+    basis: consolidated US GAAP, accrual (statements in thousands of USD)
+    figures:
+      consolidated-revenue-and-support: 653012000
+      royalties: 494874000
+      subscription-and-advertising-revenue: 64775000
+      consolidated-contributions: 12888000
+      interest-and-dividend-income: 47322000
+      consolidated-expenses: 496723000
+      income-tax-expense: 14362000
+      change-in-net-assets: 138139000
+      consolidated-net-assets: 1335986000
+      consolidated-total-assets: 1475508000
+      consolidated-total-liabilities: 139522000
+      cash-and-equivalents: 263323000
+      investments: 1006854000
+    scope: Foundation and subsidiaries, intercompany eliminated
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf'], confidence: 0.9, state: known}

@@ -1,0 +1,98 @@
+# C — the Endowment's shell and governing papers. A standalone 501(c)(3) since 2023-09-30 with its own Board and no employees; the Foundation does not control it and
+# its management is Foundation staff (C:contract/cost-sharing, held in the Foundation's atom). The fund is a C:asset; its policies are the public ones.
+nodes:
+  - id: C:entity/wikimedia-endowment
+    type: entity
+    name: Wikimedia Endowment
+    summary: A permanent fund for the Wikimedia projects; a 501(c)(3) charity in San Francisco, not a private foundation, standalone since 2023-09-30 and launched in 2016 as a fund at the Tides Foundation.
+    anchor: true
+    form: nonprofit
+    roles: [company, fund]
+    jurisdiction: US-CA
+    headquarters: "San Francisco, CA, USA"
+    global-id: {ein: "87-3024488", domain: wikimediaendowment.org}
+    domains: [wikimediaendowment.org]
+    fiscal-year: "1 July to 30 June"
+    auditor: BDO USA
+    since: 2023-09-30
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://foundation.wikimedia.org/wiki/Endowment:Bylaws", "https://projects.propublica.org/nonprofits/organizations/873024488"], confidence: 0.85, state: known}
+    pending: "the exact corporate form and state of incorporation: the bylaws are governed by California nonprofit public benefit corporation law, but the Articles of Incorporation were not among the public pages read"
+
+  - id: C:certification/irs-determination
+    type: certification
+    name: IRS determination letter, 2022-06-28
+    summary: The IRS recognised the Endowment as exempt under section 501(c)(3) in June 2022, in preparation for it to become a standalone entity, and found it is not a private foundation.
+    issuer: C:counterparty/irs
+    kind: tax-exemption
+    since: 2022-06-28
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Main", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}
+
+  - id: C:charter/bylaws
+    type: charter
+    name: Bylaws of the Wikimedia Endowment
+    summary: No voting members; 7 to 15 directors, one Community Founder seat, reserved Community Director seats for former Foundation directors who can represent the community, and At-Large seats for fundraising and financial expertise; a President, Secretary and Treasurer. California nonprofit public benefit corporation law governs.
+    kind: bylaws
+    entity: C:entity/wikimedia-endowment
+    seats: {total: "7 to 15 directors", community-founder-seat: 1, community-directors: "1 to 3 by board size", at-large: "the remainder"}
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Bylaws"], confidence: 0.85, state: known}
+
+  - id: C:governance/director-election
+    type: governance
+    name: How directors are chosen
+    summary: Sitting directors elect their successors, with at least two-thirds of those in office approving; terms are three years and most directors may serve three. The Board Governance Committee nominates and consults the Foundation's Board of Trustees. No one employed or paid by the Foundation can be a director, and no more than 15% may be interested persons.
+    elected-by: [O:role/board-of-directors]
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Bylaws"], confidence: 0.85, state: known}
+
+  - id: C:policy/investment
+    type: policy
+    name: Investment policy
+    summary: Invested mainly in index funds across public equities and fixed income, with cash, aiming for an average annual return of 6.0% (the audit calls it a real return net of fees, the annual plan a nominal return); the plan also lists alternative investments. Donated stock is sold at once.
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", "https://foundation.wikimedia.org/wiki/Endowment:Main"], confidence: 0.8, state: known}
+    pending: "whether the 6.0% target is real or nominal (the 2024-25 audit says real, net of fees; the FY2026-27 plan says nominal)"
+
+  - id: C:policy/spending
+    type: policy
+    name: Spending policy
+    summary: Appropriates a target of 4.0% of the three-year rolling average of the portfolio's market value each year; the Finance Committee may move the rate between 2.5% and 4.0%. The Board appropriates the year's budget in July.
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.9, state: known}
+
+  - id: C:policy/gifts
+    type: policy
+    name: Gift policy
+    summary: A published Gift Policy sets which gifts the Endowment accepts. Gifts are restricted to the endowment in perpetuity, and its principal is preserved under California's prudent-management law.
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Main", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.6, state: known}
+    pending: "what the Gift Policy accepts and refuses (its text was not read)"
+
+  - id: C:asset/endowment-fund
+    type: asset
+    name: The endowment fund
+    summary: "$169.7M of investments at 30 June 2025: $141.1M perpetually restricted principal, $27.6M of unappropriated earnings and $1.0M without donor restriction, in index funds and cash."
+    kind: securities
+    tenure: held
+    restriction: "gifts are restricted to the endowment in perpetuity; earnings are appropriated yearly"
+    value: {amount: 169700423, as-of: 2025-06-30, unit: USD}
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}

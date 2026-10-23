@@ -1,0 +1,10 @@
+oes: eml/1
+id: eml/bad-id-grammar
+name: bad id-grammar
+# id-grammar: an id that is not <module>:<kind>/<slug>
+nodes:
+  - id: concept-x
+    type: concept
+    name: x
+    summary: A concept with no module in its id.
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

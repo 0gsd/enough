@@ -1,0 +1,31 @@
+# C: the board and its two standing committees, as the Form 990 describes them.
+nodes:
+  - id: C:governance/board
+    type: governance
+    name: Board of Directors
+    summary: Ten voting directors, eight of them independent (Form 990, 2024). The board sets the chief officer's pay from performance and peer-organization data, with interested parties absent from the final discussion. Names are not recorded here.
+    voting-members: 10
+    independent-members: 8
+    committees: ['C:governance/audit-committee', 'C:governance/investment-committee']
+    elected-by: {pending: 'who elects the Foundation''s directors? The bylaws are published but not summarised here.'}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}
+
+  - id: C:governance/audit-committee
+    type: governance
+    name: Audit Committee
+    summary: A board committee; with the investment committee it meets in executive session from time to time and reports back to the full board, where minutes are kept.
+    reports-to: C:governance/board
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}
+
+  - id: C:governance/investment-committee
+    type: governance
+    name: Investment Committee
+    summary: A board committee; meets in executive session from time to time and reports back to the full board. The Foundation's investment income was $6.8 million in 2024.
+    reports-to: C:governance/board
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}

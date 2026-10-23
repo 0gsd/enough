@@ -1,0 +1,13 @@
+# M: the one named account.
+nodes:
+  - id: M:account/google-search
+    type: account
+    name: Google, search partner
+    summary: The named revenue-side counterparty behind the royalties. Its share of the $498.2 million of royalties is not disclosed.
+    counterparty: C:counterparty/google
+    contract: C:contract/search-partnerships
+    channel: M:channel/search-placement
+    revenue-band: {pending: Google's share of royalties; not disclosed}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://blog.mozilla.org/en/mozilla/internet-policy/defending-an-open-web/'], confidence: 0.7, state: known}

@@ -11,10 +11,10 @@ v0.0.3+ layout:
     - **copies** — for files that diverge per project from the start
       (AGENT.md, MOTIVATION.md, knowledge/project-profile.md).
 The old per-project `infoworld` symlink (into `~/enough/infoworld/`) is
-gone: that shared library is dissolved into the global **cacheawl** store
-(`~/enough/cacheawl/{personal,public,wiki}` cacheboxes). `ensure_skeleton`
+gone: that shared library is dissolved into the global **Canon** store
+(`~/enough/canon/{personal,public,wiki}` volumes). `ensure_skeleton`
 prunes the dead link from existing projects; the one-time folder move runs
-at server startup via `cacheawl.migrate_infoworld`.
+at server startup via `canon.migrate_infoworld`.
 
 If `~/enough/` doesn't exist (dev setup, or enough run before running
 bootstrap.sh), the installer defaults directory is located relative to
@@ -356,7 +356,7 @@ def _populate_skill_symlinks(project_dir: Path, defaults_root: Path) -> None:
 # symlinked into every project exactly the same way; the only difference is
 # who may write to them.
 
-#: Test/dev hook, mirroring ENOUGH_CACHEAWL_ROOT / ENOUGH_UI_CONFIG, so a
+#: Test/dev hook, mirroring ENOUGH_CANON_ROOT / ENOUGH_UI_CONFIG, so a
 #: suite (or a scratch server) never installs into the developer's real
 #: `~/enough/readvisors/`.
 _READVISORS_ROOT_ENV = "ENOUGH_READVISORS_ROOT"
@@ -777,7 +777,7 @@ def _heal_skeleton_symlinks(project_dir: Path, defaults: Path) -> list[str]:
     here.
 
     (The old top-level `infoworld` link is no longer created or healed —
-    infoworld is dissolved into cacheawl. `_prune_infoworld_link` removes
+    infoworld is dissolved into Canon. `_prune_infoworld_link` removes
     the dead link from existing projects.)
 
     Only *broken* symlinks (dangling or blanked) are touched; working links
@@ -808,8 +808,8 @@ def _heal_skeleton_symlinks(project_dir: Path, defaults: Path) -> list[str]:
 
 def _prune_infoworld_link(project_dir: Path) -> bool:
     """Remove the per-project `infoworld` symlink left over from before the
-    dissolve. infoworld is now the cacheawl `personal`/`public`/`wiki`
-    cacheboxes — a global store with no per-project symlink. Only a symlink
+    dissolve. infoworld is now the Canon `personal`/`public`/`wiki`
+    volumes — a global store with no per-project symlink. Only a symlink
     is removed (that's the artifact this package created); a real
     `infoworld/` directory the user made themselves is left untouched.
     Returns True iff a link was pruned."""
@@ -874,9 +874,9 @@ def ensure_skeleton(project_dir: Path) -> bool:
         seed_multipurpose_file(project_dir / "rness")
 
     # ALWAYS run (idempotent): remove the dead per-project `infoworld`
-    # symlink. infoworld is dissolved into the global cacheawl store
-    # (personal/public/wiki cacheboxes); the actual folder move happens
-    # once at server startup (cacheawl.migrate_infoworld).
+    # symlink. infoworld is dissolved into the global Canon store
+    # (personal/public/wiki volumes); the actual folder move happens
+    # once at server startup (canon.migrate_infoworld).
     _prune_infoworld_link(project_dir)
 
     # ALWAYS run (idempotent): sync global skills/readvisors/paradigms into the

@@ -1,0 +1,85 @@
+cosm: 0.3
+
+# The Wikimedia Foundation as the P module of atom/wikimedia-foundation: the brand at the top, the projects it hosts and the programs and products around
+# them as suites and offerings, the platform and the fundraising and stewardship functions that keep them running. Built from public sources only (see doc.cosm).
+# Affect and mattering are the modeller's reading of the Foundation's public statements, not the Foundation's own words; they carry a confidence of 0.5.
+
+brand:
+  id: P:wikimedia-foundation
+  name: Wikimedia Foundation
+  kind: nonprofit
+  summary: A charity that hosts Wikipedia and the other Wikimedia projects and supports the volunteers who write the content; free to read and reuse, no advertising, funded mostly by small donations.
+  since: 2003-06-20
+  legal-anchor: "Wikimedia Foundation, Inc., a Florida nonprofit corporation based in San Francisco; 501(c)(3) public charity; EIN 20-0049703"
+  owner: O:role/chief-executive-officer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://wikimediafoundation.org/about/", "https://foundation.wikimedia.org/wiki/Bylaws", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/"]
+  parts: [P:suite/projects, P:suite/reach-and-reuse, P:suite/community-and-movement, P:function/platform, P:function/fundraising, P:function/stewardship]
+  rules:
+    - must-not: "all-roles make content decisions on the projects"
+      source: wmf-about
+      scope: descendants
+    - must-not: "all-roles run advertising on the projects"
+      source: wmf-give
+      scope: descendants
+    - must-not: "all-roles sell or rent the personal information of readers, editors or donors"
+      source: wmf-privacy
+      scope: descendants
+    - must: "all-roles follow the Universal Code of Conduct in Foundation activities"
+      source: wmf-ucoc
+      scope: descendants
+    - must: "O:role/board-of-trustees keep a reserve of at least 12 months of operating expenses"
+      else: "the Board sets a plan to restore it"
+      source: wmf-audit-faq-25
+      confidence: 0.7
+    - counts-as: "a Wikimedia project is a wiki hosted by the Foundation and run by volunteers; the Foundation is the host and not the publisher"
+      source: wmf-terms
+  principles:
+    purpose: "Empower people around the world to collect and develop educational content under a free licence and share it effectively and globally."
+    priorities:
+      - "free to read and to reuse over revenue"
+      - "volunteers decide the content, the Foundation hosts it"
+      - "reader privacy over data"
+      - "many small donors over a few large funders"
+    pending: "are these the Foundation's own ranked priorities? read from its policies, the bylaws and the 30% cap on Enterprise income"
+    value:
+      - {to: M:audience/readers, proposition: "free, ad-free, openly licensed knowledge in more than 300 languages"}
+      - {to: M:audience/contributors, proposition: "a platform, tools, funding and protection for the volunteers who write and govern the content"}
+      - {to: M:audience/donors, proposition: "a charity that keeps the projects running and spends about three-quarters of its money on programs"}
+      - {to: M:audience/commercial-reusers, proposition: "reliable, high-volume access to Wikimedia content, on paid terms"}
+    quality:
+      - {goal: "programs get most of the money", measure: "share of expenses spent on programs (77.4% in 2024-25, goal 76.9%)"}
+      - {goal: "a clean audit", measure: "the independent auditor's opinion each year (twenty in a row by 2024-25)"}
+      - {goal: "a reserve that outlasts a bad year", measure: "months of operating expenses held in net assets (17.1 at 30 June 2025; policy 12 to 18)"}
+    decides: ["the annual plan and budget", "which projects to host", "how the Foundation spends its money on technology, volunteer support and fundraising"]
+  vocabulary:
+    terms:
+      - {term: project, means: "A wiki hosted by the Foundation and run by volunteers, such as Wikipedia, Wikimedia Commons or Wikidata."}
+      - {term: movement, means: "The volunteers, the affiliates and the Foundation working together on the projects."}
+      - {term: affiliate, means: "An independent chapter, thematic organization or user group recognised by the Board of Trustees."}
+      - {term: free licence, means: "A licence, such as CC BY-SA, that lets anyone reuse and adapt content, with credit."}
+    assumes:
+      - "volunteers keep writing, editing and governing the content"
+      - "readers keep arriving, mostly through search engines today, and a small share keeps giving"
+      - "the projects stay a trusted source for the services that reuse them"
+    boundary:
+      - "the Foundation does not write or edit the content and has no editorial role"
+      - "it runs no advertising and takes no government grants"
+      - "it is not the publisher of what volunteers write: it is a hosting service provider"
+  mattering:
+    inside:
+      - who: [O:role/chief-executive-officer, O:role/chief-product-and-technology-officer, O:role/chief-advancement-officer]
+        because: "The work is to keep one of the most visited sites in the world running, free and trusted, without ever owning what is written on it."
+        stakes: "A site that billions rely on and that volunteers could not host themselves."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/readers, M:audience/contributors, M:audience/donors]
+        because: "Readers get an ad-free reference; volunteers get a place where their work stays free; donors keep both going with small gifts."
+        stakes: "A reference that turns to advertising or to a paywall, or that volunteers can no longer afford to host."
+        confidence: 0.5
+    prospective:
+      - who: [M:audience/readers, M:audience/commercial-reusers]
+        because: "Many younger readers look for answers in AI assistants and social video, and big reusers take the content without sending people back or paying."
+        barrier: "Human page views fell about 8% in recent months of 2025 against 2024; reusers are asked to come through Wikimedia Enterprise."
+        confidence: 0.6

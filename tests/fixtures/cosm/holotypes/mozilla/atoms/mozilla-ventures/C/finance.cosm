@@ -1,0 +1,62 @@
+# C: public figures from the Foundation's Schedule R. Fund measures are named apart from the management company's.
+nodes:
+  - id: C:finance/fy2024-management
+    type: finance
+    name: Management company, 2024
+    summary: Total income $1,228,368 and end-of-year assets $417,093 (Schedule R).
+    by: atom/mozilla-ventures
+    period: '2024'
+    currency: USD
+    basis: IRS Form 990 Schedule R of the Foundation
+    figures:
+      total-income: 1228368
+      end-of-year-assets: 417093
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}
+
+  - id: C:finance/fy2023-management
+    type: finance
+    name: Management company, 2023
+    summary: Total income $163,255 and end-of-year assets $291,655 (Schedule R).
+    by: atom/mozilla-ventures
+    period: '2023'
+    currency: USD
+    basis: IRS Form 990 Schedule R of the Foundation
+    figures:
+      total-income: 163255
+      end-of-year-assets: 291655
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf'], confidence: 0.9, state: known}
+
+  - id: C:finance/fy2024-fund
+    type: finance
+    name: Fund I, 2024
+    summary: Total income $1,041,586 and end-of-year assets $32,328,929 (Schedule R). The State of Mozilla 2024 says the fund had, to date, invested in 45 companies and deployed $12.7 million.
+    by: atom/mozilla-ventures
+    period: '2024'
+    currency: USD
+    basis: IRS Form 990 Schedule R of the Foundation
+    figures:
+      fund-total-income: 1041586
+      fund-end-of-year-assets: 32328929
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/'], confidence: 0.9, state: known}
+
+  - id: C:finance/fy2023-fund
+    type: finance
+    name: Fund I, 2023
+    summary: Total income $61,530 and end-of-year assets $32,900,652 (Schedule R); the Foundation contributed $24,963,716 in cash in 2023.
+    by: atom/mozilla-ventures
+    period: '2023'
+    currency: USD
+    basis: IRS Form 990 Schedule R of the Foundation
+    figures:
+      fund-total-income: 61530
+      fund-end-of-year-assets: 32900652
+      capital-contributed-by-foundation: 24963716
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf'], confidence: 0.9, state: known}

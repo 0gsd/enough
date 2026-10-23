@@ -1,0 +1,10 @@
+oes: eml/1
+id: bad-catalog-key
+name: bad catalog-key
+# catalog-key: a catalog id that is not eml/<slug>
+nodes:
+  - id: K:concept/x
+    type: concept
+    name: x
+    summary: A concept in a catalog with a malformed id.
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

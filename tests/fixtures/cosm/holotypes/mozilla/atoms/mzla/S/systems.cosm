@@ -1,0 +1,48 @@
+# S: the three open repositories and the service infrastructure that is not yet public.
+nodes:
+  - id: S:codebase/thunderbird-desktop
+    type: codebase
+    name: Thunderbird desktop
+    summary: The official desktop repository under github.com/thunderbird (JavaScript); Mozilla Public License 2.0 per the about page.
+    runs: ['P:offering/thunderbird-desktop']
+    url: https://github.com/thunderbird/thunderbird-desktop
+    status: active
+    visibility: public
+    owner: O:role/Desktop-engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/thunderbird', 'https://www.thunderbird.net/en-US/about/'], confidence: 0.8, state: known}
+
+  - id: S:codebase/thunderbird-android
+    type: codebase
+    name: Thunderbird for Android
+    summary: The open-source Android app, formerly K-9 Mail (Kotlin; about 14,100 stars).
+    runs: ['P:offering/thunderbird-android']
+    url: https://github.com/thunderbird/thunderbird-android
+    status: active
+    visibility: public
+    owner: O:role/Mobile-engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/thunderbird'], confidence: 0.8, state: known}
+
+  - id: S:codebase/thunderbird-ios
+    type: codebase
+    name: Thunderbird for iOS
+    summary: The open-source iOS app repository (Swift; about 1,200 stars), published before release.
+    runs: ['P:offering/thunderbird-ios']
+    url: https://github.com/thunderbird/thunderbird-ios
+    status: active
+    visibility: public
+    owner: O:role/Mobile-engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/thunderbird', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.8, state: known}
+
+  - id: S:system/thundermail-infrastructure
+    type: system
+    name: Thundermail infrastructure
+    summary: The servers and services behind Thundermail, Appointment and Send; the April 2026 update says infrastructure choices for Send are still being evaluated and none is named.
+    category: hosting
+    vendor: none
+    counterparty: none
+    used-by: ['P:service/thundermail', 'P:service/send']
+    product: {pending: hosting and mail-stack vendors; not published}
+    status: active
+    visibility: public
+    owner: O:role/Web-services-engineering
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2026/04/thunderbird-pro-april-2026-update/'], confidence: 0.6, state: known}

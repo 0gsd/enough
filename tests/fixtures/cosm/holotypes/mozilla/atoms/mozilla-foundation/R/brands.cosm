@@ -1,0 +1,11 @@
+# R: the brand.
+nodes:
+  - id: R:brand/mozilla-foundation
+    type: brand
+    name: Mozilla Foundation
+    summary: The Foundation's own name and its programs' names (Mozilla Festival, Mozilla Fellows, Common Voice, Nothing Personal). The Mozilla marks themselves are owned by Mozilla.org according to the FAQ of June 2026, and by the Foundation according to the trademark policy page.
+    scope: ['P:mozilla-foundation']
+    status: active
+    visibility: public
+    owner: O:role/Director-Communications
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/', 'https://www.mozilla.org/en-US/foundation/trademarks/policy/', 'https://wiki.mozilla.org/Mozilla_org'], confidence: 0.7, state: known}

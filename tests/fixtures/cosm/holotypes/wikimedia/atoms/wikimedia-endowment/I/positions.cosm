@@ -1,0 +1,46 @@
+# I — what the Endowment publishes about "inventory": its holdings by asset class at 30 June 2025 (audited fair values). It holds no goods, no SKUs and no listings; the
+# fund is invested in index funds (Level 1 fair-value inputs). The manager and custodian are not named on the pages read.
+nodes:
+  - id: I:position/cash
+    type: position
+    name: Cash and cash equivalents
+    summary: Cash held as part of the endowment investments, $19.5M at 30 June 2025.
+    asset-class: cash
+    fair-value: {amount: 19504147, as-of: 2025-06-30, unit: USD}
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}
+
+  - id: I:position/us-equity-funds
+    type: position
+    name: U.S. equity funds
+    summary: Large-cap funds $87.7M and mid-cap funds $4.0M at 30 June 2025; large-growth funds, $22.5M a year earlier, are no longer held.
+    asset-class: equity-funds-us
+    fair-value: {amount: 91756948, as-of: 2025-06-30, unit: USD}
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}
+
+  - id: I:position/international-equity-funds
+    type: position
+    name: International equity funds
+    summary: International developed-market funds $22.9M and emerging-market funds $4.6M at 30 June 2025.
+    asset-class: equity-funds-international
+    fair-value: {amount: 27504158, as-of: 2025-06-30, unit: USD}
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}
+
+  - id: I:position/fixed-income-funds
+    type: position
+    name: Fixed-income funds
+    summary: Investment-grade taxable fixed-income funds, $30.9M at 30 June 2025. In all the investments were $169.7M.
+    asset-class: fixed-income-funds
+    fair-value: {amount: 30935170, as-of: 2025-06-30, unit: USD}
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}

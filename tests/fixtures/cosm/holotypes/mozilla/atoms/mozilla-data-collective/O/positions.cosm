@@ -1,0 +1,12 @@
+# O: the one seat; the board, if any, is not published.
+nodes:
+  - id: O:position/founder-and-chief-executive
+    type: position
+    name: Founder and Chief Executive
+    summary: The head of the company; no board is named on the pages read.
+    roles: ['O:role/Founder-and-Chief-Executive']
+    primary: O:role/Founder-and-Chief-Executive
+    reports-to: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.7, state: known}

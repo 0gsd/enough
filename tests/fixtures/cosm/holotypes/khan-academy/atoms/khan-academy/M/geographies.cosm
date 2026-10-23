@@ -1,0 +1,34 @@
+# M — regions: where the nonprofit works, from its site's country selector, the translated-site list and Form 990 Schedule F
+# (offices, headcount and spend by region for the year to June 2025: counts, not people).
+nodes:
+  - id: M:geography/united-states
+    type: geography
+    name: United States
+    summary: "The home market and the whole of the district business; Khanmigo subscriptions for learners and parents are limited to US residents. About 47% of learners are in the United States."
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [f990-2025, khanmigo-home, ka-districts], confidence: 0.8, state: known}
+
+  - id: M:geography/india
+    type: geography
+    name: India
+    summary: "A country site of its own, with content aligned to the national curriculum in English, Hindi and several regional languages. Schedule F counts one office and 19 people in South Asia, with $3.2M spent there in the year to June 2025. A related organization in India is controlled by the nonprofit."
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [f990-2025, ka-help-languages, ka-home], confidence: 0.8, state: known}
+
+  - id: M:geography/brazil
+    type: geography
+    name: Brazil
+    summary: "A country site in Brazilian Portuguese. Schedule F counts one office and 14 people in South America, with $3.4M spent there in the year to June 2025, including grantmaking. A related organization in Brazil is controlled by the nonprofit."
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [f990-2025, ka-help-languages, ka-home], confidence: 0.8, state: known}
+
+  - id: M:geography/rest-of-world
+    type: geography
+    name: Rest of the world
+    summary: "Learners in more than 190 countries and in 55 or more languages, with translated sites in four tiers (full, demo, preview, lite). Includes a Spanish site with curriculum alignment for Peru and Mexico and a Mexico option in the country selector. International partner entities carry the offer to school systems in places such as the Philippines, Bangladesh, Pakistan and Vietnam."
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-about, ka-help-languages, ka-help-partners, ka-home], confidence: 0.8, state: known}

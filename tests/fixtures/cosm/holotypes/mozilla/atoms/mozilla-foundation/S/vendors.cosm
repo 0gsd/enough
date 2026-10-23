@@ -1,0 +1,23 @@
+# S: vendors behind the stack.
+nodes:
+  - id: S:vendor/heroku
+    type: vendor
+    name: Heroku
+    summary: Hosting platform for the Foundation website's staging and production.
+    counterparty: C:counterparty/heroku
+    contract: none
+    status: active
+    visibility: public
+    owner: O:role/Senior-Director-Technology-Platforms
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla/foundation.mozilla.org'], confidence: 0.8, state: known}
+
+  - id: S:vendor/github
+    type: vendor
+    name: GitHub
+    summary: Code hosting for the Foundation's open repositories.
+    counterparty: C:counterparty/github
+    contract: none
+    status: active
+    visibility: public
+    owner: O:role/Senior-Director-Technology-Platforms
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla/foundation.mozilla.org', 'https://github.com/common-voice/common-voice'], confidence: 0.9, state: known}

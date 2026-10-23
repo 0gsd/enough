@@ -1,0 +1,153 @@
+# C — the Foundation's shell and its governing papers. One anchor entity; the wholly owned LLC that runs Wikimedia Enterprise is a
+# second C:entity (same owner, so a record inside this atom, not an atom). Charter, governance and policies are the public ones.
+nodes:
+  - id: C:entity/wikimedia-foundation
+    type: entity
+    name: Wikimedia Foundation, Inc.
+    summary: The nonprofit that hosts Wikipedia and the other Wikimedia projects; established under Florida law, based in San Francisco, a 501(c)(3) public charity funded mainly by donations.
+    anchor: true
+    form: nonprofit
+    roles: [company, brand]
+    jurisdiction: US-FL
+    headquarters: "1 Sansome Street, San Francisco, CA, USA"
+    global-id: {ein: "20-0049703", domain: wikimediafoundation.org}
+    domains: [wikimediafoundation.org, wikimedia.org, wikipedia.org]
+    fiscal-year: "1 July to 30 June"
+    auditor: KPMG
+    since: 2003-06-20
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://projects.propublica.org/nonprofits/organizations/200049703", "https://foundation.wikimedia.org/wiki/Memory:Timeline", "https://foundation.wikimedia.org/wiki/Bylaws"], confidence: 0.9, state: known}
+
+  - id: C:entity/wikimedia-llc
+    type: entity
+    name: Wikimedia, LLC
+    summary: A Delaware limited liability company with the Foundation as its sole member; a disregarded entity for tax, consolidated in the Foundation's statements. It operates Wikimedia Enterprise.
+    form: llc
+    roles: [company]
+    jurisdiction: US-DE
+    sole-member: C:entity/wikimedia-foundation
+    global-id: {pending: "Delaware file number of Wikimedia, LLC"}
+    since: 2020-07-01
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://foundation.wikimedia.org/wiki/Wikimedia_Enterprise"], confidence: 0.85, state: known}
+
+  - id: C:certification/irs-501c3
+    type: certification
+    name: IRS recognition as a 501(c)(3) public charity
+    summary: Exempt from federal income tax under section 501(c)(3) and not a private foundation; ProPublica gives March 2005 and the Foundation's timeline April 2005.
+    issuer: C:counterparty/irs
+    kind: tax-exemption
+    since: 2005
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://projects.propublica.org/nonprofits/organizations/200049703", "https://foundation.wikimedia.org/wiki/Memory:Timeline", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+
+  - id: C:ip/marks
+    type: ip
+    name: Wikimedia Foundation trademarks
+    summary: The Foundation's registered and unregistered marks and the trade dress of each site (the Wikipedia puzzle globe, Wikimedia, project names); the Wikimania name is reserved for the yearly conference.
+    kind: trademark
+    licensed-to: [C:counterparty/affiliates]
+    licence-tiers: ["none needed for use on Wikimedia sites and community events", "quick licence for photo contests and cultural-heritage work", "regular licence for publications, merchandise, public events and domain names"]
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Trademark_policy"], confidence: 0.9, state: known}
+    pending: "which marks are registered, and where (the policy points to a separate non-exhaustive list)"
+
+  - id: C:ip/content-licences
+    type: ip
+    name: Free licences on project content
+    summary: Text contributed to the projects is licensed under CC BY-SA 4.0 and the GFDL; public-domain material is welcome; each non-text file carries its own licence. The Foundation hosts the content and does not own it.
+    kind: content-licence
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use"], confidence: 0.9, state: known}
+
+  - id: C:ip/software
+    type: ip
+    name: MediaWiki and the Foundation's software
+    summary: MediaWiki, the wiki software behind the projects, is free and open-source; its documentation is under CC BY-SA 4.0. Which source licence covers which component is not itemised on the pages read.
+    kind: software-licence
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://www.mediawiki.org/wiki/MediaWiki"], confidence: 0.7, state: known}
+    pending: "the source licence and version for MediaWiki core and for each component the Foundation maintains"
+
+  - id: C:charter/bylaws
+    type: charter
+    name: Bylaws of the Wikimedia Foundation
+    summary: A nonprofit corporation governed by a Board of 9 to 16 Trustees; the mission is to empower people worldwide to collect and develop educational content under a free licence and share it globally; the officers are a Chair, one or two Vice Chairs, a Chief Executive Officer, a Secretary and a Treasurer.
+    kind: bylaws
+    entity: C:entity/wikimedia-foundation
+    seats: {total: "9 to 16 Trustees", community-and-affiliate-selected: "up to 8", board-selected: "up to 7", community-founder-seat: 1}
+    status: active
+    visibility: public
+    owner: O:role/board-of-trustees
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Bylaws"], confidence: 0.9, state: known}
+
+  - id: C:governance/board-selection
+    type: governance
+    name: How the Board of Trustees is filled
+    summary: Up to 8 seats come from a community and affiliate nomination process and are appointed by the Board; up to 7 are sourced by the Board itself; one Community Founder seat is appointed for renewable three-year terms. Terms are three years, staggered.
+    elected-by: [M:audience/contributors, M:audience/affiliates, O:role/board-of-trustees]
+    current-composition: "one founder seat, five appointed seats and six community- and affiliate-selected seats (Meta-Wiki), a table of ten sitting seats"
+    status: active
+    visibility: public
+    owner: O:role/board-of-trustees
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Bylaws", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Board_of_Trustees"], confidence: 0.8, state: known}
+    pending: "how many of the 16 possible seats are filled today (the composition names 12, the member table lists 10)"
+
+  - id: C:policy/privacy
+    type: policy
+    name: Privacy policy
+    summary: Does not sell or rent personal information; personal data is generally deleted, aggregated or de-identified after 90 days; third-party cookies only with permission. Approved 2025-09-03, in force 2025-10-06.
+    since: 2025-10-06
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Privacy_policy"], confidence: 0.9, state: known}
+
+  - id: C:policy/terms-of-use
+    type: policy
+    name: Terms of Use
+    summary: The Foundation acts only as a hosting service provider and does not monitor, edit or endorse community content; users answer for their own edits; paid editing must be disclosed. In force from 2023-06-07.
+    since: 2023-06-07
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use"], confidence: 0.9, state: known}
+
+  - id: C:policy/universal-code-of-conduct
+    type: policy
+    name: Universal Code of Conduct
+    summary: A minimum standard of behaviour on all projects, technical spaces and Foundation-run events, approved by the Board of Trustees; communities may add local rules; sanctions come from functionaries, the Foundation or both.
+    status: active
+    visibility: public
+    owner: O:role/board-of-trustees
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Universal_Code_of_Conduct"], confidence: 0.85, state: known}
+
+  - id: C:policy/enterprise-revenue-cap
+    type: policy
+    name: Cap on Wikimedia Enterprise income
+    summary: Income from Wikimedia Enterprise is capped at 30% of the Foundation's total annual revenue, so most funding keeps coming from small donations. In 2024-25 it was about 4%.
+    status: active
+    visibility: public
+    owner: O:role/board-of-trustees
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions"], confidence: 0.85, state: known}
+
+  - id: C:policy/reserves
+    type: policy
+    name: Reserve policy
+    summary: A Board resolution sets a minimum of 12 months of working capital and a target of up to 18; net assets at 30 June 2025 were about 17.1 months of operating expenses.
+    status: active
+    visibility: public
+    owner: O:role/board-of-trustees
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview"], confidence: 0.85, state: known}

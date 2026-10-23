@@ -1,0 +1,88 @@
+# C: counterparties: stubs for every outsider a contract, channel or system names.
+nodes:
+  - id: C:counterparty/google
+    type: counterparty
+    name: Google
+    summary: The search partner whose payments to independent browsers like Firefox were at stake in the 2025 remedies ruling.
+    kind: search-partner
+    global-id:
+      domain: google.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.mozilla.org/en/mozilla/internet-policy/defending-an-open-web/'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/mozilla-online
+    type: counterparty
+    name: Beijing Mozilla Firefox Information Technology, Ltd. (Mozilla Online)
+    summary: Chinese company that distributed Firefox in China. An older Mozilla page lists it as a wholly owned subsidiary of the Corporation; Mozilla filed claims in 2023 to wind it down. A stub.
+    kind: affiliate
+    global-id: {pending: Chinese unified social credit code}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://www.mozilla.org/en-US/about/governance/organizations/'], confidence: 0.7, state: known}
+
+  - id: C:counterparty/reddit
+    type: counterparty
+    name: Reddit
+    summary: Platform partner in the Anonym measurement partnership.
+    kind: partner
+    global-id:
+      domain: reddit.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.mozilla.org/en/advertising/anonym-reddit-partnership/'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/open-web-docs
+    type: counterparty
+    name: Open Web Docs
+    summary: Independent open-source organization that contributes to MDN Web Docs.
+    kind: partner
+    global-id:
+      domain: openwebdocs.org
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://developer.mozilla.org/en-US/about'], confidence: 0.8, state: known}
+
+  - id: C:counterparty/mullvad
+    type: counterparty
+    name: Mullvad VPN
+    summary: Swedish VPN provider that partnered with Mozilla in October 2019 so Mozilla VPN could use its WireGuard servers (secondary source).
+    kind: vendor
+    global-id:
+      domain: mullvad.net
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://en.wikipedia.org/wiki/Mullvad'], confidence: 0.5, state: known}
+
+  - id: C:counterparty/google-play
+    type: counterparty
+    name: Google Play
+    summary: Android app store listing Firefox and Firefox Focus.
+    kind: platform
+    global-id:
+      domain: play.google.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/mobile/'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/apple-app-store
+    type: counterparty
+    name: Apple App Store
+    summary: iOS app store listing Firefox and Firefox Focus.
+    kind: platform
+    global-id:
+      domain: apps.apple.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/mobile/'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/github
+    type: counterparty
+    name: GitHub
+    summary: Code host of the Firefox repository.
+    kind: platform
+    global-id:
+      domain: github.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-firefox/firefox'], confidence: 0.9, state: known}

@@ -1,0 +1,50 @@
+# R: three claims, one of them contradicted by other Mozilla pages.
+nodes:
+  - id: R:claim/nonprofit-owned
+    type: claim
+    name: Mozilla will always remain non-profit owned and controlled
+    summary: All Mozilla organizations are either non-profits themselves or directly non-profit owned.
+    text: Mozilla will always remain non-profit owned and controlled.
+    about: ['P:mozilla-org']
+    'on': ['R:surface/faq']
+    evidence:
+      state: supported
+      by: ['C:bond/org-owns-corporation', 'C:bond/foundation-controls-org']
+      measure: the operating companies were 100% held by the Foundation in 2024 and are held by Mozilla.org, which the Foundation controls
+    status: active
+    visibility: public
+    owner: O:role/President
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.8, state: known}
+
+  - id: R:claim/owns-subsidiaries-and-marks
+    type: claim
+    name: Mozilla.org owns the operating subsidiaries and the trademarks
+    summary: Stated in the FAQ; other Mozilla pages still say the Foundation owns them.
+    text: Mozilla.org owns the Mozilla operating subsidiaries and the Mozilla trademarks.
+    about: ['P:function/brand-and-trademarks', 'P:function/capital-allocation']
+    'on': ['R:surface/faq']
+    evidence:
+      state: partial
+      by: ['C:bond/org-owns-corporation', 'C:ip/mozilla-trademarks']
+      measure: the trademark policy page and the State of Mozilla 2025/26 still name the Foundation; no 2025 filing is available yet
+    finding: Mozilla's own pages disagree on who holds the companies and the marks.
+    status: active
+    visibility: public
+    owner: O:role/President
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/foundation/trademarks/policy/', 'https://stateof.mozilla.org/'], confidence: 0.6, state: known}
+
+  - id: R:claim/do-for-ai
+    type: claim
+    name: Do for AI what we did for the web
+    summary: The strategy line of the 2026 to 2028 portfolio strategy.
+    text: Positioning Mozilla to do for AI what we did for the web.
+    about: ['P:function/portfolio-strategy']
+    'on': ['R:surface/faq']
+    evidence:
+      state: supported
+      by: ['P:function/capital-allocation']
+      measure: about 20% of planned 2026 portfolio spend is for trustworthy open-source AI
+    status: active
+    visibility: public
+    owner: O:role/Board-of-Directors
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://stateof.mozilla.org/ledger/'], confidence: 0.7, state: known}

@@ -1,0 +1,16 @@
+# M: the one list of prices the pages publish with an amount. Firefox Relay Premium, Monitor's paid tier and MDN Plus show no price on the pages read.
+nodes:
+  - id: M:pricebook/mozilla-vpn
+    type: pricebook
+    name: Mozilla VPN list prices
+    summary: 'Two plans: $9.99 a month, or $4.99 a month billed as $59.88 a year plus tax; both with a 30-day money-back guarantee for first-time customers; up to five devices.'
+    kind: list
+    set-by: self
+    currency: USD
+    for: ['P:offering/mozilla-vpn']
+    rates:
+      - {offering: 'P:offering/mozilla-vpn', sku: 'I:sku/vpn-monthly', model: subscription, value: 9.99, unit: USD/month, billed: monthly}
+      - {offering: 'P:offering/mozilla-vpn', sku: 'I:sku/vpn-annual', model: subscription, value: 4.99, unit: USD/month, billed: 'annually, 59.88 USD/year'}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/vpn/'], confidence: 0.9, state: known}

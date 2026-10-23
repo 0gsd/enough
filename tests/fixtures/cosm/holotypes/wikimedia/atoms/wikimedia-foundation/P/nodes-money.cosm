@@ -1,0 +1,160 @@
+# P — fundraising and stewardship: how the Foundation raises money (mostly small online gifts, about 8 million donors a year) and how it accounts for it (an audit every
+# year, a Form 990, a reserve policy, and a related Endowment it manages but does not control). In 2024-25 fundraising was 11.4% of expenses and administration 11.2%.
+nodes:
+
+- id: P:function/fundraising
+  type: function
+  name: Fundraising
+  summary: Raises the annual fund from millions of donors by banner, email and SMS appeals, monthly giving and planned gifts; no advertising and no government grants. Contributions were $184.1M in 2024-25.
+  owner: O:role/chief-advancement-officer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://wikimediafoundation.org/give/", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/"]
+  parts: [P:service/donation-campaigns, P:service/recurring-and-planned-giving]
+  substrate:
+    platforms: [S:system/fundraising-stack]
+    vendors: [C:counterparty/payment-processors]
+    depends-on: [S:system/fundraising-stack]
+  mattering:
+    to-the-whole: "Pays for everything else; 2024-25 donations were $189.5M of $208.6M in revenue, and the 2026-27 target is $230M for the annual fund."
+    weight: critical
+    inside:
+      - who: [O:role/chief-advancement-officer]
+        because: "Asking millions of readers for small gifts, every year, while keeping the site free of advertising."
+        stakes: "The Foundation's independence from any one funder."
+        confidence: 0.5
+
+- id: P:service/donation-campaigns
+  type: service
+  name: Donation campaigns
+  summary: "Banner, email and SMS appeals in about 30 countries a year: banners brought $62.4M (30% of revenue) in 2024-25 and email 15%; the average gift is about $11."
+  owner: O:role/chief-advancement-officer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://www.mediawiki.org/wiki/Fundraising_tech", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/"]
+  flow:
+    inputs:
+      - {resource: donation, from: M:audience/donors, unit: USD/year, rate: 62400000}
+    outputs:
+      - {resource: appeal, to: M:audience/donors, unit: campaigns/year}
+  substrate:
+    platforms: [S:system/fundraising-stack]
+    vendors: [C:counterparty/payment-processors]
+    depends-on: [S:system/fundraising-stack]
+  rules:
+    - must-not: "O:role/chief-advancement-officer accept government grants for the annual fund"
+      source: wmf-audit-faq-25
+      confidence: 0.7
+  economics:
+    price: {model: internal}
+    cost: {model: usage, band: "donation processing $8.25M and fundraising 11.4% of 2024-25 expenses"}
+  mattering:
+    to-the-whole: "Banners are the single biggest source of money (30% of revenue) and they depend on people arriving at the site, which is where traffic is falling."
+    weight: critical
+    inside:
+      - who: [O:role/chief-advancement-officer]
+        because: "The yearly campaign is the organization's heartbeat, and its numbers are watched by everyone."
+        confidence: 0.5
+
+- id: P:service/recurring-and-planned-giving
+  type: service
+  name: Recurring and planned giving
+  summary: Monthly and yearly giving (recurring gifts were 21% of 2024-25 revenue), stock, donor-advised funds, IRA distributions, gift annuities, workplace giving and legacy gifts. Undesignated estate gifts and gifts marked for the Endowment pass to the Endowment.
+  owner: O:role/chief-advancement-officer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://wikimediafoundation.org/give/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"]
+  flow:
+    inputs:
+      - {resource: donation, from: M:audience/donors, unit: USD/year}
+    outputs:
+      - {resource: designated-gift, to: atom/wikimedia-endowment, unit: USD/year, rate: 6440089}
+      - {resource: estate-gift, to: atom/wikimedia-endowment, unit: USD/year, rate: 1490207}
+  substrate:
+    platforms: [S:system/fundraising-stack]
+    vendors: [C:counterparty/payment-processors]
+    depends-on: [S:system/fundraising-stack]
+  rules:
+    - must: "O:role/chief-financial-officer transfer donations designated for the Endowment to it every month"
+      source: wmf-audit-25
+      confidence: 0.9
+    - must: "O:role/chief-financial-officer give undesignated estate gifts to the Endowment"
+      source: wmf-audit-25
+      confidence: 0.9
+  economics:
+    price: {model: internal}
+    cost: {model: usage, band: {pending: "cost of recurring and planned giving apart from the campaigns"}}
+  mattering:
+    to-the-whole: "Recurring gifts are steadier than banners; legacy gifts are how the Endowment is meant to grow (planned giving could become its main source by 2050)."
+    weight: major
+    inside:
+      - who: [O:role/chief-advancement-officer]
+        because: "Long relationships with donors who plan to leave something to the projects."
+        confidence: 0.5
+
+- id: P:function/stewardship
+  type: function
+  name: Stewardship and accountability
+  summary: "The finance, audit and reporting that donors and the public can check: audited statements, a Form 990, a reserve of 12 to 18 months, and management of the separate Endowment."
+  owner: O:role/chief-financial-officer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://wikimediafoundation.org/about/financial-reports/"]
+  parts: [P:service/financial-reporting, P:service/endowment-management]
+  mattering:
+    to-the-whole: "Donors give without a product to inspect; the audit, the ratings and the open books are what they get to check."
+    weight: major
+    inside:
+      - who: [O:role/chief-financial-officer]
+        because: "Publishing more than the law requires, to a public that includes the volunteers."
+        confidence: 0.5
+
+- id: P:service/financial-reporting
+  type: service
+  name: Audit, Form 990 and annual plan
+  summary: Independent audit each year (a clean opinion from KPMG for the twentieth year in a row in 2024-25), the Form 990, the annual plan with a budget, and a Charity Navigator rating of four stars (100 out of 100) and Candid's Platinum Seal.
+  owner: O:role/chief-financial-officer
+  visibility: public
+  confidence: 0.9
+  sources: ["https://wikimediafoundation.org/about/financial-reports/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview"]
+  rules:
+    - must: "O:role/chief-financial-officer publish the audited statements and the Form 990 for every fiscal year"
+      source: wmf-fin-reports
+  flow:
+    outputs:
+      - {resource: report, to: M:audience/donors, unit: reports/year}
+  mattering:
+    to-the-whole: "The reason a donor can trust that 77.4% of expenses went to programs in 2024-25."
+    weight: major
+    inside:
+      - who: [O:role/chief-financial-officer]
+        because: "Being audited twenty years running and publishing the result."
+        confidence: 0.5
+
+- id: P:service/endowment-management
+  type: service
+  name: Management of the Endowment
+  summary: Foundation staff keep the books of the Endowment, raise money for it and run its operations under the cost-sharing agreement; the Endowment has no employees and its own Board, which the Foundation does not control.
+  owner: O:role/chief-financial-officer
+  visibility: public
+  confidence: 0.9
+  sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"]
+  flow:
+    inputs:
+      - {resource: reimbursement, from: atom/wikimedia-endowment, unit: USD/year, rate: 2066234}
+    outputs:
+      - {resource: management-services, to: atom/wikimedia-endowment, unit: USD/year}
+  rules:
+    - must-not: "O:role/chief-financial-officer treat the Endowment's assets as the Foundation's"
+      source: wmf-audit-25
+      confidence: 0.8
+  economics:
+    price: {model: cost-plus}
+    cost: {model: usage, band: "staff time and costs reimbursed by the Endowment plus a 15% administrative fee"}
+  mattering:
+    to-the-whole: "Two organizations with separate Boards, one set of staff: the arrangement the audit calls a related-party relationship."
+    weight: major
+    inside:
+      - who: [O:role/chief-financial-officer]
+        because: "Wearing two hats without confusing the two funds."
+        confidence: 0.5

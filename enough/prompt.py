@@ -123,16 +123,16 @@ file contents here
 <mode>copy</mode>
 </tool>
 
-<tool name="cachebox_list">
-<box>research-notes</box>
+<tool name="canon_list">
+<volume>notes</volume>
 </tool>
 
-<tool name="cachebox_create">
-<name>research-notes</name>
+<tool name="canon_create">
+<name>notes</name>
 </tool>
 
-<tool name="cachebox_ingest">
-<box>rust-book</box>
+<tool name="canon_ingest">
+<volume>rust-book</volume>
 <type>url</type>
 <value>https://doc.rust-lang.org/book/</value>
 <depth>2</depth>
@@ -328,25 +328,24 @@ call, made through the UI — when a wikisink report flags a suspicious
 deletion, surface it and explain, but never decide for them; there is
 deliberately no tool for it.
 
-Saved articles live in `{project}/wiki/` and the global `wiki` cachebox
-(`~/enough/cacheawl/wiki/`) with CC BY-SA attribution frontmatter — remind
+Saved articles live in `{project}/wiki/` and the global `wiki` volume
+(`~/enough/canon/wiki/`) with CC BY-SA attribution frontmatter — remind
 the user of the share-alike terms if they fold article text into something
 they'll publish.
 
-## cacheawl (the global file store)
+## canon (the global file store)
 
-`~/enough/cacheawl/` is a machine-global store of text the user wants to
-keep. A **cachebox** is a top-level folder in it (only direct children are
-cacheboxes; deeper folders are plain folders). Some cacheboxes are plain
-folders; others are "cached replicas" ingested from a source. Each box
-carries an auto-generated `_cachebox.merirmaid` mirror diagram of its
-contents — backend-owned; never edit it (writes are refused). To change
-what the diagram shows, change the box's files.
+`~/enough/canon/` is a machine-global store of text the user wants to
+keep. A **volume** is a top-level folder in it (deeper folders are plain
+folders). Some volumes are plain folders; others are "cached replicas"
+ingested from a source. Each volume carries a catalog, `canon.cosm`,
+listing its files — enough keeps it; never edit it (writes are refused).
+To change what it lists, change the volume's files.
 
-- `cachebox_list` — list cacheboxes (name, item count, size, origin), or
-  list one box's contents by passing `<box>`.
-- `cachebox_create` — create an empty cachebox (`<name>`).
-- `cachebox_ingest` — populate a box from a source. Inner tags: `<box>`
+- `canon_list` — list volumes (name, item count, size, origin), or list
+  one volume's contents by passing `<volume>`.
+- `canon_create` — create an empty volume (`<name>`).
+- `canon_ingest` — populate a volume from a source. Inner tags: `<volume>`
   (destination), `<type>` (`path` | `url` | `wikisink`), `<value>` (the
   source), `<depth>` (1–3) or `<all>true</all>`.
     - `path:<macOS path>` — copies text files (skips binaries) to `<depth>`
@@ -364,9 +363,9 @@ check the content has no licensing or robots restrictions on copying — a
 url ingest that robots.txt disallows, or a site whose terms forbid
 copying, should NOT be scraped; (3) for anything large, doubtful, or of
 uncertain provenance, confirm with the user (naming the source, depth, and
-rough scale) BEFORE running the ingest. Only then call `cachebox_ingest`.
-Ingests can be long-running; the box is registered immediately with status
-`ingesting` and marked `complete` (or `failed`) at the end.
+rough scale) BEFORE running the ingest. Only then call `canon_ingest`.
+Ingests can be long-running; the volume is registered immediately with
+status `ingesting` and marked `complete` (or `failed`) at the end.
 
 ## Keep going until the request is fulfilled
 
@@ -405,7 +404,7 @@ stop silently.
 # The reason is arithmetic. A local model re-reads the whole system prompt on
 # every turn of every tool loop, so a kilobyte of documentation for a tool the
 # broker has switched off is a kilobyte of the user's context window, and of
-# their prefill time, spent on nothing. Three blocks earn their gate:
+# their prefill time, spent on nothing. These blocks earn their gate:
 #
 # - the composure tools, behind the `composure_enabled` broker toggle (the
 #   canvas UI is ungated, exactly as before — this gates the *docs* along with
@@ -417,8 +416,14 @@ stop silently.
 #   install (0.4.1). Short, because then every project pays for it: the
 #   column guide is the `lexicographer` skill, in the Skills section when it
 #   is on and one `dict_guide` call away when it is off.
+# - the MacroCOSM tools (`cosm_read`, `cosm_lint`, `eml_derive`, `atem`,
+#   `cosm_guide`, 0.4.3), behind the MacroCOSM manifests shipping with this
+#   install — so in every project, as the owner decided (docs/canon-043-plan.md
+#   §13, decision 12: on by default, under 1,000 chars of prompt). The guide is
+#   the `macrocosm-oes` skill, off by default like every shipped skill and one
+#   `cosm_guide` call away, the FEED pattern exactly.
 #
-# `tool_instructions(project_dir)` assembles them. Both blocks are written to
+# `tool_instructions(project_dir)` assembles them. Each block is written to
 # stand alone, so they read correctly wherever they land in the order.
 # ---------------------------------------------------------------------------
 
@@ -572,6 +577,39 @@ Skills, call `dict_guide` (no tags) for the column guide before writing.
 """
 
 
+CANON_TOOL_INSTRUCTIONS = """\
+## MacroCOSM
+
+`.cosm` files are MacroCOSM volumes: Holotypes, Canon catalogs, EML twins.
+Paths are project-relative or `canon:<volume>/...`.
+
+<tool name="cosm_read">
+<path>meadow</path>
+<item>R:claim/books-by-7am</item>
+</tool>
+
+<tool name="cosm_lint">
+<path>notes.md.cosm</path>
+</tool>
+
+<tool name="eml_derive">
+<path>notes.md</path>
+</tool>
+
+<tool name="atem">
+<path>notes.md</path>
+</tool>
+
+<tool name="cosm_guide"></tool>
+
+`cosm_read` shows the tree; `<item>` (an id or a path) one item. `eml_derive`
+decompiles a text into its EML twin (`notes.md.cosm`), only when the user
+asks. `atem` gives the line, focus, push and pull and writes them into the
+twin; `<text>` instead of `<path>` for a passage, written nowhere. Unless the
+macrocosm-oes skill is in your Skills, read `cosm_guide` before you derive.
+"""
+
+
 PAL_TOOL_INSTRUCTIONS = """\
 ## Pal
 
@@ -636,11 +674,23 @@ def _dictionary_available() -> bool:
         return False
 
 
+def _macrocosm_available() -> bool:
+    """The MacroCOSM manifests ship with this install, so the reader and the
+    MacroCOSM tools work in every project: their block is on by default
+    (owner decision 12). One file check, cheap enough for every turn."""
+    try:
+        from . import macrocosm
+        return (macrocosm.DEFAULT_MANIFEST_DIR / "eml.manifest.cosm").is_file()
+    except Exception:  # noqa: BLE001 — no reader is not a broken prompt
+        return False
+
+
 def tool_instructions(project_dir: Path, *, pal: bool = False) -> str:
     """The always-on core plus whichever gated blocks this project can use.
 
-    Ordered core → composures → readvisors → dictionary → pal. A project
-    with none of them pays exactly what it paid before any of this landed.
+    Ordered core → composures → readvisors → dictionary → macrocosm → pal.
+    A project with none of them pays exactly what it paid before any of this
+    landed.
 
     `pal` is the narrowest gate of them all. The other two are switched on
     for a project and stay on; a pal block is carried by the one turn the
@@ -659,6 +709,8 @@ def tool_instructions(project_dir: Path, *, pal: bool = False) -> str:
         parts.append(READVISORY_TOOL_INSTRUCTIONS)
     if _dictionary_available():
         parts.append(DICTIONARY_TOOL_INSTRUCTIONS)
+    if _macrocosm_available():
+        parts.append(CANON_TOOL_INSTRUCTIONS)
     if pal:
         parts.append(PAL_TOOL_INSTRUCTIONS)
     return "\n".join(p.rstrip() + "\n" for p in parts)
@@ -683,15 +735,15 @@ that the user configures through plain-text conventions.
   `<path>rness/AGENT.md</path>`, not just `AGENT.md`). Tool paths are
   resolved from the project root, so a bare `AGENT.md` would create a NEW
   file at the project root — almost never what you or the user want.
-- The global **cacheawl** store (`~/enough/cacheawl/`) holds grounded
-  knowledge the user keeps across projects, organized as cacheboxes
+- The global **canon** store (`~/enough/canon/`) holds grounded
+  knowledge the user keeps across projects, organized as volumes
   (top-level folders). The former `infoworld/` library is now the
-  `personal`, `public`, and `wiki` cacheboxes. Reach it through the
-  cacheawl tools (`cachebox_list`, `cachebox_create`, `cachebox_ingest`) —
+  `personal`, `public`, and `wiki` volumes. Reach it through the
+  canon tools (`canon_list`, `canon_create`, `canon_ingest`) —
   it is NOT symlinked into the project tree. When the user asks something
   that could be answered from stored knowledge, prefer listing/reading a
-  cachebox over relying on training data.
-- The `wiki` cachebox and `{{project}}/wiki/` hold Wikipedia articles the
+  volume over relying on training data.
+- The `wiki` volume and `{{project}}/wiki/` hold Wikipedia articles the
   user saved via wikisink (🚰), with attribution frontmatter. When a local
   Wikipedia archive is installed, the wiki tools (`wiki_search`,
   `read_wiki_article`) search the whole archive — millions of articles —
@@ -711,7 +763,7 @@ that the user configures through plain-text conventions.
 - **Inputs** (files the user hands you for one task — pasted text, source
   documents, transcripts to work from): expect them in `rness/io/input/`.
   This is for per-task reference material; durable cross-project knowledge
-  belongs in a cacheawl cachebox (see the cacheawl tools).
+  belongs in a canon volume (see the canon tools).
 - **`rness/requests/`** is reserved for the request-tracking markdown files
   you write per the requests policy. Don't put user artifacts there. If the
   user asks you to "put X in requests/", redirect: write the artifact under
@@ -1394,7 +1446,7 @@ def list_paradigms(rness: Path) -> list[tuple[str, str, str]]:
 # legacy value (the old first-launch `all` sentinel, a list of pending bubble
 # ids, or an empty/absent section) reads as `on`, so pre-0.1.7 files upgrade
 # to "bubbles shown" without a migration pass. The file stays hidden from the
-# project tree and the cacheawl pane (HIDDEN_TREE_PATHS + build_file_tree).
+# project tree and the canon pane (HIDDEN_TREE_PATHS + build_file_tree).
 # ---------------------------------------------------------------------------
 
 _MP_PARADIGM_HEAD = "Active paradigm"

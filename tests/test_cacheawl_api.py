@@ -25,7 +25,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     (project / "hello.txt").write_text("hi from the project", encoding="utf-8")
     # cacheawl store lives INSIDE the project here only so the POST /api/file
     # mirror-refusal test can reach a mirror through an in-tree relative path.
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(project / "_store"))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(project / "_store"))
     monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(tmp_path / "no-infoworld"))
     app = create_app(project, "http://localhost:9", supervise=False)
     with TestClient(app) as c:
@@ -112,7 +112,7 @@ def test_post_file_refuses_cachebox_mirror(client: TestClient):
     assert r.status_code == 403
     assert "modality: mirror" in r.text
     mirror = ca.box_dir("mbox") / ca.MIRROR_NAME
-    assert "CLOBBER" not in mirror.read_text(encoding="utf-8")
+    assert not mirror.exists()
 
 
 # ---------------------------------------------------------------------------
@@ -144,8 +144,7 @@ def test_cacheawl_scheme_refuses_mirror_write(client: TestClient):
         "path": f"cacheawl:mir/{ca.MIRROR_NAME}", "content": "CLOBBER"})
     assert r.status_code == 403
     assert "modality: mirror" in r.text
-    assert "CLOBBER" not in (ca.box_dir("mir") / ca.MIRROR_NAME).read_text(
-        encoding="utf-8")
+    assert not (ca.box_dir("mir") / ca.MIRROR_NAME).exists()
 
 
 def test_cacheawl_scheme_refuses_meta_write(client: TestClient):
@@ -186,7 +185,7 @@ def test_mirror_endpoint_root_and_subfolder(client: TestClient):
     assert r.status_code == 200, r.text
     p = r.json()
     assert p["subpath"] == "guide"
-    assert "source: cachebox:docs/guide" in p["text"]
+    assert "source: canon:docs/guide" in p["text"]
     assert ca._node_id("guide/intro.md") in p["node_map"]
     assert not (box / "guide" / ca.MIRROR_NAME).exists()
 

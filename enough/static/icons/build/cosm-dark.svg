@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" id="cosm" viewBox="0 0 72 72">
+  <path d="M13 10 L45 10 L59 24 L59 62 L13 62 Z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round" />
+  <polyline points="45,10 45,24 59,24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <line x1="36" y1="34" x2="26" y2="52" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="#fff" />
+  <line x1="36" y1="34" x2="46" y2="52" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="#fff" />
+  <circle cx="36" cy="34" r="4" fill="#fff" />
+  <circle cx="26" cy="52" r="4" fill="#fff" />
+  <circle cx="46" cy="52" r="4" fill="#fff" />
+</svg>

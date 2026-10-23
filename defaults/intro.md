@@ -12,7 +12,7 @@ enough is a personal language system: a place to plan, read, write, and translat
 
 **Text planning is home.** Tell me what you want to write and we will build a plan together, then section scaffolds you fill with your own prose. Other paradigms cover translation and designing your own workflows.
 
-**Reference is local.** The dictionary gives any word's meaning, sound, history, and relatives: right-click a word, or browse it from ui preferences. Wikisink is an offline Wikipedia. Cacheawl keeps the sources you collect.
+**Reference is local.** The dictionary gives any word's meaning, sound, history, and relatives: right-click a word, or browse it from ui preferences. Wikisink is an offline Wikipedia. Canon keeps the sources you collect.
 
 **It grows with you.** Skills, readvisors, and paradigms are plain files you can read, change, or write yourself, and I can help you build them.
 

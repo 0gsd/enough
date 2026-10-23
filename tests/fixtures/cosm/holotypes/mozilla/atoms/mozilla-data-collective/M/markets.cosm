@@ -1,0 +1,20 @@
+# M: the market and the footprint.
+nodes:
+  - id: M:market/ai-training-data
+    type: market
+    name: AI training and research data
+    summary: Datasets for AI and research, with a stated focus on multilingual, multicultural and multimodal data.
+    taxonomy: custom
+    code: data/datasets
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilladatacollective.com/'], confidence: 0.7, state: known}
+
+  - id: M:geography/language-coverage
+    type: geography
+    name: Registered in England and Wales; global content
+    summary: The company is registered in London; the listed datasets cover many languages (listings show about fifteen language codes on the first page, among them Hausa, Lingala, Pashto, Uyghur, Urdu and Javanese).
+    regions: [GB]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://find-and-update.company-information.service.gov.uk/company/17054959', 'https://mozilladatacollective.com/datasets'], confidence: 0.7, state: known}

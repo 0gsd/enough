@@ -1,0 +1,45 @@
+# C — contracts. The cost-sharing agreement with the Foundation is held in atom/wikimedia-foundation (C:contract/cost-sharing) and cited by the bonds. These are the
+# Endowment's own: the audit, the planned-giving partnership, and grants to outside projects.
+nodes:
+  - id: C:contract/external-audit
+    type: contract
+    name: Annual audit engagement (BDO USA)
+    summary: BDO audits the Endowment's statements each year; its report on 2024-25 is dated 2026-03-06 and carries an emphasis-of-matter paragraph on the restatement of the first period.
+    between: [atom/wikimedia-endowment, C:counterparty/bdo]
+    counterparty: C:counterparty/bdo
+    terms: "annual audit of the financial statements; first draft of the Form 990 and review of the final"
+    since: 2023-09-30
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.9, state: known}
+
+  - id: C:contract/planned-giving-partnership
+    type: contract
+    name: Planned-giving partnership with FreeWill
+    summary: A partnership under which FreeWill's online will tool refers donors to the Endowment; the largest source of its planned-giving leads. Terms are not public.
+    between: [atom/wikimedia-endowment, C:counterparty/freewill]
+    counterparty: C:counterparty/freewill
+    terms: "referral of planned-giving leads; terms not public"
+    scope: [P:service/planned-giving-program]
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.8, state: known}
+    pending: "the start date and terms of the partnership"
+
+  - id: C:contract/project-grants
+    type: contract
+    name: Project grants
+    summary: "Grants for Wikimedia projects: $3.1M to the Foundation and $297,000 to Kiwix in 2024-25 on the Form 990's schedules; $3.5M disbursed for technical innovation in 2025-26; $4.3M planned for 2026-27, about 23% more."
+    between: [atom/wikimedia-endowment, atom/wikimedia-foundation, C:counterparty/kiwix]
+    terms: "restricted grants for named projects, approved by the Board; amounts by fiscal year"
+    template: true
+    instances: [atom/wikimedia-foundation, C:counterparty/kiwix]
+    scope: [P:service/grantmaking]
+    since: 2023-09-30
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.85, state: known}
+    pending: "the text of each grant agreement and the 2025-26 grant list by recipient"

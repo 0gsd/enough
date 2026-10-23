@@ -1,0 +1,9 @@
+# O: units.
+nodes:
+  - id: O:unit/executive-office
+    type: unit
+    name: Executive office
+    summary: The chief of staff's remit; not described further.
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/company/about-us'], confidence: 0.5, state: known}

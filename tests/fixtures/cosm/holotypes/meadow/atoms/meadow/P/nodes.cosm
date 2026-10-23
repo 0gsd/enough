@@ -1,0 +1,309 @@
+nodes:
+
+- id: P:suite/books
+  type: suite
+  name: Books
+  summary: Everything that touches the ledger.
+  owner: O:role/Founder
+  confidence: 0.9
+  sources: [session-1]
+  parts: [P:offering/ledger]
+  mattering:
+    to-the-whole: "The ledger is the product; payroll exists because the books are already right."
+    weight: critical
+    inside:
+      - who: [O:role/Founder, O:role/Engineer]
+        because: "This is the part customers mean when they say 'Meadow'."
+
+- id: P:offering/ledger
+  type: offering
+  name: Meadow Ledger
+  summary: Daily reconciled books with a one-page morning summary.
+  owner: O:role/Founder
+  confidence: 0.9
+  sources: [session-1, session-2]
+  parts: [P:function/ingest, P:service/reconcile]
+  flow:
+    inputs:
+      - {resource: morning-summary, from: P:service/reconcile, unit: 1/day/customer, rate: 1}
+    outputs:
+      - {resource: morning-summary, to: M:audience/restaurants, unit: 1/day/customer, rate: 1}
+      - {resource: morning-summary, to: P:offering/payroll, unit: 1/day/customer, rate: 1}
+      - {resource: pooled-tips, to: P:service/tip-out, unit: USD/day, rate: 900}
+      - {resource: year-end-export, to: M:audience/accountants, unit: 1/year/customer, rate: 1}
+  economics:
+    price: {model: flat, value: 49, unit: USD/month}
+    cost: {model: usage, band: small}
+    margin: high
+  rules:
+    - must: "O:role/Founder approve any change to the close procedure"
+      else: "change reverts"
+  principles:
+    purpose: "Show the true cash position every morning."
+    priorities: ["accuracy over speed", "clarity over features"]
+    value: [{to: M:audience/restaurants, proposition: "trustworthy books by 7am"}]
+    quality: [{goal: "closes on time", measure: "share of customer-days closed by 07:00"}]
+    decides: ["categorisation rules"]
+  vocabulary:
+    terms:
+      - {term: morning summary, maps-to: P:meadow/morning summary}
+  affect:
+    audience: M:audience/restaurants
+    elicits:
+      - {feeling: relief, intensity: 0.8, when: "opening the morning summary"}
+      - {feeling: trust, intensity: 0.9, when: "the numbers match the bank"}
+    avoids: [surprise, jargon]
+    probes: [satisfaction, anticipation]
+    tone: [plain, calm, exact]
+  mattering:
+    to-the-whole: "Without it there is no firm; payroll alone would be a commodity."
+    weight: critical
+    inside:
+      - who: [O:role/Founder, O:role/Support-Lead, O:role/Engineer]
+        because: "Every morning at 7 the team sees whether the night's closes held; the work has a daily verdict."
+        stakes: "The one thing they are known for."
+    chosen:
+      - who: [M:audience/restaurants]
+        because: "They open it before they open the restaurant."
+        stakes: "A morning without a true number, and the day's decisions made blind."
+    prospective:
+      - who: [M:audience/restaurants]
+        because: "They have never had a daily close; most see their books monthly, late, and wrong."
+        barrier: "They assume bookkeeping software means a bookkeeper's workload."
+
+- id: P:function/ingest
+  type: function
+  name: Ingest
+  summary: Gets transactions in, from anywhere.
+  owner: O:role/Founder
+  confidence: 0.9
+  sources: [session-2]
+  parts: [P:service/bank-sync, P:product/csv-importer]
+  substrate:
+    platforms: [S:system/postgres, S:system/python]
+    depends-on: [S:vendor/banks]
+    budget: small
+  mattering:
+    to-the-whole: "Nothing reconciles that didn't arrive; every late feed is a late close."
+    weight: major
+    inside:
+      - who: [O:role/Engineer]
+        because: "The unglamorous half of the product, and the half that pages them."
+        stakes: "If feeds break, support drowns."
+
+- id: P:service/bank-sync
+  type: service
+  name: Bank sync
+  summary: Pulls and normalises bank feeds overnight.
+  owner: O:role/Founder
+  confidence: 0.9
+  sources: [session-2]
+  flow:
+    inputs:  [{resource: bank-feed, from: S:vendor/banks, unit: txn/day, rate: 4000}]
+    outputs: [{resource: normalized-txn, to: P:service/reconcile, unit: txn/day, rate: 4000}]
+    capacity: {nominal: 20000, peak: 60000, unit: txn/day}
+    latency: {target: 10, p99: 60, unit: min}
+    errors: {rate: 0.002, modes: ["feed late", "duplicate posting"]}
+    degradation: queue
+    schedule: batch
+  substrate:
+    platforms: [S:system/postgres, S:system/python]
+    vendors: [S:vendor/banks]
+    depends-on: [S:vendor/banks]
+    roles-required: [{role: O:role/Engineer, load: small}]
+  rules:
+    - must: "O:role/Founder approve any change to the feed parser"
+      else: "change reverts"
+  principles:
+    purpose: "Have every transaction in by 6am."
+    priorities: ["completeness over speed"]
+    decides: ["retry policy"]
+  economics:
+    price: {model: internal}
+    cost: {model: usage, band: small}
+  vocabulary:
+    terms: [{term: pending, means: "Posted by the bank but not yet cleared."}]
+    assumes: ["bank feeds arrive before 06:00 local"]
+  affect:
+    audience: P:service/reconcile
+    elicits: [{feeling: predictability, intensity: 0.9}]
+    avoids: ["silent gaps in the feed"]
+  mattering:
+    to-the-whole: "The 7am promise is really a 6am promise made here."
+    weight: major
+    inside:
+      - who: [O:role/Engineer]
+        because: "Keeping 120 banks' quirks tamed is a craft nobody outside sees and everybody inside depends on."
+
+- id: P:product/csv-importer
+  type: product
+  name: CSV importer
+  summary: Manual upload path for banks without a feed; also the first-day import.
+  owner: O:role/Founder
+  confidence: 0.9
+  sources: [session-2]
+  flow:
+    inputs:  [{resource: csv-file, from: M:audience/restaurants, unit: files/day, rate: 15}]
+    outputs: [{resource: normalized-txn, to: P:service/reconcile, unit: txn/day, rate: 600}]
+    schedule: on-demand
+    degradation: queue
+  substrate:
+    platforms: [S:system/python]
+    roles-required: [{role: O:role/Engineer, load: small}]
+  rules:
+    - counts-as: "a file counts as imported when every row has a date, an amount and a matched account"
+  principles:
+    purpose: "Make the first day painless."
+    priorities: ["forgiving parsing over strict formats"]
+  economics:
+    price: {model: internal}
+    cost: {model: flat, band: small}
+  vocabulary:
+    terms: [{term: first import, means: "The historical load a new customer does on day one."}]
+  affect:
+    audience: M:audience/restaurants
+    elicits: [{feeling: relief, intensity: 0.7, when: "a year of history lands in one go"}]
+    avoids: ["a rejected file with no reason"]
+  mattering:
+    to-the-whole: "The front door; a bad first import loses the customer before the first morning summary."
+    weight: supporting
+    inside:
+      - who: [O:role/Engineer]
+        because: "The first thing a new customer touches; its bugs are the ones that come with a name attached."
+    chosen:
+      - who: [M:audience/restaurants]
+        because: "Their bank may never get a feed; this is how they stay."
+    prospective:
+      - who: [M:audience/restaurants]
+        because: "It is how a year of history becomes a starting point in an afternoon."
+        barrier: "Fear of a botched migration."
+
+- id: P:service/reconcile
+  type: service
+  name: Reconcile
+  summary: Categorises, matches and closes each day; writes the morning summary.
+  owner: O:role/Support-Lead
+  confidence: 0.9
+  sources: [session-2]
+  flow:
+    inputs:
+      - {resource: normalized-txn, from: P:service/bank-sync, unit: txn/day, rate: 4000}
+      - {resource: normalized-txn, from: P:product/csv-importer, unit: txn/day, rate: 600}
+    outputs: [{resource: morning-summary, to: P:offering/ledger, unit: 1/day/customer, rate: 1}]
+    capacity: {nominal: 5000, peak: 20000, unit: txn/day}
+    latency: {target: 20, p99: 90, unit: min}
+    degradation: degrade
+    schedule: batch
+  substrate:
+    platforms: [S:system/postgres, S:system/python]
+    roles-required: [{role: O:role/Support-Lead, load: medium}]
+  rules:
+    - counts-as: "a day is closed when every transaction has a category and the bank balance matches"
+  principles:
+    purpose: "Close every day before the owner wakes."
+    priorities: ["accuracy over speed"]
+    quality: [{goal: "no silent miscategorisation", measure: "corrections per 1,000 transactions"}]
+  economics:
+    price: {model: internal}
+    cost: {model: usage, band: medium}
+  vocabulary:
+    terms:
+      - term: close
+        overrides: true
+        means: "Locking a day, not a period, so the summary can go out."
+  affect:
+    audience: P:offering/ledger
+    elicits: [{feeling: certainty, intensity: 0.9, when: "the balance matches to the cent"}]
+    avoids: ["a close that silently skipped a day"]
+  mattering:
+    to-the-whole: "This is where 'true' in 'true picture' is manufactured."
+    weight: critical
+    inside:
+      - who: [O:role/Support-Lead]
+        because: "The morning health check is the job's heartbeat; a clean board means the day is theirs."
+        stakes: "A bad close is a day of tickets."
+
+- id: P:offering/payroll
+  type: offering
+  name: Meadow Pay
+  summary: Payroll with tip-out explained line by line.
+  owner: O:role/Payroll-Owner
+  confidence: 0.9
+  sources: [session-1, session-2]
+  parts: [P:service/tip-out]
+  flow:
+    inputs:
+      - {resource: morning-summary, from: P:offering/ledger, unit: 1/day/customer, rate: 1}
+      - {resource: tip-allocation, from: P:service/tip-out, unit: 1/run, rate: 1}
+    outputs: [{resource: payroll-run, to: M:audience/restaurants, unit: run/2wk, rate: 1}]
+  economics:
+    price: {model: seat, value: 4, unit: USD/employee/month}
+    cost: {model: usage, band: small}
+    margin: medium
+  rules:
+    - must: "O:role/Payroll-Owner approve the tip-out rule before the first run"
+      source: local
+  principles:
+    purpose: "Pay people exactly what the house rule says, and show the arithmetic."
+    priorities: ["fairness over flexibility"]
+    value: [{to: M:audience/restaurants, proposition: "no more tip arguments on payday"}]
+  vocabulary:
+    terms: [{term: tip-out, maps-to: P:meadow/tip-out}]
+  affect:
+    audience: M:audience/restaurants
+    elicits: [{feeling: fairness, intensity: 0.8, when: "tip-out is explained line by line"}]
+    avoids: ["a payslip nobody can explain"]
+    probes: [satisfaction, reward]
+    tone: [plain, exact]
+  mattering:
+    to-the-whole: "Turns a trusted ledger into the thing that pays the staff; doubles what Meadow is worth to a customer."
+    weight: major
+    inside:
+      - who: [O:role/Payroll-Owner]
+        because: "Payday is the one day the whole restaurant looks at the output; getting it right is visible."
+        stakes: "A wrong run is a kitchen of angry people by lunchtime."
+    chosen:
+      - who: [M:audience/restaurants]
+        because: "Tip disputes used to be weekly; now there is a line for every dollar."
+        stakes: "Back to a spreadsheet and a shouting match."
+    prospective:
+      - who: [M:audience/restaurants]
+        because: "Most payroll products do not understand pooled tips at all."
+        barrier: "They already pay for payroll somewhere and dread switching."
+
+- id: P:service/tip-out
+  type: service
+  name: Tip-out
+  summary: Allocates pooled tips by the house rule.
+  owner: O:role/Payroll-Owner
+  confidence: 0.9
+  sources: [session-2]
+  flow:
+    inputs:  [{resource: pooled-tips, from: P:offering/ledger, unit: USD/day, rate: 900}]
+    outputs: [{resource: tip-allocation, to: P:offering/payroll, unit: 1/run, rate: 1}]
+    schedule: batch
+    degradation: fail
+  substrate:
+    platforms: [S:system/python]
+    roles-required: [{role: O:role/Payroll-Owner, load: small}]
+  rules:
+    - must: "O:role/Payroll-Owner approve any change to a house rule"
+      else: "the previous rule stands"
+  principles:
+    purpose: "Apply the house rule exactly."
+    priorities: ["exactness over convenience"]
+  economics:
+    price: {model: internal}
+    cost: {model: flat, band: small}
+  vocabulary:
+    terms: [{term: house rule, means: "The restaurant's own tip-pooling formula, written once and applied every run."}]
+  affect:
+    audience: P:offering/payroll
+    elicits: [{feeling: fairness, intensity: 0.9}]
+    avoids: ["rounding that favours anyone"]
+  mattering:
+    to-the-whole: "The reason Meadow Pay is not just another payroll product."
+    weight: major
+    inside:
+      - who: [O:role/Payroll-Owner]
+        because: "Encoding a house rule with the owner is the most human conversation in the product."

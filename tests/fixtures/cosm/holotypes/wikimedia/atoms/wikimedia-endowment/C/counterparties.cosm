@@ -1,0 +1,78 @@
+# C — counterparties: the Foundation (a modelled atom) and the outsiders the Endowment's bonds, contracts and channels name. Donors are not named: the 2024 Form 990
+# says six gave above the Schedule B threshold and redacts them.
+nodes:
+  - id: C:counterparty/foundation
+    type: counterparty
+    name: Wikimedia Foundation
+    summary: The charity that runs Wikipedia; the Endowment's main grantee, and its manager under the cost-sharing agreement. A modelled atom in this Holotype.
+    kind: related-party
+    atom: atom/wikimedia-foundation
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+    status: active
+
+  - id: C:counterparty/tides-foundation
+    type: counterparty
+    name: Tides Foundation
+    summary: Held the Endowment's funds as a donor-advised fund from 2016 to 2023 and transferred $116.2M to the standalone Endowment on 2023-09-30.
+    kind: former-host
+    global-id: {domain: tides.org}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://foundation.wikimedia.org/wiki/Memory:Timeline"], confidence: 0.85, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/irs
+    type: counterparty
+    name: Internal Revenue Service
+    summary: Recognised the Endowment as a 501(c)(3) on 2022-06-28; receives its Form 990.
+    kind: regulator
+    global-id: {domain: irs.gov}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Main", "https://wikimediaendowment.org/wp-content/uploads/2026/05/2024-Form-990-WEND-Public.pdf"], confidence: 0.9, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/bdo
+    type: counterparty
+    name: BDO USA
+    summary: The Endowment's independent auditor, which also prepares the first draft of its Form 990.
+    kind: auditor
+    global-id: {domain: bdo.com}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.9, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/kiwix
+    type: counterparty
+    name: Kiwix
+    summary: Builds offline copies of Wikipedia; a grantee of the Endowment ($297,000 in 2024-25 on the Form 990's foreign-grants schedule).
+    kind: grantee
+    global-id: {domain: kiwix.org}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://wikimediaendowment.org/"], confidence: 0.85, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/freewill
+    type: counterparty
+    name: FreeWill
+    summary: A free online tool for making a will in the United States; the Endowment's partnership with it is its largest source of planned-giving leads.
+    kind: partner
+    global-id: {domain: freewill.com}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.8, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/investment-managers
+    type: counterparty
+    name: Investment managers and custodians
+    summary: Whoever manages and holds the portfolio; the public pages describe the index funds but name no manager or custodian. A class stub.
+    kind: vendor-class
+    global-id: {pending: "the managers and custodian of the endowment portfolio"}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.5, state: known}
+    atom: none
+    status: active

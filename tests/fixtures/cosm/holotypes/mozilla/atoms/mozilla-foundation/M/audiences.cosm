@@ -1,0 +1,112 @@
+# M: audiences: who funds the Foundation and whom it serves.
+nodes:
+  - id: M:audience/donors
+    type: audience
+    name: Individual donors
+    summary: People who give to the Foundation; contributions and grants were $6.5 million in 2024.
+    relation: [donor]
+    side: funding
+    geography: global
+    served-by: ['P:function/fundraising']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://www.mozillafoundation.org/en/'], confidence: 0.8, state: known}
+
+  - id: M:audience/philanthropic-partners
+    type: audience
+    name: Philanthropic and institutional partners
+    summary: Funders and institutions that co-run programs with the Foundation, such as the partners of Creative Futures and the City of Barcelona for MozFest 2026.
+    relation: [donor]
+    side: funding
+    served-by: ['P:offering/creative-futures', 'P:offering/mozilla-festival']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/', 'https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.7, state: known}
+
+  - id: M:audience/licensed-companies
+    type: audience
+    name: The Mozilla operating companies as licensees
+    summary: The Corporation and MZLA, which pay trademark licence fees ($23.0 million in 2024) that are the Foundation's largest source of revenue.
+    relation: [licensee]
+    side: funding
+    served-by: ['P:function/finance-and-treasury']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf'], confidence: 0.9, state: known}
+
+  - id: M:audience/grantees-and-fellows
+    type: audience
+    name: Grantees, fellows and incubator participants
+    summary: People and projects building alternatives to extractive technology; over 200 Fellows supported, $35 million invested over a decade.
+    relation: [beneficiary]
+    side: served
+    served-by: ['P:offering/grantmaking', 'P:offering/fellowships']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/grantmaking/', 'https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.8, state: known}
+
+  - id: M:audience/creative-sector
+    type: audience
+    name: Artists and the arts and culture sector
+    summary: Creators, residents and cultural institutions engaged in technology through Creative Futures.
+    relation: [beneficiary]
+    side: served
+    served-by: ['P:offering/creative-futures']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/', 'https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.8, state: known}
+
+  - id: M:audience/educators-and-students
+    type: audience
+    name: Educators, students and lifelong learners
+    summary: Researchers, teachers and students reached by Mozilla Education, the Responsible Computing Challenge and the curriculum library.
+    relation: [student]
+    side: served
+    served-by: ['P:offering/mozilla-education']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/'], confidence: 0.8, state: known}
+
+  - id: M:audience/open-internet-community
+    type: audience
+    name: The open-internet community and volunteers
+    summary: The global movement the Foundation says it mobilizes; about 10,000 volunteers by the 2024 Form 990 estimate.
+    relation: [member]
+    side: served
+    served-by: ['P:offering/campaigns', 'P:offering/mozilla-festival']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.7, state: known}
+
+  - id: M:audience/voice-contributors
+    type: audience
+    name: Voice contributors and speech-technology builders
+    summary: People who donate their voices to Common Voice and the builders who use the resulting public-domain datasets.
+    relation: [member]
+    side: supplying
+    served-by: ['P:offering/common-voice']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/co-create/', 'https://github.com/common-voice/common-voice'], confidence: 0.8, state: known}
+
+  - id: M:audience/builders-and-technologists
+    type: audience
+    name: Builders, technologists and artists at MozFest
+    summary: The people who gather at Mozilla Festival; about 2,000 joined in 2025.
+    relation: [member]
+    side: served
+    served-by: ['P:offering/mozilla-festival']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.8, state: known}
+
+  - id: M:audience/magazine-readers
+    type: audience
+    name: Readers of Nothing Personal
+    summary: Readers of the counterculture magazine and its product reviews.
+    relation: [customer]
+    side: served
+    served-by: ['P:offering/nothing-personal']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/', 'https://www.mozillafoundation.org/en/nothing-personal/privacy-not-included-sunset/'], confidence: 0.8, state: known}

@@ -1,0 +1,43 @@
+# S — systems: what the firm runs on. P's substrate names the first two; the Stripe feed names the third.
+nodes:
+  - id: S:system/postgres
+    type: system
+    name: PostgreSQL
+    summary: The ledger database; one primary with nightly backups, self-hosted.
+    category: datastore
+    vendor: none
+    counterparty: none
+    regulatory-criticality: high
+    status: active
+    visibility: internal
+    owner: O:role/Engineer
+    admin: O:position/engineer
+    provenance: {mode: dialectic, sources: [session-2, session-3], confidence: 0.9, state: known}
+
+  - id: S:system/python
+    type: system
+    name: Python services
+    summary: The ingest, reconcile and tip-out services; one codebase, deployed nightly.
+    category: runtime
+    vendor: none
+    counterparty: none
+    regulatory-criticality: medium
+    status: active
+    visibility: internal
+    owner: O:role/Engineer
+    admin: O:position/engineer
+    provenance: {mode: dialectic, sources: [session-2, session-3], confidence: 0.9, state: known}
+
+  - id: S:system/stripe
+    type: system
+    name: Stripe billing
+    summary: Subscription billing and card processing; holds the card numbers so Meadow never does.
+    category: billing
+    vendor: S:vendor/stripe
+    counterparty: C:counterparty/stripe
+    regulatory-criticality: high
+    status: active
+    visibility: internal
+    owner: O:role/Founder
+    admin: O:position/chief-executive
+    provenance: {mode: dialectic, sources: [session-3], confidence: 0.9, state: known}

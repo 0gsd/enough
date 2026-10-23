@@ -1,5 +1,14 @@
 {
   "_doc": "Visible-content bounding boxes for enough/static/icons/*.svg, measured 2026-07-16 via Chrome getBBox on the uniform 72x72 re-exports. Every source now has viewBox='0 0 72 72'; build_icons.py keeps that viewBox when the art fits inside it and auto-fits a square viewBox (centered on this bbox) only when the art overflows the artboard. If an icon source changes, re-measure and update its entry.",
+  "atem.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 28,
+      "w": 47,
+      "x": 11,
+      "y": 22
+    }
+  },
   "broker.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
@@ -189,6 +198,15 @@
       "h": 48
     }
   },
+  "cosm.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 52,
+      "w": 46,
+      "x": 13,
+      "y": 10
+    }
+  },
   "d6.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
@@ -277,6 +295,15 @@
       "w": 54.7,
       "x": 8.8,
       "y": 8.4
+    }
+  },
+  "macrocosm.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54,
+      "w": 54,
+      "x": 9,
+      "y": 9
     }
   },
   "merirmaidmode.svg": {

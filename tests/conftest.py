@@ -55,7 +55,11 @@ _FTR_XML = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
 _STATE_SEAMS = {
     "ENOUGH_WEIGHTS_DIR": "weights",
     "ENOUGH_LIVE_STATE": "live-models.json",
-    "ENOUGH_CACHEAWL_ROOT": "cacheawl",
+    # Canon (0.4.3): the new seam and the legacy one, at the same scratch
+    # dir — `canon.root()` reads ENOUGH_CANON_ROOT first and falls back to
+    # ENOUGH_CACHEAWL_ROOT, so both must point inside tmp_path.
+    "ENOUGH_CANON_ROOT": "canon",
+    "ENOUGH_CACHEAWL_ROOT": "canon",
     "ENOUGH_INFOWORLD_ROOT": "no-infoworld",
     "ENOUGH_WIKISINK_CONFIG": "wikisink.json",
     "ENOUGH_UI_CONFIG": "ui.json",

@@ -71,8 +71,10 @@ article the first time). Toolbar, left to right:
   (deletion override)
 - **💬** add a comment pinned to the paragraph in view
 - **save** — one button with a two-choice flyout: this project's `wiki/`
-  folder (created on first save), or the global `~/enough/cacheawl/wiki/`
-  cachebox (shared across all projects)
+  folder (created on first save), or the global `~/enough/canon/wiki/`
+  volume in Canon, enough's library (shared across all projects; Canon was
+  called cacheawl, and its volumes cacheboxes, before 0.4.3 — an existing
+  `~/enough/cacheawl/` becomes `~/enough/canon/` the first time 0.4.3 runs)
 - **newer-snapshot pill** — `newer snapshot: <date> · <size>`, shown only
   when Kiwix has a newer build of the flavor you have installed. Click →
   confirm → the same in-place upgrade the ⚙ installs list offers (same
@@ -89,7 +91,7 @@ question carries the quoted selection; without, it carries the article
 reference so the agent can read the page itself (`read_wiki_article`).
 
 A saved article is a **folder** — `wiki/<slug>/` in the project or
-`~/enough/cacheawl/wiki/<slug>/` in the global wiki cachebox — containing `article.html` (the
+`~/enough/canon/wiki/<slug>/` in Canon's global `wiki` volume — containing `article.html` (the
 article **exactly as the archive had it**) and `_manifest.md` (title,
 source URL, **CC BY-SA 4.0** license, retrieval date, origin), so every
 saved article is self-describing — and ready-made for attribution if
@@ -129,8 +131,8 @@ Nothing is ever deleted automatically.
 ## The wikisink (updating)
 
 Ask the agent — "run a wikisink" — or it happens via the `wikisink`
-tool. Every article you've **saved** (project or the global cacheawl wiki
-cachebox) or **commented on** is *watched*. A run:
+tool. Every article you've **saved** (project or Canon's global `wiki`
+volume) or **commented on** is *watched*. A run:
 
 1. checks watched articles against live Wikipedia (batched, polite,
    descriptive User-Agent);

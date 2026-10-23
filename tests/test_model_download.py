@@ -545,7 +545,7 @@ def client(iso: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     dirs (house rule) and supervise=False so no llama-server is spawned."""
     project = tmp_path / "project"
     project.mkdir()
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(tmp_path / "store"))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(tmp_path / "store"))
     monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(tmp_path / "no-infoworld"))
     monkeypatch.setenv("ENOUGH_WIKISINK_CONFIG", str(tmp_path / "wikisink.json"))
     monkeypatch.setenv("ENOUGH_UI_CONFIG", str(tmp_path / "ui.json"))

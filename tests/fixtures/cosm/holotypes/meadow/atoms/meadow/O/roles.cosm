@@ -1,0 +1,41 @@
+# O — the four roles, moved here unchanged from the COSM firm.cosm `roles:` block (ids namespaced).
+# A role is accountable for nodes; a position is a seat that holds roles; a person (in E) fills a seat.
+nodes:
+  - id: O:role/Founder
+    type: role
+    name: Founder
+    summary: Sets priorities, owns pricing and the bank roadmap, approves changes to the close procedure.
+    duties: ["set priorities", "approve changes to the close procedure"]
+    decides: ["pricing", "bank support roadmap"]
+    governs: [P:meadow, P:suite/books, P:offering/ledger, P:function/ingest]
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.9, state: known}
+
+  - id: O:role/Support-Lead
+    type: role
+    name: Support Lead
+    summary: Answers tickets and runs the morning health check; owns reconcile.
+    duties: ["answer tickets", "run the morning health check"]
+    decides: ["refund of a month on a missed close"]
+    governs: [P:service/reconcile]
+    escalates-to: O:role/Founder
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.9, state: known}
+
+  - id: O:role/Payroll-Owner
+    type: role
+    name: Payroll Owner
+    summary: Runs payroll on schedule and approves tip-out rules; owns Meadow Pay.
+    duties: ["run payroll on schedule", "approve tip-out rules"]
+    decides: ["pay-period boundaries", "rounding policy"]
+    governs: [P:offering/payroll, P:service/tip-out]
+    escalates-to: O:role/Founder
+    variance: {execution: 0.35, cadence-drift: "±3 days", note: "approvals cluster at period end"}
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.9, state: known}
+
+  - id: O:role/Engineer
+    type: role
+    name: Engineer
+    summary: Keeps the feeds flowing and ships the importer; a pool, not a single seat.
+    pool: true
+    duties: ["keep the feeds flowing", "ship the importer"]
+    escalates-to: O:role/Founder
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.9, state: known}

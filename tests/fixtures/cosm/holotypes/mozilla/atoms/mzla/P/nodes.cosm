@@ -1,0 +1,330 @@
+cosm: 0.3
+
+# Thunderbird's tree: the apps suite, Thunderbird Pro, Thunderbird Enterprise and the donations function.
+
+nodes:
+  - id: P:suite/apps
+    type: suite
+    name: Thunderbird apps
+    summary: 'The email, calendar and contacts apps: desktop, Android and iOS.'
+    owner: O:role/Chief-Executive
+    confidence: 0.8
+    sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/']
+    visibility: public
+    parts: ['P:offering/thunderbird-desktop', 'P:offering/thunderbird-android', 'P:offering/thunderbird-ios']
+    mattering:
+      to-the-whole: The State of the Bird says the project is sustained by donations and, in time, Thunderbird Pro services.
+      weight: critical
+      inside:
+        - who: ['O:role/Chief-Executive']
+          because: The chief executive answers for the apps.
+          confidence: 0.5
+
+  - id: P:offering/thunderbird-desktop
+    type: offering
+    name: Thunderbird for desktop
+    summary: Free, open-source (MPL 2.0) email, calendar and contacts for Windows, macOS and Linux. A monthly Release channel is the default for most users; the annual ESR 140 "Eclipse" came in July 2025 and ESR 153 "Meadow" in July 2026. Native Microsoft Graph support was announced in September 2026.
+    owner: O:role/Desktop-engineering
+    confidence: 0.8
+    sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://blog.thunderbird.net/']
+    since: 2003
+    visibility: public
+    parts: ['P:product/desktop-release-channel', 'P:product/desktop-esr']
+    substrate:
+      platforms:
+        - S:codebase/thunderbird-desktop
+    economics:
+      price: none
+    affect:
+      audience: M:audience/desktop-users
+      elicits:
+        - {feeling: control, when: filtering and organizing mail the way a person chooses}
+        - {feeling: trust, when: knowing no advertiser funds it}
+    mattering:
+      to-the-whole: The desktop app; the Thunderbird project dates from 2003.
+      weight: critical
+      inside:
+        - who: ['O:role/Desktop-engineering']
+          because: Desktop engineering ships a monthly Release channel and an annual ESR.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/desktop-users']
+          because: Free and open source under the MPL 2.0.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/desktop-users']
+          because: Windows, macOS and Linux users; Microsoft Graph support was announced in September 2026.
+          confidence: 0.5
+
+  - id: P:product/desktop-release-channel
+    type: product
+    name: Thunderbird Release channel
+    summary: The monthly release channel launched in 2024/25 and now the default for most users.
+    owner: O:role/Release-engineering
+    confidence: 0.8
+    sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: release, to: 'M:audience/desktop-users', unit: releases/month}
+    mattering:
+      to-the-whole: Gets features to users monthly.
+      weight: major
+      inside:
+        - who: ['O:role/Release-engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:product/desktop-esr
+    type: product
+    name: Thunderbird ESR
+    summary: 'The annual Extended Support Release: 140 "Eclipse" (July 2025) and 153 "Meadow" (July 2026).'
+    owner: O:role/Release-engineering
+    confidence: 0.8
+    sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://blog.thunderbird.net/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: release, to: 'M:audience/desktop-users', unit: releases/year}
+    mattering:
+      to-the-whole: The annual Extended Support Release.
+      weight: major
+      inside:
+        - who: ['O:role/Release-engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/thunderbird-android
+    type: offering
+    name: Thunderbird for Android
+    summary: The Android app, launched in October 2024 and built on K-9 Mail; the goal stated in 2025 is to make it the best Android email app available. Its repository has more than 14,000 stars.
+    owner: O:role/Mobile-engineering
+    confidence: 0.8
+    sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://github.com/thunderbird']
+    since: 2024-10
+    visibility: public
+    substrate:
+      platforms:
+        - S:codebase/thunderbird-android
+    economics:
+      price: none
+    affect:
+      audience: M:audience/android-users
+      elicits:
+        - {feeling: ease, when: importing account settings across Thunderbird apps}
+    mattering:
+      to-the-whole: The Android app, launched in October 2024 on the K-9 Mail base.
+      weight: major
+      inside:
+        - who: ['O:role/Mobile-engineering']
+          because: Mobile engineering ships monthly progress reports.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/android-users']
+          because: An open-source mail app for Android, on Google Play and F-Droid.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/android-users']
+          because: Desktop users who want the same on a phone.
+          confidence: 0.5
+
+  - id: P:offering/thunderbird-ios
+    type: offering
+    name: Thunderbird for iOS
+    summary: A native iPhone app being built from scratch with lessons from desktop and Android; the Thunderbird blog published a first look on 2026-10-01 and the 2025 plan was a TestFlight alpha. Not released.
+    owner: O:role/Mobile-engineering
+    confidence: 0.8
+    sources: ['https://blog.thunderbird.net/2026/10/thunderbird-for-ios-a-first-look-at-the-native-iphone-email-app-in-development/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://blog.thunderbird.net/']
+    status: planned
+    visibility: public
+    substrate:
+      platforms:
+        - S:codebase/thunderbird-ios
+    economics:
+      price: none
+    affect:
+      audience: M:audience/android-users
+      elicits:
+        - {feeling: anticipation, when: seeing the first look}
+    mattering:
+      to-the-whole: The iPhone app in development.
+      weight: major
+      inside:
+        - who: ['O:role/Mobile-engineering']
+          because: Mobile engineering publishes the repository and progress reports.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/desktop-users']
+          because: A first look was published on 2026-10-01.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/desktop-users']
+          because: iPhone users who want an open-source mail app.
+          confidence: 0.5
+
+  - id: P:offering/thunderbird-pro
+    type: offering
+    name: Thunderbird Pro (Thundermail)
+    summary: 'Since June 2026 described as the email service from Thunderbird, with features like Appointment and Send included. Thundermail is in beta: invited from a waitlist in waves; email, calendar and contacts, custom domains, working with Thunderbird and other clients. Pricing has been adjusted and no final figures are published on the pages read.'
+    owner: O:role/Web-services-engineering
+    confidence: 0.8
+    sources: ['https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/', 'https://blog.thunderbird.net/2026/04/thunderbird-pro-april-2026-update/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/']
+    status: planned
+    visibility: public
+    parts: ['P:service/thundermail', 'P:service/appointment', 'P:service/send', 'P:service/assist']
+    economics:
+      price:
+        model: subscription
+        detail: {pending: final prices; the April 2026 post says the initial price was adjusted and gives no figures}
+    affect:
+      audience: M:audience/pro-prospects
+      elicits:
+        - {feeling: independence, when: having an address off the big providers}
+        - {feeling: ease, when: 'one account for mail, calendar and scheduling'}
+      avoids: [ads, training AI on messages]
+    mattering:
+      to-the-whole: The State of the Bird names Thunderbird Pro services alongside donations as how the project stays financially sustainable.
+      weight: major
+      inside:
+        - who: ['O:role/Web-services-engineering']
+          because: Web services engineering is the team that builds the service; updates are published on the Thunderbird blog.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/pro-prospects']
+          because: Waitlist members are invited to the Thundermail beta in waves.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/pro-prospects']
+          because: People who want email without ads or AI training on their messages.
+          confidence: 0.5
+
+  - id: P:service/thundermail
+    type: service
+    name: Thundermail
+    summary: 'The email service: in Early Bird beta, with webmail still early (July 2026 update); more tiers and plans are to be added after it leaves beta.'
+    owner: O:role/Web-services-engineering
+    confidence: 0.8
+    sources: ['https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/', 'https://blog.thunderbird.net/2026/04/thunderbird-pro-april-2026-update/']
+    status: planned
+    visibility: public
+    flow:
+      outputs:
+        - {resource: mailbox, to: 'M:audience/pro-prospects', unit: invitations/wave}
+    mattering:
+      to-the-whole: The foundation of Thunderbird Pro.
+      weight: major
+      inside:
+        - who: ['O:role/Web-services-engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/appointment
+    type: service
+    name: Thunderbird Appointment
+    summary: A scheduling tool; in beta in 2025 and in development in April 2026, with simpler sign-up and one-click connection to the Thundermail calendar.
+    owner: O:role/Web-services-engineering
+    confidence: 0.8
+    sources: ['https://blog.thunderbird.net/2026/04/thunderbird-pro-april-2026-update/', 'https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/']
+    status: planned
+    visibility: public
+    flow:
+      outputs:
+        - {resource: bookings, to: 'M:audience/pro-prospects', unit: bookings/month}
+    mattering:
+      to-the-whole: The scheduling power feature.
+      weight: supporting
+      inside:
+        - who: ['O:role/Web-services-engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/send
+    type: service
+    name: Thunderbird Send
+    summary: End-to-end encrypted file sharing; in development in 2025 and April 2026, with encryption-key handling and password-protected downloads as near-term work.
+    owner: O:role/Web-services-engineering
+    confidence: 0.8
+    sources: ['https://blog.thunderbird.net/2026/04/thunderbird-pro-april-2026-update/', 'https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/']
+    status: planned
+    visibility: public
+    flow:
+      outputs:
+        - {resource: shared-files, to: 'M:audience/pro-prospects', unit: files/month}
+    mattering:
+      to-the-whole: The file-sharing power feature.
+      weight: supporting
+      inside:
+        - who: ['O:role/Web-services-engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/assist
+    type: service
+    name: Thunderbird Assist
+    summary: An AI writing tool announced in the 2025 plans; the April and June 2026 updates do not mention it.
+    owner: O:role/Web-services-engineering
+    confidence: 0.5
+    sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://blog.thunderbird.net/2026/04/thunderbird-pro-april-2026-update/']
+    status: planned
+    visibility: public
+    pending: 'whether Assist is still planned: the 2026 updates do not mention it'
+    mattering:
+      to-the-whole: The AI feature of the 2025 plan.
+      weight: peripheral
+      inside:
+        - who: ['O:role/Web-services-engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/thunderbird-enterprise
+    type: offering
+    name: Thunderbird Enterprise
+    summary: A managed edition for organizations, listed as "Coming Soon" beside Firefox Enterprise on the Firefox Enterprise page.
+    owner: O:role/Product-management
+    confidence: 0.6
+    sources: ['https://www.firefox.com/en-US/browsers/enterprise/']
+    status: planned
+    visibility: public
+    economics:
+      price:
+        model: negotiated
+        detail: {pending: price and date; none published}
+    affect:
+      audience: M:audience/enterprise-buyers
+      elicits:
+        - {feeling: control, when: managing mail clients across an organization}
+    mattering:
+      to-the-whole: Listed as Coming Soon beside Firefox Enterprise.
+      weight: supporting
+      inside:
+        - who: ['O:role/Product-management']
+          because: Product management lists it as coming soon.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/enterprise-buyers']
+          because: 'Not available yet: it is listed as coming soon.'
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/enterprise-buyers']
+          because: Organizations that use Firefox Enterprise.
+          confidence: 0.5
+
+  - id: P:function/fundraising
+    type: function
+    name: Donations
+    summary: 'User contributions through the donate page: $10.3 million in 2024 from more than 335,000 donors, 25% recurring; Fundraise Up is the platform and Stripe the processor. Gifts are not tax deductible because MZLA is a for-profit.'
+    owner: O:role/Marketing
+    confidence: 0.9
+    sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://www.thunderbird.net/en-US/donate/']
+    visibility: public
+    economics:
+      revenue:
+        user-contributions-2024: 10300000
+        unit: USD
+    mattering:
+      to-the-whole: User contributions of $10.3 million against $10.8 million of total income in 2024 make donations the main line.
+      weight: critical
+      inside:
+        - who: ['O:role/Marketing']
+          because: Marketing is one of the functions the Thunderbird about page lists.
+          confidence: 0.5

@@ -1,0 +1,56 @@
+# C: counterparties.
+nodes:
+  - id: C:counterparty/stripe
+    type: counterparty
+    name: Stripe
+    summary: Payment processor named on the Thunderbird donate page.
+    kind: platform
+    global-id:
+      domain: stripe.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/donate/'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/fundraise-up
+    type: counterparty
+    name: Fundraise Up
+    summary: Donation platform named on the Thunderbird donate page.
+    kind: platform
+    global-id:
+      domain: fundraiseup.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/donate/'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/google-play
+    type: counterparty
+    name: Google Play
+    summary: Android app store listing Thunderbird for Android.
+    kind: platform
+    global-id:
+      domain: play.google.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/mobile/'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/apple-app-store
+    type: counterparty
+    name: Apple App Store
+    summary: Planned store for Thunderbird for iOS, which is in development.
+    kind: platform
+    global-id:
+      domain: apps.apple.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2026/10/thunderbird-for-ios-a-first-look-at-the-native-iphone-email-app-in-development/'], confidence: 0.7, state: known}
+
+  - id: C:counterparty/github
+    type: counterparty
+    name: GitHub
+    summary: Code host of the Thunderbird repositories.
+    kind: platform
+    global-id:
+      domain: github.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://github.com/thunderbird'], confidence: 0.9, state: known}

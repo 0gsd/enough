@@ -1,0 +1,12 @@
+# Meadow Software — the spec's running example, in shorthand.
+# python3 scripts/cosm.py expand examples/meadow/meadow.sketch > firm.cosm
+meadow @Founder ! "must-not store card numbers at rest"
+  suite/books
+    offering/ledger @Founder $49/mo :) relief, trust
+      function/ingest ~ext/banks
+        service/bank-sync > service/reconcile
+        product/csv-importer > service/reconcile
+      service/reconcile > offering/ledger
+  offering/payroll @Payroll-Owner $4/seat :) fairness
+    service/tip-out > offering/payroll
+offering/ledger > offering/payroll, service/tip-out

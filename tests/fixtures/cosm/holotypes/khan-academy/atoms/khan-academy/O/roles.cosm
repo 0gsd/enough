@@ -1,0 +1,146 @@
+# O — the roles, from the public governance and leadership pages and the Form 990. A role is accountable for nodes; a position is a
+# seat that holds roles. No person is named anywhere: who fills a seat is not imported in a public sample.
+# Titles come from the leadership page as it stands; what each role decides is the modeller's reading unless a source says so.
+nodes:
+  - id: O:role/Board
+    type: role
+    name: Board of directors
+    summary: "Governs the nonprofit: 12 voting seats, 11 independent, at the end of the year to June 2025, elected by the board itself. Reviews the annual return before it is filed and amends the bylaws."
+    duties: ["oversee the nonprofit's governance", "review the Form 990 before it is filed", "amend the bylaws"]
+    decides: ["bylaws and board structure", "committee structure"]
+    governs: [O:position/board, C:governance/board]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [f990-2025, ka-leadership], confidence: 0.9, state: known}
+
+  - id: O:role/Audit-Committee
+    type: role
+    name: Audit oversight committee
+    summary: "Takes responsibility for oversight of the audit and for selecting the independent accountant; the financial statements are audited on a consolidated basis."
+    duties: ["oversee the independent audit of the financial statements", "select the independent accountant"]
+    governs: [C:filing/form-990-fy2025]
+    escalates-to: O:role/Board
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [f990-2025, charity-navigator], confidence: 0.9, state: known}
+
+  - id: O:role/Compensation-Committee
+    type: role
+    name: Compensation committee
+    summary: "A committee of board members that evaluates the chief executive's pay, with internal and external comparability data and a recorded approval."
+    duties: ["evaluate and approve the chief executive's compensation using comparability data"]
+    governs: [O:position/chief-executive]
+    escalates-to: O:role/Board
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [f990-2025], confidence: 0.9, state: known}
+
+  - id: O:role/Chief-Executive
+    type: role
+    name: Chief executive
+    summary: "Leads the nonprofit and is the top seat below the board. Stands behind the brand and, until a district role is named publicly, the districts business."
+    duties: ["set the nonprofit's priorities", "represent the mission publicly"]
+    decides: ["strategy and priorities"]
+    governs: [P:khan-academy, P:suite/districts, O:position/chief-executive]
+    escalates-to: O:role/Board
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-leadership, f990-2025], confidence: 0.8, state: known}
+
+  - id: O:role/Chief-Financial-Officer
+    type: role
+    name: Chief financial officer
+    summary: "Owns the books and the annual return: receives the draft Form 990 from the outside accounting firm and sends it to the full board before filing."
+    duties: ["prepare the annual return with the outside accountants", "send the return to the board before filing"]
+    governs: [C:entity/khan-academy-inc, C:entity/duck-duck-moose-llc, C:event/fiscal-year-change, C:finance/2018, C:finance/2019, C:finance/2020, C:finance/2021, C:finance/2022, C:finance/2023, C:finance/2024-01-to-2024-06, C:finance/2024-07-to-2025-06, C:finance/2025-07-to-2026-06]
+    escalates-to: O:role/Chief-Executive
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [f990-2025, ka-leadership], confidence: 0.8, state: known}
+
+  - id: O:role/Chief-Learning-Officer
+    type: role
+    name: Chief learning officer
+    summary: "Owns how learning is designed and the evidence that it works; speaks for the learning claims on the districts and impact pages."
+    duties: ["own learning design", "own the evidence base and efficacy research"]
+    governs: [P:suite/free-learning, P:suite/khanmigo, P:function/content-creation]
+    escalates-to: O:role/Chief-Executive
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-leadership, ka-districts, ka-impact], confidence: 0.6, state: known}
+
+  - id: O:role/Chief-Technology-Officer
+    type: role
+    name: Chief technology officer and engineering lead
+    summary: "Owns the platform, the AI tutor's engineering, the services behind them and the open-source code the nonprofit publishes."
+    duties: ["build and run the platform", "keep the open-source code published"]
+    governs: [P:function/platform-development, S:system/learning-platform, S:system/backend-services, S:system/khanmigo-ai, S:codebase/khan-github, S:codebase/perseus, S:codebase/wonder-blocks]
+    escalates-to: O:role/Chief-Executive
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-leadership, f990-2025, github-khan], confidence: 0.7, state: known}
+
+  - id: O:role/Chief-External-Relations-Officer
+    type: role
+    name: Chief external relations officer
+    summary: "Owns the outside relationships that spread the platform and fund it: partnerships with districts, test makers, corporations and foundations, and giving."
+    duties: ["build partnerships with institutions", "run fundraising and donor relations"]
+    governs: [P:function/awareness-and-adoption, P:function/fundraising, M:audience/donors, C:contract/stand-together]
+    escalates-to: O:role/Chief-Executive
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-leadership, f990-2025], confidence: 0.6, state: known}
+
+  - id: O:role/General-Counsel
+    type: role
+    name: General counsel and corporate secretary
+    summary: "Keeps the governing documents and the content licence, and every year collects and reviews conflict-of-interest disclosures."
+    duties: ["collect and review conflict-of-interest disclosures each year", "keep the bylaws"]
+    governs: [C:charter/bylaws, C:ip/educational-content]
+    escalates-to: O:role/Chief-Executive
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-leadership, f990-2025], confidence: 0.8, state: known}
+
+  - id: O:role/Chief-of-Staff
+    type: role
+    name: Chief of staff, strategic partnerships and business operations
+    summary: "Holds the strategic partnerships and the agreements behind them, and the bonds with sibling nonprofits, as the title suggests."
+    duties: ["run strategic partnerships", "run business operations"]
+    governs: [C:contract/college-board-sat, C:contract/microsoft, C:contract/google-org, C:contract/nwea, C:contract/new-hampshire, C:bond/affiliated-schoolhouse-world, C:bond/affiliated-khan-lab-school, C:bond/affiliated-khan-schools-network]
+    escalates-to: O:role/Chief-Executive
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-leadership], confidence: 0.5, state: known}
+
+  - id: O:role/Kids-Lead
+    type: role
+    name: Head of Khan Academy Kids
+    summary: "Leads the early-learning team behind the free app for ages 2 to 8 and its school version."
+    duties: ["lead the Khan Academy Kids team"]
+    governs: [P:suite/early-learning]
+    escalates-to: O:role/Chief-Executive
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-leadership, ka-kids], confidence: 0.8, state: known}
+
+  - id: O:role/International-Lead
+    type: role
+    name: Head of international
+    summary: "Leads work outside the United States: the offices in India and Brazil, the related organizations there, the translated sites and the international partner model."
+    duties: ["lead international programs", "work with partner entities and related organizations abroad"]
+    governs: [P:offering/international-programs, P:function/localization, C:policy/international-partner-model, C:bond/controls-khan-academy-india, C:bond/controls-khan-academy-brasil]
+    escalates-to: O:role/Chief-Executive
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-leadership, f990-2025, ka-help-partners], confidence: 0.7, state: known}
+
+  - id: O:role/Global-Advisory-Board
+    type: role
+    name: Global advisory board
+    summary: "A body of outside advisers, counted among the nonprofit's volunteers on the Form 990; a pool, not a seat. A separate thought-leadership council is also listed."
+    pool: true
+    duties: ["advise the nonprofit"]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-leadership, f990-2025], confidence: 0.8, state: known}

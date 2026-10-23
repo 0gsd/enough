@@ -42,7 +42,17 @@ CORE_BUDGET = 17_500
 #: 0.4.1: +900 for the FEED block (~580) and the core's `show_intro` plus its
 #: one-time offer (~300) — the tree measured ~21,960 before them, ~22,850
 #: after.
-FULL_BUDGET = 22_900
+#: 0.4.3: +809, exactly `len(prompt.CANON_TOOL_INSTRUCTIONS)`, the MacroCOSM
+#: block (owner decision 12: on by default, at most 1,000 chars) — the tree
+#: measured 22,746 before it, 23,556 after.
+FULL_BUDGET = 23_709
+#: The owner's cap on the MacroCOSM tools' docs (docs/canon-043-plan.md §13).
+CANON_BLOCK_MAX = 1_000
+#: A fresh project's whole assembled system prompt at HEAD (0.4.2, d865818),
+#: the project path written `<project>`: measured 2026-10-22 on this file's
+#: fixture against HEAD's tree exported with `git archive` (P6). This round's
+#: tree measured 74,166 before the MacroCOSM block and 74,976 after.
+HEAD_DEFAULT_PROMPT = 74_307
 #: The `/pal` block, which rides along on a pal turn only. Small on purpose:
 #: a turn that is about to spend the user's money on a cloud call is not the
 #: turn to also spend a page of their context window.
@@ -58,7 +68,7 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     (home / "enough" / "config").mkdir(parents=True, exist_ok=True)
     monkeypatch.setenv("HOME", str(home))
     for var, rel in (("ENOUGH_PROJECTS_STATE", "state/projects.json"),
-                     ("ENOUGH_CACHEAWL_ROOT", "cacheawl"),
+                     ("ENOUGH_CANON_ROOT", "cacheawl"),
                      ("ENOUGH_INFOWORLD_ROOT", "no-infoworld"),
                      ("ENOUGH_WIKISINK_CONFIG", "wikisink.json"),
                      ("ENOUGH_READVISORS_ROOT", "readvisors-global"),
@@ -225,6 +235,41 @@ def test_the_dictionary_block_follows_the_dictionary_not_the_skill(
     assert len(on) - len(off) == len(prompt.DICTIONARY_TOOL_INSTRUCTIONS) + 1
 
 
+def test_the_canon_block_rides_on_the_install_not_the_skill(
+        project: Path, monkeypatch: pytest.MonkeyPatch):
+    """The FEED pattern (owner decision 12): the MacroCOSM tools are on by
+    default, so their docs are in every project where the reader's manifests
+    ship; the `macrocosm-oes` skill ships OFF like every other shipped skill,
+    and `cosm_guide` hands its body over on demand."""
+    set_toggle("composure_enabled", True)
+    assert ("macrocosm-oes", False) in [(n, on) for n, on, _t in prompt.list_skills(project / "rness")]
+    off_skill = prompt.tool_instructions(project)
+    assert "## MacroCOSM" in off_skill
+    for name in ("cosm_read", "cosm_lint", "eml_derive", "atem", "cosm_guide"):
+        assert f'<tool name="{name}">' in off_skill, name
+    enable_skill(project, "macrocosm-oes")
+    assert prompt.tool_instructions(project) == off_skill
+    monkeypatch.setattr(prompt, "_macrocosm_available", lambda: False)
+    gone = prompt.tool_instructions(project)
+    assert "## MacroCOSM" not in gone and "cosm_read" not in gone and "cosm_guide" not in gone
+    assert len(off_skill) - len(gone) == len(prompt.CANON_TOOL_INSTRUCTIONS) + 1
+
+
+def test_the_default_prompt_grows_by_at_most_the_canon_block(project: Path):
+    """What a fresh project pays every turn (every shipped skill off, as shipped)
+    against HEAD (0.4.2, d865818), measured on the same fixture with HEAD's
+    tree exported read-only: the round may add the MacroCOSM block and nothing
+    more — in particular never the skill's body."""
+    text = prompt.assemble_system_prompt(project)
+    for p in {str(project.resolve()), str(project)}:
+        text = text.replace(p, "<project>")
+    assert "## macrocosm-oes" not in text and "## The six stances" not in text     # the skill's section
+    size = len(text)
+    assert size <= HEAD_DEFAULT_PROMPT + len(prompt.CANON_TOOL_INSTRUCTIONS) + 1, (
+        f"a fresh project's system prompt is {size} chars; HEAD's was {HEAD_DEFAULT_PROMPT}, and this round "
+        f"may add only the {len(prompt.CANON_TOOL_INSTRUCTIONS)}-char MacroCOSM block.")
+
+
 def test_show_intro_and_its_offer_are_in_the_always_on_core():
     assert '<tool name="show_intro">' in prompt.TOOL_INSTRUCTIONS
     assert '"want a brief introduction to enough?"' in prompt.TOOL_INSTRUCTIONS
@@ -257,13 +302,19 @@ def test_a_project_using_neither_pays_only_the_core(
         project: Path, monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
     """The whole point of the diet: a plain project is back to what it cost
     before composures and readvisor-forging existed — plus, where FEED
-    ships, the dictionary block and nothing else."""
+    ships, the dictionary block, and the MacroCOSM block every install
+    carries (0.4.3), and nothing else."""
     set_toggle("composure_enabled", False)
     disable_skill(project, "readvisory")
     assert prompt.tool_instructions(project).strip() == (
         prompt.TOOL_INSTRUCTIONS.rstrip() + "\n\n"
-        + prompt.DICTIONARY_TOOL_INSTRUCTIONS).strip()
+        + prompt.DICTIONARY_TOOL_INSTRUCTIONS.rstrip() + "\n\n"
+        + prompt.CANON_TOOL_INSTRUCTIONS).strip()
     no_feed(monkeypatch, tmp_path)
+    assert prompt.tool_instructions(project).strip() == (
+        prompt.TOOL_INSTRUCTIONS.rstrip() + "\n\n"
+        + prompt.CANON_TOOL_INSTRUCTIONS).strip()
+    monkeypatch.setattr(prompt, "_macrocosm_available", lambda: False)
     assert prompt.tool_instructions(project).strip() == \
         prompt.TOOL_INSTRUCTIONS.strip()
 
@@ -306,6 +357,14 @@ def test_the_fully_enabled_tool_docs_stay_inside_their_budget(project: Path):
         f"core + every gated block is {size} chars, over the {FULL_BUDGET} "
         f"budget. Raising this number is a decision, not a formality: it is "
         f"context window and prefill time on every turn.")
+
+
+def test_the_canon_block_stays_inside_the_owners_cap():
+    size = len(prompt.CANON_TOOL_INSTRUCTIONS)
+    assert size <= CANON_BLOCK_MAX, (
+        f"the MacroCOSM tool docs are {size} chars, over the owner's "
+        f"{CANON_BLOCK_MAX}. The guide is the macrocosm-oes skill; the block "
+        f"is only the tags.")
 
 
 def test_the_pal_block_stays_inside_its_budget():

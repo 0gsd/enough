@@ -1,0 +1,10 @@
+# M: where the donors are.
+nodes:
+  - id: M:geography/donors
+    type: geography
+    name: Where Thunderbird's money comes from
+    summary: Contributions came from over 200 countries in 2024; the top ten, led by Germany and the United States, gave 83%.
+    regions: [DE, US]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.8, state: known}

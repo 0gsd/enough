@@ -1,0 +1,101 @@
+# C: the Corporation's legal shell, its board, one acquired company and the events that shaped its portfolio.
+nodes:
+  - id: C:entity/mozilla-corporation
+    type: entity
+    name: Mozilla Corporation
+    summary: 'California C corporation that makes Firefox and the services around it: announced in August 2005 as the taxable subsidiary of the Mozilla Foundation, held at 100% by the Foundation in the 2024 filings and, per the June 2026 Mozilla.org FAQ, owned by Mozilla.org. Headquartered in San Francisco with operations in Australia, Canada, China, New Zealand, the Netherlands, Germany, France, the United Kingdom and other European countries.'
+    anchor: true
+    form: corporation
+    roles: [company, brand]
+    jurisdiction: US-CA
+    registered-office: 1875 Mission Street, Suite 103, San Francisco, CA 94103
+    former-address: 149 New Montgomery Street, 4th Floor, San Francisco, CA 94105 (Form 990 Schedule R, 2024)
+    domains: [firefox.com]
+    global-id: {ein: 20-3226186, domain: firefox.com}
+    tax-status: C corporation (taxable)
+    fiscal-year: calendar
+    since: 2005-08-03
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://en.wikipedia.org/wiki/Mozilla_Foundation', 'https://www.mozilla.org/en-US/about/legal/terms/mozilla/', 'https://www.mozilla.org/en-US/about/governance/organizations/'], confidence: 0.9, state: known}
+
+  - id: C:entity/anonym-inc
+    type: entity
+    name: Anonym, Inc.
+    summary: Privacy-preserving digital advertising measurement company, previously headquartered in San Mateo, California; Mozilla acquired 100% of its stock on 2024-06-14. The Mozilla blog calls Anonym "a Mozilla confidential computing technology designed specifically for advertising analytics" (April 2026). A legal shell inside this atom.
+    form: corporation
+    roles: [shell, company]
+    pending: Which Mozilla entity holds Anonym, Inc.? The audited statements say only "Mozilla".
+    since: 2024-06-14
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://blog.mozilla.org/en/advertising/anonym-reddit-partnership/'], confidence: 0.8, state: known}
+
+  - id: C:governance/board
+    type: governance
+    name: Board of Directors of Mozilla Corporation
+    summary: One of the family boards named on the leadership page (with the Foundation, Mozilla.org and Mozilla.ai boards). Its size, composition and committees are not published on the pages read.
+    voting-members: {pending: number of directors}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.6, state: known}
+
+  - id: C:event/fakespot-acquired
+    type: event
+    name: Mozilla acquires Fakespot
+    summary: 'On 2023-04-26 Mozilla acquired 100% of Fakespot, Inc. for cash and deferred contingent consideration: purchase consideration $27.4 million, of which $19.6 million goodwill.'
+    kind: acquisition
+    at: 2023-04-26
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://en.wikipedia.org/wiki/Fakespot'], confidence: 0.9, state: known}
+
+  - id: C:event/anonym-acquired
+    type: event
+    name: Mozilla acquires Anonym
+    summary: 'On 2024-06-14 Mozilla acquired 100% of Anonym, Inc. for cash under 5% of total assets: purchase consideration $31.2 million (goodwill $19.1 million), plus a $44.4 million holdback that vests with continued employment over three years.'
+    kind: acquisition
+    at: 2024-06-14
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf'], confidence: 0.9, state: known}
+
+  - id: C:event/mozilla-online-claims
+    type: event
+    name: Claims against Mozilla Online to wind it down
+    summary: In May 2023 Mozilla filed legal claims against Beijing Mozilla Firefox Information Technology, Ltd. (Mozilla Online) with the long-term intent to wind down its operations in China. The contract with the Corporation expired without renewal; the litigation was still in process at 2024-12-31, and in March 2025 an arbitrator awarded Mozilla a portion of the amount it claimed.
+    kind: dispute
+    period: 2023-05
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf'], confidence: 0.9, state: known}
+
+  - id: C:event/google-search-ruling
+    type: event
+    name: Mozilla comments on the US v. Google remedies ruling
+    summary: 'Mozilla''s blog of 2025-09-08, a week after the remedies ruling: Google may not stop browsers from defaulting to or promoting other search engines or generative AI services; the court considered but rejected a ban on search payments to small independent browsers like Firefox.'
+    kind: ruling
+    at: 2025-09-08
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.mozilla.org/en/mozilla/internet-policy/defending-an-open-web/'], confidence: 0.9, state: known}
+
+  - id: C:event/pocket-shutdown
+    type: event
+    name: Pocket shut down
+    summary: 'Announced 2025-05-22: downloads and new Premium subscriptions ended that day; Pocket shut down on 2025-07-08; saves could be exported until 2025-10-08, after which data was permanently deleted; annual Premium subscribers were refunded.'
+    kind: retirement
+    at: 2025-07-08
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.mozilla.org/en/mozilla/building-whats-next/', 'https://en.wikipedia.org/wiki/Pocket_(service)'], confidence: 0.9, state: known}
+
+  - id: C:event/fakespot-shutdown
+    type: event
+    name: Fakespot shut down
+    summary: The Review Checker built into Firefox ended on 2025-06-10; the Fakespot extensions, mobile apps and website stopped on 2025-07-01. The audited statements estimate a $13.7 million impairment on the acquired assets.
+    kind: retirement
+    at: 2025-07-01
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.mozilla.org/en/mozilla/building-whats-next/', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf'], confidence: 0.9, state: known}

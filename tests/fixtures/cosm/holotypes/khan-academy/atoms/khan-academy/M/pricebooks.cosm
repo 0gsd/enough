@@ -1,0 +1,18 @@
+# M — price books: the only public prices. The platform, the teacher tools and the Kids app are free; district prices are quoted on request.
+# The monthly rate also sits on the offering in P and on the SKU in I; lint rule 3 flags any disagreement.
+nodes:
+  - id: M:pricebook/khanmigo
+    type: pricebook
+    name: Khanmigo list price
+    summary: "One price for learners and one for parents: $4 a month or $44 a year, sales tax not included. A parent subscription covers up to 10 children. Free for teachers; district access is separate."
+    kind: list
+    set-by: self
+    currency: USD
+    for: [P:offering/khanmigo-families]
+    rates:
+      - {offering: P:offering/khanmigo-families, sku: I:sku/khanmigo-monthly, model: flat, value: 4, unit: USD/month, billed: monthly}
+      - {sku: I:sku/khanmigo-annual, model: flat, value: 44, unit: USD/year, billed: yearly}
+    status: active
+    visibility: public
+    owner: O:role/Chief-Learning-Officer
+    provenance: {mode: net-scan, sources: [khanmigo-learners, khanmigo-parents], confidence: 0.9, state: known}

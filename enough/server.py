@@ -28,7 +28,7 @@ import sys
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import httpx
 import uvicorn
@@ -41,8 +41,14 @@ from . import __version__
 from . import broker as _broker
 from .wikisink import config as _wikisink_config
 from .llm import LLMError, stream_chat
+from . import llm as _llm
 from . import cloud as _cloud
+from . import canon as _canon
+from . import canon_derive as _canon_derive
+from . import canon_tools as _canon_tools
+from . import canon_jobs as _canon_jobs
 from . import convert as _convert
+from . import macrocosm as _macrocosm
 from . import home as _home
 from . import models as _models
 from . import paginate as _paginate
@@ -81,7 +87,7 @@ _DEFAULT_UI_CONFIG_LIVE = Path.home() / "enough" / "config" / "ui.json"
 
 def _ui_config_live_path() -> Path:
     """Live ui.json location, honoring ENOUGH_UI_CONFIG (a test/dev hook,
-    mirroring the ENOUGH_WIKISINK_CONFIG / ENOUGH_CACHEAWL_ROOT precedent) so
+    mirroring the ENOUGH_WIKISINK_CONFIG / ENOUGH_CANON_ROOT precedent) so
     suites never touch the real ~/enough/config/ui.json."""
     env = os.environ.get("ENOUGH_UI_CONFIG")
     return Path(env).expanduser() if env else _DEFAULT_UI_CONFIG_LIVE
@@ -209,6 +215,20 @@ HIDDEN_TREE_PATHS: frozenset[str] = frozenset({
 })
 
 
+# The virtual path prefixes that address the Canon store instead of the
+# project: `canon:<volume>/<rel>` (0.4.3) and its pre-0.4.3 spelling
+# `cacheawl:<box>/<rel>`, accepted everywhere the new one is.
+STORE_PREFIXES: tuple[str, ...] = ("canon:", "cacheawl:")
+
+
+def _store_prefix(path: str) -> str | None:
+    """The Canon prefix ``path`` starts with, or None for a project path."""
+    for prefix in STORE_PREFIXES:
+        if path.startswith(prefix):
+            return prefix
+    return None
+
+
 def _readvisor_origin(project_dir: Path, name: str) -> str:
     """Where a readvisor visible in this project actually lives:
     `"project"`, `"global"` or `"shipped"` (P7).
@@ -290,8 +310,8 @@ def _wikisink_storage_real() -> frozenset[Path]:
     install's storage dir. Archives and sidecar stores (overlay,
     comments, preserved, …) must never render in the file tree — only
     articles explicitly saved into a project's wiki/ (or the global wiki
-    cachebox) are user-visible files. Resolved fresh per tree build: cheap (one
-    tiny JSON read) and always honors just-changed locations."""
+    volume in Canon) are user-visible files. Resolved fresh per tree build:
+    cheap (one tiny JSON read) and always honors just-changed locations."""
     cfg = _wikisink_config.load_config()
     dirs = [_wikisink_config.data_dir(cfg)]
     dirs += [Path(i.get("storage_dir") or "").expanduser()
@@ -330,6 +350,11 @@ def _walk_tree(
         entries = sorted(abs_dir.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
     except OSError:
         return []
+    # EML twins (`notes.md.cosm` beside `notes.md`, declaring `oes: eml/1`)
+    # hide behind their texts, which carry `eml: {path, state}` — the same
+    # one-row-per-document rule as convert twins (canon-043 plan §6.3).
+    eml_twins = _canon.eml_twins(entries)
+    eml_hidden = {t.name for t in eml_twins.values()}
     out: list[dict[str, Any]] = []
     for p in entries:
         if p.name.startswith("."):
@@ -338,6 +363,8 @@ def _walk_tree(
             continue
         rel = "/".join(rel_parts + (p.name,))
         if rel in HIDDEN_TREE_PATHS:
+            continue
+        if p.name in eml_hidden:
             continue
         if wikisink_real and p.is_dir():
             try:
@@ -377,6 +404,10 @@ def _walk_tree(
                     node["wiki_saved"] = True
             except OSError:
                 pass
+            # A Comprise Holotype: flagged so the UI can badge it and open it
+            # in the cosm viewer; the sidebar still shows its files.
+            if _canon.is_holotype_folder(p):
+                node["holotype"] = True
             node["children"] = _walk_tree(root, rel_parts + (p.name,), visited, wikisink_real)
         elif p.name == "article.html":
             try:
@@ -413,22 +444,33 @@ def _walk_tree(
                 node["pages"] = man.get("pages", 0)
         elif _convert.is_image(p):
             node["image"] = True        # opens in the viewer, not the preview
+        if not p.is_dir():
+            # The project's catalog (kept by enough, write-refused) and any
+            # other .cosm file (opens in the cosm viewer).
+            if rel == _canon.PROJECT_CATALOG:
+                node["catalog"] = True
+            elif p.suffix == ".cosm":
+                node["cosm"] = True
+            twin = eml_twins.get(p.name)
+            if twin is not None:
+                node["eml"] = _canon.eml_entry(
+                    p, "/".join(rel_parts + (twin.name,)), twin=twin)
         out.append(node)
     return out
 
 
 def _hidden_global_dirs() -> frozenset[Path]:
     """Resolved global dirs that must never render in a project's file tree:
-    the wikisink storage/data dirs plus the cacheawl store root. cacheawl is
-    a global store (like wikisink) accessed through its own UI/tools, not a
-    per-project artifact — hide it the same way, in case a project ever
+    the wikisink storage/data dirs plus the Canon store root (and the old
+    `~/enough/cacheawl/`, should it still sit beside a migrated store). Canon
+    is a global store (like wikisink) accessed through its own UI/tools, not
+    a per-project artifact — hide it the same way, in case a project ever
     symlinks to or sits near it."""
     dirs = set(_wikisink_storage_real())
     try:
-        from . import cacheawl as _cacheawl
-        r = _cacheawl.root()
-        if r.exists():
-            dirs.add(r.resolve())
+        for r in (_canon.root(), Path.home() / "enough" / "cacheawl"):
+            if r.exists():
+                dirs.add(r.resolve())
     except OSError:
         pass
     return frozenset(dirs)
@@ -483,6 +525,16 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
             man_attr = str(n["paginated"]).replace('"', "&quot;")
             conv_attr += (f' data-paginated="{man_attr}"'
                           f' data-pages="{n.get("pages", 0)}"')
+        # Canon flags (0.4.3): the project catalog, any other .cosm, and a
+        # text's EML twin (hidden from the tree, named here with its state).
+        if n.get("catalog"):
+            conv_attr += ' data-catalog="1"'
+        elif n.get("cosm"):
+            conv_attr += ' data-cosm="1"'
+        if isinstance(n.get("eml"), dict):
+            eml_path = str(n["eml"].get("path", "")).replace('"', "&quot;")
+            conv_attr += (f' data-eml="{eml_path}"'
+                          f' data-eml-state="{n["eml"].get("state", "")}"')
 
         # `data-path` + `data-name` on the row's <li> are read by the
         # tree context menu (option-click) so the JS can identify the
@@ -492,6 +544,8 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
             has_kids = bool(n.get("children"))
             dir_state_cls = " has-children" if has_kids else " empty-folder"
             saved_attr = ' data-wiki-saved="1"' if n.get("wiki_saved") else ""
+            if n.get("holotype"):
+                saved_attr += ' data-holotype="1"'
             # Zippy glyph: ▾ (expanded, default) if has children; nothing if empty.
             zippy = '<span class="zippy">▾</span>' if has_kids else '<span class="zippy-spacer"></span>'
             out.append(
@@ -1370,14 +1424,16 @@ async def _handle_tool(session: Session, call: ToolCall, sink: list[tuple[str, s
 # ---------------------------------------------------------------------------
 
 # Everything a home-mode server answers. One page, one set of prefs, the help
-# center (project-independent), the formats table its {{convert-formats}}
+# center and the MacroCOSM spec (both project-independent; Canon's
+# `/api/canon/*` and its `/api/cacheawl/*` aliases are project routes and 404
+# here alike), the formats table its {{convert-formats}}
 # token expands, the desktop shell's graceful-quit route (a home backend is
 # still a backend the shell has to be able to stop), and /api/home/*.
 # Everything else is project-scoped, and a home server has no project to scope
 # it to.
 HOME_PATHS: frozenset[str] = frozenset({
     "/", "/favicon.ico", "/api/ui-config", "/api/help-center",
-    "/api/convert/formats", "/api/shutdown",
+    "/api/macrocosm-spec", "/api/convert/formats", "/api/shutdown",
 })
 HOME_PREFIXES: tuple[str, ...] = ("/api/home/", "/static/")
 
@@ -1457,6 +1513,9 @@ def create_app(
             return
         asyncio.run_coroutine_threadsafe(session.emit(event, data), loop)
     session.supervisor = supervisor  # so _run_turn can read current ctx for the usage gauge
+    # Startup work the lifespan fires and doesn't await (the project catalog);
+    # held here so the tasks aren't garbage-collected mid-run.
+    _startup_tasks: set[asyncio.Task[Any]] = set()
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -1464,7 +1523,7 @@ def create_app(
         _loop["loop"] = loop
         if home:
             # The launch screen runs none of the below: no llm client, no
-            # supervisor, no broker, no wikisink, no cacheawl migration.
+            # supervisor, no broker, no wikisink, no Canon migration.
             # It seeds the registry from the shell's MRU (once — the flag
             # lives in the registry) and gets out of the way.
             try:
@@ -1492,17 +1551,18 @@ def create_app(
             asyncio.run_coroutine_threadsafe(session.emit("wiki_sink", data), loop)
 
         _wiki_update.PROGRESS_EMITTER = _wiki_progress
-        # One-time, idempotent dissolve of ~/enough/infoworld/ into cacheawl
-        # cacheboxes (personal/public/wiki). Missing infoworld = no-op; a box
-        # of the same name already present = skipped. Move-only.
+        # One-time, idempotent dissolve of ~/enough/infoworld/ into Canon
+        # volumes (personal/public/wiki). Missing infoworld = no-op; a volume
+        # of the same name already present = skipped. Move-only. (Its first
+        # `canon.root()` is also where ~/enough/cacheawl/ becomes
+        # ~/enough/canon/, once.)
         try:
-            from . import cacheawl as _cacheawl
-            report = await asyncio.to_thread(_cacheawl.migrate_infoworld)
+            report = await asyncio.to_thread(_canon.migrate_infoworld)
             if report.get("migrated"):
-                log.info("cacheawl: migrated infoworld folders %s",
+                log.info("canon: migrated infoworld folders %s",
                          report["migrated"])
         except Exception:  # noqa: BLE001 — never block startup on migration
-            log.exception("cacheawl infoworld migration failed")
+            log.exception("canon infoworld migration failed")
         # FEED: build ~/enough/dict/feed.sqlite from reflib/dict when it is
         # missing or its manifest digest moved. Background thread; progress
         # is /api/dict/status. A missing source is "unavailable", not an error.
@@ -1516,10 +1576,24 @@ def create_app(
                 await supervisor.bootstrap()
             except Exception:  # noqa: BLE001
                 log.exception("supervisor bootstrap failed")
+        # The project's catalog, rness/canon.cosm (plan §6.7): reconciled once
+        # at open, in a worker thread that startup doesn't wait for — it
+        # writes only when the bytes would change.
+        def _project_catalog() -> None:
+            try:
+                _canon.project_catalog(session.project_dir)
+            except Exception:  # noqa: BLE001 — a catalog is never worth a failed open
+                log.exception("canon: project catalog at startup failed")
+
+        _startup_tasks.add(loop.create_task(asyncio.to_thread(_project_catalog)))
         try:
             yield
         finally:
             _wiki_update.PROGRESS_EMITTER = None
+            # A startup catalog still running finishes in its thread; the task
+            # is let go so the loop can close without a pending-task warning.
+            for task in list(_startup_tasks):
+                task.cancel()
             await asyncio.to_thread(_dictionary.cancel_build)
             if supervisor is not None:
                 await supervisor.stop(only_if_owned=True)
@@ -2069,18 +2143,18 @@ def create_app(
         for follow-through reads; this helper guards only against path-
         string traversal (absolute paths and `..` components).
 
-        A `cacheawl:<box>/<rel>` prefix addresses the machine-global
-        cachebox store instead of the project — that's how cacheawl mode
-        launches store files into read/edit, girraph, and merirmaid
-        modes. Same traversal rules apply inside the store; the mirror
-        and sidecar write-guards downstream see the resolved target and
-        keep applying."""
-        if path.startswith("cacheawl:"):
-            rel = Path(path[len("cacheawl:"):].lstrip("/"))
+        A `canon:<volume>/<rel>` prefix (or the pre-0.4.3 spelling,
+        `cacheawl:<box>/<rel>`) addresses the machine-global Canon store
+        instead of the project — that's how Canon mode launches store files
+        into read/edit, girraph, and merirmaid modes. Same traversal rules
+        apply inside the store; the catalog and sidecar write-guards
+        downstream see the resolved target and keep applying."""
+        prefix = _store_prefix(path)
+        if prefix:
+            rel = Path(path[len(prefix):].lstrip("/"))
             if rel.is_absolute() or ".." in rel.parts or not rel.parts:
                 raise HTTPException(400, "invalid path")
-            from . import cacheawl as _cacheawl
-            return _cacheawl.root().resolve() / rel
+            return _canon.root().resolve() / rel
         p = Path(path)
         if p.is_absolute() or ".." in p.parts:
             raise HTTPException(400, "invalid path")
@@ -2375,10 +2449,10 @@ def create_app(
         None for a plain markdown file, which can still be exported (md → PDF
         works on every install) but has nothing to overwrite.
 
-        cacheawl paths are refused here on purpose — plan decision 9 scopes v1
-        to the project tree, and the store's mirror/sidecar write-guards have
-        no opinion about twins."""
-        if path.startswith("cacheawl:"):
+        Canon paths (`canon:` and the legacy `cacheawl:`) are refused here on
+        purpose — plan decision 9 scopes v1 to the project tree, and the
+        store's catalog/sidecar write-guards have no opinion about twins."""
+        if _store_prefix(path):
             raise HTTPException(400, "conversion works on project files only")
         target = _resolve_project_path(path)
         try:
@@ -2574,7 +2648,7 @@ def create_app(
         """What the modal draws itself from: the font list, the size table,
         the default export name, and whether the two engines are here. The
         frontend hardcodes none of it."""
-        if path.startswith("cacheawl:"):
+        if _store_prefix(path):
             raise HTTPException(400, "pagination works on project files only")
         _resolve_project_path(path)          # traversal guard, same as /api/file
         try:
@@ -2594,7 +2668,7 @@ def create_app(
         path = (body.get("path") or "").strip()
         if not path:
             raise HTTPException(400, "missing path")
-        if path.startswith("cacheawl:"):
+        if _store_prefix(path):
             raise HTTPException(400, "pagination works on project files only")
         _resolve_project_path(path)
         try:
@@ -2707,13 +2781,21 @@ def create_app(
     # `rness/knowledge/session-logs/<date>-broker.md`.
     from . import highlights as _highlights
 
+    def _highlight_doc(path: str) -> str:
+        """The `doc_rel` the highlights module takes. A project path passes
+        through; a Canon path (`canon:` / `cacheawl:`) becomes its absolute
+        resolved location, so the sidecar lands beside the stored document
+        (highlights composes `project_dir / doc_rel`, and an absolute
+        `doc_rel` wins that join) instead of in a folder named after the
+        prefix inside the project. The traversal guard runs either way."""
+        target = _resolve_project_path(path)
+        return str(target) if _store_prefix(path) else path
+
     @app.get("/api/highlights")
     async def api_highlights_get(path: str = Query(...)) -> dict[str, Any]:
         # Resolve through the same path-safety helper as /api/file so
-        # off-allowlist paths get the same 4xx behavior. We don't need
-        # the resolved path itself — load_highlights uses doc_rel.
-        _resolve_project_path(path)
-        items = _highlights.load_highlights(project_dir, path)
+        # off-allowlist paths get the same 4xx behavior.
+        items = _highlights.load_highlights(project_dir, _highlight_doc(path))
         return {"path": path, "highlights": items}
 
     @app.post("/api/highlights")
@@ -2722,7 +2804,7 @@ def create_app(
         path = (form.get("path") or "").strip()
         if not path:
             raise HTTPException(400, "missing path")
-        _resolve_project_path(path)
+        doc = _highlight_doc(path)
         color = (form.get("color") or "").strip()
         snippet = form.get("snippet") or ""
         if not snippet:
@@ -2740,7 +2822,7 @@ def create_app(
                 raise HTTPException(400, f"{name} must be int") from None
         try:
             entry = _highlights.add_highlight(
-                project_dir, path,
+                project_dir, doc,
                 color=color,
                 snippet=snippet,
                 before_anchor=before_anchor,
@@ -2757,8 +2839,7 @@ def create_app(
         path: str = Query(...),
         id: str = Query(...),
     ) -> dict[str, Any]:
-        _resolve_project_path(path)
-        ok = _highlights.delete_highlight(project_dir, path, id)
+        ok = _highlights.delete_highlight(project_dir, _highlight_doc(path), id)
         if not ok:
             raise HTTPException(404, "no such highlight id")
         return {"path": path, "id": id, "removed": True}
@@ -2774,7 +2855,7 @@ def create_app(
         hl_id = (form.get("id") or "").strip()
         if not path or not hl_id:
             raise HTTPException(400, "missing path or id")
-        _resolve_project_path(path)
+        doc = _highlight_doc(path)
         changes: dict[str, Any] = {}
         if (color := form.get("color")):
             color = color.strip().lower()
@@ -2787,7 +2868,7 @@ def create_app(
             changes["color"] = color
         if not changes:
             raise HTTPException(400, "no updatable fields supplied")
-        updated = _highlights.update_highlight(project_dir, path, hl_id, **changes)
+        updated = _highlights.update_highlight(project_dir, doc, hl_id, **changes)
         if updated is None:
             raise HTTPException(404, "no such highlight id")
         return {"path": path, "highlight": updated}
@@ -2850,8 +2931,9 @@ def create_app(
 
     def _merirmaid_echo(path: str) -> str:
         """The sibling `.merirmaid` path in the SAME scheme the request used —
-        so a `cacheawl:`-prefixed girraph answers with a `cacheawl:`-prefixed
-        mirror, and an in-tree girraph with an in-tree mirror."""
+        so a `canon:`- (or `cacheawl:`-) prefixed girraph answers with a
+        mirror in the same prefix, and an in-tree girraph with an in-tree
+        mirror."""
         if path.endswith(".girraph"):
             return path[: -len(".girraph")] + ".merirmaid"
         return path
@@ -2899,7 +2981,7 @@ def create_app(
         out = _girraph_tree_json(path, g)
         # The linked-mirror state, so the frontend's add/open-merirmaid
         # button needs no extra round trip. Echoed in the request's own path
-        # scheme (cacheawl: prefix preserved).
+        # scheme (canon:/cacheawl: prefix preserved).
         out["merirmaid"] = _merirmaid_echo(path) if _girraph.has_mirror(target) else None
         return out
 
@@ -3513,88 +3595,109 @@ def create_app(
         return {"ok": True, "action": action}
 
     # -----------------------------------------------------------------
-    # cacheawl — the global file store. Backend for the (future) split-view
-    # cachebox UI. Contract documented in docs/cacheawl-plan.md.
+    # Canon — the global file store (was: cacheawl). Backend for the
+    # split-view Canon UI. Contract: docs/canon-043-plan.md §6. Every route
+    # that existed before 0.4.3 answers under /api/canon/<x> AND its old
+    # /api/cacheawl/<x> (one handler, identical responses); the routes new in
+    # 0.4.3 are /api/canon/* only. Query and payload keys (`box`,
+    # `box_path`, `cacheboxes`) are unchanged on the wire.
     # -----------------------------------------------------------------
     _ingest_tasks: set[asyncio.Task[Any]] = set()
 
-    @app.get("/api/cacheawl/tree")
-    async def api_cacheawl_tree() -> dict[str, Any]:
-        """Project tree + every cachebox tree in one payload for the split
-        view. Triggers a cheap reconcile per box first so manual file drops
-        the backend didn't see are reflected."""
-        from . import cacheawl as _cacheawl
+    def _canon_route(method: str, sub: str):
+        """Register a handler under `/api/canon/<sub>` and its pre-0.4.3
+        alias `/api/cacheawl/<sub>` — stacked registrations of the same
+        function, so the two answer identically by construction."""
+        def deco(fn: Callable[..., Any]) -> Callable[..., Any]:
+            for prefix in ("/api/canon/", "/api/cacheawl/"):
+                app.add_api_route(prefix + sub, fn, methods=[method])
+            return fn
+        return deco
+
+    def _canon_http(e: "_canon.CanonError") -> HTTPException:
+        """A missing volume or folder is a 404; every other refusal a 400."""
+        return HTTPException(404 if isinstance(e, _canon.CanonNotFound) else 400, str(e))
+
+    @_canon_route("GET", "tree")
+    async def api_canon_tree() -> dict[str, Any]:
+        """Project tree + every volume tree in one payload for the split
+        view. Triggers a cheap reconcile per volume first so manual file
+        drops the backend didn't see are reflected, and reconciles the
+        project's catalog (rness/canon.cosm) — the Canon pane is one of the
+        places it is kept fresh (plan §6.7). The list stays under the key
+        `cacheboxes` for one release."""
 
         def _build() -> dict[str, Any]:
-            _cacheawl.reconcile_all()
-            boxes = []
-            for summary in _cacheawl.list_cacheboxes():
-                # A box can vanish (rename/delete race) or error between
+            _canon.reconcile_all()
+            try:
+                _canon.project_catalog(project_dir)
+            except Exception:  # noqa: BLE001 — the tree must not fail on the catalog
+                log.exception("canon tree: project catalog failed")
+            volumes = []
+            for summary in _canon.list_volumes():
+                # A volume can vanish (rename/delete race) or error between
                 # the listing and its tree scan — skip it rather than
                 # 500ing the whole two-pane view.
                 try:
-                    boxes.append(_cacheawl.cachebox_tree(summary["name"]))
-                except (_cacheawl.CacheawlError, OSError):
-                    log.warning("cacheawl tree: skipping box %r", summary["name"])
+                    volumes.append(_canon.volume_tree(summary["name"]))
+                except (_canon.CanonError, OSError):
+                    log.warning("canon tree: skipping volume %r", summary["name"])
             return {
-                "root": str(_cacheawl.root()),
+                "root": str(_canon.root()),
                 "project": build_file_tree(project_dir),
-                "cacheboxes": boxes,
+                "cacheboxes": volumes,
             }
 
         return await asyncio.to_thread(_build)
 
-    @app.post("/api/cacheawl/create")
-    async def api_cacheawl_create(request: Request) -> dict[str, Any]:
-        from . import cacheawl as _cacheawl
+    @_canon_route("POST", "create")
+    async def api_canon_create(request: Request) -> dict[str, Any]:
         body = await request.json()
         name = (body.get("name") or "").strip()
         try:
-            summary = await asyncio.to_thread(_cacheawl.create_cachebox, name)
-        except _cacheawl.CacheawlError as e:
-            raise HTTPException(400, str(e)) from None
+            summary = await asyncio.to_thread(_canon.create_volume, name)
+        except _canon.CanonError as e:
+            raise _canon_http(e) from None
         return summary
 
-    @app.post("/api/cacheawl/rename")
-    async def api_cacheawl_rename(request: Request) -> dict[str, Any]:
-        from . import cacheawl as _cacheawl
+    @_canon_route("POST", "rename")
+    async def api_canon_rename(request: Request) -> dict[str, Any]:
         body = await request.json()
         name = (body.get("name") or "").strip()
         new_name = (body.get("new_name") or "").strip()
         try:
-            return await asyncio.to_thread(_cacheawl.rename_cachebox, name, new_name)
-        except _cacheawl.CacheawlError as e:
+            return await asyncio.to_thread(_canon.rename_volume, name, new_name)
+        except _canon.CanonError as e:
+            # Pre-0.4.3 this answered 400 for a missing volume too; kept.
             raise HTTPException(400, str(e)) from None
 
-    @app.post("/api/cacheawl/delete")
-    async def api_cacheawl_delete(request: Request) -> dict[str, Any]:
-        """Delete a cachebox and its contents. Requires an explicit
+    @_canon_route("POST", "delete")
+    async def api_canon_delete(request: Request) -> dict[str, Any]:
+        """Delete a volume and its contents. Requires an explicit
         {confirm: true} — the no-deletes-without-confirmation discipline."""
-        from . import cacheawl as _cacheawl
         body = await request.json()
         name = (body.get("name") or "").strip()
         confirm = bool(body.get("confirm"))
         try:
             return await asyncio.to_thread(
-                _cacheawl.delete_cachebox, name, confirm=confirm)
-        except _cacheawl.CacheawlError as e:
-            # A missing box is a 404; an unconfirmed delete is a 400.
-            code = 404 if "no cachebox" in str(e) else 400
-            raise HTTPException(code, str(e)) from None
+                _canon.delete_volume, name, confirm=confirm)
+        except _canon.CanonError as e:
+            # A missing volume is a 404; an unconfirmed delete is a 400.
+            raise _canon_http(e) from None
 
-    @app.post("/api/cacheawl/transfer")
-    async def api_cacheawl_transfer(request: Request) -> dict[str, Any]:
-        """Copy/move a file or folder between the project dir and a cachebox
-        (either direction) or within/between cacheboxes. Body:
-        {op, src:{root,box?,path}, dst:{root,box?,path}, overwrite?}."""
-        from . import cacheawl as _cacheawl
+    @_canon_route("POST", "transfer")
+    async def api_canon_transfer(request: Request) -> dict[str, Any]:
+        """Copy/move a file or folder between the project dir and a volume
+        (either direction) or within/between volumes. Body:
+        {op, src:{root,box?,path}, dst:{root,box?,path}, overwrite?}, a
+        side's `root` being "project" or "canon" (legacy "cachebox")."""
         body = await request.json()
         op = (body.get("op") or "").strip()
         src = body.get("src") or {}
         dst = body.get("dst") or {}
         try:
             return await asyncio.to_thread(
-                _cacheawl.transfer, project_dir, op=op,
+                _canon.transfer, project_dir, op=op,
                 src_kind=(src.get("root") or "").strip(),
                 src_box=(src.get("box") or None),
                 src_path=(src.get("path") or ""),
@@ -3603,85 +3706,721 @@ def create_app(
                 dst_path=(dst.get("path") or ""),
                 overwrite=bool(body.get("overwrite")),
             )
-        except _cacheawl.CacheawlError as e:
+        except _canon.CanonError as e:
             raise HTTPException(400, str(e)) from None
 
-    @app.post("/api/cacheawl/ingest")
-    async def api_cacheawl_ingest(request: Request) -> dict[str, Any]:
-        """Start an ingest into a cachebox. Long-running work runs in the
-        background; poll /api/cacheawl/ingest-status. Obvious input errors
+    @_canon_route("POST", "ingest")
+    async def api_canon_ingest(request: Request) -> dict[str, Any]:
+        """Start an ingest into a volume. Long-running work runs in the
+        background; poll /api/canon/ingest-status. Obvious input errors
         fail fast with a 400."""
-        from . import cacheawl as _cacheawl
         body = await request.json()
         box = (body.get("box") or "").strip()
         source_type = (body.get("type") or "").strip().lower()
         value = (body.get("value") or "").strip()
         depth = body.get("depth", 1)
         all_flag = bool(body.get("all"))
-        # Register the box (status 'ingesting') synchronously so a malformed
-        # request 400s up front and ingest-status is pollable immediately —
-        # no window where the box doesn't exist yet.
+        # Register the volume (status 'ingesting') synchronously so a
+        # malformed request 400s up front and ingest-status is pollable
+        # immediately — no window where the volume doesn't exist yet.
         try:
             origin = await asyncio.to_thread(
-                _cacheawl.register_ingest, box=box, source_type=source_type,
+                _canon.register_ingest, box=box, source_type=source_type,
                 value=value, depth=depth, all_flag=all_flag)
-        except _cacheawl.CacheawlError as e:
+        except _canon.CanonError as e:
             raise HTTPException(400, str(e)) from None
 
         loop = asyncio.get_running_loop()
 
         def _run() -> None:
             try:
-                _cacheawl.run_ingest(
+                _canon.run_ingest(
                     project_dir, box=box, source_type=source_type,
                     value=value, depth=depth, all_flag=all_flag)
             except Exception:  # noqa: BLE001 — status file records the failure
-                log.exception("cacheawl ingest failed for box %s", box)
+                log.exception("canon ingest failed for volume %s", box)
 
         task = loop.create_task(asyncio.to_thread(_run))
         _ingest_tasks.add(task)
         task.add_done_callback(_ingest_tasks.discard)
         return {"box": box, "status": "ingesting", "origin": origin}
 
-    @app.get("/api/cacheawl/ingest-status")
-    async def api_cacheawl_ingest_status(box: str = Query(...)) -> dict[str, Any]:
-        from . import cacheawl as _cacheawl
+    @_canon_route("GET", "ingest-status")
+    async def api_canon_ingest_status(box: str = Query(...)) -> dict[str, Any]:
         try:
-            _cacheawl._require_box(box)
-        except _cacheawl.CacheawlError as e:
+            _canon.require_volume(box)
+        except _canon.CanonError as e:
             raise HTTPException(404, str(e)) from None
-        return await asyncio.to_thread(_cacheawl.ingest_status, box)
+        return await asyncio.to_thread(_canon.ingest_status, box)
 
-    @app.get("/api/cacheawl/mirror")
-    async def api_cacheawl_mirror(
+    @_canon_route("GET", "mirror")
+    async def api_canon_mirror(
         box: str = Query(...), path: str = Query(""),
     ) -> dict[str, Any]:
-        """Read-only mirror diagram for a cachebox (``path`` empty) or a
-        subfolder within it (``path`` set). The box root returns the
-        persisted ``_cachebox.merirmaid`` content (reconciled first so
-        manual drops are reflected); a subfolder returns an **on-demand
-        virtual mirror** generated from current contents and never written.
-        Payload: ``{text, node_map, modality, subpath}`` — ``node_map`` maps
-        each rendered node id to ``{path, is_dir}`` (path relative to the box
-        root) so the viewer's shift-click menu can resolve nodes to disk."""
-        from . import cacheawl as _cacheawl
+        """Read-only mirror diagram for a volume (``path`` empty) or a
+        subfolder within it (``path`` set), drawn on demand from current
+        contents by `canon.folder_flowchart` and never written (the volume
+        root is reconciled first, so its catalog is fresh too). Payload:
+        ``{text, node_map, modality, subpath, box_path, volume_path}`` —
+        ``node_map`` maps each rendered node id to ``{path, is_dir}`` (path
+        relative to the volume root) so the viewer's shift-click menu can
+        resolve nodes to disk; ``box_path`` = ``volume_path``, kept one
+        release. The MacroCOSM view of a volume is its catalog's lenses
+        (`/api/cosm/lens`), not this."""
 
         def _build() -> dict[str, Any]:
             subpath = (path or "").strip().strip("/")
             if not subpath:
-                # Keep the persisted root mirror fresh (fingerprint check).
-                _cacheawl.reconcile(box)
-            text, node_map = _cacheawl.build_mirror(box, subpath)
+                _canon.reconcile(box)
+            text, node_map = _canon.build_mirror(box, subpath)
+            where = str(_canon.volume_dir(box))
             return {"text": text, "node_map": node_map,
                     "modality": "mirror", "subpath": subpath,
-                    "box_path": str(_cacheawl.box_dir(box))}
+                    "box_path": where, "volume_path": where}
 
         try:
             return await asyncio.to_thread(_build)
-        except _cacheawl.CacheawlError as e:
-            msg = str(e)
-            code = 404 if ("no cachebox" in msg or "no such folder" in msg) else 400
-            raise HTTPException(code, msg) from None
+        except _canon.CanonError as e:
+            raise _canon_http(e) from None
+
+    # ---------- Catalogs and .cosm volumes (read-only, new in 0.4.3) ----------
+
+    def _parsed_volume(vol: "_macrocosm.Volume") -> dict[str, Any]:
+        return {
+            "catalog": _macrocosm.jsonable(
+                {k: v for k, v in vol.catalog.items() if k != "nodes"}),
+            "items": [_macrocosm.jsonable(it.data) for it in vol.items.values()],
+        }
+
+    def _problem_lines(vol: "_macrocosm.Volume") -> list[str]:
+        return [str(p) for p in _macrocosm.lint(vol).problems()]
+
+    @app.get("/api/canon/catalog")
+    async def api_canon_catalog(volume: str = Query(...)) -> dict[str, Any]:
+        """A volume's catalog, `canon.cosm`, reconciled first: `{volume,
+        path, text, parsed: {catalog, items}, problems}`."""
+
+        def _build() -> dict[str, Any]:
+            box = _canon.require_volume(volume)
+            _canon.reconcile(volume)
+            cat = box / _canon.CATALOG_NAME
+            if not cat.is_file():           # an ingest in flight skips reconcile
+                _canon.regenerate_catalog(volume)
+            vol = _macrocosm.load_volume(cat)
+            return {"volume": volume, "path": f"canon:{volume}/{_canon.CATALOG_NAME}",
+                    "text": cat.read_text(encoding="utf-8"),
+                    "parsed": _parsed_volume(vol), "problems": _problem_lines(vol)}
+
+        try:
+            return await asyncio.to_thread(_build)
+        except _canon.CanonError as e:
+            raise _canon_http(e) from None
+
+    @app.get("/api/canon/project-catalog")
+    async def api_canon_project_catalog() -> dict[str, Any]:
+        """This project's catalog, `rness/canon.cosm`, reconciled first
+        (written only when its bytes change): `{path, text, parsed,
+        problems}`. A project route — home mode 404s it."""
+
+        def _build() -> dict[str, Any]:
+            _canon.project_catalog(project_dir)
+            cat = project_dir / _canon.PROJECT_CATALOG
+            if not cat.is_file():
+                raise HTTPException(404, "this project has no rness/ folder, so no catalog")
+            vol = _macrocosm.load_volume(cat)
+            return {"path": _canon.PROJECT_CATALOG, "text": cat.read_text(encoding="utf-8"),
+                    "parsed": _parsed_volume(vol), "problems": _problem_lines(vol)}
+
+        return await asyncio.to_thread(_build)
+
+    def _cosm_volume(path: str) -> "_macrocosm.Volume":
+        """Load the volume a cosm route names: a project-relative or Canon
+        (`canon:`/`cacheawl:`) path to a `.cosm` file or a volume folder.
+
+        Reconciles first where enough keeps the file — the project's
+        `rness/canon.cosm`, a Canon volume's `canon.cosm` (or the volume
+        folder itself). A folder holding `holotype.cosm` loads as the
+        Holotype; a Canon volume folder otherwise loads by its catalog's
+        file path (macrocosm would prefer a Holotype or a COSM tree at the
+        same root); any other folder loads by whatever catalog it holds.
+        Blocking — call it from a worker thread."""
+        path = (path or "").strip()
+        if not path:
+            raise HTTPException(400, "missing path")
+        target = _resolve_project_path(path)
+        prefix = _store_prefix(path)
+        if prefix:
+            parts = [p for p in path[len(prefix):].split("/") if p]
+            if parts and (len(parts) == 1 or parts[1:] == [_canon.CATALOG_NAME]):
+                try:
+                    _canon.reconcile(parts[0])
+                except _canon.CanonError:
+                    pass
+        else:
+            try:
+                if target.resolve() == (project_dir / _canon.PROJECT_CATALOG).resolve():
+                    _canon.project_catalog(project_dir)
+            except OSError:
+                pass
+        if not target.exists():
+            raise HTTPException(404, f"no such file or folder: {path}")
+        if target.is_dir():
+            cat = target / _canon.CATALOG_NAME
+            store_volume = False
+            try:
+                store_volume = target.resolve().parent == _canon.root().resolve()
+            except OSError:
+                pass
+            if not _canon.is_holotype_folder(target) and store_volume and cat.is_file():
+                return _macrocosm.load_volume(cat)
+            return _macrocosm.load_volume(target)
+        if target.suffix != ".cosm":
+            raise HTTPException(400, f"{path} is not a .cosm file or a volume folder")
+        return _macrocosm.load_volume(target)
+
+    def _cosm_item(vol: "_macrocosm.Volume", it: "_macrocosm.Item") -> dict[str, Any]:
+        d = it.data
+        return {
+            "id": it.id, "key": it.key,
+            "path": _macrocosm.item_path(vol, it),
+            "name": it.name,
+            "summary": _macrocosm.jsonable(d.get("summary")),
+            "status": _macrocosm.jsonable(d.get("status")),
+            "visibility": _macrocosm.jsonable(d.get("visibility")),
+            "file": it.file,
+            "part": it.part,
+            "data": _macrocosm.jsonable(d),
+        }
+
+    def _cosm_payload(vol: "_macrocosm.Volume", path: str) -> dict[str, Any]:
+        """The cosm viewer's view of a volume: catalog header, modules in the
+        manifest's order → kinds → items, the lint problems and open
+        questions, and the lenses it can be drawn in."""
+        m = vol.manifest
+        report = _macrocosm.lint(vol)
+        modules: list[dict[str, Any]] = []
+        if m is not None:
+            found = vol.by_module()
+            letters = list(m.modules()) + [x for x in found if x not in m.modules()]
+            for letter in letters:
+                kinds_found = found.get(letter, {})
+                declared = list(m.kinds(letter)) if letter in m.modules() else []
+                order = declared + [k for k in kinds_found if k not in declared]
+                spec = m.module(letter) if letter in m.modules() else {}
+                modules.append({
+                    "letter": letter,
+                    "name": str(spec.get("name") or letter),
+                    "subtitle": str(spec.get("subtitle") or ""),
+                    "count": sum(len(v) for v in kinds_found.values()),
+                    "kinds": [{"kind": k, "items": [_cosm_item(vol, it) for it in kinds_found[k]]}
+                              for k in order if k in kinds_found],
+                })
+        refused = vol.refused is not None
+        return {
+            "path": path,
+            "minicosm": vol.minicosm,
+            "major": vol.major,
+            "title": vol.name,
+            "manifest_title": m.title if m is not None else None,
+            "uri": _macrocosm.qualified_uri(vol) if not refused else None,
+            "catalog": _macrocosm.jsonable({k: v for k, v in vol.catalog.items() if k != "nodes"}),
+            "modules": modules,
+            "problems": [str(p) for p in report.problems()],
+            "pending": report.to_dict()["pending"],
+            # The checks panel: the same findings split by severity, and the
+            # check ids this reader leaves to the MiniCOSM's own tools
+            # (Comprise's fourteen rules and P checks), never failures.
+            "report": {k: v for k, v in report.to_dict().items()
+                       if k in ("ok", "errors", "warnings", "notes", "not_run")},
+            "files": list(vol.files),
+            "lenses": _macrocosm.lenses(vol) if not refused else [],
+            "refused": str(vol.refused) if refused else None,
+        }
+
+    @app.get("/api/cosm")
+    async def api_cosm(path: str = Query(...)) -> dict[str, Any]:
+        """Any `.cosm` volume, structured for the cosm viewer: a Canon
+        catalog, a Holotype, an EML twin, a standalone COSM tree. A
+        declaration this reader can't read comes back with `refused` set and
+        nothing loaded (200: the viewer shows the refusal)."""
+        return await asyncio.to_thread(lambda: _cosm_payload(_cosm_volume(path), path))
+
+    @app.get("/api/cosm/lens")
+    async def api_cosm_lens(path: str = Query(...), lens: str = Query("map")) -> dict[str, Any]:
+        """One lens of a volume as merirmaid source: `{text, node_map,
+        lens, lenses}`. The Mermaid body is `macrocosm.to_mermaid` (no click
+        lines — resolve nodes through `node_map`, whose `fs_path` is a Canon
+        item's real path) under `modality: mirror` frontmatter, so the
+        merirmaid viewer shows it read-only."""
+
+        def _build() -> dict[str, Any]:
+            vol = _cosm_volume(path)
+            if vol.refused is not None:
+                raise HTTPException(400, str(vol.refused))
+            names = _macrocosm.lenses(vol)
+            if lens not in names:
+                raise HTTPException(
+                    400, f"unknown lens {lens!r}; this volume can be drawn as: {', '.join(names)}")
+            body, node_map = _macrocosm.to_mermaid(vol, lens)
+            title = " ".join(f"{vol.name} · {lens}".split())
+            frontmatter = "\n".join([
+                "---",
+                "merirmaid: 1",
+                f"title: {title}",
+                "modality: mirror",
+                "kind: cosm-lens",
+                f"source: {path}#{lens}",
+                "node-char-limit: 48",
+                "---",
+            ]) + "\n"
+            return {"text": frontmatter + body, "node_map": _macrocosm.jsonable(node_map),
+                    "lens": lens, "lenses": names}
+
+        return await asyncio.to_thread(_build)
+
+    @app.post("/api/cosm/lint")
+    async def api_cosm_lint(request: Request) -> dict[str, Any]:
+        """MacroCOSM's generic checks on a volume — body `{path}` — as the
+        report: `{ok, minicosm, refused, errors, warnings, notes, pending,
+        not_run, checks}`. Comprise's own rules are listed in `not_run`
+        (they need Comprise)."""
+        try:
+            body = await request.json()
+        except ValueError:
+            body = None
+        path = (body.get("path") or "").strip() if isinstance(body, dict) else ""
+
+        def _build() -> dict[str, Any]:
+            report = _macrocosm.lint(_cosm_volume(path)).to_dict()
+            report["path"] = path
+            return report
+
+        return await asyncio.to_thread(_build)
+
+    @app.get("/api/macrocosm/manifests")
+    async def api_macrocosm_manifests() -> list[dict[str, Any]]:
+        """The MiniCOSMs this install reads (the bundled registry), in
+        registry order: `[{name, title, version, declaration, summary}]`."""
+
+        def _build() -> list[dict[str, Any]]:
+            out = []
+            for m in _macrocosm.default_registry().manifests.values():
+                decl = m.declaration.get("value")
+                out.append({
+                    "name": m.name, "title": m.title, "version": m.version,
+                    "declaration": decl if isinstance(decl, str) else f"{m.name}/{m.version}",
+                    "summary": _macrocosm.jsonable(m.data.get("summary")) or "",
+                })
+            return out
+
+        return await asyncio.to_thread(_build)
+
+    @app.get("/api/macrocosm-spec", response_class=PlainTextResponse)
+    async def api_macrocosm_spec(lang: str = "en") -> PlainTextResponse:
+        """The MacroCOSM OES spec (docs/MACROCOSM_OES.md) as raw markdown for
+        the spec viewer — `/api/help-center`'s shape and whitelist: `lang`
+        picks static/i18n/<lang>/MACROCOSM_OES.md when one ships (none does
+        in 0.4.3), else English. Home-accessible, like the help center."""
+        doc = Path(__file__).resolve().parent.parent / "docs" / "MACROCOSM_OES.md"
+        if lang in UI_LANGUAGES and lang != "en":
+            translated = STATIC_DIR / "i18n" / lang / "MACROCOSM_OES.md"
+            if translated.is_file():
+                doc = translated
+        text = await asyncio.to_thread(
+            lambda: doc.read_text(encoding="utf-8") if doc.is_file() else None)
+        if text is None:
+            raise HTTPException(
+                404,
+                "MACROCOSM_OES.md not found in this install — run /update-enough "
+                "to pick up the bundled spec.")
+        return PlainTextResponse(text, media_type="text/markdown; charset=utf-8")
+
+    # ------------------------------------------------------------------
+    # Canon derivations (0.4.3, P3): EML twins, atems, compile. The engine is
+    # canon_derive.py (pure functions); the job table and the generation-lock
+    # rule are canon_jobs.py. Every route here runs only because a person
+    # asked: nothing derives on its own. Progress and results stream on the
+    # `canon` SSE event (payload = the job snapshot). Contract:
+    # docs/canon-043-plan.md §6.4 and §7, docs/canon-landed-P3.md.
+    # ------------------------------------------------------------------
+
+    canon_jobs = _canon_jobs.CanonJobs(emit=_emit_threadsafe)
+    app.state.canon_jobs = canon_jobs
+    if not home:
+        # The readvisor's MacroCOSM tools (P6) run inside a chat turn, which
+        # already holds the generation lock: they call the engine directly at
+        # this session's model and honour this table's per-file claims rather
+        # than starting jobs (a lock-taking job would wait for the very turn
+        # that is waiting for the tool).
+        _canon_tools.configure(llm_url=session.llm_url, jobs=canon_jobs)
+    # A pasted or selected passage longer than this is a file's work: derive the file.
+    CANON_ATEM_TEXT_MAX = 200_000
+
+    def _canon_job_http(e: "_canon_jobs.CanonJobError") -> HTTPException:
+        return HTTPException(e.status, str(e))
+
+    async def _json_body(request: Request) -> dict[str, Any]:
+        try:
+            body = await request.json()
+        except ValueError:
+            body = None
+        return body if isinstance(body, dict) else {}
+
+    def _canon_rel(path: str) -> str:
+        """A request path tidied the way the routes report it back: project-
+        relative, or `canon:`/`cacheawl:` + the path in the store."""
+        path = (path or "").strip()
+        prefix = _store_prefix(path) or ""
+        parts = [p for p in path[len(prefix):].replace("\\", "/").split("/") if p not in ("", ".")]
+        return prefix + "/".join(parts)
+
+    def _rel_beside(rel: str, name: str) -> str:
+        prefix = _store_prefix(rel) or ""
+        head = rel[len(prefix):].rpartition("/")[0]
+        return f"{prefix}{head}/{name}" if head else f"{prefix}{name}"
+
+    def _canon_where(rel: str) -> tuple[str | None, str | None]:
+        """`(volume, path in its volume)` for a store path, `(None, rel)` for a
+        project path — the catalog to regenerate, and the EML catalog id's
+        path (P0 decision 16). A file at the store's root has no volume."""
+        prefix = _store_prefix(rel)
+        if not prefix:
+            return None, rel
+        parts = rel[len(prefix):].split("/")
+        return (parts[0], "/".join(parts[1:])) if len(parts) > 1 else (None, parts[0])
+
+    def _canon_catalog_after(rel: str) -> None:
+        """After a twin, pin or compile is written: the Canon volume's catalog
+        (store paths) or the project catalog (project paths), through canon.py's
+        own writers (each writes only when its bytes change)."""
+        volume, _ = _canon_where(rel)
+        try:
+            if _store_prefix(rel):
+                if volume:
+                    _canon.require_volume(volume)
+                    _canon.regenerate_catalog(volume)
+            else:
+                _canon.project_catalog(project_dir)
+        except _canon.CanonError:
+            pass
+        except Exception:  # noqa: BLE001 — the write landed; a catalog hiccup heals at the next reconcile
+            log.exception("canon: catalog after a derivation write failed")
+
+    def _text_target(path: str) -> dict[str, Any]:
+        """Resolve and vet the text a derive, atem or pin names (blocking).
+        The rules and their words live in `canon_tools.text_target` (P6), so
+        the readvisor's tools refuse exactly what these routes refuse: a
+        missing file (404), a folder, a Holotype or anything in one, a catalog
+        or meta enough keeps, any `.cosm`, binaries, kinds that aren't
+        markdown or plain text, an empty file, and a `X.cosm` beside the text
+        that is not an EML twin (409). A converted original is read through
+        its markdown twin, or refused with "convert it first"."""
+        try:
+            return _canon_tools.text_target(project_dir, path)
+        except _canon_tools.TextTargetError as e:
+            raise HTTPException(e.status, str(e)) from None
+
+    def _twin_already_fresh(t: dict[str, Any], what: str) -> bool:
+        if _canon_derive.twin_state(t["target"]) != "fresh":
+            return False
+        hdr = _canon.twin_header(t["twin"])
+        if what == "atem":
+            atem = hdr.get("atem") if isinstance(hdr.get("atem"), dict) else {}
+            return isinstance(atem.get("line"), str) and bool(atem["line"].strip())
+        derived = hdr.get("derived") if isinstance(hdr.get("derived"), dict) else {}
+        return derived.get("completeness") == "full"
+
+    async def _canon_mode() -> tuple[str, str]:
+        """Model or rules, decided once, before the job starts (plan §3.8)."""
+        ok, why = await asyncio.to_thread(_llm.reachable, session.llm_url)
+        return ("model", why) if ok else ("rules", why)
+
+    def _canon_start_message(mode: str, why: str, doing: str) -> str:
+        return doing if mode == "model" else f"no model is answering ({why}); writing a scaffold"
+
+    def _model_complete(messages: list[dict[str, str]], **kw: Any) -> tuple[str, dict[str, Any]]:
+        """The engine's `complete`: `llm.complete` at the session's model
+        (looked up at call time, so tests can stand in for it), with the
+        engine's own `max_tokens` when it gives one (EML passages: 4,096,
+        bounded by the model's window). A model that stops answering mid-job
+        fails the job in words; the engine never falls back to rules halfway."""
+        kw = {k: v for k, v in kw.items() if k == "max_tokens"}
+        try:
+            return _llm.complete(messages, llm_url=session.llm_url, **kw)
+        except _llm.LLMUnavailable as e:
+            raise RuntimeError(f"the model became unavailable ({e}); nothing was written, run it again") from e
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"the model stopped answering ({e}); nothing was written, run it again") from e
+
+    def _eml_work(t: dict[str, Any], mode: str) -> Callable[[Any], dict[str, Any]]:
+        def work(ctx: Any) -> dict[str, Any]:
+            text, stat = _canon_derive.read_source(t["target"])
+            twin = t["twin"]
+            previous = twin.read_text(encoding="utf-8") if _canon.is_eml_twin(twin) else None
+            cosm, info = _canon_derive.derive_eml(
+                text, source_name=t["target"].name, source_stat=stat, rel_path=t["id_rel"],
+                complete=_model_complete if mode == "model" else None, by="person",
+                on_progress=ctx.progress, should_stop=ctx.should_stop, previous=previous)
+            ctx.check()
+            ctx.progress(phase="writing", message=f"writing {t['twin'].name}")
+            _canon_derive.write_twin(t["twin"], cosm)
+            _canon_catalog_after(t["text_rel"])
+            note = " (a scaffold: no model read it)" if info["mode"] == "rules" else ""
+            return {"twin_path": t["twin_rel"], "text_path": t["text_rel"], "mode": info["mode"],
+                    "model": info["model"], "chunks": info["chunks"], "items": info["items"],
+                    "counts": info["counts"], "dropped": info["dropped"], "normalized": info["normalized"],
+                    "continued": info["continued"], "atem": info["atem"],
+                    "state": _canon_derive.twin_state(t["target"]),
+                    "message": f"wrote {t['twin'].name}{note}"}
+        return work
+
+    def _file_atem_work(t: dict[str, Any], mode: str) -> Callable[[Any], dict[str, Any]]:
+        def work(ctx: Any) -> dict[str, Any]:
+            text, stat = _canon_derive.read_source(t["target"])
+            title = _canon_derive.text_title(text, t["target"].name)
+            atem = _canon_derive.derive_atem(
+                text, context=f"the whole of {title}", complete=_model_complete if mode == "model" else None,
+                on_progress=ctx.progress, should_stop=ctx.should_stop)
+            ctx.check()
+            ctx.progress(phase="writing", message=f"writing the atem into {t['twin'].name}")
+            twin = t["twin"]
+            existing = twin.read_text(encoding="utf-8") if _canon.is_eml_twin(twin) else None
+            cosm = _canon_derive.set_file_atem(
+                existing, atem, source_name=t["target"].name, source_stat=stat, rel_path=t["id_rel"],
+                by="person", model=atem.get("model"), title=title)
+            _canon_derive.write_twin(twin, cosm)
+            _canon_catalog_after(t["text_rel"])
+            return {"twin_path": t["twin_rel"], "text_path": t["text_rel"], "mode": atem["mode"],
+                    "model": atem.get("model"), "atem": _canon_derive.atem_block(atem),
+                    "stance_profile": atem.get("stance_profile") or {}, "written": True,
+                    "state": _canon_derive.twin_state(t["target"]),
+                    "message": f"wrote the atem into {twin.name}"}
+        return work
+
+    def _passage_atem_work(text: str, mode: str, *, t: dict[str, Any] | None,
+                           selection: dict[str, Any] | None) -> Callable[[Any], dict[str, Any]]:
+        def work(ctx: Any) -> dict[str, Any]:
+            context = None
+            span = None
+            if t is not None:
+                whole, _stat = _canon_derive.read_source(t["target"])
+                context = f"a passage of {_canon_derive.text_title(whole, t['target'].name)}"
+                span = _canon_derive.passage_span(whole, selection or {"text": text})
+            atem = _canon_derive.derive_atem(
+                text, context=context, complete=_model_complete if mode == "model" else None,
+                on_progress=ctx.progress, should_stop=ctx.should_stop)
+            out = {**_canon_derive.atem_block(atem), "stance_profile": atem.get("stance_profile") or {},
+                   "mode": atem["mode"], "model": atem.get("model"), "written": False,
+                   "pinnable": t is not None, "path": t["text_rel"] if t else None, "span": span,
+                   "message": "the atem is ready" + (" (a scaffold: no model read it)"
+                                                     if atem["mode"] == "rules" else "")}
+            return out
+        return work
+
+    def _start_canon_job(*, kind: str, path: str | None, mode: str, why: str, work: Any,
+                         key: str | None, doing: str) -> dict[str, Any]:
+        try:
+            snap = canon_jobs.start(
+                kind=kind, path=path, mode=mode, work=work, key=key,
+                lock=session.generation_lock if mode == "model" else None,
+                message=_canon_start_message(mode, why, doing))
+        except _canon_jobs.CanonJobError as e:
+            raise _canon_job_http(e) from None
+        return {"job": snap}
+
+    @app.post("/api/canon/derive")
+    async def api_canon_derive(request: Request) -> dict[str, Any]:
+        """Derive a text's EML twin (`what: eml`) or its file atem (`what:
+        atem`) as a background job: `{path, what, force?}` → `{job}`. 409 when
+        the twin is already fresh (pass `force`), or a job for the file is
+        queued or running. Model or rules is decided here, once."""
+        body = await _json_body(request)
+        what = str(body.get("what") or "eml").strip().lower()
+        if what not in ("eml", "atem"):
+            raise HTTPException(400, "what must be eml or atem")
+        t = await asyncio.to_thread(_text_target, str(body.get("path") or ""))
+        if not body.get("force") and await asyncio.to_thread(_twin_already_fresh, t, what):
+            said = "its atem is" if what == "atem" else f"{t['twin'].name} is"
+            raise HTTPException(409, f"already fresh: {said} up to date with {t['target'].name}; "
+                                     "pass force to derive it again")
+        mode, why = await _canon_mode()
+        work = _eml_work(t, mode) if what == "eml" else _file_atem_work(t, mode)
+        doing = (f"deriving the EML twin of {t['target'].name}" if what == "eml"
+                 else f"writing the atem of {t['target'].name}")
+        return _start_canon_job(kind=what, path=t["text_rel"], mode=mode, why=why, work=work,
+                                key=t["key"], doing=doing)
+
+    @app.post("/api/canon/atem")
+    async def api_canon_atem(request: Request) -> dict[str, Any]:
+        """An atem, as a job: `{path}` = the whole file's (written into its
+        twin's `atem:` block; a minimal twin when there is none); `{path,
+        selection: {text, start?, end?, lines?}}` = a passage's (not written;
+        the result is `pinnable` and carries a `span` for the pin); `{text}`
+        (or a selection with no path) = an atem of that text, nothing written."""
+        body = await _json_body(request)
+        path = str(body.get("path") or "").strip()
+        selection = body.get("selection")
+        if selection is not None and not isinstance(selection, dict):
+            raise HTTPException(400, "selection must be {text, start?, end?, lines?}")
+        sel_text = selection.get("text") if isinstance(selection, dict) else None
+        if sel_text is not None and not isinstance(sel_text, str):
+            raise HTTPException(400, "selection.text must be text")
+        if path and not (sel_text or "").strip():
+            t = await asyncio.to_thread(_text_target, path)
+            mode, why = await _canon_mode()
+            return _start_canon_job(kind="atem", path=t["text_rel"], mode=mode, why=why,
+                                    work=_file_atem_work(t, mode), key=t["key"],
+                                    doing=f"writing the atem of {t['target'].name}")
+        text = sel_text if (sel_text or "").strip() else body.get("text")
+        if not isinstance(text, str) or not text.strip():
+            raise HTTPException(400, "nothing to make an atem of: give a path, a selection or a text")
+        if len(text) > CANON_ATEM_TEXT_MAX:
+            raise HTTPException(400, "that passage is too long for an atem on the spot; derive the file instead")
+        t = await asyncio.to_thread(_text_target, path) if path else None
+        mode, why = await _canon_mode()
+        return _start_canon_job(kind="atem", path=t["text_rel"] if t else None, mode=mode, why=why,
+                                work=_passage_atem_work(text, mode, t=t, selection=selection), key=None,
+                                doing="writing the atem of the passage")
+
+    @app.post("/api/canon/atem/pin")
+    async def api_canon_atem_pin(request: Request) -> dict[str, Any]:
+        """Pin a passage's atem into the text's twin as `X:atem/<n>`:
+        `{path, atem: {line, focus, push, pull}, span, of?}` → `{twin_path,
+        item_id, job}` (synchronous; a minimal twin when there is none). 409
+        while a job for the file is queued or running."""
+        body = await _json_body(request)
+        atem = body.get("atem")
+        if not isinstance(atem, dict) or not isinstance(atem.get("line"), str) or not atem["line"].strip():
+            raise HTTPException(400, "atem must be {line, focus, push, pull} with a line")
+        for part in ("focus", "push", "pull"):
+            v = atem.get(part)
+            if v is not None and not isinstance(v, str) and not _macrocosm.is_pending(v):
+                raise HTTPException(400, f"atem.{part} must be text or {{pending: \"...\"}}")
+        span = _canon_derive.clean_span(body.get("span"))
+        if span is None:
+            raise HTTPException(400, 'span must say where the passage is: {lines: "a-b"} or {start, end}')
+        of = body.get("of")
+        if of is not None and not (isinstance(of, list) and all(isinstance(x, str) for x in of)):
+            raise HTTPException(400, "of must be a list of item ids")
+        t = await asyncio.to_thread(_text_target, str(body.get("path") or ""))
+
+        def _pin() -> str:
+            with canon_jobs.holding(t["key"], t["text_rel"]):
+                text, stat = _canon_derive.read_source(t["target"])
+                twin = t["twin"]
+                existing = twin.read_text(encoding="utf-8") if _canon.is_eml_twin(twin) else None
+                item_id = _canon_derive.next_atem_id(existing)
+                cosm = _canon_derive.pin_atem(
+                    existing, atem, span, source_name=t["target"].name, source_stat=stat,
+                    rel_path=t["id_rel"], of=of, by="person",
+                    title=_canon_derive.text_title(text, t["target"].name))
+                _canon_derive.write_twin(twin, cosm)
+                _canon_catalog_after(t["text_rel"])
+                return item_id
+
+        try:
+            item_id = await asyncio.to_thread(_pin)
+        except _canon_jobs.CanonJobError as e:
+            raise _canon_job_http(e) from None
+        except _canon_derive.DeriveError as e:
+            raise HTTPException(400, str(e)) from None
+        block = _canon_derive.atem_block(atem)
+        mode = "rules" if any(_macrocosm.is_pending(block[p]) for p in ("push", "pull")) else "model"
+        result = {"twin_path": t["twin_rel"], "item_id": item_id, "text_path": t["text_rel"]}
+        snap = canon_jobs.record(kind="pin", path=t["text_rel"], mode=mode, result=result,
+                                 message=f"pinned {item_id} to {t['twin'].name}")
+        return {"twin_path": t["twin_rel"], "item_id": item_id, "job": snap}
+
+    @app.get("/api/canon/eml")
+    async def api_canon_eml(path: str = Query(...)) -> dict[str, Any]:
+        """A text's EML twin for the reader and the viewer: `{twin_path,
+        state: fresh|stale, cosm: <the /api/cosm payload>}`; 404 when the text
+        has none. Takes the text (or the twin itself; a converted original is
+        read through its markdown twin)."""
+
+        def _build() -> dict[str, Any]:
+            rel = _canon_rel(path)
+            if not rel or rel in STORE_PREFIXES:
+                raise HTTPException(400, "missing path")
+            target = _resolve_project_path(rel)
+            if target.name.endswith(".cosm") and _canon.is_eml_twin(target):
+                twin, text, twin_rel = target, target.parent / target.name[: -len(".cosm")], rel
+            else:
+                if not target.exists():
+                    raise HTTPException(404, f"no such file: {rel}")
+                text_rel = rel
+                if (target.is_file() and target.suffix.lower() not in _canon_derive.TEXT_SUFFIXES
+                        and _convert.is_convertible(target) and _convert.twin_path(target).is_file()):
+                    target, text_rel = _convert.twin_path(target), rel + ".md"
+                twin, text, twin_rel = _canon_derive.twin_path(target), target, text_rel + ".cosm"
+            if not _canon.is_eml_twin(twin):
+                raise HTTPException(404, f"{rel} has no EML twin yet")
+            vol = _macrocosm.load_volume(twin)
+            return {"twin_path": twin_rel, "state": _canon_derive.twin_state(text),
+                    "cosm": _cosm_payload(vol, twin_rel)}
+
+        return await asyncio.to_thread(_build)
+
+    @app.post("/api/canon/compile")
+    async def api_canon_compile(request: Request) -> dict[str, Any]:
+        """Compile an EML (`eml/1` file) back into markdown as a job: `{path}`
+        → `{job}`, result `{written}` — a new datestamped file beside the EML
+        (`<stem>-from-eml-YYYY-MM-DD-HHMM.md`); the EML and its text are never
+        touched."""
+        body = await _json_body(request)
+        rel = _canon_rel(str(body.get("path") or ""))
+        if not rel or rel in STORE_PREFIXES:
+            raise HTTPException(400, "missing path")
+        target = _resolve_project_path(rel)
+
+        def _vet() -> None:
+            if not target.exists():
+                raise HTTPException(404, f"no such file: {rel}")
+            if target.is_dir() or not target.name.endswith(".cosm"):
+                raise HTTPException(400, f"{target.name} is not an EML; compile reads an eml/1 .cosm file")
+            said = _macrocosm.sniff_declaration(target)
+            if said != _canon_derive.EML_OES:
+                raise HTTPException(400, f"{target.name} is not an EML (it declares {said or 'nothing'}); "
+                                         "compile reads eml/1")
+            vol = _macrocosm.load_volume(target)
+            if vol.refused is not None:
+                raise HTTPException(400, str(vol.refused))
+
+        await asyncio.to_thread(_vet)
+        mode, why = await _canon_mode()
+
+        def work(ctx: Any) -> dict[str, Any]:
+            ctx.progress(phase="compiling", message=f"compiling {target.name}")
+            md = _canon_derive.compile_text(_macrocosm.load_volume(target),
+                                            complete=_model_complete if mode == "model" else None,
+                                            source_name=target.name)
+            ctx.check()
+            out = _canon_derive.compiled_path(target)
+            _canon_derive.write_atomic(out, md)
+            _canon_catalog_after(rel)
+            return {"written": _rel_beside(rel, out.name), "eml_path": rel, "mode": mode,
+                    "message": f"wrote {out.name}"}
+
+        return _start_canon_job(kind="compile", path=rel, mode=mode, why=why, work=work,
+                                key=f"compile:{target}", doing=f"compiling {target.name}")
+
+    @app.get("/api/canon/job/{job_id}")
+    async def api_canon_job(job_id: str) -> dict[str, Any]:
+        """One derivation job's snapshot (the same payload as its `canon` SSE events)."""
+        try:
+            return canon_jobs.snapshot(job_id)
+        except _canon_jobs.CanonJobError as e:
+            raise _canon_job_http(e) from None
+
+    @app.post("/api/canon/job/{job_id}/cancel")
+    async def api_canon_job_cancel(job_id: str) -> dict[str, Any]:
+        """Cancel a job: a queued one never starts; a running one finishes the
+        passage it is reading, then stops without writing (its snapshot says
+        `cancelling` until then). 409 when it is not queued or running."""
+        try:
+            return canon_jobs.cancel(job_id)
+        except _canon_jobs.CanonJobError as e:
+            raise _canon_job_http(e) from None
 
     @app.post("/api/file", response_class=HTMLResponse)
     async def api_file_write(request: Request) -> HTMLResponse:
@@ -3727,19 +4466,15 @@ def create_app(
         from . import composure as _composure
         if (why := _composure.write_denial(target)):
             raise HTTPException(403, why)
-        # Cachebox mirror guard: the same rule as the agent's write_file —
-        # a modality:mirror file under ~/enough/cacheawl/ is backend-owned
-        # and regenerated from the box contents, so whole-file edits are
-        # refused (in-tree paths never reach cacheawl, but a symlink or an
-        # allowlisted path could).
-        from . import cacheawl as _cacheawl
-        if (why := _cacheawl.mirror_write_denial(target)):
+        # Catalog guard: the same rule as the agent's write_file. The files
+        # enough keeps — a volume's canon.cosm, this project's
+        # rness/canon.cosm, a volume's .canon.json (or pre-0.4.3
+        # .cachebox.json, by name anywhere: a corrupted sidecar breaks
+        # ingest-status and origin tracking), and a modality:mirror file in
+        # the store — are regenerated from what they describe, so
+        # whole-file edits are refused.
+        if (why := _canon.catalog_write_denial(target, project_dir)):
             raise HTTPException(403, why)
-        if target.name == ".cachebox.json":
-            # Box metadata is backend-owned like the mirror; a corrupted
-            # sidecar breaks ingest-status and origin tracking.
-            raise HTTPException(
-                403, "cachebox metadata is backend-owned — not editable")
         if target.is_dir():
             raise HTTPException(400, "is a directory")
         target.parent.mkdir(parents=True, exist_ok=True)

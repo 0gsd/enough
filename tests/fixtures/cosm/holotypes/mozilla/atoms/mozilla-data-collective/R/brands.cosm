@@ -1,0 +1,11 @@
+# R: the brand.
+nodes:
+  - id: R:brand/mozilla-data-collective
+    type: brand
+    name: Mozilla Data Collective
+    summary: The platform and company brand; the older domain datacollective.mozillafoundation.org redirects to mozilladatacollective.com.
+    scope: ['P:mozilla-data-collective']
+    status: active
+    visibility: public
+    owner: O:role/Founder-and-Chief-Executive
+    provenance: {mode: net-scan, sources: ['https://mozilladatacollective.com/'], confidence: 0.8, state: known}

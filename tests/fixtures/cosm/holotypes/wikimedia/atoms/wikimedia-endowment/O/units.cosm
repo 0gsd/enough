@@ -1,0 +1,94 @@
+# O — the Board, its four committees, the chart, and the decision rights the bylaws and audit make public. The bylaws name an Audit, an Investment and a Board Governance
+# Committee; the governance pages list an Audit, a Finance, a Governance and a Grantmaking and Community Committee. The newer list is used; the older is a pending question.
+nodes:
+  - id: O:unit/board-of-directors
+    type: unit
+    name: Board of Directors
+    summary: The Endowment's governing body, separate from the Foundation's Board of Trustees; the Foundation's Board is consulted on nominations.
+    parent: none
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Bylaws", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.85, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/audit-committee
+    type: unit
+    name: Audit Committee
+    summary: Oversees the external auditor and reviews the audit; staff cannot sit on it.
+    parent: O:unit/board-of-directors
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Bylaws", "https://foundation.wikimedia.org/wiki/Endowment:Main"], confidence: 0.85, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/finance-committee
+    type: unit
+    name: Finance Committee
+    summary: A Board committee that can move the spending rate between 2.5% and 4.0%; the 2024 Form 990 calls it the Endowment Finance Committee.
+    parent: O:unit/board-of-directors
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://foundation.wikimedia.org/wiki/Endowment:Main", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.85, state: known}
+    pending: "how the Finance Committee relates to the Investment Committee the bylaws name"
+    covered-by: none
+    twin: none
+
+  - id: O:unit/governance-committee
+    type: unit
+    name: Governance Committee
+    summary: Nominates directors and consults the Foundation's Board of Trustees (the bylaws call it the Board Governance Committee).
+    parent: O:unit/board-of-directors
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Bylaws", "https://foundation.wikimedia.org/wiki/Endowment:Main"], confidence: 0.8, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/grantmaking-committee
+    type: unit
+    name: Grantmaking and Community Committee
+    summary: A chartered Board committee on the governance pages; its remit is not summarised there.
+    parent: O:unit/board-of-directors
+    twin: P:offering/project-grants
+    status: active
+    visibility: public
+    owner: O:role/board-of-directors
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Main"], confidence: 0.75, state: known}
+    covered-by: none
+
+  - id: O:chart/endowment
+    type: chart
+    name: The Endowment's structure
+    summary: "A Board of Directors, three officers (President, Treasurer, Secretary and Legal Counsel) and no employees: staff time is the Foundation's, reimbursed under the cost-sharing agreement."
+    root: O:position/director
+    headcount: {employees: 0, source: "the Form 990 reports zero W-2 employees and no compensation paid directly"}
+    status: active
+    visibility: public
+    owner: O:role/secretary-and-legal-counsel
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.9, state: known}
+
+  - id: O:decision-right/annual-appropriation
+    type: decision-right
+    name: Appropriating the year's spending
+    summary: Each July the Board appropriates funds for the year's operating budget and grants, within the spending policy.
+    holder: O:role/board-of-directors
+    over: C:finance/2026-07-to-2027-06
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.85, state: known}
+
+  - id: O:decision-right/spending-rate
+    type: decision-right
+    name: Setting the spending rate
+    summary: The Finance Committee may adjust the target spending rate down to 2.5% and up to 4.0% of the rolling three-year average.
+    holder: O:unit/finance-committee
+    over: C:policy/spending
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/"], confidence: 0.9, state: known}

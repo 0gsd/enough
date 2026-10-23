@@ -1,0 +1,51 @@
+# C: the Corporation's own contracts and partnerships. The trademark licence and the service agreements with the Foundation are in the Foundation atom.
+nodes:
+  - id: C:contract/search-partnerships
+    type: contract
+    name: Search partnerships in Firefox
+    summary: Mozilla builds partners' search engines into Firefox as a default or an option and generally receives royalties at a percentage of the revenue the partners earn through them. Royalties were $498.2 million of $680.4 million consolidated revenue and support in 2024; Google is the partner whose payments the September 2025 ruling concerns.
+    between: [atom/mozilla-corporation, 'C:counterparty/google']
+    counterparty: C:counterparty/google
+    scope: ['P:offering/firefox']
+    terms: royalty at a certain percentage of the revenues partners earn through their search engines in Firefox
+    partners: {pending: 'which other search engines are partners, by region'}
+    until: {pending: when the current Google agreement ends and on what terms it renews}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/', 'https://blog.mozilla.org/en/mozilla/internet-policy/defending-an-open-web/'], confidence: 0.7, state: known}
+
+  - id: C:contract/mozilla-online-agreement
+    type: contract
+    name: Contract with Mozilla Online (China)
+    summary: The contract between the Corporation and Mozilla Online expired; both parties tried to negotiate a renewal in good faith and did not reach an agreement; see the claims of May 2023.
+    between: [atom/mozilla-corporation, 'C:counterparty/mozilla-online']
+    counterparty: C:counterparty/mozilla-online
+    terms: {pending: what the contract covered}
+    until: {pending: date it expired}
+    status: dormant
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf'], confidence: 0.8, state: known}
+
+  - id: C:contract/anonym-reddit-measurement
+    type: contract
+    name: Anonym and Reddit measurement partnership
+    summary: 'Announced as expanded on 2026-04-02: from a closed beta running since 2025 to an open beta for qualified advertisers in categories with strict data restrictions; advertisers measure incremental lift on Reddit without sharing first-party data with the platform.'
+    between: [atom/mozilla-corporation, 'C:counterparty/reddit']
+    counterparty: C:counterparty/reddit
+    scope: ['P:service/anonym']
+    terms: {pending: commercial terms are not published}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.mozilla.org/en/advertising/anonym-reddit-partnership/'], confidence: 0.9, state: known}
+
+  - id: C:contract/open-web-docs-partnership
+    type: contract
+    name: MDN partnership with Open Web Docs
+    summary: Open Web Docs, an independent open-source organization, is described as one of the most productive contributors to MDN Web Docs and an invaluable partner in the day-to-day work of making MDN. MDN's partners also include Microsoft, Google, Igalia, W3C and Scrimba.
+    between: [atom/mozilla-corporation, 'C:counterparty/open-web-docs']
+    counterparty: C:counterparty/open-web-docs
+    scope: ['P:offering/mdn']
+    terms: {pending: funding and terms are not published}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://developer.mozilla.org/en-US/about'], confidence: 0.8, state: known}

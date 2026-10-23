@@ -1,6 +1,6 @@
 [project]
 name = "enough"
-version = "0.4.2"
+version = "0.4.3"
 description = "A paradigmless personal computer harness powered by a local LLM."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -48,6 +48,8 @@ dependencies = [
     # docling. Base, not an extra: re-importing our own PDF must work on every
     # install.
     "pypdf>=5",
+    # .cosm files (enough/macrocosm.py): the COSM YAML subset
+    "pyyaml>=6.0",
 ]
 
 [project.optional-dependencies]

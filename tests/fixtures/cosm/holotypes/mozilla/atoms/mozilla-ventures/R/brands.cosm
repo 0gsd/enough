@@ -1,0 +1,11 @@
+# R: the brand.
+nodes:
+  - id: R:brand/mozilla-ventures
+    type: brand
+    name: Mozilla Ventures
+    summary: The fund's brand.
+    scope: ['P:mozilla-ventures']
+    status: active
+    visibility: public
+    owner: O:role/Managing-Partner
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/'], confidence: 0.9, state: known}

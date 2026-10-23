@@ -1,0 +1,44 @@
+# O — positions: the seats. Who sits in them is an E:assignment in the store, never written here.
+nodes:
+  - id: O:position/chief-executive
+    type: position
+    name: Chief Executive
+    summary: The founder's seat; the top of the chart.
+    roles: [O:role/Founder]
+    primary: O:role/Founder
+    reports-to: none
+    status: active
+    provenance: {mode: dialectic, sources: [session-3], confidence: 0.9, state: known}
+
+  - id: O:position/support-lead
+    type: position
+    name: Support Lead
+    summary: One seat; created in 2024 with the daily health check.
+    roles: [O:role/Support-Lead]
+    primary: O:role/Support-Lead
+    reports-to: O:position/chief-executive
+    since: 2024-02
+    status: active
+    provenance: {mode: dialectic, sources: [session-2, session-3], confidence: 0.9, state: known}
+
+  - id: O:position/payroll-owner
+    type: position
+    name: Payroll Owner
+    summary: One seat; owns every payroll run and every house rule.
+    roles: [O:role/Payroll-Owner]
+    primary: O:role/Payroll-Owner
+    reports-to: O:position/chief-executive
+    status: active
+    provenance: {mode: dialectic, sources: [session-2, session-3], confidence: 0.9, state: known}
+
+  - id: O:position/engineer
+    type: position
+    name: Engineer
+    summary: The engineering seats; a template with two instances today.
+    roles: [O:role/Engineer]
+    primary: O:role/Engineer
+    reports-to: O:position/chief-executive
+    template: true
+    instances: 2
+    status: active
+    provenance: {mode: dialectic, sources: [session-3], confidence: 0.9, state: known}

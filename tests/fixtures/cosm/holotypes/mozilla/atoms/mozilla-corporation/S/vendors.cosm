@@ -1,0 +1,23 @@
+# S: vendors behind the stack. Each resolves to one counterparty.
+nodes:
+  - id: S:vendor/github
+    type: vendor
+    name: GitHub
+    summary: Hosts the Firefox and MDN repositories.
+    counterparty: C:counterparty/github
+    contract: none
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-firefox/firefox', 'https://developer.mozilla.org/en-US/about'], confidence: 0.9, state: known}
+
+  - id: S:vendor/mullvad
+    type: vendor
+    name: Mullvad VPN
+    summary: Ran the WireGuard servers behind Mozilla VPN at launch (October 2019 partnership, secondary source); whether it still does is not stated on Mozilla's current pages.
+    counterparty: C:counterparty/mullvad
+    contract: {pending: the agreement and whether it is current in 2026}
+    status: active
+    visibility: public
+    owner: O:role/Privacy-Services-Team
+    provenance: {mode: net-scan, sources: ['https://en.wikipedia.org/wiki/Mullvad', 'https://www.mozilla.org/en-US/products/vpn/'], confidence: 0.5, state: known}

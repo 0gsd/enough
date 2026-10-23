@@ -1,0 +1,10 @@
+oes: eml/1
+id: eml/bad-type
+name: bad type
+# type: a kind the module does not declare
+nodes:
+  - id: K:idea/x
+    type: idea
+    name: x
+    summary: An idea, which K does not have.
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

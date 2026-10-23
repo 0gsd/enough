@@ -1,0 +1,36 @@
+# C — aims: what the Corporation says it is trying to achieve with outside help (seeking), from the Firefox Enterprise and Mozilla Advertising pages,
+# the State of Mozilla 2025/26 and the job listings, read on 2026-10-18. The words carry no figures: an isotype publishes statements, never
+# measurements. Owners are roles; no person is named. A fact no current source states is left out (no distribution or open-to aim is stated).
+nodes:
+  - id: C:aim/firefox-enterprise-customers
+    type: aim
+    name: Organizations that want Firefox Enterprise
+    summary: "Organizations, especially regulated and security-sensitive ones, that want to run Firefox Enterprise on their own infrastructure."
+    kind: customers
+    stance: seeking
+    owner: O:role/Firefox-Product-Management
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/enterprise/', 'https://stateof.mozilla.org/roadmap/'], confidence: 0.85, state: known}
+
+  - id: C:aim/advertisers
+    type: aim
+    name: Advertisers on Firefox and MDN
+    summary: "Advertisers who want to reach people on Firefox and MDN Web Docs in brand-safe, privacy-respecting spaces."
+    kind: customers
+    stance: seeking
+    owner: O:role/Advertising-Team
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/advertising/'], confidence: 0.85, state: known}
+
+  - id: C:aim/browser-and-enterprise-hires
+    type: aim
+    name: Engineers, product managers and enterprise sales staff
+    summary: "Hire engineers and product managers for Firefox, and solutions engineers and account managers for Firefox Enterprise."
+    kind: talent
+    stance: seeking
+    owner: O:role/Chief-Executive-Officer
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/careers/listings/'], confidence: 0.75, state: known}

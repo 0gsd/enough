@@ -1,0 +1,34 @@
+# M: channels.
+nodes:
+  - id: M:channel/github
+    type: channel
+    name: GitHub
+    summary: The open tools are distributed through the mozilla-ai organization.
+    model: open source
+    seller: self
+    counterparty: C:counterparty/github
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-ai'], confidence: 0.8, state: known}
+
+  - id: M:channel/otari-hosted
+    type: channel
+    name: otari.ai (hosted)
+    summary: The hosted deployment of Otari, alongside the self-hosted gateway.
+    model: hosted service
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/product/otari'], confidence: 0.8, state: known}
+
+  - id: M:channel/octonous
+    type: channel
+    name: octonous.com
+    summary: Octonous, in beta and free to use during the beta.
+    model: free beta
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/product/octonous', 'https://www.mozilla.ai/llms.txt'], confidence: 0.8, state: known}

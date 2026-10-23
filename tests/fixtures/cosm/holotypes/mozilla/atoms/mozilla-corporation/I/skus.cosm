@@ -1,0 +1,37 @@
+# I: the two plans whose prices Mozilla publishes. Relay Premium, Monitor's paid tier and MDN Plus are not listed with a price.
+nodes:
+  - id: I:sku/vpn-monthly
+    type: sku
+    name: Mozilla VPN, monthly
+    summary: 'The monthly plan: $9.99 a month plus tax, up to five devices.'
+    kind: subscription-plan
+    unit: subscription/month
+    billing:
+      model: flat
+      value: 9.99
+      unit: USD/month
+      cadence: monthly
+    priced-by: M:pricebook/mozilla-vpn
+    seller: self
+    status: active
+    visibility: public
+    owner: O:role/Privacy-Services-Team
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/vpn/'], confidence: 0.9, state: known}
+
+  - id: I:sku/vpn-annual
+    type: sku
+    name: Mozilla VPN, annual
+    summary: 'The annual plan: $4.99 a month billed as $59.88 plus tax.'
+    kind: subscription-plan
+    unit: subscription/year
+    billing:
+      model: flat
+      value: 59.88
+      unit: USD/year
+      cadence: annual
+    priced-by: M:pricebook/mozilla-vpn
+    seller: self
+    status: active
+    visibility: public
+    owner: O:role/Privacy-Services-Team
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/vpn/'], confidence: 0.9, state: known}

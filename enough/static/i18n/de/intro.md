@@ -12,7 +12,7 @@ enough ist ein persönliches Sprachsystem: ein Ort, um Text zu planen, zu lesen,
 
 **text-planning ist die Heimat.** Sag mir, was du schreiben willst, und wir bauen gemeinsam einen Plan, danach Gerüste pro Abschnitt, die du mit deiner eigenen Prosa füllst. Andere Paradigmen decken das Übersetzen ab und das Entwerfen eigener Workflows.
 
-**Nachschlagen geht lokal.** Das Wörterbuch nennt zu jedem Wort Bedeutung, Klang, Geschichte und Verwandte: Klick mit rechts auf ein Wort, oder blätter darin über die UI-Einstellungen. Wikisink ist eine Offline-Wikipedia. Cacheawl bewahrt die Quellen auf, die du sammelst.
+**Nachschlagen geht lokal.** Das Wörterbuch nennt zu jedem Wort Bedeutung, Klang, Geschichte und Verwandte: Klick mit rechts auf ein Wort, oder blätter darin über die UI-Einstellungen. Wikisink ist eine Offline-Wikipedia. Canon bewahrt die Quellen auf, die du sammelst.
 
 **Es wächst mit dir.** Skills, Readvisors und Paradigmen sind schlichte Dateien, die du lesen, ändern oder selbst schreiben kannst, und ich helfe dir, sie zu bauen.
 

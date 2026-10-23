@@ -1,0 +1,86 @@
+# C — filings and dated events. The audit report and the Form 990 for 2024-25 are on the Endowment's site; the first return covers the period to 30 June 2024.
+nodes:
+  - id: C:filing/audit-2024-25
+    type: filing
+    name: Audited financial statements, FY2024-25
+    summary: BDO's opinion on the statements for the year to 30 June 2025 and the first period, dated 2026-03-06, with an emphasis-of-matter paragraph on the restatement of the 2024 statements.
+    entity: C:entity/wikimedia-endowment
+    kind: audit-report
+    period: 2024-07..2025-06
+    url: "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://foundation.wikimedia.org/wiki/Endowment:Main"], confidence: 0.9, state: known}
+
+  - id: C:filing/form-990-2024
+    type: filing
+    name: Form 990, tax year 2024 (FY2024-25)
+    summary: "The IRS return for the year to 30 June 2025, filed 2026-05-15: revenue $33.3M, expenses $5.6M, $3.1M in grants to the Foundation and $297K to Kiwix; no employees."
+    entity: C:entity/wikimedia-endowment
+    kind: form-990
+    period: 2024-07..2025-06
+    url: "https://wikimediaendowment.org/wp-content/uploads/2026/05/2024-Form-990-WEND-Public.pdf"
+    filed: 2026-05-15
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/05/2024-Form-990-WEND-Public.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.9, state: known}
+
+  - id: C:filing/audit-2023-24
+    type: filing
+    name: Audited financial statements, first period
+    summary: The first audit, for the period from 2023-09-30 to 2024-06-30; later restated in the 2024-25 report.
+    entity: C:entity/wikimedia-endowment
+    kind: audit-report
+    period: 2023-09..2024-06
+    url: "https://wikimediaendowment.org/wp-content/uploads/2024/11/Wikimedia-Endowment-2024-Audited-Financial-Statements.pdf"
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Main", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.8, state: known}
+
+  - id: C:filing/form-990-2023
+    type: filing
+    name: Form 990, first return (FY2023-24)
+    summary: The first IRS return, covering the period to 30 June 2024.
+    entity: C:entity/wikimedia-endowment
+    kind: form-990
+    period: 2023-09..2024-06
+    url: "https://wikimediaendowment.org/wp-content/uploads/2025/07/WEND-Form-990-FY-2023-2024.pdf"
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Main", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.8, state: known}
+
+  - id: C:event/announced
+    type: event
+    name: Creation of the Endowment announced
+    summary: In January 2016 the Foundation announces the Endowment, run in its early years as a donor-advised fund at the Tides Foundation.
+    year: 2016
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Memory:Timeline", "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/"], confidence: 0.8, state: known}
+
+  - id: C:event/irs-recognition
+    type: event
+    name: IRS recognises the Endowment
+    summary: The IRS letter of 2022-06-28 recognises the Endowment as exempt under section 501(c)(3), as preparation for standing alone.
+    at: 2022-06-28
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Main", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}
+
+  - id: C:event/grantmaking-begins
+    type: event
+    name: Grantmaking begins after reaching $100 million
+    summary: The Endowment begins making grants in 2023, after the fund reaches $100 million in value.
+    year: 2023
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/annualreports/2024-2025-annual-report/"], confidence: 0.8, state: known}
+
+  - id: C:event/standalone
+    type: event
+    name: Standalone organization
+    summary: On 2023-09-30 the Endowment becomes a standalone 501(c)(3) with its own Board of Directors and receives $116.2M from the Tides Foundation.
+    at: 2023-09-30
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}

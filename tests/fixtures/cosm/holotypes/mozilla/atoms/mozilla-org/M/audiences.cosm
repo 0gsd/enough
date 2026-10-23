@@ -1,0 +1,23 @@
+# M: who Mozilla.org serves: the organizations it runs and the community around them.
+nodes:
+  - id: M:audience/mozilla-family
+    type: audience
+    name: The Mozilla family of organizations
+    summary: The Foundation, Mozilla Corporation, MZLA, Mozilla Ventures, Mozilla.ai and Mozilla Data Collective, which Mozilla.org coordinates, funds and brands.
+    relation: [beneficiary]
+    side: served
+    served-by: ['P:offering/stewardship']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/about/'], confidence: 0.9, state: known}
+
+  - id: M:audience/mozilla-community
+    type: audience
+    name: The Mozilla Project community
+    summary: The global community active since 1998; Mozilla.org also coordinates community initiatives that support the mission.
+    relation: [member]
+    side: served
+    served-by: ['P:function/family-coordination']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.8, state: known}

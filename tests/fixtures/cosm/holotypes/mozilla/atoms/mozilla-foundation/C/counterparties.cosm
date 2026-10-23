@@ -1,0 +1,78 @@
+# C: counterparties: the outsiders the Foundation's contracts and systems name. Stubs, not modelled.
+nodes:
+  - id: C:counterparty/doris-duke-foundation
+    type: counterparty
+    name: Doris Duke Foundation
+    summary: US philanthropy; partner in the Artists Make Technology program.
+    kind: funder
+    global-id:
+      domain: dorisduke.org
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/'], confidence: 0.8, state: known}
+
+  - id: C:counterparty/rhizome
+    type: counterparty
+    name: Rhizome
+    summary: Arts organization; partner in the Counterstructures residencies.
+    kind: partner
+    global-id:
+      domain: rhizome.org
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/'], confidence: 0.7, state: known}
+
+  - id: C:counterparty/berggruen-institute
+    type: counterparty
+    name: Berggruen Institute
+    summary: Research institute; partner in the Imaginative Intelligences program.
+    kind: partner
+    global-id:
+      domain: berggruen.org
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/'], confidence: 0.8, state: known}
+
+  - id: C:counterparty/the-onion
+    type: counterparty
+    name: The Onion
+    summary: Media company named as supporting Nothing Personal.
+    kind: partner
+    global-id:
+      domain: theonion.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/'], confidence: 0.7, state: known}
+
+  - id: C:counterparty/city-of-barcelona
+    type: counterparty
+    name: City of Barcelona
+    summary: Municipal partner for Mozilla Festival 2026 and Open Tech Week.
+    kind: public-body
+    global-id:
+      domain: ajuntament.barcelona.cat
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/'], confidence: 0.8, state: known}
+
+  - id: C:counterparty/heroku
+    type: counterparty
+    name: Heroku
+    summary: Platform that hosts staging and production of the Foundation website.
+    kind: platform
+    global-id:
+      domain: heroku.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla/foundation.mozilla.org'], confidence: 0.8, state: known}
+
+  - id: C:counterparty/github
+    type: counterparty
+    name: GitHub
+    summary: Code host for the Foundation website and Common Voice repositories.
+    kind: platform
+    global-id:
+      domain: github.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla/foundation.mozilla.org', 'https://github.com/common-voice/common-voice'], confidence: 0.9, state: known}

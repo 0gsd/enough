@@ -1,0 +1,125 @@
+# O: roles are the seats' titles as the leadership page names them; nobody is named.
+nodes:
+  - id: O:role/Board-of-Directors
+    type: role
+    name: Board of Directors
+    summary: Ten voting directors; sets the chief officer's pay and receives the audit and investment committees' reports.
+    decides:
+      - the chief officer's compensation
+      - approval of the Form 990 before filing
+    governs: ['P:mozilla-foundation']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}
+
+  - id: O:role/Audit-Committee
+    type: role
+    name: Audit Committee
+    summary: Board committee for audit; reports to the full board.
+    governs: ['P:function/governance-and-compliance']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.8, state: known}
+
+  - id: O:role/Investment-Committee
+    type: role
+    name: Investment Committee
+    summary: Board committee for investments; reports to the full board.
+    governs: ['P:function/finance-and-treasury']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.8, state: known}
+
+  - id: O:role/Executive-Director
+    type: role
+    name: Executive Director
+    summary: The Foundation's chief executive seat, named first on the leadership page.
+    governs: ['P:suite/co-create', 'P:offering/common-voice']
+    escalates-to: O:role/Board-of-Directors
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.8, state: known}
+
+  - id: O:role/Chief-Operating-Officer
+    type: role
+    name: Chief Operating Officer
+    summary: Seat named on the leadership page; duties are not published.
+    governs: ['O:unit/executive-office']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:role/VP-Development
+    type: role
+    name: Vice President, Development
+    summary: Seat named on the leadership page; the Foundation raises donations and grants (contributions and grants were $6.5 million in 2024).
+    governs: ['P:function/fundraising']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:role/VP-Finance-and-Administration
+    type: role
+    name: Vice President, Finance and Administration
+    summary: Seat named on the leadership page; finance contact is finance@mozillafoundation.org.
+    governs: ['P:function/finance-and-treasury']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/', 'https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.7, state: known}
+
+  - id: O:role/VP-Imagination-and-Strategic-Growth
+    type: role
+    name: Vice President, Imagination and Strategic Growth
+    summary: Seat named on the leadership page; the Imagine side of the work.
+    governs: ['P:suite/imagine', 'P:offering/creative-futures', 'P:offering/mozilla-education']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:role/Executive-Program-Manager
+    type: role
+    name: Executive Program Manager
+    summary: Seat named on the leadership page; duties are not published.
+    governs: ['O:unit/executive-office']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:role/Senior-Counsel
+    type: role
+    name: Senior Counsel
+    summary: Seat named on the leadership page; legal and governance.
+    governs: ['P:function/governance-and-compliance']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:role/Director-Communications
+    type: role
+    name: Director, Communications
+    summary: Seat named on the leadership page; campaigns and the press center.
+    governs: ['P:offering/campaigns', 'P:offering/nothing-personal']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:role/Director-Global-Grants
+    type: role
+    name: Director, Global Grants
+    summary: Seat named on the leadership page; grantmaking.
+    governs: ['P:offering/grantmaking', 'P:offering/fellowships']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.7, state: known}
+
+  - id: O:role/Senior-Director-Technology-Platforms
+    type: role
+    name: Senior Director, Technology Platforms
+    summary: Seat named on the leadership page; the Foundation's own web platforms.
+    governs: ['S:system/foundation-website', 'S:system/common-voice-platform']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:role/Senior-Director-People-and-Culture
+    type: role
+    name: Senior Director, People and Culture
+    summary: Seat named on the leadership page; the Foundation had 73 employees in 2024.
+    governs: ['O:unit/people-and-culture']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.6, state: known}
+
+  - id: O:role/Director-Mozilla-Festival
+    type: role
+    name: Director, Mozilla Festival
+    summary: Seat named on the leadership page; MozFest.
+    governs: ['P:offering/mozilla-festival']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.7, state: known}

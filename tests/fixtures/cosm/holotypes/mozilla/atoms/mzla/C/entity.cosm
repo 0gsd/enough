@@ -1,0 +1,61 @@
+# C: MZLA's legal shell, the Thunderbird Council, its governing documents and two launches.
+nodes:
+  - id: C:entity/mzla
+    type: entity
+    name: MZLA Technologies Corporation
+    summary: California C corporation announced in January 2020 as a wholly owned for-profit subsidiary to run the Thunderbird project; Thunderbird's donate page now calls it a wholly owned for-profit subsidiary of the not-for-profit Mozilla.org. Its privacy notice gives 447 Sutter Street, Suite 405, San Francisco (May 2025); the 2024 Form 990 gives 149 New Montgomery Street.
+    anchor: true
+    form: corporation
+    roles: [company, brand]
+    jurisdiction: US-CA
+    registered-office: 447 Sutter Street, Suite 405, San Francisco, CA 94108
+    domains: [thunderbird.net]
+    global-id: {ein: 84-3352661, domain: thunderbird.net}
+    tax-status: C corporation (taxable); gifts to Thunderbird are not tax deductible as charitable gifts
+    fiscal-year: calendar
+    since: 2020-01-28
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://www.thunderbird.net/en-US/privacy/', 'https://www.thunderbird.net/en-US/donate/', 'https://en.wikipedia.org/wiki/Mozilla_Foundation'], confidence: 0.9, state: known}
+
+  - id: C:governance/thunderbird-council
+    type: governance
+    name: Thunderbird Council
+    summary: An elected council that governs the Thunderbird project; established in 2014 according to the Thunderbird about page. Its operating agreement is listed on the Foundation's public records page; the agreement's text is not summarised here.
+    elected-by: {pending: 'who votes in Council elections: the about page says only that the council is elected'}
+    since: 2014
+    url: https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.8, state: known}
+
+  - id: C:charter/articles-and-bylaws
+    type: charter
+    name: Articles of Incorporation and Bylaws of Thunderbird
+    summary: Listed under Thunderbird on the Foundation's public records page, with the Thunderbird Council Operation Agreement; the text is not summarised here.
+    kind: articles
+    entity: C:entity/mzla
+    url: https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.8, state: known}
+
+  - id: C:event/android-launch
+    type: event
+    name: Thunderbird for Android launched
+    summary: Launched in October 2024, built on the K-9 Mail app, which Thunderbird adopted.
+    kind: launch
+    period: 2024-10
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://github.com/thunderbird'], confidence: 0.8, state: known}
+
+  - id: C:event/thundermail-beta
+    type: event
+    name: Thundermail invitations begin
+    summary: Early Bird beta invitations to Thundermail were planned for May 2026 and went out in waves from the waitlist in June 2026.
+    kind: launch
+    period: 2026-06
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2026/04/thunderbird-pro-april-2026-update/', 'https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/'], confidence: 0.8, state: known}

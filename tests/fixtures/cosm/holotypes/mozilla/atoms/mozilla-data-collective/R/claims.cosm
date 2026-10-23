@@ -1,0 +1,49 @@
+# R: claims.
+nodes:
+  - id: R:claim/contributors-keep-ownership
+    type: claim
+    name: Contributors keep ownership and set their terms
+    summary: On the home page.
+    text: Upload datasets, keep ownership, set your own terms.
+    about: ['P:offering/dataset-platform']
+    'on': ['R:surface/website']
+    evidence:
+      state: supported
+      by: ['P:product/dataset-catalog']
+      measure: listings show per-dataset licences, including contributor-chosen ones
+    status: active
+    visibility: public
+    owner: O:role/Founder-and-Chief-Executive
+    provenance: {mode: net-scan, sources: ['https://mozilladatacollective.com/', 'https://mozilladatacollective.com/datasets'], confidence: 0.7, state: known}
+
+  - id: R:claim/downloads-pay-creators
+    type: claim
+    name: Every download sends money back
+    summary: On the home page, for compensated datasets.
+    text: For compensated datasets, every download sends money back to the people who made the dataset possible.
+    about: ['P:service/compensated-datasets']
+    'on': ['R:surface/website']
+    evidence:
+      state: unverified
+      by: ['P:service/compensated-datasets']
+      measure: the payout mechanism is not explained on the pages read
+    status: active
+    visibility: public
+    owner: O:role/Founder-and-Chief-Executive
+    provenance: {mode: net-scan, sources: ['https://mozilladatacollective.com/', 'https://mozilladatacollective.com/datasets'], confidence: 0.6, state: known}
+
+  - id: R:claim/mission-locked
+    type: claim
+    name: A mission-locked British company
+    summary: On the home page.
+    text: A mission-locked British company, incubated by Mozilla Foundation and backed by the not-for-profit Mozilla.org.
+    about: ['P:mozilla-data-collective']
+    'on': ['R:surface/website']
+    evidence:
+      state: partial
+      by: ['C:entity/mozilla-data-collective-ltd']
+      measure: the company exists at Companies House; the lock is not described and no controller is recorded
+    status: active
+    visibility: public
+    owner: O:role/Founder-and-Chief-Executive
+    provenance: {mode: net-scan, sources: ['https://mozilladatacollective.com/', 'https://find-and-update.company-information.service.gov.uk/company/17054959', 'https://find-and-update.company-information.service.gov.uk/company/17054959/persons-with-significant-control'], confidence: 0.7, state: known}

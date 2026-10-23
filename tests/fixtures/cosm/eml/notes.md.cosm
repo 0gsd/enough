@@ -1,0 +1,211 @@
+oes: eml/1
+id: eml/notes-md
+name: The Hollins Lane orchard, autumn notes
+source: {path: notes.md, sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7, size: 1228, mtime_ns: 1792665000000000000}
+# Written by hand as a test fixture: a full twin, every kind of item once at least. A model's twin also says model:.
+derived: {at: 2026-10-22T10:30:00Z, by: hand, mode: model, completeness: full, chunks: 1}
+atem:
+  line: "The orchard's juice rose this year for reasons still argued over, and mowing the meadow strip in July would starve the pollinators its fruit depends on."
+  focus: "A small orchard's good year, and a mowing date that could undo it."
+  push: "Ask the parish council to wait until September before mowing the meadow strip."
+  pull: "Whether leaf mould or a wet spring raised the yield, and whether the lease lets the parish mow at all."
+
+nodes:
+  # ---- L: the words the text leans on, grounded in FEED
+  - id: L:term/pollinate
+    type: term
+    name: pollinate
+    summary: To carry pollen from one flower to another so that fruit can set.
+    feed: {word: pollinate, pos: verb, origin: feed}
+    sense: To carry pollen from one flower to another so that fruit can set.
+    span: {lines: "7-8"}
+    provenance: {mode: manual, sources: ["notes.md#L7-L8"], confidence: 0.9}
+  - id: L:term/variety
+    type: term
+    name: variety
+    summary: A named, cultivated kind of apple; the text's sense of the word.
+    feed: {word: variety, pos: noun, origin: feed}
+    sense: A cultivated kind of apple tree, such as Bramley (the text's own sense, narrower than FEED's).
+    span: {lines: "7"}
+    provenance: {mode: manual, sources: ["notes.md#L7"], confidence: 0.8}
+  - id: L:term/mulch
+    type: term
+    name: mulch
+    summary: A layer of organic matter spread over soil to keep it moist and feed it.
+    feed: {word: mulch, pos: noun; verb, origin: feed}
+    sense: A layer of organic matter spread over soil to keep it moist and feed it.
+    span: {lines: "14"}
+    provenance: {mode: manual, sources: ["notes.md#L14"], confidence: 0.9}
+  - id: L:term/leaf-mould
+    type: term
+    name: leaf mould
+    summary: Fallen leaves left to rot into a dark, crumbly mulch.
+    feed: {pending: "not in FEED"}
+    sense: Fallen leaves left to rot into a dark, crumbly mulch.
+    span: {lines: "13"}
+    provenance: {mode: manual, sources: ["notes.md#L13"], confidence: 0.8}
+    links:
+      - {rel: is-a, to: L:term/mulch}
+
+  # ---- E: the particular things and people named
+  - id: E:person/mara-okafor
+    type: person
+    name: Mara Okafor
+    summary: Mara Okafor has kept the Hollins Lane orchard since 2019.
+    span: {lines: "3"}
+    provenance: {mode: manual, sources: ["notes.md#L3"], confidence: 0.95}
+  - id: E:place/hollins-lane-orchard
+    type: place
+    name: Hollins Lane orchard
+    summary: A small community orchard on Hollins Lane, with a meadow strip beside it.
+    span: {lines: "3"}
+    provenance: {mode: manual, sources: ["notes.md#L3"], confidence: 0.95}
+  - id: E:thing/bramley-by-the-gate
+    type: thing
+    name: the Bramley by the gate
+    summary: The old Bramley apple tree by the gate of the Hollins Lane orchard.
+    span: {lines: "4"}
+    provenance: {mode: manual, sources: ["notes.md#L4"], confidence: 0.9}
+    links:
+      - {rel: part-of, to: E:place/hollins-lane-orchard}
+  - id: E:org/parish-council
+    type: org
+    name: the parish council
+    summary: The parish council, whose grounds team mows the meadow strip.
+    span: {lines: "17"}
+    provenance: {mode: manual, sources: ["notes.md#L17"], confidence: 0.9}
+    pending: "Does the lease let the parish council mow the meadow strip without asking the orchard?"
+  - id: E:org/orchard-volunteers
+    type: org
+    name: the orchard volunteers
+    summary: The volunteers who work the Hollins Lane orchard.
+    span: {lines: "13"}
+    provenance: {mode: manual, sources: ["notes.md#L13"], confidence: 0.85}
+
+  # ---- K: the ideas the text uses
+  - id: K:concept/cross-pollination
+    type: concept
+    name: cross-pollination
+    summary: An apple tree sets fruit only with pollen from a second variety nearby.
+    defined-by: L:term/pollinate
+    span: {lines: "7-8"}
+    provenance: {mode: manual, sources: ["notes.md#L7-L8"], confidence: 0.9}
+  - id: K:concept/pollinator-habitat
+    type: concept
+    name: pollinator habitat
+    summary: Uncut wildflowers that feed the insects an orchard needs to set fruit.
+    span: {lines: "18-19"}
+    provenance: {mode: manual, sources: ["notes.md#L18-L19"], confidence: 0.85}
+    links:
+      - {rel: depends-on, to: K:concept/cross-pollination}
+
+  # ---- P: what the text claims, and how it knows
+  - id: P:claim/bramley-is-oldest
+    type: claim
+    name: the Bramley is the oldest tree
+    summary: Mara Okafor says the Bramley by the gate is the oldest tree on Hollins Lane; the parish records do not confirm it.
+    stance: hearsay
+    salience: low
+    roles: {source: E:person/mara-okafor, about: E:thing/bramley-by-the-gate}
+    span: {lines: "3-5"}
+    provenance: {mode: manual, sources: ["notes.md#L3-L5"], confidence: 0.9}
+  - id: P:claim/apples-need-a-second-variety
+    type: claim
+    name: apples need a second variety
+    summary: Every apple tree needs a second apple variety nearby to set fruit.
+    stance: axiom
+    salience: high
+    roles: {claim: K:concept/cross-pollination, instrument: L:term/variety}
+    span: {lines: "7-8"}
+    provenance: {mode: manual, sources: ["notes.md#L7-L8"], confidence: 0.95}
+    links:
+      - {rel: exemplifies, to: K:concept/cross-pollination}
+  - id: P:claim/juice-rose-to-140-litres
+    type: claim
+    name: the juice rose to 140 litres
+    summary: The Hollins Lane orchard pressed 140 litres of juice this year, up from 90 litres last year; the writer counted the bottles on 12 October.
+    stance: observed
+    salience: critical
+    roles: {actor: E:place/hollins-lane-orchard, measure: "140 litres, up from 90"}
+    span: {lines: "10-11"}
+    provenance: {mode: manual, sources: ["notes.md#L10-L11"], confidence: 0.95}
+  - id: P:claim/mulch-raised-the-yield
+    type: claim
+    name: the leaf mould raised the yield
+    summary: Mara Okafor holds that the leaf mould spread in March raised the Hollins Lane orchard's yield.
+    stance: opinion
+    salience: high
+    roles: {holder: E:person/mara-okafor, cause: L:term/leaf-mould, effect: P:claim/juice-rose-to-140-litres}
+    span: {lines: "13-14"}
+    provenance: {mode: manual, sources: ["notes.md#L13-L14"], confidence: 0.9}
+    links:
+      - {rel: contradicts, to: P:claim/spring-explains-the-yield}
+  - id: P:claim/spring-explains-the-yield
+    type: claim
+    name: a wet spring explains the yield
+    summary: A warm, wet spring explains most of the rise in juice, because every orchard in the valley did well.
+    stance: deduced
+    salience: high
+    roles: {cause: "a warm, wet spring", effect: P:claim/juice-rose-to-140-litres}
+    span: {lines: "14-15"}
+    provenance: {mode: manual, sources: ["notes.md#L14-L15"], confidence: 0.85}
+    links:
+      - {rel: contradicts, to: P:claim/mulch-raised-the-yield}
+  - id: P:claim/july-mowing-harms-the-orchard
+    type: claim
+    name: July mowing would harm the orchard
+    summary: Mowing the meadow strip in July would cut the wildflowers before they seed and so starve the pollinators the Hollins Lane orchard depends on.
+    stance: deduced
+    salience: critical
+    roles: {actor: E:org/parish-council, claim: K:concept/pollinator-habitat, condition: "if the strip is mown in July"}
+    span: {lines: "17-20"}
+    provenance: {mode: manual, sources: ["notes.md#L17-L20"], confidence: 0.85}
+    links:
+      - {rel: depends-on, to: P:claim/apples-need-a-second-variety}
+  - id: P:claim/strip-feeds-pollinators
+    type: claim
+    name: the strip exists for pollinators
+    summary: The meadow strip exists to feed the pollinators the Hollins Lane orchard depends on.
+    stance: assumed
+    salience: normal
+    roles: {about: K:concept/pollinator-habitat}
+    span: {lines: "18-19"}
+    provenance: {mode: manual, sources: ["notes.md#L18-L19"], confidence: 0.7}
+    links:
+      - {rel: supports, to: P:claim/july-mowing-harms-the-orchard}
+
+  # ---- T: what happens, in order
+  - id: T:event/leaf-mould-spread
+    type: event
+    name: leaf mould spread
+    summary: The orchard volunteers spread leaf mould under the trees in March.
+    agent: E:org/orchard-volunteers
+    patient: E:place/hollins-lane-orchard
+    before: T:event/pressing
+    when: March
+    span: {lines: "13"}
+    provenance: {mode: manual, sources: ["notes.md#L13"], confidence: 0.9}
+  - id: T:event/pressing
+    type: event
+    name: the pressing
+    summary: The Hollins Lane orchard pressed 140 litres of juice, counted on 12 October.
+    patient: E:place/hollins-lane-orchard
+    after: T:event/leaf-mould-spread
+    when: 12 October
+    span: {lines: "10-11"}
+    provenance: {mode: manual, sources: ["notes.md#L10-L11"], confidence: 0.95}
+    links:
+      - {rel: mentions, to: P:claim/juice-rose-to-140-litres}
+
+  # ---- X: a passage atem, pinned from the reader
+  - id: X:atem/1
+    type: atem
+    name: the mowing paragraph
+    summary: Mowing the meadow strip in July would starve the orchard's pollinators.
+    line: "Mowing the meadow strip in July would cut its wildflowers before they seed and starve the pollinators the orchard needs."
+    focus: The date the parish council mows the meadow strip.
+    push: Mow in September, after the wildflowers seed.
+    pull: The council's grounds team wants the strip cut in July.
+    of: P:claim/july-mowing-harms-the-orchard
+    span: {lines: "17-20", start: "The parish council's grounds team wants to mow", end: "the very insects that set its fruit."}
+    provenance: {mode: manual, sources: ["notes.md#L17-L20"], confidence: 0.9}

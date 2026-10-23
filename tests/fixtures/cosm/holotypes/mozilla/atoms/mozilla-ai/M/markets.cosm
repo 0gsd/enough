@@ -1,0 +1,20 @@
+# M: the market and the footprint.
+nodes:
+  - id: M:market/llm-infrastructure
+    type: market
+    name: LLM infrastructure and agent tooling
+    summary: Gateways, guardrails, agent frameworks and local model runtimes.
+    taxonomy: custom
+    code: software/llm-infrastructure
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.ai/'], confidence: 0.7, state: known}
+
+  - id: M:geography/team
+    type: geography
+    name: A team in nine countries
+    summary: Headquartered in San Francisco; the team is distributed across nine countries.
+    regions: [US]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/company/about-us'], confidence: 0.8, state: known}

@@ -1,0 +1,34 @@
+# M: audiences.
+nodes:
+  - id: M:audience/founders
+    type: audience
+    name: Founders of early-stage companies
+    summary: Founders building products that advance the Mozilla Manifesto, in trustworthy AI, healthy communities and security and privacy; they reach the fund through a contact page.
+    relation: [beneficiary]
+    side: served
+    served-by: ['P:offering/trustworthy-ai', 'P:offering/healthy-communities', 'P:offering/security-and-privacy']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/'], confidence: 0.8, state: known}
+
+  - id: M:audience/mozilla-sole-partner
+    type: audience
+    name: Mozilla as sole partner of the fund
+    summary: Mozilla is the sole partner in the first fund.
+    relation: [investor]
+    side: funding
+    served-by: ['P:mozilla-ventures']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/'], confidence: 0.9, state: known}
+
+  - id: M:audience/co-investors
+    type: audience
+    name: Co-investors and accelerators
+    summary: Other investors who invest alongside the fund and partners such as Betaworks and Mozilla Builders.
+    relation: [investor]
+    side: supplying
+    served-by: ['P:service/partner-network']
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/', 'https://mozilla.vc/'], confidence: 0.7, state: known}

@@ -1,0 +1,122 @@
+# M — accounts: the revenue-side counterparties the Foundation names publicly, all Wikimedia Enterprise customers or partners. Terms, prices and revenue per
+# account are not public (Enterprise revenue was $8.3M in 2024-25 in all, about 4% of the Foundation's total), so each band is pending. The Foundation's
+# 30% cap on Enterprise income is a policy, C:policy/enterprise-revenue-cap. The sources disagree on whether Amazon and Meta are new in 2026 or earlier.
+nodes:
+  - id: M:account/google
+    type: account
+    name: Google
+    summary: The first named Enterprise customer, announced with the Internet Archive on 2022-06-21, and a partner again in the January 2026 post.
+    counterparty: C:counterparty/google
+    channel: M:channel/enterprise-api
+    contract: C:contract/enterprise-agreements
+    pricebook: M:pricebook/enterprise
+    arr-band: {pending: "annual spend; terms are not disclosed"}
+    since: 2022-06-21
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/news/2022/06/21/wikimedia-enterprise-announces-google-and-internet-archive-first-customers/", "https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/"], confidence: 0.85, state: known}
+
+  - id: M:account/internet-archive
+    type: account
+    name: Internet Archive
+    summary: With Google, one of the first two named Enterprise customers (2022-06-21).
+    counterparty: C:counterparty/internet-archive
+    channel: M:channel/enterprise-api
+    contract: C:contract/enterprise-agreements
+    pricebook: M:pricebook/enterprise
+    arr-band: {pending: "whether and what it pays; the free tier and non-commercial access exist"}
+    since: 2022-06-21
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/news/2022/06/21/wikimedia-enterprise-announces-google-and-internet-archive-first-customers/"], confidence: 0.75, state: known}
+
+  - id: M:account/amazon
+    type: account
+    name: Amazon
+    summary: Named among the Enterprise partners on 2026-01-15; the Foundation's own news post calls it an existing partner.
+    counterparty: C:counterparty/amazon
+    channel: M:channel/enterprise-api
+    contract: C:contract/enterprise-agreements
+    pricebook: M:pricebook/enterprise
+    arr-band: {pending: "annual spend; financial terms were not disclosed"}
+    since: {pending: "when the agreement began (the two 2026-01-15 posts differ on whether it is new)"}
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/"], confidence: 0.8, state: known}
+
+  - id: M:account/meta
+    type: account
+    name: Meta
+    summary: Named among the Enterprise partners on 2026-01-15; the Foundation's own news post calls it an existing partner.
+    counterparty: C:counterparty/meta
+    channel: M:channel/enterprise-api
+    contract: C:contract/enterprise-agreements
+    pricebook: M:pricebook/enterprise
+    arr-band: {pending: "annual spend; financial terms were not disclosed"}
+    since: {pending: "when the agreement began (the two 2026-01-15 posts differ on whether it is new)"}
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/"], confidence: 0.8, state: known}
+
+  - id: M:account/microsoft
+    type: account
+    name: Microsoft
+    summary: Named among the Enterprise partners on 2026-01-15; the Foundation's news post lists it as new over the past year.
+    counterparty: C:counterparty/microsoft
+    channel: M:channel/enterprise-api
+    contract: C:contract/enterprise-agreements
+    pricebook: M:pricebook/enterprise
+    arr-band: {pending: "annual spend; financial terms were not disclosed"}
+    since: {pending: "the date in 2025 to January 2026 when the partnership began (the Foundation calls it new over the past year)"}
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/"], confidence: 0.75, state: known}
+
+  - id: M:account/mistral-ai
+    type: account
+    name: Mistral AI
+    summary: Named among the Enterprise partners on 2026-01-15; a separate Enterprise post describes a three-year partnership that began in January 2026.
+    counterparty: C:counterparty/mistral-ai
+    channel: M:channel/enterprise-api
+    contract: C:contract/enterprise-agreements
+    pricebook: M:pricebook/enterprise
+    arr-band: {pending: "annual spend; financial terms were not disclosed"}
+    since: 2026-01
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/"], confidence: 0.75, state: known}
+
+  - id: M:account/perplexity
+    type: account
+    name: Perplexity
+    summary: Named among the Enterprise partners on 2026-01-15; the Foundation's news post lists it as new over the past year.
+    counterparty: C:counterparty/perplexity
+    channel: M:channel/enterprise-api
+    contract: C:contract/enterprise-agreements
+    pricebook: M:pricebook/enterprise
+    arr-band: {pending: "annual spend; financial terms were not disclosed"}
+    since: {pending: "the date in 2025 to January 2026 when the partnership began (the Foundation calls it new over the past year)"}
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/"], confidence: 0.75, state: known}
+
+  - id: M:account/other-partners
+    type: account
+    name: Other named partners and customers
+    summary: Ecosia, Pleias and ProRata (new over the past year per the Foundation's January 2026 post), Nomic and Reef Media (Enterprise blog) and Databricks and Firecrawl (Enterprise site); some may use the free tier.
+    counterparty: C:counterparty/enterprise-other-partners
+    channel: M:channel/enterprise-api
+    contract: C:contract/enterprise-agreements
+    pricebook: M:pricebook/enterprise
+    arr-band: {pending: "which of them pay, and how much"}
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://enterprise.wikimedia.com/"], confidence: 0.75, state: known}

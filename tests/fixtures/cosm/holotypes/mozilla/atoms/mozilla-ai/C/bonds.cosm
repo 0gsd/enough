@@ -1,0 +1,34 @@
+# C: bonds. The Foundation funds Mozilla.ai ($30 million committed); Mozilla.org owns it. Both mirrored from their atoms.
+nodes:
+  - id: C:bond/foundation-funds-mozilla-ai
+    type: bond
+    name: Foundation funds Mozilla.ai
+    summary: The Foundation committed $30 million to create Mozilla.ai, launched in March 2023 and still pre-revenue in the 2024 report.
+    kinds: [funds]
+    from: atom/mozilla-foundation
+    to: atom/mozilla-ai
+    control: none
+    terms: $30 million committed at launch, March 2023
+    since: 2023-03
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/', 'https://mozilla.ai/company/about-us'], confidence: 0.8, state: known}
+
+  - id: C:bond/org-owns-mozilla-ai
+    type: bond
+    name: Mozilla.org owns Mozilla.ai
+    summary: MZL.AI, PBC was wholly owned by the Foundation in the 2024 filings; the Mozilla.ai pages still say it is backed by the Foundation.
+    kinds: [owns]
+    from: atom/mozilla-org
+    to: atom/mozilla-ai
+    economic: 1.0
+    voting: 1.0
+    control: full
+    basis: Mozilla.org owns the Mozilla operating subsidiaries (Mozilla wiki, June 2026); the Foundation held them at 100% in the audited 2024 statements and the 2024 Form 990 Schedule R
+    accounting: consolidated
+    nci: 0
+    inherits: [principles]
+    pending: The audited 2024 statements and the 2024 Form 990 give 100% held by the Foundation; the June 2026 Mozilla.org FAQ says Mozilla.org owns the operating subsidiaries without restating the share or the date of transfer. 100% is carried over from the last filing.
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://mozilla.ai/company/about-us'], confidence: 0.6, state: known}

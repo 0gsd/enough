@@ -9,7 +9,8 @@
     "project-base@ui-scale-max | offscreen | #comp-menu-btn": "[offscreen] composures sits at (998,64) 42x42 outside the 1024x640 viewport with no scroller to reach it",
     "convert-chip-mini | ellipsis-egregious | #convert-chip-mini>span.cc-name": "[ellipsis-egregious] report.pdf: only 14% of the text fits (~2 chars)",
     "convert-chip-mini | ellipsis-egregious | #preview-title": "[ellipsis-egregious] read · notes.md: only 31% of the text fits (~5 chars)",
-    "cacheawl | tiny | #ca-ingest-all": "[tiny] (no text) is only 13x13px",
+    "canon | tiny | #cn-ingest-all": "[tiny] (no text) is only 13x13px",
+    "canon-volume | tiny | #cn-ingest-all": "[tiny] (no text) is only 13x13px",
     "convert-chip-mini | tiny | #mini-face-btn": "[tiny] switch to edit face is only 14x26px",
     "convert-chip-mini | tiny | #mini-full-btn": "[tiny] expand to full size is only 14x26px",
     "girraph | tiny | #girraph-body>div:nth-of-type(2)>div.gp-row>button.gp-toggle": "[tiny] ▾ is only 16x13px",
@@ -23,6 +24,7 @@
     "modal-paginate | tiny | div.pg-block>div.pg-choices>label.cv-radio>input": "[tiny] (no text) is only 13x13px",
     "modal-paginate | tiny | div.pg-block>div.pg-row.pg-inline>label.cv-radio>input": "[tiny] (no text) is only 13x13px",
     "modal-ui | tiny | #ui-help-bubbles": "[tiny] (no text) is only 13x13px",
-    "modal-wikisink-setup | tiny | #wiki-flavor-list>label.wiki-flavor>input": "[tiny] (no text) is only 13x13px"
+    "modal-wikisink-setup | tiny | #wiki-flavor-list>label.wiki-flavor>input": "[tiny] (no text) is only 13x13px",
+    "composure-composures-menu | covered | #comp-menu>button:nth-of-type(38) | #comp-viewport": "pre-existing compPlaceMenu edge; see baseline-notes.md"
   }
 }

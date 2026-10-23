@@ -1,0 +1,26 @@
+# C — the filing this model leans on most, and the one change of fiscal year.
+nodes:
+  - id: C:filing/form-990-fy2025
+    type: filing
+    name: Form 990, year to 30 June 2025
+    summary: "The latest return on public record, e-filed on 12 February 2026: gross receipts $186,681,381, 337 people employed in calendar 2024, about 600 volunteers, financial statements audited on a consolidated basis with an audit oversight committee, accrual method. Schedules A, B, D, F, J, M, O and R are attached; Schedule R names one disregarded entity and two related tax-exempt organizations abroad."
+    entity: C:entity/khan-academy-inc
+    form: "990"
+    period: 2024-07..2025-06
+    filed: 2026-02-12
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-2025, pp-ka], confidence: 0.9, state: known}
+    pending: "the audited consolidated statements: Charity Navigator says they are posted on the nonprofit's website, but no link was found"
+
+  - id: C:event/fiscal-year-change
+    type: event
+    name: Change of fiscal year, 2024
+    summary: "The nonprofit moved from a calendar year to a year ending 30 June. A short return covers January to June 2024 (six months) and the next covers July 2024 to June 2025, so every comparison across the break needs that in mind."
+    at: 2024-06-30
+    kind: accounting-period-change
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-tp2024, f990-2025], confidence: 0.9, state: known}

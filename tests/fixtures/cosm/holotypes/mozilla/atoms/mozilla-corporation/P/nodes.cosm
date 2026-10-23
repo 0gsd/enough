@@ -1,0 +1,840 @@
+cosm: 0.3
+
+# The Corporation's tree: six suites (five live, one of retired products), eleven offerings and their units.
+
+nodes:
+  - id: P:suite/firefox
+    type: suite
+    name: Firefox
+    summary: The browser on every platform, its enterprise edition, the Mozilla account, the add-ons marketplace and support.
+    owner: O:role/Firefox-Product-Management
+    confidence: 0.8
+    sources: ['https://www.firefox.com/en-US/', 'https://www.mozilla.org/en-US/products/']
+    visibility: public
+    parts: ['P:offering/firefox', 'P:offering/firefox-enterprise', 'P:offering/mozilla-account', 'P:offering/firefox-add-ons']
+    mattering:
+      to-the-whole: Firefox earns the search royalties that were 73% of the group's revenue and support in 2024.
+      weight: critical
+      inside:
+        - who: ['O:role/Firefox-Product-Management']
+          because: Product management answers for the roadmap published at firefox.com/whatsnext.
+          confidence: 0.5
+
+  - id: P:offering/firefox
+    type: offering
+    name: Firefox
+    summary: 'The browser: protection against more than 2,000 data trackers built in, tab groups, reader mode, picture-in-picture, optional AI features, on Windows, macOS, Linux, Android and iOS; open source and not owned by shareholders.'
+    owner: O:role/Firefox-Product-Management
+    confidence: 0.8
+    sources: ['https://www.firefox.com/en-US/', 'https://www.mozilla.org/en-US/products/', 'https://blog.mozilla.org/en/firefox/firefox-roadmap-152/']
+    visibility: public
+    parts: ['P:product/firefox-desktop', 'P:product/firefox-android', 'P:product/firefox-ios', 'P:product/firefox-focus', 'P:service/firefox-release-channels', 'P:product/firefox-smart-window', 'P:service/firefox-support']
+    flow:
+      inputs:
+        - {resource: search-royalty, from: 'C:counterparty/google', unit: USD/year}
+      outputs:
+        - {resource: browser, to: 'M:audience/firefox-users', unit: users/month}
+    economics:
+      price: none
+      revenue: search royalties from partners, mainly; see C:contract/search-partnerships
+    affect:
+      audience: M:audience/firefox-users
+      elicits:
+        - {feeling: safety, when: opening a page with trackers blocked without setup}
+        - {feeling: control, when: turning AI features off}
+      avoids: [AI that cannot be turned off, setup before protection]
+      tone: [plain]
+    mattering:
+      to-the-whole: 'The browser is the Corporation''s flagship: Mozilla''s product list leads with it and Firefox-related income was $658.5 million in 2024.'
+      weight: critical
+      inside:
+        - who: ['O:role/Firefox-Product-Management']
+          because: The roadmap is public and users give feedback on Mozilla Connect.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/firefox-users']
+          because: More than 210 million people use it each month (Mozilla Advertising page, 2026).
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/firefox-users']
+          because: 'People on other browsers: the June 2026 roadmap adds PDF editing, tab groups on iOS and a free VPN on mobile.'
+          confidence: 0.5
+
+  - id: P:product/firefox-desktop
+    type: product
+    name: Firefox for desktop
+    summary: Firefox on Windows, macOS and Linux; the Firefox 158 release notes are linked from the Mozilla site in October 2026.
+    owner: O:role/Firefox-Engineering
+    confidence: 0.8
+    sources: ['https://www.firefox.com/en-US/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: browser, to: 'M:audience/firefox-users', unit: users/month}
+    substrate:
+      platforms:
+        - S:codebase/firefox
+        - S:system/firefox-ci
+    mattering:
+      to-the-whole: The desktop browser, on Windows, macOS and Linux.
+      weight: critical
+      inside:
+        - who: ['O:role/Firefox-Engineering']
+          because: Engineering builds it on the Gecko engine in the open.
+          confidence: 0.5
+
+  - id: P:product/firefox-android
+    type: product
+    name: Firefox for Android
+    summary: Firefox on Google Play. Firefox 152 (June 2026) added tab groups on Android; built-in VPN and Power Saving Mode are on the roadmap for mobile.
+    owner: O:role/Firefox-Product-Management
+    confidence: 0.8
+    sources: ['https://www.firefox.com/en-US/browsers/mobile/', 'https://blog.mozilla.org/en/firefox/firefox-roadmap-152/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: browser, to: 'M:audience/firefox-users', unit: users/month}
+    mattering:
+      to-the-whole: Firefox for Android, on Google Play.
+      weight: major
+      inside:
+        - who: ['O:role/Firefox-Product-Management']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:product/firefox-ios
+    type: product
+    name: Firefox for iOS
+    summary: Firefox in the App Store; tab-group support is expected later in 2026.
+    owner: O:role/Firefox-Product-Management
+    confidence: 0.8
+    sources: ['https://www.firefox.com/en-US/browsers/mobile/', 'https://blog.mozilla.org/en/firefox/firefox-roadmap-152/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: browser, to: 'M:audience/firefox-users', unit: users/month}
+    mattering:
+      to-the-whole: Firefox for iOS, in the App Store.
+      weight: major
+      inside:
+        - who: ['O:role/Firefox-Product-Management']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:product/firefox-focus
+    type: product
+    name: Firefox Focus
+    summary: A privacy browser with automatic tracking protection and ad blocking, for Android and iOS.
+    owner: O:role/Firefox-Product-Management
+    confidence: 0.8
+    sources: ['https://www.mozilla.org/en-US/products/', 'https://www.firefox.com/en-US/browsers/mobile/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: browser, to: 'M:audience/firefox-users', unit: users/month}
+    mattering:
+      to-the-whole: A separate privacy browser with automatic tracking protection and ad blocking.
+      weight: supporting
+      inside:
+        - who: ['O:role/Firefox-Product-Management']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/firefox-release-channels
+    type: service
+    name: Firefox release channels
+    summary: Release, Beta, Nightly and the Extended Support Release (for systems the standard release no longer supports); a Developer channel is linked from the Firefox site.
+    owner: O:role/Firefox-Engineering
+    confidence: 0.7
+    sources: ['https://www.firefox.com/en-US/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: builds, to: 'M:audience/firefox-users', unit: builds/week}
+    mattering:
+      to-the-whole: The Release, Beta, Nightly and Extended Support builds the Firefox site offers.
+      weight: major
+      inside:
+        - who: ['O:role/Firefox-Engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:product/firefox-smart-window
+    type: product
+    name: Smart Window
+    summary: An optional, private AI browsing experience for getting answers and comparing information, announced on the public roadmap in June 2026 and available to try without a waitlist; browser-wide AI controls are listed with it.
+    owner: O:role/Firefox-Engineering
+    confidence: 0.7
+    sources: ['https://blog.mozilla.org/en/firefox/firefox-roadmap-152/']
+    since: 2026-06-16
+    status: planned
+    visibility: public
+    flow:
+      outputs:
+        - {resource: answers, to: 'M:audience/firefox-users', unit: sessions/day}
+    mattering:
+      to-the-whole: An optional, private AI browsing experience on the public roadmap of June 2026.
+      weight: major
+      inside:
+        - who: ['O:role/Firefox-Engineering']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/firefox-support
+    type: service
+    name: Firefox support
+    summary: Help for Firefox at support.mozilla.org and the Mozilla Connect community, linked from the Firefox site.
+    owner: O:role/Firefox-Product-Management
+    confidence: 0.6
+    sources: ['https://www.firefox.com/en-US/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: answers, to: 'M:audience/firefox-users', unit: answers/day}
+    mattering:
+      to-the-whole: Help for Firefox users at support.mozilla.org and the Mozilla Connect community.
+      weight: supporting
+      inside:
+        - who: ['O:role/Firefox-Product-Management']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/firefox-enterprise
+    type: offering
+    name: Firefox Enterprise
+    summary: 'An on-premises, customer-controlled browser platform for regulated and security-sensitive organizations: centralized policy, native data-loss controls, AI tool controls, SIEM integration, Lockdown Mode and extension governance. Buyers contact sales; standard support is included and Professional Support is a paid upgrade.'
+    owner: O:role/Firefox-Product-Management
+    confidence: 0.8
+    sources: ['https://www.firefox.com/en-US/browsers/enterprise/']
+    visibility: public
+    economics:
+      price:
+        model: negotiated
+        channel: contact sales
+        detail: {pending: price list; none published}
+    affect:
+      audience: M:audience/enterprise-it
+      elicits:
+        - {feeling: control, when: setting a policy for every browser in the organization}
+        - {feeling: trust, when: getting a defined response from support}
+      avoids: [loss of data control]
+    mattering:
+      to-the-whole: Mozilla's browser sold to regulated and security-sensitive organizations on a contact-sales basis, a revenue line other than search royalties.
+      weight: major
+      inside:
+        - who: ['O:role/Firefox-Product-Management']
+          because: The page says the browser is open source and built on Mozilla's own browser engine.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/enterprise-it']
+          because: IT teams get centralized policy, native data-loss controls, AI tool controls and SIEM integration, per the page.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/enterprise-it']
+          because: Regulated and security-sensitive organizations, the buyers the page names.
+          confidence: 0.5
+
+  - id: P:offering/mozilla-account
+    type: offering
+    name: Mozilla account
+    summary: A single login across Firefox, Mozilla VPN, Firefox Relay and Mozilla Monitor, and Firefox Sync of tabs, passwords and bookmarks across devices.
+    owner: O:role/Firefox-Product-Management
+    confidence: 0.8
+    sources: ['https://www.mozilla.org/en-US/products/', 'https://www.firefox.com/en-US/browsers/mobile/']
+    visibility: public
+    parts: ['P:service/firefox-sync']
+    economics:
+      price: none
+    affect:
+      audience: M:audience/firefox-users
+      elicits:
+        - {feeling: continuity, when: picking up a tab on another device}
+    mattering:
+      to-the-whole: A single login across Firefox, Mozilla VPN, Firefox Relay and Mozilla Monitor.
+      weight: major
+      inside:
+        - who: ['O:role/Firefox-Product-Management']
+          because: The products page lists Firefox, VPN, Relay and Monitor as signing in with it.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/firefox-users']
+          because: Sync carries tabs, passwords and bookmarks across devices, per the Firefox mobile page.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/firefox-users']
+          because: Anyone who uses Firefox on more than one device.
+          confidence: 0.5
+
+  - id: P:service/firefox-sync
+    type: service
+    name: Firefox Sync
+    summary: Syncs tabs, passwords and bookmarks across devices.
+    owner: O:role/Firefox-Product-Management
+    confidence: 0.8
+    sources: ['https://www.firefox.com/en-US/browsers/mobile/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: synced-data, to: 'M:audience/firefox-users', unit: devices}
+    mattering:
+      to-the-whole: Syncs tabs, passwords and bookmarks across devices.
+      weight: supporting
+      inside:
+        - who: ['O:role/Firefox-Product-Management']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/firefox-add-ons
+    type: offering
+    name: Firefox Add-ons
+    summary: 'The marketplace for extensions and themes: over 30,000 extensions and thousands of themes according to the Firefox site.'
+    owner: O:role/Firefox-Product-Management
+    confidence: 0.7
+    sources: ['https://www.firefox.com/en-US/']
+    visibility: public
+    economics:
+      price: none
+    affect:
+      audience: M:audience/firefox-users
+      elicits:
+        - {feeling: delight, when: finding an extension that fits}
+    mattering:
+      to-the-whole: The Firefox site advertises over 30,000 extensions and thousands of themes.
+      weight: major
+      inside:
+        - who: ['O:role/Firefox-Product-Management']
+          because: The Add-ons link sits on the Firefox site beside downloads and release notes.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/firefox-users', 'M:audience/extension-developers']
+          because: Users customize the browser.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/extension-developers']
+          because: Developers who want to reach Firefox users.
+          confidence: 0.5
+
+  - id: P:suite/privacy-services
+    type: suite
+    name: Privacy and protection services
+    summary: 'Mozilla VPN, Firefox Relay and Mozilla Monitor: the paid and free services that protect a person''s connection, email address and data.'
+    owner: O:role/Privacy-Services-Team
+    confidence: 0.7
+    sources: ['https://www.mozilla.org/en-US/products/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/']
+    visibility: public
+    parts: ['P:offering/mozilla-vpn', 'P:offering/firefox-relay', 'P:offering/mozilla-monitor']
+    mattering:
+      to-the-whole: Pocket Premium and VPN were the subscription lines in the audited statements; subscription and advertising revenue was $66.4 million in 2024.
+      weight: major
+      inside:
+        - who: ['O:role/Privacy-Services-Team']
+          because: The 2024 annual report presents them as one vision for internet safety and privacy.
+          confidence: 0.5
+
+  - id: P:offering/mozilla-vpn
+    type: offering
+    name: Mozilla VPN
+    summary: A VPN with more than 500 servers in more than 30 countries for up to five devices; $9.99 a month or $4.99 a month billed annually. A VPN network operated with Mullvad was named at launch; a free VPN is on the Firefox mobile roadmap.
+    owner: O:role/Privacy-Services-Team
+    confidence: 0.8
+    sources: ['https://www.mozilla.org/en-US/products/vpn/', 'https://blog.mozilla.org/en/firefox/firefox-roadmap-152/', 'https://en.wikipedia.org/wiki/Mullvad', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf']
+    visibility: public
+    substrate:
+      vendors:
+        - S:vendor/mullvad
+      depends-on:
+        - S:vendor/mullvad
+    economics:
+      price:
+        model: subscription
+        tiers:
+          - {plan: monthly, value: 9.99, unit: USD/month}
+          - {plan: annual, value: 4.99, unit: USD/month, billed: 59.88 USD/year}
+        guarantee: 30-day money back, first-time customers
+    affect:
+      audience: M:audience/privacy-subscribers
+      elicits:
+        - {feeling: security, when: connecting on a public network}
+    mattering:
+      to-the-whole: One of the two subscription revenue lines the audited statements name; the other, Pocket Premium, has shut down.
+      weight: major
+      inside:
+        - who: ['O:role/Privacy-Services-Team']
+          because: A paid subscription, billed monthly or annually.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/privacy-subscribers']
+          because: Subscribers get a VPN for up to five devices with servers in more than 30 countries.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/privacy-subscribers']
+          because: Anyone who wants a VPN; a free VPN is on the Firefox mobile roadmap.
+          confidence: 0.5
+
+  - id: P:offering/firefox-relay
+    type: offering
+    name: Firefox Relay
+    summary: 'Email masks that protect a real address: five masks free with the browser extension and email tracker removal; Premium tiers add unlimited masks, promotional-email blocking, a Relay domain, anonymous replies, phone masks and a VPN bundle, and are waitlist-only on the page read.'
+    owner: O:role/Privacy-Services-Team
+    confidence: 0.8
+    sources: ['https://relay.firefox.com/']
+    visibility: public
+    economics:
+      price:
+        model: freemium
+        free-tier: 5 email masks, browser extension, email tracker removal
+        premium: {pending: 'Premium prices: the page lists none and Premium is waitlist-only'}
+    affect:
+      audience: M:audience/privacy-subscribers
+      elicits:
+        - {feeling: relief, when: giving a mask instead of a real address}
+    mattering:
+      to-the-whole: Five email masks are free; Premium tiers add unlimited masks, a phone mask and a VPN bundle.
+      weight: supporting
+      inside:
+        - who: ['O:role/Privacy-Services-Team']
+          because: Relay signs in with the Mozilla account.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/privacy-subscribers']
+          because: Relay protects a real email address to help control the inbox, per the products page.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/privacy-subscribers']
+          because: People on the Premium waitlist.
+          confidence: 0.5
+
+  - id: P:offering/mozilla-monitor
+    type: offering
+    name: Mozilla Monitor
+    summary: Checks whether personal information has been exposed in a data breach, alerts when it is, requests removal of private information from data brokers and monitors identity for new leaks.
+    owner: O:role/Privacy-Services-Team
+    confidence: 0.7
+    sources: ['https://www.mozilla.org/en-US/products/monitor/', 'https://www.mozilla.org/en-US/products/']
+    visibility: public
+    economics:
+      price:
+        model: freemium
+        premium: {pending: plans and prices of the paid tier; the product page read lists none}
+    affect:
+      audience: M:audience/privacy-subscribers
+      elicits:
+        - {feeling: awareness, when: learning what has leaked}
+    mattering:
+      to-the-whole: Checks for data breaches, requests removal of private information and monitors identity for new leaks, per the products page.
+      weight: supporting
+      inside:
+        - who: ['O:role/Privacy-Services-Team']
+          because: The page promises an instant notification if data is detected in a breach.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/privacy-subscribers']
+          because: Users are notified instantly if their data is detected in a breach, the page's promise.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/privacy-subscribers']
+          because: Anyone who wants to see how their personal information is tracked and shared, the page's digital-footprint pitch.
+          confidence: 0.5
+
+  - id: P:suite/web-platform
+    type: suite
+    name: Web platform and developers
+    summary: MDN Web Docs and its paid MDN Plus.
+    owner: O:role/MDN-Team
+    confidence: 0.8
+    sources: ['https://developer.mozilla.org/en-US/about']
+    visibility: public
+    parts: ['P:offering/mdn']
+    mattering:
+      to-the-whole: MDN counts about 15 million monthly users and names Microsoft, Google, Igalia and W3C among its partners.
+      weight: major
+      inside:
+        - who: ['O:role/MDN-Team']
+          because: Mozilla's MDN team leads platform development, content strategy and direction.
+          confidence: 0.5
+
+  - id: P:offering/mdn
+    type: offering
+    name: MDN Web Docs
+    summary: Free, high-quality, comprehensive documentation of the web platform, owned by Mozilla Corporation and built with Open Web Docs, Microsoft, Google, Igalia, W3C and others; about 45,000 pages in seven languages and 46 million monthly pageviews by its own count. MDN Plus is a paid personalized subscription introduced in 2022.
+    owner: O:role/MDN-Team
+    confidence: 0.8
+    sources: ['https://developer.mozilla.org/en-US/about', 'https://www.mozilla.org/en-US/advertising/']
+    since: 2005
+    visibility: public
+    parts: ['P:product/mdn-web-docs', 'P:service/mdn-plus']
+    substrate:
+      platforms:
+        - S:system/mdn-platform
+    economics:
+      price:
+        model: free with subscription tier
+        tier: MDN Plus
+        detail: {pending: MDN Plus price; the pages read show none}
+    affect:
+      audience: M:audience/web-developers
+      elicits:
+        - {feeling: confidence, when: finding the accurate answer}
+        - {feeling: belonging, when: contributing a fix}
+    mattering:
+      to-the-whole: Free documentation of the web platform; Mozilla Advertising also sells ads on MDN.
+      weight: major
+      inside:
+        - who: ['O:role/MDN-Team']
+          because: It is led by a dedicated Mozilla team with community and partner contributors.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/web-developers']
+          because: About 15 million monthly users by MDN's own count.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/web-developers']
+          because: Interactive learning courses with the partner Scrimba.
+          confidence: 0.5
+
+  - id: P:product/mdn-web-docs
+    type: product
+    name: MDN Web Docs content
+    summary: 'The documentation itself: open content under a Creative Commons licence, contributed through the MDN GitHub repository by a global community.'
+    owner: O:role/MDN-Team
+    confidence: 0.8
+    sources: ['https://developer.mozilla.org/en-US/about']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: documentation, to: 'M:audience/web-developers', unit: pageviews/month}
+    mattering:
+      to-the-whole: The free core of MDN.
+      weight: critical
+      inside:
+        - who: ['O:role/MDN-Team']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/mdn-plus
+    type: service
+    name: MDN Plus
+    summary: The premium personalized MDN subscription, with features such as collections and AI-powered assistance.
+    owner: O:role/MDN-Team
+    confidence: 0.7
+    sources: ['https://developer.mozilla.org/en-US/about', 'https://www.mozilla.org/en-US/products/']
+    since: 2022
+    visibility: public
+    flow:
+      outputs:
+        - {resource: subscription, to: 'M:audience/web-developers', unit: subscribers}
+    mattering:
+      to-the-whole: A premium personalized subscription introduced in 2022, with collections and AI-powered assistance.
+      weight: supporting
+      inside:
+        - who: ['O:role/MDN-Team']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:suite/ai-products
+    type: suite
+    name: AI products
+    summary: 'Two newer products for AI builders: 0DIN for AI security and Tabstack for web access.'
+    owner: O:role/AI-Products-Team
+    confidence: 0.7
+    sources: ['https://www.mozilla.org/en-US/products/', 'https://0din.ai/privacy', 'https://tabstack.ai/legal/terms']
+    visibility: public
+    parts: ['P:offering/0din', 'P:offering/tabstack']
+    mattering:
+      to-the-whole: 'The two AI products Mozilla''s products page lists: 0DIN and Tabstack.'
+      weight: major
+      inside:
+        - who: ['O:role/AI-Products-Team']
+          because: Both products are listed on the Mozilla products page.
+          confidence: 0.5
+
+  - id: P:offering/0din
+    type: offering
+    name: 0DIN
+    summary: 'An AI security platform backed by Mozilla that tests chatbots, AI applications and agents against researcher-validated attacks: a Scanner, AI Vulnerability Intelligence, Defense signals, SusFactor prompt screening, an AI bug bounty and free first-pass assessments. Operated by Mozilla Corporation.'
+    owner: O:role/AI-Products-Team
+    confidence: 0.8
+    sources: ['https://0din.ai/', 'https://0din.ai/privacy']
+    visibility: public
+    parts: ['P:service/0din-scanner', 'P:service/0din-bug-bounty']
+    economics:
+      price:
+        model: negotiated
+        free: first-pass assessment of one workflow
+        detail: {pending: plans and prices}
+    affect:
+      audience: M:audience/ai-builders
+      elicits:
+        - {feeling: assurance, when: seeing evidence of how an AI application holds up}
+    mattering:
+      to-the-whole: Backed by Mozilla and researcher-led, per its site.
+      weight: supporting
+      inside:
+        - who: ['O:role/AI-Products-Team']
+          because: Backed by a researcher community.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/ai-builders']
+          because: 0DIN turns results into evidence for security and risk teams, per its site.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/ai-builders']
+          because: Teams that want AI vulnerabilities found and fixed before production.
+          confidence: 0.5
+
+  - id: P:service/0din-scanner
+    type: service
+    name: 0DIN Scanner
+    summary: Turnkey AI security testing with scheduled scans, probe libraries and reporting.
+    owner: O:role/AI-Products-Team
+    confidence: 0.8
+    sources: ['https://0din.ai/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: scan-report, to: 'M:audience/ai-builders', unit: reports/month}
+    mattering:
+      to-the-whole: Turnkey scheduled scans, probe libraries and reporting.
+      weight: supporting
+      inside:
+        - who: ['O:role/AI-Products-Team']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/0din-bug-bounty
+    type: service
+    name: 0DIN AI Bug Bounty
+    summary: A program for reporting generative-AI security vulnerabilities.
+    owner: O:role/AI-Products-Team
+    confidence: 0.8
+    sources: ['https://0din.ai/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: findings, to: 'M:audience/ai-builders', unit: findings/month}
+    mattering:
+      to-the-whole: A program for reporting generative-AI security vulnerabilities.
+      weight: supporting
+      inside:
+        - who: ['O:role/AI-Products-Team']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/tabstack
+    type: offering
+    name: Tabstack
+    summary: A managed web API for AI models that runs web research, content extraction and public-site automation and returns cited answers, clean text or structured JSON; new accounts get 10,000 free credits; an open-source engine, Pilo, is the self-hosted option for Automate. Operated by Mozilla Corporation.
+    owner: O:role/AI-Products-Team
+    confidence: 0.8
+    sources: ['https://tabstack.ai/', 'https://tabstack.ai/legal/terms']
+    visibility: public
+    parts: ['P:service/tabstack-research', 'P:service/tabstack-extract', 'P:service/tabstack-automate']
+    economics:
+      price:
+        model: usage
+        free-credits: 10000
+        detail: {pending: paid plan prices; not listed on the page read}
+    affect:
+      audience: M:audience/ai-builders
+      elicits:
+        - {feeling: reliability, when: getting a cited answer from live sources}
+      avoids: [training on customer payloads]
+    mattering:
+      to-the-whole: Tabstack says it does not train models on customer payloads.
+      weight: supporting
+      inside:
+        - who: ['O:role/AI-Products-Team']
+          because: Built by Mozilla and presented as Tabstack by Mozilla.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/ai-builders']
+          because: Developers get cited answers, clean text or structured JSON, per the page.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/ai-builders']
+          because: New accounts start with 10,000 free credits and no card.
+          confidence: 0.5
+
+  - id: P:service/tabstack-research
+    type: service
+    name: Tabstack Research
+    summary: Returns a cited answer to a question using live sources.
+    owner: O:role/AI-Products-Team
+    confidence: 0.8
+    sources: ['https://tabstack.ai/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: result, to: 'M:audience/ai-builders', unit: calls/day}
+    mattering:
+      to-the-whole: 'One of Tabstack''s three functions: Research, Extract and Automate.'
+      weight: supporting
+      inside:
+        - who: ['O:role/AI-Products-Team']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/tabstack-extract
+    type: service
+    name: Tabstack Extract
+    summary: Turns a URL into clean text or JSON that matches a schema.
+    owner: O:role/AI-Products-Team
+    confidence: 0.8
+    sources: ['https://tabstack.ai/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: result, to: 'M:audience/ai-builders', unit: calls/day}
+    mattering:
+      to-the-whole: 'One of Tabstack''s three functions: Research, Extract and Automate.'
+      weight: supporting
+      inside:
+        - who: ['O:role/AI-Products-Team']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/tabstack-automate
+    type: service
+    name: Tabstack Automate
+    summary: Completes a task on a public website; the hosted version cannot log in.
+    owner: O:role/AI-Products-Team
+    confidence: 0.8
+    sources: ['https://tabstack.ai/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: result, to: 'M:audience/ai-builders', unit: calls/day}
+    mattering:
+      to-the-whole: 'One of Tabstack''s three functions: Research, Extract and Automate.'
+      weight: supporting
+      inside:
+        - who: ['O:role/AI-Products-Team']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:suite/advertising
+    type: suite
+    name: Mozilla Advertising
+    summary: Ads on Firefox and MDN and the Anonym measurement technology.
+    owner: O:role/Advertising-Team
+    confidence: 0.8
+    sources: ['https://www.mozilla.org/en-US/advertising/', 'https://blog.mozilla.org/en/advertising/anonym-reddit-partnership/']
+    visibility: public
+    parts: ['P:offering/mozilla-ads']
+    mattering:
+      to-the-whole: Subscription and advertising revenue was $66.4 million in 2024 against $498.2 million of royalties (audited statements).
+      weight: major
+      inside:
+        - who: ['O:role/Advertising-Team']
+          because: Anonym was acquired on 2024-06-14; the audited statements cite expected synergies with Firefox integration.
+          confidence: 0.5
+
+  - id: P:offering/mozilla-ads
+    type: offering
+    name: Mozilla Ads
+    summary: 'Ads on Firefox and MDN Web Docs, offering incremental audiences in brand-safe environments to advertisers: more than 210 million monthly active Firefox users and 16.2 million monthly active MDN users.'
+    owner: O:role/Advertising-Team
+    confidence: 0.8
+    sources: ['https://www.mozilla.org/en-US/advertising/', 'https://blog.mozilla.org/en/advertising/anonym-reddit-partnership/']
+    visibility: public
+    parts: ['P:service/anonym']
+    economics:
+      price:
+        model: negotiated
+        channel: contact sales
+    affect:
+      audience: M:audience/advertisers
+      elicits:
+        - {feeling: confidence, when: knowing where an ad ran}
+      avoids: [unwanted placements, low-quality content]
+    mattering:
+      to-the-whole: Sells ads on Firefox and MDN Web Docs.
+      weight: major
+      inside:
+        - who: ['O:role/Advertising-Team']
+          because: Mozilla Advertising is a named team on the Mozilla site.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/advertisers']
+          because: Mozilla offers advertisers incremental audiences in brand-safe environments, in its words.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/advertisers']
+          because: Advertisers in categories with strict data restrictions.
+          confidence: 0.5
+
+  - id: P:service/anonym
+    type: service
+    name: Anonym
+    summary: 'Confidential-computing advertising analytics: advertisers measure incremental lift without sharing first-party data; an open beta with Reddit began in April 2026 for qualified advertisers.'
+    owner: O:role/Advertising-Team
+    confidence: 0.8
+    sources: ['https://blog.mozilla.org/en/advertising/anonym-reddit-partnership/', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf']
+    since: 2024-06-14
+    visibility: public
+    flow:
+      outputs:
+        - {resource: measurement, to: 'M:audience/advertisers', unit: campaigns/month}
+    mattering:
+      to-the-whole: Confidential-computing analytics that let advertisers measure incremental lift without sharing first-party data.
+      weight: supporting
+      inside:
+        - who: ['O:role/Advertising-Team']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:suite/retired
+    type: suite
+    name: Products retired in 2025
+    summary: Products Mozilla announced it would phase out on 2025-05-22, kept here with their end dates.
+    owner: O:role/Chief-Executive-Officer
+    confidence: 0.9
+    sources: ['https://blog.mozilla.org/en/mozilla/building-whats-next/']
+    status: retired
+    visibility: public
+    parts: ['P:product/pocket', 'P:product/fakespot']
+    mattering:
+      to-the-whole: Pocket and Fakespot, phased out in 2025.
+      weight: peripheral
+      inside:
+        - who: ['O:role/Chief-Executive-Officer']
+          because: The decision was announced as a difficult one.
+          confidence: 0.5
+
+  - id: P:product/pocket
+    type: product
+    name: Pocket
+    summary: A bookmarking and reading tool, a subsidiary of the Corporation since its acquisition announced 2017-02-27. Downloads and new Premium subscriptions ended 2025-05-22; shut down 2025-07-08; exports until 2025-10-08, after which data was deleted.
+    owner: O:role/Chief-Executive-Officer
+    confidence: 0.9
+    sources: ['https://blog.mozilla.org/en/mozilla/building-whats-next/', 'https://en.wikipedia.org/wiki/Pocket_(service)']
+    since: 2017-02-27
+    until: 2025-07-08
+    status: retired
+    visibility: public
+    mattering:
+      to-the-whole: Retired; its recommendations experience lives on in Firefox.
+      weight: peripheral
+      inside:
+        - who: ['O:role/Chief-Executive-Officer']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:product/fakespot
+    type: product
+    name: Fakespot
+    summary: An AI review checker acquired in April 2023. The Review Checker in Firefox ended 2025-06-10; the extensions, apps and website ended 2025-07-01 because the idea did not fit a model Mozilla could sustain.
+    owner: O:role/Chief-Executive-Officer
+    confidence: 0.9
+    sources: ['https://blog.mozilla.org/en/mozilla/building-whats-next/', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://en.wikipedia.org/wiki/Fakespot']
+    since: 2023-04-26
+    until: 2025-07-01
+    status: retired
+    visibility: public
+    mattering:
+      to-the-whole: Retired; the acquisition cost $27.4 million.
+      weight: peripheral
+      inside:
+        - who: ['O:role/Chief-Executive-Officer']
+          because: This seat is accountable for it.
+          confidence: 0.5

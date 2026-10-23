@@ -1,0 +1,10 @@
+oes: eml/1
+id: eml/bad-pending-shape
+name: bad pending-shape
+# pending-shape: an open question with no question in it
+nodes:
+  - id: K:concept/x
+    type: concept
+    name: x
+    summary: {pending: ""}
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

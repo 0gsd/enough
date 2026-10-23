@@ -1,0 +1,50 @@
+# C: bonds. The owner (Mozilla.org) and the trademark licensor (the Foundation) are mirrored from their atoms; Mozilla Online is a stub.
+nodes:
+  - id: C:bond/foundation-licenses-corporation
+    type: bond
+    name: Foundation licenses the Mozilla marks to the Corporation
+    summary: 'The Corporation pays the Foundation a trademark licence royalty based on its annual royalties revenue: $22.6 million for 2024, $18.4 million for 2023.'
+    kinds: [licenses]
+    from: atom/mozilla-foundation
+    to: atom/mozilla-corporation
+    control: none
+    scope: ['atom/mozilla-org//C:ip/mozilla-trademarks']
+    terms: royalty on the Corporation's annual royalties revenue; $22,622,178 in 2024 (Form 990 Schedule R Part V)
+    pending: After the 2026 transfer the FAQ says Mozilla.org owns the trademarks; which entity is the licensor now?
+    contract: atom/mozilla-foundation//C:contract/trademark-license-corporation
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/foundation/trademarks/policy/'], confidence: 0.7, state: known}
+
+  - id: C:bond/org-owns-corporation
+    type: bond
+    name: Mozilla.org owns the Corporation
+    summary: Mozilla.org owns the Mozilla operating subsidiaries according to its FAQ; the Corporation, which makes Firefox, was a wholly owned taxable subsidiary of the Foundation until then.
+    kinds: [owns]
+    from: atom/mozilla-org
+    to: atom/mozilla-corporation
+    economic: 1.0
+    voting: 1.0
+    control: full
+    basis: Mozilla.org owns the Mozilla operating subsidiaries (Mozilla wiki, June 2026); the Foundation held them at 100% in the audited 2024 statements and the 2024 Form 990 Schedule R
+    accounting: consolidated
+    nci: 0
+    inherits: [principles]
+    pending: The audited 2024 statements and the 2024 Form 990 give 100% held by the Foundation; the June 2026 Mozilla.org FAQ says Mozilla.org owns the operating subsidiaries without restating the share or the date of transfer. 100% is carried over from the last filing.
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://www.mozilla.org/en-US/about/governance/organizations/'], confidence: 0.6, state: known}
+
+  - id: C:bond/corporation-mozilla-online
+    type: bond
+    name: Corporation and Mozilla Online
+    summary: An older Mozilla governance page calls Mozilla Online a wholly owned subsidiary of the Corporation; since May 2023 the Corporation has been in litigation and arbitration to wind it down, so the bond is dormant.
+    kinds: [affiliated]
+    from: atom/mozilla-corporation
+    to: C:counterparty/mozilla-online
+    control: none
+    contract: C:contract/mozilla-online-agreement
+    pending: what share, if any, the Corporation holds of Mozilla Online today
+    status: dormant
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/governance/organizations/', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf'], confidence: 0.7, state: known}

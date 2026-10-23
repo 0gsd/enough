@@ -1,0 +1,78 @@
+# C: counterparties: the portfolio as a class, five portfolio companies named with their domains, and a partner.
+nodes:
+  - id: C:counterparty/ventures-portfolio
+    type: counterparty
+    name: The Mozilla Ventures portfolio
+    summary: 'The class of early-stage companies the fund has backed: 40 listed on mozilla.vc/portfolio in October 2026; the 2024 report says it had invested in 45. A class stub for the template bond below.'
+    kind: portfolio
+    global-id:
+      state: not-disclosed
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/portfolio', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/'], confidence: 0.8, state: known}
+
+  - id: C:counterparty/hugging-face
+    type: counterparty
+    name: Hugging Face
+    summary: A company in the Mozilla Ventures portfolio, listed on mozilla.vc/portfolio. A stub.
+    kind: portfolio-company
+    global-id:
+      domain: huggingface.co
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/portfolio'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/credo-ai
+    type: counterparty
+    name: Credo AI
+    summary: A company in the Mozilla Ventures portfolio, listed on mozilla.vc/portfolio. A stub.
+    kind: portfolio-company
+    global-id:
+      domain: credo.ai
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/portfolio'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/flower
+    type: counterparty
+    name: Flower
+    summary: A company in the Mozilla Ventures portfolio, listed on mozilla.vc/portfolio. A stub.
+    kind: portfolio-company
+    global-id:
+      domain: flower.ai
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/portfolio'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/truepic
+    type: counterparty
+    name: Truepic
+    summary: A company in the Mozilla Ventures portfolio, listed on mozilla.vc/portfolio. A stub.
+    kind: portfolio-company
+    global-id:
+      domain: truepic.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/portfolio'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/nous-research
+    type: counterparty
+    name: Nous Research
+    summary: A company in the Mozilla Ventures portfolio, listed on mozilla.vc/portfolio. A stub.
+    kind: portfolio-company
+    global-id:
+      domain: nousresearch.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/portfolio'], confidence: 0.9, state: known}
+
+  - id: C:counterparty/betaworks
+    type: counterparty
+    name: Betaworks
+    summary: Accelerator partner in AI named in the 2024 report as a Mozilla Ventures partner.
+    kind: partner
+    global-id:
+      domain: betaworks.com
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/'], confidence: 0.8, state: known}

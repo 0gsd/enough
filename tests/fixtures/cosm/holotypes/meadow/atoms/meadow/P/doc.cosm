@@ -1,0 +1,28 @@
+# doc.cosm — the parts of the document that are not nodes: how to read it, where the firm came from,
+# what the model already shows, and the sources. The deck and the pack render these; nothing is hand-assembled.
+
+reading:
+  draft: "State draft 1"
+  date: 2026-10-12
+  author: "@example"
+  mode: "dialectic (two sessions with the Founder and the Payroll Owner)"
+  perspective: "The firm is Meadow Software Inc.; banks and the customer's accountant are externals."
+
+history:
+  - {date: 2019-03, event: "Founded; first customer a two-location taqueria", sources: [session-1]}
+  - {date: 2021-09, event: "Meadow Pay launched after customers kept asking for tip-out", sources: [session-1]}
+  - {date: 2024-02, event: "Support Lead role created; daily health check instituted", sources: [session-2]}
+
+findings:
+  - check: "flow fit · dead-input"
+    nodes: [P:service/reconcile, M:audience/restaurants]
+    finding: "Corrections customers make to categories have no declared edge back into reconcile; the quality measure counts them but nothing records how they arrive."
+    proposal: "Declare a corrections input from M:audience/restaurants on P:service/reconcile and give it a rate."
+  - check: "role coverage · owner-gap"
+    nodes: [P:function/ingest]
+    finding: "Ingest is owned by the Founder but staffed by the Engineer pool; the paging path is the pool's, the decision rights are the Founder's."
+    proposal: "Either make O:role/Engineer the owner with escalation to the Founder, or record the split under decides."
+
+sources:
+  - {id: session-1, page: "Interview with the Founder, 2026-10-05", supports: "firm identity, suites, offerings, priorities, mattering"}
+  - {id: session-2, page: "Interview with the Founder and Payroll Owner, 2026-10-09", supports: "flows, rates, rules, vocabulary, roles"}

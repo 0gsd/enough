@@ -1,0 +1,69 @@
+cosm: 0.3
+
+# The Wikimedia Endowment as the P module of atom/wikimedia-endowment: the brand, three offerings (the permanent fund, grants for projects, legacy giving) and the
+# function and services that run them. Built from public sources only (see doc.cosm). Affect and mattering are the modeller's reading, with a confidence of 0.5.
+
+brand:
+  id: P:wikimedia-endowment
+  name: Wikimedia Endowment
+  kind: nonprofit
+  summary: "A permanent fund that supports current and future Wikimedia projects: gifts are invested for good and the earnings pay for grants, mostly to technical work on the projects."
+  since: 2023-09-30
+  legal-anchor: "Wikimedia Endowment, San Francisco; 501(c)(3) public charity, EIN 87-3024488; standalone since 2023-09-30"
+  owner: O:role/president
+  visibility: public
+  confidence: 0.85
+  sources: ["https://wikimediaendowment.org/", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"]
+  parts: [P:offering/permanent-fund, P:offering/project-grants, P:offering/legacy-giving]
+  rules:
+    - must: "O:role/board-of-directors preserve the fair value of each original gift and spend only what it appropriates under the spending policy"
+      source: end-audit-25
+      scope: descendants
+    - must: "O:role/treasurer sell donated stock as soon as possible"
+      source: end-audit-25
+      scope: descendants
+    - counts-as: "a separate organization with its own Board of Directors, which the Wikimedia Foundation does not control, though Foundation staff manage it"
+      source: end-audit-25
+  principles:
+    purpose: "Be a permanent fund that supports the operations and activities of current and future Wikimedia projects for ever."
+    priorities:
+      - "protect the principal over spending more today"
+      - "technical innovation on the projects over general operating support"
+      - "a low cost of raising money (under ten cents to raise a dollar)"
+    pending: "are these the Endowment's own ranked priorities? read from its policies and plans"
+    value:
+      - {to: M:audience/donors, proposition: "a gift that is invested for good and that pays out every year to the projects"}
+      - {to: M:audience/foundation, proposition: "reliable money for long-horizon technology work, on top of the annual fund"}
+      - {to: M:audience/planned-givers, proposition: "a way to leave a lasting gift to free knowledge in a will or retirement account"}
+    quality:
+      - {goal: "the fund keeps its value", measure: "net assets at year end ($169.4M at 30 June 2025, up $25.1M)"}
+      - {goal: "return meets the target", measure: "average annual return against 6.0% (7.84% since inception, per the FY2026-27 plan)"}
+      - {goal: "a cheap dollar raised", measure: "fundraising cost per dollar raised (under 10 cents)"}
+    decides: ["the annual appropriation", "which projects to fund", "how the fund is invested"]
+  vocabulary:
+    terms:
+      - {term: perpetual restriction, means: "A donor's condition that the principal of a gift is kept for ever and only its earnings are spent."}
+      - {term: appropriation, means: "The amount the Board approves each July to spend in the coming year, within the spending policy."}
+      - {term: Wikipedia Legacy Society, means: "The group of donors who have named the Endowment in a will or other plan."}
+    assumes:
+      - "the Wikimedia projects continue, and the Foundation or its successor approves the projects the fund supports"
+      - "markets return about 6% a year over the long run"
+    boundary:
+      - "the Endowment is not the Foundation's reserve and does not pay the Foundation's operating costs"
+      - "it has no employees: Foundation staff run it under the cost-sharing agreement"
+  mattering:
+    inside:
+      - who: [O:role/board-of-directors, O:role/president, O:role/treasurer]
+        because: "The job is to be around, and be solvent, in fifty years; the work is mostly stewardship."
+        stakes: "A permanent fund that is only as trusted as its separation from the organization it supports."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/donors, M:audience/foundation]
+        because: "Donors get a gift that is invested for good; the Foundation gets money for long-term work the annual fund would not pay for."
+        stakes: "Projects whose future rests on one year's donations."
+        confidence: 0.5
+    prospective:
+      - who: [M:audience/planned-givers]
+        because: "Readers who would leave something to Wikipedia in a will, if asked and if it were easy."
+        barrier: "Few have thought of it; the will tool and the IRA route are new."
+        confidence: 0.5

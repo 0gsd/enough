@@ -33,6 +33,7 @@ than optional:
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 
 # The fixture file names seeded by server.seed_project().
@@ -41,6 +42,17 @@ GIRRAPH = "map.girraph"
 MERIRMAID = "diagram.merirmaid"
 LONG_NAME = ("a-file-with-a-deliberately-very-long-name-that-the-sidebar-"
              "has-to-decide-how-to-truncate.md")
+# The Canon round's fixtures (0.4.3), seeded by server.seed_project() and
+# server.seed_canon(): a text's EML twin, a Comprise Holotype in the project,
+# and a volume in the scratch Canon store.
+EML_TWIN = "orchard/notes.md.cosm"
+HOLOTYPE = "meadow"
+CANON_VOLUME = "field-notes"
+# Checkpoint B: the text that twin belongs to, a sentence of it, and a text
+# with no twin of its own (the pin scenario writes its minimal twin).
+EML_TEXT = "orchard/notes.md"
+EML_PASSAGE = "Every apple tree needs a second variety nearby to set fruit."
+LEDGER = "orchard/ledger.md"
 
 Step = tuple[str, str]
 
@@ -73,7 +85,7 @@ def _esc() -> Step:
 # NOT `modeRemove(name)`. `modeRemove` is the stack manager's bookkeeping —
 # it splices the entry and re-renders the indicators, and that is all. The
 # mode's own `onExit` is what stops its render loop, and girraph, merirmaid
-# and cacheawl all run one. Tearing a mode down the manager's way instead of
+# and canon all run one. Tearing a mode down the manager's way instead of
 # the user's way leaves an animation frame loop spinning behind a hidden
 # element, and after a dozen screens the renderer is saturated and stops
 # answering. (That is not a hypothesis: it is what the first version of this
@@ -131,6 +143,58 @@ WDL_READY: Step = ("eval_await", """(async () => {
     await new Promise((r) => setTimeout(r, 50));
   }
   return true; })()""")
+#: The cosm viewer has drawn its volume (cards, a refusal or an error) —
+#: GET /api/cosm then the render, waited for inside the page.
+COSM_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !document.querySelector(
+       '#cosm-body .cosm-card, #cosm-body .cosm-refusal, #cosm-body .cosm-error'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: The spec viewer has rendered the document (its headings carry ids).
+COSMSPEC_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200
+       && !document.querySelector('#cosmspec-body h2[id], #cosmspec-body .ref-error'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: The Canon chip knows the text's twin state (GET /api/canon/eml answered).
+CANON_CHIP_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !(CANON.doc && CANON.doc.state); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: The EML face has drawn the twin's cards.
+EML_FACE_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !document.querySelector(
+       '#review-eml:not([hidden]) .cosm-card, #preview-eml:not([hidden]) .cosm-card'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: The atem card has its answer (rules mode: a scaffold) or an error.
+ATEM_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !document.querySelector(
+       '#atem-modal:not(.hidden) .cosm-atem-line, #atem-modal:not(.hidden) .atem-error'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+ATEM_CLOSE: Step = ("eval", "(() => { try { atemCardClose(); } catch (e) {} return true; })()")
+
+
+def _atem_of_passage(size: str) -> Step:
+    """Open the EML text at `size` and ask for the atem of one of its
+    sentences, as the right-click menu does (path included, so the card can
+    pin). The harness has no model: the card shows the labelled scaffold.
+    The mini panel slides open over 180ms, and the card's modal makes the
+    page stop moving in a way `wait_idle` reads as settled: wait out the
+    slide first, or the header is measured half-open."""
+    return ("eval_await", "(async () => { await openReadEdit(%s, {size: %s, face: 'read'});"
+                          " await new Promise((r) => setTimeout(r, 260));"
+                          " await canonAtemSelection({text: %s}, {path: %s, where: 'notes.md'});"
+                          " return true; })()" % (json.dumps(EML_TEXT), json.dumps(size),
+                                                  json.dumps(EML_PASSAGE), json.dumps(EML_TEXT)))
+
+
 #: Back to a known order, so a screen never inherits a sort or a search the
 #: previous one (or a persisted visit) left behind.
 DICT_PLAIN = ("eval", "(() => { try { localStorage.removeItem('enough.dict.v1'); } catch (e) {}"
@@ -456,9 +520,9 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_for", "#merirmaid-mode.open"), ("wait_idle", "")),
            teardown=EXIT_ALL_MODES),
 
-    Screen("cacheawl", "project",
-           setup=(("eval", "enterCacheawlMode()"),
-                  ("wait_for", "#cacheawl-mode.open"), ("wait_idle", "")),
+    Screen("canon", "project",
+           setup=(("eval", "enterCanonMode()"),
+                  ("wait_for", "#canon-mode.open"), ("wait_idle", "")),
            teardown=EXIT_ALL_MODES),
 
     Screen("ref-mode", "project",
@@ -470,6 +534,84 @@ PROJECT_SCREENS: list[Screen] = [
            setup=(("eval", "enterRefMode()"), ("wait_for", "#ref-mode.open"),
                   ("eval", "refToggleSize()"),
                   ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES),
+
+    # --- the Canon round (0.4.3): volumes, the cosm viewer, the spec -------
+    Screen("canon-volume", "project",
+           setup=(("eval_await", "(async () => { await enterCanonMode();"
+                                 f" CN_STORE_VOLUME = '{CANON_VOLUME}'; CN_STORE_SUB = [];"
+                                 " cnRenderStore(); return true; })()"),
+                  ("wait_for", "#cn-store-grid .cn-tag"), ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="inside a volume: the catalog tile, a Holotype folder, a text "
+                "with its EML-twin chip; the project pane's catalog button"),
+
+    Screen("cosm-viewer", "project",
+           setup=(("eval", f"enterCosmMode('{EML_TWIN}')"), ("wait_for", "#cosm-mode.open"),
+                  COSM_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="an EML twin: the atem card, stances, spans, FEED grounding, "
+                "open questions"),
+
+    Screen("cosm-viewer-holotype", "project",
+           setup=(("eval", f"enterCosmMode('{HOLOTYPE}')"), ("wait_for", "#cosm-mode.open"),
+                  COSM_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a Comprise Holotype: eight modules, nested fields, the "
+                "checks left to Comprise"),
+
+    Screen("cosm-viewer-mini", "project",
+           setup=(("eval", f"enterCosmMode('{EML_TWIN}')"), ("wait_for", "#cosm-mode.open"),
+                  COSM_READY, ("eval", "cosmToggleSize()"), ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="docked right: two-row toolbar, the outline folded into a sheet"),
+
+    Screen("cosmspec", "project",
+           setup=(("eval", "enterCosmSpecMode()"), ("wait_for", "#cosmspec-mode.open"),
+                  COSMSPEC_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES),
+
+    # --- checkpoint B: the Canon chip, the EML face, the atem card ---------
+    Screen("canon-chip", "project",
+           setup=(("eval", f"openReadEdit('{EML_TEXT}', {{size:'full', face:'read'}})"),
+                  ("wait_for", "#review-mode.open"), CANON_CHIP_READY,
+                  ("wait_for", "#canon-chip-review:not([hidden])"), ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a text with a fresh EML twin in the read face: the tinted twin "
+                "badge, atem, refresh twin and the (?) in the crowded toolbar"),
+
+    Screen("eml-face", "project",
+           setup=(("eval", f"openReadEdit('{EML_TEXT}', {{size:'full', face:'read'}})"),
+                  ("wait_for", "#review-mode.open"), CANON_CHIP_READY,
+                  ("eval_await", f"emlFaceShow('{EML_TEXT}').then(() => true)"),
+                  EML_FACE_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the twin in place of the text, full size: its head (lens, outline, "
+                "open raw, compile text, back to the text), the rail and the cards"),
+
+    Screen("eml-face-mini", "project",
+           setup=(("eval", f"openReadEdit('{EML_TEXT}', {{size:'mini', face:'read'}})"),
+                  ("wait_for", "#preview.open"), CANON_CHIP_READY,
+                  ("eval_await", f"emlFaceShow('{EML_TEXT}').then(() => true)"),
+                  EML_FACE_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the same face in the mini panel: the head on two rows, the "
+                "outline folded into a sheet"),
+
+    Screen("atem-card", "project",
+           setup=(_atem_of_passage("full"), ATEM_READY, ("wait_idle", "")),
+           teardown=(ATEM_CLOSE,) + EXIT_ALL_MODES,
+           note="a passage's atem over the read face, rules mode: the line, focus, "
+                "push and pull as open questions, the scaffold note, pin to twin"),
+
+    Screen("atem-card-mini", "project",
+           setup=(_atem_of_passage("mini"), ATEM_READY, ("wait_idle", "")),
+           teardown=(ATEM_CLOSE,) + EXIT_ALL_MODES,
+           note="the card raised over the mini reader"),
+
+    Screen("cosmspec-mini", "project",
+           setup=(("eval", "enterCosmSpecMode()"), ("wait_for", "#cosmspec-mode.open"),
+                  COSMSPEC_READY, ("eval", "cosmSpecToggleSize()"), ("wait_idle", "")),
            teardown=EXIT_ALL_MODES),
 
     # --- FEED: the dictionary, the word data lightbox (0.4.1) -------------
@@ -965,6 +1107,13 @@ HOME_SCREENS: list[Screen] = [
            setup=(("eval", "openUIModal()"),
                   ("wait_for", "#ui-modal:not(.hidden)"), ("wait_idle", "")),
            teardown=(_esc(), ("wait_idle", ""))),
+
+    Screen("home-cosmspec", "home",
+           setup=(("eval", "enterCosmSpecMode()"), ("wait_for", "#cosmspec-mode.open"),
+                  COSMSPEC_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the MacroCOSM spec from the home screen (the route is "
+                "home-accessible, like the Help Center)"),
 
     Screen("home-no-readvisor", "home",
            setup=(("wait_idle", ""),),

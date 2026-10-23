@@ -1,0 +1,15 @@
+# doc.cosm.
+
+reading:
+  draft: Public sample 1
+  date: 2026-10-18
+  author: '@comprise-sample'
+  mode: research (public sources only, read 2026-10-18)
+  perspective: MZL.AI, PBC as the open-source AI company in the Mozilla group.
+
+history:
+  - {date: 2023-03, event: Mozilla.ai launched with $30 million committed by the Foundation, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/']}
+  - {date: '2026-10-14', event: llms.txt lists Otari as generally available and Octonous in beta, sources: ['https://www.mozilla.ai/llms.txt']}
+
+findings:
+  - {check: flow fit - revenue, nodes: ['P:offering/otari', 'P:offering/octonous'], finding: The company is pre-revenue in the 2024 report and its two products show no price; the Foundation's $30 million commitment funds the work., proposal: Fill price when a hosted plan is published.}

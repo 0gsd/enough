@@ -1,0 +1,36 @@
+# C — aims: what the Foundation says it is trying to achieve with outside help (seeking) and what it says it is open to (open), from the State of
+# Mozilla 2025/26 and the job listings, read on 2026-10-18. The Foundation's own site refuses automated reads, so nothing here rests on it. The words
+# carry no figures: an isotype publishes statements, never measurements. Owners are roles; no person is named. A fact no current source states is left out.
+nodes:
+  - id: C:aim/individual-and-major-donors
+    type: aim
+    name: Individual and major donors
+    summary: "Grow giving from individual donors, including major gifts, to fund the Mozilla Foundation's work to make the age of AI better, fairer and more free."
+    kind: capital
+    stance: seeking
+    owner: O:role/VP-Development
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/', 'https://stateof.mozilla.org/ledger/', 'https://www.mozilla.org/en-US/careers/listings/'], confidence: 0.7, state: known}
+
+  - id: C:aim/community-and-partnerships
+    type: aim
+    name: Community and partnerships around open source AI
+    summary: "Grow Mozilla's investment in community and partnerships, through events such as MozFest and collaboration on open source AI projects."
+    kind: partners
+    stance: seeking
+    owner: O:role/Executive-Director
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/roadmap/', 'https://stateof.mozilla.org/'], confidence: 0.8, state: known}
+
+  - id: C:aim/anyone-who-cares-where-the-internet-goes
+    type: aim
+    name: Open to anyone who cares where the internet goes
+    summary: "Open to working with anyone who cares where the internet goes next, whether developer, founder, investor, policymaker, teacher or philanthropist."
+    kind: partners
+    stance: open
+    owner: O:role/Executive-Director
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/roadmap/'], confidence: 0.75, state: known}

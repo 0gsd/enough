@@ -1,0 +1,138 @@
+# P — reach and reuse: the ways content leaves the projects. Free for readers (the apps) and for volunteers and small reusers (the public APIs and dumps);
+# paid for large commercial reusers (Wikimedia Enterprise, run through Wikimedia, LLC). Enterprise income is capped by policy at 30% of the Foundation's revenue.
+nodes:
+
+- id: P:suite/reach-and-reuse
+  type: suite
+  name: Reach and reuse
+  summary: "How Wikimedia content gets to readers and to the services that reuse it: the Wikipedia apps, the free public APIs and dumps, and the paid Wikimedia Enterprise service."
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.8
+  sources: ["https://wikimediafoundation.org/our-work/", "https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/", "https://enterprise.wikimedia.com/"]
+  parts: [P:product/mobile-apps, P:product/public-apis-and-dumps, P:offering/wikimedia-enterprise]
+  mattering:
+    to-the-whole: "The 2026-27 plan's first goal is to increase reach beyond search; this suite is where reach, and the revenue from large reusers, comes from."
+    weight: major
+    inside:
+      - who: [O:role/chief-product-and-technology-officer, O:role/president-of-wikimedia-enterprise]
+        because: "Two very different promises under one roof: free for everyone who reads, and paid for those who take at scale."
+        confidence: 0.5
+
+- id: P:product/mobile-apps
+  type: product
+  name: The Wikipedia apps
+  summary: The official Wikipedia apps for iOS and Android, free to install and ad-free.
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.8
+  sources: ["https://wikimediafoundation.org/our-work/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027"]
+  flow:
+    outputs:
+      - {resource: article-view, to: M:audience/readers, unit: views/month}
+  substrate:
+    platforms: [S:system/mediawiki, S:system/cdn]
+    depends-on: [S:system/mediawiki]
+  economics:
+    price: none
+    cost: {model: internal, band: {pending: "cost of building and maintaining the apps"}}
+  mattering:
+    to-the-whole: "A route to readers that does not pass through a search engine; the 2026-27 plan counts app downloads among its reach measures."
+    weight: supporting
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "The one place the Foundation controls the whole reading experience."
+        confidence: 0.5
+
+- id: P:product/public-apis-and-dumps
+  type: product
+  name: Public APIs and database dumps
+  summary: Free programmatic access to the projects and downloadable dumps for volunteers, researchers and small reusers; the Foundation rate-limits large-scale reuse and says it will not switch off public API access.
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.8
+  sources: ["https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/", "https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure"]
+  flow:
+    outputs:
+      - {resource: api-access, to: M:audience/developers, unit: requests/day}
+      - {resource: api-access, to: M:audience/commercial-reusers, unit: requests/day}
+  substrate:
+    platforms: [S:system/mediawiki, S:system/cdn, S:system/data-centers]
+    depends-on: [S:system/mediawiki]
+  rules:
+    - must: "O:role/chief-product-and-technology-officer keep public API access to the projects open"
+      source: wmf-cost-of-free
+      confidence: 0.8
+  economics:
+    price: none
+    cost: {model: usage, band: "bot and crawler traffic has strained servers; the cost is not itemised"}
+  mattering:
+    to-the-whole: "The open door that makes the content reusable by anyone, and the one large reusers are now asked to stop leaning on."
+    weight: major
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "Keeping the door open while crawlers and spoofed clients load it."
+        stakes: "Servers shared by readers, volunteers and bots."
+        confidence: 0.5
+
+- id: P:offering/wikimedia-enterprise
+  type: offering
+  name: Wikimedia Enterprise
+  summary: "A paid commercial service, run through Wikimedia, LLC, for companies that reuse Wikimedia content at scale: On-demand, Snapshot and Realtime APIs, Structured Contents and Credibility Signals, with a free tier. Launched 2021-10-25."
+  owner: O:role/president-of-wikimedia-enterprise
+  visibility: public
+  confidence: 0.85
+  sources: ["https://enterprise.wikimedia.com/", "https://foundation.wikimedia.org/wiki/Wikimedia_Enterprise", "https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"]
+  flow:
+    inputs:
+      - {resource: content, from: P:suite/projects, unit: pages, rate: 130000000}
+    outputs:
+      - {resource: api-access, to: M:audience/commercial-reusers, unit: contracts}
+  substrate:
+    platforms: [S:system/enterprise-platform, S:system/data-centers]
+    depends-on: [S:system/enterprise-platform]
+  rules:
+    - must-not: "O:role/president-of-wikimedia-enterprise let Enterprise income exceed 30% of the Foundation's annual revenue"
+      source: wmf-cost-of-free
+    - must: "O:role/president-of-wikimedia-enterprise keep Wikimedia content free and open to everyone, with the free tier and public APIs staying available"
+      source: wmf-cost-of-free
+      confidence: 0.8
+  principles:
+    purpose: "Give large reusers reliable, high-volume access and ask the heaviest users to help pay for the projects, without making the content less free."
+    priorities: ["donations stay the main funding (a 30% cap)", "access, not a licence on the content", "free access for non-profits, volunteers and small reusers"]
+  economics:
+    price: {model: tiered-subscription}
+    cost: {model: internal, band: {pending: "Enterprise's cost base; it has repaid its initial investment"}}
+    revenue: {value: 8297917, unit: USD/year, period: 2024-07..2025-06, share: "about 4% of total revenue"}
+    margin: {pending: "Enterprise margin"}
+  vocabulary:
+    terms:
+      - {term: Snapshot API, means: "Downloadable files for every language, refreshed on a schedule (hourly for paid plans)."}
+      - {term: Realtime API, means: "A stream of edits, creations and deletions as they happen."}
+      - {term: Credibility Signals, means: "Revert-risk scores, protection status and editor context delivered with the content."}
+  affect:
+    audience: M:audience/commercial-reusers
+    elicits:
+      - {feeling: reliability, intensity: 0.8, when: "the content arrives complete, fresh and with its licence metadata"}
+      - {feeling: fairness, intensity: 0.5, when: "the heaviest users help pay for what they take"}
+    avoids: ["scraping that strains the sites", "unclear licensing or attribution"]
+    probes: [reliability, satisfaction]
+    tone: [exact, businesslike]
+  mattering:
+    to-the-whole: "Pays part of the bill for being copied at scale, and keeps commercial reuse from being free-riding; capped so that it cannot become the Foundation's main funder."
+    weight: major
+    inside:
+      - who: [O:role/president-of-wikimedia-enterprise]
+        because: "A product that had to repay its start-up cost and earn trust from donors and volunteers who watch it closely."
+        stakes: "The Foundation's credibility on keeping the projects independent."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/commercial-reusers]
+        because: "Guaranteed volume, freshness, structure and support, with licence metadata attached to every payload."
+        stakes: "Scraping, outages and licence risk at the heart of a product."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/commercial-reusers, M:audience/developers]
+        because: "AI developers and smaller companies that still scrape; non-profits and startups that qualify for free access."
+        barrier: "The public APIs are free, and rate limits are new."
+        confidence: 0.5

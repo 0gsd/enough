@@ -31,8 +31,10 @@ import re
 from collections.abc import Callable
 
 from .driver import Driver, StepError
-from .screens import (CARDS_READY, COUNCIL_PAL_STATEMENT, DICT_PLAIN,
-                      DICT_READY, DOC, GIRRAPH, JOURNAL_READY, WDL_READY)
+from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
+                      COSM_READY, COSMSPEC_READY, COUNCIL_PAL_STATEMENT,
+                      DICT_PLAIN, DICT_READY, DOC, EML_PASSAGE, EML_TEXT,
+                      GIRRAPH, HOLOTYPE, JOURNAL_READY, LEDGER, WDL_READY)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -47,10 +49,11 @@ def _reset(d: Driver) -> None:
     d.js("(() => { Array.from(document.querySelectorAll("
          "'#mode-stack .mode-indicator .mode-ribbon')).reverse()"
          ".forEach((b) => { try { b.click(); } catch (e) {} });"
-         " ['readedit','girraph','merirmaid','wikisink','cacheawl','ref',"
-         "'paginated','blobview','dict'].forEach((n) => { try { modeRemove(n); } "
+         " ['readedit','girraph','merirmaid','wikisink','canon','ref',"
+         "'paginated','blobview','dict','cosm','cosmspec'].forEach((n) => { try { modeRemove(n); } "
          "catch (e) {} }); return true; })()")
     d.js("(() => { try { wdlClose(); dictCtxClose(); } catch (e) {} return true; })()")
+    d.js("(() => { try { atemCardClose(); } catch (e) {} return true; })()")
     d.js("(() => { document.querySelectorAll('[id$=\"-modal\"]').forEach("
          "(m) => m.classList.add('hidden'));"
          " document.getElementById('confirm-cancel')?.click();"
@@ -464,14 +467,14 @@ def scenario_rv_docked_pushes(d: Driver) -> list[str]:
     resident = _names(d)
     d.js(f"openReadEdit('{DOC}', {{size: 'full', face: 'read'}})")
     d.wait_for("#review-mode.open")
-    d.js("enterCacheawlMode()")
-    d.wait_for("#cacheawl-mode.open")
+    d.js("enterCanonMode()")
+    d.wait_for("#canon-mode.open")
     d.wait_idle()
 
     mine = _mine(d, resident)
-    if mine != ["cacheawl", "readedit"]:
+    if mine != ["canon", "readedit"]:
         fails.append(f"two pushes gave indicators {mine}, expected "
-                     f"['cacheawl', 'readedit']")
+                     f"['canon', 'readedit']")
     if _rv(d) != "open":
         fails.append(f"opening two modes changed the panel state to {_rv(d)!r}")
     items = d.js("window.__uicheck.clickables()") or []
@@ -1628,8 +1631,8 @@ def scenario_topbar_no_collisions(d: Driver) -> list[str]:
     _reset(d)
     d.js(f"enterGirraphMode('{GIRRAPH}')")
     d.wait_for("#girraph-mode.open")
-    d.js("enterCacheawlMode()")
-    d.wait_for("#cacheawl-mode.open")
+    d.js("enterCanonMode()")
+    d.wait_for("#canon-mode.open")
     d.js("enterRefMode()")
     d.wait_for("#ref-mode.open")
     d.js(f"openReadEdit('{DOC}', {{size:'full', face:'read'}})")
@@ -2502,6 +2505,395 @@ def scenario_dict_context_menu(d: Driver) -> list[str]:
     return fails
 
 
+# ---------------------------------------------------------------------------
+# The Canon round (0.4.3): catalogs, the cosm viewer, lenses, the spec viewer
+# ---------------------------------------------------------------------------
+
+def _dblclick(d: Driver, sel: str) -> bool:
+    return bool(d.js("(() => { const el = document.querySelector(%s); if (!el) return false;"
+                     " el.dispatchEvent(new MouseEvent('dblclick', {bubbles: true}));"
+                     " return true; })()" % json.dumps(sel)))
+
+
+def scenario_canon_open_catalog(d: Driver) -> list[str]:
+    """Canon → a volume → its tiles say what they are (the catalog wears the
+    cosm glyph and a "catalog" tag, a Holotype folder a "holotype" tag, a
+    text with an EML twin the twin chip) → double-click canon.cosm → the cosm
+    viewer, on top of Canon, showing the volume's catalog."""
+    fails: list[str] = []
+    _reset(d)
+    resident = _names(d)
+    d.js_await("enterCanonMode().then(() => true)")
+    vol = f'#cn-store-grid .cn-tile[data-key="box:{CANON_VOLUME}"]'
+    d.wait_for(vol)
+    _dblclick(d, vol)
+    cat = f'#cn-store-grid .cn-tile[data-key="{CANON_VOLUME}::canon.cosm"]'
+    try:
+        d.wait_for(cat)
+    except StepError:
+        fails.append("double-clicking the volume did not show its canon.cosm tile")
+        _reset(d)
+        return fails
+    tiles = d.js("(() => { const q = (k) => document.querySelector("
+                 "'#cn-store-grid .cn-tile[data-key=\"' + k + '\"]');"
+                 f" const c = q('{CANON_VOLUME}::canon.cosm'), h = q('{CANON_VOLUME}::{HOLOTYPE}'),"
+                 f" t = q('{CANON_VOLUME}::notes.md');"
+                 " return {catTag: c && !!c.querySelector('.cn-tag'),"
+                 " catIcon: c && (c.querySelector('.cn-tile-icon > img') || {}).src || '',"
+                 " holoTag: h && !!h.querySelector('.cn-tag'),"
+                 " eml: t && !!t.querySelector('.cn-eml'),"
+                 " noTwinTile: !q('" + CANON_VOLUME + "::notes.md.cosm')}; })()")
+    if not tiles.get("catTag") or "cosm" not in tiles.get("catIcon", ""):
+        fails.append(f"the catalog tile has no cosm glyph / catalog tag: {tiles}")
+    if not tiles.get("holoTag"):
+        fails.append(f"the Holotype folder has no holotype tag: {tiles}")
+    if not tiles.get("eml") or not tiles.get("noTwinTile"):
+        fails.append(f"the EML twin is not hidden behind its text with a chip: {tiles}")
+    _dblclick(d, cat)
+    try:
+        d.wait_for("#cosm-mode.open")
+        d.js_await(COSM_READY[1])
+    except StepError:
+        fails.append("double-clicking canon.cosm did not open the cosm viewer")
+        _reset(d)
+        return fails
+    d.wait_idle()
+    st = d.js("(() => ({top: modeTop() && modeTop().name,"
+              " decl: document.getElementById('cosm-decl').textContent,"
+              " title: document.getElementById('cosm-title').textContent,"
+              " cards: document.querySelectorAll('#cosm-body .cosm-card').length,"
+              " paths: document.querySelectorAll('#cosm-body a.cosm-path').length}))()")
+    if st.get("top") != "cosm":
+        fails.append(f"the cosm viewer is not the top mode: {st}")
+    if st.get("decl") != "canon/1" or st.get("title") != CANON_VOLUME:
+        fails.append(f"the viewer is not showing the volume's catalog: {st}")
+    if st.get("cards", 0) < 2 or not st.get("paths"):
+        fails.append(f"the catalog's items or their path links are missing: {st}")
+    mine = _mine(d, resident)
+    if mine != ["cosm", "canon"]:
+        fails.append(f"stack is {mine}, expected the viewer over canon: ['cosm', 'canon']")
+    _reset(d)
+    return fails
+
+
+def scenario_cosm_lens(d: Driver) -> list[str]:
+    """The viewer → a lens → merirmaid, read only, with a lens picker that
+    redraws in place → shift-click a node → "show item" → back in the viewer
+    (the diagram closed) with that item's card flashed and on screen."""
+    fails: list[str] = []
+    _reset(d)
+    resident = _names(d)
+    d.js_await(f"enterCosmMode('{HOLOTYPE}').then(() => true)")
+    d.js_await(COSM_READY[1])
+    lenses = d.js("Array.from(document.getElementById('cosm-lens').options).map((o) => o.value)"
+                  ".filter(Boolean)")
+    if "map" not in (lenses or []):
+        fails.append(f"the lens picker does not offer the map lens: {lenses}")
+        _reset(d)
+        return fails
+    d.js("(() => { const s = document.getElementById('cosm-lens'); s.value = 'map';"
+         " s.dispatchEvent(new Event('change', {bubbles: true})); return true; })()")
+    drawn = ("(async () => { for (let i = 0; i < 200 && !document.querySelector("
+             "'#merirmaid-body g.node'); i++) await new Promise((r) => setTimeout(r, 50));"
+             " return document.querySelectorAll('#merirmaid-body g.node').length; })()")
+    if not d.js_await(drawn):
+        fails.append("the map lens drew no nodes in merirmaid")
+        _reset(d)
+        return fails
+    st = d.js("(() => ({top: modeTop() && modeTop().name,"
+              " picker: !document.getElementById('mm-lens').hidden,"
+              " lens: document.getElementById('mm-lens').value,"
+              " mirror: document.getElementById('merirmaid-mode').classList.contains('mm-face-mirror')}))()")
+    if st.get("top") != "merirmaid" or not st.get("picker") or st.get("lens") != "map":
+        fails.append(f"merirmaid did not open on the lens with its picker: {st}")
+    if not st.get("mirror"):
+        fails.append("the lens is not shown read-only (mirror face)")
+    # Switch lenses in place: the picker redraws, the stack does not grow.
+    d.js("(() => { const s = document.getElementById('mm-lens'); s.value = 'tree';"
+         " s.dispatchEvent(new Event('change', {bubbles: true})); return true; })()")
+    d.js_await("(async () => { for (let i = 0; i < 200 && !(MM_CURRENT && MM_CURRENT.lens"
+               " && MM_CURRENT.lens.lens === 'tree' && document.querySelector("
+               "'#merirmaid-body g.node')); i++) await new Promise((r) => setTimeout(r, 50));"
+               " return true; })()")
+    sw = d.js("(() => ({lens: MM_CURRENT && MM_CURRENT.lens && MM_CURRENT.lens.lens,"
+              " crumbs: document.getElementById('mm-crumbs').textContent,"
+              " stack: MODE_STACK.filter((e) => e.name === 'merirmaid').length}))()")
+    if sw.get("lens") != "tree" or "tree" not in (sw.get("crumbs") or "") or sw.get("stack") != 1:
+        fails.append(f"switching to the tree lens did not redraw in place: {sw}")
+    node = d.js("(() => { const nm = (MM_CURRENT && MM_CURRENT.nodeMap) || {};"
+                " for (const g of document.querySelectorAll('#merirmaid-body g.node')) {"
+                " const id = mmNodeId(g); if (nm[id] && nm[id].id) {"
+                " const b = g.getBoundingClientRect();"
+                " g.dispatchEvent(new MouseEvent('click', {bubbles: true, shiftKey: true,"
+                " clientX: b.left + b.width / 2, clientY: b.top + b.height / 2}));"
+                " return nm[id].id; } } return null; })()")
+    if not node:
+        fails.append("no lens node resolves through node_map to an item")
+        _reset(d)
+        return fails
+    if not d.exists('#mm-node-menu:not(.hidden) .ctx-item[data-act="lens-show"]'):
+        fails.append("the node menu on a lens node has no \"show item\"")
+        _reset(d)
+        return fails
+    d.click('#mm-node-menu .ctx-item[data-act="lens-show"]')
+    _sleep(d, 400)
+    back = d.js("(() => { const c = document.querySelector('#cosm-body .cosm-card[data-key=\"'"
+                " + CSS.escape(%s) + '\"]'); const body = document.getElementById('cosm-body');"
+                " const b = c && c.getBoundingClientRect(), br = body.getBoundingClientRect();"
+                " return {top: modeTop() && modeTop().name,"
+                " mm: MODE_STACK.some((e) => e.name === 'merirmaid'),"
+                " card: !!c, flashed: !!c && (c.classList.contains('cosm-flash')"
+                " || document.activeElement === c),"
+                " inView: !!c && b.top >= br.top - 2 && b.top < br.bottom}; })()" % json.dumps(node))
+    if back.get("top") != "cosm" or back.get("mm"):
+        fails.append(f"\"show item\" did not come back to the viewer and close the diagram: {back}")
+    if not (back.get("card") and back.get("flashed") and back.get("inView")):
+        fails.append(f"the item's card ({node}) was not scrolled to and flashed: {back}")
+    if _mine(d, resident) != ["cosm"]:
+        fails.append(f"stack after \"show item\" is {_mine(d, resident)}, expected ['cosm']")
+    _reset(d)
+    return fails
+
+
+def scenario_cosmspec_contents(d: Driver) -> list[str]:
+    """The spec viewer: the badge names the version the document states,
+    headings carry `cs-sec-…` ids, "section 18.4" references link, the
+    contents list jumps (the heading lands at the top) and the back pill
+    returns — the Help Center's reader, with its own context."""
+    fails: list[str] = []
+    _reset(d)
+    d.js("enterCosmSpecMode()")
+    d.wait_for("#cosmspec-mode.open")
+    d.js_await(COSMSPEC_READY[1])
+    d.wait_idle()
+    g = d.js("(() => ({badge: document.getElementById('cs-badge').textContent,"
+             " sec: !!document.getElementById('cs-sec-18-4'),"
+             " toc: document.querySelectorAll('#cs-toc a').length,"
+             " xref: document.querySelectorAll('#cosmspec-body a.ref-xref').length,"
+             " bad: Array.from(document.querySelectorAll('#cosmspec-body a.ref-xref'))"
+             ".filter((a) => !document.getElementById(a.dataset.target)).length}))()")
+    if not re.search(r"v\d+\.\d+\.\d+$", g.get("badge") or ""):
+        fails.append(f"the badge does not carry the document's version: {g.get('badge')!r}")
+    if not g.get("sec") or g.get("toc", 0) < 20:
+        fails.append(f"headings/contents not built: {g}")
+    if not g.get("xref") or g.get("bad"):
+        fails.append(f"section references: {g.get('xref')} linked, {g.get('bad')} dangling")
+    for ui, txt in ((1, 1), (1.2, 1.3)):
+        _scales(d, ui, txt)
+        d.js("refTocToggle(true, CS_CTX)")
+        j = d.js("(() => { const body = document.getElementById('cosmspec-body');"
+                 " body.scrollTop = 0;"
+                 " const a = document.querySelector('#cs-toc a[data-target=\"cs-sec-18-4\"]')"
+                 " || document.querySelectorAll('#cs-toc a')[30];"
+                 " a.click(); const h = document.getElementById(a.dataset.target);"
+                 " const off = h.getBoundingClientRect().top - body.getBoundingClientRect().top;"
+                 " refTocToggle(true, CS_CTX);"
+                 " return {off, back: !document.getElementById('cs-back').hidden,"
+                 " cur: document.querySelector('#cs-toc a.current')?.dataset.target,"
+                 " want: a.dataset.target}; })()")
+        if not (0 <= j["off"] <= 40):
+            fails.append(f"[ui {ui}/text {txt}] a contents jump put the heading "
+                         f"{j['off']:.0f}px from the top of the frame")
+        if j["cur"] != j["want"]:
+            fails.append(f"[ui {ui}/text {txt}] the contents list marks {j['cur']}, not {j['want']}")
+        if not j["back"]:
+            fails.append(f"[ui {ui}/text {txt}] no way back after a jump")
+        d.click("#cs-back")
+        if d.js("document.getElementById('cosmspec-body').scrollTop") > 2:
+            fails.append(f"[ui {ui}/text {txt}] 'back' did not return to the top")
+    _scales(d, 1, 1)
+    # The Help Center is still its own reader: opening it over the spec
+    # gives it its own ids and contents.
+    d.js("enterRefMode()")
+    d.wait_for("#ref-body h2[id]")
+    if d.js("document.querySelectorAll('#ref-toc a').length") < 10 or \
+            not d.js("!!document.getElementById('ref-sec-1')"):
+        fails.append("the Help Center's contents/ids broke with the spec viewer open")
+    _reset(d)
+    return fails
+
+
+# ---------------------------------------------------------------------------
+# Checkpoint B (0.4.3): the Canon chip, the EML face, atems
+# ---------------------------------------------------------------------------
+
+def _wait_js(d: Driver, cond: str, ms: int = 10000) -> bool:
+    """Wait inside the page for a JS condition (the reason COUNCIL_READY gives)."""
+    return bool(d.js_await("(async () => { for (let i = 0; i < %d; i++) { if (%s) return true;"
+                           " await new Promise((r) => setTimeout(r, 50)); } return false; })()"
+                           % (max(1, ms // 50), cond)))
+
+
+def _select_text(d: Driver, root_sel: str, text: str) -> dict | None:
+    """Select `text` (one text node's worth) inside `root_sel`; the point at its middle."""
+    return d.js("(() => { const root = document.querySelector(" + json.dumps(root_sel) + ");"
+                " if (!root) return null; const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);"
+                " for (let n = w.nextNode(); n; n = w.nextNode()) { const i = n.data.indexOf(" + json.dumps(text) + ");"
+                " if (i < 0) continue; const r = document.createRange(); r.setStart(n, i);"
+                " r.setEnd(n, i + " + str(len(text)) + "); const s = getSelection(); s.removeAllRanges();"
+                " s.addRange(r); const b = r.getClientRects()[0];"
+                " return {x: b.left + Math.min(40, b.width / 2), y: b.top + b.height / 2}; } return null; })()")
+
+
+def _eml_items(d: Driver, path: str, letter: str) -> int:
+    """How many items module `letter` of `path`'s EML twin holds (0: no twin)."""
+    return int(d.js_await("(async () => { const r = await fetch('/api/canon/eml?path=' + encodeURIComponent("
+                          + json.dumps(path) + ")); if (!r.ok) return 0; const j = await r.json();"
+                          " const m = (j.cosm.modules || []).find((x) => x.letter === " + json.dumps(letter)
+                          + "); return m ? m.count : 0; })()") or 0)
+
+
+def scenario_twin_flip(d: Driver) -> list[str]:
+    """A text with an EML twin: the chip says so → "twin" turns the reader to
+    the twin, in place of the text (the button reads as pressed) → the face
+    follows the reader to the mini size and back → "back to the text" shows
+    the text again. One read/edit instance throughout."""
+    fails: list[str] = []
+    _reset(d)
+    resident = _names(d)
+    d.js(f"openReadEdit('{EML_TEXT}', {{size:'full', face:'read'}})")
+    d.wait_for("#review-mode.open")
+    d.js_await(CANON_CHIP_READY[1])
+    chip = d.js("(() => { const c = document.getElementById('canon-chip-review');"
+                " const b = c.querySelector('[data-cnc=\"badge\"]');"
+                " return {shown: !c.hidden, badge: b.className, icon: (b.querySelector('img') || {}).src || '',"
+                " title: c.querySelector('[data-cnc=\"twin\"]').title}; })()") or {}
+    if not chip.get("shown") or "state-fresh" not in chip.get("badge", "") or "twin-on" not in chip.get("icon", ""):
+        fails.append(f"the Canon chip does not show a fresh EML twin: {chip}")
+        _reset(d)
+        return fails
+    d.click('#canon-chip-review [data-cnc="twin"]')
+    if not _wait_js(d, "document.querySelector('#review-eml:not([hidden]) .cosm-card')"):
+        fails.append("\"twin\" did not turn the reader to the EML face")
+        _reset(d)
+        return fails
+    st = d.js("(() => ({text: getComputedStyle(document.getElementById('review-body')).display,"
+              " title: document.querySelector('#review-eml [data-ef=\"title\"]').textContent,"
+              " atem: !!document.querySelector('#review-eml .cosm-atem-line'),"
+              " pressed: document.querySelector('#canon-chip-review [data-cnc=\"twin\"]').getAttribute('aria-pressed'),"
+              " top: modeTop() && modeTop().name}))()") or {}
+    if st.get("text") != "none" or "notes.md" not in (st.get("title") or "") or not st.get("atem"):
+        fails.append(f"the face is not in place of the text with the twin's atem and cards: {st}")
+    if st.get("pressed") != "true":
+        fails.append(f"the twin button does not read as pressed while the face is up: {st}")
+    d.click("#review-mini-btn")
+    if not _wait_js(d, "document.querySelector('#preview.open #preview-eml:not([hidden]) .cosm-card')"):
+        fails.append("the face did not follow the reader to the mini size")
+    d.click("#mini-full-btn")
+    if not _wait_js(d, "document.querySelector('#review-eml:not([hidden]) .cosm-card')"):
+        fails.append("the face did not come back with the reader at full size")
+    d.click('#review-eml [data-ef="back"]')
+    _sleep(d, 150)
+    back = d.js("(() => ({face: !document.getElementById('review-eml').hidden,"
+                " text: getComputedStyle(document.getElementById('review-body')).display,"
+                " pressed: document.querySelector('#canon-chip-review [data-cnc=\"twin\"]').getAttribute('aria-pressed')}))()") or {}
+    if back.get("face") or back.get("text") == "none" or back.get("pressed") != "false":
+        fails.append(f"\"back to the text\" did not show the text again: {back}")
+    if _mine(d, resident) != ["readedit"]:
+        fails.append(f"stack is {_mine(d, resident)}, expected one read/edit: ['readedit']")
+    _reset(d)
+    return fails
+
+
+def scenario_atem_selection(d: Driver) -> list[str]:
+    """Select a sentence in the read face → right-click it → "atem of
+    selection" → the atem card: its source names the file, the line and the
+    three parts are there, and with no model the scaffold note says so →
+    close leaves the reader as it was."""
+    fails: list[str] = []
+    _reset(d)
+    resident = _names(d)
+    d.js(f"openReadEdit('{EML_TEXT}', {{size:'full', face:'read'}})")
+    d.wait_for("#review-mode.open")
+    d.wait_idle()
+    pos = _select_text(d, "#review-body", EML_PASSAGE)
+    if not pos:
+        fails.append(f"could not select the passage in the read face: {EML_PASSAGE!r}")
+        _reset(d)
+        return fails
+    for typ, buttons in (("mousePressed", 2), ("mouseReleased", 0)):
+        d.page.send("Input.dispatchMouseEvent", {"type": typ, "x": pos["x"], "y": pos["y"],
+                                                 "button": "right", "buttons": buttons, "clickCount": 1})
+    _sleep(d, 150)
+    if not d.exists('#dict-ctx-menu:not([hidden]) .ctx-item[data-act="atem"]'):
+        m = d.js("(() => { const m = document.getElementById('dict-ctx-menu');"
+                 " return {open: !m.hidden, text: m.innerText, sel: getSelection().toString()}; })()")
+        fails.append(f"right-clicking the selection offered no \"atem of selection\": {m}")
+        _reset(d)
+        return fails
+    d.click('#dict-ctx-menu .ctx-item[data-act="atem"]')
+    d.js_await(ATEM_READY[1])
+    card = d.js("(() => ({open: !document.getElementById('atem-modal').classList.contains('hidden'),"
+                " source: document.getElementById('atem-source').textContent,"
+                " line: (document.querySelector('#atem-modal .cosm-atem-line') || {}).textContent || '',"
+                " parts: document.querySelectorAll('#atem-modal dl.cosm-atem-parts > dt').length,"
+                " defs: Array.from(document.querySelectorAll('#atem-modal dl.cosm-atem-parts > dt')).every((x) => !!x.title),"
+                " scaffold: !!document.querySelector('#atem-modal .atem-note'),"
+                " pin: !document.getElementById('atem-pin').hidden,"
+                " error: (document.querySelector('#atem-modal .atem-error') || {}).textContent || ''}))()") or {}
+    if not card.get("open") or card.get("error"):
+        fails.append(f"the atem card did not open with an answer: {card}")
+    else:
+        if "notes.md" not in (card.get("source") or ""):
+            fails.append(f"the card's masthead does not name where the passage is from: {card}")
+        if not card.get("line") or card.get("parts") != 3 or not card.get("defs"):
+            fails.append(f"the card lacks the line, or focus/push/pull with their definitions: {card}")
+        if not card.get("scaffold"):
+            fails.append(f"no model is running, but the card does not say it is a scaffold: {card}")
+        if not card.get("pin"):
+            fails.append(f"a passage of a file can be pinned, but \"pin to twin\" is missing: {card}")
+    d.click("#atem-close")
+    _sleep(d, 150)
+    after = d.js("(() => ({open: !document.getElementById('atem-modal').classList.contains('hidden'),"
+                 " top: modeTop() && modeTop().name, review: document.getElementById('review-mode').classList.contains('open')}))()") or {}
+    if after.get("open") or after.get("top") != "readedit" or not after.get("review"):
+        fails.append(f"closing the card did not leave the reader as it was: {after}")
+    if _mine(d, resident) != ["readedit"]:
+        fails.append(f"stack is {_mine(d, resident)}, expected ['readedit']")
+    _reset(d)
+    return fails
+
+
+def scenario_atem_pin(d: Driver) -> list[str]:
+    """A text → the atem of a passage → "pin to twin" → the button says
+    pinned, the chip repaints (the text now has an EML twin) and the twin
+    gains an X:atem item (GET /api/canon/eml)."""
+    fails: list[str] = []
+    _reset(d)
+    before = _eml_items(d, LEDGER, "X")
+    d.js(f"openReadEdit('{LEDGER}', {{size:'full', face:'read'}})")
+    d.wait_for("#review-mode.open")
+    d.js_await(CANON_CHIP_READY[1])
+    d.wait_idle()
+    pos = _select_text(d, "#review-body", "Next year we want a second press")
+    if not pos:
+        fails.append("could not select a passage of the ledger")
+        _reset(d)
+        return fails
+    d.js_await("(async () => { const sel = canonSelectionAt({target: document.elementFromPoint(%s, %s),"
+               " clientX: %s, clientY: %s}); await canonAtemSelection(sel, {path: sel && sel.path,"
+               " where: sel && sel.where}); return true; })()" % (pos["x"], pos["y"], pos["x"], pos["y"]))
+    d.js_await(ATEM_READY[1])
+    if not d.exists("#atem-modal:not(.hidden) #atem-pin:not([hidden])"):
+        fails.append("the passage's card offers no \"pin to twin\"")
+        _reset(d)
+        return fails
+    d.click("#atem-pin")
+    if not _wait_js(d, "document.getElementById('atem-pin').disabled && ATEM.pinned"):
+        fails.append("\"pin to twin\" did not say it was pinned")
+    if not _wait_js(d, "CANON.doc && CANON.doc.state === 'fresh' && document.querySelector("
+                       "'#canon-chip-review [data-cnc=\"badge\"]').classList.contains('state-fresh')"):
+        st = d.js("CANON.doc && {state: CANON.doc.state, badge: document.querySelector("
+                  "'#canon-chip-review [data-cnc=\"badge\"]').className}")
+        fails.append(f"the chip did not repaint to show the twin the pin wrote: {st}")
+    after = _eml_items(d, LEDGER, "X")
+    if after != before + 1:
+        fails.append(f"the twin's X:atem items went {before} → {after}, expected one more")
+    d.js("atemCardClose()")
+    _reset(d)
+    return fails
+
+
 SCENARIOS: dict[str, Scenario] = {
     "stack-order": scenario_stack_order,
     "raise-preserves-state": scenario_raise_preserves_state,
@@ -2555,4 +2947,12 @@ SCENARIOS: dict[str, Scenario] = {
     "dict-wdl-a11y": scenario_dict_wdl_a11y,
     "dict-wdl-walk": scenario_dict_wdl_walk,
     "dict-context-menu": scenario_dict_context_menu,
+    # --- 0.4.3 Canon round: catalogs, the cosm viewer, lenses, the spec ---
+    "canon-open-catalog": scenario_canon_open_catalog,
+    "cosm-lens": scenario_cosm_lens,
+    "cosmspec-contents": scenario_cosmspec_contents,
+    # --- 0.4.3 checkpoint B: EML twins and atems in the reader ---
+    "twin-flip": scenario_twin_flip,
+    "atem-selection": scenario_atem_selection,
+    "atem-pin": scenario_atem_pin,
 }

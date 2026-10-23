@@ -1,0 +1,53 @@
+# R: surfaces.
+nodes:
+  - id: R:surface/website
+    type: surface
+    name: thunderbird.net
+    summary: The Thunderbird site.
+    kind: website
+    url: https://www.thunderbird.net/en-US/
+    presents: ['P:offering/thunderbird-desktop', 'P:offering/thunderbird-android']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Marketing
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/'], confidence: 0.9, state: known}
+
+  - id: R:surface/blog
+    type: surface
+    name: blog.thunderbird.net
+    summary: 'The Thunderbird blog: monthly digests, mobile progress reports, Thundermail updates, the annual State of the Bird.'
+    kind: website
+    url: https://blog.thunderbird.net/
+    presents: ['P:offering/thunderbird-pro']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Marketing
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/'], confidence: 0.9, state: known}
+
+  - id: R:surface/tb-pro
+    type: surface
+    name: tb.pro
+    summary: The Thunderbird Pro site; the waitlist is at tb.pro/waitlist.
+    kind: website
+    url: https://tb.pro/
+    presents: ['P:offering/thunderbird-pro']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Marketing
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/'], confidence: 0.8, state: known}
+
+  - id: R:surface/github
+    type: surface
+    name: github.com/thunderbird
+    summary: 'The verified Thunderbird GitHub organization: Android, iOS and desktop repositories.'
+    kind: repository
+    url: https://github.com/thunderbird
+    presents: ['P:offering/thunderbird-android', 'P:offering/thunderbird-ios']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Desktop-engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/thunderbird'], confidence: 0.9, state: known}

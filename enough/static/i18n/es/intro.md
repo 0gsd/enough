@@ -12,7 +12,7 @@ enough es un sistema personal de lenguaje: un lugar para planear, leer, escribir
 
 **Text-planning es el inicio.** Dime qué quieres escribir y armaremos un plan juntos, y después andamios por sección que rellenas con tu propia prosa. Otros paradigmas cubren la traducción y el diseño de tus propios flujos de trabajo.
 
-**La referencia es local.** El diccionario te da el significado, el sonido, la historia y los parientes de cualquier palabra: haz clic derecho en una palabra, o recórrelo desde las preferencias de ui. Wikisink es una Wikipedia sin conexión. Cacheawl guarda las fuentes que reúnes.
+**La referencia es local.** El diccionario te da el significado, el sonido, la historia y los parientes de cualquier palabra: haz clic derecho en una palabra, o recórrelo desde las preferencias de ui. Wikisink es una Wikipedia sin conexión. Canon guarda las fuentes que reúnes.
 
 **Crece contigo.** Las habilidades, los readvisors y los paradigmas son archivos sencillos que puedes leer, cambiar o escribir tú mismo, y yo puedo ayudarte a construirlos.
 

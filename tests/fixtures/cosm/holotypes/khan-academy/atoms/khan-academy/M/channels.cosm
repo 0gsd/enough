@@ -1,0 +1,62 @@
+# M — channels: how the offerings reach people. Every direct channel names the nonprofit as its own seller; the two app stores are stubs in C.
+nodes:
+  - id: M:channel/web
+    type: channel
+    name: khanacademy.org
+    summary: "The main channel: the free learning platform, the teacher tools and the district pages. Free for learners, teachers and families; funded by donors and partners."
+    model: none
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Chief-Technology-Officer
+    provenance: {mode: net-scan, sources: [ka-home, ka-about], confidence: 0.9, state: known}
+
+  - id: M:channel/khanmigo-site
+    type: channel
+    name: khanmigo.ai
+    summary: "Where parents and learners subscribe to Khanmigo and where teachers sign up for its free tools."
+    model: sale
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Chief-Learning-Officer
+    provenance: {mode: net-scan, sources: [khanmigo-home, khanmigo-learners, khanmigo-parents], confidence: 0.9, state: known}
+
+  - id: M:channel/district-sales
+    type: channel
+    name: Direct district sales
+    summary: "District partnerships and add-ons are sold by the nonprofit itself: a free demo, a team to talk to, and no public price list."
+    model: sale
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Chief-Executive
+    provenance: {mode: net-scan, sources: [ka-districts, ka-home, blog-map-transition], confidence: 0.8, state: known}
+
+  - id: M:channel/ios-app
+    type: channel
+    name: iOS apps
+    summary: "The Khan Academy and Khan Academy Kids apps in Apple's App Store; free."
+    model: none
+    seller: self
+    counterparty: C:counterparty/apple
+    status: active
+    visibility: public
+    owner: O:role/Chief-Technology-Officer
+    provenance: {mode: net-scan, sources: [ka-downloads], confidence: 0.9, state: known}
+
+  - id: M:channel/android-app
+    type: channel
+    name: Android apps
+    summary: "The Khan Academy and Khan Academy Kids apps in Google Play; the Kids app is also in the Amazon Appstore. Free."
+    model: none
+    seller: self
+    counterparty: C:counterparty/google
+    status: active
+    visibility: public
+    owner: O:role/Chief-Technology-Officer
+    provenance: {mode: net-scan, sources: [ka-downloads], confidence: 0.9, state: known}
+    pending: "should the Amazon Appstore, which carries the Kids app, be its own channel with its own counterparty?"

@@ -1,0 +1,58 @@
+# C — aims: what the Foundation says it is trying to achieve with outside help (seeking) and what it says it is open to (open), from its own
+# annual plan, giving pages, Wikimedia Enterprise pages and jobs page, read on 2026-10-18. The words are the Foundation's own and carry no figures:
+# an isotype publishes statements, never measurements. Nothing here is a person; owners are roles. A fact no current source states is left out.
+nodes:
+  - id: C:aim/annual-fund-and-endowment-gifts
+    type: aim
+    name: Gifts for the annual fund and the Endowment
+    summary: "Raise funds for the annual fund and for the Wikimedia Endowment from readers and donors, reaching them through paid media, search and direct email and text outreach."
+    kind: capital
+    stance: seeking
+    owner: O:role/chief-advancement-officer
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027", "https://wikimediafoundation.org/give/"], confidence: 0.85, state: known}
+
+  - id: C:aim/enterprise-reusers
+    type: aim
+    name: Large reusers on Wikimedia Enterprise
+    summary: "Have the companies that reuse Wikipedia's content at scale, including those that build AI and search, use Wikimedia Enterprise and pay for the value they take, so that the projects can stay free."
+    kind: customers
+    stance: seeking
+    owner: O:role/president-of-wikimedia-enterprise
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/", "https://enterprise.wikimedia.com/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Product_%26_Technology_OKRs"], confidence: 0.9, state: known}
+
+  - id: C:aim/reach-and-attribution-partners
+    type: aim
+    name: Partners for reach and attribution beyond the wikis
+    summary: "Grow the reach and recognition of Wikimedia content in other places on the internet, with outside partners who bring Wikipedia to new audiences and credit it as the source."
+    kind: distribution
+    stance: seeking
+    owner: O:role/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Product_%26_Technology_OKRs", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027"], confidence: 0.7, state: known}
+
+  - id: C:aim/engineering-and-data-hires
+    type: aim
+    name: Engineers and data staff for a remote-first team
+    summary: "Hire software, mobile and site reliability engineers and data scientists for its remote-first team, and take on interns who are starting in software engineering."
+    kind: talent
+    stance: seeking
+    owner: O:role/chief-people-officer
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/jobs/"], confidence: 0.8, state: known}
+
+  - id: C:aim/mission-aligned-nonprofits-and-startups
+    type: aim
+    name: Mission-aligned non-profits and startups
+    summary: "Open to partnerships with non-profits and startups whose goals or values align with the Foundation's, including free access to Wikimedia Enterprise for mission-aligned groups, smaller commercial reusers and volunteers."
+    kind: partners
+    stance: open
+    owner: O:role/president-of-wikimedia-enterprise
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/"], confidence: 0.8, state: known}

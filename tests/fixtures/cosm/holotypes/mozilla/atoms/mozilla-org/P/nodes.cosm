@@ -1,0 +1,102 @@
+cosm: 0.3
+
+# Mozilla.org's tree: one offering (stewardship) and the four functions it is made of.
+
+nodes:
+  - id: P:offering/stewardship
+    type: offering
+    name: Stewardship of the Mozilla Project
+    summary: Strategy, capital and brand for the whole Mozilla family, operating the portfolio on behalf of the Foundation.
+    owner: O:role/President
+    confidence: 0.7
+    sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://blog.mozilla.org/en/mozilla/news/announcing-mozilla-org-new-non-profit/']
+    visibility: public
+    parts: ['P:function/portfolio-strategy', 'P:function/capital-allocation', 'P:function/brand-and-trademarks', 'P:function/family-coordination']
+    economics:
+      price: none
+    affect:
+      audience: M:audience/mozilla-family
+      elicits:
+        - {feeling: alignment, when: every organization sees where it fits in the 2026 to 2028 strategy}
+        - {feeling: security, when: knowing capital is allocated for the mission}
+      tone: [plain]
+    mattering:
+      to-the-whole: 'The FAQ: Mozilla.org ensures the different parts of Mozilla collectively advance the Manifesto and the mission.'
+      weight: critical
+      inside:
+        - who: ['O:role/President']
+          because: The President sits on the Mozilla-wide executive team housed in Mozilla Management Company.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/mozilla-family']
+          because: Mozilla.org allocates funding and capital and manages the brands, the FAQ says.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/mozilla-community']
+          because: 'The FAQ names three focus areas: open source AI for developers, trusted AI experiences for consumers, and public interest tech.'
+          confidence: 0.5
+
+  - id: P:function/portfolio-strategy
+    type: function
+    name: Portfolio strategy
+    summary: 'The 2026 to 2028 Portfolio Strategy, developed in the first half of 2025: do for AI what Mozilla did for the web; a double bottom line of mission and money for all of Mozilla; three focus areas (open source AI for developers, trusted AI experiences for consumers, public interest tech by and for everyone).'
+    owner: O:role/Board-of-Directors
+    confidence: 0.8
+    sources: ['https://wiki.mozilla.org/Mozilla_org']
+    visibility: public
+    mattering:
+      to-the-whole: Sets what every organization is for over the next three years.
+      weight: critical
+      inside:
+        - who: ['O:role/Board-of-Directors']
+          because: The board oversees strategy and resource allocation.
+          confidence: 0.5
+
+  - id: P:function/capital-allocation
+    type: function
+    name: Capital allocation and investments
+    summary: 'Acts like an endowment: manages Mozilla''s assets and investments, allocates funding, gives the Foundation an annual operating grant and allocates capital to other Mozilla activities. Reserves of about $1.4 billion and planned 2026 portfolio spend of about $650 million, 80% on core products.'
+    owner: O:role/Chief-Operating-Officer
+    confidence: 0.7
+    sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://stateof.mozilla.org/ledger/']
+    visibility: public
+    mattering:
+      to-the-whole: 'Acts like an endowment: manages assets and investments and allocates funding; reserves of about $1.4 billion.'
+      weight: critical
+      inside:
+        - who: ['O:role/Chief-Operating-Officer']
+          because: The FAQ gives Mozilla.org the job of allocating funding and capital.
+          confidence: 0.5
+
+  - id: P:function/brand-and-trademarks
+    type: function
+    name: Brand and trademarks
+    summary: Manages Mozilla's brands and owns the Mozilla trademarks per the FAQ; the trademark policy page still names the Foundation as owner.
+    owner: O:role/Communications-Council-Lead
+    confidence: 0.6
+    sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/foundation/trademarks/policy/']
+    visibility: public
+    pending: Which entity owns the marks today?
+    mattering:
+      to-the-whole: Mozilla.org manages Mozilla's brands, the FAQ says.
+      weight: major
+      inside:
+        - who: ['O:role/Communications-Council-Lead']
+          because: The Communications and Brand Council exists to avoid crossed wires.
+          confidence: 0.5
+
+  - id: P:function/family-coordination
+    type: function
+    name: Coordination of the family
+    summary: The Executive Leadership Council, the Tech Council and the Communications and Brand Council, with each organization's board, and community initiatives that support the mission.
+    owner: O:role/Executive-Leadership-Council
+    confidence: 0.8
+    sources: ['https://wiki.mozilla.org/Mozilla_org']
+    visibility: public
+    mattering:
+      to-the-whole: Day-to-day alignment across organizations that do not share a payroll.
+      weight: major
+      inside:
+        - who: ['O:role/Executive-Leadership-Council']
+          because: The council meets monthly to align strategy and decide major initiatives.
+          confidence: 0.5

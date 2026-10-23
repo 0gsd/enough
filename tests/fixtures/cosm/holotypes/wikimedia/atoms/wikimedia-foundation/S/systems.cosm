@@ -1,0 +1,280 @@
+# S — systems: what the Foundation publicly runs, from the Wikitech index and the pages linked from it. Almost all of it is open source and self-hosted, so no system has a
+# vendor; the hosts' premises, the donated bandwidth and the payment processors are the outsiders (S:vendor). Each system is used by a P node, which is its referrer.
+nodes:
+  - id: S:system/mediawiki
+    type: system
+    name: MediaWiki
+    summary: The open-source wiki software, in PHP, that serves every project; production runs on Kubernetes ("MediaWiki on Kubernetes"). Release 1.46.0 came out 2026-06-30.
+    category: application
+    vendor: none
+    counterparty: none
+    regulatory-criticality: high
+    used-by: [P:offering/wikipedia, P:offering/commons, P:offering/other-projects, P:product/mediawiki, P:product/wikifunctions, P:product/public-apis-and-dumps, P:product/mobile-apps]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", "https://www.mediawiki.org/wiki/MediaWiki"], confidence: 0.9, state: known}
+    replacement: none
+
+  - id: S:system/wikibase
+    type: system
+    name: Wikibase and Wikidata
+    summary: The structured-data software, developed with Wikimedia Deutschland, that stores Wikidata's items and statements.
+    category: application
+    vendor: none
+    counterparty: C:counterparty/wikimedia-deutschland
+    regulatory-criticality: medium
+    used-by: [P:offering/wikidata, P:product/wikibase]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediafoundation.org/our-work/wikimedia-projects/"], confidence: 0.85, state: known}
+    replacement: none
+
+  - id: S:system/data-centers
+    type: system
+    name: Data centers
+    summary: Two core sites that run the applications and databases (eqiad in Ashburn, Virginia since 2010; codfw in Carrollton, Texas since 2014), five caching sites (Amsterdam, San Francisco, Singapore, Marseille, São Paulo) and two networking sites (Chicago, Dallas).
+    category: infrastructure
+    vendor: S:vendor/colocation
+    counterparty: C:counterparty/colocation-providers
+    regulatory-criticality: high
+    used-by: [P:service/hosting-and-delivery, P:function/platform, P:offering/wikipedia, P:offering/commons, P:offering/other-projects, P:product/public-apis-and-dumps, P:offering/wikimedia-enterprise]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Data_centers"], confidence: 0.9, state: known}
+    replacement: none
+
+  - id: S:system/cdn
+    type: system
+    name: Content delivery network
+    summary: Global HTTP caching and traffic routing at the edge, with Varnish and Apache Traffic Server, so that most reads never reach the core sites.
+    category: network
+    vendor: none
+    counterparty: none
+    regulatory-criticality: high
+    used-by: [P:service/hosting-and-delivery, P:offering/wikipedia, P:product/mobile-apps, P:product/public-apis-and-dumps]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", "https://wikitech.wikimedia.org/wiki/Data_centers"], confidence: 0.85, state: known}
+    replacement: none
+
+  - id: S:system/kubernetes
+    type: system
+    name: Kubernetes
+    summary: The container platform that hosts MediaWiki and other services, including the machine-learning serving layer.
+    category: runtime
+    vendor: none
+    counterparty: none
+    regulatory-criticality: high
+    used-by: [P:service/hosting-and-delivery, P:service/machine-learning]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing"], confidence: 0.85, state: known}
+    replacement: none
+
+  - id: S:system/mariadb
+    type: system
+    name: MariaDB
+    summary: The relational database behind MediaWiki, with its architecture, backups and runbooks on Wikitech.
+    category: datastore
+    vendor: none
+    counterparty: none
+    regulatory-criticality: high
+    used-by: [P:service/hosting-and-delivery, P:function/platform]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure"], confidence: 0.9, state: known}
+    replacement: none
+
+  - id: S:system/swift
+    type: system
+    name: Swift object storage
+    summary: The S3-compatible object store for media and for machine-learning model binaries.
+    category: datastore
+    vendor: none
+    counterparty: none
+    regulatory-criticality: high
+    used-by: [P:service/hosting-and-delivery, P:offering/commons]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", "https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing"], confidence: 0.85, state: known}
+    replacement: none
+
+  - id: S:system/search
+    type: system
+    name: Search (CirrusSearch on OpenSearch)
+    summary: The search backend for the projects; Wikitech documents CirrusSearch and OpenSearch administration.
+    category: search
+    vendor: none
+    counterparty: none
+    regulatory-criticality: medium
+    used-by: [P:offering/wikipedia]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure"], confidence: 0.8, state: known}
+    replacement: none
+
+  - id: S:system/event-platform
+    type: system
+    name: Kafka and the event platform
+    summary: Event streaming used for cache purging and for the data and analytics pipelines.
+    category: messaging
+    vendor: none
+    counterparty: none
+    regulatory-criticality: medium
+    used-by: [P:service/data-and-analytics]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure"], confidence: 0.75, state: known}
+    replacement: none
+
+  - id: S:system/monitoring
+    type: system
+    name: Monitoring and status
+    summary: Prometheus, Thanos, Grafana and Alertmanager for metrics and alerts, logs, distributed tracing and a public status page.
+    category: observability
+    vendor: none
+    counterparty: none
+    regulatory-criticality: medium
+    used-by: [P:service/hosting-and-delivery, P:function/platform]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure"], confidence: 0.85, state: known}
+    replacement: none
+
+  - id: S:system/analytics
+    type: system
+    name: Analytics systems
+    summary: The Hadoop cluster, Druid, the Analytics Query Service and the data lake, fed by the event platform.
+    category: analytics
+    vendor: none
+    counterparty: none
+    regulatory-criticality: medium
+    used-by: [P:service/data-and-analytics]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure"], confidence: 0.85, state: known}
+    replacement: none
+
+  - id: S:system/lift-wing
+    type: system
+    name: Lift Wing
+    summary: A scalable machine-learning model-serving platform on Kubernetes using KServe, replacing the earlier ORES service; serves revert risk, article quality, article topic and other models, with model files in Swift.
+    category: machine-learning
+    vendor: none
+    counterparty: none
+    regulatory-criticality: medium
+    used-by: [P:service/machine-learning]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing"], confidence: 0.9, state: known}
+    replacement: none
+
+  - id: S:system/toolforge
+    type: system
+    name: Toolforge and Cloud VPS
+    summary: The hosting platform for community tools and the virtual servers for volunteer projects (Wikimedia Cloud Services).
+    category: platform
+    vendor: none
+    counterparty: none
+    regulatory-criticality: low
+    used-by: [P:service/cloud-services]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", "https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/"], confidence: 0.85, state: known}
+    replacement: none
+
+  - id: S:system/code-review
+    type: system
+    name: Gerrit, GitLab and Phabricator
+    summary: Code review and continuous integration in Gerrit, repositories in GitLab (gitlab.wikimedia.org, with replicas in two data centers) and task tracking in Phabricator.
+    category: developer-tooling
+    vendor: none
+    counterparty: none
+    regulatory-criticality: low
+    used-by: [P:product/mediawiki, P:product/wikibase]
+    admin: O:position/chief-product-and-technology-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", "https://wikitech.wikimedia.org/wiki/GitLab"], confidence: 0.85, state: known}
+    replacement: none
+
+  - id: S:system/fundraising-stack
+    type: system
+    name: Fundraising technology
+    summary: A self-hosted donor database (CiviCRM), a payments framework and message queues, and the processors behind campaigns in about 30 countries a year, plus the banner, email and SMS tooling.
+    category: fundraising
+    vendor: S:vendor/payment-processors
+    counterparty: C:counterparty/payment-processors
+    regulatory-criticality: high
+    used-by: [P:function/fundraising, P:service/donation-campaigns, P:service/recurring-and-planned-giving]
+    admin: O:position/chief-advancement-officer
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://www.mediawiki.org/wiki/Fundraising_tech"], confidence: 0.8, state: known}
+    replacement: none
+
+  - id: S:system/enterprise-platform
+    type: system
+    name: Wikimedia Enterprise platform
+    summary: "The APIs and data pipeline behind Enterprise: On-demand, Snapshot and Realtime APIs and structured content built from the projects, over 920 datasets, 130 million pages and 350 languages."
+    category: data-platform
+    vendor: none
+    counterparty: none
+    regulatory-criticality: medium
+    used-by: [P:offering/wikimedia-enterprise]
+    admin: O:position/president-of-wikimedia-enterprise
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/", "https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/"], confidence: 0.85, state: known}
+    replacement: none
+
+  - id: S:integration/projects-to-enterprise
+    type: integration
+    name: Projects to Enterprise stream
+    summary: Edits, creations and deletions flow from MediaWiki to the Enterprise platform, which serves them as the Realtime stream and hourly files.
+    from: S:system/mediawiki
+    to: S:system/enterprise-platform
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/", "https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/"], confidence: 0.75, state: known}
+
+  - id: S:integration/events-to-analytics
+    type: integration
+    name: Events to analytics
+    summary: The event platform carries usage and edit events into the analytics cluster and data lake.
+    from: S:system/event-platform
+    to: S:system/analytics
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure"], confidence: 0.7, state: known}

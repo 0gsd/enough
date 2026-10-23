@@ -18,9 +18,9 @@ Isolation, in two layers, because half of enough's state predates the env
 hooks:
 
 1. every ``ENOUGH_*`` seam (weights dir, live model state, registry,
-   download URL base, cacheawl root, infoworld root, wikisink config, ui
-   config, llama-server override, FEED dictionary root) is pointed inside
-   the scratch dir; and
+   download URL base, canon root (and its legacy cacheawl seam), infoworld
+   root, wikisink config, ui config, llama-server override, FEED dictionary
+   root) is pointed inside the scratch dir; and
 2. ``$HOME`` is pointed there too, which is what actually isolates
    ``~/enough/config/broker.json``, ``openrouter.json``,
    ``orchestrator.json`` and ``~/enough/.llama-server/server.pid`` — none
@@ -152,7 +152,10 @@ def build_env(scratch: Path) -> dict[str, str]:
         # (warn, then try ~/enough/bin, then PATH) on every run.
         "ENOUGH_LLAMA_SERVER": str(scratch / "no-such-llama-server"),
         # Stores.
-        "ENOUGH_CACHEAWL_ROOT": str(scratch / "cacheawl"),
+        # Canon (0.4.3) reads ENOUGH_CANON_ROOT, then the legacy
+        # ENOUGH_CACHEAWL_ROOT: both name the same scratch store.
+        "ENOUGH_CANON_ROOT": str(scratch / "canon"),
+        "ENOUGH_CACHEAWL_ROOT": str(scratch / "canon"),
         "ENOUGH_INFOWORLD_ROOT": str(scratch / "no-infoworld"),
         "ENOUGH_WIKISINK_CONFIG": str(scratch / "wikisink.json"),
         "ENOUGH_UI_CONFIG": str(scratch / "ui.json"),

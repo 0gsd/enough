@@ -1,0 +1,30 @@
+# M: the two markets and the footprint.
+nodes:
+  - id: M:market/browsers
+    type: market
+    name: Web browsers
+    summary: The market Firefox competes in; the 2024 annual report speaks of pressure in the browser market and a drive to diversify offerings and revenue.
+    taxonomy: custom
+    code: software/web-browsers
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/'], confidence: 0.7, state: known}
+
+  - id: M:market/digital-advertising
+    type: market
+    name: Digital advertising and its measurement
+    summary: The market Mozilla Advertising and Anonym address, with an emphasis on privacy-preserving measurement.
+    taxonomy: custom
+    code: advertising/measurement
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/advertising/', 'https://blog.mozilla.org/en/advertising/anonym-reddit-partnership/'], confidence: 0.7, state: known}
+
+  - id: M:geography/operations
+    type: geography
+    name: Where the Corporation operates
+    summary: Operations in the United States, Australia, Canada, China, New Zealand, the Netherlands, Germany, France, the United Kingdom and other European countries; Mozilla VPN servers in more than 30 countries.
+    regions: [US, AU, CA, CN, NZ, NL, DE, FR, GB]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://www.mozilla.org/en-US/products/vpn/'], confidence: 0.9, state: known}

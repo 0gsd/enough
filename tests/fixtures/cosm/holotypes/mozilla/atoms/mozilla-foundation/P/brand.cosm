@@ -1,0 +1,62 @@
+cosm: 0.3
+
+# Mozilla Foundation: the perspective atom of the Mozilla Holotype. Built from public sources only (see holotype.cosm); mattering and affect are the modeller's reading of the Foundation's own words, at confidence 0.5 to 0.6.
+
+brand:
+  id: P:mozilla-foundation
+  name: Mozilla Foundation
+  kind: nonprofit
+  summary: 'The non-profit philanthropic mission-holder of the Mozilla Project: it imagines, co-creates and mobilizes people-first technology through grants, fellowships, a festival, a voice dataset, a magazine and campaigns, and controls Mozilla.org, which owns the Mozilla companies.'
+  since: 2003-07-15
+  legal-anchor: Mozilla Foundation, San Francisco CA; California not-for-profit corporation; EIN 20-0097189
+  owner: O:role/Executive-Director
+  confidence: 0.8
+  sources: ['https://www.mozillafoundation.org/en/meet-mozilla/', 'https://www.mozillafoundation.org/en/what-we-do/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://www.mozillafoundation.org/en/what-we-do/mobilize/', 'https://www.mozillafoundation.org/en/what-we-do/grantmaking/']
+  visibility: public
+  parts: ['P:suite/imagine', 'P:suite/co-create', 'P:suite/mobilize', 'P:function/fundraising', 'P:function/finance-and-treasury', 'P:function/governance-and-compliance']
+  rules:
+    - must: all-roles report potential conflicts of interest as decisions arise
+      else: the board decides whether a conflict exists and the conflicted individual does not vote
+      source: Form 990 Schedule O and the published policy
+      scope: descendants
+  principles:
+    purpose: Protect and improve the internet as a public resource, open and accessible to all, and promote more trustworthy tools, innovation and practices.
+    priorities:
+      - powered by people
+      - open by design
+      - fueled by imagination
+    value:
+      - {to: 'M:audience/grantees-and-fellows', proposition: 'funding, expertise and networks that help work scale without compromise'}
+      - {to: 'M:audience/open-internet-community', proposition: a global movement to shape technology that serves the people who use it}
+      - {to: 'M:audience/creative-sector', proposition: 'a way for artists and cultural institutions to shape technology, not only react to it'}
+      - {to: 'M:audience/licensed-companies', proposition: 'the Mozilla marks, licensed for a royalty that funds the mission'}
+    quality:
+      - {goal: invest in people building a better technology future, measure: 'dollars invested: over $35 million across the last decade; $2,336,028 paid in grants in 2024'}
+    decides:
+      - which projects, leaders and ideas to fund
+      - which campaigns to run
+      - the themes and place of Mozilla Festival
+  vocabulary:
+    terms:
+      - {term: Mozilla Project, means: 'The global community, active since 1998, that works for an open and accessible internet; its organizations are the Foundation, Mozilla Corporation, MZLA, Mozilla Ventures, Mozilla.ai, Mozilla Data Collective and Mozilla.org.'}
+      - {term: philanthropic risk capital, means: 'The Foundation''s own phrase for its role: funding that backs unproven ideas for a better technology future.'}
+      - {term: double bottom line, means: The 2025 framework by which every Mozilla organization plans and measures both mission and money.}
+      - {term: Fellow, means: 'A person the Foundation funds as a changemaker, either embedded with a civil society organization or independent.'}
+    assumes:
+      - trademark licence fees from the operating companies stay the Foundation's largest source of revenue ($23.0 million of $37.2 million in 2024)
+    boundary:
+      - the Foundation does not make the browser or the email app; the operating companies do
+      - advocacy and global programs divisions ended in November 2024
+  mattering:
+    inside:
+      - who: ['O:role/Executive-Director', 'O:role/Director-Global-Grants', 'O:role/Director-Mozilla-Festival']
+        because: The Foundation describes its staff's work as defiant optimism that the future of technology can be good if communities build it together.
+        confidence: 0.5
+    chosen:
+      - who: ['M:audience/grantees-and-fellows', 'M:audience/voice-contributors', 'M:audience/builders-and-technologists']
+        because: Over 200 Fellows have been supported, Common Voice contributors give their voices, and about 2,000 people joined MozFest 2025.
+        confidence: 0.5
+    prospective:
+      - who: ['M:audience/creative-sector', 'M:audience/educators-and-students']
+        because: The Foundation reaches artists, educators and students through Creative Futures and Mozilla Education.
+        confidence: 0.5

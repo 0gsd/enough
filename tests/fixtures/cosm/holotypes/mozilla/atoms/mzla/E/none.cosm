@@ -1,0 +1,3 @@
+module: none
+reason: people are not imported in a public sample; the model records team pools and seats, not holders (43 full-time staff at the end of 2024 per the State of the Bird)
+...

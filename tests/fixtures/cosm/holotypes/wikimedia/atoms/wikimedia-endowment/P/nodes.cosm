@@ -1,0 +1,250 @@
+# P — the Endowment's three offerings and the function and services under them. Figures are by fiscal year (1 July to 30 June); no price anywhere: everything is a gift or a grant.
+nodes:
+
+- id: P:offering/permanent-fund
+  type: offering
+  name: The permanent fund
+  summary: "Gifts invested for good: $169.7M of investments at 30 June 2025, mostly index funds, with the earnings (about 4% a year) appropriated for the Wikimedia projects."
+  owner: O:role/treasurer
+  visibility: public
+  confidence: 0.9
+  sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", "https://wikimediaendowment.org/"]
+  parts: [P:function/investment-management]
+  flow:
+    inputs:
+      - {resource: gift, from: M:audience/donors, unit: USD/year, rate: 11863214}
+      - {resource: transferred-gift, from: atom/wikimedia-foundation, unit: USD/year}
+  rules:
+    - must: "O:role/board-of-directors keep gifts restricted to the endowment in perpetuity"
+      source: end-audit-25
+      confidence: 0.85
+  principles:
+    purpose: "Keep a fund that outlasts any one year's appeal and pays the projects for ever."
+    priorities: ["principal protected over a higher payout", "a diversified portfolio over a concentrated one"]
+  economics:
+    price: none
+    cost: {model: usage, band: "operating expenses $5.3M in 2024-25, of which fundraising $1.1M and administration $0.5M"}
+  affect:
+    audience: M:audience/donors
+    elicits:
+      - {feeling: reassurance, intensity: 0.7, when: "the principal is invested for good and the report shows it grew"}
+      - {feeling: pride, intensity: 0.5, when: "a gift becomes part of something that outlives the giver"}
+    avoids: ["the fund treated as a rainy-day account for the Foundation", "opaque investment"]
+    probes: [trust, reassurance]
+    tone: [calm, exact]
+  mattering:
+    to-the-whole: "The reason the Endowment exists: a source of money that does not depend on this year's banners or on traffic from search."
+    weight: critical
+    inside:
+      - who: [O:role/treasurer, O:role/board-of-directors]
+        because: "Judged over decades, not quarters; the 4% rule and the 6% target are the discipline."
+        stakes: "The fund's value, and the credibility of its separation from the Foundation."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/donors]
+        because: "A gift whose principal is protected and whose earnings keep paying out to Wikipedia."
+        stakes: "A gift spent in a year and gone."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/donors]
+        because: "Annual-fund donors who give small gifts and have not been asked for a lasting one."
+        barrier: "Awareness that the Endowment is separate from the Foundation's annual fund."
+        confidence: 0.5
+
+- id: P:function/investment-management
+  type: function
+  name: Investment management
+  summary: "Invests the fund and sets the year's spending: index funds across equities and fixed income plus cash, a 6.0% return target, a 4.0% spending rate on a three-year average."
+  owner: O:role/treasurer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"]
+  parts: [P:service/portfolio-management, P:service/annual-appropriation]
+  substrate:
+    vendors: [C:counterparty/investment-managers]
+  mattering:
+    to-the-whole: "Turns gifts into a stream of grants without eating the principal."
+    weight: critical
+    inside:
+      - who: [O:role/treasurer]
+        because: "The numbers every report is judged on: return, drawdown, spending."
+        confidence: 0.5
+
+- id: P:service/portfolio-management
+  type: service
+  name: Portfolio management
+  summary: "At 30 June 2025: cash $19.5M, U.S. equity funds $91.8M, international and emerging-market equity funds $27.5M, investment-grade taxable fixed-income funds $30.9M. The return was 7.84% a year on average since inception, against a 6.0% target."
+  owner: O:role/treasurer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"]
+  substrate:
+    vendors: [C:counterparty/investment-managers]
+  rules:
+    - counts-as: "a holding is part of the endowment when it is an investment of donor-restricted endowment funds in the portfolio"
+      source: end-audit-25
+  economics:
+    price: {model: internal}
+    cost: {model: usage, band: {pending: "investment management fees (the audit reports returns net of fees but does not itemise them)"}}
+  mattering:
+    to-the-whole: "Produces the earnings that pay for every grant; a poor decade would cut the grants."
+    weight: major
+    inside:
+      - who: [O:role/treasurer]
+        because: "Choosing index funds and a spending rule so that judgement calls stay few."
+        confidence: 0.5
+
+- id: P:service/annual-appropriation
+  type: service
+  name: Annual appropriation
+  summary: "Each July the Board appropriates the year's spending at a target of 4.0% of the three-year rolling average of market value (range 2.5% to 4.0%): $5.6M for 2024-25, $5.7M available for the following year; the 2026-27 budget is $6.8M."
+  owner: O:role/treasurer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"]
+  rules:
+    - must: "O:role/board-of-directors appropriate each year's spending in July within the spending policy"
+      source: end-audit-25
+      confidence: 0.85
+  economics:
+    price: {model: internal}
+    cost: {model: flat, band: small}
+  mattering:
+    to-the-whole: "Sets how much of the fund's growth reaches the projects each year, and so how fast the fund can grow."
+    weight: major
+    inside:
+      - who: [O:role/board-of-directors]
+        because: "The yearly choice between paying out and compounding."
+        confidence: 0.5
+
+- id: P:offering/project-grants
+  type: offering
+  name: Grants for the Wikimedia projects
+  summary: "Restricted grants for technical innovation on the projects: $3.4M in 2024-25 (to the Foundation $3.1M and to Kiwix $297,000), $3.5M disbursed in 2025-26, $4.3M planned for 2026-27."
+  owner: O:role/president
+  visibility: public
+  confidence: 0.85
+  sources: ["https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", "https://wikimediaendowment.org/"]
+  parts: [P:service/grantmaking]
+  flow:
+    outputs:
+      - {resource: grant, to: M:audience/foundation, unit: USD/year, rate: 3100000}
+      - {resource: grant, to: M:audience/other-grantees, unit: USD/year, rate: 297000}
+  rules:
+    - must: "O:role/president direct grants to projects that are approved by and advance the purposes of the Wikimedia Foundation or its successor"
+      source: end-audit-25
+      confidence: 0.85
+  principles:
+    purpose: "Pay for the technical work that keeps Wikipedia useful as the internet changes."
+    priorities: ["technical innovation, as donors asked in 2022 interviews", "named projects over general support"]
+  economics:
+    price: none
+    cost: {model: grant, band: "$3.4M of project funding in 2024-25; $4.3M planned for 2026-27, about 23% more"}
+  affect:
+    audience: M:audience/foundation
+    elicits:
+      - {feeling: support, intensity: 0.7, when: "long-horizon work is paid for without an annual appeal"}
+    avoids: ["grants that become the Foundation's operating budget", "money without a named project"]
+    probes: [satisfaction]
+    tone: [practical, steady]
+  mattering:
+    to-the-whole: "The visible return on the fund: what a donor can point to as having been paid for."
+    weight: major
+    inside:
+      - who: [O:role/president]
+        because: "Picking projects with the grantee that also manages the fund, which asks for visible separation."
+        stakes: "The Endowment's independence in practice."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/foundation, M:audience/other-grantees]
+        because: "Money for Abstract Wikipedia, Commons, Wikidata, machine learning and offline Wikipedia that the annual fund would not cover."
+        stakes: "Technical bets that go unfunded."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/other-grantees]
+        because: "Other organizations that build tools and services around the projects."
+        barrier: "Grants have gone mostly to the Foundation so far; the criteria for others are not summarised publicly."
+        confidence: 0.5
+
+- id: P:service/grantmaking
+  type: service
+  name: Grantmaking
+  summary: The Board, its Grantmaking and Community Committee and the President choose the projects to fund; in 2025-26 the funded work included Abstract Wikipedia, Commons, Kiwix, machine-learning infrastructure and work to strengthen infrastructure against scrapers.
+  owner: O:role/president
+  visibility: public
+  confidence: 0.75
+  sources: ["https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", "https://foundation.wikimedia.org/wiki/Endowment:Main"]
+  mattering:
+    to-the-whole: "Where the fund's earnings become projects."
+    weight: major
+    inside:
+      - who: [O:role/president]
+        because: "The step donors and the Foundation both watch."
+        confidence: 0.5
+
+- id: P:offering/legacy-giving
+  type: offering
+  name: Legacy and planned giving
+  summary: "Gifts in a will, trust or retirement account, IRA distributions and gift annuities, through the Wikipedia Legacy Society: 4,190 commitments at 30 June 2026, over $2.2M from IRA distributions in 2025-26, and a will tool with FreeWill as the main source of leads."
+  owner: O:role/president
+  visibility: public
+  confidence: 0.85
+  sources: ["https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", "https://wikimediaendowment.org/"]
+  parts: [P:service/planned-giving-program]
+  flow:
+    inputs:
+      - {resource: planned-gift-commitment, from: M:audience/planned-givers, unit: commitments/year}
+  principles:
+    purpose: "Make leaving a gift to free knowledge a normal thing to do."
+    priorities: ["many modest commitments over a few large ones"]
+  economics:
+    price: none
+    cost: {model: usage, band: "fundraising $1.1M in 2024-25"}
+  affect:
+    audience: M:audience/planned-givers
+    elicits:
+      - {feeling: belonging, intensity: 0.7, when: "a name joins the Wikipedia Legacy Society"}
+      - {feeling: peace, intensity: 0.5, when: "a will is done and a lasting gift is in it"}
+    avoids: ["pressure", "confusing legal language"]
+    probes: [trust]
+    tone: [warm, plain]
+  mattering:
+    to-the-whole: "Planned gifts could be the Endowment's main source by 2050; this is how it is meant to grow."
+    weight: major
+    inside:
+      - who: [O:role/president]
+        because: "A slow pipeline whose results arrive over decades, tracked by commitments."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/planned-givers]
+        because: "A lasting gift to something they use and trust, made with a free online tool."
+        stakes: "A legacy that goes elsewhere."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/donors]
+        because: "Annual donors in the United States who have not named the Endowment in their plans."
+        barrier: "They have not been asked, and the routes are US-specific."
+        confidence: 0.5
+
+- id: P:service/planned-giving-program
+  type: service
+  name: Planned-giving program
+  summary: Outreach to future planned-gift donors, the FreeWill partnership, IRA distributions and the Wikipedia Legacy Society; the plan for 2026-27 is 540 new commitments and 25% more members. Commitments a year ran from 1 in 2013-14 to 1,116 in 2020-21.
+  owner: O:role/president
+  visibility: public
+  confidence: 0.85
+  sources: ["https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"]
+  rules:
+    - must: "O:role/president report planned-giving commitments by fiscal year in the annual plan"
+      source: end-plan-2627
+      confidence: 0.6
+  economics:
+    price: none
+    cost: {model: usage, band: {pending: "cost of the planned-giving program apart from fundraising overall"}}
+  mattering:
+    to-the-whole: "The pipeline behind the long-term growth of the fund."
+    weight: major
+    inside:
+      - who: [O:role/president]
+        because: "Counting promises that may come true in thirty years."
+        confidence: 0.5

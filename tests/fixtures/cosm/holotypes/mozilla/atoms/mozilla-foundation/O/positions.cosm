@@ -1,0 +1,168 @@
+# O: positions are seats; who sits in them is never written. Only the board, its committees and the executive seat have a published line.
+nodes:
+  - id: O:position/board-of-directors
+    type: position
+    name: Board of Directors
+    summary: The Foundation's governing body; the top of the chart.
+    roles: ['O:role/Board-of-Directors']
+    primary: O:role/Board-of-Directors
+    reports-to: none
+    template: true
+    instances: 10
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}
+
+  - id: O:position/audit-committee
+    type: position
+    name: Audit Committee
+    summary: Standing board committee.
+    roles: ['O:role/Audit-Committee']
+    primary: O:role/Audit-Committee
+    reports-to: O:position/board-of-directors
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}
+
+  - id: O:position/investment-committee
+    type: position
+    name: Investment Committee
+    summary: Standing board committee.
+    roles: ['O:role/Investment-Committee']
+    primary: O:role/Investment-Committee
+    reports-to: O:position/board-of-directors
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}
+
+  - id: O:position/executive-director
+    type: position
+    name: Executive Director
+    summary: The chief executive seat. Reporting to the board is the conventional line; the pages read do not state it.
+    roles: ['O:role/Executive-Director']
+    primary: O:role/Executive-Director
+    reports-to: O:position/board-of-directors
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.7, state: known}
+
+  - id: O:position/chief-operating-officer
+    type: position
+    name: Chief Operating Officer
+    summary: A seat on the leadership page.
+    roles: ['O:role/Chief-Operating-Officer']
+    primary: O:role/Chief-Operating-Officer
+    reports-to: {pending: reporting lines are not published; the leadership page lists titles only}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:position/vp-development
+    type: position
+    name: Vice President, Development
+    summary: A seat on the leadership page.
+    roles: ['O:role/VP-Development']
+    primary: O:role/VP-Development
+    reports-to: {pending: reporting lines are not published; the leadership page lists titles only}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:position/vp-finance-and-administration
+    type: position
+    name: Vice President, Finance and Administration
+    summary: A seat on the leadership page.
+    roles: ['O:role/VP-Finance-and-Administration']
+    primary: O:role/VP-Finance-and-Administration
+    reports-to: {pending: reporting lines are not published; the leadership page lists titles only}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:position/vp-imagination-and-strategic-growth
+    type: position
+    name: Vice President, Imagination and Strategic Growth
+    summary: A seat on the leadership page.
+    roles: ['O:role/VP-Imagination-and-Strategic-Growth']
+    primary: O:role/VP-Imagination-and-Strategic-Growth
+    reports-to: {pending: reporting lines are not published; the leadership page lists titles only}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:position/executive-program-manager
+    type: position
+    name: Executive Program Manager
+    summary: A seat on the leadership page.
+    roles: ['O:role/Executive-Program-Manager']
+    primary: O:role/Executive-Program-Manager
+    reports-to: {pending: reporting lines are not published; the leadership page lists titles only}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:position/senior-counsel
+    type: position
+    name: Senior Counsel
+    summary: A seat on the leadership page.
+    roles: ['O:role/Senior-Counsel']
+    primary: O:role/Senior-Counsel
+    reports-to: {pending: reporting lines are not published; the leadership page lists titles only}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:position/director-communications
+    type: position
+    name: Director, Communications
+    summary: A seat on the leadership page.
+    roles: ['O:role/Director-Communications']
+    primary: O:role/Director-Communications
+    reports-to: {pending: reporting lines are not published; the leadership page lists titles only}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:position/director-global-grants
+    type: position
+    name: Director, Global Grants
+    summary: A seat on the leadership page.
+    roles: ['O:role/Director-Global-Grants']
+    primary: O:role/Director-Global-Grants
+    reports-to: {pending: reporting lines are not published; the leadership page lists titles only}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:position/senior-director-technology-platforms
+    type: position
+    name: Senior Director, Technology Platforms
+    summary: A seat on the leadership page.
+    roles: ['O:role/Senior-Director-Technology-Platforms']
+    primary: O:role/Senior-Director-Technology-Platforms
+    reports-to: {pending: reporting lines are not published; the leadership page lists titles only}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:position/senior-director-people-and-culture
+    type: position
+    name: Senior Director, People and Culture
+    summary: A seat on the leadership page.
+    roles: ['O:role/Senior-Director-People-and-Culture']
+    primary: O:role/Senior-Director-People-and-Culture
+    reports-to: {pending: reporting lines are not published; the leadership page lists titles only}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}
+
+  - id: O:position/director-mozilla-festival
+    type: position
+    name: Director, Mozilla Festival
+    summary: A seat on the leadership page.
+    roles: ['O:role/Director-Mozilla-Festival']
+    primary: O:role/Director-Mozilla-Festival
+    reports-to: {pending: reporting lines are not published; the leadership page lists titles only}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.6, state: known}

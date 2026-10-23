@@ -1,0 +1,55 @@
+# O — positions: the seats, with no holder named. The President and the Treasurer seats are held by Foundation staff (shared-with); the Endowment itself has no employees.
+nodes:
+  - id: O:position/director
+    type: position
+    name: Director
+    summary: "A seat on the Board of Directors: 7 to 15 under the bylaws; the Endowment's site says 13 members, its 2024-25 annual report lists 10, and the 2024 Form 990 counts 14 volunteers including officers."
+    roles: [O:role/board-of-directors]
+    primary: O:role/board-of-directors
+    reports-to: none
+    unit: O:unit/board-of-directors
+    template: true
+    instances: {pending: "how many directors sit today: the Endowment's own pages give 13, 10 and 14 (volunteers including officers)"}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Bylaws", "https://wikimediaendowment.org/", "https://wikimediaendowment.org/annualreports/2024-2025-annual-report/", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.8, state: known}
+    dotted-to: none
+
+  - id: O:position/president
+    type: position
+    name: President
+    summary: The chief executive seat; held by a Foundation employee, with compensation allocated through the cost-sharing arrangement.
+    roles: [O:role/president]
+    primary: O:role/president
+    reports-to: O:position/director
+    shared-with: atom/wikimedia-foundation
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://foundation.wikimedia.org/wiki/Endowment:Bylaws"], confidence: 0.85, state: known}
+    dotted-to: none
+
+  - id: O:position/treasurer
+    type: position
+    name: Treasurer
+    summary: The chief financial seat; held by a Foundation employee, with compensation allocated through the cost-sharing arrangement.
+    roles: [O:role/treasurer]
+    primary: O:role/treasurer
+    reports-to: O:position/director
+    shared-with: atom/wikimedia-foundation
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://foundation.wikimedia.org/wiki/Endowment:Bylaws"], confidence: 0.85, state: known}
+    dotted-to: none
+
+  - id: O:position/secretary-and-legal-counsel
+    type: position
+    name: Secretary and Legal Counsel
+    summary: The records seat; no compensation is reported for it on the Form 990.
+    roles: [O:role/secretary-and-legal-counsel]
+    primary: O:role/secretary-and-legal-counsel
+    reports-to: O:position/director
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://wikimediaendowment.org/"], confidence: 0.75, state: known}
+    pending: "whether the Secretary is a Foundation employee"
+    dotted-to: none

@@ -1,0 +1,49 @@
+cosm: 0.3
+
+# Mozilla Data Collective. Read from its site, terms and the Mozilla Discourse announcement; the structure is only as the company describes it.
+
+brand:
+  id: P:mozilla-data-collective
+  name: Mozilla Data Collective
+  kind: company
+  summary: A data platform for people and communities to host and share datasets on their own terms, with clear provenance and licensing and, for compensated datasets, money flowing back to the people who made the datasets; the home of the Common Voice datasets since October 2025.
+  since: 2026-02-25
+  legal-anchor: Mozilla Data Collective Limited, London; company 17054959 (England and Wales)
+  owner: O:role/Founder-and-Chief-Executive
+  confidence: 0.7
+  sources: ['https://mozilladatacollective.com/', 'https://mozilladatacollective.com/terms', 'https://mozilladatacollective.com/datasets', 'https://discourse.mozilla.org/t/exciting-news-mozilla-data-collective/145191']
+  visibility: public
+  parts: ['P:offering/dataset-platform', 'P:offering/common-voice-distribution']
+  principles:
+    purpose: 'Rebuild the AI data ecosystem with communities at the centre: contributors keep ownership and set the terms; users get clear provenance and licensing.'
+    priorities:
+      - contributors keep ownership
+      - multilingual, multicultural, multimodal data
+      - fair value exchange
+    value:
+      - {to: 'M:audience/dataset-contributors', proposition: 'create, curate and control a dataset, and be paid when a priced dataset is downloaded'}
+      - {to: 'M:audience/dataset-users', proposition: datasets with clear provenance and licensing from organisations and communities worldwide}
+    decides:
+      - which licences the platform supports
+      - how compensated datasets are paid out
+  vocabulary:
+    terms:
+      - {term: compensated dataset, means: A dataset whose uploader sets a price; the listing marks it "Compensated" and the site says every download sends money back to the people who made the dataset possible.}
+      - {term: mission-locked, means: The company's own phrase for its structure; its mechanism is not described on the pages read.}
+    assumes:
+      - communities want to host and share data on their own terms, the platform's stated premise
+    boundary:
+      - it hosts and shares datasets; it is not described as training models
+  mattering:
+    inside:
+      - who: ['O:role/Founder-and-Chief-Executive']
+        because: The July 2025 announcement presents the platform as a sister to Common Voice for sharing datasets on their owners' terms.
+        confidence: 0.5
+    chosen:
+      - who: ['M:audience/dataset-contributors', 'M:audience/common-voice-community']
+        because: The catalogue lists 1,200 datasets (2026-10-18).
+        confidence: 0.5
+    prospective:
+      - who: ['M:audience/dataset-users']
+        because: The site pitches multilingual, multicultural and multimodal data with clear provenance and licensing.
+        confidence: 0.5

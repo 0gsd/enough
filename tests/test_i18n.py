@@ -44,7 +44,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     project = tmp_path / "proj"
     project.mkdir()
     monkeypatch.setenv("ENOUGH_UI_CONFIG", str(tmp_path / "ui.json"))
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(tmp_path / "_store"))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(tmp_path / "_store"))
     monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(tmp_path / "no-infoworld"))
     app = create_app(project, "http://localhost:9", supervise=False)
     with TestClient(app) as c:

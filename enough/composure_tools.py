@@ -9,7 +9,7 @@ the user are all reading the same words.
 Two rules the tools enforce that the UI does not:
 
 - the `composure_enabled` broker toggle gates all eight (the canvas itself
-  is ungated, exactly like wikisink and cacheawl); and
+  is ungated, exactly like wikisink and canon); and
 - `comp_remove_module` needs `<confirmed>yes</confirmed>`, meaning the user
   said so in their own words this turn. Never pre-fill it.
 

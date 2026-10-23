@@ -859,6 +859,50 @@ def lookup(word: str) -> dict:
         con.close()
 
 
+def lookup_many(words: Iterable[str]) -> dict[str, dict | None]:
+    """Batch grounding for the derivation engine (0.4.3): `{key: entry | None}` for many words on ONE connection.
+
+    Each key is the word's first `normalize` candidate; the value is what `lookup` would find for it — a form
+    resolves to its headword's entry (the entry's `word` says which), a user row wins over FEED's — or None. Never
+    raises for a missing or unreadable dictionary: every word is then None, so a text with no FEED still derives."""
+    keys: dict[str, list[str]] = {}
+    for w in words:
+        cands = normalize(w) if isinstance(w, str) else []
+        if cands and cands[0] not in keys:
+            keys[cands[0]] = cands
+    out: dict[str, dict | None] = dict.fromkeys(keys)
+    if not keys:
+        return out
+    try:
+        con, has_user = _connect()
+    except (DictionaryUnavailable, sqlite3.Error, OSError):
+        return out
+    heads: dict[str, dict | None] = {}
+    try:
+        for key, cands in keys.items():
+            for c in cands:
+                row, _origin = _row(con, has_user, c)
+                head = None
+                if row is not None:
+                    head = c if row["is_headword"] == 1 else row["form_of"]
+                elif has_user:
+                    r = con.execute("SELECT headword FROM u.forms WHERE form = ? ORDER BY position LIMIT 1",
+                                    (c,)).fetchone()
+                    head = r[0] if r else None
+                if not head:
+                    continue
+                if head not in heads:
+                    heads[head] = _entry(con, has_user, head)
+                if heads[head] is not None:
+                    out[key] = heads[head]
+                    break
+    except sqlite3.Error:
+        log.exception("dictionary: batch lookup failed")
+    finally:
+        con.close()
+    return out
+
+
 def _suggest(con: sqlite3.Connection, has_user: bool, word: str, n: int = 8) -> list[str]:
     seen: list[str] = []
 

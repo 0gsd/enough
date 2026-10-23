@@ -24,7 +24,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     project = tmp_path / "project"
     project.mkdir()
     scratch = tmp_path / "state"
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(scratch / "cacheawl"))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(scratch / "cacheawl"))
     monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(scratch / "no-infoworld"))
     monkeypatch.setenv("ENOUGH_WIKISINK_CONFIG", str(scratch / "wikisink.json"))
     monkeypatch.setenv("ENOUGH_UI_CONFIG", str(scratch / "ui.json"))

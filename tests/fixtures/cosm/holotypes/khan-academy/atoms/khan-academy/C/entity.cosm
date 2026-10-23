@@ -1,0 +1,37 @@
+# C — Corporation: the legal shell of the nonprofit and the one disregarded entity its Form 990 names.
+# Built from public sources only (Form 990 for the year to June 2025 and the terms of use). No person appears here.
+nodes:
+  - id: C:entity/khan-academy-inc
+    type: entity
+    name: Khan Academy, Inc.
+    summary: "The nonprofit that owns and operates khanacademy.org, its apps and its programs: a California corporation recognised by the IRS as a 501(c)(3) public charity, exempt since May 2008, formed in 2007, with its mailing address in Mountain View, California."
+    anchor: true
+    form: nonprofit
+    roles: [company, brand]
+    jurisdiction: US-CA
+    registered-office: "PO Box 1630, Mountain View, CA 94042 (the mailing address on Form 990)"
+    global-id: {ein: "26-1544963", domain: khanacademy.org}
+    domains: [khanacademy.org]
+    tax-status: "501(c)(3), exemption issued May 2008"
+    fiscal-year: "July to June since 2024 (calendar year before; see C:event/fiscal-year-change)"
+    since: "2007"
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-2025, pp-ka, ka-terms], confidence: 0.9, state: known}
+
+  - id: C:entity/duck-duck-moose-llc
+    type: entity
+    name: Duck Duck Moose LLC
+    summary: "A disregarded entity wholly controlled by the nonprofit and listed on Form 990 Schedule R with on-line early learning as its primary activity. Its apps joined Khan Academy in 2016; the terms of use still name its website and applications among the services."
+    form: llc
+    roles: [shell]
+    jurisdiction: US-CA
+    registered-office: "PO Box 1630, Mountain View, CA 94042 (as listed on Schedule R)"
+    global-id: {ein: "61-1799353"}
+    controlled-by: C:entity/khan-academy-inc
+    since: "2016"
+    status: active
+    visibility: public
+    owner: O:role/Chief-Financial-Officer
+    provenance: {mode: net-scan, sources: [f990-2025, ka-terms, techcrunch-ddm-2016], confidence: 0.8, state: known}

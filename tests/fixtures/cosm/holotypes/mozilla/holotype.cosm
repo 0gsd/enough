@@ -1,0 +1,380 @@
+oes: comprise/1
+
+# Mozilla as a public sample Holotype (phase 7 prototype), built on 2026-10-18 from public sources only: the Foundation's Forms 990 and audited
+# statements, the Mozilla wiki and blog, each organization's own pages, Companies House, GitHub and reputable reporting. No person is named
+# anywhere; seats are roles and E is none in every atom. Every node cites its sources by URL; a fact no current source confirms is a pending
+# question, never a guess. Facts change. A third-party description, reviewed by nobody at Mozilla.
+#
+# Atoms: the Foundation (the perspective), Mozilla.org (the umbrella non-profit the Foundation controls, which per its June 2026 FAQ owns the
+# operating companies), the Corporation (Firefox), MZLA (Thunderbird), Mozilla.ai, Mozilla Ventures and Mozilla Data Collective.
+# The ownership of the companies is stated differently by Mozilla's own pages (the 2024 filings and the State of Mozilla 2025/26: the Foundation;
+# the FAQ of June 2026 and the Thunderbird pages: Mozilla.org). The model follows the newest source and says so in the bonds and the findings.
+
+id: holotype/mozilla
+name: Mozilla
+sample: true
+summary: The Mozilla Foundation and the Mozilla organizations around it (Mozilla.org, the Corporation, MZLA, Mozilla.ai, Mozilla Ventures, Mozilla Data Collective), from public sources only.
+alignment:                 # whose company this is, as the people who made it said; a claim, never proof (plan/standing.md)
+  for: other
+  mode: research
+  by: "comprise-sample"
+  at: 2026-10-18
+atoms:
+  - atom/mozilla-foundation
+  - atom/mozilla-org
+  - atom/mozilla-corporation
+  - atom/mzla
+  - atom/mozilla-ai
+  - atom/mozilla-ventures
+  - atom/mozilla-data-collective
+perspective: atom/mozilla-foundation
+
+# Every source a node cites, by its URL (the id is the URL, so `provenance.sources` reads as links). Read on 2026-10-18.
+sources:
+  - id: https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf
+    page: Mozilla Foundation, IRS Form 990 for 2024 (public disclosure copy, signed 2025-11-17), with Schedules O and R
+    supports: EIN, mission, governance counts, Foundation-only revenue and expenses, program expenses, Schedule R related organizations with EINs, ownership, income and assets, and transactions with them
+    date: 2026-10-18
+  - id: https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf
+    page: Mozilla Foundation, IRS Form 990 for 2023 (public disclosure copy), Schedule R
+    supports: Related organizations and their 2023 income and assets; 2023 transactions with the Corporation and the fund
+    date: 2026-10-18
+  - id: https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf
+    page: Mozilla Foundation and Subsidiaries, consolidated financial statements for 2024 and 2023 (audited; issued 2025-09-26)
+    supports: Wholly-owned subsidiaries, consolidated revenue by source, expenses, net assets, trademark licence fees, services agreements, acquisitions, the Mozilla Online dispute, subsequent events
+    date: 2026-10-18
+  - id: https://projects.propublica.org/nonprofits/organizations/200097189
+    page: 'ProPublica Nonprofit Explorer: Mozilla Foundation (EIN 20-0097189), Form 990 filings 2011 to 2024'
+    supports: EIN, ruling year 2004, NTEE class, revenue, expenses and net assets by year
+    date: 2026-10-18
+  - id: https://projects.propublica.org/nonprofits/api/v2/organizations/200097189.json
+    page: ProPublica Nonprofit Explorer API record for Mozilla Foundation
+    supports: Address, NTEE code U40, ruling date 2004-06, total assets and liabilities by year
+    date: 2026-10-18
+  - id: https://en.wikipedia.org/wiki/Mozilla_Foundation
+    page: 'Wikipedia: Mozilla Foundation'
+    supports: Formation date, California registration number, subsidiaries announced and dates, the November 2024 layoffs (secondary source)
+    date: 2026-10-18
+  - id: https://wiki.mozilla.org/Mozilla_org
+    page: 'Mozilla wiki: Mozilla.org, the FAQ on the new nonprofit (last edited 2026-06-23)'
+    supports: What Mozilla.org is, that it owns the operating subsidiaries and the trademarks, that the Foundation appoints the majority of its board and consolidates it, the councils, the 2026 to 2028 strategy
+    date: 2026-10-18
+  - id: https://blog.mozilla.org/en/mozilla/news/announcing-mozilla-org-new-non-profit/
+    page: 'Mozilla blog: Announcing Mozilla.org (2026-06-23)'
+    supports: Mozilla.org as a 501(c)(3) strategic endowment operating the portfolio on behalf of the Foundation
+    date: 2026-10-18
+  - id: https://www.mofo.com/resources/news/260706-mofo-advises-mozilla
+    page: Law firm press release on advising on the creation of Mozilla.org (2026-07-06)
+    supports: Mozilla.org granted 501(c)(3) status and operational in June 2026; the list of organizations in the Mozilla Project
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/about/governance/organizations/
+    page: 'Mozilla: Organizations (governance page, undated; still says the Foundation wholly owns the Corporation)'
+    supports: Foundation as California non-profit; Corporation as its wholly owned taxable subsidiary; Mozilla Online as a Corporation subsidiary
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/about/
+    page: 'Mozilla: About (2026)'
+    supports: The Mozilla Project and its organizations; product and program list
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/about/leadership/
+    page: 'Mozilla: Leadership (2026), role titles only used'
+    supports: Role titles across the family and the named boards
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/about/manifesto/
+    page: The Mozilla Manifesto
+    supports: The ten principles
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/foundation/trademarks/policy/
+    page: Mozilla trademark policy (undated)
+    supports: Names the Mozilla Foundation as owner of the Mozilla marks
+    date: 2026-10-18
+  - id: https://stateof.mozilla.org/
+    page: State of Mozilla 2025/26
+    supports: Structure as the Foundation describes it; the three principles; links to the 2024 filings
+    date: 2026-10-18
+  - id: https://stateof.mozilla.org/ledger/
+    page: 'State of Mozilla 2025/26: Ledger'
+    supports: Reserves, 2026 planned spend and its split, Firefox-related income 2024, 50+ equity holdings, the double bottom line
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/foundation/annualreport/2024/
+    page: 'State of Mozilla 2024: contents'
+    supports: The report groups Mozilla VPN, Monitor and Relay as products built for people; lists Mozilla Builders, Mozilla Advertising and the other entities
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/
+    page: 'State of Mozilla 2024: Financing an open internet'
+    supports: Foundation as sole owner of the Corporation; search partnerships as the majority of revenue; Mozilla Ventures fund size and deployment; MZLA donations; Mozilla.ai commitment
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/
+    page: 'State of Mozilla 2024: Backing bold ideas (Mozilla Ventures)'
+    supports: Three investment pillars, over 45 startups, partners
+    date: 2026-10-18
+  - id: https://www.mozillafoundation.org/en/
+    page: 'Mozilla Foundation: home (2026)'
+    supports: Current programs, MozFest 2026 dates, Mozilla Data Collective, Nothing Personal
+    date: 2026-10-18
+  - id: https://www.mozillafoundation.org/en/meet-mozilla/
+    page: 'Mozilla Foundation: Meet Mozilla (mission and leadership titles)'
+    supports: Mission statement; leadership role titles; Board of Directors
+    date: 2026-10-18
+  - id: https://www.mozillafoundation.org/en/what-we-do/
+    page: 'Mozilla Foundation: What we do'
+    supports: Imagine, co-create, mobilize; philanthropic mission-holder of the Mozilla Project
+    date: 2026-10-18
+  - id: https://www.mozillafoundation.org/en/what-we-do/imagine/
+    page: 'Mozilla Foundation: Imagine'
+    supports: Creative Futures programs and partners; Nothing Personal; Mozilla Education
+    date: 2026-10-18
+  - id: https://www.mozillafoundation.org/en/what-we-do/co-create/
+    page: 'Mozilla Foundation: Co-create'
+    supports: Common Voice, social data access, Mozilla Data Collective, grants
+    date: 2026-10-18
+  - id: https://www.mozillafoundation.org/en/what-we-do/mobilize/
+    page: 'Mozilla Foundation: Mobilize'
+    supports: Mozilla Festival, Fellows, campaigns, Counterstructures residencies
+    date: 2026-10-18
+  - id: https://www.mozillafoundation.org/en/what-we-do/grantmaking/
+    page: 'Mozilla Foundation: Grantmaking'
+    supports: Incubator, Fellows, Responsible Computing Challenge, collaborative funds; over $35 million invested in a decade
+    date: 2026-10-18
+  - id: https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/
+    page: 'Mozilla Foundation: Annual reports and financials (public records)'
+    supports: Filings by year; articles, bylaws and conflict of interest policy; determination letters; subsidiary records
+    date: 2026-10-18
+  - id: https://www.mozillafoundation.org/en/nothing-personal/privacy-not-included-sunset/
+    page: 'Mozilla Foundation: Privacy Not Included has moved (2026-08-11)'
+    supports: Privacy Not Included launched 2017 and continued as Product Reviews in Nothing Personal
+    date: 2026-10-18
+  - id: https://www.mozillafoundation.org/en/common-voice/
+    page: 'Mozilla Foundation: Common Voice'
+    supports: Common Voice as a flagship Foundation initiative
+    date: 2026-10-18
+  - id: https://github.com/mozilla/foundation.mozilla.org
+    page: 'GitHub: the Foundation website repository'
+    supports: Django and Wagtail, MPL-2.0, deployed on Heroku
+    date: 2026-10-18
+  - id: https://github.com/common-voice/common-voice
+    page: 'GitHub: Common Voice web app repository'
+    supports: MPL-2.0 web app behind commonvoice.mozilla.org
+    date: 2026-10-18
+  - id: https://techcrunch.com/2024/11/09/mozilla-lays-off-30-of-its-nonprofit-arm
+    page: 'TechCrunch: Mozilla lays off 30% of its nonprofit arm (2024-11-09)'
+    supports: Layoff of 30% of Foundation staff; advocacy and global programs ended
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/products/
+    page: 'Mozilla: Products (2026)'
+    supports: The current product list
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/about/legal/terms/mozilla/
+    page: 'Mozilla: website terms (2026-09-16)'
+    supports: Legal notices address of Mozilla in San Francisco
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/advertising/
+    page: Mozilla Advertising (2026)
+    supports: Ads on Firefox and MDN; 210M+ monthly active Firefox users; 16.2M MDN users
+    date: 2026-10-18
+  - id: https://blog.mozilla.org/en/advertising/anonym-reddit-partnership/
+    page: 'Mozilla blog: Reddit expands measurement through Anonym (2026-04-02)'
+    supports: Anonym as a Mozilla confidential computing technology for advertising analytics; the Reddit partnership
+    date: 2026-10-18
+  - id: https://www.firefox.com/en-US/
+    page: 'Firefox: home (2026)'
+    supports: Platforms, channels, product claims
+    date: 2026-10-18
+  - id: https://www.firefox.com/en-US/browsers/mobile/
+    page: 'Firefox: mobile browsers (2026)'
+    supports: Firefox and Focus on Google Play and the App Store
+    date: 2026-10-18
+  - id: https://www.firefox.com/en-US/browsers/enterprise/
+    page: Firefox Enterprise (2026)
+    supports: Enterprise offering, contact sales, Thunderbird Enterprise coming soon
+    date: 2026-10-18
+  - id: https://blog.mozilla.org/en/firefox/firefox-roadmap-152/
+    page: 'Mozilla blog: Firefox 152 and the public roadmap (2026-06-16)'
+    supports: 'Roadmap items: Smart Window, built-in VPN on mobile, tab groups, AI controls'
+    date: 2026-10-18
+  - id: https://blog.mozilla.org/en/mozilla/building-whats-next/
+    page: 'Mozilla blog: Investing in what moves the internet forward (2025-05-22)'
+    supports: Pocket and Fakespot shutdown dates and reasons
+    date: 2026-10-18
+  - id: https://blog.mozilla.org/en/mozilla/internet-policy/defending-an-open-web/
+    page: 'Mozilla blog: Defending an open web, on the Google search ruling (2025-09-08)'
+    supports: The remedies ruling and search payments to independent browsers
+    date: 2026-10-18
+  - id: https://en.wikipedia.org/wiki/Pocket_(service)
+    page: 'Wikipedia: Pocket (service)'
+    supports: Pocket owned by the Corporation; acquired 2017
+    date: 2026-10-18
+  - id: https://en.wikipedia.org/wiki/Fakespot
+    page: 'Wikipedia: Fakespot'
+    supports: Fakespot acquired by the Corporation
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/products/vpn/
+    page: Mozilla VPN product page (2026)
+    supports: Monthly and annual prices; 500+ servers in 30+ countries; five devices
+    date: 2026-10-18
+  - id: https://relay.firefox.com/
+    page: Firefox Relay (2026)
+    supports: Free tier of five masks; Premium tiers by waitlist
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/products/monitor/
+    page: Mozilla Monitor product page (2026)
+    supports: Breach scanning and alerts
+    date: 2026-10-18
+  - id: https://developer.mozilla.org/en-US/about
+    page: 'MDN Web Docs: About (2026)'
+    supports: Owned by the Corporation; Open Web Docs partnership; MDN Plus since 2022; usage figures
+    date: 2026-10-18
+  - id: https://0din.ai/
+    page: 0DIN (2026)
+    supports: AI security platform and bug bounty, backed by Mozilla
+    date: 2026-10-18
+  - id: https://0din.ai/privacy
+    page: 0DIN privacy notice (2026-02-10)
+    supports: Operated by Mozilla Corporation
+    date: 2026-10-18
+  - id: https://tabstack.ai/
+    page: Tabstack (2026)
+    supports: 'Managed web API for AI models: research, extract, automate'
+    date: 2026-10-18
+  - id: https://tabstack.ai/legal/terms
+    page: Tabstack terms of service (2026-06-17)
+    supports: Operated by Mozilla Corporation; legal notices address
+    date: 2026-10-18
+  - id: https://github.com/mozilla-firefox/firefox
+    page: 'GitHub: the Firefox repository'
+    supports: Official repository of the browser; bugs tracked on Bugzilla
+    date: 2026-10-18
+  - id: https://firefox-source-docs.mozilla.org/
+    page: Firefox Source Tree Documentation
+    supports: Gecko, Rust and C++, continuous integration, developer documentation
+    date: 2026-10-18
+  - id: https://en.wikipedia.org/wiki/Mullvad
+    page: 'Wikipedia: Mullvad (secondary)'
+    supports: The 2019 partnership to run Mozilla VPN on its WireGuard servers
+    date: 2026-10-18
+  - id: https://www.thunderbird.net/en-US/about/
+    page: 'Thunderbird: About (2026)'
+    supports: Operates in a separate for-profit subsidiary of the not-for-profit Mozilla.org; MPL 2.0; Thunderbird Council; team functions
+    date: 2026-10-18
+  - id: https://www.thunderbird.net/en-US/donate/
+    page: 'Thunderbird: Donate (2026)'
+    supports: MZLA is a wholly owned for-profit subsidiary of the not-for-profit Mozilla.org; gifts are not tax deductible; Stripe processes and Fundraise Up is the donation platform
+    date: 2026-10-18
+  - id: https://www.thunderbird.net/en-US/mobile/
+    page: 'Thunderbird: mobile (2026)'
+    supports: Thunderbird for Android on Google Play and F-Droid
+    date: 2026-10-18
+  - id: https://www.thunderbird.net/en-US/privacy/
+    page: Thunderbird privacy notice (2025-05-09)
+    supports: MZLA Technologies Corporation, address; services listed
+    date: 2026-10-18
+  - id: https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/
+    page: 'Thunderbird: State of the Bird 2024/25 (2025-10)'
+    supports: Contributions of $10.3 million in 2024; donors; 43 full-time staff; product statuses
+    date: 2026-10-18
+  - id: https://blog.thunderbird.net/
+    page: The Thunderbird Blog (index, read 2026-10-18)
+    supports: 'Latest posts: iOS first look (2026-10-01), release 153, Thundermail updates'
+    date: 2026-10-18
+  - id: https://blog.thunderbird.net/2026/04/thunderbird-pro-april-2026-update/
+    page: 'Thunderbird: Thunderbird Pro April 2026 update'
+    supports: Thundermail beta; Appointment and Send in development
+    date: 2026-10-18
+  - id: https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/
+    page: 'Thunderbird: Thundermail June 2026 update'
+    supports: Thundermail in beta, invited from a waitlist in waves; Thunderbird Pro renamed around the email service
+    date: 2026-10-18
+  - id: https://blog.thunderbird.net/2026/10/thunderbird-for-ios-a-first-look-at-the-native-iphone-email-app-in-development/
+    page: 'Thunderbird: Thunderbird for iOS first look (2026-10-01)'
+    supports: iOS app in development, not released
+    date: 2026-10-18
+  - id: https://github.com/thunderbird
+    page: 'GitHub: the Thunderbird organization'
+    supports: Repositories for Android, iOS and desktop
+    date: 2026-10-18
+  - id: https://www.mozilla.ai/
+    page: 'Mozilla.ai: home (2026)'
+    supports: MZL.AI, PBC in the footer; products and open tools
+    date: 2026-10-18
+  - id: https://mozilla.ai/company/about-us
+    page: 'Mozilla.ai: About us (2026)'
+    supports: Open-source AI company backed by the Mozilla Foundation; San Francisco; principles
+    date: 2026-10-18
+  - id: https://www.mozilla.ai/llms.txt
+    page: 'Mozilla.ai: llms.txt (last updated 2026-10-14)'
+    supports: 'Product statuses: Otari generally available, Octonous beta and free'
+    date: 2026-10-18
+  - id: https://mozilla.ai/product/otari
+    page: 'Mozilla.ai: Otari (2026)'
+    supports: Open source LLM control plane, hosted or self-hosted
+    date: 2026-10-18
+  - id: https://mozilla.ai/product/octonous
+    page: 'Mozilla.ai: Octonous (2026)'
+    supports: Agent platform for everyday work across connected tools; operated by MZL.AI, PBC
+    date: 2026-10-18
+  - id: https://github.com/mozilla-ai
+    page: 'GitHub: the mozilla-ai organization'
+    supports: Open repositories; Lumigator archived
+    date: 2026-10-18
+  - id: https://mozilla.vc/
+    page: Mozilla Ventures (2026)
+    supports: Three themes; active, latest post 2026-08-10
+    date: 2026-10-18
+  - id: https://mozilla.vc/portfolio
+    page: 'Mozilla Ventures: portfolio (2026)'
+    supports: Forty portfolio companies listed
+    date: 2026-10-18
+  - id: https://mozilladatacollective.com/
+    page: Mozilla Data Collective (2026)
+    supports: Mission-locked British company, incubated by the Foundation and backed by Mozilla.org; dataset sharing on contributors terms
+    date: 2026-10-18
+  - id: https://mozilladatacollective.com/terms
+    page: Mozilla Data Collective terms (2026-05-06)
+    supports: Mozilla Data Collective LTD, company 17054959, registered office
+    date: 2026-10-18
+  - id: https://mozilladatacollective.com/organization/cmfh0j9o10006ns07jq45h7xk
+    page: 'Mozilla Data Collective: the Common Voice organization page (reached from commonvoice.mozilla.org/en/datasets)'
+    supports: Common Voice datasets under CC0-1.0 listed on the Data Collective; 133,562 downloads shown on 2026-10-18
+    date: 2026-10-18
+  - id: https://mozilladatacollective.com/datasets
+    page: 'Mozilla Data Collective: datasets (2026)'
+    supports: 1,200 datasets listed; licences; an API; compensated datasets
+    date: 2026-10-18
+  - id: https://huggingface.co/spaces/mozilla-foundation/README/blob/main/README.md
+    page: 'Hugging Face: README of the mozilla-foundation organization'
+    supports: Effective October 2025 Common Voice datasets are exclusively available through Mozilla Data Collective, with an account and its terms
+    date: 2026-10-18
+  - id: https://discourse.mozilla.org/t/exciting-news-mozilla-data-collective/145191
+    page: 'Mozilla Discourse: Exciting news, Mozilla Data Collective (2025-07-30)'
+    supports: Announcement; relation to Common Voice
+    date: 2026-10-18
+  - id: https://find-and-update.company-information.service.gov.uk/company/17054959
+    page: 'Companies House: Mozilla Data Collective Limited (company 17054959)'
+    supports: Private limited company incorporated 2026-02-25; registered office; SIC codes
+    date: 2026-10-18
+  - id: https://find-and-update.company-information.service.gov.uk/company/17054959/persons-with-significant-control
+    page: 'Companies House: persons with significant control, Mozilla Data Collective Limited'
+    supports: Statement that no registrable person or entity exists (2026-02-25)
+    date: 2026-10-18
+  - id: https://stateof.mozilla.org/roadmap/
+    page: 'State of Mozilla 2025/26: Roadmap, where we are going together'
+    supports: aims (community and partnerships, open source AI partners, enterprise offering)
+    date: 2026-10-18
+  - id: https://stateof.mozilla.org/tools/
+    page: 'State of Mozilla 2025/26: Tools, what we are building'
+    supports: aims (the Thunderbird project sustained by donations and community code, the open source AI ecosystem)
+    date: 2026-10-18
+  - id: https://www.mozilla.org/en-US/careers/listings/
+    page: 'Mozilla: job listings (open roles by team, read 2026-10-18)'
+    supports: aims (major gifts, Firefox and Firefox Enterprise hiring, Thunderbird hiring)
+    date: 2026-10-18
+  - id: https://www.thunderbird.net/en-US/participate/
+    page: 'Thunderbird: Participate (code, translate, test, document)'
+    supports: aims (community contributors)
+    date: 2026-10-18
+  - id: https://github.com/mozilla-ai/any-llm
+    page: 'GitHub: the any-llm repository and its contributing guide (contributions welcome from developers of all experience levels)'
+    supports: aims (open source contributors)
+    date: 2026-10-18
+
+attestations: []
+grants: []

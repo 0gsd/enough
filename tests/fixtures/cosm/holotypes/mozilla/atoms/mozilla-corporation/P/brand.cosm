@@ -1,0 +1,56 @@
+cosm: 0.3
+
+# Mozilla Corporation: the Firefox company. Products are only those the Mozilla and Firefox pages show live in October 2026; Pocket and Fakespot are kept, retired, with their end dates. Mattering and affect are the modeller's reading at 0.5 to 0.7.
+
+brand:
+  id: P:mozilla-corporation
+  name: Mozilla Corporation
+  kind: company
+  summary: The company that makes Firefox and the privacy services, developer resources and AI products around it, funded mostly by search partnerships and owned by a non-profit.
+  since: 2005-08-03
+  legal-anchor: Mozilla Corporation, San Francisco CA; California C corporation; EIN 20-3226186
+  owner: O:role/Chief-Executive-Officer
+  confidence: 0.7
+  sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://www.mozilla.org/en-US/products/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/', 'https://www.firefox.com/en-US/', 'https://www.mozilla.org/en-US/advertising/', 'https://developer.mozilla.org/en-US/about']
+  visibility: public
+  parts: ['P:suite/firefox', 'P:suite/privacy-services', 'P:suite/web-platform', 'P:suite/ai-products', 'P:suite/advertising', 'P:suite/retired']
+  principles:
+    purpose: Provide internet-based open-source software and services to hundreds of millions of users to fulfil Mozilla's mission to make the internet open and accessible to all.
+    priorities:
+      - choice, control and peace of mind online
+      - protection without extra setup
+      - open source
+      - AI that is optional and can be turned off
+    value:
+      - {to: 'M:audience/firefox-users', proposition: a browser that blocks trackers by default and is not owned by shareholders}
+      - {to: 'M:audience/web-developers', proposition: 'free, high-quality, comprehensive documentation of the web platform'}
+      - {to: 'M:audience/advertisers', proposition: 'incremental audiences in brand-safe environments, with privacy-preserving measurement'}
+      - {to: 'M:audience/search-partners', proposition: default and optional placement of their search engines in Firefox}
+    quality:
+      - {goal: diversify revenue in the face of pressure in the browser market, measure: 'share of revenue from search royalties: 73% of consolidated revenue and support in 2024'}
+    decides:
+      - the public Firefox roadmap
+      - which products to phase out (Pocket and Fakespot in May 2025)
+      - search partnerships
+  vocabulary:
+    terms:
+      - {term: Mozilla Products, means: The internet-based open-source software and services the Corporation makes available to hundreds of millions of users.}
+      - {term: royalty, means: 'In the audited statements: a percentage of the revenue Firefox''s search partners earn through their search engines in Firefox.'}
+      - {term: mask, means: A forwarding email address or phone number Firefox Relay creates so a person does not reveal their real one.}
+    assumes:
+      - search royalties continue to fund most of the browser
+    boundary:
+      - the Corporation does not make Thunderbird (MZLA does), Mozilla.ai's tools or the Foundation's programs
+  mattering:
+    inside:
+      - who: ['O:role/Chief-Executive-Officer', 'O:role/Firefox-Engineering', 'O:role/Firefox-Product-Management']
+        because: Mozilla says the work is to keep the internet open and accessible to all; the 2024 report speaks of pressure in the browser market.
+        confidence: 0.5
+    chosen:
+      - who: ['M:audience/firefox-users', 'M:audience/privacy-subscribers', 'M:audience/web-developers']
+        because: More than 210 million people use Firefox each month (2026) and about 15 million use MDN, by Mozilla's own counts.
+        confidence: 0.5
+    prospective:
+      - who: ['M:audience/enterprise-it', 'M:audience/ai-builders']
+        because: Mozilla now sells Firefox Enterprise to organizations and 0DIN and Tabstack to AI builders.
+        confidence: 0.5

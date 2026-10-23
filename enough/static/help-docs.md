@@ -15,7 +15,7 @@ name: wikisink
 path: ~/enough/wikisink/
 
 ### what
-your local, offline copy of (a slice of) english wikipedia — a single Kiwix ZIM archive read in place, never extracted, so the file manager only ever shows articles you explicitly save. the 🚰 button opens a browser-style reader with full-text search, cross-links, a random-article die, a readvisor chat pill, comments, and a single <strong>save button</strong> whose flyout offers two destinations (this project's <code>wiki/</code>, or the global <code>~/enough/cacheawl/wiki/</code> cachebox shared across projects). your readvisors can search and read the whole archive through their wiki tools.
+your local, offline copy of (a slice of) english wikipedia — a single Kiwix ZIM archive read in place, never extracted, so the file manager only ever shows articles you explicitly save. the 🚰 button opens a browser-style reader with full-text search, cross-links, a random-article die, a readvisor chat pill, comments, and a single <strong>save button</strong> whose flyout offers two destinations (this project's <code>wiki/</code>, or the global <code>~/enough/canon/wiki/</code> volume shared across projects). your readvisors can search and read the whole archive through their wiki tools.
 
 ### how
 first click of 🚰 runs the setup wizard: pick a size (top-1M-articles no-images ≈ 16 GB is the default; full english ≈ 49 GB; smaller options too), pick a storage folder (external drives work), confirm, and let the resumable download run — pause, quit, resume anytime. you can keep <em>several installs</em> in different places (say, the full archive on an external drive plus a small one on the internal disk) and switch between them in the ⚙ installs list; if a drive is detached, its install just shows as unreachable until the drive returns. once installed, ask your chief readvisor to run a <strong>wikisink</strong> to refresh your saved/commented ("watched") articles from live wikipedia and get a report: watched-article changes, edit spikes, pageview movers &amp; losers, and suspicious deletions. the 🛡 button on any article is the <em>deletion override</em>: keep your local copy forever, excluded from updates. ⚙ opens the installs manager, including base-archive replacement when a newer snapshot ships. you don't have to go looking for that: when a newer build of your flavor exists, a small pill appears in the reader toolbar (<code>newer snapshot: date · size</code>) — click it, confirm the size, and the same in-place upgrade runs, downloading first and swapping in only when it's done. the check happens at most once a day, never blocks the reader, and stays silent when you're offline.
@@ -33,7 +33,7 @@ path: wiki/
 wikipedia articles saved into this project from the wikisink browser (the save button → "this project"). each save is a folder: <code>article.html</code> (the article exactly as the archive had it — click it to read in the wikisink viewer, full fidelity, infoboxes and all) plus <code>_manifest.md</code> (source URL, CC BY-SA license, retrieval date, origin).
 
 ### how
-created automatically on your first project-level save — no setup. wikisink update runs treat everything here as <em>watched</em>: refreshed from live wikipedia and reported on. re-saving an article overwrites the folder with the freshest copy; to remove one, hover its folder in the tree a moment and click the 🗑 that appears. saved copies aren't meant to be hand-edited — they'd drift out of sync with the archive. (the save button's other choice saves to the global <code>~/enough/cacheawl/wiki/</code> cachebox instead, shared across all projects.)
+created automatically on your first project-level save — no setup. wikisink update runs treat everything here as <em>watched</em>: refreshed from live wikipedia and reported on. re-saving an article overwrites the folder with the freshest copy; to remove one, hover its folder in the tree a moment and click the 🗑 that appears. saved copies aren't meant to be hand-edited — they'd drift out of sync with the archive. (the save button's other choice saves to the global <code>~/enough/canon/wiki/</code> volume instead, shared across all projects.)
 
 ### ideas
 - saved articles open in the reader even when the archive's drive is detached — they're your offline-offline copies.
@@ -223,19 +223,19 @@ drop files into <code>rness/io/input/</code> and your readvisors will see them. 
 - clear both periodically — your readvisors don't need yesterday's scratch work in their context.
 
 ## infoworld
-name: cacheawl
-path: ~/enough/cacheawl/
+name: canon
+path: ~/enough/canon/
 
 ### what
-the machine-global file store, shared across every enough project. (this replaces the old <code>infoworld/</code> library — on your first launch of this version, your <code>personal/</code>, <code>public/</code>, and <code>wiki/</code> folders were moved here, each becoming a cachebox.) a <em>cachebox</em> is a top-level folder in the store: either plain text you want to keep forever, or a "cached replica" ingested from a local path, a website, or a set of wikipedia articles. the store is hidden from every project's file tree and managed through cacheawl mode + your readvisors' cachebox tools.
+the machine-global file store, shared across every enough project. (this replaces the old <code>infoworld/</code> library — on your first launch of this version, your <code>personal/</code>, <code>public/</code>, and <code>wiki/</code> folders were moved here, each becoming a volume.) a <em>volume</em> is a top-level folder in the store: either plain text you want to keep forever, or a "cached replica" ingested from a local path, a website, or a set of wikipedia articles. the store is hidden from every project's file tree and managed through canon mode + your readvisors' canon tools.
 
 ### how
-open cacheawl mode (the topbar cacheawl button) for a two-pane view: your project on one side, the cacheboxes on the other. drag a file across to copy it, shift-drag to move; the ingest bar composes a request to your chief readvisor to pull in a path/site/wiki topic. or just ask in the panel — your readvisors can list, create, and ingest into cacheboxes (gated by the "cacheawl tools" broker toggle). each box carries an auto-generated <code>_cachebox.merirmaid</code> diagram of its contents (read-only — it regenerates from the files) and hidden metadata; you never edit those directly.
+open canon mode (the topbar canon button) for a two-pane view: your project on one side, the volumes on the other. drag a file across to copy it, shift-drag to move; the ingest bar composes a request to your chief readvisor to pull in a path/site/wiki topic. or just ask in the panel — your readvisors can list, create, and ingest into volumes (gated by the "canon tools" broker toggle). each volume carries an auto-generated <code>canon.cosm</code> catalog of its contents (read-only — it regenerates from the files) and hidden metadata; you never edit those directly.
 
 ### ideas
 - ingest a documentation site to a shallow depth so your readvisors can ground on it fully offline.
-- keep a <code>personal</code> cachebox of reference material queryable from any project.
-- save wikipedia articles you rely on to the global <code>wiki</code> cachebox — shared everywhere, not tied to one project.
+- keep a <code>personal</code> volume of reference material queryable from any project.
+- save wikipedia articles you rely on to the global <code>wiki</code> volume — shared everywhere, not tied to one project.
 
 ## mode-system
 name: read / edit mode
@@ -245,7 +245,7 @@ path: the file viewer
 clicking a file opens it in one unified <strong>read/edit mode</strong> with two faces — a read face (eye) and an edit face (pencil). it lives either as a mini side panel next to the chat or expanded to a full frame; use the mini↔full toggle to switch. edits are dirty-guarded, so you won't lose unsaved changes by navigating away by accident. files enough doesn't display natively still open: a word file, pdf, deck or workbook opens as its markdown <em>twin</em> (see the <em>converted document</em> bubble on any such row), and an image opens in a plain viewer with fit and 1:1 sizes.
 
 ### how
-single-click a file in the tree to open it in the mini panel; expand it to a full frame when you want room. flip between the read (eye) and edit (pencil) faces with the dedicated face-toggle buttons in the read/edit chrome. every open mode shows a square indicator top-right (newest on the left) with a little red-x ribbon to close it — modes <em>stack</em>, so closing one reveals the mode beneath exactly as you left it. click a buried indicator to bring that mode forward; press <code>esc</code> to close the topmost mode. the same indicator + ribbon pattern covers every full-frame mode (wikisink, girraph, merirmaid, cacheawl, and the read-only <strong>help center</strong> reference mode, launched from the small <strong>help</strong> button at the top right of the ui window).
+single-click a file in the tree to open it in the mini panel; expand it to a full frame when you want room. flip between the read (eye) and edit (pencil) faces with the dedicated face-toggle buttons in the read/edit chrome. every open mode shows a square indicator top-right (newest on the left) with a little red-x ribbon to close it — modes <em>stack</em>, so closing one reveals the mode beneath exactly as you left it. click a buried indicator to bring that mode forward; press <code>esc</code> to close the topmost mode. the same indicator + ribbon pattern covers every full-frame mode (wikisink, girraph, merirmaid, canon, and the read-only <strong>help center</strong> reference mode, launched from the small <strong>help</strong> button at the top right of the ui window).
 
 ### ideas
 - keep a file open in the mini panel while you chat — reference and conversation side by side.
@@ -271,7 +271,7 @@ name: merirmaid
 path: *.merirmaid
 
 ### what
-enough's flavor of a <a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid</a> diagram: plain-text diagram source with a small header, rendered live to a picture in the browser (flowcharts, sequence diagrams, state machines, ER diagrams — anything Mermaid supports). two kinds: a <em>wip</em> diagram you can tweak, and a <em>mirror</em> that reflects some structure (like a cachebox's contents) and is read-only.
+enough's flavor of a <a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid</a> diagram: plain-text diagram source with a small header, rendered live to a picture in the browser (flowcharts, sequence diagrams, state machines, ER diagrams — anything Mermaid supports). two kinds: a <em>wip</em> diagram you can tweak, and a <em>mirror</em> that reflects some structure (like a volume's contents) and is read-only.
 
 ### how
 ask your chief readvisor to draw or revise a diagram — they write the <code>.merirmaid</code> source; opening the file renders it. in a wip diagram you can click a node's text to edit the label in place (with a live character count); structural changes go through your chief readvisor via the chat pill. nodes can link to other diagrams or docs — click them to follow, with breadcrumbs to step back. a bad diagram shows the error plus the raw source, never a blank pane. mirror diagrams show a "mirror" badge instead of edit handles.
@@ -281,20 +281,79 @@ ask your chief readvisor to draw or revise a diagram — they write the <code>.m
 - link a set of diagrams together with clickable nodes to build a navigable map.
 - pair it with girraphs: a girraph for the argument, a merirmaid for the flow.
 
-## cacheawl
-name: cacheawl
-path: ~/enough/cacheawl/
+## canon
+name: canon
+path: ~/enough/canon/
 
 ### what
-the machine-global store of <em>cacheboxes</em> — top-level folders holding text you want to keep forever, or cached replicas ingested from a local path, a website, or wikipedia articles. shared across every project and hidden from project file trees. this is where the old <code>infoworld</code> library now lives.
+the machine-global store of <em>volumes</em> — top-level folders holding text you want to keep forever, or cached replicas ingested from a local path, a website, or wikipedia articles. shared across every project and hidden from project file trees. this is where the old <code>infoworld</code> library now lives.
 
 ### how
-open cacheawl mode from the topbar for the two-pane view (project ↔ cacheboxes): drag to copy a file between them, shift-drag to move, and use the ingest bar to ask your chief readvisor to pull a source into a box. or just say so in the panel — your readvisors can list, create, and ingest into boxes when the "cacheawl tools" broker toggle is on (url ingests also respect your fetch_url toggles). every box shows an auto-generated diagram of its contents (<code>_cachebox.merirmaid</code>, read-only) and keeps hidden metadata you don't touch.
+open canon mode from the topbar for the two-pane view (project ↔ volumes): drag to copy a file between them, shift-drag to move, and use the ingest bar to ask your chief readvisor to pull a source into a volume. or just say so in the panel — your readvisors can list, create, and ingest into volumes when the "canon tools" broker toggle is on (url ingests also respect your fetch_url toggles). every volume keeps an auto-generated catalog of its contents (<code>canon.cosm</code>, read-only) and hidden metadata you don't touch. double-click that catalog — or a holotype, or any other <code>.cosm</code> file — to browse it in the cosm viewer; the <strong>project catalog</strong> button does the same for this project's own (<code>rness/canon.cosm</code>). a text that has an EML twin wears a small tinted twin badge.
 
 ### ideas
 - ingest a docs site or a folder of notes so your readvisors can work from it offline.
-- move a finished artifact into a cachebox to keep it out of the working project but still reachable everywhere.
-- double-click a box's diagram to see its shape at a glance in the merirmaid viewer.
+- move a finished artifact into a volume to keep it out of the working project but still reachable everywhere.
+- click the little diagram button on a volume's tile to see its shape at a glance in the merirmaid viewer.
+
+## cosm-viewer
+name: cosm viewer
+path: *.cosm
+
+### what
+the structured view of any <code>.cosm</code> volume — a canon volume's catalog, a comprise holotype, a text's EML twin, a standalone product tree. the rail on the left shows the catalog (its name, the language it is written in, its address), its modules and kinds with how many items each holds, and the checks; the column beside it shows one card per item: its id, kind and status, its name and summary, then every other field. an id that points at another item is a link, and an open question is marked with a ringed <strong>?</strong>.
+
+### how
+double-click a catalog, a holotype or any <code>.cosm</code> file in canon, or click a <code>.cosm</code> row in the file tree. click a module or kind in the rail to go there, and any linked id to jump to that item — a "back" pill takes you back. <strong>lens</strong> draws the volume as a diagram in merirmaid; shift-click a node there and pick <strong>show item</strong> to come back to its card. <strong>open raw</strong> shows the file itself as plain text, <strong>about this format</strong> opens the specification at the section on this volume's language, ⌘F finds words in the cards, and the size button docks the viewer to the side.
+
+### ideas
+- open this project's catalog from canon's <strong>project catalog</strong> button to see every file, its twins and its atems at a glance.
+- a big holotype shows forty cards per kind at first; <strong>show all</strong> brings the rest.
+- the checks are MacroCOSM's generic ones; a holotype's own rules belong to comprise, and the rail says how many it leaves to them.
+
+## cosmspec
+name: MacroCOSM specification
+path: docs/MACROCOSM_OES.md
+
+### what
+the specification of <strong>MacroCOSM OES</strong>, the shared grammar every <code>.cosm</code> file is written in: how a file is read, how a volume names the language it is written in, what an item and its envelope are, how items point at each other, how an unknown is written down, how anything is addressed, which checks every volume can be held to — and, in section 18, the four languages enough reads: comprise, cosm, canon and eml.
+
+### how
+open it from the <strong>MacroCOSM</strong> button at the top of the ui window, or from <strong>about this format</strong> in the cosm viewer, which lands on the right section. <strong>contents</strong> lists the sections, a "section 18.4" in the text is a link, ⌘F finds, and the size button docks it beside your work. it is written in english for now.
+
+### ideas
+- start with section 2, the model on one page.
+- keep it docked beside a holotype in the cosm viewer while you learn to read one.
+
+## canon-chip
+name: canon chip
+path: notes.md → notes.md.cosm
+
+### what
+the little group in a text's header, beside the convert chip, that says whether this text has an <strong>EML twin</strong>: a <code>.cosm</code> file written beside it (<code>notes.md</code> → <code>notes.md.cosm</code>) that takes the text apart into the words it leans on, the people and things it names, the claims it makes and how it knows them, and the events it tells. the twin badge is tinted when there is a twin, hollow when there isn't, and wears a dot when the text has changed since its twin was written. nothing is decompiled on its own — only when you ask.
+
+### how
+<strong>twin</strong> turns the reader to the twin, at the same size, in place of the text: the cosm viewer's cards, with <strong>back to the text</strong> to return, <strong>compile text</strong> to write the twin back out as a new datestamped markdown file beside it, <strong>lens</strong> for a diagram and <strong>open raw</strong> for the file itself. with no twin yet, twin decompiles first and turns over when it's done. the <strong>atem</strong> button gives you the whole text in one line (see the atem card). <strong>decompile</strong> makes the twin and <strong>refresh twin</strong> makes it again; when the twin is already up to date, enough asks first. the work shows as a toast you can cancel. with a model running it takes a while, and a chat message you send meanwhile waits its turn; with no model running you get a labelled scaffold — the words and the names, no claims yet.
+
+### ideas
+- decompile a long chapter once, then read the twin's claims as a checklist of what the chapter really argues.
+- <strong>atem</strong> and <strong>decompile</strong> are also on canon's shift-click menu and the file tree's option-click menu, and <strong>atem</strong> is on merirmaid's node menu for a node that names a text.
+- a twin opened raw is plain text you can read and edit; the cosm viewer checks it for you.
+
+## atem-card
+name: atem card
+path: (the atem of a text or a passage)
+
+### what
+an <strong>atem</strong> is the tightest fair, full, plain-English reduction of a text or of a passage. the card sets <em>the line</em> large — one sentence of fifteen to twenty-five words that says what the whole says — then three short parts: <strong>focus</strong>, what is happening and where the author points you; <strong>push</strong>, what the author wants you to take away; <strong>pull</strong>, what you should actually take away, with any hidden assumption or dependency named. where push and pull differ is usually the most useful thing on the card. rest the pointer on a label for its definition. when the model says how the claims are known, a strip shows the six stances with their counts.
+
+### how
+ask for one with <strong>atem</strong> on the canon chip or a file menu (the whole text — its atem is kept in the text's EML twin), or select a passage and right-click it: <strong>atem of selection</strong> is there in the reader, the editor, a wikisink article, the help center, the specification and a composure text page. while it reads, the card says so and offers cancel. <strong>copy</strong> copies the line (⇧-click copies all four parts), <strong>pin to twin</strong> keeps a passage's atem in the text's twin together with where it sits, and <strong>open twin</strong> shows the twin a whole-text atem went into. with no model running the card shows a scaffold: the line and the focus come from the text's first sentences, and push and pull stay open questions.
+
+### ideas
+- read a draft's atem before you send it. if the line isn't what you meant, the draft isn't either.
+- pin the atems of a long piece's key passages and you have a spine to revise against.
+- compare push and pull on someone else's argument: the gap between them is where to push back.
 
 ## footnotes
 name: footnotes

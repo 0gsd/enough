@@ -1,0 +1,52 @@
+# R — surfaces: where the nonprofit shows itself in public. All self-hosted or on its own accounts; none is a platform listing.
+nodes:
+  - id: R:surface/website
+    type: surface
+    name: khanacademy.org
+    summary: "The main site: free courses and practice, test prep, teacher tools, the district pages, the Kids pages, the supporters list, the impact page and the donate pages, with a country selector for the United States, India, Mexico and Brazil."
+    kind: website
+    url: https://www.khanacademy.org
+    presents: [P:offering/courses-and-practice, P:offering/test-prep, P:offering/teacher-tools, P:offering/districts-partnership, P:offering/learning-paths, P:offering/khan-kids, P:offering/kids-for-schools, P:offering/international-programs]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Chief-Technology-Officer
+    provenance: {mode: net-scan, sources: [ka-home, ka-about, ka-districts, ka-kids], confidence: 0.9, state: known}
+
+  - id: R:surface/khanmigo-site
+    type: surface
+    name: khanmigo.ai
+    summary: "The AI tutor and teaching assistant's own site, with pages for learners, parents, teachers, districts and the Writing Coach, and the price of the subscription."
+    kind: website
+    url: https://www.khanmigo.ai
+    presents: [P:offering/khanmigo-teachers, P:offering/khanmigo-families, P:offering/writing-coach]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Chief-Learning-Officer
+    provenance: {mode: net-scan, sources: [khanmigo-home, khanmigo-learners, khanmigo-parents], confidence: 0.9, state: known}
+
+  - id: R:surface/github
+    type: surface
+    name: GitHub organization (github.com/Khan)
+    summary: "The nonprofit's open-source code: 474 public repositories on 2026-10-18, mostly JavaScript, Python, Go and TypeScript, including the exercise renderer and the design-system components."
+    kind: code-host
+    presents: [P:product/learning-platform]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Chief-Technology-Officer
+    provenance: {mode: net-scan, sources: [github-khan], confidence: 0.8, state: known}
+
+  - id: R:surface/blog
+    type: surface
+    name: Khan Academy blog
+    summary: "News, announcements and the engineering blog: the 2026 districts redesign, partner announcements, the Gemini-powered Khanmigo tools and the Go backend posts."
+    kind: blog
+    url: https://blog.khanacademy.org
+    presents: [P:offering/districts-partnership, P:suite/khanmigo]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Chief-External-Relations-Officer
+    provenance: {mode: net-scan, sources: [blog-districts-2026, blog-google-org, eng-go-rewrite], confidence: 0.8, state: known}

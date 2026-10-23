@@ -1,0 +1,49 @@
+# R: claims.
+nodes:
+  - id: R:claim/trustworthy-ai
+    type: claim
+    name: AI that is trustworthy, transparent and controllable
+    summary: The mission line on the home page.
+    text: AI solutions should be trustworthy, transparent and controllable.
+    about: ['P:mozilla-ai']
+    'on': ['R:surface/website']
+    evidence:
+      state: partial
+      by: ['P:offering/otari']
+      measure: budgets, approvals and logs are shipped in Otari and Octonous; no external audit read
+    status: active
+    visibility: public
+    owner: O:role/Chief-Executive-Officer
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.ai/', 'https://mozilla.ai/product/octonous'], confidence: 0.6, state: known}
+
+  - id: R:claim/otari-open-source
+    type: claim
+    name: Otari is an open source LLM control plane
+    summary: On the Otari page.
+    text: The Open Source LLM Control Plane.
+    about: ['P:offering/otari']
+    'on': ['R:surface/website']
+    evidence:
+      state: supported
+      by: ['S:codebase/otari']
+      measure: a public Apache-2.0 repository, otari, with about 650 stars
+    status: active
+    visibility: public
+    owner: O:role/Product-Team
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/product/otari', 'https://github.com/mozilla-ai'], confidence: 0.8, state: known}
+
+  - id: R:claim/approval-before-action
+    type: claim
+    name: Octonous requires approval before it sends or changes anything
+    summary: On the Octonous page.
+    text: Requires approval before sending or changing anything, shows each action and keeps reviewable logs.
+    about: ['P:offering/octonous']
+    'on': ['R:surface/octonous-site']
+    evidence:
+      state: unverified
+      by: ['P:offering/octonous']
+      measure: a product claim for a beta; not tested here
+    status: active
+    visibility: public
+    owner: O:role/Product-Team
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/product/octonous'], confidence: 0.6, state: known}

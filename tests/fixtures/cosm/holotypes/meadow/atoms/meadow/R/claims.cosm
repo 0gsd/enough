@@ -1,0 +1,17 @@
+# R — claims: what the firm says in public, about which node, with what evidence.
+nodes:
+  - id: R:claim/books-by-7am
+    type: claim
+    name: Books you can trust by 7am
+    summary: The headline promise on the website; restates the ledger's value proposition.
+    text: "Books you can trust by 7am without hiring a bookkeeper."
+    about: [P:offering/ledger]
+    on: [R:surface/website]
+    evidence:
+      state: supported
+      by: [P:service/reconcile]
+      measure: share of customer-days closed by 07:00 local
+    status: active
+    visibility: public
+    owner: O:role/Founder
+    provenance: {mode: net-scan, sources: [meadow-website, session-1], confidence: 0.9, state: known}

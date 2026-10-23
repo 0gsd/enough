@@ -1,0 +1,26 @@
+# O — positions: the two seats at the top, as the Form 990 and the leadership page show them. The executive team's titles are roles above; who sits
+# in any seat is an E:assignment in the store and is not imported in a public sample.
+nodes:
+  - id: O:position/board
+    type: position
+    name: Board seat
+    summary: "The voting seats of the board; a template with 12 instances at the end of the year to June 2025, 11 of them independent. Terms are three years in a classified board since the June 2025 bylaws."
+    roles: [O:role/Board]
+    primary: O:role/Board
+    reports-to: none
+    template: true
+    instances: 12
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [f990-2025], confidence: 0.9, state: known}
+
+  - id: O:position/chief-executive
+    type: position
+    name: Chief executive
+    summary: "The top executive seat; pay is evaluated by the compensation committee. The executive team (finance, learning, technology, external relations, legal, strategic partnerships, Kids and international) reports to it."
+    roles: [O:role/Chief-Executive]
+    primary: O:role/Chief-Executive
+    reports-to: O:position/board
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-leadership, f990-2025], confidence: 0.9, state: known}

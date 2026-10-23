@@ -1,0 +1,53 @@
+# S: the systems the Corporation publicly runs: the browser's source and its build, issue and documentation stack.
+nodes:
+  - id: S:codebase/firefox
+    type: codebase
+    name: Firefox source tree
+    summary: 'The official Firefox repository on GitHub: the Gecko engine and the browser, written in C++, Rust and JavaScript; developer documentation at firefox-source-docs.mozilla.org; bugs are tracked on Bugzilla.'
+    runs: ['P:product/firefox-desktop', 'P:product/firefox-android']
+    url: https://github.com/mozilla-firefox/firefox
+    vendor: S:vendor/github
+    counterparty: C:counterparty/github
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-firefox/firefox', 'https://firefox-source-docs.mozilla.org/'], confidence: 0.8, state: known}
+
+  - id: S:system/firefox-ci
+    type: system
+    name: Firefox CI and Taskgraph
+    summary: The continuous integration system that builds and tests Firefox, documented in the Firefox Source Tree Documentation.
+    category: ci
+    vendor: none
+    counterparty: none
+    used-by: ['S:codebase/firefox', 'P:service/firefox-release-channels']
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Engineering
+    provenance: {mode: net-scan, sources: ['https://firefox-source-docs.mozilla.org/'], confidence: 0.7, state: known}
+
+  - id: S:system/bugzilla
+    type: system
+    name: Bugzilla
+    summary: The bug tracker at bugzilla.mozilla.org where Firefox bugs are tracked.
+    category: issue-tracker
+    vendor: none
+    counterparty: none
+    used-by: ['S:codebase/firefox']
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-firefox/firefox'], confidence: 0.8, state: known}
+
+  - id: S:system/mdn-platform
+    type: system
+    name: MDN platform
+    summary: The MDN site and its open-source content repository on GitHub, through which a global community contributes content, translations and browser compatibility data.
+    category: cms
+    vendor: S:vendor/github
+    counterparty: C:counterparty/github
+    used-by: ['P:offering/mdn', 'P:product/mdn-web-docs']
+    status: active
+    visibility: public
+    owner: O:role/MDN-Team
+    provenance: {mode: net-scan, sources: ['https://developer.mozilla.org/en-US/about'], confidence: 0.7, state: known}

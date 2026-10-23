@@ -1,0 +1,125 @@
+# O: roles: the chief executive, the council and the twelve team functions the about page lists. Nobody is named.
+nodes:
+  - id: O:role/Chief-Executive
+    type: role
+    name: Chief Executive
+    summary: The chief executive seat, titled CEO of Thunderbird on the leadership page.
+    governs: ['P:thunderbird']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.9, state: known}
+
+  - id: O:role/Thunderbird-Council
+    type: role
+    name: Thunderbird Council
+    summary: The elected council of the Thunderbird project.
+    governs: ['C:governance/thunderbird-council']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/'], confidence: 0.8, state: known}
+
+  - id: O:role/Desktop-engineering
+    type: role
+    name: Desktop engineering
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['P:offering/thunderbird-desktop']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: O:role/Mobile-engineering
+    type: role
+    name: Mobile engineering
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['P:offering/thunderbird-android', 'P:offering/thunderbird-ios']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: O:role/Web-services-engineering
+    type: role
+    name: Web services engineering
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['P:offering/thunderbird-pro']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: O:role/Security
+    type: role
+    name: Security
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['O:unit/security']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: O:role/Release-engineering
+    type: role
+    name: Release engineering
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['P:product/desktop-release-channel']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: O:role/UX-and-visual-design
+    type: role
+    name: UX and visual design
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['O:unit/ux-and-visual-design']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: O:role/Community-programs
+    type: role
+    name: Community programs
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['O:unit/community-programs']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: O:role/Marketing
+    type: role
+    name: Marketing
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['P:function/fundraising']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: O:role/Customer-and-technical-support
+    type: role
+    name: Customer and technical support
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['O:unit/customer-and-technical-support']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: O:role/Product-management
+    type: role
+    name: Product management
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['P:offering/thunderbird-enterprise']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: O:role/People-operations
+    type: role
+    name: People operations
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['O:unit/people-operations']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: O:role/Finance
+    type: role
+    name: Finance
+    summary: A team function listed on the Thunderbird about page; about 80% of the 43 full-time staff at the end of 2024 worked on technical roles such as product development and infrastructure.
+    governs: ['O:unit/finance']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}

@@ -1,0 +1,107 @@
+# C — the bonds. Three join this atom to the Wikimedia Endowment and are mirrored there (same id, kinds, from and to): the Endowment's grants
+# to the Foundation, the donations and estate gifts the Foundation passes to the Endowment, and the cost-sharing agreement under which Foundation staff
+# manage the Endowment. Two more run to stubs (the movement's affiliates; Wikimedia Deutschland, the Wikibase partner). The Foundation holds no
+# ownership stake in the Endowment and does not consolidate it (control: none, accounting: none).
+nodes:
+  - id: C:bond/endowment-funds-foundation
+    type: bond
+    name: endowment funds foundation
+    summary: "The Endowment gives restricted grants for Wikimedia projects: $3.1M in 2024-25 (Abstract Wikipedia $950K, machine learning $1.0M, Commons $150K, Wikidata $1.0M) and $2.6M in the period to 30 June 2024 (MediaWiki $1.5M, Abstract Wikipedia $600K, new audiences $500K)."
+    kinds: [funds]
+    from: atom/wikimedia-endowment
+    to: atom/wikimedia-foundation
+    economic: 0
+    control: none
+    accounting: none
+    basis: "the Endowment funds projects approved by and advancing the purposes of the Foundation or its successor; the Foundation books the grants as contributions with donor restrictions"
+    scope: [P:product/wikifunctions, P:offering/commons, P:offering/wikidata, P:service/machine-learning, P:product/mediawiki]
+    since: 2023-09-30
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.9, state: known}
+    voting: 0
+    nci: 0
+
+  - id: C:bond/foundation-passes-gifts-to-endowment
+    type: bond
+    name: foundation passes gifts to endowment
+    summary: The Foundation receives donations designated for the Endowment and transfers them monthly ($6.44M in 2024-25, $10.71M in 2023-24); undesignated estate gifts it receives are also given to the Endowment ($1.49M in 2024-25, $0.62M in 2023-24).
+    kinds: [funds]
+    from: atom/wikimedia-foundation
+    to: atom/wikimedia-endowment
+    economic: 0
+    control: none
+    accounting: none
+    basis: "designated gifts are not Foundation revenue; estate gifts are booked as both contributions revenue and awards-and-grants expense"
+    scope: [P:service/recurring-and-planned-giving]
+    contract: C:contract/cost-sharing
+    since: 2023-09-30
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}
+    voting: 0
+    nci: 0
+
+  - id: C:bond/foundation-manages-endowment
+    type: bond
+    name: foundation manages endowment
+    summary: The Endowment has no employees; Foundation staff manage it and keep its books under a cost-sharing agreement that renews yearly. The Foundation recognised $2.07M of cost-sharing revenue in 2024-25; the Endowment reports $1.47M paid (cost plus a 15% administrative fee).
+    kinds: [manages, shares-services-with, affiliated]
+    from: atom/wikimedia-foundation
+    to: atom/wikimedia-endowment
+    economic: 0
+    control: none
+    accounting: none
+    basis: "the Foundation has no control or controlling financial interest; the Endowment has a separate Board of Directors; it is a related party because its management is also Foundation management"
+    scope: [P:service/endowment-management]
+    contract: C:contract/cost-sharing
+    since: 2023-09-30
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions", "https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf"], confidence: 0.9, state: known}
+    pending: "why the two sides report different cost-sharing amounts for 2024-25 ($2.07M recognised by the Foundation, $1.47M paid by the Endowment)"
+    voting: 0
+    nci: 0
+
+  - id: C:bond/foundation-funds-affiliates
+    type: bond
+    name: foundation funds affiliates
+    summary: The Foundation awards grants to the movement's independent chapters, thematic organizations, user groups and individuals; awards and grants were $28.7M in 2024-25 (community and project grants $26.3M).
+    kinds: [funds, affiliated]
+    from: atom/wikimedia-foundation
+    to: C:counterparty/affiliates
+    economic: 0
+    control: none
+    accounting: none
+    basis: "affiliates are independent organizations that share the Foundation's goals; the Board of Trustees recognises affiliation models and the Affiliations Committee advises on each recognition"
+    scope: [P:offering/grants]
+    contract: C:contract/affiliate-agreements
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://meta.wikimedia.org/wiki/Wikimedia_movement_affiliates"], confidence: 0.85, state: known}
+    voting: 0
+    nci: 0
+
+  - id: C:bond/foundation-wikibase-with-wmde
+    type: bond
+    name: foundation wikibase with wmde
+    summary: A collaborative arrangement with Wikimedia Deutschland to develop Wikibase, the software behind Wikidata; the Foundation grants Wikimedia Deutschland funding for it ($6.19M in 2024-25, $6.07M in 2023-24).
+    kinds: [funds, affiliated]
+    from: atom/wikimedia-foundation
+    to: C:counterparty/wikimedia-deutschland
+    economic: 0
+    control: none
+    accounting: none
+    basis: "both organizations work on the Wikidata project; the Foundation's cost is within awards and grants"
+    scope: [P:product/wikibase, P:offering/wikidata]
+    contract: C:contract/wikibase-collaboration
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+    voting: 0
+    nci: 0

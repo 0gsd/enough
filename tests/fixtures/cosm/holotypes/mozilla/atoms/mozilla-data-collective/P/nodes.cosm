@@ -1,0 +1,127 @@
+cosm: 0.3
+
+# Mozilla Data Collective: the platform and the Common Voice distribution.
+
+nodes:
+  - id: P:offering/dataset-platform
+    type: offering
+    name: The dataset platform
+    summary: A catalogue where contributors upload datasets, keep ownership and choose the licence, the price and who may use each one; 1,200 datasets are listed under many licences (CC-BY, CC-BY-SA, CC0, GPL-3.0, Apache-2.0, NOODL-1.0 and the platform's own agreement), with an API.
+    owner: O:role/Founder-and-Chief-Executive
+    confidence: 0.8
+    sources: ['https://mozilladatacollective.com/', 'https://mozilladatacollective.com/datasets']
+    since: 2026-02-25
+    visibility: public
+    parts: ['P:product/dataset-catalog', 'P:service/data-api', 'P:service/compensated-datasets']
+    economics:
+      price:
+        model: set by each uploader
+        detail: openly licensed, community-governed or priced by the uploader
+    affect:
+      audience: M:audience/dataset-users
+      elicits:
+        - {feeling: trust, when: seeing where a dataset came from and under what licence}
+        - {feeling: agency, when: setting the terms of a dataset}
+    mattering:
+      to-the-whole: The product itself.
+      weight: critical
+      inside:
+        - who: ['O:role/Founder-and-Chief-Executive']
+          because: The company is led by its founder, per the leadership page.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/dataset-contributors', 'M:audience/dataset-users']
+          because: Contributors keep ownership and set their terms, the home page says.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/dataset-users']
+          because: The home page invites people to browse datasets shared by organisations and communities worldwide.
+          confidence: 0.5
+
+  - id: P:product/dataset-catalog
+    type: product
+    name: Dataset catalogue
+    summary: The browsable catalogue of datasets with provenance and licence on every listing; 1,200 datasets in October 2026.
+    owner: O:role/Founder-and-Chief-Executive
+    confidence: 0.8
+    sources: ['https://mozilladatacollective.com/datasets']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: datasets, to: 'M:audience/dataset-users', unit: downloads/month}
+    mattering:
+      to-the-whole: 'The browsable catalogue: 1,200 datasets in October 2026.'
+      weight: critical
+      inside:
+        - who: ['O:role/Founder-and-Chief-Executive']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/data-api
+    type: service
+    name: API
+    summary: A programmatic route to the catalogue and downloads; the site links an API reference. Common Voice announced a public API in 2025.
+    owner: O:role/Founder-and-Chief-Executive
+    confidence: 0.7
+    sources: ['https://mozilladatacollective.com/datasets', 'https://discourse.mozilla.org/t/exciting-news-mozilla-data-collective/145191']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: api-calls, to: 'M:audience/dataset-users', unit: calls/day}
+    mattering:
+      to-the-whole: Lets builders fetch datasets in code.
+      weight: supporting
+      inside:
+        - who: ['O:role/Founder-and-Chief-Executive']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/compensated-datasets
+    type: service
+    name: Compensated datasets
+    summary: Datasets priced by the uploader and marked "Compensated" in the catalogue; the site says every download sends money back to the people who made the dataset possible. How payouts are made is not explained on the pages read.
+    owner: O:role/Founder-and-Chief-Executive
+    confidence: 0.6
+    sources: ['https://mozilladatacollective.com/', 'https://mozilladatacollective.com/datasets']
+    visibility: public
+    pending: how contributors are paid, and how much
+    flow:
+      outputs:
+        - {resource: payments, to: 'M:audience/dataset-contributors', unit: payments/month}
+    mattering:
+      to-the-whole: The promise of fair value exchange.
+      weight: major
+      inside:
+        - who: ['O:role/Founder-and-Chief-Executive']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/common-voice-distribution
+    type: offering
+    name: Common Voice dataset distribution
+    summary: 'Since October 2025 the home of the Common Voice datasets: downloads require an account and agreement to the platform''s terms; existing CC0 datasets stay available on the Common Voice site and future versions are released through the Data Collective.'
+    owner: O:role/Founder-and-Chief-Executive
+    confidence: 0.8
+    sources: ['https://huggingface.co/spaces/mozilla-foundation/README/blob/main/README.md', 'https://discourse.mozilla.org/t/exciting-news-mozilla-data-collective/145191', 'https://mozilladatacollective.com/', 'https://mozilladatacollective.com/organization/cmfh0j9o10006ns07jq45h7xk']
+    visibility: public
+    economics:
+      price: none
+    affect:
+      audience: M:audience/dataset-users
+      elicits:
+        - {feeling: trust, when: getting a dataset from its source}
+    mattering:
+      to-the-whole: Common Voice datasets are exclusively available here from October 2025.
+      weight: major
+      inside:
+        - who: ['O:role/Founder-and-Chief-Executive']
+          because: Common Voice continues with full-time engineering support, per the July 2025 announcement.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/common-voice-community', 'M:audience/dataset-users']
+          because: The Common Voice page on the Data Collective lists datasets under CC0-1.0 and shows 133,562 downloads on 2026-10-18.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/dataset-users']
+          because: Developers and researchers who build speech technology.
+          confidence: 0.5

@@ -1,0 +1,89 @@
+# C: bonds. The Foundation controls Mozilla.org, licenses the marks to the Corporation and MZLA, funds Mozilla.ai and the Mozilla Ventures fund, and incubated Mozilla Data Collective. Each is mirrored in the other atom.
+nodes:
+  - id: C:bond/foundation-controls-org
+    type: bond
+    name: Foundation controls Mozilla.org
+    summary: 'Mozilla.org stays within the umbrella of the Foundation: the Foundation appoints the majority of its board and consolidates it for financial reporting. The 2024 Form 990 Schedule R lists Mozilla.org (EIN 33-3437202) as a related tax-exempt organization whose direct controlling entity is the Foundation. Not an ownership bond: a non-profit has no shares.'
+    kinds: [controls]
+    from: atom/mozilla-foundation
+    to: atom/mozilla-org
+    control: full
+    basis: appoints the majority of the Mozilla.org board; consolidates it for financial reporting (Mozilla wiki, June 2026); Schedule R Part II, 2024
+    accounting: consolidated
+    inherits: [principles]
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://blog.mozilla.org/en/mozilla/news/announcing-mozilla-org-new-non-profit/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.8, state: known}
+
+  - id: C:bond/foundation-licenses-corporation
+    type: bond
+    name: Foundation licenses the Mozilla marks to the Corporation
+    summary: 'The Corporation pays the Foundation a trademark licence royalty based on its annual royalties revenue: $22.6 million for 2024, $18.4 million for 2023.'
+    kinds: [licenses]
+    from: atom/mozilla-foundation
+    to: atom/mozilla-corporation
+    control: none
+    scope: ['atom/mozilla-org//C:ip/mozilla-trademarks']
+    terms: royalty on the Corporation's annual royalties revenue; $22,622,178 in 2024 (Form 990 Schedule R Part V)
+    pending: After the 2026 transfer the FAQ says Mozilla.org owns the trademarks; which entity is the licensor now?
+    contract: C:contract/trademark-license-corporation
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/foundation/trademarks/policy/'], confidence: 0.7, state: known}
+
+  - id: C:bond/foundation-licenses-mzla
+    type: bond
+    name: Foundation licenses the Thunderbird marks to MZLA
+    summary: 'MZLA pays the Foundation a royalty based on revenue from certain products: $415 thousand for 2024, $267 thousand for 2023.'
+    kinds: [licenses]
+    from: atom/mozilla-foundation
+    to: atom/mzla
+    control: none
+    scope: ['atom/mozilla-org//C:ip/mozilla-trademarks']
+    terms: royalty on revenue from certain products under a trademark license agreement
+    pending: After the 2026 transfer the FAQ says Mozilla.org owns the trademarks; which entity is the licensor now?
+    contract: C:contract/trademark-license-mzla
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://wiki.mozilla.org/Mozilla_org'], confidence: 0.7, state: known}
+
+  - id: C:bond/foundation-funds-mozilla-ai
+    type: bond
+    name: Foundation funds Mozilla.ai
+    summary: The Foundation committed $30 million to create Mozilla.ai, launched in March 2023 and still pre-revenue in the 2024 report.
+    kinds: [funds]
+    from: atom/mozilla-foundation
+    to: atom/mozilla-ai
+    control: none
+    terms: $30 million committed at launch, March 2023
+    since: 2023-03
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/', 'https://mozilla.ai/company/about-us'], confidence: 0.8, state: known}
+
+  - id: C:bond/foundation-funds-ventures
+    type: bond
+    name: Foundation funds the Mozilla Ventures fund
+    summary: The Foundation is the sole partner in the first fund, size $35 million, announced in November 2022; the 2023 Form 990 shows capital contributions of $24,963,716 to Mozilla Ventures I, LP in 2023.
+    kinds: [funds]
+    from: atom/mozilla-foundation
+    to: atom/mozilla-ventures
+    control: none
+    terms: sole partner in the first fund, Mozilla Ventures I, LP; fund size $35 million
+    since: 2022-11-02
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/', 'https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf', 'https://en.wikipedia.org/wiki/Mozilla_Foundation'], confidence: 0.8, state: known}
+
+  - id: C:bond/foundation-incubated-mdc
+    type: bond
+    name: Foundation incubated Mozilla Data Collective
+    summary: Mozilla Data Collective describes itself as incubated by the Mozilla Foundation; it was announced in July 2025 as a sister platform to Common Voice and registered as a UK company in February 2026.
+    kinds: [affiliated]
+    from: atom/mozilla-foundation
+    to: atom/mozilla-data-collective
+    control: none
+    since: 2025-07-30
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilladatacollective.com/', 'https://discourse.mozilla.org/t/exciting-news-mozilla-data-collective/145191'], confidence: 0.8, state: known}

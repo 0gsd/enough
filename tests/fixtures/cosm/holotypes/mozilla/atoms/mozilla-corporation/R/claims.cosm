@@ -1,0 +1,113 @@
+# R: claims the Corporation makes in public, with the evidence that is public. Claims that rest on Mozilla's own counts are marked unverified.
+nodes:
+  - id: R:claim/not-owned-by-shareholders
+    type: claim
+    name: Not owned by shareholders
+    summary: On the Firefox home page.
+    text: Not owned by shareholders.
+    about: ['P:offering/firefox']
+    'on': ['R:surface/firefox-site']
+    evidence:
+      state: supported
+      by: ['C:bond/org-owns-corporation']
+      measure: 'the Corporation is held by a non-profit: the Foundation at 100% in 2024 (Schedule R), Mozilla.org per the June 2026 FAQ'
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Product-Management
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://wiki.mozilla.org/Mozilla_org'], confidence: 0.8, state: known}
+
+  - id: R:claim/blocks-2000-trackers
+    type: claim
+    name: Blocks more than 2,000 data trackers
+    summary: On the Mozilla products page.
+    text: Automatically blocks 2,000+ data trackers, with Enhanced Tracking Protection built in.
+    about: ['P:offering/firefox']
+    'on': ['R:surface/mozilla-site']
+    evidence:
+      state: unverified
+      by: ['P:product/firefox-desktop']
+      measure: the list of blocked trackers is maintained by Mozilla; not counted here
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Product-Management
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/'], confidence: 0.6, state: known}
+
+  - id: R:claim/30000-extensions
+    type: claim
+    name: Over 30,000 extensions
+    summary: On the Firefox home page.
+    text: Over 30,000 extensions and thousands of themes.
+    about: ['P:offering/firefox-add-ons']
+    'on': ['R:surface/firefox-site']
+    evidence:
+      state: unverified
+      by: ['P:offering/firefox-add-ons']
+      measure: the Add-ons catalogue size; not counted here
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Product-Management
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/'], confidence: 0.6, state: known}
+
+  - id: R:claim/does-not-sell-data
+    type: claim
+    name: Does not sell personal data
+    summary: On the Firefox home page.
+    text: Firefox does not sell your personal data.
+    about: ['P:offering/firefox']
+    'on': ['R:surface/firefox-site']
+    evidence:
+      state: unverified
+      by: ['P:offering/firefox']
+      measure: the Firefox Privacy Notice; not read in full here
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Product-Management
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/'], confidence: 0.6, state: known}
+
+  - id: R:claim/ai-is-optional
+    type: claim
+    name: AI features are optional and can be turned off
+    summary: On the Firefox home page; the June 2026 roadmap lists browser-wide AI controls, including on mobile.
+    text: AI features are optional and can be turned off.
+    about: ['P:offering/firefox', 'P:product/firefox-smart-window']
+    'on': ['R:surface/firefox-site']
+    evidence:
+      state: partial
+      by: ['P:product/firefox-smart-window']
+      measure: the roadmap lists browser-wide AI controls as upcoming; Smart Window is opt-in
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Engineering
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/', 'https://blog.mozilla.org/en/firefox/firefox-roadmap-152/'], confidence: 0.7, state: known}
+
+  - id: R:claim/vpn-30-countries
+    type: claim
+    name: Mozilla VPN in more than 30 countries
+    summary: On the VPN page.
+    text: More than 500 servers in 30+ countries.
+    about: ['P:offering/mozilla-vpn']
+    'on': ['R:surface/mozilla-site']
+    evidence:
+      state: supported
+      by: ['I:capacity/vpn-servers']
+      measure: the server and country counts on the product page
+    status: active
+    visibility: public
+    owner: O:role/Privacy-Services-Team
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/products/vpn/'], confidence: 0.8, state: known}
+
+  - id: R:claim/browser-is-open-source
+    type: claim
+    name: The browser is open source
+    summary: On the Firefox Enterprise page; the code is in a public repository.
+    text: The browser is open source.
+    about: ['P:offering/firefox-enterprise', 'P:offering/firefox']
+    'on': ['R:surface/firefox-site']
+    evidence:
+      state: supported
+      by: ['S:codebase/firefox']
+      measure: the public repository github.com/mozilla-firefox/firefox
+    status: active
+    visibility: public
+    owner: O:role/Firefox-Engineering
+    provenance: {mode: net-scan, sources: ['https://www.firefox.com/en-US/browsers/enterprise/', 'https://github.com/mozilla-firefox/firefox'], confidence: 0.8, state: known}

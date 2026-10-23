@@ -1,0 +1,134 @@
+# C — filings (the audit reports and Forms 990 the Foundation publishes), dated events, and the two assets the audited statements itemise.
+nodes:
+  - id: C:filing/audit-2024-25
+    type: filing
+    name: Audited financial statements, FY2024-25
+    summary: KPMG's clean opinion on the consolidated statements for the years ended 30 June 2025 and 2024; available for issuance 2025-09-30, posted on the Foundation wiki 2025-11-24.
+    entity: C:entity/wikimedia-foundation
+    kind: audit-report
+    period: 2024-07..2025-06
+    url: "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediafoundation.org/about/financial-reports/"], confidence: 0.9, state: known}
+
+  - id: C:filing/form-990-2024
+    type: filing
+    name: Form 990, tax year 2024 (FY2024-25)
+    summary: "The IRS return for the fiscal year ended 30 June 2025: revenue $205.4M, expenses $189.7M, net assets $296.6M."
+    entity: C:entity/wikimedia-foundation
+    kind: form-990
+    period: 2024-07..2025-06
+    url: "https://foundation.wikimedia.org/wiki/File:Wikimedia_Foundation_2024_Form_990.pdf"
+    filed: {pending: "the filing date"}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/financial-reports/", "https://projects.propublica.org/nonprofits/organizations/200049703"], confidence: 0.9, state: known}
+
+  - id: C:filing/audit-2023-24
+    type: filing
+    name: Audited financial statements, FY2023-24
+    summary: KPMG's opinion on the statements for the year ended 30 June 2024.
+    entity: C:entity/wikimedia-foundation
+    kind: audit-report
+    period: 2023-07..2024-06
+    url: "https://upload.wikimedia.org/wikipedia/foundation/f/f6/Wikimedia_Foundation_2024_Audited_Financial_Statements.pdf"
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/financial-reports/"], confidence: 0.8, state: known}
+
+  - id: C:filing/form-990-2023
+    type: filing
+    name: Form 990, tax year 2023 (FY2023-24)
+    summary: "The IRS return for the fiscal year ended 30 June 2024: revenue $185.4M, expenses $178.6M, net assets $271.6M."
+    entity: C:entity/wikimedia-foundation
+    kind: form-990
+    period: 2023-07..2024-06
+    url: "https://foundation.wikimedia.org/wiki/File:Wikimedia_Foundation_2023_Form_990.pdf"
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/financial-reports/", "https://projects.propublica.org/nonprofits/organizations/200049703"], confidence: 0.9, state: known}
+
+  - id: C:event/founding
+    type: event
+    name: Foundation founded in Florida
+    summary: The Wikimedia Foundation is founded on 2003-06-20.
+    at: 2003-06-20
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Memory:Timeline"], confidence: 0.9, state: known}
+
+  - id: C:event/headquarters-move
+    type: event
+    name: Headquarters moves to San Francisco
+    summary: The move from Florida to San Francisco, announced 2007-10-09, is complete on 2008-01-31.
+    at: 2008-01-31
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Memory:Timeline"], confidence: 0.9, state: known}
+
+  - id: C:event/board-expansion
+    type: event
+    name: Board of Trustees expanded to up to 16
+    summary: The Board is expanded in 2020 to up to 16 Trustees, the size the bylaws now allow.
+    year: 2020
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Memory:Timeline", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Board_of_Trustees"], confidence: 0.85, state: known}
+
+  - id: C:event/enterprise-launch
+    type: event
+    name: Wikimedia Enterprise launches
+    summary: Announced 2021-03-16 and launched publicly on 2021-10-25, as a commercial service for large reusers of Wikimedia content.
+    at: 2021-10-25
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Wikimedia_Enterprise", "https://foundation.wikimedia.org/wiki/Memory:Timeline"], confidence: 0.9, state: known}
+
+  - id: C:event/first-enterprise-customers
+    type: event
+    name: First Enterprise customers announced
+    summary: Google and the Internet Archive are named as the first Wikimedia Enterprise customers, and free trials open to self sign-up.
+    at: 2022-06-21
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/news/2022/06/21/wikimedia-enterprise-announces-google-and-internet-archive-first-customers/"], confidence: 0.8, state: known}
+
+  - id: C:event/endowment-standalone
+    type: event
+    name: Endowment becomes a standalone organization
+    summary: On 2023-09-30 the Wikimedia Endowment starts as a separate 501(c)(3) with its own Board; the net assets Tides Foundation had held for it ($116.2M) move to it.
+    at: 2023-09-30
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.9, state: known}
+
+  - id: C:event/enterprise-partners-named
+    type: event
+    name: Enterprise partners named on Wikipedia's 25th birthday
+    summary: On 2026-01-15 the Foundation and Wikimedia Enterprise name Amazon, Meta, Microsoft, Mistral AI and Perplexity among the partners, beside Google and others; financial terms are not disclosed.
+    at: 2026-01-15
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/"], confidence: 0.85, state: known}
+
+  - id: C:asset/headquarters-lease
+    type: asset
+    name: Headquarters lease, San Francisco
+    summary: The office at 1 Sansome Street; a non-cancelable remaining term of 3.25 years at 30 June 2025 with one option of five more; the lease at 1 Montgomery Street was not renewed in 2024.
+    kind: leasehold
+    tenure: leasehold
+    used-by: [O:unit/office-of-the-ceo]
+    commitments: {payments-2026: 199924, payments-2027: 205922, payments-2028: 212100, payments-2029: 53414, total: 671360, unit: USD}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+
+  - id: C:asset/property-and-equipment
+    type: asset
+    name: Computer equipment and internal-use software
+    summary: Mostly computer and data-center equipment (cost $25.8M of $29.0M in all); net property and equipment $13.6M at 30 June 2025.
+    kind: equipment
+    value: {net-book-value: 13613474, cost: 29034701, as-of: 2025-06-30, unit: USD}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}

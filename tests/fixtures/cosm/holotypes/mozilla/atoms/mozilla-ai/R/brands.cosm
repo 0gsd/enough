@@ -1,0 +1,11 @@
+# R: brands.
+nodes:
+  - id: R:brand/mozilla-ai
+    type: brand
+    name: Mozilla.ai
+    summary: The company brand, with the product brands Otari and Octonous and the open tools.
+    scope: ['P:mozilla-ai']
+    status: active
+    visibility: public
+    owner: O:role/Chief-Executive-Officer
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.ai/'], confidence: 0.9, state: known}

@@ -1,0 +1,55 @@
+# R — surfaces: the Endowment's website and the governance pages it keeps on the Foundation's wiki. The annual report and financial documents hang off the website.
+nodes:
+  - id: R:surface/endowment-site
+    type: surface
+    name: wikimediaendowment.org
+    summary: "The Endowment's own website: about, impact, giving, leadership, annual reports, audits and Forms 990."
+    kind: website
+    url: https://wikimediaendowment.org
+    hosted-on: S:system/endowment-site
+    presents: [P:offering/permanent-fund, P:offering/project-grants, P:offering/legacy-giving]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/"], confidence: 0.9, state: known}
+
+  - id: R:surface/annual-report
+    type: surface
+    name: The 2024-2025 annual report
+    summary: A web annual report with a President's message, a Treasurer's note, funded initiatives, donor stories, financial accountability and leadership.
+    kind: report
+    url: https://wikimediaendowment.org/annualreports/2024-2025-annual-report/
+    hosted-on: S:system/endowment-site
+    presents: [P:offering/project-grants, P:offering/permanent-fund]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/annualreports/2024-2025-annual-report/"], confidence: 0.9, state: known}
+
+  - id: R:surface/governance-pages
+    type: surface
+    name: Endowment pages on foundation.wikimedia.org
+    summary: Bylaws, the investment, spending and gift policies, committee charters, Board meetings and the annual plans, audits and Forms 990 by year.
+    kind: website
+    url: https://foundation.wikimedia.org/wiki/Endowment:Main
+    presents: [P:function/investment-management, P:service/grantmaking]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/secretary-and-legal-counsel
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Endowment:Main", "https://foundation.wikimedia.org/wiki/Endowment:Bylaws"], confidence: 0.9, state: known}
+
+  - id: R:surface/meta-reports
+    type: surface
+    name: Endowment reports on Meta-Wiki
+    summary: Plain-language explanations of each Form 990 and audit, with the figures the Endowment wants readers to see.
+    kind: website
+    url: https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions
+    presents: [P:offering/permanent-fund, P:offering/legacy-giving]
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/treasurer
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.9, state: known}

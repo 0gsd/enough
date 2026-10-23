@@ -1,0 +1,270 @@
+# O — units (the Board and its committees, the departments and the teams inside Advancement), the chart, and the decision rights the bylaws and
+# policies make public. Departments and teams are as the Foundation's staff page lists them; their sizes are not public.
+nodes:
+  - id: O:unit/board-of-trustees
+    type: unit
+    name: Board of Trustees
+    summary: The governing body of up to 16 Trustees. Community-led committees with Trustee liaisons (elections, languages, affiliates) work beside it.
+    parent: none
+    status: active
+    visibility: public
+    owner: O:role/board-of-trustees
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Bylaws", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Board_of_Trustees"], confidence: 0.85, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/board-audit-committee
+    type: unit
+    name: Audit Committee
+    summary: The Board committee that oversees the external auditor and the audit; named in the bylaws and chartered.
+    parent: O:unit/board-of-trustees
+    status: active
+    visibility: public
+    owner: O:role/board-of-trustees
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Bylaws", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Board_of_Trustees"], confidence: 0.85, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/board-governance-committee
+    type: unit
+    name: Board Governance Committee
+    summary: A chartered Board committee; the charter's purpose is not summarised on the page read.
+    parent: O:unit/board-of-trustees
+    status: active
+    visibility: public
+    owner: O:role/board-of-trustees
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Board_of_Trustees"], confidence: 0.8, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/board-product-and-technology-committee
+    type: unit
+    name: Product and Technology Committee
+    summary: A chartered Board committee for product and technology matters.
+    parent: O:unit/board-of-trustees
+    status: active
+    visibility: public
+    owner: O:role/board-of-trustees
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Board_of_Trustees"], confidence: 0.8, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/board-executive-committee
+    type: unit
+    name: Executive Committee
+    summary: A chartered Board committee.
+    parent: O:unit/board-of-trustees
+    status: active
+    visibility: public
+    owner: O:role/board-of-trustees
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Board_of_Trustees"], confidence: 0.8, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/office-of-the-ceo
+    type: unit
+    name: Office of the Chief Executive Officer
+    summary: The Chief Executive Officer's office, with a Chief of Staff.
+    parent: none
+    status: active
+    visibility: public
+    owner: O:role/chief-executive-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.8, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/advancement
+    type: unit
+    name: Advancement
+    summary: The department for fundraising, community development, community partnerships, community resources, content enablement and Wikimedia Enterprise.
+    parent: none
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.85, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/community-development
+    type: unit
+    name: Community Development
+    summary: A team inside Advancement.
+    parent: O:unit/advancement
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.8, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/community-partnerships
+    type: unit
+    name: Community Partnerships
+    summary: A team inside Advancement.
+    parent: O:unit/advancement
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.8, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/community-resources
+    type: unit
+    name: Community Resources
+    summary: The team that runs the grants programs for community members, affiliates and nonprofits; $18.2M in grants in 2024-25.
+    parent: O:unit/advancement
+    twin: P:offering/grants
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions"], confidence: 0.8, state: known}
+    covered-by: none
+
+  - id: O:unit/content-enablement
+    type: unit
+    name: Content Enablement
+    summary: A team inside Advancement.
+    parent: O:unit/advancement
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.8, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/fundraising
+    type: unit
+    name: Fundraising
+    summary: The team behind the donation campaigns, recurring and planned giving.
+    parent: O:unit/advancement
+    twin: P:function/fundraising
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/", "https://wikimediafoundation.org/give/"], confidence: 0.8, state: known}
+    covered-by: none
+
+  - id: O:unit/wikimedia-enterprise
+    type: unit
+    name: Wikimedia Enterprise
+    summary: The commercial service for large reusers of Wikimedia content, operated through Wikimedia, LLC and listed within Advancement.
+    parent: O:unit/advancement
+    twin: P:offering/wikimedia-enterprise
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/", "https://foundation.wikimedia.org/wiki/Wikimedia_Enterprise"], confidence: 0.85, state: known}
+    covered-by: none
+
+  - id: O:unit/communications
+    type: unit
+    name: Communications
+    summary: The department for brand, external communications and movement communications.
+    parent: none
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.85, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/finance-and-administration
+    type: unit
+    name: Finance and Administration
+    summary: The finance and administration department; a Vice President and Controller seat is listed within it.
+    parent: none
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.8, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/legal
+    type: unit
+    name: Legal
+    summary: The legal department; a General Counsel and a Deputy General Counsel are listed.
+    parent: none
+    status: active
+    visibility: public
+    owner: O:role/general-counsel
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.8, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/people
+    type: unit
+    name: People
+    summary: The people department; Vice President seats for people experience and for growth and belonging are listed within it.
+    parent: none
+    status: active
+    visibility: public
+    owner: O:role/chief-people-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.8, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:unit/product-and-technology
+    type: unit
+    name: Product and Technology
+    summary: The department that builds and runs the software and infrastructure behind the projects; a Vice President of Site Reliability Engineering is listed within it.
+    parent: none
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/", "https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure"], confidence: 0.85, state: known}
+    covered-by: none
+    twin: none
+
+  - id: O:chart/foundation
+    type: chart
+    name: The Foundation's structure
+    summary: A Board of Trustees, one Chief Executive Officer, seven departments; 685 staff on 2025-12-31 (the annual plan also says over 640).
+    root: O:position/board-of-trustees
+    headcount: {staff: 685, as-of: 2025-12-31, growth-12-months: "4.21%"}
+    status: active
+    visibility: public
+    owner: O:role/chief-people-officer
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview", "https://wikimediafoundation.org/role/staff/"], confidence: 0.8, state: known}
+    pending: "who reports to whom, and the executive team's decision rights: the public pages list titles and departments, not reporting lines"
+
+  - id: O:decision-right/bylaws-and-policies
+    type: decision-right
+    name: Appointing the Chief Executive Officer
+    summary: The Board appoints the Chief Executive Officer, a non-Trustee officer, and the Secretary and the Treasurer.
+    holder: O:role/board-of-trustees
+    over: O:position/chief-executive-officer
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Bylaws"], confidence: 0.9, state: known}
+
+  - id: O:decision-right/reserve
+    type: decision-right
+    name: Setting the reserve
+    summary: The Board sets by resolution the minimum (12 months) and target (up to 18 months) of working capital.
+    holder: O:role/board-of-trustees
+    over: C:policy/reserves
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027/Budget_Overview"], confidence: 0.85, state: known}
+
+  - id: O:decision-right/affiliation-models
+    type: decision-right
+    name: Recognising affiliation models
+    summary: The Board recognises chapters, thematic organizations and user groups as affiliation models (approved 2012-03-31); the Affiliations Committee advises on each recognition.
+    holder: O:role/board-of-trustees
+    over: M:audience/affiliates
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_movement_affiliates"], confidence: 0.85, state: known}
+
+  - id: O:decision-right/conduct
+    type: decision-right
+    name: Approving the Universal Code of Conduct
+    summary: The Board approved the Universal Code of Conduct by resolution; sanctions are imposed by functionaries, the Foundation or both.
+    holder: O:role/board-of-trustees
+    over: C:policy/universal-code-of-conduct
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Policy:Universal_Code_of_Conduct"], confidence: 0.8, state: known}

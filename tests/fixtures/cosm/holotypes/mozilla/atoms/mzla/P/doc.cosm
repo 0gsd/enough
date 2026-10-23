@@ -1,0 +1,22 @@
+# doc.cosm.
+
+reading:
+  draft: Public sample 1
+  date: 2026-10-18
+  author: '@comprise-sample'
+  mode: research (public sources only, read 2026-10-18)
+  perspective: MZLA Technologies Corporation as the company behind Thunderbird.
+
+history:
+  - {date: '2003', event: The Thunderbird project founded, sources: ['https://www.thunderbird.net/en-US/about/']}
+  - {date: '2014', event: Thunderbird Council established, sources: ['https://www.thunderbird.net/en-US/about/']}
+  - {date: '2020-01-28', event: MZLA Technologies Corporation announced to run Thunderbird, sources: ['https://en.wikipedia.org/wiki/Mozilla_Foundation']}
+  - {date: 2024-10, event: Thunderbird for Android launches, sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/']}
+  - {date: 2025-07, event: ESR 140 "Eclipse", sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/']}
+  - {date: 2026-06, event: Thundermail invitations go out in waves, sources: ['https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/']}
+  - {date: 2026-07, event: ESR 153 "Meadow", sources: ['https://blog.thunderbird.net/']}
+  - {date: '2026-10-01', event: First look at the native iOS app, sources: ['https://blog.thunderbird.net/2026/10/thunderbird-for-ios-a-first-look-at-the-native-iphone-email-app-in-development/']}
+
+findings:
+  - {check: flow fit - unpriced, nodes: ['P:offering/thunderbird-pro'], finding: 'Thunderbird Pro is the stated route to lessen dependence on donations, but its final price and date are not published.', proposal: Fill the price when the Thundermail beta ends.}
+  - {check: role coverage - pools only, nodes: ['O:role/Chief-Executive'], finding: 'The 43 full-time staff are modelled as twelve team pools; the board, if any, is not published, so the chart stops at the chief executive.', proposal: Name the board seat when MZLA publishes one.}

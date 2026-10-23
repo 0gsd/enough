@@ -3,9 +3,9 @@
 A saved article is a *folder* (both destinations):
 
 - `project`   — `{project}/wiki/<slug>/`
-- `cacheawl`  — `~/enough/cacheawl/wiki/<slug>/` (the global wiki cachebox;
-                the legacy destination name `infoworld` is accepted as an
-                alias during the transition)
+- `canon`     — `~/enough/canon/wiki/<slug>/` (the global wiki volume in
+                Canon; the legacy destination names `cacheawl` and
+                `infoworld` are accepted as aliases during the transition)
 
 containing:
 
@@ -53,12 +53,20 @@ META_NAME = ".meta.json"
 ARTICLE_NAME = "article.html"
 
 
-def _cacheawl_wiki_dir() -> Path:
-    """The global wiki cachebox: ``~/enough/cacheawl/wiki/`` (honoring the
-    ENOUGH_CACHEAWL_ROOT test override). Resolved lazily so tests never
-    touch the real store."""
-    from .. import cacheawl as _cacheawl
-    return _cacheawl.root() / "wiki"
+# Save destinations: "project", and the Canon store's wiki volume under its
+# 0.4.3 name "canon" or either legacy name. Registry tags written as "canon";
+# "cacheawl" and "infoworld" tags from older saves are still read (unsave
+# drops all three).
+_CANON_DESTS = ("canon", "cacheawl", "infoworld")
+_CANON_TAGS = ("canon", "cacheawl", "infoworld")
+
+
+def _canon_wiki_dir() -> Path:
+    """The global wiki volume: ``~/enough/canon/wiki/`` (honoring the
+    ENOUGH_CANON_ROOT test override, and its legacy ENOUGH_CACHEAWL_ROOT).
+    Resolved lazily so tests never touch the real store."""
+    from .. import canon as _canon
+    return _canon.root() / "wiki"
 
 
 def _slug(title: str) -> str:
@@ -240,11 +248,11 @@ def _manifest_body(art: dict[str, Any], cfg: dict[str, Any], today: str) -> str:
 
 def save_article_to_dir(base_dir: Path, art: dict[str, Any],
                         cfg: dict[str, Any] | None = None,
-                        dest: str = "cacheawl") -> Path:
+                        dest: str = "canon") -> Path:
     """Write a resolved article as a self-describing folder under
     ``base_dir`` (``base_dir/<slug>/`` with article.html + _manifest.md +
     .meta.json). The reusable core shared by ``save_article`` and the
-    cacheawl wikisink ingest. Returns the folder path."""
+    Canon wikisink ingest. Returns the folder path."""
     cfg = cfg or wconfig.load_config()
     slug = _slug(art["title"])
     today = dt.date.today().isoformat()
@@ -273,17 +281,17 @@ def save_article_to_dir(base_dir: Path, art: dict[str, Any],
 
 def save_article(project_dir: Path, path: str, dest: str) -> dict[str, Any]:
     """Save an article as a self-describing folder. `dest` is "project" or
-    "cacheawl" ("infoworld" accepted as a legacy alias for cacheawl).
+    "canon" ("cacheawl" and "infoworld" accepted as legacy aliases for canon).
     Returns {saved_path, dest, title}; raises KeyError / WikisinkUnavailable
     / ValueError on bad dest."""
-    if dest == "infoworld":  # legacy alias — the frontend still sends this
-        dest = "cacheawl"
-    if dest not in ("project", "cacheawl"):
+    if dest in _CANON_DESTS:  # legacy aliases — older frontends send these
+        dest = "canon"
+    if dest not in ("project", "canon"):
         raise ValueError(f"unknown save destination {dest!r}")
     cfg = wconfig.load_config()
     art = woverlay.resolve_article(path=path)
 
-    base = (project_dir / "wiki") if dest == "project" else _cacheawl_wiki_dir()
+    base = (project_dir / "wiki") if dest == "project" else _canon_wiki_dir()
     art_dir = save_article_to_dir(base, art, cfg, dest=dest)
 
     if dest == "project":
@@ -291,7 +299,7 @@ def save_article(project_dir: Path, path: str, dest: str) -> dict[str, Any]:
         watched_tag = f"project:{project_dir.resolve()}"
     else:
         saved_display = str(art_dir / ARTICLE_NAME)
-        watched_tag = "cacheawl"
+        watched_tag = "canon"
 
     wconfig.upsert_watched(art["path"], art["title"], saved_to=watched_tag)
     log.info("wikisink saved %s -> %s", art["title"], art_dir)
@@ -301,17 +309,19 @@ def save_article(project_dir: Path, path: str, dest: str) -> dict[str, Any]:
 def _resolve_saved_dir(project_dir: Path, ref: str) -> Path:
     """Resolve a tree path (or absolute path) to a saved-article folder,
     validating shape and containment. `ref` may point at the folder or
-    at any file inside it. A ``cacheawl:<box>/<rel>`` prefix addresses the
-    machine-global cachebox store (same virtual prefix the file endpoints
-    use — it's how cacheawl mode launches store articles into the reader).
-    Raises ValueError with a user-facing message when it isn't a
-    saved-article folder we're allowed to touch."""
-    from .. import cacheawl as _cacheawl
-    if ref.startswith("cacheawl:"):
-        rel = Path(ref[len("cacheawl:"):].lstrip("/"))
+    at any file inside it. A ``canon:<volume>/<rel>`` prefix (or the
+    pre-0.4.3 ``cacheawl:<box>/<rel>``) addresses the machine-global Canon
+    store (same virtual prefixes the file endpoints use — it's how Canon
+    mode launches store articles into the reader). Raises ValueError with a
+    user-facing message when it isn't a saved-article folder we're allowed
+    to touch."""
+    from .. import canon as _canon
+    prefix = next((pf for pf in ("canon:", "cacheawl:") if ref.startswith(pf)), None)
+    if prefix:
+        rel = Path(ref[len(prefix):].lstrip("/"))
         if rel.is_absolute() or ".." in rel.parts or not rel.parts:
-            raise ValueError(f"invalid cacheawl path {ref!r}")
-        p = _cacheawl.root() / rel
+            raise ValueError(f"invalid canon path {ref!r}")
+        p = _canon.root() / rel
     else:
         p = Path(ref)
         if not p.is_absolute():
@@ -323,12 +333,12 @@ def _resolve_saved_dir(project_dir: Path, ref: str) -> Path:
     d = p if p.is_dir() else p.parent
     if not (d / META_NAME).is_file() or not (d / ARTICLE_NAME).is_file():
         raise ValueError(f"{ref!r} is not a saved wikisink article folder")
-    # The whole cacheawl store is a valid root (not just its wiki/ box):
-    # article folders can be copied into other cacheboxes via transfer,
+    # The whole Canon store is a valid root (not just its wiki/ volume):
+    # article folders can be copied into other volumes via transfer,
     # and the reader should open them wherever they live in the store.
-    roots = (project_dir.resolve(), _cacheawl.root().resolve())
+    roots = (project_dir.resolve(), _canon.root().resolve())
     if not any(d == r or r in d.parents for r in roots):
-        raise ValueError(f"{ref!r} is outside the project and cacheawl wiki")
+        raise ValueError(f"{ref!r} is outside the project and the canon store")
     return d
 
 
@@ -363,14 +373,16 @@ def unsave_article(project_dir: Path, ref: str) -> dict[str, Any]:
         meta = {}
     title = meta.get("title") or d.name
     zim_path = meta.get("zim_path") or ""
-    under_cacheawl = _cacheawl_wiki_dir().resolve() in d.parents
-    tag = "cacheawl" if under_cacheawl else f"project:{project_dir.resolve()}"
+    under_canon = _canon_wiki_dir().resolve() in d.parents
     shutil.rmtree(d)
     if zim_path:
-        wconfig.remove_saved_to(zim_path, tag)
-        # Legacy tag cleanup so pre-transition saves fully unwatch.
-        if under_cacheawl:
-            wconfig.remove_saved_to(zim_path, "infoworld")
+        if under_canon:
+            # The current tag plus both legacy ones, so pre-0.4.3 saves
+            # fully unwatch.
+            for tag in _CANON_TAGS:
+                wconfig.remove_saved_to(zim_path, tag)
+        else:
+            wconfig.remove_saved_to(zim_path, f"project:{project_dir.resolve()}")
     log.info("wikisink unsaved %s (%s)", title, d)
     return {"removed": str(d), "title": title,
-            "dest": "cacheawl" if under_cacheawl else "project"}
+            "dest": "canon" if under_canon else "project"}

@@ -1,0 +1,95 @@
+# M — audiences: the kinds of people and organizations the Foundation serves, funds it, or depends on for content. Counts are the Foundation's own,
+# with the year of the report that gives them. The people behind the counts are not modelled (E is none).
+nodes:
+  - id: M:audience/readers
+    type: audience
+    name: Readers
+    summary: "Everyone who reads or looks things up on the projects: nearly 15 billion page views a month and over 1.5 billion unique devices a month (Foundation news, January 2026), in more than 300 Wikipedia languages. Human page views fell about 8% in recent months of 2025 against 2024, which the Foundation puts down to generative AI answers and social video."
+    relation: [beneficiary]
+    side: served
+    geography: worldwide
+    served-by: [P:offering/wikipedia, P:offering/commons, P:offering/wikidata, P:offering/other-projects, P:product/mobile-apps]
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/", "https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/", "https://wikimediafoundation.org/about/"], confidence: 0.8, state: known}
+
+  - id: M:audience/contributors
+    type: audience
+    name: Volunteer contributors
+    summary: "The volunteers who write, edit, curate and govern the content: about 250,000 volunteer editors (2024-25 annual report), making over 300 edits a minute. The Foundation does not write or edit the content; the volunteers do. They also help select Board seats."
+    relation: [member, supplier]
+    side: supplying
+    geography: worldwide
+    served-by: [P:offering/grants, P:offering/wikipedia-library, P:service/cloud-services, P:product/mediawiki, P:service/community-health]
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://wikimediafoundation.org/about/", "https://foundation.wikimedia.org/wiki/Bylaws"], confidence: 0.85, state: known}
+
+  - id: M:audience/donors
+    type: audience
+    name: Donors
+    summary: About 8 million donors a year, mostly individuals giving small amounts (an average of $11 a gift); the Foundation also receives gifts from foundations and companies, takes no government grants, and runs no advertising.
+    relation: [donor]
+    side: funding
+    geography: worldwide
+    served-by: [P:service/donation-campaigns, P:service/recurring-and-planned-giving]
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://wikimediafoundation.org/give/"], confidence: 0.85, state: known}
+
+  - id: M:audience/affiliates
+    type: audience
+    name: Movement affiliates
+    summary: "Independent organizations that support the projects in a region or a theme: 40 chapters, 2 thematic organizations and 143 user groups, 185 in all (September 2025). They receive Foundation grants and use its marks under agreements."
+    relation: [member, beneficiary]
+    side: served
+    geography: worldwide
+    served-by: [P:offering/grants, P:service/wikimania]
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_movement_affiliates", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://foundation.wikimedia.org/wiki/Policy:Trademark_policy"], confidence: 0.85, state: known}
+
+  - id: M:audience/developers
+    type: audience
+    name: Volunteer developers and tool builders
+    summary: People who build tools, bots and extensions for the projects and for MediaWiki, using the Foundation's cloud hosting for community tools and its public interfaces.
+    relation: [supplier, member]
+    side: supplying
+    geography: worldwide
+    served-by: [P:service/cloud-services, P:product/mediawiki, P:product/public-apis-and-dumps]
+    size: {pending: "how many volunteer developers and active tools"}
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", "https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/"], confidence: 0.7, state: known}
+
+  - id: M:audience/commercial-reusers
+    type: audience
+    name: Commercial reusers of Wikimedia content
+    summary: "Companies that take project content at scale for search, assistants, knowledge panels and AI: Google, Amazon, Meta, Microsoft, Mistral AI, Perplexity and others. The Foundation asks high-volume commercial reuse to go through Wikimedia Enterprise and rate-limits large-scale use of the public APIs."
+    relation: [customer]
+    side: served
+    geography: worldwide
+    served-by: [P:offering/wikimedia-enterprise, P:product/public-apis-and-dumps]
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/07/16/wikimedia-enterprise-protecting-wikipedia-ai/", "https://enterprise.wikimedia.com/"], confidence: 0.85, state: known}
+
+  - id: M:audience/partners-and-institutions
+    type: audience
+    name: Publishers, libraries and cultural institutions
+    summary: Publishers that give editors access to paywalled sources through The Wikipedia Library, and libraries, archives and museums that share content with the projects; the annual report names UNESCO, an African library network and a jazz archive among partners.
+    relation: [supplier, beneficiary]
+    side: supplying
+    geography: worldwide
+    served-by: [P:offering/wikipedia-library, P:offering/commons]
+    size: {pending: "the number of Wikipedia Library publisher partners and of institutional content partners"}
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://wikipedialibrary.wmflabs.org/about/", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://foundation.wikimedia.org/wiki/Policy:Trademark_policy"], confidence: 0.7, state: known}

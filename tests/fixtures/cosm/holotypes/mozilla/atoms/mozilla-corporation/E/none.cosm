@@ -1,0 +1,3 @@
+module: none
+reason: people are not imported in a public sample; the model records team pools and seats, not holders
+...

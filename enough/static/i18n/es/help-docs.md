@@ -16,7 +16,7 @@ name: wikisink
 path: ~/enough/wikisink/
 
 ### what
-tu copia local y sin conexión de (una parte de) la wikipedia en inglés — un único archivo Kiwix ZIM leído en su lugar, nunca extraído, así que el gestor de archivos solo muestra los artículos que guardas explícitamente. el botón 🚰 abre un lector estilo navegador con búsqueda de texto completo, enlaces cruzados, un dado de artículo aleatorio, una píldora de chat con tu readvisor, comentarios, y un único <strong>botón de guardar</strong> cuyo menú desplegable ofrece dos destinos (el <code>wiki/</code> de este proyecto, o el cachebox global <code>~/enough/cacheawl/wiki/</code> compartido entre proyectos). tu readvisor puede buscar y leer todo el archivo mediante sus herramientas de wiki.
+tu copia local y sin conexión de (una parte de) la wikipedia en inglés — un único archivo Kiwix ZIM leído en su lugar, nunca extraído, así que el gestor de archivos solo muestra los artículos que guardas explícitamente. el botón 🚰 abre un lector estilo navegador con búsqueda de texto completo, enlaces cruzados, un dado de artículo aleatorio, una píldora de chat con tu readvisor, comentarios, y un único <strong>botón de guardar</strong> cuyo menú desplegable ofrece dos destinos (el <code>wiki/</code> de este proyecto, o el volumen global <code>~/enough/canon/wiki/</code> compartido entre proyectos). tu readvisor puede buscar y leer todo el archivo mediante sus herramientas de wiki.
 
 ### how
 el primer clic en 🚰 ejecuta el asistente de configuración: elige un tamaño (el millón de artículos más leídos, sin imágenes, ≈ 16 GB es el predeterminado; el inglés completo ≈ 49 GB; también hay opciones más pequeñas), elige una carpeta de almacenamiento (los discos externos funcionan), confirma, y deja correr la descarga reanudable — pausa, cierra, retoma cuando quieras. puedes mantener <em>varias instalaciones</em> en distintos lugares (digamos, el archivo completo en un disco externo y uno pequeño en el disco interno) y cambiar entre ellas en la lista de instalaciones de ⚙; si un disco se desconecta, su instalación simplemente aparece como inalcanzable hasta que el disco vuelve. una vez instalado, pídele a tu readvisor que ejecute un <strong>wikisink</strong> para refrescar tus artículos guardados/comentados ("vigilados") desde la wikipedia en vivo y obtener un informe: cambios en artículos vigilados, picos de edición, artículos que suben y bajan en vistas, y borrados sospechosos. el botón 🛡 en cualquier artículo es la <em>anulación de borrado</em>: conserva tu copia local para siempre, excluida de las actualizaciones. ⚙ abre el gestor de instalaciones, incluido el reemplazo del archivo base cuando sale una instantánea más nueva. no tienes que ir a buscarlo: cuando existe una versión más nueva de tu variante, aparece una pequeña píldora en la barra de herramientas del lector (<code>newer snapshot: date · size</code>) — haz clic, confirma el tamaño, y corre la misma actualización en el mismo lugar, descargando primero e intercambiando solo cuando termina. la comprobación ocurre como mucho una vez al día, nunca bloquea el lector, y se queda callada cuando estás sin conexión.
@@ -34,7 +34,7 @@ path: wiki/
 artículos de wikipedia guardados en este proyecto desde el navegador de wikisink (el botón de guardar → "este proyecto"). cada guardado es una carpeta: <code>article.html</code> (el artículo exactamente como lo tenía el archivo — haz clic para leerlo en el visor de wikisink, con fidelidad completa, infoboxes y todo) más <code>_manifest.md</code> (url de origen, licencia CC BY-SA, fecha de obtención, procedencia).
 
 ### how
-se crea automáticamente en tu primer guardado a nivel de proyecto — sin configuración. las ejecuciones de actualización de wikisink tratan todo lo de aquí como <em>vigilado</em>: se refresca desde la wikipedia en vivo y se informa sobre ello. volver a guardar un artículo sobrescribe la carpeta con la copia más reciente; para quitar uno, pasa el cursor un momento sobre su carpeta en el árbol y haz clic en el 🗑 que aparece. las copias guardadas no están pensadas para editarse a mano — se desincronizarían del archivo. (la otra opción del botón de guardar guarda en el cachebox global <code>~/enough/cacheawl/wiki/</code>, compartido entre todos los proyectos.)
+se crea automáticamente en tu primer guardado a nivel de proyecto — sin configuración. las ejecuciones de actualización de wikisink tratan todo lo de aquí como <em>vigilado</em>: se refresca desde la wikipedia en vivo y se informa sobre ello. volver a guardar un artículo sobrescribe la carpeta con la copia más reciente; para quitar uno, pasa el cursor un momento sobre su carpeta en el árbol y haz clic en el 🗑 que aparece. las copias guardadas no están pensadas para editarse a mano — se desincronizarían del archivo. (la otra opción del botón de guardar guarda en el volumen global <code>~/enough/canon/wiki/</code>, compartido entre todos los proyectos.)
 
 ### ideas
 - los artículos guardados se abren en el lector incluso cuando el disco del archivo está desconectado — son tus copias doblemente sin conexión.
@@ -224,19 +224,19 @@ coloca archivos en <code>rness/io/input/</code> y tu readvisor los verá. todo l
 - vacía ambas carpetas de vez en cuando — tu readvisor no necesita el trabajo de borrador de ayer en su contexto.
 
 ## infoworld
-name: cacheawl
-path: ~/enough/cacheawl/
+name: canon
+path: ~/enough/canon/
 
 ### what
-el almacén de archivos global de la máquina, compartido entre todos los proyectos de enough. (esto reemplaza a la antigua biblioteca <code>infoworld/</code> — en tu primer inicio de esta versión, tus carpetas <code>personal/</code>, <code>public/</code> y <code>wiki/</code> se movieron aquí, y cada una se convirtió en un cachebox.) un <em>cachebox</em> es una carpeta de nivel superior en el almacén: ya sea texto simple que quieres conservar para siempre, o una "réplica en caché" ingerida desde una ruta local, un sitio web, o un conjunto de artículos de wikipedia. el almacén está oculto del árbol de archivos de cada proyecto y se gestiona mediante el modo cacheawl y las herramientas de cachebox de tu readvisor.
+el almacén de archivos global de la máquina, compartido entre todos los proyectos de enough. (esto reemplaza a la antigua biblioteca <code>infoworld/</code> — en tu primer inicio de esta versión, tus carpetas <code>personal/</code>, <code>public/</code> y <code>wiki/</code> se movieron aquí, y cada una se convirtió en un volumen.) un <em>volumen</em> es una carpeta de nivel superior en el almacén: ya sea texto simple que quieres conservar para siempre, o una "réplica en caché" ingerida desde una ruta local, un sitio web, o un conjunto de artículos de wikipedia. el almacén está oculto del árbol de archivos de cada proyecto y se gestiona mediante el modo canon y las herramientas de canon de tu readvisor.
 
 ### how
-abre el modo cacheawl (el botón cacheawl de la barra superior) para una vista de dos paneles: tu proyecto en un lado, los cacheboxes en el otro. arrastra un archivo de un lado a otro para copiarlo, shift-arrastra para moverlo; la barra de ingesta compone una petición a tu readvisor para traer una ruta, sitio o tema de wiki. o simplemente pídeselo a tu readvisor — puede listar, crear e ingerir en cacheboxes (sujeto al interruptor del broker "cacheawl tools"). cada caja lleva un diagrama <code>_cachebox.merirmaid</code> autogenerado de su contenido (solo lectura — se regenera a partir de los archivos) y metadatos ocultos; nunca editas esos directamente.
+abre el modo canon (el botón canon de la barra superior) para una vista de dos paneles: tu proyecto en un lado, los volúmenes en el otro. arrastra un archivo de un lado a otro para copiarlo, shift-arrastra para moverlo; la barra de ingesta compone una petición a tu readvisor para traer una ruta, sitio o tema de wiki. o simplemente pídeselo a tu readvisor — puede listar, crear e ingerir en volúmenes (sujeto al interruptor del broker "canon tools"). cada volumen lleva un catálogo <code>canon.cosm</code> autogenerado de su contenido (solo lectura — se regenera a partir de los archivos) y metadatos ocultos; nunca editas esos directamente.
 
 ### ideas
 - ingiere un sitio de documentación con poca profundidad para que tu readvisor pueda fundamentarse en él completamente sin conexión.
-- mantén un cachebox <code>personal</code> de material de referencia consultable desde cualquier proyecto.
-- guarda los artículos de wikipedia de los que dependes en el cachebox global <code>wiki</code> — compartido en todas partes, sin atarse a un solo proyecto.
+- mantén un volumen <code>personal</code> de material de referencia consultable desde cualquier proyecto.
+- guarda los artículos de wikipedia de los que dependes en el volumen global <code>wiki</code> — compartido en todas partes, sin atarse a un solo proyecto.
 
 ## mode-system
 name: modo lectura / edición
@@ -246,7 +246,7 @@ path: the file viewer
 al hacer clic en un archivo se abre en un único <strong>modo lectura/edición</strong> unificado con dos facetas — una faceta de lectura (el ojo) y una faceta de edición (el lápiz). vive como un panel lateral mini junto al chat, o expandido a pantalla completa; usa el interruptor mini↔completo para cambiar. las ediciones están protegidas contra pérdida, así que no perderás cambios sin guardar por navegar a otro lado por accidente. los archivos que enough no muestra de forma nativa igual se abren: un archivo de word, pdf, presentación o libro de excel se abre como su <em>gemelo</em> en markdown (ve la burbuja de <em>documento convertido</em> en cualquiera de esas filas), y una imagen se abre en un visor simple con tamaños de ajuste y 1:1.
 
 ### how
-haz un clic en un archivo del árbol para abrirlo en el panel mini; expándelo a pantalla completa cuando quieras más espacio. alterna entre las facetas de lectura (ojo) y edición (lápiz) con los botones dedicados en la barra del modo lectura/edición. cada modo abierto muestra un indicador cuadrado arriba a la derecha (el más nuevo a la izquierda) con una pequeña cinta de x roja para cerrarlo — los modos se <em>apilan</em>, así que cerrar uno revela el modo de abajo exactamente como lo dejaste. haz clic en un indicador enterrado para traer ese modo al frente; pulsa <code>esc</code> para cerrar el modo superior. el mismo patrón de indicador + cinta cubre todos los modos de pantalla completa (wikisink, girraph, merirmaid, cacheawl, y el modo de referencia de solo lectura <strong>centro de ayuda</strong>, que se abre desde el pequeño botón de <strong>ayuda</strong> arriba a la derecha de la ventana de ui).
+haz un clic en un archivo del árbol para abrirlo en el panel mini; expándelo a pantalla completa cuando quieras más espacio. alterna entre las facetas de lectura (ojo) y edición (lápiz) con los botones dedicados en la barra del modo lectura/edición. cada modo abierto muestra un indicador cuadrado arriba a la derecha (el más nuevo a la izquierda) con una pequeña cinta de x roja para cerrarlo — los modos se <em>apilan</em>, así que cerrar uno revela el modo de abajo exactamente como lo dejaste. haz clic en un indicador enterrado para traer ese modo al frente; pulsa <code>esc</code> para cerrar el modo superior. el mismo patrón de indicador + cinta cubre todos los modos de pantalla completa (wikisink, girraph, merirmaid, canon, y el modo de referencia de solo lectura <strong>centro de ayuda</strong>, que se abre desde el pequeño botón de <strong>ayuda</strong> arriba a la derecha de la ventana de ui).
 
 ### ideas
 - mantén un archivo abierto en el panel mini mientras conversas — referencia y conversación lado a lado.
@@ -272,7 +272,7 @@ name: merirmaid
 path: *.merirmaid
 
 ### what
-la variante de enough de un diagrama <a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid</a>: código fuente de diagrama en texto plano con un pequeño encabezado, renderizado en vivo como imagen en el navegador (diagramas de flujo, diagramas de secuencia, máquinas de estado, diagramas ER — todo lo que Mermaid soporta). dos tipos: un diagrama <em>wip</em> que puedes ajustar, y un <em>espejo</em> que refleja alguna estructura (como el contenido de un cachebox) y es de solo lectura.
+la variante de enough de un diagrama <a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid</a>: código fuente de diagrama en texto plano con un pequeño encabezado, renderizado en vivo como imagen en el navegador (diagramas de flujo, diagramas de secuencia, máquinas de estado, diagramas ER — todo lo que Mermaid soporta). dos tipos: un diagrama <em>wip</em> que puedes ajustar, y un <em>espejo</em> que refleja alguna estructura (como el contenido de un volumen) y es de solo lectura.
 
 ### how
 pídele a tu readvisor que dibuje o revise un diagrama — escribe el código fuente <code>.merirmaid</code>; abrir el archivo lo renderiza. en un diagrama wip puedes hacer clic en el texto de un nodo para editar la etiqueta ahí mismo (con un contador de caracteres en vivo); los cambios estructurales pasan por tu readvisor mediante la píldora de chat. los nodos pueden enlazar a otros diagramas o documentos — haz clic en ellos para seguirlos, con migas de pan para volver atrás. un diagrama con errores muestra el error más el código fuente, nunca un panel en blanco. los diagramas espejo muestran una insignia de "espejo" en vez de asas de edición.
@@ -282,20 +282,79 @@ pídele a tu readvisor que dibuje o revise un diagrama — escribe el código fu
 - enlaza un conjunto de diagramas entre sí con nodos en los que se puede hacer clic para construir un mapa navegable.
 - combínalo con girraphs: un girraph para el argumento, un merirmaid para el flujo.
 
-## cacheawl
-name: cacheawl
-path: ~/enough/cacheawl/
+## canon
+name: canon
+path: ~/enough/canon/
 
 ### what
-el almacén global de la máquina para <em>cacheboxes</em> — carpetas de nivel superior que guardan texto que quieres conservar para siempre, o réplicas en caché ingeridas desde una ruta local, un sitio web, o artículos de wikipedia. compartido entre todos los proyectos y oculto de los árboles de archivos de los proyectos. aquí es donde vive ahora la antigua biblioteca <code>infoworld</code>.
+el almacén global de la máquina para <em>volúmenes</em> — carpetas de nivel superior que guardan texto que quieres conservar para siempre, o réplicas en caché ingeridas desde una ruta local, un sitio web, o artículos de wikipedia. compartido entre todos los proyectos y oculto de los árboles de archivos de los proyectos. aquí es donde vive ahora la antigua biblioteca <code>infoworld</code>.
 
 ### how
-abre el modo cacheawl desde la barra superior para la vista de dos paneles (proyecto ↔ cacheboxes): arrastra para copiar un archivo entre ellos, shift-arrastra para moverlo, y usa la barra de ingesta para pedirle a tu readvisor que traiga una fuente a una caja. o habla directamente con tu readvisor — puede listar, crear e ingerir en cajas cuando el interruptor del broker "cacheawl tools" está activado (las ingestas de url también respetan tus interruptores de fetch_url). cada caja muestra un diagrama autogenerado de su contenido (<code>_cachebox.merirmaid</code>, solo lectura) y mantiene metadatos ocultos que no tocas.
+abre el modo canon desde la barra superior para la vista de dos paneles (proyecto ↔ volúmenes): arrastra para copiar un archivo entre ellos, shift-arrastra para moverlo, y usa la barra de ingesta para pedirle a tu readvisor que traiga una fuente a un volumen. o habla directamente con tu readvisor — puede listar, crear e ingerir en volúmenes cuando el interruptor del broker "canon tools" está activado (las ingestas de url también respetan tus interruptores de fetch_url). cada volumen mantiene un catálogo autogenerado de su contenido (<code>canon.cosm</code>, solo lectura) y metadatos ocultos que no tocas. haz doble clic en ese catálogo — o en un Holotype, o en cualquier otro archivo <code>.cosm</code> — para recorrerlo en el visor cosm; el botón <strong>catálogo del proyecto</strong> hace lo mismo con el de este proyecto (<code>rness/canon.cosm</code>). un texto que tiene un gemelo EML lleva una pequeña insignia de gemelo teñida.
 
 ### ideas
 - ingiere un sitio de documentación o una carpeta de notas para que tu readvisor pueda trabajar con ella sin conexión.
-- mueve un artefacto terminado a un cachebox para mantenerlo fuera del proyecto de trabajo pero aun así accesible desde cualquier lugar.
-- haz doble clic en el diagrama de una caja para ver su forma de un vistazo en el visor de merirmaid.
+- mueve un artefacto terminado a un volumen para mantenerlo fuera del proyecto de trabajo pero aun así accesible desde cualquier lugar.
+- haz clic en el pequeño botón de diagrama del icono de un volumen para ver su forma de un vistazo en el visor de merirmaid.
+
+## cosm-viewer
+name: visor cosm
+path: *.cosm
+
+### what
+la vista estructurada de cualquier volumen <code>.cosm</code> — el catálogo de un volumen de canon, un Holotype (<em>holotipo</em>) de Comprise, el gemelo EML de un texto, un árbol de producto independiente. el riel de la izquierda muestra el catálogo (su nombre, el lenguaje en el que está escrito, su dirección), sus módulos y clases con cuántos elementos tiene cada uno, y las comprobaciones; la columna de al lado muestra una tarjeta por elemento: su id, su clase y su estado, su nombre y su resumen, y luego cada uno de los demás campos. un id que apunta a otro elemento es un enlace, y una pregunta abierta lleva un <strong>?</strong> en un círculo.
+
+### how
+haz doble clic en un catálogo, un Holotype o cualquier archivo <code>.cosm</code> en canon, o haz clic en una fila <code>.cosm</code> del árbol de archivos. haz clic en un módulo o una clase del riel para ir allí, y en cualquier id enlazado para saltar a ese elemento — una píldora «volver» te devuelve. <strong>lente</strong> dibuja el volumen como diagrama en merirmaid; haz shift-clic en un nodo y elige <strong>mostrar el elemento</strong> para volver a su tarjeta. <strong>abrir en bruto</strong> muestra el propio archivo como texto plano, <strong>sobre este formato</strong> abre la especificación en la sección sobre el lenguaje de este volumen, ⌘F busca palabras en las tarjetas, y el botón de tamaño acopla el visor a un lado.
+
+### ideas
+- abre el catálogo de este proyecto con el botón <strong>catálogo del proyecto</strong> de canon para ver de un vistazo cada archivo, sus gemelos y sus atems.
+- un Holotype grande muestra al principio cuarenta tarjetas por clase; <strong>mostrar todos</strong> trae el resto.
+- las comprobaciones son las genéricas de MacroCOSM; las reglas propias de un Holotype son cosa de Comprise, y el riel dice cuántas les deja.
+
+## cosmspec
+name: especificación MacroCOSM
+path: docs/MACROCOSM_OES.md
+
+### what
+la especificación de <strong>MacroCOSM OES</strong>, la gramática común en la que está escrito cada archivo <code>.cosm</code>: cómo se lee un archivo, cómo un volumen nombra el lenguaje en el que está escrito, qué son un elemento y su sobre, cómo se señalan los elementos entre sí, cómo se anota lo que no se sabe, cómo se direcciona todo, a qué comprobaciones puede someterse cada volumen — y, en la sección 18, los cuatro lenguajes que lee enough: comprise, cosm, canon y eml.
+
+### how
+ábrela con el botón <strong>MacroCOSM</strong> de la parte de arriba de la ventana de la interfaz, o desde <strong>sobre este formato</strong> en el visor cosm, que llega a la sección correcta. <strong>contenido</strong> lista las secciones, un «section 18.4» en el texto es un enlace, ⌘F busca, y el botón de tamaño la acopla junto a tu trabajo. por ahora está escrita en inglés.
+
+### ideas
+- empieza por la sección 2, el modelo en una página.
+- tenla acoplada junto a un Holotype en el visor cosm mientras aprendes a leer uno.
+
+## canon-chip
+name: chip de canon
+path: notes.md → notes.md.cosm
+
+### what
+el pequeño grupo en la cabecera de un texto, junto al chip de conversión, que dice si este texto tiene un <strong>gemelo EML</strong>: un archivo <code>.cosm</code> escrito a su lado (<code>notes.md</code> → <code>notes.md.cosm</code>) que desmonta el texto — las palabras en las que se apoya, las personas y cosas que nombra, las afirmaciones que hace y cómo las sabe, y los sucesos que cuenta. la insignia del gemelo está tintada cuando hay gemelo, hueca cuando no, y lleva un punto cuando el texto ha cambiado desde que se escribió su gemelo. nada se descompila por su cuenta: solo cuando tú lo pides.
+
+### how
+<strong>gemelo</strong> da la vuelta al lector hacia el gemelo, al mismo tamaño, en lugar del texto: las tarjetas del visor cosm, con <strong>volver al texto</strong> para regresar, <strong>compilar el texto</strong> para escribir el gemelo como un nuevo archivo markdown con fecha a su lado, <strong>lente</strong> para un diagrama y <strong>abrir en bruto</strong> para el propio archivo. si todavía no hay gemelo, el botón descompila primero y da la vuelta cuando termina. el botón <strong>atem</strong> te da el texto entero en una línea (mira la tarjeta del atem). <strong>descompilar</strong> crea el gemelo y <strong>actualizar el gemelo</strong> lo vuelve a crear; si el gemelo ya está al día, enough pregunta antes. el trabajo aparece como un aviso que puedes cancelar. con un modelo en marcha tarda un rato, y un mensaje que envíes mientras tanto espera su turno; sin modelo obtienes un andamio etiquetado: las palabras y los nombres, todavía sin afirmaciones.
+
+### ideas
+- descompila una vez un capítulo largo y lee luego las afirmaciones del gemelo como la lista de lo que el capítulo de verdad sostiene.
+- <strong>atem</strong> y <strong>descompilar</strong> están también en el menú de shift-clic de canon y en el menú de opción+clic del árbol de archivos, y <strong>atem</strong> en el menú de nodos de merirmaid para un nodo que nombra un texto.
+- un gemelo abierto en bruto es texto sencillo que puedes leer y editar; el visor cosm lo revisa por ti.
+
+## atem-card
+name: tarjeta del atem
+path: (the atem of a text or a passage)
+
+### what
+un <strong>atem</strong> es la reducción más ajustada, justa, completa y en lenguaje llano de un texto o de un pasaje. la tarjeta pone <em>la línea</em> en grande — una frase de quince a veinticinco palabras que dice lo que dice el todo — y luego tres partes breves: <strong>foco</strong>, lo que está pasando y hacia dónde te hace mirar el autor; <strong>empuje</strong>, lo que el autor quiere que te lleves; <strong>tirón</strong>, lo que de verdad deberías llevarte, con los supuestos ocultos y las dependencias nombrados. donde empuje y tirón no coinciden suele estar lo más útil de la tarjeta. deja el puntero sobre una etiqueta para ver su definición. cuando el modelo dice cómo se saben las afirmaciones, una franja muestra las seis posturas con sus cuentas.
+
+### how
+pide uno con <strong>atem</strong> en el chip de canon o en un menú de archivo (el texto entero: su atem se guarda en el gemelo EML del texto), o selecciona un pasaje y haz clic derecho: <strong>atem de la selección</strong> está en el lector, el editor, un artículo de wikisink, el centro de ayuda, la especificación y una página de texto de composure. mientras lee, la tarjeta lo dice y ofrece cancelar. <strong>copiar</strong> copia la línea (⇧-clic copia las cuatro partes), <strong>fijar en el gemelo</strong> guarda el atem de un pasaje en el gemelo del texto junto con su lugar, y <strong>abrir el gemelo</strong> muestra el gemelo al que fue el atem del texto entero. sin modelo en marcha, la tarjeta muestra un andamio: la línea y el foco salen de las primeras frases del texto, y empuje y tirón siguen siendo preguntas abiertas.
+
+### ideas
+- lee el atem de un borrador antes de enviarlo. si la línea no es lo que querías decir, el borrador tampoco.
+- fija los atems de los pasajes clave de una pieza larga y tendrás una columna vertebral para revisar.
+- compara empuje y tirón en el argumento de otra persona: el hueco entre ambos es donde objetar.
 
 ## footnotes
 name: notas al pie

@@ -571,14 +571,16 @@ def run_write_file(project_dir: Path, call: ToolCall) -> ToolResult:
         return ToolResult("write_file", "", False, "error: missing <path>")
     if call.content is None:
         return ToolResult("write_file", call.path, False, "error: missing <content>")
-    # Cachebox mirror guard: refuse to edit a modality:mirror file under the
-    # cacheawl store BEFORE allowlist resolution, so the denial explains the
-    # real reason (mirrors are backend-owned) rather than an allowlist miss.
-    from . import cacheawl as _cacheawl  # late import: avoid an import cycle
+    # Catalog guard: refuse to edit a file enough keeps — a Canon volume's
+    # canon.cosm, this project's rness/canon.cosm, a volume's metadata, a
+    # modality:mirror file in the store — BEFORE allowlist resolution, so the
+    # denial explains the real reason (they are regenerated from what they
+    # describe) rather than an allowlist miss.
+    from . import canon as _canon  # late import: avoid an import cycle
     _raw = Path(call.path).expanduser()
     _cand = _raw.resolve(strict=False) if _raw.is_absolute() \
         else (project_dir / _raw).resolve(strict=False)
-    if (why := _cacheawl.mirror_write_denial(_cand)):
+    if (why := _canon.catalog_write_denial(_cand, project_dir)):
         return ToolResult("write_file", call.path, False, why)
     try:
         # Absolute paths require the stricter file-rw allowlist; relative
@@ -728,7 +730,7 @@ class FetchError(Exception):
 @dataclass
 class FetchResponse:
     """Normalized fetch result for callers other than run_fetch_url (e.g.
-    the cacheawl url-ingest crawler) so they share one HTTP stack."""
+    the Canon url-ingest crawler) so they share one HTTP stack."""
     status: int
     content_type: str       # main MIME type, lowercased, charset stripped
     text: str               # decoded text (empty for binary types)
@@ -789,7 +791,7 @@ def fetch_gated(
     project_dir: Path, url: str, *,
     timeout: float = _FETCH_TIMEOUT_S, max_bytes: int = _FETCH_MAX_BYTES,
 ) -> tuple[FetchResponse, bool]:
-    """Public gated-fetch for non-tool callers (cacheawl). Same broker
+    """Public gated-fetch for non-tool callers (Canon). Same broker
     gating as fetch_url; returns a normalized (FetchResponse, used_tor).
     Raises FetchDenied / FetchError like _fetch_http."""
     resp, use_tor, _host = _fetch_http(project_dir, url, timeout=timeout,
@@ -1521,52 +1523,61 @@ def run_wikisink(project_dir: Path, call: ToolCall) -> ToolResult:
 
 
 # ---------------------------------------------------------------------------
-# cacheawl tools — the global file store at ~/enough/cacheawl/. Three tools:
-# cachebox_list (list boxes or a box's contents), cachebox_create (empty
-# box), cachebox_ingest (populate a box from a path/url/wikisink source).
-# All gated by the `cacheawl_enabled` broker toggle. The module (cacheawl.py)
-# owns the store; these runners are thin adapters. url ingests additionally
-# honor the fetch_url toggles by construction (they route through
-# fetch_gated).
+# canon tools — the global file store at ~/enough/canon/ (was: cacheawl).
+# Three tools: canon_list (list volumes or a volume's contents), canon_create
+# (an empty volume), canon_ingest (populate a volume from a path/url/wikisink
+# source). All gated by the `canon_enabled` broker toggle. The module
+# (canon.py) owns the store; these runners are thin adapters. url ingests
+# additionally honor the fetch_url toggles by construction (they route
+# through fetch_gated). A volume is named by `<volume>`; the pre-0.4.3 tag
+# `<box>` is read too.
 # ---------------------------------------------------------------------------
 
-def _cacheawl_denied(name: str, key: str = "") -> ToolResult:
-    return ToolResult(name, key, False, broker.denial_cacheawl_disabled())
+def _canon_denied(name: str, key: str = "") -> ToolResult:
+    return ToolResult(name, key, False, broker.denial_canon_disabled())
 
 
-def run_cachebox_list(project_dir: Path, call: ToolCall) -> ToolResult:
-    if not broker.is_enabled("cacheawl_enabled"):
-        return _cacheawl_denied("cachebox_list")
-    from . import cacheawl as _cacheawl
-    box = (call.extra.get("box") or "").strip()
+def _volume_arg(call: ToolCall) -> str:
+    return (call.extra.get("volume") or call.extra.get("box") or "").strip()
+
+
+def run_canon_list(project_dir: Path, call: ToolCall) -> ToolResult:
+    if not broker.is_enabled("canon_enabled"):
+        return _canon_denied("canon_list")
+    from . import canon as _canon
+    vol = _volume_arg(call)
     try:
-        if box:
-            _cacheawl.reconcile(box)
-            data = _cacheawl.cachebox_tree(box)
+        if vol:
+            _canon.reconcile(vol)
+            data = _canon.volume_tree(vol)
             lines = [
-                f"cachebox {box!r} — {data['item_count']} files, "
+                f"volume {vol!r} — {data['item_count']} files, "
                 f"{data['total_size_human']}, status {data['status']}",
                 f"origin: {data.get('origin')}",
-                "contents (folders first):",
+                "contents (folders first; canon.cosm is its catalog):",
             ]
 
             def render(nodes: list[dict[str, Any]], indent: str = "  ") -> None:
                 for n in nodes:
                     if n["is_dir"]:
-                        lines.append(f"{indent}{n['name']}/")
+                        mark = " [holotype]" if n.get("holotype") else ""
+                        lines.append(f"{indent}{n['name']}/{mark}")
                         render(n.get("children") or [], indent + "  ")
                     else:
-                        lines.append(f"{indent}{n['name']}")
+                        extra = ""
+                        if isinstance(n.get("eml"), dict):
+                            extra = f" [eml twin: {n['eml'].get('state', '')}]"
+                        lines.append(f"{indent}{n['name']}{extra}")
 
             render(data.get("tree") or [])
-            return ToolResult("cachebox_list", box, True, "\n".join(lines))
-        _cacheawl.reconcile_all()
-        boxes = _cacheawl.list_cacheboxes()
-        if not boxes:
-            return ToolResult("cachebox_list", "", True,
-                              "no cacheboxes yet. create one with cachebox_create.")
-        lines = [f"{len(boxes)} cachebox(es) in ~/enough/cacheawl/:"]
-        for b in boxes:
+            return ToolResult("canon_list", vol, True, "\n".join(lines))
+        _canon.reconcile_all()
+        volumes = _canon.list_volumes()
+        if not volumes:
+            return ToolResult("canon_list", "", True,
+                              "no volumes yet. create one with canon_create.")
+        lines = [f"{len(volumes)} volume(s) in ~/enough/canon/:"]
+        for b in volumes:
             o = b.get("origin") or {}
             lines.append(
                 f"- {b['name']} — {b['item_count']} files, {b['total_size_human']}, "
@@ -1574,55 +1585,55 @@ def run_cachebox_list(project_dir: Path, call: ToolCall) -> ToolResult:
                 + (f":{o.get('value')}" if o.get('value') else "")
                 + (f" [status: {b['status']}]" if b['status'] != 'complete' else "")
             )
-        return ToolResult("cachebox_list", "", True, "\n".join(lines))
-    except _cacheawl.CacheawlError as e:
-        return ToolResult("cachebox_list", box, False, f"error: {e}")
+        return ToolResult("canon_list", "", True, "\n".join(lines))
+    except _canon.CanonError as e:
+        return ToolResult("canon_list", vol, False, f"error: {e}")
 
 
-def run_cachebox_create(project_dir: Path, call: ToolCall) -> ToolResult:
-    if not broker.is_enabled("cacheawl_enabled"):
-        return _cacheawl_denied("cachebox_create")
-    from . import cacheawl as _cacheawl
+def run_canon_create(project_dir: Path, call: ToolCall) -> ToolResult:
+    if not broker.is_enabled("canon_enabled"):
+        return _canon_denied("canon_create")
+    from . import canon as _canon
     name = (call.extra.get("name") or call.path or "").strip()
     if not name:
-        return ToolResult("cachebox_create", "", False,
-                          "error: missing <name> for the new cachebox.")
+        return ToolResult("canon_create", "", False,
+                          "error: missing <name> for the new volume.")
     try:
-        summary = _cacheawl.create_cachebox(name)
-    except _cacheawl.CacheawlError as e:
-        return ToolResult("cachebox_create", name, False, f"error: {e}")
-    return ToolResult("cachebox_create", name, True,
-                      f"ok — created empty cachebox {name!r} at "
-                      f"~/enough/cacheawl/{name}/ (mirror generated).")
+        _canon.create_volume(name)
+    except _canon.CanonError as e:
+        return ToolResult("canon_create", name, False, f"error: {e}")
+    return ToolResult("canon_create", name, True,
+                      f"ok — created empty volume {name!r} at "
+                      f"~/enough/canon/{name}/ (catalog canon.cosm written).")
 
 
-def run_cachebox_ingest(project_dir: Path, call: ToolCall) -> ToolResult:
-    if not broker.is_enabled("cacheawl_enabled"):
-        return _cacheawl_denied("cachebox_ingest")
-    from . import cacheawl as _cacheawl
-    box = (call.extra.get("box") or "").strip()
+def run_canon_ingest(project_dir: Path, call: ToolCall) -> ToolResult:
+    if not broker.is_enabled("canon_enabled"):
+        return _canon_denied("canon_ingest")
+    from . import canon as _canon
+    vol = _volume_arg(call)
     source_type = (call.extra.get("type") or "").strip().lower()
     value = (call.extra.get("value") or "").strip()
     depth_raw = (call.extra.get("depth") or "").strip()
     all_flag = (call.extra.get("all") or "").strip().lower() in ("true", "yes", "1")
-    if not box:
-        return ToolResult("cachebox_ingest", "", False,
-                          "error: missing <box> (the destination cachebox name).")
+    if not vol:
+        return ToolResult("canon_ingest", "", False,
+                          "error: missing <volume> (the destination volume's name).")
     if not source_type or not value:
-        return ToolResult("cachebox_ingest", box, False,
+        return ToolResult("canon_ingest", vol, False,
                           "error: ingest needs <type> (path|url|wikisink) and "
                           "<value> (the source).")
     depth: Any = depth_raw or 1
     try:
-        summary = _cacheawl.run_ingest(
-            project_dir, box=box, source_type=source_type, value=value,
+        summary = _canon.run_ingest(
+            project_dir, box=vol, source_type=source_type, value=value,
             depth=depth, all_flag=all_flag)
-    except _cacheawl.CacheawlError as e:
-        return ToolResult("cachebox_ingest", box, False, f"error: {e}")
+    except _canon.CanonError as e:
+        return ToolResult("canon_ingest", vol, False, f"error: {e}")
     return ToolResult(
-        "cachebox_ingest", box, True,
-        f"ok — ingested {summary.get('files_written', 0)} file(s) into cachebox "
-        f"{box!r} from {source_type}:{value} (depth "
+        "canon_ingest", vol, True,
+        f"ok — ingested {summary.get('files_written', 0)} file(s) into volume "
+        f"{vol!r} from {source_type}:{value} (depth "
         f"{summary.get('origin', {}).get('depth')}). now "
         f"{summary['item_count']} files, {summary['total_size_human']}.",
     )
@@ -1684,9 +1695,9 @@ _DISPATCH = {
     "read_wiki_article": run_read_wiki_article,
     "wiki_status": run_wiki_status,
     "wikisink": run_wikisink,
-    "cachebox_list": run_cachebox_list,
-    "cachebox_create": run_cachebox_create,
-    "cachebox_ingest": run_cachebox_ingest,
+    "canon_list": run_canon_list,
+    "canon_create": run_canon_create,
+    "canon_ingest": run_canon_ingest,
 }
 
 # Map tool name to its per-tool "brokered" toggle. When that toggle is
@@ -1722,11 +1733,11 @@ _TRACE_TOGGLE = {
     "read_wiki_article": "trace_log_enabled",
     "wiki_status": "trace_log_enabled",
     "wikisink": "trace_log_enabled",
-    # cacheawl tools are gated by `cacheawl_enabled`; trace them under the
-    # universal toggle so every box mutation lands in the journal.
-    "cachebox_list": "trace_log_enabled",
-    "cachebox_create": "trace_log_enabled",
-    "cachebox_ingest": "trace_log_enabled",
+    # canon tools are gated by `canon_enabled`; trace them under the
+    # universal toggle so every volume mutation lands in the journal.
+    "canon_list": "trace_log_enabled",
+    "canon_create": "trace_log_enabled",
+    "canon_ingest": "trace_log_enabled",
 }
 
 # The nine composure tools add themselves to both tables above. One
@@ -1753,6 +1764,14 @@ _pal_tools.register()
 # imports `enough.dictionary` lazily.
 from . import dictionary_tools as _dictionary_tools  # noqa: E402
 _dictionary_tools.register()
+
+# MacroCOSM's five (0.4.3): `cosm_read`, `cosm_lint`, `eml_derive`, `atem`,
+# `cosm_guide`. Reads and project writes are ungated; a write into the Canon
+# store answers to `canon_enabled` inside the runners. Documented in every
+# project (like FEED's); the guide is the `macrocosm-oes` skill, off by
+# default and one `cosm_guide` away. The module imports the engine lazily.
+from . import canon_tools as _canon_tools  # noqa: E402
+_canon_tools.register()
 
 # `show_intro` (0.4.1): the brief introduction, on screen without a model
 # writing it. Always on and documented in the core.

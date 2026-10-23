@@ -1,0 +1,66 @@
+# R: surfaces.
+nodes:
+  - id: R:surface/website
+    type: surface
+    name: mozilla.ai
+    summary: 'The company site: products, open tools, company pages.'
+    kind: website
+    url: https://www.mozilla.ai/
+    presents: ['P:offering/otari', 'P:offering/octonous', 'P:offering/choice-first-stack']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Product-Team
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.ai/'], confidence: 0.9, state: known}
+
+  - id: R:surface/otari-site
+    type: surface
+    name: otari.ai
+    summary: The hosted Otari.
+    kind: website
+    url: https://otari.ai/
+    presents: ['P:offering/otari']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Product-Team
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.ai/'], confidence: 0.9, state: known}
+
+  - id: R:surface/octonous-site
+    type: surface
+    name: octonous.com
+    summary: Octonous.
+    kind: website
+    url: https://octonous.com/
+    presents: ['P:offering/octonous']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Product-Team
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.ai/'], confidence: 0.9, state: known}
+
+  - id: R:surface/blueprints-site
+    type: surface
+    name: blueprints.mozilla.ai
+    summary: The Blueprints collection.
+    kind: website
+    url: https://blueprints.mozilla.ai/
+    presents: ['P:offering/blueprints']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/VP-Engineering
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.ai/'], confidence: 0.9, state: known}
+
+  - id: R:surface/github
+    type: surface
+    name: github.com/mozilla-ai
+    summary: The organization's repositories.
+    kind: repository
+    url: https://github.com/mozilla-ai
+    presents: ['P:offering/choice-first-stack', 'P:offering/local-ai-tools', 'P:offering/cq']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/VP-Engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-ai'], confidence: 0.9, state: known}

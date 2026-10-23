@@ -1,0 +1,55 @@
+# R: surfaces: where the Foundation shows itself.
+nodes:
+  - id: R:surface/website
+    type: surface
+    name: mozillafoundation.org
+    summary: 'The Foundation''s website: What we do, grantmaking, Common Voice, the magazine, MozFest, public records.'
+    kind: website
+    url: https://www.mozillafoundation.org/en/
+    hosted-on: S:system/foundation-website
+    presents: ['P:offering/grantmaking', 'P:offering/fellowships', 'P:offering/mozilla-festival', 'P:offering/nothing-personal', 'P:offering/common-voice', 'P:offering/campaigns']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Senior-Director-Technology-Platforms
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/'], confidence: 0.9, state: known}
+
+  - id: R:surface/common-voice-site
+    type: surface
+    name: commonvoice.mozilla.org
+    summary: The Common Voice web app where people record and validate speech.
+    kind: website
+    url: https://commonvoice.mozilla.org
+    hosted-on: S:system/common-voice-platform
+    presents: ['P:offering/common-voice']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Senior-Director-Technology-Platforms
+    provenance: {mode: net-scan, sources: ['https://github.com/common-voice/common-voice'], confidence: 0.8, state: known}
+
+  - id: R:surface/state-of-mozilla
+    type: surface
+    name: State of Mozilla
+    summary: The annual report site (2025/26 edition at stateof.mozilla.org); links the audited statements and the Form 990.
+    kind: website
+    url: https://stateof.mozilla.org/
+    presents: ['P:function/governance-and-compliance']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Senior-Counsel
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/'], confidence: 0.9, state: known}
+
+  - id: R:surface/public-records
+    type: surface
+    name: Annual reports and financials page
+    summary: 'The Foundation''s public records page: filings by year, governing documents, determination letters, subsidiary records.'
+    kind: website
+    url: https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/
+    presents: ['P:function/governance-and-compliance']
+    counterparty: none
+    status: active
+    visibility: public
+    owner: O:role/Senior-Counsel
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.9, state: known}

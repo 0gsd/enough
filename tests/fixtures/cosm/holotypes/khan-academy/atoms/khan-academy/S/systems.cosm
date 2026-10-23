@@ -1,0 +1,42 @@
+# S — what the nonprofit publicly runs or is known for: the learning platform, the Go services behind it, the AI tutor, and the open-source code.
+nodes:
+  - id: S:system/learning-platform
+    type: system
+    name: The learning platform
+    summary: "The web site and the iOS and Android apps where learners practise, watch and get assigned work; the apps keep progress in sync with the web and let learners download videos."
+    category: application
+    vendor: none
+    counterparty: none
+    regulatory-criticality: high
+    status: active
+    visibility: public
+    owner: O:role/Chief-Technology-Officer
+    provenance: {mode: net-scan, sources: [ka-downloads, ka-home], confidence: 0.8, state: known}
+
+  - id: S:system/backend-services
+    type: system
+    name: Go services
+    summary: "The backend, rewritten from a Python 2 monolith into Go services under the project called Goliath; the engineering blog reports more than half a million lines of Go in production and names Google Cloud Datastore."
+    category: runtime
+    vendor: none
+    counterparty: none
+    regulatory-criticality: high
+    status: active
+    visibility: public
+    owner: O:role/Chief-Technology-Officer
+    provenance: {mode: net-scan, sources: [eng-go-rewrite, github-khan], confidence: 0.6, state: known}
+    pending: "the engineering post is undated; is the migration finished, and is Google Cloud still the host?"
+
+  - id: S:system/khanmigo-ai
+    type: system
+    name: Khanmigo's AI service
+    summary: "The service behind the AI tutor and teaching assistant. Its pricing pages say Khanmigo uses GPT-4 and that each interaction has a cost; the 2026 tools use Gemini models for interactive diagrams and teacher-reviewed practice."
+    category: ai
+    vendor: S:vendor/openai
+    counterparty: C:counterparty/openai
+    regulatory-criticality: high
+    status: active
+    visibility: public
+    owner: O:role/Chief-Technology-Officer
+    provenance: {mode: net-scan, sources: [khanmigo-learners, khanmigo-parents, blog-google-org, journal-khanmigo-2023], confidence: 0.7, state: known}
+    pending: "which model providers serve which Khanmigo features today (OpenAI, Google, small models from Microsoft)?"

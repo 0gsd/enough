@@ -1,0 +1,17 @@
+# O: units: only where a seat needs one to govern.
+nodes:
+  - id: O:unit/executive-office
+    type: unit
+    name: Executive office
+    summary: The executive director's office, as the seats of the chief operating officer and the executive program manager imply; no structure is published.
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/'], confidence: 0.5, state: known}
+
+  - id: O:unit/people-and-culture
+    type: unit
+    name: People and culture
+    summary: The function behind the senior director seat for people and culture; the Foundation employed 73 people in 2024 and cut 30% of staff in November 2024.
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.6, state: known}

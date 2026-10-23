@@ -17,8 +17,8 @@ What lives here
   visible markdown, using the top bar's exact rules (§1.4), cached behind a
   cheap fingerprint so a list render never re-reads a whole project.
 - **The project mirror**: the same `modality: mirror` merirmaid contract the
-  cachebox mirrors use, built by the shared flowchart helper in
-  `cacheawl.py`.
+  Canon volume mirrors use, built by the shared flowchart helper in
+  `canon.py`.
 - **The open/close handshake**: a `.home-open` handoff file plus exit code
   42 for the desktop shell, or an `os.execv` re-exec for the CLI (§1.7).
 
@@ -375,7 +375,7 @@ def _counted_files(project_dir: Path) -> list[tuple[Path, os.stat_result]]:
       agent's brief, the policies, the skills — is not the user's writing.
 
     Everything else matches `server._walk_tree`: dotfiles, `IGNORE_DIRS`,
-    `HIDDEN_TREE_PATHS`, the wikisink/cacheawl store dirs, and the same
+    `HIDDEN_TREE_PATHS`, the wikisink/Canon store dirs, and the same
     symlink-cycle protection.
     """
     # Lazy: server imports us, so a module-level import would cycle. Reaching
@@ -551,11 +551,16 @@ def list_projects() -> list[dict[str, Any]]:
 
 def _mirror_skip(project_dir: Path):
     """The tree's visibility rules as a predicate the flowchart helper can
-    use: dotfiles, IGNORE_DIRS, HIDDEN_TREE_PATHS, the global store dirs, and
-    a converted document's twin + assets folder (one row per document, same
-    as the sidebar). Unlike the counters, this one keeps `rness/` — the
-    sidebar shows it, so the mirror of what the sidebar shows does too."""
+    use: dotfiles, IGNORE_DIRS, HIDDEN_TREE_PATHS, the global store dirs, a
+    converted document's twin + assets folder, a text's EML twin
+    (`notes.md.cosm`) and a paginated PDF's pages folder (one row per
+    document, same as the sidebar). Unlike the counters, this one keeps
+    `rness/` — the sidebar shows it, so the mirror of what the sidebar shows
+    does too. Canon's project catalog (`canon.project_catalog`) is this
+    predicate minus `rness/`."""
+    from . import canon as _canon
     from . import convert as _convert
+    from . import paginate as _paginate
     from . import server as _server
 
     hidden_global = _server._hidden_global_dirs()
@@ -577,9 +582,11 @@ def _mirror_skip(project_dir: Path):
                 pass
             if p.name.endswith(".assets"):
                 return _convert.has_twin(p.parent / p.name[: -len(".assets")])
-            return False
+            return _paginate.is_pages_dir(p)
         if p.name.endswith(".md"):
             return _convert.has_twin(p.parent / p.name[: -len(".md")])
+        if p.name.endswith(".cosm"):
+            return _canon.is_eml_twin(p)
         return False
 
     return skip
@@ -588,12 +595,13 @@ def _mirror_skip(project_dir: Path):
 def build_project_mirror(project_dir: Path) -> str:
     """The merirmaid source for a project's visible contents.
 
-    Same `modality: mirror` contract, node shapes and depth cap as a cachebox
-    mirror — it *is* the cachebox machinery, called through the shared
-    `cacheawl.folder_flowchart` helper with a project's frontmatter. Pure
-    generation: nothing is written, here or anywhere.
+    Same `modality: mirror` contract, node shapes and depth cap as a Canon
+    volume mirror — it *is* the Canon machinery, called through the shared
+    `canon.folder_flowchart` helper with a project's frontmatter. Pure
+    generation: nothing is written, here or anywhere. (Rendering it from the
+    project catalog's lens is a follow-up, plan §14.)
     """
-    from . import cacheawl as _cacheawl
+    from . import canon as _canon
     from . import project_meta
 
     if not project_dir.is_dir():
@@ -610,7 +618,7 @@ def build_project_mirror(project_dir: Path) -> str:
         f"last opened: {entry.get('last_opened') or 'never'}",
         f"last edited: {entry.get('last_edited') or '?'}",
     ]
-    body, _node_map = _cacheawl.folder_flowchart(
+    body, _node_map = _canon.folder_flowchart(
         project_dir,
         f"📁 {meta['name']}",
         meta_lines=meta_lines,

@@ -1,0 +1,31 @@
+# I — SKUs: the two subscriptions Stripe bills. Entered by hand until the feed runs.
+nodes:
+  - id: I:sku/ledger-monthly
+    type: sku
+    name: Meadow Ledger, monthly
+    summary: One subscription per customer; flat, billed monthly.
+    kind: subscription-plan
+    unit: customer/month
+    billing: {model: flat, value: 49, unit: USD/month, cadence: monthly}
+    priced-by: M:pricebook/ledger
+    seller: self
+    ids: {stripe: price_ledger_monthly}
+    status: active
+    visibility: internal
+    owner: O:role/Founder
+    provenance: {mode: manual, sources: [session-3], confidence: 0.9, state: known}
+
+  - id: I:sku/payroll-per-run
+    type: sku
+    name: Meadow Pay, per run
+    summary: A metered subscription; each payroll run bills the seats it paid.
+    kind: subscription-plan
+    unit: run
+    billing: {model: seat, value: 4, unit: USD/employee/month, cadence: per-run, meter: employees-paid}
+    priced-by: M:pricebook/payroll
+    seller: self
+    ids: {stripe: price_payroll_per_run}
+    status: active
+    visibility: internal
+    owner: O:role/Payroll-Owner
+    provenance: {mode: manual, sources: [session-3], confidence: 0.9, state: known}

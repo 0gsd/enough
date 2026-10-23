@@ -1,0 +1,57 @@
+# S — vendors: the outside firms behind the stack, each resolving to one C:counterparty (rule 10). Where the sources name a class of providers but not which one is in use,
+# the provider is pending. The Foundation's technology is mostly its own; these are the exceptions.
+nodes:
+  - id: S:vendor/colocation
+    type: vendor
+    name: Data-center operators
+    summary: The companies whose buildings house the Foundation's servers; the Wikitech data-center page names none for today's sites.
+    counterparty: C:counterparty/colocation-providers
+    contract: {pending: "the colocation agreements, if published"}
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Data_centers"], confidence: 0.5, state: known}
+
+  - id: S:vendor/in-kind-bandwidth
+    type: vendor
+    name: Donors of hosting and bandwidth
+    summary: FiberRing, Tele2, Datahop, Liberty Global, Init7 and Arelion, named in the audited statements as donors of internet hosting and bandwidth.
+    counterparty: C:counterparty/in-kind-bandwidth-providers
+    contract: C:contract/in-kind-bandwidth
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+
+  - id: S:vendor/payment-processors
+    type: vendor
+    name: Donation payment processors
+    summary: The payment processors integrated into the donation flows; Adyen, Amazon Pay and Ingenico Connect appear on the Fundraising tech pages.
+    counterparty: C:counterparty/payment-processors
+    contract: {pending: "processor agreements and fees"}
+    status: active
+    visibility: public
+    owner: O:role/chief-advancement-officer
+    provenance: {mode: net-scan, sources: ["https://www.mediawiki.org/wiki/Fundraising_tech", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.6, state: known}
+
+  - id: S:vendor/employer-of-record
+    type: vendor
+    name: Employer of record outside the United States
+    summary: Administers compensation and benefits for staff located outside the United States; no provider is named.
+    counterparty: C:counterparty/employer-of-record
+    contract: C:contract/employer-of-record
+    status: active
+    visibility: public
+    owner: O:role/chief-people-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.7, state: known}
+
+  - id: S:vendor/auditor
+    type: vendor
+    name: KPMG
+    summary: The independent auditor of the consolidated statements.
+    counterparty: C:counterparty/kpmg
+    contract: C:contract/external-audit
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediafoundation.org/about/financial-reports/"], confidence: 0.9, state: known}

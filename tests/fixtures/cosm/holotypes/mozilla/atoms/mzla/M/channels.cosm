@@ -1,0 +1,56 @@
+# M: channels.
+nodes:
+  - id: M:channel/website
+    type: channel
+    name: thunderbird.net
+    summary: Desktop downloads, release notes, support and donate pages.
+    model: free distribution
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/'], confidence: 0.8, state: known}
+
+  - id: M:channel/google-play
+    type: channel
+    name: Google Play
+    summary: Thunderbird for Android on Google Play (also F-Droid, per the mobile page).
+    model: app-store distribution
+    seller: self
+    counterparty: C:counterparty/google-play
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/mobile/'], confidence: 0.8, state: known}
+
+  - id: M:channel/app-store
+    type: channel
+    name: Apple App Store (planned)
+    summary: Thunderbird for iOS is in development with a TestFlight alpha planned; not released.
+    model: app-store distribution
+    seller: self
+    counterparty: C:counterparty/apple-app-store
+    status: planned
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2026/10/thunderbird-for-ios-a-first-look-at-the-native-iphone-email-app-in-development/', 'https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/'], confidence: 0.7, state: known}
+
+  - id: M:channel/donations
+    type: channel
+    name: Donations
+    summary: 'Gifts through the donate page: Fundraise Up is the donation platform and Stripe the processor; recurring gifts are managed in a donor portal.'
+    model: donation
+    seller: self
+    counterparty: C:counterparty/fundraise-up
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/donate/'], confidence: 0.8, state: known}
+
+  - id: M:channel/pro-waitlist
+    type: channel
+    name: tb.pro waitlist
+    summary: The sign-up for Thundermail and the rest of Thunderbird Pro.
+    model: waitlist
+    seller: self
+    counterparty: none
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/'], confidence: 0.8, state: known}

@@ -15,7 +15,7 @@ name: wikisink
 path: ~/enough/wikisink/
 
 ### what
-deine lokale, offline Kopie eines Ausschnitts der englischen Wikipedia — ein einzelnes Kiwix-ZIM-Archiv, an Ort und Stelle gelesen, nie entpackt, sodass der Dateimanager nur die Artikel zeigt, die du ausdrücklich speicherst. der 🚰-Button öffnet einen browserartigen Reader mit Volltextsuche, Querverweisen, einem Zufallsartikel-Würfel, einer Readvisor-Chat-Pille, Kommentaren und einem einzigen <strong>Speichern-Button</strong>, dessen Flyout zwei Ziele bietet (den <code>wiki/</code>-Ordner dieses Projekts, oder die globale <code>~/enough/cacheawl/wiki/</code>-Cachebox, projektübergreifend geteilt). deine Readvisors können das ganze Archiv über ihre Wiki-Tools durchsuchen und lesen.
+deine lokale, offline Kopie eines Ausschnitts der englischen Wikipedia — ein einzelnes Kiwix-ZIM-Archiv, an Ort und Stelle gelesen, nie entpackt, sodass der Dateimanager nur die Artikel zeigt, die du ausdrücklich speicherst. der 🚰-Button öffnet einen browserartigen Reader mit Volltextsuche, Querverweisen, einem Zufallsartikel-Würfel, einer Readvisor-Chat-Pille, Kommentaren und einem einzigen <strong>Speichern-Button</strong>, dessen Flyout zwei Ziele bietet (den <code>wiki/</code>-Ordner dieses Projekts, oder den globalen <code>~/enough/canon/wiki/</code>-Band, projektübergreifend geteilt). deine Readvisors können das ganze Archiv über ihre Wiki-Tools durchsuchen und lesen.
 
 ### how
 der erste Klick auf 🚰 startet den Einrichtungsassistenten: eine Größe wählen (top-1M-Artikel ohne Bilder ≈ 16 GB ist die Vorgabe; komplettes Englisch ≈ 49 GB; auch kleinere Optionen), einen Speicherordner wählen (externe Laufwerke funktionieren), bestätigen, und den fortsetzbaren Download laufen lassen — jederzeit pausieren, beenden, fortsetzen. du kannst <em>mehrere Installationen</em> an verschiedenen Orten behalten (etwa das volle Archiv auf einem externen Laufwerk plus ein kleines auf der internen Platte) und in der ⚙-Installationsliste zwischen ihnen wechseln; ist ein Laufwerk getrennt, zeigt seine Installation einfach als nicht erreichbar, bis das Laufwerk zurückkommt. einmal installiert, bitte deinen Chef-Readvisor um einen <strong>wikisink</strong>-Lauf, um deine gespeicherten/kommentierten („beobachteten“) Artikel aus der echten Wikipedia zu aktualisieren und einen Bericht zu bekommen: Änderungen an beobachteten Artikeln, Bearbeitungsspitzen, Aufrufe-Gewinner &amp; -Verlierer und verdächtige Löschungen. der 🛡-Button an jedem Artikel ist der <em>Löschungs-Override</em>: deine lokale Kopie für immer behalten, von Updates ausgeschlossen. ⚙ öffnet den Installationsmanager, einschließlich Ersatz des Basisarchivs, wenn ein neuerer Snapshot erscheint. danach musst du nicht suchen: existiert ein neuerer Build deiner Variante, erscheint eine kleine Pille in der Reader-Werkzeugleiste (<code>neuerer Snapshot: Datum · Größe</code>) — klicken, Größe bestätigen, und dasselbe In-Place-Upgrade läuft, lädt erst herunter und tauscht erst ein, wenn es fertig ist. die Prüfung geschieht höchstens einmal am Tag, blockiert den Reader nie und bleibt still, wenn du offline bist.
@@ -33,7 +33,7 @@ path: wiki/
 Wikipedia-Artikel, die aus dem wikisink-Browser in dieses Projekt gespeichert wurden (Speichern-Button → „dieses Projekt“). jeder gespeicherte Artikel ist ein Ordner: <code>article.html</code> (der Artikel genau so, wie ihn das Archiv hatte — anklicken, um ihn im wikisink-Viewer zu lesen, volle Wiedergabetreue, Infoboxen inklusive) plus <code>_manifest.md</code> (Quell-URL, CC-BY-SA-Lizenz, Abrufdatum, Herkunft).
 
 ### how
-wird automatisch beim ersten projektweiten Speichern angelegt — keine Einrichtung nötig. wikisink-Update-Läufe behandeln alles hier als <em>beobachtet</em>: aus der echten Wikipedia aktualisiert und im Bericht erwähnt. erneutes Speichern eines Artikels überschreibt den Ordner mit der frischesten Kopie; zum Entfernen kurz mit der Maus über seinen Ordner im Baum bleiben und auf das erscheinende 🗑 klicken. gespeicherte Kopien sind nicht zum Von-Hand-Bearbeiten gedacht — sie würden aus dem Takt mit dem Archiv geraten. (die andere Wahl des Speichern-Buttons speichert stattdessen in die globale <code>~/enough/cacheawl/wiki/</code>-Cachebox, geteilt über alle Projekte.)
+wird automatisch beim ersten projektweiten Speichern angelegt — keine Einrichtung nötig. wikisink-Update-Läufe behandeln alles hier als <em>beobachtet</em>: aus der echten Wikipedia aktualisiert und im Bericht erwähnt. erneutes Speichern eines Artikels überschreibt den Ordner mit der frischesten Kopie; zum Entfernen kurz mit der Maus über seinen Ordner im Baum bleiben und auf das erscheinende 🗑 klicken. gespeicherte Kopien sind nicht zum Von-Hand-Bearbeiten gedacht — sie würden aus dem Takt mit dem Archiv geraten. (die andere Wahl des Speichern-Buttons speichert stattdessen in den globalen <code>~/enough/canon/wiki/</code>-Band, geteilt über alle Projekte.)
 
 ### ideas
 - gespeicherte Artikel öffnen im Reader auch dann, wenn das Laufwerk des Archivs abgesteckt ist — sie sind deine Offline-Offline-Kopien.
@@ -223,19 +223,19 @@ Dateien in <code>rness/io/input/</code> ablegen, und deine Readvisors sehen sie.
 - leere beide regelmäßig — deine Readvisors brauchen die Fingerübungen von gestern nicht in ihrem Kontext.
 
 ## infoworld
-name: cacheawl
-path: ~/enough/cacheawl/
+name: canon
+path: ~/enough/canon/
 
 ### what
-der rechnerweite Dateispeicher, geteilt über jedes enough-Projekt. (das ersetzt die alte <code>infoworld/</code>-Bibliothek — beim ersten Start dieser Version wurden deine Ordner <code>personal/</code>, <code>public/</code> und <code>wiki/</code> hierher verschoben, jeder wurde eine Cachebox.) eine <em>Cachebox</em> ist ein Ordner oberster Ebene im Speicher: entweder Klartext, den du für immer behalten willst, oder eine „Cache-Kopie“, importiert aus einem lokalen Pfad, einer Website oder einer Reihe von Wikipedia-Artikeln. der Speicher ist im Dateibaum jedes Projekts verborgen und wird über den cacheawl-Modus + die Cachebox-Tools deiner Readvisors verwaltet.
+der rechnerweite Dateispeicher, geteilt über jedes enough-Projekt. (das ersetzt die alte <code>infoworld/</code>-Bibliothek — beim ersten Start dieser Version wurden deine Ordner <code>personal/</code>, <code>public/</code> und <code>wiki/</code> hierher verschoben, jeder wurde ein Band.) ein <em>Band</em> ist ein Ordner oberster Ebene im Speicher: entweder Klartext, den du für immer behalten willst, oder eine „Cache-Kopie“, importiert aus einem lokalen Pfad, einer Website oder einer Reihe von Wikipedia-Artikeln. der Speicher ist im Dateibaum jedes Projekts verborgen und wird über den canon-Modus + die canon-Tools deiner Readvisors verwaltet.
 
 ### how
-den cacheawl-Modus öffnen (der cacheawl-Button in der oberen Leiste) für eine zweigeteilte Ansicht: dein Projekt auf der einen Seite, die Cacheboxen auf der anderen. eine Datei rüberziehen, um sie zu kopieren, shift-ziehen, um sie zu verschieben; die Import-Leiste formuliert für deinen Chef-Readvisor eine Anfrage, um einen Pfad/eine Site/ein Wiki-Thema hereinzuholen. oder frag einfach im Panel — deine Readvisors können Cacheboxen auflisten, anlegen und befüllen (gesteuert durch den Broker-Schalter „cacheawl tools“). jede Box trägt ein automatisch erzeugtes <code>_cachebox.merirmaid</code>-Diagramm ihres Inhalts (nur lesbar — es erzeugt sich aus den Dateien neu) und verborgene Metadaten; die bearbeitest du nie direkt.
+den canon-Modus öffnen (der canon-Button in der oberen Leiste) für eine zweigeteilte Ansicht: dein Projekt auf der einen Seite, die Bände auf der anderen. eine Datei rüberziehen, um sie zu kopieren, shift-ziehen, um sie zu verschieben; die Import-Leiste formuliert für deinen Chef-Readvisor eine Anfrage, um einen Pfad/eine Site/ein Wiki-Thema hereinzuholen. oder frag einfach im Panel — deine Readvisors können Bände auflisten, anlegen und befüllen (gesteuert durch den Broker-Schalter „canon tools“). jeder Band trägt einen automatisch erzeugten <code>canon.cosm</code>-Katalog seines Inhalts (nur lesbar — er erzeugt sich aus den Dateien neu) und verborgene Metadaten; die bearbeitest du nie direkt.
 
 ### ideas
 - importiere eine Dokuseite in geringer Tiefe, damit sich deine Readvisors vollständig offline darauf stützen können.
-- führe eine <code>personal</code>-Cachebox mit Referenzmaterial, das aus jedem Projekt abfragbar ist.
-- speichere Wikipedia-Artikel, auf die du dich verlässt, in die globale <code>wiki</code>-Cachebox — überall geteilt, an kein einzelnes Projekt gebunden.
+- führe einen <code>personal</code>-Band mit Referenzmaterial, das aus jedem Projekt abfragbar ist.
+- speichere Wikipedia-Artikel, auf die du dich verlässt, in den globalen <code>wiki</code>-Band — überall geteilt, an kein einzelnes Projekt gebunden.
 
 ## mode-system
 name: Lese-/Bearbeitungsmodus
@@ -245,7 +245,7 @@ path: the file viewer
 ein Klick auf eine Datei öffnet sie im einheitlichen <strong>Lese-/Bearbeitungsmodus</strong> mit zwei Seiten — einer Leseseite (Auge) und einer Bearbeitungsseite (Stift). er lebt entweder als kleines Seitenpanel neben dem Chat oder ausgeklappt im Vollbild; zum Wechseln den Mini↔Voll-Umschalter nutzen. Bearbeitungen sind schmutz-gesichert, sodass du ungespeicherte Änderungen nicht aus Versehen durch Wegnavigieren verlierst. Dateien, die enough nicht nativ anzeigt, öffnen trotzdem: eine Word-Datei, ein PDF, eine Präsentation oder Arbeitsmappe öffnet als ihr Markdown-<em>Zwilling</em> (siehe die Hilfeblase <em>konvertiertes Dokument</em> bei jeder solchen Zeile), und ein Bild öffnet in einem schlichten Betrachter mit Einpassen- und 1:1-Größen.
 
 ### how
-einfacher Klick auf eine Datei im Baum öffnet sie im Mini-Panel; ausklappen aufs Vollbild, wenn du Platz brauchst. zwischen der Lese- (Auge) und der Bearbeitungsseite (Stift) mit den eigenen Seiten-Umschalt-Buttons im Lese-/Bearbeitungs-Rahmen wechseln. jeder offene Modus zeigt oben rechts einen quadratischen Indikator (neuester links) mit einem kleinen rot-x-Band zum Schließen — Modi <em>stapeln</em> sich, das Schließen eines Modus legt also den darunterliegenden genau so frei, wie du ihn verlassen hast. auf einen vergrabenen Indikator klicken, um diesen Modus nach vorn zu holen; <code>esc</code> schließt den obersten Modus. dasselbe Muster aus Indikator + Band gilt für jeden Vollbild-Modus (wikisink, girraph, merirmaid, cacheawl und den nur lesbaren Referenzmodus <strong>Hilfe-Center</strong>, gestartet über den kleinen <strong>Hilfe</strong>-Button oben rechts im UI-Fenster).
+einfacher Klick auf eine Datei im Baum öffnet sie im Mini-Panel; ausklappen aufs Vollbild, wenn du Platz brauchst. zwischen der Lese- (Auge) und der Bearbeitungsseite (Stift) mit den eigenen Seiten-Umschalt-Buttons im Lese-/Bearbeitungs-Rahmen wechseln. jeder offene Modus zeigt oben rechts einen quadratischen Indikator (neuester links) mit einem kleinen rot-x-Band zum Schließen — Modi <em>stapeln</em> sich, das Schließen eines Modus legt also den darunterliegenden genau so frei, wie du ihn verlassen hast. auf einen vergrabenen Indikator klicken, um diesen Modus nach vorn zu holen; <code>esc</code> schließt den obersten Modus. dasselbe Muster aus Indikator + Band gilt für jeden Vollbild-Modus (wikisink, girraph, merirmaid, canon und den nur lesbaren Referenzmodus <strong>Hilfe-Center</strong>, gestartet über den kleinen <strong>Hilfe</strong>-Button oben rechts im UI-Fenster).
 
 ### ideas
 - halte eine Datei im Mini-Panel offen, während du chattest — Referenz und Gespräch Seite an Seite.
@@ -271,7 +271,7 @@ name: merirmaid
 path: *.merirmaid
 
 ### what
-enoughs Spielart eines <a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid</a>-Diagramms: Klartext-Diagrammquelle mit kleinem Header, live im Browser zu einem Bild gerendert (Flussdiagramme, Sequenzdiagramme, Zustandsautomaten, ER-Diagramme — alles, was Mermaid unterstützt). zwei Arten: ein <em>wip</em>-Diagramm, das du anpassen kannst, und ein <em>mirror</em>, das eine Struktur widerspiegelt (etwa den Inhalt einer Cachebox) und nur lesbar ist.
+enoughs Spielart eines <a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid</a>-Diagramms: Klartext-Diagrammquelle mit kleinem Header, live im Browser zu einem Bild gerendert (Flussdiagramme, Sequenzdiagramme, Zustandsautomaten, ER-Diagramme — alles, was Mermaid unterstützt). zwei Arten: ein <em>wip</em>-Diagramm, das du anpassen kannst, und ein <em>mirror</em>, das eine Struktur widerspiegelt (etwa den Inhalt eines Bandes) und nur lesbar ist.
 
 ### how
 bitte deinen Chef-Readvisor, ein Diagramm zu zeichnen oder zu überarbeiten — er schreibt die <code>.merirmaid</code>-Quelle; das Öffnen der Datei rendert sie. in einem wip-Diagramm kannst du auf den Text eines Knotens klicken, um die Bezeichnung direkt zu bearbeiten (mit laufender Zeichenzählung); strukturelle Änderungen laufen über deinen Chef-Readvisor via Chat-Pille. Knoten können auf andere Diagramme oder Dokumente verlinken — anklicken zum Folgen, mit Breadcrumbs zum Zurückgehen. ein fehlerhaftes Diagramm zeigt den Fehler plus die Rohquelle, nie eine leere Fläche. Mirror-Diagramme zeigen ein „mirror“-Abzeichen statt Bearbeitungsgriffen.
@@ -281,20 +281,79 @@ bitte deinen Chef-Readvisor, ein Diagramm zu zeichnen oder zu überarbeiten — 
 - verknüpfe mehrere Diagramme über klickbare Knoten zu einer navigierbaren Karte.
 - kombiniere es mit girraphs: ein girraph für das Argument, ein merirmaid für den Ablauf.
 
-## cacheawl
-name: cacheawl
-path: ~/enough/cacheawl/
+## canon
+name: canon
+path: ~/enough/canon/
 
 ### what
-der rechnerweite Speicher der <em>Cacheboxen</em> — Ordner oberster Ebene mit Text, den du für immer behalten willst, oder Cache-Kopien, importiert aus einem lokalen Pfad, einer Website oder Wikipedia-Artikeln. geteilt über jedes Projekt und im Dateibaum der Projekte verborgen. hier lebt jetzt die alte <code>infoworld</code>-Bibliothek.
+der rechnerweite Speicher der <em>Bände</em> — Ordner oberster Ebene mit Text, den du für immer behalten willst, oder Cache-Kopien, importiert aus einem lokalen Pfad, einer Website oder Wikipedia-Artikeln. geteilt über jedes Projekt und im Dateibaum der Projekte verborgen. hier lebt jetzt die alte <code>infoworld</code>-Bibliothek.
 
 ### how
-den cacheawl-Modus über die obere Leiste öffnen für die zweigeteilte Ansicht (Projekt ↔ Cacheboxen): ziehen, um eine Datei zwischen ihnen zu kopieren, shift-ziehen zum Verschieben, und die Import-Leiste nutzen, um deinen Chef-Readvisor zu bitten, eine Quelle in eine Box zu holen. oder sag es einfach im Panel — deine Readvisors können Boxen auflisten, anlegen und befüllen, wenn der Broker-Schalter „cacheawl tools“ an ist (URL-Importe respektieren auch deine fetch_url-Schalter). jede Box zeigt ein automatisch erzeugtes Diagramm ihres Inhalts (<code>_cachebox.merirmaid</code>, nur lesbar) und hält verborgene Metadaten, die du nicht anfasst.
+den canon-Modus über die obere Leiste öffnen für die zweigeteilte Ansicht (Projekt ↔ Bände): ziehen, um eine Datei zwischen ihnen zu kopieren, shift-ziehen zum Verschieben, und die Import-Leiste nutzen, um deinen Chef-Readvisor zu bitten, eine Quelle in einen Band zu holen. oder sag es einfach im Panel — deine Readvisors können Bände auflisten, anlegen und befüllen, wenn der Broker-Schalter „canon tools“ an ist (URL-Importe respektieren auch deine fetch_url-Schalter). jeder Band führt einen automatisch erzeugten Katalog seines Inhalts (<code>canon.cosm</code>, nur lesbar) und verborgene Metadaten, die du nicht anfasst. doppelklicke diesen Katalog — oder einen Holotype oder jede andere <code>.cosm</code>-Datei —, um ihn im cosm-Betrachter durchzusehen; der Button <strong>Projektkatalog</strong> tut dasselbe für den Katalog dieses Projekts (<code>rness/canon.cosm</code>). ein Text mit EML-Zwilling trägt ein kleines getöntes Zwillingsabzeichen.
 
 ### ideas
 - importiere eine Doku-Site oder einen Ordner voller Notizen, damit deine Readvisors offline damit arbeiten können.
-- verschiebe ein fertiges Artefakt in eine Cachebox, damit es aus dem laufenden Projekt raus ist, aber überall erreichbar bleibt.
-- doppelklicke das Diagramm einer Box, um ihre Form auf einen Blick im merirmaid-Betrachter zu sehen.
+- verschiebe ein fertiges Artefakt in einen Band, damit es aus dem laufenden Projekt raus ist, aber überall erreichbar bleibt.
+- klick auf den kleinen Diagramm-Button auf der Kachel eines Bandes, um seine Form auf einen Blick im merirmaid-Betrachter zu sehen.
+
+## cosm-viewer
+name: cosm-Betrachter
+path: *.cosm
+
+### what
+die strukturierte Ansicht jedes <code>.cosm</code>-Bandes — der Katalog eines canon-Bandes, ein Comprise-Holotype, der EML-Zwilling eines Textes, ein eigenständiger Produktbaum. die Gliederungsleiste links zeigt den Katalog (seinen Namen, die Sprache, in der er geschrieben ist, seine Adresse), seine Module und Arten mit der Zahl ihrer Einträge und die Prüfungen; die Spalte daneben zeigt eine Karte pro Eintrag: ID, Art und Status, Name und Zusammenfassung, dann jedes weitere Feld. eine ID, die auf einen anderen Eintrag zeigt, ist ein Link, und eine offene Frage ist mit einem umrandeten <strong>?</strong> markiert.
+
+### how
+doppelklicke in canon einen Katalog, einen Holotype oder irgendeine <code>.cosm</code>-Datei, oder klick im Dateibaum auf eine <code>.cosm</code>-Zeile. klick in der Gliederungsleiste auf ein Modul oder eine Art, um dorthin zu gehen, und auf eine verlinkte ID, um zu diesem Eintrag zu springen — eine „zurück“-Pille bringt dich zurück. <strong>Linse</strong> zeichnet den Band als Diagramm in merirmaid; shift-klicke dort einen Knoten und wähle <strong>Eintrag zeigen</strong>, um zu seiner Karte zurückzukommen. <strong>als Rohtext öffnen</strong> zeigt die Datei selbst als reinen Text, <strong>über dieses Format</strong> öffnet die Spezifikation beim Abschnitt über die Sprache dieses Bandes, ⌘F findet Wörter in den Karten, und der Größen-Button dockt den Betrachter an die Seite.
+
+### ideas
+- öffne den Katalog dieses Projekts über den Button <strong>Projektkatalog</strong> in canon, um jede Datei, ihre Zwillinge und ihre atems auf einen Blick zu sehen.
+- ein großer Holotype zeigt anfangs vierzig Karten pro Art; <strong>alle zeigen</strong> holt den Rest.
+- die Prüfungen sind die allgemeinen von MacroCOSM; die eigenen Regeln eines Holotypes gehören zu Comprise, und die Gliederungsleiste sagt, wie viele sie ihnen überlässt.
+
+## cosmspec
+name: MacroCOSM-Spezifikation
+path: docs/MACROCOSM_OES.md
+
+### what
+die Spezifikation von <strong>MacroCOSM OES</strong>, der gemeinsamen Grammatik, in der jede <code>.cosm</code>-Datei geschrieben ist: wie eine Datei gelesen wird, wie ein Band die Sprache nennt, in der er geschrieben ist, was ein Eintrag und sein Umschlag sind, wie Einträge aufeinander zeigen, wie man Unbekanntes festhält, wie alles adressiert wird, an welchen Prüfungen jeder Band gemessen werden kann — und, in Abschnitt 18, die vier Sprachen, die enough liest: comprise, cosm, canon und eml.
+
+### how
+öffne sie über den Button <strong>MacroCOSM</strong> oben im UI-Fenster oder über <strong>über dieses Format</strong> im cosm-Betrachter, das beim richtigen Abschnitt landet. <strong>Inhalt</strong> listet die Abschnitte, ein „section 18.4“ im Text ist ein Link, ⌘F sucht, und der Größen-Button dockt sie neben deine Arbeit. sie ist vorerst auf Englisch geschrieben.
+
+### ideas
+- fang mit Abschnitt 2 an, dem Modell auf einer Seite.
+- lass sie neben einem Holotype im cosm-Betrachter angedockt, während du lernst, einen zu lesen.
+
+## canon-chip
+name: Canon-Chip
+path: notes.md → notes.md.cosm
+
+### what
+die kleine Gruppe im Kopf eines Textes, neben dem Konvertierungs-Chip, die sagt, ob dieser Text einen <strong>EML-Zwilling</strong> hat: eine <code>.cosm</code>-Datei daneben (<code>notes.md</code> → <code>notes.md.cosm</code>), die den Text zerlegt — in die Wörter, auf die er sich stützt, die Menschen und Dinge, die er nennt, die Aussagen, die er macht, und woher er sie weiß, und die Ereignisse, die er erzählt. das Zwillingsabzeichen ist getönt, wenn es einen Zwilling gibt, hohl, wenn nicht, und trägt einen Punkt, wenn sich der Text geändert hat, seit sein Zwilling geschrieben wurde. nichts wird von selbst dekompiliert — nur, wenn du darum bittest.
+
+### how
+<strong>Zwilling</strong> dreht die Leseansicht zum Zwilling um, in derselben Größe, anstelle des Textes: die Karten des cosm-Betrachters, mit <strong>zurück zum Text</strong> für den Rückweg, <strong>Text kompilieren</strong>, um den Zwilling als neue, datierte Markdown-Datei daneben herauszuschreiben, <strong>Linse</strong> für ein Diagramm und <strong>als Rohtext öffnen</strong> für die Datei selbst. gibt es noch keinen Zwilling, dekompiliert <strong>Zwilling</strong> erst und dreht um, sobald er fertig ist. der Button <strong>atem</strong> gibt dir den ganzen Text in einer Zeile (siehe die atem-Karte). <strong>dekompilieren</strong> legt den Zwilling an, <strong>Zwilling erneuern</strong> legt ihn neu an; ist der Zwilling schon aktuell, fragt enough vorher. die Arbeit erscheint als Toast, den du abbrechen kannst. mit laufendem Modell dauert sie eine Weile, und eine Chat-Nachricht, die du solange sendest, wartet, bis sie dran ist; ohne Modell bekommst du ein beschriftetes Gerüst — die Wörter und die Namen, noch keine Aussagen.
+
+### ideas
+- dekompiliere ein langes Kapitel einmal und lies dann die Aussagen des Zwillings als Checkliste dessen, was das Kapitel wirklich behauptet.
+- <strong>atem</strong> und <strong>dekompilieren</strong> stehen auch im Shift-Klick-Menü von Canon und im Option-Klick-Menü des Dateibaums, und <strong>atem</strong> steht im Knotenmenü von merirmaid bei einem Knoten, der einen Text nennt.
+- ein als Rohtext geöffneter Zwilling ist schlichter Text, den du lesen und bearbeiten kannst; der cosm-Betrachter prüft ihn für dich.
+
+## atem-card
+name: atem-Karte
+path: (the atem of a text or a passage)
+
+### what
+ein <strong>atem</strong> ist die knappste faire, vollständige, schlichte Verdichtung eines Textes oder einer Passage. die Karte setzt <em>die Zeile</em> groß — einen Satz von fünfzehn bis fünfundzwanzig Wörtern, der sagt, was das Ganze sagt —, dann drei kurze Teile: <strong>Fokus</strong>, was geschieht und wohin der Autor dich schauen lässt; <strong>Schub</strong>, was der Autor dir mitgeben will; <strong>Zug</strong>, was du tatsächlich mitnehmen solltest, verborgene Annahmen und Abhängigkeiten beim Namen genannt. wo Schub und Zug auseinandergehen, steht meist das Nützlichste auf der Karte. lass den Zeiger auf einer Beschriftung ruhen, dann erscheint ihre Definition. sagt das Modell, woher die Aussagen ihr Wissen haben, zeigt ein Streifen die sechs Haltungen mit ihren Zahlen.
+
+### how
+bitte um eines mit <strong>atem</strong> im Canon-Chip oder in einem Dateimenü (der ganze Text — sein atem wird im EML-Zwilling des Textes aufbewahrt), oder markiere eine Passage und klicke sie mit rechts an: <strong>atem der Auswahl</strong> gibt es auf der Leseseite und der Bearbeitungsseite, in einem wikisink-Artikel, im Hilfe-Center, in der Spezifikation und auf einer composure-Textseite. solange es liest, sagt die Karte das und bietet Abbrechen an. <strong>kopieren</strong> kopiert die Zeile (⇧-Klick kopiert alle vier Teile), <strong>an den Zwilling heften</strong> bewahrt das atem einer Passage samt ihrer Stelle im Zwilling des Textes auf, und <strong>Zwilling öffnen</strong> zeigt den Zwilling, in den ein atem des ganzen Textes geschrieben wurde. läuft kein Modell, zeigt die Karte ein Gerüst: Zeile und Fokus stammen aus den ersten Sätzen des Textes, Schub und Zug bleiben offene Fragen.
+
+### ideas
+- lies das atem eines Entwurfs, bevor du ihn abschickst. ist die Zeile nicht, was du gemeint hast, ist es der Entwurf auch nicht.
+- hefte die atems der Schlüsselpassagen eines langen Stücks an, und du hast ein Rückgrat, an dem du überarbeiten kannst.
+- vergleiche Schub und Zug im Argument eines anderen: in der Lücke dazwischen setzt dein Widerspruch an.
 
 ## footnotes
 name: Fußnoten

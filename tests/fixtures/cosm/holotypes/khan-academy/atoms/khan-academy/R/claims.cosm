@@ -1,0 +1,115 @@
+# R — claims: what the nonprofit says in public, about which node, on which surface, with what evidence. Paraphrased, not quoted.
+# `evidence.state` says how far this sample could check the claim from public sources: supported, partial, contested or unsupported.
+nodes:
+  - id: R:claim/free-for-learners-and-teachers
+    type: claim
+    name: Free for learners, teachers and families
+    summary: "The core promise: the content library and the teacher tools are free, funded by donors and partners."
+    text: "Khan Academy is free for learners, teachers and families."
+    about: [P:offering/courses-and-practice, P:offering/teacher-tools]
+    on: [R:surface/website]
+    evidence:
+      state: supported
+      by: [C:finance/2024-07-to-2025-06]
+      measure: "contributions and grants were $90.4M of $117.5M revenue in the year to June 2025; learners and teachers are not charged"
+    status: active
+    visibility: public
+    owner: O:role/Chief-Executive
+    provenance: {mode: net-scan, sources: [ka-home, ka-about, f990-2025], confidence: 0.9, state: known}
+
+  - id: R:claim/reach
+    type: claim
+    name: Reach in registered users and minutes
+    summary: "Three public counts of registered users and learning minutes that differ by period and definition."
+    text: "The home page counts 180 million-plus registered users and 63 billion-plus minutes; the About page counts 227 million and 75 billion; the Form 990 counts more than 185 million registered students, teachers and parents on 30 June 2025."
+    about: [P:khan-academy]
+    on: [R:surface/website]
+    evidence:
+      state: partial
+      by: [C:filing/form-990-fy2025]
+      measure: "the return's 185 million at June 2025 sits between the two site figures; definitions and dates are not stated"
+    status: active
+    visibility: public
+    owner: O:role/Chief-External-Relations-Officer
+    provenance: {mode: net-scan, sources: [ka-home, ka-about, f990-2025], confidence: 0.7, state: known}
+    pending: "which count is current, and does the larger one include Khan Academy Kids?"
+
+  - id: R:claim/mastery-gains
+    type: claim
+    name: Skills mastered, gains in state math scores
+    summary: "The impact page ties each extra skill mastered to measurable gains and cites a peer-reviewed study of more than 200,000 students."
+    text: "Each skill mastered is linked to a gain in state math scores; 60 more skills in a year can add 30 percentage points."
+    about: [P:offering/courses-and-practice, P:offering/districts-partnership]
+    on: [R:surface/website]
+    evidence:
+      state: partial
+      by: [P:offering/courses-and-practice]
+      measure: "rests on studies the nonprofit cites; none was opened and checked for this sample"
+    status: active
+    visibility: public
+    owner: O:role/Chief-Learning-Officer
+    provenance: {mode: net-scan, sources: [ka-impact, ka-home, ka-districts], confidence: 0.6, state: known}
+
+  - id: R:claim/districts-6x
+    type: claim
+    name: District partners practise more
+    summary: "Students in district partnerships are said to be six times more likely to reach recommended practice levels."
+    text: "Students in Khan Academy Districts are six times more likely to reach recommended practice levels than students using Khan Academy on their own."
+    about: [P:offering/districts-partnership]
+    on: [R:surface/website]
+    evidence:
+      state: partial
+      by: [P:service/district-implementation]
+      measure: "a usage comparison by the nonprofit, not an outcome measure; more than 600 partner districts as the page counts them"
+    status: active
+    visibility: public
+    owner: O:role/Chief-Executive
+    provenance: {mode: net-scan, sources: [ka-districts, ka-impact, ka-about], confidence: 0.6, state: known}
+
+  - id: R:claim/sat-partner
+    type: claim
+    name: The College Board's only official SAT partner
+    summary: "The districts page says Khan Academy is the College Board's only official SAT partner."
+    text: "Khan Academy is the College Board's only official SAT partner."
+    about: [P:offering/test-prep]
+    on: [R:surface/website]
+    evidence:
+      state: partial
+      by: [P:offering/test-prep]
+      measure: "the partnership since 2015 is confirmed by the College Board's own post; exclusivity is not"
+    status: active
+    visibility: public
+    owner: O:role/Chief-of-Staff
+    provenance: {mode: net-scan, sources: [ka-districts, collegeboard-sat], confidence: 0.7, state: known}
+
+  - id: R:claim/kids-free
+    type: claim
+    name: Khan Academy Kids is free, without ads
+    summary: "The Kids app is free with no advertising or subscriptions, at home or in the classroom."
+    text: "Khan Academy Kids is 100% free, with no ads and no subscriptions."
+    about: [P:offering/khan-kids]
+    on: [R:surface/website]
+    evidence:
+      state: supported
+      by: [P:offering/khan-kids]
+      measure: "a 2018 launch report and the current Kids page agree: free, no ads, no in-app purchases"
+    status: active
+    visibility: public
+    owner: O:role/Kids-Lead
+    provenance: {mode: net-scan, sources: [ka-kids, edweek-kids-2018], confidence: 0.9, state: known}
+
+  - id: R:claim/khanmigo-guides
+    type: claim
+    name: Khanmigo guides rather than answers
+    summary: "Khanmigo is described as built to help learners think through problems instead of giving answers, and as rated four stars by an independent children's media reviewer."
+    text: "Khanmigo does not give the answer; it guides the learner to work it out, and it holds a four-star rating."
+    about: [P:offering/khanmigo-families, P:offering/khanmigo-teachers]
+    on: [R:surface/khanmigo-site]
+    evidence:
+      state: partial
+      by: [R:reflection/common-sense-khanmigo]
+      measure: "the reviewer's own assessment calls the design responsible and rates the risk low, but flags unreliable facts; its four-star figure was not on the page read"
+    status: active
+    visibility: public
+    owner: O:role/Chief-Learning-Officer
+    provenance: {mode: net-scan, sources: [khanmigo-learners, khanmigo-parents, csm-khanmigo], confidence: 0.7, state: known}

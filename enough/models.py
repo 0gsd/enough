@@ -48,7 +48,7 @@ def _weights_dir_default() -> Path:
     """~/enough/weights, or ENOUGH_WEIGHTS_DIR when that's set — the test/dev
     hook that lets a scratch QA server download stub GGUFs without planting
     fakes in the real install (mirrors ENOUGH_WIKISINK_CONFIG /
-    ENOUGH_CACHEAWL_ROOT). Read once at import: a server's environment
+    ENOUGH_CANON_ROOT). Read once at import: a server's environment
     doesn't change under it, and the suites monkeypatch WEIGHTS_DIR itself."""
     env = os.environ.get("ENOUGH_WEIGHTS_DIR")
     return Path(env).expanduser() if env else Path.home() / "enough" / "weights"

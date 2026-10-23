@@ -1,0 +1,23 @@
+# C — the licence the content is shared under, and the rule for international partner programs.
+nodes:
+  - id: C:ip/educational-content
+    type: ip
+    name: Course content and its licence
+    summary: "Videos, articles, exercises and courses are licensed to users under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 unless an item says otherwise. Partner content carries its own terms, and the terms of use deal with educational source code in a separate clause (terms of use, updated 30 January 2026)."
+    kind: copyright
+    licence: "CC BY-NC-SA 4.0 by default"
+    status: active
+    visibility: public
+    owner: O:role/General-Counsel
+    provenance: {mode: net-scan, sources: [ka-terms], confidence: 0.9, state: known}
+
+  - id: C:policy/international-partner-model
+    type: policy
+    name: International partner model
+    summary: "Since 2023 a model for international partners to bring free Khan Academy resources to school districts and government schools. A local entity manages day-to-day operations in close collaboration with Khan Academy; each program and entity is independent and not owned or controlled by Khan Academy. Named examples: the Philippines, Bangladesh, Pakistan and Vietnam, and more."
+    since: 2023
+    status: active
+    visibility: public
+    owner: O:role/International-Lead
+    provenance: {mode: net-scan, sources: [ka-help-partners], confidence: 0.9, state: known}
+    pending: "which partner entities exist today, and whether any written licence or agreement governs each"

@@ -1,0 +1,29 @@
+# S: the systems the Foundation publicly runs. Both have open repositories.
+nodes:
+  - id: S:system/foundation-website
+    type: system
+    name: Foundation website (Django and Wagtail)
+    summary: 'The Foundation''s site, mozillafoundation.org, built in the open: Django with Wagtail as the CMS, a JavaScript front end, staging and production on Heroku, MPL-2.0 licensed. It also serves the Mozilla Festival and donate sections.'
+    category: cms
+    vendor: S:vendor/heroku
+    counterparty: C:counterparty/heroku
+    used-by: ['R:surface/website', 'P:function/fundraising']
+    repository: https://github.com/mozilla/foundation.mozilla.org
+    status: active
+    visibility: public
+    owner: O:role/Senior-Director-Technology-Platforms
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla/foundation.mozilla.org'], confidence: 0.8, state: known}
+
+  - id: S:system/common-voice-platform
+    type: system
+    name: Common Voice platform
+    summary: The open-source web app behind commonvoice.mozilla.org, MPL-2.0 licensed, developed on GitHub.
+    category: application
+    vendor: S:vendor/github
+    counterparty: C:counterparty/github
+    used-by: ['R:surface/common-voice-site', 'P:product/common-voice-platform']
+    repository: https://github.com/common-voice/common-voice
+    status: active
+    visibility: public
+    owner: O:role/Senior-Director-Technology-Platforms
+    provenance: {mode: net-scan, sources: ['https://github.com/common-voice/common-voice'], confidence: 0.8, state: known}

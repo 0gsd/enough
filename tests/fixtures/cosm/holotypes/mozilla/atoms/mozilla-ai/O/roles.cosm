@@ -1,0 +1,43 @@
+# O: roles: the board, the leadership seats the about page names, and the product pool.
+nodes:
+  - id: O:role/Board-of-Directors
+    type: role
+    name: Board of Directors
+    summary: The Mozilla.ai Board named on the leadership page.
+    governs: ['P:mozilla-ai']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.7, state: known}
+
+  - id: O:role/Chief-Executive-Officer
+    type: role
+    name: Chief Executive Officer
+    summary: The chief executive seat, titled CEO Mozilla.ai on the Mozilla wiki.
+    governs: ['P:suite/products']
+    escalates-to: O:role/Board-of-Directors
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.9, state: known}
+
+  - id: O:role/VP-Engineering
+    type: role
+    name: Vice President of Engineering
+    summary: Named on the about page as part of leadership.
+    governs: ['P:suite/open-tools', 'S:codebase/llamafile']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/company/about-us'], confidence: 0.8, state: known}
+
+  - id: O:role/Chief-of-Staff
+    type: role
+    name: Chief of Staff
+    summary: Named on the about page as part of leadership.
+    governs: ['O:unit/executive-office']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/company/about-us'], confidence: 0.8, state: known}
+
+  - id: O:role/Product-Team
+    type: role
+    name: Product team
+    summary: The product thinkers the about page lists with engineers, researchers and open-source builders.
+    governs: ['P:offering/otari', 'P:offering/octonous']
+    pool: true
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/company/about-us'], confidence: 0.6, state: known}

@@ -151,8 +151,8 @@ Wikisource page, an archive.org item:
 1. **Check the license first.** The broker just transports bytes; the
    responsibility is yours. Fetch CC0 / CC-BY / public domain / user-
    approved content. Otherwise decline and ask — and "decline" means
-   propose the conservative alternative (the user's existing cacheawl
-   cacheboxes, asking them to verify the license, or adding the domain to
+   propose the conservative alternative (the user's existing canon
+   volumes, asking them to verify the license, or adding the domain to
    the allowlist if they want it fetched directly instead of via Tor),
    not just refusing.
 2. **Don't paste the full body into the conversation.** The tool result

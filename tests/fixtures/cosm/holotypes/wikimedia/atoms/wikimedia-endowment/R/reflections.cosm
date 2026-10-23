@@ -1,0 +1,14 @@
+# R — reflections: what others say. One third-party profile the Endowment itself notes.
+nodes:
+  - id: R:reflection/charity-navigator
+    type: reflection
+    name: Charity Navigator profile
+    summary: Charity Navigator has a profile for the Endowment but will not be able to give it an overall rating until 2027.
+    kind: rating
+    about: [P:wikimedia-endowment]
+    sentiment: neutral
+    rating: {pending: "an overall rating from Charity Navigator, not expected before 2027"}
+    status: active
+    visibility: public
+    owner: O:role/president
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_Endowment_reports/Financial/Form_990/2024-2025_-_frequently_asked_questions"], confidence: 0.8, state: known}

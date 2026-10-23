@@ -1,0 +1,157 @@
+# P — the platform function: what the Foundation builds and runs so that the projects stay up, fast and free: the data centers and the delivery network, MediaWiki, Wikibase,
+# the machine-learning service and the analytics. Technology is about 45% of the Foundation's 2024-25 spending (annual report). Systems are in S; the services here name them.
+nodes:
+
+- id: P:function/platform
+  type: function
+  name: Platform and infrastructure
+  summary: "The technology the Foundation builds and runs for the projects: two core data centers and five caching sites, the MediaWiki software, Wikibase, machine-learning serving and analytics."
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.8
+  sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", "https://wikitech.wikimedia.org/wiki/Data_centers", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/"]
+  parts: [P:service/hosting-and-delivery, P:product/mediawiki, P:product/wikibase, P:service/machine-learning, P:service/data-and-analytics]
+  substrate:
+    platforms: [S:system/data-centers, S:system/cdn, S:system/mariadb, S:system/swift, S:system/kubernetes, S:system/monitoring]
+    depends-on: [S:system/data-centers]
+    budget: "technology is about 45% of 2024-25 spending (annual report)"
+  mattering:
+    to-the-whole: "Without it nothing loads; with it a top-ten website runs on donations."
+    weight: critical
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "Running one of the ten most visited sites on a charity's budget, and protecting it from crawlers that evade detection."
+        confidence: 0.5
+
+- id: P:service/hosting-and-delivery
+  type: service
+  name: Hosting and delivery
+  summary: Two core data centers (Ashburn, Virginia since 2010 and Carrollton, Texas since 2014) run the applications and databases; five caching sites (Amsterdam, San Francisco, Singapore, Marseille since 2022, São Paulo since 2024) put content near readers. Internet hosting cost $3.5M in 2024-25.
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://wikitech.wikimedia.org/wiki/Data_centers", "https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"]
+  flow:
+    outputs:
+      - {resource: page-view, to: M:audience/readers, unit: views/month, rate: 15000000000}
+  substrate:
+    platforms: [S:system/data-centers, S:system/cdn, S:system/mariadb, S:system/swift, S:system/kubernetes, S:system/monitoring]
+    vendors: [C:counterparty/colocation-providers, C:counterparty/in-kind-bandwidth-providers]
+    depends-on: [S:system/data-centers, S:system/cdn]
+  rules:
+    - counts-as: "a site is core when it runs the application and the databases, and an edge site when it only caches"
+      source: wmf-datacenters
+  economics:
+    price: {model: internal}
+    cost: {model: usage, band: "internet hosting $3.47M in 2024-25 (audited), plus donated bandwidth valued at $52,735"}
+  mattering:
+    to-the-whole: "Delivers every page view; the part of the Foundation that readers notice only when it fails."
+    weight: critical
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "Capacity, latency and resilience on three continents."
+        confidence: 0.5
+
+- id: P:product/mediawiki
+  type: product
+  name: MediaWiki
+  summary: The free, open-source wiki software that runs the projects and tens of thousands of other websites; release 1.46.0 came out on 2026-06-30.
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.85
+  sources: ["https://www.mediawiki.org/wiki/MediaWiki", "https://wikimediafoundation.org/our-work/wikimedia-projects/", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"]
+  flow:
+    inputs:
+      - {resource: endowment-grant, from: atom/wikimedia-endowment, unit: USD/year, rate: 1500000}
+    outputs:
+      - {resource: software, to: M:audience/developers, unit: releases/year}
+  substrate:
+    platforms: [S:system/mediawiki]
+    depends-on: [S:system/mediawiki]
+  economics:
+    price: none
+    cost: {model: internal, band: {pending: "cost of MediaWiki development"}}
+  mattering:
+    to-the-whole: "The platform every project is built on; improving it is what the Endowment's first grants paid for ($1.5M in the period to June 2024)."
+    weight: critical
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "Software that must serve the Foundation's scale and also anyone who downloads it."
+        confidence: 0.5
+
+- id: P:product/wikibase
+  type: product
+  name: Wikibase
+  summary: The software that stores Wikidata's structured data, developed with Wikimedia Deutschland; the Foundation grants the chapter funding for its share ($6.2M in 2024-25).
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.8
+  sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"]
+  flow:
+    inputs:
+      - {resource: development, from: C:counterparty/wikimedia-deutschland, unit: person-years/year}
+  substrate:
+    platforms: [S:system/wikibase]
+    depends-on: [S:system/wikibase]
+  economics:
+    price: none
+    cost: {model: grant, band: "$6,191,630 in 2024-25 and $6,069,415 in 2023-24 granted to Wikimedia Deutschland"}
+  mattering:
+    to-the-whole: "A shared codebase with an independent chapter; the clearest case of the Foundation building with an affiliate."
+    weight: major
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "Two organizations, one data model and a collaborative arrangement to keep them aligned."
+        confidence: 0.5
+
+- id: P:service/machine-learning
+  type: service
+  name: Machine-learning serving
+  summary: Lift Wing, a machine-learning model-serving platform on Kubernetes that serves models such as revert risk (vandalism), article quality and topic; the Endowment gave $1.0M for AI and machine learning in 2024-25.
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.8
+  sources: ["https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"]
+  flow:
+    inputs:
+      - {resource: endowment-grant, from: atom/wikimedia-endowment, unit: USD/year, rate: 1000000}
+    outputs:
+      - {resource: model-score, to: M:audience/contributors, unit: requests/day}
+  substrate:
+    platforms: [S:system/lift-wing, S:system/kubernetes]
+    depends-on: [S:system/lift-wing]
+  economics:
+    price: none
+    cost: {model: grant, band: "$1.0M from the Endowment in 2024-25; staff and servers not itemised"}
+  mattering:
+    to-the-whole: "Helps volunteers find vandalism and weak articles without the Foundation taking content decisions; revert-risk scores also appear among the Credibility Signals that Enterprise delivers."
+    weight: major
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "Machine learning that serves the volunteers' judgement and does not replace it."
+        confidence: 0.5
+
+- id: P:service/data-and-analytics
+  type: service
+  name: Data, analytics and research
+  summary: The event pipeline, the analytics cluster and query service, and the research team's work, which let the Foundation and the volunteers see how the projects are used.
+  owner: O:role/chief-product-and-technology-officer
+  visibility: public
+  confidence: 0.7
+  sources: ["https://wikitech.wikimedia.org/wiki/Wikimedia_infrastructure", "https://wikimediafoundation.org/our-work/", "https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/"]
+  flow:
+    outputs:
+      - {resource: usage-statistics, to: M:audience/contributors, unit: reports}
+  substrate:
+    platforms: [S:system/analytics]
+    depends-on: [S:system/analytics]
+  economics:
+    price: none
+    cost: {model: internal, band: {pending: "cost of analytics and research"}}
+  mattering:
+    to-the-whole: "The 2025 finding that human page views fell about 8% depended on rebuilt bot detection and a reclassification of traffic."
+    weight: supporting
+    inside:
+      - who: [O:role/chief-product-and-technology-officer]
+        because: "Counting honestly, when the numbers are bad news and the traffic includes bots built to look human."
+        confidence: 0.5

@@ -1,0 +1,123 @@
+# O — positions: the seats, with no holder named (who sits in a seat would be an E:assignment, and people are not imported in a public sample).
+# The staff page lists the executive titles and the departments, not the reporting lines; each executive seat is placed under the Chief Executive Officer
+# on that reading, and the Enterprise seat under Advancement, where the departments list puts Wikimedia Enterprise. The chart node asks for confirmation.
+nodes:
+  - id: O:position/board-of-trustees
+    type: position
+    name: Trustee
+    summary: "A seat on the Board of Trustees: up to 16 in all under the bylaws, in three kinds (community- and affiliate-selected, board-selected, and one Community Founder seat)."
+    roles: [O:role/board-of-trustees]
+    primary: O:role/board-of-trustees
+    reports-to: none
+    unit: O:unit/board-of-trustees
+    template: true
+    instances: {pending: "how many seats are filled today (the Meta-Wiki composition names 12, its member table lists 10)"}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Bylaws", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation/Board_of_Trustees"], confidence: 0.85, state: known}
+    dotted-to: none
+
+  - id: O:position/chief-executive-officer
+    type: position
+    name: Chief Executive Officer
+    summary: The top executive seat, appointed by the Board; also carries the Executive Director title.
+    roles: [O:role/chief-executive-officer]
+    primary: O:role/chief-executive-officer
+    reports-to: O:position/board-of-trustees
+    unit: O:unit/office-of-the-ceo
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://foundation.wikimedia.org/wiki/Bylaws", "https://wikimediafoundation.org/role/staff/"], confidence: 0.9, state: known}
+    dotted-to: none
+
+  - id: O:position/chief-product-and-technology-officer
+    type: position
+    name: Chief Product and Technology Officer
+    summary: The head of Product and Technology; a deputy seat and a Vice President of Site Reliability Engineering are listed beneath it.
+    roles: [O:role/chief-product-and-technology-officer]
+    primary: O:role/chief-product-and-technology-officer
+    reports-to: O:position/chief-executive-officer
+    unit: O:unit/product-and-technology
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.7, state: known}
+    dotted-to: none
+
+  - id: O:position/chief-advancement-officer
+    type: position
+    name: Chief Advancement Officer
+    summary: The head of Advancement (fundraising, community resources, community development and partnerships, content enablement, Wikimedia Enterprise); the page lists the seat as interim.
+    roles: [O:role/chief-advancement-officer]
+    primary: O:role/chief-advancement-officer
+    reports-to: O:position/chief-executive-officer
+    unit: O:unit/advancement
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.7, state: known}
+    dotted-to: none
+
+  - id: O:position/president-of-wikimedia-enterprise
+    type: position
+    name: President of Wikimedia Enterprise
+    summary: The head of Wikimedia Enterprise, which the departments list places within Advancement.
+    roles: [O:role/president-of-wikimedia-enterprise]
+    primary: O:role/president-of-wikimedia-enterprise
+    reports-to: O:position/chief-advancement-officer
+    unit: O:unit/wikimedia-enterprise
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.6, state: known}
+    pending: "to whom the President of Wikimedia Enterprise reports; the placement is read from the departments list"
+    dotted-to: none
+
+  - id: O:position/general-counsel
+    type: position
+    name: General Counsel
+    summary: The head of Legal; a Deputy General Counsel seat is listed beneath it.
+    roles: [O:role/general-counsel]
+    primary: O:role/general-counsel
+    reports-to: O:position/chief-executive-officer
+    unit: O:unit/legal
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.7, state: known}
+    dotted-to: none
+
+  - id: O:position/chief-financial-officer
+    type: position
+    name: Chief Financial Officer
+    summary: The head of Finance and Administration; a Vice President and Controller seat is listed beneath it.
+    roles: [O:role/chief-financial-officer]
+    primary: O:role/chief-financial-officer
+    reports-to: O:position/chief-executive-officer
+    unit: O:unit/finance-and-administration
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.7, state: known}
+    dotted-to: none
+
+  - id: O:position/chief-communications-officer
+    type: position
+    name: Chief Communications Officer
+    summary: The head of Communications (brand, external communications, movement communications).
+    roles: [O:role/chief-communications-officer]
+    primary: O:role/chief-communications-officer
+    reports-to: O:position/chief-executive-officer
+    unit: O:unit/communications
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.7, state: known}
+    dotted-to: none
+
+  - id: O:position/chief-people-officer
+    type: position
+    name: Chief People Officer
+    summary: The head of People; two Vice President seats (people experience; growth and belonging) are listed beneath it.
+    roles: [O:role/chief-people-officer]
+    primary: O:role/chief-people-officer
+    reports-to: O:position/chief-executive-officer
+    unit: O:unit/people
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/role/staff/"], confidence: 0.7, state: known}
+    dotted-to: none

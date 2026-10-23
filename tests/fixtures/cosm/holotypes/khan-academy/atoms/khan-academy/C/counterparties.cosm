@@ -1,0 +1,147 @@
+# C — counterparties: the index of every outsider a bond, contract, channel, vendor or surface names.
+# One is a modelled atom (`atom:` points at it); the rest are stubs, each with a public id where one exists.
+nodes:
+  - id: C:counterparty/schoolhouse-world
+    type: counterparty
+    name: Schoolhouse World Inc
+    summary: "Free live peer tutoring and civil-dialogue programs, run by a separate 501(c)(3) co-founded in 2020; a modelled atom."
+    kind: affiliate
+    atom: atom/schoolhouse-world
+    global-id: {ein: "85-3101725", domain: schoolhouse.world}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [pp-schoolhouse, ka-help-partners, schoolhouse-about], confidence: 0.9, state: known}
+
+  - id: C:counterparty/khan-academy-india
+    type: counterparty
+    name: Khan Academy India
+    summary: "A related tax-exempt organization in India (education), listed on Schedule R as controlled by the nonprofit. A stub: its registry id is not on the return."
+    kind: controlled-entity
+    atom: none
+    global-id: {pending: "the Indian registry number (company or society id) of Khan Academy India"}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [f990-2025], confidence: 0.8, state: known}
+
+  - id: C:counterparty/khan-academy-brasil
+    type: counterparty
+    name: Khan Academy Brasil
+    summary: "A related tax-exempt organization in Brazil (education), listed on Schedule R as controlled by the nonprofit; its office is in Sao Paulo. A stub: its registry id is not on the return."
+    kind: controlled-entity
+    atom: none
+    global-id: {pending: "the Brazilian registry number (CNPJ) of Khan Academy Brasil"}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [f990-2025], confidence: 0.8, state: known}
+
+  - id: C:counterparty/khan-lab-school
+    type: counterparty
+    name: Khan Lab School
+    summary: "An independent K-12 school founded in 2014 with three campuses (two in Silicon Valley, one in Wichita, Kansas, opened in 2023) and its own 501(c)(3). Khan Academy lists it among the education organizations it works with. A stub."
+    kind: affiliate
+    atom: none
+    global-id: {ein: "46-5742553", domain: khanlabschool.org}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-help-partners, pp-kls], confidence: 0.9, state: known}
+
+  - id: C:counterparty/khan-schools-network
+    type: counterparty
+    name: Khan Schools Network
+    summary: "A nonprofit co-founded in 2023 that supports mastery-based schools and open-source mastery resources; a registered 501(c)(3) with a July fiscal year end. It describes itself as sitting between Khan Lab School, Khan Academy and Schoolhouse.world. A stub."
+    kind: affiliate
+    atom: none
+    global-id: {ein: "93-2673296", domain: khanschoolsnetwork.org}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-help-partners, ksn-home, pp-ksn], confidence: 0.9, state: known}
+
+  - id: C:counterparty/college-board
+    type: counterparty
+    name: College Board
+    summary: "Owner of the SAT; partner in free Official Digital SAT Prep on Khan Academy since 2015."
+    kind: partner
+    atom: none
+    global-id: {domain: collegeboard.org}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [collegeboard-sat, ka-districts], confidence: 0.9, state: known}
+
+  - id: C:counterparty/stand-together
+    type: counterparty
+    name: Stand Together Trust
+    summary: "Philanthropic funder of a five-year, $20 million commitment announced in January 2024 across Khan Academy, Schoolhouse.world and Khan Lab School."
+    kind: funder
+    atom: none
+    global-id: {domain: standtogether.org}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [standtogether], confidence: 0.8, state: known}
+
+  - id: C:counterparty/microsoft
+    type: counterparty
+    name: Microsoft
+    summary: "Donated cloud infrastructure so that Khanmigo for Teachers is free to US teachers (announced May 2024); also exploring small language models for math tutoring."
+    kind: partner
+    atom: none
+    global-id: {domain: microsoft.com}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [blog-microsoft], confidence: 0.8, state: known}
+
+  - id: C:counterparty/google
+    type: counterparty
+    name: Google
+    summary: "Google.org grant and fellowship and access to Gemini models for new Khanmigo and Writing Coach tools (2026); also the operator of the Google Play store that carries the Android apps; a founding partner on the supporters page."
+    kind: platform
+    atom: none
+    global-id: {domain: google.com}
+    platform-terms: {customer-relationship: self, take-rate: {pending: "what fees, if any, does the store charge the nonprofit for the free apps?"}}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [blog-google-org, journal-google-2026, ka-supporters, ka-downloads], confidence: 0.8, state: known}
+
+  - id: C:counterparty/apple
+    type: counterparty
+    name: Apple App Store
+    summary: "The iOS store that carries the Khan Academy and Khan Academy Kids apps."
+    kind: platform
+    atom: none
+    global-id: {domain: apple.com}
+    platform-terms: {customer-relationship: self, take-rate: {pending: "what fees, if any, does the store charge the nonprofit for the free apps?"}}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-downloads], confidence: 0.8, state: known}
+
+  - id: C:counterparty/nwea
+    type: counterparty
+    name: NWEA
+    summary: "Assessment nonprofit whose MAP Growth scores inform Learning Paths; co-launched MAP Accelerator with Khan Academy in 2019 and stays a partner through its Instructional Connections Program."
+    kind: partner
+    atom: none
+    global-id: {domain: nwea.org}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [blog-learning-paths, blog-map-transition], confidence: 0.8, state: known}
+
+  - id: C:counterparty/nh-doe
+    type: counterparty
+    name: New Hampshire Department of Education
+    summary: "The state agency that offers Khanmigo free to students and educators in grades 5 to 12 statewide, after a state pilot funded by federal COVID-relief money."
+    kind: public-body
+    atom: none
+    global-id: {domain: education.nh.gov}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [blog-new-hampshire], confidence: 0.8, state: known}
+
+  - id: C:counterparty/openai
+    type: counterparty
+    name: OpenAI
+    summary: "Maker of GPT-4, the model Khanmigo was announced on in March 2023 and that Khanmigo's own pricing pages still name."
+    kind: vendor
+    atom: none
+    global-id: {domain: openai.com}
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [journal-khanmigo-2023, khanmigo-learners], confidence: 0.8, state: known}

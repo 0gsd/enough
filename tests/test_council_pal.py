@@ -59,7 +59,7 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setenv("HOME", str(home))
     assert Path.home() == home, "a test must never touch the real ~/enough"
     for var, rel in (("ENOUGH_PROJECTS_STATE", "state/projects.json"),
-                     ("ENOUGH_CACHEAWL_ROOT", "cacheawl"),
+                     ("ENOUGH_CANON_ROOT", "cacheawl"),
                      ("ENOUGH_INFOWORLD_ROOT", "no-infoworld"),
                      ("ENOUGH_WIKISINK_CONFIG", "wikisink.json"),
                      ("ENOUGH_READVISORS_ROOT", "readvisors-global"),

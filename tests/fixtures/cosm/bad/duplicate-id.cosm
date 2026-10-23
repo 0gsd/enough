@@ -1,0 +1,15 @@
+oes: eml/1
+id: eml/bad-duplicate-id
+name: bad duplicate-id
+# duplicate-id: one id twice; the first is kept
+nodes:
+  - id: K:concept/x
+    type: concept
+    name: x
+    summary: The first x.
+    provenance: {mode: manual, sources: [fixture], confidence: 1}
+  - id: K:concept/x
+    type: concept
+    name: x again
+    summary: The second x.
+    provenance: {mode: manual, sources: [fixture], confidence: 1}

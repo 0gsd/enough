@@ -1,0 +1,47 @@
+# C — aims: what Khan Academy says it is trying to achieve with outside help (seeking), from its giving, districts and careers pages, its district
+# blog post and its public job board, read on 2026-10-18. The words are the nonprofit's own and carry no figures: an isotype publishes statements,
+# never measurements. Owners are roles; no person is named. No "open to" aim is stated in a current source, so none is written.
+nodes:
+  - id: C:aim/individual-gifts
+    type: aim
+    name: Gifts from individuals
+    summary: "Raise gifts from individuals, through the Learners Fund and one-time gifts, so that the learning tools stay free for everyone."
+    kind: capital
+    stance: seeking
+    owner: O:role/Chief-External-Relations-Officer
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-giving, ka-donate-banner, ka-about], confidence: 0.85, state: known}
+
+  - id: C:aim/corporate-partnerships
+    type: aim
+    name: Corporate partnerships
+    summary: "Build partnerships with corporations that share its mission, to sponsor content creation, fuel AI innovation and subsidize student licenses for the district program."
+    kind: capital
+    stance: seeking
+    owner: O:role/Chief-External-Relations-Officer
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-giving], confidence: 0.85, state: known}
+
+  - id: C:aim/district-partners
+    type: aim
+    name: School districts as partners
+    summary: "School districts that want to partner with it for rostering, training, ongoing guidance and the reimagined district experience with Khanmigo built in."
+    kind: customers
+    stance: seeking
+    owner: O:role/Chief-External-Relations-Officer
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-districts, blog-districts-2026], confidence: 0.8, state: known}
+
+  - id: C:aim/content-and-research-hires
+    type: aim
+    name: Content creators, researchers and designers
+    summary: "Hire content creators, researchers and experience designers for the Kids app and for assessments, and offer internships."
+    kind: talent
+    stance: seeking
+    owner: O:role/Chief-Executive
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: [ka-careers, ka-job-board], confidence: 0.75, state: known}

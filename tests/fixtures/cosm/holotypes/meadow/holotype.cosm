@@ -1,0 +1,43 @@
+oes: comprise/1
+
+# Meadow Software as a one-atom Holotype: the fixture that reaches full cross-module equilibrium,
+# so the app's "all green" state exists on day one (plan/examples-atoms.md). Fictional throughout.
+# Layout: atoms/meadow/<Module>/*.cosm for C O M P R I S; E holds a README because people live only
+# in the store. P is the skill's examples/meadow unchanged except for namespaced ids.
+
+id: holotype/meadow
+name: Meadow Software
+summary: Bookkeeping for small restaurants; one atom, no bonds, three stubs (banks, Stripe, and the customer's accountant as an audience).
+# A sample (Q51): fictional, made to show the app; it reads "Meadow Software (sample)" wherever the app names it, and its
+# isotype says sample: true and is signed by the install's sample key, never a person's.
+sample: true
+atoms:
+  - atom/meadow
+perspective: atom/meadow
+
+# Sources that nodes outside P cite. P's own sources (session-1, session-2) stay in atoms/meadow/P/doc.cosm.
+sources:
+  - {id: session-3, page: "Interview with the Founder on the shell, the stack, billing and the website, 2026-10-14", supports: "C, O positions, M price books, R, I, S"}
+  - {id: stripe-pricing, page: "Stripe published pricing page", url: "https://stripe.com/pricing", supports: "platform terms of the Stripe counterparty"}
+  - {id: meadow-website, page: "meadow.example, home and pricing pages", supports: "the surface, the claim, the list prices"}
+
+attestations: []
+
+# A net-scan grant (slice 16, Q13's shape): what the scan may read, how much, for how long; every fetch is logged.
+# The replay pages under scans/replay/ stand in for meadow.example in tests; nothing is fetched without a person's click.
+grants:
+  - {id: scan-site, kind: net-scan, domains: [meadow.example], pages: 20, ttl: 30d, granted: 2026-10-16, by: O:role/Founder, atom: atom/meadow}
+  # A reflections grant (slice 17): pages where others talk about Meadow, read every 30 days; `status: planned` keeps it off
+  # the schedule in the fixture (an active one that never ran makes R unverifiable, rule 9). Replay: scans/replay-what-others-say/.
+  - {id: what-others-say, kind: reflections, urls: ["https://reviews.example/software/meadow-software", "https://ledger.example/2026/03/meadow-closes-the-books"], pages: 6, every: 30d, ttl: 365d, granted: 2026-10-16, by: O:role/Founder, atom: atom/meadow, status: planned}
+  # A system-scan grant (slice 18): the census of what Meadow signs into and pays for, from two fictional exports under
+  # scans/census/ (an app list, a card statement); read in place, never copied; planned, like the one above, until the first run.
+  - {id: stack-census, kind: system-scan, sources: [{kind: idp-apps, path: scans/census/workspace-apps.csv}, {kind: card-statement, path: scans/census/card-2026-09.csv}], every: 90d, ttl: 365d, granted: 2026-10-16, by: O:role/Founder, atom: atom/meadow, status: planned}
+  # A directory grant (slice 22d): the Workspace users export under scans/directory/, read in place to propose the people file
+  # (never imported by itself; the person accepts it on the people page). On request only: no `every:`.
+  - {id: directory, kind: directory, sources: [{kind: google-workspace, path: scans/directory/workspace-users.csv}], ttl: 365d, granted: 2026-10-17, by: O:role/Founder, atom: atom/meadow}
+  # Accounting grants (slice 22e): the books, from reports a person exports (QuickBooks Online's Profit and Loss and Balance Sheet as
+  # CSV under scans/accounting/), read in place and never copied; one C:finance node per period is proposed, nothing written until
+  # accepted. Meadow kept 2025 in Xero and moved to QuickBooks in 2026: the Xero exports are the history, read on request. Planned until the first run.
+  - {id: books, kind: accounting, system: quickbooks, atom: atom/meadow, currency: USD, sources: [{kind: profit-and-loss, path: scans/accounting/quickbooks-profit-and-loss-2026.csv}, {kind: balance-sheet, path: scans/accounting/quickbooks-balance-sheet-2026.csv}], every: 90d, ttl: 365d, granted: 2026-10-16, by: O:role/Founder, status: planned}
+  - {id: books-2025, kind: accounting, system: xero, atom: atom/meadow, currency: USD, basis: accrual, sources: [{kind: profit-and-loss, path: scans/accounting/xero-profit-and-loss-2025.csv}, {kind: balance-sheet, path: scans/accounting/xero-balance-sheet-2025.csv}], ttl: 365d, granted: 2026-10-16, by: O:role/Founder, status: planned}

@@ -1,0 +1,52 @@
+# O: roles: the board, the Mozilla-wide executive team and the councils. Nobody is named.
+nodes:
+  - id: O:role/Board-of-Directors
+    type: role
+    name: Board of Directors
+    summary: Nine directors named on the FAQ; oversees strategy and resource allocation across the portfolio. The Foundation appoints the majority.
+    decides:
+      - portfolio strategy
+      - resource allocation across the portfolio
+    governs: ['P:mozilla-org', 'P:function/portfolio-strategy']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.9, state: known}
+
+  - id: O:role/President
+    type: role
+    name: President, Mozilla
+    summary: The head of the Mozilla-wide executive team housed in Mozilla Management Company.
+    governs: ['P:offering/stewardship']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.8, state: known}
+
+  - id: O:role/Chief-Operating-Officer
+    type: role
+    name: Chief Operating Officer, Mozilla
+    summary: Mozilla-wide executive team seat; duties are not published.
+    governs: ['P:function/capital-allocation']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.7, state: known}
+
+  - id: O:role/Chief-Technology-Officer
+    type: role
+    name: Chief Technology Officer, Mozilla
+    summary: Mozilla-wide executive team seat; leads the Tech Council.
+    governs: ['O:unit/tech-council']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org', 'https://www.mozilla.org/en-US/about/leadership/'], confidence: 0.8, state: known}
+
+  - id: O:role/Communications-Council-Lead
+    type: role
+    name: Communications Council lead
+    summary: Leads the bi-weekly Communications and Brand Council.
+    governs: ['P:function/brand-and-trademarks', 'O:unit/communications-brand-council']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.7, state: known}
+
+  - id: O:role/Executive-Leadership-Council
+    type: role
+    name: Executive Leadership Council
+    summary: The top leaders of each Mozilla organization plus the Mozilla.org executive team; meets monthly.
+    governs: ['O:unit/executive-leadership-council', 'P:function/family-coordination']
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://wiki.mozilla.org/Mozilla_org'], confidence: 0.9, state: known}

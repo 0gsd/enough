@@ -1,0 +1,32 @@
+oes: eml/1
+id: eml/a-note-on-rain
+name: A note on rain
+# No source: a standalone EML, as the rules fallback writes it when no model is running.
+derived: {at: 2026-10-22T11:05:00Z, by: rules, mode: rules, completeness: full, chunks: 1}
+atem:
+  line: "Rain that falls after a dry spell runs off before the soil can take it in."
+
+nodes:
+  - id: L:term/run-off
+    type: term
+    name: run-off
+    summary: Rain that flows over the ground instead of soaking in.
+    feed: {word: run-off, pos: noun, origin: feed}
+    sense: Rain that flows over the ground instead of soaking in.
+    provenance: {mode: derived, sources: [rules], confidence: 0.3, state: pending}
+    pending: a model has not read this passage
+  - id: K:concept/dry-soil
+    type: concept
+    name: dry soil
+    summary: Soil dried hard by weeks without rain sheds water at first.
+    defined-by: L:term/run-off
+    provenance: {mode: derived, sources: [rules], confidence: 0.3, state: pending}
+    pending: a model has not read this passage
+  - id: P:claim/rain-runs-off-dry-soil
+    type: claim
+    name: rain runs off dry soil
+    summary: Rain that falls after a dry spell runs off dry soil before the soil can take the rain in.
+    stance: assumed
+    roles: {about: K:concept/dry-soil, condition: after a dry spell}
+    provenance: {mode: derived, sources: [rules], confidence: 0.3, state: pending}
+    pending: a model has not read this passage

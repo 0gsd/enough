@@ -1,0 +1,902 @@
+# nodes.cosm: the product tree under the brand: four suites, eleven offerings, five functions and the units below them.
+# Read from the nonprofit's own pages and its Form 990 (research mode, 2026-10-18); mattering is the modeller's reading unless a source is cited.
+nodes:
+
+- id: P:suite/free-learning
+  type: suite
+  name: The free learning platform
+  summary: "Courses, practice and test prep for learners, with assignment and tracking tools for teachers, all free: more than 840 courses for K-12 and early college on the nonprofit's own count."
+  owner: O:role/Chief-Learning-Officer
+  confidence: 0.9
+  sources: [ka-about, ka-home, ka-test-prep]
+  visibility: public
+  parts: [P:offering/courses-and-practice, P:offering/test-prep, P:offering/teacher-tools]
+  mattering:
+    to-the-whole: "This is what the name means to most people; the AI tutor, the district program and the apps are built on its content and its practice."
+    weight: critical
+    inside:
+      - who: [O:role/Chief-Learning-Officer, O:role/Chief-Technology-Officer]
+        because: "The library and its practice engine are the part that has to keep working for tens of millions of people at no charge."
+        confidence: 0.5
+
+- id: P:suite/khanmigo
+  type: suite
+  name: Khanmigo
+  summary: "The AI tutor for learners and parents and the AI teaching assistant for teachers, with the Writing Coach; introduced in March 2023."
+  owner: O:role/Chief-Learning-Officer
+  pending: "which role runs Khanmigo as a product: learning, engineering or a separate product role?"
+  confidence: 0.8
+  sources: [khanmigo-home, journal-khanmigo-2023, ka-about]
+  visibility: public
+  parts: [P:offering/khanmigo-teachers, P:offering/khanmigo-families, P:offering/writing-coach]
+  mattering:
+    to-the-whole: "The nonprofit's answer to generative AI: a tutor built to guide, funded partly by subscriptions and partly by partner support."
+    weight: major
+    inside:
+      - who: [O:role/Chief-Learning-Officer, O:role/Chief-Technology-Officer]
+        because: "Every interaction costs money, so the team has to show that guided AI help leads to learners who then solve the next problem alone."
+        confidence: 0.5
+
+- id: P:suite/districts
+  type: suite
+  name: Khan Academy Districts
+  summary: "The district program, launched in 2019 and rebuilt in 2025-26 with Khanmigo built into the platform: partnership services, insights for leaders, add-ons such as Learning Paths."
+  owner: O:role/Chief-Executive
+  pending: "which role runs the districts business day to day? No public page names it"
+  confidence: 0.8
+  sources: [ka-districts, blog-districts-2026]
+  visibility: public
+  parts: [P:offering/districts-partnership, P:offering/learning-paths]
+  mattering:
+    to-the-whole: "The part of the line sold to institutions at a price; the return books $22.2 million of program service revenue in the year to June 2025 and does not say how much is districts, Khanmigo subscriptions or other fees."
+    weight: major
+    inside:
+      - who: [O:role/Chief-Executive, O:role/Chief-External-Relations-Officer]
+        because: "It is where free classroom use turns into a measured, school-wide habit, and where a nonprofit finds out whether its claims hold in real schools."
+        confidence: 0.5
+
+- id: P:suite/early-learning
+  type: suite
+  name: Khan Academy Kids
+  summary: "The early-learning line: a free app for children aged 2 to 8 and a school version with teacher tools, built in the line of the Duck Duck Moose apps."
+  owner: O:role/Kids-Lead
+  confidence: 0.9
+  sources: [ka-kids, edweek-kids-2018, techcrunch-ddm-2016]
+  visibility: public
+  parts: [P:offering/khan-kids, P:offering/kids-for-schools]
+  mattering:
+    to-the-whole: "It carries the mission down to age 2 and gives the nonprofit its youngest audience, reached through the parents who download it."
+    weight: major
+    inside:
+      - who: [O:role/Kids-Lead]
+        because: "A small team making a free product for the youngest learners, judged by parents and classroom teachers every day."
+        confidence: 0.5
+
+- id: P:offering/courses-and-practice
+  type: offering
+  name: Courses and practice
+  summary: "Free courses with videos, articles and mastery-based practice for K-12 and early college: math at every level, English language arts, science, social studies, computing, economics and life skills, plus partner courses. About 800 active courses on the Form 990 count at 30 June 2025; more than 840 on the About page."
+  owner: O:role/Chief-Learning-Officer
+  confidence: 0.9
+  sources: [ka-about, ka-home, f990-2025, ka-partner-content]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: course-content, from: P:function/content-creation, unit: courses}
+      - {resource: platform-delivery, from: P:product/learning-platform, unit: sessions}
+      - {resource: translations, from: P:function/localization, unit: languages}
+    outputs:
+      - {resource: practice-and-lessons, to: M:audience/students, unit: active learners/month, rate: 8500000}
+      - {resource: practice-and-lessons, to: M:audience/teachers, unit: assignments}
+      - {resource: math-content, to: P:offering/learning-paths, unit: courses}
+    schedule: continuous
+  substrate:
+    platforms: [S:system/learning-platform]
+    depends-on: [P:function/content-creation, P:product/learning-platform]
+  economics:
+    price: {model: free}
+    cost: {pending: "cost of the library per course or per active learner; the return gives only the program totals"}
+    margin: none
+  vocabulary:
+    terms:
+      - {term: skill, maps-to: P:khan-academy/skill}
+      - {term: mastery, maps-to: P:khan-academy/mastery}
+  affect:
+    audience: M:audience/students
+    elicits:
+      - {feeling: confidence, intensity: 0.7, when: "a skill is mastered"}
+      - {feeling: progress, intensity: 0.7, when: "the skill tally grows"}
+    avoids: ["being stuck without help", "feeling behind"]
+    probes: [motivation, satisfaction]
+    tone: [encouraging, plain, patient]
+  mattering:
+    to-the-whole: "Without it there is no nonprofit: the free library is the product every other offering is built on or sold beside."
+    weight: critical
+    inside:
+      - who: [O:role/Chief-Learning-Officer, O:role/Chief-Technology-Officer]
+        because: "Tens of millions of people learn here each year with nothing else to fall back on; a broken exercise is somebody's homework."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/students, M:audience/teachers]
+        because: "Standards-aligned practice at the learner's own level, free and available at any hour, replaces a paid tutor or a worksheet that cannot respond."
+        stakes: "Practice that stops when the lesson ends."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/students, M:audience/families]
+        because: "Families abroad and in under-served US schools gain a way to catch up in their own language."
+        barrier: "Connectivity, translation coverage and not knowing it is free."
+        confidence: 0.5
+
+- id: P:offering/test-prep
+  type: offering
+  name: Test prep
+  summary: "Free preparation for the SAT (math, reading and writing, and get-ready courses) built with the College Board, plus listed courses for the MCAT, the LSAT and the OECD's PISA practice program."
+  owner: O:role/Chief-Learning-Officer
+  confidence: 0.8
+  sources: [ka-test-prep, collegeboard-sat, ka-districts]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: official-practice-content, from: C:counterparty/college-board, unit: tests}
+      - {resource: test-prep-content, from: P:function/content-creation, unit: courses}
+      - {resource: platform-delivery, from: P:product/learning-platform, unit: sessions}
+    outputs:
+      - {resource: test-prep, to: M:audience/students, unit: learners}
+    schedule: continuous
+  substrate:
+    platforms: [S:system/learning-platform]
+    depends-on: [C:counterparty/college-board]
+  rules:
+    - must: "O:role/Chief-of-Staff keep Official Digital SAT Prep free to students"
+      source: collegeboard-sat
+      confidence: 0.8
+  economics:
+    price: {model: free}
+    cost: {pending: "cost of the SAT program and of the other test-prep courses"}
+    margin: none
+  affect:
+    audience: M:audience/students
+    elicits:
+      - {feeling: readiness, intensity: 0.7, when: "a full-length practice test is reviewed against lessons"}
+    avoids: ["test anxiety from surprises", "paying for prep"]
+    probes: [anticipation, motivation]
+    tone: [calm, exact]
+  mattering:
+    to-the-whole: "The bridge to high-stakes tests that many learners otherwise buy courses for; it also gives the nonprofit its standing with test makers and districts."
+    weight: major
+    inside:
+      - who: [O:role/Chief-Learning-Officer, O:role/Chief-of-Staff]
+        because: "A long partnership with the College Board is a trust the whole team must keep earning with each test change."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/students]
+        because: "A student can take a full practice test in the test's own app and then work the missed skills here, for nothing."
+        stakes: "Paying for a prep course, or going in blind."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/districts, M:audience/families]
+        because: "Districts see test prep as a reason to roster a whole grade; families see a free alternative to a paid course."
+        barrier: "Students who start too close to the test date."
+        confidence: 0.5
+
+- id: P:offering/teacher-tools
+  type: offering
+  name: Khan for Educators and classroom tools
+  summary: "Free tools for teachers: assign practice, track progress, plan with standards-aligned unit guides (for example for Texas and the Next Generation Science Standards) and sign up with a free teacher account."
+  owner: O:role/Chief-Learning-Officer
+  confidence: 0.8
+  sources: [ka-home, ka-about, ka-partner-content]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: platform-delivery, from: P:product/learning-platform, unit: sessions}
+    outputs:
+      - {resource: classroom-tools, to: M:audience/teachers, unit: teacher accounts}
+    schedule: continuous
+  substrate:
+    platforms: [S:system/learning-platform]
+    depends-on: [P:product/learning-platform]
+  economics:
+    price: {model: free}
+    cost: {pending: "cost of the teacher tools; donor support keeps them free"}
+    margin: none
+  affect:
+    audience: M:audience/teachers
+    elicits:
+      - {feeling: control, intensity: 0.6, when: "an assignment is set and progress is visible"}
+      - {feeling: relief, intensity: 0.5, when: "planning takes minutes"}
+    avoids: ["extra paperwork", "data that cannot be trusted"]
+    probes: [satisfaction]
+    tone: [practical, plain]
+  mattering:
+    to-the-whole: "Teachers are a main route by which the platform reaches students in classrooms; free teacher tools are the on-ramp to the district program."
+    weight: major
+    inside:
+      - who: [O:role/Chief-Learning-Officer]
+        because: "Teachers are the most direct judges of whether the practice fits a classroom."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/teachers]
+        because: "A teacher can set nightly practice and see who needs help without buying software or asking a district."
+        stakes: "Grading by hand, and no view of who is stuck."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/districts]
+        because: "Leaders who see teachers already using it have a reason to make use consistent across schools."
+        barrier: "Wanting data and training that free teacher accounts do not provide."
+        confidence: 0.5
+
+- id: P:offering/khanmigo-teachers
+  type: offering
+  name: Khanmigo for teachers
+  summary: "An AI teaching assistant, free to sign up for: lesson plans tied to the content library, summaries of recent student work, learning objectives, rubrics, exit tickets, quiz questions, differentiation and groupings. Free to US teachers since May 2024 with Microsoft's donated infrastructure."
+  owner: O:role/Chief-Learning-Officer
+  confidence: 0.8
+  sources: [khanmigo-home, blog-microsoft, journal-khanmigo-2023]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: ai-assistance, from: P:product/khanmigo-ai, unit: requests}
+      - {resource: donated-infrastructure, from: C:counterparty/microsoft, unit: compute}
+    outputs:
+      - {resource: planning-tools, to: M:audience/teachers, unit: teacher accounts}
+    schedule: on-demand
+  substrate:
+    platforms: [S:system/khanmigo-ai]
+    vendors: [S:vendor/microsoft]
+    depends-on: [P:product/khanmigo-ai, S:vendor/microsoft]
+  rules:
+    - must: "all-roles keep teacher and student data private and secure when Khanmigo is used"
+      source: khanmigo-home
+      confidence: 0.7
+  economics:
+    price: {model: free}
+    cost: {model: usage, band: {pending: "compute cost per teacher; Microsoft donates infrastructure"}}
+    margin: none
+  affect:
+    audience: M:audience/teachers
+    elicits:
+      - {feeling: relief, intensity: 0.7, when: "an hour of planning takes fifteen minutes"}
+    avoids: ["generic output", "student data leaving the classroom"]
+    probes: [satisfaction]
+    tone: [practical, plain]
+  mattering:
+    to-the-whole: "It carries the nonprofit's AI work into the classroom for free, where it can be tried by the people best placed to judge it."
+    weight: major
+    inside:
+      - who: [O:role/Chief-Learning-Officer, O:role/Chief-of-Staff]
+        because: "Free access rests on a donor in kind; the partnership has to be renewed and the cost kept in view."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/teachers]
+        because: "Planning, rubrics and quiz questions in minutes, tied to the content they already assign, at no cost to them or their school."
+        stakes: "Evenings spent on paperwork."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/districts]
+        because: "Districts see AI used safely by their own teachers before paying for student access."
+        barrier: "Student access exists only through a school or district implementation."
+        confidence: 0.5
+
+- id: P:offering/khanmigo-families
+  type: offering
+  name: Khanmigo for learners and parents
+  summary: "An AI tutor that guides a learner to the answer instead of giving it, covering subjects from algebra to essay writing and coding practice; $4 a month or $44 a year. A parent account activates it for up to 10 children, with chat history and safety alerts. For US residents with a US billing address."
+  owner: O:role/Chief-Learning-Officer
+  confidence: 0.9
+  sources: [khanmigo-learners, khanmigo-parents, khanmigo-home]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: ai-tutoring, from: P:product/khanmigo-ai, unit: conversations}
+      - {resource: subscriptions, from: M:audience/families, unit: USD/month, rate: {pending: "paying accounts; the nonprofit does not publish a subscriber count"}}
+    outputs:
+      - {resource: tutoring, to: M:audience/families, unit: conversations}
+      - {resource: tutoring, to: M:audience/students, unit: conversations}
+    schedule: on-demand
+  substrate:
+    platforms: [S:system/khanmigo-ai]
+    depends-on: [P:product/khanmigo-ai]
+  rules:
+    - must: "all-roles limit Khanmigo subscriptions for learners and parents to US residents with a US billing address"
+      source: khanmigo-home
+      confidence: 0.8
+    - must: "all-roles require parental consent or a school or district implementation before a learner under 18 uses Khanmigo"
+      source: blog-microsoft
+      confidence: 0.8
+  economics:
+    price: {model: flat, value: 4, unit: USD/month}
+    cost: {model: usage, band: {pending: "inference cost per conversation; the page says every interaction has a cost"}}
+    margin: {pending: "whether subscriptions cover the cost of serving them"}
+  vocabulary:
+    terms:
+      - {term: Khanmigo, maps-to: P:khan-academy/Khanmigo}
+  affect:
+    audience: M:audience/families
+    elicits:
+      - {feeling: reassurance, intensity: 0.7, when: "a parent sees the child's chat history and safety alerts"}
+      - {feeling: curiosity, intensity: 0.6, when: "the tutor asks a question instead of answering"}
+    avoids: ["an answer machine", "unmonitored AI chat for children"]
+    probes: [satisfaction, motivation]
+    tone: [patient, curious, plain]
+  mattering:
+    to-the-whole: "The paid side of the AI line: payment covers part of its cost and shows whether families will pay for guided help."
+    weight: major
+    inside:
+      - who: [O:role/Chief-Learning-Officer, O:role/Chief-Technology-Officer]
+        because: "Proof that an AI tutor can be built to keep learners thinking, and kept safe, is the nonprofit's claim to be different from a general chatbot."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/families, M:audience/students]
+        because: "Help with homework at any hour that makes the child do the thinking, with the parent able to see what was asked."
+        stakes: "A chatbot that gives the answer, or no help at all."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/families]
+        because: "Families outside the United States cannot subscribe at all today; those inside may not know it exists."
+        barrier: "US-only sales, price against free alternatives, and doubts about AI for children."
+        confidence: 0.5
+
+- id: P:offering/writing-coach
+  type: offering
+  name: Writing Coach
+  summary: "An AI writing practice and instruction tool for students in grades 5 to 12, with step-by-step guidance for learners and insights for teachers; free to sign up and also offered to districts. Gemini models were announced for it in February 2026, and a Reading Coach is expected later in 2026."
+  owner: O:role/Chief-Learning-Officer
+  confidence: 0.7
+  sources: [khanmigo-home, ka-districts, journal-google-2026]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: ai-feedback, from: P:product/khanmigo-ai, unit: drafts}
+      - {resource: model-access, from: C:counterparty/google, unit: requests}
+    outputs:
+      - {resource: writing-practice, to: M:audience/students, unit: drafts}
+      - {resource: writing-insights, to: M:audience/teachers, unit: reports}
+    schedule: on-demand
+  substrate:
+    platforms: [S:system/khanmigo-ai]
+    vendors: [S:vendor/google]
+    depends-on: [P:product/khanmigo-ai, S:vendor/google]
+  economics:
+    price: {model: free}
+    cost: {model: usage, band: {pending: "model cost per draft; Google.org supports the Gemini work"}}
+    margin: none
+  affect:
+    audience: M:audience/students
+    elicits:
+      - {feeling: confidence, intensity: 0.6, when: "feedback names what to fix next"}
+    avoids: ["an essay written for the student", "grades without reasons"]
+    probes: [motivation]
+    tone: [encouraging, exact]
+  mattering:
+    to-the-whole: "Writing is a skill where an AI tutor can be misused to do the work for the student; a coach that teaches it is a proof point for the whole AI line."
+    weight: supporting
+    inside:
+      - who: [O:role/Chief-Learning-Officer]
+        because: "It is offered free to learners as well as teachers, so it is where the nonprofit sees whether guidance beats shortcuts."
+        confidence: 0.4
+    chosen:
+      - who: [M:audience/students, M:audience/teachers]
+        because: "Students get feedback at every draft and teachers see where the writing is weak, without grading every draft by hand."
+        stakes: "One round of comments a week, too late to use."
+        confidence: 0.5
+    prospective:
+      - who: [M:audience/districts]
+        because: "Writing is an area where districts look for instruction support beyond math."
+        barrier: "Concern that students will let the tool write for them."
+        confidence: 0.4
+
+- id: P:offering/districts-partnership
+  type: offering
+  name: Khan Academy Districts partnership
+  summary: "A paid partnership for school districts: rostering, tailored implementation and training, ongoing strategic support, insight across schools, Khanmigo built into practice, the Writing Coach, SAT support and assessments for grades 3 to 12. More than 600 partner districts by the page's count; the rebuilt experience reaches every partner from the 2026-27 school year."
+  owner: O:role/Chief-Executive
+  pending: "which role runs district partnerships day to day, and what a partnership costs: the site says to talk to the team"
+  confidence: 0.8
+  sources: [ka-districts, blog-districts-2026, ka-home, ka-about]
+  visibility: public
+  parts: [P:service/district-implementation]
+  flow:
+    inputs:
+      - {resource: partnership-fees, from: M:audience/districts, unit: USD/year, rate: {pending: "revenue from district partnerships; not split out in the Form 990"}}
+      - {resource: platform-access, from: P:product/learning-platform, unit: student accounts}
+      - {resource: ai-tutoring, from: P:product/khanmigo-ai, unit: conversations}
+      - {resource: partner-leads, from: P:function/awareness-and-adoption, unit: districts}
+    outputs:
+      - {resource: implementation-and-insights, to: M:audience/districts, unit: districts}
+      - {resource: practice-and-tutoring, to: M:audience/students, unit: student accounts}
+    schedule: continuous
+  substrate:
+    platforms: [S:system/learning-platform, S:system/khanmigo-ai]
+    depends-on: [P:product/learning-platform, P:product/khanmigo-ai, P:function/awareness-and-adoption]
+    roles-required: [{role: O:role/Chief-Executive, load: medium}]
+  economics:
+    price: {pending: "district prices are quoted on request; the site publishes none"}
+    cost: {pending: "cost of implementation staff and support per district"}
+    margin: {pending: "whether district fees cover their own service cost"}
+  affect:
+    audience: M:audience/districts
+    elicits:
+      - {feeling: confidence, intensity: 0.7, when: "leaders see progress across every school"}
+      - {feeling: momentum, intensity: 0.6, when: "students keep practising without being pushed"}
+    avoids: ["tools that teachers do not use", "data that cannot be compared across schools"]
+    probes: [anticipation, reward]
+    tone: [practical, evidence-led]
+  mattering:
+    to-the-whole: "It turns free teacher use into a measured school-wide habit, and its fees help pay for the free tools everyone else uses."
+    weight: major
+    inside:
+      - who: [O:role/Chief-Executive, O:role/Chief-External-Relations-Officer]
+        because: "Partner districts are where the nonprofit proves its claims in real classrooms, one implementation at a time."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/districts]
+        because: "Rostering, training and a view of progress across every school, for a tool teachers already use."
+        stakes: "Uneven adoption and no data to show a board."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/districts]
+        because: "Districts not yet partners can already see teachers using the free product and a state example of free statewide access."
+        barrier: "No public price and the cost of changing a district's tools."
+        confidence: 0.5
+
+- id: P:offering/learning-paths
+  type: offering
+  name: Learning Paths informed by MAP Growth
+  summary: "An add-on to a districts partnership that turns each student's MAP Growth scores into a personalised path of Khan Academy math, from grade 3 to Geometry. Requires Clever rostering for both products and at least 250 licences; sold by the nonprofit, with NWEA as a partner."
+  owner: O:role/Chief-Executive
+  pending: "which role owns this add-on, and what a licence costs"
+  confidence: 0.8
+  sources: [blog-learning-paths, blog-map-transition]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: math-content, from: P:offering/courses-and-practice, unit: courses}
+      - {resource: assessment-scores, from: C:counterparty/nwea, unit: students}
+    outputs:
+      - {resource: personalised-paths, to: M:audience/districts, unit: licences}
+      - {resource: personalised-paths, to: M:audience/students, unit: students}
+    schedule: continuous
+  substrate:
+    depends-on: [P:offering/courses-and-practice, C:counterparty/nwea]
+  rules:
+    - must: "all-roles sell Learning Paths only as an add-on to a Khan Academy Districts partnership"
+      source: blog-learning-paths
+      confidence: 0.8
+    - must: "all-roles require Clever rostering for both Khan Academy Districts and MAP Growth before a district uses Learning Paths"
+      source: blog-map-transition
+      confidence: 0.8
+  economics:
+    price: {pending: "price per licence; the blog posts say to contact the districts team"}
+    cost: {pending: "cost of serving a licence"}
+    margin: {pending: "margin on the add-on"}
+  affect:
+    audience: M:audience/districts
+    elicits:
+      - {feeling: confidence, intensity: 0.6, when: "a path follows a student's own test results"}
+    avoids: ["generic practice assignments", "manual goal setting"]
+    probes: [satisfaction]
+    tone: [practical, exact]
+  mattering:
+    to-the-whole: "The oldest institutional product (2019 as MAP Accelerator) and proof that the platform can plug into a district's own assessment data."
+    weight: supporting
+    inside:
+      - who: [O:role/Chief-Executive]
+        because: "It shows the platform working alongside a test maker's data rather than replacing it."
+        confidence: 0.4
+    chosen:
+      - who: [M:audience/districts]
+        because: "Each student's practice follows the latest test scores with a click, and teachers can adjust the goals."
+        stakes: "Hand-built intervention lists."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/districts]
+        because: "Districts already on the assessment and on Clever are the natural buyers."
+        barrier: "A 250-licence minimum and the sales handoff from NWEA to the nonprofit."
+        confidence: 0.5
+
+- id: P:offering/khan-kids
+  type: offering
+  name: Khan Academy Kids app
+  summary: "A free app for children aged 2 to 8 covering early literacy, reading, writing, language and math through games and story-based lessons, guided by five characters; made with learning experts at Stanford and aligned to the Head Start framework and Common Core. On the App Store, Google Play and the Amazon Appstore. Launched in July 2018."
+  owner: O:role/Kids-Lead
+  confidence: 0.9
+  sources: [ka-kids, ka-downloads, edweek-kids-2018]
+  visibility: public
+  parts: [P:product/kids-app]
+  flow:
+    inputs:
+      - {resource: early-learning-content, from: P:function/content-creation, unit: activities}
+    outputs:
+      - {resource: early-learning, to: M:audience/early-learners, unit: children}
+      - {resource: early-learning, to: M:audience/families, unit: households}
+      - {resource: app-and-lessons, to: P:offering/kids-for-schools, unit: activities}
+    schedule: continuous
+  substrate:
+    platforms: [S:system/learning-platform]
+    depends-on: [P:product/kids-app]
+  rules:
+    - must-not: "all-roles show advertising or charge subscriptions in the Khan Academy Kids app"
+      source: ka-kids
+      confidence: 0.9
+  economics:
+    price: {model: free}
+    cost: {pending: "cost of the Kids team and content; the nonprofit funds it from gifts"}
+    margin: none
+  vocabulary:
+    terms:
+      - {term: Kids, maps-to: P:khan-academy/Kids}
+  affect:
+    audience: M:audience/early-learners
+    elicits:
+      - {feeling: delight, intensity: 0.8, when: "a story or game responds to a tap"}
+      - {feeling: pride, intensity: 0.6, when: "a new skill unlocks"}
+    avoids: ["ads", "pressure", "screen time without learning"]
+    probes: [reward, motivation]
+    tone: [playful, warm, gentle]
+  mattering:
+    to-the-whole: "It puts the mission in front of children before school and earns the trust of the parents who later meet the rest of the line."
+    weight: major
+    inside:
+      - who: [O:role/Kids-Lead]
+        because: "A small team whose work is used by very young children every day; a bug is a broken bedtime."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/early-learners, M:audience/families]
+        because: "A free, ad-free app with real early-learning content replaces a paid or ad-supported one for a household that cannot spend on apps."
+        stakes: "Ads in front of a three-year-old."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/families]
+        because: "Parents of toddlers search for something safe and free; the nonprofit is trusted by name."
+        barrier: "Crowded app stores and screen-time worries."
+        confidence: 0.5
+
+- id: P:offering/kids-for-schools
+  type: offering
+  name: Khan Kids for Schools
+  summary: "A school version of the Kids app for schools with a paid plan: teachers assign lessons, track progress and see insights, with a separate school login. Also the route to pre-K to grade 2 for district partners."
+  owner: O:role/Kids-Lead
+  pending: "what a school plan costs and how it is bought: the Kids page shows a school login for paid plans and no price"
+  confidence: 0.6
+  sources: [ka-kids, ka-districts]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: app-and-lessons, from: P:offering/khan-kids, unit: activities}
+      - {resource: plan-fees, from: M:audience/districts, unit: USD/year, rate: {pending: "revenue from paid school plans"}}
+    outputs:
+      - {resource: classroom-early-learning, to: M:audience/districts, unit: schools}
+      - {resource: classroom-early-learning, to: M:audience/early-learners, unit: children}
+    schedule: continuous
+  substrate:
+    platforms: [S:system/learning-platform]
+    depends-on: [P:offering/khan-kids]
+  economics:
+    price: {pending: "school plan price"}
+    cost: {pending: "cost of school support"}
+    margin: {pending: "margin on school plans"}
+  affect:
+    audience: M:audience/districts
+    elicits:
+      - {feeling: ease, intensity: 0.6, when: "a teacher assigns a lesson in a few taps"}
+    avoids: ["accounts that do not roster", "unclear student data handling"]
+    probes: [satisfaction]
+    tone: [practical, plain]
+  mattering:
+    to-the-whole: "It extends the free app into classrooms and gives the early years a place in a district agreement."
+    weight: supporting
+    inside:
+      - who: [O:role/Kids-Lead]
+        because: "Teachers are a second audience whose needs differ from parents'."
+        confidence: 0.4
+    chosen:
+      - who: [M:audience/districts]
+        because: "Teachers can assign and track early-learning activities across a school."
+        stakes: "No view of progress for the youngest students."
+        confidence: 0.5
+    prospective:
+      - who: [M:audience/districts]
+        because: "Districts that want pre-K to grade 2 covered in the same system as older grades."
+        barrier: "Unpublished price and a free app that already does most of the work."
+        confidence: 0.4
+
+- id: P:offering/international-programs
+  type: offering
+  name: International programs
+  summary: "Khan Academy beyond the United States: translated sites in more than 50 languages, country sites for India, Brazil and Mexico, offices in India and Brazil with a controlled related organization in each, independent partner entities elsewhere, and an offline route through Kolibri, an open-source platform from Learning Equality."
+  owner: O:role/International-Lead
+  confidence: 0.8
+  sources: [ka-about, ka-help-languages, ka-help-partners, f990-2025, ka-downloads]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: translations, from: P:function/localization, unit: languages}
+    outputs:
+      - {resource: localised-learning, to: M:audience/students, unit: learners}
+      - {resource: resources-and-support, to: M:audience/international-partners, unit: partner programs}
+    schedule: continuous
+  substrate:
+    platforms: [S:system/learning-platform]
+    depends-on: [P:function/localization]
+  rules:
+    - must: "all-roles treat international partner entities as independent of the nonprofit"
+      source: ka-help-partners
+      confidence: 0.8
+  economics:
+    price: {model: free}
+    cost: {pending: "cost of the international team; Schedule F counts $11.95M of activity outside the United States in the year to June 2025"}
+    margin: none
+  affect:
+    audience: M:audience/students
+    elicits:
+      - {feeling: belonging, intensity: 0.6, when: "a lesson appears in the learner's own language"}
+    avoids: ["content that does not fit the local curriculum", "being treated as an afterthought"]
+    probes: [motivation]
+    tone: [respectful, plain]
+  mattering:
+    to-the-whole: "About 53% of learners are outside the United States; this is how the mission reaches them in their own languages and school systems."
+    weight: major
+    inside:
+      - who: [O:role/International-Lead]
+        because: "A few offices and a network of volunteers and independent partners carry the offer to many countries."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/students, M:audience/international-partners]
+        because: "Free content in a local language, aligned to a national curriculum where one exists, and a partner model that lets a local group run the schools program."
+        stakes: "A foreign-language library with no local support."
+        confidence: 0.6
+    prospective:
+      - who: [M:audience/international-partners]
+        because: "New partner entities can bring the offer to more school systems under the 2023 model."
+        barrier: "Translation coverage and the terms of the partner model, which are not public."
+        confidence: 0.5
+
+- id: P:function/platform-development
+  type: function
+  name: Platform development
+  summary: "The engineering behind the web and mobile software that gives learners a personalised, always-available tutor-like experience. The Form 990's largest program service: $51.2M of expense in the year to June 2025 and $22.1M of program revenue, with an average of 8.5 million active learners a month in more than 190 countries."
+  owner: O:role/Chief-Technology-Officer
+  confidence: 0.9
+  sources: [f990-2025, github-khan]
+  visibility: public
+  parts: [P:product/learning-platform, P:product/mobile-apps, P:product/khanmigo-ai]
+  flow:
+    inputs:
+      - {resource: funding, from: P:function/fundraising, unit: USD/year}
+  substrate:
+    platforms: [S:system/learning-platform, S:system/backend-services, S:system/khanmigo-ai]
+    vendors: [S:vendor/openai, S:vendor/google, S:vendor/microsoft]
+    depends-on: [S:vendor/openai, S:vendor/google, S:vendor/microsoft]
+    roles-required: [{role: O:role/Chief-Technology-Officer, load: large}]
+    budget: "$51.2M of program expense in the year to June 2025 (Form 990 Part III, line 4a)"
+  mattering:
+    to-the-whole: "The platform is the product; every offering reaches a person through it."
+    weight: critical
+    inside:
+      - who: [O:role/Chief-Technology-Officer]
+        because: "A small engineering organisation runs a service used by millions, and publishes much of its code for others to use."
+        confidence: 0.5
+
+- id: P:function/content-creation
+  type: function
+  name: Content creation and curation
+  summary: "The library of free educational resources and the partnerships that add to it: about 800 active courses, 20,000 videos, 12,500 sets of practice problems and 10,250 articles at 30 June 2025, with partner courses from museums, science agencies and others. $12.1M of program expense in the year to June 2025."
+  owner: O:role/Chief-Learning-Officer
+  confidence: 0.9
+  sources: [f990-2025, ka-partner-content]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: funding, from: P:function/fundraising, unit: USD/year}
+    outputs:
+      - {resource: course-content, to: P:offering/courses-and-practice, unit: courses}
+      - {resource: test-prep-content, to: P:offering/test-prep, unit: courses}
+      - {resource: early-learning-content, to: P:offering/khan-kids, unit: activities}
+  substrate:
+    roles-required: [{role: O:role/Chief-Learning-Officer, load: large}]
+    budget: "$12.1M of program expense in the year to June 2025 (Form 990 Part III, line 4b)"
+  mattering:
+    to-the-whole: "Content is what a learner meets first; its quality decides whether the practice is worth doing."
+    weight: critical
+    inside:
+      - who: [O:role/Chief-Learning-Officer]
+        because: "The goal is the world's best learning resource for the K-12 classroom and for any independent learner, and the work is never finished."
+        confidence: 0.5
+
+- id: P:function/awareness-and-adoption
+  type: function
+  name: Awareness and adoption
+  summary: "Partnerships with institutions across the world to raise awareness and use: school districts in the United States and other markets, test makers and credentialing bodies, corporations and foundations. $12.3M of program expense in the year to June 2025, including $593,100 of grants; more than 185 million registered students, teachers and parents by 30 June 2025."
+  owner: O:role/Chief-External-Relations-Officer
+  confidence: 0.9
+  sources: [f990-2025]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: funding, from: P:function/fundraising, unit: USD/year}
+    outputs:
+      - {resource: partner-leads, to: P:offering/districts-partnership, unit: districts}
+  substrate:
+    roles-required: [{role: O:role/Chief-External-Relations-Officer, load: large}]
+    budget: "$12.3M of program expense in the year to June 2025 (Form 990 Part III, line 4c)"
+  mattering:
+    to-the-whole: "A free library nobody finds does not help anyone; partnerships are how it reaches classrooms, test takers and other countries."
+    weight: major
+    inside:
+      - who: [O:role/Chief-External-Relations-Officer]
+        because: "Partners, from a state department to a test maker, give the nonprofit reach it could not buy."
+        confidence: 0.5
+  pending: "the $593,100 of grants in this program is Schedule F's South American general operating support; to whom?"
+
+- id: P:function/localization
+  type: function
+  name: Localization
+  summary: "Translation of the site and its content into more than 50 languages, mostly by volunteer translators whose hours the nonprofit does not track, and an open-source AI batch-translation tool; translated sites come in full, demo, preview and lite tiers."
+  owner: O:role/International-Lead
+  confidence: 0.8
+  sources: [f990-2025, ka-help-languages, github-khan]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: volunteer-translation, from: M:audience/translators, unit: hours}
+    outputs:
+      - {resource: translations, to: P:offering/courses-and-practice, unit: languages}
+      - {resource: translations, to: P:offering/international-programs, unit: languages}
+  substrate:
+    tools: ["an AI batch-translation tool published on GitHub"]
+    roles-required: [{role: O:role/International-Lead, load: medium}]
+  mattering:
+    to-the-whole: "About 53% of learners are outside the United States; without translation many of them could not use the library."
+    weight: major
+    inside:
+      - who: [O:role/International-Lead]
+        because: "A volunteer community whose time is unpaid and untracked is the main supplier of the work."
+        confidence: 0.5
+
+- id: P:function/fundraising
+  type: function
+  name: Fundraising and donor relations
+  summary: "Gifts from individuals, foundations and corporations that fund the free tools: contributions and grants of $90.4M in the year to June 2025, including $7.6M of donated listed securities, at a fundraising cost of $3.7M. A supporters page recognises giving of $1,000 a year and up, with a monthly Learners Fund."
+  owner: O:role/Chief-External-Relations-Officer
+  confidence: 0.9
+  sources: [f990-2025, ka-supporters, ka-donate-banner]
+  visibility: public
+  flow:
+    inputs:
+      - {resource: gifts, from: M:audience/donors, unit: USD/year, rate: 90423383}
+    outputs:
+      - {resource: funding, to: P:function/platform-development, unit: USD/year}
+      - {resource: funding, to: P:function/content-creation, unit: USD/year}
+      - {resource: funding, to: P:function/awareness-and-adoption, unit: USD/year}
+  substrate:
+    roles-required: [{role: O:role/Chief-External-Relations-Officer, load: medium}]
+    budget: "$3.7M of fundraising expense in the year to June 2025"
+  mattering:
+    to-the-whole: "Free to use is not free to make; gifts are 77% of revenue and the reason the core stays free."
+    weight: critical
+    inside:
+      - who: [O:role/Chief-External-Relations-Officer, O:role/Chief-Financial-Officer]
+        because: "Contributions swing from $40.0M in 2022 to $84.2M in 2023 and $20.7M in the six months to June 2024, a pattern that suggests the budget moves with a few large gifts."
+        confidence: 0.6
+
+- id: P:product/learning-platform
+  type: product
+  name: Learning platform (web)
+  summary: "The khanacademy.org web application: videos, articles, mastery-based exercises, assignments, class rosters, progress views and, for district partners, the rebuilt experience with Khanmigo built in."
+  owner: O:role/Chief-Technology-Officer
+  confidence: 0.8
+  sources: [ka-home, ka-districts, blog-districts-2026, github-khan]
+  visibility: public
+  flow:
+    outputs:
+      - {resource: platform-delivery, to: P:offering/courses-and-practice, unit: sessions}
+      - {resource: platform-delivery, to: P:offering/test-prep, unit: sessions}
+      - {resource: platform-delivery, to: P:offering/teacher-tools, unit: sessions}
+      - {resource: platform-access, to: P:offering/districts-partnership, unit: student accounts}
+    schedule: continuous
+  substrate:
+    platforms: [S:system/learning-platform, S:system/backend-services]
+    depends-on: [S:system/learning-platform, S:system/backend-services]
+  mattering:
+    to-the-whole: "The single surface where almost every offering is delivered; its outage is the nonprofit's outage."
+    weight: critical
+    inside:
+      - who: [O:role/Chief-Technology-Officer]
+        because: "The platform is rebuilt in place while millions use it, from a Python monolith to Go services, on a shared design system."
+        confidence: 0.5
+
+- id: P:product/mobile-apps
+  type: product
+  name: Mobile apps
+  summary: "The Khan Academy apps for iOS and Android: practice, downloaded videos for offline study, an interactive scratchpad and assignments synced with the web."
+  owner: O:role/Chief-Technology-Officer
+  confidence: 0.9
+  sources: [ka-downloads]
+  visibility: public
+  flow:
+    outputs:
+      - {resource: app-access, to: M:audience/students, unit: installs}
+    schedule: continuous
+  substrate:
+    platforms: [S:system/learning-platform]
+    depends-on: [S:system/learning-platform]
+  mattering:
+    to-the-whole: "A phone may be the only device a learner has; the apps and offline downloads are how the library works away from good connectivity."
+    weight: major
+    inside:
+      - who: [O:role/Chief-Technology-Officer]
+        because: "Two native apps to keep in step with the web is a permanent tax on a small team."
+        confidence: 0.4
+
+- id: P:product/khanmigo-ai
+  type: product
+  name: Khanmigo engine
+  summary: "The AI tutor and teaching assistant built into the platform: it guides rather than answers, keeps chat history for parents, flags content, and in 2026 draws interactive diagrams and drafts teacher-reviewed practice with Gemini models."
+  owner: O:role/Chief-Technology-Officer
+  confidence: 0.8
+  sources: [khanmigo-home, khanmigo-parents, blog-google-org, edtech-google-visual]
+  visibility: public
+  flow:
+    outputs:
+      - {resource: ai-assistance, to: P:offering/khanmigo-teachers, unit: requests}
+      - {resource: ai-tutoring, to: P:offering/khanmigo-families, unit: conversations}
+      - {resource: ai-tutoring, to: P:offering/districts-partnership, unit: conversations}
+      - {resource: ai-feedback, to: P:offering/writing-coach, unit: drafts}
+    schedule: on-demand
+  substrate:
+    platforms: [S:system/khanmigo-ai]
+    vendors: [S:vendor/openai, S:vendor/google, S:vendor/microsoft]
+    depends-on: [S:system/khanmigo-ai, S:vendor/openai, S:vendor/google]
+  rules:
+    - must: "O:role/Chief-Technology-Officer keep Khanmigo guiding learners toward the answer rather than handing it over"
+      source: "khanmigo.ai learner and parent pages"
+      confidence: 0.7
+  mattering:
+    to-the-whole: "Every Khanmigo offering, free or paid, is this one engine; its cost per interaction sets what can be free."
+    weight: major
+    inside:
+      - who: [O:role/Chief-Technology-Officer]
+        because: "Quality, safety and cost are all decided here, and the 2025-26 districts redesign builds the tutor into the platform instead of leaving it a separate tool."
+        confidence: 0.4
+
+- id: P:product/kids-app
+  type: product
+  name: Khan Academy Kids app build
+  summary: "The Kids app itself: thousands of interactive activities, books and videos with a personalised path, on iOS, Android and the Amazon Appstore, built by the early-learning team."
+  owner: O:role/Kids-Lead
+  confidence: 0.8
+  sources: [ka-kids, ka-downloads]
+  visibility: public
+  flow:
+    schedule: continuous
+  substrate:
+    platforms: [S:system/learning-platform]
+  mattering:
+    to-the-whole: "The thing a three-year-old taps; the offering's promise of free and ad-free is kept or broken here."
+    weight: major
+    inside:
+      - who: [O:role/Kids-Lead]
+        because: "Craft for the youngest learners, where tone, safety and speed matter more than features."
+        confidence: 0.4
+
+- id: P:service/district-implementation
+  type: service
+  name: District implementation and support
+  summary: "Rostering and onboarding, tailored implementation and training for teachers and administrators, and ongoing strategic support with performance reviews, for district partners."
+  owner: O:role/Chief-Executive
+  pending: "which team delivers implementation, and how many staff"
+  confidence: 0.7
+  sources: [ka-districts]
+  visibility: public
+  flow:
+    schedule: continuous
+  substrate:
+    roles-required: [{role: O:role/Chief-Executive, load: medium}]
+  mattering:
+    to-the-whole: "The impact page says implementation support amplifies impact, citing a randomised trial, and the districts page ties the six-fold practice figure to partnership services."
+    weight: major
+    inside:
+      - who: [O:role/Chief-Executive]
+        because: "Implementation is hands-on work with schools that has to scale to hundreds of districts."
+        confidence: 0.4

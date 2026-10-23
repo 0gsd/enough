@@ -2,7 +2,7 @@
 `btn-bg`) into the four SHIPPED themes for pre-0.1.6 ui.json files.
 
 Isolates config via ENOUGH_UI_CONFIG (added alongside ENOUGH_WIKISINK_CONFIG
-/ ENOUGH_CACHEAWL_ROOT) so the real ~/enough/config/ui.json is untouched.
+/ ENOUGH_CANON_ROOT) so the real ~/enough/config/ui.json is untouched.
 """
 
 from __future__ import annotations
@@ -44,7 +44,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     ui_path = tmp_path / "ui.json"
     ui_path.write_text(json.dumps(_stale_ui_config()), encoding="utf-8")
     monkeypatch.setenv("ENOUGH_UI_CONFIG", str(ui_path))
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(tmp_path / "_store"))
+    monkeypatch.setenv("ENOUGH_CANON_ROOT", str(tmp_path / "_store"))
     monkeypatch.setenv("ENOUGH_INFOWORLD_ROOT", str(tmp_path / "no-infoworld"))
     app = create_app(project, "http://localhost:9", supervise=False)
     with TestClient(app) as c:

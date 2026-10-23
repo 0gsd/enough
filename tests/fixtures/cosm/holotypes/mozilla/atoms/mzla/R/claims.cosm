@@ -1,0 +1,65 @@
+# R: claims with the evidence that is public.
+nodes:
+  - id: R:claim/free-and-open-source
+    type: claim
+    name: Free and open source under the MPL 2.0
+    summary: On the Thunderbird about page.
+    text: Thunderbird is free and open-source software under the MPL 2.0.
+    about: ['P:offering/thunderbird-desktop']
+    'on': ['R:surface/website']
+    evidence:
+      state: supported
+      by: ['S:codebase/thunderbird-desktop']
+      measure: public repositories under github.com/thunderbird
+    status: active
+    visibility: public
+    owner: O:role/Desktop-engineering
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://github.com/thunderbird'], confidence: 0.8, state: known}
+
+  - id: R:claim/for-profit-subsidiary
+    type: claim
+    name: Operates in a separate for-profit subsidiary
+    summary: On the about and donate pages.
+    text: Thunderbird operates in a separate, for-profit subsidiary of the not-for-profit Mozilla.org.
+    about: ['P:thunderbird']
+    'on': ['R:surface/website']
+    evidence:
+      state: supported
+      by: ['C:bond/org-owns-mzla']
+      measure: 'the donate page: a wholly owned for-profit subsidiary of the not-for-profit Mozilla.org; MZLA in the Foundation''s 2024 filings'
+    status: active
+    visibility: public
+    owner: O:role/Chief-Executive
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/', 'https://www.thunderbird.net/en-US/donate/', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf'], confidence: 0.9, state: known}
+
+  - id: R:claim/no-ads-no-ai-training
+    type: claim
+    name: Thundermail will not train AI on messages or show ads
+    summary: Announced in 2025 as a privacy-focused webmail service.
+    text: Thundermail will not use messages to train AI or show ads.
+    about: ['P:service/thundermail']
+    'on': ['R:surface/blog']
+    evidence:
+      state: partial
+      by: ['P:service/thundermail']
+      measure: a commitment for a service still in beta; no audit published
+    status: active
+    visibility: public
+    owner: O:role/Web-services-engineering
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://blog.thunderbird.net/2026/06/thundermail-june-2026-update-what-we-learned-after-the-first-few-waves-of-invites/'], confidence: 0.6, state: known}
+
+  - id: R:claim/donations-sustain
+    type: claim
+    name: The project is sustained by user donations
+    summary: In the State of the Bird.
+    text: 'Thunderbird is sustained by contributions from users: $10.3 million in 2024.'
+    about: ['P:function/fundraising']
+    'on': ['R:surface/blog']
+    evidence:
+      state: supported
+      by: ['C:finance/fy2024']
+      measure: the 2024 figure and the Foundation's Schedule R income of MZLA ($10.8 million)
+    status: active
+    visibility: public
+    owner: O:role/Marketing
+    provenance: {mode: net-scan, sources: ['https://blog.thunderbird.net/2025/10/state-of-the-bird-2024-25/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}

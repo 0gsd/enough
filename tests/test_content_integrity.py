@@ -88,7 +88,10 @@ KNOWN_FINDINGS: dict[str, str] = {
 SAME_IN_EVERY_LANGUAGE = frozenset(s.casefold() for s in (
     # Product, mode and subsystem names — I18N.md: "product names … stay
     # as-is". `broker` is one of those: it names a component, not a job.
-    "enough", "wikisink", "cacheawl", "cachebox", "girraph", "merirmaid",
+    # `canon` (0.4.3) replaced cacheawl/cachebox, which no value uses now.
+    # `MacroCOSM` and `atem` (0.4.3) are the Canon round's own names, which
+    # the translation contract keeps as-is (with cosm and EML).
+    "enough", "wikisink", "canon", "girraph", "merirmaid", "MacroCOSM", "atem",
     "composure", "readvisor", "readvisors", "rness", "broker", "infoworld",
     "OpenRouter", "MADLAD", "Wikipedia", "markdown", "PDF", "HTML",
     "URL", "AGENT.md", "MOTIVATION.md", "FEED",
@@ -107,11 +110,14 @@ COGNATES: dict[str, frozenset[str]] = {
         " page", " pages", "page {n} / {total}", "image · {name}",
         "image",            # the French noun, spelled the same
         "module",           # likewise — "un module" is the French word
+        "modules",          # …and its plural
+        "holotype",         # the French term (taxonomy, and Comprise's word)
     )),
     "es": frozenset((
         "roles",            # plural of "rol"
         "chat",             # the RAE-accepted loan-word
         "wip · editable",   # "editable" is the Spanish word too
+        "error",            # the Spanish word, spelled the same
     )),
     "de": frozenset((
         "pink",             # German for pink
@@ -437,7 +443,6 @@ UNREACHED_SECTIONS: dict[str, str] = {
     "infoworld": "infoworld has no sidebar row until a root is configured",
     "mode-system": "no data-help on #mode-stack",
     "merirmaid": "no data-help on the merirmaid chrome",
-    "cacheawl": "no data-help on the cacheawl topbar button",
     "footnotes": "no data-help on the footnote rail",
     "paginate": "no data-help on the paginate button",
 }

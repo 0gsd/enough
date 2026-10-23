@@ -1,0 +1,49 @@
+# O: the support functions that govern no product; the product teams are the pools in roles.
+nodes:
+  - id: O:unit/security
+    type: unit
+    name: Security
+    summary: 'Security: a function listed on the Thunderbird about page.'
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/'], confidence: 0.7, state: known}
+
+  - id: O:unit/ux-and-visual-design
+    type: unit
+    name: UX and visual design
+    summary: 'UX and visual design: a function listed on the Thunderbird about page.'
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/'], confidence: 0.7, state: known}
+
+  - id: O:unit/community-programs
+    type: unit
+    name: Community programs
+    summary: 'Community programs: a function listed on the Thunderbird about page.'
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/'], confidence: 0.7, state: known}
+
+  - id: O:unit/customer-and-technical-support
+    type: unit
+    name: Customer and technical support
+    summary: 'Customer and technical support: a function listed on the Thunderbird about page.'
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/'], confidence: 0.7, state: known}
+
+  - id: O:unit/people-operations
+    type: unit
+    name: People operations
+    summary: 'People operations: a function listed on the Thunderbird about page.'
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/'], confidence: 0.7, state: known}
+
+  - id: O:unit/finance
+    type: unit
+    name: Finance
+    summary: 'Finance: a function listed on the Thunderbird about page.'
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.thunderbird.net/en-US/about/'], confidence: 0.7, state: known}

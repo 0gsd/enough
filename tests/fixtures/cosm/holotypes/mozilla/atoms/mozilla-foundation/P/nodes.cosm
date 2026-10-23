@@ -1,0 +1,716 @@
+cosm: 0.3
+
+# The Foundation's products tree below the brand: three suites that mirror Imagine, Co-create and Mobilize on its site, eight offerings, their programs, and three internal functions. Retired items keep their place with a status and an end date.
+
+nodes:
+  - id: P:suite/imagine
+    type: suite
+    name: Imagine
+    summary: 'Supporting the people and ideas that stretch what technology can be: artists, researchers and educators.'
+    owner: O:role/VP-Imagination-and-Strategic-Growth
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/']
+    visibility: public
+    parts: ['P:offering/creative-futures', 'P:offering/nothing-personal', 'P:offering/mozilla-education']
+    mattering:
+      to-the-whole: The part of the Foundation that opens the future up so more people can take part, create boldly and learn together.
+      weight: major
+      inside:
+        - who: ['O:role/VP-Imagination-and-Strategic-Growth']
+          because: 'Imagination is named as the first step: to build a better internet, first imagine it.'
+          confidence: 0.5
+
+  - id: P:suite/co-create
+    type: suite
+    name: Co-create
+    summary: 'Building good technology with the people it affects: data, grants and the Common Voice dataset.'
+    owner: O:role/Executive-Director
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/co-create/', 'https://www.mozillafoundation.org/en/what-we-do/grantmaking/']
+    visibility: public
+    parts: ['P:offering/grantmaking', 'P:offering/common-voice']
+    mattering:
+      to-the-whole: Where the Foundation puts money and engineering behind alternatives to extractive technology.
+      weight: critical
+      inside:
+        - who: ['O:role/Executive-Director', 'O:role/Director-Global-Grants']
+          because: 'The grantmaking page: Mozilla Foundation funds the innovators building the alternatives a better future demands.'
+          confidence: 0.5
+
+  - id: P:suite/mobilize
+    type: suite
+    name: Mobilize
+    summary: 'People-powered action: the festival, the fellowships and the campaigns.'
+    owner: O:role/Executive-Director
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/']
+    visibility: public
+    parts: ['P:offering/mozilla-festival', 'P:offering/fellowships', 'P:offering/campaigns']
+    mattering:
+      to-the-whole: Turns a community of technologists, artists and citizens into collective action.
+      weight: major
+      inside:
+        - who: ['O:role/Director-Mozilla-Festival', 'O:role/Director-Communications']
+          because: Community is what much of the Foundation's work is powered by.
+          confidence: 0.5
+
+  - id: P:offering/creative-futures
+    type: offering
+    name: Creative Futures
+    summary: 'Programs that turn community imagination into open artifacts, prototypes and cultural tools: assemblies, residencies, grants and performing-arts programs.'
+    owner: O:role/VP-Imagination-and-Strategic-Growth
+    confidence: 0.7
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/', 'https://www.mozillafoundation.org/en/what-we-do/mobilize/']
+    visibility: public
+    parts: ['P:service/artists-make-technology', 'P:service/counterstructures-residencies', 'P:service/imaginative-intelligences', 'P:service/creative-media-awards']
+    economics:
+      price: none
+    affect:
+      audience: M:audience/creative-sector
+      elicits:
+        - {feeling: agency, when: a community imagines a technology and holds a working artifact}
+      avoids: [technology as something done to the sector]
+    mattering:
+      to-the-whole: Anchors imagination as critical infrastructure for new technology.
+      weight: major
+      inside:
+        - who: ['O:role/VP-Imagination-and-Strategic-Growth']
+          because: The program's aim is to return agency to communities, including the funders that back them.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/creative-sector']
+          because: The programs build open cultural tools and infrastructures that shape the internet, civic institutions and culture, the page says.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/creative-sector']
+          because: The page says the programs help the arts and culture sector navigate technology shifts and build knowledge about opportunities like AI.
+          confidence: 0.5
+
+  - id: P:service/artists-make-technology
+    type: service
+    name: Artists Make Technology
+    summary: A Creative Futures program run with the Doris Duke Foundation.
+    owner: O:role/VP-Imagination-and-Strategic-Growth
+    confidence: 0.7
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: program, to: 'M:audience/creative-sector', unit: programs/year}
+    mattering:
+      to-the-whole: One of the Creative Futures programs.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Imagination-and-Strategic-Growth']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/counterstructures-residencies
+    type: service
+    name: Counterstructures residencies
+    summary: Residencies run with Rhizome and a second partner.
+    owner: O:role/VP-Imagination-and-Strategic-Growth
+    confidence: 0.7
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/', 'https://www.mozillafoundation.org/en/what-we-do/mobilize/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: program, to: 'M:audience/creative-sector', unit: programs/year}
+    mattering:
+      to-the-whole: One of the Creative Futures programs.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Imagination-and-Strategic-Growth']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/imaginative-intelligences
+    type: service
+    name: Imaginative Intelligences
+    summary: A program run with the Berggruen Institute and a second partner.
+    owner: O:role/VP-Imagination-and-Strategic-Growth
+    confidence: 0.7
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: program, to: 'M:audience/creative-sector', unit: programs/year}
+    mattering:
+      to-the-whole: One of the Creative Futures programs.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Imagination-and-Strategic-Growth']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/creative-media-awards
+    type: service
+    name: Imaginative Assemblies and Creative Media Awards
+    summary: Assemblies and awards that help the arts and culture sector navigate technology shifts such as artificial intelligence, and a Green Screen coalition joining climate justice and creative storytelling.
+    owner: O:role/VP-Imagination-and-Strategic-Growth
+    confidence: 0.7
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: program, to: 'M:audience/creative-sector', unit: programs/year}
+    mattering:
+      to-the-whole: One of the Creative Futures programs.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Imagination-and-Strategic-Growth']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/nothing-personal
+    type: offering
+    name: Nothing Personal
+    summary: A counterculture magazine made by people, with long-form essays, satirical advice and hands-on product reviews of the privacy of consumer technology, supported by The Onion.
+    owner: O:role/Director-Communications
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/', 'https://www.mozillafoundation.org/en/nothing-personal/privacy-not-included-sunset/']
+    visibility: public
+    parts: ['P:product/nothing-personal-magazine', 'P:service/product-reviews', 'P:service/privacy-not-included']
+    economics:
+      price: none
+    affect:
+      audience: M:audience/magazine-readers
+      elicits:
+        - {feeling: curiosity, when: reading an essay about online life}
+        - {feeling: confidence, when: choosing a gadget with its privacy tested}
+      tone: [witty, plain]
+    mattering:
+      to-the-whole: 'The Imagine page: it disrupts dominant tech narratives; the magazine also carries the privacy product reviews.'
+      weight: supporting
+      inside:
+        - who: ['O:role/Director-Communications']
+          because: The magazine carries on the Foundation's product privacy work after Privacy Not Included was moved into it.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/magazine-readers']
+          because: Readers get hands-on privacy testing of popular consumer tech.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/magazine-readers']
+          because: The magazine promises the insight to make good tech choices.
+          confidence: 0.5
+
+  - id: P:product/nothing-personal-magazine
+    type: product
+    name: Nothing Personal magazine
+    summary: The magazine and its essays.
+    owner: O:role/Director-Communications
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: articles, to: 'M:audience/magazine-readers', unit: articles/month}
+    mattering:
+      to-the-whole: The publication itself.
+      weight: supporting
+      inside:
+        - who: ['O:role/Director-Communications']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/product-reviews
+    type: service
+    name: Product Reviews
+    summary: Hands-on privacy testing and research on the most popular consumer tech, the continuation of Privacy Not Included inside Nothing Personal.
+    owner: O:role/Director-Communications
+    confidence: 0.9
+    sources: ['https://www.mozillafoundation.org/en/nothing-personal/privacy-not-included-sunset/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: review, to: 'M:audience/magazine-readers', unit: reviews/month}
+    mattering:
+      to-the-whole: Where the privacy guide's work lives now.
+      weight: supporting
+      inside:
+        - who: ['O:role/Director-Communications']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/privacy-not-included
+    type: service
+    name: Privacy Not Included (guide)
+    summary: The buyer's guide launched in 2017 to explain the privacy risks of connected products; moved to Product Reviews in Nothing Personal on 2026-08-11, its archive left to the Internet Archive.
+    owner: O:role/Director-Communications
+    confidence: 0.9
+    sources: ['https://www.mozillafoundation.org/en/nothing-personal/privacy-not-included-sunset/']
+    since: '2017'
+    until: 2026-08-11
+    status: retired
+    visibility: public
+    retired-note: moved to Product Reviews in Nothing Personal; start date known only as 2017
+    mattering:
+      to-the-whole: Retired as a separate guide; its readers are served by Product Reviews.
+      weight: supporting
+      inside:
+        - who: ['O:role/Director-Communications']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/mozilla-education
+    type: offering
+    name: Mozilla Education
+    summary: 'Tech education for everyone: the Responsible Computing Challenge, a curriculum library and the Equal Rating Initiative.'
+    owner: O:role/VP-Imagination-and-Strategic-Growth
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/']
+    visibility: public
+    parts: ['P:service/responsible-computing-challenge', 'P:product/curriculum-library', 'P:service/equal-rating-initiative']
+    economics:
+      price: none
+    affect:
+      audience: M:audience/educators-and-students
+      elicits:
+        - {feeling: capability, when: closing a gap in understanding how technology affects a community}
+    mattering:
+      to-the-whole: The Foundation says it is democratizing tech education globally.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Imagination-and-Strategic-Growth']
+          because: Teaching with ethics at the core is one of the ways the Foundation invests.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/educators-and-students']
+          because: Teachers and researchers get curricula and, for researchers, equitable compute access.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/educators-and-students']
+          because: Learners curious about how artificial intelligence changes daily life.
+          barrier: It is hard to keep up with the latest technology trends, the page says.
+          confidence: 0.5
+
+  - id: P:service/responsible-computing-challenge
+    type: service
+    name: Responsible Computing Challenge
+    summary: A program that reimagines how computer science is taught, with listening tours and funding to help students self-organize around ethics.
+    owner: O:role/VP-Imagination-and-Strategic-Growth
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/grantmaking/', 'https://www.mozillafoundation.org/en/what-we-do/mobilize/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: grant, to: 'M:audience/educators-and-students', unit: grants/year}
+    mattering:
+      to-the-whole: Reimagines tech education and helps students self-organize around ethics in computer science.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Imagination-and-Strategic-Growth']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:product/curriculum-library
+    type: product
+    name: Curriculum Library
+    summary: A library of teaching material on technology and society.
+    owner: O:role/VP-Imagination-and-Strategic-Growth
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: curriculum, to: 'M:audience/educators-and-students', unit: items}
+    mattering:
+      to-the-whole: The shared teaching resource.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Imagination-and-Strategic-Growth']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/equal-rating-initiative
+    type: service
+    name: Equal Rating Initiative
+    summary: A named Mozilla Education initiative listed on the Imagine page; its current activity is not described there.
+    owner: O:role/VP-Imagination-and-Strategic-Growth
+    confidence: 0.6
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/imagine/']
+    visibility: public
+    pending: what the Equal Rating Initiative does in 2026
+    mattering:
+      to-the-whole: Listed as part of Mozilla Education.
+      weight: supporting
+      inside:
+        - who: ['O:role/VP-Imagination-and-Strategic-Growth']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/grantmaking
+    type: offering
+    name: Grantmaking
+    summary: 'Funding for changemakers building better: an Incubator and collaborative funds, with grants connected to a community of mentors, peers and funders. Over $35 million invested in a decade.'
+    owner: O:role/Director-Global-Grants
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/grantmaking/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf']
+    visibility: public
+    parts: ['P:service/incubator', 'P:service/collaborative-funds']
+    economics:
+      price: none
+      cost:
+        grants-paid-2024: 2336028
+        unit: USD
+    affect:
+      audience: M:audience/grantees-and-fellows
+      elicits:
+        - {feeling: belonging, when: joining a cohort of builders}
+        - {feeling: momentum, when: securing follow-on funding}
+      avoids: [funding without community]
+    mattering:
+      to-the-whole: 'The Foundation''s central philanthropic act: scouting, funding, connecting and amplifying leaders and technologies.'
+      weight: critical
+      inside:
+        - who: ['O:role/Director-Global-Grants']
+          because: It scouts, invests, connects and amplifies, in that order.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/grantees-and-fellows']
+          because: Incubator participants secure follow-on funding and go on to real-world impact independent of the Foundation.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/grantees-and-fellows']
+          because: Builders of environmental justice tools, AI bias research and digital rights work who need funding and networks.
+          confidence: 0.5
+
+  - id: P:service/incubator
+    type: service
+    name: Incubator
+    summary: Backing the technology a better future needs; participants receive grants and community.
+    owner: O:role/Director-Global-Grants
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/grantmaking/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: grant, to: 'M:audience/grantees-and-fellows', unit: grants/year}
+    mattering:
+      to-the-whole: Backs the technology a better future needs, per the grantmaking page.
+      weight: supporting
+      inside:
+        - who: ['O:role/Director-Global-Grants']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/collaborative-funds
+    type: service
+    name: Collaborative funds
+    summary: Funds run in partnership with other funders for shared impact.
+    owner: O:role/Director-Global-Grants
+    confidence: 0.7
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/grantmaking/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: grant, to: 'M:audience/grantees-and-fellows', unit: grants/year}
+    mattering:
+      to-the-whole: Partnering for impact, per the grantmaking page.
+      weight: supporting
+      inside:
+        - who: ['O:role/Director-Global-Grants']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/common-voice
+    type: offering
+    name: Common Voice
+    summary: 'A flagship Foundation initiative to mitigate bias in AI by democratising speech technology: a web app where people donate their voices, and public datasets that, since October 2025, are distributed through Mozilla Data Collective.'
+    owner: O:role/Executive-Director
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/common-voice/', 'https://www.mozillafoundation.org/en/what-we-do/co-create/', 'https://github.com/common-voice/common-voice', 'https://huggingface.co/spaces/mozilla-foundation/README/blob/main/README.md']
+    visibility: public
+    parts: ['P:product/common-voice-platform', 'P:service/common-voice-datasets']
+    economics:
+      price: none
+    affect:
+      audience: M:audience/voice-contributors
+      elicits:
+        - {feeling: belonging, when: adding a voice that is heard in a language}
+      avoids: [bias against accents and languages]
+    mattering:
+      to-the-whole: Common Voice is a flagship Foundation initiative to mitigate bias in AI by democratising speech technology.
+      weight: major
+      inside:
+        - who: ['O:role/Executive-Director']
+          because: The Mobilize page calls Common Voice the largest people-powered voice dataset in the world.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/voice-contributors']
+          because: Communities upload voices and help improve features, the Mobilize page says.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/voice-contributors']
+          because: People who could add a voice or use the open datasets.
+          confidence: 0.5
+
+  - id: P:product/common-voice-platform
+    type: product
+    name: Common Voice platform
+    summary: The open-source web app at commonvoice.mozilla.org where people donate and validate recordings; MPL-2.0 licensed.
+    owner: O:role/Executive-Director
+    confidence: 0.9
+    sources: ['https://github.com/common-voice/common-voice', 'https://www.mozillafoundation.org/en/common-voice/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: recording, to: 'M:audience/voice-contributors', unit: recordings/day}
+    mattering:
+      to-the-whole: The collection tool.
+      weight: supporting
+      inside:
+        - who: ['O:role/Executive-Director']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/common-voice-datasets
+    type: service
+    name: Common Voice datasets
+    summary: Public datasets released from the contributions; since October 2025 downloads require an account on Mozilla Data Collective.
+    owner: O:role/Executive-Director
+    confidence: 0.8
+    sources: ['https://huggingface.co/spaces/mozilla-foundation/README/blob/main/README.md']
+    visibility: public
+    distributed-by: atom/mozilla-data-collective
+    flow:
+      outputs:
+        - {resource: dataset, to: 'M:audience/voice-contributors', unit: releases/year}
+    mattering:
+      to-the-whole: Public datasets released from the contributions, now through Mozilla Data Collective.
+      weight: supporting
+      inside:
+        - who: ['O:role/Executive-Director']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/mozilla-festival
+    type: offering
+    name: Mozilla Festival
+    summary: A festival of workshops, debates and hands-on collaboration; MozFest 2024 convened in the Netherlands and Zambia, about 2,000 people joined in 2025, and MozFest 2026 is 28 to 30 October in Barcelona.
+    owner: O:role/Director-Mozilla-Festival
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/', 'https://www.mozillafoundation.org/en/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf']
+    visibility: public
+    parts: ['P:service/mozfest-2026']
+    economics:
+      price: {pending: ticket prices for MozFest 2026}
+    affect:
+      audience: M:audience/builders-and-technologists
+      elicits:
+        - {feeling: joy, when: meeting people building a better internet}
+        - {feeling: inspiration, when: handing artists the power of programming}
+      tone: [playful]
+    mattering:
+      to-the-whole: A professional playground and networking event where technologists, artists and entrepreneurs make things together.
+      weight: major
+      inside:
+        - who: ['O:role/Director-Mozilla-Festival']
+          because: The Foundation says the festival has run for 15 years.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/builders-and-technologists']
+          because: 'The Foundation calls its approach federated design: it hands participants the power of programming.'
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/builders-and-technologists', 'M:audience/philanthropic-partners']
+          because: The page invites the world's most curious and creative minds to workshops, debates and hands-on collaboration.
+          confidence: 0.5
+
+  - id: P:service/mozfest-2026
+    type: service
+    name: MozFest 2026, Barcelona
+    summary: Three days, 2026-10-28 to 2026-10-30, at a former industrial complex in Barcelona, with the City of Barcelona and Open Tech Week.
+    owner: O:role/Director-Mozilla-Festival
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/', 'https://www.mozillafoundation.org/en/']
+    since: 2026-10-28
+    status: planned
+    visibility: public
+    flow:
+      outputs:
+        - {resource: workshop, to: 'M:audience/builders-and-technologists', unit: sessions}
+    mattering:
+      to-the-whole: The 2026 edition, 28 to 30 October in Barcelona.
+      weight: supporting
+      inside:
+        - who: ['O:role/Director-Mozilla-Festival']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:offering/fellowships
+    type: offering
+    name: Mozilla Fellows
+    summary: 'Investing in changemakers: over 200 Fellows supported, embedded with civil society organizations or independent; 2026 nominations closed with appointments due June 2026.'
+    owner: O:role/Director-Global-Grants
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/', 'https://www.mozillafoundation.org/en/what-we-do/grantmaking/']
+    visibility: public
+    economics:
+      price: none
+    affect:
+      audience: M:audience/grantees-and-fellows
+      elicits:
+        - {feeling: recognition, when: being named a Fellow}
+        - {feeling: agency, when: building without waiting for permission}
+    mattering:
+      to-the-whole: 'The Mobilize page: when the media needs tech voices that are not billionaire chief executives, Fellows are those voices.'
+      weight: major
+      inside:
+        - who: ['O:role/Director-Global-Grants']
+          because: A decade of Fellows is the Foundation's bench of public-interest technologists.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/grantees-and-fellows']
+          because: Fellows advance their careers in public interest technology.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/grantees-and-fellows']
+          because: Technologists and researchers working on AI myths, disinformation or climate justice.
+          barrier: Fellowships are by nomination.
+          confidence: 0.5
+
+  - id: P:offering/campaigns
+    type: offering
+    name: Campaigns and advocacy
+    summary: 'Petitions and open letters that rally people on platform data access, encryption and AI: the Call for Basic Data Access, 8 Rules for AI from Creative Communities and Drop Chat Control.'
+    owner: O:role/Director-Communications
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/']
+    visibility: public
+    parts: ['P:service/call-for-basic-data-access', 'P:service/eight-rules-for-ai', 'P:service/drop-chat-control']
+    economics:
+      price: none
+    affect:
+      audience: M:audience/open-internet-community
+      elicits:
+        - {feeling: solidarity, when: signing a petition or open letter}
+        - {feeling: efficacy, when: seeing a platform policy shift}
+    mattering:
+      to-the-whole: 'Collective power in motion: from dating app policies to encryption.'
+      weight: major
+      inside:
+        - who: ['O:role/Director-Communications']
+          because: The advocacy division was cut in 2024 but campaigns continue.
+          confidence: 0.5
+      chosen:
+        - who: ['M:audience/open-internet-community']
+          because: Supporters get a concrete action and a place to point their concern.
+          confidence: 0.5
+      prospective:
+        - who: ['M:audience/open-internet-community']
+          because: Citizens who worry about platforms but have not acted.
+          confidence: 0.5
+
+  - id: P:service/call-for-basic-data-access
+    type: service
+    name: Call for Basic Data Access
+    summary: A petition asking big tech platforms to share lists of their most viewed content.
+    owner: O:role/Director-Communications
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/', 'https://www.mozillafoundation.org/en/what-we-do/co-create/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: signatures, to: 'M:audience/open-internet-community', unit: signatures}
+    mattering:
+      to-the-whole: Pushes platforms toward basic transparency.
+      weight: supporting
+      inside:
+        - who: ['O:role/Director-Communications']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/eight-rules-for-ai
+    type: service
+    name: 8 Rules for AI from Creative Communities
+    summary: An open letter from 91 creatives and technologists on the purpose of creativity in the age of AI.
+    owner: O:role/Director-Communications
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: signatures, to: 'M:audience/open-internet-community', unit: signatures}
+    mattering:
+      to-the-whole: Human-centered AI from the creative sector.
+      weight: supporting
+      inside:
+        - who: ['O:role/Director-Communications']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:service/drop-chat-control
+    type: service
+    name: 'Protect Privacy: Drop Chat Control'
+    summary: A campaign against the EU's proposed Chat Control law, which would require scanning private messages.
+    owner: O:role/Director-Communications
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/what-we-do/mobilize/']
+    visibility: public
+    flow:
+      outputs:
+        - {resource: signatures, to: 'M:audience/open-internet-community', unit: signatures}
+    mattering:
+      to-the-whole: Defends encryption.
+      weight: supporting
+      inside:
+        - who: ['O:role/Director-Communications']
+          because: This seat is accountable for it.
+          confidence: 0.5
+
+  - id: P:function/fundraising
+    type: function
+    name: Fundraising and donor relations
+    summary: 'Individual donations, institutional grants and the donate pages: $6.5 million in contributions and grants in 2024 against $3.1 million of fundraising expense.'
+    owner: O:role/VP-Development
+    confidence: 0.8
+    sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://www.mozillafoundation.org/en/']
+    visibility: public
+    substrate:
+      platforms:
+        - S:system/foundation-website
+    economics:
+      cost:
+        fundraising-expenses-2024: 3052246
+        unit: USD
+    mattering:
+      to-the-whole: 'One of three revenue sources in 2024: licence fees $23.0 million, investment income $6.8 million, contributions and grants $6.5 million.'
+      weight: major
+      inside:
+        - who: ['O:role/VP-Development']
+          because: Contributions and grants were about 18% of the Foundation's 2024 revenue.
+          confidence: 0.5
+
+  - id: P:function/finance-and-treasury
+    type: function
+    name: Finance and treasury
+    summary: Accounting, investment of reserves and the financial statements; the Foundation earned $6.8 million of investment income in 2024 and its audited consolidated statements cover the whole Mozilla group.
+    owner: O:role/VP-Finance-and-Administration
+    confidence: 0.8
+    sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf']
+    visibility: public
+    mattering:
+      to-the-whole: Keeps the group's money and the Foundation's own reserves accountable.
+      weight: major
+      inside:
+        - who: ['O:role/VP-Finance-and-Administration', 'O:role/Investment-Committee']
+          because: The investment committee reports to the full board.
+          confidence: 0.5
+
+  - id: P:function/governance-and-compliance
+    type: function
+    name: Governance and compliance
+    summary: 'The board, its audit committee, the conflict of interest policy and the public records: articles, bylaws, determination letters, Forms 990 and audited statements.'
+    owner: O:role/Senior-Counsel
+    confidence: 0.8
+    sources: ['https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf']
+    visibility: public
+    mattering:
+      to-the-whole: The Foundation publishes its records as part of full transparency and accountability to its community.
+      weight: major
+      inside:
+        - who: ['O:role/Senior-Counsel', 'O:role/Audit-Committee']
+          because: The Foundation says it makes its Forms 990, financial statements and governing documents available online.
+          confidence: 0.5

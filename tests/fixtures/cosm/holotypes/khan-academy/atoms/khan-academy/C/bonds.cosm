@@ -1,0 +1,87 @@
+# C — the bonds (plan/comprise-model.md section 3). Two are control bonds to related organizations abroad that the Form 990 names;
+# four are affiliations with independent nonprofits the nonprofit itself lists as organizations it works with.
+# The one with a modelled atom (Schoolhouse World) is mirrored in that atom; the others point at stubs in C:counterparty.
+nodes:
+  - id: C:bond/controls-khan-academy-india
+    type: bond
+    name: controls Khan Academy India
+    summary: "Form 990 Schedule R lists Khan Academy India as a related tax-exempt organization whose direct controlling entity is the nonprofit, and as a section 512(b)(13) controlled entity."
+    kinds: [controls]
+    from: atom/khan-academy
+    to: C:counterparty/khan-academy-india
+    economic: 0
+    control: de-facto
+    basis: "Form 990 Schedule R Part II, year to June 2025: direct controlling entity Khan Academy Inc; controlled entity under section 512(b)(13): yes"
+    accounting: {pending: "whether the audited consolidated statements include this entity"}
+    since: {pending: "when Khan Academy India was formed or became a related organization"}
+    status: active
+    visibility: public
+    owner: O:role/International-Lead
+    provenance: {mode: net-scan, sources: [f990-2025], confidence: 0.8, state: known}
+
+  - id: C:bond/controls-khan-academy-brasil
+    type: bond
+    name: controls Khan Academy Brasil
+    summary: "Form 990 Schedule R lists Khan Academy Brasil as a related tax-exempt organization whose direct controlling entity is the nonprofit, and as a section 512(b)(13) controlled entity."
+    kinds: [controls]
+    from: atom/khan-academy
+    to: C:counterparty/khan-academy-brasil
+    economic: 0
+    control: de-facto
+    basis: "Form 990 Schedule R Part II, year to June 2025: direct controlling entity Khan Academy Inc; controlled entity under section 512(b)(13): yes"
+    accounting: {pending: "whether the audited consolidated statements include this entity"}
+    since: {pending: "when Khan Academy Brasil was formed or became a related organization"}
+    status: active
+    visibility: public
+    owner: O:role/International-Lead
+    provenance: {mode: net-scan, sources: [f990-2025], confidence: 0.8, state: known}
+    pending: "was the one South American general-operating-support grant of $593,100 in Schedule F for the year to June 2025 made to this entity? The recipient's name is not in the return's extract"
+
+  - id: C:bond/affiliated-schoolhouse-world
+    type: bond
+    name: affiliated with Schoolhouse World
+    summary: "A separate 501(c)(3) co-founded in 2020 that Khan Academy lists among the nonprofits it works with. No ownership or control is disclosed, and the Form 990 Schedule R does not list it as a related organization. Both share a funder commitment (Stand Together Trust, 2024) and a technology partner (Google, 2026)."
+    kinds: [affiliated]
+    from: atom/khan-academy
+    to: atom/schoolhouse-world
+    economic: 0
+    control: none
+    basis: "Khan Academy Help Center, education organizations it works with; Form 990 Schedule R lists no relationship"
+    since: 2020
+    status: active
+    visibility: public
+    owner: O:role/Chief-of-Staff
+    provenance: {mode: net-scan, sources: [ka-help-partners, f990-2025, pp-schoolhouse, standtogether, journal-google-2026], confidence: 0.8, state: known}
+
+  - id: C:bond/affiliated-khan-lab-school
+    type: bond
+    name: affiliated with Khan Lab School
+    summary: "An independent K-12 school with its own 501(c)(3), founded in 2014 as a school setting for the same teaching ideas; listed by Khan Academy among the organizations it works with. Not listed on Schedule R."
+    kinds: [affiliated]
+    from: atom/khan-academy
+    to: C:counterparty/khan-lab-school
+    economic: 0
+    control: none
+    basis: "Khan Academy Help Center; ProPublica Nonprofit Explorer (own EIN and Form 990 filings); Form 990 Schedule R lists no relationship"
+    since: 2014
+    status: active
+    visibility: public
+    owner: O:role/Chief-of-Staff
+    provenance: {mode: net-scan, sources: [ka-help-partners, pp-kls, f990-2025], confidence: 0.8, state: known}
+
+  - id: C:bond/affiliated-khan-schools-network
+    type: bond
+    name: affiliated with Khan Schools Network
+    summary: "A nonprofit co-founded in 2023 that builds mastery-based schools and open mastery resources and says it keeps partnerships with Khan Academy. Own 501(c)(3), exemption issued March 2024. Not listed on Schedule R."
+    kinds: [affiliated]
+    from: atom/khan-academy
+    to: C:counterparty/khan-schools-network
+    economic: 0
+    control: none
+    basis: "Khan Academy Help Center; the network's own site; ProPublica Nonprofit Explorer"
+    since: 2023
+    status: active
+    visibility: public
+    owner: O:role/Chief-of-Staff
+    provenance: {mode: net-scan, sources: [ka-help-partners, ksn-home, pp-ksn], confidence: 0.8, state: known}
+    pending: "Khan World School (co-founded in 2022 with Arizona State University) is the fourth organization on the help page's list and is not modelled: is it a legal entity or a university program?"

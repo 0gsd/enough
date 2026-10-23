@@ -1,0 +1,61 @@
+# C: the English company, its Companies House statement and three events. No financial statements are published yet, so there is no C:finance.
+nodes:
+  - id: C:entity/mozilla-data-collective-ltd
+    type: entity
+    name: Mozilla Data Collective Limited
+    summary: English private limited company, number 17054959, incorporated on 2026-02-25 with its registered office at 167-169 Great Portland Street, London; SIC codes 62020, 62090, 63110 and 63990. It calls itself a "mission-locked British company", incubated by the Mozilla Foundation and backed by the not-for-profit Mozilla.org. Companies House records a statement that it has no registrable person or entity with significant control.
+    anchor: true
+    form: corporation
+    roles: [company, brand]
+    jurisdiction: GB-ENG
+    registered-office: 167-169 Great Portland Street, 5th Floor, London, W1W 5PF
+    domains: [mozilladatacollective.com]
+    global-id: {companies-house: '17054959', domain: mozilladatacollective.com}
+    sic-codes: ['62020', '62090', '63110', '63990']
+    pending: Who holds the company's shares, and what makes it "mission-locked"? Neither the site nor Companies House says.
+    since: 2026-02-25
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://find-and-update.company-information.service.gov.uk/company/17054959', 'https://mozilladatacollective.com/terms', 'https://mozilladatacollective.com/'], confidence: 0.9, state: known}
+
+  - id: C:filing/companies-house-psc-statement
+    type: filing
+    name: Statement of no registrable person with significant control
+    summary: 'Notified on 2026-02-25: the company has no registrable person or registrable relevant legal entity in relation to it.'
+    kind: Companies House statement
+    entity: C:entity/mozilla-data-collective-ltd
+    at: 2026-02-25
+    url: https://find-and-update.company-information.service.gov.uk/company/17054959/persons-with-significant-control
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://find-and-update.company-information.service.gov.uk/company/17054959/persons-with-significant-control'], confidence: 0.9, state: known}
+
+  - id: C:event/announced
+    type: event
+    name: Mozilla Data Collective announced
+    summary: Announced on 2025-07-30 as a sister platform to Common Voice, to be built and released through 2025.
+    kind: announcement
+    at: 2025-07-30
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://discourse.mozilla.org/t/exciting-news-mozilla-data-collective/145191'], confidence: 0.9, state: known}
+
+  - id: C:event/common-voice-exclusive
+    type: event
+    name: Common Voice datasets move to the Data Collective
+    summary: From October 2025 Common Voice datasets are available only through Mozilla Data Collective; downloads require an account and agreement to its terms.
+    kind: migration
+    period: 2025-10
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://huggingface.co/spaces/mozilla-foundation/README/blob/main/README.md', 'https://discourse.mozilla.org/t/exciting-news-mozilla-data-collective/145191'], confidence: 0.8, state: known}
+
+  - id: C:event/incorporated
+    type: event
+    name: Mozilla Data Collective Limited incorporated
+    summary: Incorporated on 2026-02-25 in England and Wales.
+    kind: formation
+    at: 2026-02-25
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://find-and-update.company-information.service.gov.uk/company/17054959'], confidence: 0.9, state: known}

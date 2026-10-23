@@ -1,0 +1,33 @@
+# M — price books (decisions Q6): prices live here, P offerings carry the same figure in economics.price,
+# I lists the SKU each rate bills through. Lint rule 3 flags any disagreement between the three.
+nodes:
+  - id: M:pricebook/ledger
+    type: pricebook
+    name: Meadow Ledger list price
+    summary: One flat monthly price per customer; no tiers, no annual discount.
+    kind: list
+    set-by: self
+    currency: USD
+    for: [P:offering/ledger]
+    rates:
+      - {offering: P:offering/ledger, sku: I:sku/ledger-monthly, model: flat, value: 49, unit: USD/month, billed: monthly}
+    status: active
+    visibility: public
+    owner: O:role/Founder
+    provenance: {mode: dialectic, sources: [session-1, meadow-website], confidence: 0.9, state: known}
+
+  - id: M:pricebook/payroll
+    type: pricebook
+    name: Meadow Pay rate card
+    summary: A seat price charged per payroll run; each run bills the employees it paid, so a customer pays per run, not per calendar month.
+    kind: rate-card
+    dimensions: [employee, run]
+    set-by: self
+    currency: USD
+    for: [P:offering/payroll]
+    rates:
+      - {offering: P:offering/payroll, sku: I:sku/payroll-per-run, model: seat, value: 4, unit: USD/employee/month, billed: per-run}
+    status: active
+    visibility: public
+    owner: O:role/Payroll-Owner
+    provenance: {mode: dialectic, sources: [session-2, meadow-website], confidence: 0.9, state: known}

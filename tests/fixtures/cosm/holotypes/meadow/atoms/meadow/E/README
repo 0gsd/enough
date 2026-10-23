@@ -1,0 +1,13 @@
+E — Employees: people live only in the store, never in files.
+
+This folder is deliberately empty of .cosm files. E:person, E:assignment, E:membership, E:credential,
+E:intake, E:continuity, E:access and E:broadcast rows are canonical in store.sqlite, built by `python -m core index` and filled by
+`python -m core people import fixtures/meadow fixtures/meadow/people.yaml` (encryption at rest is phase 2). Nothing outside E may name a person; positions in O/positions.cosm are
+the seats, and who holds each seat is an E:assignment in the store.
+
+What the store will hold for Meadow (no names here, by design): one assignment per position
+(chief-executive, support-lead, payroll-owner) and two for the engineer template. The Payroll Owner's
+variance lives on the role in O, not on the person.
+
+Lint rules 6, 12 and 13 (assignments, credentials, bus factor) read the store and say "store missing"
+until it is built; after index and import, Meadow passes all fourteen.

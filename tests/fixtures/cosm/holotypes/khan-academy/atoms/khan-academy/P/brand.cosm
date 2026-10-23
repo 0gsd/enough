@@ -1,0 +1,93 @@
+cosm: 0.3
+
+# Khan Academy as the P module of atom/khan-academy: the brand and what it sells or gives, read from the nonprofit's own public pages and its
+# Form 990 (research mode, one working session, 2026-10-18). Ids are namespaced: P: for this tree, O:role/ for owners, M:audience/, S:system/ and
+# C:counterparty/ for what COSM called externals. Mattering is the modeller's reading unless a source is cited (confidence 0.5 where marked).
+
+brand:
+  id: P:khan-academy
+  name: Khan Academy
+  kind: nonprofit
+  summary: "A nonprofit that offers a free, world-class education to anyone, anywhere: a free learning platform, the Khanmigo AI tutor and teaching assistant, district partnerships, the Khan Academy Kids early-learning app and programs abroad, funded by donors and partners."
+  since: 2007
+  legal-anchor: "Khan Academy, Inc., Mountain View CA; a California nonprofit corporation and 501(c)(3) public charity (EIN 26-1544963)"
+  owner: O:role/Chief-Executive
+  confidence: 0.9
+  sources: [ka-about, ka-home, f990-2025]
+  visibility: public
+  parts: [P:suite/free-learning, P:suite/khanmigo, P:suite/districts, P:suite/early-learning, P:offering/international-programs, P:function/platform-development, P:function/content-creation, P:function/awareness-and-adoption, P:function/localization, P:function/fundraising]
+  rules:
+    - must-not: "all-roles charge learners or teachers for access to the free course library"
+      source: "the home page and the Khanmigo page, which say the library stays free"
+      scope: descendants
+      confidence: 0.9
+    - must: "O:role/Audit-Committee oversee the independent audit of the financial statements and the choice of the accountant"
+      source: f990-2025
+      scope: self
+      confidence: 0.9
+    - must: "O:role/Compensation-Committee evaluate chief executive pay with comparability data and record the approval"
+      source: f990-2025
+      scope: self
+      confidence: 0.9
+    - must: "O:role/General-Counsel collect and review conflict-of-interest disclosures every year"
+      source: f990-2025
+      scope: self
+      confidence: 0.9
+  principles:
+    purpose: "Provide a free, world-class education to anyone, anywhere."
+    priorities:
+      - "learning outcomes over novelty"
+      - "free access for learners and teachers over revenue"
+    pending: "are these the nonprofit's own ordered priorities? These are read from the impact and districts pages (if it does not improve outcomes it does not belong), not stated as a list"
+    value:
+      - {to: M:audience/students, proposition: "a free, world-class education practised skill by skill"}
+      - {to: M:audience/teachers, proposition: "free classroom tools and an AI teaching assistant"}
+      - {to: M:audience/families, proposition: "an AI tutor that guides a child to the answer instead of giving it, and a free early-learning app"}
+      - {to: M:audience/districts, proposition: "a district-wide system for mastery with implementation support"}
+      - {to: M:audience/donors, proposition: "each dollar given buys about 100 minutes of learning"}
+    quality:
+      - {goal: "learners practise enough to gain", measure: "share of district students reaching the recommended practice level"}
+      - {goal: "AI help leads to independence", measure: "share of students who solve the next problem on the same skill, in the same session, without Khanmigo's help"}
+    decides: ["which courses to build and retire", "which partners to work with", "what stays free and what is sold"]
+  vocabulary:
+    terms:
+      - {term: skill, means: "A unit of mastery on the platform; the impact page counts skills mastered."}
+      - {term: mastery, means: "Practising a skill until it is secure before moving to the next one."}
+      - {term: district partner, means: "A school district that buys a Khan Academy Districts partnership."}
+      - {term: Khanmigo, means: "The AI tutor for learners and parents and the AI teaching assistant for teachers."}
+      - {term: Kids, means: "Khan Academy Kids, the free early-learning app for ages 2 to 8."}
+      - {term: registered user, means: "An account on the platform; the public count differs by page and period."}
+      - {term: fiscal year, means: "July to June since 2024; calendar year before."}
+    assumes:
+      - "learners have a device, and where connectivity is poor an offline route such as Kolibri"
+      - "teachers and families sign up for free accounts"
+    boundary:
+      - "the nonprofit does not charge learners or teachers for the core library"
+      - "Khanmigo subscriptions for learners and parents are for US residents with a US billing address"
+  mattering:
+    inside:
+      - who: [O:role/Chief-Executive, O:role/Chief-Learning-Officer, O:role/Chief-Technology-Officer]
+        because: "The work is paid for by gifts and partners, not by prices: every year's budget is a promise to funders that free learning is getting better, and the staff are paid to make something free also good."
+        stakes: "The mission: a world-class education that does not depend on who can pay."
+        confidence: 0.5
+      - who: [O:role/Board, O:role/Audit-Committee]
+        because: "A nonprofit holds its mission in trust: the board answers for how a budget of about $88 million a year, mostly other people's gifts, is spent."
+        confidence: 0.5
+    chosen:
+      - who: [M:audience/students, M:audience/teachers, M:audience/families]
+        because: "A learner can work at the right level at any hour without paying, and a teacher can assign the same practice to a whole class for nothing."
+        stakes: "A paid tutor or paid program they may not be able to afford."
+        confidence: 0.6
+      - who: [M:audience/districts]
+        because: "District leaders get a free-to-teachers product they already know, plus the data and training to make its use consistent across every school."
+        stakes: "Uneven use, no view of progress across schools."
+        confidence: 0.5
+    prospective:
+      - who: [M:audience/students, M:audience/families]
+        because: "Many children have no tutor at all, and many do not know that free mastery practice in their own language exists."
+        barrier: "Connectivity, language coverage and trust in a free service."
+        confidence: 0.5
+      - who: [M:audience/donors]
+        because: "Less than 1% of users give; the case to a new donor is that a small gift multiplies across millions of learners."
+        barrier: "Most users never see a request, and a free product feels already paid for."
+        confidence: 0.5

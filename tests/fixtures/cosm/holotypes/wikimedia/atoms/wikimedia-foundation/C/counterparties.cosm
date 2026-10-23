@@ -1,0 +1,201 @@
+# C — counterparties: the index of every outsider a bond, contract, channel, vendor, surface or account names. The Endowment is a modelled atom;
+# the rest are stubs, each with a global id (domain or EIN) where one is public. Classes of outsiders (affiliates, partners, providers) are stubs too.
+nodes:
+  - id: C:counterparty/endowment
+    type: counterparty
+    name: Wikimedia Endowment
+    summary: The separate permanent fund for the Wikimedia projects; a modelled atom in this Holotype.
+    kind: related-party
+    atom: atom/wikimedia-endowment
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://wikimediaendowment.org/wp-content/uploads/2026/03/Wikimedia-Endowment-Audit-Report-FY-24-25.pdf"], confidence: 0.9, state: known}
+    status: active
+
+  - id: C:counterparty/irs
+    type: counterparty
+    name: Internal Revenue Service
+    summary: Recognises the Foundation and the Endowment as 501(c)(3) public charities; receives their Forms 990.
+    kind: regulator
+    global-id: {domain: irs.gov}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://projects.propublica.org/nonprofits/organizations/200049703", "https://wikimediafoundation.org/about/financial-reports/"], confidence: 0.9, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/kpmg
+    type: counterparty
+    name: KPMG
+    summary: The Foundation's independent auditor; a clean opinion each year since the year ended 30 June 2006, twenty in a row by 2024-25.
+    kind: auditor
+    global-id: {domain: kpmg.com}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions", "https://wikimediafoundation.org/about/financial-reports/"], confidence: 0.9, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/wikimedia-deutschland
+    type: counterparty
+    name: Wikimedia Deutschland
+    summary: The German chapter; develops Wikibase with the Foundation for the Wikidata project, funded by the Foundation.
+    kind: affiliate
+    global-id: {domain: wikimedia.de}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf", "https://meta.wikimedia.org/wiki/Wikimedia_movement_affiliates"], confidence: 0.85, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/affiliates
+    type: counterparty
+    name: Wikimedia movement affiliates
+    summary: Independent chapters (40), thematic organizations (2) and user groups (143), 185 in all as of September 2025, recognised by the Board of Trustees on the advice of the Affiliations Committee. A class stub.
+    kind: affiliate-class
+    global-id: {state: not-disclosed}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://meta.wikimedia.org/wiki/Wikimedia_movement_affiliates", "https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/"], confidence: 0.85, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/apple
+    type: counterparty
+    name: Apple
+    summary: Distributes the Wikipedia iOS app through its App Store.
+    kind: platform
+    global-id: {domain: apple.com}
+    platform-terms: {merchant-of-record: not-applicable, customer-relationship: shared, note: "free app; nothing is sold through the store"}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/our-work/"], confidence: 0.8, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/google
+    type: counterparty
+    name: Google
+    summary: Distributes the Wikipedia Android app through Google Play, and is a Wikimedia Enterprise customer, the first named with the Internet Archive in June 2022.
+    kind: platform
+    global-id: {domain: google.com}
+    platform-terms: {merchant-of-record: not-applicable, customer-relationship: shared, note: "free app; nothing is sold through the store"}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/our-work/", "https://wikimediafoundation.org/news/2022/06/21/wikimedia-enterprise-announces-google-and-internet-archive-first-customers/", "https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/"], confidence: 0.85, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/amazon
+    type: counterparty
+    name: Amazon
+    summary: Named among Wikimedia Enterprise partners in January 2026.
+    kind: customer
+    global-id: {domain: amazon.com}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/", "https://enterprise.wikimedia.com/"], confidence: 0.8, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/meta
+    type: counterparty
+    name: Meta
+    summary: Named among Wikimedia Enterprise partners in January 2026.
+    kind: customer
+    global-id: {domain: meta.com}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/", "https://enterprise.wikimedia.com/"], confidence: 0.8, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/microsoft
+    type: counterparty
+    name: Microsoft
+    summary: Named among Wikimedia Enterprise partners in January 2026.
+    kind: customer
+    global-id: {domain: microsoft.com}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/", "https://enterprise.wikimedia.com/"], confidence: 0.8, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/mistral-ai
+    type: counterparty
+    name: Mistral AI
+    summary: Named among Wikimedia Enterprise partners in January 2026.
+    kind: customer
+    global-id: {domain: mistral.ai}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/", "https://enterprise.wikimedia.com/"], confidence: 0.8, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/perplexity
+    type: counterparty
+    name: Perplexity
+    summary: Named among Wikimedia Enterprise partners in January 2026.
+    kind: customer
+    global-id: {domain: perplexity.ai}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://wikimediafoundation.org/news/2026/01/15/wikipedia-celebrates-25years/", "https://enterprise.wikimedia.com/"], confidence: 0.8, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/internet-archive
+    type: counterparty
+    name: Internet Archive
+    summary: With Google, one of the first two Wikimedia Enterprise customers, announced 2022-06-21.
+    kind: customer
+    global-id: {domain: archive.org}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/news/2022/06/21/wikimedia-enterprise-announces-google-and-internet-archive-first-customers/"], confidence: 0.8, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/enterprise-other-partners
+    type: counterparty
+    name: Other named Enterprise partners and customers
+    summary: Ecosia, Pleias, ProRata, Nomic and Reef Media in the January 2026 post, and Databricks and Firecrawl on the Enterprise site. A class stub; terms are not public.
+    kind: customer-class
+    global-id: {state: not-disclosed}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/blog/wikipedia-25-enterprise-partners/", "https://enterprise.wikimedia.com/"], confidence: 0.8, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/in-kind-bandwidth-providers
+    type: counterparty
+    name: Donors of hosting and bandwidth
+    summary: FiberRing, Tele2, Datahop, Liberty Global, Init7 and Arelion donated internet hosting and bandwidth in 2023-24 and 2024-25 ($52,735 in 2024-25). A class stub.
+    kind: in-kind-donor-class
+    global-id: {state: not-disclosed}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.9, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/payment-processors
+    type: counterparty
+    name: Donation payment processors
+    summary: The processors behind donation campaigns in about 30 countries a year; the Fundraising tech pages name Adyen, Amazon Pay and Ingenico Connect. A class stub.
+    kind: vendor-class
+    global-id: {pending: "the processors in use today"}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://www.mediawiki.org/wiki/Fundraising_tech", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.6, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/employer-of-record
+    type: counterparty
+    name: Employer of record outside the United States
+    summary: Administers pay and benefits for staff located outside the United States; the audited statements mention it and name no provider.
+    kind: vendor
+    global-id: {state: not-disclosed}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.7, state: known}
+    atom: none
+    status: active
+
+  - id: C:counterparty/colocation-providers
+    type: counterparty
+    name: Data-center operators
+    summary: The companies that house the two core data centers and the five caching sites; the Wikitech page names none for today's sites.
+    kind: vendor-class
+    global-id: {pending: "who operates each data center the Foundation rents space in"}
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikitech.wikimedia.org/wiki/Data_centers"], confidence: 0.5, state: known}
+    atom: none
+    status: active

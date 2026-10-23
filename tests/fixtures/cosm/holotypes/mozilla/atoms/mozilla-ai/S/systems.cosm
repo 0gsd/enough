@@ -1,0 +1,70 @@
+# S: the public repositories and the hosted Otari.
+nodes:
+  - id: S:codebase/llamafile
+    type: codebase
+    name: llamafile
+    summary: Public repository github.com/mozilla-ai/llamafile (C++; about 26,400 stars).
+    runs: ['P:product/llamafile']
+    url: https://github.com/mozilla-ai/llamafile
+    status: active
+    visibility: public
+    owner: O:role/VP-Engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-ai'], confidence: 0.8, state: known}
+
+  - id: S:codebase/any-llm
+    type: codebase
+    name: any-llm
+    summary: Public repository github.com/mozilla-ai/any-llm (Python, Apache-2.0; about 2,200 stars).
+    runs: ['P:product/any-llm']
+    url: https://github.com/mozilla-ai/any-llm
+    status: active
+    visibility: public
+    owner: O:role/VP-Engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-ai'], confidence: 0.8, state: known}
+
+  - id: S:codebase/any-agent
+    type: codebase
+    name: any-agent
+    summary: Public repository github.com/mozilla-ai/any-agent (Python; about 1,200 stars).
+    runs: ['P:product/any-agent']
+    url: https://github.com/mozilla-ai/any-agent
+    status: active
+    visibility: public
+    owner: O:role/VP-Engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-ai'], confidence: 0.8, state: known}
+
+  - id: S:codebase/cq
+    type: codebase
+    name: cq
+    summary: Public repository github.com/mozilla-ai/cq (Go; about 1,300 stars).
+    runs: ['P:offering/cq']
+    url: https://github.com/mozilla-ai/cq
+    status: active
+    visibility: public
+    owner: O:role/VP-Engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-ai'], confidence: 0.8, state: known}
+
+  - id: S:codebase/otari
+    type: codebase
+    name: otari
+    summary: Public repository github.com/mozilla-ai/otari (Python, Apache-2.0; about 650 stars).
+    runs: ['P:offering/otari']
+    url: https://github.com/mozilla-ai/otari
+    status: active
+    visibility: public
+    owner: O:role/VP-Engineering
+    provenance: {mode: net-scan, sources: ['https://github.com/mozilla-ai'], confidence: 0.8, state: known}
+
+  - id: S:system/otari-hosted
+    type: system
+    name: Otari hosted platform
+    summary: The hosted deployment at otari.ai; the vendor behind its infrastructure is not named.
+    category: hosting
+    vendor: none
+    counterparty: none
+    used-by: ['P:offering/otari', 'M:channel/otari-hosted']
+    product: {pending: cloud vendor}
+    status: active
+    visibility: public
+    owner: O:role/Product-Team
+    provenance: {mode: net-scan, sources: ['https://mozilla.ai/product/otari'], confidence: 0.6, state: known}

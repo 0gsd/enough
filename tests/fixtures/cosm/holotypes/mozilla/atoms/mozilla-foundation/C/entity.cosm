@@ -1,0 +1,123 @@
+# C: the Foundation's legal shell, its governing documents, its public filings and one event.
+nodes:
+  - id: C:entity/mozilla-foundation
+    type: entity
+    name: Mozilla Foundation
+    summary: California not-for-profit corporation formed in July 2003 and exempt under section 501(c)(3) since June 2004; the philanthropic mission-holder of the Mozilla Project, based in San Francisco with operations in Canada, Germany and the United Kingdom.
+    anchor: true
+    form: nonprofit
+    roles: [brand, holding]
+    jurisdiction: US-CA
+    registered-office: 149 New Montgomery Street, 4th Floor, San Francisco, CA 94105
+    domains: [mozillafoundation.org]
+    global-id: {ein: 20-0097189, ca-corporation-number: C2543436, domain: mozillafoundation.org}
+    tax-status: 501(c)(3) public charity; IRS ruling June 2004; NTEE U40
+    fiscal-year: calendar
+    pending: The California corporation number C2543436 is Wikipedia's; it has not been checked against the Secretary of State record.
+    since: 2003-07-15
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf', 'https://projects.propublica.org/nonprofits/organizations/200097189', 'https://projects.propublica.org/nonprofits/api/v2/organizations/200097189.json', 'https://en.wikipedia.org/wiki/Mozilla_Foundation'], confidence: 0.9, state: known}
+
+  - id: C:entity/mzfo-germany-gmbh
+    type: entity
+    name: MZFO Germany GmbH
+    summary: 'German company in Berlin held at 100% by the Foundation (Form 990 Schedule R, 2024): primary activity Internet technologies; total income $2,084,527 and end-of-year assets $250,589 in 2024. A legal shell inside this atom, not an atom of its own.'
+    form: corporation
+    roles: [shell]
+    jurisdiction: DE
+    registered-office: Schlesische Strasse 27, Gebaeude 3, 4. Obergeschoss, 10997 Berlin
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf'], confidence: 0.9, state: known}
+
+  - id: C:charter/articles
+    type: charter
+    name: Articles of Incorporation of Mozilla Foundation
+    summary: Listed on the Foundation's public records page; the document's text is not summarised here.
+    kind: articles
+    entity: C:entity/mozilla-foundation
+    url: https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.8, state: known}
+
+  - id: C:charter/bylaws
+    type: charter
+    name: Bylaws of Mozilla Foundation
+    summary: Listed on the Foundation's public records page; the document's text is not summarised here.
+    kind: bylaws
+    entity: C:entity/mozilla-foundation
+    url: https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.8, state: known}
+
+  - id: C:policy/conflict-of-interest
+    type: policy
+    name: Conflict of interest policy
+    summary: Individuals report potential conflicts as decisions arise; if the board finds a conflict the conflicted individual does not vote, and the Foundation may drop the transaction. Directors and key employees are also asked periodically to answer a questionnaire (not sent in 2024, planned for 2025).
+    scope: board and key employees
+    url: https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf', 'https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.9, state: known}
+
+  - id: C:filing/form-990-2024
+    type: filing
+    name: IRS Form 990 for 2024
+    summary: 'Public disclosure copy; signed 2025-11-17, the extended due date. Part I: 10 voting board members (8 independent), 73 employees in 2024, about 10,000 volunteers (estimate); Schedule R lists the related organizations used throughout this Holotype.'
+    kind: IRS Form 990
+    period: '2024'
+    entity: C:entity/mozilla-foundation
+    signed: 2025-11-17
+    url: https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.9, state: known}
+
+  - id: C:filing/form-990-2023
+    type: filing
+    name: IRS Form 990 for 2023
+    summary: Public disclosure copy; Schedule R shows the Corporation, MZLA, Mozilla Ventures Management, MZL.AI and MZFO Germany at 100% with 2023 income and assets, and the 2023 transactions with the Corporation and the fund.
+    kind: IRS Form 990
+    period: '2023'
+    entity: C:entity/mozilla-foundation
+    url: https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf'], confidence: 0.9, state: known}
+
+  - id: C:filing/audited-financials-2024
+    type: filing
+    name: Audited consolidated financial statements, 2024 and 2023
+    summary: 'Mozilla Foundation and Subsidiaries, issued 2025-09-26: wholly-owned for-profit subsidiaries named (the Corporation, MZLA, Mozilla Ventures, MZL.AI), consolidated revenue and support $680.4 million in 2024, net assets $1,405.5 million, and a subsequent-events note on the Mozilla Online arbitration and the Fakespot shutdown.'
+    kind: audited financial statements
+    period: '2024'
+    entity: C:entity/mozilla-foundation
+    issued: 2025-09-26
+    url: https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://stateof.mozilla.org/pdf/Mozilla%20Fdn%202024%20-%20AuditedFinancials.pdf'], confidence: 0.9, state: known}
+
+  - id: C:filing/irs-determination
+    type: filing
+    name: IRS determination letter, 2004
+    summary: Exemption under section 501(c)(3) from June 2004; the letter is listed on the Foundation's public records page.
+    kind: determination letter
+    entity: C:entity/mozilla-foundation
+    effective: 2004-06
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://projects.propublica.org/nonprofits/api/v2/organizations/200097189.json', 'https://www.mozillafoundation.org/en/meet-mozilla/annual-reports-and-financials/'], confidence: 0.9, state: known}
+
+  - id: C:event/layoffs-2024-11
+    type: event
+    name: Foundation cuts 30% of staff, advocacy and global programs end
+    summary: On 2024-11-04 the Foundation laid off 30% of its employees; its advocacy and global programs divisions were no longer part of its structure. Advocacy continues inside the campaigns the Foundation still runs.
+    kind: restructuring
+    at: 2024-11-04
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://techcrunch.com/2024/11/09/mozilla-lays-off-30-of-its-nonprofit-arm', 'https://en.wikipedia.org/wiki/Mozilla_Foundation'], confidence: 0.8, state: known}

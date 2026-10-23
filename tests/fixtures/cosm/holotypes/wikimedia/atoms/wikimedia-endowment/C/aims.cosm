@@ -1,0 +1,36 @@
+# C — aims: what the Endowment says it is trying to achieve with outside help (seeking) and what it says it is open to (open), from its annual
+# plan and its home page, read on 2026-10-18. The words are the Endowment's own and carry no figures: an isotype publishes statements, never
+# measurements. The Endowment has no employees, so there is no hiring aim. Owners are roles; no person is named.
+nodes:
+  - id: C:aim/campaign-gifts
+    type: aim
+    name: Gifts through the multi-year fundraising campaign
+    summary: "Raise gifts for the Endowment through its multi-year fundraising campaign, with direct appeals to donors and fundraising events."
+    kind: capital
+    stance: seeking
+    owner: O:role/president
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", "https://wikimediaendowment.org/"], confidence: 0.9, state: known}
+
+  - id: C:aim/planned-giving
+    type: aim
+    name: Planned and legacy gifts
+    summary: "Grow planned giving, so that more donors name the Endowment in their wills, trusts and retirement or financial accounts."
+    kind: capital
+    stance: seeking
+    owner: O:role/president
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://upload.wikimedia.org/wikipedia/foundation/d/df/FY2627-Endowment_Annual_Plan.pdf", "https://wikimediaendowment.org/"], confidence: 0.9, state: known}
+
+  - id: C:aim/partnership-opportunities
+    type: aim
+    name: Partnership opportunities
+    summary: "Open to exploring partnership opportunities with outside organisations that get in touch."
+    kind: partners
+    stance: open
+    owner: O:role/president
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ["https://wikimediaendowment.org/"], confidence: 0.6, state: known}

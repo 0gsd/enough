@@ -1,0 +1,20 @@
+# M — the one price book: Wikimedia Enterprise. Everything else the Foundation offers is free. The free tier is public; the paid plans' prices are not.
+# The annual plan names a target customer segment of $50,000 to $1,000,000 of annual spend, which is a segment, not a price.
+nodes:
+  - id: M:pricebook/enterprise
+    type: pricebook
+    name: Wikimedia Enterprise plans
+    summary: A free tier with limits on snapshot dumps, snapshot chunks and on-demand requests, and paid plans with more frequent snapshots, higher limits, the Realtime stream, an SLA and support. Prices are not published.
+    kind: rate-card
+    dimensions: [snapshot-frequency, request-volume, realtime-stream, support-level]
+    set-by: self
+    currency: USD
+    for: [P:offering/wikimedia-enterprise]
+    rates:
+      - {offering: P:offering/wikimedia-enterprise, sku: I:sku/enterprise-free-tier, model: free, value: 0, unit: USD/year, billed: none}
+      - {offering: P:offering/wikimedia-enterprise, sku: I:sku/enterprise-paid-plans, model: tiered, value: {pending: "list prices for the paid plans"}, unit: USD/year, billed: annual}
+    target-segment: "customers with annual spend of $50,000 to $1,000,000 (FY2026-27 annual plan)"
+    status: active
+    visibility: public
+    owner: O:role/president-of-wikimedia-enterprise
+    provenance: {mode: net-scan, sources: ["https://enterprise.wikimedia.com/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_Annual_Plan/2026-2027", "https://upload.wikimedia.org/wikipedia/foundation/3/3f/Wikimedia_Foundation_FY_24-25_Audit_Report.pdf"], confidence: 0.8, state: known}

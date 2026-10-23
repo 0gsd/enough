@@ -1,0 +1,34 @@
+# R: claims.
+nodes:
+  - id: R:claim/sole-partner-35m
+    type: claim
+    name: Mozilla is the sole partner in a $35 million first fund
+    summary: In the 2024 report.
+    text: Mozilla is the sole partner in this first fund, with a fund size of $35 million.
+    about: ['P:mozilla-ventures']
+    'on': ['R:surface/website']
+    evidence:
+      state: supported
+      by: ['C:bond/foundation-funds-ventures']
+      measure: 'Schedule R: the fund''s assets were $32.3 million at the end of 2024 and the Foundation contributed $24,963,716 in 2023'
+    status: active
+    visibility: public
+    owner: O:role/Managing-Partner
+    provenance: {mode: net-scan, sources: ['https://www.mozilla.org/en-US/foundation/annualreport/2024/article/financing-an-open-internet-mozillas-path-forward/', 'https://assets.mozilla.net/annualreport/2024/b200-mozilla-foundation-form-990-public-disclosure-ty23.pdf', 'https://stateof.mozilla.org/pdf/Mozilla%20Foundation_Form_990_2024.pdf'], confidence: 0.8, state: known}
+
+  - id: R:claim/portfolio-of-forty
+    type: claim
+    name: A portfolio of early-stage companies aligned with the Mozilla mission
+    summary: On the portfolio page.
+    text: The portfolio includes early-stage companies working on technologies aligned with Mozilla's mission of promoting an open and accessible internet.
+    about: ['P:mozilla-ventures']
+    'on': ['R:surface/website']
+    evidence:
+      state: partial
+      by: ['C:bond/ventures-portfolio']
+      measure: the page lists 40 companies; the 2024 report said over 45 had been invested in
+    finding: The count on the page and the count in the report differ.
+    status: active
+    visibility: public
+    owner: O:role/Managing-Partner
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/portfolio', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/'], confidence: 0.7, state: known}

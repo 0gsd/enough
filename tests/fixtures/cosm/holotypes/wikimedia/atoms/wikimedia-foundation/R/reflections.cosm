@@ -1,0 +1,41 @@
+# R — reflections: what others say or what the audience does. Two are the Foundation's own readings of how readers behave; the ratings are third-party scores the
+# Foundation reports. Ratings as series come with a scan; here each is a sourced observation.
+nodes:
+  - id: R:reflection/charity-ratings
+    type: reflection
+    name: Charity ratings
+    summary: The annual report cites a Charity Navigator rating of four stars (100 out of 100) and Candid's Platinum Seal of Transparency.
+    kind: rating
+    about: [P:service/financial-reporting, P:wikimedia-foundation]
+    sentiment: positive
+    rating: {charity-navigator: "4 stars, 100/100", candid: "Platinum Seal", as-of: 2025}
+    status: active
+    visibility: public
+    owner: O:role/chief-financial-officer
+    provenance: {mode: net-scan, sources: ["https://wikimediafoundation.org/about/annualreport/2024-2025-annual-report/", "https://meta.wikimedia.org/wiki/Wikimedia_Foundation_reports/Financial/Audits/2024-2025_-_frequently_asked_questions"], confidence: 0.8, state: known}
+
+  - id: R:reflection/press-enterprise-deals
+    type: reflection
+    name: Press on the AI and Enterprise partnerships
+    summary: Technology press reported the January 2026 partner list as the Foundation getting large AI and cloud companies to pay for structured access to Wikipedia; financial terms were not disclosed.
+    kind: press
+    about: [P:offering/wikimedia-enterprise, M:account/amazon, M:account/meta, M:account/microsoft, M:account/mistral-ai, M:account/perplexity]
+    sentiment: neutral
+    rating: {pending: "no rating series until a reflections scan runs"}
+    status: active
+    visibility: public
+    owner: O:role/chief-communications-officer
+    provenance: {mode: net-scan, sources: ["https://www.deeplearning.ai/the-batch/wikimedia-foundation-strikes-deals-with-amazon-meta-microsoft-mistral-ai-and-perplexity", "https://gigazine.net/gsc_news/en/20260116-wikipedia-enterprise"], confidence: 0.6, state: known}
+
+  - id: R:reflection/traffic-decline
+    type: reflection
+    name: Readers arriving less
+    summary: The Foundation's own analysis finds human page views down about 8% in recent months of 2025 against the same months of 2024, after bot detection was updated, and attributes it to generative AI answers and social video.
+    kind: audience-behaviour
+    about: [P:offering/wikipedia, M:audience/readers]
+    sentiment: negative
+    rating: {human-pageviews-change: "about -8% year on year", as-of: 2025}
+    status: active
+    visibility: public
+    owner: O:role/chief-product-and-technology-officer
+    provenance: {mode: net-scan, sources: ["https://diff.wikimedia.org/2025/10/17/new-user-trends-on-wikipedia/"], confidence: 0.85, state: known}

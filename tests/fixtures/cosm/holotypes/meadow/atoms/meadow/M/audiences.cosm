@@ -1,0 +1,26 @@
+# M — audiences (decisions Q5): the kinds of people the offerings serve. COSM's ext/restaurants and
+# ext/accountants live here; P's flows, affect and mattering point at these ids.
+nodes:
+  - id: M:audience/restaurants
+    type: audience
+    name: Independent restaurants
+    summary: Independent restaurants with one to four locations, in the US; the owner who opens the morning summary before opening the kitchen.
+    relation: [customer]
+    side: served
+    geography: US
+    served-by: [P:offering/ledger, P:offering/payroll]
+    status: active
+    visibility: public
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.9, state: known}
+
+  - id: M:audience/accountants
+    type: audience
+    name: The customer's outside accountant
+    summary: The accountant who receives the year-end export; served through the customer, never billed.
+    relation: [beneficiary]
+    side: served
+    geography: US
+    served-by: [P:offering/ledger]
+    status: active
+    visibility: public
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.9, state: known}

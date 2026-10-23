@@ -1,0 +1,31 @@
+# M: the three themes.
+nodes:
+  - id: M:market/trustworthy-ai
+    type: market
+    name: Trustworthy AI
+    summary: One of the three investment pillars of Mozilla Ventures.
+    taxonomy: custom
+    code: venture/trustworthy-ai
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/'], confidence: 0.9, state: known}
+
+  - id: M:market/healthy-communities
+    type: market
+    name: Healthy communities
+    summary: One of the three investment pillars of Mozilla Ventures.
+    taxonomy: custom
+    code: venture/healthy-communities
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/'], confidence: 0.9, state: known}
+
+  - id: M:market/security-and-privacy
+    type: market
+    name: Security and privacy
+    summary: One of the three investment pillars of Mozilla Ventures.
+    taxonomy: custom
+    code: venture/security-and-privacy
+    status: active
+    visibility: public
+    provenance: {mode: net-scan, sources: ['https://mozilla.vc/', 'https://www.mozilla.org/en-US/foundation/annualreport/2024/article/backing-bold-ideas-mozilla-venturesa-and-responsible-innovation/'], confidence: 0.9, state: known}

@@ -1,0 +1,179 @@
+# EML 1: the MiniCOSM for one text, decompiled (EML: enumerated meaning language).
+#
+# What a program needs to know to read an EML twin: the .cosm sidecar of a text, paired by name (notes.md and
+# notes.md.cosm), or a standalone EML with no source. It enumerates the words the text leans on (grounded in FEED,
+# enough's dictionary), the things and ideas it names, the claims it makes and how it knows each one (its stance),
+# the events it narrates, and its atems: the tightest fair plain-English reduction of the whole text (the catalog's
+# atem: block) or of a passage (an X:atem item). Derivation writes it only when a person or a readvisor asks. The
+# prose is docs/MACROCOSM_OES.md; the reference reader is enough/macrocosm.py. Where this file and the reader
+# disagree, the reader wins and this file is corrected.
+#
+# Written in the COSM YAML subset: no anchors, no aliases, no tags, one document. Words that YAML 1.1 reads as
+# booleans (on, off, yes, no) are quoted.
+#
+# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
+
+manifest: minicosm/0
+macrocosm: 0.0.1
+name: eml
+title: EML
+version: 1
+summary: "One text decompiled: the words it leans on, the things and ideas it names, the claims it makes and how it knows them, the events it narrates, and its atems."
+spec: docs/MACROCOSM_OES.md
+reference: [enough/macrocosm.py]
+
+declaration:
+  key: oes
+  value: eml/1
+  absent: refuse
+  legacy: []
+  both: oes
+  unknown: refuse
+
+format:
+  extension: .cosm
+  syntax: the COSM YAML subset
+  forbidden: [anchors, aliases, tags, multiple documents]
+  booleans: ['true', 'false']
+  encoding: utf-8
+  byte-order-mark: tolerated
+  newlines: [lf, crlf]
+
+volume:
+  catalog: '<text>.cosm'          # the twin of notes.md is notes.md.cosm; a standalone EML is any .cosm that declares eml/1
+  single-file: true
+
+catalog:
+  keys: [oes, macrocosm, id, name, source, derived, atem, nodes]
+  id: eml/<slug>
+  source-fields: [path, sha256, size, mtime_ns]                    # absent for a standalone EML
+  derived-fields: [at, by, model, mode, completeness, chunks]
+  derived-modes: [model, rules]
+  derived-completeness: [full, atem]                               # atem: only the atem block, nodes: []
+  atem-fields: [line, focus, push, pull]
+
+module-file:
+  shapes:
+    - {key: nodes, holds: 'a list of items, each a mapping with a string id'}
+  duplicate-id: load error, the first wins
+
+ids:
+  item-form: '<module>:<kind>/<slug>'
+  passage-atem: 'X:atem/<n>'
+  inside-own-text: bare
+
+paths:
+  form: '<module>/<kind>/<slug>#<field>'
+  levels: [module, kind, item, field]
+  segments:
+    module: '[LEKPTX]'
+    kind: '[a-z][a-z0-9-]*'
+    slug: '[A-Za-z0-9](?:[A-Za-z0-9._@-]*[A-Za-z0-9_@-])?'
+    field: '[A-Za-z0-9][A-Za-z0-9_-]*(?:\.[A-Za-z0-9][A-Za-z0-9_-]*|\[[0-9]+\])*'
+  map:
+    - {path: '<module>', id: none}
+    - {path: '<module>/<kind>', id: none}
+    - {path: '<module>/<kind>/<slug>', id: '<module>:<kind>/<slug>'}
+    - {path: '<item path>#<field>', id: none}
+  qualified: 'oes:eml/<twin>/<path>'
+  qualified-database: the catalog id without eml/
+  case: kept and significant
+  refused: [a leading slash, a trailing slash, an empty segment, '.', '..', percent-encoding, a backslash, whitespace, a colon,
+            non-ASCII or control characters, a segment ending in a dot, a second '#', a kind the module does not declare,
+            more than three segments, 'a Windows reserved name as any segment, in any case, alone or before a dot (con, con.txt, prn, aux, nul, com0-9, lpt0-9)']
+
+envelope:
+  fields: [id, type, name, summary, status, visibility, provenance, pending, links, span, salience]
+  references: [links]
+  required: [id, type, name, summary, provenance]
+  required-in-P: [id, type, name, summary, provenance, stance]     # every claim says how it is known
+  status: [active, dormant, planned, retired]
+  visibility: [public, internal, restricted]
+  provenance:
+    fields: [mode, sources, confidence, state]
+    modes: [dialectic, net-scan, system-scan, integration, structured-intake, manual, derived, asserted, archetype,
+            catalogue, directory, accounting]
+    states: [known, pending, not-disclosed, stale]
+    state-default: known
+    confidence: a number from 0 to 1
+    rules-mode: '{mode: derived, confidence: 0.3, state: pending} with pending: "a model has not read this passage"'
+  span: '{lines: "12-18"} or {start: "<up to 60 characters>", end: "<up to 60 characters>"}'
+  open-question: '{pending: "<the question>"}'
+  sentinels: [none, self]
+  unknown-fields: allowed and kept
+
+links:
+  rels: [is-a, part-of, depends-on, supports, contradicts, resolves, exemplifies, defines, mentions]
+
+closed-lists:
+  stance: [axiom, observed, deduced, opinion, assumed, hearsay]
+  salience: [critical, high, normal, low]
+  feed.origin: [feed, user]
+
+references:
+  forms:
+    - {form: bare, example: 'K:concept/compost', names: an item of the same text}
+    - {form: typed-link, example: '{rel: contradicts, to: P:claim/x}', names: its to; rel from links.rels}
+    - {form: role, example: 'roles: {actor: E:person/x, condition: "when it rains"}', names: 'an item where the value is an id; text otherwise'}
+    - {form: open-question, example: '{pending: "<question>"}', names: an answer still owed}
+  unresolved: error
+
+modules:
+  L:
+    name: Lexicon
+    subtitle: The words the text leans on
+    kinds:
+      term: {refs: [], checked: [feed, sense]}      # feed: {word, pos, origin: feed|user}, or feed: {pending: "not in FEED"}
+  E:
+    name: Entities
+    subtitle: The particular things and people named
+    kinds:
+      person: {refs: []}
+      org: {refs: []}
+      place: {refs: []}
+      work: {refs: []}
+      thing: {refs: []}
+  K:
+    name: Concepts
+    subtitle: The ideas and universals the text uses
+    kinds:
+      concept: {refs: [defined-by]}
+  P:
+    name: Propositions
+    subtitle: What the text claims, and how it knows
+    kinds:
+      claim: {refs: [roles.*], checked: [stance, salience, span]}      # a role's value is checked only when it is an id
+  T:
+    name: Transitions
+    subtitle: What happens, in order
+    kinds:
+      event: {refs: [agent, patient, before, after], checked: [when, span]}
+  X:
+    name: Atems
+    subtitle: The tight reductions of passages
+    kinds:
+      atem: {refs: [of], checked: [line, focus, push, pull, span]}
+
+checks:
+  load: [load]
+  envelope: [duplicate-id, id-grammar, id-module, type, type-prefix, identity-min, provenance, status, visibility,
+             ref-grammar, ref-unresolved, closed-list, pending-shape, catalog-key]
+
+open-questions:
+  form: '{pending: "<the question>"}'
+  field-path: keys joined by ".", list positions as [n]
+  on-the-whole-item: field path node
+
+renderers:
+  - id: claims
+    makes: the claims, who and what they are about, and how each is known
+    lens: {kind: mermaid, diagram: flowchart, include: [E, K, P], edges: [roles.*, links], class-by: stance,
+           shape: {claim: '[ ]', concept: '{{ }}', person: '([ ])', org: '([ ])', place: '([ ])', work: '([ ])',
+                   thing: '([ ])'}}
+  - id: map
+    makes: the whole text at a glance
+    lens: {kind: mermaid, diagram: mindmap, include: [L, E, K, P, T]}
+  - {id: text-tree, makes: the text tree, code: [python -m enough.macrocosm tree]}
+
+extension:
+  status: not built
