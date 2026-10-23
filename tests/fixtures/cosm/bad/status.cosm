@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/bad-status
+oes: emf/1
+id: emf/bad-status
 name: bad status
 # status: a value outside the closed list
 nodes:

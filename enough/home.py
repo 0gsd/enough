@@ -552,7 +552,7 @@ def list_projects() -> list[dict[str, Any]]:
 def _mirror_skip(project_dir: Path):
     """The tree's visibility rules as a predicate the flowchart helper can
     use: dotfiles, IGNORE_DIRS, HIDDEN_TREE_PATHS, the global store dirs, a
-    converted document's twin + assets folder, a text's EML twin
+    converted document's twin + assets folder, a text's EMF twin
     (`notes.md.cosm`) and a paginated PDF's pages folder (one row per
     document, same as the sidebar). Unlike the counters, this one keeps
     `rness/` — the sidebar shows it, so the mirror of what the sidebar shows
@@ -586,7 +586,7 @@ def _mirror_skip(project_dir: Path):
         if p.name.endswith(".md"):
             return _convert.has_twin(p.parent / p.name[: -len(".md")])
         if p.name.endswith(".cosm"):
-            return _canon.is_eml_twin(p)
+            return _canon.is_emf_twin(p)
         return False
 
     return skip

@@ -1,7 +1,7 @@
 """What the system prompt costs, and what it is allowed to cost.
 
-Two things are pinned here, because nothing else in the suite was watching
-either of them:
+Three things are pinned here, because nothing else in the suite was watching
+any of them:
 
 1. **Drift.** Every tool in `tools._DISPATCH` is documented in the fully
    enabled assembled prompt. A tool the model is never told about is a tool
@@ -10,6 +10,10 @@ either of them:
    every tool loop. The budgets below are deliberately close to what the tree
    costs today: the next round that adds a tool should have to look at this
    file and decide, rather than spending the user's context window quietly.
+3. **Fit** (0.4.3, docs/ctx-16gb-plan.md §8.5). Every context window
+   `defaults/models.json` ships holds a fresh project's whole prompt plus a
+   2,048-token reserve, except an explicit `KNOWN_TOO_SMALL` list that can
+   only shrink.
 
 The scratch-safety rule applies here as everywhere: `HOME` and every
 `ENOUGH_*` seam point inside `tmp_path` before anything reads state, and
@@ -245,7 +249,7 @@ def test_the_canon_block_rides_on_the_install_not_the_skill(
     assert ("macrocosm-oes", False) in [(n, on) for n, on, _t in prompt.list_skills(project / "rness")]
     off_skill = prompt.tool_instructions(project)
     assert "## MacroCOSM" in off_skill
-    for name in ("cosm_read", "cosm_lint", "eml_derive", "atem", "cosm_guide"):
+    for name in ("cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide"):
         assert f'<tool name="{name}">' in off_skill, name
     enable_skill(project, "macrocosm-oes")
     assert prompt.tool_instructions(project) == off_skill
@@ -447,3 +451,104 @@ def test_the_chat_profile_is_unchanged_by_the_council_one(project: Path):
     for section in ("# Identity", "# Motivation", "# Paradigm", "# Tools",
                     "# Converted documents", "# Context"):
         assert section in a, section
+
+
+# ---------------------------------------------------------------------------
+# 4. The prompt against the windows we ship (docs/ctx-16gb-plan.md §8.5)
+# ---------------------------------------------------------------------------
+#
+# The guard the 16 GB bug lacked: `HEAD_DEFAULT_PROMPT` pinned the prompt's
+# size against HEAD, but nothing tied it to the context windows
+# `defaults/models.json` ships — so a 20k-token prompt went out to machines
+# whose default window was 16k (or 8k) and the first message answered with
+# llama-server's 400.
+
+#: Tokens kept free beside the prompt: a first message and a thinking reply.
+#: The same reserve the runtime preflight keeps (`enough.preflight.RESERVE`).
+CTX_RESERVE = 2_048
+#: chars per token — gemma-4's, the lower (more tokens) of the two shipped
+#: tokenizer families (plan §1a: 3.76 gemma, 3.88 qwen).
+CHARS_PER_TOKEN = 3.7
+#: The fixture's project path is written `<project>`; a real one is longer.
+#: 130 chars is the path the plan measured with (§1).
+PROJECT_PATH_CHARS = 130
+#: Each tier's RAM range in GB, [low, high).
+TIERS = {"gte_64gb": (64, 10_000), "gte_32gb": (32, 64),
+         "gte_16gb": (16, 32), "lt_16gb": (0, 16)}
+#: Pairs whose shipped window cannot hold the full default prompt, each with
+#: why it is allowed to stay that way for now. The lean profile (the plan's
+#: next round) is what fixes them — and when a pair starts fitting, the test
+#: below fails until its entry is deleted, so this list can only shrink.
+KNOWN_TOO_SMALL = {
+    ("g40-26", "gte_16gb"): "stays 8,192 on 20-31 GB: 16k still cannot hold the "
+                            "full prompt and 32k costs GPU memory those machines "
+                            "lack (plan §8.1); the lean profile fixes it",
+    ("q36-27", "gte_16gb"): "16,384 on 22-31 GB: 64 KiB/token of KV makes a bigger "
+                            "window unaffordable (plan §3d); the lean profile",
+    ("q38-04", "gte_16gb"): "16,384 on 24-31 GB: same KV cost as q36-27 (plan "
+                            "§3d); the lean profile",
+    ("g40-04", "lt_16gb"): "8 GB Macs: the weights alone are about the whole GPU "
+                           "budget, no window holds the full prompt (plan §3d); "
+                           "8 GB chat support is a separate owner decision",
+    ("q35-09", "lt_16gb"): "10-15 GB: 8,192 for the same reason as g40-04 under "
+                           "16 GB; the lean profile",
+    ("g40-12", "lt_16gb"): "12-15 GB: 4,096; the lean profile",
+}
+
+
+def _default_prompt_tokens(project: Path) -> int:
+    text = prompt.assemble_system_prompt(project)
+    for p in {str(project.resolve()), str(project)}:
+        text = text.replace(p, "<project>")
+    chars = len(text) - len("<project>") * text.count("<project>") \
+        + PROJECT_PATH_CHARS * text.count("<project>")
+    return int(chars / CHARS_PER_TOKEN + 0.999)
+
+
+def _feasible_pairs() -> dict[tuple[str, str], int]:
+    """(model, tier) -> the tier's shipped window, for every pair whose model
+    runs somewhere in the tier (its RAM minimum below the tier's top). §8.5's
+    allowlist names pairs like G40-26 on 20-31 GB, so feasibility is judged
+    at the lowest machine in the tier the model runs on."""
+    import json as _json
+    reg = _json.loads((Path(__file__).resolve().parent.parent / "defaults"
+                       / "models.json").read_text(encoding="utf-8"))
+    out: dict[tuple[str, str], int] = {}
+    for cute, entry in reg["models"].items():
+        need = int(entry.get("ram_gb_recommended_min") or 0)
+        for tier, (_low, high) in TIERS.items():
+            if need < high:
+                out[(cute, tier)] = int(entry["ctx_defaults"][tier])
+    return out
+
+
+def test_every_shipped_window_holds_the_default_prompt(project: Path):
+    """Every model x RAM tier the model can run in ships a context window
+    that holds a fresh project's whole system prompt plus the reserve —
+    except the `KNOWN_TOO_SMALL` pairs, each with its reason."""
+    tokens = _default_prompt_tokens(project)
+    pairs = _feasible_pairs()
+    too_small = {p: ctx for p, ctx in pairs.items() if tokens + CTX_RESERVE > ctx}
+    new = sorted(set(too_small) - set(KNOWN_TOO_SMALL))
+    assert not new, (
+        f"a fresh project's prompt is ~{tokens:,} tokens (+{CTX_RESERVE:,} "
+        f"reserve) and these shipped windows cannot hold it: "
+        + ", ".join(f"{c} {t} ({pairs[(c, t)]:,})" for c, t in new)
+        + ". Raise the window in defaults/models.json (if the machine affords "
+          "it), shrink the prompt, or add an entry with its reason.")
+    fixed = sorted(set(KNOWN_TOO_SMALL) - set(too_small))
+    assert not fixed, (
+        f"these KNOWN_TOO_SMALL pairs hold the prompt now — delete their "
+        f"entries: {fixed}")
+
+
+def test_the_known_too_small_pairs_are_real_pairs():
+    """An entry for a pair the model cannot even run in would never fail."""
+    pairs = _feasible_pairs()
+    assert set(KNOWN_TOO_SMALL) <= set(pairs), set(KNOWN_TOO_SMALL) - set(pairs)
+    assert all(reason.strip() for reason in KNOWN_TOO_SMALL.values())
+
+
+def test_the_reserve_is_the_preflights():
+    from enough import preflight
+    assert CTX_RESERVE == preflight.RESERVE

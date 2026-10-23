@@ -2,7 +2,7 @@ oes: canon/1
 id: canon/~field-notes
 name: field-notes
 scope: project
-counts: {folders: 4, files: 4, articles: 0, twins: 1, emls: 1, atems: 1}
+counts: {folders: 4, files: 4, articles: 0, twins: 1, emfs: 1, atems: 1}
 nodes:
   - id: V:folder/drafts
     type: folder
@@ -15,7 +15,7 @@ nodes:
     path: drafts/orchard.md
     parent: V:folder/drafts
     kind: markdown
-    eml: {path: drafts/orchard.md.cosm, state: fresh}
+    emf: {path: drafts/orchard.md.cosm, state: fresh}
     atem: {line: "The orchard's juice rose this year, and mowing the meadow strip in July would starve its pollinators."}
   - id: V:file/drafts--letter-to-the-council-docx
     type: file

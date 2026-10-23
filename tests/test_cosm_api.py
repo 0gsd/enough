@@ -1,7 +1,7 @@
 """The read routes for `.cosm` volumes (0.4.3): `GET /api/cosm`,
 `GET /api/cosm/lens`, `POST /api/cosm/lint`, `GET /api/macrocosm/manifests`
 and `GET /api/macrocosm-spec`, over P1's fixtures — a Comprise Holotype in a
-Canon volume, an EML twin and a standalone EML in the project, a Canon
+Canon volume, an EMF twin and a standalone EMF in the project, a Canon
 volume's catalog, the project catalog, a crafted bad volume and a refused
 declaration.
 """
@@ -26,9 +26,9 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("ENOUGH_CANON_ROOT", str(tmp_path / "store"))
     proj = tmp_path / "project"
     proj.mkdir()
-    shutil.copyfile(FIX / "eml" / "notes.md", proj / "notes.md")
-    shutil.copyfile(FIX / "eml" / "notes.md.cosm", proj / "notes.md.cosm")
-    shutil.copyfile(FIX / "eml" / "standalone.cosm", proj / "rain.cosm")
+    shutil.copyfile(FIX / "emf" / "notes.md", proj / "notes.md")
+    shutil.copyfile(FIX / "emf" / "notes.md.cosm", proj / "notes.md.cosm")
+    shutil.copyfile(FIX / "emf" / "standalone.cosm", proj / "rain.cosm")
     shutil.copyfile(FIX / "bad" / "ref-unresolved.cosm", proj / "bad.cosm")
     (proj / "future.cosm").write_text("oes: canon/9\nnodes: []\n", encoding="utf-8")
     (proj / "plain.md").write_text("not a cosm", encoding="utf-8")
@@ -76,12 +76,12 @@ def test_cosm_volume_folder_loads_its_canon_catalog(client: TestClient):
     assert same["modules"] == p["modules"]
 
 
-def test_cosm_eml_twin_and_standalone(client: TestClient):
+def test_cosm_emf_twin_and_standalone(client: TestClient):
     p = client.get("/api/cosm", params={"path": "notes.md.cosm"}).json()
-    assert p["minicosm"] == "eml" and p["refused"] is None
+    assert p["minicosm"] == "emf" and p["refused"] is None
     assert [m["letter"] for m in p["modules"]][:6] == ["L", "E", "K", "P", "T", "X"]
     assert set(p["lenses"]) >= {"claims", "map"}
-    assert client.get("/api/cosm", params={"path": "rain.cosm"}).json()["minicosm"] == "eml"
+    assert client.get("/api/cosm", params={"path": "rain.cosm"}).json()["minicosm"] == "emf"
 
 
 def test_cosm_project_catalog_is_reconciled_on_read(client: TestClient):
@@ -143,9 +143,9 @@ def test_macrocosm_manifests(client: TestClient):
     r = client.get("/api/macrocosm/manifests")
     assert r.status_code == 200
     rows = r.json()
-    assert [m["name"] for m in rows][:4] == ["comprise", "cosm", "canon", "eml"]
+    assert [m["name"] for m in rows][:4] == ["comprise", "cosm", "canon", "emf"]
     by = {m["name"]: m for m in rows}
-    assert by["canon"]["declaration"] == "canon/1" and by["eml"]["declaration"] == "eml/1"
+    assert by["canon"]["declaration"] == "canon/1" and by["emf"]["declaration"] == "emf/1"
     for m in rows:
         assert set(m) == {"name", "title", "version", "declaration", "summary"}
         assert m["title"] and m["summary"]

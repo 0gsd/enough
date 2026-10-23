@@ -2,7 +2,7 @@
 
 Everything here reads fixtures under `tests/fixtures/cosm/`: the four public Comprise sample Holotypes and the COSM 0.2
 example tree, copied from Comprise by `scripts/sync_cosm.py` (so the suite never needs comprise-dev), plus the Canon,
-EML and `bad/` volumes written for these tests. The Comprise item and open-question counts below were measured by
+EMF and `bad/` volumes written for these tests. The Comprise item and open-question counts below were measured by
 running Comprise's own loader and lint (`core.model.load_holotype`, `core.lint.lint_holotype`, comprise-dev fbe5b08)
 read-only over the same fixtures; Comprise reports 0 load problems, 0 errors and 0 warnings on all four.
 """
@@ -38,8 +38,8 @@ VOLUMES = {
     "cosm02:meadow": FIX / "cosm02" / "meadow",
     "canon:rust-book": FIX / "canon" / "rust-book",
     "canon:project": FIX / "canon" / "project" / "canon.cosm",
-    "eml:notes": FIX / "eml" / "notes.md.cosm",
-    "eml:standalone": FIX / "eml" / "standalone.cosm",
+    "emf:notes": FIX / "emf" / "notes.md.cosm",
+    "emf:standalone": FIX / "emf" / "standalone.cosm",
 }
 
 
@@ -94,8 +94,8 @@ def _write(tmp_path: Path, name: str, text: str, *, newline: str = "\n", bom: bo
     return p
 
 
-SMALL_EML = """oes: eml/1
-id: eml/small
+SMALL_EMF = """oes: emf/1
+id: emf/small
 name: small
 nodes:
   - id: K:concept/x
@@ -109,8 +109,8 @@ nodes:
 
 
 def test_bom_and_crlf_read_the_same(tmp_path):
-    plain = M.load_volume(_write(tmp_path, "plain.cosm", SMALL_EML))
-    odd = M.load_volume(_write(tmp_path, "odd.cosm", SMALL_EML, newline="\r\n", bom=True))
+    plain = M.load_volume(_write(tmp_path, "plain.cosm", SMALL_EMF))
+    odd = M.load_volume(_write(tmp_path, "odd.cosm", SMALL_EMF, newline="\r\n", bom=True))
     assert plain.problems == [] and odd.problems == []
     assert odd.catalog == plain.catalog
     item = odd.items["K:concept/x"]
@@ -157,21 +157,21 @@ def test_dump_writes_the_subset(tmp_path):
     assert text.startswith("oes: canon/1\n")
     assert "&" not in text and "*id" not in text
     assert M.yaml_load(text) == v.catalog
-    again = M.dump({"oes": "eml/1", "a": "on", "b": "yes", "c": datetime.date(2026, 1, 2), "d": True})
-    assert M.yaml_load(again) == {"oes": "eml/1", "a": "on", "b": "yes", "c": datetime.date(2026, 1, 2), "d": True}
+    again = M.dump({"oes": "emf/1", "a": "on", "b": "yes", "c": datetime.date(2026, 1, 2), "d": True})
+    assert M.yaml_load(again) == {"oes": "emf/1", "a": "on", "b": "yes", "c": datetime.date(2026, 1, 2), "d": True}
     day = datetime.date(2026, 1, 2)
-    assert "&" not in M.dump({"oes": "eml/1", "x": day, "y": day})     # equal scalars are written twice
+    assert "&" not in M.dump({"oes": "emf/1", "x": day, "y": day})     # equal scalars are written twice
     shared = {"mode": "manual"}
     with pytest.raises(ValueError):
-        M.dump({"oes": "eml/1", "a": shared, "b": shared})
+        M.dump({"oes": "emf/1", "a": shared, "b": shared})
     assert M.dump({"manifest": "minicosm/0", "name": "x"}).startswith("manifest: minicosm/0\n")
 
 
 def test_sniff_declaration_reads_only_the_head():
-    assert M.sniff_declaration(FIX / "eml" / "notes.md.cosm") == "eml/1"
+    assert M.sniff_declaration(FIX / "emf" / "notes.md.cosm") == "emf/1"
     assert M.sniff_declaration(FIX / "canon" / "project" / "canon.cosm") == "canon/1"
     assert M.sniff_declaration(FIX / "cosm02" / "meadow" / "firm.cosm") == "cosm 0.2"
-    assert M.sniff_declaration(FIX / "eml" / "notes.md") is None
+    assert M.sniff_declaration(FIX / "emf" / "notes.md") is None
     assert M.sniff_declaration(FIX / "no-such-file.cosm") is None
 
 
@@ -181,14 +181,14 @@ def test_sniff_declaration_reads_only_the_head():
 
 def test_registry_loads_the_four_manifests_in_order():
     reg = M.default_registry()
-    assert list(reg.manifests) == ["comprise", "cosm", "canon", "eml"]
+    assert list(reg.manifests) == ["comprise", "cosm", "canon", "emf"]
     assert reg.problems == []
     assert [(m.name, m.version) for m in reg.manifests.values()] == [("comprise", 1), ("cosm", 0), ("canon", 1),
-                                                                      ("eml", 1)]
+                                                                      ("emf", 1)]
     assert M.default_registry() is reg
 
 
-@pytest.mark.parametrize("name", ["cosm", "canon", "eml"])
+@pytest.mark.parametrize("name", ["cosm", "canon", "emf"])
 def test_our_manifests_carry_the_header_and_the_notice(name):
     text = (MANIFESTS / f"{name}.manifest.cosm").read_text(encoding="utf-8")
     head = text.split("\nmanifest:", 1)[0]
@@ -205,7 +205,7 @@ def test_the_comprise_manifest_is_the_synced_copy():
 
 def test_manifest_helpers():
     reg = M.default_registry()
-    comprise, eml, canon = reg.get("comprise"), reg.get("eml"), reg.get("canon")
+    comprise, emf, canon = reg.get("comprise"), reg.get("emf"), reg.get("canon")
     assert comprise.modules() == list("COMPRISE")
     assert "bond" in comprise.kinds("C") and comprise.refs("C", "bond")[:6] == ["owner", "at", "attributed-to",
                                                                                 "counterparty", "shared-with", "links"]
@@ -214,13 +214,13 @@ def test_manifest_helpers():
     assert comprise.required_fields("P") == ["id", "type", "name", "summary", "owner"]
     assert comprise.closed_lists()["status"] == ["active", "dormant", "planned", "retired"]
     assert comprise.lenses() == []
-    assert eml.required_fields("P", "claim")[-1] == "stance"
-    assert eml.refs("P", "claim") == ["links", "roles.*"]
-    assert eml.closed_lists()["stance"] == ["axiom", "observed", "deduced", "opinion", "assumed", "hearsay"]
-    assert "contradicts" in eml.closed_lists()["links.rel"]
-    assert [lens["id"] for lens in eml.lenses()] == ["claims", "map"]
+    assert emf.required_fields("P", "claim")[-1] == "stance"
+    assert emf.refs("P", "claim") == ["links", "roles.*"]
+    assert emf.closed_lists()["stance"] == ["axiom", "observed", "deduced", "opinion", "assumed", "hearsay"]
+    assert "contradicts" in emf.closed_lists()["links.rel"]
+    assert [lens["id"] for lens in emf.lenses()] == ["claims", "map"]
     assert canon.single_file and canon.catalog_names == ["canon.cosm"]
-    assert eml.matches_catalog("notes.md.cosm") and not canon.matches_catalog("notes.md.cosm")
+    assert emf.matches_catalog("notes.md.cosm") and not canon.matches_catalog("notes.md.cosm")
 
 
 def test_load_manifest_refuses_what_is_not_one(tmp_path):
@@ -230,7 +230,7 @@ def test_load_manifest_refuses_what_is_not_one(tmp_path):
     bad = _write(tmp_path, "y.manifest.cosm", "manifest: minicosm/0\nname: Y Z\nversion: 1\n")
     assert isinstance(M.load_manifest(bad), M.Refusal)
     reg = M.Registry([tmp_path, MANIFESTS])
-    assert len(reg.problems) == 2 and list(reg.manifests) == ["comprise", "cosm", "canon", "eml"]
+    assert len(reg.problems) == 2 and list(reg.manifests) == ["comprise", "cosm", "canon", "emf"]
 
 
 # ---------------------------------------------------------------------------
@@ -248,7 +248,7 @@ def test_load_manifest_refuses_what_is_not_one(tmp_path):
     ({"opi": 0.1}, None, ("cosm", 0, "legacy")),
     ({"oes": "cosm/0", "cosm": 0.3}, None, ("cosm", 0, "oes")),
     ({"oes": "canon/1"}, "canon.cosm", ("canon", 1, "oes")),
-    ({"oes": "eml/1"}, "notes.md.cosm", ("eml", 1, "oes")),
+    ({"oes": "emf/1"}, "notes.md.cosm", ("emf", 1, "oes")),
 ])
 def test_declarations_that_read(catalog, filename, expect):
     d = M.default_registry().identify(catalog, filename=filename)
@@ -265,13 +265,13 @@ def test_declarations_that_read(catalog, filename, expect):
     ({"oes": 3}, None, "3"),
     ({"oes": "comprise"}, None, "comprise"),
     ({"oes": "comprise/01"}, None, "comprise/01"),          # one spelling: Comprise refuses it too
-    ({"oes": " eml/1 "}, None, "eml/1"),
+    ({"oes": " emf/1 "}, None, "emf/1"),
     ({"oes": "industry/1", "comprise": 0.1}, "holotype.cosm", "industry/1"),
     ({"oes": "cosm/1", "cosm": 0.3}, "brand.cosm", "cosm/1"),
     ({"oes": "canon/2"}, "canon.cosm", "canon/2"),
-    ({"oes": "eml/0"}, "notes.md.cosm", "eml/0"),
+    ({"oes": "emf/0"}, "notes.md.cosm", "emf/0"),
     ({}, "canon.cosm", None),                     # canon: absent is refused
-    ({}, "notes.md.cosm", None),                  # eml: absent is refused
+    ({}, "notes.md.cosm", None),                  # emf: absent is refused
     ({"cosm": 0.4}, "brand.cosm", None),          # an unknown COSM version is not a legacy match
 ])
 def test_declarations_that_are_refused(catalog, filename, said):
@@ -297,7 +297,7 @@ def test_a_refused_holotype_loads_nothing(tmp_path):
 
 
 def test_folders_without_a_catalog_are_refused(tmp_path):
-    v = M.load_volume(FIX / "eml")                  # an EML is loaded by its file; its folder has no catalog
+    v = M.load_volume(FIX / "emf")                  # an EMF is loaded by its file; its folder has no catalog
     assert v.refused is not None and "no catalog" in str(v.refused)
     assert M.load_volume(tmp_path / "nope").refused is not None
 
@@ -407,7 +407,7 @@ def test_qualified_forms(vols):
     assert isinstance(M.parse_path(moz, "oes:comprise/meadow/meadow/P"), M.Refusal)      # another database
     assert isinstance(M.parse_path(moz, "oes:canon/mozilla/x"), M.Refusal)               # another MiniCOSM
     assert M.qualified_uri(vols["canon:project"]) == "oes:canon/~field-notes"
-    assert M.qualified_uri(vols["eml:notes"]).startswith("oes:eml/notes-md")
+    assert M.qualified_uri(vols["emf:notes"]).startswith("oes:emf/notes-md")
 
 
 def test_vendor_paths_parse_as_a_whole(vols):
@@ -462,7 +462,7 @@ def _refused_examples(v: M.Volume, phrase: str) -> list[str]:
 
 
 REFUSED_CASES = []
-for _key in ("holotype:meadow", "cosm02:meadow", "canon:rust-book", "eml:notes"):
+for _key in ("holotype:meadow", "cosm02:meadow", "canon:rust-book", "emf:notes"):
     _m = M.load_volume(VOLUMES[_key]).manifest
     REFUSED_CASES += [(_key, str(phrase)) for phrase in _m.data["paths"]["refused"]]
 
@@ -479,7 +479,7 @@ def test_refused_paths(vols, key, phrase):
 
 def test_refusal_counts_match_the_grammar(vols):
     assert "more than four segments" in vols["holotype:meadow"].manifest.data["paths"]["refused"]
-    for key in ("cosm02:meadow", "canon:rust-book", "eml:notes"):
+    for key in ("cosm02:meadow", "canon:rust-book", "emf:notes"):
         assert "more than three segments" in vols[key].manifest.data["paths"]["refused"]
 
 
@@ -498,7 +498,7 @@ def test_resolve_ref(vols):
     assert M.resolve_ref(moz, bond, "atom/mozilla-org") is None             # a concern is not an item
     assert M.resolve_ref(moz, bond, "none") is None
     assert M.resolve_ref(moz, bond, {"pending": "who?"}) is None
-    notes = vols["eml:notes"]
+    notes = vols["emf:notes"]
     claim = notes.items["P:claim/mulch-raised-the-yield"]
     other = M.resolve_ref(notes, claim, claim.data["links"][0])
     assert other.id == "P:claim/spring-explains-the-yield"
@@ -556,7 +556,7 @@ def test_bad_input_never_raises(tmp_path):
               {"pending": "q"}, {"to": "K:concept/x"}, {"to": 5}, [], [None], {"a": {"b": [1, {"pending": 3}]}},
               ["K:concept/x", {"rel": "contradicts", "to": "nope"}], "2026-01-01", "none", "con", "a/b/c", ":"]
     keys = ["id", "type", "name", "summary", "provenance", "links", "parts", "parent", "stance", "roles", "status",
-            "visibility", "pending", "defined-by", "agent", "of", "path", "eml", "twin", "on"]
+            "visibility", "pending", "defined-by", "agent", "of", "path", "emf", "twin", "on"]
     for i in range(60):
         nodes = []
         for _ in range(rnd.randint(0, 5)):
@@ -564,7 +564,7 @@ def test_bad_input_never_raises(tmp_path):
             d["id"] = rnd.choice(["K:concept/x", "P:claim/y", "V:file/z", "L:term/con", "bad id", "E:person/é", 3])
             d["type"] = rnd.choice(["concept", "claim", "file", "folder", "term", "nope", None])
             nodes.append(d)
-        cat = {"oes": rnd.choice(["eml/1", "canon/1", "x/1", ""]), "id": copy.deepcopy(rnd.choice(values)),
+        cat = {"oes": rnd.choice(["emf/1", "canon/1", "x/1", ""]), "id": copy.deepcopy(rnd.choice(values)),
                "nodes": nodes if i % 7 else copy.deepcopy(rnd.choice(values))}
         p = tmp_path / f"{i}.{rnd.choice(['notes.md', 'canon'])}.cosm"
         p.write_text(M.dump(cat), encoding="utf-8")
@@ -574,7 +574,7 @@ def test_bad_input_never_raises(tmp_path):
             path = M.item_path(v, it)
             assert not path or M.resolve_path(v, path) is it
             M.resolve_ref(v, it, it.data.get("parent"))
-        for target in ("", "/a", "K/concept/x#a#b", None, 5, "oes:eml/x/K/concept/x"):
+        for target in ("", "/a", "K/concept/x#a#b", None, 5, "oes:emf/x/K/concept/x"):
             assert M.resolve_path(v, target) is None or isinstance(M.resolve_path(v, target), (M.Item, tuple))
             M.items_under(v, target)
         for lens in M.lenses(v):
@@ -596,7 +596,7 @@ def test_a_duplicate_is_a_load_problem_where_the_manifest_says_so(tmp_path):
 
 
 def test_unknown_catalog_keys_are_notes(tmp_path):
-    rep = M.lint(M.load_volume(_write(tmp_path, "x.cosm", SMALL_EML + "colour: blue\n")))
+    rep = M.lint(M.load_volume(_write(tmp_path, "x.cosm", SMALL_EMF + "colour: blue\n")))
     assert rep.ok and [(p.check, p.severity, p.field) for p in rep.notes] == [("catalog-key", "note", "colour")]
 
 
@@ -612,7 +612,7 @@ def test_problem_string_shape():
 
 
 def test_soft_references_are_ids_or_text(tmp_path):
-    text = SMALL_EML.replace("roles: {on: K:concept/x}", "roles: {actor: E:person/nobody, condition: when it rains}")
+    text = SMALL_EMF.replace("roles: {on: K:concept/x}", "roles: {actor: E:person/nobody, condition: when it rains}")
     rep = M.lint(M.load_volume(_write(tmp_path, "soft.cosm", text.replace("K:concept/x\n    type: concept",
                                                                              "P:claim/x\n    type: claim\n    stance: assumed"))))
     assert [(p.check, p.field) for p in rep.errors] == [("ref-unresolved", "roles.*")]
@@ -621,22 +621,22 @@ def test_soft_references_are_ids_or_text(tmp_path):
 def test_unknown_check_ids_are_not_run(tmp_path):
     d = tmp_path / "m"
     d.mkdir()
-    text = (MANIFESTS / "eml.manifest.cosm").read_text(encoding="utf-8")
-    (d / "eml.manifest.cosm").write_text(text.replace("closed-list, pending-shape, catalog-key]",
-                                                      "closed-list, pending-shape, catalog-key, eml-pronouns]"),
+    text = (MANIFESTS / "emf.manifest.cosm").read_text(encoding="utf-8")
+    (d / "emf.manifest.cosm").write_text(text.replace("closed-list, pending-shape, catalog-key]",
+                                                      "closed-list, pending-shape, catalog-key, emf-pronouns]"),
                                          encoding="utf-8")
-    v = M.load_volume(FIX / "eml" / "notes.md.cosm", M.Registry([d]))
+    v = M.load_volume(FIX / "emf" / "notes.md.cosm", M.Registry([d]))
     rep = M.lint(v)
-    assert rep.ok and rep.not_run == ["eml-pronouns"] and "eml-pronouns" not in rep.checks
+    assert rep.ok and rep.not_run == ["emf-pronouns"] and "emf-pronouns" not in rep.checks
 
 
 # ---------------------------------------------------------------------------
-# Our own MiniCOSMs: the Canon, EML and COSM examples load and lint clean
+# Our own MiniCOSMs: the Canon, EMF and COSM examples load and lint clean
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("key, oes, n", [
     ("cosm02:meadow", "cosm/0", 17), ("canon:rust-book", "canon/1", 9), ("canon:project", "canon/1", 8),
-    ("eml:notes", "eml/1", 21), ("eml:standalone", "eml/1", 3),
+    ("emf:notes", "emf/1", 21), ("emf:standalone", "emf/1", 3),
 ])
 def test_our_examples_lint_clean(vols, key, oes, n):
     v = vols[key]
@@ -656,10 +656,10 @@ def test_cosm02_reads_the_legacy_tree(vols):
     assert M.resolve_path(v, "P/brand/meadow").id == "meadow"
 
 
-def test_eml_twin_shape(vols):
-    v = vols["eml:notes"]
+def test_emf_twin_shape(vols):
+    v = vols["emf:notes"]
     assert v.catalog["source"]["path"] == "notes.md"
-    src = (FIX / "eml" / "notes.md").read_bytes()
+    src = (FIX / "emf" / "notes.md").read_bytes()
     assert v.catalog["source"]["sha256"] == hashlib.sha256(src).hexdigest()
     assert v.catalog["source"]["size"] == len(src)
     assert set(v.catalog["atem"]) == {"line", "focus", "push", "pull"}
@@ -670,7 +670,7 @@ def test_eml_twin_shape(vols):
     rep = M.lint(v)
     assert ("L:term/leaf-mould", "feed", "not in FEED") in rep.pending
     assert ("E:org/parish-council", "node", v.items["E:org/parish-council"].data["pending"]) in rep.pending
-    lines = (FIX / "eml" / "notes.md").read_text(encoding="utf-8").splitlines()
+    lines = (FIX / "emf" / "notes.md").read_text(encoding="utf-8").splitlines()
     for it in v.items.values():
         span = it.data.get("span", {}).get("lines")
         if span:
@@ -729,13 +729,13 @@ def test_lens_lists(vols):
     assert M.lenses(vols["holotype:meadow"]) == ["map", "tree"]
     assert M.lenses(vols["cosm02:meadow"]) == ["tree", "map"]
     assert M.lenses(vols["canon:rust-book"]) == ["tree", "map"]
-    assert M.lenses(vols["eml:notes"]) == ["claims", "map"]
+    assert M.lenses(vols["emf:notes"]) == ["claims", "map"]
     with pytest.raises(ValueError):
-        M.to_mermaid(vols["eml:notes"], "no-such-lens")
+        M.to_mermaid(vols["emf:notes"], "no-such-lens")
 
 
 def test_claims_lens_classes_by_stance(vols):
-    body, node_map = M.to_mermaid(vols["eml:notes"], "claims")
+    body, node_map = M.to_mermaid(vols["emf:notes"], "claims")
     for stance in ("axiom", "observed", "deduced", "opinion", "assumed", "hearsay"):
         assert f"classDef c_stance_{stance} " in body
     assert '-.->|"contradicts"|' in body
@@ -772,7 +772,7 @@ def test_labels_follow_merirmaid_rules():
 
 
 def test_text_tree_shows_every_item(vols):
-    for key in ("holotype:mozilla", "canon:rust-book", "eml:notes", "cosm02:meadow"):
+    for key in ("holotype:mozilla", "canon:rust-book", "emf:notes", "cosm02:meadow"):
         v = vols[key]
         tree = M.to_text_tree(v)
         assert tree.splitlines()[0].startswith(v.name)
@@ -804,9 +804,9 @@ def test_cli_lint():
     assert "comprise/1: 36 items, 0 errors, 0 warnings" in r.stdout
     r = _cli("lint", FIX / "bad" / "ref-unresolved.cosm")
     assert r.returncode == 1 and "ref-unresolved K:concept/x" in r.stdout
-    r = _cli("lint", FIX / "eml" / "notes.md.cosm", "--json")
+    r = _cli("lint", FIX / "emf" / "notes.md.cosm", "--json")
     body = json.loads(r.stdout)
-    assert r.returncode == 0 and body["ok"] and body["minicosm"] == "eml/1" and body["pending"]
+    assert r.returncode == 0 and body["ok"] and body["minicosm"] == "emf/1" and body["pending"]
 
 
 def test_cli_paths_tree_mermaid_identify():
@@ -817,9 +817,9 @@ def test_cli_paths_tree_mermaid_identify():
     assert _cli("paths", HOLOTYPES / "meadow", "meadow/P/no-such").returncode == 1
     r = _cli("tree", FIX / "canon" / "rust-book")
     assert r.returncode == 0 and "└── " in r.stdout and "main.rs" in r.stdout
-    r = _cli("mermaid", FIX / "eml" / "notes.md.cosm", "--lens", "claims")
+    r = _cli("mermaid", FIX / "emf" / "notes.md.cosm", "--lens", "claims")
     assert r.returncode == 0 and r.stdout.startswith("flowchart TB\n")
-    assert _cli("mermaid", FIX / "eml" / "notes.md.cosm", "--lens", "nope").returncode == 2
+    assert _cli("mermaid", FIX / "emf" / "notes.md.cosm", "--lens", "nope").returncode == 2
     r = _cli("identify", FIX / "cosm02" / "meadow")
     assert r.returncode == 0 and r.stdout.startswith("cosm/0")
     r = _cli("identify", FIX / "bad" / "module-none" / "holotype.cosm", "--json")

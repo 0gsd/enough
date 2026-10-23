@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/bad-provenance
+oes: emf/1
+id: emf/bad-provenance
 name: bad provenance
 # provenance: a mode outside the closed list
 nodes:

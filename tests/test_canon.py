@@ -1,6 +1,6 @@
 """Canon (0.4.3, was Cacheawl): the store root and its migration, volume
 catalogs (`canon.cosm`) and the project catalog (`rness/canon.cosm`), the
-listing flags (EML twins, Holotypes, catalogs, .cosm files), the Holotype
+listing flags (EMF twins, Holotypes, catalogs, .cosm files), the Holotype
 ingest filter, the write-guards, the transfer/broker/wikisink renames and
 the `enough.cacheawl` shim.
 
@@ -46,12 +46,12 @@ def _lint_clean(cat: Path) -> macrocosm.Volume:
     return vol
 
 
-def _eml_pair(folder: Path, name: str = "notes.md") -> tuple[Path, Path]:
-    """The fixture text and its EML twin, copied under `name`."""
+def _emf_pair(folder: Path, name: str = "notes.md") -> tuple[Path, Path]:
+    """The fixture text and its EMF twin, copied under `name`."""
     folder.mkdir(parents=True, exist_ok=True)
     text, twin = folder / name, folder / f"{name}.cosm"
-    shutil.copyfile(FIX / "eml" / "notes.md", text)
-    shutil.copyfile(FIX / "eml" / "notes.md.cosm", twin)
+    shutil.copyfile(FIX / "emf" / "notes.md", text)
+    shutil.copyfile(FIX / "emf" / "notes.md.cosm", twin)
     return text, twin
 
 
@@ -192,8 +192,8 @@ def test_catalog_items_folders_files_articles_twins_atems(store: Path):
     canon.create_volume("meadow handbook")
     box = store / "meadow handbook"
     (box / "README.md").write_text("hello", encoding="utf-8")
-    _eml_pair(box / "guides", "close.md")
-    shutil.copyfile(FIX / "eml" / "standalone.cosm", box / "guides" / "standalone.cosm")
+    _emf_pair(box / "guides", "close.md")
+    shutil.copyfile(FIX / "emf" / "standalone.cosm", box / "guides" / "standalone.cosm")
     # A convert twin, manifest and all, beside its original.
     (box / "guides" / "payroll.docx").write_bytes(b"PK fake docx")
     (box / "guides" / "payroll.docx.md").write_text("# payroll", encoding="utf-8")
@@ -215,7 +215,7 @@ def test_catalog_items_folders_files_articles_twins_atems(store: Path):
     assert "guides/close.md.cosm" not in items and "guides/payroll.docx.md" not in items
     close = items["guides/close.md"]
     assert close["id"] == "V:file/guides--close-md" and close["parent"] == "V:folder/guides"
-    assert close["eml"] == {"path": "guides/close.md.cosm", "state": "fresh"}
+    assert close["emf"] == {"path": "guides/close.md.cosm", "state": "fresh"}
     assert close["atem"]["line"].startswith("The orchard's juice rose")
     assert close["kind"] == "markdown" and close["size"] == (box / "guides/close.md").stat().st_size
     assert items["guides/payroll.docx"]["twin"]["path"] == "guides/payroll.docx.md"
@@ -236,7 +236,58 @@ def test_catalog_items_folders_files_articles_twins_atems(store: Path):
     (box / "guides" / "close.md").write_text("rewritten", encoding="utf-8")
     canon.reconcile("meadow handbook")
     vol = _lint_clean(box / canon.CATALOG_NAME)
-    assert vol.item("V:file/guides--close-md").data["eml"]["state"] == "stale"
+    assert vol.item("V:file/guides--close-md").data["emf"]["state"] == "stale"
+
+
+def test_short_text_name_rule():
+    n = canon.short_text_name
+    assert n("notes.short-2026-10-23-1042.md", ["notes.md", "notes.txt"]) == "notes.md"
+    assert n("notes.short-2026-10-23-1042-2.md", ["notes.txt"]) == "notes.txt"
+    # a text with an EMF twin is the one compiled from, even when it isn't .md
+    assert n("notes.short-2026-10-23-1042.md", ["notes.md", "notes.txt"], with_emf={"notes.txt"}) == "notes.txt"
+    assert n("rain.short-2026-10-23-1042.md", ["rain.cosm"]) == "rain.cosm"
+    assert n("rain.short-2026-10-23-1042.md", ["rain.cosm"], is_standalone=lambda name: False) is None
+    assert n("report.pdf.short-2026-10-23-1042.md", ["report.pdf"]) == "report.pdf"
+    assert n("notes.v2.short-2026-10-23-1042.md", ["notes.md", "notes.v2.md"]) == "notes.v2.md"
+    # not a short's name, or no text beside it
+    assert n("notes.short-2026-10-23.md", ["notes.md"]) is None
+    assert n("notes-from-emf-2026-10-23-1042.md", ["notes.md"]) is None
+    assert n("notes.short-2026-10-23-1042.md", ["other.md"]) is None
+    assert n("notes.short-2026-10-23-1042.txt", ["notes.md"]) is None
+
+
+def test_catalogs_mark_shorts_and_their_texts(store: Path, tmp_path: Path):
+    from enough import project_meta, skeleton
+
+    canon.create_volume("orchard")
+    box = store / "orchard"
+    _emf_pair(box, "notes.md")
+    for name in ("notes.short-2026-10-23-1042.md", "notes.short-2026-10-23-1042-2.md",
+                 "lonely.short-2026-10-23-1042.md"):
+        (box / name).write_text("# a short\n", encoding="utf-8")
+    shutil.copyfile(FIX / "emf" / "standalone.cosm", box / "rain.cosm")
+    (box / "rain.short-2026-10-23-1100.md").write_text("# a short\n", encoding="utf-8")
+    canon.regenerate_catalog("orchard")
+    vol = _lint_clean(box / canon.CATALOG_NAME)
+    items = {it.data["path"]: it.data for it in vol.items.values()}
+    assert items["notes.md"]["shorts"] == ["notes.short-2026-10-23-1042-2.md", "notes.short-2026-10-23-1042.md"]
+    assert items["notes.short-2026-10-23-1042.md"]["short_of"] == "notes.md"
+    assert items["notes.short-2026-10-23-1042.md"]["kind"] == "markdown", "a short is an ordinary file item"
+    assert "short_of" not in items["lonely.short-2026-10-23-1042.md"], "no text beside it: not marked"
+    assert items["rain.cosm"]["shorts"] == ["rain.short-2026-10-23-1100.md"]
+    assert items["rain.short-2026-10-23-1100.md"]["short_of"] == "rain.cosm"
+    assert vol.catalog["counts"]["files"] == 6
+    # the project catalog marks them the same way (paths: structure only)
+    proj = tmp_path / "proj"
+    proj.mkdir()
+    skeleton.ensure_skeleton(proj)
+    project_meta.save(proj, "Proj", None)
+    _emf_pair(proj / "drafts", "letter.md")
+    (proj / "drafts" / "letter.short-2026-10-23-1042.md").write_text("# a short\n", encoding="utf-8")
+    canon.project_catalog(proj)
+    pitems = {it.data["path"]: it.data for it in _lint_clean(proj / canon.PROJECT_CATALOG).items.values()}
+    assert pitems["drafts/letter.md"]["shorts"] == ["drafts/letter.short-2026-10-23-1042.md"]
+    assert pitems["drafts/letter.short-2026-10-23-1042.md"]["short_of"] == "drafts/letter.md"
 
 
 def test_slug_rule():
@@ -282,33 +333,33 @@ def _flat(nodes: list[dict]) -> dict[str, dict]:
 def test_volume_tree_flags(store: Path):
     canon.create_volume("v")
     box = store / "v"
-    text, _twin = _eml_pair(box / "docs")
-    shutil.copyfile(FIX / "eml" / "standalone.cosm", box / "docs" / "rain.cosm")
+    text, _twin = _emf_pair(box / "docs")
+    shutil.copyfile(FIX / "emf" / "standalone.cosm", box / "docs" / "rain.cosm")
     shutil.copytree(FIX / "holotypes" / "meadow", box / "meadow")
     flat = _flat(canon.volume_tree("v")["tree"])
     assert "docs/notes.md.cosm" not in flat
-    assert flat["docs/notes.md"]["eml"] == {"path": "docs/notes.md.cosm", "state": "fresh"}
+    assert flat["docs/notes.md"]["emf"] == {"path": "docs/notes.md.cosm", "state": "fresh"}
     assert flat["docs/rain.cosm"]["cosm"] is True
     assert flat[canon.CATALOG_NAME]["catalog"] is True and "cosm" not in flat[canon.CATALOG_NAME]
     assert flat["meadow"]["holotype"] is True and flat["meadow"]["children"] == []
     assert all(n["is_mirror"] is False for n in flat.values())
     text.write_text("changed", encoding="utf-8")
-    assert _flat(canon.volume_tree("v")["tree"])["docs/notes.md"]["eml"]["state"] == "stale"
+    assert _flat(canon.volume_tree("v")["tree"])["docs/notes.md"]["emf"]["state"] == "stale"
 
 
-def test_a_cosm_beside_a_text_that_is_not_eml_is_not_a_twin(store: Path):
+def test_a_cosm_beside_a_text_that_is_not_emf_is_not_a_twin(store: Path):
     canon.create_volume("v")
     box = store / "v"
     (box / "plan.md").write_text("plan", encoding="utf-8")
     (box / "plan.md.cosm").write_text("oes: canon/1\nnodes: []\n", encoding="utf-8")
     flat = _flat(canon.volume_tree("v")["tree"])
-    assert flat["plan.md.cosm"]["cosm"] is True and "eml" not in flat["plan.md"]
+    assert flat["plan.md.cosm"]["cosm"] is True and "emf" not in flat["plan.md"]
 
 
 def test_volume_mirror_draws_on_demand_and_hides_kept_files(store: Path):
     canon.create_volume("m")
     box = store / "m"
-    _eml_pair(box)
+    _emf_pair(box)
     text, node_map = canon.build_mirror("m")
     assert "source: canon:m\n" in text and "📦 m" in text
     paths = {v["path"] for v in node_map.values()}
@@ -597,7 +648,7 @@ def test_project_catalog_enumerates_what_the_sidebar_shows(project: Path):
     from enough import convert
 
     (project / "README.md").write_text("hi", encoding="utf-8")
-    _eml_pair(project / "drafts", "orchard.md")
+    _emf_pair(project / "drafts", "orchard.md")
     (project / "drafts" / "letter.docx").write_bytes(b"PK fake")
     (project / "drafts" / "letter.docx.md").write_text("# letter", encoding="utf-8")
     convert.write_manifest(project / "drafts" / "letter.docx", convert.new_manifest(
@@ -611,7 +662,7 @@ def test_project_catalog_enumerates_what_the_sidebar_shows(project: Path):
     assert not any(p == "rness" or p.startswith("rness/") for p in items)
     assert "drafts/orchard.md.cosm" not in items and "drafts/letter.docx.md" not in items
     assert ".hidden.md" not in items
-    assert items["drafts/orchard.md"]["eml"] == {"path": "drafts/orchard.md.cosm"}   # no state
+    assert items["drafts/orchard.md"]["emf"] == {"path": "drafts/orchard.md.cosm"}   # no state
     assert items["drafts/orchard.md"]["atem"]["line"]
     assert items["drafts/letter.docx"]["twin"] == {"path": "drafts/letter.docx.md"}
     assert items["research/meadow"]["holotype"] is True
@@ -624,7 +675,7 @@ def test_project_catalog_enumerates_what_the_sidebar_shows(project: Path):
 
 def test_project_catalog_is_byte_stable_and_moves_only_with_the_file_list(project: Path):
     (project / "plan.md").write_text("one", encoding="utf-8")
-    _eml_pair(project, "notes.md")
+    _emf_pair(project, "notes.md")
     canon.project_catalog(project)
     cat = project / canon.PROJECT_CATALOG
     before, mtime = cat.read_bytes(), cat.stat().st_mtime_ns
@@ -676,9 +727,9 @@ def test_project_catalog_cap_is_the_module_constant(project: Path, monkeypatch):
     assert items["a"]["counts"] == {"folders": 0, "files": 3}
 
 
-def test_the_home_mirror_hides_eml_twins_too(project: Path):
+def test_the_home_mirror_hides_emf_twins_too(project: Path):
     from enough import home
 
-    _eml_pair(project)
+    _emf_pair(project)
     text = home.build_project_mirror(project)
     assert "📄 notes.md\"" in text and "notes.md.cosm" not in text

@@ -204,9 +204,10 @@ def build_router(*, project_dir: Path, resolve_path: Resolve, emit: Emit,
 
     @router.post("/api/council/pause")
     async def api_council_pause(request: Request) -> dict[str, Any]:
-        """Stop a `/run`. The turn that is already streaming finishes and is
-        committed — a half-written statement thrown away would be a worse
-        surprise than one extra paragraph."""
+        """Stop a `/run`. A statement that has started to land (its commit is
+        being written) finishes landing before the pause returns, so the
+        canvas and the turn counter always agree (`council._land_whole`); a
+        turn still being generated is dropped, nothing of it written."""
         body = await _body(request)
         c = _council(str(body.get("path") or ""))
         task = _running_task(c)
@@ -526,8 +527,9 @@ def build_router(*, project_dir: Path, resolve_path: Resolve, emit: Emit,
         return spoke
 
     async def _run_to_end(c: engine.Council) -> None:
-        """The `/run` body. Cancellation lands between turns, so a statement
-        is never half-committed; the status then settles on `paused`."""
+        """The `/run` body. A statement is never half-committed: a cancel
+        either drops a turn still being generated or waits for one that has
+        started to land; the status then settles on `paused`."""
         try:
             while True:
                 _comp, meta = await asyncio.to_thread(_load, c)

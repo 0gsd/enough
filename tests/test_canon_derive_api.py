@@ -1,5 +1,5 @@
 """The derivation routes (0.4.3, P3): `/api/canon/derive`, `/api/canon/atem`, `/api/canon/atem/pin`,
-`/api/canon/eml`, `/api/canon/compile`, `/api/canon/job/{id}` (+ cancel) — refusals, jobs to completion, the
+`/api/canon/emf`, `/api/canon/compile`, `/api/canon/job/{id}` (+ cancel) — refusals, jobs to completion, the
 `canon` SSE event, catalogs regenerated after writes, and the generation-lock rule.
 
 TestClient over `create_app(..., supervise=False)` with a dead llm_url (port 9), so `llm.reachable` reports no
@@ -11,6 +11,7 @@ monkeypatched). The store and every other seam point inside tmp_path (conftest);
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import threading
 import time
@@ -48,8 +49,8 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr(models, "LIVE_STATE", live)
     proj = tmp_path / "project"
     proj.mkdir()
-    shutil.copyfile(FIX / "eml" / "notes.md", proj / "notes.md")
-    shutil.copyfile(FIX / "eml" / "standalone.cosm", proj / "rain.cosm")
+    shutil.copyfile(FIX / "emf" / "notes.md", proj / "notes.md")
+    shutil.copyfile(FIX / "emf" / "standalone.cosm", proj / "rain.cosm")
     shutil.copytree(FIX / "holotypes" / "meadow", proj / "meadow")
     (proj / "meadow" / "NOTES.md").write_text("A text inside a Holotype.\n", encoding="utf-8")
     (proj / "hello.md").write_text(HELLO, encoding="utf-8")
@@ -108,7 +109,7 @@ class _Calls(list):
 
 @pytest.fixture
 def model(monkeypatch: pytest.MonkeyPatch) -> list:
-    """A model that answers: reachable, and `llm.complete` returning canned EML (one claim with a bad stance the
+    """A model that answers: reachable, and `llm.complete` returning canned EMF (one claim with a bad stance the
     repair turn fixes) and the atem."""
     calls = _Calls()
 
@@ -169,12 +170,12 @@ SNAPSHOT_KEYS = {"id", "kind", "path", "state", "phase", "chunk", "chunks", "mes
 # derive: rules mode end to end
 # ---------------------------------------------------------------------------
 
-def test_derive_eml_in_rules_mode_writes_a_clean_twin(client: TestClient, project: Path, sse_events):
+def test_derive_emf_in_rules_mode_writes_a_clean_twin(client: TestClient, project: Path, sse_events):
     before = (project / canon.PROJECT_CATALOG).read_text(encoding="utf-8")
     assert "notes.md.cosm" not in before
-    job = start(client, "/api/canon/derive", {"path": "notes.md", "what": "eml"})
+    job = start(client, "/api/canon/derive", {"path": "notes.md", "what": "emf"})
     assert set(job) == SNAPSHOT_KEYS
-    assert job["kind"] == "eml" and job["mode"] == "rules" and job["path"] == "notes.md"
+    assert job["kind"] == "emf" and job["mode"] == "rules" and job["path"] == "notes.md"
     assert job["state"] in ("queued", "running") and "no model is answering" in job["message"]
     snap = wait_job(client, job["id"])
     assert snap["state"] == "done", snap
@@ -185,18 +186,18 @@ def test_derive_eml_in_rules_mode_writes_a_clean_twin(client: TestClient, projec
     twin = project / "notes.md.cosm"
     assert lint_errors(twin) == []
     doc = macrocosm.yaml_load(twin.read_text(encoding="utf-8"))
-    assert doc["derived"]["mode"] == "rules" and doc["id"] == "eml/notes-md"
+    assert doc["derived"]["mode"] == "rules" and doc["id"] == "emf/notes-md"
     # the project catalog now lists the twin behind its text
     cat = macrocosm.yaml_load((project / canon.PROJECT_CATALOG).read_text(encoding="utf-8"))
     item = next(n for n in cat["nodes"] if n.get("path") == "notes.md")
-    assert item["eml"] == {"path": "notes.md.cosm"} and item["atem"]["line"].startswith("Mara Okafor")
+    assert item["emf"] == {"path": "notes.md.cosm"} and item["atem"]["line"].startswith("Mara Okafor")
     # the reader's route and the cosm viewer's route both read it
-    eml = client.get("/api/canon/eml", params={"path": "notes.md"}).json()
-    assert eml["twin_path"] == "notes.md.cosm" and eml["state"] == "fresh"
-    assert eml["cosm"]["minicosm"] == "eml" and eml["cosm"]["report"]["errors"] == []
-    assert client.get("/api/canon/eml", params={"path": "notes.md.cosm"}).json()["twin_path"] == "notes.md.cosm"
+    emf = client.get("/api/canon/emf", params={"path": "notes.md"}).json()
+    assert emf["twin_path"] == "notes.md.cosm" and emf["state"] == "fresh"
+    assert emf["cosm"]["minicosm"] == "emf" and emf["cosm"]["report"]["errors"] == []
+    assert client.get("/api/canon/emf", params={"path": "notes.md.cosm"}).json()["twin_path"] == "notes.md.cosm"
     viewer = client.get("/api/cosm", params={"path": "notes.md.cosm"})
-    assert viewer.status_code == 200 and viewer.json()["minicosm"] == "eml"
+    assert viewer.status_code == 200 and viewer.json()["minicosm"] == "emf"
     # the SSE `canon` event carries the snapshot, ending done
     deadline = time.time() + 5
     while time.time() < deadline and not any(e == "canon" and d["state"] == "done" for e, d in sse_events):
@@ -210,7 +211,7 @@ def test_derive_eml_in_rules_mode_writes_a_clean_twin(client: TestClient, projec
 
 def test_fresh_twin_refuses_without_force(client: TestClient):
     wait_job(client, start(client, "/api/canon/derive", {"path": "notes.md"})["id"])
-    r = client.post("/api/canon/derive", json={"path": "notes.md", "what": "eml"})
+    r = client.post("/api/canon/derive", json={"path": "notes.md", "what": "emf"})
     assert r.status_code == 409 and "already fresh" in r.json()["detail"]
     snap = wait_job(client, start(client, "/api/canon/derive", {"path": "notes.md", "force": True})["id"])
     assert snap["state"] == "done"
@@ -225,14 +226,14 @@ def test_twin_state_agrees_with_the_listing(client: TestClient, project: Path):
         proj = find(tree["project"], "notes.md")
         lib = next(v for v in tree["cacheboxes"] if v["name"] == "lib")
         guide = find(lib["tree"], "guide.md")
-        return proj["eml"]["state"], guide["eml"]["state"]
+        return proj["emf"]["state"], guide["emf"]["state"]
 
     assert listed() == ("fresh", "fresh")
     assert CD.twin_state(project / "notes.md") == "fresh"
     with (project / "notes.md").open("a", encoding="utf-8") as fh:
         fh.write("\nAn afterthought.\n")
     assert listed()[0] == "stale" == CD.twin_state(project / "notes.md")
-    assert client.get("/api/canon/eml", params={"path": "notes.md"}).json()["state"] == "stale"
+    assert client.get("/api/canon/emf", params={"path": "notes.md"}).json()["state"] == "stale"
     # a stale twin is no longer "already fresh"
     assert client.post("/api/canon/derive", json={"path": "notes.md"}).status_code == 200
 
@@ -246,12 +247,12 @@ def test_derive_in_a_canon_volume_regenerates_its_catalog(client: TestClient):
     assert snap["result"]["twin_path"] == "canon:lib/guide.md.cosm"
     twin = vol / "guide.md.cosm"
     assert lint_errors(twin) == []
-    assert macrocosm.yaml_load(twin.read_text(encoding="utf-8"))["id"] == "eml/guide-md"
+    assert macrocosm.yaml_load(twin.read_text(encoding="utf-8"))["id"] == "emf/guide-md"
     cat = macrocosm.yaml_load((vol / "canon.cosm").read_text(encoding="utf-8"))
     item = next(n for n in cat["nodes"] if n.get("path") == "guide.md")
-    assert item["eml"]["path"] == "guide.md.cosm" and item["eml"]["state"] == "fresh"
-    eml = client.get("/api/canon/eml", params={"path": "cacheawl:lib/guide.md"}).json()
-    assert eml["twin_path"] == "cacheawl:lib/guide.md.cosm"
+    assert item["emf"]["path"] == "guide.md.cosm" and item["emf"]["state"] == "fresh"
+    emf = client.get("/api/canon/emf", params={"path": "cacheawl:lib/guide.md"}).json()
+    assert emf["twin_path"] == "cacheawl:lib/guide.md.cosm"
 
 
 def test_derive_reads_a_converted_original_through_its_markdown(client: TestClient, project: Path):
@@ -259,7 +260,7 @@ def test_derive_reads_a_converted_original_through_its_markdown(client: TestClie
     assert snap["state"] == "done", snap
     assert snap["result"]["text_path"] == "memo.pdf.md" and snap["result"]["twin_path"] == "memo.pdf.md.cosm"
     assert (project / "memo.pdf.md.cosm").is_file() and not (project / "memo.pdf.cosm").exists()
-    assert client.get("/api/canon/eml", params={"path": "memo.pdf"}).json()["twin_path"] == "memo.pdf.md.cosm"
+    assert client.get("/api/canon/emf", params={"path": "memo.pdf"}).json()["twin_path"] == "memo.pdf.md.cosm"
 
 
 @pytest.mark.parametrize("path,status,words", [
@@ -276,20 +277,20 @@ def test_derive_reads_a_converted_original_through_its_markdown(client: TestClie
     ("report.pdf", 400, "convert it first"),
     ("data.csv", 400, "markdown and plain text"),
     ("empty.md", 400, "empty"),
-    ("other.md", 409, "not an EML twin"),
+    ("other.md", 409, "not an EMF twin"),
     ("../outside.md", 400, "invalid path"),
     ("", 400, "missing path"),
 ])
 def test_derive_refusals(client: TestClient, project: Path, path: str, status: int, words: str):
-    r = client.post("/api/canon/derive", json={"path": path, "what": "eml"})
+    r = client.post("/api/canon/derive", json={"path": path, "what": "emf"})
     assert r.status_code == status, (path, r.text)
     assert words in r.json()["detail"], (path, r.json())
-    assert not (project / "other.md.cosm").read_text(encoding="utf-8").startswith("oes: eml/1")
+    assert not (project / "other.md.cosm").read_text(encoding="utf-8").startswith("oes: emf/1")
 
 
 def test_derive_refuses_an_unknown_what(client: TestClient):
     r = client.post("/api/canon/derive", json={"path": "notes.md", "what": "summary"})
-    assert r.status_code == 400 and "eml or atem" in r.json()["detail"]
+    assert r.status_code == 400 and "emf or atem" in r.json()["detail"]
 
 
 # ---------------------------------------------------------------------------
@@ -384,33 +385,94 @@ def test_pin_creates_then_appends(client: TestClient, project: Path, sse_events)
 # compile
 # ---------------------------------------------------------------------------
 
-def test_compile_writes_a_datestamped_file_and_touches_nothing_else(client: TestClient, project: Path):
-    shutil.copyfile(FIX / "eml" / "notes.md.cosm", project / "notes.md.cosm")
-    src, eml = project / "notes.md", project / "notes.md.cosm"
-    before = {p: (p.read_bytes(), p.stat().st_mtime_ns) for p in (src, eml)}
-    snap = wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.cosm"})["id"])
+def test_compile_writes_a_short_and_records_it_in_the_twin(client: TestClient, project: Path):
+    shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "notes.md.cosm")
+    src, emf = project / "notes.md", project / "notes.md.cosm"
+    text_before = (src.read_bytes(), src.stat().st_mtime_ns)
+    twin_before = emf.read_text(encoding="utf-8")
+    job = start(client, "/api/canon/compile", {"path": "notes.md.cosm"})
+    snap = wait_job(client, job["id"])
     assert snap["state"] == "done" and snap["kind"] == "compile", snap
-    written = snap["result"]["written"]
-    assert written.startswith("notes-from-eml-") and written.endswith(".md")
+    res = snap["result"]
+    written = res["written"]
+    assert re.fullmatch(r"notes\.short-\d{4}-\d{2}-\d{2}-\d{4}\.md", written), written
+    assert res["order"] == "told", "a twin whose text is there tells in the author's order by default"
+    assert res["mode"] == "rules" and res["recorded"] is True and res["emf_path"] == "notes.md.cosm"
     out = project / written
     md = out.read_text(encoding="utf-8")
     assert md.startswith("# The Hollins Lane orchard, autumn notes") and "It is assumed that" in md
-    assert {p: (p.read_bytes(), p.stat().st_mtime_ns) for p in (src, eml)} == before
-    # twice in the same minute: a second file, never an overwrite
-    again = wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.cosm"})["id"])
+    assert "## What it claims" not in md
+    assert md.splitlines()[-1].startswith("*a short of notes.md, told as the author told it, compiled from its EMF "
+                                          "twin on ") and md.splitlines()[-1].endswith(" by rules, without a model*")
+    assert (src.read_bytes(), src.stat().st_mtime_ns) == text_before, "the text is never touched"
+    # the twin gained exactly its shorts: list, and is still fresh and clean
+    twin_after = emf.read_text(encoding="utf-8")
+    doc = macrocosm.yaml_load(twin_after)
+    assert [(x["path"], x["by"], x["mode"], x["order"]) for x in doc["shorts"]] == [(written, "rules", "rules", "told")]
+    block = twin_after[twin_after.index("shorts:\n"):twin_after.index("\nnodes:") + 1]
+    assert block.count("\n") == 2 and twin_after.replace(block, "", 1) == twin_before, "byte-stable but for the list"
+    assert CD.twin_state(src) == "fresh" and lint_errors(emf) == []
+    # twice in the same minute, by weight: a second file, never an overwrite, and a second record
+    again = wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.cosm", "order": "weight"})["id"])
     assert again["result"]["written"] != written and out.read_text(encoding="utf-8") == md
-    # a standalone EML compiles beside itself
+    assert again["result"]["order"] == "weight"
+    md2 = (project / again["result"]["written"]).read_text(encoding="utf-8")
+    assert "## What it claims" in md2 and md2.splitlines()[-1].startswith("*a short of notes.md, told by weight,")
+    assert [x["order"] for x in macrocosm.yaml_load(emf.read_text(encoding="utf-8"))["shorts"]] == ["told", "weight"]
+    # a standalone EMF compiles beside itself, by weight, and records its short too
     rain = wait_job(client, start(client, "/api/canon/compile", {"path": "rain.cosm"})["id"])
-    assert rain["result"]["written"].startswith("rain-from-eml-")
-    cat = (project / canon.PROJECT_CATALOG).read_text(encoding="utf-8")
-    assert written in cat, "the project catalog lists the new file"
+    assert re.fullmatch(r"rain\.short-\d{4}-\d{2}-\d{2}-\d{4}\.md", rain["result"]["written"])
+    assert rain["result"]["order"] == "weight"
+    assert macrocosm.yaml_load((project / "rain.cosm").read_text(encoding="utf-8"))["shorts"][0]["order"] == "weight"
+    # the project catalog lists the shorts as ordinary files, marked, and the text with its shorts
+    cat = macrocosm.yaml_load((project / canon.PROJECT_CATALOG).read_text(encoding="utf-8"))
+    items = {n["path"]: n for n in cat["nodes"]}
+    assert items[written]["short_of"] == "notes.md" and items[written]["type"] == "file"
+    assert items["notes.md"]["shorts"] == sorted([written, again["result"]["written"]])
+    assert items[rain["result"]["written"]]["short_of"] == "rain.cosm"
+    assert items["rain.cosm"]["shorts"] == [rain["result"]["written"]]
+    # the short is visible in the file tree, not hidden like a twin
+    tree = client.get("/api/files").text
+    assert f'data-path="{written}"' in tree
+
+
+def test_compile_with_the_text_gone_defaults_to_weight(client: TestClient, project: Path):
+    shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "orphan.cosm")     # names notes.md… beside it
+    (project / "elsewhere").mkdir()
+    shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "elsewhere" / "notes.md.cosm")
+    snap = wait_job(client, start(client, "/api/canon/compile", {"path": "elsewhere/notes.md.cosm"})["id"])
+    assert snap["state"] == "done" and snap["result"]["order"] == "weight", snap
+    assert snap["result"]["written"].startswith("elsewhere/notes.short-")
+    told = wait_job(client, start(client, "/api/canon/compile",
+                                  {"path": "elsewhere/notes.md.cosm", "order": "told"})["id"])
+    assert told["result"]["order"] == "told", "told can still be asked for: the spans place the items"
+
+
+def test_compile_order_validation(client: TestClient, project: Path):
+    shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "notes.md.cosm")
+    for bad in ("as it happened", "TOLDX", 3, ["told"]):
+        r = client.post("/api/canon/compile", json={"path": "notes.md.cosm", "order": bad})
+        assert r.status_code == 400 and "told or weight" in r.json()["detail"], (bad, r.text)
+    assert not list(project.glob("notes.short-*.md")), "a refused compile writes nothing"
+    ok = wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.cosm", "order": " Weight "})["id"])
+    assert ok["result"]["order"] == "weight"
+
+
+def test_compile_shares_the_texts_claim(client: TestClient, project: Path):
+    """A compile writes the twin (its shorts: list), so it holds the claim a decompile of the text holds."""
+    shutil.copyfile(FIX / "emf" / "notes.md.cosm", project / "notes.md.cosm")
+    jobs = client.app.state.canon_jobs
+    with jobs.holding(str(project.resolve() / "notes.md"), "notes.md"):
+        r = client.post("/api/canon/compile", json={"path": "notes.md.cosm"})
+        assert r.status_code == 409, r.text
+    assert wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.cosm"})["id"])["state"] == "done"
 
 
 @pytest.mark.parametrize("path,status,words", [
     ("nope.cosm", 404, "no such file"),
-    ("notes.md", 400, "not an EML"),
+    ("notes.md", 400, "not an EMF"),
     ("rness/canon.cosm", 400, "declares canon/1"),
-    ("meadow/holotype.cosm", 400, "not an EML"),
+    ("meadow/holotype.cosm", 400, "not an EMF"),
     ("", 400, "missing path"),
 ])
 def test_compile_refusals(client: TestClient, path: str, status: int, words: str):
@@ -438,16 +500,21 @@ def test_model_mode_job(client: TestClient, project: Path, model: list):
     assert snap["result"]["mode"] == "model" and snap["result"]["model"] == "fake-model"
     assert snap["result"]["dropped"] == 0 and snap["result"]["counts"]["P"] == 2
     assert [kind_of(m) for m in model] == ["passage", "repair", "atem"]
-    assert model.budgets == [CD.EML_MAX_TOKENS, CD.EML_MAX_TOKENS, None], "EML calls carry the output budget"
+    assert model.budgets == [CD.EMF_MAX_TOKENS, CD.EMF_MAX_TOKENS, None], "EMF calls carry the output budget"
     assert snap["result"]["continued"] == 0 and snap["result"]["normalized"] >= 0
     twin = project / "notes.md.cosm"
     assert lint_errors(twin) == []
     doc = macrocosm.yaml_load(twin.read_text(encoding="utf-8"))
     assert doc["derived"]["model"] == "fake-model" and doc["derived"]["mode"] == "model"
     assert doc["atem"]["push"] == "Ask the parish council to wait until September before mowing."
-    # compile, model mode: one completion, its prose written
+    # compile, model mode: one completion, its prose written, the footer naming the model and the order
     snap = wait_job(client, start(client, "/api/canon/compile", {"path": "notes.md.cosm"})["id"])
-    assert (project / snap["result"]["written"]).read_text(encoding="utf-8") == "# The orchard\n\nProse from the model.\n"
+    written = (project / snap["result"]["written"]).read_text(encoding="utf-8")
+    assert written.startswith("# The orchard\n\nProse from the model.\n\n---\n\n*a short of notes.md, told as the "
+                              "author told it, compiled from its EMF twin on ")
+    assert written.endswith(" by fake-model*\n") and snap["result"]["model"] == "fake-model"
+    assert macrocosm.yaml_load((project / "notes.md.cosm").read_text(encoding="utf-8"))["shorts"][0]["by"] == \
+        "fake-model"
     # an atem of a passage, model mode
     snap = wait_job(client, start(client, "/api/canon/atem", {"text": "A passage."})["id"])
     assert snap["result"]["mode"] == "model" and snap["result"]["stance_profile"] == {"axiom": 1, "hearsay": 1}
@@ -566,17 +633,30 @@ def test_home_mode_has_no_derivation_routes(project: Path):
     app = create_app(project, "http://127.0.0.1:9", supervise=False, home=True)
     with TestClient(app) as c:
         for method, path in (("post", "/api/canon/derive"), ("post", "/api/canon/atem"),
-                             ("post", "/api/canon/atem/pin"), ("get", "/api/canon/eml?path=notes.md"),
+                             ("post", "/api/canon/atem/pin"), ("get", "/api/canon/emf?path=notes.md"),
+                             ("get", "/api/canon/eml?path=notes.md"),
                              ("post", "/api/canon/compile"), ("get", "/api/canon/job/cn1")):
             r = getattr(c, method)(path, **({"json": {"path": "notes.md"}} if method == "post" else {}))
             assert r.status_code == 404, path
 
 
-def test_eml_route_404s_without_a_twin(client: TestClient):
-    r = client.get("/api/canon/eml", params={"path": "hello.md"})
-    assert r.status_code == 404 and "no EML twin" in r.json()["detail"]
-    assert client.get("/api/canon/eml", params={"path": "nope.md"}).status_code == 404
-    assert client.get("/api/canon/eml", params={"path": "other.md"}).status_code == 404
+def test_emf_route_404s_without_a_twin(client: TestClient):
+    r = client.get("/api/canon/emf", params={"path": "hello.md"})
+    assert r.status_code == 404 and "no EMF twin" in r.json()["detail"]
+    assert client.get("/api/canon/emf", params={"path": "nope.md"}).status_code == 404
+    assert client.get("/api/canon/emf", params={"path": "other.md"}).status_code == 404
+
+
+def test_the_names_before_emf_still_answer_for_one_release(client: TestClient, project: Path):
+    """Plan §16: `what: "eml"` is read as `emf`, and `GET /api/canon/eml` is `/api/canon/emf`, for one release."""
+    job = start(client, "/api/canon/derive", {"path": "notes.md", "what": "eml"})
+    assert job["kind"] == "emf"
+    assert wait_job(client, job["id"])["state"] == "done"
+    new = client.get("/api/canon/emf", params={"path": "notes.md"})
+    old = client.get("/api/canon/eml", params={"path": "notes.md"})
+    assert new.status_code == old.status_code == 200 and new.json() == old.json()
+    assert client.get("/api/canon/eml", params={"path": "hello.md"}).status_code == 404
+    assert macrocosm.sniff_declaration(project / "notes.md.cosm") == "emf/1"
 
 
 def test_pins_survive_a_full_derive(client: TestClient, project: Path):

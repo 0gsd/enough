@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/bad-duplicate-id
+oes: emf/1
+id: emf/bad-duplicate-id
 name: bad duplicate-id
 # duplicate-id: one id twice; the first is kept
 nodes:

@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/bad-closed-list
+oes: emf/1
+id: emf/bad-closed-list
 name: bad closed-list
 # closed-list: a stance outside the closed list
 nodes:

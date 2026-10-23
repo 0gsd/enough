@@ -1,4 +1,4 @@
-"""Background jobs for the derivation engine (0.4.3, plan §7.5): EML twins, atems, compiles, and pins.
+"""Background jobs for the derivation engine (0.4.3, plan §7.5): EMF twins, atems, compiles, and pins.
 
 Modelled on `convert.ConvertJobs`: a snapshot dict that is both the poll payload (`GET /api/canon/job/{id}`) and
 the SSE payload (event `canon`), one manager owned by `create_app()`, a per-path claim so a double-click can't
@@ -12,7 +12,7 @@ derivation never share the local model. While it waits for the lock its state is
 the model". A rules-mode job never takes the lock. Whether a job is model or rules is decided once, before it
 starts (`llm.reachable`), and never changes mid-job: if the model stops answering, the job fails with words.
 
-Snapshot: `{id, kind: eml|atem|compile|pin, path, state: queued|running|done|failed|cancelled, phase, chunk,
+Snapshot: `{id, kind: emf|atem|compile|pin, path, state: queued|running|done|failed|cancelled, phase, chunk,
 chunks, message, mode: model|rules, result, error, started_at, finished_at}`.
 """
 
@@ -30,7 +30,7 @@ from .canon_derive import DeriveCancelled
 log = logging.getLogger(__name__)
 
 EVENT = "canon"
-KINDS = ("eml", "atem", "compile", "pin")
+KINDS = ("emf", "atem", "compile", "pin")
 ACTIVE = ("queued", "running")
 # Finished jobs kept for polling; the oldest go first past this many.
 KEEP_FINISHED = 200

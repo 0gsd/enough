@@ -33,8 +33,8 @@ from collections.abc import Callable
 from .driver import Driver, StepError
 from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       COSM_READY, COSMSPEC_READY, COUNCIL_PAL_STATEMENT,
-                      DICT_PLAIN, DICT_READY, DOC, EML_PASSAGE, EML_TEXT,
-                      GIRRAPH, HOLOTYPE, JOURNAL_READY, LEDGER, WDL_READY)
+                      DICT_PLAIN, DICT_READY, DOC, EMF_PASSAGE, EMF_TEXT,
+                      GIRRAPH, HOLOTYPE, JOURNAL_READY, LEDGER, PRESS, WDL_READY)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -2518,7 +2518,7 @@ def _dblclick(d: Driver, sel: str) -> bool:
 def scenario_canon_open_catalog(d: Driver) -> list[str]:
     """Canon → a volume → its tiles say what they are (the catalog wears the
     cosm glyph and a "catalog" tag, a Holotype folder a "holotype" tag, a
-    text with an EML twin the twin chip) → double-click canon.cosm → the cosm
+    text with an EMF twin the twin chip) → double-click canon.cosm → the cosm
     viewer, on top of Canon, showing the volume's catalog."""
     fails: list[str] = []
     _reset(d)
@@ -2541,14 +2541,14 @@ def scenario_canon_open_catalog(d: Driver) -> list[str]:
                  " return {catTag: c && !!c.querySelector('.cn-tag'),"
                  " catIcon: c && (c.querySelector('.cn-tile-icon > img') || {}).src || '',"
                  " holoTag: h && !!h.querySelector('.cn-tag'),"
-                 " eml: t && !!t.querySelector('.cn-eml'),"
+                 " emf: t && !!t.querySelector('.cn-emf'),"
                  " noTwinTile: !q('" + CANON_VOLUME + "::notes.md.cosm')}; })()")
     if not tiles.get("catTag") or "cosm" not in tiles.get("catIcon", ""):
         fails.append(f"the catalog tile has no cosm glyph / catalog tag: {tiles}")
     if not tiles.get("holoTag"):
         fails.append(f"the Holotype folder has no holotype tag: {tiles}")
-    if not tiles.get("eml") or not tiles.get("noTwinTile"):
-        fails.append(f"the EML twin is not hidden behind its text with a chip: {tiles}")
+    if not tiles.get("emf") or not tiles.get("noTwinTile"):
+        fails.append(f"the EMF twin is not hidden behind its text with a chip: {tiles}")
     _dblclick(d, cat)
     try:
         d.wait_for("#cosm-mode.open")
@@ -2714,7 +2714,7 @@ def scenario_cosmspec_contents(d: Driver) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# Checkpoint B (0.4.3): the Canon chip, the EML face, atems
+# Checkpoint B (0.4.3): the Canon chip, the EMF face, atems
 # ---------------------------------------------------------------------------
 
 def _wait_js(d: Driver, cond: str, ms: int = 10000) -> bool:
@@ -2735,23 +2735,23 @@ def _select_text(d: Driver, root_sel: str, text: str) -> dict | None:
                 " return {x: b.left + Math.min(40, b.width / 2), y: b.top + b.height / 2}; } return null; })()")
 
 
-def _eml_items(d: Driver, path: str, letter: str) -> int:
-    """How many items module `letter` of `path`'s EML twin holds (0: no twin)."""
-    return int(d.js_await("(async () => { const r = await fetch('/api/canon/eml?path=' + encodeURIComponent("
+def _emf_items(d: Driver, path: str, letter: str) -> int:
+    """How many items module `letter` of `path`'s EMF twin holds (0: no twin)."""
+    return int(d.js_await("(async () => { const r = await fetch('/api/canon/emf?path=' + encodeURIComponent("
                           + json.dumps(path) + ")); if (!r.ok) return 0; const j = await r.json();"
                           " const m = (j.cosm.modules || []).find((x) => x.letter === " + json.dumps(letter)
                           + "); return m ? m.count : 0; })()") or 0)
 
 
 def scenario_twin_flip(d: Driver) -> list[str]:
-    """A text with an EML twin: the chip says so → "twin" turns the reader to
+    """A text with an EMF twin: the chip says so → "twin" turns the reader to
     the twin, in place of the text (the button reads as pressed) → the face
     follows the reader to the mini size and back → "back to the text" shows
     the text again. One read/edit instance throughout."""
     fails: list[str] = []
     _reset(d)
     resident = _names(d)
-    d.js(f"openReadEdit('{EML_TEXT}', {{size:'full', face:'read'}})")
+    d.js(f"openReadEdit('{EMF_TEXT}', {{size:'full', face:'read'}})")
     d.wait_for("#review-mode.open")
     d.js_await(CANON_CHIP_READY[1])
     chip = d.js("(() => { const c = document.getElementById('canon-chip-review');"
@@ -2759,17 +2759,17 @@ def scenario_twin_flip(d: Driver) -> list[str]:
                 " return {shown: !c.hidden, badge: b.className, icon: (b.querySelector('img') || {}).src || '',"
                 " title: c.querySelector('[data-cnc=\"twin\"]').title}; })()") or {}
     if not chip.get("shown") or "state-fresh" not in chip.get("badge", "") or "twin-on" not in chip.get("icon", ""):
-        fails.append(f"the Canon chip does not show a fresh EML twin: {chip}")
+        fails.append(f"the Canon chip does not show a fresh EMF twin: {chip}")
         _reset(d)
         return fails
     d.click('#canon-chip-review [data-cnc="twin"]')
-    if not _wait_js(d, "document.querySelector('#review-eml:not([hidden]) .cosm-card')"):
-        fails.append("\"twin\" did not turn the reader to the EML face")
+    if not _wait_js(d, "document.querySelector('#review-emf:not([hidden]) .cosm-card')"):
+        fails.append("\"twin\" did not turn the reader to the EMF face")
         _reset(d)
         return fails
     st = d.js("(() => ({text: getComputedStyle(document.getElementById('review-body')).display,"
-              " title: document.querySelector('#review-eml [data-ef=\"title\"]').textContent,"
-              " atem: !!document.querySelector('#review-eml .cosm-atem-line'),"
+              " title: document.querySelector('#review-emf [data-ef=\"title\"]').textContent,"
+              " atem: !!document.querySelector('#review-emf .cosm-atem-line'),"
               " pressed: document.querySelector('#canon-chip-review [data-cnc=\"twin\"]').getAttribute('aria-pressed'),"
               " top: modeTop() && modeTop().name}))()") or {}
     if st.get("text") != "none" or "notes.md" not in (st.get("title") or "") or not st.get("atem"):
@@ -2777,14 +2777,14 @@ def scenario_twin_flip(d: Driver) -> list[str]:
     if st.get("pressed") != "true":
         fails.append(f"the twin button does not read as pressed while the face is up: {st}")
     d.click("#review-mini-btn")
-    if not _wait_js(d, "document.querySelector('#preview.open #preview-eml:not([hidden]) .cosm-card')"):
+    if not _wait_js(d, "document.querySelector('#preview.open #preview-emf:not([hidden]) .cosm-card')"):
         fails.append("the face did not follow the reader to the mini size")
     d.click("#mini-full-btn")
-    if not _wait_js(d, "document.querySelector('#review-eml:not([hidden]) .cosm-card')"):
+    if not _wait_js(d, "document.querySelector('#review-emf:not([hidden]) .cosm-card')"):
         fails.append("the face did not come back with the reader at full size")
-    d.click('#review-eml [data-ef="back"]')
+    d.click('#review-emf [data-ef="back"]')
     _sleep(d, 150)
-    back = d.js("(() => ({face: !document.getElementById('review-eml').hidden,"
+    back = d.js("(() => ({face: !document.getElementById('review-emf').hidden,"
                 " text: getComputedStyle(document.getElementById('review-body')).display,"
                 " pressed: document.querySelector('#canon-chip-review [data-cnc=\"twin\"]').getAttribute('aria-pressed')}))()") or {}
     if back.get("face") or back.get("text") == "none" or back.get("pressed") != "false":
@@ -2803,12 +2803,12 @@ def scenario_atem_selection(d: Driver) -> list[str]:
     fails: list[str] = []
     _reset(d)
     resident = _names(d)
-    d.js(f"openReadEdit('{EML_TEXT}', {{size:'full', face:'read'}})")
+    d.js(f"openReadEdit('{EMF_TEXT}', {{size:'full', face:'read'}})")
     d.wait_for("#review-mode.open")
     d.wait_idle()
-    pos = _select_text(d, "#review-body", EML_PASSAGE)
+    pos = _select_text(d, "#review-body", EMF_PASSAGE)
     if not pos:
-        fails.append(f"could not select the passage in the read face: {EML_PASSAGE!r}")
+        fails.append(f"could not select the passage in the read face: {EMF_PASSAGE!r}")
         _reset(d)
         return fails
     for typ, buttons in (("mousePressed", 2), ("mouseReleased", 0)):
@@ -2856,11 +2856,11 @@ def scenario_atem_selection(d: Driver) -> list[str]:
 
 def scenario_atem_pin(d: Driver) -> list[str]:
     """A text → the atem of a passage → "pin to twin" → the button says
-    pinned, the chip repaints (the text now has an EML twin) and the twin
-    gains an X:atem item (GET /api/canon/eml)."""
+    pinned, the chip repaints (the text now has an EMF twin) and the twin
+    gains an X:atem item (GET /api/canon/emf)."""
     fails: list[str] = []
     _reset(d)
-    before = _eml_items(d, LEDGER, "X")
+    before = _emf_items(d, LEDGER, "X")
     d.js(f"openReadEdit('{LEDGER}', {{size:'full', face:'read'}})")
     d.wait_for("#review-mode.open")
     d.js_await(CANON_CHIP_READY[1])
@@ -2886,10 +2886,95 @@ def scenario_atem_pin(d: Driver) -> list[str]:
         st = d.js("CANON.doc && {state: CANON.doc.state, badge: document.querySelector("
                   "'#canon-chip-review [data-cnc=\"badge\"]').className}")
         fails.append(f"the chip did not repaint to show the twin the pin wrote: {st}")
-    after = _eml_items(d, LEDGER, "X")
+    after = _emf_items(d, LEDGER, "X")
     if after != before + 1:
         fails.append(f"the twin's X:atem items went {before} → {after}, expected one more")
     d.js("atemCardClose()")
+    _reset(d)
+    return fails
+
+
+def _short_count(d: Driver, text: str) -> int:
+    """How many shorts the text's EMF twin records (its catalog's `shorts:` list)."""
+    return int(d.js_await("(async () => { const r = await fetch('/api/canon/emf?path=' + encodeURIComponent("
+                          + json.dumps(text) + ")); if (!r.ok) return -1; const j = await r.json();"
+                          " const s = (j.cosm.catalog || {}).shorts; return Array.isArray(s) ? s.length : 0; })()")
+               or 0)
+
+
+def scenario_compile_short(d: Driver) -> list[str]:
+    """SHORT (plan §15), rules mode: a text's EMF face → the caret opens the
+    tiny menu (two orders, "as the author told it" marked as the default) →
+    Esc closes only the menu → "compile a short" → the toast says "wrote
+    press.short-….md" and offers open → the file is there beside the text,
+    told in the author's order, ending with the footer line → the twin
+    records it → open shows the short in read/edit."""
+    fails: list[str] = []
+    _reset(d)
+    before = _short_count(d, PRESS)
+    d.js(f"openReadEdit('{PRESS}', {{size:'full', face:'read'}})")
+    d.wait_for("#review-mode.open")
+    d.js_await(CANON_CHIP_READY[1])
+    d.click('#canon-chip-review [data-cnc="twin"]')
+    if not _wait_js(d, "document.querySelector('#review-emf:not([hidden]) .cosm-card')"):
+        fails.append("\"twin\" did not turn the reader to the EMF face")
+        _reset(d)
+        return fails
+    d.click('#review-emf [data-ef="short-menu"]')
+    menu = d.js("(() => { const m = document.querySelector('#review-emf .emf-short-menu');"
+                " const items = Array.from(m.querySelectorAll('.emf-short-item'));"
+                " return {open: !m.hidden, n: items.length,"
+                " expanded: document.querySelector('#review-emf [data-ef=\"short-menu\"]').getAttribute('aria-expanded'),"
+                " marked: items.filter((b) => !b.querySelector('.emf-short-def').hidden).map((b) => b.dataset.ef),"
+                " focus: document.activeElement && document.activeElement.dataset.ef}; })()") or {}
+    if not menu.get("open") or menu.get("n") != 2 or menu.get("expanded") != "true":
+        fails.append(f"the caret did not open the two-order menu: {menu}")
+    if menu.get("marked") != ["short-told"]:
+        fails.append(f"a twin of a text that is there should mark \"as the author told it\" as the default: {menu}")
+    if menu.get("focus") != "short-told":
+        fails.append(f"the menu did not take the focus on its first item: {menu}")
+    d.key("Escape")
+    _sleep(d, 150)
+    esc = d.js("(() => ({menu: !document.querySelector('#review-emf .emf-short-menu').hidden,"
+               " face: !document.getElementById('review-emf').hidden,"
+               " reader: document.getElementById('review-mode').classList.contains('open')}))()") or {}
+    if esc.get("menu") or not esc.get("face") or not esc.get("reader"):
+        fails.append(f"Esc should close only the menu, leaving the face and the reader: {esc}")
+    d.click('#review-emf [data-ef="compile"]')
+    if not _wait_js(d, "Array.from(document.querySelectorAll('#convert-toasts .convert-toast.state-done .ct-msg'))"
+                       ".some((m) => /press\\.short-\\d{4}-\\d{2}-\\d{2}-\\d{4}(-\\d+)?\\.md/.test(m.textContent))"):
+        toasts = d.js("Array.from(document.querySelectorAll('#convert-toasts .convert-toast'))"
+                      ".map((t) => t.className + ': ' + t.textContent)")
+        fails.append(f"no toast said it wrote the short: {toasts}")
+        _reset(d)
+        return fails
+    toast = d.js("(() => { const t = Array.from(document.querySelectorAll('#convert-toasts .convert-toast.state-done'))"
+                 ".find((x) => /press\\.short-/.test(x.querySelector('.ct-msg').textContent));"
+                 " const name = (t.querySelector('.ct-msg').textContent.match(/press\\.short-[0-9-]+\\.md/) || [''])[0];"
+                 " return {name, buttons: Array.from(t.querySelectorAll('.ct-btn')).map((b) => b.textContent)}; })()") or {}
+    name = toast.get("name") or ""
+    if len(toast.get("buttons") or []) < 2:
+        fails.append(f"the toast offers no \"open\": {toast}")
+    short = "orchard/" + name
+    body = d.js_await("(async () => { const r = await fetch('/api/file/raw?path=' + encodeURIComponent("
+                      + json.dumps(short) + ")); return r.ok ? await r.text() : null; })()")
+    if not body:
+        fails.append(f"the short {short} is not there beside the text")
+    else:
+        last = body.rstrip("\n").splitlines()[-1]
+        if not (last.startswith("*a short of press.md, told as the author told it, compiled from its EMF twin on ")
+                and last.endswith(" by rules, without a model*")):
+            fails.append(f"the short does not end with the footer line: {last!r}")
+        if not body.startswith("# The Hollins Lane orchard") or "## What it claims" in body:
+            fails.append("the short is not told in the author's order")
+    after = _short_count(d, PRESS)
+    if after != before + 1:
+        fails.append(f"the twin's shorts: went {before} → {after}, expected one more")
+    d.js("(() => { const t = Array.from(document.querySelectorAll('#convert-toasts .convert-toast.state-done'))"
+         ".find((x) => /press\\.short-/.test(x.querySelector('.ct-msg').textContent));"
+         " if (t) t.querySelector('.ct-btn').click(); })()")
+    if not _wait_js(d, "typeof RE_PATH === 'string' && /press\\.short-/.test(RE_PATH)"):
+        fails.append("\"open\" did not show the short in read/edit")
     _reset(d)
     return fails
 
@@ -2951,8 +3036,10 @@ SCENARIOS: dict[str, Scenario] = {
     "canon-open-catalog": scenario_canon_open_catalog,
     "cosm-lens": scenario_cosm_lens,
     "cosmspec-contents": scenario_cosmspec_contents,
-    # --- 0.4.3 checkpoint B: EML twins and atems in the reader ---
+    # --- 0.4.3 checkpoint B: EMF twins and atems in the reader ---
     "twin-flip": scenario_twin_flip,
     "atem-selection": scenario_atem_selection,
     "atem-pin": scenario_atem_pin,
+    # --- 0.4.3 SHORT: a telling compiled from the twin ---
+    "compile-short": scenario_compile_short,
 }

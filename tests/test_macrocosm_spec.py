@@ -28,7 +28,7 @@ def _file_name(data: dict) -> str:
     MiniCOSM expects, so identify() sees it as a reader would."""
     if data.get("oes") == "canon/1":
         return "canon.cosm"
-    if data.get("oes") == "eml/1":
+    if data.get("oes") == "emf/1":
         source = (data.get("source") or {}).get("path") or "text.md"
         return f"{Path(str(source)).name}.cosm"
     return "brand.cosm"
@@ -53,3 +53,23 @@ def test_spec_example_loads_and_lints_clean(index, tmp_path):
     report = mc.lint(volume)
     assert report.ok, f"example {index + 1}: " + "; ".join(str(e) for e in report.errors)
     assert not report.warnings, f"example {index + 1}: " + "; ".join(str(w) for w in report.warnings)
+
+
+def test_spec_examples_use_only_declared_catalog_keys(tmp_path):
+    """Every key an example's catalog carries is one its manifest declares (no `catalog-key` note), and the EMF
+    example carries the `shorts:` list SHORT added (plan §15), so the manifest's declaration of it is tested."""
+    shorts = 0
+    for index, text in enumerate(_blocks()):
+        data = mc.yaml_load(text)
+        path = tmp_path / f"{index}" / _file_name(data)
+        path.parent.mkdir()
+        path.write_text(text, encoding="utf-8")
+        report = mc.lint(mc.load_volume(path))
+        notes = [str(p) for p in report.notes if p.check == "catalog-key"]
+        assert not notes, f"example {index + 1}: " + "; ".join(notes)
+        if data.get("oes") == "emf/1" and isinstance(data.get("shorts"), list):
+            shorts += 1
+            for entry in data["shorts"]:
+                assert set(entry) == {"path", "at", "by", "mode", "order"}, entry
+                assert entry["order"] in ("told", "weight") and entry["mode"] in ("model", "rules")
+    assert shorts >= 1, "no example shows an EMF's shorts: list"

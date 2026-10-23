@@ -39,7 +39,7 @@ The MacroCOSM OES specification (`docs/MACROCOSM_OES.md`) and the MiniCOSM
 manifests under `defaults/cosm/` describe the `.cosm` family of formats that
 enough opens, checks and draws. Copyright © 2026 Graham Smith; see
 [defaults/cosm/NOTICE.md](defaults/cosm/NOTICE.md) for the terms, which also
-cover the names MacroCOSM, MiniCOSM, MicroCOSM, Canon, EML and atem. The
+cover the names MacroCOSM, MiniCOSM, MicroCOSM, Canon, EMF and atem. The
 reader, `enough/macrocosm.py`, is ordinary enough code under Apache 2.0.
 
 ---

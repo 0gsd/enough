@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/bad-load
+oes: emf/1
+id: emf/bad-load
 name: bad load
 # load: an anchor and an alias, which the COSM subset forbids (the file still loads)
 nodes:

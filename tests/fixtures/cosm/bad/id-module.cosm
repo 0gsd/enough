@@ -1,7 +1,7 @@
-oes: eml/1
-id: eml/bad-id-module
+oes: emf/1
+id: emf/bad-id-module
 name: bad id-module
-# id-module: an id naming a module EML does not declare
+# id-module: an id naming a module EMF does not declare
 nodes:
   - id: Z:concept/x
     type: concept

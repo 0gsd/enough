@@ -54,6 +54,7 @@ from . import models as _models
 from . import paginate as _paginate
 from . import intro as _intro
 from . import pal_tools as _pal
+from . import preflight as _preflight
 from .logger import ExchangeLog, log_exchange
 from . import prompt as prompt_mod
 from .prompt import (
@@ -294,6 +295,9 @@ class Session:
     # between "the user asked for one outside opinion" and "the model may
     # send whatever it likes off this machine".
     pal_turn: bool = False
+    # The context-window preflight (0.4.3): does enough's default system
+    # prompt fit the live window? `preflight.Preflight`; None in home mode.
+    preflight: Any = None
 
     async def emit(self, event: str, data: Any) -> None:
         payload = {"event": event, "data": json.dumps(data)}
@@ -350,11 +354,11 @@ def _walk_tree(
         entries = sorted(abs_dir.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower()))
     except OSError:
         return []
-    # EML twins (`notes.md.cosm` beside `notes.md`, declaring `oes: eml/1`)
-    # hide behind their texts, which carry `eml: {path, state}` — the same
+    # EMF twins (`notes.md.cosm` beside `notes.md`, declaring `oes: emf/1`)
+    # hide behind their texts, which carry `emf: {path, state}` — the same
     # one-row-per-document rule as convert twins (canon-043 plan §6.3).
-    eml_twins = _canon.eml_twins(entries)
-    eml_hidden = {t.name for t in eml_twins.values()}
+    emf_twins = _canon.emf_twins(entries)
+    emf_hidden = {t.name for t in emf_twins.values()}
     out: list[dict[str, Any]] = []
     for p in entries:
         if p.name.startswith("."):
@@ -364,7 +368,7 @@ def _walk_tree(
         rel = "/".join(rel_parts + (p.name,))
         if rel in HIDDEN_TREE_PATHS:
             continue
-        if p.name in eml_hidden:
+        if p.name in emf_hidden:
             continue
         if wikisink_real and p.is_dir():
             try:
@@ -451,9 +455,9 @@ def _walk_tree(
                 node["catalog"] = True
             elif p.suffix == ".cosm":
                 node["cosm"] = True
-            twin = eml_twins.get(p.name)
+            twin = emf_twins.get(p.name)
             if twin is not None:
-                node["eml"] = _canon.eml_entry(
+                node["emf"] = _canon.emf_entry(
                     p, "/".join(rel_parts + (twin.name,)), twin=twin)
         out.append(node)
     return out
@@ -526,15 +530,15 @@ def _tree_to_html(nodes: list[dict[str, Any]]) -> str:
             conv_attr += (f' data-paginated="{man_attr}"'
                           f' data-pages="{n.get("pages", 0)}"')
         # Canon flags (0.4.3): the project catalog, any other .cosm, and a
-        # text's EML twin (hidden from the tree, named here with its state).
+        # text's EMF twin (hidden from the tree, named here with its state).
         if n.get("catalog"):
             conv_attr += ' data-catalog="1"'
         elif n.get("cosm"):
             conv_attr += ' data-cosm="1"'
-        if isinstance(n.get("eml"), dict):
-            eml_path = str(n["eml"].get("path", "")).replace('"', "&quot;")
-            conv_attr += (f' data-eml="{eml_path}"'
-                          f' data-eml-state="{n["eml"].get("state", "")}"')
+        if isinstance(n.get("emf"), dict):
+            emf_path = str(n["emf"].get("path", "")).replace('"', "&quot;")
+            conv_attr += (f' data-emf="{emf_path}"'
+                          f' data-emf-state="{n["emf"].get("state", "")}"')
 
         # `data-path` + `data-name` on the row's <li> are read by the
         # tree context menu (option-click) so the JS can identify the
@@ -1263,6 +1267,36 @@ async def _do_auto_reset(
         session._in_auto_reset = False
 
 
+async def _first_turn_overflow(session: Session, system_prompt: str,
+                               detail: str) -> str | None:
+    """The overflow advice for a first turn — or for any turn whose
+    instructions alone leave no room — else None (the caller keeps the
+    later-turn "things to try"). A first turn is one with no assistant
+    reply in the history yet: failed earlier attempts leave only user
+    messages behind. The numbers are exact when llama-server can tokenize
+    (one quick /tokenize), else ~chars/3.7; the window comes from the 400
+    itself, then the preflight, then the supervisor."""
+    first_turn = not any(m.get("role") == "assistant" for m in session.history)
+    cached = session.preflight.fields() if session.preflight is not None else {}
+    n_ctx = (_preflight.n_ctx_from_error(detail) or cached.get("n_ctx")
+             or _current_ctx_size(session))
+    tokens: int | None = None
+    if session.client is not None:
+        try:
+            tokens = await _preflight.count_tokens(
+                session.client, session.llm_url, system_prompt, timeout=5.0)
+        except Exception:  # noqa: BLE001 — fall back to the estimate
+            tokens = None
+    estimated = tokens is None
+    if tokens is None:
+        tokens = int(len(system_prompt or "") / 3.7)
+    alone = bool(n_ctx) and tokens + _preflight.RESERVE > int(n_ctx)
+    if not (first_turn or alone):
+        return None
+    return _preflight.first_turn_advice(tokens, int(n_ctx) if n_ctx else None,
+                                        estimated=estimated)
+
+
 async def _run_turn(
     session: Session,
     user_message: str,
@@ -1345,7 +1379,19 @@ async def _run_turn(
             looks_like_overflow = any(
                 k in low for k in ("context", "exceed", "n_ctx", "too many tokens", "token limit")
             )
+            kind = None
+            first = None
             if looks_like_overflow:
+                try:
+                    first = await _first_turn_overflow(session, system_prompt, e.detail)
+                except Exception:  # noqa: BLE001 — never lose the error itself
+                    log.exception("first-turn overflow advice failed")
+            if first is not None:
+                # A first turn, or instructions that alone leave no room:
+                # /reset and "disable skills" cannot help there (plan §8.4).
+                msg = f"context window full (llm {e.status}): {e.detail}\n{first}"
+                kind = "ctx_overflow"
+            elif looks_like_overflow:
                 msg = (
                     f"context window full (llm {e.status}): {e.detail}\n"
                     "things to try:\n"
@@ -1359,7 +1405,9 @@ async def _run_turn(
                 )
             else:
                 msg = f"llm {e.status}: {e.detail}"
-            await session.emit("error", {"message": msg})
+            # `kind` lets the page put the context notice (and its one-click
+            # fix) under a first-turn overflow; absent everywhere else.
+            await session.emit("error", {"message": msg, **({"kind": kind} if kind else {})})
             log.exception("llm error")
         except httpx.HTTPError as e:
             await session.emit("error", {"message": f"llm transport error: {e}"})
@@ -1513,6 +1561,18 @@ def create_app(
             return
         asyncio.run_coroutine_threadsafe(session.emit(event, data), loop)
     session.supervisor = supervisor  # so _run_turn can read current ctx for the usage gauge
+    # The context preflight (docs/ctx-16gb-plan.md §8.3): the default system
+    # prompt — built exactly as a chat turn builds it — against the live
+    # window, re-measured when the model turns ready (launch, adopt, switch),
+    # at project open and on each page load. Background only; never blocks.
+    preflight = None if home else _preflight.Preflight(
+        llm_url=llm_url,
+        build_prompt=lambda: assemble_system_prompt(session.project_dir),
+        supervisor=supervisor,
+    )
+    session.preflight = preflight
+    if supervisor is not None and preflight is not None:
+        supervisor.on_ready = lambda: preflight.schedule("ready")
     # Startup work the lifespan fires and doesn't await (the project catalog);
     # held here so the tasks aren't garbage-collected mid-run.
     _startup_tasks: set[asyncio.Task[Any]] = set()
@@ -1576,6 +1636,11 @@ def create_app(
                 await supervisor.bootstrap()
             except Exception:  # noqa: BLE001
                 log.exception("supervisor bootstrap failed")
+        elif preflight is not None:
+            # Not supervised: nothing will say "ready", so measure at open
+            # (a server that is not up yet just leaves the verdict unknown;
+            # the next page load asks again).
+            preflight.schedule("open")
         # The project's catalog, rness/canon.cosm (plan §6.7): reconciled once
         # at open, in a worker thread that startup doesn't wait for — it
         # writes only when the bytes would change.
@@ -1595,6 +1660,8 @@ def create_app(
             for task in list(_startup_tasks):
                 task.cancel()
             await asyncio.to_thread(_dictionary.cancel_build)
+            if preflight is not None:
+                await preflight.cancel()
             if supervisor is not None:
                 await supervisor.stop(only_if_owned=True)
             await session.client.aclose()
@@ -1623,6 +1690,10 @@ def create_app(
             "<!-- HISTORY -->",
             "" if home else _render_turn_from_history(session.history),
         )
+        # A page load is a project (re)open: re-measure the preflight, so a
+        # prompt that grew since (a skill switched on) is judged again.
+        if preflight is not None:
+            preflight.schedule("page")
         # State-aware empty-hint (drift notice, etc.). Empty-when-history-
         # exists semantics are still handled by the post-send htmx hook.
         html = html.replace(
@@ -3940,7 +4011,7 @@ def create_app(
     @app.get("/api/cosm")
     async def api_cosm(path: str = Query(...)) -> dict[str, Any]:
         """Any `.cosm` volume, structured for the cosm viewer: a Canon
-        catalog, a Holotype, an EML twin, a standalone COSM tree. A
+        catalog, a Holotype, an EMF twin, a standalone COSM tree. A
         declaration this reader can't read comes back with `refused` set and
         nothing loaded (200: the viewer shows the refusal)."""
         return await asyncio.to_thread(lambda: _cosm_payload(_cosm_volume(path), path))
@@ -4036,7 +4107,7 @@ def create_app(
         return PlainTextResponse(text, media_type="text/markdown; charset=utf-8")
 
     # ------------------------------------------------------------------
-    # Canon derivations (0.4.3, P3): EML twins, atems, compile. The engine is
+    # Canon derivations (0.4.3, P3): EMF twins, atems, compile. The engine is
     # canon_derive.py (pure functions); the job table and the generation-lock
     # rule are canon_jobs.py. Every route here runs only because a person
     # asked: nothing derives on its own. Progress and results stream on the
@@ -4081,7 +4152,7 @@ def create_app(
 
     def _canon_where(rel: str) -> tuple[str | None, str | None]:
         """`(volume, path in its volume)` for a store path, `(None, rel)` for a
-        project path — the catalog to regenerate, and the EML catalog id's
+        project path — the catalog to regenerate, and the EMF catalog id's
         path (P0 decision 16). A file at the store's root has no volume."""
         prefix = _store_prefix(rel)
         if not prefix:
@@ -4113,7 +4184,7 @@ def create_app(
         missing file (404), a folder, a Holotype or anything in one, a catalog
         or meta enough keeps, any `.cosm`, binaries, kinds that aren't
         markdown or plain text, an empty file, and a `X.cosm` beside the text
-        that is not an EML twin (409). A converted original is read through
+        that is not an EMF twin (409). A converted original is read through
         its markdown twin, or refused with "convert it first"."""
         try:
             return _canon_tools.text_target(project_dir, path)
@@ -4141,7 +4212,7 @@ def create_app(
     def _model_complete(messages: list[dict[str, str]], **kw: Any) -> tuple[str, dict[str, Any]]:
         """The engine's `complete`: `llm.complete` at the session's model
         (looked up at call time, so tests can stand in for it), with the
-        engine's own `max_tokens` when it gives one (EML passages: 4,096,
+        engine's own `max_tokens` when it gives one (EMF passages: 4,096,
         bounded by the model's window). A model that stops answering mid-job
         fails the job in words; the engine never falls back to rules halfway."""
         kw = {k: v for k, v in kw.items() if k == "max_tokens"}
@@ -4152,12 +4223,12 @@ def create_app(
         except Exception as e:  # noqa: BLE001
             raise RuntimeError(f"the model stopped answering ({e}); nothing was written, run it again") from e
 
-    def _eml_work(t: dict[str, Any], mode: str) -> Callable[[Any], dict[str, Any]]:
+    def _emf_work(t: dict[str, Any], mode: str) -> Callable[[Any], dict[str, Any]]:
         def work(ctx: Any) -> dict[str, Any]:
             text, stat = _canon_derive.read_source(t["target"])
             twin = t["twin"]
-            previous = twin.read_text(encoding="utf-8") if _canon.is_eml_twin(twin) else None
-            cosm, info = _canon_derive.derive_eml(
+            previous = twin.read_text(encoding="utf-8") if _canon.is_emf_twin(twin) else None
+            cosm, info = _canon_derive.derive_emf(
                 text, source_name=t["target"].name, source_stat=stat, rel_path=t["id_rel"],
                 complete=_model_complete if mode == "model" else None, by="person",
                 on_progress=ctx.progress, should_stop=ctx.should_stop, previous=previous)
@@ -4184,7 +4255,7 @@ def create_app(
             ctx.check()
             ctx.progress(phase="writing", message=f"writing the atem into {t['twin'].name}")
             twin = t["twin"]
-            existing = twin.read_text(encoding="utf-8") if _canon.is_eml_twin(twin) else None
+            existing = twin.read_text(encoding="utf-8") if _canon.is_emf_twin(twin) else None
             cosm = _canon_derive.set_file_atem(
                 existing, atem, source_name=t["target"].name, source_stat=stat, rel_path=t["id_rel"],
                 by="person", model=atem.get("model"), title=title)
@@ -4230,22 +4301,24 @@ def create_app(
 
     @app.post("/api/canon/derive")
     async def api_canon_derive(request: Request) -> dict[str, Any]:
-        """Derive a text's EML twin (`what: eml`) or its file atem (`what:
+        """Derive a text's EMF twin (`what: emf`) or its file atem (`what:
         atem`) as a background job: `{path, what, force?}` → `{job}`. 409 when
         the twin is already fresh (pass `force`), or a job for the file is
         queued or running. Model or rules is decided here, once."""
         body = await _json_body(request)
-        what = str(body.get("what") or "eml").strip().lower()
-        if what not in ("eml", "atem"):
-            raise HTTPException(400, "what must be eml or atem")
+        what = str(body.get("what") or "emf").strip().lower()
+        if what == "eml":                   # the value before EMF (plan §16), accepted one release
+            what = "emf"
+        if what not in ("emf", "atem"):
+            raise HTTPException(400, "what must be emf or atem")
         t = await asyncio.to_thread(_text_target, str(body.get("path") or ""))
         if not body.get("force") and await asyncio.to_thread(_twin_already_fresh, t, what):
             said = "its atem is" if what == "atem" else f"{t['twin'].name} is"
             raise HTTPException(409, f"already fresh: {said} up to date with {t['target'].name}; "
                                      "pass force to derive it again")
         mode, why = await _canon_mode()
-        work = _eml_work(t, mode) if what == "eml" else _file_atem_work(t, mode)
-        doing = (f"deriving the EML twin of {t['target'].name}" if what == "eml"
+        work = _emf_work(t, mode) if what == "emf" else _file_atem_work(t, mode)
+        doing = (f"deriving the EMF twin of {t['target'].name}" if what == "emf"
                  else f"writing the atem of {t['target'].name}")
         return _start_canon_job(kind=what, path=t["text_rel"], mode=mode, why=why, work=work,
                                 key=t["key"], doing=doing)
@@ -4308,7 +4381,7 @@ def create_app(
             with canon_jobs.holding(t["key"], t["text_rel"]):
                 text, stat = _canon_derive.read_source(t["target"])
                 twin = t["twin"]
-                existing = twin.read_text(encoding="utf-8") if _canon.is_eml_twin(twin) else None
+                existing = twin.read_text(encoding="utf-8") if _canon.is_emf_twin(twin) else None
                 item_id = _canon_derive.next_atem_id(existing)
                 cosm = _canon_derive.pin_atem(
                     existing, atem, span, source_name=t["target"].name, source_stat=stat,
@@ -4331,9 +4404,10 @@ def create_app(
                                  message=f"pinned {item_id} to {t['twin'].name}")
         return {"twin_path": t["twin_rel"], "item_id": item_id, "job": snap}
 
-    @app.get("/api/canon/eml")
-    async def api_canon_eml(path: str = Query(...)) -> dict[str, Any]:
-        """A text's EML twin for the reader and the viewer: `{twin_path,
+    @app.get("/api/canon/emf")
+    @app.get("/api/canon/eml")              # the path before EMF (plan §16), kept one release
+    async def api_canon_emf(path: str = Query(...)) -> dict[str, Any]:
+        """A text's EMF twin for the reader and the viewer: `{twin_path,
         state: fresh|stale, cosm: <the /api/cosm payload>}`; 404 when the text
         has none. Takes the text (or the twin itself; a converted original is
         read through its markdown twin)."""
@@ -4343,7 +4417,7 @@ def create_app(
             if not rel or rel in STORE_PREFIXES:
                 raise HTTPException(400, "missing path")
             target = _resolve_project_path(rel)
-            if target.name.endswith(".cosm") and _canon.is_eml_twin(target):
+            if target.name.endswith(".cosm") and _canon.is_emf_twin(target):
                 twin, text, twin_rel = target, target.parent / target.name[: -len(".cosm")], rel
             else:
                 if not target.exists():
@@ -4353,8 +4427,8 @@ def create_app(
                         and _convert.is_convertible(target) and _convert.twin_path(target).is_file()):
                     target, text_rel = _convert.twin_path(target), rel + ".md"
                 twin, text, twin_rel = _canon_derive.twin_path(target), target, text_rel + ".cosm"
-            if not _canon.is_eml_twin(twin):
-                raise HTTPException(404, f"{rel} has no EML twin yet")
+            if not _canon.is_emf_twin(twin):
+                raise HTTPException(404, f"{rel} has no EMF twin yet")
             vol = _macrocosm.load_volume(twin)
             return {"twin_path": twin_rel, "state": _canon_derive.twin_state(text),
                     "cosm": _cosm_payload(vol, twin_rel)}
@@ -4363,46 +4437,90 @@ def create_app(
 
     @app.post("/api/canon/compile")
     async def api_canon_compile(request: Request) -> dict[str, Any]:
-        """Compile an EML (`eml/1` file) back into markdown as a job: `{path}`
-        → `{job}`, result `{written}` — a new datestamped file beside the EML
-        (`<stem>-from-eml-YYYY-MM-DD-HHMM.md`); the EML and its text are never
-        touched."""
+        """Compile an EMF (`emf/1` file) into a SHORT as a job (plan §15):
+        `{path, order?}` → `{job}`, result `{written, emf_path, mode, order,
+        model, recorded}`. `order` is `told` (the author's order, by span) or
+        `weight` (by salience); absent, `told` when the EMF names a source
+        text that can be read, else `weight`. The short is a new file beside
+        the EMF, `<stem>.short-YYYY-MM-DD-HHMM.md` (`-2`, `-3`: never an
+        overwrite); the text is never touched, and the EMF only gains the
+        short in its `shorts:` list (`record_short`, byte-stable otherwise).
+        A twin's compile holds its text's claim, the one a decompile of that
+        text holds, so the two never write the twin at once."""
         body = await _json_body(request)
+        order = body.get("order")
+        if order is not None and not isinstance(order, str):
+            raise HTTPException(400, "order must be told or weight")
+        order = (order or "").strip().lower() or None
+        if order is not None and order not in _canon_derive.ORDERS:
+            raise HTTPException(400, f"order must be told or weight, not {order!r}")
         rel = _canon_rel(str(body.get("path") or ""))
         if not rel or rel in STORE_PREFIXES:
             raise HTTPException(400, "missing path")
         target = _resolve_project_path(rel)
 
-        def _vet() -> None:
+        def _vet() -> tuple[Path | None, str]:
             if not target.exists():
                 raise HTTPException(404, f"no such file: {rel}")
             if target.is_dir() or not target.name.endswith(".cosm"):
-                raise HTTPException(400, f"{target.name} is not an EML; compile reads an eml/1 .cosm file")
+                raise HTTPException(400, f"{target.name} is not an EMF; compile reads an emf/1 .cosm file")
             said = _macrocosm.sniff_declaration(target)
-            if said != _canon_derive.EML_OES:
-                raise HTTPException(400, f"{target.name} is not an EML (it declares {said or 'nothing'}); "
-                                         "compile reads eml/1")
+            if said != _canon_derive.EMF_OES:
+                raise HTTPException(400, f"{target.name} is not an EMF (it declares {said or 'nothing'}); "
+                                         "compile reads emf/1")
             vol = _macrocosm.load_volume(target)
             if vol.refused is not None:
                 raise HTTPException(400, str(vol.refused))
+            text = _canon_derive.source_path(target, vol)
+            readable = False
+            if text is not None:
+                try:
+                    _canon_derive.read_source(text)
+                    readable = True
+                except OSError:
+                    readable = False
+            return (text if readable else None), _canon_derive.default_order(vol, source_readable=readable)
 
-        await asyncio.to_thread(_vet)
+        text_path, default = await asyncio.to_thread(_vet)
+        order = order or default
         mode, why = await _canon_mode()
+        # The twin of a text shares the text's claim (canon_tools.text_target's
+        # key: the resolved text), so a decompile and a compile never write it
+        # at once; a standalone EMF is claimed by its own path.
+        key = (str(target.parent / target.name[: -len(".cosm")]) if _canon.is_emf_twin(target)
+               else str(target))
 
         def work(ctx: Any) -> dict[str, Any]:
             ctx.progress(phase="compiling", message=f"compiling {target.name}")
-            md = _canon_derive.compile_text(_macrocosm.load_volume(target),
-                                            complete=_model_complete if mode == "model" else None,
-                                            source_name=target.name)
+            now = dt.datetime.now(dt.timezone.utc)
+            source_text = None
+            if text_path is not None:
+                try:
+                    source_text, _stat = _canon_derive.read_source(text_path)
+                except OSError:
+                    source_text = None
+            md, info = _canon_derive.compile_short(
+                _macrocosm.load_volume(target), complete=_model_complete if mode == "model" else None,
+                source_name=target.name, order=order, source_text=source_text, now=now)
             ctx.check()
-            out = _canon_derive.compiled_path(target)
+            out = _canon_derive.short_path(target, now)
+            ctx.progress(phase="writing", message=f"writing {out.name}")
             _canon_derive.write_atomic(out, md)
+            recorded = True
+            try:
+                twin_text = target.read_bytes().decode("utf-8")       # bytes: CRLF kept as it is
+                _canon_derive.write_atomic(target, _canon_derive.record_short(
+                    twin_text, path=out.name, at=now, by=info["by"], mode=info["mode"], order=info["order"]))
+            except (OSError, UnicodeDecodeError, _canon_derive.DeriveError) as e:
+                recorded = False
+                log.warning("canon: wrote %s but could not record it in %s (%s)", out.name, target.name, e)
             _canon_catalog_after(rel)
-            return {"written": _rel_beside(rel, out.name), "eml_path": rel, "mode": mode,
+            return {"written": _rel_beside(rel, out.name), "emf_path": rel, "mode": info["mode"],
+                    "order": info["order"], "model": info["model"], "recorded": recorded,
                     "message": f"wrote {out.name}"}
 
         return _start_canon_job(kind="compile", path=rel, mode=mode, why=why, work=work,
-                                key=f"compile:{target}", doing=f"compiling {target.name}")
+                                key=key, doing=f"compiling {target.name}")
 
     @app.get("/api/canon/job/{job_id}")
     async def api_canon_job(job_id: str) -> dict[str, Any]:
@@ -4693,6 +4811,10 @@ def create_app(
     async def api_reset() -> HTMLResponse:
         session.history.clear()
         session.last_usage = {}
+        # The empty conversation is back, and its notice should judge the
+        # prompt as it is now.
+        if preflight is not None:
+            preflight.schedule("reset")
         # Echo a usage event so the gauge zeroes out without waiting for
         # the user to send their first post-reset turn.
         await session.emit("usage", {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0})
@@ -5085,16 +5207,31 @@ def create_app(
                 "cloud_model_id": cloud_status["model_id"],
                 "cloud_healthy": cloud_status["last_verified_ok"],
                 "cloud_last_error": cloud_status["last_error"],
+                # The context preflight does not measure the cloud.
+                **_preflight_fields(cloud=True),
             }
         if supervisor is None:
             # Non-supervised mode: best-effort probe of /health.
             try:
                 async with httpx.AsyncClient(timeout=2.0) as c:
                     r = await c.get(llm_url.rstrip("/") + "/health")
-                return {"mode": "external", "ready": r.status_code == 200, "cute": None, "ctx": None}
+                return {"mode": "external", "ready": r.status_code == 200, "cute": None, "ctx": None,
+                        **_preflight_fields()}
             except httpx.HTTPError:
-                return {"mode": "external", "ready": False, "cute": None, "ctx": None}
-        return supervisor.status()
+                return {"mode": "external", "ready": False, "cute": None, "ctx": None,
+                        **_preflight_fields()}
+        # The preflight fields (docs/ctx-16gb-plan.md §8.3) ride on every
+        # shape of this payload: prompt_tokens, n_ctx, reserve, fits,
+        # suggest_ctx, fix, fix_reason, preflight.
+        return {**supervisor.status(), **_preflight_fields()}
+
+    def _preflight_fields(*, cloud: bool = False) -> dict[str, Any]:
+        if preflight is None or cloud:
+            return {"prompt_tokens": None, "n_ctx": None,
+                    "reserve": _preflight.RESERVE, "fits": None,
+                    "suggest_ctx": None, "fix": None, "fix_reason": None,
+                    "preflight": "skipped" if cloud else "idle"}
+        return preflight.fields()
 
     @app.post("/api/model")
     async def api_model_switch(request: Request) -> dict[str, Any]:
@@ -5138,6 +5275,8 @@ def create_app(
             state = _models.load_state()
             state["current"] = "opro-api"
             _models.save_state(state)
+            if preflight is not None:
+                preflight.schedule("cloud")     # → skipped
             session.history.clear()
             session.last_usage = {}
             await session.emit("usage", {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0})
@@ -5160,11 +5299,19 @@ def create_app(
                 "llama-server isn't supervised by this enough process — "
                 "restart enough without --no-supervise to enable switching.",
             )
+        # The verdict belongs to the model being replaced; the new one is
+        # measured when it turns ready (supervisor.on_ready).
+        if preflight is not None:
+            preflight.invalidate()
         try:
             await supervisor.switch(str(cute), int(ctx) if ctx is not None else None)
         except RuntimeError as e:
+            if preflight is not None:
+                preflight.schedule("switch refused")   # the old model, if still up
             raise HTTPException(400, str(e)) from None
         except Exception as e:  # noqa: BLE001
+            if preflight is not None:
+                preflight.schedule("switch failed")
             raise HTTPException(500, f"switch failed: {e}") from None
         # Also clear in-memory conversation history — new model = fresh brain.
         session.history.clear()

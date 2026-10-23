@@ -193,10 +193,11 @@ def draft_disk_gb(model_entry: dict) -> float:
     return float((model_entry.get("mtp") or {}).get("draft_disk_gb_approx") or 0.0)
 
 
-def feasibility(model_entry: dict) -> dict:
+def feasibility(model_entry: dict, ctx: int | None = None) -> dict:
     """Can this machine run — and store — this model? Returns
 
-        {"verdict": "good" | "tight" | "no", "reasons": [<human strings>]}
+        {"verdict": "good" | "tight" | "no", "reasons": [<human strings>],
+         "ram": <the RAM axis' verdict>, "disk": <the disk axis' verdict>}
 
     RAM and disk are judged separately and the worse verdict wins.
     `reasons` is empty for "good" and otherwise says what falls short, in
@@ -204,7 +205,15 @@ def feasibility(model_entry: dict) -> dict:
     when the entry has one — the user pays for both.
 
     Thresholds: RAM good at min + 8 GB, tight at min. Disk good at
-    1.2x the download plus 10 GB, tight at the download plus 2 GB."""
+    1.2x the download plus 10 GB, tight at the download plus 2 GB.
+
+    `ctx` (the 16 GB context fix, 0.4.3) asks about one context window as
+    well: a window larger than the one the registry's own `ctx_defaults`
+    ship for this machine's RAM tier (`recommend_ctx`) is a RAM "no". The
+    tiers are the measured memory story (docs/ctx-16gb-plan.md §3), so a
+    window no tier at or below this machine ships is one this machine is
+    not promised. The preflight's one-click "larger window" fix reads the
+    `ram` axis of this, since disk is moot for a model already on disk."""
     ram = total_ram_gb()
     free = free_disk_gb()
     want_ram = int(model_entry.get("ram_gb_recommended_min") or 0)
@@ -223,6 +232,16 @@ def feasibility(model_entry: dict) -> dict:
         ram_verdict = "no"
         reasons.append(f"wants {want_ram} GB RAM, this machine has {ram}")
 
+    if ctx is not None and ram_verdict != "no":
+        shipped = recommend_ctx(model_entry, ram)
+        if int(ctx) > shipped:
+            ram_verdict = "no"
+            reasons.append(
+                f"a {int(ctx):,}-token window wants more memory than this "
+                f"machine's {ram} GB gives this model (enough ships "
+                f"{shipped:,} here)"
+            )
+
     if free >= size * DISK_SLACK_FACTOR + DISK_HEADROOM_GB:
         disk_verdict = "good"
     elif free >= size + DISK_MIN_SLACK_GB:
@@ -237,7 +256,8 @@ def feasibility(model_entry: dict) -> dict:
 
     rank = {"good": 0, "tight": 1, "no": 2}
     verdict = max(ram_verdict, disk_verdict, key=lambda v: rank[v])
-    return {"verdict": verdict, "reasons": reasons}
+    return {"verdict": verdict, "reasons": reasons,
+            "ram": ram_verdict, "disk": disk_verdict}
 
 
 # ---------------------------------------------------------------------------
@@ -484,6 +504,93 @@ def draft_flags(info: dict, binary: str | None = None) -> list[str]:
     if not spec_flags(info, binary):
         return []
     return ["--spec-draft-model", str(info["draft_path"])]
+
+
+# ---------------------------------------------------------------------------
+# Memory caps for small machines (the 16 GB context fix, 0.4.3)
+# ---------------------------------------------------------------------------
+#
+# Two llama-server defaults cost host RAM a 16-31 GB machine does not have
+# (docs/ctx-16gb-plan.md §3c): `--ctx-checkpoints` (32 per slot; one SWA
+# snapshot is 480 MiB on gemma-4 12B, and a 20k-token first turn makes 4) and
+# `--cache-ram` (8 GiB of other prompts' state). Under CAP_RAM_GB the launch
+# passes the two caps below — each only when THIS binary's `--help` lists it,
+# so an older llama.cpp that predates a flag still starts. Measured: -0.97 GiB
+# on G40-12's first turn. `llama_server.sh` applies the same rule in shell.
+
+CAP_RAM_GB = 32
+CAP_CTX_CHECKPOINTS = 2
+CAP_CACHE_RAM_MIB = 2048
+LAUNCH_CAPS: tuple[tuple[str, str], ...] = (
+    ("--ctx-checkpoints", str(CAP_CTX_CHECKPOINTS)),
+    ("--cache-ram", str(CAP_CACHE_RAM_MIB)),
+)
+
+# (binary path, st_mtime_ns, st_size) -> the long flags its --help lists.
+_HELP_FLAGS_CACHE: dict[tuple[str, int, int], frozenset[str]] = {}
+_LONG_FLAG_RE = re.compile(r"(?<![\w-])(--[a-z0-9][a-z0-9-]*)")
+
+
+def llama_server_flags(binary: str | None) -> frozenset[str]:
+    """Every long flag (`--ctx-checkpoints`, …) the binary's `--help` lists.
+
+    Probed once per binary path + mtime (+ size): a `brew upgrade` swaps the
+    file behind the same path and the next launch probes again, while a
+    model switch on the same build costs nothing. An empty set when the
+    binary is missing, will not run, or prints nothing parseable — which
+    the caller reads as "pass none of the optional flags", the safe side.
+    Failures are not cached, so a transient one is retried next launch."""
+    if not binary:
+        return frozenset()
+    try:
+        st = os.stat(binary)
+    except OSError:
+        return frozenset()
+    key = (str(binary), st.st_mtime_ns, st.st_size)
+    hit = _HELP_FLAGS_CACHE.get(key)
+    if hit is not None:
+        return hit
+    try:
+        out = subprocess.run(
+            [binary, "--help"],
+            capture_output=True, text=True, timeout=15,
+        )
+        text = (out.stdout or "") + "\n" + (out.stderr or "")
+    except Exception:  # noqa: BLE001 — a probe that fails passes no flags
+        return frozenset()
+    flags = frozenset(_LONG_FLAG_RE.findall(text))
+    if flags:
+        _HELP_FLAGS_CACHE[key] = flags
+    return flags
+
+
+def launch_caps(binary: str | None, ram_gb: int | None = None) -> tuple[list[str], str]:
+    """The memory-cap argv for a launch on this machine, plus one log line
+    saying which caps were applied or skipped and why.
+
+    `([], "...")` at CAP_RAM_GB or more (llama-server's own defaults are
+    fine there) and for every flag the binary's `--help` does not list."""
+    ram = total_ram_gb() if ram_gb is None else int(ram_gb)
+    if ram >= CAP_RAM_GB:
+        return [], (f"memory caps: none ({ram} GB RAM, caps apply below "
+                    f"{CAP_RAM_GB} GB)")
+    known = llama_server_flags(binary)
+    argv: list[str] = []
+    applied: list[str] = []
+    skipped: list[str] = []
+    for flag, value in LAUNCH_CAPS:
+        if flag in known:
+            argv += [flag, value]
+            applied.append(f"{flag} {value}")
+        else:
+            skipped.append(flag)
+    note = f"memory caps ({ram} GB RAM, under {CAP_RAM_GB} GB): "
+    note += ("applied " + " ".join(applied)) if applied else "none applied"
+    if skipped:
+        why = ("its --help could not be read" if not known
+               else "this llama-server's --help does not list it")
+        note += f"; skipped {', '.join(skipped)} ({why})"
+    return argv, note
 
 
 def recommend_ctx(model_entry: dict, ram_gb: int) -> int:

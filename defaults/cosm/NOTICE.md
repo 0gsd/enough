@@ -3,7 +3,7 @@
 Copyright © 2026 Graham Smith. All rights reserved.
 
 The MacroCOSM OES specification (`docs/MACROCOSM_OES.md`), the MiniCOSM manifests in this folder
-(`defaults/cosm/manifests/`), and the names MacroCOSM, MiniCOSM, MicroCOSM, Canon, EML and atem are **not**
+(`defaults/cosm/manifests/`), and the names MacroCOSM, MiniCOSM, MicroCOSM, Canon, EMF and atem are **not**
 covered by this repository's Apache License 2.0, nor by any other licence in this repository.
 
 They are bundled for use within enough only: enough reads the manifests to open, check and draw `.cosm` files,

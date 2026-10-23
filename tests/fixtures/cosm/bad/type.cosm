@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/bad-type
+oes: emf/1
+id: emf/bad-type
 name: bad type
 # type: a kind the module does not declare
 nodes:

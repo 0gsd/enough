@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/bad-identity-min
+oes: emf/1
+id: emf/bad-identity-min
 name: bad identity-min
 # identity-min: no summary
 nodes:

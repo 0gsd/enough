@@ -3,7 +3,7 @@
 MacroCOSM is the shared grammar every MiniCOSM is written in: a domain
 enumerated as a file system that is also a relational database, made to
 be rendered. A MiniCOSM (Comprise OES for companies, Canon for enough's
-library, EML for one text) is declared by a manifest (`manifest:
+library, EMF for one text) is declared by a manifest (`manifest:
 minicosm/0`). A volume is one database of a MiniCOSM: a folder, or a
 single catalog file, whose catalog's first key says which MiniCOSM it is
 written in (`oes: <minicosm>/<major>`). This module reads any volume of
@@ -63,7 +63,7 @@ MANIFEST_FORMAT = "minicosm/0"
 MANIFEST_GLOB = "*.manifest.cosm"
 DEFAULT_MANIFEST_DIR = Path(__file__).resolve().parents[1] / "defaults" / "cosm" / "manifests"
 # When two manifests could claim one catalog, the first in this order wins; any other MiniCOSM follows by name.
-REGISTRY_ORDER = ("comprise", "cosm", "canon", "eml")
+REGISTRY_ORDER = ("comprise", "cosm", "canon", "emf")
 # The keys `dump` puts first, looked for in this order: a catalog's declaration, a manifest's own format line.
 DECLARATION_KEYS = ("oes", "manifest", "cosm", "opi", "comprise")
 # Catalog keys any MiniCOSM accepts: kept and ignored (reserved for a version test on the grammar itself).
@@ -112,9 +112,9 @@ _SNIFF_RE = re.compile(r"^(oes|cosm|opi|comprise|manifest):[ \t]*['\"]?([^\s'\"#
 
 
 def sniff_declaration(path, *, lines: int = SNIFF_LINES) -> str | None:
-    """What a .cosm file declares, from its first lines alone and without YAML: `eml/1` for `oes: eml/1`;
+    """What a .cosm file declares, from its first lines alone and without YAML: `emf/1` for `oes: emf/1`;
     `cosm 0.3` (key and value) for a legacy key; None when none of its first `lines` lines declares anything or
-    the file cannot be read. For listings that must not parse every file (an EML twin hides behind its text)."""
+    the file cannot be read. For listings that must not parse every file (an EMF twin hides behind its text)."""
     try:
         with open(path, encoding="utf-8-sig", errors="replace") as fh:
             for _ in range(lines):
@@ -367,7 +367,7 @@ class Manifest:
     def refs(self, module: str | None, kind: str | None) -> list[str]:
         """The reference fields checked on an item of this kind: the envelope's, then the kind's own (dotted
         paths walk lists and mappings; `*` is every value of a mapping, and in such a wildcard field a value is a
-        reference only when it is written as an id: EML's `roles: {actor: E:person/ada, condition: "if it
+        reference only when it is written as an id: EMF's `roles: {actor: E:person/ada, condition: "if it
         rains"}`). Deduplicated, in that order."""
         out = _strs(self.envelope.get("references"))
         for r in _strs((self.kind(module, kind) or {}).get("refs")):
@@ -879,7 +879,7 @@ class Volume:
     @property
     def database(self) -> str:
         """The volume's name in a qualified URI: the catalog id without the literal prefix of the manifest's
-        `catalog.id` (holotype/, canon/, eml/), so a project catalog's is `~<slug>`."""
+        `catalog.id` (holotype/, canon/, emf/), so a project catalog's is `~<slug>`."""
         cid = self.id
         tmpl = self.manifest._block("catalog").get("id") if self.manifest else None
         prefix = tmpl.split("<", 1)[0] if isinstance(tmpl, str) and "<" in tmpl else ""
@@ -1056,7 +1056,7 @@ def _load_folder(vol: Volume, m: Manifest) -> None:
 
 def load_volume(path, registry: Registry | None = None) -> Volume:
     """Load a volume: a folder with a catalog at its root (a Holotype, a COSM tree, a Canon volume) or a single
-    catalog file (`canon.cosm`, an EML twin, any single-file volume; or a folder volume's catalog, which loads
+    catalog file (`canon.cosm`, an EMF twin, any single-file volume; or a folder volume's catalog, which loads
     its folder). Never raises on bad input: what does not load is in `problems`, a declaration this reader
     cannot read is `refused`."""
     reg = registry if registry is not None else default_registry()
@@ -1367,7 +1367,7 @@ def items_under(volume: Volume, path: Any) -> list[Item]:
 def qualified_uri(volume: Volume, item: Item | None = None) -> str:
     """`oes:<minicosm>/<database>/<path>` for an item, `oes:<minicosm>/<database>` for the volume; '' when the
     item has no path. The database is the catalog id without its prefix (Comprise: holotype/<x> -> x; Canon:
-    canon/<volume> -> <volume>, a project's ~<slug>; EML: eml/<x> -> x)."""
+    canon/<volume> -> <volume>, a project's ~<slug>; EMF: emf/<x> -> x)."""
     if volume.manifest is None:
         return ""
     base = f"oes:{volume.minicosm}/{volume.database}"

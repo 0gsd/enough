@@ -1,6 +1,6 @@
 """The derivation engine (0.4.3, P3): `enough/canon_derive.py` and `dictionary.lookup_many`.
 
-Rules mode against the hand-written fixture text (tests/fixtures/cosm/eml/notes.md) grounded in a tiny FEED built
+Rules mode against the hand-written fixture text (tests/fixtures/cosm/emf/notes.md) grounded in a tiny FEED built
 from `tests/test_dictionary.py`'s fixture lexicon plus a few orchard words; model mode through a fake `complete`
 (canned YAML, one deliberate lint error, garbage); atems, pins, the file atem, compile, the prompts. No model, no
 network; FEED is built into tmp_path (conftest moved `ENOUGH_DICT_ROOT` there).
@@ -20,7 +20,7 @@ from enough import canon, canon_derive as CD, canon_prompts as P, dictionary as 
 from tests.test_dictionary import SCHEMA, W, WORDS, sync_dictionary, write_lexicon
 
 REPO = Path(__file__).resolve().parent.parent
-FIX = REPO / "tests" / "fixtures" / "cosm" / "eml"
+FIX = REPO / "tests" / "fixtures" / "cosm" / "emf"
 NOW = dt.datetime(2026, 10, 22, 10, 30, tzinfo=dt.timezone.utc)
 
 # The orchard words FEED holds in these tests, beside the fixture lexicon's apple, run and the rest.
@@ -151,7 +151,7 @@ def test_term_count_scales_with_the_text():
     assert len(CD.candidate_terms(text_of(300), lookup=nolookup)) == 6
     assert len(CD.candidate_terms(text_of(1_000), lookup=nolookup)) == 20
     assert len(CD.candidate_terms(text_of(4_000), lookup=nolookup)) == 60
-    cosm, _ = CD.derive_eml(text_of(4_000), source_name="long.md", source_stat=None, lookup=nolookup)
+    cosm, _ = CD.derive_emf(text_of(4_000), source_name="long.md", source_stat=None, lookup=nolookup)
     assert sum(1 for n in nodes_of(cosm) if n["id"].startswith("L:")) == 60
 
 
@@ -182,7 +182,7 @@ def test_names_are_entities_not_terms(tmp_path):
         assert "treatise" in terms
     assert "boethius" not in CD.candidate_terms(text, lookup=fake_feed)     # sentence-initial only, not in FEED
     assert CD.entity_candidates(text) == ["Thomas Aquinas", "Averroes"]
-    cosm, _ = CD.derive_eml(text, source_name="scholars.md", source_stat=None, lookup=fake_feed)
+    cosm, _ = CD.derive_emf(text, source_name="scholars.md", source_stat=None, lookup=fake_feed)
     assert lint_errors(cosm, tmp_path) == []
     ids = {n["id"] for n in nodes_of(cosm)}
     assert {"E:thing/thomas-aquinas", "E:thing/averroes"} <= ids                # names still feed E items
@@ -232,14 +232,25 @@ def test_item_slug():
 # Rules mode
 # ---------------------------------------------------------------------------
 
-def test_rules_eml_lints_clean_and_is_grounded(feed, notes, tmp_path):
+def test_the_engine_names_before_emf_are_aliases_for_one_release():
+    """Plan §16: the EML names stay importable for one release, as the very same objects; the tool has none."""
+    from enough import canon_tools as CT, tools as T
+    assert CD.derive_eml is CD.derive_emf and CD.EML_OES == CD.EMF_OES == "emf/1"
+    assert CD.EML_MAX_TOKENS == CD.EMF_MAX_TOKENS and CT.EML_MODEL_MAX == CT.EMF_MODEL_MAX
+    for name in ("SYSTEM", "USER", "CONTINUE", "RESTART", "RETRY", "REPAIR"):
+        assert getattr(P, f"EML_{name}") is getattr(P, f"EMF_{name}"), name
+    assert "emf_derive" in CT.TOOL_NAMES and "eml_derive" not in CT.TOOL_NAMES
+    assert "emf_derive" in T._DISPATCH and "eml_derive" not in T._DISPATCH
+
+
+def test_rules_emf_lints_clean_and_is_grounded(feed, notes, tmp_path):
     text, stat = CD.read_source(notes)
-    cosm, info = CD.derive_eml(text, source_name="notes.md", source_stat=stat, now=NOW)
-    assert cosm.splitlines()[0] == "oes: eml/1"
+    cosm, info = CD.derive_emf(text, source_name="notes.md", source_stat=stat, now=NOW)
+    assert cosm.splitlines()[0] == "oes: emf/1"
     assert lint_errors(cosm, tmp_path) == []
     doc = macrocosm.yaml_load(cosm)
     assert list(doc)[:8] == ["oes", "macrocosm", "id", "name", "source", "derived", "atem", "nodes"]
-    assert doc["macrocosm"] == "0.0.1" and doc["id"] == "eml/notes-md"
+    assert doc["macrocosm"] == "0.0.1" and doc["id"] == "emf/notes-md"
     assert doc["name"] == "The Hollins Lane orchard, autumn notes"
     assert doc["source"] == {"path": "notes.md", **stat}
     assert doc["derived"] == {"at": NOW, "by": "person", "mode": "rules", "completeness": "full", "chunks": 1}
@@ -266,7 +277,7 @@ def test_rules_eml_lints_clean_and_is_grounded(feed, notes, tmp_path):
 def test_rules_spans_point_at_real_lines(notes):
     text, stat = CD.read_source(notes)
     lines = text.split("\n")
-    cosm, _ = CD.derive_eml(text, source_name="notes.md", source_stat=stat, lookup=lambda ws: {})
+    cosm, _ = CD.derive_emf(text, source_name="notes.md", source_stat=stat, lookup=lambda ws: {})
     for n in nodes_of(cosm):
         line = lines[int(n["span"]["lines"]) - 1]
         assert n["name"].lower() in line.lower(), (n["id"], line)
@@ -274,24 +285,24 @@ def test_rules_spans_point_at_real_lines(notes):
 
 def test_rules_ids_stable_across_runs(feed, notes):
     text, stat = CD.read_source(notes)
-    a, _ = CD.derive_eml(text, source_name="notes.md", source_stat=stat, now=NOW)
-    b, _ = CD.derive_eml(text, source_name="notes.md", source_stat=stat, now=NOW + dt.timedelta(hours=3))
+    a, _ = CD.derive_emf(text, source_name="notes.md", source_stat=stat, now=NOW)
+    b, _ = CD.derive_emf(text, source_name="notes.md", source_stat=stat, now=NOW + dt.timedelta(hours=3))
     assert [n["id"] for n in nodes_of(a)] == [n["id"] for n in nodes_of(b)]
     assert nodes_of(a) == nodes_of(b)
 
 
 def test_catalog_id_is_the_slugged_path_and_standalone_has_no_source(notes, tmp_path):
     text, _ = CD.read_source(notes)
-    cosm, _ = CD.derive_eml(text, source_name="close.md", source_stat=None, rel_path="guides/close.md",
+    cosm, _ = CD.derive_emf(text, source_name="close.md", source_stat=None, rel_path="guides/close.md",
                             lookup=lambda ws: {})
     doc = macrocosm.yaml_load(cosm)
-    assert doc["id"] == "eml/guides--close-md" and "source" not in doc
+    assert doc["id"] == "emf/guides--close-md" and "source" not in doc
     assert lint_errors(cosm, tmp_path) == []
 
 
 def test_twin_written_atomically_and_fresh_then_stale(notes, monkeypatch):
     text, stat = CD.read_source(notes)
-    cosm, _ = CD.derive_eml(text, source_name="notes.md", source_stat=stat, lookup=lambda ws: {})
+    cosm, _ = CD.derive_emf(text, source_name="notes.md", source_stat=stat, lookup=lambda ws: {})
     replaced = []
     real = os.replace
 
@@ -308,11 +319,11 @@ def test_twin_written_atomically_and_fresh_then_stale(notes, monkeypatch):
     assert len(replaced) == 1 and replaced[0][1] == "notes.md.cosm" and replaced[0][0].startswith(".notes.md.cosm.")
     assert sorted(p.name for p in notes.parent.iterdir()) == ["notes.md", "notes.md.cosm"], "no temp left over"
     assert CD.twin_state(notes) == "fresh"
-    assert canon.eml_state(notes, twin) == "fresh"                    # one rule: P2's
+    assert canon.emf_state(notes, twin) == "fresh"                    # one rule: P2's
     with notes.open("a", encoding="utf-8") as fh:
         fh.write("\nA line added later.\n")
     assert CD.twin_state(notes) == "stale"
-    # a .cosm beside the text that is not an EML is not its twin
+    # a .cosm beside the text that is not an EMF is not its twin
     twin.write_text("oes: canon/1\nid: canon/x\nname: x\nnodes: []\n", encoding="utf-8")
     assert CD.twin_state(notes) == "absent"
 
@@ -404,18 +415,36 @@ def test_set_file_atem_keeps_nodes_and_makes_minimal_twins(notes, tmp_path):
 # Compile
 # ---------------------------------------------------------------------------
 
-def test_compiled_path_naming_and_collisions(tmp_path):
+def test_short_path_naming_and_collisions(tmp_path):
     when = dt.datetime(2026, 10, 22, 14, 32)
-    p = CD.compiled_path(tmp_path / "notes.md.cosm", when)
-    assert p.name == "notes-from-eml-2026-10-22-1432.md"
+    p = CD.short_path(tmp_path / "notes.md.cosm", when)
+    assert p.name == "notes.short-2026-10-22-1432.md" and p.parent == tmp_path
     p.write_text("x")
-    assert CD.compiled_path(tmp_path / "notes.md.cosm", when).name == "notes-from-eml-2026-10-22-1432-2.md"
-    assert CD.compiled_path(tmp_path / "rain.cosm", when).name == "rain-from-eml-2026-10-22-1432.md"
+    second = CD.short_path(tmp_path / "notes.md.cosm", when)
+    assert second.name == "notes.short-2026-10-22-1432-2.md"
+    second.write_text("y")
+    assert CD.short_path(tmp_path / "notes.md.cosm", when).name == "notes.short-2026-10-22-1432-3.md"
+    assert CD.short_path(tmp_path / "rain.cosm", when).name == "rain.short-2026-10-22-1432.md"
+    assert CD.short_path(tmp_path / "memo.pdf.md.cosm", when).name == "memo.pdf.short-2026-10-22-1432.md"
+    # an aware time is written in local time, as convert's datestamped exports are
+    aware = dt.datetime(2026, 10, 22, 14, 32, tzinfo=dt.timezone.utc)
+    assert CD.short_path(tmp_path / "x.md.cosm", aware).name == \
+        f"x.short-{aware.astimezone().strftime('%Y-%m-%d-%H%M')}.md"
+    assert CD.compiled_path is CD.short_path, "the old name stays one release"
+    # every name short_path makes is one Canon's catalogs recognise as a short
+    for made in (p, second, CD.short_path(tmp_path / "rain.cosm", when)):
+        assert canon.SHORT_RE.match(made.name)
+    assert canon.SHORT_TEXT_SUFFIXES == CD.TEXT_SUFFIXES
+
+
+def _md_body(md: str) -> str:
+    return md.rsplit("\n---\n", 1)[0]
 
 
 def test_rules_compile_of_the_fixture(tmp_path):
     before = sorted(tmp_path.iterdir())
-    md = CD.compile_text(macrocosm.load_volume(FIX / "notes.md.cosm"), source_name="notes.md.cosm")
+    md = CD.compile_text(macrocosm.load_volume(FIX / "notes.md.cosm"), source_name="notes.md.cosm",
+                         order="weight", now=NOW)
     assert sorted(tmp_path.iterdir()) == before, "compile_text writes nothing"
     lines = md.splitlines()
     assert lines[0] == "# The Hollins Lane orchard, autumn notes"
@@ -426,25 +455,173 @@ def test_rules_compile_of_the_fixture(tmp_path):
     assert "(reported)" in md
     # claims in salience order: the critical ones before the low one
     assert md.index("140 litres of juice this year") < md.index("oldest tree on Hollins Lane")
-    # events in before/after order
+    # events in before/after order, a `when` the summary already says not said twice
     assert md.index("1. The orchard volunteers spread leaf mould") < md.index("2. The Hollins Lane orchard pressed")
+    assert "counted on 12 October." in md and "(12 October)" not in md
     assert "## Terms" in md and "- **leaf mould** (not in FEED):" in md
-    assert "by rules, without a model" in md
+    assert lines[-1] == ("*a short of notes.md, told by weight, compiled from its EMF twin on 2026-10-22 by rules, "
+                         "without a model*")
     assert CD.compile_text((FIX / "notes.md.cosm").read_text(encoding="utf-8")) .startswith("# The Hollins")
     with pytest.raises(CD.DeriveError):
         CD.compile_text("oes: canon/1\nnodes: []\n")
+    with pytest.raises(CD.DeriveError):
+        CD.compile_text(FIX / "notes.md.cosm", order="as it happened")
 
 
-def test_model_compile_uses_one_completion():
+def test_told_order_follows_the_spans(tmp_path):
+    twin = (FIX / "notes.md.cosm").read_text(encoding="utf-8")
+    md, info = CD.compile_short(twin, source_name="notes.md.cosm", order="told", now=NOW)
+    assert info == {"order": "told", "mode": "rules", "model": None, "by": "rules"}
+    body = _md_body(md)
+    assert body.splitlines()[2].startswith("The orchard's juice rose this year"), "the atem line leads here too"
+    # ascending span order: line 3 (the hearsay), 7-8 (the axiom), 10-11, 13-14, 14-15, 17-20, 18-19
+    said = ["the Bramley by the gate is the oldest tree", "It is taken as given that every apple tree",
+            "The author observed that the Hollins Lane orchard pressed 140 litres",
+            "Mara Okafor holds that the leaf mould", "It follows that a warm, wet spring",
+            "It follows that mowing the meadow strip in July", "It is assumed that the meadow strip exists"]
+    at = [body.index(s) for s in said]
+    assert at == sorted(at), "claims are told in the author's order, not by salience"
+    # the critical claim (lines 10-11) now comes after the low one (lines 3-5), unlike weight
+    assert body.index("oldest tree on Hollins Lane") < body.index("140 litres of juice this year")
+    # stances still in words; terms, entities, concepts and events told where the text has them
+    assert "(reported)" in body and "(an opinion)" in body
+    assert body.index("Mara Okafor has kept the Hollins Lane orchard since 2019.") < body.index("oldest tree")
+    assert body.index("**pollinate**:") < body.index("It is taken as given that every apple tree")
+    assert "- **leaf mould** (not in FEED): Fallen leaves" in body
+    assert body.index("The orchard volunteers spread leaf mould under the trees in March.") \
+        < body.index("Mara Okafor holds that the leaf mould")
+    assert "## What it claims" not in body and "## Terms" not in body and "## What happens" not in body
+    assert "X:atem" not in body and "mowing paragraph" not in body, "a pinned atem is not part of the telling"
+    assert md.splitlines()[-1] == ("*a short of notes.md, told as the author told it, compiled from its EMF twin on "
+                                   "2026-10-22 by rules, without a model*")
+    assert "Also in the fabula" not in body, "every item of the fixture has a span"
+
+
+def test_told_order_groups_under_the_texts_headings_and_ends_with_the_unplaced():
+    src = (FIX / "notes.md").read_text(encoding="utf-8").split("\n")
+    src[1], src[5], src[15] = "## The old tree", "## The yield", "### The mowing"     # same line numbers
+    src = "\n".join(src)
+    doc = macrocosm.yaml_load((FIX / "notes.md.cosm").read_text(encoding="utf-8"))
+    # one claim placed only by quotes, one with no span at all
+    by_id = {n["id"]: n for n in doc["nodes"]}
+    by_id["P:claim/strip-feeds-pollinators"]["span"] = {"start": "to feed the pollinators the orchard",
+                                                        "end": "depends on."}
+    del by_id["E:org/parish-council"]["span"]
+    md, info = CD.compile_short(doc, source_text=src, now=NOW)
+    assert info["order"] == "told", "a twin with a readable source tells in the author's order by default"
+    body = _md_body(md)
+    lines = body.splitlines()
+    assert lines[0] == "# The Hollins Lane orchard, autumn notes" and "# The Hollins" not in lines[1:]
+    assert lines.index("## The old tree") < lines.index("## The yield") < lines.index("### The mowing")
+    assert body.index("## The old tree") < body.index("oldest tree") < body.index("## The yield")
+    assert body.index("### The mowing") < body.index("It follows that mowing the meadow strip")
+    # the quoted span is placed on its line (18), under the mowing heading
+    assert body.index("### The mowing") < body.index("It is assumed that the meadow strip exists")
+    assert lines[-3:] == ["## Also in the fabula", "", "- The parish council, whose grounds team mows the meadow strip."]
+    # without the text: no headings, the quoted span cannot be placed
+    md2, _ = CD.compile_short(doc, order="told", now=NOW)
+    body2 = _md_body(md2)
+    assert "## The yield" not in body2
+    also = body2.split("## Also in the fabula", 1)[1]
+    assert "It is assumed that the meadow strip exists" in also and "The parish council" in also
+
+
+def test_default_order_rule():
+    twin = (FIX / "notes.md.cosm").read_text(encoding="utf-8")
+    rain = (FIX / "standalone.cosm").read_text(encoding="utf-8")
+    assert CD.default_order(twin) == "told"
+    assert CD.default_order(twin, source_readable=False) == "weight"
+    assert CD.default_order(rain) == "weight", "a standalone EMF has no telling to follow"
+    # compile_short with no order: told only when the text came with it (it could be read)
+    assert CD.compile_short(twin, source_text="x")[1]["order"] == "told"
+    assert CD.compile_short(twin)[1]["order"] == "weight"
+    md, info = CD.compile_short(rain, source_name="rain.cosm", now=NOW)
+    assert info["order"] == "weight"
+    assert md.splitlines()[-1] == ("*a short of rain.cosm, a standalone EMF, told by weight, compiled on 2026-10-22 "
+                                   "by rules, without a model*")
+
+
+def test_source_path(tmp_path):
+    shutil.copyfile(FIX / "notes.md.cosm", tmp_path / "notes.md.cosm")
+    shutil.copyfile(FIX / "standalone.cosm", tmp_path / "rain.cosm")
+    assert CD.source_path(tmp_path / "notes.md.cosm") is None, "its text is not there yet"
+    shutil.copyfile(FIX / "notes.md", tmp_path / "notes.md")
+    assert CD.source_path(tmp_path / "notes.md.cosm") == tmp_path / "notes.md"
+    assert CD.source_path(tmp_path / "rain.cosm") is None
+
+
+def test_model_compile_uses_one_completion_and_says_the_order():
     seen = []
 
     def fake(messages):
         seen.append(messages)
-        return "```markdown\n# The orchard\n\nProse.\n```", {"model": "fake"}
+        return "```markdown\n# The orchard\n\nProse.\n```", {"model": "g40-04"}
 
-    out = CD.compile_text((FIX / "notes.md.cosm").read_text(encoding="utf-8"), complete=fake)
-    assert out == "# The orchard\n\nProse.\n" and len(seen) == 1
-    assert seen[0][0]["content"] == P.COMPILE_SYSTEM and "It is assumed that" in seen[0][1]["content"]
+    twin = (FIX / "notes.md.cosm").read_text(encoding="utf-8")
+    out = CD.compile_text(twin, complete=fake, order="weight", now=NOW)
+    assert out == ("# The orchard\n\nProse.\n\n---\n\n*a short of notes.md, told by weight, compiled from its EMF "
+                   "twin on 2026-10-22 by g40-04*\n") and len(seen) == 1
+    assert seen[0][0]["content"] == P.COMPILE_SYSTEM.format(order=P.COMPILE_ORDER["weight"])
+    assert "It is assumed that" in seen[0][1]["content"] and "told by weight" in seen[0][1]["content"]
+    md, info = CD.compile_short(twin, complete=fake, order="told", source_text="x", now=NOW)
+    assert info == {"order": "told", "mode": "model", "model": "g40-04", "by": "g40-04"}
+    assert seen[1][0]["content"] == P.COMPILE_SYSTEM.format(order=P.COMPILE_ORDER["told"])
+    assert "author's own order" in seen[1][0]["content"]
+    assert "told as the author told it" in seen[1][1]["content"]
+    assert md.endswith("*a short of notes.md, told as the author told it, compiled from its EMF twin on 2026-10-22 "
+                       "by g40-04*\n")
+    # a model that does not say its name is "a model"
+    md, info = CD.compile_short(twin, complete=lambda m: "Prose.", order="told", now=NOW)
+    assert md.endswith("by a model*\n") and info["by"] == "a model"
+
+
+def test_record_short_appends_and_keeps_the_rest_byte_stable(tmp_path):
+    twin = (FIX / "notes.md.cosm").read_text(encoding="utf-8")
+    at = dt.datetime(2026, 10, 23, 10, 42, tzinfo=dt.timezone.utc)
+    one = CD.record_short(twin, path="notes.short-2026-10-23-1042.md", at=at, by="rules", mode="rules",
+                          order="told")
+    added = "shorts:\n  - {path: notes.short-2026-10-23-1042.md, at: 2026-10-23T10:42:00Z, by: rules, mode: rules, order: told}\n"
+    i = one.index(added)
+    assert one[:i] + one[i + len(added):] == twin, "only the shorts: list was added"
+    assert one.index("atem:") < i < one.index("\nnodes:"), "made just above nodes:"
+    two = CD.record_short(one, path="notes.short-2026-10-23-1043.md", at=at, by="g40-04", mode="model",
+                          order="weight")
+    line = "  - {path: notes.short-2026-10-23-1043.md, at: 2026-10-23T10:42:00Z, by: g40-04, mode: model, order: weight}\n"
+    j = two.index(line)
+    assert two[:j] + two[j + len(line):] == one, "a second short is one more line"
+    doc = macrocosm.yaml_load(two)
+    assert [s["path"] for s in doc["shorts"]] == ["notes.short-2026-10-23-1042.md", "notes.short-2026-10-23-1043.md"]
+    assert doc["shorts"][1] == {"path": "notes.short-2026-10-23-1043.md", "at": at, "by": "g40-04",
+                                "mode": "model", "order": "weight"}
+    assert lint_errors(two, tmp_path, "notes.md.cosm") == []
+    path = tmp_path / "notes.md.cosm"
+    path.write_text(two, encoding="utf-8")
+    rep = macrocosm.lint(macrocosm.load_volume(path))
+    assert not [p for p in rep.problems() if p.check == "catalog-key"], "shorts is a catalog key of emf/1"
+    # odd names are quoted, a flow list is written out again, CRLF stays CRLF, a missing nodes: is fine
+    q = CD.record_short(twin, path="my notes, v2.short-2026-10-23-1042.md", at=at, by="qwen3:8b", mode="model",
+                        order="told")
+    assert macrocosm.yaml_load(q)["shorts"][0]["path"] == "my notes, v2.short-2026-10-23-1042.md"
+    assert macrocosm.yaml_load(q)["shorts"][0]["by"] == "qwen3:8b"
+    flow = twin.replace("\nnodes:\n", "\nshorts: []\nnodes:\n", 1)
+    f = CD.record_short(flow, path="a.short-2026-10-23-1042.md", at=at, by="rules", mode="rules", order="told")
+    assert [s["path"] for s in macrocosm.yaml_load(f)["shorts"]] == ["a.short-2026-10-23-1042.md"]
+    crlf = twin.replace("\n", "\r\n")
+    c = CD.record_short(crlf, path="a.short-2026-10-23-1042.md", at=at, by="rules", mode="rules", order="told")
+    assert "\n" not in c.replace("\r\n", "") and c.replace("shorts:\r\n  - {path: a.short-2026-10-23-1042.md, at: "
+                                                           "2026-10-23T10:42:00Z, by: rules, mode: rules, order: told}\r\n", "") == crlf
+    minimal = "oes: emf/1\nid: emf/x\nname: x\nderived: {at: 2026-10-22T10:30:00Z, by: person, mode: rules}\n"
+    assert macrocosm.yaml_load(CD.record_short(minimal, path="x.short-2026-10-23-1042.md", at=at, by="rules",
+                                               mode="rules", order="weight"))["shorts"][0]["order"] == "weight"
+    for bad in ({"mode": "guess"}, {"order": "as it happened"}, {"path": ""}):
+        kw = {"path": "x.short-2026-10-23-1042.md", "by": "rules", "mode": "rules", "order": "told", **bad}
+        with pytest.raises(CD.DeriveError):
+            CD.record_short(twin, at=at, **kw)
+    with pytest.raises(CD.DeriveError):
+        CD.record_short("oes: canon/1\nnodes: []\n", path="x.md", at=at, by="rules", mode="rules", order="told")
+    with pytest.raises(CD.DeriveError):
+        CD.record_short(twin.replace("\nnodes:\n", "\nshorts: oops\nnodes:\n", 1), path="x.md", at=at, by="rules",
+                        mode="rules", order="told")
 
 
 # ---------------------------------------------------------------------------
@@ -525,7 +702,7 @@ def kind_of(messages: list[dict]) -> str:
 
 
 class FakeModel:
-    """Answers like a small local model: EML passages from `passages` (one per call, the last repeated), the
+    """Answers like a small local model: EMF passages from `passages` (one per call, the last repeated), the
     continuation, the repair, the retry, and the atem. An answer may be `(text, finish_reason)`."""
 
     def __init__(self, passages: list, repairs: list | None = None, atem: str = ATEM_YAML,
@@ -556,9 +733,9 @@ def good(stance: str = "axiom") -> str:
 def test_model_mode_repairs_one_lint_error(feed, notes, tmp_path):
     fake = FakeModel([good("certain")], repairs=[good("axiom")])
     text, stat = CD.read_source(notes)
-    cosm, info = CD.derive_eml(text, source_name="notes.md", source_stat=stat, complete=fake, now=NOW)
+    cosm, info = CD.derive_emf(text, source_name="notes.md", source_stat=stat, complete=fake, now=NOW)
     assert fake.kinds() == ["passage", "repair", "atem"]
-    assert fake.budgets[:2] == [CD.EML_MAX_TOKENS] * 2, "EML completions carry the output budget"
+    assert fake.budgets[:2] == [CD.EMF_MAX_TOKENS] * 2, "EMF completions carry the output budget"
     repair_msg = fake.calls[1][-1]["content"]
     assert "stance = 'certain'" in repair_msg and "Return only these items, corrected" in repair_msg
     assert repair_msg.count("- id: ") == 1 and "id: P:claim/apples-need-a-second-variety" in repair_msg
@@ -597,7 +774,7 @@ def test_model_mode_repairs_one_lint_error(feed, notes, tmp_path):
 def test_model_mode_drops_what_the_repair_did_not_fix(notes, tmp_path):
     fake = FakeModel([good("certain")], repairs=[good("surely")])
     text, stat = CD.read_source(notes)
-    cosm, info = CD.derive_eml(text, source_name="notes.md", source_stat=stat, complete=fake,
+    cosm, info = CD.derive_emf(text, source_name="notes.md", source_stat=stat, complete=fake,
                                lookup=lambda ws: {})
     assert lint_errors(cosm, tmp_path) == []
     doc = macrocosm.yaml_load(cosm)
@@ -612,7 +789,7 @@ def test_model_mode_garbage_everywhere_still_lints_clean(tmp_path):
     n_chunks = len(CD.chunk(text))
     assert n_chunks >= 2
     fake = FakeModel(["I'm sorry, I can't do that."], retries=["Still no YAML here: {"], atem="no atem either")
-    cosm, info = CD.derive_eml(text, source_name="long.md", source_stat=None, complete=fake,
+    cosm, info = CD.derive_emf(text, source_name="long.md", source_stat=None, complete=fake,
                                lookup=lambda ws: {})
     assert lint_errors(cosm, tmp_path) == []
     doc = macrocosm.yaml_load(cosm)
@@ -661,7 +838,7 @@ def test_model_mode_merges_across_passages_and_extends_spans(tmp_path):
             return ATEM_YAML, {"model": "m"}
         return (first if "lines 1-3:" in messages[1]["content"] else second), {"model": "m"}
 
-    cosm, info = CD.derive_eml(text, source_name="t.md", source_stat=None, complete=fake, lookup=lambda ws: {})
+    cosm, info = CD.derive_emf(text, source_name="t.md", source_stat=None, complete=fake, lookup=lambda ws: {})
     assert lint_errors(cosm, tmp_path) == []
     by_id = {n["id"]: n for n in nodes_of(cosm)}
     ada = by_id["E:person/ada-lovelace"]
@@ -679,7 +856,7 @@ def test_a_re_derive_keeps_the_pinned_atems(notes, tmp_path):
                          of=["E:thing/bramley"])
     pinned = CD.pin_atem(pinned, MODEL_ATEM, {"lines": "3"}, source_name="notes.md", source_stat=stat,
                          of=["P:claim/gone"])
-    cosm, info = CD.derive_eml(text, source_name="notes.md", source_stat=stat, lookup=lambda ws: {},
+    cosm, info = CD.derive_emf(text, source_name="notes.md", source_stat=stat, lookup=lambda ws: {},
                                previous=pinned)
     assert lint_errors(cosm, tmp_path) == []
     xs = [n for n in nodes_of(cosm) if n["id"].startswith("X:")]
@@ -687,7 +864,7 @@ def test_a_re_derive_keeps_the_pinned_atems(notes, tmp_path):
     # pinned before the twin had items, the first `of` was an open question; the second still names nothing
     assert xs[1]["of"] == [{"pending": "P:claim/gone is not an item of this twin"}]
     assert info["counts"]["X"] == 2
-    assert CD.derive_eml(text, source_name="notes.md", source_stat=stat, lookup=lambda ws: {},
+    assert CD.derive_emf(text, source_name="notes.md", source_stat=stat, lookup=lambda ws: {},
                          previous="not: [a twin")[1]["counts"].get("X") is None
 
 
@@ -696,7 +873,7 @@ def test_model_mode_cancel_between_passages():
     text = "# One\n\n" + "\n\n".join([para] * 8) + "\n"
     fake = FakeModel(["nodes: []"])
     with pytest.raises(CD.DeriveCancelled):
-        CD.derive_eml(text, source_name="long.md", source_stat=None, complete=fake, lookup=lambda ws: {},
+        CD.derive_emf(text, source_name="long.md", source_stat=None, complete=fake, lookup=lambda ws: {},
                       should_stop=lambda: len(fake.calls) >= 1)
     assert fake.kinds() == ["passage"], "the passage being read finished; no other began"
 
@@ -726,21 +903,21 @@ def test_model_atem_one_shot_and_long():
 # ---------------------------------------------------------------------------
 
 def test_prompts_size_and_required_words():
-    assert len(P.EML_SYSTEM) < 2000
-    assert len(P.EML_SYSTEM.format(source="a-rather-long-file-name.md")) < 2000
-    for prompt in (P.EML_SYSTEM, P.ATEM_SYSTEM, P.COMPILE_SYSTEM):
+    assert len(P.EMF_SYSTEM) < 2000
+    assert len(P.EMF_SYSTEM.format(source="a-rather-long-file-name.md")) < 2000
+    for prompt in (P.EMF_SYSTEM, P.ATEM_SYSTEM, P.COMPILE_SYSTEM):
         for stance in CD.STANCES:
             assert stance in prompt, (stance, prompt[:40])
         assert "pronoun" in prompt
-    assert "8 claims, 4 events, 4 concepts, 6 entities, 8 terms" in P.EML_SYSTEM
-    shapes = P.EML_SYSTEM
+    assert "8 claims, 4 events, 4 concepts, 6 entities, 8 terms" in P.EMF_SYSTEM
+    shapes = P.EMF_SYSTEM
     assert shapes.index("P:claim") < shapes.index("T:event") < shapes.index("K:concept") \
         < shapes.index("E:<person") < shapes.index("L:term") < shapes.index("X:atem"), "claims come first"
     for words in ("return only a yaml `nodes:` list", "never invent", "no pronouns in a claim's summary",
                   "name every participant", '{lines: "a-b"}', "mode: derived", "state: known", "role names"):
-        assert words in P.EML_SYSTEM.format(source="x.md").lower(), words
+        assert words in P.EMF_SYSTEM.format(source="x.md").lower(), words
     for kind in ("L:term", "E:<person|org|place|work|thing>", "K:concept", "P:claim", "T:event", "X:atem"):
-        assert kind in P.EML_SYSTEM
+        assert kind in P.EMF_SYSTEM
     # the owner's atem definitions, word for word
     a = P.ATEM_SYSTEM
     assert "15 to 25 words" in a and "Fair: the author would accept it" in a
@@ -750,11 +927,14 @@ def test_prompts_size_and_required_words():
     assert ("what the reader should actually take away, naming hidden assumptions, opinion stated as fact, "
             "dependencies") in a
     assert "stance_profile" in a
-    assert "{items}" in P.EML_REPAIR and "{problems}" in P.EML_REPAIR
-    assert "Return only these items, corrected" in P.EML_REPAIR and "Do not repeat any other item" in P.EML_REPAIR
-    assert "{last}" in P.EML_CONTINUE and "return only the remaining items" in P.EML_CONTINUE
-    for words in ("the author holds", "it is assumed", "reportedly", "## Terms", "atem line"):
-        assert words in P.COMPILE_SYSTEM
+    assert "{items}" in P.EMF_REPAIR and "{problems}" in P.EMF_REPAIR
+    assert "Return only these items, corrected" in P.EMF_REPAIR and "Do not repeat any other item" in P.EMF_REPAIR
+    assert "{last}" in P.EMF_CONTINUE and "return only the remaining items" in P.EMF_CONTINUE
+    for order, words in (("weight", "## Terms"), ("told", "## Also in the fabula")):
+        system = P.COMPILE_SYSTEM.format(order=P.COMPILE_ORDER[order])
+        for w in ("the author holds", "it is assumed", "reportedly", "atem line", words):
+            assert w in system, (order, w)
+    assert set(P.COMPILE_ORDER) == set(CD.ORDERS) and "{said}" in P.COMPILE_USER
 
 
 # ---------------------------------------------------------------------------
@@ -811,7 +991,7 @@ def test_a_cut_reply_is_salvaged_and_continued(notes, tmp_path, finish):
     cut = _items_yaml(CLAIM_A, CLAIM_B, tail)
     fake = FakeModel([(cut, finish)], continuations=[_items_yaml(CLAIM_C, ENTITY)])
     text, stat = CD.read_source(notes)
-    cosm, info = CD.derive_eml(text, source_name="notes.md", source_stat=stat, complete=fake,
+    cosm, info = CD.derive_emf(text, source_name="notes.md", source_stat=stat, complete=fake,
                                lookup=lambda ws: {})
     assert fake.kinds() == ["passage", "continue", "atem"]
     cont = fake.calls[1][-1]["content"]
@@ -829,7 +1009,7 @@ def test_a_cut_continuation_loses_only_its_last_item(notes, tmp_path):
     fake = FakeModel([(_items_yaml(CLAIM_A, CLAIM_C_CUT), "length")],
                      continuations=[(_items_yaml(ENTITY, CLAIM_C_CUT), "length")])
     text, stat = CD.read_source(notes)
-    cosm, info = CD.derive_eml(text, source_name="notes.md", source_stat=stat, complete=fake,
+    cosm, info = CD.derive_emf(text, source_name="notes.md", source_stat=stat, complete=fake,
                                lookup=lambda ws: {})
     assert fake.kinds() == ["passage", "continue", "atem"], "one continuation, never a second"
     ids = {n["id"] for n in nodes_of(cosm)}
@@ -841,7 +1021,7 @@ def test_a_reply_cut_before_its_first_item_ends_is_asked_again(notes, tmp_path):
     fake = FakeModel([("nodes:\n  - id: P:claim/x\n    type: cla", "length")],
                      continuations=[_items_yaml(CLAIM_A)])
     text, stat = CD.read_source(notes)
-    cosm, _info = CD.derive_eml(text, source_name="notes.md", source_stat=stat, complete=fake,
+    cosm, _info = CD.derive_emf(text, source_name="notes.md", source_stat=stat, complete=fake,
                                 lookup=lambda ws: {})
     assert "cut off before its first item ended" in fake.calls[1][-1]["content"]
     assert "P:claim/apples-need-a-second-variety" in {n["id"] for n in nodes_of(cosm)}
@@ -897,7 +1077,7 @@ nodes:
 def test_every_mismatch_is_normalized_not_dropped(notes, tmp_path):
     fake = FakeModel([MISMATCHES])
     text, stat = CD.read_source(notes)
-    cosm, info = CD.derive_eml(text, source_name="notes.md", source_stat=stat, complete=fake,
+    cosm, info = CD.derive_emf(text, source_name="notes.md", source_stat=stat, complete=fake,
                                lookup=lambda ws: {})
     assert fake.kinds() == ["passage", "atem"], "nothing needed a repair turn"
     assert lint_errors(cosm, tmp_path) == []
@@ -937,7 +1117,7 @@ def test_the_repair_never_asks_for_the_whole_list(notes, tmp_path):
     bad = CLAIM_B.replace("stance: deduced", "stance: maybe")
     fake = FakeModel([_items_yaml(CLAIM_A, bad, ENTITY)], repairs=[_items_yaml(CLAIM_A, CLAIM_B, ENTITY)])
     text, stat = CD.read_source(notes)
-    cosm, info = CD.derive_eml(text, source_name="notes.md", source_stat=stat, complete=fake,
+    cosm, info = CD.derive_emf(text, source_name="notes.md", source_stat=stat, complete=fake,
                                lookup=lambda ws: {})
     assert fake.kinds() == ["passage", "repair", "atem"]
     sent = fake.calls[1][-1]["content"].split("These items did not pass the checks:", 1)[1]
@@ -971,7 +1151,7 @@ def test_model_mode_keeps_the_feed_lexicon_floor(feed, notes, tmp_path):
     claim = CLAIM_A.replace("    span: {lines: \"7\"}", "    roles: {object: L:term/orchards}\n    span: {lines: \"7\"}")
     fake = FakeModel([_items_yaml(claim, orchards, mould)])
     text, stat = CD.read_source(notes)
-    cosm, _info = CD.derive_eml(text, source_name="notes.md", source_stat=stat, complete=fake)
+    cosm, _info = CD.derive_emf(text, source_name="notes.md", source_stat=stat, complete=fake)
     assert lint_errors(cosm, tmp_path) == []
     by_id = {n["id"]: n for n in nodes_of(cosm)}
     terms = [i for i in by_id if i.startswith("L:")]

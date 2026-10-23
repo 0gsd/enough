@@ -129,12 +129,12 @@ def test_files_with_no_source_are_removed_but_own_files_stay(fake, tmp_path):
     sync_cosm.sync(fake, out)
     _put(out, "tests/fixtures/cosm/holotypes/stray/holotype.cosm", "oes: comprise/1\n")
     _put(out, "tests/fixtures/cosm/NOTICE.md", "hand-written\n")
-    _put(out, "tests/fixtures/cosm/eml/notes.md", "ours\n")
+    _put(out, "tests/fixtures/cosm/emf/notes.md", "ours\n")
     report = sync_cosm.sync(fake, out)
     assert report["removed"] == ["tests/fixtures/cosm/holotypes/stray/holotype.cosm"]
     assert not (out / "tests/fixtures/cosm/holotypes/stray").exists()
     assert (out / "tests/fixtures/cosm/NOTICE.md").read_text() == "hand-written\n"
-    assert (out / "tests/fixtures/cosm/eml/notes.md").read_text() == "ours\n"
+    assert (out / "tests/fixtures/cosm/emf/notes.md").read_text() == "ours\n"
 
 
 def test_no_comprise_checkout(tmp_path, capsys):

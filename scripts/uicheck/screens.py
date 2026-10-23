@@ -43,16 +43,18 @@ MERIRMAID = "diagram.merirmaid"
 LONG_NAME = ("a-file-with-a-deliberately-very-long-name-that-the-sidebar-"
              "has-to-decide-how-to-truncate.md")
 # The Canon round's fixtures (0.4.3), seeded by server.seed_project() and
-# server.seed_canon(): a text's EML twin, a Comprise Holotype in the project,
+# server.seed_canon(): a text's EMF twin, a Comprise Holotype in the project,
 # and a volume in the scratch Canon store.
-EML_TWIN = "orchard/notes.md.cosm"
+EMF_TWIN = "orchard/notes.md.cosm"
 HOLOTYPE = "meadow"
 CANON_VOLUME = "field-notes"
 # Checkpoint B: the text that twin belongs to, a sentence of it, and a text
 # with no twin of its own (the pin scenario writes its minimal twin).
-EML_TEXT = "orchard/notes.md"
-EML_PASSAGE = "Every apple tree needs a second variety nearby to set fruit."
+EMF_TEXT = "orchard/notes.md"
+EMF_PASSAGE = "Every apple tree needs a second variety nearby to set fruit."
 LEDGER = "orchard/ledger.md"
+# SHORT: a second text with a twin, which the compile-short scenario writes beside.
+PRESS = "orchard/press.md"
 
 Step = tuple[str, str]
 
@@ -158,16 +160,16 @@ COSMSPEC_READY: Step = ("eval_await", """(async () => {
     await new Promise((r) => setTimeout(r, 50));
   }
   return true; })()""")
-#: The Canon chip knows the text's twin state (GET /api/canon/eml answered).
+#: The Canon chip knows the text's twin state (GET /api/canon/emf answered).
 CANON_CHIP_READY: Step = ("eval_await", """(async () => {
   for (let i = 0; i < 200 && !(CANON.doc && CANON.doc.state); i++) {
     await new Promise((r) => setTimeout(r, 50));
   }
   return true; })()""")
-#: The EML face has drawn the twin's cards.
-EML_FACE_READY: Step = ("eval_await", """(async () => {
+#: The EMF face has drawn the twin's cards.
+EMF_FACE_READY: Step = ("eval_await", """(async () => {
   for (let i = 0; i < 200 && !document.querySelector(
-       '#review-eml:not([hidden]) .cosm-card, #preview-eml:not([hidden]) .cosm-card'); i++) {
+       '#review-emf:not([hidden]) .cosm-card, #preview-emf:not([hidden]) .cosm-card'); i++) {
     await new Promise((r) => setTimeout(r, 50));
   }
   return true; })()""")
@@ -182,7 +184,7 @@ ATEM_CLOSE: Step = ("eval", "(() => { try { atemCardClose(); } catch (e) {} retu
 
 
 def _atem_of_passage(size: str) -> Step:
-    """Open the EML text at `size` and ask for the atem of one of its
+    """Open the EMF text at `size` and ask for the atem of one of its
     sentences, as the right-click menu does (path included, so the card can
     pin). The harness has no model: the card shows the labelled scaffold.
     The mini panel slides open over 180ms, and the card's modal makes the
@@ -191,8 +193,8 @@ def _atem_of_passage(size: str) -> Step:
     return ("eval_await", "(async () => { await openReadEdit(%s, {size: %s, face: 'read'});"
                           " await new Promise((r) => setTimeout(r, 260));"
                           " await canonAtemSelection({text: %s}, {path: %s, where: 'notes.md'});"
-                          " return true; })()" % (json.dumps(EML_TEXT), json.dumps(size),
-                                                  json.dumps(EML_PASSAGE), json.dumps(EML_TEXT)))
+                          " return true; })()" % (json.dumps(EMF_TEXT), json.dumps(size),
+                                                  json.dumps(EMF_PASSAGE), json.dumps(EMF_TEXT)))
 
 
 #: Back to a known order, so a screen never inherits a sort or a search the
@@ -372,6 +374,47 @@ PAL_BUBBLES: Step = ("eval", """(() => {
       + 'transparency duties took effect on schedule.'});
   return true; })()""")
 
+#: The context notice (the 16 GB context fix, 0.4.3). There is no model in
+#: the scratch world, so no preflight can ever say "does not fit" — the
+#: `/api/llm-status` body is stubbed IN THE PAGE (the harness wraps
+#: `window.fetch` for that one path) and the product's own poll function,
+#: `refreshLlmStatus()`, paints the notice. Everything drawn is the
+#: product's: `ctxNoticePaint()` into whatever `#empty-hint` is showing.
+#: A screen run on its own after one that removed the empty state gets it
+#: back the way a user would, through `/reset`.
+def _ctx_notice(status: dict) -> Step:
+    body = json.dumps(status)
+    return ("eval_await", f"""(async () => {{
+  if (!window.__uicheckFetch) window.__uicheckFetch = window.fetch;
+  const real = window.__uicheckFetch;
+  const body = {body!r};
+  window.fetch = (u, o) => String(u).startsWith('/api/llm-status')
+    ? Promise.resolve(new Response(body, {{status: 200,
+        headers: {{'Content-Type': 'application/json'}}}}))
+    : real(u, o);
+  if (!document.getElementById('empty-hint')) await handleSlashCommand('/reset');
+  await refreshLlmStatus();
+  for (let i = 0; i < 100 && !document.querySelector('#empty-hint .ctx-notice'); i++)
+    await new Promise((r) => setTimeout(r, 50));
+  return !!document.querySelector('#empty-hint .ctx-notice'); }})()""")
+
+
+_CTX_BASE = {"mode": "owned", "ready": True, "cute": "g40-04", "ctx": 16384,
+             "url": "http://127.0.0.1:8080", "error": None,
+             "prompt_tokens": 19974, "n_ctx": 16384, "reserve": 2048,
+             "fits": False, "preflight": "done"}
+CTX_NOTICE_SWITCH: Step = _ctx_notice(dict(
+    _CTX_BASE, suggest_ctx=32768, fix="switch", fix_reason=None))
+CTX_NOTICE_NONE: Step = _ctx_notice(dict(
+    _CTX_BASE, cute="g40-26", ctx=8192, n_ctx=8192, suggest_ctx=32768,
+    fix="none", fix_reason="memory"))
+CTX_NOTICE_BACK: tuple[Step, ...] = (
+    ("eval_await", "(async () => { if (window.__uicheckFetch) {"
+                   " window.fetch = window.__uicheckFetch;"
+                   " delete window.__uicheckFetch; }"
+                   " await refreshLlmStatus(); return true; })()"),
+    ("wait_idle", ""))
+
 PAL_BUBBLES_BACK: tuple[Step, ...] = (
     ("eval", "(() => { document.querySelectorAll('.msg.pal, .msg.pal-sent')"
              ".forEach((el) => el.remove()); return true; })()"),
@@ -544,13 +587,13 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_for", "#cn-store-grid .cn-tag"), ("wait_idle", "")),
            teardown=EXIT_ALL_MODES,
            note="inside a volume: the catalog tile, a Holotype folder, a text "
-                "with its EML-twin chip; the project pane's catalog button"),
+                "with its EMF-twin chip; the project pane's catalog button"),
 
     Screen("cosm-viewer", "project",
-           setup=(("eval", f"enterCosmMode('{EML_TWIN}')"), ("wait_for", "#cosm-mode.open"),
+           setup=(("eval", f"enterCosmMode('{EMF_TWIN}')"), ("wait_for", "#cosm-mode.open"),
                   COSM_READY, ("wait_idle", "")),
            teardown=EXIT_ALL_MODES,
-           note="an EML twin: the atem card, stances, spans, FEED grounding, "
+           note="an EMF twin: the atem card, stances, spans, FEED grounding, "
                 "open questions"),
 
     Screen("cosm-viewer-holotype", "project",
@@ -561,7 +604,7 @@ PROJECT_SCREENS: list[Screen] = [
                 "checks left to Comprise"),
 
     Screen("cosm-viewer-mini", "project",
-           setup=(("eval", f"enterCosmMode('{EML_TWIN}')"), ("wait_for", "#cosm-mode.open"),
+           setup=(("eval", f"enterCosmMode('{EMF_TWIN}')"), ("wait_for", "#cosm-mode.open"),
                   COSM_READY, ("eval", "cosmToggleSize()"), ("wait_idle", "")),
            teardown=EXIT_ALL_MODES,
            note="docked right: two-row toolbar, the outline folded into a sheet"),
@@ -571,32 +614,43 @@ PROJECT_SCREENS: list[Screen] = [
                   COSMSPEC_READY, ("wait_idle", "")),
            teardown=EXIT_ALL_MODES),
 
-    # --- checkpoint B: the Canon chip, the EML face, the atem card ---------
+    # --- checkpoint B: the Canon chip, the EMF face, the atem card ---------
     Screen("canon-chip", "project",
-           setup=(("eval", f"openReadEdit('{EML_TEXT}', {{size:'full', face:'read'}})"),
+           setup=(("eval", f"openReadEdit('{EMF_TEXT}', {{size:'full', face:'read'}})"),
                   ("wait_for", "#review-mode.open"), CANON_CHIP_READY,
                   ("wait_for", "#canon-chip-review:not([hidden])"), ("wait_idle", "")),
            teardown=EXIT_ALL_MODES,
-           note="a text with a fresh EML twin in the read face: the tinted twin "
+           note="a text with a fresh EMF twin in the read face: the tinted twin "
                 "badge, atem, refresh twin and the (?) in the crowded toolbar"),
 
-    Screen("eml-face", "project",
-           setup=(("eval", f"openReadEdit('{EML_TEXT}', {{size:'full', face:'read'}})"),
+    Screen("emf-face", "project",
+           setup=(("eval", f"openReadEdit('{EMF_TEXT}', {{size:'full', face:'read'}})"),
                   ("wait_for", "#review-mode.open"), CANON_CHIP_READY,
-                  ("eval_await", f"emlFaceShow('{EML_TEXT}').then(() => true)"),
-                  EML_FACE_READY, ("wait_idle", "")),
+                  ("eval_await", f"emfFaceShow('{EMF_TEXT}').then(() => true)"),
+                  EMF_FACE_READY, ("wait_idle", "")),
            teardown=EXIT_ALL_MODES,
            note="the twin in place of the text, full size: its head (lens, outline, "
-                "open raw, compile text, back to the text), the rail and the cards"),
+                "open raw, compile a short, back to the text), the rail and the cards"),
 
-    Screen("eml-face-mini", "project",
-           setup=(("eval", f"openReadEdit('{EML_TEXT}', {{size:'mini', face:'read'}})"),
+    Screen("emf-face-mini", "project",
+           setup=(("eval", f"openReadEdit('{EMF_TEXT}', {{size:'mini', face:'read'}})"),
                   ("wait_for", "#preview.open"), CANON_CHIP_READY,
-                  ("eval_await", f"emlFaceShow('{EML_TEXT}').then(() => true)"),
-                  EML_FACE_READY, ("wait_idle", "")),
+                  ("eval_await", f"emfFaceShow('{EMF_TEXT}').then(() => true)"),
+                  EMF_FACE_READY, ("wait_idle", "")),
            teardown=EXIT_ALL_MODES,
            note="the same face in the mini panel: the head on two rows, the "
                 "outline folded into a sheet"),
+
+    Screen("emf-short-menu", "project",
+           setup=(("eval", f"openReadEdit('{EMF_TEXT}', {{size:'full', face:'read'}})"),
+                  ("wait_for", "#review-mode.open"), CANON_CHIP_READY,
+                  ("eval_await", f"emfFaceShow('{EMF_TEXT}').then(() => true)"),
+                  EMF_FACE_READY, ("eval", "emfShortMenu(true)"),
+                  ("wait_for", "#review-emf .emf-short-menu:not([hidden])"), ("wait_idle", "")),
+           teardown=(("eval", "(() => { try { emfShortMenu(false); } catch (e) {} return true; })()"),)
+                    + EXIT_ALL_MODES,
+           note="SHORT: the face's \"compile a short\" split button with its tiny menu open "
+                "(as the author told it / by weight, the default marked) over the cards"),
 
     Screen("atem-card", "project",
            setup=(_atem_of_passage("full"), ATEM_READY, ("wait_idle", "")),
@@ -972,6 +1026,27 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_for", "#toggle-readvisor.rv-unread"), ("wait_idle", "")),
            teardown=RV_BACK,
            note="the unread dot on the topbar toggle"),
+
+    # --- the context notice (the 16 GB context fix, 0.4.3) ----------------
+    #
+    # The empty conversation when enough's instructions do not fit the
+    # model's window: with the one-click larger window, and without it (the
+    # reason and a way into the model window). See CTX_NOTICE_SWITCH.
+    Screen("readvisor-ctx-notice", "project",
+           setup=(("eval", "rvSetState('open')"), CTX_NOTICE_SWITCH,
+                  ("wait_for", "#empty-hint .ctx-notice .ctx-notice-switch"),
+                  ("wait_idle", "")),
+           teardown=CTX_NOTICE_BACK + RV_BACK,
+           note="the instructions do not fit: numbers + 'use a 32,768-token "
+                "window' (the /api/llm-status body is stubbed in the page)"),
+
+    Screen("readvisor-ctx-notice-none", "project",
+           setup=(("eval", "rvSetState('open')"), CTX_NOTICE_NONE,
+                  ("wait_for", "#empty-hint .ctx-notice .ctx-notice-open"),
+                  ("wait_idle", "")),
+           teardown=CTX_NOTICE_BACK + RV_BACK,
+           note="no affordable window: the reason, and the model window "
+                "button instead of the switch"),
 
     # --- `/pal` in the composer (P8) --------------------------------------
 

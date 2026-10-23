@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/bad-type-prefix
+oes: emf/1
+id: emf/bad-type-prefix
 name: bad type-prefix
 # type-prefix: the id's kind and the type disagree
 nodes:

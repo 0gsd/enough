@@ -6,7 +6,7 @@ origin: {type: url, value: "https://doc.rust-lang.org/book/", depth: 2}
 status: complete
 created: 2026-10-20T14:02:11Z
 updated: 2026-10-21T09:15:40Z
-counts: {folders: 3, files: 5, articles: 1, twins: 1, emls: 2, atems: 1}
+counts: {folders: 3, files: 5, articles: 1, twins: 1, emfs: 2, atems: 1}
 nodes:
   - id: V:folder/ch01-getting-started
     type: folder
@@ -21,7 +21,7 @@ nodes:
     size: 8123
     mtime: 2026-10-20T14:02:13Z
     kind: markdown
-    eml: {path: ch01-getting-started/ch01-01-installation.md.cosm, state: fresh}
+    emf: {path: ch01-getting-started/ch01-01-installation.md.cosm, state: fresh}
     atem: {line: "Install Rust with rustup, keep it current, and verify with cargo --version before anything else."}
   - id: V:file/ch01-getting-started--ch01-02-hello-world-md
     type: file
@@ -44,7 +44,7 @@ nodes:
     size: 41877
     mtime: 2026-10-20T14:02:16Z
     kind: markdown
-    eml: {path: ch02-guessing-game/ch02-00-guessing-game-tutorial.md.cosm, state: stale}
+    emf: {path: ch02-guessing-game/ch02-00-guessing-game-tutorial.md.cosm, state: stale}
   - id: V:folder/ch02-guessing-game--src
     type: folder
     name: src

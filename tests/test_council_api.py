@@ -254,6 +254,61 @@ def test_pause_stops_a_run_and_leaves_it_resumable(client: TestClient,
     assert len(said) == int(nxt.json()["council"]["turn"])
 
 
+
+def test_pause_waits_for_a_statement_already_landing(client: TestClient,
+                                                     project: Path,
+                                                     monkeypatch):
+    """A pause that arrives while a statement is being written waits for the
+    write, so the canvas and the turn counter agree. Before 0.4.3 the pause's
+    own `await task` returned at once (cancelling a task can't stop the commit
+    thread), its status write raced the commit, and the turn count could be
+    lost — two statements, turn 1 (seen once on the ubuntu CI runner). This
+    holds the commit open on purpose, so the race is no longer a matter of
+    timing: the pause must still be waiting while the commit is held."""
+    import threading
+
+    entered, release = threading.Event(), threading.Event()
+    armed = {"on": False, "held": False}
+    real_commit = K.Council._commit
+
+    def held_commit(self, ops, meta=None):
+        # Only the statement's own commit, the first one after the turn's
+        # text is ready; status writes before and after pass straight through.
+        if armed["on"] and not armed["held"]:
+            armed["held"] = True
+            entered.set()
+            assert release.wait(10), "the test never released the commit"
+        return real_commit(self, ops, meta)
+
+    async def speak(messages, on_token=None, **kw):
+        armed["on"] = True
+        if on_token is not None:
+            await on_token("landing now")
+        return "landing now"
+
+    monkeypatch.setattr(K.Council, "_commit", held_commit)
+    monkeypatch.setattr(K, "run_council_turn", speak)
+    setup(client, max_rounds=5)
+    convene(client)
+    client.post("/api/council/run", json={"path": REL})
+    assert entered.wait(10), "the run never reached its statement's commit"
+
+    result: dict = {}
+    pauser = threading.Thread(target=lambda: result.setdefault(
+        "r", client.post("/api/council/pause", json={"path": REL})))
+    pauser.start()
+    pauser.join(0.5)
+    assert pauser.is_alive(), "the pause returned while a statement was still being written"
+    release.set()
+    pauser.join(10)
+    assert not pauser.is_alive()
+
+    paused = result["r"]
+    assert paused.status_code == 200, paused.text
+    assert paused.json()["council"]["status"] == "paused"
+    said = [m for m in C.load(project / REL).modules if m.speaker]
+    assert len(said) == int(paused.json()["council"]["turn"]) == 1
+
 def test_say_commits_at_once_when_nothing_is_streaming(client: TestClient,
                                                        project: Path):
     setup(client)

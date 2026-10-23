@@ -26,6 +26,7 @@ import re
 import signal
 import subprocess
 import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
@@ -64,6 +65,11 @@ class LlamaSupervisor:
         self.ready: bool = False
         self.last_error: str | None = None
         self._healthwatch_task: asyncio.Task[None] | None = None
+        # Called (no arguments, on the event loop) each time /health turns
+        # 200 after a launch, an adopt or a switch. server.py hangs the
+        # context preflight on it; it must not block, and an exception in it
+        # is logged and swallowed — readiness never depends on a listener.
+        self.on_ready: Callable[[], Any] | None = None
 
     # -----------------------------------------------------------------------
     # State
@@ -212,8 +218,21 @@ class LlamaSupervisor:
                     _models.install_hint(**_models.LLAMA_CPP_UPGRADE_HINT),
                 )
         cmd += spec + _models.draft_flags(info, binary)
+        # Under 32 GB of RAM: cap the SWA/recurrent context checkpoints and
+        # the host-RAM prompt cache, each only if this build's --help lists
+        # the flag (docs/ctx-16gb-plan.md §3c, §8.2). One line says which.
+        caps, caps_note = _models.launch_caps(binary)
+        cmd += caps
+        log.info("%s", caps_note)
         log.info("launching llama-server: %s", " ".join(cmd))
         f = open(log_path, "ab", buffering=0)  # noqa: SIM115  (intentionally leaked to subprocess)
+        # enough.* INFO lines go nowhere by default; the caps decision also
+        # heads this launch's stretch of server.log, where llama-server's own
+        # output (and anyone debugging memory) looks.
+        try:
+            f.write(f"[enough] {caps_note}\n".encode("utf-8"))
+        except OSError:
+            pass
         self.proc = subprocess.Popen(
             cmd,
             stdout=f,
@@ -238,12 +257,22 @@ class LlamaSupervisor:
                     r = await c.get(self.llm_url + "/health")
                     if r.status_code == 200:
                         self.ready = True
+                        self._notify_ready()
                         return True
                 except httpx.HTTPError:
                     pass
                 await asyncio.sleep(1.0)
         self.last_error = f"health poll timed out after {timeout_s}s"
         return False
+
+    def _notify_ready(self) -> None:
+        cb = self.on_ready
+        if cb is None:
+            return
+        try:
+            cb()
+        except Exception:  # noqa: BLE001 — a listener never breaks readiness
+            log.exception("on_ready listener failed")
 
     def _start_healthwatch(self) -> None:
         if self._healthwatch_task and not self._healthwatch_task.done():

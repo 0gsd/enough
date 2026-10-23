@@ -1,6 +1,6 @@
 # MacroCOSM OES
 
-*Specification v0.0.1 · 2026-10-22*
+*Specification v0.0.1 · 2026-10-23*
 
 MacroCOSM OES is the shared grammar every MiniCOSM is written in. It says how a domain is enumerated as plain-text
 `.cosm` files that are at once a file system and a relational database, made to be rendered: how a file is read, how a
@@ -8,7 +8,7 @@ volume names the language it is written in, what an item is and which columns ev
 at another, how an unknown value is written down, how anything is addressed, which checks every volume can be held to,
 how a manifest declares a MiniCOSM, and how a renderer draws one. It is the grammar that Comprise OES 1 worked out for
 companies, read out of it and written down on its own, so that nothing in it says "company". Four MiniCOSMs are
-written in it today: `comprise`, `cosm`, `canon` and `eml` (section 18).
+written in it today: `comprise`, `cosm`, `canon` and `emf` (section 18).
 
 **Status.** Normative for version 0.0.1. The reference reader is `enough/macrocosm.py`. Where this text and the reader
 disagree, **the reader wins**, and this text is corrected. Section 19.4 collects every disagreement known at the time
@@ -39,7 +39,7 @@ tree made so far reads unchanged.
 15. Versions and signatures (by reference)
 16. The private/public split (by reference)
 17. MicroCOSMs (mapped)
-18. The MiniCOSMs enough ships: comprise, cosm, canon, eml
+18. The MiniCOSMs enough ships: comprise, cosm, canon, emf
 19. Conformance
 20. Decisions in this version
 21. Open questions and roadmap
@@ -60,7 +60,7 @@ reader use follows in parentheses.
 | kind | type, the `type:` field | `claim` |
 | open question | pending | `{pending: "…"}` |
 | checks | lint | `python -m enough.macrocosm lint <volume>` |
-| volume | the database a catalog heads | a Holotype, a Canon volume, an EML twin |
+| volume | the database a catalog heads | a Holotype, a Canon volume, an EMF twin |
 | part | a top-level division of a volume (Comprise: concern, *atom*) | `atoms/meadow/` |
 
 **Examples.** Every block in this document marked `cosm` is one complete file: it starts with its declaration, it
@@ -126,7 +126,7 @@ and a name on screen.
 
 | MacroCOSM | As a file system | As a relational database | On screen | Section |
 |---|---|---|---|---|
-| volume | a folder with its catalog at the root, or one catalog file that holds everything | a database | a Holotype, a Canon volume, an EML twin | 6 |
+| volume | a folder with its catalog at the root, or one catalog file that holds everything | a database | a Holotype, a Canon volume, an EMF twin | 6 |
 | catalog | the volume label: which language, which version, what is aboard | the catalog: the MiniCOSM, its version, the parts, the sources | (details) | 6.2 |
 | part | a top-level folder (Comprise's concern) | a schema | concern | 6.4 |
 | module | a folder named by one capital letter, or the items in one file whose ids carry that letter | a group of tables | module | 7.2 |
@@ -159,7 +159,7 @@ references, and the checks. A MiniCOSM may keep a local database beside its file
 | Scale | What it is | In this version |
 |---|---|---|
 | **MacroCOSM** | the whole language: the shared grammar every MiniCOSM is written in | this document, and the reader `enough/macrocosm.py` |
-| **MiniCOSM** | an OES for one domain, declared by a manifest: its volume layout, modules, kinds, fields, references, checks and renderers | four ship with enough: `comprise`, `cosm`, `canon`, `eml` (section 18) |
+| **MiniCOSM** | an OES for one domain, declared by a manifest: its volume layout, modules, kinds, fields, references, checks and renderers | four ship with enough: `comprise`, `cosm`, `canon`, `emf` (section 18) |
 | **MicroCOSM** | one organization's extension on top of a MiniCOSM: the extra kinds, fields, checks or renderers it needs | mapped, not built (section 17) |
 
 **What MacroCOSM gives every MiniCOSM.** All of it, unchanged: sections 4 to 14 of this document, and the parts
@@ -292,13 +292,13 @@ alter what a path means needs a new MiniCOSM (section 11.3).
 
 ### 5.2 Identifying a catalog
 
-The reader keeps a registry of the manifests it knows (section 13.6), in order: `comprise`, `cosm`, `canon`, `eml`.
+The reader keeps a registry of the manifests it knows (section 13.6), in order: `comprise`, `cosm`, `canon`, `emf`.
 Given a catalog, it decides which MiniCOSM the catalog is written in by these steps, in order. The first that applies
 decides.
 
 1. **An `oes:` key decides.** If its value is a string naming a MiniCOSM in the registry and a major that manifest
    declares, the catalog is written in it. Anything else under `oes:` (an unknown name, an unknown major such as
-   `comprise/2`, a value not spelled exactly, such as `comprise/01` or `' eml/1 '`, an empty value, a value that is not
+   `comprise/2`, a value not spelled exactly, such as `comprise/01` or `' emf/1 '`, an empty value, a value that is not
    a string) is refused.
 2. **A legacy key.** If the catalog has no `oes:` key, each manifest's `declaration.legacy` keys are tried in registry
    order. The first manifest that names a key present in the catalog (and, where it gives one, a matching value)
@@ -317,7 +317,7 @@ A refused catalog loads nothing. The reader returns a refusal, a value that says
 reader knows, and never raises. For example:
 
 ```text
-canon.cosm declares oes: canon/2, which this reader cannot read: it reads comprise/1, cosm/0, canon/1, eml/1;
+canon.cosm declares oes: canon/2, which this reader cannot read: it reads comprise/1, cosm/0, canon/1, emf/1;
 nothing was loaded from this volume
 ```
 
@@ -330,7 +330,7 @@ The checks report the refusal as one `load` error, and a viewer shows it in plac
 | `comprise` | `oes: comprise/1` | `comprise: 0.1`, the line in every Holotype made before Comprise OES 1 | `holotype.cosm` with no key reads as `comprise/1`, silently |
 | `cosm` | `oes: cosm/0` | `cosm: 0.2`, `cosm: 0.3`, and `opi:` with any value | refused |
 | `canon` | `oes: canon/1` | nothing | refused |
-| `eml` | `oes: eml/1` | nothing | refused |
+| `emf` | `oes: emf/1` | nothing | refused |
 
 A legacy key is never an error. A reader keeps it.
 
@@ -358,7 +358,7 @@ A **volume** is one database of a MiniCOSM. It has one of two shapes, and the ma
 | Shape | What it is | Its items | MiniCOSMs |
 |---|---|---|---|
 | a folder volume | a folder with the catalog at its root and module files below it, in the places the manifest's `volume` block names | in module files, under `nodes:` (and, where a MiniCOSM says so, a named block such as `brand:`) | `comprise` (a Holotype), `cosm` (a product tree) |
-| a single-file volume (`volume.single-file: true`) | one file: the catalog is the whole volume | under the catalog's own `nodes:` | `canon` (a Canon volume's `canon.cosm`), `eml` (a text's twin) |
+| a single-file volume (`volume.single-file: true`) | one file: the catalog is the whole volume | under the catalog's own `nodes:` | `canon` (a Canon volume's `canon.cosm`), `emf` (a text's twin) |
 
 A volume is what a URI names (section 11.3), what the checks run over, and what a renderer draws. Two volumes never
 share an item: a reference between volumes is written as a URI, and the reader does not resolve it (section 9.3).
@@ -373,7 +373,7 @@ one YAML mapping.
   ignores the ones it does not understand. A key the manifest does not list is reported by the check `catalog-key` as a
   note. A writer must not invent catalog keys the manifest does not list without a new version of its MiniCOSM.
 - **The catalog id** has the form the manifest's `catalog.id` gives: `holotype/<slug>`, `canon/<volume-slug>`,
-  `eml/<slug>`. When it is absent, the manifest's `catalog.id-absent` rule supplies it (Comprise: `holotype/<folder
+  `emf/<slug>`. When it is absent, the manifest's `catalog.id-absent` rule supplies it (Comprise: `holotype/<folder
   name>`). The id without its prefix is the volume's **database name**, the second segment of its URI.
 - **Sources.** A catalog may declare the sources its items cite (Comprise's `sources:`, with the fields the manifest's
   `catalog.source-fields` lists). Where a MiniCOSM checks that cited sources are declared, the check is its own.
@@ -449,10 +449,10 @@ An item's id never changes. Its `name` is for display and may change freely.
 ### 7.2 Modules
 
 A **module** is a group of kinds: a group of tables. It is named by one capital ASCII letter, and the manifest gives it
-a `name` and a short `subtitle`: EML's `P` is *Propositions*, "what the text claims, and how it knows".
+a `name` and a short `subtitle`: EMF's `P` is *Propositions*, "what the text claims, and how it knows".
 
 **Letters are local to a MiniCOSM.** The declaration says which language a volume is written in, and so which module a
-letter names. `P` is Products in `comprise` and in the product tree, and Propositions in `eml`. Nothing in the grammar
+letter names. `P` is Products in `comprise` and in the product tree, and Propositions in `emf`. Nothing in the grammar
 reserves a letter.
 
 | MiniCOSM | Modules |
@@ -460,7 +460,7 @@ reserves a letter.
 | `comprise` | C Corporation · O Organizations · M Markets · P Products · R Representations · I Inventories · S Stacks · E Employees |
 | `cosm` | P Products |
 | `canon` | V Volume |
-| `eml` | L Lexicon · E Entities · K Concepts · P Propositions · T Transitions · X Atems |
+| `emf` | L Lexicon · E Entities · K Concepts · P Propositions · T Transitions · X Atems |
 
 ### 7.3 Kinds
 
@@ -486,7 +486,7 @@ A **field** is a column. Every key of an item is a field.
   an open question (section 10) and follows `#` in a path (section 11.2).
 - **Dotted reference fields** walk into lists and mappings. A kind that lists `rows.sku` as a reference field means
   the `sku` of every row.
-- **Wildcard fields.** A reference field ending in `.*` names every value of a mapping (0.0.1). EML lists `roles.*`: every
+- **Wildcard fields.** A reference field ending in `.*` names every value of a mapping (0.0.1). EMF lists `roles.*`: every
   value under a claim's `roles:` is followed (section 9.6).
 - **Unknown fields are kept, always.** A field the manifest does not declare is legal. A reader keeps it, shows it, and
   never drops it; a writer that rewrites an item keeps it.
@@ -524,7 +524,7 @@ that is missing fails the check `identity-min`; only presence is checked, as in 
 | `comprise` | `id type name summary provenance`; in P, `id type name summary owner` |
 | `cosm` | `id type name summary owner` |
 | `canon` | `id type name path` |
-| `eml` | `id type name summary provenance` |
+| `emf` | `id type name summary provenance` |
 
 ### 8.3 Envelope fields a MiniCOSM adds
 
@@ -532,7 +532,7 @@ A MiniCOSM may add fields to its envelope (`envelope.fields`) and say which of t
 (`envelope.references`). Comprise adds `owner` (a role, never a person), `since`, `until`, `mattering`, `body`, `at`,
 `attributed-to`, `template`, `instances`, `counterparty`, `series` and `shared-with`, and checks `owner`, `at`,
 `attributed-to`, `counterparty`, `shared-with` and `links` as references. Canon adds `path`, `parent`, `parts`,
-`size`, `mtime`, `kind`, `twin`, `eml` and `atem`. EML adds `span` and `salience`.
+`size`, `mtime`, `kind`, `twin`, `emf` and `atem`. EMF adds `span` and `salience`.
 
 ### 8.4 Status and visibility
 
@@ -558,14 +558,14 @@ Sources or it didn't happen. `provenance` is a mapping:
 | Field | Holds | Checked |
 |---|---|---|
 | `mode` | how it came to be known, from the closed list below | error otherwise |
-| `sources` | a non-empty list of what it came from: source ids the catalog declares (Comprise), or locators in the source text (EML: `'close.md#L3-L7'`) | error when empty or not a list |
+| `sources` | a non-empty list of what it came from: source ids the catalog declares (Comprise), or locators in the source text (EMF: `'close.md#L3-L7'`) | error when empty or not a list |
 | `confidence` | a number from 0 to 1 | error otherwise |
 | `state` | `known` (the default) · `pending` · `not-disclosed` · `stale` | error otherwise |
 | other fields | what a MiniCOSM adds (Comprise: `synced-from`, `synced-at`, `max-age`) | as that MiniCOSM says |
 
 **Modes**, Comprise's twelve: `dialectic` · `net-scan` · `system-scan` · `integration` · `structured-intake` · `manual`
 · `derived` · `asserted` · `archetype` · `catalogue` · `directory` · `accounting`. `derived` is the mode every
-derivation uses: an item a program made from other material, such as an EML item made from a text.
+derivation uses: an item a program made from other material, such as an EMF item made from a text.
 
 `not-disclosed` is a fact, not a question: the subject declined to say. `pending` says the item stands on something not
 yet confirmed.
@@ -626,7 +626,7 @@ links:
 
 - `links:` may also hold bare ids: links with no relation named.
 - Comprise also reads `id:` in place of `to:`. A link with neither is skipped.
-- `rel` is free text unless the manifest closes it with `links.rels` (0.0.1). EML closes it to nine words (section
+- `rel` is free text unless the manifest closes it with `links.rels` (0.0.1). EMF closes it to nine words (section
   18.4); a `rel` outside a closed list fails `closed-list`.
 
 ### 9.5 Relations are fields
@@ -673,7 +673,7 @@ pending: "Which entity holds the trademarks since the transfer?"
 - **The report.** The checks list every open question with its item, its field path and the question (section 12.4).
 - **Not the same as "not disclosed".** `provenance.state: not-disclosed` records that the subject declined to say: a
   fact, not a question.
-- **Derivations.** A program that could not do its work writes a question, never a filler. When enough derives an EML
+- **Derivations.** A program that could not do its work writes a question, never a filler. When enough derives an EMF
   twin without a model, every item it writes says so: `pending: "a model has not read this passage"` (section 18.4).
 
 ---
@@ -717,7 +717,7 @@ A path is an id respelled as a location, through the levels the manifest's `path
 | `comprise` | concern, module, kind, item, field | `<concern>/<module>/<kind>/<slug>` |
 | `cosm` | module, kind, item, field | `P/<kind>/<slug>` |
 | `canon` | module, kind, item, field | `V/<kind>/<slug>` |
-| `eml` | module, kind, item, field | `<module>/<kind>/<slug>` |
+| `emf` | module, kind, item, field | `<module>/<kind>/<slug>` |
 
 ```text
 path      = [ part "/" ] module [ "/" kind [ "/" slug [ "#" field ] ] ]    ; part present exactly when the MiniCOSM has parts
@@ -764,8 +764,8 @@ section 18.
 | `P/offering/ledger` | `offering/ledger` | an offering of the product tree in 18.2 |
 | `P/brand/meadow` | `meadow` | that tree's brand |
 | `V/folder/guides` | `V:folder/guides` | a folder of the Canon volume in 18.3 |
-| `V/file/guides--close-md#eml.state` | `V:file/guides--close-md`, field `eml.state` | the state of a text's EML twin |
-| `P/claim/close-locks-the-day` | `P:claim/close-locks-the-day` | a claim of the EML twin in 18.4 |
+| `V/file/guides--close-md#emf.state` | `V:file/guides--close-md`, field `emf.state` | the state of a text's EMF twin |
+| `P/claim/close-locks-the-day` | `P:claim/close-locks-the-day` | a claim of the EMF twin in 18.4 |
 | `P/claim/meadow-closes-overnight#roles.actor` | `P:claim/meadow-closes-overnight`, field `roles.actor` | a role slot |
 | `X/atem/1` | `X:atem/1` | a passage atem |
 
@@ -783,7 +783,7 @@ oes:comprise/meadow                                      the Holotype itself
 oes:comprise/meadow/meadow/O/role/Founder                a role in it
 oes:canon/meadow-handbook/V/file/guides--close-md        a file in a Canon volume
 oes:canon/~meadow-notes/V/file/plan-md                   a file in a project's catalog
-oes:eml/guides--close-md/P/claim/close-locks-the-day     a claim in a text's EML twin
+oes:emf/guides--close-md/P/claim/close-locks-the-day     a claim in a text's EMF twin
 ```
 
 - **No version.** A URI carries no version, because a path keeps its meaning across every version of its MiniCOSM. A
@@ -792,7 +792,7 @@ oes:eml/guides--close-md/P/claim/close-locks-the-day     a claim in a text's EML
   globally unique name, and a resolver for URIs across installs, are mapped (section 21).
 - **A private address.** A URI names a place. It opens nothing to a reader who may not see what is there.
 - **In enough.** enough resolves URIs for its own volumes: `oes:canon/<volume>/…` for a Canon volume,
-  `oes:canon/~<project>/…` for a project's catalog, `oes:eml/<twin>/…` for an EML twin, and
+  `oes:canon/~<project>/…` for a project's catalog, `oes:emf/<twin>/…` for an EMF twin, and
   `oes:comprise/<holotype>/<path>` for any Holotype Canon holds.
 
 ---
@@ -948,7 +948,7 @@ Three more optional keys, which the reference reader (`enough/macrocosm.py`) als
 
 A reader loads every `*.manifest.cosm` in its manifest folders into a **registry**. enough's are
 `defaults/cosm/manifests/` (shipped, read-only); a folder for a person's own manifests, `~/enough/cosm/manifests/`, is
-mapped. The registry order is `comprise`, `cosm`, `canon`, `eml`, then any other in name order. A manifest that does not
+mapped. The registry order is `comprise`, `cosm`, `canon`, `emf`, then any other in name order. A manifest that does not
 load, or that names a MiniCOSM already in the registry, is skipped and reported; the first one wins. The registry is
 what step 1 of section 5.2 compares a declaration against, and what a refusal lists as known.
 
@@ -990,7 +990,7 @@ renderers:
 | `include` | the module letters to draw | every module |
 | `edges` | reference fields (dotted and wildcard fields allowed), `links` (every typed link) or one link `rel` (only the typed links with that `rel`), and `parts` and `parent`, to draw as edges | every reference field, `links`, `parts` and `parent` |
 | `shape` | a mapping from a kind to a Mermaid shape, written as its bracket pair with a space for the label (the pairs are listed below) | the kind's own shape (listed below); `'[ ]'`, a rectangle, for a kind with none |
-| `class-by` | a field whose value names a class on each node, so a stylesheet can colour nodes by it (EML: `stance`) | none |
+| `class-by` | a field whose value names a class on each node, so a stylesheet can colour nodes by it (EMF: `stance`) | none |
 
 **Shapes.** The reader accepts these bracket pairs: `'[ ]'`, `'( )'`, `'([ ])'`, `'[[ ]]'`, `'[( )]'`, `'(( ))'`,
 `'((( )))'`, `'> ]'`, `'{ }'`, `'{{ }}'`, `'[/ /]'`, `'[\ \]'`, `'[/ \]'` and `'[\ /]'`. A pair not in the list is drawn
@@ -1041,13 +1041,13 @@ are quoted, so no label can end a subgraph or break a line; subgraphs balance.
 |---|---|---|
 | `canon` | `tree` | the volume's folders, files and articles, joined by `parent` |
 | `cosm` | `tree` | the product tree, from the brand to its units, joined by `parts` |
-| `eml` | `claims` | entities, concepts and claims, joined by role slots and typed links, coloured by stance |
-| `eml` | `map` | the text's lexicon, entities, concepts, claims and events as a mindmap |
+| `emf` | `claims` | entities, concepts and claims, joined by role slots and typed links, coloured by stance |
+| `emf` | `map` | the text's lexicon, entities, concepts, claims and events as a mindmap |
 | `comprise`, `cosm`, `canon` | `map` (the generic lens) | every module, every reference field and typed link, `parts` and `parent` |
 | `comprise` | `tree` (the generic lens) | the items joined by `parts` or `parent` |
 
 In the reader's order, a volume has these lenses: a Holotype, `map` and `tree` (the `tree` only when its items carry
-`parts` or `parent`); a cosm tree, `tree` and `map`; a Canon volume, `tree` and `map`; an EML, `claims` and `map`. EML's
+`parts` or `parent`); a cosm tree, `tree` and `map`; a Canon volume, `tree` and `map`; an EMF, `claims` and `map`. EMF's
 own `map`, the mindmap, takes the place of the generic one.
 
 ---
@@ -1083,7 +1083,7 @@ The split is two formats, not one format with a setting.
 
 The words come from taxonomy, where a holotype is the one specimen that defines a species and an isotype is a duplicate
 of it. In MacroCOSM they name the two halves of the split in every MiniCOSM, not only Comprise's. In enough today a
-Holotype means a Comprise volume, because Comprise is the only MiniCOSM with a split. Canon and EML declare no public
+Holotype means a Comprise volume, because Comprise is the only MiniCOSM with a split. Canon and EMF declare no public
 projection in 0.0.1; their volumes are the owner's own files, and nothing in enough sends them anywhere.
 
 A MiniCOSM with a split declares its public projection in its manifest (Comprise's `public-projection`), and the rules of
@@ -1121,7 +1121,7 @@ Four manifests ship in `defaults/cosm/manifests/`, one per MiniCOSM.
 | `comprise` | `oes: comprise/1` | a company: its concerns, their relationships, eight modules each | a folder, the Holotype | `holotype.cosm` | C O M P R I S E |
 | `cosm` | `cosm: 0.2` · `0.3`, `opi:` | one whole's product tree, outside any Holotype | a folder of `.cosm` files | the file holding `brand:` | P |
 | `canon` | `oes: canon/1` | a Canon volume, or a project: folders, files, articles, and what has been derived from them | one file | `canon.cosm` | V |
-| `eml` | `oes: eml/1` | one text: its words, the things and ideas it names, its claims, its events, its atems | one file, beside the text | `<text>.cosm` | L E K P T X |
+| `emf` | `oes: emf/1` | one text: its words, the things and ideas it names, its claims, its events, its atems | one file, beside the text | `<text>.cosm` | L E K P T X |
 
 ### 18.1 comprise: Comprise OES 1
 
@@ -1290,9 +1290,9 @@ sources:
 ### 18.3 canon: the store's enumeration
 
 **What it enumerates.** Canon is enough's library: the store at `~/enough/canon/`, the file manager that browses it,
-and the derivations that turn its texts into EML twins and atems. A **Canon volume** is a top-level folder of the
+and the derivations that turn its texts into EMF twins and atems. A **Canon volume** is a top-level folder of the
 store. Its catalog enumerates what the volume holds (folders, files, saved articles) and what has been derived from
-each file: its markdown twin, its EML twin, its atem. The same MiniCOSM enumerates a project's files (section 18.3.4).
+each file: its markdown twin, its EMF twin, its atem. The same MiniCOSM enumerates a project's files (section 18.3.4).
 
 **Its declaration.** `oes: canon/1`. There is no legacy form, and a catalog without the key is refused.
 
@@ -1316,7 +1316,7 @@ each file: its markdown twin, its EML twin, its atem. The same MiniCOSM enumerat
 | `origin` | where a volume came from, as Canon's ingest recorded it: `{type, value, depth}`, `type` being `folder` (made empty), `path`, `url` or `wikisink` |
 | `status` | a volume's ingest state: `complete`, `ingesting` or `failed` |
 | `created`, `updated` | when a volume was made and last reconciled, as timestamps; never in a project's catalog |
-| `counts` | `{folders, files, articles, twins, atems}`: the folder, file and article items; the files with an EML twin; the files with an atem |
+| `counts` | `{folders, files, articles, twins, atems}`: the folder, file and article items; the files with an EMF twin; the files with an atem |
 | `nodes` | the items |
 
 #### 18.3.2 The module and its kinds
@@ -1326,7 +1326,7 @@ One module, V (Volume): *what the volume holds*.
 | Kind | What it is | Its own fields |
 |---|---|---|
 | `folder` | a folder of the volume | `parts`; `holotype: true` when the folder holds a `holotype.cosm` |
-| `file` | a file | `size`, `mtime`, `kind`, `twin`, `eml`, `atem` |
+| `file` | a file | `size`, `mtime`, `kind`, `twin`, `emf`, `atem`, `short_of`, `shorts` |
 | `article` | a saved article: a folder holding an `article.html` and its assets | `title`, `source` |
 
 | Field | Holds |
@@ -1338,16 +1338,20 @@ One module, V (Volume): *what the volume holds*.
 | `mtime` | the modification time, when a writer records it; never in a project's catalog |
 | `kind` | the file's format, in the word Canon's listings use (`markdown`, `text`, `pdf`, `html`, `image`, `cosm` …) |
 | `twin` | the file's markdown twin, `{path, state}`, its state one of `fresh`, `edited`, `stale`, `conflict` |
-| `eml` | the file's EML twin, `{path, state}`, its state `fresh` or `stale` (section 18.4.1) |
-| `atem` | `{line}`: the file's atem line, copied from its EML twin so a listing can show it without opening the twin |
+| `emf` | the file's EMF twin, `{path, state}`, its state `fresh` or `stale` (section 18.4.1) |
+| `atem` | `{line}`: the file's atem line, copied from its EMF twin so a listing can show it without opening the twin |
+| `short_of` | on a short (section 18.4.4), the path of the text it is a short of, when that text is beside it |
+| `shorts` | on a text, the paths of the shorts beside it, in listing order, which is the order they were written |
 | `title`, `source` | an article's title, and the address it was saved from |
 
 **Required:** `id`, `type`, `name`, `path`. **Checks:** `load`, `duplicate-id`, `id-grammar`, `id-module`, `type`,
 `identity-min`, `ref-unresolved`.
 
 **What is never an item.** The catalog itself, `.canon.json`, a markdown twin (it appears as `twin:` on its original),
-and an EML twin (it appears as `eml:` on its text). This matches what Canon's listings show: twins hide behind the files
-they belong to. An `eml/1` file with no sibling text is an ordinary `file` item of kind `cosm`. A folder holding a
+and an EMF twin (it appears as `emf:` on its text). This matches what Canon's listings show: twins hide behind the files
+they belong to. A short is the opposite: an ordinary `file` item, the person's to read and edit, which nothing hides;
+its `short_of` and its text's `shorts` are all that mark it. An `emf/1` file with no sibling text is an ordinary `file`
+item of kind `cosm`. A folder holding a
 `holotype.cosm` is one `folder` item with `holotype: true`; the catalog does not enumerate its contents, since the
 Holotype is a volume of its own and opens in the cosm viewer.
 
@@ -1367,11 +1371,11 @@ A project gets a catalog too: `rness/canon.cosm`, with `scope: project`.
 
 - **What it enumerates.** Exactly what the project's file tree shows, minus `rness/`, which is enough's own machinery
   and holds the catalog itself. Dotfiles, ignored folders, and markdown twins with their asset folders stay out, as they
-  stay out of the tree. EML twins hide behind their texts. A folder holding a `holotype.cosm` is one item, not
+  stay out of the tree. EMF twins hide behind their texts. A folder holding a `holotype.cosm` is one item, not
   recursed.
 - **Its id** is `canon/~<project-slug>`, the project's name slugged; its URI is `oes:canon/~<project-slug>/<path>`.
 - **Structure only.** A project's catalog holds no `size`, no `mtime`, no timestamps, and no twin states: its `twin`
-  and `eml` entries carry the `path` alone, and a viewer works out the state when it shows one. The catalog changes only
+  and `emf` entries carry the `path` alone, and a viewer works out the state when it shows one. The catalog changes only
   when files are added, removed or renamed, or when twins and atems appear, go or change, so a project kept in version
   control sees no churn from ordinary edits.
 - **A cap.** At most 5,000 items. Past the cap, the folders not yet enumerated are listed without their contents, each
@@ -1395,7 +1399,12 @@ An **atem** is the tightest fair, full, plain-English reduction of a text or of 
 Push is the author's side and pull is the reader's. They agree when a text is honest and complete; where they differ, the
 difference is the most useful thing an atem shows.
 
-- **Where an atem lives.** In the text's EML twin. A file's atem is the twin's `atem:` block (section 18.4). Asking for
+**Three densities of one meaning: fabula (EMF) · short (SHORT) · atem.** A text's EMF twin, the fabula, holds its
+meaning item by item (section 18.4); a SHORT tells it again as prose, in an order (section 18.4.4); an atem says it in
+one line. The fabula is the material and a short is one arrangement of it. The atem is neither: it is a reduction, with
+a hermeneutic shape of its own in push and pull.
+
+- **Where an atem lives.** In the text's EMF twin. A file's atem is the twin's `atem:` block (section 18.4). Asking for
   the atem alone makes a minimal twin, `completeness: atem` with `nodes: []`. A passage's atem is shown to the person
   first; when they pin it, it is appended to the twin as an item `X:atem/<n>` with the passage's `span`. Canon copies a
   file's atem line onto the file's item.
@@ -1436,7 +1445,7 @@ nodes:
     parent: V:folder/guides
     size: 494
     kind: markdown
-    eml: {path: guides/close.md.cosm, state: fresh}
+    emf: {path: guides/close.md.cosm, state: fresh}
     atem: {line: "Meadow closes each customer's books overnight once the bank feeds arrive, locks the day, and retries a failed close before anyone opens the summary."}
   - id: V:file/guides--payroll-pdf
     type: file
@@ -1475,7 +1484,7 @@ nodes:
     name: plan.md
     path: plan.md
     kind: markdown
-    eml: {path: plan.md.cosm}
+    emf: {path: plan.md.cosm}
     atem: {line: "The plan moves Meadow's support hours earlier so that a failed overnight close is caught and explained before owners open for the day."}
   - id: V:folder/research
     type: folder
@@ -1488,35 +1497,37 @@ nodes:
     path: research/interviews.txt
     parent: V:folder/research
     kind: text
-    eml: {path: research/interviews.txt.cosm}
+    emf: {path: research/interviews.txt.cosm}
     atem: {line: "Owners of six restaurants in Portland were interviewed in September 2026 about how and when they read their books."}
 ```
 
-### 18.4 eml: a text's enumeration
+### 18.4 emf: a text's enumeration
 
-**What it enumerates.** One text. **EML** stands for *enumerated meaning language*: a text decompiled into the words it
-leans on, the particular things and people it names, the ideas it uses, the claims it makes and how it knows each one,
-the events it narrates in order, and its atems. An EML twin is not a summary. It is the text's meaning taken apart into
-items that can be checked, drawn, compared and compiled back into prose. A text is what a person reads; its twin is what
-the text says, enumerated.
+**What it enumerates.** One text. **EMF** stands for *enumerated meaning fabula*: the fabula of a text, enumerated — the
+order-free material a telling is made from. A text is decompiled into the words it leans on, the particular things and
+people it names, the ideas it uses, the claims it makes and how it knows each one, the events it narrates in order, and
+its atems; *fabula*, for short, is the everyday word for what that makes (section 18.4.4 says where the word comes
+from). An EMF twin is not a summary. It is the text's meaning taken apart into items that can be checked, drawn,
+compared and compiled back into prose. A text is what a person reads; its twin is what the text says, enumerated.
 
-**Its declaration.** `oes: eml/1`. There is no legacy form, and a catalog without the key is refused.
+**Its declaration.** `oes: emf/1`. There is no legacy form, and a catalog without the key is refused.
 
-**Its volume.** One file. An **EML twin** sits beside its text and is named by adding `.cosm` to the text's whole name:
-`close.md` and `close.md.cosm`. There is no `.eml` extension; the family has one. A twin's `source:` names its text;
-an EML file with no `source:` is a standalone EML, read the same way.
+**Its volume.** One file. An **EMF twin** sits beside its text and is named by adding `.cosm` to the text's whole name:
+`close.md` and `close.md.cosm`. There is no `.emf` extension; the family has one. A twin's `source:` names its text;
+an EMF file with no `source:` is a standalone EMF, read the same way.
 
 #### 18.4.1 The catalog
 
 | Key | Holds |
 |---|---|
-| `oes` | `eml/1` |
+| `oes` | `emf/1` |
 | `macrocosm` | reserved (section 5.6) |
-| `id` | `eml/<slug>`, the slug being the text's path in its volume or project, respelled by the Canon rule (section 18.3.3): the twin of `guides/close.md` is `eml/guides--close-md` |
+| `id` | `emf/<slug>`, the slug being the text's path in its volume or project, respelled by the Canon rule (section 18.3.3): the twin of `guides/close.md` is `emf/guides--close-md` |
 | `name` | the text's title, or its file name when it has none |
-| `source` | the text: `{path, sha256, size, mtime_ns}`, its `path` relative to the twin (the sibling's file name); absent for a standalone EML |
+| `source` | the text: `{path, sha256, size, mtime_ns}`, its `path` relative to the twin (the sibling's file name); absent for a standalone EMF |
 | `derived` | how the twin was made: `{at, by, model, mode, completeness, chunks}`: when; at whose request (`person`, or the readvisor's name); the model's id (absent in rules mode); `mode`, `model` or `rules`; `completeness`, `full` or `atem`; how many chunks the text was read in. A derivation that dropped items it could not repair records how many in `dropped` |
 | `atem` | the whole text's atem: `{line, focus, push, pull}` (section 18.3.5) |
+| `shorts` | the shorts compiled from the twin, one `{path, at, by, mode, order}` per compile, appended (section 18.4.4); absent until the first |
 | `nodes` | the items |
 
 **Fresh and stale.** A twin is `fresh` while its text's size and modification time match the twin's `source`, and,
@@ -1534,7 +1545,7 @@ stale twin is kept and shown with its state; it is refreshed only when someone a
 | T | Transitions | what happens, in order | `event` | `agent`, `patient`, `before`, `after` | `when`, `span` |
 | X | Atems | the tight reductions of passages | `atem` | `of` | `line`, `focus`, `push`, `pull`, `span` |
 
-**Envelope.** Required: `id`, `type`, `name`, `summary`, `provenance`. EML adds `span` and `salience` to the envelope.
+**Envelope.** Required: `id`, `type`, `name`, `summary`, `provenance`. EMF adds `span` and `salience` to the envelope.
 **Closed lists:** `stance` (below), `salience` (`critical` · `high` · `normal` · `low`), and the nine link relations.
 **Checks:** `load`, `duplicate-id`, `id-grammar`, `id-module`, `type`, `identity-min`, `provenance`, `ref-unresolved`,
 `closed-list`.
@@ -1569,7 +1580,7 @@ spirit of the evidential markers some languages carry in their grammar:
 | `hearsay` | reported from someone else, who fills the claim's `source` slot when the text names them |
 
 **Typed links instead of arrows.** A relation between two items is a typed link in the first item's `links:`, never a
-symbol between them. EML closes the relations to nine:
+symbol between them. EMF closes the relations to nine:
 
 | `rel` | The item … the target |
 |---|---|
@@ -1599,12 +1610,65 @@ writes has `confidence: 0.3`, `state: pending`, and `pending: "a model has not r
 **Made on request, never in passing.** A twin is made when a person asks for it, or a readvisor's tool does. Nothing
 that imports, copies, lists or reconciles files ever decompiles a text.
 
-**Compiling back.** Compiling an EML twin writes a new markdown file beside it, named
-`<stem>-from-eml-<YYYY-MM-DD-HHMM>.md`, and never overwrites the text: the atem line first, then the claims in order of
-salience grouped by the concepts they lean on, each claim's stance said in plain words ("the author holds", "it is
-assumed", "reportedly"), then the events in order, then the terms.
+**Compiled back, it is told again.** Compiling a twin writes a short beside its text, and never touches the text
+(section 18.4.4).
 
-#### 18.4.4 An example
+#### 18.4.4 Shorts
+
+**What a short is.** A **SHORT**, *syuzhetic-hermeneutic open readable text*, is a telling of a text that enough
+compiles from its EMF twin. It is *syuzhetic*: an arrangement, the twin's items put in an order. It is *hermeneutic*:
+as it tells each thing it says how the thing is known, every claim's stance in plain words. It is *open*: it is plain
+markdown that anyone can read without enough, it is yours to edit, it is honest about its gaps, and it is open to the
+reader's own reading. It is *readable text*: prose, not a database. The name covers only what enough compiles.
+
+**One fabula, many tellings.** A text's EMF twin is its fabula (section 18.4): the order-free material a telling is made
+from. Every claim is there with its stance, every event with its own before and after, every term grounded, and each
+item's `span` says where in the telling it was found. A *syuzhet* is a telling of that material, an arrangement of it.
+The author's text is a syuzhet of the same fabula, the first one, and it is the author's: it is never called a short. A
+short is a syuzhet enough compiles, and a text can have many. The atem sits outside the pair. It is the breath of the
+text, a reduction with its own hermeneutic shape (push and pull), neither material nor arrangement.
+
+**Two orders.**
+
+| Order | In words | How it tells |
+|---|---|---|
+| `told` | as the author told it | every item with a span, in the order of its span: by first line, then last line, and within one line the words, the names, the ideas, the claims, then the events. Under the text's own headings when the text can be read (a span given as quotes is then placed on its line). Items that no span places come last, under "Also in the fabula" |
+| `weight` | by weight | the claims in order of salience, grouped by the concepts they lean on; then the events, in before/after order; then the terms |
+
+Both open with the atem line, and both say each claim's stance in plain words ("the author holds that", "it is assumed
+that", "reportedly"). Pinned passage atems are not told: like the file's atem, they stand outside the telling. With no
+order given, a compile tells `told` when the twin names a source text that can be read, and `weight` for a standalone
+EMF. Without a model a short is the ordered outline itself, said in the items' own sentences; with one, a model writes
+the outline as prose and is told which order it is in. A third order, the events first in the order they happened, is
+planned.
+
+**The file.** A short is written beside its text as `<text-stem>.short-<YYYY-MM-DD-HHMM>.md`, in local time:
+`notes.md` gives `notes.short-2026-10-23-1042.md`, and a standalone `rain.cosm` gives `rain.short-…md`. A second compile
+in the same minute takes `-2`, then `-3`. Every compile is a new file. Nothing is overwritten, and the text is never
+touched. A short is an ordinary markdown file, shown in every listing; Canon's catalogs mark it `short_of` its text,
+and the text `shorts` (section 18.3.2).
+
+**The footer.** Every short ends with one italic line that says what it is a short of, in which order, when, and by
+which model or by rules:
+
+```text
+*a short of notes.md, told as the author told it, compiled from its EMF twin on 2026-10-23 by g40-04*
+```
+
+Without a model the line ends "by rules, without a model". A short of a standalone EMF says so: "a short of rain.cosm,
+a standalone EMF, told by weight, compiled on …".
+
+**The fabula records its tellings.** Each compile appends one entry to the twin's `shorts:` list, `{path, at, by,
+mode, order}`: the short's file name beside the twin; when, as a timestamp in UTC; the model's id, or `rules`; `model`
+or `rules`; `told` or `weight`. The list is made just above `nodes:` the first time. Nothing else in the twin changes:
+not its items, not its `source:` (a fresh twin stays fresh), not a byte of the rest.
+
+**Where the words come from.** *Fabula* and *syuzhet* are the Russian Formalists' pair: the story as it happened, and
+the story as it is told. Their work on how a telling makes the familiar strange began with Viktor Shklovsky's *Art as
+Technique* (1917), and Boris Tomashevsky's *Thematics* (1925) set the two terms out. MacroCOSM borrows the pair for
+meaning rather than plot: the twin is the material, and a short is one telling of it.
+
+#### 18.4.5 An example
 
 The text, `guides/close.md` in the Canon volume of section 18.3.6:
 
@@ -1619,12 +1683,13 @@ Because the close waits for the feeds, a late feed delays the summary.
 We think a summary that arrives every morning is why owners stay.
 ```
 
-Its twin, `guides/close.md.cosm`, made by a model. Each of the six stances appears once.
+Its twin, `guides/close.md.cosm`, made by a model and compiled once into a short. Each of the six stances appears
+once.
 
 ```cosm
-oes: eml/1
+oes: emf/1
 macrocosm: 0.0.1
-id: eml/guides--close-md
+id: emf/guides--close-md
 name: The morning close
 source: {path: close.md, sha256: d297e46db2cbd55a0fb8af894c130604f087455510bec9417548ce3742191b14, size: 494, mtime_ns: 1792660324518000000}
 derived: {at: 2026-10-22T09:15:30Z, by: person, model: g40-04, mode: model, completeness: full, chunks: 1}
@@ -1633,6 +1698,8 @@ atem:
   focus: How Meadow's overnight close works, what it guarantees, and what it waits on.
   push: Trust the morning summary, because every day is locked and a failed close is caught before seven.
   pull: The summary is only as early as the bank feeds, which Meadow does not control, so a late feed still delays it.
+shorts:
+  - {path: close.short-2026-10-22-0931.md, at: 2026-10-22T09:31:12Z, by: g40-04, mode: model, order: told}
 nodes:
   - id: L:term/close
     type: term
@@ -1773,8 +1840,8 @@ A minimal twin, made by asking for the atem of `research/interviews.txt` (the pr
 running. It holds the atem and nothing else, and says it is a scaffold.
 
 ```cosm
-oes: eml/1
-id: eml/research--interviews-txt
+oes: emf/1
+id: emf/research--interviews-txt
 name: interviews.txt
 source: {path: interviews.txt, sha256: 452787f27e8ffbcf380f0af7e7887e974cc198d3a270224861e09690675631c7, size: 240, mtime_ns: 1792600811204000000}
 derived: {at: 2026-10-21T16:41:02Z, by: person, mode: rules, completeness: atem, chunks: 1}
@@ -1817,7 +1884,7 @@ nodes: []
 5. Keep the fields it does not understand when it rewrites an item.
 6. Write nothing into a file that its MiniCOSM keeps out of files (Comprise's people).
 7. Where its MiniCOSM says that checks gate writes, leave the volume's checks no worse.
-8. Write a catalog that a program owns (a Canon catalog) only from that program; and make derived items (an EML twin,
+8. Write a catalog that a program owns (a Canon catalog) only from that program; and make derived items (an EMF twin,
    an atem) only when a person or a readvisor asks.
 
 ### 19.3 The conformance corpus
@@ -1831,7 +1898,7 @@ A reader conforms to MacroCOSM OES 0.0.1 when:
   manifest selects with no errors;
 - every path in the table of section 11.2 resolves to the id beside it;
 - each refusal case of section 5 (an unknown MiniCOSM, an unknown major, a misspelled value such as `comprise/01` or
-  `' eml/1 '`, an empty `oes:`, a catalog with no declaration at a name no default claims) is refused, and each legacy
+  `' emf/1 '`, an empty `oes:`, a catalog with no declaration at a name no default claims) is refused, and each legacy
   case is read.
 
 The reader's own tests are the tie-break. Where they and this list disagree, the tests win and this section is
@@ -1857,7 +1924,7 @@ in.
    as `comprise/1`; a generic reader that applied the default everywhere would claim every YAML file it was shown.
 5. **A refusal is a value, not an exception.** A viewer shows the refusal in place of the volume and goes on.
 6. **`macrocosm:` is reserved and ignored.** Room for a grammar version test later, without refusing any file today.
-7. **Single-file volumes.** A Canon volume and an EML twin are one catalog each; a folder per text would double every
+7. **Single-file volumes.** A Canon volume and an EMF twin are one catalog each; a folder per text would double every
    tree.
 8. **Module letters are local to a MiniCOSM.** The declaration already says which language a volume speaks; reserving
    letters across languages would run out of letters and buy nothing.
@@ -1865,7 +1932,7 @@ in.
    that never varies is noise.
 10. **Wildcard reference fields check only id-shaped values.** Role slots mix item ids with literals such as conditions;
     checking literals as ids would make every condition an error.
-11. **Link relations may be closed.** EML closes them so that twins can be drawn and compared; Comprise keeps its own
+11. **Link relations may be closed.** EMF closes them so that twins can be drawn and compared; Comprise keeps its own
     free.
 12. **Closed lists and severities by name, in the manifest.** A MiniCOSM's own vocabularies (stance, salience) and its
     severities are checked without new code.
@@ -1880,9 +1947,9 @@ in.
     mechanics stay Comprise's until a second MiniCOSM needs them.
 18. **A URI between volumes is a value, not a reference.** Resolving across volumes needs a registry of volumes this
     version does not define.
-19. **The EML twin's name adds `.cosm` to the text's whole name.** `notes.md` and `notes.md.cosm` sort together and pair
+19. **The EMF twin's name adds `.cosm` to the text's whole name.** `notes.md` and `notes.md.cosm` sort together and pair
     by name; the family keeps one extension.
-20. **An EML twin's id respells the text's path.** Two texts with the same name in different folders must not share an
+20. **An EMF twin's id respells the text's path.** Two texts with the same name in different folders must not share an
     address.
 21. **A project's catalog records structure only.** No sizes, times or twin states, so that a project in version control
     does not change with every edit.
@@ -1892,6 +1959,11 @@ in.
     a filler.
 24. **The specification lives in enough for now.** Comprise vendors it later, with the reader.
 25. **All rights reserved for the specification and the manifests; the reader is Apache 2.0** with the rest of enough.
+26. **What enough compiles from a twin is a SHORT, written beside the text and recorded by the twin.** One fabula, many
+    tellings: the EMF twin, *enumerated meaning fabula*, is the material and a short one arrangement of it. The author's
+    text is the first arrangement and is never called a short; the atem stays outside the pair. Every compile is a new
+    file in one of two orders, the author's or by weight, and the twin lists its shorts so the material knows its
+    tellings.
 
 ---
 
@@ -1957,7 +2029,7 @@ Section by section, where each part of this document comes from in Comprise OES 
 | 17 MicroCOSMs | README §5; the manifest's `extension` | mapped, unchanged |
 | 18.1 comprise | the whole of Comprise OES 1 | how it sits in MacroCOSM |
 | 18.2 cosm | chapter P, P.7; COSM 0.2 | a MiniCOSM for trees outside a Holotype |
-| 18.3 canon, 18.4 eml | none | new MiniCOSMs, written in the grammar |
+| 18.3 canon, 18.4 emf | none | new MiniCOSMs, written in the grammar |
 | 19 Conformance | §13 | the corpus named; the reader wins |
 | 20 Decisions | §14 | this version's own |
 | 21 Roadmap | README §7; §12's *not built* | the morph-driven renderers named |

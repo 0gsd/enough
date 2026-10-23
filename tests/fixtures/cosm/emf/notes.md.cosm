@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/notes-md
+oes: emf/1
+id: emf/notes-md
 name: The Hollins Lane orchard, autumn notes
 source: {path: notes.md, sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7, size: 1228, mtime_ns: 1792665000000000000}
 # Written by hand as a test fixture: a full twin, every kind of item once at least. A model's twin also says model:.

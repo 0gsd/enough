@@ -110,7 +110,7 @@
        the chat, not modals or bubbles (those follow --uiz alone).
        Extending text scale to another surface = one selector here. */
     :is(#review-mode, #ref-mode, #cosmspec-mode, #cosm-mode) .review-body,
-    .eml-face .review-body,
+    .emf-face .review-body,
     #edit-mode .edit-textarea,
     #wiki-body,
     #preview-body {
@@ -604,6 +604,22 @@
        the badge box uses the same object-fit:cover crop the topbar's
        wide pill toggles use: scale to the box WIDTH, crop the empty
        top/bottom. */
+    /* A short's row (plan §15): the Canon tile's quiet tag, small. */
+    .tree-short-tag {
+      flex: 0 0 auto;
+      margin-left: 3px;
+      padding: 0 4px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      line-height: 13px;
+      font-variant-caps: all-small-caps;
+      letter-spacing: 0.065em;
+      color: color-mix(in oklab, var(--accent-tool) 60%, var(--fg));
+      border: 1px solid color-mix(in oklab, var(--accent-tool) 55%, transparent);
+      border-radius: 7px;
+      white-space: nowrap;
+    }
+
     .convert-badge {
       position: relative;
       display: inline-flex;
@@ -3523,6 +3539,104 @@
       color: var(--accent-agent);
     }
 
+    /* The context notice (the 16 GB context fix, 0.4.3): enough's
+       instructions do not fit the model's window. ctxNoticePaint() puts it
+       at the top of whatever #empty-hint is showing, and under a first-turn
+       overflow error. Colours are the theme's own tokens, so all four themes
+       carry it; sizes are px inside the --uiz-zoomed panel, like the rest of
+       the chat. */
+    .ctx-notice {
+      font-style: normal;
+      color: var(--fg);
+      text-align: left;
+      max-width: 520px;
+      margin: 0 auto 18px auto;
+      padding: 14px 16px;
+      border: 1px solid color-mix(in oklab, var(--accent-tool) 45%, var(--border));
+      border-left: 3px solid var(--accent-tool);
+      border-radius: 6px;
+      background: var(--bg-raise);
+      overflow-wrap: break-word;
+    }
+
+    .ctx-notice--turn {
+      margin: 8px auto 16px auto;
+    }
+
+    .ctx-notice-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin: 0 0 6px 0;
+    }
+
+    .ctx-notice-body {
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .ctx-notice-body + .ctx-notice-body {
+      margin-top: 8px;
+      color: var(--fg-muted);
+    }
+
+    .ctx-notice-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .ctx-notice-btn {
+      font: inherit;
+      font-size: 12px;
+      line-height: 1.4;
+      white-space: normal;
+      text-align: left;
+      min-height: 26px;
+      padding: 5px 14px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      cursor: pointer;
+    }
+
+    .ctx-notice-btn:hover:not(:disabled),
+    .ctx-notice-btn:focus-visible {
+      border-color: var(--fg-faint);
+    }
+
+    /* Tinted rather than filled: theme text on a 22% accent wash keeps its
+       contrast in every theme (pastel's accent is too light to carry its
+       own background colour as text). */
+    .ctx-notice-btn.primary {
+      background: color-mix(in oklab, var(--accent-agent) 22%, var(--bg));
+      color: var(--fg);
+      border-color: var(--accent-agent);
+      font-weight: 600;
+    }
+
+    .ctx-notice-btn.primary:hover:not(:disabled) {
+      background: color-mix(in oklab, var(--accent-agent) 34%, var(--bg));
+    }
+
+    .ctx-notice-btn:disabled {
+      opacity: 0.55;
+      cursor: progress;
+    }
+
+    .ctx-notice-status {
+      font-size: 12px;
+      color: var(--fg-muted);
+      margin: 8px 0 0 0;
+    }
+
+    .ctx-notice-status.error {
+      color: var(--accent-error);
+      font-weight: 600;
+    }
+
     .msg.assistant.pending .body::after {
       content: "▋";
       color: var(--accent-agent);
@@ -5461,7 +5575,7 @@
     }
 
     /* ---------------- The cosm viewer (0.4.3) ----------------
-       Any MacroCOSM volume — a Canon catalog, a Holotype, an EML twin, a
+       Any MacroCOSM volume — a Canon catalog, a Holotype, an EMF twin, a
        standalone COSM tree — as a rail (the catalog, its modules and kinds,
        the checks) beside a reading column of item cards. The cards are
        .review-body (the serif reading face and the max-contrast --review-*
@@ -5504,12 +5618,12 @@
       font-size: 15px;
     }
 
-    :is(#cosm-mode, .eml-face) button,
-    :is(#cosm-mode, .eml-face) select {
+    :is(#cosm-mode, .emf-face) button,
+    :is(#cosm-mode, .emf-face) select {
       font: inherit;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-toolbar {
+    :is(#cosm-mode, .emf-face) .cosm-toolbar {
       display: flex;
       align-items: center;
       gap: 6px 10px;
@@ -5521,13 +5635,13 @@
       font-size: 12px;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-mode-icon {
+    :is(#cosm-mode, .emf-face) .cosm-mode-icon {
       width: 20px;
       height: 20px;
       flex-shrink: 0;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-title {
+    :is(#cosm-mode, .emf-face) .cosm-title {
       font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
@@ -5536,9 +5650,9 @@
       flex: 0 1 auto;
     }
 
-    /* The declaration: which MiniCOSM, at which major (comprise/1, eml/1…).
+    /* The declaration: which MiniCOSM, at which major (comprise/1, emf/1…).
        Mirrors the reader badges (.ref-badge, .mm-badge). */
-    :is(#cosm-mode, .eml-face) .cosm-decl {
+    :is(#cosm-mode, .emf-face) .cosm-decl {
       font-family: var(--font-mono);
       font-size: 10.5px;
       color: var(--accent-tool);
@@ -5549,19 +5663,19 @@
       flex-shrink: 0;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-decl[hidden],
-    :is(#cosm-mode, .eml-face) .cosm-lens[hidden],
-    :is(#cosm-mode, .eml-face) .cosm-tool-btn[hidden] {
+    :is(#cosm-mode, .emf-face) .cosm-decl[hidden],
+    :is(#cosm-mode, .emf-face) .cosm-lens[hidden],
+    :is(#cosm-mode, .emf-face) .cosm-tool-btn[hidden] {
       display: none;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-spacer {
+    :is(#cosm-mode, .emf-face) .cosm-spacer {
       flex: 1 1 0;
       min-width: 0;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-tool-btn,
-    :is(#cosm-mode, .eml-face) .cosm-lens {
+    :is(#cosm-mode, .emf-face) .cosm-tool-btn,
+    :is(#cosm-mode, .emf-face) .cosm-lens {
       font-size: 11.5px;
       color: var(--fg);
       background-color: var(--btn-bg, var(--bg-raise));
@@ -5573,16 +5687,16 @@
       flex-shrink: 0;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-lens {
+    :is(#cosm-mode, .emf-face) .cosm-lens {
       padding: 2px 6px;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-tool-btn[aria-expanded="true"] {
+    :is(#cosm-mode, .emf-face) .cosm-tool-btn[aria-expanded="true"] {
       border-color: var(--accent-tool);
       color: var(--accent-tool);
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-size-btn {
+    :is(#cosm-mode, .emf-face) .cosm-size-btn {
       width: 26px;
       height: 26px;
       display: inline-flex;
@@ -5599,13 +5713,13 @@
           rgba(128, 128, 128, 0));
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-size-btn img {
+    :is(#cosm-mode, .emf-face) .cosm-size-btn img {
       width: 16px;
       height: 16px;
     }
 
     /* "open raw" on a folder volume: the files it is made of. */
-    :is(#cosm-mode, .eml-face) .cosm-pop {
+    :is(#cosm-mode, .emf-face) .cosm-pop {
       position: absolute;
       z-index: 6;
       min-width: 220px;
@@ -5621,16 +5735,16 @@
       font-size: 12px;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-pop[hidden] {
+    :is(#cosm-mode, .emf-face) .cosm-pop[hidden] {
       display: none;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-pop-h {
+    :is(#cosm-mode, .emf-face) .cosm-pop-h {
       padding: 3px 8px 5px;
       color: var(--fg-muted);
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-pop button {
+    :is(#cosm-mode, .emf-face) .cosm-pop button {
       display: block;
       width: 100%;
       text-align: left;
@@ -5647,19 +5761,19 @@
       text-overflow: ellipsis;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-pop button:hover,
-    :is(#cosm-mode, .eml-face) .cosm-pop button:focus-visible {
+    :is(#cosm-mode, .emf-face) .cosm-pop button:hover,
+    :is(#cosm-mode, .emf-face) .cosm-pop button:focus-visible {
       background: color-mix(in oklab, var(--accent-tool) 14%, transparent);
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-stage {
+    :is(#cosm-mode, .emf-face) .cosm-stage {
       flex: 1;
       min-height: 0;
       display: flex;
       position: relative;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-body {
+    :is(#cosm-mode, .emf-face) .cosm-body {
       min-width: 0;
     }
 
@@ -5668,7 +5782,7 @@
     }
 
     /* ---- the rail ---- */
-    :is(#cosm-mode, .eml-face) .cosm-rail {
+    :is(#cosm-mode, .emf-face) .cosm-rail {
       flex: 0 0 280px;
       overflow-y: auto;
       overscroll-behavior: contain;
@@ -5680,24 +5794,24 @@
       line-height: 1.4;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-rail[hidden] {
+    :is(#cosm-mode, .emf-face) .cosm-rail[hidden] {
       display: none;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-rail-h {
+    :is(#cosm-mode, .emf-face) .cosm-rail-h {
       color: var(--fg-muted);
       margin: 16px 0 6px;
       font-size: 11.5px;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-cat-name {
+    :is(#cosm-mode, .emf-face) .cosm-cat-name {
       font-weight: 700;
       font-size: 14px;
       line-height: 1.3;
       overflow-wrap: anywhere;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-cat-sum {
+    :is(#cosm-mode, .emf-face) .cosm-cat-sum {
       margin: 5px 0 0;
       color: var(--fg-muted);
       font-family: var(--font-serif, Georgia, serif);
@@ -5705,30 +5819,30 @@
       line-height: 1.4;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-cat-meta {
+    :is(#cosm-mode, .emf-face) .cosm-cat-meta {
       margin-top: 6px;
       color: var(--fg-muted);
       overflow-wrap: anywhere;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-cat-meta .cosm-cat-decl {
+    :is(#cosm-mode, .emf-face) .cosm-cat-meta .cosm-cat-decl {
       color: var(--cosm-ink-tool);
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-scaffold {
+    :is(#cosm-mode, .emf-face) .cosm-scaffold {
       margin-top: 6px;
       color: var(--cosm-ink-tool);
       font-style: italic;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-uri {
+    :is(#cosm-mode, .emf-face) .cosm-uri {
       display: flex;
       align-items: center;
       gap: 6px;
       margin-top: 6px;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-uri code {
+    :is(#cosm-mode, .emf-face) .cosm-uri code {
       flex: 1;
       min-width: 0;
       font-family: var(--font-mono);
@@ -5737,7 +5851,7 @@
       overflow-wrap: anywhere;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-copy {
+    :is(#cosm-mode, .emf-face) .cosm-copy {
       flex-shrink: 0;
       width: 22px;
       height: 20px;
@@ -5751,22 +5865,22 @@
       cursor: pointer;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-copy:hover {
+    :is(#cosm-mode, .emf-face) .cosm-copy:hover {
       color: var(--accent-tool);
       border-color: var(--accent-tool);
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-outline ul {
+    :is(#cosm-mode, .emf-face) .cosm-outline ul {
       list-style: none;
       margin: 0 0 4px;
       padding: 0 0 0 26px;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-rmod {
+    :is(#cosm-mode, .emf-face) .cosm-rmod {
       margin: 0 0 6px;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-rail button.cosm-rl {
+    :is(#cosm-mode, .emf-face) .cosm-rail button.cosm-rl {
       display: flex;
       align-items: baseline;
       gap: 6px;
@@ -5780,33 +5894,33 @@
       cursor: pointer;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-rail button.cosm-rl:hover,
-    :is(#cosm-mode, .eml-face) .cosm-rail button.cosm-rl:focus-visible {
+    :is(#cosm-mode, .emf-face) .cosm-rail button.cosm-rl:hover,
+    :is(#cosm-mode, .emf-face) .cosm-rail button.cosm-rl:focus-visible {
       background: var(--bg-raise);
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-rl-name {
+    :is(#cosm-mode, .emf-face) .cosm-rl-name {
       flex: 1;
       min-width: 0;
       overflow-wrap: anywhere;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-rmod > .cosm-rl .cosm-rl-name {
+    :is(#cosm-mode, .emf-face) .cosm-rmod > .cosm-rl .cosm-rl-name {
       font-weight: 600;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-rmod-sub {
+    :is(#cosm-mode, .emf-face) .cosm-rmod-sub {
       padding: 0 6px 2px 32px;
       color: var(--fg-muted);
       font-size: 11.5px;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-rmod.empty .cosm-rl,
-    :is(#cosm-mode, .eml-face) .cosm-rmod.empty .cosm-rmod-sub {
+    :is(#cosm-mode, .emf-face) .cosm-rmod.empty .cosm-rl,
+    :is(#cosm-mode, .emf-face) .cosm-rmod.empty .cosm-rmod-sub {
       color: var(--fg-faint);
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-count {
+    :is(#cosm-mode, .emf-face) .cosm-count {
       flex-shrink: 0;
       color: var(--fg-muted);
       font-variant-numeric: tabular-nums;
@@ -5814,7 +5928,7 @@
     }
 
     /* The module letter, a little square plate (FEED's spine mark). */
-    :is(#cosm-mode, .eml-face) .cosm-letter {
+    :is(#cosm-mode, .emf-face) .cosm-letter {
       flex-shrink: 0;
       display: inline-block;
       min-width: 1.45em;
@@ -5829,31 +5943,31 @@
       border-radius: 3px;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-checks details {
+    :is(#cosm-mode, .emf-face) .cosm-checks details {
       margin: 4px 0;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-checks summary {
+    :is(#cosm-mode, .emf-face) .cosm-checks summary {
       cursor: pointer;
       padding: 2px 0;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-checks ul {
+    :is(#cosm-mode, .emf-face) .cosm-checks ul {
       list-style: none;
       margin: 4px 0 6px;
       padding: 0 0 0 4px;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-checks li {
+    :is(#cosm-mode, .emf-face) .cosm-checks li {
       margin: 0 0 6px;
       overflow-wrap: anywhere;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-ok {
+    :is(#cosm-mode, .emf-face) .cosm-ok {
       color: var(--fg);
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-ok::before {
+    :is(#cosm-mode, .emf-face) .cosm-ok::before {
       content: "✓";
       display: inline-block;
       margin-right: 6px;
@@ -5863,7 +5977,7 @@
 
     /* Severity: a shape and a hue — square error, triangle warning,
        circle note. */
-    :is(#cosm-mode, .eml-face) .cosm-sev {
+    :is(#cosm-mode, .emf-face) .cosm-sev {
       display: inline-block;
       width: 0.6em;
       height: 0.6em;
@@ -5872,37 +5986,37 @@
       background: var(--accent-error);
       border-radius: 1px;
     }
-    :is(#cosm-mode, .eml-face) .cosm-sev.sev-warning {
+    :is(#cosm-mode, .emf-face) .cosm-sev.sev-warning {
       width: 0.7em;
       background: var(--accent-tool);
       clip-path: polygon(50% 0, 100% 100%, 0 100%);
       border-radius: 0;
     }
-    :is(#cosm-mode, .eml-face) .cosm-sev.sev-note {
+    :is(#cosm-mode, .emf-face) .cosm-sev.sev-note {
       background: var(--fg-muted);
       border-radius: 50%;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-checks code {
+    :is(#cosm-mode, .emf-face) .cosm-checks code {
       font-family: var(--font-mono);
       font-size: 0.9em;
       color: var(--fg-muted);
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-rail a {
+    :is(#cosm-mode, .emf-face) .cosm-rail a {
       display: inline-block;
       padding: 1px 0;
       color: var(--fg);
       text-decoration: underline dotted;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-pf {
+    :is(#cosm-mode, .emf-face) .cosm-pf {
       font-family: var(--font-mono);
       font-size: 0.88em;
       color: var(--fg-muted);
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-notrun {
+    :is(#cosm-mode, .emf-face) .cosm-notrun {
       margin-top: 8px;
       color: var(--fg-muted);
       font-size: 11.5px;
@@ -5910,18 +6024,18 @@
     }
 
     /* ---- the reading column ---- */
-    :is(#cosm-mode, .eml-face) .cosm-state {
+    :is(#cosm-mode, .emf-face) .cosm-state {
       color: var(--review-fg-muted);
       font-style: italic;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-error {
+    :is(#cosm-mode, .emf-face) .cosm-error {
       color: var(--accent-error);
       font-family: var(--font-mono);
       font-size: 0.8em;
     }
 
-    :is(#cosm-mode, .eml-face) .review-body h2.cosm-mod-h {
+    :is(#cosm-mode, .emf-face) .review-body h2.cosm-mod-h {
       display: flex;
       align-items: baseline;
       flex-wrap: wrap;
@@ -5930,24 +6044,24 @@
       margin: 1.4em 0 0.4em;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-mod:first-child h2.cosm-mod-h,
-    :is(#cosm-mode, .eml-face, #atem-modal) .cosm-atem + .cosm-mod h2.cosm-mod-h {
+    :is(#cosm-mode, .emf-face) .cosm-mod:first-child h2.cosm-mod-h,
+    :is(#cosm-mode, .emf-face, #atem-modal) .cosm-atem + .cosm-mod h2.cosm-mod-h {
       margin-top: 0.2em;
     }
 
-    :is(#cosm-mode, .eml-face) h2.cosm-mod-h .cosm-letter {
+    :is(#cosm-mode, .emf-face) h2.cosm-mod-h .cosm-letter {
       font-size: 0.6em;
       align-self: center;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-mod-sub {
+    :is(#cosm-mode, .emf-face) .cosm-mod-sub {
       font-size: 0.55em;
       font-weight: 400;
       font-style: italic;
       color: var(--review-fg-muted);
     }
 
-    :is(#cosm-mode, .eml-face) .review-body h3.cosm-kind-h {
+    :is(#cosm-mode, .emf-face) .review-body h3.cosm-kind-h {
       font-size: 1.05em;
       margin: 1.2em 0 0.55em;
       display: flex;
@@ -5955,7 +6069,7 @@
       gap: 0.5em;
     }
 
-    :is(#cosm-mode, .eml-face) h3.cosm-kind-h .cosm-count {
+    :is(#cosm-mode, .emf-face) h3.cosm-kind-h .cosm-count {
       font-weight: 400;
       color: var(--review-fg-muted);
     }
@@ -5964,7 +6078,7 @@
        without laying out cards nobody has scrolled to; `auto` in the
        intrinsic size remembers each card's real height once it has been
        drawn, so a jump back up the column lands where it should. */
-    :is(#cosm-mode, .eml-face) .cosm-card {
+    :is(#cosm-mode, .emf-face) .cosm-card {
       content-visibility: auto;
       contain-intrinsic-size: auto 170px;
       margin: 0 0 12px;
@@ -5975,7 +6089,7 @@
       outline-offset: 2px;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-card:focus {
+    :is(#cosm-mode, .emf-face) .cosm-card:focus {
       outline-color: color-mix(in oklab, var(--accent-tool) 55%, transparent);
     }
 
@@ -5990,11 +6104,11 @@
       }
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-card.cosm-flash {
+    :is(#cosm-mode, .emf-face) .cosm-card.cosm-flash {
       animation: cosm-flash 1.6s ease-out;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-env {
+    :is(#cosm-mode, .emf-face) .cosm-env {
       font-family: var(--font-mono);
       font-size: 0.66em;
       line-height: 1.5;
@@ -6002,7 +6116,7 @@
       overflow-wrap: anywhere;
     }
 
-    :is(#cosm-mode, .eml-face) .review-body h4.cosm-name {
+    :is(#cosm-mode, .emf-face) .review-body h4.cosm-name {
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
@@ -6012,15 +6126,15 @@
       overflow-wrap: anywhere;
     }
 
-    :is(#cosm-mode, .eml-face) .review-body p.cosm-summary {
+    :is(#cosm-mode, .emf-face) .review-body p.cosm-summary {
       margin: 0.25em 0 0.45em;
     }
 
-    :is(#cosm-mode, .eml-face) .review-body p.cosm-pending {
+    :is(#cosm-mode, .emf-face) .review-body p.cosm-pending {
       margin: 0.3em 0 0.45em;
     }
 
-    :is(#cosm-mode, .eml-face) dl.cosm-fields {
+    :is(#cosm-mode, .emf-face) dl.cosm-fields {
       display: grid;
       grid-template-columns: minmax(5.5em, max-content) minmax(0, 1fr);
       gap: 0.2em 0.9em;
@@ -6029,14 +6143,14 @@
       line-height: 1.45;
     }
 
-    :is(#cosm-mode, .eml-face) dl.cosm-fields dl.cosm-fields {
+    :is(#cosm-mode, .emf-face) dl.cosm-fields dl.cosm-fields {
       font-size: 1em;
       margin: 0.1em 0 0.2em;
       padding-left: 0.7em;
       border-left: 2px solid var(--cosm-rule);
     }
 
-    :is(#cosm-mode, .eml-face) dl.cosm-fields > dt {
+    :is(#cosm-mode, .emf-face) dl.cosm-fields > dt {
       font-family: var(--font-mono);
       font-variant-caps: all-small-caps;
       letter-spacing: 0.065em;
@@ -6044,53 +6158,53 @@
       overflow-wrap: anywhere;
     }
 
-    :is(#cosm-mode, .eml-face) dl.cosm-fields > dd {
+    :is(#cosm-mode, .emf-face) dl.cosm-fields > dd {
       margin: 0;
       min-width: 0;
       overflow-wrap: anywhere;
     }
 
-    :is(#cosm-mode, .eml-face) ul.cosm-stack {
+    :is(#cosm-mode, .emf-face) ul.cosm-stack {
       list-style: none;
       margin: 0;
       padding: 0;
     }
 
-    :is(#cosm-mode, .eml-face) ul.cosm-stack > li {
+    :is(#cosm-mode, .emf-face) ul.cosm-stack > li {
       margin: 0 0 0.3em;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-lit,
-    :is(#cosm-mode, .eml-face) .cosm-compact,
-    :is(#cosm-mode, .eml-face) .cosm-prov {
+    :is(#cosm-mode, .emf-face) .cosm-lit,
+    :is(#cosm-mode, .emf-face) .cosm-compact,
+    :is(#cosm-mode, .emf-face) .cosm-prov {
       font-family: var(--font-mono);
       font-size: 0.92em;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-nil,
-    :is(#cosm-mode, .eml-face) .cosm-prov {
+    :is(#cosm-mode, .emf-face) .cosm-nil,
+    :is(#cosm-mode, .emf-face) .cosm-prov {
       color: var(--review-fg-muted);
     }
 
-    :is(#cosm-mode, .eml-face) .review-body a.cosm-ref,
-    :is(#cosm-mode, .eml-face) .review-body a.cosm-path {
+    :is(#cosm-mode, .emf-face) .review-body a.cosm-ref,
+    :is(#cosm-mode, .emf-face) .review-body a.cosm-path {
       font-family: var(--font-mono);
       font-size: 0.92em;
       text-decoration-style: dotted;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-rel {
+    :is(#cosm-mode, .emf-face) .cosm-rel {
       font-family: var(--font-mono);
       font-size: 0.92em;
       color: var(--review-fg-muted);
     }
 
     /* An open question: a ringed "?" and the question in italics. */
-    :is(#cosm-mode, .eml-face, #atem-modal) .cosm-q {
+    :is(#cosm-mode, .emf-face, #atem-modal) .cosm-q {
       font-style: italic;
     }
 
-    :is(#cosm-mode, .eml-face, #atem-modal) .cosm-qm {
+    :is(#cosm-mode, .emf-face, #atem-modal) .cosm-qm {
       display: inline-block;
       width: 1.25em;
       height: 1.25em;
@@ -6109,14 +6223,14 @@
 
     /* A claim's stance: a shape and an ink per word (FEED's part-of-speech
        spine, here for how the text knows a claim). */
-    :is(#cosm-mode, .eml-face, #atem-modal) .cst-axiom { --pc: var(--fg); }
-    :is(#cosm-mode, .eml-face, #atem-modal) .cst-observed { --pc: var(--accent-agent); }
-    :is(#cosm-mode, .eml-face, #atem-modal) .cst-deduced { --pc: var(--accent-tool); }
-    :is(#cosm-mode, .eml-face, #atem-modal) .cst-opinion { --pc: var(--accent-user); }
-    :is(#cosm-mode, .eml-face, #atem-modal) .cst-assumed { --pc: var(--fg-muted); }
-    :is(#cosm-mode, .eml-face, #atem-modal) .cst-hearsay { --pc: var(--accent-error); }
+    :is(#cosm-mode, .emf-face, #atem-modal) .cst-axiom { --pc: var(--fg); }
+    :is(#cosm-mode, .emf-face, #atem-modal) .cst-observed { --pc: var(--accent-agent); }
+    :is(#cosm-mode, .emf-face, #atem-modal) .cst-deduced { --pc: var(--accent-tool); }
+    :is(#cosm-mode, .emf-face, #atem-modal) .cst-opinion { --pc: var(--accent-user); }
+    :is(#cosm-mode, .emf-face, #atem-modal) .cst-assumed { --pc: var(--fg-muted); }
+    :is(#cosm-mode, .emf-face, #atem-modal) .cst-hearsay { --pc: var(--accent-error); }
 
-    :is(#cosm-mode, .eml-face, #atem-modal) .cosm-stance {
+    :is(#cosm-mode, .emf-face, #atem-modal) .cosm-stance {
       display: inline-flex;
       align-items: center;
       gap: 0.35em;
@@ -6133,20 +6247,20 @@
       white-space: nowrap;
     }
 
-    :is(#cosm-mode, .eml-face, #atem-modal) .cosm-sh {
+    :is(#cosm-mode, .emf-face, #atem-modal) .cosm-sh {
       display: inline-block;
       width: 0.6em;
       height: 0.6em;
       background: var(--pc);
       border-radius: 1px;
     }
-    :is(#cosm-mode, .eml-face, #atem-modal) .cst-observed .cosm-sh { border-radius: 50%; }
-    :is(#cosm-mode, .eml-face, #atem-modal) .cst-deduced .cosm-sh { width: 0.7em; clip-path: polygon(50% 0, 100% 100%, 0 100%); border-radius: 0; }
-    :is(#cosm-mode, .eml-face, #atem-modal) .cst-opinion .cosm-sh { width: 0.5em; height: 0.5em; transform: rotate(45deg); }
-    :is(#cosm-mode, .eml-face, #atem-modal) .cst-assumed .cosm-sh { background: transparent; border: 1.5px solid var(--pc); border-radius: 50%; }
-    :is(#cosm-mode, .eml-face, #atem-modal) .cst-hearsay .cosm-sh { background: transparent; border: 1.5px solid var(--pc); }
+    :is(#cosm-mode, .emf-face, #atem-modal) .cst-observed .cosm-sh { border-radius: 50%; }
+    :is(#cosm-mode, .emf-face, #atem-modal) .cst-deduced .cosm-sh { width: 0.7em; clip-path: polygon(50% 0, 100% 100%, 0 100%); border-radius: 0; }
+    :is(#cosm-mode, .emf-face, #atem-modal) .cst-opinion .cosm-sh { width: 0.5em; height: 0.5em; transform: rotate(45deg); }
+    :is(#cosm-mode, .emf-face, #atem-modal) .cst-assumed .cosm-sh { background: transparent; border: 1.5px solid var(--pc); border-radius: 50%; }
+    :is(#cosm-mode, .emf-face, #atem-modal) .cst-hearsay .cosm-sh { background: transparent; border: 1.5px solid var(--pc); }
 
-    :is(#cosm-mode, .eml-face) .cosm-sal {
+    :is(#cosm-mode, .emf-face) .cosm-sal {
       font-family: var(--font-mono);
       font-weight: 400;
       font-size: 0.62em;
@@ -6157,31 +6271,31 @@
       white-space: nowrap;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-sal.sal-critical,
-    :is(#cosm-mode, .eml-face) .cosm-sal.sal-high {
+    :is(#cosm-mode, .emf-face) .cosm-sal.sal-critical,
+    :is(#cosm-mode, .emf-face) .cosm-sal.sal-high {
       color: var(--review-fg);
       border-bottom-style: solid;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-feed .dict-sc {
+    :is(#cosm-mode, .emf-face) .cosm-feed .dict-sc {
       color: var(--review-fg-muted);
     }
 
-    /* The whole text's atem (an EML twin's `atem:` block), above the cards:
+    /* The whole text's atem (an EMF twin's `atem:` block), above the cards:
        the line large in the serif italic, then focus / push / pull. */
-    :is(#cosm-mode, .eml-face, #atem-modal) .cosm-atem {
+    :is(#cosm-mode, .emf-face, #atem-modal) .cosm-atem {
       margin: 0 0 1.6em;
       padding: 0.3em 0 0.4em 1.1em;
       border-left: 3px solid var(--accent-tool);
     }
 
-    :is(#cosm-mode, .eml-face, #atem-modal) .cosm-atem-label {
+    :is(#cosm-mode, .emf-face, #atem-modal) .cosm-atem-label {
       color: var(--cosm-ink-tool);
       font-family: var(--font-mono);
       font-size: 0.72em;
     }
 
-    :is(#cosm-mode, .eml-face) .review-body p.cosm-atem-line {
+    :is(#cosm-mode, .emf-face) .review-body p.cosm-atem-line {
       margin: 0.15em 0 0.55em;
       font-family: var(--font-serif, Georgia, serif);
       font-style: italic;
@@ -6189,7 +6303,7 @@
       line-height: 1.4;
     }
 
-    :is(#cosm-mode, .eml-face) dl.cosm-atem-parts {
+    :is(#cosm-mode, .emf-face) dl.cosm-atem-parts {
       display: grid;
       grid-template-columns: max-content minmax(0, 1fr);
       gap: 0.25em 0.9em;
@@ -6197,18 +6311,18 @@
       font-size: 0.9em;
     }
 
-    :is(#cosm-mode, .eml-face) dl.cosm-atem-parts > dt {
+    :is(#cosm-mode, .emf-face) dl.cosm-atem-parts > dt {
       font-family: var(--font-mono);
       font-variant-caps: all-small-caps;
       letter-spacing: 0.065em;
       color: var(--review-fg-muted);
     }
 
-    :is(#cosm-mode, .eml-face) dl.cosm-atem-parts > dd {
+    :is(#cosm-mode, .emf-face) dl.cosm-atem-parts > dd {
       margin: 0;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-more {
+    :is(#cosm-mode, .emf-face) .cosm-more {
       display: block;
       margin: 0 0 1em;
       padding: 4px 12px;
@@ -6221,15 +6335,15 @@
       cursor: pointer;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-more:hover {
+    :is(#cosm-mode, .emf-face) .cosm-more:hover {
       border-color: var(--accent-tool);
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-refusal {
+    :is(#cosm-mode, .emf-face) .cosm-refusal {
       max-width: 38em;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-refusal .cosm-tool-btn {
+    :is(#cosm-mode, .emf-face) .cosm-refusal .cosm-tool-btn {
       font-family: var(--font-mono);
       font-size: 12px;
       color: var(--fg);
@@ -6240,7 +6354,7 @@
       cursor: pointer;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-back {
+    :is(#cosm-mode, .emf-face) .cosm-back {
       position: absolute;
       left: 50%;
       bottom: 18px;
@@ -6257,7 +6371,7 @@
       white-space: nowrap;
     }
 
-    :is(#cosm-mode, .eml-face) .cosm-back[hidden] {
+    :is(#cosm-mode, .emf-face) .cosm-back[hidden] {
       display: none;
     }
 
@@ -6266,15 +6380,15 @@
        declaration, then the tools — rather than squeezing the name to
        nothing. */
     @container cosmmode (max-width: 980px) {
-      :is(#cosm-mode, .eml-face) .cosm-toolbar {
+      :is(#cosm-mode, .emf-face) .cosm-toolbar {
         flex-wrap: wrap;
         row-gap: 6px;
       }
-      :is(#cosm-mode, .eml-face) .cosm-spacer {
+      :is(#cosm-mode, .emf-face) .cosm-spacer {
         flex: 1 0 100%;
         height: 0;
       }
-      :is(#cosm-mode, .eml-face) .cosm-size-btn {
+      :is(#cosm-mode, .emf-face) .cosm-size-btn {
         margin-left: auto;
       }
     }
@@ -6283,7 +6397,7 @@
        panel): the rail becomes a sheet over the column, and the outline
        button folds it away again after a jump. */
     @container cosmmode (max-width: 760px) {
-      :is(#cosm-mode, .eml-face) .cosm-rail {
+      :is(#cosm-mode, .emf-face) .cosm-rail {
         position: absolute;
         top: 0;
         left: 0;
@@ -6297,27 +6411,27 @@
     }
 
     @container cosmmode (max-width: 560px) {
-      :is(#cosm-mode, .eml-face) dl.cosm-fields {
+      :is(#cosm-mode, .emf-face) dl.cosm-fields {
         grid-template-columns: minmax(0, 1fr);
         gap: 0 0;
       }
-      :is(#cosm-mode, .eml-face) dl.cosm-fields > dd {
+      :is(#cosm-mode, .emf-face) dl.cosm-fields > dd {
         margin-bottom: 0.3em;
       }
-      :is(#cosm-mode, .eml-face) .cosm-card {
+      :is(#cosm-mode, .emf-face) .cosm-card {
         padding: 8px 12px 10px;
       }
-      :is(#cosm-mode, .eml-face) .cosm-decl {
+      :is(#cosm-mode, .emf-face) .cosm-decl {
         display: none;
       }
     }
 
     /* ---------------- The Canon chip (0.4.3, checkpoint B) ----------------
-       A text's EML twin and its atem, in the three reader headers beside
+       A text's EMF twin and its atem, in the three reader headers beside
        the convert chip and sized to the same neighbours (26px in the mini
        header, 30px in the edit toolbar, 30x32 in the read toolbar). The
        twin button carries the badge — convert's twin glyph, tinted with the
-       tool accent when the text has an EML twin (owner decision 5), hollow
+       tool accent when the text has an EMF twin (owner decision 5), hollow
        when it has none, with the corner dot when the twin is out of date;
        the tooltip says which in words. */
     .canon-chip {
@@ -6638,14 +6752,14 @@
       }
     }
 
-    /* ---------------- The EML face (0.4.3) ----------------
-       The text's EML twin in place of the text, at the reader's size: the
+    /* ---------------- The EMF face (0.4.3) ----------------
+       The text's EMF twin in place of the text, at the reader's size: the
        cosm viewer's content component (cosmRailHTML / cosmBodyHTML, drawn
-       for the EMLF host) under a head of its own. The viewer's rules above
-       are written :is(#cosm-mode, .eml-face), and the face is the same
+       for the EMF_FACE host) under a head of its own. The viewer's rules above
+       are written :is(#cosm-mode, .emf-face), and the face is the same
        `cosmmode` container, so the outline folds into a sheet the same way
        when there is no room for it beside the cards. */
-    .eml-face {
+    .emf-face {
       display: flex;
       flex-direction: column;
       min-height: 0;
@@ -6656,27 +6770,108 @@
       --cosm-ink-tool: color-mix(in oklab, var(--accent-tool) 60%, var(--fg));
     }
 
-    .eml-face[hidden] {
+    .emf-face[hidden] {
       display: none;
     }
 
-    .eml-face button,
-    .eml-face select {
+    .emf-face button,
+    .emf-face select {
       font: inherit;
     }
 
-    .eml-face .eml-back {
+    .emf-face .emf-back {
       border-color: var(--accent-tool);
     }
 
+    /* SHORT (plan §15): "compile a short" and its caret are one split
+       button; the caret opens a tiny menu of the two telling orders, the
+       default marked. The menu hangs under the button, over the cards. */
+    .emf-face .emf-short {
+      position: relative;
+      display: inline-flex;
+      flex-shrink: 0;
+    }
+
+    .emf-face .emf-short[hidden] {
+      display: none;
+    }
+
+    .emf-face .emf-short .emf-short-go {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .emf-face .emf-short .emf-short-more {
+      min-width: 22px;
+      padding: 3px 5px;
+      margin-left: -1px;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      line-height: 1;
+    }
+
+    .emf-face .emf-short-menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      z-index: 8;
+      min-width: 190px;
+      display: flex;
+      flex-direction: column;
+      padding: 4px;
+      background: var(--bg-raise);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .emf-face .emf-short-menu[hidden] {
+      display: none;
+    }
+
+    .emf-face .emf-short-item {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 24px;
+      padding: 4px 8px;
+      text-align: left;
+      font-size: 12px;
+      color: var(--fg);
+      background: none;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .emf-face .emf-short-item:hover,
+    .emf-face .emf-short-item:focus-visible {
+      background: var(--bg);
+    }
+
+    .emf-face .emf-short-def {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      font-variant-caps: all-small-caps;
+      letter-spacing: 0.05em;
+      color: color-mix(in oklab, var(--accent-tool) 60%, var(--fg));
+    }
+
+    .emf-face .emf-short-def[hidden] {
+      display: none;
+    }
+
     /* Full: over the read face's column, under its toolbar (whose height
-       emlFaceShow measures into --eml-top). What belongs to the text — the
+       emfFaceShow measures into --emf-top). What belongs to the text — the
        column, the line rail, formatting, highlights, paginate, the undo
        bar — steps aside while the face is up. */
-    #review-mode .eml-face {
+    #review-mode .emf-face {
       position: absolute;
       inset: 0;
-      padding-top: var(--eml-top, 47px);
+      padding-top: var(--emf-top, 47px);
       background: var(--review-bg, var(--bg));
       color: var(--review-fg, var(--fg));
     }
@@ -6695,22 +6890,22 @@
       line-height: 14px;
     }
 
-    #review-mode.eml-on #review-body,
-    #review-mode.eml-on #review-linenav,
-    #review-mode.eml-on .review-toolbar .rt-format,
-    #review-mode.eml-on .review-toolbar .rt-highlights,
-    #review-mode.eml-on #paginate-btn,
-    #review-mode.eml-on #review-undo-bar {
+    #review-mode.emf-on #review-body,
+    #review-mode.emf-on #review-linenav,
+    #review-mode.emf-on .review-toolbar .rt-format,
+    #review-mode.emf-on .review-toolbar .rt-highlights,
+    #review-mode.emf-on #paginate-btn,
+    #review-mode.emf-on #review-undo-bar {
       display: none !important;
     }
 
     /* Mini: in place of #preview-body, in the panel's own (theme) colours —
        the --review-* names the cosm rules read, pointed at the theme. */
-    #preview.eml-on #preview-body {
+    #preview.emf-on #preview-body {
       display: none;
     }
 
-    #preview .eml-face {
+    #preview .emf-face {
       flex: 1;
       background: var(--bg-alt);
       color: var(--fg);
@@ -6720,7 +6915,7 @@
       --review-fg-faint: var(--fg-faint);
     }
 
-    #preview .eml-face .review-body {
+    #preview .emf-face .review-body {
       flex: 1;
       overflow: auto;
       padding: 18px 16px 48px;
@@ -6729,13 +6924,13 @@
       line-height: 1.6;
     }
 
-    #preview .eml-face .review-body :is(h2, h3, h4) {
+    #preview .emf-face .review-body :is(h2, h3, h4) {
       font-weight: 700;
       line-height: 1.25;
       color: var(--review-fg);
     }
 
-    #preview .eml-face .review-body a {
+    #preview .emf-face .review-body a {
       color: var(--review-fg);
       text-decoration: underline;
       text-decoration-style: dotted;
@@ -6745,13 +6940,13 @@
        definition) is a click target of its own: at the mini sizes' smaller
        type its line box is under 16px, so it gets one of at least 16px.
        References are never part of running prose, which is untouched. */
-    :is(#cosm-mode, .eml-face) :is(ul.cosm-stack > li, dl.cosm-fields > dd) > :is(a.cosm-ref, a.cosm-path) {
+    :is(#cosm-mode, .emf-face) :is(ul.cosm-stack > li, dl.cosm-fields > dd) > :is(a.cosm-ref, a.cosm-path) {
       display: inline-block;
       min-height: 16px;
     }
 
     /* The twin is being written: a spinner, what the job is doing, cancel. */
-    .eml-face .eml-wait {
+    .emf-face .emf-wait {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -6761,11 +6956,11 @@
       color: var(--review-fg-muted);
     }
 
-    .eml-face .eml-wait .eml-wait-lead {
+    .emf-face .emf-wait .emf-wait-lead {
       color: var(--review-fg);
     }
 
-    .eml-face .eml-wait button {
+    .emf-face .emf-wait button {
       font-size: 12px;
       color: var(--fg);
       background-color: var(--btn-bg, var(--bg-raise));
@@ -6775,7 +6970,7 @@
       cursor: pointer;
     }
 
-    .eml-face .eml-wait-error {
+    .emf-face .emf-wait-error {
       color: var(--accent-error);
     }
 
@@ -8817,6 +9012,13 @@
     /* 0.4.3: what a tile IS, in a word — "catalog" on a volume's canon.cosm
        (and the project's), "holotype" on a Comprise Holotype folder or
        volume. Top-right of the tile, opposite the squircle. */
+    /* A short's tag sits top-left: the top-right corner is where a text's
+       EMF twin badge reaches (a short can have a twin of its own). */
+    #canon-mode .cn-tag.cn-tag-short {
+      right: auto;
+      left: 3px;
+    }
+
     #canon-mode .cn-tag {
       position: absolute;
       top: 3px;
@@ -8838,12 +9040,12 @@
       pointer-events: none;
     }
 
-    /* A text with an EML twin: the convert twin glyph, tinted with the
+    /* A text with an EMF twin: the convert twin glyph, tinted with the
        tool accent (owner decision 5). A stale twin gets the corner dot, as a
        stale convert twin does — the tooltip says it. Since checkpoint B it
-       is a button (the text opens with its EML face showing), so it is a
+       is a button (the text opens with its EMF face showing), so it is a
        16px-tall target. */
-    #canon-mode .cn-eml {
+    #canon-mode .cn-emf {
       position: absolute;
       top: -4px;
       right: -10px;
@@ -8859,19 +9061,19 @@
       font: inherit;
     }
 
-    #canon-mode .cn-eml:hover,
-    #canon-mode .cn-eml:focus-visible {
+    #canon-mode .cn-emf:hover,
+    #canon-mode .cn-emf:focus-visible {
       border-color: var(--accent-tool);
       background: color-mix(in oklab, var(--accent-tool) 36%, var(--bg));
     }
 
-    #canon-mode .cn-eml img.svg-icon {
+    #canon-mode .cn-emf img.svg-icon {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    #canon-mode .cn-eml.state-stale::after {
+    #canon-mode .cn-emf.state-stale::after {
       content: "";
       position: absolute;
       right: -3px;
@@ -14790,7 +14992,7 @@
               <img class="svg-icon" data-icon="view-original" alt="view original" draggable="false">
             </button>
           </span>
-          <!-- 0.4.3: the Canon chip — the text's EML twin and its atem.
+          <!-- 0.4.3: the Canon chip — the text's EMF twin and its atem.
                Painted by canonPaintChips() when a text opens (convert's
                moment, from openReadEdit); hidden for .cosm files, catalogs
                and binaries. Identical markup in the two full toolbars. -->
@@ -14812,13 +15014,13 @@
             </span>
         </div>
         <div id="preview-body"></div>
-        <!-- 0.4.3: the EML face — the text's twin in place of the text, the
-             cosm viewer's content drawn here by emlFaceShow(). -->
-        <div class="eml-face" id="preview-eml" hidden>
-          <div class="cosm-toolbar eml-head">
+        <!-- 0.4.3: the EMF face — the text's twin in place of the text, the
+             cosm viewer's content drawn here by emfFaceShow(). -->
+        <div class="emf-face" id="preview-emf" hidden>
+          <div class="cosm-toolbar emf-head">
             <img class="svg-icon cosm-mode-icon" data-icon="cosm" alt="" draggable="false">
             <span class="cosm-title" data-ef="title"></span>
-            <span class="cosm-decl" data-ef="stale" hidden data-i18n="eml.face.stale">out of date</span>
+            <span class="cosm-decl" data-ef="stale" hidden data-i18n="emf.face.stale">out of date</span>
             <span class="cosm-decl" data-ef="scaffold" hidden data-i18n="cosm.scaffold">scaffold, no model</span>
             <span class="cosm-spacer"></span>
             <select class="cosm-lens" data-ef="lens" hidden
@@ -14830,16 +15032,35 @@
             <button type="button" class="cosm-tool-btn" data-ef="raw"
               title="open the file itself as plain text in read/edit" data-i18n-title="cosm.raw.title"
               data-i18n="cosm.raw.label">open raw</button>
-            <button type="button" class="cosm-tool-btn" data-ef="compile"
-              title="write the twin back out as a new markdown file beside it; the text is never touched"
-              data-i18n-title="eml.face.compile.title" data-i18n="eml.face.compile">compile text</button>
-            <button type="button" class="cosm-tool-btn eml-back" data-ef="back"
-              title="show the text again" data-i18n-title="eml.face.back.title"
-              data-i18n="eml.face.back">back to the text</button>
+            <!-- SHORT (0.4.3, plan §15): compile the twin into a short, a new
+                 markdown telling beside the text, in the order the tiny
+                 menu chooses (the default marked); emfShortMenu(). -->
+            <span class="emf-short" data-ef="short">
+              <button type="button" class="cosm-tool-btn emf-short-go" data-ef="compile"
+                title="write a short: a new markdown telling of the text, compiled from its twin and written beside it; the text is never touched"
+                data-i18n-title="emf.face.short.title" data-i18n="emf.face.short">compile a short</button
+              ><button type="button" class="cosm-tool-btn emf-short-more" data-ef="short-menu"
+                aria-haspopup="menu" aria-expanded="false"
+                title="choose the order the short tells it in" data-i18n-title="emf.face.short.menu.title"
+                aria-label="the order of the short" data-i18n-aria="emf.face.short.menu.aria">&#9662;</button>
+              <span class="emf-short-menu" role="menu" hidden>
+                <button type="button" class="emf-short-item" role="menuitem" data-ef="short-told"
+                  title="in the author's order: everything the twin holds, where the text has it, under the text's own headings"
+                  data-i18n-title="emf.face.short.told.title"><span data-i18n="emf.face.short.told">as the author told it</span
+                  ><span class="emf-short-def" data-i18n="emf.face.short.default" hidden>default</span></button>
+                <button type="button" class="emf-short-item" role="menuitem" data-ef="short-weight"
+                  title="by weight: the claims that matter most first, grouped by the ideas they lean on, then the events, then the terms"
+                  data-i18n-title="emf.face.short.weight.title"><span data-i18n="emf.face.short.weight">by weight</span
+                  ><span class="emf-short-def" data-i18n="emf.face.short.default" hidden>default</span></button>
+              </span>
+            </span>
+            <button type="button" class="cosm-tool-btn emf-back" data-ef="back"
+              title="show the text again" data-i18n-title="emf.face.back.title"
+              data-i18n="emf.face.back">back to the text</button>
           </div>
           <div class="cosm-stage">
             <nav class="cosm-rail" data-ef="rail" aria-label="outline" data-i18n-aria="cosm.rail.aria" hidden></nav>
-            <div class="review-body cosm-body eml-body" data-ef="body" tabindex="-1"></div>
+            <div class="review-body cosm-body emf-body" data-ef="body" tabindex="-1"></div>
           </div>
         </div>
       </div>
@@ -14934,12 +15155,12 @@
           </div>
         </div>
         <div class="review-body" id="review-body" data-path=""></div>
-        <!-- 0.4.3: the EML face (see #preview-eml). -->
-        <div class="eml-face" id="review-eml" hidden>
-          <div class="cosm-toolbar eml-head">
+        <!-- 0.4.3: the EMF face (see #preview-emf). -->
+        <div class="emf-face" id="review-emf" hidden>
+          <div class="cosm-toolbar emf-head">
             <img class="svg-icon cosm-mode-icon" data-icon="cosm" alt="" draggable="false">
             <span class="cosm-title" data-ef="title"></span>
-            <span class="cosm-decl" data-ef="stale" hidden data-i18n="eml.face.stale">out of date</span>
+            <span class="cosm-decl" data-ef="stale" hidden data-i18n="emf.face.stale">out of date</span>
             <span class="cosm-decl" data-ef="scaffold" hidden data-i18n="cosm.scaffold">scaffold, no model</span>
             <span class="cosm-spacer"></span>
             <select class="cosm-lens" data-ef="lens" hidden
@@ -14951,16 +15172,35 @@
             <button type="button" class="cosm-tool-btn" data-ef="raw"
               title="open the file itself as plain text in read/edit" data-i18n-title="cosm.raw.title"
               data-i18n="cosm.raw.label">open raw</button>
-            <button type="button" class="cosm-tool-btn" data-ef="compile"
-              title="write the twin back out as a new markdown file beside it; the text is never touched"
-              data-i18n-title="eml.face.compile.title" data-i18n="eml.face.compile">compile text</button>
-            <button type="button" class="cosm-tool-btn eml-back" data-ef="back"
-              title="show the text again" data-i18n-title="eml.face.back.title"
-              data-i18n="eml.face.back">back to the text</button>
+            <!-- SHORT (0.4.3, plan §15): compile the twin into a short, a new
+                 markdown telling beside the text, in the order the tiny
+                 menu chooses (the default marked); emfShortMenu(). -->
+            <span class="emf-short" data-ef="short">
+              <button type="button" class="cosm-tool-btn emf-short-go" data-ef="compile"
+                title="write a short: a new markdown telling of the text, compiled from its twin and written beside it; the text is never touched"
+                data-i18n-title="emf.face.short.title" data-i18n="emf.face.short">compile a short</button
+              ><button type="button" class="cosm-tool-btn emf-short-more" data-ef="short-menu"
+                aria-haspopup="menu" aria-expanded="false"
+                title="choose the order the short tells it in" data-i18n-title="emf.face.short.menu.title"
+                aria-label="the order of the short" data-i18n-aria="emf.face.short.menu.aria">&#9662;</button>
+              <span class="emf-short-menu" role="menu" hidden>
+                <button type="button" class="emf-short-item" role="menuitem" data-ef="short-told"
+                  title="in the author's order: everything the twin holds, where the text has it, under the text's own headings"
+                  data-i18n-title="emf.face.short.told.title"><span data-i18n="emf.face.short.told">as the author told it</span
+                  ><span class="emf-short-def" data-i18n="emf.face.short.default" hidden>default</span></button>
+                <button type="button" class="emf-short-item" role="menuitem" data-ef="short-weight"
+                  title="by weight: the claims that matter most first, grouped by the ideas they lean on, then the events, then the terms"
+                  data-i18n-title="emf.face.short.weight.title"><span data-i18n="emf.face.short.weight">by weight</span
+                  ><span class="emf-short-def" data-i18n="emf.face.short.default" hidden>default</span></button>
+              </span>
+            </span>
+            <button type="button" class="cosm-tool-btn emf-back" data-ef="back"
+              title="show the text again" data-i18n-title="emf.face.back.title"
+              data-i18n="emf.face.back">back to the text</button>
           </div>
           <div class="cosm-stage">
             <nav class="cosm-rail" data-ef="rail" aria-label="outline" data-i18n-aria="cosm.rail.aria" hidden></nav>
-            <div class="review-body cosm-body eml-body" data-ef="body" tabindex="-1"></div>
+            <div class="review-body cosm-body emf-body" data-ef="body" tabindex="-1"></div>
           </div>
         </div>
         <!-- Phase 5d: line-nav column. Pinned to the right wall of
@@ -15209,7 +15449,7 @@
       </div>
 
       <!-- The cosm viewer (0.4.3): any .cosm volume — a Canon catalog, a
-           Comprise Holotype, an EML twin, a standalone COSM tree — read
+           Comprise Holotype, an EMF twin, a standalone COSM tree — read
            only, from GET /api/cosm. Toolbar; a rail (the catalog, its
            modules and kinds, the checks) beside a reading column of item
            cards. Opened from Canon tiles, .cosm rows in the tree, a lens's
@@ -16541,10 +16781,10 @@
           title="copy the line (⇧-click copies all four parts)" data-i18n-title="atem.card.copy.title"
           data-i18n="atem.card.copy">copy</button>
         <button type="button" id="atem-pin" hidden
-          title="keep this passage's atem in the text's EML twin" data-i18n-title="atem.card.pin.title"
+          title="keep this passage's atem in the text's EMF twin" data-i18n-title="atem.card.pin.title"
           data-i18n="atem.card.pin">pin to twin</button>
         <button type="button" id="atem-open" hidden
-          title="open the text's EML twin, where this atem now lives" data-i18n-title="atem.card.open.title"
+          title="open the text's EMF twin, where this atem now lives" data-i18n-title="atem.card.open.title"
           data-i18n="atem.card.open">open twin</button>
         <button type="button" class="primary" id="atem-close" data-i18n="atem.card.close">close</button>
       </div>
@@ -16824,6 +17064,7 @@
       if (typeof _resetHelpDocs === 'function') _resetHelpDocs();
       if (window.dictOnLanguage) window.dictOnLanguage();
       if (window.canonOnLanguage) window.canonOnLanguage();
+      if (window.ctxNoticeOnLanguage) window.ctxNoticeOnLanguage();
       if (!(opts && opts.skipSave)) saveUIConfig({ ui_language: lang });
     }
 
@@ -20167,6 +20408,7 @@
         if (!r.ok) return;
         LLM_STATUS = await r.json();
         updateBadge();
+        ctxNoticePaint();
       } catch (_) { /* transient */ }
     }
 
@@ -21007,8 +21249,10 @@
     // Status polling: fast while loading, relaxed once ready.
     async function pollLoop() {
       await refreshLlmStatus();
-      const interval = (LLM_STATUS && LLM_STATUS.ready) ? 8000 : 2000;
-      setTimeout(pollLoop, interval);
+      // Fast while loading — and while the context preflight is measuring,
+      // so its notice lands seconds after ready, not eight.
+      const relaxed = LLM_STATUS && LLM_STATUS.ready && LLM_STATUS.preflight !== 'pending';
+      setTimeout(pollLoop, relaxed ? 8000 : 2000);
     }
     // A home server supervises no llama-server and holds no session:
     // /api/models, /api/llm-status, /api/usage and /api/orchestrator all
@@ -21275,7 +21519,7 @@
       } else if (path.toLowerCase().endsWith('.merirmaid')) {
         enterMerirmaidMode(path);
       } else if (path.toLowerCase().endsWith('.cosm')) {
-        // 0.4.3: a catalog, an EML file with no text beside it, any other
+        // 0.4.3: a catalog, an EMF file with no text beside it, any other
         // .cosm — the cosm viewer (option-click → "open raw" for the text).
         enterCosmMode(path);
       } else {
@@ -21426,9 +21670,12 @@
 
     es.addEventListener('error', (e) => {
       try {
-        const { message } = JSON.parse(e.data || '{}');
+        const { message, kind } = JSON.parse(e.data || '{}');
         conversation.insertAdjacentHTML('beforeend',
           `<div class="msg assistant"><div class="role">error</div><div class="body error">${escapeHtml(message || 'stream error')}</div></div>`);
+        // A first-turn context overflow: the notice (and its one-click
+        // larger window, when there is one) goes right under the error.
+        if (kind === 'ctx_overflow') ctxNoticeAfterError(conversation.lastElementChild);
       } catch (_) { /* ignore parse errors from native event */ }
       autoscroll();
       // A failed turn is still a turn that ended — the dot means "something
@@ -21750,6 +21997,183 @@
     // After the whole script has run: renderMarkdown's state is declared
     // further down the file.
     setTimeout(() => { introRender(); introDecorateEmpty(); }, 0);
+
+    // ---------- the context notice (the 16 GB context fix, 0.4.3) ----------
+    //
+    // /api/llm-status carries the server's preflight (enough/preflight.py):
+    // the default system prompt counted by llama-server's own tokenizer
+    // (`prompt_tokens`) against the live window (`n_ctx`), with a 2,048-token
+    // reserve. When `fits` is false the empty conversation says so in plain
+    // words, before anyone types into a 400. `fix: "switch"` adds the one
+    // click — POST /api/model {cute, ctx: suggest_ctx}, the model window's
+    // own request — and `fix: "none"` says what would help instead
+    // (`fix_reason`: memory | unsupervised | no_window). Built with t(), so
+    // it is rebuilt (not re-translated in place) when the language changes.
+    function ctxFmt(n) {
+      try { return Number(n).toLocaleString(I18N.lang || undefined); }
+      catch (_) { return String(n); }
+    }
+
+    function ctxNoticeWanted(s) {
+      return !!s && s.fits === false && s.mode !== 'cloud'
+        && !!s.prompt_tokens && !!s.n_ctx;
+    }
+
+    function ctxNoticeKey(s) {
+      return [I18N.lang, s.cute, s.prompt_tokens, s.n_ctx, s.fix,
+        s.fix_reason, s.suggest_ctx].join('|');
+    }
+
+    function ctxNoticeBuild(s, extraClass) {
+      const box = document.createElement('div');
+      box.className = 'ctx-notice' + (extraClass ? ' ' + extraClass : '');
+      box.setAttribute('role', 'status');
+      box.dataset.key = ctxNoticeKey(s);
+      const add = (tag, cls, text) => {
+        const el = document.createElement(tag);
+        el.className = cls;
+        el.textContent = text;
+        box.appendChild(el);
+        return el;
+      };
+      add('div', 'ctx-notice-title', t('chat.ctx.title', "the model's window is too small"));
+      add('p', 'ctx-notice-body', t('chat.ctx.body',
+        "enough's instructions take about {prompt} tokens and this model's window holds {ctx}, so your first message can't fit.")
+        .replace('{prompt}', () => ctxFmt(s.prompt_tokens))
+        .replace('{ctx}', () => ctxFmt(s.n_ctx)));
+      const want = s.suggest_ctx ? ctxFmt(s.suggest_ctx) : '';
+      const actions = document.createElement('div');
+      actions.className = 'ctx-notice-actions';
+      const button = (cls, text, onClick) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'ctx-notice-btn' + (cls ? ' ' + cls : '');
+        b.textContent = text;
+        b.addEventListener('click', onClick);
+        actions.appendChild(b);
+        return b;
+      };
+      if (s.fix === 'switch' && s.cute && s.suggest_ctx) {
+        button('primary ctx-notice-switch',
+          t('chat.ctx.switch', 'use a {ctx}-token window').replace('{ctx}', () => want),
+          (e) => ctxNoticeSwitch(e.currentTarget, s.cute, s.suggest_ctx));
+      } else {
+        let reason = '';
+        if (s.fix_reason === 'memory') {
+          reason = t('chat.ctx.reason.memory',
+            'a window that holds them ({ctx} tokens) needs more memory than this machine has for this model. open the model window to choose a model that runs here with a larger window.');
+        } else if (s.fix_reason === 'unsupervised') {
+          reason = t('chat.ctx.reason.unsupervised',
+            "enough doesn't run this model's server, so it can't change the window itself. restart llama-server with a context of at least {ctx} tokens.");
+        } else if (s.fix_reason === 'no_window') {
+          reason = t('chat.ctx.reason.noWindow',
+            'no window this model supports can hold them. open the model window to choose a model with a larger window.');
+        }
+        if (reason) add('p', 'ctx-notice-body', reason.replace('{ctx}', () => want));
+        // The model window can switch models only when enough runs them.
+        if (s.fix_reason !== 'unsupervised') {
+          button('ctx-notice-open', t('chat.ctx.open', 'open the model window'),
+            () => openModelModal());
+        }
+      }
+      if (actions.childElementCount) box.appendChild(actions);
+      const status = add('p', 'ctx-notice-status', '');
+      status.hidden = true;
+      return box;
+    }
+
+    // Keep every notice true to LLM_STATUS: one at the top of #empty-hint,
+    // plus any left under a first-turn overflow error (`ctx-notice--turn`).
+    // A notice mid-switch (`data-busy`) is left alone until it settles.
+    function ctxNoticePaint() {
+      const s = LLM_STATUS;
+      const wanted = ctxNoticeWanted(s);
+      const key = wanted ? ctxNoticeKey(s) : '';
+      document.querySelectorAll('#conversation .ctx-notice').forEach((el) => {
+        if (el.dataset.busy) return;
+        if (!wanted) { el.remove(); return; }
+        if (el.dataset.key !== key) {
+          el.replaceWith(ctxNoticeBuild(s, el.classList.contains('ctx-notice--turn')
+            ? 'ctx-notice--turn' : ''));
+        }
+      });
+      if (!wanted) return;
+      const hint = document.getElementById('empty-hint');
+      if (hint && !hint.querySelector('.ctx-notice')) {
+        hint.insertBefore(ctxNoticeBuild(s), hint.firstChild);
+      }
+    }
+    window.ctxNoticePaint = ctxNoticePaint;
+    window.ctxNoticeOnLanguage = ctxNoticePaint;
+
+    // A first-turn overflow (the server's error `kind`): the conversation is
+    // no longer empty, so the notice — and its button — goes under the error.
+    async function ctxNoticeAfterError(errorEl) {
+      await refreshLlmStatus();
+      if (!ctxNoticeWanted(LLM_STATUS) || !errorEl || !errorEl.isConnected) return;
+      errorEl.insertAdjacentElement('afterend', ctxNoticeBuild(LLM_STATUS, 'ctx-notice--turn'));
+      autoscroll();
+    }
+
+    async function ctxNoticeSwitch(btn, cute, ctx) {
+      const box = btn.closest('.ctx-notice');
+      if (!box || box.dataset.busy) return;
+      const status = box.querySelector('.ctx-notice-status');
+      const say = (text, kind) => {
+        status.hidden = !text;
+        status.className = 'ctx-notice-status' + (kind ? ' ' + kind : '');
+        status.textContent = text || '';
+      };
+      box.dataset.busy = '1';
+      box.querySelectorAll('button').forEach((b) => { b.disabled = true; });
+      say(t('chat.ctx.switching', 'restarting the model with a {ctx}-token window…')
+        .replace('{ctx}', () => ctxFmt(ctx)));
+      try {
+        const r = await fetch('/api/model', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cute, ctx }),
+        });
+        if (!r.ok) {
+          const js = await r.json().catch(() => ({}));
+          throw new Error(js.detail || `request failed (${r.status})`);
+        }
+        say(t('chat.ctx.loading', 'the model is loading — this can take a minute.'));
+        // The model window's own wait: poll until this model is ready again.
+        const deadline = Date.now() + 300000;
+        let back = false;
+        while (Date.now() < deadline) {
+          await new Promise((res) => setTimeout(res, 1500));
+          await refreshLlmStatus();
+          if (LLM_STATUS && LLM_STATUS.ready && LLM_STATUS.cute === cute) { back = true; break; }
+        }
+        if (!back) throw new Error(t('chat.ctx.timeout', "the model didn't come back in time — check the model window."));
+        // The server cleared the conversation with the switch; the page
+        // does too, exactly as the model window does after a switch.
+        conversation.innerHTML =
+          '<div class="empty-hint" id="empty-hint">model switched. start anew.</div>';
+        loadModels();
+        // Re-check: the new window's verdict lands a moment after ready.
+        for (let i = 0; i < 20; i++) {
+          if (LLM_STATUS && LLM_STATUS.preflight !== 'pending'
+              && LLM_STATUS.preflight !== 'idle') break;
+          await new Promise((res) => setTimeout(res, 1000));
+          await refreshLlmStatus();
+        }
+        ctxNoticePaint();
+      } catch (e) {
+        delete box.dataset.busy;
+        box.querySelectorAll('button').forEach((b) => { b.disabled = false; });
+        say(t('chat.ctx.failed', "that didn't work: {error}")
+          .replace('{error}', () => String((e && e.message) || e)), 'error');
+      }
+    }
+    window.ctxNoticeSwitch = ctxNoticeSwitch;
+
+    // #empty-hint is rebuilt by /reset, a model switch and the server's
+    // render; watching the conversation's children catches all of them.
+    new MutationObserver(() => ctxNoticePaint())
+      .observe(conversation, { childList: true });
 
     // System bubbles — rness narrating what's happening (auto-reset
     // chrome). These don't go into the model's history; they're only for
@@ -23952,7 +24376,7 @@
       }
       // 0.4.3: a face of the previous text's twin steps down (it comes back
       // with canonOnDocOpen when this is the same text and it was up).
-      if (window.__canonReady) emlFaceHide({ forget: false });
+      if (window.__canonReady) emfFaceHide({ forget: false });
       _reHideCurrent();
       RE_PATH = path;
       RE_FACE = face;
@@ -23972,7 +24396,7 @@
       // both toolbars. Fire-and-forget — the chrome fills in a beat later
       // and stays hidden for ordinary markdown.
       convertOnDocOpen(path);
-      // 0.4.3: the Canon chip — does this text have an EML twin? Same moment,
+      // 0.4.3: the Canon chip — does this text have an EMF twin? Same moment,
       // same fire-and-forget.
       if (window.__canonReady) canonOnDocOpen(path);
     }
@@ -23982,8 +24406,8 @@
     // dirty prompts to discard.
     async function reSetFace(face) {
       if (!reIsActive() || face === RE_FACE) return;
-      // 0.4.3: to the editor from the EML face — the person left the twin.
-      if (face === 'edit' && window.__canonReady && emlFaceOn()) emlFaceHide();
+      // 0.4.3: to the editor from the EMF face — the person left the twin.
+      if (face === 'edit' && window.__canonReady && emfFaceOn()) emfFaceHide();
       const path = RE_PATH;
       if (RE_FACE === 'edit') {
         RE_EDIT_BUFFER = reCurrentEditValue();
@@ -24051,10 +24475,10 @@
       const view = _reCaptureView();
       let carry = null;
       if (RE_FACE === 'edit') { RE_EDIT_BUFFER = reCurrentEditValue(); carry = RE_EDIT_BUFFER; }
-      // 0.4.3: the EML face follows the reader to its new size.
-      const face = window.__canonReady && emlFaceOn()
-        ? { text: EMLF.text, waiting: EMLF.waiting, waitSnap: EMLF.waitSnap } : null;
-      if (face) emlFaceHide({ forget: false });
+      // 0.4.3: the EMF face follows the reader to its new size.
+      const face = window.__canonReady && emfFaceOn()
+        ? { text: EMF_FACE.text, waiting: EMF_FACE.waiting, waitSnap: EMF_FACE.waitSnap } : null;
+      if (face) emfFaceHide({ forget: false });
       _reHideCurrent();
       RE_SIZE = size;
       if (RE_FACE === 'read') {
@@ -24071,10 +24495,10 @@
       _reApplyView(view);
       convertPaintChips();   // the chrome lives in all three headers
       if (face) {
-        await emlFaceShow(face.text);
-        if (face.waiting && emlFaceOn()) {
-          Object.assign(EMLF, { waiting: face.waiting, waitSnap: face.waitSnap });
-          emlFaceRender();
+        await emfFaceShow(face.text);
+        if (face.waiting && emfFaceOn()) {
+          Object.assign(EMF_FACE, { waiting: face.waiting, waitSnap: face.waitSnap });
+          emfFaceRender();
         }
       }
       if (window.__canonReady) canonPaintChips();
@@ -24092,9 +24516,9 @@
       REVIEW_PATH = null; EDIT_PATH = null; LAST_REVIEW_SELECTION = null;
       CONVERT_DOC = null;            // convert §5.2 — twin chrome is per-document
       convertPaintChips();
-      // 0.4.3: the EML face and its per-text memory end with the reader.
+      // 0.4.3: the EMF face and its per-text memory end with the reader.
       if (window.__canonReady) {
-        emlFaceHide({ forget: false });
+        emfFaceHide({ forget: false });
         CANON.faces.clear();
         CANON.doc = null;
         CANON.seq++;
@@ -25703,8 +26127,8 @@
     // drag handlers need: pane, box (canon pane: the volume), path (relative),
     // name, is_dir, is_box (a root volume pseudo-node), is_mirror — and, from
     // 0.4.3's listings, catalog (a canon.cosm), cosm (any other .cosm),
-    // holotype (a folder or volume holding holotype.cosm) and eml (a text's
-    // EML twin, {path, state}).
+    // holotype (a folder or volume holding holotype.cosm) and emf (a text's
+    // EMF twin, {path, state}).
     function cnTile(d) {
       const tile = document.createElement('div');
       tile.className = 'cn-tile';
@@ -25741,15 +26165,15 @@
           iconWrap.appendChild(b);
         }
       }
-      // A text with an EML twin wears the twin glyph, tinted; a click on it
-      // opens the text with its EML face showing (0.4.3, checkpoint B).
-      if (d.eml && !d.is_dir && !d.is_box) {
-        const stale = d.eml.state === 'stale';
+      // A text with an EMF twin wears the twin glyph, tinted; a click on it
+      // opens the text with its EMF face showing (0.4.3, checkpoint B).
+      if (d.emf && !d.is_dir && !d.is_box) {
+        const stale = d.emf.state === 'stale';
         const c = document.createElement('button');
         c.type = 'button';
-        c.className = 'cn-eml' + (stale ? ' state-stale' : '');
-        c.title = (stale ? t('cn.eml.stale', 'EML twin is stale') : t('cn.eml.fresh', 'has an EML twin'))
-          + ' — ' + t('cn.eml.open', 'click to open the text with its twin showing');
+        c.className = 'cn-emf' + (stale ? ' state-stale' : '');
+        c.title = (stale ? t('cn.emf.stale', 'EMF twin is stale') : t('cn.emf.fresh', 'has an EMF twin'))
+          + ' — ' + t('cn.emf.open', 'click to open the text with its twin showing');
         c.setAttribute('aria-label', c.title);
         c.draggable = false;
         const ci = document.createElement('img');
@@ -25780,6 +26204,15 @@
         tile.title = d.catalog
           ? t('cn.tag.catalog.title', 'a catalog — double-click to browse it in the cosm viewer')
           : t('cn.tag.holotype.title', 'a Comprise Holotype — double-click to browse it in the cosm viewer');
+        tile.appendChild(tag);
+      } else if (d.short_of) {
+        // A SHORT (plan §15): an ordinary file, yours to read and edit,
+        // wearing a quiet tag that says what it is a short of.
+        const tag = document.createElement('span');
+        tag.className = 'cn-tag cn-tag-short';
+        tag.textContent = t('cn.tag.short', 'short');
+        tile.title = t('cn.tag.short.title', '{name} — a short of {text}: a telling compiled from its EMF twin')
+          .replace('{name}', () => d.name).replace('{text}', () => d.short_of);
         tile.appendChild(tag);
       }
       if (CN_SELECTED && CN_SELECTED.pane === d.pane && CN_SELECTED.key === d.key) {
@@ -25890,12 +26323,15 @@
       if (!nodes.length) {
         grid.innerHTML = '<div class="cn-empty">' + escapeHtml(t('cn.empty.folder', 'empty folder')) + '</div>';
       }
+      const files = nodes.filter((n) => !n.is_dir).map((n) => n.name);
+      const withEmf = nodes.filter((n) => n.emf).map((n) => n.name);
       nodes.forEach((n) => {
         grid.appendChild(cnTile({
           pane: 'project', key: n.path, name: n.name, path: n.path,
           is_dir: !!n.is_dir, is_box: false, is_mirror: false,
           wiki_article: !!n.wiki_article,
-          catalog: !!n.catalog, cosm: !!n.cosm, holotype: !!n.holotype, eml: n.eml || null,
+          catalog: !!n.catalog, cosm: !!n.cosm, holotype: !!n.holotype, emf: n.emf || null,
+          short_of: n.is_dir ? null : canonShortOf(n.name, files, withEmf),
         }));
       });
     }
@@ -25922,12 +26358,15 @@
         if (!nodes.length) {
           grid.innerHTML = '<div class="cn-empty">' + escapeHtml(t('cn.empty.volume', 'empty')) + '</div>';
         }
+        const files = nodes.filter((n) => !n.is_dir).map((n) => n.name);
+        const withEmf = nodes.filter((n) => n.emf).map((n) => n.name);
         nodes.forEach((n) => {
           grid.appendChild(cnTile({
             pane: 'canon', key: CN_STORE_VOLUME + '::' + n.path, name: n.name, path: n.path,
             box: CN_STORE_VOLUME, is_dir: !!n.is_dir, is_box: false, is_mirror: !!n.is_mirror,
             wiki_article: !!n.wiki_article,
-            catalog: !!n.catalog, cosm: !!n.cosm, holotype: !!n.holotype, eml: n.eml || null,
+            catalog: !!n.catalog, cosm: !!n.cosm, holotype: !!n.holotype, emf: n.emf || null,
+            short_of: n.is_dir ? null : canonShortOf(n.name, files, withEmf),
           }));
         });
       }
@@ -26178,8 +26617,8 @@
           items.push('<button type="button" class="ctx-item" data-act="open-raw">' + t('menu.openRaw', 'open raw') + '</button>');
           items.push('<div class="ctx-sep"></div>');
         } else if (!d.is_dir && !d.is_box) {
-          // 0.4.3: a text's atem, and its EML twin.
-          items.push(canonMenuItems(cnTilePath(d), d.eml && d.eml.state));
+          // 0.4.3: a text's atem, and its EMF twin.
+          items.push(canonMenuItems(cnTilePath(d), d.emf && d.emf.state));
         }
         items.push('<button type="button" class="ctx-item" data-act="copy-path">' + t('menu.tree.copyPath', 'copy path') + '</button>');
         items.push('<button type="button" class="ctx-item" data-act="copy-name">' + t('menu.cn.copyName', 'copy name') + '</button>');
@@ -26206,7 +26645,7 @@
       if (act === 'copy-path') { copyToClipboard(cnClipboardPath(d)); return; }
       if (act === 'copy-name') { copyToClipboard(d.name || ''); return; }
       if (act === 'browse') { cnDescend(d); return; }
-      if (canonMenuRun(act, cnTilePath(d), d.eml && d.eml.state)) return;
+      if (canonMenuRun(act, cnTilePath(d), d.emf && d.emf.state)) return;
       if (act === 'open-raw') {
         const p = cnTilePath(d);
         openReadEdit(d.holotype ? p + '/holotype.cosm' : p, { size: 'full', face: 'edit' });
@@ -26358,7 +26797,7 @@
     // ================================================================
     // Any MacroCOSM volume, read only: a Canon catalog (a volume's
     // canon.cosm, the project's rness/canon.cosm), a Comprise Holotype, an
-    // EML twin, a standalone COSM tree. GET /api/cosm?path= answers the
+    // EMF twin, a standalone COSM tree. GET /api/cosm?path= answers the
     // catalog, its modules → kinds → items in the manifest's order, the
     // generic checks' report, the open questions, the files and the lenses
     // (docs/canon-landed-P2.md). `path` is project-relative or
@@ -26376,7 +26815,7 @@
     const COSM_SKIP = new Set(['id', 'type', 'name', 'summary', 'status', 'visibility']);
     const COSM_STANCES = ['axiom', 'observed', 'deduced', 'opinion', 'assumed', 'hearsay'];
     // "about this format": each MiniCOSM's section of the spec.
-    const COSM_SPEC_SECTION = { comprise: '18.1', cosm: '18.2', canon: '18.3', eml: '18.4' };
+    const COSM_SPEC_SECTION = { comprise: '18.1', cosm: '18.2', canon: '18.3', emf: '18.4' };
     const COSM = {
       path: null,          // what was asked for
       data: null,          // the /api/cosm payload
@@ -26387,7 +26826,7 @@
       backTop: null,       // where "back" returns to, in #cosm-body px
       // The host contract (0.4.3, checkpoint B). The content functions below
       // (cosmRailHTML, cosmBodyHTML, the cards, cosmFocus, the outline) draw
-      // for a HOST — this viewer, or a reader's EML face (EMLF, by the Canon
+      // for a HOST — this viewer, or a reader's EMF face (EMF_FACE, by the Canon
       // chip) — passed as their last argument and defaulting to the viewer.
       // A host is its state (path, data, ix, shown, railWant) plus where it
       // draws: its column, its rail and its outline button.
@@ -26608,7 +27047,7 @@
       h += '<div class="cosm-cat-meta"><span class="cosm-cat-decl dict-sc" title="'
         + cosmEsc(data.manifest_title || '') + '">' + cosmEsc(data.minicosm + '/' + data.major)
         + '</span> · ' + counts + '</div>';
-      // An EML twin written by the rules fallback says so (spec 18.4.3).
+      // An EMF twin written by the rules fallback says so (spec 18.4.3).
       if (cosmIsMap(cat.derived) && cat.derived.mode === 'rules') {
         h += '<div class="cosm-scaffold">' + cosmEsc(t('cosm.scaffold', 'scaffold, no model')) + '</div>';
       }
@@ -26751,7 +27190,7 @@
         + cosmEsc(data.refused) + '</p>' + raw + '</div>';
     }
 
-    // The whole text's atem, an EML twin's `atem:` block (spec 18.3.5) —
+    // The whole text's atem, an EMF twin's `atem:` block (spec 18.3.5) —
     // also the core of the atem card (#atem-modal). Each part carries the
     // owner's definition as its tooltip, in one short phrase.
     function cosmAtemParts() {
@@ -26815,7 +27254,7 @@
           + '"><span class="cosm-sh" aria-hidden="true"></span>' + d.stance + '</span>';
         skip.add('stance');
       }
-      if (host.data.minicosm === 'eml' && typeof d.salience === 'string') {
+      if (host.data.minicosm === 'emf' && typeof d.salience === 'string') {
         badges += '<span class="cosm-sal sal-' + cosmEsc(d.salience) + '" title="'
           + cosmEsc(t('cosm.salience.title', 'salience: how much this matters to the text')) + '">'
           + cosmEsc(d.salience) + '</span>';
@@ -26862,7 +27301,7 @@
           return cosmPathHTML(v, ctx.holotype ? 'holotype' : (ctx.kind || 'file'), host);
         }
         // A Canon file's twins: their own path opens the twin itself.
-        if (canon && (k === 'twin' || k === 'eml') && cosmIsMap(v)) {
+        if (canon && (k === 'twin' || k === 'emf') && cosmIsMap(v)) {
           return '<dl class="cosm-fields">' + Object.entries(v).map(([kk, vv]) => '<dt>' + cosmEsc(kk)
             + '</dt><dd>' + (kk === 'path' && typeof vv === 'string' ? cosmPathHTML(vv, 'file', host)
               : cosmValue(vv, ctx, 2)) + '</dd>').join('') + '</dl>';
@@ -26912,7 +27351,7 @@
       return '<span class="cosm-prov">' + cosmEsc(bits.join(' · ')) + '</span>';
     }
 
-    // An EML item's place in its text (plain text this round).
+    // An EMF item's place in its text (plain text this round).
     function cosmSpanText(span) {
       const lines = span.lines != null ? String(span.lines).trim() : '';
       if (lines) {
@@ -27206,17 +27645,17 @@
     }
 
     // ================================================================
-    // Canon in the reader: EML twins and atems (0.4.3, checkpoint B)
+    // Canon in the reader: EMF twins and atems (0.4.3, checkpoint B)
     // ================================================================
     // The Canon chip in the three reader headers says whether the text on
-    // screen has an EML twin (`notes.md` ↔ `notes.md.cosm`, owner decision 4)
+    // screen has an EMF twin (`notes.md` ↔ `notes.md.cosm`, owner decision 4)
     // and offers three things: its atem (the card, #atem-modal), the twin
-    // itself (the EML face, in place of the text, at the reader's size) and a
+    // itself (the EMF face, in place of the text, at the reader's size) and a
     // decompile / refresh. Nothing here runs unless a person asked (plan §0:
     // no auto-derivation). The routes are P3's (docs/canon-landed-P3.md):
     // POST /api/canon/derive, /atem, /compile answer `{job}`, a snapshot that
     // is followed on the SSE `canon` event and by polling, and shown as a
-    // toast with cancel; /atem/pin writes at once; GET /api/canon/eml gives a
+    // toast with cancel; /atem/pin writes at once; GET /api/canon/emf gives a
     // text's twin as a /api/cosm payload with its state (fresh | stale; 404 =
     // none yet). Every path is project-relative or `canon:<volume>/<rel>`.
     const CANON_TEXT_RE = /\.(md|markdown|mdown|mkd|txt|text)$/i;
@@ -27224,7 +27663,7 @@
     const CANON_TERMINAL = new Set(['done', 'failed', 'cancelled']);
     const CANON = {
       doc: null,          // the text on screen: {path, state, twin, data, completeness}
-      faces: new Set(),   // texts (canonKey) whose EML face is up — kept until read/edit closes
+      faces: new Set(),   // texts (canonKey) whose EMF face is up — kept until read/edit closes
       jobs: new Map(),    // job id → what we asked for (canonTrack)
       snaps: new Map(),   // job id → the newest snapshot seen (an SSE event can beat the POST's answer)
       seq: 0,             // guards out-of-order twin fetches
@@ -27235,6 +27674,38 @@
     function canonIsText(path) {
       return !!path && !/\.cosm$/i.test(path) && CANON_TEXT_RE.test(path);
     }
+    // A SHORT's file name (plan §15): `<stem>.short-YYYY-MM-DD-HHMM[-n].md`
+    // beside its text. Which sibling it is a short of, by canon.py's
+    // short_text_name rule: a text with that stem (one with an EMF twin
+    // first, then .md), else `<stem>.cosm` (a standalone EMF), else a file
+    // named just the stem (a converted original). null: not a short's name,
+    // or its text is not there. A short is an ordinary file; this only lets
+    // a tile or a row wear the quiet "short" tag.
+    function canonShortOf(name, siblings, withEmf) {
+      const m = /^(.+)\.short-\d{4}-\d{2}-\d{2}-\d{4}(?:-[1-9]\d*)?\.md$/.exec(String(name || ''));
+      if (!m) return null;
+      const stem = m[1];
+      const exts = ['md', 'markdown', 'mdown', 'mkd', 'txt', 'text'];
+      const emf = new Set(withEmf || []);
+      const names = new Set(siblings || []);
+      names.delete(name);
+      const texts = [];
+      names.forEach((n) => {
+        const i = n.lastIndexOf('.');
+        const ext = i > 0 ? n.slice(i + 1).toLowerCase() : '';
+        if (i > 0 && n.slice(0, i) === stem && exts.includes(ext)) {
+          texts.push([emf.has(n) ? 0 : 1, ext === 'md' ? 0 : 1, exts.indexOf(ext), n]);
+        }
+      });
+      if (texts.length) {
+        texts.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2] || (a[3] < b[3] ? -1 : a[3] > b[3] ? 1 : 0));
+        return texts[0][3];
+      }
+      if (names.has(stem + '.cosm')) return stem + '.cosm';
+      return names.has(stem) ? stem : null;
+    }
+    window.canonShortOf = canonShortOf;
+
     function canonKey(path) {
       return String(path || '').replace(/\\/g, '/').replace(/\/{2,}/g, '/').replace(/(^|\/)\.\//g, '$1')
         .replace(/\/+$/, '');
@@ -27267,7 +27738,7 @@
 
     // ---- the text on screen and its twin ----
     // From openReadEdit, at convert's moment: what the chip shows, and the
-    // EML face again if it was up for this text before.
+    // EMF face again if it was up for this text before.
     async function canonOnDocOpen(path) {
       const seq = ++CANON.seq;
       CANON.doc = (IS_HOME || !canonIsText(path)) ? null
@@ -27276,15 +27747,15 @@
       if (!CANON.doc) return;
       await canonRefreshDoc(seq);
       if (seq !== CANON.seq || !CANON.doc || !reIsActive() || !canonSame(RE_PATH, path)) return;
-      if (CANON.faces.has(canonKey(path)) && CANON.doc.data && RE_FACE === 'read' && !emlFaceOn()) {
-        emlFaceShow(path);
+      if (CANON.faces.has(canonKey(path)) && CANON.doc.data && RE_FACE === 'read' && !emfFaceOn()) {
+        emfFaceShow(path);
       }
     }
 
     async function canonRefreshDoc(seq = CANON.seq) {
       const doc = CANON.doc;
       if (!doc) return null;
-      const r = await canonJSON('/api/canon/eml?path=' + encodeURIComponent(doc.path));
+      const r = await canonJSON('/api/canon/emf?path=' + encodeURIComponent(doc.path));
       if (seq !== CANON.seq || CANON.doc !== doc) return null;
       if (r.ok && r.data) {
         const data = r.data.cosm || null;
@@ -27314,7 +27785,7 @@
 
     function canonPaintChips() {
       const d = CANON.doc;
-      const faceOn = !!(d && emlFaceOn() && canonSame(EMLF.text, d.path));
+      const faceOn = !!(d && emfFaceOn() && canonSame(EMF_FACE.text, d.path));
       const busy = d ? canonBusyFor(d.path) : null;
       CANON_CHIP_IDS.forEach((id) => {
         const chip = document.getElementById(id);
@@ -27323,26 +27794,26 @@
         chip.hidden = false;
         const has = d.state === 'fresh' || d.state === 'stale';
         const atemOnly = has && d.completeness === 'atem';
-        const words = d.state === 'stale' ? t('canon.chip.stale', 'EML twin is out of date')
-          : (has ? t('cn.eml.fresh', 'has an EML twin') : t('canon.chip.absent', 'no EML twin yet'));
+        const words = d.state === 'stale' ? t('canon.chip.stale', 'EMF twin is out of date')
+          : (has ? t('cn.emf.fresh', 'has an EMF twin') : t('canon.chip.absent', 'no EMF twin yet'));
         const badge = chip.querySelector('[data-cnc="badge"]');
         badge.className = 'cnc-badge state-' + d.state;
         setIcon(badge.querySelector('img'), has ? 'twin-on' : 'twin-off');
         const twin = chip.querySelector('[data-cnc="twin"]');
         const how = faceOn ? t('canon.chip.twin.back', 'show the text again')
-          : (has ? t('canon.chip.twin.show', 'show the EML twin in place of the text')
-            : t('canon.chip.twin.make', 'decompile the text into its EML twin, then show it'));
+          : (has ? t('canon.chip.twin.show', 'show the EMF twin in place of the text')
+            : t('canon.chip.twin.make', 'decompile the text into its EMF twin, then show it'));
         twin.title = words + ' — ' + how;
         twin.setAttribute('aria-label', twin.title);
         twin.setAttribute('aria-pressed', faceOn ? 'true' : 'false');
         const derive = chip.querySelector('[data-cnc="derive"]');
         derive.disabled = !!busy;
-        const dl = (busy && busy.kind === 'eml') ? t('canon.chip.deriving', 'decompiling…')
+        const dl = (busy && busy.kind === 'emf') ? t('canon.chip.deriving', 'decompiling…')
           : ((!has || atemOnly) ? t('canon.chip.decompile', 'decompile') : t('canon.chip.refresh', 'refresh twin'));
         derive.querySelector('.cnc-dl').textContent = dl;
         derive.setAttribute('aria-label', dl);
         derive.title = !has
-          ? t('canon.chip.decompile.title', 'decompile the text into an EML twin: the words it leans on, the names, claims and events in it')
+          ? t('canon.chip.decompile.title', 'decompile the text into an EMF twin: the words it leans on, the names, claims and events in it')
           : (atemOnly ? t('canon.chip.decompile.atemOnly', 'the twin holds only the atem so far: decompile the whole text into it')
             : (d.state === 'stale' ? t('canon.chip.refresh.stale', 'the text has changed since its twin was written: decompile it again')
               : t('canon.chip.refresh.fresh', 'the twin is up to date: decompile it again anyway')));
@@ -27366,8 +27837,8 @@
     async function canonTwinClick() {
       const d = CANON.doc;
       if (!d) return;
-      if (emlFaceOn() && canonSame(EMLF.text, d.path)) { emlFaceHide(); return; }
-      if (d.state === 'fresh' || d.state === 'stale') { await emlFaceShow(d.path); return; }
+      if (emfFaceOn() && canonSame(EMF_FACE.text, d.path)) { emfFaceHide(); return; }
+      if (d.state === 'fresh' || d.state === 'stale') { await emfFaceShow(d.path); return; }
       await canonDecompile(d.path, { flip: true });
     }
 
@@ -27376,7 +27847,7 @@
     async function canonDeriveDoc() {
       const d = CANON.doc;
       if (!d) return;
-      const onFace = emlFaceOn() && canonSame(EMLF.text, d.path);
+      const onFace = emfFaceOn() && canonSame(EMF_FACE.text, d.path);
       await canonDecompileAsk(d.path, d.state === 'fresh' && d.completeness !== 'atem' ? 'fresh' : d.state,
         { flip: onFace });
     }
@@ -27388,7 +27859,7 @@
         const ok = await confirmOverlay({
           title: t('canon.confirm.refresh.title', 'Decompile it again?'),
           message: t('canon.confirm.refresh.body',
-            'The EML twin of “{name}” is up to date with the text. Decompile it again anyway? The new twin replaces it; atems you pinned are kept.')
+            'The EMF twin of “{name}” is up to date with the text. Decompile it again anyway? The new twin replaces it; atems you pinned are kept.')
             .replace('{name}', () => canonBase(path)),
           confirmLabel: t('canon.confirm.refresh.ok', 'decompile again'),
           cancelLabel: t('canon.confirm.refresh.cancel', 'keep it'),
@@ -27403,14 +27874,14 @@
       const label = canonBase(path);
       let waiting = false;
       if (flip && reIsActive() && canonSame(RE_PATH, path)) {
-        waiting = await emlFaceShow(path, { wait: true });
+        waiting = await emfFaceShow(path, { wait: true });
       }
-      const r = await canonPost('/api/canon/derive', { path, what: 'eml', force: !!force });
+      const r = await canonPost('/api/canon/derive', { path, what: 'emf', force: !!force });
       if (!r.ok) {
-        if (waiting && emlFaceOn() && canonSame(EMLF.text, path)) {
-          EMLF.waiting = null;
-          EMLF.error = r.error;
-          emlFaceRender();
+        if (waiting && emfFaceOn() && canonSame(EMF_FACE.text, path)) {
+          EMF_FACE.waiting = null;
+          EMF_FACE.error = r.error;
+          emfFaceRender();
         }
         convertNotice(label, r.error, 'failed', { icon: 'cosm', ttl: 12000 });
         return null;
@@ -27444,10 +27915,15 @@
       return canonTrack(r.data.job, { want: 'card', token, label: source, writes: false });
     }
 
-    // "compile text": the twin back out as a new datestamped markdown file
-    // beside it (the text is never touched); the toast offers to open it.
-    async function canonCompile(twin) {
-      const r = await canonPost('/api/canon/compile', { path: twin });
+    // "compile a short" (plan §15): the twin back out as a SHORT, a new
+    // datestamped markdown telling beside it (`notes.short-…md`; the text is
+    // never touched, the twin records it in its shorts: list); the toast
+    // offers to open it. `order` is told | weight; none = the server's
+    // default (told when the twin's text is there to follow).
+    async function canonCompile(twin, order) {
+      const body = { path: twin };
+      if (order === 'told' || order === 'weight') body.order = order;
+      const r = await canonPost('/api/canon/compile', body);
       if (!r.ok) { convertNotice(canonBase(twin), r.error, 'failed', { icon: 'cosm', ttl: 12000 }); return null; }
       return canonTrack(r.data.job, { want: 'toast', label: canonBase(twin), writes: false });
     }
@@ -27459,7 +27935,7 @@
 
     // ---- jobs ----
     // One entry per job we started: `want` says where its progress shows —
-    // `card` (the atem card), `flip` (the EML face waits, then shows the
+    // `card` (the atem card), `flip` (the EMF face waits, then shows the
     // twin), `toast`. Snapshots arrive on SSE and by polling (every 1.5 s,
     // so a dropped stream cannot strand a job); a finished job never goes
     // back to running.
@@ -27469,7 +27945,7 @@
         label: canonBase(snap.path), writes: false, snap: null, terminal: false, poll: null }, opts);
       CANON.jobs.set(e.id, e);
       if (e.want === 'card') atemCardBind(e);
-      if (e.want === 'flip') emlFaceBind(e);
+      if (e.want === 'flip') emfFaceBind(e);
       const seen = CANON.snaps.get(e.id);
       if (!seen) CANON.snaps.set(e.id, Object.assign({ _at: Date.now() }, snap));
       canonApply(e, seen || snap);
@@ -27511,11 +27987,11 @@
     function canonByNotice(snap) {
       const res = snap.result || {};
       const name = canonBase(res.text_path || snap.path || '');
-      const msg = snap.kind === 'eml' ? t('canon.by.eml', '{by} made an EML twin of {name}')
+      const msg = snap.kind === 'emf' ? t('canon.by.emf', '{by} made an EMF twin of {name}')
         : (snap.kind === 'atem' ? t('canon.by.atem', '{by} wrote the atem of {name}') : '');
       if (!msg) return;
       convertNotice(canonBase(res.twin_path || name), msg.replace('{by}', () => snap.by)
-        .replace('{name}', () => name), 'done', { icon: snap.kind === 'eml' ? 'cosm' : 'atem', square: true,
+        .replace('{name}', () => name), 'done', { icon: snap.kind === 'emf' ? 'cosm' : 'atem', square: true,
         ttl: 5000 });
     }
 
@@ -27529,7 +28005,7 @@
       }
       canonToast(e, snap);
       if (e.want === 'card') atemCardOnSnap(e, snap);
-      if (e.want === 'flip') emlFaceOnSnap(e, snap);
+      if (e.want === 'flip') emfFaceOnSnap(e, snap);
       if (end) {
         if (snap.state === 'done') canonAfterWrite(snap);
         setTimeout(() => CANON.jobs.delete(e.id), 60000);
@@ -27544,13 +28020,13 @@
     // is the hook that makes it now.
     function canonAfterWrite(snap) {
       const res = (snap && snap.result) || {};
-      const wrote = snap.kind === 'eml' || snap.kind === 'pin' || snap.kind === 'compile'
+      const wrote = snap.kind === 'emf' || snap.kind === 'pin' || snap.kind === 'compile'
         || (snap.kind === 'atem' && res.written);
       if (!wrote) return;
       const text = res.text_path || snap.path;
       if (CANON.doc && reIsActive() && canonSame(CANON.doc.path, text)) {
         canonRefreshDoc().then(() => {
-          if (emlFaceOn() && canonSame(EMLF.text, text) && !EMLF.waiting) emlFaceRender();
+          if (emfFaceOn() && canonSame(EMF_FACE.text, text) && !EMF_FACE.waiting) emfFaceRender();
         });
       }
       if (document.getElementById('canon-mode')?.classList.contains('open')) cnLoadTree();
@@ -27566,7 +28042,7 @@
       const of = snap.chunks > 0 && snap.chunk > 0
         ? t('canon.phase.passage', 'passage {k} of {n}').replace('{k}', String(snap.chunk))
           .replace('{n}', String(snap.chunks)) : '';
-      const eml = (e && e.kind) === 'eml' || snap.kind === 'eml';
+      const emf = (e && e.kind) === 'emf' || snap.kind === 'emf';
       switch (snap.phase) {
         case 'waiting': return t('canon.phase.waiting', 'waiting for the model');
         case 'starting':
@@ -27575,7 +28051,7 @@
         case 'lexicon': return t('canon.phase.lexicon', 'finding the words it leans on');
         case 'reading':
         case 'continuing':
-          return (eml ? t('canon.phase.decompiling', 'decompiling {name}').replace('{name}', () => name)
+          return (emf ? t('canon.phase.decompiling', 'decompiling {name}').replace('{name}', () => name)
             : t('cosm.loading', 'reading…')) + (of ? ' · ' + of : '');
         case 'repairing': return t('canon.phase.repairing', 'repairing…') + (of ? ' · ' + of : '');
         case 'merging': return t('canon.phase.merging', 'merging the passages');
@@ -27592,7 +28068,7 @@
 
     function canonToast(e, snap) {
       const id = 'canon:' + e.id;
-      const icon = e.kind === 'eml' || e.kind === 'compile' ? 'cosm' : 'atem';
+      const icon = e.kind === 'emf' || e.kind === 'compile' ? 'cosm' : 'atem';
       const dismiss = { label: t('canon.job.dismiss', 'dismiss'), run: () => convertToastClose(id) };
       if (!CANON_TERMINAL.has(snap.state)) {
         if (e.want === 'card') return;                    // the card shows its own progress
@@ -27608,11 +28084,11 @@
         if (e.want === 'card') { convertToastClose(id); return; }   // the card says it
         let message = '';
         let actions = [dismiss];
-        if (e.kind === 'eml') {
+        if (e.kind === 'emf') {
           message = res.mode === 'rules'
-            ? t('canon.job.emlRules', 'EML twin written — a scaffold: no model was running')
-            : t('canon.job.eml', 'EML twin written: {n} items').replace('{n}', String(res.items == null ? '?' : res.items));
-          if (!(emlFaceOn() && canonSame(EMLF.text, res.text_path || e.path))) {
+            ? t('canon.job.emfRules', 'EMF twin written — a scaffold: no model was running')
+            : t('canon.job.emf', 'EMF twin written: {n} items').replace('{n}', String(res.items == null ? '?' : res.items));
+          if (!(emfFaceOn() && canonSame(EMF_FACE.text, res.text_path || e.path))) {
             actions = [{ label: t('canon.job.show', 'show'), run: () => {
               convertToastClose(id); canonOpenWithFace(res.text_path || e.path);
             } }, dismiss];
@@ -27661,7 +28137,7 @@
       }
       if (!busy) { el.hidden = true; el.textContent = ''; return; }
       const name = canonBase(busy.path || '');
-      const what = busy.kind === 'eml' ? t('canon.busy.eml', 'decompiling {name}').replace('{name}', () => name)
+      const what = busy.kind === 'emf' ? t('canon.busy.emf', 'decompiling {name}').replace('{name}', () => name)
         : (busy.kind === 'compile' ? t('canon.busy.compile', 'compiling {name}').replace('{name}', () => name)
           : t('canon.busy.atem', 'writing an atem'));
       el.innerHTML = '<span class="atem-spin" aria-hidden="true"></span><span></span>';
@@ -27674,79 +28150,82 @@
       canonBusyPaint._t = setTimeout(canonBusyPaint, 30000);
     }
 
-    // Open a text with its EML face showing (the atem card's "open twin",
+    // Open a text with its EMF face showing (the atem card's "open twin",
     // a Canon tile's twin badge, a toast's "show").
     function canonOpenWithFace(text) {
       if (!text) return;
       CANON.faces.add(canonKey(text));
-      if (reIsActive() && canonSame(RE_PATH, text)) { void emlFaceShow(RE_PATH); return; }
+      if (reIsActive() && canonSame(RE_PATH, text)) { void emfFaceShow(RE_PATH); return; }
       openReadEdit(text, { size: 'full', face: 'read' });
     }
 
-    // ---- the EML face ----
-    // The twin in place of the text, in #review-eml (full) or #preview-eml
-    // (mini): a head of its own ("EML twin of notes.md", lens, outline, open
-    // raw, compile text, back to the text), then the cosm viewer's content
-    // component drawn for this host. EMLF is the host (see COSM's comment).
-    const EMLF = {
+    // ---- the EMF face ----
+    // The twin in place of the text, in #review-emf (full) or #preview-emf
+    // (mini): a head of its own ("EMF twin of notes.md", lens, outline, open
+    // raw, compile a short, back to the text), then the cosm viewer's content
+    // component drawn for this host. EMF_FACE is the host (see COSM's comment).
+    const EMF_FACE = {
       path: null,          // the twin: what the lenses and "open raw" open
       text: null,          // the text it is the twin of
       data: null, ix: null, shown: new Map(), railWant: null,
       el: null,            // the face on screen
       waiting: null,       // a decompile this face is waiting for: its job id, or 'pending'
       waitSnap: null,
+      shortDefault: 'told', // the order "compile a short" tells in when none is chosen (marked in its menu)
       error: null,
-      body: () => EMLF.el && EMLF.el.querySelector('[data-ef="body"]'),
-      rail: () => EMLF.el && EMLF.el.querySelector('[data-ef="rail"]'),
-      railBtn: () => EMLF.el && EMLF.el.querySelector('[data-ef="outline"]'),
+      body: () => EMF_FACE.el && EMF_FACE.el.querySelector('[data-ef="body"]'),
+      rail: () => EMF_FACE.el && EMF_FACE.el.querySelector('[data-ef="rail"]'),
+      railBtn: () => EMF_FACE.el && EMF_FACE.el.querySelector('[data-ef="outline"]'),
       viewer: false,
     };
-    function emlFaceOn() { return !!(EMLF.el && !EMLF.el.hidden); }
-    window.emlFaceOn = emlFaceOn;
+    function emfFaceOn() { return !!(EMF_FACE.el && !EMF_FACE.el.hidden); }
+    window.emfFaceOn = emfFaceOn;
 
-    async function emlFaceShow(path, { wait = false } = {}) {
+    async function emfFaceShow(path, { wait = false } = {}) {
       if (!reIsActive() || !canonSame(RE_PATH, path)) return false;
       if (RE_FACE === 'edit') {
         await reSetFace('read');                 // the dirty guard may keep the editor
         if (RE_FACE !== 'read') return false;
       }
-      const el = document.getElementById(RE_SIZE === 'full' ? 'review-eml' : 'preview-eml');
-      if (EMLF.el && EMLF.el !== el) emlFaceHide({ forget: false });
+      const el = document.getElementById(RE_SIZE === 'full' ? 'review-emf' : 'preview-emf');
+      if (EMF_FACE.el && EMF_FACE.el !== el) emfFaceHide({ forget: false });
       CANON.faces.add(canonKey(path));
-      Object.assign(EMLF, { el, text: path, error: null, waiting: wait ? 'pending' : EMLF.waiting,
-        waitSnap: wait ? null : EMLF.waitSnap });
+      Object.assign(EMF_FACE, { el, text: path, error: null, waiting: wait ? 'pending' : EMF_FACE.waiting,
+        waitSnap: wait ? null : EMF_FACE.waitSnap });
       if (RE_SIZE === 'full') {
         const bar = document.getElementById('review-toolbar');
-        el.style.setProperty('--eml-top', (bar ? bar.offsetHeight : 47) + 'px');
-        document.getElementById('review-mode').classList.add('eml-on');
+        el.style.setProperty('--emf-top', (bar ? bar.offsetHeight : 47) + 'px');
+        document.getElementById('review-mode').classList.add('emf-on');
       } else {
-        document.getElementById('preview').classList.add('eml-on');
+        document.getElementById('preview').classList.add('emf-on');
       }
       el.hidden = false;
-      emlFaceRender();
+      emfFaceRender();
       canonPaintChips();
       if (!wait && CANON.doc && canonSame(CANON.doc.path, path) && !CANON.doc.data) {
         await canonRefreshDoc();
-        if (emlFaceOn() && canonSame(EMLF.text, path)) emlFaceRender();
+        if (emfFaceOn() && canonSame(EMF_FACE.text, path)) emfFaceRender();
       }
       return true;
     }
-    window.emlFaceShow = emlFaceShow;
+    window.emfFaceShow = emfFaceShow;
 
-    function emlFaceHide({ forget = true } = {}) {
-      const text = EMLF.text;
-      const wasOn = emlFaceOn();
-      ['review-eml', 'preview-eml'].forEach((id) => {
+    function emfFaceHide({ forget = true } = {}) {
+      const text = EMF_FACE.text;
+      const wasOn = emfFaceOn();
+      ['review-emf', 'preview-emf'].forEach((id) => {
         const el = document.getElementById(id);
         if (!el) return;
         el.hidden = true;
         el.querySelector('[data-ef="body"]').innerHTML = '';
         el.querySelector('[data-ef="rail"]').innerHTML = '';
+        el.querySelector('.emf-short-menu').hidden = true;
+        el.querySelector('[data-ef="short-menu"]').setAttribute('aria-expanded', 'false');
       });
-      document.getElementById('review-mode').classList.remove('eml-on');
-      document.getElementById('preview').classList.remove('eml-on');
+      document.getElementById('review-mode').classList.remove('emf-on');
+      document.getElementById('preview').classList.remove('emf-on');
       if (forget && text) CANON.faces.delete(canonKey(text));
-      Object.assign(EMLF, { path: null, text: null, data: null, ix: null, shown: new Map(), railWant: null,
+      Object.assign(EMF_FACE, { path: null, text: null, data: null, ix: null, shown: new Map(), railWant: null,
         el: null, waiting: null, waitSnap: null, error: null });
       canonPaintChips();
       // The text's marks were laid out while it was hidden: lay them again.
@@ -27756,16 +28235,16 @@
         });
       }
     }
-    window.emlFaceHide = emlFaceHide;
+    window.emfFaceHide = emfFaceHide;
 
-    function emlFaceRender() {
-      const el = EMLF.el;
+    function emfFaceRender() {
+      const el = EMF_FACE.el;
       if (!el) return;
       const q = (k) => el.querySelector('[data-ef="' + k + '"]');
-      const d = CANON.doc && canonSame(CANON.doc.path, EMLF.text) ? CANON.doc : null;
-      const data = !EMLF.waiting && !EMLF.error && d ? d.data : null;
+      const d = CANON.doc && canonSame(CANON.doc.path, EMF_FACE.text) ? CANON.doc : null;
+      const data = !EMF_FACE.waiting && !EMF_FACE.error && d ? d.data : null;
       const title = q('title');
-      title.textContent = t('eml.face.title', 'EML twin of {name}').replace('{name}', () => canonBase(EMLF.text));
+      title.textContent = t('emf.face.title', 'EMF twin of {name}').replace('{name}', () => canonBase(EMF_FACE.text));
       title.title = (d && d.twin) || '';
       q('stale').hidden = !(data && d.state === 'stale');
       const derived = data && data.catalog && data.catalog.derived;
@@ -27777,101 +28256,176 @@
         + lenses.map((l) => '<option value="' + cosmEsc(l) + '">' + cosmEsc(l) + '</option>').join('');
       lens.value = '';
       q('raw').hidden = !(data && d.twin);
-      q('compile').hidden = !(data && !data.refused);
+      q('short').hidden = !(data && !data.refused);
+      emfShortMenu(false);
+      // The order a plain click tells in, marked in the menu: the author's
+      // when the twin names its text (it is open here), else by weight.
+      const told = !!(data && data.catalog && data.catalog.source && typeof data.catalog.source === 'object');
+      EMF_FACE.shortDefault = told ? 'told' : 'weight';
+      el.querySelectorAll('.emf-short-item').forEach((b) => {
+        const on = b.dataset.ef === 'short-' + EMF_FACE.shortDefault;
+        b.querySelector('.emf-short-def').hidden = !on;
+      });
       const body = q('body'), rail = q('rail');
-      Object.assign(EMLF, { path: (d && d.twin) || null, data, ix: data ? cosmIndex(data) : null,
+      Object.assign(EMF_FACE, { path: (d && d.twin) || null, data, ix: data ? cosmIndex(data) : null,
         shown: new Map() });
       if (!data) {
         rail.innerHTML = '';
-        body.innerHTML = emlFaceWaitHTML();
+        body.innerHTML = emfFaceWaitHTML();
       } else if (data.refused) {
         rail.innerHTML = '';
         body.innerHTML = '<div class="cosm-refusal"><p><strong>'
           + cosmEsc(t('cosm.refused.lead', 'enough can’t read this as a volume:')) + '</strong></p><p>'
           + cosmEsc(data.refused) + '</p></div>';
       } else {
-        rail.innerHTML = cosmRailHTML(data, EMLF);
-        body.innerHTML = cosmBodyHTML(data, EMLF);
+        rail.innerHTML = cosmRailHTML(data, EMF_FACE);
+        body.innerHTML = cosmBodyHTML(data, EMF_FACE);
       }
       body.scrollTop = 0;
-      cosmRailApply(EMLF);
+      cosmRailApply(EMF_FACE);
     }
 
-    function emlFaceWaitHTML() {
-      if (EMLF.error) return '<p class="eml-wait eml-wait-error">' + cosmEsc(EMLF.error) + '</p>';
-      if (!EMLF.waiting) {
-        const d = CANON.doc && canonSame(CANON.doc.path, EMLF.text) ? CANON.doc : null;
+    function emfFaceWaitHTML() {
+      if (EMF_FACE.error) return '<p class="emf-wait emf-wait-error">' + cosmEsc(EMF_FACE.error) + '</p>';
+      if (!EMF_FACE.waiting) {
+        const d = CANON.doc && canonSame(CANON.doc.path, EMF_FACE.text) ? CANON.doc : null;
         if (d && d.state === 'absent') {
-          return '<p class="eml-wait">' + cosmEsc(t('eml.face.none',
-            'this text has no EML twin yet: decompile it from the twin button')) + '</p>';
+          return '<p class="emf-wait">' + cosmEsc(t('emf.face.none',
+            'this text has no EMF twin yet: decompile it from the twin button')) + '</p>';
         }
-        return '<p class="eml-wait"><span class="atem-spin" aria-hidden="true"></span>'
+        return '<p class="emf-wait"><span class="atem-spin" aria-hidden="true"></span>'
           + cosmEsc(t('cosm.loading', 'reading…')) + '</p>';
       }
-      const e = CANON.jobs.get(EMLF.waiting);
-      const snap = EMLF.waitSnap;
-      const phase = snap ? canonPhaseText(e || { label: canonBase(EMLF.text), kind: 'eml' }, snap) : '';
-      return '<div class="eml-wait" role="status"><span class="atem-spin" aria-hidden="true"></span>'
-        + '<span class="eml-wait-lead">' + cosmEsc(t('eml.face.decompiling', 'decompiling into EML…')) + '</span>'
-        + (phase ? '<span class="eml-wait-phase">' + cosmEsc(phase) + '</span>' : '')
+      const e = CANON.jobs.get(EMF_FACE.waiting);
+      const snap = EMF_FACE.waitSnap;
+      const phase = snap ? canonPhaseText(e || { label: canonBase(EMF_FACE.text), kind: 'emf' }, snap) : '';
+      return '<div class="emf-wait" role="status"><span class="atem-spin" aria-hidden="true"></span>'
+        + '<span class="emf-wait-lead">' + cosmEsc(t('emf.face.decompiling', 'decompiling into EMF…')) + '</span>'
+        + (phase ? '<span class="emf-wait-phase">' + cosmEsc(phase) + '</span>' : '')
         + (e ? '<button type="button" data-ef="cancel">' + cosmEsc(t('canon.job.cancel', 'cancel')) + '</button>' : '')
         + '</div>';
     }
 
-    function emlFaceBind(e) {
-      if (emlFaceOn() && EMLF.waiting === 'pending' && canonSame(EMLF.text, e.path)) {
-        EMLF.waiting = e.id;
-        emlFaceRender();
+    function emfFaceBind(e) {
+      if (emfFaceOn() && EMF_FACE.waiting === 'pending' && canonSame(EMF_FACE.text, e.path)) {
+        EMF_FACE.waiting = e.id;
+        emfFaceRender();
       }
     }
 
-    function emlFaceOnSnap(e, snap) {
-      if (!emlFaceOn() || EMLF.waiting !== e.id) return;
+    function emfFaceOnSnap(e, snap) {
+      if (!emfFaceOn() || EMF_FACE.waiting !== e.id) return;
       if (!CANON_TERMINAL.has(snap.state)) {
-        EMLF.waitSnap = snap;
-        const ph = EMLF.el.querySelector('.eml-wait-phase');
+        EMF_FACE.waitSnap = snap;
+        const ph = EMF_FACE.el.querySelector('.emf-wait-phase');
         if (ph) ph.textContent = canonPhaseText(e, snap);
-        else emlFaceRender();
+        else emfFaceRender();
         return;
       }
-      EMLF.waiting = null;
-      EMLF.waitSnap = null;
-      if (snap.state === 'cancelled') { emlFaceHide(); return; }   // back to the text; the toast says why
-      if (snap.state === 'failed') EMLF.error = snap.error || snap.message || t('canon.job.failed', 'that did not work');
-      emlFaceRender();     // done: "reading…" until canonAfterWrite has fetched the twin
+      EMF_FACE.waiting = null;
+      EMF_FACE.waitSnap = null;
+      if (snap.state === 'cancelled') { emfFaceHide(); return; }   // back to the text; the toast says why
+      if (snap.state === 'failed') EMF_FACE.error = snap.error || snap.message || t('canon.job.failed', 'that did not work');
+      emfFaceRender();     // done: "reading…" until canonAfterWrite has fetched the twin
     }
 
-    function emlFaceAct(act) {
-      if (act === 'back') { emlFaceHide(); return; }
-      if (act === 'outline') { cosmRailToggle(undefined, EMLF); return; }
-      if (act === 'raw') { if (EMLF.path) openReadEdit(EMLF.path, { size: RE_SIZE || 'full', face: 'edit' }); return; }
-      if (act === 'compile') { if (EMLF.path) void canonCompile(EMLF.path); return; }
-      if (act === 'cancel') { if (EMLF.waiting && EMLF.waiting !== 'pending') void canonCancel(EMLF.waiting); }
+    // The short's tiny menu: the two telling orders, the default marked.
+    // Opens under the caret; closes on a choice, a click elsewhere, Esc
+    // (which then goes no further: it must not close the reader too) or
+    // when the face redraws. Up/Down move between the two items.
+    function emfShortMenu(open, { focus = false } = {}) {
+      const el = EMF_FACE.el;
+      const menu = el && el.querySelector('.emf-short-menu');
+      const more = el && el.querySelector('[data-ef="short-menu"]');
+      if (!menu || !more) return false;
+      const want = open === undefined ? menu.hidden : !!open;
+      if (want === !menu.hidden) return want;
+      menu.hidden = !want;
+      more.setAttribute('aria-expanded', want ? 'true' : 'false');
+      menu.style.left = '';
+      menu.style.right = '';
+      if (want) {
+        // It hangs from the button's right edge; where the head wraps the
+        // button to the left of a narrow face, hang it from the left instead.
+        const box = el.getBoundingClientRect();
+        if (menu.getBoundingClientRect().left < box.left + 4) {
+          menu.style.right = 'auto';
+          menu.style.left = '0';
+        }
+        const first = menu.querySelector('.emf-short-item');
+        if (first) first.focus();
+      } else if (focus) {
+        more.focus();
+      }
+      return want;
+    }
+    window.emfShortMenu = emfShortMenu;
+
+    function emfShortMenuOpen() {
+      const menu = EMF_FACE.el && EMF_FACE.el.querySelector('.emf-short-menu');
+      return !!(menu && !menu.hidden);
     }
 
-    ['review-eml', 'preview-eml'].forEach((id) => {
+    document.addEventListener('pointerdown', (e) => {
+      if (emfShortMenuOpen() && !e.target.closest('.emf-short')) emfShortMenu(false);
+    }, true);
+
+    window.addEventListener('keydown', (e) => {
+      if (!emfShortMenuOpen()) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        emfShortMenu(false, { focus: true });
+        return;
+      }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        const items = Array.from(EMF_FACE.el.querySelectorAll('.emf-short-item'));
+        let at = items.indexOf(document.activeElement);
+        if (at < 0) at = e.key === 'ArrowDown' ? -1 : 0;
+        const next = items[(at + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length];
+        if (next) { e.preventDefault(); next.focus(); }
+        return;
+      }
+      if (e.key === 'Tab') emfShortMenu(false);
+    }, true);
+
+    function emfFaceAct(act) {
+      if (act === 'back') { emfFaceHide(); return; }
+      if (act === 'outline') { cosmRailToggle(undefined, EMF_FACE); return; }
+      if (act === 'raw') { if (EMF_FACE.path) openReadEdit(EMF_FACE.path, { size: RE_SIZE || 'full', face: 'edit' }); return; }
+      if (act === 'compile') { emfShortMenu(false); if (EMF_FACE.path) void canonCompile(EMF_FACE.path); return; }
+      if (act === 'short-menu') { emfShortMenu(); return; }
+      if (act === 'short-told' || act === 'short-weight') {
+        emfShortMenu(false, { focus: true });
+        if (EMF_FACE.path) void canonCompile(EMF_FACE.path, act.slice(6));
+        return;
+      }
+      if (act === 'cancel') { if (EMF_FACE.waiting && EMF_FACE.waiting !== 'pending') void canonCancel(EMF_FACE.waiting); }
+    }
+
+    ['review-emf', 'preview-emf'].forEach((id) => {
       const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener('click', (e) => {
         const act = e.target.closest('[data-ef]');
-        if (act && act.tagName === 'BUTTON') { emlFaceAct(act.dataset.ef); return; }
+        if (act && act.tagName === 'BUTTON') { emfFaceAct(act.dataset.ef); return; }
         const go = e.target.closest('[data-go]');
-        if (go) { e.preventDefault(); cosmFocus(go.dataset.go, { host: EMLF }); return; }
+        if (go) { e.preventDefault(); cosmFocus(go.dataset.go, { host: EMF_FACE }); return; }
         const op = e.target.closest('[data-open]');
         if (op) { e.preventDefault(); cosmOpenPath(op.dataset.open, op.dataset.okind || 'file'); return; }
         const more = e.target.closest('[data-more]');
-        if (more) { cosmShowAll(more.dataset.more, EMLF); return; }
+        if (more) { cosmShowAll(more.dataset.more, EMF_FACE); return; }
         const sc = e.target.closest('[data-scroll]');
-        if (sc) { cosmJumpTo(sc.dataset.scroll, EMLF); return; }
+        if (sc) { cosmJumpTo(sc.dataset.scroll, EMF_FACE); return; }
         const cp = e.target.closest('[data-copy]');
         if (cp) copyToClipboard(cp.dataset.copy);
       });
       el.querySelector('[data-ef="lens"]').addEventListener('change', (e) => {
         const lens = e.target.value;
         e.target.value = '';
-        if (lens && EMLF.path) enterMerirmaidLens(EMLF.path, lens);
+        if (lens && EMF_FACE.path) enterMerirmaidLens(EMF_FACE.path, lens);
       });
-      new ResizeObserver(() => { if (EMLF.el === el && emlFaceOn()) cosmRailApply(EMLF); }).observe(el);
+      new ResizeObserver(() => { if (EMF_FACE.el === el && emfFaceOn()) cosmRailApply(EMF_FACE); }).observe(el);
     });
 
     // ---- the atem card ----
@@ -27882,7 +28436,7 @@
     const ATEM = { open: false, token: 0, job: null, kind: null, source: '', path: null, snap: null,
       result: null, error: null, pinned: null };
     // A host for cosmAtemHTML that resolves nothing (the card has no volume).
-    const ATEM_HOST = { path: null, data: { minicosm: 'eml' }, shown: new Map(), railWant: null, viewer: false,
+    const ATEM_HOST = { path: null, data: { minicosm: 'emf' }, shown: new Map(), railWant: null, viewer: false,
       ix: { byKey: new Map(), byId: new Map(), byPart: new Map(), where: new Map() },
       body: () => null, rail: () => null, railBtn: () => null };
     const atemEl = (id) => document.getElementById(id);
@@ -28179,7 +28733,7 @@
 
     window.canonOnLanguage = () => {
       canonPaintChips();
-      if (emlFaceOn()) emlFaceRender();
+      if (emfFaceOn()) emfFaceRender();
       if (ATEM.open) atemCardPaint();
       canonBusyPaint();
     };
@@ -28879,8 +29433,8 @@
         items.push('<button type="button" class="ctx-item" data-act="open-raw">' + t('menu.openRaw', 'open raw') + '</button>');
         items.push('<div class="ctx-sep"></div>');
       } else if (target.kind !== 'dir') {
-        // 0.4.3: a text's atem, and its EML twin (the row names its state).
-        items.push(canonMenuItems(target.path, target.eml));
+        // 0.4.3: a text's atem, and its EMF twin (the row names its state).
+        items.push(canonMenuItems(target.path, target.emf));
       }
       if (target.kind === 'dir') {
         items.push('<button type="button" class="ctx-item" data-act="new-folder">' + t('menu.tree.newFolder', 'new subfolder') + '</button>');
@@ -28928,7 +29482,7 @@
           // 0.4.3 listing flags (server `_tree_to_html`)
           cosm: /\.cosm$/i.test(li.dataset.path || ''),
           holotype: li.dataset.holotype === '1',
-          eml: li.dataset.emlState || '',
+          emf: li.dataset.emfState || '',
         });
       }, true);   // <-- capture phase
     })();
@@ -28947,7 +29501,7 @@
         case 'new-file': openTreePrompt('file', t.path, t.name); break;
         case 'open-cosm': enterCosmMode(t.path); break;
         case 'open-raw': openReadEdit(t.path, { size: 'full', face: 'edit' }); break;
-        default: canonMenuRun(act, t.path, t.eml);
+        default: canonMenuRun(act, t.path, t.emf);
       }
     });
 
@@ -29949,7 +30503,7 @@
       convertHandleSyncFragment(fragment, savedPath);
       // The twin just moved from `fresh` to `edited` — repaint the chrome.
       convertRefreshDoc();
-      // 0.4.3: and an EML twin of this text is out of date now.
+      // 0.4.3: and an EMF twin of this text is out of date now.
       if (window.__canonReady) canonRefreshDoc();
     }
 
@@ -30321,6 +30875,32 @@
     // The tree re-renders every 3s (htmx), so this runs on every settle and
     // rebuilds nothing it doesn't have to: the badge element is reused and
     // only its state class, icon and tooltip are re-applied.
+    // A SHORT's row in the file tree (plan §15) wears a quiet "short" tag,
+    // as its Canon tile does: the file is ordinary and visible (never hidden
+    // like a twin); the tag only says what it is a short of. Drawn in the
+    // same frame as the rows, like the convert badge.
+    function decorateShortRows() {
+      const tree = document.getElementById('tree');
+      if (!tree) return;
+      tree.querySelectorAll('li.file[data-name]').forEach((li) => {
+        const name = li.dataset.name || '';
+        if (!/\.short-\d{4}-\d{2}-\d{2}-\d{4}(?:-[1-9]\d*)?\.md$/.test(name)) return;
+        const row = li.querySelector(':scope > .file-row');
+        if (!row || row.querySelector('.tree-short-tag')) return;
+        const sibs = Array.from(li.parentElement ? li.parentElement.children : [])
+          .filter((x) => x.matches && x.matches('li.file[data-name]'));
+        const text = canonShortOf(name, sibs.map((x) => x.dataset.name),
+          sibs.filter((x) => x.dataset.emf).map((x) => x.dataset.name));
+        if (!text) return;
+        const tag = document.createElement('span');
+        tag.className = 'tree-short-tag';
+        tag.textContent = t('cn.tag.short', 'short');
+        tag.title = t('cn.tag.short.title', '{name} — a short of {text}: a telling compiled from its EMF twin')
+          .replace('{name}', () => name).replace('{text}', () => text);
+        row.appendChild(tag);
+      });
+    }
+
     function decorateConvertRows() {
       const tree = document.getElementById('tree');
       if (!tree) return;
@@ -31359,7 +31939,7 @@
       if (d.job) convertHandleJobSnap(d);
     });
 
-    // 0.4.3: Canon derivations (EML twins, atems, compiles, pins) — the
+    // 0.4.3: Canon derivations (EMF twins, atems, compiles, pins) — the
     // payload is the job snapshot (canonOnSnap, by the Canon chip's code).
     es.addEventListener('canon', (e) => {
       let d;
@@ -31388,9 +31968,9 @@
     // frame the rows are: the tree re-renders every 3s, and decorating a
     // settle later makes the whole column blink.
     document.body.addEventListener('htmx:afterSwap', (e) => {
-      if (e.target && e.target.id === 'tree') decorateConvertRows();
+      if (e.target && e.target.id === 'tree') { decorateConvertRows(); decorateShortRows(); }
     });
-    document.body.addEventListener('htmx:afterSettle', () => decorateConvertRows());
+    document.body.addEventListener('htmx:afterSettle', () => { decorateConvertRows(); decorateShortRows(); });
     convertFormats().then(() => { decorateConvertRows(); convertExtrasPaint(); });
     decorateConvertRows();
 
@@ -42654,7 +43234,7 @@
       if (target.closest('#wdl-plate')) return 'wdl';
       if (target.closest('#dict-mode')) return target.closest('.dict-toolbar, .dict-opts') ? null : 'dict';
       if (target.closest('#review-body, #preview-body, #edit-textarea, #mini-edit-textarea, #conversation,'
-        + ' #wiki-body, #ref-body, #help-body, #cosm-body, #cosmspec-body, .eml-body')) return 'open';
+        + ' #wiki-body, #ref-body, #help-body, #cosm-body, #cosmspec-body, .emf-body')) return 'open';
       return null;
     }
 
@@ -42755,7 +43335,7 @@
       const where = dictCtxWhere(e.target);
       if (!where) return;
       const scope = e.target.closest('#wdl-plate, #dict-mode, #review-body, #preview-body, #conversation,'
-        + ' #wiki-body, #ref-body, #help-body, #cosm-body, #cosmspec-body, .eml-body');
+        + ' #wiki-body, #ref-body, #help-body, #cosm-body, #cosmspec-body, .emf-body');
       const hit = dictWordFromEvent(e, scope);
       // 0.4.3: a selection on a reading surface adds "atem of selection", and
       // a right-click on the selection itself opens the menu off a word too.

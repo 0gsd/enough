@@ -1,4 +1,4 @@
-"""The derivation engine (0.4.3, plan §7): a text → its EML twin (decompile), an EML twin → markdown (compile), any
+"""The derivation engine (0.4.3, plan §7): a text → its EMF twin (decompile), an EMF twin → markdown (compile), any
 text or passage → its atem.
 
 Pure functions. Nothing here imports the server, starts a job, holds a lock or decides whether a model is up: the
@@ -11,7 +11,7 @@ Nothing runs on import, ingest, listing, reconcile or startup. Twins are written
 `macrocosm.lint` with no errors in both modes: what a model wrote that still fails after one repair turn is dropped
 and counted in `derived.dropped`, and references left dangling become open questions, `{pending: "..."}`.
 
-The shape written is docs/MACROCOSM_OES.md §18.4 (the `eml/1` MiniCOSM, defaults/cosm/manifests/eml.manifest.cosm);
+The shape written is docs/MACROCOSM_OES.md §18.4 (the `emf/1` MiniCOSM, defaults/cosm/manifests/emf.manifest.cosm);
 an atem's four parts are the owner's definitions (§18.3.5).
 """
 
@@ -21,6 +21,7 @@ import bisect
 import datetime as dt
 import hashlib
 import inspect
+import json
 import os
 import re
 import tempfile
@@ -35,7 +36,8 @@ from . import canon as _canon
 from . import canon_prompts as P
 from . import macrocosm
 
-EML_OES = "eml/1"
+EMF_OES = "emf/1"
+EML_OES = EMF_OES                     # the name before EMF (plan §16), kept one release
 PENDING_NO_MODEL = "a model has not read this passage"
 PENDING_NOT_IN_FEED = "not in FEED"
 RULES_CONFIDENCE = 0.3
@@ -62,8 +64,9 @@ TERMS_MAX = 60
 # A word FEED does not hold ranks with FEED's "Rare" band (2): rarer than most, never above the truly rare.
 UNKNOWN_BAND = 2
 TERM_MIN_LETTERS = 4
-# An EML completion's output budget: this, or less when the model's window is smaller (llm.completion_budget).
-EML_MAX_TOKENS = 4_096
+# An EMF completion's output budget: this, or less when the model's window is smaller (llm.completion_budget).
+EMF_MAX_TOKENS = 4_096
+EML_MAX_TOKENS = EMF_MAX_TOKENS       # the name before EMF (plan §16), kept one release
 # A model item that says nothing of its confidence (or no provenance at all) is written with this.
 MODEL_CONFIDENCE = 0.7
 # The lexicon floor in model mode: a FEED-grounded term the model did not discuss says so.
@@ -383,9 +386,9 @@ def _lines(text: str) -> list[str]:
 
 @lru_cache(maxsize=1)
 def _manifest() -> macrocosm.Manifest:
-    m = macrocosm.default_registry().get("eml")
+    m = macrocosm.default_registry().get("emf")
     if m is None:
-        raise DeriveError("the eml manifest is missing from defaults/cosm/manifests")
+        raise DeriveError("the emf manifest is missing from defaults/cosm/manifests")
     return m
 
 
@@ -410,37 +413,42 @@ def read_source(path: Path) -> tuple[str, dict]:
 
 def twin_path(text_path: Path | str) -> Path:
     """`notes.md` → `notes.md.cosm` (the convert-twin convention, owner decision 4)."""
-    return _canon.eml_twin_path(Path(text_path))
+    return _canon.emf_twin_path(Path(text_path))
 
 
 def twin_state(text_path: Path | str) -> str:
-    """`fresh`, `stale` or `absent` — P2's rule (`canon.eml_state`), the one the listings use: a twin is fresh
+    """`fresh`, `stale` or `absent` — P2's rule (`canon.emf_state`), the one the listings use: a twin is fresh
     while the text's size and mtime match its `source:`, or else its sha256 does. Absent when there is no
-    `X.cosm` declaring `eml/1` beside the text."""
+    `X.cosm` declaring `emf/1` beside the text."""
     text = Path(text_path)
     twin = twin_path(text)
-    if not _canon.is_eml_twin(twin):
+    if not _canon.is_emf_twin(twin):
         return "absent"
-    return _canon.eml_state(text, twin)
+    return _canon.emf_state(text, twin)
 
 
-def compiled_path(eml_path: Path | str, now: dt.datetime | None = None) -> Path:
-    """Where compiling an EML writes: beside it, `<stem>-from-eml-YYYY-MM-DD-HHMM.md` in local time, `-2`, `-3` …
-    on a collision (convert's datestamped export rule). `notes.md.cosm` → `notes-from-eml-…`; a standalone
-    `rain.cosm` → `rain-from-eml-…`; the stem drops `.cosm` and then one extension."""
-    eml = Path(eml_path)
-    name = eml.name[: -len(".cosm")] if eml.name.endswith(".cosm") and len(eml.name) > 5 else eml.name
+def short_path(emf_path: Path | str, now: dt.datetime | None = None) -> Path:
+    """Where compiling an EMF writes its short (plan §15, owner decision 3): beside it,
+    `<stem>.short-YYYY-MM-DD-HHMM.md` in local time, `-2`, `-3` … on a collision, so every compile is a new file
+    and never an overwrite. `notes.md.cosm` → `notes.short-…md`; a standalone `rain.cosm` → `rain.short-…md`; the
+    stem drops `.cosm` and then one extension. Canon's catalogs recognise the name (`canon.SHORT_RE`)."""
+    emf = Path(emf_path)
+    name = emf.name[: -len(".cosm")] if emf.name.endswith(".cosm") and len(emf.name) > 5 else emf.name
     stem = Path(name).stem or name
     when = now or dt.datetime.now()
     if when.tzinfo is not None:
         when = when.astimezone()
     stamp = when.strftime("%Y-%m-%d-%H%M")
-    cand = eml.parent / f"{stem}-from-eml-{stamp}.md"
+    cand = emf.parent / f"{stem}.short-{stamp}.md"
     n = 2
-    while cand.exists():
-        cand = eml.parent / f"{stem}-from-eml-{stamp}-{n}.md"
+    while cand.exists() or cand.is_symlink():
+        cand = emf.parent / f"{stem}.short-{stamp}-{n}.md"
         n += 1
     return cand
+
+
+# The name before SHORT (0.4.3's first landing), kept one release: it is `short_path` now.
+compiled_path = short_path
 
 
 def write_atomic(path: Path, text: str) -> None:
@@ -461,15 +469,15 @@ write_twin = write_atomic
 
 
 def catalog_id(rel_path: str) -> str:
-    """`eml/<slug>`: the text's path in its volume or project, slugged by the Canon rule (P0 decision 16):
-    `guides/close.md` → `eml/guides--close-md`."""
-    return f"eml/{_canon.slug(rel_path)}"
+    """`emf/<slug>`: the text's path in its volume or project, slugged by the Canon rule (P0 decision 16):
+    `guides/close.md` → `emf/guides--close-md`."""
+    return f"emf/{_canon.slug(rel_path)}"
 
 
 def _catalog(*, rel_path: str, source_name: str, source_stat: dict | None, name: str, derived: dict,
              atem: dict | None, nodes: list) -> dict:
     cat: dict[str, Any] = {
-        "oes": EML_OES,
+        "oes": EMF_OES,
         "macrocosm": macrocosm.MACROCOSM_VERSION,
         "id": catalog_id(rel_path),
         "name": name,
@@ -1178,7 +1186,7 @@ def _map_refs(item: dict, fn: Callable[[str, Any], Any]) -> None:
             item[head] = fn(head, v)
 
 
-# Kind words a model reaches for, read as the eml manifest's kinds (owner's list, plus three obvious ones).
+# Kind words a model reaches for, read as the emf manifest's kinds (owner's list, plus three obvious ones).
 KIND_SYNONYMS = {
     "organization": "org", "organisation": "org", "company": "org", "institution": "org",
     "location": "place", "area": "place",
@@ -1467,10 +1475,10 @@ def _merge_into(first: dict, other: dict) -> None:
 
 
 def _lint_items(items: list[dict], workdir: Path, label: str, *, ignore: tuple[str, ...] = ()) -> dict[str, list]:
-    """Check items as a throwaway `eml/1` volume in `workdir`: `{item id: [problems]}` for the errors (the key ""
+    """Check items as a throwaway `emf/1` volume in `workdir`: `{item id: [problems]}` for the errors (the key ""
     for problems with no item). `ignore` names checks left for later (a passage's references to items another
     passage holds are resolved after the merge)."""
-    doc = {"oes": EML_OES, "macrocosm": macrocosm.MACROCOSM_VERSION, "id": "eml/derivation", "name": label,
+    doc = {"oes": EMF_OES, "macrocosm": macrocosm.MACROCOSM_VERSION, "id": "emf/derivation", "name": label,
            "nodes": items}
     path = workdir / f"{label}.cosm"
     path.write_text(_dump(doc), encoding="utf-8")
@@ -1551,19 +1559,19 @@ def _salvage(text: str, finish: str | None) -> tuple[list[dict], list[str], bool
 
 def _read_passage(c: Chunk, *, complete: CompleteFn, source: str, table: list[dict], workdir: Path,
                   stats: dict, on_progress: ProgressFn | None, chunks: int) -> tuple[list[dict], dict, int]:
-    """One passage, in at most three completions, each with an output budget (`EML_MAX_TOKENS`, bounded by the
+    """One passage, in at most three completions, each with an output budget (`EMF_MAX_TOKENS`, bounded by the
     model's window): the reading; ONE continuation when the reading was cut off (after the last complete item);
     ONE repair of only the items that still fail after normalization (or, when the reading held no list at all,
     one retry). Returns `(items that pass, remap, dropped)`: `dropped` counts the items that still fail, an item
     lost to a cut the continuation could not recover, and one per passage with no readable list."""
     prefix = f"c{c.id}"
-    system = {"role": "system", "content": P.EML_SYSTEM.format(source=source)}
-    user = P.EML_USER.format(terms=_passage_terms(table, c), source=source, start=c.start_line, end=c.end_line,
+    system = {"role": "system", "content": P.EMF_SYSTEM.format(source=source)}
+    user = P.EMF_USER.format(terms=_passage_terms(table, c), source=source, start=c.start_line, end=c.end_line,
                              passage=c.text_numbered)
 
     def ask(extra: str = "") -> tuple[str, dict]:
         reply, meta = _call(complete, [system, {"role": "user", "content": user + extra}],
-                            max_tokens=EML_MAX_TOKENS)
+                            max_tokens=EMF_MAX_TOKENS)
         stats["model"] = stats.get("model") or meta.get("model")
         return reply, meta
 
@@ -1575,8 +1583,8 @@ def _read_passage(c: Chunk, *, complete: CompleteFn, source: str, table: list[di
         _progress(on_progress, phase="continuing", chunk=c.id, chunks=chunks,
                   message=f"passage {c.id} of {chunks} was cut off; asking for the rest")
         ids = [str(x["id"]).strip() for x in raw if isinstance(x.get("id"), str) and x["id"].strip()]
-        extra = (P.EML_CONTINUE.format(ids="\n".join(f"- {i}" for i in ids), last=ids[-1]) if ids
-                 else P.EML_RESTART)
+        extra = (P.EMF_CONTINUE.format(ids="\n".join(f"- {i}" for i in ids), last=ids[-1]) if ids
+                 else P.EMF_RESTART)
         reply2, meta2 = ask(extra)
         raw2, broken2, cut2, listed2 = _salvage(reply2, meta2.get("finish_reason"))
         raw, broken, listed = raw + raw2, broken + broken2, listed or listed2
@@ -1585,7 +1593,7 @@ def _read_passage(c: Chunk, *, complete: CompleteFn, source: str, table: list[di
     if not listed:
         _progress(on_progress, phase="repairing", chunk=c.id, chunks=chunks,
                   message=f"passage {c.id} of {chunks} had no list; asking once more")
-        reply3, meta3 = ask(P.EML_RETRY)
+        reply3, meta3 = ask(P.EMF_RETRY)
         raw, broken, cut3, listed = _salvage(reply3, meta3.get("finish_reason"))
         lost += int(cut3)
         if not listed:
@@ -1608,7 +1616,7 @@ def _read_passage(c: Chunk, *, complete: CompleteFn, source: str, table: list[di
     problems = _problem_lines({k: v for k, v in bad.items() if k}, [f"- {r.get('id') or 'an item'}: {why}"
                                                                     for r, why in unplaced]
                               + ["- an item that is not valid YAML"] * bool(broken))
-    reply4, meta4 = ask(P.EML_REPAIR.format(items=shown.strip(), problems=problems))
+    reply4, meta4 = ask(P.EMF_REPAIR.format(items=shown.strip(), problems=problems))
     raw4, _broken4, _cut4, _listed4 = _salvage(reply4, meta4.get("finish_reason"))
     fixed, remap4, _unplaced4, fixes4 = _normalize(raw4, chunk_=c, source=source, prefix=f"{prefix}r")
     stats["normalized"] += fixes4
@@ -1708,14 +1716,14 @@ def _final_clean(items: list[dict], workdir: Path, remap: dict[str, str]) -> tup
     return items, dropped
 
 
-def derive_eml(text: str, *, source_name: str, source_stat: dict | None, complete: CompleteFn | None = None,
+def derive_emf(text: str, *, source_name: str, source_stat: dict | None, complete: CompleteFn | None = None,
                lookup: LookupFn | None = None, by: str = "person", now: dt.datetime | None = None,
                rel_path: str | None = None, on_progress: ProgressFn | None = None,
                should_stop: StopFn | None = None, previous: str | None = None) -> tuple[str, dict]:
-    """Decompile a text into its EML twin: `(cosm_text, info)` (plan §7.3 A).
+    """Decompile a text into its EMF twin: `(cosm_text, info)` (plan §7.3 A).
 
     - `source_name` — the text's file name (the twin's `source.path`, provenance locators); `source_stat` —
-      `{sha256, size, mtime_ns}` of the bytes read (`read_source`), or None for a standalone EML; `rel_path` —
+      `{sha256, size, mtime_ns}` of the bytes read (`read_source`), or None for a standalone EMF; `rel_path` —
       the text's path in its volume or project, for the catalog id (default: `source_name`).
     - `complete` — `complete(messages) -> (text, meta)`, or None for rules mode. `lookup` — FEED batch lookup,
       `dictionary.lookup_many` by default (all None when FEED is not built: terms are then `{pending}`).
@@ -1727,7 +1735,7 @@ def derive_eml(text: str, *, source_name: str, source_stat: dict | None, complet
     Model mode: per passage one completion with an output budget (claims first, capped per kind) → a reply cut
     off by the budget keeps its complete items and gets ONE continuation after the last of them → every item
     normalized deterministically (kinds, modules, synonyms, stance/salience words, spans, provenance, counted in
-    `info["normalized"]`) → checked as a throwaway volume against the eml manifest → ONE repair turn for only the
+    `info["normalized"]`) → checked as a throwaway volume against the emf manifest → ONE repair turn for only the
     items that still fail → those still failing are dropped (`derived.dropped`); passages merge (ids
     `<M>:<kind>/<slug of the name>`, the first of two wins, its span extended and the sources appended);
     references are resolved after the merge (dangling ones become `{pending}`); terms are grounded in FEED and
@@ -1757,7 +1765,7 @@ def derive_eml(text: str, *, source_name: str, source_stat: dict | None, complet
     _check(should_stop)
     carried = _carried_pins(previous, nodes)
     if carried:                               # a hand-edited pin that no longer checks is not carried
-        with tempfile.TemporaryDirectory(prefix="enough-eml-") as tmp:
+        with tempfile.TemporaryDirectory(prefix="enough-emf-") as tmp:
             bad = _lint_items(nodes + carried, Path(tmp), "carried-check")
         keep = [it for it in carried if it["id"] not in bad]
         dropped += len(carried) - len(keep)
@@ -1775,6 +1783,10 @@ def derive_eml(text: str, *, source_name: str, source_stat: dict | None, complet
     return _dump(cat), info
 
 
+# The name before EMF (plan §16), kept one release: it is `derive_emf` now.
+derive_eml = derive_emf
+
+
 def _carried_pins(previous: str | None, nodes: list[dict]) -> list[dict]:
     """The pinned passage atems of the twin a derivation replaces, ready to append: ids kept, `of` references
     re-checked against the new items (one that names nothing now is an open question). An unreadable previous
@@ -1782,7 +1794,7 @@ def _carried_pins(previous: str | None, nodes: list[dict]) -> list[dict]:
     if not previous:
         return []
     data = _yaml(previous)
-    old = data.get("nodes") if isinstance(data, dict) and data.get("oes") == EML_OES else None
+    old = data.get("nodes") if isinstance(data, dict) and data.get("oes") == EMF_OES else None
     ids = {it["id"] for it in nodes}
     out = []
     for it in old if isinstance(old, list) else []:
@@ -1881,7 +1893,7 @@ def _model_nodes(text: str, parts: list[Chunk], *, complete: CompleteFn, lookup:
     merged: dict[str, dict] = {}
     remap: dict[str, str] = {}
     dropped = 0
-    with tempfile.TemporaryDirectory(prefix="enough-eml-") as tmp:
+    with tempfile.TemporaryDirectory(prefix="enough-emf-") as tmp:
         work = Path(tmp)
         for c in parts:
             _check(should_stop)
@@ -1927,13 +1939,13 @@ def _model_nodes(text: str, parts: list[Chunk], *, complete: CompleteFn, lookup:
 
 def _load_twin(twin_text: str) -> dict:
     data = _yaml(twin_text)
-    if not isinstance(data, dict) or data.get("oes") != EML_OES:
-        raise DeriveError("the EML twin could not be read; fix it or derive it again")
+    if not isinstance(data, dict) or data.get("oes") != EMF_OES:
+        raise DeriveError("the EMF twin could not be read; fix it or derive it again")
     nodes = data.get("nodes")
     if nodes is None:
         data["nodes"] = []
     elif not isinstance(nodes, list):
-        raise DeriveError("the EML twin's nodes: is not a list; fix it or derive it again")
+        raise DeriveError("the EMF twin's nodes: is not a list; fix it or derive it again")
     return _plain(data)
 
 
@@ -2030,7 +2042,7 @@ def set_file_atem(twin_text_or_none: str | None, atem: dict, *, source_name: str
 
 
 # ---------------------------------------------------------------------------
-# Compile: an EML twin → markdown
+# Compile: an EMF twin → markdown
 # ---------------------------------------------------------------------------
 
 STANCE_PHRASE = {
@@ -2054,8 +2066,8 @@ def _as_doc(volume_or_text: Any) -> tuple[dict, list[dict]]:
         data = volume_or_text
     else:
         data = _yaml(str(volume_or_text))
-    if not isinstance(data, dict) or data.get("oes") != EML_OES:
-        raise DeriveError("not an EML (oes: eml/1)")
+    if not isinstance(data, dict) or data.get("oes") != EMF_OES:
+        raise DeriveError("not an EMF (oes: emf/1)")
     nodes = data.get("nodes") if isinstance(data.get("nodes"), list) else []
     return data, [n for n in nodes if isinstance(n, dict)]
 
@@ -2080,19 +2092,72 @@ def _lead_lower(s: str, names: set[str]) -> str:
     return s[0].lower() + s[1:]
 
 
-def outline(volume_or_text: Any) -> tuple[str, list[str]]:
-    """`(title, markdown lines)`: the rules-mode compile, and the outline a model rewrites (plan §7.3 B): the atem
-    line as the lead; the claims in salience order grouped by the concept they mostly reference, each claim's
-    stance said in words; the events in before/after order; a closing terms list."""
+ORDERS = ("told", "weight")
+# The order in words, as a short's footer and the compile prompt say it.
+ORDER_SAID = {"told": "told as the author told it", "weight": "told by weight"}
+ALSO_HEADING = "Also in the fabula"
+ENTITY_KINDS = ("person", "org", "place", "work", "thing")
+# Within one line of the text: the words, the names, the ideas, then what is claimed and what happens.
+_TOLD_RANK = {"term": 0, **{k: 1 for k in ENTITY_KINDS}, "concept": 2, "claim": 3, "event": 4}
+# Items no span places, at the end: claims and events first.
+_ALSO_RANK = {"claim": 0, "event": 1, "concept": 2, **{k: 3 for k in ENTITY_KINDS}, "term": 4}
+
+
+def _source_of(cat: dict) -> str | None:
+    """The text a twin is of: its `source.path` (a file name beside the twin), or None for a standalone EMF."""
+    src = cat.get("source")
+    p = src.get("path") if isinstance(src, dict) else None
+    return p.strip() if isinstance(p, str) and p.strip() else None
+
+
+def source_path(emf_path: Path | str, volume_or_text: Any = None) -> Path | None:
+    """The text an EMF twin names in its `source:`, beside the twin, when it is there as a file; None for a
+    standalone EMF or a text that has gone. `volume_or_text` defaults to the EMF file itself."""
+    emf = Path(emf_path)
+    try:
+        cat, _items = _as_doc(volume_or_text if volume_or_text is not None
+                              else emf.read_text(encoding="utf-8-sig", errors="replace"))
+    except (OSError, DeriveError):
+        return None
+    name = _source_of(cat)
+    if not name:
+        return None
+    text = emf.parent / Path(name.replace("\\", "/")).name
+    return text if text.is_file() else None
+
+
+def default_order(volume_or_text: Any, *, source_readable: bool = True) -> str:
+    """The order a compile tells in when nobody chose (owner decision 4): `told`, the author's own order, when
+    the EMF has a `source` and its text can be read; `weight` for a standalone EMF (no telling to follow)."""
+    cat, _items = _as_doc(volume_or_text)
+    return "told" if _source_of(cat) and source_readable else "weight"
+
+
+def _check_order(order: Any) -> str | None:
+    if order is None or order == "":
+        return None
+    if order not in ORDERS:
+        raise DeriveError(f"order must be one of {', '.join(ORDERS)}")
+    return str(order)
+
+
+def outline(volume_or_text: Any, *, order: str = "weight", source_text: str | None = None) -> tuple[str, list[str]]:
+    """`(title, markdown lines)`: the rules-mode short, and the outline a model rewrites (plan §7.3 B, §15). The
+    atem line leads in both orders. `weight`: the claims in salience order grouped by the concept they mostly
+    reference, each claim's stance said in words; the events in before/after order; a closing terms list.
+    `told`: every item with a span, in the author's order (`_told_lines`)."""
     cat, items = _as_doc(volume_or_text)
+    order = _check_order(order) or "weight"
     by_id = {str(it.get("id")): it for it in items}
-    names = {str(it.get("name")) for it in items if it.get("type") in ("person", "org", "place", "work", "thing")
+    names = {str(it.get("name")) for it in items if it.get("type") in ENTITY_KINDS
              and isinstance(it.get("name"), str)}
     title = str(cat.get("name") or "untitled")
     out = [f"# {title}", ""]
     atem = cat.get("atem") if isinstance(cat.get("atem"), dict) else {}
     if isinstance(atem.get("line"), str) and atem["line"].strip():
         out += [_sentence(atem["line"]), ""]
+    if order == "told":
+        return title, out + _told_lines(items, by_id, names, title=title, source_text=source_text)
     order = {it_id: i for i, it_id in enumerate(by_id)}
     sal = {s: i for i, s in enumerate(SALIENCE)}
     claims = [it for it in items if it.get("type") == "claim" and isinstance(it.get("summary"), str)]
@@ -2132,10 +2197,7 @@ def outline(volume_or_text: Any) -> tuple[str, list[str]]:
     if events:
         out += ["## What happens", ""]
         for i, ev in enumerate(_event_order(events), 1):
-            when = ev.get("when")
-            said = " ".join(str(ev["summary"]).split()).rstrip(".")
-            tail = f" ({' '.join(str(when).split())})" if isinstance(when, str) and when.strip() else ""
-            out.append(f"{i}. {said}{tail}.")
+            out.append(f"{i}. {_event_said(ev)}")
         out.append("")
     terms = [it for it in items if it.get("type") == "term"]
     if terms:
@@ -2165,6 +2227,15 @@ def _claim_sentence(c: dict, by_id: dict, names: set[str]) -> str:
     return f"{STANCE_PHRASE[stance]} {_lead_lower(s, names)}"
 
 
+def _event_said(ev: dict) -> str:
+    """An event's summary as a sentence, with its `when` in brackets unless the summary already says it."""
+    said = " ".join(str(ev.get("summary") or "").split()).rstrip(".")
+    when = ev.get("when")
+    when = " ".join(when.split()) if isinstance(when, str) else ""
+    tail = f" ({when})" if when and when.lower() not in said.lower() else ""
+    return f"{said}{tail}."
+
+
 def _event_order(events: list[dict]) -> list[dict]:
     """Events in before/after order (a stable topological sort), else by where the text tells them."""
     ids = [str(e.get("id")) for e in events]
@@ -2189,30 +2260,336 @@ def _event_order(events: list[dict]) -> list[dict]:
     return [by[i] for i in done]
 
 
-def compile_text(volume_or_text: Any, *, complete: CompleteFn | None = None, source_name: str | None = None) -> str:
-    """An EML twin back into gfm markdown (plan §7.3 B). Rules mode: the outline verbatim (the atem line, the
-    claims with their stance said in words, the events, the terms) with a closing note that no model wrote it.
-    Model mode: one completion that writes the outline as prose. Never writes a file (the job does)."""
-    title, lines = outline(volume_or_text)
+# ---------------------------------------------------------------------------
+# SHORT: a telling compiled from the fabula (plan §15)
+# ---------------------------------------------------------------------------
+#
+# An EMF twin is the fabula: the order-free material of a text, every item with a `span` saying where in the
+# telling it was found. A SHORT (syuzhetic-hermeneutic open readable text) is a telling enough compiles from it:
+# an arrangement that says how each thing is known as it tells it, in plain markdown, yours to edit, honest about
+# its gaps and open to the reader's own reading. Two orders: `told` (the author's, by span) and `weight` (salience,
+# grouped by concept, then events, then terms). The atem leads both and belongs to neither.
+
+@dataclass(frozen=True)
+class _Heading:
+    line: int | None     # where the text has it (None: a heading an item's span names)
+    level: int           # the short's own level, 2 and down
+    title: str
+
+
+def _norm(text: str) -> str:
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def _source_headings(source_text: str | None, title: str) -> list[_Heading]:
+    """The text's headings, outside fenced code, as the short's section headings: the first one is the short's
+    own `# title` when it is a level-1 heading or says the twin's name (a twin is named from it), so it is left
+    out; the rest keep their relative depth, the shallowest becoming `##`."""
+    if not source_text:
+        return []
+    norm = _norm(source_text)
+    lines = norm.split("\n")
+    heading_lines, _code = _line_kinds(norm)
+    found: list[tuple[int, int, str]] = []
+    for n in sorted(heading_lines):
+        raw = lines[n - 1].strip()
+        level = len(raw) - len(raw.lstrip("#"))
+        said = _strip_inline(raw.lstrip("#").strip().rstrip("#").strip())
+        if said:
+            found.append((n, level, said))
+    if found and (found[0][1] == 1 or found[0][2] == title):
+        found = found[1:]
+    if not found:
+        return []
+    top = min(level for _n, level, _s in found)
+    return [_Heading(n, min(6, level - top + 2), said) for n, level, said in found]
+
+
+def _folded_lines(source_text: str) -> tuple[str, list[int]]:
+    """The text with its whitespace folded to single spaces, and where each line starts in it."""
+    starts: list[int] = []
+    parts: list[str] = []
+    pos = 0
+    for line in _norm(source_text).split("\n"):
+        words = " ".join(line.split())
+        starts.append(pos)
+        if words:
+            parts.append(words)
+            pos += len(words) + 1
+    return " ".join(parts), starts
+
+
+def _span_place(span: Any, folded: tuple[str, list[int]] | None) -> tuple[int, int] | None:
+    """Where an item sits in the telling, as `(first line, last line)`: its span's `lines`, else (with the text at
+    hand) the lines its `start` and `end` quotes are found on. None: the span does not place it."""
+    if not isinstance(span, dict):
+        return None
+    ab = parse_lines(span.get("lines"))
+    if ab:
+        return ab
+    start = span.get("start")
+    if folded is None or not isinstance(start, str) or not start.strip():
+        return None
+    text, starts = folded
+    at = text.find(" ".join(start.split()))
+    if at < 0:
+        return None
+    a = bisect.bisect_right(starts, at)
+    b = a
+    end = span.get("end")
+    if isinstance(end, str) and end.strip():
+        to = text.find(" ".join(end.split()), at)
+        if to >= 0:
+            b = bisect.bisect_right(starts, to)
+    return a, max(a, b)
+
+
+def _told_item(it: dict, by_id: dict, names: set[str]) -> str | None:
+    """One item of the fabula, said as a line of the telling; None when it has nothing to say."""
+    kind = it.get("type")
+    summary = it.get("summary") if isinstance(it.get("summary"), str) and it["summary"].strip() else None
+    name = str(it.get("name") or "").strip()
+    if kind == "claim":
+        return _claim_sentence(it, by_id, names) if summary else None
+    if kind == "event":
+        return _event_said(it) if summary else None
+    if kind == "term":
+        sense = it.get("sense") if isinstance(it.get("sense"), str) and it["sense"].strip() else summary
+        note = " (not in FEED)" if macrocosm.is_pending(it.get("feed")) else ""
+        return f"**{name}**{note}: {_sentence(sense)}".rstrip() if sense else (f"**{name}**{note}" if name else None)
+    if kind == "concept":
+        return f"**{name}**: {_sentence(summary)}" if summary else (f"**{name}**" if name else None)
+    if kind in ENTITY_KINDS:
+        return _sentence(summary) if summary else (name or None)
+    return None
+
+
+def _told_lines(items: list[dict], by_id: dict, names: set[str], *, title: str,
+                source_text: str | None) -> list[str]:
+    """The `told` order: every item a span places, in the order the author told them (first line, last line,
+    then words, names, ideas, claims, events, then the twin's own order), grouped under the text's headings — the
+    one an item's span names (`span.heading`, when a twin records it), else the heading it falls under in the text,
+    when the text is at hand, else none; then the items no span places, under "Also in the fabula". The atem is
+    not among them: it is the breath of the whole, outside the telling. Pinned passage atems (X) likewise."""
+    folded = _folded_lines(source_text) if source_text else None
+    heads = _source_headings(source_text, title)
+    chains: list[list[_Heading]] = []
+    for i, h in enumerate(heads):
+        chain = [h]
+        level = h.level
+        for j in range(i - 1, -1, -1):
+            if heads[j].level < level:
+                chain.append(heads[j])
+                level = heads[j].level
+        chains.append(list(reversed(chain)))
+    starts = [h.line or 0 for h in heads]
+    placed: list[tuple[tuple, dict]] = []
+    also: list[tuple[tuple, dict]] = []
+    for pos, it in enumerate(items):
+        kind = it.get("type")
+        if kind not in _TOLD_RANK:
+            continue
+        where = _span_place(it.get("span"), folded)
+        if where is None:
+            also.append(((_ALSO_RANK[kind], pos), it))
+        else:
+            placed.append(((where[0], where[1], _TOLD_RANK[kind], pos), it))
+    out: list[str] = []
+    current: list[_Heading] = []
+    open_list = False
+    for key, it in sorted(placed, key=lambda p: p[0]):
+        said = _told_item(it, by_id, names)
+        if said is None:
+            continue
+        span = it.get("span") if isinstance(it.get("span"), dict) else {}
+        named = span.get("heading")
+        if isinstance(named, str) and named.strip():
+            chain = [_Heading(None, 2, " ".join(named.split()))]
+        else:
+            i = bisect.bisect_right(starts, key[0]) - 1
+            chain = chains[i] if i >= 0 else []
+        k = 0
+        while k < min(len(chain), len(current)) and chain[k] == current[k]:
+            k += 1
+        if chain[k:] or len(chain) < len(current):
+            for h in chain[k:]:
+                if open_list:
+                    out.append("")
+                    open_list = False
+                out += [f"{'#' * h.level} {h.title}", ""]
+            current = chain
+        out.append(f"- {said}")
+        open_list = True
+    tail = [s for _k, it in sorted(also, key=lambda p: p[0]) if (s := _told_item(it, by_id, names))]
+    if open_list:
+        out.append("")
+    if tail:
+        out += [f"## {ALSO_HEADING}", ""] + [f"- {s}" for s in tail] + [""]
+    return out
+
+
+def short_footer(*, text_name: str, standalone: bool, order: str, day: str, model: str | None,
+                 mode: str) -> str:
+    """The one italic line every short ends with (owner decision 6): what it is a short of, in which order, when,
+    and by which model or by rules."""
+    who = f"by {model or 'a model'}" if mode == "model" else "by rules, without a model"
+    said = ORDER_SAID[order]
+    if standalone:
+        return f"*a short of {text_name}, a standalone EMF, {said}, compiled on {day} {who}*"
+    return f"*a short of {text_name}, {said}, compiled from its EMF twin on {day} {who}*"
+
+
+def _local_day(now: dt.datetime | None) -> str:
+    when = now or dt.datetime.now()
+    if when.tzinfo is not None:
+        when = when.astimezone()
+    return when.strftime("%Y-%m-%d")
+
+
+def compile_short(volume_or_text: Any, *, complete: CompleteFn | None = None, source_name: str | None = None,
+                  order: str | None = None, source_text: str | None = None,
+                  now: dt.datetime | None = None) -> tuple[str, dict]:
+    """An EMF back into a SHORT: gfm markdown in the chosen order (`told` | `weight`; None → `default_order`, the
+    text counted readable when `source_text` is given or the twin names no source), ending with the footer line.
+    Rules mode: the outline verbatim, each claim's stance said in words. Model mode: one completion that writes
+    the outline as prose, told the order. `source_text` (the twin's text) lets `told` group under its headings and
+    place spans given as quotes. `source_name` is the EMF's file name (a standalone's footer names it). Returns
+    `(markdown, {order, mode, model, by})`, `by` being the model's id or `rules`. Never writes a file."""
+    cat, items = _as_doc(volume_or_text)
+    doc = {**cat, "nodes": items}
+    chosen = _check_order(order) or default_order(doc, source_readable=source_text is not None)
+    title, lines = outline(doc, order=chosen, source_text=source_text)
+    text_name = _source_of(cat)
+    standalone = text_name is None
+    if standalone:
+        text_name = Path(source_name).name if source_name else str(cat.get("name") or "an EMF")
+    else:
+        text_name = Path(text_name.replace("\\", "/")).name
+    day = _local_day(now)
     if complete is None:
-        made = f"compiled from {source_name}" if source_name else "compiled from its EML twin"
-        lines += ["---", "", f"*{made} by rules, without a model: the twin's own sentences, in order.*", ""]
-        return "\n".join(lines).rstrip() + "\n"
-    reply, _meta = _call(complete, [{"role": "system", "content": P.COMPILE_SYSTEM},
-                                    {"role": "user", "content": P.COMPILE_USER.format(name=title,
-                                                                                      outline="\n".join(lines))}])
+        foot = short_footer(text_name=text_name, standalone=standalone, order=chosen, day=day, model=None,
+                            mode="rules")
+        body = "\n".join(lines).rstrip()
+        return (body + "\n\n---\n\n" + foot + "\n",
+                {"order": chosen, "mode": "rules", "model": None, "by": "rules"})
+    system = P.COMPILE_SYSTEM.format(order=P.COMPILE_ORDER[chosen])
+    user = P.COMPILE_USER.format(name=title, said=ORDER_SAID[chosen], outline="\n".join(lines))
+    reply, meta = _call(complete, [{"role": "system", "content": system}, {"role": "user", "content": user}])
     body = reply.strip()
     m = re.match(r"^```(?:markdown|md|gfm)?\s*\n(.*?)\n```\s*$", body, re.S)
     if m:
         body = m.group(1).strip()
     if not body:
         raise DeriveError("the model returned nothing to write")
-    return body + "\n"
+    model = meta.get("model") if isinstance(meta, dict) and meta.get("model") else None
+    foot = short_footer(text_name=text_name, standalone=standalone, order=chosen, day=day, model=model,
+                        mode="model")
+    return (body + "\n\n---\n\n" + foot + "\n",
+            {"order": chosen, "mode": "model", "model": model, "by": model or "a model"})
+
+
+def compile_text(volume_or_text: Any, *, complete: CompleteFn | None = None, source_name: str | None = None,
+                 order: str | None = None, source_text: str | None = None,
+                 now: dt.datetime | None = None) -> str:
+    """An EMF twin back into a SHORT, the markdown only (`compile_short` without its info)."""
+    return compile_short(volume_or_text, complete=complete, source_name=source_name, order=order,
+                         source_text=source_text, now=now)[0]
+
+
+# ---------------------------------------------------------------------------
+# The fabula records its tellings: the twin's `shorts:` list
+# ---------------------------------------------------------------------------
+
+_PLAIN_SCALAR = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_.@/+-]*$")
+_TOP_KEY = re.compile(r"^([A-Za-z_][A-Za-z0-9_-]*)[ \t]*:(.*)$")
+SHORT_FIELDS = ("path", "at", "by", "mode", "order")
+
+
+def _flow_scalar(v: Any) -> str:
+    """A value as a flow mapping writes it: a timestamp in UTC, a safe word plain, anything else double-quoted."""
+    if isinstance(v, dt.datetime):
+        return _now(v).strftime("%Y-%m-%dT%H:%M:%SZ")
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        return str(v)
+    s = str(v)
+    if _PLAIN_SCALAR.match(s):
+        try:
+            if macrocosm.yaml_load(f"k: {s}\n") == {"k": s}:
+                return s
+        except Exception:  # noqa: BLE001 — quote it instead
+            pass
+    return json.dumps(s, ensure_ascii=False)
+
+
+def _flow_entry(entry: dict) -> str:
+    return "{" + ", ".join(f"{k}: {_flow_scalar(v)}" for k, v in entry.items()) + "}"
+
+
+def record_short(twin_text: str, *, path: str, at: dt.datetime | None = None, by: str, mode: str,
+                 order: str) -> str:
+    """Append one telling to the EMF's `shorts:` list — `{path, at, by, mode, order}`: the short's file name
+    beside the twin, when (UTC), the model's id or `rules`, `model` | `rules`, `told` | `weight` — and return the
+    EMF's new text. The list is made just above `nodes:` when there is none. Everything else stays byte for byte:
+    the change is made in the text, never by loading and dumping the twin (its comments, quoting and order are
+    the author's). Raises DeriveError when the result would not read back as the same EMF with one more short."""
+    if mode not in ("model", "rules"):
+        raise DeriveError("mode must be model or rules")
+    _check_order(order)
+    if not isinstance(path, str) or not path.strip():
+        raise DeriveError("a short needs its path")
+    before = _yaml(twin_text)
+    if not isinstance(before, dict) or before.get("oes") != EMF_OES:
+        raise DeriveError("not an EMF (oes: emf/1)")
+    old = before.get("shorts")
+    if old is not None and not isinstance(old, list):
+        raise DeriveError("the EMF's shorts: is not a list; fix it by hand")
+    entry = {"path": path.strip(), "at": _now(at), "by": str(by or mode), "mode": mode, "order": order}
+    nl = "\r\n" if "\r\n" in twin_text else "\n"
+    lines = twin_text.splitlines(keepends=True)
+    if lines and not lines[-1].endswith(("\n", "\r")):
+        lines[-1] += nl
+    tops = [(i, m) for i, line in enumerate(lines) if (m := _TOP_KEY.match(line.lstrip("﻿")))]
+    at_shorts = next(((i, m) for i, m in tops if m.group(1) == "shorts"), None)
+    if at_shorts is not None:
+        i, m = at_shorts
+        j = i + 1
+        while j < len(lines) and (lines[j][:1] in (" ", "\t", "-") or not lines[j].strip()):
+            j += 1
+        k = j
+        while k > i + 1 and not lines[k - 1].strip():
+            k -= 1
+        value = m.group(2).split(" #", 1)[0].strip()
+        items = [ln for ln in lines[i + 1:k] if ln.strip() and not ln.lstrip().startswith("#")]
+        dashes = [ln for ln in items if ln.lstrip().startswith("- ")]
+        if not value and items and len(dashes) == len(items):
+            lead = dashes[0][: len(dashes[0]) - len(dashes[0].lstrip())]
+            lines[k:k] = [f"{lead}- {_flow_entry(entry)}{nl}"]
+        else:                                  # `shorts: []`, a flow list, nested blocks: written out again
+            entries = [e for e in (old or []) if isinstance(e, dict)] + [entry]
+            lines[i:k] = [f"shorts:{nl}"] + [f"  - {_flow_entry(e)}{nl}" for e in entries]
+    else:
+        at_nodes = next((i for i, m in tops if m.group(1) == "nodes"), None)
+        if at_nodes is None:
+            at_nodes = len(lines)
+        else:
+            while at_nodes > 0 and lines[at_nodes - 1].lstrip().startswith("#"):
+                at_nodes -= 1                  # a comment just above nodes: belongs to the nodes
+        lines[at_nodes:at_nodes] = [f"shorts:{nl}", f"  - {_flow_entry(entry)}{nl}"]
+    out = "".join(lines)
+    after = _yaml(out)
+    got = after.get("shorts") if isinstance(after, dict) else None
+    if (not isinstance(got, list) or len(got) != len(old or []) + 1 or not isinstance(got[-1], dict)
+            or got[-1].get("path") != entry["path"]
+            or {k: v for k, v in after.items() if k != "shorts"} != {k: v for k, v in before.items() if k != "shorts"}):
+        raise DeriveError("the short could not be recorded in the EMF without changing it; it was left as it was")
+    return out
 
 
 __all__ = [
-    "Chunk", "DeriveCancelled", "DeriveError", "atem_block", "candidate_terms", "catalog_id", "chunk",
-    "clean_span", "compile_text", "compiled_path", "derive_atem", "derive_eml", "entity_candidates", "item_slug",
-    "next_atem_id", "outline", "parse_lines", "passage_span", "pin_atem", "read_source", "rules_atem", "sentences",
-    "set_file_atem", "text_title", "twin_path", "twin_state", "write_atomic", "write_twin",
+    "ALSO_HEADING", "Chunk", "DeriveCancelled", "DeriveError", "ORDERS", "ORDER_SAID", "SHORT_FIELDS", "atem_block",
+    "candidate_terms", "catalog_id", "chunk", "clean_span", "compile_short", "compile_text", "compiled_path",
+    "default_order", "derive_atem", "derive_emf", "entity_candidates", "item_slug", "next_atem_id", "outline",
+    "parse_lines", "passage_span", "pin_atem", "read_source", "record_short", "rules_atem", "sentences",
+    "set_file_atem", "short_footer", "short_path", "source_path", "text_title", "twin_path", "twin_state",
+    "write_atomic", "write_twin",
 ]

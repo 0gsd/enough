@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/bad-id-grammar
+oes: emf/1
+id: emf/bad-id-grammar
 name: bad id-grammar
 # id-grammar: an id that is not <module>:<kind>/<slug>
 nodes:

@@ -416,7 +416,7 @@ stop silently.
 #   install (0.4.1). Short, because then every project pays for it: the
 #   column guide is the `lexicographer` skill, in the Skills section when it
 #   is on and one `dict_guide` call away when it is off.
-# - the MacroCOSM tools (`cosm_read`, `cosm_lint`, `eml_derive`, `atem`,
+# - the MacroCOSM tools (`cosm_read`, `cosm_lint`, `emf_derive`, `atem`,
 #   `cosm_guide`, 0.4.3), behind the MacroCOSM manifests shipping with this
 #   install — so in every project, as the owner decided (docs/canon-043-plan.md
 #   §13, decision 12: on by default, under 1,000 chars of prompt). The guide is
@@ -580,7 +580,7 @@ Skills, call `dict_guide` (no tags) for the column guide before writing.
 CANON_TOOL_INSTRUCTIONS = """\
 ## MacroCOSM
 
-`.cosm` files are MacroCOSM volumes: Holotypes, Canon catalogs, EML twins.
+`.cosm` files are MacroCOSM volumes: Holotypes, Canon catalogs, EMF twins.
 Paths are project-relative or `canon:<volume>/...`.
 
 <tool name="cosm_read">
@@ -592,7 +592,7 @@ Paths are project-relative or `canon:<volume>/...`.
 <path>notes.md.cosm</path>
 </tool>
 
-<tool name="eml_derive">
+<tool name="emf_derive">
 <path>notes.md</path>
 </tool>
 
@@ -602,8 +602,8 @@ Paths are project-relative or `canon:<volume>/...`.
 
 <tool name="cosm_guide"></tool>
 
-`cosm_read` shows the tree; `<item>` (an id or a path) one item. `eml_derive`
-decompiles a text into its EML twin (`notes.md.cosm`), only when the user
+`cosm_read` shows the tree; `<item>` (an id or a path) one item. `emf_derive`
+decompiles a text into its EMF twin (`notes.md.cosm`), only when the user
 asks. `atem` gives the line, focus, push and pull and writes them into the
 twin; `<text>` instead of `<path>` for a passage, written nowhere. Unless the
 macrocosm-oes skill is in your Skills, read `cosm_guide` before you derive.
@@ -680,7 +680,7 @@ def _macrocosm_available() -> bool:
     (owner decision 12). One file check, cheap enough for every turn."""
     try:
         from . import macrocosm
-        return (macrocosm.DEFAULT_MANIFEST_DIR / "eml.manifest.cosm").is_file()
+        return (macrocosm.DEFAULT_MANIFEST_DIR / "emf.manifest.cosm").is_file()
     except Exception:  # noqa: BLE001 — no reader is not a broken prompt
         return False
 

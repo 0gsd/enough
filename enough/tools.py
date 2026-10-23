@@ -1565,8 +1565,8 @@ def run_canon_list(project_dir: Path, call: ToolCall) -> ToolResult:
                         render(n.get("children") or [], indent + "  ")
                     else:
                         extra = ""
-                        if isinstance(n.get("eml"), dict):
-                            extra = f" [eml twin: {n['eml'].get('state', '')}]"
+                        if isinstance(n.get("emf"), dict):
+                            extra = f" [emf twin: {n['emf'].get('state', '')}]"
                         lines.append(f"{indent}{n['name']}{extra}")
 
             render(data.get("tree") or [])
@@ -1765,7 +1765,7 @@ _pal_tools.register()
 from . import dictionary_tools as _dictionary_tools  # noqa: E402
 _dictionary_tools.register()
 
-# MacroCOSM's five (0.4.3): `cosm_read`, `cosm_lint`, `eml_derive`, `atem`,
+# MacroCOSM's five (0.4.3): `cosm_read`, `cosm_lint`, `emf_derive`, `atem`,
 # `cosm_guide`. Reads and project writes are ungated; a write into the Canon
 # store answers to `canon_enabled` inside the runners. Documented in every
 # project (like FEED's); the guide is the `macrocosm-oes` skill, off by

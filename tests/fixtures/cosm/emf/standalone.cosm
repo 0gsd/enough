@@ -1,7 +1,7 @@
-oes: eml/1
-id: eml/a-note-on-rain
+oes: emf/1
+id: emf/a-note-on-rain
 name: A note on rain
-# No source: a standalone EML, as the rules fallback writes it when no model is running.
+# No source: a standalone EMF, as the rules fallback writes it when no model is running.
 derived: {at: 2026-10-22T11:05:00Z, by: rules, mode: rules, completeness: full, chunks: 1}
 atem:
   line: "Rain that falls after a dry spell runs off before the soil can take it in."

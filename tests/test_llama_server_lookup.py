@@ -193,6 +193,8 @@ def test_supervisor_launch_uses_the_override(
     )
     monkeypatch.setattr(models, "spec_flags", lambda info, binary=None: [])
     monkeypatch.setattr(models, "draft_flags", lambda info, binary=None: [])
+    # No memory caps (and so no RAM or --help probe through the fake Popen).
+    monkeypatch.setattr(models, "total_ram_gb", lambda: 64)
 
     seen: dict = {}
 

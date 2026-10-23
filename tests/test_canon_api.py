@@ -42,9 +42,9 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     proj = tmp_path / "project"
     proj.mkdir()
     (proj / "hello.md").write_text("hi from the project", encoding="utf-8")
-    shutil.copyfile(FIX / "eml" / "notes.md", proj / "notes.md")
-    shutil.copyfile(FIX / "eml" / "notes.md.cosm", proj / "notes.md.cosm")
-    shutil.copyfile(FIX / "eml" / "standalone.cosm", proj / "rain.cosm")
+    shutil.copyfile(FIX / "emf" / "notes.md", proj / "notes.md")
+    shutil.copyfile(FIX / "emf" / "notes.md.cosm", proj / "notes.md.cosm")
+    shutil.copyfile(FIX / "emf" / "standalone.cosm", proj / "rain.cosm")
     shutil.copytree(FIX / "holotypes" / "meadow", proj / "meadow")
     skeleton.ensure_skeleton(proj)
     assert str(Path.home()).startswith(str(tmp_path))
@@ -91,18 +91,18 @@ def test_every_old_route_answers_under_both_prefixes(client: TestClient):
 
 def test_tree_payload_keeps_its_wire_keys_and_flags(client: TestClient, project: Path):
     box = _store_volume(client, "v")
-    shutil.copyfile(FIX / "eml" / "notes.md", box / "notes.md")
-    shutil.copyfile(FIX / "eml" / "notes.md.cosm", box / "notes.md.cosm")
+    shutil.copyfile(FIX / "emf" / "notes.md", box / "notes.md")
+    shutil.copyfile(FIX / "emf" / "notes.md.cosm", box / "notes.md.cosm")
     payload = client.get("/api/canon/tree").json()
     assert set(payload) == {"root", "project", "cacheboxes"}
     vol = next(v for v in payload["cacheboxes"] if v["name"] == "v")
     assert vol["catalog"] == canon.CATALOG_NAME and vol["holotype"] is False
     names = {n["name"]: n for n in vol["tree"]}
     assert "notes.md.cosm" not in names
-    assert names["notes.md"]["eml"]["state"] == "fresh"
+    assert names["notes.md"]["emf"]["state"] == "fresh"
     assert names[canon.CATALOG_NAME]["catalog"] is True
     proj = {n["name"]: n for n in payload["project"]}
-    assert "notes.md.cosm" not in proj and proj["notes.md"]["eml"]["path"] == "notes.md.cosm"
+    assert "notes.md.cosm" not in proj and proj["notes.md"]["emf"]["path"] == "notes.md.cosm"
     assert proj["meadow"]["holotype"] is True and proj["meadow"]["children"]   # contents still shown
 
 
@@ -167,7 +167,7 @@ def test_project_catalog_route_reconciles_first(client: TestClient, project: Pat
     assert p["problems"] == []
     paths = {it["path"]: it for it in p["parsed"]["items"]}
     assert "later.md" in paths and "notes.md.cosm" not in paths
-    assert paths["notes.md"]["eml"] == {"path": "notes.md.cosm"}
+    assert paths["notes.md"]["emf"] == {"path": "notes.md.cosm"}
     assert paths["meadow"]["holotype"] is True
     assert not any(k.startswith("rness") for k in paths)
 
@@ -250,7 +250,7 @@ def test_post_file_refuses_every_kept_file(client: TestClient, project: Path):
 def test_files_html_flags(client: TestClient):
     html = client.get("/api/files").text
     assert 'data-path="notes.md.cosm"' not in html
-    assert 'data-eml="notes.md.cosm" data-eml-state="fresh"' in html
+    assert 'data-emf="notes.md.cosm" data-emf-state="fresh"' in html
     assert 'data-path="rain.cosm"' in html and 'data-cosm="1"' in html
     assert 'data-holotype="1"' in html
     assert 'data-path="rness/canon.cosm"' in html and 'data-catalog="1"' in html

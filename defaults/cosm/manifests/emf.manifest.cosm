@@ -1,12 +1,13 @@
-# EML 1: the MiniCOSM for one text, decompiled (EML: enumerated meaning language).
+# EMF 1: the MiniCOSM for one text, decompiled (EMF: enumerated meaning fabula, "the fabula" for short).
 #
-# What a program needs to know to read an EML twin: the .cosm sidecar of a text, paired by name (notes.md and
-# notes.md.cosm), or a standalone EML with no source. It enumerates the words the text leans on (grounded in FEED,
+# What a program needs to know to read an EMF twin: the .cosm sidecar of a text, paired by name (notes.md and
+# notes.md.cosm), or a standalone EMF with no source. It enumerates the words the text leans on (grounded in FEED,
 # enough's dictionary), the things and ideas it names, the claims it makes and how it knows each one (its stance),
 # the events it narrates, and its atems: the tightest fair plain-English reduction of the whole text (the catalog's
-# atem: block) or of a passage (an X:atem item). Derivation writes it only when a person or a readvisor asks. The
-# prose is docs/MACROCOSM_OES.md; the reference reader is enough/macrocosm.py. Where this file and the reader
-# disagree, the reader wins and this file is corrected.
+# atem: block) or of a passage (an X:atem item). Derivation writes it only when a person or a readvisor asks. A
+# twin is the text's fabula: compiling it writes a SHORT beside it (a telling, plain markdown, never a .cosm), and
+# the twin records each one in its shorts: list. The prose is docs/MACROCOSM_OES.md; the reference reader is
+# enough/macrocosm.py. Where this file and the reader disagree, the reader wins and this file is corrected.
 #
 # Written in the COSM YAML subset: no anchors, no aliases, no tags, one document. Words that YAML 1.1 reads as
 # booleans (on, off, yes, no) are quoted.
@@ -15,8 +16,8 @@
 
 manifest: minicosm/0
 macrocosm: 0.0.1
-name: eml
-title: EML
+name: emf
+title: EMF
 version: 1
 summary: "One text decompiled: the words it leans on, the things and ideas it names, the claims it makes and how it knows them, the events it narrates, and its atems."
 spec: docs/MACROCOSM_OES.md
@@ -24,7 +25,7 @@ reference: [enough/macrocosm.py]
 
 declaration:
   key: oes
-  value: eml/1
+  value: emf/1
   absent: refuse
   legacy: []
   both: oes
@@ -40,17 +41,21 @@ format:
   newlines: [lf, crlf]
 
 volume:
-  catalog: '<text>.cosm'          # the twin of notes.md is notes.md.cosm; a standalone EML is any .cosm that declares eml/1
+  catalog: '<text>.cosm'          # the twin of notes.md is notes.md.cosm; a standalone EMF is any .cosm that declares emf/1
   single-file: true
 
 catalog:
-  keys: [oes, macrocosm, id, name, source, derived, atem, nodes]
-  id: eml/<slug>
-  source-fields: [path, sha256, size, mtime_ns]                    # absent for a standalone EML
+  keys: [oes, macrocosm, id, name, source, derived, atem, shorts, nodes]
+  id: emf/<slug>
+  source-fields: [path, sha256, size, mtime_ns]                    # absent for a standalone EMF
   derived-fields: [at, by, model, mode, completeness, chunks]
   derived-modes: [model, rules]
   derived-completeness: [full, atem]                               # atem: only the atem block, nodes: []
   atem-fields: [line, focus, push, pull]
+  shorts-fields: [path, at, by, mode, order]                       # one per compile, appended; absent until the first
+  shorts-path: '<text-stem>.short-<YYYY-MM-DD-HHMM>.md'            # beside the twin; -2, -3 on a collision
+  shorts-modes: [model, rules]                                     # by: the model's id, or rules
+  shorts-orders: [told, weight]                                    # told: the author's order, by span; weight: by salience
 
 module-file:
   shapes:
@@ -75,8 +80,8 @@ paths:
     - {path: '<module>/<kind>', id: none}
     - {path: '<module>/<kind>/<slug>', id: '<module>:<kind>/<slug>'}
     - {path: '<item path>#<field>', id: none}
-  qualified: 'oes:eml/<twin>/<path>'
-  qualified-database: the catalog id without eml/
+  qualified: 'oes:emf/<twin>/<path>'
+  qualified-database: the catalog id without emf/
   case: kept and significant
   refused: [a leading slash, a trailing slash, an empty segment, '.', '..', percent-encoding, a backslash, whitespace, a colon,
             non-ASCII or control characters, a segment ending in a dot, a second '#', a kind the module does not declare,

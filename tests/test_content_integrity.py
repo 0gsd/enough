@@ -90,8 +90,10 @@ SAME_IN_EVERY_LANGUAGE = frozenset(s.casefold() for s in (
     # as-is". `broker` is one of those: it names a component, not a job.
     # `canon` (0.4.3) replaced cacheawl/cachebox, which no value uses now.
     # `MacroCOSM` and `atem` (0.4.3) are the Canon round's own names, which
-    # the translation contract keeps as-is (with cosm and EML).
-    "enough", "wikisink", "canon", "girraph", "merirmaid", "MacroCOSM", "atem",
+    # the translation contract keeps as-is (with cosm and EMF). `short`
+    # (0.4.3, SHORT, plan §15) is the product word for a telling compiled
+    # from an EMF twin, kept as-is in every language (docs/I18N.md).
+    "enough", "wikisink", "canon", "girraph", "merirmaid", "MacroCOSM", "atem", "short",
     "composure", "readvisor", "readvisors", "rness", "broker", "infoworld",
     "OpenRouter", "MADLAD", "Wikipedia", "markdown", "PDF", "HTML",
     "URL", "AGENT.md", "MOTIVATION.md", "FEED",

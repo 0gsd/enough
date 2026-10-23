@@ -57,6 +57,9 @@ MIN_RELEASE=0
 # code paths that skip it (MODEL given as a literal .gguf path).
 DRAFT_ARGS=()
 DRAFT_NOTE=""
+# Derived by resolve_cap_flags: the small-machine memory caps.
+CAP_ARGS=()
+CAP_NOTE=""
 
 ENOUGH_HOME="$HOME/enough"
 resolve_model() {
@@ -172,6 +175,62 @@ resolve_spec_flags() {
   fi
 }
 
+total_ram_gb() {
+  # Total physical RAM in GB, rounded down — the same probe order as
+  # enough.models.total_ram_gb(): sysctl (macOS), /proc/meminfo (Linux),
+  # else 16.
+  local bytes kb
+  bytes="$(sysctl -n hw.memsize 2>/dev/null || true)"
+  if [[ "$bytes" =~ ^[0-9]+$ ]]; then
+    echo $(( bytes / 1073741824 ))
+    return 0
+  fi
+  if [[ -r /proc/meminfo ]]; then
+    kb="$(awk '/^MemTotal:/ {print $2; exit}' /proc/meminfo 2>/dev/null || true)"
+    if [[ "$kb" =~ ^[0-9]+$ ]]; then
+      echo $(( kb / 1048576 ))
+      return 0
+    fi
+  fi
+  echo 16
+}
+
+help_lists_flag() {
+  # Does this llama-server's --help text ($1) list the long flag $2? A
+  # whole-word match, so --cache-ram never matches --cache-ram-foo.
+  grep -Eq -- "(^|[^-[:alnum:]])$2([^-[:alnum:]]|\$)" <<<"$1"
+}
+
+resolve_cap_flags() {
+  # Under 32 GB of RAM, cap llama-server's context checkpoints and its
+  # host-RAM prompt cache (docs/ctx-16gb-plan.md §3c) — the same rule as
+  # enough.models.launch_caps(): each flag only when this build's --help
+  # lists it, so an older llama.cpp still starts.
+  CAP_ARGS=()
+  local ram help applied="" skipped=""
+  ram="$(total_ram_gb)"
+  if [[ "$ram" -ge 32 ]]; then
+    CAP_NOTE="none (${ram} GB RAM, caps apply below 32 GB)"
+    return 0
+  fi
+  help="$("$LLAMA_BIN" --help 2>&1 || true)"
+  if help_lists_flag "$help" --ctx-checkpoints; then
+    CAP_ARGS+=(--ctx-checkpoints 2); applied="$applied --ctx-checkpoints 2"
+  else
+    skipped="$skipped --ctx-checkpoints"
+  fi
+  if help_lists_flag "$help" --cache-ram; then
+    CAP_ARGS+=(--cache-ram 2048); applied="$applied --cache-ram 2048"
+  else
+    skipped="$skipped --cache-ram"
+  fi
+  CAP_NOTE="${ram} GB RAM:"
+  if [[ -n "$applied" ]]; then CAP_NOTE="$CAP_NOTE applied$applied"; else CAP_NOTE="$CAP_NOTE none applied"; fi
+  if [[ -n "$skipped" ]]; then
+    CAP_NOTE="$CAP_NOTE; skipped$skipped (this llama-server's --help does not list it)"
+  fi
+}
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STATE_DIR="$SCRIPT_DIR/.llama-server"
 LOG_FILE="$STATE_DIR/server.log"
@@ -210,11 +269,13 @@ start() {
   fi
   mkdir -p "$STATE_DIR"
   resolve_spec_flags
+  resolve_cap_flags
   local ctx_to_use="${CTX:-32768}"
   echo "launching llama-server with:"
   echo "  model: $MODEL_PATH"
   echo "  ctx:   $ctx_to_use"
   echo "  mtp:   ${SPEC_FLAGS:-off}${DRAFT_NOTE}"
+  echo "  caps:  $CAP_NOTE"
   # SPEC_FLAGS is deliberately unquoted: it's a space-separated flag
   # string (no values with spaces) that llama-server gets as N args. The
   # draft file IS a path, so it rides in an array instead — expanded with
@@ -226,6 +287,7 @@ start() {
     --host "$HOST" --port "$PORT" \
     -ngl "$NGL" -c "$ctx_to_use" --parallel "$PARALLEL" --jinja \
     $SPEC_FLAGS ${DRAFT_ARGS[@]+"${DRAFT_ARGS[@]}"} \
+    ${CAP_ARGS[@]+"${CAP_ARGS[@]}"} \
     >"$LOG_FILE" 2>&1 &
   echo $! >"$PID_FILE"
   disown

@@ -1,5 +1,5 @@
 """The readvisor's MacroCOSM tools: read a `.cosm` volume, lint it, decompile
-a text into its EML twin, make an atem, and fetch the guide (0.4.3, P6).
+a text into its EMF twin, make an atem, and fetch the guide (0.4.3, P6).
 
 Registered into `tools._DISPATCH` the way `dictionary_tools` is. The reading
 is `enough.macrocosm`'s (the text tree, the generic checks); the writing is
@@ -9,7 +9,7 @@ is `enough.macrocosm`'s (the text tree, the generic checks); the writing is
 turn holds `session.generation_lock` for its whole length. The UI's
 derivations go through `CanonJobs`, whose model-mode jobs take that same
 lock; a tool that started one would wait for the turn that is waiting for
-the tool. So the tools call `derive_eml`/`derive_atem` in the tool's own
+the tool. So the tools call `derive_emf`/`derive_atem` in the tool's own
 worker thread, with a `complete` closure over `llm.complete` at this
 session's model (the model is idle between a turn's streams). They still
 honour the job table's per-file claims (`CanonJobs.holding`), so a tool and
@@ -25,7 +25,7 @@ in the chief's chat turns (a council strips tool calls).
 
 **The refusals are the routes'.** `text_target()` is the one place that
 decides which texts can be decompiled or given an atem (no Holotypes, no
-`.cosm`, no catalogs, text kinds only, never overwrite a non-EML `X.cosm`);
+`.cosm`, no catalogs, text kinds only, never overwrite a non-EMF `X.cosm`);
 the server's `/api/canon/derive`, `/atem` and `/atem/pin` delegate to it, so
 the UI and the tools refuse exactly the same things in the same words.
 
@@ -39,8 +39,8 @@ like the FEED tools': the tools are always there. The guide is the shipped
 skill rides in every turn), and one `cosm_guide` call away when it is off.
 
 **Model mode is for short texts.** A small local model takes a minute or more
-per ~1,200 characters, and the chat turn waits: `eml_derive` uses the model
-only up to EML_MODEL_MAX characters and writes the rules scaffold above that,
+per ~1,200 characters, and the chat turn waits: `emf_derive` uses the model
+only up to EMF_MODEL_MAX characters and writes the rules scaffold above that,
 saying the full pass belongs in the reader's decompile (a background job).
 `atem` is one or a few completions, so it keeps the TEXT_MAX limit only.
 
@@ -62,7 +62,7 @@ from typing import Any, Callable, Iterator
 
 log = logging.getLogger("enough.canon_tools")
 
-TOOL_NAMES: tuple[str, ...] = ("cosm_read", "cosm_lint", "eml_derive", "atem", "cosm_guide")
+TOOL_NAMES: tuple[str, ...] = ("cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide")
 
 #: The shipped skill whose body `cosm_guide` hands back.
 SKILL_NAME = "macrocosm-oes"
@@ -77,10 +77,11 @@ STORE_PREFIXES: tuple[str, ...] = ("canon:", "cacheawl:")
 #: Over this a text is the reader's work, not a chat turn's: a model reads it
 #: passage by passage, a minute or more each, while the turn waits.
 TEXT_MAX = 24_000
-#: The longest text `eml_derive` gives the model inside a chat turn
+#: The longest text `emf_derive` gives the model inside a chat turn
 #: (gemma-4-E4B: 85–105 s for ~1,200 characters, the orchestrator's measure).
 #: Longer texts get the rules scaffold and a pointer to the reader.
-EML_MODEL_MAX = 6_000
+EMF_MODEL_MAX = 6_000
+EML_MODEL_MAX = EMF_MODEL_MAX     # the name before EMF (plan §16), kept one release
 #: The reader's words for that, in the result.
 LONG_FOR_A_TURN = ("a full model pass on a text this long belongs in the reader's decompile, which runs in "
                    "the background")
@@ -174,7 +175,7 @@ def resolve(project_dir: Path, path: str) -> Path:
 
 def where(rel: str) -> tuple[str | None, str]:
     """`(volume, path in its volume)` for a store path, `(None, rel)` for a
-    project path: the catalog to regenerate and the EML catalog id's path (P0
+    project path: the catalog to regenerate and the EMF catalog id's path (P0
     decision 16). A file at the store's root has no volume."""
     prefix = store_prefix(rel)
     if not prefix:
@@ -205,7 +206,7 @@ def text_target(project_dir: Path, path: str) -> dict[str, Any]:
     missing file (404), a folder, a Holotype or anything in one (owner:
     browsed, not decompiled), a catalog or meta enough keeps, any `.cosm`
     (already enumerated), binaries, kinds that aren't markdown or plain text,
-    an empty file, and a `X.cosm` beside the text that is not an EML twin
+    an empty file, and a `X.cosm` beside the text that is not an EMF twin
     (409: deriving would overwrite it). A converted original (`report.pdf`)
     is read through its markdown twin (`report.pdf.md`), or refused with
     "convert it first".
@@ -249,8 +250,8 @@ def text_target(project_dir: Path, path: str) -> dict[str, Any]:
     elif _canon.looks_binary(target):
         raise TextTargetError(400, f"{name} looks binary; derive reads markdown and plain text")
     twin = _canon_derive.twin_path(target)
-    if twin.exists() and not _canon.is_eml_twin(twin):
-        raise TextTargetError(409, f"{twin.name} already exists and is not an EML twin; move or rename it first")
+    if twin.exists() and not _canon.is_emf_twin(twin):
+        raise TextTargetError(409, f"{twin.name} already exists and is not an EMF twin; move or rename it first")
     try:
         if not target.read_bytes().strip():
             raise TextTargetError(400, f"{target.name} is empty: there is nothing to derive")
@@ -409,7 +410,7 @@ def load(project_dir: Path, path: str) -> tuple[Any, str]:
     the cosm viewer's routes load it: the project catalog and a Canon volume's
     catalog reconciled first; a folder holding `holotype.cosm` as the
     Holotype; a store volume folder by its `canon.cosm`; any other folder by
-    the catalog it holds. A text with an EML twin reads as its twin (`note`
+    the catalog it holds. A text with an EMF twin reads as its twin (`note`
     says so). Raises `_ReadError` in words."""
     from . import canon as _canon
     from . import canon_derive as _canon_derive
@@ -443,9 +444,9 @@ def load(project_dir: Path, path: str) -> tuple[Any, str]:
         return _macrocosm.load_volume(target), ""
     if target.suffix != ".cosm":
         twin = _canon_derive.twin_path(target)
-        if _canon.is_eml_twin(twin):
-            return _macrocosm.load_volume(twin), f"(reading {twin.name}, the EML twin of {target.name})"
-        hint = (" It has no EML twin yet; eml_derive makes one, when the user asks."
+        if _canon.is_emf_twin(twin):
+            return _macrocosm.load_volume(twin), f"(reading {twin.name}, the EMF twin of {target.name})"
+        hint = (" It has no EMF twin yet; emf_derive makes one, when the user asks."
                 if target.suffix.lower() in _canon_derive.TEXT_SUFFIXES else "")
         raise _ReadError(f"{path} is not a .cosm file or a volume folder.{hint}")
     return _macrocosm.load_volume(target), ""
@@ -718,7 +719,7 @@ def run_cosm_lint(project_dir: Path, call: Any) -> Any:
 
 
 # ---------------------------------------------------------------------------
-# Writing: the EML twin and the atem
+# Writing: the EMF twin and the atem
 # ---------------------------------------------------------------------------
 
 def _too_long(name: str, n: int, what: str) -> str:
@@ -754,7 +755,7 @@ def _module_counts(counts: dict) -> str:
     from . import macrocosm as _macrocosm
     names: dict[str, str] = {}
     try:
-        man = _macrocosm.default_registry().get("eml")
+        man = _macrocosm.default_registry().get("emf")
         if man is not None:
             names = {m: str(man.module(m).get("name") or m) for m in man.modules()}
     except Exception:  # noqa: BLE001 — names are a nicety
@@ -762,10 +763,10 @@ def _module_counts(counts: dict) -> str:
     return " · ".join(f"{m} {names.get(m, m)} {counts.get(m, 0)}" for m in _canon_derive.MODULE_ORDER)
 
 
-def run_eml_derive(project_dir: Path, call: Any) -> Any:
-    """`eml_derive <path> [<force>yes</force>]` — decompile a text into its EML
+def run_emf_derive(project_dir: Path, call: Any) -> Any:
+    """`emf_derive <path> [<force>yes</force>]` — decompile a text into its EMF
     twin (`notes.md` → `notes.md.cosm`), by this session's model when it
-    answers and the text is at most EML_MODEL_MAX characters, by rules
+    answers and the text is at most EMF_MODEL_MAX characters, by rules
     otherwise. Refuses what the reader's decompile refuses, and texts over
     TEXT_MAX."""
     from . import canon as _canon
@@ -773,25 +774,25 @@ def run_eml_derive(project_dir: Path, call: Any) -> Any:
     from . import canon_jobs as _canon_jobs
     raw = (call.path or "").strip()
     if not raw:
-        return _err("eml_derive", "", "eml_derive needs the text in a <path> tag (project-relative, or "
+        return _err("emf_derive", "", "emf_derive needs the text in a <path> tag (project-relative, or "
                                       "canon:<volume>/<path>).")
     path = _tool_path(project_dir, raw)
     if _store_write_denied(path):
         from . import broker
-        return _err("eml_derive", raw, broker.denial_canon_disabled())
+        return _err("emf_derive", raw, broker.denial_canon_disabled())
     try:
         t = text_target(project_dir, path)
     except TextTargetError as e:
-        return _refusal("eml_derive", raw, e)
+        return _refusal("emf_derive", raw, e)
     started = _stamp()
     try:
         size = len(_canon_derive.read_source(t["target"])[0])
     except OSError as e:
-        return _err("eml_derive", raw, f"{t['target'].name} could not be read ({e})")
+        return _err("emf_derive", raw, f"{t['target'].name} could not be read ({e})")
     if size > TEXT_MAX:
-        return _err("eml_derive", raw, _too_long(t["target"].name, size, "decompile"))
+        return _err("emf_derive", raw, _too_long(t["target"].name, size, "decompile"))
     complete, why = model()
-    if complete is not None and size > EML_MODEL_MAX:
+    if complete is not None and size > EMF_MODEL_MAX:
         complete, why = None, f"{size:,} characters: {LONG_FOR_A_TURN}"
     mode = "model" if complete is not None else "rules"
     force = (call.extra.get("force") or "").strip().lower() in ("yes", "true", "1")
@@ -799,7 +800,7 @@ def run_eml_derive(project_dir: Path, call: Any) -> Any:
         derived = _canon.twin_header(t["twin"]).get("derived")
         derived = derived if isinstance(derived, dict) else {}
         if derived.get("completeness") == "full" and (derived.get("mode") == "model" or mode == "rules"):
-            return _result("eml_derive", raw, True,
+            return _result("emf_derive", raw, True,
                            f"already fresh: {t['twin_rel']} is up to date with {t['text_rel']} "
                            f"({derived.get('mode') or '?'} mode, by {derived.get('by') or '?'}). Read it with "
                            f"cosm_read; pass <force>yes</force> to derive it again.")
@@ -808,25 +809,25 @@ def run_eml_derive(project_dir: Path, call: Any) -> Any:
         with _claim(t):
             text, stat = _canon_derive.read_source(t["target"])
             if len(text) > TEXT_MAX:
-                return _err("eml_derive", raw, _too_long(t["target"].name, len(text), "decompile"))
-            if complete is not None and len(text) > EML_MODEL_MAX:       # it grew since the first read
+                return _err("emf_derive", raw, _too_long(t["target"].name, len(text), "decompile"))
+            if complete is not None and len(text) > EMF_MODEL_MAX:       # it grew since the first read
                 complete, why = None, f"{len(text):,} characters: {LONG_FOR_A_TURN}"
             twin = t["twin"]
-            previous = twin.read_text(encoding="utf-8") if _canon.is_eml_twin(twin) else None
-            cosm, info = _canon_derive.derive_eml(
+            previous = twin.read_text(encoding="utf-8") if _canon.is_emf_twin(twin) else None
+            cosm, info = _canon_derive.derive_emf(
                 text, source_name=t["target"].name, source_stat=stat, rel_path=t["id_rel"],
                 complete=complete, by=by, previous=previous)
             _canon_derive.write_twin(twin, cosm)
     except _canon_jobs.CanonJobError as e:
-        return _err("eml_derive", raw, str(e))
+        return _err("emf_derive", raw, str(e))
     except Exception as e:  # noqa: BLE001 — a model that died, a file that vanished: words, nothing written
-        log.warning("eml_derive failed: %s", e)
-        return _err("eml_derive", raw, f"the decompile failed: {e}")
+        log.warning("emf_derive failed: %s", e)
+        return _err("emf_derive", raw, f"the decompile failed: {e}")
     catalog_after(project_dir, t["text_rel"])
     state = _canon_derive.twin_state(t["target"])
     atem = info.get("atem") or {}
     n = info["chunks"]
-    lines = [f"ok — wrote {t['twin_rel']}, the EML twin of {t['text_rel']} ({n} passage{'' if n == 1 else 's'}; "
+    lines = [f"ok — wrote {t['twin_rel']}, the EMF twin of {t['text_rel']} ({n} passage{'' if n == 1 else 's'}; "
              f"by {by}).",
              f"mode: {_mode_note(info['mode'], info.get('model'), why)}",
              f"items: {_module_counts(info.get('counts') or {})} — {info['items']} in all"
@@ -840,9 +841,9 @@ def run_eml_derive(project_dir: Path, call: Any) -> Any:
               "model": info.get("model"), "chunks": info["chunks"], "items": info["items"],
               "counts": info.get("counts") or {}, "dropped": info.get("dropped", 0), "atem": atem,
               "state": state}
-    snap = snapshot(kind="eml", path=t["text_rel"], mode=info["mode"], result=result, message=message,
+    snap = snapshot(kind="emf", path=t["text_rel"], mode=info["mode"], result=result, message=message,
                     started=started, chunks=info["chunks"], by=by)
-    return _result("eml_derive", raw, True, "\n".join(lines), {SIDE_EFFECT: snap})
+    return _result("emf_derive", raw, True, "\n".join(lines), {SIDE_EFFECT: snap})
 
 
 def run_atem(project_dir: Path, call: Any) -> Any:
@@ -896,7 +897,7 @@ def run_atem(project_dir: Path, call: Any) -> Any:
             title = _canon_derive.text_title(text, t["target"].name)
             atem = _canon_derive.derive_atem(text, context=f"the whole of {title}", complete=complete)
             twin = t["twin"]
-            existing = twin.read_text(encoding="utf-8") if _canon.is_eml_twin(twin) else None
+            existing = twin.read_text(encoding="utf-8") if _canon.is_emf_twin(twin) else None
             cosm = _canon_derive.set_file_atem(
                 existing, atem, source_name=t["target"].name, source_stat=stat, rel_path=t["id_rel"],
                 by=by, model=atem.get("model"), title=title)
@@ -963,7 +964,7 @@ def run_cosm_guide(project_dir: Path, call: Any) -> Any:
 _RUNNERS = {
     "cosm_read": run_cosm_read,
     "cosm_lint": run_cosm_lint,
-    "eml_derive": run_eml_derive,
+    "emf_derive": run_emf_derive,
     "atem": run_atem,
     "cosm_guide": run_cosm_guide,
 }
@@ -979,8 +980,8 @@ def register() -> None:
         t._TRACE_TOGGLE.setdefault(tool_name, "trace_log_enabled")
 
 
-__all__ = ["EML_MODEL_MAX", "LONG_FOR_A_TURN", "SIDE_EFFECT", "SKILL_NAME", "STORE_PREFIXES", "TEXT_MAX",
+__all__ = ["EMF_MODEL_MAX", "LONG_FOR_A_TURN", "SIDE_EFFECT", "SKILL_NAME", "STORE_PREFIXES", "TEXT_MAX",
            "TOOL_NAMES", "TextTargetError", "atem_lines", "capped_tree", "catalog_after", "configure",
            "declaration_text", "guide_text", "inside_holotype", "load", "model", "readvisor_name", "register",
            "report_lines", "resolve", "run_atem", "run_cosm_guide", "run_cosm_lint", "run_cosm_read",
-           "run_eml_derive", "snapshot", "store_prefix", "text_target", "tidy_rel", "where"]
+           "run_emf_derive", "snapshot", "store_prefix", "text_target", "tidy_rel", "where"]

@@ -1,7 +1,7 @@
-oes: eml/1
+oes: emf/1
 id: bad-catalog-key
 name: bad catalog-key
-# catalog-key: a catalog id that is not eml/<slug>
+# catalog-key: a catalog id that is not emf/<slug>
 nodes:
   - id: K:concept/x
     type: concept

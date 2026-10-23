@@ -51,6 +51,36 @@ from .composure import ComposureError
 
 log = logging.getLogger("enough.council")
 
+
+async def _land_whole(aw: Awaitable[Any]) -> Any:
+    """Await a statement's landing (its commit on a worker thread, then the
+    announcements) to the end, even when the task awaiting it is cancelled
+    meanwhile — and only then let the cancellation through.
+
+    Cancelling a task cannot stop the thread it is waiting on. Before 0.4.3
+    a pause cancelled the run while `commit_statement` was still writing, its
+    own `await task` returned at once, and its status write raced the commit
+    on the council's state: a lost update that left the statement on the
+    canvas with the turn counter not counting it (seen on CI as
+    `test_pause_stops_a_run_and_leaves_it_resumable`, two statements, turn 1).
+    Now a statement that has started to land lands whole, and the pause that
+    asked for the stop waits for it."""
+    fut = asyncio.ensure_future(aw)
+    try:
+        return await asyncio.shield(fut)
+    except asyncio.CancelledError as cancel:
+        while not fut.done():
+            try:
+                await asyncio.shield(fut)
+            except asyncio.CancelledError:
+                continue          # a second cancel: still wait for the commit
+            except Exception:  # noqa: BLE001 — the cancel is what propagates
+                break
+        if not fut.cancelled() and fut.exception() is not None:
+            log.warning("a council statement failed to land while its run was "
+                        "being stopped: %s", fut.exception())
+        raise cancel
+
 EVENT = "council"
 
 # ---------------------------------------------------------------------------
@@ -1334,7 +1364,16 @@ class Council:
                     stripped: int = 0, bg: str | None = None,
                     title: str | None = None) -> TurnResult:
         """Commit a statement and tell everybody. The tail of every turn —
-        an ordinary one, a conclusion, and a pal's answer."""
+        an ordinary one, a conclusion, and a pal's answer. Once it starts it
+        lands whole: a pause arriving meanwhile waits for it (`_land_whole`)."""
+        return await _land_whole(self._land_now(
+            comp, speaker, text, stats=stats, stripped=stripped, bg=bg,
+            title=title))
+
+    async def _land_now(self, comp: comp_core.Composure, speaker: dict[str, Any],
+                        text: str, *, stats: dict[str, int] | None = None,
+                        stripped: int = 0, bg: str | None = None,
+                        title: str | None = None) -> TurnResult:
         stats = stats or {}
         out = await asyncio.to_thread(self.commit_statement, speaker, text,
                                       bg=bg, title=title)
@@ -1501,7 +1540,10 @@ class Council:
 
     async def _drain_user_statement(self) -> TurnResult:
         """Commit the oldest queued user statement. Not a completion — the
-        user already wrote it."""
+        user already wrote it. Lands whole, like `_land`."""
+        return await _land_whole(self._drain_now())
+
+    async def _drain_now(self) -> TurnResult:
         out, result = await asyncio.to_thread(self._commit_user_statement)
         await self._announce({"phase": "end", "turn": str(out.turn),
                               "speaker": out.speaker, "speaker_kind": "user",

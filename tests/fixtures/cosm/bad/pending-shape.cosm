@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/bad-pending-shape
+oes: emf/1
+id: emf/bad-pending-shape
 name: bad pending-shape
 # pending-shape: an open question with no question in it
 nodes:

@@ -1,5 +1,5 @@
-oes: eml/1
-id: eml/bad-ref-grammar
+oes: emf/1
+id: emf/bad-ref-grammar
 name: bad ref-grammar
 # ref-grammar: a reference field holding text instead of an id
 nodes:

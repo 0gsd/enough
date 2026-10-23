@@ -405,6 +405,11 @@ def launcher(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     # models.find_llama_server(), which is the one place the
     # $ENOUGH_LLAMA_SERVER → ~/enough/bin → PATH order lives.
     monkeypatch.setattr(models, "find_llama_server", lambda: "/fake/bin/llama-server")
+    # A big machine by default: no memory caps, so no RAM probe or --help
+    # probe goes through the recording Popen (subprocess.run and
+    # check_output are built on it). tests/test_launch_caps.py covers the
+    # small-machine branch.
+    monkeypatch.setattr(models, "total_ram_gb", lambda: 64)
 
     def _set_model(**over):
         info = {
