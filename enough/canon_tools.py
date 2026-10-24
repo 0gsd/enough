@@ -1,5 +1,7 @@
 """The readvisor's MacroCOSM tools: read a `.cosm` volume, lint it, decompile
-a text into its EMF twin, make an atem, and fetch the guide (0.4.3, P6).
+a text into its EMF twin, make an atem, and fetch the guide (0.4.3, P6); and
+look a word up in the MacroCOSM spec or the enough manual, `doc_lookup`
+(0.4.4: the DocOES doc volumes, `enough.docoes`, built on first use).
 
 Registered into `tools._DISPATCH` the way `dictionary_tools` is. The reading
 is `enough.macrocosm`'s (the text tree, the generic checks); the writing is
@@ -62,7 +64,7 @@ from typing import Any, Callable, Iterator
 
 log = logging.getLogger("enough.canon_tools")
 
-TOOL_NAMES: tuple[str, ...] = ("cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide")
+TOOL_NAMES: tuple[str, ...] = ("cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide", "doc_lookup")
 
 #: The shipped skill whose body `cosm_guide` hands back.
 SKILL_NAME = "macrocosm-oes"
@@ -958,6 +960,323 @@ def run_cosm_guide(project_dir: Path, call: Any) -> Any:
 
 
 # ---------------------------------------------------------------------------
+# doc_lookup (0.4.4): what a word means in the spec or the manual
+# ---------------------------------------------------------------------------
+
+#: The documents `doc_lookup` searches, in this order: the MacroCOSM spec, then the Help Center in the UI language.
+DOC_LOOKUP_DOCS: tuple[str, ...] = ("macrocosm-oes", "help-center")
+#: How each document is named in an answer.
+DOC_LOOKUP_TITLES = {"macrocosm-oes": "the MacroCOSM OES spec", "help-center": "the enough manual"}
+#: A leading word that narrows the search to one document: `help 3`, `spec: stance`.
+_DOC_QUALIFIERS = {"spec": "macrocosm-oes", "macrocosm": "macrocosm-oes", "help": "help-center",
+                   "manual": "help-center"}
+#: "Mentioned in" sections shown, and the longest definition quoted.
+DOC_MENTIONS_SHOWN = 3
+DOC_TEXT_MAX = 700
+#: Which kind answers first when two items share a name (sections are only the fallback).
+_DOC_KIND_RANK = {k: i for i, k in enumerate(("term", "minicosm", "kind", "list", "check", "lens", "module",
+                                               "bubble", "example", "decision", "chapter"))}
+_ARTICLES = frozenset({"a", "an", "the", "der", "die", "das", "ein", "eine", "le", "la", "les", "l'", "un", "une",
+                       "el", "los", "las", "uno", "una"})
+#: The fields that name a place in the prose (what "mentioned in" reverses).
+_MENTION_FIELDS = ("mentions", "about", "see")
+
+
+def ui_language() -> str:
+    """The UI language, read from the live ui.json (`ENOUGH_UI_CONFIG`, as the server reads it); en when the file
+    is missing or names a language enough does not ship."""
+    import json
+
+    from . import docoes as _docoes
+    from . import prompt as _prompt
+    try:
+        cfg = json.loads(_prompt._ui_config_path().read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        cfg = None
+    lang = cfg.get("ui_language") if isinstance(cfg, dict) else None
+    return lang if isinstance(lang, str) and lang in _docoes.LANGS else "en"
+
+
+def _norm(s: Any) -> str:
+    import unicodedata
+    t = unicodedata.normalize("NFKC", str(s or "")).strip().strip("`*_\"'“”‘’«»").strip()
+    return " ".join(t.casefold().split())
+
+
+def _forms(s: Any) -> set[str]:
+    """A name's spellings for matching: casefolded, without a leading article, singular or plural."""
+    base = _norm(s)
+    out = {base}
+    words = base.split(" ")
+    if len(words) > 1 and words[0] in _ARTICLES:
+        out.add(" ".join(words[1:]))
+    for f in list(out):
+        if f.endswith("ies") and len(f) > 4:
+            out.add(f[:-3] + "y")
+        if f.endswith("es") and len(f) > 3:
+            out.add(f[:-2])
+        if f.endswith("s") and len(f) > 2:
+            out.add(f[:-1])
+    return {f for f in out if f}
+
+
+def _section_label(vol: Any, ref: Any) -> str:
+    it = vol.item(ref) if isinstance(ref, str) else ref
+    if it is None:
+        return str(ref)
+    num = it.data.get("number")
+    label = f"§{num} {it.name}" if num not in (None, "") else it.name
+    chap = it.data.get("chapter")
+    if isinstance(chap, str):
+        c = vol.item(chap)
+        label += f" (in {c.name if c is not None else chap})"
+    return label
+
+
+def _plain_text(text: Any, limit: int = DOC_TEXT_MAX) -> str:
+    import re
+    t = re.sub(r"<!--.*?-->", "", str(text or ""), flags=re.S)
+    paras = [p.strip() for p in re.split(r"\n\s*\n", t) if p.strip() and not p.lstrip().startswith(("#", "|", "```"))]
+    t = " ".join(" ".join(paras[:2]).split()) if paras else ""
+    return t if len(t) <= limit else t[:limit - 1].rstrip() + "…"
+
+
+def _mentioned_in(vol: Any, it: Any) -> list[Any]:
+    """The sections whose prose names `it` (their `mentions`; a decision's `about` and a bubble's `see` count for
+    the section that holds them, when they have one): numbered sections first, in telling order, then the
+    unnumbered ones (the title, Contents), which name nearly everything."""
+    hits: dict[str, Any] = {}
+    for src in vol.items.values():
+        if src.key == it.key:
+            continue
+        named = any(it.id in (src.data.get(f) or []) if isinstance(src.data.get(f), list) else src.data.get(f) == it.id
+                    for f in _MENTION_FIELDS)
+        if not named:
+            continue
+        sec = src if src.kind == "section" else (vol.item(src.data["in"]) if isinstance(src.data.get("in"), str)
+                                                  else None)
+        if sec is not None and sec.key != it.key:
+            hits.setdefault(sec.key, sec)
+    return sorted(hits.values(), key=lambda s: (s.data.get("number") in (None, ""),
+                                                s.data.get("order") if isinstance(s.data.get("order"), int) else 0))
+
+
+def _where(vol: Any, it: Any) -> str:
+    """Where an item is defined, in words: a section, or what it is a part of."""
+    d = it.data
+    of = vol.item(d["of"]) if isinstance(d.get("of"), str) else None
+
+    def mini(x: Any) -> str:
+        while x is not None and x.kind != "minicosm":
+            x = vol.item(x.data["of"]) if isinstance(x.data.get("of"), str) else None
+        return x.name if x is not None else "a MiniCOSM"
+
+    if it.kind == "term":
+        where = _section_label(vol, d.get("defined_in"))
+        also = [_section_label(vol, r) for r in d.get("also_defined_in") or []]
+        return where + (f" (also defined in {', '.join(also)})" if also else "")
+    if it.kind == "section":
+        parent = d.get("parent")
+        return f"a section of {DOC_LOOKUP_TITLES.get(_doc_of(vol), vol.name)}" + (
+            f", in {_section_label(vol, parent)}" if isinstance(parent, str) and parent != "S:section/root" else "")
+    if it.kind == "kind":
+        return f"a kind of {mini(it)}" + (f", in module {of.data.get('letter', '')} · {of.name}" if of else "")
+    if it.kind == "list":
+        return f"a closed list of {mini(it)} (the field {d.get('field', it.name)})"
+    if it.kind == "module":
+        return f"a module of {mini(it)}"
+    if it.kind == "lens":
+        return f"a lens of {mini(it)}"
+    if it.kind == "minicosm":
+        return f"a MiniCOSM, declared oes: {d.get('declaration', '?')}"
+    if it.kind == "check":
+        by = [vol.item(r).name if vol.item(r) is not None else str(r) for r in d.get("selected_by") or []]
+        return f"a check ({d.get('severity', '?')})" + (f", selected by {', '.join(by)}" if by else "")
+    if it.kind in ("example", "decision"):
+        return f"a{'n' if it.kind == 'example' else ''} {it.kind} in {_section_label(vol, d.get('in'))}"
+    if it.kind == "bubble":
+        return f"a help bubble beside a control" + (f" ({d['path']})" if isinstance(d.get("path"), str) else "")
+    if it.kind == "chapter":
+        return f"a chapter: {d.get('source', '')} at {d.get('commit', '?')}, read-only"
+    return it.kind or "an item"
+
+
+def _doc_of(vol: Any) -> str:
+    return str(vol.catalog.get("id") or "").removeprefix("doc/")
+
+
+def _answer(vol: Any, lang: str, it: Any, also: list[str]) -> str:
+    d = it.data
+    doc = _doc_of(vol)
+    lines = [f"{it.name}  [{it.id} · {it.kind}]  — {DOC_LOOKUP_TITLES.get(doc, vol.name)} ({lang})"]
+    if isinstance(d.get("atem"), str):
+        lines.append(f"atem: {d['atem']}")
+    if it.kind == "section":
+        text = _plain_text(d.get("body"))
+    elif it.kind == "bubble":
+        text = _plain_text(d.get("what"))
+    else:
+        text = " ".join(str(d.get("summary") or "").split())
+    if text and _norm(text).rstrip(".") != _norm(d.get("atem")):
+        lines.append(("definition: " if it.kind == "term" else "") + text)
+    if it.kind == "list" and isinstance(d.get("meanings"), dict):
+        lines += [f"- {k} — {v}" for k, v in d["meanings"].items()]
+    elif it.kind == "list" and isinstance(d.get("values"), list):
+        lines.append("values: " + ", ".join(str(v) for v in d["values"]))
+    if it.kind == "term":
+        # A term that names a closed list (0.4.4: the spec defines `stance` in prose and lists its six words in a
+        # table): the one call still answers with the words and what each means.
+        for li in vol.items.values():
+            if li.kind == "list" and _forms(li.name) & _forms(it.name):
+                ld = li.data
+                lines.append(f"the closed list {li.id}:")
+                if isinstance(ld.get("meanings"), dict):
+                    lines += [f"- {k} — {v}" for k, v in ld["meanings"].items()]
+                elif isinstance(ld.get("values"), list):
+                    lines.append("values: " + ", ".join(str(v) for v in ld["values"]))
+    if it.kind == "kind":
+        for f in ("fields", "required", "refs"):
+            if d.get(f):
+                lines.append(f"{f}: {', '.join(str(v) for v in d[f])}")
+    if it.kind == "section" and d.get("parts"):
+        parts = [_section_label(vol, p) for p in d["parts"][:8]]
+        lines.append("parts: " + "; ".join(parts) + (" …" if len(d["parts"]) > 8 else ""))
+    lines.append(f"{'where' if it.kind in ('section', 'bubble', 'chapter') else 'defined in'}: {_where(vol, it)}")
+    if it.kind == "term" and d.get("fallback"):
+        lines.append(f"(told in English: this telling has no {lang} words for it)")
+    secs = _mentioned_in(vol, it)
+    if secs:
+        shown = "; ".join(_section_label(vol, s) for s in secs[:DOC_MENTIONS_SHOWN])
+        more = len(secs) - DOC_MENTIONS_SHOWN
+        lines.append(f"mentioned in: {shown}" + (f" (and {more} more)" if more > 0 else ""))
+    lines += also
+    return "\n".join(lines)
+
+
+class _DocVolumes:
+    """(doc, lang, volume) in search order, each loaded (built first when stale) only when a search reaches it, so
+    a word the spec defines never builds the manual. `problems` holds the volumes that could not be had."""
+
+    def __init__(self, only: str | None = None):
+        from . import docoes as _docoes
+        lang = ui_language()
+        self._todo = [(d, lang if lang in _docoes.tellings(d) else "en") for d in DOC_LOOKUP_DOCS
+                      if not only or d == only]
+        self._done: list[tuple[str, str, Any]] = []
+        self.problems: list[str] = []
+
+    def __iter__(self) -> Iterator[tuple[str, str, Any]]:
+        from . import docoes as _docoes
+        yield from list(self._done)
+        while self._todo:
+            doc, telling = self._todo.pop(0)
+            try:
+                entry = (doc, telling, _docoes.load_built(doc, telling))
+            except Exception as e:  # noqa: BLE001 — one missing volume never costs the other
+                self.problems.append(f"{doc}.{telling}: {e}")
+                continue
+            self._done.append(entry)
+            yield entry
+
+
+def find_doc_entry(query: str) -> tuple[Any, str, Any, list[str]] | None:
+    """`(volume, telling, item, notes)` for what `query` names — an id, a section number, a name — or None. Spec
+    first, then the manual; a section title only when no other item has the name; `notes` names a same-numbered
+    section in the other document."""
+    import re
+    q = " ".join(str(query or "").split())
+    only = None
+    m = re.match(r"^(spec|macrocosm|help|manual)\b[:\s]+(.+)$", q, re.I)
+    if m:
+        only, q = _DOC_QUALIFIERS[m.group(1).lower()], m.group(2).strip()
+    vols = _DocVolumes(only)
+    if re.match(r"^[STRB]:[a-z][a-z0-9-]*/\S+$", q):
+        for _doc, lang, vol in vols:
+            it = vol.item(q)
+            if it is not None:
+                return vol, lang, it, []
+        return None
+    sec = re.match(r"^(?:§\s*|(?:sections?|sec\.?|abschnitt|section|sección|chapitre|セクション)\s*)?"
+                   r"((?:\d+|[A-Z])(?:\.\d+)*)\.?$", q, re.I)
+    if sec:
+        def numbered(vol: Any) -> Any:
+            """The document's own section, else a chapter's (Comprise's P.3 is `S:section/comprise.P.3`)."""
+            prefixes = [""] + [f"{c['prefix']}." for c in vol.catalog.get("chapters") or []
+                               if isinstance(c, dict) and c.get("prefix")]
+            return next((it for it in (vol.item(f"S:section/{p}{sec.group(1)}") for p in prefixes) if it), None)
+
+        hits = [(vol, lang, numbered(vol)) for _doc, lang, vol in vols]
+        hits = [h for h in hits if h[2] is not None]
+        if hits:
+            vol, lang, it = hits[0]
+            notes = [f"(also §{sec.group(1)} in {DOC_LOOKUP_TITLES[_doc_of(v)]}: {i.name} — ask for "
+                     f"\"{'help' if _doc_of(v) == 'help-center' else 'spec'} {sec.group(1)}\")" for v, _l, i in hits[1:]]
+            return vol, lang, it, notes
+        return None
+    want = _forms(q)
+    if not want:
+        return None
+    for _doc, lang, vol in vols:
+        named = [it for it in vol.items.values() if it.kind != "section" and _forms(it.name) & want]
+        if named:
+            named.sort(key=lambda it: _DOC_KIND_RANK.get(it.kind or "", len(_DOC_KIND_RANK)))
+            return vol, lang, named[0], []
+    for _doc, lang, vol in vols:                                      # the fallback: a section's title
+        titled = [it for it in vol.items.values() if it.kind == "section" and _forms(it.name) & want]
+        if titled:
+            return vol, lang, titled[0], []
+    for _doc, lang, vol in vols:                                      # a title that holds the words
+        nq = _norm(q)
+        titled = [it for it in vol.items.values() if it.kind == "section" and
+                  re.search(rf"(?<!\w){re.escape(nq)}(?!\w)", _norm(it.name))]
+        if titled:
+            titled.sort(key=lambda it: len(it.name))
+            return vol, lang, titled[0], []
+    return None
+
+
+def run_doc_lookup(project_dir: Path, call: Any) -> Any:
+    """`doc_lookup <term>` — what a word, a section number or an id means in the MacroCOSM spec or the enough
+    manual (in the UI language): its atem, its definition, where it is defined and up to three sections that
+    mention it; "no entry" plainly. Read-only."""
+    import re
+    extra = getattr(call, "extra", None) or {}
+    q = " ".join(str(extra.get("term") or extra.get("id") or extra.get("section") or call.path or
+                     call.content or "").split())
+    if not q:
+        return _err("doc_lookup", "", "doc_lookup needs what to look up in a <term> tag: a word (stance), a "
+                                      "section number (18.4, or help 3) or an id (R:kind/emf.P.claim).")
+    try:
+        found = find_doc_entry(q)
+    except Exception as e:  # noqa: BLE001
+        log.exception("doc_lookup failed")
+        return _err("doc_lookup", q, f"the lookup failed ({type(e).__name__}).")
+    if found is not None:
+        vol, lang, it, notes = found
+        return _result("doc_lookup", q, True, _answer(vol, lang, it, notes))
+    vols = _DocVolumes()
+    loaded = list(vols)
+    if not loaded:
+        return _err("doc_lookup", q, "the documents could not be read: " + "; ".join(vols.problems))
+    vols = loaded
+    nq = _norm(q)
+    near = []
+    for _doc, lang, vol in vols:                                      # apropos: atems that use the words
+        for it in vol.items.values():
+            if isinstance(it.data.get("atem"), str) and re.search(rf"(?<!\w){re.escape(nq)}(?!\w)",
+                                                                  _norm(it.data["atem"])):
+                near.append(f"- {it.name}  [{it.id}] ({DOC_LOOKUP_TITLES[_doc_of(vol)]}) — {it.data['atem']}")
+            if len(near) >= 5:
+                break
+        if len(near) >= 5:
+            break
+    body = f"no entry for {q!r} in the MacroCOSM spec or the enough manual."
+    if near:
+        body += "\nlines that use the words:\n" + "\n".join(near)
+    return _result("doc_lookup", q, True, body)
+
+
+# ---------------------------------------------------------------------------
 # Registration
 # ---------------------------------------------------------------------------
 
@@ -967,11 +1286,12 @@ _RUNNERS = {
     "emf_derive": run_emf_derive,
     "atem": run_atem,
     "cosm_guide": run_cosm_guide,
+    "doc_lookup": run_doc_lookup,
 }
 
 
 def register() -> None:
-    """Add the five tools to `tools._DISPATCH` and `_TRACE_TOGGLE`. Idempotent,
+    """Add the six tools to `tools._DISPATCH` and `_TRACE_TOGGLE`. Idempotent,
     called once at `tools` import time; traced under the universal toggle,
     like every other tool that writes something of the user's."""
     t = _tools()
@@ -980,8 +1300,9 @@ def register() -> None:
         t._TRACE_TOGGLE.setdefault(tool_name, "trace_log_enabled")
 
 
-__all__ = ["EMF_MODEL_MAX", "LONG_FOR_A_TURN", "SIDE_EFFECT", "SKILL_NAME", "STORE_PREFIXES", "TEXT_MAX",
+__all__ = ["DOC_LOOKUP_DOCS", "EMF_MODEL_MAX", "LONG_FOR_A_TURN", "SIDE_EFFECT", "SKILL_NAME", "STORE_PREFIXES", "TEXT_MAX",
            "TOOL_NAMES", "TextTargetError", "atem_lines", "capped_tree", "catalog_after", "configure",
            "declaration_text", "guide_text", "inside_holotype", "load", "model", "readvisor_name", "register",
            "report_lines", "resolve", "run_atem", "run_cosm_guide", "run_cosm_lint", "run_cosm_read",
-           "run_emf_derive", "snapshot", "store_prefix", "text_target", "tidy_rel", "where"]
+           "run_doc_lookup", "run_emf_derive", "snapshot", "store_prefix", "text_target", "tidy_rel",
+           "ui_language", "find_doc_entry", "where"]

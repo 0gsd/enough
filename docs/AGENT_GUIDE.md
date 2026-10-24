@@ -1,10 +1,10 @@
-# enough — Agent Guide (v0.4.3)
+# enough — Agent Guide (v0.4.4)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
 > end-user-facing intro see the [README](../README.md), and for the full
-> user manual see [docs/HELP_CENTER.md](HELP_CENTER.md) (served in-app
-> via the help-center reference mode). This doc is dense,
+> user manual see [docs/HELP_CENTER.md](HELP_CENTER.md) (read in-app
+> in the docs viewer, `#docs-mode`, as a DocOES volume — 0.4.4). This doc is dense,
 > file-path-heavy, and assumes you can read Python and call tools.
 > The historical planning docs (girraph-plan, girraphs, merirmaid-plan,
 > cacheawl-plan, mode-stack-plan, help-system-plan) were folded into
@@ -71,6 +71,7 @@ Three locations that matter:
 | `~/enough/wikisink/` | Default wikisink location: the user's wikisink *data* (comments, overlays, preserved articles, rankings, run state) and — unless pointed elsewhere — the base `.zim` archive(s). Archives can live anywhere, external drives included; several installs can be registered at once. Hidden from the file-manager tree. | Managed via the 🚰 UI; don't hand-edit. |
 | `~/enough/canon/` | The machine-global **Canon** store (0.4.3; `~/enough/cacheawl/` before, renamed in place on first use — see "Canon"): root-level folders are *volumes* (plain kept-forever text, or cached replicas ingested from a path/URL/wikisink), each carrying a backend-owned `canon.cosm` catalog and a hidden `.canon.json`. Global wiki saves land in the `wiki/` volume; the dissolved infoworld folders became the `personal`/`public`/`wiki` volumes. Seam **`ENOUGH_CANON_ROOT`**, then the legacy `ENOUGH_CACHEAWL_ROOT`. Hidden from every project's file tree. | Managed via Canon mode + the readvisors' `canon_*` tools; `canon.cosm` and `.canon.json` are backend-owned. |
 | `~/enough/dict/` | FEED's state root (0.4.1), seam **`ENOUGH_DICT_ROOT`**: `feed.sqlite`, the official dictionary — **built** from the shipped `reflib/dict/` and disposable (rebuilt whenever the manifest digest moves) — and `user-dictionary.sqlite`, the user's own entries — **precious**: created on the first write, never rebuilt or deleted by code. Install-wide, not per project. See "The dictionary (FEED)". | `feed.sqlite` is the build's; the user DB changes only through the `dict_*` tools and `DELETE /api/dict/user/{word}`. Don't hand-edit either. |
+| `~/enough/docoes/` | DocOES's built doc volumes (0.4.4), seam **`ENOUGH_DOCS_ROOT`**: one `<doc>.<lang>.doc.cosm` per telling — `macrocosm-oes.en` (the spec, with Comprise's two chapters and the reference generated from the manifests) and `help-center.<lang>` ×6 (the manual + its bubbles) — **built** by `enough/docoes.py` from the install's own markdown and manifests the first time a route or `doc_lookup` asks, and rebuilt whenever the source digest moves (like `feed.sqlite`). Disposable, never committed, never in a file tree. Install-wide. See "DocOES". | Only `docoes.build()` writes it (atomic `os.replace`). **Every DocOES CLI run and every scratch server exports the seam** — an unseamed `python -m enough.docoes lint …` builds into the real `~/enough/docoes/`. |
 | `<project>/rness/` | The per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/**readvisors** (and into `~/enough/readvisors/` for the user's own); per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`, `project.json`; per-project state in `io/`, `requests/`, `knowledge/`. Composure-round additions: **`rness/readvisors/`** (was `roles/`, migrated by `skeleton._migrate_roles_to_readvisors`), **`rness/io/composure/`** (where new `.comp` files land — in `_EMPTY_DIRS`, so it is back-filled on every launch), **`rness/composure-forms/`** (project forms; **not** in `_EMPTY_DIRS` — created on the first save-as-form) and **`rness/knowledge/councils/`** (exported council transcripts, created by `council.py` on the first conclude). 0.4.3 adds **`rness/canon.cosm`**, the project's catalog (backend-owned, write-refused, written lazily — see "Canon"). | Edit to affect just this project (never `rness/canon.cosm`). |
 | `<dir>/.<name>.comp.comments.json` | A composure's comments sidecar, beside the `.comp` it belongs to. Backend-owned, hidden from the tree by the leading dot, carried along by `composure.move_sidecars()` on a rename. Both write doors refuse it by name. | Managed via the composure comment endpoints; don't hand-edit. |
 
@@ -90,7 +91,7 @@ Every Python module in `enough/`:
 
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
-| [enough/server.py](../enough/server.py) | ~5510 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, `GET /api/pal/status`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Since 0.4.3 also Canon's store routes (`/api/canon/*`, each pre-0.4.3 one aliased under `/api/cacheawl/*` by `_canon_route`), the derivation routes and their `CanonJobs` table, the MacroCOSM read routes (`/api/cosm*`, `/api/macrocosm/manifests`, `/api/macrocosm-spec`), the `canon:`/`cacheawl:` path prefixes (`STORE_PREFIXES`) and the project-catalog task in the lifespan. Mounts the composure, council and dictionary routers in one `include_router` call each, and starts FEED's background build in the lifespan (`dictionary.ensure_built(background=True)`; `cancel_build()` on shutdown). Owns `GET /api/intro` and the intro match in `POST /api/chat` (see "The readvisor panel"). Owns the `/pal` prefix branch in `POST /api/chat` and `_render_pal_bubbles`. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. | `create_app()`, `_drive_message()`, `_run_turn(session, message, pal=, log_user=)`, `_render_pal_bubbles()`, `Session.pal_turn`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `STORE_PREFIXES`, `_canon_route()`, `_text_target()` (delegates to `canon_tools.text_target`), `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
+| [enough/server.py](../enough/server.py) | ~5510 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, `GET /api/pal/status`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Since 0.4.3 also Canon's store routes (`/api/canon/*`, each pre-0.4.3 one aliased under `/api/cacheawl/*` by `_canon_route`), the derivation routes and their `CanonJobs` table, the MacroCOSM read routes (`/api/cosm*`, `/api/macrocosm/manifests`, `/api/macrocosm-spec`), the `canon:`/`cacheawl:` path prefixes (`STORE_PREFIXES`) and the project-catalog task in the lifespan. Mounts the composure, council and dictionary routers in one `include_router` call each, and starts FEED's background build in the lifespan (`dictionary.ensure_built(background=True)`; `cancel_build()` on shutdown). Owns `GET /api/intro` and the intro match in `POST /api/chat` (see "The readvisor panel"). Owns the `/pal` prefix branch in `POST /api/chat` and `_render_pal_bubbles`. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. Since 0.4.4 the **agent-free boundary** too: `AgentFreeGate`, `AGENT_FREE_PATHS`/`AGENT_FREE_PREFIXES`/`AGENT_FREE_OPEN`, the switch in `POST /api/ui-config`, and `GET /api/canon/ingest-caps` (see "Agent-free mode"). | `create_app()`, `_drive_message()`, `_run_turn(session, message, pal=, log_user=)`, `_render_pal_bubbles()`, `Session.pal_turn`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `STORE_PREFIXES`, `_canon_route()`, `_text_target()` (delegates to `canon_tools.text_target`), `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
 | [enough/prompt.py](../enough/prompt.py) | ~1865 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/readvisor/paradigm enumeration + toggle-state helpers, the generated identity preface, the chief readvisor's name, and the gated tool-doc blocks. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt(project_dir, readvisors=, profile=, pal=)`, `readvisor_identity()`, `identity_preface()`, `chief_name()` / `valid_chief_name()` / `CHIEF_NAME_DEFAULT` / `CHIEF_NAME_MAX`, `readvisor_shape()`, `tool_instructions(project_dir, pal=)`, `TOOL_INSTRUCTIONS` / `COMPOSURE_TOOL_INSTRUCTIONS` / `READVISORY_TOOL_INSTRUCTIONS` / `DICTIONARY_TOOL_INSTRUCTIONS` / `CANON_TOOL_INSTRUCTIONS` (+ its gate `_macrocosm_available()`) / `PAL_TOOL_INSTRUCTIONS` / `PAL_TURN_INSTRUCTION`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()` / `_readvisors_dir()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()`, `HOME_PARADIGM` / `ensure_multipurpose_file()` (the `default` → home migration) |
 | [enough/composure.py](../enough/composure.py) | ~3060 | The composure core (0.3.5): the `.comp` HTML5 parser/serializer, the sanitizer, markdown ⇄ rich text, the node-level op vocabulary (the only way content changes), `place_module`/`arrange`/`estimate_height`, the JSON document model the canvas renders from, the comments sidecar, the forms registry, the outline→composure converter, and the write-door denial. **No FastAPI import** — exercisable with no web layer. See "Composures". | `loads()` / `dumps()`, `model()`, `apply_ops()`, `path_lock()`, `OP_NAMES` / `SOURCES` / `MODULE_TYPES` / `BG_SWATCHES` / `SHIPPED_FORMS` / `CAPS`, `place_module()`, `estimate_height()`, `write_denial()`, `comments_path()` / `load_comments()` / `move_sidecars()`, `parse_outline()` / `outline_ops()` / `from_outline()`, `ComposureError` |
 | [enough/composure_api.py](../enough/composure_api.py) | ~520 | HTTP translation only: `build_router(project_dir, resolve_path, emit)` → the `APIRouter` `create_app` mounts. Every `/api/composure*` route, the comments CRUD, `link-preview`, `webframe/refresh`, and the `composure` SSE event. | `build_router()`, `EVENT` |
@@ -104,6 +105,7 @@ Every Python module in `enough/`:
 | [enough/dictionary_tools.py](../enough/dictionary_tools.py) | ~340 | The four readvisor FEED tools; `register()` wires them like `pal_tools`. Writes reach only the user DB and fire `dict_changed`. **No toggle** — the documentation is what is gated. | `TOOL_NAMES`, `SIDE_EFFECT`, `register()`, `run_dict_lookup()` / `run_dict_add_entry()` / `run_dict_update_entry()` / `run_dict_guide()`, `render_entry()`, `fields_from_call()` / `parse_form()`, `guide_text()` |
 | [enough/intro.py](../enough/intro.py) | ~205 | The brief introduction (0.4.1): the text (`defaults/intro.md`, translations at `static/i18n/<lang>/intro.md`), the whole-message match `/api/chat` answers with no model turn, the `show_intro` tool and its `intro` side effect, and the reload re-render. | `text_for()` / `path_for()` / `english_path()`, `is_intro_request()` / `INTRO_PHRASES` / `INTRO_COMMAND` / `normalize()`, `bubble()`, `run_show_intro()`, `render_tool_result()` / `is_intro_text()`, `set_language_source()`, `register()` |
 | [enough/skillaudit.py](../enough/skillaudit.py) | ~1020 | First-use audit of untrusted skills (0.2.2). Trust classification (symlink into *an* enough install's `defaults/skills/` = trusted — this install or a sibling one, since 0.2.7), the content fingerprint, the `verdict.json` sidecar, both audit passes (deterministic `payload_scanner.py` + a single non-streaming LLM completion — since 0.4.3 through `llm.complete(cloud_gate=False)`; `_complete` / `_message_text` / `_completion_budget` survive as thin wrappers for its tests), the in-flight registry, and the guarded toggle. Progress on the `skill-audit` SSE event. | `is_trusted()`, `fingerprint()` / `skill_fingerprint()`, `skill_state()`, `set_skill_enabled_guarded()`, `SkillAuditRefused`, `audit_skill()` / `audit_and_enable()`, `run_llm_audit()` (module-level test hook), `quarantine_untrusted()`, `trust_override()`, `read_verdict()` / `write_verdict()` |
+| [enough/agent_free.py](../enough/agent_free.py) | ~85 | Agent-free mode (0.4.4): the one reader of the machine-global `agent_free` switch in ui.json (honours `ENOUGH_UI_CONFIG`; stat-cached; on only for a literal `true`) and the 409 sentence. Stdlib only, imports nothing from enough — `llm`, `cloud`, `supervisor`, `preflight`, `tools` and `server` all ask it. See "Agent-free mode". | `enabled()`, `value()`, `ui_config_path()`, `detail()`, `KEY`, `REASON` |
 | [enough/broker.py](../enough/broker.py) | ~440 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
 | [enough/tools.py](../enough/tools.py) | ~1825 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers, the three `canon_*` store tools), the tool-call XML parser, the dispatch table. Six import-time `register()` calls at the bottom fold in the composure, readvisor, pal, dictionary, MacroCOSM (`canon_tools`) and intro tools. `read_file` alone may follow a `rness/` symlink into a shipped root, read-only (`_shipped_read_target`, 0.4.1). `fetch_and_cache()` is the shared fetch pipeline `run_fetch_url` and the webframe refresh both render. | `_DISPATCH` (~line 1680), `_TRACE_TOGGLE` (~line 1709), `execute()`, `_safe_join()` / `_shipped_read_target()`, `parse_tool_calls()`, `fetch_and_cache()`, `ToolResult.side_effects`, `_CLOUD_KEY_EXFIL_PATTERNS` |
 | [enough/project_meta.py](../enough/project_meta.py) | ~300 | `rness/project.json`: the project's nice name + description, the `ui` block (`ui_scale`, `text_scale`, `readvisor_panel`) and the `composure` block (`launch`, `path`, `form`, `last`). Every reader gets a fully populated, validated view; a garbage value reads as the default rather than raising. | `load()`, `save()`, `save_ui()`, `save_composure()`, `touch_composure()` |
@@ -124,13 +126,14 @@ Every Python module in `enough/`:
 | [enough/canon.py](../enough/canon.py) | ~2300 | Canon (0.4.3; the cacheawl store, moved and extended): volume CRUD, path/URL/wikisink **ingest** (with the Holotype privacy filter), the `canon.cosm` volume catalogs and the project catalog `rness/canon.cosm`, reconcile, the on-demand merirmaid mirror, the catalog/meta write-guards, transfer (copy/move), the one-time store-folder rename, the EMF-twin listing rules (`emf_state` is the one fresh/stale rule), and the launch-time `infoworld` migration. Root `~/enough/canon/` (`ENOUGH_CANON_ROOT`, then `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store. Still exports the generic folder→flowchart walker `home.py` builds project maps with. See "Canon". | `root()`, `migrate_store_folder()`, `create_volume()` / `list_volumes()` / `volume_tree()` / `rename_volume()` / `delete_volume()` / `require_volume()`, `run_ingest()`, `build_catalog()` / `regenerate_catalog()` / `project_catalog(project_dir, *, write=)`, `reconcile()` / `reconcile_all()`, `build_mirror()`, `folder_flowchart()`, `is_catalog_file()` / `catalog_write_denial()`, `emf_twin_path()` / `is_emf_twin()` / `emf_state()` / `twin_header()`, `is_holotype_folder()`, `slug()` / `item_slugs()` / `file_kind()`, `transfer()`, `migrate_infoworld()`, `CanonError` / `CanonNotFound`, `CATALOG_ITEM_CAP` |
 | [enough/cacheawl.py](../enough/cacheawl.py) | 77 | **A compatibility shim, for one release** (0.4.3): explicit re-exports of every public name of the old module mapped onto `canon` (`box_dir` → `volume_dir`, `regenerate_mirror` → `regenerate_catalog`, `mirror_write_denial` → `catalog_write_denial`, the `*cachebox*` CRUD → `*_volume`, `CacheawlError = CanonError` …), plus the three private names `tests/test_cacheawl*.py` reach for. New code imports `canon` | — |
 | [enough/macrocosm.py](../enough/macrocosm.py) | ~2150 | The MacroCOSM OES reference reader (0.4.3): the COSM YAML loader, manifests and the registry, volumes, paths/URIs, references, the sixteen generic checks, Mermaid lenses and the text tree, a CLI. **PyYAML + stdlib only, imports nothing from enough** — vendorable as one file. See "MacroCOSM". | `yaml_load()` / `dump()` / `sniff_declaration()`, `Registry` / `default_registry()` / `load_manifest()`, `load_volume()` → `Volume`, `parse_path()` / `resolve_path()` / `qualified_uri()`, `resolve_ref()`, `lint()` → `Report`, `lenses()` / `to_mermaid()` / `to_text_tree()`, `Refusal` (falsy), `CHECKS`, `DEFAULT_MANIFEST_DIR` |
+| [enough/docoes.py](../enough/docoes.py) | ~2250 | DocOES (0.4.4): a markdown document enumerated as a `doc/1` volume — sections, terms, examples, decisions, Comprise's chapters, the help bubbles, and the reference (`R:` items) generated from the MiniCOSM manifests; build-on-digest into `ENOUGH_DOCS_ROOT`; the byte-for-byte round trip; inventories and cross-volume refs; DocOES's seven checks; a CLI. stdlib + PyYAML + `enough.macrocosm`. See "DocOES". | `DOCUMENTS`, `BUBBLE_DOCUMENT`, `tellings()`, `docs_root()`, `ensure_built()` / `is_fresh()` / `build()` / `load_built()`, `catalog_for()`, `compile_doc()`, `inventory()` / `resolve_xref()`, `lint_doc()`, `atem_problems()`, `DocsUnavailable` |
 | [enough/canon_derive.py](../enough/canon_derive.py) | ~2220 | The derivation engine (0.4.3): text → EMF twin, EMF → markdown, text or passage → atem, pins. **Pure functions, no server imports**; every model call through an injected `complete`. See "EMF twins and atems". | `derive_emf()`, `derive_atem()`, `compile_short()` / `compile_text()`, `record_short()`, `short_path()` (old name `compiled_path`), `default_order()` / `source_path()`, `pin_atem()` / `next_atem_id()` / `set_file_atem()`, `read_source()`, `write_atomic()` / `write_twin()`, `twin_path()` / `twin_state()`, `candidate_terms()` / `entity_candidates()` / `chunk()`, `DeriveCancelled` / `DeriveError`, `TEXT_SUFFIXES` |
 | [enough/canon_prompts.py](../enough/canon_prompts.py) | ~115 | The derivation prompts, plain strings (`.format` only); test-asserted to name the six stances, rule out pronouns, keep `EMF_SYSTEM` under 2,000 chars and carry the owner's atem definitions verbatim | `EMF_SYSTEM` / `EMF_USER` / `EMF_CONTINUE` / `EMF_RESTART` / `EMF_RETRY` / `EMF_REPAIR`, `ATEM_SYSTEM` / `ATEM_USER` / `ATEM_WHOLE_USER`, `COMPILE_SYSTEM` / `COMPILE_USER` |
 | [enough/canon_jobs.py](../enough/canon_jobs.py) | ~260 | The derivation job table (convert's shape): one writing job per file, the generation-lock rule for model-mode jobs, cooperative cancel, SSE event `canon` | `CanonJobs` (`start` / `snapshot` / `cancel` / `active` / `holding` / `record`), `JobContext`, `EVENT`, `KINDS` |
-| [enough/canon_tools.py](../enough/canon_tools.py) | ~985 | The five MacroCOSM readvisor tools (`cosm_read`, `cosm_lint`, `emf_derive`, `atem`, `cosm_guide`), `text_target` — the derivation refusals the routes share — and the `configure()` seam. `register()` wires them at `tools` import time. Never takes the generation lock (see "EMF twins and atems") | `TOOL_NAMES`, `register()`, `configure(llm_url=, jobs=)`, `text_target()` / `TextTargetError`, `catalog_after()`, `run_cosm_read()` … `run_cosm_guide()`, `STORE_PREFIXES`, `TEXT_MAX` / `EMF_MODEL_MAX` |
+| [enough/canon_tools.py](../enough/canon_tools.py) | ~985 | The six MacroCOSM readvisor tools (`cosm_read`, `cosm_lint`, `emf_derive`, `atem`, `cosm_guide`, and since 0.4.4 `doc_lookup`), `text_target` — the derivation refusals the routes share — and the `configure()` seam. `register()` wires them at `tools` import time. Never takes the generation lock (see "EMF twins and atems") | `TOOL_NAMES`, `register()`, `configure(llm_url=, jobs=)`, `text_target()` / `TextTargetError`, `catalog_after()`, `run_cosm_read()` … `run_cosm_guide()`, `run_doc_lookup()` / `find_doc_entry()`, `STORE_PREFIXES`, `TEXT_MAX` / `EMF_MODEL_MAX` |
 | [enough/home.py](../enough/home.py) | ~805 | The home screen (0.2.5): the project **registry** (`~/enough/config/projects.json`, seam `ENOUGH_PROJECTS_STATE`), the ¶/W/C counters ported from the top bar, the fingerprint cache (which since 0.2.8 also snapshots the `rness/project.json` display name/description so an unreachable folder's row keeps its nice name — live reads still win), seeding from the shell's `desktop.json` MRU (temp-dir paths — chiefly the wizard's `$TMPDIR/enough-onboarding` scratch — are refused, skipped, and pruned when the registry is durable, 0.2.8), the project map (via `canon.folder_flowchart`; its skip rule `_mirror_skip` is also what the project catalog enumerates), the add-guards + the osascript folder chooser, and both halves of the open/close handoff. Imports `server` **lazily, inside functions** — `server` imports `home` at module level, and that is the cycle-breaker. | `projects_state_path()` / `config_dir()` / `handoff_path()`, `read_registry()` / `save_registry()` / `register()` / `touch_opened()` / `set_hidden()`, `seed_from_desktop()`, `count_text()` / `fingerprint_of()` / `refresh_entry()` / `list_projects()`, `build_project_mirror()`, `check_addable()` / `add_project()` / `choose_folder()`, `write_handoff()` / `read_handoff()`, `exec_argv()` |
 | [enough/logger.py](../enough/logger.py) | small | Stdlib logging setup. | — |
-| [enough/static/index.html](../enough/static/index.html) | ~42800 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), **the readvisor panel** (`#readvisor-panel`, the third `.layout` column — the conversation lives here now, not in a chat home pane), **the composure canvas** (`#composure` at the base layer: `COMP`, `COMP_TOOLS`, `COMP_MODULE_RENDERERS`, `COMP_FORM_BEHAVIORS`, ~126 `comp*` functions), **the composure base indicator + peek** (`html[data-comp-peek]`), SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode (+ lens entries), Canon split-view mode (`#canon-mode`, `cn*`), **the cosm viewer** (`#cosm-mode`, `COSM`, `cosm*`), **the MacroCOSM spec viewer** (`#cosmspec-mode`, `CS_CTX`), **the Canon chip + EMF face + atem card + job toasts** (`CANON`, `EMF_FACE`, `canon*`, `emfFace*`, `#atem-modal`, `atemCard*`), the home frame + project map + handoff overlays (gated on `IS_HOME` / `body[data-mode]`), SVG icon pipeline (`data-icon`/`iconSrc`), MODE STACK registry, confirmOverlay, **the shared modal a11y helper** (`MODAL`, `modalSync()`), **the find bar** (`findBarAttach`, `FIND_BARS`), **dictionary mode** (`#dict-mode`, `DICT`, `dict*`), **the word data lightbox** (`#wdl-modal`, `WDL`, `wdl*`) and the **"dictionary entry" menu** (`#dict-ctx-menu`). **The five per-mode chat pills are gone** (review / edit / merirmaid / wiki / cacheawl, as Canon was then called) — there is one composer now, `#message` in the panel |
+| [enough/static/index.html](../enough/static/index.html) | ~46700 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), **the readvisor panel** (`#readvisor-panel`, the third `.layout` column — the conversation lives here now, not in a chat home pane), **the composure canvas** (`#composure` at the base layer: `COMP`, `COMP_TOOLS`, `COMP_MODULE_RENDERERS`, `COMP_FORM_BEHAVIORS`, ~126 `comp*` functions), **the composure base indicator + peek** (`html[data-comp-peek]`), SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode (+ lens entries), Canon split-view mode (`#canon-mode`, `cn*`), **the cosm viewer** (`#cosm-mode`, `COSM`, `cosm*`), **the docs viewer** (`#docs-mode`, `DOCS`, `DOCS_DENSITIES`, `DOCS_FAB`, `docs*` — the help center and the MacroCOSM spec at three densities, 0.4.4; it replaced ref mode and the spec viewer), **agent-free mode** (`AGENT_FREE`, `agentFree*`, the CSS block keyed on `html[data-agent-free]`), **the Canon chip + EMF face + atem card + job toasts** (`CANON`, `EMF_FACE`, `canon*`, `emfFace*`, `#atem-modal`, `atemCard*`), the home frame + project map + handoff overlays (gated on `IS_HOME` / `body[data-mode]`), SVG icon pipeline (`data-icon`/`iconSrc`), MODE STACK registry, confirmOverlay, **the shared modal a11y helper** (`MODAL`, `modalSync()`), **the find bar** (`findBarAttach`, `FIND_BARS`), **dictionary mode** (`#dict-mode`, `DICT`, `dict*`), **the word data lightbox** (`#wdl-modal`, `WDL`, `wdl*`) and the **"dictionary entry" menu** (`#dict-ctx-menu`). **The five per-mode chat pills are gone** (review / edit / merirmaid / wiki / cacheawl, as Canon was then called) — there is one composer now, `#message` in the panel |
 
 `defaults/` ships templates that get copied or symlinked into project
 skeletons by `skeleton.py`:
@@ -150,11 +153,16 @@ skeletons by `skeleton.py`:
   (`blank` `cards` `scaffold` `journal` `council`). **Generated**, not
   hand-written — `scripts/gen_composure_forms.py` (`--check` verifies)
 - `defaults/policies/*.md` — operating policies (symlinked)
-- `defaults/cosm/manifests/*.manifest.cosm` — the four MiniCOSM manifests
-  (0.4.3) the MacroCOSM reader loads, read in place from the install, never
+- `defaults/cosm/manifests/*.manifest.cosm` — the five MiniCOSM manifests
+  (0.4.3; `doc` joined in 0.4.4) the MacroCOSM reader loads, read in place from the install, never
   copied into a project; `comprise.manifest.cosm` is synced from comprise-dev
   and never edited here. `defaults/cosm/NOTICE.md`: all rights reserved, not
   Apache (see "MacroCOSM" and "License")
+- `defaults/cosm/chapters/` — Comprise OES 1's specification and paradigm map
+  (0.4.4), synced read-only by `scripts/sync_cosm.py` with a `manifest.json`
+  (source commit, sha256 each) and a hand-written `NOTICE.md`: chapters of the
+  spec's doc volume. Comprise's prose, never enough's voice (exempt from the
+  legacy-vocabulary test); never edit it here
 - `defaults/models.json` — local-model registry template
 - `defaults/openrouter-config.json` — cloud-slot metadata template
 - `defaults/ui-config.json` — UI prefs template (theme, font, `ui_language`,
@@ -180,7 +188,7 @@ unit tests: `cargo test` in `desktop/src-tauri/`.
 | [desktop/src-tauri/src/http.rs](../desktop/src-tauri/src/http.rs) | ~60-line loopback-only HTTP/1.1 client (no client crate) |
 | [desktop/src-tauri/src/bundled.rs](../desktop/src-tauri/src/bundled.rs) | where the bundle's payload lives (uv sidecar, llama.cpp, source snapshot), derived from `current_exe()` |
 | [desktop/src-tauri/src/onboarding.rs](../desktop/src-tauri/src/onboarding.rs) | the first-run wizard's six IPC commands + the launch thread's wait loop |
-| [desktop/src-tauri/build.rs](../desktop/src-tauri/build.rs) | stages the source snapshot (pyproject, uv.lock, `enough/`, `defaults/`, licenses, `docs/HELP_CENTER.md` — the single file, so gitignored plan docs never ship; without it the .app's help center 404'd pre-0.2.8 — since 0.4.3 `docs/MACROCOSM_OES.md` beside it for the spec viewer, and, since 0.4.1, `reflib/dict`, FEED's ~380 MB text form: that subfolder only, not `reflib/`) into the bundle on every `cargo build`; since 0.2.7 also stages `enough/static/enough-loader_1-2.svg` into `desktop/ui/` (gitignored there) so the loading screen can show it |
+| [desktop/src-tauri/build.rs](../desktop/src-tauri/build.rs) | stages the source snapshot (pyproject, uv.lock, `enough/`, `defaults/`, licenses, `docs/HELP_CENTER.md` — the single file, so gitignored plan docs never ship; without it the .app's help center 404'd pre-0.2.8 — since 0.4.3 `docs/MACROCOSM_OES.md` beside it, which DocOES enumerates for the docs viewer (0.4.4), and, since 0.4.1, `reflib/dict`, FEED's ~380 MB text form: that subfolder only, not `reflib/`) into the bundle on every `cargo build`; since 0.2.7 also stages `enough/static/enough-loader_1-2.svg` into `desktop/ui/` (gitignored there) so the loading screen can show it |
 | [desktop/ui/loading.html](../desktop/ui/loading.html) | the shell's own page; static, zero Tauri IPC exposed to the enough UI. Since 0.2.7 it shows the real loader graphic (mascot + wordmark, the same SVG `enough/static/loader.html` uses) instead of the wordmark set in type |
 | [desktop/ui/onboarding.html](../desktop/ui/onboarding.html) | the first-run wizard: welcome → environment → models → extras. Drives the *existing* `/api/models*` endpoints through the Rust proxy; shares nothing with `index.html` |
 | [desktop/src-tauri/tauri.conf.json](../desktop/src-tauri/tauri.conf.json) | `bundle.macOS.dmg` (0.4.1): a 660x400 window, enough.app at (180,170), Applications at (480,170), and a plain background PNG (`desktop/src-tauri/dmg/background.png`) — the background is what makes the bundler park hidden items off-window. [scripts/check_dmg_layout.py](../scripts/check_dmg_layout.py) `PATH.dmg` mounts a built image read-only, decodes its `.DS_Store` (stdlib only) and fails on a wrong position, a wrong window size, or any dotfile with an icon slot inside the window — the 0.4.0 DMG, built while Finder showed hidden files, gave `.VolumeIcon.icns` a slot and shoved both real icons |
@@ -677,6 +685,105 @@ The endpoint validates the three gates (toggle off, key present, key
 healthy) and either persists the selection or returns a 400 with the
 appropriate `broker.denial_*` message.
 
+### Agent-free mode (0.4.4)
+
+Everything above is **free-agent mode**. One machine-global switch turns on
+**agent-free mode**: no model at all (docs/docoes-044-plan.md §13). It is
+`agent_free` in `~/enough/config/ui.json` (shipped `false` in
+`defaults/ui-config.json`; the `ENOUGH_UI_CONFIG` seam, so no new state
+location), read by [agent_free.py](../enough/agent_free.py) — stdlib only,
+one stat per ask, on only for a literal `true`. `POST /api/ui-config
+{"agent_free": bool}` writes it (`GET` always carries the effective value),
+and the boot UI state (`BOOT_UI_STATE`) carries it for first paint.
+
+- **Boot.** `__main__` and the lifespan read it before any model would
+  start: no adopt, no launch, no preflight; `--no-supervise` skips its
+  llama-server check. `LlamaSupervisor.bootstrap()` is a no-op, `_launch()`
+  and `switch()` raise, `status()` answers `mode: "agent-free"`.
+- **The runtime toggle.** On: running councils pause, the preflight is
+  skipped, `supervisor.stop()` (owned or adopted, like a switch). Off:
+  `supervisor.bootstrap()` — the ordinary startup choice. Each flip emits
+  the `agent-free` SSE event `{agent_free, supervisor}`. Home saves the
+  switch and has no model to stop.
+- **The gate.** `AgentFreeGate` (raw ASGI, beside `ModeGate`; table
+  `AGENT_FREE_PATHS` / `AGENT_FREE_PREFIXES` / `AGENT_FREE_OPEN`) answers
+  409 `{"detail": "agent-free mode: …"}` to `POST /api/chat` (every
+  message, `/pal` and `/intro` included), `/api/model`,
+  `/api/cloud/health-check`, **`/api/transcribe`** (whisper is a model too)
+  and every `POST /api/council/*` but `pause`; `POST /api/skills/toggle`
+  answers 409 itself for a toggle-on that needs the first-use audit.
+  Behind it, the backstops: `llm.complete`/`stream_chat` raise
+  `LLMUnavailable("agent-free")`, `llm.reachable()` answers `(False,
+  "agent-free")` without probing, `cloud.gate_status()` is shut (so `/pal`,
+  `ask_pal`, `cloud_pipeline` and `/api/pal/status` say so), and
+  `tools.execute` refuses. **Open while agent-free**: model downloads,
+  their cancel and deletes; cloud key storage (`set-key` stores, its health
+  check skipped), `clear-key`, `set-model`; `GET /api/reset`, `GET
+  /api/intro`, `GET /api/stream`; council reads and `pause`; Canon (ingest
+  included) and the derivations' rules path; every `/api/docs*` and
+  `/api/cosm/inline*` route.
+- **What still works.** Everything without a model: composures, the
+  dictionary, wikisink, Canon (incl. `POST /api/canon/ingest`, which the
+  ingest bar calls directly after a confirmation built from `GET
+  /api/canon/ingest-caps`), convert, paginate, girraph/merirmaid, the cosm
+  viewer, model downloads and deletes, setting a cloud key (its check is
+  skipped). Derive / atem / compile take their rules path — `llm.reachable`
+  answers `(False, "agent-free")` without probing — and their jobs and
+  results carry `reason: "agent-free"` beside `mode: "rules"`. A skill
+  toggle-on that needs the first-use audit is a 409.
+- **Payloads.** `/api/llm-status` → `{mode: "agent-free", ready: false,
+  agent_free: true, fits: null, preflight: "skipped", …}`; `/api/models` →
+  `agent_free: true` and `supervisor.mode: "agent-free"`. Tests:
+  `tests/test_agent_free.py`.
+- **The UI (index.html, U-A).** The slider is one control drawn twice:
+  `#am-ui-switch` (in `#am-ui-item`, the UI window's controls row, also on
+  home) and `#am-model-switch` (in `#am-model-row`, the model window, with
+  `#am-model-reason`) — `button.am-switch[role=switch][aria-checked]` holding
+  `.am-track > .am-knob` and four word spans (`agentmode.free` /
+  `agentmode.agent`, the two words; `agentmode.off` / `agentmode.on`, the two
+  phrases). `agentFreeUsesPhrases()`: when, whitespace aside, `off` ==
+  free+agent and `on` == agent+free, the two words swap (CSS `order` + one
+  FLIP transition, `agentFreePaintSwitch`); otherwise the whole phrase shows.
+  en and ja swap; de, fr, es and zh use phrases (0.4.4's translator pass kept
+  that: none of the four can swap the words grammatically). The knob rides
+  with "free": left off, right on (owner's ruling). **The page state**:
+  `AGENT_FREE` / `agentFreeOn()`; `agentFreeApply(on)` — the one door, never
+  POSTs: sets `<html data-agent-free>`, closes the readvisor panel without
+  saving it (`AF_RV_PRIOR` restores it), releases a pinned council, repaints
+  the badge, the model window and both switches, fires the `document` event
+  `agent-free`; `agentFreeToggle()` — the click: applies at once, then `POST
+  /api/ui-config {"agent_free": bool}` (rolled back on failure), and off →
+  `agentFreeWaitForModel()` polls `/api/llm-status`; `agentFreeSet(bool)`
+  (window; the harness's). First paint: the head script sets the attribute
+  from `BOOT_UI_STATE.agent_free`. Followers: SSE `agent-free` and
+  `/api/llm-status`'s `agent_free`. **Every hidden site is in one CSS block,
+  "Agent-free mode", keyed on `html[data-agent-free]`** (plus the JS braces:
+  `rvSetState`, `rvAsk`, `introAsk`, `trySubmit`, the chat form's capture
+  submit, the ⌘/ ⇧⌘/ ⌘K ⌘↵ keys, `compCouncilIs`, `ctxNoticeWanted`,
+  `canonBusyPaint`, `wdlMissingHTML`, the council form skipped in "new from
+  form…"; the keyboard rows marked `[data-af-hide]`) — add a new site
+  there, not elsewhere. The model window greys its running controls
+  (`.am-greyed`, `agentFreePaintModelWindow`); the home screen shows
+  `#home-agentfree`. **Canon's ingest bar**: `submitCanonIngest()` →
+  `submitCanonIngestDirect()` while on — a relative `path:` made absolute
+  against the project, `GET /api/canon/ingest-caps`, then
+  **`confirmOverlay({lines: true})`** (a message shown as lines,
+  `#confirm-message-text.confirm-lines`; every other confirm unchanged),
+  `cnIngestVolumeName` (the empty volume you stand in, else one named after
+  the source, ` 2`/` 3` on a clash), `POST /api/canon/ingest`,
+  `cnIngestWatch(box)` (a toast to the end). Derivations keyed on `reason ===
+  "agent-free"` say `canon.agentFree`; the twin face and the viewer key off
+  the twin's `derived.mode: rules` plus `agentFreeOn()`. D3 reworded the two
+  merirmaid flashes (`mm.flash.noNodeAgentFree` / `noPatchAgentFree`) and
+  wikisink's update toast (`wiki.toast.updateStartedAgentFree`) for the
+  agent-free state; the broker window and the OpenRouter wizard stay as they
+  are (owner's ruling). The owner's word rule: "agent" appears only in the
+  slider's two states and its tooltip (`tests/test_vocabulary.py`'s
+  allowlist holds each language's two phrases). **uicheck** screens
+  `ui-modal-agentfree`, `project-agentfree`, `model-modal-agentfree`,
+  `canon-ingest-agentfree`, `home-agentfree` (steps `AF_ON` / `AF_OFF`
+  through `agentFreeSet`); scenario `agentfree-toggle`.
+
 ---
 
 ## OPRO-API (the cloud slot) — full architecture
@@ -1039,6 +1146,7 @@ project need no switch, and a write into the store rides on the existing
 | `emf_derive` | `canon_tools.run_emf_derive` | `canon_enabled` for a store path only; `text_target`'s refusals (no Holotypes, no `.cosm`, no catalogs, text kinds only, never over a non-EMF `X.cosm`); refused over `TEXT_MAX` (24 000 chars); **rules scaffold over `EMF_MODEL_MAX` (6 000)** even with a model; "already fresh" unless `<force>yes</force>`; holds the file's claim, **never the generation lock**; fires `canon` |
 | `atem` | `canon_tools.run_atem` | as `emf_derive` for `<path>` (writes the twin's `atem:`, a minimal twin when none); `<text>` writes nothing; model up to `TEXT_MAX`; fires `canon` on a write |
 | `cosm_guide` | `canon_tools.run_cosm_guide` | none; no tags. The install's `macrocosm-oes` SKILL.md, for a model whose skill is off |
+| `doc_lookup` | `canon_tools.run_doc_lookup` | none (it reads); `<term>` (or `<id>`, `<section>`): a word, a section number (`18.4`, `help 3`) or an id → its atem, definition, where it is defined and up to three sections that mention it, from the spec then the manual in the UI language; a term that names a closed list adds the list's values and meanings (0.4.4). Builds a doc volume on first use (see "DocOES") |
 | `read_composure` | `composure_tools.run_read_composure` | `composure_enabled`; `.comp` path. No `<module>` → the outline (three header lines + one line per module). With `<module>` → that module as markdown, cached to `rness/io/input/` over `CACHE_OVER_CHARS` = 4000 |
 | `new_composure` | `composure_tools.run_new_composure` | `composure_enabled`; `<form>` from `SHIPPED_FORMS` + project forms. Writes the file **immediately** (unlike the canvas's lazy create) |
 | `comp_add_module` | `composure_tools.run_comp_add_module` | `composure_enabled`; omit geometry and let `place_module` choose |
@@ -1695,7 +1803,7 @@ phase; `_default` handles any form with no entry, including project forms).
 The backend contracts for all of them are final and documented above.
 
 The base layer also owns the **peek**: `html[data-comp-peek="1"]` hides the
-twelve stacked mode roots (0.4.3 added `#cosm-mode` and `#cosmspec-mode`)
+eleven stacked mode roots (`_ALL_MODE_ROOTS`; 0.4.3 added `#cosm-mode`, and 0.4.4's `#docs-mode` replaced `#ref-mode` and the 0.4.3 `#cosmspec-mode`)
 so the canvas shows through, and Esc restores them
 before it starts popping the stack. `_modeRender()` appends a permanent
 base square to `#mode-stack`, rightmost, **with no exit ribbon** (see "What
@@ -2818,11 +2926,11 @@ an unknown value is an open question (`{pending: "<the question, for whoever can
 never a guess. The spec is [docs/MACROCOSM_OES.md](MACROCOSM_OES.md), v0.0.1:
 §2 is the model on one page, §4 the file format, §5 the declaration, §11
 ids/paths/URIs, §12 the checks, §13 the manifest, §14 renderers and lenses,
-§18 the four MiniCOSMs enough ships, each with an example (complete files
-for cosm, canon and emf; a Holotype is a folder, so comprise's is a
+§18 the five MiniCOSMs enough ships, each with an example (complete files
+for cosm, canon, emf and doc; a Holotype is a folder, so comprise's is a
 fragment). This
 section summarizes and points; read the spec before you change the format, a
-manifest or the reader. User-facing doc: HELP_CENTER §13 (the spec viewer)
+manifest or the reader. User-facing doc: HELP_CENTER §13 (the dialects; §13.1–13.2 the docs viewer)
 and §12.3 (Holotypes and other `.cosm` files). Comprise (comprise-dev) is
 the reference implementation of the first MiniCOSM and stays read-only from
 here.
@@ -2906,8 +3014,9 @@ Exit 0 ok, 1 errors / refused / nothing there, 2 an unknown lens.
 | `cosm.manifest.cosm` | legacy `cosm: 0.2` / `0.3` and `opi:` → `cosm/0` | a folder of `.cosm` files — the standalone product trees the context-ontology skill writes — module P, bare ids | written in enough |
 | `canon.manifest.cosm` | `oes: canon/1` | one file, `canon.cosm` or `rness/canon.cosm`; module V | written in enough |
 | `emf.manifest.cosm` | `oes: emf/1` | one file, `<text>.cosm`; modules L E K P T X | written in enough |
+| `doc.manifest.cosm` (0.4.4) | `oes: doc/1` | one file per telling, `<doc>.<lang>.doc.cosm`, built by enough into `ENOUGH_DOCS_ROOT`; modules S T R B | written in enough (see "DocOES") |
 
-The three written here carry a comment header, `macrocosm: 0.0.1` and the
+The four written here carry a comment header, `macrocosm: 0.0.1` and the
 © line. The optional keys 0.0.1 adds, which the reader reads (spec §13.5):
 `volume.single-file`, `renderers[].lens`, `links.rels`, `closed-lists`,
 `checks.severity`, `module-file.items`, a kind's own `required`, and
@@ -2938,7 +3047,11 @@ Exit 0 synced or nothing to do, 1 `--check` found changes, 2 no checkout —
 `sync_dictionary.py`'s shape. `tests/fixtures/cosm/NOTICE.md` is hand-written
 and never touched. Beside the synced copies sit enough's own fixtures:
 `canon/{rust-book,project}/canon.cosm`, `emf/{notes.md, notes.md.cosm,
-standalone.cosm}`, and `bad/` (one volume per check).
+standalone.cosm}`, and `bad/` (one volume per check). Since 0.4.4 the same
+script also copies Comprise's `oes/comprise-oes.md` and `oes/README.md` into
+`defaults/cosm/chapters/` (`comprise-oes.md`, `comprise-paradigm-map.md`, with
+their own `manifest.json`) — the spec volume's chapters; the release commits
+them with the bump.
 
 **The four public samples are the only Holotypes enough may hold.** The
 script names them by allowlist and never lists Comprise's fixtures, because
@@ -2964,15 +3077,104 @@ in `asyncio.to_thread`.
 | Route | Returns |
 |---|---|
 | `GET /api/cosm?path=` | a `.cosm` file or a volume folder → `{path, minicosm, major, title (the volume's name), manifest_title, uri, catalog (no nodes), modules: [{letter, name, subtitle, count, kinds: [{kind, items: [{id, key, path, name, summary, status, visibility, file, part, data}]}]}], problems, pending, lenses, report, files, refused}`. Modules in manifest order, every one even when empty; a refused volume is a 200 with `refused` set. A folder holding `holotype.cosm` loads as the Holotype; a store volume folder by its `canon.cosm`; any other folder by whatever catalog it holds; a volume catalog and `rness/canon.cosm` are reconciled first. A non-`.cosm` file is 400, a missing one 404 |
-| `GET /api/cosm/lens?path=&lens=` | `{text, node_map, lens, lenses}`: merirmaid frontmatter (`merirmaid: 1`, `title: <name> · <lens>`, `modality: mirror`, `kind: cosm-lens`, `source: <path>#<lens>`, `node-char-limit: 48`) + the `to_mermaid` body; 400 unknown lens / refused |
+| `GET /api/cosm/lens?path=&lens=[&around=&depth=]` | `{text, node_map, lens, lenses, around}` (0.4.4: `around` = a key, id or path draws a local graph — the lens's edges `depth` steps out, 0–4, the centre in class `focus`; `around` in the answer is the centre's key or null): merirmaid frontmatter (`merirmaid: 1`, `title: <name> · <lens>`, `modality: mirror`, `kind: cosm-lens`, `source: <path>#<lens>`, `node-char-limit: 48`) + the `to_mermaid` body; 400 unknown lens / refused |
 | `POST /api/cosm/lint` | `{path}` → `lint(...).to_dict()` + `path` |
 | `GET /api/macrocosm/manifests` | `[{name, title, version, declaration, summary}]`, registry order |
-| `GET /api/macrocosm-spec?lang=` | `docs/MACROCOSM_OES.md` as text/markdown with `/api/help-center`'s language whitelist (a `static/i18n/<lang>/MACROCOSM_OES.md` would win; none ships — the spec is English only); 404 with a sentence when the file is missing. **In `HOME_PATHS`**, so the spec viewer works on the home screen; `desktop/src-tauri/build.rs` stages the file into the .app |
+| `GET /api/macrocosm-spec?lang=` | `docs/MACROCOSM_OES.md` as text/markdown with `/api/help-center`'s language whitelist (a `static/i18n/<lang>/MACROCOSM_OES.md` would win; none ships — the spec is English only); 404 with a sentence when the file is missing. **In `HOME_PATHS`**. Since 0.4.4 the frontend reads the spec through `/api/docs` (see "DocOES"); this route is **kept** as the spec's raw-markdown source, like `/api/help-center` for the manual; `desktop/src-tauri/build.rs` stages the file into the .app |
+| `POST /api/cosm/inline {text, filename?}` · `POST /api/cosm/inline/lens {text, filename?, lens?, around?, depth?}` (0.4.4) | a volume read from text (`macrocosm.load_volume_text`, nothing written): `/api/cosm`'s payload with `path: "inline:<filename>"` (default `inline.cosm`; 400 no text, 413 over 256 KB, a refused declaration is a 200 with `refused`), and its lens. **Home-accessible** (the docs viewer's live examples) and open while agent-free |
 
 A `.cosm` saved through read/edit is never refused for lint (the spec says
 checks *may* gate writes; Comprise's "a write that adds an error is undone"
 is Comprise's rule, not MacroCOSM's). Raw `.cosm` editing is plain text in
 read/edit's edit face; there is no highlighter yet.
+
+---
+
+## DocOES (documents enumerated in their own grammar, 0.4.4)
+
+**DocOES** (`oes: doc/1`, "Documentation OES") is the fifth MiniCOSM: one
+markdown document taken apart into items — its sections (`S:section/<n>`,
+numbered by the document's own numbering, `root`, `front`, or a slug), the
+terms it defines (`T:term/<slug>`), its complete ```` ```cosm ```` examples
+(`S:example/<n>`), the decisions of a "Decisions …" section
+(`S:decision/<n>`), its synced chapters (`S:chapter/<slug>`, Comprise's
+spec and paradigm map inside the MacroCOSM spec, items prefixed
+`comprise.` / `comprise-map.`), the help bubbles (`B:bubble/<id>`, the
+manual only) — joined to the **reference** generated from the MiniCOSM
+manifests (`R:minicosm`, `R:module`, `R:kind`, `R:list`, `R:check`,
+`R:lens`, each with `provenance` naming the manifest path and a hash). The
+volume is the document's fabula; compiled "as told" it is the markdown again,
+byte for byte (`compile_doc`; tested for the spec, both chapters and all six
+manual tellings). Spec: `docs/MACROCOSM_OES.md` §18.5; plan:
+`docs/docoes-044-plan.md` (local). User-facing: HELP_CENTER §13.1–13.2.
+
+- **Documents** (`docoes.DOCUMENTS`): `macrocosm-oes` — English only,
+  `docs/MACROCOSM_OES.md` + the chapters in `defaults/cosm/chapters/` + the
+  reference; `help-center` — six tellings, `docs/HELP_CENTER.md` /
+  `static/i18n/<lang>/help-center.md` with `static/help-docs.md` /
+  `static/i18n/<lang>/help-docs.md`, `voice: rosa`, mentions counted
+  "distinctive" (a plain use links only a name with a space, an inner
+  capital/digit or a symbol). A translation takes its ids from the English:
+  sections by number, terms by their place in the section, else the English
+  item verbatim with `fallback: en` (ja 7, zh 3, the others 0 in 0.4.4) — so
+  **a translated manual must mirror the English markdown's shape** (bold
+  labels, term-shaped bullets), not only its headings.
+- **Where it is built**: `ENOUGH_DOCS_ROOT`, default `~/enough/docoes/`
+  (`docs_root()`), one `<doc>.<lang>.doc.cosm` per telling, on first use and
+  again whenever the digest moves (sha256 over the DocOES format number,
+  enough's version, every source file and every manifest; `is_fresh` reads
+  only the recorded digest). `load_built(doc, lang)` = ensure + load, the
+  `Volume` cached by mtime+size. Build ≈ 0.2–0.4 s a telling. Never
+  committed, never in a file tree; `docoes.SOURCES` points the enumeration at
+  another install root (the tests' miniature).
+- **Writing for it.** A section's atem is its first sentence unless a
+  `<!-- atem: … -->` comment is the first line under its heading (the spec
+  sets one under every numbered `##` and §18.1–§18.5); a term is defined by a
+  bold first table cell, a `- **term** — definition` bullet, a paragraph
+  opening `(A|An|The) **term** is|are|means|stands for …`, the "How to read
+  this" table, or a `<!-- term: x -->` comment before a paragraph (0.4.4's
+  spec pass marked EMF, fabula, short, syuzhet, stance, salience, span,
+  telling, Canon, DocOES, chapter; Holotype/isotype and the two orders
+  "as told"/"by weight" are bullets). Two definitions of one term are a
+  `term-defined-once` warning. DocOES's own checks (`lint_doc`): `atem-shape`
+  (2–15 words, CJK 2–45 characters, a phrase, no final period, no ids or
+  markup), `numbering`, `term-defined-once`, `unlinked-mentions` (a note),
+  `empty-section`, `stale-provenance-hash`, `xref-unresolved`. The spec must
+  lint **0 errors / 0 warnings** (its 8 notes are Comprise's and the spec's
+  own label paragraphs); the manual has 4 known `term-defined-once` warnings
+  (AGENT.md, MOTIVATION.md, council, input/) in every telling.
+- **Bubbles about another document**: `BUBBLE_DOCUMENT = {"docs":
+  "macrocosm-oes"}` — the docs viewer's bubble names the spec's section 2,
+  so its "section N" become `xrefs` (`macrocosm-oes@0.0.1:section:2`), never
+  `see` links into the manual.
+- **The CLI rule.** `python -m enough.docoes build|lint|compile|inventory|
+  status <doc> [--lang L] [--chapter SLUG] [--force] [--json]
+  [--docs-root DIR]` — **always with `ENOUGH_DOCS_ROOT` (better: every seam
+  of `scripts/smoke_boot.build_env()`) pointed at a scratch dir**; without it
+  the CLI builds into the real `~/enough/docoes/` (it happened once, during
+  the round). `lint macrocosm-oes` and a byte-exact `compile macrocosm-oes`
+  are the checks after any spec edit.
+
+### Routes (all read-only, home-accessible, open while agent-free)
+
+| Route | Answers |
+|---|---|
+| `GET /api/docs?doc=&lang=&density=atem\|short\|fabula[&section=][&module=]` | `doc` ∈ `macrocosm-oes`, `help-center`; `lang` absent → the UI language, not one of the six → 404, a document without that telling → the author's with `requested_lang`. Head: `{doc, lang, requested_lang, density, id, title, uri, telling, tellings, document, chapters, built}`; **atem** + `items` (light: key, id, kind, module, name, atem, order, level, parent, number, anchor, chapter, fallback, in, of, defined_in); **short** + `sections` (telling order, `heading` + `body` verbatim, `mentioned_in`, `examples`) and `terms`; **fabula** = `/api/cosm`'s payload with `report = lint_doc`, `backrefs` (target → sources, minus `parts`/`parent`/`chapter`), `inventory`, `declared_lenses: [{id, kind, diagram, include, generic}]` (each lens's modules — the manifest's `include`, every module when none — and the reader's generic `tree`, `generic: true`; D3 0.4.4) and `page`. 202 `{building, progress}` while a build runs; 503 when it cannot be built. Payloads are JSON-encoded once per built volume |
+| `GET /api/docs/status` · `POST /api/docs/build {doc?, lang?}` | every telling's `{built, fresh, digest, building, progress}` · start a background build (the UI window warms all seven) |
+| `GET /api/docs/lens?doc=&lang=&lens=&around=&depth=` | `/api/cosm/lens`'s shape for a doc volume (`map`, `graph`, `tree`; `graph` around an item by default) |
+| `POST /api/docs/compile {doc, lang?, chapter?}` · `GET /api/docs/inventory?doc=&lang=` | the markdown, byte for byte · the inventory rows `{inventory, xref, id, kind, version, anchor, atem}` |
+
+`POST /api/cosm/inline*` (see "MacroCOSM" → "Routes") serves the live
+examples. `doc_lookup` (see "EMF twins and atems" → "The readvisor tools")
+reads the same volumes through `load_built`, spec first, then the manual in
+the live ui.json's language. Tests: `tests/test_docoes.py` (the enumeration,
+the round trip, the real bubbles), `tests/test_docs_api.py` (routes, payloads,
+the inline reader, the local graph, `doc_lookup`).
+
+### The docs viewer
+
+See "The help system" → "The docs viewer (0.4.4)" for its functions, its
+three densities and its uicheck screens and scenarios.
 
 ---
 
@@ -3219,9 +3421,10 @@ at once ("… is being derived right now; try again when that job is done").
 
 ### The readvisor tools ([enough/canon_tools.py](../enough/canon_tools.py))
 
-Five tools, registered at `tools` import time like `dictionary_tools`, each
+Six tools, registered at `tools` import time like `dictionary_tools`, each
 traced under `trace_log_enabled` (rows in the "Tools" table): `cosm_read`,
-`cosm_lint`, `emf_derive`, `atem`, `cosm_guide`. `<path>` is project-relative
+`cosm_lint`, `emf_derive`, `atem`, `cosm_guide`, and `doc_lookup` (0.4.4, see
+"DocOES"). `<path>` is project-relative
 or `canon:<volume>/…`; a full path inside the project is made relative, any
 other leading slash is dropped, exactly as the routes read it.
 
@@ -3248,12 +3451,12 @@ other leading slash is dropped, exactly as the routes read it.
   `canon_jobs`' shape with `id: "rv<n>"` and `by` — which `server._handle_tool`
   emits as SSE `canon` after the tool's own events; the UI repaints for any
   `done` snapshot and says "Ed made an EMF twin of notes.md".
-- **The docs block**: `prompt.CANON_TOOL_INSTRUCTIONS` ("## MacroCOSM", 809
-  chars against the owner's 1 000 cap, test-pinned; one example per tool, each
+- **The docs block**: `prompt.CANON_TOOL_INSTRUCTIONS` ("## MacroCOSM", 965
+  chars against the owner's 1 000 cap since 0.4.4's `doc_lookup` example — 809 in 0.4.3 — test-pinned; one example per tool, each
   round-tripping through `parse_tool_calls`), gated by
   `prompt._macrocosm_available()` — see "The request lifecycle".
 - **The skill**: `defaults/skills/macrocosm-oes/` (`SKILL.md` + a
-  `references/README.md` of pointers to the spec, the four manifests and the
+  `references/README.md` of pointers to the spec, the five manifests and the
   reader — no copies) teaches the format, the six stances, the atem's parts,
   when to decompile and when an atem is enough, and how to read a Holotype.
   **Off by default** like every shipped skill — the tool docs are always on;
@@ -3268,8 +3471,8 @@ other leading slash is dropped, exactly as the routes read it.
   the lens `<select>` (`#cosm-lens` → `enterMerirmaidLens`), **open raw**
   (`cosmRawOpen`: read/edit's *edit* face, because the read face would render
   the YAML as markdown; a folder volume with several files gets the
-  `#cosm-raw-pop` list), **about this format** (`cosmAbout` → the spec viewer
-  at §18.1–18.4 by MiniCOSM), outline (`cosmRailToggle`; a sheet when
+  `#cosm-raw-pop` list), **about this format** (`cosmAbout` → the docs viewer, spec at short,
+  on §18.1–18.5 by MiniCOSM via `COSM_SPEC_SECTION`), outline (`cosmRailToggle`; a sheet when
   narrow), find (`COSM_FIND`, `FIND_BARS.cosm`), the `(?)`
   (`data-help="cosm-viewer"`), mini/full. The rail (`cosmRailHTML`,
   `cosmChecksHTML`): name, counts or "N items", "scaffold, no model" for a
@@ -3290,10 +3493,18 @@ other leading slash is dropped, exactly as the routes read it.
 - **The host contract.** The viewer's content functions take the **host**
   they draw for as their last parameter, defaulting to the viewer — `COSM`
   (the viewer), `EMF_FACE` (the EMF face), `ATEM_HOST` (the atem card, resolves
-  nothing). A host is its state (`path, data, ix, shown, railWant`) plus
-  `body()`, `rail()`, `railBtn()` and `viewer` (only the viewer offers the back
-  pill and refreshes its find bar). One component, three hosts, no fork —
-  extend it the same way.
+  nothing) and, since 0.4.4, `DOCS_FAB` (the docs viewer's fabula density). A
+  host is its state (`path, data, ix, shown, railWant`) plus `body()`,
+  `rail()`, `railBtn()` and `viewer` (only the viewer offers the back pill and
+  refreshes its find bar), and optionally `card` (0.4.4: `cosmCardHTML(it,
+  kind, host)` calls `host.card` when set, else `cosmCardBaseHTML` — the docs
+  viewer's prism card wraps the base card) and `unwrap`. Every host's cards
+  now draw a `body` field as markdown under the summary (`cosmField`'s **body
+  face**, `cosmBodyFace`; `body` joined `COSM_SKIP`), Holotype items included.
+  `COSM_INLINE` (0.4.4) maps an `inline:<…>` handle to `{text, filename?,
+  title}`: `cosmLoad` and `mmFetchLens` post it to `/api/cosm/inline*` instead
+  of naming a path, and "open raw" hides for it. One component, four hosts, no
+  fork — extend it the same way.
 - **The Canon chip** — `#canon-chip-mini`, `#canon-chip-review`,
   `#canon-chip-edit`, beside the convert chip in the three reader headers.
   `canonPaintChips()` paints it from `canonOnDocOpen(path)` (called in
@@ -3332,7 +3543,8 @@ other leading slash is dropped, exactly as the routes read it.
 - **Right-click atem.** `dictCtxOpen(x, y, hit, where, sel)` gains **atem of
   selection** when `canonSelectionAt(e)` finds a non-empty selection on
   `#review-body`, `#preview-body`, `#edit-textarea`, `#mini-edit-textarea`,
-  `#wiki-body`, `#ref-body` or `#cosmspec-body`; a right-click on the
+  `#wiki-body` or `#docs-body` (0.4.4, at all three densities; a selection
+  inside a docs link opens the menu too); a right-click on the
   selection opens the menu even off a word (elsewhere today's rule stands),
   "copy" then copies the selection, and a textarea selection is no longer
   replaced by the word under the pointer. It
@@ -3357,10 +3569,9 @@ other leading slash is dropped, exactly as the routes read it.
   **`window.__canonReady`** guards read/edit's calls into the Canon block —
   give any new call from read/edit code the same guard.
 - **uicheck**: screens `canon`, `canon-volume`, `cosm-viewer`,
-  `cosm-viewer-holotype`, `cosm-viewer-mini`, `cosmspec`, `cosmspec-mini`,
-  `home-cosmspec`, `canon-chip`, `emf-face`, `emf-face-mini`, `emf-short-menu`
+  `cosm-viewer-holotype`, `cosm-viewer-mini`, `canon-chip`, `emf-face`, `emf-face-mini`, `emf-short-menu`
   (SHORT: the split button's menu open), `atem-card`, `atem-card-mini`;
-  scenarios `canon-open-catalog`, `cosm-lens`, `cosmspec-contents`,
+  scenarios `canon-open-catalog`, `cosm-lens`,
   `twin-flip`, `atem-selection`, `atem-pin`, `compile-short` (SHORT, rules
   mode: the menu's two orders with told marked, Esc closing only the menu,
   compile → the "wrote press.short-….md" toast → the file with its footer, one
@@ -3371,14 +3582,18 @@ other leading slash is dropped, exactly as the routes read it.
   scenario has something to write and the hand-made twins never change) and
   `meadow/` (the public Holotype) into
   the scratch project, and a `field-notes` volume into the scratch store
-  (`seed_canon`, which refuses any root outside the scratch dir).
+  (`seed_canon`, which refuses any root outside the scratch dir). The
+  0.4.3 spec-viewer screens and `cosmspec-contents` became the docs viewer's
+  (see "DocOES" → "The docs viewer").
 
 ---
 
 ## The dictionary (FEED)
 
-**FEED**, the **first-party enough english dictionary** (0.4.1): 116,881
-headwords (209,751 words with their forms) as shipped since 0.4.2 —
+**FEED**, the **first-party enough english dictionary** (0.4.1): 116,897
+headwords (209,783 words with their forms) as shipped in 0.4.4 — pack 042 added
+the MacroCOSM/Comprise terms of art (atem, cosm, minicosm, syuzhet …) and 19
+OES senses of existing words —
 `reflib/dict/manifest.json`'s `headwords` / `words` are the live numbers,
 and every re-sync moves them — an original work, read-only to
 the user and to the readvisors, with a second **user dictionary** beside it
@@ -3581,7 +3796,7 @@ lightbox (WDL) and the "dictionary entry" context menu" banner.
 - **The context menu** (`#dict-ctx-menu`, `dictCtxOpen`). The rule: a
   right-click **on a word** — `dictCtxWhere()` names the surfaces: read
   face, preview, both edit textareas, `#conversation`, `#wiki-body`,
-  `#ref-body`, `#help-body`, `#cosmspec-body`, `#cosm-body` and the EMF
+  `#docs-body` (0.4.4), `#help-body`, `#cosm-body` and the EMF
   face's cards (0.4.3), the dictionary, the WDL — opens "dictionary
   entry" + "copy" (and, since 0.4.3, **atem of selection** when a selection
   is under it — see "EMF twins and atems"); **anywhere else** (no word under the pointer, a link, an
@@ -3928,7 +4143,11 @@ one frozenset plus one prefix tuple:
 
 ```python
 HOME_PATHS     = {"/", "/favicon.ico", "/api/ui-config", "/api/help-center",
-                  "/api/macrocosm-spec", "/api/convert/formats", "/api/shutdown"}
+                  "/api/macrocosm-spec", "/api/convert/formats", "/api/shutdown",
+                  # DocOES (0.4.4): read-only, from the install's own documents
+                  "/api/docs", "/api/docs/status", "/api/docs/build", "/api/docs/lens",
+                  "/api/docs/compile", "/api/docs/inventory",
+                  "/api/cosm/inline", "/api/cosm/inline/lens"}
 HOME_PREFIXES  = ("/api/home/", "/static/")
 ```
 
@@ -3936,8 +4155,9 @@ Two of those look surprising and both earn their place: the **formats
 table** is a static registry the help center's `{{convert-formats}}` token
 expands (and the help center works in home mode), and **`/api/shutdown`** is
 how the shell quits a backend — a home backend is still a backend.
-`/api/macrocosm-spec` (0.4.3) is there because the spec viewer is
-project-independent, like the help center; Canon's `/api/canon/*`, its
+`/api/macrocosm-spec` (0.4.3) and the DocOES routes (0.4.4) are there because
+the docs viewer is project-independent, like the help center before it — the
+two inline routes too, because its live examples must load from home; Canon's `/api/canon/*`, its
 `/api/cacheawl/*` aliases and the `/api/cosm*` routes are project routes and
 404 on a home server. Anything
 else 404s with a JSON `detail` in the house voice. In project mode the gate
@@ -4334,8 +4554,8 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   `GET /api/convert/formats` — never hand-maintain those lists in prose.
   All four are expanded by `_helpExpandTokens()` in index.html;
   `{{convert-formats}}` is the one token that also appears in the
-  **manual**, where `enterRefMode()` expands it to a markdown pipe table
-  before rendering (one row-builder, two renderings — see
+  **manual**, where the docs viewer's short density expands it to a markdown
+  pipe table before rendering (one row-builder, two renderings — see
   `convertFormatsHelpRows()` / `…Html()` / `…Markdown()`). Bubbles are governed by
   one per-project boolean (`GET`/`POST /api/help/bubbles`, stored in the
   multipurpose `rness/active-paradigm` file, default on, surfaced as the
@@ -4345,60 +4565,126 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   machinery — that design was superseded. 0.4.3 renamed `## cacheawl` to
   `## canon` (now reachable from the store pane's `(?)`, so it left
   `UNREACHED_SECTIONS`) and added `cosm-viewer`, `cosmspec`, `canon-chip`
-  and `atem-card`, each in all six files. A `(?)` inside a full-frame mode
+  and `atem-card`, each in all six files; 0.4.4 added `agentmode` (on the
+  slider's wrapper, in the UI and model windows — `HELP_ANCHORS` gained
+  `#ui-modal [data-help], #model-modal [data-help]`, and `openUIModal()` /
+  `openModelModal()` call `applyHelpBubbles()`, since home never runs
+  `loadHelpBubbles`) and `docs` (the docs viewer's `(?)`), and merged
+  `cosmspec` into `docs`. DocOES also enumerates every bubble as a
+  `B:bubble/<id>` item of the help volume (the fabula's cards); a bubble about
+  another document is mapped in `docoes.BUBBLE_DOCUMENT` (`{"docs":
+  "macrocosm-oes"}`), so its "section N" names that document's sections
+  (cross-volume `xrefs`) instead of the manual's — keep every other bubble's
+  section numbers the manual's. A `(?)` inside a full-frame mode
   works because `openHelp` lifts `#help-viewer` above the mode stack
   (`z = 32 + stack depth`), and above an open dialog (z 1001, leaving the
   mini reader open) so the atem card's `(?)` works too.
 - **The manual.** `docs/HELP_CENTER.md` is the complete end-user manual
   (voice-matched to the project; edit it like documentation, verify
-  claims against the code first). `GET /api/help-center` serves it raw;
-  the **reference mode** (`#ref-mode`) renders it read-only in-app,
-  launched from `#ui-help-center-btn` — since 0.2.2 a normal small
-  **help** button inline in the UI modal's header row, right-aligned
-  beside the ×, rather than the old full-width banner. It kept its
-  `.help-center-launch` class name, its `hxc` icon, and its `onclick`;
-  only the CSS shrank; since 0.4.1 `#ui-dict-btn` (dictionary mode) sits
-  beside it with the same class. See the mode-stack notes under "Change
-  the UI".
-  **Contents, find, links, back (0.4.1).** After every render
-  `refAfterRender()` runs `slugifyHeadings(body, 'ref-')` — stable ids from
-  the manual's **own numbering** (`ref-sec-7-3`, identical in every
-  language; a text slug only for an unnumbered heading) — then
-  `refBuildToc()` (h2 + h3 into `#ref-toc`: a side column when there is
-  room, a sheet when not — a container query decides and `refTocIsSheet()`
-  reads the answer back; `refTocSync()` marks the current section),
-  `refLinkSections()` (`REF_XREF_RE`: "section 7.3", "§7.3" and the five
-  translations' words for it become links when the number names exactly
-  one heading; code, links and headings are left alone), and the find bar
-  (`REF_FIND = findBarAttach(#ref-find, …)`, ⌘F while `ref` is on top).
-  Every jump leaves a `#ref-back` pill (`refBackOffer`, skipped for a jump
-  that stays on screen). **So the manual's numbering is UI now**:
+  claims against the code first). Since 0.4.4 it is read in-app as a
+  **DocOES volume** in the docs viewer (below), one telling per language,
+  launched from `#ui-help-center-btn` (`openHelpCenter()`) — a small **help**
+  button inline in the UI modal's header row, beside the × (it kept its
+  `.help-center-launch` class and its `hxc` icon); `#ui-dict-btn` and
+  `#ui-cosmspec-btn` ("MacroCOSM", the spec in the same viewer) sit beside
+  it. `GET /api/help-center?lang=` still serves the raw markdown with the
+  language whitelist — **kept** in 0.4.4 though the frontend no longer calls
+  it: it is the manual's plain-text route, as `/api/macrocosm-spec` is the
+  spec's, and the cheapest way for a tool or a person to read the source.
+  **So the manual's numbering is UI**: section ids, "section 7.3" links and
+  DocOES's item ids come from it, identical in all six languages;
   `test_content_integrity.py` keeps it contiguous and every cross-reference
-  resolvable, and the five translations mirror it — renumbering English is
-  a translation job too.
-- **The spec viewer (0.4.3)** — mode `cosmspec`, root `#cosmspec-mode`,
-  icon `macrocosm`: the same reader for `docs/MACROCOSM_OES.md`, fetched from
-  `GET /api/macrocosm-spec?lang=` (home-accessible; English only, with a
-  `#cs-lang-note` when the UI is not). Launched from `#ui-cosmspec-btn`
-  ("MacroCOSM") in the UI modal head after the dictionary button, visible in
-  home mode too, and from the cosm viewer's "about this format"
-  (`enterCosmSpecMode('18.4')` lands on a section). **Ref mode is
-  parameterised, not copied**: a reader context — `REF_CTX = {root, body,
-  toc, tocBtn, back, prefix: 'ref-', xref: REF_XREF_RE, find, want,
-  backTop}` and `CS_CTX` with the `cosmspec-*` / `cs-*` ids and an
-  English-only xref (`sections? N.N.N`, no "§": the spec's appendix uses
-  "§" for Comprise's sections) — is the last argument of `refAfterRender`,
-  `refBuildToc`, `refTocIsSheet`, `refTocApply`, `refTocToggle`,
-  `refTocSync`, `refScrollTo`, `refJump`, `refBackOffer`, `refBackHide`,
-  `refBackGo`, `refLinkSections`, plus the new `refWireReader(ctx)`; every
-  default is `REF_CTX`, so the help center's calls are unchanged. The ref
-  CSS reads `:is(#ref-mode, #cosmspec-mode)`. The spec is hard-wrapped at
-  120 columns and `renderMarkdown` keeps a single newline as `<br>`, so
-  `cosmSpecUnwrap()` re-flows prose lines (fences, tables, lists, headings,
-  quotes and rules untouched) before rendering; the Help Center is not
-  re-flowed. The badge (`cosmSpecBadge`) reads the H1 and the `vN.N.N` on the
-  status line. The **cosm viewer** (mode `cosm`) is the other new reader —
-  see "EMF twins and atems" → "The UI".
+  resolvable, `i18n_check.py` keeps the six heading structures equal, and
+  renumbering English is a translation job too (0.4.4 renumbered §13.2 →
+  §13.3 and added §10.7, §13.2, §16.5 in all six).
+- **The docs viewer (0.4.4)** — mode `docs`, root `#docs-mode` (carries
+  `data-doc` and `data-density`), one viewer for two documents:
+  `help-center` (icon `hxc`, the UI language's telling, badge "written by
+  Rosa" from the catalog's `telling.voice`) and `macrocosm-oes` (icon
+  `macrocosm`, English; a translated UI gets `requested_lang` and the note
+  `docs.note.specEnglish`; badge "MacroCOSM OES · v0.0.1"). Functions
+  (window): `enterDocsMode({doc, lang, density, anchor})` (no `density` →
+  the remembered one, `localStorage['enough.docs.density.<doc>']`, default
+  `short`), `exitDocsMode()`, `openHelpCenter()`, `docsSetDensity(d,
+  {anchor})` (keeps the place across densities), `docsToggleSize()`,
+  `docsTocToggle()`, `docsBackGo()` (async; the back pill crosses densities:
+  `docsBackMark`/`docsBackShow`), `docsFindOpen()`, `docsOpenItem(key)`,
+  `docsTermOpen(key, el)` (= `docsTermCard`: a term link opens the term's
+  card), `docsWarm()` (`POST /api/docs/build {}` once per page, from
+  `openUIModal()`), `docsOnLanguage()` (from `setUILanguage`: re-tells the
+  help center in place), `docsShowItemFromLens(key)`. State: `DOCS` (doc,
+  lang, density, data, ix, cache, seq, at, back), `DOCS_DOCS` (per
+  document), `DOCS_CTX` (the reader context), `DOCS_FIND`
+  (`FIND_BARS.docs`), `DOCS_XREF_RE` + `DOCS_XREF_RULES` (six languages'
+  "section N", lists and ranges, `§N`, `README §N`, `P.N`, resolved per
+  scope: in the spec § and P.N are Comprise's chapter, README § its paradigm
+  map). Loading: `docsLoad` → `GET /api/docs?doc=&lang=&density=` (202 →
+  `docsBusy(progress.current)` and a 300 ms retry; 503 → `.ref-error`); one
+  payload cache per open. Anchors anywhere: an item key (`S:section/18.4`,
+  `T:term/atem`), a section number (`18.4`, `P.3`, `§2`) or a heading id
+  (`docs-sec-18-4`; 0.4.3's `cs-sec-…` and 0.4.1's `ref-sec-…` still land).
+  **`DOCS_DENSITIES`** maps a density to its renderer `async (data, at)`;
+  a radio with no renderer is disabled. The density control
+  `#docs-density[role=radiogroup]` holds three `button[role=radio]` (roving
+  tabindex; arrows/Home/End move and choose):
+  - `short` — every section's `heading + body` → `docsStripComments` (drops
+    the whole-line `<!-- atem/term -->` markers outside fences) →
+    `cosmSpecUnwrap` (the spec only: it is hard-wrapped at 120 columns) →
+    `{{convert-formats}}` expanded → `renderMarkdown` → `<section
+    class="docs-sec" data-key>`, ids `docs-<anchor>` (a chapter's
+    `docs-<prefix>-<anchor>`); contents from `[data-toc]` headings
+    (`docsBuildToc`); `refLinkSections(DOCS_CTX)` with `docsXrefResolve`;
+    `docsLinkTerms` (each term's first use per section as
+    `a.docs-term[data-term]`, never in its defining section; the help center
+    links only distinctive words, and a bold use only when its case matches);
+    margin marks `button.docs-mark[data-key]` (`◂ N` = `mentioned_in`, `❏ N`
+    = examples; placeholders) flip to the section's card; `.docs-fb` "told in
+    English" on a fallback section, `docs.note.fallback` counts them.
+  - `atem` — `.docs-atem`: the outline (`a.docs-ol-row[data-go]`), the
+    glossary (`dl.docs-gloss`), and, for the spec, the reference per
+    MiniCOSM and the checks; find here searches names and atems only.
+  - `fabula` (U2) — the cosm viewer's content component drawn for the
+    **`DOCS_FAB` host** (`body` `#docs-body`, `rail` `#docs-toc`, `railBtn`
+    `#docs-toc-btn`, `card` = `docsPrismHTML`, `viewer: false`); the root
+    gains `.docs-fab`, and the cosm viewer's card/rail rules are written
+    `:is(#cosm-mode, .emf-face, .docs-fab)`. The whole volume loads once and
+    pages client-side (`docsFabPrepare`: section pages = a top-level section
+    with its subtree and the examples/decisions in it; `DOCS_FAB.pages`,
+    `pageOf`); facets by kind and by MiniCOSM (`.docs-chip[data-facet]`);
+    the pager `nav.docs-fab-pager`. The **prism card** (`docsPrismHTML`
+    around `cosmCardBaseHTML`; `DOCS_PRISM_SCHEMA` / `DOCS_PRISM_NOISE` sort
+    the fields): atem first, the breadcrumb (`nav.docs-crumb`, each step →
+    that section at short), then `dl.docs-facets` — identity (address, "cite
+    it as", "edit at <file> §N" / "declared by <manifest>#<path>" / the
+    chapter note), schema, checks, renderings (from the payload's
+    `declared_lenses`: each lens's `include`; drawable ones draw around the
+    item), examples, mentioned in (`backrefs` minus containment — equal to
+    the short's margin mark) — and **graph around this** (`docsFabLens` →
+    `enterMerirmaidLens('docs:<doc>.<lang>', lens, {around, depth: 1,
+    label})` → `mmFetchLens(entry)` → `GET /api/docs/lens`; a node's "show
+    item" → `docsShowItemFromLens`). **Live examples**: an `S:example` card
+    posts its `body` to `/api/cosm/inline` (`docsLiveLoad`, the handle
+    `inline:<doc>/<key>` in `COSM_INLINE`), shows the verdict, a lens picker
+    and "open in the cosm viewer". Find at the fabula searches the cards
+    drawn. Bubbles are cards (`docsBubbleHTML`, simple tags only).
+  The 0.4.1 reader machinery (`refJump`, `refScrollTo`, `refTocApply/
+  Toggle/IsSheet/Sync`, `refBackOffer/Hide/Go`, `refWireReader`,
+  `refLinkSections`) now has one context, `DOCS_CTX`. **Gone in 0.4.4**:
+  `#ref-mode`, `REF_CTX`, `REF_XREF_RE`, `enterRefMode`, `exitRefMode`,
+  `refToggleSize`, `slugifyHeadings`, `refAfterRender`, `refBuildToc`;
+  `#cosmspec-mode`, `CS_CTX`, `enterCosmSpecMode`, `exitCosmSpecMode`,
+  `cosmSpecBadge`; U1's term popover `#docs-pop` (U2: a term link opens a
+  card). Kept keys: `ref.toc.*`, `ref.find.label`, `ref.size.*`,
+  `ref.back.*`; `cosmSpecUnwrap` moved into the docs block.
+  **uicheck** screens `docs-help`, `docs-help-mini`, `docs-help-fr`,
+  `docs-atem`, `docs-short`, `docs-spec`, `docs-spec-mini`, `docs-fabula`,
+  `docs-fabula-mini`, `docs-card-term`, `docs-card-example-live`,
+  `docs-graph`, `home-docs-spec`, `home-docs-help`, `home-docs-fabula`
+  (the home screens fail when a route is not home-accessible), and
+  `readvisor-and-minis` docks the viewer; scenarios `docs-find-contents`
+  (the ref-mode gate), `docs-contents`, `docs-term-roundtrip`,
+  `docs-example-live`, `docs-graph-roundtrip`; the four mode-stack scenarios
+  use the docs viewer as their second mode.
 - **Inline code in `renderMarkdown` (a 0.4.3 fix).** Before 0.4.3 the
   shared renderer double-escaped `<` and `&` inside backticks (every caller
   hands `renderInline` already-escaped text, which was then escaped again),
@@ -4433,7 +4719,7 @@ Mechanism, all CSS custom properties on `<html>`:
 - `--uiz` — whole-UI zoom: `body { zoom: var(--uiz, 1) }`.
 - `--txz` — content-only zoom, multiplicative, applied to the **mode
   document surfaces** only (one selector list next to the body rule:
-  `:is(#review-mode, #ref-mode, #cosmspec-mode, #cosm-mode) .review-body`,
+  `:is(#review-mode, #docs-mode, #cosm-mode) .review-body`,
   `.emf-face .review-body`, `#edit-mode .edit-textarea`, `#wiki-body`,
   `#preview-body`). Extending text scale to a new surface = adding one
   selector there. The readvisor panel, sidebar, modals and the
@@ -4485,7 +4771,9 @@ string that has a `data-i18n*` key.** The short version:
   `en/ui.json` is the canonical catalog and must stay byte-identical
   to the inline English. The server (`UI_LANGUAGES`, `_ui_language()`)
   whitelists codes, templates the boot language into `BOOT_UI_STATE`,
-  and serves translated manuals via `GET /api/help-center?lang=`.
+  and serves translated manuals via `GET /api/help-center?lang=`; since
+  0.4.4 the docs viewer reads them as DocOES tellings
+  (`GET /api/docs?doc=help-center&lang=`), all six sharing one id set.
 - `ui_language` is a top-level ui.json key (POST /api/ui-config,
   validated like `home_view`).
 - **Every English string change must keep the catalogs in lockstep:**
@@ -4886,14 +5174,16 @@ than reinvent:
     caller has already re-targeted content — e.g. `enterGirraphMode` on a
     new file resets `GIRRAPH_STACK` itself). One live instance per name
     (`readedit`, `girraph`, `merirmaid`, `wikisink`, `canon` — `cacheawl`
-    until 0.4.3 — `ref`, `paginated`, `dict`, `cosm`, `cosmspec`, and
+    until 0.4.3 — `paginated`, `dict`, `cosm`, `docs` — 0.4.4's, which
+    replaced `ref` and `cosmspec` — and
     `blobview`, which shares the mini panel). **Composure is not one of them** — it is the base layer
     below the stack (z < 30), permanent and uncloseable; see "Composures".
   - `modeRemove(name)` — splice at any depth, re-apply z-order, re-render
     indicators. **Bookkeeping only**: it does not run `onExit` and does not
     hide the mode's root, so callers tear the mode down first (see "What
     NOT to touch", and the block comment at its definition, which names all
-    eleven callers — 0.4.3 added `exitCosmMode` and `exitCosmSpecMode` —
+    eleven callers — 0.4.3 added `exitCosmMode`, and 0.4.4's `exitDocsMode`
+    replaced `exitRefMode` and `exitCosmSpecMode` —
     and the one legacy wrapper that is the exception). A mode
     "closed" with this alone leaves its render loop spinning behind an
     element that is still in the DOM. Empty stack = the bare composure
@@ -4943,20 +5233,21 @@ than reinvent:
   the read/edit chrome (`#review-face-btn` / `#edit-face-btn` /
   `#mini-face-btn`) — the topbar indicator is not a button. The full-frame
   family is wikisink, girraph, merirmaid, Canon, read/edit, the cosm
-  viewer, and the read-only **reference mode** below with its sibling the
-  spec viewer — all stack citizens.
-- **Reference mode (`#ref-mode`, name `ref`).** The read-only manual
-  viewer: fetches `GET /api/help-center` (which serves the repo's
-  `docs/HELP_CENTER.md`) and renders it through `renderMarkdown` into a
+  viewer, the dictionary, and the read-only **docs viewer** below — all stack
+  citizens.
+- **The docs viewer (`#docs-mode`, name `docs`, 0.4.4).** The read-only
+  reader for enough's two documents, the help center and the MacroCOSM spec,
+  over their DocOES volumes (`GET /api/docs`; see "DocOES" and "The help
+  system"). It replaced **reference mode** (`#ref-mode`, retired at plan §5's
+  gate) and the 0.4.3 **spec viewer** (`#cosmspec-mode`). It renders into a
   `.review-body`-styled frame (the pretty-markdown CSS is shared via
-  `:is(#review-mode, #ref-mode, #cosmspec-mode, #cosm-mode) .review-body`
-  selectors since 0.4.3, and `applyReviewContrast()` covers `ref-mode` —
-  and the two new readers — alongside review/wiki). View
+  `:is(#review-mode, #docs-mode, #cosm-mode) .review-body`, and
+  `applyReviewContrast()` covers `docs-mode` alongside review/wiki). View
   only by design: no edit face, no highlighting, no chat affordance. The
-  `ref-mini` class docks it to the right edge for side-by-side reading
-  (`refToggleSize()`); launched from the small **help** button in the UI
-  modal's header (see "The help system" for its contents, find and
-  section links). The 3D icon-button gradient used on square chips is
+  `ref-mini` class (the 0.4.1 reader's, now the docs viewer's alone) docks it
+  to the right edge (`docsToggleSize()`); launched from the small **help**
+  button in the UI modal's header (`openHelpCenter()`) and from
+  `#ui-cosmspec-btn` ("MacroCOSM"). The 3D icon-button gradient used on square chips is
   the shipped two-stop ramp `rgba(128,128,128,0.42) → 0.10 at 62% → 0`
   over `var(--btn-bg, var(--bg-raise))`.
 
@@ -5010,10 +5301,12 @@ actually had to tick. Grep `dict` beside each step for the worked example.
 14. **Docs**: a HELP_CENTER section (and the renumbering that follows),
     this guide, and help-docs.md sections only if it adds `data-help` rows.
 
-0.4.3 ran the list twice more. The **spec viewer** is the variant to copy
-when the new mode is another long document like the manual: give ref mode a
-reader context (`CS_CTX` beside `REF_CTX`; see "The help system") instead of
-copying its functions. The **cosm viewer** is the variant for a structured
+0.4.3 ran the list twice more and 0.4.4 once. The **docs viewer** is the
+variant to copy when the new mode is another long document: it is one mode
+over any DocOES volume (`DOCS_DOCS` holds the per-document settings, a new
+document is a row in `docoes.DOCUMENTS` plus one there), and the 0.4.1
+reader's `ref*` functions take its reader context (`DOCS_CTX`; see "The help
+system"). The **cosm viewer** is the variant for a structured
 view that a second surface also draws: write its content functions against a
 *host* (`COSM` / `EMF_FACE` / `ATEM_HOST`; see "EMF twins and atems") so the EMF
 face and the atem card reuse them without a fork. Both also had to join
@@ -5418,7 +5711,8 @@ A list of things that will confuse you if you don't see them coming:
   `ENOUGH_INFOWORLD_ROOT`, `ENOUGH_UI_CONFIG`,
   `ENOUGH_WEIGHTS_DIR`, `ENOUGH_EXTRAS_STATE`, `ENOUGH_LIVE_STATE`,
   `ENOUGH_MODELS_REGISTRY`, `ENOUGH_PROJECTS_STATE`,
-  **`ENOUGH_READVISORS_ROOT`**, **`ENOUGH_DICT_ROOT`** and
+  **`ENOUGH_READVISORS_ROOT`**, **`ENOUGH_DOCS_ROOT`** (0.4.4, the built doc
+  volumes), **`ENOUGH_DICT_ROOT`** and
   **`ENOUGH_DICT_SOURCE`** (the latter pointed at *nothing*, so no test
   starts a 380 MB build — see "The dictionary (FEED)")
   (plus `ENOUGH_MODELS_URL_BASE`, which rebases the model download URLs
@@ -5804,7 +6098,7 @@ enough only; a licence is still to be decided. Its
 `defaults/cosm/manifests/` and the names MacroCOSM, MiniCOSM, MicroCOSM,
 Canon, EMF and atem are © 2026 Graham Smith, all rights reserved — bundled
 for use within enough only (enough reads the manifests and shows the spec in
-its spec viewer), a licence for the specification still to be decided.
+its docs viewer), a licence for the specification still to be decided.
 [defaults/cosm/NOTICE.md](../defaults/cosm/NOTICE.md) is authoritative, and
 `tests/fixtures/cosm/NOTICE.md` covers the synced Comprise samples. **The
 reader, `enough/macrocosm.py`, is part of enough and Apache 2.0** with the

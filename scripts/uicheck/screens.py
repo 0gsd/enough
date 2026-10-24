@@ -153,13 +153,51 @@ COSM_READY: Step = ("eval_await", """(async () => {
     await new Promise((r) => setTimeout(r, 50));
   }
   return true; })()""")
-#: The spec viewer has rendered the document (its headings carry ids).
-COSMSPEC_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 200
-       && !document.querySelector('#cosmspec-body h2[id], #cosmspec-body .ref-error'); i++) {
+#: The docs viewer (0.4.4) has drawn its document — the short density's
+#: sections, the atem density's outline or the fabula's prism cards (or an
+#: error, which the `_OK` variants below refuse to call ready). GET /api/docs
+#: builds the doc volume on its first call (about a second, cold), so the
+#: wait is long and in-page.
+DOCS_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 300 && !document.querySelector(
+       '#docs-body .docs-sec h2[id], #docs-body .docs-outline, #docs-body .cosm-card.docs-prism,'
+       + ' #docs-body .ref-error'); i++) {
     await new Promise((r) => setTimeout(r, 50));
   }
   return true; })()""")
+#: …and it is the short density's sections, not an error: a step that fails
+#: (a harness error) when the document could not be loaded — how the home
+#: screens prove the route is home-accessible.
+DOCS_SHORT_OK: Step = ("wait_for", "#docs-body .docs-sec h2[id]")
+DOCS_ATEM_OK: Step = ("wait_for", "#docs-body .docs-outline .docs-ol-row")
+#: The fabula density (U2) has drawn its prism cards and the rail beside them.
+DOCS_FAB_OK: Step = ("wait_for", "#docs-body .cosm-card.docs-prism")
+#: …and a live example's block has loaded and linted (POST /api/cosm/inline),
+#: its verdict line painted — waited for inside the page.
+DOCS_LIVE_OK: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !document.querySelector('#docs-body .docs-live[data-ready]'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return !!document.querySelector('#docs-body .docs-live[data-ready="ok"]'); })()""")
+#: merirmaid has drawn a diagram's nodes (a lens: GET /api/docs/lens, then mermaid).
+MM_NODES_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 300 && !document.querySelector('#merirmaid-body g.node'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+
+
+def _docs(doc: str, density: str = "short", lang: str | None = None,
+          anchor: str | None = None) -> Step:
+    """Open the docs viewer on `doc` at `density` — always named: the
+    viewer remembers a density per document in localStorage, which outlives
+    the reloads between screens. `anchor`: an item key or a section number."""
+    opts = {"doc": doc, "density": density}
+    if lang:
+        opts["lang"] = lang
+    if anchor:
+        opts["anchor"] = anchor
+    return ("eval", f"enterDocsMode({json.dumps(opts)})")
 #: The Canon chip knows the text's twin state (GET /api/canon/emf answered).
 CANON_CHIP_READY: Step = ("eval_await", """(async () => {
   for (let i = 0; i < 200 && !(CANON.doc && CANON.doc.state); i++) {
@@ -465,6 +503,37 @@ COMP_RESET: tuple[Step, ...] = (
 #: matrix measures after it.
 RV_BACK: tuple[Step, ...] = (("eval", "rvSetState('open')"), ("wait_idle", ""))
 
+#: Agent-free mode (0.4.4, plan §13), switched the way the slider switches
+#: it: `agentFreeSet()` POSTs /api/ui-config {agent_free} and awaits the
+#: answer. The preference lives in the ui.json `build_env()` points
+#: ENOUGH_UI_CONFIG at — the SCRATCH one, shared by the run's project and
+#: home servers, never the developer's. The 260 ms waits out the panel's
+#: 180 ms column slide, which `wait_idle` cannot see (SIDEBAR_SETTLED's
+#: reason).
+AF_ON: Step = ("eval_await", "(async () => { await agentFreeSet(true);"
+                             " await new Promise((r) => setTimeout(r, 260));"
+                             " return agentFreeOn(); })()")
+#: Every agent-free screen's teardown. The page is reloaded after a screen,
+#: but the FILE is not: a switch left on would carry into every screen (and
+#: both servers) after it. If the page's own setter cannot, the scratch
+#: config is written directly.
+AF_OFF: Step = ("eval_await", "(async () => { try { await agentFreeSet(false); } catch (e) {}"
+                              " if (window.agentFreeOn && agentFreeOn()) {"
+                              " await fetch('/api/ui-config', {method: 'POST',"
+                              " headers: {'Content-Type': 'application/json'},"
+                              " body: JSON.stringify({agent_free: false})}); }"
+                              " return true; })()")
+#: Canon's ingest bar, filled with a url (the confirmation with the most
+#: lines: source, volume, depth, the page cap and the fetch gate) and
+#: submitted. Agent-free, that raises the plain confirmation — nothing is
+#: fetched unless it is confirmed, and the screens never confirm.
+CANON_INGEST_URL: Step = ("eval", "(() => { document.getElementById('cn-ingest-type').value = 'url';"
+                                  " cnIngestTypeChanged();"
+                                  " document.getElementById('cn-ingest-value').value ="
+                                  " 'https://example.invalid/orchard/pressing-notes';"
+                                  " document.getElementById('cn-ingest-depth').value = '2';"
+                                  " submitCanonIngest(); return true; })()")
+
 
 # ---------------------------------------------------------------------------
 # Project-mode screens
@@ -568,16 +637,86 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_for", "#canon-mode.open"), ("wait_idle", "")),
            teardown=EXIT_ALL_MODES),
 
-    Screen("ref-mode", "project",
-           setup=(("eval", "enterRefMode()"),
-                  ("wait_for", "#ref-mode.open"), ("wait_idle", "")),
-           teardown=EXIT_ALL_MODES),
+    # --- the docs viewer (0.4.4, DocOES): the help center and the spec ----
+    # (the 0.4.1 ref-mode / ref-mini screens, re-pointed: plan §5's gate)
+    Screen("docs-help", "project",
+           setup=(_docs("help-center"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_SHORT_OK, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the help center at the short density, in the UI language's "
+                "telling: contents beside the text, margin marks, term links"),
 
-    Screen("ref-mini", "project",
-           setup=(("eval", "enterRefMode()"), ("wait_for", "#ref-mode.open"),
-                  ("eval", "refToggleSize()"),
+    Screen("docs-help-mini", "project",
+           setup=(_docs("help-center"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_SHORT_OK, ("eval", "docsToggleSize()"),
                   ("wait_idle", "")),
-           teardown=EXIT_ALL_MODES),
+           teardown=EXIT_ALL_MODES,
+           note="docked right: the density control down to its glyphs, the "
+                "contents folded into a sheet"),
+
+    Screen("docs-help-fr", "project",
+           setup=(_docs("help-center", lang="fr"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_SHORT_OK, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a telling other than the UI language's (French), in every "
+                "language's chrome"),
+
+    Screen("docs-atem", "project",
+           setup=(_docs("macrocosm-oes", "atem"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_ATEM_OK, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the spec at the atem density: the outline, the glossary strip "
+                "and the reference one-liners grouped by MiniCOSM"),
+
+    Screen("docs-short", "project",
+           setup=(("eval_await", "(async () => { await enterDocsMode({doc: 'macrocosm-oes',"
+                                 " density: 'short', anchor: '18.4.5'}); return true; })()"),
+                  DOCS_SHORT_OK, ("eval", "document.querySelector('#docs-body button.docs-mark')?.focus()"),
+                  ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the spec at short on §18.4.5: the margin marks (buttons that flip "
+                "to the section's card, one focused), the quiet term links"),
+
+    # --- the fabula density (0.4.4, U2): prism cards, facets, live examples --
+    Screen("docs-fabula", "project",
+           setup=(_docs("macrocosm-oes", "fabula", anchor="18.4"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_FAB_OK, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the spec at the fabula density on §18.4: the rail (catalog, facets, "
+                "modules, section pages, checks) beside the section page's pager and "
+                "prism cards"),
+
+    Screen("docs-fabula-mini", "project",
+           setup=(_docs("help-center", "fabula", anchor="B:bubble/wikisink"),
+                  ("wait_for", "#docs-mode.open"), DOCS_READY, DOCS_FAB_OK,
+                  ("eval", "docsToggleSize()"), ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the help center's fabula docked right on a help bubble's card: the "
+                "outline folded into a sheet, the card's lists stacked"),
+
+    Screen("docs-card-term", "project",
+           setup=(_docs("macrocosm-oes", "fabula", anchor="T:term/atem"),
+                  ("wait_for", "#docs-mode.open"), DOCS_READY, DOCS_FAB_OK, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a term's prism card: its atem, the breadcrumb into the short, "
+                "identity, schema (defined in), renderings, mentioned in"),
+
+    Screen("docs-card-example-live", "project",
+           setup=(_docs("macrocosm-oes", "fabula", anchor="S:example/4"),
+                  ("wait_for", "#docs-mode.open"), DOCS_READY, DOCS_FAB_OK, DOCS_LIVE_OK,
+                  ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="an example's card, live: its block loaded as a volume, the lint "
+                "verdict, a lens picker and \"open in the cosm viewer\""),
+
+    Screen("docs-graph", "project",
+           setup=(_docs("macrocosm-oes", "fabula", anchor="S:section/18.4"),
+                  ("wait_for", "#docs-mode.open"), DOCS_READY, DOCS_FAB_OK,
+                  ("click", '#docs-body .cosm-card[data-key="S:section/18.4"] [data-dact="graph"]'),
+                  ("wait_for", "#merirmaid-mode.open"), MM_NODES_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="\"graph around this\" on §18.4's card: the local graph (one step, "
+                "in and out) in merirmaid, read only, the item in bold"),
 
     # --- the Canon round (0.4.3): volumes, the cosm viewer, the spec -------
     Screen("canon-volume", "project",
@@ -609,10 +748,13 @@ PROJECT_SCREENS: list[Screen] = [
            teardown=EXIT_ALL_MODES,
            note="docked right: two-row toolbar, the outline folded into a sheet"),
 
-    Screen("cosmspec", "project",
-           setup=(("eval", "enterCosmSpecMode()"), ("wait_for", "#cosmspec-mode.open"),
-                  COSMSPEC_READY, ("wait_idle", "")),
-           teardown=EXIT_ALL_MODES),
+    Screen("docs-spec", "project",
+           setup=(_docs("macrocosm-oes"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_SHORT_OK, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the MacroCOSM spec at short (the 0.4.3 cosmspec screen): its "
+                "name and version in the badge, the English-only note in a "
+                "translated UI"),
 
     # --- checkpoint B: the Canon chip, the EMF face, the atem card ---------
     Screen("canon-chip", "project",
@@ -663,9 +805,9 @@ PROJECT_SCREENS: list[Screen] = [
            teardown=(ATEM_CLOSE,) + EXIT_ALL_MODES,
            note="the card raised over the mini reader"),
 
-    Screen("cosmspec-mini", "project",
-           setup=(("eval", "enterCosmSpecMode()"), ("wait_for", "#cosmspec-mode.open"),
-                  COSMSPEC_READY, ("eval", "cosmSpecToggleSize()"), ("wait_idle", "")),
+    Screen("docs-spec-mini", "project",
+           setup=(_docs("macrocosm-oes"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_SHORT_OK, ("eval", "docsToggleSize()"), ("wait_idle", "")),
            teardown=EXIT_ALL_MODES),
 
     # --- FEED: the dictionary, the word data lightbox (0.4.1) -------------
@@ -1076,8 +1218,8 @@ PROJECT_SCREENS: list[Screen] = [
            setup=(("eval", "rvSetState('open')"),
                   ("eval", f"openReadEdit('{DOC}', {{size:'mini', face:'read'}})"),
                   ("wait_for", "#preview.open"),
-                  ("eval", "enterRefMode()"), ("wait_for", "#ref-mode.open"),
-                  ("eval", "refToggleSize()"), ("wait_idle", "")),
+                  _docs("help-center"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, ("eval", "docsToggleSize()"), ("wait_idle", "")),
            teardown=EXIT_ALL_MODES + RV_BACK,
            note="both mini panels dock INSIDE main, left of the panel"),
 
@@ -1159,6 +1301,40 @@ PROJECT_SCREENS: list[Screen] = [
                   ("eval", f"openReadEdit('{DOC}', {{size:'full', face:'read'}})"),
                   ("wait_for", "#review-mode.open"), ("wait_idle", "")),
            teardown=EXIT_ALL_MODES),
+
+    # --- agent-free mode (0.4.4, plan §13) ---------------------------------
+    Screen("ui-modal-agentfree", "project",
+           setup=(AF_ON, ("wait_for", "html[data-agent-free]"),
+                  ("eval", "openUIModal()"),
+                  ("wait_for", "#ui-modal:not(.hidden)"), ("wait_idle", "")),
+           teardown=(_esc(), AF_OFF, ("wait_idle", "")),
+           note="the slider on (\"agent free\"), the readvisor keyboard rows gone"),
+
+    Screen("project-agentfree", "project",
+           setup=(AF_ON, ("wait_for", "html[data-agent-free]"),
+                  SIDEBAR_SETTLED, ("wait_idle", "")),
+           teardown=(AF_OFF, ("wait_idle", "")),
+           note="the panel collapsed and its toggle gone, the sidebar down to "
+                "the project tree, the badge saying the state word"),
+
+    Screen("model-modal-agentfree", "project",
+           setup=(AF_ON, ("wait_for", "html[data-agent-free]"),
+                  ("eval", "openModelModal()"),
+                  ("wait_for", "#model-modal:not(.hidden)"), ("wait_idle", "")),
+           teardown=(_esc(), AF_OFF, ("wait_idle", "")),
+           note="the mirrored slider and its reason; switch, ctx, auto-reset "
+                "greyed; download and delete live"),
+
+    Screen("canon-ingest-agentfree", "project",
+           setup=(AF_ON, ("wait_for", "html[data-agent-free]"),
+                  ("eval", "enterCanonMode()"), ("wait_for", "#canon-mode.open"),
+                  CANON_INGEST_URL,
+                  ("wait_for", "#confirm-overlay:not([hidden])"), ("wait_idle", "")),
+           teardown=(("click", "#confirm-cancel"),
+                     ("wait_gone", "#confirm-overlay:not([hidden])"), AF_OFF)
+                    + EXIT_ALL_MODES,
+           note="the plain confirmation: source, volume, depth, the url cap "
+                "and the fetch gate (the longest one there is)"),
 ]
 
 
@@ -1183,18 +1359,40 @@ HOME_SCREENS: list[Screen] = [
                   ("wait_for", "#ui-modal:not(.hidden)"), ("wait_idle", "")),
            teardown=(_esc(), ("wait_idle", ""))),
 
-    Screen("home-cosmspec", "home",
-           setup=(("eval", "enterCosmSpecMode()"), ("wait_for", "#cosmspec-mode.open"),
-                  COSMSPEC_READY, ("wait_idle", "")),
+    Screen("home-docs-spec", "home",
+           setup=(_docs("macrocosm-oes"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_SHORT_OK, ("wait_idle", "")),
            teardown=EXIT_ALL_MODES,
-           note="the MacroCOSM spec from the home screen (the route is "
-                "home-accessible, like the Help Center)"),
+           note="the MacroCOSM spec from the home screen (/api/docs is "
+                "home-accessible): the 0.4.3 home-cosmspec screen"),
+
+    Screen("home-docs-fabula", "home",
+           setup=(_docs("macrocosm-oes", "fabula", anchor="S:example/1"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_FAB_OK, DOCS_LIVE_OK,
+                  ("wait_for", '#docs-body .docs-live[data-ready="ok"]'), ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the fabula from the home screen on a live example: /api/docs and "
+                "/api/cosm/inline are home-accessible (the wait fails when not)"),
+
+    Screen("home-docs-help", "home",
+           setup=(("eval", "openUIModal()"), ("wait_for", "#ui-modal:not(.hidden)"),
+                  ("click", "#ui-help-center-btn"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_SHORT_OK, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the help center opened from the home screen's ui window, "
+                "through its own button"),
 
     Screen("home-no-readvisor", "home",
            setup=(("wait_idle", ""),),
            note="P3: home has no readvisor at all — the toggle is display:none "
                 "and the panel is visibility:hidden. Measured under its own "
                 "name so a finding says which page lost it"),
+
+    Screen("home-agentfree", "home",
+           setup=(AF_ON, ("wait_for", "html[data-agent-free]"), ("wait_idle", "")),
+           teardown=(AF_OFF, ("wait_idle", "")),
+           note="0.4.4: the head's agent-free word (home has no model badge; "
+                "the switch decides how a project opens)"),
 ]
 
 

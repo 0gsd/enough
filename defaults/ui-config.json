@@ -18,6 +18,10 @@
     "    stay in whatever language you write \u2014 local models read English best)",
     "  help_highlight_on_new_project \u2014 light up the (?) help",
     "    bubbles on a project's first launch until each is viewed (default true)",
+    "  agent_free \u2014 true turns on agent-free mode for this machine: no",
+    "    model starts, the readvisor and everything that needs a model is",
+    "    off, and the rules tools (decompile / atem / compile) still work",
+    "    (default false; the free agent / agent free slider in ui preferences)",
     "",
     "For zoom in a browser, use the browser's native zoom (Cmd +/- on Mac,",
     "Ctrl on Win/Linux). The desktop app has no browser chrome, so use the",
@@ -35,6 +39,7 @@
     "font": "mono"
   },
   "help_highlight_on_new_project": true,
+  "agent_free": false,
   "ui_language": "en",
   "chief_readvisor_name": "Ed",
   "fonts": {

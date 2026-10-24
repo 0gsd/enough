@@ -417,7 +417,7 @@ stop silently.
 #   column guide is the `lexicographer` skill, in the Skills section when it
 #   is on and one `dict_guide` call away when it is off.
 # - the MacroCOSM tools (`cosm_read`, `cosm_lint`, `emf_derive`, `atem`,
-#   `cosm_guide`, 0.4.3), behind the MacroCOSM manifests shipping with this
+#   `cosm_guide`, 0.4.3; `doc_lookup`, 0.4.4), behind the MacroCOSM manifests shipping with this
 #   install — so in every project, as the owner decided (docs/canon-043-plan.md
 #   §13, decision 12: on by default, under 1,000 chars of prompt). The guide is
 #   the `macrocosm-oes` skill, off by default like every shipped skill and one
@@ -602,11 +602,17 @@ Paths are project-relative or `canon:<volume>/...`.
 
 <tool name="cosm_guide"></tool>
 
+<tool name="doc_lookup">
+<term>stance</term>
+</tool>
+
 `cosm_read` shows the tree; `<item>` (an id or a path) one item. `emf_derive`
 decompiles a text into its EMF twin (`notes.md.cosm`), only when the user
 asks. `atem` gives the line, focus, push and pull and writes them into the
 twin; `<text>` instead of `<path>` for a passage, written nowhere. Unless the
 macrocosm-oes skill is in your Skills, read `cosm_guide` before you derive.
+`doc_lookup` says what a term, section number or id means in the MacroCOSM
+spec or the enough manual.
 """
 
 

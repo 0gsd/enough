@@ -16,7 +16,7 @@ same envelope: name, summary, status, visibility, provenance. A value nobody
 has given yet is an **open question**, `{pending: "the question"}`, never a
 guess.
 
-## The four MiniCOSMs enough ships
+## The five MiniCOSMs enough ships
 
 | MiniCOSM | Declaration | A volume is | Modules |
 |---|---|---|---|
@@ -24,6 +24,7 @@ guess.
 | `cosm` | `cosm: 0.2` or `0.3` | a standalone product tree: brand, suites, offerings | P |
 | `canon` | `oes: canon/1` | a Canon volume's or a project's catalog, `canon.cosm`, kept by enough | V |
 | `emf` | `oes: emf/1` | a text's EMF twin, `notes.md.cosm` beside `notes.md` | L E K P T X |
+| `doc` | `oes: doc/1` | a document enumerated (the spec, the manual), built by enough | S T R B |
 
 **EMF** (*enumerated meaning fabula*; "the fabula") takes a text apart: L terms
 grounded in FEED, E entities, K concepts, P claims, T events in order, X atems.
@@ -103,14 +104,17 @@ is one `cosm_guide` call away.
 3. `emf_derive` (a text → its EMF twin) or `atem` (the four parts, written
    into the twin; an inline `<text>` writes nothing) — only on request.
 
+For "what is X" about the format or the app, `doc_lookup` answers from the
+spec and the manual.
+
 Then `cosm_read` the twin to talk about what it holds. Writing into the Canon
 store (`canon:` paths) needs the broker's canon tools switched on.
 
 ## More
 
 The full specification is `docs/MACROCOSM_OES.md` in enough, which the user
-can open in the app as the MacroCOSM spec viewer. `references/README.md` says
-where the spec and the four manifests live.
+can open in the app's docs viewer (the MacroCOSM button). `references/README.md` says
+where the spec and the five manifests live.
 
 MacroCOSM OES © 2026 Graham Smith; see defaults/cosm/NOTICE.md
 

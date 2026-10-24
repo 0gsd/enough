@@ -53,6 +53,9 @@ def fake(tmp_path: Path) -> Path:
     ex = "core/vendor/comprise-oes/examples/meadow"
     for name in ("firm.cosm", "nodes.cosm", "doc.cosm", "meadow.sketch", "README.md", "extra.txt"):
         _put(c, f"{ex}/{name}", f"# {name}\n")
+    _put(c, "oes/comprise-oes.md", "# Comprise OES 1\n\n## 1. The map\n")
+    _put(c, "oes/README.md", "# OES: the paradigm map\n")
+    _put(c, "oes/notes.md", "not a chapter\n")
     return c
 
 
@@ -75,6 +78,9 @@ def test_sync_copies_the_allowlist_and_nothing_else(fake, tmp_path):
         "tests/fixtures/cosm/cosm02/meadow/meadow.sketch",
         "tests/fixtures/cosm/cosm02/meadow/README.md",
         "tests/fixtures/cosm/manifest.json",
+        "defaults/cosm/chapters/comprise-oes.md",
+        "defaults/cosm/chapters/comprise-paradigm-map.md",
+        "defaults/cosm/chapters/manifest.json",
     }
     assert _files(out) == expected
     assert sorted(report["added"]) == sorted(expected)
@@ -83,6 +89,26 @@ def test_sync_copies_the_allowlist_and_nothing_else(fake, tmp_path):
     assert "secret-client" not in text and "people: [" not in text
     assert (out / "defaults/cosm/manifests/comprise.manifest.cosm").read_bytes() == \
         (fake / "oes/comprise-oes.manifest.cosm").read_bytes()
+    assert (out / "defaults/cosm/chapters/comprise-oes.md").read_bytes() == (fake / "oes/comprise-oes.md").read_bytes()
+    assert (out / "defaults/cosm/chapters/comprise-paradigm-map.md").read_bytes() == \
+        (fake / "oes/README.md").read_bytes()
+
+
+def test_the_chapters_carry_their_source_and_hash(fake, tmp_path):
+    """The chapters' manifest.json is what the doc volume's chapter provenance reads: the source path, the commit,
+    and each copy's sha256; no timestamps, so a rerun is byte-stable."""
+    out = tmp_path / "repo"
+    sync_cosm.sync(fake, out)
+    body = json.loads((out / "defaults/cosm/chapters/manifest.json").read_text(encoding="utf-8"))
+    assert set(body) == {"source", "source_commit", "chapters"} and body["source"] == "comprise-dev"
+    assert body["chapters"] == {
+        "comprise-oes.md": {"source": "oes/comprise-oes.md",
+                            "sha256": hashlib.sha256((fake / "oes/comprise-oes.md").read_bytes()).hexdigest()},
+        "comprise-paradigm-map.md": {"source": "oes/README.md",
+                                     "sha256": hashlib.sha256((fake / "oes/README.md").read_bytes()).hexdigest()}}
+    before = (out / "defaults/cosm/chapters/manifest.json").read_bytes()
+    assert sync_cosm.sync(fake, out)["changed"] == []
+    assert (out / "defaults/cosm/chapters/manifest.json").read_bytes() == before
 
 
 def test_manifest_json_records_every_copy(fake, tmp_path):
@@ -151,6 +177,12 @@ def test_the_shipped_copies_match_their_manifest():
     body = json.loads((REPO / sync_cosm.MANIFEST_JSON).read_text(encoding="utf-8"))
     for rel, sha in body["files"].items():
         assert hashlib.sha256((REPO / rel).read_bytes()).hexdigest() == sha, f"{rel} was edited by hand: rerun the sync"
+    chapters = json.loads((REPO / sync_cosm.CHAPTERS_JSON).read_text(encoding="utf-8"))
+    assert chapters["source_commit"] == body["source_commit"]
+    assert set(chapters["chapters"]) == set(sync_cosm.CHAPTERS.values())
+    for dest, entry in chapters["chapters"].items():
+        rel = f"{sync_cosm.CHAPTERS_DEST}/{dest}"
+        assert body["files"][rel] == entry["sha256"] == hashlib.sha256((REPO / rel).read_bytes()).hexdigest()
     assert set(sync_cosm._existing(REPO)) == {rel for rel in body["files"] if not rel.startswith("defaults/")}
     holotypes = {rel.split("/")[4] for rel in body["files"] if rel.startswith(sync_cosm.HOLOTYPES_DEST)}
     assert holotypes == set(sync_cosm.HOLOTYPES)

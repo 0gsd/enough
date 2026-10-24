@@ -1862,8 +1862,8 @@ def run_ingest(project_dir: Path, *, box: str, source_type: str, value: str,
             written = _ingest_url(project_dir, name, value, norm_depth)
         else:
             written = _ingest_wikisink(project_dir, name, value, norm_depth)
-    except CanonError:
-        _mark_failed(name)
+    except CanonError as e:
+        _mark_failed(name, str(e))  # the sentence travels to ingest-status
         raise
     except Exception as e:  # noqa: BLE001 — record + re-raise as CanonError
         _mark_failed(name, str(e))
@@ -2037,6 +2037,10 @@ def _ingest_path(project_dir: Path, name: str, value: str,
     Comprise's outside-the-model files and folders, its database and its
     people files out of the copy."""
     src_root = Path(value).expanduser()
+    if not src_root.is_absolute():
+        # A relative source is relative to the project, the one folder the
+        # person (and the readvisor) can see — never the server's cwd.
+        src_root = Path(project_dir) / src_root
     try:
         src_root = src_root.resolve(strict=True)
     except (OSError, RuntimeError):

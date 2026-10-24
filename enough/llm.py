@@ -8,6 +8,8 @@ from typing import Any
 
 import httpx
 
+from . import agent_free as _agent_free
+
 
 class LLMError(RuntimeError):
     """Raised when llama-server returns a 4xx/5xx on the streaming endpoint."""
@@ -65,7 +67,12 @@ async def stream_chat(
 
     The caller handles connection lifecycle via the passed-in client; we can
     cancel mid-stream by aclose()'ing the generator.
+
+    Agent-free mode refuses here too (`LLMUnavailable`), behind the route
+    gate that should have stopped the turn first.
     """
+    if _agent_free.enabled():
+        raise LLMUnavailable(_agent_free.REASON)
     url = base_url.rstrip("/") + "/v1/chat/completions"
     payload: dict[str, Any] = {
         "model": "local",
@@ -141,8 +148,9 @@ CTX_HEADROOM = 512
 
 
 class LLMUnavailable(RuntimeError):
-    """No model can answer this completion: the cloud slot is chosen but the
-    cloud gate is shut. Carries the gate's plain reason as its message."""
+    """No model can answer this completion: agent-free mode is on, or the
+    cloud slot is chosen but the cloud gate is shut. Carries the plain reason
+    as its message (`agent-free` for the first)."""
 
 
 def message_text(message: dict[str, Any]) -> tuple[str, bool]:
@@ -207,7 +215,10 @@ def complete(messages: list[dict[str, str]], *, llm_url: str | None,
     (httpx errors, `cloud.CloudError`); the caller turns them into words.
 
     `cloud_gate=False` is the skill audit's pre-0.4.3 behaviour (it never
-    asked the gate); every new caller keeps the default."""
+    asked the gate); every new caller keeps the default. Agent-free mode
+    refuses whatever the slot (`LLMUnavailable("agent-free")`)."""
+    if _agent_free.enabled():
+        raise LLMUnavailable(_agent_free.REASON)
     if _current_slot() == "opro-api":
         from . import cloud as _cloud
         if cloud_gate:
@@ -243,7 +254,13 @@ def reachable(llm_url: str | None) -> tuple[bool, str]:
     The cloud gate when the cloud slot is chosen; otherwise llama-server's
     `/health`, where 503 ("loading") counts as NOT ready: a derivation that
     starts against a loading model fails on its first chunk, so the engine
-    asks this before it starts and writes a labelled scaffold instead."""
+    asks this before it starts and writes a labelled scaffold instead.
+
+    Agent-free mode answers `(False, "agent-free")` before anything is
+    probed: the derivations then take their rules path, and the reason rides
+    on the job (`reason: agent-free`) so the UI can say why."""
+    if _agent_free.enabled():
+        return False, _agent_free.REASON
     if _current_slot() == "opro-api":
         from . import cloud as _cloud
         try:

@@ -31,6 +31,9 @@ def _file_name(data: dict) -> str:
     if data.get("oes") == "emf/1":
         source = (data.get("source") or {}).get("path") or "text.md"
         return f"{Path(str(source)).name}.cosm"
+    if data.get("oes") == "doc/1":
+        telling = (data.get("telling") or {}).get("lang") or "en"
+        return f"{str(data.get('id', 'doc/x')).split('/', 1)[-1]}.{telling}.doc.cosm"
     return "brand.cosm"
 
 

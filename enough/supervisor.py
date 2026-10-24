@@ -12,6 +12,10 @@ Responsibilities
   running so the user's prior manual setup survives.
 - Non-blocking startup: the supervisor returns immediately; a background
   task polls /health and flips `ready` to True when llama-server responds.
+- Agent-free mode (0.4.4, `enough.agent_free`): never adopt, never launch,
+  never switch while the machine-global switch is on; `status()` says
+  `mode: "agent-free"`. server.py stops the model when the switch turns on
+  and calls `bootstrap()` again when it turns off.
 
 The supervisor is intentionally ignorant of FastAPI — server.py wires it
 into the lifespan. Tests can instantiate it directly.
@@ -33,6 +37,7 @@ from urllib.parse import urlsplit
 
 import httpx
 
+from . import agent_free as _agent_free
 from . import models as _models
 
 log = logging.getLogger("enough.supervisor")
@@ -76,6 +81,13 @@ class LlamaSupervisor:
     # -----------------------------------------------------------------------
 
     def status(self) -> dict[str, Any]:
+        agent_free = _agent_free.enabled()
+        if agent_free:
+            # Whatever is (still) running, nothing answers through enough:
+            # the gate is shut, so the model is not ready for anyone.
+            return {"mode": _agent_free.REASON, "ready": False,
+                    "cute": None, "ctx": None, "url": self.llm_url,
+                    "error": None, "agent_free": True}
         mode = "owned" if self.proc else ("adopted" if self.adopted_pid else "off")
         return {
             "mode": mode,
@@ -84,6 +96,7 @@ class LlamaSupervisor:
             "ctx": self.current_ctx,
             "url": self.llm_url,
             "error": self.last_error,
+            "agent_free": False,
         }
 
     # -----------------------------------------------------------------------
@@ -91,7 +104,13 @@ class LlamaSupervisor:
     # -----------------------------------------------------------------------
 
     async def bootstrap(self) -> None:
-        """Adopt-or-launch. Safe to call once during FastAPI lifespan."""
+        """Adopt-or-launch. Safe to call once during FastAPI lifespan, and
+        again after `stop()` (turning agent-free off starts the model this
+        way, through the same startup choice). A no-op while agent-free."""
+        if _agent_free.enabled():
+            self.last_error = None
+            log.info("agent-free mode: not adopting or starting llama-server")
+            return
         # Case 1: llama-server already up → adopt.
         pid = await self._probe_existing()
         if pid is not None:
@@ -157,6 +176,8 @@ class LlamaSupervisor:
     # -----------------------------------------------------------------------
 
     def _launch(self, cute: str, ctx: int) -> None:
+        if _agent_free.enabled():
+            raise RuntimeError(_agent_free.detail("no model starts while agent-free is on"))
         info = _models.resolve(cute)
         if not info["installed"]:
             raise RuntimeError(
@@ -327,7 +348,9 @@ class LlamaSupervisor:
     async def switch(self, cute: str, ctx: int | None = None) -> None:
         """Swap in a new model (and optionally a new ctx). Stops whatever's
         running, then launches fresh. Persists the choice to the live
-        model state."""
+        model state. Refused while agent-free, before anything is stopped."""
+        if _agent_free.enabled():
+            raise RuntimeError(_agent_free.detail("no model starts while agent-free is on"))
         info = _models.resolve(cute)
         if not info["installed"]:
             raise RuntimeError(f"model {cute} is not installed; cannot switch to it.")

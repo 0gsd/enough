@@ -93,7 +93,11 @@ SAME_IN_EVERY_LANGUAGE = frozenset(s.casefold() for s in (
     # the translation contract keeps as-is (with cosm and EMF). `short`
     # (0.4.3, SHORT, plan §15) is the product word for a telling compiled
     # from an EMF twin, kept as-is in every language (docs/I18N.md).
+    # `fabula` (0.4.4, DocOES) is the third of the docs viewer's three
+    # densities beside atem and short, kept as-is like them; `MiniCOSMs`
+    # (0.4.4, the fabula's facet by MiniCOSM) is the format's own word.
     "enough", "wikisink", "canon", "girraph", "merirmaid", "MacroCOSM", "atem", "short",
+    "fabula", "MiniCOSMs",
     "composure", "readvisor", "readvisors", "rness", "broker", "infoworld",
     "OpenRouter", "MADLAD", "Wikipedia", "markdown", "PDF", "HTML",
     "URL", "AGENT.md", "MOTIVATION.md", "FEED",
@@ -114,12 +118,14 @@ COGNATES: dict[str, frozenset[str]] = {
         "module",           # likewise — "un module" is the French word
         "modules",          # …and its plural
         "holotype",         # the French term (taxonomy, and Comprise's word)
+        "agent",            # "un agent" — the slider's word (agentmode.agent, 0.4.4)
     )),
     "es": frozenset((
         "roles",            # plural of "rol"
         "chat",             # the RAE-accepted loan-word
         "wip · editable",   # "editable" is the Spanish word too
         "error",            # the Spanish word, spelled the same
+        "ideas",            # the Spanish plural of "idea" (docs.bubble.ideas, 0.4.4)
     )),
     "de": frozenset((
         "pink",             # German for pink

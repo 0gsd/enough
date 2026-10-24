@@ -179,16 +179,16 @@ def test_sniff_declaration_reads_only_the_head():
 # Manifests and the registry
 # ---------------------------------------------------------------------------
 
-def test_registry_loads_the_four_manifests_in_order():
+def test_registry_loads_the_five_manifests_in_order():
     reg = M.default_registry()
-    assert list(reg.manifests) == ["comprise", "cosm", "canon", "emf"]
+    assert list(reg.manifests) == ["comprise", "cosm", "canon", "emf", "doc"]
     assert reg.problems == []
     assert [(m.name, m.version) for m in reg.manifests.values()] == [("comprise", 1), ("cosm", 0), ("canon", 1),
-                                                                      ("emf", 1)]
+                                                                      ("emf", 1), ("doc", 1)]
     assert M.default_registry() is reg
 
 
-@pytest.mark.parametrize("name", ["cosm", "canon", "emf"])
+@pytest.mark.parametrize("name", ["cosm", "canon", "emf", "doc"])
 def test_our_manifests_carry_the_header_and_the_notice(name):
     text = (MANIFESTS / f"{name}.manifest.cosm").read_text(encoding="utf-8")
     head = text.split("\nmanifest:", 1)[0]
@@ -230,7 +230,7 @@ def test_load_manifest_refuses_what_is_not_one(tmp_path):
     bad = _write(tmp_path, "y.manifest.cosm", "manifest: minicosm/0\nname: Y Z\nversion: 1\n")
     assert isinstance(M.load_manifest(bad), M.Refusal)
     reg = M.Registry([tmp_path, MANIFESTS])
-    assert len(reg.problems) == 2 and list(reg.manifests) == ["comprise", "cosm", "canon", "emf"]
+    assert len(reg.problems) == 2 and list(reg.manifests) == ["comprise", "cosm", "canon", "emf", "doc"]
 
 
 # ---------------------------------------------------------------------------

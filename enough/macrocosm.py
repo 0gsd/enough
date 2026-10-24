@@ -38,8 +38,15 @@ is read or written.
     python -m enough.macrocosm lint     <volume> [--json]
     python -m enough.macrocosm paths    <volume> [<path or id>]
     python -m enough.macrocosm tree     <volume>
-    python -m enough.macrocosm mermaid  <volume> [--lens ID] [--max-nodes N]
+    python -m enough.macrocosm mermaid  <volume> [--lens ID] [--max-nodes N] [--around KEY [--depth N]]
     python -m enough.macrocosm identify <catalog or folder>
+
+Two entry points beside `load_volume`: `load_volume_text(text, filename=)`
+reads one catalog held in memory (a spec example, a block a viewer shows)
+exactly as `load_volume` reads a file of that name, writing nothing; and
+`to_mermaid(volume, lens, around=key, depth=1)` draws a local graph, the
+item and what its references and links reach in or out within `depth`
+steps, as one flowchart with the centre node in the class `focus`.
 """
 
 from __future__ import annotations
@@ -63,7 +70,10 @@ MANIFEST_FORMAT = "minicosm/0"
 MANIFEST_GLOB = "*.manifest.cosm"
 DEFAULT_MANIFEST_DIR = Path(__file__).resolve().parents[1] / "defaults" / "cosm" / "manifests"
 # When two manifests could claim one catalog, the first in this order wins; any other MiniCOSM follows by name.
-REGISTRY_ORDER = ("comprise", "cosm", "canon", "emf")
+REGISTRY_ORDER = ("comprise", "cosm", "canon", "emf", "doc")
+# The lens kinds `to_mermaid` draws. A manifest may declare others (DocOES's `short` and `table`): `Manifest.lenses`
+# keeps them for the code that renders them; `lenses(volume)` lists only the ones drawn here.
+DRAWN_LENS_KINDS = ("mermaid",)
 # The keys `dump` puts first, looked for in this order: a catalog's declaration, a manifest's own format line.
 DECLARATION_KEYS = ("oes", "manifest", "cosm", "opi", "comprise")
 # Catalog keys any MiniCOSM accepts: kept and ignored (reserved for a version test on the grammar itself).
@@ -1069,6 +1079,47 @@ def load_volume(path, registry: Registry | None = None) -> Volume:
                       problems=[Problem("load", "error", "", "", msg)])
 
 
+def load_volume_text(text: str, *, filename: str, registry: Registry | None = None) -> Volume:
+    """A volume from one catalog's text, as `load_volume` would read a file named `filename` holding it: a
+    single-file MiniCOSM loads whole; a folder MiniCOSM loads the catalog alone (a flat layout reads its items from
+    the catalog, as from any module file at the root; a layout with parts reports each declared part's folder as
+    missing). Nothing is written to disk. `filename` matters only where the manifests let a catalog without a
+    declaration be claimed by its name. Never raises on bad input."""
+    reg = registry if registry is not None else default_registry()
+    rel = Path(str(filename or "")).name or "inline.cosm"
+    vol = Volume(Path(rel), catalog_file=rel, files=[rel])
+    data, forbidden, error = _parse(text if isinstance(text, str) else "")
+    vol.problems += [Problem("load", "error", "", rel, msg) for msg in forbidden]
+    if error or (data is not None and not isinstance(data, dict)):
+        vol.problems.append(Problem("load", "error", "", rel, error or "top level must be a mapping"))
+        vol.refused = Refusal(f"{rel} could not be read, so the MiniCOSM it is written in is unknown; nothing was "
+                              "loaded", file=rel)
+        return vol
+    doc = data or {}
+    decl = reg.identify(doc, filename=rel)
+    if isinstance(decl, Refusal):
+        vol.catalog = {k: doc[k] for k in ("id", "name", *DECLARATION_KEYS) if k in doc}
+        vol.refused = decl
+        vol.problems.append(Problem("load", "error", "", rel, decl.message))
+        return vol
+    m = decl.manifest
+    vol.manifest, vol.minicosm, vol.major, vol.declaration, vol.catalog = m, decl.minicosm, decl.major, decl, doc
+    g, lay = m.grammar, m.layout
+    if m.single_file:
+        _add_items(vol, m, doc, rel, None, None)
+    elif g.part_level and lay["parts"]:
+        key = lay["parts_key"]
+        for a in _list(doc.get(key)) if key else []:
+            aid = a if isinstance(a, str) else (a.get("id") if isinstance(a, dict) else None)
+            if g.is_part_id(aid):
+                folder = lay["parts"].replace(f"<{g.part_level}>", g.part_slug(aid) or "")
+                vol.problems.append(Problem("load", "error", aid, "", f"folder {folder} missing (only the catalog "
+                                                                      "was given)"))
+    elif fnmatch.fnmatch(rel, lay["files"]):
+        _add_items(vol, m, doc, rel, None, None)
+    return vol
+
+
 def _load_volume(p: Path, reg: Registry) -> Volume:
     if p.is_dir():
         cat = reg.find_catalog(p)
@@ -1772,12 +1823,18 @@ def _has_tree(volume: Volume) -> bool:
                for it in volume.items.values())
 
 
+def _drawn(spec: dict) -> bool:
+    """A lens `to_mermaid` can draw: kind `mermaid`, or no kind given."""
+    return spec.get("kind", "mermaid") in DRAWN_LENS_KINDS
+
+
 def lenses(volume: Volume) -> list[str]:
-    """The lens ids for a volume: the manifest's, then the generic `map` always, then a generic `tree` when
-    items carry `parts` or `parent`."""
+    """The lens ids for a volume: the manifest's Mermaid lenses, then the generic `map` always, then a generic
+    `tree` when items carry `parts` or `parent`. A lens of another kind (DocOES's `manual`, a short; its
+    `inventory`, a table) is the manifest's to declare and another renderer's to draw: it is not listed here."""
     if volume.manifest is None:
         return []
-    out = [spec["id"] for spec in volume.manifest.lenses()]
+    out = [spec["id"] for spec in volume.manifest.lenses() if _drawn(spec)]
     if "map" not in out:
         out.append("map")
     if "tree" not in out and _has_tree(volume):
@@ -1788,6 +1845,9 @@ def lenses(volume: Volume) -> list[str]:
 def _lens_spec(volume: Volume, lens: str) -> dict:
     for spec in volume.manifest.lenses():
         if spec["id"] == lens:
+            if not _drawn(spec):
+                raise ValueError(f"lens {lens!r} is a {spec.get('kind')}, not a Mermaid drawing; this reader draws "
+                                 f"{', '.join(lenses(volume))}")
             return spec
     if lens == "map":
         return {"id": "map", "diagram": "flowchart"}
@@ -1866,12 +1926,18 @@ def _module_label(m: Manifest, letter: str) -> str:
 
 
 def to_mermaid(volume: Volume, lens: str = "map", *, include: list[str] | None = None, max_nodes: int = MAX_NODES,
-               clicks: bool = False) -> tuple[str, dict]:
+               clicks: bool = False, around: str | None = None, depth: int = 1) -> tuple[str, dict]:
     """A plain Mermaid body (no frontmatter) for one lens, and its node_map {mermaid node id: {"id": item key,
     "path": item path, "file": the item's file, "fs_path": the item's `path` field}}. Modules are subgraphs
     (inside a subgraph per part where the volume has parts); past `max_nodes` items, the rest of each subgraph
     collapses into one "… N more" node (node_map: id None, `more`: N). `clicks` adds a `click` line carrying
-    each item's path. Raises ValueError for a lens the volume does not have (see `lenses`)."""
+    each item's path. Raises ValueError for a lens the volume does not have (see `lenses`).
+
+    `around` (an item's key, id or path) draws a local graph instead: that item and the items the lens's edges
+    reach from it or to it within `depth` steps (1 by default), among the lens's included modules, as one
+    flowchart with no subgraphs (a mindmap lens too), the centre node in the class `focus` and marked `focus:
+    true` in node_map; past `max_nodes` the nearest are kept and the rest become one "… N more" node. Raises
+    ValueError when no item answers to `around`."""
     if volume.manifest is None:
         why = str(volume.refused) if volume.refused is not None else "not loaded"
         return f'flowchart TB\n  refused["{_mm_text(why)}"]\n', {}
@@ -1879,6 +1945,8 @@ def to_mermaid(volume: Volume, lens: str = "map", *, include: list[str] | None =
     spec = _lens_spec(volume, lens)
     modules = [str(x) for x in (include or spec.get("include") or m.modules())]
     items = [it for it in volume.items.values() if (it.module or "") in modules]
+    if around is not None:
+        return _local_graph(volume, spec, items, around, depth=depth, max_nodes=max_nodes, clicks=clicks)
     if spec.get("tree"):
         keep = _tree_keys(volume)
         items = [it for it in items if it.key in keep]
@@ -1949,6 +2017,85 @@ def to_mermaid(volume: Volume, lens: str = "map", *, include: list[str] | None =
                 cname = f"c_{_slug(cls, 16)}_{_slug(val, 24)}"
                 lines.append(f"  classDef {cname} stroke:{_PALETTE[i % len(_PALETTE)]},stroke-width:2px;")
                 lines.append(f"  class {','.join(by[val])} {cname};")
+    if clicks:
+        for nid, entry in node_map.items():
+            if entry["id"] is not None and entry["path"]:
+                lines.append(f'  click {nid} "{_mm_text(entry["path"], 0)}"')
+    return "\n".join(lines) + "\n", node_map
+
+
+def _centre(volume: Volume, around: Any) -> Item:
+    ref = str(around).strip()
+    hit: Any = volume.item(ref)
+    if hit is None:
+        hit = resolve_path(volume, ref)
+        if isinstance(hit, tuple):
+            hit = hit[0]
+    if not isinstance(hit, Item):
+        raise ValueError(f"no item {ref!r} in this volume to draw around")
+    return hit
+
+
+def _local_graph(volume: Volume, spec: dict, items: list[Item], around: Any, *, depth: int, max_nodes: int,
+                 clicks: bool) -> tuple[str, dict]:
+    """`to_mermaid(..., around=)`: the neighbourhood of one item, breadth first, as one flowchart."""
+    centre = _centre(volume, around)
+    allowed = {it.key for it in items} | {centre.key}
+    rank = {k: i for i, k in enumerate(volume.items)}
+    adj: dict[str, set[str]] = {}
+    edges: list[tuple[Item, Item, str, str]] = []
+    for it in volume.items.values():
+        if it.key not in allowed:
+            continue
+        for a, b, label, style in _edges(volume, spec, it):
+            if a.key in allowed and b.key in allowed and a.key != b.key:
+                edges.append((a, b, label, style))
+                adj.setdefault(a.key, set()).add(b.key)
+                adj.setdefault(b.key, set()).add(a.key)
+    order, seen, frontier = [centre.key], {centre.key}, [centre.key]
+    for _ in range(max(int(depth), 0)):
+        nxt: list[str] = []
+        for k in frontier:
+            for n in sorted(adj.get(k, ()), key=lambda x: rank.get(x, 0)):
+                if n not in seen:
+                    seen.add(n)
+                    order.append(n)
+                    nxt.append(n)
+        frontier = nxt
+    keep = order[:max(int(max_nodes), 1)]
+    hidden = order[len(keep):]
+    lines = [f"flowchart {spec.get('direction') or 'LR'}"]
+    node_map: dict[str, dict] = {}
+    ids: dict[str, str] = {}
+    for key in keep:
+        it = volume.items[key]
+        nid = _node_id(key)
+        o, c = _shape(spec, it.kind)
+        lines.append(f'  {nid}{o}"{_mm_text(it.name)}"{c}')
+        ids[key] = nid
+        node_map[nid] = {"id": key, "path": item_path(volume, it), "file": it.file,
+                         "fs_path": it.data.get("path") if isinstance(it.data.get("path"), str) else None}
+    node_map[ids[centre.key]]["focus"] = True
+    if hidden:
+        mid = _node_id(centre.key, "more")
+        lines.append(f'  {mid}["… {len(hidden)} more"]')
+        node_map[mid] = {"id": None, "path": "", "file": None, "fs_path": None, "more": len(hidden)}
+        for key in hidden:
+            ids[key] = mid
+    seen_edges: set[tuple] = set()
+    arrows = {"ref": "-->", "link": "-.->", "tree": "-->"}
+    for a, b, label, style in edges:
+        x, y = ids.get(a.key), ids.get(b.key)
+        if not x or not y or x == y:
+            continue
+        k = (x, y, style) if style == "tree" else (x, y, style, label)
+        if k in seen_edges:
+            continue
+        seen_edges.add(k)
+        lab = f'|"{_mm_text(label, 32)}"|' if label else ""
+        lines.append(f"  {x} {arrows[style]}{lab} {y}")
+    lines.append("  classDef focus stroke-width:3px,font-weight:bold;")
+    lines.append(f"  class {ids[centre.key]} focus;")
     if clicks:
         for nid, entry in node_map.items():
             if entry["id"] is not None and entry["path"]:
@@ -2079,6 +2226,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("target", nargs="?", help="paths: a path, qualified URI or id to resolve")
     ap.add_argument("--lens", default="map", help="mermaid: the lens id (default map)")
     ap.add_argument("--max-nodes", type=int, default=MAX_NODES, help="mermaid: collapse past this many items")
+    ap.add_argument("--around", help="mermaid: draw the local graph around this item (key, id or path)")
+    ap.add_argument("--depth", type=int, default=1, help="mermaid --around: steps out from the item (default 1)")
     ap.add_argument("--json", action="store_true", help="lint, identify: JSON output")
     ap.add_argument("--manifests", action="append", type=Path, help="read manifests from this folder (repeatable)")
     args = ap.parse_args(argv)
@@ -2136,7 +2285,7 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.write(to_text_tree(vol))
         return 0
     try:
-        body, _ = to_mermaid(vol, args.lens, max_nodes=args.max_nodes)
+        body, _ = to_mermaid(vol, args.lens, max_nodes=args.max_nodes, around=args.around, depth=args.depth)
     except ValueError as e:
         print(str(e), file=sys.stderr)
         return 2

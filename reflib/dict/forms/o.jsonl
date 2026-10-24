@@ -562,9 +562,10 @@
 {"headword": "oka", "form": "okas", "position": 1, "pronunciation": "/ˈoʊkəz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "oka", "form": "oke", "position": 2, "pronunciation": "/oʊk/", "labels": "[\"var.\"]", "synonyms": null}
 {"headword": "okapi", "form": "okapis", "position": 1, "pronunciation": "/oʊˈkɑpiz/", "labels": "[\"pl.\"]", "synonyms": null}
-{"headword": "okay", "form": "okayed", "position": 1, "pronunciation": "/ˌoʊˈkeɪd/", "labels": "[\"past\"]", "synonyms": null}
-{"headword": "okay", "form": "okaying", "position": 2, "pronunciation": "/ˌoʊˈkeɪɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
-{"headword": "okay", "form": "okays", "position": 3, "pronunciation": "/ˌoʊˈkeɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
+{"headword": "okay", "form": "ok", "position": 1, "pronunciation": "/ˌoʊˈkeɪ/", "labels": "[\"var.\"]", "synonyms": null}
+{"headword": "okay", "form": "okayed", "position": 2, "pronunciation": "/ˌoʊˈkeɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "okay", "form": "okaying", "position": 3, "pronunciation": "/ˌoʊˈkeɪɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "okay", "form": "okays", "position": 4, "pronunciation": "/ˌoʊˈkeɪz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
 {"headword": "oke", "form": "okes", "position": 1, "pronunciation": "/oʊks/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "okeh", "form": "okehs", "position": 1, "pronunciation": "/ˌoʊˈkeɪz/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "okoume", "form": "okoumes", "position": 1, "pronunciation": "/ˌoʊkəˈmeɪz/", "labels": "[\"pl.\"]", "synonyms": null}

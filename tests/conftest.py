@@ -75,6 +75,9 @@ _STATE_SEAMS = {
     # write a small fixture source and point the seam at it themselves.
     "ENOUGH_DICT_ROOT": "dict",
     "ENOUGH_DICT_SOURCE": "no-dict-source",
+    # DocOES (0.4.4): the built doc volumes. Every test that builds one lands
+    # here; the real ~/enough/docoes/ is never touched by the suite.
+    "ENOUGH_DOCS_ROOT": "docoes",
 }
 
 # Seams that must be *absent*, not redirected. Each of these changes

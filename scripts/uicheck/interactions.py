@@ -32,7 +32,7 @@ from collections.abc import Callable
 
 from .driver import Driver, StepError
 from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
-                      COSM_READY, COSMSPEC_READY, COUNCIL_PAL_STATEMENT,
+                      COSM_READY, DOCS_READY, COUNCIL_PAL_STATEMENT,
                       DICT_PLAIN, DICT_READY, DOC, EMF_PASSAGE, EMF_TEXT,
                       GIRRAPH, HOLOTYPE, JOURNAL_READY, LEDGER, PRESS, WDL_READY)
 
@@ -49,8 +49,8 @@ def _reset(d: Driver) -> None:
     d.js("(() => { Array.from(document.querySelectorAll("
          "'#mode-stack .mode-indicator .mode-ribbon')).reverse()"
          ".forEach((b) => { try { b.click(); } catch (e) {} });"
-         " ['readedit','girraph','merirmaid','wikisink','canon','ref',"
-         "'paginated','blobview','dict','cosm','cosmspec'].forEach((n) => { try { modeRemove(n); } "
+         " ['readedit','girraph','merirmaid','wikisink','canon',"
+         "'paginated','blobview','dict','cosm','docs'].forEach((n) => { try { modeRemove(n); } "
          "catch (e) {} }); return true; })()")
     d.js("(() => { try { wdlClose(); dictCtxClose(); } catch (e) {} return true; })()")
     d.js("(() => { try { atemCardClose(); } catch (e) {} return true; })()")
@@ -195,8 +195,8 @@ def scenario_esc_closes_only_top(d: Driver) -> list[str]:
     resident = _names(d)
     d.js(f"enterGirraphMode('{GIRRAPH}')")
     d.wait_for("#girraph-mode.open")
-    d.js("enterRefMode()")
-    d.wait_for("#ref-mode.open")
+    d.js("enterDocsMode({doc: 'help-center', density: 'short'})")
+    d.wait_for("#docs-mode.open")
     d.wait_idle()
 
     d.key("Escape")
@@ -204,7 +204,7 @@ def scenario_esc_closes_only_top(d: Driver) -> list[str]:
     names = _mine(d, resident)
     if names != ["girraph"]:
         fails.append(f"one esc left {names} of this scenario's modes open, "
-                     f"expected only the top (ref) to close: ['girraph']")
+                     f"expected only the top (docs) to close: ['girraph']")
     d.key("Escape")
     d.wait_idle()
     if _mine(d, resident):
@@ -270,8 +270,8 @@ def scenario_buried_ribbon_closes_that_entry(d: Driver) -> list[str]:
     resident = _names(d)
     d.js(f"enterGirraphMode('{GIRRAPH}')")
     d.wait_for("#girraph-mode.open")
-    d.js("enterRefMode()")
-    d.wait_for("#ref-mode.open")
+    d.js("enterDocsMode({doc: 'help-center', density: 'short'})")
+    d.wait_for("#docs-mode.open")
     d.wait_idle()
 
     clicked = d.js("(() => { const sq = document.querySelector("
@@ -282,9 +282,9 @@ def scenario_buried_ribbon_closes_that_entry(d: Driver) -> list[str]:
         return fails + ["the buried girraph indicator has no ribbon-redx"]
     d.wait_idle()
     names = _mine(d, resident)
-    if names != ["ref"]:
+    if names != ["docs"]:
         fails.append(f"closing the buried entry from its ribbon left {names}, "
-                     f"expected ['ref'] — the ribbon must close THAT entry, "
+                     f"expected ['docs'] — the ribbon must close THAT entry, "
                      f"not the top one")
     _reset(d)
     return fails
@@ -613,9 +613,9 @@ def scenario_rv_minis_inside_main(d: Driver) -> list[str]:
     d.wait_idle()
     d.js(f"openReadEdit('{DOC}', {{size: 'mini', face: 'read'}})")
     d.wait_for("#preview.open")
-    d.js("enterRefMode()")
-    d.wait_for("#ref-mode.open")
-    d.js("refToggleSize()")
+    d.js("enterDocsMode({doc: 'help-center', density: 'short'})")
+    d.wait_for("#docs-mode.open")
+    d.js("docsToggleSize()")
     d.wait_idle()
 
     rects = d.js("(() => { const r = (s) => { const e ="
@@ -623,12 +623,12 @@ def scenario_rv_minis_inside_main(d: Driver) -> list[str]:
                  " const b = e.getBoundingClientRect();"
                  " return {left: b.left, right: b.right, w: b.width}; };"
                  " return {panel: r('#readvisor-panel'), mini: r('#preview'),"
-                 "  ref: r('#ref-mode')}; })()") or {}
+                 "  docs: r('#docs-mode')}; })()") or {}
     panel = rects.get("panel")
     if not panel or not panel["w"]:
         fails.append(f"the readvisor panel has no box to be left of: {panel}")
     else:
-        for name in ("mini", "ref"):
+        for name in ("mini", "docs"):
             box = rects.get(name)
             if not box or not box["w"]:
                 fails.append(f"#{name} is not on screen: {box}")
@@ -1633,8 +1633,8 @@ def scenario_topbar_no_collisions(d: Driver) -> list[str]:
     d.wait_for("#girraph-mode.open")
     d.js("enterCanonMode()")
     d.wait_for("#canon-mode.open")
-    d.js("enterRefMode()")
-    d.wait_for("#ref-mode.open")
+    d.js("enterDocsMode({doc: 'help-center', density: 'short'})")
+    d.wait_for("#docs-mode.open")
     d.js(f"openReadEdit('{DOC}', {{size:'full', face:'read'}})")
     d.wait_for("#review-mode.open")
     d.wait_idle()
@@ -1927,37 +1927,50 @@ def _scales(d: Driver, ui: float, txt: float) -> None:
     _sleep(d, 200)
 
 
-_FIND_OPEN = "!document.getElementById('ref-find').hidden"
+_FIND_OPEN = "!document.getElementById('docs-find').hidden"
 _CUR_IN_VIEW = ("(() => { const h = window.CSS && CSS.highlights"
                 " && CSS.highlights.get('enough-find-current');"
-                " const m = document.querySelector('#ref-body mark.find-hit.current');"
+                " const m = document.querySelector('#docs-body mark.find-hit.current');"
                 " const r = h ? [...h][0].getBoundingClientRect()"
                 " : (m ? m.getBoundingClientRect() : null);"
                 " if (!r) return null;"
-                " const b = document.getElementById('ref-body').getBoundingClientRect();"
+                " const b = document.getElementById('docs-body').getBoundingClientRect();"
                 " return r.top >= b.top && r.bottom <= b.bottom; })()")
+_DOCS_OPEN = "document.getElementById('docs-mode').classList.contains('open')"
 
 
-def scenario_ref_find_contents(d: Driver) -> list[str]:
-    """Help: stable section ids, a contents list that jumps and tracks,
-    cross-references that link, ⌘F find that steps through matches and
-    keeps the current one on screen at any ui/text scale, esc closing the
-    bar before the mode, a way back after a jump — and ⌘F left alone while
-    the chat composer has the caret."""
+def _docs_open(d: Driver, doc: str, density: str = "short", anchor: str | None = None) -> None:
+    """The docs viewer on `doc` at `density`, drawn. The density is always
+    named: the viewer remembers one per document in localStorage."""
+    opts = {"doc": doc, "density": density}
+    if anchor:
+        opts["anchor"] = anchor
+    d.js_await("(async () => { await enterDocsMode(" + json.dumps(opts) + "); return true; })()")
+    d.js_await(DOCS_READY[1])
+    d.wait_for({"short": "#docs-body .docs-sec h2[id]", "atem": "#docs-body .docs-outline",
+                "fabula": "#docs-body .cosm-card.docs-prism"}[density])
+    d.wait_idle()
+
+
+def scenario_docs_find_contents(d: Driver) -> list[str]:
+    """The help center in the docs viewer at short (0.4.1's ref-find-contents,
+    re-pointed at #docs-mode — plan §5's gate): stable section ids, a
+    contents list that jumps and tracks, cross-references that link, ⌘F find
+    that steps through matches and keeps the current one on screen at any
+    ui/text scale, esc closing the bar before the mode, a way back after a
+    jump — and ⌘F left alone while the chat composer has the caret."""
     fails: list[str] = []
     _reset(d)
-    d.js("enterRefMode()")
-    d.wait_for("#ref-body h2[id]")
-    d.wait_idle()
+    _docs_open(d, "help-center")
     g = d.js("(() => { const hs = Array.from(document.querySelectorAll("
-             "'#ref-body h1, #ref-body h2, #ref-body h3'));"
+             "'#docs-body h1, #docs-body h2, #docs-body h3'));"
              " const ids = hs.map((h) => h.id);"
              " return {n: hs.length, uniq: new Set(ids).size, first: ids[1],"
-             " toc: document.querySelectorAll('#ref-toc a').length,"
-             " xref: document.querySelectorAll('#ref-body a.ref-xref').length,"
-             " bad: Array.from(document.querySelectorAll('#ref-body a.ref-xref'))"
+             " toc: document.querySelectorAll('#docs-toc a').length,"
+             " xref: document.querySelectorAll('#docs-body a.ref-xref').length,"
+             " bad: Array.from(document.querySelectorAll('#docs-body a.ref-xref'))"
              ".filter((a) => !document.getElementById(a.dataset.target)).length}; })()")
-    if g["uniq"] != g["n"] or g["first"] != "ref-sec-1":
+    if g["uniq"] != g["n"] or g["first"] != "docs-sec-1":
         fails.append(f"heading ids are not unique/stable: {g}")
     if g["toc"] < 10:
         fails.append(f"the contents list has {g['toc']} entries")
@@ -1968,14 +1981,14 @@ def scenario_ref_find_contents(d: Driver) -> list[str]:
     # the list marks it, and the reader can go back.
     for ui, txt in ((1, 1), (1.2, 1.3)):
         _scales(d, ui, txt)
-        d.js("refTocToggle(true)")
-        j = d.js("(() => { const body = document.getElementById('ref-body');"
-                 " body.scrollTop = 0; const a = document.querySelectorAll('#ref-toc a')[25];"
+        d.js("docsTocToggle(true)")
+        j = d.js("(() => { const body = document.getElementById('docs-body');"
+                 " body.scrollTop = 0; const a = document.querySelectorAll('#docs-toc a')[25];"
                  " a.click(); const h = document.getElementById(a.dataset.target);"
                  " const off = h.getBoundingClientRect().top - body.getBoundingClientRect().top;"
-                 " refTocToggle(true);"
-                 " return {off, back: !document.getElementById('ref-back').hidden,"
-                 " cur: document.querySelector('#ref-toc a.current')?.dataset.target,"
+                 " docsTocToggle(true);"
+                 " return {off, back: !document.getElementById('docs-back').hidden,"
+                 " cur: document.querySelector('#docs-toc a.current')?.dataset.target,"
                  " want: a.dataset.target}; })()")
         if not (0 <= j["off"] <= 40):
             fails.append(f"[ui {ui}/text {txt}] a contents jump put the heading "
@@ -1985,8 +1998,8 @@ def scenario_ref_find_contents(d: Driver) -> list[str]:
                          f"{j['cur']}, not {j['want']}")
         if not j["back"]:
             fails.append(f"[ui {ui}/text {txt}] no way back after a jump")
-        d.js("refBackGo()")
-        if d.js("document.getElementById('ref-body').scrollTop") > 2:
+        d.js("docsBackGo()")
+        if d.js("document.getElementById('docs-body').scrollTop") > 2:
             fails.append(f"[ui {ui}/text {txt}] 'back' did not return to the top")
 
     # ⌘F, typing, Return/shift-Return stepping, the current match in view.
@@ -1998,7 +2011,7 @@ def scenario_ref_find_contents(d: Driver) -> list[str]:
         fails.append(f"⌘F opened the bar but focus is on {_active(d)}")
     d.type_text("composure")
     _sleep(d, 350)
-    st = d.js("REF_FIND.state()")
+    st = d.js("DOCS_FIND.state()")
     if not st or st["n"] < 3:
         fails.append(f"find 'composure' in the manual: {st}")
     else:
@@ -2011,32 +2024,31 @@ def scenario_ref_find_contents(d: Driver) -> list[str]:
             if not all(seen):
                 fails.append(f"[ui {ui}/text {txt}] a current match was off "
                              f"screen after Return: {seen}")
-        i0 = d.js("REF_FIND.state().i")
+        i0 = d.js("DOCS_FIND.state().i")
         _shift_enter = {"key": "Enter", "code": "Enter", "windowsVirtualKeyCode": 13,
                         "nativeVirtualKeyCode": 13, "text": "\r", "modifiers": 8}
         d.page.send("Input.dispatchKeyEvent", {"type": "keyDown", **_shift_enter})
         d.page.send("Input.dispatchKeyEvent", {"type": "keyUp", **_shift_enter})
-        if d.js("REF_FIND.state().i") != i0 - 1:
+        if d.js("DOCS_FIND.state().i") != i0 - 1:
             fails.append("shift-Return did not step back one match")
-        cnt = d.js("document.querySelector('#ref-find .find-count').textContent")
+        cnt = d.js("document.querySelector('#docs-find .find-count').textContent")
         if cnt != f"{i0} of {st['n']}" and d.js("I18N.lang") == "en":
             fails.append(f"the count reads {cnt!r}, expected '{i0} of {st['n']}'")
     d.key("Escape")
     d.wait_idle()
     if d.js(_FIND_OPEN):
         fails.append("esc in the find field did not close the bar")
-    if not d.js("document.getElementById('ref-mode').classList.contains('open')"):
+    if not d.js(_DOCS_OPEN):
         fails.append("esc in the find field closed help as well as the bar")
     if d.js("window.CSS && CSS.highlights && CSS.highlights.size") or \
-            d.js("document.querySelectorAll('#ref-body mark.find-hit').length"):
+            d.js("document.querySelectorAll('#docs-body mark.find-hit').length"):
         fails.append("closing find left matches painted")
     # Bar open but focus elsewhere: esc still takes the bar first.
     _cmd_f(d)
     d.js("document.activeElement.blur()")
     d.key("Escape")
     d.wait_idle()
-    if d.js(_FIND_OPEN) or not d.js(
-            "document.getElementById('ref-mode').classList.contains('open')"):
+    if d.js(_FIND_OPEN) or not d.js(_DOCS_OPEN):
         fails.append("with the bar open and unfocused, esc did not close the "
                      "bar first (and only the bar)")
     # The chat composer keeps ⌘F.
@@ -2046,16 +2058,16 @@ def scenario_ref_find_contents(d: Driver) -> list[str]:
     if d.js(_FIND_OPEN):
         fails.append("⌘F with the caret in the chat composer opened help's find")
     # Mini: the contents list drops over the text and esc folds it first.
-    d.js("document.activeElement.blur(); refToggleSize(); refTocToggle(true)")
+    d.js("document.activeElement.blur(); docsToggleSize(); docsTocToggle(true)")
     _sleep(d, 200)
-    sheet = d.js("getComputedStyle(document.getElementById('ref-toc')).position")
+    sheet = d.js("getComputedStyle(document.getElementById('docs-toc')).position")
     if sheet != "absolute":
         fails.append(f"in mini the contents list is not a sheet ({sheet})")
     d.key("Escape")
     d.wait_idle()
-    if not d.js("document.getElementById('ref-toc').hidden"):
+    if not d.js("document.getElementById('docs-toc').hidden"):
         fails.append("esc did not fold the contents sheet")
-    if not d.js("document.getElementById('ref-mode').classList.contains('open')"):
+    if not d.js(_DOCS_OPEN):
         fails.append("esc folded the contents sheet AND closed help")
     _scales(d, 1, 1)
     _reset(d)
@@ -2655,41 +2667,60 @@ def scenario_cosm_lens(d: Driver) -> list[str]:
     return fails
 
 
-def scenario_cosmspec_contents(d: Driver) -> list[str]:
-    """The spec viewer: the badge names the version the document states,
-    headings carry `cs-sec-…` ids, "section 18.4" references link, the
-    contents list jumps (the heading lands at the top) and the back pill
-    returns — the Help Center's reader, with its own context."""
+def scenario_docs_contents(d: Driver) -> list[str]:
+    """The spec in the docs viewer (0.4.3's cosmspec-contents, re-pointed):
+    the badge names the version the document states, headings carry
+    `docs-sec-…` ids (a chapter's carry its prefix), "section 18.4", "§2.5"
+    and "P.7" link (the last two into Comprise's chapter), the contents list
+    jumps (the heading lands at the top) and the back pill returns. Then
+    what is new in 0.4.4: a term's popover (esc closes it first, focus goes
+    back to the link), the density control (to atem on the section you were
+    reading, remembered, the arrow keys, an outline row back to short),
+    both launchers in the ui window (the help button is the home screen's
+    too), "about this format" from the cosm viewer, and one viewer switching
+    documents (the help center's ids and contents replace the spec's)."""
     fails: list[str] = []
     _reset(d)
-    d.js("enterCosmSpecMode()")
-    d.wait_for("#cosmspec-mode.open")
-    d.js_await(COSMSPEC_READY[1])
-    d.wait_idle()
-    g = d.js("(() => ({badge: document.getElementById('cs-badge').textContent,"
-             " sec: !!document.getElementById('cs-sec-18-4'),"
-             " toc: document.querySelectorAll('#cs-toc a').length,"
-             " xref: document.querySelectorAll('#cosmspec-body a.ref-xref').length,"
-             " bad: Array.from(document.querySelectorAll('#cosmspec-body a.ref-xref'))"
-             ".filter((a) => !document.getElementById(a.dataset.target)).length}))()")
+    d.js("(() => { try { localStorage.removeItem('enough.docs.density.macrocosm-oes');"
+         " localStorage.removeItem('enough.docs.density.help-center'); } catch (e) {} return true; })()")
+    _docs_open(d, "macrocosm-oes")
+    g = d.js("(() => ({badge: document.getElementById('docs-badge').textContent,"
+             " sec: !!document.getElementById('docs-sec-18-4'),"
+             " toc: document.querySelectorAll('#docs-toc a').length,"
+             " xref: document.querySelectorAll('#docs-body a.ref-xref').length,"
+             " chap: Array.from(document.querySelectorAll('#docs-body a.ref-xref'))"
+             ".filter((a) => /^(§|P\\.)/.test(a.textContent.replace(/^README\\s+/, ''))"
+             " && a.dataset.target.startsWith('docs-comprise')).length,"
+             " stray: Array.from(document.querySelectorAll('#docs-body a.ref-xref'))"
+             ".filter((a) => /^P\\./.test(a.textContent) && !a.dataset.target.startsWith('docs-comprise-')).length,"
+             " bad: Array.from(document.querySelectorAll('#docs-body a.ref-xref'))"
+             ".filter((a) => !document.getElementById(a.dataset.target)).length,"
+             " comments: Array.from(document.querySelectorAll('#docs-body p')).filter((p) => {"
+             " const c = p.cloneNode(true); c.querySelectorAll('code').forEach((x) => x.remove());"
+             " return /<!--/.test(c.textContent); }).length}))()")
     if not re.search(r"v\d+\.\d+\.\d+$", g.get("badge") or ""):
         fails.append(f"the badge does not carry the document's version: {g.get('badge')!r}")
     if not g.get("sec") or g.get("toc", 0) < 20:
         fails.append(f"headings/contents not built: {g}")
     if not g.get("xref") or g.get("bad"):
         fails.append(f"section references: {g.get('xref')} linked, {g.get('bad')} dangling")
+    if not g.get("chap") or g.get("stray"):
+        fails.append(f"§/P.N references: {g.get('chap')} into the Comprise chapter, "
+                     f"{g.get('stray')} P.N pointing elsewhere")
+    if g.get("comments"):
+        fails.append(f"{g['comments']} paragraph(s) show an HTML comment (an atem/term marker)")
     for ui, txt in ((1, 1), (1.2, 1.3)):
         _scales(d, ui, txt)
-        d.js("refTocToggle(true, CS_CTX)")
-        j = d.js("(() => { const body = document.getElementById('cosmspec-body');"
+        d.js("docsTocToggle(true)")
+        j = d.js("(() => { const body = document.getElementById('docs-body');"
                  " body.scrollTop = 0;"
-                 " const a = document.querySelector('#cs-toc a[data-target=\"cs-sec-18-4\"]')"
-                 " || document.querySelectorAll('#cs-toc a')[30];"
+                 " const a = document.querySelector('#docs-toc a[data-target=\"docs-sec-18-4\"]')"
+                 " || document.querySelectorAll('#docs-toc a')[30];"
                  " a.click(); const h = document.getElementById(a.dataset.target);"
                  " const off = h.getBoundingClientRect().top - body.getBoundingClientRect().top;"
-                 " refTocToggle(true, CS_CTX);"
-                 " return {off, back: !document.getElementById('cs-back').hidden,"
-                 " cur: document.querySelector('#cs-toc a.current')?.dataset.target,"
+                 " docsTocToggle(true);"
+                 " return {off, back: !document.getElementById('docs-back').hidden,"
+                 " cur: document.querySelector('#docs-toc a.current')?.dataset.target,"
                  " want: a.dataset.target}; })()")
         if not (0 <= j["off"] <= 40):
             fails.append(f"[ui {ui}/text {txt}] a contents jump put the heading "
@@ -2698,17 +2729,411 @@ def scenario_cosmspec_contents(d: Driver) -> list[str]:
             fails.append(f"[ui {ui}/text {txt}] the contents list marks {j['cur']}, not {j['want']}")
         if not j["back"]:
             fails.append(f"[ui {ui}/text {txt}] no way back after a jump")
-        d.click("#cs-back")
-        if d.js("document.getElementById('cosmspec-body').scrollTop") > 2:
+        d.click("#docs-back")
+        if d.js("document.getElementById('docs-body').scrollTop") > 2:
             fails.append(f"[ui {ui}/text {txt}] 'back' did not return to the top")
     _scales(d, 1, 1)
-    # The Help Center is still its own reader: opening it over the spec
-    # gives it its own ids and contents.
-    d.js("enterRefMode()")
-    d.wait_for("#ref-body h2[id]")
-    if d.js("document.querySelectorAll('#ref-toc a').length") < 10 or \
-            not d.js("!!document.getElementById('ref-sec-1')"):
-        fails.append("the Help Center's contents/ids broke with the spec viewer open")
+
+    # A term link opens the term's card at the fabula (U1's popover was the
+    # stand-in); the back pill returns to the link (docs-term-roundtrip has
+    # the rest).
+    d.js("refJump('docs-sec-18-4', DOCS_CTX)")
+    _sleep(d, 100)
+    t = d.js("(() => { const a = document.getElementById('docs-sec-18-4').closest('.docs-sec')"
+             ".querySelector('a.docs-term'); if (!a) return null; a.focus(); a.click();"
+             " return a.dataset.term; })()")
+    if not t:
+        fails.append("§18.4 has no term link")
+    elif not _wait_js(d, "DOCS.density === 'fabula' && document.activeElement"
+                         " && document.activeElement.dataset.key === %s" % json.dumps(t)):
+        fails.append(f"the term link did not open {t}'s card (focus on {_active(d)})")
+    else:
+        d.click("#docs-back")
+        if not _wait_js(d, "DOCS.density === 'short' && document.activeElement"
+                           " && document.activeElement.classList.contains('docs-term')"):
+            fails.append(f"back from the card left focus on {_active(d)}, not the term link")
+        if not d.js(_DOCS_OPEN):
+            fails.append("back from the card closed the viewer")
+
+    # The density control: atem keeps your place and is remembered.
+    d.js("document.activeElement && document.activeElement.blur()")
+    d.click('#docs-density [data-density="atem"]')
+    ok = _wait_js(d, "!!document.querySelector('#docs-body .docs-outline .docs-ol-row')")
+    a = d.js("(() => ({density: DOCS.density,"
+             " cur: document.querySelector('#docs-body .docs-ol-row.current')?.dataset.go,"
+             " sections: document.querySelectorAll('#docs-body .docs-sec').length,"
+             " gloss: document.querySelectorAll('#docs-body .docs-gloss dt').length,"
+             " rmini: document.querySelectorAll('#docs-body .docs-rmini').length,"
+             " checked: document.querySelector('#docs-density [aria-checked=\"true\"]')?.dataset.density,"
+             " kept: localStorage.getItem('enough.docs.density.macrocosm-oes')}))()")
+    if not ok or a["density"] != "atem" or a["sections"]:
+        fails.append(f"atem did not draw the outline: {a}")
+    elif a["cur"] != "S:section/18.4":
+        fails.append(f"atem marks {a['cur']!r}, not the section being read (S:section/18.4)")
+    if a.get("checked") != "atem" or a.get("kept") != "atem":
+        fails.append(f"the control/memory disagree with the density: {a}")
+    if not a.get("gloss") or not a.get("rmini"):
+        fails.append(f"atem lacks the glossary or the reference one-liners: {a}")
+    # Arrow keys move the radio group's choice.
+    d.focus('#docs-density [data-density="atem"]')
+    d.key("ArrowRight")
+    if not _wait_js(d, "DOCS.density === 'short' && !!document.querySelector('#docs-body .docs-sec h2[id]')"):
+        fails.append(f"ArrowRight in the density control left it at {d.js('DOCS.density')!r}")
+    elif d.js("document.activeElement && document.activeElement.dataset.density") != "short":
+        fails.append(f"after ArrowRight focus is on {_active(d)}, not the short segment")
+    # An outline row opens its section at short.
+    d.js("docsSetDensity('atem')")
+    _wait_js(d, "!!document.querySelector('#docs-body .docs-outline .docs-ol-row')")
+    d.js("document.querySelector('#docs-body .docs-ol-row[data-go=\"S:section/18.2\"]').click()")
+    if not _wait_js(d, "DOCS.density === 'short' && !!document.getElementById('docs-sec-18-2')"):
+        fails.append("an outline row did not open its section at short")
+    else:
+        off = d.js("document.getElementById('docs-sec-18-2').getBoundingClientRect().top"
+                   " - document.getElementById('docs-body').getBoundingClientRect().top")
+        if not (0 <= off <= 40):
+            fails.append(f"the outline row landed §18.2 {off:.0f}px from the top")
+
+    # Both launchers (the help button is the home screen's too).
+    _reset(d)
+    d.js("openUIModal()")
+    d.wait_for("#ui-modal:not(.hidden)")
+    d.click("#ui-cosmspec-btn")
+    if not _wait_js(d, "DOCS.data && DOCS.data.doc === 'macrocosm-oes'"
+                       " && !!document.getElementById('docs-sec-18-4')"):
+        fails.append("the MacroCOSM button did not open the spec in the docs viewer")
+    d.js("openUIModal()")
+    d.wait_for("#ui-modal:not(.hidden)")
+    d.click("#ui-help-center-btn")
+    if not _wait_js(d, "DOCS.data && DOCS.data.doc === 'help-center' && DOCS.density === 'short'"
+                       " && !!document.getElementById('docs-sec-1')"):
+        fails.append("the help button did not open the help center at short")
+    # One viewer, two documents: the help center's ids replace the spec's.
+    h = d.js("(() => ({toc: document.querySelectorAll('#docs-toc a').length,"
+             " spec: !!document.querySelector('#docs-body [id^=\"docs-comprise\"]'),"
+             " icon: document.getElementById('docs-icon').dataset.icon,"
+             " stack: (modeTop() || {}).icon}))()")
+    if h["toc"] < 10 or h["spec"] or h["icon"] != "hxc" or h["stack"] != "hxc":
+        fails.append(f"switching to the help center left the spec behind: {h}")
+    # "about this format" from the cosm viewer lands on the MiniCOSM's section.
+    _reset(d)
+    d.js(f"enterCosmMode('{EMF_TEXT}.cosm')")
+    d.wait_for("#cosm-mode.open")
+    d.js_await(COSM_READY[1])
+    d.click("#cosm-about-btn")
+    if not _wait_js(d, "DOCS.data && DOCS.data.doc === 'macrocosm-oes' && DOCS.density === 'short'"
+                       " && !!document.getElementById('docs-sec-18-4')"):
+        fails.append("about this format did not open the spec at short")
+    else:
+        _sleep(d, 150)
+        off = d.js("document.getElementById('docs-sec-18-4').getBoundingClientRect().top"
+                   " - document.getElementById('docs-body').getBoundingClientRect().top")
+        if not (0 <= off <= 40):
+            fails.append(f"about this format landed §18.4 {off:.0f}px from the top")
+    d.js("(() => { try { localStorage.removeItem('enough.docs.density.macrocosm-oes'); } catch (e) {}"
+         " return true; })()")
+    _reset(d)
+    return fails
+
+
+# ---------------------------------------------------------------------------
+# 0.4.4 (U2): the docs viewer's fabula density — prism cards, live examples,
+# the local graph
+# ---------------------------------------------------------------------------
+
+_IN_VIEW = ("(() => { const c = document.querySelector('#docs-body .cosm-card[data-key=\"' + CSS.escape(%s)"
+            " + '\"]'); if (!c) return null; const b = document.getElementById('docs-body')"
+            ".getBoundingClientRect(), r = c.getBoundingClientRect();"
+            " return {top: r.top - b.top, focused: document.activeElement === c,"
+            " atem: c.firstElementChild && c.firstElementChild.classList.contains('docs-prism-atem')"
+            " ? c.firstElementChild.textContent : null,"
+            " crumb: Array.from(c.querySelectorAll('.docs-crumb a[data-short]')).map((a) => a.dataset.short)}; })()")
+
+
+def scenario_docs_term_roundtrip(d: Driver) -> list[str]:
+    """short → a term link → the term's prism card at the fabula (focused,
+    on screen, its atem first, a breadcrumb into the short) → back (the pill)
+    to the link → the card again → its breadcrumb → the short at the term's
+    defining section → back to the card. Then the other ways in: a margin
+    mark flips to its section's card, an atem row of the reference opens its
+    card; a section page from the rail, a facet and "show everything"; find
+    at the fabula searches the cards drawn and says so; the density is
+    remembered."""
+    fails: list[str] = []
+    _reset(d)
+    d.js("(() => { try { localStorage.removeItem('enough.docs.density.macrocosm-oes'); } catch (e) {}"
+         " return true; })()")
+    _docs_open(d, "macrocosm-oes", "short", "18.4")
+    t = d.js("(() => { const a = document.getElementById('docs-sec-18-4').closest('.docs-sec')"
+             ".querySelector('a.docs-term'); if (!a) return null; a.focus(); a.click();"
+             " return {key: a.dataset.term, def: DOCS.ix.terms.get(a.dataset.term).defined_in,"
+             " atem: DOCS.ix.terms.get(a.dataset.term).atem}; })()")
+    if not t:
+        fails.append("§18.4 has no term link")
+        _reset(d)
+        return fails
+    key = json.dumps(t["key"])
+    if not _wait_js(d, "DOCS.density === 'fabula' && !!document.querySelector("
+                       "'#docs-body .cosm-card[data-key=\"' + CSS.escape(%s) + '\"]')" % key):
+        fails.append(f"the term link did not open the fabula on {t['key']}'s card")
+        _reset(d)
+        return fails
+    _sleep(d, 150)
+    c = d.js(_IN_VIEW % key)
+    if not c or not c["focused"] or not (-2 <= c["top"] <= 80):
+        fails.append(f"{t['key']}'s card is not focused at the top of the frame: {c}")
+    if not c or c["atem"] != t["atem"]:
+        fails.append(f"the card does not open with the term's atem: {c and c['atem']!r} vs {t['atem']!r}")
+    if not c or not c["crumb"] or c["crumb"][-1] != t["def"]:
+        fails.append(f"the card's breadcrumb does not end at the defining section {t['def']}: {c}")
+    if d.js("document.getElementById('docs-back').hidden"):
+        fails.append("no back pill after the jump from the short to the card")
+    # Back: the short, on the link.
+    d.click("#docs-back")
+    if not _wait_js(d, "DOCS.density === 'short' && document.activeElement"
+                       " && document.activeElement.dataset.term === %s" % key):
+        fails.append(f"back did not return to the term link at short (focus on {_active(d)})")
+    else:
+        off = d.js("document.activeElement.getBoundingClientRect().top"
+                   " - document.getElementById('docs-body').getBoundingClientRect().top")
+        h = d.js("document.getElementById('docs-body').clientHeight")
+        if not (0 <= off <= h):
+            fails.append(f"back left the term link off screen ({off:.0f}px)")
+    # The card again, then its breadcrumb: the short at the defining section.
+    d.js("document.activeElement.click()")
+    _wait_js(d, "DOCS.density === 'fabula' && document.activeElement"
+                " && document.activeElement.dataset.key === %s" % key)
+    _sleep(d, 150)
+    d.js("(() => { const c = document.querySelector('#docs-body .cosm-card[data-key=\"' + CSS.escape(%s)"
+         " + '\"]'); const a = c.querySelectorAll('.docs-crumb a[data-short]'); a[a.length - 1].click();"
+         " return true; })()" % key)
+    dom = json.dumps(t["def"])
+    if not _wait_js(d, "DOCS.density === 'short' && !!document.querySelector('#docs-body .docs-sec')"):
+        fails.append("the breadcrumb did not open the short")
+    else:
+        _sleep(d, 150)
+        off = d.js("(() => { const id = DOCS.ix.dom.get(%s); const h = document.getElementById(id);"
+                   " return h ? h.getBoundingClientRect().top - document.getElementById('docs-body')"
+                   ".getBoundingClientRect().top : null; })()" % dom)
+        if off is None or not (0 <= off <= 40):
+            fails.append(f"the breadcrumb landed the defining section {t['def']} {off}px from the top")
+        if d.js("document.getElementById('docs-back').hidden"):
+            fails.append("no back pill after the breadcrumb")
+        else:
+            d.click("#docs-back")
+            if not _wait_js(d, "DOCS.density === 'fabula' && document.activeElement"
+                               " && document.activeElement.dataset.key === %s" % key):
+                fails.append(f"back from the breadcrumb did not return to the card (focus on {_active(d)})")
+            else:
+                _sleep(d, 150)
+                c = d.js(_IN_VIEW % key)
+                if not c or not (-200 <= c["top"] <= d.js("document.getElementById('docs-body').clientHeight")):
+                    fails.append(f"back from the breadcrumb left the card off screen: {c}")
+    # A margin mark at short flips to its section's card.
+    _docs_open(d, "macrocosm-oes", "short", "18.4.5")
+    mk = d.js("(() => { const m = document.querySelector('#docs-body .docs-sec[data-key=\"S:section/18.4.5\"]"
+              " button.docs-mark'); if (!m) return null; m.click(); return m.dataset.key; })()")
+    if not mk:
+        fails.append("§18.4.5 has no margin mark (it holds two examples)")
+    elif not _wait_js(d, "DOCS.density === 'fabula' && document.activeElement"
+                         " && document.activeElement.dataset.key === 'S:section/18.4.5'"):
+        fails.append(f"the margin mark did not flip to §18.4.5's card (focus on {_active(d)})")
+    else:
+        ex = d.js("Array.from(document.activeElement.querySelectorAll('dd[data-facet=\"examples\"] a[data-go]'))"
+                  ".map((a) => a.dataset.go)")
+        if sorted(ex or []) != ["S:example/4", "S:example/5"]:
+            fails.append(f"§18.4.5's card lists examples {ex}, expected S:example/4 and /5")
+    # An atem row of the reference opens its card.
+    _docs_open(d, "macrocosm-oes", "atem")
+    d.js("document.querySelector('#docs-body .docs-rmini a[data-go=\"R:kind/emf.P.claim\"]').click()")
+    if not _wait_js(d, "DOCS.density === 'fabula' && document.activeElement"
+                       " && document.activeElement.dataset.key === 'R:kind/emf.P.claim'"):
+        fails.append(f"the atem row of R:kind/emf.P.claim did not open its card (focus on {_active(d)})")
+    else:
+        r = d.js("(() => { const c = document.activeElement; return {crumb: Array.from(c.querySelectorAll("
+                 "'.docs-crumb a[data-short]')).map((a) => a.dataset.short),"
+                 " src: c.querySelector('dd[data-facet=\"identity\"] .docs-src')?.textContent || '',"
+                 " schema: Array.from(c.querySelectorAll('dd[data-facet=\"schema\"] dt')).map((x) => x.textContent)}; })()")
+        if not r["crumb"] or r["crumb"][-1] != "S:section/18.4":
+            fails.append(f"a kind of EMF's breadcrumb does not lead to §18.4: {r['crumb']}")
+        if "emf.manifest.cosm" not in r["src"]:
+            fails.append(f"a generated item does not say which manifest declared it: {r['src']!r}")
+        if not {"fields", "required", "lists"} <= set(r["schema"]):
+            fails.append(f"a kind's schema facet lacks fields/required/lists: {r['schema']}")
+    # A section page from the rail; a facet; "show everything".
+    d.js("docsTocToggle(true)")
+    pg = d.js("(() => { const a = document.querySelector('#docs-toc a[data-page=\"S:section/12\"]');"
+              " if (!a) return null; a.click(); return {page: DOCS_FAB.page,"
+              " on: document.querySelector('#docs-toc a.docs-page-on')?.dataset.page,"
+              " head: !!document.querySelector('#docs-body .cosm-card[data-key=\"S:section/12.2\"]'),"
+              " other: !!document.querySelector('#docs-body .cosm-card[data-key=\"S:section/18.4\"]')}; })()")
+    if not pg or pg["page"] != "S:section/12" or pg["on"] != "S:section/12" or not pg["head"] or pg["other"]:
+        fails.append(f"the rail's section page §12 did not turn the page: {pg}")
+    f = d.js("(() => { document.querySelector('#docs-toc [data-facet=\"kind:term\"]').click();"
+             " return {mods: Array.from(document.querySelectorAll('#docs-body .cosm-mod')).map((m) => m.dataset.mod),"
+             " pressed: document.querySelector('#docs-toc [data-facet=\"kind:term\"]').getAttribute('aria-pressed'),"
+             " all: !!document.querySelector('#docs-toc [data-facet=\"all\"]')}; })()")
+    if f["mods"] != ["T"] or f["pressed"] != "true" or not f["all"]:
+        fails.append(f"the term facet did not narrow the cards to Terms: {f}")
+    d.js("document.querySelector('#docs-toc [data-facet=\"all\"]').click()")
+    if d.js("document.querySelectorAll('#docs-body .cosm-mod').length") < 3:
+        fails.append("\"show everything\" did not bring the modules back")
+    # Find at the fabula: the cards drawn, and it says so.
+    _cmd_f(d)
+    if not _wait_js(d, _FIND_OPEN, 3000):
+        fails.append("⌘F did not open find at the fabula")
+    else:
+        ph = d.js("document.querySelector('#docs-find .find-q').placeholder")
+        if ph == d.js("t('find.placeholder', 'find…')"):
+            fails.append(f"find at the fabula does not say it searches the cards: {ph!r}")
+        d.type_text("check")
+        _sleep(d, 300)
+        n = d.js("(() => { const s = FIND_BARS.docs.state(); return s.n; })()")
+        if not n:
+            fails.append("find at the fabula found nothing for 'check'")
+        d.key("Escape")
+    if d.js("localStorage.getItem('enough.docs.density.macrocosm-oes')") != "fabula":
+        fails.append("the fabula density is not remembered for the document")
+    d.js("(() => { try { localStorage.removeItem('enough.docs.density.macrocosm-oes'); } catch (e) {}"
+         " return true; })()")
+    _reset(d)
+    return fails
+
+
+def _mm_shift_click_node(d: Driver) -> str | None:
+    """Shift-click the first lens node whose node_map resolves to an item."""
+    return d.js("(() => { const nm = (MM_CURRENT && MM_CURRENT.nodeMap) || {};"
+                " for (const g of document.querySelectorAll('#merirmaid-body g.node')) {"
+                " const id = mmNodeId(g); if (nm[id] && nm[id].id) {"
+                " const b = g.getBoundingClientRect();"
+                " g.dispatchEvent(new MouseEvent('click', {bubbles: true, shiftKey: true,"
+                " clientX: b.left + b.width / 2, clientY: b.top + b.height / 2}));"
+                " return nm[id].id; } } return null; })()")
+
+
+_MM_DRAWN = ("(async () => { for (let i = 0; i < 300 && !document.querySelector("
+             "'#merirmaid-body g.node'); i++) await new Promise((r) => setTimeout(r, 50));"
+             " return document.querySelectorAll('#merirmaid-body g.node').length; })()")
+
+
+def scenario_docs_example_live(d: Driver) -> list[str]:
+    """An example's prism card is live: its block loads as a volume of its own
+    (POST /api/cosm/inline) and says its verdict; a lens from the picker
+    draws it in merirmaid (read only, the example's name on the crumb); a
+    node's "show item" closes the diagram and opens the cosm viewer on the
+    example's volume at that item; closing the viewer is the way back to the
+    card. "open in the cosm viewer" opens the same volume (no raw file to
+    open, "about this format" there)."""
+    fails: list[str] = []
+    _reset(d)
+    resident = _names(d)
+    _docs_open(d, "macrocosm-oes", "fabula", "S:example/1")
+    live = "#docs-body .cosm-card[data-key=\"S:example/1\"] .docs-live"
+    if not _wait_js(d, "!!document.querySelector(%s + '[data-ready]')" % json.dumps(live)):
+        fails.append("the example's live block never said its verdict")
+        _reset(d)
+        return fails
+    v = d.js("(() => { const l = document.querySelector(%s); return {ready: l.dataset.ready,"
+             " verdict: l.querySelector('.docs-live-v').textContent,"
+             " lenses: Array.from(l.querySelectorAll('option')).map((o) => o.value).filter(Boolean),"
+             " cosm: !l.querySelector('[data-dact=\"cosm\"]').disabled}; })()" % json.dumps(live))
+    if v["ready"] != "ok" or not v["verdict"].startswith("cosm/0") or not v["cosm"]:
+        fails.append(f"the live verdict is not a loaded cosm/0 volume: {v}")
+    if "tree" not in v["lenses"]:
+        fails.append(f"the live lens picker does not offer the tree lens: {v['lenses']}")
+        _reset(d)
+        return fails
+    d.js("(() => { const s = document.querySelector(%s + ' .docs-live-lens'); s.value = 'tree';"
+         " s.dispatchEvent(new Event('change', {bubbles: true})); return true; })()" % json.dumps(live))
+    if not d.js_await(_MM_DRAWN):
+        fails.append("the example's tree lens drew no nodes in merirmaid")
+        _reset(d)
+        return fails
+    st = d.js("(() => ({top: modeTop() && modeTop().name,"
+              " crumbs: document.getElementById('mm-crumbs').textContent,"
+              " mirror: document.getElementById('merirmaid-mode').classList.contains('mm-face-mirror')}))()")
+    if st["top"] != "merirmaid" or "Meadow" not in (st["crumbs"] or "") or not st["mirror"]:
+        fails.append(f"merirmaid did not open on the example's lens, read only: {st}")
+    node = _mm_shift_click_node(d)
+    if not node:
+        fails.append("no node of the example's lens resolves to an item")
+        _reset(d)
+        return fails
+    menu = d.js("Array.from(document.querySelectorAll('#mm-node-menu:not(.hidden) .ctx-item'))"
+                ".map((b) => b.dataset.act)")
+    if "lens-show" not in (menu or []) or "lens-open" in (menu or []):
+        fails.append(f"the example node's menu should offer show item and no open file: {menu}")
+        _reset(d)
+        return fails
+    d.click('#mm-node-menu .ctx-item[data-act="lens-show"]')
+    if not _wait_js(d, "modeTop() && modeTop().name === 'cosm' && COSM.data"
+                       " && !!document.querySelector('#cosm-body .cosm-card[data-key=\"' + CSS.escape(%s)"
+                       " + '\"]')" % json.dumps(node)):
+        fails.append(f"\"show item\" did not open the cosm viewer on {node}")
+        _reset(d)
+        return fails
+    _sleep(d, 200)
+    sh = d.js("(() => ({mm: MODE_STACK.some((e) => e.name === 'merirmaid'),"
+              " title: document.getElementById('cosm-title').textContent,"
+              " raw: document.getElementById('cosm-raw-btn').hidden,"
+              " about: !document.getElementById('cosm-about-btn').hidden,"
+              " focused: document.activeElement && document.activeElement.dataset.key}))()")
+    if sh["mm"] or sh["focused"] != node or not sh["raw"] or not sh["about"]:
+        fails.append(f"after \"show item\": diagram still open, card not focused, or raw/about wrong: {sh}")
+    if _mine(d, resident) != ["cosm", "docs"]:
+        fails.append(f"stack after \"show item\" is {_mine(d, resident)}, expected ['cosm', 'docs']")
+    # Back: closing the cosm viewer returns to the card.
+    d.js("exitCosmMode()")
+    if not _wait_js(d, "modeTop() && modeTop().name === 'docs' && DOCS.density === 'fabula'"
+                       " && !!document.querySelector(%s)" % json.dumps(live), 4000):
+        fails.append("closing the cosm viewer did not come back to the example's card")
+    # "open in the cosm viewer".
+    d.click(live + ' [data-dact="cosm"]')
+    if not _wait_js(d, "modeTop() && modeTop().name === 'cosm' && COSM.data"
+                       " && COSM.data.minicosm === 'cosm' && !!document.querySelector('#cosm-body .cosm-card')"):
+        fails.append("\"open in the cosm viewer\" did not open the example's volume")
+    _reset(d)
+    return fails
+
+
+def scenario_docs_graph_roundtrip(d: Driver) -> list[str]:
+    """"graph around this" on a card draws the local graph (GET
+    /api/docs/lens?lens=graph&around=…&depth=1) in merirmaid, read only, the
+    item centred; a node's "show item" closes the diagram and lands on that
+    item's card back at the fabula — never the default view."""
+    fails: list[str] = []
+    _reset(d)
+    resident = _names(d)
+    _docs_open(d, "macrocosm-oes", "fabula", "S:section/18.4")
+    d.click('#docs-body .cosm-card[data-key="S:section/18.4"] [data-dact="graph"]')
+    if not d.js_await(_MM_DRAWN):
+        fails.append("\"graph around this\" drew no nodes")
+        _reset(d)
+        return fails
+    st = d.js("(() => ({top: modeTop() && modeTop().name, around: mmTop() && mmTop().around,"
+              " lens: mmTop() && mmTop().lens, focus: !!document.querySelector('#merirmaid-body g.node.focus'),"
+              " title: document.getElementById('merirmaid-title').textContent,"
+              " nodes: document.querySelectorAll('#merirmaid-body g.node').length}))()")
+    if st["top"] != "merirmaid" or st["around"] != "S:section/18.4" or st["lens"] != "graph":
+        fails.append(f"merirmaid did not open on the local graph around §18.4: {st}")
+    if not (2 <= st["nodes"] <= 60):
+        fails.append(f"the local graph has {st['nodes']} nodes (one step out should be a handful)")
+    node = d.js("(() => { const nm = (MM_CURRENT && MM_CURRENT.nodeMap) || {};"
+                " for (const g of document.querySelectorAll('#merirmaid-body g.node')) {"
+                " const id = mmNodeId(g); if (nm[id] && nm[id].id && nm[id].id !== 'S:section/18.4') {"
+                " const b = g.getBoundingClientRect();"
+                " g.dispatchEvent(new MouseEvent('click', {bubbles: true, shiftKey: true,"
+                " clientX: b.left + b.width / 2, clientY: b.top + b.height / 2}));"
+                " return nm[id].id; } } return null; })()")
+    if not node:
+        fails.append("no neighbour in the local graph resolves to an item")
+        _reset(d)
+        return fails
+    d.click('#mm-node-menu .ctx-item[data-act="lens-show"]')
+    if not _wait_js(d, "modeTop() && modeTop().name === 'docs' && DOCS.density === 'fabula'"
+                       " && document.activeElement && document.activeElement.dataset.key === %s" % json.dumps(node)):
+        fails.append(f"\"show item\" did not return to {node}'s card (focus on {_active(d)})")
+    elif _mine(d, resident) != ["docs"]:
+        fails.append(f"stack after \"show item\" is {_mine(d, resident)}, expected ['docs']")
     _reset(d)
     return fails
 
@@ -2979,6 +3404,141 @@ def scenario_compile_short(d: Driver) -> list[str]:
     return fails
 
 
+# ---------------------------------------------------------------------------
+# 0.4.4: agent-free mode (docs/docoes-044-plan.md §13)
+# ---------------------------------------------------------------------------
+
+#: The slider's state as the page shows it, in one read.
+_AF_STATE = """(() => {
+  const sw = document.getElementById('am-ui-switch');
+  const shown = (el) => !!el && getComputedStyle(el).display !== 'none';
+  const order = Array.from(sw.querySelectorAll('.am-word'))
+    .filter(shown).sort((a, b) => a.getBoundingClientRect().left - b.getBoundingClientRect().left)
+    .map((w) => w.textContent);
+  const phrase = Array.from(sw.querySelectorAll('.am-phrase')).filter(shown).map((w) => w.textContent);
+  return {
+    on: agentFreeOn(), busy: AF_BUSY,
+    attr: document.documentElement.dataset.agentFree === '1',
+    rv: document.documentElement.dataset.rv,
+    checked: sw.getAttribute('aria-checked'),
+    mirror: document.getElementById('am-model-switch').getAttribute('aria-checked'),
+    phrases: sw.classList.contains('am-phrases'), order, phrase,
+    want: {on: t('agentmode.on', 'agent free'), off: t('agentmode.off', 'free agent'),
+           free: t('agentmode.free', 'free'), agent: t('agentmode.agent', 'agent')},
+    toggle: shown(document.getElementById('toggle-readvisor')),
+    panel: getComputedStyle(document.getElementById('readvisor-panel')).visibility,
+    sections: Array.from(document.querySelectorAll('.sidebar-section'))
+      .filter(shown).map((s) => s.dataset.section),
+    badge: document.querySelector('#model-badge .cute').textContent,
+    status: (document.getElementById('switch-status') || {}).textContent || '',
+  }; })()"""
+
+
+def scenario_agentfree_toggle(d: Driver) -> list[str]:
+    """The slider turns agent-free on: everything that needs a model goes at
+    once, the panel collapses and stays collapsed, the chat shortcuts and the
+    composer are inert. Off again (by keyboard), the page restores and polls
+    /api/llm-status for the model. Switched in the run's SCRATCH ui.json."""
+    fails: list[str] = []
+    _reset(d)
+    d.js("rvSetState('open')")
+    d.wait_idle()
+    try:
+        # --- on, through the real control --------------------------------
+        d.js("openUIModal()")
+        d.wait_for("#ui-modal:not(.hidden)")
+        d.click("#am-ui-switch")
+        if not _wait_js(d, "agentFreeOn() && !AF_BUSY", 15000):
+            fails.append("the slider did not turn agent-free on (or its save never answered)")
+            return fails
+        d.js_await("new Promise((r) => setTimeout(r, 320))")   # the knob, the words, the column
+        st = d.js(_AF_STATE) or {}
+        want = st.get("want") or {}
+        if not (st.get("attr") and st.get("checked") == "true" and st.get("mirror") == "true"):
+            fails.append(f"on: <html data-agent-free> / aria-checked on both copies not set: {st}")
+        if st.get("phrases"):
+            if st.get("phrase") != [want.get("on")]:
+                fails.append(f"on: the phrase shown is {st.get('phrase')}, expected [{want.get('on')!r}]")
+        elif st.get("order") != [want.get("agent"), want.get("free")]:
+            fails.append(f"on: the words read {st.get('order')}, expected "
+                         f"{[want.get('agent'), want.get('free')]} (they swap order)")
+        if st.get("rv") != "closed" or st.get("panel") != "hidden":
+            fails.append(f"on: the readvisor panel is {st.get('rv')}/{st.get('panel')}, expected closed/hidden")
+        if st.get("toggle"):
+            fails.append("on: #toggle-readvisor is still shown")
+        if st.get("sections") != ["project"]:
+            fails.append(f"on: the sidebar shows {st.get('sections')}, expected only the project tree")
+        if st.get("badge") != want.get("on"):
+            fails.append(f"on: the model badge says {st.get('badge')!r}, expected {want.get('on')!r}")
+        saved = d.js_await("fetch('/api/ui-config').then((r) => r.json()).then((j) => j.agent_free)")
+        if saved is not True:
+            fails.append(f"on: the scratch ui config says agent_free={saved!r}")
+        d.key("Escape")
+        d.wait_gone("#ui-modal:not(.hidden)")
+        # --- inert while on ------------------------------------------------
+        inert = d.js_await("""(async () => {
+          let sent = false;
+          const spy = (e) => { if (e.detail && e.detail.elt && e.detail.elt.id === 'chat-form') sent = true; };
+          document.body.addEventListener('htmx:beforeRequest', spy);
+          const kd = (init) => document.dispatchEvent(new KeyboardEvent('keydown',
+            Object.assign({bubbles: true, cancelable: true, metaKey: true}, init)));
+          kd({key: '/', code: 'Slash'});
+          kd({key: '/', code: 'Slash', shiftKey: true});
+          kd({key: 'k', code: 'KeyK'});
+          rvSetState('open');
+          rvAsk();
+          const msg = document.getElementById('message');
+          msg.value = 'uicheck: this must never be sent';
+          document.getElementById('chat-form').requestSubmit();
+          await new Promise((r) => setTimeout(r, 400));
+          msg.value = '';
+          document.body.removeEventListener('htmx:beforeRequest', spy);
+          return {rv: document.documentElement.dataset.rv,
+                  focus: (document.activeElement || {}).id || '', sent}; })()""") or {}
+        if inert.get("rv") != "closed":
+            fails.append(f"inert: ⌘/, ⇧⌘/, ⌘K, rvSetState or rvAsk opened the panel ({inert.get('rv')})")
+        if inert.get("focus") == "message":
+            fails.append("inert: the chat composer took focus while agent-free")
+        if inert.get("sent"):
+            fails.append("inert: the chat form posted /api/chat while agent-free")
+        # --- off, by keyboard ----------------------------------------------
+        d.js("(() => { window.__afPolls = 0; if (!window.__afFetch) { window.__afFetch = window.fetch;"
+             " window.fetch = (u, o) => { if (String(u).startsWith('/api/llm-status')) window.__afPolls++;"
+             " return window.__afFetch(u, o); }; } return true; })()")
+        d.js("openUIModal()")
+        d.wait_for("#ui-modal:not(.hidden)")
+        d.focus("#am-ui-switch")
+        d.key("Enter")
+        if not _wait_js(d, "!agentFreeOn() && !AF_BUSY && window.__afPolls > 0"
+                           " && LLM_STATUS && LLM_STATUS.agent_free === false", 15000):
+            fails.append("off: Enter on the slider did not turn agent-free off, or "
+                         "/api/llm-status was never polled after it")
+        d.js_await("new Promise((r) => setTimeout(r, 320))")
+        st = d.js(_AF_STATE) or {}
+        want = st.get("want") or {}
+        if st.get("attr") or st.get("checked") != "false" or st.get("mirror") != "false":
+            fails.append(f"off: the page still says agent-free: {st}")
+        if not st.get("phrases") and st.get("order") != [want.get("free"), want.get("agent")]:
+            fails.append(f"off: the words read {st.get('order')}, expected "
+                         f"{[want.get('free'), want.get('agent')]}")
+        if st.get("rv") != "open" or not st.get("toggle"):
+            fails.append(f"off: the panel was not given back (rv={st.get('rv')}, toggle shown={st.get('toggle')})")
+        if st.get("sections") != ["paradigm", "roles", "skills", "project"]:
+            fails.append(f"off: the sidebar shows {st.get('sections')}")
+        if st.get("badge") == want.get("on"):
+            fails.append("off: the model badge still says the agent-free word")
+        if not st.get("status"):
+            fails.append("off: the model window's status line said nothing about the model")
+    finally:
+        d.js_await("(async () => { if (window.__afFetch) { window.fetch = window.__afFetch;"
+                   " delete window.__afFetch; } try { await agentFreeSet(false); } catch (e) {}"
+                   " if (agentFreeOn()) await fetch('/api/ui-config', {method: 'POST',"
+                   " headers: {'Content-Type': 'application/json'},"
+                   " body: JSON.stringify({agent_free: false})}); return true; })()")
+        _reset(d)
+    return fails
+
+
 SCENARIOS: dict[str, Scenario] = {
     "stack-order": scenario_stack_order,
     "raise-preserves-state": scenario_raise_preserves_state,
@@ -3022,7 +3582,7 @@ SCENARIOS: dict[str, Scenario] = {
     "modal-broker-a11y": scenario_modal_broker_a11y,
     "modal-return-after-open": scenario_modal_return_after_open,
     "modal-confirm-stack": scenario_modal_confirm_stack,
-    "ref-find-contents": scenario_ref_find_contents,
+    "docs-find-contents": scenario_docs_find_contents,
     "chat-intro": scenario_chat_intro,
     # --- 0.4.1 FEED: dictionary mode, the WDL, the context menu (U3) ---
     "dict-open-flip": scenario_dict_open_flip,
@@ -3035,11 +3595,17 @@ SCENARIOS: dict[str, Scenario] = {
     # --- 0.4.3 Canon round: catalogs, the cosm viewer, lenses, the spec ---
     "canon-open-catalog": scenario_canon_open_catalog,
     "cosm-lens": scenario_cosm_lens,
-    "cosmspec-contents": scenario_cosmspec_contents,
+    "docs-contents": scenario_docs_contents,
+    # --- 0.4.4 (U2): the docs viewer's fabula density ---
+    "docs-term-roundtrip": scenario_docs_term_roundtrip,
+    "docs-example-live": scenario_docs_example_live,
+    "docs-graph-roundtrip": scenario_docs_graph_roundtrip,
     # --- 0.4.3 checkpoint B: EMF twins and atems in the reader ---
     "twin-flip": scenario_twin_flip,
     "atem-selection": scenario_atem_selection,
     "atem-pin": scenario_atem_pin,
     # --- 0.4.3 SHORT: a telling compiled from the twin ---
     "compile-short": scenario_compile_short,
+    # --- 0.4.4: agent-free mode ---
+    "agentfree-toggle": scenario_agentfree_toggle,
 }

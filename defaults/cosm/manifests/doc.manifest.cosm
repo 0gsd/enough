@@ -1,0 +1,185 @@
+# DocOES 1: the MiniCOSM for one document, enumerated (DocOES: Documentation OES).
+#
+# What a program needs to know to read a doc volume: one markdown document (the MacroCOSM OES specification, or the
+# Help Center in one of its six tellings) enumerated into its sections, the terms it defines, the complete examples
+# it shows and the decisions it records, joined to the reference generated from the MiniCOSM manifests and, for the
+# Help Center, to the help bubbles beside the controls. enough/docoes.py builds a doc volume at runtime into the
+# install's state (ENOUGH_DOCS_ROOT, ~/enough/docoes/ by default), rebuilds it when the document, a chapter, a manifest
+# or enough's version changes, and never commits it; nobody edits it by hand. Compiled as told, its section bodies give
+# back the markdown byte for byte. The prose is docs/MACROCOSM_OES.md (section 18.5); the reference reader is
+# enough/macrocosm.py. Where this file and the reader disagree, the reader wins and this file is corrected.
+#
+# Written in the COSM YAML subset: no anchors, no aliases, no tags, one document. Words that YAML 1.1 reads as
+# booleans (on, off, yes, no) are quoted.
+#
+# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
+
+manifest: minicosm/0
+macrocosm: 0.0.1
+name: doc
+title: DocOES
+version: 1
+summary: "One document enumerated: its sections, the terms it defines, its examples and decisions, joined to the reference generated from the MiniCOSM manifests it describes."
+spec: docs/MACROCOSM_OES.md
+reference: [enough/macrocosm.py, enough/docoes.py]
+
+declaration:
+  key: oes
+  value: doc/1
+  absent: refuse                  # a doc volume without oes: doc/1 is refused
+  legacy: []
+  both: oes
+  unknown: refuse
+
+format:
+  extension: .cosm
+  syntax: the COSM YAML subset
+  forbidden: [anchors, aliases, tags, multiple documents]
+  booleans: ['true', 'false']
+  encoding: utf-8
+  byte-order-mark: tolerated
+  newlines: [lf, crlf]
+
+volume:
+  catalog: '<doc>.<lang>.doc.cosm'   # one per telling: macrocosm-oes.en.doc.cosm, help-center.fr.doc.cosm
+  single-file: true
+  built-into: ENOUGH_DOCS_ROOT, ~/enough/docoes/ by default; never committed, never shown in the file tree
+
+catalog:
+  keys: [oes, macrocosm, id, name, document, telling, tellings, chapters, built, nodes]
+  id: doc/<slug>                  # doc/macrocosm-oes, doc/help-center: one id for every telling of a document
+  document-fields: [path, sha256, version]                 # the markdown this telling was enumerated from
+  telling-fields: [lang, voice]                            # voice: rosa for the Help Center
+  telling-langs: [en, de, es, fr, ja, zh]
+  chapter-fields: [id, path, source, commit, sha256, prefix, version]
+  built-fields: [at, by, digest, manifests]                # manifests: [{name, version, sha256}]
+
+module-file:
+  shapes:
+    - {key: nodes, holds: 'a list of items, each a mapping with a string id'}
+  duplicate-id: load error, the first wins
+
+ids:
+  item-form: '<module>:<kind>/<slug>'
+  section: "the heading's number (18.4, P.3.1); root for the title; front for any text before it; else the heading's text slugged"
+  chapter-prefix: '<prefix>.<slug>'                         # S:section/comprise.4.1, T:term/comprise.concern
+  reference: '<minicosm>.<letter>.<kind>'                    # R:kind/emf.P.claim, R:module/emf.P, R:list/emf.stance
+  cross-volume: '<inventory>@<version>:<kind>:<id>'          # comprise@1:section:2.5, kept in xrefs, never a reference
+  inside-own-volume: bare
+
+paths:
+  form: '<module>/<kind>/<slug>#<field>'
+  levels: [module, kind, item, field]
+  segments:
+    module: '[STRB]'
+    kind: '[a-z][a-z0-9-]*'
+    slug: '[A-Za-z0-9](?:[A-Za-z0-9._@-]*[A-Za-z0-9_@-])?'
+    field: '[A-Za-z0-9][A-Za-z0-9_-]*(?:\.[A-Za-z0-9][A-Za-z0-9_-]*|\[[0-9]+\])*'
+  map:
+    - {path: '<module>', id: none}
+    - {path: '<module>/<kind>', id: none}
+    - {path: '<module>/<kind>/<slug>', id: '<module>:<kind>/<slug>'}
+    - {path: '<item path>#<field>', id: none}
+  qualified: 'oes:doc/<slug>/<path>'
+  qualified-database: the catalog id without doc/
+  case: kept and significant
+  refused: [a leading slash, a trailing slash, an empty segment, '.', '..', percent-encoding, a backslash, whitespace, a colon,
+            non-ASCII or control characters, a segment ending in a dot, a second '#', a kind the module does not declare,
+            more than three segments, 'a Windows reserved name as any segment, in any case, alone or before a dot (con, con.txt, prn, aux, nul, com0-9, lpt0-9)']
+
+envelope:
+  fields: [id, type, name, summary, atem, body, lines, order, chapter, status, visibility, provenance, pending, links]
+  references: [links, chapter]
+  required: [id, type, name, summary]
+  status: [active, dormant, planned, retired, pending, attic]   # pending: proposed, not settled; attic: retired, still resolves
+  visibility: [public, internal, restricted]
+  provenance:
+    fields: [mode, sources, confidence, state, hash]
+    modes: [dialectic, net-scan, system-scan, integration, structured-intake, manual, derived, asserted, archetype,
+            catalogue, directory, accounting]
+    states: [known, pending, not-disclosed, stale]
+    state-default: known
+    confidence: a number from 0 to 1
+    from-markdown: '{mode: derived, sources: [<path>#L<a>-L<b>], confidence: 1}'
+    from-a-manifest: '{mode: catalogue, sources: [defaults/cosm/manifests/<name>.manifest.cosm#<field path>], confidence: 1, hash: <16 hex>}'
+  atem: '2 to 15 words (in Japanese and Chinese, 2 to 45 characters); one phrase; no final period; no ids and no markup; unlike the atem of any other item with the same name'
+  body: markdown, verbatim between a heading and the next; never re-flowed
+  open-question: '{pending: "<the question>"}'
+  sentinels: [none, self]
+  unknown-fields: allowed and kept
+
+links:
+  rels: [mentions, defines, exemplifies, decides, see, same_as]
+
+closed-lists:
+  convention: [table, bullet, sentence, glossary, marker]   # how a term was found in the document
+
+references:
+  forms:
+    - {form: bare, example: 'S:section/18.4', names: an item of the same volume}
+    - {form: typed-link, example: '{rel: see, to: S:section/12.2}', names: its to; rel from links.rels}
+    - {form: open-question, example: '{pending: "<question>"}', names: an answer still owed}
+  unresolved: error
+  cross-volume: 'an item''s xrefs: <inventory>@<version>:<kind>:<id>, checked by xref-unresolved against an inventory'
+
+modules:
+  S:
+    name: Structure
+    subtitle: What the document is made of
+    kinds:
+      section: {refs: [parent, parts, mentions], checked: [number, level, heading, eol, lines, order, anchor, xrefs]}
+      example: {refs: [in, declares], checked: [declaration, lines, order]}
+      decision: {refs: [in, about], checked: [number, lines, order, xrefs]}
+      chapter: {refs: [parts], checked: [provenance, path, source, commit, sha256, prefix, version]}
+  T:
+    name: Terms
+    subtitle: The words it defines
+    kinds:
+      term: {refs: [defined_in, also_defined_in, same_as], checked: [convention, in_the_files, fallback, lines, order]}
+  R:
+    name: Reference
+    subtitle: What the manifests declare
+    kinds:
+      minicosm: {refs: [modules, lenses], checked: [declaration, version]}
+      module: {refs: [of, kinds], checked: [letter]}
+      kind: {refs: [of, lists], checked: [refs, fields, required, declared]}
+      list: {refs: [of], checked: [field, values, meanings]}
+      check: {refs: [selected_by], checked: [severity]}
+      lens: {refs: [of, draws], checked: [lens]}
+  B:
+    name: Bubbles
+    subtitle: The help that sits beside a control
+    kinds:
+      bubble: {refs: [see], checked: [about, path, what, how, ideas, xrefs]}
+
+checks:
+  load: [load]
+  envelope: [duplicate-id, id-grammar, id-module, type, type-prefix, identity-min, status, visibility, ref-grammar,
+             ref-unresolved, closed-list, pending-shape, catalog-key, atem-shape, numbering, term-defined-once,
+             unlinked-mentions, empty-section, stale-provenance-hash, xref-unresolved]
+  own: the seven after catalog-key are DocOES's own, run by enough/docoes.py (lint_doc); a generic reader lists them as not run
+  severity: {}
+
+open-questions:
+  form: '{pending: "<the question>"}'
+  field-path: keys joined by ".", list positions as [n]
+  on-the-whole-item: field path node
+
+renderers:
+  - id: manual
+    makes: the readable manual, the document compiled as told (the short density)
+    lens: {kind: short, order: told}
+  - id: map
+    makes: the document's sections and terms at a glance
+    lens: {kind: mermaid, diagram: mindmap, include: [S, T]}
+  - id: graph
+    makes: what an item mentions, defines and exemplifies, and what mentions it
+    lens: {kind: mermaid, diagram: flowchart, include: [S, T, R], edges: [mentions, defined_in, in, declares, about, of, see], local: true}
+  - id: inventory
+    makes: every item as one row, for references from other volumes
+    lens: {kind: table, columns: [id, kind, version, anchor, atem]}
+  - {id: text-tree, makes: the text tree, code: [python -m enough.macrocosm tree]}
+  - {id: compile, makes: the markdown again, byte for byte, code: [python -m enough.docoes compile]}
+
+extension:
+  status: not built

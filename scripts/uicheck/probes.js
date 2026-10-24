@@ -119,7 +119,7 @@
   var LAYER_SEL = '#confirm-overlay, #help-viewer, #preview, [id$="-modal"],' +
     ' #readvisor-panel,' +
     ' #review-mode, #edit-mode, #girraph-mode, #merirmaid-mode, #wiki-mode,' +
-    ' #canon-mode, #ref-mode, #paginated-mode, #dict-mode, #cosm-mode, #cosmspec-mode';
+    ' #canon-mode, #paginated-mode, #dict-mode, #cosm-mode, #docs-mode';
   /* `#readvisor-panel` joined the list in P6c, when the panel's own screens
    * were finally wired. Docked, it PUSHES — nothing is covered and the list
    * changes nothing. In `full` (and in the narrow-viewport overlay) it is
@@ -178,7 +178,7 @@
     return { rect: rectOf(el), inView: inView, hitSelf: self,
              coveredBy: covered ? pathOf(covered) : null,
              coveredByLayer: covered ? layerOf(covered) : null,
-             hasHit: !!hit };
+             hasHit: !!hit, hitEl: covered };
   }
 
   function scrollParent(el) {
@@ -206,11 +206,18 @@
    * have not scrolled down yet". The scroller's own box is the only thing
    * that can tell those apart from a real cover, and only the page knows it.
    */
-  function scrolledPast(el, sp, r) {
+  function scrolledPast(el, sp, r, hitEl) {
     if (!sp) return false;
     var s = sp.getBoundingClientRect();
     var cx = r.x + r.w / 2, cy = r.y + r.h / 2;
-    return cx < s.left || cx > s.right || cy < s.top || cy > s.bottom;
+    if (cx < s.left || cx > s.right || cy < s.top || cy > s.bottom) return true;
+    // The half-way case (0.4.4): a row CUT by its scroller's edge, whose
+    // centre the scroller's clip hands — by a sub-pixel — to whatever lies
+    // beyond that edge (the model window's foot, under its scrolling list).
+    // That is still "not scrolled to yet", not a cover: the thing it "hits"
+    // is outside the scroller, and the element is not wholly inside it.
+    if (!hitEl || sp.contains(hitEl)) return false;
+    return r.x < s.left || r.x + r.w > s.right || r.y < s.top || r.y + r.h > s.bottom;
   }
 
   function clickables() {
@@ -227,7 +234,7 @@
         rect: v.rect, inView: v.inView, hitSelf: v.hitSelf,
         coveredBy: v.coveredBy, coveredByLayer: v.coveredByLayer,
         layer: layerOf(el), inScroller: sp ? pathOf(sp) : null,
-        outOfScroller: scrolledPast(el, sp, v.rect),
+        outOfScroller: scrolledPast(el, sp, v.rect, v.hitEl),
         z: getComputedStyle(el).zIndex
       });
       el.__uicheckIndex = out.length - 1;

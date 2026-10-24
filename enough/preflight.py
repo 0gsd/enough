@@ -28,7 +28,8 @@ It never blocks a request and never raises into one: runs are background
 tasks, a failure (the model still loading, an old build without
 `/tokenize`, a timeout) leaves the verdict unknown (`fits: None`), and cloud
 mode (`opro-api`) is skipped outright — the cloud's window is not ours to
-measure. stdlib + httpx, like `llm.py`.
+measure. Agent-free mode (0.4.4) skips it the same way: no model runs, so
+there is nothing to measure against. stdlib + httpx, like `llm.py`.
 """
 
 from __future__ import annotations
@@ -42,6 +43,7 @@ from typing import Any
 
 import httpx
 
+from . import agent_free as _agent_free
 from . import models as _models
 
 log = logging.getLogger("enough.preflight")
@@ -216,6 +218,11 @@ def _current_slot() -> str | None:
         return None
 
 
+def _skipped() -> bool:
+    """Nothing of ours to measure: the cloud slot, or agent-free mode."""
+    return _agent_free.enabled() or _current_slot() == CLOUD_SLOT
+
+
 class Preflight:
     """One project's preflight: a cached verdict and the background task
     that refreshes it.
@@ -280,7 +287,7 @@ class Preflight:
             loop = asyncio.get_running_loop()
         except RuntimeError:
             return
-        if _current_slot() == CLOUD_SLOT:
+        if _skipped():
             self.invalidate()
             self.state = "skipped"
             return
@@ -312,8 +319,9 @@ class Preflight:
 
     async def run(self, reason: str = "") -> dict[str, Any] | None:
         """Measure once. Returns the verdict, or None when it is unknown
-        (failure) or skipped (cloud). Never raises, except cancellation."""
-        if _current_slot() == CLOUD_SLOT:
+        (failure) or skipped (cloud, agent-free). Never raises, except
+        cancellation."""
+        if _skipped():
             self.invalidate()
             self.state = "skipped"
             return None

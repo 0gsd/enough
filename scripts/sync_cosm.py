@@ -14,7 +14,11 @@ This script only ever READS the Comprise checkout. It copies, byte for byte:
   `atoms/**/README*` -> `tests/fixtures/cosm/holotypes/<name>/`. Nothing else in a Holotype folder is copied: no
   local database, no people files, no scans, feeds, bindings, reports, snapshots, vendors or logos;
 - the COSM 0.2 example tree (`core/vendor/comprise-oes/examples/meadow/`: `firm.cosm`, `nodes.cosm`, `doc.cosm`,
-  `meadow.sketch`, `README.md`) -> `tests/fixtures/cosm/cosm02/meadow/`.
+  `meadow.sketch`, `README.md`) -> `tests/fixtures/cosm/cosm02/meadow/`;
+- Comprise OES 1's own words, read-only chapters of the MacroCOSM spec's doc volume (enough/docoes.py):
+  `oes/comprise-oes.md` -> `defaults/cosm/chapters/comprise-oes.md` and `oes/README.md` (its paradigm map) ->
+  `defaults/cosm/chapters/comprise-paradigm-map.md`, recorded with the source commit and each file's sha256 in
+  `defaults/cosm/chapters/manifest.json`, which the enumeration reads for the chapters' provenance.
 
 The Holotypes are named by an allowlist, never found by listing Comprise's fixtures: a fixture that is not public
 must never reach this repository, so nothing here can copy one by accident. Only changed files are rewritten;
@@ -50,6 +54,10 @@ EXAMPLE_DEST = f"{FIXTURES}/cosm02/meadow"
 # Folders this script owns outright: anything in them with no source is removed.
 OWNED = (HOLOTYPES_DEST, f"{FIXTURES}/cosm02")
 MANIFEST_JSON = f"{FIXTURES}/manifest.json"
+# Comprise's spec and its paradigm map, synced read-only as chapters of the doc volume (DocOES, 0.4.4): {source: dest}.
+CHAPTERS = {"oes/comprise-oes.md": "comprise-oes.md", "oes/README.md": "comprise-paradigm-map.md"}
+CHAPTERS_DEST = "defaults/cosm/chapters"
+CHAPTERS_JSON = f"{CHAPTERS_DEST}/manifest.json"
 
 
 def _sha(data: bytes) -> str:
@@ -83,6 +91,10 @@ def plan(comprise: Path) -> dict[str, Path]:
         p = comprise / EXAMPLE_SOURCE / fname
         if p.is_file():
             files[f"{EXAMPLE_DEST}/{fname}"] = p
+    for source, dest in CHAPTERS.items():
+        p = comprise / source
+        if p.is_file():
+            files[f"{CHAPTERS_DEST}/{dest}"] = p
     return dict(sorted(files.items()))
 
 
@@ -93,7 +105,7 @@ def source_commit(comprise: Path) -> str | None:
                               capture_output=True, text=True, timeout=10)
         if head.returncode != 0:
             return None
-        paths = [MANIFEST_SOURCE, EXAMPLE_SOURCE] + [f"fixtures/{n}/holotype.cosm" for n in HOLOTYPES] \
+        paths = [MANIFEST_SOURCE, EXAMPLE_SOURCE, *CHAPTERS] + [f"fixtures/{n}/holotype.cosm" for n in HOLOTYPES] \
             + [f"fixtures/{n}/atoms" for n in HOLOTYPES]
         status = subprocess.run(["git", "-C", str(comprise), "status", "--porcelain", "--", *paths],
                                 capture_output=True, text=True, timeout=10)
@@ -109,6 +121,18 @@ def manifest_for(hashes: dict[str, str], commit: str | None) -> bytes:
     hashes = dict(sorted(hashes.items()))
     digest = _sha("".join(f"{rel} {h}\n" for rel, h in hashes.items()).encode("utf-8"))
     body = {"source_commit": commit, "files": hashes, "digest": digest}
+    return (json.dumps(body, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+
+
+def chapters_for(hashes: dict[str, str], commit: str | None) -> bytes:
+    """`defaults/cosm/chapters/manifest.json`: where each chapter came from, at which commit, with its sha256. No
+    timestamps, so a rerun over an unchanged checkout is byte-stable."""
+    chapters = {}
+    for source, dest in CHAPTERS.items():
+        rel = f"{CHAPTERS_DEST}/{dest}"
+        if rel in hashes:
+            chapters[dest] = {"source": source, "sha256": hashes[rel]}
+    body = {"source": "comprise-dev", "source_commit": commit, "chapters": chapters}
     return (json.dumps(body, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
 
 
@@ -167,12 +191,14 @@ def sync(comprise: Path, root: Path = REPO_ROOT, *, check: bool = False) -> dict
                 (root / rel).unlink()
     if not check:
         _prune(root)
-    manifest = manifest_for(hashes, source_commit(comprise))
-    mpath = root / MANIFEST_JSON
-    if not mpath.is_file() or mpath.read_bytes() != manifest:
-        report["changed" if mpath.is_file() else "added"].append(MANIFEST_JSON)
-        if not check:
-            _write(mpath, manifest)
+    commit = source_commit(comprise)
+    manifest = manifest_for(hashes, commit)
+    for rel, data in ((MANIFEST_JSON, manifest), (CHAPTERS_JSON, chapters_for(hashes, commit))):
+        mpath = root / rel
+        if not mpath.is_file() or mpath.read_bytes() != data:
+            report["changed" if mpath.is_file() else "added"].append(rel)
+            if not check:
+                _write(mpath, data)
     body = json.loads(manifest)
     report.update(files=len(hashes), digest=body["digest"], source_commit=body["source_commit"])
     return report

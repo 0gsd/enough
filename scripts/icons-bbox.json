@@ -486,6 +486,15 @@
       "y": 17.4
     }
   },
+  "short.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 38,
+      "w": 50,
+      "x": 11,
+      "y": 17
+    }
+  },
   "speak.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {

@@ -31,7 +31,7 @@ from typing import Any
 
 import httpx
 
-from . import broker, girraph, highlights
+from . import agent_free, broker, girraph, highlights
 
 log = logging.getLogger("enough.tools")
 
@@ -1765,8 +1765,8 @@ _pal_tools.register()
 from . import dictionary_tools as _dictionary_tools  # noqa: E402
 _dictionary_tools.register()
 
-# MacroCOSM's five (0.4.3): `cosm_read`, `cosm_lint`, `emf_derive`, `atem`,
-# `cosm_guide`. Reads and project writes are ungated; a write into the Canon
+# MacroCOSM's six (0.4.3, `doc_lookup` in 0.4.4): `cosm_read`, `cosm_lint`,
+# `emf_derive`, `atem`, `cosm_guide`, `doc_lookup`. Reads and project writes are ungated; a write into the Canon
 # store answers to `canon_enabled` inside the runners. Documented in every
 # project (like FEED's); the guide is the `macrocosm-oes` skill, off by
 # default and one `cosm_guide` away. The module imports the engine lazily.
@@ -1799,6 +1799,12 @@ def _trace_args_for(call: ToolCall) -> dict[str, object]:
 
 
 def execute(project_dir: Path, call: ToolCall) -> ToolResult:
+    # Agent-free mode (0.4.4): a tool call only ever comes from a readvisor's
+    # turn, and no turn starts while it is on (the route gate). Refused here
+    # too, defensively, and untraced: nothing ran.
+    if agent_free.enabled():
+        return ToolResult(call.name, call.path or call.command or "", False, "error: " + agent_free.detail(
+            "tools run only for a readvisor, and none runs while agent-free is on"))
     fn = _DISPATCH.get(call.name)
     if fn is None:
         return ToolResult(

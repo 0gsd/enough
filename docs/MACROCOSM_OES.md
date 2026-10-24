@@ -7,8 +7,8 @@ MacroCOSM OES is the shared grammar every MiniCOSM is written in. It says how a 
 volume names the language it is written in, what an item is and which columns every item carries, how one item points
 at another, how an unknown value is written down, how anything is addressed, which checks every volume can be held to,
 how a manifest declares a MiniCOSM, and how a renderer draws one. It is the grammar that Comprise OES 1 worked out for
-companies, read out of it and written down on its own, so that nothing in it says "company". Four MiniCOSMs are
-written in it today: `comprise`, `cosm`, `canon` and `emf` (section 18).
+companies, read out of it and written down on its own, so that nothing in it says "company". Five MiniCOSMs are
+written in it today: `comprise`, `cosm`, `canon`, `emf` and `doc` (section 18).
 
 **Status.** Normative for version 0.0.1. The reference reader is `enough/macrocosm.py`. Where this text and the reader
 disagree, **the reader wins**, and this text is corrected. Section 19.4 collects every disagreement known at the time
@@ -22,6 +22,7 @@ tree made so far reads unchanged.
 
 ## Contents
 
+<!-- atem: every section of this specification, in order -->
 1. Provenance and the name
 2. The model on one page
 3. Scales: MacroCOSM, MiniCOSM, MicroCOSM
@@ -39,7 +40,7 @@ tree made so far reads unchanged.
 15. Versions and signatures (by reference)
 16. The private/public split (by reference)
 17. MicroCOSMs (mapped)
-18. The MiniCOSMs enough ships: comprise, cosm, canon, emf
+18. The MiniCOSMs enough ships: comprise, cosm, canon, emf, doc
 19. Conformance
 20. Decisions in this version
 21. Open questions and roadmap
@@ -48,6 +49,7 @@ Appendix: the mapping to Comprise OES 1 · Colophon
 
 ## How to read this
 
+<!-- atem: the rule words, the words on screen, and what an example promises -->
 **Must and may.** *Must* is a rule a conforming reader or writer keeps. *May* is a permission. *Should* is advice the
 checks do not enforce.
 
@@ -70,6 +72,8 @@ loads, and it passes the checks its MiniCOSM selects, with every reference resol
 ---
 
 ## 1. Provenance and the name
+
+<!-- atem: where MacroCOSM came from, what its name means, and who keeps it -->
 
 ### 1.1 Lineage
 
@@ -121,6 +125,7 @@ the names of the family are his (see the colophon). The reference reader is part
 
 ## 2. The model on one page
 
+<!-- atem: a volume read as a file system and as a relational database -->
 A volume is a file system that is also a relational database. Every part of the grammar has a place in both readings,
 and a name on screen.
 
@@ -156,10 +161,12 @@ references, and the checks. A MiniCOSM may keep a local database beside its file
 
 ## 3. Scales: MacroCOSM, MiniCOSM, MicroCOSM
 
+<!-- atem: the three scales: the grammar, a domain's dialect, an organization's additions -->
+
 | Scale | What it is | In this version |
 |---|---|---|
 | **MacroCOSM** | the whole language: the shared grammar every MiniCOSM is written in | this document, and the reader `enough/macrocosm.py` |
-| **MiniCOSM** | an OES for one domain, declared by a manifest: its volume layout, modules, kinds, fields, references, checks and renderers | four ship with enough: `comprise`, `cosm`, `canon`, `emf` (section 18) |
+| **MiniCOSM** | an OES for one domain, declared by a manifest: its volume layout, modules, kinds, fields, references, checks and renderers | five ship with enough: `comprise`, `cosm`, `canon`, `emf`, `doc` (section 18) |
 | **MicroCOSM** | one organization's extension on top of a MiniCOSM: the extra kinds, fields, checks or renderers it needs | mapped, not built (section 17) |
 
 **What MacroCOSM gives every MiniCOSM.** All of it, unchanged: sections 4 to 14 of this document, and the parts
@@ -179,6 +186,8 @@ and the declaration mean the same thing in every MiniCOSM.
 ---
 
 ## 4. The file format
+
+<!-- atem: how a cosm file is written: its encoding, its YAML subset, its scalars -->
 
 ### 4.1 Encoding and shape
 
@@ -270,6 +279,8 @@ an address, never a door (section 11.2).
 
 ## 5. The declaration
 
+<!-- atem: the one line that names a volume's MiniCOSM, and what a reader refuses -->
+
 ### 5.1 The form
 
 A catalog says which MiniCOSM it is written in with its first key:
@@ -292,7 +303,8 @@ alter what a path means needs a new MiniCOSM (section 11.3).
 
 ### 5.2 Identifying a catalog
 
-The reader keeps a registry of the manifests it knows (section 13.6), in order: `comprise`, `cosm`, `canon`, `emf`.
+The reader keeps a registry of the manifests it knows (section 13.6), in order: `comprise`, `cosm`, `canon`, `emf`,
+`doc`.
 Given a catalog, it decides which MiniCOSM the catalog is written in by these steps, in order. The first that applies
 decides.
 
@@ -317,7 +329,7 @@ A refused catalog loads nothing. The reader returns a refusal, a value that says
 reader knows, and never raises. For example:
 
 ```text
-canon.cosm declares oes: canon/2, which this reader cannot read: it reads comprise/1, cosm/0, canon/1, emf/1;
+canon.cosm declares oes: canon/2, which this reader cannot read: it reads comprise/1, cosm/0, canon/1, emf/1, doc/1;
 nothing was loaded from this volume
 ```
 
@@ -331,6 +343,7 @@ The checks report the refusal as one `load` error, and a viewer shows it in plac
 | `cosm` | `oes: cosm/0` | `cosm: 0.2`, `cosm: 0.3`, and `opi:` with any value | refused |
 | `canon` | `oes: canon/1` | nothing | refused |
 | `emf` | `oes: emf/1` | nothing | refused |
+| `doc` | `oes: doc/1` | nothing | refused |
 
 A legacy key is never an error. A reader keeps it.
 
@@ -350,6 +363,8 @@ and no writer is required to write it.
 ---
 
 ## 6. Volumes and catalogs
+
+<!-- atem: a volume is one database, headed by its catalog -->
 
 ### 6.1 Volumes
 
@@ -437,6 +452,8 @@ the model: the checks do not read it unless a MiniCOSM's own checks say so, and 
 
 ## 7. Items, kinds, fields
 
+<!-- atem: items, the modules and kinds they belong to, and their fields -->
+
 ### 7.1 Items
 
 An **item** is a row: a mapping with a string `id` and a `type`. It is written in a `nodes:` list, or in a named block
@@ -461,6 +478,7 @@ reserves a letter.
 | `cosm` | P Products |
 | `canon` | V Volume |
 | `emf` | L Lexicon · E Entities · K Concepts · P Propositions · T Transitions · X Atems |
+| `doc` | S Structure · T Terms · R Reference · B Bubbles |
 
 ### 7.3 Kinds
 
@@ -497,6 +515,8 @@ A **field** is a column. Every key of an item is a field.
 
 ## 8. The envelope
 
+<!-- atem: the columns every item carries, whatever its kind -->
+
 ### 8.1 The columns every item has
 
 The **envelope** is the set of columns every item carries, whatever its kind: the system columns of every table.
@@ -525,6 +545,7 @@ that is missing fails the check `identity-min`; only presence is checked, as in 
 | `cosm` | `id type name summary owner` |
 | `canon` | `id type name path` |
 | `emf` | `id type name summary provenance` |
+| `doc` | `id type name summary` |
 
 ### 8.3 Envelope fields a MiniCOSM adds
 
@@ -532,7 +553,8 @@ A MiniCOSM may add fields to its envelope (`envelope.fields`) and say which of t
 (`envelope.references`). Comprise adds `owner` (a role, never a person), `since`, `until`, `mattering`, `body`, `at`,
 `attributed-to`, `template`, `instances`, `counterparty`, `series` and `shared-with`, and checks `owner`, `at`,
 `attributed-to`, `counterparty`, `shared-with` and `links` as references. Canon adds `path`, `parent`, `parts`,
-`size`, `mtime`, `kind`, `twin`, `emf` and `atem`. EMF adds `span` and `salience`.
+`size`, `mtime`, `kind`, `twin`, `emf` and `atem`. EMF adds `span` and `salience`. DocOES adds `atem`, `body`, `lines`,
+`order` and `chapter`, and checks `chapter` as a reference.
 
 ### 8.4 Status and visibility
 
@@ -581,6 +603,8 @@ Allowed, and kept. The envelope is a floor, not a ceiling.
 ---
 
 ## 9. References and links
+
+<!-- atem: how one item points at another, and how a reader resolves it -->
 
 ### 9.1 What a reference is
 
@@ -653,6 +677,7 @@ every value is checked, and a literal fails `ref-grammar`.
 
 ## 10. Open questions
 
+<!-- atem: an unknown written down as a question, never as a guess -->
 An **open question** (*pending*) is a value nobody has yet given, written where the value would go:
 
 ```yaml
@@ -680,6 +705,7 @@ pending: "Which entity holds the trademarks since the transfer?"
 
 ## 11. Ids, paths, URIs
 
+<!-- atem: how anything is addressed: an item's id, its path and its URI -->
 Every item has an **id**, the primary key. Every part, module, kind, item and field has a **path**, the id respelled
 as a location. Every volume and everything in it has a **URI**, the path qualified with the MiniCOSM and the volume.
 
@@ -718,6 +744,7 @@ A path is an id respelled as a location, through the levels the manifest's `path
 | `cosm` | module, kind, item, field | `P/<kind>/<slug>` |
 | `canon` | module, kind, item, field | `V/<kind>/<slug>` |
 | `emf` | module, kind, item, field | `<module>/<kind>/<slug>` |
+| `doc` | module, kind, item, field | `<module>/<kind>/<slug>` |
 
 ```text
 path      = [ part "/" ] module [ "/" kind [ "/" slug [ "#" field ] ] ]    ; part present exactly when the MiniCOSM has parts
@@ -768,6 +795,7 @@ section 18.
 | `P/claim/close-locks-the-day` | `P:claim/close-locks-the-day` | a claim of the EMF twin in 18.4 |
 | `P/claim/meadow-closes-overnight#roles.actor` | `P:claim/meadow-closes-overnight`, field `roles.actor` | a role slot |
 | `X/atem/1` | `X:atem/1` | a passage atem |
+| `S/section/1.1` | `S:section/1.1` | a section of the doc volume in 18.5 |
 
 ### 11.3 URIs
 
@@ -784,6 +812,7 @@ oes:comprise/meadow/meadow/O/role/Founder                a role in it
 oes:canon/meadow-handbook/V/file/guides--close-md        a file in a Canon volume
 oes:canon/~meadow-notes/V/file/plan-md                   a file in a project's catalog
 oes:emf/guides--close-md/P/claim/close-locks-the-day     a claim in a text's EMF twin
+oes:doc/macrocosm-oes/S/section/18.5                      a section of this specification's doc volume
 ```
 
 - **No version.** A URI carries no version, because a path keeps its meaning across every version of its MiniCOSM. A
@@ -792,12 +821,14 @@ oes:emf/guides--close-md/P/claim/close-locks-the-day     a claim in a text's EMF
   globally unique name, and a resolver for URIs across installs, are mapped (section 21).
 - **A private address.** A URI names a place. It opens nothing to a reader who may not see what is there.
 - **In enough.** enough resolves URIs for its own volumes: `oes:canon/<volume>/…` for a Canon volume,
-  `oes:canon/~<project>/…` for a project's catalog, `oes:emf/<twin>/…` for an EMF twin, and
-  `oes:comprise/<holotype>/<path>` for any Holotype Canon holds.
+  `oes:canon/~<project>/…` for a project's catalog, `oes:emf/<twin>/…` for an EMF twin,
+  `oes:comprise/<holotype>/<path>` for any Holotype Canon holds, and `oes:doc/<document>/…` for a doc volume.
 
 ---
 
 ## 12. Checks
+
+<!-- atem: the checks every volume can be held to, and the report they make -->
 
 ### 12.1 What the checks are
 
@@ -873,6 +904,8 @@ person's judgement. Ids that differ only in case, and slugs outside the path set
 
 ## 13. The manifest
 
+<!-- atem: the small file that declares a MiniCOSM, so a reader needs no new code -->
+
 ### 13.1 What it is
 
 A **manifest** is the machine-readable declaration of a MiniCOSM: what a program needs to read, check and render its
@@ -943,18 +976,23 @@ Three more optional keys, which the reference reader (`enough/macrocosm.py`) als
 - `catalog.<key>`, where `<key>` is listed in `catalog.keys` and the manifest gives it a list: the closed list of values
   that catalog key may hold. Canon's `scope` (`volume`, `project`) and `status` (`complete`, `ingesting`, `failed`) are
   two. A value outside the list fails `catalog-key`; an open question passes.
+- A lens of a kind other than `mermaid`, under `renderers[].lens.kind`: DocOES declares a `short` and a `table`. A reader
+  keeps it in the manifest for the code that renders it, and neither lists it among a volume's lenses nor draws it
+  (section 14.3).
 
 ### 13.6 The registry
 
 A reader loads every `*.manifest.cosm` in its manifest folders into a **registry**. enough's are
 `defaults/cosm/manifests/` (shipped, read-only); a folder for a person's own manifests, `~/enough/cosm/manifests/`, is
-mapped. The registry order is `comprise`, `cosm`, `canon`, `emf`, then any other in name order. A manifest that does not
+mapped. The registry order is `comprise`, `cosm`, `canon`, `emf`, `doc`, then any other in name order. A manifest that does not
 load, or that names a MiniCOSM already in the registry, is skipped and reported; the first one wins. The registry is
 what step 1 of section 5.2 compares a declaration against, and what a refusal lists as known.
 
 ---
 
 ## 14. Renderers and lenses
+
+<!-- atem: how a volume is drawn: renderers, the text tree and Mermaid lenses -->
 
 ### 14.1 Renderers
 
@@ -985,7 +1023,7 @@ renderers:
 
 | Lens key | Holds | Default |
 |---|---|---|
-| `kind` | `mermaid` (the only kind in 0.0.1) | required |
+| `kind` | `mermaid`, the only kind the generic renderer draws; a MiniCOSM may declare another (DocOES's `short` and `table`), which a reader keeps and neither lists among a volume's lenses nor draws | required |
 | `diagram` | `flowchart` or `mindmap` | `flowchart` |
 | `include` | the module letters to draw | every module |
 | `edges` | reference fields (dotted and wildcard fields allowed), `links` (every typed link) or one link `rel` (only the typed links with that `rel`), and `parts` and `parent`, to draw as edges | every reference field, `links`, `parts` and `parent` |
@@ -1032,6 +1070,14 @@ draws no edges.
 left over in each subgraph (in a mindmap, under each module) collapse into one node labelled "… N more", N being how
 many; an edge to a collapsed item ends at that node, and in `node_map` that node maps to no item.
 
+**A local graph.** Given an item (`around`: its key, id or path) and a `depth` (1 unless the caller says otherwise),
+`to_mermaid` draws only that item and the items the lens's edges reach from it or to it within `depth` steps, as one
+flowchart with no subgraphs, the item itself in the class `focus`.
+
+**A volume from text.** `load_volume_text(text, filename=…)` reads one catalog held in memory, an example of this
+specification say, exactly as `load_volume` reads a file of that name, so it can be checked and drawn where it stands
+without writing anything to disk.
+
 **Well formed.** Node ids are Mermaid-safe, unique in the diagram, and the same for the same volume every time; labels
 are quoted, so no label can end a subgraph or break a line; subgraphs balance.
 
@@ -1045,15 +1091,22 @@ are quoted, so no label can end a subgraph or break a line; subgraphs balance.
 | `emf` | `map` | the text's lexicon, entities, concepts, claims and events as a mindmap |
 | `comprise`, `cosm`, `canon` | `map` (the generic lens) | every module, every reference field and typed link, `parts` and `parent` |
 | `comprise` | `tree` (the generic lens) | the items joined by `parts` or `parent` |
+| `doc` | `manual` | the readable manual: the document compiled as told, its short density (a short, not a drawing) |
+| `doc` | `map` | the document's sections and terms, as a mindmap |
+| `doc` | `graph` | what an item mentions, defines and exemplifies, and what mentions it |
+| `doc` | `inventory` | every item as one row: its id, kind, version, anchor and atem (a table, not a drawing) |
+| `doc` | `tree` (the generic lens) | the document's sections, joined by `parts` and `parent` |
 
 In the reader's order, a volume has these lenses: a Holotype, `map` and `tree` (the `tree` only when its items carry
-`parts` or `parent`); a cosm tree, `tree` and `map`; a Canon volume, `tree` and `map`; an EMF, `claims` and `map`. EMF's
-own `map`, the mindmap, takes the place of the generic one.
+`parts` or `parent`); a cosm tree, `tree` and `map`; a Canon volume, `tree` and `map`; an EMF, `claims` and `map`; a doc
+volume, `map`, `graph` and `tree`. EMF's own `map`, the mindmap, takes the place of the generic one, and so does
+DocOES's; its `manual` and `inventory` are drawn by its own renderers.
 
 ---
 
 ## 15. Versions and signatures (by reference)
 
+<!-- atem: saved versions and signatures, defined in Comprise OES 1 -->
 *Defined here, built in Comprise OES 1 (its section 10), not built in MacroCOSM 0.0.1.*
 
 - **A saved version** is an immutable copy of a volume's model files at a moment, with a manifest that holds every
@@ -1072,12 +1125,13 @@ reserved `macrocosm:` key (section 5.6). A path and a URI carry no version (sect
 
 ## 16. The private/public split (by reference)
 
+<!-- atem: the private Holotype and its public isotype: two formats, not a setting -->
 *Defined here, built in Comprise OES 1 (its section 11), not built in MacroCOSM 0.0.1.*
 
 The split is two formats, not one format with a setting.
 
-- The **Holotype** is the complete, private description of one subject, kept by the subject, on the subject's machine.
-- The **isotype** is a small public projection of it: a separate document with fixed fields, each derived from the
+- **Holotype** — the complete, private description of one subject, kept by the subject, on the subject's machine.
+- **isotype** — a small public projection of the Holotype: a separate document with fixed fields, each derived from the
   Holotype by one rule, default-deny, released and signed by the subject. A field added to the model later never flows
   into it by itself.
 
@@ -1093,9 +1147,10 @@ the projection are its own.
 
 ## 17. MicroCOSMs (mapped)
 
+<!-- atem: one organization's additions to a MiniCOSM, mapped and not yet built -->
 *Mapped in Comprise's `oes/README.md` (its section 5) and the `extension:` block of its manifest. Not built anywhere.*
 
-A **MicroCOSM** is one organization's extension of a MiniCOSM.
+A MicroCOSM is one organization's extension of a MiniCOSM.
 
 **It may add:** kinds, in any module; fields, on any kind; checks, including stricter versions of the MiniCOSM's own;
 renderers.
@@ -1114,7 +1169,8 @@ How a volume says that it uses a MicroCOSM, and how a reader loads one, are not 
 
 ## 18. The MiniCOSMs enough ships
 
-Four manifests ship in `defaults/cosm/manifests/`, one per MiniCOSM.
+<!-- atem: the five MiniCOSMs enough ships, one manifest each -->
+Five manifests ship in `defaults/cosm/manifests/`, one per MiniCOSM.
 
 | MiniCOSM | Declaration | Enumerates | Volume | Catalog | Modules |
 |---|---|---|---|---|---|
@@ -1122,9 +1178,11 @@ Four manifests ship in `defaults/cosm/manifests/`, one per MiniCOSM.
 | `cosm` | `cosm: 0.2` · `0.3`, `opi:` | one whole's product tree, outside any Holotype | a folder of `.cosm` files | the file holding `brand:` | P |
 | `canon` | `oes: canon/1` | a Canon volume, or a project: folders, files, articles, and what has been derived from them | one file | `canon.cosm` | V |
 | `emf` | `oes: emf/1` | one text: its words, the things and ideas it names, its claims, its events, its atems | one file, beside the text | `<text>.cosm` | L E K P T X |
+| `doc` | `oes: doc/1` | one document: its sections, terms, examples and decisions, joined to the reference | one file per telling, built by enough | `<doc>.<lang>.doc.cosm` | S T R B |
 
 ### 18.1 comprise: Comprise OES 1
 
+<!-- atem: a company as Comprise describes it, read here without Comprise's own rules -->
 **What it enumerates.** Companies. A Holotype describes one company at a moment as a set of **concerns** (going
 concerns: a corporation's branded face, a subsidiary, a joint venture) joined by **relationships**, each concern with
 eight modules. The spec is Comprise's own, `oes/comprise-oes.md`; this section says only how it sits in MacroCOSM.
@@ -1185,6 +1243,7 @@ sources:
 
 ### 18.2 cosm: the standalone product tree
 
+<!-- atem: one whole's product tree, as COSM 0.2 and 0.3 wrote it -->
 **What it enumerates.** One whole's product tree, as COSM 0.2 and 0.3 wrote it outside any Holotype: the brand, and
 below it suites, offerings, functions, products and services, each answering the same nine questions (identity, flow,
 substrate, rules, principles, economics, vocabulary, affect, mattering). The context-ontology skill still writes trees in
@@ -1289,9 +1348,12 @@ sources:
 
 ### 18.3 canon: the store's enumeration
 
-**What it enumerates.** Canon is enough's library: the store at `~/enough/canon/`, the file manager that browses it,
-and the derivations that turn its texts into EMF twins and atems. A **Canon volume** is a top-level folder of the
-store. Its catalog enumerates what the volume holds (folders, files, saved articles) and what has been derived from
+<!-- atem: a Canon volume or a project: its files and what was made from them -->
+**What it enumerates.** A library, and what has been made from what it holds.
+
+<!-- term: Canon -->
+Canon is enough's library: the store at `~/enough/canon/`, the file manager that browses it, and the derivations that
+turn its texts into EMF twins and atems. A **Canon volume** is a top-level folder of the store. Its catalog enumerates what the volume holds (folders, files, saved articles) and what has been derived from
 each file: its markdown twin, its EMF twin, its atem. The same MiniCOSM enumerates a project's files (section 18.3.4).
 
 **Its declaration.** `oes: canon/1`. There is no legacy form, and a catalog without the key is refused.
@@ -1503,12 +1565,19 @@ nodes:
 
 ### 18.4 emf: a text's enumeration
 
-**What it enumerates.** One text. **EMF** stands for *enumerated meaning fabula*: the fabula of a text, enumerated — the
-order-free material a telling is made from. A text is decompiled into the words it leans on, the particular things and
-people it names, the ideas it uses, the claims it makes and how it knows each one, the events it narrates in order, and
-its atems; *fabula*, for short, is the everyday word for what that makes (section 18.4.4 says where the word comes
-from). An EMF twin is not a summary. It is the text's meaning taken apart into items that can be checked, drawn,
-compared and compiled back into prose. A text is what a person reads; its twin is what the text says, enumerated.
+<!-- atem: one text taken apart into what it says, item by item -->
+**What it enumerates.** One text, taken apart into what it says.
+
+<!-- term: EMF -->
+**EMF** stands for *enumerated meaning fabula*: the fabula of a text, enumerated. A text is decompiled into the words it
+leans on, the particular things and people it names, the ideas it uses, the claims it makes and how it knows each one,
+the events it narrates in order, and its atems. An EMF twin is not a summary. It is the text's meaning taken apart into
+items that can be checked, drawn, compared and compiled back into prose. A text is what a person reads; its twin is what
+the text says, enumerated.
+
+<!-- term: fabula -->
+A text's *fabula* is the order-free material a telling is made from. "The fabula", for short, is the everyday name for
+what a decompile makes, the EMF twin (section 18.4.4 says where the word comes from).
 
 **Its declaration.** `oes: emf/1`. There is no legacy form, and a catalog without the key is refused.
 
@@ -1567,8 +1636,9 @@ it: `{actor: E:org/meadow, act: K:concept/close, after: E:thing/bank-feed}`. The
 `instrument`, `source`, `holder`, `cause`, `effect`, `condition` …). A slot holds an item id whenever the participant is
 an item of the twin, and is then checked; otherwise it holds a literal (section 9.6).
 
-**Every claim has a stance:** how the text knows it. The stance is required, and comes from a closed list of six, in the
-spirit of the evidential markers some languages carry in their grammar:
+<!-- term: stance -->
+A claim's **stance** is how the text knows it. Every claim has one, from a closed list of six, in the spirit of the
+evidential markers some languages carry in their grammar:
 
 | Stance | The text holds the claim as |
 |---|---|
@@ -1578,6 +1648,10 @@ spirit of the evidential markers some languages carry in their grammar:
 | `opinion` | a judgement or a preference of the author's |
 | `assumed` | taken for granted: the text relies on it without stating it as a premise, or supposes it for the sake of argument |
 | `hearsay` | reported from someone else, who fills the claim's `source` slot when the text names them |
+
+<!-- term: salience -->
+A claim's **salience** is how much it matters to the text, from a closed list of four: `critical`, `high`, `normal` and
+`low`. A short told by weight puts the claims in that order (section 18.4.4).
 
 **Typed links instead of arrows.** A relation between two items is a typed link in the first item's `links:`, never a
 symbol between them. EMF closes the relations to nine:
@@ -1594,7 +1668,8 @@ symbol between them. EMF closes the relations to nine:
 | `defines` | gives the meaning of |
 | `mentions` | names, without saying more about |
 
-**Every item points back at the text.** `span` says where in the text the item comes from: `{lines: "3"}` or
+<!-- term: span -->
+An item's **span** points it back at the text: it says where in the text the item comes from, `{lines: "3"}` or
 `{lines: "12-18"}`, or, when lines do not serve, `{start: "<up to 60 characters>", end: "<up to 60 characters>"}`,
 quoted from the passage's first and last words. A reader jumps from an item to its passage by its span.
 
@@ -1615,20 +1690,27 @@ that imports, copies, lists or reconciles files ever decompiles a text.
 
 #### 18.4.4 Shorts
 
-**What a short is.** A **SHORT**, *syuzhetic-hermeneutic open readable text*, is a telling of a text that enough
-compiles from its EMF twin. It is *syuzhetic*: an arrangement, the twin's items put in an order. It is *hermeneutic*:
+<!-- term: short -->
+A **short** is a telling of a text that enough compiles from its EMF twin. Its name is an acronym, **SHORT**,
+*syuzhetic-hermeneutic open readable text*. It is *syuzhetic*: an arrangement, the twin's items put in an order. It is *hermeneutic*:
 as it tells each thing it says how the thing is known, every claim's stance in plain words. It is *open*: it is plain
 markdown that anyone can read without enough, it is yours to edit, it is honest about its gaps, and it is open to the
 reader's own reading. It is *readable text*: prose, not a database. The name covers only what enough compiles.
 
 **One fabula, many tellings.** A text's EMF twin is its fabula (section 18.4): the order-free material a telling is made
 from. Every claim is there with its stance, every event with its own before and after, every term grounded, and each
-item's `span` says where in the telling it was found. A *syuzhet* is a telling of that material, an arrangement of it.
-The author's text is a syuzhet of the same fabula, the first one, and it is the author's: it is never called a short. A
-short is a syuzhet enough compiles, and a text can have many. The atem sits outside the pair. It is the breath of the
-text, a reduction with its own hermeneutic shape (push and pull), neither material nor arrangement.
+item's `span` says where in the telling it was found.
 
-**Two orders.**
+<!-- term: syuzhet -->
+A *syuzhet* is a telling of a fabula, an arrangement of its material. The author's text is a syuzhet of the same fabula,
+the first one, and it is the author's: it is never called a short. A short is a syuzhet enough compiles, and a text can
+have many. The atem sits outside the pair. It is the breath of the text, a reduction with its own hermeneutic shape
+(push and pull), neither material nor arrangement.
+
+**Two orders.** A short tells the twin's items in one of two orders:
+
+- **as told** — every item where its span puts it, in the author's order: `told` in the files;
+- **by weight** — the claims that matter most first, then the events, then the terms: `weight` in the files.
 
 | Order | In words | How it tells |
 |---|---|---|
@@ -1853,9 +1935,315 @@ atem:
 nodes: []
 ```
 
+### 18.5 doc: a document's enumeration
+
+<!-- atem: one document taken apart into items and compiled back, byte for byte -->
+**What it enumerates.** One document, taken apart and told again.
+
+<!-- term: DocOES -->
+**DocOES**, *Documentation OES*, takes a markdown document apart into items:
+its sections, the terms it defines, the complete examples it shows and the decisions it records. It joins them to
+items generated from the MiniCOSM manifests (every MiniCOSM, module, kind, closed list, check and lens) and, for
+enough's own manual, to the help bubbles that sit beside the controls. A doc volume is a document's fabula: the
+material, item by item. Its short is the readable manual, compiled as told, and it gives back the markdown the
+author wrote, byte for byte. This specification is enumerated this way, with Comprise's specification and paradigm
+map as chapters, and so is the Help Center, in each of its six languages.
+
+**Its declaration.** `oes: doc/1`. There is no legacy form, and a catalog without the key is refused.
+
+**Its volume.** One file per telling, `<doc>.<lang>.doc.cosm`: `macrocosm-oes.en.doc.cosm`,
+`help-center.fr.doc.cosm`. enough builds it at runtime into its own state (`~/enough/docoes/`) from the markdown and
+the manifests, and builds it again whenever the document, a chapter, any manifest or enough's own version changes.
+It is never written by hand, never committed and never shown in the file tree. The markdown stays the authoring
+surface: to change a doc volume, change its document. The enumeration is `enough/docoes.py`.
+
+#### 18.5.1 The catalog
+
+| Key | Holds |
+|---|---|
+| `oes` | `doc/1` |
+| `macrocosm` | reserved (section 5.6) |
+| `id` | `doc/<slug>`: `doc/macrocosm-oes`, `doc/help-center`. Every telling of a document has the same id |
+| `name` | the document's title |
+| `document` | the markdown this telling was enumerated from: `{path, sha256, version}` |
+| `telling` | `{lang, voice}`: the language, one of `en`, `de`, `es`, `fr`, `ja` and `zh`; and the voice the document is written in, when it has one (the Help Center's is `rosa`) |
+| `tellings` | the languages the document is told in |
+| `chapters` | the synced documents inside the volume, one `{id, path, source, commit, sha256, prefix, version}` each |
+| `built` | `{at, by, digest, manifests}`: when, by which enough, the digest of everything the volume was built from, and each manifest's `{name, version, sha256}` |
+| `nodes` | the items |
+
+#### 18.5.2 The modules and their kinds
+
+| Letter | Module | What it holds | Kinds |
+|---|---|---|---|
+| S | Structure | what the document is made of | `section`, `example`, `decision`, `chapter` |
+| T | Terms | the words it defines | `term` |
+| R | Reference | what the manifests declare | `minicosm`, `module`, `kind`, `list`, `check`, `lens` |
+| B | Bubbles | the help that sits beside a control | `bubble` |
+
+| Kind | What it is | Reference fields | Its own fields |
+|---|---|---|---|
+| `section` | a heading and the text under it, down to the next heading | `parent`, `parts`, `mentions` | `number`, `level`, `heading`, `body`, `lines`, `order`, `anchor`, `xrefs` |
+| `example` | a complete file the document shows in a block marked `cosm` | `in`, `declares` | `declaration`, `body`, `lines` |
+| `decision` | one numbered decision of a section of decisions | `in`, `about` | `number`, `body`, `lines`, `xrefs` |
+| `chapter` | a synced document inside the volume, read-only, in its author's own words | `parts` | `path`, `source`, `commit`, `sha256`, `prefix`, `version` |
+| `term` | a word the document defines | `defined_in`, `also_defined_in`, `same_as` | `convention`, `in_the_files`, `lines` |
+| `minicosm` | a MiniCOSM, as its manifest declares it | `modules`, `lenses` | `declaration`, `version` |
+| `module` | a module of a MiniCOSM | `of`, `kinds` | `letter` |
+| `kind` | a kind of a module, with the fields its manifest names | `of`, `lists` | `refs`, `fields`, `required`, `declared` |
+| `list` | a closed list of values, with what each value means where this document says | `of` | `field`, `values`, `meanings` |
+| `check` | a check, with the MiniCOSMs that select it | `selected_by` | `severity` |
+| `lens` | a lens a MiniCOSM declares, or the generic one it gets | `of`, `draws` | `lens` |
+| `bubble` | a help bubble: what a control is, how to use it, and ideas for it | `see` | `about`, `path`, `what`, `how`, `ideas`, `xrefs` |
+
+**Envelope.** Required: `id`, `type`, `name`, `summary`. DocOES adds `atem`, `body`, `lines`, `order` and `chapter`
+to the envelope, and `chapter` is a reference. Its status list adds two words to Comprise's four: `pending`, an item
+proposed and not yet settled, and `attic`, an item retired that still resolves. **Closed lists:** a term's
+`convention` (`table`, `bullet`, `sentence`, `glossary`, `marker`) and six link relations, `mentions`, `defines`,
+`exemplifies`, `decides`, `see` and `same_as`. **Checks:** `load`, `duplicate-id`, `id-grammar`, `id-module`, `type`,
+`type-prefix`, `identity-min`, `status`, `visibility`, `ref-grammar`, `ref-unresolved`, `closed-list`,
+`pending-shape`, `catalog-key`, and seven of its own (section 18.5.4).
+
+#### 18.5.3 The conventions, in plain words
+
+**Every item has an atem.** `atem` is the one line the atem density shows: two to fifteen words (in Japanese and
+Chinese, two to forty-five characters), one phrase, no final period, no ids and no markup, and unlike the atem of any
+other item with the same name. It is made by rule, never by a model. A section's atem is the first sentence of its
+first paragraph, cut at a clause break when it runs long; an HTML comment `<!-- atem: … -->` on the first line under
+a heading sets it by hand, as this section's does. A term's atem is its definition, and a reference item's is this
+specification's own line for it, or its manifest's subtitle. A model may offer a better line in the viewer, on
+request; it is never written into the volume.
+
+**Sections.** Every heading of the document is a section, except a heading inside a fenced block. A numbered heading
+takes its number as its id: `### 18.4 emf: a text's enumeration` is `S:section/18.4`, and Comprise's `#### P.3` is
+`P.3`. The title is `S:section/root`, any text before it `S:section/front`, and any other heading without a number
+takes its text, slugged: `S:section/how-to-read-this`. A section's `body` is the markdown between its heading and the
+next heading, verbatim and never re-flowed; `heading` is the heading line itself; `lines` says where both are, and
+`order` is the section's place in the telling. Its `parts` are the sections under it, and its `parent` the one above.
+
+**Terms.** A term is enumerated where the document defines it in one of the conventions this specification and the
+Help Center already use: a table row whose first cell is bold; a bullet that opens with a bold phrase and a dash or a
+colon, `- **term** — what it is`; a paragraph that opens `**term** is …` or `A **term** is …`; and the first column
+of the "How to read this" table, which defines only the words nothing else defines. Where no convention fits, an
+HTML comment `<!-- term: x -->` before a paragraph makes the paragraph the definition of x. A term is defined once; a
+second definition is kept as `also_defined_in` and reported.
+
+**Mentions are computed.** A section's `mentions` are the sections it names ("section 18.4", "sections 4 to 14") and
+the terms it uses, outside code. A term's use counts when it is written in bold anywhere, and in plain text when its
+name is distinctive (more than one word, or a capital or a digit inside it); in this specification every plain use
+counts. "Its section 10" names another document's section and is not a mention. What mentions an item is never
+stored: a viewer reverses the typed links when it loads the volume.
+
+**Examples.** Every block marked `cosm` is an example, `S:example/<n>`, numbered through the document. Its `body` is
+the block, `declares` the MiniCOSM its declaration names, as a reference item, and `in` the section it is in. A block
+marked `yaml` or `text` stays part of its section's body. A viewer loads an example as a volume of its own, checks it
+and draws it.
+
+**Decisions.** The numbered items of a section called "Decisions …" whose first words are bold, like those of section
+20, are decisions, `S:decision/<n>`: the bold words are a decision's name, and `about` the sections and terms it names.
+
+**The reference, generated.** For every manifest in the registry the volume holds `R:minicosm/<name>`,
+`R:module/<name>.<L>`, `R:kind/<name>.<L>.<kind>` with the kind's reference fields, checked fields, required fields
+and closed lists, `R:list/<name>.<field>` for each closed list, and `R:lens/<name>.<lens>`; and `R:check/<id>` for each
+generic check and each of DocOES's own, with the MiniCOSMs that select it. Each says where it came from:
+`provenance: {mode: catalogue, sources: ['defaults/cosm/manifests/emf.manifest.cosm#modules.P.kinds.claim'], hash}`,
+the hash taken over that part of the manifest. The hand-written line for a check, a lens, a MiniCOSM, a kind or a
+value of a closed list stays in this specification's own tables, joined by the id in the first cell: the checks of
+sections 12.2 and 18.5.4, the lenses of section 14.5, the MiniCOSMs of section 18, the kinds of sections 18.2, 18.3.2
+and 18.5.2, and the stances and relations of section 18.4.3. Nobody edits a generated item; its words are changed
+where they are written.
+
+<!-- term: chapter -->
+A **chapter** is a document synced into the volume, read-only, in its author's own words: Comprise OES 1's
+specification and its paradigm map, copied from Comprise by enough's sync and recorded with the commit they came
+from and each file's sha256. A chapter's items take its prefix, `S:section/comprise.4.1` and `T:term/comprise.concern`,
+and its `S:chapter/<slug>` item carries `provenance: {mode: catalogue, sources: ['comprise-dev oes/comprise-oes.md @
+<commit>'], hash}`. A chapter's term with the name of one of the document's terms is `same_as` it.
+
+**References across volumes.** Each doc volume has an inventory: one row per item, with its id, kind, version, anchor
+and atem. A chapter has an inventory of its own, named by its prefix. A reference into another volume, or into a
+chapter, is written `<inventory>@<version>:<kind>:<id>`, as in `comprise@1:section:2.5`, and kept in the item's
+`xrefs`. It is not a reference in the sense of section 9, since a URI between volumes is a value (decision 18); the
+check `xref-unresolved` resolves it through the inventory instead. In this specification, `§` always names a section
+of Comprise OES 1, "README §" one of its paradigm map, and `P.7` a section of its chapter P: the appendix's references
+are all of this kind.
+
+<!-- term: telling -->
+A *telling* is one arrangement of a fabula in words: the author's text is one and a short another, and each language a
+document is told in is a telling, a volume of its own. All the tellings of a document share one set of ids: the fabula
+has no language, and a section's name and body are its telling's. A translated telling takes its ids from the
+author's, its sections by number and its terms by their place in the section; where a place cannot be matched, the
+item is told from the author's telling and says so, `fallback: en`.
+
+**Voice.** The catalog's `telling` names the voice a document is written in. The Help Center's is `{lang: en, voice:
+rosa}`, so a viewer can say who wrote it and a readvisor can quote it as hers.
+
+**Bubbles.** In the Help Center's volume, each section of `static/help-docs.md`, or of its translation, is a bubble,
+`B:bubble/<id>`: its `what`, `how` and `ideas` verbatim, `about` the control it sits beside (its `data-help` id), and
+`see` the manual's sections it names. A bubble about another document names that document's sections instead, and
+keeps them as references across volumes, `xrefs`: the docs viewer's bubble points into this specification. Its atem
+is the first sentence of `what`.
+
+**Three densities.** A viewer shows a doc volume at three densities: the **fabula**, each item as a full card; the
+**short**, the readable manual, compiled as told; and the **atem**, the document as an outline of its items' one-line
+atems. Compiled as told, a doc volume's sections, each its heading and then its body, in `order`, are the document
+again, byte for byte. That round trip is tested for this specification, for both of its chapters, and for each
+telling of the Help Center.
+
+**In enough.** The docs viewer shows both documents at the three densities, from a project or from the home screen,
+with no model needed. It asks for one telling at one density (`GET /api/docs?doc=&lang=&density=`), and the volume is
+built the first time it is asked for, or again when its digest has moved; it draws a local graph around an item
+(`GET /api/docs/lens`, section 14.4), loads a live example as a volume from text (`POST /api/cosm/inline`), and gives
+back the markdown, byte for byte (`POST /api/docs/compile`). `GET /api/docs/inventory` serves the inventory. A
+readvisor asks the same volumes with the tool `doc_lookup`: a word, a section number or an id, answered with its atem,
+its definition and where it is defined.
+
+#### 18.5.4 Its own checks
+
+| Check | Default severity | Catches |
+|---|---|---|
+| `atem-shape` | error | an item with no atem; an atem that is not one phrase of two to fifteen words with no final period, ids or markup; one that repeats the atem of another item with the same name |
+| `numbering` | error | a section number used twice, one that skips or repeats among its siblings, or one that does not start with its parent's |
+| `term-defined-once` | warning | a term the document defines more than once; the first definition is kept |
+| `unlinked-mentions` | note | a paragraph that opens with a bold phrase the way a definition does, when no term is enumerated for it |
+| `empty-section` | note | a heading with no body and no sections under it |
+| `stale-provenance-hash` | warning | a generated item whose part of a manifest has changed; a chapter that differs from its recorded copy; a document changed since its volume was built |
+| `xref-unresolved` | error | a reference across volumes that names nothing in its inventory; a note when that inventory was not given |
+
+A generic reader lists these seven as not run; enough runs them with the generic ones.
+
+#### 18.5.5 An example
+
+The text, a small handbook in the spirit of section 18.4.5, `handbook.md`:
+
+```markdown
+# The Meadow handbook
+
+## 1. The close
+
+<!-- atem: how Meadow locks a day of the books -->
+A **close** is the overnight run that locks one day of a customer's books.
+
+### 1.1 When a close fails
+
+A failed close is retried at five. Section 1 says what it locks.
+```
+
+Its doc volume, as enough builds it. Compiled as told, its three sections give the text back exactly.
+
+```cosm
+oes: doc/1
+macrocosm: 0.0.1
+id: doc/meadow-handbook
+name: The Meadow handbook
+document:
+  path: handbook.md
+  sha256: 6a88887fd059cbf9f2ee82fb2648dccc14e728f27a995760c309f667ae2b4c2a
+  version: '1'
+telling:
+  lang: en
+tellings:
+- en
+built:
+  at: '2026-10-23T10:00:00Z'
+  by: enough/0.4.4
+  digest: dcf85812fbb3650e52f42cf61a4a3d5c7f709d4a34f168d3a50efb278910a4d3
+  manifests:
+  - name: doc
+    version: 1
+    sha256: ffa5a64f64b05ca3ca61b1656525870773afa8c54305e9d7f6ad0a2bdaa2a213
+nodes:
+- id: S:section/root
+  type: section
+  name: The Meadow handbook
+  summary: 'The Meadow handbook: The close'
+  atem: 'The Meadow handbook: The close'
+  level: 1
+  heading: '# The Meadow handbook'
+  parts:
+  - S:section/1
+  order: 1
+  lines: 1-2
+  anchor: the-meadow-handbook
+  provenance:
+    mode: derived
+    sources:
+    - handbook.md#L1-L2
+    confidence: 1
+    state: known
+  body: |2+
+
+- id: S:section/1
+  type: section
+  name: The close
+  summary: A close is the overnight run that locks one day of a customer's books.
+  atem: how Meadow locks a day of the books
+  number: '1'
+  level: 2
+  heading: '## 1. The close'
+  parent: S:section/root
+  parts:
+  - S:section/1.1
+  order: 2
+  lines: 3-7
+  anchor: sec-1
+  provenance:
+    mode: derived
+    sources:
+    - handbook.md#L3-L7
+    confidence: 1
+    state: known
+  body: |2+
+
+    <!-- atem: how Meadow locks a day of the books -->
+    A **close** is the overnight run that locks one day of a customer's books.
+
+- id: T:term/close
+  type: term
+  name: close
+  summary: A close is the overnight run that locks one day of a customer's books.
+  atem: the overnight run that locks one day of a customer's books
+  defined_in: S:section/1
+  convention: sentence
+  order: 3
+  lines: '6'
+  provenance:
+    mode: derived
+    sources:
+    - handbook.md#L6
+    confidence: 1
+    state: known
+- id: S:section/1.1
+  type: section
+  name: When a close fails
+  summary: A failed close is retried at five.
+  atem: A failed close is retried at five
+  number: '1.1'
+  level: 3
+  heading: '### 1.1 When a close fails'
+  parent: S:section/1
+  mentions:
+  - S:section/1
+  - T:term/close
+  order: 4
+  lines: 8-10
+  anchor: sec-1-1
+  provenance:
+    mode: derived
+    sources:
+    - handbook.md#L8-L10
+    confidence: 1
+    state: known
+  body: |2
+
+    A failed close is retried at five. Section 1 says what it locks.
+```
+
 ---
 
 ## 19. Conformance
+
+<!-- atem: what a conforming reader and writer must do, and the corpus that shows it -->
 
 ### 19.1 A reader must
 
@@ -1914,6 +2302,7 @@ in.
 
 ## 20. Decisions in this version
 
+<!-- atem: the decisions this version settled, one numbered line each -->
 1. **MacroCOSM is the grammar Comprise mapped, made real.** Not a new taxonomy. Comprise OES 1 already held every part
    of the grammar; a second one would split the family.
 2. **The format does not change.** One loader, Comprise's, for every `.cosm` file. Hundreds of existing files read as
@@ -1964,10 +2353,17 @@ in.
     text is the first arrangement and is never called a short; the atem stays outside the pair. Every compile is a new
     file in one of two orders, the author's or by weight, and the twin lists its shorts so the material knows its
     tellings.
+27. **A document is enumerated in its own grammar.** DocOES (`doc/1`) takes a markdown document apart into its
+    sections, terms, examples and decisions and joins them to the reference generated from the manifests; compiled as
+    told, the volume gives the markdown back byte for byte. The markdown stays the authoring surface, the volume is
+    built at runtime and never committed, every item carries a one-line atem made by rule, and this specification's
+    own tables are the hand-written overlay on what is generated, so nobody edits a generated item.
 
 ---
 
 ## 21. Open questions and roadmap
+
+<!-- atem: what is mapped but not built, and what this version leaves open -->
 
 ### 21.1 Mapped, not built
 
@@ -2029,7 +2425,7 @@ Section by section, where each part of this document comes from in Comprise OES 
 | 17 MicroCOSMs | README §5; the manifest's `extension` | mapped, unchanged |
 | 18.1 comprise | the whole of Comprise OES 1 | how it sits in MacroCOSM |
 | 18.2 cosm | chapter P, P.7; COSM 0.2 | a MiniCOSM for trees outside a Holotype |
-| 18.3 canon, 18.4 emf | none | new MiniCOSMs, written in the grammar |
+| 18.3 canon, 18.4 emf, 18.5 doc | none | new MiniCOSMs, written in the grammar |
 | 19 Conformance | §13 | the corpus named; the reader wins |
 | 20 Decisions | §14 | this version's own |
 | 21 Roadmap | README §7; §12's *not built* | the morph-driven renderers named |

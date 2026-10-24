@@ -982,6 +982,7 @@
 {"headword": "capsulize", "form": "capsulizing", "position": 3, "pronunciation": "/ˈkæpsəˌlaɪzɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "capsulorhexis", "form": "capsulorhexes", "position": 1, "pronunciation": "/ˌkæpsəloʊˈrɛksiz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "capsulotomy", "form": "capsulotomies", "position": 1, "pronunciation": "/ˌkæpsəˈlɑtəmiz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "captable", "form": "captables", "position": 1, "pronunciation": "/ˈkæpˌteɪbəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "captain", "form": "captained", "position": 1, "pronunciation": "/ˈkæptənd/", "labels": "[\"past\"]", "synonyms": null}
 {"headword": "captain", "form": "captaining", "position": 2, "pronunciation": "/ˈkæptənɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "captain", "form": "captains", "position": 3, "pronunciation": "/ˈkæptənz/", "labels": "[\"pl.\", \"3rd sing.\"]", "synonyms": null}
@@ -5385,6 +5386,9 @@
 {"headword": "coinvent", "form": "coinventing", "position": 2, "pronunciation": "/ˌkoʊɪnˈvɛntɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
 {"headword": "coinvent", "form": "coinvents", "position": 3, "pronunciation": "/ˌkoʊɪnˈvɛnts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "coinventor", "form": "coinventors", "position": 1, "pronunciation": "/ˌkoʊɪnˈvɛntərz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "coinvest", "form": "coinvested", "position": 1, "pronunciation": "/ˌkoʊɪnˈvɛstɪd/", "labels": "[\"past\"]", "synonyms": null}
+{"headword": "coinvest", "form": "coinvesting", "position": 2, "pronunciation": "/ˌkoʊɪnˈvɛstɪŋ/", "labels": "[\"pres. part.\"]", "synonyms": null}
+{"headword": "coinvest", "form": "coinvests", "position": 3, "pronunciation": "/ˌkoʊɪnˈvɛsts/", "labels": "[\"3rd sing.\"]", "synonyms": null}
 {"headword": "coinvestor", "form": "coinvestors", "position": 1, "pronunciation": "/ˌkoʊɪnˈvɛstərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "coir", "form": "coirs", "position": 1, "pronunciation": "/ˈkɔɪərz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "coistrel", "form": "coistrels", "position": 1, "pronunciation": "/ˈkʌstrəlz/", "labels": "[\"pl.\"]", "synonyms": null}
@@ -7766,6 +7770,7 @@
 {"headword": "cosiness", "form": "cosinesses", "position": 1, "pronunciation": "/ˈkoʊzinəsɪz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "cosiness", "form": "coziness", "position": 2, "pronunciation": "/ˈkoʊzinəs/", "labels": "[\"var.\"]", "synonyms": "[\"cosiness\", \"snugness\"]"}
 {"headword": "cosiness", "form": "cozinesses", "position": 3, "pronunciation": "/ˈkoʊzinəsəz/", "labels": "[\"pl.\"]", "synonyms": null}
+{"headword": "cosm", "form": "cosms", "position": 1, "pronunciation": "/ˈkɑzəmz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "cosmeceutical", "form": "cosmeceuticals", "position": 1, "pronunciation": "/ˌkɑzməˈsutɪkəlz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "cosmetician", "form": "cosmeticians", "position": 1, "pronunciation": "/ˌkɑzməˈtɪʃənz/", "labels": "[\"pl.\"]", "synonyms": null}
 {"headword": "cosmeticize", "form": "cosmeticized", "position": 1, "pronunciation": "/kɑzˈmɛtɪˌsaɪzd/", "labels": "[\"past\"]", "synonyms": null}

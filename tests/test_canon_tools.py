@@ -137,13 +137,17 @@ def test_registered_traced_and_the_prefixes_match_the_server():
 
 
 def test_every_documented_example_runs(project: Path):
-    """The block's five examples, parsed exactly as the model would write them, run in order on a project that
+    """The block's six examples, parsed exactly as the model would write them, run in order on a project that
     holds what they name: the guide, decompile notes.md, lint the twin, write its atem, read an item of the
-    Holotype."""
+    Holotype, and look a word up in the spec (0.4.4; its volume is built into the tmp docs root)."""
     examples = re.findall(r'<tool name="[a-z_]+">.*?</tool>', prompt.CANON_TOOL_INSTRUCTIONS, re.DOTALL)
     assert [T.parse_tool_calls(e)[0].name for e in examples] == [
-        "cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide"]
-    read, lint, derive, atem, guide = examples
+        "cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide", "doc_lookup"]
+    read, lint, derive, atem, guide, lookup = examples
+    r = run(project, lookup)
+    # 0.4.4 (D3's spec pass): the spec defines `stance` as a term; its answer still carries the closed list's words.
+    assert r.ok and r.body.startswith("stance  [T:term/stance") and "R:list/emf.stance" in r.body, r.body
+    assert all(f"- {w} — " in r.body for w in ("axiom", "observed", "deduced", "opinion", "assumed", "hearsay"))
     r = run(project, guide)
     assert r.ok and r.body.startswith("# macrocosm-oes"), r.body[:80]
     r = run(project, derive)

@@ -413,8 +413,8 @@ class Driver:
         .forEach(function (b) { try { b.click(); } catch (e) {} });
       try { if (window.wdlClose) wdlClose(); } catch (e) {}
       try { if (window.atemCardClose) atemCardClose(); } catch (e) {}
-      ['readedit','girraph','merirmaid','wikisink','canon','ref',
-       'paginated','blobview','dict','cosm','cosmspec'].forEach(function (n) {
+      ['readedit','girraph','merirmaid','wikisink','canon',
+       'paginated','blobview','dict','cosm','docs'].forEach(function (n) {
         try { modeRemove(n); } catch (e) {}
       });
       document.querySelectorAll('[id$="-modal"]').forEach(function (m) {
@@ -433,8 +433,8 @@ class Driver:
       var p = document.getElementById('preview');
       if (p) p.classList.remove('open');
       ['review-mode','edit-mode','girraph-mode','merirmaid-mode','wiki-mode',
-       'canon-mode','ref-mode','paginated-mode','dict-mode','cosm-mode',
-       'cosmspec-mode'].forEach(function (id) {
+       'canon-mode','paginated-mode','dict-mode','cosm-mode',
+       'docs-mode'].forEach(function (id) {
         var el = document.getElementById(id);
         if (el) el.classList.remove('open');
       });

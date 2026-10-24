@@ -13,7 +13,8 @@ the model". A rules-mode job never takes the lock. Whether a job is model or rul
 starts (`llm.reachable`), and never changes mid-job: if the model stops answering, the job fails with words.
 
 Snapshot: `{id, kind: emf|atem|compile|pin, path, state: queued|running|done|failed|cancelled, phase, chunk,
-chunks, message, mode: model|rules, result, error, started_at, finished_at}`.
+chunks, message, mode: model|rules, result, error, started_at, finished_at}`, plus `reason: "agent-free"` on a rules
+job agent-free mode chose (0.4.4) — absent otherwise, so every other snapshot keeps its 0.4.3 shape.
 """
 
 from __future__ import annotations
@@ -113,7 +114,7 @@ class CanonJobs:
     # -- control ----------------------------------------------------------
 
     def _new(self, *, kind: str, path: str | None, mode: str, state: str, message: str,
-             key: str | None) -> str:
+             key: str | None, reason: str | None = None) -> str:
         """Record a job under the table lock; 409 when `key` is claimed. Caller holds `self._lock`."""
         if kind not in KINDS:
             raise ValueError(f"unknown job kind {kind!r}")
@@ -130,19 +131,23 @@ class CanonJobs:
             "message": message, "mode": mode, "result": None, "error": None,
             "started_at": None, "finished_at": None,
         }
+        if reason:
+            self._snaps[job_id]["reason"] = reason
         self._stops[job_id] = threading.Event()
         self._trim()
         return job_id
 
     def start(self, *, kind: str, path: str | None, mode: str, work: Callable[[JobContext], Any],
-              key: str | None = None, lock: asyncio.Lock | None = None, message: str = "") -> dict[str, Any]:
+              key: str | None = None, lock: asyncio.Lock | None = None, message: str = "",
+              reason: str | None = None) -> dict[str, Any]:
         """Claim `key` (409 when a job for it is queued or running), record the job and schedule it on the running
         loop. `work(ctx)` is blocking and runs in a worker thread; with `lock` (model mode: the session's
         generation lock) the job waits for it first, `queued` meanwhile. Returns the first snapshot."""
         with self._lock:
             waiting = lock is not None and lock.locked()
             job_id = self._new(kind=kind, path=path, mode=mode, state="queued",
-                               message="waiting for the model" if waiting else (message or "starting"), key=key)
+                               message="waiting for the model" if waiting else (message or "starting"), key=key,
+                               reason=reason)
         self._fire(job_id)
         task = asyncio.get_running_loop().create_task(self._run(job_id, work, lock, message))
         self._tasks[job_id] = task

@@ -733,3 +733,29 @@ def test_the_home_mirror_hides_emf_twins_too(project: Path):
     _emf_pair(project)
     text = home.build_project_mirror(project)
     assert "📄 notes.md\"" in text and "notes.md.cosm" not in text
+
+
+def test_a_failed_path_ingest_records_its_reason(store: Path, tmp_path: Path):
+    # 0.4.4: a CanonError's sentence lands in ingest-status, so the UI's toast can say why.
+    project = tmp_path / "proj"
+    project.mkdir()
+    with pytest.raises(canon.CanonError, match="does not exist"):
+        canon.run_ingest(project, box="gone", source_type="path",
+                         value=str(tmp_path / "nowhere"), all_flag=True)
+    st = canon.ingest_status("gone")
+    assert st["status"] == "failed"
+    assert "does not exist" in (st["ingest"] or {}).get("error", "")
+
+
+def test_a_relative_ingest_path_is_relative_to_the_project(store: Path, tmp_path: Path, monkeypatch):
+    # 0.4.4: never the server's cwd — the project folder is the one the person can see.
+    project = tmp_path / "proj"
+    (project / "readings").mkdir(parents=True)
+    (project / "readings" / "a.md").write_text("from the project", encoding="utf-8")
+    elsewhere = tmp_path / "elsewhere"
+    (elsewhere / "readings").mkdir(parents=True)
+    (elsewhere / "readings" / "b.md").write_text("from the cwd", encoding="utf-8")
+    monkeypatch.chdir(elsewhere)
+    canon.run_ingest(project, box="rel", source_type="path", value="readings", all_flag=True)
+    rels = {p.relative_to(store / "rel").as_posix() for p in canon._content_files(store / "rel")}
+    assert any(r.endswith("a.md") for r in rels) and not any(r.endswith("b.md") for r in rels)

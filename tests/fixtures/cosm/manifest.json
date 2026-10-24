@@ -1,6 +1,8 @@
 {
   "source_commit": "fbe5b08",
   "files": {
+    "defaults/cosm/chapters/comprise-oes.md": "2c578c9c04dec2184be8fe827d81a2ce5880d4ae93782f897b71739a214a5a21",
+    "defaults/cosm/chapters/comprise-paradigm-map.md": "0a3a52762c908f0cebd67a16032acf6f2671b551947f1eeedcbbda8f8b8b661d",
     "defaults/cosm/manifests/comprise.manifest.cosm": "de6ee3f563d8036801b1f2f6f1b71af87a3f7c947e854dc1e837b9560e350b02",
     "tests/fixtures/cosm/cosm02/meadow/README.md": "16191d33e16461b17c1014e0628b6f01f1e9fff51531d9f673b488420daed3c0",
     "tests/fixtures/cosm/cosm02/meadow/doc.cosm": "43bcda7bf2eef2909fd1578ce2eb494a9c8e0b012502f5c32daa6d52f75093f7",
@@ -254,5 +256,5 @@
     "tests/fixtures/cosm/holotypes/wikimedia/atoms/wikimedia-foundation/S/vendors.cosm": "4afb533195221f2829757edc47e386987861ef4fb2a9f65db7850cc910c91905",
     "tests/fixtures/cosm/holotypes/wikimedia/holotype.cosm": "28bf13bf4ff0a7b093394e5d2e9add0a1377dbbc7ed1c4e0627a5650958dc7f6"
   },
-  "digest": "f5972000e49e765d6a816aaf16b549bb956df818ccfb558def9595f41fca80eb"
+  "digest": "22ac1d30c567590b50e07a5d5b4373522fd66aa09f979b32311ab4564d2d5df5"
 }

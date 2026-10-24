@@ -17,7 +17,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-10-16T03:37:03.889303Z"
+exclude-newer = "2026-10-17T00:21:35.306009Z"
 exclude-newer-span = "P1W"
 
 [[package]]
@@ -653,7 +653,7 @@ models-local = [
 
 [[package]]
 name = "enough"
-version = "0.4.3"
+version = "0.4.4"
 source = { editable = "." }
 dependencies = [
     { name = "ctranslate2" },

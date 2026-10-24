@@ -72,10 +72,11 @@ button is the one slot the fold never sheds, and at that size the toolbar's
 fixed part alone is wider than the stage. **The toolbar needs an overflow
 menu for its last slot at large scales.**
 
-## 3. Native checkboxes and radios at 13×13 — 11 entries — **a form-control pass**
+## 3. Native checkboxes and radios at 13×13 — 12 entries — **a form-control pass**
 
 `modal-paginate` ×5 (`#pg-bring-in`, `#pg-headers`, `#pg-page-numbers`, two
-`label.cv-radio>input`), `modal-ui` (`#ui-help-bubbles`), `modal-model`
+`label.cv-radio>input`), `modal-ui` and `ui-modal-agentfree` (`#ui-help-bubbles` —
+the same ui window, the second time with the agent-free slider on; joined in 0.4.4), `modal-model`
 (`#auto-reset-toggle`), `modal-wikisink-setup`
 (`#wiki-flavor-list>label.wiki-flavor>input`), `canon` and `canon-volume`
 (`#cn-ingest-all` — the same ingest bar, once on the volume list and once

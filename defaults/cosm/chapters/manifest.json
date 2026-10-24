@@ -1,0 +1,14 @@
+{
+  "source": "comprise-dev",
+  "source_commit": "fbe5b08",
+  "chapters": {
+    "comprise-oes.md": {
+      "source": "oes/comprise-oes.md",
+      "sha256": "2c578c9c04dec2184be8fe827d81a2ce5880d4ae93782f897b71739a214a5a21"
+    },
+    "comprise-paradigm-map.md": {
+      "source": "oes/README.md",
+      "sha256": "0a3a52762c908f0cebd67a16032acf6f2671b551947f1eeedcbbda8f8b8b661d"
+    }
+  }
+}

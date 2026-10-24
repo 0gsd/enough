@@ -611,8 +611,18 @@ def gate_status() -> dict[str, Any]:
     has not blessed yet raises a system dialog — asking for the key of a
     service the user has switched off would be a prompt they cannot make
     sense of.
+
+    Agent-free mode (0.4.4) shuts the gate before even the toggle: no model
+    answers anything while it is on, the cloud's included.
     """
+    from . import agent_free as _agent_free
     from . import broker
+    if _agent_free.enabled():
+        return {"open": False,
+                "reason": "agent-free mode is on",
+                "denial": _agent_free.detail(
+                    "no model answers while agent-free is on, the cloud's included"),
+                "model_id": None}
     if broker.is_enabled("local_models_only"):
         return {"open": False,
                 "reason": "'local models only' is on in the broker",

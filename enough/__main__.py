@@ -90,6 +90,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
 
     # Late imports so --help and --version don't require the full dep tree.
+    from . import agent_free
     from .llm import check_llm_reachable
     from .server import run
     from .skeleton import ensure_skeleton
@@ -151,7 +152,13 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
 
-    if args.no_supervise:
+    # Agent-free mode (docs/docoes-044-plan.md §13), read here before any
+    # model would start: the supervisor in create_app() reads the same switch
+    # and launches nothing, and a --no-supervise run has no llama-server to
+    # insist on.
+    no_model = agent_free.enabled()
+
+    if args.no_supervise and not no_model:
         ok, why = check_llm_reachable(args.llm_url)
         if not ok:
             print(f"error: cannot reach llama-server at {args.llm_url}", file=sys.stderr)
@@ -181,7 +188,7 @@ def main(argv: list[str] | None = None) -> int:
     url = f"http://127.0.0.1:{args.port}"
     print(f"enough {__version__} — serving {project_dir}")
     print(f"  web:   {url}")
-    print(f"  llm:   {args.llm_url}")
+    print(f"  llm:   {'agent-free (no model)' if no_model else args.llm_url}")
     print("  ctrl-c to stop")
 
     if not args.no_browser:

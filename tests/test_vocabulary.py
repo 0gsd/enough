@@ -134,6 +134,21 @@ ALLOWLIST: tuple[tuple[str, str], ...] = (
     (r"`rness/roles/`[^`]*`rness/readvisors/`",
      "the rename migration note, old path named alongside the new"),
 
+    # --- agent-free mode (0.4.4, docs/docoes-044-plan.md §13). The owner's
+    #     rule: "agent" appears only in the slider's two states — "free agent"
+    #     / "agent free" — and its tooltip; the derivations are labelled
+    #     "agent-free". These are the two state names, whole, in each
+    #     language (and the slider's second word on its own, the one key
+    #     `agentmode.agent`); a bare "agent" anywhere else still fails.
+    (r"\bfree agent\b", "the agent-free slider's off state (§13)"),
+    (r"\bagent[- ]free\b", "the slider's on state; the rules-derivation label (§13)"),
+    (r"^agent$", "agentmode.agent: the slider's word, alone (§13)"),
+    (r"\bagent libre\b|\bsans agent\b", "fr: the slider's two states (§13)"),
+    (r"\bagente libre\b|\bsin agente\b|^agente$", "es: the slider's two states and word (§13)"),
+    (r"\bfreier Agent\b", "de: the slider's off state (§13; agentenfrei never matches)"),
+    (r"自由智能体|无智能体|^智能体$", "zh: the slider's two states and word (§13)"),
+    (r"フリーエージェント|エージェントフリー|^エージェント$", "ja: the slider's two states and word (§13)"),
+
     # --- katakana collisions: the ja legacy word ロール is a substring of
     #     ordinary vocabulary. Nothing here is the readvisor sense.
     (r"スクロール", "ja: スクロール = scroll / scrollback"),
@@ -301,6 +316,9 @@ def test_readme_has_no_legacy_vocabulary():
 
 def test_defaults_prose_has_no_legacy_vocabulary():
     files = sorted(DEFAULTS.rglob("*.md"))
+    # defaults/cosm/chapters/ is Comprise OES 1's own prose, synced verbatim and read-only by
+    # scripts/sync_cosm.py (the doc volume's chapters, 0.4.4): Comprise's words, never enough's voice.
+    files = [f for f in files if not f.is_relative_to(DEFAULTS / "cosm" / "chapters")]
     assert files, "no shipped markdown found under defaults/"
     hits = [h for path in files for h in _scan_markdown(path, ENGLISH_LEGACY)]
     assert not hits, _report(hits, "defaults/**/*.md")

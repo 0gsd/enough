@@ -25,6 +25,8 @@ import shutil
 import signal
 import subprocess
 import sys
+import threading
+import time
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -33,11 +35,12 @@ from typing import Any, Callable
 import httpx
 import uvicorn
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 
 from . import __version__
+from . import agent_free as _agent_free
 from . import broker as _broker
 from .wikisink import config as _wikisink_config
 from .llm import LLMError, stream_chat
@@ -48,6 +51,7 @@ from . import canon_derive as _canon_derive
 from . import canon_tools as _canon_tools
 from . import canon_jobs as _canon_jobs
 from . import convert as _convert
+from . import docoes as _docoes
 from . import macrocosm as _macrocosm
 from . import home as _home
 from . import models as _models
@@ -956,7 +960,13 @@ def _ui_language(cfg: dict[str, Any] | None = None) -> str:
 def _read_ui_config() -> dict[str, Any]:
     path = _ensure_live_ui_config()
     try:
-        return _merge_shipped_theme_keys(json.loads(path.read_text(encoding="utf-8")))
+        cfg = _merge_shipped_theme_keys(json.loads(path.read_text(encoding="utf-8")))
+        # Agent-free mode (0.4.4): the read view always says what the switch
+        # IS — false for a file that predates it (or holds anything but a
+        # literal true), exactly as `agent_free.enabled()` reads it.
+        if isinstance(cfg, dict):
+            cfg[_agent_free.KEY] = _agent_free.value(cfg)
+        return cfg
     except (OSError, json.JSONDecodeError):
         log.exception("failed to read live ui config; falling back to template")
         if UI_CONFIG_TEMPLATE.is_file():
@@ -1472,7 +1482,10 @@ async def _handle_tool(session: Session, call: ToolCall, sink: list[tuple[str, s
 # ---------------------------------------------------------------------------
 
 # Everything a home-mode server answers. One page, one set of prefs, the help
-# center and the MacroCOSM spec (both project-independent; Canon's
+# center and the MacroCOSM spec (both project-independent), the DocOES doc
+# volumes (`/api/docs*`, built into the install's state, never a project) and
+# the inline cosm reader (`/api/cosm/inline*`: a volume from the text the
+# request carries, so the docs viewer's live examples work at home too; Canon's
 # `/api/canon/*` and its `/api/cacheawl/*` aliases are project routes and 404
 # here alike), the formats table its {{convert-formats}}
 # token expands, the desktop shell's graceful-quit route (a home backend is
@@ -1482,6 +1495,10 @@ async def _handle_tool(session: Session, call: ToolCall, sink: list[tuple[str, s
 HOME_PATHS: frozenset[str] = frozenset({
     "/", "/favicon.ico", "/api/ui-config", "/api/help-center",
     "/api/macrocosm-spec", "/api/convert/formats", "/api/shutdown",
+    # DocOES (0.4.4): read-only, from the install's own documents.
+    "/api/docs", "/api/docs/status", "/api/docs/build", "/api/docs/lens",
+    "/api/docs/compile", "/api/docs/inventory",
+    "/api/cosm/inline", "/api/cosm/inline/lens",
 })
 HOME_PREFIXES: tuple[str, ...] = ("/api/home/", "/static/")
 
@@ -1519,6 +1536,75 @@ class ModeGate:
             why = self._blocked(scope.get("path", ""))
             if why:
                 await JSONResponse({"detail": why}, status_code=404)(
+                    scope, receive, send)
+                return
+        await self.app(scope, receive, send)
+
+
+# ---------------------------------------------------------------------------
+# The agent-free boundary (docs/docoes-044-plan.md §13)
+# ---------------------------------------------------------------------------
+
+# Every write route that would start a model, mapped to what the 409 says.
+# Exact paths, POST only (each of these is a POST; their GETs, where they
+# exist, are reads and stay open). Not here, on purpose:
+# - `/api/canon/derive`, `/api/canon/atem`, `/api/canon/compile` run in rules
+#   mode instead (`llm.reachable` answers `(False, "agent-free")`), and their
+#   jobs carry `reason: agent-free`;
+# - `/api/skills/toggle` refuses only a toggle-on that needs the first-use
+#   audit (the route itself answers that 409); toggles that need no model work;
+# - `/api/models/download/*`, `/api/models/delete/*`, `/api/cloud/set-key`
+#   (its health check is skipped), `/api/cloud/clear-key`,
+#   `/api/cloud/set-model`: installing and configuring stay allowed;
+# - `/api/reset` (clears the history), `/api/intro` (a static text),
+#   `/api/canon/ingest` (no model; the ingest bar calls it directly);
+# - `/api/council/pause`: stopping is always allowed.
+AGENT_FREE_PATHS: dict[str, str] = {
+    "/api/chat": "the chat needs a readvisor, and none runs while agent-free is on",
+    "/api/model": "no model starts while agent-free is on (installing and "
+                  "downloading models still work)",
+    "/api/cloud/health-check": "the cloud check sends a prompt to a model",
+    # Whisper is a model too, and agent-free means no AI at all (owner, §13).
+    "/api/transcribe": "voice input runs a speech model, and none runs while agent-free is on",
+}
+# Every POST under these prefixes, less AGENT_FREE_OPEN: a council is
+# readvisors speaking, so setting one up, convening, driving, a user
+# statement, `/pal`, concluding and reconvening are all refused.
+AGENT_FREE_PREFIXES: dict[str, str] = {
+    "/api/council/": "councils need readvisors, and none runs while agent-free is on",
+}
+AGENT_FREE_OPEN: frozenset[str] = frozenset({"/api/council/pause"})
+_READ_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
+
+
+def agent_free_refusal(method: str, path: str) -> str | None:
+    """The 409 sentence for a request agent-free mode refuses, else None.
+    Pure: whether agent-free is ON is the caller's question."""
+    if method.upper() in _READ_METHODS or path in AGENT_FREE_OPEN:
+        return None
+    what = AGENT_FREE_PATHS.get(path)
+    if what is None:
+        what = next((w for p, w in AGENT_FREE_PREFIXES.items()
+                     if path.startswith(p)), None)
+    return _agent_free.detail(what) if what else None
+
+
+class AgentFreeGate:
+    """409 every model route while agent-free mode is on.
+
+    The same raw-ASGI shape as `ModeGate`, for the same reason (the SSE
+    stream's receive channel stays untouched). The switch is asked only for
+    a request the table would refuse, so every other request costs a dict
+    lookup and nothing more."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: dict[str, Any], receive: Any, send: Any) -> None:
+        if scope.get("type") == "http":
+            why = agent_free_refusal(scope.get("method", "GET"), scope.get("path", ""))
+            if why and _agent_free.enabled():
+                await JSONResponse({"detail": why}, status_code=409)(
                     scope, receive, send)
                 return
         await self.app(scope, receive, send)
@@ -1631,7 +1717,11 @@ def create_app(
             await asyncio.to_thread(_dictionary.ensure_built, background=True)
         except Exception:  # noqa: BLE001 — never block startup on the dictionary
             log.exception("dictionary build could not start")
-        if supervisor is not None:
+        if _agent_free.enabled():
+            # Agent-free mode (§13): the model never starts and the preflight
+            # never runs. Turning it off (POST /api/ui-config) bootstraps then.
+            log.info("agent-free mode: no model this session until it is turned off")
+        elif supervisor is not None:
             try:
                 await supervisor.bootstrap()
             except Exception:  # noqa: BLE001
@@ -1675,6 +1765,9 @@ def create_app(
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
     app.add_middleware(ModeGate, home=home)
+    # Home has no model routes to refuse (ModeGate 404s them all).
+    if not home:
+        app.add_middleware(AgentFreeGate)
 
     @app.get("/", response_class=HTMLResponse)
     async def index() -> HTMLResponse:
@@ -1718,10 +1811,13 @@ def create_app(
         # the scales: it is in the byline of every history bubble the server
         # just rendered, and the panel header, so the page must not first
         # paint someone else's name.
+        # `agent_free` rides along for the same reason: the readvisor panel
+        # and every other model surface must not paint and then vanish.
         boot_ui: dict[str, Any] = {
             "home": home,
             "lang": _ui_language(),
             "chief_readvisor_name": prompt_mod.chief_name(),
+            "agent_free": _agent_free.enabled(),
         }
         if not home:
             meta = project_meta.load(session.project_dir)
@@ -1983,6 +2079,10 @@ def create_app(
             })
             return await api_skills()  # type: ignore[return-value]
         if res.get("state") == "needs_audit":
+            if _agent_free.enabled():
+                # The first-use audit asks a model; the skill stays off.
+                raise HTTPException(409, _agent_free.detail(
+                    f"{name} needs its first-use audit, and the audit needs a model"))
             _schedule_skill_audit(name)
         return await api_skills()  # type: ignore[return-value]
 
@@ -3824,6 +3924,42 @@ def create_app(
             raise HTTPException(404, str(e)) from None
         return await asyncio.to_thread(_canon.ingest_status, box)
 
+    @app.get("/api/canon/ingest-caps")
+    async def api_canon_ingest_caps() -> dict[str, Any]:
+        """What an ingest may do, for the plain confirmation the ingest bar
+        shows before it posts `/api/canon/ingest` itself (agent-free mode,
+        plan §13; no readvisor vets it): the three caps, the depth rule, the
+        fetch gate a url crawl goes through (the `fetch_url` broker toggles
+        and the project's internet allowlist; robots.txt is always obeyed)
+        and whether a wikisink archive is there to ingest from. Read-only,
+        no model, new in 0.4.4 (so no /api/cacheawl alias)."""
+        from . import tools as _tools_mod
+
+        def _build() -> dict[str, Any]:
+            try:
+                wiki_ok = bool(_wikisink_config.installed())
+                wiki_why = None if wiki_ok else (_wikisink_config.unavailable_reason()
+                                                 or "no local wikipedia archive is installed.")
+            except Exception as e:  # noqa: BLE001 — a caps read never fails on wikisink
+                wiki_ok, wiki_why = False, str(e)
+            return {
+                "caps": {"url_pages": _canon.INGEST_URL_PAGE_CAP,
+                         "wiki_articles": _canon.INGEST_WIKI_ARTICLE_CAP,
+                         "path_files": _canon.INGEST_PATH_FILE_CAP},
+                "types": ["path", "url", "wikisink"],
+                # 1-3 levels (folders / link layers / crosslink layers), or
+                # `all: true` — never for wikisink.
+                "depth": {"min": 1, "max": 3, "all": ["path", "url"]},
+                "fetch": {"enabled": _broker.is_enabled("fetch_url_enabled"),
+                          "tor_for_offlist": _broker.is_enabled("fetch_url_tor_for_offlist"),
+                          "allowlist": _tools_mod._read_internet_allowlist(project_dir),
+                          "robots": True},
+                "wikisink": {"installed": wiki_ok, "reason": wiki_why},
+                "agent_free": _agent_free.enabled(),
+            }
+
+        return await asyncio.to_thread(_build)
+
     @_canon_route("GET", "mirror")
     async def api_canon_mirror(
         box: str = Query(...), path: str = Query(""),
@@ -3963,12 +4099,14 @@ def create_app(
             "data": _macrocosm.jsonable(d),
         }
 
-    def _cosm_payload(vol: "_macrocosm.Volume", path: str) -> dict[str, Any]:
+    def _cosm_payload(vol: "_macrocosm.Volume", path: str,
+                      report: "_macrocosm.Report | None" = None) -> dict[str, Any]:
         """The cosm viewer's view of a volume: catalog header, modules in the
         manifest's order → kinds → items, the lint problems and open
-        questions, and the lenses it can be drawn in."""
+        questions, and the lenses it can be drawn in. `report` replaces the
+        generic lint (a doc volume passes `docoes.lint_doc`'s)."""
         m = vol.manifest
-        report = _macrocosm.lint(vol)
+        report = report if report is not None else _macrocosm.lint(vol)
         modules: list[dict[str, Any]] = []
         if m is not None:
             found = vol.by_module()
@@ -4016,38 +4154,59 @@ def create_app(
         nothing loaded (200: the viewer shows the refusal)."""
         return await asyncio.to_thread(lambda: _cosm_payload(_cosm_volume(path), path))
 
+    LENS_MAX_DEPTH = 4
+
+    def _lens_payload(vol: "_macrocosm.Volume", lens: str | None, source: str,
+                      around: str | None = None, depth: int = 1) -> dict[str, Any]:
+        """One lens of a loaded volume as merirmaid source, `{text, node_map,
+        lens, lenses, around}`: `macrocosm.to_mermaid` under `modality:
+        mirror` frontmatter. `around` (an item's key, id or path) draws the
+        local graph instead (`depth` steps, 0–4); `around` in the payload is
+        the centre's key, else None. Blocking."""
+        if vol.refused is not None:
+            raise HTTPException(400, str(vol.refused))
+        names = _macrocosm.lenses(vol)
+        around = (around or "").strip() or None
+        if not lens:
+            lens = "graph" if around and "graph" in names else "map"
+        if lens not in names:
+            raise HTTPException(
+                400, f"unknown lens {lens!r}; this volume can be drawn as: {', '.join(names)}")
+        depth = max(0, min(int(depth), LENS_MAX_DEPTH))
+        try:
+            body, node_map = _macrocosm.to_mermaid(vol, lens, around=around, depth=depth)
+        except ValueError as e:
+            raise HTTPException(404 if around else 400, str(e)) from None
+        centre = next((k for k, v in node_map.items() if v.get("focus")), None)
+        centre_key = node_map[centre]["id"] if centre else None
+        title = f"{vol.name} · {lens}"
+        if centre_key:
+            title += f" · around {vol.items[centre_key].name}"
+        frontmatter = "\n".join([
+            "---",
+            "merirmaid: 1",
+            f"title: {' '.join(title.split())}",
+            "modality: mirror",
+            "kind: cosm-lens",
+            f"source: {source}#{lens}",
+            "node-char-limit: 48",
+            "---",
+        ]) + "\n"
+        return {"text": frontmatter + body, "node_map": _macrocosm.jsonable(node_map),
+                "lens": lens, "lenses": names, "around": centre_key}
+
     @app.get("/api/cosm/lens")
-    async def api_cosm_lens(path: str = Query(...), lens: str = Query("map")) -> dict[str, Any]:
+    async def api_cosm_lens(path: str = Query(...), lens: str = Query("map"),
+                            around: str = Query(""), depth: int = Query(1)) -> dict[str, Any]:
         """One lens of a volume as merirmaid source: `{text, node_map,
-        lens, lenses}`. The Mermaid body is `macrocosm.to_mermaid` (no click
-        lines — resolve nodes through `node_map`, whose `fs_path` is a Canon
-        item's real path) under `modality: mirror` frontmatter, so the
-        merirmaid viewer shows it read-only."""
-
-        def _build() -> dict[str, Any]:
-            vol = _cosm_volume(path)
-            if vol.refused is not None:
-                raise HTTPException(400, str(vol.refused))
-            names = _macrocosm.lenses(vol)
-            if lens not in names:
-                raise HTTPException(
-                    400, f"unknown lens {lens!r}; this volume can be drawn as: {', '.join(names)}")
-            body, node_map = _macrocosm.to_mermaid(vol, lens)
-            title = " ".join(f"{vol.name} · {lens}".split())
-            frontmatter = "\n".join([
-                "---",
-                "merirmaid: 1",
-                f"title: {title}",
-                "modality: mirror",
-                "kind: cosm-lens",
-                f"source: {path}#{lens}",
-                "node-char-limit: 48",
-                "---",
-            ]) + "\n"
-            return {"text": frontmatter + body, "node_map": _macrocosm.jsonable(node_map),
-                    "lens": lens, "lenses": names}
-
-        return await asyncio.to_thread(_build)
+        lens, lenses, around}`. The Mermaid body is `macrocosm.to_mermaid`
+        (no click lines — resolve nodes through `node_map`, whose `fs_path`
+        is a Canon item's real path) under `modality: mirror` frontmatter,
+        so the merirmaid viewer shows it read-only. `around=<key>` (+
+        `depth`, default 1) draws that item's local graph, the centre node
+        classed `focus` (0.4.4)."""
+        return await asyncio.to_thread(
+            lambda: _lens_payload(_cosm_volume(path), lens, path, around, depth))
 
     @app.post("/api/cosm/lint")
     async def api_cosm_lint(request: Request) -> dict[str, Any]:
@@ -4088,8 +4247,10 @@ def create_app(
 
     @app.get("/api/macrocosm-spec", response_class=PlainTextResponse)
     async def api_macrocosm_spec(lang: str = "en") -> PlainTextResponse:
-        """The MacroCOSM OES spec (docs/MACROCOSM_OES.md) as raw markdown for
-        the spec viewer — `/api/help-center`'s shape and whitelist: `lang`
+        """The MacroCOSM OES spec (docs/MACROCOSM_OES.md) as raw markdown —
+        the 0.4.3 spec viewer's source; since 0.4.4 the docs viewer reads the
+        spec's DocOES volume (`/api/docs`) and this route is kept as the raw
+        source. `/api/help-center`'s shape and whitelist: `lang`
         picks static/i18n/<lang>/MACROCOSM_OES.md when one ships (none does
         in 0.4.3), else English. Home-accessible, like the help center."""
         doc = Path(__file__).resolve().parent.parent / "docs" / "MACROCOSM_OES.md"
@@ -4105,6 +4266,478 @@ def create_app(
                 "MACROCOSM_OES.md not found in this install — run /update-enough "
                 "to pick up the bundled spec.")
         return PlainTextResponse(text, media_type="text/markdown; charset=utf-8")
+
+    # ---------- Inline volumes (0.4.4): a volume from the text a request carries ----------
+
+    INLINE_MAX_BYTES = 256 * 1024
+
+    async def _inline_volume(request: Request) -> tuple["_macrocosm.Volume", str, dict[str, Any]]:
+        """`(volume, filename, body)` for a `{text, filename}` body: read by
+        `macrocosm.load_volume_text`, nothing written. 400 without text, 413
+        over 256 KB."""
+        try:
+            body = await request.json()
+        except ValueError:
+            body = None
+        if not isinstance(body, dict) or not isinstance(body.get("text"), str) or not body["text"].strip():
+            raise HTTPException(400, "send {text, filename}: the text of one .cosm catalog")
+        text = body["text"]
+        if len(text.encode("utf-8")) > INLINE_MAX_BYTES:
+            raise HTTPException(413, f"an inline volume is at most {INLINE_MAX_BYTES // 1024} KB; "
+                                     "open a file this large from the project instead")
+        filename = str(body.get("filename") or "").strip() or "inline.cosm"
+        vol = await asyncio.to_thread(_macrocosm.load_volume_text, text, filename=filename)
+        return vol, Path(filename).name or "inline.cosm", body
+
+    @app.post("/api/cosm/inline")
+    async def api_cosm_inline(request: Request) -> dict[str, Any]:
+        """The `/api/cosm` payload for a volume read from text — body
+        `{text, filename}` — for the docs viewer's live examples: it loads,
+        lints and lists its lenses exactly as the same file would. `path`
+        is `inline:<filename>`; nothing is written. Read-only, so
+        home-accessible and open while agent-free."""
+        vol, name, _body = await _inline_volume(request)
+        return await asyncio.to_thread(lambda: _cosm_payload(vol, f"inline:{name}"))
+
+    @app.post("/api/cosm/inline/lens")
+    async def api_cosm_inline_lens(request: Request) -> dict[str, Any]:
+        """One lens of an inline volume — body `{text, filename, lens,
+        around, depth}` — as `/api/cosm/lens` gives it."""
+        vol, name, body = await _inline_volume(request)
+        try:
+            depth = int(body.get("depth") or 1)
+        except (TypeError, ValueError):
+            depth = 1
+        return await asyncio.to_thread(lambda: _lens_payload(
+            vol, str(body.get("lens") or "") or None, f"inline:{name}",
+            str(body.get("around") or "") or None, depth))
+
+    # ---------- DocOES: the doc volumes at three densities (0.4.4) ----------
+    #
+    # A doc volume is built from the install's own documents into its state
+    # (`ENOUGH_DOCS_ROOT`, ~/enough/docoes/), never into a project, so every
+    # route here is home-accessible (HOME_PATHS) and, reading only, open
+    # while agent-free. A telling is built by the first request that finds
+    # it stale, in a worker thread (0.2–0.6 s); a request that arrives while
+    # a build of that telling runs — that one, or a `POST /api/docs/build` —
+    # gets 202 `{building: true, progress}` and asks again. Payloads are
+    # encoded once per built volume (keyed by its digest and build time).
+
+    DOCS_DENSITIES = ("atem", "short", "fabula")
+    # A typed reference names a place in the prose: what "mentioned in" counts.
+    DOCS_MENTION_FIELDS = frozenset({"mentions", "about", "see", "same_as", "also_defined_in"})
+    # The tree: carried both ways on every item already, so never a backref.
+    DOCS_TREE_FIELDS = frozenset({"parts", "parent", "chapter"})
+    _docs_jobs: dict[tuple[str, str], dict[str, Any]] = {}
+    _docs_guard = threading.Lock()
+    _docs_cache: dict[tuple, bytes] = {}
+    _docs_tasks: set[asyncio.Task[Any]] = set()
+
+    def _docs_telling(doc: str | None, lang: str | None) -> tuple[str, str, str | None]:
+        """`(doc, telling, requested)`: 404 for a document or a language
+        enough does not have; a language the document has no telling in
+        (the spec is English only) falls back to the author's telling, and
+        `requested` says what was asked. No `lang`: the UI language."""
+        slug = (doc or "").strip().removeprefix("doc/")
+        if slug not in _docoes.DOCUMENTS:
+            raise HTTPException(404, f"no document {doc!r}; enough has {', '.join(_docoes.DOCUMENTS)}")
+        want = (lang or "").strip() or _ui_language()
+        if want not in _docoes.LANGS:
+            raise HTTPException(404, f"no language {lang!r}; enough's languages are {', '.join(_docoes.LANGS)}")
+        tells = _docoes.tellings(slug)
+        if want in tells:
+            return slug, want, None
+        return slug, ("en" if "en" in tells else tells[0]), want
+
+    def _docs_new_job(keys: list[tuple[str, str]]) -> dict[str, Any]:
+        """Register one build covering `keys` (call under `_docs_guard`)."""
+        job = {"keys": list(keys), "done": 0, "total": len(keys),
+               "current": f"{keys[0][0]}.{keys[0][1]}" if keys else None, "started": time.monotonic()}
+        for k in keys:
+            _docs_jobs[k] = job
+        return job
+
+    def _docs_finish(job: dict[str, Any]) -> None:
+        with _docs_guard:
+            for k in job["keys"]:
+                if _docs_jobs.get(k) is job:
+                    del _docs_jobs[k]
+
+    def _docs_progress(job: dict[str, Any]) -> dict[str, Any]:
+        return {"done": job["done"], "total": job["total"], "current": job["current"],
+                "elapsed_s": round(time.monotonic() - job["started"], 2)}
+
+    def _docs_step(job: dict[str, Any]) -> Callable[[int, int, str], None]:
+        def step(done: int, total: int, current: str) -> None:
+            job["done"], job["total"], job["current"] = done, total, current
+        return step
+
+    def _docs_202(slug: str, lang: str, job: dict[str, Any]) -> JSONResponse:
+        return JSONResponse({"building": True, "doc": slug, "lang": lang,
+                             "progress": _docs_progress(job)}, status_code=202)
+
+    def _docs_is_fresh(slug: str, lang: str) -> bool:
+        try:
+            return _docoes.is_fresh(slug, lang)
+        except (OSError, KeyError, UnicodeDecodeError):
+            return False
+
+    async def _docs_volume(slug: str, lang: str) -> "_macrocosm.Volume | JSONResponse":
+        """The loaded telling, built first when stale; a 202 while a build of
+        it runs; 503 when it has no volume and cannot be built."""
+        key = (slug, lang)
+        with _docs_guard:
+            job = _docs_jobs.get(key)
+        if job is not None:
+            return _docs_202(slug, lang, job)
+        if not await asyncio.to_thread(_docs_is_fresh, slug, lang):
+            with _docs_guard:
+                job = _docs_jobs.get(key)
+                mine = job is None
+                if mine:
+                    job = _docs_new_job([key])
+            if not mine:
+                return _docs_202(slug, lang, job)
+            try:
+                await asyncio.to_thread(_docoes.ensure_built, slug, lang, on_step=_docs_step(job))
+            finally:
+                _docs_finish(job)
+        try:
+            return await asyncio.to_thread(_docoes.load_built, slug, lang, ensure=False)
+        except _docoes.DocsUnavailable as e:
+            raise HTTPException(503, f"the {slug} volume ({lang}) could not be built: {e}") from None
+
+    def _docs_head(vol: "_macrocosm.Volume", slug: str, lang: str, requested: str | None,
+                   density: str) -> dict[str, Any]:
+        cat = vol.catalog
+        built = cat.get("built") if isinstance(cat.get("built"), dict) else {}
+        return {
+            "doc": slug, "lang": lang, "requested_lang": requested, "density": density,
+            "id": vol.id, "title": vol.name, "uri": _macrocosm.qualified_uri(vol),
+            "telling": _macrocosm.jsonable(cat.get("telling")),
+            "tellings": _macrocosm.jsonable(cat.get("tellings")) or [lang],
+            "document": _macrocosm.jsonable(cat.get("document")),
+            "chapters": _macrocosm.jsonable(cat.get("chapters") or []),
+            "built": _macrocosm.jsonable({k: built.get(k) for k in ("at", "by", "digest")}),
+        }
+
+    _DOCS_LIGHT = ("number", "anchor", "chapter", "fallback", "in", "of", "defined_in")
+
+    def _docs_light(it: "_macrocosm.Item") -> dict[str, Any]:
+        d = it.data
+        row = {"key": it.key, "id": it.id, "kind": it.kind, "module": it.module, "name": it.name,
+               "atem": _macrocosm.jsonable(d.get("atem")), "order": d.get("order"),
+               "level": d.get("level"), "parent": d.get("parent")}
+        for k in _DOCS_LIGHT:
+            row[k] = _macrocosm.jsonable(d.get(k))
+        return row
+
+    def _docs_edges(vol: "_macrocosm.Volume") -> list[tuple[str, str, str]]:
+        """`(from key, to key, field or link rel)` for every declared
+        reference and typed link that resolves, the tree aside."""
+        out: list[tuple[str, str, str]] = []
+        for it in vol.items.values():
+            for a, b, label, style in _macrocosm._edges(vol, {}, it):
+                if style == "tree" or label in DOCS_TREE_FIELDS or a.key == b.key:
+                    continue
+                out.append((a.key, b.key, label if style == "ref" else f"link:{label}"))
+        return out
+
+    def _docs_backrefs(edges: list[tuple[str, str, str]]) -> dict[str, list[str]]:
+        back: dict[str, list[str]] = {}
+        for a, b, _label in edges:
+            seen = back.setdefault(b, [])
+            if a not in seen:
+                seen.append(a)
+        return back
+
+    def _docs_order(it: "_macrocosm.Item") -> int:
+        o = it.data.get("order")
+        return o if isinstance(o, int) else 0
+
+    def _docs_short(vol: "_macrocosm.Volume") -> dict[str, Any]:
+        edges = _docs_edges(vol)
+        mentioned: dict[str, set[str]] = {}
+        for a, b, label in edges:
+            if label in DOCS_MENTION_FIELDS or label.startswith("link:"):
+                mentioned.setdefault(b, set()).add(a)
+        examples: dict[str, list[str]] = {}
+        for it in vol.items.values():
+            if it.kind == "example" and isinstance(it.data.get("in"), str):
+                examples.setdefault(it.data["in"], []).append(it.id)
+        sections = []
+        for it in sorted((x for x in vol.items.values() if x.kind == "section"), key=_docs_order):
+            d = it.data
+            sections.append({
+                "key": it.key, "id": it.id, "order": d.get("order"), "level": d.get("level"),
+                "number": _macrocosm.jsonable(d.get("number")), "name": it.name,
+                "anchor": d.get("anchor"), "heading": d.get("heading"), "body": d.get("body") or "",
+                "atem": _macrocosm.jsonable(d.get("atem")), "parent": d.get("parent"),
+                "chapter": d.get("chapter"), "fallback": d.get("fallback"),
+                "mentioned_in": len(mentioned.get(it.key, ())), "examples": examples.get(it.id, []),
+            })
+        terms = []
+        for it in vol.items.values():
+            if it.kind != "term":
+                continue
+            d = it.data
+            terms.append({"key": it.key, "id": it.id, "name": it.name,
+                          "atem": _macrocosm.jsonable(d.get("atem")),
+                          "summary": _macrocosm.jsonable(d.get("summary")),
+                          "defined_in": d.get("defined_in"),
+                          "also_defined_in": _macrocosm.jsonable(d.get("also_defined_in") or []),
+                          "same_as": _macrocosm.jsonable(d.get("same_as") or []),
+                          "chapter": d.get("chapter"), "fallback": d.get("fallback")})
+        return {"sections": sections, "terms": terms}
+
+    def _docs_inventories(slug: str) -> list[dict[str, Any]] | None:
+        """The inventory rows of the documents this one's bubbles point into
+        (the Help Center's `docs` bubble names a spec section), so those
+        cross-volume references lint as resolved; built if stale (blocking).
+        None when there are none, or one cannot be had."""
+        others = sorted(set(_docoes.BUBBLE_DOCUMENT.values()) - {slug}) \
+            if _docoes.DOCUMENTS[slug].bubbles else []
+        rows: list[dict[str, Any]] = []
+        for other in others:
+            try:
+                rows += _docoes.inventory(_docoes.load_built(other, "en"))
+            except (_docoes.DocsUnavailable, KeyError, OSError):
+                return None
+        return rows or None
+
+    def _docs_page(vol: "_macrocosm.Volume", section: str, module: str) -> set[str]:
+        """The keys of one fabula page: a section with everything under it
+        (its parts, the examples and decisions `in` them, the terms
+        `defined_in` them), and/or one module."""
+        keys = set(vol.items)
+        if section:
+            ref = section.strip()
+            top = vol.item(ref) or vol.item(f"S:section/{ref.removeprefix('§').strip()}")
+            if top is None or top.kind != "section":
+                raise HTTPException(404, f"no section {section!r} in {vol.name}")
+            ids, frontier = {top.id}, [top]
+            while frontier:
+                nxt = []
+                for it in frontier:
+                    for v in it.data.get("parts") or []:
+                        t = _macrocosm.resolve_ref(vol, it, v)
+                        if t is not None and t.id not in ids:
+                            ids.add(t.id)
+                            nxt.append(t)
+                frontier = nxt
+            keys = {k for k, it in vol.items.items()
+                    if it.id in ids or it.data.get("in") in ids or it.data.get("defined_in") in ids}
+        if module:
+            keys = {k for k in keys if (vol.items[k].module or "") == module}
+        return keys
+
+    def _docs_fabula(vol: "_macrocosm.Volume", slug: str, lang: str, section: str,
+                     module: str) -> dict[str, Any]:
+        report = _docoes.lint_doc(vol, inventories=_docs_inventories(slug))
+        payload = _cosm_payload(vol, f"docs:{slug}.{lang}", report=report)
+        if section or module:
+            keep = _docs_page(vol, section, module)
+            for mod in payload["modules"]:
+                kinds = []
+                for k in mod["kinds"]:
+                    items = [i for i in k["items"] if i["key"] in keep]
+                    if items:
+                        kinds.append({"kind": k["kind"], "items": items})
+                mod["kinds"] = kinds
+                mod["count"] = sum(len(k["items"]) for k in kinds)
+            payload["page"] = {"section": section or None, "module": module or None,
+                               "count": len(keep), "total": len(vol.items)}
+        else:
+            payload["page"] = None
+        payload["backrefs"] = _docs_backrefs(_docs_edges(vol))
+        payload["inventory"] = _macrocosm.jsonable(_docoes.inventory(vol))
+        payload["declared_lenses"] = _docs_declared_lenses(vol)
+        return payload
+
+    def _docs_declared_lenses(vol: "_macrocosm.Volume") -> list[dict[str, Any]]:
+        """The lenses a doc volume is drawn by, with the modules each draws:
+        `[{id, kind, diagram, include, generic}]`. Every lens the manifest
+        declares (a lens without `include` draws every module), then the
+        reader's generic drawings it does not declare (`tree` over a volume
+        with parts; `map` if the manifest had none), marked `generic` — the
+        same set DocOES enumerates as the spec's `R:lens/doc.*` items, so the
+        prism card's "renderings" reads one list for every telling."""
+        if vol.manifest is None:
+            return []
+        letters = [str(x) for x in vol.manifest.modules()]
+        out: list[dict[str, Any]] = []
+        for spec in vol.manifest.lenses():
+            include = [str(x) for x in (spec.get("include") or [])] or letters
+            out.append({"id": spec["id"], "kind": spec.get("kind", "mermaid"), "diagram": spec.get("diagram"),
+                        "include": include, "generic": False})
+        declared = {d["id"] for d in out}
+        for lid in _macrocosm.lenses(vol):
+            if lid not in declared:
+                out.append({"id": lid, "kind": "mermaid", "diagram": "flowchart", "include": letters,
+                            "generic": True})
+        return out
+
+    def _docs_encoded(vol: "_macrocosm.Volume", slug: str, lang: str, requested: str | None,
+                      density: str, section: str = "", module: str = "") -> Response:
+        """One density of a telling, JSON-encoded once per built volume."""
+        built = vol.catalog.get("built") if isinstance(vol.catalog.get("built"), dict) else {}
+        key = (str(vol.path), str(built.get("digest")), str(built.get("at")), requested,
+               density, section, module)
+        with _docs_guard:
+            hit = _docs_cache.get(key)
+        if hit is None:
+            out = _docs_head(vol, slug, lang, requested, density)
+            if density == "fabula":                 # the modules carry every item, whole
+                out = {**_docs_fabula(vol, slug, lang, section, module), **out}
+            else:
+                out["items"] = [_docs_light(it) for it in vol.items.values()]
+                if density == "short":
+                    out.update(_docs_short(vol))
+            hit = json.dumps(out, ensure_ascii=False, default=str).encode("utf-8")
+            with _docs_guard:
+                _docs_cache[key] = hit
+                while len(_docs_cache) > 24:
+                    _docs_cache.pop(next(iter(_docs_cache)))
+        return Response(content=hit, media_type="application/json")
+
+    @app.get("/api/docs")
+    async def api_docs(doc: str = Query(...), lang: str = Query(""), density: str = Query("short"),
+                       section: str = Query(""), module: str = Query("")) -> Response:
+        """A doc volume (DocOES) at one density — `doc` macrocosm-oes |
+        help-center, `lang` one of the six (default: the UI language),
+        `density` atem | short (default) | fabula. Every density carries the
+        head `{doc, lang, requested_lang, density, id, title, uri, telling,
+        tellings, document, chapters, built}`; atem adds `items` (all, light);
+        short adds `sections` (telling order, bodies verbatim) and `terms`;
+        fabula is the `/api/cosm` payload (+ `backrefs`, `inventory`,
+        `declared_lenses`, `page`), one section's subtree with `section=`
+        and/or one module with `module=`. Home-accessible; built on first
+        use (202 while a build runs; 503 when it cannot be built)."""
+        if density not in DOCS_DENSITIES:
+            raise HTTPException(400, f"density is one of {', '.join(DOCS_DENSITIES)}")
+        slug, telling, requested = _docs_telling(doc, lang)
+        vol = await _docs_volume(slug, telling)
+        if isinstance(vol, JSONResponse):
+            return vol
+        return await asyncio.to_thread(_docs_encoded, vol, slug, telling, requested, density,
+                                       section.strip(), module.strip())
+
+    @app.get("/api/docs/status")
+    async def api_docs_status() -> dict[str, Any]:
+        """Every document's tellings: `{root, ready, building, documents:
+        [{doc, lang, built, fresh, digest, building, progress}]}` — `built`:
+        a volume exists; `fresh`: it records the current digest; `digest`:
+        the one it records."""
+
+        def _build() -> dict[str, Any]:
+            st = _docoes.status()
+            with _docs_guard:
+                running = {k: _docs_progress(j) for k, j in _docs_jobs.items()}
+            rows = []
+            for r in st["documents"]:
+                k = (r["doc"], r["lang"])
+                rows.append({"doc": r["doc"], "lang": r["lang"], "built": r["exists"], "fresh": r["fresh"],
+                             "digest": _docoes.recorded_digest(Path(r["path"])),
+                             "building": k in running, "progress": running.get(k)})
+            return {"root": st["root"], "ready": st["ready"], "building": bool(running), "documents": rows}
+
+        return await asyncio.to_thread(_build)
+
+    @app.post("/api/docs/build")
+    async def api_docs_build(request: Request) -> JSONResponse:
+        """Build the stale tellings in the background — body `{doc?, lang?}`
+        (nothing: every document and telling) — so a viewer can warm them
+        before it opens. 202 `{building: true, progress}`; follow it on
+        `GET /api/docs/status`. A build already running is reported, not
+        doubled. Writes only into the docs root."""
+        try:
+            body = await request.json()
+        except ValueError:
+            body = None
+        body = body if isinstance(body, dict) else {}
+        doc, lang = (str(body.get("doc") or "").strip() or None), (str(body.get("lang") or "").strip() or None)
+        slug: str | None = None
+        telling: str | None = None
+        if doc is not None:
+            slug, resolved, _requested = _docs_telling(doc, lang or "en")
+            telling = resolved if lang else None          # no lang: every telling of that document
+        elif lang is not None:
+            raise HTTPException(400, "a lang needs its doc")
+        keys = [(s, lg) for s in ([slug] if slug else list(_docoes.DOCUMENTS))
+                for lg in ([telling] if telling else _docoes.tellings(s))]
+        with _docs_guard:
+            running = next((_docs_jobs[k] for k in keys if k in _docs_jobs), None)
+            job = running or _docs_new_job(keys)
+        if running is None:
+            def _run() -> None:
+                try:
+                    _docoes.ensure_built(slug, telling, on_step=_docs_step(job))
+                except Exception:  # noqa: BLE001 — a background build never takes the server down
+                    log.exception("docs: background build failed")
+                finally:
+                    _docs_finish(job)
+
+            task = asyncio.get_running_loop().create_task(asyncio.to_thread(_run))
+            _docs_tasks.add(task)
+            task.add_done_callback(_docs_tasks.discard)
+        return JSONResponse({"building": True, "doc": slug, "lang": telling,
+                             "progress": _docs_progress(job)}, status_code=202)
+
+    @app.get("/api/docs/lens")
+    async def api_docs_lens(doc: str = Query(...), lang: str = Query(""), lens: str = Query(""),
+                            around: str = Query(""), depth: int = Query(1)) -> Any:
+        """One lens of a doc volume as merirmaid source — `/api/cosm/lens`'s
+        payload (+ `doc`, `lang`). `around=<key>` draws that item's local
+        graph (`lens` then defaults to `graph`, else `map`). Home-accessible."""
+        slug, telling, _requested = _docs_telling(doc, lang)
+        vol = await _docs_volume(slug, telling)
+        if isinstance(vol, JSONResponse):
+            return vol
+
+        def _build() -> dict[str, Any]:
+            out = _lens_payload(vol, lens.strip() or None, f"docs:{slug}.{telling}", around, depth)
+            return {**out, "doc": slug, "lang": telling}
+
+        return await asyncio.to_thread(_build)
+
+    @app.post("/api/docs/compile")
+    async def api_docs_compile(request: Request) -> Any:
+        """The document again — body `{doc, lang?, chapter?}` — compiled as
+        told from its volume: `{doc, lang, chapter, markdown}`, byte for byte
+        the markdown it was enumerated from (a chapter's with `chapter`, a
+        slug or `S:chapter/…` id). For "open raw" and download; writes nothing."""
+        try:
+            body = await request.json()
+        except ValueError:
+            body = None
+        body = body if isinstance(body, dict) else {}
+        slug, telling, _requested = _docs_telling(str(body.get("doc") or ""), str(body.get("lang") or ""))
+        chapter = str(body.get("chapter") or "").strip() or None
+        vol = await _docs_volume(slug, telling)
+        if isinstance(vol, JSONResponse):
+            return vol
+
+        def _build() -> dict[str, Any]:
+            if chapter is not None:
+                cid = chapter if chapter.startswith("S:chapter/") else f"S:chapter/{chapter}"
+                if vol.item(cid) is None:
+                    raise HTTPException(404, f"no chapter {chapter!r} in {vol.name}")
+            return {"doc": slug, "lang": telling, "chapter": chapter,
+                    "markdown": _docoes.compile_doc(vol, chapter=chapter)}
+
+        return await asyncio.to_thread(_build)
+
+    @app.get("/api/docs/inventory")
+    async def api_docs_inventory(doc: str = Query(...), lang: str = Query("")) -> Any:
+        """The inventory lens's rows: `{doc, lang, rows: [{inventory, xref,
+        id, kind, version, anchor, atem}]}` — what a cross-volume reference
+        `<inventory>@<version>:<kind>:<id>` resolves through."""
+        slug, telling, _requested = _docs_telling(doc, lang)
+        vol = await _docs_volume(slug, telling)
+        if isinstance(vol, JSONResponse):
+            return vol
+        return await asyncio.to_thread(lambda: {
+            "doc": slug, "lang": telling, "rows": _macrocosm.jsonable(_docoes.inventory(vol))})
 
     # ------------------------------------------------------------------
     # Canon derivations (0.4.3, P3): EMF twins, atems, compile. The engine is
@@ -4202,12 +4835,27 @@ def create_app(
         return derived.get("completeness") == "full"
 
     async def _canon_mode() -> tuple[str, str]:
-        """Model or rules, decided once, before the job starts (plan §3.8)."""
+        """Model or rules, decided once, before the job starts (plan §3.8).
+        Agent-free mode is rules with `why == "agent-free"` (`llm.reachable`)."""
         ok, why = await asyncio.to_thread(_llm.reachable, session.llm_url)
         return ("model", why) if ok else ("rules", why)
 
+    def _agent_free_reason(mode: str, why: str) -> str | None:
+        """`"agent-free"` for a rules job agent-free mode chose, else None —
+        the job's `reason`, which the UI labels "agent-free" rather than
+        "scaffold, no model"."""
+        return _agent_free.REASON if mode == "rules" and why == _agent_free.REASON else None
+
     def _canon_start_message(mode: str, why: str, doing: str) -> str:
-        return doing if mode == "model" else f"no model is answering ({why}); writing a scaffold"
+        if mode == "model":
+            return doing
+        if _agent_free_reason(mode, why):
+            return f"agent-free: {doing} by rules"
+        return f"no model is answering ({why}); writing a scaffold"
+
+    def _rules_note(why: str) -> str:
+        return (" (by rules: agent-free)" if why == _agent_free.REASON
+                else " (a scaffold: no model read it)")
 
     def _model_complete(messages: list[dict[str, str]], **kw: Any) -> tuple[str, dict[str, Any]]:
         """The engine's `complete`: `llm.complete` at the session's model
@@ -4223,7 +4871,7 @@ def create_app(
         except Exception as e:  # noqa: BLE001
             raise RuntimeError(f"the model stopped answering ({e}); nothing was written, run it again") from e
 
-    def _emf_work(t: dict[str, Any], mode: str) -> Callable[[Any], dict[str, Any]]:
+    def _emf_work(t: dict[str, Any], mode: str, why: str = "") -> Callable[[Any], dict[str, Any]]:
         def work(ctx: Any) -> dict[str, Any]:
             text, stat = _canon_derive.read_source(t["target"])
             twin = t["twin"]
@@ -4236,7 +4884,7 @@ def create_app(
             ctx.progress(phase="writing", message=f"writing {t['twin'].name}")
             _canon_derive.write_twin(t["twin"], cosm)
             _canon_catalog_after(t["text_rel"])
-            note = " (a scaffold: no model read it)" if info["mode"] == "rules" else ""
+            note = _rules_note(why) if info["mode"] == "rules" else ""
             return {"twin_path": t["twin_rel"], "text_path": t["text_rel"], "mode": info["mode"],
                     "model": info["model"], "chunks": info["chunks"], "items": info["items"],
                     "counts": info["counts"], "dropped": info["dropped"], "normalized": info["normalized"],
@@ -4269,7 +4917,8 @@ def create_app(
         return work
 
     def _passage_atem_work(text: str, mode: str, *, t: dict[str, Any] | None,
-                           selection: dict[str, Any] | None) -> Callable[[Any], dict[str, Any]]:
+                           selection: dict[str, Any] | None,
+                           why: str = "") -> Callable[[Any], dict[str, Any]]:
         def work(ctx: Any) -> dict[str, Any]:
             context = None
             span = None
@@ -4283,18 +4932,28 @@ def create_app(
             out = {**_canon_derive.atem_block(atem), "stance_profile": atem.get("stance_profile") or {},
                    "mode": atem["mode"], "model": atem.get("model"), "written": False,
                    "pinnable": t is not None, "path": t["text_rel"] if t else None, "span": span,
-                   "message": "the atem is ready" + (" (a scaffold: no model read it)"
+                   "message": "the atem is ready" + (_rules_note(why)
                                                      if atem["mode"] == "rules" else "")}
             return out
         return work
 
     def _start_canon_job(*, kind: str, path: str | None, mode: str, why: str, work: Any,
                          key: str | None, doing: str) -> dict[str, Any]:
+        reason = _agent_free_reason(mode, why)
+        if reason:
+            # The result says why too, beside its `mode: rules`.
+            inner = work
+
+            def work(ctx: Any) -> Any:
+                out = inner(ctx)
+                if isinstance(out, dict):
+                    out["reason"] = reason
+                return out
         try:
             snap = canon_jobs.start(
                 kind=kind, path=path, mode=mode, work=work, key=key,
                 lock=session.generation_lock if mode == "model" else None,
-                message=_canon_start_message(mode, why, doing))
+                message=_canon_start_message(mode, why, doing), reason=reason)
         except _canon_jobs.CanonJobError as e:
             raise _canon_job_http(e) from None
         return {"job": snap}
@@ -4317,7 +4976,7 @@ def create_app(
             raise HTTPException(409, f"already fresh: {said} up to date with {t['target'].name}; "
                                      "pass force to derive it again")
         mode, why = await _canon_mode()
-        work = _emf_work(t, mode) if what == "emf" else _file_atem_work(t, mode)
+        work = _emf_work(t, mode, why) if what == "emf" else _file_atem_work(t, mode)
         doing = (f"deriving the EMF twin of {t['target'].name}" if what == "emf"
                  else f"writing the atem of {t['target'].name}")
         return _start_canon_job(kind=what, path=t["text_rel"], mode=mode, why=why, work=work,
@@ -4352,7 +5011,8 @@ def create_app(
         t = await asyncio.to_thread(_text_target, path) if path else None
         mode, why = await _canon_mode()
         return _start_canon_job(kind="atem", path=t["text_rel"] if t else None, mode=mode, why=why,
-                                work=_passage_atem_work(text, mode, t=t, selection=selection), key=None,
+                                work=_passage_atem_work(text, mode, t=t, selection=selection, why=why),
+                                key=None,
                                 doing="writing the atem of the passage")
 
     @app.post("/api/canon/atem/pin")
@@ -4989,8 +5649,54 @@ def create_app(
         chief = prompt_mod.valid_chief_name((body or {}).get("chief_readvisor_name"))
         if chief:
             cfg["chief_readvisor_name"] = chief
+        # Agent-free mode (§13): machine-global, top-level like the language,
+        # a bool or nothing. The model follows the switch once it is saved:
+        # on stops it, off starts it through the ordinary startup choice.
+        was_free = _agent_free.value(cfg)
+        want_free = (body or {}).get(_agent_free.KEY)
+        if isinstance(want_free, bool):
+            cfg[_agent_free.KEY] = want_free
         _write_ui_config(cfg)
+        if isinstance(want_free, bool) and want_free != was_free:
+            await _agent_free_switched(want_free)
         return cfg
+
+    async def _agent_free_switched(on: bool) -> None:
+        """The switch just flipped (and is saved, so the gate already reads
+        the new value). On: running councils pause, the preflight forgets its
+        verdict, the supervised model stops — owned or adopted, as a model
+        switch would stop it. Off: the model starts the way a launch starts
+        it (`supervisor.bootstrap()`: adopt-or-launch, `_resolve_startup_
+        choice`). Home has no model either way. Announced on the stream as
+        `agent-free` so every open window can follow."""
+        if home:
+            return
+        if on:
+            from . import council as _council
+            runs = [t for t in list(_council._RUNS.values()) if not t.done()]
+            for task in runs:
+                task.cancel()
+            if runs:
+                await asyncio.gather(*runs, return_exceptions=True)
+            if preflight is not None:
+                await preflight.cancel()
+                preflight.schedule("agent-free")     # → skipped
+            if supervisor is not None:
+                try:
+                    await supervisor.stop()
+                except Exception:  # noqa: BLE001 — the gate is shut regardless
+                    log.exception("agent-free: stopping the model failed")
+        elif supervisor is not None:
+            try:
+                await supervisor.bootstrap()
+            except Exception:  # noqa: BLE001
+                log.exception("agent-free off: supervisor bootstrap failed")
+        elif preflight is not None:
+            preflight.schedule("agent-free off")
+        await session.emit("agent-free", {
+            "agent_free": on,
+            "supervisor": supervisor.status() if supervisor is not None else None,
+        })
 
     @app.get("/api/readvisor/chief")
     async def api_readvisor_chief_get() -> dict[str, Any]:
@@ -5066,7 +5772,15 @@ def create_app(
             raise HTTPException(500, str(e)) from None
         except _cloud.CloudError as e:
             raise HTTPException(400, str(e)) from None
-        health = _cloud.health_check()
+        if _agent_free.enabled():
+            # Storing a key is configuring, and stays allowed; the check is a
+            # prompt to a model, and waits until agent-free is off.
+            health = {"ok": False, "model": _cloud.HEALTH_CHECK_MODEL,
+                      "checked_at": None, "skipped": _agent_free.REASON,
+                      "error": _agent_free.detail("the key is saved; the cloud "
+                                                  "check waits until agent-free is off")}
+        else:
+            health = _cloud.health_check()
         return {"status": _cloud.status_snapshot(), "health": health}
 
     @app.post("/api/cloud/clear-key")
@@ -5151,7 +5865,12 @@ def create_app(
             # llama.cpp on PATH", which gates every gated model — correctly.
             "llama_release": await asyncio.to_thread(_models.llama_release),
         }
-        payload["supervisor"] = supervisor.status() if supervisor else {"mode": "off"}
+        # Agent-free mode (§13): the model window greys its running controls
+        # (switch, start) on this flag; downloads and deletes stay live.
+        agent_free = _agent_free.enabled()
+        payload["agent_free"] = agent_free
+        payload["supervisor"] = supervisor.status() if supervisor else {
+            "mode": _agent_free.REASON if agent_free else "off", "agent_free": agent_free}
 
         # Inject OPRO-API when cloud is unlocked. The model list is the
         # only frontend surface that needs to know about it; everything
@@ -5191,6 +5910,12 @@ def create_app(
         model is loaded, ready-for-requests? When OPRO-API is the active
         model, the supervisor's local-llama state is irrelevant — what
         matters is whether the cloud key is healthy."""
+        # Agent-free mode first (§13): no model, whatever is installed or
+        # chosen; the preflight is skipped, its verdict unknown.
+        if _agent_free.enabled():
+            return {"mode": _agent_free.REASON, "ready": False, "cute": None,
+                    "ctx": None, "agent_free": True,
+                    **_preflight_fields(skipped=True)}
         # Short-circuit: OPRO-API mode. Local llama-server may or may not
         # be running in the background; we report cloud-readiness instead.
         try:
@@ -5207,8 +5932,9 @@ def create_app(
                 "cloud_model_id": cloud_status["model_id"],
                 "cloud_healthy": cloud_status["last_verified_ok"],
                 "cloud_last_error": cloud_status["last_error"],
+                "agent_free": False,
                 # The context preflight does not measure the cloud.
-                **_preflight_fields(cloud=True),
+                **_preflight_fields(skipped=True),
             }
         if supervisor is None:
             # Non-supervised mode: best-effort probe of /health.
@@ -5216,21 +5942,22 @@ def create_app(
                 async with httpx.AsyncClient(timeout=2.0) as c:
                     r = await c.get(llm_url.rstrip("/") + "/health")
                 return {"mode": "external", "ready": r.status_code == 200, "cute": None, "ctx": None,
-                        **_preflight_fields()}
+                        "agent_free": False, **_preflight_fields()}
             except httpx.HTTPError:
                 return {"mode": "external", "ready": False, "cute": None, "ctx": None,
-                        **_preflight_fields()}
+                        "agent_free": False, **_preflight_fields()}
         # The preflight fields (docs/ctx-16gb-plan.md §8.3) ride on every
         # shape of this payload: prompt_tokens, n_ctx, reserve, fits,
         # suggest_ctx, fix, fix_reason, preflight.
         return {**supervisor.status(), **_preflight_fields()}
 
-    def _preflight_fields(*, cloud: bool = False) -> dict[str, Any]:
-        if preflight is None or cloud:
+    def _preflight_fields(*, skipped: bool = False) -> dict[str, Any]:
+        """`skipped`: the cloud, or agent-free mode — nothing of ours to measure."""
+        if preflight is None or skipped:
             return {"prompt_tokens": None, "n_ctx": None,
                     "reserve": _preflight.RESERVE, "fits": None,
                     "suggest_ctx": None, "fix": None, "fix_reason": None,
-                    "preflight": "skipped" if cloud else "idle"}
+                    "preflight": "skipped" if skipped else "idle"}
         return preflight.fields()
 
     @app.post("/api/model")

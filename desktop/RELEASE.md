@@ -46,7 +46,20 @@ then `uv run pytest -q tests/test_macrocosm.py`, and commit
 `defaults/cosm/manifests/comprise.manifest.cosm` and `tests/fixtures/cosm/`
 with the bump. Exit 2 means no checkout was found: run it on the machine
 where comprise-dev is checked out. The script only reads comprise-dev, and
-copies the public samples by name only.
+copies the public samples by name only. It also copies Comprise's spec and
+paradigm map into `defaults/cosm/chapters/` (with their commit and sha256 in
+its `manifest.json`), the read-only chapters of the spec's doc volume: commit
+that folder with the bump too.
+
+**The doc volumes build themselves (0.4.4).** The docs viewer reads the Help
+Center and the spec as DocOES volumes that every install builds at runtime into
+`~/enough/docoes/` from the sources the bundle already carries
+(`docs/HELP_CENTER.md`, `docs/MACROCOSM_OES.md`, `enough/static/i18n/`,
+`defaults/cosm/`), rebuilding them whenever those or enough's version change.
+There is nothing to generate, commit or stage for them; a version bump alone
+rebuilds them on first use. Any DocOES command you run while preparing a release
+needs `ENOUGH_DOCS_ROOT` pointed at a scratch folder, or it builds into your own
+`~/enough/docoes/`.
 
 ---
 

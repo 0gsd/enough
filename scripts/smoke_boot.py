@@ -20,7 +20,7 @@ hooks:
 1. every ``ENOUGH_*`` seam (weights dir, live model state, registry,
    download URL base, canon root (and its legacy cacheawl seam), infoworld
    root, wikisink config, ui config, llama-server override, FEED dictionary
-   root) is pointed inside the scratch dir; and
+   root, DocOES docs root) is pointed inside the scratch dir; and
 2. ``$HOME`` is pointed there too, which is what actually isolates
    ``~/enough/config/broker.json``, ``openrouter.json``,
    ``orchestrator.json`` and ``~/enough/.llama-server/server.pid`` — none
@@ -169,6 +169,10 @@ def build_env(scratch: Path) -> dict[str, str]:
         # The source stays the checkout's reflib/dict (the shipping path), so
         # the boot really starts a background build — into the scratch dir.
         "ENOUGH_DICT_ROOT": str(scratch / "dict"),
+        # DocOES (0.4.4): the built doc volumes (the spec, the Help Center in
+        # six tellings), ~/enough/docoes/ by default. Disposable, rebuilt on
+        # digest — into the scratch dir.
+        "ENOUGH_DOCS_ROOT": str(scratch / "docoes"),
         # The home screen's project registry. $HOME already points here, so
         # this is belt and braces — but the rule is "every ENOUGH_* seam", and
         # the handoff file and desktop.json are derived from this one's dir.
@@ -222,6 +226,23 @@ def check_project(base: str, project: Path) -> None:
     # /api/home/* belongs to a home-mode server; a project one must not serve it.
     status, _ = request(f"{base}/api/home/projects")
     need(status == 404, "/api/home/projects 404s on a project server")
+
+
+def check_docs(base: str, scratch: Path) -> None:
+    """DocOES (0.4.4): the Help Center's doc volume builds on first request,
+    into the scratch docs root — never ~/enough/docoes/."""
+    url = f"{base}/api/docs?doc=help-center&lang=en&density=atem"
+    status, body = request(url)
+    deadline = time.monotonic() + REQUEST_TIMEOUT_S
+    while status == 202 and time.monotonic() < deadline:     # another request is building it
+        time.sleep(0.25)
+        status, body = request(url)
+    need(status == 200, "GET /api/docs builds and serves the Help Center (atem density)")
+    payload = json.loads(body)
+    need(payload.get("doc") == "help-center" and payload.get("items"),
+         "…with its items, one line each")
+    need((scratch / "docoes" / "help-center.en.doc.cosm").is_file(),
+         "…built into the scratch docs root")
 
 
 def check_models(base: str) -> None:
@@ -346,6 +367,7 @@ def run(scratch: Path, *, verbose: bool) -> None:
         need(booted, f"the server answered /api/project within {BOOT_TIMEOUT_S:.0f}s")
 
         check_project(base, project)
+        check_docs(base, scratch)
         check_models(base)
         check_degraded(base)
         check_shutdown(base, proc)

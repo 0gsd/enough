@@ -49,7 +49,10 @@ CORE_BUDGET = 17_500
 #: 0.4.3: +809, exactly `len(prompt.CANON_TOOL_INSTRUCTIONS)`, the MacroCOSM
 #: block (owner decision 12: on by default, at most 1,000 chars) — the tree
 #: measured 22,746 before it, 23,556 after.
-FULL_BUDGET = 23_709
+#: 0.4.4: +156, exactly the `doc_lookup` lines added to that block (its
+#: example and one sentence; the block went 809 -> 965 chars, still under
+#: the owner's 1,000) — the tree measured 23,556 before them, 23,712 after.
+FULL_BUDGET = 23_865
 #: The owner's cap on the MacroCOSM tools' docs (docs/canon-043-plan.md §13).
 CANON_BLOCK_MAX = 1_000
 #: A fresh project's whole assembled system prompt at HEAD (0.4.2, d865818),
@@ -249,13 +252,14 @@ def test_the_canon_block_rides_on_the_install_not_the_skill(
     assert ("macrocosm-oes", False) in [(n, on) for n, on, _t in prompt.list_skills(project / "rness")]
     off_skill = prompt.tool_instructions(project)
     assert "## MacroCOSM" in off_skill
-    for name in ("cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide"):
+    for name in ("cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide", "doc_lookup"):
         assert f'<tool name="{name}">' in off_skill, name
     enable_skill(project, "macrocosm-oes")
     assert prompt.tool_instructions(project) == off_skill
     monkeypatch.setattr(prompt, "_macrocosm_available", lambda: False)
     gone = prompt.tool_instructions(project)
     assert "## MacroCOSM" not in gone and "cosm_read" not in gone and "cosm_guide" not in gone
+    assert "doc_lookup" not in gone
     assert len(off_skill) - len(gone) == len(prompt.CANON_TOOL_INSTRUCTIONS) + 1
 
 

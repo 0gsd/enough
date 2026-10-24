@@ -245,7 +245,7 @@ path: the file viewer
 clicking a file opens it in one unified <strong>read/edit mode</strong> with two faces — a read face (eye) and an edit face (pencil). it lives either as a mini side panel next to the chat or expanded to a full frame; use the mini↔full toggle to switch. edits are dirty-guarded, so you won't lose unsaved changes by navigating away by accident. files enough doesn't display natively still open: a word file, pdf, deck or workbook opens as its markdown <em>twin</em> (see the <em>converted document</em> bubble on any such row), and an image opens in a plain viewer with fit and 1:1 sizes.
 
 ### how
-single-click a file in the tree to open it in the mini panel; expand it to a full frame when you want room. flip between the read (eye) and edit (pencil) faces with the dedicated face-toggle buttons in the read/edit chrome. every open mode shows a square indicator top-right (newest on the left) with a little red-x ribbon to close it — modes <em>stack</em>, so closing one reveals the mode beneath exactly as you left it. click a buried indicator to bring that mode forward; press <code>esc</code> to close the topmost mode. the same indicator + ribbon pattern covers every full-frame mode (wikisink, girraph, merirmaid, canon, and the read-only <strong>help center</strong> reference mode, launched from the small <strong>help</strong> button at the top right of the ui window).
+single-click a file in the tree to open it in the mini panel; expand it to a full frame when you want room. flip between the read (eye) and edit (pencil) faces with the dedicated face-toggle buttons in the read/edit chrome. every open mode shows a square indicator top-right (newest on the left) with a little red-x ribbon to close it — modes <em>stack</em>, so closing one reveals the mode beneath exactly as you left it. click a buried indicator to bring that mode forward; press <code>esc</code> to close the topmost mode. the same indicator + ribbon pattern covers every full-frame mode: wikisink, girraph, merirmaid, canon, the cosm viewer, the dictionary, and the <strong>docs viewer</strong>, where you read this help center and the MacroCOSM specification (the small <strong>help</strong> button at the top right of the ui window opens it).
 
 ### ideas
 - keep a file open in the mini panel while you chat — reference and conversation side by side.
@@ -289,7 +289,7 @@ path: ~/enough/canon/
 the machine-global store of <em>volumes</em> — top-level folders holding text you want to keep forever, or cached replicas ingested from a local path, a website, or wikipedia articles. shared across every project and hidden from project file trees. this is where the old <code>infoworld</code> library now lives.
 
 ### how
-open canon mode from the topbar for the two-pane view (project ↔ volumes): drag to copy a file between them, shift-drag to move, and use the ingest bar to ask your chief readvisor to pull a source into a volume. or just say so in the panel — your readvisors can list, create, and ingest into volumes when the "canon tools" broker toggle is on (url ingests also respect your fetch_url toggles). every volume keeps an auto-generated catalog of its contents (<code>canon.cosm</code>, read-only) and hidden metadata you don't touch. double-click that catalog — or a holotype, or any other <code>.cosm</code> file — to browse it in the cosm viewer; the <strong>project catalog</strong> button does the same for this project's own (<code>rness/canon.cosm</code>). a text that has an EMF twin wears a small tinted twin badge.
+open canon mode from the topbar for the two-pane view (project ↔ volumes): drag to copy a file between them, shift-drag to move, and use the ingest bar to ask your chief readvisor to pull a source into a volume — or, agent free, to see the source and its limits in a plain confirmation and run the ingest yourself. or just say so in the panel — your readvisors can list, create, and ingest into volumes when the "canon tools" broker toggle is on (url ingests also respect your fetch_url toggles). every volume keeps an auto-generated catalog of its contents (<code>canon.cosm</code>, read-only) and hidden metadata you don't touch. double-click that catalog — or a holotype, or any other <code>.cosm</code> file — to browse it in the cosm viewer; the <strong>project catalog</strong> button does the same for this project's own (<code>rness/canon.cosm</code>). a text that has an EMF twin wears a small tinted twin badge.
 
 ### ideas
 - ingest a docs site or a folder of notes so your readvisors can work from it offline.
@@ -311,19 +311,22 @@ double-click a catalog, a holotype or any <code>.cosm</code> file in canon, or c
 - a big holotype shows forty cards per kind at first; <strong>show all</strong> brings the rest.
 - the checks are MacroCOSM's generic ones; a holotype's own rules belong to comprise, and the rail says how many it leaves to them.
 
-## cosmspec
-name: MacroCOSM specification
-path: docs/MACROCOSM_OES.md
+## docs
+name: docs viewer
+path: docs/HELP_CENTER.md · docs/MACROCOSM_OES.md
 
 ### what
-the specification of <strong>MacroCOSM OES</strong>, the shared grammar every <code>.cosm</code> file is written in: how a file is read, how a volume names the language it is written in, what an item and its envelope are, how items point at each other, how an unknown is written down, how anything is addressed, which checks every volume can be held to — and, in section 18, the four languages enough reads: comprise, cosm, canon and emf.
+where enough's two documents are read: this <strong>help center</strong>, in your ui language, and the <strong>MacroCOSM OES specification</strong>, the shared grammar every <code>.cosm</code> file is written in (english for now). each comes at three densities: <strong>fabula</strong>, every part of it as a card; <strong>short</strong>, the document to read, just as it was written; and <strong>atem</strong>, the whole of it as an outline of one-liners. a word the document defines is a quiet link to its card, and a section's margin says how often the rest of the document points at it and how many examples it holds — click it for the section's card. a card opens with its one line and its place in the document, then says the rest: where its words come from, what it is made of, the checks that touch it, the lenses that draw it, its examples, and every place that mentions it.
 
 ### how
-open it from the <strong>MacroCOSM</strong> button at the top of the ui window, or from <strong>about this format</strong> in the cosm viewer, which lands on the right section. <strong>contents</strong> lists the sections, a "section 18.4" in the text is a link, ⌘F finds, and the size button docks it beside your work. it is written in english for now.
+open the help center from <strong>help</strong> at the top of the ui window, and the specification from <strong>MacroCOSM</strong> beside it, or from <strong>about this format</strong> in the cosm viewer, which lands on the right section. the three buttons in the toolbar switch density (the arrow keys move between them), and the viewer remembers your choice for each document. at <strong>short</strong>, <strong>contents</strong> lists the sections, a section number in the text is a link, ⌘F finds, and a jump leaves a "back to where you were" pill. at <strong>atem</strong>, click any line to read that section; ⌘F there searches only the names and the one-liners. at <strong>fabula</strong>, the <strong>outline</strong> beside the cards turns to a section page, narrows the cards to some kinds of item or to one MiniCOSM, and lists the checks; a card's breadcrumb takes you to its place in the short and the back pill brings you back, <strong>graph around this</strong> draws the item and its neighbours in merirmaid (shift-click a node for <strong>show item</strong>), and ⌘F searches the cards on the page. an example's card is live: its block is read as a volume of its own, says whether it checks out, and opens in a lens or in the cosm viewer. the size button docks the viewer beside your work.
 
 ### ideas
-- start with section 2, the model on one page.
-- keep it docked beside a holotype in the cosm viewer while you learn to read one.
+- in the help center, try <strong>atem</strong> first: the whole manual on a few screens, one line per section.
+- in the specification, start with section 2, the model on one page, and keep it docked beside a holotype in the cosm viewer while you learn to read one.
+- the specification carries comprise's own specification as a chapter: its words, synced read-only, with the commit they came from.
+- at <strong>fabula</strong>, the help bubbles are cards too: every (?) in the app, with the parts of the help center it points to.
+- in the specification, open a kind from <strong>atem</strong>'s reference list: its card shows its fields, the closed lists they use and the manifest that declares it.
 
 ## canon-chip
 name: canon chip
@@ -333,7 +336,7 @@ path: notes.md → notes.md.cosm
 the little group in a text's header, beside the convert chip, that says whether this text has an <strong>EMF twin</strong>: a <code>.cosm</code> file written beside it (<code>notes.md</code> → <code>notes.md.cosm</code>) that takes the text apart into the words it leans on, the people and things it names, the claims it makes and how it knows them, and the events it tells. the twin badge is tinted when there is a twin, hollow when there isn't, and wears a dot when the text has changed since its twin was written. nothing is decompiled on its own — only when you ask.
 
 ### how
-<strong>twin</strong> turns the reader to the twin, at the same size, in place of the text: the cosm viewer's cards, with <strong>back to the text</strong> to return, <strong>compile a short</strong> to write the twin back out as a <em>short</em> — a new markdown telling beside the text, <code>notes.short-2026-10-23-1042.md</code>, as the author told it or by weight (the little ▾ chooses; the twin keeps a list of every short made from it) — <strong>lens</strong> for a diagram and <strong>open raw</strong> for the file itself. with no twin yet, twin decompiles first and turns over when it's done. the <strong>atem</strong> button gives you the whole text in one line (see the atem card). <strong>decompile</strong> makes the twin and <strong>refresh twin</strong> makes it again; when the twin is already up to date, enough asks first. the work shows as a toast you can cancel. with a model running it takes a while, and a chat message you send meanwhile waits its turn; with no model running you get a labelled scaffold — the words and the names, no claims yet.
+<strong>twin</strong> turns the reader to the twin, at the same size, in place of the text: the cosm viewer's cards, with <strong>back to the text</strong> to return, <strong>compile a short</strong> to write the twin back out as a <em>short</em> — a new markdown telling beside the text, <code>notes.short-2026-10-23-1042.md</code>, as the author told it or by weight (the little ▾ chooses; the twin keeps a list of every short made from it) — <strong>lens</strong> for a diagram and <strong>open raw</strong> for the file itself. with no twin yet, twin decompiles first and turns over when it's done. the <strong>atem</strong> button gives you the whole text in one line (see the atem card). <strong>decompile</strong> makes the twin and <strong>refresh twin</strong> makes it again; when the twin is already up to date, enough asks first. the work shows as a toast you can cancel. with a model running it takes a while, and a chat message you send meanwhile waits its turn; with no model running you get a labelled scaffold — the words and the names, no claims yet — and agent free, the label says <em>agent-free</em>.
 
 ### ideas
 - decompile a long chapter once, then read the twin's claims as a checklist of what the chapter really argues.
@@ -504,3 +507,18 @@ start a message with <code>/pal</code> and the rest of it is the ask: <code>/pal
 - put <code>:online</code> on the end of the model id in the OpenRouter settings — <code>anthropic/claude-sonnet-4.5:online</code> — and your pal answers with the web in front of it. it bills extra per search, and it is the fix for a model frozen at its training cutoff.
 - keep it for what a local model cannot have: this week's news, a library released last month, a second opinion on a judgement call you have already made.
 - read the outgoing bubble before you read the answer. it is the only place that shows exactly what left, and it is there on purpose.
+
+## agentmode
+name: agent free
+path: ~/enough/config/ui.json → agent_free
+
+### what
+one switch for the whole machine. <strong>free agent</strong> is how enough has always worked: a model runs, your readvisor reads beside you, councils sit, skills and paradigms shape the replies. <strong>agent free</strong> is no AI at all — no model starts, and everything that needs one steps aside: the readvisor panel and its toggle, the selection chip, "ask your readvisor", the brief introduction, the sidebar's paradigms, readvisors and skills, councils and <code>/pal</code>. what stays is yours to work with by hand: composure, the dictionary, wikisink, canon, convert, paginate, girraph and merirmaid, the cosm viewer, and the docs viewer with this help in it.
+
+### how
+slide it in the ui window, beside the language, or in the model window, where it is the same switch. the words swap as it moves: <em>free agent</em> when it is off, <em>agent free</em> when it is on, and the top bar's badge says <em>agent free</em> for as long as it is. turning it on stops the model at once; turning it off starts it again the ordinary way, and the model window shows it loading. while it is on you can still install and delete models, but not switch to one. canon's ingest bar asks you to confirm the source, the depth and the limits and then fetches by itself, and decompile, atem and compile still work — by rules, labelled agent-free. the choice is kept in <code>~/enough/config/ui.json</code>, and every project opens the way you left it.
+
+### ideas
+- turn it on when the machine needs its memory for something else: a project opens in seconds, with no 5–17 GB model to load.
+- write a first draft agent free, then slide it back and ask your readvisor what it makes of it.
+- on a plane, or anywhere you would rather nothing ran in the background, agent free is the honest setting.

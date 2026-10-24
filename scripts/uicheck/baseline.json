@@ -24,6 +24,7 @@
     "modal-paginate | tiny | div.pg-block>div.pg-choices>label.cv-radio>input": "[tiny] (no text) is only 13x13px",
     "modal-paginate | tiny | div.pg-block>div.pg-row.pg-inline>label.cv-radio>input": "[tiny] (no text) is only 13x13px",
     "modal-ui | tiny | #ui-help-bubbles": "[tiny] (no text) is only 13x13px",
+    "ui-modal-agentfree | tiny | #ui-help-bubbles": "[tiny] (no text) is only 13x13px",
     "modal-wikisink-setup | tiny | #wiki-flavor-list>label.wiki-flavor>input": "[tiny] (no text) is only 13x13px",
     "composure-composures-menu | covered | #comp-menu>button:nth-of-type(38) | #comp-viewport": "pre-existing compPlaceMenu edge; see baseline-notes.md"
   }

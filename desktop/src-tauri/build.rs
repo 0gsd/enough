@@ -40,7 +40,7 @@ use std::path::{Path, PathBuf};
 ///   snapshot once the app runs from it. The single file, NOT `docs/` — the
 ///   dev tree keeps gitignored local planning docs there that must never
 ///   ship (0.2.8; before this the .app's help center 404'd).
-/// - `docs/MACROCOSM_OES.md` — the in-app spec viewer reads it from
+/// - `docs/MACROCOSM_OES.md` — DocOES (the in-app docs viewer, 0.4.4) reads it from
 ///   `<package parent>/docs/` the same way (0.4.3). The single file again,
 ///   for the same reason as HELP_CENTER.
 /// - `reflib/dict` — FEED's shipped text form (~380 MB of JSON lines, plus

@@ -7,7 +7,7 @@ The MacroCOSM OES specification (`docs/MACROCOSM_OES.md`), the MiniCOSM manifest
 covered by this repository's Apache License 2.0, nor by any other licence in this repository.
 
 They are bundled for use within enough only: enough reads the manifests to open, check and draw `.cosm` files,
-and shows the specification in its spec viewer. No other use, copying, redistribution or derivative work is
+and shows the specification in its docs viewer. No other use, copying, redistribution or derivative work is
 licensed. A licence for the specification is still to be decided; until one is published here, all rights are
 reserved.
 
