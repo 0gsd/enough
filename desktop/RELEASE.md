@@ -186,6 +186,18 @@ built with hidden files shown — `.VolumeIcon.icns` got its own icon slot and
 `tauri.conf.json` now pins the layout and a background image (which makes the
 bundler park hidden items off-window), but the check below is what proves it.
 
+**If that window stays open for more than about 30 seconds** (seen once, on
+0.4.4 under macOS 26): the layout is already set and the bundler's script is
+looping, waiting for Finder to write the volume's `.DS_Store`, which it never
+times out on. Nudge Finder from another terminal — the mount point is the
+`/Volumes/dmg.XXXXXXXX` folder (`ls /Volumes`):
+
+    osascript -e 'tell application "Finder" to update disk "dmg.XXXXXXXX"'
+
+The file appears within seconds and the build carries on. Then run the layout
+check below as usual; don't create the `.DS_Store` by hand, which would end
+the loop with no layout in it.
+
 The bundler signs `Contents/MacOS/uv` and then the .app (inside out, as Apple
 requires), reads `entitlements.plist`, applies the hardened runtime, and —
 because `APPLE_API_*` are exported — submits the result to `notarytool` and
