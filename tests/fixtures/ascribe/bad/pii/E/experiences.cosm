@@ -1,0 +1,21 @@
+nodes:
+  - id: E:experience/joining-the-club
+    type: experience
+    name: Joining the club
+    summary: Called the sailing club on +1 415 555 0142 to join.
+    form: F:form/sailing
+    provenance: {mode: manual, sources: [self], confidence: 1}
+
+  - id: E:experience/arrival
+    type: experience
+    name: Arrival
+    summary: Born on 3 March 1990 in a house by the harbour.
+    form: F:form/sailing
+    provenance: {mode: manual, sources: [self], confidence: 1}
+
+  - id: E:experience/coast-walks
+    type: experience
+    name: Coast walks
+    summary: Walked the coast path with Odile Fenwhistle every spring.
+    form: F:form/sailing
+    provenance: {mode: manual, sources: [self], confidence: 1}

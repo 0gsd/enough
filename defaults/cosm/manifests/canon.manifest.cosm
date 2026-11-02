@@ -14,7 +14,7 @@
 # Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
 
 manifest: minicosm/0
-macrocosm: 0.0.1
+macrocosm: 0.0.2
 name: canon
 title: Canon
 version: 1

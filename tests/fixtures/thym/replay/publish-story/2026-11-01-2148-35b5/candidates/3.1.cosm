@@ -1,0 +1,81 @@
+contract:
+  move: 'null'
+  schema:
+    format: yaml
+    stamp: engine
+    says: 'a YAML mapping: sentences, a list in the order told, each {say: one sentence, cites: [the ids of the
+      items it says]}, with paragraph: true on a sentence that starts a new paragraph'
+  checks:
+  - coverage
+  - no-invention
+  - stance-kept
+  - null-pinned
+  - provenance
+inputs:
+  fabula: 11f87a5bb18fe02faaa8b620cdf0f6919717ce1846446b6950be2f0535037a92
+  outline: 2334f71f876e312768f37eaf46c0893abc37e6920606c8cf9802c02bd2d067bb
+engine: model:Qwen3.8-27B-Q4_K_M.gguf
+attempts: 1
+tokens: 2574
+seconds: 27
+output:
+  sentences:
+  - say: The Hollins Lane orchard pressed 140 litres of juice.
+    cites:
+    - T:event/juice-pressing
+    - P:claim/juice-yield-increase
+  - say: This is an increase from 90 litres last year.
+    cites:
+    - P:claim/juice-yield-increase
+  - say: Volunteers spread leaf mould under the trees in March.
+    cites:
+    - T:event/leaf-mould-spread
+  - say: Mara Okafor holds that the leaf mould improved the yield.
+    cites:
+    - P:claim/mulch-effect-on-yield
+  - say: It follows that a warm, wet spring explains the increase.
+    cites:
+    - P:claim/spring-weather-effect
+  - say: Every orchard in the valley did well.
+    cites:
+    - P:claim/spring-weather-effect
+  - say: The Bramley apple tree is by the gate.
+    cites:
+    - E:thing/bramley-apple-tree
+  - say: Reportedly, it is the oldest tree on the lane.
+    cites:
+    - P:claim/oldest-tree-status
+  - say: Parish records do not state its planting date.
+    cites:
+    - P:claim/oldest-tree-status
+  - say: Every apple tree needs a second variety nearby.
+    cites:
+    - P:claim/apple-pollination-requirement
+  - say: This is how apples pollinate.
+    cites:
+    - P:claim/apple-pollination-requirement
+  - say: The meadow strip feeds the pollinators.
+    cites:
+    - E:place/meadow-strip
+  - say: The orchard depends on these pollinators.
+    cites:
+    - K:concept/pollinator-dependence
+  - say: The parish council's grounds team wants to mow in July.
+    cites:
+    - T:event/meadow-mowing-plan
+  - say: It follows that mowing would cut wildflowers before they seed.
+    cites:
+    - P:claim/meadow-mowing-threat
+  - say: The orchard would lose the pollinators it needs.
+    cites:
+    - P:claim/meadow-mowing-threat
+  - say: Mara Okafor will write to the council.
+    cites:
+    - T:event/council-letter-request
+  - say: She asks them to wait until September.
+    cites:
+    - T:event/council-letter-request
+  - say: It is assumed that the lease allows mowing without asking.
+    cites:
+    - P:claim/lease-mowing-question
+  engine: model:Qwen3.8-27B-Q4_K_M.gguf

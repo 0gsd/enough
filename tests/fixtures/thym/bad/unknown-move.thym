@@ -1,0 +1,9 @@
+-- refused: compile unknown-move line 8
+thym 0
+
+program summary
+  why: a move no manifest declares.
+  takes t: text
+  gives s: short
+  give summarise t
+end

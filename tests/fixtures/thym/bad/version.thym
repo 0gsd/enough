@@ -1,0 +1,8 @@
+-- refused: compile version line 2
+thym 1
+
+program nothing
+  why: the version is not zero.
+  gives n: number
+  give 0
+end

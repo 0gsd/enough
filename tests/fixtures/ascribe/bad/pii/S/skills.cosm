@@ -1,0 +1,15 @@
+nodes:
+  - id: S:skill/skipper-licence
+    type: skill
+    name: A skipper's licence
+    summary: Holds skipper licence number 000-12-3456.
+    form: F:form/sailing
+    provenance: {mode: manual, sources: [self], confidence: 1}
+
+  - id: S:skill/rigging
+    type: skill
+    name: Rigging
+    summary: Splicing, whipping and setting up standing rigging.
+    form: F:form/sailing
+    employer: Harbourside Chandlery Ltd
+    provenance: {mode: manual, sources: [self], confidence: 1}

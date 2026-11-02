@@ -1,0 +1,24 @@
+thym 0
+
+context on-the-train
+  why: five minutes on a phone, standing.
+
+  medium "phone"
+  hurry true
+  words 300
+end
+
+program read-my-way
+  why: a package is read on the reader's terms: in a hurry, the short way in;
+       otherwise a telling in the reader's own morph, for this occasion.
+
+  takes p: package, mine: morph, now: context
+  gives r: short
+
+  let f = fabula of p
+  if now.medium is "phone" and now.hurry then
+    give expand (atem f) with f to 300 words     -- the short way in
+  else
+    give read f with mine in now                 -- a telling in my morph, labelled a reading
+  end
+end

@@ -1,0 +1,342 @@
+# Ascribe 1: the MiniCOSM for a person's holograph (Ascribe: a self described well enough that no name is needed).
+#
+# What a program needs to know to read a holograph: a folder whose catalog, holograph.cosm, is the self, declared
+# oes: ascribe/1, with a pseudonymous handle and no name of the person anywhere. Beside the catalog sit ten module
+# folders, one kind each, the kind the singular of the module's name and the letter its initial: A affinity, B belief,
+# C concern, E experience, I interest, O opinion, Q quale, S skill, U understanding, Y yearning. Every node of the self
+# is one of these ten kinds, and every node anchors to a form. The forms live in F: anything a person can love or
+# hate, know well or want to learn (is there an encyclopedia article for it, or should there be?), grounded in FEED
+# where the form is one word that FEED has, with the polyforms that combine them and the relations an author declares.
+# The rest is the author's to shape as they go: hierarchies, branches and flat lists by parts and of, typed links from
+# a short starter list or from relations they declare, a when, a valence and a strength. The dialectic: block holds
+# the opening questions a guided process or an agent asks to help a person fill it in.
+#
+# The prose is docs/ASCRIBE.md (0.5.0, wave 3); this file and the owner's rulings of 2026-11-01 are
+# the spec. The reference reader is enough/macrocosm.py; Ascribe's own checks are enough/ascribe.py. Where this file
+# and the reader disagree, the reader wins and this file is corrected.
+#
+# No personal data, three ways: the schema has no kind or field for it; the no-pii check warns, and never refuses, on
+# what reads like it; and the filter: block keeps private files and restricted nodes out of ingest and transfer.
+#
+# Written in the COSM YAML subset: no anchors, no aliases, no tags, one document. Words that YAML 1.1 reads as
+# booleans (on, off, yes, no) are quoted.
+#
+# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
+
+manifest: minicosm/0
+macrocosm: 0.0.2
+name: ascribe
+title: Ascribe
+version: 1
+summary: "A person's holograph: a self described in ten kinds of node, each anchored to a form, comprehensive enough that a name is unnecessary."
+spec: docs/ASCRIBE.md             # the prose (0.5.0); this manifest is the truth where they differ
+reference: [enough/macrocosm.py, enough/ascribe.py]
+
+declaration:
+  key: oes
+  value: ascribe/1
+  absent: refuse                  # a holograph.cosm without oes: ascribe/1 is refused
+  legacy: []
+  both: oes
+  unknown: refuse
+
+format:
+  extension: .cosm
+  syntax: the COSM YAML subset
+  forbidden: [anchors, aliases, tags, multiple documents]
+  booleans: ['true', 'false']
+  encoding: utf-8
+  byte-order-mark: tolerated
+  newlines: [lf, crlf]
+
+# Laid out as a Holotype's atoms are, minus the parts level: one person, one volume, so the module folders sit directly
+# beside the catalog. The reader reads every module file below the catalog's folder; enough/ascribe.py holds each node
+# to its own module's folder (check id-module), and the catalog may carry a few nodes of any module in its own nodes:.
+volume:
+  catalog: holograph.cosm
+  modules: <module>/              # A/ B/ C/ E/ I/ O/ Q/ S/ U/ Y/ for the ten kinds; F/ for forms, polyforms, relations
+  module-files: '<module folder>/**/*.cosm'
+  module-folder-case: read either, write the capital
+  private-marker: .ascribe-private  # see filter: below
+
+catalog:
+  keys: [oes, macrocosm, id, handle, summary, sample, visibility, pseudonyms, nodes]
+  id: ascribe/<hid>               # ascribe/aej6l5qrka6c6btarfiy2f7vnj
+  hid: '[a-z2-7]{26}'             # 26 characters of lowercase base32, as Connect's hid; checked by enough/ascribe.py
+  handle: 'a pseudonymous handle: lowercase words joined by hyphens (salt-and-crumb); never a name'
+  summary: one line, optional; people appear in it by role, never by name
+  sample: [true, false]           # true on a fixture or a demonstration, never on a real person's holograph
+  visibility: [public, internal, restricted]
+  visibility-absent: internal
+  pseudonyms: 'the stand-in names the author uses for the people in their life ("Wren", "the Captain"), so the
+               no-pii check reads them as declared, not as personal names'
+  never: [the person's name, an email address, a phone number, a postal address, a birth date, a government id,
+          an employer's legal name]
+
+module-file:
+  shapes:
+    - {key: nodes, holds: 'a list of items, each a mapping with a string id'}
+  duplicate-id: load error, the first wins
+
+ids:
+  item-form: '<module>:<kind>/<slug>'
+  node: '<module>:<kind>/<slug>, the kind the module''s one kind: A:affinity/sourdough-baking, Q:quale/starter-smell'
+  form: 'F:form/<slug>, F:polyform/<slug>, F:relation/<slug>'
+  inside-own-volume: bare
+
+paths:
+  form: '<module>/<kind>/<slug>#<field>'
+  levels: [module, kind, item, field]
+  segments:
+    module: '[ABCEIOQSUYF]'
+    kind: '[a-z][a-z0-9-]*'
+    slug: '[A-Za-z0-9](?:[A-Za-z0-9._@-]*[A-Za-z0-9_@-])?'
+    field: '[A-Za-z0-9][A-Za-z0-9_-]*(?:\.[A-Za-z0-9][A-Za-z0-9_-]*|\[[0-9]+\])*'
+  map:
+    - {path: '<module>', id: none}
+    - {path: '<module>/<kind>', id: none}
+    - {path: '<module>/<kind>/<slug>', id: '<module>:<kind>/<slug>'}
+    - {path: '<item path>#<field>', id: none}
+  qualified: 'oes:ascribe/<hid>/<path>'
+  qualified-database: the catalog id without ascribe/
+  case: kept and significant
+  refused: [a leading slash, a trailing slash, an empty segment, '.', '..', percent-encoding, a backslash, whitespace, a colon,
+            non-ASCII or control characters, a segment ending in a dot, a second '#', a kind the module does not declare,
+            more than three segments, 'a Windows reserved name as any segment, in any case, alone or before a dot (con, con.txt, prn, aux, nul, com0-9, lpt0-9)']
+
+# Comprise's envelope, so Thym moves work on both subjects: confidence and sources live in provenance, as they do in
+# Comprise outside P. name is the item's, never the person's. form, of, parts, when, valence and strength are Ascribe's.
+envelope:
+  fields: [id, type, name, summary, status, visibility, provenance, pending, links, span, form, of, parts, when, valence,
+           strength, made]
+  references: [links]
+  required: [id, type, name, summary, provenance]
+  status: [active, dormant, planned, retired]   # retired: once true of the person, no longer (a belief given up)
+  visibility: [public, internal, restricted]
+  visibility-absent: internal
+  provenance:
+    fields: [mode, sources, confidence, state]
+    modes: [dialectic, net-scan, system-scan, integration, structured-intake, manual, derived, asserted, archetype,
+            catalogue, directory, accounting]
+    states: [known, pending, not-disclosed, stale]
+    state-default: known
+    confidence: a number from 0 to 1, how sure the person is
+    sources: 'a dialectic session (session-3), a text the author wrote (notes.md#L3-L7), or self for what they
+              wrote down directly'
+  span: '{lines: "12-18"} or {start: "<up to 60 characters>", end: "<up to 60 characters>"}, optional: where in a
+         text the node was read'
+  form: 'F:form/<slug> or F:polyform/<slug>: what the node is about; every node of the ten kinds carries one (check
+         form-anchored)'
+  of: the node this one is a child of; the parent lists it in parts
+  parts: the node's children, in order; a hierarchy, a branch or a flat list, as the author likes
+  when: 'a date (2014-06-03), a year (2014) or an era word (childhood, 2010s, university); absent, the node is not on
+         the timeline (check when-shape)'
+  valence: 'for, against or mixed: an affinity against something is still an affinity'
+  strength: a whole number from 1 to 5 (check strength-range)
+  made: '{move, run, step, engine}: the Thym move that made the item; {move: none} for a hand-made item (docs/THYM.md
+         5.3); a generic reader keeps it as an unknown field'
+  metadata: on a form it is global, shared by every node anchored to it; on a node it belongs to that node alone
+  open-question: '{pending: "<the question>"}'
+  sentinels: [none, self]
+  unknown-fields: allowed and kept
+
+# The starter relations. links.rels is left out on purpose: a closed list there would make the generic reader refuse a
+# relation an author declares. relation-declared, Ascribe's own check, closes the list instead: a rel is a starter
+# word, or the slug (or the id) of an F:relation the holograph declares, and nothing else, so a typo never becomes a
+# relation.
+links:
+  starter: [is-a, part-of, about, because, before, after, with, against, like, from, toward, see]
+  declared: 'F:relation/<slug>, with a name and a one-line summary giving its sense; a link names it as rel: <slug>'
+  order: before and after order nodes in time without dates
+
+closed-lists:
+  valence: [for, against, mixed]
+  feed.origin: [feed, user]
+
+references:
+  forms:
+    - {form: bare, example: 'F:form/sourdough', names: an item of the same holograph}
+    - {form: typed-link, example: '{rel: because, to: E:experience/first-night-crossing}',
+       names: its to; rel a starter word or a declared relation}
+    - {form: open-question, example: '{pending: "<question>"}', names: an answer still owed}
+  unresolved: error
+  other-people: 'never a reference to another person''s holograph: what one person knows of another is an experience
+                 in their own'
+
+modules:
+  A:
+    name: Affinities
+    subtitle: What you are drawn to, and what you turn from
+    kinds:
+      affinity: {refs: [form, of, parts, links], checked: [when, valence, strength]}
+  B:
+    name: Beliefs
+    subtitle: What you hold to be true
+    kinds:
+      belief: {refs: [form, of, parts, links], checked: [when, valence, strength]}
+  C:
+    name: Concerns
+    subtitle: What weighs on you
+    kinds:
+      concern: {refs: [form, of, parts, links], checked: [when, valence, strength]}
+  E:
+    name: Experiences
+    subtitle: What has happened to you, and what you did
+    kinds:
+      experience: {refs: [form, of, parts, links], checked: [when, valence, strength]}
+  I:
+    name: Interests
+    subtitle: What you want to know more about
+    kinds:
+      interest: {refs: [form, of, parts, links], checked: [when, valence, strength]}
+  O:
+    name: Opinions
+    subtitle: What you think, and would say so
+    kinds:
+      opinion: {refs: [form, of, parts, links], checked: [when, valence, strength]}
+  Q:
+    name: Qualia
+    subtitle: How things feel from the inside
+    kinds:
+      quale: {refs: [form, of, parts, links], checked: [when, valence, strength]}
+  S:
+    name: Skills
+    subtitle: What you can do
+    kinds:
+      skill: {refs: [form, of, parts, links], checked: [when, valence, strength]}
+  U:
+    name: Understandings
+    subtitle: What you have come to understand
+    kinds:
+      understanding: {refs: [form, of, parts, links], checked: [when, valence, strength]}
+  Y:
+    name: Yearnings
+    subtitle: What you long for
+    kinds:
+      yearning: {refs: [form, of, parts, links], checked: [when, valence, strength]}
+  F:
+    name: Forms
+    subtitle: The things a self is about, and how they combine
+    note: forms are shared roots, not nodes of the self; they anchor nothing and need no form of their own
+    kinds:
+      # form: feed is {word, pos, origin: feed|user} when the form is one word FEED has, else {pending: "not in FEED"};
+      # wiki is a URL or an article's title. polyform: forms are the forms it combines; links, {from, rel, to}, join them.
+      form: {refs: [links], checked: [feed, wiki, when]}
+      polyform: {refs: [forms, links, links.from], checked: [feed, wiki, when]}
+      relation: {refs: [], checked: [name, summary]}         # a relation the author declares; links name it by its slug
+
+checks:
+  load: [load]
+  envelope: [duplicate-id, id-grammar, id-module, type, type-prefix, identity-min, provenance, status, visibility, ref-grammar,
+             ref-unresolved, closed-list, pending-shape, catalog-key]
+  own: 'Ascribe''s own checks, run by enough/ascribe.py (lint_holograph) after the generic ones; a generic reader does not run
+        them. form-anchored: every node of the ten kinds names a form or a polyform that exists. relation-declared: every
+        link''s rel is a starter word or a relation the holograph declares. when-shape: a when is a date, a year or an
+        era word. strength-range: a strength is a whole number from 1 to 5. no-pii: an email address, a phone number, an
+        id-like run of digits, a street address, a date that reads as a birth, a field for any of these, or a capitalised
+        pair in a prose field that reads as a personal name, anywhere in the volume, comments included; a warning, never
+        an error. private-marker: what a .ascribe-private marker would keep out of ingest and transfer, a note. The same
+        code also holds id-module to the module folders and catalog-key to the hid and the handle, which the generic
+        reader cannot read from this file.'
+  severity: {no-pii: warning}
+
+open-questions:
+  form: '{pending: "<the question>"}'
+  answered-by: the person; a dialectic may ask it again later
+  field-path: keys joined by ".", list positions as [n]
+  on-the-whole-item: field path node
+
+renderers:
+  - id: self
+    makes: the self at a glance, a branch for each module and a leaf for each node
+    lens: {kind: mermaid, diagram: mindmap, include: [A, B, C, E, I, O, Q, S, U, Y]}
+  - id: timeline
+    makes: every node that carries a when, one row each, dates and years in order and eras after them
+    lens: {kind: table, columns: [when, id, name, valence, strength]}
+  - id: graph
+    makes: every typed link between the nodes and the forms, coloured by valence
+    lens: {kind: mermaid, diagram: flowchart, include: [A, B, C, E, I, O, Q, S, U, Y, F], edges: [links], class-by: valence,
+           shape: {form: '([ ])', polyform: '{{ }}', relation: '[/ /]'}}
+  - {id: text-tree, makes: the text tree, code: [python -m enough.macrocosm tree]}
+
+# The opening questions, three to five for each module, in plain words and in no one's voice. A guided process or an
+# agent asks them and writes what the person says as nodes; nothing else of the dialectic is built in 0.5.0.
+dialectic:
+  status: questions only; the process that asks them is a later round
+  writes: 'nodes with provenance {mode: dialectic, sources: [session-<n>], confidence: <how sure the person is>}'
+  questions:
+    A:
+      - What do you go back to, again and again?
+      - What can you not stand, even when everyone around you loves it?
+      - Which place or kind of work feels most like yours?
+      - What did you love as a child that you still love?
+    B:
+      - What do you believe that most people around you do not?
+      - What did you once believe and no longer do?
+      - What would you hold to even if it cost you something?
+      - What do you take on trust?
+    C:
+      - What keeps you awake at night?
+      - What do you worry about for the people close to you?
+      - Which problem do you wish more people noticed?
+      - If you could fix one thing, what would it be?
+    E:
+      - What happened that changed the direction of your life?
+      - Which day would you live again?
+      - What have you done that you are proud of?
+      - Which stretch of years feels like a chapter of its own?
+    I:
+      - What could you read about for hours?
+      - What have you looked up lately just because you wanted to know?
+      - What would you study if you had a year to spare?
+      - What do you notice that others walk past?
+    O:
+      - What do you think most people get wrong?
+      - What is overrated, and what is underrated?
+      - Which argument would you gladly start at dinner?
+      - What have you changed your mind about lately?
+    Q:
+      - Which sensation do you remember most exactly?
+      - What does your favourite weather feel like?
+      - Which sound, smell or taste takes you straight back somewhere?
+      - What does it feel like when your work is going well?
+    S:
+      - What can you do without thinking about it?
+      - What do people ask you to help with?
+      - What did you learn the hard way?
+      - What are you getting better at right now?
+    U:
+      - What do you understand now that you did not ten years ago?
+      - What could you explain to a curious stranger?
+      - Which idea changed how you see things once it clicked?
+      - What do you know from experience that no book taught you?
+    Y:
+      - What do you wish you had time for?
+      - What would you try if you knew you could not fail?
+      - Where would you go, given the chance?
+      - What do you miss?
+    F:
+      - Which words would you put on a list of things you care about?
+      - What would you look up first in an encyclopedia?
+      - Which subject deserves an article that nobody has written yet?
+      - Which things belong together for you, though others keep them apart?
+
+# What ingest and transfer leave out of a holograph. The rule is declared here; the code that applies it is a later
+# round. enough/ascribe.py's private-marker check reports what a marker would drop, and drops nothing.
+filter:
+  status: declared, not built
+  applies-to: [ingest, transfer]
+  marker: .ascribe-private
+  drops:
+    - every file and folder beside a .ascribe-private marker, with everything below them
+    - every node with visibility restricted
+  keeps: everything else, unchanged; a reference to a dropped node keeps its id and gains no name
+
+public-projection:
+  status: not built
+  isograph: an isograph is a Thym projection of the holograph, made by a program its holder runs (docs/THYM.md)
+  outsiders: no outsider's graph of a person exists
+
+extension:
+  status: not built
+  note: an isograph is a Thym projection of the holograph; no outsider's graph of a person exists

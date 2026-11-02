@@ -1,0 +1,18 @@
+nodes:
+  - id: O:opinion/noon-sight-for-everyone
+    type: opinion
+    name: Everyone should take a noon sight
+    summary: Every sailor ought to be able to find their latitude from the sun at midday.
+    form: F:form/celestial-navigation
+    valence: for
+    strength: 4
+    links:
+      - {rel: because, to: E:experience/first-night-crossing}
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.9}
+
+  - id: O:opinion/recipes-overrated
+    type: opinion
+    name: Recipes are overrated
+    summary: A dough says when it is ready; the clock on the recipe does not.
+    form: F:form/sourdough
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.75}

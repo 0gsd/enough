@@ -290,10 +290,11 @@ def test_the_spec_examples_are_items_that_load(built, tmp_path):
     vol = built["vols"][("macrocosm-oes", "en")]
     blocks = re.findall(r"^```cosm\n(.*?)^```", SPEC.read_text(encoding="utf-8"), re.S | re.M)
     examples = [it for it in vol.items.values() if it.data.get("type") == "example"]
-    assert len(examples) == len(blocks) == 6
+    assert len(examples) == len(blocks) == 8                    # §18.6 ascribe and §18.7 thym added theirs (0.5.0)
     assert [it.data["body"] for it in examples] == blocks
     assert [it.data["declares"] for it in examples] == ["R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/canon",
-                                                        "R:minicosm/emf", "R:minicosm/emf", "R:minicosm/doc"]
+                                                        "R:minicosm/emf", "R:minicosm/emf", "R:minicosm/doc",
+                                                        "R:minicosm/ascribe", "R:minicosm/thym"]
     assert vol.item("S:example/6").data["in"] == "S:section/18.5.5"
     for it in examples:
         decl = it.data["declaration"]
@@ -368,11 +369,13 @@ def test_manifests_become_reference_items():
     by = {it["id"]: it for it in items}
     count = Counter((it["type"], it["id"].split("/", 1)[1].split(".", 1)[0]) for it in items
                     if it["type"] in ("module", "kind", "list"))
-    assert [(count[("module", m)], count[("kind", m)]) for m in ("comprise", "cosm", "canon", "emf", "doc")] == \
-        [(8, 71), (1, 9), (1, 3), (6, 10), (4, 12)]
+    assert [(count[("module", m)], count[("kind", m)])
+            for m in ("comprise", "cosm", "canon", "emf", "doc", "ascribe", "thym")] == \
+        [(8, 71), (1, 9), (1, 3), (6, 10), (4, 12), (11, 13), (5, 12)]
     assert [count[("list", m)] for m in ("comprise", "cosm", "canon", "emf")] == [4, 1, 4, 8]
     assert [it["id"] for it in items if it["type"] == "minicosm"] == \
-        ["R:minicosm/comprise", "R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/emf", "R:minicosm/doc"]
+        ["R:minicosm/comprise", "R:minicosm/cosm", "R:minicosm/canon", "R:minicosm/emf", "R:minicosm/doc",
+         "R:minicosm/ascribe", "R:minicosm/thym"]
     checks = [it["id"].split("/", 1)[1] for it in items if it["type"] == "check"]
     assert checks == list(mc.CHECKS) + list(D.DOC_CHECKS)
     claim = by["R:kind/emf.P.claim"]
@@ -384,7 +387,8 @@ def test_manifests_become_reference_items():
     assert by["R:module/emf.P"]["atem"] == "What the text claims, and how it knows"
     assert by["R:check/ref-unresolved"]["atem"] == "a reference that names nothing in the volume"
     assert by["R:check/ref-unresolved"]["selected_by"] == [f"R:minicosm/{m}" for m in ("comprise", "cosm", "canon",
-                                                                                         "emf", "doc")]
+                                                                                         "emf", "doc", "ascribe",
+                                                                                         "thym")]
     assert by["R:check/module-none"]["selected_by"] == ["R:minicosm/comprise"]
     assert by["R:check/atem-shape"]["severity"] == "error" and by["R:check/atem-shape"]["atem"] == "an item with no atem"
     assert by["R:list/emf.stance"]["meanings"]["assumed"].startswith("taken for granted")
@@ -474,7 +478,7 @@ the specification, read in section 18.4.
     assert w["how"] == "see section 11 for <strong>setup</strong>, and section 11.2."
     assert w["ideas"] == "- save the articles a project leans on."
     assert w["see"] == ["S:section/11", "S:section/11.2"]
-    assert items[1]["xrefs"] == ["macrocosm-oes@0.0.1:section:18.4"] and "see" not in items[1]
+    assert items[1]["xrefs"] == ["macrocosm-oes@0.0.2:section:18.4"] and "see" not in items[1]
     assert w["provenance"]["sources"] == ["help-docs.md#L5-L17"]
 
 
@@ -596,14 +600,14 @@ def test_inventory_and_cross_volume_references(built):
     vol = built["vols"][("macrocosm-oes", "en")]
     rows = D.inventory(vol)
     by_xref = {r["xref"]: r for r in rows}
-    own = by_xref["macrocosm-oes@0.0.1:section:18.5"]
-    assert own == {"inventory": "macrocosm-oes", "xref": "macrocosm-oes@0.0.1:section:18.5",
-                   "id": "S:section/18.5", "kind": "section", "version": "0.0.1", "anchor": "sec-18-5",
+    own = by_xref["macrocosm-oes@0.0.2:section:18.5"]
+    assert own == {"inventory": "macrocosm-oes", "xref": "macrocosm-oes@0.0.2:section:18.5",
+                   "id": "S:section/18.5", "kind": "section", "version": "0.0.2", "anchor": "sec-18-5",
                    "atem": vol.item("S:section/18.5").data["atem"]}
     assert by_xref["comprise@1:section:2.5"]["id"] == "S:section/comprise.2.5"
     assert by_xref["comprise@1:term:concern"]["id"] == "T:term/comprise.concern"
     assert by_xref["comprise@1:kind:C.bond"]["id"] == "R:kind/comprise.C.bond"     # the reference Comprise declares
-    assert by_xref["macrocosm-oes@0.0.1:kind:comprise.C.bond"]["id"] == "R:kind/comprise.C.bond"
+    assert by_xref["macrocosm-oes@0.0.2:kind:comprise.C.bond"]["id"] == "R:kind/comprise.C.bond"
     assert D.resolve_xref("comprise@1:section:P.3.1", rows)["id"] == "S:section/comprise.P.3.1"
     assert D.resolve_xref("comprise@1:section:99", rows) is None
     assert D.resolve_xref("comprise@2:section:2.5", rows) is None                   # the version is part of it

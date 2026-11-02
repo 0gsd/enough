@@ -1,7 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" id="comp-redo" viewBox="0 0 72 72">
-  <g transform="translate(72,0) scale(-1,1)">
-    <path d="M15 34 C22 18 48 15 56 29 C63 42 54 56 39 56" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" />
-    <polyline points="26,26 14,34 21,46" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-2 {
+        opacity: .3;
+      }
+
+      .cls-2, .cls-3, .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-3 {
+        opacity: .7;
+      }
+
+      .cls-5 {
+        fill: #00a550;
+      }
+
+      .cls-6 {
+        fill: #4b3aa8;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="14.83" y1="19.83" x2="57.05" y2="62.05" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" />
+      <stop offset="0" stop-color="#fff" stop-opacity=".99" />
+      <stop offset=".23" stop-color="#fff" stop-opacity=".69" />
+      <stop offset=".43" stop-color="#fff" stop-opacity=".45" />
+      <stop offset=".62" stop-color="#fff" stop-opacity=".25" />
+      <stop offset=".78" stop-color="#fff" stop-opacity=".12" />
+      <stop offset=".91" stop-color="#fff" stop-opacity=".03" />
+      <stop offset="1" stop-color="#fff" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <g id="c-white">
+    <rect class="cls-1" x="12.31" y="22.36" width="47.27" height="37.16" />
+  </g>
+  <g id="comp-redo">
+    <path d="M9.06,8.89h54v54H9.06V8.89ZM12.43,19.01h47.25v-6.75H12.43v6.75ZM12.43,59.51h47.25V22.39H12.43v37.12ZM22.56,25.76h3.38v3.38h-3.38v-3.38ZM22.56,32.51h3.38v3.38h-3.38v-3.38ZM22.56,39.26h3.38v3.38h-3.38v-3.38ZM22.56,46.01h3.38v3.38h-3.38v-3.38ZM22.56,52.76h3.38v3.38h-3.38v-3.38ZM42.28,33.2l7.96,7.91-7.96,7.96-2.32-2.37,3.85-3.9h-12.81v-3.38h12.81l-3.85-3.85,2.32-2.37Z" />
+    <polygon class="cls-5" points="43.28 33.2 51.24 41.11 43.28 49.07 40.96 46.7 44.81 42.8 31.99 42.8 31.99 39.42 44.81 39.42 40.96 35.57 43.28 33.2" />
+  </g>
+  <g id="c-bar">
+    <rect class="cls-6" x="12.28" y="12.24" width="47.41" height="6.75" />
+    <rect class="cls-4" x="15.68" y="13.92" width="3.38" height="3.38" />
+    <rect class="cls-3" x="22.43" y="13.92" width="3.38" height="3.38" />
+    <rect class="cls-2" x="29.18" y="13.92" width="3.38" height="3.38" />
   </g>
 </svg>

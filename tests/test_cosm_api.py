@@ -1,6 +1,6 @@
 """The read routes for `.cosm` volumes (0.4.3): `GET /api/cosm`,
-`GET /api/cosm/lens`, `POST /api/cosm/lint`, `GET /api/macrocosm/manifests`
-and `GET /api/macrocosm-spec`, over P1's fixtures — a Comprise Holotype in a
+`GET /api/cosm/lens`, `POST /api/cosm/lint`, `GET /api/macrocosm/manifests`,
+`GET /api/macrocosm-spec` and `GET /api/thym-spec` (0.5.0), over P1's fixtures — a Comprise Holotype in a
 Canon volume, an EMF twin and a standalone EMF in the project, a Canon
 volume's catalog, the project catalog, a crafted bad volume and a refused
 declaration.
@@ -158,6 +158,31 @@ def test_macrocosm_spec(client: TestClient):
         assert r.status_code == 200, lang
         assert r.headers["content-type"].startswith("text/markdown")
         assert r.text == english, lang
+
+
+def test_thym_spec(client: TestClient):
+    """`GET /api/thym-spec` (0.5.0) is `/api/macrocosm-spec`'s twin for docs/THYM.md: raw markdown, English for
+    every language (none ships translated), an unknown or hostile `lang` never used as a path."""
+    english = (REPO / "docs" / "THYM.md").read_text(encoding="utf-8")
+    for lang in ("en", "fr", "ja", "xx", "../../etc"):
+        r = client.get("/api/thym-spec", params={"lang": lang})
+        assert r.status_code == 200, lang
+        assert r.headers["content-type"].startswith("text/markdown")
+        assert r.text == english, lang
+    assert english.startswith("# Thym 0")
+
+
+def test_thym_spec_is_home_accessible(tmp_path: Path):
+    """Like the MacroCOSM spec, the Thym spec is project-independent: a home-mode server answers it."""
+    from enough.server import HOME_PATHS
+    assert "/api/thym-spec" in HOME_PATHS and "/api/macrocosm-spec" in HOME_PATHS
+    proj = tmp_path / "project"
+    proj.mkdir()
+    app = create_app(proj, "http://localhost:9", supervise=False, home=True)
+    with TestClient(app) as c:
+        r = c.get("/api/thym-spec")
+        assert r.status_code == 200 and r.text.startswith("# Thym 0")
+        assert c.get("/api/cosm", params={"path": "x.cosm"}).status_code == 404     # a project route stays shut
 
 
 def test_cosm_payload_carries_the_checks_panel_and_files(client: TestClient):

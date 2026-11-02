@@ -1,10 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" id="comp-file-entry" viewBox="0 0 72 72">
-  <rect x="24" y="10" width="24" height="26" rx="2" ry="2" fill="none" stroke="#000" stroke-width="3" />
-  <line x1="30" y1="18" x2="42" y2="18" stroke="#000" stroke-width="3" stroke-linecap="round" />
-  <line x1="30" y1="24" x2="42" y2="24" stroke="#000" stroke-width="3" stroke-linecap="round" />
-  <line x1="30" y1="30" x2="37" y2="30" stroke="#000" stroke-width="3" stroke-linecap="round" />
-  <polyline points="30,40 36,46 42,40" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-  <polyline points="12,44 12,60 60,60 60,44" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-  <polyline points="12,44 22,44 26,51 46,51 50,44 60,44" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-2 {
+        opacity: .3;
+      }
+
+      .cls-2, .cls-3, .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-3 {
+        opacity: .7;
+      }
+
+      .cls-5 {
+        fill: #00b2e1;
+      }
+
+      .cls-6 {
+        fill: #4b3aa8;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="14.83" y1="19.83" x2="57.05" y2="62.05" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" />
+      <stop offset="0" stop-color="#fff" stop-opacity=".99" />
+      <stop offset=".23" stop-color="#fff" stop-opacity=".69" />
+      <stop offset=".43" stop-color="#fff" stop-opacity=".45" />
+      <stop offset=".62" stop-color="#fff" stop-opacity=".25" />
+      <stop offset=".78" stop-color="#fff" stop-opacity=".12" />
+      <stop offset=".91" stop-color="#fff" stop-opacity=".03" />
+      <stop offset="1" stop-color="#fff" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <g id="c-white">
+    <rect class="cls-1" x="12.31" y="22.36" width="47.27" height="37.16" />
+  </g>
+  <g id="comp-file-entry">
+    <path d="M32.59,62.85H8.96V8.85h54v23.62h-3.38v-10.12H12.34v37.12h20.25v3.38ZM12.34,18.98h47.25v-6.75H12.34v6.75ZM15.71,13.92h3.38v3.38h-3.38v-3.38ZM22.46,13.92h3.38v3.38h-3.38v-3.38ZM29.21,13.92h3.38v3.38h-3.38v-3.38ZM59.59,39.23h3.38v11.81c0,1.65-.31,3.19-.92,4.61-.62,1.42-1.46,2.67-2.53,3.74-1.07,1.07-2.32,1.92-3.74,2.53-1.42.61-2.96.92-4.61.92s-3.2-.31-4.64-.92c-1.44-.62-2.69-1.46-3.74-2.53s-1.89-2.32-2.5-3.74c-.62-1.42-.92-2.96-.92-4.61v-11.81c0-2.35.82-4.35,2.45-5.99s3.63-2.45,5.99-2.45,4.35.82,5.99,2.45,2.45,3.63,2.45,5.99v11.81c0,1.44-.48,2.65-1.45,3.61-.97.97-2.17,1.45-3.61,1.45s-2.65-.48-3.61-1.45c-.97-.97-1.45-2.17-1.45-3.61v-11.81h3.38v11.81c0,.49.16.9.47,1.21s.72.47,1.21.47.9-.16,1.21-.47.47-.72.47-1.21v-11.81c0-1.44-.48-2.65-1.45-3.61-.97-.97-2.17-1.45-3.61-1.45s-2.65.48-3.61,1.45c-.97.97-1.45,2.17-1.45,3.61v11.81c0,2.36.82,4.35,2.45,5.99s3.63,2.45,5.99,2.45,4.35-.82,5.99-2.45,2.45-3.63,2.45-5.99v-11.81Z" />
+    <path class="cls-5" d="M58.59,38.23h3.38v11.81c0,1.65-.31,3.19-.92,4.61-.62,1.42-1.46,2.67-2.53,3.74-1.07,1.07-2.32,1.92-3.74,2.53-1.42.61-2.96.92-4.61.92s-3.2-.31-4.64-.92c-1.44-.62-2.69-1.46-3.74-2.53s-1.89-2.32-2.5-3.74c-.62-1.42-.92-2.96-.92-4.61v-11.81c0-2.35.82-4.35,2.45-5.99s3.63-2.45,5.99-2.45,4.35.82,5.99,2.45,2.45,3.63,2.45,5.99v11.81c0,1.44-.48,2.65-1.45,3.61-.97.97-2.17,1.45-3.61,1.45s-2.65-.48-3.61-1.45c-.97-.97-1.45-2.17-1.45-3.61v-11.81h3.38v11.81c0,.49.16.9.47,1.21s.72.47,1.21.47.9-.16,1.21-.47.47-.72.47-1.21v-11.81c0-1.44-.48-2.65-1.45-3.61-.97-.97-2.17-1.45-3.61-1.45s-2.65.48-3.61,1.45c-.97.97-1.45,2.17-1.45,3.61v11.81c0,2.36.82,4.35,2.45,5.99s3.63,2.45,5.99,2.45,4.35-.82,5.99-2.45,2.45-3.63,2.45-5.99v-11.81Z" />
+  </g>
+  <g id="c-bar">
+    <rect class="cls-6" x="12.28" y="12.24" width="47.41" height="6.75" />
+    <rect class="cls-4" x="15.68" y="13.92" width="3.38" height="3.38" />
+    <rect class="cls-3" x="22.43" y="13.92" width="3.38" height="3.38" />
+    <rect class="cls-2" x="29.18" y="13.92" width="3.38" height="3.38" />
+  </g>
 </svg>

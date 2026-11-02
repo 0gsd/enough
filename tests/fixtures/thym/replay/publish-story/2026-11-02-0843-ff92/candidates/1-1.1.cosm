@@ -1,0 +1,124 @@
+contract:
+  move: derive
+  schema:
+    format: text
+    engine: passage
+  checks:
+  - span-resolves
+  - stance-closed
+  - terms-grounded
+  - coverage
+  - emf-checks
+  - provenance
+inputs:
+  messages: 4a46b48b14b824eba4e60eb74c550598465e8288b9494ec8039cec104df5fb8b
+engine: model:Qwen3.8-27B-Q4_K_M.gguf
+attempts: 1
+tokens: 5058
+seconds: 138
+output: "nodes:\n  - id: P:claim/bramley-oldest-tree\n    type: claim\n    name: Bramley by the gate is the oldest\
+  \ tree\n    summary: Mara Okafor states that the Bramley apple tree by the gate is the oldest tree on the lane.\n\
+  \    stance: hearsay\n    salience: normal\n    roles:\n      actor: E:person/mara-okafor\n      object: E:thing/bramley-tree\n\
+  \    links:\n      - rel: supports\n        to: P:claim/parish-records-silent\n    span:\n      lines: \"3-5\"\
+  \n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L3-L5\n      confidence: 0.9\n    \
+  \  state: known\n\n  - id: P:claim/parish-records-silent\n    type: claim\n    name: Parish records do not state\
+  \ planting date\n    summary: The parish records do not specify when the Bramley tree was planted.\n    stance:\
+  \ observed\n    salience: low\n    roles:\n      object: E:thing/parish-records\n    links:\n      - rel: supports\n\
+  \        to: P:claim/bramley-oldest-tree\n    span:\n      lines: \"4-5\"\n    provenance:\n      mode: derived\n\
+  \      sources:\n        - notes.md#L4-L5\n      confidence: 0.95\n      state: known\n\n  - id: P:claim/apple-pollination-requirement\n\
+  \    type: claim\n    name: Apple trees need a second variety to set fruit\n    summary: Every apple tree requires\
+  \ a second variety nearby to enable pollination and fruit setting.\n    stance: axiom\n    salience: critical\n\
+  \    roles:\n      object: K:concept/apple-pollination\n    links:\n      - rel: supports\n        to: P:claim/meadow-mowing-threat\n\
+  \    span:\n      lines: \"7-8\"\n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L7-L8\n\
+  \      confidence: 1.0\n      state: known\n\n  - id: P:claim/juice-yield-increase\n    type: claim\n    name:\
+  \ Orchard juice yield increased to 140 litres\n    summary: The Hollins Lane orchard produced 140 litres of juice\
+  \ this year, an increase from 90 litres last year.\n    stance: observed\n    salience: high\n    roles:\n   \
+  \   actor: E:place/hollins-lane-orchard\n      object: E:thing/juice\n    links:\n      - rel: supports\n    \
+  \    to: P:claim/mulch-vs-weather-debate\n    span:\n      lines: \"10-11\"\n    provenance:\n      mode: derived\n\
+  \      sources:\n        - notes.md#L10-L11\n      confidence: 0.95\n      state: known\n\n  - id: P:claim/mulch-vs-weather-debate\n\
+  \    type: claim\n    name: Cause of yield increase is debated\n    summary: Mara Okafor attributes the yield\
+  \ increase to leaf mould, while the author suggests a warm, wet spring is the more likely cause.\n    stance:\
+  \ opinion\n    salience: high\n    roles:\n      actor: E:person/mara-okafor\n      object: K:concept/leaf-mould\n\
+  \    links:\n      - rel: contradicts\n        to: P:claim/mulch-caused-yield-rise\n    span:\n      lines: \"\
+  13-15\"\n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L13-L15\n      confidence: 0.8\n\
+  \      state: known\n\n  - id: P:claim/mulch-caused-yield-rise\n    type: claim\n    name: Leaf mould caused the\
+  \ yield rise\n    summary: Mara Okafor believes the leaf mould spread under the trees in March made the difference\
+  \ in fruit yield.\n    stance: opinion\n    salience: normal\n    roles:\n      actor: E:person/mara-okafor\n\
+  \      object: K:concept/leaf-mould\n    links:\n      - rel: supports\n        to: P:claim/mulch-vs-weather-debate\n\
+  \    span:\n      lines: \"13-14\"\n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L13-L14\n\
+  \      confidence: 0.7\n      state: known\n\n  - id: P:claim/meadow-mowing-threat\n    type: claim\n    name:\
+  \ July mowing threatens orchard pollinators\n    summary: Mowing the meadow strip in July would cut wildflowers\
+  \ before they seed, harming the pollinators the orchard depends on.\n    stance: deduced\n    salience: critical\n\
+  \    roles:\n      actor: E:org/parish-council\n      object: K:concept/pollinator\n    links:\n      - rel: depends-on\n\
+  \        to: P:claim/apple-pollination-requirement\n    span:\n      lines: \"17-20\"\n    provenance:\n     \
+  \ mode: derived\n      sources:\n        - notes.md#L17-L20\n      confidence: 0.9\n      state: known\n\n  -\
+  \ id: P:claim/lease-uncertainty\n    type: claim\n    name: Uncertainty over parish mowing rights\n    summary:\
+  \ It is an open question whether the lease allows the parish to mow the meadow without asking the orchard keepers.\n\
+  \    stance: assumed\n    salience: high\n    roles:\n      object: E:thing/lease\n    links:\n      - rel: depends-on\n\
+  \        to: P:claim/meadow-mowing-threat\n    span:\n      lines: \"25\"\n    provenance:\n      mode: derived\n\
+  \      sources:\n        - notes.md#L25\n      confidence: 0.6\n      state: known\n\n  - id: T:event/juice-count\n\
+  \    type: event\n    name: Juice bottle count\n    summary: The author counted the juice bottles on 12 October.\n\
+  \    agent: E:person/author\n    patient: E:thing/juice\n    when: 12 October\n    span:\n      lines: \"10-11\"\
+  \n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L10-L11\n      confidence: 0.95\n \
+  \     state: known\n\n  - id: T:event/leaf-mould-spread\n    type: event\n    name: Leaf mould spread under trees\n\
+  \    summary: Volunteers spread leaf mould under the trees in March.\n    agent: E:org/volunteers\n    patient:\
+  \ K:concept/leaf-mould\n    when: March\n    span:\n      lines: \"13\"\n    provenance:\n      mode: derived\n\
+  \      sources:\n        - notes.md#L13\n      confidence: 0.9\n      state: known\n\n  - id: T:event/planned-mowing\n\
+  \    type: event\n    name: Planned meadow mowing\n    summary: The parish council's grounds team wants to mow\
+  \ the meadow strip in July.\n    agent: E:org/parish-council\n    patient: E:place/meadow-strip\n    when: July\n\
+  \    span:\n      lines: \"17\"\n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L17\n\
+  \      confidence: 0.9\n      state: known\n\n  - id: T:event/letter-writing\n    type: event\n    name: Mara\
+  \ to write letter to council\n    summary: Mara Okafor will write a letter to the council asking them to wait\
+  \ until September.\n    agent: E:person/mara-okafor\n    patient: E:thing/letter\n    span:\n      lines: \"22-23\"\
+  \n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L22-L23\n      confidence: 0.9\n  \
+  \    state: known\n\n  - id: K:concept/apple-pollination\n    type: concept\n    name: Apple pollination\n   \
+  \ summary: The process by which apple trees require a second variety nearby to set fruit.\n    span:\n      lines:\
+  \ \"7-8\"\n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L7-L8\n      confidence: 1.0\n\
+  \      state: known\n\n  - id: K:concept/leaf-mould\n    type: concept\n    name: Leaf mould\n    summary: Loose\
+  \ soil rich in organic matter used as mulch under trees.\n    span:\n      lines: \"13\"\n    provenance:\n  \
+  \    mode: derived\n      sources:\n        - notes.md#L13\n      confidence: 0.9\n      state: known\n\n  - id:\
+  \ K:concept/pollinator\n    type: concept\n    name: Pollinator\n    summary: An agent, often an insect, that\
+  \ carries pollen from flower to flower.\n    span:\n      lines: \"19-20\"\n    provenance:\n      mode: derived\n\
+  \      sources:\n        - notes.md#L19-L20\n      confidence: 1.0\n      state: known\n\n  - id: K:concept/hearsay\n\
+  \    type: concept\n    name: Hearsay\n    summary: Information passed along secondhand, repeated from what someone\
+  \ else said.\n    span:\n      lines: \"5\"\n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L5\n\
+  \      confidence: 0.9\n      state: known\n\n  - id: E:person/mara-okafor\n    type: person\n    name: Mara Okafor\n\
+  \    summary: The keeper of the Hollins Lane orchard since 2019.\n    span:\n      lines: \"3\"\n    provenance:\n\
+  \      mode: derived\n      sources:\n        - notes.md#L3\n      confidence: 1.0\n      state: known\n\n  -\
+  \ id: E:place/hollins-lane-orchard\n    type: place\n    name: Hollins Lane orchard\n    summary: The orchard\
+  \ located on Hollins Lane.\n    span:\n      lines: \"1\"\n    provenance:\n      mode: derived\n      sources:\n\
+  \        - notes.md#L1\n      confidence: 1.0\n      state: known\n\n  - id: E:thing/bramley-tree\n    type: thing\n\
+  \    name: Bramley by the gate\n    summary: The oldest apple tree on the lane, a Bramley variety.\n    span:\n\
+  \      lines: \"3-4\"\n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L3-L4\n      confidence:\
+  \ 0.9\n      state: known\n\n  - id: E:org/parish-council\n    type: org\n    name: Parish council\n    summary:\
+  \ The local governing body with a grounds team that wants to mow the meadow.\n    span:\n      lines: \"17\"\n\
+  \    provenance:\n      mode: derived\n      sources:\n        - notes.md#L17\n      confidence: 0.9\n      state:\
+  \ known\n\n  - id: E:place/meadow-strip\n    type: place\n    name: Meadow strip\n    summary: A strip of land\
+  \ that exists to feed the pollinators the orchard depends on.\n    span:\n      lines: \"17-19\"\n    provenance:\n\
+  \      mode: derived\n      sources:\n        - notes.md#L17-L19\n      confidence: 0.9\n      state: known\n\n\
+  \  - id: E:thing/lease\n    type: thing\n    name: Lease\n    summary: The legal agreement that may or may not\
+  \ allow the parish to mow without asking.\n    span:\n      lines: \"25\"\n    provenance:\n      mode: derived\n\
+  \      sources:\n        - notes.md#L25\n      confidence: 0.8\n      state: known\n\n  - id: L:term/pollinate\n\
+  \    type: term\n    name: pollinate\n    summary: To transfer pollen to a flower's stigma, enabling fertilization.\n\
+  \    sense: verb\n    span:\n      lines: \"8\"\n    provenance:\n      mode: derived\n      sources:\n      \
+  \  - notes.md#L8\n      confidence: 1.0\n      state: known\n\n  - id: L:term/pollinator\n    type: term\n   \
+  \ name: pollinator\n    summary: An agent, often an insect such as a bee, that carries pollen from flower to flower.\n\
+  \    sense: noun\n    span:\n      lines: \"19-20\"\n    provenance:\n      mode: derived\n      sources:\n  \
+  \      - notes.md#L19-L20\n      confidence: 1.0\n      state: known\n\n  - id: L:term/hearsay\n    type: term\n\
+  \    name: hearsay\n    summary: Information passed along secondhand, repeated from what someone else said rather\
+  \ than known directly.\n    sense: noun\n    span:\n      lines: \"5\"\n    provenance:\n      mode: derived\n\
+  \      sources:\n        - notes.md#L5\n      confidence: 1.0\n      state: known\n\n  - id: L:term/leaflet\n\
+  \    type: term\n    name: leaflet\n    summary: A small printed sheet distributed for information or advertising.\n\
+  \    sense: noun\n    span:\n      lines: \"8\"\n    provenance:\n      mode: derived\n      sources:\n      \
+  \  - notes.md#L8\n      confidence: 1.0\n      state: known\n\n  - id: L:term/quirk\n    type: term\n    name:\
+  \ quirk\n    summary: A small peculiarity of behavior or style.\n    sense: noun\n    span:\n      lines: \"8\"\
+  \n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L8\n      confidence: 1.0\n      state:\
+  \ known\n\n  - id: L:term/mould\n    type: term\n    name: mould\n    summary: Commonwealth spelling of mold:\
+  \ a fuzzy fungal growth, loose soil rich in organic matter.\n    sense: noun\n    span:\n      lines: \"13\"\n\
+  \    provenance:\n      mode: derived\n      sources:\n        - notes.md#L13\n      confidence: 1.0\n      state:\
+  \ known\n\n  - id: X:atem/1\n    type: atem\n    name: Meadow mowing threat\n    summary: The parish council's\
+  \ plan to mow the meadow in July threatens the pollinators the orchard depends on.\n    line: \"Mowing then would\
+  \ cut the wildflowers before they seed, and the strip exists to feed the pollinators the orchard depends on.\"\
+  \n    focus: P:claim/meadow-mowing-threat\n    push: T:event/planned-mowing\n    pull: K:concept/pollinator\n\
+  \    span:\n      lines: \"17-20\"\n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L17-L20\n\
+  \      confidence: 0.9\n      state: known\n"

@@ -1,6 +1,6 @@
 [project]
 name = "enough"
-version = "0.4.4"
+version = "0.5.0"
 description = "A paradigmless personal computer harness powered by a local LLM."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -50,6 +50,11 @@ dependencies = [
     "pypdf>=5",
     # .cosm files (enough/macrocosm.py): the COSM YAML subset
     "pyyaml>=6.0",
+    # sealed Thym packages (enough/thym/vault.py, 0.5.0): AES-256-GCM, so that a
+    # package sealed here is Comprise's comprise-bundle/0 exactly and opens
+    # there, and the reverse (owner decision, 2026-11-02). Without it the
+    # module falls back to an HMAC-SHA256 AEAD named in the file.
+    "cryptography>=43",
 ]
 
 [project.optional-dependencies]

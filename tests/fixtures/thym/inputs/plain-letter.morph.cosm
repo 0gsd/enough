@@ -1,0 +1,18 @@
+oes: thym/1
+kind: morph
+id: thym/plain-letter
+name: plain-letter
+# A hand-declared morph for the conformance suite: a letter home, personal, a little hedged, never ornate.
+# Unlisted scales sit at 1, the null's value.
+nodes:
+  - id: M:morph/plain-letter
+    type: morph
+    name: plain-letter
+    summary: A letter home, personal, a little hedged, never ornate.
+    declared: true
+    shared: false
+    scales: {register: 1, sentence-length: 1, paragraph-rhythm: 1, analytical-depth: 1, figurative-density: 1,
+             stance-style: 3, person-voice: 4, formality: 2, humour: 1, allusion: 1}
+    toward: casual
+    pinned: []
+    provenance: {mode: manual, sources: ["plain-letter.morph.cosm"], confidence: 1}

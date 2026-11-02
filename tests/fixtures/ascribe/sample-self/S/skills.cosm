@@ -1,0 +1,19 @@
+nodes:
+  - id: S:skill/keeping-a-starter
+    type: skill
+    name: Keeping a starter alive
+    summary: Feeding, storing and reviving a starter through holidays and heatwaves.
+    form: F:form/sourdough
+    strength: 5
+    when: 2016
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.95}
+
+  - id: S:skill/noon-sight
+    type: skill
+    name: Taking a noon sight
+    summary: Finding latitude from the sun at midday with a sextant and a table.
+    form: F:form/celestial-navigation
+    strength: 3
+    links:
+      - {rel: learned-in, to: E:experience/winter-navigation-class}
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.8}

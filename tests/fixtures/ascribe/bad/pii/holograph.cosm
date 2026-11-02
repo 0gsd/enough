@@ -1,0 +1,9 @@
+oes: ascribe/1
+
+# A bad holograph: every no-PII pattern, once each, as warnings and nothing else (tests/test_ascribe.py). Every value
+# is invented: the email domain is reserved for examples, the phone number is in a range kept for fiction, and no
+# government issues an id that starts with three zeros.
+
+id: ascribe/ouks4bpkvoamjwh2w5zp7v5d77
+handle: harbour-notes
+sample: true

@@ -1,0 +1,31 @@
+isotype: comprise-isotype/0
+hid: null
+epoch: 2026-Q4
+cadence: quarterly
+sample: true
+identity:
+  name: Meadow Software
+  domains:
+  - meadow.example
+  founded: 2019
+  kind: company
+shape:
+  employees: none
+offers:
+- name: CSV importer
+  summary: Manual upload path for banks without a feed; also the first-day import.
+  kind: product
+- name: Bank sync
+  summary: Pulls and normalises bank feeds overnight.
+  kind: service
+- name: Reconcile
+  summary: Categorises, matches and closes each day; writes the morning summary.
+  kind: service
+- name: Tip-out
+  summary: Allocates pooled tips by the house rule.
+  kind: service
+seeks: []
+open_to: []
+program:
+  name: open-house
+  sha256: 79df51f9ad8a8db5a31572b59c8a2de4a8aed946b6d11ceb5487b97c2426e0cc

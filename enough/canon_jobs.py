@@ -12,9 +12,11 @@ derivation never share the local model. While it waits for the lock its state is
 the model". A rules-mode job never takes the lock. Whether a job is model or rules is decided once, before it
 starts (`llm.reachable`), and never changes mid-job: if the model stops answering, the job fails with words.
 
-Snapshot: `{id, kind: emf|atem|compile|pin, path, state: queued|running|done|failed|cancelled, phase, chunk,
-chunks, message, mode: model|rules, result, error, started_at, finished_at}`, plus `reason: "agent-free"` on a rules
-job agent-free mode chose (0.4.4) — absent otherwise, so every other snapshot keeps its 0.4.3 shape.
+Snapshot: `{id, kind: emf|atem|compile|pin|thym|read, path, state: queued|running|done|failed|cancelled, phase,
+chunk, chunks, message, mode: model|rules, result, error, started_at, finished_at}`, plus `reason: "agent-free"` on a
+rules job agent-free mode chose (0.4.4) — absent otherwise, so every other snapshot keeps its 0.4.3 shape. A Thym run
+(0.5.0, kind `thym`, and a reading, kind `read`) also reports `progress: {node, of, name, move, state}`, the node it is
+at, beside `chunk`/`chunks` (the same node and count, for the toasts that read those).
 """
 
 from __future__ import annotations
@@ -31,7 +33,7 @@ from .canon_derive import DeriveCancelled
 log = logging.getLogger(__name__)
 
 EVENT = "canon"
-KINDS = ("emf", "atem", "compile", "pin")
+KINDS = ("emf", "atem", "compile", "pin", "thym", "read")    # thym: a program's run; read: a reading (0.5.0)
 ACTIVE = ("queued", "running")
 # Finished jobs kept for polling; the oldest go first past this many.
 KEEP_FINISHED = 200
@@ -60,7 +62,8 @@ class JobContext:
         self.job_id = job_id
 
     def progress(self, fields: dict[str, Any] | None = None, **more: Any) -> None:
-        upd = {k: v for k, v in {**(fields or {}), **more}.items() if k in ("phase", "chunk", "chunks", "message")}
+        upd = {k: v for k, v in {**(fields or {}), **more}.items()
+               if k in ("phase", "chunk", "chunks", "message", "progress")}
         if self.should_stop():
             upd.pop("message", None)          # keep saying "cancelling …" once asked
             upd.pop("phase", None)

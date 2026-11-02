@@ -1,12 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- PLACEHOLDER (composure round, P4c). Original line art on the house
-     72x72 artboard, drawn inside the ~54 art box. Pure #000 so
-     build_icons.py's black<->white swap produces the dark variant.
-     Overwrite this file and re-run scripts/build_icons.py to replace it. -->
-<svg id="comp-text" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
-  <line x1="36" y1="12" x2="36" y2="60" stroke="#000" stroke-width="4" stroke-linecap="round"/>
-  <line x1="25" y1="12" x2="47" y2="12" stroke="#000" stroke-width="4" stroke-linecap="round"/>
-  <line x1="25" y1="60" x2="47" y2="60" stroke="#000" stroke-width="4" stroke-linecap="round"/>
-  <line x1="14" y1="22" x2="14" y2="50" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-  <line x1="58" y1="22" x2="58" y2="50" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 72 72">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-2 {
+        opacity: .3;
+      }
+
+      .cls-2, .cls-3, .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-3 {
+        opacity: .7;
+      }
+
+      .cls-5 {
+        fill: #4b3aa8;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="14.83" y1="19.83" x2="57.05" y2="62.05" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="0" stop-color="#fff" stop-opacity=".99"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".69"/>
+      <stop offset=".43" stop-color="#fff" stop-opacity=".45"/>
+      <stop offset=".62" stop-color="#fff" stop-opacity=".25"/>
+      <stop offset=".78" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".91" stop-color="#fff" stop-opacity=".03"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <g id="c-white">
+    <rect class="cls-1" x="12.31" y="22.36" width="47.27" height="37.16"/>
+  </g>
+  <g id="comp-text">
+    <path d="M41.06,62.85H9V8.85h54v27h-3.38v-13.5H12.38v37.12h28.69v3.38ZM12.38,18.98h47.25v-6.75H12.38v6.75ZM15.75,13.92h3.38v3.38h-3.38v-3.38ZM22.5,13.92h3.38v3.38h-3.38v-3.38ZM29.25,13.92h3.38v3.38h-3.38v-3.38ZM59.62,47.67v-5.06h-6.75v16.88h5.06v3.38h-13.5v-3.38h5.06v-16.88h-6.75v5.06h-3.38v-8.44h23.62v8.44h-3.38Z"/>
+  </g>
+  <g id="c-bar">
+    <rect class="cls-5" x="12.28" y="12.24" width="47.41" height="6.75"/>
+    <rect class="cls-4" x="15.68" y="13.92" width="3.38" height="3.38"/>
+    <rect class="cls-3" x="22.43" y="13.92" width="3.38" height="3.38"/>
+    <rect class="cls-2" x="29.18" y="13.92" width="3.38" height="3.38"/>
+  </g>
 </svg>

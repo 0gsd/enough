@@ -1,0 +1,14 @@
+oes: thym/1
+kind: context
+id: thym/on-the-train
+name: on-the-train
+# An occasional context for the conformance suite: five minutes on a phone, standing.
+nodes:
+  - id: C:context/on-the-train
+    type: context
+    name: on-the-train
+    summary: Five minutes on a phone, standing.
+    medium: phone
+    hurry: true
+    words: 300
+    provenance: {mode: manual, sources: ["on-the-train.context.cosm"], confidence: 1}

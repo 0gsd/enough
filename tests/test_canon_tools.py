@@ -66,6 +66,9 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     (proj / "other.md.cosm").write_text("oes: canon/1\nid: canon/x\nname: x\nnodes: []\n", encoding="utf-8")
     (proj / "odd.cosm").write_text("oes: nonesuch/9\nid: x\nnodes: []\n", encoding="utf-8")
     (proj / "folder").mkdir()
+    # A package's folder form (0.5.0, THYM.md 15): kept whole, its text never derived in place.
+    shutil.copytree(REPO / "tests" / "fixtures" / "thym" / "replay" / "publish-story" / "2026-11-01-2148-35b5"
+                    / "outputs" / "notes.thym", proj / "story.thym")
     skeleton.ensure_skeleton(proj)
     canon.project_catalog(proj)                        # what a server writes at startup
     assert str(Path.home()).startswith(str(tmp_path))
@@ -137,13 +140,14 @@ def test_registered_traced_and_the_prefixes_match_the_server():
 
 
 def test_every_documented_example_runs(project: Path):
-    """The block's six examples, parsed exactly as the model would write them, run in order on a project that
-    holds what they name: the guide, decompile notes.md, lint the twin, write its atem, read an item of the
-    Holotype, and look a word up in the spec (0.4.4; its volume is built into the tmp docs root)."""
+    """The block's six MacroCOSM examples, parsed exactly as the model would write them, run in order on a project
+    that holds what they name: the guide, decompile notes.md, lint the twin, write its atem, read an item of the
+    Holotype, and look a word up in the spec (0.4.4; its volume is built into the tmp docs root). The block's two
+    Thym examples (0.5.0) run in tests/test_thym_tools.py, behind the macrocosm-oes skill."""
     examples = re.findall(r'<tool name="[a-z_]+">.*?</tool>', prompt.CANON_TOOL_INSTRUCTIONS, re.DOTALL)
     assert [T.parse_tool_calls(e)[0].name for e in examples] == [
-        "cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide", "doc_lookup"]
-    read, lint, derive, atem, guide, lookup = examples
+        "cosm_read", "cosm_lint", "emf_derive", "atem", "cosm_guide", "doc_lookup", "thym_check", "thym_run"]
+    read, lint, derive, atem, guide, lookup, _check, _run = examples
     r = run(project, lookup)
     # 0.4.4 (D3's spec pass): the spec defines `stance` as a term; its answer still carries the closed list's words.
     assert r.ok and r.body.startswith("stance  [T:term/stance") and "R:list/emf.stance" in r.body, r.body
@@ -536,6 +540,9 @@ REFUSED = [
     ("meadow", 400, "Holotype is browsed"),
     ("meadow/NOTES.md", 400, "Holotype is browsed"),
     ("meadow/holotype.cosm", 400, "Holotype is browsed"),
+    ("story.thym", 400, "package is kept whole"),
+    ("story.thym/text.md", 400, "package is kept whole"),
+    ("story.thym/fabula.cosm", 400, "package is kept whole"),
     ("rness/canon.cosm", 400, "kept by enough"),
     ("canon:lib/canon.cosm", 400, "kept by enough"),
     ("canon:lib/.canon.json", 400, "kept by enough"),

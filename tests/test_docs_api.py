@@ -527,8 +527,10 @@ def test_the_spec_examples_through_the_inline_route(index: int, project: Path, t
     from test_macrocosm_spec import _file_name
     text = _spec_blocks()[index]
     name = _file_name(mc.yaml_load(text))
-    (tmp_path / name).write_text(text, encoding="utf-8")
-    on_disk = mc.load_volume(tmp_path / name)
+    alone = tmp_path / "example"           # a folder of its own: a holograph reads every .cosm below its catalog
+    alone.mkdir()
+    (alone / name).write_text(text, encoding="utf-8")
+    on_disk = mc.load_volume(alone / name)
     with _client(project, "home") as c:
         for filename in (name, None):
             r = c.post("/api/cosm/inline", json={"text": text, **({"filename": filename} if filename else {})})

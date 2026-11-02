@@ -1,0 +1,473 @@
+oes: thym/1
+kind: trace
+id: thym/2026-11-02-0843-ff92
+name: publish-story run 2026-11-02-0843-ff92
+program:
+  name: publish-story
+  sha256: 5bf1730785d53906879af4224bec6069d77ef3888490fed182f29bc8e6930945
+plan:
+  sha256: 47c488f800bea79d81a946d8898a58ea2ee6d2597a2ebf5e510a4e14e0686c3c
+environment:
+  enough: 0.4.4
+  model: g40-04
+  context: 16384
+  agent_free: false
+  memory_band: 64 GB
+started: '2026-11-02T13:43:23Z'
+ended: '2026-11-02T13:47:18Z'
+outcome: landed
+nodes:
+- id: R:trace/2026-11-02-0843-ff92
+  type: trace
+  name: publish-story run 2026-11-02-0843-ff92
+  summary: 'ran publish-story on notes.md in 235 s on Qwen3.8-27B-Q4_K_M.gguf: 7 steps, all checks green'
+  records:
+  - R:record/1
+  - R:record/2
+  - R:record/3
+  - R:record/4
+  - R:record/5
+  - R:record/6
+  - R:record/7
+  outcome: landed
+  inputs_root: .
+  engines:
+  - canon
+  - docoes
+  - feed
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-02-0843-ff92.plan.cosm
+    confidence: 1
+- id: R:record/1
+  type: record
+  name: derive story
+  summary: model:Qwen3.8-27B-Q4_K_M.gguf, 1 attempt, 6 checks green.
+  node: R:node/1
+  move: derive
+  inputs:
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  outputs:
+  - name: f
+    sha256: a495128951c90f70dd8dd1d6aeb28ad44e7747a014e1b9020d525b1d214b2438
+  engine: model:Qwen3.8-27B-Q4_K_M.gguf
+  attempts: 1
+  tokens: 7604
+  seconds: 152
+  checks:
+  - name: span-resolves
+    ok: true
+    why: ''
+  - name: stance-closed
+    ok: true
+    why: ''
+  - name: terms-grounded
+    ok: true
+    why: ''
+  - name: coverage
+    ok: true
+    why: '14 claim-bearing sentences, each traced (spans): s1→E:person/mara-okafor,E:thing/bramley-by-the-gate,P:claim/bramley-by-the-gate-is-the-oldest-tree,P:claim/parish-records-do-not-state-planting-date;
+      s2→L:term/hearsay,E:thing/bramley-by-the-gate,K:concept/hearsay,P:claim/bramley-by-the-gate-is-the-oldest-tree,P:claim/parish-records-do-not-state-planting-date;
+      s3→K:concept/apple-pollination,P:claim/apple-trees-need-a-second-variety-to-set-fruit; s4→L:term/pollinate,L:term/leaflet,L:term/quirk,K:concept/apple-pollination,P:claim/apple-trees-need-a-second-variety-to-set-fruit;
+      s5→P:claim/orchard-juice-yield-increased-to-140-litres,T:event/juice-bottle-count; s6→P:claim/orchard-juice-yield-increased-to-140-litres,T:event/juice-bottle-count;
+      s7→L:term/mould,K:concept/leaf-mould,P:claim/cause-of-yield-increase-is-debated,P:claim/leaf-mould-caused-the-yield-rise,T:event/leaf-mould-spread-under-trees;
+      s8→P:claim/cause-of-yield-increase-is-debated,P:claim/leaf-mould-caused-the-yield-rise; s9→P:claim/cause-of-yield-increase-is-debated,P:claim/leaf-mould-caused-the-yield-rise;
+      s10→E:org/parish-council,E:place/meadow-strip,P:claim/july-mowing-threatens-orchard-pollinators,T:event/planned-meadow-mowing;
+      s11→L:term/pollinator,E:place/meadow-strip,K:concept/pollinator,P:claim/july-mowing-threatens-orchard-pollinators;
+      s12→L:term/pollinator,E:place/meadow-strip,K:concept/pollinator,P:claim/july-mowing-threatens-orchard-pollinators;
+      s13→T:event/mara-to-write-letter-to-council; s14→T:event/mara-to-write-letter-to-council'
+  - name: emf-checks
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-02-0843-ff92.plan.cosm#R:node/1
+    confidence: 1
+- id: R:record/2
+  type: record
+  name: assert f covers story
+  summary: code, 1 attempt, 1 check green.
+  node: R:node/2
+  move: assert
+  inputs:
+  - name: f
+    sha256: a495128951c90f70dd8dd1d6aeb28ad44e7747a014e1b9020d525b1d214b2438
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  outputs: []
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks:
+  - name: coverage
+    ok: true
+    why: '14 claim-bearing sentences, each traced (spans): s1→E:person/mara-okafor,E:thing/bramley-by-the-gate,P:claim/bramley-by-the-gate-is-the-oldest-tree,P:claim/parish-records-do-not-state-planting-date;
+      s2→L:term/hearsay,E:thing/bramley-by-the-gate,K:concept/hearsay,P:claim/bramley-by-the-gate-is-the-oldest-tree,P:claim/parish-records-do-not-state-planting-date;
+      s3→K:concept/apple-pollination,P:claim/apple-trees-need-a-second-variety-to-set-fruit; s4→L:term/pollinate,L:term/leaflet,L:term/quirk,K:concept/apple-pollination,P:claim/apple-trees-need-a-second-variety-to-set-fruit;
+      s5→P:claim/orchard-juice-yield-increased-to-140-litres,T:event/juice-bottle-count; s6→P:claim/orchard-juice-yield-increased-to-140-litres,T:event/juice-bottle-count;
+      s7→L:term/mould,K:concept/leaf-mould,P:claim/cause-of-yield-increase-is-debated,P:claim/leaf-mould-caused-the-yield-rise,T:event/leaf-mould-spread-under-trees;
+      s8→P:claim/cause-of-yield-increase-is-debated,P:claim/leaf-mould-caused-the-yield-rise; s9→P:claim/cause-of-yield-increase-is-debated,P:claim/leaf-mould-caused-the-yield-rise;
+      s10→E:org/parish-council,E:place/meadow-strip,P:claim/july-mowing-threatens-orchard-pollinators,T:event/planned-meadow-mowing;
+      s11→L:term/pollinator,E:place/meadow-strip,K:concept/pollinator,P:claim/july-mowing-threatens-orchard-pollinators;
+      s12→L:term/pollinator,E:place/meadow-strip,K:concept/pollinator,P:claim/july-mowing-threatens-orchard-pollinators;
+      s13→T:event/mara-to-write-letter-to-council; s14→T:event/mara-to-write-letter-to-council'
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-02-0843-ff92.plan.cosm#R:node/2
+    confidence: 1
+- id: R:record/3
+  type: record
+  name: null of f
+  summary: model:Qwen3.8-27B-Q4_K_M.gguf, 3 attempts, 5 checks green.
+  node: R:node/3
+  move: 'null'
+  inputs:
+  - name: f
+    sha256: a495128951c90f70dd8dd1d6aeb28ad44e7747a014e1b9020d525b1d214b2438
+  outputs:
+  - name: t3
+    sha256: f236e85604449337a608915c34d3a549a15865cd8291f3a1777a38fe595bbeda
+  engine: model:Qwen3.8-27B-Q4_K_M.gguf
+  attempts: 3
+  tokens: 7811
+  seconds: 80
+  checks:
+  - name: coverage
+    ok: true
+    why: '19 claim-bearing sentences, each traced (citations): s1→E:person/mara-okafor; s2→E:place/hollins-lane-orchard;
+      s3→P:claim/bramley-by-the-gate-is-the-oldest-tree; s4→E:thing/bramley-by-the-gate; s5→P:claim/parish-records-do-not-state-planting-date;
+      s6→P:claim/apple-trees-need-a-second-variety-to-set-fruit; s7→K:concept/apple-pollination; s8→P:claim/orchard-juice-yield-increased-to-140-litres;
+      s9→P:claim/orchard-juice-yield-increased-to-140-litres; s10→T:event/juice-bottle-count; s11→T:event/leaf-mould-spread-under-trees;
+      s12→P:claim/leaf-mould-caused-the-yield-rise; s13→P:claim/leaf-mould-caused-the-yield-rise; s14→P:claim/cause-of-yield-increase-is-debated;
+      s15→T:event/planned-meadow-mowing; s16→E:place/meadow-strip; s17→P:claim/july-mowing-threatens-orchard-pollinators;
+      s18→T:event/mara-to-write-letter-to-council; s19→P:claim/uncertainty-over-parish-mowing-rights'
+  - name: no-invention
+    ok: true
+    why: ''
+  - name: stance-kept
+    ok: true
+    why: ''
+  - name: null-pinned
+    ok: true
+    why: statistics all 1; figurative-density, humour and allusion assumed 1 (judgement, not asked)
+  - name: provenance
+    ok: true
+    why: ''
+  tries:
+  - attempt: 1
+    failed:
+    - name: stance-kept
+      why: 'P:claim/bramley-by-the-gate-is-the-oldest-tree is hearsay in the fabula and the telling says it as opinion:
+        Mara Okafor holds that the Bramley tree is oldest. (say it with the stance''s phrase: reportedly, it is
+        assumed that, the author holds that)'
+  - attempt: 2
+    failed:
+    - name: coverage
+      why: 'a sentence cites Atem, which the fabula does not hold: Mara Okafor and the narrator plan a delay.'
+    - name: no-invention
+      why: sentence 1 cites Atem, which the fabula does not hold
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-02-0843-ff92.plan.cosm#R:node/3
+    confidence: 1
+- id: R:record/4
+  type: record
+  name: measure story against t3
+  summary: model:Qwen3.8-27B-Q4_K_M.gguf, 1 attempt, 3 checks green.
+  node: R:node/4
+  move: measure
+  inputs:
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  - name: t3
+    sha256: f236e85604449337a608915c34d3a549a15865cd8291f3a1777a38fe595bbeda
+  outputs:
+  - name: m
+    sha256: 44ea6b44583aec2770efd9294f2724f3c70bcbe9bf54ba22dbe1289f08c89744
+  engine: model:Qwen3.8-27B-Q4_K_M.gguf
+  attempts: 1
+  tokens: 739
+  seconds: 0
+  checks:
+  - name: scale-range
+    ok: true
+    why: ''
+  - name: scale-evidence
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-02-0843-ff92.plan.cosm#R:node/4
+    confidence: 1
+- id: R:record/5
+  type: record
+  name: context of story
+  summary: code, 1 attempt, 0 checks green.
+  node: R:node/5
+  move: context
+  inputs:
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  outputs:
+  - name: c
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks: []
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-02-0843-ff92.plan.cosm#R:node/5
+    confidence: 1
+- id: R:record/6
+  type: record
+  name: graph of story
+  summary: code, 1 attempt, 1 check green.
+  node: R:node/6
+  move: graph
+  inputs:
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  outputs:
+  - name: g
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks:
+  - name: released
+    ok: true
+    why: 'no graph: nothing was released, and nothing travels'
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-02-0843-ff92.plan.cosm#R:node/6
+    confidence: 1
+- id: R:record/7
+  type: record
+  name: package story, f, m, c, g
+  summary: code, 1 attempt, 3 checks green.
+  node: R:node/7
+  move: package
+  inputs:
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  - name: f
+    sha256: a495128951c90f70dd8dd1d6aeb28ad44e7747a014e1b9020d525b1d214b2438
+  - name: m
+    sha256: 44ea6b44583aec2770efd9294f2724f3c70bcbe9bf54ba22dbe1289f08c89744
+  - name: c
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  - name: g
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  outputs:
+  - name: out
+    sha256: 00e831281ed6fee4ec4bbdee3ddd709cc6082665a243cb7e565954dd25a8ebbb
+    path: outputs/out.package.cosm
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks:
+  - name: digests
+    ok: true
+    why: ''
+  - name: released
+    ok: true
+    why: 'no graph: nothing was released, and nothing travels'
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-02-0843-ff92.plan.cosm#R:node/7
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: derive story
+  summary: text to fabula; asks the coprocessor under emf/1
+  step:
+    program: publish-story
+    n: 1
+  move: derive
+  asks: true
+  takes:
+  - story
+  gives: f
+  after: []
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 12
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L12
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: assert f covers story
+  summary: assert f covers story
+  step:
+    program: publish-story
+    n: 2
+  move: assert
+  asks: false
+  takes:
+  - f
+  - story
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 13
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L13
+    confidence: 1
+- id: R:node/3
+  type: node
+  name: null of f
+  summary: 'the holomorph: the departure from the null morph'
+  step:
+    program: publish-story
+    n: 3
+  move: 'null'
+  asks: true
+  takes:
+  - f
+  gives: t3
+  after:
+  - R:node/1
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 14
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L14
+    confidence: 1
+- id: R:node/4
+  type: node
+  name: measure story against t3
+  summary: 'the holomorph: the departure from the null morph'
+  step:
+    program: publish-story
+    n: 3
+  move: measure
+  asks: true
+  takes:
+  - story
+  - t3
+  gives: m
+  after:
+  - R:node/3
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 14
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L14
+    confidence: 1
+- id: R:node/5
+  type: node
+  name: context of story
+  summary: the surrounding volume's catalog, read-only
+  step:
+    program: publish-story
+    n: 4
+  move: context
+  asks: false
+  takes:
+  - story
+  gives: c
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 15
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L15
+    confidence: 1
+- id: R:node/6
+  type: node
+  name: graph of story
+  summary: what the holograph released for this text, or nothing
+  step:
+    program: publish-story
+    n: 5
+  move: graph
+  asks: false
+  takes:
+  - story
+  gives: g
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 16
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L16
+    confidence: 1
+- id: R:node/7
+  type: node
+  name: package story, f, m, c, g
+  summary: package story, f, m, c, g
+  step:
+    program: publish-story
+    n: 6
+  move: package
+  asks: false
+  takes:
+  - story
+  - f
+  - m
+  - c
+  - g
+  gives: out
+  after:
+  - R:node/2
+  - R:node/4
+  - R:node/5
+  - R:node/6
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 17
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L17
+    confidence: 1

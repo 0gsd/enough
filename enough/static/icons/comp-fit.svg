@@ -1,12 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- PLACEHOLDER (composure round, P4c). Original line art on the house
-     72x72 artboard, drawn inside the ~54 art box. Pure #000 so
-     build_icons.py's black<->white swap produces the dark variant.
-     Overwrite this file and re-run scripts/build_icons.py to replace it. -->
-<svg id="comp-fit" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
-  <rect x="10" y="14" width="52" height="44" rx="3" ry="3" fill="none" stroke="#000" stroke-width="3"/>
-  <polyline points="22,26 30,26 30,34" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="50,26 42,26 42,34" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="22,46 30,46 30,38" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <polyline points="50,46 42,46 42,38" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 72 72">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-2 {
+        opacity: .3;
+      }
+
+      .cls-2, .cls-3, .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-3 {
+        opacity: .7;
+      }
+
+      .cls-5 {
+        fill: #4b3aa8;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="14.83" y1="19.83" x2="57.05" y2="62.05" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="0" stop-color="#fff" stop-opacity=".99"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".69"/>
+      <stop offset=".43" stop-color="#fff" stop-opacity=".45"/>
+      <stop offset=".62" stop-color="#fff" stop-opacity=".25"/>
+      <stop offset=".78" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".91" stop-color="#fff" stop-opacity=".03"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <g id="c-white">
+    <rect class="cls-1" x="12.31" y="22.36" width="47.27" height="37.16"/>
+  </g>
+  <g id="comp-fit">
+    <path d="M32.53,62.89H8.9V8.89h54v23.62h-3.38v-10.12H12.28v37.12h20.25v3.38ZM12.28,19.01h47.25v-6.75H12.28v6.75ZM15.65,13.95h3.38v3.38h-3.38v-3.38ZM22.4,13.95h3.38v3.38h-3.38v-3.38ZM29.15,13.95h3.38v3.38h-3.38v-3.38ZM35.9,47.39h10.28v3.38h-10.28v-3.38ZM46.19,42.32c-.92,0-1.71.33-2.37.98-.67.65-1,1.45-1,2.4h-3.38c0-1.97.66-3.62,1.98-4.96,1.32-1.34,2.91-2,4.77-2v3.59ZM46.19,59.36c-1.86,0-3.45-.67-4.77-2-1.32-1.34-1.98-2.97-1.98-4.9h3.38c0,.98.33,1.82,1,2.5.67.69,1.46,1.03,2.37,1.03v3.38ZM48.03,35.2h3.38v10.28h-3.38v-10.28ZM48.03,52.61h3.38v10.28h-3.38v-10.28ZM53.09,38.74c1.97,0,3.61.67,4.93,2,1.32,1.34,1.92,2.99,1.82,4.96h-3.38c0-1.02-.33-1.87-.98-2.56-.65-.69-1.45-1.03-2.4-1.03v-3.38ZM53.09,47.39h10.34v3.38h-10.34v-3.38ZM60.05,52.45c0,1.93-.67,3.57-2,4.9-1.34,1.34-2.92,2-4.75,2v-3.38c.91,0,1.71-.33,2.37-1,.67-.67,1-1.46,1-2.37l3.38-.16Z"/>
+  </g>
+  <g id="c-bar">
+    <rect class="cls-5" x="12.28" y="12.24" width="47.41" height="6.75"/>
+    <rect class="cls-4" x="15.68" y="13.92" width="3.38" height="3.38"/>
+    <rect class="cls-3" x="22.43" y="13.92" width="3.38" height="3.38"/>
+    <rect class="cls-2" x="29.18" y="13.92" width="3.38" height="3.38"/>
+  </g>
 </svg>

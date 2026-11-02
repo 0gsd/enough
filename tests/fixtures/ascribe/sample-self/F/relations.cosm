@@ -1,0 +1,7 @@
+# F: the one relation this author declares beyond the starter list.
+nodes:
+  - id: F:relation/learned-in
+    type: relation
+    name: learned in
+    summary: A skill or an understanding picked up during the experience the link points to.
+    provenance: {mode: manual, sources: [self], confidence: 1}

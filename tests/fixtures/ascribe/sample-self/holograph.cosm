@@ -1,0 +1,13 @@
+oes: ascribe/1
+
+# The sample holograph: an invented person, a baker and an amateur navigator who lives by a working harbour.
+# Everything here is made up and nothing names anyone: people appear by role ("a retired harbour pilot") or by the
+# one pseudonym this catalog declares. It lints clean, with no warnings, through enough/macrocosm.py and
+# enough/ascribe.py (tests/test_ascribe.py holds it to that). Layout: the ten module folders and F/ beside this file.
+
+id: ascribe/aej6l5qrka6c6btarfiy2f7vnj
+handle: salt-and-crumb
+summary: A baker and amateur navigator by a working harbour, slow at most things on purpose.
+sample: true
+visibility: internal
+pseudonyms: [Wren]

@@ -271,6 +271,56 @@ def test_screen_names_are_unique_and_modes_are_known():
     assert {s.mode for s in screens.ALL_SCREENS} == {"project", "home"}
 
 
+def test_the_thym_round_has_its_screens_and_scenarios():
+    """0.5.0 (U1): a program, a plan, a trace, the run card and a reading
+    each have a screen; a run that lands and a labelled reading each have a
+    scenario, and the scratch project is seeded with what they open."""
+    from uicheck import server
+    from uicheck.interactions import SCENARIOS
+
+    names = {s.name for s in screens.ALL_SCREENS if s.mode == "project"}
+    assert {"thym-program", "thym-plan", "thym-trace", "thym-run", "thym-read"} <= names
+    assert {"thym-run-roundtrip", "thym-read-labelled"} <= set(SCENARIOS)
+    for fixture in (server.THYM_FIXTURES / "programs" / server.THYM_PROGRAM,
+                    server.THYM_REPLAY / server.THYM_TRACE,
+                    server.THYM_REPLAY / "outputs" / "notes.thym" / "morph.cosm",
+                    server.THYM_REPLAY / "outputs" / "out.package.cosm"):
+        assert fixture.is_file(), fixture
+    # The hand-made reading carries the label THYM.md 14 requires: front matter and footer.
+    assert server.FIXTURE_READING.startswith("---\nread_through: ")
+    assert server.FIXTURE_READING.rstrip("\n").splitlines()[-1] == screens.THYM_READING_FOOTER
+    assert screens.THYM_READING.endswith(server.THYM_READING)
+
+
+def test_the_package_cards_have_their_screens_scenario_and_sealed_seed(tmp_path):
+    """0.5.0 (U2): the package card, its key shown once and the unpack card
+    each have a screen, the round trip has its scenario, and the seed puts a
+    sealed copy of the package in a folder of its own whose key is kept only
+    in the harness's memory — never in the scratch project — and opens it."""
+    from enough.thym import vault
+    from uicheck import server
+    from uicheck.interactions import SCENARIOS
+
+    names = {s.name for s in screens.ALL_SCREENS if s.mode == "project"}
+    assert {"thym-package", "thym-package-key", "thym-unpack"} <= names
+    assert "thym-package-roundtrip" in SCENARIOS
+    assert screens.THYM_SEALED == f"{server.EMF_DIR}/{server.THYM_RECEIVED}/{server.THYM_SEALED}"
+    assert screens.THYM_MORPH == f"{server.EMF_DIR}/{server.THYM_MORPH}"
+
+    project = tmp_path / "project"
+    server.seed_project(project)
+    sealed = project / screens.THYM_SEALED
+    assert sealed.is_file() and sorted(p.name for p in sealed.parent.iterdir()) == [server.THYM_SEALED]
+    key = server.THYM_SEALED_KEY
+    assert vault.normalize_code(key), key
+    assert vault.open(sealed.read_bytes(), key) == (project / server.EMF_DIR / "notes.package.cosm").read_bytes()
+    plain = key.replace("-", "").encode()
+    for f in project.rglob("*"):
+        if f.is_file():
+            assert key.encode() not in f.read_bytes() and plain not in f.read_bytes(), f
+    assert (project / screens.THYM_MORPH).is_file()
+
+
 def test_every_step_verb_is_one_the_driver_implements():
     from uicheck.driver import Driver
 

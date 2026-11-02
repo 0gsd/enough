@@ -1,0 +1,7 @@
+nodes:
+  - id: Y:yearning/the-old-house
+    type: yearning
+    name: The old house
+    summary: To live again at 17 Quillfeather Lane.
+    form: F:form/sailing
+    provenance: {mode: manual, sources: [self], confidence: 1}

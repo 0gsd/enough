@@ -1,0 +1,17 @@
+nodes:
+  - id: Q:quale/starter-smell
+    type: quale
+    name: The smell of a ripe starter
+    summary: Sour like green apples and wet wood, strongest just before it peaks.
+    form: F:form/sourdough
+    strength: 5
+    provenance: {mode: dialectic, sources: [session-1], confidence: 1}
+
+  - id: Q:quale/quiet-at-night
+    type: quale
+    name: Quiet on the water at night
+    summary: The hiss of the hull and nothing else, with the sky very close.
+    form: F:form/celestial-navigation
+    links:
+      - {rel: from, to: E:experience/first-night-crossing}
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.9}

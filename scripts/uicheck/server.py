@@ -21,6 +21,12 @@ overlap, and an empty project has nothing to clip. Since 0.4.3 it also holds
 the Canon round's volumes (copied from tests/fixtures/cosm/): a text with its
 EMF twin, a Comprise Holotype, and — in the scratch Canon store, never the
 real one — a volume holding a text, its twin and a copy of the Holotype.
+Since 0.5.0 it holds the Thym round's too (copied from tests/fixtures/thym/):
+a program with its enumeration, a plan, a trace, a package in both forms, a
+hand-made reading, and a small deterministic program a run can land without
+a model; and, for the package and unpack cards (U2), the measured morph
+beside the notes and a sealed copy of the package in a folder of its own,
+sealed at seed time, whose key lives only in this process.
 """
 
 from __future__ import annotations
@@ -148,6 +154,65 @@ juice spends less time waiting in the sun.
 # the notes.md pair the cosm-viewer and EMF-face screens draw never changes.
 PRESS = "press.md"             # orchard/press.md + orchard/press.md.cosm
 HOLOTYPE_DIR = "meadow"        # a Comprise Holotype: holotype.cosm + atoms/
+# Thym (0.5.0), all in orchard/ beside the notes they were made from. The
+# replay fixture is checkpoint A's real run of publish-story on notes.md, so
+# its package (both forms) and its measured holomorph are the real thing; the
+# reading is hand-made (no model here) with the §14 front matter and footer.
+THYM_FIXTURES = REPO / "tests" / "fixtures" / "thym"
+THYM_REPLAY = THYM_FIXTURES / "replay" / "publish-story" / "2026-11-01-2148-35b5"
+THYM_PROGRAM = "publish-story.thym"            # + publish-story.thym.cosm, its enumeration
+THYM_PLAN = "publish-story.plan.cosm"
+THYM_TRACE = "2026-11-01-2148-35b5.trace.cosm"
+THYM_PACKAGE = "notes.thym"                    # the folder form; notes.package.cosm the single file
+THYM_READING = "notes.read-null-2026-11-01-1200.md"
+FIXTURE_READING = """---
+read_through: 'null'
+---
+
+Mara Okafor has kept the Hollins Lane orchard since 2019. Mara Okafor says that the old Bramley by the gate is the
+oldest tree on the lane. It is reportedly the oldest tree. The parish records do not say when it was planted.
+
+Every apple tree needs a second variety nearby to set fruit. This is how apples pollinate. The nursery leaflet says
+the same.
+
+The orchard pressed 140 litres of juice this year. It pressed 90 litres last year. The author counted the bottles on
+12 October.
+
+*a reading of notes.md through null, made here on 2026-11-01 by a model; the text stands unchanged*
+"""
+# A program with no step that asks a model, so a run lands with none
+# running (thym-run-roundtrip), on a text no other recipe reads.
+THYM_RULES_PROGRAM = "count-words.thym"
+FIXTURE_RULES_PROGRAM = """thym 0
+
+program count-words
+  why: how long a text is, counted in words, and no model is asked.
+
+  takes story: text
+  gives n: number
+
+  give words story                           -- every word of the text, counted by rule
+end
+"""
+HARVEST = "harvest.md"
+# The package and unpack cards (0.5.0, U2). The author's morph beside the
+# notes (a copy of the package's measured one), so "package…" packs a morph
+# as well — and a re-packed notes.thym/ keeps the scales the EMF face draws.
+# A sealed copy of checkpoint A's package (THYM.md 15.3), alone in a folder of
+# its own as if it had come from someone: sealed at seed time with enough's own
+# vault, so its key exists only in this process (THYM_SEALED_KEY), never in the
+# scratch project, for the round trip to unpack it with. THYM_ORCHARD is where
+# it was seeded, so the round trip can compare the unpacked bytes on disk.
+THYM_MORPH = "notes.morph.cosm"
+THYM_RECEIVED = "received"                     # orchard/received/notes.thym.enc
+THYM_SEALED = "notes.thym.enc"
+THYM_SEALED_KEY = ""
+THYM_ORCHARD: Path | None = None
+FIXTURE_HARVEST = """# The harvest list
+
+Bramleys from the gate tree, Discovery from the north row, and a basket of
+windfalls for the juice. Next year we will weigh them as well as count them.
+"""
 CANON_VOLUME = "field-notes"   # in the scratch store: notes.md (+ twin), meadow/
 
 
@@ -184,6 +249,40 @@ def seed_project(project: Path) -> None:
     twin = twin.replace("id: emf/notes-md\n", "id: emf/orchard--press-md\n", 1)
     twin = twin.replace("source: {path: notes.md,", f"source: {{path: {PRESS},", 1)
     (emf / f"{PRESS}.cosm").write_text(twin, encoding="utf-8")
+    _seed_thym(emf)
+
+
+def _seed_thym(orchard: Path) -> None:
+    """The Thym round's volumes beside the orchard notes (see THYM_* above):
+    copies, never the fixtures themselves, so a run that writes beside them
+    touches only the scratch project."""
+    shutil.copyfile(THYM_FIXTURES / "programs" / THYM_PROGRAM, orchard / THYM_PROGRAM)
+    # `python -m enough.thym enumerate` names a program's items <stem>.thym.cosm.
+    shutil.copyfile(THYM_FIXTURES / "expected" / "publish-story" / "items.cosm",
+                    orchard / THYM_PROGRAM.replace(".thym", ".thym.cosm"))
+    shutil.copyfile(THYM_FIXTURES / "expected" / "publish-story" / "plan.cosm", orchard / THYM_PLAN)
+    shutil.copyfile(THYM_REPLAY / THYM_TRACE, orchard / THYM_TRACE)
+    shutil.copytree(THYM_REPLAY / "outputs" / "notes.thym", orchard / THYM_PACKAGE, dirs_exist_ok=True)
+    shutil.copyfile(THYM_REPLAY / "outputs" / "out.package.cosm", orchard / "notes.package.cosm")
+    (orchard / THYM_READING).write_text(FIXTURE_READING, encoding="utf-8")
+    (orchard / THYM_RULES_PROGRAM).write_text(FIXTURE_RULES_PROGRAM, encoding="utf-8")
+    (orchard / HARVEST).write_text(FIXTURE_HARVEST, encoding="utf-8")
+    shutil.copyfile(THYM_REPLAY / "outputs" / "notes.thym" / "morph.cosm", orchard / THYM_MORPH)
+    _seed_sealed(orchard)
+
+
+def _seed_sealed(orchard: Path) -> None:
+    """orchard/received/notes.thym.enc: the seeded package's single file,
+    sealed with `enough.thym.vault.seal` (pure: no state, no network, no
+    seam to cross), the key kept in THYM_SEALED_KEY and nowhere on disk."""
+    global THYM_SEALED_KEY, THYM_ORCHARD
+    from enough.thym import vault
+    single = orchard / "notes.package.cosm"
+    sealed, key = vault.seal(single.read_bytes(), path=single.name, slug="notes")
+    received = orchard / THYM_RECEIVED
+    received.mkdir(parents=True, exist_ok=True)
+    (received / THYM_SEALED).write_bytes(sealed)
+    THYM_SEALED_KEY, THYM_ORCHARD = key, orchard
 
 
 def seed_canon(scratch: Path) -> None:

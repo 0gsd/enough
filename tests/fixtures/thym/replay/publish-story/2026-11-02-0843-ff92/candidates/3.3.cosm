@@ -1,0 +1,80 @@
+contract:
+  move: 'null'
+  schema:
+    format: yaml
+    stamp: engine
+    says: 'a YAML mapping: sentences, a list in the order told, each {say: one sentence, cites: [the ids of the
+      items it says]}, with paragraph: true on a sentence that starts a new paragraph'
+  checks:
+  - coverage
+  - no-invention
+  - stance-kept
+  - null-pinned
+  - provenance
+inputs:
+  fabula: a495128951c90f70dd8dd1d6aeb28ad44e7747a014e1b9020d525b1d214b2438
+  outline: a192d3c495b41da8507c6998389aeb8cc889cc47eec2ed11e31470a615328728
+engine: model:Qwen3.8-27B-Q4_K_M.gguf
+attempts: 1
+tokens: 2617
+seconds: 25
+output:
+  sentences:
+  - say: Mara Okafor keeps the orchard.
+    cites:
+    - E:person/mara-okafor
+  - say: The orchard is on Hollins Lane.
+    cites:
+    - E:place/hollins-lane-orchard
+  - say: Mara Okafor says the Bramley is oldest.
+    cites:
+    - P:claim/bramley-by-the-gate-is-the-oldest-tree
+  - say: The Bramley is by the gate.
+    cites:
+    - E:thing/bramley-by-the-gate
+  - say: Parish records lack a planting date.
+    cites:
+    - P:claim/parish-records-do-not-state-planting-date
+  - say: Apple trees need a second variety.
+    cites:
+    - P:claim/apple-trees-need-a-second-variety-to-set-fruit
+  - say: This variety enables pollination.
+    cites:
+    - K:concept/apple-pollination
+  - say: The orchard produced 140 litres of juice.
+    cites:
+    - P:claim/orchard-juice-yield-increased-to-140-litres
+  - say: Last year it produced 90 litres.
+    cites:
+    - P:claim/orchard-juice-yield-increased-to-140-litres
+  - say: The author counted the bottles.
+    cites:
+    - T:event/juice-bottle-count
+  - say: Volunteers spread leaf mould in March.
+    cites:
+    - T:event/leaf-mould-spread-under-trees
+  - say: The author holds that leaf mould caused the rise.
+    cites:
+    - P:claim/leaf-mould-caused-the-yield-rise
+  - say: Mara Okafor holds that leaf mould caused the rise.
+    cites:
+    - P:claim/leaf-mould-caused-the-yield-rise
+  - say: The author holds that a warm spring caused it.
+    cites:
+    - P:claim/cause-of-yield-increase-is-debated
+  - say: The parish council wants to mow.
+    cites:
+    - T:event/planned-meadow-mowing
+  - say: The meadow strip feeds pollinators.
+    cites:
+    - E:place/meadow-strip
+  - say: It follows that July mowing harms pollinators.
+    cites:
+    - P:claim/july-mowing-threatens-orchard-pollinators
+  - say: Mara Okafor will write to the council.
+    cites:
+    - T:event/mara-to-write-letter-to-council
+  - say: It is assumed that the lease is unclear.
+    cites:
+    - P:claim/uncertainty-over-parish-mowing-rights
+  engine: model:Qwen3.8-27B-Q4_K_M.gguf

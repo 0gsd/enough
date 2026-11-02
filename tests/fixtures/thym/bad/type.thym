@@ -1,0 +1,10 @@
+-- refused: compile type line 9
+thym 0
+
+program wrong-density
+  why: an atem of a morph is nothing.
+  takes m: morph
+  gives a: atem
+
+  give atem m
+end

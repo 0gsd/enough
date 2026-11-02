@@ -403,6 +403,20 @@ def _walk_tree(
             "is_dir": p.is_dir(),
             "is_symlink": p.is_symlink(),
         }
+        # A Thym package (0.5.0, THYM.md 15.1) is kept whole: its folder form
+        # `<stem>.thym/` is one row with no children (never opened up as loose
+        # texts), its single file `<stem>.package.cosm` and its sealed form
+        # `<stem>.thym.enc` carry their kind, so the page draws them as Canon's
+        # listing does and routes a click to the package card.
+        if p.is_dir() and _canon.is_package_folder(p):
+            node["kind"] = "package"
+            node["children"] = []
+            out.append(node)
+            continue
+        if not p.is_dir() and _canon.is_sealed_package(p):
+            node["kind"] = "sealed"
+        elif not p.is_dir() and _canon.is_package_file(p):
+            node["kind"] = "package"
         if p.is_dir():
             # Saved wikisink articles are folders shaped {article.html,
             # _manifest.md, .meta.json}; the tree marks them so the UI
@@ -1494,7 +1508,7 @@ async def _handle_tool(session: Session, call: ToolCall, sink: list[tuple[str, s
 # it to.
 HOME_PATHS: frozenset[str] = frozenset({
     "/", "/favicon.ico", "/api/ui-config", "/api/help-center",
-    "/api/macrocosm-spec", "/api/convert/formats", "/api/shutdown",
+    "/api/macrocosm-spec", "/api/thym-spec", "/api/convert/formats", "/api/shutdown",
     # DocOES (0.4.4): read-only, from the install's own documents.
     "/api/docs", "/api/docs/status", "/api/docs/build", "/api/docs/lens",
     "/api/docs/compile", "/api/docs/inventory",
@@ -1566,6 +1580,9 @@ AGENT_FREE_PATHS: dict[str, str] = {
     "/api/cloud/health-check": "the cloud check sends a prompt to a model",
     # Whisper is a model too, and agent-free means no AI at all (owner, §13).
     "/api/transcribe": "voice input runs a speech model, and none runs while agent-free is on",
+    # Thym (0.5.0): a reading is told by a model and `read` has no scaffold (THYM.md 14, 19). A Thym run is not here:
+    # a plan that asks nothing runs while agent-free is on, and the run route refuses one that asks, with the count.
+    "/api/canon/read": "a reading is told by a model, and none runs while agent-free is on",
 }
 # Every POST under these prefixes, less AGENT_FREE_OPEN: a council is
 # readvisors speaking, so setting one up, convening, driving, a user
@@ -4054,6 +4071,10 @@ def create_app(
         path = (path or "").strip()
         if not path:
             raise HTTPException(400, "missing path")
+        from . import thym_api as _thym_api
+        thym = _thym_api.thym_volume(project_dir, path)     # a run's plan or trace (thym:), a program (.thym)
+        if thym is not None:
+            return thym
         target = _resolve_project_path(path)
         prefix = _store_prefix(path)
         if prefix:
@@ -4264,6 +4285,26 @@ def create_app(
             raise HTTPException(
                 404,
                 "MACROCOSM_OES.md not found in this install — run /update-enough "
+                "to pick up the bundled spec.")
+        return PlainTextResponse(text, media_type="text/markdown; charset=utf-8")
+
+    @app.get("/api/thym-spec", response_class=PlainTextResponse)
+    async def api_thym_spec(lang: str = "en") -> PlainTextResponse:
+        """The Thym language spec (docs/THYM.md) as raw markdown (0.5.0), on
+        `/api/macrocosm-spec`'s pattern: `lang` picks static/i18n/<lang>/THYM.md
+        when one ships (none does in 0.5.0; the spec is English only), else
+        English. Home-accessible, like the MacroCOSM spec."""
+        doc = Path(__file__).resolve().parent.parent / "docs" / "THYM.md"
+        if lang in UI_LANGUAGES and lang != "en":
+            translated = STATIC_DIR / "i18n" / lang / "THYM.md"
+            if translated.is_file():
+                doc = translated
+        text = await asyncio.to_thread(
+            lambda: doc.read_text(encoding="utf-8") if doc.is_file() else None)
+        if text is None:
+            raise HTTPException(
+                404,
+                "THYM.md not found in this install — run /update-enough "
                 "to pick up the bundled spec.")
         return PlainTextResponse(text, media_type="text/markdown; charset=utf-8")
 
@@ -4957,6 +4998,19 @@ def create_app(
         except _canon_jobs.CanonJobError as e:
             raise _canon_job_http(e) from None
         return {"job": snap}
+
+    # ---------- Thym (0.5.0): programs, plans, runs, traces; packages and readings ----------
+    #
+    # One line, as for the composure and council routers: `enough/thym/` is the language, `enough/thym_host.py`
+    # enough's side of it, `enough/thym_api.py` the HTTP translation. Runs and readings are CanonJobs (kinds `thym`
+    # and `read`) started through `_start_canon_job`, so they take the generation lock in model mode and carry the
+    # agent-free reason like a derivation; the cosm viewer's payload is `_cosm_payload`, passed in, not copied.
+    from . import thym_api as _thym_api
+    app.include_router(_thym_api.build_router(
+        project_dir=project_dir, llm_url=session.llm_url, jobs=canon_jobs, canon_mode=_canon_mode,
+        start_job=_start_canon_job, text_target=_text_target, catalog_after=_canon_catalog_after,
+        model_complete=_model_complete, cosm_payload=_cosm_payload,
+    ))
 
     @app.post("/api/canon/derive")
     async def api_canon_derive(request: Request) -> dict[str, Any]:

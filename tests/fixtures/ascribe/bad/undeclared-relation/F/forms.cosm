@@ -1,0 +1,7 @@
+nodes:
+  - id: F:form/sailing
+    type: form
+    name: sailing
+    summary: Moving a boat across water by the wind in its sails.
+    feed: {word: sailing, pos: noun, origin: feed}
+    provenance: {mode: manual, sources: [self], confidence: 1}

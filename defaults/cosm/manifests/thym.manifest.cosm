@@ -1,0 +1,304 @@
+# Thym 1: the MiniCOSM for programs, morphs, contexts, plans, traces and packages (Thym: the MacroCOSM language).
+#
+# What a program needs to know to read a thym volume: one file, declared oes: thym/1, that is one of six kinds. A
+# program volume is the enumeration of one .thym file (its blocks, steps and contracts; compiled back byte for byte);
+# a morph volume holds style sheets measured against the null morph or declared by hand; a context volume holds
+# occasions; a plan volume is what a program will do, before it does it; a trace volume is what a run did; a package
+# volume is the catalog of a self-contained export of a text. The prose is docs/THYM.md (section 17); the reference
+# compiler and runtime are enough/thym/ (0.5.0); the reference reader is enough/macrocosm.py. Where this file and the
+# reader disagree, the reader wins and this file is corrected.
+#
+# The moves: block at the end declares the moves this MiniCOSM owns (docs/THYM.md, section 17.6). Every MiniCOSM may
+# carry one; Comprise's lives beside its manifest in comprise.moves.cosm, since that manifest is a byte copy.
+#
+# Written in the COSM YAML subset: no anchors, no aliases, no tags, one document. Words that YAML 1.1 reads as
+# booleans (on, off, yes, no) are quoted.
+#
+# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
+
+manifest: minicosm/0
+macrocosm: 0.0.2
+name: thym
+title: Thym
+version: 1
+summary: "Programs that move meaning between densities, the morphs and contexts they use, the plans they make, the traces they leave, and the packages a text travels in."
+spec: docs/THYM.md
+reference: [enough/macrocosm.py, enough/thym/]
+
+declaration:
+  key: oes
+  value: thym/1
+  absent: refuse                  # a thym volume without oes: thym/1 is refused
+  legacy: []
+  both: oes
+  unknown: refuse
+
+format:
+  extension: .cosm
+  syntax: the COSM YAML subset
+  forbidden: [anchors, aliases, tags, multiple documents]
+  booleans: ['true', 'false']
+  encoding: utf-8
+  byte-order-mark: tolerated
+  newlines: [lf, crlf]
+
+volume:
+  catalog: ['<name>.thym.cosm', '<name>.morph.cosm', '<name>.context.cosm', '<run-id>.plan.cosm', '<run-id>.trace.cosm', package.cosm,
+            '<name>.package.cosm']
+  single-file: true
+  built-into: 'a program volume beside its .thym file when asked; plans and traces under ENOUGH_THYM_ROOT/runs/, ~/enough/thym/ by default; a package where its owner puts it'
+  program-file: '<name>.thym'     # the source a program volume is enumerated from; never committed as a volume, the file is the truth
+
+catalog:
+  keys: [oes, macrocosm, id, name, kind, source, front, built, program, plan, inputs, estimate, environment, started, ended, outcome,
+         contents, made, notice, encrypted, nodes]
+  id: thym/<slug>                 # thym/publish-story, thym/plain-letter, thym/2026-11-01-1042-7f3a, thym/orchard-notes
+  kind: [program, morph, context, plan, trace, package]
+  source-fields: [path, sha256, size]                      # a program volume: the .thym file it was enumerated from
+  front: 'a program volume: everything before the first block, verbatim (the version line, use lines, comments)'
+  built-fields: [at, by]
+  program-fields: [name, sha256]                           # a plan or a trace: the program it is of
+  plan-fields: [sha256]                                    # a trace: the plan it ran
+  inputs-fields: [name, type, path, sha256]
+  estimate-fields: [steps, asks, largest_prompt, output_words]
+  environment-fields: [enough, model, context, agent_free, memory_band]
+  outcome: [landed, refused]
+  contents-fields: [path, sha256, role, text]              # a package: role is text, fabula, morph, context or graph; text holds the bytes in the single-file form
+  made-fields: [program, trace, at, by]
+  # the sealed form (docs/THYM.md 15.3): the cipher and its AEAD, key: shown-once, the clear ids, the recovery
+  # keyring entry, the sealed manifest and the sealed chunks; the key itself is in no file
+  encrypted-fields: [cipher, aead, key, hid, bundle, keyring, manifest, chunks]
+
+module-file:
+  shapes:
+    - {key: nodes, holds: 'a list of items, each a mapping with a string id'}
+  duplicate-id: load error, the first wins
+
+ids:
+  item-form: '<module>:<kind>/<slug>'
+  program: 'P:program/<name>; a move P:move/<name>, or P:move/<program>.<name> when local to a program'
+  step: 'P:step/<program>.<n>, numbered from 1 in the order the statements are written; P:contract/<program>.<n> beside a contracted step'
+  run: 'R:plan/<run-id> and R:trace/<run-id> are the root items of a plan and a trace; R:node/<n> and R:record/<n> their parts'
+  inside-own-volume: bare
+
+paths:
+  form: '<module>/<kind>/<slug>#<field>'
+  levels: [module, kind, item, field]
+  segments:
+    module: '[PMCRK]'
+    kind: '[a-z][a-z0-9-]*'
+    slug: '[A-Za-z0-9](?:[A-Za-z0-9._@-]*[A-Za-z0-9_@-])?'
+    field: '[A-Za-z0-9][A-Za-z0-9_-]*(?:\.[A-Za-z0-9][A-Za-z0-9_-]*|\[[0-9]+\])*'
+  map:
+    - {path: '<module>', id: none}
+    - {path: '<module>/<kind>', id: none}
+    - {path: '<module>/<kind>/<slug>', id: '<module>:<kind>/<slug>'}
+    - {path: '<item path>#<field>', id: none}
+  qualified: 'oes:thym/<slug>/<path>'
+  qualified-database: the catalog id without thym/
+  case: kept and significant
+  refused: [a leading slash, a trailing slash, an empty segment, '.', '..', percent-encoding, a backslash, whitespace, a colon,
+            non-ASCII or control characters, a segment ending in a dot, a second '#', a kind the module does not declare,
+            more than three segments, 'a Windows reserved name as any segment, in any case, alone or before a dot (con, con.txt, prn, aux, nul, com0-9, lpt0-9)']
+
+envelope:
+  fields: [id, type, name, summary, status, visibility, provenance, pending, links, made]
+  references: [links]
+  required: [id, type, name, summary]
+  status: [active, dormant, planned, retired]
+  visibility: [public, internal, restricted]
+  provenance:
+    fields: [mode, sources, confidence, state]
+    modes: [dialectic, net-scan, system-scan, integration, structured-intake, manual, derived, asserted, archetype,
+            catalogue, directory, accounting]
+    states: [known, pending, not-disclosed, stale]
+    state-default: known
+    confidence: a number from 0 to 1
+    from-a-program: '{mode: derived, sources: [<name>.thym#L<a>-L<b>], confidence: 1}'
+  made: '{move, run, step, engine}: the move that made the item, the run and step, and rules or model:<id>; {move: none} for a hand-made item (docs/THYM.md 5.3)'
+  open-question: '{pending: "<the question>"}'
+  sentinels: [none, self]
+  unknown-fields: allowed and kept
+
+links:
+  rels: [of, after, step, node, see]
+
+closed-lists:
+  form: [let, assert, if, for, emit, give, withhold, effect]   # a step's statement kind
+  basis.*: [statistics, judgement]                              # how each scale was measured (a mapping, scale by scale)
+  toward: [formal, casual]                                      # the direction of the formality scale
+  outcome: [landed, refused]                                    # how a run ended
+
+references:
+  forms:
+    - {form: bare, example: 'P:step/publish-story.3', names: an item of the same volume}
+    - {form: typed-link, example: '{rel: see, to: P:program/publish-story}', names: its to; rel from links.rels}
+    - {form: open-question, example: '{pending: "<question>"}', names: an answer still owed}
+  unresolved: error
+
+modules:
+  P:
+    name: Programs
+    subtitle: What a program says and does
+    kinds:
+      program: {refs: [steps, moves], checked: [why, takes, gives, body, lines, order]}
+      move: {refs: [steps], checked: [params, body, lines, order]}          # order: a top-level move only
+      step: {refs: [of, contracts, branches.then, branches.else, steps], checked: [n, text, line, lines, form, move, calls, binds, uses, asks, slot]}
+      contract: {refs: [of], checked: [move, checks]}
+  M:
+    name: Morphs
+    subtitle: How a telling departs from the plainest one
+    kinds:
+      morph: {refs: [], checked: [scales, evidence, basis, confidence, pinned, toward, shared]}
+  C:
+    name: Contexts
+    subtitle: The occasion a text is told or read on
+    kinds:
+      context: {refs: [], checked: [purpose, audience, medium, moment, hurry, words, minutes, language]}
+  R:
+    name: Runs
+    subtitle: What a program will do, and what a run did
+    kinds:
+      plan: {refs: [nodes], checked: [asks, largest_prompt]}
+      node: {refs: [after], checked: [step, move, asks, takes, gives, budget, line, repeats, branch, slot]}
+      trace: {refs: [records, stopped_at], checked: [outcome]}
+      record: {refs: [node], checked: [move, inputs, outputs, engine, attempts, tokens, seconds, checks]}
+  K:
+    name: Packages
+    subtitle: What a text travels in, and what was read from it
+    kinds:
+      package: {refs: [], checked: [contents, made]}
+      reading: {refs: [of], checked: [read_through, path, at, by]}
+
+checks:
+  load: [load]
+  envelope: [duplicate-id, id-grammar, id-module, type, type-prefix, identity-min, status, visibility, ref-grammar,
+             ref-unresolved, closed-list, pending-shape, catalog-key]
+  own: 'program-compiles, plan-acyclic, trace-complete, scale-range, digests and reading-labelled are Thym''s own, run by enough/thym (docs/THYM.md 17.4); a generic reader lists them as not run'
+  severity: {}
+
+open-questions:
+  form: '{pending: "<the question>"}'
+  field-path: keys joined by ".", list positions as [n]
+  on-the-whole-item: field path node
+
+renderers:
+  - id: program
+    makes: the program as written, compiled back from its items (the short density)
+    lens: {kind: short, order: told}
+  - id: plan
+    makes: the plan's nodes in the order they run, joined by what each takes from the others
+    lens: {kind: mermaid, diagram: flowchart, include: [R], edges: [after], local: false}
+  - id: trace
+    makes: every record of a run as one row
+    lens: {kind: table, columns: [id, move, engine, attempts, seconds]}
+  - {id: text-tree, makes: the text tree, code: [python -m enough.macrocosm tree]}
+  - {id: compile, makes: the .thym file again, byte for byte, code: [python -m enough.thym compile]}
+
+moves:                                  # the moves thym/1 owns (docs/THYM.md, sections 6.2 and 6.3)
+  - name: cut
+    takes: [short]
+    gives: short
+    modifiers: {to: 'words | sentences'}
+    contract: [whole-sentences, weight-order, coverage, provenance]
+    code: enough.thym.moves.edit:cut
+    says: a short shortened by whole sentences, the lightest first
+  - name: count
+    takes: ['volume | fabula | short | list']
+    gives: number
+    code: enough.thym.moves.edit:count
+    says: how many items, lines or members
+  - name: words
+    takes: ['text | short | atem']
+    gives: number
+    code: enough.thym.moves.edit:words
+    says: how many words
+  - name: digest
+    takes: ['text | fabula | short | atem | item | volume | morph | graph | package']
+    gives: string
+    code: enough.thym.moves.edit:digest
+    says: the sha256 of a value's canonical bytes
+  - name: 'null'
+    takes: []
+    gives: short
+    modifiers: {of: fabula}
+    asks: true
+    contract: [coverage, no-invention, stance-kept, null-pinned, provenance]
+    scaffold: outline
+    code: enough.thym.moves.morph:null
+    says: the plainest telling of a fabula, the reference every morph is measured against
+  - name: measure
+    takes: [text]
+    gives: morph
+    modifiers: {against: short}
+    asks: true
+    contract: [scale-range, scale-evidence, provenance]
+    scaffold: statistics
+    code: enough.thym.moves.morph:measure
+    says: a text's departure from the null telling on ten scales, with evidence
+  - name: morph
+    takes: [short]
+    gives: short
+    modifiers: {with: morph}
+    asks: true
+    contract: [coverage, no-invention, stance-kept, scales-met, provenance]
+    code: enough.thym.moves.morph:morph
+    says: a short told again in a morph
+  - name: read
+    takes: [fabula]
+    gives: short
+    modifiers: {with: morph, in: context}
+    asks: true
+    contract: [coverage, no-invention, stance-kept, scales-met, labelled, never-source, provenance]
+    code: enough.thym.moves.morph:read
+    says: someone else's fabula told in your morph, for this occasion, labelled a reading
+  - name: package
+    takes: [text, fabula, morph, context, graph]
+    gives: package
+    contract: [digests, released, provenance]
+    code: enough.thym.moves.pack:package
+    says: a text with its fabula, morph, context and released graph, self-contained
+  - name: unpack
+    takes: [package]
+    gives: text
+    contract: [digests]
+    code: enough.thym.moves.pack:unpack
+    says: the text a package carries, after its digests are checked
+  - name: lint
+    takes: [volume]
+    gives: report
+    code: enough.thym.moves.edit:lint
+    says: the checks a volume's MiniCOSM selects, and their verdicts
+  - name: trace
+    takes: []
+    gives: trace
+    code: enough.thym.moves.edit:trace
+    says: the current run's trace so far
+  - name: fabula
+    takes: []
+    gives: fabula
+    modifiers: {of: package}
+    code: enough.thym.moves.pack:fabula_of
+    says: the fabula a package carries
+  - name: context
+    takes: []
+    gives: context
+    modifiers: {of: 'text | package'}
+    code: enough.thym.moves.pack:context_of
+    says: the surrounding volume's catalog around a text, read-only, or the context a package carries
+  - name: graph
+    takes: []
+    gives: graph
+    modifiers: {of: 'text | package'}
+    contract: [released]
+    code: enough.thym.moves.pack:graph_of
+    says: what the holograph released for a text, or nothing
+  - name: isomorph
+    takes: []
+    gives: morph
+    modifiers: {of: package}
+    code: enough.thym.moves.pack:isomorph_of
+    says: the morph a package carries, the author's shared one, or nothing
+
+extension:
+  status: not built

@@ -106,6 +106,23 @@ def test_tree_payload_keeps_its_wire_keys_and_flags(client: TestClient, project:
     assert proj["meadow"]["holotype"] is True and proj["meadow"]["children"]   # contents still shown
 
 
+def test_tree_keeps_a_thym_package_whole(client: TestClient, project: Path):
+    """THYM.md 15.1: a package's folder form is one row with no children (never opened up as loose texts); the
+    single file and the sealed form carry their kind, so the page routes a click to the package card."""
+    from enough.thym import vault
+    outputs = REPO / "tests" / "fixtures" / "thym" / "replay" / "publish-story" / "2026-11-01-2148-35b5" / "outputs"
+    shutil.copytree(outputs / "notes.thym", project / "story.thym")
+    shutil.copyfile(outputs / "out.package.cosm", project / "story.package.cosm")
+    sealed, _key = vault.seal((outputs / "out.package.cosm").read_bytes(), path="story.package.cosm", slug="story")
+    (project / "story.thym.enc").write_bytes(sealed)
+    proj = {n["name"]: n for n in client.get("/api/canon/tree").json()["project"]}
+    assert proj["story.thym"]["kind"] == "package" and proj["story.thym"]["is_dir"] is True
+    assert proj["story.thym"]["children"] == [], "a package folder is never opened up"
+    assert proj["story.package.cosm"]["kind"] == "package"
+    assert proj["story.thym.enc"]["kind"] == "sealed"
+    assert "kind" not in proj["notes.md"] and "kind" not in proj["meadow"]
+
+
 def test_mirror_payload_has_volume_path_and_canon_source(client: TestClient):
     box = _store_volume(client, "m")
     (box / "guide").mkdir()

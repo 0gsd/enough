@@ -1,0 +1,24 @@
+thym 0
+
+program open-house
+  why: show what the house sells and what it wants, as the house says them; say how many
+       people only in bands; keep everything internal inside.
+
+  takes h: volume                  -- the holotype
+  gives i: volume                  -- an isotype: comprise-isotype/0, and no more
+
+  move offer-line(o: item): item
+    give mark o as verified        -- an offer is what the house does now: verified
+  end
+
+  for each o in h where kind in [product, service, platform]
+    emit offer-line o
+  end
+  for each a in h where kind is aim
+    emit mark a as stated          -- an aim is the house's own words: stated
+  end
+  let staff = h where module is employees
+  emit employees: band (count staff) as [none, some] marked verified     -- never a number
+  withhold h where visibility is internal
+  give project h as isotype
+end

@@ -1,0 +1,22 @@
+contract:
+  move: derive
+  schema:
+    format: text
+    engine: passage
+  checks:
+  - span-resolves
+  - stance-closed
+  - terms-grounded
+  - coverage
+  - emf-checks
+  - provenance
+inputs:
+  messages: 40e0bbb5948118db08d5ad4c65ad296b68da14027d7999f2e7cb192cdd3c3b45
+engine: model:Qwen3.8-27B-Q4_K_M.gguf
+attempts: 1
+tokens: 1566
+seconds: 6
+output: "nodes:\n  - id: L:term/mould\n    type: term\n    name: mould\n    summary: \"Commonwealth spelling of\
+  \ mold: a fuzzy fungal growth, loose soil rich in organic matter.\"\n    sense: noun\n    span:\n      lines:\
+  \ \"13\"\n    provenance:\n      mode: derived\n      sources:\n        - notes.md#L13\n      confidence: 1.0\n\
+  \      state: known\n"

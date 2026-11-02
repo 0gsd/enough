@@ -1,0 +1,9 @@
+-- refused: compile unbound line 8
+thym 0
+
+program loose
+  why: a name nobody bound.
+  takes t: text
+  gives f: fabula
+  give derive story
+end

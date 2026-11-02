@@ -179,12 +179,14 @@ def test_sniff_declaration_reads_only_the_head():
 # Manifests and the registry
 # ---------------------------------------------------------------------------
 
-def test_registry_loads_the_five_manifests_in_order():
+def test_registry_loads_the_shipped_manifests_in_order():
+    """The five of 0.0.1 in registry order, then any other by name (spec 13.6): ascribe and thym joined in 0.5.0."""
     reg = M.default_registry()
-    assert list(reg.manifests) == ["comprise", "cosm", "canon", "emf", "doc"]
+    assert list(reg.manifests) == ["comprise", "cosm", "canon", "emf", "doc", "ascribe", "thym"]
     assert reg.problems == []
     assert [(m.name, m.version) for m in reg.manifests.values()] == [("comprise", 1), ("cosm", 0), ("canon", 1),
-                                                                      ("emf", 1), ("doc", 1)]
+                                                                      ("emf", 1), ("doc", 1), ("ascribe", 1),
+                                                                      ("thym", 1)]
     assert M.default_registry() is reg
 
 
@@ -230,7 +232,8 @@ def test_load_manifest_refuses_what_is_not_one(tmp_path):
     bad = _write(tmp_path, "y.manifest.cosm", "manifest: minicosm/0\nname: Y Z\nversion: 1\n")
     assert isinstance(M.load_manifest(bad), M.Refusal)
     reg = M.Registry([tmp_path, MANIFESTS])
-    assert len(reg.problems) == 2 and list(reg.manifests) == ["comprise", "cosm", "canon", "emf", "doc"]
+    assert len(reg.problems) == 2 and list(reg.manifests) == ["comprise", "cosm", "canon", "emf", "doc", "ascribe",
+                                                              "thym"]
 
 
 # ---------------------------------------------------------------------------
@@ -654,6 +657,15 @@ def test_cosm02_reads_the_legacy_tree(vols):
     assert kinds["meadow"] == "brand" and kinds["role/Founder"] == "role" and kinds["ext/banks"] == "external"
     assert M.item_path(v, v.items["ext/banks"]) == "P/external/banks"
     assert M.resolve_path(v, "P/brand/meadow").id == "meadow"
+
+
+def test_a_catalog_without_a_name_is_titled_by_its_handle(tmp_path):
+    """A holograph's catalog never names its person (ascribe/1), so its title is the handle, not its first item."""
+    v = M.load_volume(REPO / "tests" / "fixtures" / "ascribe" / "sample-self")
+    assert "name" not in v.catalog and v.name == v.catalog["handle"] == "salt-and-crumb"
+    # A name, when there is one, still wins.
+    (tmp_path / "x.cosm").write_text("oes: cosm/0\nid: cosm/x\nname: Named\nhandle: h\nnodes: []\n", encoding="utf-8")
+    assert M.load_volume(tmp_path / "x.cosm").name == "Named"
 
 
 def test_emf_twin_shape(vols):

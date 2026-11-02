@@ -199,6 +199,7 @@ All three by Georgi Gerganov and contributors.
 | sse-starlette | BSD-3-Clause | Server-Sent Events for FastAPI | <https://github.com/sysid/sse-starlette> |
 | python-multipart | Apache-2.0 | Multipart form parsing | <https://github.com/Kludex/python-multipart> |
 | pydantic | MIT | Data models under FastAPI | <https://github.com/pydantic/pydantic> |
+| cryptography | Apache-2.0 OR BSD-3-Clause | AES-256-GCM for sealed Thym packages (0.5.0) | <https://github.com/pyca/cryptography> |
 
 ### Translation runtime
 

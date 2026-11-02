@@ -1,0 +1,33 @@
+contract:
+  move: derive
+  schema:
+    format: text
+    says: the whole text's atem, as Canon's derivation asks for it
+  checks:
+  - span-resolves
+  - stance-closed
+  - terms-grounded
+  - coverage
+  - emf-checks
+  - provenance
+inputs:
+  messages: dae7d8b0e7bf384b8278d473a75deef479adfff0aa5114a9348423f546fb0761
+engine: model:Qwen3.8-27B-Q4_K_M.gguf
+attempts: 1
+tokens: 980
+seconds: 7
+output: 'line: Mara Okafor and the narrator plan to ask the parish council to delay mowing the orchard meadow strip
+  until September to protect pollinators.
+
+  focus: The text details the orchard''s improved yield and the specific threat that early mowing poses to the wildflowers
+  feeding essential insects.
+
+  push: The author wants the reader to support the request to delay mowing because it protects the orchard''s fruit
+  production.
+
+  pull: The text assumes the meadow strip is the orchard''s primary pollinator source and that the council will
+  accept the delay request.
+
+  stance_profile: {axiom: 1, observed: 2, deduced: 1, opinion: 2, assumed: 1, hearsay: 1}
+
+  '

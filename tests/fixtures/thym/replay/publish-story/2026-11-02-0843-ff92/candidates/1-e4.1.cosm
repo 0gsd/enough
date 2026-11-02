@@ -1,0 +1,139 @@
+engine: feed
+inputs:
+  call: 50ff654fcffd5434692f39b3a177a7567ff11543f6d894c72c67482262cb68e9
+keys: []
+tokens: 0
+seconds: 0
+output:
+  pollinate:
+    word: pollinate
+    letter: p
+    length: 9
+    is_headword: 1
+    pronunciation: /ˈpɑləˌneɪt/
+    ipa: /ˈpɑləˌneɪt/
+    definition: To transfer pollen to a flower's stigma, enabling fertilization.
+    usage_note: null
+    pos: verb
+    pos_primary: verb
+    synonyms: null
+    forms:
+    - word: pollinated
+      pronunciation: /ˈpɑləˌneɪtɪd/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: pollinates
+      pronunciation: /ˈpɑləˌneɪts/
+      labels:
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+    - word: pollinating
+      pronunciation: /ˈpɑləˌneɪtɪŋ/
+      labels:
+      - pres. part.
+      synonyms: []
+      label_meanings:
+      - present participle
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - great
+    - state
+    - wait
+    - late
+    - date
+    - rate
+    - hate
+    - straight
+    - create
+    - eight
+    - weight
+    - separate
+    - estate
+    - appreciate
+    - update
+    - debate
+    - mate
+    - plate
+    - operate
+    - celebrate
+    - gate
+    - participate
+    - fate
+    - indicate
+    - investigate
+    - relate
+    - generate
+    - communicate
+    - demonstrate
+    - eliminate
+    slant_rhymes:
+    - make
+    - take
+    - break
+    - lake
+    - wake
+    - shape
+    - mistake
+    - fake
+    - escape
+    - cake
+    - rape
+    - tape
+    - sake
+    - landscape
+    - shake
+    - cape
+    - snake
+    - jake
+    - earthquake
+    - stake
+    homophones: []
+    domain: plants
+    etymology: From Latin pollen, genitive pollinis 'fine flour', plus -ate.
+    examples:
+    - The orchard keepers of Damson Hill rent hives each spring so the bees will pollinate the plum blossom.
+    - Children in Ring C used soft brushes to pollinate the squash flowers by hand.
+    related:
+    - pollen
+    - fertilize
+    - bee
+    antonyms: []
+    hyphenation: pol·li·nate
+    frequency_rank: 2
+    first_use: 19th century
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - polliniser
+    fr_definition: Transférer du pollen jusqu'au stigmate d'une fleur, permettant ainsi la fécondation.
+    es_compare:
+    - polinizar
+    es_definition: Transferir polen hasta el estigma de una flor, permitiendo así la fecundación.
+    de_compare:
+    - bestäuben
+    de_definition: Pollen auf die Narbe einer Blüte übertragen und dadurch die Befruchtung ermöglichen.
+    zh_compare:
+    - 传粉
+    zh_definition: 将花粉传送到花的柱头上，从而使受精成为可能。
+    ja_compare:
+    - 受粉させる
+    ja_definition: 花粉を花の柱頭に運び、受精を可能にすること。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 2
+      name: Rare
+      examples: honeypot, gloaming, subfolder
+    syllables: 3
+    era: 19th century

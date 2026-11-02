@@ -1,0 +1,10 @@
+nodes:
+  - id: S:skill/racing-starts
+    type: skill
+    name: Racing starts
+    summary: Crossing the line at full speed as the gun goes.
+    form: F:form/sailing
+    strength: 2
+    links:
+      - {rel: inspired-by, to: E:experience/first-regatta}
+    provenance: {mode: manual, sources: [self], confidence: 1}

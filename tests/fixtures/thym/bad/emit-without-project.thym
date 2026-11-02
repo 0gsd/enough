@@ -1,0 +1,12 @@
+-- refused: compile emit-without-project line 9
+thym 0
+
+program nowhere
+  why: emitted items go nowhere.
+  takes h: volume
+  gives n: number
+  for each o in h where kind is aim
+    emit o
+  end
+  give count h
+end

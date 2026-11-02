@@ -417,7 +417,8 @@ stop silently.
 #   column guide is the `lexicographer` skill, in the Skills section when it
 #   is on and one `dict_guide` call away when it is off.
 # - the MacroCOSM tools (`cosm_read`, `cosm_lint`, `emf_derive`, `atem`,
-#   `cosm_guide`, 0.4.3; `doc_lookup`, 0.4.4), behind the MacroCOSM manifests shipping with this
+#   `cosm_guide`, 0.4.3; `doc_lookup`, 0.4.4; `thym_check` and `thym_run`, 0.5.0, which answer only
+#   with the `macrocosm-oes` skill on), behind the MacroCOSM manifests shipping with this
 #   install — so in every project, as the owner decided (docs/canon-043-plan.md
 #   §13, decision 12: on by default, under 1,000 chars of prompt). The guide is
 #   the `macrocosm-oes` skill, off by default like every shipped skill and one
@@ -580,7 +581,7 @@ Skills, call `dict_guide` (no tags) for the column guide before writing.
 CANON_TOOL_INSTRUCTIONS = """\
 ## MacroCOSM
 
-`.cosm` files are MacroCOSM volumes: Holotypes, Canon catalogs, EMF twins.
+`.cosm` files are MacroCOSM volumes: Holotypes, catalogs, EMF twins.
 Paths are project-relative or `canon:<volume>/...`.
 
 <tool name="cosm_read">
@@ -606,13 +607,20 @@ Paths are project-relative or `canon:<volume>/...`.
 <term>stance</term>
 </tool>
 
-`cosm_read` shows the tree; `<item>` (an id or a path) one item. `emf_derive`
-decompiles a text into its EMF twin (`notes.md.cosm`), only when the user
-asks. `atem` gives the line, focus, push and pull and writes them into the
-twin; `<text>` instead of `<path>` for a passage, written nowhere. Unless the
-macrocosm-oes skill is in your Skills, read `cosm_guide` before you derive.
-`doc_lookup` says what a term, section number or id means in the MacroCOSM
-spec or the enough manual.
+<tool name="thym_check">
+<path>a.thym</path>
+</tool>
+
+<tool name="thym_run">
+<program>open-house</program>
+<path>meadow</path>
+</tool>
+
+`cosm_read` shows the tree or one `<item>`. `emf_derive` makes a text's EMF
+twin, only when asked. `atem` writes line, focus, push and pull into the twin;
+`<text>` for a passage, kept nowhere. `doc_lookup` explains a spec or manual
+term. `thym_check` checks a Thym program, `thym_run` runs one; both need the
+macrocosm-oes skill on. Without it, read `cosm_guide` before you derive.
 """
 
 

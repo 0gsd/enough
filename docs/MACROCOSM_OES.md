@@ -1,16 +1,16 @@
 # MacroCOSM OES
 
-*Specification v0.0.1 · 2026-10-23*
+*Specification v0.0.2 · 2026-11-02*
 
 MacroCOSM OES is the shared grammar every MiniCOSM is written in. It says how a domain is enumerated as plain-text
 `.cosm` files that are at once a file system and a relational database, made to be rendered: how a file is read, how a
 volume names the language it is written in, what an item is and which columns every item carries, how one item points
 at another, how an unknown value is written down, how anything is addressed, which checks every volume can be held to,
 how a manifest declares a MiniCOSM, and how a renderer draws one. It is the grammar that Comprise OES 1 worked out for
-companies, read out of it and written down on its own, so that nothing in it says "company". Five MiniCOSMs are
-written in it today: `comprise`, `cosm`, `canon`, `emf` and `doc` (section 18).
+companies, read out of it and written down on its own, so that nothing in it says "company". Seven MiniCOSMs are
+written in it today: `comprise`, `cosm`, `canon`, `emf`, `doc`, `ascribe` and `thym` (section 18).
 
-**Status.** Normative for version 0.0.1. The reference reader is `enough/macrocosm.py`. Where this text and the reader
+**Status.** Normative for version 0.0.2. The reference reader is `enough/macrocosm.py`. Where this text and the reader
 disagree, **the reader wins**, and this text is corrected. Section 19.4 collects every disagreement known at the time
 of writing. *By reference* marks a part that is defined elsewhere and not built here; *mapped* marks a part that is
 planned and not built anywhere.
@@ -87,6 +87,7 @@ one learned.
 | COSM 0.3 | 2026-10-20 | the tree taken whole into Comprise OES 1 as its chapter P, the product tree: the root renamed the brand, a `restricted` visibility, ids namespaced inside a Holotype | `cosm: 0.3`, `brand:`, `P:offering/ledger` |
 | Comprise OES 1 | 2026-10-20 | the first MiniCOSM: a company as a folder that is also a relational database, eight modules, a declaration line, paths, a manifest, and a map naming MacroCOSM, MiniCOSM and MicroCOSM as *mapped, not built* | `oes: comprise/1`, `manifest: minicosm/0` |
 | MacroCOSM OES 0.0.1 | 2026-10-22 | this document: the grammar Comprise mapped, written down apart from any one domain, with a reader that loads any MiniCOSM from its manifest | `oes: <minicosm>/<major>`, `macrocosm: 0.0.1` (reserved) |
+| MacroCOSM OES 0.0.2 | 2026-11-02 | two MiniCOSMs more, `ascribe/1` (a self with no name, section 18.6) and `thym/1` (programs, morphs, contexts, plans, traces and packages, section 18.7); the `moves:` block of a manifest and the `<name>.moves.cosm` sidecar (section 13.4); the grammar unchanged | `macrocosm: 0.0.2` (reserved) |
 
 The earlier specifications stay where they are. COSM 0.2 is the context-ontology skill's own reference. Comprise OES 1
 is `oes/comprise-oes.md` in the Comprise repository, with its map in `oes/README.md` and its manifest in
@@ -166,7 +167,7 @@ references, and the checks. A MiniCOSM may keep a local database beside its file
 | Scale | What it is | In this version |
 |---|---|---|
 | **MacroCOSM** | the whole language: the shared grammar every MiniCOSM is written in | this document, and the reader `enough/macrocosm.py` |
-| **MiniCOSM** | an OES for one domain, declared by a manifest: its volume layout, modules, kinds, fields, references, checks and renderers | five ship with enough: `comprise`, `cosm`, `canon`, `emf`, `doc` (section 18) |
+| **MiniCOSM** | an OES for one domain, declared by a manifest: its volume layout, modules, kinds, fields, references, checks and renderers | seven ship with enough: `comprise`, `cosm`, `canon`, `emf`, `doc`, `ascribe`, `thym` (section 18) |
 | **MicroCOSM** | one organization's extension on top of a MiniCOSM: the extra kinds, fields, checks or renderers it needs | mapped, not built (section 17) |
 
 **What MacroCOSM gives every MiniCOSM.** All of it, unchanged: sections 4 to 14 of this document, and the parts
@@ -222,7 +223,7 @@ A reader must not crash on a forbidden construct, and must name it in the proble
 | `2019-03-01` | a date | a date field is a date, not a string |
 | `2026-10-22T09:15:30Z` | a date and time, in UTC | |
 | `cosm: 0.3` | the float 0.3 | a version compares as text (`0.3`), never as a number |
-| `macrocosm: 0.0.1` | the string `0.0.1` | |
+| `macrocosm: 0.0.2` | the string `0.0.2` (a reader keeps `0.0.1` as it is) | |
 | `0.10` | the float 0.1 | |
 | `7:00` | the integer 420 (base 60) | write times quoted: `"07:00"` |
 | `012` | the integer 10 (octal) | write codes with leading zeros quoted: `"012"` |
@@ -356,7 +357,7 @@ A legacy key is never an error. A reader keeps it.
 
 ### 5.6 The reserved key `macrocosm:`
 
-A catalog or a manifest may carry `macrocosm: 0.0.1`, after its declaration. Readers keep the key and ignore it. It is
+A catalog or a manifest may carry `macrocosm: 0.0.2` (or an earlier `0.0.1`), after its declaration. Readers keep the key and ignore it. It is
 reserved for the day the grammar itself needs a version test; until then no reader refuses a file for what it says,
 and no writer is required to write it.
 
@@ -956,6 +957,15 @@ A generic reader needs only the keys above to load, check and draw a volume. Eve
 A manifest is never rewritten by a reader. The Comprise manifest that ships with enough is a byte copy of Comprise's own,
 refreshed from it and never edited in enough.
 
+A manifest may also carry a `moves:` list: the moves its MiniCOSM declares for Thym, the language that composes them
+(`docs/THYM.md`, where the block has a part of its own). Each entry names a move, what it takes and gives, its
+modifiers, whether it asks the model, the contract its output is held to, its rules-mode stand-in and its reference
+code. The generic reader keeps the block as one more key it does not use; the Thym compiler reads it, from every
+manifest in the registry, when it resolves a program's names. A MiniCOSM whose manifest enough does not edit declares
+its moves in a sidecar beside the manifest, `<name>.moves.cosm`, a mapping
+`{moves-of: <minicosm>/<major>, moves: [...]}`: Comprise's is `comprise.moves.cosm`. A sidecar is not a manifest, and
+the registry passes it by; where a manifest and a sidecar both declare moves, the manifest's list wins.
+
 ### 13.5 What 0.0.1 adds
 
 Optional keys new in 0.0.1: `volume.single-file`, `renderers[].lens`, `links.rels`, `closed-lists`,
@@ -984,9 +994,10 @@ Three more optional keys, which the reference reader (`enough/macrocosm.py`) als
 
 A reader loads every `*.manifest.cosm` in its manifest folders into a **registry**. enough's are
 `defaults/cosm/manifests/` (shipped, read-only); a folder for a person's own manifests, `~/enough/cosm/manifests/`, is
-mapped. The registry order is `comprise`, `cosm`, `canon`, `emf`, `doc`, then any other in name order. A manifest that does not
-load, or that names a MiniCOSM already in the registry, is skipped and reported; the first one wins. The registry is
-what step 1 of section 5.2 compares a declaration against, and what a refusal lists as known.
+mapped. The registry order is `comprise`, `cosm`, `canon`, `emf`, `doc`, then any other in name order (`ascribe`, then
+`thym`). A manifest that does not load, or that names a MiniCOSM already in the registry, is skipped and reported; the
+first one wins. The registry is what step 1 of section 5.2 compares a declaration against, and what a refusal lists as
+known.
 
 ---
 
@@ -1096,11 +1107,18 @@ are quoted, so no label can end a subgraph or break a line; subgraphs balance.
 | `doc` | `graph` | what an item mentions, defines and exemplifies, and what mentions it |
 | `doc` | `inventory` | every item as one row: its id, kind, version, anchor and atem (a table, not a drawing) |
 | `doc` | `tree` (the generic lens) | the document's sections, joined by `parts` and `parent` |
+| `ascribe` | `self` | the self at a glance: a branch for each of the ten modules and a leaf for each node, as a mindmap |
+| `ascribe` | `graph` | every typed link between the nodes and the forms, coloured by valence |
+| `ascribe` | `timeline` | every node that carries a `when`, one row each, in order (a table, not a drawing) |
+| `thym` | `program` | the program as written, compiled back from its items: its short density (a short, not a drawing) |
+| `thym` | `plan` | a plan's nodes in the order they run, joined by what each runs after |
+| `thym` | `trace` | every record of a run as one row (a table, not a drawing) |
 
 In the reader's order, a volume has these lenses: a Holotype, `map` and `tree` (the `tree` only when its items carry
 `parts` or `parent`); a cosm tree, `tree` and `map`; a Canon volume, `tree` and `map`; an EMF, `claims` and `map`; a doc
-volume, `map`, `graph` and `tree`. EMF's own `map`, the mindmap, takes the place of the generic one, and so does
-DocOES's; its `manual` and `inventory` are drawn by its own renderers.
+volume, `map`, `graph` and `tree`; a holograph, `self`, `graph` and `map`; a Thym volume, `plan` and `map`. EMF's own
+`map`, the mindmap, takes the place of the generic one, and so does DocOES's; its `manual` and `inventory` are drawn by
+its own renderers, as Ascribe's `timeline` and Thym's `program` and `trace` are by theirs.
 
 ---
 
@@ -1169,8 +1187,9 @@ How a volume says that it uses a MicroCOSM, and how a reader loads one, are not 
 
 ## 18. The MiniCOSMs enough ships
 
-<!-- atem: the five MiniCOSMs enough ships, one manifest each -->
-Five manifests ship in `defaults/cosm/manifests/`, one per MiniCOSM.
+<!-- atem: the seven MiniCOSMs enough ships, one manifest each -->
+Seven manifests ship in `defaults/cosm/manifests/`, one per MiniCOSM, and one sidecar of moves beside them
+(section 13.4).
 
 | MiniCOSM | Declaration | Enumerates | Volume | Catalog | Modules |
 |---|---|---|---|---|---|
@@ -1179,6 +1198,8 @@ Five manifests ship in `defaults/cosm/manifests/`, one per MiniCOSM.
 | `canon` | `oes: canon/1` | a Canon volume, or a project: folders, files, articles, and what has been derived from them | one file | `canon.cosm` | V |
 | `emf` | `oes: emf/1` | one text: its words, the things and ideas it names, its claims, its events, its atems | one file, beside the text | `<text>.cosm` | L E K P T X |
 | `doc` | `oes: doc/1` | one document: its sections, terms, examples and decisions, joined to the reference | one file per telling, built by enough | `<doc>.<lang>.doc.cosm` | S T R B |
+| `ascribe` | `oes: ascribe/1` | one person, without a name: the holograph, ten kinds of node anchored to forms | a folder, the holograph | `holograph.cosm` | A B C E I O Q S U Y F |
+| `thym` | `oes: thym/1` | Thym's programs, morphs, contexts, plans, traces and packages | one file, one of six kinds | `<name>.thym.cosm`, `<name>.morph.cosm` … | P M C R K |
 
 ### 18.1 comprise: Comprise OES 1
 
@@ -2239,6 +2260,170 @@ nodes:
     A failed close is retried at five. Section 1 says what it locks.
 ```
 
+### 18.6 ascribe: a person's holograph
+
+<!-- atem: one person described without a name, in ten kinds of node anchored to forms -->
+**What it enumerates.** One person, described well enough that no name is needed. Ascribe's volume is a **holograph**:
+the whole self, private, kept by its subject, as a Holotype is a company's. It holds what the person is drawn to,
+believes, worries about, has lived through, wants to know, thinks, feels, can do, understands and longs for, each item
+anchored to the thing it is about. There is no kind and no field for a name, an email address, a phone number, a postal
+address, a birth date, a government id or an employer's legal name; people in a person's life appear by role or by a
+pseudonym the catalog declares. The full description is `docs/ASCRIBE.md`; the manifest is
+`defaults/cosm/manifests/ascribe.manifest.cosm`.
+
+**Its declaration.** `oes: ascribe/1`. There is no legacy form, and a catalog without the key is refused.
+
+**Its volume.** A folder whose catalog, `holograph.cosm`, is the self: `id: ascribe/<hid>` (twenty-six characters of
+lowercase base32, the shape of a Comprise Connect `hid`), a pseudonymous `handle`, an optional one-line `summary`,
+`pseudonyms` and `sample`. Beside it sit the module folders, `A/` to `Y/` and `F/`, each holding `.cosm` files of
+`nodes:`. The catalog may carry a few nodes of any module in its own `nodes:`, which is how the example below is one
+file. A `.ascribe-private` marker names files that ingest and transfer leave behind; the rule is declared, and enough
+applies it nowhere yet.
+
+**Its modules and kinds.** Ten containers of the self, one kind each, the kind the singular of the module's name and the
+letter its initial, and F for what they anchor to.
+
+| Kind | Module | What it is |
+|---|---|---|
+| `affinity` | A Affinities | something the person is drawn to, or turns from |
+| `belief` | B Beliefs | something the person holds to be true |
+| `concern` | C Concerns | something that weighs on the person |
+| `experience` | E Experiences | something that happened to the person, or that they did |
+| `interest` | I Interests | something the person wants to know more about |
+| `opinion` | O Opinions | something the person thinks, and would say so |
+| `quale` | Q Qualia | how something feels from the inside |
+| `skill` | S Skills | something the person can do |
+| `understanding` | U Understandings | something the person has come to understand |
+| `yearning` | Y Yearnings | something the person longs for |
+| `form` | F Forms | a thing a self can be about, grounded in FEED where it is one word FEED has |
+| `polyform` | F Forms | several forms taken together, with the links between them |
+| `relation` | F Forms | a relation the author declares beyond the starter list, named by its slug |
+
+**Its envelope** is Comprise's, so that the same moves work on both subjects, plus six fields of Ascribe's own: `form`
+(what a node is about: every node of the ten kinds names a form or a polyform), `of` and `parts` (a hierarchy, a branch
+or a flat list, as the author likes), `when` (a date, a year or an era word), `valence` (`for`, `against` or `mixed`)
+and `strength` (1 to 5). Typed links use a starter list of relations (`is-a`, `part-of`, `about`, `because`, `before`,
+`after`, `with`, `against`, `like`, `from`, `toward`, `see`) or a relation the holograph declares; the manifest keeps
+`links.starter` rather than a closed `links.rels`, so the generic reader lets a declared relation through and Ascribe's
+own check closes the list.
+
+**In enough.** The reader loads, checks and draws a holograph like any volume, titled by its handle. Ascribe's own
+checks (an anchored form, a declared relation, the shape of a `when`, the range of a `strength`, what reads like
+personal data, and what a private marker would drop) run in `enough/ascribe.py`, as
+`python -m enough.ascribe lint <folder>`, and a generic reader runs none of them. The personal-data check warns and
+never refuses. Nothing else of Ascribe is built: no application module, no isograph, no index.
+
+**An example.** A holograph small enough to be one file: two forms, a declared relation and two nodes.
+
+```cosm
+oes: ascribe/1
+id: ascribe/aej6l5qrka6c6btarfiy2f7vnj
+handle: salt-and-crumb
+summary: A baker by a working harbour, slow at most things on purpose.
+sample: true
+visibility: internal
+pseudonyms: [Wren]
+nodes:
+  - id: F:form/sourdough
+    type: form
+    name: sourdough
+    summary: Bread leavened by a starter of wild yeasts and bacteria instead of commercial yeast.
+    feed: {word: sourdough, pos: noun, origin: feed}
+    provenance: {mode: dialectic, sources: [session-1], confidence: 1}
+  - id: F:relation/learned-in
+    type: relation
+    name: learned in
+    summary: A skill picked up during the experience the link points to.
+    provenance: {mode: manual, sources: [self], confidence: 1}
+  - id: A:affinity/sourdough-baking
+    type: affinity
+    name: Baking sourdough
+    summary: Bread from a starter kept going for years, baked twice a week.
+    form: F:form/sourdough
+    valence: for
+    strength: 5
+    when: 2016
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.95}
+  - id: S:skill/shaping-dough
+    type: skill
+    name: Shaping dough
+    summary: A loaf shaped by feel, tight enough to hold its rise.
+    form: F:form/sourdough
+    strength: 4
+    links:
+      - {rel: learned-in, to: A:affinity/sourdough-baking}
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.9}
+```
+
+### 18.7 thym: programs and what they leave
+
+<!-- atem: Thym's programs, morphs, contexts, plans, traces and packages, one file each -->
+**What it enumerates.** What Thym, the language that moves meaning between densities and projections, reads and writes.
+A `thym/1` volume is one of six kinds: a **program** volume, the enumeration of one `.thym` file, compiled back byte for
+byte; a **morph** volume of style sheets, measured against the null morph or declared by hand on ten scales; a
+**context** volume of occasions; a **plan**, what a program will do before it does it; a **trace**, what a run did, one
+record per node; and a **package**, the catalog of a text's self-contained export. The full specification is
+`docs/THYM.md`, whose part on the `thym/1` MiniCOSM this section summarizes; the manifest is
+`defaults/cosm/manifests/thym.manifest.cosm`.
+
+**Its declaration.** `oes: thym/1`. There is no legacy form, and a catalog without the key is refused.
+
+**Its volume.** One file (`volume.single-file: true`), whose catalog's `kind` says which of the six it is:
+`<name>.thym.cosm` beside a program, `<name>.morph.cosm`, `<name>.context.cosm`, `<run-id>.plan.cosm`,
+`<run-id>.trace.cosm` (both under the Thym root, `~/enough/thym/runs/`, by default), and `package.cosm` inside a
+package's folder or `<name>.package.cosm` beside its text.
+
+**Its modules and kinds.**
+
+| Kind | Module | What it is |
+|---|---|---|
+| `program` | P Programs | a block of a program file: its heads, its body verbatim, its steps |
+| `move` | P Programs | a move a program defines, with its parameters |
+| `step` | P Programs | one statement of a program, verbatim, with the moves it calls |
+| `contract` | P Programs | the checks a step's move must pass |
+| `morph` | M Morphs | ten scales of a telling's departure from the null morph, with evidence |
+| `context` | C Contexts | an occasion: purpose, audience, medium, moment, hurry, words |
+| `plan` | R Runs | what a program will do, before it does it |
+| `node` | R Runs | one call or check of a plan, and the nodes it runs after |
+| `trace` | R Runs | what a run did, and how it ended |
+| `record` | R Runs | one node's run: engine, attempts, tokens, seconds and every check |
+| `package` | K Packages | a package's catalog entry, for an index that lists packages |
+| `reading` | K Packages | a saved reading's record: what it read, through which morph |
+
+Every item may carry `made`, the provenance field Thym adds: the move, run, step and engine that made it. Six checks
+are Thym's own (a program volume compiles to its items, a plan is acyclic, a trace is complete, a scale is in range, a
+package's digests match, a reading is labelled); `enough/thym` runs them, and a generic reader does not.
+
+**Its moves.** The manifest ends in a `moves:` block (section 13.4): the moves `thym/1` owns, `cut`, `count`, `words`,
+`digest`, `null`, `measure`, `morph`, `read`, `package`, `unpack`, `lint`, `trace` and the accessors `fabula`,
+`context`, `graph` and `isomorph`. `emf/1` and `doc/1` declare theirs in their own manifests, and Comprise's sit in
+`comprise.moves.cosm`.
+
+**In enough.** The compiler and runtime are `enough/thym/` (`python -m enough.thym check|plan|run|trace|conform`); the
+cosm viewer draws a program's steps with their contracts, a plan as a graph and a trace as cards, and the docs viewer
+reads a program at three densities.
+
+**An example.** A morph declared by hand: a letter home, personal, a little hedged, never ornate.
+
+```cosm
+oes: thym/1
+kind: morph
+id: thym/plain-letter
+name: plain-letter
+nodes:
+  - id: M:morph/plain-letter
+    type: morph
+    name: plain-letter
+    summary: A letter home, personal, a little hedged, never ornate.
+    declared: true
+    shared: false
+    scales: {register: 1, sentence-length: 1, paragraph-rhythm: 1, analytical-depth: 1, figurative-density: 1,
+             stance-style: 3, person-voice: 4, formality: 2, humour: 1, allusion: 1}
+    toward: casual
+    pinned: []
+    provenance: {mode: manual, sources: [plain-letter.morph.cosm], confidence: 1}
+```
+
 ---
 
 ## 19. Conformance
@@ -2372,13 +2557,17 @@ in.
 - **Shared public forms.** A vocabulary of kinds of thing that many subjects name ("chair", "M4 screw", "invoice",
   "lease"), each defined once, in public, and cited by id from any MiniCOSM that needs it, so that two volumes that name
   the same kind of thing name it checkably.
-- **People, as a MiniCOSM with its own rules.** It comes last, and comes with rules no other MiniCOSM has: the person
-  holds the keys, only the person releases anything, and no other subject's volume ever holds a person's private detail.
-- **Style-profile renderers.** Today a renderer decides how a volume looks. Later a renderer follows two envelopes,
-  whose planned names are the **Holomorph**, an author's intent envelope carried with the text, and the **Isomorph**, a
-  reader's own profile (how much detail, which words, which pictures, beginner or expert). The same truth is then retold
-  for a beginner, set as story problems, told as narrative or drawn as a scene. These morph-driven renderers need a later
-  version of the grammar.
+- **People, the rest of it.** Ascribe's manifest and its checks are built (section 18.6), with the rules no other
+  MiniCOSM has: no field for a person's private detail, and no other subject's volume ever holding one. Still mapped:
+  the application module that asks the dialectic's questions and writes the nodes; Ascribe-Connect, which would vouch
+  that one real person holds a holograph; isographs, the holograph projected by a Thym program and listed on an index;
+  consented match tokens, so that an index can match a sealed package without reading it; and the private-marker
+  filter applied to ingest and transfer.
+- **Morphs beyond texts.** Thym built morphs for texts (section 18.7, and `docs/THYM.md` in full): the null morph, ten
+  scales, the holomorph a person's writing is measured into, the isomorph they share, and readings told through either.
+  Still mapped: readings made in the page, which need a JavaScript runtime of Thym that passes its conformance suite;
+  and renderers that follow a morph for any volume, so that the same truth is retold for a beginner, set as story
+  problems, told as narrative or drawn as a scene.
 - **Other MiniCOSMs.** An industry or a market, a body of knowledge or a practice, an institution, a built world.
 - **Universal addressing.** A globally unique database name, and a resolver for URIs across installs.
 - **Editing in place.** Byte-preserving edits of one item inside a file, so that a structured viewer can edit without
@@ -2425,7 +2614,7 @@ Section by section, where each part of this document comes from in Comprise OES 
 | 17 MicroCOSMs | README §5; the manifest's `extension` | mapped, unchanged |
 | 18.1 comprise | the whole of Comprise OES 1 | how it sits in MacroCOSM |
 | 18.2 cosm | chapter P, P.7; COSM 0.2 | a MiniCOSM for trees outside a Holotype |
-| 18.3 canon, 18.4 emf, 18.5 doc | none | new MiniCOSMs, written in the grammar |
+| 18.3 canon, 18.4 emf, 18.5 doc, 18.6 ascribe, 18.7 thym | none | new MiniCOSMs, written in the grammar |
 | 19 Conformance | §13 | the corpus named; the reader wins |
 | 20 Decisions | §14 | this version's own |
 | 21 Roadmap | README §7; §12's *not built* | the morph-driven renderers named |

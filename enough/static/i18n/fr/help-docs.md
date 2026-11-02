@@ -523,3 +523,51 @@ faites-le glisser dans la fenêtre ui, à côté de la langue, ou dans la fenêt
 - activez-le quand la machine a besoin de sa mémoire pour autre chose : un projet s'ouvre en quelques secondes, sans modèle de 5 à 17 Go à charger.
 - écrivez un premier jet sans agent, puis repassez sur agent libre et demandez à votre readvisor ce qu'il en pense.
 - en avion, ou partout où vous préférez que rien ne tourne en arrière-plan, sans agent est le réglage honnête.
+
+## thym
+name: lancer avec…
+path: *.thym → a plan, a run, a trace
+
+### what
+<strong>thym</strong> est la petite langue dans laquelle s'écrivent les programmes d'enough. un <strong>programme</strong> est un fichier <code>.thym</code> qui dit, étape par étape, quoi faire d'un texte — le démonter en sa fabula, mesurer comment il est écrit, l'emballer — et pourquoi. chaque étape nomme un mouvement ; une étape qui interroge le modèle porte un losange plein, et sa réponse est vérifiée au regard du contrat du mouvement avant que rien ne soit gardé. un programme est aussi un document : ouvrez un fichier <code>.thym</code> et vous le lisez aux trois densités — son pourquoi et ses étapes en une ligne chacun (atem), tel qu'il a été écrit (short), ou en cartes, avec les contrats de chaque étape suspendus dessous (fabula).
+
+### how
+<strong>lancer avec…</strong> se trouve dans les menus option-clic et maj-clic d'un texte, sur la carte d'un fichier canon et sur celle d'un programme. choisissez un programme — ceux de ce projet d'abord, puis ceux de canon, puis ceux livrés avec enough ; un programme qui ne compile pas est grisé, avec la raison — et son <strong>plan</strong> s'affiche avant que rien ne tourne : combien de nœuds, combien interrogent un modèle, et s'il tient sur cette machine. <strong>lancer</strong> le démarre ; la carte le suit nœud par nœud et vous pouvez annuler. quand il aboutit, sa <strong>trace</strong> s'ouvre dans la visionneuse cosm, une carte par nœud avec chaque vérification et son verdict, et ce qu'il a fait se trouve à côté du texte dans l'arborescence (<code>notes.package.cosm</code> et <code>notes.thym/</code> pour un paquet). sans agent, seuls les programmes dont aucune étape n'interroge de modèle sont proposés, et une ligne dit combien ont été écartés.
+
+### ideas
+- lisez le plan d'un programme avant de le lancer sur un long texte : la ligne de coût dit combien de fois le modèle sera interrogé.
+- un programme qui ne demande rien tourne en un instant, sans agent ou pas : <code>words</code>, <code>count</code> et <code>cut</code> n'ont jamais besoin de modèle.
+- une exécution refusée n'est pas une exécution cassée : sa trace dit quelle étape l'a arrêtée et pourquoi, et rien de ce qu'elle préparait n'a été gardé.
+- la section 13.4 du centre d'aide dit tout : les trois programmes fournis avec enough, la trace, et les dix échelles.
+
+## package
+name: paquet
+path: *.package.cosm · *.thym/
+
+### what
+un <strong>paquet</strong> est un texte qui quitte la maison avec ce qui le décrit : le texte exactement tel qu'il a été écrit, sa fabula (le jumeau EMF), le morph de l'auteur quand il y en a un — la façon dont le texte s'écarte, sur dix échelles, du récit le plus simple de la même fabula — et son contexte. il existe sous deux formes côte à côte : un fichier, <code>notes.package.cosm</code>, qui voyage, et un dossier, <code>notes.thym/</code>, à ouvrir fichier par fichier. son catalogue liste chaque fichier avec son empreinte, nomme le programme et l'exécution qui l'ont fait, et ne nomme jamais l'auteur, sauf si le texte le fait.
+
+### how
+ouvrez l'une ou l'autre forme et la visionneuse cosm montre la carte du paquet : ce qu'il contient (chaque fichier est un lien, dans la forme dossier), ce qui l'a fait et quand, <strong>ouvrir le texte</strong>, et <strong>lire à travers…</strong>, qui raconte le texte à nouveau dans un morph de votre choix — celui du paquet, pour le lire à la manière de l'auteur, l'un des vôtres, ou le morph nul. le texte à l'intérieur n'est jamais touché. <code>publish-story</code>, l'un des programmes livrés avec enough, pose un paquet à côté de tout texte sur lequel vous le lancez. <strong>empaqueter…</strong>, sur un texte dont le jumeau EMF est à jour, en fait un selon des règles, sans rien demander au modèle, et peut aussi le sceller, avec une clé qu'on vous montre une seule fois et qui n'est gardée nulle part ; <strong>déballer…</strong>, sur n'importe quelle forme d'un paquet, vérifie d'abord chaque empreinte, réécrit le texte et son jumeau à côté, et demande la clé quand le paquet est scellé.
+
+### ideas
+- envoyez le fichier unique : tout ce qu'il faut à un lecteur pour le lire à sa manière est dedans.
+- ouvrez <code>morph.cosm</code> dans la forme dossier pour voir les dix échelles de l'auteur, avec les phrases qui ont fait bouger chacune.
+- les empreintes sont là pour qu'un lecteur puisse s'assurer que le texte est bien celui qui a été emballé.
+- la section 12.6 du centre d'aide dit ce que contient un paquet, comment un paquet scellé garde sa clé, et ce que le déballage vérifie d'abord.
+
+## reading
+name: lecture
+path: *.read-*-YYYY-MM-DD-HHMM.md
+
+### what
+une <strong>lecture</strong> est le texte de quelqu'un d'autre raconté à nouveau à travers un morph — le vôtre, celui de l'auteur, ou le morph nul — sur votre machine, dans un nouveau fichier à côté du texte. elle est étiquetée deux fois : <code>read_through:</code> en tête, et une ligne de pied de page à la fin : <em>a reading of notes.md through plain-letter, made here on … ; the text stands unchanged</em>. le bandeau sous l'en-tête du lecteur affiche cette étiquette tant que la lecture est ouverte, dans l'une ou l'autre face et à l'une ou l'autre taille, et il ne peut pas être fermé : une lecture ne se fait jamais passer pour le texte.
+
+### how
+demandez-en une avec <strong>lire à travers…</strong> sur un paquet, ou sur un texte qui a un jumeau EMF ; choisissez un morph, et la lecture s'ouvre une fois écrite, sous le nom <code>notes.read-plain-letter-2026-11-01-1042.md</code> (avec <code>-2</code>, <code>-3</code> quand il en existe déjà une de cette minute). une lecture a besoin d'un modèle — <code>read</code> n'a pas de remplaçant par règles — alors, sans agent, la carte le dit et ne lit rien. la lecture d'une lecture est refusée : une lecture lit une fabula, et une lecture est un récit.
+
+### ideas
+- lisez un rapport dense à travers le morph nul pour voir exactement ce qu'il affirme, une affirmation par phrase.
+- lisez une lettre à travers votre propre morph pour entendre comment vous l'auriez dite, puis revenez à l'original.
+- gardez les lectures : chacune nomme son morph et son jour, si bien que vous pouvez poser côte à côte les lectures d'un même texte.
+- la section 12.6 du centre d'aide parle des lectures et de leur étiquette ; la section 13.4, des morphs à travers lesquels elles sont racontées.

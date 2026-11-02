@@ -1,4 +1,4 @@
-"""MacroCOSM OES: the reference reader for `.cosm` volumes (MacroCOSM OES v0.0.1).
+"""MacroCOSM OES: the reference reader for `.cosm` volumes (MacroCOSM OES v0.0.2).
 
 MacroCOSM is the shared grammar every MiniCOSM is written in: a domain
 enumerated as a file system that is also a relational database, made to
@@ -65,7 +65,7 @@ from typing import Any, Iterator
 
 import yaml
 
-MACROCOSM_VERSION = "0.0.1"
+MACROCOSM_VERSION = "0.0.2"                 # 0.0.2 (0.5.0): the ascribe and thym MiniCOSMs, the `moves:` block and sidecars
 MANIFEST_FORMAT = "minicosm/0"
 MANIFEST_GLOB = "*.manifest.cosm"
 DEFAULT_MANIFEST_DIR = Path(__file__).resolve().parents[1] / "defaults" / "cosm" / "manifests"
@@ -900,6 +900,11 @@ class Volume:
         n = self.catalog.get("name")
         if isinstance(n, str) and n.strip():
             return n.strip()
+        # A catalog that holds no name on purpose (an Ascribe holograph, whose person is never named) is titled by
+        # its `handle`, never after whichever item happens to come first.
+        h = self.catalog.get("handle")
+        if isinstance(h, str) and h.strip():
+            return h.strip()
         first = next(iter(self.items.values()), None)
         return first.name if first is not None else (self.root or self.path).name
 
@@ -2220,7 +2225,7 @@ def _cli_registry(args) -> Registry:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m enough.macrocosm",
-                                 description="MacroCOSM OES v0.0.1: read, check and draw .cosm volumes.")
+                                 description="MacroCOSM OES v0.0.2: read, check and draw .cosm volumes.")
     ap.add_argument("command", choices=["lint", "paths", "tree", "mermaid", "identify"])
     ap.add_argument("path", help="a volume folder or a catalog file")
     ap.add_argument("target", nargs="?", help="paths: a path, qualified URI or id to resolve")

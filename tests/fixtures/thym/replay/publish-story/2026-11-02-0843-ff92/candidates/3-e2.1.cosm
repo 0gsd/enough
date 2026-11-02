@@ -1,0 +1,864 @@
+engine: feed
+inputs:
+  call: fa9fa89af3c73f1c917d5fe7ab8b1c2b525497338118721e22a769f37bba04d5
+keys: []
+tokens: 0
+seconds: 0
+output:
+  keeps:
+    word: keeps
+    letter: k
+    length: 5
+    is_headword: 1
+    pronunciation: /kips/
+    ipa: /kips/
+    definition: Holds onto, maintains, or continues something, from a promise to a possession; also the stronghold
+      at the heart of a castle, or the provisions needed to support someone. Chiefly in the phrase for keeps, meaning
+      permanently.
+    usage_note: null
+    pos: verb; noun
+    pos_primary: verb
+    synonyms: null
+    forms: null
+    form_of: keep
+    form_labels:
+    - pl.
+    - 3rd sing.
+    parents:
+    - headword: keep
+      pronunciation: /kips/
+      labels:
+      - pl.
+      - 3rd sing.
+      label_meanings:
+      - plural
+      - third-person singular present
+    perfect_rhymes:
+    - creeps
+    - sweeps
+    - heaps
+    - tweeps
+    - sleeps
+    - leaps
+    - peeps
+    - jeeps
+    - weeps
+    - beeps
+    - seeps
+    - reaps
+    - deeps
+    - bleeps
+    - steeps
+    - neeps
+    - cheeps
+    - microsleeps
+    - oversleeps
+    - barkeeps
+    - beleaps
+    - beweeps
+    - bopeeps
+    - clepes
+    - dustheaps
+    - gatekeeps
+    - geeps
+    - housekeeps
+    - miskeeps
+    - neaps
+    slant_rhymes:
+    - sheets
+    - eats
+    - sweets
+    - heats
+    - greets
+    - cleats
+    - deets
+    - obliques
+    - excretes
+    - breeks
+    - guix
+    - needs
+    - weeds
+    - peds
+    - fatigues
+    - tweeds
+    - she
+    - see
+    - three
+    - free
+    homophones: []
+    domain: everyday life
+    etymology: Third-person singular of keep, from Old English cepan.
+    examples:
+    - Siobhan Daly keeps a spare fuse in every pocket of her laboratory coat.
+    - In Kingdom, two rival lords glare at each other from their keeps on opposite banks of a slow river.
+    related:
+    - keep
+    - hold
+    - maintain
+    - stronghold
+    antonyms: []
+    hyphenation: keeps
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - garde
+    - donjon
+    fr_definition: Détient, maintient ou poursuit quelque chose, d'une promesse à une possession ; désigne aussi
+      le donjon au cœur d'un château, ou les provisions nécessaires pour subvenir aux besoins de quelqu'un. Surtout
+      dans l'expression « for keeps », signifiant de façon permanente.
+    es_compare:
+    - guarda
+    - torreón
+    es_definition: Mantiene, conserva o continúa algo, desde una promesa hasta una posesión; también designa la
+      torre del homenaje en el centro de un castillo, o las provisiones necesarias para mantener a alguien. Sobre
+      todo en la expresión “for keeps”, que significa de forma permanente.
+    de_compare:
+    - hält
+    - Bergfried
+    de_definition: Hält, bewahrt oder setzt etwas fort, von einem Versprechen bis zu einem Besitz; bezeichnet auch
+      den Bergfried im Zentrum einer Burg, oder den Lebensunterhalt, den jemand braucht. Vor allem in der Wendung
+      „for keeps“, was dauerhaft bedeutet.
+    zh_compare:
+    - 保持
+    - 城堡主塔
+    zh_definition: 保有、维持或延续某事物，从一个承诺到一件财产皆可；也指城堡中心的主塔，或维持某人生活所需的供给。尤见于短语“for keeps”，意为永久地。
+    ja_compare:
+    - 保つ
+    - 天守
+    ja_definition: 約束であれ所有物であれ、何かを保持し維持し続けることを指し、城の中心にある天守や、誰かを養うのに必要な生活の糧も意味する。特に「for keeps」という表現では、永久にという意味になる。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    form_label_meanings:
+    - plural
+    - third-person singular present
+    syllables: 1
+    era: old english
+  holds:
+    word: hold
+    letter: h
+    length: 4
+    is_headword: 1
+    pronunciation: /hoʊld/
+    ipa: /hoʊld/
+    definition: To grasp, contain, or keep possession of something, from a hand holding a cup to a shelf holding
+      books. As a noun it can be a grip, a place where animals or prisoners are kept, or a ship's cargo space below
+      deck.
+    usage_note: null
+    pos: verb; noun
+    pos_primary: verb
+    synonyms:
+    - clasp
+    - clench
+    - clutch
+    - clutches
+    - grasp
+    - grip
+    - handgrip
+    - keep
+    forms:
+    - word: held
+      pronunciation: /hɛld/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: holden
+      pronunciation: /ˈhoʊldən/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: holding
+      pronunciation: /ˈhoʊldɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - retention
+      - keeping
+      - property
+      - belongings
+      label_meanings:
+      - present participle
+    - word: holds
+      pronunciation: /hoʊldz/
+      labels:
+      - pl.
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - plural
+      - third-person singular present
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - old
+    - gold
+    - cold
+    - sold
+    - controlled
+    - household
+    - bold
+    - rolled
+    - fold
+    - mold
+    - behold
+    - uphold
+    - mould
+    - unfold
+    - stronghold
+    - manifold
+    - untold
+    - withhold
+    - bowled
+    - polled
+    - uncontrolled
+    - foothold
+    - freehold
+    - patrolled
+    - unsold
+    - ahold
+    - foretold
+    - twofold
+    - scrolled
+    - scold
+    slant_rhymes:
+    - bolt
+    - revolt
+    - holt
+    - colt
+    - volt
+    - thunderbolt
+    - jolt
+    - dolt
+    - moult
+    - deadbolt
+    - unbolt
+    - smolt
+    - kilovolt
+    - polt
+    - poult
+    - megavolt
+    - archivolt
+    - demivolt
+    - eyebolt
+    - fishbolt
+    homophones:
+    - holed
+    domain: general
+    etymology: From Old English healdan, from Proto-Germanic haldana.
+    examples:
+    - Elevator Nine in the Grain can hold forty thousand bushels of wheat.
+    - Captain Rhoswen Tull stowed the spare nets in the hold of the Patient Margin and sat on the hatch cover.
+    related:
+    - cargo
+    antonyms:
+    - release
+    hyphenation: hold
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - tenir
+    - cale
+    fr_definition: Saisir, contenir ou garder possession de quelque chose, d'une main tenant une tasse à une étagère
+      tenant des livres. Comme nom, cela peut être une prise, un lieu où des animaux ou des prisonniers sont gardés,
+      ou l'espace de cargaison d'un navire sous le pont.
+    es_compare:
+    - sostener
+    - bodega
+    es_definition: Agarrar, contener o mantener posesión de algo, desde una mano que sostiene una taza hasta un
+      estante que sostiene libros. Como sustantivo puede ser un agarre, un lugar donde se guardan animales o prisioneros,
+      o el espacio de carga de un barco bajo cubierta.
+    de_compare:
+    - halten
+    - Laderaum
+    de_definition: Etwas ergreifen, enthalten oder in Besitz behalten, von einer Hand, die eine Tasse hält, bis
+      zu einem Regal, das Bücher trägt. Als Substantiv kann es einen Griff, einen Ort, an dem Tiere oder Gefangene
+      gehalten werden, oder den Laderaum eines Schiffs unter Deck bezeichnen.
+    zh_compare:
+    - 拿住
+    - 船舱
+    zh_definition: 抓住、容纳或保有某物，从手拿杯子到架子放书皆可。作名词时可指握力、关押动物或囚犯的地方，或船只甲板下的货舱。
+    ja_compare:
+    - 持つ
+    - 船倉
+    ja_definition: 何かをつかみ、包含し、あるいは所持し続けること。カップを持つ手から本を支える棚まで幅広く使う。名詞としては握り、動物や囚人を留め置く場所、または甲板下の船の貨物室を指す。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    syllables: 1
+    era: old english
+  needs:
+    word: needs
+    letter: n
+    length: 5
+    is_headword: 1
+    pronunciation: /nidz/
+    ipa: /nidz/
+    definition: 'Plural of need: requirements or things essential to a person. As an adverb, chiefly archaic and
+      used with must, necessarily, as in you must needs be patient.'
+    usage_note: null
+    pos: noun; verb; adverb
+    pos_primary: noun
+    synonyms:
+    - inevitably
+    - necessarily
+    forms: null
+    form_of: need
+    form_labels:
+    - pl.
+    - 3rd sing.
+    parents:
+    - headword: need
+      pronunciation: /nidz/
+      labels:
+      - pl.
+      - 3rd sing.
+      label_meanings:
+      - plural
+      - third-person singular present
+    perfect_rhymes:
+    - weeds
+    - peds
+    - tweeds
+    - seeds
+    - reads
+    - speeds
+    - feeds
+    - deeds
+    - beads
+    - breeds
+    - exceeds
+    - succeeds
+    - swedes
+    - pleads
+    - bleeds
+    - precedes
+    - reeds
+    - concedes
+    - misdeeds
+    - creeds
+    - supersedes
+    - recedes
+    - nosebleeds
+    - meads
+    - centipedes
+    - seaweeds
+    - misleads
+    - steeds
+    - tumbleweeds
+    - cedes
+    slant_rhymes:
+    - fatigues
+    - keeps
+    - sheets
+    - eats
+    - sweets
+    - heats
+    - creeps
+    - sweeps
+    - heaps
+    - greets
+    - cleats
+    - deets
+    - tweeps
+    - obliques
+    - excretes
+    - breeks
+    - guix
+    - goldfields
+    - she
+    - see
+    homophones:
+    - kneads
+    domain: general
+    etymology: From Old English nedes, niedes 'of necessity', from nied plus -es, an adverbial genitive suffix.
+    examples:
+    - The ring committee listed the needs of every household in Ring F before asking the council for money.
+    - Hob Garrick's barn door needs a new hinge before the first frost.
+    related:
+    - need
+    - necessity
+    - must
+    antonyms: []
+    hyphenation: needs
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - besoins
+    fr_definition: 'Pluriel de need: des exigences ou des choses essentielles pour une personne. Comme adverbe,
+      principalement archaïque et employé avec « must », nécessairement, comme dans « you must needs be patient ».'
+    es_compare:
+    - necesidades
+    es_definition: 'Plural de need: requisitos o cosas esenciales para una persona. Como adverbio, sobre todo arcaico
+      y usado con “must”, necesariamente, como en “you must needs be patient”.'
+    de_compare:
+    - Bedürfnisse
+    de_definition: 'Plural von need: Anforderungen oder Dinge, die für eine Person unerlässlich sind. Als Adverb
+      vor allem veraltet und mit „must“ gebraucht, notwendigerweise, wie in „you must needs be patient“.'
+    zh_compare:
+    - 需求
+    zh_definition: need 的复数形式：对一个人来说是必要的要求或事物。作副词时多为古旧用法，与“must”连用，表示必然地，如“you must needs be patient”。
+    ja_compare:
+    - 必要なもの
+    ja_definition: need の複数形。ある人にとって不可欠な要求や事柄。副詞としては主に古語で、「must」と共に使われ、必然的にという意味になる。「you must needs be patient」のように使う。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    form_label_meanings:
+    - plural
+    - third-person singular present
+    syllables: 1
+    era: old english
+  feeds:
+    word: feed
+    letter: f
+    length: 4
+    is_headword: 1
+    pronunciation: /fid/
+    ipa: /fid/
+    definition: To give food to someone or an animal, or to eat; as a noun, food given to non-human animals, or
+      any material supplied continuously into a system.
+    usage_note: null
+    pos: verb; noun
+    pos_primary: verb
+    synonyms:
+    - provender
+    - fertilize
+    - give
+    - eat
+    - feast
+    - prey
+    - run
+    - flow
+    - course
+    forms:
+    - word: feeding
+      pronunciation: /ˈfidɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - eating
+      - alimentation
+      label_meanings:
+      - present participle
+    - word: feeds
+      pronunciation: /fidz/
+      labels:
+      - pl.
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - plural
+      - third-person singular present
+    form_of: fee
+    form_labels:
+    - past
+    parents:
+    - headword: fee
+      pronunciation: /fid/
+      labels:
+      - past
+      label_meanings:
+      - past tense and past participle
+    perfect_rhymes:
+    - need
+    - read
+    - speed
+    - agreed
+    - indeed
+    - seed
+    - guaranteed
+    - succeed
+    - weed
+    - lied
+    - proceed
+    - breed
+    - reed
+    - exceed
+    - deed
+    - greed
+    - bleed
+    - creed
+    - plead
+    - concede
+    - heed
+    - bead
+    - mead
+    - tweed
+    - mislead
+    - seaweed
+    - impede
+    - stampede
+    - peed
+    - swede
+    slant_rhymes:
+    - league
+    - fatigue
+    - intrigue
+    - glebe
+    - dweeb
+    - weeb
+    - grebe
+    - caribe
+    - interleague
+    - plebe
+    - gigue
+    - nonleague
+    - ephebe
+    - garigue
+    - outintrigue
+    - overfatigue
+    - peag
+    - squeteague
+    - hebe
+    - keep
+    homophones: []
+    domain: food
+    etymology: From Middle English feden, from Old English fedan, from Proto-Germanic fodijan.
+    examples:
+    - On the Slope, the camp cook Old Enough would feed any stranger who came to the fire, guests first.
+    - The co-op sold bags of chicken feed from the loading dock at Elevator Nine in the Grain.
+    related:
+    - fee
+    - food
+    - fodder
+    - nourish
+    antonyms: []
+    hyphenation: feed
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - nourrir
+    - alimenter
+    fr_definition: Donner de la nourriture à quelqu'un ou à un animal, ou manger ; comme nom, la nourriture donnée
+      aux animaux non humains, ou toute matière fournie en continu dans un système.
+    es_compare:
+    - alimentar
+    es_definition: Dar comida a alguien o a un animal, o comer; como sustantivo, el alimento dado a animales no
+      humanos, o cualquier material suministrado continuamente a un sistema.
+    de_compare:
+    - füttern
+    - ernähren
+    de_definition: Jemandem oder einem Tier Nahrung geben, oder essen; als Substantiv, das Futter für Tiere, oder
+      jedes Material, das kontinuierlich in ein System eingespeist wird.
+    zh_compare:
+    - 喂养
+    - 饲料
+    zh_definition: 给某人或某动物喂食，或指进食；作为名词，指给非人类动物的食物，或持续供给系统的任何材料。
+    ja_compare:
+    - 餌を与える
+    - 飼料
+    ja_definition: 人や動物に食べ物を与えること、または食べることを指す。名詞としては、動物に与える餌、あるいはシステムに継続的に供給される材料一般を意味する。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    form_label_meanings:
+    - past tense and past participle
+    syllables: 1
+    era: old english
+  follows:
+    word: follow
+    letter: f
+    length: 6
+    is_headword: 1
+    pronunciation: /ˈfɑloʊ/
+    ipa: /ˈfɑloʊ/
+    definition: To go or come after a person or thing; to pursue; to happen or come next in sequence; to obey or
+      act in accordance with; to understand the sense of, as in following an argument.
+    usage_note: null
+    pos: verb; noun
+    pos_primary: verb
+    synonyms:
+    - trace
+    - accompany
+    - pursue
+    - surveil
+    - survey
+    - adopt
+    - espouse
+    - succeed
+    - watch
+    - observe
+    forms:
+    - word: followed
+      pronunciation: /ˈfɑloʊd/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: following
+      pronunciation: /ˈfɑloʊɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - pursuit
+      - chase
+      - followers
+      - next
+      label_meanings:
+      - present participle
+    - word: follows
+      pronunciation: /ˈfɑloʊz/
+      labels:
+      - 3rd sing.
+      - pl.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+      - plural
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - hollow
+    - swallow
+    - apollo
+    - wallow
+    - unfollow
+    - mahalo
+    - calo
+    - giallo
+    - robalo
+    slant_rhymes:
+    - borrow
+    - sorrow
+    - morrow
+    - claro
+    - maro
+    - saguaro
+    - farro
+    - charro
+    - overborrow
+    - zingaro
+    - methaqualone
+    - retablo
+    - boldo
+    - hallot
+    - halloth
+    - tolloaf
+    - colorado
+    - combo
+    - morocco
+    - bravo
+    homophones: []
+    domain: general
+    etymology: From Old English folgian, of Germanic origin.
+    examples:
+    - The geese follow Hob Garrick down Cottage Row in a loud line.
+    - Monte's post about the morning numbers earned exactly one new follow, and it came from the Caribbean Desk.
+    related:
+    - trail
+    - obey
+    antonyms:
+    - lead
+    hyphenation: fol·low
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - suivre
+    fr_definition: Aller ou venir après une personne ou une chose ; poursuivre ; se produire ou venir ensuite dans
+      une séquence ; obéir ou agir conformément à ; comprendre le sens de quelque chose, comme dans suivre un raisonnement.
+    es_compare:
+    - seguir
+    es_definition: Ir o venir detrás de una persona o cosa; perseguir; suceder o venir a continuación en una secuencia;
+      obedecer o actuar conforme a; comprender el sentido de algo, como en seguir un razonamiento.
+    de_compare:
+    - folgen
+    de_definition: Einer Person oder Sache nachgehen oder nachkommen; verfolgen; als Nächstes in einer Reihenfolge
+      geschehen; gehorchen oder sich danach richten; den Sinn von etwas verstehen, wie beim Folgen eines Arguments.
+    zh_compare:
+    - 跟随
+    - 遵循
+    zh_definition: 跟在某人或某物之后前行；追赶；在顺序中随之发生；服从或按照某事行事；理解某事的含义，如听懂一个论点。
+    ja_compare:
+    - 従う
+    - 追う
+    ja_definition: 人や物の後について行くこと。追跡すること。順序において次に起こること。従うこと、それに沿って行動すること。議論の内容を理解することも指す。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    syllables: 2
+    era: old english
+  assumed:
+    word: assumed
+    letter: a
+    length: 7
+    is_headword: 1
+    pronunciation: /əˈsumd/
+    ipa: /əˈsumd/
+    definition: Adopted, especially a name or identity, in order to deceive or conceal; also, more broadly, supposed
+      to be true without being checked.
+    usage_note: null
+    pos: verb; adjective
+    pos_primary: verb
+    synonyms:
+    - 'false'
+    - fictitious
+    - fictive
+    - pretended
+    - sham
+    forms: null
+    form_of: assume
+    form_labels:
+    - past
+    parents:
+    - headword: assume
+      pronunciation: /əˈsumd/
+      labels:
+      - past
+      label_meanings:
+      - past tense and past participle
+    perfect_rhymes:
+    - consumed
+    - doomed
+    - presumed
+    - groomed
+    - costumed
+    - perfumed
+    - fumed
+    - bedroomed
+    - plumed
+    - unconsumed
+    - broomed
+    - enwombed
+    - resumed
+    - zoomed
+    - loomed
+    - boomed
+    - exhumed
+    - bloomed
+    - subsumed
+    - entombed
+    - roomed
+    - reassumed
+    - begloomed
+    - coassumed
+    - deplumed
+    - displumed
+    - flumed
+    - foredoomed
+    - gloomed
+    - illumed
+    slant_rhymes:
+    - wound
+    - tuned
+    - attuned
+    - festooned
+    - cocooned
+    - mooned
+    - untuned
+    - gadrooned
+    - mistuned
+    - unattuned
+    - unpruned
+    - oont
+    - you
+    - who
+    - new
+    - two
+    - too
+    - through
+    - few
+    - food
+    homophones: []
+    domain: general
+    etymology: Formed from assume plus the suffix -ed.
+    examples:
+    - Everyone assumed the Cafeteria was open at the sixth hour, so nobody packed a lunch.
+    - A thief on the Concourse gave an assumed name at the pawnshop, and Warden Pell saw through it.
+    related:
+    - assume
+    - alias
+    antonyms:
+    - genuine
+    hyphenation: as·sumed
+    frequency_rank: 4
+    first_use: 16th century
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - d'emprunt
+    - présumé
+    fr_definition: Adopté, en particulier un nom ou une identité, afin de tromper ou de dissimuler ; aussi, plus
+      largement, supposé vrai sans avoir été vérifié.
+    es_compare:
+    - supuesto
+    - fingido
+    es_definition: Adoptado, en especial un nombre o identidad, para engañar u ocultar; también, más ampliamente,
+      supuesto como verdadero sin haberlo comprobado.
+    de_compare:
+    - angenommen
+    de_definition: Angenommen, insbesondere ein Name oder eine Identität, um zu täuschen oder zu verbergen; auch,
+      allgemeiner, als wahr vorausgesetzt, ohne überprüft worden zu sein.
+    zh_compare:
+    - 假冒的
+    - 假定的
+    zh_definition: 为欺骗或掩饰而采用的，尤指姓名或身份；也泛指未经核实就被当作真实的。
+    ja_compare:
+    - 偽の
+    - 想定された
+    ja_definition: 欺いたり隠したりするために採用された、特に名前や身分について言う。また、確認されないまま真実だと考えられていることも指す。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 4
+      name: Occasional
+      examples: lantern, tidy, frugal
+    form_label_meanings:
+    - past tense and past participle
+    syllables: 2
+    era: 16th century

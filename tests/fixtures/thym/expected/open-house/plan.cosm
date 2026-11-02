@@ -1,0 +1,111 @@
+oes: thym/1
+kind: plan
+id: thym/plan.open-house
+name: open-house on meadow
+# The plan of programs/open-house.thym over the public sample Holotype ../cosm/holotypes/meadow, written by hand for
+# the conformance suite (docs/THYM.md 11.1, 17.3). Nothing asks the model. A for each over a volume known only at run
+# time gives one node marked repeats; a filter expression (h where ...) folds into the node that consumes it; the
+# marked modifier is a mark node of its own. The input's sha256 is its catalog file's. Compared without run ids,
+# timestamps and prompt token counts.
+program: {name: open-house, sha256: 79df51f9ad8a8db5a31572b59c8a2de4a8aed946b6d11ceb5487b97c2426e0cc}
+inputs: [{name: h, type: volume, path: ../cosm/holotypes/meadow, sha256: b27e86f12b2b2d588cbdaa47c82d160a60cc2056030050088bfc31a9e6f5a5d7}]
+estimate: {steps: 7, asks: 0, largest_prompt: 0, output_words: 0}
+nodes:
+  - id: R:plan/fixture
+    type: plan
+    name: open-house on meadow
+    summary: "Seven nodes, none of which asks the model."
+    nodes: [R:node/1, R:node/2, R:node/3, R:node/4, R:node/5, R:node/6, R:node/7]
+    asks: 0
+    largest_prompt: 0
+    provenance: {mode: derived, sources: ["open-house.thym"], confidence: 1}
+  - id: R:node/1
+    type: node
+    name: emit offer-line o, for each o in h where kind in [product, service, platform]
+    summary: "emit offer-line o, for each o in h where kind in [product, service, platform]"
+    step: {program: open-house, n: 2}
+    move: offer-line
+    asks: false
+    takes: [h]
+    repeats: true
+    after: []
+    budget: {attempts: 1, output_words: 0}
+    line: 15
+    provenance: {mode: derived, sources: ["open-house.thym#L14-L16"], confidence: 1}
+  - id: R:node/2
+    type: node
+    name: emit mark a as stated, for each a in h where kind is aim
+    summary: "an aim is the house's own words: stated"
+    step: {program: open-house, n: 4}
+    move: mark
+    asks: false
+    takes: [h]
+    repeats: true
+    after: []
+    budget: {attempts: 1, output_words: 0}
+    line: 18
+    provenance: {mode: derived, sources: ["open-house.thym#L17-L19"], confidence: 1}
+  - id: R:node/3
+    type: node
+    name: count staff
+    summary: "never a number"
+    step: {program: open-house, n: 6}
+    move: count
+    asks: false
+    takes: [h]
+    gives: t3
+    after: []
+    budget: {attempts: 1, output_words: 0}
+    line: 21
+    provenance: {mode: derived, sources: ["open-house.thym#L20-L21"], confidence: 1}
+  - id: R:node/4
+    type: node
+    name: band t3 as [none, some]
+    summary: "never a number"
+    step: {program: open-house, n: 6}
+    move: band
+    asks: false
+    takes: [t3]
+    gives: t4
+    after: [R:node/3]
+    budget: {attempts: 1, output_words: 0}
+    line: 21
+    provenance: {mode: derived, sources: ["open-house.thym#L21"], confidence: 1}
+  - id: R:node/5
+    type: node
+    name: "emit employees: mark t4 as verified"
+    summary: "never a number"
+    slot: employees
+    step: {program: open-house, n: 6}
+    move: mark
+    asks: false
+    takes: [t4]
+    after: [R:node/4]
+    budget: {attempts: 1, output_words: 0}
+    line: 21
+    provenance: {mode: derived, sources: ["open-house.thym#L21"], confidence: 1}
+  - id: R:node/6
+    type: node
+    name: withhold h where visibility is internal
+    summary: "withhold h where visibility is internal"
+    step: {program: open-house, n: 7}
+    move: withhold
+    asks: false
+    takes: [h]
+    after: []
+    budget: {attempts: 1, output_words: 0}
+    line: 22
+    provenance: {mode: derived, sources: ["open-house.thym#L22"], confidence: 1}
+  - id: R:node/7
+    type: node
+    name: project h as isotype
+    summary: "project h as isotype"
+    step: {program: open-house, n: 8}
+    move: project
+    asks: false
+    takes: [h]
+    gives: i
+    after: [R:node/1, R:node/2, R:node/5, R:node/6]
+    budget: {attempts: 1, output_words: 0}
+    line: 23
+    provenance: {mode: derived, sources: ["open-house.thym#L23"], confidence: 1}

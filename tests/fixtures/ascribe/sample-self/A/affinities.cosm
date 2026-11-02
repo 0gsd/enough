@@ -1,0 +1,28 @@
+nodes:
+  - id: A:affinity/sourdough-baking
+    type: affinity
+    name: Baking sourdough
+    summary: Bread from a starter kept going for years, baked twice a week.
+    form: F:form/sourdough
+    valence: for
+    strength: 5
+    when: 2016
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.95}
+
+  - id: A:affinity/fast-bread
+    type: affinity
+    name: Fast bread
+    summary: Bread hurried along with commercial yeast tastes of very little.
+    form: F:form/sourdough
+    valence: against
+    strength: 3
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.8}
+
+  - id: A:affinity/sea-glass-hunting
+    type: affinity
+    name: Hunting for sea glass
+    summary: Walking the tideline after a storm, looking for the rare blues and reds.
+    form: F:form/sea-glass
+    valence: for
+    strength: 2
+    provenance: {mode: manual, sources: [self], confidence: 0.9}

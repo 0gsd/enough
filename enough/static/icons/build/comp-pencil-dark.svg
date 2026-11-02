@@ -1,6 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" id="comp-pencil" viewBox="0 0 72 72">
-  <path d="M12 60 L17 45 L47 15 L57 25 L27 55 Z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round" />
-  <line x1="17" y1="45" x2="27" y2="55" stroke="#fff" stroke-width="3" fill="#fff" />
-  <line x1="42" y1="20" x2="52" y2="30" stroke="#fff" stroke-width="3" fill="#fff" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-2 {
+        opacity: .3;
+      }
+
+      .cls-2, .cls-3, .cls-4 {
+        fill: #000;
+      }
+
+      .cls-3 {
+        opacity: .7;
+      }
+
+      .cls-5 {
+        fill: #f9ed32;
+      }
+
+      .cls-6 {
+        fill: #4b3aa8;
+      }
+
+      .cls-7 {
+        fill: #754932;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="14.83" y1="19.83" x2="57.05" y2="62.05" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#000" />
+      <stop offset="0" stop-color="#000" stop-opacity=".99" />
+      <stop offset=".23" stop-color="#000" stop-opacity=".69" />
+      <stop offset=".43" stop-color="#000" stop-opacity=".45" />
+      <stop offset=".62" stop-color="#000" stop-opacity=".25" />
+      <stop offset=".78" stop-color="#000" stop-opacity=".12" />
+      <stop offset=".91" stop-color="#000" stop-opacity=".03" />
+      <stop offset="1" stop-color="#000" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <g id="c-white">
+    <rect class="cls-1" x="12.31" y="22.36" width="47.27" height="37.16" />
+  </g>
+  <g id="comp-pencil">
+    <g>
+      <path class="cls-7" d="M45.48,40.92l-4.38,4.37-.84-.84c-.6-.6-.9-1.33-.9-2.19s.3-1.59.9-2.19c.59-.6,1.32-.89,2.18-.89s1.59.29,2.19.89l.85.85Z" />
+      <path d="M63.04,53.73v9.12h-9.44l-15.88-16.03c-1.19-1.26-1.78-2.78-1.76-4.56.02-1.77.66-3.3,1.92-4.56,1.37-1.27,2.93-1.9,4.67-1.9s3.28.63,4.61,1.9l15.88,16.03ZM59.66,59.48v-4.38l-11.81-11.81-4.38,4.38,11.81,11.81h4.38ZM41.1,45.29l4.38-4.37-.85-.85c-.6-.6-1.32-.89-2.19-.89s-1.59.29-2.18.89c-.6.6-.9,1.33-.9,2.19s.3,1.59.9,2.19l.84.84Z" fill="#fff" />
+      <path d="M63.04,8.85v23.63h-3.38v-10.13H12.41v37.13h20.25v3.37H9.04V8.85h54ZM59.66,18.98v-6.75H12.41v6.75h47.25Z" fill="#fff" />
+      <polygon class="cls-5" points="59.66 55.1 59.66 59.48 55.28 59.48 43.47 47.67 47.85 43.29 59.66 55.1" />
+      <rect x="29.29" y="13.92" width="3.37" height="3.37" fill="#fff" />
+      <rect x="22.54" y="13.92" width="3.37" height="3.37" fill="#fff" />
+      <rect x="15.79" y="13.92" width="3.37" height="3.37" fill="#fff" />
+    </g>
+  </g>
+  <g id="c-bar">
+    <rect class="cls-6" x="12.28" y="12.24" width="47.41" height="6.75" />
+    <rect class="cls-4" x="15.68" y="13.92" width="3.38" height="3.38" />
+    <rect class="cls-3" x="22.43" y="13.92" width="3.38" height="3.38" fill="#fff" />
+    <rect class="cls-2" x="29.18" y="13.92" width="3.38" height="3.38" fill="#fff" />
+  </g>
 </svg>

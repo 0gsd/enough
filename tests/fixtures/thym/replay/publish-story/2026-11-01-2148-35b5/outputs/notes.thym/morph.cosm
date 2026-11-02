@@ -1,0 +1,98 @@
+oes: thym/1
+kind: morph
+id: thym/notes
+name: notes
+nodes:
+- id: M:morph/notes
+  type: morph
+  name: notes
+  summary: How notes.md departs from the null telling of its fabula, on ten scales.
+  scales:
+    register: 3
+    sentence-length: 2
+    paragraph-rhythm: 2
+    analytical-depth: 3
+    figurative-density: 1
+    stance-style: 1
+    person-voice: 3
+    formality: 1
+    humour: 1
+    allusion: 1
+  evidence:
+    register:
+    - That is not a local quirk; it is how apples pollinate, and the nursery leaflet says the same.
+    - Mara thinks the mulch made the difference.
+    - Mowing then would cut the wildflowers before they seed, and the strip exists to feed the pollinators the orchard
+      depends on.
+    sentence-length:
+    - Mara Okafor, who has kept the Hollins Lane orchard since 2019, says the old Bramley by the gate is the oldest
+      tree on the lane.
+    - 'I am less sure: a warm, wet spring would explain most of it, and every orchard in the valley did well.'
+    - Mowing then would cut the wildflowers before they seed, and the strip exists to feed the pollinators the orchard
+      depends on.
+    paragraph-rhythm:
+    - The rise came after the volunteers spread leaf mould under the trees in March.
+    - 'Open question: does the lease let the parish mow without asking us?'
+    analytical-depth:
+    - Every apple tree needs a second variety nearby to set fruit.
+    - That is not a local quirk; it is how apples pollinate, and the nursery leaflet says the same.
+    - This year the orchard pressed 140 litres of juice, up from 90 last year.
+    figurative-density:
+    - Mara Okafor, who has kept the Hollins Lane orchard since 2019, says the old Bramley by the gate is the oldest
+      tree on the lane.
+    stance-style:
+    - Mara Okafor, who has kept the Hollins Lane orchard since 2019, says the old Bramley by the gate is the oldest
+      tree on the lane.
+    person-voice:
+    - I counted the bottles myself on 12 October.
+    - 'I am less sure: a warm, wet spring would explain most of it, and every orchard in the valley did well.'
+    - We agreed to ask the council to wait until September.
+    formality:
+    - Mara Okafor, who has kept the Hollins Lane orchard since 2019, says the old Bramley by the gate is the oldest
+      tree on the lane.
+    humour:
+    - Mara Okafor, who has kept the Hollins Lane orchard since 2019, says the old Bramley by the gate is the oldest
+      tree on the lane.
+    allusion:
+    - Mara Okafor, who has kept the Hollins Lane orchard since 2019, says the old Bramley by the gate is the oldest
+      tree on the lane.
+  basis:
+    register: statistics
+    sentence-length: statistics
+    paragraph-rhythm: statistics
+    analytical-depth: statistics
+    figurative-density: judgement
+    stance-style: statistics
+    person-voice: statistics
+    formality: statistics
+    humour: judgement
+    allusion: judgement
+  confidence:
+    register: 50
+    sentence-length: 50
+    paragraph-rhythm: 50
+    analytical-depth: 50
+    figurative-density: 40
+    stance-style: 50
+    person-voice: 50
+    formality: 50
+    humour: 40
+    allusion: 40
+  pinned: []
+  derived:
+    from:
+    - notes.md#sha256:54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    against: sha256:0361af3a32ed6d8607fb835d88d56e2093f1eed79a2d78a528725d7304a48b06
+    at: 2026-11-02 02:48:11+00:00
+    by: model:Qwen3.8-27B-Q4_K_M.gguf
+  shared: false
+  provenance:
+    mode: derived
+    sources:
+    - notes.md
+  made:
+    move: measure
+    run: 2026-11-01-2148-35b5
+    step: 3
+    node: '4'
+    engine: model:Qwen3.8-27B-Q4_K_M.gguf

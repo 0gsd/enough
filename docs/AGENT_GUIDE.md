@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.4.4)
+# enough — Agent Guide (v0.5.0)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -50,7 +50,13 @@ it, and every project, carries a `canon.cosm` catalog written in
 and whose spec ships as [docs/MACROCOSM_OES.md](MACROCOSM_OES.md); and any
 text can be decompiled — on request, never automatically — into an **EMF
 twin** beside it and reduced to an **atem** (see "Canon", "MacroCOSM" and
-"EMF twins and atems"). New projects start in the **text-planning**
+"EMF twins and atems"). **Thym** (0.5.0) is MacroCOSM's language: a `.thym`
+program composes moves (derive, tell, measure, package, project…), is
+compiled into a plan a person can read, and runs with model-backed moves
+behind contracts, leaving a trace that replays; a text leaves as a
+**package** and is read again as a labelled **reading** (see "Thym"). Its
+spec ships as [docs/THYM.md](THYM.md), and a person's holograph is a seventh
+MiniCOSM, Ascribe ([docs/ASCRIBE.md](ASCRIBE.md)). New projects start in the **text-planning**
 paradigm, which absorbed the retired `default` (see "Add a new paradigm").
 
 This guide tells you what files are involved in what, how the runtime
@@ -72,6 +78,7 @@ Three locations that matter:
 | `~/enough/canon/` | The machine-global **Canon** store (0.4.3; `~/enough/cacheawl/` before, renamed in place on first use — see "Canon"): root-level folders are *volumes* (plain kept-forever text, or cached replicas ingested from a path/URL/wikisink), each carrying a backend-owned `canon.cosm` catalog and a hidden `.canon.json`. Global wiki saves land in the `wiki/` volume; the dissolved infoworld folders became the `personal`/`public`/`wiki` volumes. Seam **`ENOUGH_CANON_ROOT`**, then the legacy `ENOUGH_CACHEAWL_ROOT`. Hidden from every project's file tree. | Managed via Canon mode + the readvisors' `canon_*` tools; `canon.cosm` and `.canon.json` are backend-owned. |
 | `~/enough/dict/` | FEED's state root (0.4.1), seam **`ENOUGH_DICT_ROOT`**: `feed.sqlite`, the official dictionary — **built** from the shipped `reflib/dict/` and disposable (rebuilt whenever the manifest digest moves) — and `user-dictionary.sqlite`, the user's own entries — **precious**: created on the first write, never rebuilt or deleted by code. Install-wide, not per project. See "The dictionary (FEED)". | `feed.sqlite` is the build's; the user DB changes only through the `dict_*` tools and `DELETE /api/dict/user/{word}`. Don't hand-edit either. |
 | `~/enough/docoes/` | DocOES's built doc volumes (0.4.4), seam **`ENOUGH_DOCS_ROOT`**: one `<doc>.<lang>.doc.cosm` per telling — `macrocosm-oes.en` (the spec, with Comprise's two chapters and the reference generated from the manifests) and `help-center.<lang>` ×6 (the manual + its bubbles) — **built** by `enough/docoes.py` from the install's own markdown and manifests the first time a route or `doc_lookup` asks, and rebuilt whenever the source digest moves (like `feed.sqlite`). Disposable, never committed, never in a file tree. Install-wide. See "DocOES". | Only `docoes.build()` writes it (atomic `os.replace`). **Every DocOES CLI run and every scratch server exports the seam** — an unseamed `python -m enough.docoes lint …` builds into the real `~/enough/docoes/`. |
+| `~/enough/thym/` | Thym's state root (0.5.0), seam **`ENOUGH_THYM_ROOT`** (read by `thym_host.host_root()` and `thym.trace.runs_dir`): `runs/<run-id>/` per run — `<run-id>.plan.cosm`, `<run-id>.trace.cosm`, `candidates/` (every coprocessor answer, `<node>[-<k>].<attempt>.cosm`, and every engine call, `<node>-e<k>.1.cosm`), `stage/` while it runs, `outputs/<gives>.<ext>` once every node has passed. **Never created by asking**: `GET /api/thym/runs` answers `[]` when it is absent; the first run makes it. Install-wide; records, not precious (a run is replayable from its folder). See "Thym". | Only the runtime writes it (`thym.run.run`, from `POST /api/thym/run`, `/api/canon/package`, `/api/canon/read`, `thym_run` and the CLI). **Every Thym CLI run and every scratch server exports the seam** — `python -m enough.thym run` without it writes into the real `~/enough/thym/`. |
 | `<project>/rness/` | The per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/**readvisors** (and into `~/enough/readvisors/` for the user's own); per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`, `project.json`; per-project state in `io/`, `requests/`, `knowledge/`. Composure-round additions: **`rness/readvisors/`** (was `roles/`, migrated by `skeleton._migrate_roles_to_readvisors`), **`rness/io/composure/`** (where new `.comp` files land — in `_EMPTY_DIRS`, so it is back-filled on every launch), **`rness/composure-forms/`** (project forms; **not** in `_EMPTY_DIRS` — created on the first save-as-form) and **`rness/knowledge/councils/`** (exported council transcripts, created by `council.py` on the first conclude). 0.4.3 adds **`rness/canon.cosm`**, the project's catalog (backend-owned, write-refused, written lazily — see "Canon"). | Edit to affect just this project (never `rness/canon.cosm`). |
 | `<dir>/.<name>.comp.comments.json` | A composure's comments sidecar, beside the `.comp` it belongs to. Backend-owned, hidden from the tree by the leading dot, carried along by `composure.move_sidecars()` on a rename. Both write doors refuse it by name. | Managed via the composure comment endpoints; don't hand-edit. |
 
@@ -91,7 +98,7 @@ Every Python module in `enough/`:
 
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
-| [enough/server.py](../enough/server.py) | ~5510 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, `GET /api/pal/status`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Since 0.4.3 also Canon's store routes (`/api/canon/*`, each pre-0.4.3 one aliased under `/api/cacheawl/*` by `_canon_route`), the derivation routes and their `CanonJobs` table, the MacroCOSM read routes (`/api/cosm*`, `/api/macrocosm/manifests`, `/api/macrocosm-spec`), the `canon:`/`cacheawl:` path prefixes (`STORE_PREFIXES`) and the project-catalog task in the lifespan. Mounts the composure, council and dictionary routers in one `include_router` call each, and starts FEED's background build in the lifespan (`dictionary.ensure_built(background=True)`; `cancel_build()` on shutdown). Owns `GET /api/intro` and the intro match in `POST /api/chat` (see "The readvisor panel"). Owns the `/pal` prefix branch in `POST /api/chat` and `_render_pal_bubbles`. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. Since 0.4.4 the **agent-free boundary** too: `AgentFreeGate`, `AGENT_FREE_PATHS`/`AGENT_FREE_PREFIXES`/`AGENT_FREE_OPEN`, the switch in `POST /api/ui-config`, and `GET /api/canon/ingest-caps` (see "Agent-free mode"). | `create_app()`, `_drive_message()`, `_run_turn(session, message, pal=, log_user=)`, `_render_pal_bubbles()`, `Session.pal_turn`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `STORE_PREFIXES`, `_canon_route()`, `_text_target()` (delegates to `canon_tools.text_target`), `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
+| [enough/server.py](../enough/server.py) | ~5510 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, `GET /api/pal/status`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Since 0.4.3 also Canon's store routes (`/api/canon/*`, each pre-0.4.3 one aliased under `/api/cacheawl/*` by `_canon_route`), the derivation routes and their `CanonJobs` table, the MacroCOSM read routes (`/api/cosm*`, `/api/macrocosm/manifests`, `/api/macrocosm-spec`), the `canon:`/`cacheawl:` path prefixes (`STORE_PREFIXES`) and the project-catalog task in the lifespan. Mounts the composure, council and dictionary routers in one `include_router` call each, and starts FEED's background build in the lifespan (`dictionary.ensure_built(background=True)`; `cancel_build()` on shutdown). Owns `GET /api/intro` and the intro match in `POST /api/chat` (see "The readvisor panel"). Owns the `/pal` prefix branch in `POST /api/chat` and `_render_pal_bubbles`. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. Since 0.4.4 the **agent-free boundary** too: `AgentFreeGate`, `AGENT_FREE_PATHS`/`AGENT_FREE_PREFIXES`/`AGENT_FREE_OPEN`, the switch in `POST /api/ui-config`, and `GET /api/canon/ingest-caps` (see "Agent-free mode"). Since 0.5.0 it mounts the Thym router (`thym_api.build_router(...)`, one `include_router`), asks `thym_api.thym_volume` first in `_cosm_volume` (so `/api/cosm` and `/api/cosm/lens` load `thym:` paths and `.thym` programs), serves `GET /api/thym-spec` (in `HOME_PATHS`), and gates `/api/canon/read` in `AGENT_FREE_PATHS` (see "Thym"). | `create_app()`, `_drive_message()`, `_run_turn(session, message, pal=, log_user=)`, `_render_pal_bubbles()`, `Session.pal_turn`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `STORE_PREFIXES`, `_canon_route()`, `_text_target()` (delegates to `canon_tools.text_target`), `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
 | [enough/prompt.py](../enough/prompt.py) | ~1865 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/readvisor/paradigm enumeration + toggle-state helpers, the generated identity preface, the chief readvisor's name, and the gated tool-doc blocks. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt(project_dir, readvisors=, profile=, pal=)`, `readvisor_identity()`, `identity_preface()`, `chief_name()` / `valid_chief_name()` / `CHIEF_NAME_DEFAULT` / `CHIEF_NAME_MAX`, `readvisor_shape()`, `tool_instructions(project_dir, pal=)`, `TOOL_INSTRUCTIONS` / `COMPOSURE_TOOL_INSTRUCTIONS` / `READVISORY_TOOL_INSTRUCTIONS` / `DICTIONARY_TOOL_INSTRUCTIONS` / `CANON_TOOL_INSTRUCTIONS` (+ its gate `_macrocosm_available()`) / `PAL_TOOL_INSTRUCTIONS` / `PAL_TURN_INSTRUCTION`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()` / `_readvisors_dir()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()`, `HOME_PARADIGM` / `ensure_multipurpose_file()` (the `default` → home migration) |
 | [enough/composure.py](../enough/composure.py) | ~3060 | The composure core (0.3.5): the `.comp` HTML5 parser/serializer, the sanitizer, markdown ⇄ rich text, the node-level op vocabulary (the only way content changes), `place_module`/`arrange`/`estimate_height`, the JSON document model the canvas renders from, the comments sidecar, the forms registry, the outline→composure converter, and the write-door denial. **No FastAPI import** — exercisable with no web layer. See "Composures". | `loads()` / `dumps()`, `model()`, `apply_ops()`, `path_lock()`, `OP_NAMES` / `SOURCES` / `MODULE_TYPES` / `BG_SWATCHES` / `SHIPPED_FORMS` / `CAPS`, `place_module()`, `estimate_height()`, `write_denial()`, `comments_path()` / `load_comments()` / `move_sidecars()`, `parse_outline()` / `outline_ops()` / `from_outline()`, `ComposureError` |
 | [enough/composure_api.py](../enough/composure_api.py) | ~520 | HTTP translation only: `build_router(project_dir, resolve_path, emit)` → the `APIRouter` `create_app` mounts. Every `/api/composure*` route, the comments CRUD, `link-preview`, `webframe/refresh`, and the `composure` SSE event. | `build_router()`, `EVENT` |
@@ -107,7 +114,7 @@ Every Python module in `enough/`:
 | [enough/skillaudit.py](../enough/skillaudit.py) | ~1020 | First-use audit of untrusted skills (0.2.2). Trust classification (symlink into *an* enough install's `defaults/skills/` = trusted — this install or a sibling one, since 0.2.7), the content fingerprint, the `verdict.json` sidecar, both audit passes (deterministic `payload_scanner.py` + a single non-streaming LLM completion — since 0.4.3 through `llm.complete(cloud_gate=False)`; `_complete` / `_message_text` / `_completion_budget` survive as thin wrappers for its tests), the in-flight registry, and the guarded toggle. Progress on the `skill-audit` SSE event. | `is_trusted()`, `fingerprint()` / `skill_fingerprint()`, `skill_state()`, `set_skill_enabled_guarded()`, `SkillAuditRefused`, `audit_skill()` / `audit_and_enable()`, `run_llm_audit()` (module-level test hook), `quarantine_untrusted()`, `trust_override()`, `read_verdict()` / `write_verdict()` |
 | [enough/agent_free.py](../enough/agent_free.py) | ~85 | Agent-free mode (0.4.4): the one reader of the machine-global `agent_free` switch in ui.json (honours `ENOUGH_UI_CONFIG`; stat-cached; on only for a literal `true`) and the 409 sentence. Stdlib only, imports nothing from enough — `llm`, `cloud`, `supervisor`, `preflight`, `tools` and `server` all ask it. See "Agent-free mode". | `enabled()`, `value()`, `ui_config_path()`, `detail()`, `KEY`, `REASON` |
 | [enough/broker.py](../enough/broker.py) | ~440 | Broker config (toggles), trace journal writer, canned denial messages. New toggles auto-render in the broker pane via `/api/broker`. | `TOGGLES` tuple, `load_config()`, `is_enabled()`, `trace()`, `denial_*()` |
-| [enough/tools.py](../enough/tools.py) | ~1825 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers, the three `canon_*` store tools), the tool-call XML parser, the dispatch table. Six import-time `register()` calls at the bottom fold in the composure, readvisor, pal, dictionary, MacroCOSM (`canon_tools`) and intro tools. `read_file` alone may follow a `rness/` symlink into a shipped root, read-only (`_shipped_read_target`, 0.4.1). `fetch_and_cache()` is the shared fetch pipeline `run_fetch_url` and the webframe refresh both render. | `_DISPATCH` (~line 1680), `_TRACE_TOGGLE` (~line 1709), `execute()`, `_safe_join()` / `_shipped_read_target()`, `parse_tool_calls()`, `fetch_and_cache()`, `ToolResult.side_effects`, `_CLOUD_KEY_EXFIL_PATTERNS` |
+| [enough/tools.py](../enough/tools.py) | ~1825 | Tool runners (`read_file`, `write_file`, `shell`, `fetch_url`, `read_highlights`, `navigate_to_highlight`, `cloud_pipeline`, girraph ops, wiki tool wrappers, the three `canon_*` store tools), the tool-call XML parser, the dispatch table. Seven import-time `register()` calls at the bottom fold in the composure, readvisor, pal, dictionary, MacroCOSM (`canon_tools`), Thym (`thym_tools`, 0.5.0) and intro tools. `read_file` alone may follow a `rness/` symlink into a shipped root, read-only (`_shipped_read_target`, 0.4.1). `fetch_and_cache()` is the shared fetch pipeline `run_fetch_url` and the webframe refresh both render. | `_DISPATCH` (~line 1680), `_TRACE_TOGGLE` (~line 1709), `execute()`, `_safe_join()` / `_shipped_read_target()`, `parse_tool_calls()`, `fetch_and_cache()`, `ToolResult.side_effects`, `_CLOUD_KEY_EXFIL_PATTERNS` |
 | [enough/project_meta.py](../enough/project_meta.py) | ~300 | `rness/project.json`: the project's nice name + description, the `ui` block (`ui_scale`, `text_scale`, `readvisor_panel`) and the `composure` block (`launch`, `path`, `form`, `last`). Every reader gets a fully populated, validated view; a garbage value reads as the default rather than raising. | `load()`, `save()`, `save_ui()`, `save_composure()`, `touch_composure()` |
 | [enough/convert.py](../enough/convert.py) | ~1395 | Document conversion (0.2.5): the format **registry** (`FORMATS`), engine probing + caching, twin/assets/manifest naming, the state machine, the job runner that drives the worker, export/sync/resolve, and the `pdf`-extra installer. Imports nothing heavy — docling and pandoc are only ever reached through `convert_worker`. See "Document conversion" below. | `FORMATS` / `formats_view()` / `engines()`, `pandoc_path()` / `typst_path()` / `docling_available()`, `twin_path()` / `assets_dir()` / `manifest_path()` / `pair_for()`, `state()` / `has_twin()`, `read_manifest()` / `write_manifest()`, `ConvertJobs`, `do_export()` / `sync_after_save()` / `resolve()`, `ExtraInstaller`, `installed_extras()` / `record_extra()`, `reset_engines()` |
 | [enough/convert_worker.py](../enough/convert_worker.py) | ~840 | The out-of-process worker: `python -m enough.convert_worker`, one JSON job on stdin, NDJSON records on stdout, exit. pandoc is shelled out to; **docling runs in this process** — which is the whole reason the worker exists (torch must never be imported into the server). | `main()`, `_OPS` (`convert` / `export` / `prefetch`), `do_convert()` / `do_export()` / `do_prefetch()`, `_convert_docling()`, `_flatten_media()` / `_relink_docling_assets()` / `_normalize_images()`, `_Heartbeat`, `TWIN_FORMAT` |
@@ -123,14 +130,19 @@ Every Python module in `enough/`:
 | [enough/paginate.py](../enough/paginate.py) | ~920 | Pagination (0.2.7): options schema + named size table, output naming (`name-YYYY-MM-DD.pdf` + `-1`/`-2`), the `.typ` surgery (pandoc-template split, balanced-bracket `#footnote[...]` extraction, endnote reflow, option preamble), pure 2-up/booklet imposition math, bundled-fonts lookup, and the PDF source-attachment probe that powers unpack-on-import. Heavy lifting (pandoc/typst/pypdf compile) runs in `convert_worker.do_paginate`. See "Pagination" below. | `validate()`, `sizes_view()` / `page_size_mm()`, `output_pdf()` / `pages_dir()` / `viewer_manifest_path()`, `fonts_dir()` / `font_paths()`, `embedded_source()` / `has_embedded_source()`, `sheet_order()` / `slot_rect()`, `split_template()` / `extract_footnotes()` / `place_endnotes()` / `preamble()` / `build_typ()`, `status()` / `run_paginate()`, `PaginateError` |
 | [enough/highlights.py](../enough/highlights.py) | ~280 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
 | [enough/girraph.py](../enough/girraph.py) | ~885 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
-| [enough/canon.py](../enough/canon.py) | ~2300 | Canon (0.4.3; the cacheawl store, moved and extended): volume CRUD, path/URL/wikisink **ingest** (with the Holotype privacy filter), the `canon.cosm` volume catalogs and the project catalog `rness/canon.cosm`, reconcile, the on-demand merirmaid mirror, the catalog/meta write-guards, transfer (copy/move), the one-time store-folder rename, the EMF-twin listing rules (`emf_state` is the one fresh/stale rule), and the launch-time `infoworld` migration. Root `~/enough/canon/` (`ENOUGH_CANON_ROOT`, then `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store. Still exports the generic folder→flowchart walker `home.py` builds project maps with. See "Canon". | `root()`, `migrate_store_folder()`, `create_volume()` / `list_volumes()` / `volume_tree()` / `rename_volume()` / `delete_volume()` / `require_volume()`, `run_ingest()`, `build_catalog()` / `regenerate_catalog()` / `project_catalog(project_dir, *, write=)`, `reconcile()` / `reconcile_all()`, `build_mirror()`, `folder_flowchart()`, `is_catalog_file()` / `catalog_write_denial()`, `emf_twin_path()` / `is_emf_twin()` / `emf_state()` / `twin_header()`, `is_holotype_folder()`, `slug()` / `item_slugs()` / `file_kind()`, `transfer()`, `migrate_infoworld()`, `CanonError` / `CanonNotFound`, `CATALOG_ITEM_CAP` |
+| [enough/canon.py](../enough/canon.py) | ~2300 | Canon (0.4.3; the cacheawl store, moved and extended): volume CRUD, path/URL/wikisink **ingest** (with the Holotype privacy filter), the `canon.cosm` volume catalogs and the project catalog `rness/canon.cosm`, reconcile, the on-demand merirmaid mirror, the catalog/meta write-guards, transfer (copy/move), the one-time store-folder rename, the EMF-twin listing rules (`emf_state` is the one fresh/stale rule), the launch-time `infoworld` migration, and (0.5.0) Thym packages as volume kinds: the suffixes `PACKAGE_FOLDER_SUFFIX` (`.thym`), `PACKAGE_FILE_SUFFIX` (`.package.cosm`), `SEALED_SUFFIX` (`.thym.enc`), `is_package_folder` (a `<stem>.thym/` whose `package.cosm` sniffs `oes: thym/1`) / `is_package_file` / `is_sealed_package` / `package_stem` / `package_text_name` / `packages_beside`; `file_kind` says `package` / `sealed`; the scan never recurses a package folder and the catalog lists one as a single `kind: package` item; `catalog_excerpt` (the surrounding context, built in memory). Root `~/enough/canon/` (`ENOUGH_CANON_ROOT`, then `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store. Still exports the generic folder→flowchart walker `home.py` builds project maps with. See "Canon". | `root()`, `migrate_store_folder()`, `create_volume()` / `list_volumes()` / `volume_tree()` / `rename_volume()` / `delete_volume()` / `require_volume()`, `run_ingest()`, `build_catalog()` / `regenerate_catalog()` / `project_catalog(project_dir, *, write=)`, `reconcile()` / `reconcile_all()`, `build_mirror()`, `folder_flowchart()`, `is_catalog_file()` / `catalog_write_denial()`, `emf_twin_path()` / `is_emf_twin()` / `emf_state()` / `twin_header()`, `is_holotype_folder()`, `slug()` / `item_slugs()` / `file_kind()`, `transfer()`, `migrate_infoworld()`, `CanonError` / `CanonNotFound`, `CATALOG_ITEM_CAP` |
 | [enough/cacheawl.py](../enough/cacheawl.py) | 77 | **A compatibility shim, for one release** (0.4.3): explicit re-exports of every public name of the old module mapped onto `canon` (`box_dir` → `volume_dir`, `regenerate_mirror` → `regenerate_catalog`, `mirror_write_denial` → `catalog_write_denial`, the `*cachebox*` CRUD → `*_volume`, `CacheawlError = CanonError` …), plus the three private names `tests/test_cacheawl*.py` reach for. New code imports `canon` | — |
-| [enough/macrocosm.py](../enough/macrocosm.py) | ~2150 | The MacroCOSM OES reference reader (0.4.3): the COSM YAML loader, manifests and the registry, volumes, paths/URIs, references, the sixteen generic checks, Mermaid lenses and the text tree, a CLI. **PyYAML + stdlib only, imports nothing from enough** — vendorable as one file. See "MacroCOSM". | `yaml_load()` / `dump()` / `sniff_declaration()`, `Registry` / `default_registry()` / `load_manifest()`, `load_volume()` → `Volume`, `parse_path()` / `resolve_path()` / `qualified_uri()`, `resolve_ref()`, `lint()` → `Report`, `lenses()` / `to_mermaid()` / `to_text_tree()`, `Refusal` (falsy), `CHECKS`, `DEFAULT_MANIFEST_DIR` |
+| [enough/macrocosm.py](../enough/macrocosm.py) | ~2150 | The MacroCOSM OES reference reader (0.4.3): the COSM YAML loader, manifests and the registry, volumes, paths/URIs, references, the sixteen generic checks, Mermaid lenses and the text tree, a CLI. **PyYAML + stdlib only, imports nothing from enough** — vendorable as one file. See "MacroCOSM". | `yaml_load()` / `dump()` / `sniff_declaration()`, `Registry` / `default_registry()` / `load_manifest()` (seven manifests since 0.5.0; `*.moves.cosm` sidecars are not manifests), `Volume.name` (falls back to a catalog's `handle`, so a holograph is titled by its pseudonym — 0.5.0), `load_volume()` → `Volume`, `parse_path()` / `resolve_path()` / `qualified_uri()`, `resolve_ref()`, `lint()` → `Report`, `lenses()` / `to_mermaid()` / `to_text_tree()`, `Refusal` (falsy), `CHECKS`, `DEFAULT_MANIFEST_DIR` |
 | [enough/docoes.py](../enough/docoes.py) | ~2250 | DocOES (0.4.4): a markdown document enumerated as a `doc/1` volume — sections, terms, examples, decisions, Comprise's chapters, the help bubbles, and the reference (`R:` items) generated from the MiniCOSM manifests; build-on-digest into `ENOUGH_DOCS_ROOT`; the byte-for-byte round trip; inventories and cross-volume refs; DocOES's seven checks; a CLI. stdlib + PyYAML + `enough.macrocosm`. See "DocOES". | `DOCUMENTS`, `BUBBLE_DOCUMENT`, `tellings()`, `docs_root()`, `ensure_built()` / `is_fresh()` / `build()` / `load_built()`, `catalog_for()`, `compile_doc()`, `inventory()` / `resolve_xref()`, `lint_doc()`, `atem_problems()`, `DocsUnavailable` |
 | [enough/canon_derive.py](../enough/canon_derive.py) | ~2220 | The derivation engine (0.4.3): text → EMF twin, EMF → markdown, text or passage → atem, pins. **Pure functions, no server imports**; every model call through an injected `complete`. See "EMF twins and atems". | `derive_emf()`, `derive_atem()`, `compile_short()` / `compile_text()`, `record_short()`, `short_path()` (old name `compiled_path`), `default_order()` / `source_path()`, `pin_atem()` / `next_atem_id()` / `set_file_atem()`, `read_source()`, `write_atomic()` / `write_twin()`, `twin_path()` / `twin_state()`, `candidate_terms()` / `entity_candidates()` / `chunk()`, `DeriveCancelled` / `DeriveError`, `TEXT_SUFFIXES` |
 | [enough/canon_prompts.py](../enough/canon_prompts.py) | ~115 | The derivation prompts, plain strings (`.format` only); test-asserted to name the six stances, rule out pronouns, keep `EMF_SYSTEM` under 2,000 chars and carry the owner's atem definitions verbatim | `EMF_SYSTEM` / `EMF_USER` / `EMF_CONTINUE` / `EMF_RESTART` / `EMF_RETRY` / `EMF_REPAIR`, `ATEM_SYSTEM` / `ATEM_USER` / `ATEM_WHOLE_USER`, `COMPILE_SYSTEM` / `COMPILE_USER` |
-| [enough/canon_jobs.py](../enough/canon_jobs.py) | ~260 | The derivation job table (convert's shape): one writing job per file, the generation-lock rule for model-mode jobs, cooperative cancel, SSE event `canon` | `CanonJobs` (`start` / `snapshot` / `cancel` / `active` / `holding` / `record`), `JobContext`, `EVENT`, `KINDS` |
-| [enough/canon_tools.py](../enough/canon_tools.py) | ~985 | The six MacroCOSM readvisor tools (`cosm_read`, `cosm_lint`, `emf_derive`, `atem`, `cosm_guide`, and since 0.4.4 `doc_lookup`), `text_target` — the derivation refusals the routes share — and the `configure()` seam. `register()` wires them at `tools` import time. Never takes the generation lock (see "EMF twins and atems") | `TOOL_NAMES`, `register()`, `configure(llm_url=, jobs=)`, `text_target()` / `TextTargetError`, `catalog_after()`, `run_cosm_read()` … `run_cosm_guide()`, `run_doc_lookup()` / `find_doc_entry()`, `STORE_PREFIXES`, `TEXT_MAX` / `EMF_MODEL_MAX` |
+| [enough/canon_jobs.py](../enough/canon_jobs.py) | ~275 | The derivation job table (convert's shape): one writing job per file, the generation-lock rule for model-mode jobs, cooperative cancel, SSE event `canon`. 0.5.0 adds the kinds `thym` (a program's run) and `read` (a reading) and a nested `progress: {node, of, name, move, state}` that `JobContext.progress` passes through | `CanonJobs` (`start` / `snapshot` / `cancel` / `active` / `holding` / `record`), `JobContext`, `EVENT`, `KINDS` |
+| [enough/canon_tools.py](../enough/canon_tools.py) | ~985 | The six MacroCOSM readvisor tools (`cosm_read`, `cosm_lint`, `emf_derive`, `atem`, `cosm_guide`, and since 0.4.4 `doc_lookup`), `text_target` — the derivation refusals the routes share — and the `configure()` seam. `register()` wires them at `tools` import time. Never takes the generation lock (see "EMF twins and atems"). Since 0.5.0 `text_target` also refuses a Thym package folder and anything inside it (`inside_package`, beside `inside_holotype`: "a package is kept whole") | `TOOL_NAMES`, `register()`, `configure(llm_url=, jobs=)`, `text_target()` / `TextTargetError`, `inside_holotype()` / `inside_package()`, `catalog_after()`, `run_cosm_read()` … `run_cosm_guide()`, `run_doc_lookup()` / `find_doc_entry()`, `STORE_PREFIXES`, `TEXT_MAX` / `EMF_MODEL_MAX` |
+| [enough/thym/](../enough/thym/) | ~11 300 (pkg) | **Thym** (0.5.0): the compiler and the reference runtime of `docs/THYM.md` v0. Compiler: `parse.py` (recursive descent, line-keeping), `declarations.py` (every manifest's `moves:` and every `*.moves.cosm` sidecar), `types.py`, `check.py` (resolve, types, static contracts), `enumerate.py` (a `.thym` file ⇄ a `thym/1` program volume, byte for byte), `plan.py`, `contracts.py`. Runtime: `values.py`, `registry.py`, `checks.py` (the dynamic checks of THYM.md 7.3), `coprocessor.py` (`Refusing…`, `Replay…`), `run.py`, `trace.py`, `engines.py` (the per-node call counter; engine calls recorded and replayed), `vault.py` (the sealed package: Comprise's `comprise-bundle/0`), `conform.py`, `cli.py`, `__main__.py`. Moves: `moves/{emf,edit,morph,project,doc,pack}.py`. **Imports the stdlib, PyYAML and `enough.macrocosm` only** (a test parses the imports): enough's engines plug in through `thym_host`. See "Thym". | `check_file()` / `plan_file()`, `Refusal`, `parse.parse()`, `check.check()`, `enumerate.enumerate_file()` / `compile_volume()`, `plan.plan()` / `plan.build()`, `run.run()` / `run.replay()`, `trace.runs_dir()`, `conform.conform()`, `cli.main()` / `cli.plan_atem()`, `vault.seal()` / `vault.open()` |
+| [enough/thym_host.py](../enough/thym_host.py) | ~820 | enough's side of Thym: `ModelCoprocessor` over `llm.complete` (schema'd answers, narrow repair, a prose-wrapped YAML answer failing `schema` and re-asked with `ONLY_THE_YAML`), the eight prompt builders (`PROMPTS`), `engines()` (canon, docoes, feed, the surrounding catalog), `preflight_hook` (a plan's largest prompt against the window, `preflight.evaluate`'s words), `Window` (the model's window, read once and only when a model runs), `runtime_kwargs`, `host_root()` (the seam), and the programs a run may pick (`SHIPPED_PROGRAMS` = `defaults/thym/`, `list_programs` project → canon → shipped, `find_program`) | `ModelCoprocessor`, `host_coprocessor()`, `preflight_hook()`, `Window`, `environment()`, `runtime_kwargs()`, `engines()` / `canon_engine()` / `docoes_engine()` / `catalog_engine()`, `PROMPTS`, `host_root()`, `agent_free()`, `SHIPPED_PROGRAMS`, `program_name()` / `list_programs()` / `find_program()` |
+| [enough/thym_api.py](../enough/thym_api.py) | ~985 | HTTP translation for Thym (0.5.0): `build_router(...)` → `GET /api/thym/programs|program|runs|trace`, `POST /api/thym/compile|plan|run`, `POST /api/canon/package|unpack|read`; runs and readings are CanonJobs; outputs land beside the first input all at once (`copy_all`, `land_beside`); `thym_volume` loads `thym:` paths and `.thym` files for `/api/cosm`; export, unpack and the reading's program are generated programs run through the runtime | `build_router()`, `thym_volume()`, `make_plan()`, `asks_refusal()`, `land_beside()`, `list_runs()`, `export_package()`, `unpack_package()`, `reading_program()` / `reading_path()` |
+| [enough/thym_tools.py](../enough/thym_tools.py) | ~450 | The readvisor's two Thym tools (0.5.0), `thym_check` and `thym_run`, behind the `macrocosm-oes` skill (`skill_on`); `register()` like `canon_tools`. No lock, no job; a run lands under the Thym root only | `register()`, `run_thym_check()`, `run_thym_run()`, `skill_on()`, `SKILL_NAME`, `OUTPUTS_NOTE` |
+| [enough/ascribe.py](../enough/ascribe.py) | ~540 | Ascribe OES 1 (0.5.0): a holograph's own checks beside the generic ones — `form-anchored`, `relation-declared`, `when-shape`, `strength-range`, `no-pii` (a warning, never an error), `private-marker` (a note) — plus `id-module` held to the module folders and `catalog-key` to the hid and handle; `python -m enough.ascribe lint <folder> [--json]`. Stdlib + `enough.macrocosm`; reads the folder it is given, writes nothing; no route, viewer or tool calls it. Spec: [docs/ASCRIBE.md](ASCRIBE.md) | `lint_holograph()`, `pii_findings()`, `name_bigrams()`, `when_ok()` / `strength_ok()`, `private_drops()`, `ASCRIBE_CHECKS`, `PII_PATTERNS`, `IDENTIFYING_FIELDS` |
 | [enough/home.py](../enough/home.py) | ~805 | The home screen (0.2.5): the project **registry** (`~/enough/config/projects.json`, seam `ENOUGH_PROJECTS_STATE`), the ¶/W/C counters ported from the top bar, the fingerprint cache (which since 0.2.8 also snapshots the `rness/project.json` display name/description so an unreachable folder's row keeps its nice name — live reads still win), seeding from the shell's `desktop.json` MRU (temp-dir paths — chiefly the wizard's `$TMPDIR/enough-onboarding` scratch — are refused, skipped, and pruned when the registry is durable, 0.2.8), the project map (via `canon.folder_flowchart`; its skip rule `_mirror_skip` is also what the project catalog enumerates), the add-guards + the osascript folder chooser, and both halves of the open/close handoff. Imports `server` **lazily, inside functions** — `server` imports `home` at module level, and that is the cycle-breaker. | `projects_state_path()` / `config_dir()` / `handoff_path()`, `read_registry()` / `save_registry()` / `register()` / `touch_opened()` / `set_hidden()`, `seed_from_desktop()`, `count_text()` / `fingerprint_of()` / `refresh_entry()` / `list_projects()`, `build_project_mirror()`, `check_addable()` / `add_project()` / `choose_folder()`, `write_handoff()` / `read_handoff()`, `exec_argv()` |
 | [enough/logger.py](../enough/logger.py) | small | Stdlib logging setup. | — |
 | [enough/static/index.html](../enough/static/index.html) | ~46700 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), **the readvisor panel** (`#readvisor-panel`, the third `.layout` column — the conversation lives here now, not in a chat home pane), **the composure canvas** (`#composure` at the base layer: `COMP`, `COMP_TOOLS`, `COMP_MODULE_RENDERERS`, `COMP_FORM_BEHAVIORS`, ~126 `comp*` functions), **the composure base indicator + peek** (`html[data-comp-peek]`), SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode (+ lens entries), Canon split-view mode (`#canon-mode`, `cn*`), **the cosm viewer** (`#cosm-mode`, `COSM`, `cosm*`), **the docs viewer** (`#docs-mode`, `DOCS`, `DOCS_DENSITIES`, `DOCS_FAB`, `docs*` — the help center and the MacroCOSM spec at three densities, 0.4.4; it replaced ref mode and the spec viewer), **agent-free mode** (`AGENT_FREE`, `agentFree*`, the CSS block keyed on `html[data-agent-free]`), **the Canon chip + EMF face + atem card + job toasts** (`CANON`, `EMF_FACE`, `canon*`, `emfFace*`, `#atem-modal`, `atemCard*`), the home frame + project map + handoff overlays (gated on `IS_HOME` / `body[data-mode]`), SVG icon pipeline (`data-icon`/`iconSrc`), MODE STACK registry, confirmOverlay, **the shared modal a11y helper** (`MODAL`, `modalSync()`), **the find bar** (`findBarAttach`, `FIND_BARS`), **dictionary mode** (`#dict-mode`, `DICT`, `dict*`), **the word data lightbox** (`#wdl-modal`, `WDL`, `wdl*`) and the **"dictionary entry" menu** (`#dict-ctx-menu`). **The five per-mode chat pills are gone** (review / edit / merirmaid / wiki / cacheawl, as Canon was then called) — there is one composer now, `#message` in the panel |
@@ -153,16 +165,22 @@ skeletons by `skeleton.py`:
   (`blank` `cards` `scaffold` `journal` `council`). **Generated**, not
   hand-written — `scripts/gen_composure_forms.py` (`--check` verifies)
 - `defaults/policies/*.md` — operating policies (symlinked)
-- `defaults/cosm/manifests/*.manifest.cosm` — the five MiniCOSM manifests
-  (0.4.3; `doc` joined in 0.4.4) the MacroCOSM reader loads, read in place from the install, never
+- `defaults/cosm/manifests/*.manifest.cosm` — the seven MiniCOSM manifests
+  (0.4.3; `doc` joined in 0.4.4, `ascribe` and `thym` in 0.5.0) the MacroCOSM reader loads, read in place from the install, never
   copied into a project; `comprise.manifest.cosm` is synced from comprise-dev
-  and never edited here. `defaults/cosm/NOTICE.md`: all rights reserved, not
+  and never edited here, so Comprise's Thym moves live in the sidecar
+  `comprise.moves.cosm` beside it (not a manifest; the registry glob skips it).
+  `emf`, `doc` and `thym` carry their own `moves:` blocks. `defaults/cosm/NOTICE.md`: all rights reserved, not
   Apache (see "MacroCOSM" and "License")
 - `defaults/cosm/chapters/` — Comprise OES 1's specification and paradigm map
   (0.4.4), synced read-only by `scripts/sync_cosm.py` with a `manifest.json`
   (source commit, sha256 each) and a hand-written `NOTICE.md`: chapters of the
   spec's doc volume. Comprise's prose, never enough's voice (exempt from the
   legacy-vocabulary test); never edit it here
+- `defaults/thym/*.thym` — the three programs shipped with enough (0.5.0):
+  `publish-story`, `read-my-way`, `open-house`, byte for byte the conformance
+  suite's `tests/fixtures/thym/programs/` (`tests/test_thym_host.py` pins the
+  equality). Read in place, never copied; listed last by `run with…`
 - `defaults/models.json` — local-model registry template
 - `defaults/openrouter-config.json` — cloud-slot metadata template
 - `defaults/ui-config.json` — UI prefs template (theme, font, `ui_language`,
@@ -455,6 +473,10 @@ cache.
 | The project catalog | `rness/canon.cosm` (`scope: project`, structure only) | none — written by `canon.project_catalog()` | no (`cosm_read rness/canon.cosm`) |
 | EMF twins and atems | `<dir>/<text>.cosm` beside `<text>` (`notes.md` ↔ `notes.md.cosm`), hidden behind it in both trees; atems live inside it; a compile writes a SHORT, a new visible `<stem>.short-<YYYY-MM-DD-HHMM>.md` beside the text, and appends it to the twin's `shorts:` list | none — written only on request (a click or a tool call) | no (`cosm_read`, `emf_derive`, `atem`) |
 | MiniCOSM manifests | — (install-wide) | `defaults/cosm/manifests/*.manifest.cosm` | only `CANON_TOOL_INSTRUCTIONS`; the `macrocosm-oes` skill when on |
+| Thym programs | `<anywhere>/<name>.thym` (the file is the truth; `<name>.thym.cosm` only when enumerated on request) | `defaults/thym/*.thym` (the three shipped programs, read in place) | no — `thym_check`/`thym_run` read them on demand |
+| Thym runs | `~/enough/thym/runs/<run-id>/` (plan, trace, candidates, outputs; seam `ENOUGH_THYM_ROOT`); a run with… copies its outputs beside the first input (`<stem>.<gives>.<ext>`) | none — written by `thym.run` | no |
+| Packages and readings | `<dir>/<stem>.thym/` + `<stem>.package.cosm` (+ `<stem>.thym.enc` sealed) beside the text; `<dir>/<stem>.read-<morph>-YYYY-MM-DD-HHMM.md` | none — written by the runtime | no |
+| Holographs | `<anywhere>/<folder>/holograph.cosm` + module folders (read only; nothing in enough writes one) | none | no |
 | Wikisink registry/state | `~/enough/config/wikisink.json` (user-global, **not** per-project) | none | no |
 | Wiki comments/overlays | `<wikisink data dir>/comments/`, `overlay/`, `preserved/` | none | no |
 | FEED (the dictionary) | — (install-wide) | `reflib/dict/` (shipped text form) → `~/enough/dict/feed.sqlite` (built) | only `DICTIONARY_TOOL_INSTRUCTIONS`; entries are read through `dict_lookup` |
@@ -735,6 +757,19 @@ and the boot UI state (`BOOT_UI_STATE`) carries it for first paint.
   agent_free: true, fits: null, preflight: "skipped", …}`; `/api/models` →
   `agent_free: true` and `supervisor.mode: "agent-free"`. Tests:
   `tests/test_agent_free.py`.
+- **Thym (0.5.0).** `/api/canon/read` is in `AGENT_FREE_PATHS` (a reading
+  always asks the model; `read` has no scaffold). `/api/thym/run` is **not**,
+  on purpose: a plan with no `asks` runs agent-free (by code, job `reason:
+  agent-free`), and one that asks is refused 409 at plan time with the count
+  ("3 steps ask a model; agent-free is on"), the runtime's own words
+  (`run._environment`; the coprocessor is the refusing one). `POST
+  /api/thym/plan` says the same as a refusal with check `agent-free`; `GET`
+  routes, compile and unpack stay open. The run card lists only programs
+  with `asks: 0` and says how many it left out; "read through…" says a
+  reading needs a model. `thym_check` is agent-free-safe as a runner, but
+  `tools.execute` refuses every tool while agent-free is on, so no chat turn
+  reaches it. `--rules` (and `mode: rules`) runs scaffolds; agent-free never
+  does: it refuses an asking plan outright.
 - **The UI (index.html, U-A).** The slider is one control drawn twice:
   `#am-ui-switch` (in `#am-ui-item`, the UI window's controls row, also on
   home) and `#am-model-switch` (in `#am-model-row`, the model window, with
@@ -1147,6 +1182,8 @@ project need no switch, and a write into the store rides on the existing
 | `atem` | `canon_tools.run_atem` | as `emf_derive` for `<path>` (writes the twin's `atem:`, a minimal twin when none); `<text>` writes nothing; model up to `TEXT_MAX`; fires `canon` on a write |
 | `cosm_guide` | `canon_tools.run_cosm_guide` | none; no tags. The install's `macrocosm-oes` SKILL.md, for a model whose skill is off |
 | `doc_lookup` | `canon_tools.run_doc_lookup` | none (it reads); `<term>` (or `<id>`, `<section>`): a word, a section number (`18.4`, `help 3`) or an id → its atem, definition, where it is defined and up to three sections that mention it, from the spec then the manual in the UI language; a term that names a closed list adds the list's values and meanings (0.4.4). Builds a doc volume on first use (see "DocOES") |
+| `thym_check` | `thym_tools.run_thym_check` | the `macrocosm-oes` skill on in the project (else one line asking the user to switch it on); read-only, every mode. `<path>` or `<program>` (a name resolves project → canon → shipped), optional `<inputs>` lines `name=path`. Answers `ok`, the CLI's plan line (`cli.plan_atem`, word for word) and `takes`/`gives`; without inputs it plans on placeholders and says the largest prompt was not measured; a refusal names the file and line (0.5.0) |
+| `thym_run` | `thym_tools.run_thym_run` | the `macrocosm-oes` skill on; `<program>`, `<path>` (the first `takes`), further `<inputs>` lines. Refused at plan time, nothing run: a plan that asks while no model runs or agent-free is on ("3 steps ask a model; …"), a preflight that does not fit, an asking plan over a text past `TEXT_MAX` (sent to the reader's run with…). No lock, no job; outputs and trace land under the Thym root only, the answer names them; fires `canon` with `kind: thym` (0.5.0) |
 | `read_composure` | `composure_tools.run_read_composure` | `composure_enabled`; `.comp` path. No `<module>` → the outline (three header lines + one line per module). With `<module>` → that module as markdown, cached to `rness/io/input/` over `CACHE_OVER_CHARS` = 4000 |
 | `new_composure` | `composure_tools.run_new_composure` | `composure_enabled`; `<form>` from `SHIPPED_FORMS` + project forms. Writes the file **immediately** (unlike the canvas's lazy create) |
 | `comp_add_module` | `composure_tools.run_comp_add_module` | `composure_enabled`; omit geometry and let `place_module` choose |
@@ -2926,8 +2963,8 @@ an unknown value is an open question (`{pending: "<the question, for whoever can
 never a guess. The spec is [docs/MACROCOSM_OES.md](MACROCOSM_OES.md), v0.0.1:
 §2 is the model on one page, §4 the file format, §5 the declaration, §11
 ids/paths/URIs, §12 the checks, §13 the manifest, §14 renderers and lenses,
-§18 the five MiniCOSMs enough ships, each with an example (complete files
-for cosm, canon, emf and doc; a Holotype is a folder, so comprise's is a
+§18 the seven MiniCOSMs enough ships, each with an example (complete files
+for cosm, canon, emf, doc, ascribe and thym; a Holotype is a folder, so comprise's is a
 fragment). This
 section summarizes and points; read the spec before you change the format, a
 manifest or the reader. User-facing doc: HELP_CENTER §13 (the dialects; §13.1–13.2 the docs viewer)
@@ -3015,9 +3052,14 @@ Exit 0 ok, 1 errors / refused / nothing there, 2 an unknown lens.
 | `canon.manifest.cosm` | `oes: canon/1` | one file, `canon.cosm` or `rness/canon.cosm`; module V | written in enough |
 | `emf.manifest.cosm` | `oes: emf/1` | one file, `<text>.cosm`; modules L E K P T X | written in enough |
 | `doc.manifest.cosm` (0.4.4) | `oes: doc/1` | one file per telling, `<doc>.<lang>.doc.cosm`, built by enough into `ENOUGH_DOCS_ROOT`; modules S T R B | written in enough (see "DocOES") |
+| `ascribe.manifest.cosm` (0.5.0) | `oes: ascribe/1` | a holograph: a folder, catalog `holograph.cosm` (the self: `id: ascribe/<hid>`, `handle`, `pseudonyms`, `sample`, no name), module folders A B C E I O Q S U Y (one kind each) and F (form, polyform, relation); `links.starter`, not a closed `links.rels`; `dialectic:` and `filter:` blocks | written in enough; spec [docs/ASCRIBE.md](ASCRIBE.md); own checks in `enough/ascribe.py` |
+| `thym.manifest.cosm` (0.5.0) | `oes: thym/1` | one file of six kinds (`catalog.kind`: program, morph, context, plan, trace, package); modules P M C R K; a `moves:` block | written in enough; spec [docs/THYM.md](THYM.md) §17 (see "Thym") |
+| `comprise.moves.cosm` (0.5.0) | `moves-of: comprise/1` | **a sidecar, not a manifest**: Comprise's Thym moves (`project`, `band`, `mark`, `withhold`), since its manifest is a byte copy; the registry glob passes it by and `thym.declarations` reads it | written in enough |
 
-The four written here carry a comment header, `macrocosm: 0.0.1` and the
-© line. The optional keys 0.0.1 adds, which the reader reads (spec §13.5):
+The six written here carry a comment header, `macrocosm: 0.0.1` and the
+© line. Since 0.5.0 a manifest may end in a `moves:` list (THYM.md §17.6; spec
+§13.4): the generic reader keeps it as an unknown key and the Thym compiler
+reads it; `MACROCOSM_VERSION` stays 0.0.1. The optional keys 0.0.1 adds, which the reader reads (spec §13.5):
 `volume.single-file`, `renderers[].lens`, `links.rels`, `closed-lists`,
 `checks.severity`, `module-file.items`, a kind's own `required`, and
 `catalog.<key>` closed lists (Canon's `scope` and `status`). A folder for a
@@ -3028,8 +3070,9 @@ rights reserved (`defaults/cosm/NOTICE.md`; see "License").
 **To add a MiniCOSM**: write `<name>.manifest.cosm` in the `minicosm/0` key
 shape (copy `canon.manifest.cosm`), give it a subsection of spec §18 with at
 least one complete ```` ```cosm ```` example (so `test_macrocosm_spec.py`
-holds it), and add fixtures and tests beside the others in
-`tests/test_macrocosm.py`. Nothing below the manifest needs code — the
+holds it; give `_file_name` there its catalog name, and raise the example
+count in `tests/test_docoes.py`), and add fixtures and tests beside the others in
+`tests/test_macrocosm.py` (the registry tests count the manifests: seven in 0.5.0). Nothing below the manifest needs code — the
 checks, paths, the viewer, the lenses and the tools are generic.
 
 ### Fixtures, and the sync
@@ -3081,6 +3124,7 @@ in `asyncio.to_thread`.
 | `POST /api/cosm/lint` | `{path}` → `lint(...).to_dict()` + `path` |
 | `GET /api/macrocosm/manifests` | `[{name, title, version, declaration, summary}]`, registry order |
 | `GET /api/macrocosm-spec?lang=` | `docs/MACROCOSM_OES.md` as text/markdown with `/api/help-center`'s language whitelist (a `static/i18n/<lang>/MACROCOSM_OES.md` would win; none ships — the spec is English only); 404 with a sentence when the file is missing. **In `HOME_PATHS`**. Since 0.4.4 the frontend reads the spec through `/api/docs` (see "DocOES"); this route is **kept** as the spec's raw-markdown source, like `/api/help-center` for the manual; `desktop/src-tauri/build.rs` stages the file into the .app |
+| `GET /api/thym-spec?lang=` (0.5.0) | `docs/THYM.md`, the Thym spec, on the same pattern: raw markdown, the language whitelist, English only (a `static/i18n/<lang>/THYM.md` would win), 404 with a sentence when missing; **in `HOME_PATHS`**, open while agent-free. `desktop/src-tauri/build.rs`'s `SNAPSHOT` must stage `docs/THYM.md` for the route to answer in the .app |
 | `POST /api/cosm/inline {text, filename?}` · `POST /api/cosm/inline/lens {text, filename?, lens?, around?, depth?}` (0.4.4) | a volume read from text (`macrocosm.load_volume_text`, nothing written): `/api/cosm`'s payload with `path: "inline:<filename>"` (default `inline.cosm`; 400 no text, 413 over 256 KB, a refused declaration is a 200 with `refused`), and its lens. **Home-accessible** (the docs viewer's live examples) and open while agent-free |
 
 A `.cosm` saved through read/edit is never refused for lint (the spec says
@@ -3116,7 +3160,7 @@ manual tellings). Spec: `docs/MACROCOSM_OES.md` §18.5; plan:
   "distinctive" (a plain use links only a name with a space, an inner
   capital/digit or a symbol). A translation takes its ids from the English:
   sections by number, terms by their place in the section, else the English
-  item verbatim with `fallback: en` (ja 7, zh 3, the others 0 in 0.4.4) — so
+  item verbatim with `fallback: en` (ja 7, zh 1, the others 0 in 0.5.0; ja 7, zh 3 in 0.4.4) — so
   **a translated manual must mirror the English markdown's shape** (bold
   labels, term-shaped bullets), not only its headings.
 - **Where it is built**: `ENOUGH_DOCS_ROOT`, default `~/enough/docoes/`
@@ -3424,7 +3468,10 @@ at once ("… is being derived right now; try again when that job is done").
 Six tools, registered at `tools` import time like `dictionary_tools`, each
 traced under `trace_log_enabled` (rows in the "Tools" table): `cosm_read`,
 `cosm_lint`, `emf_derive`, `atem`, `cosm_guide`, and `doc_lookup` (0.4.4, see
-"DocOES"). `<path>` is project-relative
+"DocOES"). Since 0.5.0 the same documentation block carries two more,
+`thym_check` and `thym_run` (`enough/thym_tools.py`, see "Thym"), so the
+block documents **eight** tools; those two answer only with the
+`macrocosm-oes` skill on. `<path>` is project-relative
 or `canon:<volume>/…`; a full path inside the project is made relative, any
 other leading slash is dropped, exactly as the routes read it.
 
@@ -3451,16 +3498,20 @@ other leading slash is dropped, exactly as the routes read it.
   `canon_jobs`' shape with `id: "rv<n>"` and `by` — which `server._handle_tool`
   emits as SSE `canon` after the tool's own events; the UI repaints for any
   `done` snapshot and says "Ed made an EMF twin of notes.md".
-- **The docs block**: `prompt.CANON_TOOL_INSTRUCTIONS` ("## MacroCOSM", 965
-  chars against the owner's 1 000 cap since 0.4.4's `doc_lookup` example — 809 in 0.4.3 — test-pinned; one example per tool, each
+- **The docs block**: `prompt.CANON_TOOL_INSTRUCTIONS` ("## MacroCOSM", **994**
+  chars against the owner's 1 000 cap since 0.5.0's two Thym examples and one
+  sentence — 965 in 0.4.4 after `doc_lookup`, 809 in 0.4.3 — test-pinned; R1 paid
+  for the Thym lines by shortening the other tools' prose; one example per tool, each
   round-tripping through `parse_tool_calls`), gated by
   `prompt._macrocosm_available()` — see "The request lifecycle".
 - **The skill**: `defaults/skills/macrocosm-oes/` (`SKILL.md` + a
-  `references/README.md` of pointers to the spec, the five manifests and the
-  reader — no copies) teaches the format, the six stances, the atem's parts,
-  when to decompile and when an atem is enough, and how to read a Holotype.
+  `references/README.md` of pointers to the spec, the seven manifests, the
+  sidecar, `docs/THYM.md`, `defaults/thym/` and the reader — no copies) teaches the format, the six stances, the atem's parts,
+  when to decompile and when an atem is enough, how to read a Holotype, and
+  (0.5.0, "## Thym programs") what a program is and when to call `thym_check`
+  and `thym_run`; its MiniCOSM table lists seven.
   **Off by default** like every shipped skill — the tool docs are always on;
-  switched on, its guide (~6 600 chars) rides in every turn; switched off,
+  switched on, its guide (~8 400 chars since 0.5.0) rides in every turn; switched off,
   it is one `cosm_guide` call away.
 
 ### The UI (index.html)
@@ -3585,6 +3636,193 @@ other leading slash is dropped, exactly as the routes read it.
   (`seed_canon`, which refuses any root outside the scratch dir). The
   0.4.3 spec-viewer screens and `cosmspec-contents` became the docs viewer's
   (see "DocOES" → "The docs viewer").
+
+---
+
+## Thym (the MacroCOSM language, 0.5.0)
+
+**Thym** is the language in which MacroCOSM moves meaning between densities
+and projections. A program (`<name>.thym`, its first line `thym 0`) composes
+**moves** — `derive`, `tell`, `atem`, `expand` (`emf/1`), `enumerate`,
+`compile` (`doc/1`), `cut`, `count`, `words`, `null`, `measure`, `morph`,
+`read`, `package`, `unpack` and the accessors (`thym/1`), `project`, `band`,
+`mark`, `withhold` (`comprise/1`, in the sidecar) — that the MiniCOSMs
+declare in their `moves:` blocks. The compiler parses, resolves, types,
+checks the static contracts, estimates, enumerates the program into `thym/1`
+items and plans it; the runtime checks the plan against the machine, runs
+deterministic moves in code and sends model-backed ones (`asks: true`) to a
+**coprocessor** behind the move's contract, lands every output or none, and
+writes a **trace** that replays byte for byte from its recorded candidates.
+Spec: [docs/THYM.md](THYM.md) (v0; **the reference wins**: where it and
+`enough/thym/` disagree the code is right and §20.4 records the fix;
+`tests/test_thym_spec.py` compiles every ```` ```thym ```` block in it).
+Design and rulings: `docs/thym-architecture.md`, plan `docs/thym-050-plan.md`,
+lane notes `docs/thym-landed-*.md` (all local, gitignored). User-facing:
+HELP_CENTER §12.6 (packages, sealed packages, unpack, readings) and §13.4
+(programs, run with…, the trace, morphs, the readvisor's tools, agent free).
+`GET /api/thym-spec?lang=` serves THYM.md raw (`/api/macrocosm-spec`'s
+twin, in `HOME_PATHS`, English only; a `static/i18n/<lang>/THYM.md` would win).
+
+### The pieces
+
+| Where | What |
+|---|---|
+| `enough/thym/` | the compiler, the runtime, the moves (see the Code map row); stdlib + PyYAML + `enough.macrocosm` only, so it is vendorable as the reader is |
+| `enough/thym_host.py` | enough's engines behind the runtime: the model coprocessor, the prompt builders, `engines()`, the preflight hook, the window, the Thym root, the program listing |
+| `enough/thym_api.py` | the routes (below); mounted by `server.create_app` in one `include_router` |
+| `enough/thym_tools.py` | `thym_check`, `thym_run` (see "The readvisor tools" below) |
+| `defaults/cosm/manifests/thym.manifest.cosm` | the `thym/1` MiniCOSM: one file of six kinds (`program`, `morph`, `context`, `plan`, `trace`, `package`), modules P M C R K, and the `moves:` it owns |
+| `moves:` in `emf.manifest.cosm`, `doc.manifest.cosm`; `comprise.moves.cosm` | the other MiniCOSMs' moves; the sidecar because Comprise's manifest is a byte copy |
+| `defaults/thym/` | the three shipped programs, `publish-story` (text → package; three nodes ask), `read-my-way` (package, morph, context → short; asks), `open-house` (Holotype → isotype; deterministic) |
+| `tests/fixtures/thym/` | the conformance suite (below) |
+
+**The CLI.** `python -m enough.thym check|plan|run|trace|enumerate|compile|conform`
+(`run <program> <inputs…> [--rules]`, `run --replay <run-id>`, `conform
+[<suite>]`). **Always with `ENOUGH_THYM_ROOT` (better: every seam of
+`scripts/smoke_boot.build_env()`) pointed at a scratch dir**; `conform` writes
+into a temp root and reads only, the others write runs under the root.
+`plan` prints one line, `cli.plan_atem`'s: "publish-story: 7 nodes, 3 ask a
+model; largest prompt 307 tokens, output budget 0 words" — the routes and
+`thym_check` show the same line.
+
+**Model mode and the window.** A plan carries its largest prompt;
+`thym_host.preflight_hook` holds it against the model's window with
+`preflight.evaluate`'s 2,048-token reserve and refuses with the number and
+the window that would fit ("the plan's largest prompt is 307 tokens and the
+model's window is 2,048 with 2,048 kept free; a 32,768-token window would hold
+it"). The window is a `Window`, read once and **only when a plan asks a
+model** — an eager read once sent `GET /props` to the owner's 8080 from a
+test; `tests/test_thym_run.py` now fails if a deterministic run reads it.
+
+### The routes ([enough/thym_api.py](../enough/thym_api.py))
+
+Project routes (ModeGate 404s them at home); refusals are 400/404/409 with a
+plain sentence; outputs land beside the **first input**, all at once or not
+at all (`copy_all`), replacing an earlier copy.
+
+| Route | Answers |
+|---|---|
+| `GET /api/thym/programs` | `{programs: [{name, where (project/canon/shipped), rel, steps, asks, takes, gives, why}]}`, project → canon → shipped; a row that does not compile is `{name, where, rel, problem}` |
+| `GET /api/thym/program?path=` | `{name, rel, why, source, volume}` (a name, a project path, a `canon:` path or a shipped file name; 404 when none) |
+| `POST /api/thym/compile {path} \| {text}` | `{ok, name, refusal: {stage, check, line, message}, estimate}` |
+| `POST /api/thym/plan {program, inputs \| path, mode?}` | `{ok, plan, atem, mode, fits, refusal, why?}`; rules mode refuses a plan that asks (check `agent-free` or `no-model`), model mode runs the preflight |
+| `POST /api/thym/run {program, inputs \| path, mode?}` | `{job}`: a CanonJob of kind `thym`, claim key the first input's path (so a run and a decompile of one file exclude each other), the generation lock in model mode; result `{run, trace, atem, outcome, mode, outputs: [{name, path, rel, folder?}], refusal?}`. Refused before any job: compile 400, plan 409 (asks while rules/agent-free, preflight), `mode: model` with no model 409 |
+| `GET /api/thym/runs` · `GET /api/thym/trace?run=` | the 200 newest runs, newest first (`[]` when the root is absent) · one run's head and `path: thym:runs/<run>/<run>.trace.cosm` |
+| `POST /api/canon/package {path, morph?, context?, encrypt?}` | runs the generated program `export` over the text and its **fresh** twin (409 "derive the twin first"), lands `<stem>.thym/` and `<stem>.package.cosm`; `encrypt: true` writes `<stem>.thym.enc` and returns `key` **once**, in the response only. Synchronous, under the text's claim |
+| `POST /api/canon/unpack {path, key?}` | verifies every digest and span first, then writes `<stem>.md`, `<stem>.md.cosm` (source and locators renamed), `<stem>.morph|context|graph.cosm`; 400 sealed without or with a wrong key; 409 bad digest, unresolved span, or a file beside it that differs (identical bytes are fine); nothing written on any refusal |
+| `POST /api/canon/read {path, morph}` | `{job}`, kind `read`: the generated program `reading` (`read f with mine`, or the null); result `{reading, label: "read through <name>", run, trace, mode}`; the file `<text-stem>.read-<morph>-YYYY-MM-DD-HHMM.md` (`-2`, `-3`) beside the text or package, with `read_through:` front matter and the THYM.md §14 footer. **Agent-free gated**; rules mode fails the job ("read has no scaffold") |
+| `GET /api/thym-spec?lang=` | THYM.md, raw markdown; home-accessible (in `server.py`, not the router) |
+
+**Jobs.** Runs and readings are CanonJobs (`canon_jobs.KINDS` gained
+`thym`, `read`) whose snapshot carries `progress: {node, of, name, move,
+state}` (state `running`/`done`/`skipped`/`refused`), mirrored into
+`chunk`/`chunks`/`message` for the existing toasts. A run landed or refused is
+`done` (the result says which); a plan-time refusal inside the job fails it.
+
+**`thym:` paths in the cosm viewer.** `server._cosm_volume` asks
+`thym_api.thym_volume` first, so `GET /api/cosm` and `/api/cosm/lens` load
+`thym:runs/<run>/<run>.trace.cosm|plan.cosm` (from the Thym root) and any
+`<x>.thym` **file** as its enumerated program volume. A `.thym` path that is a
+**folder** (a package's folder form) falls through to the ordinary volume load
+and draws the package catalog.
+
+### Packages, sealed packages, readings (Canon)
+
+A package is the self-contained export of a text (THYM.md §15): the folder
+form `<stem>.thym/` (`text.md`, `fabula.cosm`, `morph.cosm`, `context.cosm`,
+`graph.cosm` as present, and `package.cosm`, the catalog with every file's
+sha256, the program and run that made it, and the notice) beside the
+single-file form `<stem>.package.cosm` (the same catalog with each file's
+bytes inline). Canon treats both as kinds (`kind: package`, `kind: sealed`
+for `<stem>.thym.enc`), lists each as one thing, and marks a text node
+`package: {path, folder, sealed}`. **The cipher** (`enough/thym/vault.py`) is
+Comprise's `comprise-bundle/0` vendored: a data key per package, AES-256-GCM
+over 4 MiB chunks, an encrypted manifest, the key as Comprise's recovery code
+(15 bytes, 24 base32 characters in six groups of four) wrapping the data key
+by PBKDF2-HMAC-SHA256 at 600,000 iterations. `cryptography` is a dependency
+since 0.5.0 (the owner's ruling, 2026-11-02), so a package sealed here is
+Comprise's scheme exactly; the file keeps an HMAC-SHA256 encrypt-then-MAC
+AEAD (`aead: hmac-sha256-ctr`, named in the file) for an install without
+it. The UI has no button for sealing or unpacking in 0.5.0 (the manual says
+so); `run with…` → `publish-story` makes the two plain forms, and "read
+through…" reads either.
+
+### The readvisor tools ([enough/thym_tools.py](../enough/thym_tools.py))
+
+`thym_check` and `thym_run`, behind the `macrocosm-oes` skill (`skill_on`:
+off → one line asking the user to switch it on, nothing runs), registered
+like `canon_tools` and traced under `trace_log_enabled`; their examples and
+one sentence sit in `CANON_TOOL_INSTRUCTIONS` (994 of 1,000 characters).
+Neither takes the lock or starts a job — a tool runs inside a chat turn that
+holds the generation lock (see "EMF twins and atems") — and a run lands under
+the Thym root only: the answer names the outputs and the trace and says the
+reader's run with… is what lands them beside the text. Refused at plan time,
+nothing run: an asking plan with no model or agent-free on, a preflight
+miss, and an asking plan over a text past `canon_tools.TEXT_MAX` (24,000
+chars), which belongs to the reader's run with…. A run fires `{"canon":
+snapshot(kind="thym", …)}`. Tests: `tests/test_thym_tools.py`.
+
+### The conformance suite
+
+`tests/fixtures/thym/` (THYM.md §20.3; its `README.md` is the layout):
+`programs/` (the three, byte for byte `defaults/thym/`), `inputs/` (the
+orchard notes and their twin, a package in folder form, `plain-letter.morph.cosm`,
+`on-the-train.context.cosm`), `expected/<name>/items.cosm` and `plan.cosm`,
+`expected/open-house/outputs/` (frozen from the first conforming run; the
+clock is pinned to 2026-11-01T12:00:00Z), `bad/` (eleven compile-time
+refusals, the first line naming stage, check and line), and **two replay
+fixtures** under `replay/publish-story/`: `2026-11-01-2148-35b5/`
+(checkpoint A, 112 KB, recorded before engine calls were, so its prompts
+carry FEED lookups and it is **skipped** where the host has no FEED, as under
+the test seams) and `2026-11-02-0843-ff92/` (808 KB, with engine records:
+replays with no dictionary and no engine). `python -m enough.thym conform`:
+26 passed / 0 failed / 0 skipped with FEED built, 25 / 0 / 1 under the seams.
+A replay refuses at the first input, call or prompt whose digest differs,
+before any engine or model work.
+
+### The UI (index.html, U1)
+
+One CSS block and one JS block, both "Thym in the page (0.5.0, U1)", ending
+`window.__thymReady = true`; every hook into older code is guarded by it.
+`THYM` (state), `thymBodyHTML` (the `thym/1` layouts in the cosm viewer:
+program steps with contracts, plan graph `thymGraphHTML` + cost line
+`thymCostLine`, trace cards `thymTraceBody`/`thymRecordHTML`, morph
+`thymMorphBody`, package `thymPackageBody`), `enterProgramDoc` (a `.thym`
+file in the docs viewer at three densities), `thymFaceScales` /
+`thymScalesHTML` (the ten scales on the EMF face when a morph is found:
+`X.thym/morph.cosm`, `<text>.morph.cosm`, `<stem>.morph.cosm`,
+`<stem>.thym/morph.cosm`), `thymRunOpen` / `thymReadOpen` (the `#thym-modal`
+card: programs project → canon → shipped, the plan and its cost, run, the job
+tracked by `canonTrack(job, {want})`, the trace opened by its `thym:` path;
+agent-free lists only `asks: 0`), the reading band (`#read-band-mini`,
+`#read-band-review`, `#read-band-edit`; `thymBandPaint`: "read through
+<name>" + the footer line, never dismissable, on any file named
+`<stem>.read-<morph>-YYYY-MM-DD-HHMM[-n].md`), and the `thym-run:<id>`
+handle `cosmLoad` resolves through `GET /api/thym/trace`. 126 keys in six
+catalogs (`docs.title.program`, `modes.docs.program.*`, `thym.*`; translated
+properly in wave 3), bubbles `thym`, `package`, `reading`. **uicheck**
+screens `thym-program` (docs viewer, fabula), `thym-plan`, `thym-trace`
+(cosm viewer), `thym-run` (the card on the orchard notes, publish-story
+chosen; no model, so the plan's refusal shows), `thym-read` (a reading with
+its band); scenarios `thym-run-roundtrip` (the deterministic `count-words`
+on `orchard/harvest.md`: listed project-first, planned "it can run", run,
+the trace opens with green checks, `orchard/harvest.n.txt` in the tree) and
+`thym-read-labelled` (the band in every face and size, gone on close, the
+text unchanged). Seeded by `scripts/uicheck/server.py` `_seed_thym` in
+`orchard/`.
+
+### Tests
+
+`tests/test_thym_spec.py` (the spec's blocks compile; every `bad/` program
+refused at its stage, check and line), `test_thym_compile.py`,
+`test_thym_run.py` (incl. the import rule and "a deterministic run never
+reads the window"), `test_thym_moves.py`, `test_thym_host.py` (shipped ==
+suite programs), `test_thym_api.py` (the routes through the app),
+`test_thym_tools.py`, `test_canon_package.py` (the cipher; packages in
+Canon's scan, catalog and mirror), `test_canon_tools.py` (package
+refusals), `test_cosm_api.py` (`/api/thym-spec`), `test_ascribe.py`; the
+UI's in `test_ui_check.py`. None reaches a model: the coprocessor is a fake,
+a replay, or the refusing one.
 
 ---
 
@@ -4570,7 +4808,10 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   `#ui-modal [data-help], #model-modal [data-help]`, and `openUIModal()` /
   `openModelModal()` call `applyHelpBubbles()`, since home never runs
   `loadHelpBubbles`) and `docs` (the docs viewer's `(?)`), and merged
-  `cosmspec` into `docs`. DocOES also enumerates every bubble as a
+  `cosmspec` into `docs`; 0.5.0 added `thym` (the run card's and a program
+  card's `(?)`), `package` (a package's card) and `reading` (the reading
+  band), each ending in an idea that names its Help Center section (13.4,
+  12.6), so their cards' `see` point at the manual. DocOES also enumerates every bubble as a
   `B:bubble/<id>` item of the help volume (the fabula's cards); a bubble about
   another document is mapped in `docoes.BUBBLE_DOCUMENT` (`{"docs":
   "macrocosm-oes"}`), so its "section N" names that document's sections
@@ -4596,7 +4837,9 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   `test_content_integrity.py` keeps it contiguous and every cross-reference
   resolvable, `i18n_check.py` keeps the six heading structures equal, and
   renumbering English is a translation job too (0.4.4 renumbered §13.2 →
-  §13.3 and added §10.7, §13.2, §16.5 in all six).
+  §13.3 and added §10.7, §13.2, §16.5 in all six; 0.5.0 added §12.6 and §13.4
+  in all six, with the same defined terms in the same places, so no telling
+  falls back to English for them).
 - **The docs viewer (0.4.4)** — mode `docs`, root `#docs-mode` (carries
   `data-doc` and `data-density`), one viewer for two documents:
   `help-center` (icon `hxc`, the UI language's telling, badge "written by
@@ -4685,6 +4928,10 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   (the ref-mode gate), `docs-contents`, `docs-term-roundtrip`,
   `docs-example-live`, `docs-graph-roundtrip`; the four mode-stack scenarios
   use the docs viewer as their second mode.
+  **Programs (0.5.0, U1)**: `DOCS_DOCS.program` reads any `.thym` file at
+  three densities (`enterProgramDoc(path, {density, anchor})`, `DOCS_PROG`,
+  `DOCS_PROGRAM_DENSITIES`; data from `GET /api/thym/program`, falling back to
+  `/api/file/raw` + `<stem>.thym.cosm`); see "Thym" → "The UI".
 - **Inline code in `renderMarkdown` (a 0.4.3 fix).** Before 0.4.3 the
   shared renderer double-escaped `<` and `&` inside backticks (every caller
   hands `renderInline` already-escaped text, which was then escaped again),
@@ -4995,9 +5242,9 @@ sentence at conclude until it is built.** Adding a kind:
 2. Register in `_DISPATCH` (~line 1680 in tools.py) and `_TRACE_TOGGLE`
    (~line 1709). Both grep cleanly by name if line numbers drift again. A
    whole *family* of tools goes in its own module with a `register()` that
-   `setdefault`s into both, called at the bottom of tools.py — the six
+   `setdefault`s into both, called at the bottom of tools.py — the seven
    existing ones are `composure_tools`, `readvisor_tools`, `pal_tools`,
-   `dictionary_tools`, `canon_tools`, `intro`.
+   `dictionary_tools`, `canon_tools`, `thym_tools` (0.5.0), `intro`.
 3. If `ToolResult.render()` needs a specific attribute (e.g. `output=`
    for `cloud_pipeline`), add a branch in `render()`.
 4. Add an XML example block + prose to `TOOL_INSTRUCTIONS` in
@@ -5712,7 +5959,7 @@ A list of things that will confuse you if you don't see them coming:
   `ENOUGH_WEIGHTS_DIR`, `ENOUGH_EXTRAS_STATE`, `ENOUGH_LIVE_STATE`,
   `ENOUGH_MODELS_REGISTRY`, `ENOUGH_PROJECTS_STATE`,
   **`ENOUGH_READVISORS_ROOT`**, **`ENOUGH_DOCS_ROOT`** (0.4.4, the built doc
-  volumes), **`ENOUGH_DICT_ROOT`** and
+  volumes), **`ENOUGH_THYM_ROOT`** (0.5.0, Thym's runs), **`ENOUGH_DICT_ROOT`** and
   **`ENOUGH_DICT_SOURCE`** (the latter pointed at *nothing*, so no test
   starts a 380 MB build — see "The dictionary (FEED)")
   (plus `ENOUGH_MODELS_URL_BASE`, which rebases the model download URLs
@@ -5746,6 +5993,34 @@ A list of things that will confuse you if you don't see them coming:
   suite (or a scratch server) that touches any of them must also
   `monkeypatch.setenv("HOME", …)`. `tests/test_llama_server_lookup.py`,
   `tests/test_platform_linux.py` and `scripts/smoke_boot.py` all do.
+  **And three of them bind at import** (found in the 0.5.0 round, when
+  `~/enough/config/broker.json` was rewritten during a wave with no writer
+  identified): `broker.CONFIG_PATH`, `cloud.CONFIG_PATH` and
+  `server.ORCHESTRATOR_CONFIG` are computed from `Path.home()` when the module
+  is imported — at collection, before any fixture moves `$HOME` — so moving
+  `$HOME` alone does not reach them. `tests/conftest.py`'s autouse fixture now
+  patches all three into the test's `$HOME` for every test; a new module-level
+  path computed from `Path.home()` needs the same line there.
+- **A Thym package is kept whole (0.5.0).** A `<stem>.thym/` folder whose
+  `package.cosm` sniffs `oes: thym/1` is one thing: Canon's scan never
+  recurses it, its catalog lists it as one `kind: package` item, the mirror
+  draws it as one node, and `canon_tools.text_target` refuses it and anything
+  inside it ("a package is kept whole: unpack it beside itself, then derive the
+  text it gives"). Never decompile, atem or write into a package folder; a
+  digest in its catalog would stop matching. Unpack writes beside it, never
+  over a file that differs, and nothing on a refusal.
+- **The Thym root is the runtime's (0.5.0).** Only `thym.run` writes under
+  `ENOUGH_THYM_ROOT`; a run lands all of its outputs or none (`stage/` then a
+  move), and `candidates/` is what makes a replay byte-identical — editing a
+  recorded candidate makes that run's replay refuse at the first digest that
+  differs. The two replay fixtures under `tests/fixtures/thym/replay/` are
+  frozen records of real-model runs: re-record, never hand-edit. A shipped
+  program in `defaults/thym/` must stay byte-identical to its copy in
+  `tests/fixtures/thym/programs/` (a test pins it).
+- **The sealed package's key is shown once and stored nowhere.** `POST
+  /api/canon/package {encrypt: true}` returns `key` in the response only; a
+  test greps the project and the Thym root for it. Never log it, never put it
+  in a trace, a snapshot or an SSE event.
 - **The `ENOUGH_DESKTOP*` vars are NOT scratch-isolation hooks** — they
   are the desktop shell's capability gate, set by the shell when it
   spawns a backend. `ENOUGH_DESKTOP=1` enables `POST /api/shutdown` (the

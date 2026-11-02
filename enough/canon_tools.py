@@ -201,6 +201,22 @@ def inside_holotype(project_dir: Path, target: Path) -> bool:
     return False
 
 
+def inside_package(project_dir: Path, target: Path) -> bool:
+    """True when `target` is a package folder (`<stem>.thym/`, THYM.md 15) or anything inside one, looking up no
+    further than the project or the store root. A package is kept whole: its text is read through the package and
+    derived, if at all, after an unpack, never in place (0.5.0)."""
+    from . import canon as _canon
+    stops = {project_dir.resolve(), _canon.root().resolve()}
+    p = target if target.is_dir() else target.parent
+    for _ in range(64):
+        if _canon.is_package_folder(p):
+            return True
+        if p in stops or p.parent == p:
+            return False
+        p = p.parent
+    return False
+
+
 def text_target(project_dir: Path, path: str) -> dict[str, Any]:
     """Resolve and vet the text a derive, an atem or a pin names (blocking).
 
@@ -229,6 +245,8 @@ def text_target(project_dir: Path, path: str) -> dict[str, Any]:
         raise TextTargetError(404, f"no such file: {rel}")
     if inside_holotype(project_dir, target):
         raise TextTargetError(400, "a Holotype is browsed, not decompiled: open it in the cosm viewer")
+    if inside_package(project_dir, target):
+        raise TextTargetError(400, "a package is kept whole: unpack it beside itself, then derive the text it gives")
     if target.is_dir():
         raise TextTargetError(400, f"{rel} is a folder; derive reads one text at a time")
     if _canon.is_catalog_file(target, project_dir) or name in (
@@ -1302,7 +1320,7 @@ def register() -> None:
 
 __all__ = ["DOC_LOOKUP_DOCS", "EMF_MODEL_MAX", "LONG_FOR_A_TURN", "SIDE_EFFECT", "SKILL_NAME", "STORE_PREFIXES", "TEXT_MAX",
            "TOOL_NAMES", "TextTargetError", "atem_lines", "capped_tree", "catalog_after", "configure",
-           "declaration_text", "guide_text", "inside_holotype", "load", "model", "readvisor_name", "register",
+           "declaration_text", "guide_text", "inside_holotype", "inside_package", "load", "model", "readvisor_name", "register",
            "report_lines", "resolve", "run_atem", "run_cosm_guide", "run_cosm_lint", "run_cosm_read",
            "run_doc_lookup", "run_emf_derive", "snapshot", "store_prefix", "text_target", "tidy_rel",
            "ui_language", "find_doc_entry", "where"]

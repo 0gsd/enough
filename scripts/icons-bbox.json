@@ -1,12 +1,12 @@
 {
-  "_doc": "Visible-content bounding boxes for enough/static/icons/*.svg, measured 2026-07-16 via Chrome getBBox on the uniform 72x72 re-exports. Every source now has viewBox='0 0 72 72'; build_icons.py keeps that viewBox when the art fits inside it and auto-fits a square viewBox (centered on this bbox) only when the art overflows the artboard. If an icon source changes, re-measure and update its entry.",
+  "_doc": "Visible-content bounding boxes for enough/static/icons/*.svg, measured 2026-07-16 via Chrome getBBox on the uniform 72x72 re-exports. Every source now has viewBox='0 0 72 72'; build_icons.py keeps that viewBox when the art fits inside it and auto-fits a square viewBox (centered on this bbox) only when the art overflows the artboard. If an icon source changes, re-measure and update its entry. The twenty-one originals that replaced the 0.3.5\u20130.4.4 placeholders (the composure, readvisor, cosm, macrocosm, atem, short and fabula icons) were measured the same way on 2026-11-02.",
   "atem.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "h": 28,
-      "w": 47,
-      "x": 11,
-      "y": 22
+      "h": 54.4,
+      "w": 54.6,
+      "x": 8.7,
+      "y": 8.8
     }
   },
   "broker.svg": {
@@ -84,127 +84,127 @@
   "comp-add-module.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 10,
-      "y": 14,
-      "w": 48,
-      "h": 47
+      "h": 54,
+      "w": 54,
+      "x": 8.9,
+      "y": 8.9
     }
   },
   "comp-eraser.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 12,
-      "y": 13,
-      "w": 48,
-      "h": 46
+      "h": 54,
+      "w": 54,
+      "x": 9,
+      "y": 8.9
     }
   },
   "comp-file-entry.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 12,
-      "y": 10,
-      "w": 48,
-      "h": 50
+      "h": 54,
+      "w": 54,
+      "x": 9,
+      "y": 8.9
     }
   },
   "comp-fit.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 10,
-      "y": 14,
-      "w": 52,
-      "h": 44
+      "h": 54,
+      "w": 54.5,
+      "x": 8.9,
+      "y": 8.9
     }
   },
   "comp-new.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 14,
-      "y": 11,
-      "w": 42,
-      "h": 50
+      "h": 64.6,
+      "w": 65.1,
+      "x": 4.2,
+      "y": 4.2
     }
   },
   "comp-page-next.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 12,
-      "y": 11,
-      "w": 50,
-      "h": 50
+      "h": 54,
+      "w": 54,
+      "x": 9,
+      "y": 8.9
     }
   },
   "comp-page-prev.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 10,
-      "y": 11,
-      "w": 50,
-      "h": 50
+      "h": 54,
+      "w": 54.8,
+      "x": 8.9,
+      "y": 8.9
     }
   },
   "comp-pencil.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 12,
-      "y": 15,
-      "w": 45,
-      "h": 45
+      "h": 54,
+      "w": 54,
+      "x": 9,
+      "y": 8.9
     }
   },
   "comp-pointer.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 20,
-      "y": 10,
-      "w": 33,
-      "h": 50
+      "h": 56.5,
+      "w": 54,
+      "x": 9,
+      "y": 8.9
     }
   },
   "comp-redo.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 13.6,
-      "y": 20.1,
-      "w": 44.4,
-      "h": 35.9
+      "h": 54,
+      "w": 54,
+      "x": 9.1,
+      "y": 8.9
     }
   },
   "comp-text.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 14,
-      "y": 12,
-      "w": 44,
-      "h": 48
+      "h": 54,
+      "w": 54,
+      "x": 9,
+      "y": 8.9
     }
   },
   "comp-undo.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 14,
-      "y": 20.1,
-      "w": 44.4,
-      "h": 35.9
+      "h": 54,
+      "w": 54,
+      "x": 9,
+      "y": 8.9
     }
   },
   "composure.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 9,
-      "y": 12,
-      "w": 54,
-      "h": 48
+      "h": 63.7,
+      "w": 63.5,
+      "x": 4.2,
+      "y": 4.2
     }
   },
   "cosm.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "h": 52,
-      "w": 46,
-      "x": 13,
-      "y": 10
+      "h": 53.9,
+      "w": 53.3,
+      "x": 9.4,
+      "y": 9
     }
   },
   "d6.svg": {
@@ -232,6 +232,15 @@
       "w": 53.89,
       "x": 9.06,
       "y": 8.99
+    }
+  },
+  "fabula.svg": {
+    "viewBox": "0 0 72 72",
+    "visBBox": {
+      "h": 54.4,
+      "w": 54.6,
+      "x": 8.7,
+      "y": 8.8
     }
   },
   "feed.svg": {
@@ -300,9 +309,9 @@
   "macrocosm.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "h": 54,
-      "w": 54,
-      "x": 9,
+      "h": 53.9,
+      "w": 53.3,
+      "x": 9.4,
       "y": 9
     }
   },
@@ -381,46 +390,46 @@
   "readvisor-dock.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 9,
-      "y": 15,
-      "w": 54,
-      "h": 42
+      "h": 51.6,
+      "w": 62.6,
+      "x": 4.7,
+      "y": 11.3
     }
   },
   "readvisor-full.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 9,
-      "y": 15,
-      "w": 54,
-      "h": 42
+      "h": 49.4,
+      "w": 62.6,
+      "x": 4.7,
+      "y": 11.3
     }
   },
   "readvisor-rename.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 10,
-      "y": 18,
-      "w": 54,
-      "h": 44
+      "h": 62,
+      "w": 62.6,
+      "x": 4.7,
+      "y": 5
     }
   },
   "readvisornav-off.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 9,
-      "y": 24.2,
+      "h": 23.6,
       "w": 54,
-      "h": 23.6
+      "x": 9,
+      "y": 24.2
     }
   },
   "readvisornav-on.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "x": 9,
-      "y": 24.2,
+      "h": 23.6,
       "w": 54,
-      "h": 23.6
+      "x": 9,
+      "y": 24.2
     }
   },
   "ribbon-alert.svg": {
@@ -489,10 +498,10 @@
   "short.svg": {
     "viewBox": "0 0 72 72",
     "visBBox": {
-      "h": 38,
-      "w": 50,
-      "x": 11,
-      "y": 17
+      "h": 54.4,
+      "w": 54.6,
+      "x": 8.7,
+      "y": 8.8
     }
   },
   "speak.svg": {

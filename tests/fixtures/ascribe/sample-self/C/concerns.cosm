@@ -1,0 +1,19 @@
+nodes:
+  - id: C:concern/lost-without-satellites
+    type: concern
+    name: Lost without satellites
+    summary: Few sailors could find their way home if the satellite fixes went quiet.
+    form: F:form/celestial-navigation
+    strength: 4
+    links:
+      - {rel: with, to: O:opinion/noon-sight-for-everyone}
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.85}
+
+  - id: C:concern/plastic-on-the-tideline
+    type: concern
+    name: Plastic on the tideline
+    summary: There is more plastic than sea glass on the beach now, and a little more every year.
+    form: F:form/sea-glass
+    valence: against
+    strength: 4
+    provenance: {mode: manual, sources: [self], confidence: 0.9}

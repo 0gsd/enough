@@ -15,7 +15,7 @@
 # Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
 
 manifest: minicosm/0
-macrocosm: 0.0.1
+macrocosm: 0.0.2
 name: emf
 title: EMF
 version: 1
@@ -179,6 +179,41 @@ renderers:
     makes: the whole text at a glance
     lens: {kind: mermaid, diagram: mindmap, include: [L, E, K, P, T]}
   - {id: text-tree, makes: the text tree, code: [python -m enough.macrocosm tree]}
+
+moves:                                  # Thym (docs/THYM.md, sections 6 and 17.6): the moves this MiniCOSM declares
+  - name: derive
+    takes: [text]
+    gives: fabula
+    asks: true
+    contract: [span-resolves, stance-closed, terms-grounded, coverage, emf-checks, provenance]
+    scaffold: rules-twin
+    code: enough.thym.moves.emf:derive
+    says: a text decompiled into its fabula, the EMF twin
+  - name: tell
+    takes: ['fabula | item | volume']
+    gives: short
+    modifiers: {as: order, by: order, with: morph}
+    asks: true
+    contract: [coverage, no-invention, stance-kept, scales-met, footer, provenance]
+    scaffold: outline
+    code: enough.thym.moves.emf:tell
+    says: a telling of the fabula, in an order, in a morph
+  - name: atem
+    takes: ['text | fabula | short | item']
+    gives: atem
+    asks: true
+    contract: [atem-shape, span-resolves, provenance]
+    scaffold: first-sentence
+    code: enough.thym.moves.emf:atem
+    says: the line, focus, push and pull of a text or a passage
+  - name: expand
+    takes: [atem]
+    gives: short
+    modifiers: {with: fabula, to: words}
+    asks: true
+    contract: [coverage, no-invention, stance-kept, length, span-inside, provenance]
+    code: enough.thym.moves.emf:expand
+    says: an atem opened out into a short of a given length, from its fabula
 
 extension:
   status: not built

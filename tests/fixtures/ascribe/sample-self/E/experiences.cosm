@@ -1,0 +1,30 @@
+# E: a branch, the harbour years, with two parts; each part names the branch in of.
+nodes:
+  - id: E:experience/harbour-years
+    type: experience
+    name: The harbour years
+    summary: A decade living by a working harbour and learning the water.
+    form: F:polyform/slow-crafts
+    when: 2010s
+    parts: [E:experience/winter-navigation-class, E:experience/first-night-crossing]
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.9}
+
+  - id: E:experience/winter-navigation-class
+    type: experience
+    name: A winter of navigation lessons
+    summary: A retired harbour pilot taught a small evening class with a sextant, a clock and a book of tables.
+    form: F:form/celestial-navigation
+    of: E:experience/harbour-years
+    when: 2014
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.9}
+
+  - id: E:experience/first-night-crossing
+    type: experience
+    name: The first night crossing
+    summary: Crossed the bay at night by the stars alone, with the friend I call Captain Wren at the helm.
+    form: F:form/celestial-navigation
+    of: E:experience/harbour-years
+    when: 2015-08-21
+    valence: mixed
+    strength: 5
+    provenance: {mode: dialectic, sources: [session-2], confidence: 1}

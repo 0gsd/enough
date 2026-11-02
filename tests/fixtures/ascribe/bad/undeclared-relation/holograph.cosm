@@ -1,0 +1,8 @@
+oes: ascribe/1
+
+# A bad holograph: a link whose rel is neither a starter word nor a declared F:relation, so relation-declared is its
+# one error (tests/test_ascribe.py).
+
+id: ascribe/7h5cusf4zdybylgmxvo3wh3efi
+handle: knot-and-splice
+sample: true

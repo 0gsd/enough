@@ -1,0 +1,12 @@
+-- refused: compile recursion line 8
+thym 0
+
+program loop
+  why: a move that calls itself.
+  takes t: text
+  gives s: short
+  move again(f: fabula): short
+    give again f
+  end
+  give again (derive t)
+end

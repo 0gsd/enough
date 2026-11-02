@@ -1,0 +1,11 @@
+-- refused: compile rebound line 9
+thym 0
+
+program twice
+  why: let binds once.
+  takes t: text
+  gives f: fabula
+  let f = derive t
+  let f = derive t
+  give f
+end

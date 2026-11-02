@@ -1,0 +1,15 @@
+nodes:
+  - id: A:affinity/small-boats
+    type: affinity
+    name: Small boats
+    summary: Dinghies and day boats, close enough to the water to feel it.
+    form: F:form/sailing
+    valence: for
+    provenance: {mode: manual, sources: [self], confidence: 1}
+
+  - id: A:affinity/night-watches
+    type: affinity
+    name: Night watches
+    summary: The hours on deck between midnight and four, when everyone else is asleep.
+    valence: for
+    provenance: {mode: manual, sources: [self], confidence: 1}

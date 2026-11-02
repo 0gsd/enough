@@ -1,0 +1,187 @@
+oes: thym/1
+kind: program
+id: thym/publish-story
+name: publish-story
+# The enumeration of programs/publish-story.thym, written by hand for the conformance suite (docs/THYM.md 10, 17.3).
+# front, then every top-level item's body in order, is the file byte for byte; every step's text is its line.
+source: {path: publish-story.thym, sha256: 5bf1730785d53906879af4224bec6069d77ef3888490fed182f29bc8e6930945, size: 853}
+front: |+
+  thym 0
+
+built: {at: 2026-11-01T12:00:00Z, by: hand}
+nodes:
+  - id: P:program/publish-story
+    type: program
+    name: publish-story
+    summary: "A story leaves the house with its fabula and its author's morph, so that others may read it their way and the author's way stays the author's."
+    why: "a story leaves the house with its fabula and its author's morph, so that others may read it their way and the author's way stays the author's."
+    must: ["nothing in the package names the author."]
+    decided: [{date: 2026-11-01, what: "readings are local and labelled; the text is never replaced."}]
+    takes: [{name: story, type: text}]
+    gives: [{name: out, type: package}]
+    lines: "3-18"
+    order: 1
+    body: |
+      program publish-story
+        why: a story leaves the house with its fabula and its author's morph, so that others
+             may read it their way and the author's way stays the author's.
+        must: nothing in the package names the author.
+        decided 2026-11-01: readings are local and labelled; the text is never replaced.
+
+        takes story: text
+        gives out: package
+
+        let f = derive story                       -- text to fabula; asks the coprocessor under emf/1
+        assert f covers story else "the fabula does not cover the text"
+        let m = measure story against null of f    -- the holomorph: the departure from the null morph
+        let c = context of story                   -- the surrounding volume's catalog, read-only
+        let g = graph of story                     -- what the holograph released for this text, or nothing
+        give package story, f, m, c, g
+      end
+    steps: [P:step/publish-story.1, P:step/publish-story.2, P:step/publish-story.3, P:step/publish-story.4,
+            P:step/publish-story.5, P:step/publish-story.6]
+    provenance: {mode: derived, sources: ["publish-story.thym#L3-L18"], confidence: 1}
+
+  - id: P:step/publish-story.1
+    type: step
+    name: let f = derive story
+    summary: "text to fabula; asks the coprocessor under emf/1"
+    of: P:program/publish-story
+    n: 1
+    text: "  let f = derive story                       -- text to fabula; asks the coprocessor under emf/1"
+    line: 12
+    form: let
+    move: derive
+    calls: [derive]
+    binds: f
+    uses: [story]
+    asks: true
+    contracts: [P:contract/publish-story.1]
+    provenance: {mode: derived, sources: ["publish-story.thym#L12"], confidence: 1}
+  - id: P:step/publish-story.2
+    type: step
+    name: assert f covers story else "the fabula does not cover the text"
+    summary: "assert f covers story else \"the fabula does not cover the text\""
+    of: P:program/publish-story
+    n: 2
+    text: "  assert f covers story else \"the fabula does not cover the text\""
+    line: 13
+    form: assert
+    move: assert
+    calls: []
+    uses: [f, story]
+    asks: false
+    contracts: [P:contract/publish-story.2]
+    provenance: {mode: derived, sources: ["publish-story.thym#L13"], confidence: 1}
+  - id: P:step/publish-story.3
+    type: step
+    name: let m = measure story against null of f
+    summary: "the holomorph: the departure from the null morph"
+    of: P:program/publish-story
+    n: 3
+    text: "  let m = measure story against null of f    -- the holomorph: the departure from the null morph"
+    line: 14
+    form: let
+    move: measure
+    calls: [measure, 'null']
+    binds: m
+    uses: [story, f]
+    asks: true
+    contracts: [P:contract/publish-story.3, P:contract/publish-story.3.1]
+    provenance: {mode: derived, sources: ["publish-story.thym#L14"], confidence: 1}
+  - id: P:step/publish-story.4
+    type: step
+    name: let c = context of story
+    summary: "the surrounding volume's catalog, read-only"
+    of: P:program/publish-story
+    n: 4
+    text: "  let c = context of story                   -- the surrounding volume's catalog, read-only"
+    line: 15
+    form: let
+    move: context
+    calls: [context]
+    binds: c
+    uses: [story]
+    asks: false
+    contracts: []
+    provenance: {mode: derived, sources: ["publish-story.thym#L15"], confidence: 1}
+  - id: P:step/publish-story.5
+    type: step
+    name: let g = graph of story
+    summary: "what the holograph released for this text, or nothing"
+    of: P:program/publish-story
+    n: 5
+    text: "  let g = graph of story                     -- what the holograph released for this text, or nothing"
+    line: 16
+    form: let
+    move: graph
+    calls: [graph]
+    binds: g
+    uses: [story]
+    asks: false
+    contracts: [P:contract/publish-story.5]
+    provenance: {mode: derived, sources: ["publish-story.thym#L16"], confidence: 1}
+  - id: P:step/publish-story.6
+    type: step
+    name: give package story, f, m, c, g
+    summary: "give package story, f, m, c, g"
+    of: P:program/publish-story
+    n: 6
+    text: "  give package story, f, m, c, g"
+    line: 17
+    form: give
+    move: package
+    calls: [package]
+    uses: [story, f, m, c, g]
+    asks: false
+    contracts: [P:contract/publish-story.6]
+    provenance: {mode: derived, sources: ["publish-story.thym#L17"], confidence: 1}
+
+  - id: P:contract/publish-story.1
+    type: contract
+    name: derive
+    summary: "What derive must leave true of what it gives."
+    of: P:step/publish-story.1
+    move: derive
+    checks: [span-resolves, stance-closed, terms-grounded, coverage, emf-checks, provenance]
+    provenance: {mode: derived, sources: ["publish-story.thym#L12"], confidence: 1}
+  - id: P:contract/publish-story.2
+    type: contract
+    name: assert
+    summary: "The program's own check: f covers story."
+    of: P:step/publish-story.2
+    move: assert
+    checks: [coverage]
+    provenance: {mode: derived, sources: ["publish-story.thym#L13"], confidence: 1}
+  - id: P:contract/publish-story.3
+    type: contract
+    name: measure
+    summary: "What measure must leave true of what it gives."
+    of: P:step/publish-story.3
+    move: measure
+    checks: [scale-range, scale-evidence, provenance]
+    provenance: {mode: derived, sources: ["publish-story.thym#L14"], confidence: 1}
+  - id: P:contract/publish-story.3.1
+    type: contract
+    name: 'null'
+    summary: "What null must leave true of what it gives."
+    of: P:step/publish-story.3
+    move: 'null'
+    checks: [coverage, no-invention, stance-kept, null-pinned, provenance]
+    provenance: {mode: derived, sources: ["publish-story.thym#L14"], confidence: 1}
+  - id: P:contract/publish-story.5
+    type: contract
+    name: graph
+    summary: "What graph must leave true of what it gives."
+    of: P:step/publish-story.5
+    move: graph
+    checks: [released]
+    provenance: {mode: derived, sources: ["publish-story.thym#L16"], confidence: 1}
+  - id: P:contract/publish-story.6
+    type: contract
+    name: package
+    summary: "What package must leave true of what it gives."
+    of: P:step/publish-story.6
+    move: package
+    checks: [digests, released, provenance]
+    provenance: {mode: derived, sources: ["publish-story.thym#L17"], confidence: 1}

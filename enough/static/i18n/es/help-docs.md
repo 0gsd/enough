@@ -523,3 +523,51 @@ deslízalo en la ventana de ui, junto al idioma, o en la ventana de modelo, dond
 - enciéndelo cuando la máquina necesite su memoria para otra cosa: un proyecto se abre en segundos, sin un modelo de 5 a 17 GB que cargar.
 - escribe un primer borrador sin agente, luego vuelve a deslizarlo y pregúntale a tu readvisor qué le parece.
 - en un avión, o donde prefieras que nada corra en segundo plano, sin agente es el ajuste honesto.
+
+## thym
+name: ejecutar con…
+path: *.thym → a plan, a run, a trace
+
+### what
+<strong>thym</strong> es el pequeño lenguaje en el que se escriben los programas de enough. un <strong>programa</strong> es un archivo <code>.thym</code> que dice, paso a paso, qué hacer con un texto — desmontarlo en su fabula, medir cómo está escrito, empaquetarlo — y por qué. cada paso nombra un movimiento; un paso que le pregunta al modelo lleva un rombo relleno, y su respuesta se comprueba contra el contrato del movimiento antes de guardar nada. un programa también es un documento: abre un archivo <code>.thym</code> y lo lees en las tres densidades — su porqué y sus pasos en una línea cada uno (atem), tal como se escribió (short), o como tarjetas con los contratos de cada paso colgando debajo (fabula).
+
+### how
+<strong>ejecutar con…</strong> está en los menús de opción+clic y de shift-clic de un texto, en la tarjeta de un archivo de canon y en la de un programa. elige un programa — primero los de este proyecto, luego los de canon, luego los que vienen con enough; uno que no compila aparece en gris, con el motivo — y su <strong>plan</strong> se muestra antes de que nada se ejecute: cuántos nodos, cuántos le preguntan a un modelo y si cabe en esta máquina. <strong>ejecutar</strong> lo pone en marcha; la tarjeta lo sigue nodo a nodo y puedes cancelarlo. cuando se completa, su <strong>traza</strong> se abre en el visor cosm, una tarjeta por nodo con cada comprobación y su veredicto, y lo que hizo queda junto al texto en el árbol (<code>notes.package.cosm</code> y <code>notes.thym/</code> para un paquete). sin agente, solo se ofrecen los programas en los que ningún paso le pregunta a un modelo, y una línea dice cuántos se quedaron fuera.
+
+### ideas
+- lee el plan de un programa antes de ejecutarlo sobre un texto largo: la línea del coste te dice cuántas veces se le va a preguntar al modelo.
+- un programa que no pregunta nada se ejecuta en un momento, sin agente o no: <code>words</code>, <code>count</code> y <code>cut</code> nunca necesitan un modelo.
+- una ejecución rechazada no es una ejecución rota: su traza dice qué paso la detuvo y por qué, y no se guardó nada de lo que estaba haciendo.
+- la sección 13.4 del centro de ayuda lo tiene todo: los tres programas que vienen con enough, la traza y las diez escalas.
+
+## package
+name: paquete
+path: *.package.cosm · *.thym/
+
+### what
+un <strong>paquete</strong> es un texto que sale de casa con lo que lo describe: el texto exactamente como se escribió, su fabula (el gemelo EMF), el morfo del autor cuando lo hay — cómo se aparta el texto, en diez escalas, del relato más llano de esa misma fabula — y su contexto. viene en dos formas, lado a lado: un archivo, <code>notes.package.cosm</code>, que viaja, y una carpeta, <code>notes.thym/</code>, que puedes abrir archivo por archivo. su catálogo lista cada archivo con su huella, nombra el programa y la ejecución que lo hicieron, y nunca nombra al autor salvo que el texto lo haga.
+
+### how
+abre cualquiera de las dos formas y el visor cosm muestra la tarjeta del paquete: lo que contiene (cada archivo es un enlace, en la forma de carpeta), qué lo hizo y cuándo, <strong>abrir el texto</strong>, y <strong>leer a través de…</strong>, que cuenta el texto de nuevo en un morfo que tú eliges — el del paquete, para leerlo a la manera del autor, uno tuyo, o el morfo nulo. el texto de dentro nunca se toca. <code>publish-story</code>, uno de los programas que vienen con enough, deja un paquete junto a cualquier texto sobre el que lo ejecutes. <strong>empaquetar…</strong>, en un texto cuyo gemelo EMF está al día, hace uno por reglas, sin preguntarle nada al modelo, y puede sellarlo también, con una clave que se te muestra una sola vez y no se guarda en ninguna parte; <strong>desempaquetar…</strong>, en cualquier forma de un paquete, comprueba primero cada huella, vuelve a escribir el texto y su gemelo a su lado, y pide la clave cuando el paquete está sellado.
+
+### ideas
+- envía el archivo único: todo lo que un lector necesita para leerlo a su manera va dentro.
+- abre <code>morph.cosm</code> en la forma de carpeta para ver las diez escalas del autor, con las frases que movieron cada una.
+- las huellas están ahí para que un lector pueda saber que el texto es el que se empaquetó.
+- la sección 12.6 del centro de ayuda dice qué contiene un paquete, cómo guarda su clave uno sellado y qué comprueba primero el desempaquetado.
+
+## reading
+name: lectura
+path: *.read-*-YYYY-MM-DD-HHMM.md
+
+### what
+una <strong>lectura</strong> es el texto de otra persona contado de nuevo a través de un morfo — el tuyo, el del autor o el morfo nulo — en tu máquina, como un archivo nuevo junto al texto. va etiquetada dos veces: <code>read_through:</code> arriba del todo, y una línea de pie al final: <em>a reading of notes.md through plain-letter, made here on … ; the text stands unchanged</em>. la franja bajo la cabecera del lector muestra esa etiqueta mientras la lectura esté abierta, en cualquiera de las dos facetas y de los dos tamaños, y no se puede cerrar: una lectura nunca se hace pasar por el texto.
+
+### how
+pide una con <strong>leer a través de…</strong> en un paquete, o en un texto que tenga gemelo EMF; elige un morfo, y la lectura se abre en cuanto está escrita, como <code>notes.read-plain-letter-2026-11-01-1042.md</code> (con <code>-2</code>, <code>-3</code> cuando ya hay una de ese minuto). una lectura necesita un modelo — <code>read</code> no tiene sustituto por reglas —, así que sin agente la tarjeta lo dice y no lee nada. una lectura de una lectura se rechaza: una lectura lee una fabula, y una lectura es un relato.
+
+### ideas
+- lee un informe denso a través del morfo nulo para ver exactamente lo que afirma, una afirmación por frase.
+- lee una carta a través de tu propio morfo para oír cómo lo habrías dicho tú, y luego vuelve al original.
+- guarda las lecturas: cada una nombra su morfo y su día, así que puedes poner lado a lado las lecturas de un mismo texto.
+- la sección 12.6 del centro de ayuda trata de las lecturas y su etiqueta; la sección 13.4, de los morfos a través de los que se cuentan.

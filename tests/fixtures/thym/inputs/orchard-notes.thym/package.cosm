@@ -1,0 +1,14 @@
+oes: thym/1
+kind: package
+id: thym/orchard-notes
+name: The Hollins Lane orchard, autumn notes
+# A package written by hand for the conformance suite (docs/THYM.md 15): the orchard text with its fabula, in folder
+# form. No morph, context or graph travels with it; read-my-way brings the reader's own.
+contents:
+  - {path: text.md, sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7, role: text}
+  - {path: fabula.cosm, sha256: a8043346a1539c43918e08ac391f4283d5ee93cb4fd95c63ad7eacf4f95b53b1, role: fabula}
+made: {program: {name: publish-story, sha256: 5bf1730785d53906879af4224bec6069d77ef3888490fed182f29bc8e6930945},
+       trace: {run: fixture, sha256: 0000000000000000000000000000000000000000000000000000000000000000},
+       at: 2026-11-01T12:00:00Z, by: hand}
+notice: "A Thym package. The text is its author's; the fabula, morph and context describe it. Readings made from it are the reader's and are labelled."
+nodes: []

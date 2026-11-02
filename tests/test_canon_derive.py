@@ -250,7 +250,7 @@ def test_rules_emf_lints_clean_and_is_grounded(feed, notes, tmp_path):
     assert lint_errors(cosm, tmp_path) == []
     doc = macrocosm.yaml_load(cosm)
     assert list(doc)[:8] == ["oes", "macrocosm", "id", "name", "source", "derived", "atem", "nodes"]
-    assert doc["macrocosm"] == "0.0.1" and doc["id"] == "emf/notes-md"
+    assert doc["macrocosm"] == "0.0.2" and doc["id"] == "emf/notes-md"
     assert doc["name"] == "The Hollins Lane orchard, autumn notes"
     assert doc["source"] == {"path": "notes.md", **stat}
     assert doc["derived"] == {"at": NOW, "by": "person", "mode": "rules", "completeness": "full", "chunks": 1}

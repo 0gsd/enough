@@ -1,0 +1,33 @@
+# F: the forms the nodes anchor to. sourdough is one FEED word, grounded; celestial navigation has an encyclopedia
+# article, named by its title; sea glass is not in FEED, so its grounding is an open question. slow-crafts is the
+# polyform that joins the first two.
+nodes:
+  - id: F:form/sourdough
+    type: form
+    name: sourdough
+    summary: Bread leavened by a starter of wild yeasts and bacteria instead of commercial yeast.
+    feed: {word: sourdough, pos: noun, origin: feed}
+    provenance: {mode: dialectic, sources: [session-1], confidence: 1}
+
+  - id: F:form/celestial-navigation
+    type: form
+    name: celestial navigation
+    summary: Finding a position at sea from the sun, the moon and the stars, with a sextant, a clock and tables.
+    wiki: Celestial navigation
+    provenance: {mode: dialectic, sources: [session-2], confidence: 1}
+
+  - id: F:form/sea-glass
+    type: form
+    name: sea glass
+    summary: Broken glass worn smooth and frosted by the sea, and found on beaches.
+    feed: {pending: "not in FEED"}
+    provenance: {mode: manual, sources: [self], confidence: 1}
+
+  - id: F:polyform/slow-crafts
+    type: polyform
+    name: slow crafts
+    summary: Sourdough and navigation together, two crafts done by watching time pass and trusting it.
+    forms: [F:form/sourdough, F:form/celestial-navigation]
+    links:
+      - {from: F:form/sourdough, rel: like, to: F:form/celestial-navigation}
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.8}

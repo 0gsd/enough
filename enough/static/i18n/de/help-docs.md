@@ -522,3 +522,51 @@ schieb ihn im UI-Fenster, neben der Sprache, oder im Modell-Fenster, wo es derse
 - schalt ihn ein, wenn der Rechner seinen Arbeitsspeicher für etwas anderes braucht: ein Projekt öffnet sich in Sekunden, ohne ein 5–17-GB-Modell zu laden.
 - schreib einen ersten Entwurf agentenfrei, dann schieb den Schalter zurück und frag deinen Readvisor, was er davon hält.
 - im Flugzeug oder überall, wo lieber nichts im Hintergrund laufen soll, ist agentenfrei die ehrliche Einstellung.
+
+## thym
+name: ausführen mit…
+path: *.thym → a plan, a run, a trace
+
+### what
+<strong>thym</strong> ist die kleine Sprache, in der die Programme von enough geschrieben sind. ein <strong>Programm</strong> ist eine <code>.thym</code>-Datei, die Schritt für Schritt sagt, was mit einem Text geschehen soll — ihn in seine Fabula zerlegen, messen, wie er geschrieben ist, ihn verpacken — und warum. jeder Schritt nennt einen Handgriff; ein Schritt, der das Modell fragt, trägt eine gefüllte Raute, und seine Antwort wird gegen den Vertrag des Handgriffs geprüft, bevor irgendetwas behalten wird. ein Programm ist auch ein Dokument: öffne eine <code>.thym</code>-Datei, und du liest sie in den drei Dichten — ihr Warum und ihre Schritte als Einzeiler (atem), so wie geschrieben (short) oder als Karten, unter jedem Schritt seine Verträge (fabula).
+
+### how
+<strong>ausführen mit…</strong> steht im Option-Klick- und im Shift-Klick-Menü eines Textes, auf der Karte einer canon-Datei und auf der eines Programms. wähl ein Programm — zuerst die dieses Projekts, dann die von canon, dann die mit enough mitgelieferten; eines, das nicht kompiliert, ist ausgegraut, mit dem Grund — und sein <strong>Plan</strong> erscheint, bevor irgendetwas läuft: wie viele Knoten, wie viele davon ein Modell fragen und ob es auf diesen Rechner passt. <strong>ausführen</strong> startet es; die Karte folgt ihm Knoten für Knoten, und du kannst abbrechen. wenn es landet, öffnet sich seine <strong>Spur</strong> im cosm-Betrachter, eine Karte pro Knoten mit jeder Prüfung und ihrem Urteil, und was es gemacht hat, liegt im Baum neben dem Text (<code>notes.package.cosm</code> und <code>notes.thym/</code> bei einem Paket). agentenfrei werden nur Programme angeboten, in denen kein Schritt ein Modell fragt, und eine Zeile sagt, wie viele weggelassen wurden.
+
+### ideas
+- lies den Plan eines Programms, bevor du es auf einen langen Text loslässt: die Kostenzeile sagt dir, wie oft das Modell gefragt wird.
+- ein Programm, das nichts fragt, läuft in einem Augenblick, agentenfrei oder nicht: <code>words</code>, <code>count</code> und <code>cut</code> brauchen nie ein Modell.
+- ein abgelehnter Lauf ist kein kaputter: seine Spur sagt, welcher Schritt ihn angehalten hat und warum, und nichts von dem, was er gerade machte, wurde behalten.
+- Abschnitt 13.4 des Hilfe-Centers hat das Ganze: die drei Programme, die mit enough kommen, die Spur und die zehn Skalen.
+
+## package
+name: Paket
+path: *.package.cosm · *.thym/
+
+### what
+ein <strong>Paket</strong> ist ein Text, der das Haus mit dem verlässt, was ihn beschreibt: der Text genau so, wie er geschrieben wurde, seine Fabula (der EMF-Zwilling), der Morph des Autors, wenn es einen gibt — wie der Text auf zehn Skalen von der schlichtesten Erzählung derselben Fabula abweicht — und sein Kontext. ein Paket gibt es in zwei Formen nebeneinander: eine Datei, <code>notes.package.cosm</code>, die reist, und einen Ordner, <code>notes.thym/</code>, den du Datei für Datei öffnen kannst. sein Katalog listet jede Datei mit ihrer Prüfsumme auf, nennt das Programm und den Lauf, die es gemacht haben, und nennt den Autor nie, es sei denn, der Text tut es.
+
+### how
+öffne eine der beiden Formen, und der cosm-Betrachter zeigt die Karte des Pakets: was es enthält (in der Ordnerform jede Datei ein Link), womit es gemacht wurde und wann, <strong>den Text öffnen</strong> und <strong>lesen durch…</strong>, das den Text in einem Morph deiner Wahl neu erzählt — dem eigenen des Pakets, damit du ihn auf die Art des Autors liest, einem von deinen oder dem Null-Morph. der Text darin wird nie angerührt. <code>publish-story</code>, eines der mit enough mitgelieferten Programme, legt neben jeden Text, auf dem du es ausführst, ein Paket. <strong>packen…</strong> macht auf einem Text, dessen EMF-Zwilling aktuell ist, eines nach Regeln, ohne das Modell zu fragen, und kann es auch versiegeln, mit einem Schlüssel, den du genau einmal siehst und den nichts aufbewahrt; <strong>auspacken…</strong> prüft bei jeder Form eines Pakets zuerst jede Prüfsumme, schreibt den Text und seinen Zwilling wieder daneben und fragt nach dem Schlüssel, wenn das Paket versiegelt ist.
+
+### ideas
+- schick die einzelne Datei: alles, was ein Leser braucht, um den Text auf seine Art zu lesen, steckt darin.
+- öffne <code>morph.cosm</code> in der Ordnerform, um die zehn Skalen des Autors zu sehen, mit den Sätzen, die jede davon bewegt haben.
+- die Prüfsummen sind da, damit ein Leser erkennen kann, dass der Text der ist, der verpackt wurde.
+- Abschnitt 12.6 des Hilfe-Centers sagt, was ein Paket enthält, wie ein versiegeltes seinen Schlüssel hütet und was das Auspacken zuerst prüft.
+
+## reading
+name: Lesart
+path: *.read-*-YYYY-MM-DD-HHMM.md
+
+### what
+eine <strong>Lesart</strong> ist der Text eines anderen, durch einen Morph neu erzählt — deinen, den des Autors oder den Null-Morph —, auf deinem Rechner, als neue Datei neben dem Text. sie ist doppelt gekennzeichnet: <code>read_through:</code> ganz oben und eine Fußzeile am Ende: <em>a reading of notes.md through plain-letter, made here on … ; the text stands unchanged</em>. das Band unter dem Kopf der Leseansicht zeigt diese Kennzeichnung, solange die Lesart offen ist, auf beiden Seiten und in beiden Größen, und es lässt sich nicht wegklicken: eine Lesart gibt sich nie als der Text aus.
+
+### how
+fordere eine an mit <strong>lesen durch…</strong> auf einem Paket oder auf einem Text, der einen EMF-Zwilling hat; wähl einen Morph, und die Lesart öffnet sich, sobald sie geschrieben ist, als <code>notes.read-plain-letter-2026-11-01-1042.md</code> (mit <code>-2</code>, <code>-3</code>, wenn es aus dieser Minute schon eine gibt). eine Lesart braucht ein Modell — <code>read</code> hat keinen Ersatz nach Regeln —, darum sagt die Karte agentenfrei genau das und liest nichts. die Lesart einer Lesart wird abgelehnt: eine Lesart liest eine Fabula, und eine Lesart ist eine Erzählung.
+
+### ideas
+- lies einen dichten Bericht durch den Null-Morph, um genau zu sehen, was er behauptet, eine Aussage pro Satz.
+- lies einen Brief durch deinen eigenen Morph, um zu hören, wie du es gesagt hättest, und geh dann zurück zum Original.
+- behalte die Lesarten: jede nennt ihren Morph und ihren Tag, so kannst du die Lesarten eines Textes nebeneinanderlegen.
+- Abschnitt 12.6 des Hilfe-Centers hat die Lesarten und ihre Kennzeichnung; Abschnitt 13.4 hat die Morphs, durch die sie erzählt werden.

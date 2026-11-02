@@ -1,0 +1,203 @@
+oes: thym/1
+kind: plan
+id: thym/2026-11-01-2148-af8e
+name: publish-story on notes.md
+program:
+  name: publish-story
+  sha256: 5bf1730785d53906879af4224bec6069d77ef3888490fed182f29bc8e6930945
+inputs:
+- name: story
+  type: text
+  path: inputs/notes.md
+  sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+estimate:
+  steps: 7
+  asks: 3
+  largest_prompt: 307
+  output_words: 0
+nodes:
+- id: R:plan/2026-11-01-2148-af8e
+  type: plan
+  name: publish-story on notes.md
+  summary: Seven nodes, three of which ask the model.
+  nodes:
+  - R:node/1
+  - R:node/2
+  - R:node/3
+  - R:node/4
+  - R:node/5
+  - R:node/6
+  - R:node/7
+  asks: 3
+  largest_prompt: 307
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: derive story
+  summary: text to fabula; asks the coprocessor under emf/1
+  step:
+    program: publish-story
+    n: 1
+  move: derive
+  asks: true
+  takes:
+  - story
+  gives: f
+  after: []
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 12
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L12
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: assert f covers story
+  summary: assert f covers story
+  step:
+    program: publish-story
+    n: 2
+  move: assert
+  asks: false
+  takes:
+  - f
+  - story
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 13
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L13
+    confidence: 1
+- id: R:node/3
+  type: node
+  name: null of f
+  summary: 'the holomorph: the departure from the null morph'
+  step:
+    program: publish-story
+    n: 3
+  move: 'null'
+  asks: true
+  takes:
+  - f
+  gives: t3
+  after:
+  - R:node/1
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 14
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L14
+    confidence: 1
+- id: R:node/4
+  type: node
+  name: measure story against t3
+  summary: 'the holomorph: the departure from the null morph'
+  step:
+    program: publish-story
+    n: 3
+  move: measure
+  asks: true
+  takes:
+  - story
+  - t3
+  gives: m
+  after:
+  - R:node/3
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 14
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L14
+    confidence: 1
+- id: R:node/5
+  type: node
+  name: context of story
+  summary: the surrounding volume's catalog, read-only
+  step:
+    program: publish-story
+    n: 4
+  move: context
+  asks: false
+  takes:
+  - story
+  gives: c
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 15
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L15
+    confidence: 1
+- id: R:node/6
+  type: node
+  name: graph of story
+  summary: what the holograph released for this text, or nothing
+  step:
+    program: publish-story
+    n: 5
+  move: graph
+  asks: false
+  takes:
+  - story
+  gives: g
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 16
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L16
+    confidence: 1
+- id: R:node/7
+  type: node
+  name: package story, f, m, c, g
+  summary: package story, f, m, c, g
+  step:
+    program: publish-story
+    n: 6
+  move: package
+  asks: false
+  takes:
+  - story
+  - f
+  - m
+  - c
+  - g
+  gives: out
+  after:
+  - R:node/2
+  - R:node/4
+  - R:node/5
+  - R:node/6
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 17
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L17
+    confidence: 1

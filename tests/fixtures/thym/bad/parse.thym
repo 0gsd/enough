@@ -1,0 +1,10 @@
+-- refused: compile parse line 8
+thym 0
+
+program broken
+  why: a statement that is not one.
+  takes t: text
+  gives s: short
+  let = derive t
+  give tell (derive t) as told
+end

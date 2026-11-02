@@ -1,0 +1,11 @@
+-- refused: compile no-counts line 9
+thym 0
+
+program leaky
+  why: a count must not reach an isotype.
+  takes h: volume
+  gives i: volume
+  let staff = h where module is employees
+  emit employees: count staff
+  give project h as isotype
+end

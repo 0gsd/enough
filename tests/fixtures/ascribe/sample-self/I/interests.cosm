@@ -1,0 +1,15 @@
+nodes:
+  - id: I:interest/old-star-tables
+    type: interest
+    name: Old star tables
+    summary: How navigators worked out a position before there were electronic calculators.
+    form: F:form/celestial-navigation
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.8}
+
+  - id: I:interest/wild-yeasts
+    type: interest
+    name: Wild yeasts
+    summary: Which yeasts and bacteria live in a starter, and why no two starters taste alike.
+    form: F:form/sourdough
+    strength: 3
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.8}

@@ -1,0 +1,9 @@
+nodes:
+  - id: U:understanding/dough-keeps-its-own-time
+    type: understanding
+    name: Dough keeps its own time
+    summary: Temperature sets the pace of a dough more than any recipe does.
+    form: F:form/sourdough
+    links:
+      - {rel: see, to: O:opinion/recipes-overrated}
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.9}

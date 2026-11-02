@@ -1,0 +1,263 @@
+oes: thym/1
+kind: program
+id: thym/open-house
+name: open-house
+# The enumeration of programs/open-house.thym, written by hand for the conformance suite (docs/THYM.md 10, 17.3).
+# A move declared inside a program is a P:move item named after both, with a body and lines but no order (the
+# program's body already holds it); a for each is one step whose body holds the steps inside it.
+source: {path: open-house.thym, sha256: 79df51f9ad8a8db5a31572b59c8a2de4a8aed946b6d11ceb5487b97c2426e0cc, size: 853}
+front: |+
+  thym 0
+
+built: {at: 2026-11-01T12:00:00Z, by: hand}
+nodes:
+  - id: P:program/open-house
+    type: program
+    name: open-house
+    summary: "Show what the house sells and what it wants, as the house says them; say how many people only in bands; keep everything internal inside."
+    why: "show what the house sells and what it wants, as the house says them; say how many people only in bands; keep everything internal inside."
+    must: []
+    decided: []
+    takes: [{name: h, type: volume}]
+    gives: [{name: i, type: volume}]
+    lines: "3-24"
+    order: 1
+    body: |
+      program open-house
+        why: show what the house sells and what it wants, as the house says them; say how many
+             people only in bands; keep everything internal inside.
+
+        takes h: volume                  -- the holotype
+        gives i: volume                  -- an isotype: comprise-isotype/0, and no more
+
+        move offer-line(o: item): item
+          give mark o as verified        -- an offer is what the house does now: verified
+        end
+
+        for each o in h where kind in [product, service, platform]
+          emit offer-line o
+        end
+        for each a in h where kind is aim
+          emit mark a as stated          -- an aim is the house's own words: stated
+        end
+        let staff = h where module is employees
+        emit employees: band (count staff) as [none, some] marked verified     -- never a number
+        withhold h where visibility is internal
+        give project h as isotype
+      end
+    moves: [P:move/open-house.offer-line]
+    steps: [P:step/open-house.1, P:step/open-house.3, P:step/open-house.5, P:step/open-house.6, P:step/open-house.7,
+            P:step/open-house.8]
+    provenance: {mode: derived, sources: ["open-house.thym#L3-L24"], confidence: 1}
+
+  - id: P:move/open-house.offer-line
+    type: move
+    name: offer-line
+    summary: "move offer-line(o: item): item"
+    params: [{name: o, type: item}]
+    gives: [{name: offer-line, type: item}]
+    lines: "10-12"
+    body: |2
+        move offer-line(o: item): item
+          give mark o as verified        -- an offer is what the house does now: verified
+        end
+    steps: [P:step/open-house.offer-line.1]
+    provenance: {mode: derived, sources: ["open-house.thym#L10-L12"], confidence: 1}
+  - id: P:step/open-house.offer-line.1
+    type: step
+    name: give mark o as verified
+    summary: "an offer is what the house does now: verified"
+    of: P:move/open-house.offer-line
+    n: 1
+    text: "    give mark o as verified        -- an offer is what the house does now: verified"
+    line: 11
+    form: give
+    move: mark
+    calls: [mark]
+    uses: [o]
+    asks: false
+    contracts: [P:contract/open-house.offer-line.1]
+    provenance: {mode: derived, sources: ["open-house.thym#L11"], confidence: 1}
+
+  - id: P:step/open-house.1
+    type: step
+    name: for each o in h where kind in [product, service, platform]
+    summary: "for each o in h where kind in [product, service, platform]"
+    of: P:program/open-house
+    n: 1
+    text: "  for each o in h where kind in [product, service, platform]"
+    line: 14
+    lines: "14-16"
+    form: for
+    calls: []
+    binds: o
+    uses: [h]
+    asks: false
+    steps: [P:step/open-house.2]
+    contracts: []
+    provenance: {mode: derived, sources: ["open-house.thym#L14-L16"], confidence: 1}
+  - id: P:step/open-house.2
+    type: step
+    name: emit offer-line o
+    summary: "emit offer-line o"
+    of: P:program/open-house
+    n: 2
+    text: "    emit offer-line o"
+    line: 15
+    form: emit
+    move: offer-line
+    calls: [offer-line, mark]
+    uses: [o]
+    asks: false
+    contracts: [P:contract/open-house.2]
+    provenance: {mode: derived, sources: ["open-house.thym#L15"], confidence: 1}
+  - id: P:step/open-house.3
+    type: step
+    name: for each a in h where kind is aim
+    summary: "for each a in h where kind is aim"
+    of: P:program/open-house
+    n: 3
+    text: "  for each a in h where kind is aim"
+    line: 17
+    lines: "17-19"
+    form: for
+    calls: []
+    binds: a
+    uses: [h]
+    asks: false
+    steps: [P:step/open-house.4]
+    contracts: []
+    provenance: {mode: derived, sources: ["open-house.thym#L17-L19"], confidence: 1}
+  - id: P:step/open-house.4
+    type: step
+    name: emit mark a as stated
+    summary: "an aim is the house's own words: stated"
+    of: P:program/open-house
+    n: 4
+    text: "    emit mark a as stated          -- an aim is the house's own words: stated"
+    line: 18
+    form: emit
+    move: mark
+    calls: [mark]
+    uses: [a]
+    asks: false
+    contracts: [P:contract/open-house.4]
+    provenance: {mode: derived, sources: ["open-house.thym#L18"], confidence: 1}
+  - id: P:step/open-house.5
+    type: step
+    name: let staff = h where module is employees
+    summary: "let staff = h where module is employees"
+    of: P:program/open-house
+    n: 5
+    text: "  let staff = h where module is employees"
+    line: 20
+    form: let
+    calls: []
+    binds: staff
+    uses: [h]
+    asks: false
+    contracts: []
+    provenance: {mode: derived, sources: ["open-house.thym#L20"], confidence: 1}
+  - id: P:step/open-house.6
+    type: step
+    name: "emit employees: band (count staff) as [none, some] marked verified"
+    summary: "never a number"
+    of: P:program/open-house
+    n: 6
+    text: "  emit employees: band (count staff) as [none, some] marked verified     -- never a number"
+    slot: employees
+    line: 21
+    form: emit
+    move: band
+    calls: [band, count, mark]
+    uses: [staff]
+    asks: false
+    contracts: [P:contract/open-house.6, P:contract/open-house.6.1]
+    provenance: {mode: derived, sources: ["open-house.thym#L21"], confidence: 1}
+  - id: P:step/open-house.7
+    type: step
+    name: withhold h where visibility is internal
+    summary: "withhold h where visibility is internal"
+    of: P:program/open-house
+    n: 7
+    text: "  withhold h where visibility is internal"
+    line: 22
+    form: withhold
+    move: withhold
+    calls: [withhold]
+    uses: [h]
+    asks: false
+    contracts: [P:contract/open-house.7]
+    provenance: {mode: derived, sources: ["open-house.thym#L22"], confidence: 1}
+  - id: P:step/open-house.8
+    type: step
+    name: give project h as isotype
+    summary: "give project h as isotype"
+    of: P:program/open-house
+    n: 8
+    text: "  give project h as isotype"
+    line: 23
+    form: give
+    move: project
+    calls: [project]
+    uses: [h]
+    asks: false
+    contracts: [P:contract/open-house.8]
+    provenance: {mode: derived, sources: ["open-house.thym#L23"], confidence: 1}
+
+  - id: P:contract/open-house.offer-line.1
+    type: contract
+    name: mark
+    summary: "What mark must leave true of what it gives."
+    of: P:step/open-house.offer-line.1
+    move: mark
+    checks: [verified-only-where-derived]
+    provenance: {mode: derived, sources: ["open-house.thym#L11"], confidence: 1}
+  - id: P:contract/open-house.2
+    type: contract
+    name: offer-line
+    summary: "What offer-line must leave true of what it gives."
+    of: P:step/open-house.2
+    move: offer-line
+    checks: [verified-only-where-derived]
+    provenance: {mode: derived, sources: ["open-house.thym#L15"], confidence: 1}
+  - id: P:contract/open-house.4
+    type: contract
+    name: mark
+    summary: "What mark must leave true of what it gives."
+    of: P:step/open-house.4
+    move: mark
+    checks: [verified-only-where-derived]
+    provenance: {mode: derived, sources: ["open-house.thym#L18"], confidence: 1}
+  - id: P:contract/open-house.6
+    type: contract
+    name: band
+    summary: "What band must leave true of what it gives."
+    of: P:step/open-house.6
+    move: band
+    checks: [banded]
+    provenance: {mode: derived, sources: ["open-house.thym#L21"], confidence: 1}
+  - id: P:contract/open-house.6.1
+    type: contract
+    name: mark
+    summary: "What mark must leave true of what it gives."
+    of: P:step/open-house.6
+    move: mark
+    checks: [verified-only-where-derived]
+    provenance: {mode: derived, sources: ["open-house.thym#L21"], confidence: 1}
+  - id: P:contract/open-house.7
+    type: contract
+    name: withhold
+    summary: "What withhold must leave true of what it gives."
+    of: P:step/open-house.7
+    move: withhold
+    checks: [no-mark]
+    provenance: {mode: derived, sources: ["open-house.thym#L22"], confidence: 1}
+  - id: P:contract/open-house.8
+    type: contract
+    name: project
+    summary: "What project must leave true of what it gives."
+    of: P:step/open-house.8
+    move: project
+    checks: [default-deny, no-counts, banded, no-mark, verified-derived, standing-gate, epoch, provenance]
+    provenance: {mode: derived, sources: ["open-house.thym#L23"], confidence: 1}

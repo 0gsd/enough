@@ -1,0 +1,9 @@
+-- refused: compile no-give line 4
+thym 0
+
+program silent
+  why: it gives a short and never gives.
+  takes t: text
+  gives s: short
+  let f = derive t
+end

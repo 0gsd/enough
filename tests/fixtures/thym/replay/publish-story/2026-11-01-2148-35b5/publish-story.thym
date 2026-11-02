@@ -1,0 +1,18 @@
+thym 0
+
+program publish-story
+  why: a story leaves the house with its fabula and its author's morph, so that others
+       may read it their way and the author's way stays the author's.
+  must: nothing in the package names the author.
+  decided 2026-11-01: readings are local and labelled; the text is never replaced.
+
+  takes story: text
+  gives out: package
+
+  let f = derive story                       -- text to fabula; asks the coprocessor under emf/1
+  assert f covers story else "the fabula does not cover the text"
+  let m = measure story against null of f    -- the holomorph: the departure from the null morph
+  let c = context of story                   -- the surrounding volume's catalog, read-only
+  let g = graph of story                     -- what the holograph released for this text, or nothing
+  give package story, f, m, c, g
+end

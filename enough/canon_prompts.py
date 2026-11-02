@@ -90,7 +90,7 @@ line: one sentence of 15 to 25 words that says what the whole says. Fair: the au
 focus: at most two sentences: what is happening, what the author directs attention to.
 push: one sentence: what the author wants the reader to take away, believe or do.
 pull: one sentence: what the reader should actually take away, naming hidden assumptions, opinion stated as fact, dependencies.
-stance_profile: how many of its claims the text holds as each stance: {{axiom: n, observed: n, deduced: n, opinion: n, assumed: n, hearsay: n}}
+stance_profile: how many of its claims the text holds as each stance: {axiom: n, observed: n, deduced: n, opinion: n, assumed: n, hearsay: n}
 Name who does what: no pronoun whose noun the atem has not named. Use only what the text says; never invent.
 """
 

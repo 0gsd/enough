@@ -522,3 +522,51 @@ slide it in the ui window, beside the language, or in the model window, where it
 - turn it on when the machine needs its memory for something else: a project opens in seconds, with no 5–17 GB model to load.
 - write a first draft agent free, then slide it back and ask your readvisor what it makes of it.
 - on a plane, or anywhere you would rather nothing ran in the background, agent free is the honest setting.
+
+## thym
+name: run with…
+path: *.thym → a plan, a run, a trace
+
+### what
+<strong>thym</strong> is the small language enough's programs are written in. a <strong>program</strong> is a <code>.thym</code> file that says, step by step, what to do with a text — take it apart into its fabula, measure how it is written, pack it up — and why. every step names a move; a step that asks the model is marked with a filled diamond, and its answer is checked against the move's contract before anything is kept. a program is a document too: open a <code>.thym</code> file and you read it at the three densities — its why and its steps as one-liners (atem), as written (short), or as cards with each step's contracts hanging under it (fabula).
+
+### how
+<strong>run with…</strong> is on a text's option-click and shift-click menus, on a canon file's card and on a program's card. pick a program — this project's first, then canon's, then the ones shipped with enough; one that does not compile is greyed with the reason — and its <strong>plan</strong> shows before anything runs: how many nodes, how many ask a model, and whether it fits this machine. <strong>run</strong> starts it; the card follows it node by node and you can cancel. when it lands, its <strong>trace</strong> opens in the cosm viewer, one card per node with every check and its verdict, and what it made sits beside the text in the tree (<code>notes.package.cosm</code> and <code>notes.thym/</code> for a package). agent free, only programs with no step that asks a model are offered, and a line says how many were left out.
+
+### ideas
+- read a program's plan before you run it on a long text: the cost line tells you how many times the model will be asked.
+- a program that asks nothing runs in a moment, agent free or not: <code>words</code>, <code>count</code> and <code>cut</code> never need a model.
+- a refused run is not a broken one: its trace says which step stopped it and why, and nothing it was making was kept.
+- section 13.4 of the help center has the whole of it: the three programs that come with enough, the trace, and the ten scales.
+
+## package
+name: package
+path: *.package.cosm · *.thym/
+
+### what
+a <strong>package</strong> is a text that leaves the house with what describes it: the text exactly as written, its fabula (the EMF twin), the author's morph when there is one — how the text departs, on ten scales, from the plainest telling of the same fabula — and its context. it comes in two forms side by side: one file, <code>notes.package.cosm</code>, that travels, and a folder, <code>notes.thym/</code>, you can open file by file. its catalog lists every file with its digest, names the program and the run that made it, and never names the author unless the text does.
+
+### how
+open either form and the cosm viewer shows the package's card: what it holds (each file a link, in the folder form), what made it and when, <strong>open the text</strong>, and <strong>read through…</strong>, which tells the text again in a morph you choose — the package's own, so you read it the author's way, one of yours, or the null morph. the text inside is never touched. <code>publish-story</code>, one of the programs shipped with enough, lands a package beside any text you run it on. <strong>package…</strong>, on a text whose twin is up to date, makes one by rule with no model asked and can seal it too, with a key shown to you once and kept nowhere; <strong>unpack…</strong>, on any form of a package, checks every digest first, writes the text and its twin back beside it, and asks for the key when the package is sealed.
+
+### ideas
+- send the single file: everything a reader needs to read it their way is inside it.
+- open <code>morph.cosm</code> in the folder form to see the author's ten scales, with the sentences that moved each one.
+- the digests are there so that a reader can tell the text is the one that was packed.
+- section 12.6 of the help center says what a package holds, how a sealed one keeps its key, and what unpacking checks first.
+
+## reading
+name: reading
+path: *.read-*-YYYY-MM-DD-HHMM.md
+
+### what
+a <strong>reading</strong> is someone else's text told again through a morph — yours, the author's, or the null morph — on your machine, as a new file beside the text. it is labelled twice: <code>read_through:</code> at its top, and a footer line at its end: <em>a reading of notes.md through plain-letter, made here on … ; the text stands unchanged</em>. the band under the reader's header shows that label for as long as the reading is open, in either face and at either size, and it cannot be dismissed: a reading is never passed off as the text.
+
+### how
+ask for one with <strong>read through…</strong> on a package, or on a text that has an EMF twin; pick a morph, and the reading opens when it is written, as <code>notes.read-plain-letter-2026-11-01-1042.md</code> (with <code>-2</code>, <code>-3</code> when one of that minute is already there). a reading needs a model — <code>read</code> has no rules-only stand-in — so agent free the card says so and reads nothing. a reading of a reading is refused: a reading reads a fabula, and a reading is a telling.
+
+### ideas
+- read a dense report through the null morph to see exactly what it claims, one claim to a sentence.
+- read a letter through your own morph to hear how you would have said it, then go back to the original.
+- keep the readings: each names its morph and its day, so you can lay one text's readings side by side.
+- section 12.6 of the help center has readings and their label; section 13.4 has the morphs they are told through.

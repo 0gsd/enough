@@ -1,6 +1,6 @@
 ---
 name: macrocosm-oes
-description: Reads, checks and explains MacroCOSM `.cosm` files — Comprise Holotypes, Canon catalogs, standalone COSM product trees and EMF twins — and, only when the user asks, decompiles a text into its EMF twin or writes its atem, the tightest fair, full, plain reduction of a text. Use for "what is this .cosm file", "read this Holotype", "explain this Holotype", "what does the Holotype say about X", "lint this .cosm", "check this .cosm", "decompile this text", "enumerate this document", "make an EMF twin", "make an atem of this", "summarize this tightly", "say it in one line", "what is MacroCOSM", "what is EMF", "what is an atem", "what does this stance mean". Not for an ordinary summary in the user's own terms (answer that directly), not for editing a Holotype's content (that is Comprise's work), and not for writing new .cosm volumes by hand.
+description: Reads, checks and explains MacroCOSM `.cosm` files — Comprise Holotypes, Canon catalogs, standalone COSM product trees and EMF twins — and, only when the user asks, decompiles a text into its EMF twin, writes its atem (the tightest fair, full, plain reduction of a text) or runs a Thym program on a file. Use for "what is this .cosm file", "read this Holotype", "explain this Holotype", "what does the Holotype say about X", "lint this .cosm", "check this .cosm", "decompile this text", "enumerate this document", "make an EMF twin", "make an atem of this", "summarize this tightly", "say it in one line", "what is MacroCOSM", "what is EMF", "what is an atem", "what does this stance mean", "check this Thym program", "run a Thym program on a file", "run publish-story on this", "what is Thym". Not for an ordinary summary in the user's own terms (answer that directly), not for editing a Holotype's content (that is Comprise's work), and not for writing new .cosm volumes by hand.
 ---
 
 # macrocosm-oes
@@ -16,7 +16,7 @@ same envelope: name, summary, status, visibility, provenance. A value nobody
 has given yet is an **open question**, `{pending: "the question"}`, never a
 guess.
 
-## The five MiniCOSMs enough ships
+## The seven MiniCOSMs enough ships
 
 | MiniCOSM | Declaration | A volume is | Modules |
 |---|---|---|---|
@@ -25,6 +25,8 @@ guess.
 | `canon` | `oes: canon/1` | a Canon volume's or a project's catalog, `canon.cosm`, kept by enough | V |
 | `emf` | `oes: emf/1` | a text's EMF twin, `notes.md.cosm` beside `notes.md` | L E K P T X |
 | `doc` | `oes: doc/1` | a document enumerated (the spec, the manual), built by enough | S T R B |
+| `thym` | `oes: thym/1` | one file: a Thym program, morph, context, plan, trace or package | P M C R K |
+| `ascribe` | `oes: ascribe/1` | a holograph: a self described with no name, a folder with `holograph.cosm` | A B C E I O Q S U Y F |
 
 **EMF** (*enumerated meaning fabula*; "the fabula") takes a text apart: L terms
 grounded in FEED, E entities, K concepts, P claims, T events in order, X atems.
@@ -93,6 +95,25 @@ Representations, Inventories, Stacks, Employees).
 - Quote ids and paths as the tools give them; an item's `provenance` says
   where each fact came from.
 
+## Thym programs
+
+A **Thym program** is a `.thym` file: a short recipe of moves over documents
+(derive a fabula, measure a morph, package a text). It is checked and planned
+before anything runs, and every run leaves a trace that can be replayed.
+
+- `thym_check`: "ok" and the plan's line (steps, how many ask a model, the
+  largest prompt), or the refusal with its line. Use it before a run.
+- `thym_run`, only when asked: `<program>` by name or path, `<path>` the first
+  input, others as `<inputs>` lines (`name=path`). It answers with the trace's
+  line and the outputs' paths; the reader's "run with…" puts them beside the
+  text, so point the user there to keep them.
+- Programs come from the project, then the Canon store, then the three enough
+  ships: `publish-story`, `read-my-way`, `open-house`.
+- A step that asks a model needs one: with agent-free on or no model running,
+  `thym_run` refuses such a plan; `open-house` asks none and still runs.
+- Both tools need this skill on. Say what a refusal refused and what would
+  make it run; never present it as a result.
+
 ## The tools, in order
 
 Their tags are in the Tools section. With this skill switched off, this guide
@@ -103,6 +124,8 @@ is one `cosm_guide` call away.
 2. `cosm_lint` — the checks: errors, warnings, notes, open questions.
 3. `emf_derive` (a text → its EMF twin) or `atem` (the four parts, written
    into the twin; an inline `<text>` writes nothing) — only on request.
+4. `thym_check` (a program → its plan's line, or the refusal), then
+   `thym_run` (a program on a file → the trace's line) — runs only on request.
 
 For "what is X" about the format or the app, `doc_lookup` answers from the
 spec and the manual.
@@ -113,10 +136,11 @@ store (`canon:` paths) needs the broker's canon tools switched on.
 ## More
 
 The full specification is `docs/MACROCOSM_OES.md` in enough, which the user
-can open in the app's docs viewer (the MacroCOSM button). `references/README.md` says
-where the spec and the five manifests live.
+can open in the app's docs viewer (the MacroCOSM button); Thym's is `docs/THYM.md`.
+`references/README.md` says where the specs, the seven manifests and the shipped
+programs live.
 
 MacroCOSM OES © 2026 Graham Smith; see defaults/cosm/NOTICE.md
 
 ---
-enough-tooltip-text: "use macrocosm-oes to read and check .cosm files — Holotypes, Canon catalogs, EMF twins — and, when you ask, to decompile a text into its EMF twin or make its atem."
+enough-tooltip-text: "use macrocosm-oes to read and check .cosm files — Holotypes, Canon catalogs, EMF twins — and, when you ask, to decompile a text into its EMF twin, make its atem, or run a Thym program on it."

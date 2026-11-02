@@ -1,12 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- PLACEHOLDER (composure round, P4c). Original line art on the house
-     72x72 artboard, drawn inside the ~54 art box. Pure #000 so
-     build_icons.py's black<->white swap produces the dark variant.
-     Overwrite this file and re-run scripts/build_icons.py to replace it. -->
-<svg id="comp-page-next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
-  <g transform="translate(72,0) scale(-1,1)">
-    <rect x="26" y="11" width="34" height="50" rx="3" ry="3" fill="none" stroke="#000" stroke-width="3"/>
-    <polyline points="22,24 10,36 22,48" fill="none" stroke="#000" stroke-width="4"
-              stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 72 72">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-2 {
+        opacity: .3;
+      }
+
+      .cls-2, .cls-3, .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-3 {
+        opacity: .7;
+      }
+
+      .cls-5 {
+        fill: #4b3aa8;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="14.83" y1="19.83" x2="57.05" y2="62.05" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="0" stop-color="#fff" stop-opacity=".99"/>
+      <stop offset=".23" stop-color="#fff" stop-opacity=".69"/>
+      <stop offset=".43" stop-color="#fff" stop-opacity=".45"/>
+      <stop offset=".62" stop-color="#fff" stop-opacity=".25"/>
+      <stop offset=".78" stop-color="#fff" stop-opacity=".12"/>
+      <stop offset=".91" stop-color="#fff" stop-opacity=".03"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <g id="c-white">
+    <rect class="cls-1" x="12.31" y="22.36" width="47.27" height="37.16"/>
+  </g>
+  <g id="comp-page-next">
+    <path d="M32.59,62.85H8.96V8.85h54v23.62h-3.38v-10.12H12.34v37.12h20.25v3.38ZM12.34,18.98h47.25v-6.75H12.34v6.75ZM15.71,13.92h3.38v3.38h-3.38v-3.38ZM22.46,13.92h3.38v3.38h-3.38v-3.38ZM29.21,13.92h3.38v3.38h-3.38v-3.38ZM52.52,56.63l3.85-3.9h-17.03v-3.38h17.03l-3.85-3.9,2.32-2.32,7.96,7.91-7.96,7.91-2.32-2.32Z"/>
+  </g>
+  <g id="c-bar">
+    <rect class="cls-5" x="12.28" y="12.24" width="47.41" height="6.75"/>
+    <rect class="cls-4" x="15.68" y="13.92" width="3.38" height="3.38"/>
+    <rect class="cls-3" x="22.43" y="13.92" width="3.38" height="3.38"/>
+    <rect class="cls-2" x="29.18" y="13.92" width="3.38" height="3.38"/>
   </g>
 </svg>

@@ -1,0 +1,19 @@
+nodes:
+  - id: B:belief/patience-pays
+    type: belief
+    name: Patience pays
+    summary: Slow work done with attention outlasts fast work done with none.
+    form: F:polyform/slow-crafts
+    strength: 4
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.9}
+
+  - id: B:belief/talent-first
+    type: belief
+    name: Talent first
+    summary: Once held that a gift for something mattered more than years of practice.
+    form: F:polyform/slow-crafts
+    status: retired
+    when: childhood
+    links:
+      - {rel: before, to: B:belief/patience-pays}
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.7}

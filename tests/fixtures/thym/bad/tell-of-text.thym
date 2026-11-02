@@ -1,0 +1,9 @@
+-- refused: compile type line 8
+thym 0
+
+program untold
+  why: a text must be derived before it is told.
+  takes t: text
+  gives s: short
+  give tell t as told
+end

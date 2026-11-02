@@ -1,0 +1,22 @@
+engine: canon.read_atem
+inputs:
+  call: 42684f1a36773e39f7b7931cc0a1204f1aa7ceb0d20ff87ce494746b7f48981f
+keys: []
+tokens: 0
+seconds: 0
+output:
+  line: Mara Okafor and the narrator plan to ask the parish council to delay mowing the orchard meadow strip until
+    September to protect pollinators.
+  focus: The text details the orchard's improved yield and the specific threat that early mowing poses to the wildflowers
+    feeding essential insects.
+  push: The author wants the reader to support the request to delay mowing because it protects the orchard's fruit
+    production.
+  pull: The text assumes the meadow strip is the orchard's primary pollinator source and that the council will accept
+    the delay request.
+  stance_profile:
+    axiom: 1
+    observed: 2
+    deduced: 1
+    opinion: 2
+    assumed: 1
+    hearsay: 1

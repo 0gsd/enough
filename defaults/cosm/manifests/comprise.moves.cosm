@@ -1,0 +1,44 @@
+# The moves Comprise OES 1 declares for Thym (docs/THYM.md, sections 6, 17.6 and 18), kept beside its manifest.
+#
+# comprise.manifest.cosm is a byte copy of Comprise's own manifest and is never edited in enough, so this sidecar holds
+# the declaration until Comprise's manifest carries a moves: block of its own; when it does, the manifest's block wins
+# and this file is reported and retired. The generic reader never loads this file (it is not *.manifest.cosm); the Thym
+# compiler reads it at resolve time. The contracts named here are the rules of comprise-isotype/0 as core/isotype.py
+# states them: default-deny, assertions not measurements, withhold never falsify, epochs and bands, verified and stated,
+# the standing gate.
+#
+# Written in the COSM YAML subset: no anchors, no aliases, no tags, one document.
+#
+# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
+
+moves-of: comprise/1
+
+moves:
+  - name: project
+    takes: [volume]
+    gives: volume
+    modifiers: {as: 'isotype | paratype'}
+    contract: [default-deny, no-counts, banded, no-mark, verified-derived, standing-gate, epoch, provenance]
+    code: enough.thym.moves.project:project
+    says: a holotype projected as the target kind, from what the program emitted and withheld
+  - name: band
+    takes: [number]
+    gives: word
+    modifiers: {as: 'list of word'}
+    contract: [banded]
+    code: enough.thym.moves.project:band
+    says: a number said as a word from a list, and never the number
+  - name: mark
+    takes: ['item | word']
+    gives: 'item | word'
+    modifiers: {as: marking}
+    contract: [verified-only-where-derived]
+    code: enough.thym.moves.project:mark
+    says: an item, or a banded word, marked verified or stated
+  - name: withhold
+    takes: ['item | volume']
+    gives: nothing
+    modifiers: {where: condition}
+    contract: [no-mark]
+    code: enough.thym.moves.project:withhold
+    says: items left out of the projection without a trace

@@ -14,6 +14,16 @@ named by their place in an enough install:
 - `defaults/cosm/manifests/emf.manifest.cosm` — EMF twins of texts.
 - `defaults/cosm/manifests/doc.manifest.cosm` — DocOES: a document (this
   specification, the Help Center) enumerated into a doc volume.
+- `defaults/cosm/manifests/thym.manifest.cosm` — Thym 1: programs, morphs,
+  contexts, plans, traces and packages, with the moves Thym owns.
+- `defaults/cosm/manifests/ascribe.manifest.cosm` — Ascribe 1: a holograph, a
+  self described with no name.
+- `defaults/cosm/manifests/comprise.moves.cosm` — the moves Comprise's
+  MiniCOSM offers to Thym, beside its byte-copied manifest.
+- `docs/THYM.md` — Thym 0, the MacroCOSM language: its programs, compiler and
+  runtime. `defaults/thym/` holds the three programs enough ships
+  (`publish-story`, `read-my-way`, `open-house`); `enough/thym/` is the
+  reference compiler and runtime.
 - `enough/macrocosm.py` — the reference reader. Where the specification and
   the reader disagree, the reader wins and the text is corrected.
 

@@ -564,6 +564,91 @@ def emf_entry(text: Path, rel_twin: str, *, with_state: bool = True,
     return out
 
 
+# A PACKAGE (Thym 0, docs/THYM.md 15): the self-contained export of a text, with its fabula, morph, context and
+# released graph, beside the text it was made from: the folder form `<stem>.thym/` (holding `package.cosm`, the
+# catalog), the single-file form `<stem>.package.cosm`, and the encrypted form `<stem>.thym.enc`. Listings and
+# catalogs show each as one thing (`kind: package`, `kind: sealed`), never open a package folder up as texts, and
+# mark the text a package was made from with `package: {path, folder, sealed}`, as a text carries its EMF twin.
+PACKAGE_FOLDER_SUFFIX = ".thym"
+PACKAGE_FILE_SUFFIX = ".package.cosm"
+SEALED_SUFFIX = ".thym.enc"
+PACKAGE_CATALOG = "package.cosm"
+THYM_OES = "thym/1"
+
+
+def is_package_folder(p: Path) -> bool:
+    """A folder `<stem>.thym/` holding a `package.cosm` that declares `oes: thym/1`: a package's folder form."""
+    try:
+        return (p.name.endswith(PACKAGE_FOLDER_SUFFIX) and len(p.name) > len(PACKAGE_FOLDER_SUFFIX) and p.is_dir()
+                and macrocosm.sniff_declaration(p / PACKAGE_CATALOG) == THYM_OES)
+    except OSError:
+        return False
+
+
+def is_package_file(p: Path) -> bool:
+    """A file `<stem>.package.cosm` that declares `oes: thym/1`: a package's single-file form."""
+    try:
+        return (p.name.endswith(PACKAGE_FILE_SUFFIX) and len(p.name) > len(PACKAGE_FILE_SUFFIX) and p.is_file()
+                and macrocosm.sniff_declaration(p) == THYM_OES)
+    except OSError:
+        return False
+
+
+def is_sealed_package(p: Path) -> bool:
+    """A file `<stem>.thym.enc`: a package's encrypted form (its header is read only with its key's help)."""
+    try:
+        return p.name.endswith(SEALED_SUFFIX) and len(p.name) > len(SEALED_SUFFIX) and p.is_file()
+    except OSError:
+        return False
+
+
+def package_stem(name: str) -> str | None:
+    """`notes.package.cosm`, `notes.thym` and `notes.thym.enc` -> `notes`; None for any other name."""
+    for suffix in (PACKAGE_FILE_SUFFIX, SEALED_SUFFIX, PACKAGE_FOLDER_SUFFIX):
+        if name.endswith(suffix) and len(name) > len(suffix):
+            return name[: -len(suffix)]
+    return None
+
+
+def package_text_name(stem: str, names: Any, *, with_emf: Any = ()) -> str | None:
+    """The text among `names` (one folder's file names) a package `<stem>.…` was made from: a text whose name less
+    its extension is the stem, one with an EMF twin first, then `.md` (the rule a short follows to its text)."""
+    emf = {str(n) for n in with_emf}
+    texts = []
+    for n in {str(x) for x in names}:
+        base, dot, ext = n.rpartition(".")
+        if dot and base == stem and f".{ext.lower()}" in SHORT_TEXT_SUFFIXES:
+            texts.append((n not in emf, ext.lower() != "md", SHORT_TEXT_SUFFIXES.index(f".{ext.lower()}"), n))
+    return min(texts)[-1] if texts else None
+
+
+def packages_beside(entries: list[Path], *, with_emf: Any = ()) -> dict[str, dict[str, str]]:
+    """`{text name: {path?, folder?, sealed?}}` for the packages among one folder's entries, each under the text it
+    was made from (`path` the single file, `folder` the folder form, `sealed` the encrypted form; names, not paths)."""
+    names = [p.name for p in entries]
+    files = {p.name for p in entries if p.is_file()}
+    out: dict[str, dict[str, str]] = {}
+    for p in entries:
+        if is_package_file(p):
+            role = "path"
+        elif is_sealed_package(p):
+            role = "sealed"
+        elif is_package_folder(p):
+            role = "folder"
+        else:
+            continue
+        stem = package_stem(p.name)
+        text = package_text_name(stem, [n for n in names if n in files], with_emf=with_emf) if stem else None
+        if text is not None:
+            out.setdefault(text, {})[role] = p.name
+    order = ("path", "folder", "sealed")
+    return {t: {k: v[k] for k in order if k in v} for t, v in out.items()}
+
+
+def _package_rel(entry: dict[str, str], prefix: str) -> dict[str, str]:
+    return {k: f"{prefix}/{v}" if prefix else v for k, v in entry.items()}
+
+
 def is_holotype_folder(p: Path) -> bool:
     """A folder holding a ``holotype.cosm``: one database of Comprise OES.
     Canon shows it as one folder (badge, opens in the cosm viewer) and never
@@ -611,7 +696,14 @@ for _kind, _exts in {
 def file_kind(path: Path | str) -> str:
     """A file's format in the word Canon's listings and catalogs use
     (``markdown``, ``text``, ``pdf``, ``html``, ``image``, ``cosm`` …;
-    ``file`` when the extension says nothing)."""
+    ``file`` when the extension says nothing). A Thym package's single-file
+    form, ``<stem>.package.cosm``, is ``package`` and its encrypted form,
+    ``<stem>.thym.enc``, ``sealed`` (THYM.md 15.3), by name."""
+    name = Path(path).name.lower()
+    if name.endswith(PACKAGE_FILE_SUFFIX) and len(name) > len(PACKAGE_FILE_SUFFIX):
+        return "package"
+    if name.endswith(SEALED_SUFFIX) and len(name) > len(SEALED_SUFFIX):
+        return "sealed"
     return _KIND_BY_EXT.get(Path(path).suffix.lower(), "file")
 
 
@@ -639,6 +731,7 @@ def _scan_tree(box: Path, rel_parts: tuple[str, ...] = ()) -> list[dict[str, Any
         return []
     twins = emf_twins(entries)
     hidden = {t.name for t in twins.values()}
+    packages = packages_beside(entries, with_emf=twins)
     out: list[dict[str, Any]] = []
     for p in entries:
         if p.name.startswith(".") or p.name in hidden:
@@ -653,6 +746,9 @@ def _scan_tree(box: Path, rel_parts: tuple[str, ...] = ()) -> list[dict[str, Any
         if p.is_dir():
             if is_holotype_folder(p):
                 node["holotype"] = True
+                node["children"] = []
+            elif is_package_folder(p):
+                node["kind"] = "package"            # one package, never opened up as texts (THYM.md 15.1)
                 node["children"] = []
             else:
                 node["children"] = _scan_tree(box, rel_parts + (p.name,))
@@ -674,9 +770,13 @@ def _scan_tree(box: Path, rel_parts: tuple[str, ...] = ()) -> list[dict[str, Any
                         node["wiki_article"] = True
                 except OSError:
                     pass
+            if is_package_file(p) or is_sealed_package(p):
+                node["kind"] = file_kind(p)         # package, or sealed
             twin = twins.get(p.name)
             if twin is not None:
                 node["emf"] = emf_entry(p, "/".join(rel_parts + (twin.name,)), twin=twin)
+            if p.name in packages:
+                node["package"] = _package_rel(packages[p.name], "/".join(rel_parts))
         out.append(node)
     return out
 
@@ -835,7 +935,11 @@ def folder_flowchart(
             rel = "/".join(rel_parts + (e.name,))
             nid = _node_id(rel)
             node_map[nid] = {"path": rel, "is_dir": e.is_dir()}
-            if e.is_dir():
+            if e.is_dir() and is_package_folder(e):
+                # a package's folder form is one thing, drawn as one node (THYM.md 15.1)
+                lines.append(f'  {nid}["🧳 {_mm_label(e.name)}"]')
+                edges.append(f"  {parent_id} --> {nid}")
+            elif e.is_dir():
                 lines.append(f'  {nid}["📁 {_mm_label(e.name)}"]')
                 edges.append(f"  {parent_id} --> {nid}")
                 walk(rel_parts + (e.name,), nid, level + 1)
@@ -1096,6 +1200,7 @@ def _enumerate(base: Path, *, skip: Callable[[Path], bool], project: bool,
             continue
         twins = emf_twins(entries)
         hide = {t.name for t in twins.values()}
+        packages = packages_beside(entries, with_emf=twins)
         shown = [p for p in entries if p.name not in hide and not skip(p)]
         if rel and count + len(shown) > cap:
             raw[rel]["counts"] = _subtree_counts(folder)
@@ -1112,6 +1217,9 @@ def _enumerate(base: Path, *, skip: Callable[[Path], bool], project: bool,
             if is_dir and is_holotype_folder(p):
                 it["type"] = "folder"
                 it["holotype"] = True
+            elif is_dir and is_package_folder(p):
+                it["type"] = "folder"
+                it["kind"] = "package"              # a package's folder form: one item, never enumerated
             elif is_dir and _is_article_folder(p):
                 title, source = _read_article_meta(p)
                 it["type"] = "article"
@@ -1147,6 +1255,8 @@ def _enumerate(base: Path, *, skip: Callable[[Path], bool], project: bool,
                     line = _atem_line(hdr)
                     if line:
                         it["atem"] = {"line": line}
+                if p.name in packages:
+                    it["package"] = _package_rel(packages[p.name], rel)
             raw[crel] = it
             kids.append(crel)
             count += 1
@@ -1184,10 +1294,11 @@ def _enumerate(base: Path, *, skip: Callable[[Path], bool], project: bool,
         node: dict[str, Any] = {"id": ids[rel], "type": it["type"], "name": it["name"], "path": rel}
         if it["parent"]:
             node["parent"] = ids[it["parent"]]
-        for key in ("holotype", "size", "kind", "twin", "emf", "atem", "short_of", "shorts", "title", "source"):
+        for key in ("holotype", "size", "kind", "twin", "emf", "atem", "package", "short_of", "shorts", "title",
+                    "source"):
             if key in it:
                 node[key] = it[key]
-        if it["type"] == "folder" and not it.get("holotype"):
+        if it["type"] == "folder" and not it.get("holotype") and it.get("kind") != "package":
             if rel in children:
                 node["parts"] = [ids[c] for c in children[rel]]
             if "counts" in it:
@@ -1356,6 +1467,57 @@ def project_catalog(project_dir: Path, *, write: bool = True) -> str:
             except OSError as e:
                 log.warning("canon: could not write %s (%s)", project_dir / PROJECT_CATALOG, e)
     return text
+
+
+EXCERPT_NEIGHBOURS = 40
+_EXCERPT_KEYS = ("id", "type", "name", "path", "kind", "atem", "emf", "package")
+
+
+def catalog_excerpt(target: Path, project_dir: Path | None = None, *,
+                    limit: int = EXCERPT_NEIGHBOURS) -> dict[str, Any] | None:
+    """A text's surrounding context (docs/THYM.md 16.1): the catalog of the volume it sits in, a Canon volume's or the
+    project's, cut to what is around it: the volume's `{id, name, scope}`, the text's own item (`text`), and its
+    `neighbours`, the items beside it in listing order (at most `limit`; `more` counts the rest). Read, never
+    written: the catalog is built in memory, as `build_catalog` builds it. None for a path in neither."""
+    try:
+        real = Path(target).resolve()
+    except OSError:
+        return None
+    cat: dict[str, Any] | None = None
+    rel: str | None = None
+    try:
+        parts = real.relative_to(root().resolve()).parts
+    except (ValueError, OSError):
+        parts = ()
+    if len(parts) >= 2 and _is_volume(parts[0]):
+        cat = _volume_catalog(parts[0], load_meta(parts[0]), volume_dir(parts[0]))
+        rel = "/".join(parts[1:])
+    elif project_dir is not None:
+        try:
+            rel = real.relative_to(Path(project_dir).resolve()).as_posix()
+        except (ValueError, OSError):
+            rel = None
+        if rel and not rel.startswith("rness/"):
+            data = macrocosm.yaml_load(project_catalog(Path(project_dir), write=False))
+            cat = data if isinstance(data, dict) else None
+    if not cat or rel is None:
+        return None
+    nodes = [n for n in cat.get("nodes") or [] if isinstance(n, dict)]
+    me = next((n for n in nodes if n.get("path") == rel), None)
+    parent = me.get("parent") if me else None
+    near = [n for n in nodes if n.get("parent") == parent and n is not me]
+
+    def cut(n: dict[str, Any]) -> dict[str, Any]:
+        return {k: n[k] for k in _EXCERPT_KEYS if k in n}
+
+    out: dict[str, Any] = {"volume": {"id": cat.get("id"), "name": cat.get("name"),
+                                      "scope": cat.get("scope") or "volume"}}
+    if me is not None:
+        out["text"] = cut(me)
+    out["neighbours"] = [cut(n) for n in near[:limit]]
+    if len(near) > limit:
+        out["more"] = len(near) - limit
+    return out
 
 
 # ---------------------------------------------------------------------------

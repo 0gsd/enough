@@ -1,0 +1,137 @@
+engine: feed
+inputs:
+  call: 8799eb03c8c0fc0ce4f5d37f9399e5971e0ae6f81a421f13a64ffa5747db81c4
+keys: []
+tokens: 0
+seconds: 0
+output:
+  leaflet:
+    word: leaflet
+    letter: l
+    length: 7
+    is_headword: 1
+    pronunciation: /ˈliflət/
+    ipa: /ˈliflət/
+    definition: A small printed sheet distributed for information or advertising, or, botanically, one segment of
+      a compound leaf. As a verb, to distribute such sheets.
+    usage_note: null
+    pos: noun; verb
+    pos_primary: noun
+    synonyms:
+    - booklet
+    - brochure
+    - folder
+    - pamphlet
+    forms:
+    - word: leafleted
+      pronunciation: /ˈliflɪtɪd/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: leafleting
+      pronunciation: /ˈliflətɪŋ/
+      labels:
+      - pres. part.
+      synonyms: []
+      label_meanings:
+      - present participle
+    - word: leaflets
+      pronunciation: /ˈlifləts/
+      labels:
+      - pl.
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - plural
+      - third-person singular present
+    - word: leafletted
+      pronunciation: /ˈliflətɪd/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: leafletting
+      pronunciation: /ˈliflətɪŋ/
+      labels:
+      - pres. part.
+      synonyms: []
+      label_meanings:
+      - present participle
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes: []
+    slant_rhymes:
+    - sleevelet
+    - idea
+    - diarrhea
+    - tequila
+    - pia
+    - tortilla
+    - ria
+    - chia
+    - rhea
+    - correa
+    - pizzeria
+    - urea
+    - panacea
+    - galleria
+    - gonorrhea
+    - althea
+    - kea
+    - sangria
+    - selah
+    - latakia
+    homophones: []
+    domain: general
+    etymology: From leaf plus -let.
+    examples:
+    - A volunteer pressed a leaflet about the council vote into Beatrix's hand outside the Terminal.
+    - Sanjit spent the morning leafleting the Concourse for the new cobbler's grand opening.
+    related:
+    - leaf
+    - flyer
+    - handout
+    antonyms: []
+    hyphenation: leaf·let
+    frequency_rank: 3
+    first_use: 18th century
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - dépliant
+    - tract
+    fr_definition: Petite feuille imprimée distribuée à des fins d'information ou de publicité, ou, en botanique,
+      un segment d'une feuille composée. Comme verbe, distribuer de telles feuilles.
+    es_compare:
+    - folleto
+    - volante
+    es_definition: Hoja pequeña impresa que se distribuye con fines informativos o publicitarios, o, en botánica,
+      un segmento de una hoja compuesta. Como verbo, distribuir tales hojas.
+    de_compare:
+    - Flugblatt
+    - Faltblatt
+    de_definition: Ein kleines bedrucktes Blatt, das zu Informations- oder Werbezwecken verteilt wird, oder, botanisch,
+      ein Segment eines gefiederten Blattes. Als Verb, solche Blätter verteilen.
+    zh_compare:
+    - 传单
+    zh_definition: 用于传递信息或做广告而分发的小张印刷品，在植物学中也指复叶的一个小叶片。作动词时，指分发此类印刷品。
+    ja_compare:
+    - ちらし
+    - リーフレット
+    ja_definition: 情報提供や宣伝のために配られる小さな印刷物のこと。植物学では複葉を構成する一枚一枚の小葉も指す。動詞としては、そうした印刷物を配ることを意味する。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 3
+      name: Uncommon
+      examples: procrastinate, gourd
+    syllables: 2
+    era: 18th century

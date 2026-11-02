@@ -26,6 +26,7 @@ DOM state, not pixels, so repeating them per viewport would buy nothing.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from collections.abc import Callable
@@ -34,7 +35,9 @@ from .driver import Driver, StepError
 from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       COSM_READY, DOCS_READY, COUNCIL_PAL_STATEMENT,
                       DICT_PLAIN, DICT_READY, DOC, EMF_PASSAGE, EMF_TEXT,
-                      GIRRAPH, HOLOTYPE, JOURNAL_READY, LEDGER, PRESS, WDL_READY)
+                      GIRRAPH, HARVEST, HOLOTYPE, JOURNAL_READY, LEDGER, PRESS,
+                      THYM_BAND_READY, THYM_MORPH, THYM_READING, THYM_READING_FOOTER,
+                      THYM_RULES_PROGRAM, THYM_SEALED, WDL_READY)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -54,6 +57,8 @@ def _reset(d: Driver) -> None:
          "catch (e) {} }); return true; })()")
     d.js("(() => { try { wdlClose(); dictCtxClose(); } catch (e) {} return true; })()")
     d.js("(() => { try { atemCardClose(); } catch (e) {} return true; })()")
+    d.js("(() => { try { thymPickClose(); } catch (e) {} return true; })()")
+    d.js("(() => { try { thymPackClose(true); } catch (e) {} return true; })()")
     d.js("(() => { document.querySelectorAll('[id$=\"-modal\"]').forEach("
          "(m) => m.classList.add('hidden'));"
          " document.getElementById('confirm-cancel')?.click();"
@@ -3405,6 +3410,299 @@ def scenario_compile_short(d: Driver) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
+# 0.5.0: Thym — a run lands and its trace opens; a reading wears its label
+# ---------------------------------------------------------------------------
+
+def _raw(d: Driver, path: str) -> str | None:
+    """A project file's text as the server reads it (None: not there)."""
+    return d.js_await("(async () => { const r = await fetch('/api/file/raw?path=' + encodeURIComponent("
+                      + json.dumps(path) + ")); return r.ok ? await r.text() : null; })()")
+
+
+def scenario_thym_run_roundtrip(d: Driver) -> list[str]:
+    """"run with…" on a text, rules mode, a program that asks no model: the
+    programs are listed → choosing count-words plans it ("it can run") → run
+    → the card gives way to the trace in the cosm viewer, one record with its
+    checks → what landed beside the text is in the tree."""
+    fails: list[str] = []
+    _reset(d)
+    if not d.js_await("(async () => (await fetch('/api/thym/programs')).ok)()"):
+        return ["GET /api/thym/programs did not answer (lane P1's route): the round trip cannot run"]
+    d.js_await("(async () => { await thymRunOpen({input: %s}); return true; })()" % json.dumps(HARVEST))
+    radio = '#thym-list input[value="%s"]' % THYM_RULES_PROGRAM
+    if not _wait_js(d, "!!document.querySelector(%s)" % json.dumps(radio)):
+        fails.append(f"the run card did not list {THYM_RULES_PROGRAM}: "
+                     + str(d.js("document.getElementById('thym-list').innerText")))
+        _reset(d)
+        return fails
+    order = d.js("Array.from(document.querySelectorAll('#thym-list .thym-opt input')).map((i) => i.value)") or []
+    shipped = [i for i, v in enumerate(order) if "/" not in v]
+    if shipped and any("/" in v for v in order[shipped[0]:]):
+        fails.append(f"shipped programs should come after the project's: {order}")
+    d.click(radio)
+    if not _wait_js(d, "!!document.querySelector('#thym-plan .thym-fits') && !document.getElementById('thym-go').disabled"):
+        fails.append("choosing the program did not show a plan that can run: "
+                     + str(d.js("document.getElementById('thym-plan').innerText")))
+        _reset(d)
+        return fails
+    cost = d.js("(document.querySelector('#thym-plan .thym-atem-line') || {}).textContent || ''") or ""
+    if "count-words" not in cost:
+        fails.append(f"the plan's cost line does not name the program: {cost!r}")
+    d.click("#thym-go")
+    if not _wait_js(d, "document.getElementById('cosm-mode').classList.contains('open')"
+                       " && /^thym(-run)?:/.test(String(COSM.path))"
+                       " && !!document.querySelector('#cosm-body [data-kind=\"R/record\"] .cosm-card')", 20000):
+        fails.append("the trace did not open in the cosm viewer: "
+                     + str(d.js("({modal: document.getElementById('thym-status') && document.getElementById('thym-status').innerText,"
+                                " cosm: COSM.path})")))
+        _reset(d)
+        return fails
+    trace = d.js("(() => ({modal: !document.getElementById('thym-modal').classList.contains('hidden'),"
+                 " records: document.querySelectorAll('#cosm-body [data-kind=\"R/record\"] .cosm-card').length,"
+                 " checks: Array.from(document.querySelectorAll('#cosm-body .thym-checks li')).map((li) => li.className),"
+                 " atem: (document.querySelector('#cosm-body .thym-trace-card .thym-atem-line') || {}).textContent || '',"
+                 " outs: Array.from(document.querySelectorAll('#cosm-body .thym-trace-card a[data-open]')).map((a) => a.textContent)}))()") or {}
+    if trace.get("modal"):
+        fails.append("the run card stayed open over the trace")
+    if trace.get("records") != 1:
+        fails.append(f"a one-node program's trace should hold one record card: {trace}")
+    if any(c != "ok" for c in trace.get("checks") or []):
+        fails.append(f"a check failed on a deterministic run: {trace}")
+    if "count-words" not in (trace.get("atem") or ""):
+        fails.append(f"the trace's title line is not its atem: {trace.get('atem')!r}")
+    outs = trace.get("outs") or []
+    if not outs:
+        fails.append(f"the trace card names no output landed beside the text: {trace}")
+    for rel in outs:
+        if not _wait_js(d, "!!document.querySelector('#tree li[data-path=' + JSON.stringify(%s) + ']')" % json.dumps(rel)):
+            fails.append(f"{rel} landed beside the text but is not in the tree")
+    _reset(d)
+    return fails
+
+
+def scenario_thym_read_labelled(d: Driver) -> list[str]:
+    """A reading opened in the reader wears its label — "read through
+    <name>" and the footer line — as a band under the header, at every size
+    and face, for as long as it is open; the text it reads is untouched."""
+    fails: list[str] = []
+    _reset(d)
+    text_before = _raw(d, EMF_TEXT)
+    reading_before = _raw(d, THYM_READING)
+    if text_before is None or reading_before is None:
+        return [f"the seeded text or reading is missing: {EMF_TEXT} / {THYM_READING}"]
+    d.js(f"openReadEdit('{THYM_READING}', {{size:'full', face:'read'}})")
+    d.wait_for("#review-mode.open")
+    d.js_await(THYM_BAND_READY[1])
+    band = d.js("(() => { const b = document.getElementById('read-band-review');"
+                " return {shown: !b.hidden, lead: b.querySelector('.read-band-lead').textContent,"
+                " want: t('thym.band.lead', 'read through {name}').replace('{name}', 'null'),"
+                " line: b.querySelector('.read-band-line').textContent,"
+                " under: b.getBoundingClientRect().top >= document.getElementById('review-toolbar').getBoundingClientRect().bottom - 1,"
+                " help: !!b.querySelector('[data-help=\"reading\"]')}; })()") or {}
+    if not band.get("shown"):
+        fails.append("the reading opened without its band")
+    if band.get("lead") != band.get("want"):
+        fails.append(f"the band should say {band.get('want')!r}: {band.get('lead')!r}")
+    if band.get("line") != THYM_READING_FOOTER.strip("*"):
+        fails.append(f"the band should carry the reading's footer line: {band.get('line')!r}")
+    if not band.get("under"):
+        fails.append("the band is hidden under the toolbar")
+    if not band.get("help"):
+        fails.append("the band has no (?) for the reading bubble")
+    for step, want in (("reSetSize('mini')", "read-band-mini"), ("reSetFace('edit')", "read-band-mini"),
+                       ("reSetSize('full')", "read-band-edit"), ("reSetFace('read')", "read-band-review")):
+        d.js_await(f"(async () => {{ await {step}; return true; }})()")
+        if not _wait_js(d, "!document.getElementById(%s).hidden" % json.dumps(want), 4000):
+            fails.append(f"after {step} the band is not shown ({want})")
+    d.js("_teardownReadEdit()")
+    gone = d.js("['read-band-mini', 'read-band-review', 'read-band-edit']"
+                ".every((id) => document.getElementById(id).hidden)")
+    if not gone:
+        fails.append("the band outlived the reading")
+    if _raw(d, EMF_TEXT) != text_before:
+        fails.append(f"{EMF_TEXT} changed: a reading must never touch its text")
+    if _raw(d, THYM_READING) != reading_before:
+        fails.append(f"{THYM_READING} changed by being read")
+    _reset(d)
+    return fails
+
+
+# ---------------------------------------------------------------------------
+# 0.5.0 (U2): a package made and sealed, its key shown once, a package unpacked
+# ---------------------------------------------------------------------------
+
+#: A key in the right shape that opens nothing.
+_WRONG_KEY = "AAAA-BBBB-CCCC-DDDD-EEEE-FFFF"
+
+
+def _sha_of(d: Driver, path: str) -> str | None:
+    """The sha256 of a project file's text as the server reads it (utf-8)."""
+    return d.js_await("(async () => { const r = await fetch('/api/file/raw?path=' + encodeURIComponent("
+                      + json.dumps(path) + ")); if (!r.ok) return null;"
+                      " const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(await r.text()));"
+                      " return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join(''); })()")
+
+
+def _unpack_status(d: Driver, path: str, key: str) -> int | None:
+    """POST /api/canon/unpack straight to the route: its HTTP status."""
+    return d.js_await("(async () => (await fetch('/api/canon/unpack', {method: 'POST', headers:"
+                      " {'Content-Type': 'application/json'}, body: JSON.stringify({path: %s, key: %s})})).status)()"
+                      % (json.dumps(path), json.dumps(key)))
+
+
+def scenario_thym_package_roundtrip(d: Driver) -> list[str]:
+    """"package…" on the orchard notes with the seal box ticked: the card says
+    what goes in (the morph beside them found), the route packs by rule (no
+    model here), the card lists both forms and the sealed file and shows the
+    key once, large and monospaced with copy; esc and the backdrop only point
+    at "I have it", no storage holds it, and it is the key that opens what it
+    sealed; "I have it" closes the card and takes the key with it; the tree
+    has all three, the sealed one with its lock. Then "unpack…" on the sealed
+    copy that came in a folder of its own: no key and a wrong key are refused
+    in the card in the route's words, the seeded key unpacks it, the text opens
+    in the reader, and its bytes are the packed text's."""
+    from . import server as uiserver
+
+    fails: list[str] = []
+    _reset(d)
+    seeded_key = uiserver.THYM_SEALED_KEY
+    if not seeded_key:
+        return ["the seed holds no sealed package's key (server._seed_sealed did not run in this process)"]
+    folder = EMF_TEXT.rsplit("/", 1)[0]
+    want = {"package": f"{folder}/notes.package.cosm", "folder": f"{folder}/notes.thym",
+            "sealed": f"{folder}/notes.thym.enc"}
+
+    # --- package…, sealed too ---
+    d.js_await("(async () => { await thymPackOpen(%s); return true; })()" % json.dumps(EMF_TEXT))
+    if not _wait_js(d, "THYM_PACK.open && THYM_PACK.morph !== undefined"):
+        _reset(d)
+        return ["the package card did not open on the notes"]
+    card = d.js("(() => ({parts: Array.from(document.querySelectorAll('#thym-pack-parts li')).map((li) => li.textContent),"
+                " morph: THYM_PACK.morph, help: !!document.querySelector('#thym-pack-modal [data-help=\"package\"]')}))()") or {}
+    if len(card.get("parts") or []) != 4:
+        fails.append(f"the card should say the four things that go in: {card.get('parts')}")
+    if card.get("morph") != THYM_MORPH:
+        fails.append(f"the card should find the morph beside the notes ({THYM_MORPH}): {card.get('morph')!r}")
+    if not card.get("help"):
+        fails.append("the package card has no (?) for the package bubble")
+    d.click("#thym-pack-seal")
+    if d.js("THYM_PACK.seal") is not True:
+        fails.append("ticking the seal box did not take")
+    d.click("#thym-pack-go")
+    if not _wait_js(d, "!THYM_PACK.busy && (!!THYM_PACK.result || !!THYM_PACK.error)", 20000):
+        _reset(d)
+        return fails + ["package… never answered: the card is still busy"]
+    err = d.js("THYM_PACK.error")
+    if err:
+        _reset(d)
+        return fails + [f"the package route refused: {err}"]
+    got = d.js("(() => { const code = document.getElementById('thym-key-code'); const cs = getComputedStyle(code);"
+               " return {result: THYM_PACK.result, key: code.textContent, shown: !document.getElementById('thym-pack-key').hidden,"
+               " size: parseFloat(cs.fontSize), font: cs.fontFamily,"
+               " once: (document.querySelector('#thym-pack-key .thym-key-once') || {}).textContent || '',"
+               " copy: !!document.getElementById('thym-key-copy'),"
+               " have: !document.getElementById('thym-pack-have').hidden,"
+               " closers: !document.getElementById('thym-pack-close').hidden || !document.getElementById('thym-pack-x').hidden,"
+               " landed: Array.from(document.querySelectorAll('#thym-pack-status code')).map((c) => c.textContent)}; })()") or {}
+    res = got.get("result") or {}
+    for part, rel in want.items():
+        if res.get(part) != rel:
+            fails.append(f"the route's {part} should be {rel}: {res.get(part)!r}")
+        if rel not in (got.get("landed") or []):
+            fails.append(f"the card does not list the {part} ({rel}): {got.get('landed')}")
+    if "key" in res:
+        fails.append("the card's result keeps a copy of the key")
+    key = got.get("key") or ""
+    if not re.fullmatch(r"[A-Z2-7]{4}(?:-[A-Z2-7]{4}){5}", key):
+        fails.append(f"the key is not shown as six groups of four: {key!r}")
+    if not got.get("shown") or (got.get("size") or 0) < 18 or "mono" not in str(got.get("font") or "").lower():
+        fails.append(f"the key should show large and monospaced: {got.get('size')}px, {got.get('font')!r}")
+    if not got.get("copy") or not got.get("once"):
+        fails.append("the key has no copy button or no shown-once line")
+    if not got.get("have") or got.get("closers"):
+        fails.append("with the key showing, only “I have it” may close the card")
+    stored = d.js("(() => { const out = []; for (const s of [localStorage, sessionStorage]) {"
+                  " for (let i = 0; i < s.length; i++) { const k = s.key(i); out.push(k + '=' + s.getItem(k)); } }"
+                  " return out.join('\\n') + '\\n' + document.cookie + '\\n' + document.title; })()") or ""
+    if key and (key in stored or key.replace("-", "") in stored):
+        fails.append("the key is in the page's storage, a cookie or the title")
+    sealed_text = _raw(d, want["sealed"]) or ""
+    if not sealed_text:
+        fails.append(f"{want['sealed']} is not there to read")
+    elif key and (key in sealed_text or key.replace("-", "") in sealed_text):
+        fails.append("the key is written in the sealed file")
+    d.key("Escape")
+    d.js("(() => { document.querySelector('#thym-pack-modal .modal-backdrop').click(); return true; })()")
+    after = d.js("({open: !document.getElementById('thym-pack-modal').classList.contains('hidden'),"
+                 " same: THYM_PACK.key === document.getElementById('thym-key-code').textContent,"
+                 " nudge: !document.getElementById('thym-key-nudge').hidden})") or {}
+    if not after.get("open") or not after.get("same"):
+        fails.append("esc or the backdrop closed the card while the key showed")
+    if not after.get("nudge"):
+        fails.append("esc while the key shows should say why the card stays")
+    # The key the card showed is the one that opens the file it sealed: a wrong
+    # key is the route's 400; this one gets past the cipher (409 here, since the
+    # twin beside the notes differs from the package's re-written one).
+    if _unpack_status(d, want["sealed"], _WRONG_KEY) != 400:
+        fails.append("a wrong key should be refused with a 400")
+    status = _unpack_status(d, want["sealed"], key)
+    if status not in (200, 409):
+        fails.append(f"the key the card showed does not open {want['sealed']}: HTTP {status}")
+    for rel in (want["package"], want["folder"]):
+        if not _wait_js(d, "!!document.querySelector('#tree li[data-path=' + JSON.stringify(%s) + ']')" % json.dumps(rel)):
+            fails.append(f"{rel} landed but is not in the tree")
+    if not _wait_js(d, "!!document.querySelector('#tree li[data-path=' + JSON.stringify(%s) + '] .tree-sealed-tag')"
+                    % json.dumps(want["sealed"])):
+        fails.append(f"{want['sealed']} is not in the tree with its lock")
+    d.click("#thym-pack-have")
+    gone = d.js("({hidden: document.getElementById('thym-pack-modal').classList.contains('hidden'),"
+                " key: THYM_PACK.key, code: !!document.getElementById('thym-key-code')})") or {}
+    if not gone.get("hidden") or gone.get("key") or gone.get("code"):
+        fails.append(f"“I have it” should close the card and take the key with it: {gone}")
+
+    # --- unpack… the sealed copy that came on its own ---
+    target = THYM_SEALED.rsplit("/", 1)[0] + "/notes.md"
+    d.js_await("(async () => { await thymUnpackOpen(%s); return true; })()" % json.dumps(THYM_SEALED))
+    if not _wait_js(d, "THYM_PACK.open && THYM_PACK.parts !== null && !!document.getElementById('thym-unpack-key')"):
+        _reset(d)
+        return fails + ["the unpack card did not open on the sealed package with a key field"]
+    rows = d.js("Array.from(document.querySelectorAll('#thym-pack-parts code')).map((c) => c.textContent)") or []
+    if rows[:2] != [target, target + ".cosm"]:
+        fails.append(f"the card should say the text and its twin land beside it: {rows}")
+    for label, value, word in (("no key", "", "sealed"), ("a wrong key", _WRONG_KEY, "key")):
+        d.js("(() => { document.getElementById('thym-unpack-key').value = %s; return true; })()" % json.dumps(value))
+        d.click("#thym-pack-go")
+        if not _wait_js(d, "!THYM_PACK.busy && !!THYM_PACK.error"):
+            fails.append(f"unpacking with {label} was not refused in the card")
+            continue
+        said = d.js("({open: THYM_PACK.open, text: (document.querySelector('#thym-pack-status .thym-refusal') || {}).textContent || ''})") or {}
+        if not said.get("open") or word not in said.get("text", ""):
+            fails.append(f"unpacking with {label} should stay in the card with the route's words: {said}")
+    d.js("(() => { document.getElementById('thym-unpack-key').value = ''; return true; })()")
+    d.focus("#thym-unpack-key")
+    d.type_text(seeded_key)
+    d.key("Enter")
+    if not _wait_js(d, "!THYM_PACK.open && document.getElementById('review-mode').classList.contains('open')"
+                       " && RE_PATH === %s" % json.dumps(target), 20000):
+        fails.append("the seeded key did not unpack it into the reader: "
+                     + str(d.js("({open: THYM_PACK.open, error: THYM_PACK.error, path: typeof RE_PATH === 'string' ? RE_PATH : null})")))
+        _reset(d)
+        return fails
+    packed = hashlib.sha256((uiserver.COSM_FIXTURES / "emf" / "notes.md").read_bytes()).hexdigest()
+    if _sha_of(d, target) != packed or _sha_of(d, EMF_TEXT) != packed:
+        fails.append(f"{target} is not byte for byte the text that was packed")
+    orchard = uiserver.THYM_ORCHARD
+    if orchard is not None:
+        unpacked = orchard / uiserver.THYM_RECEIVED / "notes.md"
+        if not unpacked.is_file() or unpacked.read_bytes() != (orchard / "notes.md").read_bytes():
+            fails.append(f"on disk, {target} differs from {EMF_TEXT}")
+    if not _wait_js(d, "!!document.querySelector('#tree li[data-path=' + JSON.stringify(%s) + ']')" % json.dumps(target)):
+        fails.append(f"{target} was unpacked but is not in the tree")
+    _reset(d)
+    return fails
+
+
+# ---------------------------------------------------------------------------
 # 0.4.4: agent-free mode (docs/docoes-044-plan.md §13)
 # ---------------------------------------------------------------------------
 
@@ -3608,4 +3906,8 @@ SCENARIOS: dict[str, Scenario] = {
     "compile-short": scenario_compile_short,
     # --- 0.4.4: agent-free mode ---
     "agentfree-toggle": scenario_agentfree_toggle,
+    # --- 0.5.0: Thym (U1) ---
+    "thym-run-roundtrip": scenario_thym_run_roundtrip,
+    "thym-read-labelled": scenario_thym_read_labelled,
+    "thym-package-roundtrip": scenario_thym_package_roundtrip,
 }

@@ -173,6 +173,8 @@ def build_env(scratch: Path) -> dict[str, str]:
         # six tellings), ~/enough/docoes/ by default. Disposable, rebuilt on
         # digest — into the scratch dir.
         "ENOUGH_DOCS_ROOT": str(scratch / "docoes"),
+        # Thym (0.5.0): plans, traces, recorded candidates and landed outputs, ~/enough/thym/ by default.
+        "ENOUGH_THYM_ROOT": str(scratch / "thym"),
         # The home screen's project registry. $HOME already points here, so
         # this is belt and braces — but the rule is "every ENOUGH_* seam", and
         # the handoff file and desktop.json are derived from this one's dir.

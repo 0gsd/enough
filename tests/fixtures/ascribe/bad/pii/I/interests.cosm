@@ -1,0 +1,7 @@
+nodes:
+  - id: I:interest/sailing-newsletters
+    type: interest
+    name: Sailing newsletters
+    summary: Subscribed as wren.fenwhistle@example.org to a sailing newsletter.
+    form: F:form/sailing
+    provenance: {mode: manual, sources: [self], confidence: 1}

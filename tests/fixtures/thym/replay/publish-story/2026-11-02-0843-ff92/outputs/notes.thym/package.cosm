@@ -1,0 +1,25 @@
+oes: thym/1
+kind: package
+id: thym/notes
+name: The Hollins Lane orchard, autumn notes
+contents:
+- path: text.md
+  sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+  role: text
+- path: fabula.cosm
+  sha256: 1d88e67a37add952ecaf171e9d551557ea2308885360b71fd10411e8766cc92a
+  role: fabula
+- path: morph.cosm
+  sha256: 44ea6b44583aec2770efd9294f2724f3c70bcbe9bf54ba22dbe1289f08c89744
+  role: morph
+made:
+  program:
+    name: publish-story
+    sha256: 5bf1730785d53906879af4224bec6069d77ef3888490fed182f29bc8e6930945
+  trace:
+    run: 2026-11-02-0843-ff92
+  at: 2026-11-02 13:43:23+00:00
+  by: thym 0
+notice: A Thym package. The text is its author's; the fabula, morph and context describe it. Readings made from
+  it are the reader's and are labelled.
+nodes: []

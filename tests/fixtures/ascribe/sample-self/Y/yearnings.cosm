@@ -1,0 +1,17 @@
+nodes:
+  - id: Y:yearning/ocean-by-sextant
+    type: yearning
+    name: An ocean crossed by sextant
+    summary: To cross an ocean with no satellite fix, by the sun and the stars alone.
+    form: F:form/celestial-navigation
+    valence: for
+    strength: 4
+    provenance: {mode: dialectic, sources: [session-2], confidence: 0.85}
+
+  - id: Y:yearning/time-to-bake-daily
+    type: yearning
+    name: Time to bake every day
+    summary: Mornings free enough to bake a loaf before anything else happens.
+    form: F:form/sourdough
+    strength: 3
+    provenance: {mode: dialectic, sources: [session-1], confidence: 0.8}

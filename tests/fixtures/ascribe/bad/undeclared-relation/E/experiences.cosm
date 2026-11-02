@@ -1,0 +1,8 @@
+nodes:
+  - id: E:experience/first-regatta
+    type: experience
+    name: The first regatta
+    summary: Came last in a fleet of twelve and had the best day of the summer.
+    form: F:form/sailing
+    when: 2012
+    provenance: {mode: manual, sources: [self], confidence: 1}

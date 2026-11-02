@@ -55,6 +55,9 @@ const SNAPSHOT: &[&str] = &[
     "THIRD_PARTY_LICENSES.md",
     "docs/HELP_CENTER.md",
     "docs/MACROCOSM_OES.md",
+    // 0.5.0: the Thym and Ascribe specifications, read by `/api/thym-spec` and the docs viewer's terms the same way.
+    "docs/THYM.md",
+    "docs/ASCRIBE.md",
     "enough",
     "defaults",
     "reflib/dict",

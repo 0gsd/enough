@@ -995,12 +995,32 @@ def _yaml(text: str) -> Any:
 
 
 def _read_mapping(text: str, keys: Iterable[str]) -> dict | None:
+    """The model's answer as a mapping holding `keys`: YAML first; then YAML from the first asked key on; then, when
+    the answer is YAML-like but not YAML (a model that echoes a template's doubled braces, or a colon inside a value),
+    the asked keys read line by line, each running to the next key at the start of a line."""
     body = _strip_fences(text or "")
+    keys = tuple(keys)
     data = _yaml(body)
     if not isinstance(data, dict):
-        keys = tuple(keys)
         m = re.search(rf"^(?:{'|'.join(map(re.escape, keys))})\s*:", body, re.M)
         data = _yaml(body[m.start():]) if m else None
+    if not isinstance(data, dict) and "{{" in body:
+        data = _yaml(body.replace("{{", "{").replace("}}", "}"))
+    if not isinstance(data, dict):
+        found: dict[str, str] = {}
+        for mt in re.finditer(r"^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$", body, re.M):
+            key = mt.group(1)
+            if key in keys or key in ("stance_profile", "stances", "of"):
+                start = mt.end(2)
+                nxt = re.search(r"^[A-Za-z_][A-Za-z0-9_]*\s*:", body[start:], re.M)
+                rest = body[start:start + nxt.start()] if nxt else body[start:]
+                found[key] = (mt.group(2) + " " + " ".join(rest.split())).strip()
+        if any(k in found for k in keys):
+            data = dict(found)
+            for k in ("stance_profile", "stances"):
+                if isinstance(data.get(k), str):
+                    prof = _yaml(data[k].replace("{{", "{").replace("}}", "}"))
+                    data[k] = prof if isinstance(prof, dict) else {}
     return data if isinstance(data, dict) else None
 
 

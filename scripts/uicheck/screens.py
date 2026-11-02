@@ -55,6 +55,26 @@ EMF_PASSAGE = "Every apple tree needs a second variety nearby to set fruit."
 LEDGER = "orchard/ledger.md"
 # SHORT: a second text with a twin, which the compile-short scenario writes beside.
 PRESS = "orchard/press.md"
+# Thym (0.5.0), seeded by server._seed_thym() beside the orchard notes: a
+# program with its enumeration, a plan, checkpoint A's real trace, the package
+# it landed (both forms), a hand-made reading, and a program that asks no
+# model, with a text of its own for it to run on.
+THYM_PROGRAM = "orchard/publish-story.thym"
+THYM_PLAN = "orchard/publish-story.plan.cosm"
+THYM_TRACE = "orchard/2026-11-01-2148-35b5.trace.cosm"
+THYM_PACKAGE = "orchard/notes.thym"
+THYM_READING = "orchard/notes.read-null-2026-11-01-1200.md"
+THYM_READING_FOOTER = ("*a reading of notes.md through null, made here on 2026-11-01 by a model; "
+                       "the text stands unchanged*")
+THYM_RULES_PROGRAM = "orchard/count-words.thym"
+HARVEST = "orchard/harvest.md"
+# The package and unpack cards (U2): the morph beside the notes, and a sealed
+# copy of the package alone in a folder of its own (server._seed_sealed; its
+# key is server.THYM_SEALED_KEY, in the harness's memory only).
+THYM_MORPH = "orchard/notes.morph.cosm"
+THYM_SEALED = "orchard/received/notes.thym.enc"
+#: What the key screen paints in place of a real key: it seals nothing.
+THYM_PLACEHOLDER_KEY = "AAAA-BBBB-CCCC-DDDD-EEEE-FFFF"
 
 Step = tuple[str, str]
 
@@ -185,6 +205,57 @@ MM_NODES_READY: Step = ("eval_await", """(async () => {
     await new Promise((r) => setTimeout(r, 50));
   }
   return true; })()""")
+
+
+#: A program in the docs viewer (0.5.0) has drawn its density — cards, the
+#: source, the outline — or said what is missing.
+THYM_DOC_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !document.querySelector('#docs-body .cosm-card, #docs-body .thym-src,'
+       + ' #docs-body .docs-outline, #docs-body .ref-error, #docs-body .docs-busy'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: The run card has its programs (or the "not available yet" line), and a
+#: program chosen shows its plan, a refusal, or the same line.
+THYM_PICK_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !document.querySelector('#thym-plan .thym-atem-line, #thym-plan .thym-unavail,'
+       + ' #thym-plan .thym-refusal, #thym-list .thym-unavail'); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: A reading's band is up in the full reader with its footer line read.
+THYM_BAND_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !(document.querySelector('#read-band-review:not([hidden])')
+       && document.querySelector('#read-band-review .read-band-line').textContent); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+
+
+#: The package card has looked for a morph beside its text (the parts drawn).
+THYM_PACK_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !(THYM_PACK.open && THYM_PACK.morph !== undefined); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: The unpack card knows what the package carries (a sealed one: that it cannot).
+THYM_UNPACK_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !(THYM_PACK.open && THYM_PACK.parts !== null); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+#: Closes the package card even with a key showing (only "I have it" does, by hand).
+THYM_PACK_CLOSE: Step = ("eval", "(() => { try { thymPackClose(true); } catch (e) {} return true; })()")
+
+
+def _thym_pick(text: str, program: str) -> Step:
+    """Open "run with…" on `text` and choose `program` as a person would (a
+    click on its radio, which plans it); the route-less build shows its line."""
+    return ("eval_await", "(async () => { await thymRunOpen({input: %s});"
+                          " for (let i = 0; i < 200 && !document.querySelector('#thym-list input, #thym-list .thym-unavail'); i++)"
+                          " await new Promise((r) => setTimeout(r, 50));"
+                          " const r = document.querySelector('#thym-list input[value=' + JSON.stringify(%s) + ']');"
+                          " if (r) r.click(); return true; })()" % (json.dumps(text), json.dumps(program)))
 
 
 def _docs(doc: str, density: str = "short", lang: str | None = None,
@@ -793,6 +864,77 @@ PROJECT_SCREENS: list[Screen] = [
                     + EXIT_ALL_MODES,
            note="SHORT: the face's \"compile a short\" split button with its tiny menu open "
                 "(as the author told it / by weight, the default marked) over the cards"),
+
+    # --- 0.5.0, Thym (U1): programs, plans, traces, the run card, readings ---
+    Screen("thym-program", "project",
+           setup=(("eval_await", f"(async () => {{ await enterProgramDoc('{THYM_PROGRAM}', {{density: 'fabula'}});"
+                                 " return true; })()"),
+                  ("wait_for", "#docs-mode.open"), THYM_DOC_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a program as a document at the fabula density: the program's card with "
+                "\"run with…\" and its (?), its steps in order with their contracts under "
+                "them, the rail with the steps"),
+
+    Screen("thym-plan", "project",
+           setup=(("eval", f"enterCosmMode('{THYM_PLAN}')"), ("wait_for", "#cosm-mode.open"),
+                  COSM_READY, ("wait_for", "#cosm-body figure.thym-graph"), ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a plan in the cosm viewer: its atem and cost line, the graph (nodes, "
+                "`after` as edges, a diamond where a node asks the model), the plan lens "
+                "button, the nodes in order"),
+
+    Screen("thym-trace", "project",
+           setup=(("eval", f"enterCosmMode('{THYM_TRACE}')"), ("wait_for", "#cosm-mode.open"),
+                  COSM_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="checkpoint A's trace: the atem as the title line with the outcome, one "
+                "card per record (step, move, engine, attempts, seconds, tokens, every "
+                "check with its verdict), the plan it followed folded"),
+
+    Screen("thym-run", "project",
+           setup=(_thym_pick(EMF_TEXT, THYM_PROGRAM), ("wait_for", "#thym-modal:not(.hidden)"),
+                  THYM_PICK_READY, ("wait_idle", "")),
+           teardown=(("eval", "(() => { try { thymPickClose(); } catch (e) {} return true; })()"),)
+                    + EXIT_ALL_MODES,
+           note="\"run with…\" on the orchard notes, publish-story chosen: the programs "
+                "(project first, shipped last), the plan's cost line and, with no model "
+                "here, the refusal that says why it cannot run; route-less, the "
+                "\"not available yet\" line"),
+
+    Screen("thym-read", "project",
+           setup=(("eval", f"openReadEdit('{THYM_READING}', {{size:'full', face:'read'}})"),
+                  ("wait_for", "#review-mode.open"), THYM_BAND_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a reading open in the full reader: the band under the toolbar, "
+                "\"read through null\" and the footer line, with the (?)"),
+
+    # --- 0.5.0, Thym (U2): a package made, its key shown once, a package unpacked ---
+    Screen("thym-package", "project",
+           setup=(("eval_await", f"(async () => {{ await thymPackOpen('{EMF_TEXT}'); return true; }})()"),
+                  ("wait_for", "#thym-pack-modal:not(.hidden)"), THYM_PACK_READY, ("wait_idle", "")),
+           teardown=(THYM_PACK_CLOSE,) + EXIT_ALL_MODES,
+           note="\"package…\" on the orchard notes: what goes in (the text, its twin, the morph "
+                "beside it, its context), where both forms land, the seal box with its note, the "
+                "package button and the (?)"),
+
+    Screen("thym-package-key", "project",
+           setup=(("eval_await", f"(async () => {{ await thymPackOpen('{EMF_TEXT}'); return true; }})()"),
+                  ("wait_for", "#thym-pack-modal:not(.hidden)"), THYM_PACK_READY,
+                  ("eval", "(() => { Object.assign(THYM_PACK, {seal: true, result: {package: 'orchard/notes.package.cosm',"
+                           " folder: 'orchard/notes.thym', sealed: 'orchard/notes.thym.enc'},"
+                           f" key: '{THYM_PLACEHOLDER_KEY}', nudge: true}}); thymPackPaint(); return true; }})()"),
+                  ("wait_for", "#thym-pack-key:not([hidden])"), ("wait_idle", "")),
+           teardown=(THYM_PACK_CLOSE,) + EXIT_ALL_MODES,
+           note="the same card once a sealed package has landed: the three forms listed, the key "
+                "large and monospaced with its copy button, the shown-once line and the nudge esc "
+                "gives; only \"I have it\" closes it (a placeholder key: the screen seals nothing)"),
+
+    Screen("thym-unpack", "project",
+           setup=(("eval_await", f"(async () => {{ await thymUnpackOpen('{THYM_SEALED}'); return true; }})()"),
+                  ("wait_for", "#thym-pack-modal:not(.hidden)"), THYM_UNPACK_READY, ("wait_idle", "")),
+           teardown=(THYM_PACK_CLOSE,) + EXIT_ALL_MODES,
+           note="\"unpack…\" on a sealed package that came in a folder of its own: what will be "
+                "written beside it, the key field, the unpack button"),
 
     Screen("atem-card", "project",
            setup=(_atem_of_passage("full"), ATEM_READY, ("wait_idle", "")),

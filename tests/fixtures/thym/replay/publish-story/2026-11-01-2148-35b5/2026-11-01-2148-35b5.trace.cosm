@@ -1,0 +1,459 @@
+oes: thym/1
+kind: trace
+id: thym/2026-11-01-2148-35b5
+name: publish-story run 2026-11-01-2148-35b5
+program:
+  name: publish-story
+  sha256: 5bf1730785d53906879af4224bec6069d77ef3888490fed182f29bc8e6930945
+plan:
+  sha256: e2041acb9e9df03a43b8c8ea24cee024dc65b68cf7ab758e4be81721f040c86b
+environment:
+  enough: 0.4.4
+  model: g40-04
+  context: 0
+  agent_free: false
+  memory_band: 64 GB
+started: '2026-11-02T02:48:11Z'
+ended: '2026-11-02T02:51:11Z'
+outcome: landed
+nodes:
+- id: R:trace/2026-11-01-2148-35b5
+  type: trace
+  name: publish-story run 2026-11-01-2148-35b5
+  summary: 'ran publish-story on notes.md in 180 s on Qwen3.8-27B-Q4_K_M.gguf: 7 steps, all checks green'
+  records:
+  - R:record/1
+  - R:record/2
+  - R:record/3
+  - R:record/4
+  - R:record/5
+  - R:record/6
+  - R:record/7
+  outcome: landed
+  inputs_root: .
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-01-2148-35b5.plan.cosm
+    confidence: 1
+- id: R:record/1
+  type: record
+  name: derive story
+  summary: model:Qwen3.8-27B-Q4_K_M.gguf, 1 attempt, 6 checks green.
+  node: R:node/1
+  move: derive
+  inputs:
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  outputs:
+  - name: f
+    sha256: 11f87a5bb18fe02faaa8b620cdf0f6919717ce1846446b6950be2f0535037a92
+  engine: model:Qwen3.8-27B-Q4_K_M.gguf
+  attempts: 1
+  tokens: 977
+  seconds: 150
+  checks:
+  - name: span-resolves
+    ok: true
+    why: ''
+  - name: stance-closed
+    ok: true
+    why: ''
+  - name: terms-grounded
+    ok: true
+    why: ''
+  - name: coverage
+    ok: true
+    why: '14 claim-bearing sentences, each traced (spans): s1→E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,P:claim/oldest-tree-status;
+      s2→L:term/hearsay,E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,P:claim/oldest-tree-status;
+      s3→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/apple-pollination-requirement; s4→L:term/pollinate,L:term/leaflet,L:term/quirk,E:person/mara-okafor,E:place/hollins-lane-orchard,K:concept/pollination,P:claim/apple-pollination-requirement;
+      s5→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/juice-yield-increase,T:event/juice-pressing;
+      s6→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/juice-yield-increase,T:event/juice-pressing;
+      s7→L:term/mould,E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/leaf-mould,K:concept/leaf-mould,P:claim/mulch-effect-on-yield,T:event/leaf-mould-spread;
+      s8→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/mulch-effect-on-yield,P:claim/spring-weather-effect;
+      s9→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/mulch-effect-on-yield,P:claim/spring-weather-effect;
+      s10→E:person/mara-okafor,E:place/hollins-lane-orchard,E:org/parish-councils-grounds-team,E:place/meadow-strip,P:claim/meadow-mowing-threat,T:event/meadow-mowing-plan;
+      s11→L:term/pollinator,E:person/mara-okafor,E:place/hollins-lane-orchard,E:place/meadow-strip,K:concept/wildflower-seeding,K:concept/pollinator-dependence,P:claim/meadow-mowing-threat;
+      s12→L:term/pollinator,E:person/mara-okafor,E:place/hollins-lane-orchard,E:place/meadow-strip,K:concept/pollinator-dependence,P:claim/meadow-mowing-threat;
+      s13→E:person/mara-okafor,T:event/council-letter-request; s14→E:person/mara-okafor,T:event/council-letter-request'
+  - name: emf-checks
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-01-2148-35b5.plan.cosm#R:node/1
+    confidence: 1
+- id: R:record/2
+  type: record
+  name: assert f covers story
+  summary: code, 1 attempt, 1 check green.
+  node: R:node/2
+  move: assert
+  inputs:
+  - name: f
+    sha256: 11f87a5bb18fe02faaa8b620cdf0f6919717ce1846446b6950be2f0535037a92
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  outputs: []
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks:
+  - name: coverage
+    ok: true
+    why: '14 claim-bearing sentences, each traced (spans): s1→E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,P:claim/oldest-tree-status;
+      s2→L:term/hearsay,E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,P:claim/oldest-tree-status;
+      s3→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/apple-pollination-requirement; s4→L:term/pollinate,L:term/leaflet,L:term/quirk,E:person/mara-okafor,E:place/hollins-lane-orchard,K:concept/pollination,P:claim/apple-pollination-requirement;
+      s5→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/juice-yield-increase,T:event/juice-pressing;
+      s6→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/juice-yield-increase,T:event/juice-pressing;
+      s7→L:term/mould,E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/leaf-mould,K:concept/leaf-mould,P:claim/mulch-effect-on-yield,T:event/leaf-mould-spread;
+      s8→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/mulch-effect-on-yield,P:claim/spring-weather-effect;
+      s9→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/mulch-effect-on-yield,P:claim/spring-weather-effect;
+      s10→E:person/mara-okafor,E:place/hollins-lane-orchard,E:org/parish-councils-grounds-team,E:place/meadow-strip,P:claim/meadow-mowing-threat,T:event/meadow-mowing-plan;
+      s11→L:term/pollinator,E:person/mara-okafor,E:place/hollins-lane-orchard,E:place/meadow-strip,K:concept/wildflower-seeding,K:concept/pollinator-dependence,P:claim/meadow-mowing-threat;
+      s12→L:term/pollinator,E:person/mara-okafor,E:place/hollins-lane-orchard,E:place/meadow-strip,K:concept/pollinator-dependence,P:claim/meadow-mowing-threat;
+      s13→E:person/mara-okafor,T:event/council-letter-request; s14→E:person/mara-okafor,T:event/council-letter-request'
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-01-2148-35b5.plan.cosm#R:node/2
+    confidence: 1
+- id: R:record/3
+  type: record
+  name: null of f
+  summary: model:Qwen3.8-27B-Q4_K_M.gguf, 1 attempt, 5 checks green.
+  node: R:node/3
+  move: 'null'
+  inputs:
+  - name: f
+    sha256: 11f87a5bb18fe02faaa8b620cdf0f6919717ce1846446b6950be2f0535037a92
+  outputs:
+  - name: t3
+    sha256: 0361af3a32ed6d8607fb835d88d56e2093f1eed79a2d78a528725d7304a48b06
+  engine: model:Qwen3.8-27B-Q4_K_M.gguf
+  attempts: 1
+  tokens: 2574
+  seconds: 27
+  checks:
+  - name: coverage
+    ok: true
+    why: '19 claim-bearing sentences, each traced (citations): s1→T:event/juice-pressing,P:claim/juice-yield-increase;
+      s2→P:claim/juice-yield-increase; s3→T:event/leaf-mould-spread; s4→P:claim/mulch-effect-on-yield; s5→P:claim/spring-weather-effect;
+      s6→P:claim/spring-weather-effect; s7→E:thing/bramley-apple-tree; s8→P:claim/oldest-tree-status; s9→P:claim/oldest-tree-status;
+      s10→P:claim/apple-pollination-requirement; s11→P:claim/apple-pollination-requirement; s12→E:place/meadow-strip;
+      s13→K:concept/pollinator-dependence; s14→T:event/meadow-mowing-plan; s15→P:claim/meadow-mowing-threat; s16→P:claim/meadow-mowing-threat;
+      s17→T:event/council-letter-request; s18→T:event/council-letter-request; s19→P:claim/lease-mowing-question'
+  - name: no-invention
+    ok: true
+    why: ''
+  - name: stance-kept
+    ok: true
+    why: ''
+  - name: null-pinned
+    ok: true
+    why: statistics all 1; figurative-density, humour and allusion assumed 1 (judgement, not asked)
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-01-2148-35b5.plan.cosm#R:node/3
+    confidence: 1
+- id: R:record/4
+  type: record
+  name: measure story against t3
+  summary: model:Qwen3.8-27B-Q4_K_M.gguf, 1 attempt, 3 checks green.
+  node: R:node/4
+  move: measure
+  inputs:
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  - name: t3
+    sha256: 0361af3a32ed6d8607fb835d88d56e2093f1eed79a2d78a528725d7304a48b06
+  outputs:
+  - name: m
+    sha256: 070f6b812190b180086af09bdc081587f79c412fc20d5403fffb788d4e6b8a6b
+  engine: model:Qwen3.8-27B-Q4_K_M.gguf
+  attempts: 1
+  tokens: 739
+  seconds: 2
+  checks:
+  - name: scale-range
+    ok: true
+    why: ''
+  - name: scale-evidence
+    ok: true
+    why: ''
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-01-2148-35b5.plan.cosm#R:node/4
+    confidence: 1
+- id: R:record/5
+  type: record
+  name: context of story
+  summary: code, 1 attempt, 0 checks green.
+  node: R:node/5
+  move: context
+  inputs:
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  outputs:
+  - name: c
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks: []
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-01-2148-35b5.plan.cosm#R:node/5
+    confidence: 1
+- id: R:record/6
+  type: record
+  name: graph of story
+  summary: code, 1 attempt, 1 check green.
+  node: R:node/6
+  move: graph
+  inputs:
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  outputs:
+  - name: g
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks:
+  - name: released
+    ok: true
+    why: 'no graph: nothing was released, and nothing travels'
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-01-2148-35b5.plan.cosm#R:node/6
+    confidence: 1
+- id: R:record/7
+  type: record
+  name: package story, f, m, c, g
+  summary: code, 1 attempt, 3 checks green.
+  node: R:node/7
+  move: package
+  inputs:
+  - name: story
+    sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
+    path: inputs/notes.md
+  - name: f
+    sha256: 11f87a5bb18fe02faaa8b620cdf0f6919717ce1846446b6950be2f0535037a92
+  - name: m
+    sha256: 070f6b812190b180086af09bdc081587f79c412fc20d5403fffb788d4e6b8a6b
+  - name: c
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  - name: g
+    sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  outputs:
+  - name: out
+    sha256: 40c97776747201544555d7db5d1588f8c782862e1b590979a39b29697c6aff39
+    path: outputs/out.package.cosm
+  engine: code
+  attempts: 1
+  tokens: 0
+  seconds: 0
+  checks:
+  - name: digests
+    ok: true
+    why: ''
+  - name: released
+    ok: true
+    why: 'no graph: nothing was released, and nothing travels'
+  - name: provenance
+    ok: true
+    why: ''
+  provenance:
+    mode: derived
+    sources:
+    - 2026-11-01-2148-35b5.plan.cosm#R:node/7
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: derive story
+  summary: text to fabula; asks the coprocessor under emf/1
+  step:
+    program: publish-story
+    n: 1
+  move: derive
+  asks: true
+  takes:
+  - story
+  gives: f
+  after: []
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 12
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L12
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: assert f covers story
+  summary: assert f covers story
+  step:
+    program: publish-story
+    n: 2
+  move: assert
+  asks: false
+  takes:
+  - f
+  - story
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 13
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L13
+    confidence: 1
+- id: R:node/3
+  type: node
+  name: null of f
+  summary: 'the holomorph: the departure from the null morph'
+  step:
+    program: publish-story
+    n: 3
+  move: 'null'
+  asks: true
+  takes:
+  - f
+  gives: t3
+  after:
+  - R:node/1
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 14
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L14
+    confidence: 1
+- id: R:node/4
+  type: node
+  name: measure story against t3
+  summary: 'the holomorph: the departure from the null morph'
+  step:
+    program: publish-story
+    n: 3
+  move: measure
+  asks: true
+  takes:
+  - story
+  - t3
+  gives: m
+  after:
+  - R:node/3
+  budget:
+    attempts: 3
+    output_words: 0
+  line: 14
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L14
+    confidence: 1
+- id: R:node/5
+  type: node
+  name: context of story
+  summary: the surrounding volume's catalog, read-only
+  step:
+    program: publish-story
+    n: 4
+  move: context
+  asks: false
+  takes:
+  - story
+  gives: c
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 15
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L15
+    confidence: 1
+- id: R:node/6
+  type: node
+  name: graph of story
+  summary: what the holograph released for this text, or nothing
+  step:
+    program: publish-story
+    n: 5
+  move: graph
+  asks: false
+  takes:
+  - story
+  gives: g
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 16
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L16
+    confidence: 1
+- id: R:node/7
+  type: node
+  name: package story, f, m, c, g
+  summary: package story, f, m, c, g
+  step:
+    program: publish-story
+    n: 6
+  move: package
+  asks: false
+  takes:
+  - story
+  - f
+  - m
+  - c
+  - g
+  gives: out
+  after:
+  - R:node/2
+  - R:node/4
+  - R:node/5
+  - R:node/6
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 17
+  provenance:
+    mode: derived
+    sources:
+    - publish-story.thym#L17
+    confidence: 1

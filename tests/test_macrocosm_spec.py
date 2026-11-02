@@ -16,11 +16,12 @@ import pytest
 from enough import macrocosm as mc
 
 SPEC = Path(__file__).resolve().parents[1] / "docs" / "MACROCOSM_OES.md"
+ASCRIBE = Path(__file__).resolve().parents[1] / "docs" / "ASCRIBE.md"      # Ascribe OES 1 (0.5.0): the same promise
 _BLOCK = re.compile(r"^```cosm\n(.*?)^```", re.S | re.M)
 
 
-def _blocks() -> list[str]:
-    return _BLOCK.findall(SPEC.read_text(encoding="utf-8"))
+def _blocks(doc: Path = SPEC) -> list[str]:
+    return _BLOCK.findall(doc.read_text(encoding="utf-8")) if doc.is_file() else []
 
 
 def _file_name(data: dict) -> str:
@@ -34,6 +35,12 @@ def _file_name(data: dict) -> str:
     if data.get("oes") == "doc/1":
         telling = (data.get("telling") or {}).get("lang") or "en"
         return f"{str(data.get('id', 'doc/x')).split('/', 1)[-1]}.{telling}.doc.cosm"
+    if data.get("oes") == "ascribe/1":
+        return "holograph.cosm"
+    if data.get("oes") == "thym/1":                       # <slug>.<kind>.cosm: plain-letter.morph.cosm
+        kind = data.get("kind") or "morph"
+        slug = str(data.get("id", "thym/x")).split("/", 1)[-1]
+        return "package.cosm" if kind == "package" else f"{slug}.{kind}.cosm"
     return "brand.cosm"
 
 
@@ -76,3 +83,44 @@ def test_spec_examples_use_only_declared_catalog_keys(tmp_path):
                 assert set(entry) == {"path", "at", "by", "mode", "order"}, entry
                 assert entry["order"] in ("told", "weight") and entry["mode"] in ("model", "rules")
     assert shorts >= 1, "no example shows an EMF's shorts: list"
+
+
+# ---------------------------------------------------------------------------
+# docs/ASCRIBE.md (0.5.0) makes the same promise for its blocks, and a holograph's own checks hold too
+# ---------------------------------------------------------------------------
+
+def test_ascribe_spec_exists_and_has_an_example():
+    assert ASCRIBE.is_file(), "docs/ASCRIBE.md is missing"
+    assert len(_blocks(ASCRIBE)) >= 1
+
+
+@pytest.mark.parametrize("index", range(len(_blocks(ASCRIBE))))
+def test_ascribe_example_loads_and_lints_clean(index, tmp_path):
+    from enough import ascribe
+    text = _blocks(ASCRIBE)[index]
+    data = mc.yaml_load(text)
+    assert isinstance(data, dict) and next(iter(data)) == "oes", f"example {index + 1} does not start with oes:"
+    path = tmp_path / _file_name(data)
+    path.write_text(text, encoding="utf-8")
+    volume = mc.load_volume(path)
+    assert volume.refused is None, f"example {index + 1} refused: {volume.refused}"
+    report = ascribe.lint_holograph(path) if data.get("oes") == "ascribe/1" else mc.lint(volume)
+    problems = report.errors + report.warnings + report.notes
+    assert report.ok and not problems, f"example {index + 1}: " + "; ".join(str(p) for p in problems)
+
+
+def test_the_spec_examples_of_ascribe_and_thym_pass_their_own_checks(tmp_path):
+    """The MacroCOSM spec's §18.6 holograph passes Ascribe's own checks, not only the generic ones."""
+    from enough import ascribe
+    seen = set()
+    for index, text in enumerate(_blocks()):
+        data = mc.yaml_load(text)
+        if data.get("oes") not in ("ascribe/1", "thym/1"):
+            continue
+        seen.add(data["oes"])
+        path = tmp_path / str(index) / _file_name(data)
+        path.parent.mkdir()
+        path.write_text(text, encoding="utf-8")
+        report = ascribe.lint_holograph(path) if data["oes"] == "ascribe/1" else mc.lint(mc.load_volume(path))
+        assert report.ok and not report.warnings, f"example {index + 1}: " + "; ".join(map(str, report.problems()))
+    assert seen == {"ascribe/1", "thym/1"}

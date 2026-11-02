@@ -1773,6 +1773,12 @@ _dictionary_tools.register()
 from . import canon_tools as _canon_tools  # noqa: E402
 _canon_tools.register()
 
+# Thym's two (0.5.0): `thym_check` and `thym_run`, documented in the MacroCOSM
+# block and behind the `macrocosm-oes` skill, checked inside the runners. A run
+# writes only under the Thym root. The module imports the runtime lazily.
+from . import thym_tools as _thym_tools  # noqa: E402
+_thym_tools.register()
+
 # `show_intro` (0.4.1): the brief introduction, on screen without a model
 # writing it. Always on and documented in the core.
 from . import intro as _intro  # noqa: E402

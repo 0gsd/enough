@@ -1,0 +1,2598 @@
+engine: feed
+inputs:
+  call: 32756c76c2e2d2db6e3f72e999e8d07c520a231afa5a9b1f96e899aa42ea9e75
+keys: []
+tokens: 0
+seconds: 0
+output:
+  narrator:
+    word: narrator
+    letter: n
+    length: 8
+    is_headword: 1
+    pronunciation: /ˈnɛreɪtər/
+    ipa: /ˈnɛreɪtər/
+    definition: The person who tells a story, or the voice through which a story is told, whether first-person,
+      omniscient, or unreliable. In a documentary, the narrator is the voice-over guiding the viewer through the
+      footage.
+    usage_note: null
+    pos: noun
+    pos_primary: noun
+    synonyms:
+    - storyteller
+    - teller
+    forms:
+    - word: narrater
+      pronunciation: /ˈnɛreɪtər/
+      labels:
+      - var.
+      synonyms: []
+      label_meanings:
+      - variant spelling
+    - word: narraters
+      pronunciation: /ˈnɛreɪtərz/
+      labels:
+      - pl.
+      synonyms: []
+      label_meanings:
+      - plural
+    - word: narrators
+      pronunciation: /ˈnɛreɪtərz/
+      labels:
+      - pl.
+      synonyms: []
+      label_meanings:
+      - plural
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes: []
+    slant_rhymes:
+    - interpellator
+    - spectator
+    - security
+    - majority
+    - authority
+    - charity
+    - minority
+    - priority
+    - popularity
+    - prosperity
+    - clarity
+    - solidarity
+    - maturity
+    - severity
+    - purity
+    - refrigerator
+    - superiority
+    - similarity
+    - insecurity
+    - curator
+    homophones:
+    - narrater
+    domain: literature
+    etymology: From narrate + -or, from Latin narrator.
+    examples:
+    - The narrator of Dust, Dirt and Stones spoke in a hush, as if the rocks might overhear.
+    - The narrator of the Ring C bird count film mispronounced warbler three times.
+    related:
+    - narrate
+    - narrative
+    antonyms: []
+    hyphenation: nar·ra·tor
+    frequency_rank: 4
+    first_use: 17th century
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - narrateur
+    - voix off
+    fr_definition: La personne qui raconte une histoire, ou la voix par laquelle une histoire est racontée, qu'elle
+      soit à la première personne, omnisciente ou peu fiable. Dans un documentaire, le narrateur est la voix off
+      qui guide le spectateur à travers les images.
+    es_compare:
+    - narrador
+    es_definition: La persona que cuenta una historia, o la voz mediante la cual se cuenta, ya sea en primera persona,
+      omnisciente o poco fiable. En un documental, el narrador es la voz en off que guía al espectador a través
+      de las imágenes.
+    de_compare:
+    - Erzähler
+    - Sprecher
+    de_definition: Die Person, die eine Geschichte erzählt, oder die Stimme, durch die eine Geschichte erzählt wird,
+      sei sie in der ersten Person, allwissend oder unzuverlässig. In einer Dokumentation ist der Erzähler die Stimme
+      aus dem Off, die den Zuschauer durch das Filmmaterial führt.
+    zh_compare:
+    - 叙述者
+    - 旁白
+    zh_definition: 讲述故事的人，或故事借以讲述的声音，无论是第一人称、全知视角还是不可靠的叙述者；在纪录片中，叙述者是引导观众了解画面内容的旁白声音。
+    ja_compare:
+    - 語り手
+    - ナレーター
+    ja_definition: 物語を語る人、あるいは物語が語られる声のことで、一人称であれ、全知の視点であれ、信頼できない語り手であれよい。ドキュメンタリーでは、映像を通して視聴者を導くナレーションの声を指す。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 4
+      name: Occasional
+      examples: lantern, tidy, frugal
+    syllables: 3
+    era: 17th century
+  plan:
+    word: plan
+    letter: p
+    length: 4
+    is_headword: 1
+    pronunciation: /plæn/
+    ipa: /plæn/
+    definition: A set of intended steps toward a goal, or a drawing that lays out a building or machine from above
+      in simplified, symbolic form. As a verb, to design something or to work out how to achieve it.
+    usage_note: null
+    pos: noun; verb
+    pos_primary: noun
+    synonyms:
+    - design
+    - program
+    - programme
+    - project
+    - contrive
+    forms:
+    - word: planned
+      pronunciation: /plænd/
+      labels:
+      - past
+      synonyms:
+      - aforethought
+      - plotted
+      label_meanings:
+      - past tense and past participle
+    - word: planning
+      pronunciation: /ˈplænɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - preparation
+      - provision
+      label_meanings:
+      - present participle
+    - word: plans
+      pronunciation: /plænz/
+      labels:
+      - 3rd sing.
+      - pl.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+      - plural
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - an
+    - can
+    - than
+    - man
+    - fan
+    - japan
+    - van
+    - ban
+    - pan
+    - scan
+    - span
+    - stan
+    - tan
+    - clan
+    - businessman
+    - caravan
+    - sedan
+    - fisherman
+    - nan
+    - gran
+    - lifespan
+    - bran
+    - frontman
+    - ironman
+    - tarzan
+    - snowman
+    - gan
+    - minivan
+    - saucepan
+    - sandman
+    slant_rhymes:
+    - damn
+    - hang
+    - gang
+    - bang
+    - exam
+    - ram
+    - dam
+    - jam
+    - ham
+    - cam
+    - sang
+    - spam
+    - lamb
+    - slam
+    - scam
+    - yang
+    - diagram
+    - lang
+    - gram
+    - chang
+    homophones: []
+    domain: general
+    etymology: Borrowed from French plan 'flat surface, ground plot, map'.
+    examples:
+    - The plan for the Pump Room reopening listed every step from sweeping to sound check.
+    - Tibor Ansel planned each suit on paper before cutting a thread of cloth.
+    related:
+    - scheme
+    - blueprint
+    antonyms: []
+    hyphenation: plan
+    frequency_rank: 5
+    first_use: 17th century
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - plan
+    - projet
+    - planifier
+    fr_definition: Un ensemble d'étapes prévues vers un but, ou un dessin qui représente un bâtiment ou une machine
+      vue de dessus sous une forme simplifiée et symbolique. Comme verbe, concevoir quelque chose ou déterminer
+      comment l'accomplir.
+    es_compare:
+    - plan
+    - planear
+    es_definition: Un conjunto de pasos previstos hacia una meta, o un dibujo que representa un edificio o una máquina
+      vista desde arriba de forma simplificada y simbólica. Como verbo, diseñar algo o determinar cómo lograrlo.
+    de_compare:
+    - Plan
+    - planen
+    de_definition: Eine Reihe geplanter Schritte zu einem Ziel, oder eine Zeichnung, die ein Gebäude oder eine Maschine
+      von oben in vereinfachter, symbolischer Form darstellt. Als Verb, etwas entwerfen oder festlegen, wie es erreicht
+      werden soll.
+    zh_compare:
+    - 计划
+    - 设计图
+    zh_definition: 为达成目标而设定的一系列步骤，或以简化符号形式从上方展示建筑物或机器的图纸。作动词时指设计某物，或规划如何实现某目标。
+    ja_compare:
+    - 計画
+    - 設計図
+    ja_definition: 目標に向けた一連の意図された手順、または建物や機械を上から見た簡略化・記号化した図面。動詞としては、何かを設計すること、またはそれを達成する方法を考え出すことを意味する。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    syllables: 1
+    era: 17th century
+  delay:
+    word: delay
+    letter: d
+    length: 5
+    is_headword: 1
+    pronunciation: /dɪˈleɪ/
+    ipa: /dɪˈleɪ/
+    definition: A period of time before something happens, or the act of putting something off; as a verb, to postpone
+      or hinder. In audio, a delay is an effect that repeats a sound after a short interval.
+    usage_note: null
+    pos: noun; verb
+    pos_primary: noun
+    synonyms:
+    - holdup
+    - hold
+    - postponement
+    - wait
+    - check
+    - retard
+    - detain
+    - stay
+    forms:
+    - word: delayed
+      pronunciation: /dɪˈleɪd/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: delaying
+      pronunciation: /dɪˈleɪɪŋ/
+      labels:
+      - pres. part.
+      synonyms: []
+      label_meanings:
+      - present participle
+    - word: delays
+      pronunciation: /dɪˈleɪz/
+      labels:
+      - pl.
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - plural
+      - third-person singular present
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - a
+    - they
+    - way
+    - may
+    - day
+    - say
+    - away
+    - play
+    - today
+    - pay
+    - stay
+    - hey
+    - okay
+    - anyway
+    - yesterday
+    - gay
+    - birthday
+    - bay
+    - ray
+    - survey
+    - holiday
+    - lay
+    - display
+    - highway
+    - grey
+    - everyday
+    - railway
+    - gray
+    - pray
+    - jay
+    slant_rhymes:
+    - make
+    - made
+    - take
+    - great
+    - same
+    - state
+    - game
+    - place
+    - days
+    - name
+    - case
+    - change
+    - based
+    - came
+    - face
+    - wait
+    - late
+    - age
+    - main
+    - space
+    homophones: []
+    domain: general
+    etymology: From Old French delaier 'to postpone'.
+    examples:
+    - A delay of forty minutes on the Shore Slow left the whole carriage waiting beside the marsh.
+    - Hail will delay the Grain's wheat harvest at Flood's Crossing until the fields dry out.
+    related:
+    - postpone
+    - hinder
+    antonyms: []
+    hyphenation: de·lay
+    frequency_rank: 4
+    first_use: 14th century
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - retard
+    - retarder
+    fr_definition: Un laps de temps avant que quelque chose ne se produise, ou l'acte de le repousser; comme verbe,
+      reporter ou entraver. En audio, un « delay » est un effet qui répète un son après un court intervalle.
+    es_compare:
+    - retraso
+    - atrasar
+    es_definition: Un lapso de tiempo antes de que algo suceda, o el acto de posponerlo; como verbo, aplazar u obstaculizar.
+      En audio, un “delay” es un efecto que repite un sonido tras un breve intervalo.
+    de_compare:
+    - Verzögerung
+    - aufschieben
+    de_definition: Eine Zeitspanne, bevor etwas geschieht, oder das Aufschieben davon; als Verb bedeutet es, zu
+      verschieben oder zu behindern. In der Audiotechnik ist ein „delay“ ein Effekt, der einen Ton nach einem kurzen
+      Intervall wiederholt.
+    zh_compare:
+    - 延迟
+    - 耽误
+    zh_definition: 某事发生前的一段时间，或推迟某事的行为；作动词指推迟或阻碍；在音频中，“delay”是一种在短暂间隔后重复声音的效果。
+    ja_compare:
+    - 遅れ
+    - 遅らせる
+    ja_definition: 何かが起こるまでの時間、またはそれを先延ばしにする行為。動詞では延期する、妨げるという意味。音響では「delay」は短い間隔をおいて音を繰り返すエフェクトを指す。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 4
+      name: Occasional
+      examples: lantern, tidy, frugal
+    syllables: 2
+    era: 14th century
+  ask:
+    word: ask
+    letter: a
+    length: 3
+    is_headword: 1
+    pronunciation: /æsk/
+    ipa: /æsk/
+    definition: To put a question to someone, or to request something from them. It can also mean to require or
+      expect something, as a task or situation does.
+    usage_note: null
+    pos: verb
+    pos_primary: verb
+    synonyms:
+    - require
+    - expect
+    - inquire
+    - enquire
+    - necessitate
+    - postulate
+    - need
+    - take
+    - involve
+    - demand
+    forms:
+    - word: asked
+      pronunciation: /æskt/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: asking
+      pronunciation: /ˈæskɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - request
+      label_meanings:
+      - present participle
+    - word: asks
+      pronunciation: /æsks/
+      labels:
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+    - word: axe
+      pronunciation: /æks/
+      labels:
+      - arch. var.
+      synonyms: []
+      label_meanings:
+      - archaic variant spelling
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - task
+    - mask
+    - flask
+    - basque
+    - cask
+    - bask
+    - masque
+    - multitask
+    - unmask
+    - facemask
+    - casque
+    - subtask
+    - dask
+    - antimask
+    - dnsmasq
+    - outask
+    - outtask
+    - overtask
+    - umask
+    slant_rhymes:
+    - last
+    - past
+    - fast
+    - passed
+    - cast
+    - aircraft
+    - draft
+    - attached
+    - vast
+    - broadcast
+    - blast
+    - craft
+    - forecast
+    - grasp
+    - shaft
+    - smashed
+    - detached
+    - spacecraft
+    - caste
+    - harassed
+    homophones: []
+    domain: general
+    etymology: From Middle English asken, from Old English ascian, from a Germanic root meaning 'to wish, request'.
+    examples:
+    - Beatrix will ask the ticket clerk at the Terminal which coach goes to the Grain.
+    - The spring stair race in the Building asks more of a runner's knees than of the lungs.
+    related:
+    - request
+    antonyms: []
+    hyphenation: ask
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - demander
+    fr_definition: Poser une question à quelqu'un, ou lui demander quelque chose. Le verbe peut aussi signifier
+      exiger ou attendre quelque chose, comme le fait une tâche ou une situation.
+    es_compare:
+    - preguntar
+    - pedir
+    es_definition: Formular una pregunta a alguien, o pedirle algo. También puede significar requerir o esperar
+      algo, como lo hace una tarea o una situación.
+    de_compare:
+    - fragen
+    - bitten
+    de_definition: Jemandem eine Frage stellen, oder ihn um etwas bitten. Es kann auch bedeuten, etwas zu erfordern
+      oder zu erwarten, wie es eine Aufgabe oder eine Situation tut.
+    zh_compare:
+    - 问
+    - 请求
+    zh_definition: 向某人提出问题，或向其请求某物。也可指需要或期望某事物，如某项任务或某种情况所要求的那样。
+    ja_compare:
+    - 尋ねる
+    - 頼む
+    ja_definition: 誰かに質問すること、またはその人に何かを頼むこと。また、仕事や状況がそうするように、何かを必要とする、または期待することも意味する。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    syllables: 1
+    era: old english
+  goal:
+    word: goal
+    letter: g
+    length: 4
+    is_headword: 1
+    pronunciation: /ɡoʊl/
+    ipa: /ɡoʊl/
+    definition: Something a person aims to achieve, or in sports, the area or act of sending the ball or puck into
+      it, and the point scored for doing so.
+    usage_note: null
+    pos: noun; verb
+    pos_primary: noun
+    synonyms:
+    - end
+    - finish
+    - destination
+    forms:
+    - word: goaled
+      pronunciation: /ɡoʊld/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: goaling
+      pronunciation: /ˈɡoʊlɪŋ/
+      labels:
+      - pres. part.
+      synonyms: []
+      label_meanings:
+      - present participle
+    - word: goals
+      pronunciation: /ɡoʊlz/
+      labels:
+      - pl.
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - plural
+      - third-person singular present
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - whole
+    - control
+    - role
+    - soul
+    - roll
+    - hole
+    - bowl
+    - coal
+    - poll
+    - sole
+    - pole
+    - stole
+    - cole
+    - patrol
+    - console
+    - toll
+    - scroll
+    - parole
+    - payroll
+    - ole
+    - troll
+    - mole
+    - charcoal
+    - stroll
+    - enroll
+    - dole
+    - loophole
+    - casserole
+    - shoal
+    - knoll
+    slant_rhymes:
+    - crore
+    - old
+    - hold
+    - gold
+    - cold
+    - sold
+    - controlled
+    - household
+    - bold
+    - rolled
+    - polls
+    - fold
+    - bolt
+    - olds
+    - mold
+    - behold
+    - bowls
+    - revolt
+    - holt
+    - colt
+    homophones: []
+    domain: general
+    etymology: From Middle English gol 'boundary, limit', of uncertain origin.
+    examples:
+    - Miss Araminta Loy's goal was to see every child in Lesser Wend reading by spring.
+    - Otis Brule goaled twice in the last ten minutes, and the Sheaf City crowd carried the farmhand off the field.
+    related:
+    - objective
+    - target
+    - aim
+    antonyms: []
+    hyphenation: goal
+    frequency_rank: 5
+    first_use: Middle English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - objectif
+    - but
+    fr_definition: Quelque chose qu'une personne cherche à accomplir, ou, en sport, la zone ou l'acte d'y envoyer
+      le ballon ou le palet, ainsi que le point marqué pour cela.
+    es_compare:
+    - meta
+    - gol
+    es_definition: Algo que una persona busca lograr, o, en deportes, el área o el acto de enviar la pelota o el
+      disco hacia ella, así como el punto anotado por hacerlo.
+    de_compare:
+    - Ziel
+    - Tor
+    de_definition: Etwas, das eine Person zu erreichen sucht, oder, im Sport, der Bereich oder der Akt, den Ball
+      oder Puck dorthin zu befördern, sowie der dafür erzielte Punkt.
+    zh_compare:
+    - 目标
+    - 进球
+    zh_definition: 一个人努力想要实现的事情，或在体育运动中，指将球或冰球送入的区域或动作，以及为此得到的分数。
+    ja_compare:
+    - 目標
+    - ゴール
+    ja_definition: 人が達成しようとする何かのこと、またはスポーツにおいて、ボールやパックを送り込む区域やその行為、そしてそれによって得られる得点も指す。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    syllables: 1
+    era: middle english
+  protect:
+    word: protect
+    letter: p
+    length: 7
+    is_headword: 1
+    pronunciation: /prəˈtɛkt/
+    ipa: /prəˈtɛkt/
+    definition: To keep someone or something safe from harm, danger, or damage.
+    usage_note: null
+    pos: verb
+    pos_primary: verb
+    synonyms: null
+    forms:
+    - word: protected
+      pronunciation: /prəˈtɛktɪd/
+      labels:
+      - past
+      synonyms:
+      - saved
+      label_meanings:
+      - past tense and past participle
+    - word: protecting
+      pronunciation: /prəˈtɛktɪŋ/
+      labels:
+      - pres. part.
+      synonyms: []
+      label_meanings:
+      - present participle
+    - word: protects
+      pronunciation: /prəˈtɛkts/
+      labels:
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - perfect
+    - respect
+    - effect
+    - expect
+    - direct
+    - correct
+    - affect
+    - checked
+    - suspect
+    - select
+    - reflect
+    - connect
+    - collect
+    - architect
+    - detect
+    - elect
+    - reject
+    - indirect
+    - incorrect
+    - neglect
+    - insect
+    - disrespect
+    - inspect
+    - wrecked
+    - dialect
+    - sect
+    - erect
+    - intellect
+    - disconnect
+    - inject
+    slant_rhymes:
+    - except
+    - accept
+    - sept
+    - stepped
+    - swept
+    - intercept
+    - adept
+    - inept
+    - prepped
+    - precept
+    - windswept
+    - repped
+    - unkept
+    - etanercept
+    - upswept
+    - unswept
+    - incept
+    - backswept
+    - crowstepped
+    - discept
+    homophones: []
+    domain: general
+    etymology: From Latin protectus, past participle of protegere, from pro- 'in front of' plus tegere 'to cover'.
+    examples:
+    - Hob Garrick wrapped the hives in sacking to protect them from the first hard frost.
+    - The Reverend Ezra Flood built a stone wall to protect the church garden from the Grain's wind.
+    related:
+    - protection
+    - protector
+    - protective
+    antonyms:
+    - endanger
+    - harm
+    hyphenation: pro·tect
+    frequency_rank: 5
+    first_use: 15th century
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - protéger
+    fr_definition: Préserver quelqu'un ou quelque chose du mal, du danger ou des dommages.
+    es_compare:
+    - proteger
+    es_definition: Mantener a alguien o algo a salvo del mal, el peligro o el daño.
+    de_compare:
+    - schützen
+    de_definition: Jemanden oder etwas vor Schaden, Gefahr oder Beschädigung bewahren.
+    zh_compare:
+    - 保护
+    zh_definition: 使某人或某物免受伤害、危险或损害。
+    ja_compare:
+    - 守る
+    - 保護する
+    ja_definition: 人や物を害や危険、損傷から安全に保つこと。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    syllables: 2
+    era: 15th century
+  sits:
+    word: sit
+    letter: s
+    length: 3
+    is_headword: 1
+    pronunciation: /sɪt/
+    ipa: /sɪt/
+    definition: 'To rest with the body''s weight on the buttocks rather than standing, or to move into that position.
+      Loosely, it can mean to occupy a place, hold a session, or simply remain: a house may sit empty, a jury may
+      sit for weeks.'
+    usage_note: null
+    pos: verb; noun
+    pos_primary: verb
+    synonyms:
+    - seat
+    - ride
+    - model
+    - pose
+    - posture
+    forms:
+    - word: sat
+      pronunciation: /sæt/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: sate
+      pronunciation: /seɪt/
+      labels:
+      - past
+      synonyms:
+      - satiate
+      - replete
+      - fill
+      label_meanings:
+      - past tense and past participle
+    - word: sits
+      pronunciation: /sɪts/
+      labels:
+      - pl.
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - plural
+      - third-person singular present
+    - word: sitten
+      pronunciation: /ˈsɪtən/
+      labels:
+      - past
+      - pl.
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+      - plural
+    - word: sitting
+      pronunciation: /ˈsɪtɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - posing
+      - seance
+      - session
+      - seated
+      label_meanings:
+      - present participle
+    - word: sot
+      pronunciation: /sɑt/
+      labels:
+      - past
+      synonyms:
+      - drunkard
+      - drunk
+      - rummy
+      - inebriate
+      - wino
+      label_meanings:
+      - past tense and past participle
+    form_of: situation
+    form_labels:
+    - abbr.
+    parents:
+    - headword: situation
+      pronunciation: /sɪt/
+      labels:
+      - abbr.
+      label_meanings:
+      - abbreviation
+    perfect_rhymes:
+    - it
+    - bit
+    - hit
+    - fit
+    - split
+    - admit
+    - quit
+    - kit
+    - commit
+    - submit
+    - pit
+    - outfit
+    - permit
+    - lit
+    - wit
+    - spit
+    - transmit
+    - knit
+    - cockpit
+    - brit
+    - unfit
+    - slit
+    - grit
+    - hypocrite
+    - counterfeit
+    - git
+    - mitt
+    - writ
+    - emit
+    - britt
+    slant_rhymes:
+    - relationship
+    - pick
+    - quick
+    - ship
+    - trip
+    - sick
+    - click
+    - leadership
+    - stick
+    - kick
+    - nick
+    - tip
+    - championship
+    - partnership
+    - trick
+    - membership
+    - hip
+    - thick
+    - ownership
+    - strip
+    homophones: []
+    domain: general
+    etymology: From Old English sittan, from Proto-Germanic sitjan, from Proto-Indo-European sed- 'sit'.
+    examples:
+    - The old men of Taffy Row on the Shore sit on a bench outside the pull shop all afternoon, watching the taffy.
+    - After the climb to Low Sun Pass, the guide called for a five-minute sit on the flat rocks before the descent.
+    related:
+    - situation
+    - chair
+    - session
+    - sedentary
+    antonyms:
+    - stand
+    hyphenation: sit
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - s'asseoir
+    - siéger
+    fr_definition: 'Se reposer avec le poids du corps sur les fesses plutôt que debout, ou se mettre dans cette
+      position. De façon plus large, cela peut signifier occuper un lieu, tenir une séance, ou simplement demeurer:
+      une maison peut rester vide, un jury peut siéger pendant des semaines.'
+    es_compare:
+    - sentarse
+    es_definition: 'Descansar con el peso del cuerpo sobre las nalgas en lugar de estar de pie, o moverse hacia
+      esa posición. De manera más amplia, puede significar ocupar un lugar, celebrar una sesión, o simplemente permanecer:
+      una casa puede quedar vacía, un jurado puede sesionar durante semanas.'
+    de_compare:
+    - sitzen
+    de_definition: 'Mit dem Körpergewicht auf dem Gesäß ruhen statt zu stehen, oder sich in diese Stellung begeben.
+      Weiter gefasst kann es bedeuten, einen Ort einzunehmen, eine Sitzung abzuhalten, oder schlicht zu verbleiben:
+      ein Haus kann leer stehen, eine Jury kann wochenlang tagen.'
+    zh_compare:
+    - 坐
+    zh_definition: 以臀部承重休息而非站立，或移动到这种姿势。更广泛地说，也可指占据某个位置、举行会议，或仅仅保持不动：一栋房子可能空置，一个陪审团可能连续开庭数周。
+    ja_compare:
+    - 座る
+    ja_definition: 立っているのではなく、体重をお尻にかけて休むこと、またはその姿勢を取ること。より広くは、ある場所を占めること、会議を開くこと、あるいは単にそのままであることも意味し、家が空いたまま、陪審員団が何週間も審理を続けるといった使い方をする。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    form_label_meanings:
+    - abbreviation
+    syllables: 1
+    era: old english
+  has:
+    word: have
+    letter: h
+    length: 4
+    is_headword: 1
+    pronunciation: /hæv/
+    ipa: /hæv/
+    definition: To possess, hold, or experience something, or to include it as a feature; to cause something to
+      be done; or, with "to," to be obliged; and serves as an auxiliary forming perfect tenses. As a noun, a have
+      is a wealthy or privileged person.
+    usage_note: null
+    pos: verb; noun
+    pos_primary: verb
+    synonyms:
+    - bear
+    - suffer
+    - sustain
+    - get
+    - let
+    - experience
+    - induce
+    forms:
+    - word: had
+      pronunciation: /hæd/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: haddest
+      pronunciation: /ˈhædɪst/
+      labels:
+      - arch. var.
+      synonyms: []
+      label_meanings:
+      - archaic variant spelling
+    - word: hadst
+      pronunciation: /hædst/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: hae
+      pronunciation: /heɪ/
+      labels:
+      - var.
+      synonyms: []
+      label_meanings:
+      - variant spelling
+    - word: haeing
+      pronunciation: /ˈheɪɪŋ/
+      labels:
+      - pres. part.
+      synonyms: []
+      label_meanings:
+      - present participle
+    - word: haes
+      pronunciation: /heɪz/
+      labels:
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+    - word: has
+      pronunciation: /hæz/
+      labels:
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+    - word: hast
+      pronunciation: /hæst/
+      labels:
+      - form
+      synonyms: []
+      label_meanings:
+      - 'related form: agent noun, singular of a plural headword, or other derivative'
+    - word: hath
+      pronunciation: /hæθ/
+      labels:
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+    - word: haves
+      pronunciation: /hævz/
+      labels:
+      - pl.
+      synonyms: []
+      label_meanings:
+      - plural
+    - word: having
+      pronunciation: /ˈhævɪŋ/
+      labels:
+      - pres. part.
+      synonyms: []
+      label_meanings:
+      - present participle
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - sav
+    - lav
+    - pav
+    - grav
+    - calve
+    - scav
+    slant_rhymes:
+    - whereas
+    - jazz
+    - badge
+    - hajj
+    - haj
+    - pizzazz
+    - caz
+    - razz
+    - pizazz
+    - razzmatazz
+    - doas
+    - cadge
+    - whenas
+    - radge
+    - rebadge
+    - bezazz
+    - fadge
+    - pazazz
+    - spaz
+    - half
+    homophones:
+    - halve
+    domain: general
+    etymology: From Old English habban 'to have', from Proto-Germanic *habjaną, probably from a Proto-Indo-European
+      root meaning 'to seize'.
+    examples:
+    - Cyrus did not have enough change for the tram on Park Avenue.
+    - Barnaby Lull counted himself among the haves and had never once carried his own luggage to the Terminal.
+    related:
+    - auxiliary
+    - perfect
+    - verb
+    antonyms:
+    - lack
+    hyphenation: have
+    frequency_rank: 7
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - avoir
+    fr_definition: Posséder, détenir ou éprouver quelque chose, ou l'inclure comme caractéristique ; faire faire
+      quelque chose ; ou, avec « to », être obligé ; sert aussi d'auxiliaire pour former les temps composés. Comme
+      nom, un have est une personne riche ou privilégiée.
+    es_compare:
+    - tener
+    es_definition: Poseer, tener o experimentar algo, o incluirlo como una característica; hacer que algo se haga;
+      o, con “to”, estar obligado; y sirve como auxiliar para formar los tiempos perfectos. Como sustantivo, un
+      have es una persona adinerada o privilegiada.
+    de_compare:
+    - haben
+    de_definition: Etwas besitzen, halten oder erleben, oder es als Merkmal beinhalten; etwas veranlassen oder machen
+      lassen; oder, mit „to“, verpflichtet sein; dient auch als Hilfsverb zur Bildung der Perfektformen. Als Substantiv
+      ist ein have eine wohlhabende oder privilegierte Person.
+    zh_compare:
+    - 有
+    - 拥有
+    zh_definition: 拥有、持有或经历某事物，或将其作为一种特征；使某事被完成；或与“to”连用，表示不得不；并用作助动词构成完成时态。作名词时，“have”指富裕或享有特权的人。
+    ja_compare:
+    - 持つ
+    - ある
+    ja_definition: 何かを所有する、保持する、経験する、またはそれを特徴として含むことを意味し、何かをさせる、してもらうことも意味する。「to」を伴うと、しなければならないという意味になり、完了時制を作る助動詞としても働く。名詞としては、裕福な人や恵まれた人を指す。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 7
+      name: Very common
+      examples: have, time, people
+    syllables: 1
+    era: old english
+  kept:
+    word: keep
+    letter: k
+    length: 4
+    is_headword: 1
+    pronunciation: /kip/
+    ipa: /kip/
+    definition: To hold onto, retain, or continue to have; to maintain in a given condition or place; to observe
+      or fulfil, as a promise or a rule; to look after or provide for. As a noun, the fortified tower at the heart
+      of a castle; the food and money needed to support someone.
+    usage_note: null
+    pos: verb; noun
+    pos_primary: verb
+    synonyms:
+    - hold
+    - donjon
+    - dungeon
+    - support
+    - livelihood
+    - living
+    - sustenance
+    - preserve
+    - restrain
+    - observe
+    forms:
+    - word: keeping
+      pronunciation: /ˈkipɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - retention
+      - holding
+      - guardianship
+      - safekeeping
+      label_meanings:
+      - present participle
+    - word: keeps
+      pronunciation: /kips/
+      labels:
+      - pl.
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - plural
+      - third-person singular present
+    - word: kept
+      pronunciation: /kɛpt/
+      labels:
+      - past
+      synonyms:
+      - unbroken
+      label_meanings:
+      - past tense and past participle
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - deep
+    - sleep
+    - cheap
+    - asleep
+    - sheep
+    - steep
+    - sweep
+    - leap
+    - creep
+    - jeep
+    - heap
+    - reap
+    - beep
+    - peep
+    - weep
+    - upkeep
+    - seep
+    - veep
+    - cheep
+    - barkeep
+    - oversleep
+    - tweep
+    - scrapheap
+    - neap
+    - geep
+    - neep
+    - gatekeep
+    - kreep
+    - microsleep
+    - antisleep
+    slant_rhymes:
+    - week
+    - street
+    - meet
+    - eat
+    - complete
+    - speak
+    - beat
+    - sweet
+    - heat
+    - seat
+    - treat
+    - unique
+    - weak
+    - meat
+    - seek
+    - peak
+    - defeat
+    - greek
+    - repeat
+    - technique
+    homophones: []
+    domain: general
+    etymology: From Old English cēpan 'to seize, keep, observe'.
+    examples:
+    - Odalys Brandt will keep the co-op's seed in the cold cellar until spring.
+    - The ruined keep above Lesser Wend still held a few stones and a very loud owl.
+    related:
+    - retain
+    antonyms:
+    - release
+    hyphenation: keep
+    frequency_rank: 6
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - garder
+    - donjon
+    fr_definition: Tenir, conserver, ou continuer à posséder quelque chose; maintenir dans un état ou un lieu donné;
+      observer ou tenir, comme une promesse ou une règle; s'occuper de ou subvenir aux besoins de quelqu'un. Comme
+      nom, la tour fortifiée au cœur d'un château; la nourriture et l'argent nécessaires pour subvenir aux besoins
+      de quelqu'un.
+    es_compare:
+    - guardar
+    - torreón
+    es_definition: Sostener, conservar, o seguir teniendo algo; mantener en un estado o lugar dado; observar o cumplir,
+      como una promesa o una regla; cuidar de o sustentar a alguien. Como sustantivo, la torre fortificada en el
+      corazón de un castillo; la comida y el dinero necesarios para sustentar a alguien.
+    de_compare:
+    - behalten
+    - Bergfried
+    de_definition: Etwas festhalten, bewahren, oder weiterhin besitzen; in einem gegebenen Zustand oder Ort erhalten;
+      ein Versprechen oder eine Regel einhalten; sich um jemanden kümmern oder ihn versorgen. Als Substantiv, der
+      befestigte Turm im Herzen einer Burg; das Essen und Geld, die nötig sind, um jemanden zu unterhalten.
+    zh_compare:
+    - 保留
+    - 城堡主楼
+    zh_definition: 抓住、保存或继续拥有某物；使其保持在某种状态或地点；遵守，如承诺或规则；照料或供养某人。作名词时指城堡核心的坚固塔楼；供养某人所需的食物和金钱。
+    ja_compare:
+    - 保つ
+    - 主塔
+    ja_definition: 何かをつかんでおく、保存する、または持ち続けること。ある状態や場所に維持すること。約束や規則を守ること。誰かの世話をする、あるいは扶養することも指す。名詞としては城の中心にある要塞化された塔、または誰かを養うのに必要な食料やお金を指す。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 6
+      name: Common
+      examples: house, water, happy
+    syllables: 1
+    era: old english
+  stands:
+    word: stand
+    letter: s
+    length: 5
+    is_headword: 1
+    pronunciation: /stænd/
+    ipa: /stænd/
+    definition: To support oneself upright on the feet, or to remain in place without moving; as a noun, a position
+      taken, a piece of furniture that holds things upright, or a spot where something is sold or performed. Taking
+      a stand means holding firm on a matter despite opposition.
+    usage_note: null
+    pos: verb; noun
+    pos_primary: verb
+    synonyms:
+    - bandstand
+    - base
+    - pedestal
+    - rack
+    - stall
+    - viewpoint
+    - standpoint
+    - standstill
+    - digest
+    - endure
+    forms:
+    - word: standing
+      pronunciation: /ˈstændɪŋ/
+      labels:
+      - pres. part.
+      synonyms: []
+      label_meanings:
+      - present participle
+    - word: stands
+      pronunciation: /stændz/
+      labels:
+      - pl.
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - plural
+      - third-person singular present
+    - word: stood
+      pronunciation: /stʊd/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - and
+    - hand
+    - understand
+    - land
+    - band
+    - grand
+    - demand
+    - brand
+    - command
+    - planned
+    - sand
+    - banned
+    - expand
+    - homeland
+    - mainland
+    - inland
+    - rand
+    - strand
+    - withstand
+    - woodland
+    - beforehand
+    - canned
+    - scanned
+    - wonderland
+    - bland
+    - manned
+    - midland
+    - gland
+    - farmland
+    - unmanned
+    slant_rhymes:
+    - damned
+    - programmed
+    - slammed
+    - hanged
+    - banged
+    - jammed
+    - rammed
+    - reprogrammed
+    - fanged
+    - hammed
+    - tanged
+    - gamb
+    - enjambed
+    - pranged
+    - telegrammed
+    - unhanged
+    - goddamned
+    - thank
+    - bank
+    - plant
+    homophones:
+    - stanned
+    domain: general
+    etymology: From Old English standan, from Proto-Germanic standaną, meaning to stand.
+    examples:
+    - In the nor'easter nobody could stand on the Long Pier without gripping the rail.
+    - A cider stand opened at the Fairgrounds gate, and by noon the barrels were empty.
+    related:
+    - position
+    - booth
+    - rise
+    antonyms:
+    - sit
+    hyphenation: stand
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - se tenir debout
+    - stand
+    fr_definition: Se soutenir droit sur les pieds, ou rester en place sans bouger ; comme nom, une position adoptée,
+      un meuble qui maintient des objets debout, ou un endroit où l'on vend ou se produit quelque chose. Prendre
+      position signifie tenir bon sur une question malgré l'opposition.
+    es_compare:
+    - estar de pie
+    - puesto
+    es_definition: Sostenerse erguido sobre los pies, o permanecer en un lugar sin moverse; como sustantivo, una
+      postura adoptada, un mueble que sostiene objetos en pie, o un lugar donde se vende o se actúa algo. Tomar
+      una postura significa mantenerse firme en un asunto pese a la oposición.
+    de_compare:
+    - stehen
+    - Stand
+    de_definition: Sich aufrecht auf den Füßen halten, oder unbeweglich an einem Ort bleiben; als Substantiv, eine
+      eingenommene Haltung, ein Möbelstück, das Dinge aufrecht hält, oder ein Ort, an dem etwas verkauft oder aufgeführt
+      wird. Eine Haltung einzunehmen bedeutet, trotz Widerstand an einer Sache festzuhalten.
+    zh_compare:
+    - 站立
+    - 摊位
+    zh_definition: 用双脚直立支撑身体，或原地不动；作名词时，指所持的立场、支撑物品直立的家具，或出售或表演某物的地点。坚持立场指在遭到反对时仍坚守某事。
+    ja_compare:
+    - 立つ
+    - 屋台
+    ja_definition: 両足でまっすぐに体を支えること、または動かずにその場にとどまること。名詞としては、取った立場、物を立てて支える家具、あるいは物を売ったり演じたりする場所を指す。立場を貫くとは、反対にあっても物事を堅持することを意味する。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    syllables: 1
+    era: old english
+  says:
+    word: say
+    letter: s
+    length: 3
+    is_headword: 1
+    pronunciation: /seɪ/
+    ipa: /seɪ/
+    definition: To speak words aloud; to state or assert; of a text, sign, or instrument, to convey information.
+      As a noun, the right or chance to influence a decision; as an adverb, approximately or for example.
+    usage_note: null
+    pos: verb; noun; adverb; interjection
+    pos_primary: verb
+    synonyms:
+    - order
+    - tell
+    - enjoin
+    - suppose
+    - pronounce
+    - articulate
+    - enounce
+    - enunciate
+    - state
+    - allege
+    forms:
+    - word: said
+      pronunciation: /sɛd/
+      labels:
+      - past
+      synonyms:
+      - aforesaid
+      - aforementioned
+      label_meanings:
+      - past tense and past participle
+    - word: saith
+      pronunciation: /sɛθ/
+      labels:
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+    - word: sayest
+      pronunciation: /ˈseɪɪst/
+      labels:
+      - form
+      synonyms: []
+      label_meanings:
+      - 'related form: agent noun, singular of a plural headword, or other derivative'
+    - word: saying
+      pronunciation: /ˈseɪɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - expression
+      - locution
+      label_meanings:
+      - present participle
+    - word: says
+      pronunciation: /sɛz/
+      labels:
+      - 3rd sing.
+      - pl.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+      - plural
+    - word: sayst
+      pronunciation: /seɪst/
+      labels:
+      - var.
+      synonyms: []
+      label_meanings:
+      - variant spelling
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - a
+    - they
+    - way
+    - may
+    - day
+    - away
+    - play
+    - today
+    - pay
+    - stay
+    - hey
+    - okay
+    - anyway
+    - yesterday
+    - gay
+    - birthday
+    - bay
+    - ray
+    - survey
+    - holiday
+    - lay
+    - display
+    - highway
+    - grey
+    - everyday
+    - railway
+    - gray
+    - delay
+    - pray
+    - jay
+    slant_rhymes:
+    - make
+    - made
+    - take
+    - great
+    - same
+    - state
+    - game
+    - place
+    - days
+    - name
+    - case
+    - change
+    - based
+    - came
+    - face
+    - wait
+    - late
+    - age
+    - main
+    - space
+    homophones:
+    - sae
+    - sei
+    domain: language
+    etymology: From Old English secgan 'to say'.
+    examples:
+    - Ines Corvo would say little about the boots, but the customers kept coming back.
+    - Every tenant of Ring D had a say in where the new water tank went.
+    related:
+    - speak
+    antonyms: []
+    hyphenation: say
+    frequency_rank: 6
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - dire
+    fr_definition: Prononcer des mots à voix haute; affirmer ou déclarer; d'un texte, d'un signe ou d'un instrument,
+      transmettre une information. Comme nom, le droit ou la possibilité d'influencer une décision; comme adverbe,
+      environ ou par exemple.
+    es_compare:
+    - decir
+    es_definition: Pronunciar palabras en voz alta; afirmar o declarar; de un texto, señal o instrumento, transmitir
+      información. Como sustantivo, el derecho o la oportunidad de influir en una decisión; como adverbio, aproximadamente
+      o por ejemplo.
+    de_compare:
+    - sagen
+    de_definition: Worte laut aussprechen; behaupten oder erklären; von einem Text, Schild oder Instrument, Information
+      vermitteln. Als Substantiv, das Recht oder die Gelegenheit, eine Entscheidung zu beeinflussen; als Adverb,
+      ungefähr oder zum Beispiel.
+    zh_compare:
+    - 说
+    zh_definition: 大声说出话语；陈述或声明；就文本、标志或仪器而言，传达信息。作名词时指影响决定的权利或机会；作副词时表示大约或例如。
+    ja_compare:
+    - 言う
+    ja_definition: 言葉を声に出すこと。主張または宣言すること。文章や標識、計器が情報を伝えることも指す。名詞としては決定に影響を与える権利や機会を指し、副詞としてはおよそ、例えばという意味になる。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 6
+      name: Common
+      examples: house, water, happy
+    syllables: 1
+    era: old english
+  holds:
+    word: hold
+    letter: h
+    length: 4
+    is_headword: 1
+    pronunciation: /hoʊld/
+    ipa: /hoʊld/
+    definition: To grasp, contain, or keep possession of something, from a hand holding a cup to a shelf holding
+      books. As a noun it can be a grip, a place where animals or prisoners are kept, or a ship's cargo space below
+      deck.
+    usage_note: null
+    pos: verb; noun
+    pos_primary: verb
+    synonyms:
+    - clasp
+    - clench
+    - clutch
+    - clutches
+    - grasp
+    - grip
+    - handgrip
+    - keep
+    forms:
+    - word: held
+      pronunciation: /hɛld/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: holden
+      pronunciation: /ˈhoʊldən/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: holding
+      pronunciation: /ˈhoʊldɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - retention
+      - keeping
+      - property
+      - belongings
+      label_meanings:
+      - present participle
+    - word: holds
+      pronunciation: /hoʊldz/
+      labels:
+      - pl.
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - plural
+      - third-person singular present
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - old
+    - gold
+    - cold
+    - sold
+    - controlled
+    - household
+    - bold
+    - rolled
+    - fold
+    - mold
+    - behold
+    - uphold
+    - mould
+    - unfold
+    - stronghold
+    - manifold
+    - untold
+    - withhold
+    - bowled
+    - polled
+    - uncontrolled
+    - foothold
+    - freehold
+    - patrolled
+    - unsold
+    - ahold
+    - foretold
+    - twofold
+    - scrolled
+    - scold
+    slant_rhymes:
+    - bolt
+    - revolt
+    - holt
+    - colt
+    - volt
+    - thunderbolt
+    - jolt
+    - dolt
+    - moult
+    - deadbolt
+    - unbolt
+    - smolt
+    - kilovolt
+    - polt
+    - poult
+    - megavolt
+    - archivolt
+    - demivolt
+    - eyebolt
+    - fishbolt
+    homophones:
+    - holed
+    domain: general
+    etymology: From Old English healdan, from Proto-Germanic haldana.
+    examples:
+    - Elevator Nine in the Grain can hold forty thousand bushels of wheat.
+    - Captain Rhoswen Tull stowed the spare nets in the hold of the Patient Margin and sat on the hatch cover.
+    related:
+    - cargo
+    antonyms:
+    - release
+    hyphenation: hold
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - tenir
+    - cale
+    fr_definition: Saisir, contenir ou garder possession de quelque chose, d'une main tenant une tasse à une étagère
+      tenant des livres. Comme nom, cela peut être une prise, un lieu où des animaux ou des prisonniers sont gardés,
+      ou l'espace de cargaison d'un navire sous le pont.
+    es_compare:
+    - sostener
+    - bodega
+    es_definition: Agarrar, contener o mantener posesión de algo, desde una mano que sostiene una taza hasta un
+      estante que sostiene libros. Como sustantivo puede ser un agarre, un lugar donde se guardan animales o prisioneros,
+      o el espacio de carga de un barco bajo cubierta.
+    de_compare:
+    - halten
+    - Laderaum
+    de_definition: Etwas ergreifen, enthalten oder in Besitz behalten, von einer Hand, die eine Tasse hält, bis
+      zu einem Regal, das Bücher trägt. Als Substantiv kann es einen Griff, einen Ort, an dem Tiere oder Gefangene
+      gehalten werden, oder den Laderaum eines Schiffs unter Deck bezeichnen.
+    zh_compare:
+    - 拿住
+    - 船舱
+    zh_definition: 抓住、容纳或保有某物，从手拿杯子到架子放书皆可。作名词时可指握力、关押动物或囚犯的地方，或船只甲板下的货舱。
+    ja_compare:
+    - 持つ
+    - 船倉
+    ja_definition: 何かをつかみ、包含し、あるいは所持し続けること。カップを持つ手から本を支える棚まで幅広く使う。名詞としては握り、動物や囚人を留め置く場所、または甲板下の船の貨物室を指す。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    syllables: 1
+    era: old english
+  feeds:
+    word: feed
+    letter: f
+    length: 4
+    is_headword: 1
+    pronunciation: /fid/
+    ipa: /fid/
+    definition: To give food to someone or an animal, or to eat; as a noun, food given to non-human animals, or
+      any material supplied continuously into a system.
+    usage_note: null
+    pos: verb; noun
+    pos_primary: verb
+    synonyms:
+    - provender
+    - fertilize
+    - give
+    - eat
+    - feast
+    - prey
+    - run
+    - flow
+    - course
+    forms:
+    - word: feeding
+      pronunciation: /ˈfidɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - eating
+      - alimentation
+      label_meanings:
+      - present participle
+    - word: feeds
+      pronunciation: /fidz/
+      labels:
+      - pl.
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - plural
+      - third-person singular present
+    form_of: fee
+    form_labels:
+    - past
+    parents:
+    - headword: fee
+      pronunciation: /fid/
+      labels:
+      - past
+      label_meanings:
+      - past tense and past participle
+    perfect_rhymes:
+    - need
+    - read
+    - speed
+    - agreed
+    - indeed
+    - seed
+    - guaranteed
+    - succeed
+    - weed
+    - lied
+    - proceed
+    - breed
+    - reed
+    - exceed
+    - deed
+    - greed
+    - bleed
+    - creed
+    - plead
+    - concede
+    - heed
+    - bead
+    - mead
+    - tweed
+    - mislead
+    - seaweed
+    - impede
+    - stampede
+    - peed
+    - swede
+    slant_rhymes:
+    - league
+    - fatigue
+    - intrigue
+    - glebe
+    - dweeb
+    - weeb
+    - grebe
+    - caribe
+    - interleague
+    - plebe
+    - gigue
+    - nonleague
+    - ephebe
+    - garigue
+    - outintrigue
+    - overfatigue
+    - peag
+    - squeteague
+    - hebe
+    - keep
+    homophones: []
+    domain: food
+    etymology: From Middle English feden, from Old English fedan, from Proto-Germanic fodijan.
+    examples:
+    - On the Slope, the camp cook Old Enough would feed any stranger who came to the fire, guests first.
+    - The co-op sold bags of chicken feed from the loading dock at Elevator Nine in the Grain.
+    related:
+    - fee
+    - food
+    - fodder
+    - nourish
+    antonyms: []
+    hyphenation: feed
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - nourrir
+    - alimenter
+    fr_definition: Donner de la nourriture à quelqu'un ou à un animal, ou manger ; comme nom, la nourriture donnée
+      aux animaux non humains, ou toute matière fournie en continu dans un système.
+    es_compare:
+    - alimentar
+    es_definition: Dar comida a alguien o a un animal, o comer; como sustantivo, el alimento dado a animales no
+      humanos, o cualquier material suministrado continuamente a un sistema.
+    de_compare:
+    - füttern
+    - ernähren
+    de_definition: Jemandem oder einem Tier Nahrung geben, oder essen; als Substantiv, das Futter für Tiere, oder
+      jedes Material, das kontinuierlich in ein System eingespeist wird.
+    zh_compare:
+    - 喂养
+    - 饲料
+    zh_definition: 给某人或某动物喂食，或指进食；作为名词，指给非人类动物的食物，或持续供给系统的任何材料。
+    ja_compare:
+    - 餌を与える
+    - 飼料
+    ja_definition: 人や動物に食べ物を与えること、または食べることを指す。名詞としては、動物に与える餌、あるいはシステムに継続的に供給される材料一般を意味する。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    form_label_meanings:
+    - past tense and past participle
+    syllables: 1
+    era: old english
+  follows:
+    word: follow
+    letter: f
+    length: 6
+    is_headword: 1
+    pronunciation: /ˈfɑloʊ/
+    ipa: /ˈfɑloʊ/
+    definition: To go or come after a person or thing; to pursue; to happen or come next in sequence; to obey or
+      act in accordance with; to understand the sense of, as in following an argument.
+    usage_note: null
+    pos: verb; noun
+    pos_primary: verb
+    synonyms:
+    - trace
+    - accompany
+    - pursue
+    - surveil
+    - survey
+    - adopt
+    - espouse
+    - succeed
+    - watch
+    - observe
+    forms:
+    - word: followed
+      pronunciation: /ˈfɑloʊd/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: following
+      pronunciation: /ˈfɑloʊɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - pursuit
+      - chase
+      - followers
+      - next
+      label_meanings:
+      - present participle
+    - word: follows
+      pronunciation: /ˈfɑloʊz/
+      labels:
+      - 3rd sing.
+      - pl.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+      - plural
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - hollow
+    - swallow
+    - apollo
+    - wallow
+    - unfollow
+    - mahalo
+    - calo
+    - giallo
+    - robalo
+    slant_rhymes:
+    - borrow
+    - sorrow
+    - morrow
+    - claro
+    - maro
+    - saguaro
+    - farro
+    - charro
+    - overborrow
+    - zingaro
+    - methaqualone
+    - retablo
+    - boldo
+    - hallot
+    - halloth
+    - tolloaf
+    - colorado
+    - combo
+    - morocco
+    - bravo
+    homophones: []
+    domain: general
+    etymology: From Old English folgian, of Germanic origin.
+    examples:
+    - The geese follow Hob Garrick down Cottage Row in a loud line.
+    - Monte's post about the morning numbers earned exactly one new follow, and it came from the Caribbean Desk.
+    related:
+    - trail
+    - obey
+    antonyms:
+    - lead
+    hyphenation: fol·low
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - suivre
+    fr_definition: Aller ou venir après une personne ou une chose ; poursuivre ; se produire ou venir ensuite dans
+      une séquence ; obéir ou agir conformément à ; comprendre le sens de quelque chose, comme dans suivre un raisonnement.
+    es_compare:
+    - seguir
+    es_definition: Ir o venir detrás de una persona o cosa; perseguir; suceder o venir a continuación en una secuencia;
+      obedecer o actuar conforme a; comprender el sentido de algo, como en seguir un razonamiento.
+    de_compare:
+    - folgen
+    de_definition: Einer Person oder Sache nachgehen oder nachkommen; verfolgen; als Nächstes in einer Reihenfolge
+      geschehen; gehorchen oder sich danach richten; den Sinn von etwas verstehen, wie beim Folgen eines Arguments.
+    zh_compare:
+    - 跟随
+    - 遵循
+    zh_definition: 跟在某人或某物之后前行；追赶；在顺序中随之发生；服从或按照某事行事；理解某事的含义，如听懂一个论点。
+    ja_compare:
+    - 従う
+    - 追う
+    ja_definition: 人や物の後について行くこと。追跡すること。順序において次に起こること。従うこと、それに沿って行動すること。議論の内容を理解することも指す。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    syllables: 2
+    era: old english
+  those:
+    word: that
+    letter: t
+    length: 4
+    is_headword: 1
+    pronunciation: /ðæt/
+    ipa: /ðæt/
+    definition: Indicating a person or thing more distant, already mentioned, or understood from context, as determiner
+      or pronoun; also the conjunction introducing a subordinate clause, as in she said that she would come.
+    usage_note: null
+    pos: determiner; pronoun; conjunction
+    pos_primary: determiner
+    synonyms: null
+    forms:
+    - word: those
+      pronunciation: /ðoʊz/
+      labels:
+      - pl.
+      synonyms: []
+      label_meanings:
+      - plural
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - at
+    - cat
+    - flat
+    - sat
+    - chat
+    - hat
+    - format
+    - bat
+    - democrat
+    - pat
+    - rat
+    - habitat
+    - stat
+    - mat
+    - diplomat
+    - kat
+    - vat
+    - matte
+    - brat
+    - tat
+    - spat
+    - frat
+    - att
+    - caveat
+    - plat
+    - thermostat
+    - wildcat
+    - expat
+    - aristocrat
+    - copycat
+    slant_rhymes:
+    - back
+    - black
+    - attack
+    - track
+    - lack
+    - app
+    - jack
+    - map
+    - pack
+    - cap
+    - gap
+    - mac
+    - crack
+    - trap
+    - feedback
+    - tap
+    - snap
+    - wrap
+    - lap
+    - rap
+    homophones: []
+    domain: language
+    etymology: From Old English þæt, the neuter demonstrative and relative pronoun, from Proto-Germanic *þat.
+    examples:
+    - '"We will not reach that ridge by dusk," said Kesh Who-Counts, looking across Under-Snow Lake.'
+    - '"That is the barley that failed," said Juno Pike, pointing at the empty bin.'
+    related:
+    - which
+    - determiner
+    - conjunction
+    - who
+    antonyms:
+    - this
+    hyphenation: that
+    frequency_rank: 7
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - ce
+    - cela
+    - que
+    fr_definition: Désigne une personne ou une chose plus éloignée, déjà mentionnée ou comprise du contexte, en
+      tant que déterminant ou pronom ; c'est aussi la conjonction qui introduit une proposition subordonnée, comme
+      dans elle a dit qu'elle viendrait.
+    es_compare:
+    - ese
+    - aquel
+    - que
+    es_definition: Señala a una persona o cosa más distante, ya mencionada o entendida por el contexto, como determinante
+      o pronombre; también es la conjunción que introduce una oración subordinada, como en dijo que vendría.
+    de_compare:
+    - jener
+    - das
+    - dass
+    de_definition: Bezeichnet eine Person oder Sache, die weiter entfernt, bereits erwähnt oder aus dem Kontext
+      bekannt ist, als Determinativ oder Pronomen; auch die Konjunktion, die einen Nebensatz einleitet, wie in sie
+      sagte, dass sie kommen würde.
+    zh_compare:
+    - 那个
+    - 那
+    zh_definition: 指较远的、已经提到的或可从上下文理解的人或事物，用作限定词或代词；也是引导从句的连词，如“她说她会来”。
+    ja_compare:
+    - あの
+    - その
+    - と
+    ja_definition: より遠くにある、すでに述べられた、または文脈から理解される人や物を指す限定詞または代名詞。また、従属節を導く接続詞でもあり、「彼女は来ると言った」のように使う。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 7
+      name: Very common
+      examples: have, time, people
+    syllables: 1
+    era: old english
+  asks:
+    word: ask
+    letter: a
+    length: 3
+    is_headword: 1
+    pronunciation: /æsk/
+    ipa: /æsk/
+    definition: To put a question to someone, or to request something from them. It can also mean to require or
+      expect something, as a task or situation does.
+    usage_note: null
+    pos: verb
+    pos_primary: verb
+    synonyms:
+    - require
+    - expect
+    - inquire
+    - enquire
+    - necessitate
+    - postulate
+    - need
+    - take
+    - involve
+    - demand
+    forms:
+    - word: asked
+      pronunciation: /æskt/
+      labels:
+      - past
+      synonyms: []
+      label_meanings:
+      - past tense and past participle
+    - word: asking
+      pronunciation: /ˈæskɪŋ/
+      labels:
+      - pres. part.
+      synonyms:
+      - request
+      label_meanings:
+      - present participle
+    - word: asks
+      pronunciation: /æsks/
+      labels:
+      - 3rd sing.
+      synonyms: []
+      label_meanings:
+      - third-person singular present
+    - word: axe
+      pronunciation: /æks/
+      labels:
+      - arch. var.
+      synonyms: []
+      label_meanings:
+      - archaic variant spelling
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - task
+    - mask
+    - flask
+    - basque
+    - cask
+    - bask
+    - masque
+    - multitask
+    - unmask
+    - facemask
+    - casque
+    - subtask
+    - dask
+    - antimask
+    - dnsmasq
+    - outask
+    - outtask
+    - overtask
+    - umask
+    slant_rhymes:
+    - last
+    - past
+    - fast
+    - passed
+    - cast
+    - aircraft
+    - draft
+    - attached
+    - vast
+    - broadcast
+    - blast
+    - craft
+    - forecast
+    - grasp
+    - shaft
+    - smashed
+    - detached
+    - spacecraft
+    - caste
+    - harassed
+    homophones: []
+    domain: general
+    etymology: From Middle English asken, from Old English ascian, from a Germanic root meaning 'to wish, request'.
+    examples:
+    - Beatrix will ask the ticket clerk at the Terminal which coach goes to the Grain.
+    - The spring stair race in the Building asks more of a runner's knees than of the lungs.
+    related:
+    - request
+    antonyms: []
+    hyphenation: ask
+    frequency_rank: 5
+    first_use: Old English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - demander
+    fr_definition: Poser une question à quelqu'un, ou lui demander quelque chose. Le verbe peut aussi signifier
+      exiger ou attendre quelque chose, comme le fait une tâche ou une situation.
+    es_compare:
+    - preguntar
+    - pedir
+    es_definition: Formular una pregunta a alguien, o pedirle algo. También puede significar requerir o esperar
+      algo, como lo hace una tarea o una situación.
+    de_compare:
+    - fragen
+    - bitten
+    de_definition: Jemandem eine Frage stellen, oder ihn um etwas bitten. Es kann auch bedeuten, etwas zu erfordern
+      oder zu erwarten, wie es eine Aufgabe oder eine Situation tut.
+    zh_compare:
+    - 问
+    - 请求
+    zh_definition: 向某人提出问题，或向其请求某物。也可指需要或期望某事物，如某项任务或某种情况所要求的那样。
+    ja_compare:
+    - 尋ねる
+    - 頼む
+    ja_definition: 誰かに質問すること、またはその人に何かを頼むこと。また、仕事や状況がそうするように、何かを必要とする、または期待することも意味する。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 5
+      name: Familiar
+      examples: window, borrow, gentle
+    syllables: 1
+    era: old english
+  assumed:
+    word: assumed
+    letter: a
+    length: 7
+    is_headword: 1
+    pronunciation: /əˈsumd/
+    ipa: /əˈsumd/
+    definition: Adopted, especially a name or identity, in order to deceive or conceal; also, more broadly, supposed
+      to be true without being checked.
+    usage_note: null
+    pos: verb; adjective
+    pos_primary: verb
+    synonyms:
+    - 'false'
+    - fictitious
+    - fictive
+    - pretended
+    - sham
+    forms: null
+    form_of: assume
+    form_labels:
+    - past
+    parents:
+    - headword: assume
+      pronunciation: /əˈsumd/
+      labels:
+      - past
+      label_meanings:
+      - past tense and past participle
+    perfect_rhymes:
+    - consumed
+    - doomed
+    - presumed
+    - groomed
+    - costumed
+    - perfumed
+    - fumed
+    - bedroomed
+    - plumed
+    - unconsumed
+    - broomed
+    - enwombed
+    - resumed
+    - zoomed
+    - loomed
+    - boomed
+    - exhumed
+    - bloomed
+    - subsumed
+    - entombed
+    - roomed
+    - reassumed
+    - begloomed
+    - coassumed
+    - deplumed
+    - displumed
+    - flumed
+    - foredoomed
+    - gloomed
+    - illumed
+    slant_rhymes:
+    - wound
+    - tuned
+    - attuned
+    - festooned
+    - cocooned
+    - mooned
+    - untuned
+    - gadrooned
+    - mistuned
+    - unattuned
+    - unpruned
+    - oont
+    - you
+    - who
+    - new
+    - two
+    - too
+    - through
+    - few
+    - food
+    homophones: []
+    domain: general
+    etymology: Formed from assume plus the suffix -ed.
+    examples:
+    - Everyone assumed the Cafeteria was open at the sixth hour, so nobody packed a lunch.
+    - A thief on the Concourse gave an assumed name at the pawnshop, and Warden Pell saw through it.
+    related:
+    - assume
+    - alias
+    antonyms:
+    - genuine
+    hyphenation: as·sumed
+    frequency_rank: 4
+    first_use: 16th century
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - d'emprunt
+    - présumé
+    fr_definition: Adopté, en particulier un nom ou une identité, afin de tromper ou de dissimuler ; aussi, plus
+      largement, supposé vrai sans avoir été vérifié.
+    es_compare:
+    - supuesto
+    - fingido
+    es_definition: Adoptado, en especial un nombre o identidad, para engañar u ocultar; también, más ampliamente,
+      supuesto como verdadero sin haberlo comprobado.
+    de_compare:
+    - angenommen
+    de_definition: Angenommen, insbesondere ein Name oder eine Identität, um zu täuschen oder zu verbergen; auch,
+      allgemeiner, als wahr vorausgesetzt, ohne überprüft worden zu sein.
+    zh_compare:
+    - 假冒的
+    - 假定的
+    zh_definition: 为欺骗或掩饰而采用的，尤指姓名或身份；也泛指未经核实就被当作真实的。
+    ja_compare:
+    - 偽の
+    - 想定された
+    ja_definition: 欺いたり隠したりするために採用された、特に名前や身分について言う。また、確認されないまま真実だと考えられていることも指す。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 4
+      name: Occasional
+      examples: lantern, tidy, frugal
+    form_label_meanings:
+    - past tense and past participle
+    syllables: 2
+    era: 16th century

@@ -1,8 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" id="comp-add-module" viewBox="0 0 72 72">
-  <rect x="10" y="14" width="38" height="30" rx="3" ry="3" fill="none" stroke="#000" stroke-width="3" />
-  <line x1="18" y1="24" x2="40" y2="24" stroke="#000" stroke-width="3" stroke-linecap="round" />
-  <line x1="18" y1="34" x2="33" y2="34" stroke="#000" stroke-width="3" stroke-linecap="round" />
-  <line x1="48" y1="41" x2="48" y2="61" stroke="#000" stroke-width="4" stroke-linecap="round" />
-  <line x1="38" y1="51" x2="58" y2="51" stroke="#000" stroke-width="4" stroke-linecap="round" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #005698;
+      }
+
+      .cls-2 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-3 {
+        opacity: .3;
+      }
+
+      .cls-3, .cls-4, .cls-5 {
+        fill: #fff;
+      }
+
+      .cls-4 {
+        opacity: .7;
+      }
+
+      .cls-6 {
+        fill: #4b3aa8;
+      }
+
+      .cls-7 {
+        fill: #27d2ff;
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="14.83" y1="19.83" x2="57.05" y2="62.05" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" />
+      <stop offset="0" stop-color="#fff" stop-opacity=".99" />
+      <stop offset=".23" stop-color="#fff" stop-opacity=".69" />
+      <stop offset=".43" stop-color="#fff" stop-opacity=".45" />
+      <stop offset=".62" stop-color="#fff" stop-opacity=".25" />
+      <stop offset=".78" stop-color="#fff" stop-opacity=".12" />
+      <stop offset=".91" stop-color="#fff" stop-opacity=".03" />
+      <stop offset="1" stop-color="#fff" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <g id="c-white">
+    <rect class="cls-2" x="12.31" y="22.36" width="47.27" height="37.16" />
+  </g>
+  <g id="comp-add-module">
+    <circle class="cls-1" cx="49.49" cy="49.44" r="10.17" />
+    <path class="cls-7" d="M59.16,49.8c0-2.78-.99-5.16-2.98-7.15-1.99-1.99-4.37-2.98-7.15-2.98s-5.16.99-7.15,2.98c-.96.97-1.69,2.03-2.19,3.18-.26.93-.41,1.91-.41,2.92,0,5.98,4.85,10.82,10.82,10.82.89,0,1.75-.12,2.58-.32,1.27-.49,2.44-1.26,3.49-2.31,1.99-1.99,2.98-4.37,2.98-7.15ZM55.78,51.49h-5.06v5.06h-3.38v-5.06h-5.06v-3.38h5.06v-5.06h3.38v5.06h5.06v3.38Z" />
+    <path d="M32.57,62.89H8.94V8.89h54v23.62h-3.38v-10.12H12.32v37.12h20.25v3.38ZM12.32,19.01h47.25v-6.75H12.32v6.75ZM15.69,13.95h3.38v3.38h-3.38v-3.38ZM22.44,13.95h3.38v3.38h-3.38v-3.38ZM29.19,13.95h3.38v3.38h-3.38v-3.38ZM49.44,35.89c1.86,0,3.61.35,5.25,1.05,1.63.7,3.07,1.67,4.3,2.9,1.23,1.23,2.2,2.66,2.9,4.3.7,1.63,1.05,3.38,1.05,5.25s-.35,3.61-1.05,5.25c-.7,1.63-1.67,3.07-2.9,4.3-1.23,1.23-2.66,2.2-4.3,2.9-1.63.7-3.38,1.05-5.25,1.05s-3.61-.35-5.25-1.05c-1.63-.7-3.07-1.67-4.3-2.9-1.23-1.23-2.2-2.66-2.9-4.3-.7-1.63-1.05-3.38-1.05-5.25s.35-3.61,1.05-5.25c.7-1.63,1.67-3.07,2.9-4.3,1.23-1.23,2.66-2.2,4.3-2.9,1.63-.7,3.38-1.05,5.25-1.05ZM49.44,59.51c2.78,0,5.16-.99,7.15-2.98,1.99-1.99,2.98-4.37,2.98-7.15s-.99-5.16-2.98-7.15c-1.99-1.99-4.37-2.98-7.15-2.98s-5.16.99-7.15,2.98c-1.99,1.99-2.98,4.37-2.98,7.15s.99,5.16,2.98,7.15c1.99,1.99,4.37,2.98,7.15,2.98ZM51.13,47.7h5.06v3.38h-5.06v5.06h-3.38v-5.06h-5.06v-3.38h5.06v-5.06h3.38v5.06Z" />
+    <polygon class="cls-5" points="56.19 47.7 51.13 47.7 51.13 42.64 47.76 42.64 47.76 47.7 42.69 47.7 42.69 51.08 47.76 51.08 47.76 56.14 51.13 56.14 51.13 51.08 56.19 51.08 56.19 47.7" />
+  </g>
+  <g id="c-bar">
+    <rect class="cls-6" x="12.28" y="12.24" width="47.41" height="6.75" />
+    <rect class="cls-5" x="15.68" y="13.92" width="3.38" height="3.38" />
+    <rect class="cls-4" x="22.43" y="13.92" width="3.38" height="3.38" />
+    <rect class="cls-3" x="29.18" y="13.92" width="3.38" height="3.38" />
+  </g>
 </svg>

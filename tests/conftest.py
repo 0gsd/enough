@@ -78,6 +78,8 @@ _STATE_SEAMS = {
     # DocOES (0.4.4): the built doc volumes. Every test that builds one lands
     # here; the real ~/enough/docoes/ is never touched by the suite.
     "ENOUGH_DOCS_ROOT": "docoes",
+    # Thym (0.5.0): runs (plans, traces, candidates, outputs). No test may land a run in ~/enough/thym/.
+    "ENOUGH_THYM_ROOT": "thym",
 }
 
 # Seams that must be *absent*, not redirected. Each of these changes
@@ -137,6 +139,15 @@ def isolated_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     """
     if _still_pristine("HOME"):
         monkeypatch.setenv("HOME", str(tmp_path / "home"))
+        # Three paths are bound to `Path.home()` when their modules import, which happens at collection, before
+        # this fixture moves `$HOME`: without these the broker's, the cloud slot's and the orchestrator's config
+        # files are the developer's real ones in every test that does not patch them itself (wave 2 of 0.5.0:
+        # `~/enough/config/broker.json` was found rewritten during a round of test runs).
+        from enough import broker as _broker, cloud as _cloud, server as _server
+        home = tmp_path / "home" / "enough" / "config"
+        monkeypatch.setattr(_broker, "CONFIG_PATH", home / "broker.json")
+        monkeypatch.setattr(_cloud, "CONFIG_PATH", home / "openrouter.json")
+        monkeypatch.setattr(_server, "ORCHESTRATOR_CONFIG", home / "orchestrator.json")
 
     state = tmp_path / "state"
     for var, rel in _STATE_SEAMS.items():

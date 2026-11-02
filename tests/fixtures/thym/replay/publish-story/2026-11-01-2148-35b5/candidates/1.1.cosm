@@ -1,0 +1,33 @@
+contract:
+  move: derive
+  schema:
+    format: text
+    says: the whole text's atem, as Canon's derivation asks for it
+  checks:
+  - span-resolves
+  - stance-closed
+  - terms-grounded
+  - coverage
+  - emf-checks
+  - provenance
+inputs:
+  messages: b4d03990fdbd3efc599d59623d214d3e2a8c4572cf2690f1bdf6efeab84d7596
+engine: model:Qwen3.8-27B-Q4_K_M.gguf
+attempts: 1
+tokens: 977
+seconds: 8
+output: 'line: Mara Okafor and the narrator defend the Hollins Lane orchard by challenging the council''s July mowing
+  plan that threatens pollinators.
+
+  focus: The text contrasts the orchard''s improved yield with the danger of early mowing, directing attention to
+  the need for pollinators.
+
+  push: The author wants the reader to support delaying the mowing until September to protect the orchard''s fruit
+  production.
+
+  pull: The text assumes the meadow strip is the sole source of pollinators and ignores the lease''s legal ambiguity
+  regarding mowing rights.
+
+  stance_profile: {axiom: 1, observed: 2, deduced: 1, opinion: 2, assumed: 1, hearsay: 1}
+
+  '

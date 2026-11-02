@@ -1,0 +1,68 @@
+contract:
+  move: 'null'
+  schema:
+    format: yaml
+    stamp: engine
+    says: 'a YAML mapping: sentences, a list in the order told, each {say: one sentence, cites: [the ids of the
+      items it says]}, with paragraph: true on a sentence that starts a new paragraph'
+  checks:
+  - coverage
+  - no-invention
+  - stance-kept
+  - null-pinned
+  - provenance
+inputs:
+  fabula: a495128951c90f70dd8dd1d6aeb28ad44e7747a014e1b9020d525b1d214b2438
+  outline: a192d3c495b41da8507c6998389aeb8cc889cc47eec2ed11e31470a615328728
+engine: model:Qwen3.8-27B-Q4_K_M.gguf
+attempts: 1
+tokens: 2431
+seconds: 24
+output:
+  sentences:
+  - say: Mara Okafor keeps the Hollins Lane orchard.
+    cites:
+    - E:person/mara-okafor
+    - E:place/hollins-lane-orchard
+  - say: Mara Okafor holds that the Bramley tree is oldest.
+    cites:
+    - P:claim/bramley-by-the-gate-is-the-oldest-tree
+  - say: Parish records do not state the planting date.
+    cites:
+    - P:claim/parish-records-do-not-state-planting-date
+  - say: Every apple tree needs a second variety.
+    cites:
+    - P:claim/apple-trees-need-a-second-variety-to-set-fruit
+  - say: The orchard produced 140 litres of juice.
+    cites:
+    - P:claim/orchard-juice-yield-increased-to-140-litres
+  - say: The author counted the juice bottles.
+    cites:
+    - T:event/juice-bottle-count
+  - say: Volunteers spread leaf mould under the trees.
+    cites:
+    - T:event/leaf-mould-spread-under-trees
+  - say: Mara Okafor holds that leaf mould caused the rise.
+    cites:
+    - P:claim/leaf-mould-caused-the-yield-rise
+  - say: The author holds that a warm spring caused it.
+    cites:
+    - P:claim/cause-of-yield-increase-is-debated
+  - say: The parish council wants to mow the meadow.
+    cites:
+    - T:event/planned-meadow-mowing
+    - E:org/parish-council
+  - say: The meadow strip feeds the orchard pollinators.
+    cites:
+    - E:place/meadow-strip
+  - say: It follows that July mowing threatens pollinators.
+    cites:
+    - P:claim/july-mowing-threatens-orchard-pollinators
+  - say: Mara Okafor will write a letter to the council.
+    cites:
+    - T:event/mara-to-write-letter-to-council
+  - say: It is assumed that the lease allows mowing.
+    cites:
+    - P:claim/uncertainty-over-parish-mowing-rights
+    paragraph: true
+  engine: model:Qwen3.8-27B-Q4_K_M.gguf

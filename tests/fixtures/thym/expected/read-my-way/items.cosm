@@ -1,0 +1,150 @@
+oes: thym/1
+kind: program
+id: thym/read-my-way
+name: read-my-way
+# The enumeration of programs/read-my-way.thym, written by hand for the conformance suite (docs/THYM.md 10, 17.3).
+# A context block declared in the file is a C:context item with a body and an order like any top-level block; an if
+# is one step whose branches hold the steps inside it, and else and end are structure, not steps.
+source: {path: read-my-way.thym, sha256: 5c0cce9cf1b2cfccdb18e8a531c7e68d2583d92c6496a20868f6b1fd963283de, size: 603}
+front: |+
+  thym 0
+
+built: {at: 2026-11-01T12:00:00Z, by: hand}
+nodes:
+  - id: C:context/on-the-train
+    type: context
+    name: on-the-train
+    summary: "Five minutes on a phone, standing."
+    why: "five minutes on a phone, standing."
+    medium: phone
+    hurry: true
+    words: 300
+    lines: "3-9"
+    order: 1
+    body: |+
+      context on-the-train
+        why: five minutes on a phone, standing.
+
+        medium "phone"
+        hurry true
+        words 300
+      end
+
+    provenance: {mode: derived, sources: ["read-my-way.thym#L3-L9"], confidence: 1}
+
+  - id: P:program/read-my-way
+    type: program
+    name: read-my-way
+    summary: "A package is read on the reader's terms: in a hurry, the short way in; otherwise a telling in the reader's own morph, for this occasion."
+    why: "a package is read on the reader's terms: in a hurry, the short way in; otherwise a telling in the reader's own morph, for this occasion."
+    must: []
+    decided: []
+    takes: [{name: p, type: package}, {name: mine, type: morph}, {name: now, type: context}]
+    gives: [{name: r, type: short}]
+    lines: "11-24"
+    order: 2
+    body: |
+      program read-my-way
+        why: a package is read on the reader's terms: in a hurry, the short way in;
+             otherwise a telling in the reader's own morph, for this occasion.
+
+        takes p: package, mine: morph, now: context
+        gives r: short
+
+        let f = fabula of p
+        if now.medium is "phone" and now.hurry then
+          give expand (atem f) with f to 300 words     -- the short way in
+        else
+          give read f with mine in now                 -- a telling in my morph, labelled a reading
+        end
+      end
+    steps: [P:step/read-my-way.1, P:step/read-my-way.2]
+    provenance: {mode: derived, sources: ["read-my-way.thym#L11-L24"], confidence: 1}
+
+  - id: P:step/read-my-way.1
+    type: step
+    name: let f = fabula of p
+    summary: "let f = fabula of p"
+    of: P:program/read-my-way
+    n: 1
+    text: "  let f = fabula of p"
+    line: 18
+    form: let
+    move: fabula
+    calls: [fabula]
+    binds: f
+    uses: [p]
+    asks: false
+    contracts: []
+    provenance: {mode: derived, sources: ["read-my-way.thym#L18"], confidence: 1}
+  - id: P:step/read-my-way.2
+    type: step
+    name: if now.medium is "phone" and now.hurry then
+    summary: "if now.medium is \"phone\" and now.hurry then"
+    of: P:program/read-my-way
+    n: 2
+    text: "  if now.medium is \"phone\" and now.hurry then"
+    line: 19
+    lines: "19-23"
+    form: if
+    calls: []
+    uses: [now]
+    asks: false
+    branches: {then: [P:step/read-my-way.3], else: [P:step/read-my-way.4]}
+    contracts: []
+    provenance: {mode: derived, sources: ["read-my-way.thym#L19-L23"], confidence: 1}
+  - id: P:step/read-my-way.3
+    type: step
+    name: give expand (atem f) with f to 300 words
+    summary: "the short way in"
+    of: P:program/read-my-way
+    n: 3
+    text: "    give expand (atem f) with f to 300 words     -- the short way in"
+    line: 20
+    form: give
+    move: expand
+    calls: [expand, atem]
+    uses: [f]
+    asks: true
+    contracts: [P:contract/read-my-way.3, P:contract/read-my-way.3.1]
+    provenance: {mode: derived, sources: ["read-my-way.thym#L20"], confidence: 1}
+  - id: P:step/read-my-way.4
+    type: step
+    name: give read f with mine in now
+    summary: "a telling in my morph, labelled a reading"
+    of: P:program/read-my-way
+    n: 4
+    text: "    give read f with mine in now                 -- a telling in my morph, labelled a reading"
+    line: 22
+    form: give
+    move: read
+    calls: [read]
+    uses: [f, mine, now]
+    asks: true
+    contracts: [P:contract/read-my-way.4]
+    provenance: {mode: derived, sources: ["read-my-way.thym#L22"], confidence: 1}
+
+  - id: P:contract/read-my-way.3
+    type: contract
+    name: expand
+    summary: "What expand must leave true of what it gives."
+    of: P:step/read-my-way.3
+    move: expand
+    checks: [coverage, no-invention, stance-kept, length, span-inside, provenance]
+    provenance: {mode: derived, sources: ["read-my-way.thym#L20"], confidence: 1}
+  - id: P:contract/read-my-way.3.1
+    type: contract
+    name: atem
+    summary: "What atem must leave true of what it gives."
+    of: P:step/read-my-way.3
+    move: atem
+    checks: [atem-shape, span-resolves, provenance]
+    provenance: {mode: derived, sources: ["read-my-way.thym#L20"], confidence: 1}
+  - id: P:contract/read-my-way.4
+    type: contract
+    name: read
+    summary: "What read must leave true of what it gives."
+    of: P:step/read-my-way.4
+    move: read
+    checks: [coverage, no-invention, stance-kept, scales-met, labelled, never-source, provenance]
+    provenance: {mode: derived, sources: ["read-my-way.thym#L22"], confidence: 1}

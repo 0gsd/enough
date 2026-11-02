@@ -1,0 +1,91 @@
+oes: thym/1
+kind: plan
+id: thym/plan.read-my-way
+name: read-my-way on orchard-notes.thym
+# The plan of programs/read-my-way.thym over the orchard package, the plain-letter morph and the on-the-train context,
+# written by hand for the conformance suite (docs/THYM.md 11.1, 17.3). A file input's sha256 is its bytes'; a volume's or
+# a package's is its catalog file's (package.cosm). An if gives a node for its condition and the
+# nodes of each branch say which branch they belong to; both branches give r. Compared without run ids, timestamps
+# and prompt token counts.
+program: {name: read-my-way, sha256: 5c0cce9cf1b2cfccdb18e8a531c7e68d2583d92c6496a20868f6b1fd963283de}
+inputs:
+  - {name: p, type: package, path: inputs/orchard-notes.thym, sha256: 88cf873f685fd93cb0da5bf9e0c4513efdb94e586276f35f73c8c9accc1a3e18}
+  - {name: mine, type: morph, path: inputs/plain-letter.morph.cosm, sha256: cd4465f4f2fe4ad36b7ba01007eac9678991a6b21f2bf8d9c71056c713ef644d}
+  - {name: now, type: context, path: inputs/on-the-train.context.cosm, sha256: b82f41482d2bd071ad67e48a47ee298deffb0aedf15fbdaa5bf54ba72caa8d67}
+estimate: {steps: 5, asks: 3, largest_prompt: 0, output_words: 300}
+nodes:
+  - id: R:plan/fixture
+    type: plan
+    name: read-my-way on orchard-notes.thym
+    summary: "Five nodes, three of which ask the model."
+    nodes: [R:node/1, R:node/2, R:node/3, R:node/4, R:node/5]
+    asks: 3
+    largest_prompt: 0
+    provenance: {mode: derived, sources: ["read-my-way.thym"], confidence: 1}
+  - id: R:node/1
+    type: node
+    name: fabula of p
+    summary: "fabula of p"
+    step: {program: read-my-way, n: 1}
+    move: fabula
+    asks: false
+    takes: [p]
+    gives: f
+    after: []
+    budget: {attempts: 1, output_words: 0}
+    line: 18
+    provenance: {mode: derived, sources: ["read-my-way.thym#L18"], confidence: 1}
+  - id: R:node/2
+    type: node
+    name: if now.medium is "phone" and now.hurry
+    summary: "if now.medium is \"phone\" and now.hurry"
+    step: {program: read-my-way, n: 2}
+    move: if
+    asks: false
+    takes: [now]
+    after: []
+    budget: {attempts: 1, output_words: 0}
+    line: 19
+    provenance: {mode: derived, sources: ["read-my-way.thym#L19"], confidence: 1}
+  - id: R:node/3
+    type: node
+    name: atem f
+    summary: "the short way in"
+    step: {program: read-my-way, n: 3}
+    branch: then
+    move: atem
+    asks: true
+    takes: [f]
+    gives: t3
+    after: [R:node/1, R:node/2]
+    budget: {attempts: 3, output_words: 0}
+    line: 20
+    provenance: {mode: derived, sources: ["read-my-way.thym#L20"], confidence: 1}
+  - id: R:node/4
+    type: node
+    name: expand t3 with f to 300 words
+    summary: "the short way in"
+    step: {program: read-my-way, n: 3}
+    branch: then
+    move: expand
+    asks: true
+    takes: [t3, f]
+    gives: r
+    after: [R:node/3]
+    budget: {attempts: 3, output_words: 300}
+    line: 20
+    provenance: {mode: derived, sources: ["read-my-way.thym#L20"], confidence: 1}
+  - id: R:node/5
+    type: node
+    name: read f with mine in now
+    summary: "a telling in my morph, labelled a reading"
+    step: {program: read-my-way, n: 4}
+    branch: else
+    move: read
+    asks: true
+    takes: [f, mine, now]
+    gives: r
+    after: [R:node/1, R:node/2]
+    budget: {attempts: 3, output_words: 0}
+    line: 22
+    provenance: {mode: derived, sources: ["read-my-way.thym#L22"], confidence: 1}

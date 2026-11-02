@@ -1,0 +1,138 @@
+engine: feed
+inputs:
+  call: 50c2dc37b17b2c2bb16a8d0362aaf88ff474e2a825e37b9ed3eaeebabb8b9582
+keys: []
+tokens: 0
+seconds: 0
+output:
+  hearsay:
+    word: hearsay
+    letter: h
+    length: 7
+    is_headword: 1
+    pronunciation: /ˈhirˌseɪ/
+    ipa: /ˈhirˌseɪ/
+    definition: Information passed along secondhand, repeated from what someone else said rather than known firsthand.
+      In law it names an out-of-court statement usually barred from testimony because it cannot be cross-examined.
+    usage_note: null
+    pos: noun
+    pos_primary: noun
+    synonyms:
+    - rumor
+    - rumour
+    forms:
+    - word: hearsays
+      pronunciation: /ˈhirˌseɪz/
+      labels:
+      - pl.
+      synonyms: []
+      label_meanings:
+      - plural
+    form_of: null
+    form_labels: null
+    parents: null
+    perfect_rhymes:
+    - a
+    - they
+    - way
+    - may
+    - day
+    - say
+    - away
+    - play
+    - today
+    - pay
+    - stay
+    - hey
+    - okay
+    - anyway
+    - yesterday
+    - gay
+    - birthday
+    - bay
+    - ray
+    - survey
+    - holiday
+    - lay
+    - display
+    - highway
+    - grey
+    - everyday
+    - railway
+    - gray
+    - delay
+    - pray
+    slant_rhymes:
+    - make
+    - made
+    - take
+    - great
+    - same
+    - state
+    - game
+    - place
+    - days
+    - name
+    - case
+    - change
+    - based
+    - came
+    - face
+    - wait
+    - late
+    - age
+    - main
+    - space
+    homophones: []
+    domain: law
+    etymology: From the Middle English phrase heren seien, 'to hear people say'.
+    examples:
+    - When the witness repeated what a cousin had overheard at the Parlay Vouz, the advocate objected to it as hearsay.
+    - The rumor about a camera in the ceiling was mere hearsay, passed from desk to desk.
+    related:
+    - testimony
+    - evidence
+    - witness
+    antonyms: []
+    hyphenation: hear·say
+    frequency_rank: 3
+    first_use: Middle English
+    source: null
+    added_on: null
+    updated_on: '2026-10-06'
+    status: live
+    notes: null
+    fr_compare:
+    - ouï-dire
+    - rumeur
+    fr_definition: Une information transmise de seconde main, répétée d'après ce qu'une autre personne aurait dit
+      plutôt que sue de première main. En droit, cela désigne une déclaration faite hors du tribunal, généralement
+      écartée du témoignage car elle ne peut être contre-interrogée.
+    es_compare:
+    - rumor
+    - testimonio de oídas
+    es_definition: Una información transmitida de segunda mano, repetida a partir de lo que otra persona supuestamente
+      dijo en vez de conocida de primera mano. En derecho, designa una declaración hecha fuera del tribunal, generalmente
+      excluida del testimonio porque no puede someterse a contrainterrogatorio.
+    de_compare:
+    - Hörensagen
+    de_definition: Eine aus zweiter Hand weitergegebene Information, wiederholt nach dem, was angeblich jemand anderes
+      gesagt hat, statt aus erster Hand bekannt. Rechtlich bezeichnet es eine außergerichtliche Aussage, die meist
+      als Zeugnis ausgeschlossen wird, weil sie nicht ins Kreuzverhör genommen werden kann.
+    zh_compare:
+    - 传闻
+    - 道听途说
+    zh_definition: 转手传递的信息，是复述他人所说的话而非亲自获知的内容。在法律上，指庭外陈述，通常因无法接受交叉盘问而被排除在证词之外。
+    ja_compare:
+    - 伝聞
+    - 又聞き
+    ja_definition: 人づてに聞いたことを繰り返した、直接知ったのではない二次的な情報。法律上は法廷外での供述を指し、反対尋問ができないため証言として通常認められない。
+    corrected_on: null
+    origin: feed
+    overrides_feed: false
+    frequency_band:
+      band: 3
+      name: Uncommon
+      examples: procrastinate, gourd
+    syllables: 2
+    era: middle english
