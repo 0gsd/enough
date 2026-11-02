@@ -1,10 +1,11 @@
 """DocOES (enough/docoes.py): a document enumerated into a doc volume, and compiled back.
 
 The enumeration of a crafted document (sections, terms by each convention, mentions, examples, decisions, atems),
-the real documents (the MacroCOSM spec with Comprise's chapters, the Help Center in six tellings), the reference
-generated from the manifests, the round trip byte for byte, build-on-digest, the chapters' provenance, the inventory
-and cross-volume references, DocOES's own checks, and the CLI. Every build goes into a scratch docs root: the real
-`~/enough/docoes/` is never touched (conftest points ENOUGH_DOCS_ROOT into tmp_path).
+the real documents (the MacroCOSM spec with Comprise's chapters, the Thym and Ascribe specifications, the Help Center
+in six tellings), the reference generated from the manifests, the round trip byte for byte, build-on-digest, the
+chapters' provenance, the inventory and cross-volume references, DocOES's own checks, and the CLI. Every build goes
+into a scratch docs root: the real `~/enough/docoes/` is never touched (conftest points ENOUGH_DOCS_ROOT into
+tmp_path).
 """
 from __future__ import annotations
 
@@ -30,7 +31,7 @@ def _read(rel: str) -> str:
 
 @pytest.fixture(scope="module")
 def built(tmp_path_factory) -> dict:
-    """Every telling of both documents, built once into a scratch docs root and loaded through the reader."""
+    """Every telling of every document, built once into a scratch docs root and loaded through the reader."""
     root = tmp_path_factory.mktemp("docs")
     vols = {}
     for doc in D.DOCUMENTS:
@@ -500,6 +501,43 @@ def test_the_real_bubbles(built):
 
 
 # ---------------------------------------------------------------------------
+# Thym and Ascribe (0.5.0, lane X2): the two specifications written in MacroCOSM OES
+# ---------------------------------------------------------------------------
+
+def test_the_four_documents():
+    assert list(D.DOCUMENTS) == ["macrocosm-oes", "thym", "ascribe", "help-center"]
+    for slug, name, version, path in (("thym", "Thym 0", "0", "docs/THYM.md"),
+                                      ("ascribe", "Ascribe OES 1", "1", "docs/ASCRIBE.md")):
+        d = D.DOCUMENTS[slug]
+        assert (d.slug, d.name, d.version, d.sources) == (slug, name, version, {"en": path})
+        assert (d.chapters, d.reference, d.bubbles, d.voice, d.plain_mentions) == ((), False, {}, None, "all")
+        assert D.tellings(slug) == ["en"]
+    # Thym's document is "Version 0 of the language"; its MiniCOSM declares thym/1, which is not the document's.
+    assert str(mc.default_registry().get("thym").version) != D.DOCUMENTS["thym"].version
+
+
+def test_thym_and_ascribe_enumerate(built):
+    """The counts lane X1 surveyed (docs/thym-landed-X1.md), the document's own name and version in the catalog,
+    no chapters and no reference, and every term defined in a section of its own document."""
+    for slug, counts in (("thym", {"section": 83, "term": 12, "example": 1, "decision": 18}),
+                         ("ascribe", {"section": 27, "term": 5, "example": 1, "decision": 11})):
+        vol = built["vols"][(slug, "en")]
+        assert vol.refused is None and vol.id == f"doc/{slug}"
+        got = Counter(it.data.get("type") for it in vol.items.values())
+        assert {k: got[k] for k in counts} == counts, slug
+        assert not [k for k in vol.items if k.startswith(("R:", "B:", "S:chapter/"))], slug
+        assert vol.name == D.DOCUMENTS[slug].name
+        assert vol.catalog["document"]["version"] == D.DOCUMENTS[slug].version
+        assert vol.catalog["document"]["path"] == D.DOCUMENTS[slug].sources["en"]
+        assert vol.catalog.get("chapters") in (None, [])
+        for it in vol.items.values():
+            if it.data.get("type") == "term":
+                assert it.data["defined_in"] in vol.items, (slug, it.key)
+        rows = D.inventory(vol)
+        assert rows and all(r["inventory"] == slug and r["version"] == D.DOCUMENTS[slug].version for r in rows)
+
+
+# ---------------------------------------------------------------------------
 # The round trip, for every document and telling
 # ---------------------------------------------------------------------------
 
@@ -568,6 +606,8 @@ def test_status(tmp_path):
     rows = {(r["doc"], r["lang"]): r for r in D.status(docs_root=out, sources=src)["documents"]}
     assert rows[("help-center", "en")]["fresh"] is True
     assert rows[("help-center", "fr")]["exists"] is False and rows[("macrocosm-oes", "en")]["fresh"] is False
+    assert rows[("thym", "en")]["exists"] is False and rows[("ascribe", "en")]["exists"] is False   # no sources here
+    assert [r for r in rows if r[0] in ("thym", "ascribe")] == [("thym", "en"), ("ascribe", "en")]
 
 
 # ---------------------------------------------------------------------------

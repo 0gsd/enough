@@ -2854,6 +2854,109 @@ _IN_VIEW = ("(() => { const c = document.querySelector('#docs-body .cosm-card[da
             " crumb: Array.from(c.querySelectorAll('.docs-crumb a[data-short]')).map((a) => a.dataset.short)}; })()")
 
 
+def scenario_docs_specs(d: Driver) -> list[str]:
+    """0.5.0 (lane X2): the three specifications share one chrome. Each opens
+    from its item in the ui window's MacroCOSM menu (the button opens the
+    menu with focus on its first item; esc closes the menu, not the window,
+    and gives focus back to the button) at short,
+    with its icon in the toolbar and on the mode stack, its own stack title,
+    the toolbar's "specification", the badge "<title> · v<version>", and the
+    English-only note in a translated UI (none in English). At short its
+    headings carry unique ids, its section references link and none
+    dangles, and its terms are links; at atem the outline holds every
+    section but the title and the glossary every term; at fabula its cards
+    draw."""
+    fails: list[str] = []
+    _reset(d)
+    forget = ("(() => { try { ['macrocosm-oes', 'thym', 'ascribe'].forEach((k) =>"
+              " localStorage.removeItem('enough.docs.density.' + k)); } catch (e) {} return true; })()")
+    d.js(forget)
+    english = d.js("I18N.lang") == "en"
+    specs = (("macrocosm-oes", "ui-cosmspec-btn", "macrocosm", r"^MacroCOSM OES · v\d+\.\d+\.\d+$",
+              "t('modes.docs.spec.icon', 'MacroCOSM specification')"),
+             ("thym", "ui-thym-btn", "cosm", r"^Thym 0 · v0$", "t('modes.docs.thym.icon', 'Thym specification')"),
+             ("ascribe", "ui-ascribe-btn", "readvisor-rename", r"^Ascribe OES 1 · v1$",
+              "t('modes.docs.ascribe.icon', 'Ascribe specification')"))
+    for doc, btn, icon, badge, stack in specs:
+        _reset(d)
+        d.js("openUIModal()")
+        d.wait_for("#ui-modal:not(.hidden)")
+        menu = ("(() => ({menu: !document.getElementById('ui-specs-menu').hidden,"
+                " expanded: document.getElementById('ui-specs-btn').getAttribute('aria-expanded'),"
+                " modal: !document.getElementById('ui-modal').classList.contains('hidden'),"
+                " focus: document.activeElement && document.activeElement.id}))()")
+        d.click("#ui-specs-btn")
+        m = d.js(menu)
+        if not m["menu"] or m["expanded"] != "true" or m["focus"] != "ui-cosmspec-btn":
+            fails.append(f"the MacroCOSM button did not open the specs menu on its first item: {m}")
+        if doc == "macrocosm-oes":
+            d.key("Escape")
+            m = d.js(menu)
+            if m["menu"] or not m["modal"] or m["focus"] != "ui-specs-btn" or m["expanded"] != "false":
+                fails.append(f"esc in the specs menu left {m} (want: the menu closed, the window open, "
+                             f"focus on the button)")
+            d.click("#ui-specs-btn")
+        d.click("#" + btn)
+        if not _wait_js(d, f"DOCS.data && DOCS.data.doc === {json.dumps(doc)} && DOCS.density === 'short'"
+                           " && !!document.querySelector('#docs-body .docs-sec h2[id]')", ms=20000):
+            fails.append(f"#{btn} did not open {doc} at short")
+            continue
+        g = d.js("(() => { const el = (i) => document.getElementById(i);"
+                 " const ids = Array.from(document.querySelectorAll('#docs-body [id]')).map((e) => e.id);"
+                 " const top = modeTop() || {};"
+                 " return {badge: el('docs-badge').textContent, title: el('docs-title').textContent,"
+                 " spec: t('docs.title.spec', 'specification'),"
+                 " icon: el('docs-icon').dataset.icon, stack: top.icon, stackTitle: top.iconTitle,"
+                 " wantStack: " + stack + ","
+                 " note: el('docs-note').hidden ? '' : el('docs-note').textContent,"
+                 " english: t('docs.note.specEnglish', 'the specification is written in English'),"
+                 " modal: !el('ui-modal').classList.contains('hidden') || !el('ui-specs-menu').hidden,"
+                 " ids: ids.length, dup: ids.length - new Set(ids).size,"
+                 " xref: document.querySelectorAll('#docs-body a.ref-xref').length,"
+                 " bad: Array.from(document.querySelectorAll('#docs-body a.ref-xref'))"
+                 ".filter((a) => !el(a.dataset.target)).length,"
+                 " terms: document.querySelectorAll('#docs-body a.docs-term').length,"
+                 " sections: (DOCS.data.sections || []).length,"
+                 " glossary: DOCS.ix ? DOCS.ix.terms.size : -1}; })()")
+        if not re.search(badge, g["badge"] or ""):
+            fails.append(f"{doc}: the badge reads {g['badge']!r}")
+        if g["title"] != g["spec"]:
+            fails.append(f"{doc}: the toolbar says {g['title']!r}, not {g['spec']!r}")
+        if g["icon"] != icon or g["stack"] != icon:
+            fails.append(f"{doc}: icon {g['icon']!r} in the toolbar and {g['stack']!r} on the stack, not {icon!r}")
+        if g["stackTitle"] != g["wantStack"]:
+            fails.append(f"{doc}: the stack's title is {g['stackTitle']!r}, not {g['wantStack']!r}")
+        if english and g["note"]:
+            fails.append(f"{doc}: a note in an English UI: {g['note']!r}")
+        if not english and g["note"] != g["english"]:
+            fails.append(f"{doc}: the note in a translated UI reads {g['note']!r}, not {g['english']!r}")
+        if g["modal"]:
+            fails.append(f"#{btn} left the ui window or its specs menu open")
+        if g["dup"]:
+            fails.append(f"{doc}: {g['dup']} duplicate id(s) at short")
+        if not g["xref"] or g["bad"]:
+            fails.append(f"{doc}: {g['xref']} section references linked, {g['bad']} dangling")
+        if not g["terms"]:
+            fails.append(f"{doc}: no term is a link at short")
+        d.js("docsSetDensity('atem')")
+        if not _wait_js(d, "DOCS.density === 'atem' && !!document.querySelector('#docs-body .docs-outline .docs-ol-row')"):
+            fails.append(f"{doc}: the atem density did not draw")
+        else:
+            a = d.js("({rows: document.querySelectorAll('#docs-body .docs-ol-row').length,"
+                     " gloss: document.querySelectorAll('#docs-body dl.docs-gloss dt').length})")
+            # Every section but the root (the title, drawn as the page's h1) is a row.
+            if a["rows"] != g["sections"] - 1 or a["gloss"] != g["glossary"]:
+                fails.append(f"{doc}: atem shows {a['rows']} outline rows / {a['gloss']} glossary entries for "
+                             f"{g['sections']} sections (the root is the h1) / {g['glossary']} terms")
+        d.js("docsSetDensity('fabula')")
+        if not _wait_js(d, "DOCS.density === 'fabula' && !!document.querySelector('#docs-body .cosm-card.docs-prism')",
+                        ms=20000):
+            fails.append(f"{doc}: the fabula density did not draw its cards")
+    d.js(forget)
+    _reset(d)
+    return fails
+
+
 def scenario_docs_term_roundtrip(d: Driver) -> list[str]:
     """short → a term link → the term's prism card at the fabula (focused,
     on screen, its atem first, a breadcrumb into the short) → back (the pill)
@@ -3894,6 +3997,8 @@ SCENARIOS: dict[str, Scenario] = {
     "canon-open-catalog": scenario_canon_open_catalog,
     "cosm-lens": scenario_cosm_lens,
     "docs-contents": scenario_docs_contents,
+    # --- 0.5.0 (lane X2): the three specifications in the docs viewer ---
+    "docs-specs": scenario_docs_specs,
     # --- 0.4.4 (U2): the docs viewer's fabula density ---
     "docs-term-roundtrip": scenario_docs_term_roundtrip,
     "docs-example-live": scenario_docs_example_live,

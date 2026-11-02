@@ -4,9 +4,9 @@
 (+ `/lens`), `GET /api/cosm/lens?around=`, `macrocosm.load_volume_text`, `to_mermaid(around=, depth=)` and the
 readvisor's `doc_lookup`, in project and home mode and while agent-free.
 
-Most tests read a miniature install (`docoes.SOURCES` pointed at tmp: a small spec, a small Help Center in English
-and German, their bubbles, and the real manifests), so they never enumerate the real 2,000-line spec; one test reads
-the real documents once. Built volumes land in conftest's tmp `ENOUGH_DOCS_ROOT`; no model is started.
+Most tests read a miniature install (`docoes.SOURCES` pointed at tmp: a small spec, small Thym and Ascribe stand-ins,
+a small Help Center in English and German, their bubbles, and the real manifests), so they never enumerate the real
+2,000-line spec; one test reads the real documents once. Built volumes land in conftest's tmp `ENOUGH_DOCS_ROOT`; no model is started.
 """
 
 from __future__ import annotations
@@ -75,6 +75,60 @@ A fruit falls from a tree (section 1.1). A small catalog:
 2. **Fruit second.** Fruit follows it (section 2).
 """
 
+# Stand-ins for docs/THYM.md and docs/ASCRIBE.md (0.5.0, lane X2), shaped like the real documents' heads: an H1, a
+# Contents, a "How to read this", two numbered sections, one bold-defined term.
+FIXTURE_THYM = """\
+# Thym 0: a language in miniature
+
+Version 0 of the language, in miniature.
+
+## Contents
+
+1. Moves
+2. Programs
+
+## How to read this
+
+<!-- atem: the rule words of this specification -->
+*Must* is a rule a conforming runtime keeps; *may* is a permission.
+
+## 1. Moves
+
+<!-- atem: what a move does -->
+A **move** is one step a program takes. Section 2 puts moves together.
+
+## 2. Programs
+
+<!-- atem: moves in order -->
+A program is a list of moves, in the order section 1 gives them.
+"""
+
+FIXTURE_ASCRIBE = """\
+# Ascribe OES 1: a person in miniature
+
+*Specification of the `ascribe/1` MiniCOSM, in miniature.*
+
+## Contents
+
+1. The holograph
+2. Checks
+
+## How to read this
+
+<!-- atem: the rule words of this specification -->
+*Must* is a rule a conforming reader keeps; *may* is a permission.
+
+## 1. The holograph
+
+<!-- atem: one person, described without a name -->
+A **holograph** is one person's description, under a handle and without a name. Section 2 checks it.
+
+## 2. Checks
+
+<!-- atem: what a reader checks -->
+A reader checks a holograph before it draws one (section 1).
+"""
+
 FIXTURE_HELP_EN = """\
 # the orchard help center
 
@@ -137,6 +191,8 @@ def docs_src(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     root = tmp_path / "install"
     files = {
         "docs/MACROCOSM_OES.md": FIXTURE_SPEC.format(example=_canon_example()),
+        "docs/THYM.md": FIXTURE_THYM,
+        "docs/ASCRIBE.md": FIXTURE_ASCRIBE,
         "docs/HELP_CENTER.md": FIXTURE_HELP_EN,
         "enough/static/i18n/de/help-center.md": FIXTURE_HELP_DE,
         "enough/static/help-docs.md": FIXTURE_BUBBLES,
@@ -287,7 +343,7 @@ def test_every_docs_route_answers(docs_src: Path, project: Path, mode: str):
         assert _docs(c, "help-center", "de").status_code == 200
         st = c.get("/api/docs/status")
         assert st.status_code == 200 and {(d["doc"], d["lang"]) for d in st.json()["documents"]} >= \
-            {("macrocosm-oes", "en"), ("help-center", "de")}
+            {("macrocosm-oes", "en"), ("thym", "en"), ("ascribe", "en"), ("help-center", "de")}
         r = c.get("/api/docs/lens", params={"doc": "macrocosm-oes", "lang": "en", "around": "T:term/tree"})
         assert r.status_code == 200 and r.json()["around"] == "T:term/tree", r.text
         r = c.post("/api/docs/compile", json={"doc": "help-center", "lang": "de"})
@@ -319,6 +375,32 @@ def test_cosm_lens_draws_around_an_item_of_a_project_volume(project: Path):
         assert [v["id"] for v in p["node_map"].values() if v.get("focus")] == [some.key]
         plain = c.get("/api/cosm/lens", params={"path": "notes.md.cosm"}).json()
         assert plain["around"] is None and not any(v.get("focus") for v in plain["node_map"].values())
+
+
+@pytest.mark.parametrize("mode", ["project", "home"])
+def test_thym_and_ascribe_are_served(docs_src: Path, project: Path, mode: str):
+    """0.5.0 (lane X2): the two specifications written in MacroCOSM OES are documents of their own, English only,
+    at every density, with their own name and version in the head, compiled back byte for byte."""
+    with _client(project, mode) as c:
+        for doc, title, version, rel, term in (
+                ("thym", "Thym 0", "0", "docs/THYM.md", "T:term/move"),
+                ("ascribe", "Ascribe OES 1", "1", "docs/ASCRIBE.md", "T:term/holograph")):
+            for density in ("atem", "short", "fabula"):
+                r = _docs(c, doc, density=density)
+                assert r.status_code == 200, (doc, density, r.text)
+                p = r.json()
+                assert (p["doc"], p["lang"], p["requested_lang"], p["title"]) == (doc, "en", None, title)
+                assert p["document"]["version"] == version and p["chapters"] == []
+            short = _docs(c, doc, density="short").json()
+            assert [t["id"] for t in short["terms"]] == [term]
+            assert {s["number"] for s in short["sections"] if s.get("number")} >= {"1", "2"}
+            assert not [i for i in _docs(c, doc, density="atem").json()["items"] if i["module"] == "R"]
+            r = _docs(c, doc, "ja", density="short")                       # told in English only
+            assert r.status_code == 200 and (r.json()["lang"], r.json()["requested_lang"]) == ("en", "ja")
+            r = c.post("/api/docs/compile", json={"doc": doc})
+            assert r.status_code == 200 and r.json()["markdown"].encode("utf-8") == (docs_src / rel).read_bytes()
+            rows = c.get("/api/docs/inventory", params={"doc": doc}).json()["rows"]
+            assert f"{doc}@{version}:section:2" in {x["xref"] for x in rows}
 
 
 def test_unknown_documents_languages_and_densities(docs_src: Path, project: Path):
@@ -506,7 +588,7 @@ def test_the_background_build(docs_src: Path, project: Path):
     import time
     with _client(project, "home") as c:
         r = c.post("/api/docs/build", json={})
-        assert r.status_code == 202 and r.json()["progress"]["total"] == 7
+        assert r.status_code == 202 and r.json()["progress"]["total"] == 9      # 3 specs + the help center's 6
         for _ in range(200):
             st = c.get("/api/docs/status").json()
             if not st["building"]:
@@ -514,6 +596,7 @@ def test_the_background_build(docs_src: Path, project: Path):
             time.sleep(0.05)
         rows = {(d["doc"], d["lang"]): d for d in st["documents"]}
         assert rows[("macrocosm-oes", "en")]["fresh"] and rows[("help-center", "de")]["fresh"]
+        assert rows[("thym", "en")]["fresh"] and rows[("ascribe", "en")]["fresh"]
         assert not rows[("help-center", "fr")]["built"]                      # no source in this install
         assert st["ready"] is False
 

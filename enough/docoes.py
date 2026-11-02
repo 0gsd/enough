@@ -24,9 +24,11 @@ Standalone like the reader: the standard library, PyYAML and `enough.macrocosm`,
     python -m enough.docoes lint      <doc> [--lang L] [--json]
     python -m enough.docoes compile   <doc> [--lang L] [--chapter SLUG]
     python -m enough.docoes inventory <doc> [--lang L] [--json]
+    python -m enough.docoes export    <doc> <out-dir> [--densities …] [--page D=HREF] [--standalone]   (docoes_html)
 
-Documents: `macrocosm-oes` (English, with Comprise's spec and paradigm map as chapters) and `help-center` (six
-tellings: en de es fr ja zh, written by Rosa).
+Documents: `macrocosm-oes` (English, with Comprise's spec and paradigm map as chapters), `thym` and `ascribe` (the
+Thym language and the Ascribe MiniCOSM, English, 0.5.0) and `help-center` (six tellings: en de es fr ja zh, written
+by Rosa).
 """
 
 from __future__ import annotations
@@ -121,6 +123,10 @@ DOCUMENTS: dict[str, Document] = {
         # In the spec, § always names a section of Comprise OES 1, "README §" one of its paradigm map, and P.N a
         # section of its chapter P: all three become cross-volume references into the chapters (xrefs).
         xref={"§": "comprise", "README §": "comprise-map", "P.": "comprise"}),
+    # 0.5.0 (lane X2): the two specifications written in MacroCOSM OES, English only, no chapters, no reference.
+    # Thym's document is "Version 0 of the language"; its MiniCOSM declares `thym/1`, which is not the document's.
+    "thym": Document("thym", "Thym 0", {"en": "docs/THYM.md"}, version="0"),
+    "ascribe": Document("ascribe", "Ascribe OES 1", {"en": "docs/ASCRIBE.md"}, version="1"),
     "help-center": Document(
         "help-center", "the enough help center",
         {"en": "docs/HELP_CENTER.md", **{lang: f"enough/static/i18n/{lang}/help-center.md" for lang in LANGS[1:]}},
@@ -151,11 +157,14 @@ def volume_path(doc: str, lang: str = "en", root: Path | None = None) -> Path:
     return Path(root or docs_root()) / f"{doc}.{lang}.doc.cosm"
 
 
-def tellings(doc: str) -> list[str]:
+def tellings(doc: str | Document) -> list[str]:
     return [lang for lang in LANGS if lang in _document(doc).sources]
 
 
-def _document(doc: str) -> Document:
+def _document(doc: str | Document) -> Document:
+    """A registered document by slug (`doc/` optional), or a `Document` given as is (an ad hoc one: the export)."""
+    if isinstance(doc, Document):
+        return doc
     d = DOCUMENTS.get(doc.removeprefix("doc/"))
     if d is None:
         raise KeyError(f"no document {doc!r}; enough enumerates {', '.join(DOCUMENTS)}")
@@ -1661,7 +1670,7 @@ def _source_files(d: Document, lang: str) -> list[str]:
     return out
 
 
-def digest(doc: str, lang: str = "en", *, sources: Path | None = None,
+def digest(doc: str | Document, lang: str = "en", *, sources: Path | None = None,
            registry: mc.Registry | None = None) -> str:
     """What a doc volume is built from, as one sha256: DocOES's rules (FORMAT), enough's version, each source
     file's sha256 and every manifest's sha256."""
@@ -1681,12 +1690,12 @@ def _read(root: Path, rel: str) -> str:
     return (root / rel).read_bytes().decode("utf-8")
 
 
-def catalog_for(doc: str, lang: str = "en", *, sources: Path | None = None,
+def catalog_for(doc: str | Document, lang: str = "en", *, sources: Path | None = None,
                 registry: mc.Registry | None = None) -> dict:
     """The whole doc catalog for one telling, in memory: the document, its chapters, the reference, the bubbles."""
     d = _document(doc)
     if lang not in d.sources:
-        raise KeyError(f"{d.slug} has no {lang} telling; it has {', '.join(tellings(d.slug))}")
+        raise KeyError(f"{d.slug} has no {lang} telling; it has {', '.join(tellings(d))}")
     root = Path(sources or sources_root())
     reg = registry or _registry(root)
     text = _read(root, d.sources[lang])
@@ -1695,7 +1704,7 @@ def catalog_for(doc: str, lang: str = "en", *, sources: Path | None = None,
                              reference_text=ref_text, name=d.name, version=d.version, xref=d.xref,
                              plain_mentions=d.plain_mentions, registry=reg)
     nodes = cat["nodes"]
-    cat["tellings"] = tellings(d.slug)
+    cat["tellings"] = tellings(d)
     order = max((it.get("order", 0) for it in nodes), default=0)
     chapters_meta = {}
     if d.chapters:
@@ -1759,16 +1768,17 @@ def catalog_for(doc: str, lang: str = "en", *, sources: Path | None = None,
     return cat
 
 
-def build(doc: str, lang: str = "en", *, docs_root: Path | None = None, sources: Path | None = None) -> Path:
+def build(doc: str | Document, lang: str = "en", *, docs_root: Path | None = None,
+          sources: Path | None = None) -> Path:
     """Build one telling's doc volume, unconditionally, and write it atomically to
     `<docs_root>/<doc>.<lang>.doc.cosm`. Returns the path."""
     d = _document(doc)
     root = Path(sources or sources_root())
     reg = _registry(root)
-    cat = catalog_for(d.slug, lang, sources=root, registry=reg)
+    cat = catalog_for(d, lang, sources=root, registry=reg)
     nodes = cat.pop("nodes")
     cat["built"] = {"at": _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "by": f"enough/{ENOUGH_VERSION}", "digest": digest(d.slug, lang, sources=root, registry=reg),
+                    "by": f"enough/{ENOUGH_VERSION}", "digest": digest(d, lang, sources=root, registry=reg),
                     "manifests": [{"name": m.name, "version": m.version, "sha256": _file_sha(m.path) if m.path else None}
                                   for m in reg.manifests.values()]}
     cat["nodes"] = nodes
@@ -1828,7 +1838,7 @@ def _build_lock(path: Path) -> threading.Lock:
         return _BUILD_LOCKS.setdefault(str(path), threading.Lock())
 
 
-def ensure_built(doc: str | None = None, lang: str | None = None, *, docs_root: Path | None = None,
+def ensure_built(doc: str | Document | None = None, lang: str | None = None, *, docs_root: Path | None = None,
                  sources: Path | None = None, on_step: Any = None) -> dict:
     """Build each doc volume whose recorded digest is not the current one (all documents and tellings when
     `doc`/`lang` are not given). Idempotent; a source that cannot be read is reported, never raised. `on_step`,
@@ -1837,19 +1847,20 @@ def ensure_built(doc: str | None = None, lang: str | None = None, *, docs_root: 
     out_dir = Path(docs_root or docs_root_default())
     reg = _registry(root)
     out = {"root": str(out_dir), "built": [], "fresh": [], "errors": []}
-    docs = [_document(doc).slug] if doc else list(DOCUMENTS)
-    todo = [(slug, lg) for slug in docs for lg in ([lang] if lang else tellings(slug))]
-    for i, (slug, lg) in enumerate(todo):
+    docs = [_document(doc)] if doc else list(DOCUMENTS.values())
+    todo = [(d, lg) for d in docs for lg in ([lang] if lang else tellings(d))]
+    for i, (d, lg) in enumerate(todo):
+        slug = d.slug
         if on_step is not None:
             on_step(i, len(todo), f"{slug}.{lg}")
         path = volume_path(slug, lg, out_dir)
         try:
             with _build_lock(path):
-                want = digest(slug, lg, sources=root, registry=reg)
+                want = digest(d, lg, sources=root, registry=reg)
                 if recorded_digest(path) == want:
                     out["fresh"].append(f"{slug}.{lg}")
                     continue
-                build(slug, lg, docs_root=out_dir, sources=root)
+                build(d, lg, docs_root=out_dir, sources=root)
                 out["built"].append(f"{slug}.{lg}")
         except (OSError, KeyError, UnicodeDecodeError) as e:
             out["errors"].append(f"{slug}.{lg}: {type(e).__name__}: {e}")
@@ -1919,7 +1930,8 @@ def status(*, docs_root: Path | None = None, sources: Path | None = None) -> dic
     return {"root": str(out_dir), "documents": rows, "ready": all(r["fresh"] for r in rows)}
 
 
-def load(doc: str, lang: str = "en", *, docs_root: Path | None = None, sources: Path | None = None) -> mc.Volume:
+def load(doc: str | Document, lang: str = "en", *, docs_root: Path | None = None,
+         sources: Path | None = None) -> mc.Volume:
     """A telling's volume, built first when stale, read through the reference reader."""
     root = Path(sources or sources_root())
     ensure_built(doc, lang, docs_root=docs_root, sources=root)
@@ -2170,9 +2182,15 @@ def lint_doc(volume: mc.Volume, *, registry: mc.Registry | None = None, sources:
 # ---------------------------------------------------------------------------
 
 def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv[:1] == ["export"]:                          # its own options: enough/docoes_html.py
+        from . import docoes_html
+        return docoes_html.main(argv[1:])
     ap = argparse.ArgumentParser(prog="python -m enough.docoes",
-                                 description="DocOES: enumerate a document into a doc volume, check it, compile it.")
-    ap.add_argument("command", choices=["build", "lint", "compile", "inventory", "status"])
+                                 description="DocOES: enumerate a document into a doc volume, check it, compile it, "
+                                             "export it as static HTML (`export --help`).")
+    ap.add_argument("command", choices=["build", "lint", "compile", "inventory", "status", "export"],
+                    help="export: the volume as static HTML at the three densities (see `export --help`)")
     ap.add_argument("doc", nargs="?", default=None, help=f"one of {', '.join(DOCUMENTS)}")
     ap.add_argument("--lang", default="en", help="the telling (default en)")
     ap.add_argument("--chapter", help="compile: a chapter's slug instead of the document")

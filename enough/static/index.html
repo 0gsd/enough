@@ -10098,10 +10098,74 @@
     }
 
     /* The dictionary launcher sits right beside help (0.4.1), and the
-       MacroCOSM spec beside it (0.4.3). */
-    #ui-dict-btn,
-    #ui-cosmspec-btn {
+       MacroCOSM spec beside it (0.4.3): since 0.5.0 (lane X2) a small menu
+       of the three specifications, MacroCOSM OES, Thym and Ascribe. */
+    #ui-dict-btn {
       margin-left: 0;
+    }
+
+    .ui-specs-wrap {
+      position: relative;
+      display: inline-flex;
+      margin-right: 10px;
+    }
+
+    .ui-specs-wrap > .help-center-launch {
+      margin: 0;
+    }
+
+    .ui-specs-caret {
+      font-size: 9px;
+      opacity: 0.7;
+      margin-left: -2px;
+    }
+
+    .ui-specs-menu[hidden] {
+      display: none;
+    }
+
+    .ui-specs-menu {
+      position: absolute;
+      top: calc(100% + 4px);
+      right: 0;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 100%;
+      padding: 4px;
+      background: var(--bg-raise);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+    }
+
+    .ui-specs-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--fg);
+      font: inherit;
+      font-size: 12px;
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .ui-specs-item:hover,
+    .ui-specs-item:focus-visible {
+      background: var(--btn-bg, var(--bg-raise));
+      border-color: var(--border);
+    }
+
+    .ui-specs-item .svg-icon {
+      width: 15px;
+      height: 15px;
+      flex: 0 0 auto;
     }
 
     #merirmaid-mode {
@@ -18255,15 +18319,49 @@
           <span data-i18n="dict.launch.label">dictionary</span>
         </button>
         <!-- MacroCOSM (0.4.3): the specification every .cosm file is
-             written in, in the docs viewer (0.4.4, see #docs-mode). Both
-             modes, like help: /api/docs is home-accessible. -->
-        <button type="button" class="help-center-launch" id="ui-cosmspec-btn"
-          data-i18n-title="docs.launch.spec.title"
-          title="open the MacroCOSM OES specification — the grammar every .cosm file is written in"
-          onclick="closeUIModal(); enterDocsMode({doc: 'macrocosm-oes'});">
-          <img class="svg-icon" data-icon="macrocosm" alt="" draggable="false">
-          <span data-i18n="docs.launch.spec.label">MacroCOSM</span>
-        </button>
+             written in, in the docs viewer (0.4.4, see #docs-mode). Since
+             0.5.0 (lane X2) the button opens a small menu of the three
+             specifications — MacroCOSM OES and the two written in it, Thym
+             and Ascribe — instead of two more buttons in this row, which
+             wrapped the title and "close project" in de, fr, es and ja.
+             Both modes, like help: /api/docs is home-accessible. Icons in
+             the menu: the closest existing glyphs (cosm, which the Thym
+             surfaces already wear; readvisor-rename, a person saying who
+             they are) until thym and ascribe have their own. -->
+        <div class="ui-specs-wrap" id="ui-specs-wrap">
+          <button type="button" class="help-center-launch" id="ui-specs-btn"
+            aria-haspopup="menu" aria-expanded="false" aria-controls="ui-specs-menu"
+            data-i18n-title="docs.launch.specs.title"
+            title="the MacroCOSM specification and the two written in it, Thym and Ascribe"
+            onclick="uiSpecsMenu();">
+            <img class="svg-icon" data-icon="macrocosm" alt="" draggable="false">
+            <span data-i18n="docs.launch.spec.label">MacroCOSM</span>
+            <span class="ui-specs-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="ui-specs-menu" id="ui-specs-menu" role="menu" aria-labelledby="ui-specs-btn" hidden>
+            <button type="button" class="ui-specs-item" role="menuitem" id="ui-cosmspec-btn"
+              data-i18n-title="docs.launch.spec.title"
+              title="open the MacroCOSM OES specification — the grammar every .cosm file is written in"
+              onclick="closeUIModal(); enterDocsMode({doc: 'macrocosm-oes'});">
+              <img class="svg-icon" data-icon="macrocosm" alt="" draggable="false">
+              <span data-i18n="docs.launch.spec.label">MacroCOSM</span>
+            </button>
+            <button type="button" class="ui-specs-item" role="menuitem" id="ui-thym-btn"
+              data-i18n-title="docs.launch.thym.title"
+              title="open the Thym specification — the language enough's programs are written in, with its compiler and runtime"
+              onclick="closeUIModal(); enterDocsMode({doc: 'thym'});">
+              <img class="svg-icon" data-icon="cosm" alt="" draggable="false">
+              <span data-i18n="docs.launch.thym.label">Thym</span>
+            </button>
+            <button type="button" class="ui-specs-item" role="menuitem" id="ui-ascribe-btn"
+              data-i18n-title="docs.launch.ascribe.title"
+              title="open the Ascribe OES specification — the holograph: a person, described without a name"
+              onclick="closeUIModal(); enterDocsMode({doc: 'ascribe'});">
+              <img class="svg-icon" data-icon="readvisor-rename" alt="" draggable="false">
+              <span data-i18n="docs.launch.ascribe.label">Ascribe</span>
+            </button>
+          </div>
+        </div>
         <button class="modal-close" onclick="closeUIModal()" aria-label="close" data-i18n-aria="misc.close.aria">×</button>
       </div>
       <div class="ui-head-note" id="ui-close-project-note" data-i18n="prefs.closeProject.note">the folder on disk is untouched</div>
@@ -21453,15 +21551,24 @@
     // The docs viewer (0.4.4, DocOES) — `#docs-mode`
     // ================================================================
     //
-    // One mode (stack name `docs`), two documents, each read from its
+    // One mode (stack name `docs`), four documents, each read from its
     // built doc volume through GET /api/docs?doc=&lang=&density= (D2;
-    // home-accessible, so both open from the home screen's UI window too):
+    // home-accessible, so all four open from the home screen's UI window
+    // too):
     //   help-center    the enough manual, in the UI language's telling
     //                  (six tellings, one id-set; a translation tells a few
     //                  items in English and says so), icon hxc;
     //   macrocosm-oes  the MacroCOSM OES specification with its synced
     //                  chapters (Comprise OES 1, its paradigm map), English
-    //                  only, icon macrocosm.
+    //                  only, icon macrocosm;
+    //   thym           Thym 0, the language, its compiler and its runtime
+    //                  (docs/THYM.md, 0.5.0), English only, icon cosm;
+    //   ascribe        Ascribe OES 1, a person's holograph (docs/ASCRIBE.md,
+    //                  0.5.0), English only, icon readvisor-rename.
+    // The three specifications share one chrome (`kind: 'spec'` below): the
+    // toolbar's "specification", a badge "<title> · v<version>", and in a
+    // translated UI the note that they are written in English. (A Thym
+    // program, 0.5.0, is a fifth, file-backed kind: DOCS_DOCS.program.)
     // Three densities, one control, remembered per document (default
     // short):
     //   atem    the document as an outline of one-liners — every section's
@@ -21490,19 +21597,36 @@
     // ================================================================
 
     // The documents the viewer knows, and what is particular to each.
-    //   unwrap: the source is hard-wrapped (the spec, at 120 columns);
+    //   unwrap: the source is hard-wrapped (the specs, at 120 columns);
     //   plain:  how a term's plain (not bold) use becomes a link — 'all',
     //           or 'distinctive' (only names with a space, an inner
     //           capital or digit, or a symbol: the manual defines everyday
     //           words like "project" and "find"); DocOES counts mentions
-    //           the same way (docs/docoes-landed-D1.md).
+    //           the same way (docs/docoes-landed-D1.md);
+    //   kind:   'spec' for a specification (English only; the toolbar says
+    //           "specification", the badge "<title> · v<version>", a
+    //           translated UI gets docs.note.specEnglish);
+    //   stack:  the mode stack's icon title for it.
     const DOCS_DOCS = {
-      'help-center': { icon: 'hxc', unwrap: false, plain: 'distinctive' },
-      'macrocosm-oes': { icon: 'macrocosm', unwrap: true, plain: 'all' },
+      'help-center': { icon: 'hxc', unwrap: false, plain: 'distinctive',
+        stack: () => t('modes.docs.help.icon', 'help center') },
+      'macrocosm-oes': { icon: 'macrocosm', unwrap: true, plain: 'all', kind: 'spec',
+        stack: () => t('modes.docs.spec.icon', 'MacroCOSM specification') },
+      // 0.5.0 (lane X2): the two specifications written in MacroCOSM OES.
+      thym: { icon: 'cosm', unwrap: true, plain: 'all', kind: 'spec',
+        stack: () => t('modes.docs.thym.icon', 'Thym specification') },
+      ascribe: { icon: 'readvisor-rename', unwrap: true, plain: 'all', kind: 'spec',
+        stack: () => t('modes.docs.ascribe.icon', 'Ascribe specification') },
       // 0.5.0: a Thym program (any `.thym` file; DOCS.prog names it), drawn
       // by DOCS_PROGRAM_DENSITIES in the Thym block.
-      program: { icon: 'cosm', unwrap: false, plain: 'all' },
+      program: { icon: 'cosm', unwrap: false, plain: 'all',
+        stack: () => t('modes.docs.program.icon', 'a Thym program') },
     };
+
+    // Whether a document is one of the specifications (`kind: 'spec'`).
+    function docsIsSpec(doc) {
+      return !!(DOCS_DOCS[doc] && DOCS_DOCS[doc].kind === 'spec');
+    }
 
     // Where "§N", "README §N" and "P.N" point, by the scope a sentence is
     // written in ('' = the document itself, else a chapter's prefix) —
@@ -21535,7 +21659,7 @@
     })();
 
     const DOCS = {
-      doc: null,           // 'help-center' | 'macrocosm-oes'
+      doc: null,           // a DOCS_DOCS key: 'help-center', 'macrocosm-oes', 'thym', 'ascribe', 'program'
       lang: null,          // the telling asked for
       density: 'short',
       data: null,          // the payload on screen
@@ -21640,8 +21764,9 @@
       try { localStorage.setItem(docsDensityKey(doc), d); } catch (_e) { /* not kept */ }
     }
 
-    // Warm all seven tellings in the background (D2: POST /api/docs/build),
-    // once, when the UI window first opens — not at page load.
+    // Warm all nine tellings in the background (D2: POST /api/docs/build;
+    // the help center's six and the three specs'), once, when the UI
+    // window first opens — not at page load.
     function docsWarm() {
       if (DOCS.warmed) return;
       DOCS.warmed = true;
@@ -21762,9 +21887,9 @@
 
     // ---- entering, leaving, the chrome ----
 
-    // opts: {doc, lang, density, anchor}. A doc other than the two known
-    // ones opens the help center; lang defaults to the UI language (the
-    // spec answers with its English telling and the note says so).
+    // opts: {doc, lang, density, anchor}. A doc the viewer does not know
+    // opens the help center; lang defaults to the UI language (a spec
+    // answers with its English telling and the note says so).
     async function enterDocsMode(opts = {}) {
       let doc = DOCS_DOCS[opts.doc] ? opts.doc : 'help-center';
       // A program needs its file; one the viewer is not showing yet is loaded afresh.
@@ -21778,13 +21903,12 @@
       if (!wasOpen) DOCS.cache.clear();   // hand edits to a manual show on the next open
       root.classList.add('open');
       root.setAttribute('aria-hidden', 'false');
-      const spec = doc === 'macrocosm-oes';
+      const spec = docsIsSpec(doc);
       const prog = doc === 'program';
       modePush('docs', {
         icon: DOCS_DOCS[doc].icon,
         onExit: exitDocsMode,
-        iconTitle: prog ? t('modes.docs.program.icon', 'a Thym program')
-          : (spec ? t('modes.docs.spec.icon', 'MacroCOSM specification') : t('modes.docs.help.icon', 'help center')),
+        iconTitle: DOCS_DOCS[doc].stack(),
         exitTitle: prog ? t('modes.docs.program.exit', 'close the program')
           : (spec ? t('modes.docs.spec.exit', 'close the specification') : t('modes.docs.help.exit', 'close the help center')),
       });
@@ -21842,7 +21966,7 @@
     // Icon, title, badge, the note line, the density control, the size tip.
     function docsPaintChrome() {
       const doc = DOCS.doc, data = DOCS.data;
-      const spec = doc === 'macrocosm-oes';
+      const spec = docsIsSpec(doc);
       setIcon(docsEl('docs-icon'), DOCS_DOCS[doc] ? DOCS_DOCS[doc].icon : 'hxc');
       docsEl('docs-title').textContent = doc === 'program' ? t('docs.title.program', 'program')
         : (spec ? t('docs.title.spec', 'specification') : t('docs.title.help', 'help center'));
@@ -21851,7 +21975,7 @@
         badge = String(data.name || '') + (data.rel ? ' · ' + data.rel : '');
       } else if (data && spec) {
         const ver = data.document && data.document.version;
-        badge = (data.title || 'MacroCOSM OES') + (ver ? ' · v' + ver : '');
+        badge = (data.title || doc) + (ver ? ' · v' + ver : '');
       } else if (data && data.telling && data.telling.voice) {
         const v = String(data.telling.voice);
         badge = t('docs.badge.voice', 'written by {voice}')
@@ -23667,15 +23791,78 @@
       // The slider's (?) — home never runs loadHelpBubbles (the setting is
       // per project), so the modal decorates itself on the way in.
       applyHelpBubbles();
-      // The window holds both docs launchers: build the doc volumes now,
-      // in the background, so the first open finds them ready.
+      // The window holds the docs launchers (help, the specs menu): build
+      // the doc volumes now, in the background, so the first open finds
+      // them ready.
       if (window.docsWarm) window.docsWarm();
       document.getElementById('ui-modal').classList.remove('hidden');
     }
     function closeUIModal() {
+      uiSpecsMenu(false, { quiet: true });
       document.getElementById('ui-modal').classList.add('hidden');
     }
     window.closeUIModal = closeUIModal;  // inline onclick handlers need this
+
+    // The specifications menu in the header row (0.5.0, lane X2): the
+    // MacroCOSM button opens it, its three items open MacroCOSM OES, Thym
+    // and Ascribe in the docs viewer. Opening puts focus on the first item;
+    // ↑/↓/Home/End move, Esc closes it (not the window) and gives focus
+    // back to the button, Tab or a click elsewhere closes it.
+    function uiSpecsMenu(open, opts = {}) {
+      const menu = document.getElementById('ui-specs-menu');
+      const btn = document.getElementById('ui-specs-btn');
+      if (!menu || !btn) return false;
+      const show = open === undefined ? menu.hidden : !!open;
+      const was = !menu.hidden;
+      menu.hidden = !show;
+      btn.setAttribute('aria-expanded', show ? 'true' : 'false');
+      if (show) {
+        const first = menu.querySelector('[role="menuitem"]');
+        if (first) first.focus({ preventScroll: true });
+      } else if (was && !opts.quiet) {
+        btn.focus({ preventScroll: true });
+      }
+      return show;
+    }
+    window.uiSpecsMenu = uiSpecsMenu;
+    document.getElementById('ui-specs-btn').addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        uiSpecsMenu(true);
+        if (e.key === 'ArrowUp') {
+          const items = document.querySelectorAll('#ui-specs-menu [role="menuitem"]');
+          if (items.length) items[items.length - 1].focus({ preventScroll: true });
+        }
+      }
+    });
+    document.getElementById('ui-specs-menu').addEventListener('keydown', (e) => {
+      const items = Array.from(document.querySelectorAll('#ui-specs-menu [role="menuitem"]'));
+      const at = items.indexOf(document.activeElement);
+      let to = null;
+      if (e.key === 'ArrowDown') to = (at + 1) % items.length;
+      else if (e.key === 'ArrowUp') to = (at - 1 + items.length) % items.length;
+      else if (e.key === 'Home') to = 0;
+      else if (e.key === 'End') to = items.length - 1;
+      else if (e.key === 'Tab') { uiSpecsMenu(false, { quiet: true }); return; }
+      if (to === null || !items.length) return;
+      e.preventDefault();
+      items[to].focus({ preventScroll: true });
+    });
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('ui-specs-menu');
+      if (!menu || menu.hidden) return;
+      if (!document.getElementById('ui-specs-wrap').contains(e.target)) uiSpecsMenu(false, { quiet: true });
+    });
+    // Capture phase + stopPropagation, as the confirm overlay does: the
+    // menu's Esc wins over the window's own.
+    document.addEventListener('keydown', (e) => {
+      const menu = document.getElementById('ui-specs-menu');
+      if (e.key === 'Escape' && menu && !menu.hidden) {
+        e.stopPropagation();
+        e.preventDefault();
+        uiSpecsMenu(false);
+      }
+    }, true);
 
     document.getElementById('ui-btn').addEventListener('click', openUIModal);
     document.getElementById('ui-theme').addEventListener('change', (e) => {
@@ -33050,7 +33237,7 @@
       const file = reIsActive() && canonIsText(RE_PATH) ? RE_PATH : null;
       const where = id === 'wiki-body' ? t('atem.where.wiki', 'this article')
           : id === 'docs-body' ? (DOCS.doc === 'help-center' ? t('atem.where.help', 'the Help Center')
-            : DOCS.doc === 'macrocosm-oes' ? t('atem.where.spec', 'the specification')
+            : docsIsSpec(DOCS.doc) ? t('atem.where.spec', 'the specification')
               : t('atem.where.docs', 'this document'))
             : (RE_PATH ? canonBase(RE_PATH) : t('atem.where.text', 'this text'));
       const isFile = /^(review-body|preview-body|edit-textarea|mini-edit-textarea)$/.test(id);

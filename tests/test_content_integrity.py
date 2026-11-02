@@ -96,8 +96,10 @@ SAME_IN_EVERY_LANGUAGE = frozenset(s.casefold() for s in (
     # `fabula` (0.4.4, DocOES) is the third of the docs viewer's three
     # densities beside atem and short, kept as-is like them; `MiniCOSMs`
     # (0.4.4, the fabula's facet by MiniCOSM) is the format's own word.
+    # `Thym` and `Ascribe` (0.5.0, lane X2: the docs viewer's launchers for
+    # their two specifications) are names like MacroCOSM.
     "enough", "wikisink", "canon", "girraph", "merirmaid", "MacroCOSM", "atem", "short",
-    "fabula", "MiniCOSMs",
+    "fabula", "MiniCOSMs", "Thym", "Ascribe",
     "composure", "readvisor", "readvisors", "rness", "broker", "infoworld",
     "OpenRouter", "MADLAD", "Wikipedia", "markdown", "PDF", "HTML",
     "URL", "AGENT.md", "MOTIVATION.md", "FEED",

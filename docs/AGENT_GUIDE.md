@@ -77,7 +77,7 @@ Three locations that matter:
 | `~/enough/wikisink/` | Default wikisink location: the user's wikisink *data* (comments, overlays, preserved articles, rankings, run state) and — unless pointed elsewhere — the base `.zim` archive(s). Archives can live anywhere, external drives included; several installs can be registered at once. Hidden from the file-manager tree. | Managed via the 🚰 UI; don't hand-edit. |
 | `~/enough/canon/` | The machine-global **Canon** store (0.4.3; `~/enough/cacheawl/` before, renamed in place on first use — see "Canon"): root-level folders are *volumes* (plain kept-forever text, or cached replicas ingested from a path/URL/wikisink), each carrying a backend-owned `canon.cosm` catalog and a hidden `.canon.json`. Global wiki saves land in the `wiki/` volume; the dissolved infoworld folders became the `personal`/`public`/`wiki` volumes. Seam **`ENOUGH_CANON_ROOT`**, then the legacy `ENOUGH_CACHEAWL_ROOT`. Hidden from every project's file tree. | Managed via Canon mode + the readvisors' `canon_*` tools; `canon.cosm` and `.canon.json` are backend-owned. |
 | `~/enough/dict/` | FEED's state root (0.4.1), seam **`ENOUGH_DICT_ROOT`**: `feed.sqlite`, the official dictionary — **built** from the shipped `reflib/dict/` and disposable (rebuilt whenever the manifest digest moves) — and `user-dictionary.sqlite`, the user's own entries — **precious**: created on the first write, never rebuilt or deleted by code. Install-wide, not per project. See "The dictionary (FEED)". | `feed.sqlite` is the build's; the user DB changes only through the `dict_*` tools and `DELETE /api/dict/user/{word}`. Don't hand-edit either. |
-| `~/enough/docoes/` | DocOES's built doc volumes (0.4.4), seam **`ENOUGH_DOCS_ROOT`**: one `<doc>.<lang>.doc.cosm` per telling — `macrocosm-oes.en` (the spec, with Comprise's two chapters and the reference generated from the manifests) and `help-center.<lang>` ×6 (the manual + its bubbles) — **built** by `enough/docoes.py` from the install's own markdown and manifests the first time a route or `doc_lookup` asks, and rebuilt whenever the source digest moves (like `feed.sqlite`). Disposable, never committed, never in a file tree. Install-wide. See "DocOES". | Only `docoes.build()` writes it (atomic `os.replace`). **Every DocOES CLI run and every scratch server exports the seam** — an unseamed `python -m enough.docoes lint …` builds into the real `~/enough/docoes/`. |
+| `~/enough/docoes/` | DocOES's built doc volumes (0.4.4), seam **`ENOUGH_DOCS_ROOT`**: one `<doc>.<lang>.doc.cosm` per telling — `macrocosm-oes.en` (the spec, with Comprise's two chapters and the reference generated from the manifests), `thym.en` and `ascribe.en` (the Thym and Ascribe specifications, 0.5.0) and `help-center.<lang>` ×6 (the manual + its bubbles) — **built** by `enough/docoes.py` from the install's own markdown and manifests the first time a route or `doc_lookup` asks, and rebuilt whenever the source digest moves (like `feed.sqlite`). Disposable, never committed, never in a file tree. Install-wide. See "DocOES". | Only `docoes.build()` writes it (atomic `os.replace`). **Every DocOES CLI run and every scratch server exports the seam** — an unseamed `python -m enough.docoes lint …` builds into the real `~/enough/docoes/`. |
 | `~/enough/thym/` | Thym's state root (0.5.0), seam **`ENOUGH_THYM_ROOT`** (read by `thym_host.host_root()` and `thym.trace.runs_dir`): `runs/<run-id>/` per run — `<run-id>.plan.cosm`, `<run-id>.trace.cosm`, `candidates/` (every coprocessor answer, `<node>[-<k>].<attempt>.cosm`, and every engine call, `<node>-e<k>.1.cosm`), `stage/` while it runs, `outputs/<gives>.<ext>` once every node has passed. **Never created by asking**: `GET /api/thym/runs` answers `[]` when it is absent; the first run makes it. Install-wide; records, not precious (a run is replayable from its folder). See "Thym". | Only the runtime writes it (`thym.run.run`, from `POST /api/thym/run`, `/api/canon/package`, `/api/canon/read`, `thym_run` and the CLI). **Every Thym CLI run and every scratch server exports the seam** — `python -m enough.thym run` without it writes into the real `~/enough/thym/`. |
 | `<project>/rness/` | The per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/**readvisors** (and into `~/enough/readvisors/` for the user's own); per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`, `project.json`; per-project state in `io/`, `requests/`, `knowledge/`. Composure-round additions: **`rness/readvisors/`** (was `roles/`, migrated by `skeleton._migrate_roles_to_readvisors`), **`rness/io/composure/`** (where new `.comp` files land — in `_EMPTY_DIRS`, so it is back-filled on every launch), **`rness/composure-forms/`** (project forms; **not** in `_EMPTY_DIRS` — created on the first save-as-form) and **`rness/knowledge/councils/`** (exported council transcripts, created by `council.py` on the first conclude). 0.4.3 adds **`rness/canon.cosm`**, the project's catalog (backend-owned, write-refused, written lazily — see "Canon"). | Edit to affect just this project (never `rness/canon.cosm`). |
 | `<dir>/.<name>.comp.comments.json` | A composure's comments sidecar, beside the `.comp` it belongs to. Backend-owned, hidden from the tree by the leading dot, carried along by `composure.move_sidecars()` on a rename. Both write doors refuse it by name. | Managed via the composure comment endpoints; don't hand-edit. |
@@ -3152,9 +3152,14 @@ byte for byte (`compile_doc`; tested for the spec, both chapters and all six
 manual tellings). Spec: `docs/MACROCOSM_OES.md` §18.5; plan:
 `docs/docoes-044-plan.md` (local). User-facing: HELP_CENTER §13.1–13.2.
 
-- **Documents** (`docoes.DOCUMENTS`): `macrocosm-oes` — English only,
-  `docs/MACROCOSM_OES.md` + the chapters in `defaults/cosm/chapters/` + the
-  reference; `help-center` — six tellings, `docs/HELP_CENTER.md` /
+- **Documents** (`docoes.DOCUMENTS`, four, in this order): `macrocosm-oes`
+  — English only, `docs/MACROCOSM_OES.md` + the chapters in
+  `defaults/cosm/chapters/` + the reference; `thym` ("Thym 0", version `0`:
+  the document is "Version 0 of the language", while its MiniCOSM declares
+  `thym/1`) — `docs/THYM.md`; `ascribe` ("Ascribe OES 1", version `1`) —
+  `docs/ASCRIBE.md`; the last two English only, no chapters, no reference,
+  every plain use a mention (0.5.0, lane X2: 83 sections / 12 terms and 27 /
+  5; ≈0.1 s and ≈0.03 s to build); `help-center` — six tellings, `docs/HELP_CENTER.md` /
   `static/i18n/<lang>/help-center.md` with `static/help-docs.md` /
   `static/i18n/<lang>/help-docs.md`, `voice: rosa`, mentions counted
   "distinctive" (a plain use links only a name with a space, an inner
@@ -3197,14 +3202,35 @@ manual tellings). Spec: `docs/MACROCOSM_OES.md` §18.5; plan:
   of `scripts/smoke_boot.build_env()`) pointed at a scratch dir**; without it
   the CLI builds into the real `~/enough/docoes/` (it happened once, during
   the round). `lint macrocosm-oes` and a byte-exact `compile macrocosm-oes`
-  are the checks after any spec edit.
+  are the checks after any spec edit. (`lint thym` / `lint ascribe` are not
+  clean in 0.5.0: five and one `atem-shape` errors — atem markers of 16–17
+  words — and Thym's "MacroCOSM section 18.5" read as its own §18.5; see
+  `docs/thym-landed-X2.md`.)
+- **The static export** (0.5.0, `enough/docoes_html.py`; lane X1, spec
+  `docs/thym-landed-X1.md` §2): `python -m enough.docoes export <doc>
+  <out-dir> [--lang L] [--densities short,atem,fabula] [--page
+  short=short.html …] [--standalone] [--slug S] [--name N] [--version V]
+  [--docs-root DIR]`. `<doc>` is a registered slug or a markdown path inside
+  the install (a path whose default slug is registered is that document:
+  `docs/MACROCOSM_OES.md` with its chapters, and since X2 `docs/THYM.md` →
+  `thym`, named "Thym 0"; any other path is ad hoc — slug from the file
+  name, name its H1, version the manifest named like the slug, if any). It builds the volume fresh into a **temporary directory** (never
+  `docs_root()` unless `--docs-root` says so), reads it back through
+  `load_volume`, and writes `<slug>/{short,atem,fabula}.html` — script-free,
+  style-free fragments (`article.docoes`, one `<h1>`, the app's heading ids,
+  xref and term rules ported from the docs viewer, every `href="#…"`
+  resolving inside its fragment, no timestamps) — plus `docs.css` and a
+  `manifest.json` merged across runs (`docoes-export/1`, sha256 per file).
+  markdown-it-py renders (lazily imported; html off, so `<slug>`
+  placeholders stay text). Nothing in the app calls it; comprise-connect's
+  `scripts/sync_macrocosmoes.py` does. Tests: `tests/test_docoes_export.py`.
 
 ### Routes (all read-only, home-accessible, open while agent-free)
 
 | Route | Answers |
 |---|---|
-| `GET /api/docs?doc=&lang=&density=atem\|short\|fabula[&section=][&module=]` | `doc` ∈ `macrocosm-oes`, `help-center`; `lang` absent → the UI language, not one of the six → 404, a document without that telling → the author's with `requested_lang`. Head: `{doc, lang, requested_lang, density, id, title, uri, telling, tellings, document, chapters, built}`; **atem** + `items` (light: key, id, kind, module, name, atem, order, level, parent, number, anchor, chapter, fallback, in, of, defined_in); **short** + `sections` (telling order, `heading` + `body` verbatim, `mentioned_in`, `examples`) and `terms`; **fabula** = `/api/cosm`'s payload with `report = lint_doc`, `backrefs` (target → sources, minus `parts`/`parent`/`chapter`), `inventory`, `declared_lenses: [{id, kind, diagram, include, generic}]` (each lens's modules — the manifest's `include`, every module when none — and the reader's generic `tree`, `generic: true`; D3 0.4.4) and `page`. 202 `{building, progress}` while a build runs; 503 when it cannot be built. Payloads are JSON-encoded once per built volume |
-| `GET /api/docs/status` · `POST /api/docs/build {doc?, lang?}` | every telling's `{built, fresh, digest, building, progress}` · start a background build (the UI window warms all seven) |
+| `GET /api/docs?doc=&lang=&density=atem\|short\|fabula[&section=][&module=]` | `doc` ∈ `macrocosm-oes`, `thym`, `ascribe`, `help-center`; `lang` absent → the UI language, not one of the six → 404, a document without that telling → the author's with `requested_lang`. Head: `{doc, lang, requested_lang, density, id, title, uri, telling, tellings, document, chapters, built}`; **atem** + `items` (light: key, id, kind, module, name, atem, order, level, parent, number, anchor, chapter, fallback, in, of, defined_in); **short** + `sections` (telling order, `heading` + `body` verbatim, `mentioned_in`, `examples`) and `terms`; **fabula** = `/api/cosm`'s payload with `report = lint_doc`, `backrefs` (target → sources, minus `parts`/`parent`/`chapter`), `inventory`, `declared_lenses: [{id, kind, diagram, include, generic}]` (each lens's modules — the manifest's `include`, every module when none — and the reader's generic `tree`, `generic: true`; D3 0.4.4) and `page`. 202 `{building, progress}` while a build runs; 503 when it cannot be built. Payloads are JSON-encoded once per built volume |
+| `GET /api/docs/status` · `POST /api/docs/build {doc?, lang?}` | every telling's `{built, fresh, digest, building, progress}` · start a background build (the UI window warms all nine: three specs + six manual tellings) |
 | `GET /api/docs/lens?doc=&lang=&lens=&around=&depth=` | `/api/cosm/lens`'s shape for a doc volume (`map`, `graph`, `tree`; `graph` around an item by default) |
 | `POST /api/docs/compile {doc, lang?, chapter?}` · `GET /api/docs/inventory?doc=&lang=` | the markdown, byte for byte · the inventory rows `{inventory, xref, id, kind, version, anchor, atem}` |
 
@@ -4827,8 +4853,12 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   launched from `#ui-help-center-btn` (`openHelpCenter()`) — a small **help**
   button inline in the UI modal's header row, beside the × (it kept its
   `.help-center-launch` class and its `hxc` icon); `#ui-dict-btn` and
-  `#ui-cosmspec-btn` ("MacroCOSM", the spec in the same viewer) sit beside
-  it. `GET /api/help-center?lang=` still serves the raw markdown with the
+  `#ui-specs-btn` ("MacroCOSM ▾") sit beside it — since 0.5.0 (lane X2) a
+  small menu (`#ui-specs-menu[role=menu]`, `uiSpecsMenu(open)`; focus on
+  the first item, ↑/↓/Home/End, Esc closes the menu before the window) of
+  the three specifications in the same viewer: `#ui-cosmspec-btn`
+  (MacroCOSM OES), `#ui-thym-btn` (Thym), `#ui-ascribe-btn` (Ascribe). Two
+  more inline buttons wrapped the header row in de, fr, es and ja. `GET /api/help-center?lang=` still serves the raw markdown with the
   language whitelist — **kept** in 0.4.4 though the frontend no longer calls
   it: it is the manual's plain-text route, as `/api/macrocosm-spec` is the
   spec's, and the cheapest way for a tool or a person to read the source.
@@ -4841,11 +4871,19 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   in all six, with the same defined terms in the same places, so no telling
   falls back to English for them).
 - **The docs viewer (0.4.4)** — mode `docs`, root `#docs-mode` (carries
-  `data-doc` and `data-density`), one viewer for two documents:
+  `data-doc` and `data-density`), one viewer for four documents:
   `help-center` (icon `hxc`, the UI language's telling, badge "written by
-  Rosa" from the catalog's `telling.voice`) and `macrocosm-oes` (icon
-  `macrocosm`, English; a translated UI gets `requested_lang` and the note
-  `docs.note.specEnglish`; badge "MacroCOSM OES · v0.0.1"). Functions
+  Rosa" from the catalog's `telling.voice`) and three specifications,
+  `macrocosm-oes` (icon `macrocosm`), `thym` (icon `cosm`) and `ascribe`
+  (icon `readvisor-rename`; both 0.5.0, lane X2, the closest existing
+  glyphs). A spec is `DOCS_DOCS[doc].kind === 'spec'` (`docsIsSpec(doc)`):
+  English only, so a translated UI gets `requested_lang` and the note
+  `docs.note.specEnglish`; the toolbar says `docs.title.spec`; the badge is
+  `<title> · v<document.version>` ("MacroCOSM OES · v0.0.2", "Thym 0 · v0",
+  "Ascribe OES 1 · v1"); the mode stack's icon title is the entry's
+  `stack()` (`modes.docs.{spec,thym,ascribe}.icon`), its exit
+  `modes.docs.spec.exit`. `COSM_SPEC_SECTION` and "about this format" stay
+  on macrocosm-oes. Functions
   (window): `enterDocsMode({doc, lang, density, anchor})` (no `density` →
   the remembered one, `localStorage['enough.docs.density.<doc>']`, default
   `short`), `exitDocsMode()`, `openHelpCenter()`, `docsSetDensity(d,
@@ -4922,12 +4960,16 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   **uicheck** screens `docs-help`, `docs-help-mini`, `docs-help-fr`,
   `docs-atem`, `docs-short`, `docs-spec`, `docs-spec-mini`, `docs-fabula`,
   `docs-fabula-mini`, `docs-card-term`, `docs-card-example-live`,
-  `docs-graph`, `home-docs-spec`, `home-docs-help`, `home-docs-fabula`
-  (the home screens fail when a route is not home-accessible), and
-  `readvisor-and-minis` docks the viewer; scenarios `docs-find-contents`
-  (the ref-mode gate), `docs-contents`, `docs-term-roundtrip`,
-  `docs-example-live`, `docs-graph-roundtrip`; the four mode-stack scenarios
-  use the docs viewer as their second mode.
+  `docs-graph`, `docs-thym`, `docs-ascribe`, `modal-ui-specs` (the ui
+  window's MacroCOSM menu open), `home-docs-spec`,
+  `home-docs-thym` (through the home ui window's menu item),
+  `home-docs-help`, `home-docs-fabula` (the home screens fail when a route
+  is not home-accessible), and `readvisor-and-minis` docks the viewer;
+  scenarios `docs-find-contents` (the ref-mode gate), `docs-contents`,
+  `docs-specs` (0.5.0, X2: the specs menu, and the three specs' shared
+  chrome, links and densities), `docs-term-roundtrip`,
+  `docs-example-live`, `docs-graph-roundtrip`; the four mode-stack
+  scenarios use the docs viewer as their second mode.
   **Programs (0.5.0, U1)**: `DOCS_DOCS.program` reads any `.thym` file at
   three densities (`enterProgramDoc(path, {density, anchor})`, `DOCS_PROG`,
   `DOCS_PROGRAM_DENSITIES`; data from `GET /api/thym/program`, falling back to
@@ -5483,7 +5525,8 @@ than reinvent:
   viewer, the dictionary, and the read-only **docs viewer** below — all stack
   citizens.
 - **The docs viewer (`#docs-mode`, name `docs`, 0.4.4).** The read-only
-  reader for enough's two documents, the help center and the MacroCOSM spec,
+  reader for enough's four documents, the help center and the three
+  specifications (MacroCOSM OES, and since 0.5.0 Thym and Ascribe),
   over their DocOES volumes (`GET /api/docs`; see "DocOES" and "The help
   system"). It replaced **reference mode** (`#ref-mode`, retired at plan §5's
   gate) and the 0.4.3 **spec viewer** (`#cosmspec-mode`). It renders into a
@@ -5493,8 +5536,9 @@ than reinvent:
   only by design: no edit face, no highlighting, no chat affordance. The
   `ref-mini` class (the 0.4.1 reader's, now the docs viewer's alone) docks it
   to the right edge (`docsToggleSize()`); launched from the small **help**
-  button in the UI modal's header (`openHelpCenter()`) and from
-  `#ui-cosmspec-btn` ("MacroCOSM"). The 3D icon-button gradient used on square chips is
+  button in the UI modal's header (`openHelpCenter()`) and from the
+  "MacroCOSM ▾" menu beside it (`#ui-cosmspec-btn`, `#ui-thym-btn`,
+  `#ui-ascribe-btn`). The 3D icon-button gradient used on square chips is
   the shipped two-stop ramp `rgba(128,128,128,0.42) → 0.10 at 62% → 0`
   over `var(--btn-bg, var(--bg-raise))`.
 
@@ -5551,7 +5595,8 @@ actually had to tick. Grep `dict` beside each step for the worked example.
 0.4.3 ran the list twice more and 0.4.4 once. The **docs viewer** is the
 variant to copy when the new mode is another long document: it is one mode
 over any DocOES volume (`DOCS_DOCS` holds the per-document settings, a new
-document is a row in `docoes.DOCUMENTS` plus one there), and the 0.4.1
+document is a row in `docoes.DOCUMENTS` plus one there — `kind: 'spec'` for
+a specification's chrome, as Thym and Ascribe were added in 0.5.0), and the 0.4.1
 reader's `ref*` functions take its reader context (`DOCS_CTX`; see "The help
 system"). The **cosm viewer** is the variant for a structured
 view that a second surface also draws: write its content functions against a

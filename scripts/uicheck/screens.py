@@ -639,6 +639,14 @@ PROJECT_SCREENS: list[Screen] = [
                   ("wait_for", "#ui-modal:not(.hidden)"), ("wait_idle", "")),
            teardown=(_esc(), ("wait_idle", ""))),
 
+    Screen("modal-ui-specs", "project",
+           setup=(("eval", "openUIModal()"),
+                  ("wait_for", "#ui-modal:not(.hidden)"), ("click", "#ui-specs-btn"),
+                  ("wait_for", "#ui-specs-menu:not([hidden])"), ("wait_idle", "")),
+           teardown=(_esc(), _esc(), ("wait_idle", "")),
+           note="the MacroCOSM button's menu open (0.5.0, X2): MacroCOSM, Thym, "
+                "Ascribe under the header row"),
+
     Screen("modal-project", "project",
            setup=(("eval", "openProjectModal()"),
                   ("wait_for", "#project-modal:not(.hidden)"), ("wait_idle", "")),
@@ -951,6 +959,21 @@ PROJECT_SCREENS: list[Screen] = [
            setup=(_docs("macrocosm-oes"), ("wait_for", "#docs-mode.open"),
                   DOCS_READY, DOCS_SHORT_OK, ("eval", "docsToggleSize()"), ("wait_idle", "")),
            teardown=EXIT_ALL_MODES),
+
+    # --- 0.5.0 (lane X2): Thym and Ascribe, the two specs written in MacroCOSM OES
+    Screen("docs-thym", "project",
+           setup=(_docs("thym"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_SHORT_OK, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the Thym specification at short: \"Thym 0 · v0\" in the badge, "
+                "the English-only note in a translated UI, its term links"),
+
+    Screen("docs-ascribe", "project",
+           setup=(_docs("ascribe"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_SHORT_OK, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the Ascribe OES specification at short: \"Ascribe OES 1 · v1\" "
+                "in the badge, the English-only note in a translated UI"),
 
     # --- FEED: the dictionary, the word data lightbox (0.4.1) -------------
     Screen("dict-mode", "project",
@@ -1515,6 +1538,16 @@ HOME_SCREENS: list[Screen] = [
            teardown=EXIT_ALL_MODES,
            note="the fabula from the home screen on a live example: /api/docs and "
                 "/api/cosm/inline are home-accessible (the wait fails when not)"),
+
+    Screen("home-docs-thym", "home",
+           setup=(("eval", "(() => { try { localStorage.removeItem('enough.docs.density.thym'); }"
+                           " catch (e) {} return true; })()"),
+                  ("eval", "openUIModal()"), ("wait_for", "#ui-modal:not(.hidden)"),
+                  ("click", "#ui-thym-btn"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_SHORT_OK, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the Thym specification opened from the home screen's ui window, "
+                "through its own button (0.5.0, X2; the wait fails when not)"),
 
     Screen("home-docs-help", "home",
            setup=(("eval", "openUIModal()"), ("wait_for", "#ui-modal:not(.hidden)"),

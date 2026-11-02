@@ -313,13 +313,13 @@ path: *.cosm
 
 ## docs
 name: 文档查看器
-path: docs/HELP_CENTER.md · docs/MACROCOSM_OES.md
+path: docs/HELP_CENTER.md · docs/MACROCOSM_OES.md · docs/THYM.md · docs/ASCRIBE.md
 
 ### what
-enough 的两份文档在这里读：这份<strong>帮助中心</strong>，用你的界面语言；以及 <strong>MacroCOSM OES 规范</strong>，每个 <code>.cosm</code> 文件共用的那套语法（眼下还是英文）。每份都有三种密度：<strong>fabula</strong>，它的每个部分各是一张卡片；<strong>short</strong>，拿来读的文档，就照它写成的样子；以及 <strong>atem</strong>，整份文档成了一份一行一句的大纲。文档定义的词是一个低调的链接，通往它的卡片；一节的页边写着文档其余部分多常指向它、它含有几个示例——点一下，就是这一节的卡片。一张卡片先给出它的那一句和它在文档里的位置，再说其余的：它的文字从哪里来、它由什么构成、涉及它的检查、画它的透镜、它的示例，以及提到它的每一处。
+enough 的四份文档在这里读：这份<strong>帮助中心</strong>，用你的界面语言；<strong>MacroCOSM OES 规范</strong>，每个 <code>.cosm</code> 文件共用的那套语法；<strong>Thym</strong>，enough 的程序所用的那门小语言，连同它的编译器和运行时；以及 <strong>Ascribe</strong>，holograph 的 MiniCOSM，一个人被描述得足够清楚，用不着名字。这三份规范眼下还是英文。每份都有三种密度：<strong>fabula</strong>，它的每个部分各是一张卡片；<strong>short</strong>，拿来读的文档，就照它写成的样子；以及 <strong>atem</strong>，整份文档成了一份一行一句的大纲。文档定义的词是一个低调的链接，通往它的卡片；一节的页边写着文档其余部分多常指向它、它含有几个示例——点一下，就是这一节的卡片。一张卡片先给出它的那一句和它在文档里的位置，再说其余的：它的文字从哪里来、它由什么构成、涉及它的检查、画它的透镜、它的示例，以及提到它的每一处。
 
 ### how
-从 ui 窗口顶上的<strong>帮助</strong>打开帮助中心，从它旁边的 <strong>MacroCOSM</strong> 打开规范，也可以从 cosm 查看器的<strong>关于这种格式</strong>打开，它会落在对的那一节。工具栏里的三个按钮切换密度（方向键在它们之间走），查看器会替每份文档记住你的选择。在 <strong>short</strong> 下，<strong>目录</strong>列出各节，正文里的节号是链接，⌘F 查找，每次跳转都留下一颗「回到你刚才的位置」药丸。在 <strong>atem</strong> 下，点任意一行就去读那一节；这里的 ⌘F 只搜名字和那一句句话。在 <strong>fabula</strong> 下，卡片旁边的<strong>大纲</strong>可以翻到某个分节页，把卡片限定为某几类条目或某一个 MiniCOSM，并列出各项检查；卡片的面包屑带你去它在 short 里的位置，回去的药丸再把你带回来，<strong>以此为中心的关系图</strong>在 merirmaid 里画出这个条目和它的邻居（按住 shift 点一个节点，选<strong>显示条目</strong>），⌘F 则搜这一页上的卡片。示例的卡片是活的：它的代码块被当作一个独立的卷读进来，说出它过不过得了检查，还能在透镜里或 cosm 查看器里打开。尺寸按钮把查看器停靠在你的工作旁边。
+从 ui 窗口顶上的<strong>帮助</strong>打开帮助中心，从它旁边的 <strong>MacroCOSM</strong> 打开各份规范：一个小菜单，列着三份——MacroCOSM OES、Thym 和 Ascribe。MacroCOSM 规范也可以从 cosm 查看器的<strong>关于这种格式</strong>打开，它会落在对的那一节。工具栏里的三个按钮切换密度（方向键在它们之间走），查看器会替每份文档记住你的选择。在 <strong>short</strong> 下，<strong>目录</strong>列出各节，正文里的节号是链接，⌘F 查找，每次跳转都留下一颗「回到你刚才的位置」药丸。在 <strong>atem</strong> 下，点任意一行就去读那一节；这里的 ⌘F 只搜名字和那一句句话。在 <strong>fabula</strong> 下，卡片旁边的<strong>大纲</strong>可以翻到某个分节页，把卡片限定为某几类条目或某一个 MiniCOSM，并列出各项检查；卡片的面包屑带你去它在 short 里的位置，回去的药丸再把你带回来，<strong>以此为中心的关系图</strong>在 merirmaid 里画出这个条目和它的邻居（按住 shift 点一个节点，选<strong>显示条目</strong>），⌘F 则搜这一页上的卡片。示例的卡片是活的：它的代码块被当作一个独立的卷读进来，说出它过不过得了检查，还能在透镜里或 cosm 查看器里打开。尺寸按钮把查看器停靠在你的工作旁边。
 
 ### ideas
 - 在帮助中心里，先试试 <strong>atem</strong>：几屏看完整本手册，每节一行。
