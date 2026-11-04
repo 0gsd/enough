@@ -676,8 +676,9 @@ def as_list(v: Any) -> list:
     return list(v) if isinstance(v, (list, tuple)) else [v]
 
 
-# Every module registers its moves and checks when imported; importing one imports them all.
-from enough.thym.moves import doc, edit, emf, morph, pack, project  # noqa: E402,F401
+# Every module registers its moves and checks when imported; importing one imports them all. `project` stays out: it
+# implements moves a MiniCOSM declares with `code:`, so `load_all` imports it from the sidecar and a host's `code:` wins.
+from enough.thym.moves import doc, edit, emf, morph, pack  # noqa: E402,F401
 
 __all__ = ["LADDER", "RANK", "SALIENCE", "CoverMap", "EngineAdapter", "MoveError", "Sentence", "claim_bearing",
            "compose", "cover_map", "engine", "fabula_doc", "fabula_for", "first_input", "fold", "item_kind",

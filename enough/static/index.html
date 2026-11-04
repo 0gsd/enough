@@ -13,6 +13,20 @@
     // PROJECT_NAME token. Stays null when served statically or on the
     // home screen (home:true), where both vars keep their 1 default.
     const BOOT_UI_STATE = /*UI_STATE_JSON*/null;
+    // Static asset URLs carry the server's version (0.5.1): staticUrl(path)
+    // appends `?v=<version>` (bare when served statically). An icon's path
+    // never changed between releases and /static sent no Cache-Control, so
+    // the desktop webview kept 0.4.4's icons as "fresh" right through the
+    // 0.5.0 upgrade — the snapshot had the new ones, the server sent them,
+    // the page never asked. The server now answers /static with
+    // `Cache-Control: no-cache` as well; the stamp is what gets a page past
+    // the entries an older release already cached. Defined here, in the
+    // head, because the help loader below calls it while the main script
+    // is still evaluating (a const declared later would be in its TDZ).
+    const ASSET_VERSION = (BOOT_UI_STATE && BOOT_UI_STATE.version) || '';
+    function staticUrl(path) {
+      return ASSET_VERSION ? path + '?v=' + encodeURIComponent(ASSET_VERSION) : path;
+    }
     if (BOOT_UI_STATE && !BOOT_UI_STATE.home) {
       const _de = document.documentElement;
       if (BOOT_UI_STATE.ui_scale > 0 && BOOT_UI_STATE.ui_scale !== 1)
@@ -57,7 +71,7 @@
     // same frame it wires the UI (English needs no catalog at all).
     window.__I18N_PREFETCH =
       (BOOT_UI_STATE && BOOT_UI_STATE.lang && BOOT_UI_STATE.lang !== 'en')
-        ? fetch('/static/i18n/' + BOOT_UI_STATE.lang + '/ui.json')
+        ? fetch(staticUrl('/static/i18n/' + BOOT_UI_STATE.lang + '/ui.json'))
             .then((r) => (r.ok ? r.json() : null)).catch(() => null)
         : Promise.resolve(null);
   </script>
@@ -5328,7 +5342,9 @@
        (wave 2c). Same shell pattern as #girraph-mode: absolute-inset
        overlay inside <main class="content">, toolbar + body + a chat
        pill mirroring the live conversation. Rendering is done client
-       side by the vendored mermaid.min.js (lazy-loaded on first open). */
+       side by the vendored pele.global.js (Pele, lazy-loaded on first
+       open); its colours are the --pele-* variables on #merirmaid-mode
+       below, so a theme change needs no re-render. */
     /* ---------------- The reader (the docs viewer's frame) ---------------- */
     /* Full-frame reader for a read-only document — view only: no edit
        face, no highlighting, no chat pill. Shares the pretty markdown
@@ -10322,6 +10338,25 @@
       position: relative;
     }
 
+    /* Pele (0.5.1) colours its SVG from these variables, so a diagram
+       follows the app theme without re-rendering. Lines and borders lean
+       on the muted/faint tokens (the hairline --border would vanish on
+       the node surface); --pele-font is set per render from the body's
+       computed font so Pele measures text in the face it is drawn in. */
+    #merirmaid-mode {
+      --pele-bg: var(--bg);
+      --pele-fg: var(--fg);
+      --pele-muted: var(--fg-muted);
+      --pele-line: var(--fg-muted);
+      --pele-surface: var(--bg-raise);
+      --pele-surface-alt: var(--bg-alt);
+      --pele-border: var(--fg-faint);
+      --pele-accent: var(--accent-user);
+      --pele-error: var(--accent-error);
+      --pele-font-mono: var(--font-mono);
+      --pele-radius: 4px;
+    }
+
     #merirmaid-mode .mm-diagram {
       display: flex;
       justify-content: center;
@@ -10351,7 +10386,7 @@
       white-space: pre-wrap;
     }
 
-    /* Render-error view — the mermaid error message plus the raw
+    /* Render-error view — the renderer's error message plus the raw
        source, so the pane is never blank. */
     #merirmaid-mode .mm-error {
       color: var(--accent-error, #d66);
@@ -17265,7 +17300,7 @@
       <!-- Merirmaid view mode (wave 2c): full-frame Mermaid-diagram
            viewer/editor for .merirmaid files. Opened from a .merirmaid
            row in the tree, or by click-link navigation from another
-           diagram. The body holds the rendered SVG (mermaid.min.js is
+           diagram. The body holds the rendered SVG (pele.global.js is
            lazy-loaded on first open); the chat pill mirrors the live
            conversation so structure edits happen via your readvisor without
            leaving the diagram. -->
@@ -19112,7 +19147,7 @@
       }
       if (!data) {
         try {
-          const r = await fetch('/static/i18n/' + lang + '/ui.json');
+          const r = await fetch(staticUrl('/static/i18n/' + lang + '/ui.json'));
           if (r.ok) data = await r.json();
         } catch (_e) { /* missing catalog ⇒ English strings via fallback */ }
       }
@@ -19321,12 +19356,12 @@
           let mdT = null;
           if (I18N.lang !== 'en') {
             try {
-              mdT = await fetch('/static/i18n/' + I18N.lang + '/help-docs.md');
+              mdT = await fetch(staticUrl('/static/i18n/' + I18N.lang + '/help-docs.md'));
             } catch (_e) { mdT = null; }
             if (mdT && !mdT.ok) mdT = null;
           }
           const [mdR, defR] = await Promise.all([
-            mdT || fetch('/static/help-docs.md'),
+            mdT || fetch(staticUrl('/static/help-docs.md')),
             fetch('/api/help/defaults'),
           ]);
           if (mdR.ok) md = await mdR.text();
@@ -19826,9 +19861,11 @@
     // live theme change (no reload). Later waves: reuse setIcon/iconSrc.
     let ICON_VARIANT = 'dark';
 
+    // Icon URLs carry the version stamp: staticUrl() is defined in the
+    // head boot script (0.5.1), beside BOOT_UI_STATE.
     function iconSrc(name) {
       const suffix = ICON_VARIANT === 'dark' ? '-dark' : '';
-      return '/static/icons/build/' + name + suffix + '.svg';
+      return staticUrl('/static/icons/build/' + name + suffix + '.svg');
     }
     function setIcon(el, name) {
       if (!el) return;
@@ -23573,12 +23610,9 @@
       if (typeof applyReviewContrast === 'function') {
         applyReviewContrast();
       }
-      // If merirmaid mode is open, re-render its diagram so the mermaid
-      // theme tracks the new app theme. (Guarded; may be undefined during
-      // initial bootstrap before merirmaid JS is parsed.)
-      if (typeof mmOnThemeChange === 'function') {
-        mmOnThemeChange();
-      }
+      // Merirmaid needs no re-render on a theme change since 0.5.1: Pele
+      // colours its SVG from the --pele-* variables on #merirmaid-mode,
+      // which follow the app tokens in CSS.
       // The dictionary measures its pages in the UI font (FEED, 0.4.1).
       if (typeof dictOnUIChange === 'function') dictOnUIChange();
     }
@@ -29231,12 +29265,15 @@
     });
 
     // ================================================================
-    // Merirmaid mode (wave 2c) — Mermaid diagram viewer/editor
+    // Merirmaid mode (wave 2c) — Mermaid-syntax diagram viewer/editor
     // ================================================================
     //
     // Full-frame mode for .merirmaid files: frontmatter + Mermaid source,
-    // rendered client-side by the vendored mermaid.min.js (lazy-loaded on
-    // first open — it's ~3.5 MB, must not weigh down initial page load).
+    // rendered client-side by the vendored pele.global.js (Pele 1.13.0,
+    // Obsidian's Mermaid renderer, since 0.5.1; Mermaid's own bundle from
+    // 0.1.6 to 0.5.0). Lazy-loaded on first open — 730 kB that must not
+    // weigh down the initial page load. Pele renders synchronously, does
+    // its own layout, and stamps every node `g.pele-node[data-id]`.
     // Navigation between diagrams uses a breadcrumb descent stack with the
     // same push/pop-back semantics as girraph mode (pushing an
     // already-visited path pops back to it, keeping cycles navigable).
@@ -29246,8 +29283,7 @@
     let MM_PATH = null;           // top diagram path (for the chat preamble)
     let MM_TITLE = null;          // top diagram title (for the chat preamble)
     let MM_RENDER_SEQ = 0;        // guards against out-of-order async renders
-    let MM_MERMAID_LOADING = null;
-    let MM_MERMAID_INITED = false;
+    let MM_PELE_LOADING = null;   // the lazy-load promise, once started
 
     // Node shapes we can locate/patch by nodeId, longest opener first so
     // `[[`/`([` win over `[`. Each is [openDelim, closeDelim].
@@ -29507,29 +29543,36 @@
       return res;
     }
 
-    function mmMermaidTheme() {
-      return (typeof ICON_VARIANT !== 'undefined' && ICON_VARIANT === 'dark') ? 'dark' : 'default';
+    // Lazy-load pele.global.js. Returns a promise that resolves once
+    // window.pele is ready; a failed load is forgotten so the next render
+    // tries again.
+    function mmEnsurePele() {
+      if (window.pele) return Promise.resolve();
+      if (MM_PELE_LOADING) return MM_PELE_LOADING;
+      MM_PELE_LOADING = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = staticUrl('/static/pele.global.js');
+        s.onload = () => (window.pele ? resolve()
+          : reject(new Error('pele.global.js loaded but defined no renderer')));
+        s.onerror = () => reject(new Error('could not load /static/pele.global.js'));
+        document.head.appendChild(s);
+      }).catch((e) => { MM_PELE_LOADING = null; throw e; });
+      return MM_PELE_LOADING;
     }
 
-    // Lazy-load + one-time initialize mermaid.min.js. Returns a promise
-    // that resolves once window.mermaid is ready.
-    function mmEnsureMermaid() {
-      if (window.mermaid && MM_MERMAID_INITED) return Promise.resolve();
-      if (MM_MERMAID_LOADING) return MM_MERMAID_LOADING;
-      MM_MERMAID_LOADING = new Promise((resolve, reject) => {
-        if (window.mermaid) { resolve(); return; }
-        const s = document.createElement('script');
-        s.src = '/static/mermaid.min.js';
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error('could not load /static/mermaid.min.js'));
-        document.head.appendChild(s);
-      }).then(() => {
-        if (!MM_MERMAID_INITED) {
-          window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: mmMermaidTheme() });
-          MM_MERMAID_INITED = true;
-        }
-      }).catch((e) => { MM_MERMAID_LOADING = null; throw e; });
-      return MM_MERMAID_LOADING;
+    // Pele's render options. The font it measures text in is the font the
+    // SVG is drawn in: the body's computed family, also pushed to
+    // --pele-font on the mode so the two never drift. Links and images
+    // stay off — `click` lines are stripped and wired by hand
+    // (mmExtractClicks / mmWireNodes). The source limit is raised from
+    // Pele's 50k characters so a hundred-item holotype map still draws.
+    function mmPeleOptions(seq) {
+      const root = document.getElementById('merirmaid-mode');
+      const font = getComputedStyle(document.body).fontFamily || 'sans-serif';
+      const mono = (root && getComputedStyle(root).getPropertyValue('--font-mono').trim()) || undefined;
+      if (root) root.style.setProperty('--pele-font', font);
+      return { idPrefix: 'mm-svg-' + seq, fontFamily: font, fontFamilyMono: mono,
+        links: false, images: false, limit: 400000, responsive: true };
     }
 
     async function renderMerirmaidTop() {
@@ -29704,9 +29747,15 @@
     }
 
     // Visible text of a rendered node (emoji + label) — the fallback action
-    // for wip / non-volume nodes that have no on-disk mapping.
+    // for wip / non-volume nodes that have no on-disk mapping. Pele wraps
+    // a label into <tspan> lines; join them with a space so "ship a" +
+    // "plugin API?" reads as one label.
     function mmNodeLabelText(g) {
-      return (g && g.textContent || '').trim();
+      if (!g) return '';
+      const label = g.querySelector('.pele-label') || g;
+      const lines = label.querySelectorAll('tspan');
+      const text = lines.length ? Array.from(lines, (l) => l.textContent).join(' ') : label.textContent;
+      return (text || '').replace(/\s+/g, ' ').trim();
     }
 
     // ----- shift-click node menu -----
@@ -29881,17 +29930,15 @@
       const seq = ++MM_RENDER_SEQ;
       body.innerHTML = '<div class="mm-doc-note">rendering…</div>';
       try {
-        await mmEnsureMermaid();
+        await mmEnsurePele();
       } catch (e) {
         if (seq !== MM_RENDER_SEQ) return;
-        body.innerHTML = '<div class="mm-error">could not load the mermaid renderer: '
+        body.innerHTML = '<div class="mm-error">could not load the diagram renderer: '
           + escapeHtml(e.message) + '</div>'
           + '<pre class="mm-source">' + escapeHtml(parsed.body) + '</pre>';
         return;
       }
       if (seq !== MM_RENDER_SEQ) return;
-      // Re-apply theme each render so an app-theme swap takes effect.
-      window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: mmMermaidTheme() });
 
       const { cleaned, links } = mmExtractClicks(parsed.body);
       MM_LINKS = links;
@@ -29909,13 +29956,11 @@
 
       let out;
       try {
-        out = await window.mermaid.render('mm-svg-' + seq, cleaned);
+        out = window.pele.render(cleaned, mmPeleOptions(seq));   // synchronous
       } catch (e) {
         if (seq !== MM_RENDER_SEQ) return;
-        // Never a blank pane: error message + raw source.
-        // mermaid.render can leave a stray #dmm-svg-* orphan on failure.
-        const orphan = document.getElementById('dmm-svg-' + seq);
-        if (orphan) orphan.remove();
+        // Never a blank pane: error message + raw source. A PeleError
+        // carries the line and column; say them when the message does not.
         body.innerHTML = '';
         if (parsed.warning) {
           const w = document.createElement('div');
@@ -29924,8 +29969,10 @@
         }
         const err = document.createElement('div');
         err.className = 'mm-error';
-        err.textContent = t('mm.renderFailed', 'mermaid could not render this diagram:\n')
-          + (e && e.message ? e.message : String(e));
+        const msg = e && e.message ? e.message : String(e);
+        err.textContent = t('mm.renderFailed', 'this diagram could not be rendered:\n') + msg
+          + (e && e.line > 0 && !/\bline\b/i.test(msg)
+            ? ' (line ' + e.line + (e.column > 0 ? ':' + e.column : '') + ')' : '');
         const pre = document.createElement('pre');
         pre.className = 'mm-source';
         pre.textContent = parsed.body;
@@ -29933,33 +29980,21 @@
         return;
       }
       if (seq !== MM_RENDER_SEQ) return;
-      holder.innerHTML = out.svg;
-      const svg = holder.querySelector('svg');
-      if (svg) { svg.removeAttribute('height'); svg.style.maxWidth = '100%'; }
+      holder.innerHTML = out.svg;   // sized by Pele: max-width 100%, height auto
       mmWireNodes(holder, path, parsed);
       body.scrollTop = 0;
     }
 
-    // Extract the mermaid node id from a rendered <g class="node"> element.
-    // Flowchart node dom ids render as `<renderId>-flowchart-<id>-<n>`
-    // (the renderId prefix is the id we pass to mermaid.render, and it
-    // itself contains hyphens), so anchor the parse on the `flowchart-`
-    // marker rather than the string start. Some builds also stamp a
-    // data-id — prefer it when present.
+    // The source node id of a rendered node: Pele stamps it verbatim as
+    // `data-id` on every `g.pele-node` (flowcharts and mindmaps alike).
     function mmNodeId(g) {
-      const dataId = g.getAttribute('data-id');
-      if (dataId) return dataId;
-      const raw = g.id || '';
-      const marker = raw.indexOf('flowchart-');
-      let s = marker >= 0 ? raw.slice(marker + 'flowchart-'.length) : raw;
-      s = s.replace(/-\d+$/, '');
-      return s || null;
+      return g.getAttribute('data-id') || null;
     }
 
     function mmWireNodes(holder, path, parsed) {
       const editable = parsed.modality === 'wip' && mmIsFlowchart(parsed.body);
       const nodeMap = (MM_CURRENT && MM_CURRENT.nodeMap) || null;
-      holder.querySelectorAll('g.node').forEach((g) => {
+      holder.querySelectorAll('g.pele-node').forEach((g) => {
         const id = mmNodeId(g);
         if (!id) return;
         // Shift-click → per-node action menu, in BOTH faces (mirror + wip).
@@ -30185,16 +30220,8 @@
       input.addEventListener('blur', onBlur);
     }
 
-    // Re-render on app-theme change (hook called from applyUIConfig) so the
-    // mermaid theme tracks light/dark.
-    function mmOnThemeChange() {
-      const root = document.getElementById('merirmaid-mode');
-      if (!root || !root.classList.contains('open')) return;
-      const top = mmTop();
-      if (!MM_CURRENT || !top || (top.kind !== 'merirmaid' && top.kind !== 'lens')) return;
-      mmRenderDiagram(MM_CURRENT.path, MM_CURRENT.parsed, document.getElementById('merirmaid-body'));
-    }
-    window.mmOnThemeChange = mmOnThemeChange;
+    // (A theme change no longer re-renders — 0.5.1: Pele's colours are the
+    // --pele-* variables on #merirmaid-mode, which follow the app tokens.)
 
     document.getElementById('mm-refresh').addEventListener('click', () => renderMerirmaidTop());
     // Reposition/close the label editor if the body scrolls under it.

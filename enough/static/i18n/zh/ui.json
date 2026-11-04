@@ -3,7 +3,7 @@
     "language": "zh",
     "label": "中文",
     "role": "translated chrome strings",
-    "source": "en @ 0.5.0"
+    "source": "en @ 0.5.1"
   },
   "strings": {
     "agentmode.agent": "智能体",
@@ -974,7 +974,7 @@
     "mm.openProject.label": "打开项目",
     "mm.openProject.title": "打开这个项目——服务器会交接并重新载入它",
     "mm.refresh.title": "重新读取文件（拿到你阅问的改动）",
-    "mm.renderFailed": "mermaid 渲染不了这张图：\n",
+    "mm.renderFailed": "渲染不了这张图：\n",
     "models.applyBtn": "应用并重启",
     "models.autoReset.hint": "当仪表越过阈值时，enough 会往当前的请求文件里写一个 Continuation 块，对话清空，然后你的阅问从检查点接着走。实验性功能——想完全手动掌控就别开。",
     "models.foot": "切换会把当前模型从内存里卸下来，载入新的，并清空内存中的对话。磁盘上的请求历史（会话日志、请求）都还在。",

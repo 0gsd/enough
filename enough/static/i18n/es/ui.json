@@ -3,7 +3,7 @@
     "language": "es",
     "label": "Español",
     "role": "translated chrome strings",
-    "source": "en @ 0.5.0"
+    "source": "en @ 0.5.1"
   },
   "strings": {
     "agentmode.agent": "agente",
@@ -974,7 +974,7 @@
     "mm.openProject.label": "abrir proyecto",
     "mm.openProject.title": "abrir este proyecto — el servidor cede el control y recarga en él",
     "mm.refresh.title": "releer el archivo (recoger las ediciones de tu readvisor)",
-    "mm.renderFailed": "mermaid no pudo renderizar este diagrama:\n",
+    "mm.renderFailed": "no se pudo renderizar este diagrama:\n",
     "models.applyBtn": "aplicar y reiniciar",
     "models.autoReset.hint": "cuando el indicador cruza el umbral, enough escribe un bloque de Continuación en el archivo de solicitud activo, la conversación se borra, y tu readvisor retoma desde el punto de control. experimental — déjalo desactivado si quieres control manual total.",
     "models.foot": "cambiar de modelo descarga el modelo actual de la RAM, carga el nuevo, y borra la conversación en memoria. el historial de solicitudes en disco (registros de sesión, solicitudes) se conserva.",

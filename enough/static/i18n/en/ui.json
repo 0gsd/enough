@@ -3,7 +3,7 @@
     "language": "en",
     "label": "English",
     "role": "canonical string catalog",
-    "source": "index.html @ 0.5.0"
+    "source": "index.html @ 0.5.1"
   },
   "strings": {
     "agentmode.agent": "agent",
@@ -974,7 +974,7 @@
     "mm.openProject.label": "open project",
     "mm.openProject.title": "open this project — the server hands off and reloads into it",
     "mm.refresh.title": "re-read the file (pick up your readvisor's edits)",
-    "mm.renderFailed": "mermaid could not render this diagram:\n",
+    "mm.renderFailed": "this diagram could not be rendered:\n",
     "models.applyBtn": "apply & restart",
     "models.autoReset.hint": "when the gauge crosses the threshold, enough writes a Continuation block to the active\n              request file, the conversation clears, and your readvisor resumes from the checkpoint. experimental — leave off if you\n              want full manual control.",
     "models.foot": "\n        switching unloads the current model from RAM, loads the new one, and\n        clears the in-memory conversation. request history on disk (session\n        logs, requests) is preserved.\n      ",

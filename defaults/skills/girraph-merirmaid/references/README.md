@@ -11,8 +11,8 @@ These files are excerpted from the official Mermaid documentation
 the syntax-documentation body is kept; the site's Jekyll frontmatter
 and navigation boilerplate were stripped. Each file keeps a one-line
 attribution header pointing at its upstream source. The vendored
-renderer these diagrams target is `enough/static/mermaid.min.js`
-(Mermaid v11).
+renderer that draws these diagrams is `enough/static/pele.global.js`
+(Pele 1.13.0, which targets Mermaid 12.1.0 syntax).
 
 | File | Diagram type | Use it for |
 |---|---|---|

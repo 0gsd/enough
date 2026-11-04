@@ -45,6 +45,7 @@ import httpx
 
 from . import agent_free as _agent_free
 from . import models as _models
+from . import prompt as _prompt
 
 log = logging.getLogger("enough.preflight")
 
@@ -235,9 +236,15 @@ class Preflight:
 
     def __init__(self, *, llm_url: str, build_prompt: Callable[[], str],
                  supervisor: Any = None,
-                 transport: httpx.AsyncBaseTransport | None = None) -> None:
+                 transport: httpx.AsyncBaseTransport | None = None,
+                 build_lean_prompt: Callable[[], str] | None = None) -> None:
         self.llm_url = llm_url.rstrip("/")
         self._build_prompt = build_prompt
+        #: 0.5.1: the lean profile's prompt. When the full prompt would take
+        #: more than half the window (`prompt.lean_wanted`, the rule a turn
+        #: applies), the verdict measures this one instead and says so in
+        #: `profile`. None (the tests' bare runner) measures the full prompt.
+        self._build_lean_prompt = build_lean_prompt
         self._supervisor = supervisor
         self._transport = transport
         self._task: asyncio.Task[None] | None = None
@@ -277,6 +284,7 @@ class Preflight:
             "suggest_ctx": r.get("suggest_ctx"),
             "fix": r.get("fix"),
             "fix_reason": r.get("fix_reason"),
+            "profile": r.get("profile"),
             "preflight": state,
         }
 
@@ -332,10 +340,17 @@ class Preflight:
         self.state = "pending"
         try:
             system_prompt = await asyncio.to_thread(self._build_prompt)
+            profile = "chat"
             async with httpx.AsyncClient(transport=self._transport) as client:
                 tokens = await count_tokens(client, self.llm_url, system_prompt)
                 n_ctx = await read_n_ctx(client, self.llm_url)
+                if self._build_lean_prompt is not None and _prompt.lean_wanted(tokens, n_ctx):
+                    # The turn would send the lean prompt: measure that.
+                    lean_prompt = await asyncio.to_thread(self._build_lean_prompt)
+                    tokens = await count_tokens(client, self.llm_url, lean_prompt)
+                    profile = "lean"
             result = evaluate(tokens, n_ctx, entry=entry, supervised=supervised)
+            result["profile"] = profile
         except asyncio.CancelledError:
             self.state = "idle"
             raise
@@ -353,9 +368,9 @@ class Preflight:
         self._key = key
         self.state = "done"
         log.info(
-            "context preflight (%s): instructions %d tokens + reserve %d vs "
+            "context preflight (%s): instructions %d tokens (%s profile) + reserve %d vs "
             "window %d — %s",
-            reason or "run", result["prompt_tokens"], RESERVE, result["n_ctx"],
+            reason or "run", result["prompt_tokens"], profile, RESERVE, result["n_ctx"],
             "fits" if result["fits"] else
             f"too small; fix={result['fix']} reason={result['fix_reason']} "
             f"suggest={result['suggest_ctx']}",

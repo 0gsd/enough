@@ -1357,7 +1357,12 @@ async def _run_turn(
     """
     async with session.generation_lock:
         # Re-assemble system prompt fresh per spec.
-        system_prompt = assemble_system_prompt(session.project_dir, pal=pal)
+        # 0.5.1: the lean profile when the full prompt would take more than
+        # half the live window (`prompt.choose_profile`); the preflight showed
+        # the same choice in the empty conversation. `prompt_profile` is what
+        # `/api/llm-status` reports, so a bug report can say which ran.
+        system_prompt, session.prompt_profile = prompt_mod.assemble_for_window(
+            session.project_dir, _current_ctx_size(session) or session.last_usage.get("ctx"), pal=pal)
 
         tool_calls_for_log: list[tuple[str, str]] = []
         assistant_text_for_log: list[str] = []
@@ -1631,6 +1636,27 @@ class AgentFreeGate:
 # App factory
 # ---------------------------------------------------------------------------
 
+
+class _RevalidatingStatic(StaticFiles):
+    """`/static` with `Cache-Control: no-cache` (0.5.1).
+
+    Starlette's StaticFiles sends an ETag and Last-Modified but no
+    Cache-Control, which leaves freshness to the browser's heuristic — a
+    tenth of the file's age — and an icon's URL never changes between
+    releases. So the 0.5.0 desktop app, whose snapshot held the new icons
+    and whose server sent them, still drew 0.4.4's: the webview had them
+    cached as fresh. `no-cache` means "keep it, but ask first": every load
+    revalidates with If-None-Match and a 304 costs nothing on loopback.
+    (index.html itself is already `no-store` below; the page stamps its
+    asset URLs with the version too, see staticUrl() there, so a 0.5.1
+    page never even asks for a path the old cache knows.)
+    """
+
+    async def get_response(self, path: str, scope):  # type: ignore[override]
+        response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
 def create_app(
     project_dir: Path,
     llm_url: str,
@@ -1671,6 +1697,7 @@ def create_app(
     preflight = None if home else _preflight.Preflight(
         llm_url=llm_url,
         build_prompt=lambda: assemble_system_prompt(session.project_dir),
+        build_lean_prompt=lambda: assemble_system_prompt(session.project_dir, profile="lean"),
         supervisor=supervisor,
     )
     session.preflight = preflight
@@ -1779,7 +1806,7 @@ def create_app(
     # need it; a test that has to reason about the generation lock (the
     # council exclusion, P5) has no other way to reach it.
     app.state.session = session
-    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+    app.mount("/static", _RevalidatingStatic(directory=str(STATIC_DIR)), name="static")
 
     app.add_middleware(ModeGate, home=home)
     # Home has no model routes to refuse (ModeGate 404s them all).
@@ -1835,6 +1862,9 @@ def create_app(
             "lang": _ui_language(),
             "chief_readvisor_name": prompt_mod.chief_name(),
             "agent_free": _agent_free.enabled(),
+            # 0.5.1: stamps the page's static asset URLs (staticUrl() in
+            # index.html) so an upgrade never shows the last release's icons.
+            "version": __version__,
         }
         if not home:
             meta = project_meta.load(session.project_dir)
@@ -6007,12 +6037,16 @@ def create_app(
 
     def _preflight_fields(*, skipped: bool = False) -> dict[str, Any]:
         """`skipped`: the cloud, or agent-free mode — nothing of ours to measure."""
+        # `profile` is the preflight's choice for the empty conversation;
+        # `prompt_profile` the one the last turn actually sent (0.5.1).
+        sent = {"prompt_profile": getattr(session, "prompt_profile", None)}
         if preflight is None or skipped:
             return {"prompt_tokens": None, "n_ctx": None,
                     "reserve": _preflight.RESERVE, "fits": None,
                     "suggest_ctx": None, "fix": None, "fix_reason": None,
-                    "preflight": "skipped" if skipped else "idle"}
-        return preflight.fields()
+                    "profile": None,
+                    "preflight": "skipped" if skipped else "idle", **sent}
+        return {**preflight.fields(), **sent}
 
     @app.post("/api/model")
     async def api_model_switch(request: Request) -> dict[str, Any]:

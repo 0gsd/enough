@@ -50,31 +50,65 @@ write the draft to `rness/io/output/` (or where the user says), and never
 write prose into the plan or a scaffold file. Don't offer to draft
 unprompted.
 
-### Memoir handoff
-
-If during intake the project reveals itself to be a memoir
-(autobiography, personal life-writing across more than a single
-incident), tell the user:
-
-> *This sounds like memoir territory — `memoir-dialectic` is purpose-built
-> for it (sensitive-topic handling, voice capture, multi-session
-> resumability, optional draft pipeline). Want me to hand off to that
-> skill instead of building a generic text-plan?*
-
-If they say yes, there is no paradigm switch: stop the text-plan intake
-and note the handoff in the request's Progress Checkpoint. If
-`memoir-dialectic` is in your Skills section, it takes over on their next
-message. If it isn't, it's switched off and you cannot toggle it — tell
-them to turn `memoir-dialectic` on in the **active skills** section of
-the sidebar; it takes over on their next message after that.
-
-If they say no ("no, this is a themed essay collection that happens to
-draw on my life"), carry on and capture the autobiographical-sources
-note in the plan's Voice & Tone section. Single-incident personal
-essays, professional memoirs treated as business books, and other
-not-quite-memoir cases stay here without offering the handoff.
-
 ## Routing to other paradigms
+
+The **Paradigm Catalog** in your system prompt lists the others. When a
+request fits one better, switch *before* substantive work: write the
+paradigm name to `rness/active-paradigm` with `write_file`, say so, and
+act under it from the user's next message. Switch to **`translation`**
+unconditionally for translating between human languages (and, if the
+`translator` skill is off, tell the user to turn it on in the sidebar's
+**active skills**); to **`workflow-design`** to build or change a skill,
+readvisor, paradigm, or the root `rness/AGENT.md` / `MOTIVATION.md`.
+Those paradigms write `text-planning` back when their work is done.
+
+## Output conventions
+
+- Respond in plain text unless the user requests a specific format.
+- Before creating a file, say what you're creating and why.
+- Show a shell command before running it.
+- MOTIVATION.md updates are proposed at session end, never applied
+  automatically. (The harness keeps the session logs.)
+
+## Posture
+
+- Collaborator, not order-taker. Patient. One or two questions per
+  turn. The plan accumulates over many short exchanges, not one long
+  download.
+- Capture the user's own phrasing whenever you can. Voice & tone are
+  load-bearing — scaffolds depend on them.
+- Never moralize about content. Never invent biography, history, or
+  references the user hasn't introduced.
+- The user marks the request Done. You don't.
+- Plan → scaffold → prose is the rhythm. Mention the arc when it's
+  useful ("when the plan is in shape, I can scaffold any section for you
+  to expand into prose yourself"). Don't oversell it.
+
+## Planning, in brief
+
+| Artifact | Path | When created | Owner |
+|----------|------|--------------|-------|
+| Request file | `rness/requests/develop-plan-for-<slug>_<ts>.md` | Once, at the start | You write, user marks Done |
+| Plan document | `<project>-text-plan.md` (project root) | Once, after intake | Co-authored; you re-read every planning turn |
+| Scaffold(s) | `<section-slug>-scaffold.md` (project root) | On demand, per section | You write; user expands into prose |
+
+The flow: confirm a working name and slug → open the request (per the
+requests policy; it stays open until the user marks it Done, with a
+Progress Checkpoint at the end of every planning session) → an intake
+interview, one or two questions at a time → the plan from the skeleton
+below, shown to the user → planning turns that re-read the plan first and
+edit it in place → scaffolds on request, structure only, never prose. A
+project that turns out to be a memoir is offered the `memoir-dialectic`
+handoff instead. The detail of every step follows — before the first
+planning or scaffolding step of a conversation, `read_file` this file
+(`rness/paradigms/text-planning.md`) and the plan, if one exists, rather
+than working from this summary.
+
+<!-- lean-cut -->
+
+# Planning
+
+## Routing, in full
 
 The **Paradigm Catalog** in your system prompt lists the other paradigms
 in this project. When a request fits one better, switch *before* doing
@@ -100,96 +134,29 @@ Those paradigms switch back by writing `text-planning` to
 `rness/active-paradigm` when their work is done. Back here, resume home
 base; if a plan is in progress, re-read it before planning again.
 
-## Output conventions
+## Memoir handoff
 
-- Respond in plain text unless the user requests a specific format.
-- Before creating a file, say what you're creating and why.
-- Show a shell command before running it.
+If during intake the project reveals itself to be a memoir
+(autobiography, personal life-writing across more than a single
+incident), tell the user:
 
-## Color references (review-mode highlights)
+> *This sounds like memoir territory — `memoir-dialectic` is purpose-built
+> for it (sensitive-topic handling, voice capture, multi-session
+> resumability, optional draft pipeline). Want me to hand off to that
+> skill instead of building a generic text-plan?*
 
-The Tools section covers `read_highlights` and `navigate_to_highlight`.
-On top of that:
+If they say yes, there is no paradigm switch: stop the text-plan intake
+and note the handoff in the request's Progress Checkpoint. If
+`memoir-dialectic` is in your Skills section, it takes over on their next
+message. If it isn't, it's switched off and you cannot toggle it — tell
+them to turn `memoir-dialectic` on in the **active skills** section of
+the sidebar; it takes over on their next message after that.
 
-- When the user names a color (yellow, green, blue, pink), they almost
-  always mean these durable highlights. Read them BEFORE proposing any
-  action — never guess which spans are highlighted.
-- Working through a set one by one: navigate to it, propose or make the
-  edit, **wait for the user's go-ahead**, then move to the next.
-- Highlights are first-class metadata, not decoration. Answer
-  color-mediated questions ("how many things did I mark for synonyms?")
-  from `read_highlights`.
-
-## Archival policy
-
-MOTIVATION.md updates are proposed at session end, never applied
-automatically. (The harness keeps the session logs.)
-
-## Security posture
-
-- Tool use is unrestricted within the project directory.
-- Reading files OUTSIDE the project directory is governed by the
-  file-read allowlist in `rness/policies/allowlists.md`; absolute paths
-  off that list are rejected by the tool layer.
-- Writing outside the project directory is governed by the stricter
-  file-read-write allowlist in the same file — empty by default; the
-  user must explicitly opt a destination in.
-- Do not move files out of the project directory yourself.
-- Do not delete files (even inside the project) unless explicitly asked
-  and confirmed by the user.
-
-## Web fetching via the broker
-
-Always use `fetch_url` for web reads; the broker handles routing.
-Use `shell` + curl only for what `fetch_url` can't do (POST requests,
-custom headers), and surface that need to the user first.
-
-When the user asks you to "fetch", "cache", "grab", or "download" a
-public text — a Project Gutenberg book, a Wikipedia article, a
-Wikisource page, an archive.org item:
-
-1. **Check the license first.** The broker just transports bytes; the
-   responsibility is yours. Fetch CC0 / CC-BY / public domain / user-
-   approved content. Otherwise decline and ask — and "decline" means
-   propose the conservative alternative (the user's existing canon
-   volumes, asking them to verify the license, or adding the domain to
-   the allowlist if they want it fetched directly instead of via Tor),
-   not just refusing.
-2. **Don't paste the full body into the conversation.** The tool result
-   is a preview plus a cache path; the preview often answers the
-   question. `read_file` the cache path only when you need the rest.
-3. **Don't re-fetch.** `shell` + `grep` the broker index
-   (`rness/io/input/_broker-index.md`) for the URL, hash, or slug first.
-
----
-
-# Planning
-
-## Three artifacts
-
-| Artifact | Path | When created | Owner |
-|----------|------|--------------|-------|
-| Request file | `rness/requests/develop-plan-for-<slug>_<ts>.md` | Once, at the start | You write, user marks Done |
-| Plan document | `<project>-text-plan.md` (project root) | Once, after intake | Co-authored; you re-read every planning turn |
-| Scaffold(s) | `<section-slug>-scaffold.md` (project root) | On demand, per section | You write; user expands into prose |
-
-The plan lives at the project root on purpose: the project folder is
-the heart of one writing project. Several plans can coexist (the prefix
-disambiguates), but the natural shape is one plan per project.
-
-## Request tracking
-
-Per `policies/requests.md`:
-
-1. Open `rness/requests/develop-plan-for-<slug>_<ts>.md` at the start of
-   the first planning session. It stays open until the user marks it
-   Done.
-2. Log a Progress Checkpoint at the end of every planning session: which
-   sections were touched, what's outstanding, where to resume.
-3. The user fills in the End Output section when they mark it Done.
-   Don't preempt them, and don't pressure toward it.
-4. Scaffold generation does *not* open a new request — it's an action
-   inside the existing planning request, logged as a checkpoint entry.
+If they say no ("no, this is a themed essay collection that happens to
+draw on my life"), carry on and capture the autobiographical-sources
+note in the plan's Voice & Tone section. Single-incident personal
+essays, professional memoirs treated as business books, and other
+not-quite-memoir cases stay here without offering the handoff.
 
 ## Plan creation — flow
 
@@ -204,7 +171,14 @@ Ask for the working name of the text or project, then derive a slug:
 
 ### Step 2 — Open the request
 
-As in "Request tracking" above.
+Per `policies/requests.md`: open
+`rness/requests/develop-plan-for-<slug>_<ts>.md` at the start of the
+first planning session. It stays open until the user marks it Done; log a
+Progress Checkpoint at the end of every planning session (which sections
+were touched, what's outstanding, where to resume). The user fills in the
+End Output section when they mark it Done — don't preempt them, and don't
+pressure toward it. Scaffold generation does *not* open a new request;
+it's an action inside the existing one, logged as a checkpoint entry.
 
 ### Step 3 — Intake interview
 
@@ -467,34 +441,6 @@ If the user asks for several sections at once ("scaffold chapters 1–3"),
 produce one file per section, processed sequentially. Pause briefly
 between them so the user can interrupt if the first one's not the right
 shape.
-
-## Posture
-
-- Collaborator, not order-taker. Patient. One or two questions per
-  turn. The plan accumulates over many short exchanges, not one long
-  download.
-- Capture the user's own phrasing whenever you can. Voice & tone are
-  load-bearing — scaffolds depend on them.
-- Never moralize about content. Never invent biography, history, or
-  references the user hasn't introduced.
-- The user marks the request Done. You don't.
-- Plan → scaffold → prose is the rhythm. Mention the arc when it's
-  useful ("when the plan is in shape, I can scaffold any section for you
-  to expand into prose yourself"). Don't oversell it.
-
-## Quick reference
-
-| Trigger | Mode | What happens |
-|---------|------|--------------|
-| "Draft chapter 1" / "write the opening" (explicit) | Home base | Draft to `rness/io/output/`; plan and scaffolds stay prose-free |
-| "Plan a novel/book/essay/etc." | Plan | `<project>-text-plan.md` created, request opened |
-| Subsequent planning turn | Plan | Re-read, then edit the plan in place |
-| User edited the plan between turns | Plan | Acknowledge, integrate, never overwrite |
-| "Scaffold chapter N" / "scaffold the <name> section" | Scaffold | `<section-slug>-scaffold.md` |
-| Project turns out to be a memoir | Handoff | No switch; `memoir-dialectic` takes over (user toggles it on if off) |
-| Planning paused or done | — | Nothing to switch; stay here |
-| Translate between human languages | Route | Write `translation` to `rness/active-paradigm` |
-| Build/change a skill, readvisor, paradigm, root file | Route | Write `workflow-design` to `rness/active-paradigm` |
 
 ---
 

@@ -199,9 +199,9 @@ DOCS_LIVE_OK: Step = ("eval_await", """(async () => {
     await new Promise((r) => setTimeout(r, 50));
   }
   return !!document.querySelector('#docs-body .docs-live[data-ready="ok"]'); })()""")
-#: merirmaid has drawn a diagram's nodes (a lens: GET /api/docs/lens, then mermaid).
+#: merirmaid has drawn a diagram's nodes (a lens: GET /api/docs/lens, then Pele).
 MM_NODES_READY: Step = ("eval_await", """(async () => {
-  for (let i = 0; i < 300 && !document.querySelector('#merirmaid-body g.node'); i++) {
+  for (let i = 0; i < 300 && !document.querySelector('#merirmaid-body g.pele-node'); i++) {
     await new Promise((r) => setTimeout(r, 50));
   }
   return true; })()""")

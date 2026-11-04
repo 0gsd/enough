@@ -3,7 +3,7 @@
     "language": "de",
     "label": "Deutsch",
     "role": "translated chrome strings",
-    "source": "en @ 0.5.0"
+    "source": "en @ 0.5.1"
   },
   "strings": {
     "agentmode.agent": "Agent",
@@ -974,7 +974,7 @@
     "mm.openProject.label": "Projekt öffnen",
     "mm.openProject.title": "dieses Projekt öffnen — der Server übergibt und lädt neu hinein",
     "mm.refresh.title": "die Datei neu einlesen (die Änderungen deines Readvisors übernehmen)",
-    "mm.renderFailed": "mermaid konnte dieses Diagramm nicht darstellen:\n",
+    "mm.renderFailed": "dieses Diagramm konnte nicht dargestellt werden:\n",
     "models.applyBtn": "anwenden & neu starten",
     "models.autoReset.hint": "wenn die Anzeige die Schwelle überschreitet, schreibt enough einen Continuation-Block in die aktive Anfrage-Datei, das Gespräch wird geleert, und dein Readvisor setzt vom Checkpoint aus fort. experimentell — lass es aus, wenn du volle manuelle Kontrolle willst.",
     "models.foot": "Wechseln entlädt das aktuelle Modell aus dem RAM, lädt das neue und leert das Gespräch im Arbeitsspeicher. der Anfrageverlauf auf der Festplatte (Sitzungsprotokolle, Anfragen) bleibt erhalten.",

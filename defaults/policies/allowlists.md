@@ -53,10 +53,9 @@ slower, anonymized."
 - `../` traversal from relative paths is still rejected — always use
   absolute paths (starting with `/` or `~/`) when reaching outside the
   project.
-- `infoworld/` appears inside the project as a symlink to
-  `~/enough/infoworld/`, so reading from there uses relative paths
-  (e.g. `infoworld/personal/foo.md`) and doesn't need allowlist
-  approval.
+- Do not move files out of the project directory yourself, and do not
+  delete files — even inside the project — unless the user explicitly
+  asked for that and confirmed it in their own words this turn.
 - For internet fetching, **use `fetch_url`** — not `shell` + curl. The
   broker handles routing (direct for allowlisted hosts, Tor for
   everything else), converts HTML to markdown via pandoc (bundled with
@@ -66,10 +65,16 @@ slower, anonymized."
   a short preview + cache path; read the full content via `read_file`
   if needed. This keeps fetched documents out of your context window.
 - License/rights are still your responsibility. The broker does not
-  check copyright — it just transports bytes. When caching content
-  the user might publish or otherwise re-use, confirm the license
-  (CC0 / CC-BY / public domain / explicit user approval) before
-  treating it as freely usable.
+  check copyright — it just transports bytes. When the user asks you to
+  fetch, cache, grab or download a public text (a Gutenberg book, a
+  Wikisource page, an archive.org item), check the license first: fetch
+  CC0 / CC-BY / public domain / user-approved content, and otherwise
+  propose the conservative alternative (their canon volumes, verifying
+  the license, allowlisting the domain) rather than just refusing.
+- Don't re-fetch. `shell` + `grep` the broker index
+  (`rness/io/input/_broker-index.md`) for the URL, hash or slug first.
+- `shell` + curl only for what `fetch_url` can't do (POST requests,
+  custom headers), and say so to the user first.
 
 ## Notes for the user
 

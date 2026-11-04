@@ -37,7 +37,12 @@ from enough import tools as T
 #: 0.4.1, the core plus the dictionary block, which every install that ships
 #: FEED carries. `show_intro` with its one-time offer (~300 chars) and the
 #: dictionary block (~580) both fit inside the existing headroom.
-CORE_BUDGET = 17_500
+#: 0.5.1: the core lost the girraph, review, wiki, cloud and canon-store
+#: sections (now blocks of their own, two of them gated) and the cloud
+#: example — it measured 13,0xx chars before, ~3.3k after. The budget
+#: follows it down so the next section added to the always-on text is a
+#: decision again.
+CORE_BUDGET = 4_000
 #: Core plus every gated block an ordinary turn can carry — the worst case,
 #: for a project using composures and forging readvisors. The pal block is
 #: deliberately NOT in here: it is carried by the one turn the user opened
@@ -56,7 +61,18 @@ CORE_BUDGET = 17_500
 #: two examples and one sentence, paid for by shorter prose elsewhere in the
 #: block; it went 965 -> 994 chars, still under the owner's 1,000) — the tree
 #: measured 23,712 before them, 23,741 after.
-FULL_BUDGET = 23_865
+#: 0.5.1: FULL now means every gate open — the cloud block (2.4k) and the
+#: wiki block (2.2k) included, which an ordinary default install never
+#: carries (no key, no archive) — minus the duplicated paradigm and AGENT.md
+#: text the diet removed. The fully enabled tree measured 23,741 before the
+#: round; the budget stays, as the ceiling it was.
+FULL_BUDGET = 24_500
+#: The lean profile's whole prompt for a fresh project, in chars: what an
+#: 8,192-token window must hold with the 2,048 reserve at 3.7 chars/token,
+#: less the project-path allowance — (8192 - 2048) * 3.7 ≈ 22.7k. Measured
+#: 22,387 chars (5,977 gemma tokens, exact) when it landed; the fit test
+#: below is the real guard, this number the early warning.
+LEAN_BUDGET = 22_500
 #: The owner's cap on the MacroCOSM tools' docs (docs/canon-043-plan.md §13).
 CANON_BLOCK_MAX = 1_000
 #: A fresh project's whole assembled system prompt at HEAD (0.4.2, d865818),
@@ -87,6 +103,12 @@ def project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         monkeypatch.setenv(var, str(tmp_path / rel))
     monkeypatch.setattr(broker, "CONFIG_PATH",
                         home / "enough" / "config" / "broker.json")
+    # The wiki gate (0.5.1) reads `wikisink.config.CONFIG_PATH`, which is
+    # resolved from the env at import time like broker's — an earlier module
+    # that imported it with an archive in its own tmp dir would otherwise
+    # leave this fixture seeing an installed archive.
+    from enough.wikisink import config as _wcfg
+    monkeypatch.setattr(_wcfg, "CONFIG_PATH", tmp_path / "wikisink.json")
     # FEED ships, as in a real install: the dictionary block is in. A
     # manifest and a schema are all `dictionary.available()` asks about.
     feed = tmp_path / "feed-source"
@@ -127,38 +149,48 @@ def disable_skill(project: Path, name: str) -> None:
     f.write_text("\n".join(sorted(names)) + "\n", encoding="utf-8")
 
 
-def fully_enabled(project: Path) -> str:
+def open_gates(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The two 0.5.1 gates that depend on the machine, not the project: the
+    cloud gate (a key, a health check) and a Wikipedia archive. Opened by
+    hand so a test sees the blocks they guard."""
+    monkeypatch.setattr(prompt, "_cloud_usable", lambda: True)
+    monkeypatch.setattr(prompt, "_wiki_installed", lambda: True)
+
+
+def fully_enabled(project: Path, monkeypatch: pytest.MonkeyPatch | None = None) -> str:
     """Everything an ordinary turn can carry — what FULL_BUDGET measures."""
     enable_skill(project, "readvisory")
     set_toggle("composure_enabled", True)
+    if monkeypatch is not None:
+        open_gates(monkeypatch)
     return prompt.tool_instructions(project)
 
 
-def every_block(project: Path) -> str:
+def every_block(project: Path, monkeypatch: pytest.MonkeyPatch) -> str:
     """...plus the per-turn ones. Drift is measured against this: a tool is
     documented if the turn that can call it says so, not if every turn does."""
-    return fully_enabled(project) + prompt.tool_instructions(project, pal=True)
+    return fully_enabled(project, monkeypatch) + prompt.tool_instructions(project, pal=True)
 
 
 # ---------------------------------------------------------------------------
 # 1. Drift — every tool is documented
 # ---------------------------------------------------------------------------
 
-def test_every_dispatchable_tool_is_documented(project: Path):
+def test_every_dispatchable_tool_is_documented(project: Path, monkeypatch: pytest.MonkeyPatch):
     """The guard this file exists for. A tool in `_DISPATCH` that no prompt
     mentions can never be called, and nothing else in the suite notices."""
-    text = every_block(project)
+    text = every_block(project, monkeypatch)
     missing = [name for name in sorted(T._DISPATCH) if name not in text]
     assert not missing, f"undocumented tools: {', '.join(missing)}"
 
 
-def test_every_documented_tool_is_dispatchable(project: Path):
+def test_every_documented_tool_is_dispatchable(project: Path, monkeypatch: pytest.MonkeyPatch):
     """...and the other direction, which is how a renamed tool is caught:
     every `<tool name="x">` example names something that can actually run,
     and no example is written in a form the parser would not see as a call
     at all (`<tool>x`, `<tool name='x'>`) — a model copies what it is shown."""
     import re
-    text = every_block(project)
+    text = every_block(project, monkeypatch)
     named = set(re.findall(r'<tool name="([a-z_]+)">', text))
     assert named, "no tool examples found at all"
     assert not (named - set(T._DISPATCH)), named - set(T._DISPATCH)
@@ -167,13 +199,13 @@ def test_every_documented_tool_is_dispatchable(project: Path):
     assert not nameless, f"tool examples without name=\"…\": {nameless}"
 
 
-def test_every_tool_example_round_trips_through_the_parser(project: Path):
+def test_every_tool_example_round_trips_through_the_parser(project: Path, monkeypatch: pytest.MonkeyPatch):
     """What the prompt shows is what the harness parses: every `<tool …>…
     </tool>` example block in the fully-enabled docs comes back from
     `parse_tool_calls` as exactly one call of the same name, and is a
     complete call by `has_complete_tool_call`'s reckoning."""
     import re
-    text = every_block(project)
+    text = every_block(project, monkeypatch)
     blocks = re.findall(r"<tool\b[^>\n]*>.*?</tool>", text, re.DOTALL)
     assert blocks, "no tool example blocks found"
     calls = T.parse_tool_calls(text)
@@ -186,9 +218,10 @@ def test_every_tool_example_round_trips_through_the_parser(project: Path):
         assert len(T.parse_tool_calls(block)) == 1, block[:60]
 
 
-def test_the_assembled_prompt_carries_the_tools_it_documents(project: Path):
+def test_the_assembled_prompt_carries_the_tools_it_documents(project: Path, monkeypatch: pytest.MonkeyPatch):
     enable_skill(project, "readvisory")
     set_toggle("composure_enabled", True)
+    open_gates(monkeypatch)
     ordinary = prompt.assemble_system_prompt(project)
     pal = prompt.assemble_system_prompt(project, pal=True)
     for name in sorted(T._DISPATCH):
@@ -319,17 +352,23 @@ def test_a_project_using_neither_pays_only_the_core(
     carries (0.4.3), and nothing else."""
     set_toggle("composure_enabled", False)
     disable_skill(project, "readvisory")
+    monkeypatch.setattr(prompt, "_cloud_usable", lambda: False)
+    monkeypatch.setattr(prompt, "_wiki_installed", lambda: False)
+    # 0.5.1: the always-on text is the core plus the sections that were in it
+    # until the round carved them out (girraphs, review, the canon store,
+    # keep going) and the note that no archive is installed.
+    plain = "\n\n".join(b.rstrip() for b in (
+        prompt.TOOL_INSTRUCTIONS, prompt.GIRRAPH_TOOL_INSTRUCTIONS, prompt.REVIEW_TOOL_INSTRUCTIONS,
+        prompt.WIKI_ABSENT_INSTRUCTIONS, prompt.CANON_STORE_INSTRUCTIONS, prompt.KEEP_GOING_INSTRUCTIONS))
     assert prompt.tool_instructions(project).strip() == (
-        prompt.TOOL_INSTRUCTIONS.rstrip() + "\n\n"
+        plain + "\n\n"
         + prompt.DICTIONARY_TOOL_INSTRUCTIONS.rstrip() + "\n\n"
         + prompt.CANON_TOOL_INSTRUCTIONS).strip()
     no_feed(monkeypatch, tmp_path)
     assert prompt.tool_instructions(project).strip() == (
-        prompt.TOOL_INSTRUCTIONS.rstrip() + "\n\n"
-        + prompt.CANON_TOOL_INSTRUCTIONS).strip()
+        plain + "\n\n" + prompt.CANON_TOOL_INSTRUCTIONS).strip()
     monkeypatch.setattr(prompt, "_macrocosm_available", lambda: False)
-    assert prompt.tool_instructions(project).strip() == \
-        prompt.TOOL_INSTRUCTIONS.strip()
+    assert prompt.tool_instructions(project).strip() == plain.strip()
 
 
 def test_an_unreadable_broker_config_does_not_hide_the_tools(project: Path,
@@ -364,8 +403,8 @@ def test_the_core_and_the_dictionary_block_stay_inside_the_core_budget():
         f"budget every project pays. Compress one of them.")
 
 
-def test_the_fully_enabled_tool_docs_stay_inside_their_budget(project: Path):
-    size = len(fully_enabled(project))
+def test_the_fully_enabled_tool_docs_stay_inside_their_budget(project: Path, monkeypatch: pytest.MonkeyPatch):
+    size = len(fully_enabled(project, monkeypatch))
     assert size <= FULL_BUDGET, (
         f"core + every gated block is {size} chars, over the {FULL_BUDGET} "
         f"budget. Raising this number is a decision, not a formality: it is "
@@ -463,6 +502,154 @@ def test_the_chat_profile_is_unchanged_by_the_council_one(project: Path):
 
 
 # ---------------------------------------------------------------------------
+# 3b. The lean profile (0.5.1, docs/ctx-16gb-plan.md §4b–4c)
+# ---------------------------------------------------------------------------
+
+def _lean(project: Path, **kw) -> str:
+    return prompt.assemble_system_prompt(project, profile="lean", **kw)
+
+
+def test_the_lean_prompt_stays_inside_its_budget(project: Path):
+    text = _lean(project)
+    for p in {str(project.resolve()), str(project)}:
+        text = text.replace(p, "<project>")
+    assert len(text) <= LEAN_BUDGET, (
+        f"a fresh project's lean prompt is {len(text)} chars, over the {LEAN_BUDGET} budget "
+        f"— an 8,192-token window stops holding it with the reserve (see the fit test).")
+    assert len(text) < len(prompt.assemble_system_prompt(project)) // 2
+
+
+def test_the_lean_prompt_names_every_tool_a_turn_can_call(project: Path, monkeypatch: pytest.MonkeyPatch):
+    """Lean summarises; it never hides a tool. Every dispatchable tool is
+    named in the lean prompt (the pal one on a pal turn), and every section
+    marked *(guide: X)* is a topic `harness_guide` answers."""
+    import re
+    enable_skill(project, "readvisory")
+    enable_skill(project, "girraph-merirmaid")
+    set_toggle("composure_enabled", True)
+    open_gates(monkeypatch)
+    text = _lean(project, pal=True)
+    missing = [name for name in sorted(T._DISPATCH) if name not in text]
+    assert not missing, f"the lean prompt never names: {', '.join(missing)}"
+    guides = prompt.harness_guides()
+    marked = set(re.findall(r"\(guide: ([a-z]+)\)", text))
+    assert marked and marked <= set(guides), marked - set(guides)
+    assert "harness_guide" in text and '<tool name="harness_guide">' in text
+    for topic, body in guides.items():
+        assert body.strip(), topic
+
+
+def test_harness_guide_hands_back_the_full_text(project: Path):
+    for topic, body in prompt.harness_guides().items():
+        call = T.parse_tool_calls(f'<tool name="harness_guide">\n<topic>{topic}</topic>\n</tool>')[0]
+        r = T.execute(project, call)
+        assert r.ok and r.body == body.rstrip(), topic
+    bad = T.execute(project, T.parse_tool_calls('<tool name="harness_guide">\n<topic>x</topic>\n</tool>')[0])
+    assert not bad.ok and "composures" in bad.body
+
+
+def test_the_lean_policies_are_an_index_with_the_hard_rules(project: Path):
+    text = _lean(project)
+    full = prompt.assemble_system_prompt(project)
+    assert "# Policies" in text
+    for stem in ("allowlists", "context-management", "profile-maintenance", "requests"):
+        assert f"`rness/policies/{stem}.md`" in text, stem
+        assert f"## {stem}" in full and f"## {stem}" not in text
+    assert "to `/reset`" in text and "`rness/policies/allowlists.md` names" in text
+    assert "`rness/knowledge/project-profile.md`" in text
+    # a user's own policy is indexed by its first paragraph
+    (project / "rness" / "policies" / "house-style.md").write_text(
+        "# Policy: House style\n\nLowercase prose in every UI string.\n\nMore.\n", encoding="utf-8")
+    assert "**house-style** (`rness/policies/house-style.md`) — Lowercase prose in every UI string." in _lean(project)
+
+
+def test_the_lean_paradigm_is_cut_at_its_marker(project: Path):
+    text = _lean(project)
+    full = prompt.assemble_system_prompt(project)
+    assert prompt.LEAN_CUT in (project / "rness" / "paradigms" / "text-planning.md").read_text(encoding="utf-8")
+    assert "## Planning, in brief" in text and "## Plan creation — flow" in full
+    assert "## Plan creation — flow" not in text and "## Scaffold mode" not in text
+    assert "read with\n`read_file` the moment it applies" in text
+    # a paradigm without the marker rides whole
+    (project / "rness" / "paradigms" / "plain.md").write_text("# Plain\n\nAll of it.\n", encoding="utf-8")
+    prompt.set_active_paradigm(project / "rness", "plain")
+    assert "All of it." in _lean(project)
+
+
+def test_the_lean_tool_docs_summarise_the_long_sections(project: Path, monkeypatch: pytest.MonkeyPatch):
+    set_toggle("composure_enabled", True)
+    open_gates(monkeypatch)
+    full = prompt.tool_instructions(project)
+    lean = prompt.tool_instructions(project, lean=True)
+    assert prompt.LEAN_TOOLS_NOTE.strip() in lean and prompt.LEAN_TOOLS_NOTE.strip() not in full
+    for long, short in ((prompt.COMPOSURE_TOOL_INSTRUCTIONS, prompt.COMPOSURE_LEAN_INSTRUCTIONS),
+                        (prompt.REVIEW_TOOL_INSTRUCTIONS, prompt.REVIEW_LEAN_INSTRUCTIONS),
+                        (prompt.WIKI_TOOL_INSTRUCTIONS, prompt.WIKI_LEAN_INSTRUCTIONS),
+                        (prompt.CLOUD_TOOL_INSTRUCTIONS, prompt.CLOUD_LEAN_INSTRUCTIONS),
+                        (prompt.CANON_STORE_INSTRUCTIONS, prompt.CANON_STORE_LEAN_INSTRUCTIONS),
+                        (prompt.KEEP_GOING_INSTRUCTIONS, prompt.KEEP_GOING_LEAN_INSTRUCTIONS)):
+        assert long.strip() in full and short.strip() in lean
+        assert short.strip() not in full and long.strip() not in lean
+        assert len(short) < len(long)
+    # the girraph summary rides only with a map in the project or the skill on
+    assert prompt.GIRRAPH_TOOL_INSTRUCTIONS.strip() in full
+    assert "read_girraph" not in lean and prompt.GIRRAPH_ABSENT_LEAN_INSTRUCTIONS.strip() in lean
+    assert prompt.GIRRAPH_LEAN_INSTRUCTIONS.strip() not in lean
+    (project / "plans").mkdir()
+    (project / "plans" / "map.girraph").write_text("# A map\n", encoding="utf-8")
+    with_map = prompt.tool_instructions(project, lean=True)
+    assert prompt.GIRRAPH_LEAN_INSTRUCTIONS.strip() in with_map
+    assert prompt.GIRRAPH_ABSENT_LEAN_INSTRUCTIONS.strip() not in with_map
+
+
+def test_the_cloud_and_wiki_blocks_follow_their_gates(project: Path, monkeypatch: pytest.MonkeyPatch):
+    """Tier 1 of the diet: dead text in a default install leaves. The cloud
+    block rides only through an open cloud gate; the wiki block only with
+    an archive, a short note naming the wiki tools otherwise."""
+    monkeypatch.setattr(prompt, "_cloud_usable", lambda: False)
+    monkeypatch.setattr(prompt, "_wiki_installed", lambda: False)
+    shut = prompt.tool_instructions(project)
+    assert '<tool name="cloud_pipeline">' not in shut and "## Cloud pipeline" not in shut
+    assert prompt.WIKI_ABSENT_INSTRUCTIONS.strip() in shut and '<tool name="wiki_search">' not in shut
+    for name in ("wiki_status", "wiki_search", "read_wiki_article", "wikisink"):
+        assert name in shut, name                       # named, so never a phantom
+    open_gates(monkeypatch)
+    opened = prompt.tool_instructions(project)
+    assert '<tool name="cloud_pipeline">' in opened and "summarize_each" in opened
+    assert '<tool name="wiki_search">' in opened and prompt.WIKI_ABSENT_INSTRUCTIONS.strip() not in opened
+    # each block joins as its stripped text plus two newlines
+    assert len(opened) - len(shut) == (len(prompt.CLOUD_TOOL_INSTRUCTIONS.rstrip()) + 2
+                                       + len(prompt.WIKI_TOOL_INSTRUCTIONS.rstrip())
+                                       - len(prompt.WIKI_ABSENT_INSTRUCTIONS.rstrip()))
+
+
+def test_choose_profile_follows_the_half_window_rule(project: Path):
+    full = prompt.assemble_system_prompt(project)
+    est = prompt.estimate_tokens(full)
+    assert prompt.choose_profile(full, None) == "chat"            # an unknown window: the full prompt
+    assert prompt.choose_profile(full, est * 2 + 1) == "chat"
+    assert prompt.choose_profile(full, est * 2 - 1) == "lean"
+    assert prompt.choose_profile(full, 8192) == "lean" and prompt.choose_profile(full, 65536) == "chat"
+    text, profile = prompt.assemble_for_window(project, 8192)
+    assert profile == "lean" and text == prompt.assemble_system_prompt(project, profile="lean")
+    text, profile = prompt.assemble_for_window(project, 131072)
+    assert profile == "chat" and text == full
+    assert prompt.lean_wanted(10_000, 16_384) and not prompt.lean_wanted(10_000, 32_768)
+
+
+def test_lean_keeps_what_the_council_profile_keeps(project: Path):
+    """Lean trims the harness, never the person: identity, motivation and the
+    project description ride whole, as in every profile."""
+    from enough import project_meta
+    project_meta.save(project, None, "A novel about lighthouses.")
+    (project / "rness" / "AGENT.md").write_text("# Ed\n\nIDENTITY-MARKER\n", encoding="utf-8")
+    text = _lean(project)
+    for kept in ("chief readvisor", "IDENTITY-MARKER", "A novel about lighthouses.", "# Paradigm", "# Policies",
+                 "# Tools", "# Converted documents", "# Context", "*(guide: twins)*"):
+        assert kept in text, kept
+
+
+# ---------------------------------------------------------------------------
 # 4. The prompt against the windows we ship (docs/ctx-16gb-plan.md §8.5)
 # ---------------------------------------------------------------------------
 #
@@ -488,25 +675,18 @@ TIERS = {"gte_64gb": (64, 10_000), "gte_32gb": (32, 64),
 #: why it is allowed to stay that way for now. The lean profile (the plan's
 #: next round) is what fixes them — and when a pair starts fitting, the test
 #: below fails until its entry is deleted, so this list can only shrink.
+#: 0.5.1: the lean profile (~5.8k tokens) fits every 8,192 window with the
+#: reserve, so five of the six pairs left this list: G40-26, Q36-27 and
+#: Q38-04 on 16-31 GB, G40-04 and Q35-09 under 16 GB.
 KNOWN_TOO_SMALL = {
-    ("g40-26", "gte_16gb"): "stays 8,192 on 20-31 GB: 16k still cannot hold the "
-                            "full prompt and 32k costs GPU memory those machines "
-                            "lack (plan §8.1); the lean profile fixes it",
-    ("q36-27", "gte_16gb"): "16,384 on 22-31 GB: 64 KiB/token of KV makes a bigger "
-                            "window unaffordable (plan §3d); the lean profile",
-    ("q38-04", "gte_16gb"): "16,384 on 24-31 GB: same KV cost as q36-27 (plan "
-                            "§3d); the lean profile",
-    ("g40-04", "lt_16gb"): "8 GB Macs: the weights alone are about the whole GPU "
-                           "budget, no window holds the full prompt (plan §3d); "
-                           "8 GB chat support is a separate owner decision",
-    ("q35-09", "lt_16gb"): "10-15 GB: 8,192 for the same reason as g40-04 under "
-                           "16 GB; the lean profile",
-    ("g40-12", "lt_16gb"): "12-15 GB: 4,096; the lean profile",
+    ("g40-12", "lt_16gb"): "12-15 GB: 4,096 cannot hold even the lean prompt with "
+                           "the reserve; raising it on a 12 GB machine is an owner "
+                           "call (plan §3d)",
 }
 
 
-def _default_prompt_tokens(project: Path) -> int:
-    text = prompt.assemble_system_prompt(project)
+def _default_prompt_tokens(project: Path, profile: str = "chat") -> int:
+    text = prompt.assemble_system_prompt(project, profile=profile)
     for p in {str(project.resolve()), str(project)}:
         text = text.replace(p, "<project>")
     chars = len(text) - len("<project>") * text.count("<project>") \
@@ -534,14 +714,19 @@ def _feasible_pairs() -> dict[tuple[str, str], int]:
 def test_every_shipped_window_holds_the_default_prompt(project: Path):
     """Every model x RAM tier the model can run in ships a context window
     that holds a fresh project's whole system prompt plus the reserve —
-    except the `KNOWN_TOO_SMALL` pairs, each with its reason."""
-    tokens = _default_prompt_tokens(project)
+    the prompt a turn would send there, which since 0.5.1 is the lean
+    profile wherever the full one would take more than half the window
+    (`prompt.lean_wanted`) — except the `KNOWN_TOO_SMALL` pairs, each with
+    its reason."""
+    full = _default_prompt_tokens(project)
+    lean = _default_prompt_tokens(project, "lean")
     pairs = _feasible_pairs()
-    too_small = {p: ctx for p, ctx in pairs.items() if tokens + CTX_RESERVE > ctx}
+    sent = {p: (lean if prompt.lean_wanted(full, ctx) else full) for p, ctx in pairs.items()}
+    too_small = {p: ctx for p, ctx in pairs.items() if sent[p] + CTX_RESERVE > ctx}
     new = sorted(set(too_small) - set(KNOWN_TOO_SMALL))
     assert not new, (
-        f"a fresh project's prompt is ~{tokens:,} tokens (+{CTX_RESERVE:,} "
-        f"reserve) and these shipped windows cannot hold it: "
+        f"a fresh project's prompt is ~{full:,} tokens (lean: ~{lean:,}; +{CTX_RESERVE:,} "
+        f"reserve) and these shipped windows cannot hold the profile they would get: "
         + ", ".join(f"{c} {t} ({pairs[(c, t)]:,})" for c, t in new)
         + ". Raise the window in defaults/models.json (if the machine affords "
           "it), shrink the prompt, or add an entry with its reason.")

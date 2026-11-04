@@ -76,6 +76,7 @@ docs/docoes-precedents.md
 docs/docoes-landed-*.md
 docs/composure-landed-*.md
 docs/ctx-16gb-plan.md
+docs/ctx16-eval/
 docs/ctx-16gb-landed.md
 docs/thym-architecture.md
 docs/thym-050-plan.md

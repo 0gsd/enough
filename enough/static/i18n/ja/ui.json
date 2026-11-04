@@ -3,7 +3,7 @@
     "language": "ja",
     "label": "日本語",
     "role": "translated chrome strings",
-    "source": "en @ 0.5.0"
+    "source": "en @ 0.5.1"
   },
   "strings": {
     "agentmode.agent": "エージェント",
@@ -974,7 +974,7 @@
     "mm.openProject.label": "プロジェクトを開く",
     "mm.openProject.title": "このプロジェクトを開く — サーバーが引き継いで、そこへ読み込み直します",
     "mm.refresh.title": "ファイルを読み直す（リードバイザーの編集を取り込む）",
-    "mm.renderFailed": "mermaid はこの図を描画できませんでした:\n",
+    "mm.renderFailed": "この図を描画できませんでした:\n",
     "models.applyBtn": "適用して再起動",
     "models.autoReset.hint": "ゲージがしきい値を超えると、enough が実行中のリクエストファイルに Continuation ブロックを書き、会話がクリアされ、あなたのリードバイザーがそのチェックポイントから再開します。実験的な機能です。すべて手動で握っていたいなら、オフのままにしてください。",
     "models.foot": "切り替えると、いまのモデルは RAM から降り、新しいモデルが読み込まれ、メモリ上の会話はクリアされます。ディスク上のリクエスト履歴（セッションログ、リクエスト）はそのまま残ります。",

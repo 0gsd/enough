@@ -51,6 +51,117 @@ file contents here
 <index>2</index>
 </tool>
 
+<tool name="export_document">
+<path>reports/q3.docx</path>
+<target>.docx</target>
+<mode>copy</mode>
+</tool>
+
+<tool name="canon_list">
+<volume>notes</volume>
+</tool>
+
+<tool name="canon_create">
+<name>notes</name>
+</tool>
+
+<tool name="canon_ingest">
+<volume>rust-book</volume>
+<type>url</type>
+<value>https://doc.rust-lang.org/book/</value>
+<depth>2</depth>
+</tool>
+
+<tool name="show_intro">
+</tool>
+
+<tool name="harness_guide">
+<topic>composures</topic>
+</tool>
+
+Rules:
+- All paths are relative to the project directory. Absolute paths and `../`
+  traversal are rejected.
+- `write_file` creates parent directories automatically.
+- `shell` executes in the project directory. stdout and stderr are captured
+  and returned. There is no sandbox — be deliberate.
+- `fetch_url` is the canonical way to read from the web — prefer it over
+  `shell` + `curl`. It routes by the internet allowlist (direct for listed
+  domains, Tor for the rest), converts the page to markdown, caches it
+  under `rness/io/input/<timestamp>-<hash>-<slug>.md` and indexes it in
+  `rness/io/input/_broker-index.md`. The result is a short preview plus
+  the cache path — `read_file` the cache only when you need the rest, so
+  fetched documents stay out of your context window.
+- `show_intro` puts enough's brief introduction on the user's screen, in
+  your voice. If a conversation opens with a bare greeting, offer once:
+  "want a brief introduction to enough?" Call it on a yes, or when they ask
+  what enough is or does; then don't repeat it.
+- `harness_guide` `<topic>` returns the full text of a section a shorter
+  prompt only summarises (`composures`, `girraphs`, `review`, `wikisink`,
+  `canon`, `cloud`, `twins`); a summary marked *(guide: X)* is the cue.
+- After a tool call, the harness will send back:
+  <tool_result name="toolname" path="..." (or command="...", url="..."")>
+  [result or error]
+  </tool_result>
+- You may chain tool calls across turns. The harness caps a single user turn
+  at 10 tool iterations.
+- All tool calls flow through the broker, which writes a journal entry to
+  `rness/knowledge/session-logs/<date>-broker.md`. You don't write that
+  file directly; the harness does.
+"""
+
+#: The closing section of the tool docs, in every profile: a tool call is a
+#: step, not an answer. Carried separately so the sections that can be
+#: gated or summarised sit between the core and it, as they always did.
+KEEP_GOING_INSTRUCTIONS = """\
+## Keep going until the request is fulfilled
+
+A tool call is never a complete response on its own — it's a step toward
+something the user asked for. When a `<tool_result>` arrives, the user is
+still waiting for the work that result was leading to. Your next move is
+**always** one of:
+
+1. **Emit another tool call** to make further progress (read the next file,
+   write the output, run the next shell command, etc.).
+2. **Produce the final user-facing answer** that uses what the tool result
+   gave you (the analysis, the synthesis, the explanation).
+
+Do NOT end your turn immediately after a `<tool_result>` with empty or
+near-empty content. If you find yourself about to do that, ask: "did I
+actually do what the user asked, or did I just *prepare* to do it?" If
+the answer is "prepared," keep going. The user should not have to nudge
+you with "everything ok?" to make you continue work you already started.
+
+**Implicit multi-step asks are the norm, not the exception.** "Use the
+analyzer skill on this file," "translate this document," "summarize this
+report" all decompose into at least two steps (read the input → produce
+the output). Plan to do both before ending the turn. If the work is too
+large to finish in one turn, say so explicitly in your final reply and
+write a request-tracking file (see the requests policy) — don't just
+stop silently.
+"""
+
+#: The lean profile's version of the same: the rule, without the worked
+#: examples.
+KEEP_GOING_LEAN_INSTRUCTIONS = """\
+## Keep going until the request is fulfilled
+
+A tool call is a step, never an answer. When a `<tool_result>` arrives the
+user is still waiting: either emit the next tool call or write the reply
+that uses the result. Never end a turn right after a tool result with
+nothing said. "Use the analyzer skill on this file", "translate this
+document", "summarize this report" are all read → produce: do both before
+the turn ends, and if the work is too large for one turn say so and track
+it in a request file.
+"""
+
+#: `cloud_pipeline`: its example and its rule, paid for only when the cloud
+#: gate is open (`local_models_only` off, a key present and healthy —
+#: `cloud.gate_status()`). In a default install the toggle is on, so this
+#: was 629 tokens of dead text on every turn (plan §4b, tier 1).
+CLOUD_TOOL_INSTRUCTIONS = """\
+## Cloud pipeline (OpenRouter batch jobs)
+
 <tool name="cloud_pipeline">
 <content>
 {
@@ -69,6 +180,39 @@ file contents here
 </content>
 </tool>
 
+- `cloud_pipeline` is the broker-driven multi-step batch tool for
+  OpenRouter. Use it when the user wants a single large job done by a
+  cloud model in many sequential calls — generating long-form content
+  by section (e.g. "write 36 chapters"), running per-chunk transformations
+  across a corpus, or producing a draft and then a single proofread/
+  edit pass over the compiled result. The broker runs every step server-
+  side (so you don't have to loop), caches each response under
+  `rness/io/cloud-cache/<timestamp>-<slug>.md`, optionally compiles
+  them, optionally final-passes, and returns a short structured summary
+  plus output path. Pre-conditions: the `local_models_only` broker
+  toggle must be OFF and the OpenRouter key must be present + healthy.
+  The full per-step text never enters your context window — read
+  individual cache files with `read_file` only when you need to inspect
+  output. Don't use for one-off chat-style requests; for those, just
+  respond normally (the active OPRO-API model will route your reply
+  through the cloud automatically).
+  - **compile.method** has two options: `"concat"` joins step outputs
+    verbatim with a separator; `"summarize_each"` makes a follow-up
+    cloud call per step to produce a one-paragraph summary, and the
+    compiled artifact (plus any final_pass input) is built from the
+    summaries instead of the full step bodies. Full step outputs are
+    still cached individually on disk. Use `summarize_each` when a
+    final pass over all steps would otherwise blow past the model's
+    context — e.g. when arc-level editing a 36-chapter draft where
+    each chapter is 5k words. The `summary_prompt` field accepts a
+    template containing the literal `{step}` placeholder, which is
+    substituted with each step's full text before sending.
+"""
+
+#: The girraph node tools: five examples and the section. On in every chat
+#: turn; in the lean profile only when the project holds a `.girraph` or
+#: the `girraph-merirmaid` skill is on (and then as the summary below).
+GIRRAPH_TOOL_INSTRUCTIONS = """\
 <tool name="read_girraph">
 <path>plans/plugin-api.girraph</path>
 <node>p1</node>
@@ -100,102 +244,6 @@ file contents here
 <id>a2</id>
 <confirmed>yes</confirmed>
 </tool>
-
-<tool name="wiki_search">
-<query>norse mythology ravens</query>
-<limit>10</limit>
-</tool>
-
-<tool name="read_wiki_article">
-<path>Odin</path>
-</tool>
-
-<tool name="wiki_status">
-</tool>
-
-<tool name="wikisink">
-<scope>watched</scope>
-</tool>
-
-<tool name="export_document">
-<path>reports/q3.docx</path>
-<target>.docx</target>
-<mode>copy</mode>
-</tool>
-
-<tool name="canon_list">
-<volume>notes</volume>
-</tool>
-
-<tool name="canon_create">
-<name>notes</name>
-</tool>
-
-<tool name="canon_ingest">
-<volume>rust-book</volume>
-<type>url</type>
-<value>https://doc.rust-lang.org/book/</value>
-<depth>2</depth>
-</tool>
-
-<tool name="show_intro">
-</tool>
-
-Rules:
-- All paths are relative to the project directory. Absolute paths and `../`
-  traversal are rejected.
-- `write_file` creates parent directories automatically.
-- `shell` executes in the project directory. stdout and stderr are captured
-  and returned. There is no sandbox — be deliberate.
-- `fetch_url` is the canonical way to read from the web — prefer it over
-  `shell` + `curl`. It handles internet-allowlist routing (direct fetch
-  for allowlisted domains; transparent Tor anonymization for off-allowlist
-  ones), converts HTML to markdown via pandoc — which ships with enough,
-  so the conversion is always available — caches the result under
-  `rness/io/input/<timestamp>-<hash>-<slug>.md`, and indexes it in
-  `rness/io/input/_broker-index.md`. The tool result is just a short
-  preview + the cache path — read the full content with `read_file` if
-  needed. This keeps fetched documents out of your context window.
-- `cloud_pipeline` is the broker-driven multi-step batch tool for
-  OpenRouter. Use it when the user wants a single large job done by a
-  cloud model in many sequential calls — generating long-form content
-  by section (e.g. "write 36 chapters"), running per-chunk transformations
-  across a corpus, or producing a draft and then a single proofread/
-  edit pass over the compiled result. The broker runs every step server-
-  side (so you don't have to loop), caches each response under
-  `rness/io/cloud-cache/<timestamp>-<slug>.md`, optionally compiles
-  them, optionally final-passes, and returns a short structured summary
-  plus output path. Pre-conditions: the `local_models_only` broker
-  toggle must be OFF and the OpenRouter key must be present + healthy.
-  The full per-step text never enters your context window — read
-  individual cache files with `read_file` only when you need to inspect
-  output. Don't use for one-off chat-style requests; for those, just
-  respond normally (the active OPRO-API model will route your reply
-  through the cloud automatically).
-  - **compile.method** has two options: `"concat"` joins step outputs
-    verbatim with a separator; `"summarize_each"` makes a follow-up
-    cloud call per step to produce a one-paragraph summary, and the
-    compiled artifact (plus any final_pass input) is built from the
-    summaries instead of the full step bodies. Full step outputs are
-    still cached individually on disk. Use `summarize_each` when a
-    final pass over all steps would otherwise blow past the model's
-    context — e.g. when arc-level editing a 36-chapter draft where
-    each chapter is 5k words. The `summary_prompt` field accepts a
-    template containing the literal `{step}` placeholder, which is
-    substituted with each step's full text before sending.
-- `show_intro` puts enough's brief introduction on the user's screen, in
-  your voice. If a conversation opens with a bare greeting, offer once:
-  "want a brief introduction to enough?" Call it on a yes, or when they ask
-  what enough is or does; then don't repeat it.
-- After a tool call, the harness will send back:
-  <tool_result name="toolname" path="..." (or command="...", url="..."")>
-  [result or error]
-  </tool_result>
-- You may chain tool calls across turns. The harness caps a single user turn
-  at 10 tool iterations.
-- All tool calls flow through the broker, which writes a journal entry to
-  `rness/knowledge/session-logs/<date>-broker.md`. You don't write that
-  file directly; the harness does.
 
 ## Working with girraphs
 
@@ -233,6 +281,10 @@ Rules:
   and refuses to orphan: removing a node with children needs
   `<cascade>true</cascade>`, which removes the whole subtree.
 
+"""
+
+#: The two review-mode sections (colour highlights, selection edits).
+REVIEW_TOOL_INSTRUCTIONS = """\
 ## Working with review-mode color highlights
 
 Review mode (the full-frame markdown reader) lets the user paint
@@ -295,6 +347,29 @@ Don't undo on the user's behalf. Don't make multiple speculative
 edits in one turn. The pattern is: one selection in, one focused
 edit out, one explicit save/undo confirmation.
 
+"""
+
+#: The wiki tools: four examples and the section, paid for only when a local
+#: Wikipedia archive is installed and reachable (`wikisink.config.installed`;
+#: plan §4b, tier 1). Without one, WIKI_ABSENT_INSTRUCTIONS names the tools
+#: and says why they wait.
+WIKI_TOOL_INSTRUCTIONS = """\
+<tool name="wiki_search">
+<query>norse mythology ravens</query>
+<limit>10</limit>
+</tool>
+
+<tool name="read_wiki_article">
+<path>Odin</path>
+</tool>
+
+<tool name="wiki_status">
+</tool>
+
+<tool name="wikisink">
+<scope>watched</scope>
+</tool>
+
 ## Wikisink (local Wikipedia)
 
 When a local Wikipedia archive is installed (check with `wiki_status` if
@@ -333,6 +408,19 @@ Saved articles live in `{project}/wiki/` and the global `wiki` volume
 the user of the share-alike terms if they fold article text into something
 they'll publish.
 
+"""
+
+WIKI_ABSENT_INSTRUCTIONS = """\
+## Wikisink (local Wikipedia)
+
+No local Wikipedia archive is installed (the user adds one from the 🚰
+wikisink pane); `wiki_status` says so, and `wiki_search`, `read_wiki_article`
+and `wikisink` wait on it. Use `fetch_url` for an encyclopedic lookup.
+"""
+
+#: The canon store section (the three `canon_*` tools keep their examples
+#: in the core).
+CANON_STORE_INSTRUCTIONS = """\
 ## canon (the global file store)
 
 `~/enough/canon/` is a machine-global store of text the user wants to
@@ -367,31 +455,6 @@ rough scale) BEFORE running the ingest. Only then call `canon_ingest`.
 Ingests can be long-running; the volume is registered immediately with
 status `ingesting` and marked `complete` (or `failed`) at the end.
 
-## Keep going until the request is fulfilled
-
-A tool call is never a complete response on its own — it's a step toward
-something the user asked for. When a `<tool_result>` arrives, the user is
-still waiting for the work that result was leading to. Your next move is
-**always** one of:
-
-1. **Emit another tool call** to make further progress (read the next file,
-   write the output, run the next shell command, etc.).
-2. **Produce the final user-facing answer** that uses what the tool result
-   gave you (the analysis, the synthesis, the explanation).
-
-Do NOT end your turn immediately after a `<tool_result>` with empty or
-near-empty content. If you find yourself about to do that, ask: "did I
-actually do what the user asked, or did I just *prepare* to do it?" If
-the answer is "prepared," keep going. The user should not have to nudge
-you with "everything ok?" to make you continue work you already started.
-
-**Implicit multi-step asks are the norm, not the exception.** "Use the
-analyzer skill on this file," "translate this document," "summarize this
-report" all decompose into at least two steps (read the input → produce
-the output). Plan to do both before ending the turn. If the work is too
-large to finish in one turn, say so explicitly in your final reply and
-write a request-tracking file (see the requests policy) — don't just
-stop silently.
 """
 
 # ---------------------------------------------------------------------------
@@ -671,6 +734,250 @@ parts of what you tell them came from the pal and which are yours.
 """
 
 
+# ---------------------------------------------------------------------------
+# The lean profile (0.5.1, docs/ctx-16gb-plan.md §4b–4c)
+#
+# A fresh project's full prompt is ~20k tokens; a 16k or 8k window cannot
+# hold it with room for a conversation, and even a 32k one spends half of
+# itself before the first message. `assemble_system_prompt(profile="lean")`
+# is the same prompt with the long sections summarised: the policies as an
+# index (the files stay in the project, one `read_file` away), the paradigm
+# cut at its `LEAN_CUT` marker, the composure / girraph / review / wiki /
+# canon / cloud / twins sections as the summaries below, each marked
+# *(guide: X)* so `harness_guide` can hand the full text back the moment it
+# is needed. `choose_profile` picks lean whenever the full prompt would take
+# more than `LEAN_SHARE` of the window; the server does that per turn and the
+# preflight measures the profile a turn would get.
+# ---------------------------------------------------------------------------
+
+#: The marker a paradigm file may carry: the lean profile keeps what is above
+#: it and points at the rest.
+LEAN_CUT = "<!-- lean-cut -->"
+#: Lean when the full prompt would take more than this share of the window.
+LEAN_SHARE = 0.5
+#: The estimator shared with the fit test (chars per token across the shipped
+#: tokenizers, plan §1a); exact counts come from the preflight's `/tokenize`.
+CHARS_PER_TOKEN = 3.7
+
+LEAN_TOOLS_NOTE = """\
+Lean prompt (this model's window is small): a section marked *(guide: X)* is
+a summary — call `harness_guide` with that topic before acting on it for the
+first time in a conversation.
+"""
+
+GIRRAPH_LEAN_INSTRUCTIONS = """\
+## Working with girraphs *(guide: girraphs)*
+
+A girraph is a plain-text IBIS map in a `.girraph` file — issues (?),
+positions (!), supporting and objecting arguments (+ / -), notes (.), nested
+girraphs (@) — with stable node ids (q1, p2, a3…) that you and the user edit
+together. Edit it ONLY through the node tools; `write_file` on a `.girraph`
+is refused. `read_girraph` (`<path>`, `<node>`, `<depth>`, default 1) reads a
+branch; `add_node` (`<path>`, `<type>`, `<label>`, `<parent>`, `<by>`) adds
+one, and with no `<parent>` starts a new girraph; `update_node` (`<id>`,
+`<label>`), `link_nodes` (`<from>`, `<to>`), `remove_node` (`<id>`, the
+user's own `<confirmed>yes</confirmed>` this turn, `<cascade>true</cascade>`
+for a subtree). Expand only the branch you work on; keep `by:` honest.
+"""
+
+#: ...and, with no map in the project and the skill off, the two lines that
+#: keep girraphs makeable: a user who asks for one by name in a fresh
+#: project (the real-model smoke's miss) still gets one.
+GIRRAPH_ABSENT_LEAN_INSTRUCTIONS = """\
+## Girraphs *(guide: girraphs)*
+
+A girraph is a plain-text IBIS map (issues, positions, arguments) in a
+`.girraph` file, made only through node tools (`add_node` with no `<parent>`
+starts one). Before your first girraph here, call `harness_guide` with
+`<topic>girraphs</topic>`.
+"""
+
+REVIEW_LEAN_INSTRUCTIONS = """\
+## Review-mode highlights and selections *(guide: review)*
+
+The user paints review-mode documents in four colours (yellow, green, blue,
+pink). When they name a colour, `read_highlights` says what is marked and
+`navigate_to_highlight` scrolls the open pane to one — never guess. A message
+opening with `[review-mode selection in <path>, line N]` and a quoted snippet
+asks for that snippet alone — never a rewrite in the reply: (1) `read_file`
+the document; (2) `write_file` the whole file with exactly that text
+replaced, everything else byte-identical; (3) end with one line on the
+change and the literal **"save or undo?"**. One selection in, one edit out.
+"""
+
+WIKI_LEAN_INSTRUCTIONS = """\
+## Wikisink (local Wikipedia) *(guide: wikisink)*
+
+A local Wikipedia archive is installed: prefer `wiki_search` (`<query>`,
+`<limit>`) and `read_wiki_article` (`<path>` from a search result or a chat
+preamble, or `<title>`; a preview plus a cache path under `rness/io/input/`)
+over `fetch_url` for anything encyclopedic. `wiki_status` reports the
+install; `wikisink` runs the update and returns a report to reproduce
+verbatim in a fenced block, never saved unasked. Saved articles carry
+CC BY-SA terms — say so when the user reuses one.
+"""
+
+CANON_STORE_LEAN_INSTRUCTIONS = """\
+## canon (the global file store) *(guide: canon)*
+
+`~/enough/canon/` holds the text the user keeps, as volumes (top-level
+folders), each with a catalog `canon.cosm` enough maintains — never edit it.
+`canon_list` lists volumes, or one with `<volume>`; `canon_create` makes an
+empty one (`<name>`); `canon_ingest` fills one from `<type>` `path`, `url` or
+`wikisink` with `<value>`, `<depth>` 1–3 or `<all>true</all>` (not for
+wikisink). Before any ingest the source must be reachable and free to copy
+(robots.txt, licence); confirm anything large or doubtful with the user
+first, naming source, depth and scale.
+"""
+
+CLOUD_LEAN_INSTRUCTIONS = """\
+## Cloud pipeline *(guide: cloud)*
+
+`cloud_pipeline` runs one large job as many sequential OpenRouter calls,
+server-side: `<content>` is JSON with `steps` (each a `prompt`), optional
+`compile` (`concat` or `summarize_each`), optional `final_pass`, an
+`output_path` under `rness/io/output/` and a `model`. Only for a job the
+user wants a cloud model to do in many calls; never for ordinary replies.
+"""
+
+COMPOSURE_LEAN_INSTRUCTIONS = """\
+## Composures *(guide: composures)*
+
+A composure is a canvas document in a `.comp` file: modules (text cards,
+pages, links to project files, wiki articles or web pages) on a plane the
+user is looking at while you work — shared ground, never a file you own,
+for material with a shape rather than a sequence. Every tool takes the
+`.comp` `<path>`:
+
+<tool name="comp_add_module">
+<path>rness/io/composure/chapter-map.comp</path>
+<type>text</type>
+<title>Act two</title>
+<content>The middle goes slack here.</content>
+</tool>
+
+`read_composure` (the outline, or `<module>m3</module>`'s text — quote the
+ids it gives back), `new_composure` (`<form>` blank | cards | scaffold |
+journal | council, `<title>`), `comp_add_module` (`<type>` text | doc | wiki |
+weblink | webframe | image, `<bg>` a named swatch, markdown `<content>`;
+leave the geometry to enough), `comp_update_module`, `comp_set_page`
+(`<module>`, `<page>`, `<content>`), `comp_remove_module` (the user's own
+`<confirmed>yes</confirmed>` this turn), `comp_arrange`, `comp_save_as_form`,
+`composure_from_outline` (`<title>`, `<form>`, one markdown outline: `#`
+title, `##` groups, `###` cards — use it for more than three modules at
+once). Never `write_file` a `.comp`. One module, one idea.
+"""
+
+POLICIES_LEAN_PREAMBLE = """\
+The policies are summarised here; each lives in `rness/policies/` and is
+read with `read_file` the first time its trigger fires. Three rules hold
+regardless:
+
+- Outside the project, read and write only paths
+  `rness/policies/allowlists.md` names (`~/enough/` is readable); for any
+  other path, say so and point the user at that file. Never move files out
+  of the project; never delete a file until you have asked the user to
+  confirm the deletion and they have, in this turn.
+- Before the first substantive tool call of a job that takes more than one
+  (research, several files, a skill on a file), write a request file
+  under `rness/requests/` per `rness/policies/requests.md`, and keep
+  progress checkpoints in it; when the context grows heavy, write a
+  checkpoint and a Continuation block there, tell the user, and ask them
+  to `/reset`.
+- A preference, convention or working agreement the user states goes
+  into `rness/knowledge/project-profile.md` with `write_file` the same
+  turn, per `rness/policies/profile-maintenance.md`.
+"""
+
+#: What `harness_guide` hands back, by topic. The composure and girraph
+#: texts are the full blocks the chat profile carries; the others are the
+#: sections the lean profile summarises.
+def harness_guides() -> dict[str, str]:
+    return {
+        "composures": COMPOSURE_TOOL_INSTRUCTIONS,
+        "girraphs": GIRRAPH_TOOL_INSTRUCTIONS,
+        "review": REVIEW_TOOL_INSTRUCTIONS,
+        "wikisink": WIKI_TOOL_INSTRUCTIONS,
+        "canon": CANON_STORE_INSTRUCTIONS,
+        "cloud": CLOUD_TOOL_INSTRUCTIONS,
+        "twins": convert_instructions(),
+    }
+
+
+def _cloud_usable() -> bool:
+    """The cloud gate (`cloud.gate_status`): `local_models_only` off, a key
+    present and last verified. `cloud_pipeline` refuses otherwise, so its
+    docs are dead text otherwise."""
+    try:
+        from . import cloud
+        return bool(cloud.gate_status().get("open"))
+    except Exception:  # noqa: BLE001 — an unreadable gate is a shut gate
+        return False
+
+
+def _wiki_installed() -> bool:
+    """A local Wikipedia archive is installed and reachable right now."""
+    try:
+        from .wikisink import config as _wcfg
+        return bool(_wcfg.installed())
+    except Exception:  # noqa: BLE001 — no wikisink is no archive
+        return False
+
+
+#: Folders a girraph search never enters (state, caches, the store).
+_GIRRAPH_SKIP = {"rness", ".git", "node_modules", ".venv", "__pycache__"}
+
+
+def _girraph_present(project_dir: Path, max_depth: int = 3) -> bool:
+    """Does the project hold a `.girraph` within `max_depth` folder levels?
+    The lean profile carries the girraph summary only then (or with the
+    `girraph-merirmaid` skill on): a map the user made in the UI is the one
+    thing a gate on the skill alone would miss."""
+    try:
+        base = Path(project_dir)
+        stack = [(base, 0)]
+        while stack:
+            d, depth = stack.pop()
+            with os.scandir(d) as it:
+                for entry in it:
+                    if entry.is_dir(follow_symlinks=False):
+                        if depth < max_depth and entry.name not in _GIRRAPH_SKIP \
+                                and not entry.name.startswith("."):
+                            stack.append((Path(entry.path), depth + 1))
+                    elif entry.name.endswith(".girraph"):
+                        return True
+    except OSError:
+        return False
+    return False
+
+
+def estimate_tokens(text: str) -> int:
+    """A char-based token estimate for choosing a profile (exact counts are the
+    preflight's, from `/tokenize`)."""
+    return int(len(text or "") / CHARS_PER_TOKEN + 0.999)
+
+
+def lean_wanted(prompt_tokens: int, n_ctx: int | None) -> bool:
+    """The rule: lean when the full prompt would take more than LEAN_SHARE of
+    the window. An unknown window keeps the full prompt."""
+    return bool(n_ctx) and prompt_tokens > int(n_ctx) * LEAN_SHARE
+
+
+def choose_profile(full_prompt: str, n_ctx: int | None) -> str:
+    return "lean" if lean_wanted(estimate_tokens(full_prompt), n_ctx) else "chat"
+
+
+def assemble_for_window(project_dir: Path, n_ctx: int | None, *,
+                        readvisors: str = "voltron", pal: bool = False) -> tuple[str, str]:
+    """The prompt a turn sends and the profile it got: the full `chat` prompt
+    unless `choose_profile` says the window wants `lean`."""
+    full = assemble_system_prompt(project_dir, readvisors, "chat", pal=pal)
+    profile = choose_profile(full, n_ctx)
+    if profile == "chat":
+        return full, profile
+    return assemble_system_prompt(project_dir, readvisors, "lean", pal=pal), profile
+
+
 def _skill_enabled(rness: Path, name: str) -> bool:
     try:
         return any(n == name and on for n, on, _tip in list_skills(rness))
@@ -699,26 +1006,49 @@ def _macrocosm_available() -> bool:
         return False
 
 
-def tool_instructions(project_dir: Path, *, pal: bool = False) -> str:
+def tool_instructions(project_dir: Path, *, pal: bool = False, lean: bool = False) -> str:
     """The always-on core plus whichever gated blocks this project can use.
 
-    Ordered core → composures → readvisors → dictionary → macrocosm → pal.
-    A project with none of them pays exactly what it paid before any of this
-    landed.
+    Ordered core → girraphs → review → wiki → cloud → canon store → keep going
+    → composures → readvisors → dictionary → macrocosm → pal. A project with
+    none of the gated ones pays exactly what it paid before any of this
+    landed. Two gates are new in 0.5.1 and hold in every profile: the cloud
+    block rides only when the cloud gate is open, the wiki block only when
+    an archive is installed (a short note names the wiki tools otherwise).
+
+    `lean` is the lean profile's version: the same core, the long sections
+    replaced by their *(guide: X)* summaries, the girraph summary only when
+    the project holds a `.girraph` or the `girraph-merirmaid` skill is on
+    (two lines that say girraphs exist and how to start one otherwise).
 
     `pal` is the narrowest gate of them all. The other two are switched on
     for a project and stay on; a pal block is carried by the one turn the
     user opened with `/pal` and by no other, so `ask_pal` costs an ordinary
     turn nothing at all."""
-    parts = [TOOL_INSTRUCTIONS]
     rness = project_dir / "rness"
+    parts = [LEAN_TOOLS_NOTE, TOOL_INSTRUCTIONS] if lean else [TOOL_INSTRUCTIONS]
+    if not lean:
+        parts.append(GIRRAPH_TOOL_INSTRUCTIONS)
+    elif _skill_enabled(rness, "girraph-merirmaid") or _girraph_present(project_dir):
+        parts.append(GIRRAPH_LEAN_INSTRUCTIONS)
+    else:
+        parts.append(GIRRAPH_ABSENT_LEAN_INSTRUCTIONS)
+    parts.append(REVIEW_LEAN_INSTRUCTIONS if lean else REVIEW_TOOL_INSTRUCTIONS)
+    if _wiki_installed():
+        parts.append(WIKI_LEAN_INSTRUCTIONS if lean else WIKI_TOOL_INSTRUCTIONS)
+    else:
+        parts.append(WIKI_ABSENT_INSTRUCTIONS)
+    if _cloud_usable():
+        parts.append(CLOUD_LEAN_INSTRUCTIONS if lean else CLOUD_TOOL_INSTRUCTIONS)
+    parts.append(CANON_STORE_LEAN_INSTRUCTIONS if lean else CANON_STORE_INSTRUCTIONS)
+    parts.append(KEEP_GOING_LEAN_INSTRUCTIONS if lean else KEEP_GOING_INSTRUCTIONS)
     try:
         from . import broker
         composures = broker.is_enabled("composure_enabled")
     except Exception:  # noqa: BLE001 — an unreadable broker config is not a gate
         composures = True
     if composures:
-        parts.append(COMPOSURE_TOOL_INSTRUCTIONS)
+        parts.append(COMPOSURE_LEAN_INSTRUCTIONS if lean else COMPOSURE_TOOL_INSTRUCTIONS)
     if _skill_enabled(rness, "readvisory"):
         parts.append(READVISORY_TOOL_INSTRUCTIONS)
     if _dictionary_available():
@@ -728,7 +1058,6 @@ def tool_instructions(project_dir: Path, *, pal: bool = False) -> str:
     if pal:
         parts.append(PAL_TOOL_INSTRUCTIONS)
     return "\n".join(p.rstrip() + "\n" for p in parts)
-
 
 HARNESS_CONTEXT_TMPL = """\
 You are running inside an "enough" harness — a paradigmless personal computer
@@ -785,6 +1114,32 @@ that the user configures through plain-text conventions.
 """
 
 
+#: The lean profile's Context section: the same paths and the same rules on
+#: where files go, in fewer words; the canon store and the wiki archive are
+#: the lean tool summaries' business.
+HARNESS_CONTEXT_LEAN_TMPL = """\
+You are running inside an "enough" harness — a paradigmless personal computer
+the user configures through plain-text conventions.
+
+- Project directory: {project_dir}
+- Your configuration lives under `rness/`: `rness/AGENT.md` (identity),
+  `rness/MOTIVATION.md` (drive), `rness/paradigms/<name>.md` (the active one
+  is named in `rness/active-paradigm`), `rness/knowledge/project-profile.md`
+  (living notes, piped into your prompt each turn). Edit them by their full
+  `rness/…` path — a bare `AGENT.md` would create a new file at the root.
+- **Outputs** you produce (drafts, analyses, exports) go to
+  `rness/io/output/`, mirroring any subfolder the user names; **inputs** the
+  user hands you for a task are in `rness/io/input/`; `rness/requests/` holds
+  only your request-tracking files, never user artifacts.
+"""
+
+
+def harness_context(project_dir: Path, *, lean: bool = False) -> str:
+    """The Context section: `HARNESS_CONTEXT_TMPL`, or the lean template."""
+    tmpl = HARNESS_CONTEXT_LEAN_TMPL if lean else HARNESS_CONTEXT_TMPL
+    return tmpl.format(project_dir=project_dir)
+
+
 def _read_or_empty(path: Path) -> str:
     try:
         return path.read_text(encoding="utf-8").strip()
@@ -809,7 +1164,7 @@ def _section(title: str, body: str) -> str:
     return f"# {title}\n\n{body}\n"
 
 
-def convert_instructions() -> str:
+def convert_instructions(lean: bool = False) -> str:
     """The twin paragraph for the system prompt, with its formats table
     rendered from `convert.FORMATS`.
 
@@ -817,6 +1172,18 @@ def convert_instructions() -> str:
     truth for which file types are supported, precisely so the prompt, the
     help center, and the export modal can't drift apart from the code."""
     from . import convert as _convert
+    if lean:
+        targets = ", ".join(f"`{t}`" for t in _convert.EXPORT_TARGETS)
+        return (
+            "*(guide: twins)* enough opens a PDF, Word document or ebook as an\n"
+            "editable markdown **twin** beside it (`report.pdf` → `report.pdf.md`).\n"
+            "To change one: `read_file` the original (it returns the twin's text),\n"
+            "then `write_file` the twin, `report.pdf.md` — never the original.\n"
+            "`export_document` (`<path>`, `<target>` one of " + targets + ",\n"
+            "`<mode>` `copy` or `overwrite`) turns edits back into a document, on\n"
+            "request; an overwrite is refused when the original changed outside\n"
+            "enough.\n"
+        )
     rows = ["| type | opens as | export back | keep in sync |",
             "|---|---|---|---|"]
     for ext, spec in _convert.FORMATS.items():
@@ -1335,17 +1702,49 @@ def readvisor_shape(agent_md: str, motivation_md: str) -> list[str]:
     return problems
 
 
-def _load_policies(rness: Path) -> str:
-    """Concatenate every policy under rness/policies/ into one block."""
+def _load_policies(rness: Path, *, lean: bool = False) -> str:
+    """Concatenate every policy under rness/policies/ into one block — or, for
+    the lean profile, index them: one line per file, its first paragraph as
+    the trigger, after the two rules that hold without reading anything."""
     policies_dir = rness / "policies"
     if not policies_dir.is_dir():
         return ""
     parts: list[str] = []
     for p in sorted(policies_dir.glob("*.md")):
         text = _read_or_empty(p)
-        if text:
+        if not text:
+            continue
+        if lean:
+            parts.append(f"- **{p.stem}** (`rness/policies/{p.name}`) — {_policy_gist(text)}")
+        else:
             parts.append(f"## {p.stem}\n\n{text}")
+    if lean:
+        return POLICIES_LEAN_PREAMBLE + "\n" + "\n".join(parts) if parts else ""
     return "\n\n".join(parts)
+
+
+def _policy_gist(text: str, limit: int = 120) -> str:
+    """A policy's first paragraph after its title, on one line — what the
+    lean index says it is for. Capped at a sentence boundary past `limit`."""
+    paras: list[str] = []
+    cur: list[str] = []
+    for ln in text.splitlines():
+        s = ln.strip()
+        if s.startswith("#") or s == "---":
+            if cur:
+                break
+            continue
+        if not s:
+            if cur:
+                break
+            continue
+        cur.append(s)
+    gist = " ".join(cur) if cur else ""
+    gist = re.sub(r"\s+", " ", gist).strip()
+    if len(gist) > limit:
+        cutp = gist.find(". ", limit)
+        gist = gist[:cutp + 1] if cutp != -1 else gist[:limit].rstrip() + "…"
+    return gist or "read it when its subject comes up."
 
 
 # ---------------------------------------------------------------------------
@@ -1648,15 +2047,23 @@ def ensure_multipurpose_file(rness: Path) -> None:
         pass
 
 
-def _load_active_paradigm_body(rness: Path, active: str) -> str:
+def _load_active_paradigm_body(rness: Path, active: str, *, lean: bool = False) -> str:
     """Read the active paradigm's content, stripping its frontmatter so
-    the YAML doesn't leak into the system prompt."""
+    the YAML doesn't leak into the system prompt. For the lean profile a
+    paradigm that carries the `LEAN_CUT` marker is cut there, and a short
+    paragraph says where the rest is; one without the marker rides whole."""
     p = rness / "paradigms" / f"{active}.md"
     text = _read_or_empty(p)
     if not text:
         return ""
     _meta, body = _parse_paradigm_frontmatter(text)
-    return body.strip()
+    body = body.strip()
+    if lean and LEAN_CUT in body:
+        head = body.split(LEAN_CUT, 1)[0].rstrip()
+        return (head + "\n\n*(lean prompt)* The rest of this paradigm — everything after the\n"
+                f"line `{LEAN_CUT}` in `rness/paradigms/{active}.md` — is read with\n"
+                "`read_file` the moment it applies, before acting on it.\n")
+    return body
 
 
 def _load_paradigm_catalog(rness: Path, active: str) -> str:
@@ -1741,6 +2148,12 @@ def assemble_system_prompt(
 
     - `"chat"` (default) — everything: identity, memory, paradigm, policies,
       skills, tools, the converted-documents note and the harness context.
+    - `"lean"` (0.5.1) — the chat prompt for a small window: the policies as
+      an index with two hard rules, the paradigm cut at its `LEAN_CUT`
+      marker, the composure / girraph / review / wiki / canon / cloud /
+      twins sections as summaries that `harness_guide` expands on demand.
+      About a third of the chat prompt. `choose_profile` says when a window
+      wants it; `assemble_for_window` applies the rule.
     - `"council"` — **who the chief is, and nothing else**: the identity
       preface, Identity, Motivation, the project description and the project
       profile. No readvisors, no paradigm or catalog, no policies, no skills,
@@ -1770,10 +2183,11 @@ def assemble_system_prompt(
     working memory), active paradigm + catalog, optional INTENTION.md,
     tool instructions, and the rness-context block.
     """
-    if profile not in ("chat", "council"):
+    if profile not in ("chat", "council", "lean"):
         raise ValueError(
-            f"unknown system-prompt profile {profile!r}; one of chat, council")
-    if pal and profile != "chat":
+            f"unknown system-prompt profile {profile!r}; one of chat, council, lean")
+    lean = profile == "lean"
+    if pal and profile == "council":
         raise ValueError(
             "a pal turn is a chat turn; the council profile carries no tools")
     rness = project_dir / "rness"
@@ -1785,7 +2199,7 @@ def assemble_system_prompt(
     project_profile = _read_or_empty(rness / "knowledge" / "project-profile.md")
     description = project_meta.load(project_dir)["description"].strip()
     active_paradigm = get_active_paradigm(rness)
-    paradigm = _load_active_paradigm_body(rness, active_paradigm)
+    paradigm = _load_active_paradigm_body(rness, active_paradigm, lean=lean)
     catalog = _load_paradigm_catalog(rness, active_paradigm)
     intention = _read_or_empty(rness / "INTENTION.md")
 
@@ -1824,7 +2238,7 @@ def assemble_system_prompt(
     parts.append(_section(f"Paradigm: {active_paradigm}", paradigm))
     if catalog:
         parts.append(_section("Paradigm Catalog", catalog))
-    policies_block = _load_policies(rness)
+    policies_block = _load_policies(rness, lean=lean)
     if policies_block:
         parts.append(_section("Policies", policies_block))
     skills_block = _load_skills(rness)
@@ -1832,9 +2246,9 @@ def assemble_system_prompt(
         parts.append(_section("Skills", skills_block))
     if intention:
         parts.append(_section("Current Intention", intention))
-    parts.append(_section("Tools", tool_instructions(project_dir, pal=pal)))
-    parts.append(_section("Converted documents (twins)", convert_instructions()))
-    parts.append(_section("Context", HARNESS_CONTEXT_TMPL.format(project_dir=project_dir)))
+    parts.append(_section("Tools", tool_instructions(project_dir, pal=pal, lean=lean)))
+    parts.append(_section("Converted documents (twins)", convert_instructions(lean=lean)))
+    parts.append(_section("Context", harness_context(project_dir, lean=lean)))
 
     drift_note = _drift_notice(project_dir)
     if drift_note:

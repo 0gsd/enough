@@ -586,7 +586,7 @@ output. A model-backed output that fails is repaired narrowly, retried within it
 | `verified-derived` | `verified` only on fields the target schema derives (identity, shape, offers); `stated` on the subject's own words (aims) | Comprise |
 | `verified-only-where-derived` | `mark … as verified` only on an item whose MiniCOSM lists it as derivable | new |
 | `standing-gate` | a release as the subject needs first-party standing, or `sample: true` | Comprise `standing.py` |
-| `epoch` | the date shown is the epoch, never the edit day; lists are sorted | Comprise |
+| `epoch` | the date shown is the epoch, never the edit day; lists keep a fixed order that file order cannot change | Comprise |
 | `digests` | every file in a package's catalog has the sha256 the catalog says | new |
 | `released` | nothing is in `graph.cosm` without a release recorded in the holograph | new; Ascribe |
 | `provenance` | every output carries `made` | new |
@@ -1253,7 +1253,7 @@ An isotype is a holotype *transcoded*: `project h as isotype`, under a program t
 (`fabula`, `short`, `atem`, or withheld) and a marking (`verified`, `stated`). The target schema's rules
 (`comprise-isotype/0`: default-deny, assertions not measurements, withhold never falsify, epochs and bands, verified
 only where derived, the standing gate) are the contract of `project` (section 6.3), so the schema stops being the
-ceiling and becomes the law. The Connect wizard becomes three preset programs (minimal, open, house), and a verified
+ceiling and becomes the law. The isotype's draft step becomes three preset programs (minimal, fuller, house), and a verified
 owner may write their own. A release carries the digests of the program and the trace that made it. The Comprise side
 is a specification of its own, for comprise-dev; enough builds none of it and reads what it produces.
 

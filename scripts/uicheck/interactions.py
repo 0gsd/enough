@@ -2611,8 +2611,8 @@ def scenario_cosm_lens(d: Driver) -> list[str]:
     d.js("(() => { const s = document.getElementById('cosm-lens'); s.value = 'map';"
          " s.dispatchEvent(new Event('change', {bubbles: true})); return true; })()")
     drawn = ("(async () => { for (let i = 0; i < 200 && !document.querySelector("
-             "'#merirmaid-body g.node'); i++) await new Promise((r) => setTimeout(r, 50));"
-             " return document.querySelectorAll('#merirmaid-body g.node').length; })()")
+             "'#merirmaid-body g.pele-node'); i++) await new Promise((r) => setTimeout(r, 50));"
+             " return document.querySelectorAll('#merirmaid-body g.pele-node').length; })()")
     if not d.js_await(drawn):
         fails.append("the map lens drew no nodes in merirmaid")
         _reset(d)
@@ -2630,7 +2630,7 @@ def scenario_cosm_lens(d: Driver) -> list[str]:
          " s.dispatchEvent(new Event('change', {bubbles: true})); return true; })()")
     d.js_await("(async () => { for (let i = 0; i < 200 && !(MM_CURRENT && MM_CURRENT.lens"
                " && MM_CURRENT.lens.lens === 'tree' && document.querySelector("
-               "'#merirmaid-body g.node')); i++) await new Promise((r) => setTimeout(r, 50));"
+               "'#merirmaid-body g.pele-node')); i++) await new Promise((r) => setTimeout(r, 50));"
                " return true; })()")
     sw = d.js("(() => ({lens: MM_CURRENT && MM_CURRENT.lens && MM_CURRENT.lens.lens,"
               " crumbs: document.getElementById('mm-crumbs').textContent,"
@@ -2638,7 +2638,7 @@ def scenario_cosm_lens(d: Driver) -> list[str]:
     if sw.get("lens") != "tree" or "tree" not in (sw.get("crumbs") or "") or sw.get("stack") != 1:
         fails.append(f"switching to the tree lens did not redraw in place: {sw}")
     node = d.js("(() => { const nm = (MM_CURRENT && MM_CURRENT.nodeMap) || {};"
-                " for (const g of document.querySelectorAll('#merirmaid-body g.node')) {"
+                " for (const g of document.querySelectorAll('#merirmaid-body g.pele-node')) {"
                 " const id = mmNodeId(g); if (nm[id] && nm[id].id) {"
                 " const b = g.getBoundingClientRect();"
                 " g.dispatchEvent(new MouseEvent('click', {bubbles: true, shiftKey: true,"
@@ -3110,7 +3110,7 @@ def scenario_docs_term_roundtrip(d: Driver) -> list[str]:
 def _mm_shift_click_node(d: Driver) -> str | None:
     """Shift-click the first lens node whose node_map resolves to an item."""
     return d.js("(() => { const nm = (MM_CURRENT && MM_CURRENT.nodeMap) || {};"
-                " for (const g of document.querySelectorAll('#merirmaid-body g.node')) {"
+                " for (const g of document.querySelectorAll('#merirmaid-body g.pele-node')) {"
                 " const id = mmNodeId(g); if (nm[id] && nm[id].id) {"
                 " const b = g.getBoundingClientRect();"
                 " g.dispatchEvent(new MouseEvent('click', {bubbles: true, shiftKey: true,"
@@ -3119,8 +3119,8 @@ def _mm_shift_click_node(d: Driver) -> str | None:
 
 
 _MM_DRAWN = ("(async () => { for (let i = 0; i < 300 && !document.querySelector("
-             "'#merirmaid-body g.node'); i++) await new Promise((r) => setTimeout(r, 50));"
-             " return document.querySelectorAll('#merirmaid-body g.node').length; })()")
+             "'#merirmaid-body g.pele-node'); i++) await new Promise((r) => setTimeout(r, 50));"
+             " return document.querySelectorAll('#merirmaid-body g.pele-node').length; })()")
 
 
 def scenario_docs_example_live(d: Driver) -> list[str]:
@@ -3218,15 +3218,15 @@ def scenario_docs_graph_roundtrip(d: Driver) -> list[str]:
         _reset(d)
         return fails
     st = d.js("(() => ({top: modeTop() && modeTop().name, around: mmTop() && mmTop().around,"
-              " lens: mmTop() && mmTop().lens, focus: !!document.querySelector('#merirmaid-body g.node.focus'),"
+              " lens: mmTop() && mmTop().lens, focus: !!document.querySelector('#merirmaid-body g.pele-node.focus'),"
               " title: document.getElementById('merirmaid-title').textContent,"
-              " nodes: document.querySelectorAll('#merirmaid-body g.node').length}))()")
+              " nodes: document.querySelectorAll('#merirmaid-body g.pele-node').length}))()")
     if st["top"] != "merirmaid" or st["around"] != "S:section/18.4" or st["lens"] != "graph":
         fails.append(f"merirmaid did not open on the local graph around §18.4: {st}")
     if not (2 <= st["nodes"] <= 60):
         fails.append(f"the local graph has {st['nodes']} nodes (one step out should be a handful)")
     node = d.js("(() => { const nm = (MM_CURRENT && MM_CURRENT.nodeMap) || {};"
-                " for (const g of document.querySelectorAll('#merirmaid-body g.node')) {"
+                " for (const g of document.querySelectorAll('#merirmaid-body g.pele-node')) {"
                 " const id = mmNodeId(g); if (nm[id] && nm[id].id && nm[id].id !== 'S:section/18.4') {"
                 " const b = g.getBoundingClientRect();"
                 " g.dispatchEvent(new MouseEvent('click', {bubbles: true, shiftKey: true,"

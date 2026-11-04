@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.5.0)
+# enough — Agent Guide (v0.5.1)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -99,7 +99,7 @@ Every Python module in `enough/`:
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
 | [enough/server.py](../enough/server.py) | ~5510 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, `GET /api/pal/status`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Since 0.4.3 also Canon's store routes (`/api/canon/*`, each pre-0.4.3 one aliased under `/api/cacheawl/*` by `_canon_route`), the derivation routes and their `CanonJobs` table, the MacroCOSM read routes (`/api/cosm*`, `/api/macrocosm/manifests`, `/api/macrocosm-spec`), the `canon:`/`cacheawl:` path prefixes (`STORE_PREFIXES`) and the project-catalog task in the lifespan. Mounts the composure, council and dictionary routers in one `include_router` call each, and starts FEED's background build in the lifespan (`dictionary.ensure_built(background=True)`; `cancel_build()` on shutdown). Owns `GET /api/intro` and the intro match in `POST /api/chat` (see "The readvisor panel"). Owns the `/pal` prefix branch in `POST /api/chat` and `_render_pal_bubbles`. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. Since 0.4.4 the **agent-free boundary** too: `AgentFreeGate`, `AGENT_FREE_PATHS`/`AGENT_FREE_PREFIXES`/`AGENT_FREE_OPEN`, the switch in `POST /api/ui-config`, and `GET /api/canon/ingest-caps` (see "Agent-free mode"). Since 0.5.0 it mounts the Thym router (`thym_api.build_router(...)`, one `include_router`), asks `thym_api.thym_volume` first in `_cosm_volume` (so `/api/cosm` and `/api/cosm/lens` load `thym:` paths and `.thym` programs), serves `GET /api/thym-spec` (in `HOME_PATHS`), and gates `/api/canon/read` in `AGENT_FREE_PATHS` (see "Thym"). | `create_app()`, `_drive_message()`, `_run_turn(session, message, pal=, log_user=)`, `_render_pal_bubbles()`, `Session.pal_turn`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `STORE_PREFIXES`, `_canon_route()`, `_text_target()` (delegates to `canon_tools.text_target`), `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
-| [enough/prompt.py](../enough/prompt.py) | ~1865 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/readvisor/paradigm enumeration + toggle-state helpers, the generated identity preface, the chief readvisor's name, and the gated tool-doc blocks. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt(project_dir, readvisors=, profile=, pal=)`, `readvisor_identity()`, `identity_preface()`, `chief_name()` / `valid_chief_name()` / `CHIEF_NAME_DEFAULT` / `CHIEF_NAME_MAX`, `readvisor_shape()`, `tool_instructions(project_dir, pal=)`, `TOOL_INSTRUCTIONS` / `COMPOSURE_TOOL_INSTRUCTIONS` / `READVISORY_TOOL_INSTRUCTIONS` / `DICTIONARY_TOOL_INSTRUCTIONS` / `CANON_TOOL_INSTRUCTIONS` (+ its gate `_macrocosm_available()`) / `PAL_TOOL_INSTRUCTIONS` / `PAL_TURN_INSTRUCTION`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()` / `_readvisors_dir()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()`, `HOME_PARADIGM` / `ensure_multipurpose_file()` (the `default` → home migration) |
+| [enough/prompt.py](../enough/prompt.py) | ~1865 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/readvisor/paradigm enumeration + toggle-state helpers, the generated identity preface, the chief readvisor's name, and the gated tool-doc blocks. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt(project_dir, readvisors=, profile=chat|council|lean, pal=)`, `assemble_for_window()` / `choose_profile()` / `lean_wanted()` / `estimate_tokens()` (0.5.1), `harness_guides()`, `harness_context()`, `readvisor_identity()`, `identity_preface()`, `chief_name()` / `valid_chief_name()` / `CHIEF_NAME_DEFAULT` / `CHIEF_NAME_MAX`, `readvisor_shape()`, `tool_instructions(project_dir, pal=, lean=)`, `TOOL_INSTRUCTIONS` (the core) / `GIRRAPH_` / `REVIEW_` / `WIKI_` (+ `WIKI_ABSENT_`, gate `_wiki_installed()`) / `CLOUD_` (gate `_cloud_usable()`) / `CANON_STORE_` / `KEEP_GOING_` / `COMPOSURE_TOOL_INSTRUCTIONS` / `READVISORY_TOOL_INSTRUCTIONS` / `DICTIONARY_TOOL_INSTRUCTIONS` / `CANON_TOOL_INSTRUCTIONS` (+ its gate `_macrocosm_available()`) / `PAL_TOOL_INSTRUCTIONS` / `PAL_TURN_INSTRUCTION`, the `*_LEAN_INSTRUCTIONS` summaries, `LEAN_CUT` / `LEAN_SHARE` / `CHARS_PER_TOKEN`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()` / `_readvisors_dir()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()`, `HOME_PARADIGM` / `ensure_multipurpose_file()` (the `default` → home migration) |
 | [enough/composure.py](../enough/composure.py) | ~3060 | The composure core (0.3.5): the `.comp` HTML5 parser/serializer, the sanitizer, markdown ⇄ rich text, the node-level op vocabulary (the only way content changes), `place_module`/`arrange`/`estimate_height`, the JSON document model the canvas renders from, the comments sidecar, the forms registry, the outline→composure converter, and the write-door denial. **No FastAPI import** — exercisable with no web layer. See "Composures". | `loads()` / `dumps()`, `model()`, `apply_ops()`, `path_lock()`, `OP_NAMES` / `SOURCES` / `MODULE_TYPES` / `BG_SWATCHES` / `SHIPPED_FORMS` / `CAPS`, `place_module()`, `estimate_height()`, `write_denial()`, `comments_path()` / `load_comments()` / `move_sidecars()`, `parse_outline()` / `outline_ops()` / `from_outline()`, `ComposureError` |
 | [enough/composure_api.py](../enough/composure_api.py) | ~520 | HTTP translation only: `build_router(project_dir, resolve_path, emit)` → the `APIRouter` `create_app` mounts. Every `/api/composure*` route, the comments CRUD, `link-preview`, `webframe/refresh`, and the `composure` SSE event. | `build_router()`, `EVENT` |
 | [enough/composure_tools.py](../enough/composure_tools.py) | ~490 | The nine readvisor composure tools; `register()` adds them to `tools._DISPATCH` / `_TRACE_TOGGLE` at `tools` import time. Gated by `composure_enabled`. | `TOOL_NAMES`, `register()`, `run_read_composure()` … `run_composure_from_outline()`, `CACHE_OVER_CHARS` |
@@ -592,6 +592,66 @@ pieces answer it; none changes prompt text.
   KV quantization (quality untested) and `--swa-checkpoints` as an alias
   (its semantics on old builds were never verified).
 
+**The diet and the lean profile (0.5.1, plan §4b–4c).** Two kinds of cut:
+
+- *In every profile, no behaviour change.* The `cloud_pipeline` example and
+  rule ride only through an open cloud gate (`prompt._cloud_usable()` →
+  `cloud.gate_status()`); the wiki block only with an installed archive
+  (`_wiki_installed()` → `wikisink.config.installed()`), a four-line
+  `WIKI_ABSENT_INSTRUCTIONS` naming the wiki tools otherwise; the paradigm
+  lost its restatements of the highlight, security and fetching rules and
+  its quick-reference table (the two fetching rules it alone stated moved
+  to `allowlists.md`'s notes); `defaults/AGENT.md` lost its file-conventions
+  recap of the Context block. The core `TOOL_INSTRUCTIONS` is now the
+  preamble, the examples and the rules (~3.3k chars); the girraph, review,
+  wiki, cloud, canon-store and keep-going sections are blocks of their own,
+  assembled in the old order by `tool_instructions()`. A fresh project's
+  chat prompt went 19,990 → ~18,100 gemma tokens.
+- *The `lean` profile* — `assemble_system_prompt(profile="lean")`, ~6.0k
+  gemma tokens (22.4k chars) for a fresh project: the policies as an index
+  (`_load_policies(lean=True)`: two hard rules — the allowlists, the request
+  file and `/reset` — then one line per file, its first paragraph as the
+  trigger, user policies included), the paradigm cut at its
+  `LEAN_CUT` marker (`<!-- lean-cut -->`; `text-planning.md` keeps home
+  base, routing, posture and "Planning, in brief" above it, the full flow,
+  skeleton and scaffold mode below; a paradigm without the marker rides
+  whole), the composure / girraph / review / wiki / canon / cloud / twins /
+  keep-going sections as `*_LEAN_INSTRUCTIONS` summaries each marked
+  *(guide: X)*, the girraph summary only with a `.girraph` in the project
+  (`_girraph_present`, three levels, skipping `rness/`) or the skill on —
+  `GIRRAPH_ABSENT_LEAN_INSTRUCTIONS`, two lines, otherwise, so a map can
+  still be started by name — and `HARNESS_CONTEXT_LEAN_TMPL` for the
+  Context section. The **`harness_guide`**
+  tool (`<topic>` composures | girraphs | review | wikisink | canon | cloud |
+  twins; `tools.run_harness_guide`, `prompt.harness_guides()`) hands the full
+  text back on demand — no file, no gate, exactly what the chat prompt would
+  have said. It is documented in the core, so the chat profile knows it too.
+- *The rule.* `lean_wanted(tokens, n_ctx)`: lean when the full prompt would
+  take more than `LEAN_SHARE` (half) of the window. `_run_turn` applies it
+  per turn through `assemble_for_window(project_dir, n_ctx, pal=)` (chars /
+  `CHARS_PER_TOKEN` = 3.7, the fit test's estimator) and records the choice
+  on `session.prompt_profile`; `/api/llm-status` reports it as
+  `prompt_profile` beside the preflight's own `profile`. The preflight gets
+  a second builder, `build_lean_prompt`, and when the exact full count wants
+  lean it tokenizes the lean prompt instead and reports that — so the
+  empty-conversation notice measures what the turn will send. Effect at the
+  shipped defaults: lean at 8k, 16k and 32k, full at 64k and up; every
+  8,192 window now holds the prompt with the reserve, which emptied
+  `KNOWN_TOO_SMALL` down to G40-12 under 16 GB (4,096). A council turn is
+  unaffected (its own profile); a `/pal` turn may be lean.
+  **Measured:** the plan's behaviour eval (§5) ran twice on E4B
+  (`docs/ctx16-eval/eval.py`, 16 scripted prompts, one reply each, scored
+  on whether the first reply reaches for the right file, guide or tool;
+  results in plan §10): round 2 chat 14/16 at 32k, lean 12/16 at 32k and
+  14/16 at 8k — where the full prompt cannot start at all. Round 1 found
+  two defects the texts now fix: the full prompt ran `rm` on a delete
+  request because tier 1 had cut the paradigm's only "never delete without
+  confirmation" rule as a duplicate (it is in `allowlists.md`'s notes now),
+  and lean did not know girraphs existed in a fresh project. Lean's
+  remaining misses: scaffolding without reading the plan (chat too), a
+  research job without a request file. Not confirmed on real 16 / 24 GB
+  hardware.
+
 **The preflight** ([enough/preflight.py](../enough/preflight.py)) asks the
 live model, before anyone types, whether enough's instructions fit:
 
@@ -666,8 +726,9 @@ live model, before anyone types, whether enough's instructions fit:
   model × RAM-tier pair the model runs in (its RAM minimum below the tier's
   top) to ship `ctx_default ≥ tokens + 2,048`, tokens = chars / 3.7 of a
   fresh project's prompt (with a 130-char project path). The exceptions are
-  `KNOWN_TOO_SMALL`, six pairs, each with its reason: G40-26, Q36-27 and
-  Q38-04 on `gte_16gb`; G40-04, Q35-09 and G40-12 on `lt_16gb`. Each is a
+  `KNOWN_TOO_SMALL` — since 0.5.1 one pair, G40-12 on `lt_16gb` (4,096;
+  the lean profile fits every 8,192 window, and the test measures the
+  profile a window would get) — each with its reason. Each is a
   machine where a chat cannot open at the shipped default, so the list is
   debt, not configuration: the test fails on a new short pair **and** on a
   listed pair that fits now, so whichever change makes a pair fit (a leaner
@@ -2457,10 +2518,21 @@ Architecture notes:
 
 ## Merirmaid (the Mermaid-diagram primitive)
 
-A `.merirmaid` file is a Mermaid diagram with a small frontmatter header,
-rendered to SVG live in the browser by a **vendored** (local, no CDN)
-`enough/static/mermaid.min.js` (v11.16.0, MIT — shipped like
-`htmx.min.js`). The paradigm-shift from girraph: there is no owning
+A `.merirmaid` file is a Mermaid-syntax diagram with a small frontmatter
+header, rendered to SVG live in the browser by a **vendored** (local, no
+CDN) `enough/static/pele.global.js` — [Pele](https://github.com/obsidianmd/pele)
+1.13.0, Obsidian's Mermaid renderer (MIT, shipped like `htmx.min.js`; the
+global IIFE build from the npm tarball, pinned — Pele is young and moves
+fast). Since 0.5.1; Mermaid's own 3.4 MB bundle drew the diagrams from
+0.1.6 to 0.5.0. Pele renders synchronously (`pele.render(text, options)` →
+`{svg, width, height, links}`), lays out itself, targets Mermaid 12.1.0
+syntax, and takes its colours from CSS variables: `#merirmaid-mode` sets
+`--pele-bg/fg/muted/line/surface/surface-alt/border/accent` from enough's
+tokens, so a theme change needs no re-render (`mmOnThemeChange` is gone).
+Every rendered node is `g.pele-node[data-id=<source id>]`, which is what
+`mmNodeId()`, `mmWireNodes()` and the harness's `MM_NODES_READY` key on.
+Every diagram looks different from 0.5.0 (a new layout engine). The
+paradigm-shift from girraph: there is no owning
 Python module for the *format* — the source is plain text a readvisor
 writes with `write_file` and the frontend renders. The backend code that
 produces `.merirmaid` text is the girraph-mirror generator in `girraph.py`
@@ -2513,8 +2585,9 @@ Architecture notes:
   string or `None`; `cacheawl.mirror_write_denial` survives as a shim alias
   for one release); both write paths call it — see "Canon".
 - **Merirmaid mode** (`#merirmaid-mode` in index.html) is a full-frame mode
-  like girraph mode: lazy-loads mermaid.js on first open, renders the SVG,
-  intercepts Mermaid `click "path"` interactions to push targets onto a
+  like girraph mode: lazy-loads `pele.global.js` on first open (730 kB —
+  never at page load), renders the SVG with `links: false`, strips Mermaid
+  `click "path"` lines itself and wires them by hand to push targets onto a
   breadcrumb stack (`.merirmaid`/`.girraph`/`.md`), and shows the raw source
   in a `<pre>` on a render error instead of a blank pane. Active-mode icon
   top-right with the exit ribbon, per the mode conventions (see "Change the
@@ -5444,7 +5517,18 @@ than reinvent:
   DOM, every icon is `<img class="svg-icon" data-icon="<name>">`; `iconSrc()`
   resolves the variant, `setIcon(el, name)` swaps a toggle icon, and
   `refreshThemeIcons()` re-derives all variants on a live theme change (no
-  reload). Reuse those helpers — don't write `<img src>` by hand.
+  reload). Reuse those helpers — don't write `<img src>` by hand. Since
+  0.5.1 `iconSrc()` goes through `staticUrl(path)`, which stamps the URL
+  with the server's version (`BOOT_UI_STATE.version`; bare when served
+  statically), and `/static` answers `Cache-Control: no-cache`
+  (`server._RevalidatingStatic`). Both because the 0.5.0 desktop app drew
+  0.4.4's icons: an icon's path never changed between releases, the mount
+  sent no freshness, and the webview kept the old files as fresh — the
+  snapshot had the new ones, the server sent them, the page never asked.
+  The header fixes it going forward; the stamp is what gets a new release's
+  page past what an older one cached. Any new `fetch('/static/…')` goes
+  through `staticUrl()` too (ui.json, help-docs.md and Pele already do).
+  `tests/test_static_assets.py` keeps both.
 - **Theme-aware icon variants.** The active variant comes from the theme's
   `icons` key (`"dark"` | `"light"`), reflected onto the root as the
   `data-icons` attribute; themes predating the key fall back to a luminance

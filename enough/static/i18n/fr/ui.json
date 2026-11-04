@@ -3,7 +3,7 @@
     "language": "fr",
     "label": "Français",
     "role": "translated chrome strings",
-    "source": "en @ 0.5.0"
+    "source": "en @ 0.5.1"
   },
   "strings": {
     "agentmode.agent": "agent",
@@ -974,7 +974,7 @@
     "mm.openProject.label": "ouvrir le projet",
     "mm.openProject.title": "ouvrir ce projet — le serveur passe la main et recharge dedans",
     "mm.refresh.title": "relire le fichier (récupérer les modifications de votre readvisor)",
-    "mm.renderFailed": "mermaid n'a pas pu afficher ce diagramme :\n",
+    "mm.renderFailed": "ce diagramme n'a pas pu être affiché :\n",
     "models.applyBtn": "appliquer et redémarrer",
     "models.autoReset.hint": "quand la jauge dépasse le seuil, enough écrit un bloc Continuation dans le fichier de requête actif, la conversation se vide, et votre readvisor reprend depuis le point de contrôle. expérimental — laissez désactivé si vous voulez garder le contrôle manuel complet.",
     "models.foot": "changer de modèle décharge le modèle actuel de la RAM, charge le nouveau, et vide la conversation en mémoire. l'historique des requêtes sur disque (journaux de session, requêtes) est conservé.",

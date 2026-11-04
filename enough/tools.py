@@ -1677,6 +1677,24 @@ def run_export_document(project_dir: Path, call: ToolCall) -> ToolResult:
         f"ok — wrote {out['written']}{undo}")
 
 
+# ---------------------------------------------------------------------------
+# harness_guide (0.5.1) — the full text of a part of the system prompt that
+# the lean profile only summarises (docs/ctx-16gb-plan.md §4b, tier 2). No
+# file, no gate, no side effect: the texts are `prompt`'s own constants, so
+# what the model reads on demand is exactly what the full prompt would have
+# said. Useful in the chat profile too, where it merely repeats.
+# ---------------------------------------------------------------------------
+def run_harness_guide(project_dir: Path, call: ToolCall) -> ToolResult:
+    from . import prompt as _prompt
+    guides = _prompt.harness_guides()
+    topic = (call.extra.get("topic") or "").strip().lower()
+    if topic not in guides:
+        return ToolResult("harness_guide", topic, False,
+                          "error: unknown guide topic " + (repr(topic) if topic else "(none)")
+                          + ". one of: " + ", ".join(guides))
+    return ToolResult("harness_guide", topic, True, guides[topic].rstrip())
+
+
 _DISPATCH = {
     "read_file": run_read_file,
     "write_file": run_write_file,
@@ -1698,6 +1716,7 @@ _DISPATCH = {
     "canon_list": run_canon_list,
     "canon_create": run_canon_create,
     "canon_ingest": run_canon_ingest,
+    "harness_guide": run_harness_guide,
 }
 
 # Map tool name to its per-tool "brokered" toggle. When that toggle is
@@ -1738,6 +1757,9 @@ _TRACE_TOGGLE = {
     "canon_list": "trace_log_enabled",
     "canon_create": "trace_log_enabled",
     "canon_ingest": "trace_log_enabled",
+    # harness_guide reads nothing and changes nothing; it journals under the
+    # universal toggle like the other read-only helpers.
+    "harness_guide": "trace_log_enabled",
 }
 
 # The nine composure tools add themselves to both tables above. One
