@@ -15,12 +15,12 @@
 # Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
 
 manifest: minicosm/0
-macrocosm: 0.0.2
+macrocosm: 0.5.4
 name: emf
 title: EMF
 version: 1
 summary: "One text decompiled: the words it leans on, the things and ideas it names, the claims it makes and how it knows them, the events it narrates, and its atems."
-spec: docs/MACROCOSM_OES.md
+spec: https://macro.cosmoes.org/      # MacroCOSM OES, the canonical edition (bundled as docs/MACROCOSM_OES.md)
 reference: [enough/macrocosm.py]
 
 declaration:

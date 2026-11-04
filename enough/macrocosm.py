@@ -1,4 +1,4 @@
-"""MacroCOSM OES: the reference reader for `.cosm` volumes (MacroCOSM OES v0.0.2).
+"""MacroCOSM OES: the reference reader for `.cosm` volumes (grammar version 0.5.4; 0.0.2 and 0.0.1 read unchanged).
 
 MacroCOSM is the shared grammar every MiniCOSM is written in: a domain
 enumerated as a file system that is also a relational database, made to
@@ -65,7 +65,12 @@ from typing import Any, Iterator
 
 import yaml
 
-MACROCOSM_VERSION = "0.0.2"                 # 0.0.2 (0.5.0): the ascribe and thym MiniCOSMs, the `moves:` block and sidecars
+MACROCOSM_VERSION = "0.5.4"                 # the grammar version enough writes (0.5.4: the Studio 54 editions; the grammar
+#                                             itself unchanged since 0.0.1). 0.0.2 (0.5.0) added the ascribe and thym
+#                                             MiniCOSMs, the `moves:` block and sidecars.
+# Every grammar version this reader reads unchanged: a catalog or manifest carrying one of these in its reserved
+# `macrocosm:` key is read as it is; any other value is a `macrocosm-version` note (never a refusal).
+MACROCOSM_VERSIONS = ("0.0.1", "0.0.2", "0.5.4")
 MANIFEST_FORMAT = "minicosm/0"
 MANIFEST_GLOB = "*.manifest.cosm"
 DEFAULT_MANIFEST_DIR = Path(__file__).resolve().parents[1] / "defaults" / "cosm" / "manifests"
@@ -76,7 +81,7 @@ REGISTRY_ORDER = ("comprise", "cosm", "canon", "emf", "doc")
 DRAWN_LENS_KINDS = ("mermaid",)
 # The keys `dump` puts first, looked for in this order: a catalog's declaration, a manifest's own format line.
 DECLARATION_KEYS = ("oes", "manifest", "cosm", "opi", "comprise")
-# Catalog keys any MiniCOSM accepts: kept and ignored (reserved for a version test on the grammar itself).
+# Catalog keys any MiniCOSM accepts: kept, read only for the grammar-version note (`_version_note`).
 RESERVED_CATALOG_KEYS = ("macrocosm",)
 
 # The generic checks this version implements. A manifest's `checks.load` + `checks.envelope` select from them;
@@ -535,6 +540,7 @@ class Registry:
     def __init__(self, dirs: list[Path] | None = None):
         self.dirs = [DEFAULT_MANIFEST_DIR] if dirs is None else [Path(d) for d in dirs]
         self.problems: list[str] = []
+        self.notes: list[str] = []            # a manifest's unknown `macrocosm:` version (read all the same)
         found: dict[str, Manifest] = {}
         for d in self.dirs:
             try:
@@ -550,6 +556,10 @@ class Registry:
                     self.problems.append(f"{p}: a second manifest named {m.name}; the first ({found[m.name].path}) is kept")
                 else:
                     found[m.name] = m
+                    said = m.data.get("macrocosm")
+                    if said is not None and str(said) not in MACROCOSM_VERSIONS:
+                        self.notes.append(f"{p.name}: macrocosm: {said!r} is not a grammar version this reader knows "
+                                          f"({', '.join(MACROCOSM_VERSIONS)}); read as {MACROCOSM_VERSION}")
         order = [n for n in REGISTRY_ORDER if n in found] + sorted(n for n in found if n not in REGISTRY_ORDER)
         self.manifests: dict[str, Manifest] = {n: found[n] for n in order}
 
@@ -1069,6 +1079,19 @@ def _load_folder(vol: Volume, m: Manifest) -> None:
             _add_items(vol, m, doc, rel, None, None)
 
 
+def _version_note(vol: "Volume", doc: dict, rel: str) -> None:
+    """The grammar-version test the reserved `macrocosm:` key was kept for (spec 5.6, 15): a catalog saying a version
+    this reader does not know is read all the same, with a `macrocosm-version` note in its problems (a note, never an
+    error: the grammar has not changed since 0.0.1, so an unknown value is news, not a fault)."""
+    said = doc.get("macrocosm")
+    if said is None:
+        return
+    if str(said) not in MACROCOSM_VERSIONS:
+        vol.problems.append(Problem("macrocosm-version", "note", "", rel,
+                                    f"macrocosm: {said!r} is not a grammar version this reader knows "
+                                    f"({', '.join(MACROCOSM_VERSIONS)}); read as {MACROCOSM_VERSION}"))
+
+
 def load_volume(path, registry: Registry | None = None) -> Volume:
     """Load a volume: a folder with a catalog at its root (a Holotype, a COSM tree, a Canon volume) or a single
     catalog file (`canon.cosm`, an EMF twin, any single-file volume; or a folder volume's catalog, which loads
@@ -1109,6 +1132,7 @@ def load_volume_text(text: str, *, filename: str, registry: Registry | None = No
         return vol
     m = decl.manifest
     vol.manifest, vol.minicosm, vol.major, vol.declaration, vol.catalog = m, decl.minicosm, decl.major, decl, doc
+    _version_note(vol, doc, rel)
     g, lay = m.grammar, m.layout
     if m.single_file:
         _add_items(vol, m, doc, rel, None, None)
@@ -1152,6 +1176,7 @@ def _load_volume(p: Path, reg: Registry) -> Volume:
         return vol
     m = decl.manifest
     vol.manifest, vol.minicosm, vol.major, vol.declaration, vol.catalog = m, decl.minicosm, decl.major, decl, doc
+    _version_note(vol, doc, rel)
     if m.single_file:
         _add_items(vol, m, doc, rel, None, None)
     else:
@@ -2225,7 +2250,7 @@ def _cli_registry(args) -> Registry:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m enough.macrocosm",
-                                 description="MacroCOSM OES v0.0.2: read, check and draw .cosm volumes.")
+                                 description="MacroCOSM OES: read, check and draw .cosm volumes (grammar 0.5.4; 0.0.2 and 0.0.1 read unchanged).")
     ap.add_argument("command", choices=["lint", "paths", "tree", "mermaid", "identify"])
     ap.add_argument("path", help="a volume folder or a catalog file")
     ap.add_argument("target", nargs="?", help="paths: a path, qualified URI or id to resolve")

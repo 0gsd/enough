@@ -36,20 +36,25 @@ with the bump. The snapshot in `build.rs` copies that folder into the bundle,
 and every install rebuilds its `~/enough/dict/feed.sqlite` when the manifest
 digest changes.
 
-**Check the Comprise manifest before bumping, too.** enough reads Comprise
-Holotypes through a byte copy of Comprise's MiniCOSM manifest and tests its
-reader against Comprise's four public sample Holotypes. Run
-`uv run python scripts/sync_cosm.py --check` (default checkout
-`../../comprise-dev`; `--comprise DIR` for another). Exit 0 means nothing
-moved. Exit 1 means it changed: run `uv run python scripts/sync_cosm.py`,
-then `uv run pytest -q tests/test_macrocosm.py`, and commit
-`defaults/cosm/manifests/comprise.manifest.cosm` and `tests/fixtures/cosm/`
-with the bump. Exit 2 means no checkout was found: run it on the machine
-where comprise-dev is checked out. The script only reads comprise-dev, and
-copies the public samples by name only. It also copies Comprise's spec and
-paradigm map into `defaults/cosm/chapters/` (with their commit and sha256 in
-its `manifest.json`), the read-only chapters of the spec's doc volume: commit
-that folder with the bump too.
+**Sync the specifications before bumping, too (0.5.4).** The four OES
+specifications enough shows in its docs viewer — MacroCOSM OES, Thym, Ascribe
+and Comprise OES — are the canonical editions published at cosmoes.org, edited
+only in the cosmoes-site repository (`specs/`), and bundled here byte for byte
+as `docs/MACROCOSM_OES.md`, `docs/THYM.md`, `docs/ASCRIBE.md` and
+`docs/COMPRISE_OES.md`, with their editions in `docs/specs.json`; the sync
+client enough runs at launch is vendored from the same repository as
+`enough/cosmoes_client.py`. Run `uv run python scripts/sync_specs.py --check`
+(default checkout `../../cosmoes-site`, on main and pulled; `--cosmoes DIR` for
+another). Exit 0 means the bundled copies are the checkout's. Exit 1 means a
+text or the client moved: run `uv run python scripts/sync_specs.py`, then
+`uv run pytest -q tests/test_docoes.py tests/test_sync_specs.py`, and commit the
+four texts, `docs/specs.json` and `enough/cosmoes_client.py` with the bump. Exit
+2 means no checkout was found: run it on the machine where cosmoes-site is
+checked out. The script only reads cosmoes-site. (The Comprise MiniCOSM manifest
+and the four public sample Holotypes under `tests/fixtures/cosm/` are byte copies
+from comprise-dev too; the script that refreshed them, `scripts/sync_cosm.py`,
+retired with 0.5.4 and is in git history at e318fcd should they need refreshing;
+`tests/test_macrocosm.py` still checks the copies against their manifest.json.)
 
 **The doc volumes build themselves (0.4.4).** The docs viewer reads the Help
 Center and the spec as DocOES volumes that every install builds at runtime into

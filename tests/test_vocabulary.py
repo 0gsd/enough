@@ -316,9 +316,6 @@ def test_readme_has_no_legacy_vocabulary():
 
 def test_defaults_prose_has_no_legacy_vocabulary():
     files = sorted(DEFAULTS.rglob("*.md"))
-    # defaults/cosm/chapters/ is Comprise OES 1's own prose, synced verbatim and read-only by
-    # scripts/sync_cosm.py (the doc volume's chapters, 0.4.4): Comprise's words, never enough's voice.
-    files = [f for f in files if not f.is_relative_to(DEFAULTS / "cosm" / "chapters")]
     assert files, "no shipped markdown found under defaults/"
     hits = [h for path in files for h in _scan_markdown(path, ENGLISH_LEGACY)]
     assert not hits, _report(hits, "defaults/**/*.md")

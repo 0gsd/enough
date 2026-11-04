@@ -1,7 +1,7 @@
 """The DocOES export (enough/docoes_html.py, `python -m enough.docoes export`): a doc volume as static HTML at the
 three densities, docs.css and a merged manifest.json (docs/thym-landed-X1.md section 2).
 
-Every fast test exports a miniature install written here — a crafted spec with two crafted chapters, the real
+Every fast test exports a miniature install written here — a crafted spec, a mini Thym and Comprise OES, the real
 manifests, two ad hoc documents — never the real 2,600-line spec; the last test exports the real three documents
 once and checks them against the survey's counts. Volumes are built into tmp dirs (the export's own temporary
 directory, or `--docs-root` under tmp_path); conftest points ENOUGH_DOCS_ROOT into tmp_path as well.
@@ -38,7 +38,8 @@ MacroCOSM OES is the grammar. Read section 1 first, and sections 2 to 3 after.
 ## 1. Volumes
 
 <!-- atem: what a volume is, and what names it -->
-A **catalog** is the file that names a volume. See section 2.1, §2 of Comprise, README §1 and P.1.
+A **catalog** is the file that names a volume. See section 2.1, §2 of Comprise, README §1 and P.1. Thym
+(https://thym.cosmoes.org/), its section 2, is Thym's own.
 
 - **atem** — the one line every item has
 - a list item that wraps
@@ -70,7 +71,7 @@ nodes: []
 2. **A catalog names a volume.** One file, one name.
 """
 
-MINI_COMPRISE = """# Comprise OES 1
+MINI_COMPRISE = """# Comprise OES
 
 The specification of Comprise, in miniature.
 
@@ -88,13 +89,6 @@ Eight modules per concern.
 ### P.1 Brands
 
 A brand is a concern's face; see section 1.
-"""
-
-MINI_MAP = """# OES: the paradigm map
-
-## 1. The map
-
-Comprise's spec §1 and P.1 hold it; README §1 is this section.
 """
 
 MINI_THYM = """# Thym 0: a language in miniature
@@ -136,22 +130,17 @@ def _write(root: Path, rel: str, text: str) -> None:
 
 @pytest.fixture
 def mini(tmp_path) -> Path:
-    """A miniature install: the crafted spec + chapters (registered `macrocosm-oes`), a mini Thym (registered
-    `thym`), two ad hoc documents, the real manifests."""
+    """A miniature install: the crafted spec (registered `macrocosm-oes`), a mini Thym (registered `thym`), a mini
+    Comprise OES (registered `comprise-oes`), two ad hoc documents, the real manifests and docs/specs.json."""
     root = tmp_path / "install"
     _write(root, "docs/MACROCOSM_OES.md", MINI_SPEC)
     _write(root, "docs/THYM.md", MINI_THYM)
     _write(root, "docs/EMF.md", MINI_EMF)
     _write(root, "docs/FIELD_NOTES.md", MINI_NOTES)
-    _write(root, f"{D.CHAPTERS_DIR}/comprise-oes.md", MINI_COMPRISE)
-    _write(root, f"{D.CHAPTERS_DIR}/comprise-paradigm-map.md", MINI_MAP)
-    sha = {f: hashlib.sha256((root / D.CHAPTERS_DIR / f).read_bytes()).hexdigest()
-           for f in ("comprise-oes.md", "comprise-paradigm-map.md")}
-    _write(root, f"{D.CHAPTERS_DIR}/manifest.json", json.dumps({
-        "source": "comprise-dev", "source_commit": "abc1234",
-        "chapters": {"comprise-oes.md": {"source": "oes/comprise-oes.md", "sha256": sha["comprise-oes.md"]},
-                     "comprise-paradigm-map.md": {"source": "oes/README.md",
-                                                  "sha256": sha["comprise-paradigm-map.md"]}}}))
+    # 0.5.4: Comprise OES is a document of its own; the miniature carries the real docs/specs.json, so the
+    # registered specifications resolve their editions (names carry no number; the edition is a field).
+    _write(root, "docs/COMPRISE_OES.md", MINI_COMPRISE)
+    shutil.copyfile(REPO / D.SPECS_JSON, root / D.SPECS_JSON)
     shutil.copytree(REPO / D.MANIFESTS_DIR, root / D.MANIFESTS_DIR)
     return root
 
@@ -241,16 +230,14 @@ def test_the_export_writes_three_fragments_css_and_a_manifest(mini, tmp_path, ca
     assert man["pages"] == {"short": "short.html", "atem": "atem.html", "fabula": "fabula.html"}
     (entry,) = man["documents"]
     assert entry["slug"] == "macrocosm-oes" and entry["name"] == "MacroCOSM OES"
-    assert entry["version"] == mc.MACROCOSM_VERSION and entry["id"] == "doc/macrocosm-oes" and entry["oes"] == "doc/1"
+    assert entry["version"] == D.document_version("macrocosm-oes", sources=mini) != ""    # its edition (specs.json)
+    assert entry["id"] == "doc/macrocosm-oes" and entry["oes"] == "doc/1"
     assert entry["lead"] == "the grammar every miniature is written in"
     assert entry["source"] == {"path": "docs/MACROCOSM_OES.md",
                                "sha256": hashlib.sha256(MINI_SPEC.encode("utf-8")).hexdigest()}
-    assert [c["id"] for c in entry["chapters"]] == ["S:chapter/comprise-oes", "S:chapter/comprise-paradigm-map"]
-    assert entry["chapters"][0] | {"sha256": None} == {"id": "S:chapter/comprise-oes", "name": "Comprise OES 1",
-                                                       "source": "oes/comprise-oes.md", "commit": "abc1234",
-                                                       "sha256": None, "prefix": "comprise", "version": "1"}
+    assert entry["chapters"] == []                                            # no chapters since 0.5.4
     c = entry["counts"]
-    assert c["sections"] >= 10 and c["terms"] >= 4 and c["examples"] == 1 and c["decisions"] == 2
+    assert c["sections"] >= 6 and c["terms"] >= 3 and c["examples"] == 1 and c["decisions"] == 2
     assert c["reference"] > 50                                               # the R: items of the real manifests
     for dens, f in entry["files"].items():
         data = (out / f["path"]).read_bytes()
@@ -277,40 +264,29 @@ def test_the_short_density(mini, tmp_path):
     vol_secs = [s for s in sc.sections if "docs-glossary" not in s["class"]]
     assert vol_secs and all(s["key"] and s["scope"] is not None for s in vol_secs)
     assert [s["key"] for s in vol_secs][:3] == ["S:section/root", "S:section/how-to-read-this", "S:section/1"]
-    assert {s["scope"] for s in vol_secs} == {"", "comprise", "comprise-map"}
-    # Heading ids as the app's, the levels as written, a chapter's one level down; data-toc on h2/h3.
+    assert {s["scope"] for s in vol_secs} == {""}                                 # one document, no chapters
+    # Heading ids as the app's, the levels as written; data-toc on h2/h3.
     assert '<h1 id="docs-macrocosm-oes">MacroCOSM OES</h1>' in text
     assert '<h2 id="docs-sec-1" data-toc="2">1. Volumes</h2>' in text
     assert '<h3 id="docs-sec-2-1" data-toc="3">2.1 An example</h3>' in text
-    assert '<h2 id="docs-comprise-comprise-oes-1" data-toc="2">Comprise OES 1</h2>' in text
-    assert '<h3 id="docs-comprise-sec-1" data-toc="3">1. Concerns</h3>' in text
-    assert '<h4 id="docs-comprise-p-1-brands">P.1 Brands</h4>' in text
-    assert ('<p class="docs-chapter-note">a chapter of this volume, synced read-only from oes/comprise-oes.md @ '
-            'abc1234</p>') in text
+    assert "docs-comprise-" not in text and "docs-chapter-note" not in text
     # Markers dropped outside fences, placeholders shown as text, code left alone, tables wrapped.
     assert "atem:" not in re.sub(r"<pre>.*?</pre>", "", text, flags=re.S)
     assert "&lt;slug&gt;" in text and "<code>&lt;code&gt;</code>" in text and "<code>section 2</code>" in text
     assert '<div class="docs-table">\n<table>' in text
     assert '<pre><code class="language-cosm">oes: canon/1' in text
     assert "a list item that wraps\nonto a second line" in text                 # lazy continuation, one item
-    # Cross-references by the spec's rules: § and P.N are Comprise's, README § the map's; own "section N".
+    # Cross-references by the spec's rules (0.5.4): §, README § and P.N name other documents' sections and are
+    # never linked; "section N" is its own.
     xr = {(a["text"], a["href"]) for a in sc.links if "ref-xref" in a["class"]}
     assert ("section 2.1", "#docs-sec-2-1") in xr
-    assert ("§2", "#docs-comprise-sec-2") in xr
-    assert ("README §1", "#docs-comprise-map-sec-1") in xr
-    assert ("P.1", "#docs-comprise-p-1-brands") in xr
+    assert not [a for a in sc.links if a["text"] in ("§2", "README §1", "P.1")]
     assert ("sections 2", "#docs-sec-2") in xr and ("3", "#docs-sec-3") in xr     # a range: each number
     assert ("Sections 1", "#docs-sec-1") in xr and ("2", "#docs-sec-2") in xr
     assert not [a for a in sc.links if a["text"] == "9"]                         # names no heading: not linked
     assert '<a class="ref-xref ref-xref-num" href="#docs-sec-3">3</a>' in text
-    # In Comprise's own words § names other documents: never linked; its section N is its own.
-    comprise_root = text.split('data-key="S:section/comprise.root"')[1].split("</section>")[0]
-    assert "§2 of the plan" in comprise_root
-    assert '<a class="ref-xref" href="#docs-comprise-sec-2">section 2</a>' in comprise_root
-    assert '<a class="ref-xref" href="#docs-comprise-p-1-brands">P.1</a>' in comprise_root
-    mp = text.split('data-key="S:section/comprise-map.1"')[1].split("</section>")[0]
-    assert '<a class="ref-xref" href="#docs-comprise-sec-1">§1</a>' in mp
-    assert '<a class="ref-xref" href="#docs-comprise-map-sec-1">README §1</a>' in mp
+    # "its section N" (0.5.4) is another document's section: never linked, whatever number follows.
+    assert "its section 2" in text and 'its <a class="ref-xref"' not in text
     # Margin marks.
     assert re.search(r'<h2 id="docs-sec-2" data-toc="2">2\. Atems</h2>\n<p class="docs-marks"><span class="docs-mark" '
                      r'title="mentioned in \d+ places?">◂ \d+</span></p>', text)
@@ -324,31 +300,28 @@ def test_term_links_and_the_glossary(mini, tmp_path):
     sc = _fragment_ok(text)
     vol = _volume(mini)
     terms = {k: it for k, it in vol.items.items() if it.kind == "term"}
-    assert {"T:term/catalog", "T:term/atem", "T:term/volume", "T:term/comprise.concern"} <= set(terms)
+    assert {"T:term/catalog", "T:term/atem", "T:term/volume"} <= set(terms)
     for s in sc.sections:
         assert len(s["terms"]) == len(set(s["terms"])), s["key"]               # the first use per section
         for k in s["terms"]:
             assert terms[k].data["defined_in"] != s["key"], (k, s["key"])       # never where it is defined
     by_sec = {s["key"]: s["terms"] for s in sc.sections}
     assert "T:term/catalog" not in by_sec["S:section/1"] and "T:term/catalog" in by_sec["S:section/2"]
-    assert "T:term/catalog" in by_sec["S:section/comprise.1"]                  # a chapter sees the document's terms
-    assert not any("T:term/comprise.concern" in by_sec[k] for k in by_sec if k and "comprise" not in k)
     a = next(x for x in sc.links if x["term"] == "T:term/catalog")
     assert a["href"] == "#docs-item-t-term-catalog" and a["class"] == "docs-term"
     assert re.search(r'<a class="docs-term" href="#docs-item-t-term-catalog" data-term="T:term/catalog" '
                      r'title="[^"]+">catalog</a>', text)
-    # The glossary: last, the document's terms alphabetically, then each chapter's under its own h3.
+    # The glossary: last, the document's terms alphabetically.
     gl = text.split('<section class="docs-sec docs-glossary" id="docs-glossary">')[1]
     assert gl.startswith('<h2 id="docs-glossary-h" data-toc="2">Terms</h2>')
     names = re.findall(r'<dt id="docs-item-t-term-[a-z0-9-]+">([^<]+)</dt>', gl.split("<h3")[0])
     assert names == sorted(names, key=str.casefold) and "catalog" in names
-    assert '<h3 id="docs-glossary-comprise" data-toc="3">Comprise OES 1\'s terms</h3>' in gl
+    assert "<h3" not in gl                                                      # no chapter's terms under their own h3
     assert ('<dt id="docs-item-t-term-catalog">catalog</dt><dd>the file that names a volume — <a class="ref-xref" '
             'href="#docs-sec-1">defined in §1 Volumes</a></dd>') in gl
     toc = text.split("</nav>")[0]
-    assert toc.rstrip().endswith('<li class="lvl2"><a href="#docs-glossary-h">Terms</a><ol><li class="lvl3">'
-                                 '<a href="#docs-glossary-comprise">Comprise OES 1\'s terms</a></li></ol></li></ol>')
-    assert '<li class="lvl2 chapter"><a href="#docs-comprise-comprise-oes-1">Comprise OES 1</a><ol>' in toc
+    assert toc.rstrip().endswith('<li class="lvl2"><a href="#docs-glossary-h">Terms</a></li></ol>')
+    assert 'class="lvl2 chapter"' not in toc
 
 
 def _volume(src: Path) -> mc.Volume:
@@ -371,8 +344,7 @@ def test_the_atem_and_fabula_densities_and_page_hrefs(mini, tmp_path):
             'class="docs-ol-num">1</span> <span class="docs-ol-name">Volumes</span> <span class="docs-ol-atem">— what '
             'a volume is, and what names it</span></a></li>') in atem
     assert '<li data-depth="1"><a class="docs-ol-row" href="short#docs-sec-2-1">' in atem
-    assert '<li class="docs-ol-top docs-ol-chapter" data-depth="0"><a class="docs-ol-row" ' \
-           'href="short#docs-comprise-comprise-oes-1">' in atem
+    assert "docs-ol-chapter" not in atem
     for hid in ("docs-atem-outline", "docs-atem-glossary", "docs-atem-reference", "docs-atem-checks"):
         assert f'id="{hid}" data-toc=' in atem
     assert '<h3 id="docs-item-r-minicosm-comprise" data-toc="3">Comprise OES · comprise/1</h3>' in atem
@@ -428,9 +400,9 @@ def test_a_markdown_path_exports_ad_hoc(mini, tmp_path):
     assert emf["chapters"] == [] and emf["counts"]["reference"] == 0
     assert docs["field-notes"]["name"] == "Field notes" and docs["field-notes"]["version"] == ""
     assert docs["notes"]["name"] == "Notes" and docs["notes"]["version"] == "7"
-    assert docs["macrocosm-oes"]["chapters"]                                     # the registered document, whole
+    assert docs["macrocosm-oes"]["chapters"] == []                               # the registered document, whole
     thym = docs["thym"]                                                          # the registered one: its name
-    assert (thym["name"], thym["version"], thym["id"]) == ("Thym 0", "0", "doc/thym")
+    assert (thym["name"], thym["version"], thym["id"]) == ("Thym", D.document_version("thym", sources=mini), "doc/thym")
     text = (out / "emf" / "short.html").read_text(encoding="utf-8")
     sc = _fragment_ok(text)
     assert '<p class="docs-note">' not in text                                   # inline: the note's words
@@ -439,6 +411,84 @@ def test_a_markdown_path_exports_ad_hoc(mini, tmp_path):
     assert ('<a class="ref-xref" href="#docs-sec-2">section 2</a>') in text      # an ad hoc document: own scope
     assert {s["scope"] for s in sc.sections if s["key"]} == {""}
     assert (out / "notes" / "fabula.html").is_file() and (out / "field-notes" / "atem.html").is_file()
+
+
+def test_no_marks_leaves_the_margin_marks_out(mini, tmp_path):
+    """`--no-marks`: the short density without `◂ N` / `❏ N` (cosmoes-site's build asks for it; the marks are the
+    in-app viewer's buttons, inert in a static page). Nothing else changes: strip the marks from the marked export and
+    the fragments are the same bytes; atem and fabula never carried them."""
+    marked, bare = tmp_path / "marked", tmp_path / "bare"
+    assert _export(mini, marked) == 0
+    assert _export(mini, bare, "macrocosm-oes", "--no-marks") == 0
+    with_marks = (marked / "macrocosm-oes" / "short.html").read_text(encoding="utf-8")
+    text = (bare / "macrocosm-oes" / "short.html").read_text(encoding="utf-8")
+    assert '<p class="docs-marks">' in with_marks and "◂" in with_marks and "❏" in with_marks
+    assert "docs-mark" not in text and "◂" not in text and "❏" not in text
+    assert re.sub(r'<p class="docs-marks">.*?</p>\n', "", with_marks) == text
+    _fragment_ok(text)
+    for dens in ("atem", "fabula"):
+        assert (marked / "macrocosm-oes" / f"{dens}.html").read_bytes() == (bare / "macrocosm-oes" / f"{dens}.html").read_bytes()
+    counts = [json.loads((d / "manifest.json").read_text(encoding="utf-8"))["documents"][0]["counts"] for d in (marked, bare)]
+    assert counts[0] == counts[1]
+
+
+def test_reference_joins_the_manifests_reference_to_an_ad_hoc_document(mini, tmp_path):
+    """`--reference`: an ad hoc document carries the R: items generated from the manifests, as the registered
+    MacroCOSM OES does (the same registry, the same count); without it, none."""
+    out = tmp_path / "site"
+    assert _export(mini, out) == 0
+    assert _export(mini, out, "docs/EMF.md") == 0
+    assert _export(mini, out, "docs/EMF.md", "--slug", "emf-ref", "--reference") == 0
+    docs = {d["slug"]: d for d in json.loads((out / "manifest.json").read_text(encoding="utf-8"))["documents"]}
+    assert docs["emf"]["counts"]["reference"] == 0
+    assert docs["emf-ref"]["counts"]["reference"] == docs["macrocosm-oes"]["counts"]["reference"] > 0
+    assert docs["emf-ref"]["counts"]["sections"] == docs["emf"]["counts"]["sections"]
+    assert 'id="docs-atem-reference"' not in (out / "emf" / "atem.html").read_text(encoding="utf-8")
+    for dens in X.DENSITIES:
+        text = (out / "emf-ref" / f"{dens}.html").read_text(encoding="utf-8")
+        _fragment_ok(text)
+        plain = (out / "emf" / f"{dens}.html").read_text(encoding="utf-8")
+        if dens == "atem":
+            assert 'id="docs-atem-reference"' in text and 'class="docs-r-name"' in text
+        if dens == "fabula":
+            assert text.count('<article class="docs-card"') > plain.count('<article class="docs-card"')
+        if dens == "short":
+            assert text.count("<section") == plain.count("<section")              # the prose is the same
+
+
+def test_an_explicit_registered_slug_exports_the_path_ad_hoc(mini, tmp_path):
+    """cosmoes-site keeps the texts outside enough and builds each from its path under the registered slug: the
+    text alone (no chapters, the reference only with --reference), the name and version given, the spec's own
+    cross-reference rules still keyed by its slug (§ and P.N name Comprise's sections, which this volume lacks, so
+    they stay plain text; its own "section N" links as before)."""
+    out = tmp_path / "site"
+    assert _export(mini, out, "docs/MACROCOSM_OES.md", "--slug", "macrocosm-oes", "--name", "MacroCOSM OES",
+                   "--version", "0.5.4", "--no-marks") == 0
+    assert _export(mini, out, "docs/THYM.md", "--slug", "thym", "--name", "Thym", "--version", "0.5.4") == 0
+    docs = {d["slug"]: d for d in json.loads((out / "manifest.json").read_text(encoding="utf-8"))["documents"]}
+    spec = docs["macrocosm-oes"]
+    assert (spec["name"], spec["version"], spec["id"]) == ("MacroCOSM OES", "0.5.4", "doc/macrocosm-oes")
+    assert spec["chapters"] == [] and spec["counts"]["reference"] == 0
+    assert spec["source"]["path"] == "docs/MACROCOSM_OES.md"
+    text = (out / "macrocosm-oes" / "short.html").read_text(encoding="utf-8")
+    sc = _fragment_ok(text)
+    assert {s["scope"] for s in sc.sections if s["key"]} == {""}
+    assert "docs-chapter-note" not in text and "docs-comprise" not in text and "docs-marks" not in text
+    xr = {(a["text"], a["href"]) for a in sc.links if "ref-xref" in a["class"]}
+    assert ("section 2.1", "#docs-sec-2-1") in xr and ("sections 2", "#docs-sec-2") in xr
+    assert not [a for a in sc.links if a["text"] in ("§2", "P.1", "README §1")]
+    assert "§2 of Comprise, README §1 and P.1" in text
+    thym = docs["thym"]
+    assert (thym["name"], thym["version"], thym["id"], thym["chapters"]) == ("Thym", "0.5.4", "doc/thym", [])
+    # With --reference the same text carries the manifests' reference, as the registered document does.
+    ref = tmp_path / "ref"
+    assert _export(mini, ref, "docs/MACROCOSM_OES.md", "--slug", "macrocosm-oes", "--reference") == 0
+    r = json.loads((ref / "manifest.json").read_text(encoding="utf-8"))["documents"][0]
+    assert r["chapters"] == [] and r["counts"]["reference"] > 0 and r["counts"]["terms"] == spec["counts"]["terms"]
+    # Without --slug, a registered document's path still exports the registered document, whole.
+    whole = tmp_path / "whole"
+    assert _export(mini, whole, "docs/MACROCOSM_OES.md") == 0
+    assert json.loads((whole / "manifest.json").read_text(encoding="utf-8"))["documents"][0]["counts"]["reference"] > 50
 
 
 def test_distinctive_mentions_as_the_help_center_counts_them(mini, tmp_path):
@@ -490,7 +540,7 @@ def test_exit_codes(mini, tmp_path, capsys, monkeypatch):
     assert _export(mini, out, "macrocosm-oes", "--densities", "short,syuzhet") == 2
     assert _export(mini, out, "macrocosm-oes", "--page", "middle=x") == 2
     assert _export(mini, out, str(REPO / "README.md")) == 2                       # outside the sources root
-    assert _export(mini, out, "docs/THYM.md", "--slug", "help-center") == 2
+    assert _export(mini, tmp_path / "ok", "docs/THYM.md", "--slug", "help-center") == 0   # an explicit registered slug: ad hoc
     foreign = tmp_path / "foreign"
     foreign.mkdir()
     (foreign / "manifest.json").write_text('{"format": "something/9"}', encoding="utf-8")
@@ -526,18 +576,24 @@ def test_item_ids():
 # The real documents, once
 # ---------------------------------------------------------------------------
 
-SURVEY = {"macrocosm-oes": {"sections": 220, "terms": 68, "examples": 8, "decisions": 46, "reference": 256},
-          "thym": {"sections": 83, "terms": 12, "examples": 1, "decisions": 18},
-          "ascribe": {"sections": 27, "terms": 5, "examples": 1, "decisions": 11}}
+SURVEY = {"macrocosm-oes": {"sections": 110, "terms": 41, "examples": 8, "decisions": 38, "reference": 256},
+          "thym": {"sections": 83, "terms": 12, "examples": 1, "decisions": 25},
+          "ascribe": {"sections": 27, "terms": 2, "examples": 1, "decisions": 12},
+          "comprise-oes": {"sections": 99, "terms": 15, "examples": 0, "decisions": 21}}
 
 
-def test_the_real_three_documents(tmp_path):
+def test_the_real_four_documents(tmp_path):
+    """The four bundled editions export whole (0.5.4: Comprise OES a document of its own, no chapters anywhere, the
+    counts of the Changes sections' decisions, and no "its section N" linked in any of them)."""
     out = tmp_path / "site"
-    for doc in ("macrocosm-oes", "docs/THYM.md", "docs/ASCRIBE.md"):
+    for doc in ("macrocosm-oes", "docs/THYM.md", "docs/ASCRIBE.md", "docs/COMPRISE_OES.md"):
         assert D.main(["export", doc, str(out), "--page", "short=short", "--page", "atem=atem",
                        "--page", "fabula=fabula"]) == 0
     man = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
-    assert [d["slug"] for d in man["documents"]] == ["macrocosm-oes", "thym", "ascribe"]
+    assert [d["slug"] for d in man["documents"]] == ["macrocosm-oes", "thym", "ascribe", "comprise-oes"]
+    assert [d["name"] for d in man["documents"]] == ["MacroCOSM OES", "Thym", "Ascribe", "Comprise OES"]
+    assert {d["version"] for d in man["documents"]} == {D.document_version("macrocosm-oes")}
+    assert all(d["chapters"] == [] for d in man["documents"])
     for d in man["documents"]:
         for k, n in SURVEY[d["slug"]].items():
             assert d["counts"][k] >= n, (d["slug"], k)
@@ -546,6 +602,11 @@ def test_the_real_three_documents(tmp_path):
             assert hashlib.sha256(text.encode("utf-8")).hexdigest() == f["sha256"]
             _fragment_ok(text, crafted=False)
     spec = (out / "macrocosm-oes" / "short.html").read_text(encoding="utf-8")
-    assert spec.count('class="ref-xref') > 200 and spec.count('class="docs-term"') > 1000
-    assert 'href="#docs-comprise-' in spec
-    assert man["documents"][1]["name"].startswith("Thym") and man["documents"][2]["name"].startswith("Ascribe")
+    assert spec.count('class="ref-xref') > 100 and spec.count('class="docs-term"') > 700
+    assert "docs-comprise-" not in spec
+    for d in man["documents"]:
+        for f in d["files"].values():
+            text = (out / f["path"]).read_text(encoding="utf-8")
+            assert not re.search(r"[Ii]ts <a class=\"ref-xref", text), (d["slug"], f["path"])
+    comprise = (out / "comprise-oes" / "short.html").read_text(encoding="utf-8")
+    assert 'id="docs-p-1' in comprise and '<a class="ref-xref" href="#docs-p-' in comprise   # P.N: its own chapter P

@@ -136,7 +136,11 @@ store (`canon:` paths) needs the broker's canon tools switched on.
 ## More
 
 The full specification is `docs/MACROCOSM_OES.md` in enough, which the user
-can open in the app's docs viewer (the MacroCOSM button); Thym's is `docs/THYM.md`.
+can open in the app's docs viewer (the MacroCOSM button, a menu of the four
+specifications); Thym's is `docs/THYM.md`, Ascribe's `docs/ASCRIBE.md` and
+Comprise OES's `docs/COMPRISE_OES.md`. The four are the canonical editions
+published at cosmoes.org (macro., thym., ascribe. and comprise.cosmoes.org),
+which enough keeps current from there; `docs/specs.json` names each edition.
 `references/README.md` says where the specs, the seven manifests and the shipped
 programs live.
 

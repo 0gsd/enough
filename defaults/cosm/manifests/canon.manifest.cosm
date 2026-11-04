@@ -14,12 +14,12 @@
 # Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
 
 manifest: minicosm/0
-macrocosm: 0.0.2
+macrocosm: 0.5.4
 name: canon
 title: Canon
 version: 1
 summary: One Canon volume (a top-level folder of the store), or one project, enumerated as folders, files and articles, with what has been derived from them.
-spec: docs/MACROCOSM_OES.md
+spec: https://macro.cosmoes.org/      # MacroCOSM OES, the canonical edition (bundled as docs/MACROCOSM_OES.md)
 reference: [enough/macrocosm.py, enough/canon.py]
 
 declaration:

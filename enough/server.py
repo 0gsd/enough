@@ -53,6 +53,7 @@ from . import canon_jobs as _canon_jobs
 from . import convert as _convert
 from . import docoes as _docoes
 from . import macrocosm as _macrocosm
+from . import specs as _specs
 from . import home as _home
 from . import models as _models
 from . import paginate as _paginate
@@ -1513,7 +1514,9 @@ async def _handle_tool(session: Session, call: ToolCall, sink: list[tuple[str, s
 # it to.
 HOME_PATHS: frozenset[str] = frozenset({
     "/", "/favicon.ico", "/api/ui-config", "/api/help-center",
-    "/api/macrocosm-spec", "/api/thym-spec", "/api/convert/formats", "/api/shutdown",
+    # The four specifications' raw markdown (0.5.4: the synced copy when one is in use) and the launch check's report.
+    "/api/macrocosm-spec", "/api/thym-spec", "/api/ascribe-spec", "/api/comprise-spec", "/api/specs-status",
+    "/api/convert/formats", "/api/shutdown",
     # DocOES (0.4.4): read-only, from the install's own documents.
     "/api/docs", "/api/docs/status", "/api/docs/build", "/api/docs/lens",
     "/api/docs/compile", "/api/docs/inventory",
@@ -1722,6 +1725,10 @@ def create_app(
                     log.info("home: seeded %d project(s) from desktop.json", added)
             except Exception:  # noqa: BLE001 — never block the launch screen
                 log.exception("home: seeding from desktop.json failed")
+            # The specifications' launch check (0.5.4): the home screen opens
+            # the docs viewer too. One daemon thread, never awaited; off by
+            # the preference or ENOUGH_SPECS_SYNC=0.
+            _specs.launch_check(_read_ui_config())
             yield
             return
         session.client = httpx.AsyncClient()
@@ -1761,6 +1768,12 @@ def create_app(
             await asyncio.to_thread(_dictionary.ensure_built, background=True)
         except Exception:  # noqa: BLE001 — never block startup on the dictionary
             log.exception("dictionary build could not start")
+        # The specifications kept current from cosmoes.org (0.5.4,
+        # enough/specs.py): one request for the manifest in a daemon thread,
+        # only changed texts fetched, into ENOUGH_SPECS_ROOT; the docs viewer
+        # rebuilds a changed volume on its next open. Off by the `specs_sync`
+        # preference or ENOUGH_SPECS_SYNC=0 (every test and scratch rig).
+        _specs.launch_check(_read_ui_config())
         if _agent_free.enabled():
             # Agent-free mode (§13): the model never starts and the preflight
             # never runs. Turning it off (POST /api/ui-config) bootstraps then.
@@ -4296,17 +4309,19 @@ def create_app(
 
         return await asyncio.to_thread(_build)
 
-    @app.get("/api/macrocosm-spec", response_class=PlainTextResponse)
-    async def api_macrocosm_spec(lang: str = "en") -> PlainTextResponse:
-        """The MacroCOSM OES spec (docs/MACROCOSM_OES.md) as raw markdown —
-        the 0.4.3 spec viewer's source; since 0.4.4 the docs viewer reads the
-        spec's DocOES volume (`/api/docs`) and this route is kept as the raw
-        source. `/api/help-center`'s shape and whitelist: `lang`
-        picks static/i18n/<lang>/MACROCOSM_OES.md when one ships (none does
-        in 0.4.3), else English. Home-accessible, like the help center."""
-        doc = Path(__file__).resolve().parent.parent / "docs" / "MACROCOSM_OES.md"
+    async def _spec_markdown(slug: str, lang: str) -> PlainTextResponse:
+        """One of the four specifications as raw markdown — the docs viewer
+        reads the DocOES volume (`/api/docs`); these routes are the raw
+        source, like `/api/help-center` for the manual. The file is the one
+        DocOES builds from (0.5.4): the copy synced from cosmoes.org when one
+        is in use, else the text bundled with enough (`docoes.spec_source`).
+        `lang` picks static/i18n/<lang>/<FILE>.md when one ships (none does;
+        the specifications are English only), else English. Home-accessible."""
+        d = _docoes.DOCUMENTS[slug]
+        name = Path(d.sources["en"]).name
+        doc = _docoes.spec_source(slug)
         if lang in UI_LANGUAGES and lang != "en":
-            translated = STATIC_DIR / "i18n" / lang / "MACROCOSM_OES.md"
+            translated = STATIC_DIR / "i18n" / lang / name
             if translated.is_file():
                 doc = translated
         text = await asyncio.to_thread(
@@ -4314,29 +4329,38 @@ def create_app(
         if text is None:
             raise HTTPException(
                 404,
-                "MACROCOSM_OES.md not found in this install — run /update-enough "
+                f"{name} not found in this install — run /update-enough "
                 "to pick up the bundled spec.")
         return PlainTextResponse(text, media_type="text/markdown; charset=utf-8")
 
+    @app.get("/api/macrocosm-spec", response_class=PlainTextResponse)
+    async def api_macrocosm_spec(lang: str = "en") -> PlainTextResponse:
+        """MacroCOSM OES (docs/MACROCOSM_OES.md, or its synced copy) as raw markdown; see `_spec_markdown`."""
+        return await _spec_markdown("macrocosm-oes", lang)
+
     @app.get("/api/thym-spec", response_class=PlainTextResponse)
     async def api_thym_spec(lang: str = "en") -> PlainTextResponse:
-        """The Thym language spec (docs/THYM.md) as raw markdown (0.5.0), on
-        `/api/macrocosm-spec`'s pattern: `lang` picks static/i18n/<lang>/THYM.md
-        when one ships (none does in 0.5.0; the spec is English only), else
-        English. Home-accessible, like the MacroCOSM spec."""
-        doc = Path(__file__).resolve().parent.parent / "docs" / "THYM.md"
-        if lang in UI_LANGUAGES and lang != "en":
-            translated = STATIC_DIR / "i18n" / lang / "THYM.md"
-            if translated.is_file():
-                doc = translated
-        text = await asyncio.to_thread(
-            lambda: doc.read_text(encoding="utf-8") if doc.is_file() else None)
-        if text is None:
-            raise HTTPException(
-                404,
-                "THYM.md not found in this install — run /update-enough "
-                "to pick up the bundled spec.")
-        return PlainTextResponse(text, media_type="text/markdown; charset=utf-8")
+        """Thym (docs/THYM.md, or its synced copy) as raw markdown (0.5.0); see `_spec_markdown`."""
+        return await _spec_markdown("thym", lang)
+
+    @app.get("/api/ascribe-spec", response_class=PlainTextResponse)
+    async def api_ascribe_spec(lang: str = "en") -> PlainTextResponse:
+        """Ascribe (docs/ASCRIBE.md, or its synced copy) as raw markdown (0.5.4); see `_spec_markdown`."""
+        return await _spec_markdown("ascribe", lang)
+
+    @app.get("/api/comprise-spec", response_class=PlainTextResponse)
+    async def api_comprise_spec(lang: str = "en") -> PlainTextResponse:
+        """Comprise OES (docs/COMPRISE_OES.md, or its synced copy) as raw markdown (0.5.4); see `_spec_markdown`."""
+        return await _spec_markdown("comprise-oes", lang)
+
+    @app.get("/api/specs-status")
+    async def api_specs_status() -> dict[str, Any]:
+        """The launch check's report (0.5.4, `enough/specs.py`): whether it
+        ran (`ran`, `reason`), `checked`, `updated`, `unchanged`, `errors`,
+        `elapsed`, `at`, the base it asked and the specs root, and every
+        document's `edition`, `revised` and `source` (cosmoes | bundled) — the
+        docs viewer's badge title and QA read it. Home-accessible, read-only."""
+        return await asyncio.to_thread(lambda: _specs.status(_read_ui_config()))
 
     # ---------- Inline volumes (0.4.4): a volume from the text a request carries ----------
 
@@ -5740,6 +5764,12 @@ def create_app(
         want_free = (body or {}).get(_agent_free.KEY)
         if isinstance(want_free, bool):
             cfg[_agent_free.KEY] = want_free
+        # Keep the specifications current from cosmoes.org (0.5.4): machine-
+        # global like the language, a bool or nothing; absent reads as on.
+        # Takes effect at the next launch (the check runs once per launch).
+        want_sync = (body or {}).get(_specs.PREF_KEY)
+        if isinstance(want_sync, bool):
+            cfg[_specs.PREF_KEY] = want_sync
         _write_ui_config(cfg)
         if isinstance(want_free, bool) and want_free != was_free:
             await _agent_free_switched(want_free)

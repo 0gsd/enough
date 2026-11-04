@@ -80,6 +80,17 @@ _STATE_SEAMS = {
     "ENOUGH_DOCS_ROOT": "docoes",
     # Thym (0.5.0): runs (plans, traces, candidates, outputs). No test may land a run in ~/enough/thym/.
     "ENOUGH_THYM_ROOT": "thym",
+    # The specifications synced from cosmoes.org (0.5.4): the client's folder. A test that wants a synced copy
+    # writes one here; none may be read from the developer's real ~/enough/specs/.
+    "ENOUGH_SPECS_ROOT": "specs",
+}
+
+# Seams that must hold a fixed value, not a path: the launch check (0.5.4) is off for every test, and the client's
+# base is a loopback port nothing listens on, so a test that forgot the switch fails instantly instead of asking
+# cosmoes.org. Tests of the check set both for themselves (a stand-in server, or an injected opener).
+_FIXED_SEAMS = {
+    "ENOUGH_SPECS_SYNC": "0",
+    "ENOUGH_COSMOES_BASE": "http://127.0.0.1:1",
 }
 
 # Seams that must be *absent*, not redirected. Each of these changes
@@ -153,6 +164,9 @@ def isolated_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     for var, rel in _STATE_SEAMS.items():
         if _still_pristine(var):
             monkeypatch.setenv(var, str(state / rel))
+    for var, value in _FIXED_SEAMS.items():
+        if _still_pristine(var):
+            monkeypatch.setenv(var, value)
 
     # A read-only file, but "every ENOUGH_* points inside tmp_path" is a rule
     # worth being able to state without exceptions — and a copy also means a

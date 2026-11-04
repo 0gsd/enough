@@ -965,15 +965,25 @@ PROJECT_SCREENS: list[Screen] = [
            setup=(_docs("thym"), ("wait_for", "#docs-mode.open"),
                   DOCS_READY, DOCS_SHORT_OK, ("wait_idle", "")),
            teardown=EXIT_ALL_MODES,
-           note="the Thym specification at short: \"Thym 0 · v0\" in the badge, "
-                "the English-only note in a translated UI, its term links"),
+           note="the Thym specification at short: \"Thym · edition 0.5.4\" in the "
+                "badge, the English-only note in a translated UI, its term links"),
 
     Screen("docs-ascribe", "project",
            setup=(_docs("ascribe"), ("wait_for", "#docs-mode.open"),
                   DOCS_READY, DOCS_SHORT_OK, ("wait_idle", "")),
            teardown=EXIT_ALL_MODES,
-           note="the Ascribe OES specification at short: \"Ascribe OES 1 · v1\" "
-                "in the badge, the English-only note in a translated UI"),
+           note="the Ascribe specification at short: \"Ascribe · edition 0.5.4\" "
+                "in the badge (its title says where the text came from), the "
+                "English-only note in a translated UI"),
+
+    # --- 0.5.4: Comprise OES, the fourth specification, a document of its own
+    Screen("docs-comprise", "project",
+           setup=(_docs("comprise-oes"), ("wait_for", "#docs-mode.open"),
+                  DOCS_READY, DOCS_SHORT_OK, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="the Comprise OES specification at short: \"Comprise OES · edition "
+                "0.5.4\" in the badge, its P.N section numbers linked, its § left "
+                "as words"),
 
     # --- FEED: the dictionary, the word data lightbox (0.4.1) -------------
     Screen("dict-mode", "project",

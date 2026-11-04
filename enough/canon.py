@@ -564,7 +564,7 @@ def emf_entry(text: Path, rel_twin: str, *, with_state: bool = True,
     return out
 
 
-# A PACKAGE (Thym 0, docs/THYM.md 15): the self-contained export of a text, with its fabula, morph, context and
+# A PACKAGE (Thym, docs/THYM.md 15): the self-contained export of a text, with its fabula, morph, context and
 # released graph, beside the text it was made from: the folder form `<stem>.thym/` (holding `package.cosm`, the
 # catalog), the single-file form `<stem>.package.cosm`, and the encrypted form `<stem>.thym.enc`. Listings and
 # catalogs show each as one thing (`kind: package`, `kind: sealed`), never open a package folder up as texts, and

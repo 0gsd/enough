@@ -129,6 +129,28 @@ A **holograph** is one person's description, under a handle and without a name. 
 A reader checks a holograph before it draws one (section 1).
 """
 
+# 0.5.4: Comprise OES, a document of its own. P.N names its own chapter P (`own_p`); § names other documents.
+FIXTURE_COMPRISE = """# Comprise OES
+
+<!-- atem: a company as Comprise describes one -->
+A company, described in eight modules; see section 2 and P.1.
+
+## 1. Concerns
+
+<!-- atem: the parts a company is made of -->
+A **concern** is one part of a company, with its own chapters. §4 of the plan says why.
+
+## 2. The volume
+
+<!-- atem: the folder a Holotype is -->
+A Holotype is a folder of concerns.
+
+### P.1 Brands
+
+<!-- atem: the names a company trades under -->
+A brand is a name the company trades under (section 1).
+"""
+
 FIXTURE_HELP_EN = """\
 # the orchard help center
 
@@ -193,6 +215,7 @@ def docs_src(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         "docs/MACROCOSM_OES.md": FIXTURE_SPEC.format(example=_canon_example()),
         "docs/THYM.md": FIXTURE_THYM,
         "docs/ASCRIBE.md": FIXTURE_ASCRIBE,
+        "docs/COMPRISE_OES.md": FIXTURE_COMPRISE,
         "docs/HELP_CENTER.md": FIXTURE_HELP_EN,
         "enough/static/i18n/de/help-center.md": FIXTURE_HELP_DE,
         "enough/static/help-docs.md": FIXTURE_BUBBLES,
@@ -202,6 +225,8 @@ def docs_src(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         (root / rel).write_text(text, encoding="utf-8")
     shutil.copytree(REPO / "defaults" / "cosm" / "manifests", root / "defaults" / "cosm" / "manifests")
+    # 0.5.4: the real docs/specs.json, so the specifications resolve their editions (the texts are miniatures).
+    shutil.copyfile(REPO / "docs" / "specs.json", root / "docs" / "specs.json")
     monkeypatch.setattr(docoes, "SOURCES", root)
     assert docoes.docs_root().is_relative_to(tmp_path)
     return root
@@ -379,18 +404,23 @@ def test_cosm_lens_draws_around_an_item_of_a_project_volume(project: Path):
 
 @pytest.mark.parametrize("mode", ["project", "home"])
 def test_thym_and_ascribe_are_served(docs_src: Path, project: Path, mode: str):
-    """0.5.0 (lane X2): the two specifications written in MacroCOSM OES are documents of their own, English only,
-    at every density, with their own name and version in the head, compiled back byte for byte."""
+    """0.5.0 (lane X2), 0.5.4: the three specifications written in MacroCOSM OES are documents of their own, English
+    only, at every density, with their name (no number) and edition in the head — and where the text came from
+    (bundled here) — compiled back byte for byte."""
     with _client(project, mode) as c:
-        for doc, title, version, rel, term in (
-                ("thym", "Thym 0", "0", "docs/THYM.md", "T:term/move"),
-                ("ascribe", "Ascribe OES 1", "1", "docs/ASCRIBE.md", "T:term/holograph")):
+        for doc, title, rel, term in (
+                ("thym", "Thym", "docs/THYM.md", "T:term/move"),
+                ("ascribe", "Ascribe", "docs/ASCRIBE.md", "T:term/holograph"),
+                ("comprise-oes", "Comprise OES", "docs/COMPRISE_OES.md", "T:term/concern")):
+            version = docoes.document_version(doc, sources=docs_src)
+            assert version and not any(ch.isdigit() for ch in title)
             for density in ("atem", "short", "fabula"):
                 r = _docs(c, doc, density=density)
                 assert r.status_code == 200, (doc, density, r.text)
                 p = r.json()
                 assert (p["doc"], p["lang"], p["requested_lang"], p["title"]) == (doc, "en", None, title)
                 assert p["document"]["version"] == version and p["chapters"] == []
+                assert p["document"]["source"] == "bundled" and p["document"]["home"].endswith(".cosmoes.org/")
             short = _docs(c, doc, density="short").json()
             assert [t["id"] for t in short["terms"]] == [term]
             assert {s["number"] for s in short["sections"] if s.get("number")} >= {"1", "2"}
@@ -540,7 +570,7 @@ def test_the_help_center_fabula_resolves_the_bubble_into_the_spec(docs_src: Path
     assert not [e for e in p["report"]["errors"] if "xref" in str(e)]
     assert not [n for n in p["report"]["notes"] if "xref" in str(n)]
     bubble = next(i for m in p["modules"] for k in m["kinds"] for i in k["items"] if i["id"] == "B:bubble/docs")
-    assert bubble["data"]["xrefs"] == [f"macrocosm-oes@{mc.MACROCOSM_VERSION}:section:1"]
+    assert bubble["data"]["xrefs"] == [f"macrocosm-oes@{docoes.document_version('macrocosm-oes', sources=docs_src)}:section:1"]
 
 
 # ---------------------------------------------------------------------------
@@ -588,7 +618,7 @@ def test_the_background_build(docs_src: Path, project: Path):
     import time
     with _client(project, "home") as c:
         r = c.post("/api/docs/build", json={})
-        assert r.status_code == 202 and r.json()["progress"]["total"] == 9      # 3 specs + the help center's 6
+        assert r.status_code == 202 and r.json()["progress"]["total"] == 10     # 4 specs + the help center's 6
         for _ in range(200):
             st = c.get("/api/docs/status").json()
             if not st["building"]:
@@ -656,8 +686,9 @@ def test_the_inventory_route(docs_src: Path, project: Path):
     rows = p["rows"]
     assert (p["doc"], p["lang"]) == ("macrocosm-oes", "en")
     row = next(r for r in rows if r["id"] == "S:section/1.1")
-    assert row == {"inventory": "macrocosm-oes", "xref": f"macrocosm-oes@{mc.MACROCOSM_VERSION}:section:1.1",
-                   "id": "S:section/1.1", "kind": "section", "version": mc.MACROCOSM_VERSION,
+    ver = docoes.document_version("macrocosm-oes", sources=docs_src)              # its edition, not the grammar's
+    assert row == {"inventory": "macrocosm-oes", "xref": f"macrocosm-oes@{ver}:section:1.1",
+                   "id": "S:section/1.1", "kind": "section", "version": ver,
                    "anchor": "sec-1-1", "atem": row["atem"]}
     assert docoes.resolve_xref(row["xref"], rows)["id"] == "S:section/1.1"
 
@@ -749,7 +780,7 @@ def test_the_real_spec_once(project: Path):
     assert docoes.SOURCES is None
     with _client(project, "home") as c:
         short = _docs(c, density="short").json()
-        assert len(short["sections"]) == sum(1 for i in short["items"] if i["kind"] == "section") > 200
+        assert len(short["sections"]) == sum(1 for i in short["items"] if i["kind"] == "section") > 100
         r = c.post("/api/docs/compile", json={"doc": "macrocosm-oes", "lang": "en"})
         assert r.json()["markdown"].encode("utf-8") == SPEC.read_bytes()
         r = c.get("/api/docs/lens", params={"doc": "macrocosm-oes", "around": "T:term/atem"})

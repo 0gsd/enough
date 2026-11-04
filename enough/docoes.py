@@ -26,9 +26,10 @@ Standalone like the reader: the standard library, PyYAML and `enough.macrocosm`,
     python -m enough.docoes inventory <doc> [--lang L] [--json]
     python -m enough.docoes export    <doc> <out-dir> [--densities …] [--page D=HREF] [--standalone]   (docoes_html)
 
-Documents: `macrocosm-oes` (English, with Comprise's spec and paradigm map as chapters), `thym` and `ascribe` (the
-Thym language and the Ascribe MiniCOSM, English, 0.5.0) and `help-center` (six tellings: en de es fr ja zh, written
-by Rosa).
+Documents: the four OES specifications — `macrocosm-oes`, `thym`, `ascribe` and `comprise-oes` (0.5.4) — English,
+the canonical editions published at cosmoes.org, bundled as `docs/*.md` by `scripts/sync_specs.py` (their editions
+in `docs/specs.json`) and read from a synced copy under `ENOUGH_SPECS_ROOT` (`~/enough/specs/`) once `enough/specs.py`
+has fetched one; and `help-center` (six tellings: en de es fr ja zh, written by Rosa).
 """
 
 from __future__ import annotations
@@ -40,6 +41,7 @@ import html
 import json
 import os
 import re
+import shutil
 import sys
 import tempfile
 import threading
@@ -68,8 +70,12 @@ LANGS = ("en", "de", "es", "fr", "ja", "zh")
 CJK = ("ja", "zh")
 ATEM_WORDS = (2, 15)
 ATEM_CJK_CHARS = (2, 45)
-CHAPTERS_DIR = "defaults/cosm/chapters"
 MANIFESTS_DIR = "defaults/cosm/manifests"
+# The specifications' bundled editions (0.5.4): written by `scripts/sync_specs.py` from a cosmoes-site checkout —
+# each document's registry entry (name, edition, revised, host) with the bundled path and sha256. A synced copy
+# under `specs_root()` (the client's folder: `<slug>/source.md` + `state.json`) is read in its place when its
+# state.json lists the slug with a sha256 that matches the file; see `spec_source`.
+SPECS_JSON = "docs/specs.json"
 
 # DocOES's own checks, run by `lint_doc` after the generic ones (a generic reader lists them as not run).
 DOC_CHECKS = ("atem-shape", "numbering", "term-defined-once", "unlinked-mentions", "empty-section",
@@ -85,11 +91,13 @@ DOC_SEVERITY = {"atem-shape": "error", "numbering": "error", "term-defined-once"
 
 @dataclass(frozen=True)
 class Chapter:
-    """A synced, read-only document inside a doc volume: Comprise's own words, under its own id prefix."""
-    file: str                    # its copy under defaults/cosm/chapters/
+    """A synced, read-only document inside a doc volume, under its own id prefix. No registered document carries
+    one since 0.5.4 (Comprise OES is a document of its own); the machinery stays for `enumerate_markdown(chapter=)`,
+    `compile_doc(chapter=)` and the exporter, which still render a volume that has them."""
+    file: str                    # its copy, relative to the install
     slug: str                    # S:chapter/<slug>
     prefix: str                  # S:section/<prefix>.4.1; also its inventory's name (comprise@1:section:4.1)
-    source: str                  # where the sync copied it from, in the Comprise checkout
+    source: str                  # where the sync copied it from
     label: str                   # whose words: "Comprise"
     version: str                 # the chapter's own version, for its inventory
     xref: tuple = ()             # (marker, inventory) pairs: what its § and P.N name; an empty inventory: not linked
@@ -104,29 +112,26 @@ class Document:
     voice: str | None = None
     chapters: tuple = ()
     reference: bool = False      # join the R: items generated from the manifests
-    version: str = ""
-    xref: dict = field(default_factory=dict)        # how this document's own words point at a chapter
+    version: str = ""            # the help center's: enough's version; a specification's comes from its edition
+    xref: dict = field(default_factory=dict)        # what this document's § / README § / P. name ("" = not linked)
     plain_mentions: str = "all"  # all: every plain use of a term is a mention; distinctive: only distinctive names
+    spec: bool = False           # one of the OES specifications pulled from cosmoes.org: edition from specs.json or
+    #                              the synced state.json, the text from the synced copy when one is in use
+    own_p: bool = False          # P.N names this document's own chapter-P sections (Comprise OES)
 
 
-# Comprise's spec uses § only for other documents (HELP_CENTER §8, plan/comprise-model.md §5): never linked. Its
-# paradigm map's § and P.N name sections of the spec: cross-volume references into the comprise chapter.
-_COMPRISE = Chapter("comprise-oes.md", "comprise-oes", "comprise", "oes/comprise-oes.md", "Comprise", "1",
-                    (("§", ""),))
-_PARADIGM_MAP = Chapter("comprise-paradigm-map.md", "comprise-paradigm-map", "comprise-map", "oes/README.md",
-                        "Comprise", "1", (("§", "comprise"), ("P.", "comprise")))
-
+# The four specifications are the canonical editions published at cosmoes.org (names carry no number; the edition is
+# a field), bundled by `scripts/sync_specs.py` and refreshed at run time by `enough/specs.py`. In MacroCOSM OES, §,
+# "README §" and P.N name sections of other documents (Comprise OES, the paradigm map): never linked. Comprise OES
+# uses § only for other documents (never linked) and P.N for its own chapter P.
 DOCUMENTS: dict[str, Document] = {
     "macrocosm-oes": Document(
-        "macrocosm-oes", "MacroCOSM OES", {"en": "docs/MACROCOSM_OES.md"},
-        chapters=(_COMPRISE, _PARADIGM_MAP), reference=True, version=mc.MACROCOSM_VERSION,
-        # In the spec, § always names a section of Comprise OES 1, "README §" one of its paradigm map, and P.N a
-        # section of its chapter P: all three become cross-volume references into the chapters (xrefs).
-        xref={"§": "comprise", "README §": "comprise-map", "P.": "comprise"}),
-    # 0.5.0 (lane X2): the two specifications written in MacroCOSM OES, English only, no chapters, no reference.
-    # Thym's document is "Version 0 of the language"; its MiniCOSM declares `thym/1`, which is not the document's.
-    "thym": Document("thym", "Thym 0", {"en": "docs/THYM.md"}, version="0"),
-    "ascribe": Document("ascribe", "Ascribe OES 1", {"en": "docs/ASCRIBE.md"}, version="1"),
+        "macrocosm-oes", "MacroCOSM OES", {"en": "docs/MACROCOSM_OES.md"}, reference=True, spec=True,
+        xref={"§": "", "README §": "", "P.": ""}),
+    "thym": Document("thym", "Thym", {"en": "docs/THYM.md"}, spec=True),
+    "ascribe": Document("ascribe", "Ascribe", {"en": "docs/ASCRIBE.md"}, spec=True),
+    "comprise-oes": Document("comprise-oes", "Comprise OES", {"en": "docs/COMPRISE_OES.md"}, spec=True, own_p=True,
+                             xref={"§": ""}),
     "help-center": Document(
         "help-center", "the enough help center",
         {"en": "docs/HELP_CENTER.md", **{lang: f"enough/static/i18n/{lang}/help-center.md" for lang in LANGS[1:]}},
@@ -151,6 +156,80 @@ def docs_root() -> Path:
 def sources_root() -> Path:
     """The install the documents are read from: `SOURCES` when set, else this package's own install."""
     return Path(SOURCES) if SOURCES is not None else INSTALL_ROOT
+
+
+def specs_root() -> Path:
+    """Where the specifications synced from cosmoes.org live (0.5.4): `ENOUGH_SPECS_ROOT`, else `~/enough/specs/`
+    — the client's folder: `<slug>/source.md` per document, `manifest.json`, `state.json`. Written only by the
+    client (`enough/specs.py` runs it once per launch); read here, never created by asking."""
+    env = os.environ.get("ENOUGH_SPECS_ROOT")
+    return Path(env).expanduser() if env else Path.home() / "enough" / "specs"
+
+
+def bundled_editions(sources: Path | None = None) -> dict[str, dict]:
+    """`docs/specs.json`'s documents by slug: the editions bundled with this install (name, edition, revised, host,
+    path, sha256); `{}` when the install has none (a miniature without it)."""
+    root = Path(sources or sources_root())
+    try:
+        body = json.loads((root / SPECS_JSON).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    docs = body.get("documents") if isinstance(body, dict) else None
+    return {str(d["slug"]): d for d in (docs or []) if isinstance(d, dict) and d.get("slug")}
+
+
+def synced_spec(slug: str, root: Path | None = None) -> dict | None:
+    """The synced copy of a specification, when `state.json` under the specs root lists the slug with a source
+    sha256 that matches `<root>/<slug>/source.md`: `{path, name, version, revised, host, sha256}`. Else None — a
+    missing, corrupt or half-written copy is simply not in use, and the bundled text stands."""
+    root = Path(root or specs_root())
+    try:
+        state = json.loads((root / "state.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    doc = (state.get("documents") or {}).get(slug) if isinstance(state, dict) else None
+    if not isinstance(doc, dict):
+        return None
+    kinds = doc.get("kinds") if isinstance(doc.get("kinds"), dict) else {}
+    source = kinds.get("source") if isinstance(kinds.get("source"), dict) else {}
+    sha = source.get("sha256")
+    path = root / slug / "source.md"
+    if not isinstance(sha, str) or _file_sha(path) != sha:
+        return None
+    return {"path": path, "name": doc.get("name"), "version": doc.get("version"), "revised": doc.get("revised"),
+            "host": doc.get("host"), "sha256": sha}
+
+
+def spec_info(doc: str | Document, *, sources: Path | None = None, synced: bool = True) -> dict:
+    """Where a specification is read from and which edition it is: `{path, version, revised, host, home, source}`
+    with `source` "cosmoes" (a synced copy is in use) or "bundled" (the text shipped with enough, its edition from
+    docs/specs.json). `synced=False` ignores the specs root (the validator builds a candidate text on its own)."""
+    d = _document(doc)
+    root = Path(sources or sources_root())
+    rel = d.sources["en"]
+    s = synced_spec(d.slug) if (d.spec and synced) else None
+    if s:
+        host = s.get("host")
+        return {"path": s["path"], "version": str(s.get("version") or ""), "revised": s.get("revised"),
+                "host": host, "home": f"https://{host}/" if host else None, "source": "cosmoes"}
+    b = bundled_editions(root).get(d.slug, {}) if d.spec else {}
+    host = b.get("host")
+    return {"path": root / rel, "version": str(b.get("edition") or d.version or ""), "revised": b.get("revised"),
+            "host": host, "home": f"https://{host}/" if host else None, "source": "bundled"}
+
+
+def spec_source(slug: str, *, sources: Path | None = None) -> Path:
+    """The file a specification is read from: `<specs root>/<slug>/source.md` when state.json lists the slug with a
+    sha256 that matches the file, else the bundled path. What `/api/*-spec` serves and the viewer's volume is built
+    from; DocOES's digest follows it, so a synced change rebuilds the volume on the next open."""
+    return spec_info(slug, sources=sources)["path"]
+
+
+def document_version(doc: str | Document, *, sources: Path | None = None) -> str:
+    """The version a document's items are cited under: a specification's edition (synced or bundled), else the
+    document's own (`Document.version`: enough's, for the help center)."""
+    d = _document(doc)
+    return spec_info(d, sources=sources)["version"] if d.spec else d.version
 
 
 def volume_path(doc: str, lang: str = "en", root: Path | None = None) -> Path:
@@ -809,10 +888,10 @@ def _first_prose(blocks: list[_Block], lang: str) -> tuple[str | None, str | Non
 
 def _enumerate(text: str, *, doc_id: str, lang: str, source_path: str, chapter: Chapter | None = None,
                reference: tuple | None = None, xref: dict | None = None, plain_mentions: str = "all",
-               registry: mc.Registry | None = None, order_start: int = 0, doc_name: str | None = None
-               ) -> tuple[list[dict], _Aux, int]:
+               registry: mc.Registry | None = None, order_start: int = 0, doc_name: str | None = None,
+               own_p: bool = False) -> tuple[list[dict], _Aux, int]:
     """(items, aux, next order) for one document. `reference` is the author's telling's (items, aux) when this is
-    a translation: ids come from it, words from this text."""
+    a translation: ids come from it, words from this text. `own_p`: P.N names this document's own sections."""
     lines, fences = _scan(text)
     prefix = f"{chapter.prefix}." if chapter else ""
     chap_id = f"S:chapter/{chapter.slug}" if chapter else None
@@ -962,7 +1041,7 @@ def _enumerate(text: str, *, doc_id: str, lang: str, source_path: str, chapter: 
     term_names = {it["name"]: tid for tid, it in term_items.items()}
     matcher = _TermMatcher(term_names, lang, plain_mentions)
     doc_xref = dict(xref or {}) or (dict(chapter.xref) if chapter else {})
-    own_p = chapter is not None and chapter.prefix == "comprise"
+    own_p = own_p or (chapter is not None and chapter.prefix == "comprise")
 
     # Examples: every ```cosm block, numbered in order through the document.
     reg = registry or mc.default_registry()
@@ -1062,9 +1141,9 @@ def _enumerate(text: str, *, doc_id: str, lang: str, source_path: str, chapter: 
         for ex in examples_in.get(s.sid, []):
             local.append((ex["fence"].open + 1, _example(ex, s, blocks, lines, prefix, source_path, reg, lang,
                                                          chap_id)))
-        if s.name.casefold().startswith("decisions"):
+        if _is_decisions_section(s.name):
             for d in _decisions(s, blocks, lines, prefix, source_path, lang, doc_xref, own_p, matcher,
-                                term_items, chap_id):
+                                term_items, chap_id, changes=_is_changes_section(s.name)):
                 local.append((int(d["lines"].split("-")[0]), d))
         for _, x in sorted(local, key=lambda p: p[0]):
             order += 1
@@ -1131,57 +1210,126 @@ def _example(ex: dict, s: _Sec, blocks: list[_Block], lines: list[_Line], prefix
     return it
 
 
+def _is_changes_section(name: str) -> bool:
+    """A "Changes" section (0.5.4): the texts' dated appendix, newest edition first, read as the decisions source."""
+    return name.casefold().strip().startswith("changes")
+
+
+def _is_decisions_section(name: str) -> bool:
+    """Where a document records its decisions: a "Decisions …" section (older texts) or a "Changes" section."""
+    return name.casefold().strip().startswith("decisions") or _is_changes_section(name)
+
+
+# An edition's entry in a Changes section opens a paragraph: "**Edition 0.5.4 · 2026-11-03.** …", "**Version 0 ·
+# 2026-11-01.** …" (the date optional) or "**Edition 0.5.4 · 2026-11-03, second revision.** …" (a qualifier after
+# the date). The paragraph introduces the entry's list when one follows; an entry with no list is one decision in
+# itself.
+_EDITION_HEAD = re.compile(r"^\*\*(?P<word>Edition|Version)\s+(?P<edition>[^*·,]+?)\s*"
+                           r"(?:·\s*(?P<date>\d{4}-\d\d-\d\d))?(?:,\s*(?P<note>[^*]+?))?\.?\*\*")
+_DECISION_ITEM = re.compile(r"^(\d+)\.\s+\*\*(.+?)\*\*(.*)$")
+_CHANGE_ITEM = re.compile(r"^(?:(\d+)\.|[-*])\s+(?:\*\*(.+?)\*\*)?(.*)$")
+_ITEM_MARK = re.compile(r"^(?:\d+\.|[-*])\s+")
+
+
 def _decisions(s: _Sec, blocks: list[_Block], lines: list[_Line], prefix: str, source_path: str, lang: str,
-               doc_xref: dict, own_p: bool, matcher: _TermMatcher, terms: dict, chap_id: str | None) -> list[dict]:
-    out = []
+               doc_xref: dict, own_p: bool, matcher: _TermMatcher, terms: dict, chap_id: str | None,
+               changes: bool = False) -> list[dict]:
+    """The decisions a section records, in order. A "Decisions …" section: its numbered bold items, each numbered as
+    written. A "Changes" section (`changes`): every item of every edition's list — numbered or bulleted, with or
+    without a bold lead — and an edition's entry that has no list, numbered through the section (the editions'
+    lists each start at 1), each carrying its `edition` and, when the entry is dated, `dated`."""
+    # What becomes a decision, in document order: [label, lead, lines, edition, dated, head]; `head` is the edition's
+    # opening paragraph's match when the entry itself is the decision.
+    raw: list[list] = []
+    edition: str | None = None
+    dated: str | None = None
+    head: re.Match | None = None
+    pending: _Block | None = None            # an edition's opening paragraph, a decision unless a list follows it
+
+    def settle_pending() -> None:
+        nonlocal pending
+        if pending is not None:
+            raw.append([None, None, list(pending.lines), edition, dated, head])
+        pending = None
+
     for blk in blocks:
-        if blk.kind != "list":
-            continue
-        raw_items: list[list] = []
-        for ln in blk.lines:
-            m = re.match(r"^(\d+)\.\s+\*\*(.+?)\*\*(.*)$", ln.text)
+        if changes and blk.kind == "para":
+            m = _EDITION_HEAD.match(blk.lines[0].text.strip())
             if m:
-                raw_items.append([m.group(1), m.group(2), [ln]])
-            elif raw_items:
-                raw_items[-1][2].append(ln)
-        for num, lead, item_lines in raw_items:
-            text = " ".join(x.text.strip() for x in item_lines)
-            rest = _plain(re.sub(r"^\d+\.\s+\*\*.+?\*\*", "", text))
+                settle_pending()
+                edition, dated, head = m.group("edition").strip(), m.group("date"), m
+                pending = blk
+            continue
+        if blk.kind != "list":
+            if changes and blk.kind != "comment":
+                settle_pending()
+            continue
+        pending = None                        # the entry's paragraph introduced this list
+        items_here: list[list] = []
+        for ln in blk.lines:
+            m = (_CHANGE_ITEM if changes else _DECISION_ITEM).match(ln.text)
+            if m:
+                if changes and m.group(1) is None and m.group(2) is None and not m.group(3).strip():
+                    continue                  # a bare bullet with nothing on its line
+                items_here.append([m.group(1), m.group(2), [ln], edition, dated, None])
+            elif items_here:
+                items_here[-1][2].append(ln)
+        raw += items_here
+    if changes:
+        settle_pending()
+
+    out: list[dict] = []
+    for k, (label, lead, item_lines, ed, dt, hd) in enumerate(raw, 1):
+        num = str(k) if changes else (label or str(k))
+        text = " ".join(x.text.strip() for x in item_lines)
+        if hd is not None:                    # an edition's entry with no list: the entry is the decision
+            name = f"{hd.group('word')} {ed}" + (f" · {dt}" if dt else "") + \
+                (f", {hd.group('note').strip()}" if hd.group("note") else "")
+            rest = _plain(_EDITION_HEAD.sub("", text, count=1))
+        elif lead is not None:                # "1. **The lead.** the rest" or "- **The lead.** the rest"
             name = _plain(lead).rstrip(".").strip()
-            summary = (_sentences(rest, lang) or [name])[0] if rest.strip(" ,.") else name
-            atem = _atem_cut(name, lang)
-            if atem_problems(atem, lang):
-                atem = _atem_of(rest, lang) or _atem_of(_plain(text), lang) or \
-                    _atem_cut(f"decision {num} of {s.name}", lang)
-            masked = "\n".join(_mask_code(x.text) for x in item_lines)
-            refs = _refs_in(masked, doc_xref, own_p=own_p)
-            about = [f"S:section/{prefix}{x}" for x in dict.fromkeys(refs.sections)]
-            about += [t for t in matcher.find(masked) if t not in about]
-            a, b = item_lines[0].no, item_lines[-1].no
-            it: dict = {"id": f"S:decision/{prefix}{num}", "type": "decision", "name": name, "summary": summary,
-                        "atem": atem, "number": num, "in": f"S:section/{s.sid}"}
-            if about:
-                it["about"] = about
-            xr = [f"{inv}@{_inventory_version(inv)}:{k}:{i}" for inv, k, i in refs.xrefs]
-            if xr:
-                it["xrefs"] = list(dict.fromkeys(xr))
-            if chap_id:
-                it["chapter"] = chap_id
-            it["lines"] = _span(a, b)
-            it["provenance"] = _derived(source_path, a, b)
-            it["body"] = "".join(x.text + x.eol for x in item_lines)
-            out.append(it)
+            rest = _plain(re.sub(r"^(?:\d+\.|[-*])\s+\*\*.+?\*\*", "", text))
+        else:                                 # a plain bullet: its first sentence names it
+            rest = _plain(_ITEM_MARK.sub("", text, count=1))
+            name = (_sentences(rest, lang) or [rest])[0].strip().rstrip(".").strip() or f"decision {num}"
+        summary = (_sentences(rest, lang) or [name])[0] if rest.strip(" ,.") else name
+        atem = _atem_cut(name, lang)
+        if atem_problems(atem, lang):
+            atem = _atem_of(rest, lang) or _atem_of(_plain(text), lang) or \
+                _atem_cut(f"decision {num} of {s.name}", lang)
+        masked = "\n".join(_mask_code(x.text) for x in item_lines)
+        refs = _refs_in(masked, doc_xref, own_p=own_p)
+        about = [f"S:section/{prefix}{x}" for x in dict.fromkeys(refs.sections)]
+        about += [t for t in matcher.find(masked) if t not in about]
+        a, b = item_lines[0].no, item_lines[-1].no
+        it: dict = {"id": f"S:decision/{prefix}{num}", "type": "decision", "name": name, "summary": summary,
+                    "atem": atem, "number": num, "in": f"S:section/{s.sid}"}
+        if ed is not None:
+            it["edition"] = ed
+            if dt:
+                it["dated"] = dt
+        if about:
+            it["about"] = about
+        xr = [f"{inv}@{_inventory_version(inv)}:{kind}:{i}" for inv, kind, i in refs.xrefs]
+        if xr:
+            it["xrefs"] = list(dict.fromkeys(xr))
+        if chap_id:
+            it["chapter"] = chap_id
+        it["lines"] = _span(a, b)
+        it["provenance"] = _derived(source_path, a, b)
+        it["body"] = "".join(x.text + x.eol for x in item_lines)
+        out.append(it)
     return out
 
 
 def _inventory_version(inv: str) -> str:
-    """The version a cross-volume reference names: a chapter's own, or a document's."""
+    """The version a cross-volume reference names: a chapter's own, or a document's (a specification's edition)."""
     for d in DOCUMENTS.values():
         for c in d.chapters:
             if c.prefix == inv:
                 return c.version
         if d.slug == inv:
-            return d.version
+            return document_version(d)
     return "1"
 
 
@@ -1189,24 +1337,26 @@ def enumerate_markdown(text: str, *, doc_id: str, lang: str = "en", voice: str |
                        source_path: str, chapter: Chapter | dict | None = None, reference_text: str | None = None,
                        name: str | None = None, version: str | None = None, xref: dict | None = None,
                        plain_mentions: str = "all", registry: mc.Registry | None = None,
-                       chapter_meta: dict | None = None) -> dict:
+                       chapter_meta: dict | None = None, own_p: bool = False,
+                       document: dict | None = None) -> dict:
     """One markdown document as a doc catalog (a mapping with `nodes`): its sections (`S:section/<n>`, `root` for
     the title, `front` for any text before it, a slug for an unnumbered heading) with their bodies verbatim, the
     terms it defines, the section references and term uses each section makes (`mentions`), its ```cosm examples
     and its decisions. `reference_text` is the author's telling when this is a translation: ids come from it,
     words from `text`. With `chapter`, the items carry the chapter's prefix and the mapping holds the chapter item
-    first; `chapter_meta` gives its commit and hash."""
+    first; `chapter_meta` gives its commit and hash. `own_p`: P.N names this document's own sections. `document`:
+    more fields for the catalog's `document` block (a specification's `revised`, `source`, `home`)."""
     slug = doc_id.removeprefix("doc/")
     chap = Chapter(**chapter) if isinstance(chapter, dict) else chapter
     reference = None
     if reference_text is not None:
         ref_items, ref_aux, _ = _enumerate(reference_text, doc_id=slug, lang="en", source_path=source_path,
                                            chapter=chap, xref=xref, plain_mentions=plain_mentions,
-                                           registry=registry, doc_name=name)
+                                           registry=registry, doc_name=name, own_p=own_p)
         reference = (ref_items, ref_aux)
     items, _aux, _ = _enumerate(text, doc_id=slug, lang=lang, source_path=source_path, chapter=chap,
                                 reference=reference, xref=xref, plain_mentions=plain_mentions, registry=registry,
-                                doc_name=name)
+                                doc_name=name, own_p=own_p)
     if reference is not None:
         _take_author_ids(items, reference[0])
     root = next((it for it in items if it["id"].endswith("/root") or it["id"].endswith(".root")), None)
@@ -1230,7 +1380,8 @@ def enumerate_markdown(text: str, *, doc_id: str, lang: str = "en", voice: str |
         return {"nodes": [citem] + items}
     telling = {"lang": lang, **({"voice": voice} if voice else {})}
     cat = {"oes": OES, "macrocosm": mc.MACROCOSM_VERSION, "id": f"doc/{slug}", "name": title,
-           "document": {"path": source_path, "sha256": _sha(text.encode("utf-8")), "version": version or ""},
+           "document": {"path": source_path, "sha256": _sha(text.encode("utf-8")), "version": version or "",
+                        **{k: v for k, v in (document or {}).items() if v is not None}},
            "telling": telling, "nodes": items}
     return cat
 
@@ -1663,80 +1814,65 @@ def _source_files(d: Document, lang: str) -> list[str]:
         out.append(d.sources["en"])                     # a translation takes its ids from the author's telling
     if d.bubbles.get(lang):
         out.append(d.bubbles[lang])
-    for c in d.chapters:
-        out.append(f"{CHAPTERS_DIR}/{c.file}")
-    if d.chapters:
-        out.append(f"{CHAPTERS_DIR}/manifest.json")
     return out
 
 
 def digest(doc: str | Document, lang: str = "en", *, sources: Path | None = None,
-           registry: mc.Registry | None = None) -> str:
+           registry: mc.Registry | None = None, synced: bool = True) -> str:
     """What a doc volume is built from, as one sha256: DocOES's rules (FORMAT), enough's version, each source
-    file's sha256 and every manifest's sha256."""
+    file's sha256 and every manifest's sha256; for a specification, the file actually read (the synced copy when
+    one is in use) and its edition; for a document with bubbles, the editions of the documents its bubbles cite."""
     d = _document(doc)
     root = Path(sources or sources_root())
     reg = registry or _registry(root)
     parts = [f"docoes {FORMAT}", f"enough {ENOUGH_VERSION}", f"doc {d.slug} {lang}"]
-    for rel in _source_files(d, lang):
-        parts.append(f"{rel} {_file_sha(root / rel) or 'missing'}")
+    if d.spec:
+        info = spec_info(d, sources=root, synced=synced)
+        parts.append(f"spec {info['source']} {info['version']} {info['revised'] or ''} {info['path']} "
+                     f"{_file_sha(info['path']) or 'missing'}")
+    else:
+        for rel in _source_files(d, lang):
+            parts.append(f"{rel} {_file_sha(root / rel) or 'missing'}")
+    if d.bubbles:
+        for cited in sorted(set(BUBBLE_DOCUMENT.values())):
+            if cited in DOCUMENTS:
+                parts.append(f"cites {cited} {document_version(cited, sources=root)}")
     for m in reg.manifests.values():
         parts.append(f"manifest {m.name} {m.version} {_file_sha(m.path) if m.path else 'none'}")
     return _sha("\n".join(parts).encode("utf-8"))
 
 
-def _read(root: Path, rel: str) -> str:
-    """A source as written: utf-8, no newline translation, so a body is exactly its bytes."""
+def _read(root: Path, rel: str | Path) -> str:
+    """A source as written: utf-8, no newline translation, so a body is exactly its bytes. An absolute `rel` (a
+    synced specification under the specs root) is read as it is."""
     return (root / rel).read_bytes().decode("utf-8")
 
 
 def catalog_for(doc: str | Document, lang: str = "en", *, sources: Path | None = None,
-                registry: mc.Registry | None = None) -> dict:
-    """The whole doc catalog for one telling, in memory: the document, its chapters, the reference, the bubbles."""
+                registry: mc.Registry | None = None, synced: bool = True) -> dict:
+    """The whole doc catalog for one telling, in memory: the document, the reference, the bubbles. A specification
+    is read from its synced copy when one is in use (`synced=False`: the bundled text only), and its catalog's
+    `document` block carries the edition, `revised`, `source` (cosmoes | bundled) and `home`."""
     d = _document(doc)
     if lang not in d.sources:
         raise KeyError(f"{d.slug} has no {lang} telling; it has {', '.join(tellings(d))}")
     root = Path(sources or sources_root())
     reg = registry or _registry(root)
-    text = _read(root, d.sources[lang])
+    version, document, source_path = d.version, None, d.sources[lang]
+    if d.spec:
+        info = spec_info(d, sources=root, synced=synced)
+        text = info["path"].read_bytes().decode("utf-8")
+        version = info["version"]
+        source_path = d.sources["en"] if info["source"] == "bundled" else str(info["path"])
+        document = {"revised": info["revised"], "source": info["source"], "home": info["home"]}
+    else:
+        text = _read(root, d.sources[lang])
     ref_text = _read(root, d.sources["en"]) if lang != "en" else None
-    cat = enumerate_markdown(text, doc_id=d.slug, lang=lang, voice=d.voice, source_path=d.sources[lang],
-                             reference_text=ref_text, name=d.name, version=d.version, xref=d.xref,
-                             plain_mentions=d.plain_mentions, registry=reg)
+    cat = enumerate_markdown(text, doc_id=d.slug, lang=lang, voice=d.voice, source_path=source_path,
+                             reference_text=ref_text, name=d.name, version=version, xref=d.xref,
+                             plain_mentions=d.plain_mentions, registry=reg, own_p=d.own_p, document=document)
     nodes = cat["nodes"]
     cat["tellings"] = tellings(d)
-    order = max((it.get("order", 0) for it in nodes), default=0)
-    chapters_meta = {}
-    if d.chapters:
-        try:
-            chapters_meta = json.loads(_read(root, f"{CHAPTERS_DIR}/manifest.json"))
-        except (OSError, ValueError):
-            chapters_meta = {}
-        cat["chapters"] = []
-        for c in d.chapters:
-            rel = f"{CHAPTERS_DIR}/{c.file}"
-            try:
-                ctext = _read(root, rel)
-            except OSError:
-                continue
-            entry = (chapters_meta.get("chapters") or {}).get(c.file) or {}
-            meta = {"commit": chapters_meta.get("source_commit"), "sha256": entry.get("sha256")}
-            sub = enumerate_markdown(ctext, doc_id=d.slug, lang="en", source_path=rel, chapter=c,
-                                     plain_mentions="all", registry=reg, chapter_meta=meta)
-            for it in sub["nodes"]:
-                if "order" in it:
-                    it["order"] += order
-            order = max((it.get("order", 0) for it in sub["nodes"]), default=order)
-            nodes += sub["nodes"]
-            cat["chapters"].append({"id": f"S:chapter/{c.slug}", "path": rel, "source": c.source,
-                                    "commit": meta["commit"], "sha256": _sha(ctext.encode("utf-8")),
-                                    "prefix": c.prefix, "version": c.version})
-            # Chapter terms that share a name with a term of the document are the same word.
-            mine = {it["name"].casefold(): it["id"] for it in nodes if it.get("type") == "term" and
-                    "chapter" not in it}
-            for it in sub["nodes"]:
-                if it.get("type") == "term" and it["name"].casefold() in mine:
-                    it["same_as"] = [mine[it["name"].casefold()]]
     if d.reference:
         tables = spec_tables(text)
         rs = enumerate_manifests(reg, tables=tables, root=root)
@@ -1769,16 +1905,18 @@ def catalog_for(doc: str | Document, lang: str = "en", *, sources: Path | None =
 
 
 def build(doc: str | Document, lang: str = "en", *, docs_root: Path | None = None,
-          sources: Path | None = None) -> Path:
+          sources: Path | None = None, synced: bool = True) -> Path:
     """Build one telling's doc volume, unconditionally, and write it atomically to
-    `<docs_root>/<doc>.<lang>.doc.cosm`. Returns the path."""
+    `<docs_root>/<doc>.<lang>.doc.cosm`. Returns the path. `synced=False` reads a specification's bundled text
+    only (the validator's build of a candidate)."""
     d = _document(doc)
     root = Path(sources or sources_root())
     reg = _registry(root)
-    cat = catalog_for(d, lang, sources=root, registry=reg)
+    cat = catalog_for(d, lang, sources=root, registry=reg, synced=synced)
     nodes = cat.pop("nodes")
     cat["built"] = {"at": _dt.datetime.now(_dt.timezone.utc).replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "by": f"enough/{ENOUGH_VERSION}", "digest": digest(d, lang, sources=root, registry=reg),
+                    "by": f"enough/{ENOUGH_VERSION}",
+                    "digest": digest(d, lang, sources=root, registry=reg, synced=synced),
                     "manifests": [{"name": m.name, "version": m.version, "sha256": _file_sha(m.path) if m.path else None}
                                   for m in reg.manifests.values()]}
     cat["nodes"] = nodes
@@ -1798,6 +1936,43 @@ def build(doc: str | Document, lang: str = "en", *, docs_root: Path | None = Non
 
 def docs_root_default() -> Path:
     return docs_root()
+
+
+def validate_spec_source(slug: str, kind: str, data: bytes) -> str | None:
+    """The sync client's `validate` hook (enough/specs.py): a candidate text for one of the four specifications is
+    built with the real DocOES build into a temporary docs root (a miniature install: the text at its bundled path,
+    the install's manifests and specs.json) and read back through the reference reader. None when it builds and
+    loads; else why not, and the client keeps the previous copy."""
+    if kind != "source":
+        return f"{kind}: enough syncs only a specification's source"
+    d = DOCUMENTS.get(slug)
+    if d is None or not d.spec:
+        return f"{slug}: not a specification enough bundles"
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError as e:
+        return f"not UTF-8: {e}"
+    if not text.strip() or not any(ln.startswith("# ") for ln in text.splitlines()[:40]):
+        return "not a specification: no title in its first lines"
+    real = sources_root()
+    with tempfile.TemporaryDirectory(prefix="enough-spec-check-") as tmp:
+        root = Path(tmp) / "install"
+        target = root / d.sources["en"]
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+        try:
+            shutil.copytree(real / MANIFESTS_DIR, root / MANIFESTS_DIR)
+            if (real / SPECS_JSON).is_file():
+                shutil.copyfile(real / SPECS_JSON, root / SPECS_JSON)
+            path = build(d, "en", docs_root=Path(tmp) / "docoes", sources=root, synced=False)
+            vol = mc.load_volume(path)
+        except Exception as e:  # noqa: BLE001 — any failure of the build is the verdict, never an exception upward
+            return f"does not build: {type(e).__name__}: {e}"
+        if vol.refused is not None:
+            return f"refused by the reader: {vol.refused}"
+        if not any(it.data.get("type") == "section" for it in vol.items.values()):
+            return "builds to no sections"
+    return None
 
 
 _DIGEST_LINE = re.compile(r"^\s+digest:\s*['\"]?([0-9a-f]{64})")
@@ -2154,7 +2329,7 @@ def lint_doc(volume: mc.Volume, *, registry: mc.Registry | None = None, sources:
         want = (it.data.get("provenance") or {}).get("hash") if isinstance(it.data.get("provenance"), dict) else None
         if have and want and have != want:
             add("stale-provenance-hash", it, f"{path} differs from the copy the sync recorded: rerun "
-                                             "scripts/sync_cosm.py", "provenance.hash")
+                                             "the sync that made it", "provenance.hash")
     doc = volume.catalog.get("document") if isinstance(volume.catalog.get("document"), dict) else {}
     if isinstance(doc.get("path"), str) and doc.get("sha256"):
         have = _file_sha(root / doc["path"])

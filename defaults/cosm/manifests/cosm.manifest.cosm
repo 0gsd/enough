@@ -13,12 +13,12 @@
 # Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
 
 manifest: minicosm/0
-macrocosm: 0.0.2
+macrocosm: 0.5.4
 name: cosm
 title: COSM product tree
 version: 0
 summary: One firm's product tree as the COSM 0.2 and 0.3 skills write it outside a Holotype, read so it opens in enough.
-spec: docs/MACROCOSM_OES.md
+spec: https://macro.cosmoes.org/      # MacroCOSM OES, the canonical edition (bundled as docs/MACROCOSM_OES.md)
 reference: [enough/macrocosm.py]
 predecessor: OPI 0.1 (opi:, read as cosm/0); .opi files themselves are not read
 

@@ -1,4 +1,4 @@
-"""MacroCOSM OES v0.0.1: the reference reader (`enough/macrocosm.py`) and the four MiniCOSM manifests it ships.
+"""MacroCOSM OES: the reference reader (`enough/macrocosm.py`) and the MiniCOSM manifests it ships.
 
 Everything here reads fixtures under `tests/fixtures/cosm/`: the four public Comprise sample Holotypes and the COSM 0.2
 example tree, copied from Comprise by `scripts/sync_cosm.py` (so the suite never needs comprise-dev), plus the Canon,
@@ -846,3 +846,77 @@ def test_cli_refuses_plainly(tmp_path):
     assert r.returncode == 1 and "industry/1" in r.stdout
     r = _cli("tree", p)
     assert r.returncode == 1 and "refused" in r.stderr
+
+
+# ---------------------------------------------------------------------------
+# The grammar version (0.5.4): one value written, three read unchanged
+# ---------------------------------------------------------------------------
+
+def test_the_grammar_version_set():
+    """enough writes MACROCOSM_VERSION into every catalog it makes; the reader reads every version in
+    MACROCOSM_VERSIONS unchanged (the grammar has not changed since 0.0.1). Every shipped manifest that carries the
+    key carries the current one, and the registry notes nothing."""
+    assert M.MACROCOSM_VERSION == "0.5.4" and M.MACROCOSM_VERSIONS == ("0.0.1", "0.0.2", "0.5.4")
+    assert M.MACROCOSM_VERSION in M.MACROCOSM_VERSIONS
+    reg = M.default_registry()
+    assert reg.notes == [] and reg.problems == []
+    carried = {m.name: str(m.data.get("macrocosm")) for m in reg.manifests.values() if "macrocosm" in m.data}
+    assert carried == {n: "0.5.4" for n in ("cosm", "canon", "emf", "doc", "ascribe", "thym")}   # Comprise's has none
+
+
+@pytest.mark.parametrize("said", ["0.0.1", "0.0.2", "0.5.4"])
+def test_a_volume_written_under_any_known_grammar_version_opens_unchanged(tmp_path, said):
+    cat = tmp_path / "canon.cosm"
+    cat.write_text(f"oes: canon/1\nmacrocosm: {said}\nid: canon/orchard\nname: orchard\nnodes: []\n", encoding="utf-8")
+    v = M.load_volume(cat)
+    assert v.refused is None and v.problems == [] and v.minicosm == "canon" and v.catalog["macrocosm"] == said
+    assert M.lint(v).ok
+
+
+def test_an_unknown_grammar_version_is_a_note_never_a_refusal(tmp_path):
+    cat = tmp_path / "canon.cosm"
+    cat.write_text("oes: canon/1\nmacrocosm: 9.9.9\nid: canon/orchard\nname: orchard\nnodes: []\n", encoding="utf-8")
+    v = M.load_volume(cat)
+    assert v.refused is None and v.catalog["macrocosm"] == "9.9.9"
+    notes = [p for p in v.problems if p.check == "macrocosm-version"]
+    assert len(notes) == 1 and notes[0].severity == "note" and "9.9.9" in notes[0].message \
+        and "0.0.1, 0.0.2, 0.5.4" in notes[0].message
+    rep = M.lint(v)
+    assert rep.ok and rep.errors == [] and [p.check for p in rep.notes] == ["macrocosm-version"]
+    # The same from text, and a manifest's own `macrocosm:` in a registry of its own.
+    assert [p.check for p in M.load_volume_text(cat.read_text(encoding="utf-8"), filename="canon.cosm").problems] \
+        == ["macrocosm-version"]
+    d = tmp_path / "manifests"
+    d.mkdir()
+    text = (REPO / "defaults" / "cosm" / "manifests" / "canon.manifest.cosm").read_text(encoding="utf-8")
+    (d / "canon.manifest.cosm").write_text(text.replace("macrocosm: 0.5.4", "macrocosm: 7.7.7", 1), encoding="utf-8")
+    reg = M.Registry([d])
+    assert list(reg.manifests) == ["canon"] and reg.problems == []
+    assert len(reg.notes) == 1 and "7.7.7" in reg.notes[0] and "read as 0.5.4" in reg.notes[0]
+
+
+# ---------------------------------------------------------------------------
+# The Comprise copies (byte copies from comprise-dev; the script that made them retired in 0.5.4)
+# ---------------------------------------------------------------------------
+
+PUBLIC_HOLOTYPES = ("meadow", "mozilla", "wikimedia", "khan-academy")
+
+
+def test_the_comprise_copies_match_their_manifest_and_name_only_the_public_samples():
+    """`tests/fixtures/cosm/manifest.json` records every byte copy taken from comprise-dev (the manifest, the four
+    public Holotypes' models, the COSM 0.2 example) with its sha256: nothing was edited by hand, and the Holotype folder
+    holds the four public samples only — comprise-dev also holds a partner's private fixtures, and nothing of theirs
+    may reach enough. (`scripts/sync_cosm.py`, which copied them, retired in 0.5.4; git history at e318fcd.)"""
+    import hashlib
+    body = json.loads((FIX / "manifest.json").read_text(encoding="utf-8"))
+    assert set(body) == {"source_commit", "files", "digest"} and body["files"]
+    for rel, sha in body["files"].items():
+        assert hashlib.sha256((REPO / rel).read_bytes()).hexdigest() == sha, f"{rel} was edited by hand"
+    lines = "".join(f"{rel} {sha}\n" for rel, sha in body["files"].items())
+    assert body["digest"] == hashlib.sha256(lines.encode("utf-8")).hexdigest()
+    holotypes = {d.name for d in (FIX / "holotypes").iterdir() if d.is_dir()}
+    assert holotypes == set(PUBLIC_HOLOTYPES)
+    recorded = {rel.split("/")[4] for rel in body["files"] if rel.startswith("tests/fixtures/cosm/holotypes/")}
+    assert recorded == set(PUBLIC_HOLOTYPES)
+    assert "defaults/cosm/manifests/comprise.manifest.cosm" in body["files"]
+    assert not [rel for rel in body["files"] if "chapters" in rel]           # the chapters went with 0.5.4

@@ -5,7 +5,7 @@
 # a morph volume holds style sheets measured against the null morph or declared by hand; a context volume holds
 # occasions; a plan volume is what a program will do, before it does it; a trace volume is what a run did; a package
 # volume is the catalog of a self-contained export of a text. The prose is docs/THYM.md (section 17); the reference
-# compiler and runtime are enough/thym/ (0.5.0); the reference reader is enough/macrocosm.py. Where this file and the
+# compiler and runtime are enough/thym/; the reference reader is enough/macrocosm.py. Where this file and the
 # reader disagree, the reader wins and this file is corrected.
 #
 # The moves: block at the end declares the moves this MiniCOSM owns (docs/THYM.md, section 17.6). Every MiniCOSM may
@@ -17,12 +17,12 @@
 # Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
 
 manifest: minicosm/0
-macrocosm: 0.0.2
+macrocosm: 0.5.4
 name: thym
 title: Thym
 version: 1
 summary: "Programs that move meaning between densities, the morphs and contexts they use, the plans they make, the traces they leave, and the packages a text travels in."
-spec: docs/THYM.md
+spec: https://thym.cosmoes.org/       # Thym, the canonical edition (bundled as docs/THYM.md)
 reference: [enough/macrocosm.py, enough/thym/]
 
 declaration:

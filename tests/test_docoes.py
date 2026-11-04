@@ -1,9 +1,9 @@
 """DocOES (enough/docoes.py): a document enumerated into a doc volume, and compiled back.
 
 The enumeration of a crafted document (sections, terms by each convention, mentions, examples, decisions, atems),
-the real documents (the MacroCOSM spec with Comprise's chapters, the Thym and Ascribe specifications, the Help Center
-in six tellings), the reference generated from the manifests, the round trip byte for byte, build-on-digest, the
-chapters' provenance, the inventory and cross-volume references, DocOES's own checks, and the CLI. Every build goes
+the real documents (the four OES specifications bundled from cosmoes.org — MacroCOSM OES, Thym, Ascribe, Comprise
+OES — and the Help Center in six tellings), the reference generated from the manifests, the round trip byte for byte,
+build-on-digest, the inventory and cross-volume references, DocOES's own checks, and the CLI. Every build goes
 into a scratch docs root: the real `~/enough/docoes/` is never touched (conftest points ENOUGH_DOCS_ROOT into
 tmp_path).
 """
@@ -322,9 +322,11 @@ def test_the_spec_references_all_resolve_and_it_lints(built):
     assert not [p for p in rep.problems() if p.check in ("ref-unresolved", "ref-grammar", "numbering")]
     mentions = [m for it in vol.items.values() for m in it.data.get("mentions") or []]
     assert sum(1 for m in mentions if m.startswith("S:section/")) > 150
-    appendix = vol.item("S:section/appendix-the-mapping-to-comprise-oes-1").data
-    assert "comprise@1:section:6.4.6" in appendix["xrefs"] and "comprise-map@1:section:2" in appendix["xrefs"]
-    assert "comprise@1:section:P.11" in appendix["xrefs"]
+    # 0.5.4: the appendix cites Comprise OES by bare number under a header that names it — no in-page link, no
+    # xref: the chapters are gone, and §, README § and P.N in this text name other documents' sections, never its own.
+    appendix = vol.item("S:section/appendix-the-mapping-to-comprise-oes").data
+    assert "xrefs" not in appendix
+    assert not [k for k in vol.items if k.startswith("S:chapter/") or k.startswith("S:section/comprise")]
     assert {p.check for p in rep.warnings} <= {"term-defined-once"}
 
 
@@ -335,30 +337,31 @@ def test_the_spec_terms_and_decisions(built):
     assert vol.item("T:term/part").data["convention"] == "glossary"
     assert vol.item("T:term/stance") is None or vol.item("T:term/stance").data["defined_in"].startswith("S:section/")
     assert "T:term/kind" in vol.item("S:section/7.4").data["mentions"]
-    decisions = [it for it in vol.items.values() if it.data.get("type") == "decision" and "chapter" not in it.data]
-    assert len(decisions) == 27 and decisions[-1].data["name"] == "A document is enumerated in its own grammar"
+    # 0.5.4: the decisions come from the "Changes" section — every item of every edition's list, numbered through
+    # the section, each carrying its edition and date: 8 for 0.5.4, 3 for 0.0.2, the 27 old decisions under 0.0.1.
+    decisions = [it for it in vol.items.values() if it.data.get("type") == "decision"]
+    assert len(decisions) == 38 and decisions[-1].data["name"] == "A document is enumerated in its own grammar"
+    assert Counter(d.data.get("edition") for d in decisions) == {"0.5.4": 8, "0.0.2": 3, "0.0.1": 27}
+    first = decisions[0].data
+    assert (first["id"], first["name"], first["edition"], first["dated"]) == \
+        ("S:decision/1", "Names carry no number", "0.5.4", "2026-11-03")
+    assert [d.data["number"] for d in decisions] == [str(i) for i in range(1, 39)]
+    assert decisions[-1].data["in"] == decisions[0].data["in"] == "S:section/20"
 
 
-def test_the_chapters_round_trip_and_carry_their_provenance(built):
-    vol = built["vols"][("macrocosm-oes", "en")]
-    meta = json.loads(_read("defaults/cosm/chapters/manifest.json"))
-    for slug, file in (("comprise-oes", "comprise-oes.md"), ("comprise-paradigm-map", "comprise-paradigm-map.md")):
-        text = _read(f"defaults/cosm/chapters/{file}")
-        assert D.compile_doc(vol, chapter=slug) == text
-        ch = vol.item(f"S:chapter/{slug}").data
-        sha = hashlib.sha256(text.encode("utf-8")).hexdigest()
-        assert ch["sha256"] == sha == meta["chapters"][file]["sha256"] and ch["commit"] == meta["source_commit"]
-        assert ch["provenance"]["mode"] == "catalogue" and ch["provenance"]["hash"] == sha
-        assert ch["provenance"]["sources"] == [f"comprise-dev {ch['source']} @ {meta['source_commit']}"]
-        assert ch["parts"] and all(vol.item(p).data["parent"] == f"S:chapter/{slug}" for p in ch["parts"])
-    cat_chapters = vol.catalog["chapters"]
-    assert [c["id"] for c in cat_chapters] == ["S:chapter/comprise-oes", "S:chapter/comprise-paradigm-map"]
-    assert vol.item("S:section/comprise.P.3.1").data["chapter"] == "S:chapter/comprise-oes"
-    assert vol.item("T:term/comprise.concern").data["defined_in"] == "S:section/comprise.3.1"
-    assert vol.item("T:term/comprise.item").data["same_as"] == ["T:term/item"]
-    assert len([it for it in vol.items.values() if it.data.get("type") == "decision" and
-                it.data.get("chapter") == "S:chapter/comprise-oes"]) == 19
-    assert not [it for it in vol.items.values() if it.data.get("type") == "example" and it.data.get("chapter")]
+def test_no_document_carries_chapters(built):
+    """0.5.4: Comprise OES is a document of its own (it was two chapters of MacroCOSM OES before, synced from
+    comprise-dev); no registered document has chapters, no volume a chapter item, no catalog a `chapters` list."""
+    assert all(d.chapters == () for d in D.DOCUMENTS.values())
+    for (slug, lang), vol in built["vols"].items():
+        assert not [k for k in vol.items if k.startswith("S:chapter/")], (slug, lang)
+        assert vol.catalog.get("chapters") in (None, []), (slug, lang)
+    c = built["vols"][("comprise-oes", "en")]
+    assert c.item("S:section/P.1") is not None and c.item("S:section/P.3").data["number"] == "P.3"
+    # Comprise's P.N names its own chapter P (`own_p`); its § names other documents and is never linked.
+    assert "S:section/P.3" in c.item("S:section/root").data.get("mentions", []) or any(
+        "S:section/P.3" in (it.data.get("mentions") or []) for it in c.items.values())
+    assert not [it for it in c.items.values() if it.data.get("xrefs")]
 
 
 # ---------------------------------------------------------------------------
@@ -479,7 +482,8 @@ the specification, read in section 18.4.
     assert w["how"] == "see section 11 for <strong>setup</strong>, and section 11.2."
     assert w["ideas"] == "- save the articles a project leans on."
     assert w["see"] == ["S:section/11", "S:section/11.2"]
-    assert items[1]["xrefs"] == ["macrocosm-oes@0.0.2:section:18.4"] and "see" not in items[1]
+    assert items[1]["xrefs"] == [f"macrocosm-oes@{D.document_version('macrocosm-oes')}:section:18.4"]
+    assert "see" not in items[1]
     assert w["provenance"]["sources"] == ["help-docs.md#L5-L17"]
 
 
@@ -504,37 +508,63 @@ def test_the_real_bubbles(built):
 # Thym and Ascribe (0.5.0, lane X2): the two specifications written in MacroCOSM OES
 # ---------------------------------------------------------------------------
 
-def test_the_four_documents():
-    assert list(D.DOCUMENTS) == ["macrocosm-oes", "thym", "ascribe", "help-center"]
-    for slug, name, version, path in (("thym", "Thym 0", "0", "docs/THYM.md"),
-                                      ("ascribe", "Ascribe OES 1", "1", "docs/ASCRIBE.md")):
+def test_the_five_documents():
+    """0.5.4: four specifications — the canonical editions published at cosmoes.org, bundled by
+    scripts/sync_specs.py with their editions in docs/specs.json — and the help center. Names carry no number; a
+    specification's version is its edition, read from specs.json (or a synced state.json), never the grammar's."""
+    assert list(D.DOCUMENTS) == ["macrocosm-oes", "thym", "ascribe", "comprise-oes", "help-center"]
+    editions = D.bundled_editions()
+    assert set(editions) == {"macrocosm-oes", "thym", "ascribe", "comprise-oes"}
+    for slug, name, path in (("macrocosm-oes", "MacroCOSM OES", "docs/MACROCOSM_OES.md"),
+                             ("thym", "Thym", "docs/THYM.md"), ("ascribe", "Ascribe", "docs/ASCRIBE.md"),
+                             ("comprise-oes", "Comprise OES", "docs/COMPRISE_OES.md")):
         d = D.DOCUMENTS[slug]
-        assert (d.slug, d.name, d.version, d.sources) == (slug, name, version, {"en": path})
-        assert (d.chapters, d.reference, d.bubbles, d.voice, d.plain_mentions) == ((), False, {}, None, "all")
+        assert (d.slug, d.name, d.sources, d.spec) == (slug, name, {"en": path}, True)
+        assert (d.chapters, d.bubbles, d.voice, d.plain_mentions, d.version) == ((), {}, None, "all", "")
         assert D.tellings(slug) == ["en"]
-    # Thym's document is "Version 0 of the language"; its MiniCOSM declares thym/1, which is not the document's.
-    assert str(mc.default_registry().get("thym").version) != D.DOCUMENTS["thym"].version
+        e = editions[slug]
+        assert e["name"] == name and e["path"] == path and e["revised"] and e["host"].endswith("cosmoes.org")
+        assert re.fullmatch(r"\d+\.\d+\.\d+", e["edition"])
+        assert hashlib.sha256((REPO / path).read_bytes()).hexdigest() == e["sha256"]   # the bundled text, as synced
+        assert D.document_version(slug) == e["edition"]
+        info = D.spec_info(slug)
+        assert (info["source"], info["path"], info["home"]) == ("bundled", REPO / path, f"https://{e['host']}/")
+        assert D.spec_source(slug) == REPO / path
+        assert not any(ch.isdigit() for ch in d.name)
+    assert D.DOCUMENTS["macrocosm-oes"].reference and not D.DOCUMENTS["thym"].reference
+    assert D.DOCUMENTS["macrocosm-oes"].xref == {"§": "", "README §": "", "P.": ""}
+    assert D.DOCUMENTS["comprise-oes"].own_p and D.DOCUMENTS["comprise-oes"].xref == {"§": ""}
+    # The grammar version is the reader's; a MiniCOSM's declaration version is not an edition either.
+    assert D.document_version("macrocosm-oes") != "" and mc.MACROCOSM_VERSION == "0.5.4"
+    assert str(mc.default_registry().get("thym").version) == "1"
 
 
-def test_thym_and_ascribe_enumerate(built):
-    """The counts lane X1 surveyed (docs/thym-landed-X1.md), the document's own name and version in the catalog,
-    no chapters and no reference, and every term defined in a section of its own document."""
-    for slug, counts in (("thym", {"section": 83, "term": 12, "example": 1, "decision": 18}),
-                         ("ascribe", {"section": 27, "term": 5, "example": 1, "decision": 11})):
+def test_the_three_minicosm_specifications_enumerate(built):
+    """The counts of the 0.5.4 editions (the decisions are the Changes sections' items: 7 + 18, 1 + 11, 2 + 19),
+    the document's name and edition in the catalog with where it came from, no chapters and no reference, and
+    every term defined in a section of its own document."""
+    for slug, counts in (("thym", {"section": 83, "term": 12, "example": 1, "decision": 25}),
+                         ("ascribe", {"section": 27, "term": 2, "example": 1, "decision": 12}),
+                         ("comprise-oes", {"section": 99, "term": 15, "example": 0, "decision": 21})):
         vol = built["vols"][(slug, "en")]
         assert vol.refused is None and vol.id == f"doc/{slug}"
         got = Counter(it.data.get("type") for it in vol.items.values())
         assert {k: got[k] for k in counts} == counts, slug
         assert not [k for k in vol.items if k.startswith(("R:", "B:", "S:chapter/"))], slug
         assert vol.name == D.DOCUMENTS[slug].name
-        assert vol.catalog["document"]["version"] == D.DOCUMENTS[slug].version
-        assert vol.catalog["document"]["path"] == D.DOCUMENTS[slug].sources["en"]
+        doc = vol.catalog["document"]
+        edition = D.document_version(slug)
+        assert doc["version"] == edition and doc["path"] == D.DOCUMENTS[slug].sources["en"]
+        assert doc["source"] == "bundled" and doc["revised"] and doc["home"].endswith(".cosmoes.org/")
         assert vol.catalog.get("chapters") in (None, [])
         for it in vol.items.values():
             if it.data.get("type") == "term":
                 assert it.data["defined_in"] in vol.items, (slug, it.key)
         rows = D.inventory(vol)
-        assert rows and all(r["inventory"] == slug and r["version"] == D.DOCUMENTS[slug].version for r in rows)
+        assert rows and all(r["inventory"] == slug and r["version"] == edition for r in rows)
+        decisions = [it for it in vol.items.values() if it.data.get("type") == "decision"]
+        assert decisions and all(d.data.get("edition") for d in decisions), slug
+        assert decisions[0].data["edition"] == "0.5.4" and decisions[0].data["dated"] == "2026-11-03", slug
 
 
 # ---------------------------------------------------------------------------
@@ -606,8 +636,10 @@ def test_status(tmp_path):
     rows = {(r["doc"], r["lang"]): r for r in D.status(docs_root=out, sources=src)["documents"]}
     assert rows[("help-center", "en")]["fresh"] is True
     assert rows[("help-center", "fr")]["exists"] is False and rows[("macrocosm-oes", "en")]["fresh"] is False
-    assert rows[("thym", "en")]["exists"] is False and rows[("ascribe", "en")]["exists"] is False   # no sources here
-    assert [r for r in rows if r[0] in ("thym", "ascribe")] == [("thym", "en"), ("ascribe", "en")]
+    for slug in ("thym", "ascribe", "comprise-oes"):
+        assert rows[(slug, "en")]["exists"] is False                                   # no sources here
+    assert [r for r in rows if r[0] in ("thym", "ascribe", "comprise-oes")] == \
+        [("thym", "en"), ("ascribe", "en"), ("comprise-oes", "en")]
 
 
 # ---------------------------------------------------------------------------
@@ -624,11 +656,9 @@ def test_stale_provenance_hash(built, tmp_path):
     m = root / "defaults/cosm/manifests/emf.manifest.cosm"
     m.write_text(m.read_text(encoding="utf-8").replace("subtitle: What the text claims, and how it knows",
                                                        "subtitle: What the text claims"), encoding="utf-8")
-    ch = root / "defaults/cosm/chapters/comprise-oes.md"
-    ch.write_text(ch.read_text(encoding="utf-8") + "\nedited by hand\n", encoding="utf-8")
     rep = D.lint_doc(vol, sources=root, registry=mc.Registry([root / "defaults/cosm/manifests"]))
     stale = {p.item for p in rep.warnings if p.check == "stale-provenance-hash"}
-    assert {"R:module/emf.P", "S:chapter/comprise-oes"} <= stale
+    assert "R:module/emf.P" in stale
     assert "R:module/emf.L" not in stale
 
 
@@ -638,21 +668,27 @@ def test_stale_provenance_hash(built, tmp_path):
 
 def test_inventory_and_cross_volume_references(built):
     vol = built["vols"][("macrocosm-oes", "en")]
+    ver = D.document_version("macrocosm-oes")
     rows = D.inventory(vol)
     by_xref = {r["xref"]: r for r in rows}
-    own = by_xref["macrocosm-oes@0.0.2:section:18.5"]
-    assert own == {"inventory": "macrocosm-oes", "xref": "macrocosm-oes@0.0.2:section:18.5",
-                   "id": "S:section/18.5", "kind": "section", "version": "0.0.2", "anchor": "sec-18-5",
+    own = by_xref[f"macrocosm-oes@{ver}:section:18.5"]
+    assert own == {"inventory": "macrocosm-oes", "xref": f"macrocosm-oes@{ver}:section:18.5",
+                   "id": "S:section/18.5", "kind": "section", "version": ver, "anchor": "sec-18-5",
                    "atem": vol.item("S:section/18.5").data["atem"]}
-    assert by_xref["comprise@1:section:2.5"]["id"] == "S:section/comprise.2.5"
-    assert by_xref["comprise@1:term:concern"]["id"] == "T:term/comprise.concern"
-    assert by_xref["comprise@1:kind:C.bond"]["id"] == "R:kind/comprise.C.bond"     # the reference Comprise declares
-    assert by_xref["macrocosm-oes@0.0.2:kind:comprise.C.bond"]["id"] == "R:kind/comprise.C.bond"
-    assert D.resolve_xref("comprise@1:section:P.3.1", rows)["id"] == "S:section/comprise.P.3.1"
-    assert D.resolve_xref("comprise@1:section:99", rows) is None
-    assert D.resolve_xref("comprise@2:section:2.5", rows) is None                   # the version is part of it
-    assert D.resolve_xref("not a reference", rows) is None
-    assert all(r["atem"] for r in rows)
+    assert by_xref[f"macrocosm-oes@{ver}:kind:comprise.C.bond"]["id"] == "R:kind/comprise.C.bond"  # Comprise's manifest
+    assert not [x for x in by_xref if x.startswith("comprise@")]      # Comprise's sections are its own document's now
+    # Comprise OES's inventory is its own (0.5.4), under its edition; P.N sections are addressable like any other.
+    cvol = built["vols"][("comprise-oes", "en")]
+    cver = D.document_version("comprise-oes")
+    crows = D.inventory(cvol)
+    cby = {r["xref"]: r for r in crows}
+    assert cby[f"comprise-oes@{cver}:section:2.5"]["id"] == "S:section/2.5"
+    assert cby[f"comprise-oes@{cver}:section:P.3"]["id"] == "S:section/P.3"
+    assert D.resolve_xref(f"comprise-oes@{cver}:section:P.3", crows)["id"] == "S:section/P.3"
+    assert D.resolve_xref(f"comprise-oes@{cver}:section:99", crows) is None
+    assert D.resolve_xref("comprise-oes@2:section:2.5", crows) is None            # the version is part of it
+    assert D.resolve_xref("not a reference", crows) is None
+    assert all(r["atem"] for r in rows) and all(r["atem"] for r in crows)
 
 
 # ---------------------------------------------------------------------------
@@ -668,9 +704,13 @@ def test_cli(tmp_path, capsys):
     assert D.main(["compile", "help-center", "--lang", "fr", "--docs-root", out]) == 0
     assert capsys.readouterr().out == _read("enough/static/i18n/fr/help-center.md")
     assert D.main(["inventory", "macrocosm-oes", "--docs-root", out]) == 0
-    assert "comprise@1:section:2.5\tS:section/comprise.2.5\t" in capsys.readouterr().out
-    assert D.main(["compile", "macrocosm-oes", "--chapter", "comprise-oes", "--docs-root", out]) == 0
-    assert capsys.readouterr().out == _read("defaults/cosm/chapters/comprise-oes.md")
+    assert f"macrocosm-oes@{D.document_version('macrocosm-oes')}:section:18.5\tS:section/18.5\t" in \
+        capsys.readouterr().out
+    assert D.main(["inventory", "comprise-oes", "--docs-root", out]) == 0
+    assert f"comprise-oes@{D.document_version('comprise-oes')}:section:2.5\tS:section/2.5\t" in \
+        capsys.readouterr().out
+    assert D.main(["compile", "comprise-oes", "--docs-root", out]) == 0
+    assert capsys.readouterr().out == _read("docs/COMPRISE_OES.md")
     assert D.main(["lint", "macrocosm-oes", "--docs-root", out, "--json"]) == 0
     assert json.loads(capsys.readouterr().out)["ok"] is True
     assert D.main(["status", "--docs-root", out]) == 0

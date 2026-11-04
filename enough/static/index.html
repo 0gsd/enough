@@ -11456,6 +11456,13 @@
       color: var(--fg-muted);
     }
 
+    /* The specifications preference's one-line note (0.5.4): under the
+       controls row, read left to right like the row above it. */
+    #ui-modal .ui-specs-sync-note {
+      text-align: left;
+      padding: 0 16px 6px;
+    }
+
     /* ---- the one-line controls row (uiscale round) ---- */
     #ui-modal #ui-controls-row {
       align-items: center;
@@ -18367,7 +18374,7 @@
           <button type="button" class="help-center-launch" id="ui-specs-btn"
             aria-haspopup="menu" aria-expanded="false" aria-controls="ui-specs-menu"
             data-i18n-title="docs.launch.specs.title"
-            title="the MacroCOSM specification and the two written in it, Thym and Ascribe"
+            title="the MacroCOSM specification and the three written in it: Thym, Ascribe and Comprise OES"
             onclick="uiSpecsMenu();">
             <img class="svg-icon" data-icon="macrocosm" alt="" draggable="false">
             <span data-i18n="docs.launch.spec.label">MacroCOSM</span>
@@ -18390,10 +18397,19 @@
             </button>
             <button type="button" class="ui-specs-item" role="menuitem" id="ui-ascribe-btn"
               data-i18n-title="docs.launch.ascribe.title"
-              title="open the Ascribe OES specification — the holograph: a person, described without a name"
+              title="open the Ascribe specification — the holograph: a person, described without a name"
               onclick="closeUIModal(); enterDocsMode({doc: 'ascribe'});">
               <img class="svg-icon" data-icon="readvisor-rename" alt="" draggable="false">
               <span data-i18n="docs.launch.ascribe.label">Ascribe</span>
+            </button>
+            <!-- 0.5.4: Comprise OES, a document of its own (two chapters of
+                 MacroCOSM OES before), from cosmoes.org like the other three. -->
+            <button type="button" class="ui-specs-item" role="menuitem" id="ui-comprise-btn"
+              data-i18n-title="docs.launch.comprise.title"
+              title="open the Comprise OES specification — a company as Comprise describes one: the Holotype, its isotype and the outside chart"
+              onclick="closeUIModal(); enterDocsMode({doc: 'comprise-oes'});">
+              <img class="svg-icon" data-icon="cosm" alt="" draggable="false">
+              <span data-i18n="docs.launch.comprise.label">Comprise OES</span>
             </button>
           </div>
         </div>
@@ -18451,6 +18467,18 @@
             <span class="ui-scale-name" data-i18n="prefs.uiLanguage">ui language</span>
             <select id="ui-language"></select>
           </label>
+          <!-- Keep the specifications current from cosmoes.org (0.5.4).
+               Machine-global like the language (ui.json `specs_sync`, POST
+               /api/ui-config; absent reads as on), so it stays on the home
+               screen too; takes effect at the next launch, when the check
+               runs once (enough/specs.py). The note under the row says what
+               it does. -->
+          <label class="ui-check-label" id="ui-specs-sync-item"
+            title="one request to cosmoes.org per launch, for the manifest of the four specifications; off, enough shows the copies it ships"
+            data-i18n-title="prefs.specsSync.title">
+            <input type="checkbox" id="ui-specs-sync">
+            <span data-i18n="prefs.specsSync">keep the specifications current from cosmoes.org</span>
+          </label>
           <!-- Agent-free mode (0.4.4, plan §13). Machine-global like the
                language (ui.json `agent_free`, POST /api/ui-config), so it
                stays on the home screen too. An HTML slider, not an icon:
@@ -18474,6 +18502,7 @@
             </button>
           </span>
         </div>
+        <div class="ui-head-note ui-specs-sync-note" id="ui-specs-sync-note" data-i18n="prefs.specsSync.note">On launch enough asks cosmoes.org once for the specifications’ manifest and fetches only a changed text. Nothing of yours is sent.</div>
         <!-- convert §5.7: extras. One row per optional dependency group;
              "PDF reading" is the only one in 0.2.3. State comes from
              GET /api/convert/install/status + the engines object from
@@ -21595,15 +21624,19 @@
     //   help-center    the enough manual, in the UI language's telling
     //                  (six tellings, one id-set; a translation tells a few
     //                  items in English and says so), icon hxc;
-    //   macrocosm-oes  the MacroCOSM OES specification with its synced
-    //                  chapters (Comprise OES 1, its paradigm map), English
-    //                  only, icon macrocosm;
-    //   thym           Thym 0, the language, its compiler and its runtime
+    //   macrocosm-oes  MacroCOSM OES, the grammar (docs/MACROCOSM_OES.md),
+    //                  English only, icon macrocosm;
+    //   thym           Thym, the language, its compiler and its runtime
     //                  (docs/THYM.md, 0.5.0), English only, icon cosm;
-    //   ascribe        Ascribe OES 1, a person's holograph (docs/ASCRIBE.md,
-    //                  0.5.0), English only, icon readvisor-rename.
-    // The three specifications share one chrome (`kind: 'spec'` below): the
-    // toolbar's "specification", a badge "<title> · v<version>", and in a
+    //   ascribe        Ascribe, a person's holograph (docs/ASCRIBE.md,
+    //                  0.5.0), English only, icon readvisor-rename;
+    //   comprise-oes   Comprise OES, a company as Comprise describes one
+    //                  (docs/COMPRISE_OES.md, 0.5.4), English only, icon cosm.
+    // The four are the canonical editions published at cosmoes.org, kept
+    // current from it once per launch (enough/specs.py); names carry no
+    // number, the edition is a field. They share one chrome (`kind: 'spec'`
+    // below): the toolbar's "specification", a badge "<title> · edition
+    // <edition>" whose title says where the text came from, and in a
     // translated UI the note that they are written in English. (A Thym
     // program, 0.5.0, is a fifth, file-backed kind: DOCS_DOCS.program.)
     // Three densities, one control, remembered per document (default
@@ -21641,7 +21674,7 @@
     //           words like "project" and "find"); DocOES counts mentions
     //           the same way (docs/docoes-landed-D1.md);
     //   kind:   'spec' for a specification (English only; the toolbar says
-    //           "specification", the badge "<title> · v<version>", a
+    //           "specification", the badge "<title> · edition <edition>", a
     //           translated UI gets docs.note.specEnglish);
     //   stack:  the mode stack's icon title for it.
     const DOCS_DOCS = {
@@ -21654,6 +21687,10 @@
         stack: () => t('modes.docs.thym.icon', 'Thym specification') },
       ascribe: { icon: 'readvisor-rename', unwrap: true, plain: 'all', kind: 'spec',
         stack: () => t('modes.docs.ascribe.icon', 'Ascribe specification') },
+      // 0.5.4: Comprise OES, a document of its own (two chapters of MacroCOSM
+      // OES before), pulled from cosmoes.org like the other three.
+      'comprise-oes': { icon: 'cosm', unwrap: true, plain: 'all', kind: 'spec',
+        stack: () => t('modes.docs.comprise.icon', 'Comprise OES specification') },
       // 0.5.0: a Thym program (any `.thym` file; DOCS.prog names it), drawn
       // by DOCS_PROGRAM_DENSITIES in the Thym block.
       program: { icon: 'cosm', unwrap: false, plain: 'all',
@@ -21667,16 +21704,16 @@
 
     // Where "§N", "README §N" and "P.N" point, by the scope a sentence is
     // written in ('' = the document itself, else a chapter's prefix) —
-    // DocOES's cross-volume rule: the spec's § and P.N are Comprise's;
-    // Comprise's own § names other documents and is never linked.
-    // "section N" always names a section of its own scope. A scope not
-    // listed links all three forms to itself.
+    // DocOES's rule: in MacroCOSM OES the three forms name sections of other
+    // documents (Comprise OES, the paradigm map, each at its own cosmoes.org
+    // home since 0.5.4) and are never linked; Comprise OES's own § names
+    // other documents (never linked) and its P.N its own chapter P.
+    // "section N" always names a section of its own scope; "its section N"
+    // (0.5.4) is another document's and is never linked. A scope not listed
+    // links all three forms to itself.
     const DOCS_XREF_RULES = {
-      'macrocosm-oes': {
-        '': { para: 'comprise', readme: 'comprise-map', letter: 'comprise' },
-        comprise: { para: null, readme: 'comprise-map', letter: 'comprise' },
-        'comprise-map': { para: 'comprise', readme: 'comprise-map', letter: 'comprise' },
-      },
+      'macrocosm-oes': { '': { para: null, readme: null, letter: null } },
+      'comprise-oes': { '': { para: null, readme: null, letter: '' } },
     };
 
     // "section 7.3" and its five translations, "sections 4 to 14" and
@@ -21689,7 +21726,7 @@
         + '|から|と|至|到|和|及|与)\\s*';
       const list = num + '(?:' + join + num + ')*';
       return new RegExp(
-        '(?:\\b(?:sections?|secci[oó]n(?:es)?|Abschnitt(?:en|e)?)\\s+|セクション\\s*)(' + list + ')'
+        '(?:(?<![Ii]ts\\s)\\b(?:sections?|secci[oó]n(?:es)?|Abschnitt(?:en|e)?)\\s+|セクション\\s*)(' + list + ')'
         + '|第\\s*(' + num + ')\\s*节'
         + '|(README\\s+)?§§?\\s*(' + list + ')'
         + '|\\b([A-Z])\\.(\\d+(?:\\.\\d+)*)\\b', 'giu');
@@ -21801,8 +21838,8 @@
       try { localStorage.setItem(docsDensityKey(doc), d); } catch (_e) { /* not kept */ }
     }
 
-    // Warm all nine tellings in the background (D2: POST /api/docs/build;
-    // the help center's six and the three specs'), once, when the UI
+    // Warm all ten tellings in the background (D2: POST /api/docs/build;
+    // the help center's six and the four specs'), once, when the UI
     // window first opens — not at page load.
     function docsWarm() {
       if (DOCS.warmed) return;
@@ -22007,18 +22044,32 @@
       setIcon(docsEl('docs-icon'), DOCS_DOCS[doc] ? DOCS_DOCS[doc].icon : 'hxc');
       docsEl('docs-title').textContent = doc === 'program' ? t('docs.title.program', 'program')
         : (spec ? t('docs.title.spec', 'specification') : t('docs.title.help', 'help center'));
-      let badge = '';
+      let badge = '', badgeTitle = '';
       if (data && doc === 'program') {
         badge = String(data.name || '') + (data.rel ? ' · ' + data.rel : '');
       } else if (data && spec) {
-        const ver = data.document && data.document.version;
-        badge = (data.title || doc) + (ver ? ' · v' + ver : '');
+        // 0.5.4: "<name> · edition <edition>" (names carry no number, the
+        // edition is a field, never a "v"), and in the title where the text
+        // came from: cosmoes.org and its revision date, or the copy bundled
+        // with this enough (the catalog's `document.source`, `.revised`).
+        const dc = data.document || {};
+        const ver = dc.version ? String(dc.version) : '';
+        badge = ver
+          ? t('docs.badge.edition', '{name} · edition {edition}')
+            .replace('{name}', () => data.title || doc).replace('{edition}', () => ver)
+          : (data.title || doc);
+        badgeTitle = dc.source === 'cosmoes'
+          ? t('docs.badge.fromCosmoes', 'from cosmoes.org, revised {date}')
+            .replace('{date}', () => String(dc.revised || ''))
+          : t('docs.badge.bundled', 'bundled with enough {version}')
+            .replace('{version}', () => String((BOOT_UI_STATE && BOOT_UI_STATE.version) || ''));
       } else if (data && data.telling && data.telling.voice) {
         const v = String(data.telling.voice);
         badge = t('docs.badge.voice', 'written by {voice}')
           .replace('{voice}', () => v.charAt(0).toUpperCase() + v.slice(1));
       }
       docsEl('docs-badge').textContent = badge;
+      docsEl('docs-badge').title = badgeTitle;
       const note = docsEl('docs-note');
       let msg = '';
       if (data && data.requested_lang && data.requested_lang !== data.lang) {
@@ -23802,6 +23853,10 @@
         }
       }
       if (langSel) langSel.value = I18N.lang;
+      // Keep the specifications current from cosmoes.org (0.5.4): the
+      // top-level ui.json flag; absent reads as on.
+      const ss = document.getElementById('ui-specs-sync');
+      if (ss) ss.checked = !(UI_CONFIG && UI_CONFIG.specs_sync === false);
     }
 
     async function saveUIConfig(partial) {
@@ -23838,8 +23893,9 @@
     window.closeUIModal = closeUIModal;  // inline onclick handlers need this
 
     // The specifications menu in the header row (0.5.0, lane X2): the
-    // MacroCOSM button opens it, its three items open MacroCOSM OES, Thym
-    // and Ascribe in the docs viewer. Opening puts focus on the first item;
+    // MacroCOSM button opens it, its four items open MacroCOSM OES, Thym,
+    // Ascribe and (0.5.4) Comprise OES in the docs viewer. Opening puts
+    // focus on the first item;
     // ↑/↓/Home/End move, Esc closes it (not the window) and gives focus
     // back to the button, Tab or a click elsewhere closes it.
     function uiSpecsMenu(open, opts = {}) {
@@ -23907,6 +23963,9 @@
     });
     document.getElementById('ui-language')?.addEventListener('change', (e) => {
       setUILanguage(e.target.value);
+    });
+    document.getElementById('ui-specs-sync')?.addEventListener('change', (e) => {
+      saveUIConfig({ specs_sync: !!e.target.checked });
     });
     document.getElementById('ui-help-bubbles')?.addEventListener('change', async (e) => {
       const enabled = e.target.checked;

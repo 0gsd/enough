@@ -42,7 +42,9 @@ use std::path::{Path, PathBuf};
 ///   ship (0.2.8; before this the .app's help center 404'd).
 /// - `docs/MACROCOSM_OES.md` — DocOES (the in-app docs viewer, 0.4.4) reads it from
 ///   `<package parent>/docs/` the same way (0.4.3). The single file again,
-///   for the same reason as HELP_CENTER.
+///   for the same reason as HELP_CENTER. `docs/THYM.md`, `docs/ASCRIBE.md`,
+///   `docs/COMPRISE_OES.md` and `docs/specs.json` (0.5.4) ride the same way:
+///   the four specifications bundled from cosmoes.org and their editions.
 /// - `reflib/dict` — FEED's shipped text form (~380 MB of JSON lines, plus
 ///   its manifest and NOTICE), which `enough/dictionary.py` builds into
 ///   `~/enough/dict/feed.sqlite` on first launch. That one subfolder only:
@@ -58,6 +60,11 @@ const SNAPSHOT: &[&str] = &[
     // 0.5.0: the Thym and Ascribe specifications, read by `/api/thym-spec` and the docs viewer's terms the same way.
     "docs/THYM.md",
     "docs/ASCRIBE.md",
+    // 0.5.4: the fourth specification, Comprise OES, and `docs/specs.json`, the four bundled editions (name,
+    // edition, revised, home; written by scripts/sync_specs.py from cosmoes-site) that the docs viewer's badge and
+    // `enough/specs.py`'s launch check read. The single files again; the chapters folder is gone.
+    "docs/COMPRISE_OES.md",
+    "docs/specs.json",
     "enough",
     "defaults",
     "reflib/dict",

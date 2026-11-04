@@ -1,4 +1,4 @@
-# enough — Agent Guide (v0.5.1)
+# enough — Agent Guide (v0.5.4)
 
 > **Audience:** another LLM agent (e.g. a Claude Code session) helping a
 > human modify their local `enough` install. Not for end-users — for an
@@ -77,8 +77,9 @@ Three locations that matter:
 | `~/enough/wikisink/` | Default wikisink location: the user's wikisink *data* (comments, overlays, preserved articles, rankings, run state) and — unless pointed elsewhere — the base `.zim` archive(s). Archives can live anywhere, external drives included; several installs can be registered at once. Hidden from the file-manager tree. | Managed via the 🚰 UI; don't hand-edit. |
 | `~/enough/canon/` | The machine-global **Canon** store (0.4.3; `~/enough/cacheawl/` before, renamed in place on first use — see "Canon"): root-level folders are *volumes* (plain kept-forever text, or cached replicas ingested from a path/URL/wikisink), each carrying a backend-owned `canon.cosm` catalog and a hidden `.canon.json`. Global wiki saves land in the `wiki/` volume; the dissolved infoworld folders became the `personal`/`public`/`wiki` volumes. Seam **`ENOUGH_CANON_ROOT`**, then the legacy `ENOUGH_CACHEAWL_ROOT`. Hidden from every project's file tree. | Managed via Canon mode + the readvisors' `canon_*` tools; `canon.cosm` and `.canon.json` are backend-owned. |
 | `~/enough/dict/` | FEED's state root (0.4.1), seam **`ENOUGH_DICT_ROOT`**: `feed.sqlite`, the official dictionary — **built** from the shipped `reflib/dict/` and disposable (rebuilt whenever the manifest digest moves) — and `user-dictionary.sqlite`, the user's own entries — **precious**: created on the first write, never rebuilt or deleted by code. Install-wide, not per project. See "The dictionary (FEED)". | `feed.sqlite` is the build's; the user DB changes only through the `dict_*` tools and `DELETE /api/dict/user/{word}`. Don't hand-edit either. |
-| `~/enough/docoes/` | DocOES's built doc volumes (0.4.4), seam **`ENOUGH_DOCS_ROOT`**: one `<doc>.<lang>.doc.cosm` per telling — `macrocosm-oes.en` (the spec, with Comprise's two chapters and the reference generated from the manifests), `thym.en` and `ascribe.en` (the Thym and Ascribe specifications, 0.5.0) and `help-center.<lang>` ×6 (the manual + its bubbles) — **built** by `enough/docoes.py` from the install's own markdown and manifests the first time a route or `doc_lookup` asks, and rebuilt whenever the source digest moves (like `feed.sqlite`). Disposable, never committed, never in a file tree. Install-wide. See "DocOES". | Only `docoes.build()` writes it (atomic `os.replace`). **Every DocOES CLI run and every scratch server exports the seam** — an unseamed `python -m enough.docoes lint …` builds into the real `~/enough/docoes/`. |
+| `~/enough/docoes/` | DocOES's built doc volumes (0.4.4), seam **`ENOUGH_DOCS_ROOT`**: one `<doc>.<lang>.doc.cosm` per telling — `macrocosm-oes.en` (the spec with the reference generated from the manifests), `thym.en`, `ascribe.en` and `comprise-oes.en` (the four OES specifications, 0.5.4: the bundled editions, or the copies synced from cosmoes.org) and `help-center.<lang>` ×6 (the manual + its bubbles) — **built** by `enough/docoes.py` from the install's own markdown and manifests the first time a route or `doc_lookup` asks, and rebuilt whenever the source digest moves (like `feed.sqlite`). Disposable, never committed, never in a file tree. Install-wide. See "DocOES". | Only `docoes.build()` writes it (atomic `os.replace`). **Every DocOES CLI run and every scratch server exports the seam** — an unseamed `python -m enough.docoes lint …` builds into the real `~/enough/docoes/`. |
 | `~/enough/thym/` | Thym's state root (0.5.0), seam **`ENOUGH_THYM_ROOT`** (read by `thym_host.host_root()` and `thym.trace.runs_dir`): `runs/<run-id>/` per run — `<run-id>.plan.cosm`, `<run-id>.trace.cosm`, `candidates/` (every coprocessor answer, `<node>[-<k>].<attempt>.cosm`, and every engine call, `<node>-e<k>.1.cosm`), `stage/` while it runs, `outputs/<gives>.<ext>` once every node has passed. **Never created by asking**: `GET /api/thym/runs` answers `[]` when it is absent; the first run makes it. Install-wide; records, not precious (a run is replayable from its folder). See "Thym". | Only the runtime writes it (`thym.run.run`, from `POST /api/thym/run`, `/api/canon/package`, `/api/canon/read`, `thym_run` and the CLI). **Every Thym CLI run and every scratch server exports the seam** — `python -m enough.thym run` without it writes into the real `~/enough/thym/`. |
+| `~/enough/specs/` | The specifications synced from cosmoes.org (0.5.4), seam **`ENOUGH_SPECS_ROOT`** (`docoes.specs_root()`): the vendored client's folder — `<slug>/source.md` for `macrocosm-oes`, `thym`, `ascribe` and `comprise-oes`, `manifest.json` (the last manifest fetched, verbatim) and `state.json` (each document's name, edition, revised date, host and the source's sha256). Written only by the launch check (`enough/specs.py`: once per server start, a daemon thread, when the `specs_sync` preference is on and `ENOUGH_SPECS_SYNC` is not `0`); read by `docoes.spec_source()`, which uses a copy only while state.json's sha256 matches the file and reads the bundled text otherwise. Never created by asking; disposable (the bundled texts are the floor). See "DocOES" → "The specifications from cosmoes.org". | Only the client writes it (temp file + `os.replace`, state.json last). **Every test and scratch rig exports the seam, `ENOUGH_SPECS_SYNC=0` and `ENOUGH_COSMOES_BASE` (a dead loopback port)** — nothing in the suite may reach cosmoes.org. |
 | `<project>/rness/` | The per-project skeleton. Symlinks back into `~/enough/defaults/` for shipped paradigms/skills/policies/**readvisors** (and into `~/enough/readvisors/` for the user's own); per-project copies of `AGENT.md`, `MOTIVATION.md`, `active-paradigm`, `project.json`; per-project state in `io/`, `requests/`, `knowledge/`. Composure-round additions: **`rness/readvisors/`** (was `roles/`, migrated by `skeleton._migrate_roles_to_readvisors`), **`rness/io/composure/`** (where new `.comp` files land — in `_EMPTY_DIRS`, so it is back-filled on every launch), **`rness/composure-forms/`** (project forms; **not** in `_EMPTY_DIRS` — created on the first save-as-form) and **`rness/knowledge/councils/`** (exported council transcripts, created by `council.py` on the first conclude). 0.4.3 adds **`rness/canon.cosm`**, the project's catalog (backend-owned, write-refused, written lazily — see "Canon"). | Edit to affect just this project (never `rness/canon.cosm`). |
 | `<dir>/.<name>.comp.comments.json` | A composure's comments sidecar, beside the `.comp` it belongs to. Backend-owned, hidden from the tree by the leading dot, carried along by `composure.move_sidecars()` on a rename. Both write doors refuse it by name. | Managed via the composure comment endpoints; don't hand-edit. |
 
@@ -133,7 +134,9 @@ Every Python module in `enough/`:
 | [enough/canon.py](../enough/canon.py) | ~2300 | Canon (0.4.3; the cacheawl store, moved and extended): volume CRUD, path/URL/wikisink **ingest** (with the Holotype privacy filter), the `canon.cosm` volume catalogs and the project catalog `rness/canon.cosm`, reconcile, the on-demand merirmaid mirror, the catalog/meta write-guards, transfer (copy/move), the one-time store-folder rename, the EMF-twin listing rules (`emf_state` is the one fresh/stale rule), the launch-time `infoworld` migration, and (0.5.0) Thym packages as volume kinds: the suffixes `PACKAGE_FOLDER_SUFFIX` (`.thym`), `PACKAGE_FILE_SUFFIX` (`.package.cosm`), `SEALED_SUFFIX` (`.thym.enc`), `is_package_folder` (a `<stem>.thym/` whose `package.cosm` sniffs `oes: thym/1`) / `is_package_file` / `is_sealed_package` / `package_stem` / `package_text_name` / `packages_beside`; `file_kind` says `package` / `sealed`; the scan never recurses a package folder and the catalog lists one as a single `kind: package` item; `catalog_excerpt` (the surrounding context, built in memory). Root `~/enough/canon/` (`ENOUGH_CANON_ROOT`, then `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store. Still exports the generic folder→flowchart walker `home.py` builds project maps with. See "Canon". | `root()`, `migrate_store_folder()`, `create_volume()` / `list_volumes()` / `volume_tree()` / `rename_volume()` / `delete_volume()` / `require_volume()`, `run_ingest()`, `build_catalog()` / `regenerate_catalog()` / `project_catalog(project_dir, *, write=)`, `reconcile()` / `reconcile_all()`, `build_mirror()`, `folder_flowchart()`, `is_catalog_file()` / `catalog_write_denial()`, `emf_twin_path()` / `is_emf_twin()` / `emf_state()` / `twin_header()`, `is_holotype_folder()`, `slug()` / `item_slugs()` / `file_kind()`, `transfer()`, `migrate_infoworld()`, `CanonError` / `CanonNotFound`, `CATALOG_ITEM_CAP` |
 | [enough/cacheawl.py](../enough/cacheawl.py) | 77 | **A compatibility shim, for one release** (0.4.3): explicit re-exports of every public name of the old module mapped onto `canon` (`box_dir` → `volume_dir`, `regenerate_mirror` → `regenerate_catalog`, `mirror_write_denial` → `catalog_write_denial`, the `*cachebox*` CRUD → `*_volume`, `CacheawlError = CanonError` …), plus the three private names `tests/test_cacheawl*.py` reach for. New code imports `canon` | — |
 | [enough/macrocosm.py](../enough/macrocosm.py) | ~2150 | The MacroCOSM OES reference reader (0.4.3): the COSM YAML loader, manifests and the registry, volumes, paths/URIs, references, the sixteen generic checks, Mermaid lenses and the text tree, a CLI. **PyYAML + stdlib only, imports nothing from enough** — vendorable as one file. See "MacroCOSM". | `yaml_load()` / `dump()` / `sniff_declaration()`, `Registry` / `default_registry()` / `load_manifest()` (seven manifests since 0.5.0; `*.moves.cosm` sidecars are not manifests), `Volume.name` (falls back to a catalog's `handle`, so a holograph is titled by its pseudonym — 0.5.0), `load_volume()` → `Volume`, `parse_path()` / `resolve_path()` / `qualified_uri()`, `resolve_ref()`, `lint()` → `Report`, `lenses()` / `to_mermaid()` / `to_text_tree()`, `Refusal` (falsy), `CHECKS`, `DEFAULT_MANIFEST_DIR` |
-| [enough/docoes.py](../enough/docoes.py) | ~2250 | DocOES (0.4.4): a markdown document enumerated as a `doc/1` volume — sections, terms, examples, decisions, Comprise's chapters, the help bubbles, and the reference (`R:` items) generated from the MiniCOSM manifests; build-on-digest into `ENOUGH_DOCS_ROOT`; the byte-for-byte round trip; inventories and cross-volume refs; DocOES's seven checks; a CLI. stdlib + PyYAML + `enough.macrocosm`. See "DocOES". | `DOCUMENTS`, `BUBBLE_DOCUMENT`, `tellings()`, `docs_root()`, `ensure_built()` / `is_fresh()` / `build()` / `load_built()`, `catalog_for()`, `compile_doc()`, `inventory()` / `resolve_xref()`, `lint_doc()`, `atem_problems()`, `DocsUnavailable` |
+| [enough/docoes.py](../enough/docoes.py) | ~2250 | DocOES (0.4.4): a markdown document enumerated as a `doc/1` volume — sections, terms, examples, the decisions of a "Decisions …" or (0.5.4) "Changes" section, the help bubbles, and the reference (`R:` items) generated from the MiniCOSM manifests; build-on-digest into `ENOUGH_DOCS_ROOT`; the byte-for-byte round trip; inventories and cross-volume refs; DocOES's seven checks; a CLI. Since 0.5.4 the four specifications resolve to a synced copy under `ENOUGH_SPECS_ROOT` when one is in use, with their editions from `docs/specs.json` or the synced `state.json`. stdlib + PyYAML + `enough.macrocosm`. See "DocOES". | `DOCUMENTS`, `BUBBLE_DOCUMENT`, `tellings()`, `docs_root()`, `specs_root()`, `bundled_editions()`, `spec_info()` / `spec_source()` / `document_version()`, `validate_spec_source()`, `ensure_built()` / `is_fresh()` / `build()` / `load_built()`, `catalog_for()`, `compile_doc()`, `inventory()` / `resolve_xref()`, `lint_doc()`, `atem_problems()`, `DocsUnavailable` |
+| [enough/specs.py](../enough/specs.py) | ~170 | The specifications kept current from cosmoes.org (0.5.4): the launch check — one daemon thread per server start running the vendored client's `sync` of the four sources into `ENOUGH_SPECS_ROOT`, each candidate validated by `docoes.validate_spec_source` (a real DocOES build) — its report for `GET /api/specs-status`, the `specs_sync` preference and the three seams. Never on the request path, never blocking startup, one request per launch, 3 s timeout, INFO when something updated. See "DocOES". | `SLUGS`, `PREF_KEY`, `USER_AGENT`, `launch_check()`, `status()`, `documents()`, `cosmoes_base()`, `sync_allowed()`, `preference_on()`, `reset_for_tests()` |
+| [enough/cosmoes_client.py](../enough/cosmoes_client.py) | ~680 | **Vendored, never edited here** (0.5.4): cosmoes-site's `client/cosmoes_client.py` byte for byte, the commit it was taken from in `docs/specs.json`; the one sync client for cosmoes.org's `/manifest.json` and `/raw/*` — hosts restricted to cosmoes.org (loopback under a loopback base), sha256-verified, 5 MB-capped, same-host redirects only, an ETag, atomic writes, `state.json` last; `sync` never raises for a network or content fault. Stdlib only. A fix goes to cosmoes-site and is taken again by `scripts/sync_specs.py`. | `CosmoesClient`, `Report`, `Fetch`, `basic_validate`, `load_state`, `main` |
 | [enough/canon_derive.py](../enough/canon_derive.py) | ~2220 | The derivation engine (0.4.3): text → EMF twin, EMF → markdown, text or passage → atem, pins. **Pure functions, no server imports**; every model call through an injected `complete`. See "EMF twins and atems". | `derive_emf()`, `derive_atem()`, `compile_short()` / `compile_text()`, `record_short()`, `short_path()` (old name `compiled_path`), `default_order()` / `source_path()`, `pin_atem()` / `next_atem_id()` / `set_file_atem()`, `read_source()`, `write_atomic()` / `write_twin()`, `twin_path()` / `twin_state()`, `candidate_terms()` / `entity_candidates()` / `chunk()`, `DeriveCancelled` / `DeriveError`, `TEXT_SUFFIXES` |
 | [enough/canon_prompts.py](../enough/canon_prompts.py) | ~115 | The derivation prompts, plain strings (`.format` only); test-asserted to name the six stances, rule out pronouns, keep `EMF_SYSTEM` under 2,000 chars and carry the owner's atem definitions verbatim | `EMF_SYSTEM` / `EMF_USER` / `EMF_CONTINUE` / `EMF_RESTART` / `EMF_RETRY` / `EMF_REPAIR`, `ATEM_SYSTEM` / `ATEM_USER` / `ATEM_WHOLE_USER`, `COMPILE_SYSTEM` / `COMPILE_USER` |
 | [enough/canon_jobs.py](../enough/canon_jobs.py) | ~275 | The derivation job table (convert's shape): one writing job per file, the generation-lock rule for model-mode jobs, cooperative cancel, SSE event `canon`. 0.5.0 adds the kinds `thym` (a program's run) and `read` (a reading) and a nested `progress: {node, of, name, move, state}` that `JobContext.progress` passes through | `CanonJobs` (`start` / `snapshot` / `cancel` / `active` / `holding` / `record`), `JobContext`, `EVENT`, `KINDS` |
@@ -142,7 +145,7 @@ Every Python module in `enough/`:
 | [enough/thym_host.py](../enough/thym_host.py) | ~820 | enough's side of Thym: `ModelCoprocessor` over `llm.complete` (schema'd answers, narrow repair, a prose-wrapped YAML answer failing `schema` and re-asked with `ONLY_THE_YAML`), the eight prompt builders (`PROMPTS`), `engines()` (canon, docoes, feed, the surrounding catalog), `preflight_hook` (a plan's largest prompt against the window, `preflight.evaluate`'s words), `Window` (the model's window, read once and only when a model runs), `runtime_kwargs`, `host_root()` (the seam), and the programs a run may pick (`SHIPPED_PROGRAMS` = `defaults/thym/`, `list_programs` project → canon → shipped, `find_program`) | `ModelCoprocessor`, `host_coprocessor()`, `preflight_hook()`, `Window`, `environment()`, `runtime_kwargs()`, `engines()` / `canon_engine()` / `docoes_engine()` / `catalog_engine()`, `PROMPTS`, `host_root()`, `agent_free()`, `SHIPPED_PROGRAMS`, `program_name()` / `list_programs()` / `find_program()` |
 | [enough/thym_api.py](../enough/thym_api.py) | ~985 | HTTP translation for Thym (0.5.0): `build_router(...)` → `GET /api/thym/programs|program|runs|trace`, `POST /api/thym/compile|plan|run`, `POST /api/canon/package|unpack|read`; runs and readings are CanonJobs; outputs land beside the first input all at once (`copy_all`, `land_beside`); `thym_volume` loads `thym:` paths and `.thym` files for `/api/cosm`; export, unpack and the reading's program are generated programs run through the runtime | `build_router()`, `thym_volume()`, `make_plan()`, `asks_refusal()`, `land_beside()`, `list_runs()`, `export_package()`, `unpack_package()`, `reading_program()` / `reading_path()` |
 | [enough/thym_tools.py](../enough/thym_tools.py) | ~450 | The readvisor's two Thym tools (0.5.0), `thym_check` and `thym_run`, behind the `macrocosm-oes` skill (`skill_on`); `register()` like `canon_tools`. No lock, no job; a run lands under the Thym root only | `register()`, `run_thym_check()`, `run_thym_run()`, `skill_on()`, `SKILL_NAME`, `OUTPUTS_NOTE` |
-| [enough/ascribe.py](../enough/ascribe.py) | ~540 | Ascribe OES 1 (0.5.0): a holograph's own checks beside the generic ones — `form-anchored`, `relation-declared`, `when-shape`, `strength-range`, `no-pii` (a warning, never an error), `private-marker` (a note) — plus `id-module` held to the module folders and `catalog-key` to the hid and handle; `python -m enough.ascribe lint <folder> [--json]`. Stdlib + `enough.macrocosm`; reads the folder it is given, writes nothing; no route, viewer or tool calls it. Spec: [docs/ASCRIBE.md](ASCRIBE.md) | `lint_holograph()`, `pii_findings()`, `name_bigrams()`, `when_ok()` / `strength_ok()`, `private_drops()`, `ASCRIBE_CHECKS`, `PII_PATTERNS`, `IDENTIFYING_FIELDS` |
+| [enough/ascribe.py](../enough/ascribe.py) | ~540 | Ascribe (0.5.0; the `ascribe/1` MiniCOSM): a holograph's own checks beside the generic ones — `form-anchored`, `relation-declared`, `when-shape`, `strength-range`, `no-pii` (a warning, never an error), `private-marker` (a note) — plus `id-module` held to the module folders and `catalog-key` to the hid and handle; `python -m enough.ascribe lint <folder> [--json]`. Stdlib + `enough.macrocosm`; reads the folder it is given, writes nothing; no route, viewer or tool calls it. Spec: [docs/ASCRIBE.md](ASCRIBE.md) | `lint_holograph()`, `pii_findings()`, `name_bigrams()`, `when_ok()` / `strength_ok()`, `private_drops()`, `ASCRIBE_CHECKS`, `PII_PATTERNS`, `IDENTIFYING_FIELDS` |
 | [enough/home.py](../enough/home.py) | ~805 | The home screen (0.2.5): the project **registry** (`~/enough/config/projects.json`, seam `ENOUGH_PROJECTS_STATE`), the ¶/W/C counters ported from the top bar, the fingerprint cache (which since 0.2.8 also snapshots the `rness/project.json` display name/description so an unreachable folder's row keeps its nice name — live reads still win), seeding from the shell's `desktop.json` MRU (temp-dir paths — chiefly the wizard's `$TMPDIR/enough-onboarding` scratch — are refused, skipped, and pruned when the registry is durable, 0.2.8), the project map (via `canon.folder_flowchart`; its skip rule `_mirror_skip` is also what the project catalog enumerates), the add-guards + the osascript folder chooser, and both halves of the open/close handoff. Imports `server` **lazily, inside functions** — `server` imports `home` at module level, and that is the cycle-breaker. | `projects_state_path()` / `config_dir()` / `handoff_path()`, `read_registry()` / `save_registry()` / `register()` / `touch_opened()` / `set_hidden()`, `seed_from_desktop()`, `count_text()` / `fingerprint_of()` / `refresh_entry()` / `list_projects()`, `build_project_mirror()`, `check_addable()` / `add_project()` / `choose_folder()`, `write_handoff()` / `read_handoff()`, `exec_argv()` |
 | [enough/logger.py](../enough/logger.py) | small | Stdlib logging setup. | — |
 | [enough/static/index.html](../enough/static/index.html) | ~46700 | The entire frontend — HTML, CSS, vanilla JS, htmx. Single file. | model modal, broker modal, OPRO-API wizard + settings, file tree (+ option-click context menu), **the readvisor panel** (`#readvisor-panel`, the third `.layout` column — the conversation lives here now, not in a chat home pane), **the composure canvas** (`#composure` at the base layer: `COMP`, `COMP_TOOLS`, `COMP_MODULE_RENDERERS`, `COMP_FORM_BEHAVIORS`, ~126 `comp*` functions), **the composure base indicator + peek** (`html[data-comp-peek]`), SSE consumer, wikisink setup/installs modal + reader mode, the unified read/edit mode (mini ↔ full frame), girraph mode, merirmaid mode (+ lens entries), Canon split-view mode (`#canon-mode`, `cn*`), **the cosm viewer** (`#cosm-mode`, `COSM`, `cosm*`), **the docs viewer** (`#docs-mode`, `DOCS`, `DOCS_DENSITIES`, `DOCS_FAB`, `docs*` — the help center and the MacroCOSM spec at three densities, 0.4.4; it replaced ref mode and the spec viewer), **agent-free mode** (`AGENT_FREE`, `agentFree*`, the CSS block keyed on `html[data-agent-free]`), **the Canon chip + EMF face + atem card + job toasts** (`CANON`, `EMF_FACE`, `canon*`, `emfFace*`, `#atem-modal`, `atemCard*`), the home frame + project map + handoff overlays (gated on `IS_HOME` / `body[data-mode]`), SVG icon pipeline (`data-icon`/`iconSrc`), MODE STACK registry, confirmOverlay, **the shared modal a11y helper** (`MODAL`, `modalSync()`), **the find bar** (`findBarAttach`, `FIND_BARS`), **dictionary mode** (`#dict-mode`, `DICT`, `dict*`), **the word data lightbox** (`#wdl-modal`, `WDL`, `wdl*`) and the **"dictionary entry" menu** (`#dict-ctx-menu`). **The five per-mode chat pills are gone** (review / edit / merirmaid / wiki / cacheawl, as Canon was then called) — there is one composer now, `#message` in the panel |
@@ -172,11 +175,16 @@ skeletons by `skeleton.py`:
   `comprise.moves.cosm` beside it (not a manifest; the registry glob skips it).
   `emf`, `doc` and `thym` carry their own `moves:` blocks. `defaults/cosm/NOTICE.md`: all rights reserved, not
   Apache (see "MacroCOSM" and "License")
-- `defaults/cosm/chapters/` — Comprise OES 1's specification and paradigm map
-  (0.4.4), synced read-only by `scripts/sync_cosm.py` with a `manifest.json`
-  (source commit, sha256 each) and a hand-written `NOTICE.md`: chapters of the
-  spec's doc volume. Comprise's prose, never enough's voice (exempt from the
-  legacy-vocabulary test); never edit it here
+- `docs/specs.json` (0.5.4) — the registry of the four bundled OES specifications as cosmoes-site
+  publishes them (slug, name, edition, describes, host, revised; plus the bundled
+  path and sha256 of each copy), the vendored client's source, commit and sha256,
+  the cosmoes-site commit and the sync date. Written only by
+  `scripts/sync_specs.py --cosmoes <checkout>`; read by `docoes.bundled_editions()`.
+  The texts themselves — `docs/MACROCOSM_OES.md`, `docs/THYM.md`, `docs/ASCRIBE.md`,
+  `docs/COMPRISE_OES.md` — are cosmoes-site's `specs/*.md` byte for byte: edited only
+  there, never here (`tests/test_sync_specs.py` pins the hashes). The
+  `defaults/cosm/chapters/` folder of 0.4.4–0.5.1 (Comprise's texts as chapters of
+  the MacroCOSM volume) is gone: Comprise OES is a document of its own
 - `defaults/thym/*.thym` — the three programs shipped with enough (0.5.0):
   `publish-story`, `read-my-way`, `open-house`, byte for byte the conformance
   suite's `tests/fixtures/thym/programs/` (`tests/test_thym_host.py` pins the
@@ -211,7 +219,7 @@ unit tests: `cargo test` in `desktop/src-tauri/`.
 | [desktop/ui/onboarding.html](../desktop/ui/onboarding.html) | the first-run wizard: welcome → environment → models → extras. Drives the *existing* `/api/models*` endpoints through the Rust proxy; shares nothing with `index.html` |
 | [desktop/src-tauri/tauri.conf.json](../desktop/src-tauri/tauri.conf.json) | `bundle.macOS.dmg` (0.4.1): a 660x400 window, enough.app at (180,170), Applications at (480,170), and a plain background PNG (`desktop/src-tauri/dmg/background.png`) — the background is what makes the bundler park hidden items off-window. [scripts/check_dmg_layout.py](../scripts/check_dmg_layout.py) `PATH.dmg` mounts a built image read-only, decodes its `.DS_Store` (stdlib only) and fails on a wrong position, a wrong window size, or any dotfile with an icon slot inside the window — the 0.4.0 DMG, built while Finder showed hidden files, gave `.VolumeIcon.icns` a slot and shoved both real icons |
 | [desktop/fetch-sidecars.sh](../desktop/fetch-sidecars.sh) | checksum-pinned fetch of the `uv` and `llama.cpp` release binaries (they are gitignored, not vendored) |
-| [desktop/RELEASE.md](../desktop/RELEASE.md) | the user-executed release checklist: sync the dictionary before the bump (and, since 0.4.3, check the Comprise manifest and fixtures with `scripts/sync_cosm.py --check`), the Developer ID certificate (must be **G2**-issued; the original CA expires 2027-02-01), sign / notarize / staple / verify, the Finder hidden-files note for the DMG step, and `scripts/check_dmg_layout.py` (all 0.4.1 additions). The source of truth — reference it, don't restate it |
+| [desktop/RELEASE.md](../desktop/RELEASE.md) | the user-executed release checklist: sync the dictionary before the bump (and, since 0.5.4, sync the four OES specifications and the client from a cosmoes-site checkout with `scripts/sync_specs.py --check`), the Developer ID certificate (must be **G2**-issued; the original CA expires 2027-02-01), sign / notarize / staple / verify, the Finder hidden-files note for the DMG step, and `scripts/check_dmg_layout.py` (all 0.4.1 additions). The source of truth — reference it, don't restate it |
 
 The shell talks to the backend it spawned through the `ENOUGH_DESKTOP*`
 env gate (see "What NOT to touch"). The .app runs the source snapshot
@@ -3120,7 +3128,7 @@ Exit 0 ok, 1 errors / refused / nothing there, 2 an unknown lens.
 
 | Manifest | Declaration | Volume | Who writes it |
 |---|---|---|---|
-| `comprise.manifest.cosm` | `oes: comprise/1` (a `holotype.cosm` with no key, or the legacy `comprise: 0.1`, reads as it) | a Holotype: a folder, catalog `holotype.cosm`, one part per concern, modules C O M P R I S E (E is never in a file) | **synced, read-only**: a byte copy of comprise-dev's `oes/comprise-oes.manifest.cosm` made by `scripts/sync_cosm.py`. Never edit it here |
+| `comprise.manifest.cosm` | `oes: comprise/1` (a `holotype.cosm` with no key, or the legacy `comprise: 0.1`, reads as it) | a Holotype: a folder, catalog `holotype.cosm`, one part per concern, modules C O M P R I S E (E is never in a file) | **synced, read-only**: a byte copy of comprise-dev's `oes/comprise-oes.manifest.cosm` (made by `scripts/sync_cosm.py`, retired in 0.5.4 and in git history at e318fcd). Never edit it here |
 | `cosm.manifest.cosm` | legacy `cosm: 0.2` / `0.3` and `opi:` → `cosm/0` | a folder of `.cosm` files — the standalone product trees the context-ontology skill writes — module P, bare ids | written in enough |
 | `canon.manifest.cosm` | `oes: canon/1` | one file, `canon.cosm` or `rness/canon.cosm`; module V | written in enough |
 | `emf.manifest.cosm` | `oes: emf/1` | one file, `<text>.cosm`; modules L E K P T X | written in enough |
@@ -3129,10 +3137,23 @@ Exit 0 ok, 1 errors / refused / nothing there, 2 an unknown lens.
 | `thym.manifest.cosm` (0.5.0) | `oes: thym/1` | one file of six kinds (`catalog.kind`: program, morph, context, plan, trace, package); modules P M C R K; a `moves:` block | written in enough; spec [docs/THYM.md](THYM.md) §17 (see "Thym") |
 | `comprise.moves.cosm` (0.5.0) | `moves-of: comprise/1` | **a sidecar, not a manifest**: Comprise's Thym moves (`project`, `band`, `mark`, `withhold`), since its manifest is a byte copy; the registry glob passes it by and `thym.declarations` reads it | written in enough |
 
-The six written here carry a comment header, `macrocosm: 0.0.1` and the
-© line. Since 0.5.0 a manifest may end in a `moves:` list (THYM.md §17.6; spec
-§13.4): the generic reader keeps it as an unknown key and the Thym compiler
-reads it; `MACROCOSM_VERSION` stays 0.0.1. The optional keys 0.0.1 adds, which the reader reads (spec §13.5):
+The six written here carry a comment header, `macrocosm: 0.5.4`, a `spec:`
+naming the text's cosmoes.org home (`https://macro.cosmoes.org/`,
+`https://thym.cosmoes.org/`, `https://ascribe.cosmoes.org/`; the bundled path
+in the comment beside it) and the © line, and no round language ("a later
+round", "built in 0.5.0" — 0.5.4 removed it; a gap is "reserved for a later
+edition"). Since 0.5.0 a manifest may end in a `moves:` list (THYM.md §17.6;
+spec §13.4): the generic reader keeps it as an unknown key and the Thym compiler
+reads it. **The grammar version (0.5.4):** `MACROCOSM_VERSION = "0.5.4"` is what
+enough writes into every catalog it makes (`canon.py`, `canon_derive.py`,
+`docoes.py`); `MACROCOSM_VERSIONS = ("0.0.1", "0.0.2", "0.5.4")` is what the
+reader reads unchanged — the grammar has not changed since 0.0.1, so every
+volume in people's Canon written under 0.0.2 opens as it did. A catalog's or a
+manifest's `macrocosm:` outside the set is a `macrocosm-version` **note**
+(`_version_note` in both loaders, `Registry.notes` for a manifest), never a
+refusal. The texts' editions (0.5.4 for all four, in `docs/specs.json`) are a
+separate field, not the grammar version: `docoes` no longer reads
+`MACROCOSM_VERSION` for a document's version. The optional keys 0.0.1 adds, which the reader reads (spec §13.5):
 `volume.single-file`, `renderers[].lens`, `links.rels`, `closed-lists`,
 `checks.severity`, `module-file.items`, a kind's own `required`, and
 `catalog.<key>` closed lists (Canon's `scope` and `status`). A folder for a
@@ -3148,35 +3169,44 @@ count in `tests/test_docoes.py`), and add fixtures and tests beside the others i
 `tests/test_macrocosm.py` (the registry tests count the manifests: seven in 0.5.0). Nothing below the manifest needs code — the
 checks, paths, the viewer, the lenses and the tools are generic.
 
-### Fixtures, and the sync
+### Fixtures, and the syncs
 
-`scripts/sync_cosm.py [--comprise DIR] [--check]` only ever **reads** a
-comprise-dev checkout (default `../../comprise-dev` from the repo root) and
-copies, byte for byte: the manifest; for each Holotype on its **allowlist**
-(`HOLOTYPES = (meadow, mozilla, wikimedia, khan-academy)`) only the model —
-`holotype.cosm`, `atoms/**/*.cosm`, `atoms/**/README*` — into
-`tests/fixtures/cosm/holotypes/<name>/`; the COSM 0.2 example tree into
-`tests/fixtures/cosm/cosm02/meadow/`; and `tests/fixtures/cosm/manifest.json`
-(source commit, every file's sha256, a digest, no timestamps — a rerun over
-an unchanged checkout is byte-stable; only changed files are rewritten).
-Exit 0 synced or nothing to do, 1 `--check` found changes, 2 no checkout —
-`sync_dictionary.py`'s shape. `tests/fixtures/cosm/NOTICE.md` is hand-written
-and never touched. Beside the synced copies sit enough's own fixtures:
+**The Comprise fixtures** (`tests/fixtures/cosm/`) are byte copies from
+comprise-dev: for each Holotype on an **allowlist** (meadow, mozilla, wikimedia,
+khan-academy) only the model — `holotype.cosm`, `atoms/**/*.cosm`,
+`atoms/**/README*` — under `holotypes/<name>/`; the COSM 0.2 example tree under
+`cosm02/meadow/`; and `manifest.json` (source commit, every file's sha256, a
+digest). The script that copied them, `scripts/sync_cosm.py`, **retired in
+0.5.4** with the chapters it also carried (git history at e318fcd has it,
+should the samples or `defaults/cosm/manifests/comprise.manifest.cosm` ever
+need refreshing); the fixtures stay as they are, and `tests/test_macrocosm.py`
+still checks every copy against `manifest.json`. `tests/fixtures/cosm/NOTICE.md`
+is hand-written. Beside the synced copies sit enough's own fixtures:
 `canon/{rust-book,project}/canon.cosm`, `emf/{notes.md, notes.md.cosm,
-standalone.cosm}`, and `bad/` (one volume per check). Since 0.4.4 the same
-script also copies Comprise's `oes/comprise-oes.md` and `oes/README.md` into
-`defaults/cosm/chapters/` (`comprise-oes.md`, `comprise-paradigm-map.md`, with
-their own `manifest.json`) — the spec volume's chapters; the release commits
-them with the bump.
+standalone.cosm}`, and `bad/` (one volume per check).
 
 **The four public samples are the only Holotypes enough may hold.** The
-script names them by allowlist and never lists Comprise's fixtures, because
-comprise-dev also holds private client fixtures (its `fixtures/PRIVATE.md`
-says which): never copy, name or describe those in enough — not into tests,
-not into docs, not into a scratch run you commit.
+allowlist stands though the script is gone: comprise-dev also holds private
+client fixtures (its `fixtures/PRIVATE.md` says which), and nothing of theirs
+may reach enough — not into tests, not into docs, not into a scratch run you
+commit.
 
-Conformance (`tests/test_macrocosm.py`, 212 tests; `tests/test_sync_cosm.py`,
-8): the four load with 0 problems and 1 010 items (meadow 36, mozilla 524,
+**The specifications' sync** (0.5.4) runs the other way, from cosmoes-site:
+`scripts/sync_specs.py [--cosmoes DIR] [--check]` only ever **reads** a
+cosmoes-site checkout (default `../../cosmoes-site`) and copies, byte for byte,
+`specs/{macrocosm-oes,thym,ascribe,comprise-oes}.md` to `docs/MACROCOSM_OES.md`,
+`docs/THYM.md`, `docs/ASCRIBE.md`, `docs/COMPRISE_OES.md` (the apex text `oes`
+is not bundled) and `client/cosmoes_client.py` to `enough/cosmoes_client.py`,
+and writes `docs/specs.json` (above). Exit 0 synced or nothing to do, 1
+`--check` found a difference, 2 no checkout; a rerun over an unchanged checkout
+writes nothing (the commit and date move only with a change). Run it before a
+bump (desktop/RELEASE.md), and once more at the end of a round that edits a
+text on cosmoes-site. Tests: `tests/test_sync_specs.py` (a fake checkout; the
+shipped copies against `docs/specs.json`; `--check` against the real checkout
+when one is beside this repo).
+
+Conformance (`tests/test_macrocosm.py`, 212 tests + the grammar-version set and
+the fixture guards; `tests/test_sync_specs.py`, 8; `tests/test_specs.py`, 7): the four load with 0 problems and 1 010 items (meadow 36, mozilla 524,
 wikimedia 318, khan-academy 132 — measured against Comprise's own loader;
 the plan's 1 070 was wrong), with the same open-question counts Comprise's
 linter reports; every item's path round-trips id → path → id; every path
@@ -3196,8 +3226,8 @@ in `asyncio.to_thread`.
 | `GET /api/cosm/lens?path=&lens=[&around=&depth=]` | `{text, node_map, lens, lenses, around}` (0.4.4: `around` = a key, id or path draws a local graph — the lens's edges `depth` steps out, 0–4, the centre in class `focus`; `around` in the answer is the centre's key or null): merirmaid frontmatter (`merirmaid: 1`, `title: <name> · <lens>`, `modality: mirror`, `kind: cosm-lens`, `source: <path>#<lens>`, `node-char-limit: 48`) + the `to_mermaid` body; 400 unknown lens / refused |
 | `POST /api/cosm/lint` | `{path}` → `lint(...).to_dict()` + `path` |
 | `GET /api/macrocosm/manifests` | `[{name, title, version, declaration, summary}]`, registry order |
-| `GET /api/macrocosm-spec?lang=` | `docs/MACROCOSM_OES.md` as text/markdown with `/api/help-center`'s language whitelist (a `static/i18n/<lang>/MACROCOSM_OES.md` would win; none ships — the spec is English only); 404 with a sentence when the file is missing. **In `HOME_PATHS`**. Since 0.4.4 the frontend reads the spec through `/api/docs` (see "DocOES"); this route is **kept** as the spec's raw-markdown source, like `/api/help-center` for the manual; `desktop/src-tauri/build.rs` stages the file into the .app |
-| `GET /api/thym-spec?lang=` (0.5.0) | `docs/THYM.md`, the Thym spec, on the same pattern: raw markdown, the language whitelist, English only (a `static/i18n/<lang>/THYM.md` would win), 404 with a sentence when missing; **in `HOME_PATHS`**, open while agent-free. `desktop/src-tauri/build.rs`'s `SNAPSHOT` must stage `docs/THYM.md` for the route to answer in the .app |
+| `GET /api/macrocosm-spec?lang=` · `GET /api/thym-spec?lang=` (0.5.0) · `GET /api/ascribe-spec?lang=` · `GET /api/comprise-spec?lang=` (0.5.4) | one specification as raw markdown (`_spec_markdown(slug, lang)`): **the file DocOES builds from** — the copy synced from cosmoes.org when one is in use, else the bundled `docs/*.md` (`docoes.spec_source`) — with `/api/help-center`'s language whitelist (a `static/i18n/<lang>/<FILE>.md` would win; none ships, the specifications are English only); 404 with a sentence when the file is missing. **In `HOME_PATHS`**, open while agent-free. Since 0.4.4 the frontend reads the specifications through `/api/docs`; these routes are kept as the raw-markdown sources, like `/api/help-center` for the manual. `desktop/src-tauri/build.rs` stages the four files and `docs/specs.json` into the .app |
+| `GET /api/specs-status` (0.5.4) | the launch check's report (`enough/specs.py`): `ran`, `reason` (`ENOUGH_SPECS_SYNC=0` / `preference off`), `checked`, `updated`, `unchanged`, `skipped`, `errors` (`[slug, kind, message]`), `elapsed`, `at`, `base`, `root`, `user_agent`, `enabled` (the preference), `allowed` (the seam), and `documents: {slug: {name, edition, revised, source: cosmoes \| bundled, path, home}}`. **In `HOME_PATHS`**; what the docs viewer's badge title says and what QA reads |
 | `POST /api/cosm/inline {text, filename?}` · `POST /api/cosm/inline/lens {text, filename?, lens?, around?, depth?}` (0.4.4) | a volume read from text (`macrocosm.load_volume_text`, nothing written): `/api/cosm`'s payload with `path: "inline:<filename>"` (default `inline.cosm`; 400 no text, 413 over 256 KB, a refused declaration is a 200 with `refused`), and its lens. **Home-accessible** (the docs viewer's live examples) and open while agent-free |
 
 A `.cosm` saved through read/edit is never refused for lint (the spec says
@@ -3213,97 +3243,188 @@ read/edit's edit face; there is no highlighter yet.
 markdown document taken apart into items — its sections (`S:section/<n>`,
 numbered by the document's own numbering, `root`, `front`, or a slug), the
 terms it defines (`T:term/<slug>`), its complete ```` ```cosm ```` examples
-(`S:example/<n>`), the decisions of a "Decisions …" section
-(`S:decision/<n>`), its synced chapters (`S:chapter/<slug>`, Comprise's
-spec and paradigm map inside the MacroCOSM spec, items prefixed
-`comprise.` / `comprise-map.`), the help bubbles (`B:bubble/<id>`, the
-manual only) — joined to the **reference** generated from the MiniCOSM
-manifests (`R:minicosm`, `R:module`, `R:kind`, `R:list`, `R:check`,
+(`S:example/<n>`), the decisions of a "Decisions …" section or, since 0.5.4, of
+a dated "Changes" section (`S:decision/<n>`, below), the help bubbles
+(`B:bubble/<id>`, the manual only) — joined to the **reference** generated from
+the MiniCOSM manifests (`R:minicosm`, `R:module`, `R:kind`, `R:list`, `R:check`,
 `R:lens`, each with `provenance` naming the manifest path and a hash). The
 volume is the document's fabula; compiled "as told" it is the markdown again,
-byte for byte (`compile_doc`; tested for the spec, both chapters and all six
-manual tellings). Spec: `docs/MACROCOSM_OES.md` §18.5; plan:
+byte for byte (`compile_doc`; tested for the four specifications and all six
+manual tellings). Spec: MacroCOSM OES §18.5 (`docs/MACROCOSM_OES.md`); plan:
 `docs/docoes-044-plan.md` (local). User-facing: HELP_CENTER §13.1–13.2.
 
-- **Documents** (`docoes.DOCUMENTS`, four, in this order): `macrocosm-oes`
-  — English only, `docs/MACROCOSM_OES.md` + the chapters in
-  `defaults/cosm/chapters/` + the reference; `thym` ("Thym 0", version `0`:
-  the document is "Version 0 of the language", while its MiniCOSM declares
-  `thym/1`) — `docs/THYM.md`; `ascribe` ("Ascribe OES 1", version `1`) —
-  `docs/ASCRIBE.md`; the last two English only, no chapters, no reference,
-  every plain use a mention (0.5.0, lane X2: 83 sections / 12 terms and 27 /
-  5; ≈0.1 s and ≈0.03 s to build); `help-center` — six tellings, `docs/HELP_CENTER.md` /
+- **Documents** (`docoes.DOCUMENTS`, five, in this order). The four **OES
+  specifications** (`Document.spec`), the canonical editions published at
+  cosmoes.org and bundled byte for byte by `scripts/sync_specs.py` (0.5.4; see
+  "The specifications from cosmoes.org" below): `macrocosm-oes` ("MacroCOSM
+  OES", `docs/MACROCOSM_OES.md`, + the reference; its §, "README §" and P.N
+  name sections of *other* documents and are never linked: `xref={"§": "",
+  "README §": "", "P.": ""}`), `thym` ("Thym", `docs/THYM.md`), `ascribe`
+  ("Ascribe", `docs/ASCRIBE.md`) and `comprise-oes` ("Comprise OES",
+  `docs/COMPRISE_OES.md`, `own_p=True`: its P.N name its own chapter P, its §
+  other documents). English only, no chapters, every plain use a mention;
+  **names carry no number** — a document's `version` is its **edition**
+  (`document_version()`: the synced `state.json`'s when a synced copy is in
+  use, else `docs/specs.json`'s; 0.5.4 for all four), never `MACROCOSM_VERSION`
+  (that is the grammar's). 0.5.4 counts: 110 / 41 / 8 / 38 (sections, terms,
+  examples, decisions), 83 / 12 / 1 / 25, 27 / 2 / 1 / 12, 99 / 15 / 0 / 21.
+  Then `help-center` — six tellings, `docs/HELP_CENTER.md` /
   `static/i18n/<lang>/help-center.md` with `static/help-docs.md` /
   `static/i18n/<lang>/help-docs.md`, `voice: rosa`, mentions counted
   "distinctive" (a plain use links only a name with a space, an inner
   capital/digit or a symbol). A translation takes its ids from the English:
   sections by number, terms by their place in the section, else the English
-  item verbatim with `fallback: en` (ja 7, zh 1, the others 0 in 0.5.0; ja 7, zh 3 in 0.4.4) — so
-  **a translated manual must mirror the English markdown's shape** (bold
-  labels, term-shaped bullets), not only its headings.
+  item verbatim with `fallback: en` — so **a translated manual must mirror the
+  English markdown's shape** (bold labels, term-shaped bullets), not only its
+  headings. **Chapters are gone** (0.5.4): Comprise's texts were two synced
+  read-only chapters of the MacroCOSM volume (`defaults/cosm/chapters/`,
+  `scripts/sync_cosm.py`); Comprise OES is a document of its own now, and no
+  registered document has chapters. The `Chapter` dataclass,
+  `enumerate_markdown(chapter=)`, `compile_doc(chapter=)` and the exporter's
+  chapter rendering remain, inert.
 - **Where it is built**: `ENOUGH_DOCS_ROOT`, default `~/enough/docoes/`
   (`docs_root()`), one `<doc>.<lang>.doc.cosm` per telling, on first use and
   again whenever the digest moves (sha256 over the DocOES format number,
-  enough's version, every source file and every manifest; `is_fresh` reads
-  only the recorded digest). `load_built(doc, lang)` = ensure + load, the
-  `Volume` cached by mtime+size. Build ≈ 0.2–0.4 s a telling. Never
-  committed, never in a file tree; `docoes.SOURCES` points the enumeration at
-  another install root (the tests' miniature).
+  enough's version, every source file — for a specification **the file
+  actually read**, the synced copy or the bundled text, with its edition and
+  revised date; for the manual also the editions of the documents its bubbles
+  cite — and every manifest; `is_fresh` reads only the recorded digest). So a
+  synced text picks itself up on the next open. `load_built(doc, lang)` =
+  ensure + load, the `Volume` cached by mtime+size. Build ≈ 0.05–0.6 s a
+  telling. Never committed, never in a file tree; `docoes.SOURCES` points the
+  enumeration at another install root (the tests' miniature — which copies the
+  real `docs/specs.json` so the editions resolve).
 - **Writing for it.** A section's atem is its first sentence unless a
-  `<!-- atem: … -->` comment is the first line under its heading (the spec
-  sets one under every numbered `##` and §18.1–§18.5); a term is defined by a
-  bold first table cell, a `- **term** — definition` bullet, a paragraph
-  opening `(A|An|The) **term** is|are|means|stands for …`, the "How to read
-  this" table, or a `<!-- term: x -->` comment before a paragraph (0.4.4's
-  spec pass marked EMF, fabula, short, syuzhet, stance, salience, span,
-  telling, Canon, DocOES, chapter; Holotype/isotype and the two orders
-  "as told"/"by weight" are bullets). Two definitions of one term are a
-  `term-defined-once` warning. DocOES's own checks (`lint_doc`): `atem-shape`
-  (2–15 words, CJK 2–45 characters, a phrase, no final period, no ids or
-  markup), `numbering`, `term-defined-once`, `unlinked-mentions` (a note),
-  `empty-section`, `stale-provenance-hash`, `xref-unresolved`. The spec must
-  lint **0 errors / 0 warnings** (its 8 notes are Comprise's and the spec's
-  own label paragraphs); the manual has 4 known `term-defined-once` warnings
-  (AGENT.md, MOTIVATION.md, council, input/) in every telling.
+  `<!-- atem: … -->` comment is the first line under its heading; a term is
+  defined by a bold first table cell, a `- **term** — definition` bullet, a
+  paragraph opening `(A|An|The) **term** is|are|means|stands for …`, the "How
+  to read this" table, or a `<!-- term: x -->` comment before a paragraph. Two
+  definitions of one term are a `term-defined-once` warning. **Decisions**: a
+  "Decisions …" section's numbered bold items, numbered as written; a
+  **"Changes"** section (0.5.4: the texts' dated appendix, newest edition
+  first — `**Edition 0.5.4 · 2026-11-03.** …` then a list; a qualifier after the
+  date, `**Edition 0.5.4 · 2026-11-03, second revision.**`, joins the name) gives every item of
+  every edition's list (numbered or bulleted, with or without a bold lead) and
+  an edition's entry that has no list, numbered 1..N through the section, each
+  with `edition` and, when dated, `dated` (`_decisions(changes=True)`,
+  `_EDITION_HEAD`). **Cross-document citations** are written "<Name>
+  (<home>), its section N": the core's `_SEC_REF` skips "its section N", and
+  since 0.5.4 so do the exporter's `XREF_RE` and the viewer's `DOCS_XREF_RE`
+  (a `(?<![Ii]ts\s)` lookbehind), so a text may cite another document's
+  section without the number ever linking into the citing text;
+  `tests/test_specs.py` checks that every section the four texts cite of one
+  another exists in that document's headings (the texts are cosmoes-site's:
+  a miss is reported, not fixed). DocOES's own checks (`lint_doc`):
+  `atem-shape` (2–15 words, CJK 2–45 characters, a phrase, no final period, no
+  ids or markup), `numbering`, `term-defined-once`, `unlinked-mentions` (a
+  note), `empty-section`, `stale-provenance-hash`, `xref-unresolved`. The four
+  specifications lint **0 errors / 0 warnings** at 0.5.4 (notes only); the
+  manual has 4 known `term-defined-once` warnings (AGENT.md, MOTIVATION.md,
+  council, input/) in every telling.
 - **Bubbles about another document**: `BUBBLE_DOCUMENT = {"docs":
   "macrocosm-oes"}` — the docs viewer's bubble names the spec's section 2,
-  so its "section N" become `xrefs` (`macrocosm-oes@0.0.1:section:2`), never
-  `see` links into the manual.
+  so its "section N" become `xrefs` (`macrocosm-oes@0.5.4:section:2`, the
+  edition in the reference), never `see` links into the manual.
 - **The CLI rule.** `python -m enough.docoes build|lint|compile|inventory|
   status <doc> [--lang L] [--chapter SLUG] [--force] [--json]
   [--docs-root DIR]` — **always with `ENOUGH_DOCS_ROOT` (better: every seam
-  of `scripts/smoke_boot.build_env()`) pointed at a scratch dir**; without it
-  the CLI builds into the real `~/enough/docoes/` (it happened once, during
-  the round). `lint macrocosm-oes` and a byte-exact `compile macrocosm-oes`
-  are the checks after any spec edit. (`lint thym` / `lint ascribe` are not
-  clean in 0.5.0: five and one `atem-shape` errors — atem markers of 16–17
-  words — and Thym's "MacroCOSM section 18.5" read as its own §18.5; see
-  `docs/thym-landed-X2.md`.)
+  of `scripts/smoke_boot.build_env()`, `ENOUGH_SPECS_ROOT` and
+  `ENOUGH_SPECS_SYNC=0` included) pointed at a scratch dir**; without it the
+  CLI builds into the real `~/enough/docoes/` and reads the real
+  `~/enough/specs/`. `lint <slug>` and a byte-exact `compile <slug>` are the
+  checks after a sync (every text is cosmoes-site's: a fault is fixed there).
 - **The static export** (0.5.0, `enough/docoes_html.py`; lane X1, spec
   `docs/thym-landed-X1.md` §2): `python -m enough.docoes export <doc>
   <out-dir> [--lang L] [--densities short,atem,fabula] [--page
   short=short.html …] [--standalone] [--slug S] [--name N] [--version V]
-  [--docs-root DIR]`. `<doc>` is a registered slug or a markdown path inside
-  the install (a path whose default slug is registered is that document:
-  `docs/MACROCOSM_OES.md` with its chapters, and since X2 `docs/THYM.md` →
-  `thym`, named "Thym 0"; any other path is ad hoc — slug from the file
-  name, name its H1, version the manifest named like the slug, if any). It builds the volume fresh into a **temporary directory** (never
-  `docs_root()` unless `--docs-root` says so), reads it back through
+  [--no-marks] [--reference] [--sources ROOT] [--docs-root DIR]`. `<doc>` is a
+  registered slug or a markdown path inside the install (a path whose default
+  slug is registered is that document: `docs/THYM.md` → `thym`, named "Thym";
+  an explicit `--slug` naming a registered document exports the path ad hoc
+  under that slug (0.5.1+, W1: so another checkout's text can be built as
+  that document, `XREF_RULES` applied by slug); any other path is ad hoc —
+  slug from the file name, name its H1, version the manifest named like the
+  slug, if any). `--no-marks` leaves the margin marks (`<p class="docs-marks">`)
+  out; `--reference` joins the R: items generated from the manifests to an ad
+  hoc document. It builds the volume fresh into a **temporary directory**
+  (never `docs_root()` unless `--docs-root` says so), reads it back through
   `load_volume`, and writes `<slug>/{short,atem,fabula}.html` — script-free,
   style-free fragments (`article.docoes`, one `<h1>`, the app's heading ids,
   xref and term rules ported from the docs viewer, every `href="#…"`
   resolving inside its fragment, no timestamps) — plus `docs.css` and a
   `manifest.json` merged across runs (`docoes-export/1`, sha256 per file).
   markdown-it-py renders (lazily imported; html off, so `<slug>`
-  placeholders stay text). Nothing in the app calls it; comprise-connect's
-  `scripts/sync_macrocosmoes.py` does. Tests: `tests/test_docoes_export.py`.
+  placeholders stay text). **cosmoes-site is the exporter's customer**
+  (0.5.4): its `scripts/build_specs.py` runs this export once per text in an
+  enough checkout to make the pages at macro./thym./ascribe./comprise.cosmoes.org
+  and the apex; the apps' copies (enough's `docs/*.md`, Comprise's, Connect's)
+  are synced *from* the site, never the other way. Nothing in the app calls
+  it. Tests: `tests/test_docoes_export.py`.
+
+### The specifications from cosmoes.org (0.5.4)
+
+The four texts are edited only in cosmoes-site (`specs/`); enough bundles a
+copy of each as the floor and refreshes it two ways.
+
+- **At release time**: `scripts/sync_specs.py --cosmoes <checkout>` (above) →
+  `docs/MACROCOSM_OES.md`, `docs/THYM.md`, `docs/ASCRIBE.md`,
+  `docs/COMPRISE_OES.md`, `enough/cosmoes_client.py`, `docs/specs.json`.
+- **At run time**: `enough/specs.py`'s **launch check**. At server start
+  (home and project alike — the home screen opens the docs viewer too), when
+  the preference is on and `ENOUGH_SPECS_SYNC` is not `0`, one daemon thread
+  runs `CosmoesClient(base=ENOUGH_COSMOES_BASE or https://cosmoes.org,
+  timeout=3, user_agent="cosmoes-client/1 (enough <version>)").sync(specs_root(),
+  wants={slug: ["source"] for the four}, validate=docoes.validate_spec_source)`:
+  one GET of `/manifest.json` (with `If-None-Match` once an ETag is kept; a 304
+  means nothing moved), then one GET of `https://<host>/raw/source.md` per
+  changed text, each verified against the manifest's sha256, size-capped,
+  validated by a real DocOES build into a temporary docs root (`validate_
+  spec_source`: UTF-8, a title, builds, loads, has sections — else the previous
+  copy is kept), written whole, `state.json` last. Nothing of the user's is
+  sent. The report lands in `_STATUS` for `GET /api/specs-status`; INFO when
+  something updated, WARNING per error; `sync` never raises (a refused base is
+  a `['*', 'client', …]` error line). One check per process
+  (`launch_check` is a no-op the second time; `reset_for_tests()`).
+- **Resolution** (`docoes.spec_source(slug)` / `spec_info`): `<specs
+  root>/<slug>/source.md` when `state.json` lists the slug with a source
+  sha256 that matches the file, else the bundled path; the edition, `revised`
+  and `home` follow the same source (state.json's, else specs.json's). The
+  catalog's `document` block carries `version` (the edition), `revised`,
+  `source` (`cosmoes` | `bundled`) and `home`; `/api/docs`'s head carries it to
+  the viewer, whose badge reads `<name> · edition <edition>`
+  (`docs.badge.edition`, no "v") with the title "from cosmoes.org, revised
+  <date>" or "bundled with enough <version>" (`docs.badge.fromCosmoes`,
+  `docs.badge.bundled`). The `/api/*-spec` routes serve the same file.
+- **Seams**: `ENOUGH_SPECS_ROOT` (default `~/enough/specs/`),
+  `ENOUGH_COSMOES_BASE` (default `https://cosmoes.org`; the client accepts
+  only that, a `.cosmoes.org` host, or `http://127.0.0.1…` / `http://localhost…`
+  for a stand-in) and `ENOUGH_SPECS_SYNC` (`0` turns the check off).
+  `tests/conftest.py` sets all three (`_STATE_SEAMS`, `_FIXED_SEAMS`:
+  `ENOUGH_SPECS_SYNC=0`, `ENOUGH_COSMOES_BASE=http://127.0.0.1:1`), so does
+  `smoke_boot.build_env()` (hence every uicheck and smoke server); a rig that
+  wants the check on sets `ENOUGH_SPECS_SYNC=1` and points the base at its own
+  loopback stand-in (`tests/test_specs.py`'s `Fake` is the pattern).
+- **The preference**: `specs_sync`, a top-level ui.json bool (absent = on),
+  `POST /api/ui-config {"specs_sync": bool}` like `agent_free`; the checkbox
+  `#ui-specs-sync` in the UI window's controls row with the note
+  `#ui-specs-sync-note` under it ("On launch enough asks cosmoes.org once for
+  the specifications’ manifest and fetches only a changed text. Nothing of
+  yours is sent."), global, so on the home screen too; takes effect at the
+  next launch. HELP_CENTER §1.1 and §13.1 say so in six languages.
+- **Tests**: `tests/test_specs.py` (the vendored client unchanged, one sync
+  against a loopback stand-in — a changed text, an invalid one, a 304 on the
+  second launch — the validator, the seams and the preference, the "its
+  section" exemption in all three parsers, every cross-document citation
+  resolving, the Changes decompiler), `tests/test_cosm_api.py` (the four
+  routes, the synced copy served, `/api/specs-status`, the preference round
+  trip), `tests/test_sync_specs.py`.
 
 ### Routes (all read-only, home-accessible, open while agent-free)
 
 | Route | Answers |
 |---|---|
-| `GET /api/docs?doc=&lang=&density=atem\|short\|fabula[&section=][&module=]` | `doc` ∈ `macrocosm-oes`, `thym`, `ascribe`, `help-center`; `lang` absent → the UI language, not one of the six → 404, a document without that telling → the author's with `requested_lang`. Head: `{doc, lang, requested_lang, density, id, title, uri, telling, tellings, document, chapters, built}`; **atem** + `items` (light: key, id, kind, module, name, atem, order, level, parent, number, anchor, chapter, fallback, in, of, defined_in); **short** + `sections` (telling order, `heading` + `body` verbatim, `mentioned_in`, `examples`) and `terms`; **fabula** = `/api/cosm`'s payload with `report = lint_doc`, `backrefs` (target → sources, minus `parts`/`parent`/`chapter`), `inventory`, `declared_lenses: [{id, kind, diagram, include, generic}]` (each lens's modules — the manifest's `include`, every module when none — and the reader's generic `tree`, `generic: true`; D3 0.4.4) and `page`. 202 `{building, progress}` while a build runs; 503 when it cannot be built. Payloads are JSON-encoded once per built volume |
-| `GET /api/docs/status` · `POST /api/docs/build {doc?, lang?}` | every telling's `{built, fresh, digest, building, progress}` · start a background build (the UI window warms all nine: three specs + six manual tellings) |
+| `GET /api/docs?doc=&lang=&density=atem\|short\|fabula[&section=][&module=]` | `doc` ∈ `macrocosm-oes`, `thym`, `ascribe`, `comprise-oes` (0.5.4), `help-center`; `lang` absent → the UI language, not one of the six → 404, a document without that telling → the author's with `requested_lang`. Head: `{doc, lang, requested_lang, density, id, title, uri, telling, tellings, document, chapters, built}`; **atem** + `items` (light: key, id, kind, module, name, atem, order, level, parent, number, anchor, chapter, fallback, in, of, defined_in); **short** + `sections` (telling order, `heading` + `body` verbatim, `mentioned_in`, `examples`) and `terms`; **fabula** = `/api/cosm`'s payload with `report = lint_doc`, `backrefs` (target → sources, minus `parts`/`parent`/`chapter`), `inventory`, `declared_lenses: [{id, kind, diagram, include, generic}]` (each lens's modules — the manifest's `include`, every module when none — and the reader's generic `tree`, `generic: true`; D3 0.4.4) and `page`. 202 `{building, progress}` while a build runs; 503 when it cannot be built. Payloads are JSON-encoded once per built volume |
+| `GET /api/docs/status` · `POST /api/docs/build {doc?, lang?}` | every telling's `{built, fresh, digest, building, progress}` · start a background build (the UI window warms all ten: four specs + six manual tellings) |
 | `GET /api/docs/lens?doc=&lang=&lens=&around=&depth=` | `/api/cosm/lens`'s shape for a doc volume (`map`, `graph`, `tree`; `graph` around an item by default) |
 | `POST /api/docs/compile {doc, lang?, chapter?}` · `GET /api/docs/inventory?doc=&lang=` | the markdown, byte for byte · the inventory rows `{inventory, xref, id, kind, version, anchor, atem}` |
 
@@ -4929,9 +5050,10 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   `#ui-specs-btn` ("MacroCOSM ▾") sit beside it — since 0.5.0 (lane X2) a
   small menu (`#ui-specs-menu[role=menu]`, `uiSpecsMenu(open)`; focus on
   the first item, ↑/↓/Home/End, Esc closes the menu before the window) of
-  the three specifications in the same viewer: `#ui-cosmspec-btn`
-  (MacroCOSM OES), `#ui-thym-btn` (Thym), `#ui-ascribe-btn` (Ascribe). Two
-  more inline buttons wrapped the header row in de, fr, es and ja. `GET /api/help-center?lang=` still serves the raw markdown with the
+  the four specifications in the same viewer: `#ui-cosmspec-btn`
+  (MacroCOSM OES), `#ui-thym-btn` (Thym), `#ui-ascribe-btn` (Ascribe) and,
+  since 0.5.4, `#ui-comprise-btn` (Comprise OES). Two more inline buttons
+  wrapped the header row in de, fr, es and ja. `GET /api/help-center?lang=` still serves the raw markdown with the
   language whitelist — **kept** in 0.4.4 though the frontend no longer calls
   it: it is the manual's plain-text route, as `/api/macrocosm-spec` is the
   spec's, and the cheapest way for a tool or a person to read the source.
@@ -4944,17 +5066,21 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   in all six, with the same defined terms in the same places, so no telling
   falls back to English for them).
 - **The docs viewer (0.4.4)** — mode `docs`, root `#docs-mode` (carries
-  `data-doc` and `data-density`), one viewer for four documents:
+  `data-doc` and `data-density`), one viewer for five documents:
   `help-center` (icon `hxc`, the UI language's telling, badge "written by
-  Rosa" from the catalog's `telling.voice`) and three specifications,
-  `macrocosm-oes` (icon `macrocosm`), `thym` (icon `cosm`) and `ascribe`
+  Rosa" from the catalog's `telling.voice`) and four specifications,
+  `macrocosm-oes` (icon `macrocosm`), `thym` (icon `cosm`), `ascribe`
   (icon `readvisor-rename`; both 0.5.0, lane X2, the closest existing
-  glyphs). A spec is `DOCS_DOCS[doc].kind === 'spec'` (`docsIsSpec(doc)`):
+  glyphs) and `comprise-oes` (icon `cosm`, 0.5.4). A spec is
+  `DOCS_DOCS[doc].kind === 'spec'` (`docsIsSpec(doc)`):
   English only, so a translated UI gets `requested_lang` and the note
   `docs.note.specEnglish`; the toolbar says `docs.title.spec`; the badge is
-  `<title> · v<document.version>` ("MacroCOSM OES · v0.0.2", "Thym 0 · v0",
-  "Ascribe OES 1 · v1"); the mode stack's icon title is the entry's
-  `stack()` (`modes.docs.{spec,thym,ascribe}.icon`), its exit
+  `<title> · edition <document.version>` (`docs.badge.edition`: "Thym ·
+  edition 0.5.4" — names carry no number, the edition is a field, no "v")
+  with a title saying where the text came from (`docs.badge.fromCosmoes` /
+  `docs.badge.bundled`, from the head's `document.source` and `.revised`);
+  the mode stack's icon title is the entry's
+  `stack()` (`modes.docs.{spec,thym,ascribe,comprise}.icon`), its exit
   `modes.docs.spec.exit`. `COSM_SPEC_SECTION` and "about this format" stay
   on macrocosm-oes. Functions
   (window): `enterDocsMode({doc, lang, density, anchor})` (no `density` →
@@ -5039,8 +5165,8 @@ Three layers, all markdown (design formerly in docs/help-system-plan.md):
   `home-docs-help`, `home-docs-fabula` (the home screens fail when a route
   is not home-accessible), and `readvisor-and-minis` docks the viewer;
   scenarios `docs-find-contents` (the ref-mode gate), `docs-contents`,
-  `docs-specs` (0.5.0, X2: the specs menu, and the three specs' shared
-  chrome, links and densities), `docs-term-roundtrip`,
+  `docs-specs` (0.5.0, X2: the specs menu, and the specs' shared
+  chrome, links and densities; screens `docs-thym`, `docs-ascribe`, `docs-comprise`), `docs-term-roundtrip`,
   `docs-example-live`, `docs-graph-roundtrip`; the four mode-stack
   scenarios use the docs viewer as their second mode.
   **Programs (0.5.0, U1)**: `DOCS_DOCS.program` reads any `.thym` file at
@@ -5853,9 +5979,10 @@ A list of things that will confuse you if you don't see them coming:
 - **Don't edit the synced Comprise manifest, and never copy Comprise's
   private fixtures.** `defaults/cosm/manifests/comprise.manifest.cosm` and
   `tests/fixtures/cosm/holotypes/` are byte copies made by
-  `scripts/sync_cosm.py` from comprise-dev, which is read-only from this
-  repo; a change belongs in comprise-dev, then a re-sync. The sync names its
-  four public Holotypes by allowlist; comprise-dev also holds a partner's
+  `scripts/sync_cosm.py` (retired in 0.5.4; git history at e318fcd) from
+  comprise-dev, which is read-only from this repo; a change belongs in
+  comprise-dev, then a re-copy. The copies were named by allowlist — the
+  four public Holotypes only; comprise-dev also holds a partner's
   client fixtures (its `fixtures/PRIVATE.md`), and nothing of theirs may
   reach enough — not a file, not a test, not a name in a doc or a commit.
 - **A twin's `source:` and `derived:` blocks are the engine's.** They are
@@ -6058,7 +6185,7 @@ A list of things that will confuse you if you don't see them coming:
   (`test_canon.py`, `test_canon_api.py`, and the legacy
   `test_cacheawl*.py` running through the shim), the MacroCOSM reader, its
   fixtures and the spec's examples (`test_macrocosm.py`,
-  `test_sync_cosm.py`, `test_macrocosm_spec.py`), the cosm routes
+  `test_sync_specs.py`, `test_specs.py`, `test_macrocosm_spec.py`), the cosm routes
   (`test_cosm_api.py`), the derivation engine, jobs and routes
   (`test_llm_complete.py`, `test_canon_derive.py`,
   `test_canon_derive_api.py` — rules mode, or a monkeypatched
@@ -6088,7 +6215,10 @@ A list of things that will confuse you if you don't see them coming:
   `ENOUGH_WEIGHTS_DIR`, `ENOUGH_EXTRAS_STATE`, `ENOUGH_LIVE_STATE`,
   `ENOUGH_MODELS_REGISTRY`, `ENOUGH_PROJECTS_STATE`,
   **`ENOUGH_READVISORS_ROOT`**, **`ENOUGH_DOCS_ROOT`** (0.4.4, the built doc
-  volumes), **`ENOUGH_THYM_ROOT`** (0.5.0, Thym's runs), **`ENOUGH_DICT_ROOT`** and
+  volumes), **`ENOUGH_THYM_ROOT`** (0.5.0, Thym's runs), **`ENOUGH_SPECS_ROOT`**
+  with **`ENOUGH_SPECS_SYNC=0`** and **`ENOUGH_COSMOES_BASE`** at a dead loopback
+  port (0.5.4, the specifications synced from cosmoes.org: no test may reach
+  it), **`ENOUGH_DICT_ROOT`** and
   **`ENOUGH_DICT_SOURCE`** (the latter pointed at *nothing*, so no test
   starts a 380 MB build — see "The dictionary (FEED)")
   (plus `ENOUGH_MODELS_URL_BASE`, which rebases the model download URLs
@@ -6337,13 +6467,16 @@ touching `cloud.py`, `tools.py`, and `server.py`.
 
 **MacroCOSM and Canon, day to day (0.4.3).**
 
-- `uv run python scripts/sync_cosm.py --check` says whether comprise-dev's
-  manifest or its four public samples moved; without `--check` it re-copies
-  them into `defaults/cosm/manifests/comprise.manifest.cosm` and
-  `tests/fixtures/cosm/` (then run `tests/test_macrocosm.py`). It needs a
-  comprise-dev checkout at `../../comprise-dev` (or `--comprise DIR`; exit 2
-  when there is none) and only ever reads it. desktop/RELEASE.md runs it
-  before every bump.
+- `uv run python scripts/sync_specs.py --check` says whether the four bundled
+  specifications or the vendored client differ from a cosmoes-site checkout at
+  `../../cosmoes-site` (or `--cosmoes DIR`; exit 2 when there is none); without
+  `--check` it re-copies them into `docs/*.md`, `enough/cosmoes_client.py` and
+  writes `docs/specs.json` (then run `tests/test_docoes.py` and
+  `tests/test_sync_specs.py`). It only ever reads cosmoes-site.
+  desktop/RELEASE.md runs it before every bump. (`scripts/sync_cosm.py`, the
+  comprise-dev direction, retired in 0.5.4.)
+- `GET /api/specs-status` on any running server says whether the launch check
+  ran, what it updated and where each specification comes from.
 - `uv run python -m enough.macrocosm lint|tree|paths|mermaid|identify
   <volume>` is the quickest look at any `.cosm` — no server, nothing
   imported from enough. `tests/fixtures/cosm/` has a volume of every kind to
@@ -6497,8 +6630,11 @@ data. © 2026 Graham Smith, all rights reserved, bundled for use within
 enough only; a licence is still to be decided. Its
 [NOTICE.md](../reflib/dict/NOTICE.md) is authoritative.
 
-**Nor is MacroCOSM OES** (0.4.3): the specification
-([docs/MACROCOSM_OES.md](MACROCOSM_OES.md)), the MiniCOSM manifests in
+**Nor are the OES specifications** (0.4.3; four since 0.5.4): MacroCOSM OES,
+Thym, Ascribe and Comprise OES ([docs/MACROCOSM_OES.md](MACROCOSM_OES.md),
+[THYM.md](THYM.md), [ASCRIBE.md](ASCRIBE.md), [COMPRISE_OES.md](COMPRISE_OES.md)
+— the canonical editions published at cosmoes.org, bundled by
+`scripts/sync_specs.py` and refreshed from there at run time), the MiniCOSM manifests in
 `defaults/cosm/manifests/` and the names MacroCOSM, MiniCOSM, MicroCOSM,
 Canon, EMF and atem are © 2026 Graham Smith, all rights reserved — bundled
 for use within enough only (enough reads the manifests and shows the spec in

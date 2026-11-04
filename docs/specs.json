@@ -1,0 +1,71 @@
+{
+  "source": "cosmoes-site",
+  "commit": "22c10e6",
+  "dirty": false,
+  "synced": "2026-11-03",
+  "client": {
+    "path": "enough/cosmoes_client.py",
+    "source": "client/cosmoes_client.py",
+    "commit": "c142959",
+    "sha256": "63f67d01f01a12059ba2a21b75825b9483a003ec92dfc7a0d18e84d169306148"
+  },
+  "documents": [
+    {
+      "slug": "macrocosm-oes",
+      "file": "macrocosm-oes.md",
+      "name": "MacroCOSM OES",
+      "edition": "0.5.4",
+      "describes": {
+        "macrocosm": "0.5.4"
+      },
+      "host": "macro.cosmoes.org",
+      "revised": "2026-11-03",
+      "reference": true,
+      "path": "docs/MACROCOSM_OES.md",
+      "source": "specs/macrocosm-oes.md",
+      "sha256": "9b815df5e9fa94eef97cd0bf59e215eceecd2433cf7170f67444ca7d39c380ff"
+    },
+    {
+      "slug": "thym",
+      "file": "thym.md",
+      "name": "Thym",
+      "edition": "0.5.4",
+      "describes": {
+        "thym": "1"
+      },
+      "host": "thym.cosmoes.org",
+      "revised": "2026-11-03",
+      "path": "docs/THYM.md",
+      "source": "specs/thym.md",
+      "sha256": "c16196caca0b42f1d2b0bc308b2952ef8ef4eb0f779442f88cacc57d67065d5c"
+    },
+    {
+      "slug": "ascribe",
+      "file": "ascribe.md",
+      "name": "Ascribe",
+      "edition": "0.5.4",
+      "describes": {
+        "ascribe": "1"
+      },
+      "host": "ascribe.cosmoes.org",
+      "revised": "2026-11-03",
+      "path": "docs/ASCRIBE.md",
+      "source": "specs/ascribe.md",
+      "sha256": "71ee6e4e62160873ed0d0f846ecd7096dcdb159350cb1c8af348277b99bea16f"
+    },
+    {
+      "slug": "comprise-oes",
+      "file": "comprise-oes.md",
+      "name": "Comprise OES",
+      "edition": "0.5.4",
+      "describes": {
+        "comprise": "1"
+      },
+      "host": "comprise.cosmoes.org",
+      "revised": "2026-11-03",
+      "path": "docs/COMPRISE_OES.md",
+      "source": "specs/comprise-oes.md",
+      "sha256": "fe9181a729117f341c8c1871aa0f97ba32b5f8ba9adea9dc3be33fab8c5265e9"
+    }
+  ]
+}

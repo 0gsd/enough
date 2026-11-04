@@ -2,20 +2,20 @@
   "_doc": "Accepted pre-existing UI findings, keyed by (screen | class | selector-path[ | second path]) — never by pixel values, so an entry survives a re-layout and dies with the element it names. Regenerate with `uv run python scripts/ui_check.py --update-baseline` and read the diff: a key that disappears means something got fixed (delete it), a key that appears means something new needs a human. The list is a to-do, not an amnesty.",
   "_notes": "EVERY entry below is justified, by family, in scripts/uicheck/baseline-notes.md — what it is, why it is accepted, and which lane should fix it. If you add one, add a paragraph there; if you fix one, delete both in the same change.",
   "accepted": {
+    "canon | tiny | #cn-ingest-all": "[tiny] (no text) is only 13x13px",
+    "canon-volume | tiny | #cn-ingest-all": "[tiny] (no text) is only 13x13px",
     "convert-chip-edit | covered | #convert-chip-edit>button.cc-btn | #edit-linenav": "[covered] 変更を書き出す is covered by #edit-linenav",
     "convert-chip-edit | covered | #edit-revert-btn | #edit-linenav": "[covered] revert is covered by #edit-linenav",
     "convert-chip-edit | offscreen | #edit-revert-btn": "[offscreen] zurücksetzen sits at (927,44) 113x30 outside the 1024x640 viewport with no scroller to reach it",
-    "convert-chip-review | offscreen | #review-toolbar>div.rt-group.rt-highlights>button.rt-color": "[offscreen] highlight yellow sits at (1016,48) 22x22 outside the 1024x640 viewport with no scroller to reach it",
-    "project-base@ui-scale-max | offscreen | #comp-menu-btn": "[offscreen] composures sits at (998,64) 42x42 outside the 1024x640 viewport with no scroller to reach it",
     "convert-chip-mini | ellipsis-egregious | #convert-chip-mini>span.cc-name": "[ellipsis-egregious] report.pdf: only 14% of the text fits (~2 chars)",
     "convert-chip-mini | ellipsis-egregious | #preview-title": "[ellipsis-egregious] read · notes.md: only 31% of the text fits (~5 chars)",
-    "canon | tiny | #cn-ingest-all": "[tiny] (no text) is only 13x13px",
-    "canon-volume | tiny | #cn-ingest-all": "[tiny] (no text) is only 13x13px",
     "convert-chip-mini | tiny | #mini-face-btn": "[tiny] switch to edit face is only 14x26px",
     "convert-chip-mini | tiny | #mini-full-btn": "[tiny] expand to full size is only 14x26px",
+    "convert-chip-review | offscreen | #review-toolbar>div.rt-group.rt-highlights>button.rt-color": "[offscreen] highlight yellow sits at (1016,48) 22x22 outside the 1024x640 viewport with no scroller to reach it",
     "girraph | tiny | #girraph-body>div:nth-of-type(2)>div.gp-row>button.gp-toggle": "[tiny] ▾ is only 16x13px",
     "girraph | tiny | div.gp-children>div:nth-of-type(1)>div.gp-row>button.gp-toggle": "[tiny] ▾ is only 16x13px",
     "girraph | tiny | div.gp-children>div:nth-of-type(2)>div.gp-row>button.gp-chip": "[tiny] → a1 is only 42x15px",
+    "home-ui-modal | tiny | #ui-specs-sync": "[tiny] (no text) is only 13x13px",
     "modal-broker | tiny | #broker-toggles>div.broker-row.on>button.broker-toggle": "[tiny] ● is only 14x14px",
     "modal-model | tiny | #auto-reset-toggle": "[tiny] (no text) is only 13x13px",
     "modal-paginate | tiny | #pg-bring-in": "[tiny] (no text) is only 13x13px",
@@ -24,8 +24,12 @@
     "modal-paginate | tiny | div.pg-block>div.pg-choices>label.cv-radio>input": "[tiny] (no text) is only 13x13px",
     "modal-paginate | tiny | div.pg-block>div.pg-row.pg-inline>label.cv-radio>input": "[tiny] (no text) is only 13x13px",
     "modal-ui | tiny | #ui-help-bubbles": "[tiny] (no text) is only 13x13px",
+    "modal-ui | tiny | #ui-specs-sync": "[tiny] (no text) is only 13x13px",
     "modal-ui-specs | tiny | #ui-help-bubbles": "[tiny] (no text) is only 13x13px",
+    "modal-ui-specs | tiny | #ui-specs-sync": "[tiny] (no text) is only 13x13px",
+    "modal-wikisink-setup | tiny | #wiki-flavor-list>label.wiki-flavor>input": "[tiny] (no text) is only 13x13px",
+    "project-base@ui-scale-max | offscreen | #comp-menu-btn": "[offscreen] composures sits at (998,64) 42x42 outside the 1024x640 viewport with no scroller to reach it",
     "ui-modal-agentfree | tiny | #ui-help-bubbles": "[tiny] (no text) is only 13x13px",
-    "modal-wikisink-setup | tiny | #wiki-flavor-list>label.wiki-flavor>input": "[tiny] (no text) is only 13x13px"
+    "ui-modal-agentfree | tiny | #ui-specs-sync": "[tiny] (no text) is only 13x13px"
   }
 }

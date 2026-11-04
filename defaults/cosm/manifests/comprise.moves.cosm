@@ -1,4 +1,4 @@
-# The moves Comprise OES 1 declares for Thym (docs/THYM.md, sections 6, 17.6 and 18), kept beside its manifest.
+# The moves Comprise OES declares for Thym (https://thym.cosmoes.org/, sections 6, 17.6 and 18), kept beside its manifest.
 #
 # comprise.manifest.cosm is a byte copy of Comprise's own manifest and is never edited in enough, so this sidecar holds
 # the declaration until Comprise's manifest carries a moves: block of its own; when it does, the manifest's block wins

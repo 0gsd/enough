@@ -33,14 +33,21 @@ lines, which enough builds into its local dictionary database on first
 launch. Copyright © 2026 Graham Smith; see
 [reflib/dict/NOTICE.md](reflib/dict/NOTICE.md) for the terms.
 
-### MacroCOSM OES
+### The OES specifications (MacroCOSM OES, Thym, Ascribe, Comprise OES)
 
-The MacroCOSM OES specification (`docs/MACROCOSM_OES.md`) and the MiniCOSM
-manifests under `defaults/cosm/` describe the `.cosm` family of formats that
-enough opens, checks and draws. Copyright © 2026 Graham Smith; see
-[defaults/cosm/NOTICE.md](defaults/cosm/NOTICE.md) for the terms, which also
-cover the names MacroCOSM, MiniCOSM, MicroCOSM, Canon, EMF and atem. The
-reader, `enough/macrocosm.py`, is ordinary enough code under Apache 2.0.
+The four OES specifications bundled as `docs/MACROCOSM_OES.md`, `docs/THYM.md`,
+`docs/ASCRIBE.md` and `docs/COMPRISE_OES.md` are the canonical editions
+published at [cosmoes.org](https://cosmoes.org/) (their editions in
+`docs/specs.json`), copyright © 2026 Graham Smith, all rights reserved. They are
+bundled for use inside enough — the docs viewer and the `/api/*-spec` routes —
+and refreshed from cosmoes.org by `scripts/sync_specs.py` at release time and
+by enough itself at run time (`enough/specs.py`, with the client cosmoes-site
+publishes, `enough/cosmoes_client.py`, Apache 2.0). The MiniCOSM manifests under
+`defaults/cosm/` describe the `.cosm` family of formats that enough opens,
+checks and draws, under the same terms; see
+[defaults/cosm/NOTICE.md](defaults/cosm/NOTICE.md), which also covers the names
+MacroCOSM, MiniCOSM, MicroCOSM, Canon, EMF and atem. The reader,
+`enough/macrocosm.py`, is ordinary enough code under Apache 2.0.
 
 ---
 

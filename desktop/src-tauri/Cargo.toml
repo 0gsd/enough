@@ -1,6 +1,6 @@
 [package]
 name = "enough-desktop"
-version = "0.5.1"
+version = "0.5.4"
 description = "enough.app — the desktop shell"
 authors = ["enough"]
 license = "Apache-2.0"

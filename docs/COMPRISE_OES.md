@@ -1,18 +1,28 @@
-# Comprise OES 1
+# Comprise OES
 
-*The specification of Comprise OES, version 1: the MiniCOSM for companies. Written 2026-10-20 for phase 10 (decision
-Q54, slice 30b). It replaces COSM 0.3, the earlier spec of the product tree (now history), as the description of the
-format; COSM 0.3's product tree is chapter P below, whole. Read `oes/README.md` first for where this sits; `MO.md`, in
-the repository, says why.*
+*Edition 0.5.4 · revised 2026-11-03 · cosmoes.org home: https://comprise.cosmoes.org/*
 
-**Status.** Normative. The code in `core/` is the reference reader and writer. Where this text and the code disagree,
-**the code wins**, and the text is corrected; every disagreement known today is marked *code wins* where it occurs and
-collected in chapter P.12 and section 13.4. *Not built* marks what is mapped and not yet in the code.
+*This edition describes the `comprise/1` MiniCOSM: a catalog declaring `oes: comprise/1`, with P files headed
+`cosm: 0.3`, the isotype `comprise-isotype/0`, the outside chart `comprise-paratype/0`, the backup `comprise-bundle/0`,
+and the sealed package as a `thym/1` package.*
+
+Comprise OES is the MiniCOSM for companies: the format of a Holotype, one company described in plain-text `.cosm` files
+that are at once a file system and a relational database. Every part of the company the format knows (its legal bodies,
+roles, markets, products, representations, inventories, systems and people) has a place in both readings.
+
+Comprise OES replaces COSM 0.3, the earlier specification of the product tree, as the description of the format; COSM
+0.3's product tree is chapter P below, whole. Where this specification sits among the OES specifications, and why any of
+them exists, is said at https://cosmoes.org/.
+
+**Status.** Normative. Comprise, the product, is the reference implementation: its reader and writer read and write
+this format, and the `python -m core …` lines quoted in this text are its command line, given as examples of how a
+check is run, never as the rule. Where an implementation and this text disagree, one of them is in error; the Changes
+appendix (section 14) records which was corrected. *Not checked* marks a rule the checks do not enforce (section 13.3).
 
 **The format does not change.** A Comprise OES file is a `.cosm` file: the COSM YAML subset (section 2.5) and, for
-sketches, the one-line shorthand (P.6), exactly as Holotypes were written before this version. Version 1 names the
-format and maps it; it adds one line to the catalog (section 2.3) and one way to address things (section 6). Every
-Holotype made so far is a Comprise OES 1 Holotype as it stands.
+sketches, the one-line shorthand (P.6), exactly as Holotypes were written before the format had a name. `comprise/1`
+names the format and maps it; it adds one line to the catalog (section 2.3) and one way to address things (section 6).
+Every Holotype written before the declaration existed is a `comprise/1` Holotype as it stands.
 
 ## Contents
 
@@ -29,13 +39,14 @@ Holotype made so far is a Comprise OES 1 Holotype as it stands.
 11. The private/public split
 12. Renderers
 13. Conformance
-14. Decisions in this version
+14. Changes
 
 ## How to read this
 
-**Words.** The words a person reads on screen come first (they are `MO.md`'s). Where the spec must be exact, the model's
-own term follows in parentheses, because it is the one the files, the ids and the command line use. *Details*, in the
-table below, is the disclosure on a page that shows ids, files and paths.
+**Words.** The words a person reads on screen come first; they are the product's, and this text borrows them. Where the
+spec must be exact, the model's own term follows in parentheses, because it is the one the files, the ids and the
+command line use: those words are this text's. *Details*, in the table below, is the disclosure on a page that shows
+ids, files and paths.
 
 | Here | The model's term | In the files |
 |---|---|---|
@@ -53,12 +64,16 @@ table below, is the disclosure on a page that shows ids, files and paths.
 **Must and may.** *Must* is a rule a conforming reader or writer keeps. *May* is a permission. *Should* is advice the
 checks do not enforce.
 
-**Sources.** `core/schema.py` (kinds, references, closed lists, the id grammar), `core/model.py` (loading and
-resolution), `core/paths.py` (paths), `core/lint.py` (the envelope and the fourteen rules), the vendored `cosm.py`
-(chapter P's checks), `core/isotype.py` (the public projection), `plan/comprise-model.md` (the model, draft 1), and
-COSM 0.3 (decision Q29; the full COSM 0.2 and 0.3 text survives in `plan/cosm/cosm-spec.md`, and the vendored
-`references/cosm-spec.md` is now a pointer to this spec that keeps only the nine aspects' sections the app reads). The
-machine-readable form of everything here that a program needs is `oes/comprise-oes.manifest.cosm`.
+**Sources.** The rules here were drawn from Comprise, the reference implementation (its schema: kinds, references,
+closed lists and the id grammar; its loading and resolution; its paths; its checks, the envelope and the fourteen rules;
+the product-tree tooling behind chapter P's checks; its public projection), from the Comprise model document, and from
+COSM 0.3, the earlier specification of the product tree, which this text supersedes and whose nine aspects survive as
+P.3. The machine-readable form of everything here that a program needs is the MiniCOSM's manifest,
+`comprise-oes.manifest.cosm`: a `.cosm` file outside every Holotype, which a Holotype never embeds, since it names its
+MiniCOSM by the declaration alone (2.3). The manifest's fields per kind are the reference fields of section 5, exactly,
+plus the fields a check reads; every other field is open. The word *manifest* has two senses in Comprise: this
+declaration of a language, and the hash list of a saved version, a backup or a published atom; they never meet on
+screen.
 
 ---
 
@@ -95,8 +110,8 @@ canonical. The relational database is real in part. `store.sqlite` holds a `node
 concern and id, with its envelope columns and the whole item as JSON), an `edges` table (one row per resolved
 reference: source, field path, target) and a full-text index, all rebuilt from the files by `python -m core index`;
 and it holds the tables that are canonical and never in a file (the people, feed rows, series, accounts, releases).
-SQL views over the local database, one per kind, are *not built*: the "table" of a kind is, today, the set of items
-whose id carries that kind.
+The "table" of a kind is the set of items whose id carries that kind; SQL views over the local database, one per kind,
+are reserved for a later edition.
 
 The two readings agree because one rule holds: **a path names the same thing a primary key does** (section 6).
 
@@ -124,6 +139,9 @@ The two readings agree because one rule holds: **a path names the same thing a p
 A module folder's letter is read case-insensitively (`p/` loads as `P/`); a writer must write the capital. A folder
 under `atoms/` that the catalog does not declare is a load error. A declared concern without a folder is a load error.
 
+A `logo.svg` or `logo.png` in the volume replaces the drawn company mark (section 12). An SVG so supplied is served so
+that no script in it runs: it is only ever a picture.
+
 ### 2.2 The catalog: `holotype.cosm`
 
 One YAML mapping. Its keys:
@@ -131,7 +149,7 @@ One YAML mapping. Its keys:
 | Key | Holds | Read by |
 |---|---|---|
 | `oes` | the declaration: `comprise/1` (2.3) | the loader |
-| `comprise` | legacy: `0.1` in every Holotype made before phase 10; read as `oes: comprise/1` | the loader |
+| `comprise` | legacy: `0.1` in every Holotype made before the declaration existed; read as `oes: comprise/1` | the loader |
 | `id` | `holotype/<slug>`; when absent the reader uses `holotype/<folder name>` | everything |
 | `name`, `summary` | the subject's name and one line | the pages, the export |
 | `sample` | `true` for a sample (fictional, or public sources only); only the literal `true` counts | the pages, the isotype |
@@ -147,6 +165,8 @@ One YAML mapping. Its keys:
 
 Unknown keys are kept and ignored. A writer must not invent keys the catalog does not list without a version change.
 
+A sample holds no person's name anywhere, and every rendering of it is marked *(sample)*.
+
 ### 2.3 The declaration: `oes: comprise/1`
 
 A Holotype says which MiniCOSM it is written in with one line in its catalog:
@@ -158,19 +178,16 @@ oes: comprise/1
 The value is `<MiniCOSM>/<version>`: the MiniCOSM's name (lowercase), a slash, its major version (an integer).
 
 1. **Read.** A reader must accept `oes: comprise/1`.
-2. **Default.** A catalog with no `oes:` key is read as `comprise/1`, silently. This covers every Holotype made so far,
-   which says `comprise: 0.1`. The legacy key is read and kept; it is never an error.
+2. **Default.** A catalog with no `oes:` key is read as `comprise/1`, silently. This covers every Holotype made before
+   the declaration existed, which says `comprise: 0.1`. The legacy key is read and kept; it is never an error.
 3. **Both.** When a catalog has both, `oes:` decides and `comprise:` is ignored.
 4. **Write.** A writer creating a Holotype must write `oes: comprise/1` as the first line of the catalog. It must not
    rewrite the line of a Holotype it did not create: no migration.
 5. **Refuse.** A catalog declaring a MiniCOSM or a version the reader does not know (`oes: industry/1`,
-   `oes: comprise/2`), or an `oes:` with no value, is refused with a plain error naming what it declares and what the
-   reader knows. Nothing is loaded from it: the checks report the error and `python -m core lint` exits 1, the app will
-   not register it, and a registered Holotype whose catalog is changed to such a line answers 409 until it is changed
-   back.
-
-*Status:* built (decision Q54, slice 30c). `core/model.py` reads, defaults and refuses (`declaration`); `core/align.py`
-writes the line into every new catalog.
+   `oes: comprise/2`), or an `oes:` with no value, is refused with a plain error (`declaration`) naming what it declares
+   and what the reader knows. Nothing is loaded from it: the checks report the error (in Comprise, `python -m core lint`
+   exits 1, the app will not register it, and a registered Holotype whose catalog is changed to such a line answers 409
+   until it is changed back).
 
 The P files keep their own header, `cosm: 0.3` (chapter P.7). It names the product tree's format, not the MiniCOSM.
 
@@ -212,8 +229,8 @@ reason: people are not imported in a public sample; the model records seats, not
 
 `atoms/<concern>/E/` holds a `README` saying where the people are, or a `none.cosm` with `module: none` and a reason.
 The people of a concern live only in the local database (2.8), imported from `people.yaml`. A Holotype's files hold
-counts and roles, never names. *Not checked:* the checks do not refuse an item written into an E file today; a writer
-must not write one (section 13.3).
+counts and roles, never names. *Not checked:* the checks do not refuse an item written into an E file; a writer must
+not write one (section 13.3).
 
 ### 2.7 Other folders
 
@@ -231,7 +248,8 @@ of the model; none is read by the checks except where a section says so.
   and candidates; logins, invites, tokens, keys (public halves only) and the audit; standing statements and evidence;
   isotype settings and releases.
 
-No export of a Holotype includes the canonical tables, and no `.cosm` file ever holds what they hold.
+No export of a Holotype includes the canonical tables, and no `.cosm` file ever holds what they hold. A member of the
+team is named by an account id in the logins, the invites and the audit, never by an email address.
 
 ---
 
@@ -265,8 +283,8 @@ id.
 
 A **relationship** is a typed, dated, sourced tie between two concerns, or between a concern and an outside
 organization, a group or a vendor-published atom. It is an item of kind `C:bond`. Holding structures, licences, supply,
-regulation and franchising are all relationships. The rules named below are the fourteen of section 9.3. From
-`fixtures/mozilla`, a sample built from public sources, abridged:
+regulation and franchising are all relationships. The rules named below are the fourteen of section 9.3. From the
+Mozilla sample Holotype, built from public sources, abridged:
 
 ```yaml
 - id: C:bond/foundation-controls-org
@@ -327,8 +345,8 @@ In the file-system reading it is a mount point: a named place where something ou
 ### 3.4 Groups
 
 A **group** (*atom group*) is a named set of concerns ("the group", a reporting segment), declared in the catalog's
-`groups:`. A group may be a relationship's end. Its id is free text. *Not built:* groups as perspectives, rollup scopes
-and Holotype roots, which `plan/comprise-model.md` describes.
+`groups:`. A group may be a relationship's end. Its id is free text. Groups as perspectives, rollup scopes and Holotype
+roots are reserved for a later edition.
 
 ### 3.5 Vendor-published atoms
 
@@ -364,7 +382,7 @@ Every item carries the same envelope: the system columns of every table. Outside
 | `links` | typed links `{rel, to}` or ids | as references |
 | `mattering` | why it matters, and to whom (chapter P.3.9) | |
 | `body` | Markdown prose | full-text indexed |
-| `at` | where it is, as an id; on a filing, an event or a reflection, a date | as a reference unless a date; `site/…` is refused (13.4) |
+| `at` | where it is, as an id; on a filing, an event or a reflection, a date | as a reference unless a date; `site/…` is a `ref-grammar` error, since a site is not an item (`I:location` keeps `site` as free text) |
 | `attributed-to` | the concern something belongs to when it sits in another's books | as a reference |
 | `template`, `instances` | a shell record that stands for many ("store manager × 31,000") | rule 14 |
 | `counterparty` | the `C:counterparty` the item concerns | as a reference; rule 10 |
@@ -372,8 +390,8 @@ Every item carries the same envelope: the system columns of every table. Outside
 | `shared-with` | the concern or group a shared item is shared with | as a reference |
 
 The envelope's reference fields are `owner`, `at`, `attributed-to`, `counterparty`, `shared-with` and `links`. Every
-other field is the kind's own (section 5). Unknown fields are allowed: the model is young, and a reader must keep what
-it does not understand.
+other field is the kind's own (section 5). Unknown fields are allowed, and a reader must keep what it does not
+understand.
 
 ### 4.1 P is different
 
@@ -420,7 +438,7 @@ Every concern has the eight modules, C · O · M · P · R · I · S · E. Each 
 which of its fields are references (checked as references, section 7) or read by a check (section 9). A module may be
 empty, or `module: none` with a reason.
 
-The reference fields below are `core/schema.py`'s, exactly. A dotted field (`rows.sku`) walks into lists and mappings:
+The reference fields below are normative, exactly as listed. A dotted field (`rows.sku`) walks into lists and mappings:
 the `sku` of every row.
 
 ### Chapter C · Corporation
@@ -480,8 +498,10 @@ the `sku` of every row.
 ### Chapter P · Products: the product tree
 
 *What it offers, and why that matters.* Chapter P is COSM 0.3, the product tree, rewritten in Comprise OES's terms.
-Everything normative in COSM 0.3 is kept; what COSM 0.3 described and the code does not do is marked *not built*
-(P.11); where its text and the code disagree, the code wins (P.12).
+Everything normative in COSM 0.3 is kept, as this chapter states it. What COSM 0.3 described beyond the description of a
+tree (simulation, an editing API, exports and imports, the tree written back as a sketch) is reserved for a later
+edition; where COSM 0.3's text and this chapter differ, this chapter holds, and the Changes appendix (section 14)
+records the differences.
 
 #### P.1 What P describes
 
@@ -507,7 +527,8 @@ service directly.
 | L0 | `product` · `service` | the unit that does the work: a product is an artifact, a service an activity | nothing: what is inside goes in `substrate` | parts |
 
 P has one more kind, `release` (`P:release/<unit>@<version>`: date, channels, build, notes, listings), declared in the
-schema. *Code wins:* P's checks do not know the kind, and a `P:release` item fails them as an unknown kind (P.12).
+schema. P's checks do not know the kind, and a `P:release` item fails them as an unknown kind: a disagreement recorded,
+not resolved; its resolution is reserved for a later edition.
 
 **Invariants**, checked except where marked:
 
@@ -549,7 +570,7 @@ stale or leak.
 | `owner` | the accountable role, `O:role/…`; required |
 | `since`, `until` | lifecycle bounds; no `until` means active |
 | `status` | the envelope's; the isotype offers only items with no status or `active` |
-| `version` | of this description, not of the thing; optional, unused by the code |
+| `version` | of this description, not of the thing; optional; no check reads it |
 | `confidence`, `consensus` | 0 to 1: how sure the elicitation was; how much the sources agreed |
 | `sources` | the sources it came from (4.1) |
 | `visibility` | `public` · `internal` · `restricted`. When absent: `public` for the brand, suites and offerings; `internal` for functions; for a product or service, `public` only when one of its flows touches a market or a channel (P.5.2) |
@@ -707,14 +728,14 @@ Three aspects flow down the tree; six do not.
 
 A child may redefine an inherited word, but must say so with `overrides: true` (or map it with `maps-to`); silent
 redefinition of a brand word is an error (`override-explicit`). A child may add rules and may narrow a `may`; it must not
-weaken an inherited `must` or `must-not` (*not checked*, P.12). The effective item, with every inherited line marked with
+weaken an inherited `must` or `must-not` (*not checked*, section 13.3). The effective item, with every inherited line marked with
 the ancestor it came from, is what an item's card shows.
 
 #### P.6 The sketch (shorthand)
 
 For whiteboards, interviews and chat. One item per line; indentation is containment; the first line is the brand.
 Expanding a sketch writes the canonical YAML with an open question on every aspect the sketch did not fill (`python -m
-core align sketch`, which runs cosm.py's `expand` and adds the Comprise namespaces).
+core align sketch`, which runs the product-tree tooling's `expand` and adds the Comprise namespaces).
 
 | Mark | Means | Lands in |
 |---|---|---|
@@ -756,10 +777,10 @@ atoms/<concern>/P/
 - `reading` (how to read the draft: date, author, mode, perspective, note), `history` (dated events that explain the
   shape), `findings` (what the structure already shows: check, nodes, finding, proposal) and `sources` (the P items'
   sources) carry the document. The export renders them; nothing is assembled by hand.
-- `roles:`, `externals:` and `contracts:` inside P are legacy: still read, never written. Roles live in O, contracts in C,
+- `roles:`, `externals:` and `contracts:` inside P are legacy: read, never written. Roles live in O, contracts in C,
   externals are derived (P.5.2).
 - Ids in P files are namespaced (`P:offering/ledger`, `O:role/Founder`); the tooling strips and restores the namespace
-  when it hands the tree to cosm.py.
+  when it hands the tree to the product-tree checks.
 - `type: firm` loads as `brand`, and `type: stack` as `function`, with a note. A writer must write the current kinds.
 - P may be `module: none` with a reason. A concern whose P has neither a brand nor `module: none` is an error.
 
@@ -787,9 +808,9 @@ Every drawing is a view over the same items, never drawn by hand. The text is ca
 | bound-by | `<-->`, labelled with the contract |
 | maps | `-. maps .-` |
 
-Built views (cosm.py `render`): `map` (the tree with feeds over it), `tree`, `flow`, `affect`, `mattering`. *Not built:*
-`substrate` and `rules`. The app draws P in its own renderers (section 12); the card (`card`) and the text tree
-(`ascii`) are cosm.py's.
+The views (the product-tree tooling's `render`): `map` (the tree with feeds over it), `tree`, `flow`, `affect`,
+`mattering`; a `substrate` view and a `rules` view are reserved for a later edition. The app draws P in its own renderers
+(section 12); the card (`card`) and the text tree (`ascii`) are the product-tree tooling's.
 
 #### P.9 P's checks
 
@@ -849,40 +870,13 @@ drops substrate, costs, margins, settlements, role details, open questions, find
 public by P.3.1. The top of the tree looks the same to a customer as to an employee; only the depth differs. The pack,
 a published atom and the isotype's offers all use this rule.
 
-#### P.11 What COSM 0.3 described that Comprise OES 1 does not build
+#### P.11 (withdrawn)
 
-Kept as the map of where P can go. None of it is in the code today.
+Chapter P.11 was withdrawn in edition 0.5.4; its content, where it survives, is in the Changes appendix (section 14).
 
-| COSM 0.3 | State in Comprise OES 1 |
-|---|---|
-| simulation: units as queues, aggregates by min-cut, role variance as jitter, rule gates, affect probes, scenarios | *not built* |
-| `whatif`, `harmonize` (nine checks), `propose`, `rank`, `uat`, `qa`, `hooks` | *not built*; the findings in `doc.cosm` use harmonize's words |
-| `depersonalize` (proposing role substitutions) | *not built*; the `no-humans` checks find, a person fixes |
-| `export` to JSON-LD, Turtle, OWL, SHACL, ArchiMate, CSV; `import` | *not built* |
-| `save`, `put`, `remove`, `where`, `upstream`, `downstream`, `glossary`, `capacity`, `cost` as an API | *not built* as an API; the app's editor writes through the checks |
-| `sketch` (the tree back as shorthand) | *not built*; `expand` is |
-| the Remote Assistance Protocol (grants, propose mode, the remote queue) | replaced by Comprise's own: grants in the catalog, proposals a person accepts, the audit (section 10) |
-| the State Library, `history`, `diff`, `at`, `attest` | replaced by saved and signed versions (section 10) |
-| mattering shares, an affect scale, firms within firms, product internals | open questions of COSM 0.3; firms within firms are now concerns and relationships (section 3) |
+#### P.12 (withdrawn)
 
-#### P.12 Where COSM 0.3's text and the code disagree
-
-The code wins in every row.
-
-| COSM 0.3's text says | The code does |
-|---|---|
-| its header: v0.2 | the tree is 0.3 (Q29: the brand, `restricted`); P files say `cosm: 0.3`, and so does cosm.py's `VERSION` (`0.3`, the line `expand` writes) |
-| `rule-syntax` is an error when the actor is not a role | a warning; an external may also be an actor; only a rule with no aim is an error |
-| `no-humans` is an error | a warning (pronouns) and a note (a name-like pair); outside P, a pronoun in name or summary is a warning and a pointer to `E:person` from an unrestricted item an error |
-| `term-resolves` (warning) and `no-weakening` (error) | not checked |
-| `role-exists` covers rule actors | covers the owner only |
-| rule-consistency: a `must` and a `must-not` whose `when` can both hold | a `must` and a `must-not` with the same text |
-| flow balance within a tolerance the brand sets, default 10% | always 10% |
-| the API table counts six equilibrium conditions | there are seven, in text and code |
-| `snapshot` is refused unless equilibrium holds | a saved version is always taken and records the verdict; signing is refused unless the checks allow it (section 10) |
-| one node per file, or many under `nodes:` | the convention is `brand.cosm`, `nodes.cosm`, `doc.cosm`; any `*.cosm` under P is read |
-| the `substrate` and `rules` views | not built |
-| `P:release` is a P kind (`plan/comprise-model.md`) | in the schema, but P's checks reject it as an unknown kind |
+Chapter P.12 was withdrawn in edition 0.5.4; its content, where it survives, is in the Changes appendix (section 14).
 
 ### Chapter R · Representations and reflections
 
@@ -942,7 +936,7 @@ module with personal data, and it is never in a file (2.6). Its kinds are tables
 | `credential` | `credentials`: a licence or certification a person holds; issuer, scope and data sealed | |
 | `access` | `access` | |
 | `intake`, `continuity` | a person's profile, inside `persons.data` | |
-| `broadcast` | declared; *not built* | |
+| `broadcast` | declared; reserved for a later edition | |
 
 Pages show E as counts. Rules 6, 12 and 13 read it from the local database; without it they are unverifiable, unless
 E is `module: none` (or the database says `people: none`) with a reason.
@@ -962,8 +956,8 @@ levels. Paths are accepted beside ids, never instead of them.
 
 ### 6.1 Properties
 
-- **A respelling.** A path is computed from an id, and an id from a path, with no lookup. Every item of the six fixtures
-  (1,227 items) has a path, and every path turns back into its id.
+- **A respelling.** A path is computed from an id, and an id from a path, with no lookup. Every item of the reference
+  implementation's sample Holotypes has a path, and every path turns back into its id.
 - **Slug-based.** It is built from slugs, which never change when an item is renamed.
 - **Absolute.** It always starts with the concern. There are no relative paths: a bare id inside a concern becomes a
   path by adding that concern.
@@ -1004,7 +998,7 @@ only an item. Segments are case-sensitive: module letters are capitals, kinds an
 | an item and a field path | `<item path>#<field>` | a field (a cell) |
 | `vendor/<domain>/<slug>` | `vendor/<domain>/<slug>` | a vendor-published atom |
 
-The module and kind levels have no id today; the path is their only name. The reverse is the same table read right to
+The module and kind levels have no id; the path is their only name. The reverse is the same table read right to
 left. The concern of a bare id is the concern whose files hold it.
 
 ### 6.4 Edge cases, settled
@@ -1050,10 +1044,10 @@ field (`#global-id`), not a path: a path addresses the volume, never the world.
 #### 6.4.5 Vendor-published atoms
 
 A vendor-published atom's path is its id, `vendor/<domain>/<slug>`, and nothing below it. Its items have no address in
-the customer's Holotype in Comprise OES 1: they belong to the vendor's own Holotype, where they are an ordinary concern,
+the customer's Holotype in `comprise/1`: they belong to the vendor's own Holotype, where they are an ordinary concern,
 and the qualified form (6.4.7) addresses them there. `vendor/<domain>/<slug>` never collides with a concern named
-`vendor`, because a concern path's second segment is a module letter, a capital, and a domain never is. No fixture holds
-a vendor-published atom, so this section uses placeholders.
+`vendor`, because a concern path's second segment is a module letter, a capital, and a domain never is. The examples in
+this section are placeholders, not items of a sample Holotype.
 
 #### 6.4.6 Fields
 
@@ -1070,8 +1064,8 @@ mozilla-foundation/C/bond/foundation-licenses-corporation#scope[0]
 A field path names a value that is there; a path to a missing field names nothing. An open question on a whole item
 (a `pending:` key on the item) is addressed by the item's path with no field. A key outside the `key` rule (one with a
 slash or a space) has no field path. In a URL, `#` is the fragment: the browser keeps it across the redirect, so
-`/h/{key}/at/<path>#<field>` opens the item's page. *Not built:* the page does not yet scroll to or select the field;
-the command line and MCP address fields (6.5).
+`/h/{key}/at/<path>#<field>` opens the item's page (the item, not the field); the command line and MCP address fields
+(6.5).
 
 #### 6.4.7 The qualified form
 
@@ -1086,23 +1080,23 @@ oes:comprise/mozilla                                    the Holotype itself
 
 `<holotype>` is the Holotype's id without `holotype/` (`holotype/mozilla` → `mozilla`). The form carries no version:
 a path keeps its meaning across versions of a MiniCOSM, and a change that would alter a path's meaning must be a new
-MiniCOSM. A Holotype's id is unique within one install's registry, not in the world. *Not built:* a globally unique
-Holotype name (Connect's Holotype id, or an isotype's handle on the Index) and a resolver for qualified paths across
-installs. A qualified path names a private address; it opens nothing to a reader who may not see it.
+MiniCOSM. A Holotype's id is unique within one install's registry, not in the world; a globally unique Holotype name
+and a resolver for qualified paths across installs are reserved for a later edition. A qualified path names a private
+address; it opens nothing to a reader who may not see it.
 
 #### 6.4.8 Case, characters and what has no path
 
 - Ids and paths are case-sensitive and keep their case: `meadow/O/role/Founder`. Two ids that differ only in case are
   two items, and a case-insensitive file system (Windows, macOS by default) would merge them if a writer ever used paths
-  as file names. Comprise OES 1 never does; a tool that does must refuse such a pair. *Not checked:* the checks do not yet
-  warn about ids that differ only in case.
+  as file names. `comprise/1` never does; a tool that does must refuse such a pair. *Not checked:* the checks do not
+  warn about ids that differ only in case (section 13.3).
 - A slug uses ASCII letters, digits, `.`, `_`, `@` and `-`, and never ends in `.` (Windows drops a trailing dot). This is
   the set the tooling already reads in bare P ids, and it holds `P:release/<unit>@<version>`. No segment is a Windows
   reserved name, alone or before a dot (6.6).
 - An id whose slug falls outside that set (one with a slash, a colon, a `#`, a space or a non-ASCII letter) parses as an
-  id but has **no path** in Comprise OES 1. The CLI says so. *Not checked:* the checks do not yet warn about such ids;
-  none exists in any fixture.
-- The catalog's own entries (sources, grants, groups, attestations) have no path in Comprise OES 1.
+  id but has **no path** in `comprise/1`; the command line says so. *Not checked:* the checks do not warn about such ids
+  (section 13.3).
+- The catalog's own entries (sources, grants, groups, attestations) have no path in `comprise/1`.
 
 ### 6.5 Where paths are accepted
 
@@ -1119,9 +1113,6 @@ The app's own links stay id-based (`/h/{key}/node/<concern>/<id>`); `/at/` is ho
 `#<field>` to the server, so `/at/` opens items and folders, and the CLI and MCP address fields. `/at/` takes the path
 only, never the qualified form: it already knows the Holotype.
 
-*Status:* built (slice 30c): `core/paths.py`, the `path` command in `core/cli.py`, `core/mcpserver.py`, `core/pack.py`,
-and the `/at/` route and the item page's Details in `app/`.
-
 ### 6.6 Scope and safety
 
 - A path to something the reader may not see answers exactly as its id would: the same 404, no name, no link. A path is
@@ -1136,7 +1127,7 @@ and the `/at/` route and the item page's Details in `app/`.
 
 ### 6.7 Examples
 
-Every example in this document resolves on the fixtures; the read-only script that checks them prints each with its id.
+Every example in this document resolves on the reference implementation's sample Holotypes.
 
 | Path | Id | Names |
 |---|---|---|
@@ -1210,10 +1201,10 @@ reader; display does.
 
 ### 7.5 Named relations
 
-`plan/comprise-model.md` names the cross-module relations (owner, holds, serves, sold-through, priced-by, maps-to or
-entitles, listed-on, runs-on, presents, about, bound-by, shared-with, feeds, attributed-to, at, twin, counterparty,
-licensed-by, requires-credential, member-of). In Comprise OES 1 each is a field; the relation's name is the field's,
-and the checks know them only as reference fields. A typed link's `rel` is free text.
+The cross-module relations have names (owner, holds, serves, sold-through, priced-by, maps-to or entitles, listed-on,
+runs-on, presents, about, bound-by, shared-with, feeds, attributed-to, at, twin, counterparty, licensed-by,
+requires-credential, member-of). In `comprise/1` each is a field; the relation's name is the field's, and the checks know
+them only as reference fields. A typed link's `rel` is free text.
 
 ---
 
@@ -1236,7 +1227,7 @@ pending: After the 2026 transfer the FAQ says Mozilla.org owns the trademarks; w
 - **Not the same as "not disclosed".** `provenance.state: not-disclosed` says the subject declined to say: a fact.
 - **Not the same as "to fill in".** *To fill in* counts the details the question bank would still ask about an item,
   its open questions included; an item with nothing left to fill in is **complete**. The three health figures (open
-  questions, to fill in, complete) come from one place, `core/health.py`.
+  questions, to fill in, complete) come from one place.
 
 ---
 
@@ -1330,6 +1321,10 @@ reason.
 **The Holotype is private by construction; the isotype is public by construction.** Two formats, not one format with a
 setting.
 
+**Standing** is whether the people keeping a Holotype speak for its subject, and to what proven level: the domain, the
+legal entity, the person acting for it. First-party standing is proven at one of those levels by Comprise Connect; a
+claim in the catalog (`alignment`, 2.2) is never proof; an outsider's standing is third-party (11.4).
+
 ### 11.1 The private side
 
 - The files stay on the subject's machine. Nothing leaves unless a person set up where it goes.
@@ -1374,20 +1369,122 @@ seeks[], open_to[]:  kind (the aim kinds), summary
 | `offers` | the live, public suites and offerings of every member (products and services when there are none), at most 50 |
 | `seeks`, `open_to` | public, live or planned `C:aim` items, by stance |
 
-**The rules that bind it** (decision Q50):
+**The rules that bind it:**
 
 - **Assertions, not measurements.** No counts of anything internal; the only number is the founded year.
 - **Withhold, never falsify.** What is not public is left out and leaves no mark. An offer whose summary holds a
   digit keeps its name and loses the summary; an aim or a market with a digit is left out.
 - **Verified and stated.** Identity, shape and offers are derived from the Holotype (*verified*); seeks and open to are
-  the company's own words (*stated*).
+  the company's own words (*stated*), and so are `bonds` and `policies` when a release carries them.
 - **Epochs and bands.** The date is the epoch (`2026-Q4`, `2026-10`, `2026-W43`), never the day of an edit; lists are
   sorted so file order leaks nothing; a banded number moves only after 90 days past the boundary.
 - **One release per epoch, signed.** Quarterly by default; monthly or weekly by choice. A release needs a first-party
   concern, unless the Holotype is a sample, whose isotype says `sample: true` and is signed by the install's sample key.
-- **Opt-indexed.** Nothing is listed on the Index unless the subject released it and chose to list it.
+- **Opt-indexed.** Nothing is listed on the Index as its subject unless the subject released it and chose to list it. An
+  outside chart (11.4) is listed under Outside View, and never as the subject. Comprise Connect charges fees for what it
+  does, and its terms page states them; a promoted entry on the Index is always labelled as promoted.
 
-*Not built:* the dial, more isotype fields a subject may open one at a time, each opt-in and marked verified or stated.
+**What a release may also carry.** Each of these is optional and the version stays `/0`, so a stored isotype stays
+valid and an older one reads as it always did. Default-deny still holds: anything not named here is refused, never filtered. A text is
+at most 600 characters, a list 50 items, and a document 64 KB. The numbers rule holds: the words in these keys hold no digit, and a
+digest's digits count nothing.
+
+| Key | Holds | Emitted by |
+|---|---|---|
+| `program` | `{name, sha256}`: the preset or program that made it, and the sha256 of its `.thym` bytes | every release through the app |
+| `trace` | `{sha256}`: the sha256 of the cleaned trace, which stays on the machine | every release through the app |
+| `shape.markets` | a list of names, as above, or one word: `few` (1 to 2 regions), `several` (3 to 9), `many` (10 or more, or a region named exactly `worldwide` or `global`, in any case) | a list from *minimal*, a word from *fuller* and *house* |
+| `offers[].told`, `seeks[].told`, `open_to[].told` | one line built from the item's summary and the names of its public children, by a rule and never by a model, and only when it says more than `summary` | *fuller*, *house* |
+| `offers[].tiers` | at most 10 of `{name, price}`, `price` being `free`, `paid` or `on-request`, from the offer's public pricebook | *house* |
+| `seeks[].horizon`, `open_to[].horizon` | `this year`, `next year` or `later`, relative to the epoch, or a few words of the company's with no digit | *house* |
+| `bonds` | `{kinds, from, to}`: public relationships with both ends concerns of this Holotype, by name, and never an outside counterparty | *house* |
+| `policies` | `{name, summary}`: public policies | *house* |
+
+**The dial: a release is a program's projection.** `project` calls the rules in the table above, then narrows to what a Thym program
+emitted and withheld, so a program only chooses: it can keep more back, and it can't add a row, word one or ask a model. Three presets ship
+with Comprise: *minimal*, which reproduces those rules byte for byte; *fuller*, with `told` and a word for `shape.markets`; and *house*,
+which adds the rest of the table. A subject with first-party standing may write its own program, and a program that breaks a rule is refused,
+with the line. A first release states a market word, and after that it moves only after 90 days past its boundary. The moves are declared
+in a sidecar, `comprise.moves.cosm`, and never in the manifest; the language a program is written in is Thym
+(https://thym.cosmoes.org/).
+
+Further isotype fields a subject may open one at a time, each opt-in and marked verified or stated, are reserved for a
+later edition.
+
+### 11.4 The outside chart: `comprise-paratype/0`
+
+An outsider's isotype of a subject, at third-party standing and never the subject's word. On a screen it is an *outside chart*, in full.
+
+```
+{paratype, standing, submitter, of, hid, epoch, program, trace, identity, shape, offers, seeks, open_to}
+optional:  bonds, policies, and the optional keys of items (11.3)
+refused:   isotype, sample, cadence, agreement
+```
+
+| Key | Holds |
+|---|---|
+| `paratype` | `comprise-paratype/0` |
+| `standing` | `third-party`, always |
+| `submitter` | the maker's stable holder id, `h-` and 16 of `a-z2-7`, which a page shows as their current handle. Never a name, an email or an organization |
+| `of` | the subject: one primary domain in normal form (lower case, no trailing dot, no scheme, no `www.`), holding a dot and no IP address |
+| `hid` | a random id the app makes for this chart, and not a vault id, so uploading needs no vault |
+| `epoch` | a calendar quarter, `2026-Q4`, not later than the current one |
+| `program`, `trace` | as 11.3, and required here, because a chart is always a program's projection |
+
+Every other key, and every limit on it, is `comprise-isotype/0`'s. Comprise and Comprise Connect check a chart against one and the same
+contract, and reach one verdict on it.
+
+- **Signing.** Ed25519 over the canonical JSON, sent as `{paratype, signature, public_key}`, by a chart key kept per holder in the keychain
+  (`comprise/chart`), and never the key that signs an isotype, which would link the person to the company in a public document.
+- **A chart can't become an isotype.** It never carries `sample`, is never listed as the subject, and nothing an outsider derives is marked
+  verified.
+- **The handle.** A holder's handle is words and digits joined by hyphens, so it never reads as a subject's handle, and
+  names no one. It changes at most once in 90 days; at 365 days Connect replaces it at the holder's next visit; every
+  handle a holder has had stays on their public history page. A line beside a handle saying what Connect has verified of
+  the holder's organization shows only when something was checked, and never names the organization.
+- **The monthly limit.** Connect takes 3, 10 or 30 new charts a month from a holder, by what the holder's organization
+  has proven: 3 with nothing proven, 10 with a proven domain, 30 with the entity or its representative verified. A
+  replacement counts, the same chart sent again does not, and a withdrawal gives none back.
+- **On the Index.** One live chart per holder per subject: a new one replaces it. Agreement is computed by Connect, is never in the document, and
+  counts only closed or banded fields and sets of kinds. Prose is never merged. A count says what these holders say, not
+  that the thing is so, and since one person may hold many accounts it can be farmed. Counts stop once the subject picks
+  among its charts or deletes one, and do not come back.
+- **Once the subject lists.** A listing that has proven the domain demotes its charts, computed at read, and the owner chooses what shows.
+
+### 11.5 The sealed package: a cryptotype
+
+The owner's encrypted package of a Holotype, or of a program's projection of it, handed with a key to a chosen party. It is a Thym package
+(Thym, its section 15, https://thym.cosmoes.org/) in its encrypted form. On a screen it is a *sealed package*, and a projection in one is a *reduced copy*.
+
+```
+<name>.thym/           the folder form, with its catalog package.cosm
+<name>.package.cosm    the single file: the same catalog, with each file's bytes on its row
+<name>.thym.enc        the sealed file: the single file, encrypted
+catalog:   oes: thym/1, kind: package, id: thym/<name>, name, contents: [{path, sha256, role}], made: {program?, trace?, at, by}, notice, nodes: []
+roles:     holotype, projection, program, trace
+```
+
+- **Two kinds.** *The whole Holotype* is one `holotype` row per model file, at its own path. *A projection* is `projection` (`projection.json`, a
+  `comprise-isotype/0` document with its `program` and `trace` digests, unsigned), `program` (`program.thym`, its source) and `trace`
+  (`trace.cosm`, the cleaned trace). Nothing else is a package: no local database, no store key, no people file, and no chart key.
+  A reduced copy's record still shows counts: the trace holds the steps and how many items each went through, which can
+  be more than the copy says.
+- **Text.** A file that isn't text, or that YAML would change, goes under a row's `base64`, with `sha256` still over its bytes.
+- **The seal.** The bundle's cipher (`comprise-bundle/0`: AES-256-GCM chunks and an encrypted manifest) under a **fresh data key for the package**,
+  never the Holotype's, with one recovery-code keyring entry. The sealed file is a `thym/1` catalog with `encrypted: {cipher: comprise-bundle/0,
+  aead: a256gcm, key: shown-once, hid, bundle, keyring, manifest, chunks}`, its `id` is `thym/<hid>`, and `hid` is a random id of its own. Its manifest
+  also holds `clear`, the sha256 of the file's own bytes with that value taken out, so a byte changed anywhere refuses it.
+- **The key** is a recovery code: 24 characters of A-Z and 2-7, shown once and stored nowhere. A lost key is a lost package.
+- **Standing.** Any standing may make one, since it speaks as no one and is not signed. Below first-party its notice says it is research.
+- **Hosting** is the owner's choice per package. Comprise Connect stores the sealed file in parts, zero-access, in a storage area of its own, with a
+  capability it keeps only hashed, and sees its size, its times and its fetches. A withdrawal really removes it, and
+  cannot recall a copy already fetched.
+- **Match tokens** are the one exception to zero access, by the owner's consent: `{about, token}`, `token` being the lowercase hex HMAC-SHA256
+  of `about`, a newline and the value's normal form, under a key per package that Connect holds with a hosted copy. `about` is one of `identity.kind`,
+  `identity.country`, `shape.employees`, `shape.structure`, `shape.markets`, `offers.kind`, `seeks.kind` and `open_to.kind`, and a value is a closed word or a
+  two-letter country, so Connect can work out what each says. A package handed over directly has none. Someone who found
+  what a package says may write to its owner: the words are plain words Connect holds, not sealed, and only the owner's
+  yes, in the owner's own words, reaches the asker.
 
 ---
 
@@ -1396,23 +1493,25 @@ seeks[], open_to[]:  kind (the aim kinds), summary
 A **renderer** turns a Holotype into another form. Renderers only read. Each applies the reader's scope (4.2): a hidden
 item is absent.
 
-| Renderer | Makes | Where |
-|---|---|---|
-| the 3D Overview | the scene: a campus with a building per concern, its modules as blocks, kinds, items as bricks, fields as stairs | `core/overview3d.py`, `app/static/overview3d/` |
-| the circles (V1) | concerns, modules, kinds and items as circles within circles | `core/overview.py`, `app/static/overview.js` |
-| the Field Guide | the Summary, the eight chapters, the item pages, the questions | `app/fieldguide.py`, `app/fieldpages.py` |
-| the text tree | P as indented text, with the relationships and the derived tree | `python -m core ascii`, `tree` |
-| the export | `CONTEXT.md` for an audience and a scope, with its hash | `core/pack.py`, `python -m core pack` |
-| reports | columns and rows from a definition, as of now or a saved version | `core/reports.py` |
-| the diff and the timeline | change between saved versions | `core/snapshot.py` |
-| the company mark | an isometric cluster in the module colours, sized by contents | `core/mark.py` |
-| the published atom | a concern's public files, signed, for a vendor to serve | `core/publish.py` |
-| the isotype | the public projection (11.3) | `core/isotype.py` |
-| P's card and Mermaid views | one item's nine aspects; `map`, `tree`, `flow`, `affect`, `mattering` | cosm.py, through `core/cosm_bridge.py` |
-| the deck | PDF, SVG and HTML pages of a product tree | the skill's `cosm_deck.py`; the app does not call it |
+| Renderer | Makes |
+|---|---|
+| the 3D Overview | the scene: a campus with a building per concern, its modules as blocks, kinds, items as bricks, fields as stairs |
+| the circles (V1) | concerns, modules, kinds and items as circles within circles |
+| the Field Guide | the Summary, the eight chapters, the item pages, the questions |
+| the text tree | P as indented text, with the relationships and the derived tree (`python -m core ascii`, `tree`) |
+| the export | `CONTEXT.md` for an audience and a scope, with its hash (`python -m core pack`) |
+| reports | columns and rows from a definition, as of now or a saved version |
+| the diff and the timeline | change between saved versions |
+| the company mark | an isometric cluster in the module colours, sized by contents |
+| the published atom | a concern's public files, signed, for a vendor to serve |
+| the isotype | the public projection (11.3), under a program |
+| the outside chart | an outsider's projection (11.4) |
+| the sealed package | the whole Holotype or a projection, encrypted (11.5) |
+| P's card and Mermaid views | one item's nine aspects (`card`); `map`, `tree`, `flow`, `affect`, `mattering` (P.8); the product-tree tooling's |
+| the deck | PDF, SVG and HTML pages of a product tree, made by the agent skill's deck tool; the app does not call it |
 
-*Not built:* renderers driven by a reader's own style profile; rewritings for beginners, story problems and narrative
-(the text cases of what the trade calls *transcreation*).
+Renderers driven by a reader's own style profile, and rewritings for beginners, story problems and narrative (the text
+cases of what the trade calls *transcreation*), are reserved for a later edition.
 
 ---
 
@@ -1420,7 +1519,7 @@ item is absent.
 
 ### 13.1 A reader must
 
-1. Read the catalog; accept `oes: comprise/1`; read a catalog without `oes:` as Comprise OES 1; refuse an unknown
+1. Read the catalog; accept `oes: comprise/1`; read a catalog without `oes:` as `comprise/1`; refuse an unknown
    MiniCOSM or version with a plain error (2.3).
 2. Load every declared concern's eight modules from `*.cosm` files at any depth, as UTF-8 with an optional BOM, with
    YAML 1.2 booleans, never stopping at the first problem (2.4, 2.5).
@@ -1431,6 +1530,7 @@ item is absent.
 6. Apply visibility (4.2) before showing anything: a hidden item is absent, and a reference to it keeps its id and no
    name.
 7. Never read the local database's people into anything but counts, outside E's own pages.
+8. Read through another system's tool (an MCP source) and never write through it.
 
 ### 13.2 A writer must
 
@@ -1454,65 +1554,100 @@ relationship kinds and bases; aims; P's per-item checks and seven conditions; th
 - that no item is written into an E file;
 - that exactly one entity per concern is the anchor, and that the brand holds at least one part;
 - that a `restricted` item's pointer to a person is lawful;
-- inherited `must` and `must-not` are not weakened (P.12);
+- inherited `must` and `must-not` are not weakened (P.5.3);
 - that ids differ by more than case, and that every slug is path-safe (6.4.8);
 - that an `M:account` is restricted.
 
-### 13.4 Where the code wins
+### 13.4 (withdrawn)
 
-Besides chapter P.12:
-
-| Text elsewhere says | The code does |
-|---|---|
-| HELP_CENTER §8: one file per type family under `{C,O,M,P,R,I,S}/` | reads any `*.cosm` at any depth under a module folder |
-| `plan/comprise-model.md` §5 lists C's kinds without `aim` | `C:aim` exists (slice 26a) |
-| `plan/comprise-model.md` §4: the envelope includes `pending, links, mattering, body` | the same, plus `shared-with` as an envelope reference |
-| `plan/comprise-model.md` §8: E is canonical in the store | as written; the store's `access` table also holds team access levels |
-| `plan/comprise-model.md` §1, §4: any item may say `at: site/…` | `at` must be an id or a date; `site/…` is a `ref-grammar` error, because sites are not items yet (`I:location` keeps `site` as free text) |
-| COSM 0.3's API: "ids are the only handles" | paths are accepted beside ids (section 6) |
+Section 13.4 was withdrawn in edition 0.5.4; its content, where it survives, is in the Changes appendix (section 14).
 
 ---
 
-## 14. Decisions in this version
+## 14. Changes
 
-Made by the writer of slice 30b, 2026-10-20, without asking, as the brief required. Slice 30c built on them, so a
-change to what a path means now needs a new MiniCOSM (decision 9).
+Newest first. An entry records what changed in the text; where an implementation and this text had disagreed, it says
+which was corrected.
 
-1. **The spec is one document**, with the product tree as chapter P and the other seven modules as chapters of the same
-   shape. COSM 0.3's normative text survives in chapter P; its unbuilt API is a table (P.11).
-2. **Paths are a pure respelling of ids.** No lookup, no index. Checked: all 1,227 items of the six fixtures round-trip.
-3. **The brand's path is `<concern>/P/brand/<slug>`**, mapping to `P:<slug>`. One-to-one because `P:brand/<slug>` is
+**Edition 0.5.4 · 2026-11-03, second revision.** Rules the reference implementation keeps and this text had not stated
+are written in: the logo file served script-free (2.1); a sample's names and mark (2.2); team members named by account
+id (2.8); standing and its proven levels (section 11); fees and promoted entries (11.3); the holder's handle, the
+monthly limit and what agreement counts and never means (11.4); a reduced copy's record, what a withdrawal cannot
+recall, and a finder's words to an owner (11.5); reading, never writing, through another system's tool (13.1).
+
+**Edition 0.5.4 · 2026-11-03.** The canonical edition, published at https://comprise.cosmoes.org/. The name carries no
+number: Comprise OES, describing the `comprise/1` MiniCOSM; the dated introduction gives way to the status line and the
+lead. Comprise, the product, is named as the reference implementation in place of its code, and "the code wins" gives
+way to this appendix's rule. Chapter P.11 (what COSM 0.3 described and the implementation did not build), chapter P.12
+(where COSM 0.3's text and the implementation disagreed) and section 13.4 (where the code wins) are withdrawn: P.11's
+and P.12's substance is recorded in the entry for 2026-10-20 below, 13.4's rules stand in their own sections, and its
+rule for `at: site/…` is folded into section 4. The *not built* markers are withdrawn and each gap is stated where it
+falls as reserved for a later edition (SQL views per kind, groups as perspectives, the `substrate` and `rules` views,
+the resolution of `P:release`, a globally unique Holotype name and a resolver for qualified paths, further opt-in isotype
+fields, style-profile renderers). The manifest's rules, formerly among the decisions of 2026-10-20, are folded into
+"How to read this". Status passages, decision and slice references, repository paths, pointers to planning documents
+and the item counts of the sample Holotypes are removed; the cross-references to Thym and to the overview are their
+cosmoes.org homes. Section 14, "Decisions in this version", becomes this appendix.
+
+**Edition 1 · 2026-10-20.** The first edition of the format under its own name, replacing COSM 0.3.
+
+1. **One document.** The product tree is chapter P and the other seven modules are chapters of the same shape. COSM
+   0.3's normative text survives in chapter P. What COSM 0.3 described beyond the description of a tree is not part of
+   the format: simulation (units as queues, aggregates by min-cut, role variance as jitter, rule gates, affect probes,
+   scenarios); `whatif`, `harmonize`, `propose`, `rank`, `uat`, `qa` and `hooks` (the findings in `doc.cosm` keep
+   harmonize's words); `depersonalize` (the `no-humans` checks find, a person fixes); export to JSON-LD, Turtle, OWL,
+   SHACL, ArchiMate and CSV, and import; `save`, `put`, `remove`, `where`, `upstream`, `downstream`, `glossary`,
+   `capacity` and `cost` as an API (the app's editor writes through the checks); `sketch`, the tree written back as
+   shorthand (`expand` is kept). The Remote Assistance Protocol is replaced by grants in the catalog, proposals a person
+   accepts and the audit; the State Library (`history`, `diff`, `at`, `attest`) by saved and signed versions (section
+   10); firms within firms by concerns and relationships (section 3). COSM 0.3's own open questions (mattering shares,
+   an affect scale, product internals) are not taken up.
+2. **Where COSM 0.3's text and this edition differ, this edition holds.** The tree's version is 0.3 (the brand and
+   `restricted` added), and P files say `cosm: 0.3`. `rule-syntax` is a warning when the actor is not a role (an
+   external may also be an actor) and an error only for a rule with no aim. `no-humans` is a warning for a pronoun and
+   a note for a name-like pair; outside P, a pronoun in name or summary is a warning and a pointer to `E:person` from
+   an unrestricted item an error. `term-resolves` and `no-weakening` are not checked. `role-exists` covers the owner
+   only. Rule-consistency compares a `must` and a `must-not` with the same text. Flow balance is always within 10%. The
+   equilibrium conditions are seven. A saved version is always taken and records the verdict; only signing is refused.
+   Any `*.cosm` under P is read; `brand.cosm`, `nodes.cosm` and `doc.cosm` are the convention. `P:release` is declared
+   in the schema and rejected by P's checks: a disagreement recorded, not resolved.
+3. **Paths are a pure respelling of ids** (section 6): no lookup, no index; every item of the sample Holotypes
+   round-trips.
+4. **The brand's path is `<concern>/P/brand/<slug>`**, mapping to `P:<slug>`; one-to-one because `P:brand/<slug>` is
    never a valid id. `<concern>/P/<slug>` is not a path.
-4. **The kind level is a table, never a file.** Neither ids nor paths name files; the file is metadata.
-5. **A relationship has one path per copy**, each in its own concern; cite the copy in the `from` concern.
-6. **Outside organizations are ordinary C items.** Their global id is a field, not part of a path.
-7. **A vendor-published atom is addressed only as a whole**, `vendor/<domain>/<slug>`, which is also its id. Its items
+5. **The kind level is a table, never a file.** Neither ids nor paths name files; the file is metadata.
+6. **A relationship has one path per copy**, each in its own concern; the copy in the `from` concern is the one to cite.
+7. **Outside organizations are ordinary C items.** Their global id is a field, not part of a path.
+8. **A vendor-published atom is addressed only as a whole**, `vendor/<domain>/<slug>`, which is also its id. Its items
    are addressed in the vendor's own Holotype by the qualified form. The case of the second segment keeps it apart from
    a concern called `vendor`.
-8. **Fields use the checks' own field paths** after `#`: keys by `.`, list positions by `[n]` from zero. Fields only
+9. **Fields use the checks' own field paths** after `#`: keys by `.`, list positions by `[n]` from zero. Fields only
    follow items. An open question on a whole item is the item's path.
-9. **The qualified form is `oes:comprise/<holotype>/<path>`**, with the Holotype's id slug and no version. A path must
-   keep its meaning across versions; a change of meaning is a new MiniCOSM. A globally unique Holotype name is not built.
-10. **Case is kept and significant.** The slug's characters are the ones the tooling already reads (`[A-Za-z0-9._@-]`,
-    no trailing dot). An id outside them has no path; a warning for it, and for ids that differ only in case, is
-    proposed and not built (slice 30c did not add it), and not specified as a check here.
-11. **One spelling.** A reader refuses a malformed path rather than normalizing it: no trailing slash, no `..`, no `%`.
-12. **The catalog's entries have no path** in version 1 (sources, grants, groups, attestations).
-13. **When a catalog has both `oes:` and `comprise:`, `oes:` decides.** An unknown version of a known MiniCOSM is refused
-    like an unknown MiniCOSM. A new catalog carries the declaration as its first line, so a person or a tool sees it
-    without parsing the file.
-14. **P files keep `cosm: 0.3`.** It is the product tree's format version, read by P's checks, and says nothing about
+10. **The qualified form is `oes:comprise/<holotype>/<path>`**, with the Holotype's id slug and no version. A path keeps
+    its meaning across versions of a MiniCOSM; a change of meaning is a new MiniCOSM. A globally unique Holotype name is
+    reserved for a later edition.
+11. **Case is kept and significant.** A slug's characters are `[A-Za-z0-9._@-]`, with no trailing dot. An id outside
+    them has no path. A warning for such ids, and for ids that differ only in case, is not specified as a check.
+12. **One spelling.** A reader refuses a malformed path rather than normalizing it: no trailing slash, no `..`, no `%`.
+13. **The catalog's entries have no path** (sources, grants, groups, attestations).
+14. **When a catalog has both `oes:` and `comprise:`, `oes:` decides.** An unknown version of a known MiniCOSM is
+    refused like an unknown MiniCOSM. A new catalog carries the declaration as its first line, so a person or a tool
+    sees it without parsing the file.
+15. **P files keep `cosm: 0.3`.** It is the product tree's format version, read by P's checks, and says nothing about
     the MiniCOSM.
-15. **The manifest is a `.cosm` file outside every Holotype**, beside this spec. A Holotype names its MiniCOSM by the
-    declaration only and never embeds the manifest. The word *manifest* has two senses in Comprise: this declaration of a
-    language, and the hash list of a saved version, a bundle or a published atom. They never meet on screen.
-16. **The manifest's fields per kind are the schema's reference fields, exactly**, plus the fields a check reads. Every
-    other field is open, as the schema says. P lists its nine aspects. E's kinds are marked as stored in the local
-    database.
-17. **An absent visibility outside P reads as `internal`**: visible to every signed-in reader, never public. This is
-    what the code does; the spec states it.
-18. **`P:release` stays declared and is marked as rejected by P's checks.** The disagreement is listed, not resolved:
-    fixing it is a code change (the schema or cosm.py), outside this slice.
-19. **Words.** The spec says concern, item, relationship, open question, outside organization and kind, with the model's
-    term in parentheses where exactness needs it. Ids, file names and check names keep the model's words, because they
-    are the format.
+16. **The manifest is a `.cosm` file outside every Holotype.** A Holotype names its MiniCOSM by the declaration only and
+    never embeds the manifest. The word *manifest* has two senses in Comprise: this declaration of a language, and the
+    hash list of a saved version, a backup or a published atom; they never meet on screen.
+17. **The manifest's fields per kind are the schema's reference fields, exactly**, plus the fields a check reads. Every
+    other field is open. P lists its nine aspects. E's kinds are marked as stored in the local database.
+18. **An absent visibility outside P reads as `internal`**: visible to every signed-in reader, never public.
+19. **Words.** The text says concern, item, relationship, open question, outside organization and kind, with the
+    model's term in parentheses where exactness needs it. Ids, file names and check names keep the model's words,
+    because they are the format.
+
+---
+
+## Colophon
+
+Comprise OES — Copyright © 2026 Graham Smith. All rights reserved. The canonical edition is published at
+https://comprise.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.

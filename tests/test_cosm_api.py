@@ -169,7 +169,64 @@ def test_thym_spec(client: TestClient):
         assert r.status_code == 200, lang
         assert r.headers["content-type"].startswith("text/markdown")
         assert r.text == english, lang
-    assert english.startswith("# Thym 0")
+    assert english.startswith("# Thym\n")                                     # 0.5.4: names carry no number
+
+
+def test_ascribe_and_comprise_specs(client: TestClient):
+    """0.5.4: `GET /api/ascribe-spec` and `GET /api/comprise-spec` on the same pattern, for the two other
+    specifications bundled from cosmoes.org; all four routes and `/api/specs-status` are home-accessible."""
+    from enough.server import HOME_PATHS
+    for route, rel, head in (("/api/ascribe-spec", "docs/ASCRIBE.md", "# Ascribe\n"),
+                             ("/api/comprise-spec", "docs/COMPRISE_OES.md", "# Comprise OES\n")):
+        english = (REPO / rel).read_text(encoding="utf-8")
+        assert english.startswith(head)
+        for lang in ("en", "de", "xx", "../../etc"):
+            r = client.get(route, params={"lang": lang})
+            assert r.status_code == 200 and r.headers["content-type"].startswith("text/markdown"), (route, lang)
+            assert r.text == english, (route, lang)
+    assert {"/api/macrocosm-spec", "/api/thym-spec", "/api/ascribe-spec", "/api/comprise-spec",
+            "/api/specs-status"} <= HOME_PATHS
+
+
+def test_a_spec_route_serves_the_synced_copy_once_one_exists(client: TestClient, tmp_path: Path,
+                                                             monkeypatch: pytest.MonkeyPatch):
+    """0.5.4: `docoes.spec_source` — the copy under the specs root when state.json lists the slug with a sha256 that
+    matches the file; else the bundled text. The routes read what DocOES builds from."""
+    import hashlib
+    import json
+    root = tmp_path / "specs"
+    (root / "thym").mkdir(parents=True)
+    text = b"# Thym\n\n*Edition 0.5.5 \u00b7 revised 2026-11-04 \u00b7 cosmoes.org home: https://thym.cosmoes.org/*\n\n## 1. A\n\nchanged\n"
+    (root / "thym" / "source.md").write_bytes(text)
+    state = {"checked": "2026-11-04T00:00:00Z", "updated": "2026-11-04T00:00:00Z", "etag": None, "documents": {
+        "thym": {"name": "Thym", "version": "0.5.5", "revised": "2026-11-04", "host": "thym.cosmoes.org",
+                 "kinds": {"source": {"sha256": hashlib.sha256(text).hexdigest(), "fetched": "2026-11-04T00:00:00Z"}}}}}
+    (root / "state.json").write_text(json.dumps(state), encoding="utf-8")
+    monkeypatch.setenv("ENOUGH_SPECS_ROOT", str(root))
+    assert client.get("/api/thym-spec").text == text.decode("utf-8")
+    bundled = (REPO / "docs" / "MACROCOSM_OES.md").read_text(encoding="utf-8")
+    assert client.get("/api/macrocosm-spec").text == bundled                   # not synced: the bundled text stands
+    status = client.get("/api/specs-status").json()
+    assert status["documents"]["thym"] == {"name": "Thym", "edition": "0.5.5", "revised": "2026-11-04",
+                                           "source": "cosmoes", "path": str(root / "thym" / "source.md"),
+                                           "home": "https://thym.cosmoes.org/"}
+    assert status["documents"]["macrocosm-oes"]["source"] == "bundled"
+    assert status["ran"] is False and status["reason"] == "ENOUGH_SPECS_SYNC=0" and status["allowed"] is False
+    # A copy whose bytes no longer match what state.json recorded is not in use: the bundled text again.
+    (root / "thym" / "source.md").write_bytes(text + b"tampered\n")
+    assert client.get("/api/thym-spec").text == (REPO / "docs" / "THYM.md").read_text(encoding="utf-8")
+
+
+def test_the_specs_preference_round_trips(client: TestClient):
+    """0.5.4: `specs_sync`, a top-level ui.json bool like `agent_free`; absent reads as on; a non-bool is dropped."""
+    cfg = client.get("/api/ui-config").json()
+    assert "specs_sync" not in cfg and client.get("/api/specs-status").json()["enabled"] is True
+    cfg = client.post("/api/ui-config", json={"specs_sync": False}).json()
+    assert cfg["specs_sync"] is False and client.get("/api/specs-status").json()["enabled"] is False
+    cfg = client.post("/api/ui-config", json={"specs_sync": "yes"}).json()
+    assert cfg["specs_sync"] is False                                          # a non-bool changes nothing
+    cfg = client.post("/api/ui-config", json={"specs_sync": True}).json()
+    assert cfg["specs_sync"] is True and client.get("/api/specs-status").json()["enabled"] is True
 
 
 def test_thym_spec_is_home_accessible(tmp_path: Path):
@@ -181,7 +238,7 @@ def test_thym_spec_is_home_accessible(tmp_path: Path):
     app = create_app(proj, "http://localhost:9", supervise=False, home=True)
     with TestClient(app) as c:
         r = c.get("/api/thym-spec")
-        assert r.status_code == 200 and r.text.startswith("# Thym 0")
+        assert r.status_code == 200 and r.text.startswith("# Thym\n")
         assert c.get("/api/cosm", params={"path": "x.cosm"}).status_code == 404     # a project route stays shut
 
 

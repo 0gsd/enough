@@ -2674,9 +2674,10 @@ def scenario_cosm_lens(d: Driver) -> list[str]:
 
 def scenario_docs_contents(d: Driver) -> list[str]:
     """The spec in the docs viewer (0.4.3's cosmspec-contents, re-pointed):
-    the badge names the version the document states, headings carry
-    `docs-sec-…` ids (a chapter's carry its prefix), "section 18.4", "§2.5"
-    and "P.7" link (the last two into Comprise's chapter), the contents list
+    the badge names the document's edition (0.5.4: "<name> · edition
+    <edition>"), headings carry `docs-sec-…` ids, "section 18.4" links while
+    "§2.5", "P.7" and "its section N" do not (they name other documents'
+    sections, since 0.5.4 at their own cosmoes.org homes), the contents list
     jumps (the heading lands at the top) and the back pill returns. Then
     what is new in 0.4.4: a term's popover (esc closes it first, focus goes
     back to the link), the density control (to atem on the section you were
@@ -2693,25 +2694,29 @@ def scenario_docs_contents(d: Driver) -> list[str]:
              " sec: !!document.getElementById('docs-sec-18-4'),"
              " toc: document.querySelectorAll('#docs-toc a').length,"
              " xref: document.querySelectorAll('#docs-body a.ref-xref').length,"
-             " chap: Array.from(document.querySelectorAll('#docs-body a.ref-xref'))"
-             ".filter((a) => /^(§|P\\.)/.test(a.textContent.replace(/^README\\s+/, ''))"
-             " && a.dataset.target.startsWith('docs-comprise')).length,"
-             " stray: Array.from(document.querySelectorAll('#docs-body a.ref-xref'))"
-             ".filter((a) => /^P\\./.test(a.textContent) && !a.dataset.target.startsWith('docs-comprise-')).length,"
+             # 0.5.4: §, README § and P.N name other documents' sections (Comprise OES at its own home): none links.
+             " other: Array.from(document.querySelectorAll('#docs-body a.ref-xref'))"
+             ".filter((a) => /^(§|P\\.)/.test(a.textContent.replace(/^README\\s+/, ''))).length,"
+             " its: Array.from(document.querySelectorAll('#docs-body a.ref-xref'))"
+             ".filter((a) => a.previousSibling && a.previousSibling.nodeType === 3"
+             " && /\\bits\\s*$/i.test(a.previousSibling.textContent)).length,"
              " bad: Array.from(document.querySelectorAll('#docs-body a.ref-xref'))"
              ".filter((a) => !document.getElementById(a.dataset.target)).length,"
              " comments: Array.from(document.querySelectorAll('#docs-body p')).filter((p) => {"
              " const c = p.cloneNode(true); c.querySelectorAll('code').forEach((x) => x.remove());"
              " return /<!--/.test(c.textContent); }).length}))()")
-    if not re.search(r"v\d+\.\d+\.\d+$", g.get("badge") or ""):
-        fails.append(f"the badge does not carry the document's version: {g.get('badge')!r}")
+    # 0.5.4: "<name> · edition <edition>" (the edition is a field; no "v"), in the UI language's words.
+    edition = d.js("t('docs.badge.edition', '{name} · edition {edition}')").split("{name}", 1)[1]
+    want = re.escape(edition).replace(re.escape("{edition}"), r"\d+\.\d+\.\d+") + "$"
+    if not re.search(want, g.get("badge") or ""):
+        fails.append(f"the badge does not carry the document's edition: {g.get('badge')!r}")
     if not g.get("sec") or g.get("toc", 0) < 20:
         fails.append(f"headings/contents not built: {g}")
     if not g.get("xref") or g.get("bad"):
         fails.append(f"section references: {g.get('xref')} linked, {g.get('bad')} dangling")
-    if not g.get("chap") or g.get("stray"):
-        fails.append(f"§/P.N references: {g.get('chap')} into the Comprise chapter, "
-                     f"{g.get('stray')} P.N pointing elsewhere")
+    if g.get("other") or g.get("its"):
+        fails.append(f"{g.get('other')} §/README §/P.N reference(s) linked (they name other documents' sections), "
+                     f"{g.get('its')} \"its section N\" linked (another document's)")
     if g.get("comments"):
         fails.append(f"{g['comments']} paragraph(s) show an HTML comment (an atem/term marker)")
     for ui, txt in ((1, 1), (1.2, 1.3)):
@@ -2860,23 +2865,32 @@ def scenario_docs_specs(d: Driver) -> list[str]:
     menu with focus on its first item; esc closes the menu, not the window,
     and gives focus back to the button) at short,
     with its icon in the toolbar and on the mode stack, its own stack title,
-    the toolbar's "specification", the badge "<title> · v<version>", and the
+    the toolbar's "specification", the badge "<title> · edition <edition>" (0.5.4) with a
+    title saying where the text came from, and the
     English-only note in a translated UI (none in English). At short its
     headings carry unique ids, its section references link and none
-    dangles, and its terms are links; at atem the outline holds every
+    dangles, and its terms are links wherever the volume mentions one (Ascribe's
+    0.5.4 edition defines two glossary terms nobody uses); at atem the outline holds every
     section but the title and the glossary every term; at fabula its cards
     draw."""
     fails: list[str] = []
     _reset(d)
-    forget = ("(() => { try { ['macrocosm-oes', 'thym', 'ascribe'].forEach((k) =>"
+    forget = ("(() => { try { ['macrocosm-oes', 'thym', 'ascribe', 'comprise-oes'].forEach((k) =>"
               " localStorage.removeItem('enough.docs.density.' + k)); } catch (e) {} return true; })()")
     d.js(forget)
     english = d.js("I18N.lang") == "en"
-    specs = (("macrocosm-oes", "ui-cosmspec-btn", "macrocosm", r"^MacroCOSM OES · v\d+\.\d+\.\d+$",
+    # 0.5.4: four specifications; the badge is "<name> · edition <edition>" (names carry no number, the edition is a
+    # field, never a "v"), its title says where the text came from. The edition is the catalog's (docs/specs.json or
+    # a synced state.json), so the pattern is a version shape, not a number.
+    edition = r" · " + d.js("t('docs.badge.edition', '{name} · edition {edition}')").split(" · ", 1)[1] \
+        .replace("{edition}", r"\d+\.\d+\.\d+") + "$"
+    specs = (("macrocosm-oes", "ui-cosmspec-btn", "macrocosm", r"^MacroCOSM OES" + edition,
               "t('modes.docs.spec.icon', 'MacroCOSM specification')"),
-             ("thym", "ui-thym-btn", "cosm", r"^Thym 0 · v0$", "t('modes.docs.thym.icon', 'Thym specification')"),
-             ("ascribe", "ui-ascribe-btn", "readvisor-rename", r"^Ascribe OES 1 · v1$",
-              "t('modes.docs.ascribe.icon', 'Ascribe specification')"))
+             ("thym", "ui-thym-btn", "cosm", r"^Thym" + edition, "t('modes.docs.thym.icon', 'Thym specification')"),
+             ("ascribe", "ui-ascribe-btn", "readvisor-rename", r"^Ascribe" + edition,
+              "t('modes.docs.ascribe.icon', 'Ascribe specification')"),
+             ("comprise-oes", "ui-comprise-btn", "cosm", r"^Comprise OES" + edition,
+              "t('modes.docs.comprise.icon', 'Comprise OES specification')"))
     for doc, btn, icon, badge, stack in specs:
         _reset(d)
         d.js("openUIModal()")
@@ -2901,7 +2915,7 @@ def scenario_docs_specs(d: Driver) -> list[str]:
                            " && !!document.querySelector('#docs-body .docs-sec h2[id]')", ms=20000):
             fails.append(f"#{btn} did not open {doc} at short")
             continue
-        g = d.js("(() => { const el = (i) => document.getElementById(i);"
+        g = d.js_await("(async () => { const el = (i) => document.getElementById(i);"
                  " const ids = Array.from(document.querySelectorAll('#docs-body [id]')).map((e) => e.id);"
                  " const top = modeTop() || {};"
                  " return {badge: el('docs-badge').textContent, title: el('docs-title').textContent,"
@@ -2917,7 +2931,13 @@ def scenario_docs_specs(d: Driver) -> list[str]:
                  ".filter((a) => !el(a.dataset.target)).length,"
                  " terms: document.querySelectorAll('#docs-body a.docs-term').length,"
                  " sections: (DOCS.data.sections || []).length,"
-                 " glossary: DOCS.ix ? DOCS.ix.terms.size : -1}; })()")
+                 " glossary: DOCS.ix ? DOCS.ix.terms.size : -1,"
+                 # 0.5.4: whether any term is mentioned outside its own definition at all (the volume's backrefs onto
+                 # T: items). Ascribe's edition defines two glossary terms nobody uses, so it has nothing to link.
+                 " used: await (async () => { const p = await (await fetch('/api/docs?doc=' + encodeURIComponent(DOCS.doc)"
+                 " + '&density=fabula')).json(); const br = p.backrefs || {};"
+                 " return Object.keys(br).filter((k) => k.startsWith('T:term/') && (br[k] || []).length).length; })()"
+                 "}; })()")
         if not re.search(badge, g["badge"] or ""):
             fails.append(f"{doc}: the badge reads {g['badge']!r}")
         if g["title"] != g["spec"]:
@@ -2936,8 +2956,10 @@ def scenario_docs_specs(d: Driver) -> list[str]:
             fails.append(f"{doc}: {g['dup']} duplicate id(s) at short")
         if not g["xref"] or g["bad"]:
             fails.append(f"{doc}: {g['xref']} section references linked, {g['bad']} dangling")
-        if not g["terms"]:
-            fails.append(f"{doc}: no term is a link at short")
+        if g["used"] and not g["terms"]:
+            fails.append(f"{doc}: no term is a link at short, though {g['used']} of its terms are mentioned")
+        if g["terms"] and not g["used"]:
+            fails.append(f"{doc}: {g['terms']} term links at short, but the volume mentions no term")
         d.js("docsSetDensity('atem')")
         if not _wait_js(d, "DOCS.density === 'atem' && !!document.querySelector('#docs-body .docs-outline .docs-ol-row')"):
             fails.append(f"{doc}: the atem density did not draw")

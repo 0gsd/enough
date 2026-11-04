@@ -1,24 +1,26 @@
 # MacroCOSM OES
 
-*Specification v0.0.2 · 2026-11-02*
+*Edition 0.5.4 · revised 2026-11-03 · cosmoes.org home: https://macro.cosmoes.org/*
+
+*This edition describes grammar version 0.5.4; files written under 0.0.2 are read unchanged.*
 
 MacroCOSM OES is the shared grammar every MiniCOSM is written in. It says how a domain is enumerated as plain-text
 `.cosm` files that are at once a file system and a relational database, made to be rendered: how a file is read, how a
 volume names the language it is written in, what an item is and which columns every item carries, how one item points
 at another, how an unknown value is written down, how anything is addressed, which checks every volume can be held to,
-how a manifest declares a MiniCOSM, and how a renderer draws one. It is the grammar that Comprise OES 1 worked out for
+how a manifest declares a MiniCOSM, and how a renderer draws one. It is the grammar that Comprise OES worked out for
 companies, read out of it and written down on its own, so that nothing in it says "company". Seven MiniCOSMs are
-written in it today: `comprise`, `cosm`, `canon`, `emf`, `doc`, `ascribe` and `thym` (section 18).
+written in it: `comprise`, `cosm`, `canon`, `emf`, `doc`, `ascribe` and `thym` (section 18).
 
-**Status.** Normative for version 0.0.2. The reference reader is `enough/macrocosm.py`. Where this text and the reader
-disagree, **the reader wins**, and this text is corrected. Section 19.4 collects every disagreement known at the time
-of writing. *By reference* marks a part that is defined elsewhere and not built here; *mapped* marks a part that is
-planned and not built anywhere.
+**Status.** This text is normative. Its reference implementation is enough (https://github.com/0gsd/enough), which
+reads every MiniCOSM registered in section 18; Comprise is the reference implementation of Comprise OES. Where an
+implementation and this text disagree, one of them is in error; the Changes appendix (section 20) records which was
+corrected. *By reference* marks a part that is defined in another document, which is linked where it is named.
 
-**The format does not change.** A MacroCOSM file is a `.cosm` file in the COSM YAML subset, exactly as Comprise OES 1
+**The format does not change.** A MacroCOSM file is a `.cosm` file in the COSM YAML subset, exactly as Comprise OES
 reads it. Version 0.0.1 names the grammar, generalizes it, and adds a few optional manifest keys so that a reader can
 handle a MiniCOSM it has never seen without new code (section 13.5). Every Comprise Holotype and every standalone COSM
-tree made so far reads unchanged.
+tree written under an earlier version reads unchanged.
 
 ## Contents
 
@@ -39,13 +41,13 @@ tree made so far reads unchanged.
 14. Renderers and lenses
 15. Versions and signatures (by reference)
 16. The private/public split (by reference)
-17. MicroCOSMs (mapped)
-18. The MiniCOSMs enough ships: comprise, cosm, canon, emf, doc
+17. MicroCOSMs
+18. The MiniCOSMs: comprise, cosm, canon, emf, doc, ascribe, thym
 19. Conformance
-20. Decisions in this version
-21. Open questions and roadmap
+20. Changes
+21. *Withdrawn in edition 0.5.4*
 
-Appendix: the mapping to Comprise OES 1 · Colophon
+Appendix: the mapping to Comprise OES · Colophon
 
 ## How to read this
 
@@ -61,7 +63,7 @@ reader use follows in parentheses.
 | item | node, a mapping in a `nodes:` list | `P:claim/close-locks-the-day` |
 | kind | type, the `type:` field | `claim` |
 | open question | pending | `{pending: "…"}` |
-| checks | lint | `python -m enough.macrocosm lint <volume>` |
+| checks | lint | enough's `lint` command, run over a volume |
 | volume | the database a catalog heads | a Holotype, a Canon volume, an EMF twin |
 | part | a top-level division of a volume (Comprise: concern, *atom*) | `atoms/meadow/` |
 
@@ -88,10 +90,11 @@ one learned.
 | Comprise OES 1 | 2026-10-20 | the first MiniCOSM: a company as a folder that is also a relational database, eight modules, a declaration line, paths, a manifest, and a map naming MacroCOSM, MiniCOSM and MicroCOSM as *mapped, not built* | `oes: comprise/1`, `manifest: minicosm/0` |
 | MacroCOSM OES 0.0.1 | 2026-10-22 | this document: the grammar Comprise mapped, written down apart from any one domain, with a reader that loads any MiniCOSM from its manifest | `oes: <minicosm>/<major>`, `macrocosm: 0.0.1` (reserved) |
 | MacroCOSM OES 0.0.2 | 2026-11-02 | two MiniCOSMs more, `ascribe/1` (a self with no name, section 18.6) and `thym/1` (programs, morphs, contexts, plans, traces and packages, section 18.7); the `moves:` block of a manifest and the `<name>.moves.cosm` sidecar (section 13.4); the grammar unchanged | `macrocosm: 0.0.2` (reserved) |
+| MacroCOSM OES 0.5.4 | 2026-11-03 | the canonical edition, published at https://macro.cosmoes.org/ with the MiniCOSM specifications at their own homes; the grammar unchanged, and files written under 0.0.2 read unchanged | `macrocosm: 0.5.4` (reserved) |
 
-The earlier specifications stay where they are. COSM 0.2 is the context-ontology skill's own reference. Comprise OES 1
-is `oes/comprise-oes.md` in the Comprise repository, with its map in `oes/README.md` and its manifest in
-`oes/comprise-oes.manifest.cosm`. This document points at their section numbers and does not repeat them.
+The earlier specifications stay where they are. COSM 0.2 is the context-ontology skill's own reference. Comprise OES is
+published at https://comprise.cosmoes.org/, and the map of the family, which named the three scales, is the front page
+of https://cosmoes.org/. This document points at their section numbers and does not repeat them.
 
 ### 1.2 The name
 
@@ -119,8 +122,9 @@ scale keeps the order of the larger and adds to it.
 
 ### 1.3 Stewardship
 
-MacroCOSM is stewarded by Verroes (Graham Smith). The specification, the MiniCOSM manifests that ship with enough and
-the names of the family are his (see the colophon). The reference reader is part of enough.
+MacroCOSM is stewarded by Verroes (Graham Smith). The specification, the MiniCOSM manifests registered in section 18
+and the names of the family are his (see the colophon). The reference implementation is enough
+(https://github.com/0gsd/enough).
 
 ---
 
@@ -164,11 +168,11 @@ references, and the checks. A MiniCOSM may keep a local database beside its file
 
 <!-- atem: the three scales: the grammar, a domain's dialect, an organization's additions -->
 
-| Scale | What it is | In this version |
+| Scale | What it is | In this edition |
 |---|---|---|
-| **MacroCOSM** | the whole language: the shared grammar every MiniCOSM is written in | this document, and the reader `enough/macrocosm.py` |
-| **MiniCOSM** | an OES for one domain, declared by a manifest: its volume layout, modules, kinds, fields, references, checks and renderers | seven ship with enough: `comprise`, `cosm`, `canon`, `emf`, `doc`, `ascribe`, `thym` (section 18) |
-| **MicroCOSM** | one organization's extension on top of a MiniCOSM: the extra kinds, fields, checks or renderers it needs | mapped, not built (section 17) |
+| **MacroCOSM** | the whole language: the shared grammar every MiniCOSM is written in | this document, and its reference implementation, enough |
+| **MiniCOSM** | an OES for one domain, declared by a manifest: its volume layout, modules, kinds, fields, references, checks and renderers | seven are registered: `comprise`, `cosm`, `canon`, `emf`, `doc`, `ascribe`, `thym` (section 18) |
+| **MicroCOSM** | one organization's extension on top of a MiniCOSM: the extra kinds, fields, checks or renderers it needs | reserved for a later edition (section 17) |
 
 **What MacroCOSM gives every MiniCOSM.** All of it, unchanged: sections 4 to 14 of this document, and the parts
 defined by reference in sections 15 to 17.
@@ -188,7 +192,7 @@ and the declaration mean the same thing in every MiniCOSM.
 
 ## 4. The file format
 
-<!-- atem: how a cosm file is written: its encoding, its YAML subset, its scalars -->
+<!-- atem: how a cosm file is written: its encoding, YAML subset and scalars -->
 
 ### 4.1 Encoding and shape
 
@@ -268,7 +272,7 @@ A second implementation in another language must reproduce these results, not YA
   them, so no anchor is ever written.
 - A writer quotes every scalar meant as text that the loader would read as something else (section 4.3).
 - A semantic rewrite (load, change, dump) keeps every key and value and loses comments and layout. Byte-preserving edits
-  of one item inside a file are Comprise's (its `edit` model) and are mapped for MacroCOSM (section 21).
+  of one item inside a file are Comprise's (its `edit` model); MacroCOSM reserves them for a later edition.
 
 ### 4.6 Text, not code
 
@@ -280,7 +284,7 @@ an address, never a door (section 11.2).
 
 ## 5. The declaration
 
-<!-- atem: the one line that names a volume's MiniCOSM, and what a reader refuses -->
+<!-- atem: the line that names a volume's MiniCOSM, and what a reader refuses -->
 
 ### 5.1 The form
 
@@ -305,7 +309,7 @@ alter what a path means needs a new MiniCOSM (section 11.3).
 ### 5.2 Identifying a catalog
 
 The reader keeps a registry of the manifests it knows (section 13.6), in order: `comprise`, `cosm`, `canon`, `emf`,
-`doc`.
+`doc`, then any other in name order (`ascribe`, `thym`).
 Given a catalog, it decides which MiniCOSM the catalog is written in by these steps, in order. The first that applies
 decides.
 
@@ -357,9 +361,9 @@ A legacy key is never an error. A reader keeps it.
 
 ### 5.6 The reserved key `macrocosm:`
 
-A catalog or a manifest may carry `macrocosm: 0.0.2` (or an earlier `0.0.1`), after its declaration. Readers keep the key and ignore it. It is
-reserved for the day the grammar itself needs a version test; until then no reader refuses a file for what it says,
-and no writer is required to write it.
+A catalog or a manifest may carry `macrocosm: 0.5.4` (or an earlier `0.0.2` or `0.0.1`), after its declaration.
+Readers keep the key and ignore it. It is reserved for the day the grammar itself needs a version test; until then no
+reader refuses a file for what it says, and no writer is required to write it.
 
 ---
 
@@ -390,7 +394,10 @@ one YAML mapping.
   note. A writer must not invent catalog keys the manifest does not list without a new version of its MiniCOSM.
 - **The catalog id** has the form the manifest's `catalog.id` gives: `holotype/<slug>`, `canon/<volume-slug>`,
   `emf/<slug>`. When it is absent, the manifest's `catalog.id-absent` rule supplies it (Comprise: `holotype/<folder
-  name>`). The id without its prefix is the volume's **database name**, the second segment of its URI.
+  name>`). The id without its prefix is the volume's **database name**, the second segment of its URI. A catalog with
+  no `id` fails `catalog-key` where the manifest's `catalog.id` is a template; where the manifest gives
+  `catalog.id-absent`, the reader supplies the id instead, and a manifest that gave both would get the error and the
+  supplied id.
 - **Sources.** A catalog may declare the sources its items cite (Comprise's `sources:`, with the fields the manifest's
   `catalog.source-fields` lists). Where a MiniCOSM checks that cited sources are declared, the check is its own.
 
@@ -635,8 +642,8 @@ fetched is a warning). A value in a reference field that has none of the forms a
 
 - A bare id resolves in its own part; a qualified id in the named part; a part id to the part.
 - Resolution runs against the loaded volume, never against the disk, and never depends on who is reading.
-- A URI written in a field (`oes:comprise/meadow/meadow/O/role/Founder`) is not a reference in 0.0.1. It is kept as a
-  value and not checked; resolving across volumes is mapped (section 21).
+- A URI written in a field (`oes:comprise/meadow/meadow/O/role/Founder`) is not a reference in this edition. It is kept
+  as a value and not checked; resolving across volumes is reserved for a later edition.
 
 ### 9.4 Typed links
 
@@ -819,7 +826,7 @@ oes:doc/macrocosm-oes/S/section/18.5                      a section of this spec
 - **No version.** A URI carries no version, because a path keeps its meaning across every version of its MiniCOSM. A
   change that would alter what a path means must be a new MiniCOSM.
 - **Unique within one install.** A database name is unique among the volumes one reader knows, not in the world. A
-  globally unique name, and a resolver for URIs across installs, are mapped (section 21).
+  globally unique name, and a resolver for URIs across installs, are reserved for a later edition.
 - **A private address.** A URI names a place. It opens nothing to a reader who may not see what is there.
 - **In enough.** enough resolves URIs for its own volumes: `oes:canon/<volume>/…` for a Canon volume,
   `oes:canon/~<project>/…` for a project's catalog, `oes:emf/<twin>/…` for an EMF twin,
@@ -829,12 +836,13 @@ oes:doc/macrocosm-oes/S/section/18.5                      a section of this spec
 
 ## 12. Checks
 
-<!-- atem: the checks every volume can be held to, and the report they make -->
+<!-- atem: the checks every volume can be held to, and the report -->
 
 ### 12.1 What the checks are
 
-The **checks** (*lint*) are the constraints of the database, run over the whole volume. The reader runs them on load:
-`python -m enough.macrocosm lint <volume>`. They never raise and never stop at the first problem. Each problem names its
+The **checks** (*lint*) are the constraints of the database, run over the whole volume. The reader runs them on load,
+and an implementation may offer them as a command (enough's is `lint`, run over a volume). They never raise and never
+stop at the first problem. Each problem names its
 check, its item (or its file), the field path where it applies, and a plain message.
 
 MacroCOSM defines a fixed vocabulary of **generic checks** that any reader can run on any volume from its manifest
@@ -875,6 +883,7 @@ rules). The generic reader does not run those, and says so (section 12.3).
   (`{<check id>: error | warning | note}`, 0.0.1) gives another. The mapping sets the severity of a check's findings
   except those that are fixed: a problem found while loading (`load`, and a duplicate id) is always an error, and two
   findings are always notes, an unlisted catalog key (`catalog-key`) and a legacy kind read under its new name (`type`).
+  Whether the mapping may lower a default severity, or only raise it, is reserved for a later edition.
 
 ### 12.4 The report
 
@@ -899,13 +908,13 @@ generic checks when a `.cosm` file is saved and never refuses the save.
 What a domain means. The generic checks say a volume is well formed and closed: every item is in a declared table,
 every required column is filled, every closed value is in its list, every reference has two ends. They do not say that
 a product tree balances, that a claim is true, or that a role is lawfully held. Those are a MiniCOSM's own checks, or a
-person's judgement. Ids that differ only in case, and slugs outside the path set, are not checked in 0.0.1.
+person's judgement. Ids that differ only in case, and slugs outside the path set, are not checked in this edition.
 
 ---
 
 ## 13. The manifest
 
-<!-- atem: the small file that declares a MiniCOSM, so a reader needs no new code -->
+<!-- atem: the file declaring a MiniCOSM, so a reader needs no new code -->
 
 ### 13.1 What it is
 
@@ -958,11 +967,12 @@ A manifest is never rewritten by a reader. The Comprise manifest that ships with
 refreshed from it and never edited in enough.
 
 A manifest may also carry a `moves:` list: the moves its MiniCOSM declares for Thym, the language that composes them
-(`docs/THYM.md`, where the block has a part of its own). Each entry names a move, what it takes and gives, its
-modifiers, whether it asks the model, the contract its output is held to, its rules-mode stand-in and its reference
+(https://thym.cosmoes.org/, where the block has a part of its own). Each entry names a move, what it takes and gives,
+its modifiers, whether it asks the model, the contract its output is held to, its rules-mode stand-in and its reference
 code. The generic reader keeps the block as one more key it does not use; the Thym compiler reads it, from every
-manifest in the registry, when it resolves a program's names. A MiniCOSM whose manifest enough does not edit declares
-its moves in a sidecar beside the manifest, `<name>.moves.cosm`, a mapping
+manifest in the registry, when it resolves a program's names. A MiniCOSM whose manifest is kept by another
+implementation, and copied into the registry unedited, declares its moves in a sidecar beside the manifest,
+`<name>.moves.cosm`, a mapping
 `{moves-of: <minicosm>/<major>, moves: [...]}`: Comprise's is `comprise.moves.cosm`. A sidecar is not a manifest, and
 the registry passes it by; where a manifest and a sidecar both declare moves, the manifest's list wins.
 
@@ -970,9 +980,9 @@ the registry passes it by; where a manifest and a sidecar both declare moves, th
 
 Optional keys new in 0.0.1: `volume.single-file`, `renderers[].lens`, `links.rels`, `closed-lists`,
 `checks.severity`, Canon's `catalog.scope`, and the reserved `macrocosm`. A reader that does not know
-them keeps them and loses nothing it relied on before. Section 20 gives the reason for each.
+them keeps them and loses nothing it relied on before. The Changes appendix (section 20) records each.
 
-Three more optional keys, which the reference reader (`enough/macrocosm.py`) also reads:
+Four more optional keys, which the reference implementation also reads:
 
 - `module-file.items`: where a module file's items are. A list of entries `{key, kind, one, module}`, of which only `key`
   is required. `key` is the top-level key of the file that holds items: a list of items, or, with `one: true`, a single
@@ -992,9 +1002,8 @@ Three more optional keys, which the reference reader (`enough/macrocosm.py`) als
 
 ### 13.6 The registry
 
-A reader loads every `*.manifest.cosm` in its manifest folders into a **registry**. enough's are
-`defaults/cosm/manifests/` (shipped, read-only); a folder for a person's own manifests, `~/enough/cosm/manifests/`, is
-mapped. The registry order is `comprise`, `cosm`, `canon`, `emf`, `doc`, then any other in name order (`ascribe`, then
+A reader loads every `*.manifest.cosm` in its manifest folders into a **registry**. enough ships its manifests
+read-only; a folder for a person's own manifests is reserved for a later edition. The registry order is `comprise`, `cosm`, `canon`, `emf`, `doc`, then any other in name order (`ascribe`, then
 `thym`). A manifest that does not load, or that names a MiniCOSM already in the registry, is skipped and reported; the
 first one wins. The registry is what step 1 of section 5.2 compares a declaration against, and what a refusal lists as
 known.
@@ -1124,8 +1133,8 @@ its own renderers, as Ascribe's `timeline` and Thym's `program` and `trace` are 
 
 ## 15. Versions and signatures (by reference)
 
-<!-- atem: saved versions and signatures, defined in Comprise OES 1 -->
-*Defined here, built in Comprise OES 1 (its section 10), not built in MacroCOSM 0.0.1.*
+<!-- atem: saved versions and signatures, defined in Comprise OES -->
+*Defined here; specified in Comprise OES, in its section on versions (https://comprise.cosmoes.org/).*
 
 - **A saved version** is an immutable copy of a volume's model files at a moment, with a manifest that holds every
   file's hash, the checks' verdict and its own hash. Taking one changes nothing.
@@ -1133,10 +1142,11 @@ its own renderers, as Ascribe's `timeline` and Thym's `program` and `trace` are 
   holders of the roles that govern the volume.
 - **The diff** between two saved versions is item by item, with the field paths that moved.
 
-In 0.0.1 enough neither saves nor signs volumes. A reader treats a Holotype's `snapshots/` folder as outside the model.
+Saving and signing are Comprise's; the generic reader does neither, and treats a Holotype's `snapshots/` folder as
+outside the model.
 
 Three other things carry versions, and none of them is a saved version: a MiniCOSM carries its major in the
-declaration (`comprise/1`, section 5); the manifest format is `minicosm/0` (section 13.2); the grammar is 0.0.1, in the
+declaration (`comprise/1`, section 5); the manifest format is `minicosm/0` (section 13.2); the grammar is 0.5.4, in the
 reserved `macrocosm:` key (section 5.6). A path and a URI carry no version (section 11.3).
 
 ---
@@ -1144,7 +1154,7 @@ reserved `macrocosm:` key (section 5.6). A path and a URI carry no version (sect
 ## 16. The private/public split (by reference)
 
 <!-- atem: the private Holotype and its public isotype: two formats, not a setting -->
-*Defined here, built in Comprise OES 1 (its section 11), not built in MacroCOSM 0.0.1.*
+*Defined here; specified in Comprise OES, in its section on the private/public split (https://comprise.cosmoes.org/).*
 
 The split is two formats, not one format with a setting.
 
@@ -1154,19 +1164,20 @@ The split is two formats, not one format with a setting.
   into it by itself.
 
 The words come from taxonomy, where a holotype is the one specimen that defines a species and an isotype is a duplicate
-of it. In MacroCOSM they name the two halves of the split in every MiniCOSM, not only Comprise's. In enough today a
-Holotype means a Comprise volume, because Comprise is the only MiniCOSM with a split. Canon and EMF declare no public
-projection in 0.0.1; their volumes are the owner's own files, and nothing in enough sends them anywhere.
+of it. In MacroCOSM they name the two halves of the split in every MiniCOSM, not only Comprise's. Among the registered
+MiniCOSMs a Holotype means a Comprise volume, because Comprise is the only one with a split. Canon and EMF declare no
+public projection; their volumes are the owner's own files, and no reader sends them anywhere.
 
 A MiniCOSM with a split declares its public projection in its manifest (Comprise's `public-projection`), and the rules of
 the projection are its own.
 
 ---
 
-## 17. MicroCOSMs (mapped)
+## 17. MicroCOSMs
 
-<!-- atem: one organization's additions to a MiniCOSM, mapped and not yet built -->
-*Mapped in Comprise's `oes/README.md` (its section 5) and the `extension:` block of its manifest. Not built anywhere.*
+<!-- atem: one organization's additions to a MiniCOSM, reserved for a later edition -->
+*Described in the map of the family at https://cosmoes.org/ and in the `extension:` block of Comprise's manifest;
+reserved for a later edition.*
 
 A MicroCOSM is one organization's extension of a MiniCOSM.
 
@@ -1181,15 +1192,16 @@ What a MicroCOSM adds carries its name, `<microcosm>.<kind>` and `<microcosm>.<f
 MiniCOSM can never collide with it. A volume written with a MicroCOSM is still a valid volume of its MiniCOSM: a reader
 that does not know the MicroCOSM keeps its fields and ignores its checks.
 
-How a volume says that it uses a MicroCOSM, and how a reader loads one, are not decided in 0.0.1 (section 21).
+How a volume says that it uses a MicroCOSM, and how a reader loads one, are reserved for a later edition.
 
 ---
 
-## 18. The MiniCOSMs enough ships
+## 18. The MiniCOSMs
 
-<!-- atem: the seven MiniCOSMs enough ships, one manifest each -->
-Seven manifests ship in `defaults/cosm/manifests/`, one per MiniCOSM, and one sidecar of moves beside them
-(section 13.4).
+<!-- atem: the seven registered MiniCOSMs, one manifest each -->
+Seven MiniCOSMs are registered, one manifest each, with one sidecar of moves beside them (section 13.4). Three are
+specified in documents of their own: Comprise OES at https://comprise.cosmoes.org/, Ascribe at
+https://ascribe.cosmoes.org/ and Thym at https://thym.cosmoes.org/; the other four are specified in this section.
 
 | MiniCOSM | Declaration | Enumerates | Volume | Catalog | Modules |
 |---|---|---|---|---|---|
@@ -1201,15 +1213,16 @@ Seven manifests ship in `defaults/cosm/manifests/`, one per MiniCOSM, and one si
 | `ascribe` | `oes: ascribe/1` | one person, without a name: the holograph, ten kinds of node anchored to forms | a folder, the holograph | `holograph.cosm` | A B C E I O Q S U Y F |
 | `thym` | `oes: thym/1` | Thym's programs, morphs, contexts, plans, traces and packages | one file, one of six kinds | `<name>.thym.cosm`, `<name>.morph.cosm` … | P M C R K |
 
-### 18.1 comprise: Comprise OES 1
+### 18.1 comprise: Comprise OES
 
 <!-- atem: a company as Comprise describes it, read here without Comprise's own rules -->
 **What it enumerates.** Companies. A Holotype describes one company at a moment as a set of **concerns** (going
 concerns: a corporation's branded face, a subsidiary, a joint venture) joined by **relationships**, each concern with
-eight modules. The spec is Comprise's own, `oes/comprise-oes.md`; this section says only how it sits in MacroCOSM.
+eight modules. The specification is Comprise's own, Comprise OES (https://comprise.cosmoes.org/); this section says
+only how it sits in MacroCOSM.
 
 **Its declaration.** `oes: comprise/1`. A `holotype.cosm` without the key reads as `comprise/1`, silently, and so does
-the legacy line `comprise: 0.1` that every Holotype made before Comprise OES 1 carries.
+the legacy line `comprise: 0.1` that every Holotype made before edition 1 of Comprise OES carries.
 
 **Its volume.** A folder.
 
@@ -1267,8 +1280,8 @@ sources:
 <!-- atem: one whole's product tree, as COSM 0.2 and 0.3 wrote it -->
 **What it enumerates.** One whole's product tree, as COSM 0.2 and 0.3 wrote it outside any Holotype: the brand, and
 below it suites, offerings, functions, products and services, each answering the same nine questions (identity, flow,
-substrate, rules, principles, economics, vocabulary, affect, mattering). The context-ontology skill still writes trees in
-this form. The MiniCOSM exists so that they open, check and draw beside everything else.
+substrate, rules, principles, economics, vocabulary, affect, mattering). The context-ontology skill writes trees in this
+form. The MiniCOSM exists so that they open, check and draw beside everything else.
 
 **Its declaration.** None of its own in the files: a tree's files say `cosm: 0.2` or `cosm: 0.3` (or `opi:`, the oldest
 form), and each reads as `cosm/0`. `oes: cosm/0` is accepted too. enough writes no standalone trees.
@@ -1302,8 +1315,8 @@ Legacy kinds read as current ones: `firm` as `brand`, `stack` as `function`.
 - **The reference fields** are the ones the tree's own grammar follows: `parts`, `owner`, `flow.inputs.from`,
   `flow.outputs.to` and `substrate.depends-on` (dotted fields, section 7.4), and a role's `governs` and `escalates-to`.
 
-The tree's own checks (its levels, its flows, the seven conditions of equilibrium) belong to the skill's `cosm.py` and
-to Comprise; enough runs the generic checks only. A product-tree file taken out of a Holotype
+The tree's own checks (its levels, its flows, the seven conditions of equilibrium) belong to the context-ontology skill
+and to Comprise; enough runs the generic checks only. A product-tree file taken out of a Holotype
 (`atoms/<concern>/P/brand.cosm`) also says `cosm: 0.3`. Opened on its own it reads as a `cosm/0` tree whose references
 outside P do not resolve; open the Holotype instead.
 
@@ -1369,12 +1382,12 @@ sources:
 
 ### 18.3 canon: the store's enumeration
 
-<!-- atem: a Canon volume or a project: its files and what was made from them -->
+<!-- atem: a Canon volume or project: its files and their derivations -->
 **What it enumerates.** A library, and what has been made from what it holds.
 
 <!-- term: Canon -->
-Canon is enough's library: the store at `~/enough/canon/`, the file manager that browses it, and the derivations that
-turn its texts into EMF twins and atems. A **Canon volume** is a top-level folder of the store. Its catalog enumerates what the volume holds (folders, files, saved articles) and what has been derived from
+Canon is enough's library: the store, the file manager that browses it, and the derivations that turn its texts into
+EMF twins and atems. A **Canon volume** is a top-level folder of the store. Its catalog enumerates what the volume holds (folders, files, saved articles) and what has been derived from
 each file: its markdown twin, its EMF twin, its atem. The same MiniCOSM enumerates a project's files (section 18.3.4).
 
 **Its declaration.** `oes: canon/1`. There is no legacy form, and a catalog without the key is refused.
@@ -1467,6 +1480,9 @@ A project gets a catalog too: `rness/canon.cosm`, with `scope: project`.
   through the cosm viewer, and after any derivation in the project. It is written only when its bytes would change, and
   never from the file tree's own refresh.
 - **Write-refused** like a volume's catalog.
+
+How a project's catalog and a Canon volume's catalog of the same folder relate, when a project is copied into Canon, is
+reserved for a later edition.
 
 #### 18.3.5 Atems
 
@@ -1743,7 +1759,7 @@ that", "reportedly"). Pinned passage atems are not told: like the file's atem, t
 order given, a compile tells `told` when the twin names a source text that can be read, and `weight` for a standalone
 EMF. Without a model a short is the ordered outline itself, said in the items' own sentences; with one, a model writes
 the outline as prose and is told which order it is in. A third order, the events first in the order they happened, is
-planned.
+reserved for a later edition.
 
 **The file.** A short is written beside its text as `<text-stem>.short-<YYYY-MM-DD-HHMM>.md`, in local time:
 `notes.md` gives `notes.short-2026-10-23-1042.md`, and a standalone `rain.cosm` gives `rain.short-…md`. A second compile
@@ -1967,16 +1983,16 @@ its sections, the terms it defines, the complete examples it shows and the decis
 items generated from the MiniCOSM manifests (every MiniCOSM, module, kind, closed list, check and lens) and, for
 enough's own manual, to the help bubbles that sit beside the controls. A doc volume is a document's fabula: the
 material, item by item. Its short is the readable manual, compiled as told, and it gives back the markdown the
-author wrote, byte for byte. This specification is enumerated this way, with Comprise's specification and paradigm
-map as chapters, and so is the Help Center, in each of its six languages.
+author wrote, byte for byte. This specification is enumerated this way, and so is enough's Help Center, in each of its
+six languages.
 
 **Its declaration.** `oes: doc/1`. There is no legacy form, and a catalog without the key is refused.
 
 **Its volume.** One file per telling, `<doc>.<lang>.doc.cosm`: `macrocosm-oes.en.doc.cosm`,
-`help-center.fr.doc.cosm`. enough builds it at runtime into its own state (`~/enough/docoes/`) from the markdown and
-the manifests, and builds it again whenever the document, a chapter, any manifest or enough's own version changes.
-It is never written by hand, never committed and never shown in the file tree. The markdown stays the authoring
-surface: to change a doc volume, change its document. The enumeration is `enough/docoes.py`.
+`help-center.fr.doc.cosm`. enough builds it at runtime into its own state from the markdown and the manifests, and
+builds it again whenever the document, a chapter, any manifest or enough's own version changes. It is never written by
+hand, never committed and never shown in the file tree. The markdown stays the authoring surface: to change a doc
+volume, change its document. The reference enumeration is enough's.
 
 #### 18.5.1 The catalog
 
@@ -2060,14 +2076,14 @@ the block, `declares` the MiniCOSM its declaration names, as a reference item, a
 marked `yaml` or `text` stays part of its section's body. A viewer loads an example as a volume of its own, checks it
 and draws it.
 
-**Decisions.** The numbered items of a section called "Decisions …" whose first words are bold, like those of section
-20, are decisions, `S:decision/<n>`: the bold words are a decision's name, and `about` the sections and terms it names.
+**Decisions.** The numbered items of a section called "Decisions …" whose first words are bold are decisions,
+`S:decision/<n>`: the bold words are a decision's name, and `about` the sections and terms it names.
 
 **The reference, generated.** For every manifest in the registry the volume holds `R:minicosm/<name>`,
 `R:module/<name>.<L>`, `R:kind/<name>.<L>.<kind>` with the kind's reference fields, checked fields, required fields
 and closed lists, `R:list/<name>.<field>` for each closed list, and `R:lens/<name>.<lens>`; and `R:check/<id>` for each
 generic check and each of DocOES's own, with the MiniCOSMs that select it. Each says where it came from:
-`provenance: {mode: catalogue, sources: ['defaults/cosm/manifests/emf.manifest.cosm#modules.P.kinds.claim'], hash}`,
+`provenance: {mode: catalogue, sources: ['emf.manifest.cosm#modules.P.kinds.claim'], hash}`,
 the hash taken over that part of the manifest. The hand-written line for a check, a lens, a MiniCOSM, a kind or a
 value of a closed list stays in this specification's own tables, joined by the id in the first cell: the checks of
 sections 12.2 and 18.5.4, the lenses of section 14.5, the MiniCOSMs of section 18, the kinds of sections 18.2, 18.3.2
@@ -2075,19 +2091,17 @@ and 18.5.2, and the stances and relations of section 18.4.3. Nobody edits a gene
 where they are written.
 
 <!-- term: chapter -->
-A **chapter** is a document synced into the volume, read-only, in its author's own words: Comprise OES 1's
-specification and its paradigm map, copied from Comprise by enough's sync and recorded with the commit they came
-from and each file's sha256. A chapter's items take its prefix, `S:section/comprise.4.1` and `T:term/comprise.concern`,
-and its `S:chapter/<slug>` item carries `provenance: {mode: catalogue, sources: ['comprise-dev oes/comprise-oes.md @
-<commit>'], hash}`. A chapter's term with the name of one of the document's terms is `same_as` it.
+A **chapter** is a document synced into the volume, read-only, in its author's own words, recorded with the commit it
+came from and each file's sha256. A chapter's items take its prefix: a chapter with the prefix `comprise` gives
+`S:section/comprise.4.1` and `T:term/comprise.concern`, and its `S:chapter/<slug>` item carries `provenance: {mode:
+catalogue, sources: ['<repository> <path> @ <commit>'], hash}`. A chapter's term with the name of one of the document's
+terms is `same_as` it.
 
 **References across volumes.** Each doc volume has an inventory: one row per item, with its id, kind, version, anchor
 and atem. A chapter has an inventory of its own, named by its prefix. A reference into another volume, or into a
 chapter, is written `<inventory>@<version>:<kind>:<id>`, as in `comprise@1:section:2.5`, and kept in the item's
-`xrefs`. It is not a reference in the sense of section 9, since a URI between volumes is a value (decision 18); the
-check `xref-unresolved` resolves it through the inventory instead. In this specification, `§` always names a section
-of Comprise OES 1, "README §" one of its paradigm map, and `P.7` a section of its chapter P: the appendix's references
-are all of this kind.
+`xrefs`. It is not a reference in the sense of section 9, since a URI between volumes is a value (section 9.3); the
+check `xref-unresolved` resolves it through the inventory instead.
 
 <!-- term: telling -->
 A *telling* is one arrangement of a fabula in words: the author's text is one and a short another, and each language a
@@ -2099,7 +2113,8 @@ item is told from the author's telling and says so, `fallback: en`.
 **Voice.** The catalog's `telling` names the voice a document is written in. The Help Center's is `{lang: en, voice:
 rosa}`, so a viewer can say who wrote it and a readvisor can quote it as hers.
 
-**Bubbles.** In the Help Center's volume, each section of `static/help-docs.md`, or of its translation, is a bubble,
+**Bubbles.** In the Help Center's volume, each section of enough's help-bubbles document, or of its translation, is a
+bubble,
 `B:bubble/<id>`: its `what`, `how` and `ideas` verbatim, `about` the control it sits beside (its `data-help` id), and
 `see` the manual's sections it names. A bubble about another document names that document's sections instead, and
 keeps them as references across volumes, `xrefs`: the docs viewer's bubble points into this specification. Its atem
@@ -2108,10 +2123,9 @@ is the first sentence of `what`.
 **Three densities.** A viewer shows a doc volume at three densities: the **fabula**, each item as a full card; the
 **short**, the readable manual, compiled as told; and the **atem**, the document as an outline of its items' one-line
 atems. Compiled as told, a doc volume's sections, each its heading and then its body, in `order`, are the document
-again, byte for byte. That round trip is tested for this specification, for both of its chapters, and for each
-telling of the Help Center.
+again, byte for byte. That round trip is tested for this specification and for each telling of the Help Center.
 
-**In enough.** The docs viewer shows both documents at the three densities, from a project or from the home screen,
+**In enough.** The docs viewer shows the documents it holds at the three densities, from a project or from the home screen,
 with no model needed. It asks for one telling at one density (`GET /api/docs?doc=&lang=&density=`), and the volume is
 built the first time it is asked for, or again when its digest has moved; it draws a local graph around an item
 (`GET /api/docs/lens`, section 14.4), loads a live example as a volume from text (`POST /api/cosm/inline`), and gives
@@ -2262,14 +2276,14 @@ nodes:
 
 ### 18.6 ascribe: a person's holograph
 
-<!-- atem: one person described without a name, in ten kinds of node anchored to forms -->
+<!-- atem: one person described without a name, ten node kinds anchored to forms -->
 **What it enumerates.** One person, described well enough that no name is needed. Ascribe's volume is a **holograph**:
 the whole self, private, kept by its subject, as a Holotype is a company's. It holds what the person is drawn to,
 believes, worries about, has lived through, wants to know, thinks, feels, can do, understands and longs for, each item
 anchored to the thing it is about. There is no kind and no field for a name, an email address, a phone number, a postal
 address, a birth date, a government id or an employer's legal name; people in a person's life appear by role or by a
-pseudonym the catalog declares. The full description is `docs/ASCRIBE.md`; the manifest is
-`defaults/cosm/manifests/ascribe.manifest.cosm`.
+pseudonym the catalog declares. The full specification is Ascribe (https://ascribe.cosmoes.org/); this section says how
+it sits in MacroCOSM.
 
 **Its declaration.** `oes: ascribe/1`. There is no legacy form, and a catalog without the key is refused.
 
@@ -2277,8 +2291,8 @@ pseudonym the catalog declares. The full description is `docs/ASCRIBE.md`; the m
 lowercase base32, the shape of a Comprise Connect `hid`), a pseudonymous `handle`, an optional one-line `summary`,
 `pseudonyms` and `sample`. Beside it sit the module folders, `A/` to `Y/` and `F/`, each holding `.cosm` files of
 `nodes:`. The catalog may carry a few nodes of any module in its own `nodes:`, which is how the example below is one
-file. A `.ascribe-private` marker names files that ingest and transfer leave behind; the rule is declared, and enough
-applies it nowhere yet.
+file. A `.ascribe-private` marker names files that ingest and transfer leave behind; the rule is declared, and its
+application to ingest and transfer is reserved for a later edition.
 
 **Its modules and kinds.** Ten containers of the self, one kind each, the kind the singular of the module's name and the
 letter its initial, and F for what they anchor to.
@@ -2309,9 +2323,9 @@ own check closes the list.
 
 **In enough.** The reader loads, checks and draws a holograph like any volume, titled by its handle. Ascribe's own
 checks (an anchored form, a declared relation, the shape of a `when`, the range of a `strength`, what reads like
-personal data, and what a private marker would drop) run in `enough/ascribe.py`, as
-`python -m enough.ascribe lint <folder>`, and a generic reader runs none of them. The personal-data check warns and
-never refuses. Nothing else of Ascribe is built: no application module, no isograph, no index.
+personal data, and what a private marker would drop) are enough's (its `ascribe lint` command runs them over a
+holograph's folder), and a generic reader runs none of them. The personal-data check warns and never refuses. Ascribe's
+application module, isographs and index belong to Ascribe's own specification.
 
 **An example.** A holograph small enough to be one file: two forms, a declared relation and two nodes.
 
@@ -2362,15 +2376,14 @@ nodes:
 A `thym/1` volume is one of six kinds: a **program** volume, the enumeration of one `.thym` file, compiled back byte for
 byte; a **morph** volume of style sheets, measured against the null morph or declared by hand on ten scales; a
 **context** volume of occasions; a **plan**, what a program will do before it does it; a **trace**, what a run did, one
-record per node; and a **package**, the catalog of a text's self-contained export. The full specification is
-`docs/THYM.md`, whose part on the `thym/1` MiniCOSM this section summarizes; the manifest is
-`defaults/cosm/manifests/thym.manifest.cosm`.
+record per node; and a **package**, the catalog of a text's self-contained export. The full specification is Thym
+(https://thym.cosmoes.org/), whose part on the `thym/1` MiniCOSM this section summarizes.
 
 **Its declaration.** `oes: thym/1`. There is no legacy form, and a catalog without the key is refused.
 
 **Its volume.** One file (`volume.single-file: true`), whose catalog's `kind` says which of the six it is:
 `<name>.thym.cosm` beside a program, `<name>.morph.cosm`, `<name>.context.cosm`, `<run-id>.plan.cosm`,
-`<run-id>.trace.cosm` (both under the Thym root, `~/enough/thym/runs/`, by default), and `package.cosm` inside a
+`<run-id>.trace.cosm` (both under the implementation's Thym root by default), and `package.cosm` inside a
 package's folder or `<name>.package.cosm` beside its text.
 
 **Its modules and kinds.**
@@ -2392,15 +2405,15 @@ package's folder or `<name>.package.cosm` beside its text.
 
 Every item may carry `made`, the provenance field Thym adds: the move, run, step and engine that made it. Six checks
 are Thym's own (a program volume compiles to its items, a plan is acyclic, a trace is complete, a scale is in range, a
-package's digests match, a reading is labelled); `enough/thym` runs them, and a generic reader does not.
+package's digests match, a reading is labelled); enough runs them, and a generic reader does not.
 
 **Its moves.** The manifest ends in a `moves:` block (section 13.4): the moves `thym/1` owns, `cut`, `count`, `words`,
 `digest`, `null`, `measure`, `morph`, `read`, `package`, `unpack`, `lint`, `trace` and the accessors `fabula`,
 `context`, `graph` and `isomorph`. `emf/1` and `doc/1` declare theirs in their own manifests, and Comprise's sit in
 `comprise.moves.cosm`.
 
-**In enough.** The compiler and runtime are `enough/thym/` (`python -m enough.thym check|plan|run|trace|conform`); the
-cosm viewer draws a program's steps with their contracts, a plan as a graph and a trace as cards, and the docs viewer
+**In enough.** enough is Thym's reference compiler and runtime (its `thym` command offers `check`, `plan`, `run`,
+`trace` and `conform`); the cosm viewer draws a program's steps with their contracts, a plan as a graph and a trace as cards, and the docs viewer
 reads a program at three densities.
 
 **An example.** A morph declared by hand: a letter home, personal, a little hedged, never ornate.
@@ -2428,7 +2441,7 @@ nodes:
 
 ## 19. Conformance
 
-<!-- atem: what a conforming reader and writer must do, and the corpus that shows it -->
+<!-- atem: what a conforming reader and writer must do, and the corpus -->
 
 ### 19.1 A reader must
 
@@ -2462,7 +2475,7 @@ nodes:
 
 ### 19.3 The conformance corpus
 
-A reader conforms to MacroCOSM OES 0.0.1 when:
+A reader conforms to MacroCOSM OES when:
 
 - Comprise's four public sample Holotypes (meadow, khan-academy, mozilla and wikimedia; 1,010 items between them) load
   through the generic reader and Comprise's manifest with no load problems, and every item has the path Comprise gives
@@ -2474,53 +2487,90 @@ A reader conforms to MacroCOSM OES 0.0.1 when:
   `' emf/1 '`, an empty `oes:`, a catalog with no declaration at a name no default claims) is refused, and each legacy
   case is read.
 
-The reader's own tests are the tie-break. Where they and this list disagree, the tests win and this section is
-corrected.
+Where the reference implementation's tests and this list disagree, one of them is in error; the Changes appendix
+(section 20) records which was corrected.
 
-### 19.4 Where the reader wins
+### 19.4 Where an implementation and this text disagree
 
-No disagreement between this text and `enough/macrocosm.py` is known at the time of writing. When one is found, the
-text is corrected and the disagreement is recorded here, with the section it touched, until the next version folds it
-in.
+Where an implementation and this text disagree, one of them is in error. The disagreement is settled by correcting the
+one that is wrong, and the Changes appendix (section 20) records which was corrected, with the section it touched. No
+disagreement stands as a rule of its own.
 
 ---
 
-## 20. Decisions in this version
+## 20. Changes
 
-<!-- atem: the decisions this version settled, one numbered line each -->
-1. **MacroCOSM is the grammar Comprise mapped, made real.** Not a new taxonomy. Comprise OES 1 already held every part
-   of the grammar; a second one would split the family.
-2. **The format does not change.** One loader, Comprise's, for every `.cosm` file. Hundreds of existing files read as
-   they are.
-3. **One declaration grammar,** `oes: <minicosm>/<major>`, for every MiniCOSM, with each manifest naming the legacy
-   forms it still reads. One line a person sees without parsing the file.
+<!-- atem: what changed in each edition and version, newest first -->
+Each entry records what changed in the text or the grammar, newest first. Where an implementation and this text
+disagreed and one was corrected, the entry says which.
+
+**Edition 0.5.4 · 2026-11-03.** The canonical edition, published at https://macro.cosmoes.org/.
+
+1. **Names carry no number.** MacroCOSM OES, Comprise OES, Ascribe and Thym; the edition and the grammar version are
+   fields of the status line, never part of a name.
+2. **The grammar version is 0.5.4,** in the reserved `macrocosm:` key (sections 5.6 and 15); files written under 0.0.2
+   and 0.0.1 read unchanged. Nothing in the grammar changed.
+3. **The Comprise OES chapters are no longer appended to this document.** Comprise OES, Ascribe and Thym are published
+   at their own homes, and sections 1.1, 18, 18.1, 18.6, 18.7 and the appendix point at them; references to their
+   sections are written in words.
+4. **The roadmap sections were withdrawn.** Section 21 (open questions and roadmap, with its lists of what was mapped and
+   what was left open) was withdrawn, and the *mapped* status marker with it; each gap is stated where it falls as
+   reserved for a later edition (sections 4.5, 9.3, 11.3, 12.3, 13.6, 17, 18.3.4, 18.4.4 and 18.6), and the rule on a
+   catalog with no `id` was folded into section 6.2.
+5. **The text is normative.** The status paragraph, section 19.3 and section 19.4 no longer give the reader the last
+   word: where an implementation and this text disagree, one of them is in error, and this section records which was
+   corrected. Section 19.4's list of known disagreements (empty) was withdrawn.
+6. **Reference implementations are named, not pathed.** enough (https://github.com/0gsd/enough) for MacroCOSM and every
+   registered MiniCOSM; Comprise for Comprise OES. Command lines remain as examples of each implementation's own.
+7. **Section 18 is "The MiniCOSMs".** The seven registered MiniCOSMs, each with its home where it has one; the contents
+   list names all seven.
+8. **Small corrections.** The registry order of section 5.2 completed with `ascribe` and `thym` as section 13.6 gives
+   it; the count of further optional keys in section 13.5 corrected from three to four; the colophon names where the
+   canonical edition and its source are kept.
+
+**Version 0.0.2 · 2026-11-02.**
+
+1. **Two MiniCOSMs more:** `ascribe/1`, a self with no name (section 18.6), and `thym/1`, programs, morphs, contexts,
+   plans, traces and packages (section 18.7).
+2. **The `moves:` block of a manifest and the `<name>.moves.cosm` sidecar** (section 13.4), read by the Thym compiler
+   and kept by the generic reader.
+3. **The grammar unchanged.**
+
+**Version 0.0.1 · 2026-10-22.** The grammar written down apart from any one domain.
+
+1. **MacroCOSM is the grammar Comprise mapped, made real.** Not a new taxonomy: Comprise OES already held every part of
+   the grammar, and a second one would split the family.
+2. **The format does not change.** One loader, Comprise's, for every `.cosm` file; every existing file reads as it is.
+3. **One declaration grammar,** `oes: <minicosm>/<major>`, for every MiniCOSM, each manifest naming the legacy forms it
+   reads: one line a person sees without parsing the file.
 4. **An absent-declaration default claims only its own catalog file.** Comprise reads a `holotype.cosm` without `oes:`
-   as `comprise/1`; a generic reader that applied the default everywhere would claim every YAML file it was shown.
+   as `comprise/1`; a default applied everywhere would claim every YAML file a reader was shown.
 5. **A refusal is a value, not an exception.** A viewer shows the refusal in place of the volume and goes on.
-6. **`macrocosm:` is reserved and ignored.** Room for a grammar version test later, without refusing any file today.
+6. **`macrocosm:` is reserved and ignored.** Room for a grammar version test, without refusing any file.
 7. **Single-file volumes.** A Canon volume and an EMF twin are one catalog each; a folder per text would double every
    tree.
-8. **Module letters are local to a MiniCOSM.** The declaration already says which language a volume speaks; reserving
-   letters across languages would run out of letters and buy nothing.
+8. **Module letters are local to a MiniCOSM.** The declaration says which language a volume speaks; letters reserved
+   across languages would run out and buy nothing.
 9. **Paths drop the part level when a MiniCOSM has no parts.** A single-file volume has one implicit part, and a segment
    that never varies is noise.
 10. **Wildcard reference fields check only id-shaped values.** Role slots mix item ids with literals such as conditions;
-    checking literals as ids would make every condition an error.
+    literals checked as ids would make every condition an error.
 11. **Link relations may be closed.** EMF closes them so that twins can be drawn and compared; Comprise keeps its own
     free.
 12. **Closed lists and severities by name, in the manifest.** A MiniCOSM's own vocabularies (stance, salience) and its
     severities are checked without new code.
 13. **Lenses are declared in the manifest, with a default.** A MiniCOSM can be drawn without code; Comprise's manifest,
-    a byte copy that declares no lens, still draws with `map`.
-14. **Generic checks only.** A MiniCOSM's own rules are its own code. Reproducing Comprise's fourteen rules in enough
-    would fork Comprise; a viewer says plainly that they need Comprise.
-15. **Checks may gate writes; MacroCOSM does not require it.** Comprise undoes a write that adds an error. enough edits
+    a byte copy that declares no lens, draws with `map`.
+14. **Generic checks only.** A MiniCOSM's own rules are its own code; Comprise's fourteen rules are not reproduced in
+    the generic reader, and a viewer says plainly that they need Comprise.
+15. **Checks may gate writes; MacroCOSM does not require it.** Comprise undoes a write that adds an error; enough edits
     raw text and reports problems after a save, never refusing it.
 16. **`load` always runs.** Nothing can be checked that was not read.
-17. **Versions, the split and MicroCOSMs are by reference or mapped.** They are built only in Comprise, or nowhere; their
-    mechanics stay Comprise's until a second MiniCOSM needs them.
-18. **A URI between volumes is a value, not a reference.** Resolving across volumes needs a registry of volumes this
-    version does not define.
+17. **Versions, the split and MicroCOSMs are by reference.** Saved versions, signatures and the split are Comprise's
+    (Comprise OES, its sections on versions and on the private/public split); MicroCOSMs are reserved for a later
+    edition.
+18. **A URI between volumes is a value, not a reference.** Resolving across volumes needs a registry of volumes the
+    grammar does not define.
 19. **The EMF twin's name adds `.cosm` to the text's whole name.** `notes.md` and `notes.md.cosm` sort together and pair
     by name; the family keeps one extension.
 20. **An EMF twin's id respells the text's path.** Two texts with the same name in different folders must not share an
@@ -2531,9 +2581,11 @@ in.
     keeps; the three vectors are what a reader needs to trust it.
 23. **Without a model, a labelled scaffold.** A derivation that could not read writes open questions and says so, never
     a filler.
-24. **The specification lives in enough for now.** Comprise vendors it later, with the reader.
-25. **All rights reserved for the specification and the manifests; the reader is Apache 2.0** with the rest of enough.
-26. **What enough compiles from a twin is a SHORT, written beside the text and recorded by the twin.** One fabula, many
+24. **The specification shipped inside enough,** beside the reference reader (superseded in edition 0.5.4 by the
+    canonical edition at https://macro.cosmoes.org/).
+25. **All rights reserved for the specification and the manifests;** the reference implementation is licensed on its
+    own terms.
+26. **What is compiled from a twin is a SHORT, written beside the text and recorded by the twin.** One fabula, many
     tellings: the EMF twin, *enumerated meaning fabula*, is the material and a short one arrangement of it. The author's
     text is the first arrangement and is never called a short; the atem stays outside the pair. Every compile is a new
     file in one of two orders, the author's or by weight, and the twin lists its shorts so the material knows its
@@ -2546,88 +2598,55 @@ in.
 
 ---
 
-## 21. Open questions and roadmap
+## 21. Withdrawn
 
-<!-- atem: what is mapped but not built, and what this version leaves open -->
-
-### 21.1 Mapped, not built
-
-- **MicroCOSMs** (section 17). How a volume says that it uses one, how a reader loads one, and how its names are kept
-  apart from a later version of its MiniCOSM's own.
-- **Shared public forms.** A vocabulary of kinds of thing that many subjects name ("chair", "M4 screw", "invoice",
-  "lease"), each defined once, in public, and cited by id from any MiniCOSM that needs it, so that two volumes that name
-  the same kind of thing name it checkably.
-- **People, the rest of it.** Ascribe's manifest and its checks are built (section 18.6), with the rules no other
-  MiniCOSM has: no field for a person's private detail, and no other subject's volume ever holding one. Still mapped:
-  the application module that asks the dialectic's questions and writes the nodes; Ascribe-Connect, which would vouch
-  that one real person holds a holograph; isographs, the holograph projected by a Thym program and listed on an index;
-  consented match tokens, so that an index can match a sealed package without reading it; and the private-marker
-  filter applied to ingest and transfer.
-- **Morphs beyond texts.** Thym built morphs for texts (section 18.7, and `docs/THYM.md` in full): the null morph, ten
-  scales, the holomorph a person's writing is measured into, the isomorph they share, and readings told through either.
-  Still mapped: readings made in the page, which need a JavaScript runtime of Thym that passes its conformance suite;
-  and renderers that follow a morph for any volume, so that the same truth is retold for a beginner, set as story
-  problems, told as narrative or drawn as a scene.
-- **Other MiniCOSMs.** An industry or a market, a body of knowledge or a practice, an institution, a built world.
-- **Universal addressing.** A globally unique database name, and a resolver for URIs across installs.
-- **Editing in place.** Byte-preserving edits of one item inside a file, so that a structured viewer can edit without
-  losing comments; syntax highlighting for `.cosm` in the editor.
-- **SQL views** over the reader's tables, one per kind.
-
-### 21.2 Left open by this version
-
-- Whether a person's own manifests may precede the shipped ones in the registry, and how a reader reports a clash.
-- Whether `checks.severity` may lower a default severity, or only raise it.
-- Whether ids that differ only in case, and ids whose slugs fall outside the path set, become generic checks.
-- Whether a URI written in a field becomes a reference, once volumes have a registry.
-- Whether a catalog with no `id` is an error. When the manifest's `catalog.id` is a template, `catalog-key` reports a
-  missing id as an error; when the manifest gives `catalog.id-absent`, a reader supplies the id instead (section 6.2).
-  No manifest that ships has both, since the two that give `id-absent` (comprise and cosm) do not select `catalog-key`.
-  A manifest that had both would get the error and the supplied id.
-- How a project's catalog and a Canon volume's catalog of the same folder relate when a project is copied into Canon.
+<!-- atem: section 21 was withdrawn in edition 0.5.4 -->
+Section 21 was withdrawn in edition 0.5.4; its content, where it survives, is in the Changes appendix (section 20) and
+in the sections that state each gap where it falls.
 
 ---
 
-## Appendix: the mapping to Comprise OES 1
+## Appendix: the mapping to Comprise OES
 
-Section by section, where each part of this document comes from in Comprise OES 1 (`oes/comprise-oes.md`), its map
-(`oes/README.md`) and its manifest (`oes/comprise-oes.manifest.cosm`), and what changed on the way.
+Section by section, where each part of this document comes from in Comprise OES (https://comprise.cosmoes.org/), the
+map of the family (https://cosmoes.org/, called "the map" below) and Comprise's manifest, and what changed on the way.
+A bare number in the middle column is a section of Comprise OES; `P.n` is a section of its chapter P, the product
+tree; a decision is a numbered item of its Changes appendix.
 
-| MacroCOSM OES 0.0.1 | Comprise OES 1 | What changed |
+| MacroCOSM OES | Comprise OES | What changed |
 |---|---|---|
-| 1 Provenance and the name | the opening note; README §2; P.11 | the lineage carried one step further |
-| 2 The model on one page | §1, the map | "Holotype" became "volume", "concern" became "part"; the store left the table |
-| 3 Scales | README §2–§4 | MacroCOSM's parts listed against this document's sections |
-| 4 The file format | §2.5; the manifest's `format` | the loader written out; the YAML 1.1 surprises tabled |
-| 5 The declaration | §2.3; decision 13 | any MiniCOSM; the absent default scoped to its own catalog file; a registry order |
-| 6 Volumes and catalogs | §2.1, §2.2, §2.4, §2.7, §2.8; §3.1 for parts | single-file volumes; concerns generalized as parts |
-| 7 Items, kinds, fields | §2.4; §5's opening; §6.4.6 | module letters local to a MiniCOSM; wildcard fields |
-| 8 The envelope | §4, §4.1, §4.2, §4.3 | a nine-field minimum; required fields per MiniCOSM |
-| 9 References and links | §7 | closed link relations; literals in wildcard fields; URIs as values |
-| 10 Open questions | §8 | unchanged, with the `pending-shape` check |
-| 11 Ids, paths, URIs | §6 | levels from the manifest; no part segment without parts |
-| 12 Checks | §9.1, §9.2 | a fixed generic vocabulary; unknown ids reported as not run |
-| 13 The manifest | README §4; the manifest; decisions 15–16 | read generically; optional 0.0.1 keys; the registry |
-| 14 Renderers and lenses | §12; P.8 | lenses declared in the manifest; a default lens |
-| 15 Versions and signatures | §10 | by reference |
-| 16 The private/public split | §11 | by reference; the words named for every MiniCOSM |
-| 17 MicroCOSMs | README §5; the manifest's `extension` | mapped, unchanged |
-| 18.1 comprise | the whole of Comprise OES 1 | how it sits in MacroCOSM |
+| 1 Provenance and the name | the opening note; the map; P.11 | the lineage carried one step further |
+| 2 The model on one page | 1; the map | "Holotype" became "volume", "concern" became "part"; the store left the table |
+| 3 Scales | the map | MacroCOSM's parts listed against this document's sections |
+| 4 The file format | 2.5; the manifest's `format` | the loader written out; the YAML 1.1 surprises tabled |
+| 5 The declaration | 2.3; decision 13 | any MiniCOSM; the absent default scoped to its own catalog file; a registry order |
+| 6 Volumes and catalogs | 2.1, 2.2, 2.4, 2.7 and 2.8; 3.1 for parts | single-file volumes; concerns generalized as parts |
+| 7 Items, kinds, fields | 2.4; the opening of 5; 6.4.6 | module letters local to a MiniCOSM; wildcard fields |
+| 8 The envelope | 4, 4.1, 4.2 and 4.3 | a nine-field minimum; required fields per MiniCOSM |
+| 9 References and links | 7 | closed link relations; literals in wildcard fields; URIs as values |
+| 10 Open questions | 8 | unchanged, with the `pending-shape` check |
+| 11 Ids, paths, URIs | 6 | levels from the manifest; no part segment without parts |
+| 12 Checks | 9.1 and 9.2 | a fixed generic vocabulary; unknown ids reported as not run |
+| 13 The manifest | the map; the manifest; decisions 15 and 16 | read generically; optional 0.0.1 keys; the registry |
+| 14 Renderers and lenses | 12; P.8 | lenses declared in the manifest; a default lens |
+| 15 Versions and signatures | 10 | by reference |
+| 16 The private/public split | 11 | by reference; the words named for every MiniCOSM |
+| 17 MicroCOSMs | the map; the manifest's `extension` | unchanged; reserved for a later edition |
+| 18.1 comprise | the whole of Comprise OES | how it sits in MacroCOSM |
 | 18.2 cosm | chapter P, P.7; COSM 0.2 | a MiniCOSM for trees outside a Holotype |
 | 18.3 canon, 18.4 emf, 18.5 doc, 18.6 ascribe, 18.7 thym | none | new MiniCOSMs, written in the grammar |
-| 19 Conformance | §13 | the corpus named; the reader wins |
-| 20 Decisions | §14 | this version's own |
-| 21 Roadmap | README §7; §12's *not built* | the morph-driven renderers named |
+| 19 Conformance | 13 | the corpus named; where an implementation and this text disagree, one is in error |
+| 20 Changes | 14 | this document's own |
+| 21 (withdrawn) | the map; the *not built* of 12 | withdrawn in edition 0.5.4 |
 
-**What stays Comprise's alone.** Concerns and relationships (its §3), the eight modules' kinds and fields (§5), the
-product tree's checks and its seven conditions (P.9), the fourteen rules and the verdict (§9.3, §9.4), the isotype's
-fields and rules (§11.3), and the people, who are never in a file (§2.6, §2.8). MacroCOSM reads all of them, keeps them,
-and leaves their meaning to Comprise.
+**What stays Comprise's alone.** Concerns and relationships, the eight modules' kinds and fields, the product tree's
+checks and its seven conditions (P.9), the fourteen rules and the verdict, the isotype's fields and rules, and the
+people, who are never in a file: Comprise OES (https://comprise.cosmoes.org/) specifies each of them. MacroCOSM reads all
+of them, keeps them, and leaves their meaning to Comprise.
 
 ---
 
 ## Colophon
 
-MacroCOSM OES — Copyright © 2026 Graham Smith. All rights reserved.
-
-This specification is not covered by enough's Apache License 2.0; see `defaults/cosm/NOTICE.md` for its terms.
+MacroCOSM OES — Copyright © 2026 Graham Smith. All rights reserved. The canonical edition is published at
+https://macro.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.

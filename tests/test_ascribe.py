@@ -48,7 +48,9 @@ def test_the_manifest_joins_the_registry_seventh():
     assert reg.problems == []
     m = reg.get("ascribe")
     assert (m.name, m.title, m.version, mc._decl_value(m)) == ("ascribe", "Ascribe", 1, "ascribe/1")
-    assert m.data["spec"] == "docs/ASCRIBE.md" and m.data["reference"] == ["enough/macrocosm.py", "enough/ascribe.py"]
+    # 0.5.4: `spec:` is the text's cosmoes.org home (bundled as docs/ASCRIBE.md), not a repository path.
+    assert m.data["spec"] == "https://ascribe.cosmoes.org/"
+    assert m.data["reference"] == ["enough/macrocosm.py", "enough/ascribe.py"]
     assert m.declaration["absent"] == "refuse" and m.volume["catalog"] == "holograph.cosm"
 
 
@@ -58,7 +60,8 @@ def test_the_manifest_carries_the_header_and_the_notice():
     assert head.startswith("# ") and all(line.startswith("#") or not line for line in head.splitlines())
     assert "# Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md." in head
     assert text.count("\nmanifest: minicosm/0\n") == 1
-    assert "the prose (0.5.0)" in text.split("\nspec:", 1)[1].splitlines()[0]
+    assert "the canonical edition" in text.split("\nspec:", 1)[1].splitlines()[0]
+    assert "later round" not in text and "0.5.0" not in text                   # no round language (0.5.4)
 
 
 def test_ten_modules_of_one_kind_each_and_the_forms():

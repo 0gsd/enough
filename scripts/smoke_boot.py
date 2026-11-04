@@ -175,6 +175,13 @@ def build_env(scratch: Path) -> dict[str, str]:
         "ENOUGH_DOCS_ROOT": str(scratch / "docoes"),
         # Thym (0.5.0): plans, traces, recorded candidates and landed outputs, ~/enough/thym/ by default.
         "ENOUGH_THYM_ROOT": str(scratch / "thym"),
+        # The specifications synced from cosmoes.org (0.5.4): the client's folder, ~/enough/specs/ by default;
+        # the launch check is off (no scratch boot may reach cosmoes.org) and the client's base is a dead
+        # loopback port, so a rig that turns the check back on must also point ENOUGH_COSMOES_BASE at its own
+        # stand-in.
+        "ENOUGH_SPECS_ROOT": str(scratch / "specs"),
+        "ENOUGH_SPECS_SYNC": "0",
+        "ENOUGH_COSMOES_BASE": "http://127.0.0.1:1",
         # The home screen's project registry. $HOME already points here, so
         # this is belt and braces — but the rule is "every ENOUGH_* seam", and
         # the handoff file and desktop.json are derived from this one's dir.

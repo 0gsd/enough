@@ -1,13 +1,17 @@
-# Thym 0: the MacroCOSM language, its compiler and its runtime
+# Thym
 
-Version 0 of the language, written 2026-11-01 for enough 0.5.0. It was a draft until checkpoint A of the 0.5.0 round,
-when the reference compiler and runtime first passed the conformance suite on a real model (2026-11-01, the night
-of the same day). From then on it is the specification, and `enough/thym/` is its reference implementation. Where the two disagree, the reference wins and this
-text is corrected (section 20.4), as `docs/MACROCOSM_OES.md` promises for its reader.
+*Edition 0.5.4 · revised 2026-11-03 · cosmoes.org home: https://thym.cosmoes.org/*
 
-The design behind this document, with the owner's rulings, is `docs/thym-architecture.md` (local). Thym is folded into
-the MacroCOSM specification, `docs/MACROCOSM_OES.md`, and its words (item, kind, volume, catalog, module, check, lens,
-atem) keep their meaning here.
+*This edition describes the `thym/1` MiniCOSM and defines the language; a program's version line, `thym 0`, names the grammar as this edition defines it.*
+
+Thym is the MacroCOSM language, its compiler and its runtime: programs compose named moves over values typed by density,
+a compiler checks and plans a whole program before anything runs, and a runtime walks the plan, asks a model only behind
+a contract, and traces every run so that it replays. Thym is folded into MacroCOSM OES (https://macro.cosmoes.org/), and
+MacroCOSM's words (item, kind, volume, catalog, module, check, lens, atem) keep their meaning here.
+
+enough (https://github.com/0gsd/enough) is the reference implementation of the language, its compiler and its runtime.
+Where an implementation and this text disagree, one of them is in error; the Changes appendix (section 21) records which
+was corrected.
 
 ## Contents
 
@@ -32,8 +36,8 @@ atem) keep their meaning here.
 18. Projections: the dial as a program
 19. Agent-free
 20. Conformance
-21. Decisions in this version
-22. Open questions and roadmap
+21. Changes
+22. Withdrawn
 
 Colophon
 
@@ -74,8 +78,8 @@ follows in parentheses where they differ. Thym's words are mostly the files' own
 (`P:step`), a part of a plan is a *node* (`R:node`), and an entry of a trace is a *record* (`R:record`). A plan's node
 is an item of kind `node`; it is not MacroCOSM's file word for an item.
 
-**Blocks.** A block marked `thym` is one complete program file: it starts with its version line, it compiles under the
-reference compiler with the standard moves, and its plan is well formed. A block marked `cosm` is one complete `.cosm`
+**Blocks.** A block marked `thym` is one complete program file: it starts with its version line, it compiles under a
+conforming compiler with the standard moves, and its plan is well formed. A block marked `cosm` is one complete `.cosm`
 file that loads and lints clean. A block marked `yaml` is a fragment and may point outside itself. A block marked
 `python` sketches an interface. A block marked `text` is grammar, a transcript or a picture.
 
@@ -87,14 +91,15 @@ file that loads and lints clean. A block marked `yaml` is a fragment and may poi
 
 ### 1.1 Lineage
 
-MacroCOSM OES 0.0.1 gave enough one grammar for volumes of items: Comprise's Holotypes, Canon's catalogs, EMF twins,
-documents. Everything a reader does with them (load, check, draw) is generic. Everything that *moves* meaning between
-them was not: deriving a twin, compiling a short, writing an atem and projecting an isotype were each a Python function
-or a model prompt standing outside the format. Thym makes those moves first-class (section 2).
+MacroCOSM OES (https://macro.cosmoes.org/) gives one grammar for volumes of items: Comprise's Holotypes, Canon's
+catalogs, EMF twins, documents. Everything a reader does with them (load, check, draw) is generic. Before Thym,
+everything that *moves* meaning between them was not: deriving a twin, compiling a short, writing an atem and projecting
+an isotype were each a function or a model prompt standing outside the format. Thym makes those moves first-class
+(section 2).
 
 Three precedents shaped it.
 
-- **DocOES** (MacroCOSM section 18.5). A document is enumerated into items and compiled back byte for byte, so the
+- **DocOES** (MacroCOSM OES, its section 18.5, https://macro.cosmoes.org/). A document is enumerated into items and compiled back byte for byte, so the
   written file stays the source of truth. A Thym program is enumerated the same way.
 - **Lossy codecs.** A codec specifies the stream and the reference decoder, and leaves the encoder free. Thym specifies
   what a move must preserve (its contract) and leaves the model free.
@@ -111,15 +116,17 @@ name.
 
 ### 1.3 Stewardship
 
-The owner of enough keeps this specification. A program's version line, `thym 0`, pins the grammar of this document: a
-program written under version 0 must compile under every later reference compiler. The language grows by moves, which
-MiniCOSMs declare (section 17.6), and never by syntax within a version.
+This specification is kept by its copyright holder (see the colophon) and revised at its home, https://thym.cosmoes.org/;
+each revision is an edition, and the Changes appendix (section 21) records what each edition changed. A program's version
+line, `thym 0`, pins the grammar of this document: a program written under it must compile under every later conforming
+compiler. The language grows by moves, which MiniCOSMs declare (section 17.6), and never by syntax within a grammar
+version.
 
 ---
 
 ## 2. The model on one page
 
-<!-- atem: programs compose moves over typed values; a compiler plans; a runtime runs and traces -->
+<!-- atem: moves over typed values; a compiler plans; a runtime runs and traces -->
 
 ```text
    author's side                   the three densities                  interpreter's side
@@ -172,13 +179,13 @@ MiniCOSMs declare (section 17.6), and never by syntax within a version.
 6. **Nothing partial.** A program compiles whole or not at all. A run lands every output or none, and its trace says
    where it stopped and why.
 7. **Portable by design.** The grammar, the types, the contracts and the conformance suite are language neutral:
-   `.cosm` in, `.cosm` out. The Python reference uses nothing a JavaScript runtime could not mirror (section 12.6).
+   `.cosm` in, `.cosm` out. The Python reference implementation uses nothing a JavaScript runtime could not mirror (section 12.6).
 
 ---
 
 ## 4. Programs: the language
 
-<!-- atem: the file, its blocks, its heads and statements, and the grammar in full -->
+<!-- atem: the file, its blocks, heads and statements, and the grammar in full -->
 
 ### 4.1 The file
 
@@ -187,7 +194,7 @@ first line that is neither blank nor a comment is the **version line**, `thym 0`
 in any order. A comment runs from `--` to the end of the line. Blank lines are free. Indentation is free too: the
 examples indent for the eye, and a compiler must read the same file with none.
 
-A complete program, as it reads on the day the owner's drawing works end to end:
+A complete program, which packages a story with its fabula and its author's morph (section 15):
 
 ```thym
 thym 0
@@ -305,7 +312,7 @@ compile error, so a typo never becomes a word.
 
 | literal | form | examples |
 |---|---|---|
-| number | an integer; version 0 has no floats | `300`, `0` |
+| number | an integer; the language has no floats (section 12.6) | `300`, `0` |
 | string | double quotes; `\"` and `\\` are the only escapes | `"phone"` |
 | date | `YYYY-MM-DD` | `2026-11-01` |
 | word | a bare word where only a word can stand (section 4.5) | `told`, `verified`, `aim` |
@@ -315,12 +322,12 @@ compile error, so a typo never becomes a word.
 | marking | `verified` `stated` | |
 | stance | `axiom` `observed` `deduced` `opinion` `assumed` `hearsay` | EMF's closed list |
 | bool, nothing | `true` `false` `nothing` | `nothing` is the absent value an accessor may give |
-| URI | `oes:<minicosm>/<database>[/<path>]`, as MacroCOSM section 11.3 writes it, or a relative file path | `oes:emf/notes-md`, `oes:thym/house/M/morph/rosa`, `notes.md` |
+| URI | `oes:<minicosm>/<database>[/<path>]`, as MacroCOSM OES writes it in its grammar of URIs (https://macro.cosmoes.org/), or a relative file path | `oes:emf/notes-md`, `oes:thym/house/M/morph/rosa`, `notes.md` |
 
 ### 4.7 Keywords
 
 Every keyword is a FEED headword or a form of one (`takes`, `gives`, `has` and `covers` are forms of `take`, `give`,
-`have` and `cover`). The keywords of version 0 are:
+`have` and `cover`). The keywords are:
 
 ```text
 thym use program move morph context end
@@ -450,7 +457,7 @@ that calls it: it is called with values, never with the caller's scope.
 
 ## 6. Moves
 
-<!-- atem: the primitives: a signature, an asks flag, a contract, and the MiniCOSM that owns each -->
+<!-- atem: the primitives: a signature, an asks flag, a contract, and an owner -->
 
 ### 6.1 What a move is
 
@@ -467,11 +474,11 @@ stand-in with a weaker output, which a run with `--rules` uses instead (section 
 | `thym/1` | `cut`, `count`, `words`, `digest`, `null`, `measure`, `morph`, `read`, `package`, `unpack`, `lint`, `trace`, and the accessors `fabula`, `context`, `graph`, `isomorph` |
 | `emf/1` | `derive`, `tell`, `atem`, `expand` |
 | `doc/1` | `enumerate`, `compile` |
-| `comprise/1` | `project`, `band`, `mark`, `withhold`, in a sidecar, since enough never edits Comprise's manifest |
+| `comprise/1` | `project`, `band`, `mark`, `withhold`, in a sidecar (section 17.6), since `comprise/1`'s manifest belongs to Comprise OES |
 
 Section 17.6 gives the `moves:` block that declares them.
 
-### 6.3 The standard moves of version 0
+### 6.3 The standard moves
 
 Each contract below is the `contract:` list of the move's declaration; section 7.3 says what each check holds.
 
@@ -541,7 +548,7 @@ A contract is a list of named checks that must hold on a move's output before th
 compiler checks the **static** part: it refuses a composition that cannot satisfy a contract, such as a `tell` whose
 input is a `text`, or a `project … as isotype` that emits a bare count. The runtime checks the **dynamic** part on every
 output. A model-backed output that fails is repaired narrowly, retried within its budget, and then refuses the run
-(section 9). Most checks already exist as code in enough and Comprise; Thym names them and attaches them to moves.
+(section 9). Most checks exist as code in enough and Comprise; Thym names them and attaches them to moves.
 
 ### 7.2 The six laws
 
@@ -558,39 +565,39 @@ output. A model-backed output that fails is repaired narrowly, retried within it
 
 ### 7.3 The named checks
 
-| check | holds when | exists today as |
+| check | holds when | where it comes from |
 |---|---|---|
-| `span-resolves` | every `span` names lines or quotes that exist in the source text | `canon_derive` |
-| `stance-closed` | every claim's stance is in EMF's closed list | the generic `closed-list` check |
-| `terms-grounded` | every `L:term` is in FEED, or carries `{pending: "not in FEED"}`, or is a named entity | `canon_derive`'s lexicon floor |
-| `coverage` | every sentence of a telling traces to one or more items of its fabula. As a condition it is written `f covers t`, for a fabula `f` and a text or short `t`: the fabula's items cover every claim-bearing sentence of `t` (prose or a list item of three or more words that does not end in a question mark; headings never count); the map `[{sentence, lines, items}]` lives in a derived fabula's `derived.covers` and in the check's verdict | new; the trace records the sentence → item map |
-| `no-invention` | the telling names no entity, claim or event the fabula lacks | new |
-| `stance-kept` | each claim's stance in the telling is at or below its fabula stance on the ladder; a sentence counts at the weakest stance its wording marks (a hedge reads as `hearsay`, a plain sentence as `observed`), and a claim told over several sentences is said at the weakest any of them marks | new |
-| `footer` | a short ends with MacroCOSM 18.4.4's footer line | `short_footer` |
-| `byte-exact` | the compiled bytes equal the source bytes | `docoes` |
-| `atem-shape` | the line is 15 to 25 words; focus is at most two sentences; push is one; pull is one | MacroCOSM 18.3.5 |
-| `length` | `to N words`: at most N words and at least 80 per hundred of N; `to N sentences`: N sentences or fewer | new |
-| `span-inside` | the expanded short contains the claims of the atem's span | new |
-| `whole-sentences` | `cut` removed whole sentences only | new |
-| `weight-order` | `cut` removed the lowest-salience sentences first (by their items' salience) | new |
-| `scale-range` | every scale is an integer from 1 to 5 | new |
-| `scale-evidence` | every scale cites one to three sentences of the measured text, and gives its basis and confidence | new |
-| `null-pinned` | every scale of the null telling is 1 (section 13.4 says why `analytical-depth` is) | new; the null morph's contract |
-| `scales-met` | each scale of the output, measured, is within one step of the morph asked for; `analytical-depth` excepted, since the fabula sets it (section 13.4) | new |
-| `labelled` | a reading carries `read_through: <morph name>` and the reading footer (section 14) | new |
-| `never-source` | a reading's output path is not the path of any input, and no input file changed | new |
-| `default-deny` | the projected volume holds only the fields its target schema names | Comprise `isotype.py` |
+| `span-resolves` | every `span` names lines or quotes that exist in the source text | enough (Canon's derivation) |
+| `stance-closed` | every claim's stance is in EMF's closed list | MacroCOSM's generic `closed-list` check |
+| `terms-grounded` | every `L:term` is in FEED, or carries `{pending: "not in FEED"}`, or is a named entity | enough (the lexicon floor) |
+| `coverage` | every sentence of a telling traces to one or more items of its fabula. As a condition it is written `f covers t`, for a fabula `f` and a text or short `t`: the fabula's items cover every claim-bearing sentence of `t` (prose or a list item of three or more words that does not end in a question mark; headings never count); the map `[{sentence, lines, items}]` lives in a derived fabula's `derived.covers` and in the check's verdict | Thym's own; the trace records the sentence → item map |
+| `no-invention` | the telling names no entity, claim or event the fabula lacks | Thym's own |
+| `stance-kept` | each claim's stance in the telling is at or below its fabula stance on the ladder; a sentence counts at the weakest stance its wording marks (a hedge reads as `hearsay`, a plain sentence as `observed`), and a claim told over several sentences is said at the weakest any of them marks | Thym's own |
+| `footer` | a short ends with the footer line of MacroCOSM OES, its section 18.4.4 | enough (the short footer) |
+| `byte-exact` | the compiled bytes equal the source bytes | DocOES (MacroCOSM OES, its section 18.5) |
+| `atem-shape` | the line is 15 to 25 words; focus is at most two sentences; push is one; pull is one | the rule of MacroCOSM OES, its section 18.3.5 |
+| `length` | `to N words`: at most N words and at least 80 per hundred of N; `to N sentences`: N sentences or fewer | Thym's own |
+| `span-inside` | the expanded short contains the claims of the atem's span | Thym's own |
+| `whole-sentences` | `cut` removed whole sentences only | Thym's own |
+| `weight-order` | `cut` removed the lowest-salience sentences first (by their items' salience) | Thym's own |
+| `scale-range` | every scale is an integer from 1 to 5 | Thym's own |
+| `scale-evidence` | every scale cites one to three sentences of the measured text, and gives its basis and confidence | Thym's own |
+| `null-pinned` | every scale of the null telling is 1 (section 13.4 says why `analytical-depth` is) | Thym's own; the null morph's contract |
+| `scales-met` | each scale of the output, measured, is within one step of the morph asked for; `analytical-depth` excepted, since the fabula sets it (section 13.4) | Thym's own |
+| `labelled` | a reading carries `read_through: <morph name>` and the reading footer (section 14) | Thym's own |
+| `never-source` | a reading's output path is not the path of any input, and no input file changed | Thym's own |
+| `default-deny` | the projected volume holds only the fields its target schema names | Comprise (the isotype) |
 | `no-counts` | no number of anything internal reaches the projection; the only number allowed is one the schema names (a founded year) | Comprise |
-| `banded` | a number leaves only as a word from the declared list, and a band changes only after the value has stayed past the boundary for 90 days | Comprise `band` |
+| `banded` | a number leaves only as a word from the declared list, and a band changes only after the value has stayed past the boundary for 90 days | Comprise (bands) |
 | `no-mark` | a withheld item leaves no placeholder, count or gap | Comprise |
 | `verified-derived` | `verified` only on fields the target schema derives (identity, shape, offers); `stated` on the subject's own words (aims) | Comprise |
-| `verified-only-where-derived` | `mark … as verified` only on an item whose MiniCOSM lists it as derivable | new |
-| `standing-gate` | a release as the subject needs first-party standing, or `sample: true` | Comprise `standing.py` |
+| `verified-only-where-derived` | `mark … as verified` only on an item whose MiniCOSM lists it as derivable | Thym's own |
+| `standing-gate` | a release as the subject needs first-party standing, or `sample: true` | Comprise (the standing gate) |
 | `epoch` | the date shown is the epoch, never the edit day; lists keep a fixed order that file order cannot change | Comprise |
-| `digests` | every file in a package's catalog has the sha256 the catalog says | new |
-| `released` | nothing is in `graph.cosm` without a release recorded in the holograph | new; Ascribe |
-| `provenance` | every output carries `made` | new |
-| `emf-checks` | the volume passes `emf/1`'s checks | `macrocosm.lint` |
+| `digests` | every file in a package's catalog has the sha256 the catalog says | Thym's own |
+| `released` | nothing is in `graph.cosm` without a release recorded in the holograph | Thym's own; the release is Ascribe's (https://ascribe.cosmoes.org/) |
+| `provenance` | every output carries `made` | Thym's own |
+| `emf-checks` | the volume passes `emf/1`'s checks | the MacroCOSM reader's lint |
 
 ### 7.4 `assert`
 
@@ -602,7 +609,7 @@ the condition uses (`covers` is `coverage`). A user move's `assert` lines become
 
 ## 8. Control flow, bindings, user moves, `use`
 
-<!-- atem: one choice, one loop, one output; moves that call moves; files that lend their moves -->
+<!-- atem: one choice, one loop, one output; moves calling moves; files lending moves -->
 
 Bindings are section 5.4.
 
@@ -624,8 +631,8 @@ mark.
 
 A `move` block is a named program with parameters. It is called like a standard move, with its operands in parameter
 order. It has a declared signature and inherits the contracts of the moves it uses, and its `assert` lines become
-contracts of its own. A move may call other moves. A move that calls itself, directly or through another, is refused in
-version 0. A move sees only its parameters.
+contracts of its own. A move may call other moves. A move that calls itself, directly or through another, is refused
+(`recursion`, section 9); recursion is reserved for a later edition. A move sees only its parameters.
 
 ```thym
 thym 0
@@ -689,7 +696,7 @@ and the viewer shows it in place of the plan or the outputs. It carries `stage` 
 
 ## 10. Programs as documents
 
-<!-- atem: a program enumerated into items, read at three densities, compiled back byte for byte -->
+<!-- atem: a program enumerated into items and compiled back byte for byte -->
 
 The enumerator reads a `.thym` file into a `thym/1` volume of kind `program` (section 17). Ids name their block: the
 program's name, or `<program>.<move>` for a move local to a program.
@@ -716,7 +723,7 @@ program's name, or `<program>.<move>` for a move local to a program.
   contracts the move inherits.
 
 `compile` on the items gives the file back byte for byte: the catalog's `front` (everything before the first block),
-then each top-level item's `body` in `order`, is the file. The docs viewer shows a program at three densities like any
+then each top-level item's `body` in `order`, is the file. enough's docs viewer shows a program at three densities like any
 volume: its atem (the first sentence of the `why`), its short (the program as written, term-linked), and its fabula
 (steps, moves and contracts as cards, with "mentioned in" across programs).
 
@@ -727,7 +734,7 @@ of a program is the one line a listing shows.
 
 ## 11. The compiler
 
-<!-- atem: seven stages, each refusing whole, ending in items and a plan a person can inspect -->
+<!-- atem: seven stages, each refusing whole, ending in items and an inspectable plan -->
 
 ### 11.1 The stages
 
@@ -762,14 +769,15 @@ nodes with their `asks` flags and budgets, and agent-free mode refuses it on sig
 
 ### 11.2 The package
 
-`enough/thym/` is one Python package: `parse.py`, `types.py`, `check.py`, `enumerate.py`, `plan.py`, `run.py`,
-`coprocessor.py`, `trace.py`, `contracts.py`, `moves/` and `cli.py`. The moves are implemented in `moves/`, by subject
-(`emf`, `doc`, `project`, `edit`, `morph`, `pack`), as the manifests' `code` keys name them. The package imports the
-standard library, PyYAML and `enough.macrocosm`, and nothing else of enough. The engines (`canon_derive`, `docoes`,
-`llm`, `preflight`) plug in from outside, through the coprocessor and the moves' registration, so the compiler is
-vendorable, as the reader is.
+In the reference implementation, enough (https://github.com/0gsd/enough), the compiler and the runtime are one Python
+package, with the moves implemented by subject (`emf`, `doc`, `project`, `edit`, `morph`, `pack`) as the manifests'
+`code` keys name them. The package depends on the standard library, PyYAML and the MacroCOSM reader, and on nothing else
+of enough. The engines (Canon's derivation, DocOES, the model client, preflight) plug in from outside, through the
+coprocessor and the moves' registration, so the compiler is vendorable, as the reader is.
 
 ### 11.3 The command line
+
+enough's command line, as an example of the operations a compiler and a runtime offer:
 
 ```text
 python -m enough.thym check     <program.thym>                     compile only; prints the refusal or "ok"
@@ -782,14 +790,14 @@ python -m enough.thym compile   <name.thym.cosm>                   the file agai
 python -m enough.thym conform   [<suite folder>]                   run the conformance suite
 ```
 
-Every command reads `ENOUGH_THYM_ROOT` (default `~/enough/thym/`) for where runs live, and writes nowhere else unless it
-is told the path.
+Every enough command reads `ENOUGH_THYM_ROOT` (default `~/enough/thym/`) for where runs live, and writes nowhere else
+unless it is told the path.
 
 ---
 
 ## 12. The runtime
 
-<!-- atem: a plan walked in order; the model as a contracted coprocessor; every run traced and replayable -->
+<!-- atem: the plan walked in order; the model behind a contract; runs replayable -->
 
 The runtime is non-traditional in four ways and ordinary in every other. Its values are documents. One of its
 instructions is "ask a mind", behind a contract. Every run leaves a readable account of itself. And programs, plans and
@@ -820,7 +828,7 @@ Budget    = {attempts, output_words, prompt_tokens_max, seconds}   # the node's 
 Candidate = {output, engine, attempts, tokens, seconds, checks: [{name, ok, why}]}
 ```
 
-- **`ModelCoprocessor`** is enough's: `llm.complete` with `canon_derive`'s machinery, generalised. It asks for
+- **`ModelCoprocessor`** is enough's: its model client with the machinery of Canon's derivation, generalised. It asks for
   schema'd output; makes the narrow repairs the contract allows (drop an item whose span does not resolve, normalise a
   stance word, re-ask once with the failed checks listed); keeps within its attempts; and applies the lexicon floor and
   the span checks. An answer that is to be YAML and has prose before, after or instead of it (a narration, a heading,
@@ -838,8 +846,8 @@ Candidate = {output, engine, attempts, tokens, seconds, checks: [{name, ok, why}
 ### 12.3 Traces
 
 A run writes one `thym/1` volume of kind `trace`. Its catalog names the run; the program (name and sha256); the plan's
-sha256; the environment (enough's version, the model's id and context size, agent-free or not, the machine's memory
-band); when the run started and ended; and its outcome. One `R:record` item per node holds the node, the move, the
+sha256; the environment (the implementation and its version, the model's id and context size, agent-free or not, the
+machine's memory band); when the run started and ended; and its outcome. One `R:record` item per node holds the node, the move, the
 digests of the inputs and outputs, and the candidate's fields: the engine (`code` for a deterministic node, `rules`
 for a scaffold, `model:<id>`, or `skipped` for a node on the branch not taken), attempts, tokens, seconds, and every
 check with its verdict and, for a failed check, why; a node asked more than once also keeps `tries`, each failed
@@ -847,7 +855,7 @@ attempt's checks with their reasons, so a refused node explains all its tries. A
 its engines made, as the engine reports them where it does, else estimated; the environment's context size is the
 model's window, read when a model runs and 0 when none does; and the trace's root item names the engines whose calls
 the run recorded (`engines`, section 12.4). The trace also carries a copy of its plan's nodes, so that its
-records' `node` references resolve inside the volume and the trace lints clean on its own. Traces live under `ENOUGH_THYM_ROOT/runs/` as
+records' `node` references resolve inside the volume and the trace lints clean on its own. In enough, traces live under `ENOUGH_THYM_ROOT/runs/` as
 `<run-id>.trace.cosm`, with a copy beside the outputs when they land in a volume. A value's `made` names its run, and so
 its trace. The docs viewer shows a trace at the fabula density as cards; its atem is one line: "derived 17 items from
 close.md in 11 s on g40-04, all checks green".
@@ -875,7 +883,8 @@ was recorded before engine calls were, and replays with the host's live engines.
 ### 12.5 Budgets and the 16 GB rule
 
 A plan carries the largest prompt it will build. At plan time the runtime asks `preflight` whether the machine's model
-holds it; on a small machine a program may be refused with the number and the fix, as chat is today. Every node has an
+holds it; on a small machine a program may be refused with the number and the fix, as enough refuses a chat the machine cannot
+hold. Every node has an
 `attempts` budget (3 for a model-backed node, 1 otherwise) and an output budget in words (the call's `to N words`, or
 else the machine's). The trace records what each node cost.
 
@@ -884,7 +893,7 @@ else the machine's). The trace records what each node cost.
 No Python-only semantics. No reliance on mapping order beyond what the COSM YAML subset fixes. No floats in contracts:
 bands and scales are integers, and the ratios of section 13.3 are integers per hundred or per thousand. Digests are
 sha256: a text's over its bytes, a volume's over its catalog file, a file's always over its bytes, and a mapping's
-over the reader's canonical dump (`macrocosm.dump`: keys in file order, LF newlines, UTF-8); the compiler's own
+over the reader's canonical dump (keys in file order, LF newlines, UTF-8); the compiler's own
 `dump` writes program volumes for people, with block scalars, and is never a digest's form. File paths are URIs. Time is UTC in traces and local only in file names. A JavaScript
 runtime that passes the conformance suite is a conforming runtime, and the docs viewer could then make readings in the
 page.
@@ -893,7 +902,7 @@ page.
 
 ## 13. The null morph, the ten scales, morphs
 
-<!-- atem: the plainest telling as the reference, and a morph as a measured departure from it -->
+<!-- atem: the plainest telling is the reference; a morph is a measured departure -->
 
 ### 13.1 The null morph
 
@@ -930,8 +939,8 @@ formal` or `toward: casual`.
 
 ### 13.3 Measurement
 
-Ratios are per hundred or per thousand words, compared as integers. The thresholds are version 0's. The conformance
-suite pins them, and a later version may move them only with a decision recorded in section 21.
+Ratios are per hundred or per thousand words, compared as integers. The thresholds are this edition's. The conformance
+suite pins them, and a later edition may move them only with an entry in the Changes appendix (section 21).
 
 | scale | measure | 1 | 2 | 3 | 4 | 5 |
 |---|---|---|---|---|---|---|
@@ -948,11 +957,11 @@ suite pins them, and a later version may move them only with a decision recorded
 
 For every scale, `measure` gives a `value`; a `basis` (`statistics` or `judgement`); `evidence`, one to three sentences
 of the text that moved it; and a `confidence` as an integer per hundred (no floats reach a `.cosm`). Below 300 words
-or three paragraphs, a statistics scale reports a confidence of at most 50, and a judgement scale at most 40. The word lists above are version 0's seed; the
-reference keeps them in `enough/thym/moves/morph.py`. The statistics read English: the lists, the honorifics, the
+or three paragraphs, a statistics scale reports a confidence of at most 50, and a judgement scale at most 40. The word lists above are this edition's seed; the
+reference implementation keeps them beside its measures. The statistics read English: the lists, the honorifics, the
 stance phrases, FEED's bands and the rule of nine letters are English's, so a text in another language is measured
-as if it were English (its judgement scales still hold, since the model reads the language); a later version may
-give the lists per language.
+as if it were English (its judgement scales still hold, since the model reads the language); lists per language are
+reserved for a later edition.
 
 ### 13.4 Holomorph and isomorph
 
@@ -1013,7 +1022,7 @@ end. And it **never touches the source** (`never-source`): its path is never an 
 A reading is saved beside the package or the text as `<text-stem>.read-<morph>-<YYYY-MM-DD-HHMM>.md`, in local time,
 taking `-2`, then `-3`, on a collision, as shorts do.
 
-The footer (the owner's wording, 2026-11-01):
+The footer:
 
 ```text
 *a reading of notes.md through plain-letter, made here on 2026-11-01 by g40-04; the text stands unchanged*
@@ -1029,7 +1038,7 @@ what the author published. A reading of a reading is refused: `read` takes a fab
 
 ## 15. Packages
 
-<!-- atem: the self-contained export of a text, in a folder, in one file, or encrypted -->
+<!-- atem: the self-contained export of a text: a folder, one file, or encrypted -->
 
 ### 15.1 Folder form
 
@@ -1081,7 +1090,7 @@ nodes: []
 encrypted on the owner's machine and handed, with a key, to a chosen party: this is what a cryptotype and a cryptograph
 *are*. The cipher is Comprise's bundle scheme, `comprise-bundle/0` (a data key per package, AES-256-GCM over chunks, an
 encrypted manifest), vendored into enough so that one cipher serves both subjects; the catalog's `encrypted: {cipher,
-key: shown-once}` field names it, and the key never leaves the owner (the owner's ruling, 2026-11-01). An index may hold only **consented match tokens**, hashes
+key: shown-once}` field names it, and the key never leaves the owner. An index may hold only **consented match tokens**, hashes
 of characteristics the owner chose to make matchable, so that a search can match an encrypted package without reading
 it.
 
@@ -1089,8 +1098,8 @@ The encrypted form is a `thym/1` package catalog that holds nothing in the clear
 comprise-bundle/0, aead, key: shown-once, hid, bundle, keyring, manifest, chunks}`, binary values in base64. The key is
 Comprise's recovery code (fifteen random bytes as twenty-four base32 characters, shown as six groups of four), which
 wraps the package's data key by PBKDF2-HMAC-SHA256 at 600,000 iterations, as Comprise's recovery keyring entry does; it
-is shown once and stored nowhere. enough depends on `cryptography` for AES-256-GCM (0.5.0, the owner's decision of
-2026-11-02), so a package sealed in enough is Comprise's and opens there. Where AES-256-GCM is not available (a
+is shown once and stored nowhere. enough uses the `cryptography` package for AES-256-GCM, so a package sealed in enough
+is Comprise's and opens there. Where AES-256-GCM is not available (a
 vendored runtime without that package), the same layout is sealed with an encrypt-then-MAC AEAD built from HMAC-SHA256 alone (`aead:
 hmac-sha256-ctr`: an HMAC keystream in counter mode, then a 16-byte HMAC tag, under keys split from the one key by
 HKDF), and the file says so; a package sealed with AES-256-GCM opens only where AES-256-GCM is available.
@@ -1107,7 +1116,7 @@ text.
 
 ## 16. Context
 
-<!-- atem: the volume a text lives in, and the occasion it is read on -->
+<!-- atem: the volume a text lives in; the occasion it is read on -->
 
 ### 16.1 Surrounding context
 
@@ -1156,7 +1165,7 @@ end
 
 ## 17. The `thym/1` MiniCOSM and the `moves:` block
 
-<!-- atem: the MiniCOSM that holds programs, morphs, contexts, plans, traces and packages; and how any MiniCOSM declares moves -->
+<!-- atem: programs, morphs, contexts, plans, traces, packages; how any MiniCOSM declares moves -->
 
 ### 17.1 The catalog
 
@@ -1213,7 +1222,7 @@ Steps are numbered from 1 in the order they are written. In a move local to a pr
 
 ### 17.4 Checks
 
-The envelope checks the generic reader runs, and six of `thym/1`'s own, which `enough/thym` runs; the manifest states
+The envelope checks the generic reader runs, and six of `thym/1`'s own, which a Thym compiler and runtime run; the manifest states
 them as prose under `checks.own`, so a generic reader neither runs nor lists them, and lints a Thym volume on the
 envelope alone: `program-compiles` (a `program` volume's `source` compiles to these items), `plan-acyclic`,
 `trace-complete` (every node has a record, or the trace is `refused` with `stopped_at`), `scale-range`, `digests` (a
@@ -1226,7 +1235,7 @@ package's files match its catalog), `reading-labelled`.
 
 ### 17.6 The `moves:` block
 
-Any MiniCOSM's manifest may carry a `moves:` list. A MiniCOSM whose manifest enough does not edit declares its moves in
+Any MiniCOSM's manifest may carry a `moves:` list. A MiniCOSM whose manifest another specification keeps declares its moves in
 a sidecar `<name>.moves.cosm` beside the manifest, a mapping `{moves-of: <minicosm>/<major>, moves: [...]}`; Comprise's
 is `comprise.moves.cosm`. When both exist, the manifest's list wins and the sidecar is reported. The generic reader
 keeps the block as an unknown key; the Thym compiler reads it. Each entry:
@@ -1247,15 +1256,16 @@ keeps the block as an unknown key; the Thym compiler reads it. Each entry:
 
 ## 18. Projections: the dial as a program
 
-<!-- atem: an isotype is a holotype transcoded by a program whose contracts are the target schema's rules -->
+<!-- atem: a holotype transcoded by a program whose contracts are the schema's rules -->
 
 An isotype is a holotype *transcoded*: `project h as isotype`, under a program that gives every item a density
 (`fabula`, `short`, `atem`, or withheld) and a marking (`verified`, `stated`). The target schema's rules
 (`comprise-isotype/0`: default-deny, assertions not measurements, withhold never falsify, epochs and bands, verified
 only where derived, the standing gate) are the contract of `project` (section 6.3), so the schema stops being the
-ceiling and becomes the law. The isotype's draft step becomes three preset programs (minimal, fuller, house), and a verified
+ceiling and becomes the law. The isotype's draft step is three preset programs (minimal, fuller, house), and a verified
 owner may write their own. A release carries the digests of the program and the trace that made it. The Comprise side
-is a specification of its own, for comprise-dev; enough builds none of it and reads what it produces.
+is a specification of its own, Comprise OES (https://comprise.cosmoes.org/); Thym defines none of it, and a Thym
+implementation reads what Comprise produces.
 
 The example program, deterministic end to end:
 
@@ -1297,7 +1307,7 @@ the holotype holds people or says it has none, and always fills `shape.markets`;
 
 ## 19. Agent-free
 
-<!-- atem: with the agent off, only deterministic plans run, and scaffolds stand in where they are honest -->
+<!-- atem: the agent off: only deterministic plans run; scaffolds where they are honest -->
 
 In agent-free mode the coprocessor is the refusing one: a plan with model-backed nodes is refused at plan time with
 their count and the first one's line ("3 steps ask a model; agent-free is on"). A plan with none runs. With `--rules`,
@@ -1311,7 +1321,7 @@ plans that can run.
 
 ## 20. Conformance
 
-<!-- atem: what a compiler and a runtime must do, and the suite that shows it -->
+<!-- atem: what compilers and runtimes must do, and the suite that shows it -->
 
 ### 20.1 A compiler must
 
@@ -1335,8 +1345,8 @@ plans that can run.
 
 ### 20.3 The suite
 
-`tests/fixtures/thym/` in enough-dev, portable as a folder together with `tests/fixtures/cosm/`, MacroCOSM's own corpus,
-which holds the sample Holotype that `open-house` runs on:
+The suite is a folder, portable together with MacroCOSM's own corpus, which holds the sample Holotype that `open-house`
+runs on; the reference implementation carries both (https://github.com/0gsd/enough):
 
 ```text
 README.md                       the layout, the inputs of each program, and what passing means
@@ -1357,19 +1367,42 @@ the clock pinned to 2026-11-01T12:00:00Z, so an epoch in a recorded output stays
 (sections 4.1, 16.2 and 18) are the suite's first three, byte for byte, and the suite's test compiles every block marked
 `thym` here.
 
-### 20.4 Where the reference wins
+### 20.4 Where an implementation and this text disagree
 
-The reference landed on 2026-11-01 and passed checkpoint A (a real-model run that replays) the same night. Two
-readings were corrected on the way and folded into their sections: `stance-kept` reads a claim across every sentence
-that cites it (section 7.3), and the null telling's `register` exempts its fabula's own words (section 13.3). When a
-further disagreement is found, the text is corrected and the disagreement recorded here with the section it touched,
-until the next version folds it in.
+Where an implementation and this text disagree, one of them is in error: either the implementation does not conform, or
+the text is corrected in a later edition. The Changes appendix (section 21) records which was corrected, with the
+section it touched.
 
 ---
 
-## 21. Decisions in this version
+## 21. Changes
 
-<!-- atem: the decisions version 0 settled, one numbered line each -->
+<!-- atem: what each edition changed, newest first -->
+
+**Edition 0.5.4 · 2026-11-03.** The canonical edition at cosmoes.org (https://thym.cosmoes.org/).
+
+- The name carries no number: Thym, not Thym 0. The edition is a field of the status line; a program's version line,
+  `thym 0`, is unchanged and names the same grammar.
+- The reference implementation is named (enough, https://github.com/0gsd/enough) rather than located by path;
+  cross-references to MacroCOSM OES, Ascribe and Comprise OES are their cosmoes.org homes.
+- Section 20.4 states the rule of disagreement: where an implementation and this text disagree, one of them is in error,
+  and this appendix records which was corrected.
+- Section 22 (open questions and roadmap) is withdrawn. The gaps it listed are stated where they fall: recursion in user
+  moves (section 8.3), the thresholds and the word lists of measurement (section 13.3), the Comprise side of projection
+  (section 18); its settled items are recorded under version 0 below.
+- Section 21 (decisions in this version) is this appendix.
+- Section 1.3 states how the specification is kept and revised; section 11.2 describes the reference implementation's
+  package without its file list; the third column of the check table (section 7.3) names where each check comes from by
+  product rather than by module.
+- The grammar, the types, the standard moves, the checks, the six laws, the `thym/1` MiniCOSM and every example are
+  unchanged.
+
+**Version 0 · 2026-11-01.** The first version of the language, whose grammar the version line `thym 0` names. The
+reference compiler and runtime passed the conformance suite the same day, with a real-model run that replays. Two
+readings of the text were corrected on the way and folded into their sections: `stance-kept` reads a claim across every
+sentence that cites it (section 7.3), and the null telling's `register` exempts its fabula's own words (section 13.3).
+The decisions of the version:
+
 1. **Thym is a full procedural language folded into MacroCOSM.** The OES gains a verb; `thym/1` holds programs, morphs,
    contexts, plans, traces and packages; every MiniCOSM may declare moves.
 2. **Its own text syntax, English-leaning, every keyword a FEED headword or a form of one.** Programs read aloud, and moves, not syntax,
@@ -1398,29 +1431,24 @@ until the next version folds it in.
 17. **Python reference, JavaScript-portable**; the conformance suite is a folder of `.thym` and `.cosm` files.
 18. **The version line pins the grammar**: `thym 0`.
 
+Settled the same day: the reading footer's wording (section 14); the encrypted package uses Comprise's bundle cipher,
+`comprise-bundle/0`, and the key never leaves the owner (section 15.3); the holograph's modules are Ascribe's, under its
+own manifest (https://ascribe.cosmoes.org/); the stance ladder as section 7.2 writes it; in enough, the `thym_run` and
+`thym_check` tools sit behind its `macrocosm-oes` skill. On 2026-11-02 the reference implementation took the
+`cryptography` package for AES-256-GCM, so that a package sealed in enough opens in Comprise, with the HMAC-SHA256 AEAD
+where AES-256-GCM is absent (section 15.3).
+
 ---
 
-## 22. Open questions and roadmap
+## 22. Withdrawn
 
-<!-- atem: what version 0 leaves for the round, and what waits for a later version -->
+<!-- atem: withdrawn in this edition; what survives of it is in Changes -->
 
-**For the 0.5.0 round:** the names of the three preset projection programs (Comprise's side); whether `bool` stays the
-type word (FEED has it only in the bowls sense) and whether *transconceptualize*, the verb, enters FEED under R6 beside
-the noun. Settled on 2026-11-01: the reading footer's wording (section 14); the encrypted package vendors Comprise's
-bundle cipher (section 15.3); `thym_run` and `thym_check` sit behind the `macrocosm-oes` skill; the holograph's
-modules (Ascribe OES 1, its own manifest); the stance ladder as section 7.2 writes it.
-
-**Open in version 0:** the `register` measure where FEED has no frequency band for a word; the thresholds of section 13.3 before the first corpus; parallel nodes in the
-reference runtime (allowed, not required).
-
-**Later versions:** recursion in user moves; `for each` over the lines of a short with edits (a text editor in Thym);
-user-defined check names beyond `assert`; a third order for `tell` (events first, as they happened); a JavaScript
-runtime and readings in the page; Ascribe's module in enough; the bridge between Comprise's employees and Ascribe.
+Section 22 was withdrawn in edition 0.5.4; its content, where it survives, is in the Changes appendix (section 21).
 
 ---
 
 ## Colophon
 
-Written 2026-11-01 for enough 0.5.0, version 0 of the language. The design document with the owner's rulings is
-`docs/thym-architecture.md` (local); the plan is `docs/thym-050-plan.md` (local). The MacroCOSM specification is
-`docs/MACROCOSM_OES.md`. Copyright © 2026 Graham Smith. All rights reserved.
+Thym — Copyright © 2026 Graham Smith. All rights reserved. The canonical edition is published at
+https://thym.cosmoes.org/; its source and history are at https://github.com/0gsd/cosmoes-site.

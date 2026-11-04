@@ -2,11 +2,16 @@
 
     python -m enough.docoes export <doc> <out-dir> [--lang en] [--densities short,atem,fabula]
         [--page short=short.html] [--page atem=atem.html] [--page fabula=fabula.html]
-        [--standalone] [--slug S] [--name N] [--version V] [--sources ROOT] [--docs-root DIR]
+        [--standalone] [--slug S] [--name N] [--version V] [--no-marks] [--reference]
+        [--sources ROOT] [--docs-root DIR]
 
 `<doc>` is a registered document (`macrocosm-oes`, `help-center`) or a markdown path inside the sources root
 (`docs/THYM.md`): a path whose default slug names a registered document exports that document (chapters, reference
-and all); any other is exported ad hoc. The volume is built fresh — into a temporary directory unless `--docs-root`
+and all); any other is exported ad hoc, and so is a path given with an explicit `--slug`, even one that names a
+registered document (cosmoes-site builds the public editions that way, from texts kept outside enough). `--no-marks`
+leaves out the margin marks (`◂ N` mentioned in N places, `❏ N` examples: the in-app viewer's buttons, inert in a
+static page); `--reference` joins the reference generated from the MiniCOSM manifests to an ad hoc document, as the
+registered MacroCOSM OES carries it. The volume is built fresh — into a temporary directory unless `--docs-root`
 is given, never into `docs_root()` — and read back through `macrocosm.load_volume`, so the export sees exactly what
 the app would. Written to `<out-dir>`:
 
@@ -94,11 +99,11 @@ def strip_comments(src: str) -> str:
 # `DOCS_XREF_RULES`: where "§N", "README §N" and "P.N" point, by the scope a sentence is written in ('' = the
 # document, else a chapter's prefix). An unlisted document or scope links all three forms to its own scope.
 XREF_RULES: dict[str, dict[str, dict[str, str | None]]] = {
-    "macrocosm-oes": {
-        "": {"para": "comprise", "readme": "comprise-map", "letter": "comprise"},
-        "comprise": {"para": None, "readme": "comprise-map", "letter": "comprise"},
-        "comprise-map": {"para": "comprise", "readme": "comprise-map", "letter": "comprise"},
-    },
+    # MacroCOSM OES: §N, README §N and P.N name sections of other documents (Comprise OES, the paradigm map, both
+    # published at their own homes since 0.5.4): never linked to its own sections.
+    "macrocosm-oes": {"": {"para": None, "readme": None, "letter": None}},
+    # Comprise OES: § only for other documents (never linked); P.N its own chapter P.
+    "comprise-oes": {"": {"para": None, "readme": None, "letter": ""}},
 }
 
 # `DOCS_XREF_RE`: "section 7.3" and its five translations, lists and ranges ("sections 4 to 14", "4, 5 and 7"),
@@ -110,8 +115,11 @@ _JOIN = (r"\s*(?:,|–|—|-|~|～|〜|、|and|or|to|through|bis|und|oder|à|et|
 _LIST = _NUM + "(?:" + _JOIN + _NUM + ")*"
 _WB_BEFORE = r"(?<![A-Za-z0-9_])"
 _WB_AFTER = r"(?![A-Za-z0-9_])"
+# "its section N" (0.5.4) is another document's section — "Thym (https://thym.cosmoes.org/), its section 15" — and is
+# never linked to the citing document's own; the core's `_SEC_REF` skips the same form.
+_NOT_ITS = r"(?<![Ii]ts )"
 XREF_RE = re.compile(
-    r"(?:" + _WB_BEFORE + r"(?:sections?|secci[oó]n(?:es)?|Abschnitt(?:en|e)?)\s+|セクション\s*)(" + _LIST + ")"
+    r"(?:" + _NOT_ITS + _WB_BEFORE + r"(?:sections?|secci[oó]n(?:es)?|Abschnitt(?:en|e)?)\s+|セクション\s*)(" + _LIST + ")"
     r"|第\s*(" + _NUM + r")\s*节"
     r"|(README\s+)?§§?\s*(" + _LIST + ")"
     r"|" + _WB_BEFORE + r"([A-Z])\.(" + _NUM + ")" + _WB_AFTER, re.I)
@@ -202,8 +210,9 @@ class Exporter:
     links across densities; `densities` are the ones this run writes (a link to one it does not is left out)."""
 
     def __init__(self, vol: mc.Volume, doc: D.Document, lang: str, *, pages: dict | None = None,
-                 densities: tuple = DENSITIES):
+                 densities: tuple = DENSITIES, marks: bool = True):
         self.vol, self.doc, self.lang = vol, doc, lang
+        self.marks = marks
         self.pages = {**DEFAULT_PAGES, **(pages or {})}
         self.densities = tuple(densities)
         self.md, self.Token = _markdown()
@@ -501,6 +510,8 @@ class Exporter:
         return 2 if level == 2 else 3 if level == 3 else 0
 
     def _marks(self, sec: mc.Item) -> str:
+        if not self.marks:
+            return ""
         m = len(self.mentioned.get(sec.key, ()))
         x = len(self.examples.get(sec.id, []))
         if not (m or x):
@@ -1080,7 +1091,9 @@ def _h1(text: str) -> str:
 
 def resolve_document(arg: str, *, sources: Path, lang: str | None = None, slug: str | None = None,
                      name: str | None = None, version: str | None = None) -> tuple[D.Document, str]:
-    """(the Document, the telling) for a registered slug or a markdown path inside `sources`."""
+    """(the Document, the telling) for a registered slug or a markdown path inside `sources`. A path is exported
+    as the registered document its default slug names unless `slug` is given: an explicit slug, a registered one
+    included, makes an ad hoc document of the path's text alone (no chapters; the reference only when asked)."""
     reg_slug = arg.removeprefix("doc/")
     if reg_slug in D.DOCUMENTS and not arg.endswith(".md"):
         d = D.DOCUMENTS[reg_slug]
@@ -1103,8 +1116,8 @@ def resolve_document(arg: str, *, sources: Path, lang: str | None = None, slug: 
             s = slug or own
             if not re.fullmatch(r"[a-z0-9][a-z0-9-]*", s or ""):
                 raise ExportError(f"{s!r} is not a slug (a-z, 0-9 and -)")
-            if s in D.DOCUMENTS:
-                raise ExportError(f"--slug {s} is a registered document: export it by name")
+            # A registered slug given explicitly is allowed: the Exporter keys its cross-reference rules
+            # (XREF_RULES) by slug, so the spec's own conventions still hold for a text exported from elsewhere.
             lang = lang or "en"
             if version is None:
                 m = D._registry(sources).get(s)
@@ -1182,9 +1195,10 @@ def link_check(fragment: str) -> dict:
 def export(doc: str | D.Document, out_dir: Path, *, lang: str | None = None, densities: tuple = DENSITIES,
            pages: dict | None = None, standalone_pages: bool = False, slug: str | None = None,
            name: str | None = None, version: str | None = None, sources: Path | None = None,
-           docs_root: Path | None = None) -> dict:
+           docs_root: Path | None = None, marks: bool = True, reference: bool = False) -> dict:
     """Export one document into `out_dir` and merge its entry into the manifest. Returns the entry plus `stats`
-    (per density: the counts and the link self-check) and `seconds`."""
+    (per density: the counts and the link self-check) and `seconds`. `marks=False` leaves the margin marks out of
+    the short density; `reference=True` joins the manifests' reference (R: items) whatever the document says."""
     t0 = time.monotonic()
     root = Path(sources or D.sources_root())
     densities = tuple(densities)
@@ -1200,6 +1214,8 @@ def export(doc: str | D.Document, out_dir: Path, *, lang: str | None = None, den
             raise ExportError(f"{d.slug} has no {lg} telling")
     else:
         d, lg = resolve_document(doc, sources=root, lang=lang, slug=slug, name=name, version=version)
+    if reference and not d.reference:
+        d = dataclasses.replace(d, reference=True)
     out = Path(out_dir)
     previous = _read_manifest(out)                      # refuse a foreign out-dir before anything is written
     pages = {**DEFAULT_PAGES, **(pages or {})}
@@ -1212,7 +1228,7 @@ def export(doc: str | D.Document, out_dir: Path, *, lang: str | None = None, den
         vol = mc.load_volume(path, D._registry(root))
         if vol.refused is not None:
             raise ExportError(f"{d.slug}.{lg}: the volume is refused: {vol.refused}", 1)
-        ex = Exporter(vol, d, lg, pages=pages, densities=densities)
+        ex = Exporter(vol, d, lg, pages=pages, densities=densities, marks=marks)
         files, stats = {}, {}
         for dens in densities:
             frag, st = ex.render(dens)
@@ -1281,6 +1297,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--slug", help="an ad hoc document's slug (default: the file stem)")
     ap.add_argument("--name", help="the document's name (default: its H1)")
     ap.add_argument("--version", help="the document's version (default: its manifest's, else none)")
+    ap.add_argument("--no-marks", action="store_true",
+                    help="leave out the margin marks (mentioned in N places, N examples) of the short density")
+    ap.add_argument("--reference", action="store_true",
+                    help="join the reference generated from the MiniCOSM manifests (an ad hoc document has none)")
     ap.add_argument("--sources", type=Path, help="the install the documents are read from (default: this one)")
     ap.add_argument("--docs-root", type=Path,
                     help="build the volume here (default: a temporary directory, removed afterwards)")
@@ -1296,7 +1316,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         r = export(args.doc, args.out_dir, lang=args.lang, densities=densities, pages=pages,
                    standalone_pages=args.standalone, slug=args.slug, name=args.name, version=args.version,
-                   sources=args.sources, docs_root=args.docs_root)
+                   sources=args.sources, docs_root=args.docs_root, marks=not args.no_marks,
+                   reference=args.reference)
     except ExportError as e:
         print(str(e), file=sys.stderr)
         return e.code

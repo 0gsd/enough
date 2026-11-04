@@ -11,9 +11,9 @@
 # a short starter list or from relations they declare, a when, a valence and a strength. The dialectic: block holds
 # the opening questions a guided process or an agent asks to help a person fill it in.
 #
-# The prose is docs/ASCRIBE.md (0.5.0, wave 3); this file and the owner's rulings of 2026-11-01 are
-# the spec. The reference reader is enough/macrocosm.py; Ascribe's own checks are enough/ascribe.py. Where this file
-# and the reader disagree, the reader wins and this file is corrected.
+# The prose is Ascribe, the canonical edition at https://ascribe.cosmoes.org/ (bundled as docs/ASCRIBE.md); this
+# file is its machine-readable declaration. The reference reader is enough/macrocosm.py; Ascribe's own checks are
+# enough/ascribe.py. Where this file and the reader disagree, one of them is in error and is corrected.
 #
 # No personal data, three ways: the schema has no kind or field for it; the no-pii check warns, and never refuses, on
 # what reads like it; and the filter: block keeps private files and restricted nodes out of ingest and transfer.
@@ -24,12 +24,12 @@
 # Copyright © 2026 Graham Smith. All rights reserved. See defaults/cosm/NOTICE.md.
 
 manifest: minicosm/0
-macrocosm: 0.0.2
+macrocosm: 0.5.4
 name: ascribe
 title: Ascribe
 version: 1
 summary: "A person's holograph: a self described in ten kinds of node, each anchored to a form, comprehensive enough that a name is unnecessary."
-spec: docs/ASCRIBE.md             # the prose (0.5.0); this manifest is the truth where they differ
+spec: https://ascribe.cosmoes.org/    # Ascribe, the canonical edition (bundled as docs/ASCRIBE.md)
 reference: [enough/macrocosm.py, enough/ascribe.py]
 
 declaration:
@@ -260,9 +260,9 @@ renderers:
   - {id: text-tree, makes: the text tree, code: [python -m enough.macrocosm tree]}
 
 # The opening questions, three to five for each module, in plain words and in no one's voice. A guided process or an
-# agent asks them and writes what the person says as nodes; nothing else of the dialectic is built in 0.5.0.
+# agent asks them and writes what the person says as nodes; the process that asks them is reserved for a later edition.
 dialectic:
-  status: questions only; the process that asks them is a later round
+  status: questions only; the process that asks them is reserved for a later edition
   writes: 'nodes with provenance {mode: dialectic, sources: [session-<n>], confidence: <how sure the person is>}'
   questions:
     A:
@@ -321,10 +321,10 @@ dialectic:
       - Which subject deserves an article that nobody has written yet?
       - Which things belong together for you, though others keep them apart?
 
-# What ingest and transfer leave out of a holograph. The rule is declared here; the code that applies it is a later
-# round. enough/ascribe.py's private-marker check reports what a marker would drop, and drops nothing.
+# What ingest and transfer leave out of a holograph. The rule is declared here; the filter that applies it is
+# reserved for a later edition. enough/ascribe.py's private-marker check reports what a marker would drop, and drops nothing.
 filter:
-  status: declared, not built
+  status: declared; the filter that applies it is reserved for a later edition
   applies-to: [ingest, transfer]
   marker: .ascribe-private
   drops:
@@ -334,7 +334,7 @@ filter:
 
 public-projection:
   status: not built
-  isograph: an isograph is a Thym projection of the holograph, made by a program its holder runs (docs/THYM.md)
+  isograph: an isograph is a Thym projection of the holograph, made by a program its holder runs (Thym, https://thym.cosmoes.org/)
   outsiders: no outsider's graph of a person exists
 
 extension:
