@@ -22,7 +22,7 @@ from typing import Any, Callable
 
 from enough import macrocosm as mc
 from enough.thym import Refusal
-from enough.thym.values import Value, digest_path, plain, sha256_bytes
+from enough.thym.values import Value, digest_path, item_id, plain, sha256_bytes
 
 CheckFn = Callable[[Value, dict, dict, Any, Any], Any]
 
@@ -375,9 +375,12 @@ def _no_mark(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tu
     data = output.mapping()
     readable = data is not None or isinstance(output.payload, str)
     text = output.bytes().decode("utf-8", errors="replace") if readable else ""
-    for wid in withheld:
-        if wid and wid in text:
-            return False, f"the withheld item {wid} is named in the output"
+    for wid, item in withheld.items():
+        # held by its key (`MoveContext.withhold`); the output may name it by its bare id too, and either gives it away
+        names = {wid} | ({item_id(item)} if isinstance(item, Value) and not item.is_nothing else set())
+        for name in sorted(n for n in names if n):
+            if name in text:
+                return False, f"the withheld item {name} is named in the output"
     if data is not None:
         for path, v in _walk(plain(data)):
             leaf = path.rsplit(".", 1)[-1]

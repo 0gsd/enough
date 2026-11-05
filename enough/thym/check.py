@@ -22,7 +22,7 @@ from __future__ import annotations
 import difflib
 import re
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Callable, Iterator, Mapping
 
 from enough import macrocosm as mc
@@ -38,6 +38,35 @@ ENVELOPE_KEYS = frozenset(("id", "type", "name", "summary", "status", "visibilit
 _OES_THYM = re.compile(r"^oes:thym/([A-Za-z0-9](?:[A-Za-z0-9._@-]*[A-Za-z0-9_@-])?)$")
 
 Volumes = Mapping[str, Any] | Callable[[str], Any] | None
+
+
+def _escapes(uri: str) -> str | None:
+    """Why a `use`d path reaches outside the program's folder (THYM.md 8.4: a file beside this one; the grammar's URI
+    is a relative path), or None when it stays inside: an absolute path, a drive, or a `..` step, on either system's
+    reading of the text. A link that leads out is caught after it is followed (`_inside`)."""
+    if PurePosixPath(uri).is_absolute() or PureWindowsPath(uri).anchor:
+        return "is an absolute path"
+    if ".." in PurePosixPath(uri).parts or ".." in PureWindowsPath(uri).parts:
+        return "steps out with .."
+    return None
+
+
+def _inside(base: Path, p: Path) -> bool:
+    """Whether `p`, every link followed, lies inside the folder `base` (itself followed)."""
+    try:
+        return p.resolve().is_relative_to(base.resolve())
+    except (OSError, RuntimeError):
+        return False
+
+
+def _yaml_problem(e: Exception) -> str:
+    """What is wrong with a used file's YAML, with its place and never its text: PyYAML's message quotes the line it
+    stopped on, and a refusal must not carry a file's content."""
+    problem = getattr(e, "problem", None)
+    mark = getattr(e, "problem_mark", None)
+    if problem and mark is not None:
+        return f"{problem} at line {mark.line + 1}, column {mark.column + 1}"
+    return problem or type(e).__name__
 
 
 @dataclass(eq=False)
@@ -418,6 +447,8 @@ class _Checker:
         uri = u.uri
         base = Path(self.file).parent if self.file else Path.cwd()
         found = self.lookup_volume(uri)
+        outside = (f"use names a .thym file or a thym/1 volume inside this program's folder; {uri} "
+                   "{why}, and was not read")
         if found is None:
             if uri.startswith("oes:"):
                 mt = _OES_THYM.match(uri)
@@ -428,10 +459,19 @@ class _Checker:
                 for name in (f"{slug}.morph.cosm", f"{slug}.context.cosm", f"{slug}.thym.cosm",
                              f"{slug}.package.cosm", f"{slug}.cosm"):
                     if (base / name).is_file():
+                        if not _inside(base, base / name):
+                            self.fail("unknown-uri", outside.format(why=f"is {name}, a link that leads out of it"),
+                                      u.line)
                         found = base / name
                         break
-            elif (base / uri).is_file():
-                found = base / uri
+            else:
+                why = _escapes(uri)
+                if why:
+                    self.fail("unknown-uri", outside.format(why=why), u.line)
+                if (base / uri).is_file():
+                    if not _inside(base, base / uri):
+                        self.fail("unknown-uri", outside.format(why="is a link that leads out of it"), u.line)
+                    found = base / uri
         if found is None:
             self.fail("unknown-uri", f"nothing answers to {uri}: no such thym/1 volume or file is known here", u.line)
         if isinstance(found, ps.Module):
@@ -443,7 +483,7 @@ class _Checker:
             try:
                 found = mc.yaml_load(mc.read_text(p))
             except Exception as e:                      # noqa: BLE001  (a bad used file is a refusal)
-                self.fail("unknown-uri", f"{uri} cannot be read as a thym/1 volume: {e}", u.line)
+                self.fail("unknown-uri", f"{uri} cannot be read as a thym/1 volume: {_yaml_problem(e)}", u.line)
             label = str(p)
         else:
             label = uri

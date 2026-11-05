@@ -137,11 +137,17 @@ def _load(reg: mc.Registry) -> Declarations:
             problems.append(f"{m.path.name if m.path else m.name}: moves must be a list")
             continue
         blocks[m.name] = (str(m.path) if m.path else m.name, moves)
+    from_sidecar: set[str] = set()
     for owner, path, moves in _sidecars(reg, problems):
         if owner in blocks:
-            problems.append(f"{Path(path).name}: {owner}'s manifest declares its own moves, which win; "
-                            "this sidecar is not read")
+            if owner in from_sidecar:                    # the first sidecar for a MiniCOSM wins, in the folders' order
+                problems.append(f"{Path(path).name}: an earlier sidecar for {owner} ({blocks[owner][0]}) is read; "
+                                "this sidecar is not read")
+            else:
+                problems.append(f"{Path(path).name}: {owner}'s manifest declares its own moves, which win; "
+                                "this sidecar is not read")
             continue
+        from_sidecar.add(owner)
         if owner not in reg.manifests:
             problems.append(f"{Path(path).name}: a sidecar for {owner}, which the registry does not know; "
                             "its moves are read")

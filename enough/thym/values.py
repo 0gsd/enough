@@ -16,9 +16,10 @@ from __future__ import annotations
 import dataclasses
 import datetime as _dt
 import hashlib
+import os
 import re
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePath, PureWindowsPath
 from typing import Any
 
 from enough import macrocosm as mc
@@ -294,6 +295,44 @@ def members(value: Value) -> list[Value] | None:
     if value.type in ("short", "text") and isinstance(p, str):
         return [Value("short", line) for line in p.splitlines() if line.strip()]
     return None
+
+
+def posix_path(path: Any) -> str:
+    """A path as a plan or a trace writes it: with forward slashes whatever system made it (`outputs/out.package.cosm`,
+    never `outputs\\out.package.cosm`), so that a run recorded on Windows replays anywhere. A text given on Windows is
+    read as a Windows path; elsewhere a text stands as it is, since a backslash is a letter of a POSIX name."""
+    if isinstance(path, PurePath):
+        return path.as_posix()
+    text = str(path)
+    return PureWindowsPath(text).as_posix() if os.sep == "\\" else text
+
+
+def item_id(value: Value) -> str | None:
+    """An item's bare id (`P:service/reconcile`): its origin's, else its mapping's."""
+    iid = (value.origin or {}).get("id") or (value.mapping() or {}).get("id")
+    return str(iid) if iid else None
+
+
+def item_key(value: Value) -> str | None:
+    """An item's own key (`atom/meadow//C:entity/meadow-software-inc`): its id qualified with its part where the volume
+    has parts (`Item.key`), else its bare id. Ids repeat across a holotype's parts (two concerns may each hold an
+    `M:audience/donors`), so what is withheld is told apart by key (THYM.md 18)."""
+    key = (value.origin or {}).get("key")
+    return str(key) if key else item_id(value)
+
+
+def is_withheld(withheld: Any, value: Value) -> bool:
+    """Whether `withhold` took this item (`MoveContext.withheld`): an item it was given is held by its key, so its
+    twin in another part stays; an id it was given as a word (`ctx.withhold("C:entity/x")`) takes every item of that
+    id, since a word names no part."""
+    if not withheld:
+        return False
+    key = item_key(value)
+    if key is not None and key in withheld:
+        return True
+    iid = item_id(value)
+    held = withheld.get(iid) if iid is not None and hasattr(withheld, "get") else None
+    return isinstance(held, Value) and held.is_nothing
 
 
 # ---------------------------------------------------------------------------

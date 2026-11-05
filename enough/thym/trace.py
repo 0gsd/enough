@@ -27,7 +27,7 @@ from typing import Any
 
 from enough import macrocosm as mc
 from enough.thym import MINICOSM, Refusal
-from enough.thym.values import Value, plain
+from enough.thym.values import Value, plain, posix_path
 
 
 def utc(t: _dt.datetime | None) -> str | None:
@@ -107,7 +107,7 @@ def record(node: dict, *, run_id: str, move: str, engine: str, inputs: list | No
 
 def digest_row(name: str, value: Value, path: str | None = None) -> dict:
     row = {"name": str(name), "sha256": value.sha256}
-    p = path if path is not None else (str(value.path) if value.path is not None else None)
+    p = posix_path(path) if path is not None else (posix_path(value.path) if value.path is not None else None)
     if p:
         row["path"] = p
     return row

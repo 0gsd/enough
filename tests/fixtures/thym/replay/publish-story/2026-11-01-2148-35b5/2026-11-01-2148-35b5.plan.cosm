@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-01-2148-af8e
+id: thym/2026-11-05-1653-af8e
 name: publish-story on notes.md
 program:
   name: publish-story
@@ -13,10 +13,10 @@ inputs:
 estimate:
   steps: 7
   asks: 3
-  largest_prompt: 307
+  largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-01-2148-af8e
+- id: R:plan/2026-11-05-1653-af8e
   type: plan
   name: publish-story on notes.md
   summary: Seven nodes, three of which ask the model.
@@ -29,7 +29,7 @@ nodes:
   - R:node/6
   - R:node/7
   asks: 3
-  largest_prompt: 307
+  largest_prompt: 0
   provenance:
     mode: derived
     sources:

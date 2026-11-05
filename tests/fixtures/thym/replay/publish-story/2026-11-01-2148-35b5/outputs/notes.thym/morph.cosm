@@ -11,7 +11,7 @@ nodes:
     register: 3
     sentence-length: 2
     paragraph-rhythm: 2
-    analytical-depth: 3
+    analytical-depth: 1
     figurative-density: 1
     stance-style: 1
     person-voice: 3
@@ -34,9 +34,8 @@ nodes:
     - The rise came after the volunteers spread leaf mould under the trees in March.
     - 'Open question: does the lease let the parish mow without asking us?'
     analytical-depth:
-    - Every apple tree needs a second variety nearby to set fruit.
-    - That is not a local quirk; it is how apples pollinate, and the nursery leaflet says the same.
-    - This year the orchard pressed 140 litres of juice, up from 90 last year.
+    - Mara Okafor, who has kept the Hollins Lane orchard since 2019, says the old Bramley by the gate is the oldest
+      tree on the lane.
     figurative-density:
     - Mara Okafor, who has kept the Hollins Lane orchard since 2019, says the old Bramley by the gate is the oldest
       tree on the lane.
@@ -82,8 +81,8 @@ nodes:
   derived:
     from:
     - notes.md#sha256:54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
-    against: sha256:0361af3a32ed6d8607fb835d88d56e2093f1eed79a2d78a528725d7304a48b06
-    at: 2026-11-02 02:48:11+00:00
+    against: sha256:76da9a4af15f57b89eaadb6e309485c83af798f90f0874486c03a97431d84104
+    at: 2026-11-05 21:53:05+00:00
     by: model:Qwen3.8-27B-Q4_K_M.gguf
   shared: false
   provenance:

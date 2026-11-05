@@ -387,12 +387,34 @@ def _no_feed(words: list) -> dict:
     return {}
 
 
+#: The fields of a FEED entry that anything a run reaches reads, and so all the feed engine answers with. A recorded run
+#: writes every answer into its trace (`candidates/<node>-e<k>.1.cosm`), so a whole entry (rhymes, forms, six
+#: languages' definitions) would make the record many times the run. The readers, all of them:
+#: - `moves/morph.py` `statistics` (measure, and `null-pinned`'s and `scales-met`'s count of a telling): `frequency_rank`;
+#: - `moves/emf.py` `_term_problem` (`terms-grounded`): only whether a word has an entry (any mapping);
+#: - `canon_derive` through the `canon` engine (`derive_passages`, `derive_rules`, `derive_gaps`, `derive_finish`):
+#:   `_term_table` reads `word` and `frequency_rank`, `_passage_terms` `definition`, `pos_primary` and `pos`,
+#:   `_feed_block` `word`, `pos_primary`, `pos` and `origin`, `_ground_terms` and the rules scaffold `definition`.
+#: A new reader of a field adds it here, or it reads nothing in a run.
+FEED_FIELDS = ("word", "frequency_rank", "definition", "pos_primary", "pos", "origin")
+
+
+def feed_fields(lookup: Callable[[list], dict]) -> Callable[[list], dict]:
+    """A batch lookup that answers what `lookup` does, each entry cut to `FEED_FIELDS` (a word it does not know stays
+    None, so a term still says `{pending: "not in FEED"}`)."""
+    def feed(words: list) -> dict:
+        found = lookup(words) or {}
+        return {k: ({f: e[f] for f in FEED_FIELDS if f in e} if isinstance(e, dict) else e) for k, e in found.items()}
+    feed.__name__ = getattr(lookup, "__name__", "feed")
+    return feed
+
+
 def _feed() -> Callable | None:
-    """FEED's batch lookup (`dictionary.lookup_many`) when the dictionary is built here; None otherwise, so that a
-    machine without FEED grounds nothing rather than everything as unknown."""
+    """FEED's batch lookup (`dictionary.lookup_many`, cut to `FEED_FIELDS`) when the dictionary is built here; None
+    otherwise, so that a machine without FEED grounds nothing rather than everything as unknown."""
     try:
         from . import dictionary
-        return dictionary.lookup_many if dictionary.feed_path().is_file() else None
+        return feed_fields(dictionary.lookup_many) if dictionary.feed_path().is_file() else None
     except Exception:  # noqa: BLE001 - no FEED: the moves say so
         return None
 

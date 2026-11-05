@@ -197,3 +197,32 @@ def test_reachable_on_the_cloud_slot_is_the_gate(monkeypatch, live_state):
     assert llm.reachable(None) == (True, "cloud (cloud/model)")
     gate(monkeypatch, open_=False, reason="the last health check failed")
     assert llm.reachable(None) == (False, "the last health check failed")
+
+
+# ---------------------------------------------------------------------------
+# fabula P6: the route and provider in meta; the local-only door
+# ---------------------------------------------------------------------------
+
+def test_cloud_meta_names_the_provider(monkeypatch, live_state):
+    use_cloud(live_state)
+    gate(monkeypatch, open_=True)
+    cloud_answers(monkeypatch)
+    _, meta = llm.complete([{"role": "user", "content": "hi"}], llm_url=None)
+    assert meta["route"] == "cloud" and meta["provider"] == "openrouter"
+
+
+def test_complete_local_ignores_the_cloud_slot(monkeypatch, live_state):
+    use_cloud(live_state)
+    gate(monkeypatch, open_=True)
+    calls = cloud_answers(monkeypatch)
+    sent = fake_llama(monkeypatch, content="local")
+    text, meta = llm.complete_local([{"role": "user", "content": "hi"}], llm_url="http://127.0.0.1:9")
+    assert (text, meta["route"], meta["model"]) == ("local", "local", "g40-04")
+    assert calls == [] and sent["posts"] == 1
+
+
+def test_usage_of_reads_what_the_transport_gives():
+    assert llm.usage_of({"usage": {"prompt_tokens": 3, "completion_tokens": 2, "total_tokens": 5}}) == {
+        "prompt_tokens": 3, "completion_tokens": 2, "total_tokens": 5}
+    assert llm.usage_of({"usage": {"prompt_tokens": 3}}) == {"prompt_tokens": 3}
+    assert llm.usage_of({}) is None and llm.usage_of({"usage": {}}) is None

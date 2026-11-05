@@ -5,6 +5,7 @@
     uv run python scripts/ui_check.py --quick      # 3 viewports x 3 languages
     uv run python scripts/ui_check.py --update-baseline
     uv run python scripts/ui_check.py --screens read-full,girraph -v
+    uv run python scripts/ui_check.py --scenarios dict-sorts-rail --langs es   # one scenario, one language
 
 What it does: boots two scratch enough servers (a project one and a home
 one) through the real `python -m enough` entry, drives a headless Chrome
@@ -107,6 +108,8 @@ def build_plan(args: argparse.Namespace) -> Plan:
                              f"{', '.join(v.name for v in VIEWPORTS)}")
 
     chosen = screens_mod.ALL_SCREENS
+    if args.scenarios and not args.screens:
+        chosen = []                      # --scenarios alone: those scenarios, no layout sweep
     if args.screens:
         want = {s.strip() for s in args.screens.split(",") if s.strip()}
         chosen = [s for s in chosen if s.name in want]
@@ -114,6 +117,12 @@ def build_plan(args: argparse.Namespace) -> Plan:
         if missing:
             raise SystemExit(f"unknown screen(s): {', '.join(sorted(missing))}")
     scenarios = tuple(SCENARIOS) if not args.no_scenarios else ()
+    if args.scenarios and not args.no_scenarios:
+        want_sc = [x.strip() for x in args.scenarios.split(",") if x.strip()]
+        unknown_sc = set(want_sc) - set(SCENARIOS)
+        if unknown_sc:
+            raise SystemExit(f"unknown scenario(s): {', '.join(sorted(unknown_sc))}")
+        scenarios = tuple(want_sc)
     return Plan(viewports, tuple(langs), list(chosen), scenarios)
 
 
@@ -639,6 +648,8 @@ def main(argv: list[str] | None = None) -> int:
                     help="comma-separated language codes (default: the matrix)")
     ap.add_argument("--viewports", default="",
                     help="comma-separated viewport names, e.g. 1512x982@2")
+    ap.add_argument("--scenarios", default="",
+                    help="comma-separated scenario names (default: all); alone, it skips the layout sweep")
     ap.add_argument("--no-scenarios", action="store_true",
                     help="skip the mode-stack interaction scenarios")
     ap.add_argument("--update-baseline", action="store_true",

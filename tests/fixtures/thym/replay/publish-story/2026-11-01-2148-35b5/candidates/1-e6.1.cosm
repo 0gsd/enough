@@ -1,0 +1,15 @@
+engine: feed
+inputs:
+  call: 50c2dc37b17b2c2bb16a8d0362aaf88ff474e2a825e37b9ed3eaeebabb8b9582
+keys: []
+tokens: 0
+seconds: 0
+output:
+  hearsay:
+    word: hearsay
+    frequency_rank: 3
+    definition: Information passed along secondhand, repeated from what someone else said rather than known firsthand.
+      In law it names an out-of-court statement usually barred from testimony because it cannot be cross-examined.
+    pos_primary: noun
+    pos: noun
+    origin: feed

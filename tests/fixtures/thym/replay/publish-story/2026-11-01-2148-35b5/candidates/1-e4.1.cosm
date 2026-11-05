@@ -1,0 +1,14 @@
+engine: feed
+inputs:
+  call: 50ff654fcffd5434692f39b3a177a7567ff11543f6d894c72c67482262cb68e9
+keys: []
+tokens: 0
+seconds: 0
+output:
+  pollinate:
+    word: pollinate
+    frequency_rank: 2
+    definition: To transfer pollen to a flower's stigma, enabling fertilization.
+    pos_primary: verb
+    pos: verb
+    origin: feed

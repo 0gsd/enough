@@ -11,23 +11,23 @@ contract:
   - emf-checks
   - provenance
 inputs:
-  messages: b4d03990fdbd3efc599d59623d214d3e2a8c4572cf2690f1bdf6efeab84d7596
+  messages: 0191dfa528091dbf02138310006ebc584c2dcc8bf6e1a7f4ff5df7d2db788c3d
 engine: model:Qwen3.8-27B-Q4_K_M.gguf
 attempts: 1
-tokens: 977
-seconds: 8
-output: 'line: Mara Okafor and the narrator defend the Hollins Lane orchard by challenging the council''s July mowing
-  plan that threatens pollinators.
+tokens: 1035
+seconds: 9
+output: 'line: The Hollins Lane orchard produced 140 litres of juice this year, up from 90 last year, and the group
+  agreed to ask the council to wait until September to mow the meadow strip to protect pollinators.
 
-  focus: The text contrasts the orchard''s improved yield with the danger of early mowing, directing attention to
-  the need for pollinators.
+  focus: The text details the orchard''s increased juice yield and the group''s plan to delay mowing. The author
+  highlights the dependency between the meadow strip and fruit pollination.
 
-  push: The author wants the reader to support delaying the mowing until September to protect the orchard''s fruit
-  production.
+  push: The reader should support the request to delay mowing to protect the pollinators essential for the orchard''s
+  fruit production.
 
-  pull: The text assumes the meadow strip is the sole source of pollinators and ignores the lease''s legal ambiguity
-  regarding mowing rights.
+  pull: The text assumes the meadow strip is the primary pollinator source and that the council will accept the
+  delay request.
 
-  stance_profile: {axiom: 1, observed: 2, deduced: 1, opinion: 2, assumed: 1, hearsay: 1}
+  stance_profile: {axiom: 1, observed: 3, deduced: 2, opinion: 2, assumed: 1, hearsay: 1}
 
   '

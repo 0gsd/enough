@@ -6,6 +6,7 @@ No app here (the routes are `tests/test_thym_api.py`); the store points inside t
 from __future__ import annotations
 
 import hashlib
+import json
 import shutil
 from pathlib import Path
 
@@ -71,6 +72,69 @@ def test_one_flipped_byte_is_refused(single: bytes):
     raw[len(raw) // 2] ^= 0x01                               # any byte at all: a refusal, never other bytes
     r = vault.open(bytes(raw), key)
     assert isinstance(r, Refusal) and r.check in ("sealed", "key")
+
+
+# What a stranger's file may cost before any key (Comprise's review, ported: comprise-dev core/vault.py)
+
+def test_a_file_larger_than_any_sealed_package_is_not_read(single: bytes, monkeypatch):
+    sealed, key = vault.seal(single, iterations=FAST)
+    monkeypatch.setattr(vault, "MAX_SEALED", len(sealed) - 1)
+    for r in (vault.header(sealed), vault.open(sealed, key)):
+        assert isinstance(r, Refusal) and r.check == "sealed" and "was not read" in r.message, r
+    monkeypatch.setattr(vault.mc, "yaml_load", lambda text: pytest.fail("parsed a file over the cap"))
+    assert isinstance(vault.header(sealed), Refusal)
+
+
+def test_a_clear_part_with_an_anchor_or_an_alias_is_refused_before_it_is_built(single: bytes, monkeypatch):
+    sealed, key = vault.seal(single, iterations=FAST)
+    text = sealed.decode("utf-8")
+    laughs = "lol: &a [x, x, x, x, x, x, x, x, x]\nlol2: &b [*a, *a, *a, *a, *a, *a, *a, *a, *a]\n" \
+             "lol3: [*b, *b, *b, *b, *b, *b, *b, *b, *b]\n"
+    for changed in (text.replace("notice:", laughs + "notice:", 1), text.replace("nodes: []", "nodes: &n []", 1)):
+        monkeypatch.setattr(vault.mc, "yaml_load", lambda t: pytest.fail("built a clear part with an alias"))
+        r = vault.header(changed.encode("utf-8"))
+        assert isinstance(r, Refusal) and r.check == "sealed" and "an anchor or an alias" in r.message, r
+        monkeypatch.undo()
+        assert isinstance(vault.open(changed.encode("utf-8"), key), Refusal)
+
+
+def test_a_clear_part_of_too_many_pieces_or_too_deep_is_refused(single: bytes):
+    sealed, _key = vault.seal(single, iterations=FAST)
+    text = sealed.decode("utf-8")
+    many = "pad: [" + ", ".join("x" for _ in range(vault.MAX_SEALED_EVENTS)) + "]\n"
+    r = vault.header(text.replace("notice:", many + "notice:", 1).encode("utf-8"))
+    assert isinstance(r, Refusal) and r.check == "sealed" and "pieces" in r.message, r
+    deep = "pad: " + "[" * (vault.MAX_YAML_DEPTH + 1) + "]" * (vault.MAX_YAML_DEPTH + 1) + "\n"
+    r = vault.header(text.replace("notice:", deep + "notice:", 1).encode("utf-8"))
+    assert isinstance(r, Refusal) and r.check == "sealed" and "deep" in r.message, r
+    assert vault.plain_yaml_events(text) < 100, "a real sealed file is a few dozen pieces"
+
+
+def _reseal_manifest(sealed: bytes, key: str, repeat: int) -> bytes:
+    """The sealed file with its manifest sealed again, naming its one chunk `repeat` times (the key is known)."""
+    doc = mc.yaml_load(sealed.decode("utf-8"))
+    enc, kr = doc["encrypted"], doc["encrypted"]["keyring"]
+    aead = enc["aead"]
+    wk = vault.wrapping_key(vault.normalize_code(key), vault._unb64(kr["salt"]), int(kr["iterations"]))
+    dek = vault.aead_open(aead, wk, vault._unb64(kr["nonce"]) + vault._unb64(kr["wrapped"]), None)
+    _id_key, chunk_key = vault.subkeys(dek)
+    manifest = json.loads(vault.aead_open(aead, chunk_key, vault._unb64(enc["manifest"]), vault.MANIFEST_AAD))
+    f = manifest["files"][0]
+    f["chunks"] = f["chunks"] * repeat
+    f["size"] *= repeat
+    f["sha256"] = hashlib.sha256(vault.open(sealed, key) * repeat).hexdigest()
+    enc["manifest"] = vault.b64(vault.aead_seal(aead, chunk_key, vault.canonical_json(manifest), vault.MANIFEST_AAD))
+    return mc.dump(doc).encode("utf-8")
+
+
+def test_a_manifest_that_repeats_a_chunk_cannot_swell_what_opens(single: bytes):
+    sealed, key = vault.seal(single, iterations=FAST)
+    twice = _reseal_manifest(sealed, key, 2)                # a repeated chunk is the format's own, and opens
+    assert vault.open(twice, key) == single * 2
+    swollen = _reseal_manifest(sealed, key, 50)              # 50 copies of a chunk of a file of one chunk
+    assert len(swollen) < 2 * len(sealed)
+    r = vault.open(swollen, key)
+    assert isinstance(r, Refusal) and r.check == "sealed" and "far more than it holds" in r.message, r
 
 
 def test_the_key_is_not_in_the_sealed_bytes(single: bytes):

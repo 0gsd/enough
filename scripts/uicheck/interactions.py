@@ -2241,6 +2241,19 @@ def scenario_dict_open_flip(d: Driver) -> list[str]:
     return fails
 
 
+#: Waits (up to `ms`) until the dictionary has drawn the CURRENT order, and says whether it did. A new order is
+#: fetched, not computed — its group index (`/api/dict/index`), the anchor's position and the page's rows — and
+#: `dictViewChanged()` and the sort select's `change` return before any of it lands, so a fixed sleep is a race
+#: with the server (it lost about once per full run: the domain/era sub-sort, while the machine was busy).
+#: `dictEdge()` stamps the rail with the view's key and its group count once the page for that view is drawn, and
+#: `dictViewChanged()` blanks the stamp first, so a stamp that matches the current store is the settled state.
+_DICT_SETTLED = ("(async (ms) => { const until = Date.now() + ms; const ok = () => { const st = dictStore();"
+                 " const e = document.getElementById('dict-edge');"
+                 " return !!st.groups && e.dataset.key === st.key + '|' + st.groups.length && DICT.start != null"
+                 " && !!document.querySelector('#dict-flow .dict-e'); };"
+                 " while (!ok() && Date.now() < until) await new Promise((r) => setTimeout(r, 50)); return ok(); })")
+
+
 def scenario_dict_sorts_rail(d: Driver) -> list[str]:
     """Every sort key (and a sub-sort) draws its group headings and a thumb
     index whose tabs are the server's groups; a tab click turns to that
@@ -2250,40 +2263,43 @@ def scenario_dict_sorts_rail(d: Driver) -> list[str]:
     _dict_open(d)
     for sort in ("alpha", "length", "domain", "era", "pos", "frequency", "syllables", "added", "origin"):
         r = d.js_await("(async () => { const s = document.getElementById('dict-s1'); s.value = " + json.dumps(sort) + ";"
-                       " s.dispatchEvent(new Event('change')); await new Promise((r) => setTimeout(r, 900));"
-                       " const st = dictStore(); return {sort: DICT.view.sort, total: st.total,"
+                       " s.dispatchEvent(new Event('change')); const settled = await " + _DICT_SETTLED + "(15000);"
+                       " const st = dictStore(); return {settled, sort: DICT.view.sort, total: st.total,"
                        " groups: (st.groups || []).length, tabs: document.querySelectorAll('#dict-edge .dict-tab[data-off]').length,"
                        " here: document.querySelectorAll('#dict-edge .dict-tab.here').length,"
                        " n: document.querySelectorAll('#dict-flow .dict-e').length}; })()", timeout=25) or {}
-        if r.get("sort") != sort or not r.get("n"):
-            fails.append(f"sort {sort}: no page ({r})")
+        if r.get("sort") != sort or not r.get("n") or not r.get("settled"):
+            fails.append(f"sort {sort}: no page drawn for it within 15 s ({r})")
             continue
         if r.get("tabs") != r.get("groups"):
             fails.append(f"sort {sort}: {r.get('tabs')} live tabs for {r.get('groups')} groups")
         if not r.get("here"):
             fails.append(f"sort {sort}: no tab marks the current page")
     r = d.js_await("(async () => { const tabs = document.querySelectorAll('#dict-edge .dict-tab[data-off]');"
-                   " const t = tabs[Math.floor(tabs.length / 2)]; t.click(); await new Promise((r) => setTimeout(r, 700));"
+                   " const t = tabs[Math.floor(tabs.length / 2)]; t.click(); const until = Date.now() + 15000;"
+                   " const ok = () => DICT.start === +t.dataset.off && t.classList.contains('here')"
+                   "   && !!document.querySelector('#dict-flow .dict-gh');"
+                   " while (!ok() && Date.now() < until) await new Promise((r) => setTimeout(r, 50));"
                    " return {want: +t.dataset.off, got: DICT.start, here: t.classList.contains('here'),"
                    " gh: !!document.querySelector('#dict-flow .dict-gh')}; })()", timeout=20) or {}
     if r.get("want") != r.get("got") or not r.get("here") or not r.get("gh"):
         fails.append(f"a thumb tab did not open its group with a heading: {r}")
     r = d.js_await("(async () => { Object.assign(DICT.view, {sort: 'domain', dir: 'asc', then: 'era', thenDir: 'asc'});"
-                   " dictViewChanged(); await new Promise((r) => setTimeout(r, 900));"
-                   " return {keys: document.querySelectorAll('#dict-flow .dict-key, #dict-flow .dict-key-n').length,"
+                   " dictViewChanged(); const settled = await " + _DICT_SETTLED + "(15000);"
+                   " return {settled, keys: document.querySelectorAll('#dict-flow .dict-key, #dict-flow .dict-key-n').length,"
                    " d2: document.getElementById('dict-d2').disabled}; })()", timeout=20) or {}
-    if not r.get("keys") or r.get("d2"):
+    if not r.get("settled") or not r.get("keys") or r.get("d2"):
         fails.append(f"domain, then era: no margin keys or the sub-sort direction is off: {r}")
     # Both keys of a two-key order show on every entry (0.4.1, U4), so the
     # order is legible: "length, then era" reads "7 · middle eng.".
     r = d.js_await("(async () => { Object.assign(DICT.view, {sort: 'length', dir: 'asc', then: 'era', thenDir: 'asc'});"
-                   " dictViewChanged(); await new Promise((r) => setTimeout(r, 900));"
+                   " dictViewChanged(); const settled = await " + _DICT_SETTLED + "(15000);"
                    " const es = Array.from(document.querySelectorAll('#dict-flow .dict-e'));"
                    " const two = es.filter((e) => e.querySelector('.dict-key .dict-key-sep, .dict-key-n .dict-key-sep'));"
                    " const k = two[0] && (two[0].querySelector('.dict-key, .dict-key-n') || {}).textContent;"
-                   " return {n: es.length, two: two.length, k, len: two[0] && two[0].dataset.w.length}; })()",
+                   " return {settled, n: es.length, two: two.length, k, len: two[0] && two[0].dataset.w.length}; })()",
                    timeout=20) or {}
-    if not r.get("n") or r.get("two", 0) < r.get("n", 1) * 0.8 or not str(r.get("k") or "").startswith(str(r.get("len"))):
+    if not r.get("settled") or not r.get("n") or r.get("two", 0) < r.get("n", 1) * 0.8 or not str(r.get("k") or "").startswith(str(r.get("len"))):
         fails.append(f"length, then era: the entries do not show both keys: {r}")
     _reset(d)
     return fails

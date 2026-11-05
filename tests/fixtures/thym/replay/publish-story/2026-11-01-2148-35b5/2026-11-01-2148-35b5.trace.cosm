@@ -6,21 +6,21 @@ program:
   name: publish-story
   sha256: 5bf1730785d53906879af4224bec6069d77ef3888490fed182f29bc8e6930945
 plan:
-  sha256: e2041acb9e9df03a43b8c8ea24cee024dc65b68cf7ab758e4be81721f040c86b
+  sha256: e39e610f17a8bddeb6739c6f8c75294f4f2c9c576aef463ad77a714179d0037e
 environment:
-  enough: 0.4.4
-  model: g40-04
-  context: 0
+  enough: 0.5.4
+  model: q38-04
+  context: 16384
   agent_free: false
   memory_band: 64 GB
-started: '2026-11-02T02:48:11Z'
-ended: '2026-11-02T02:51:11Z'
+started: '2026-11-05T21:53:05Z'
+ended: '2026-11-05T21:59:58Z'
 outcome: landed
 nodes:
 - id: R:trace/2026-11-01-2148-35b5
   type: trace
   name: publish-story run 2026-11-01-2148-35b5
-  summary: 'ran publish-story on notes.md in 180 s on Qwen3.8-27B-Q4_K_M.gguf: 7 steps, all checks green'
+  summary: 'ran publish-story on notes.md in 413 s on Qwen3.8-27B-Q4_K_M.gguf: 7 steps, all checks green'
   records:
   - R:record/1
   - R:record/2
@@ -31,6 +31,10 @@ nodes:
   - R:record/7
   outcome: landed
   inputs_root: .
+  engines:
+  - canon
+  - docoes
+  - feed
   provenance:
     mode: derived
     sources:
@@ -48,11 +52,11 @@ nodes:
     path: inputs/notes.md
   outputs:
   - name: f
-    sha256: 11f87a5bb18fe02faaa8b620cdf0f6919717ce1846446b6950be2f0535037a92
+    sha256: fe970d1b49e4c1548c336e9de5facd3bb3458ba01fe251cf52d20356c934b714
   engine: model:Qwen3.8-27B-Q4_K_M.gguf
   attempts: 1
-  tokens: 977
-  seconds: 150
+  tokens: 6356
+  seconds: 356
   checks:
   - name: span-resolves
     ok: true
@@ -65,18 +69,19 @@ nodes:
     why: ''
   - name: coverage
     ok: true
-    why: '14 claim-bearing sentences, each traced (spans): s1→E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,P:claim/oldest-tree-status;
-      s2→L:term/hearsay,E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,P:claim/oldest-tree-status;
-      s3→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/apple-pollination-requirement; s4→L:term/pollinate,L:term/leaflet,L:term/quirk,E:person/mara-okafor,E:place/hollins-lane-orchard,K:concept/pollination,P:claim/apple-pollination-requirement;
+    why: '14 claim-bearing sentences, each traced (spans): s1→E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,K:concept/parish-records,P:claim/bramley-is-oldest-tree;
+      s2→L:term/hearsay,E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,K:concept/parish-records,P:claim/bramley-is-oldest-tree;
+      s3→E:person/mara-okafor,E:place/hollins-lane-orchard,K:concept/apple-pollination,P:claim/cross-pollination-required;
+      s4→L:term/pollinate,L:term/leaflet,L:term/quirk,E:person/mara-okafor,E:place/hollins-lane-orchard,K:concept/apple-pollination,P:claim/cross-pollination-required;
       s5→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/juice-yield-increase,T:event/juice-pressing;
-      s6→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/juice-yield-increase,T:event/juice-pressing;
-      s7→L:term/mould,E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/leaf-mould,K:concept/leaf-mould,P:claim/mulch-effect-on-yield,T:event/leaf-mould-spread;
-      s8→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/mulch-effect-on-yield,P:claim/spring-weather-effect;
-      s9→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/mulch-effect-on-yield,P:claim/spring-weather-effect;
-      s10→E:person/mara-okafor,E:place/hollins-lane-orchard,E:org/parish-councils-grounds-team,E:place/meadow-strip,P:claim/meadow-mowing-threat,T:event/meadow-mowing-plan;
-      s11→L:term/pollinator,E:person/mara-okafor,E:place/hollins-lane-orchard,E:place/meadow-strip,K:concept/wildflower-seeding,K:concept/pollinator-dependence,P:claim/meadow-mowing-threat;
-      s12→L:term/pollinator,E:person/mara-okafor,E:place/hollins-lane-orchard,E:place/meadow-strip,K:concept/pollinator-dependence,P:claim/meadow-mowing-threat;
-      s13→E:person/mara-okafor,T:event/council-letter-request; s14→E:person/mara-okafor,T:event/council-letter-request'
+      s6→E:person/mara-okafor,E:person/author,E:place/hollins-lane-orchard,P:claim/juice-yield-increase,T:event/juice-pressing,T:event/bottle-counting;
+      s7→L:term/mould,E:person/mara-okafor,E:person/author,E:org/volunteers,E:thing/leaf-mould,P:claim/leaf-mould-causes-yield-increase,T:event/leaf-mould-spreading;
+      s8→E:person/mara-okafor,E:person/author,E:thing/leaf-mould,K:concept/warm-wet-spring,P:claim/leaf-mould-causes-yield-increase,P:claim/warm-spring-causes-yield-increase;
+      s9→E:person/mara-okafor,E:person/author,E:thing/leaf-mould,K:concept/warm-wet-spring,P:claim/leaf-mould-causes-yield-increase,P:claim/warm-spring-causes-yield-increase;
+      s10→E:person/mara-okafor,E:person/author,E:org/parish-council,E:place/meadow-strip,P:claim/july-mowing-harms-orchard,T:event/july-mowing;
+      s11→L:term/pollinator,E:person/mara-okafor,E:person/author,E:org/parish-council,E:place/meadow-strip,K:concept/pollinator-dependency,P:claim/july-mowing-harms-orchard;
+      s12→L:term/pollinator,E:person/mara-okafor,E:person/author,E:org/parish-council,K:concept/pollinator-dependency,P:claim/july-mowing-harms-orchard;
+      s13→E:person/mara-okafor,E:person/author,E:org/parish-council,P:claim/ask-council-to-wait; s14→E:person/mara-okafor,E:person/author,E:org/parish-council,P:claim/ask-council-to-wait'
   - name: emf-checks
     ok: true
     why: ''
@@ -96,7 +101,7 @@ nodes:
   move: assert
   inputs:
   - name: f
-    sha256: 11f87a5bb18fe02faaa8b620cdf0f6919717ce1846446b6950be2f0535037a92
+    sha256: fe970d1b49e4c1548c336e9de5facd3bb3458ba01fe251cf52d20356c934b714
   - name: story
     sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
     path: inputs/notes.md
@@ -108,18 +113,19 @@ nodes:
   checks:
   - name: coverage
     ok: true
-    why: '14 claim-bearing sentences, each traced (spans): s1→E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,P:claim/oldest-tree-status;
-      s2→L:term/hearsay,E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,P:claim/oldest-tree-status;
-      s3→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/apple-pollination-requirement; s4→L:term/pollinate,L:term/leaflet,L:term/quirk,E:person/mara-okafor,E:place/hollins-lane-orchard,K:concept/pollination,P:claim/apple-pollination-requirement;
+    why: '14 claim-bearing sentences, each traced (spans): s1→E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,K:concept/parish-records,P:claim/bramley-is-oldest-tree;
+      s2→L:term/hearsay,E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/bramley-apple-tree,K:concept/parish-records,P:claim/bramley-is-oldest-tree;
+      s3→E:person/mara-okafor,E:place/hollins-lane-orchard,K:concept/apple-pollination,P:claim/cross-pollination-required;
+      s4→L:term/pollinate,L:term/leaflet,L:term/quirk,E:person/mara-okafor,E:place/hollins-lane-orchard,K:concept/apple-pollination,P:claim/cross-pollination-required;
       s5→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/juice-yield-increase,T:event/juice-pressing;
-      s6→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/juice-yield-increase,T:event/juice-pressing;
-      s7→L:term/mould,E:person/mara-okafor,E:place/hollins-lane-orchard,E:thing/leaf-mould,K:concept/leaf-mould,P:claim/mulch-effect-on-yield,T:event/leaf-mould-spread;
-      s8→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/mulch-effect-on-yield,P:claim/spring-weather-effect;
-      s9→E:person/mara-okafor,E:place/hollins-lane-orchard,P:claim/mulch-effect-on-yield,P:claim/spring-weather-effect;
-      s10→E:person/mara-okafor,E:place/hollins-lane-orchard,E:org/parish-councils-grounds-team,E:place/meadow-strip,P:claim/meadow-mowing-threat,T:event/meadow-mowing-plan;
-      s11→L:term/pollinator,E:person/mara-okafor,E:place/hollins-lane-orchard,E:place/meadow-strip,K:concept/wildflower-seeding,K:concept/pollinator-dependence,P:claim/meadow-mowing-threat;
-      s12→L:term/pollinator,E:person/mara-okafor,E:place/hollins-lane-orchard,E:place/meadow-strip,K:concept/pollinator-dependence,P:claim/meadow-mowing-threat;
-      s13→E:person/mara-okafor,T:event/council-letter-request; s14→E:person/mara-okafor,T:event/council-letter-request'
+      s6→E:person/mara-okafor,E:person/author,E:place/hollins-lane-orchard,P:claim/juice-yield-increase,T:event/juice-pressing,T:event/bottle-counting;
+      s7→L:term/mould,E:person/mara-okafor,E:person/author,E:org/volunteers,E:thing/leaf-mould,P:claim/leaf-mould-causes-yield-increase,T:event/leaf-mould-spreading;
+      s8→E:person/mara-okafor,E:person/author,E:thing/leaf-mould,K:concept/warm-wet-spring,P:claim/leaf-mould-causes-yield-increase,P:claim/warm-spring-causes-yield-increase;
+      s9→E:person/mara-okafor,E:person/author,E:thing/leaf-mould,K:concept/warm-wet-spring,P:claim/leaf-mould-causes-yield-increase,P:claim/warm-spring-causes-yield-increase;
+      s10→E:person/mara-okafor,E:person/author,E:org/parish-council,E:place/meadow-strip,P:claim/july-mowing-harms-orchard,T:event/july-mowing;
+      s11→L:term/pollinator,E:person/mara-okafor,E:person/author,E:org/parish-council,E:place/meadow-strip,K:concept/pollinator-dependency,P:claim/july-mowing-harms-orchard;
+      s12→L:term/pollinator,E:person/mara-okafor,E:person/author,E:org/parish-council,K:concept/pollinator-dependency,P:claim/july-mowing-harms-orchard;
+      s13→E:person/mara-okafor,E:person/author,E:org/parish-council,P:claim/ask-council-to-wait; s14→E:person/mara-okafor,E:person/author,E:org/parish-council,P:claim/ask-council-to-wait'
   provenance:
     mode: derived
     sources:
@@ -133,23 +139,23 @@ nodes:
   move: 'null'
   inputs:
   - name: f
-    sha256: 11f87a5bb18fe02faaa8b620cdf0f6919717ce1846446b6950be2f0535037a92
+    sha256: fe970d1b49e4c1548c336e9de5facd3bb3458ba01fe251cf52d20356c934b714
   outputs:
   - name: t3
-    sha256: 0361af3a32ed6d8607fb835d88d56e2093f1eed79a2d78a528725d7304a48b06
+    sha256: 76da9a4af15f57b89eaadb6e309485c83af798f90f0874486c03a97431d84104
   engine: model:Qwen3.8-27B-Q4_K_M.gguf
   attempts: 1
-  tokens: 2574
-  seconds: 27
+  tokens: 2578
+  seconds: 45
   checks:
   - name: coverage
     ok: true
-    why: '19 claim-bearing sentences, each traced (citations): s1→T:event/juice-pressing,P:claim/juice-yield-increase;
-      s2→P:claim/juice-yield-increase; s3→T:event/leaf-mould-spread; s4→P:claim/mulch-effect-on-yield; s5→P:claim/spring-weather-effect;
-      s6→P:claim/spring-weather-effect; s7→E:thing/bramley-apple-tree; s8→P:claim/oldest-tree-status; s9→P:claim/oldest-tree-status;
-      s10→P:claim/apple-pollination-requirement; s11→P:claim/apple-pollination-requirement; s12→E:place/meadow-strip;
-      s13→K:concept/pollinator-dependence; s14→T:event/meadow-mowing-plan; s15→P:claim/meadow-mowing-threat; s16→P:claim/meadow-mowing-threat;
-      s17→T:event/council-letter-request; s18→T:event/council-letter-request; s19→P:claim/lease-mowing-question'
+    why: '14 claim-bearing sentences, each traced (citations): s1→E:place/hollins-lane-orchard,E:person/mara-okafor;
+      s2→E:place/hollins-lane-orchard,T:event/juice-pressing; s3→P:claim/juice-yield-increase; s4→P:claim/bramley-is-oldest-tree;
+      s5→K:concept/parish-records; s6→P:claim/cross-pollination-required; s7→T:event/bottle-counting,E:person/author;
+      s8→T:event/leaf-mould-spreading,E:org/volunteers; s9→P:claim/leaf-mould-causes-yield-increase; s10→P:claim/warm-spring-causes-yield-increase;
+      s11→T:event/july-mowing,E:org/parish-council; s12→P:claim/july-mowing-harms-orchard; s13→P:claim/ask-council-to-wait;
+      s14→P:claim/lease-uncertainty'
   - name: no-invention
     ok: true
     why: ''
@@ -178,14 +184,14 @@ nodes:
     sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
     path: inputs/notes.md
   - name: t3
-    sha256: 0361af3a32ed6d8607fb835d88d56e2093f1eed79a2d78a528725d7304a48b06
+    sha256: 76da9a4af15f57b89eaadb6e309485c83af798f90f0874486c03a97431d84104
   outputs:
   - name: m
-    sha256: 070f6b812190b180086af09bdc081587f79c412fc20d5403fffb788d4e6b8a6b
+    sha256: b6597718f557f36836706872d9bc6d60eb06d08ad07b20b0ef2189f6efa04b27
   engine: model:Qwen3.8-27B-Q4_K_M.gguf
   attempts: 1
-  tokens: 739
-  seconds: 2
+  tokens: 744
+  seconds: 9
   checks:
   - name: scale-range
     ok: true
@@ -261,16 +267,16 @@ nodes:
     sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
     path: inputs/notes.md
   - name: f
-    sha256: 11f87a5bb18fe02faaa8b620cdf0f6919717ce1846446b6950be2f0535037a92
+    sha256: fe970d1b49e4c1548c336e9de5facd3bb3458ba01fe251cf52d20356c934b714
   - name: m
-    sha256: 070f6b812190b180086af09bdc081587f79c412fc20d5403fffb788d4e6b8a6b
+    sha256: b6597718f557f36836706872d9bc6d60eb06d08ad07b20b0ef2189f6efa04b27
   - name: c
     sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
   - name: g
     sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
   outputs:
   - name: out
-    sha256: 40c97776747201544555d7db5d1588f8c782862e1b590979a39b29697c6aff39
+    sha256: c820fc87c41827c1eab812a2975272a3781a5f8d9dac9b8b60228604885c21a6
     path: outputs/out.package.cosm
   engine: code
   attempts: 1

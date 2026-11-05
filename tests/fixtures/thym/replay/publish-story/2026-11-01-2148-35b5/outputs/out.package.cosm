@@ -51,182 +51,187 @@ contents:
 
     '
 - path: fabula.cosm
-  sha256: 17d1e14254a60fab378ba87a6be693723b4c39e256f8b483d0ac0a48716f4e7f
+  sha256: 944ba27ebfc6663d3d960d790620c138cb1e22a29be841e756210c8d8a4a6d7c
   role: fabula
-  text: "oes: emf/1\nmacrocosm: 0.0.1\nid: emf/notes-md\nname: The Hollins Lane orchard, autumn notes\nsource:\n\
+  text: "oes: emf/1\nmacrocosm: 0.5.4\nid: emf/notes-md\nname: The Hollins Lane orchard, autumn notes\nsource:\n\
     \  path: text.md\n  sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7\n  size: 1228\n\
-    derived:\n  at: 2026-11-02 02:48:11+00:00\n  by: thym\n  model: Qwen3.8-27B-Q4_K_M.gguf\n  mode: model\n  completeness:\
+    derived:\n  at: 2026-11-05 21:53:05+00:00\n  by: thym\n  model: Qwen3.8-27B-Q4_K_M.gguf\n  mode: model\n  completeness:\
     \ full\n  chunks: 1\n  covers:\n  - sentence: 1\n    lines: 3-4\n    items:\n    - E:person/mara-okafor\n  \
-    \  - E:place/hollins-lane-orchard\n    - E:thing/bramley-apple-tree\n    - P:claim/oldest-tree-status\n  - sentence:\
-    \ 2\n    lines: 4-5\n    items:\n    - L:term/hearsay\n    - E:person/mara-okafor\n    - E:place/hollins-lane-orchard\n\
-    \    - E:thing/bramley-apple-tree\n    - P:claim/oldest-tree-status\n  - sentence: 3\n    lines: '7'\n    items:\n\
-    \    - E:person/mara-okafor\n    - E:place/hollins-lane-orchard\n    - P:claim/apple-pollination-requirement\n\
-    \  - sentence: 4\n    lines: 7-8\n    items:\n    - L:term/pollinate\n    - L:term/leaflet\n    - L:term/quirk\n\
-    \    - E:person/mara-okafor\n    - E:place/hollins-lane-orchard\n    - K:concept/pollination\n    - P:claim/apple-pollination-requirement\n\
+    \  - E:place/hollins-lane-orchard\n    - E:thing/bramley-apple-tree\n    - K:concept/parish-records\n    - P:claim/bramley-is-oldest-tree\n\
+    \  - sentence: 2\n    lines: 4-5\n    items:\n    - L:term/hearsay\n    - E:person/mara-okafor\n    - E:place/hollins-lane-orchard\n\
+    \    - E:thing/bramley-apple-tree\n    - K:concept/parish-records\n    - P:claim/bramley-is-oldest-tree\n  -\
+    \ sentence: 3\n    lines: '7'\n    items:\n    - E:person/mara-okafor\n    - E:place/hollins-lane-orchard\n\
+    \    - K:concept/apple-pollination\n    - P:claim/cross-pollination-required\n  - sentence: 4\n    lines: 7-8\n\
+    \    items:\n    - L:term/pollinate\n    - L:term/leaflet\n    - L:term/quirk\n    - E:person/mara-okafor\n\
+    \    - E:place/hollins-lane-orchard\n    - K:concept/apple-pollination\n    - P:claim/cross-pollination-required\n\
     \  - sentence: 5\n    lines: '10'\n    items:\n    - E:person/mara-okafor\n    - E:place/hollins-lane-orchard\n\
     \    - P:claim/juice-yield-increase\n    - T:event/juice-pressing\n  - sentence: 6\n    lines: 10-11\n    items:\n\
-    \    - E:person/mara-okafor\n    - E:place/hollins-lane-orchard\n    - P:claim/juice-yield-increase\n    - T:event/juice-pressing\n\
-    \  - sentence: 7\n    lines: '13'\n    items:\n    - L:term/mould\n    - E:person/mara-okafor\n    - E:place/hollins-lane-orchard\n\
-    \    - E:thing/leaf-mould\n    - K:concept/leaf-mould\n    - P:claim/mulch-effect-on-yield\n    - T:event/leaf-mould-spread\n\
-    \  - sentence: 8\n    lines: '14'\n    items:\n    - E:person/mara-okafor\n    - E:place/hollins-lane-orchard\n\
-    \    - P:claim/mulch-effect-on-yield\n    - P:claim/spring-weather-effect\n  - sentence: 9\n    lines: 14-15\n\
-    \    items:\n    - E:person/mara-okafor\n    - E:place/hollins-lane-orchard\n    - P:claim/mulch-effect-on-yield\n\
-    \    - P:claim/spring-weather-effect\n  - sentence: 10\n    lines: '17'\n    items:\n    - E:person/mara-okafor\n\
-    \    - E:place/hollins-lane-orchard\n    - E:org/parish-councils-grounds-team\n    - E:place/meadow-strip\n\
-    \    - P:claim/meadow-mowing-threat\n    - T:event/meadow-mowing-plan\n  - sentence: 11\n    lines: 18-19\n\
-    \    items:\n    - L:term/pollinator\n    - E:person/mara-okafor\n    - E:place/hollins-lane-orchard\n    -\
-    \ E:place/meadow-strip\n    - K:concept/wildflower-seeding\n    - K:concept/pollinator-dependence\n    - P:claim/meadow-mowing-threat\n\
+    \    - E:person/mara-okafor\n    - E:person/author\n    - E:place/hollins-lane-orchard\n    - P:claim/juice-yield-increase\n\
+    \    - T:event/juice-pressing\n    - T:event/bottle-counting\n  - sentence: 7\n    lines: '13'\n    items:\n\
+    \    - L:term/mould\n    - E:person/mara-okafor\n    - E:person/author\n    - E:org/volunteers\n    - E:thing/leaf-mould\n\
+    \    - P:claim/leaf-mould-causes-yield-increase\n    - T:event/leaf-mould-spreading\n  - sentence: 8\n    lines:\
+    \ '14'\n    items:\n    - E:person/mara-okafor\n    - E:person/author\n    - E:thing/leaf-mould\n    - K:concept/warm-wet-spring\n\
+    \    - P:claim/leaf-mould-causes-yield-increase\n    - P:claim/warm-spring-causes-yield-increase\n  - sentence:\
+    \ 9\n    lines: 14-15\n    items:\n    - E:person/mara-okafor\n    - E:person/author\n    - E:thing/leaf-mould\n\
+    \    - K:concept/warm-wet-spring\n    - P:claim/leaf-mould-causes-yield-increase\n    - P:claim/warm-spring-causes-yield-increase\n\
+    \  - sentence: 10\n    lines: '17'\n    items:\n    - E:person/mara-okafor\n    - E:person/author\n    - E:org/parish-council\n\
+    \    - E:place/meadow-strip\n    - P:claim/july-mowing-harms-orchard\n    - T:event/july-mowing\n  - sentence:\
+    \ 11\n    lines: 18-19\n    items:\n    - L:term/pollinator\n    - E:person/mara-okafor\n    - E:person/author\n\
+    \    - E:org/parish-council\n    - E:place/meadow-strip\n    - K:concept/pollinator-dependency\n    - P:claim/july-mowing-harms-orchard\n\
     \  - sentence: 12\n    lines: 19-20\n    items:\n    - L:term/pollinator\n    - E:person/mara-okafor\n    -\
-    \ E:place/hollins-lane-orchard\n    - E:place/meadow-strip\n    - K:concept/pollinator-dependence\n    - P:claim/meadow-mowing-threat\n\
-    \  - sentence: 13\n    lines: '22'\n    items:\n    - E:person/mara-okafor\n    - T:event/council-letter-request\n\
-    \  - sentence: 14\n    lines: 22-23\n    items:\n    - E:person/mara-okafor\n    - T:event/council-letter-request\n\
-    atem:\n  line: Mara Okafor and the narrator defend the Hollins Lane orchard by challenging the council's July\
-    \ mowing plan\n    that threatens pollinators.\n  focus: The text contrasts the orchard's improved yield with\
-    \ the danger of early mowing, directing attention to\n    the need for pollinators.\n  push: The author wants\
-    \ the reader to support delaying the mowing until September to protect the orchard's fruit\n    production.\n\
-    \  pull: The text assumes the meadow strip is the sole source of pollinators and ignores the lease's legal ambiguity\n\
-    \    regarding mowing rights.\nnodes:\n- id: L:term/pollinate\n  type: term\n  name: pollinate\n  summary: To\
-    \ transfer pollen to a flower's stigma, enabling fertilization, as described for apple trees.\n  sense: The\
-    \ biological process of pollen transfer\n  span:\n    lines: '8'\n  provenance:\n    mode: derived\n    sources:\n\
+    \ E:person/author\n    - E:org/parish-council\n    - K:concept/pollinator-dependency\n    - P:claim/july-mowing-harms-orchard\n\
+    \  - sentence: 13\n    lines: '22'\n    items:\n    - E:person/mara-okafor\n    - E:person/author\n    - E:org/parish-council\n\
+    \    - P:claim/ask-council-to-wait\n  - sentence: 14\n    lines: 22-23\n    items:\n    - E:person/mara-okafor\n\
+    \    - E:person/author\n    - E:org/parish-council\n    - P:claim/ask-council-to-wait\natem:\n  line: The Hollins\
+    \ Lane orchard produced 140 litres of juice this year, up from 90 last year, and the group agreed\n    to ask\
+    \ the council to wait until September to mow the meadow strip to protect pollinators.\n  focus: The text details\
+    \ the orchard's increased juice yield and the group's plan to delay mowing. The author highlights\n    the dependency\
+    \ between the meadow strip and fruit pollination.\n  push: The reader should support the request to delay mowing\
+    \ to protect the pollinators essential for the orchard's\n    fruit production.\n  pull: The text assumes the\
+    \ meadow strip is the primary pollinator source and that the council will accept the\n    delay request.\nnodes:\n\
+    - id: L:term/pollinate\n  type: term\n  name: pollinate\n  summary: To transfer pollen to a flower's stigma,\
+    \ enabling fertilization.\n  sense: verb\n  span:\n    lines: '8'\n  provenance:\n    mode: derived\n    sources:\n\
     \    - text.md#L8\n    confidence: 0.95\n    state: known\n  feed:\n    word: pollinate\n    pos: verb\n   \
     \ origin: feed\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine:\
     \ model:Qwen3.8-27B-Q4_K_M.gguf\n- id: L:term/pollinator\n  type: term\n  name: pollinator\n  summary: An agent,\
-    \ often an insect, that carries pollen from flower to flower, which the orchard depends on.\n  sense: An insect\
-    \ that aids in fertilization\n  span:\n    lines: '19'\n  provenance:\n    mode: derived\n    sources:\n   \
-    \ - text.md#L19\n    confidence: 0.95\n    state: known\n  feed:\n    word: pollinator\n    pos: noun\n    origin:\
+    \ often an insect, that carries pollen from flower to flower.\n  sense: noun\n  span:\n    lines: '19'\n  provenance:\n\
+    \    mode: derived\n    sources:\n    - text.md#L19\n    confidence: 0.95\n    state: known\n  feed:\n    word:\
+    \ pollinator\n    pos: noun\n    origin: feed\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n  \
+    \  step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: L:term/hearsay\n  type: term\n \
+    \ name: hearsay\n  summary: Information passed along secondhand, repeated from what someone else said rather\
+    \ than known directly.\n  sense: noun\n  span:\n    lines: '5'\n  provenance:\n    mode: derived\n    sources:\n\
+    \    - text.md#L5\n    confidence: 0.95\n    state: known\n  feed:\n    word: hearsay\n    pos: noun\n    origin:\
     \ feed\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n\
-    - id: L:term/hearsay\n  type: term\n  name: hearsay\n  summary: Information passed along secondhand, used here\
-    \ to describe the unverified claim about the Bramley tree's\n    age.\n  sense: Information reported without\
-    \ direct evidence\n  span:\n    lines: '5'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L5\n\
-    \    confidence: 0.95\n    state: known\n  feed:\n    word: hearsay\n    pos: noun\n    origin: feed\n  made:\n\
-    \    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n\
     - id: L:term/leaflet\n  type: term\n  name: leaflet\n  summary: A small printed sheet distributed for information,\
-    \ used here to refer to a nursery document about apple\n    pollination.\n  sense: A printed informational document\n\
-    \  span:\n    lines: '8'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L8\n    confidence:\
-    \ 0.9\n    state: known\n  feed:\n    word: leaflet\n    pos: noun\n    origin: feed\n  made:\n    move: derive\n\
+    \ here referring to a nursery document.\n  sense: noun\n  span:\n    lines: '8'\n  provenance:\n    mode: derived\n\
+    \    sources:\n    - text.md#L8\n    confidence: 0.95\n    state: known\n  feed:\n    word: leaflet\n    pos:\
+    \ noun\n    origin: feed\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n\
+    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: L:term/quirk\n  type: term\n  name: quirk\n  summary: A small\
+    \ peculiarity of behavior or style, here used to describe a local idiosyncrasy.\n  sense: noun\n  span:\n  \
+    \  lines: '8'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L8\n    confidence: 0.95\n    state:\
+    \ known\n  feed:\n    word: quirk\n    pos: noun\n    origin: feed\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n\
+    \    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: L:term/mould\n  type: term\n \
+    \ name: mould\n  summary: A fuzzy fungal growth or loose soil rich in organic matter, here referring to leaf\
+    \ mould.\n  sense: noun\n  span:\n    lines: '13'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L13\n\
+    \    confidence: 0.95\n    state: known\n  feed:\n    word: mould\n    pos: noun\n    origin: feed\n  made:\n\
+    \    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n\
+    - id: E:person/mara-okafor\n  type: person\n  name: Mara Okafor\n  summary: The keeper of the Hollins Lane orchard\
+    \ since 2019, who plans to write a letter to the council.\n  span:\n    lines: 3-22\n  provenance:\n    mode:\
+    \ derived\n    sources:\n    - text.md#L3\n    confidence: 0.95\n    state: known\n  made:\n    move: derive\n\
     \    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id:\
-    \ L:term/quirk\n  type: term\n  name: quirk\n  summary: A small peculiarity of behavior or style, used here\
-    \ to describe a local custom that is actually a biological\n    necessity.\n  sense: An idiosyncrasy or peculiarity\n\
-    \  span:\n    lines: '8'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L8\n    confidence:\
-    \ 0.9\n    state: known\n  feed:\n    word: quirk\n    pos: noun\n    origin: feed\n  made:\n    move: derive\n\
-    \    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id:\
-    \ L:term/mould\n  type: term\n  name: mould\n  summary: A fuzzy fungal growth or loose soil rich in organic\
-    \ matter, used here to refer to leaf mould used as\n    mulch.\n  sense: Decomposed organic matter used as mulch\n\
-    \  span:\n    lines: '13'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L13\n    confidence:\
-    \ 0.9\n    state: known\n  feed:\n    word: mould\n    pos: noun\n    origin: feed\n  made:\n    move: derive\n\
-    \    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id:\
-    \ E:person/mara-okafor\n  type: person\n  name: Mara Okafor\n  summary: The keeper of the Hollins Lane orchard\
-    \ since 2019, who believes leaf mould improved the yield and will\n    write to the council.\n  span:\n    lines:\
-    \ 3-22\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L3, notes.md#L14, notes.md#L22\n    confidence:\
-    \ 0.95\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n\
-    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: E:place/hollins-lane-orchard\n  type: place\n  name: Hollins\
-    \ Lane orchard\n  summary: An orchard on Hollins Lane that pressed 140 litres of juice this year and depends\
-    \ on nearby pollinators.\n  span:\n    lines: 1-20\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L1,\
-    \ notes.md#L10, notes.md#L20\n    confidence: 0.95\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n\
+    \ E:person/author\n  type: person\n  name: Author\n  summary: The narrator who counted the bottles and is less\
+    \ sure about the cause of the yield increase.\n  span:\n    lines: 11-23\n  provenance:\n    mode: derived\n\
+    \    sources:\n    - text.md#L11\n    confidence: 0.95\n    state: known\n  made:\n    move: derive\n    run:\
+    \ 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: E:org/parish-council\n\
+    \  type: org\n  name: Parish council\n  summary: The local governing body whose grounds team wants to mow the\
+    \ meadow strip in July.\n  span:\n    lines: 17-22\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L17\n\
+    \    confidence: 0.95\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step:\
+    \ 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: E:org/volunteers\n  type: org\n  name:\
+    \ Volunteers\n  summary: A group of people who spread leaf mould under the orchard trees in March.\n  span:\n\
+    \    lines: '13'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L13\n    confidence: 0.9\n \
+    \   state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n   \
+    \ engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: E:place/hollins-lane-orchard\n  type: place\n  name: Hollins\
+    \ Lane orchard\n  summary: The orchard kept by Mara Okafor, located on Hollins Lane, which produced 140 litres\
+    \ of juice this year.\n  span:\n    lines: 1-10\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L1\n\
+    \    confidence: 0.95\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step:\
+    \ 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: E:place/meadow-strip\n  type: place\n \
+    \ name: Meadow strip\n  summary: A strip of land adjacent to the orchard that exists to feed pollinators and\
+    \ is planned for mowing in\n    July.\n  span:\n    lines: 17-18\n  provenance:\n    mode: derived\n    sources:\n\
+    \    - text.md#L17\n    confidence: 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n\
     \    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: E:thing/bramley-apple-tree\n \
     \ type: thing\n  name: Bramley apple tree\n  summary: An old apple tree by the gate, claimed to be the oldest\
-    \ tree on the lane.\n  span:\n    lines: '4'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L4\n\
+    \ on the lane.\n  span:\n    lines: 3-4\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L3\n\
     \    confidence: 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step:\
-    \ 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: E:org/parish-councils-grounds-team\n  type:\
-    \ org\n  name: Parish council's grounds team\n  summary: The team that wants to mow the meadow strip in July.\n\
-    \  span:\n    lines: '17'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L17\n    confidence:\
-    \ 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n\
-    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: E:place/meadow-strip\n  type: place\n  name: Meadow strip\n\
-    \  summary: A strip of land that exists to feed the pollinators the orchard depends on.\n  span:\n    lines:\
-    \ 17-19\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L17, notes.md#L19\n    confidence: 0.9\n\
-    \    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n  \
-    \  engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: E:thing/leaf-mould\n  type: thing\n  name: Leaf mould\n  summary:\
-    \ A mulch material spread under the trees by volunteers in March.\n  span:\n    lines: '13'\n  provenance:\n\
-    \    mode: derived\n    sources:\n    - text.md#L13\n    confidence: 0.9\n    state: known\n  made:\n    move:\
+    \ 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: E:thing/leaf-mould\n  type: thing\n  name:\
+    \ Leaf mould\n  summary: A mulch material spread under the orchard trees in March, believed by Mara to have\
+    \ improved yields.\n  span:\n    lines: 13-14\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L13\n\
+    \    confidence: 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step:\
+    \ 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: K:concept/apple-pollination\n  type: concept\n\
+    \  name: Apple pollination\n  summary: The biological process where apple trees require a second variety nearby\
+    \ to set fruit.\n  span:\n    lines: 7-8\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L7-L8\n\
+    \    confidence: 0.95\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step:\
+    \ 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: K:concept/warm-wet-spring\n  type: concept\n\
+    \  name: Warm wet spring\n  summary: A weather condition characterized by warmth and moisture that benefits\
+    \ orchard growth.\n  span:\n    lines: '14'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L14\n\
+    \    confidence: 0.8\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step:\
+    \ 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: K:concept/pollinator-dependency\n  type:\
+    \ concept\n  name: Pollinator dependency\n  summary: The reliance of the orchard on wildflowers in the meadow\
+    \ strip to support the insects that pollinate\n    the trees.\n  span:\n    lines: 18-20\n  provenance:\n  \
+    \  mode: derived\n    sources:\n    - text.md#L18-L20\n    confidence: 0.9\n    state: known\n  made:\n    move:\
     \ derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n\
-    - id: K:concept/pollination\n  type: concept\n  name: Pollination\n  summary: The process by which pollen is\
-    \ transferred to a flower's stigma, enabling fertilization and fruit setting\n    in apple trees.\n  span:\n\
-    \    lines: '8'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L8\n    confidence: 0.95\n  \
-    \  state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine:\
-    \ model:Qwen3.8-27B-Q4_K_M.gguf\n- id: K:concept/leaf-mould\n  type: concept\n  name: Leaf mould\n  summary:\
-    \ A mulch material made from decomposed leaves, spread under trees to potentially improve orchard yield.\n \
-    \ span:\n    lines: '13'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L13\n    confidence:\
-    \ 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n\
-    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: K:concept/wildflower-seeding\n  type: concept\n  name: Wildflower\
-    \ seeding\n  summary: The process by which wildflowers produce seeds, which is prevented if the meadow is mowed\
-    \ in July.\n  span:\n    lines: '18'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L18\n  \
-    \  confidence: 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n\
-    \    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: K:concept/pollinator-dependence\n  type: concept\n\
-    \  name: Pollinator dependence\n  summary: The orchard's reliance on insects from the meadow strip to pollinate\
-    \ its apple trees and set fruit.\n  span:\n    lines: 19-20\n  provenance:\n    mode: derived\n    sources:\n\
-    \    - text.md#L19-L20\n    confidence: 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n\
-    \    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/oldest-tree-status\n \
-    \ type: claim\n  name: Oldest tree status\n  summary: The Bramley apple tree by the gate is the oldest tree\
-    \ on the lane, but this is hearsay because parish\n    records do not state its planting date.\n  stance: hearsay\n\
-    \  salience: normal\n  roles:\n    actor: E:person/mara-okafor\n    object: E:thing/bramley-apple-tree\n   \
-    \ source:\n      pending: E:org/parish-records is not an item of this twin\n  links:\n  - rel: mentions\n  \
-    \  to: L:term/hearsay\n  span:\n    lines: 3-5\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L3-L5\n\
-    \    confidence: 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step:\
-    \ 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/apple-pollination-requirement\n\
-    \  type: claim\n  name: Apple pollination requirement\n  summary: Every apple tree needs a second variety nearby\
-    \ to set fruit because that is how apples pollinate.\n  stance: axiom\n  salience: critical\n  roles:\n    actor:\n\
-    \      pending: E:thing/apple-tree is not an item of this twin\n    object:\n      pending: E:thing/second-variety\
-    \ is not an item of this twin\n    cause: K:concept/pollination\n  links:\n  - rel: supports\n    to: P:claim/meadow-mowing-threat\n\
-    \  span:\n    lines: 7-8\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L7-L8\n    confidence:\
-    \ 0.95\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n\
-    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/juice-yield-increase\n  type: claim\n  name: Juice\
-    \ yield increase\n  summary: The orchard pressed 140 litres of juice this year, which is an increase from 90\
-    \ litres last year.\n  stance: observed\n  salience: high\n  roles:\n    actor: E:place/hollins-lane-orchard\n\
-    \    object:\n      pending: E:thing/apple-juice is not an item of this twin\n  links:\n  - rel: supports\n\
-    \    to: P:claim/mulch-effect-on-yield\n  span:\n    lines: 10-11\n  provenance:\n    mode: derived\n    sources:\n\
-    \    - text.md#L10-L11\n    confidence: 0.95\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n\
-    \    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/mulch-effect-on-yield\n\
-    \  type: claim\n  name: Mulch effect on yield\n  summary: Mara Okafor thinks the leaf mould spread under the\
-    \ trees in March made the difference in the juice yield\n    increase.\n  stance: opinion\n  salience: high\n\
-    \  roles:\n    actor: E:person/mara-okafor\n    object: E:thing/leaf-mould\n    effect: P:claim/juice-yield-increase\n\
-    \  links:\n  - rel: contradicts\n    to: P:claim/spring-weather-effect\n  span:\n    lines: 13-14\n  provenance:\n\
-    \    mode: derived\n    sources:\n    - text.md#L13-L14\n    confidence: 0.8\n    state: known\n  made:\n  \
-    \  move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n\
-    - id: P:claim/spring-weather-effect\n  type: claim\n  name: Spring weather effect\n  summary: A warm, wet spring\
-    \ would explain most of the juice yield increase, and every orchard in the valley did\n    well.\n  stance:\
-    \ deduced\n  salience: high\n  roles:\n    actor:\n      pending: E:thing/warm-wet-spring is not an item of\
-    \ this twin\n    object: P:claim/juice-yield-increase\n  links:\n  - rel: contradicts\n    to: P:claim/mulch-effect-on-yield\n\
+    - id: K:concept/parish-records\n  type: concept\n  name: Parish records\n  summary: Official documents that\
+    \ do not specify the planting date of the Bramley apple tree.\n  span:\n    lines: 4-5\n  provenance:\n    mode:\
+    \ derived\n    sources:\n    - text.md#L4-L5\n    confidence: 0.8\n    state: known\n  made:\n    move: derive\n\
+    \    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id:\
+    \ P:claim/juice-yield-increase\n  type: claim\n  name: Juice yield increase\n  summary: The Hollins Lane orchard\
+    \ produced 140 litres of juice this year, an increase from 90 litres last year.\n  stance: observed\n  salience:\
+    \ high\n  roles:\n    actor: E:person/mara-okafor\n    object: E:place/hollins-lane-orchard\n  span:\n    lines:\
+    \ 10-11\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L10-L11\n    confidence: 0.95\n    state:\
+    \ known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n\
+    - id: P:claim/leaf-mould-causes-yield-increase\n  type: claim\n  name: Leaf mould causes yield increase\n  summary:\
+    \ Mara Okafor believes that spreading leaf mould under the trees in March caused the increase in juice\n   \
+    \ production.\n  stance: opinion\n  salience: high\n  roles:\n    actor: E:person/mara-okafor\n    cause: E:thing/leaf-mould\n\
+    \    effect: P:claim/juice-yield-increase\n  span:\n    lines: 13-14\n  provenance:\n    mode: derived\n   \
+    \ sources:\n    - text.md#L13-L14\n    confidence: 0.8\n    state: known\n  made:\n    move: derive\n    run:\
+    \ 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/warm-spring-causes-yield-increase\n\
+    \  type: claim\n  name: Warm spring causes yield increase\n  summary: The author deduces that a warm, wet spring\
+    \ explains most of the orchard's improved performance, as all\n    valley orchards did well.\n  stance: deduced\n\
+    \  salience: high\n  roles:\n    cause: K:concept/warm-wet-spring\n    effect: P:claim/juice-yield-increase\n\
     \  span:\n    lines: 14-15\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L14-L15\n    confidence:\
-    \ 0.85\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n\
-    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/meadow-mowing-threat\n  type: claim\n  name: Meadow\
-    \ mowing threat\n  summary: Mowing the meadow strip in July would cut wildflowers before they seed, causing\
-    \ the orchard to lose the\n    pollinators it depends on to set fruit.\n  stance: deduced\n  salience: critical\n\
-    \  roles:\n    actor: E:org/parish-councils-grounds-team\n    object: E:place/meadow-strip\n    effect:\n  \
-    \    pending: E:thing/pollinators is not an item of this twin\n  links:\n  - rel: depends-on\n    to: P:claim/apple-pollination-requirement\n\
+    \ 0.7\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n\
+    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/july-mowing-harms-orchard\n  type: claim\n  name:\
+    \ July mowing harms orchard\n  summary: Mowing the meadow strip in July would cut wildflowers before they seed,\
+    \ removing the pollinators the\n    orchard depends on for fruit.\n  stance: deduced\n  salience: critical\n\
+    \  roles:\n    actor: E:org/parish-council\n    cause: T:event/july-mowing\n    effect: E:place/hollins-lane-orchard\n\
     \  span:\n    lines: 17-20\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L17-L20\n    confidence:\
     \ 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n\
-    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/lease-mowing-question\n  type: claim\n  name: Lease\
-    \ mowing question\n  summary: It is an open question whether the lease lets the parish mow the meadow strip\
-    \ without asking the orchard\n    keepers.\n  stance: assumed\n  salience: normal\n  roles:\n    actor:\n  \
-    \    pending: E:org/parish is not an item of this twin\n    object:\n      pending: E:thing/lease is not an\
-    \ item of this twin\n  span:\n    lines: '25'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L25\n\
-    \    confidence: 0.7\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step:\
-    \ 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: T:event/juice-pressing\n  type: event\n\
-    \  name: Juice pressing\n  summary: The orchard pressed 140 litres of juice this year.\n  agent: E:place/hollins-lane-orchard\n\
-    \  patient:\n    pending: E:thing/apple-juice is not an item of this twin\n  when: this year\n  span:\n    lines:\
-    \ '10'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L10\n    confidence: 0.95\n    state:\
-    \ known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n\
-    - id: T:event/leaf-mould-spread\n  type: event\n  name: Leaf mould spread\n  summary: Volunteers spread leaf\
-    \ mould under the trees in March.\n  agent:\n    pending: E:org/volunteers is not an item of this twin\n  patient:\
-    \ E:thing/leaf-mould\n  when: March\n  span:\n    lines: '13'\n  provenance:\n    mode: derived\n    sources:\n\
-    \    - text.md#L13\n    confidence: 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n\
-    \    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: T:event/meadow-mowing-plan\n \
-    \ type: event\n  name: Meadow mowing plan\n  summary: The parish council's grounds team wants to mow the meadow\
-    \ strip in July.\n  agent: E:org/parish-councils-grounds-team\n  patient: E:place/meadow-strip\n  when: July\n\
-    \  span:\n    lines: '17'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L17\n    confidence:\
-    \ 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n\
-    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: T:event/council-letter-request\n  type: event\n  name: Council\
-    \ letter request\n  summary: Mara Okafor will write a letter to ask the council to wait until September to mow\
-    \ the meadow strip.\n  agent: E:person/mara-okafor\n  patient:\n    pending: E:org/parish-council is not an\
-    \ item of this twin\n  when: future\n  span:\n    lines: 22-23\n  provenance:\n    mode: derived\n    sources:\n\
-    \    - text.md#L22-L23\n    confidence: 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n\
-    \    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n"
+    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/bramley-is-oldest-tree\n  type: claim\n  name: Bramley\
+    \ is oldest tree\n  summary: Mara Okafor states that the old Bramley apple tree by the gate is the oldest tree\
+    \ on the lane, though\n    parish records do not confirm the planting date.\n  stance: hearsay\n  salience:\
+    \ normal\n  roles:\n    actor: E:person/mara-okafor\n    object: E:thing/bramley-apple-tree\n    source: E:person/mara-okafor\n\
+    \  span:\n    lines: 3-5\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L3-L5\n    confidence:\
+    \ 0.6\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n\
+    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/cross-pollination-required\n  type: claim\n  name:\
+    \ Cross-pollination required\n  summary: Apple trees require a second variety nearby to set fruit, a biological\
+    \ necessity rather than a local\n    quirk.\n  stance: axiom\n  salience: high\n  roles:\n    object: K:concept/apple-pollination\n\
+    \  span:\n    lines: 7-8\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L7-L8\n    confidence:\
+    \ 0.95\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n\
+    \    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/ask-council-to-wait\n  type: claim\n  name: Ask council\
+    \ to wait\n  summary: The group agreed to ask the parish council to delay mowing the meadow strip until September\
+    \ to protect\n    pollinators.\n  stance: observed\n  salience: high\n  roles:\n    actor: E:person/author\n\
+    \    object: E:org/parish-council\n  span:\n    lines: 22-23\n  provenance:\n    mode: derived\n    sources:\n\
+    \    - text.md#L22-L23\n    confidence: 0.95\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n\
+    \    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: P:claim/lease-uncertainty\n  type:\
+    \ claim\n  name: Lease uncertainty\n  summary: It is an open question whether the lease allows the parish to\
+    \ mow the meadow strip without asking the\n    orchard keepers.\n  stance: assumed\n  salience: normal\n  roles:\n\
+    \    object:\n      pending: E:thing/lease is not an item of this twin\n  span:\n    lines: '25'\n  provenance:\n\
+    \    mode: derived\n    sources:\n    - text.md#L25\n    confidence: 0.5\n    state: known\n  made:\n    move:\
+    \ derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n\
+    - id: T:event/juice-pressing\n  type: event\n  name: Juice pressing\n  summary: The orchard pressed 140 litres\
+    \ of apple juice this year.\n  agent: E:place/hollins-lane-orchard\n  patient:\n    pending: E:thing/apple-juice\
+    \ is not an item of this twin\n  when: this year\n  span:\n    lines: '10'\n  provenance:\n    mode: derived\n\
+    \    sources:\n    - text.md#L10\n    confidence: 0.95\n    state: known\n  made:\n    move: derive\n    run:\
+    \ 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: T:event/leaf-mould-spreading\n\
+    \  type: event\n  name: Leaf mould spreading\n  summary: Volunteers spread leaf mould under the orchard trees\
+    \ in March.\n  agent: E:org/volunteers\n  patient: E:thing/leaf-mould\n  when: March\n  span:\n    lines: '13'\n\
+    \  provenance:\n    mode: derived\n    sources:\n    - text.md#L13\n    confidence: 0.9\n    state: known\n\
+    \  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n\
+    - id: T:event/july-mowing\n  type: event\n  name: July mowing\n  summary: The parish council's grounds team\
+    \ plans to mow the meadow strip in July.\n  agent: E:org/parish-council\n  patient: E:place/meadow-strip\n \
+    \ when: July\n  span:\n    lines: '17'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L17\n\
+    \    confidence: 0.9\n    state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step:\
+    \ 1\n    node: '1'\n    engine: model:Qwen3.8-27B-Q4_K_M.gguf\n- id: T:event/bottle-counting\n  type: event\n\
+    \  name: Bottle counting\n  summary: The author counted the juice bottles on 12 October.\n  agent: E:person/author\n\
+    \  patient:\n    pending: E:thing/juice-bottles is not an item of this twin\n  when: 12 October\n  span:\n \
+    \   lines: '11'\n  provenance:\n    mode: derived\n    sources:\n    - text.md#L11\n    confidence: 0.95\n \
+    \   state: known\n  made:\n    move: derive\n    run: 2026-11-01-2148-35b5\n    step: 1\n    node: '1'\n   \
+    \ engine: model:Qwen3.8-27B-Q4_K_M.gguf\n"
 - path: morph.cosm
-  sha256: 070f6b812190b180086af09bdc081587f79c412fc20d5403fffb788d4e6b8a6b
+  sha256: b6597718f557f36836706872d9bc6d60eb06d08ad07b20b0ef2189f6efa04b27
   role: morph
   text: "oes: thym/1\nkind: morph\nid: thym/notes\nname: notes\nnodes:\n- id: M:morph/notes\n  type: morph\n  name:\
     \ notes\n  summary: How notes.md departs from the null telling of its fabula, on ten scales.\n  scales:\n  \
-    \  register: 3\n    sentence-length: 2\n    paragraph-rhythm: 2\n    analytical-depth: 3\n    figurative-density:\
+    \  register: 3\n    sentence-length: 2\n    paragraph-rhythm: 2\n    analytical-depth: 1\n    figurative-density:\
     \ 1\n    stance-style: 1\n    person-voice: 3\n    formality: 1\n    humour: 1\n    allusion: 1\n  evidence:\n\
     \    register:\n    - That is not a local quirk; it is how apples pollinate, and the nursery leaflet says the\
     \ same.\n    - Mara thinks the mulch made the difference.\n    - Mowing then would cut the wildflowers before\
@@ -236,9 +241,8 @@ contents:
     \ orchard in the valley did well.'\n    - Mowing then would cut the wildflowers before they seed, and the strip\
     \ exists to feed the pollinators the orchard\n      depends on.\n    paragraph-rhythm:\n    - The rise came\
     \ after the volunteers spread leaf mould under the trees in March.\n    - 'Open question: does the lease let\
-    \ the parish mow without asking us?'\n    analytical-depth:\n    - Every apple tree needs a second variety nearby\
-    \ to set fruit.\n    - That is not a local quirk; it is how apples pollinate, and the nursery leaflet says the\
-    \ same.\n    - This year the orchard pressed 140 litres of juice, up from 90 last year.\n    figurative-density:\n\
+    \ the parish mow without asking us?'\n    analytical-depth:\n    - Mara Okafor, who has kept the Hollins Lane\
+    \ orchard since 2019, says the old Bramley by the gate is the oldest\n      tree on the lane.\n    figurative-density:\n\
     \    - Mara Okafor, who has kept the Hollins Lane orchard since 2019, says the old Bramley by the gate is the\
     \ oldest\n      tree on the lane.\n    stance-style:\n    - Mara Okafor, who has kept the Hollins Lane orchard\
     \ since 2019, says the old Bramley by the gate is the oldest\n      tree on the lane.\n    person-voice:\n \
@@ -254,7 +258,7 @@ contents:
     \ judgement\n  confidence:\n    register: 50\n    sentence-length: 50\n    paragraph-rhythm: 50\n    analytical-depth:\
     \ 50\n    figurative-density: 40\n    stance-style: 50\n    person-voice: 50\n    formality: 50\n    humour:\
     \ 40\n    allusion: 40\n  pinned: []\n  derived:\n    from:\n    - notes.md#sha256:54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7\n\
-    \    against: sha256:0361af3a32ed6d8607fb835d88d56e2093f1eed79a2d78a528725d7304a48b06\n    at: 2026-11-02 02:48:11+00:00\n\
+    \    against: sha256:76da9a4af15f57b89eaadb6e309485c83af798f90f0874486c03a97431d84104\n    at: 2026-11-05 21:53:05+00:00\n\
     \    by: model:Qwen3.8-27B-Q4_K_M.gguf\n  shared: false\n  provenance:\n    mode: derived\n    sources:\n  \
     \  - notes.md\n  made:\n    move: measure\n    run: 2026-11-01-2148-35b5\n    step: 3\n    node: '4'\n    engine:\
     \ model:Qwen3.8-27B-Q4_K_M.gguf\n"
@@ -264,7 +268,7 @@ made:
     sha256: 5bf1730785d53906879af4224bec6069d77ef3888490fed182f29bc8e6930945
   trace:
     run: 2026-11-01-2148-35b5
-  at: 2026-11-02 02:48:11+00:00
+  at: 2026-11-05 21:53:05+00:00
   by: thym 0
 notice: A Thym package. The text is its author's; the fabula, morph and context describe it. Readings made from
   it are the reader's and are labelled.

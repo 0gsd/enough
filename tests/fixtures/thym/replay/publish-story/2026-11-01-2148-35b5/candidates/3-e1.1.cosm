@@ -1,0 +1,7 @@
+engine: canon.short_footer
+inputs:
+  call: be848d0c3fe26ca9c0efaac89d7768a62d66aa74707af1db454eb15b91f5e271
+keys: []
+tokens: 0
+seconds: 0
+output: '*a short of notes.md, told as the author told it, compiled from its EMF twin on 2026-11-05 by Qwen3.8-27B-Q4_K_M.gguf*'

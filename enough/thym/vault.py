@@ -61,6 +61,8 @@ import re
 import secrets
 from typing import Any
 
+import yaml
+
 from enough import macrocosm as mc
 from enough.thym import MINICOSM, Refusal
 
@@ -72,6 +74,13 @@ TAG_BYTES = 16
 SALT_BYTES = 16
 ITERATIONS = 600000
 MAX_ITERATIONS = 10_000_000                   # a file asking for more is refused rather than computed
+# What a stranger's file may cost before any key, as Comprise's reader holds it (comprise-dev core/vault.py, its review
+# of 2026-11-03): a size read first, a YAML stream read with no anchors or aliases and a cap on its pieces and depth,
+# and what opens held to a multiple of the file before any chunk is joined.
+MAX_SEALED = 256 * 1024 * 1024               # 256 MiB, Comprise Connect's limit: a larger file is not read at all
+MAX_OPENED_RATIO = 4                          # what opens, against the file it came in (base64 alone makes it 3/4)
+MAX_SEALED_EVENTS = 10_000                    # YAML pieces in the clear part: about 35, and 6 per chunk
+MAX_YAML_DEPTH = 64                           # how deep the clear part may nest; a sealed file nests 4 deep
 INFO_CHUNK_ID = b"comprise chunk-id"
 INFO_CHUNK_KEY = b"comprise chunk-key"
 MANIFEST_AAD = b"manifest"
@@ -258,10 +267,44 @@ def seal(data: bytes, *, path: str = "package.cosm", slug: str = "package", now:
     return mc.dump(doc).encode("utf-8"), code
 
 
+class NotPlainYaml(yaml.YAMLError):
+    """A clear part this reader will not build: an anchor or an alias, or too many pieces, or too deep."""
+
+
+def plain_yaml_events(text: str, max_events: int = MAX_SEALED_EVENTS) -> int:
+    """Read `text` as a stream, holding nothing, and stop at the first anchor, alias, or piece or level too many: an
+    answer from the parser itself, before anything is built (Comprise's `model.plain_yaml_events`). -> its pieces."""
+    depth = events = 0
+    for ev in yaml.parse(text, Loader=mc.Loader):
+        events += 1
+        if events > max_events:
+            raise NotPlainYaml(f"more than {max_events} pieces")
+        if isinstance(ev, yaml.AliasEvent) or getattr(ev, "anchor", None) is not None:
+            raise NotPlainYaml("an anchor or an alias")
+        if isinstance(ev, (yaml.SequenceStartEvent, yaml.MappingStartEvent)):
+            depth += 1
+            if depth > MAX_YAML_DEPTH:
+                raise NotPlainYaml(f"nested more than {MAX_YAML_DEPTH} deep")
+        elif isinstance(ev, (yaml.SequenceEndEvent, yaml.MappingEndEvent)):
+            depth -= 1
+    return events
+
+
 def header(sealed: bytes) -> dict | Refusal:
-    """A sealed file's clear header (its `encrypted:` block and catalog keys), or a refusal when it is not one."""
+    """A sealed file's clear header (its `encrypted:` block and catalog keys), or a refusal when it is not one.
+    Anyone can hand a file to this with no key, so it is held to `MAX_SEALED` first, then read as a stream with no
+    anchors or aliases and at most `MAX_SEALED_EVENTS` pieces (`plain_yaml_events`), and only then built."""
+    if not isinstance(sealed, (bytes, bytearray)):
+        return Refusal("run", "sealed", "not a sealed package")
+    if len(sealed) > MAX_SEALED:
+        return Refusal("run", "sealed", f"larger than any sealed package can be ({MAX_SEALED // (1024 * 1024)} MiB), "
+                                        "so it was not read")
     try:
-        doc = mc.yaml_load(bytes(sealed).decode("utf-8-sig"))
+        text = bytes(sealed).decode("utf-8-sig")
+        plain_yaml_events(text)
+        doc = mc.yaml_load(text)
+    except NotPlainYaml as e:
+        return Refusal("run", "sealed", f"not a sealed package: its clear part holds {e}, which a sealed file never does")
     except Exception as e:  # noqa: BLE001 - anything a changed file can be
         return Refusal("run", "sealed", f"not a sealed package: it cannot be read ({type(e).__name__})")
     enc = doc.get("encrypted") if isinstance(doc, dict) else None
@@ -314,8 +357,17 @@ def open(sealed: bytes, key_text: str) -> bytes | Refusal:  # noqa: A001 - the A
             or manifest.get("id") != enc.get("bundle") or not isinstance(files, list) or len(files) != 1):
         return Refusal("run", "sealed", "the manifest is not this package's")
     f = files[0]
+    ids = f.get("chunks") if isinstance(f, dict) else None
+    if not isinstance(ids, list) or not all(isinstance(c, str) for c in ids):
+        return Refusal("run", "sealed", "the sealed package was changed: its chunk list cannot be read")
+    # A manifest may name one chunk over and over (a bundle shares a repeated chunk, and this reader takes one), so how
+    # far a file can open is held down before anything is joined, by the objects' own sizes, not the manifest's word.
+    opened = sum(max(len(objects[c]) - NONCE_BYTES - TAG_BYTES, 0) for c in ids if c in objects)
+    if opened > MAX_SEALED or opened > MAX_OPENED_RATIO * len(sealed):
+        return Refusal("run", "sealed", "the sealed package says it opens to far more than it holds, so it was not "
+                                        "opened; ask whoever sent it to seal it again")
     parts = []
-    for cid in f.get("chunks") or []:
+    for cid in ids:
         if not isinstance(cid, str) or not _HEX64.match(cid) or cid not in objects:
             return Refusal("run", "sealed", "the sealed package was changed: a chunk is missing")
         try:
@@ -331,4 +383,5 @@ def open(sealed: bytes, key_text: str) -> bytes | Refusal:  # noqa: A001 - the A
     return data
 
 
-__all__ = ["FORMAT", "ITERATIONS", "have_aes_gcm", "header", "open", "seal"]
+__all__ = ["FORMAT", "ITERATIONS", "MAX_OPENED_RATIO", "MAX_SEALED", "MAX_SEALED_EVENTS", "have_aes_gcm", "header",
+           "open", "plain_yaml_events", "seal"]

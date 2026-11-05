@@ -54,7 +54,8 @@ from enough.thym.coprocessor import prose_problem
 from enough.thym.engines import CallCounter, EngineRefusal, Recording, Replaying, recorded_names
 from enough.thym.registry import Amount, Request, Where, decl_get
 from enough.thym.trace import Trace, default_root, digest_row, node_number, write_atomic
-from enough.thym.values import NOTHING, Value, canonical, load_input, members, plain, sha256_bytes, stamp, wrap
+from enough.thym.values import (NOTHING, Value, canonical, item_key, load_input, members, plain, posix_path,
+                                 sha256_bytes, stamp, wrap)
 
 MODIFIERS = ("as", "by", "with", "to", "against", "of", "in", "where", "marked")
 UNITS = ("words", "sentences")
@@ -783,16 +784,18 @@ class MoveContext:
     calls: Any = field(default=None, repr=False)
 
     def withhold(self, *items: Any) -> None:
-        """Mark items withheld from the projection (THYM.md 18): values (items, or a list of them) or ids."""
+        """Mark items withheld from the projection (THYM.md 18): values (items, or a list of them) or ids. An item is
+        held by its own key (`values.item_key`: its id qualified with its part), so withholding one item never takes
+        a twin that shares its id in another part; an id given as a word is held as that word (`values.is_withheld`)."""
         for x in items:
             if isinstance(x, (list, tuple)):
                 self.withhold(*x)
             elif isinstance(x, Value) and x.type == "list":
                 self.withhold(*(x.payload or []))
             elif isinstance(x, Value):
-                iid = (x.origin or {}).get("id") or (x.mapping() or {}).get("id")
-                if iid:
-                    self.withheld[str(iid)] = x
+                key = item_key(x)
+                if key:
+                    self.withheld[key] = x
             elif isinstance(x, str) and x:
                 self.withheld[x] = NOTHING
 
@@ -1023,7 +1026,7 @@ class _Run:
                 return v
             name = str(spec.get("name"))
             self.inputs[name] = v
-            self.input_paths[name] = str(spec.get("path"))
+            self.input_paths[name] = posix_path(spec.get("path"))
         if (self.preflight is not None and asks and not self.rules
                 and not isinstance(self.coproc, (RefusingCoprocessor, ReplayCoprocessor))):
             try:
@@ -1293,12 +1296,37 @@ class _Run:
             rows = [r for r in rows if self._cond(loop.cond, scope, item=r)]
         outs = []
         for k, r in enumerate(rows, 1):
-            v = self._eval(st.expr, scope.child({loop.var: r}))
+            try:
+                v = self._eval(st.expr, scope.child({loop.var: r}))
+            except _Stop as s:
+                raise _Stop(self._whole_list_note(s.refusal)) from None
             self._deliver(st, v, self.cur.node, k)
             outs.append(v)
         g = self.cur.node.get("gives")
         if isinstance(g, str):
             self.env[g] = Value("list", outs)
+
+    def _whole_list_note(self, r: Refusal) -> Refusal:
+        """A refusal inside a `for each` whose node takes a temporary another repeating node gave: that temporary is
+        the list of every pass's result, not this pass's (a call nested inside a call in a loop is planned as a node
+        of its own, which walks the whole collection first; THYM.md 11.1). The refusal is the move's or the check's
+        own; this only says why the value was a list, and what to write instead. Wording only: nothing is refused
+        here that was not refused before."""
+        node = self.cur.node if self.cur is not None else {}
+        whole = [(t, self.by_id.get(g)) for t in node.get("takes") or []
+                 if re.fullmatch(r"t\d+", str(t)) for g in [f"R:node/{str(t)[1:]}"]]
+        whole = [(t, n) for t, n in whole if isinstance(n, dict) and n.get("repeats") and n.get("gives") == t]
+        if not whole:
+            return r
+        t, giver = whole[0]
+        inner = str(giver.get("name") or "").split(", for each ", 1)[0]
+        note = (f"; here {t} is not this pass's value but the list of every pass's result of node "
+                f"{node_number(giver.get('id'))} ({inner}): a call nested inside another call in a for each is "
+                "planned as its own node, which walks the whole collection first. Write the calls as a move of their "
+                "own and call that move in the loop, as open-house's offer-line does")
+        if note in r.message:
+            return r
+        return Refusal(r.stage, r.check, r.message + note, line=r.line, file=r.file)
 
     def _assert(self, st: Stmt, scope: _Scope) -> None:
         ok = self._cond(st.cond, scope)
@@ -1702,7 +1730,7 @@ class _Run:
         for rec in self.records:
             for row in rec.get("outputs") or []:
                 if row.get("name") == name and name in landed:
-                    row["path"] = str(landed[name])
+                    row["path"] = posix_path(landed[name])        # the same on every system (values.posix_path)
         for n, rel in landed.items():
             self.trace.outputs[n] = self.dir / rel
             if self.destination is not None:

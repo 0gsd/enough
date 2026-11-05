@@ -30,6 +30,7 @@ from enough.thym import trace as T
 from enough.thym import moves as M
 from enough.thym.moves import edit, emf, morph, pack, project
 from enough.thym.registry import Amount, Request
+from enough.thym import values as V
 from enough.thym.values import NOTHING, Value, digest_path, read_value
 from tests.test_thym_run import FakeCoprocessor, hand_plan, lint_errors, node
 
@@ -396,7 +397,65 @@ def test_band_mark_and_withhold(tmp_path):
     assert not verdict("verified-only-where-derived", claim, node_={"modifiers": {"as": "verified"}})[0]
     where = R.Where("visibility is internal", lambda r: r.field("visibility") == "internal")
     assert project.withhold(ctx, meadow, where=where) is None
-    assert "C:entity/meadow-software-inc" in ctx.withheld and "P:service/reconcile" not in ctx.withheld
+    assert "atom/meadow//C:entity/meadow-software-inc" in ctx.withheld          # held by its key, not its bare id
+    assert "atom/meadow//P:service/reconcile" not in ctx.withheld
+    assert "C:entity/meadow-software-inc" not in ctx.withheld
+
+
+def _twins() -> tuple[Value, Value]:
+    """Two concerns' items that share an id, as Wikimedia's Foundation and Endowment each hold `M:audience/donors`."""
+    def row(atom: str, name: str, vis: str) -> Value:
+        iid = "M:audience/donors"
+        return Value("item", {"id": iid, "type": "audience", "name": name, "visibility": vis, "status": "active"},
+                     origin={"item": True, "id": iid, "key": f"atom/{atom}//{iid}", "kind": "audience",
+                             "oes": "comprise/1"})
+    return row("wmf", "Donors", "public"), row("endowment", "Donors to the Endowment", "internal")
+
+
+def test_withholding_one_twin_keeps_the_other(tmp_path):
+    """Withholding one item of an id leaves another item that shares the id in another part (THYM.md 18)."""
+    foundation, endowment = _twins()
+    ctx = ctx_for(tmp_path)
+    project.withhold(ctx, endowment)
+    assert list(ctx.withheld) == ["atom/endowment//M:audience/donors"]
+    assert V.is_withheld(ctx.withheld, endowment) and not V.is_withheld(ctx.withheld, foundation)
+    both = Value("list", [foundation, endowment])
+    ctx2 = ctx_for(tmp_path)
+    project.withhold(ctx2, both, where=R.Where("visibility is internal",
+                                               lambda r: r.field("visibility") == "internal"))
+    assert list(ctx2.withheld) == ["atom/endowment//M:audience/donors"]
+    # an id given as a word names no part, and takes every item of that id
+    ctx3 = ctx_for(tmp_path)
+    ctx3.withhold("M:audience/donors")
+    assert V.is_withheld(ctx3.withheld, foundation) and V.is_withheld(ctx3.withheld, endowment)
+    # an item with no key is held by its id, as before
+    bare = Value("item", {"id": "P:claim/x", "type": "claim"}, origin={"id": "P:claim/x"})
+    ctx4 = ctx_for(tmp_path)
+    ctx4.withhold(bare)
+    assert list(ctx4.withheld) == ["P:claim/x"] and V.is_withheld(ctx4.withheld, bare)
+
+
+def test_verified_derived_counts_a_twin_of_a_withheld_item(tmp_path):
+    """`project`'s rules compare by key too: the kept twin is still an emitted, marked item."""
+    foundation, endowment = _twins()
+    ctx = ctx_for(tmp_path)
+    ctx.emitted.append(project.mark(ctx, foundation, **{"as": "verified"}))
+    ctx.emitted.append(project.mark(ctx, endowment, **{"as": "stated"}))      # stated on an audience: refused, unless withheld
+    ok, why = verdict("verified-derived", Value("volume", {}), ctx=ctx)
+    assert not ok and "is marked stated" in why
+    project.withhold(ctx, endowment)
+    ok, why = verdict("verified-derived", Value("volume", {}), ctx=ctx)
+    assert ok and "verified on 1 item" in why, why
+
+
+def test_no_mark_finds_a_withheld_item_by_key_or_by_id(tmp_path):
+    _foundation, endowment = _twins()
+    ctx = ctx_for(tmp_path)
+    project.withhold(ctx, endowment)
+    assert verdict("no-mark", Value("volume", {"offers": [{"name": "Donors"}]}), ctx=ctx)[0]
+    for said in ("M:audience/donors", "atom/endowment//M:audience/donors"):
+        ok, why = verdict("no-mark", Value("volume", {"offers": [{"name": said}]}), ctx=ctx)
+        assert not ok and "is named in the output" in why
 
 
 def test_projection_rules_hold_and_fail(tmp_path):
@@ -991,15 +1050,43 @@ def test_a_run_records_its_engine_calls_and_replays_with_no_engine(root):
     assert isinstance(again, T.Trace) and again.landed, getattr(again, "refusal", again)
     assert again.replay == {"of": t.run_id, "identical": True, "differences": []}
     assert conform._records_engines(t.dir) is True
-    frozen = SUITE / "replay" / "publish-story" / "2026-11-01-2148-35b5"
-    assert conform._records_engines(frozen) is False, "the frozen fixture was recorded before engine calls were"
+    older = _as_recorded_before_engine_calls(t.dir, root.parent / "older")
+    assert conform._records_engines(older) is False, "a trace that names no engines was recorded before they were"
 
 
-def test_the_frozen_replay_skips_with_its_reason_where_there_is_no_feed(tmp_path):
-    rep = conform.conform(SUITE, root=tmp_path / "conform-root", engines=H.engines(feed=None))
+def _as_recorded_before_engine_calls(run_dir: Path, to: Path) -> Path:
+    """A copy of a recorded run whose trace names no `engines`, as every run recorded before 0.5.0's wave 2 was
+    (THYM.md 12.4: it replays with the host's live engines). The suite's own replays all record their engine calls
+    since the checkpoint-A fixture was re-recorded (a grammar bump had changed what the live Canon engine writes)."""
+    dst = to / run_dir.name
+    shutil.copytree(run_dir, dst)
+    trace = next(dst.glob("*.trace.cosm"))
+    vol = mc.yaml_load(trace.read_text(encoding="utf-8"))
+    for it in vol.get("nodes") or []:
+        it.pop("engines", None)
+    trace.write_text(mc.dump(vol), encoding="utf-8")
+    return dst
+
+
+def test_a_replay_recorded_before_engine_calls_skips_with_its_reason_where_there_is_no_feed(tmp_path):
+    suite = tmp_path / "suite"
+    shutil.copytree(SUITE, suite)
+    shutil.copytree(SUITE.parent / "cosm", tmp_path / "cosm")          # the plan of open-house names ../cosm
+    runs = sorted((suite / "replay" / "publish-story").iterdir())
+    assert all(conform._records_engines(r) for r in runs), "every replay of the suite records its engine calls"
+    shutil.rmtree(runs[0])
+    _as_recorded_before_engine_calls(runs[1], tmp_path / "older")
+    shutil.rmtree(runs[1])
+    shutil.copytree(tmp_path / "older" / runs[1].name, runs[1])
+    rep = conform.conform(suite, root=tmp_path / "conform-root", engines=H.engines(feed=None))
     assert rep.ok, "\n".join(rep.failed)
-    skip = [s for s in rep.skipped if "2026-11-01-2148-35b5" in s]
-    assert len(skip) == 1 and "recorded before engine calls were" in skip[0] and "no FEED engine" in skip[0]
+    assert len(rep.skipped) == 1 and runs[1].name in rep.skipped[0], rep.skipped
+    assert "recorded before engine calls were" in rep.skipped[0] and "no FEED engine" in rep.skipped[0]
+
+
+def test_every_replay_of_the_suite_replays_with_no_feed_and_no_engine(tmp_path):
+    rep = conform.conform(SUITE, root=tmp_path / "conform-root", engines=H.engines(feed=None))
+    assert rep.ok and not rep.skipped, "\n".join(rep.failed + rep.skipped)
 
 
 TWICE = """thym 0
@@ -1171,3 +1258,91 @@ def test_a_replay_that_cannot_match_refuses_at_once(root, tmp_path):
     t0 = _time.monotonic()
     r = RUN.replay(t3.dir, root=root)
     assert isinstance(r, Refusal) and (r.stage, r.check) == ("plan", "input") and _time.monotonic() - t0 < 2
+
+
+# ---------------------------------------------------------------------------
+# Paths in plans and traces are POSIX on every system
+# ---------------------------------------------------------------------------
+
+def test_a_trace_writes_posix_paths_whatever_system_made_them(monkeypatch):
+    """A run recorded on Windows must replay elsewhere: `outputs/out.package.cosm`, never `outputs\\out.package.cosm`.
+    Tested without Windows: a PureWindowsPath goes through the same helper `_land`, `digest_row` and the plan use."""
+    from pathlib import PurePosixPath, PureWindowsPath
+    from types import SimpleNamespace
+    assert V.posix_path(PureWindowsPath("outputs") / "out.package.cosm") == "outputs/out.package.cosm"
+    assert V.posix_path(PureWindowsPath("outputs\\notes.thym")) == "outputs/notes.thym"
+    assert V.posix_path(PurePosixPath("outputs") / "out.package.cosm") == "outputs/out.package.cosm"
+    assert V.posix_path("inputs/notes.md") == "inputs/notes.md"
+    assert V.posix_path("odd\\name.md") == "odd\\name.md"                 # on POSIX a backslash is a letter of a name
+    monkeypatch.setattr(V, "os", SimpleNamespace(sep="\\"))                 # as Windows reads a text it was given
+    assert V.posix_path("inputs\\notes.md") == "inputs/notes.md"
+    monkeypatch.undo()
+    v = Value("text", "x", path=PureWindowsPath("C:\\runs\\outputs\\out.md"))
+    assert T.digest_row("out", v)["path"] == "C:/runs/outputs/out.md"
+    assert T.digest_row("out", v, path=PureWindowsPath("outputs") / "out.md")["path"] == "outputs/out.md"
+    assert "str(landed[name])" not in Path(RUN.__file__).read_text(encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# A call nested inside another call in a `for each` (wording only; the language is unchanged)
+# ---------------------------------------------------------------------------
+
+def _loop_program(tmp_path: Path, body: str):
+    from enough import thym
+    meadow = SUITE.parent / "cosm" / "holotypes" / "meadow"
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    prog = tmp_path / "p.thym"
+    prog.write_text("thym 0\n\nprogram p\n  takes h: volume\n  gives i: volume\n\n" + body
+                    + "  give project h as isotype\nend\n", encoding="utf-8")
+    pl = thym.plan_file(prog, [{"name": "h", "type": "volume", "path": str(meadow), "sha256": sha(meadow)}])
+    assert not isinstance(pl, Refusal), pl
+    return RUN.run(pl, inputs_root=SUITE, root=tmp_path / "root", program=prog, engines=H.engines(feed=None), now=NOW)
+
+
+def test_a_nested_call_in_a_loop_is_refused_saying_it_was_handed_every_passs_list(tmp_path):
+    t = _loop_program(tmp_path, "  for each o in h where kind is service\n"
+                                "    emit mark (mark o as stated) as verified\n  end\n")
+    assert isinstance(t, T.Trace) and not t.landed
+    msg = t.refusal.message
+    assert t.refusal.check == "verified-only-where-derived" and t.refusal.line == 8
+    assert "t1 is not this pass's value but the list of every pass's result of node 1 (mark o as stated)" in msg
+    assert "as a move of their own" in msg
+    ok = _loop_program(tmp_path / "ok", "  move both(o: item): item\n    give mark (mark o as stated) as verified\n"
+                                        "  end\n\n  for each o in h where kind is service\n    emit both o\n  end\n")
+    assert isinstance(ok, T.Trace) and ok.landed, getattr(ok, "refusal", ok)
+
+
+# ---------------------------------------------------------------------------
+# The feed engine answers only the fields a run reads
+# ---------------------------------------------------------------------------
+
+def test_the_feed_engine_answers_only_the_fields_the_moves_read():
+    whole = {"word": "orchard", "frequency_rank": 7, "definition": "A planting of fruit trees.", "pos": "noun",
+             "pos_primary": "noun", "origin": "feed", "perfect_rhymes": ["x"] * 50, "zh_definition": "果园",
+             "forms": [{"word": "orchards"}]}
+    feed = H.feed_fields(lambda words: {w: (dict(whole) if w == "orchard" else None) for w in words})
+    got = feed(["orchard", "zzxq"])
+    assert got == {"orchard": {k: whole[k] for k in H.FEED_FIELDS}, "zzxq": None}
+    # what the readers make of it is what they made of the whole entry
+    text = "The orchard stands. The orchard grows old."
+    full = morph.statistics(text, feed=lambda ws: {w: (whole if w == "orchard" else None) for w in ws})
+    cut = morph.statistics(text, feed=feed)
+    assert full == cut
+    import enough.canon_derive as CD
+    lookup_full = lambda ws: {w: (whole if w == "orchard" else None) for w in ws}       # noqa: E731
+    assert CD._term_table(text, lookup_full) == [
+        {**r, "entry": whole if r["entry"] else None} for r in CD._term_table(text, feed)]
+    assert CD._feed_block(whole) == CD._feed_block(feed(["orchard"])["orchard"])
+
+
+def test_a_packaged_fabula_says_text_md_in_every_locator():
+    """`notes.md#L3, notes.md#L14` in one source becomes `text.md#L3, text.md#L14` (THYM.md 15: every span resolves
+    into text.md); a name that merely ends the same way is left alone."""
+    doc = {"oes": "emf/1", "id": "emf/notes-md", "name": "n", "source": {"path": "notes.md"},
+           "nodes": [{"id": "E:person/a", "type": "person", "name": "A",
+                      "provenance": {"mode": "derived", "sources": ["notes.md#L3, notes.md#L14,notes.md#L22",
+                                                                    "other-notes.md#L2", "notes.md"]}}]}
+    out = mc.yaml_load(pack._packaged_fabula(Value("fabula", doc)).decode("utf-8"))
+    assert out["source"]["path"] == "text.md"
+    assert out["nodes"][0]["provenance"]["sources"] == ["text.md#L3, text.md#L14,text.md#L22", "other-notes.md#L2",
+                                                        "text.md"]

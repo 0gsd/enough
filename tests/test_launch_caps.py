@@ -182,6 +182,12 @@ def launch(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     return run
 
 
+def test_launch_names_the_model_with_its_cute_alias(launch):
+    """fabula P6: llama-server reports the cute name as its model id."""
+    cmd = launch(64, HELP_BOTH)
+    assert cmd[cmd.index("--alias") + 1] == "tiny"
+
+
 def test_launch_under_32_gb_carries_the_caps(launch, caplog, tmp_path: Path):
     with caplog.at_level("INFO", logger="enough.supervisor"):
         cmd = launch(16, HELP_BOTH)
@@ -296,3 +302,12 @@ def test_the_script_leaves_a_big_machine_alone(tmp_path: Path):
     assert "--ctx-checkpoints" not in argv and "--cache-ram" not in argv
     assert "caps:  none (64 GB RAM" in stdout
     assert not (tmp_path / "help.log").exists()      # never even asked
+
+
+def test_the_script_aliases_a_cute_name_and_not_a_literal_path(tmp_path: Path):
+    """fabula P6: a registry model launches with `--alias <cute>`; a literal .gguf path has no cute name."""
+    text = SCRIPT.read_text(encoding="utf-8")
+    assert 'ALIAS_ARGS=(--alias "$MODEL_CUTE")' in text
+    assert '${ALIAS_ARGS[@]+"${ALIAS_ARGS[@]}"}' in text
+    _, argv = _run_script(tmp_path, 64, HELP_BOTH)
+    assert "--alias" not in argv

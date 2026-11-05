@@ -1,0 +1,1091 @@
+engine: feed
+inputs:
+  call: a6826f8b8e4c8717fb39e8252673d6cdef715bfd5f4960ead2882c996416f15d
+keys: []
+tokens: 0
+seconds: 0
+output:
+  mara:
+    word: mara
+    frequency_rank: 3
+    definition: A long-legged, dense-furred cavy of the grasslands of Argentina and neighboring countries, also
+      called the Patagonian hare.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  who:
+    word: who
+    frequency_rank: 6
+    definition: Which person or persons, used in questions such as who is there, and as a relative pronoun referring
+      to people, as in the man who left. In Unix and Linux, a command that lists the users currently logged in and
+      where.
+    pos_primary: pronoun
+    pos: pronoun; noun
+    origin: feed
+  has:
+    word: have
+    frequency_rank: 7
+    definition: To possess, hold, or experience something, or to include it as a feature; to cause something to
+      be done; or, with "to," to be obliged; and serves as an auxiliary forming perfect tenses. As a noun, a have
+      is a wealthy or privileged person.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  kept:
+    word: keep
+    frequency_rank: 6
+    definition: To hold onto, retain, or continue to have; to maintain in a given condition or place; to observe
+      or fulfil, as a promise or a rule; to look after or provide for. As a noun, the fortified tower at the heart
+      of a castle; the food and money needed to support someone.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  the:
+    word: the
+    frequency_rank: 8
+    definition: The definite article, used before a noun to indicate a specific or already identified thing; also
+      used with comparatives to show proportion, as in the sooner the better.
+    pos_primary: article
+    pos: article; adverb
+    origin: feed
+  orchard:
+    word: orchard
+    frequency_rank: 4
+    definition: A plot of land planted with fruit or nut trees, or the trees themselves collectively.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  since:
+    word: since
+    frequency_rank: 6
+    definition: From a particular point in the past up to now, or during the time after that point. It also works
+      as a conjunction meaning because, as in since you asked, I'll explain.
+    pos_primary: preposition
+    pos: preposition; adverb; conjunction
+    origin: feed
+  says:
+    word: say
+    frequency_rank: 6
+    definition: To speak words aloud; to state or assert; of a text, sign, or instrument, to convey information.
+      As a noun, the right or chance to influence a decision; as an adverb, approximately or for example.
+    pos_primary: verb
+    pos: verb; noun; adverb; interjection
+    origin: feed
+  old:
+    word: old
+    frequency_rank: 6
+    definition: Having existed or lived for a long time relative to others of its kind, whether a person, an object,
+      or a perishable good nearing the end of its shelf life. Informally, the plural names older people as a group
+      or, in slang, one's parents.
+    pos_primary: adjective
+    pos: adjective; noun
+    origin: feed
+  by:
+    word: by
+    frequency_rank: 7
+    definition: As a preposition, marking an agent, means, nearby location, or point in time, as in written by her,
+      travel by train, stand by the door, or done by noon. As an adverb, past or along, as in the years went by.
+    pos_primary: preposition
+    pos: preposition; adverb
+    origin: feed
+  gate:
+    word: gate
+    frequency_rank: 4
+    definition: A hinged or sliding barrier that closes an opening in a wall or fence, or the boarding area at an
+      airport. As a verb it means to confine behind such a barrier, or to open an electronic channel, as in gating
+      an ion channel.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  is:
+    word: is
+    frequency_rank: 7
+    definition: The third-person singular present-tense form of be, used with he, she, and it, as in it is raining.
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  oldest:
+    word: oldest
+    frequency_rank: 4
+    definition: Most old of all being compared; also used as a noun for the eldest child in a family.
+    pos_primary: adjective
+    pos: adjective; noun
+    origin: feed
+  tree:
+    word: tree
+    frequency_rank: 5
+    definition: A tall woody plant with a trunk, branches, and leaves, or by extension any similarly shaped object,
+      like a shoe tree or a rack for hanging coats. As a verb, to tree someone or something is to chase it up into
+      the branches. In Unix and Linux, a command that lists a directory and its contents as an indented tree.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  'on':
+    word: 'on'
+    frequency_rank: 7
+    definition: As a preposition, indicating position on a surface, a day or topic, as in on the table, on Monday,
+      or a book on birds. As an adverb, indicating continuation or operation, as in keep on going or turn the light
+      on.
+    pos_primary: preposition
+    pos: preposition; adverb
+    origin: feed
+  lane:
+    word: lane
+    frequency_rank: 5
+    definition: A narrow road or passage, often between hedges or walls; one of the marked strips into which a roadway
+      is divided for traffic; a marked course for a runner or swimmer; a route regularly followed by ships or aircraft.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  parish:
+    word: parish
+    frequency_rank: 4
+    definition: A local church district and its community, overseen by a priest or minister; in Louisiana, the equivalent
+      of a county.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  records:
+    word: record
+    frequency_rank: 5
+    definition: To set down information in permanent form for future reference, or to capture sound or images on
+      a medium; a written account, official document, or disc on which sound is stored; also, the best performance
+      yet achieved, and as an adjective marking such an achievement.
+    pos_primary: noun
+    pos: noun; verb; adjective
+    origin: feed
+  do:
+    word: do
+    frequency_rank: 6
+    definition: An auxiliary verb used to form questions and negatives and to add emphasis, as in do they agree
+      or I do like it; also, to perform or complete an action, as in do the dishes. In solfège, the first note of
+      a major scale.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  not:
+    word: not
+    frequency_rank: 7
+    definition: The basic word of negation, reversing the sense of a word, phrase, or clause, as in is not. In informal
+      use it may be added after a statement to contradict it sarcastically.
+    pos_primary: adverb
+    pos: adverb; interjection
+    origin: feed
+  say:
+    word: say
+    frequency_rank: 6
+    definition: To speak words aloud; to state or assert; of a text, sign, or instrument, to convey information.
+      As a noun, the right or chance to influence a decision; as an adverb, approximately or for example.
+    pos_primary: verb
+    pos: verb; noun; adverb; interjection
+    origin: feed
+  when:
+    word: when
+    frequency_rank: 6
+    definition: Asking or naming the time at which something happens, as in when did you arrive; also used to join
+      clauses, meaning at the time that or as soon as. As a noun, it means the time or occasion of an event.
+    pos_primary: adverb
+    pos: adverb; conjunction; pronoun; noun
+    origin: feed
+  it:
+    word: it
+    frequency_rank: 7
+    definition: The third-person singular pronoun used to refer to a thing, animal, or idea previously mentioned,
+      or as a grammatical placeholder subject, as in it rained all day.
+    pos_primary: pronoun
+    pos: pronoun
+    origin: feed
+  was:
+    word: was
+    frequency_rank: 7
+    definition: The past-tense form of be used with I, he, she, and it, as in "I was tired".
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  planted:
+    word: plant
+    frequency_rank: 5
+    definition: A living organism, typically rooted and photosynthetic, from mosses to trees; also a factory or
+      industrial facility, and, as a verb, to put a seed or seedling into soil to grow.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  so:
+    word: so
+    frequency_rank: 7
+    definition: As an adverb, to such an extent, as in so tired; also in that manner, as in do it so. As a conjunction,
+      introducing a result, as in it rained, so we stayed in. In solfège, the fifth note of a major scale.
+    pos_primary: adverb
+    pos: adverb; conjunction; noun
+    origin: feed
+  that:
+    word: that
+    frequency_rank: 7
+    definition: Indicating a person or thing more distant, already mentioned, or understood from context, as determiner
+      or pronoun; also the conjunction introducing a subordinate clause, as in she said that she would come.
+    pos_primary: determiner
+    pos: determiner; pronoun; conjunction
+    origin: feed
+  hearsay:
+    word: hearsay
+    frequency_rank: 3
+    definition: Information passed along secondhand, repeated from what someone else said rather than known firsthand.
+      In law it names an out-of-court statement usually barred from testimony because it cannot be cross-examined.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  for:
+    word: for
+    frequency_rank: 7
+    definition: 'A preposition marking purpose, direction, benefit, or duration, as in working for a wage or waiting
+      for a bus. As a conjunction it can mean because, in a more formal or literary register: "she smiled, for she
+      had won."'
+    pos_primary: preposition
+    pos: preposition; conjunction
+    origin: feed
+  now:
+    word: now
+    frequency_rank: 6
+    definition: At the present time or moment, or at once; also used to introduce a statement, mark a transition,
+      or convey mild rebuke. As a noun, the present time as opposed to past or future. As a conjunction, since or
+      seeing that.
+    pos_primary: adverb
+    pos: adverb; noun; conjunction; interjection
+    origin: feed
+  every:
+    word: every
+    frequency_rank: 6
+    definition: Each one of a group, considered individually and without exception; also used to mark a regular
+      interval, as in every third day.
+    pos_primary: determiner
+    pos: determiner
+    origin: feed
+  apple:
+    word: apple
+    frequency_rank: 5
+    definition: The round fruit of the apple tree, with red, yellow, or green skin and crisp, sweet-to-tart white
+      flesh.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  needs:
+    word: needs
+    frequency_rank: 5
+    definition: 'Plural of need: requirements or things essential to a person. As an adverb, chiefly archaic and
+      used with must, necessarily, as in you must needs be patient.'
+    pos_primary: noun
+    pos: noun; verb; adverb
+    origin: feed
+  a:
+    word: a
+    frequency_rank: 7
+    definition: The indefinite article, used before a singular countable noun to indicate one unspecified member
+      of a class, as in a cat sat on the mat. Also the first letter of the alphabet and the sixth note in the scale
+      of C major.
+    pos_primary: article
+    pos: article; noun
+    origin: feed
+  second:
+    word: second
+    frequency_rank: 6
+    definition: Coming after the first in order, rank, or time; a unit of time equal to one sixtieth of a minute,
+      or a very short interval. As a verb, to second a motion is to formally support it so that debate may proceed.
+    pos_primary: adjective
+    pos: adjective; adverb; noun; verb
+    origin: feed
+  variety:
+    word: variety
+    frequency_rank: 5
+    definition: The quality of including many different kinds, or a particular kind within a larger category.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  nearby:
+    word: nearby
+    frequency_rank: 5
+    definition: Close at hand; not far off.
+    pos_primary: adjective
+    pos: adjective; adverb
+    origin: feed
+  to:
+    word: to
+    frequency_rank: 7
+    definition: As a preposition, indicating direction, destination, or a recipient, as in go to the store or give
+      it to her; it also marks an infinitive, as in to run. As an adverb, into a closed position, as in pull the
+      door to.
+    pos_primary: preposition
+    pos: preposition; adverb
+    origin: feed
+  set:
+    word: set
+    frequency_rank: 6
+    definition: To put something in a particular place or position; to fix, establish, or adjust; of the sun, to
+      sink below the horizon; of a substance, to harden. As a noun, a group of related things, a piece of stage
+      scenery, a division of a tennis match, or a period of play by a musician. As an adjective, fixed, prearranged,
+      or ready. In Unix and Linux, a shell command that shows the shell's variables or turns its options on and
+      off.
+    pos_primary: verb
+    pos: verb; noun; adjective
+    origin: feed
+  fruit:
+    word: fruit
+    frequency_rank: 5
+    definition: The seed-bearing part of a plant, often sweet and eaten raw, that develops from a fertilized flower;
+      more loosely, any comparable produce of a plant or effort, as in the fruits of labor. As a verb, a plant fruits
+      when it produces this part.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  local:
+    word: local
+    frequency_rank: 5
+    definition: Belonging to or affecting a particular nearby place rather than a wider area; in medicine, affecting
+      one part of the body. As a noun, a resident of a place, a branch of a trade union, a train stopping at all
+      stations, or, in Britain, a neighbourhood pub.
+    pos_primary: adjective
+    pos: adjective; noun; adverb
+    origin: feed
+  quirk:
+    word: quirk
+    frequency_rank: 3
+    definition: A small peculiarity of behavior or style, the kind of idiosyncrasy that makes a person recognizable.
+      It can also mean a sudden wry twist, or, in carpentry, a narrow groove cut into a molding.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  how:
+    word: how
+    frequency_rank: 6
+    definition: A word asking about manner, method, degree, or reason, as in how did you do that. As a noun, the
+      means by which something happens, as in the how of it.
+    pos_primary: adverb
+    pos: adverb; conjunction; noun; interjection
+    origin: feed
+  apples:
+    word: apples
+    frequency_rank: 4
+    definition: The plural of apple, the fruit that fills orchards, pie fillings, and lunchboxes.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  pollinate:
+    word: pollinate
+    frequency_rank: 2
+    definition: To transfer pollen to a flower's stigma, enabling fertilization.
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  and:
+    word: and
+    frequency_rank: 7
+    definition: A conjunction used to join words, phrases or clauses, often indicating addition or connection.
+    pos_primary: conjunction
+    pos: conjunction
+    origin: feed
+  nursery:
+    word: nursery
+    frequency_rank: 4
+    definition: A room set aside for young children, or an institution that cares for them during the day. It can
+      also mean a place where young plants are raised, or figuratively any place where something is fostered and
+      encouraged to grow.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  leaflet:
+    word: leaflet
+    frequency_rank: 3
+    definition: A small printed sheet distributed for information or advertising, or, botanically, one segment of
+      a compound leaf. As a verb, to distribute such sheets.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  same:
+    word: same
+    frequency_rank: 6
+    definition: Identical or unchanged; alike in kind or degree; the very one already mentioned. As a pronoun, that
+      identical person or thing. In informal use, same expresses agreement or shared feeling.
+    pos_primary: adjective
+    pos: adjective; adverb; pronoun; interjection
+    origin: feed
+  this:
+    word: this
+    frequency_rank: 7
+    definition: Points to something near at hand, just mentioned, or about to be mentioned, as opposed to that.
+      It also intensifies degree, as in this tall, and online can stand alone as a shout of agreement.
+    pos_primary: determiner
+    pos: determiner; pronoun; adverb; interjection; noun
+    origin: feed
+  year:
+    word: year
+    frequency_rank: 6
+    definition: The time it takes the Earth to complete one cycle of seasons, roughly 365 days, or any of several
+      more precise astronomical versions of that span. It can also stand loosely for an age group, as in a school
+      year.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  pressed:
+    word: pressed
+    frequency_rank: 4
+    definition: Pushed against with force, as with a button; also under strain, urgency, or emotional distress.
+    pos_primary: verb
+    pos: verb; adjective
+    origin: feed
+  litres:
+    word: litre
+    frequency_rank: 4
+    definition: A metric unit of volume equal to one cubic decimeter, used chiefly for liquids.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  of:
+    word: of
+    frequency_rank: 7
+    definition: A preposition indicating possession, origin, material, or a part-to-whole relationship, as in the
+      roof of the house, a friend of mine, or a cup of tea.
+    pos_primary: preposition
+    pos: preposition
+    origin: feed
+  juice:
+    word: juice
+    frequency_rank: 4
+    definition: The liquid found in or extracted from fruit, vegetables, or meat, or a drink made from it; slang
+      for liquor, energy, or electricity. As a verb, to extract that liquid, or to energize something.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  up:
+    word: up
+    frequency_rank: 6
+    definition: As an adverb, indicating movement to a higher position, an increase, or completion, as in climb
+      up or eat up. As a preposition, toward a higher point along something, as in up the hill. As a verb, informally,
+      to increase, as in up the price.
+    pos_primary: adverb
+    pos: adverb; preposition; verb
+    origin: feed
+  from:
+    word: from
+    frequency_rank: 7
+    definition: Indicates a starting point or source in space, time, or origin, as in a letter from a friend, a
+      habit from childhood, or open from noon.
+    pos_primary: preposition
+    pos: preposition
+    origin: feed
+  last:
+    word: last
+    frequency_rank: 6
+    definition: Coming after all others, most recent, or least likely; as an adverb, most recently or after everything
+      else; as a verb, to continue or endure over time. In Unix and Linux, a command that lists the most recent
+      logins on a machine.
+    pos_primary: adjective
+    pos: adjective; determiner; adverb; verb; noun
+    origin: feed
+  i:
+    word: i
+    frequency_rank: 7
+    definition: The first-person singular pronoun, used by a speaker or writer as the subject of a verb, as in I
+      am ready, and always written as a capital I. Also the ninth letter of the alphabet.
+    pos_primary: pronoun
+    pos: pronoun; noun
+    origin: feed
+  counted:
+    word: count
+    frequency_rank: 5
+    definition: To recite numbers in order, to tally up a quantity, or figuratively to matter or be included. As
+      a noun it is that tally, a distinct charge in an indictment, or a nobleman ranking between duke and baron.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  bottles:
+    word: bottle
+    frequency_rank: 5
+    definition: A narrow-necked container, usually glass or plastic, for holding liquid, or its contents; as a verb,
+      to seal something into one. In British slang it also means nerve, as in losing one's bottle at the last moment.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  myself:
+    word: myself
+    frequency_rank: 5
+    definition: The reflexive form of I, used when the speaker is also the object of an action, as in I hurt myself;
+      also emphatic, as in I myself saw it, or denoting one's usual state, as in I don't feel myself today.
+    pos_primary: pronoun
+    pos: pronoun
+    origin: feed
+  rise:
+    word: rise
+    frequency_rank: 5
+    definition: To move upward, get up, grow taller, or slope up, as the sun rises or a hill rises above a plain;
+      to increase in amount or intensity; as a noun, an upward movement, an increase, or, in British use, a pay
+      raise.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  came:
+    word: came
+    frequency_rank: 6
+    definition: 'Past tense of come: arrived, happened, or occurred. Unrelated in origin, the same spelling also
+      names the slender grooved strip of lead or other metal that holds the pieces of a stained-glass window together.'
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  after:
+    word: after
+    frequency_rank: 6
+    definition: Following in time, order, or position; later than; behind. Also used to mean in pursuit of or in
+      imitation of, as in named after her grandmother.
+    pos_primary: preposition
+    pos: preposition; adverb; conjunction
+    origin: feed
+  volunteers:
+    word: volunteer
+    frequency_rank: 4
+    definition: Someone who offers to do something, often unpaid, of their own free will, including a soldier who
+      enlists rather than is drafted; as a verb, to offer oneself or something for a task.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  spread:
+    word: spread
+    frequency_rank: 5
+    definition: To open or stretch something out over an area; to scatter or disperse more widely, as news or disease
+      does. As a noun, the act or extent of spreading, a soft food put on bread, or an expanse of land.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  leaf:
+    word: leaf
+    frequency_rank: 4
+    definition: The flat, usually green organ of a plant that carries out photosynthesis; also, a sheet of paper
+      in a book, thin beaten metal, or a removable tabletop section. As a verb, to grow foliage or to turn pages
+      quickly.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  mould:
+    word: mould
+    frequency_rank: 3
+    definition: 'Commonwealth spelling of mold: a fuzzy fungal growth, loose soil rich in organic matter, or a hollow
+      form used to shape or cast something; as a verb, to shape material or to become covered with fungus.'
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  under:
+    word: under
+    frequency_rank: 6
+    definition: Beneath or below something, in position, rank, or amount; also used to mean passing beneath, or
+      less than a stated figure. As an adjective, subordinate or, informally, anesthetized; as a noun, a shortfall.
+    pos_primary: preposition
+    pos: preposition; adverb; adjective; noun
+    origin: feed
+  trees:
+    word: tree
+    frequency_rank: 5
+    definition: A tall woody plant with a trunk, branches, and leaves, or by extension any similarly shaped object,
+      like a shoe tree or a rack for hanging coats. As a verb, to tree someone or something is to chase it up into
+      the branches. In Unix and Linux, a command that lists a directory and its contents as an indented tree.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  in:
+    word: in
+    frequency_rank: 7
+    definition: As a preposition, indicating location within, enclosure, or a period of time, as in in the box or
+      in April. As an adverb, indicating movement toward the inside or a state of being present or included, as
+      in come in or she is in.
+    pos_primary: preposition
+    pos: preposition; adverb
+    origin: feed
+  thinks:
+    word: think
+    frequency_rank: 6
+    definition: To use the mind to consider, reason, remember, or form an opinion; also to believe or suppose something
+      is true. As a noun, an act of thinking, as in having a good think about it.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  mulch:
+    word: mulch
+    frequency_rank: 3
+    definition: A layer of material, such as bark, straw, or leaves, spread over soil to hold moisture, block weeds,
+      and moderate temperature. As a verb, it means to spread or turn something into this covering.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  made:
+    word: made
+    frequency_rank: 6
+    definition: Formed, produced, or brought about, as in she made dinner or the decision had already been made.
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  difference:
+    word: difference
+    frequency_rank: 5
+    definition: The quality or fact of being unlike something else, or a specific point on which two things are
+      unlike. It can also mean a disagreement, or the result of subtracting one quantity from another.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  am:
+    word: am
+    frequency_rank: 6
+    definition: The first-person singular present-tense form of be, used with I, as in I am tired.
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  less:
+    word: less
+    frequency_rank: 5
+    definition: A smaller amount, extent, or degree; used as determiner, adverb, and noun, and as a preposition
+      meaning minus. Less sugar denotes a smaller quantity; less sweet, a smaller degree. In Unix and Linux, a command
+      that shows a file a screen at a time, letting the user scroll and search.
+    pos_primary: adverb
+    pos: adverb; determiner; preposition; adjective; noun; conjunction
+    origin: feed
+  sure:
+    word: sure
+    frequency_rank: 6
+    definition: Certain, confident, or free from doubt; also reliable or unfailing, as in a sure sign. As an adverb,
+      certainly; as an interjection, a casual expression of assent.
+    pos_primary: adjective
+    pos: adjective; adverb; interjection
+    origin: feed
+  warm:
+    word: warm
+    frequency_rank: 5
+    definition: Having a pleasant or moderate heat, or, of people, showing friendliness and affection; as a verb,
+      to make or become heated, or to grow more favorably disposed.
+    pos_primary: adjective
+    pos: adjective; verb
+    origin: feed
+  wet:
+    word: wet
+    frequency_rank: 5
+    definition: Covered or soaked in liquid, usually water; also, of weather, rainy. As a noun, moisture or rainy
+      weather; as a verb, to make something wet, sometimes used of urinating accidentally.
+    pos_primary: adjective
+    pos: adjective; noun; verb
+    origin: feed
+  spring:
+    word: spring
+    frequency_rank: 5
+    definition: To leap up suddenly, or to appear, grow, or burst forth; also the season between winter and summer,
+      and a coiled device or water source.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  would:
+    word: would
+    frequency_rank: 6
+    definition: An auxiliary verb marking a hypothetical or future-in-the-past action, habitual past behavior, or
+      firm intention, as in she would call every Sunday.
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  explain:
+    word: explain
+    frequency_rank: 5
+    definition: To make something clear or understandable, or to give the reasons behind an action or event.
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  most:
+    word: most
+    frequency_rank: 6
+    definition: 'The superlative of much and many: the greatest amount, or more than half of a group. It also forms
+      superlative adjectives, as in most interesting, and stands alone as a noun or pronoun meaning the greater
+      part. Informally, it also means almost.'
+    pos_primary: determiner
+    pos: determiner; adverb; adjective; pronoun; noun
+    origin: feed
+  valley:
+    word: valley
+    frequency_rank: 5
+    definition: The long low stretch of land between hills or mountains, often carved by a river, or, by extension,
+      any similar dip, such as where two roof slopes meet. Rarely, as a verb, to form such a shape.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  did:
+    word: do
+    frequency_rank: 6
+    definition: An auxiliary verb used to form questions and negatives and to add emphasis, as in do they agree
+      or I do like it; also, to perform or complete an action, as in do the dishes. In solfège, the first note of
+      a major scale.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  well:
+    word: well
+    frequency_rank: 6
+    definition: As an adverb, in a good, proper, or thorough manner; as an adjective, in good health; as a noun,
+      a shaft sunk in the ground for water or oil; as an interjection, used to introduce or pause before a remark.
+      As a verb, to flow or rise up, as tears well in the eyes.
+    pos_primary: adverb
+    pos: adverb; adjective; interjection; noun; verb
+    origin: feed
+  grounds:
+    word: grounds
+    frequency_rank: 4
+    definition: The land surrounding a building; reasons or a basis for belief or action; the sediment left by brewed
+      coffee. Also plural of ground.
+    pos_primary: noun
+    pos: noun; verb; adjective
+    origin: feed
+  team:
+    word: team
+    frequency_rank: 6
+    definition: A group working together toward a shared goal, whether in sport, work, or a pair of draft animals
+      pulling a cart. As a verb, to join forces or to harness animals together.
+    pos_primary: noun
+    pos: noun; verb; interjection
+    origin: feed
+  wants:
+    word: want
+    frequency_rank: 6
+    definition: To desire or wish for something; to require or need; as a noun, a desire, or a lack or shortage
+      of something needed, as in want of money.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  mow:
+    word: mow
+    frequency_rank: 3
+    definition: To cut down grass or grain, or by extension to slaughter in great numbers; also the act of such
+      cutting. Less commonly it means to make a scornful grimace, or names a stack or storage place for hay.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  meadow:
+    word: meadow
+    frequency_rank: 4
+    definition: A field of grass, kept for grazing or cut for hay. As a verb, to lay land down to grass.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  strip:
+    word: strip
+    frequency_rank: 4
+    definition: A long, narrow piece of something, from a strip of land to a comic strip; as a verb, to remove something,
+      often clothing, or to take a thing apart down to its bare essentials.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  mowing:
+    word: mowing
+    frequency_rank: 3
+    definition: Cutting down grass, hay, or grain, and by extension the field where such cutting happens.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  then:
+    word: then
+    frequency_rank: 6
+    definition: At that time, or next in a sequence of events; it can also mean therefore or in addition. As an
+      adjective, it means existing or holding a particular position at that time.
+    pos_primary: adverb
+    pos: adverb; adjective; conjunction
+    origin: feed
+  cut:
+    word: cut
+    frequency_rank: 5
+    definition: To divide, wound, or shape something using a sharp edge, or the resulting mark, wound, or reduction
+      itself; as a film term, to switch abruptly to another shot. As an interjection on set, the director's order
+      to stop filming. In Unix and Linux, a command that prints chosen columns or fields from each line of input.
+    pos_primary: verb
+    pos: verb; noun; adjective; interjection
+    origin: feed
+  wildflowers:
+    word: wildflower
+    frequency_rank: 3
+    definition: A flowering plant that grows without cultivation, or one of its blooms.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  before:
+    word: before
+    frequency_rank: 6
+    definition: Earlier than in time, or in front of in space; also in the presence or judgment of someone, as in
+      before the court. As a conjunction, earlier than the time when; as an adverb, previously.
+    pos_primary: preposition
+    pos: preposition; adverb; conjunction; noun
+    origin: feed
+  they:
+    word: they
+    frequency_rank: 6
+    definition: Used to refer to two or more people or things previously mentioned or easily identified; also the
+      standard singular pronoun for a person whose gender is unknown, unspecified, or nonbinary. Sometimes used
+      loosely of people in general or of unspecified authorities, as in they say it will rain.
+    pos_primary: pronoun
+    pos: pronoun
+    origin: feed
+  seed:
+    word: seed
+    frequency_rank: 4
+    definition: A plant's embryo enclosed in a protective coat, capable of growing into a new plant. As a verb,
+      to sow with seed, or figuratively to plant an idea; also, to rank competitors in a tournament.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  exists:
+    word: exist
+    frequency_rank: 5
+    definition: To be real; to have being; to occur. Also, to survive with only the barest necessities of life.
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  feed:
+    word: feed
+    frequency_rank: 5
+    definition: To give food to someone or an animal, or to eat; as a noun, food given to non-human animals, or
+      any material supplied continuously into a system.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  pollinators:
+    word: pollinator
+    frequency_rank: 2
+    definition: An agent, often an insect such as a bee, that carries pollen from flower to flower; also, a plant
+      used as the pollen source in cross-breeding.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  depends:
+    word: depends
+    frequency_rank: 5
+    definition: 'Relies on someone or something, or is conditioned upon circumstance. Often used as a reply to a
+      question with no simple answer: it depends.'
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  if:
+    word: if
+    frequency_rank: 6
+    definition: A conjunction introducing a condition on which something else depends, as in if it rains, bring
+      an umbrella, or a wish, as in if only I had known.
+    pos_primary: conjunction
+    pos: conjunction
+    origin: feed
+  mown:
+    word: mow
+    frequency_rank: 3
+    definition: To cut down grass or grain, or by extension to slaughter in great numbers; also the act of such
+      cutting. Less commonly it means to make a scornful grimace, or names a stack or storage place for hay.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  loses:
+    word: lose
+    frequency_rank: 5
+    definition: To no longer have something, whether through misplacement, defeat, death, or failure to keep it.
+      Used of objects, contests, weight, or people, as in to lose one's keys, a game, or a loved one.
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  very:
+    word: very
+    frequency_rank: 6
+    definition: To a great degree, used to intensify an adjective or adverb, as in very tired. As an adjective it
+      can mean true or exact, as in the very same day, or simply this one and no other.
+    pos_primary: adverb
+    pos: adverb; adjective
+    origin: feed
+  insects:
+    word: insect
+    frequency_rank: 4
+    definition: A small arthropod with six legs, a segmented body, a hard external skeleton, and often wings, such
+      as an ant, beetle, or fly. In looser or older use, any small crawling creature; also used contemptuously of
+      a person.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  its:
+    word: its
+    frequency_rank: 6
+    definition: Belonging to it, as in the dog wagged its tail. This possessive form takes no apostrophe, distinguishing
+      it from the contraction it's.
+    pos_primary: determiner
+    pos: determiner; pronoun
+    origin: feed
+  we:
+    word: we
+    frequency_rank: 7
+    definition: The first-person plural pronoun, used by a speaker or writer to refer to themselves together with
+      one or more others, as in we are ready.
+    pos_primary: pronoun
+    pos: pronoun
+    origin: feed
+  agreed:
+    word: agreed
+    frequency_rank: 5
+    definition: Accepted or settled by mutual consent; past tense and past participle of agree.
+    pos_primary: adjective
+    pos: adjective; verb
+    origin: feed
+  ask:
+    word: ask
+    frequency_rank: 5
+    definition: To put a question to someone, or to request something from them. It can also mean to require or
+      expect something, as a task or situation does.
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  council:
+    word: council
+    frequency_rank: 5
+    definition: A group of people convened to lead, advise, or govern, such as a city council or student council,
+      or the deliberation such a group carries out. In British usage it can also refer, by extension, to the local
+      authority itself.
+    pos_primary: noun
+    pos: noun
+    origin: feed
+  wait:
+    word: wait
+    frequency_rank: 5
+    definition: To delay action until a particular time or event, or to serve customers at tables, as in waiting
+      tables. As a noun, the period of delay; as an interjection, a call to pause. In Unix and Linux, a shell command
+      that waits for background jobs to finish before going on.
+    pos_primary: verb
+    pos: verb; noun; interjection
+    origin: feed
+  until:
+    word: until
+    frequency_rank: 6
+    definition: Up to the time that; up to the point when something stops or happens, as in until dawn or until
+      you finish.
+    pos_primary: preposition
+    pos: preposition; conjunction
+    origin: feed
+  will:
+    word: will
+    frequency_rank: 6
+    definition: As an auxiliary verb, marks the future tense or expresses willingness, capability, or habit; as
+      a main verb, it means to bequeath. As a noun, it means the faculty of choice, firm intention, or a legal document
+      directing the distribution of one's estate after death.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  write:
+    word: write
+    frequency_rank: 5
+    definition: To form letters or symbols to record language, or, more broadly, to compose something such as a
+      book, letter, or song. In computing, it also means to store data onto a disk or into memory.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  letter:
+    word: letter
+    frequency_rank: 5
+    definition: A single symbol of the alphabet, or a written message sent to someone, usually more formal than
+      a note. It can also mean the strict, literal sense of a rule as opposed to its spirit. As a verb, it means
+      to mark with letters.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  bring:
+    word: bring
+    frequency_rank: 5
+    definition: To carry or lead something or someone toward the speaker or a stated place, or, more broadly, to
+      cause or produce a result.
+    pos_primary: verb
+    pos: verb
+    origin: feed
+  bottle:
+    word: bottle
+    frequency_rank: 5
+    definition: A narrow-necked container, usually glass or plastic, for holding liquid, or its contents; as a verb,
+      to seal something into one. In British slang it also means nerve, as in losing one's bottle at the last moment.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  count:
+    word: count
+    frequency_rank: 5
+    definition: To recite numbers in order, to tally up a quantity, or figuratively to matter or be included. As
+      a noun it is that tally, a distinct charge in an indictment, or a nobleman ranking between duke and baron.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  as:
+    word: as
+    frequency_rank: 7
+    definition: A conjunction introducing comparison or reason, as in tall as a tree or as it rained, we stayed
+      in; a preposition meaning in the role of, as in she works as a nurse; an adverb used in equal comparisons,
+      as in as good as gold.
+    pos_primary: conjunction
+    pos: conjunction; preposition; adverb
+    origin: feed
+  evidence:
+    word: evidence
+    frequency_rank: 5
+    definition: Facts, objects, or testimony that support a claim, especially the sort a court weighs to decide
+      what happened. As a verb, to evidence something is to show it plainly.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  open:
+    word: open
+    frequency_rank: 5
+    definition: Not shut, sealed, or covered, so that something can pass through, be seen, or be reached; candid
+      or frank, as in an open conversation; available or accessible, as in open to the public. As a verb, to make
+      or become open, or to begin.
+    pos_primary: adjective
+    pos: adjective; verb; noun
+    origin: feed
+  question:
+    word: question
+    frequency_rank: 5
+    definition: A sentence or phrase that asks for information, or a matter under doubt or discussion. As a verb,
+      it means to interrogate someone or to doubt something's truth.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  does:
+    word: does
+    frequency_rank: 6
+    definition: Female deer, rabbits, hares, or squirrels; or, in the verb form, the third-person present tense
+      of do.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  lease:
+    word: lease
+    frequency_rank: 4
+    definition: A contract granting temporary use of property, such as land, a car, or an apartment, in exchange
+      for payment; also the document recording it. As a verb, to lease is either to grant such use as landlord or
+      to take it as tenant.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  let:
+    word: let
+    frequency_rank: 6
+    definition: To allow something to happen or someone to act without interference; chiefly British, to rent out
+      property. As a noun, a rental arrangement, or in tennis a serve replayed because it clipped the net.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  without:
+    word: without
+    frequency_rank: 6
+    definition: Lacking or not having something, as in without money; also, in older or literary use, outside of
+      a place. As an archaic conjunction, unless, as in without you help me.
+    pos_primary: preposition
+    pos: preposition; adverb; conjunction; noun
+    origin: feed
+  asking:
+    word: asking
+    frequency_rank: 5
+    definition: The act of putting a question or making a request.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  us:
+    word: us
+    frequency_rank: 6
+    definition: The objective case of the first-person plural pronoun we, used as the object of a verb or preposition,
+      as in they told us.
+    pos_primary: pronoun
+    pos: pronoun
+    origin: feed

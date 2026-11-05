@@ -11,11 +11,11 @@ contract:
 inputs:
   text: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
   sentences: 521fcbe859a0fcc5bb95a0f9e0e0380b59d8b37784b71a3941aedd7f1304bc71
-  candidates: 46b05fb3c605dd440b26f318008b30e9c986c9a911b192b6e28ebbd276a75b1f
+  candidates: f2da853ce208eb1da83e31564707495adef6fddd4cb59c5f3d2758dfbcc83256
 engine: model:Qwen3.8-27B-Q4_K_M.gguf
 attempts: 1
-tokens: 739
-seconds: 2
+tokens: 744
+seconds: 9
 output:
   figurative: []
   humour: []

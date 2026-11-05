@@ -7,10 +7,10 @@ contents:
   sha256: 54055e89856a29970eeb75baa1c24db60a13a5527a5a11b7cce650de07dc71c7
   role: text
 - path: fabula.cosm
-  sha256: 17d1e14254a60fab378ba87a6be693723b4c39e256f8b483d0ac0a48716f4e7f
+  sha256: 944ba27ebfc6663d3d960d790620c138cb1e22a29be841e756210c8d8a4a6d7c
   role: fabula
 - path: morph.cosm
-  sha256: 070f6b812190b180086af09bdc081587f79c412fc20d5403fffb788d4e6b8a6b
+  sha256: b6597718f557f36836706872d9bc6d60eb06d08ad07b20b0ef2189f6efa04b27
   role: morph
 made:
   program:
@@ -18,7 +18,7 @@ made:
     sha256: 5bf1730785d53906879af4224bec6069d77ef3888490fed182f29bc8e6930945
   trace:
     run: 2026-11-01-2148-35b5
-  at: 2026-11-02 02:48:11+00:00
+  at: 2026-11-05 21:53:05+00:00
   by: thym 0
 notice: A Thym package. The text is its author's; the fabula, morph and context describe it. Readings made from
   it are the reader's and are labelled.

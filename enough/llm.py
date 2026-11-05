@@ -210,7 +210,8 @@ def complete(messages: list[dict[str, str]], *, llm_url: str | None,
     `models.load_state()["current"] == "opro-api"` (only while the cloud
     gate is open, else `LLMUnavailable`), otherwise llama-server's
     `/v1/chat/completions` at `llm_url`. Returns `(text, meta)`, meta =
-    `{model, route: local|cloud, from_reasoning, finish_reason}` (`"length"`
+    `{model, route: local|cloud, from_reasoning, finish_reason}`, plus
+    `provider: openrouter` on the cloud route (`"length"`
     when the answer was cut off by the budget or the window). Transport failures raise
     (httpx errors, `cloud.CloudError`); the caller turns them into words.
 
@@ -230,8 +231,20 @@ def complete(messages: list[dict[str, str]], *, llm_url: str | None,
         choice = (resp.get("choices") or [{}])[0]
         text, from_reasoning = message_text(choice.get("message") or {})
         return text, {"model": resp.get("model"), "route": "cloud",
+                      "provider": "openrouter",
                       "from_reasoning": from_reasoning,
                       "finish_reason": choice.get("finish_reason")}
+    text, meta, _data = _local_completion(messages, llm_url=llm_url, max_tokens=max_tokens,
+                                          temperature=temperature, timeout=timeout)
+    return text, meta
+
+
+def _local_completion(messages: list[dict[str, str]], *, llm_url: str | None,
+                      max_tokens: int | None, temperature: float,
+                      timeout: float) -> tuple[str, dict[str, Any], dict[str, Any]]:
+    """llama-server's `/v1/chat/completions` at `llm_url`, once:
+    `(text, meta, raw response)`. No agent-free check and no slot lookup:
+    the callers do those."""
     base = (llm_url or DEFAULT_LLM_URL).rstrip("/")
     r = httpx.post(f"{base}/v1/chat/completions", timeout=timeout, json={
         "messages": messages, "stream": False,
@@ -245,7 +258,36 @@ def complete(messages: list[dict[str, str]], *, llm_url: str | None,
     text, from_reasoning = message_text(choice.get("message") or {})
     return text, {"model": data.get("model"), "route": "local",
                   "from_reasoning": from_reasoning,
-                  "finish_reason": choice.get("finish_reason")}
+                  "finish_reason": choice.get("finish_reason")}, data
+
+
+def usage_of(response: dict[str, Any]) -> dict[str, int] | None:
+    """The `usage` token counts of an OpenAI-shaped response
+    (`prompt_tokens`, `completion_tokens`, `total_tokens`, those present),
+    or None when the transport gave none."""
+    usage = response.get("usage") if isinstance(response, dict) else None
+    if not isinstance(usage, dict):
+        return None
+    out = {k: int(v) for k in ("prompt_tokens", "completion_tokens", "total_tokens")
+           if isinstance((v := usage.get(k)), (int, float)) and not isinstance(v, bool)}
+    return out or None
+
+
+def complete_local(messages: list[dict[str, str]], *, llm_url: str,
+                   max_tokens: int | None = None, temperature: float = 0.2,
+                   timeout: float = 600.0) -> tuple[str, dict[str, Any]]:
+    """One non-streaming completion from llama-server at `llm_url`, whatever
+    the session's model slot is: never the cloud (`enough.model_route`'s
+    local route). Same request as `complete`'s local path; meta as there,
+    plus `usage` when llama-server reports it. Agent-free refuses
+    (`LLMUnavailable("agent-free")`)."""
+    if _agent_free.enabled():
+        raise LLMUnavailable(_agent_free.REASON)
+    text, meta, data = _local_completion(messages, llm_url=llm_url, max_tokens=max_tokens,
+                                         temperature=temperature, timeout=timeout)
+    if (usage := usage_of(data)):
+        meta["usage"] = usage
+    return text, meta
 
 
 def reachable(llm_url: str | None) -> tuple[bool, str]:

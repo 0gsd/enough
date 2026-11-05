@@ -15,16 +15,34 @@ an App Store Connect key, and agents never handle either.
 
 Everything here is arm64-only (tauri-plan §4). One machine, one architecture.
 
-**Version bumps touch five files in lockstep** — `pyproject.toml`,
-`enough/__init__.py`, `desktop/src-tauri/tauri.conf.json`,
-`desktop/src-tauri/Cargo.toml`, and the version string in `bootstrap.sh` —
-so the UI badge, the bundle's Info.plist, and the DMG filename all agree.
-`desktop/src-tauri/Cargo.lock` is the silent sixth: it records the crate's
-own version and only updates when cargo next runs — so bump, **build**,
-*then* commit, or the lockfile trails the release by one commit. The repo's
-`uv.lock` is the silent seventh, for the same reason (it records `enough`'s
-own version): run `uv lock` after the bump and expect exactly two changed
-lines — the version, and the rolling `exclude-newer` timestamp.
+**Bump the version with `scripts/bump_version.py`, never by hand.** The
+version is written in 19 places, and the script moves all of them together
+so the UI badge, the bundle's Info.plist, the DMG filename and the manuals
+agree: `pyproject.toml`, `enough/__init__.py`,
+`desktop/src-tauri/tauri.conf.json`, `desktop/src-tauri/Cargo.toml`, the
+`enough-desktop` entry in `desktop/src-tauri/Cargo.lock`, the prose in
+`bootstrap.sh`, the title line of `docs/AGENT_GUIDE.md`, "Written against
+enough **x.y.z**" in `docs/HELP_CENTER.md` and in the five translated
+manuals (`enough/static/i18n/{fr,es,de,zh,ja}/help-center.md`), and the
+`_meta.source` line of all six `enough/static/i18n/*/ui.json`. It then
+regenerates the five shipped composure forms
+(`scripts/gen_composure_forms.py`, which stamps `enough.__version__`) and
+re-runs its own check. The `SITES` and `NOT_A_VERSION` lists at the top of
+the script name each site, and each lookalike string it leaves alone on
+purpose.
+
+```sh
+uv run python scripts/bump_version.py --to 0.6.0 --dry-run   # the diff, nothing written
+uv run python scripts/bump_version.py --to 0.6.0              # writes, then checks
+uv run python scripts/bump_version.py --check                 # exit 0: "all sites agree"
+```
+
+`--check` and `--to` exclude each other; `--to` refuses to go backwards
+without `--force`. The script never runs git. The repo's `uv.lock` is the
+one site it does not touch (it records `enough`'s own version): run
+`uv lock` after the bump and expect exactly two changed lines — the
+version, and the rolling `exclude-newer` timestamp. (The release routine in
+the verroes repo runs `--to`, `--check` and `uv lock` in that order.)
 Any bump (or any bundle change at all) means re-running §4 and §6: a new
 Info.plist is a new bundle is a new signature is a new notarization.
 
@@ -79,12 +97,24 @@ needs `ENOUGH_DOCS_ROOT` pointed at a scratch folder, or it builds into your own
   `Developer ID Application: Jane Smith (AB12CD34EF)`.
   The certificate must come from the **G2** authority: the original
   Developer ID Certification Authority, and every certificate it issued,
-  expires on February 1, 2027. Check the issuer and expiry with
+  expires on February 1, 2027. Check the issuer and expiry of every
+  certificate with that name (`-a`: without it `security` prints only the
+  first, and with an old and a new certificate in the keychain that hides
+  one of them; `openssl x509` reads only the first PEM it is given, so take
+  them one at a time):
   ```sh
-  security find-certificate -c "Developer ID Application" -p | openssl x509 -noout -issuer -enddate
+  security find-certificate -a -c "Developer ID Application" -p |
+    awk '/BEGIN CERT/{n++} {print > ("/tmp/devid-" n ".pem")}'
+  for f in /tmp/devid-*.pem; do openssl x509 -in "$f" -noout -issuer -enddate; done
+  rm -f /tmp/devid-*.pem
   ```
-  (`CN=Developer ID Certification Authority (G2)` is the new one; G2
-  certificates are renewed yearly.) While an old and a new certificate with
+  A G2 certificate's issuer reads
+  `CN=Developer ID Certification Authority, OU=G2, O=Apple Inc., C=US`
+  (macOS's own `/usr/bin/openssl` prints it as
+  `/CN=Developer ID Certification Authority/OU=G2/...`); the old authority's
+  reads `OU=Apple Certification Authority` in the same place. The common
+  name is the same for both, so it is the `OU` that tells them apart. G2
+  certificates are renewed yearly. While an old and a new certificate with
   the same name sit in the keychain together, the name is ambiguous to
   `codesign`: export the new one's SHA-1 hash from `find-identity` as
   `APPLE_SIGNING_IDENTITY` instead of the name, or delete the old one.

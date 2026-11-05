@@ -1,0 +1,15 @@
+engine: feed
+inputs:
+  call: b9d97acfb7cb13f364a3c37d286aadd19261ec8c5c3949c34776c26ed3556dde
+keys: []
+tokens: 0
+seconds: 0
+output:
+  quirk:
+    word: quirk
+    frequency_rank: 3
+    definition: A small peculiarity of behavior or style, the kind of idiosyncrasy that makes a person recognizable.
+      It can also mean a sudden wry twist, or, in carpentry, a narrow groove cut into a molding.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed

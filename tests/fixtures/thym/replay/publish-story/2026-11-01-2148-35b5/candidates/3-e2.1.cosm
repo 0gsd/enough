@@ -1,0 +1,64 @@
+engine: feed
+inputs:
+  call: 49dd465826f33e1d4083c134acea2a5a4148c3a716278959661c4146f205b926
+keys: []
+tokens: 0
+seconds: 0
+output:
+  up:
+    word: up
+    frequency_rank: 6
+    definition: As an adverb, indicating movement to a higher position, an increase, or completion, as in climb
+      up or eat up. As a preposition, toward a higher point along something, as in up the hill. As a verb, informally,
+      to increase, as in up the price.
+    pos_primary: adverb
+    pos: adverb; preposition; verb
+    origin: feed
+  says:
+    word: say
+    frequency_rank: 6
+    definition: To speak words aloud; to state or assert; of a text, sign, or instrument, to convey information.
+      As a noun, the right or chance to influence a decision; as an adverb, approximately or for example.
+    pos_primary: verb
+    pos: verb; noun; adverb; interjection
+    origin: feed
+  holds:
+    word: hold
+    frequency_rank: 5
+    definition: To grasp, contain, or keep possession of something, from a hand holding a cup to a shelf holding
+      books. As a noun it can be a grip, a place where animals or prisoners are kept, or a ship's cargo space below
+      deck.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  follows:
+    word: follow
+    frequency_rank: 5
+    definition: To go or come after a person or thing; to pursue; to happen or come next in sequence; to obey or
+      act in accordance with; to understand the sense of, as in following an argument.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  gain:
+    word: gain
+    frequency_rank: 5
+    definition: To acquire, increase, or come out ahead, as in gaining weight, ground, or an advantage over a rival.
+      As a noun it names what was gained, from money to insight, and in electronics, how much a signal is amplified.
+    pos_primary: verb
+    pos: verb; noun
+    origin: feed
+  harm:
+    word: harm
+    frequency_rank: 4
+    definition: Injury or damage, physical or emotional, and as a verb, the act of causing it.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed
+  assumed:
+    word: assumed
+    frequency_rank: 4
+    definition: Adopted, especially a name or identity, in order to deceive or conceal; also, more broadly, supposed
+      to be true without being checked.
+    pos_primary: verb
+    pos: verb; adjective
+    origin: feed

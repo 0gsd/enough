@@ -188,6 +188,19 @@ def isolated_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
             monkeypatch.delenv(var, raising=False)
 
 
+@pytest.fixture(autouse=True)
+def unwired_pal_seam(monkeypatch: pytest.MonkeyPatch):
+    """Every test starts with `council.PAL_CALL` unwired, and gets back whatever was there after.
+
+    `create_app` wires that module global to the project it serves (`council_api.build_router`) and nothing
+    unwires it: in the app that is one process, one project, but in the suite the binding outlived the test that
+    made it — `tests/test_pal.py`'s `client` fixture left it bound to a deleted tmp project, and
+    `tests/test_council_pal.py::test_create_app_wires_pal_call_to_the_pal_lanes_one_shot_call` (which checks
+    that `create_app` is what wires it) failed whenever test_pal ran first in the same process."""
+    from enough import council as _council
+    monkeypatch.setattr(_council, "PAL_CALL", _council._pal_not_wired)
+
+
 FIXTURE_MD = (
     "# Fixture\n\n"
     "A paragraph with a footnote.[^1]\n\n"

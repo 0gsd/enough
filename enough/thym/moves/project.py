@@ -30,7 +30,8 @@ spec 2.1): `paratype` in place of `isotype`, with `standing`, `submitter` and `o
 
 `band` says a number as a word from a list: `[none, some]` is 0 for none and anything more for some; any other list
 of k words is cut at equal thresholds of ten (the first word below 10, the next below 20, the last from 10·(k-1)).
-`mark` sets `marking: verified | stated` on an item, or on a word. `withhold` records items in `ctx.withheld`.
+`mark` sets `marking: verified | stated` on an item, or on a word. `withhold` records items in `ctx.withheld`, by
+key, so a twin with the same id in another part stays.
 
 Standalone: the standard library, PyYAML and `enough.macrocosm`.
 """
@@ -47,7 +48,7 @@ from enough.thym.checks import check
 from enough.thym.moves import MoveError, as_list, fold, modifiers
 from enough.thym.registry import implements
 from enough.thym.trace import write_atomic
-from enough.thym.values import Value, members, plain
+from enough.thym.values import Value, is_withheld, item_key, members, plain
 
 ISOTYPE = "comprise-isotype/0"
 PARATYPE = "comprise-paratype/0"
@@ -144,9 +145,10 @@ def _domain(url: str) -> str | None:
     return host[4:] if host.startswith("www.") else host
 
 
-def identity(rows: list[Value], withheld: set[str]) -> dict:
-    """Identity, each field only where the holotype states it publicly (Comprise's `identity`)."""
-    rows = [r for r in rows if _id(r) not in withheld]
+def identity(rows: list[Value], withheld: Any) -> dict:
+    """Identity, each field only where the holotype states it publicly (Comprise's `identity`), from the items
+    `withheld` (`ctx.withheld`) did not take."""
+    rows = [r for r in rows if not is_withheld(withheld, r)]
     brand = next((r for r in rows if _kind(r) == "brand" and _public(r)), None)
     entity = next((r for r in rows if _kind(r) == "entity" and (r.mapping() or {}).get("anchor") is True
                    and (r.mapping() or {}).get("visibility") == "public"), None)
@@ -205,14 +207,14 @@ def project(ctx: Any, h: Value, **mods: Any) -> Value:
         raise MoveError(f"project gives an isotype or a paratype, not {kind}")
     cat = h.mapping() or {}
     rows = members(h) or []
-    withheld = set(ctx.withheld)
+    withheld = ctx.withheld
     cadence = cat.get("cadence") if cat.get("cadence") in CADENCES else "quarterly"
     offers: dict = {}
     markets: set[str] = set()
     seeks: dict = {}
     open_to: dict = {}
     for v in ctx.emitted:
-        if not isinstance(v, Value) or _id(v) in withheld or not isinstance(v.payload, dict):
+        if not isinstance(v, Value) or is_withheld(withheld, v) or not isinstance(v.payload, dict):
             continue
         d, k, m = v.payload, _kind(v), marking_of(v)
         if m == "verified" and k in OFFER_KINDS and d.get("status") in LIVE and _plain(d.get("name")):
@@ -334,9 +336,10 @@ def _banded(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tup
 
 def _neither(inputs: dict, ctx: Any) -> int:
     h = next((v for v in inputs.values() if isinstance(v, Value) and v.type == "volume"), None)
-    ids = {_id(r) for r in (members(h) or [])} if h is not None else set()
-    emitted = {_id(v) for v in (getattr(ctx, "emitted", None) or []) if isinstance(v, Value)}
-    return len(ids - emitted - set(getattr(ctx, "withheld", None) or {}))
+    withheld = getattr(ctx, "withheld", None) or {}
+    emitted = {item_key(v) for v in (getattr(ctx, "emitted", None) or []) if isinstance(v, Value)}
+    return sum(1 for r in (members(h) or [] if h is not None else [])
+               if item_key(r) not in emitted and not is_withheld(withheld, r))
 
 
 @check("verified-derived")
@@ -346,9 +349,9 @@ def _verified_derived(output: Value, inputs: dict, node: dict, decl: Any, ctx: A
     it neither emitted nor withheld, which default-deny left out."""
     nv = ns = 0
     derivable = DERIVABLE["comprise"]
-    withheld = set(getattr(ctx, "withheld", None) or {})
+    withheld = getattr(ctx, "withheld", None) or {}
     for v in getattr(ctx, "emitted", None) or []:
-        if not isinstance(v, Value) or _id(v) in withheld:
+        if not isinstance(v, Value) or is_withheld(withheld, v):
             continue
         m, k = marking_of(v), _kind(v)
         if m == "verified" and k not in derivable:

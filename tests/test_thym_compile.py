@@ -443,6 +443,66 @@ def test_use_clash_names_both_files(house):
     assert (r.check, r.line) == ("use-clash", 2) and "local.thym" in r.message
 
 
+SECRET = "s3cret-line-that-must-not-leave"
+
+
+def _outside(tmp_path: Path) -> tuple[Path, Path]:
+    """A program's folder, and a folder beside it holding a file that is no thym/1 volume, whose YAML is broken on a
+    line a refusal could quote."""
+    prog, other = tmp_path / "prog", tmp_path / "other"
+    prog.mkdir()
+    other.mkdir()
+    (other / "secret.cosm").write_text(f"oes: thym/1\nkey: [unclosed {SECRET}\n", encoding="utf-8")
+    (other / "secret.thym").write_text(f"thym 0\n{SECRET} is no statement\n", encoding="utf-8")
+    (other / "voices.morph.cosm").write_text(f"{SECRET}: [\n", encoding="utf-8")
+    return prog, other
+
+
+@pytest.mark.parametrize("uri", ["../other/secret.cosm", "../other/secret.thym", "sub/../../other/secret.cosm",
+                                 "{abs}/secret.cosm", "{abs}/secret.thym", "..\\other\\secret.cosm", "C:\\other\\secret.cosm"])
+def test_use_refuses_a_path_out_of_the_programs_folder_and_never_reads_it(tmp_path, uri):
+    prog, other = _outside(tmp_path)
+    uri = uri.replace("{abs}", other.as_posix())
+    p = _write(prog, "u.thym", f"thym 0\nuse {uri}\n\nprogram p\n  gives n: number\n  give 0\nend\n")
+    r = thym.check_file(p)
+    assert (r.stage, r.check, r.line) == ("compile", "unknown-uri", 2), str(r)
+    assert "inside this program's folder" in r.message and "was not read" in r.message, r.message
+    assert SECRET not in str(r)
+
+
+@pytest.mark.parametrize("name", ["link.cosm", "link.thym", "voices.morph.cosm"])
+def test_use_refuses_a_link_that_leads_out_of_the_programs_folder(tmp_path, name):
+    prog, other = _outside(tmp_path)
+    target = other / ("secret.thym" if name.endswith(".thym") else
+                      "voices.morph.cosm" if name.startswith("voices") else "secret.cosm")
+    (prog / name).symlink_to(target)
+    uri = "oes:thym/voices" if name.startswith("voices") else name
+    p = _write(prog, "u.thym", f"thym 0\nuse {uri}\n\nprogram p\n  gives n: number\n  give 0\nend\n")
+    r = thym.check_file(p)
+    assert (r.check, r.line) == ("unknown-uri", 2) and "a link that leads out of it" in r.message, str(r)
+    assert SECRET not in str(r)
+
+
+def test_use_of_a_file_in_a_subfolder_or_a_link_inside_still_works(house):
+    (house / "lib").mkdir()
+    (house / "lib" / "house.thym").write_text((house / "house.thym").read_text(encoding="utf-8"), encoding="utf-8")
+    p = _write(house, "sub.thym", "thym 0\nuse lib/house.thym\n\nprogram brief\n  takes t: text\n  gives s: short\n"
+               "  let f = derive t\n  give plainly f\nend\n")
+    assert isinstance(thym.check_file(p), ck.Checked), thym.check_file(p)
+    (house / "alias.thym").symlink_to(house / "lib" / "house.thym")
+    p = _write(house, "alias-user.thym", "thym 0\nuse alias.thym\n\nprogram brief\n  takes t: text\n  gives s: short\n"
+               "  let f = derive t\n  give plainly f\nend\n")
+    assert isinstance(thym.check_file(p), ck.Checked), thym.check_file(p)
+
+
+def test_a_used_volume_that_is_not_yaml_is_refused_without_its_text(house):
+    (house / "broken.cosm").write_text(f"oes: thym/1\nkey: [unclosed {SECRET}\n", encoding="utf-8")
+    p = _write(house, "b.thym", "thym 0\nuse broken.cosm\n\nprogram p\n  gives n: number\n  give 0\nend\n")
+    r = thym.check_file(p)
+    assert (r.check, r.line) == ("unknown-uri", 2) and "cannot be read as a thym/1 volume" in r.message, str(r)
+    assert "line 3, column 1" in r.message and SECRET not in str(r), r.message
+
+
 @pytest.mark.parametrize("uri", ["oes:thym/nowhere", "missing.thym", "oes:emf/notes-md", "oes:thym/voices/M/morph/rosa"])
 def test_unknown_uri(house, uri):
     p = _write(house, "u.thym", f"thym 0\nuse {uri}\n\nprogram p\n  gives n: number\n  give 0\nend\n")
@@ -520,6 +580,27 @@ def test_a_manifest_block_wins_over_a_sidecar_and_a_move_declared_twice_is_repor
     assert "retell" not in decls and decls["tell"].owner == "emf"
     joined = " | ".join(decls.problems)
     assert "emf.moves.cosm" in joined and "tell is declared again" in joined
+    assert "emf.moves.cosm: emf's manifest declares its own moves, which win; this sidecar is not read" in joined
+
+
+def test_a_second_sidecar_says_the_first_sidecar_won_not_a_manifest(tmp_path):
+    """Two folders each with a sidecar for the same MiniCOSM (Comprise's `oes/` before the vendored reference): the
+    first is read, and the second's problem names that sidecar, not a manifest that declares no moves."""
+    first, second = tmp_path / "first", tmp_path / "second"
+    first.mkdir()
+    second.mkdir()
+    for p in mc.DEFAULT_MANIFEST_DIR.glob("*.cosm"):
+        if not p.name.endswith(".moves.cosm"):
+            shutil.copy(p, second / p.name)
+    (first / "comprise.moves.cosm").write_text("moves-of: comprise/1\nmoves:\n  - {name: project, takes: [volume], "
+                                               "gives: volume, says: ours}\n")
+    shutil.copy(mc.DEFAULT_MANIFEST_DIR / "comprise.moves.cosm", second / "comprise.moves.cosm")
+    decls = dc.load(mc.Registry([first, second]))
+    assert decls["project"].says == "ours" and "band" not in decls
+    joined = " | ".join(decls.problems)
+    assert "manifest declares its own moves" not in joined, joined
+    assert f"comprise.moves.cosm: an earlier sidecar for comprise ({first / 'comprise.moves.cosm'}) is read; this " \
+           "sidecar is not read" in joined
 
 
 def test_types_accept_by_density_and_never_coerce():

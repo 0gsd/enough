@@ -1,0 +1,15 @@
+engine: feed
+inputs:
+  call: 546c0e9a60d3f885508b5d5ea59422cfd728a0458508ec9ac7ff1a4f1991a32a
+keys: []
+tokens: 0
+seconds: 0
+output:
+  mould:
+    word: mould
+    frequency_rank: 3
+    definition: 'Commonwealth spelling of mold: a fuzzy fungal growth, loose soil rich in organic matter, or a hollow
+      form used to shape or cast something; as a verb, to shape material or to become covered with fungus.'
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed

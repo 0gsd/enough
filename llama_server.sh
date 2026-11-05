@@ -60,6 +60,10 @@ DRAFT_NOTE=""
 # Derived by resolve_cap_flags: the small-machine memory caps.
 CAP_ARGS=()
 CAP_NOTE=""
+# Set by resolve_model's registry branch (`enough.models params`); a literal
+# .gguf path has no cute name, so it launches without --alias.
+MODEL_CUTE=""
+ALIAS_ARGS=()
 
 ENOUGH_HOME="$HOME/enough"
 resolve_model() {
@@ -270,6 +274,10 @@ start() {
   mkdir -p "$STATE_DIR"
   resolve_spec_flags
   resolve_cap_flags
+  # --alias: llama-server reports the cute name (g40-04) as its model id,
+  # the name enough's journals and derived records carry (fabula P6).
+  ALIAS_ARGS=()
+  if [[ -n "$MODEL_CUTE" ]]; then ALIAS_ARGS=(--alias "$MODEL_CUTE"); fi
   local ctx_to_use="${CTX:-32768}"
   echo "launching llama-server with:"
   echo "  model: $MODEL_PATH"
@@ -286,6 +294,7 @@ start() {
     -m "$MODEL_PATH" \
     --host "$HOST" --port "$PORT" \
     -ngl "$NGL" -c "$ctx_to_use" --parallel "$PARALLEL" --jinja \
+    ${ALIAS_ARGS[@]+"${ALIAS_ARGS[@]}"} \
     $SPEC_FLAGS ${DRAFT_ARGS[@]+"${DRAFT_ARGS[@]}"} \
     ${CAP_ARGS[@]+"${CAP_ARGS[@]}"} \
     >"$LOG_FILE" 2>&1 &

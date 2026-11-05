@@ -1,0 +1,15 @@
+engine: feed
+inputs:
+  call: 8799eb03c8c0fc0ce4f5d37f9399e5971e0ae6f81a421f13a64ffa5747db81c4
+keys: []
+tokens: 0
+seconds: 0
+output:
+  leaflet:
+    word: leaflet
+    frequency_rank: 3
+    definition: A small printed sheet distributed for information or advertising, or, botanically, one segment of
+      a compound leaf. As a verb, to distribute such sheets.
+    pos_primary: noun
+    pos: noun; verb
+    origin: feed

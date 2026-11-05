@@ -611,9 +611,12 @@ def _mask_code(text: str) -> str:
 # ---------------------------------------------------------------------------
 
 _NUM = r"\d+(?:\.\d+)*"
-_JOIN = r"(?:\s*(?:,|、|and|or|und|oder|et|ou|y|o|to|bis|à|a|–|—|-|〜|～|から)\s*)"
+# と joins two numbers in Japanese ("セクション 12.4 と 12.5"), as the page's and the export's joins do.
+_JOIN = r"(?:\s*(?:,|、|と|and|or|und|oder|et|ou|y|o|to|bis|à|a|–|—|-|〜|～|から)\s*)"
+# The word-boundary lookbehind guards the Latin words only: Japanese runs unspaced, and a particle before セクション
+# ("ヘルプセンターのセクション 13.4") is a word character.
 _SEC_REF = re.compile(
-    rf"(?P<its>\bits\s+)?(?<![\w-])(?:[Ss]ections?|[Ss]ecci[oó]n(?:es)?|Abschnitt(?:en|e)?|セクション)\s*"
+    rf"(?P<its>\bits\s+)?(?:(?<![\w-])(?:[Ss]ections?|[Ss]ecci[oó]n(?:es)?|Abschnitt(?:en|e)?)|セクション)\s*"
     rf"(?P<list>{_NUM}(?:{_JOIN}(?:§\s*)?{_NUM})*)")
 _ZH_REF = re.compile(rf"第\s*({_NUM})\s*节")
 _SIGN_REF = re.compile(rf"(?P<readme>README\s+)?§\s*(?P<list>{_NUM}(?:\s*(?:,|–|—|-|to|and)\s*§?\s*{_NUM})*)")
@@ -728,7 +731,8 @@ class _TermMatcher:
 _ATEM_MARK = re.compile(r"^\s*<!--\s*atem:\s*(.*?)\s*-->\s*$")
 _TERM_MARK = re.compile(r"^\s*<!--\s*term:\s*(.*?)\s*-->\s*$")
 _BOLD_LABEL = re.compile(r"^\*\*([^*]+?[.:：])\*\*\s*")
-_SEP = r"(?:—|–|--|:|：|——|-)"
+# The longest dash first: Chinese writes ——, which `—` alone would cut in half.
+_SEP = r"(?:——|—|–|--|:|：|-)"
 _BULLET_TERM = re.compile(rf"^\*\*(?P<t>[^*]+?)\*\*\s*(?P<sep>{_SEP})\s*(?P<rest>.*)$")
 _SENTENCE_TERM = re.compile(
     r"^(?:(?:A|An|The) )?\*\*(?P<t>[^*]+?)\*\*(?P<paren> \([^)]*\))?,? "
@@ -845,7 +849,8 @@ def _term_meaning(cls: str, cand: dict, lang: str) -> tuple[str, str]:
             pred_first = (_sentences(pred_plain, lang) or [pred_plain])[0]
             atem = _atem_cut(pred_first if verb in ("is", "are", "means") else f"{verb} {pred_first}", lang)
         else:
-            atem = _atem_of(_plain(re.sub(r"^\S*\s*\*\*[^*]+\*\*", "", cand["full"])), lang) or \
+            # The lead is one optional word and the first bold run: lazy, or unspaced CJK runs on to the second bold.
+            atem = _atem_of(_plain(re.sub(r"^\S*?\s*\*\*[^*]+\*\*", "", cand["full"])), lang) or \
                 _atem_cut(summary, lang)
         return summary, atem
     rest = _plain(cand.get("rest", ""))

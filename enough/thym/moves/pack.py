@@ -53,7 +53,8 @@ def _packaged_fabula(f: Value) -> bytes:
     if src is not None:
         src["path"] = "text.md"
     if old and old != "text.md":
-        rx = re.compile(rf"^{re.escape(old)}(?=#|$)")
+        # every locator in a source, not only the first: a source may hold several, `notes.md#L3, notes.md#L14`
+        rx = re.compile(rf"(?<![^\s,]){re.escape(old)}(?=#|,|\s|$)")
         for it in doc.get("nodes") or []:
             prov = it.get("provenance") if isinstance(it, dict) else None
             if isinstance(prov, dict) and isinstance(prov.get("sources"), list):

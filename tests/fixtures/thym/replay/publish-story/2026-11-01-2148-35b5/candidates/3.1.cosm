@@ -12,70 +12,59 @@ contract:
   - null-pinned
   - provenance
 inputs:
-  fabula: 11f87a5bb18fe02faaa8b620cdf0f6919717ce1846446b6950be2f0535037a92
-  outline: 2334f71f876e312768f37eaf46c0893abc37e6920606c8cf9802c02bd2d067bb
+  fabula: fe970d1b49e4c1548c336e9de5facd3bb3458ba01fe251cf52d20356c934b714
+  outline: f1bb63ca177983fbbe2c4672995595eddf2c0c6966764a38e7367bbfed8dca28
 engine: model:Qwen3.8-27B-Q4_K_M.gguf
 attempts: 1
-tokens: 2574
-seconds: 27
+tokens: 2578
+seconds: 45
 output:
   sentences:
-  - say: The Hollins Lane orchard pressed 140 litres of juice.
+  - say: The Hollins Lane orchard is kept by Mara Okafor.
     cites:
+    - E:place/hollins-lane-orchard
+    - E:person/mara-okafor
+  - say: It produced 140 litres of juice this year.
+    cites:
+    - E:place/hollins-lane-orchard
     - T:event/juice-pressing
-    - P:claim/juice-yield-increase
-  - say: This is an increase from 90 litres last year.
+  - say: This is up from 90 litres last year.
     cites:
     - P:claim/juice-yield-increase
+  - say: Mara Okafor says the Bramley tree is oldest.
+    cites:
+    - P:claim/bramley-is-oldest-tree
+  - say: Parish records do not confirm the planting date.
+    cites:
+    - K:concept/parish-records
+  - say: Apple trees require a second variety to set fruit.
+    cites:
+    - P:claim/cross-pollination-required
+  - say: The author counted the juice bottles on 12 October.
+    cites:
+    - T:event/bottle-counting
+    - E:person/author
   - say: Volunteers spread leaf mould under the trees in March.
     cites:
-    - T:event/leaf-mould-spread
-  - say: Mara Okafor holds that the leaf mould improved the yield.
+    - T:event/leaf-mould-spreading
+    - E:org/volunteers
+  - say: Mara Okafor holds that leaf mould caused the increase.
     cites:
-    - P:claim/mulch-effect-on-yield
-  - say: It follows that a warm, wet spring explains the increase.
+    - P:claim/leaf-mould-causes-yield-increase
+  - say: It follows that a warm, wet spring explains the gain.
     cites:
-    - P:claim/spring-weather-effect
-  - say: Every orchard in the valley did well.
+    - P:claim/warm-spring-causes-yield-increase
+  - say: The parish council plans to mow the meadow strip in July.
     cites:
-    - P:claim/spring-weather-effect
-  - say: The Bramley apple tree is by the gate.
+    - T:event/july-mowing
+    - E:org/parish-council
+  - say: It follows that July mowing would harm the orchard.
     cites:
-    - E:thing/bramley-apple-tree
-  - say: Reportedly, it is the oldest tree on the lane.
+    - P:claim/july-mowing-harms-orchard
+  - say: The group agreed to ask the council to wait.
     cites:
-    - P:claim/oldest-tree-status
-  - say: Parish records do not state its planting date.
-    cites:
-    - P:claim/oldest-tree-status
-  - say: Every apple tree needs a second variety nearby.
-    cites:
-    - P:claim/apple-pollination-requirement
-  - say: This is how apples pollinate.
-    cites:
-    - P:claim/apple-pollination-requirement
-  - say: The meadow strip feeds the pollinators.
-    cites:
-    - E:place/meadow-strip
-  - say: The orchard depends on these pollinators.
-    cites:
-    - K:concept/pollinator-dependence
-  - say: The parish council's grounds team wants to mow in July.
-    cites:
-    - T:event/meadow-mowing-plan
-  - say: It follows that mowing would cut wildflowers before they seed.
-    cites:
-    - P:claim/meadow-mowing-threat
-  - say: The orchard would lose the pollinators it needs.
-    cites:
-    - P:claim/meadow-mowing-threat
-  - say: Mara Okafor will write to the council.
-    cites:
-    - T:event/council-letter-request
-  - say: She asks them to wait until September.
-    cites:
-    - T:event/council-letter-request
+    - P:claim/ask-council-to-wait
   - say: It is assumed that the lease allows mowing without asking.
     cites:
-    - P:claim/lease-mowing-question
+    - P:claim/lease-uncertainty
   engine: model:Qwen3.8-27B-Q4_K_M.gguf

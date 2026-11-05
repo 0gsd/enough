@@ -12,7 +12,7 @@ The calling convention, frozen for the moves lane:
 
 - `ctx` is the run's `MoveContext` (`enough.thym.run`): `ctx.run` (the run id `made` names), `ctx.node` (the plan
   node), `ctx.decls` (the declarations, by name), `ctx.coprocessor`, `ctx.rules`, `ctx.now` (the run's start, UTC),
-  `ctx.emitted` and `ctx.slots` (what `emit` collected), `ctx.withheld` (item id -> item) and `ctx.withhold(*items)`,
+  `ctx.emitted` and `ctx.slots` (what `emit` collected), `ctx.withheld` (item key -> item: `values.item_key`, `values.is_withheld`) and `ctx.withhold(*items)`,
   `ctx.inputs_root`, `ctx.root`, `ctx.stage`, `ctx.trace()` (the run's trace so far, as a value).
 - `operands` are values (`enough.thym.values.Value`), in the order the call writes them.
 - `modifiers` are keyed by the modifier word itself (`as`, `by`, `with`, `to`, `against`, `of`, `in`, `where`), so a

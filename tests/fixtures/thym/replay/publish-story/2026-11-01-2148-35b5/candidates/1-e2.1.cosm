@@ -1,0 +1,22 @@
+engine: canon.read_atem
+inputs:
+  call: 17df8e7359c25802b2b720d923b8d16ae56c098e36dbd9aac3ca50e83c18fa06
+keys: []
+tokens: 0
+seconds: 0
+output:
+  line: The Hollins Lane orchard produced 140 litres of juice this year, up from 90 last year, and the group agreed
+    to ask the council to wait until September to mow the meadow strip to protect pollinators.
+  focus: The text details the orchard's increased juice yield and the group's plan to delay mowing. The author highlights
+    the dependency between the meadow strip and fruit pollination.
+  push: The reader should support the request to delay mowing to protect the pollinators essential for the orchard's
+    fruit production.
+  pull: The text assumes the meadow strip is the primary pollinator source and that the council will accept the
+    delay request.
+  stance_profile:
+    axiom: 1
+    observed: 3
+    deduced: 2
+    opinion: 2
+    assumed: 1
+    hearsay: 1

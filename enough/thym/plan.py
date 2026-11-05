@@ -39,6 +39,7 @@ from . import MINICOSM, Refusal
 from . import check as ck
 from . import enumerate as en
 from . import parse as ps
+from .values import posix_path
 
 _NUMBERS = ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
             "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty")
@@ -411,7 +412,7 @@ def plan(checked: ck.Checked, inputs: list[dict], *, program: str | None = None,
     unknown = [n for n in given if n not in {p.name for p in block.takes}]
     if unknown:
         return Refusal("plan", "input", f"program {block.name} takes no {unknown[0]}", None, m.path)
-    ins = [{"name": str(i.get("name")), "type": str(i.get("type")), "path": str(i.get("path")),
+    ins = [{"name": str(i.get("name")), "type": str(i.get("type")), "path": posix_path(i.get("path")),
             "sha256": str(i.get("sha256"))} for i in inputs]
     program_sha = en.sha256(m.text.encode("utf-8"))
     rid = run_id(program_sha, ins, now)

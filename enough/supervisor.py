@@ -219,6 +219,9 @@ class LlamaSupervisor:
             "-c", str(ctx),
             "--parallel", str(self.parallel),
             "--jinja",
+            # The id llama-server reports (`model` in every completion) is
+            # the cute name people know, not the gguf's file name (fabula P6).
+            "--alias", cute,
         ]
         spec = _models.spec_flags(info, binary)
         if info.get("spec_args") and not spec:
