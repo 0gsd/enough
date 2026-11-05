@@ -74,14 +74,6 @@ The problems:
 Return only these items, corrected, as a YAML `nodes:` list. Do not repeat any other item.
 """
 
-# The names before EMF (plan §16), kept one release.
-EML_SYSTEM = EMF_SYSTEM
-EML_USER = EMF_USER
-EML_CONTINUE = EMF_CONTINUE
-EML_RESTART = EMF_RESTART
-EML_RETRY = EMF_RETRY
-EML_REPAIR = EMF_REPAIR
-
 # A text or a passage → its atem. The four parts are the owner's definitions.
 ATEM_SYSTEM = """\
 You write the atem of a text or a passage: its tightest fair, full, plain-English reduction.

@@ -268,7 +268,8 @@ def test_agent_free_refuses_a_plan_that_asks_before_any_call(root):
                 agent_free=True, moves=fake_moves(), checks=fake_checks())
     assert isinstance(r, Refusal)
     assert (r.stage, r.check, r.line) == ("plan", "agent-free", 12)
-    assert r.message == "3 steps ask a model; agent-free is on"
+    # THYM 9: the first step that asks is named as the person wrote it; without the program, by the plan's words
+    assert r.message == "3 steps ask a model, the first derive story (line 12); agent-free is on"
     assert cp.calls == []
     assert not (root / "runs").exists()
 
@@ -360,7 +361,8 @@ def test_a_check_the_registry_lacks_refuses_never_passes(root):
     cp = FakeCoprocessor({"derive": TWIN.read_text(encoding="utf-8"), "tell": telling()})
     t = RUN.run(brief_plan(), inputs_root=SUITE, root=root, coprocessor=cp, moves=fake_moves(), checks=ck)
     assert t.outcome == "refused"
-    assert (t.refusal.stage, t.refusal.check, t.refusal.message) == ("run", "no-invention", "check not implemented")
+    assert (t.refusal.stage, t.refusal.check, t.refusal.message) == ("run", "no-invention",
+                                                                      "tell f as told (line 6): check not implemented")
 
 
 def test_model_output_carries_made_with_its_engine(root):
@@ -433,10 +435,11 @@ def test_rules_refuses_a_plan_whose_model_steps_have_no_scaffold(root):
                           line=6))                                # expand declares no scaffold (THYM.md 19)
     r = RUN.run(plan, inputs_root=SUITE, root=root, rules=True, moves=fake_moves(), checks=fake_checks())
     assert isinstance(r, Refusal) and (r.stage, r.check, r.line) == ("plan", "rules", 6)
-    assert r.message == "1 step asks a model and has no scaffold; --rules runs no model"
+    assert r.message == "1 step asks a model and has no scaffold: expand f to 300 words (line 6); --rules runs no model"
     r = RUN.run(plan, inputs_root=SUITE, root=root, rules=True, agent_free=True, moves=fake_moves(),
                 checks=fake_checks())
-    assert (r.check, r.message) == ("agent-free", "1 step asks a model and has no scaffold; agent-free is on")
+    assert (r.check, r.message) == ("agent-free", "1 step asks a model and has no scaffold: expand f to 300 words "
+                                                  "(line 6); agent-free is on")
 
 
 def test_an_if_takes_one_branch_and_skips_the_other(root):
@@ -507,7 +510,8 @@ def test_a_failed_assert_inside_a_user_move_refuses_with_its_message(root):
                 moves=fake_moves(), checks=ck)
     assert t.outcome == "refused" and t.stopped_at == "R:record/2"
     assert (t.refusal.stage, t.refusal.check, t.refusal.line) == ("run", "coverage", 16)
-    assert t.refusal.message == "the telling lost part of the fabula (sentence 2 traces to no item)"
+    assert t.refusal.message == ("give plain-paragraph f (line 16): the telling lost part of the fabula (sentence 2 "
+                                 "traces to no item)")
     assert not (t.dir / "outputs").exists()
 
 

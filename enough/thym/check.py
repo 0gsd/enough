@@ -16,6 +16,13 @@ static contract `no-counts`. A refusal is a value with the line; nothing here ra
 `check` gives a `Checked`: the module with every expression typed and every call bound to its target, the file's
 symbols, and the user moves with the contracts, calls and asks they inherit. `own_call`, `step_calls`, `eval_calls`,
 `names_used` and `walk` are the views of a statement that enumeration and planning share.
+
+**Versions** (THYM 4.9). A module is checked against the declarations a program of its grammar version sees
+(`declarations.views`): a `thym 0` program sees each move's `thym 0` view and no move that says `since: 1`. The
+checker logs in `Module.features` each `thym 1` feature it meets (a move only `thym 1` sees, a word or an operand
+only a move's `thym 1` view admits). A `thym 0` module refused here is compiled again as `thym 1` (`needs_thym1`):
+when that compile succeeds, the refusal becomes `version` at the first `thym 1` feature in the file. A used file is
+read by its own version line; a `thym 0` program may not use a `thym 1` file.
 """
 from __future__ import annotations
 
@@ -61,12 +68,12 @@ def _inside(base: Path, p: Path) -> bool:
 
 def _yaml_problem(e: Exception) -> str:
     """What is wrong with a used file's YAML, with its place and never its text: PyYAML's message quotes the line it
-    stopped on, and a refusal must not carry a file's content."""
+    stopped on, and a refusal must not carry a file's content (nor an implementation's exception, THYM 9)."""
     problem = getattr(e, "problem", None)
     mark = getattr(e, "problem_mark", None)
     if problem and mark is not None:
         return f"{problem} at line {mark.line + 1}, column {mark.column + 1}"
-    return problem or type(e).__name__
+    return problem or "it is not YAML this reader can read"
 
 
 @dataclass(eq=False)
@@ -325,7 +332,8 @@ class _Checker:
     def __init__(self, module: ps.Module, decls: dict, volumes: Volumes, seen: frozenset[str]):
         self.m, self.decls, self.volumes, self.seen = module, decls, volumes, seen
         self.file = module.path
-        self.reserved = set(ps.KEYWORDS) | set(decls) | set(ty.LITERAL_WORDS)
+        self.g = module.grammar
+        self.reserved = set(self.g.keywords) | set(decls) | set(ty.LITERAL_WORDS)
         self.names: dict[str, Binding] = {}
         self.moves: dict[str, UserMove] = {}
         self.local: dict[str, dict[str, UserMove]] = {}
@@ -341,7 +349,7 @@ class _Checker:
         raise _Fail(Refusal("compile", check, message, line, file or self.file))
 
     def what_is(self, name: str) -> str | None:
-        if name in ps.KEYWORDS:
+        if name in self.g.keywords:
             return "keyword"
         if name in self.decls:
             return "standard move"
@@ -519,14 +527,19 @@ class _Checker:
             return {}
         try:
             text = p.read_bytes().decode("utf-8")
-        except (OSError, UnicodeDecodeError) as e:
-            self.fail("unknown-uri", f"{uri} cannot be read: {e}", line)
+        except OSError as e:
+            self.fail("unknown-uri", f"{uri} cannot be read: {e.strerror or 'the system would not open it'}", line)
+        except UnicodeDecodeError:
+            self.fail("unknown-uri", f"{uri} cannot be read: it is not UTF-8", line)
         mod = ps.parse(text, path=str(p))
         if isinstance(mod, Refusal):
             raise _Fail(mod)
         return self.names_of_module(mod, uri, line, key)
 
     def names_of_module(self, mod: ps.Module, uri: str, line: int, key: str | None = None) -> dict:
+        if mod.version > self.m.version:
+            self.fail("version", f"use {uri} brings a thym {mod.version} file into a thym {self.m.version} program; "
+                      f"this needs `thym {mod.version}`", line)
         sub = check(mod, decls=self.decls, volumes=self.volumes,
                     _seen=self.seen | {key or str(mod.path), str(Path(self.file).resolve()) if self.file else ""})
         if isinstance(sub, Refusal):
@@ -847,6 +860,7 @@ class _Checker:
             self.fail("unknown-move", f"unknown move `{c.move}`" + (f"; did you mean `{near[0]}`?" if near else
                       "; no manifest declares it and no move block of this file is named so"), c.line)
         c.target = target
+        self.thym1_move(c, target)
         if isinstance(target, UserMove):
             if len(c.operands) != len(target.params):
                 self.fail("type", f"{c.move} takes {len(target.params)} operand(s) "
@@ -890,12 +904,45 @@ class _Checker:
             self.modifier(c, m, list(target.modifiers[m.word]), scope, ctx)
         if not takes and "of" in target.modifiers and c.mod("of") is None:
             self.fail("type", f"{c.move} takes its argument through of: {c.move} of …", c.line)
+        self.thym1_use(c, target)
         gives = list(target.gives)
         if len(gives) == 1:
             return gives[0]
         if c.operands and c.operands[0].type in gives:
             return c.operands[0].type
         return ty.ANY
+
+    def thym1_move(self, c: ps.Call, target: Any) -> None:
+        """Log the `thym 1` features a call of a declared move meets (THYM 4.9): the move is one only `thym 1` sees
+        (`since: 1`), or the call writes a word, a modifier or an operand that only the move's `thym 1` view admits.
+        Called after the call is resolved; the words and operands are compared once they are typed (`thym1_use`)."""
+        if self.m.version < 1 or not isinstance(target, dc.MoveDecl):
+            return
+        if target.since >= 1:
+            self.m.met(c.line, "since-move", c.move)
+
+    def thym1_use(self, c: ps.Call, target: Any) -> None:
+        """The words, modifiers and operand types of a typed call that the move's `thym 0` view would not take."""
+        if self.m.version < 1 or not isinstance(target, dc.MoveDecl) or target.since >= 1 or not target.base.thym1:
+            return
+        old = target.frozen_view()
+        if old is None:
+            return
+        for op, alts in zip(c.operands, old.takes):
+            w = strip_paren(op)
+            word = w.name if isinstance(w, ps.Name) and w.kind == "word" else None
+            if op.type is not None and not ty.accepts(list(alts), op.type, word=word):
+                self.m.met(op.line, "thym1-operand", f"{c.move} {ps.render(op)} (a {op.type})")
+        for m in c.mods:
+            if m.word not in old.modifiers:
+                self.m.met(m.line, "thym1-word", f"{m.word} of {c.move}")
+                continue
+            words = [m.arg] if isinstance(m.arg, ps.Word) else (
+                list(m.arg.items) if isinstance(m.arg, ps.ListLit) and all(isinstance(x, ps.Word) for x in m.arg.items)
+                else [])
+            for wd in words:
+                if not ty.accepts(list(old.modifiers[m.word]), ty.WORD, word=wd.word):
+                    self.m.met(m.line, "thym1-word", f"{wd.word} after {m.word} of {c.move}")
 
     def modifier(self, c: ps.Call, m: ps.Mod, alts: list[str], scope: _Scope, ctx: _Ctx) -> None:
         arg = m.arg
@@ -1005,7 +1052,11 @@ class _Checker:
             first, cycle = min(on_cycle, key=lambda x: x[0].line)
             chain = " → ".join(m.name for m in cycle)
             how = "calls itself" if len(cycle) <= 2 and cycle[0] is cycle[-1] else f"calls itself through {chain}"
-            self.fail("recursion", f"move {first.name} {how}; version 0 has no recursion", first.line)
+            if self.m.version < 1:
+                self.fail("recursion", f"move {first.name} {how}, and thym 0 has no recursion; thym 1 allows it with "
+                          "a depth: line", first.line)
+            # the seam for recursion under depth: (a later part of the compiler): until then thym 1 refuses as 0 did
+            self.fail("recursion", f"move {first.name} {how}, and has no depth: line", first.line)
 
     def inherit(self, mv: UserMove, busy: set[int]) -> UserMove:
         if mv.inherited or id(mv) in busy:
@@ -1046,16 +1097,40 @@ def _once(xs: list[str]) -> list[str]:
 def check(module: ps.Module, *, decls: dict | None = None, volumes: Volumes = None,
           _seen: frozenset[str] = frozenset()) -> Checked | Refusal:
     """Resolve, type-check and contract-check a parsed module. `decls` are the declared moves (the bundled
-    registry's by default); `volumes` answers a `use oes:…` (a mapping or a function from the URI to a loaded
-    `thym/1` mapping, a path, or a parsed module), before the files beside the program are looked at."""
+    registry's by default), seen in the view of the module's grammar version (THYM 4.9); `volumes` answers a `use
+    oes:…` (a mapping or a function from the URI to a loaded `thym/1` mapping, a path, or a parsed module), before
+    the files beside the program are looked at. A `thym 0` module refused here is compiled again as `thym 1`
+    (`needs_thym1`)."""
     if isinstance(module, Refusal):
         return module
     if not isinstance(module, ps.Module):
         return Refusal("compile", "parse", "check takes a parsed module", None, None)
     decls = dc.load() if decls is None else decls
     try:
-        return _Checker(module, decls, volumes, _seen).run()
+        return _Checker(module, dc.views(decls, module.version), volumes, _seen).run()
     except _Fail as f:
-        return f.refusal
+        refused = f.refusal
     except RecursionError:
         return Refusal("compile", "parse", "the program nests too deeply", None, module.path)
+    if module.version == 0 and module.written is None and refused.check != "version":
+        return needs_thym1(module.text, module.path, refused, decls=decls, volumes=volumes, _seen=_seen)
+    return refused
+
+
+def needs_thym1(text: str, path: str | None, refused: Refusal, *, decls: dict | None = None, volumes: Volumes = None,
+                _seen: frozenset[str] = frozenset()) -> Refusal:
+    """The refusal of a `thym 0` file, after the same text is compiled again as `thym 1` (THYM 4.9): `version`, at
+    the line of the first `thym 1` feature in the file, when that compile succeeds; else `refused` unchanged. The
+    second compile only chooses the message: it never changes what a `thym 0` program means."""
+    try:
+        again = ps.parse(text, path=path, version=1)
+        if isinstance(again, Refusal):
+            return refused
+        checked = check(again, decls=decls, volumes=volumes, _seen=_seen)
+    except RecursionError:
+        return refused
+    if isinstance(checked, Refusal) or not again.features:
+        return refused
+    line, phrase = min(again.features, key=lambda f: f[0])
+    return Refusal("compile", "version", f"this needs `thym 1`: {phrase} at line {line}; the first line says thym 0",
+                   line, path)

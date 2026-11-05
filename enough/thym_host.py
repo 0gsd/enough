@@ -815,7 +815,7 @@ def list_programs(project_dir: Path | None = None, *, canon: bool = True, shippe
 
 def find_program(ref: str, project_dir: Path | None = None) -> Path | None:
     """The file a program reference names, or None. `ref` is a path when it ends in `.thym` or holds a slash (a
-    project-relative path, or a `canon:`/`cacheawl:` store path), else a program's declared name, resolved in
+    project-relative path, or a `canon:` store path), else a program's declared name, resolved in
     `list_programs`' order: the project's first, then the store's, then the shipped one."""
     ref = (ref or "").strip()
     if not ref:

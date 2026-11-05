@@ -1,0 +1,10 @@
+-- refused: compile version line 8
+thym 0
+
+program loud
+  why: a call in a condition, written without parentheses under a thym 0 line.
+  takes t: text
+  gives n: number
+  assert words t > 0 else "the text has no words"
+  give words t
+end

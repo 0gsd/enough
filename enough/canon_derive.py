@@ -37,7 +37,6 @@ from . import canon_prompts as P
 from . import macrocosm
 
 EMF_OES = "emf/1"
-EML_OES = EMF_OES                     # the name before EMF (plan §16), kept one release
 PENDING_NO_MODEL = "a model has not read this passage"
 PENDING_NOT_IN_FEED = "not in FEED"
 RULES_CONFIDENCE = 0.3
@@ -66,7 +65,6 @@ UNKNOWN_BAND = 2
 TERM_MIN_LETTERS = 4
 # An EMF completion's output budget: this, or less when the model's window is smaller (llm.completion_budget).
 EMF_MAX_TOKENS = 4_096
-EML_MAX_TOKENS = EMF_MAX_TOKENS       # the name before EMF (plan §16), kept one release
 # A model item that says nothing of its confidence (or no provenance at all) is written with this.
 MODEL_CONFIDENCE = 0.7
 # The lexicon floor in model mode: a FEED-grounded term the model did not discuss says so.
@@ -445,10 +443,6 @@ def short_path(emf_path: Path | str, now: dt.datetime | None = None) -> Path:
         cand = emf.parent / f"{stem}.short-{stamp}-{n}.md"
         n += 1
     return cand
-
-
-# The name before SHORT (0.4.3's first landing), kept one release: it is `short_path` now.
-compiled_path = short_path
 
 
 def write_atomic(path: Path, text: str) -> None:
@@ -1803,10 +1797,6 @@ def derive_emf(text: str, *, source_name: str, source_stat: dict | None, complet
     return _dump(cat), info
 
 
-# The name before EMF (plan §16), kept one release: it is `derive_emf` now.
-derive_eml = derive_emf
-
-
 def _carried_pins(previous: str | None, nodes: list[dict]) -> list[dict]:
     """The pinned passage atems of the twin a derivation replaces, ready to append: ids kept, `of` references
     re-checked against the new items (one that names nothing now is an open question). An unreadable previous
@@ -2607,7 +2597,7 @@ def record_short(twin_text: str, *, path: str, at: dt.datetime | None = None, by
 
 __all__ = [
     "ALSO_HEADING", "Chunk", "DeriveCancelled", "DeriveError", "ORDERS", "ORDER_SAID", "SHORT_FIELDS", "atem_block",
-    "candidate_terms", "catalog_id", "chunk", "clean_span", "compile_short", "compile_text", "compiled_path",
+    "candidate_terms", "catalog_id", "chunk", "clean_span", "compile_short", "compile_text",
     "default_order", "derive_atem", "derive_emf", "entity_candidates", "item_slug", "next_atem_id", "outline",
     "parse_lines", "passage_span", "pin_atem", "read_source", "record_short", "rules_atem", "sentences",
     "set_file_atem", "short_footer", "short_path", "source_path", "text_title", "twin_path", "twin_state",

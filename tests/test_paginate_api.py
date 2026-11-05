@@ -65,13 +65,13 @@ def test_status_carries_the_table_the_modal_draws(client: TestClient):
     assert isinstance(body["fonts_bundled"], bool)
 
 
-def test_status_refuses_traversal_cacheawl_and_non_markdown(client: TestClient):
+def test_status_refuses_traversal_canon_and_non_markdown(client: TestClient):
     project: Path = client._project  # type: ignore[attr-defined]
     (project / "notes.txt").write_text("x", encoding="utf-8")
     assert client.get("/api/paginate/status",
                       params={"path": "../escape.md"}).status_code == 400
     assert client.get("/api/paginate/status",
-                      params={"path": "cacheawl:box/a.md"}).status_code == 400
+                      params={"path": "canon:box/a.md"}).status_code == 400
     assert client.get("/api/paginate/status",
                       params={"path": "notes.txt"}).status_code == 400
     assert client.get("/api/paginate/status",
@@ -134,7 +134,7 @@ def test_paginate_rejects_bad_options(client: TestClient):
     assert client.post("/api/paginate",
                        json={"path": "../escape.md"}).status_code == 400
     assert client.post("/api/paginate",
-                       json={"path": "cacheawl:box/a.md"}).status_code == 400
+                       json={"path": "canon:box/a.md"}).status_code == 400
     assert client.post("/api/paginate",
                        json={"path": "missing.md"}).status_code == 404
 

@@ -1,13 +1,25 @@
 """Thym's parser: a `.thym` file into a tree, by recursive descent over the grammar of THYM.md 4.8, with sections
 4.1–4.6 as its prose rules.
 
-The file is read line by line. Its first line that is neither blank nor a comment is the version line, `thym 0`;
-after it come `use` lines and the four kinds of block (`program`, `move`, `morph`, `context`), each closed by
-`end`, with `move` blocks also standing inside a program before its statements. A comment runs from `--` to the end
-of the line, outside strings, and a line holding only a comment counts as blank. A block's prose heads (`why:`,
-`must:`, `decided <date>:`) run to a blank line, a line whose first word is a head keyword, or `end`; a prose line
-that begins with a statement keyword is kept as prose with a warning on the module, since the writer probably
-forgot the blank line. A statement ends at the end of its line, except inside parentheses or a list.
+The file is read line by line. Its first line that is neither blank nor a comment is the version line, `thym 0` or
+`thym 1`, and the whole file is read by that version's tables (`GRAMMARS`, THYM 4.9): its keywords, the head words a
+prose head stops at, its statement, modifier and block words, and its types. After the version line come `use` lines
+and the blocks (`program`, `move`, `morph`, `context`, and in `thym 1` `contract`), each closed by `end`, with `move`
+blocks also standing inside a program before its statements. A comment runs from `--` to the end of the line,
+outside strings, and a line holding only a comment counts as blank. A block's prose heads (`why:`, `must:`, `decided
+<date>:`) run to a blank line, a line whose first word is a head word of the file's version, or `end`; a prose line
+that begins with a statement keyword is kept as prose with a warning on the module, since the writer probably forgot
+the blank line. A statement ends at the end of its line, except inside parentheses or a list.
+
+**Two grammars, one parser.** A `thym 1` construct is read only where the file's grammar admits it, and the parser
+logs `(line, phrase)` in `Module.features` each time it reads one, the phrase naming it in the person's words
+(`FEATURES`). A `thym 0` file is read by the `thym 0` tables exactly, so every `thym 0` program parses as it always
+did. When a `thym 0` file is refused, `parse` (for a parse refusal) and `check.check` (for a check refusal) compile the
+same text again as `thym 1` (`check.needs_thym1`); if that compile succeeds, the refusal becomes `version` at the
+first `thym 1` feature it met ("this needs `thym 1`: …"), and otherwise the first refusal stands (THYM 4.9). The
+`thym 1` productions written so far: a call on either side of a comparison without parentheses (THYM 4.5). The words
+of `PENDING` are in the `thym 1` tables and their productions are not read yet: a `thym 1` file that writes one is
+refused, saying so.
 
 Calls are read with the names of the moves the file can see: the declared moves (`declarations.names()`), the file's
 own `move` blocks, and the `move` blocks of the `.thym` files it `use`s. A modifier's argument that begins with a
@@ -43,6 +55,82 @@ STATEMENT_WORDS = ("let", "assert", "if", "for", "emit", "give", "withhold")
 MODIFIER_WORDS = ("as", "by", "with", "to", "against", "of", "in", "where", "marked")
 BLOCK_WORDS = ("program", "move", "morph", "context")
 LITERAL_KEYWORDS = ("true", "false", "nothing")
+#: The words a condition's terms are joined and compared with: a call written on a side of a comparison without
+#: parentheses (`thym 1`) ends at one of them (THYM 4.5).
+CONDITION_WORDS = ("is", "in", "has", "covers", "and", "or", "not", "then", "else")
+
+
+@dataclass(frozen=True)
+class Grammar:
+    """One grammar version's tables (THYM 4.9): what the version line switches. `features` names the `thym 1`
+    productions the grammar admits (keys of `FEATURES`); a `thym 0` grammar admits none."""
+    version: int
+    keywords: frozenset[str]
+    head_words: tuple[str, ...]
+    statement_words: tuple[str, ...]
+    modifier_words: tuple[str, ...]
+    block_words: tuple[str, ...]
+    types: tuple[str, ...]
+    features: frozenset[str] = frozenset()
+
+    def admits(self, feature: str) -> bool:
+        return feature in self.features
+
+
+#: The `thym 1` features, by key, with the phrase a "this needs `thym 1`" refusal names each by (THYM 4.9; the
+#: design's list). `{}` takes the construct as written. Each later part of the compiler that writes a production
+#: adds its key to `THYM1.features` and logs it where the parser or the checker reads it.
+FEATURES = {
+    "type-folder": "the type folder",
+    "type-line": "the type line",
+    "type-change": "the type change",
+    "collecting-loop": "a loop that collects (let {} = for each …)",
+    "contract-block": "a contract block (contract {})",
+    "keeps": "a keeps line",
+    "depth": "a depth: line",
+    "recursion": "a move that calls itself (move {})",
+    "side-call": "a call in a condition without parentheses ({})",
+    "in-text": "in with a text on its right",
+    "several-gives": "a program that gives several outputs",
+    "labelled-give": "a labelled give (give {}: …)",
+    "loop-where": "a for each whose collection is a call followed by where",
+    "since-move": "the move {}, which thym 1 declares",
+    "thym1-word": "the word {}, which thym 1 adds",
+    "thym1-operand": "{}, which thym 1 allows",
+    "use-thym1": "use of a thym 1 file ({})",
+}
+
+#: Words of the `thym 1` tables whose productions are not read yet (a later part of the compiler writes each and
+#: takes it out of here): a `thym 1` file that writes one is refused at parse, naming what it is.
+PENDING = {
+    "contract": "a contract block", "keeps": "a keeps line", "depth": "a depth: line",
+    "keep": "a loop that collects (let … = for each … keep … end)",
+    "folder": "the type folder", "line": "the type line", "change": "the type change",
+}
+
+THYM0 = Grammar(0, KEYWORDS, HEAD_WORDS, STATEMENT_WORDS, MODIFIER_WORDS, BLOCK_WORDS, ty.SIMPLE)
+THYM1 = Grammar(
+    1,
+    KEYWORDS | frozenset(("keep", "keeps", "contract", "depth", "before", "after")),
+    HEAD_WORDS + ("keeps", "depth"),
+    STATEMENT_WORDS + ("keep",),
+    MODIFIER_WORDS + ("before", "after"),
+    BLOCK_WORDS + ("contract",),
+    ty.SIMPLE + ("folder", "line", "change"),
+    frozenset(("side-call", "since-move", "thym1-word", "thym1-operand")),
+)
+#: The grammars this compiler reads, by the number on the version line.
+GRAMMARS = {0: THYM0, 1: THYM1}
+
+
+def grammar(version: int | None) -> Grammar:
+    """The tables of a grammar version (`thym 0`'s for None)."""
+    return GRAMMARS.get(version or 0, THYM0)
+
+
+def feature(key: str, what: str = "") -> str:
+    """A `thym 1` feature's phrase, with the construct as written where the phrase takes one."""
+    return FEATURES[key].format(what) if "{}" in FEATURES[key] else FEATURES[key]
 
 NAME = re.compile(r"^[a-z][a-z0-9-]*$")
 FIELD = re.compile(r"^[a-z][a-z0-9_-]*$")
@@ -362,6 +450,20 @@ class Module:
     blocks: list[Block]
     warnings: list[ParseWarning]
     moves_known: frozenset[str]
+    #: the grammar version the file was read by: its version line's, unless `parse` was told another
+    version: int = 0
+    #: the `thym 1` features met while reading and checking it, `(line, phrase)`, in the order met
+    features: list[tuple[int, str]] = field(default_factory=list)
+    #: what the version line says, when the file was read by another grammar (the second compile of THYM 4.9)
+    written: int | None = None
+
+    @property
+    def grammar(self) -> Grammar:
+        return grammar(self.version)
+
+    def met(self, line: int, key: str, what: str = "") -> None:
+        """Log a `thym 1` feature met at `line` (the checker logs the ones it meets here too)."""
+        self.features.append((line, feature(key, what)))
 
     @property
     def file_name(self) -> str:
@@ -530,14 +632,14 @@ class _Stream:
             raise _Fail("parse", f"unexpected `{t.text}`: a line holds one statement, and this one has ended", t.line)
 
 
-def _operand_start(t: Token | None) -> bool:
+def _operand_start(t: Token | None, keywords: frozenset[str] = KEYWORDS) -> bool:
     if t is None:
         return False
     if t.kind in ("int", "date", "string", "uri"):
         return True
     if t.kind == "punct":
         return t.text in ("(", "[")
-    return t.text not in KEYWORDS or t.text in LITERAL_KEYWORDS
+    return t.text not in keywords or t.text in LITERAL_KEYWORDS
 
 
 # ---------------------------------------------------------------------------
@@ -545,8 +647,13 @@ def _operand_start(t: Token | None) -> bool:
 # ---------------------------------------------------------------------------
 
 class _Parser:
-    def __init__(self, text: str, path: str | None, moves: frozenset[str]):
-        self.text, self.path, self.moves = text, path, moves
+    def __init__(self, text: str, path: str | None, moves: frozenset[str] | None, version: int | None = None):
+        self.text, self.path, self.given_moves, self.override = text, path, moves, version
+        self.moves: frozenset[str] = moves or frozenset()
+        self.in_moves: frozenset[str] = frozenset()
+        self.g: Grammar = THYM0
+        self.written: int | None = None
+        self.features: list[tuple[int, str]] = []
         self.raw = text.split("\n")
         lines = [ln[:-1] if ln.endswith("\r") else ln for ln in self.raw]
         if lines and lines[0].startswith("﻿"):
@@ -594,15 +701,22 @@ class _Parser:
         while i < self.n and self.blank(i):
             i += 1
         if i == self.n:
-            raise _Fail("version", "an empty program: a program starts with its version line, thym 0", 1)
+            raise _Fail("version", "an empty program: a program starts with its version line, thym 0 or thym 1", 1)
         try:
             toks = _tokens(self.codes[i], i + 1)
         except _Fail:
             toks = []
         if not (len(toks) == 2 and toks[0].text == "thym" and toks[1].kind == "int"):
-            raise _Fail("version", "the first line must be the version line, `thym 0`", i + 1)
-        if toks[1].value != 0:
-            raise _Fail("version", f"this compiler reads thym 0, and the file says thym {toks[1].value}", i + 1)
+            raise _Fail("version", "the first line must be the version line, `thym 0` or `thym 1`", i + 1)
+        if toks[1].value not in GRAMMARS:
+            known = " and ".join(f"thym {v}" for v in GRAMMARS)
+            raise _Fail("version", f"this compiler reads {known}, and the file says thym {toks[1].value}", i + 1)
+        self.written = toks[1].value
+        self.g = grammar(self.override if self.override is not None else self.written)
+        if self.given_moves is None:
+            self.moves, self.in_moves = _known_moves(self.text, self.path, self.g.version)
+        else:
+            self.in_moves = _in_moves(self.g.version) & self.moves
         version_line = i + 1
         i += 1
         uses: list[Use] = []
@@ -618,14 +732,22 @@ class _Parser:
                     raise _Fail("parse", "a use line names one URI or file: use oes:thym/house, use house.thym", i + 1)
                 uses.append(Use(line=i + 1, uri=mt.group(1), text=self.raw[i]))
                 i += 1
-            elif fw in BLOCK_WORDS:
+            elif fw in self.g.block_words:
+                self.pending(fw, i + 1)
                 b, i = self.block(i)
                 blocks.append(b)
             else:
-                raise _Fail("parse", f"expected a use line or a block (program, move, morph, context), found "
+                raise _Fail("parse", f"expected a use line or a block ({', '.join(self.g.block_words)}), found "
                             f"`{self.codes[i].strip()}`", i + 1)
         return Module(self.path, self.text, self.raw, self.lines, version_line, uses, blocks, self.warnings,
-                      self.moves)
+                      self.moves, version=self.g.version, features=self.features,
+                      written=self.written if self.written != self.g.version else None)
+
+    def pending(self, word: str | None, line: int) -> None:
+        """Refuse a word of the file's grammar whose production this compiler does not read yet (`PENDING`)."""
+        if word in PENDING and (word in self.g.keywords or word in self.g.types):
+            raise _Fail("parse", f"`{word}` begins {PENDING[word]}, which is thym {self.g.version} syntax this "
+                        "compiler does not read yet", line)
 
     # -- blocks ------------------------------------------------------------
 
@@ -681,9 +803,10 @@ class _Parser:
             ts.next()
             ts.expect_word("of", "a list type reads list of <type>")
             return ty.list_of(self.type_(ts))
-        if t.text not in ty.SIMPLE:
-            raise _Fail("parse", f"`{t.text}` is not a type; the types are {', '.join(ty.SIMPLE)} and list of <type>",
-                        t.line)
+        if t.text not in self.g.types:
+            raise _Fail("parse", f"`{t.text}` is not a type; the types are {', '.join(self.g.types)} and list of "
+                        "<type>", t.line)
+        self.pending(t.text, t.line)
         ts.next()
         return t.text
 
@@ -739,6 +862,7 @@ class _Parser:
                     b.gives = params[0]
                 i = j + 1
             else:
+                self.pending(fw if fw in self.g.head_words else None, i + 1)
                 break
         return i
 
@@ -751,9 +875,9 @@ class _Parser:
                 break
             mt = _FIRST_WORD.match(t)
             fw = mt.group(1) if mt else None
-            if fw in HEAD_WORDS or fw == "end":
+            if fw in self.g.head_words or fw == "end":
                 break
-            if fw in STATEMENT_WORDS or fw == "move" or (kind == "morph" and fw in ty.SCALES):
+            if fw in self.g.statement_words or fw == "move" or (kind == "morph" and fw in ty.SCALES):
                 self.warnings.append(ParseWarning(j + 1, f"a prose head holds a line that begins with `{fw}`; "
                                                          "a blank line probably belongs before it"))
             texts.append(t)
@@ -819,9 +943,11 @@ class _Parser:
                 if b.kind == "program":
                     raise _Fail("parse", "a local move stands before the program's statements", i + 1)
                 raise _Fail("parse", "a move stands at the top of a file or at the start of a program", i + 1)
-            if fw in HEAD_WORDS:
+            if fw in self.g.head_words:
+                self.pending(fw, i + 1)
                 raise _Fail("parse", f"`{fw}` is a head: heads stand at the top of a block, before its statements",
                             i + 1)
+            self.pending(fw if fw in self.g.statement_words or fw in self.g.block_words else None, i + 1)
             if fw in ("program", "use"):
                 raise _Fail("parse", f"`{fw}` stands at the top level; close {b.kind} {b.name} with end first", i + 1)
             st, i = self.stmt(i, b)
@@ -839,6 +965,8 @@ class _Parser:
             ts.next()
             name = ts.name("let names what it binds: let <name> = <expression>").text
             ts.expect_punct("=", f"let binds with =: let {name} = <expression>")
+            if ts.is_word("for") and "keep" in self.g.keywords:
+                self.pending("keep", line)                      # a loop that collects: its production is pending
             expr = self.expr(ts)
             ts.end()
             return Let(name=name, expr=expr, **common), j + 1
@@ -933,21 +1061,25 @@ class _Parser:
         if t.kind == "name":
             if t.text in self.moves:
                 return self.call(ts)
-            if t.text not in KEYWORDS and NAME.match(t.text) and _operand_start(ts.peek(1)):
+            if t.text not in self.g.keywords and NAME.match(t.text) and _operand_start(ts.peek(1), self.g.keywords):
                 return self.call(ts, known=False)
         return self.primary(ts)
 
-    def call(self, ts: _Stream, known: bool = True) -> Expr:
+    def call(self, ts: _Stream, known: bool = True, *, side: bool = False) -> Expr:
+        """A move call. On a side of a comparison (`side`, `thym 1`) it ends at a word a condition is built with, and
+        at `in` unless the move declares an `in` modifier (THYM 4.5)."""
         head = ts.next()
         c = Call(line=head.line, move=head.text, known=known)
-        if _operand_start(ts.peek()):
+        if _operand_start(ts.peek(), self.g.keywords):
             c.operands.append(self.operand(ts))
             while ts.is_punct(","):
                 ts.next()
                 c.operands.append(self.operand(ts))
         while True:
             t = ts.peek()
-            if t is None or t.kind != "name" or t.text not in MODIFIER_WORDS:
+            if t is None or t.kind != "name" or t.text not in self.g.modifier_words:
+                return c
+            if side and t.text == "in" and c.move not in self.in_moves:
                 return c
             ts.next()
             w = t.text
@@ -989,7 +1121,7 @@ class _Parser:
 
     def bare_word(self, ts: _Stream, after: str) -> str:
         t = ts.peek()
-        if t is None or t.kind != "name" or not NAME.match(t.text) or t.text in KEYWORDS:
+        if t is None or t.kind != "name" or not NAME.match(t.text) or t.text in self.g.keywords:
             raise _Fail("parse", f"{after} takes a bare word here", t.line if t else ts.last_line())
         ts.next()
         return t.text
@@ -1016,7 +1148,7 @@ class _Parser:
                 e = Lit(line=t.line, kind="bool", value=t.text == "true")
             elif t.text == "nothing":
                 e = Lit(line=t.line, kind="nothing", value=None)
-            elif t.text in KEYWORDS:
+            elif t.text in self.g.keywords:
                 raise _Fail("parse", f"`{t.text}` is a keyword, and a value is expected here", t.line)
             else:
                 e = Name(line=t.line, name=t.text)
@@ -1095,21 +1227,50 @@ class _Parser:
         return Truth(line=a.line, expr=a)
 
     def cond_primary(self, ts: _Stream) -> Expr:
+        """One side of a term. In `thym 0` a call goes in parentheses; in `thym 1` a call may stand on a side as it
+        is (THYM 4.5): `assert words x > 0`."""
         t = ts.peek()
-        if t is not None and t.kind == "name" and t.text in self.moves and _operand_start(ts.peek(1)):
-            raise _Fail("parse", f"a call inside a condition goes in parentheses: ({t.text} …)", t.line)
+        if t is not None and t.kind == "name" and self.side_call_starts(ts):
+            if not self.g.admits("side-call"):
+                raise _Fail("parse", f"a call inside a condition goes in parentheses: ({t.text} …)", t.line)
+            c = self.call(ts, known=t.text in self.moves, side=True)
+            self.features.append((t.line, feature("side-call", render(c))))
+            return c
         return self.primary(ts)
+
+    def side_call_starts(self, ts: _Stream) -> bool:
+        """Whether a call begins here on a side of a term: a move's name followed by an operand (in `thym 0` only to
+        refuse it); in `thym 1` also an unknown name followed by an operand (the checker refuses it with the nearest
+        move), or a move's name followed by a modifier word other than `in`, `where` and `marked` (`fabula of p is
+        nothing`)."""
+        t, nxt = ts.peek(), ts.peek(1)
+        if t is None or t.text in self.g.keywords or not NAME.match(t.text):
+            return False
+        if _operand_start(nxt, self.g.keywords):
+            return t.text in self.moves or self.g.admits("side-call")
+        if not self.g.admits("side-call") or t.text not in self.moves:
+            return False
+        return (nxt is not None and nxt.kind == "name" and nxt.text in self.g.modifier_words
+                and nxt.text not in ("in", "where", "marked"))
 
 
 # ---------------------------------------------------------------------------
 # Entry points
 # ---------------------------------------------------------------------------
 
-def _known_moves(text: str, path: str | None) -> frozenset[str]:
-    """The move names a file can see before it is checked: the declared ones, its own `move` blocks, and the `move`
-    blocks of the `.thym` files beside it that it `use`s."""
+def _in_moves(version: int) -> frozenset[str]:
+    """The declared moves a program of this version sees that take an `in` modifier: in a condition, `in` after
+    one of them is the modifier, never membership (THYM 4.5)."""
     from . import declarations
-    found = set(declarations.names())
+    return frozenset(n for n, d in declarations.load().view(version).items() if "in" in (d.modifiers or {}))
+
+
+def _known_moves(text: str, path: str | None, version: int = 0) -> tuple[frozenset[str], frozenset[str]]:
+    """The move names a file can see before it is checked: the declared ones a program of its version sees, its own
+    `move` blocks, and the `move` blocks of the `.thym` files beside it that it `use`s; and which of the declared
+    ones take an `in` modifier."""
+    from . import declarations
+    found = set(declarations.names(version=version))
     found.update(_MOVE_LINE.findall(text))
     base = Path(path).parent if path else Path.cwd()
     for uri in _USE_LINE.findall(text):
@@ -1119,22 +1280,30 @@ def _known_moves(text: str, path: str | None) -> frozenset[str]:
             found.update(_MOVE_LINE.findall((base / uri).read_bytes().decode("utf-8", "replace")))
         except OSError:
             pass
-    return frozenset(found)
+    return frozenset(found), _in_moves(version)
 
 
-def parse(text: str, *, path: str | None = None, moves: Iterable[str] | None = None) -> Module | Refusal:
-    """A program's text as a `Module`, or the `Refusal` that says where it is not Thym 0. `path` is where the
-    text was read from (for `use` of a file beside it, and for refusals); `moves` overrides the move names the
-    parser reads calls with (by default every declared move, the file's own and its `use`d files')."""
+def parse(text: str, *, path: str | None = None, moves: Iterable[str] | None = None,
+          version: int | None = None) -> Module | Refusal:
+    """A program's text as a `Module`, or the `Refusal` that says where it is not Thym. `path` is where the text was
+    read from (for `use` of a file beside it, and for refusals); `moves` overrides the move names the parser reads
+    calls with (by default every declared move a program of its version sees, the file's own and its `use`d
+    files'). The file is read by the grammar its version line names, or by `version` when one is given (the
+    second compile of THYM 4.9). A `thym 0` file refused here is compiled again as `thym 1`, and the refusal becomes
+    "this needs `thym 1`" when that compile succeeds (`check.needs_thym1`)."""
     if not isinstance(text, str):
         return Refusal("compile", "parse", "a program is text", None, path)
-    known = frozenset(moves) if moves is not None else _known_moves(text, path)
+    parser = _Parser(text, path, frozenset(moves) if moves is not None else None, version)
     try:
-        return _Parser(text, path, known).run()
+        return parser.run()
     except _Fail as f:
-        return Refusal("compile", f.check, f.message, f.line, path)
+        refused = Refusal("compile", f.check, f.message, f.line, path)
     except RecursionError:
         return Refusal("compile", "parse", "the expression nests too deeply", None, path)
+    if version is None and moves is None and parser.written == 0 and refused.check != "version":
+        from . import check
+        return check.needs_thym1(text, path, refused)
+    return refused
 
 
 # ---------------------------------------------------------------------------

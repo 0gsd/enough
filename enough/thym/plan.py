@@ -3,14 +3,22 @@
 
 The nodes come in evaluation order, a nested call before the call that takes its value:
 
-- one node per move call, a `marked` modifier included (a `mark` node of its own), and one per `assert`; a call of
-  a user move is one node;
+- outside a loop's body, one node per move call, a `marked` modifier included (a `mark` node of its own), and one
+  per `assert`; a call of a user move is one node;
 - one node per `if`, for its condition; each node of a branch says which branch it is in and waits on the condition;
-- for a `for each` over a list written in the program, a node per member for each call in its body; over anything
-  else (known only at run time), one node per call, marked `repeats`, that takes the collection;
+- for a `for each`, one node per statement of its body (THYM 11.1): for each member when the collection is a list
+  written in the program (the node binds the loop variable to that member, `, for x = <member>`), otherwise once,
+  marked `repeats`, taking the collection (`, for each …`). A call nested inside a statement of a loop's body,
+  `marked` included, is part of that statement's node (it is *folded*, `_Planner.fold`) and is evaluated with each
+  member; it is never a node of its own and makes no temporary. A statement of a loop's body that holds one call and
+  nothing nested in it is planned exactly as it always was, so the plans of such loops are unchanged;
 - no node for a `let` whose value is not a call: a filter, a name or a field folds into the node that takes it, which
   then takes what the filter reads and spans its line. A call-less `emit` or `give` is a node of its own (`emit`,
   `give`), so that the plan says everything the run does.
+
+Both grammar versions plan by these rules. The `thym 1` rule for a loop over a collection known only at run time (one
+node for the loop, its body run member by member as a unit) is a later part of the compiler: `_Planner.loop` is the
+seam where it goes.
 
 A node takes names (inputs, bindings, or a temporary `t<n>` made by the nested call at node n) and gives at most
 one: its binding, the block's `gives` name, or a temporary. It runs after the nodes whose outputs it takes; the node
@@ -76,6 +84,7 @@ class PlanNode:
     name: str = ""
     summary: str = ""
     inputs: set[str] = field(default_factory=set)
+    folded: bool = False           # a statement of a loop's body with its nested calls folded in (THYM 11.1)
 
 
 @dataclass
@@ -117,14 +126,16 @@ class _Planner:
 
     # -- names -------------------------------------------------------------
 
-    def names(self, x: Any, env: _Env, sub: dict[int, str], stmt: ps.Stmt) -> tuple[list[str], set[int]]:
-        """The names a part of a statement takes, making a node (a temporary) for every call inside it first."""
-        if isinstance(x, (ps.Call, ps.Marked)):
+    def names(self, x: Any, env: _Env, sub: dict[int, str], stmt: ps.Stmt,
+              fold: bool = False) -> tuple[list[str], set[int]]:
+        """The names a part of a statement takes, making a node (a temporary) for every call inside it first; with
+        `fold`, a call inside it makes no node, and the names its operands and modifiers take are taken instead."""
+        if isinstance(x, (ps.Call, ps.Marked)) and not fold:
             temp = self.expr(x, env, stmt, role="temp")
             sub[id(x)] = temp
             return [temp], set()
         if isinstance(x, ps.Paren):
-            names, lines = self.names(x.inner, env, sub, stmt)
+            names, lines = self.names(x.inner, env, sub, stmt, fold)
             if id(x.inner) in sub:
                 sub[id(x)] = sub[id(x.inner)]
             return names, lines
@@ -134,6 +145,8 @@ class _Planner:
             if env.loop is not None and x.name == env.loop.var:
                 if env.loop_names is not None:
                     return list(env.loop_names[0]), set(env.loop_names[1])
+                if env.member is not None:                  # a written list's member: what it names, if a binding
+                    return self.names(env.member, env.child(loop=None, member=None), sub, stmt, True)
                 return [], set()
             if x.name in env.aliases:
                 names, lines = env.aliases[x.name]
@@ -142,7 +155,7 @@ class _Planner:
         out: list[str] = []
         lines: set[int] = set()
         for ch in ck.children(x):
-            n, ls = self.names(ch, env, sub, stmt)
+            n, ls = self.names(ch, env, sub, stmt, fold)
             out.extend(n)
             lines |= ls
         return out, lines
@@ -247,6 +260,9 @@ class _Planner:
             self.stmt(s, env)
 
     def stmt(self, s: ps.Stmt, env: _Env) -> None:
+        if env.loop is not None and _nests(s):
+            self.fold(s, env)
+            return
         top = ck.strip_paren(getattr(s, "expr", None))
         is_call = isinstance(top, (ps.Call, ps.Marked))
         if isinstance(s, ps.Let):
@@ -264,19 +280,7 @@ class _Planner:
             if s.else_ is not None:
                 self.stmts(s.else_, env.child(branch="else", path=env.path + ((node.n, "else"),), cond=node.n))
         elif isinstance(s, ps.For):
-            sub = {}
-            names, lines = self.names(s.coll, env, sub, s)
-            if s.where is not None:
-                inner = env.child(loop=s, loop_names=None)
-                more, more_lines = self.names(s.where, inner, sub, s)
-                names += more
-                lines |= more_lines
-            coll = ck.strip_paren(s.coll)
-            if isinstance(coll, ps.ListLit) and s.where is None:
-                for member in coll.items:
-                    self.stmts(s.body, env.child(loop=s, loop_names=None, member=member))
-            else:
-                self.stmts(s.body, env.child(loop=s, loop_names=(_once(names), lines), member=None))
+            self.loop(s, env)
         elif isinstance(s, ps.Emit):
             if is_call:
                 self.expr(top, env, s, role=f"emit:{s.slot or ''}")
@@ -293,6 +297,67 @@ class _Planner:
         elif isinstance(s, ps.Effect):
             if is_call:
                 self.expr(top, env, s, role="effect")
+
+    def loop(self, s: ps.For, env: _Env) -> None:
+        """A `for each`: its body's statements once per member of a list written in the program, else once, each
+        node marked `repeats` and taking what the collection and the `where` read (THYM 11.1). This is where the
+        `thym 1` rule goes (`self.c.module.version >= 1`: a loop over a collection known only at run time is one node,
+        its body run member by member as a unit, named by the loop's own line, `move: for`, with `calls`); a later
+        part of the compiler writes it. Until then both versions plan a loop by the `thym 0` rule."""
+        sub: dict[int, str] = {}
+        names, lines = self.names(s.coll, env, sub, s)
+        if s.where is not None:
+            inner = env.child(loop=s, loop_names=None)
+            more, more_lines = self.names(s.where, inner, sub, s)
+            names += more
+            lines |= more_lines
+        coll = ck.strip_paren(s.coll)
+        if isinstance(coll, ps.ListLit) and s.where is None:
+            for member in coll.items:
+                self.stmts(s.body, env.child(loop=s, loop_names=None, member=member))
+        else:
+            self.stmts(s.body, env.child(loop=s, loop_names=(_once(names), lines), member=None))
+
+    def fold(self, s: ps.Stmt, env: _Env) -> None:
+        """A statement of a loop's body that nests a call inside another (or a call inside an `assert` or an `if`):
+        one node, its nested calls folded in and evaluated with each member (THYM 11.1). Its move is the statement's
+        outermost call (`mark` for a `marked` at the top; `assert`, `if`, `emit` when there is none), it asks when any
+        of its calls asks, and it takes every name the statement and the loop's `where` read."""
+        sub: dict[int, str] = {}
+        takes: list[str] = []
+        lines: set[int] = set()
+        for part in ck.parts(s):
+            n, ls = self.names(part, env, sub, s, fold=True)
+            takes.extend(n)
+            lines |= ls
+        calls = [c for part in ck.parts(s) for c in ck.eval_calls(part)]
+        top = ck.strip_paren(getattr(s, "expr", None))
+        if isinstance(s, ps.Withhold):
+            top = s.call
+        if isinstance(s, (ps.Assert, ps.If)):
+            kind = move = "assert" if isinstance(s, ps.Assert) else "if"
+            expr: Any = s.cond
+        elif isinstance(top, ps.Marked):
+            kind, move, expr = "mark", "mark", top
+        elif isinstance(top, ps.Call):
+            kind, move, expr = "call", top.move, top
+        else:
+            kind, move, expr = "emit", "emit", s.expr
+        node = PlanNode(0, kind, move, s, expr, 0, takes, folded=True)
+        node.asks = any(ck.call_asks(c) for c in calls)
+        node.own = True
+        node.output_words = max((c.mod("to").arg.count for c in calls if isinstance(c, ps.Call) and c.mod("to")
+                                 and isinstance(c.mod("to").arg, ps.Units) and c.mod("to").arg.unit == "words"),
+                                default=0)
+        if isinstance(s, ps.Let):
+            node.gives = s.name
+        elif isinstance(s, ps.Emit):
+            node.emits, node.slot = True, s.slot
+        self.add(node, env, lines)
+        if isinstance(s, ps.If):
+            self.stmts(s.then, env.child(branch="then", path=env.path + ((node.n, "then"),), cond=node.n))
+            if s.else_ is not None:
+                self.stmts(s.else_, env.child(branch="else", path=env.path + ((node.n, "else"),), cond=node.n))
 
     def run(self) -> list[PlanNode]:
         self.stmts(self.b.stmts, _Env({}, {}))
@@ -311,7 +376,9 @@ class _Planner:
     # -- words -------------------------------------------------------------
 
     def node_name(self, nd: PlanNode) -> str:
-        if nd.kind in ("assert", "if"):
+        if nd.folded:
+            text = _statement_text(nd.stmt)
+        elif nd.kind in ("assert", "if"):
             text = f"{nd.kind} {ps.render_cond(nd.expr, nd.subst)}"
         elif nd.kind == "mark":
             inner = ck.strip_paren(nd.expr.inner)
@@ -321,7 +388,9 @@ class _Planner:
             text = ps.render(nd.expr, nd.subst)
         else:
             text = ps.render(nd.expr, nd.subst)
-        if nd.emits:
+        if nd.folded:
+            pass
+        elif nd.emits:
             text = f"emit {nd.slot + ': ' if nd.slot else ''}{text}"
         elif nd.kind == "give":
             text = f"give {text}"
@@ -335,6 +404,33 @@ class _Planner:
     def node_summary(self, nd: PlanNode) -> str:
         """A node's summary: its line's comment, else its name (THYM.md 10)."""
         return nd.stmt.comment or nd.name
+
+
+def _nests(s: ps.Stmt) -> bool:
+    """Whether a statement holds a call nested inside another, or a call inside an `assert` or an `if` condition: in
+    a loop's body such a statement is folded into one node (THYM 11.1). A statement of one call, or none, is not."""
+    if isinstance(s, (ps.For, ps.Give)):
+        return False
+    calls = [c for part in ck.parts(s) for c in ck.eval_calls(part)]
+    if isinstance(s, (ps.Assert, ps.If)):
+        return bool(calls)
+    own = ck.own_call(s)
+    return any(c is not own for c in calls)
+
+
+def _statement_text(s: ps.Stmt) -> str:
+    """A folded statement as a node names it: the statement in canonical spacing, nested calls as written (a
+    temporary never stands in for one), so that the runtime reads it whole."""
+    if isinstance(s, ps.Assert):
+        return f"assert {ps.render_cond(s.cond)}"
+    if isinstance(s, ps.If):
+        return f"if {ps.render_cond(s.cond)}"
+    if isinstance(s, ps.Withhold):
+        return ps.render(s.call)
+    text = ps.render(ck.strip_paren(s.expr))
+    if isinstance(s, ps.Emit):
+        return f"emit {s.slot + ': ' if s.slot else ''}{text}"
+    return text
 
 
 # ---------------------------------------------------------------------------

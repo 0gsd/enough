@@ -389,16 +389,26 @@ def digest_path(path: Path) -> str | None:
     return sha256_bytes(path.read_bytes())
 
 
+#: The declarations a fabula is written under: `fabula/1`, and `emf/1`, its old spelling, read as a fabulan (THYM 5.2).
+FABULA_DECLARATIONS = ("fabula/1", "emf/1")
+
+
+def is_fabula(declaration: Any) -> bool:
+    """Whether a volume's declaration (`oes:`) says it is a fabula: `fabula/1`, or `emf/1`, the same thing under its
+    old name. The one place enough/thym decides it."""
+    return isinstance(declaration, str) and declaration.strip() in FABULA_DECLARATIONS
+
+
 def guess_type(path: Path) -> str:
     """A path's Thym type when the plan does not say: a folder with `package.cosm` is a package, any other folder a
-    volume; a `.md` file a text; a `.cosm` file by what it declares (an `emf/1` twin is a fabula, a `thym/1` file is
-    its kind)."""
+    volume; a `.md` file a text; a `.cosm` file by what it declares (a `fabula/1` or `emf/1` twin is a fabula, a
+    `thym/1` file is its kind)."""
     path = Path(path)
     if path.is_dir():
         return "package" if (path / "package.cosm").is_file() else "volume"
     if path.suffix == ".cosm":
         said = mc.sniff_declaration(path) or ""
-        if said.startswith("emf/"):
+        if is_fabula(said):
             return "fabula"
         if said.startswith("thym/"):
             try:

@@ -1,7 +1,7 @@
 """canon — enough's library: the machine-global store at ``~/enough/canon/``.
 
-Canon was called Cacheawl until 0.4.3; ``enough/cacheawl.py`` is now a
-one-release shim that re-exports this module under the old names.
+Canon was called Cacheawl until 0.4.3; the one-release ``enough/cacheawl.py``
+shim that re-exported this module under the old names was removed in 0.6.
 
 A **volume** (was: cachebox) is a ROOT-LEVEL folder inside the store. Only
 direct children of the store are volumes; folders nested deeper are plain
@@ -37,9 +37,9 @@ a source (a local path, a website URL, or a set of wikisink articles) to a
 user-chosen depth.
 
 The root is resolvable via ``ENOUGH_CANON_ROOT`` (a test/dev hook, mirroring
-the ``ENOUGH_WIKISINK_CONFIG`` precedent); the old ``ENOUGH_CACHEAWL_ROOT``
-is honoured when the new one is unset, so suites never touch the real
-``~/enough/canon``. Without either, the first `root()` call renames an old
+the ``ENOUGH_WIKISINK_CONFIG`` precedent), so suites never touch the real
+``~/enough/canon`` (the old ``ENOUGH_CACHEAWL_ROOT`` was removed in 0.6).
+Without it, the first `root()` call renames an old
 ``~/enough/cacheawl/`` to ``~/enough/canon/`` when only the old one exists.
 
 Path-traversal safety: every path that crosses the store boundary is
@@ -73,7 +73,7 @@ from . import macrocosm
 
 log = logging.getLogger("enough.canon")
 
-# ENOUGH_CANON_ROOT (then the legacy ENOUGH_CACHEAWL_ROOT) overrides the
+# ENOUGH_CANON_ROOT overrides the
 # store location — the test/dev hook so suites and smoke runs never mutate
 # the real ~/enough/canon. Resolved per call in `root()`; these constants
 # are the defaults as the process found $HOME.
@@ -141,9 +141,9 @@ _BINARY_EXTS = frozenset({
 
 _NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 _-]{0,63}$")
 
-# The transfer endpoint words for a volume: "canon" (0.4.3) and the legacy
-# "cachebox", both accepted for one release.
-VOLUME_KINDS = ("canon", "cachebox")
+# The transfer endpoint word for a volume: "canon" (0.4.3; the legacy
+# "cachebox" 0.4.3 accepted for one release was removed in 0.6).
+VOLUME_KINDS = ("canon",)
 
 
 class CanonError(ValueError):
@@ -202,11 +202,11 @@ def migrate_store_folder(new: Path, old: Path) -> str:
 
 
 def root() -> Path:
-    """The Canon store root. ``ENOUGH_CANON_ROOT`` when set, else the legacy
-    ``ENOUGH_CACHEAWL_ROOT``, else ``~/enough/canon`` — renamed from
+    """The Canon store root. ``ENOUGH_CANON_ROOT`` when set, else
+    ``~/enough/canon`` — renamed from
     ``~/enough/cacheawl`` on first use when only the old folder exists.
     Created on demand (the store is a flat dir of volumes)."""
-    raw = os.environ.get("ENOUGH_CANON_ROOT") or os.environ.get("ENOUGH_CACHEAWL_ROOT")
+    raw = os.environ.get("ENOUGH_CANON_ROOT")
     if raw:
         p = Path(raw).expanduser()
     else:
@@ -719,9 +719,8 @@ def _scan_tree(box: Path, rel_parts: tuple[str, ...] = ()) -> list[dict[str, Any
     other ``*.cosm`` is ``cosm: true``; an EMF twin is hidden behind its text,
     which carries ``emf: {path, state}``; a folder holding ``holotype.cosm``
     is ``holotype: true`` and not recursed (it opens in the cosm viewer); a
-    saved wikisink ``article.html`` is ``wiki_article``. ``is_mirror`` is on
-    every node and always false — the mirror is no longer a file — kept for
-    one release so older UI code reads a boolean."""
+    saved wikisink ``article.html`` is ``wiki_article``. (The always-false
+    ``is_mirror`` flag 0.4.3 kept for one release was removed in 0.6.)"""
     here = box.joinpath(*rel_parts)
     try:
         entries = sorted(
@@ -741,7 +740,6 @@ def _scan_tree(box: Path, rel_parts: tuple[str, ...] = ()) -> list[dict[str, Any
             "name": p.name,
             "path": rel,
             "is_dir": p.is_dir(),
-            "is_mirror": False,
         }
         if p.is_dir():
             if is_holotype_folder(p):
@@ -1688,8 +1686,7 @@ def delete_volume(name: str, *, confirm: bool) -> dict[str, Any]:
 def _resolve_endpoint(project_dir: Path, kind: str, box: str | None,
                       rel: str) -> tuple[Path, Path]:
     """Resolve one side of a transfer to (base_root, absolute_target),
-    verifying containment. ``kind`` is 'project' or 'canon' (the legacy
-    'cachebox' is accepted). Raises `CanonError` on traversal escape or a bad
+    verifying containment. ``kind`` is 'project' or 'canon'. Raises `CanonError` on traversal escape or a bad
     volume.
 
     Containment is checked against the resolved base — the /var vs
@@ -1748,7 +1745,7 @@ def transfer(project_dir: Path, *, op: str,
              overwrite: bool = False) -> dict[str, Any]:
     """Copy or move a file/folder between the project dir and a volume
     (either direction) or within/between volumes. A side's kind is
-    ``"project"`` or ``"canon"`` (legacy ``"cachebox"`` accepted).
+    ``"project"`` or ``"canon"``.
 
     ``dst_path`` names the destination path (including the final name). If
     it names an existing directory, the source is placed inside it under
@@ -1827,7 +1824,6 @@ def transfer(project_dir: Path, *, op: str,
         "src": {"kind": src_kind, "box": src_box, "path": src_path},
         "dst": {"kind": dst_kind, "box": dst_box,
                 "path": str(dst.relative_to(dbase))},
-        "boxes_updated": sorted(touched),
         "volumes_updated": sorted(touched),
         "skipped": [q.relative_to(_sbase).as_posix() + ("/" if q.is_dir() else "")
                     for q in skipped],

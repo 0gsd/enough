@@ -1,12 +1,13 @@
 """Canon (0.4.3, was Cacheawl): the store root and its migration, volume
 catalogs (`canon.cosm`) and the project catalog (`rness/canon.cosm`), the
 listing flags (EMF twins, Holotypes, catalogs, .cosm files), the Holotype
-ingest filter, the write-guards, the transfer/broker/wikisink renames and
-the `enough.cacheawl` shim.
+ingest filter, the write-guards, the transfer/broker/wikisink renames, and
+that the pre-0.4.3 names (the `enough.cacheawl` shim, `ENOUGH_CACHEAWL_ROOT`,
+the `cacheawl:` prefix) are gone since 0.6.
 
 Every store goes through `ENOUGH_CANON_ROOT` (or, where the test is about
-the fallback, `ENOUGH_CACHEAWL_ROOT`/`$HOME` inside tmp_path); conftest
-points both seams and `$HOME` at tmp_path before anything here runs.
+the fallback, `$HOME` inside tmp_path); conftest points the seam and `$HOME`
+at tmp_path before anything here runs.
 """
 
 from __future__ import annotations
@@ -59,23 +60,23 @@ def _emf_pair(folder: Path, name: str = "notes.md") -> tuple[Path, Path]:
 # The root: env precedence and the one-time folder rename
 # --------------------------------------------------------------------------
 
-def test_canon_root_env_wins_over_the_legacy_one(tmp_path: Path, monkeypatch):
+def test_canon_root_env_is_the_seam(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("ENOUGH_CANON_ROOT", str(tmp_path / "new"))
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(tmp_path / "old"))
     assert canon.root() == tmp_path / "new"
-
-
-def test_legacy_env_still_works_when_the_new_one_is_unset(tmp_path: Path, monkeypatch):
-    monkeypatch.delenv("ENOUGH_CANON_ROOT", raising=False)
-    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(tmp_path / "legacy-store"))
-    assert canon.root() == tmp_path / "legacy-store"
     canon.create_volume("kept")
-    assert (tmp_path / "legacy-store" / "kept" / canon.CATALOG_NAME).is_file()
+    assert (tmp_path / "new" / "kept" / canon.CATALOG_NAME).is_file()
+
+
+def test_the_legacy_env_is_no_longer_read(tmp_path: Path, monkeypatch):
+    """0.6 removed `ENOUGH_CACHEAWL_ROOT` (kept one release by 0.4.3)."""
+    home = _no_store_env(monkeypatch, tmp_path)
+    monkeypatch.setenv("ENOUGH_CACHEAWL_ROOT", str(tmp_path / "legacy-store"))
+    assert canon.root() == home / "canon"
+    assert not (tmp_path / "legacy-store").exists()
 
 
 def _no_store_env(monkeypatch, tmp_path: Path) -> Path:
     monkeypatch.delenv("ENOUGH_CANON_ROOT", raising=False)
-    monkeypatch.delenv("ENOUGH_CACHEAWL_ROOT", raising=False)
     home = tmp_path / "home"
     monkeypatch.setenv("HOME", str(home))
     assert Path.home() == home
@@ -342,7 +343,7 @@ def test_volume_tree_flags(store: Path):
     assert flat["docs/rain.cosm"]["cosm"] is True
     assert flat[canon.CATALOG_NAME]["catalog"] is True and "cosm" not in flat[canon.CATALOG_NAME]
     assert flat["meadow"]["holotype"] is True and flat["meadow"]["children"] == []
-    assert all(n["is_mirror"] is False for n in flat.values())
+    assert not any("is_mirror" in n for n in flat.values())      # removed in 0.6
     text.write_text("changed", encoding="utf-8")
     assert _flat(canon.volume_tree("v")["tree"])["docs/notes.md"]["emf"]["state"] == "stale"
 
@@ -546,8 +547,11 @@ def test_transfer_accepts_canon_and_legacy_cachebox_sides(store: Path, tmp_path:
     canon.create_volume("t")
     out = canon.transfer(project, op="copy", src_kind="project", src_box=None, src_path="doc.md",
                          dst_kind="canon", dst_box="t", dst_path="doc.md")
-    assert out["volumes_updated"] == ["t"] == out["boxes_updated"]
-    canon.transfer(project, op="copy", src_kind="cachebox", src_box="t", src_path="doc.md",
+    assert out["volumes_updated"] == ["t"] and "boxes_updated" not in out
+    with pytest.raises(canon.CanonError):                      # the legacy word, removed in 0.6
+        canon.transfer(project, op="copy", src_kind="cachebox", src_box="t", src_path="doc.md",
+                       dst_kind="project", dst_box=None, dst_path="back.md")
+    canon.transfer(project, op="copy", src_kind="canon", src_box="t", src_path="doc.md",
                    dst_kind="project", dst_box=None, dst_path="back.md")
     assert (project / "back.md").read_text(encoding="utf-8") == "doc"
     assert "doc.md" in (store / "t" / canon.CATALOG_NAME).read_text(encoding="utf-8")
@@ -586,7 +590,7 @@ def test_canon_tools_are_gated_and_named(store: Path, tmp_path: Path, monkeypatc
     assert not res.ok and "canon tools are disabled" in res.body
 
 
-def test_wikisink_saved_dir_resolves_both_prefixes(store: Path, tmp_path: Path):
+def test_wikisink_saved_dir_resolves_the_canon_prefix(store: Path, tmp_path: Path):
     from enough.wikisink import save as wsave
 
     art = store / "wiki" / "odin"
@@ -595,31 +599,21 @@ def test_wikisink_saved_dir_resolves_both_prefixes(store: Path, tmp_path: Path):
     (art / ".meta.json").write_text("{}", encoding="utf-8")
     project = tmp_path / "proj"
     project.mkdir()
-    for ref in ("canon:wiki/odin/article.html", "cacheawl:wiki/odin/article.html"):
-        assert wsave._resolve_saved_dir(project, ref) == art.resolve()
+    assert wsave._resolve_saved_dir(project, "canon:wiki/odin/article.html") == art.resolve()
     with pytest.raises(ValueError):
         wsave._resolve_saved_dir(project, "canon:../etc")
+    with pytest.raises(ValueError):             # the pre-0.4.3 prefix, removed in 0.6
+        wsave._resolve_saved_dir(project, "cacheawl:wiki/odin/article.html")
 
 
-def test_the_cacheawl_shim_re_exports_every_old_name():
-    from enough import cacheawl
+def test_the_pre_0_4_3_names_are_gone():
+    """0.4.3 kept the old names one release; 0.6 removed them."""
+    import importlib.util
 
-    assert cacheawl.CacheawlError is canon.CanonError
-    pairs = {
-        "box_dir": canon.volume_dir, "regenerate_mirror": canon.regenerate_catalog,
-        "is_mirror_file": canon.is_catalog_file, "mirror_write_denial": canon.catalog_write_denial,
-        "cachebox_summary": canon.volume_summary, "list_cacheboxes": canon.list_volumes,
-        "cachebox_tree": canon.volume_tree, "create_cachebox": canon.create_volume,
-        "rename_cachebox": canon.rename_volume, "delete_cachebox": canon.delete_volume,
-    }
-    for old, new in pairs.items():
-        assert getattr(cacheawl, old) is new, old
-    for same in ("root", "load_meta", "save_meta", "folder_flowchart", "build_mirror", "transfer",
-                 "reconcile", "reconcile_all", "ingest_status", "register_ingest", "run_ingest",
-                 "posix_dirname", "migrate_infoworld"):
-        assert getattr(cacheawl, same) is getattr(canon, same), same
-    assert cacheawl.META_NAME == ".canon.json" and cacheawl.MIRROR_NAME == "_cachebox.merirmaid"
-    assert set(cacheawl.__all__) <= set(dir(cacheawl))
+    from enough import broker
+
+    assert importlib.util.find_spec("enough.cacheawl") is None
+    assert not hasattr(broker, "denial_cacheawl_disabled")
 
 
 # --------------------------------------------------------------------------

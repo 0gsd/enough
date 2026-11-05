@@ -1299,17 +1299,18 @@ def _loop_program(tmp_path: Path, body: str):
     return RUN.run(pl, inputs_root=SUITE, root=tmp_path / "root", program=prog, engines=H.engines(feed=None), now=NOW)
 
 
-def test_a_nested_call_in_a_loop_is_refused_saying_it_was_handed_every_passs_list(tmp_path):
+def test_a_nested_call_in_a_loop_is_folded_into_its_statement_and_lands(tmp_path):
+    """T0's probe (survey 2.3.1): the nested `mark` is part of its statement's node and runs with each member, so the
+    run lands (THYM 11.1); before the fold it was planned as a node of its own and handed every pass's list."""
     t = _loop_program(tmp_path, "  for each o in h where kind is service\n"
                                 "    emit mark (mark o as stated) as verified\n  end\n")
-    assert isinstance(t, T.Trace) and not t.landed
-    msg = t.refusal.message
-    assert t.refusal.check == "verified-only-where-derived" and t.refusal.line == 8
-    assert "t1 is not this pass's value but the list of every pass's result of node 1 (mark o as stated)" in msg
-    assert "as a move of their own" in msg
+    assert isinstance(t, T.Trace) and t.landed, getattr(t, "refusal", t)
     ok = _loop_program(tmp_path / "ok", "  move both(o: item): item\n    give mark (mark o as stated) as verified\n"
                                         "  end\n\n  for each o in h where kind is service\n    emit both o\n  end\n")
     assert isinstance(ok, T.Trace) and ok.landed, getattr(ok, "refusal", ok)
+    def offers(tr):
+        return mc.yaml_load((tr.dir / "outputs" / "i.cosm").read_text(encoding="utf-8")).get("offers")
+    assert offers(t) == offers(ok) and offers(t)            # the same isotype, but for the program that made it
 
 
 # ---------------------------------------------------------------------------

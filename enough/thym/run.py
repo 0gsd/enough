@@ -9,13 +9,18 @@ behind their contracts, every run traced and replayable (docs/THYM.md 12, with 4
    prompt the machine's model cannot hold; every move must be declared and implemented here;
 2. walks the nodes in a topological order (sequentially, plan order breaking ties). A node's call is read from its
    `name` (`band t3 as [none, some]`, `emit employees: mark t4 as verified`, `emit offer-line o, for each o in h where
-   kind in [product, service, platform]`, `if now.medium is "phone" and now.hurry`, `assert f covers story`): the
-   planner writes nested calls as temporaries, so a name is one flat statement. A deterministic node calls the
+   kind in [product, service, platform]`, `if now.medium is "phone" and now.hurry`, `assert f covers story`): outside
+   a loop's body the planner writes nested calls as temporaries, so a name is one flat statement; inside one, a
+   statement's nested calls are folded into its node (THYM 11.1), and the name holds them as written (`emit mark (mark
+   o as stated) as verified, for each o in h …`, `assert words x > 0, for x = t`), evaluated whole for each member
+   through `_eval`, which runs every nested call with its contract. A deterministic node calls the
    registry; a model-backed one builds the contract from the declaration (`checks` = its `contract:` list) and the
    node's budget, sends the move's `Request` to the coprocessor, checks every candidate against the contract, repairs
    and retries within `attempts`, and refuses the whole run on failure. An `if` node evaluates its condition, and the
    nodes of the branch not taken are skipped; a `repeats` node walks its collection (a volume's items in told order, a
-   short's lines, a list's members) and runs its call once per member; `emit` collects into the run's output volume
+   short's lines, a list's members) and runs its statement once per member (an `assert` too); a node of a loop over a
+   written list (`, for x = <member>`) runs once, with the loop variable bound to its member; `emit` collects into
+   the run's output volume
    (`ctx.emitted`, or a labelled field, `ctx.slots`) for `project`; a `let` filter (`let staff = h where module is
    employees`), which has no node of its own, and a user move's body are read from the program (its items, or its
    `.thym` source);
@@ -27,6 +32,18 @@ behind their contracts, every run traced and replayable (docs/THYM.md 12, with 4
 
 A plan-time refusal is returned as a `Refusal` (nothing ran, nothing was written). A run that starts returns its
 `Trace`, whose `outcome` is `landed` or `refused` and whose `refusal` says why (THYM.md 9: a refusal is a value).
+
+**Refusals in the person's words** (THYM 9). A refusal at plan or run time names the statement as the person wrote
+it (from the program beside the plan, by its line; without the program, the node's name with every temporary put
+back as the expression it stands for), cut to 60 characters, then its line and, inside a loop, the pass:
+`<statement> (line N[, for <var> = <member>]): <what failed>[: the fix]` (`_worded`). It never shows a temporary, a
+node's number or id, an implementation's exception or a value as Python prints it; a fault of the runtime itself says
+so, and its record keeps the detail under `fault`.
+
+Two `thym 0` loops still run wrong, and are refused at run with the fix, write `thym 1` (THYM 8.1): an `if` inside a
+loop over a collection known only at run time (its condition is evaluated once, before the loop), and a `let` inside
+such a loop read later in the same loop (it holds every pass's value at once). The `thym 1` loop node, whose body
+runs member by member as a unit, is a later part of the runtime; `_repeat` is its seam.
 
 Standalone: the standard library, PyYAML and `enough.macrocosm`.
 """
@@ -54,11 +71,17 @@ from enough.thym.coprocessor import prose_problem
 from enough.thym.engines import CallCounter, EngineRefusal, Recording, Replaying, recorded_names
 from enough.thym.registry import Amount, Request, Where, decl_get
 from enough.thym.trace import Trace, default_root, digest_row, node_number, write_atomic
-from enough.thym.values import (NOTHING, Value, canonical, item_key, load_input, members, plain, posix_path,
-                                 sha256_bytes, stamp, wrap)
+from enough.thym.values import (NOTHING, Value, canonical, item_id, item_key, load_input, members, plain,
+                                 posix_path, sha256_bytes, stamp, wrap)
 
 MODIFIERS = ("as", "by", "with", "to", "against", "of", "in", "where", "marked")
 UNITS = ("words", "sentences")
+#: The words a condition's terms are joined and compared with; a call on a side of a comparison ends at one (THYM 4.5)
+_COND_WORDS = ("is", "in", "has", "covers", "and", "or", "not", "then", "else", "where", "marked")
+_KEYWORDS = frozenset(("thym", "use", "program", "move", "morph", "context", "end", "why", "must", "decided", "takes",
+                       "gives", "let", "assert", "if", "then", "else", "for", "each", "in", "where", "emit", "give",
+                       "withhold", "as", "by", "with", "to", "against", "of", "marked", "is", "not", "and", "or", "has",
+                       "covers", "keep", "keeps", "contract", "depth", "before", "after"))
 _ENGINE_RANK = {"skipped": 0, "code": 1, "rules": 2}
 
 
@@ -203,14 +226,17 @@ class Stmt:
     message: str | None = None
     loop: Loop | None = None
     text: str = ""
+    #: a node of a loop over a written list: `(var, member)`, read from its `, for x = <member>` trailer
+    member: tuple | None = None
 
 
 class _Reader:
-    def __init__(self, text: str, moves: set[str]) -> None:
+    def __init__(self, text: str, moves: set[str], in_moves: frozenset[str] = frozenset()) -> None:
         self.text = text
         self.toks = _tokenize(text)
         self.i = 0
         self.moves = moves
+        self.in_moves = in_moves
 
     # -- tokens --
     def peek(self, k: int = 0) -> tuple[str, str]:
@@ -243,6 +269,27 @@ class _Reader:
     def at_trailer(self) -> bool:
         return self.at(",") and self.at("for", 1) and self.at("each", 2)
 
+    def at_member_trailer(self) -> bool:
+        """`, for x = <member>`: the node of a loop over a written list, for one member (THYM 11.1)."""
+        return self.at(",") and self.at("for", 1) and self.peek(2)[0] == "name" and self.at("=", 3)
+
+    def at_side_call(self) -> bool:
+        """A call on a side of a comparison (`thym 1`, THYM 4.5): a move's name followed by an operand, or by a
+        modifier word other than `in`, `where` and `marked`. A field that happens to share a move's name (`where
+        count is 3`) is not one: nothing that begins an operand follows it."""
+        if not self.at_move():
+            return False
+        kind, text = self.peek(1)
+        if kind in ("string", "int", "date", "uri"):
+            return True
+        if kind == "punct":
+            return text in ("(", "[")
+        if kind != "name":
+            return False
+        if text in MODIFIERS:
+            return text not in ("in", "where", "marked")
+        return text not in _KEYWORDS or text in ("true", "false", "nothing")
+
     def at_modifier(self) -> bool:
         t = self.peek()
         return t[0] == "name" and t[1] in MODIFIERS
@@ -260,6 +307,12 @@ class _Reader:
         if self.at_trailer():
             self.take()
             st.loop = self.for_header()
+        elif self.at_member_trailer():
+            self.take()
+            self.take()
+            var = self.name()
+            self.expect("=")
+            st.member = (var, self.list_member_or_primary())
         if not self.at_end():
             raise ReadError(f"unexpected {self.peek()[1]!r}")
         st.text = self.text
@@ -324,20 +377,25 @@ class _Reader:
             self.take()
             c0 = self.i
             cond = self.cond()
-            return Filter(p, cond, self.span(c0, self.i) or self.span(a, self.i))
+            p = Filter(p, cond, self.span(c0, self.i) or self.span(a, self.i))
+        if self.at("marked"):                       # `x marked verified`, short for `mark x as verified` (THYM 4.5)
+            self.take()
+            p = Call("mark", [p], {"as": self.name()})
         return p
 
-    def call(self) -> Call:
+    def call(self, side: bool = False) -> Call:
         move = self.name()
         operands: list = []
         if not (self.at_end() or self.at_modifier() or self.at(")") or self.at("]") or self.at(",")
-                or self.at("then") or self.at("else")):
+                or self.at("then") or self.at("else") or (side and self.peek()[1] in _COND_WORDS + ("<", ">", "="))):
             operands.append(self.primary())
-            while self.at(",") and not self.at_trailer():
+            while self.at(",") and not self.at_trailer() and not self.at_member_trailer():
                 self.take()
                 operands.append(self.primary())
         mods: dict = {}
         while self.at_modifier():
+            if side and self.at("in") and move not in self.in_moves:
+                break                               # membership, not the modifier (THYM 4.5)
             w = self.take()[1]
             if w == "as":
                 mods["as"] = self.word_or_list()
@@ -414,6 +472,11 @@ class _Reader:
             return Lit(Value("word", self.take()[1]))
         return self.primary()
 
+    def list_member_or_primary(self) -> Any:
+        """A written list's member, as a node's `, for x = <member>` trailer holds it: a bare name is kept as a name,
+        and means its binding when one is bound, else the word (THYM 4.5: the binding wins)."""
+        return self.primary()
+
     # -- conditions --
     def cond(self) -> Any:
         items = [self._and()]
@@ -435,8 +498,12 @@ class _Reader:
             return Not(self._not())
         return self._term()
 
+    def side(self) -> Any:
+        """One side of a term: a call without parentheses (`thym 1`), or a primary."""
+        return self.call(side=True) if self.at_side_call() else self.primary()
+
     def _term(self) -> Any:
-        left = self.primary()
+        left = self.side()
         if self.at("is"):
             self.take()
             neg = False
@@ -446,20 +513,22 @@ class _Reader:
             return Cmp("is not" if neg else "is", left, self.rhs_word())
         if self.at("in"):
             self.take()
-            return Cmp("in", left, self.primary())
+            return Cmp("in", left, self.side())
         for op in ("<", ">", "="):
             if self.at(op):
                 self.take()
-                return Cmp(op, left, self.primary())
+                return Cmp(op, left, self.side())
         if self.at("has"):
             self.take()
             return Has(left, self.name())
         if self.at("covers"):
             self.take()
-            return Covers(left, self.primary())
+            return Covers(left, self.side())
         return Bare(left)
 
     def rhs_word(self) -> Any:
+        if self.at_side_call():
+            return self.call(side=True)
         t = self.peek()
         if t[0] == "name" and not self.at(".", 1) and t[1] not in ("true", "false", "nothing"):
             self.take()
@@ -475,10 +544,10 @@ def _name_of(e: Any) -> str:
     return e.name if isinstance(e, Name) else str(e)
 
 
-def read_statement(text: str, moves: set[str] | frozenset[str]) -> Stmt:
-    """One statement, read with the names of the moves in scope (a name that is a move begins a call). Raises
-    `ReadError`."""
-    return _Reader(text, set(moves)).statement()
+def read_statement(text: str, moves: set[str] | frozenset[str], in_moves: frozenset[str] = frozenset()) -> Stmt:
+    """One statement, read with the names of the moves in scope (a name that is a move begins a call), and of those
+    that take an `in` modifier (in a condition, `in` after one of them is the modifier). Raises `ReadError`."""
+    return _Reader(text, set(moves), frozenset(in_moves)).statement()
 
 
 def read_expression(text: str, moves: set[str] | frozenset[str]) -> Any:
@@ -495,31 +564,52 @@ def _cond_text(c: Any) -> str:
     if isinstance(c, Not):
         return f"not {_cond_text(c.item)}"
     if isinstance(c, Cmp):
-        return f"{_expr_text(c.left)} {c.op} {_expr_text(c.right)}"
+        return f"{_expr_text(c.left, True)} {c.op} {_expr_text(c.right, True)}"
     if isinstance(c, Has):
-        return f"{_expr_text(c.base)} has {c.name}"
+        return f"{_expr_text(c.base, True)} has {c.name}"
     if isinstance(c, Covers):
-        return f"{_expr_text(c.left)} covers {_expr_text(c.right)}"
+        return f"{_expr_text(c.left, True)} covers {_expr_text(c.right, True)}"
     if isinstance(c, Bare):
         return _expr_text(c.expr)
     return str(c)
 
 
-def _expr_text(e: Any) -> str:
+def _expr_text(e: Any, nested: bool = False) -> str:
+    """An expression of the reader's as the person would write it; a call inside another, or on a side of a
+    comparison (`nested`), in parentheses. Never a Python repr."""
     if isinstance(e, Name):
         return e.name
     if isinstance(e, Lit):
         v = e.value
-        return f'"{v.payload}"' if v.type == "string" else str(v.plain() if v.type != "nothing" else "nothing")
+        if v.type == "string":
+            return f'"{v.payload}"'
+        if v.type == "bool":
+            return "true" if v.payload else "false"
+        if v.type == "date" and isinstance(v.payload, _dt.date):
+            return v.payload.isoformat()
+        return "nothing" if v.is_nothing else str(v.payload)
     if isinstance(e, FieldRead):
-        return f"{_expr_text(e.base)}.{e.name}"
+        return f"{_expr_text(e.base, True)}.{e.name}"
     if isinstance(e, ListLit):
         return "[" + ", ".join(_expr_text(x) for x in e.items) + "]"
     if isinstance(e, Call):
-        return f"{e.move} " + ", ".join(_expr_text(o) for o in e.operands)
+        out = e.move + ("" if not e.operands else " " + ", ".join(_expr_text(o, True) for o in e.operands))
+        for w, a in e.mods.items():
+            if w == "where":
+                out += f" where {a[1]}"
+            elif isinstance(a, list):
+                out += f" {w} [" + ", ".join(map(str, a)) + "]"
+            elif isinstance(a, Amount):
+                out += f" {w} {a.n} {a.unit}"
+            elif isinstance(a, str):
+                out += f" {w} {a}"
+            else:
+                out += f" {w} {_expr_text(a, True)}"
+        return f"({out})" if nested else out
     if isinstance(e, Filter):
-        return f"{_expr_text(e.base)} where {e.text}"
-    return str(e)
+        out = f"{_expr_text(e.base, True)} where {e.text}"
+        return f"({out})" if nested else out
+    return "the value"
 
 
 def calls_in(x: Any) -> list[str]:
@@ -597,6 +687,10 @@ class ProgramInfo:
     lets: dict = field(default_factory=dict)
     moves: dict = field(default_factory=dict)
     messages: dict = field(default_factory=dict)
+    #: every statement as the person wrote it, by its first line, without indentation or comment (THYM 9)
+    statements: dict = field(default_factory=dict)
+    #: the grammar version its version line names (`thym 0` or `thym 1`), None when it was not read
+    version: int | None = None
 
     @classmethod
     def from_any(cls, program: Any) -> "ProgramInfo":
@@ -623,6 +717,7 @@ class ProgramInfo:
     @classmethod
     def from_items(cls, vol: dict) -> "ProgramInfo":
         info = cls()
+        info.version = _version_of(str(vol.get("front") or ""))
         nodes = [n for n in vol.get("nodes") or [] if isinstance(n, dict)]
         by_id = {n.get("id"): n for n in nodes}
         prog = next((n for n in nodes if n.get("type") == "program"), None)
@@ -634,6 +729,10 @@ class ProgramInfo:
         for st in nodes:
             if st.get("type") != "step":
                 continue
+            if isinstance(st.get("line"), int):
+                said = st.get("name") or " ".join(strip_comment(x).strip()
+                                                  for x in str(st.get("text") or "").split("\n"))
+                info.statements.setdefault(st["line"], str(said).strip())
             text = strip_comment(str(st.get("text") or "")).strip()
             if st.get("form") == "let" and not st.get("calls") and not str(st.get("of") or "").startswith("P:move/"):
                 mt = _LET.match(text)
@@ -674,6 +773,7 @@ class ProgramInfo:
     def from_source(cls, text: str) -> "ProgramInfo":
         """Read from the `.thym` text itself, line by line (a statement is one line, THYM.md 4.8)."""
         info = cls()
+        info.version = _version_of(text)
         stack: list[dict] = []
         prose = False
 
@@ -738,6 +838,7 @@ class ProgramInfo:
             if s == "else" and top["kind"] == "if":
                 top["in_else"] = True
                 continue
+            info.statements.setdefault(ln, s)
             if first == "if":
                 stack.append({"kind": "if", "line": ln, "text": s, "then": [], "else": [], "in_else": False})
                 continue
@@ -753,6 +854,63 @@ class ProgramInfo:
                 if mm:
                     info.messages[ln] = _unquote(f'"{mm.group(1)}"')
         return info
+
+
+def _version_of(text: str) -> int | None:
+    """The number a program's version line names (its first line that is neither blank nor a comment)."""
+    for raw in text.replace("\r\n", "\n").split("\n"):
+        s = strip_comment(raw).strip().lstrip("\ufeff")
+        if not s:
+            continue
+        mt = re.fullmatch(r"thym\s+(\d+)", s)
+        return int(mt.group(1)) if mt else None
+    return None
+
+
+# ---------------------------------------------------------------------------
+# The person's words (THYM 9)
+# ---------------------------------------------------------------------------
+
+_TRAILER = re.compile(r", for (?:each [a-z][a-z0-9-]* in .*|[a-z][a-z0-9-]* = .*)$")
+_TEMP = re.compile(r"\bt(\d+)\b")
+_ORDINALS = ("first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth",
+             "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth", "seventeenth",
+             "eighteenth", "nineteenth", "twentieth")
+_RUNTIME_FAULT = "a fault of the runtime, not of the program"
+
+
+def _cut(text: str, n: int = 60) -> str:
+    """A statement as a refusal quotes it: one line, at most `n` characters, cut with "…"."""
+    text = " ".join(str(text).split())
+    return text if len(text) <= n else text[:n - 1].rstrip() + "…"
+
+
+def _ordinal(k: int) -> str:
+    return f"the {_ORDINALS[k - 1]} member" if 1 <= k <= len(_ORDINALS) else f"member {k}"
+
+
+def describe(v: Any) -> str:
+    """A value as a refusal names it, in the program's terms: a number, a word or a date as itself, a string quoted,
+    an item by its id, anything else by its type. Never as Python prints it."""
+    if not isinstance(v, Value):
+        return "a value"
+    if v.is_nothing:
+        return "nothing"
+    if v.type == "bool":
+        return "true" if v.payload else "false"
+    if v.type in ("number", "word"):
+        return str(v.payload)
+    if v.type == "date" and isinstance(v.payload, _dt.date):
+        return v.payload.isoformat()
+    if v.type == "string" and isinstance(v.payload, str):
+        return '"' + _cut(v.payload, 40) + '"'
+    if v.type == "list":
+        n = len(v.payload or [])
+        return f"a list of {n}" if n != 1 else "a list of one"
+    if v.type == "item":
+        return item_id(v) or "an item"
+    a = "an" if v.type[:1] in "aeiou" else "a"
+    return f"{a} {v.type}"
 
 
 # ---------------------------------------------------------------------------
@@ -812,9 +970,14 @@ class MoveContext:
 # ---------------------------------------------------------------------------
 
 class _Stop(Exception):
-    def __init__(self, refusal: Refusal) -> None:
+    """A refusal on its way out of a node. `worded` when its message already names its statement (THYM 9), so that
+    the node does not name it again; `fault` the detail of a fault of the runtime, which the record keeps."""
+
+    def __init__(self, refusal: Refusal, *, worded: bool = False, fault: str | None = None) -> None:
         super().__init__(str(refusal))
         self.refusal = refusal
+        self.worded = worded
+        self.fault = fault
 
 
 @dataclass
@@ -837,6 +1000,8 @@ class _NodeState:
     calls: CallCounter | None = None
     state: str | None = None
     tries: list = field(default_factory=list)      # each attempt that failed: {attempt, failed: [{name, why}]}
+    passing: str | None = None                     # the pass a loop is on, in the person's terms: `for o = M:aim/x`
+    fault: str | None = None                       # a fault of the runtime: its detail, for the record only
 
     def __post_init__(self) -> None:
         if self.calls is None:
@@ -885,8 +1050,11 @@ def topo_order(nodes: list[dict]) -> list[dict] | Refusal:
                 if not v:
                     heapq.heappush(ready, idx[k])
     if len(out) != len(nodes):
-        stuck = [k for k in waiting if k not in {o.get("id") for o in out}]
-        return Refusal("plan", "plan-acyclic", f"the plan's nodes wait on each other: {', '.join(map(str, stuck))}")
+        done = {o.get("id") for o in out}
+        lines = sorted({n.get("line") for n in nodes if n.get("id") not in done and isinstance(n.get("line"), int)})
+        where = f" (the statements at lines {', '.join(map(str, lines))})" if lines else ""
+        return Refusal("plan", "plan-acyclic", f"the plan's steps wait on each other{where}, so none of them can run "
+                                               "first: plan the program again")
     return out
 
 
@@ -946,6 +1114,8 @@ class _Run:
         self.cur: _NodeState | None = None
         self._let_busy: set[str] = set()
         self._move_stack: list[str] = []
+        self._sides: list[tuple[str, Value]] = []      # the sides the last comparison compared, for an assert's words
+        self.in_moves: frozenset[str] = frozenset()
 
     # -- plan time ------------------------------------------------------------------------------------------------
 
@@ -963,8 +1133,15 @@ class _Run:
         self.load_problems = _registry.load_all(self.decls)
         try:
             self.info = ProgramInfo.from_any(self.program)
-        except (OSError, ValueError) as e:
-            return Refusal("plan", "program", f"the program could not be read: {e}")
+        except OSError as e:
+            return Refusal("plan", "program", f"the program could not be read: {e.strerror or 'the system would not '
+                                                                                         'open it'}")
+        except ValueError:
+            return Refusal("plan", "program", "the program could not be read: it is neither a .thym file nor a program "
+                                              "volume")
+        # the moves a program of its version sees (THYM 4.9); a plan run without its program sees every move whole
+        self.decls = _views(self.decls, self.info.version if self.info.version is not None else 1)
+        self.in_moves = frozenset(n for n, d in self.decls.items() if "in" in (decl_get(d, "modifiers") or {}))
         self.move_names = frozenset(set(self.decls) | set(self.info.moves))
         est = self.plan.get("estimate") if isinstance(self.plan.get("estimate"), dict) else {}
         self.largest_prompt = int(self.head.get("largest_prompt") or est.get("largest_prompt") or 0)
@@ -980,7 +1157,7 @@ class _Run:
         def walk(body: list) -> None:
             for part in body:
                 try:
-                    st = read_statement(part[2], self.move_names)
+                    st = read_statement(part[2], self.move_names, self.in_moves)
                 except ReadError:
                     continue
                 for m in calls_in(st):
@@ -1015,8 +1192,9 @@ class _Run:
                 many = f"{k} step{'s' if k != 1 else ''} ask{'' if k != 1 else 's'} a model"
                 if self.rules:
                     many += f" and {'have' if k != 1 else 'has'} no scaffold"
+                first = f", the first {self._at(blocked[0])}" if k > 1 else f": {self._at(blocked[0])}"
                 why = "agent-free is on" if self.agent_free else "--rules runs no model"
-                return Refusal("plan", "agent-free" if self.agent_free else "rules", f"{many}; {why}",
+                return Refusal("plan", "agent-free" if self.agent_free else "rules", f"{many}{first}; {why}",
                                line=blocked[0].get("line"))
         for spec in self.plan.get("inputs") or []:
             if not isinstance(spec, dict):
@@ -1042,17 +1220,21 @@ class _Run:
             for m in self._moves_of(n):
                 decl = self.decls.get(m)
                 if decl is None:
-                    hint = ("; a move the program defines needs the program beside the plan (its items or its .thym "
-                            "file)" if self.program is None else "")
-                    return Refusal("plan", "unknown-move", f"node {node_number(n.get('id'))}: the move {m} is not "
-                                   f"declared and the program defines no move of that name{hint}", line=line)
+                    if self.program is None:
+                        prog = f"{(self.plan.get('program') or {}).get('name') or self.info.name or 'its program'}.thym"
+                        return Refusal("plan", "unknown-move", f"{self._at(n)}: {m} is no declared move, so it is a "
+                                       f"move of {prog}, and this run has only the plan; run it with the program "
+                                       f"beside the plan (--program {prog})", line=line)
+                    return Refusal("plan", "unknown-move", f"{self._at(n)}: the move {m} is not declared, and the "
+                                   "program defines no move of that name", line=line)
                 if decl_get(decl, "asks") is True and self.rules:
                     if self.moves.scaffold(decl) is None:
-                        return Refusal("plan", "move", f"the scaffold of {m} ({decl_get(decl, 'scaffold')}) has no "
-                                                       "implementation here", line=line)
+                        return Refusal("plan", "move", f"{self._at(n)}: the scaffold of {m} "
+                                                       f"({decl_get(decl, 'scaffold')}) has no implementation here",
+                                       line=line)
                 elif self.moves.lookup(m) is None:
                     why = next((p.split(": ", 1)[1] for p in self.load_problems if p.startswith(f"{m}: ")), None)
-                    return Refusal("plan", "move", f"the move {m} has no implementation here"
+                    return Refusal("plan", "move", f"{self._at(n)}: the move {m} has no implementation here"
                                                    + (f" ({why})" if why else ""), line=line)
         return None
 
@@ -1111,8 +1293,8 @@ class _Run:
         total = len(self.order)
         for i, node in enumerate(self.order, 1):
             if self.should_stop is not None and self.should_stop():
-                refusal = Refusal("run", "cancelled", f"the run was cancelled before node {node_number(node.get('id'))}; "
-                                                      "nothing landed", line=node.get("line"))
+                refusal = Refusal("run", "cancelled", f"the run was cancelled before {self._at(node)}; nothing landed",
+                                  line=node.get("line"))
                 stopped = f"R:record/{node_number(node.get('id'))}"
                 break
             self._tell(i, total, node, "running")
@@ -1121,8 +1303,11 @@ class _Run:
             except _Stop as s:                    # pragma: no cover - _node catches its own
                 refusal = s.refusal
             except Exception as e:  # noqa: BLE001 - a runtime fault refuses the run with its words; never half-lands
-                refusal = Refusal("run", "runtime", f"node {node_number(node.get('id'))}: {type(e).__name__}: {e}",
+                refusal = Refusal("run", "runtime", f"{self._at(node)}: the runtime failed while running this "
+                                                    f"statement, {_RUNTIME_FAULT}; nothing landed",
                                   line=node.get("line"))
+                if self.cur is not None:
+                    self.cur.fault = f"{type(e).__name__}: {e}"           # the record keeps it, for the maintainer
                 self._record(node, refusal)
             self._tell(i, total, node, "refused" if refusal is not None else
                        ("skipped" if node.get("id") in self.skipped else "done"))
@@ -1226,24 +1411,32 @@ class _Run:
             return None
         text = str(node.get("name") or "").strip() or " ".join([str(node.get("move"))] + list(node.get("takes") or []))
         try:
-            st = read_statement(text, self.move_names)
+            st = read_statement(text, self.move_names, self.in_moves)
         except ReadError as e:
-            r = Refusal("run", "parse", f"node {node_number(nid)} ({text}): {e}", line=node.get("line"))
+            self.cur.fault = f"{text}: {e}"
+            r = Refusal("run", "parse", f"{self._at(node)}: the runtime could not read this statement; that is "
+                                        f"{_RUNTIME_FAULT}", line=node.get("line"))
             self._record(node, r)
             return r
         scope = _Scope(self.env, True)
         try:
+            if st.member is not None:                     # a node of a loop over a written list: one member
+                var, member = st.member
+                self.cur.passing = f"for {var} = {self._member_label(node)}"
+                scope = scope.child({var: self._member(member, scope)})
             if st.form == "if":
-                self.if_results[nid] = self._cond(st.cond, scope)
-            elif st.form == "assert":
-                self._assert(st, scope)
+                self.if_results[nid] = self._if(st, scope, node)
             elif st.loop is not None:
                 self._repeat(st, scope)
+            elif st.form == "assert":
+                self._assert(st, scope)
             else:
                 self._deliver(st, self._eval(st.expr, scope), node)
         except _Stop as s:
-            r = s.refusal
+            r = s.refusal if s.worded else self._worded(s.refusal, node, self.cur.passing)
             r = r if r.line else Refusal(r.stage, r.check, r.message, line=node.get("line"), file=r.file)
+            if s.fault:
+                self.cur.fault = s.fault
             self._record(node, r)
             return r
         if st.loop is None:
@@ -1264,6 +1457,8 @@ class _Run:
                             inputs=ins, outputs=cur.outputs, attempts=cur.attempts if cur.engine != "skipped" else 0,
                             tokens=tokens, seconds=seconds, checks=cur.checks, state=cur.state, refusal=refusal,
                             tries=cur.tries)
+        if cur.fault:
+            rec["fault"] = cur.fault          # a fault of the runtime: the detail, for whoever maintains it (THYM 9)
         self.records = [r for r in self.records if r["id"] != rec["id"]] + [rec]
 
     def _deliver(self, st: Stmt, v: Value, node: dict, k: int | None = None) -> None:
@@ -1286,53 +1481,161 @@ class _Run:
             self.cur.outputs.append(digest_row(f"value{suffix}", v, path=""))
 
     def _repeat(self, st: Stmt, scope: _Scope) -> None:
+        """A `repeats` node: its statement once per member of the collection, the members the `where` keeps, each
+        pass with the loop variable bound to its member (THYM 8.1, 11.1). The statement's nested calls are folded
+        into it and run with each member. This is the seam for `thym 1`'s loop node, whose body of several statements
+        runs member by member as a unit (`_body` already runs a body so)."""
         loop = st.loop
+        node = self.cur.node
+        found = self._same_loop_let(node)
+        if found is not None:
+            name, giver = found
+            raise _Stop(Refusal("run", "loop", f"{self._at(node)}: {name} is bound by {self._at(giver)} inside this "
+                                               f"for each, and {self._loop_reason()}, so here {name} would hold "
+                                               f"every pass's value at once; {self._loop_fix()}"), worded=True)
         coll = self._eval(loop.coll, scope)
         rows = members(coll)
         if rows is None:
-            raise _Stop(Refusal("run", "type",
-                                f"{_expr_text(loop.coll)} is a {coll.type}, which a for each cannot walk"))
+            head, at = self._loop_statement(node)
+            raise _Stop(Refusal("run", "type", f"{head} (line {at}): a for each goes through a volume, a fabula, a "
+                                               f"short or a list, and {_expr_text(loop.coll)} is a {coll.type}"),
+                        worded=True)
         if loop.cond is not None:
             rows = [r for r in rows if self._cond(loop.cond, scope, item=r)]
         outs = []
         for k, r in enumerate(rows, 1):
-            try:
-                v = self._eval(st.expr, scope.child({loop.var: r}))
-            except _Stop as s:
-                raise _Stop(self._whole_list_note(s.refusal)) from None
+            self.cur.passing = self._pass(loop.var, r, k, coll)
+            inner = scope.child({loop.var: r})
+            if st.form == "assert":
+                self._assert(st, inner)
+                continue
+            v = self._eval(st.expr, inner)
             self._deliver(st, v, self.cur.node, k)
             outs.append(v)
+        self.cur.passing = None
         g = self.cur.node.get("gives")
         if isinstance(g, str):
             self.env[g] = Value("list", outs)
 
-    def _whole_list_note(self, r: Refusal) -> Refusal:
-        """A refusal inside a `for each` whose node takes a temporary another repeating node gave: that temporary is
-        the list of every pass's result, not this pass's (a call nested inside a call in a loop is planned as a node
-        of its own, which walks the whole collection first; THYM.md 11.1). The refusal is the move's or the check's
-        own; this only says why the value was a list, and what to write instead. Wording only: nothing is refused
-        here that was not refused before."""
-        node = self.cur.node if self.cur is not None else {}
-        whole = [(t, self.by_id.get(g)) for t in node.get("takes") or []
-                 if re.fullmatch(r"t\d+", str(t)) for g in [f"R:node/{str(t)[1:]}"]]
-        whole = [(t, n) for t, n in whole if isinstance(n, dict) and n.get("repeats") and n.get("gives") == t]
-        if not whole:
-            return r
-        t, giver = whole[0]
-        inner = str(giver.get("name") or "").split(", for each ", 1)[0]
-        note = (f"; here {t} is not this pass's value but the list of every pass's result of node "
-                f"{node_number(giver.get('id'))} ({inner}): a call nested inside another call in a for each is "
-                "planned as its own node, which walks the whole collection first. Write the calls as a move of their "
-                "own and call that move in the loop, as open-house's offer-line does")
-        if note in r.message:
-            return r
-        return Refusal(r.stage, r.check, r.message + note, line=r.line, file=r.file)
+    def _if(self, st: Stmt, scope: _Scope, node: dict) -> bool:
+        """An `if` node's condition. In a loop over a collection known only at run time, `thym 0` evaluates it once,
+        before the loop and without the loop's variable (THYM 8.1): a condition that needs the variable is refused
+        with the fix."""
+        if st.loop is None:
+            return self._cond(st.cond, scope)
+        try:
+            return self._cond(st.cond, scope)
+        except _Stop as s:
+            raise _Stop(Refusal("run", s.refusal.check, f"{self._at(node)}: {s.refusal.message}: in thym "
+                                f"{self._version()} an if inside a for each over a collection known only at run time "
+                                f"is evaluated once, before the loop, and not for each member; {self._loop_fix()}"),
+                        worded=True) from None
+
+    def _version(self) -> int:
+        return self.info.version if self.info.version is not None else 0
+
+    def _loop_reason(self) -> str:
+        return (f"in thym {self._version()} each statement of a for each over a collection known only at run time "
+                "runs over every member before the next statement starts")
+
+    def _loop_fix(self) -> str:
+        if self._version() < 1:
+            return "inside a for each, write thym 1, where a loop's body runs member by member"
+        return "this runtime does not yet run a thym 1 loop's body member by member as a unit"
+
+    def _same_loop_let(self, node: dict) -> tuple[str, dict] | None:
+        """A name this repeating node takes that a `let` of the same loop binds (a node of the same loop gives it):
+        in `thym 0` it holds every pass's value at once (THYM 8.1)."""
+        mine = _TRAILER.search(str(node.get("name") or ""))
+        if mine is None:
+            return None
+        for t in node.get("takes") or []:
+            for g in self.nodes:
+                if g is node or g.get("gives") != t or not g.get("repeats"):
+                    continue
+                theirs = _TRAILER.search(str(g.get("name") or ""))
+                if theirs is not None and theirs.group(0) == mine.group(0) \
+                        and g.get("provenance") == node.get("provenance"):
+                    return str(t), g
+        return None
+
+    def _loop_statement(self, node: dict) -> tuple[str, Any]:
+        """The `for each` line a repeating node's loop was written on, and its line (the nearest such line before
+        the node's statement), from the program when it is beside the plan."""
+        mt = _TRAILER.search(str(node.get("name") or ""))
+        head = mt.group(0)[2:] if mt else "for each"
+        line = node.get("line")
+        found = [ln for ln, text in self.info.statements.items()
+                 if text == head and isinstance(line, int) and ln <= line]
+        return _cut(head), (max(found) if found else line)
+
+    def _pass(self, var: str, row: Any, k: int, coll: Value) -> str:
+        """A pass of a loop in the person's terms (THYM 9): an item by its id, a line of a short by its number, a
+        member of a list by its place."""
+        if isinstance(row, Value) and row.type == "item":
+            label = item_id(row) or _ordinal(k)
+        elif coll.type in ("short", "text"):
+            label = f"line {k}"
+        else:
+            label = _ordinal(k)
+        return f"for {var} = {label}"
+
+    def _member(self, e: Any, scope: _Scope) -> Value:
+        """A written list's member, as a node binds its loop variable to it: a bare name means its binding when one is
+        bound, else the word (THYM 4.5); anything else is evaluated."""
+        if isinstance(e, Name):
+            if e.name in scope.vars or (scope.program and e.name in self.info.lets):
+                return self._lookup(e.name, scope, None)
+            return Value("word", e.name)
+        return self._eval(e, scope)
+
+    def _member_label(self, node: dict) -> str:
+        """Which member of its written list a node is for: its place among the nodes of the same statement."""
+        same = [n for n in self.nodes if n.get("step") == node.get("step") and n.get("line") == node.get("line")]
+        k = next((i for i, n in enumerate(same, 1) if n is node), 1)
+        return _ordinal(k)
+
+    # -- the person's words (THYM 9) ------------------------------------------------------------------------------
+
+    def _words(self, text: str, depth: int = 0) -> str:
+        """Text from the plan with every temporary put back as the expression it stands for, in parentheses."""
+        def back(mt: re.Match) -> str:
+            giver = self.by_id.get(f"R:node/{mt.group(1)}")
+            if not isinstance(giver, dict) or giver.get("gives") != mt.group(0) or depth > 32:
+                return mt.group(0)
+            return "(" + self._words(_TRAILER.sub("", str(giver.get("name") or "")), depth + 1) + ")"
+        return _TEMP.sub(back, text)
+
+    def _said(self, node: dict) -> str:
+        """The statement a node runs, as the person wrote it: from the program by its line, else the node's name
+        with its temporaries put back; cut to 60 characters."""
+        line = node.get("line")
+        text = self.info.statements.get(line) if isinstance(line, int) else None
+        if not text:
+            text = self._words(_TRAILER.sub("", str(node.get("name") or node.get("move") or "")))
+        return _cut(text)
+
+    def _at(self, node: dict, passing: str | None = None) -> str:
+        """`<statement> (line N[, for <var> = <member>])`, the head of a refusal (THYM 9)."""
+        line = node.get("line")
+        where = f"line {line}" if isinstance(line, int) else "a line the plan does not give"
+        return f"{self._said(node)} ({where}{', ' + passing if passing else ''})"
+
+    def _worded(self, r: Refusal, node: dict, passing: str | None = None) -> Refusal:
+        """A refusal raised while a node ran, headed by the node's statement, its line and the pass."""
+        return Refusal(r.stage, r.check, f"{self._at(node, passing)}: {r.message}", line=r.line or node.get("line"),
+                       file=r.file)
 
     def _assert(self, st: Stmt, scope: _Scope) -> None:
+        self._sides = []
         ok = self._cond(st.cond, scope)
         check = "coverage" if _has_covers(st.cond) else "assert"
         line = self.cur.node.get("line") if self._move_stack == [] else None
-        msg = st.message or (self.info.messages.get(line) if line else None) or f"{_cond_text(st.cond)} does not hold"
+        msg = st.message or (self.info.messages.get(line) if line else None)
+        if msg is None and not ok:
+            msg = f"{self._condition_said(st, line)} does not hold" + "".join(
+                f"; {text} is {describe(v)}" for text, v in self._sides)
+        msg = msg or ""
         if check == "coverage":
             for c in self.cur.checks:
                 if c.get("name") == "coverage" and not c.get("ok") and c.get("why"):
@@ -1343,6 +1646,14 @@ class _Run:
         if not ok:
             raise _Stop(Refusal("run", check, msg))
 
+    def _condition_said(self, st: Stmt, line: Any) -> str:
+        """An `assert`'s condition as the person wrote it: from the program's statement, else read back from the
+        plan with its temporaries put back."""
+        said = self.info.statements.get(line) if isinstance(line, int) else None
+        if said and said.startswith("assert "):
+            return _cut(_ELSE_MSG.sub("", said[len("assert "):]).strip())
+        return _cut(self._words(_cond_text(st.cond)))
+
     # -- values ---------------------------------------------------------------------------------------------------
 
     def _lookup(self, name: str, scope: _Scope, item: Value | None) -> Value:
@@ -1352,7 +1663,9 @@ class _Run:
             try:
                 e = read_expression(self.info.lets[name], self.move_names)
             except ReadError as err:
-                raise _Stop(Refusal("run", "parse", f"let {name} = {self.info.lets[name]}: {err}")) from None
+                raise _Stop(Refusal("run", "parse", f"the runtime could not read let {name} = "
+                                                    f"{_cut(self.info.lets[name], 40)}; that is {_RUNTIME_FAULT}"),
+                            fault=f"let {name} = {self.info.lets[name]}: {err}") from None
             if not isinstance(e, Call):
                 self._let_busy.add(name)
                 try:
@@ -1363,7 +1676,8 @@ class _Run:
                 return v
         if item is not None:
             return wrap(item.field(name))
-        hint = ("; it is a let the plan folded into this node, so run with the program beside the plan"
+        hint = ("; it is bound by a let whose value the plan does not hold (a filter folds into the node that reads "
+                "it), and this run has only the plan: run it with the program beside the plan (--program)"
                 if self.program is None and scope.program else "")
         raise _Stop(Refusal("run", "unbound", f"{name} is not bound{hint}"))
 
@@ -1373,18 +1687,22 @@ class _Run:
         if isinstance(e, Lit):
             return e.value
         if isinstance(e, ListLit):
-            return Value("list", [self._eval(x, scope, item) for x in e.items])
+            return Value("list", [self._member(Name(x.value.payload), scope)
+                                  if isinstance(x, Lit) and x.value.type == "word" else self._eval(x, scope, item)
+                                  for x in e.items])
         if isinstance(e, FieldRead):
             return wrap(self._eval(e.base, scope, item).field(e.name))
         if isinstance(e, Filter):
             base = self._eval(e.base, scope, item)
             rows = members(base)
             if rows is None:
-                raise _Stop(Refusal("run", "type", f"{_expr_text(e.base)} is a {base.type}, which where cannot filter"))
+                raise _Stop(Refusal("run", "type", f"where filters a volume, a fabula, a short or a list, and "
+                                                   f"{self._words(_expr_text(e.base))} is a {base.type}"))
             return Value("list", [r for r in rows if self._cond(e.cond, scope, item=r)])
         if isinstance(e, Call):
             return self._call(e, scope, item)
-        raise _Stop(Refusal("run", "parse", f"cannot evaluate {e!r}"))
+        raise _Stop(Refusal("run", "runtime", f"the runtime cannot evaluate a part of this statement; that is "
+                                              f"{_RUNTIME_FAULT}"), fault=f"cannot evaluate {e!r}")
 
     def _cond(self, c: Any, scope: _Scope, item: Value | None = None) -> bool:
         if isinstance(c, BoolOp):
@@ -1408,8 +1726,12 @@ class _Run:
             self.cur.checks.append({"name": "coverage", "ok": r[0], "why": r[1]})
             return r[0]
         if isinstance(c, Cmp):
-            a = self._eval(c.left, scope, item).plain()
-            b = self._eval(c.right, scope, item).plain()
+            av = self._eval(c.left, scope, item)
+            bv = self._eval(c.right, scope, item)
+            if item is None and c.op != "in":             # what an assert that fails says it compared (THYM 9)
+                self._sides = [(self._words(_expr_text(x, True)), v) for x, v in ((c.left, av), (c.right, bv))
+                               if not isinstance(x, Lit)]
+            a, b = av.plain(), bv.plain()
             if c.op == "is":
                 return _eq(a, b)
             if c.op == "is not":
@@ -1421,7 +1743,8 @@ class _Run:
             if isinstance(a, bool) or isinstance(b, bool) or not isinstance(a, int) or not isinstance(b, int):
                 return False
             return a < b if c.op == "<" else a > b
-        raise _Stop(Refusal("run", "parse", f"cannot evaluate the condition {c!r}"))
+        raise _Stop(Refusal("run", "runtime", f"the runtime cannot evaluate a condition of this statement; that is "
+                                              f"{_RUNTIME_FAULT}"), fault=f"cannot evaluate the condition {c!r}")
 
     # -- calls ----------------------------------------------------------------------------------------------------
 
@@ -1524,7 +1847,11 @@ class _Run:
         except EngineRefusal as e:                      # a replayed engine call that does not match its record
             raise _Stop(e.refusal) from None
         except Exception as e:  # noqa: BLE001 - THYM.md 9: a deterministic move that raises refuses the run
-            raise _Stop(Refusal("run", "move", f"{move} raised {type(e).__name__}: {e}")) from None
+            if any(k.__name__ == "MoveError" for k in type(e).__mro__):
+                # a move that cannot go on says why in the program's terms (moves.MoveError)
+                raise _Stop(Refusal("run", "move", str(e) or f"{move} cannot go on with what it was given")) from None
+            raise _Stop(Refusal("run", "move", f"{move} failed inside its implementation; that is {_RUNTIME_FAULT}"),
+                        fault=f"{move}: {type(e).__name__}: {e}") from None
 
     def _as_value(self, r: Any, decl: Any) -> Value:
         if isinstance(r, Value):
@@ -1563,8 +1890,7 @@ class _Run:
         self._merge_checks(verdicts)
         bad = next((x for x in verdicts if not x["ok"]), None)
         if bad is not None:
-            raise _Stop(Refusal("run", bad["name"], f"{move} at node {node_number(node.get('id'))}: "
-                                                    f"{bad['why'] or 'the check does not hold'}"))
+            raise _Stop(Refusal("run", bad["name"], bad["why"] or f"{move}'s check {bad['name']} does not hold"))
 
     def _read(self, req: Request, decl: Any, cand: dict) -> tuple[Value | None, list[dict]]:
         out = cand.get("output")
@@ -1608,7 +1934,6 @@ class _Run:
             ins[str(k)] = (v, v.sha256)
         budget = {"attempts": attempts, "output_words": int(rb.get("output_words") or nb.get("output_words") or 0),
                   "prompt_tokens_max": self.largest_prompt, "seconds": int(rb.get("seconds") or 600)}
-        n = node_number(self.cur.node.get("id"))
         key = self.cur.calls.request_key()
         last: list[dict] = []
         engine = "model:unknown"
@@ -1651,7 +1976,7 @@ class _Run:
         bad = next((x for x in last if not x["ok"]), {"name": "schema", "why": "no answer"})
         tries = f"{attempts} attempt{'s' if attempts != 1 else ''}"
         why = f": {bad['why']}" if bad.get("why") else ""
-        raise _Stop(Refusal("run", bad["name"], f"{move} at node {n} still fails {bad['name']} after {tries}{why}"))
+        raise _Stop(Refusal("run", bad["name"], f"{move} still fails {bad['name']} after {tries}{why}"))
 
     # -- user moves (THYM.md 8.3) ---------------------------------------------------------------------------------
 
@@ -1681,6 +2006,9 @@ class _Run:
                     return out
             elif part[0] == "for":
                 st = self._read_stmt(part[2])
+                if st.loop is None:
+                    raise _Stop(Refusal("run", "parse", f"the runtime could not read {_cut(part[2])} as a for each; "
+                                                        f"that is {_RUNTIME_FAULT}"))
                 coll = self._eval(st.loop.coll, scope)
                 rows = members(coll) or []
                 if st.loop.cond is not None:
@@ -1704,9 +2032,10 @@ class _Run:
 
     def _read_stmt(self, text: str) -> Stmt:
         try:
-            return read_statement(text, self.move_names)
+            return read_statement(text, self.move_names, self.in_moves)
         except ReadError as e:
-            raise _Stop(Refusal("run", "parse", f"{text}: {e}")) from None
+            raise _Stop(Refusal("run", "parse", f"the runtime could not read {_cut(text)}; that is {_RUNTIME_FAULT}"),
+                        fault=f"{text}: {e}") from None
 
     # -- landing (THYM.md 12.1: every output or none) -------------------------------------------------------------
 
@@ -1716,7 +2045,10 @@ class _Run:
         if name:
             v = self.env.get(name)
             if v is None:
-                return Refusal("run", "no-give", f"the program gives {name}, and no node gave it")
+                prog = self.info.name or (self.plan.get("program") or {}).get("name") or "the program"
+                missed = [n for n in self.nodes if n.get("gives") == name and n.get("id") in self.skipped]
+                why = (f": the give at line {missed[0].get('line')} is on the branch not taken" if missed else "")
+                return Refusal("run", "no-give", f"program {prog} gives {name}, and no give reached it{why}")
             fname = f"{name}.{v.ext}"
             target = self.stage / fname
             if isinstance(v.payload, mc.Volume) and v.path is not None and Path(v.path).is_dir():
@@ -1741,6 +2073,26 @@ class _Run:
                 else:
                     write_atomic(dst, src.read_bytes())
         return None
+
+
+def _views(decls: Any, version: int) -> Any:
+    """The declarations a program of grammar `version` sees (THYM 4.9): the compiler's `declarations.views` when it
+    is there, else each mapping's own `since` and `thym-1` keys read here."""
+    try:
+        from enough.thym import declarations as _decls     # the compiler's module
+        return _decls.views(decls, version)
+    except ImportError:
+        pass
+    out: dict = {}
+    for name, d in (decls or {}).items():
+        if isinstance(d, dict):
+            since = d.get("since")
+            if isinstance(since, int) and not isinstance(since, bool) and since > version:
+                continue
+            over = d.get("thym-1") if isinstance(d.get("thym-1"), dict) and version >= 1 else {}
+            d = {**{k: v for k, v in d.items() if k != "thym-1"}, **over}
+        out[name] = d
+    return out
 
 
 def _alternatives(x: Any) -> list[str]:

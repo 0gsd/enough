@@ -455,7 +455,7 @@ def test_project_mode_marks_the_page_too(project_client: TestClient):
 
 def test_the_mode_gate_hides_the_project_routes_from_home(home_client: TestClient):
     for path in ("/api/project", "/api/files", "/api/models", "/api/broker",
-                 "/api/cacheawl/tree", "/api/wiki/status"):
+                 "/api/canon/tree", "/api/wiki/status"):
         assert home_client.get(path).status_code == 404, path
     assert home_client.post("/api/close-project").status_code == 404
     # …and keeps the handful of things home does serve.

@@ -60,8 +60,8 @@ def test_cosm_holotype_in_a_volume(client: TestClient):
     assert set(item) >= {"id", "key", "path", "name", "summary", "status", "visibility", "data"}
     assert item["key"].startswith("atom/")                          # Holotype keys are qualified
     assert "nodes" not in p["catalog"]
-    # The same through the legacy prefix.
-    assert client.get("/api/cosm", params={"path": "cacheawl:lib/meadow"}).json()["minicosm"] == "comprise"
+    # The pre-0.4.3 prefix no longer reaches the store (removed in 0.6).
+    assert client.get("/api/cosm", params={"path": "cacheawl:lib/meadow"}).status_code != 200
 
 
 def test_cosm_volume_folder_loads_its_canon_catalog(client: TestClient):

@@ -232,13 +232,15 @@ def test_item_slug():
 # Rules mode
 # ---------------------------------------------------------------------------
 
-def test_the_engine_names_before_emf_are_aliases_for_one_release():
-    """Plan §16: the EML names stay importable for one release, as the very same objects; the tool has none."""
+def test_the_engine_names_before_emf_are_gone():
+    """Plan §16 kept the EML names one release; 0.6 removed them. The tool never had one."""
     from enough import canon_tools as CT, tools as T
-    assert CD.derive_eml is CD.derive_emf and CD.EML_OES == CD.EMF_OES == "emf/1"
-    assert CD.EML_MAX_TOKENS == CD.EMF_MAX_TOKENS and CT.EML_MODEL_MAX == CT.EMF_MODEL_MAX
+    assert CD.EMF_OES == "emf/1"
+    for gone in ("derive_eml", "EML_OES", "EML_MAX_TOKENS", "compiled_path"):
+        assert not hasattr(CD, gone), gone
+    assert not hasattr(CT, "EML_MODEL_MAX")
     for name in ("SYSTEM", "USER", "CONTINUE", "RESTART", "RETRY", "REPAIR"):
-        assert getattr(P, f"EML_{name}") is getattr(P, f"EMF_{name}"), name
+        assert not hasattr(P, f"EML_{name}"), name
     assert "emf_derive" in CT.TOOL_NAMES and "eml_derive" not in CT.TOOL_NAMES
     assert "emf_derive" in T._DISPATCH and "eml_derive" not in T._DISPATCH
 
@@ -430,7 +432,6 @@ def test_short_path_naming_and_collisions(tmp_path):
     aware = dt.datetime(2026, 10, 22, 14, 32, tzinfo=dt.timezone.utc)
     assert CD.short_path(tmp_path / "x.md.cosm", aware).name == \
         f"x.short-{aware.astimezone().strftime('%Y-%m-%d-%H%M')}.md"
-    assert CD.compiled_path is CD.short_path, "the old name stays one release"
     # every name short_path makes is one Canon's catalogs recognise as a short
     for made in (p, second, CD.short_path(tmp_path / "rain.cosm", when)):
         assert canon.SHORT_RE.match(made.name)

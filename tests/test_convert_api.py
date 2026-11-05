@@ -104,9 +104,9 @@ def test_convert_refuses_a_second_job_for_the_same_path(client: TestClient, make
     assert wait_for_job(client, r.json()["job"])["state"] == "done"
 
 
-def test_convert_rejects_cacheawl_and_traversal(client: TestClient):
+def test_convert_rejects_canon_and_traversal(client: TestClient):
     assert client.get("/api/convert/status",
-                      params={"path": "cacheawl:box/a.docx"}).status_code == 400
+                      params={"path": "canon:box/a.docx"}).status_code == 400
     assert client.get("/api/convert/status",
                       params={"path": "../escape.docx"}).status_code == 400
 

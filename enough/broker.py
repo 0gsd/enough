@@ -428,10 +428,6 @@ def denial_canon_disabled() -> str:
     )
 
 
-# The pre-0.4.3 name, kept one release for any caller still using it.
-denial_cacheawl_disabled = denial_canon_disabled
-
-
 def denial_composure_disabled() -> str:
     return (
         "error: the composure tools are disabled in the broker config. "

@@ -505,8 +505,7 @@ def test_no_text_no_path(project: Path):
 
 def test_store_writes_answer_to_canon_enabled(project: Path):
     set_toggle("canon_enabled", False)
-    for text in (tool("emf_derive", path="canon:lib/guide.md"), tool("atem", path="canon:lib/guide.md"),
-                 tool("emf_derive", path="cacheawl:lib/guide.md")):
+    for text in (tool("emf_derive", path="canon:lib/guide.md"), tool("atem", path="canon:lib/guide.md")):
         r = run(project, text)
         assert not r.ok and r.body == broker.denial_canon_disabled(), r.body
     assert not (canon.volume_dir("lib") / "guide.md.cosm").exists()

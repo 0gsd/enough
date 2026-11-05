@@ -29693,7 +29693,7 @@
         }
         raw = payload.text;
         nodeMap = payload.node_map || {};
-        boxPath = payload.box_path || null;
+        boxPath = payload.volume_path || null;
         boxName = top.box; subpath = top.subpath || '';
       } else if (top.kind === 'lens') {
         let payload;
@@ -29732,7 +29732,7 @@
           try {
             const payload = await mmFetchMirror(bx.box, '');
             nodeMap = payload.node_map || {};
-            boxPath = payload.box_path || null;
+            boxPath = payload.volume_path || null;
             boxName = bx.box; subpath = '';
           } catch (_e) { /* menu just won't offer disk actions */ }
         }
@@ -29765,7 +29765,7 @@
     // ----- on-demand mirror plumbing (canon squircles + node menu) -----
 
     // Fetch a volume / subfolder mirror from the backend. Returns
-    // {text, node_map, box_path, modality, subpath}.
+    // {text, node_map, volume_path, modality, subpath}.
     async function mmFetchMirror(box, subpath) {
       const q = '/api/canon/mirror?box=' + encodeURIComponent(box)
         + (subpath ? '&path=' + encodeURIComponent(subpath) : '');
@@ -29778,10 +29778,9 @@
       return r.json();
     }
 
-    // Derive the volume name from a `canon:<volume>/<rel>` file path (the
-    // legacy `cacheawl:` prefix still resolves server-side, so accept it too).
+    // Derive the volume name from a `canon:<volume>/<rel>` file path.
     function mmCanonBox(path) {
-      const pre = /^(?:canon|cacheawl):/.exec(path || '');
+      const pre = /^canon:/.exec(path || '');
       if (!pre) return null;
       const rest = path.slice(pre[0].length).replace(/^\/+/, '');
       const slash = rest.indexOf('/');
@@ -30296,7 +30295,7 @@
     // POST /api/canon/transfer (copy/move) and /api/canon/create (new
     // volume); ingest is composed into the MAIN chat, not called directly.
     // See docs/cacheawl-plan.md for the original contract. The wire keeps
-    // its old field names: `cacheboxes` in the tree, `box` / `box_path`.
+    // its old field names: `cacheboxes` in the tree, `box`.
     // ================================================================
     let CN_DATA = null;          // { root, project:[nodes], cacheboxes:[{...,tree}] }
     let CN_PROJECT_SUB = [];     // folder names descended into the project pane
@@ -31993,7 +31992,7 @@
     function cosmOpenPath(full, kind) {
       if (kind === 'holotype') { enterCosmMode(full); return; }
       if (kind === 'folder') {
-        const store = /^(?:canon|cacheawl):/.exec(full);
+        const store = /^canon:/.exec(full);
         if (store) {
           const rest = full.slice(store[0].length).replace(/^\/+/, '').replace(/\/+$/, '');
           const i = rest.indexOf('/');
@@ -32330,7 +32329,7 @@
     function canonSame(a, b) { return !!a && !!b && canonKey(a) === canonKey(b); }
     function canonBase(path) {
       const p = canonKey(path);
-      return p.slice(p.lastIndexOf('/') + 1).replace(/^(?:canon|cacheawl):/, '');
+      return p.slice(p.lastIndexOf('/') + 1).replace(/^canon:/, '');
     }
 
     async function canonJSON(url, opts) {
@@ -35021,7 +35020,7 @@
     async function thymPackMorph(path) {
       const dir = thymPackDir(path);
       for (const p of [path + '.morph.cosm', dir + thymPackStem(path) + '.morph.cosm']) {
-        if (!/^(?:canon|cacheawl):/.test(p)
+        if (!/^canon:/.test(p)
           && !document.querySelector('#tree li.file[data-path="' + CSS.escape(p) + '"]')) continue;
         const r = await canonJSON('/api/cosm?path=' + encodeURIComponent(p));
         if (r.ok && r.data && r.data.minicosm === 'thym' && thymItems(r.data).kind('morph').length) return p;

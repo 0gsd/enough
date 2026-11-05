@@ -8,6 +8,11 @@ deterministic program's run is compared with `expected/<name>/outputs/` byte for
 outputs, and every recorded run under `replay/<name>/` is replayed to its recorded outputs; these parts need only the
 runtime and the moves. Every `bad/` program must be refused at the stage, check and line its first line names.
 
+The suite reads each file by its own version line (THYM 24.3): a `thym 0` program by the `thym 0` grammar and the
+`thym 0` view of every declaration, a `thym 1` program by `thym 1`'s, and a `bad/` file's refusal is the one its
+own version gives (`bad/version.thym` names `thym 2`, a grammar no compiler knows). Each line of the report says
+which version it read.
+
 `conform(suite)` returns a `Report`; `main(suite)` prints it and returns 1 on any failure, 0 otherwise (a skip is not
 a failure). Runs land in a temporary root unless one is given, never in the user's.
 
@@ -43,6 +48,17 @@ from enough.thym.values import plain
 
 SUITE = Path(__file__).resolve().parents[2] / "tests" / "fixtures" / "thym"
 _REFUSED = re.compile(r"^-- refused: (compile|plan|run) ([a-z0-9-]+) line (\d+)\s*$")
+_VERSION = re.compile(r"^\s*thym\s+(\d+)\s*(?:--.*)?$")
+
+
+def version_of(text: str) -> str:
+    """What a program's version line says, `thym 0` or `thym 1` (or the number it names); `no version line`."""
+    for line in text.lstrip("\ufeff").replace("\r\n", "\n").split("\n"):
+        if not line.strip() or line.strip().startswith("--"):
+            continue
+        mt = _VERSION.match(line)
+        return f"thym {mt.group(1)}" if mt else "no version line"
+    return "no version line"
 
 
 @dataclass
@@ -116,7 +132,7 @@ def _compile_parts(rep: Report, name: str, src: Path, exp: Path, mods: dict, why
     if isinstance(checked, Refusal):
         rep.add("FAIL", f"{name}: refused: {checked}")
         return
-    rep.add("pass", f"{name}: compiles")
+    rep.add("pass", f"{name}: compiles ({version_of(text)})")
     try:
         items = en.enumerate_file(src)
     except Exception as e:  # noqa: BLE001
@@ -236,7 +252,7 @@ def _bad_parts(rep: Report, suite: Path, mods: dict, why: str | None) -> None:
             rep.add("FAIL", f"bad/{p.name}: refused at {r.stage} {r.check} line {r.line}, "
                             f"not {stage} {chk} line {line}")
         else:
-            rep.add("pass", f"bad/{p.name}: refused at {stage} {chk} line {line}")
+            rep.add("pass", f"bad/{p.name}: refused at {stage} {chk} line {line} ({version_of(text)})")
 
 
 def conform(suite: Path | str | None = None, *, root: Path | str | None = None, **run_kw: Any) -> Report:

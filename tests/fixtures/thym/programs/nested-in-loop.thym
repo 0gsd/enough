@@ -1,0 +1,14 @@
+thym 0
+
+program nested-in-loop
+  why: every service the house sells, marked as the house says it and then as what it does now:
+       the nested mark runs with each service, as part of its statement's one node.
+
+  takes h: volume                  -- the holotype
+  gives i: volume                  -- an isotype
+
+  for each o in h where kind is service
+    emit mark (mark o as stated) as verified    -- one node: the inner mark is folded in
+  end
+  give project h as isotype
+end

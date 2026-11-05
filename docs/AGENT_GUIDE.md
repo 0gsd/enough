@@ -99,7 +99,7 @@ Every Python module in `enough/`:
 
 | Module | Lines | Role | Key entry points |
 |---|---:|---|---|
-| [enough/server.py](../enough/server.py) | ~5510 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, `GET /api/pal/status`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Since 0.4.3 also Canon's store routes (`/api/canon/*`, each pre-0.4.3 one aliased under `/api/cacheawl/*` by `_canon_route`), the derivation routes and their `CanonJobs` table, the MacroCOSM read routes (`/api/cosm*`, `/api/macrocosm/manifests`, `/api/macrocosm-spec`), the `canon:`/`cacheawl:` path prefixes (`STORE_PREFIXES`) and the project-catalog task in the lifespan. Mounts the composure, council and dictionary routers in one `include_router` call each, and starts FEED's background build in the lifespan (`dictionary.ensure_built(background=True)`; `cancel_build()` on shutdown). Owns `GET /api/intro` and the intro match in `POST /api/chat` (see "The readvisor panel"). Owns the `/pal` prefix branch in `POST /api/chat` and `_render_pal_bubbles`. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. Since 0.4.4 the **agent-free boundary** too: `AgentFreeGate`, `AGENT_FREE_PATHS`/`AGENT_FREE_PREFIXES`/`AGENT_FREE_OPEN`, the switch in `POST /api/ui-config`, and `GET /api/canon/ingest-caps` (see "Agent-free mode"). Since 0.5.0 it mounts the Thym router (`thym_api.build_router(...)`, one `include_router`), asks `thym_api.thym_volume` first in `_cosm_volume` (so `/api/cosm` and `/api/cosm/lens` load `thym:` paths and `.thym` programs), serves `GET /api/thym-spec` (in `HOME_PATHS`), and gates `/api/canon/read` in `AGENT_FREE_PATHS` (see "Thym"). | `create_app()`, `_drive_message()`, `_run_turn(session, message, pal=, log_user=)`, `_render_pal_bubbles()`, `Session.pal_turn`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `STORE_PREFIXES`, `_canon_route()`, `_text_target()` (delegates to `canon_tools.text_target`), `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
+| [enough/server.py](../enough/server.py) | ~5510 | FastAPI app: chat dispatch, SSE streaming, file tree, model modal, broker modal, auto-reset orchestration, all `/api/*` endpoints (including `/api/wiki/*`, `/api/models/*`, `/api/skills*` — whose toggle is guarded by `skillaudit` — `/api/roles*` + `/api/readvisors/remove` + `/api/readvisor/chief`, `GET /api/pal/status`, the desktop-gated `POST /api/shutdown`, and `/api/home/*` + `/api/close-project`; see the `ENOUGH_DESKTOP*` note under "What NOT to touch"). Since 0.4.3 also Canon's store routes (`/api/canon/*`, registered by `_canon_route`; the pre-0.4.3 `/api/cacheawl/*` aliases were removed in 0.6), the derivation routes and their `CanonJobs` table, the MacroCOSM read routes (`/api/cosm*`, `/api/macrocosm/manifests`, `/api/macrocosm-spec`), the `canon:` path prefix (`STORE_PREFIXES`) and the project-catalog task in the lifespan. Mounts the composure, council and dictionary routers in one `include_router` call each, and starts FEED's background build in the lifespan (`dictionary.ensure_built(background=True)`; `cancel_build()` on shutdown). Owns `GET /api/intro` and the intro match in `POST /api/chat` (see "The readvisor panel"). Owns the `/pal` prefix branch in `POST /api/chat` and `_render_pal_bubbles`. Also owns the **mode boundary**: `create_app(home=…)`, the `ModeGate` ASGI middleware, `HOME_PATHS`/`HOME_PREFIXES`, and the `data-mode` marker templated into `/`. Since 0.4.4 the **agent-free boundary** too: `AgentFreeGate`, `AGENT_FREE_PATHS`/`AGENT_FREE_PREFIXES`/`AGENT_FREE_OPEN`, the switch in `POST /api/ui-config`, and `GET /api/canon/ingest-caps` (see "Agent-free mode"). Since 0.5.0 it mounts the Thym router (`thym_api.build_router(...)`, one `include_router`), asks `thym_api.thym_volume` first in `_cosm_volume` (so `/api/cosm` and `/api/cosm/lens` load `thym:` paths and `.thym` programs), serves `GET /api/thym-spec` (in `HOME_PATHS`), and gates `/api/canon/read` in `AGENT_FREE_PATHS` (see "Thym"). | `create_app()`, `_drive_message()`, `_run_turn(session, message, pal=, log_user=)`, `_render_pal_bubbles()`, `Session.pal_turn`, `ModeGate`, `HOME_PATHS`, `HIDDEN_TREE_PATHS`, `STORE_PREFIXES`, `_canon_route()`, `_text_target()` (delegates to `canon_tools.text_target`), `_readvisor_origin()`, `request_process_exit()` / `request_process_exec()` (module-level so tests can swap them), `HANDOFF_EXIT_CODE`, all `@app.{get,post}` handlers |
 | [enough/prompt.py](../enough/prompt.py) | ~1865 | Assembles the system prompt from `rness/` on every turn (no caching). Also owns skill/readvisor/paradigm enumeration + toggle-state helpers, the generated identity preface, the chief readvisor's name, and the gated tool-doc blocks. `set_skill_enabled()` is the dumb `.disabled` writer — the *guarded* door for skill toggles is `skillaudit.set_skill_enabled_guarded()` (see "Skill trust"). | `assemble_system_prompt(project_dir, readvisors=, profile=chat|council|lean, pal=)`, `assemble_for_window()` / `choose_profile()` / `lean_wanted()` / `estimate_tokens()` (0.5.1), `harness_guides()`, `harness_context()`, `readvisor_identity()`, `identity_preface()`, `chief_name()` / `valid_chief_name()` / `CHIEF_NAME_DEFAULT` / `CHIEF_NAME_MAX`, `readvisor_shape()`, `tool_instructions(project_dir, pal=, lean=)`, `TOOL_INSTRUCTIONS` (the core) / `GIRRAPH_` / `REVIEW_` / `WIKI_` (+ `WIKI_ABSENT_`, gate `_wiki_installed()`) / `CLOUD_` (gate `_cloud_usable()`) / `CANON_STORE_` / `KEEP_GOING_` / `COMPOSURE_TOOL_INSTRUCTIONS` / `READVISORY_TOOL_INSTRUCTIONS` / `DICTIONARY_TOOL_INSTRUCTIONS` / `CANON_TOOL_INSTRUCTIONS` (+ its gate `_macrocosm_available()`) / `PAL_TOOL_INSTRUCTIONS` / `PAL_TURN_INSTRUCTION`, the `*_LEAN_INSTRUCTIONS` summaries, `LEAN_CUT` / `LEAN_SHARE` / `CHARS_PER_TOKEN`, `convert_instructions()`, `list_skills()` / `set_skill_enabled()`, `list_roles()` / `set_role_enabled()` / `_readvisors_dir()`, `list_paradigms()`, `get_active_paradigm()` / `set_active_paradigm()`, `HOME_PARADIGM` / `ensure_multipurpose_file()` (the `default` → home migration) |
 | [enough/composure.py](../enough/composure.py) | ~3060 | The composure core (0.3.5): the `.comp` HTML5 parser/serializer, the sanitizer, markdown ⇄ rich text, the node-level op vocabulary (the only way content changes), `place_module`/`arrange`/`estimate_height`, the JSON document model the canvas renders from, the comments sidecar, the forms registry, the outline→composure converter, and the write-door denial. **No FastAPI import** — exercisable with no web layer. See "Composures". | `loads()` / `dumps()`, `model()`, `apply_ops()`, `path_lock()`, `OP_NAMES` / `SOURCES` / `MODULE_TYPES` / `BG_SWATCHES` / `SHIPPED_FORMS` / `CAPS`, `place_module()`, `estimate_height()`, `write_denial()`, `comments_path()` / `load_comments()` / `move_sidecars()`, `parse_outline()` / `outline_ops()` / `from_outline()`, `ComposureError` |
 | [enough/composure_api.py](../enough/composure_api.py) | ~520 | HTTP translation only: `build_router(project_dir, resolve_path, emit)` → the `APIRouter` `create_app` mounts. Every `/api/composure*` route, the comments CRUD, `link-preview`, `webframe/refresh`, and the `composure` SSE event. | `build_router()`, `EVENT` |
@@ -132,12 +132,11 @@ Every Python module in `enough/`:
 | [enough/highlights.py](../enough/highlights.py) | ~280 | Review-mode color highlights (yellow/green/blue/pink) stored in per-doc `.<filename>.highlights.json` sidecars. Tools `read_highlights` and `navigate_to_highlight` consume them. | — |
 | [enough/girraph.py](../enough/girraph.py) | ~885 | The girraph primitive: parser/serializer for the plain-text `.girraph` IBIS format, node-level ops (the only way content changes), ASCII tree renderer, per-path write locks. Agent tools and UI endpoints both call through here. | `loads()` / `dumps()`, `add_node()` / `update_node()` / `link_nodes()` / `remove_node()`, `ascii_render()`, `path_lock()` |
 | [enough/canon.py](../enough/canon.py) | ~2300 | Canon (0.4.3; the cacheawl store, moved and extended): volume CRUD, path/URL/wikisink **ingest** (with the Holotype privacy filter), the `canon.cosm` volume catalogs and the project catalog `rness/canon.cosm`, reconcile, the on-demand merirmaid mirror, the catalog/meta write-guards, transfer (copy/move), the one-time store-folder rename, the EMF-twin listing rules (`emf_state` is the one fresh/stale rule), the launch-time `infoworld` migration, and (0.5.0) Thym packages as volume kinds: the suffixes `PACKAGE_FOLDER_SUFFIX` (`.thym`), `PACKAGE_FILE_SUFFIX` (`.package.cosm`), `SEALED_SUFFIX` (`.thym.enc`), `is_package_folder` (a `<stem>.thym/` whose `package.cosm` sniffs `oes: thym/1`) / `is_package_file` / `is_sealed_package` / `package_stem` / `package_text_name` / `packages_beside`; `file_kind` says `package` / `sealed`; the scan never recurses a package folder and the catalog lists one as a single `kind: package` item; `catalog_excerpt` (the surrounding context, built in memory). Root `~/enough/canon/` (`ENOUGH_CANON_ROOT`, then `ENOUGH_CACHEAWL_ROOT`). Owns everything under the store. Still exports the generic folder→flowchart walker `home.py` builds project maps with. See "Canon". | `root()`, `migrate_store_folder()`, `create_volume()` / `list_volumes()` / `volume_tree()` / `rename_volume()` / `delete_volume()` / `require_volume()`, `run_ingest()`, `build_catalog()` / `regenerate_catalog()` / `project_catalog(project_dir, *, write=)`, `reconcile()` / `reconcile_all()`, `build_mirror()`, `folder_flowchart()`, `is_catalog_file()` / `catalog_write_denial()`, `emf_twin_path()` / `is_emf_twin()` / `emf_state()` / `twin_header()`, `is_holotype_folder()`, `slug()` / `item_slugs()` / `file_kind()`, `transfer()`, `migrate_infoworld()`, `CanonError` / `CanonNotFound`, `CATALOG_ITEM_CAP` |
-| [enough/cacheawl.py](../enough/cacheawl.py) | 77 | **A compatibility shim, for one release** (0.4.3): explicit re-exports of every public name of the old module mapped onto `canon` (`box_dir` → `volume_dir`, `regenerate_mirror` → `regenerate_catalog`, `mirror_write_denial` → `catalog_write_denial`, the `*cachebox*` CRUD → `*_volume`, `CacheawlError = CanonError` …), plus the three private names `tests/test_cacheawl*.py` reach for. New code imports `canon` | — |
 | [enough/macrocosm.py](../enough/macrocosm.py) | ~2150 | The MacroCOSM OES reference reader (0.4.3): the COSM YAML loader, manifests and the registry, volumes, paths/URIs, references, the sixteen generic checks, Mermaid lenses and the text tree, a CLI. **PyYAML + stdlib only, imports nothing from enough** — vendorable as one file. See "MacroCOSM". | `yaml_load()` / `dump()` / `sniff_declaration()`, `Registry` / `default_registry()` / `load_manifest()` (seven manifests since 0.5.0; `*.moves.cosm` sidecars are not manifests), `Volume.name` (falls back to a catalog's `handle`, so a holograph is titled by its pseudonym — 0.5.0), `load_volume()` → `Volume`, `parse_path()` / `resolve_path()` / `qualified_uri()`, `resolve_ref()`, `lint()` → `Report`, `lenses()` / `to_mermaid()` / `to_text_tree()`, `Refusal` (falsy), `CHECKS`, `DEFAULT_MANIFEST_DIR` |
 | [enough/docoes.py](../enough/docoes.py) | ~2250 | DocOES (0.4.4): a markdown document enumerated as a `doc/1` volume — sections, terms, examples, the decisions of a "Decisions …" or (0.5.4) "Changes" section, the help bubbles, and the reference (`R:` items) generated from the MiniCOSM manifests; build-on-digest into `ENOUGH_DOCS_ROOT`; the byte-for-byte round trip; inventories and cross-volume refs; DocOES's seven checks; a CLI. Since 0.5.4 the four specifications resolve to a synced copy under `ENOUGH_SPECS_ROOT` when one is in use, with their editions from `docs/specs.json` or the synced `state.json`. stdlib + PyYAML + `enough.macrocosm`. See "DocOES". | `DOCUMENTS`, `BUBBLE_DOCUMENT`, `tellings()`, `docs_root()`, `specs_root()`, `bundled_editions()`, `spec_info()` / `spec_source()` / `document_version()`, `validate_spec_source()`, `ensure_built()` / `is_fresh()` / `build()` / `load_built()`, `catalog_for()`, `compile_doc()`, `inventory()` / `resolve_xref()`, `lint_doc()`, `atem_problems()`, `DocsUnavailable` |
 | [enough/specs.py](../enough/specs.py) | ~170 | The specifications kept current from cosmoes.org (0.5.4): the launch check — one daemon thread per server start running the vendored client's `sync` of the four sources into `ENOUGH_SPECS_ROOT`, each candidate validated by `docoes.validate_spec_source` (a real DocOES build) — its report for `GET /api/specs-status`, the `specs_sync` preference and the three seams. Never on the request path, never blocking startup, one request per launch, 3 s timeout, INFO when something updated. See "DocOES". | `SLUGS`, `PREF_KEY`, `USER_AGENT`, `launch_check()`, `status()`, `documents()`, `cosmoes_base()`, `sync_allowed()`, `preference_on()`, `reset_for_tests()` |
 | [enough/cosmoes_client.py](../enough/cosmoes_client.py) | ~680 | **Vendored, never edited here** (0.5.4): cosmoes-site's `client/cosmoes_client.py` byte for byte, the commit it was taken from in `docs/specs.json`; the one sync client for cosmoes.org's `/manifest.json` and `/raw/*` — hosts restricted to cosmoes.org (loopback under a loopback base), sha256-verified, 5 MB-capped, same-host redirects only, an ETag, atomic writes, `state.json` last; `sync` never raises for a network or content fault. Stdlib only. A fix goes to cosmoes-site and is taken again by `scripts/sync_specs.py`. | `CosmoesClient`, `Report`, `Fetch`, `basic_validate`, `load_state`, `main` |
-| [enough/canon_derive.py](../enough/canon_derive.py) | ~2220 | The derivation engine (0.4.3): text → EMF twin, EMF → markdown, text or passage → atem, pins. **Pure functions, no server imports**; every model call through an injected `complete`. See "EMF twins and atems". | `derive_emf()`, `derive_atem()`, `compile_short()` / `compile_text()`, `record_short()`, `short_path()` (old name `compiled_path`), `default_order()` / `source_path()`, `pin_atem()` / `next_atem_id()` / `set_file_atem()`, `read_source()`, `write_atomic()` / `write_twin()`, `twin_path()` / `twin_state()`, `candidate_terms()` / `entity_candidates()` / `chunk()`, `DeriveCancelled` / `DeriveError`, `TEXT_SUFFIXES` |
+| [enough/canon_derive.py](../enough/canon_derive.py) | ~2220 | The derivation engine (0.4.3): text → EMF twin, EMF → markdown, text or passage → atem, pins. **Pure functions, no server imports**; every model call through an injected `complete`. See "EMF twins and atems". | `derive_emf()`, `derive_atem()`, `compile_short()` / `compile_text()`, `record_short()`, `short_path()` (old name `compiled_path`, removed in 0.6), `default_order()` / `source_path()`, `pin_atem()` / `next_atem_id()` / `set_file_atem()`, `read_source()`, `write_atomic()` / `write_twin()`, `twin_path()` / `twin_state()`, `candidate_terms()` / `entity_candidates()` / `chunk()`, `DeriveCancelled` / `DeriveError`, `TEXT_SUFFIXES` |
 | [enough/canon_prompts.py](../enough/canon_prompts.py) | ~115 | The derivation prompts, plain strings (`.format` only); test-asserted to name the six stances, rule out pronouns, keep `EMF_SYSTEM` under 2,000 chars and carry the owner's atem definitions verbatim | `EMF_SYSTEM` / `EMF_USER` / `EMF_CONTINUE` / `EMF_RESTART` / `EMF_RETRY` / `EMF_REPAIR`, `ATEM_SYSTEM` / `ATEM_USER` / `ATEM_WHOLE_USER`, `COMPILE_SYSTEM` / `COMPILE_USER` |
 | [enough/canon_jobs.py](../enough/canon_jobs.py) | ~275 | The derivation job table (convert's shape): one writing job per file, the generation-lock rule for model-mode jobs, cooperative cancel, SSE event `canon`. 0.5.0 adds the kinds `thym` (a program's run) and `read` (a reading) and a nested `progress: {node, of, name, move, state}` that `JobContext.progress` passes through | `CanonJobs` (`start` / `snapshot` / `cancel` / `active` / `holding` / `record`), `JobContext`, `EVENT`, `KINDS` |
 | [enough/canon_tools.py](../enough/canon_tools.py) | ~985 | The six MacroCOSM readvisor tools (`cosm_read`, `cosm_lint`, `emf_derive`, `atem`, `cosm_guide`, and since 0.4.4 `doc_lookup`), `text_target` — the derivation refusals the routes share — and the `configure()` seam. `register()` wires them at `tools` import time. Never takes the generation lock (see "EMF twins and atems"). Since 0.5.0 `text_target` also refuses a Thym package folder and anything inside it (`inside_package`, beside `inside_holotype`: "a package is kept whole") | `TOOL_NAMES`, `register()`, `configure(llm_url=, jobs=)`, `text_target()` / `TextTargetError`, `inside_holotype()` / `inside_package()`, `catalog_after()`, `run_cosm_read()` … `run_cosm_guide()`, `run_doc_lookup()` / `find_doc_entry()`, `STORE_PREFIXES`, `TEXT_MAX` / `EMF_MODEL_MAX` |
@@ -476,7 +475,7 @@ cache.
 | Broker journal | `rness/knowledge/session-logs/<date>-broker.md` | none | no |
 | Fetched web cache | `rness/io/input/<timestamp>-<hash>-<slug>.md` | none | no |
 | Cloud cache | `rness/io/cloud-cache/<timestamp>-<slug>.md` + `_cloud-index.md` | none | no |
-| Saved wiki articles | `<project>/wiki/<slug>/` or `~/enough/canon/wiki/<slug>/` (the global `wiki` volume; save dest `"canon"`, with `"cacheawl"` and `"infoworld"` accepted as legacy aliases) — folder of `article.html` (verbatim archive copy) + `_manifest.md` + hidden `.meta.json` | none — created on first save | no (readvisors read on demand) |
+| Saved wiki articles | `<project>/wiki/<slug>/` or `~/enough/canon/wiki/<slug>/` (the global `wiki` volume; save dest `"canon"`, with `"infoworld"` accepted as a legacy alias; `"cacheawl"` was until 0.6) — folder of `article.html` (verbatim archive copy) + `_manifest.md` + hidden `.meta.json` | none — created on first save | no (readvisors read on demand) |
 | Canon volumes | `~/enough/canon/<volume>/…` — root-level folders, each with a backend-owned `canon.cosm` catalog (visible, write-refused) + hidden `.canon.json` meta | none — created via UI/readvisor/migration | no (readvisors reach it via the `canon_*` tools, and read catalogs with `cosm_read`) |
 | The project catalog | `rness/canon.cosm` (`scope: project`, structure only) | none — written by `canon.project_catalog()` | no (`cosm_read rness/canon.cosm`) |
 | EMF twins and atems | `<dir>/<text>.cosm` beside `<text>` (`notes.md` ↔ `notes.md.cosm`), hidden behind it in both trees; atems live inside it; a compile writes a SHORT, a new visible `<stem>.short-<YYYY-MM-DD-HHMM>.md` beside the text, and appends it to the twin's `shorts:` list | none — written only on request (a click or a tool call) | no (`cosm_read`, `emf_derive`, `atem`) |
@@ -1785,8 +1784,8 @@ Three fields decide behaviour:
 ### Endpoints
 
 All project-mode (home 404s them via `ModeGate`). Every `path` goes through
-`create_app`'s `_resolve_project_path`, so `canon:` (and the legacy
-`cacheawl:`) works and traversal is a 400; a path that does not end in
+`create_app`'s `_resolve_project_path`, so `canon:` works (the legacy
+`cacheawl:` was removed in 0.6) and traversal is a 400; a path that does not end in
 `.comp` is a 400 that says so.
 
 | Route | Method | Notes |
@@ -2590,8 +2589,8 @@ Architecture notes:
   *and* which lives under the Canon store (`~/enough/canon/`), along with
   Canon's own catalogs and meta. That guard is
   `canon.catalog_write_denial(target, project_dir)` (returns the denial
-  string or `None`; `cacheawl.mirror_write_denial` survives as a shim alias
-  for one release); both write paths call it — see "Canon".
+  string or `None`; the `cacheawl.mirror_write_denial` shim alias was
+  removed in 0.6); both write paths call it — see "Canon".
 - **Merirmaid mode** (`#merirmaid-mode` in index.html) is a full-frame mode
   like girraph mode: lazy-loads `pele.global.js` on first open (730 kB —
   never at page load), renders the SVG with `links: false`, strips Mermaid
@@ -2608,13 +2607,13 @@ Architecture notes:
   (warm/amber tint, in-place label editing). Shift-click any node opens
   a per-node action menu filtered by type — folder: copy path / open in
   Canon (`mmOpenFolderInCanon`); file: copy path / copy contents / open in
-  its natural mode via the `canon:` scheme (`mmCanonBox` also accepts the
-  legacy `cacheawl:`), and since 0.4.3 **atem** for a text (`mmAtemItem`).
+  its natural mode via the `canon:` scheme (`mmCanonBox`; the legacy
+  `cacheawl:` it also accepted was removed in 0.6), and since 0.4.3 **atem** for a text (`mmAtemItem`).
   The menu resolves nodes through the mirror payload's `node_map`
   (`{nodeId → {path, is_dir}}`).
 - **Volume mirrors are drawn on demand, never persisted** (0.4.3; until
   then the box-root `_cachebox.merirmaid` was written to disk).
-  `GET /api/canon/mirror?box=…&path=…` (alias `/api/cacheawl/mirror`)
+  `GET /api/canon/mirror?box=…&path=…`
   draws the volume root or a subtree fresh per request. The 30px
   **squircle** launcher on volume headers and folder tiles opens these in
   the view-only face.
@@ -2732,9 +2731,11 @@ Architecture notes:
   (`~/enough/canon/wiki/<slug>/`) — the reader's single save button
   opens a two-choice flyout. `save.save_article(project_dir, path, dest)`
   takes `dest` in `{"project", "canon"}` (the frontend sends `"canon"`
-  since 0.4.3); `save.py` still accepts the legacy `"cacheawl"` and
-  `"infoworld"` as **aliases**, writes the registry tag `"canon"`, and an
-  unsave drops any of the three tags. `save_article_to_dir`'s default dest
+  since 0.4.3); `save.py` still accepts the legacy `"infoworld"` as an
+  **alias** (the `"cacheawl"` alias was removed in 0.6), writes the registry
+  tag `"canon"`, and an unsave drops any of the three tags — `"cacheawl"`
+  and `"infoworld"` from older saves included, since those are a person's
+  registry, not a name in the API. `save_article_to_dir`'s default dest
   is `"canon"`. History: the global destination moved from
   `~/enough/infoworld/wiki/` to the cacheawl store in 0.1.6 (the whole
   infoworld library dissolved into cacheboxes), and the store became Canon
@@ -2762,14 +2763,14 @@ Architecture notes:
 
 ## Canon (the machine-global library, 0.4.3)
 
-**Cacheawl until 0.4.3**, renamed with compatibility shims that live for one
-release. Canon is three things under one name: the store at
+**Cacheawl until 0.4.3**, renamed with compatibility shims that lived for one
+release (in practice until 0.6, which removed them; the data migrations stay). Canon is three things under one name: the store at
 `~/enough/canon/` where the user keeps text forever, the full-frame
 two-pane file manager that browses it, and the de/recompiler that turns its
 texts — and a project's — into EMF twins and atems (see "EMF twins and
 atems"). The store's code lives in [enough/canon.py](../enough/canon.py);
-`server.py` mounts `/api/canon/*`, keeps every pre-0.4.3 route answering
-under `/api/cacheawl/*` too, and hides the store (and a leftover
+`server.py` mounts `/api/canon/*` (the pre-0.4.3 `/api/cacheawl/*`
+aliases were removed in 0.6) and hides the store (and a leftover
 `~/enough/cacheawl/`) from every project tree. User-facing doc:
 HELP_CENTER §12. Design record: `docs/canon-043-plan.md` and its
 `docs/canon-landed-*.md` notes (local planning docs, untracked); its §14
@@ -2780,8 +2781,8 @@ signatures, and keeps `box` where it is on the wire. The catalogs' format
 is spec §18.3 ([docs/MACROCOSM_OES.md](MACROCOSM_OES.md)).
 
 **The store and its root.** `canon.root()` resolves `ENOUGH_CANON_ROOT` →
-`ENOUGH_CACHEAWL_ROOT` (legacy, read only when the new one is unset) →
-`~/enough/canon`. On the default path only, the **one-time folder rename**
+`~/enough/canon` (the legacy `ENOUGH_CACHEAWL_ROOT` fallback was removed in
+0.6). On the default path only, the **one-time folder rename**
 (`migrate_store_folder`): `~/enough/cacheawl` exists and `~/enough/canon`
 doesn't → `os.rename`, one INFO line; **both exist** → `canon` is used and
 one WARNING per process names both — never merged, never deleted; a failed
@@ -2865,8 +2866,8 @@ recorded follow-up).
 `GET /api/canon/mirror?box=&path=` draws the volume root or a subtree fresh
 per request through `canon.build_mirror(name, subpath)` (over
 `folder_flowchart`, the walker `home.py` also uses), with the payload it
-always had — `text`, `node_map`, `modality: mirror`, `subpath`, `box_path` —
-plus `volume_path` (= `box_path`, which stays one release). The MacroCOSM
+had — `text`, `node_map`, `modality: mirror`, `subpath` — and `volume_path`
+(0.4.3 also sent `box_path`, the same value, for one release; removed in 0.6). The MacroCOSM
 view of a volume is its catalog's lenses (`/api/cosm/lens`).
 
 **Listings.** Two trees share the rules in `canon.py`: `_scan_tree` (the
@@ -2885,27 +2886,27 @@ declare `oes: emf/1` (`macrocosm.sniff_declaration` — no YAML load during a
 tree build). State: `fresh` when the text's size + `mtime_ns` match the
 twin's `source:`, else a sha256 compare, else `stale` (also `stale` when the
 twin has no readable `source:`); `canon.emf_state` is the one rule
-everything uses, and listings never write a twin. Every node keeps
-`is_mirror` (always `false`). Volume summaries gain `catalog: "canon.cosm"`
+everything uses, and listings never write a twin. (Every node carried
+`is_mirror`, always `false`, for one release; removed in 0.6.) Volume summaries gain `catalog: "canon.cosm"`
 and `holotype` (the volume's root itself holds one). The Canon grid still
 shows convert twins (unchanged); only the catalogs hide them.
 `home._mirror_skip` now also hides EMF twins and paginated `X.pdf.pages/`,
 so "what the sidebar shows" is exact again for the project map and the
 project catalog.
 
-**Routes.** Every pre-0.4.3 handler answers under both prefixes — one
-handler, stacked by `server._canon_route` — and new routes are
-`/api/canon/*` only. Both prefixes 404 in home mode. Wire keys did not move:
-`box=` query params, `box` / `box_path` in payloads, the tree's `cacheboxes`
-list.
+**Routes.** Every handler answers under `/api/canon/*`, registered by
+`server._canon_route` (0.4.3 stacked each pre-0.4.3 handler under
+`/api/cacheawl/*` too, for one release; 0.6 removed those aliases). The
+routes 404 in home mode. Wire keys did not move: `box=` query params, `box`
+in payloads, the tree's `cacheboxes` list.
 
-| Endpoint (`/api/canon/…`, aliased `/api/cacheawl/…`) | Method | Purpose |
+| Endpoint (`/api/canon/…`) | Method | Purpose |
 |---|---|---|
 | `tree` | GET | Split-view payload: project tree + every volume summary and tree in one call (key `cacheboxes`). Reconciles every volume and the project catalog first |
 | `create` | POST | `{name}` → a new empty volume + its catalog. Names: letters/digits/spaces/hyphens/underscores, no leading symbol, ≤ 64 chars; 400 bad/duplicate |
 | `rename` | POST | `{name, new_name}`; 400 if the target exists (and for a missing volume, as before) |
 | `delete` | POST | `{name, confirm: true}` — unconfirmed → 400, missing → 404; a permanent whole-folder delete the UI gates behind a confirm |
-| `transfer` | POST | `{op: copy\|move, src, dst, overwrite?}`, each side `{root: project\|canon, box?, path}` (`cachebox` still accepted for `canon`). Traversal-checked both sides; catalogs, meta and legacy mirrors refused as source or destination; no clobber without `overwrite: true`; regenerates each touched volume's catalog (`volumes_updated`, with `boxes_updated` beside it) |
+| `transfer` | POST | `{op: copy\|move, src, dst, overwrite?}`, each side `{root: project\|canon, box?, path}` (the legacy `cachebox` for `canon` was removed in 0.6). Traversal-checked both sides; catalogs, meta and legacy mirrors refused as source or destination; no clobber without `overwrite: true`; regenerates each touched volume's catalog (`volumes_updated`; the `boxes_updated` beside it was removed in 0.6) |
 | `ingest` | POST | `{box, type: path\|url\|wikisink, value, depth?\|all?}` — the volume is registered `ingesting` synchronously, the work runs in a thread. `all` invalid for wikisink |
 | `ingest-status` | GET | `?box=` — poll while `ingesting`; failure ends `status: "failed"` + `ingest.error`, never a phantom complete |
 | `mirror` | GET | `?box=&path=` — the on-demand root or subtree mirror above; 404 for a missing volume |
@@ -2945,8 +2946,8 @@ fuzzy-matches an article then expands crosslinks `depth` layers.
   the file (the mirror's still says `modality: mirror`). `is_catalog_file`
   is the predicate. Don't add a code path that writes these from anywhere
   but `canon.py`.
-- **The `canon:<volume>/<rel>` path scheme**, with `cacheawl:<box>/<rel>`
-  still accepted (`server.STORE_PREFIXES`, `_store_prefix`;
+- **The `canon:<volume>/<rel>` path scheme** (`cacheawl:<box>/<rel>` was
+  accepted for one release and removed in 0.6) (`server.STORE_PREFIXES`, `_store_prefix`;
   `canon_tools.STORE_PREFIXES` is a copy, and a test keeps the two equal
   because `canon_tools` must not import `server`). `_resolve_project_path`
   resolves the remainder against `canon.root()` — that is how Canon
@@ -2958,7 +2959,7 @@ fuzzy-matches an article then expands crosslinks `depth` layers.
   door. The highlights routes pass a store path's resolved absolute location
   as `doc_rel` (before 0.4.3 `cacheawl:x/y.md` made a folder literally named
   `cacheawl:x` inside the project); convert and both paginate routes refuse
-  both prefixes.
+  the prefix.
 - **Ingest runs in the background.** The volume is registered synchronously
   with `status: "ingesting"` before the response returns (so
   `GET /api/canon/ingest-status?box=…` is immediately pollable); the work runs
@@ -2991,11 +2992,11 @@ fuzzy-matches an article then expands crosslinks `depth` layers.
   tests would flag one), documented in the "## canon" section of
   `prompt.TOOL_INSTRUCTIONS`. Broker toggle `canon_enabled` ("canon tools",
   group `canon`); `broker.load_config` moves a stored `cacheawl_enabled` to
-  it once and rewrites the file; `denial_cacheawl_disabled` is an alias of
-  `denial_canon_disabled`. The MacroCOSM tools' store writes ride on the same
+  it once and rewrites the file (a person's setting, so this migration
+  stays; the `denial_cacheawl_disabled` alias was removed in 0.6). The MacroCOSM tools' store writes ride on the same
   toggle.
-- **The shim, `enough/cacheawl.py`** (77 lines; its docstring says one
-  release): explicit re-exports of every public name of the old module onto
+- **The shim, `enough/cacheawl.py`** (77 lines, 0.4.3 to 0.6; its docstring
+  said one release): explicit re-exports of every public name of the old module onto
   Canon's — `box_dir` → `volume_dir`, `regenerate_mirror` →
   `regenerate_catalog`, `is_mirror_file` → `is_catalog_file`,
   `mirror_write_denial` → `catalog_write_denial`, the six `*cachebox*` CRUD
@@ -3003,10 +3004,10 @@ fuzzy-matches an article then expands crosslinks `depth` layers.
   (`root`, `load_meta`, `save_meta`, `folder_flowchart`, `build_mirror`,
   `transfer`, `reconcile`, `run_ingest`, `migrate_infoworld`, the constants
   …) as-is — plus `_require_box`, `_node_id` and `_content_files` for
-  `tests/test_cacheawl.py` / `test_cacheawl_api.py`, which stay as
-  compatibility tests and go green through it. Its `META_NAME` is the new
-  `.canon.json`. New code imports `canon`; remove the shim and those two
-  files in the release after 0.4.3.
+  `tests/test_cacheawl.py` / `test_cacheawl_api.py`, which stayed as
+  compatibility tests and went green through it. Its `META_NAME` was the new
+  `.canon.json`. New code imports `canon`. **Removed in 0.6**, with those
+  two test files (the owner's ruling for the fabula round).
 - **The UI** is the full-frame split-view mode `#canon-mode` (mode-stack
   name `canon`, launcher `#canon-btn`, ids `cn-*`, functions `cn*`, state
   `CN_*`, i18n keys `cn.*` / `menu.cn.*` / `modes.canon.*` /
@@ -3216,8 +3217,8 @@ example in comprise-oes.md §6.7 resolves; the COSM 0.2 meadow tree loads as
 
 ### Routes
 
-Project routes unless noted; `path` is project-relative or `canon:` /
-`cacheawl:`, resolved through `_resolve_project_path`; the blocking work runs
+Project routes unless noted; `path` is project-relative or `canon:`,
+resolved through `_resolve_project_path`; the blocking work runs
 in `asyncio.to_thread`.
 
 | Route | Returns |
@@ -3467,7 +3468,7 @@ until just before 0.4.3 shipped; nothing shipped says EML, so the sweep is
 total — `oes: emf/1`, `emf.manifest.cosm`, `emf/<slug>` ids, `oes:emf/…`
 URIs, the `emf` listing/catalog field, job kind `emf`, tool `emf_derive`,
 the `emf-face` UI, `emf.*` i18n keys, `tests/fixtures/cosm/emf/`. Kept one
-release, then removed: the engine names `canon_derive.derive_eml`,
+release, then removed (in 0.6): the engine names `canon_derive.derive_eml`,
 `EML_OES`, `EML_MAX_TOKENS`, `canon_prompts.EML_SYSTEM`/`_USER`/`_CONTINUE`/
 `_RESTART`/`_RETRY`/`_REPAIR` and `canon_tools.EML_MODEL_MAX` (one-line
 aliases); the route `GET /api/canon/eml` (stacked on `/api/canon/emf`); and
@@ -3512,8 +3513,8 @@ twin's `X:atem` items over (a dead `of` reference becomes an open question).
 Canon copies a file's atem line onto its catalog item. **Compile never
 overwrites**: EMF → markdown writes a new, visible SHORT,
 `<stem>.short-<YYYY-MM-DD-HHMM>.md` beside the twin (local time; `-2`,
-`-3` on a collision; `short_path`, which `compiled_path` still names for one
-release), mirroring convert's datestamped exports, and appends it to the
+`-3` on a collision; `short_path`, which `compiled_path` named for one
+release until 0.6), mirroring convert's datestamped exports, and appends it to the
 twin's `shorts:` list (see "SHORT" below).
 
 ### The engine
@@ -3629,7 +3630,7 @@ no `short` tool: the reader's button is the door.
 ### Routes, jobs and the `canon` SSE event
 
 All project routes (404 in home mode); paths through
-`_resolve_project_path`, so `canon:` / `cacheawl:` work. The refusals live in
+`_resolve_project_path`, so `canon:` works. The refusals live in
 **`canon_tools.text_target(project_dir, path)`**, which raises
 `TextTargetError(status, message)`; `server._text_target` delegates to it, so
 the routes and the readvisor tools refuse in the same words (a test compares
@@ -4444,7 +4445,7 @@ runs in-process with `generate_picture_images=True`, `images_scale=2.0`,
 | `/api/convert/install` + `/install/status` | POST/GET | the `pdf` extra installer (single-slot) |
 | `/api/file/blob` | GET | raw bytes for the image viewer / view-original, from an explicit extension→type table (`convert.BLOB_MEDIA_TYPES`), **not** `mimetypes.guess_type`. Always `X-Content-Type-Options: nosniff`; SVG additionally carries `convert.SVG_CSP`; `text/html` is unreachable by construction (415). `&meta=1` returns `{path, size, media_type, width: null, height: null}` — the frontend reads dimensions off the loaded `<img>` |
 
-`canon:` and `cacheawl:` paths are refused (400) by every convert route (and
+`canon:` paths are refused (400) by every convert route (and
 by both paginate routes): v1 is scoped to the project tree, and the store's
 write-guards have no opinion about twins. (Canon's *listings* still read a
 convert twin's state for a volume catalog's `twin:` entry, through
@@ -4623,8 +4624,8 @@ expands (and the help center works in home mode), and **`/api/shutdown`** is
 how the shell quits a backend — a home backend is still a backend.
 `/api/macrocosm-spec` (0.4.3) and the DocOES routes (0.4.4) are there because
 the docs viewer is project-independent, like the help center before it — the
-two inline routes too, because its live examples must load from home; Canon's `/api/canon/*`, its
-`/api/cacheawl/*` aliases and the `/api/cosm*` routes are project routes and
+two inline routes too, because its live examples must load from home; Canon's `/api/canon/*` and the
+`/api/cosm*` routes are project routes and
 404 on a home server. Anything
 else 404s with a JSON `detail` in the house voice. In project mode the gate
 inverts: `/api/home/*` 404s and everything else passes. `/api/close-project`
@@ -6159,9 +6160,9 @@ A list of things that will confuse you if you don't see them coming:
   symlinked into every project they open afterwards — a leak that survives
   the run that caused it. Anything a test can reach that is not under
   `tmp_path` is a bug in the seam list, not in the test. The newest is
-  `ENOUGH_CANON_ROOT` (0.4.3): a *renamed* location keeps its old seam too
-  (`ENOUGH_CACHEAWL_ROOT` is still read as a fallback), so both harnesses
-  set both, pointing at one scratch store.
+  `ENOUGH_CANON_ROOT` (0.4.3). A *renamed* location kept its old seam too
+  for one release (`ENOUGH_CACHEAWL_ROOT`, read as a fallback until 0.6
+  removed it); both harnesses now set the one seam that exists.
 - **Don't put `--btn-bg` in `:root`.** Button chips use `var(--btn-bg,
   var(--bg-raise))`, and the fallback is load-bearing: old user configs that
   predate the `btn-bg` theme color rely on `--btn-bg` being *undefined* so
@@ -6169,7 +6170,7 @@ A list of things that will confuse you if you don't see them coming:
   The shipped themes carry `btn-bg` in their theme `colors` (and the
   server backfills it for pre-0.1.6 configs — see `_merge_shipped_theme_keys`
   in server.py); the CSS default must stay absent.
-- **The `canon:` scheme (and the legacy `cacheawl:`) resolves through
+- **The `canon:` scheme resolves through
   `_resolve_project_path` only.** That's the single door from the
   project-relative file endpoints — and `/api/cosm*`, the derivation routes
   and the MacroCOSM tools — into the machine-global store. Don't add other
@@ -6188,10 +6189,9 @@ A list of things that will confuse you if you don't see them coming:
 - **The pytest suite lives in `tests/`** (tracked since the seven-models
   round; it was gitignored before — `git log` has the story). Run
   `uv run pytest tests/ -q` before declaring done; it covers girraphs,
-  project metadata, the Canon store + `/api/canon/*` and its
-  `/api/cacheawl/*` aliases + both path schemes + the project catalog
-  (`test_canon.py`, `test_canon_api.py`, and the legacy
-  `test_cacheawl*.py` running through the shim), the MacroCOSM reader, its
+  project metadata, the Canon store + `/api/canon/*` + the `canon:` path
+  scheme + the project catalog (`test_canon.py`, `test_canon_api.py`;
+  the legacy `test_cacheawl*.py` went with the shim in 0.6), the MacroCOSM reader, its
   fixtures and the spec's examples (`test_macrocosm.py`,
   `test_sync_specs.py`, `test_specs.py`, `test_macrocosm_spec.py`), the cosm routes
   (`test_cosm_api.py`), the derivation engine, jobs and routes
@@ -6217,8 +6217,8 @@ A list of things that will confuse you if you don't see them coming:
   which, like every other suite, can never reach kiwix.org or a model).
   Suites
   isolate global state via env hooks — `ENOUGH_WIKISINK_CONFIG`,
-  **`ENOUGH_CANON_ROOT`** (with the legacy `ENOUGH_CACHEAWL_ROOT` pointed at
-  the same scratch store, since `canon.root()` falls back to it),
+  **`ENOUGH_CANON_ROOT`** (its legacy `ENOUGH_CACHEAWL_ROOT` fallback was
+  removed in 0.6),
   `ENOUGH_INFOWORLD_ROOT`, `ENOUGH_UI_CONFIG`,
   `ENOUGH_WEIGHTS_DIR`, `ENOUGH_EXTRAS_STATE`, `ENOUGH_LIVE_STATE`,
   `ENOUGH_MODELS_REGISTRY`, `ENOUGH_PROJECTS_STATE`,
@@ -6439,7 +6439,7 @@ harper have no distro package and are built from their own repos.
 `bootstrap.sh` prints those commands and installs none of them.
 
 A pytest suite lives in `tests/` (girraphs, project metadata, the Canon
-store + endpoints + `canon:` / `cacheawl:` schemes, the ui-config theme-key merge, the
+store + endpoints + the `canon:` scheme, the ui-config theme-key merge, the
 models registry/feasibility/downloads, the llama-server lookup, the desktop
 shutdown gate, the platform seams, the shipped skills' frontmatter/tooltip/
 script conventions, the skill trust model + first-use audit + `/api/skills*`,
@@ -6489,7 +6489,7 @@ touching `cloud.py`, `tools.py`, and `server.py`.
   <volume>` is the quickest look at any `.cosm` — no server, nothing
   imported from enough. `tests/fixtures/cosm/` has a volume of every kind to
   try it on.
-- `ENOUGH_CANON_ROOT` (with `ENOUGH_CACHEAWL_ROOT`) is in
+- `ENOUGH_CANON_ROOT` is in
   `smoke_boot.build_env()` and `conftest._STATE_SEAMS`, so a scratch server
   built from `build_env()` has its own store. Without the seam, a dev server
   against your real home renames `~/enough/cacheawl` to `~/enough/canon` on

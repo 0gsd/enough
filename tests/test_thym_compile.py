@@ -250,7 +250,7 @@ def test_bare_words_stand_for_themselves_in_their_places():
     ("program p\n  give 0\nend\n", "version", 1),
     (V + "program p\n  takes t: text\n  gives f: fabula\n  give derive t\n", "parse", 3),
     (V + "program p\n  takes h: volume\n  gives i: volume\n  if count h > 3 then\n    give project h as isotype\n"
-         "  else\n    give project h as paratype\n  end\nend\n", "parse", 6),
+         "  else\n    give project h as paratype\n  end\nend\n", "version", 6),    # thym 1 reads it (THYM 4.9)
     (V + "program p\n  takes t: text\n  gives s: short\n  give tell derive t as told\nend\n", "parse", 6),
     (V + "program p\n  takes t: text\n  gives f: fabula\n  let f = derive t\n  move m(x: text): fabula\n"
          "    give derive x\n  end\n  give f\nend\n", "parse", 7),

@@ -221,10 +221,10 @@ HIDDEN_TREE_PATHS: frozenset[str] = frozenset({
 })
 
 
-# The virtual path prefixes that address the Canon store instead of the
-# project: `canon:<volume>/<rel>` (0.4.3) and its pre-0.4.3 spelling
-# `cacheawl:<box>/<rel>`, accepted everywhere the new one is.
-STORE_PREFIXES: tuple[str, ...] = ("canon:", "cacheawl:")
+# The virtual path prefix that addresses the Canon store instead of the
+# project: `canon:<volume>/<rel>` (0.4.3; the pre-0.4.3 `cacheawl:` spelling
+# was removed in 0.6).
+STORE_PREFIXES: tuple[str, ...] = ("canon:",)
 
 
 def _store_prefix(path: str) -> str | None:
@@ -1506,8 +1506,7 @@ async def _handle_tool(session: Session, call: ToolCall, sink: list[tuple[str, s
 # volumes (`/api/docs*`, built into the install's state, never a project) and
 # the inline cosm reader (`/api/cosm/inline*`: a volume from the text the
 # request carries, so the docs viewer's live examples work at home too; Canon's
-# `/api/canon/*` and its `/api/cacheawl/*` aliases are project routes and 404
-# here alike), the formats table its {{convert-formats}}
+# `/api/canon/*` are project routes and 404 here), the formats table its {{convert-formats}}
 # token expands, the desktop shell's graceful-quit route (a home backend is
 # still a backend the shell has to be able to stop), and /api/home/*.
 # Everything else is project-scoped, and a home server has no project to scope
@@ -2374,8 +2373,7 @@ def create_app(
         for follow-through reads; this helper guards only against path-
         string traversal (absolute paths and `..` components).
 
-        A `canon:<volume>/<rel>` prefix (or the pre-0.4.3 spelling,
-        `cacheawl:<box>/<rel>`) addresses the machine-global Canon store
+        A `canon:<volume>/<rel>` prefix addresses the machine-global Canon store
         instead of the project — that's how Canon mode launches store files
         into read/edit, girraph, and merirmaid modes. Same traversal rules
         apply inside the store; the catalog and sidecar write-guards
@@ -2680,7 +2678,7 @@ def create_app(
         None for a plain markdown file, which can still be exported (md → PDF
         works on every install) but has nothing to overwrite.
 
-        Canon paths (`canon:` and the legacy `cacheawl:`) are refused here on
+        Canon paths (`canon:`) are refused here on
         purpose — plan decision 9 scopes v1 to the project tree, and the
         store's catalog/sidecar write-guards have no opinion about twins."""
         if _store_prefix(path):
@@ -3014,7 +3012,7 @@ def create_app(
 
     def _highlight_doc(path: str) -> str:
         """The `doc_rel` the highlights module takes. A project path passes
-        through; a Canon path (`canon:` / `cacheawl:`) becomes its absolute
+        through; a Canon path (`canon:`) becomes its absolute
         resolved location, so the sidecar lands beside the stored document
         (highlights composes `project_dir / doc_rel`, and an absolute
         `doc_rel` wins that join) instead of in a folder named after the
@@ -3162,7 +3160,7 @@ def create_app(
 
     def _merirmaid_echo(path: str) -> str:
         """The sibling `.merirmaid` path in the SAME scheme the request used —
-        so a `canon:`- (or `cacheawl:`-) prefixed girraph answers with a
+        so a `canon:`-prefixed girraph answers with a
         mirror in the same prefix, and an in-tree girraph with an in-tree
         mirror."""
         if path.endswith(".girraph"):
@@ -3212,7 +3210,7 @@ def create_app(
         out = _girraph_tree_json(path, g)
         # The linked-mirror state, so the frontend's add/open-merirmaid
         # button needs no extra round trip. Echoed in the request's own path
-        # scheme (canon:/cacheawl: prefix preserved).
+        # scheme (canon: prefix preserved).
         out["merirmaid"] = _merirmaid_echo(path) if _girraph.has_mirror(target) else None
         return out
 
@@ -3828,20 +3826,16 @@ def create_app(
     # -----------------------------------------------------------------
     # Canon — the global file store (was: cacheawl). Backend for the
     # split-view Canon UI. Contract: docs/canon-043-plan.md §6. Every route
-    # that existed before 0.4.3 answers under /api/canon/<x> AND its old
-    # /api/cacheawl/<x> (one handler, identical responses); the routes new in
-    # 0.4.3 are /api/canon/* only. Query and payload keys (`box`,
-    # `box_path`, `cacheboxes`) are unchanged on the wire.
+    # answers under /api/canon/<x> (the /api/cacheawl/<x> aliases 0.4.3 kept
+    # were removed in 0.6). Query and payload keys (`box`, `cacheboxes`) are
+    # unchanged on the wire.
     # -----------------------------------------------------------------
     _ingest_tasks: set[asyncio.Task[Any]] = set()
 
     def _canon_route(method: str, sub: str):
-        """Register a handler under `/api/canon/<sub>` and its pre-0.4.3
-        alias `/api/cacheawl/<sub>` — stacked registrations of the same
-        function, so the two answer identically by construction."""
+        """Register a handler under `/api/canon/<sub>`."""
         def deco(fn: Callable[..., Any]) -> Callable[..., Any]:
-            for prefix in ("/api/canon/", "/api/cacheawl/"):
-                app.add_api_route(prefix + sub, fn, methods=[method])
+            app.add_api_route("/api/canon/" + sub, fn, methods=[method])
             return fn
         return deco
 
@@ -3921,7 +3915,7 @@ def create_app(
         """Copy/move a file or folder between the project dir and a volume
         (either direction) or within/between volumes. Body:
         {op, src:{root,box?,path}, dst:{root,box?,path}, overwrite?}, a
-        side's `root` being "project" or "canon" (legacy "cachebox")."""
+        side's `root` being "project" or "canon"."""
         body = await request.json()
         op = (body.get("op") or "").strip()
         src = body.get("src") or {}
@@ -3992,7 +3986,7 @@ def create_app(
         fetch gate a url crawl goes through (the `fetch_url` broker toggles
         and the project's internet allowlist; robots.txt is always obeyed)
         and whether a wikisink archive is there to ingest from. Read-only,
-        no model, new in 0.4.4 (so no /api/cacheawl alias)."""
+        no model, new in 0.4.4."""
         from . import tools as _tools_mod
 
         def _build() -> dict[str, Any]:
@@ -4028,11 +4022,10 @@ def create_app(
         subfolder within it (``path`` set), drawn on demand from current
         contents by `canon.folder_flowchart` and never written (the volume
         root is reconciled first, so its catalog is fresh too). Payload:
-        ``{text, node_map, modality, subpath, box_path, volume_path}`` —
+        ``{text, node_map, modality, subpath, volume_path}`` —
         ``node_map`` maps each rendered node id to ``{path, is_dir}`` (path
         relative to the volume root) so the viewer's shift-click menu can
-        resolve nodes to disk; ``box_path`` = ``volume_path``, kept one
-        release. The MacroCOSM view of a volume is its catalog's lenses
+        resolve nodes to disk. The MacroCOSM view of a volume is its catalog's lenses
         (`/api/cosm/lens`), not this."""
 
         def _build() -> dict[str, Any]:
@@ -4043,7 +4036,7 @@ def create_app(
             where = str(_canon.volume_dir(box))
             return {"text": text, "node_map": node_map,
                     "modality": "mirror", "subpath": subpath,
-                    "box_path": where, "volume_path": where}
+                    "volume_path": where}
 
         try:
             return await asyncio.to_thread(_build)
@@ -4102,7 +4095,7 @@ def create_app(
 
     def _cosm_volume(path: str) -> "_macrocosm.Volume":
         """Load the volume a cosm route names: a project-relative or Canon
-        (`canon:`/`cacheawl:`) path to a `.cosm` file or a volume folder.
+        (`canon:`) path to a `.cosm` file or a volume folder.
 
         Reconciles first where enough keeps the file — the project's
         `rness/canon.cosm`, a Canon volume's `canon.cosm` (or the volume
@@ -4867,7 +4860,7 @@ def create_app(
 
     def _canon_rel(path: str) -> str:
         """A request path tidied the way the routes report it back: project-
-        relative, or `canon:`/`cacheawl:` + the path in the store."""
+        relative, or `canon:` + the path in the store."""
         path = (path or "").strip()
         prefix = _store_prefix(path) or ""
         parts = [p for p in path[len(prefix):].replace("\\", "/").split("/") if p not in ("", ".")]
@@ -5074,8 +5067,6 @@ def create_app(
         queued or running. Model or rules is decided here, once."""
         body = await _json_body(request)
         what = str(body.get("what") or "emf").strip().lower()
-        if what == "eml":                   # the value before EMF (plan §16), accepted one release
-            what = "emf"
         if what not in ("emf", "atem"):
             raise HTTPException(400, "what must be emf or atem")
         t = await asyncio.to_thread(_text_target, str(body.get("path") or ""))
@@ -5173,7 +5164,6 @@ def create_app(
         return {"twin_path": t["twin_rel"], "item_id": item_id, "job": snap}
 
     @app.get("/api/canon/emf")
-    @app.get("/api/canon/eml")              # the path before EMF (plan §16), kept one release
     async def api_canon_emf(path: str = Query(...)) -> dict[str, Any]:
         """A text's EMF twin for the reader and the viewer: `{twin_path,
         state: fresh|stale, cosm: <the /api/cosm payload>}`; 404 when the text

@@ -1,6 +1,6 @@
-"""The Canon HTTP surface (0.4.3): `/api/canon/*` with its `/api/cacheawl/*`
-aliases answering identically, the new catalog routes, the `canon:` and
-`cacheawl:` path prefixes, the write-guards on `POST /api/file`, the listing
+"""The Canon HTTP surface (0.4.3): `/api/canon/*` (the `/api/cacheawl/*`
+aliases and the `cacheawl:` prefix 0.4.3 kept one release are gone since
+0.6), the catalog routes, the `canon:` path prefix, the write-guards on `POST /api/file`, the listing
 flags in the sidebar tree, and the project catalog's triggers (written at
 open, never by `/api/files`).
 
@@ -69,24 +69,20 @@ def _store_volume(client: TestClient, name: str) -> Path:
 
 
 # --------------------------------------------------------------------------
-# Aliases
+# The routes (the /api/cacheawl/* aliases were removed in 0.6)
 # --------------------------------------------------------------------------
 
-def test_every_old_route_answers_under_both_prefixes(client: TestClient):
+def test_every_route_answers_under_canon_and_the_old_prefix_is_gone(client: TestClient):
     box = _store_volume(client, "docs")
     (box / "a.md").write_text("a", encoding="utf-8")
     for sub, params in (("tree", {}), ("mirror", {"box": "docs"}),
                         ("ingest-status", {"box": "docs"})):
         new = client.get(f"/api/canon/{sub}", params=params)
-        old = client.get(f"/api/cacheawl/{sub}", params=params)
-        assert new.status_code == old.status_code == 200, (sub, new.text)
-        a, b = new.json(), old.json()
-        if sub == "mirror":            # the frontmatter carries a generated: stamp
-            a["text"], b["text"] = (t.split("generated:", 1)[0] for t in (a["text"], b["text"]))
-        assert a == b, sub
+        assert new.status_code == 200, (sub, new.text)
+        assert client.get(f"/api/cacheawl/{sub}", params=params).status_code in (404, 405), sub
     for sub in ("create", "rename", "delete", "transfer", "ingest"):
-        assert client.post(f"/api/cacheawl/{sub}", json={}).status_code == 400, sub
         assert client.post(f"/api/canon/{sub}", json={}).status_code == 400, sub
+        assert client.post(f"/api/cacheawl/{sub}", json={}).status_code in (404, 405), sub
 
 
 def test_tree_payload_keeps_its_wire_keys_and_flags(client: TestClient, project: Path):
@@ -128,7 +124,7 @@ def test_mirror_payload_has_volume_path_and_canon_source(client: TestClient):
     (box / "guide").mkdir()
     (box / "guide" / "intro.md").write_text("x", encoding="utf-8")
     p = client.get("/api/canon/mirror", params={"box": "m"}).json()
-    assert p["volume_path"] == p["box_path"] == str(box)
+    assert p["volume_path"] == str(box) and "box_path" not in p          # box_path: removed in 0.6
     assert "source: canon:m\n" in p["text"] and "📦 m" in p["text"]
     assert all(v["path"] != canon.CATALOG_NAME for v in p["node_map"].values())
     assert not (box / canon.LEGACY_MIRROR_NAME).exists()
@@ -137,16 +133,19 @@ def test_mirror_payload_has_volume_path_and_canon_source(client: TestClient):
     assert client.get("/api/canon/mirror", params={"box": "ghost"}).status_code == 404
 
 
-def test_transfer_with_canon_root_and_legacy_cachebox_root(client: TestClient, project: Path):
+def test_transfer_with_canon_root(client: TestClient, project: Path):
     box = _store_volume(client, "box")
     r = client.post("/api/canon/transfer", json={
         "op": "copy", "src": {"root": "project", "path": "hello.md"},
         "dst": {"root": "canon", "box": "box", "path": "hello.md"}})
     assert r.status_code == 200, r.text
-    r = client.post("/api/cacheawl/transfer", json={
-        "op": "copy", "src": {"root": "cachebox", "box": "box", "path": "hello.md"},
+    r = client.post("/api/canon/transfer", json={
+        "op": "copy", "src": {"root": "canon", "box": "box", "path": "hello.md"},
         "dst": {"root": "project", "path": "copy.md"}})
     assert r.status_code == 200, r.text
+    assert client.post("/api/canon/transfer", json={       # the legacy word, removed in 0.6
+        "op": "copy", "src": {"root": "cachebox", "box": "box", "path": "hello.md"},
+        "dst": {"root": "project", "path": "copy2.md"}}).status_code == 400
     assert (project / "copy.md").read_text(encoding="utf-8") == "hi from the project"
     assert "hello.md" in (box / canon.CATALOG_NAME).read_text(encoding="utf-8")
 
@@ -172,7 +171,6 @@ def test_volume_catalog_route(client: TestClient):
     assert [it["path"] for it in p["parsed"]["items"]] == ["a.md"]      # reconciled first
     assert client.get("/api/canon/catalog", params={"volume": "ghost"}).status_code == 404
     assert client.get("/api/canon/catalog", params={"volume": "../x"}).status_code == 400
-    assert client.get("/api/cacheawl/catalog", params={"volume": "lib"}).status_code == 404
 
 
 def test_project_catalog_route_reconciles_first(client: TestClient, project: Path):
@@ -202,44 +200,43 @@ def test_project_catalog_is_written_at_open_and_never_by_the_tree_poll(client: T
 
 
 # --------------------------------------------------------------------------
-# Paths: canon: and cacheawl:
+# Paths: canon: (the cacheawl: spelling was removed in 0.6)
 # --------------------------------------------------------------------------
 
-def test_both_prefixes_read_and_write_the_store(client: TestClient):
+def test_the_canon_prefix_reads_and_writes_the_store(client: TestClient):
     box = _store_volume(client, "reads")
     (box / "note.md").write_text("stored body", encoding="utf-8")
-    for prefix in ("canon:", "cacheawl:"):
-        r = client.get("/api/file/raw", params={"path": f"{prefix}reads/note.md"})
-        assert r.status_code == 200 and r.text == "stored body", prefix
+    r = client.get("/api/file/raw", params={"path": "canon:reads/note.md"})
+    assert r.status_code == 200 and r.text == "stored body"
+    r = client.get("/api/file/raw", params={"path": "cacheawl:reads/note.md"})
+    assert r.status_code != 200, "the pre-0.4.3 prefix no longer reaches the store"
     r = client.post("/api/file", data={"path": "canon:reads/fresh.md", "content": "via canon"})
     assert r.status_code == 200, r.text
     assert (box / "fresh.md").read_text(encoding="utf-8") == "via canon"
 
 
 def test_prefixes_keep_the_traversal_rules(client: TestClient):
-    for bad in ("canon:../../etc/passwd", "canon:box/../../escape", "canon:",
-                "cacheawl:../x", "cacheawl:"):
+    for bad in ("canon:../../etc/passwd", "canon:box/../../escape", "canon:"):
         r = client.get("/api/file/raw", params={"path": bad})
         assert r.status_code == 400, f"{bad!r} -> {r.status_code}"
 
 
-def test_project_only_features_refuse_both_prefixes(client: TestClient):
-    for prefix in ("canon:", "cacheawl:"):
-        assert client.get("/api/convert/status",
-                          params={"path": f"{prefix}box/a.docx"}).status_code == 400
-        assert client.get("/api/paginate/status",
-                          params={"path": f"{prefix}box/a.md"}).status_code == 400
+def test_project_only_features_refuse_the_canon_prefix(client: TestClient):
+    assert client.get("/api/convert/status",
+                      params={"path": "canon:box/a.docx"}).status_code == 400
+    assert client.get("/api/paginate/status",
+                      params={"path": "canon:box/a.md"}).status_code == 400
 
 
 def test_highlights_on_a_canon_path_live_beside_the_stored_file(client: TestClient, project: Path):
     box = _store_volume(client, "hl")
     (box / "doc.md").write_text("some highlighted words here", encoding="utf-8")
-    for prefix in ("canon:", "cacheawl:"):
+    for snippet in ("highlighted", "words"):
         r = client.post("/api/highlights", data={
-            "path": f"{prefix}hl/doc.md", "color": "yellow", "snippet": "highlighted"})
+            "path": "canon:hl/doc.md", "color": "yellow", "snippet": snippet})
         assert r.status_code == 200, r.text
     assert (box / ".doc.md.highlights.json").is_file()
-    assert not any(p.name.startswith(("canon:", "cacheawl:")) for p in project.iterdir())
+    assert not any(p.name.startswith("canon:") for p in project.iterdir())
     got = client.get("/api/highlights", params={"path": "canon:hl/doc.md"}).json()
     assert len(got["highlights"]) == 2
 
@@ -251,7 +248,7 @@ def test_highlights_on_a_canon_path_live_beside_the_stored_file(client: TestClie
 def test_post_file_refuses_every_kept_file(client: TestClient, project: Path):
     box = _store_volume(client, "kept")
     before = (box / canon.CATALOG_NAME).read_text(encoding="utf-8")
-    for path in ("canon:kept/canon.cosm", "cacheawl:kept/canon.cosm", "canon:kept/.canon.json",
+    for path in ("canon:kept/canon.cosm", "canon:kept/.canon.json",
                  "canon:kept/.cachebox.json", "canon:kept/_cachebox.merirmaid", "rness/canon.cosm"):
         r = client.post("/api/file", data={"path": path, "content": "CLOBBER"})
         assert r.status_code == 403, (path, r.text)
@@ -280,7 +277,7 @@ def test_files_html_flags(client: TestClient):
 def test_home_mode_hides_canon_routes_alike(project: Path):
     app = create_app(project, "http://localhost:9", supervise=False, home=True)
     with TestClient(app) as c:
-        for path in ("/api/canon/tree", "/api/cacheawl/tree", "/api/canon/project-catalog",
+        for path in ("/api/canon/tree", "/api/canon/project-catalog",
                      "/api/cosm?path=rain.cosm"):
             assert c.get(path).status_code == 404, path
         r = c.get("/api/macrocosm-spec")

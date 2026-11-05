@@ -1,0 +1,77 @@
+oes: thym/1
+kind: plan
+id: thym/plan.nested-in-loop
+name: nested-in-loop on meadow
+program:
+  name: nested-in-loop
+  sha256: 80ba008e906517d0a5321f88b975931385c0fd100b140e9f8da631bca259a976
+inputs:
+- name: h
+  type: volume
+  path: ../cosm/holotypes/meadow
+  sha256: b27e86f12b2b2d588cbdaa47c82d160a60cc2056030050088bfc31a9e6f5a5d7
+estimate:
+  steps: 2
+  asks: 0
+  largest_prompt: 0
+  output_words: 0
+nodes:
+- id: R:plan/fixture
+  type: plan
+  name: nested-in-loop on meadow
+  summary: Two nodes, none of which asks the model.
+  nodes:
+  - R:node/1
+  - R:node/2
+  asks: 0
+  largest_prompt: 0
+  provenance:
+    mode: derived
+    sources:
+    - nested-in-loop.thym
+    confidence: 1
+- id: R:node/1
+  type: node
+  name: emit mark (mark o as stated) as verified, for each o in h where kind is service
+  summary: 'one node: the inner mark is folded in'
+  step:
+    program: nested-in-loop
+    n: 2
+  move: mark
+  asks: false
+  takes:
+  - h
+  repeats: true
+  after: []
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 11
+  provenance:
+    mode: derived
+    sources:
+    - nested-in-loop.thym#L10-L12
+    confidence: 1
+- id: R:node/2
+  type: node
+  name: project h as isotype
+  summary: project h as isotype
+  step:
+    program: nested-in-loop
+    n: 3
+  move: project
+  asks: false
+  takes:
+  - h
+  gives: i
+  after:
+  - R:node/1
+  budget:
+    attempts: 1
+    output_words: 0
+  line: 13
+  provenance:
+    mode: derived
+    sources:
+    - nested-in-loop.thym#L13
+    confidence: 1

@@ -74,7 +74,7 @@ SIDE_EFFECT = "canon"
 
 #: The virtual prefixes that address the Canon store instead of the project.
 #: The same tuple as `server.STORE_PREFIXES` (a test keeps them equal).
-STORE_PREFIXES: tuple[str, ...] = ("canon:", "cacheawl:")
+STORE_PREFIXES: tuple[str, ...] = ("canon:",)
 
 #: Over this a text is the reader's work, not a chat turn's: a model reads it
 #: passage by passage, a minute or more each, while the turn waits.
@@ -83,7 +83,6 @@ TEXT_MAX = 24_000
 #: (gemma-4-E4B: 85–105 s for ~1,200 characters, the orchestrator's measure).
 #: Longer texts get the rules scaffold and a pointer to the reader.
 EMF_MODEL_MAX = 6_000
-EML_MODEL_MAX = EMF_MODEL_MAX     # the name before EMF (plan §16), kept one release
 #: The reader's words for that, in the result.
 LONG_FOR_A_TURN = ("a full model pass on a text this long belongs in the reader's decompile, which runs in "
                    "the background")
@@ -149,7 +148,7 @@ def store_prefix(path: str) -> str | None:
 
 def tidy_rel(path: str) -> str:
     """A path tidied the way the routes report it back: project-relative, or
-    `canon:`/`cacheawl:` + the path in the store (empty and `.` segments
+    `canon:` + the path in the store (empty and `.` segments
     dropped, backslashes read as slashes)."""
     path = (path or "").strip()
     prefix = store_prefix(path) or ""

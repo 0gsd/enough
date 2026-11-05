@@ -4,8 +4,8 @@ A saved article is a *folder* (both destinations):
 
 - `project`   — `{project}/wiki/<slug>/`
 - `canon`     — `~/enough/canon/wiki/<slug>/` (the global wiki volume in
-                Canon; the legacy destination names `cacheawl` and
-                `infoworld` are accepted as aliases during the transition)
+                Canon; the legacy destination name `infoworld` is accepted
+                as an alias, `cacheawl` no longer since 0.6)
 
 containing:
 
@@ -54,16 +54,17 @@ ARTICLE_NAME = "article.html"
 
 
 # Save destinations: "project", and the Canon store's wiki volume under its
-# 0.4.3 name "canon" or either legacy name. Registry tags written as "canon";
-# "cacheawl" and "infoworld" tags from older saves are still read (unsave
-# drops all three).
-_CANON_DESTS = ("canon", "cacheawl", "infoworld")
+# 0.4.3 name "canon" or the legacy "infoworld" (the "cacheawl" destination
+# alias was removed in 0.6). Registry tags written as "canon"; "cacheawl" and
+# "infoworld" tags from older saves are still read (unsave drops all three) —
+# those are a person's saved registry, not a name in the API.
+_CANON_DESTS = ("canon", "infoworld")
 _CANON_TAGS = ("canon", "cacheawl", "infoworld")
 
 
 def _canon_wiki_dir() -> Path:
     """The global wiki volume: ``~/enough/canon/wiki/`` (honoring the
-    ENOUGH_CANON_ROOT test override, and its legacy ENOUGH_CACHEAWL_ROOT).
+    ENOUGH_CANON_ROOT test override).
     Resolved lazily so tests never touch the real store."""
     from .. import canon as _canon
     return _canon.root() / "wiki"
@@ -281,7 +282,7 @@ def save_article_to_dir(base_dir: Path, art: dict[str, Any],
 
 def save_article(project_dir: Path, path: str, dest: str) -> dict[str, Any]:
     """Save an article as a self-describing folder. `dest` is "project" or
-    "canon" ("cacheawl" and "infoworld" accepted as legacy aliases for canon).
+    "canon" ("infoworld" accepted as a legacy alias for canon).
     Returns {saved_path, dest, title}; raises KeyError / WikisinkUnavailable
     / ValueError on bad dest."""
     if dest in _CANON_DESTS:  # legacy aliases — older frontends send these
@@ -309,14 +310,13 @@ def save_article(project_dir: Path, path: str, dest: str) -> dict[str, Any]:
 def _resolve_saved_dir(project_dir: Path, ref: str) -> Path:
     """Resolve a tree path (or absolute path) to a saved-article folder,
     validating shape and containment. `ref` may point at the folder or
-    at any file inside it. A ``canon:<volume>/<rel>`` prefix (or the
-    pre-0.4.3 ``cacheawl:<box>/<rel>``) addresses the machine-global Canon
-    store (same virtual prefixes the file endpoints use — it's how Canon
+    at any file inside it. A ``canon:<volume>/<rel>`` prefix addresses the
+    machine-global Canon store (same virtual prefixes the file endpoints use — it's how Canon
     mode launches store articles into the reader). Raises ValueError with a
     user-facing message when it isn't a saved-article folder we're allowed
     to touch."""
     from .. import canon as _canon
-    prefix = next((pf for pf in ("canon:", "cacheawl:") if ref.startswith(pf)), None)
+    prefix = "canon:" if ref.startswith("canon:") else None
     if prefix:
         rel = Path(ref[len(prefix):].lstrip("/"))
         if rel.is_absolute() or ".." in rel.parts or not rel.parts:

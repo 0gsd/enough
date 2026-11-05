@@ -9,7 +9,7 @@ and a readvisor read the same sentence.
 
 `build_router()` takes the three things `create_app` owns and the core does
 not: the project directory, the path-safety helper (`_resolve_project_path`,
-which also carries the `canon:` scheme and its legacy `cacheawl:` spelling),
+which also carries the `canon:` scheme),
 and `session.emit`. That is the whole seam — no globals, and the router is
 constructible in a test with three lambdas.
 

@@ -1,0 +1,167 @@
+oes: thym/1
+kind: program
+id: thym/nested-in-loop
+name: nested-in-loop
+source:
+  path: nested-in-loop.thym
+  sha256: 80ba008e906517d0a5321f88b975931385c0fd100b140e9f8da631bca259a976
+  size: 480
+front: |+
+  thym 0
+
+built:
+  at: '2026-11-05T12:00:00Z'
+  by: enough/0.5.4
+nodes:
+- id: P:program/nested-in-loop
+  type: program
+  name: nested-in-loop
+  summary: 'Every service the house sells, marked as the house says it and then as what it does now: the nested
+    mark runs with each service, as part of its statement''s one node.'
+  why: 'every service the house sells, marked as the house says it and then as what it does now: the nested mark
+    runs with each service, as part of its statement''s one node.'
+  must: []
+  decided: []
+  takes:
+  - name: h
+    type: volume
+  gives:
+  - name: i
+    type: volume
+  lines: 3-14
+  order: 1
+  body: |
+    program nested-in-loop
+      why: every service the house sells, marked as the house says it and then as what it does now:
+           the nested mark runs with each service, as part of its statement's one node.
+
+      takes h: volume                  -- the holotype
+      gives i: volume                  -- an isotype
+
+      for each o in h where kind is service
+        emit mark (mark o as stated) as verified    -- one node: the inner mark is folded in
+      end
+      give project h as isotype
+    end
+  steps:
+  - P:step/nested-in-loop.1
+  - P:step/nested-in-loop.3
+  provenance:
+    mode: derived
+    sources:
+    - nested-in-loop.thym#L3-L14
+    confidence: 1
+- id: P:step/nested-in-loop.1
+  type: step
+  name: for each o in h where kind is service
+  summary: for each o in h where kind is service
+  of: P:program/nested-in-loop
+  n: 1
+  text: '  for each o in h where kind is service'
+  line: 10
+  lines: 10-12
+  form: for
+  calls: []
+  binds: o
+  uses:
+  - h
+  asks: false
+  steps:
+  - P:step/nested-in-loop.2
+  contracts: []
+  provenance:
+    mode: derived
+    sources:
+    - nested-in-loop.thym#L10-L12
+    confidence: 1
+- id: P:step/nested-in-loop.2
+  type: step
+  name: emit mark (mark o as stated) as verified
+  summary: 'one node: the inner mark is folded in'
+  of: P:program/nested-in-loop
+  n: 2
+  text: '    emit mark (mark o as stated) as verified    -- one node: the inner mark is folded in'
+  line: 11
+  form: emit
+  move: mark
+  calls:
+  - mark
+  uses:
+  - o
+  asks: false
+  contracts:
+  - P:contract/nested-in-loop.2
+  - P:contract/nested-in-loop.2.1
+  provenance:
+    mode: derived
+    sources:
+    - nested-in-loop.thym#L11
+    confidence: 1
+- id: P:step/nested-in-loop.3
+  type: step
+  name: give project h as isotype
+  summary: give project h as isotype
+  of: P:program/nested-in-loop
+  n: 3
+  text: '  give project h as isotype'
+  line: 13
+  form: give
+  move: project
+  calls:
+  - project
+  uses:
+  - h
+  asks: false
+  contracts:
+  - P:contract/nested-in-loop.3
+  provenance:
+    mode: derived
+    sources:
+    - nested-in-loop.thym#L13
+    confidence: 1
+- id: P:contract/nested-in-loop.2
+  type: contract
+  name: mark
+  summary: What mark must leave true of what it gives.
+  of: P:step/nested-in-loop.2
+  move: mark
+  checks:
+  - verified-only-where-derived
+  provenance:
+    mode: derived
+    sources:
+    - nested-in-loop.thym#L11
+    confidence: 1
+- id: P:contract/nested-in-loop.2.1
+  type: contract
+  name: mark
+  summary: What mark must leave true of what it gives.
+  of: P:step/nested-in-loop.2
+  move: mark
+  checks:
+  - verified-only-where-derived
+  provenance:
+    mode: derived
+    sources:
+    - nested-in-loop.thym#L11
+    confidence: 1
+- id: P:contract/nested-in-loop.3
+  type: contract
+  name: project
+  summary: What project must leave true of what it gives.
+  of: P:step/nested-in-loop.3
+  move: project
+  checks:
+  - default-deny
+  - no-counts
+  - banded
+  - no-mark
+  - verified-derived
+  - standing-gate
+  - epoch
+  - provenance
+  provenance:
+    mode: derived
+    sources:
+    - nested-in-loop.thym#L13
+    confidence: 1

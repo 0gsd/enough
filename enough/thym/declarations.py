@@ -9,13 +9,23 @@ declared twice across the registry is reported too, and the first declaration, i
 
 `load` never raises for a bad declaration: what it cannot read goes into the result's `problems` list and is left
 out, as the reader treats a bad manifest.
+
+**Two views** (THYM 4.9, 17.6). An entry may say `since: 1`, and then only `thym 1` programs see the move; and it may
+carry a `thym-1:` mapping of the keys a `thym 1` program sees in place of its own (`takes`, `gives`, `modifiers`,
+`contract`, `scaffold`). `load` gives each declaration as written (its own keys, `since` and `thym-1` kept beside
+them); `MoveDecl.view(version)` and `Declarations.view(version)` give what a program of that version sees: a
+`thym 0` program sees each entry without its `thym-1:` mapping and no entry that says `since: 1`, its view frozen; a
+`thym 1` program sees every entry whole, its `thym-1:` keys in place of its own. `view_of` does the same for a
+declaration written as a mapping (the runtime's own reader's).
 """
 from __future__ import annotations
 
+import dataclasses
 import functools
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from enough import macrocosm as mc
 
@@ -24,6 +34,12 @@ from . import types as ty
 SIDECAR_GLOB = "*.moves.cosm"
 _NAME = re.compile(r"^[a-z][a-z0-9-]*$")
 _MOVES_OF = re.compile(r"^([a-z][a-z0-9-]*)/([0-9]+)$")
+#: The keys a `thym-1:` mapping may hold in this compiler, by the `MoveDecl` field each replaces (THYM 17.6). The
+#: table's other keys (`gives-when`, `contract-when`, `scaffold-when`) are read by a later part of the compiler.
+THYM1_KEYS = {"takes": "takes", "gives": "gives", "modifiers": "modifiers", "contract": "contract",
+              "scaffold": "scaffold"}
+#: The grammar versions a declaration may name in `since` (the versions this compiler reads, THYM 4.9).
+VERSIONS = (0, 1)
 
 
 @dataclass(frozen=True)
@@ -43,6 +59,56 @@ class MoveDecl:
     code: str | None = None
     says: str = ""
     source: str | None = None
+    #: the first grammar version that sees the move (`since:`, THYM 4.9); 0 when the entry does not say
+    since: int = 0
+    #: the `thym-1:` mapping, read into the fields it replaces (`THYM1_KEYS`); empty when the entry has none
+    thym1: dict = field(default_factory=dict, hash=False, compare=False)
+    #: which view this is: None for the entry as written, else the grammar version it was viewed for
+    version: int | None = field(default=None, hash=False, compare=False)
+
+    def view(self, version: int) -> "MoveDecl | None":
+        """What a program of grammar `version` sees of this move: None when the move is not there for it (`since`
+        names a later version); for `thym 0` the entry without its `thym-1:` mapping; for `thym 1` the entry whole,
+        each `thym-1:` key in place of its own. Taken of a view, it is taken of the entry as written."""
+        base = self.base
+        if base is not self:
+            return base.view(version)
+        if self.since > version:
+            return None
+        if version < 1:
+            out = dataclasses.replace(self, version=version)
+        else:
+            out = dataclasses.replace(self, **self.thym1, version=version)
+        object.__setattr__(out, "_base", self)
+        return out
+
+    @property
+    def base(self) -> "MoveDecl":
+        """The entry as written, from any view of it (a `thym 1` view replaced its own keys; the entry keeps them)."""
+        return self.__dict__.get("_base", self)
+
+    def frozen_view(self) -> "MoveDecl | None":
+        """The `thym 0` view of this move, whichever view this is: what a `thym 0` program sees of it (None when it
+        is not there for one)."""
+        return self.base.view(0)
+
+
+def view_of(decl: Any, version: int) -> Any:
+    """A declaration as a program of grammar `version` sees it, whatever form it comes in: a `MoveDecl` by its
+    `view`; a mapping (the runtime's own reader's) by its `since` and `thym-1` keys; anything else as it is. None
+    when the move is not there for that version."""
+    if isinstance(decl, MoveDecl):
+        return decl.view(version)
+    if isinstance(decl, dict):
+        since = decl.get("since")
+        if isinstance(since, int) and not isinstance(since, bool) and since > version:
+            return None
+        over = decl.get("thym-1") if isinstance(decl.get("thym-1"), dict) else {}
+        out = {k: v for k, v in decl.items() if k != "thym-1"}
+        if version >= 1:
+            out.update({k: v for k, v in over.items() if k in THYM1_KEYS})
+        return out
+    return decl
 
 
 class Declarations(dict):
@@ -55,6 +121,55 @@ class Declarations(dict):
     def copy(self) -> "Declarations":
         return Declarations(self, problems=self.problems)
 
+    def view(self, version: int) -> "Declarations":
+        """The moves a program of grammar `version` sees (THYM 4.9), each in its view for that version."""
+        return views(self, version)
+
+
+def views(decls: dict, version: int) -> "Declarations":
+    """`decls` as a program of grammar `version` sees them: each declaration's view (`view_of`), and none that is
+    not there for that version. The `problems` of a `Declarations` are kept."""
+    out = Declarations(problems=getattr(decls, "problems", None))
+    for name, d in decls.items():
+        v = view_of(d, version)
+        if v is not None:
+            out[name] = v
+    return out
+
+
+def _signature(entry: dict, keys, what: str, problems: list[str]) -> dict | None:
+    """The signature keys of an entry (or of its `thym-1:` mapping) that are present among `keys`, read into
+    `MoveDecl` fields; None, with the problem, when one is malformed."""
+    out: dict = {}
+    if "takes" in keys:
+        takes = entry.get("takes", [])
+        if not isinstance(takes, list) or not all(isinstance(t, str) for t in takes):
+            problems.append(f"{what}: takes must be a list of type strings")
+            return None
+        out["takes"] = tuple(tuple(ty.alternatives(t)) for t in takes)
+    if "gives" in keys:
+        gives = entry.get("gives")
+        if not isinstance(gives, str) or not gives.strip():
+            problems.append(f"{what}: gives must name a type")
+            return None
+        out["gives"] = tuple(ty.alternatives(gives))
+    if "modifiers" in keys:
+        mods = entry.get("modifiers") or {}
+        if not isinstance(mods, dict) or not all(isinstance(k, str) and isinstance(v, str) for k, v in mods.items()):
+            problems.append(f"{what}: modifiers must map each word to a type string")
+            return None
+        out["modifiers"] = {str(k): tuple(ty.alternatives(v)) for k, v in mods.items()}
+    if "contract" in keys:
+        contract = entry.get("contract") or []
+        if not isinstance(contract, list) or not all(isinstance(c, str) for c in contract):
+            problems.append(f"{what}: contract must be a list of check names")
+            return None
+        out["contract"] = tuple(contract)
+    if "scaffold" in keys:
+        sc = entry.get("scaffold")
+        out["scaffold"] = sc if isinstance(sc, str) else None
+    return out
+
 
 def _decl(owner: str, entry, source: str, problems: list[str]) -> MoveDecl | None:
     where = f"{Path(source).name}"
@@ -65,35 +180,37 @@ def _decl(owner: str, entry, source: str, problems: list[str]) -> MoveDecl | Non
     if not isinstance(name, str) or not _NAME.match(name):
         problems.append(f"{where}: a move's name must be a lowercase name, not {name!r}")
         return None
-    takes = entry.get("takes", [])
-    if not isinstance(takes, list) or not all(isinstance(t, str) for t in takes):
-        problems.append(f"{where}: move {name}: takes must be a list of type strings")
-        return None
-    gives = entry.get("gives")
-    if not isinstance(gives, str) or not gives.strip():
-        problems.append(f"{where}: move {name}: gives must name a type")
-        return None
-    mods = entry.get("modifiers") or {}
-    if not isinstance(mods, dict) or not all(isinstance(k, str) and isinstance(v, str) for k, v in mods.items()):
-        problems.append(f"{where}: move {name}: modifiers must map each word to a type string")
-        return None
-    contract = entry.get("contract") or []
-    if not isinstance(contract, list) or not all(isinstance(c, str) for c in contract):
-        problems.append(f"{where}: move {name}: contract must be a list of check names")
+    sig = _signature(entry, ("takes", "gives", "modifiers", "contract", "scaffold"), f"{where}: move {name}",
+                     problems)
+    if sig is None:
         return None
     asks = entry.get("asks", False)
     if asks not in (None, True, False):
         problems.append(f"{where}: move {name}: asks must be true or false")
         return None
+    since = entry.get("since", 0)
+    if since is None:
+        since = 0
+    if isinstance(since, bool) or not isinstance(since, int) or since not in VERSIONS:
+        problems.append(f"{where}: move {name}: since names a grammar version, "
+                        f"{' or '.join(map(str, VERSIONS))}, not {since!r}")
+        return None
+    thym1: dict = {}
+    over = entry.get("thym-1")
+    if over is not None:
+        if not isinstance(over, dict):
+            problems.append(f"{where}: move {name}: thym-1 must be a mapping of the keys a thym 1 program sees")
+            return None
+        read = _signature(over, [k for k in THYM1_KEYS if k in over], f"{where}: move {name}: thym-1", problems)
+        if read is None:
+            return None
+        thym1 = {THYM1_KEYS[k]: v for k, v in read.items()}
     return MoveDecl(
         name=name, owner=owner,
-        takes=tuple(tuple(ty.alternatives(t)) for t in takes),
-        gives=tuple(ty.alternatives(gives)),
-        modifiers={str(k): tuple(ty.alternatives(v)) for k, v in mods.items()},
-        asks=bool(asks), contract=tuple(contract),
-        scaffold=entry.get("scaffold") if isinstance(entry.get("scaffold"), str) else None,
+        takes=sig["takes"], gives=sig["gives"], modifiers=sig["modifiers"],
+        asks=bool(asks), contract=sig["contract"], scaffold=sig["scaffold"],
         code=entry.get("code") if isinstance(entry.get("code"), str) else None,
-        says=str(entry.get("says") or ""), source=source)
+        says=str(entry.get("says") or ""), source=source, since=since, thym1=thym1)
 
 
 def _sidecars(reg: mc.Registry, problems: list[str]) -> list[tuple[str, str, list]]:
@@ -182,6 +299,8 @@ def load(registry: mc.Registry | None = None) -> Declarations:
     return _load(registry)
 
 
-def names(registry: mc.Registry | None = None) -> frozenset[str]:
-    """The declared move names: what the parser needs to read a call (THYM.md 4.5)."""
-    return frozenset(load(registry))
+def names(registry: mc.Registry | None = None, *, version: int | None = None) -> frozenset[str]:
+    """The declared move names: what the parser needs to read a call (THYM.md 4.5). With `version`, only the moves a
+    program of that grammar version sees (THYM 4.9)."""
+    found = load(registry)
+    return frozenset(found if version is None else found.view(version))

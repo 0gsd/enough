@@ -1,5 +1,5 @@
 -- refused: compile version line 2
-thym 1
+thym 2
 
 program nothing
   why: the version is not zero.

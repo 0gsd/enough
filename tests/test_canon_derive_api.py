@@ -251,8 +251,8 @@ def test_derive_in_a_canon_volume_regenerates_its_catalog(client: TestClient):
     cat = macrocosm.yaml_load((vol / "canon.cosm").read_text(encoding="utf-8"))
     item = next(n for n in cat["nodes"] if n.get("path") == "guide.md")
     assert item["emf"]["path"] == "guide.md.cosm" and item["emf"]["state"] == "fresh"
-    emf = client.get("/api/canon/emf", params={"path": "cacheawl:lib/guide.md"}).json()
-    assert emf["twin_path"] == "cacheawl:lib/guide.md.cosm"
+    emf = client.get("/api/canon/emf", params={"path": "canon:lib/guide.md"}).json()
+    assert emf["twin_path"] == "canon:lib/guide.md.cosm"
 
 
 def test_derive_reads_a_converted_original_through_its_markdown(client: TestClient, project: Path):
@@ -634,7 +634,6 @@ def test_home_mode_has_no_derivation_routes(project: Path):
     with TestClient(app) as c:
         for method, path in (("post", "/api/canon/derive"), ("post", "/api/canon/atem"),
                              ("post", "/api/canon/atem/pin"), ("get", "/api/canon/emf?path=notes.md"),
-                             ("get", "/api/canon/eml?path=notes.md"),
                              ("post", "/api/canon/compile"), ("get", "/api/canon/job/cn1")):
             r = getattr(c, method)(path, **({"json": {"path": "notes.md"}} if method == "post" else {}))
             assert r.status_code == 404, path
@@ -647,15 +646,13 @@ def test_emf_route_404s_without_a_twin(client: TestClient):
     assert client.get("/api/canon/emf", params={"path": "other.md"}).status_code == 404
 
 
-def test_the_names_before_emf_still_answer_for_one_release(client: TestClient, project: Path):
-    """Plan §16: `what: "eml"` is read as `emf`, and `GET /api/canon/eml` is `/api/canon/emf`, for one release."""
-    job = start(client, "/api/canon/derive", {"path": "notes.md", "what": "eml"})
-    assert job["kind"] == "emf"
+def test_the_names_before_emf_are_gone(client: TestClient, project: Path):
+    """Plan §16 kept `what: "eml"` and `GET /api/canon/eml` one release; 0.6 removed them."""
+    assert client.post("/api/canon/derive", json={"path": "notes.md", "what": "eml"}).status_code == 400
+    job = start(client, "/api/canon/derive", {"path": "notes.md", "what": "emf"})
     assert wait_job(client, job["id"])["state"] == "done"
-    new = client.get("/api/canon/emf", params={"path": "notes.md"})
-    old = client.get("/api/canon/eml", params={"path": "notes.md"})
-    assert new.status_code == old.status_code == 200 and new.json() == old.json()
-    assert client.get("/api/canon/eml", params={"path": "hello.md"}).status_code == 404
+    assert client.get("/api/canon/emf", params={"path": "notes.md"}).status_code == 200
+    assert client.get("/api/canon/eml", params={"path": "notes.md"}).status_code in (404, 405)
     assert macrocosm.sniff_declaration(project / "notes.md.cosm") == "emf/1"
 
 
