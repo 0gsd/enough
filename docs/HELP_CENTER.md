@@ -973,7 +973,7 @@ At the **fabula** the document becomes cards, one per item, drawn the way the co
 
 - its **atem** first, then where it sits: a breadcrumb, *in §12 › §12.4*, every step of which opens that section at the short — and the **↩ back** pill brings you straight back to the card;
 - its name, its summary, and its text, set as it reads in the document;
-- **identity** gives its id and path, its address with a copy button, how another volume would cite it, and where it comes from: *edit at* the document and section, for anything written in one; *declared by* a manifest, for the reference, which is generated and so read-only here (change the declaration instead);;
+- **identity** gives its id and path, its address with a copy button, how another volume would cite it, and where it comes from: *edit at* the document and section, for anything written in one; *declared by* a manifest, for the reference, which is generated and so read-only here (change the declaration instead);
 - **schema** says what it's made of: a section's parts and the words it defines, where a term is defined, a kind's fields and the closed lists they use, a list's values and what each one means;
 - **checks** says what the checks found about it, and, for a check, which MiniCOSMs choose it;
 - **renderings** lists the lenses that draw it; click one to draw it around this item, in merirmaid;

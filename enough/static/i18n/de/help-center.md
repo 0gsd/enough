@@ -973,7 +973,7 @@ In der **fabula** wird das Dokument zu Karten, eine pro Eintrag, gezeichnet so, 
 
 - zuerst sein **atem**, dann, wo er sitzt: ein Pfad, *steht in §12 › §12.4*, und jeder Schritt darin öffnet diesen Abschnitt im Short — und die Pille **↩ zurück** bringt dich geradewegs zur Karte zurück;
 - sein Name, seine Zusammenfassung und sein Text, gesetzt, wie er im Dokument steht;
-- **Identität** nennt seine ID und seinen Pfad, seine Adresse mit einem Kopier-Button, wie ein anderer Band ihn zitieren würde, und woher er kommt: bei allem, was in einem Dokument geschrieben ist, *bearbeiten in* mit Dokument und Abschnitt; bei der Referenz, die erzeugt und darum hier nur lesbar ist, *deklariert in* mit ihrem Manifest (ändere stattdessen die Deklaration);;
+- **Identität** nennt seine ID und seinen Pfad, seine Adresse mit einem Kopier-Button, wie ein anderer Band ihn zitieren würde, und woher er kommt: bei allem, was in einem Dokument geschrieben ist, *bearbeiten in* mit Dokument und Abschnitt; bei der Referenz, die erzeugt und darum hier nur lesbar ist, *deklariert in* mit ihrem Manifest (ändere stattdessen die Deklaration);
 - **Schema** sagt, woraus er besteht: die Teile eines Abschnitts und die Wörter, die er definiert, wo ein Begriff definiert ist, die Felder einer Art und die geschlossenen Listen, die sie benutzen, die Werte einer Liste und was jeder davon bedeutet;
 - **Prüfungen** sagt, was die Prüfungen über ihn herausgefunden haben, und bei einer Prüfung, welche MiniCOSMs sie auswählen;
 - **Darstellungen** listet die Linsen, die ihn zeichnen; klick eine an, und sie zeichnet ihn samt Umgebung in merirmaid;

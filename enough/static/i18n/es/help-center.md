@@ -973,7 +973,7 @@ En la **fabula**, el documento se vuelve tarjetas, una por elemento, dibujadas c
 
 - su **atem** primero, y luego dónde está: una ruta de migas, *en §12 › §12.4*, cada uno de cuyos pasos abre esa sección en el short — y la píldora **↩ volver** te trae directo de vuelta a la tarjeta;
 - su nombre, su resumen y su texto, compuesto como se lee en el documento;
-- **identidad** da su id y su ruta, su dirección con un botón para copiarla, cómo lo citaría otro volumen, y de dónde viene: *se edita en* el documento y la sección, para lo que está escrito en uno; *declarado por* un manifiesto, para la referencia, que es generada y por eso aquí es de solo lectura (cambia la declaración en su lugar);;
+- **identidad** da su id y su ruta, su dirección con un botón para copiarla, cómo lo citaría otro volumen, y de dónde viene: *se edita en* el documento y la sección, para lo que está escrito en uno; *declarado por* un manifiesto, para la referencia, que es generada y por eso aquí es de solo lectura (cambia la declaración en su lugar);
 - **estructura** dice de qué está hecho: las partes de una sección y las palabras que define, dónde se define un término, los campos de un tipo y las listas cerradas que usan, los valores de una lista y lo que significa cada uno;
 - **comprobaciones** dice qué encontraron las comprobaciones sobre él y, para una comprobación, qué MiniCOSMs la eligen;
 - **representaciones** lista las lentes que lo dibujan; haz clic en una para dibujarlo alrededor de este elemento, en merirmaid;
