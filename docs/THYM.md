@@ -645,7 +645,7 @@ additions of the second table.
 | `measure` | text → morph; `against` short (the null) | yes | `scale-range` `scale-evidence` `provenance` |
 | `morph` | short → short; `with` morph | yes | `coverage` `no-invention` `stance-kept` `scales-met` `provenance` |
 | `read` | fabula → short; `with` morph; `in` context | yes | `coverage` `no-invention` `stance-kept` `scales-met` `labelled` `never-source` `provenance` |
-| `project` | volume → volume; `as` kind (`isotype` or `paratype`, Comprise OES's; `isograph`, Ascribe's) | no | the target schema's rules: for `isotype` and `paratype`, `default-deny` `no-counts` `banded` `no-mark` `verified-derived` `standing-gate` `epoch` `provenance`; for `isograph`, `default-deny` `no-counts` `no-mark` `epoch` `provenance`. A check holds by the rules of the kind the call names: for an isograph, those of `ascribe-isograph/0` |
+| `project` | volume → volume; `as` kind (`isotype` or `paratype`, Comprise OES's; `isograph`, Ascribe's) | no | the target schema's rules: for `isotype` and `paratype`, `default-deny` `no-counts` `banded` `no-mark` `verified-derived` `standing-gate` `epoch` `provenance`; for `isograph`, `default-deny` `no-counts` `no-mark` `epoch` `provenance`. A check holds by the rules of the kind the call names: for an isograph, those of `ascribe-isograph/0`. For an isograph, the ids of the items that leave are handed to the host with the value, as the release's `items` (Ascribe, its section 14.1) |
 | `band` | number → word; `as` a list of words (`[none, some]`: 0 is `none`; any other list: equal steps of ten) | no | `banded` |
 | `mark` | item \| word → the same; `as` marking | no | `verified-only-where-derived` |
 | `withhold` | item \| volume → nothing; `where` condition | no | `no-mark` |
@@ -696,12 +696,12 @@ The moves `thym 1` adds or extends. Every move in this table carries `since: 1` 
 | `words` | adds line \| string | no | none | — |
 
 `propose` is Ascribe's: it reads the holder's own text, decompiled to a fabulan, and gives candidate nodes of the
-holograph, each with the question that asks the holder whether it is so; a program lands them with `gather`.
-`atem`, `expand`, `null`, `measure`, `morph`, `read`, `cut`, `package` and the rest are the same in both versions.
-`atem f` of a fabulac is the catem at depth `line`, under the same contract. The compiler picks the `gives`, the
-contract and the scaffold of a call from the call as written (its `as` word, or its first operand's type), and the
-plan's `P:contract` item lists the chosen contract, so a plan says exactly which checks a node keeps. Sections 20, 21
-and 22 say what these moves do.
+holograph, each with the question that asks the holder whether it is so; a program lands them with `gather`. `atem`,
+`expand`, `null`, `measure`, `morph`, `read`, `cut`, `package` and the rest are the same in both versions. `atem f` of a
+fabulac is the catem at depth `line`, under the same contract. The compiler picks the `gives`, the contract and the
+scaffold of a call from the call as written (its `as` word, or its first operand's type), and the plan's `P:contract`
+item lists the chosen contract, so a plan says exactly which checks a node keeps. A call whose scaffold is `none` has no
+scaffold, and `--rules` refuses it at plan time (section 19). Sections 20, 21 and 22 say what these moves do.
 
 ### 6.4 Signatures in the manifest
 
@@ -808,7 +808,7 @@ The checks the moves of `thym 1` add:
 | `history-grounded` | every change cites commits the clone's log answered, every release a tag it answered, and every maker rests on commits it answered and carries no address | Thym's own |
 | `parses` | every file of a cshort in a language the fabulac names is read by that language's parser without a syntax error; parsing is not running, and nothing is imported or executed | Thym's own; the host's syntax engine |
 | `interfaces-present` | every interface of the fabulac is defined in the cshort's file it is `defined-in`, with the same name, kind and parameter names in the same order | Thym's own; the host's syntax engine |
-| `files-present` | the cshort holds every file it is required to rebuild, at its path (every `C:file` in a programming language that is not a test, and the README; MacroCOSM OES, its section 18.4.7), with `CSHORT.md`, and the digests `CSHORT.md` lists are the files' | Thym's own |
+| `files-present` | the cshort holds every file it is required to rebuild, at its path (every `C:file` in a programming language that is not a test, a type stub or the repository's own tooling, and the README; MacroCOSM OES, its section 18.4.7), and the packaging file rules write whenever the fabulac records enough for one, exactly as they write it, with `CSHORT.md`, and the digests `CSHORT.md` lists are the files' | Thym's own |
 | `uses-told` | a catem tells everything its depth asks for: at `overview` every use, at `manual` every use and every interface a person reaches | Thym's own |
 | `nothing-lost` | every item of every part gathered, and of the `with` volume, is in the output with every field it carries, as it carries it (`made` aside); the output's item may say more | Thym's own |
 | `ids-unique` | no two different items of the output share an id (two byte-equal ones, `made` aside, are one; `gather` merges two that say the same item before they land, section 20.6) | Thym's own |
@@ -1264,7 +1264,8 @@ Candidate = {output, engine, route, provider, attempts, tokens, seconds, checks:
 
 A candidate's `route` and `provider` say where its model ran (section 23); a candidate recorded before this edition
 has neither. A kept contract that failed (section 7.5) reaches the next request under `repair`, as the move's own failed
-checks do.
+checks do. A move that asks more than once may name under `repair.failed` what it could not take in its last answer;
+that reaches the next request too, after the runtime's own verdicts, so that a request asked again says why.
 
 - **`ModelCoprocessor`** is enough's: its model client with the machinery of Canon's derivation, generalised, on the
   run's route, a local model or a cloud model through a broker. It asks for
@@ -1720,7 +1721,7 @@ keeps the block as an unknown key; the Thym compiler reads it. Each entry:
 | `thym-1` | a mapping of the keys a `thym 1` program sees in addition to, or in place of, the entry's own: `takes`, `gives`, `modifiers`, `contract`, `scaffold`, and the three below; a `thym 0` program sees the entry without it |
 | `gives-when` | a list of `{as: <words>, gives: <type>}` or `{takes: <type>, gives: <type>}`: the type a call gives when its `as` word, or its first operand's type, is one of these |
 | `contract-when` | the same shape, with `contract: [...]`: the call's contract when its `as` word or first operand's type matches; else `contract` |
-| `scaffold-when` | the same shape for `scaffold` |
+| `scaffold-when` | the same shape for `scaffold`; a rule may say `scaffold: none`, and a call it matches then has no scaffold, so that `--rules` refuses it at plan time |
 
 `gives` may also say `same-as-with` or `same-as-in`: the call gives the type of its `with` (or `in`) value.
 
@@ -1793,7 +1794,9 @@ gives the rules twin, `atem` the labelled scaffold, `tell` and `null` the ordere
 statistics scales with the three judgement scales pending; in `thym 1`, `derive … as code` gives its file's outline
 marked pending, `tell` at a catem's depth the uses and interfaces in told order, `question` the bank's questions only,
 and `settle` its rules part, leaving the answers that must be read again answered and unsettled, for a run with a model.
-A move with no scaffold (`expand`, `morph`, `read`, `reword`, `derive` of a folder, `tell … as code`) still refuses.
+A move with no scaffold (`expand`, `morph`, `read`, `reword`, `derive` of a folder, `tell … as code`) still refuses,
+at plan time: "1 step asks a model and has no scaffold: give code: tell f as code (line 12); --rules runs no model"
+(with agent-free on, in the words above, which then add that the steps have no scaffold).
 `survey`, `history`, `record` and the editing moves other than `reword` ask nothing, and run. The trace says `engine:
 rules` for each scaffold, and every output is marked `state: pending`, as a fabula's rules mode marks a twin. The viewer
 offers only plans that can run.
@@ -1961,9 +1964,9 @@ that landed. The stages, and the moves that make them:
 
 | stage | the move | asks | what it gives, and what its contract holds |
 |---|---|---|---|
-| survey | `survey repo`, rules only | no | a fabulac outline: a `C:file` per file (language, lines, sha256), a `C:component` per module, package and class, a `C:interface` per public function, class, method, constant and command-line entry point, with its name and parameters from the syntax tree, a `C:dependency` per import from outside the tree and per declared requirement, a `C:setting` per environment variable read and per command-line option, a `C:structure` per data shape (a data class, a named tuple, a typed dictionary, an enumeration, a class with annotated attributes), the messages of the errors a function raises on its interface's `raises`, what a function prints, logs or exits with as a behaviour, a command's exit statuses on its interface's `gives`, the licence and the means. `files-found`, `code-span`, `licence-recorded` |
-| history | `history repo with f`, rules only | no | the fabula so far, with the clone's history: changes grouped into episodes (the commits between two tags, split again where two commits stand more than fourteen days apart), a release per tag with its date, a maker per author: by name only where the repository states it (its licence's copyright holder, or a line of an authors file), otherwise as a numbered contributor, never by address. `history-grounded` |
-| read | `derive t as code with f`, once per file, in a loop that collects | yes | that file's behaviours, structures, cases, terms, claims and events, read against the outline. `code-span`, `outline-cited`, `coverage` (every interface and component the outline lists for the file is the subject of a behaviour or a structure), `terms-grounded`, `stance-closed`. Its scaffold gives the outline's own items for the file, marked pending |
+| survey | `survey repo`, rules only | no | a fabulac outline: a `C:file` per file (language, lines, sha256), a `C:component` per module, package and class (a nested class too), a `C:interface` per public function, class, method, constant and command-line entry point, with its name, parameters and decorators from the syntax tree (a property with its setter is one interface, overloads are read on their function, a definition under a module-level `if`, `try` or `with` carries the condition, and a private class a public one inherits from, or a private name another module or a test imports, is an interface not exported), a `C:dependency` per import from outside the tree (an import of a module of the tree, beside the importer or named in `from <package> import <module>`, is that module) and per declared requirement, the types a module's stub (`.pyi`) gives its interfaces, a `C:setting` per environment variable read, per command-line option (its help as a user sees it, or marked a template where no rule can fill it) and per key of the program's own `[tool.<its name>]` table in its `pyproject.toml`, a `C:structure` per data shape (a data class, a named tuple, a typed dictionary, an enumeration, a class with annotated attributes, a type alias), each public documentation string past its first paragraph as a behaviour and each of its doctest examples as a case, the messages of the errors a function raises on its interface's `raises`, what a function prints, logs or exits with as a behaviour, a command's exit statuses on its interface's `gives`, the licence and the means. The repository's own tooling (its documentation's build, its scripts, its examples) is not the program. `files-found`, `code-span`, `licence-recorded` |
+| history | `history repo with f`, rules only | no | the fabula so far, with the clone's history: changes grouped into episodes (the commits between two tags, split again where two commits stand more than fourteen days apart; where that gives more than twenty episodes, the commits between two tags alone; where that still does, one episode per year), a release for every tag with its date, placed by its commit, else by the newest commit whose subject names its version as a release, else unplaced, a maker per author: by name only where the repository states it (its licence's copyright holder, a line of an authors file, or an author or maintainer its packaging file names), otherwise as a numbered contributor, never by address. An implementation may bound the log it reads and keep only the newest changes as items, counting the rest in their episode and release (enough reads at most four hundred commits and keeps forty); a history that does not reach the first commit ends in a phase that says so. `history-grounded` |
+| read | `derive t as code with f`, once per file, in a loop that collects | yes | that file's behaviours, structures, cases, terms, claims and events, read against the outline. `code-span`, `outline-cited`, `coverage` (every interface the outline lists for the file is the subject of a behaviour or has a structure of its name, and every component is the subject of a behaviour or has its `does`), `terms-grounded`, `stance-closed`. A test file's reading takes cases and structures only, and a file the outline gives no interface or component a structure that says what it is; a file longer than one request is read in parts, each covering the interfaces whose lines it holds, the first also the components, and a part a check's verdict is about is the only one asked again. Its scaffold gives the outline's own items for the file, marked pending |
 | (join) | `gather readings with f` | no | the fabula so far with every reading in it, each reading's additions to the outline merged into the outline's own items. `nothing-lost`, `ids-unique` |
 | fold | `derive repo with f` | yes | read as a whole: aims, audience, uses, requirements, decisions, exclusions, inspiration, and the atem. `fold-grounded`, `atem-shape`, `licence-recorded`. It has no scaffold: nothing but a model reads intent. A `derive` of a folder without `with` is refused: "derive of a folder folds what the stages found: derive repo with f" |
 | question | `question f`, landed with `gather` | yes | the dialectic's questions where the build was unsure (section 22) |
@@ -2068,21 +2071,25 @@ does not run them in sequence. Running a file whose programs each give one fabul
 `fabula` input with the fabula the run before landed and taking up again after the last that landed, is the host's job,
 specified with the fabulac (MacroCOSM OES, its section 18.4.7). A fabula built in several runs records every one of
 them: its catalog's `derived` describes the last run that derived it, and `derived.runs` holds one entry per run that
-wrote into the volume, a settle run included, with its program, its run, its model and its route (MacroCOSM OES,
-its section 18.4.1).
+wrote into the volume, a settle run included, with its program's name, its run, its model and its route (MacroCOSM
+OES, its section 18.4.1). Under `--rules` a host runs survey and history and stops: the outline (MacroCOSM OES, its
+section 18.4.7).
 
 ### 20.7 Compiling a fabulac
 
 **`tell f as code`** gives a folder, the **cshort**: source code rebuilt from the fabulac, file by file, one model
 request per file it rebuilds: every `C:file` in a programming language that is not a test, and the README (MacroCOSM
-OES, its section 18.4.7). Each request carries the file's items: its components, its interfaces with their
-parameters, the behaviours and cases about them, and the settings and dependencies it touches. The move assembles the
+OES, its section 18.4.7). Each request carries the file's items: its components, its interfaces with their parameters,
+the behaviours and cases about them (and the cases of an interface whose behaviours name this file's module or a private
+helper of it: the file that does its work), the settings and dependencies it touches and the open questions about them;
+and what it reaches in the other files: the interfaces of the modules it uses and of those its items name, with the
+lines of the behaviours about each it names. The README is asked for in the format its name says. The move assembles the
 files and writes `CSHORT.md`: the cshort's footer line first (MacroCOSM OES, its section 18.4.7), then the file list
-with digests, then the source's licence line. Its contract is checked without executing anything: `parses`,
-`interfaces-present`, `files-present`, `footer` (`CSHORT.md`'s first line is the footer, naming the fabulac's file,
-the language, the UTC day of the run and the model; its last line is the licence line, equal to `source.licence`) and
-`provenance`. A failed check asks again only for the files it names, within the node's attempts. `tell … as code` has
-no scaffold, so `--rules` refuses it.
+with digests (the packaging file rules wrote among them, or why none was written), then the source's licence line. Its
+contract is checked without executing anything: `parses`, `interfaces-present`, `files-present`, `footer` (`CSHORT.md`'s
+first line is the footer, naming the fabulac's file, the language, the UTC day of the run and the model; its last line
+is the licence line, equal to `source.licence`) and `provenance`. A failed check asks again only for the files it names,
+within the node's attempts. `tell … as code` has no scaffold, so `--rules` refuses it at plan time.
 
 **`tell f as line`, `as overview` and `as manual`** give a short, the **catem** at that depth. `line` is the atem's
 line, the same as `atem f`'s; `overview` names every use; `manual` names every use and every interface a person
@@ -2163,8 +2170,8 @@ text edited is a new value: it lands in the run's outputs and goes where the per
 1. every change names its source: its `of` is the digest of the value being edited ("a change names line 3 of another
    text");
 2. every change's line exists there with that digest ("line 12 changed since it was read");
-3. no two `replace` or `drop` changes name one line, and inserts at one place keep their written order ("lines 7 and
-   7 are both replaced");
+3. no two `replace` or `drop` changes name one line, and inserts at one place keep their written order ("line 7 is
+   replaced twice");
 4. the output is the input with exactly those changes: every input line no change names appears byte for byte and in
    order, and the output holds no line that neither the input nor a change gave.
 
@@ -2254,7 +2261,10 @@ always have, and a replay of either run needs neither the person nor the model.
 flavour or format, a question for every `{pending: …}` field, and one for every item marked unsure (a confidence below
 0.5, or pending) that holds no pending of its own (MacroCOSM OES, its section 18.6.5).
 When the run asks the model, the model adds questions where the volume is unsure, ambiguous, in conflict or silent on
-intent, and only there. Under `--rules` the bank part alone runs. Each question says who raised it and is `open`. Its
+intent, and only there. It reads only the items a person can say something about: of a fabulac its aims, uses,
+requirements, decisions, exclusions, behaviours, interfaces, structures and claims; of any other volume every item but
+its files, changes, releases, test cases and dependencies as such; and in every flavour any item marked unsure or
+pending. Under `--rules` the bank part alone runs. Each question says who raised it and is `open`. Its
 contract is `addressed`, `no-duplicate` and `provenance`. `question` gives a list, and a program lands the questions with
 the volume through `gather asked with f`.
 
@@ -2266,8 +2276,12 @@ session's record, and for each question answered, only its id, its new state and
 the format of the volume it answers (`fabula/1` for a twin read under `emf/1`: an old spelling is never written),
 carries that volume's `id`, and its `macrocosm:` when that volume has one; its `nodes:` hold exactly one `D:session`
 item and, for each question answered, unknown or declined, a mapping of the question's `id`, its new `state` and its
-new `answers`, each naming the session. A skipped question shows only in the session's `skipped`. It is read only as a
-delta, never checked as a volume of that format on its own. To Thym it is a `volume`.
+new `answers`, each naming the session. An address asked without a question item (a format that asks from a bank
+without writing question items, as Comprise OES does, or a bank asked directly) is an entry `{about, answers}`: the
+address, `<item id>#<field path>`, and its new answers. A skipped question shows only in the session's `skipped`. It is
+read only as a delta, never checked as a volume of that format on its own. To Thym it is a `volume`. A sitting written
+and not yet recorded is read with the volume when its questions are listed: a question it answers is not put again, and
+a second sitting may not answer it.
 
 `record said in f` is code: it appends each answer to its question's answers (never rewriting one), sets the question's
 state to `answered`, `unknown` or `declined`, and adds the session. It refuses an answers volume whose session the
@@ -2287,7 +2301,8 @@ answers that must be read again answered and unsettled, for a run with a model. 
 `only-the-asked` (the fields that change are exactly those the answered questions are about, with their provenance and
 the questions' `settled` field); `fabula-checks`; and `provenance`: every field written carries `provenance: {mode:
 dialectic, sources: [D:session/<id>], confidence}`. In a fabula the settle run joins `derived.runs`, and `derived`'s
-single keys stay those of the run that derived it.
+single keys stay those of the run that derived it. A volume that is not a fabula, which the program of section 22.4 does
+not take, a host settles by the same moves' rules: it records the answers, then settles them with no reading.
 
 ### 22.4 The two runs, read as a pair
 
@@ -2345,11 +2360,13 @@ route: a local model at best effort fails more often, and is refused honestly; i
 ### 23.1 The route
 
 The **route** is chosen per run, and nowhere else: `local` (the default: the host's local model) or `cloud` (a cloud
-model through a broker, the host's named one or one the person names by the provider's id). On the command line it is
-`--model local`, `--model cloud` or `--model cloud:<id>` (section 11.3). A plan that asks a model on a cloud route whose
-gate is closed is refused at plan time, check `cloud`, in the gate's own words: "the cloud is not open for this run:
-'local models only' is on in the broker". A plan that asks nothing runs on either route and reaches no model. Nothing
-reaches a cloud model that the person did not choose for that run.
+model through a broker, the host's named one or one the person names by the provider's id). A run, or any job a host
+starts that asks a model, that names no route runs on the local route, whatever model the host's other work uses; with
+no local model running it runs by rules where it has a rules form, or refuses in words, and never falls back to the
+cloud. On the command line it is `--model local`, `--model cloud` or `--model cloud:<id>` (section 11.3). A plan that
+asks a model on a cloud route whose gate is closed is refused at plan time, check `cloud`, in the gate's own words: "the
+cloud is not open for this run: 'local models only' is on in the broker". A plan that asks nothing runs on either route
+and reaches no model. Nothing reaches a cloud model that the person did not choose for that run.
 
 ### 23.2 What the plan shows
 
@@ -2378,8 +2395,8 @@ program's.
   provider, and the window of that model (section 12.3); where a provider answers with a more exact id of its own, that
   id is in `engine` and `made`.
 - A fabula a program builds records which model made it, in its catalog's `derived`: `model`, `route`, `provider`,
-  `program` and `run` for the last run that derived it, and one entry in `derived.runs` per run that wrote into it,
-  a settle run included (section 20.6).
+  `program` (the program's name) and `run` for the last run that derived it, and one entry in `derived.runs` per run
+  that wrote into it, a settle run included (section 20.6).
 
 ### 23.4 Budgets
 

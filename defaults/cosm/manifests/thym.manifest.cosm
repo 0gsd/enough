@@ -51,8 +51,8 @@ volume:
   program-file: '<name>.thym'     # the source a program volume is enumerated from; never committed as a volume, the file is the truth
 
 catalog:
-  keys: [oes, macrocosm, id, name, kind, source, front, built, program, plan, inputs, estimate, environment, started, ended, outcome,
-         contents, made, notice, encrypted, path, tree, commit, origin, files, texts, nodes]   # path … texts: a run's snapshot of a folder
+  keys: [oes, macrocosm, id, name, kind, source, front, built, program, plan, inputs, estimate, models, environment, started, ended,
+         outcome, contents, made, notice, encrypted, path, tree, commit, origin, files, texts, nodes]   # models: a plan that asks a model; path … texts: a run's snapshot of a folder
   id: thym/<slug>                 # thym/publish-story, thym/plain-letter, thym/2026-11-01-1042-7f3a, thym/orchard-notes
   kind: [program, morph, context, plan, trace, package, folder]
   source-fields: [path, sha256, size]                      # a program volume: the .thym file it was enumerated from

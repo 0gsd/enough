@@ -9,10 +9,10 @@ nodes:
     at: 2026-11-05T12:00:00Z
     with: {to: author, who: Meadow's head of support}
     through: person
-    asked: [D:question/occasion]
-    answered: [D:question/occasion]
+    asked: [D:question/audience]
+    answered: [D:question/audience]
     skipped: []
-  - id: D:question/occasion
+  - id: D:question/audience
     state: answered
     answers:
-      - {at: 2026-11-05T12:01:30Z, by: author, says: "An owner rang support asking why her summary was late, twice in a week.", value: "an owner's call to support about a late morning summary", confidence: 0.9, session: D:session/session-2}
+      - {at: 2026-11-05T12:01:30Z, by: author, says: "For owners first. Support reads it too, so they say the same thing on the phone.", value: "restaurant owners who are Meadow's customers, and Meadow's support staff", confidence: 1, session: D:session/session-2}

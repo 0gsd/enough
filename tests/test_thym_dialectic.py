@@ -134,7 +134,12 @@ def test_question_by_rules_on_the_three_example_fabulas(tmp_path, src, flavour, 
     assert all((q["raised"]["by"] in ("bank", "move")) for q in qs)
     banked = [q for q in qs if q["raised"]["by"] == "bank"]
     assert all(q["raised"]["from"].startswith(flavour + "/") for q in banked)
-    assert len(banked) >= 1 and len(banked) <= n_bank * 4
+    if src == CLOSE:
+        # the question run's questions stand in this twin (MacroCOSM 18.4.5): no bank entry is asked again, and the
+        # occasion, whose pending its sitting settled, is still marked pending, so it is asked about as a whole
+        assert banked == [] and [(q["about"], q["why"]) for q in qs] == [("I:occasion/why-written", "unsure")]
+    else:
+        assert len(banked) >= 1 and len(banked) <= n_bank * 4
     assert got.origin["question"]["model"] == 0
     inputs = {"found": fabula(src)}
     for check in ("addressed", "no-duplicate"):
@@ -175,7 +180,7 @@ GOOD = {"about": "P:claim/close-locks-the-day", "asks": "Can anything in a locke
         "why": "ambiguous", "kind": "yes-no"}
 GOOD2 = {"about": "K:concept/close#summary", "asks": "Does the close also lock a day's notes, or only its entries?",
          "why": "ambiguous", "kind": "choice", "options": ["entries only", "entries and notes"]}
-DUPLICATE = {"about": "I:occasion/why-written#roles.event", "asks": "What prompted this guide?", "why": "intent",
+DUPLICATE = {"about": "R:release/handbook#at", "asks": "When was the guide first published?", "why": "intent",
              "kind": "text"}
 NOWHERE = {"about": "P:claim/nothing-like-this", "asks": "Is this one meant?", "why": "intent", "kind": "yes-no"}
 ANSWERED_BY_SOURCE = {"about": "K:concept/close#name", "asks": "What is this concept called?", "why": "unsure",
@@ -427,8 +432,8 @@ def test_the_checks_catch_their_broken_cases():
                                         "asks": "Is it?", "state": "open", "raised": {"from": "question"}})])
     ok, why = verdict("addressed", bad, {"found": f})
     assert not ok and why == "D:question/x: P:claim/gone names nothing in this volume"
-    dup = Value("list", [Value("item", {"id": "D:question/again", "about": "I:occasion/why-written#roles.event",
-                                        "asks": "What prompted this guide", "state": "open",
+    dup = Value("list", [Value("item", {"id": "D:question/again", "about": "R:release/handbook#at",
+                                        "asks": "When was the guide first published", "state": "open",
                                         "raised": {"from": "hand"}})])
     ok, why = verdict("no-duplicate", dup, {"found": f})
     assert not ok and "already asks" in why
@@ -440,7 +445,7 @@ def test_the_checks_catch_their_broken_cases():
     runs["derived"]["model"] = "another"
     assert verdict("only-the-asked", Value("fabula", runs), {"f": f}) == (False, "derived changed beyond its runs")
     runs = copy.deepcopy(doc(f))
-    runs["derived"]["runs"] = [{"program": "settle.thym", "run": "r", "at": NOW}]
+    runs["derived"]["runs"] = runs["derived"].get("runs", []) + [{"program": "settle.thym", "run": "r", "at": NOW}]
     assert verdict("only-the-asked", Value("fabula", runs), {"f": f}) == (True, "")     # a run joins derived.runs
 
 

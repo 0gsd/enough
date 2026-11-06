@@ -1,12 +1,12 @@
 oes: thym/1
 kind: trace
-id: thym/2026-11-05-2031-5615
-name: settle-the-answers run 2026-11-05-2031-5615
+id: thym/2026-11-06-0035-c4b5
+name: settle-the-answers run 2026-11-06-0035-c4b5
 program:
   name: settle-the-answers
   sha256: ed2cb780b628c18e0d2b92949cbc4837a784f0f96cf8813132e0d812c4296b0b
 plan:
-  sha256: c0a92f436be457a23408d90006bb8527f11510ae2e0b53b00b09e696eccd7147
+  sha256: 7885f6eb4ca2aff09cddf86a533a2a504aa5164f2d404a179c993d442eb6a9fb
 environment:
   enough: unknown
   model: none
@@ -14,27 +14,30 @@ environment:
   agent_free: false
   memory_band: unknown
 started: '2026-11-01T12:00:00Z'
-ended: '2026-11-06T01:31:29Z'
+ended: '2026-11-06T05:35:36Z'
 outcome: landed
 nodes:
-- id: R:trace/2026-11-05-2031-5615
+- id: R:trace/2026-11-06-0035-c4b5
   type: trace
-  name: settle-the-answers run 2026-11-05-2031-5615
-  summary: 'ran settle-the-answers on close.md.fabulan.cosm, close.md.fabulan.answers-2026-11-05-1200.cosm in 394289
+  name: settle-the-answers run 2026-11-06-0035-c4b5
+  summary: 'ran settle-the-answers on close.md.fabulan.cosm, close.md.fabulan.answers-2026-11-05-1200.cosm in 408936
     s on code: 2 steps, all checks green'
   records:
   - R:record/1
   - R:record/2
   outcome: landed
-  inputs_root: /Users/m3u/METMcloud/METMroot/enough-dev/tests/fixtures/thym
+  inputs_root: /private/tmp/claude-501/-Users-m3u--claude-spares-spare-KWx7g8/e6dd56a4-2d3c-4549-9c4b-5a67e09cf882/scratchpad/x3/enough/tests/fixtures/thym
   engines:
+  - ascribe
   - canon
   - dialectic
   - docoes
+  - repo
+  - syntax
   provenance:
     mode: derived
     sources:
-    - 2026-11-05-2031-5615.plan.cosm
+    - 2026-11-06-0035-c4b5.plan.cosm
     confidence: 1
 - id: R:record/1
   type: record
@@ -44,14 +47,14 @@ nodes:
   move: record
   inputs:
   - name: said
-    sha256: f03f30947a43faa4f2159ec4dd12fe5c8918d054faf051b23b4d406bfb92813d
+    sha256: 06895c0df4eda4f72cd06809c0c30d87d31116f225cefe4dfde68f4dd06350ce
     path: inputs/close.md.fabulan.answers-2026-11-05-1200.cosm
   - name: f
-    sha256: d70fab0db467384a02d67b0bbcb9c7da4f822f1d9fb10356d395f7219b77c41a
+    sha256: bb71bac8480e68a46b3487cdaca165132a24c1c652ab237841d51197c2e49cd2
     path: inputs/close.md.fabulan.cosm
   outputs:
   - name: answered
-    sha256: e749492ddf282546e9f2a31249f07f98750a030e9ad5a5e59adc1269bcad1d8c
+    sha256: bee07902c6f91652d1b9ed1ded3b20988fd0bd9e551f81335523c3e0a613dc64
   engine: code
   attempts: 1
   tokens: 0
@@ -69,7 +72,7 @@ nodes:
   provenance:
     mode: derived
     sources:
-    - 2026-11-05-2031-5615.plan.cosm#R:node/1
+    - 2026-11-06-0035-c4b5.plan.cosm#R:node/1
     confidence: 1
 - id: R:record/2
   type: record
@@ -79,10 +82,10 @@ nodes:
   move: settle
   inputs:
   - name: answered
-    sha256: e749492ddf282546e9f2a31249f07f98750a030e9ad5a5e59adc1269bcad1d8c
+    sha256: bee07902c6f91652d1b9ed1ded3b20988fd0bd9e551f81335523c3e0a613dc64
   outputs:
   - name: g
-    sha256: be1ef7eb22f3090430381f317bc7ea0807341d921ca9206c42d8da1e98c16928
+    sha256: 5511fef57e76ca903ae599dc5660a440f354499dd8f3cb51053564b5c3810e82
     path: outputs/g.cosm
   engine: code
   attempts: 1
@@ -104,7 +107,7 @@ nodes:
   provenance:
     mode: derived
     sources:
-    - 2026-11-05-2031-5615.plan.cosm#R:node/2
+    - 2026-11-06-0035-c4b5.plan.cosm#R:node/2
     confidence: 1
 - id: R:node/1
   type: node

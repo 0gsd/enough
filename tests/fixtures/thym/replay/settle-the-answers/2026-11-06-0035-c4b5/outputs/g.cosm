@@ -13,7 +13,8 @@ derived:
   completeness: full
   chunks: 1
   runs:
-    - {program: settle-the-answers, run: 2026-11-05-2031-5615, at: 2026-11-01T12:00:00Z}
+    - {program: settle-the-answers, run: 2026-11-05-1031-b7e0, at: 2026-11-05T10:31:02Z}
+    - {program: settle-the-answers, run: 2026-11-06-0035-c4b5, at: 2026-11-01T12:00:00Z}
 atem:
   line: Meadow closes each customer's books overnight once the bank feeds arrive, locks the day, and retries a failed close before anyone opens the summary.
   focus: How Meadow's overnight close works, what it guarantees, and what it waits on.
@@ -32,10 +33,10 @@ nodes:
     span: {lines: "1"}
     provenance:
       mode: derived
-      sources: [close.md#L1, D:session/session-2]
+      sources: [close.md#L1, D:session/session-1]
       confidence: 0.3
       state: pending
-      answered: {roles.event: {sources: [D:session/session-2], confidence: 0.9}}
+      answered: {roles.event: {sources: [D:session/session-1], confidence: 0.9}}
   # --- L E K: the twin of 18.4.5, item for item ------------------------------------------------------------------
   - id: L:term/close
     type: term
@@ -97,18 +98,13 @@ nodes:
     provenance: {mode: derived, sources: ['close.md#L3-L8'], confidence: 0.7, state: known}
   - id: N:audience/owners
     type: audience
-    name: Restaurant owners, then support staff
-    summary: The guide is written for the restaurant owners who read the morning summary; Meadow's support staff read it too.
-    stance: hearsay
-    who: restaurant owners who are Meadow's customers, and Meadow's support staff
+    name: Restaurant owners
+    summary: The guide is written for the restaurant owners who read the morning summary.
+    stance: deduced
+    who: restaurant owners who are Meadow's customers
     needs: To know whether the morning summary can be relied on, and what happens when the close fails.
     span: {lines: "5"}
-    provenance:
-      mode: derived
-      sources: ['close.md#L5', D:session/session-1]
-      confidence: 0.9
-      state: known
-      answered: {summary: {sources: [D:session/session-1], confidence: 1}, who: {sources: [D:session/session-1], confidence: 1}}
+    provenance: {mode: derived, sources: ['close.md#L5'], confidence: 0.8, state: known}
   - id: N:exclusion/no-feed-promise
     type: exclusion
     name: No promise about the feeds
@@ -255,43 +251,239 @@ nodes:
     span: {lines: "6-7"}
     provenance: {mode: derived, sources: ['close.md#L6-L7'], confidence: 0.8, state: known}
   # --- D: the dialectic ---------------------------------------------------------------------------------------------
+  - id: D:question/occasion
+    type: question
+    about: I
+    asks: "What prompted this text: an event, a request, a need?"
+    why: missing
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/occasion, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/influence
+    type: question
+    about: I
+    asks: Which writers, works or traditions shaped it?
+    why: missing
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/influence, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/aim
+    type: question
+    about: N
+    asks: What should a reader know, believe or do after reading it?
+    why: intent
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/aim, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
   - id: D:question/audience
     type: question
-    about: N:audience/owners
-    asks: Whom did you write the guide for?
+    about: N
+    asks: Whom did you write it for?
     why: missing
     kind: text
     to: author
     raised: {by: bank, from: fabulan/audience, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
     state: answered
     answers:
-      - {at: 2026-11-05T10:20:40Z, by: author, says: "For owners first. Support reads it too, so they say the same thing on the phone.", value: "restaurant owners who are Meadow's customers, and Meadow's support staff", confidence: 1, session: D:session/session-1}
-    settled: {at: 2026-11-05T10:31:02Z, run: 2026-11-05-1031-b7e0, wrote: ['N:audience/owners#summary', 'N:audience/owners#who']}
-  - id: D:question/occasion
+      - {at: 2026-11-05T12:01:30Z, by: author, says: "For owners first. Support reads it too, so they say the same thing on the phone.", value: "restaurant owners who are Meadow's customers, and Meadow's support staff", confidence: 1, session: D:session/session-2}
+    settled: {at: 2026-11-01T12:00:00Z, run: 2026-11-06-0035-c4b5, wrote: [N:audience/restaurant-owners-who-are-meadow-s-custo]}
+  - id: D:question/exclusion
     type: question
-    about: I:occasion/why-written#roles.event
-    asks: What prompted this guide?
+    about: N
+    asks: What did you choose to leave out, and why?
+    why: intent
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/exclusion, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/decision
+    type: question
+    about: N
+    asks: Which choice in it was hardest to make?
+    why: intent
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/decision, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/voice
+    type: question
+    about: C
+    asks: Who is speaking here, and to whom?
+    why: unsure
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/voice, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/parts
+    type: question
+    about: C
+    asks: Why is it divided the way it is?
+    why: intent
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/parts, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/maker
+    type: question
+    about: R
+    asks: Who wrote it, and who else had a hand in it?
     why: missing
     kind: text
     to: author
-    raised: {by: bank, from: fabulan/occasion, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    raised: {by: bank, from: fabulan/maker, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/release
+    type: question
+    about: R
+    asks: Where and when was it first published?
+    why: missing
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/release, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/drafts
+    type: question
+    about: R
+    asks: What changed between drafts?
+    why: missing
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/drafts, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/licence
+    type: question
+    about: R
+    asks: May others copy it, and on what terms?
+    why: missing
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/licence, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/weight
+    type: question
+    about: P
+    asks: Which claim matters most to you?
+    why: intent
+    kind: ref
+    to: author
+    raised: {by: bank, from: fabulan/weight, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/stand-by-meadow-closes-overnight
+    type: question
+    about: P:claim/meadow-closes-overnight
+    asks: "Would you still stand behind this: Meadow closes overnight?"
+    why: unsure
+    kind: yes-no
+    to: author
+    raised: {by: bank, from: fabulan/stand-by, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/stand-by-every-customer-has-a-feed
+    type: question
+    about: P:claim/every-customer-has-a-feed
+    asks: "Would you still stand behind this: Every customer has a bank feed?"
+    why: unsure
+    kind: yes-no
+    to: author
+    raised: {by: bank, from: fabulan/stand-by, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/stand-by-close-locks-the-day
+    type: question
+    about: P:claim/close-locks-the-day
+    asks: "Would you still stand behind this: A close locks the day?"
+    why: unsure
+    kind: yes-no
+    to: author
+    raised: {by: bank, from: fabulan/stand-by, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/stand-by-owners-read-summary-first
+    type: question
+    about: P:claim/owners-read-summary-first
+    asks: "Would you still stand behind this: Owners read the summary first?"
+    why: unsure
+    kind: yes-no
+    to: author
+    raised: {by: bank, from: fabulan/stand-by, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/stand-by-late-feed-delays-summary
+    type: question
+    about: P:claim/late-feed-delays-summary
+    asks: "Would you still stand behind this: A late feed delays the summary?"
+    why: unsure
+    kind: yes-no
+    to: author
+    raised: {by: bank, from: fabulan/stand-by, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/stand-by-daily-summary-keeps-owners
+    type: question
+    about: P:claim/daily-summary-keeps-owners
+    asks: "Would you still stand behind this: The daily summary keeps owners?"
+    why: unsure
+    kind: yes-no
+    to: author
+    raised: {by: bank, from: fabulan/stand-by, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/refuse
+    type: question
+    about: P
+    asks: Is there a reading of it you would refuse?
+    why: intent
+    kind: text
+    to: author
+    raised: {by: bank, from: fabulan/refuse, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/why-written-roles-event
+    type: question
+    about: I:occasion/why-written#roles.event
+    asks: "What prompted this guide: a support question, a failed close, a launch?"
+    why: missing
+    kind: text
+    to: author
+    raised: {by: move, from: question, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
     state: answered
     answers:
-      - {at: 2026-11-05T12:01:30Z, by: author, says: "An owner rang support asking why her summary was late, twice in a week.", value: an owner's call to support about a late morning summary, confidence: 0.9, session: D:session/session-2}
-    settled: {at: 2026-11-01T12:00:00Z, run: 2026-11-05-2031-5615, wrote: [I:occasion/why-written#roles.event]}
+      - {at: 2026-11-05T10:20:40Z, by: author, says: "An owner rang support asking why her summary was late, twice in a week.", value: an owner's call to support about a late morning summary, confidence: 0.9, session: D:session/session-1}
+    settled: {at: 2026-11-05T10:31:02Z, run: 2026-11-05-1031-b7e0, wrote: [I:occasion/why-written#roles.event]}
+  - id: D:question/morning-summary-feed
+    type: question
+    about: L:term/morning-summary#feed
+    asks: What should the feed of "morning summary" say?
+    why: missing
+    kind: text
+    hint: not in FEED
+    to: author
+    raised: {by: move, from: question, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
+  - id: D:question/handbook-at
+    type: question
+    about: R:release/handbook#at
+    asks: When was the guide first published?
+    why: missing
+    kind: text
+    to: author
+    raised: {by: move, from: question, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: open
   - id: D:session/session-1
     type: session
     at: 2026-11-05T10:18:05Z
     with: {to: author, who: Meadow's head of support}
     through: person
-    asked: [D:question/audience, D:question/occasion]
-    answered: [D:question/audience]
-    skipped: [D:question/occasion]
+    asked: [D:question/audience, D:question/why-written-roles-event]
+    answered: [D:question/why-written-roles-event]
+    skipped: [D:question/audience]
   - id: D:session/session-2
     type: session
     at: 2026-11-05T12:00:00Z
     with: {to: author, who: Meadow's head of support}
     through: person
-    asked: [D:question/occasion]
-    answered: [D:question/occasion]
+    asked: [D:question/audience]
+    answered: [D:question/audience]
     skipped: []
+  - id: N:audience/restaurant-owners-who-are-meadow-s-custo
+    type: audience
+    name: restaurant owners who are Meadow's customers
+    summary: restaurant owners who are Meadow's customers, and Meadow's support staff
+    stance: hearsay
+    provenance: {mode: dialectic, sources: [D:session/session-2], confidence: 1}

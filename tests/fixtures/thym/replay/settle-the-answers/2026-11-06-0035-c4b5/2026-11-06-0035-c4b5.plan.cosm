@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-05-2031-67e6
+id: thym/2026-11-06-0035-a501
 name: settle-the-answers on close.md.fabulan.cosm
 program:
   name: settle-the-answers
@@ -9,18 +9,18 @@ inputs:
 - name: f
   type: fabula
   path: inputs/close.md.fabulan.cosm
-  sha256: d70fab0db467384a02d67b0bbcb9c7da4f822f1d9fb10356d395f7219b77c41a
+  sha256: bb71bac8480e68a46b3487cdaca165132a24c1c652ab237841d51197c2e49cd2
 - name: said
   type: volume
   path: inputs/close.md.fabulan.answers-2026-11-05-1200.cosm
-  sha256: f03f30947a43faa4f2159ec4dd12fe5c8918d054faf051b23b4d406bfb92813d
+  sha256: 06895c0df4eda4f72cd06809c0c30d87d31116f225cefe4dfde68f4dd06350ce
 estimate:
   steps: 2
   asks: 1
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-05-2031-67e6
+- id: R:plan/2026-11-06-0035-a501
   type: plan
   name: settle-the-answers on close.md.fabulan.cosm
   summary: Two nodes, one of which asks the model.

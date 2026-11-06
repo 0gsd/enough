@@ -405,10 +405,10 @@ def test_ascribes_older_shape_reads_as_one_bank():
 
 def test_the_dialectics_fields_are_kept():
     v = M.load_volume(CLOSE)
-    aud = v.items["N:audience/owners"].data
-    assert set(aud["provenance"]["answered"]) == {"who", "summary"}
-    q = v.items["D:question/audience"].data
-    assert q["settled"]["wrote"] == ["N:audience/owners#summary", "N:audience/owners#who"]
+    occ = v.items["I:occasion/why-written"].data
+    assert set(occ["provenance"]["answered"]) == {"roles.event"}
+    q = v.items["D:question/why-written-roles-event"].data
+    assert q["settled"]["wrote"] == ["I:occasion/why-written#roles.event"]
 
 
 # ---------------------------------------------------------------------------
@@ -459,7 +459,7 @@ def _own(text: str, name: str = "x.fabulac.cosm") -> M.Report:
 
 
 def test_the_three_examples_pass_every_check():
-    for path, n, pending, fl in ((CLOSE, 28, 3, "fabulan"), (ROSE, 43, 5, "fabulap"), (TALLY, 79, 4, "fabulac")):
+    for path, n, pending, fl in ((CLOSE, 49, 2, "fabulan"), (ROSE, 43, 5, "fabulap"), (TALLY, 79, 4, "fabulac")):
         rep = fabula.lint(path)
         v = rep.volume
         assert v.declaration.how == "oes" and fabula.flavour(v) == fl
@@ -528,18 +528,18 @@ def test_case_outcome():
 
 def test_question_about():
     t = _text(CLOSE)
-    assert "    about: I:occasion/why-written#roles.event\n" in t
+    assert "    about: R:release/handbook#at\n" in t
     for about, fine in (("I", True), ("N:audience", True), ("N:audience/owners#who", True), ('{lines: "3-4"}', True),
                         ('{start: "Meadow closes", end: "arrive."}', True), ("N:nothing", False),
                         ("Q", False), ("N:audience/nobody", False), ("N:audience/owners#bad path", False),
                         ('{lines: "4-3"}', False), ("{file: x.py, lines: \"1\"}", False),
                         ("C:voice#roles.speaker", False)):
-        rep = _own(t.replace("    about: I:occasion/why-written#roles.event\n", f"    about: {about}\n", 1),
+        rep = _own(t.replace("    about: R:release/handbook#at\n", f"    about: {about}\n", 1),
                    "x.fabulan.cosm")
         errs = _checks(rep, "question-about")
         assert (not errs) == fine, (about, [str(p) for p in errs])
-    gone = t.replace("about: N:audience/owners\n", "about: N:audience/gone\n", 1)
-    assert "about: N:audience/gone" in gone
+    gone = t.replace("about: I:occasion/why-written#roles.event\n", "about: I:occasion/gone#roles.event\n", 1)
+    assert "about: I:occasion/gone#roles.event" in gone
     assert not _checks(_own(gone, "x.fabulan.cosm"), "question-about")               # settled: skipped (18.6.3)
     spans = _text(TALLY)
     assert not _checks(_own(spans.replace("about: ", "about: {file: tally/cli.py, lines: \"1-2\"}\n    was: ", 1)),
@@ -551,11 +551,12 @@ def test_question_about_skips_a_question_that_has_ended(state):
     """The conductor's ruling 1 (docs/fabula-landed-D1.md, 3.1): a stale or withdrawn question whose item is gone is
     not an error, since that is why it ended; an open one about the same nothing still is."""
     t = _text(CLOSE)
-    occ = "    about: I:occasion/why-written#roles.event\n"
-    gone = t.replace(occ, "    about: I:occasion/gone#roles.event\n", 1)
+    at = "    about: R:release/handbook#at\n"
+    gone = t.replace(at, "    about: R:release/gone#at\n", 1)
     assert _checks(_own(gone, "x.fabulan.cosm"), "question-about")
-    ended = gone.replace("    state: open\n", f"    state: {state}\n    ended: {{at: 2026-11-05T11:00:00Z, by: "
-                                                 "derive, because: its item is gone}\n", 1)
+    head, mark, tail = gone.partition("    about: R:release/gone#at\n")
+    ended = head + mark + tail.replace("    state: open\n", f"    state: {state}\n    ended: {{at: "
+                                       "2026-11-05T11:00:00Z, by: derive, because: its item is gone}\n", 1)
     assert not _checks(_own(ended, "x.fabulan.cosm"), "question-about")
     assert not _checks(_own(ended, "x.fabulan.cosm"), "question-shape")
 
@@ -604,7 +605,7 @@ def test_session_declared():
     warn = _checks(rep, "session-declared")
     assert warn and all(p.severity == "warning" for p in warn)
     assert "D:session/session-1 is not a session of this volume" in [p.message for p in warn]
-    bare = t.replace("sources: ['close.md#L5', D:session/session-1]", "sources: ['close.md#L5', session-2]", 1)
+    bare = t.replace("sources: [close.md#L1, D:session/session-1]", "sources: [close.md#L1, session-2]", 1)
     assert "session-2]" in bare
     notes = _checks(_own(bare, "x.fabulan.cosm"), "session-declared")
     assert [p.severity for p in notes] == ["note"]

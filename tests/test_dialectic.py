@@ -130,17 +130,20 @@ def head(text: str) -> str:
 
 def test_reading_the_close_example():
     t = dl.open_twin(CLOSE)
-    assert [q["id"] for q in dl.questions(t)] == ["D:question/audience", "D:question/occasion"]
-    assert [q["id"] for q in dl.questions(t, state="open")] == ["D:question/occasion"]
+    qs = [q["id"] for q in dl.questions(t)]
+    assert len(qs) == 23 and qs[:4] == ["D:question/occasion", "D:question/influence", "D:question/aim",
+                                        "D:question/audience"]
+    assert qs[-3:] == ["D:question/why-written-roles-event", "D:question/morning-summary-feed",
+                       "D:question/handbook-at"]
+    assert [q["id"] for q in dl.questions(t, state="answered")] == ["D:question/why-written-roles-event"]
+    assert len(dl.questions(t, state="open")) == 22
     assert [s["id"] for s in dl.sessions(t)] == ["D:session/session-1"]
     oq = dl.open_questions(t)
-    assert [(e["form"], e["about"]) for e in oq] == [
-        ("question", "I:occasion/why-written#roles.event"),
-        ("pending", "L:term/morning-summary#feed"),
-        ("pending", "R:release/handbook#at"),
-    ]
-    # the pending the open question is about is not listed twice (18.6.5: one open question, two lengths)
-    assert "I:occasion/why-written#roles.event" not in [e["about"] for e in oq if e["form"] == "pending"]
+    assert len(oq) == 22 and ("question", "N") in [(e["form"], e["about"]) for e in oq]
+    assert [(e["form"], e["about"]) for e in oq][-2:] == [("question", "L:term/morning-summary#feed"),
+                                                          ("question", "R:release/handbook#at")]
+    # the pendings the open questions are about are not listed twice (18.6.5: one open question, two lengths)
+    assert [e for e in oq if e["form"] == "pending"] == []
 
 
 @pytest.mark.parametrize("about,form,ok", [
@@ -276,9 +279,17 @@ def test_a_whole_item_pending_is_asked_about_the_item():
 def test_unsure_items_raise_a_question_and_pending_ones_do_not_twice():
     r = dl.raise_questions(mini(), at=AT, banks=[], pending=False)
     assert [(q["about"], q["why"]) for q in r.questions] == [("P:claim/one", "unsure")]
-    # appendix B: the occasion is pending and at 0.3, but its pending is already asked: no unsure question
-    r = dl.raise_questions(dl.open_twin(CLOSE), at=AT, banks=[])
+    # MacroCOSM 18.4.5: before its sitting, the occasion is pending and at 0.3, but its pending is already asked: no
+    # unsure question; once the answer is settled it holds no pending and is still marked pending: asked as a whole
+    settled = "    roles: {event: an owner's call to support about a late morning summary}\n"
+    text = CLOSE.read_text(encoding="utf-8")
+    assert settled in text
+    before = text.replace(settled, '    roles: {event: {pending: "what prompted this guide: a support question, a '
+                                   'failed close, a launch?"}}\n', 1)
+    r = dl.raise_questions(dl.twin_from_text(before, filename=CLOSE.name), at=AT, banks=[])
     assert "I:occasion/why-written" not in [q["about"] for q in r.questions]
+    r = dl.raise_questions(dl.open_twin(CLOSE), at=AT, banks=[])
+    assert [(q["about"], q["why"]) for q in r.questions] == [("I:occasion/why-written", "unsure")]
 
 
 def test_ascribes_44_questions_as_the_reader_gives_them():
@@ -628,9 +639,9 @@ def test_an_answers_volume_is_written_beside_and_leaves_the_volume_alone(tmp_pat
     (lambda s: s.replace("session: D:session/session-2}", "session: D:session/session-9}"), "names session"),
     (lambda s: s.replace("  - id: D:session/session-2\n", "  - id: D:session/session-3\n    type: session\n"
                                                           "  - id: D:session/session-2\n"), "exactly one"),
-    (lambda s: s.replace("D:question/occasion\n    state", "D:question/nothing\n    state"), "not a question"),
-    (lambda s: s.replace("value: \"an owner's call to support about a late morning summary\"", "value: {a: 1}"),
-     "words"),
+    (lambda s: s.replace("D:question/audience\n    state", "D:question/nothing\n    state"), "not a question"),
+    (lambda s: s.replace("value: \"restaurant owners who are Meadow's customers, and Meadow's support staff\"",
+                         "value: {a: 1}"), "words"),
 ])
 def test_a_bad_answers_volume_is_refused(edit, words):
     text = edit((ANS / "close.md.fabulan.answers-2026-11-05-1200.cosm").read_text(encoding="utf-8"))
@@ -972,8 +983,7 @@ def test_carry_over_after_a_decompile_done_again():
 # ---------------------------------------------------------------------------
 
 EXAMPLES = {
-    "close": (CLOSE, "close.md.fabulan.answers-2026-11-05-1200.cosm",
-              {"I:occasion/why-written": {"roles", "provenance"}}),
+    "close": (CLOSE, "close.md.fabulan.answers-2026-11-05-1200.cosm", {}),   # a new item (below), nothing changed
     "rose": (ROSE, "the-sick-rose.txt.fabulap.answers-2026-11-05-1200.cosm",
              {"C:voice/speaker-to-rose": {"roles", "provenance"}, "P:reading/worm-as-desire": {"intended", "provenance"},
               "L:term/bed": {"sense", "provenance"}, "P:reading/worm-is-a-canker": {"pending"},
@@ -1017,7 +1027,13 @@ def test_the_appendix_examples_answered_and_settled(name, tmp_path):
     # every question answered is settled; a skipped one stays open
     for e in dl.read_answers_volume(tmp_path / answers).entries:
         assert out.ledger.question(e["id"])["settled"]["run"] == RUN
-    assert {k: v for k, v in out.doc["derived"].items() if k != "runs"} == before["derived"]
+    assert {k: v for k, v in out.doc["derived"].items() if k != "runs"} == \
+        {k: v for k, v in before["derived"].items() if k != "runs"}
+    if name == "close":   # the bank's audience entry is about the module: its text answer is a new item (18.6.4)
+        new = [d for d in out.ledger.items if d["id"] not in b]
+        assert [(d["type"], d["summary"], d["stance"], d["provenance"]["mode"]) for d in new if not dl.is_d_item(d)] \
+            == [("audience", "restaurant owners who are Meadow's customers, and Meadow's support staff", "hearsay",
+                 "dialectic")]
     assert out.doc["derived"]["runs"][-1]["program"] == "settle.thym"
     # byte for byte outside what changed: the declaration and source lines, and every untouched item
     assert original.splitlines()[:6] == text.splitlines()[:6]
@@ -1136,7 +1152,7 @@ def test_cli_list_raise_answer_settle(tmp_path):
     shutil.copy(CLOSE, vol)
     out = io.StringIO()
     assert dl.main(["list", str(vol)], out=out) == 0
-    assert "D:question/occasion" in out.getvalue() and "1 sessions, 3 open" in out.getvalue()
+    assert "D:question/occasion" in out.getvalue() and "1 sessions, 22 open" in out.getvalue()
     out = io.StringIO()
     assert dl.main(["raise", str(vol), "--rules", "--run", "r1"], out=out) == 0
     assert "questions raised" in out.getvalue()

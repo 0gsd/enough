@@ -1338,7 +1338,7 @@ that a reader always has them, and that reading their volumes needs no specifica
 | `canon` | `oes: canon/1` | Canon, the home file system: a volume or a project, its folders, files and articles, and what has been derived from them | one file | `canon.cosm` | V | 18.3 |
 | `fabula` | `oes: fabula/1`; old spelling `oes: emf/1` | one input decompiled, a text, a poem or a folder of code: everything found in it or derived from it, item by item | one file, beside its input | `<text>.fabulan.cosm`, `<text>.fabulap.cosm`, `<folder>.fabulac.cosm`; an older twin's `<text>.cosm` | I L E K N C R P T X | 18.4 |
 | `doc` | `oes: doc/1` | one document: its sections, terms, examples and decisions, joined to the reference | one file per telling, built at runtime | `<doc>.<lang>.doc.cosm` | S T R B | 18.5 |
-| `thym` | `oes: thym/1` | Thym's programs, morphs, contexts, plans, traces and packages | one file, one of six kinds | `<name>.thym.cosm`, `<name>.morph.cosm` … | P M C R K | 18.7 |
+| `thym` | `oes: thym/1` | Thym's programs, morphs, contexts, plans, traces and packages, and a run's snapshots of the folders it took | one file, one of seven kinds | `<name>.thym.cosm`, `<name>.morph.cosm` … | P M C R K | 18.7 |
 
 Every format, built in or not, has the dialectic's module D: the core's, merged in where its manifest does not
 declare it (sections 13.4 and 18.6).
@@ -1372,11 +1372,11 @@ and specified in Thym (https://thym.cosmoes.org/), its sections 6.3 and 20. DocO
 act, which gives a document back from its own volume (section 18.5).
 
 **Models.** A fabula records which model made it: the model's own id, its route (`local`, a model on the person's own
-machine, or `cloud`, a model reached through a broker), and for a cloud model its provider, once for each run that
-wrote into the volume (section 18.4.1). The model is chosen for each run: the same programs run on a local model at its
-best effort or on a cloud model through a broker, and nothing reaches a cloud model that the person did not choose for
-that run. A run made without a model is in rules mode and says so. With its agent off, an implementation refuses every
-model, local or cloud (Thym, its section 19).
+machine, or `cloud`, a model reached through a broker), and for a cloud model its provider, once for each run that wrote
+into the volume (section 18.4.1). The model is chosen for each run: the same programs run on a local model at its best
+effort or on a cloud model through a broker, and nothing reaches a cloud model that the person did not choose for that
+run: a run that names no route runs on the local model. A run made without a model is in rules mode and says so. With
+its agent off, an implementation refuses every model, local or cloud (Thym, its section 19).
 
 ### 18.2 cosm: the product tree
 
@@ -1813,13 +1813,13 @@ source; a run that only settles the dialectic's answers (section 18.6.4) changes
 | `model` | the model's own id: for a local model, the name the implementation knows it by; for a cloud model, the provider's resolved id, of the form `vendor/model` | model mode |
 | `route` | `local` or `cloud` | model mode |
 | `provider` | the service that carried a cloud request, by its name | cloud only |
-| `program` | the file of the Thym program that built the fabula (`decompile-python.thym`) | when a Thym program did |
+| `program` | the name of the Thym program that built the fabula, as its `program` line gives it (`raise-the-questions`); one file may hold several programs | when a Thym program did |
 | `run` | the trace id of that program's run | with `program` |
 | `mode` | `model` or `rules` | always |
 | `completeness` | `full`; `atem`, a fabula that holds the atem and nothing else; or `outline`, a fabulac's rules-only skeleton (section 18.4.7) | always |
 | `chunks` | how many chunks the text was read in; for a fabulac, how many files a model read | always |
 | `dropped` | how many items a derivation dropped because it could not repair them | when any were |
-| `runs` | one entry per run that wrote into the fabula, in order, a settle run included: `{program, run, at, model, route, provider}`, the last three absent for a run made by rules alone | when a Thym program wrote into the fabula |
+| `runs` | one entry per run that wrote into the fabula, in order, a settle run included: `{program, run, at, model, route, provider}`, `program` naming the program as above, the last three absent for a run made by rules alone | when a Thym program wrote into the fabula |
 
 A fabula built in several runs, as a fabulac is, says through `runs` which model made each part of it; a resumed build
 appends its runs. The single keys repeat the last entry that derived the fabula, so a reader that knows nothing of
@@ -1830,7 +1830,7 @@ appends its runs. The single keys repeat the last entry that derived the fabula,
 | List | Entry | Notes |
 |---|---|---|
 | `shorts`, a prose or verse short | `{path, at, by, mode, order}`, and `route` when a model told it | `order` is `told` or `weight`; the path is `<text-stem>.short-<YYYY-MM-DD-HHMM>.md` (section 18.4.4) |
-| `shorts`, a cshort | `{path, at, by, mode, order: code, route, language, files}` | `path` is the folder `<name>.cshort-<YYYY-MM-DD-HHMM>/`, with its `/`; `language` is the cshort's own; `files`, how many files it holds (section 18.4.7) |
+| `shorts`, a cshort | `{path, at, by, mode, order: code, route, language, files}` | `path` is the folder `<name>.cshort-<YYYY-MM-DD-HHMM>/`, with its `/`, taking `-2`, `-3` on a collision; `language` is the cshort's own; `files`, how many files it holds besides `CSHORT.md` (section 18.4.7) |
 | `catems` | `{path, at, by, mode, route, depth}` | `depth` is `line`, `overview` or `manual`; the path is `<name>.catem-<YYYY-MM-DD-HHMM>.md`, taking `-2`, `-3` on a collision as shorts do (section 18.4.7) |
 
 **Fresh and stale, for a text.** A twin is `fresh` while its text's size and modification time match the twin's
@@ -1956,7 +1956,7 @@ literal; *integer*, *bool*, *date*; a list in square brackets is closed. A bold 
 | `C:rhyme` | `scheme` *text*, the letter; `sound` *text*; `lines` *refs* `C:line`; `quality` [`full` `slant` `eye` `identical`]; `placement` [`end` `internal`] |
 | `C:file` | **`path`**, relative to `source.path`; `language`; `holds` *text*, the names it defines or one line on its content; `component` *ref*; `length` `{lines, bytes}`; `sha256`; `entry` *bool*, run directly |
 | `C:component` | `files` *refs* `C:file`; `of` *ref* `C:component`; `does` *text*, its responsibility in one sentence; `exposes` *refs* `C:interface`; `uses` *refs* (`C:component`, `C:dependency`) |
-| `C:interface` | **`surface`** [`function` `method` `class` `command` `format` `stream`]; `signature` *text*, exact: a Python `def` or `class` line with its annotations and defaults, a command's usage line, a format's one-line grammar; `defined-in` *ref* `C:file`; `takes`, a list of `{name, type, default, required, means}`; `gives`, `{type, means}` for a function or `{output, exit}` for a command; `raises`, a list of `{error, when, message}`; `exported` *bool* |
+| `C:interface` | **`surface`** [`function` `method` `class` `command` `format` `stream`]; `signature` *text*, exact: a Python `def` or `class` line with its annotations and defaults, and with its decorators before it on the same line (`@property def size(self)`), a command's usage line, a format's one-line grammar; `defined-in` *ref* `C:file`; `takes`, a list of `{name, type, default, required, means}`; `gives`, `{type, means}` for a function or `{output, exit}` for a command; `raises`, a list of `{error, when, message}`; `exported` *bool* |
 | `C:structure` | `defined-in` *ref*; `shape` *text* (`a record class that cannot change`, `a JSON object per line`); `fields`, a list of `{name, type, default, required, means}`; `invariants`, a list of *text* |
 | `C:behaviour` | **`does`** *text*; `of` *refs* (`C:interface`, `C:component`); `when` *text*, the trigger; `edges`, a list of `{given, then}`; `errors`, a list of `{when, message, exit}`; `intended` *bool*, absent until asked |
 | `C:dependency` | **`scope`** [`standard` `run-time` `test` `build` `optional`]; `package`; `version`, a constraint; `needed-for` *text*; `used-by` *refs*; `licence` |
@@ -2069,7 +2069,8 @@ back as section 18.6 says.
 **A fabula records which model made it.** The catalog's `derived` names the model, its route and, for a cloud model,
 its provider; `derived.runs` names them for every run that wrote into the fabula; and every item's provenance names its
 mode and its sources. A fabula made partly on a local model and partly on a cloud model says which part came from which
-(section 18.4.1). Nothing reaches a cloud model that the person did not choose for that job.
+(section 18.4.1). Nothing reaches a cloud model that the person did not choose for that job, and a job that names no
+route runs on the local model, whatever entry point started it.
 
 **A scaffold says it is one.** When no model is available, an implementation still writes a fabula, by rules: for a
 text, candidate terms and entities from the text and FEED, and atems as in section 18.3.5; for a folder, the `outline`
@@ -2176,9 +2177,13 @@ We think a summary that arrives every morning is why owners stay.
 
 Its twin, `guides/close.md.fabulan.cosm`, made by a local model in a run of the program `decompile-prose`, and settled
 by a second run, by rules (`derived.runs` lists both). It was decompiled again from a twin of the old name, whose one
-short it carries over. Each of the six stances appears once on its claims. The author was asked two questions
-from the fabulan's bank: one was answered and settled into `N:audience/owners`, whose provenance says which fields the
-answer wrote; the other was skipped and stays open, with `I:occasion/why-written`'s event still a question.
+short it carries over. Each of the six stances appears once on its claims. The first run also raised its questions by
+rules: one for each entry of the fabulan's bank that applies, asked once of the volume but for `stand-by`, which is
+asked of each of the six claims, and one for each pending value: twenty-two in all. Two of them were put to the author
+in a first sitting and are shown here with the sitting; the other twenty are open and are left out. The question the
+occasion's pending value raised was answered and settled into `I:occasion/why-written`, whose provenance says which
+field the answer wrote. The bank's audience question, which is about module N and not about `N:audience/owners`, was
+skipped and stays open.
 
 ```cosm
 oes: fabula/1
@@ -2192,14 +2197,14 @@ derived:
   by: person
   model: g40-04
   route: local
-  program: decompile-prose.thym
+  program: decompile-prose
   run: 2026-11-05-1002-a1c4
   mode: model
   completeness: full
   chunks: 1
   runs:
-    - {program: decompile-prose.thym, run: 2026-11-05-1002-a1c4, at: 2026-11-05T10:02:11Z, model: g40-04, route: local}
-    - {program: settle.thym, run: 2026-11-05-1031-b7e0, at: 2026-11-05T10:31:02Z}
+    - {program: decompile-prose, run: 2026-11-05-1002-a1c4, at: 2026-11-05T10:02:11Z, model: g40-04, route: local}
+    - {program: settle-the-answers, run: 2026-11-05-1031-b7e0, at: 2026-11-05T10:31:02Z}
 atem:
   line: Meadow closes each customer's books overnight once the bank feeds arrive, locks the day, and retries a failed close before anyone opens the summary.
   focus: How Meadow's overnight close works, what it guarantees, and what it waits on.
@@ -2213,9 +2218,14 @@ nodes:
     name: Why the guide was written
     summary: Nothing in the text says what prompted Meadow to write the guide.
     stance: assumed
-    roles: {event: {pending: "what prompted this guide: a support question, a failed close, a launch?"}}
+    roles: {event: an owner's call to support about a late morning summary}
     span: {lines: "1"}
-    provenance: {mode: derived, sources: ['close.md#L1'], confidence: 0.3, state: pending}
+    provenance:
+      mode: derived
+      sources: ['close.md#L1', D:session/session-1]
+      confidence: 0.3
+      state: pending
+      answered: {roles.event: {sources: [D:session/session-1], confidence: 0.9}}
   - id: L:term/close
     type: term
     name: close
@@ -2275,18 +2285,13 @@ nodes:
     provenance: {mode: derived, sources: ['close.md#L3-L8'], confidence: 0.7, state: known}
   - id: N:audience/owners
     type: audience
-    name: Restaurant owners, then support staff
-    summary: The guide is written for the restaurant owners who read the morning summary; Meadow's support staff read it too.
-    stance: hearsay
-    who: restaurant owners who are Meadow's customers, and Meadow's support staff
+    name: Restaurant owners
+    summary: The guide is written for the restaurant owners who read the morning summary.
+    stance: deduced
+    who: restaurant owners who are Meadow's customers
     needs: To know whether the morning summary can be relied on, and what happens when the close fails.
     span: {lines: "5"}
-    provenance:
-      mode: derived
-      sources: ['close.md#L5', D:session/session-1]
-      confidence: 0.9
-      state: known
-      answered: {summary: {sources: [D:session/session-1], confidence: 1}, who: {sources: [D:session/session-1], confidence: 1}}
+    provenance: {mode: derived, sources: ['close.md#L5'], confidence: 0.8, state: known}
   - id: C:voice/meadow-we
     type: voice
     name: Meadow, in the first person plural
@@ -2394,33 +2399,33 @@ nodes:
     provenance: {mode: derived, sources: ['close.md#L6-L7'], confidence: 0.8, state: known}
   - id: D:question/audience
     type: question
-    about: N:audience/owners
-    asks: Whom did you write the guide for?
+    about: N
+    asks: Whom did you write it for?
     why: missing
     kind: text
     to: author
     raised: {by: bank, from: fabulan/audience, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
-    state: answered
-    answers:
-      - {at: 2026-11-05T10:20:40Z, by: author, says: "For owners first. Support reads it too, so they say the same thing on the phone.", value: "restaurant owners who are Meadow's customers, and Meadow's support staff", confidence: 1, session: D:session/session-1}
-    settled: {at: 2026-11-05T10:31:02Z, run: 2026-11-05-1031-b7e0, wrote: ['N:audience/owners#summary', 'N:audience/owners#who']}
-  - id: D:question/occasion
+    state: open
+  - id: D:question/why-written-roles-event
     type: question
     about: I:occasion/why-written#roles.event
-    asks: What prompted this guide?
+    asks: "What prompted this guide: a support question, a failed close, a launch?"
     why: missing
     kind: text
     to: author
-    raised: {by: bank, from: fabulan/occasion, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
-    state: open
+    raised: {by: move, from: question, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: answered
+    answers:
+      - {at: 2026-11-05T10:20:40Z, by: author, says: "An owner rang support asking why her summary was late, twice in a week.", value: an owner's call to support about a late morning summary, confidence: 0.9, session: D:session/session-1}
+    settled: {at: 2026-11-05T10:31:02Z, run: 2026-11-05-1031-b7e0, wrote: [I:occasion/why-written#roles.event]}
   - id: D:session/session-1
     type: session
     at: 2026-11-05T10:18:05Z
     with: {to: author, who: Meadow's head of support}
     through: person
-    asked: [D:question/audience, D:question/occasion]
-    answered: [D:question/audience]
-    skipped: [D:question/occasion]
+    asked: [D:question/audience, D:question/why-written-roles-event]
+    answered: [D:question/why-written-roles-event]
+    skipped: [D:question/audience]
 ```
 
 A twin written before this edition, still read: the minimal twin made by asking for the atem of
@@ -2760,10 +2765,12 @@ question (`licence-recorded`, section 18.4.8).
 
 **History.** When the folder is a git clone, its history is read from the clone alone: its log, its tags, and the
 documents and change logs in the tree. Commits are grouped into episodes (`R:phase`), tags become releases, and authors
-become makers: by name only where the repository states that name itself (its licence's copyright holder, or a line of
-an authors file), otherwise as a numbered contributor, and never by address. A folder that is not a clone has only the
-history its own documents hold. Issues, pull requests and anything else held outside the clone are reserved for a later
-edition.
+become makers: by name only where the repository states that name itself (its licence's copyright holder, a line of an
+authors file, or an author or maintainer its packaging file names), otherwise as a numbered contributor, and never by
+address. An implementation may bound how much of the log it reads and how many changes it keeps as items; a history that
+does not reach the first commit says so, and what is not kept item by item is counted in its episode and its release
+(Thym (https://thym.cosmoes.org/), its section 20.6). A folder that is not a clone has only the history its own
+documents hold. Issues, pull requests and anything else held outside the clone are reserved for a later edition.
 
 **How a fabulac is built.** In five stages, each one whole run that lands its result before the next begins:
 
@@ -2780,15 +2787,14 @@ its kind takes that the outline lacks (an interface's `takes`, `gives` and `rais
 `invariants`; a component's `does`; a setting's `means`), and add inside one (a parameter's `means`), never changing
 what a rules stage read.
 
-After each stage the fabulac, with what the stage found, is written beside the folder, and a build that stops is resumed after the last
-stage that landed, as long as the tree digest has not moved. The fabulac's `derived.runs` lists every run. A build with
-no model runs the first two stages only and writes the `outline`: `derived.completeness: outline`, the files,
-components, interfaces, dependencies, settings, licence and history, with nothing read for meaning or intent. A Thym
-program that builds a fabulac is one file of five programs (Thym (https://thym.cosmoes.org/), its section 20). The
-host runs the file's programs as one job, in the order they are written, filling each program's `fabula` input with
-the fabulac the program before it landed, and a job that stops takes up again after the last program that landed. Each
-run joins `derived.runs`, naming the file in `program` and its own trace in `run`, which tells the programs of one file
-apart.
+After each stage the fabulac, with what the stage found, is written beside the folder, and a build that stops is resumed
+after the last stage that landed, as long as the tree digest has not moved. The fabulac's `derived.runs` lists every
+run. A build with no model runs the first two stages only and writes the `outline`: `derived.completeness: outline`, the
+files, components, interfaces, dependencies, settings, licence and history, with nothing read for meaning or intent. A
+Thym program that builds a fabulac is one file of five programs (Thym (https://thym.cosmoes.org/), its section 20). The
+host runs the file's programs as one job, in the order they are written, filling each program's `fabula` input with the
+fabulac the program before it landed, and a job that stops takes up again after the last program that landed. Each run
+joins `derived.runs`, naming its program in `program` (`survey-the-repo`) and its own trace in `run`.
 
 **What this edition specifies.** A conforming builder handles pure-Python source that a person could read in an
 afternoon: no C extensions and no generated code, up to about sixty files and six thousand lines. Larger repositories,
@@ -2796,13 +2802,19 @@ other languages and a fabulac kept as a volume of several files are reserved for
 
 **The cshort.** Compiling a fabulac writes a folder beside it, `<name>.cshort-<YYYY-MM-DD-HHMM>/`, holding the rebuilt
 tree and a `CSHORT.md`. The cshort rebuilds every `C:file` whose language is a programming language and that is not a
-test, and the README; tests are rebuilt only when asked, since their content is held as `P:case` items. `CSHORT.md`'s
-first line is the footer, one italic line naming the fabulac, the language, the day of the run (in UTC) and the model:
-"*a cshort of days.fabulac.cosm, in Python, compiled on 2026-11-05 by …*". Then come a table of the files written, each
-with the `C:file` it came from and its sha256, what was not rebuilt, and, last, the source's licence line, `Licence of
-the source: <source.licence>` (with none recorded, `Licence of the source: not recorded (<the open question>)`). A
-compile is recorded in the fabulac's `shorts:` (section 18.4.1). One fabulac may be told in another language than its
-source's; the entry's `language` names the cshort's own.
+test, nor a type stub (`.pyi`), nor the repository's own tooling (its documentation's build, its scripts, its examples
+and benchmarks), and the README; tests are rebuilt only when asked, since their content is held as `P:case` items. It
+also carries a packaging file written by rules, never by a model, from what the survey recorded (the project's name, its
+version where recorded, the Python floor, the dependencies and optional groups, and the modules and packages with their
+layout), its first comment line saying that rules wrote it from the fabulac, so that the rebuilt program can be
+installed and its tests run from the folder; where the survey recorded too little to write one truthfully, it writes
+none and `CSHORT.md` says why. `CSHORT.md`'s first line is the footer, one italic line naming the fabulac, the language,
+the day of the run (in UTC) and the model: "*a cshort of days.fabulac.cosm, in Python, compiled on 2026-11-05 by …*".
+Then come a table of the files written, each with the `C:file` it came from (`rules` for the packaging file) and its
+sha256, what was not rebuilt, why no packaging file was written when none was, and, last, the source's licence line,
+`Licence of the source: <source.licence>` (with none recorded, `Licence of the source: not recorded (<the open
+question>)`). A compile is recorded in the fabulac's `shorts:` (section 18.4.1). One fabulac may be told in another
+language than its source's; the entry's `language` names the cshort's own.
 
 A compile passes these checks, all without executing anything:
 
@@ -2810,7 +2822,7 @@ A compile passes these checks, all without executing anything:
 |---|---|
 | `parses` | every rebuilt file in a programming language is parsed by that language's parser with no syntax error. Parsing is not running: nothing is imported, compiled to disk or executed |
 | `interfaces-present` | every `C:interface` of the fabulac is defined in the cshort's file it is `defined-in`, with the same name, the same surface and the same parameter names in the same order |
-| `files-present` | the cshort holds every file it is required to rebuild, at its path, and the digests `CSHORT.md` lists are the files' |
+| `files-present` | the cshort holds every file it is required to rebuild, at its path, and the packaging file rules write whenever the fabulac records enough for one, exactly as they write it; and the digests `CSHORT.md` lists are the files' |
 | `footer` | `CSHORT.md`'s first line is the footer, naming the fabulac's file, the language, the day of the run (in UTC) and the model; its last line is the licence line, agreeing with `source.licence` |
 | `provenance` | the compile is recorded in `shorts:` with `path`, `at`, `by`, `mode`, `order: code`, `route`, `language` and `files`, and the footer names the run |
 
@@ -2912,17 +2924,17 @@ derived:
   by: person
   model: g40-04
   route: local
-  program: decompile-python.thym
+  program: raise-the-questions
   run: 2026-11-05-1521-9e07
   mode: model
   completeness: full
   chunks: 1
   runs:
-    - {program: decompile-python.thym, run: 2026-11-05-1512-0b31, at: 2026-11-05T15:12:03Z}
-    - {program: decompile-python.thym, run: 2026-11-05-1512-7c20, at: 2026-11-05T15:12:05Z}
-    - {program: decompile-python.thym, run: 2026-11-05-1513-41aa, at: 2026-11-05T15:14:52Z, model: g40-04, route: local}
-    - {program: decompile-python.thym, run: 2026-11-05-1515-d3f8, at: 2026-11-05T15:18:30Z, model: vendor/large-model, route: cloud, provider: broker-name}
-    - {program: decompile-python.thym, run: 2026-11-05-1521-9e07, at: 2026-11-05T15:21:40Z, model: g40-04, route: local}
+    - {program: survey-the-repo, run: 2026-11-05-1512-0b31, at: 2026-11-05T15:12:03Z}
+    - {program: read-the-history, run: 2026-11-05-1512-7c20, at: 2026-11-05T15:12:05Z}
+    - {program: read-every-file, run: 2026-11-05-1513-41aa, at: 2026-11-05T15:14:52Z, model: g40-04, route: local}
+    - {program: fold-the-whole, run: 2026-11-05-1515-d3f8, at: 2026-11-05T15:18:30Z, model: vendor/large-model, route: cloud, provider: broker-name}
+    - {program: raise-the-questions, run: 2026-11-05-1521-9e07, at: 2026-11-05T15:21:40Z, model: g40-04, route: local}
 atem:
   line: days prints how many whole days lie between today, or a date you give, and another date, as a phrase or as a bare number.
   focus: One command that reads one or two dates written YYYY-MM-DD and says the distance between them in days.
@@ -3183,6 +3195,8 @@ The first lines of its cshort's `CSHORT.md`:
 | days.py | C:file/days-py | <the sha256 of the file as written> |
 
 Not rebuilt: LICENSE (its licence is named below).
+
+No packaging file was written: the fabulac does not record the project's name (its survey read no packaging file that names one).
 ```
 
 Its catem at depth `overview`, `days.catem-2026-11-05-1532.md`:
@@ -3616,7 +3630,7 @@ provenance.
 | `with` | `{to, who}`: the answerer's word from `to`, and a plain description of them. Never a name where the format forbids one (Ascribe, Comprise OES) |
 | `through` | `person` (a person at a screen) or `agent` (an agent putting one or two questions at a time) |
 | `model` | the agent's model, when `through: agent` |
-| `covers` | `{part, module}`: the part and the module the session was about, or `*` |
+| `covers` | `{part, module}`: the part and the module the session was about; a sitting across the whole volume is `{module: '*'}`, with no `part` |
 | `asked`, `answered`, `skipped` | the session's questions, each in the order it happened: references to `D:question` items, or, where a format asks from a bank without writing question items, the addresses asked, `<item id>#<field path>` |
 
 **Closed lists.** `why`, `kind`, `state` (of a question) and `through` (of a session) are closed, as above; a value
@@ -3633,7 +3647,9 @@ folder volume, in module files in the place the manifest gives module D, in the 
 layout puts each module in a folder named by its letter, that folder is `D`. A question about an item of another part
 names it by its qualified id (section 6.4). A MiniCOSM's own specification may say where its volumes keep these items:
 Comprise OES keeps each session as a record under its catalog's `sessions:` and writes no question items, asking each
-bank question of a field directly (Comprise OES (https://comprise.cosmoes.org/), its section 8).
+bank question of a field directly (Comprise OES (https://comprise.cosmoes.org/), its section 8). An answer to such an
+address, asked without a question item, reaches an answers volume as an entry `{about, answers}` (Thym
+(https://thym.cosmoes.org/), its section 22.2).
 
 #### 18.6.3 The life of a question
 
@@ -3664,7 +3680,7 @@ not written again: the new decompile reads the source afresh, and an open questi
 
 | `kind` | Written into a field | When `about` is a module or a kind |
 |---|---|---|
-| `text` | the answer, a string | a new item of the kind the bank entry `writes` (or, where the entry names none, the module's first kind; section 18.6.6): `name` its first words, `summary` the answer, where the kind requires a stance, `stance: hearsay`, and every other field the kind requires, which the answer cannot fill, as an open question, `{pending: "what is the <field> of this <kind>?"}` (section 10), for a later run to ask |
+| `text` | the answer, a string | a new item of the kind the bank entry `writes` (or, where the entry names none, the module's kind named like the entry's id, where it has one, else the module's first kind; section 18.6.6): `name` its first words, `summary` the answer, where the kind requires a stance, `stance: hearsay`, and every other field the kind requires, which the answer cannot fill, as an open question, `{pending: "what is the <field> of this <kind>?"}` (section 10), for a later run to ask |
 | `choice` | one of `options` (or an open word where `options-open`) | as `text` |
 | `yes-no` | `true` or `false` | not allowed: a yes-no question is always about a field |
 | `number` | a number inside `range` | not allowed |
@@ -3715,8 +3731,10 @@ The two are one thing in two lengths. `{pending: "…"}` (section 10) stays the 
 would go, and every reader that lists open questions keeps working. A `D:question` is its long form: the same open
 question with an address, an answerer, a reason, a shape and a record of what was said. A question raised about a
 pending field is `about: <item>#<field>`, `why: missing`, `kind: text`, and `asks` the pending text with its first
-letter capitalised. Settling an answer replaces the pending value; settling "I don't know" rewrites it in the person's
-words. A volume may hold either form, or both for one field, and neither is ever an error.
+letter capitalised when it is a question; words that are not become one, made from the field and the item's name, with
+the words as its `hint` (`What is the reason for "Not thread-safe"?`). Settling an answer replaces the pending value;
+settling "I don't know" rewrites it in the person's words. A volume may hold either form, or both for one field, and
+neither is ever an error.
 
 An item below confidence 0.5, or whose `provenance.state` is `pending`, raises one question about the whole item:
 `why: unsure`, `kind: text`, asking whether the item is right and, if not, what is, with its summary quoted. An item
@@ -3732,7 +3750,7 @@ of the format before anything else is known.
 dialectic:
   writes: <one line: what an answer writes>
   answer-kinds: [text, choice, yes-no, number, date, ref, span]
-  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes]
+  entry-fields: [id, about, asks, kind, options, to, why, many, hint, writes, only-with, at-most]
   banks:
     <bank name>:
       for: {flavour: fabulap}                # or {module: S}, or nothing: the whole format
@@ -3744,14 +3762,26 @@ dialectic:
 ```
 
 An entry's `about` names a module (`I`: asked once of the volume), a kind (`C:voice`: asked of each item of that kind)
-or a kind's field (`C:voice#roles.speaker`: asked of each item where the field is absent or pending). `{name}`, and any
-`{<field>}`, are filled from the item when the question is raised. A raised question's `raised.from` is
-`<bank name>/<entry id>`. An entry about a module may say `writes`: the kind (`<kind>` of that module, or
-`<M>:<kind>`) that a new item written from its answer takes; absent, the module's first kind (section 18.6.4).
+or a kind's field (`C:voice#roles.speaker`: asked of each item where the field is absent or pending). An entry about a
+kind whose words fill nothing from the item (no `{name}` and no `{<field>}`) is asked once of the volume, about the
+kind's module, when the volume holds an item of that kind: a question that would be asked alike of each test case is one
+question. An entry may bound itself: `only-with: <field>` asks it only of an item whose field holds a value, and
+`at-most: <n>` of at most n items, those a person can best speak to: a command first, then a public name at the top of
+its module, then a public method, never first a private, dunder or abstract one; a setting a user sets before a
+constant; a change whose words say something before a release or a change-log entry; within that, what the reading
+marked unsure, then what carries an edge; ties to the newest. A field entry is not asked of an item that holds a pending
+of that field's name: the pending asks it. `{name}`, and any `{<field>}`, are filled from the item when the question is
+raised. A raised question's `raised.from` is `<bank name>/<entry id>`. An entry about a module may say `writes`: the
+kind (`<kind>` of that module, or `<M>:<kind>`) that a new item written from its answer takes; absent, the module's kind
+named like the entry's id (an entry `audience` about N writes an `N:audience`), where the module has one, else the
+module's first kind (section 18.6.4).
 
 **The older shape** keeps reading: `dialectic: {questions: {<letter>: ["…", …]}}` is one bank, named after the
 manifest, each string an entry `{about: <letter>, asks: <the string>, kind: text, why: missing}` with the bank's
 default answerer. A manifest may hold either shape, and a reader reads both.
+
+A bank may keep its questions in a file of the format's own, named in `from: <file>` in place of `questions`; a
+reader that does not have the file reads the bank as one with no questions.
 
 **Each format carries its own banks.** The fabula carries one bank per flavour (section 18.4). Ascribe's opening
 questions are a bank (Ascribe (https://ascribe.cosmoes.org/), its section 8), and so are Comprise OES's, module by
@@ -3782,9 +3812,11 @@ on any other: `closed-list` on the four closed lists, `ref-unresolved` on the re
 
 #### 18.6.9 An example
 
-The twin of `guides/close.md` (section 18.4.5) after one session, cut to four items and the dialectic's three. The
-author was asked two questions from the fabulan bank, answered one and skipped the other, and a second run settled the
-answer into `N:audience/owners`; `derived.runs` lists that run beside the decompile, whose single keys stand.
+The twin of `guides/close.md` (section 18.4.5) after one session, cut to four items and three of the dialectic's.
+The decompile's run raised the questions by rules, among them one from the pending value of the occasion's event and
+one from the fabulan bank's `audience` entry, which is about module N and so is asked once of the volume. The author
+was asked those two, answered the first and skipped the second, and a second run settled the answer into
+`I:occasion/why-written`; `derived.runs` lists that run beside the decompile, whose single keys stand.
 
 ```cosm
 oes: fabula/1
@@ -3798,14 +3830,14 @@ derived:
   by: person
   model: g40-04
   route: local
-  program: decompile-prose.thym
+  program: decompile-prose
   run: 2026-11-05-1002-a1c4
   mode: model
   completeness: full
   chunks: 1
   runs:
-    - {program: decompile-prose.thym, run: 2026-11-05-1002-a1c4, at: 2026-11-05T10:02:11Z, model: g40-04, route: local}
-    - {program: settle.thym, run: 2026-11-05-1031-b7e0, at: 2026-11-05T10:31:02Z}
+    - {program: decompile-prose, run: 2026-11-05-1002-a1c4, at: 2026-11-05T10:02:11Z, model: g40-04, route: local}
+    - {program: settle-the-answers, run: 2026-11-05-1031-b7e0, at: 2026-11-05T10:31:02Z}
 atem:
   line: Meadow closes each customer's books overnight once the bank feeds arrive, locks the day, and retries a failed close before anyone opens the summary.
   focus: How Meadow's overnight close works, what it guarantees, and what it waits on.
@@ -3817,9 +3849,14 @@ nodes:
     name: Why the guide was written
     summary: Nothing in the text says what prompted Meadow to write the guide.
     stance: assumed
-    roles: {event: {pending: "what prompted this guide: a support question, a failed close, a launch?"}}
+    roles: {event: an owner's call to support about a late morning summary}
     span: {lines: "1"}
-    provenance: {mode: derived, sources: ['close.md#L1'], confidence: 0.3, state: pending}
+    provenance:
+      mode: derived
+      sources: ['close.md#L1', D:session/session-1]
+      confidence: 0.3
+      state: pending
+      answered: {roles.event: {sources: [D:session/session-1], confidence: 0.9}}
   - id: K:concept/close
     type: concept
     name: the close
@@ -3839,69 +3876,70 @@ nodes:
     provenance: {mode: derived, sources: ['close.md#L4'], confidence: 0.9, state: known}
   - id: N:audience/owners
     type: audience
-    name: Restaurant owners, then support staff
-    summary: The guide is written for the restaurant owners who read the morning summary; Meadow's support staff read it too.
-    stance: hearsay
-    who: restaurant owners who are Meadow's customers, and Meadow's support staff
+    name: Restaurant owners
+    summary: The guide is written for the restaurant owners who read the morning summary.
+    stance: deduced
+    who: restaurant owners who are Meadow's customers
     span: {lines: "5"}
-    provenance:
-      mode: derived
-      sources: ['close.md#L5', D:session/session-1]
-      confidence: 0.9
-      state: known
-      answered: {summary: {sources: [D:session/session-1], confidence: 1}, who: {sources: [D:session/session-1], confidence: 1}}
+    provenance: {mode: derived, sources: ['close.md#L5'], confidence: 0.8, state: known}
   - id: D:question/audience
     type: question
-    about: N:audience/owners
-    asks: Whom did you write the guide for?
+    about: N
+    asks: Whom did you write it for?
     why: missing
     kind: text
     to: author
     raised: {by: bank, from: fabulan/audience, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
-    state: answered
-    answers:
-      - {at: 2026-11-05T10:20:40Z, by: author, says: "For owners first. Support reads it too, so they say the same thing on the phone.", value: "restaurant owners who are Meadow's customers, and Meadow's support staff", confidence: 1, session: D:session/session-1}
-    settled: {at: 2026-11-05T10:31:02Z, run: 2026-11-05-1031-b7e0, wrote: ['N:audience/owners#summary', 'N:audience/owners#who']}
-  - id: D:question/occasion
+    state: open
+  - id: D:question/why-written-roles-event
     type: question
     about: I:occasion/why-written#roles.event
-    asks: What prompted this guide?
+    asks: "What prompted this guide: a support question, a failed close, a launch?"
     why: missing
     kind: text
     to: author
-    raised: {by: bank, from: fabulan/occasion, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
-    state: open
+    raised: {by: move, from: question, at: 2026-11-05T10:02:11Z, run: 2026-11-05-1002-a1c4}
+    state: answered
+    answers:
+      - {at: 2026-11-05T10:20:40Z, by: author, says: "An owner rang support asking why her summary was late, twice in a week.", value: an owner's call to support about a late morning summary, confidence: 0.9, session: D:session/session-1}
+    settled: {at: 2026-11-05T10:31:02Z, run: 2026-11-05-1031-b7e0, wrote: [I:occasion/why-written#roles.event]}
   - id: D:session/session-1
     type: session
     at: 2026-11-05T10:18:05Z
     with: {to: author, who: Meadow's head of support}
     through: person
-    asked: [D:question/audience, D:question/occasion]
-    answered: [D:question/audience]
-    skipped: [D:question/occasion]
+    asked: [D:question/audience, D:question/why-written-roles-event]
+    answered: [D:question/why-written-roles-event]
+    skipped: [D:question/audience]
 ```
 
-The skipped question stays open, and the occasion's own pending value stands beside it: the inline form and the long
-form of one open question. `N:audience/owners` keeps `mode: derived`, because the text first showed its audience; the
-two fields the author gave name the session in `provenance.answered`. Loaded against the fabula's manifest, the volume
-passes every generic check and the three of section 18.6.8, with one open question listed.
+The answered question was the long form of the occasion's pending value: settling it replaced the pending value
+with the answer. `I:occasion/why-written` keeps `mode: derived`, its confidence and its `state: pending`, because the
+text did not show its occasion; the field the author gave names the session in `provenance.answered`, so the next run
+of `question` asks whether the item as a whole is right (section 18.6.5). The skipped question stays open. Had the
+author answered it, `settle` would have written a new `N:audience` item from the answer (section 18.6.4), beside the
+one the reading found. Loaded against the fabula's manifest, the volume passes every generic check and the three of
+section 18.6.8, with one question open.
 
 ### 18.7 thym: Thym's volumes
 
 <!-- atem: Thym's programs, morphs, contexts, plans, traces and packages, one file each -->
 **What it enumerates.** What Thym, the transcognition language that connects OESes, reads and writes. `thym/1` is a
-built-in of the core, specified in Thym's own text and never a MiniCOSM. A `thym/1` volume is one of six kinds: a **program** volume, the enumeration of one `.thym` file, compiled back byte for
-byte; a **morph** volume of style sheets, measured against the null morph or declared by hand on ten scales; a
-**context** volume of occasions; a **plan**, what a program will do before it does it; a **trace**, what a run did, one
-record per node; and a **package**, the catalog of a text's self-contained export. The full specification is Thym
+built-in of the core, specified in Thym's own text and never a MiniCOSM. A `thym/1` volume is one of seven kinds: a
+**program** volume, the enumeration of one `.thym` file, compiled back byte for byte; a **morph** volume of style
+sheets, measured against the null morph or declared by hand on ten scales; a **context** volume of occasions; a
+**plan**, what a program will do before it does it; a **trace**, what a run did, one record per node; a **package**, the
+catalog of a text's self-contained export; and a **folder**, a run's snapshot of a folder it took, every file's digest
+and every text file's bytes, so that the run replays without the folder. The full specification is Thym
 (https://thym.cosmoes.org/), its section 17, which this section summarizes.
 
 **Its declaration.** `oes: thym/1`. There is no legacy form, and a catalog without the key is refused.
 
-**Its volume.** One file (`volume.single-file: true`), whose catalog's `kind` says which of the six it is:
+**Its volume.** One file (`volume.single-file: true`), whose catalog's `kind` says which of the seven it is:
 `<name>.thym.cosm` beside a program, `<name>.morph.cosm`, `<name>.context.cosm`, `<run-id>.plan.cosm`,
-`<run-id>.trace.cosm` (both under the implementation's Thym root by default), and `package.cosm` inside a
-package's folder or `<name>.package.cosm` beside its text.
+`<run-id>.trace.cosm` (both under the implementation's Thym root by default), `package.cosm` inside a
+package's folder or `<name>.package.cosm` beside its text, and `inputs/<name>.folder.cosm` inside a run's folder. A
+folder snapshot's catalog adds the keys `path`, `tree`, `commit`, `origin`, `files` and `texts`, and holds no items.
 
 **Its modules and kinds.**
 
@@ -4248,8 +4286,9 @@ disagreed and one was corrected, the entry says which.
    18.6).
 7. **The manifest's new keys.** `core`; `declaration.old`, with the reader reporting a catalog identified `old`;
    `catalog.id-old`; a kind's `flavours` and per-kind `closed` lists; `checks.own` as a list, each own check listed as
-   not run by a reader that does not run it; `dialectic`; and the core's module D, declared once in
-   `core.modules.cosm`. A reference may be an address, an id with `#` and a field path. Two generic checks are added,
+   not run by a reader that does not run it; `dialectic`; and the core's module D, declared once in `core.modules.cosm`.
+   `thym/1` gains a seventh kind of volume, `folder`, a run's snapshot of a folder it took, with its own catalog keys
+   (section 18.7). A reference may be an address, an id with `#` and a field path. Two generic checks are added,
    `flavour` and `flavour-kind`. The registry order is `comprise`, `cosm`, `canon`, `fabula`, `doc`, then any other by
    name, and the registry keeps the built-ins and the MiniCOSMs as two lists (sections 7.3, 9.1, 12.2, 12.3 and 13).
 8. **Every table that lists formats lists every format,** grouped as the core's built-ins and the MiniCOSMs: sections

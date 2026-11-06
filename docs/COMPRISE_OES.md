@@ -945,9 +945,9 @@ file inside the Holotype, relative to its root and written with `/`, conventiona
 volume, never an item, and it never leaves the Holotype.
 
 - **Checked** (`codebase-fabula`): the file must be there, inside the Holotype, load, and declare `oes: fabula/1` with
-  `flavour: fabulac` (an error otherwise). When the source folder the fabulac describes is present, the fabulac must be
-  fresh against it, its tree digest unchanged (a warning when it is stale). With no folder present, freshness is not
-  judged.
+  `flavour: fabulac` (an error otherwise). When the source folder the fabulac describes is present (the folder its
+  `source.path` names, relative to the fabulac's file), the fabulac must be fresh against it, its tree digest unchanged
+  (a warning when it is stale). With no folder present, freshness is not judged.
 - **Shown.** A reader shows the fabulac's atem line beside the codebase, under the codebase's visibility (4.2). No other
   part of the fabulac is rendered from the Holotype.
 - **Read, never built.** Comprise OES reads a fabulac; it does not build one. A fabulac is made by decompiling the
@@ -1264,16 +1264,17 @@ person what a source means and recording what they say, as MacroCOSM OES (https:
 its section 18.6, defines it. What Comprise OES adds to it:
 
 - **The banks.** Comprise OES's question banks are the dialectic banks of its manifest (its `dialectic:` key, read as
-  the core reads every manifest's banks): one bank per module, each question about a field of one or more kinds,
-  asked of the item with the most left to fill in. A bank may also hold a *counter* per check: the question to put
-  when that check refuses an answer.
+  the core reads every manifest's banks), each kept in a file of Comprise OES's own that the bank names in `from:`, so a
+  reader without those files reads banks with no questions: one bank per module, each question about a field of one or
+  more kinds, asked of the item with the most left to fill in. A bank may also hold a *counter* per check: the question
+  to put when that check refuses an answer.
 - **The sitting.** One elicitation sitting is one session of the dialectic, written as a `D:session` record in the
-  catalog's `sessions:` (2.2). Its id keeps the spelling `elicit-<date>-<hex>` (`D:session/elicit-2026-11-02-a3f9`),
-  and the catalog's `sources:` declares the same id as a source, as before; the record sits beside that declaration
-  and does not replace it. The record holds `at` (when the sitting began), `with: {to, who}` (`to` the role answering
-  or `owner`; `who` a plain description, never a name), `through` (`person` or `agent`), `model` (the model that
-  parsed or rephrased answers, when one did), `covers: {part, module}` (the concern, and the module's letter, or `*`
-  for a sitting across the Holotype), and `asked`, `answered` and `skipped`: the fields put to the person, each as
+  catalog's `sessions:` (2.2). Its id keeps the spelling `elicit-<date>-<hex>` (`D:session/elicit-2026-11-02-a3f9`), and
+  the catalog's `sources:` declares the same id as a source, as before; the record sits beside that declaration and does
+  not replace it. The record holds `at` (when the sitting began), `with: {to, who}` (`to` the role answering or `owner`;
+  `who` a plain description, never a name), `through` (`person` or `agent`), `model` (the model that parsed or rephrased
+  answers, when one did), `covers: {part, module}` (the concern, and the module's letter; a sitting across the Holotype
+  is `{module: '*'}`, with no `part`), and `asked`, `answered` and `skipped`: the fields put to the person, each as
   `atom/<concern>//<id>#<field path>`.
 - **Ask, check, commit.** A question is put to one field. The answer becomes the field's value, and the write goes
   through the checks (section 9): a write that would add an error is undone, and the bank's counter for that check is
@@ -1637,7 +1638,8 @@ which was corrected.
    MacroCOSM OES, an OES: the shared grammar and its core, which holds the formats built into every reader, the
    densities and the dialectic; Thym is
    named the transcognition language that connects OESes (the lead and 11.3). The status paragraph names the steward.
-2. **Elicitation is the dialectic** (section 8). The question banks are the dialectic banks of the manifest. A sitting
+2. **Elicitation is the dialectic** (section 8). The question banks are the dialectic banks of the manifest, each kept in
+   a file of Comprise OES's own that the bank names in `from:`. A sitting
    is a session of the dialectic, written as a `D:session` record in the catalog's new `sessions:` (2.2) beside the
    source the catalog already declares for it, its id still spelled `elicit-<date>-<hex>`; ask, check and commit, "I
    don't know" and who is asked are said against the core's primitive. Provenance written before,

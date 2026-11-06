@@ -13,8 +13,8 @@ Ascribe is one of the two MiniCOSMs, the domain OESes with a specification of th
 (https://comprise.cosmoes.org/), for companies, is the other. Both are written in MacroCOSM OES
 (https://macro.cosmoes.org/), an OES: the shared grammar and its core, which holds the formats built into every
 reader, the densities and the dialectic; its words (item, kind, volume, catalog, module, check, lens, open question, question, session) keep
-their meaning here. Thym (https://thym.cosmoes.org/) is the transcognition language that connects OESes: what leaves a
-holograph leaves by a Thym program its holder runs. Comprise describes companies and Ascribe describes people, in the
+their meaning here. Thym (https://thym.cosmoes.org/) is the transcognition language that connects OESes: an isograph
+leaves a holograph by a Thym program its holder runs. Comprise describes companies and Ascribe describes people, in the
 same grammar and with the same envelope, so that one set of moves works on both.
 
 **Status.** Normative for `ascribe/1`. The declaration is the manifest, `ascribe.manifest.cosm`. The reference
@@ -121,7 +121,8 @@ changed.
 - Nothing about the person that would identify them has a place in the schema. A check warns on what reads like it,
   and a filter keeps private files and restricted nodes out of everything that leaves (section 11).
 - The holograph stays with its holder. What leaves it, as an isograph, a cryptograph, match tokens or an isomorph,
-  leaves by a Thym program the holder runs (section 14), and each release is recorded in the holograph (section 13).
+  leaves by the holder's act: an isograph by a Thym program the holder runs, the others made by the implementation
+  (section 14); each release is recorded in the holograph (section 13).
 
 ---
 
@@ -699,7 +700,7 @@ nothing is in a package's `graph.cosm` without a release recorded in the hologra
 | `epoch` | the epoch the release carries: a quarter (`2026-Q4`), a month (`2026-11`) or a week (`2026-W45`), never the day of an edit | yes |
 | `as` | what left: `isograph`, `cryptograph`, `tokens` or `isomorph` | yes |
 | `program` | `{name, sha256}`: the program that made it, and the sha256 of its `.thym` bytes | yes |
-| `trace` | `{run, sha256}`: the run's id, and the sha256 of its cleaned trace, which stays on the holder's machine | yes |
+| `trace` | `{run, sha256}`: the run's id, and the sha256 of its trace file as the run wrote it, which stays on the holder's machine | yes |
 | `at` | when the release was made: a timestamp, kept in the holograph and never in what left | yes |
 | `sha256` | the sha256 of the bytes that left: the isograph's canonical JSON, the sealed file, the token list or the morph volume | yes |
 | `items` | the ids of the holograph's items that left, sorted, and for an isomorph the morph's id (`M:morph/<slug>`); `all` for a cryptograph of the whole holograph | yes |
@@ -730,8 +731,10 @@ its holder releases something.
 ## 14. Projections: the isograph, the cryptograph, match tokens, morphs
 
 <!-- atem: what may leave a holograph, in what shape, and by whose act -->
-What leaves a holograph leaves by a Thym program its holder runs, after the private filter (section 11), and is
-recorded as a release (section 13). Every projection keeps four rules:
+What leaves a holograph leaves by its holder's act, after the private filter (section 11), and is recorded as a release
+(section 13). In this edition an isograph is made by a Thym program the holder runs ([Thym](https://thym.cosmoes.org/),
+its section 18); a cryptograph, an isomorph and match tokens are made by the implementation at the holder's act, and
+Thym moves for them are reserved for a later edition. Every projection keeps four rules:
 
 1. **Default-deny.** Only what this section names may appear; anything else is refused, never filtered.
 2. **Withhold, never falsify.** What does not leave leaves no mark: no placeholder, no gap, no count.
@@ -822,8 +825,8 @@ one chosen party. It is, for a person, the sealed package of [Comprise OES](http
 
 - **Two kinds.** *The whole holograph*: one `holograph` row per file the filter keeps, at its own path, module D left
   out. *A projection*: `projection` (`projection.json`, an `ascribe-isograph/0` document), `program` (`program.thym`)
-  and `trace` (`trace.cosm`, the cleaned trace). Nothing else is a cryptograph: no key, no morph's evidence, nothing the
-  filter withholds.
+  and `trace` (`trace.cosm`, the run's trace as the run wrote it). Nothing else is a cryptograph: no key, no morph's
+  evidence, nothing the filter withholds.
 - **The seal.** The cipher of Thym's encrypted form under a fresh data key for the package; its catalog's `hid` is a
   random id of its own, never the holograph's, so that a cryptograph cannot be joined to the holder's isograph.
 - **The key** is shown once, stored nowhere, and handed by the holder to the party of their choosing. A lost key is a
