@@ -99,8 +99,10 @@ SAME_IN_EVERY_LANGUAGE = frozenset(s.casefold() for s in (
     # `Thym` and `Ascribe` (0.5.0, lane X2: the docs viewer's launchers for
     # their two specifications) are names like MacroCOSM.
     # `Comprise OES` (0.5.4: the fourth specification's launcher) is a name like the three before it.
+    # `cshort` and `catem` (0.6, pins P0: a fabulac's short and its atem at a
+    # depth) are product words like short and atem, lowercase in every language.
     "enough", "wikisink", "canon", "girraph", "merirmaid", "MacroCOSM", "atem", "short",
-    "fabula", "MiniCOSMs", "Thym", "Ascribe", "Comprise OES",
+    "fabula", "MiniCOSMs", "Thym", "Ascribe", "Comprise OES", "cshort", "catem",
     "composure", "readvisor", "readvisors", "rness", "broker", "infoworld",
     "OpenRouter", "MADLAD", "Wikipedia", "markdown", "PDF", "HTML",
     "URL", "AGENT.md", "MOTIVATION.md", "FEED",
@@ -122,6 +124,7 @@ COGNATES: dict[str, frozenset[str]] = {
         "modules",          # …and its plural
         "holotype",         # the French term (taxonomy, and Comprise's word)
         "agent",            # "un agent" — the slider's word (agentmode.agent, 0.4.4)
+        "prose",            # "la prose" — a text's flavour, fabulan (fab.fl.prose, 0.6)
     )),
     "es": frozenset((
         "roles",            # plural of "rol"

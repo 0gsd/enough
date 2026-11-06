@@ -37,7 +37,8 @@ from .screens import (ATEM_READY, CANON_CHIP_READY, CANON_VOLUME, CARDS_READY,
                       DICT_PLAIN, DICT_READY, DOC, EMF_PASSAGE, EMF_TEXT,
                       GIRRAPH, HARVEST, HOLOTYPE, JOURNAL_READY, LEDGER, PRESS,
                       THYM_BAND_READY, THYM_MORPH, THYM_READING, THYM_READING_FOOTER,
-                      THYM_RULES_PROGRAM, THYM_SEALED, WDL_READY)
+                      THYM_RULES_PROGRAM, THYM_SEALED, WDL_READY,
+                      FAB_CSHORT, FAB_POEM, FAB_TINY, FAB_TOOL, FAB_READY, FABV_READY)
 
 Scenario = Callable[[Driver], list[str]]
 
@@ -59,6 +60,7 @@ def _reset(d: Driver) -> None:
     d.js("(() => { try { atemCardClose(); } catch (e) {} return true; })()")
     d.js("(() => { try { thymPickClose(); } catch (e) {} return true; })()")
     d.js("(() => { try { thymPackClose(true); } catch (e) {} return true; })()")
+    d.js("(() => { try { fabCardClose(); fabViewClose(); } catch (e) {} return true; })()")
     d.js("(() => { document.querySelectorAll('[id$=\"-modal\"]').forEach("
          "(m) => m.classList.add('hidden'));"
          " document.getElementById('confirm-cancel')?.click();"
@@ -3308,7 +3310,7 @@ def _select_text(d: Driver, root_sel: str, text: str) -> dict | None:
 
 def _emf_items(d: Driver, path: str, letter: str) -> int:
     """How many items module `letter` of `path`'s EMF twin holds (0: no twin)."""
-    return int(d.js_await("(async () => { const r = await fetch('/api/canon/emf?path=' + encodeURIComponent("
+    return int(d.js_await("(async () => { const r = await fetch('/api/fabula/twin?path=' + encodeURIComponent("
                           + json.dumps(path) + ")); if (!r.ok) return 0; const j = await r.json();"
                           " const m = (j.cosm.modules || []).find((x) => x.letter === " + json.dumps(letter)
                           + "); return m ? m.count : 0; })()") or 0)
@@ -3467,7 +3469,7 @@ def scenario_atem_pin(d: Driver) -> list[str]:
 
 def _short_count(d: Driver, text: str) -> int:
     """How many shorts the text's EMF twin records (its catalog's `shorts:` list)."""
-    return int(d.js_await("(async () => { const r = await fetch('/api/canon/emf?path=' + encodeURIComponent("
+    return int(d.js_await("(async () => { const r = await fetch('/api/fabula/twin?path=' + encodeURIComponent("
                           + json.dumps(text) + ")); if (!r.ok) return -1; const j = await r.json();"
                           " const s = (j.cosm.catalog || {}).shorts; return Array.isArray(s) ? s.length : 0; })()")
                or 0)
@@ -3546,6 +3548,177 @@ def scenario_compile_short(d: Driver) -> list[str]:
          " if (t) t.querySelector('.ct-btn').click(); })()")
     if not _wait_js(d, "typeof RE_PATH === 'string' && /press\\.short-/.test(RE_PATH)"):
         fails.append("\"open\" did not show the short in read/edit")
+    _reset(d)
+    return fails
+
+
+# ---------------------------------------------------------------------------
+# 0.6 (U1a): the fabula card, a fabulac built by rules, a cshort read
+# ---------------------------------------------------------------------------
+
+def _fab_card(d: Driver) -> dict:
+    return d.js("(() => ({open: !document.getElementById('fabula-modal').classList.contains('hidden'),"
+                " face: FAB.face, flavour: FAB.flavour, suggested: FAB.suggested,"
+                " checked: (document.querySelector('#fab-main input[name=\"fab-fl\"]:checked') || {}).value || null,"
+                " cloud: !!document.querySelector('#fab-route-box input[value=\"cloud\"]'),"
+                " line: (document.querySelector('#fab-route-box .fab-model-line') || {}).textContent || '',"
+                " go: document.getElementById('fab-go').textContent,"
+                " focusIn: document.getElementById('fabula-modal').contains(document.activeElement)}))()") or {}
+
+
+def scenario_fabula_decompile_card(d: Driver) -> list[str]:
+    """A poem with no twin: "decompile" opens the card, not a job → verse is
+    preselected as the suggestion → the model line says here and offers no
+    cloud (the gate is shut here) → Esc closes it and nothing was written →
+    open again, decompile → by rules the twin lands under the verse name,
+    declared a fabulap → the call went to /api/fabula/derive with route local."""
+    fails: list[str] = []
+    _reset(d)
+    d.js("(() => { window.__fabCalls = []; if (!window.__fabFetch) { window.__fabFetch = window.fetch;"
+         " window.fetch = (u, o) => { try { window.__fabCalls.push([String(u), o && o.body ? String(o.body) : '']); }"
+         " catch (e) {} return window.__fabFetch(u, o); }; } return true; })()")
+    d.js(f"canonDecompileAsk('{FAB_POEM}', 'absent')")
+    d.js_await(FAB_READY[1])
+    c = _fab_card(d)
+    if not c.get("open") or c.get("face") != "text":
+        fails.append(f"\"decompile\" did not open the fabula card: {c}")
+        _reset(d)
+        return fails
+    if c.get("suggested") != "fabulap" or c.get("checked") != "fabulap":
+        fails.append(f"a poem should be suggested and preselected as verse (fabulap): {c}")
+    if c.get("cloud") or not (c.get("line") or "").strip():
+        fails.append(f"with the gate shut the model line should say here and offer no cloud: {c}")
+    if not c.get("focusIn"):
+        fails.append(f"the card did not take the focus: {c}")
+    before = (_raw(d, FAB_POEM + ".fabulap.cosm"), _raw(d, FAB_POEM + ".fabulan.cosm"))
+    d.key("Escape")
+    _sleep(d, 300)
+    if _fab_card(d).get("open"):
+        fails.append("Esc did not close the fabula card")
+    if (_raw(d, FAB_POEM + ".fabulap.cosm"), _raw(d, FAB_POEM + ".fabulan.cosm")) != before:
+        fails.append("closing the card wrote a twin")
+    d.js(f"canonDecompileAsk('{FAB_POEM}', 'absent')")
+    d.js_await(FAB_READY[1])
+    d.click("#fab-go")
+    if not _wait_js(d, "Array.from(document.querySelectorAll('#convert-toasts .convert-toast.state-done')).length > 0", 20000):
+        fails.append("no toast said the fabula was written")
+    twin = None
+    for _ in range(40):
+        twin = _raw(d, FAB_POEM + ".fabulap.cosm")
+        if twin:
+            break
+        _sleep(d, 250)
+    if not twin or "oes: fabula/1" not in twin or "flavour: fabulap" not in twin:
+        fails.append(f"the verse twin did not land as a fabulap: {(twin or '')[:120]!r}")
+    calls = d.js("window.__fabCalls") or []
+    derive = [b for u, b in calls if "/api/fabula/derive" in u]
+    if not derive or '"route":"local"' not in derive[-1] or '"what":"fabula"' not in derive[-1]:
+        fails.append(f"the decompile did not go to /api/fabula/derive with what fabula and route local: {derive}")
+    if any("/api/canon/derive" in u or "/api/canon/emf" in u or "/api/canon/compile" in u for u, _ in calls):
+        fails.append("the page still called a retired /api/canon/ route")
+    _reset(d)
+    return fails
+
+
+def scenario_fabulac_build_outline(d: Driver) -> list[str]:
+    """A folder of Python: its option-click menu offers "build its fabulac…"
+    → the card says there is none yet → build: no model here, so the job
+    lands the outline (survey and history) and says, in the job's words,
+    what waits → the stages read two landed → "take up again" is offered →
+    "open the fabulac" opens it in the cosm viewer, which offers "build and
+    compile…" and says it is an outline."""
+    fails: list[str] = []
+    _reset(d)
+    d.js("(() => { showTreeContextMenu(40, 40, {kind: 'dir', path: %s, name: 'tiny-tool'}); return true; })()"
+         % json.dumps(FAB_TINY))
+    item = d.js("(() => { const b = document.querySelector('#tree-context-menu [data-act=\"fab-build\"]');"
+                " return b ? b.textContent : null; })()")
+    if not item:
+        fails.append("a folder's menu has no \"build its fabulac…\"")
+        d.js("hideTreeContextMenu()")
+        d.js(f"fabFolderOpen('{FAB_TINY}')")
+    else:
+        d.click('#tree-context-menu [data-act="fab-build"]')
+    d.js_await(FAB_READY[1])
+    first = d.js("(() => ({open: FAB.open, exists: FAB.build && FAB.build.exists, landed: FAB.build && FAB.build.landed,"
+                 " go: document.getElementById('fab-go').textContent}))()") or {}
+    if not first.get("open"):
+        fails.append(f"the fabulac card did not open: {first}")
+        _reset(d)
+        return fails
+    d.click("#fab-go")
+    if not _wait_js(d, "FAB.result !== null || FAB.error !== null", 30000):
+        fails.append("the build did not finish")
+        _reset(d)
+        return fails
+    _wait_js(d, "document.querySelectorAll('#fab-main ol.fab-stages li.landed').length >= 2", 8000)
+    st = d.js("(() => ({error: FAB.error, msg: FAB.result && (FAB.result.message || (FAB.result.refusal || {}).message), refusal: !!(FAB.result && FAB.result.refusal),"
+              " landed: FAB.build && FAB.build.landed, complete: FAB.build && FAB.build.complete,"
+              " marks: Array.from(document.querySelectorAll('#fab-main ol.fab-stages li.landed')).length,"
+              " says: document.querySelector('#fab-main').textContent,"
+              " go: document.getElementById('fab-go').textContent,"
+              " open: !document.getElementById('fab-open').hidden, fabulac: FAB.build && FAB.build.fabulac}))()") or {}
+    if st.get("error"):
+        fails.append(f"the build failed: {st.get('error')}")
+    if st.get("landed") != 2 or st.get("complete") or st.get("marks") != 2:
+        fails.append(f"a build by rules should land survey and history only: {st}")
+    if not st.get("refusal") or not st.get("msg") or st.get("msg") not in (st.get("says") or ""):
+        fails.append(f"the card does not say what waits in the job's words: {st}")
+    if not st.get("open"):
+        fails.append(f"no \"open the fabulac\" once it exists: {st}")
+    d.click("#fab-open")
+    d.wait_for("#cosm-mode.open")
+    d.js_await(COSM_READY[1])
+    cv = d.js("(() => ({btn: !document.getElementById('cosm-fab-btn').hidden,"
+              " outline: !!document.querySelector('#cosm-rail .cosm-scaffold')}))()") or {}
+    if not cv.get("btn") or not cv.get("outline"):
+        fails.append(f"the fabulac in the cosm viewer should offer build and compile… and say it is an outline: {cv}")
+    _reset(d)
+    return fails
+
+
+def scenario_cshort_read(d: Driver) -> list[str]:
+    """A built fabulac's card lists what it made → "open" on the cshort
+    opens the viewer: the line that says enough never runs it, its files;
+    a click on a .py file shows it as text in a <pre> → no control in the
+    viewer offers to run, open a terminal or download → Esc closes the
+    viewer only, and the card under it keeps the focus."""
+    fails: list[str] = []
+    _reset(d)
+    d.js(f"fabFolderOpen('{FAB_TOOL}')")
+    d.js_await(FAB_READY[1])
+    rows = d.js("Array.from(document.querySelectorAll('#fab-compile ul.fab-made-list button[data-fab=\"view\"]'))"
+                ".map((b) => b.dataset.fabPath)") or []
+    if FAB_CSHORT not in rows:
+        fails.append(f"the card does not list the cshort with open: {rows}")
+        d.js(f"fabViewOpen('{FAB_CSHORT}')")
+    else:
+        d.click('#fab-compile button[data-fab="view"][data-fab-path="%s"]' % FAB_CSHORT)
+    d.js_await(FABV_READY[1])
+    d.js("(() => { const b = Array.from(document.querySelectorAll('#fabv-body button[data-fab=\"file\"]'))"
+         ".find((x) => /cli\\.py$/.test(x.dataset.fabPath)); if (b) b.click(); return true; })()")
+    _wait_js(d, "FABV.file && /cli\\.py$/.test(FABV.file) && FABV.text !== null", 8000)
+    v = d.js("(() => { const m = document.getElementById('cshort-modal');"
+             " return {open: !m.classList.contains('hidden'), never: /never runs it/.test(m.textContent) || !!m.querySelector('.fabv-note strong'),"
+             " pre: (m.querySelector('pre.fabv-code') || {}).textContent || '',"
+             " files: m.querySelectorAll('button[data-fab=\"file\"]').length,"
+             " risky: Array.from(m.querySelectorAll('button, a')).map((b) => b.textContent.trim().toLowerCase())"
+             ".filter((x) => /^(run|execute|open in terminal|download)/.test(x))}; })()") or {}
+    if not v.get("open") or v.get("files", 0) < 2:
+        fails.append(f"the cshort viewer did not list its files: {v}")
+    if "def " not in (v.get("pre") or ""):
+        fails.append(f"a .py file is not shown as text in a <pre>: {(v.get('pre') or '')[:80]!r}")
+    if v.get("risky"):
+        fails.append(f"the viewer offers to run or download: {v.get('risky')}")
+    d.key("Escape")
+    _sleep(d, 150)
+    after = d.js("(() => ({viewer: !document.getElementById('cshort-modal').classList.contains('hidden'),"
+                 " card: !document.getElementById('fabula-modal').classList.contains('hidden'),"
+                 " focus: document.getElementById('fabula-modal').contains(document.activeElement)}))()") or {}
+    if after.get("viewer") or not after.get("card"):
+        fails.append(f"Esc should close the viewer only: {after}")
+    if not after.get("focus"):
+        fails.append(f"the focus did not come back to the card: {after}")
     _reset(d)
     return fails
 
@@ -4053,4 +4226,8 @@ SCENARIOS: dict[str, Scenario] = {
     "thym-run-roundtrip": scenario_thym_run_roundtrip,
     "thym-read-labelled": scenario_thym_read_labelled,
     "thym-package-roundtrip": scenario_thym_package_roundtrip,
+    # --- 0.6: the fabula round (U1a) ---
+    "fabula-decompile-card": scenario_fabula_decompile_card,
+    "fabulac-build-outline": scenario_fabulac_build_outline,
+    "cshort-read": scenario_cshort_read,
 }

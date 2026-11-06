@@ -289,7 +289,7 @@ path: ~/enough/canon/
 机器全局的<em>卷</em>仓库——那些顶层文件夹，装着你想永久留下的文字，或者从本地路径、网站、维基百科条目导入来的缓存副本。所有项目共享，且对项目文件树隐藏。从前的 <code>infoworld</code> 库如今就住在这里。
 
 ### how
-从顶栏打开 canon 模式看双栏视图（项目 ↔ 卷）：拖动可在两边复制文件，按住 shift 拖是移动，用导入栏让阅问把某个来源拉进某个卷——或者，在无智能体下，在一个朴素的确认框里看清来源和它的上限，自己来跑这次导入。或者直接和你的阅问说——只要 broker 的「canon 工具」开关开着，它就能列出、创建卷并往里导入（网址导入同样遵守你的 fetch_url 开关）。每个卷都保有一份自动生成的内容目录（<code>canon.cosm</code>，只读），以及一些你不用碰的隐藏元数据。双击这份目录——或一个 Holotype（正模），或任何别的 <code>.cosm</code> 文件——就能在 cosm 查看器里浏览它；<strong>项目目录</strong>按钮对本项目自己的目录（<code>rness/canon.cosm</code>）做同样的事。有 EMF 孪生文件的文本会戴一个着色的小孪生徽章。
+从顶栏打开 canon 模式看双栏视图（项目 ↔ 卷）：拖动可在两边复制文件，按住 shift 拖是移动，用导入栏让阅问把某个来源拉进某个卷——或者，在无智能体下，在一个朴素的确认框里看清来源和它的上限，自己来跑这次导入。或者直接和你的阅问说——只要 broker 的「canon 工具」开关开着，它就能列出、创建卷并往里导入（网址导入同样遵守你的 fetch_url 开关）。每个卷都保有一份自动生成的内容目录（<code>canon.cosm</code>，只读），以及一些你不用碰的隐藏元数据。双击这份目录——或一个 Holotype（正模），或任何别的 <code>.cosm</code> 文件——就能在 cosm 查看器里浏览它；<strong>项目目录</strong>按钮对本项目自己的目录（<code>rness/canon.cosm</code>）做同样的事。有 fabula 的文本会戴一个着色的小孪生徽章。
 
 ### ideas
 - 导入一个文档站点或一整个笔记文件夹，你的阅问就能离线地照着它工作。
@@ -301,7 +301,7 @@ name: cosm 查看器
 path: *.cosm
 
 ### what
-任何 <code>.cosm</code> 卷的结构化视图——canon 卷的目录、Comprise 的 Holotype（正模）、文本的 EMF 孪生文件、独立的产品树。左边的栏显示目录（名字、所用的语言、地址）、它的模块和种类以及各有多少条目，还有检查结果；旁边那一栏每个条目一张卡片：id、种类和状态，名字和摘要，然后是其余每个字段。指向别的条目的 id 是链接，待解决的问题标着一个带圈的 <strong>?</strong>。
+任何 <code>.cosm</code> 卷的结构化视图——canon 卷的目录、Comprise 的 Holotype（正模）、文本的 fabula、fabulac、独立的产品树。左边的栏显示目录（名字、所用的语言、地址）、它的模块和种类以及各有多少条目，还有检查结果；旁边那一栏每个条目一张卡片：id、种类和状态，名字和摘要，然后是其余每个字段。指向别的条目的 id 是链接，待解决的问题标着一个带圈的 <strong>?</strong>。
 
 ### how
 在 canon 里双击一份目录、一个 Holotype 或任何 <code>.cosm</code> 文件，或者在文件树里点一行 <code>.cosm</code>。点栏里的模块或种类就跳过去，点任何带链接的 id 就跳到那个条目——一个“返回”小药丸能带你回去。<strong>透镜</strong>把这卷在 merirmaid 里画成图；在那里 shift-点一个节点，选<strong>显示条目</strong>就回到它的卡片。<strong>以原始文本打开</strong>把文件本身当纯文本显示，<strong>关于这种格式</strong>在讲这卷语言的那一节打开规范，⌘F 在卡片里找词，尺寸按钮把查看器停靠到一边。
@@ -330,18 +330,47 @@ enough 的五份文档在这里读：这份<strong>帮助中心</strong>，用�
 
 ## canon-chip
 name: Canon 小标签
-path: notes.md → notes.md.cosm
+path: notes.md → notes.md.fabulan.cosm
 
 ### what
-文本页头里、转换小标签旁边的那一小组按钮，告诉你这段文本有没有 <strong>EMF 孪生文件</strong>：一个写在它旁边的 <code>.cosm</code> 文件（<code>notes.md</code> → <code>notes.md.cosm</code>），把文本拆开——它倚重的词语、它提到的人和事物、它提出的主张以及这些主张从何得知、它讲述的事件。有孪生文件时徽标带颜色，没有时是空心的；孪生文件写成之后文本若有改动，徽标上会多一个小点。不会自动反编译——只在你要求时才做。
+文本页头里、转换小标签旁边的那一小组按钮，告诉你这段文本有没有 <strong>fabula</strong>，也就是它的孪生文件：一个写在它旁边的 <code>.cosm</code> 文件（<code>notes.md</code> → <code>notes.md.fabulan.cosm</code>），把文本拆开——它倚重的词语、它提到的人和事物、它提出的主张以及这些主张从何得知、它讲述的事件。有孪生文件时徽标带颜色，没有时是空心的；孪生文件写成之后文本若有改动，徽标上会多一个小点。不会自动反编译——只在你要求时才做。
 
 ### how
-<strong>孪生</strong> 把阅读器翻到孪生文件，大小不变，替换文本：cosm 查看器的卡片，加上返回用的 <strong>回到文本</strong>、把孪生文件写成一个 <em>short</em> 的 <strong>编译一个 short</strong>（文本旁边一份新的 markdown 讲述，<code>notes.short-2026-10-23-1042.md</code>，按作者讲述的顺序或按分量，由小小的 ▾ 选择；孪生文件会记住从它讲出的每一个 short）、画成图的 <strong>透镜</strong>，以及查看文件本身的 <strong>以原始文本打开</strong>。还没有孪生文件时，这个按钮会先反编译，完成后再翻过去。<strong>atem</strong> 按钮把整段文本浓缩成一句（见 atem 卡片）。<strong>反编译</strong> 生成孪生文件，<strong>更新孪生文件</strong> 重新生成；如果孪生文件已经是最新的，enough 会先问你。处理过程显示成一条可以取消的通知。有模型运行时要花些时间，这期间你发出的聊天消息会排队等候；没有模型时你会得到一个标明的脚手架——只有词语和名称，还没有主张——而在无智能体下，标签写的是<em>无智能体</em>。
+<strong>孪生</strong> 把阅读器翻到孪生文件，大小不变，替换文本：cosm 查看器的卡片，加上返回用的 <strong>回到文本</strong>、把孪生文件写成一个 <em>short</em> 的 <strong>编译一个 short</strong>（文本旁边一份新的 markdown 讲述，<code>notes.short-2026-10-23-1042.md</code>，按作者讲述的顺序或按分量，由小小的 ▾ 选择；孪生文件会记住从它讲出的每一个 short）、画成图的 <strong>透镜</strong>，以及查看文件本身的 <strong>以原始文本打开</strong>。还没有孪生文件时，这个按钮会先反编译，完成后再翻过去。<strong>atem</strong> 按钮把整段文本浓缩成一句（见 atem 卡片）。<strong>反编译</strong> 生成孪生文件，<strong>更新孪生文件</strong> 重新生成；两者都会先打开一张小卡片：散文还是韵文（enough 会建议一种，由你决定），以及模型在哪里运行；孪生文件已经是最新的时候，卡片会告诉你。处理过程显示成一条可以取消的通知。有模型运行时要花些时间，这期间你发出的聊天消息会排队等候；没有模型时你会得到一个标明的脚手架——只有词语和名称，还没有主张——而在无智能体下，标签写的是<em>无智能体</em>。
 
 ### ideas
 - 把很长的一章反编译一次，然后把孪生文件里的主张当成清单来读，看这一章到底论证了什么。
 - <strong>atem</strong> 和<strong>反编译</strong>也在 canon 的 shift-点击菜单和文件树的 option-点击菜单里；merirmaid 的节点菜单里，指向文本的节点有 <strong>atem</strong>。
 - 以原始文本打开的孪生文件就是普通文本，可以阅读和编辑；cosm 查看器会替你检查它。
+
+## fabula-card
+name: 反编译… / fabulac
+path: notes.md → notes.md.fabulan.cosm · tool/ → tool.fabulac.cosm
+
+### what
+反编译之前出现的那张卡片，也是一个文件夹的 <strong>fabulac</strong> 卡片。在文本上，它问两件事：把它当作<strong>散文</strong>（<code>fabulan</code>）还是<strong>韵文</strong>（<code>fabulap</code>）来读——enough 会根据文本的样子建议一种，由你决定——以及模型在哪里运行。它列出文本每种已有的孪生文件，说明哪个是最新的；如果某个孪生文件还是旧名字（<code>notes.md.cosm</code>），它会告诉你再次反编译会写出新名字并移除旧文件。在一个 python 文件夹上，它显示这个文件夹的 fabulac（<code>tool.fabulac.cosm</code>）的构建，分五个阶段：勘查和历史按规则进行，然后是阅读、折叠和提问，这三步需要模型。
+
+### how
+在文本上点<strong>反编译</strong>或<strong>更新孪生文件</strong>会打开它；在文件夹的 option 点击菜单里点<strong>构建它的 fabulac…</strong>，或在 cosm 查看器里对一个 fabulac 点<strong>构建与编译…</strong>，会在文件夹上打开它。<strong>模型在哪里运行</strong>默认是<em>本机</em>，也就是这台机器运行的模型，除非你为这一次任务选择云端；只有云端开放时才会提供这个选项。云端构建可以为每个阶段的模型调用设一个上限。构建会显示当前阶段、已读的文件和已发出的调用；<strong>取消</strong>会保留每个已完成的阶段，只要文件夹没有变化，<strong>接着做</strong>就从停下的地方继续。没有模型时，构建会留下<em>轮廓</em>（勘查和历史），并说明还在等什么。<strong>编译</strong>把 fabulac <strong>编译为代码</strong>（一个 <em>cshort</em>），或讲成深度为 line、overview 或 manual 的 <em>catem</em>；它产出的东西列在下面，每项都有<strong>打开</strong>。
+
+### ideas
+- 先给一个小工具构建一次 fabulac，在读它的代码之前，先读深度为 overview 的 catem。
+- 无代理模式下，构建照样会留下轮廓：文件、它们的接口、历史和许可证。
+- cshort 是供阅读的文本：enough 从不运行它。
+
+## cshort
+name: cshort / catem
+path: tool.cshort-2026-11-05-1412/ · tool.catem-2026-11-05-1415.md
+
+### what
+fabulac 编译出来的东西，在这里阅读。<strong>cshort</strong> 是一个源代码文件夹，完全根据 fabulac 一个文件一个文件地写成，附带 <code>CSHORT.md</code>（说明每个文件来自哪个条目）、说明它如何制成的页脚，以及源代码的许可证。<strong>catem</strong> 是一份 markdown，在某个深度上说明用户能用这个程序做什么：<code>line</code>、<code>overview</code> 或 <code>manual</code>。
+
+### how
+从 fabulac 卡片的列表里、编译完成时的提示里，或者 cshort 文件夹、catem 文件的 option 点击菜单里打开一个。cshort 的文件在左边；点一个就以纯文本阅读。这里没有任何东西会运行它、在终端里打开它或下载它来运行：enough 从不运行 cshort。按 esc 关闭查看器。
+
+### ideas
+- 先读 <code>CSHORT.md</code>：它说明每个文件是根据 fabulac 的哪一部分写的。
+- 把 cshort 放在原代码旁边比较：fabulac 漏掉的，cshort 也会缺。
 
 ## atem-card
 name: atem 卡片
@@ -351,7 +380,7 @@ path: (the atem of a text or a passage)
 <strong>atem</strong> 是对一段文本或一个段落最紧凑、公允、完整、平实的浓缩。卡片把 <em>那一句</em> 放大显示——一句十五到二十五个词、说出整体所说内容的话——然后是三个简短部分：<strong>焦点</strong>，正在发生什么、作者把你的目光引向哪里；<strong>推</strong>，作者希望你带走的东西；<strong>拉</strong>，你真正该带走的东西，点明隐藏的假设和所依赖之处。推和拉不一致的地方，往往就是卡片上最有用的内容。把指针停在标签上可以看到它的定义。当模型说明了各项主张从何得知时，会有一条色带显示六种立场及其数量。
 
 ### how
-在 canon 小标签或文件菜单里点 <strong>atem</strong>（整段文本——它的 atem 会存进文本的 EMF 孪生文件），或者选中一段再点右键：<strong>所选内容的 atem</strong> 在阅读器、编辑器、wikisink 文章、帮助中心、规范和 composure 文本页里都有。读的时候卡片会提示，并提供取消。<strong>复制</strong> 复制那一句（⇧-点击复制全部四个部分），<strong>钉到孪生文件</strong> 把一个段落的 atem 连同它的位置存进文本的孪生文件，<strong>打开孪生文件</strong> 显示整段文本的 atem 所写入的孪生文件。没有模型运行时卡片显示一个脚手架：那一句和焦点取自文本开头的几句话，推和拉仍是待解决的问题。
+在 canon 小标签或文件菜单里点 <strong>atem</strong>（整段文本——它的 atem 会存进文本的 fabula），或者选中一段再点右键：<strong>所选内容的 atem</strong> 在阅读器、编辑器、wikisink 文章、帮助中心、规范和 composure 文本页里都有。读的时候卡片会提示，并提供取消。<strong>复制</strong> 复制那一句（⇧-点击复制全部四个部分），<strong>钉到孪生文件</strong> 把一个段落的 atem 连同它的位置存进文本的孪生文件，<strong>打开孪生文件</strong> 显示整段文本的 atem 所写入的孪生文件。没有模型运行时卡片显示一个脚手架：那一句和焦点取自文本开头的几句话，推和拉仍是待解决的问题。
 
 ### ideas
 - 发出草稿之前先读一读它的 atem。如果那一句不是你想说的，草稿也不是。
@@ -544,10 +573,10 @@ name: 包
 path: *.package.cosm · *.thym/
 
 ### what
-<strong>包</strong>是一份带着描述它的东西出门的文本：完全照原样的文本，它的 fabula（EMF 孪生文件），作者的 morph（如果有的话）——也就是这份文本在十个尺度上偏离同一个 fabula 最朴素的讲述的方式——以及它的上下文。它有并排的两种形式：一个随身带走的文件 <code>notes.package.cosm</code>，和一个可以一个文件一个文件打开的文件夹 <code>notes.thym/</code>。它的目录列出每个文件和它的校验值，写明做出它的程序和那次运行，而且除非文本自己写了，绝不写出作者的名字。
+<strong>包</strong>是一份带着描述它的东西出门的文本：完全照原样的文本，它的 fabula（它的孪生文件），作者的 morph（如果有的话）——也就是这份文本在十个尺度上偏离同一个 fabula 最朴素的讲述的方式——以及它的上下文。它有并排的两种形式：一个随身带走的文件 <code>notes.package.cosm</code>，和一个可以一个文件一个文件打开的文件夹 <code>notes.thym/</code>。它的目录列出每个文件和它的校验值，写明做出它的程序和那次运行，而且除非文本自己写了，绝不写出作者的名字。
 
 ### how
-打开任一种形式，cosm 查看器都会显示这个包的卡片：它装着什么（在文件夹形式里，每个文件都是链接）、由什么在什么时候做出来、<strong>打开文本</strong>，以及<strong>透过…来读</strong>——它用你选的 morph 把文本重新讲一遍：包自己的那个，让你按作者的方式读；你自己的某一个；或者零 morph。包里的文本从不被碰。enough 附带的程序之一 <code>publish-story</code>，会在你运行它的任何文本旁边放下一个包。<strong>打包…</strong>在 EMF 孪生文件是最新的文本上，按规则做出一个包，不问模型，也可以顺便把它密封，钥匙只给你看一次，哪里都不留；<strong>拆包…</strong>在任一种形式的包上，先核对每一个校验值，再把文本和它的孪生文件写回旁边，包是密封的就向你要钥匙。
+打开任一种形式，cosm 查看器都会显示这个包的卡片：它装着什么（在文件夹形式里，每个文件都是链接）、由什么在什么时候做出来、<strong>打开文本</strong>，以及<strong>透过…来读</strong>——它用你选的 morph 把文本重新讲一遍：包自己的那个，让你按作者的方式读；你自己的某一个；或者零 morph。包里的文本从不被碰。enough 附带的程序之一 <code>publish-story</code>，会在你运行它的任何文本旁边放下一个包。<strong>打包…</strong>在 fabula 是最新的文本上，按规则做出一个包，不问模型，也可以顺便把它密封，钥匙只给你看一次，哪里都不留；<strong>拆包…</strong>在任一种形式的包上，先核对每一个校验值，再把文本和它的孪生文件写回旁边，包是密封的就向你要钥匙。
 
 ### ideas
 - 发那一个单文件就够了：读者按自己的方式读它所需的一切都在里面。
@@ -563,7 +592,7 @@ path: *.read-*-YYYY-MM-DD-HHMM.md
 <strong>读本</strong>是透过一个 morph 重新讲一遍的别人的文本——你的 morph、作者的，或者零 morph——在你自己的机器上，作为文本旁边的一个新文件。它标明了两次：开头的 <code>read_through:</code>，以及结尾的一行页脚：<em>a reading of notes.md through plain-letter, made here on … ; the text stands unchanged</em>。只要这份读本开着，阅读器页头下的横带就一直显示这个标注，哪一面、哪种大小都一样，而且关不掉：读本绝不冒充原文。
 
 ### how
-在一个包上，或者在一份有 EMF 孪生文件的文本上，用<strong>透过…来读</strong>要一份；选一个 morph，读本写好就会打开，名字像 <code>notes.read-plain-letter-2026-11-01-1042.md</code>（那一分钟已经有一份时，加 <code>-2</code>、<code>-3</code>）。读本需要模型——<code>read</code> 没有只靠规则的替代——所以无智能体下，卡片会这么说，什么也不读。给读本再做读本会被拒绝：读本读的是 fabula，而读本本身是一种讲述。
+在一个包上，或者在一份有 fabula 的文本上，用<strong>透过…来读</strong>要一份；选一个 morph，读本写好就会打开，名字像 <code>notes.read-plain-letter-2026-11-01-1042.md</code>（那一分钟已经有一份时，加 <code>-2</code>、<code>-3</code>）。读本需要模型——<code>read</code> 没有只靠规则的替代——所以无智能体下，卡片会这么说，什么也不读。给读本再做读本会被拒绝：读本读的是 fabula，而读本本身是一种讲述。
 
 ### ideas
 - 透过零 morph 读一份密密麻麻的报告，就能确切看到它主张了什么，一句一个主张。

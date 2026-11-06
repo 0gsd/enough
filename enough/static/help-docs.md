@@ -289,7 +289,7 @@ path: ~/enough/canon/
 the machine-global store of <em>volumes</em> — top-level folders holding text you want to keep forever, or cached replicas ingested from a local path, a website, or wikipedia articles. shared across every project and hidden from project file trees. this is where the old <code>infoworld</code> library now lives.
 
 ### how
-open canon mode from the topbar for the two-pane view (project ↔ volumes): drag to copy a file between them, shift-drag to move, and use the ingest bar to ask your chief readvisor to pull a source into a volume — or, agent free, to see the source and its limits in a plain confirmation and run the ingest yourself. or just say so in the panel — your readvisors can list, create, and ingest into volumes when the "canon tools" broker toggle is on (url ingests also respect your fetch_url toggles). every volume keeps an auto-generated catalog of its contents (<code>canon.cosm</code>, read-only) and hidden metadata you don't touch. double-click that catalog — or a holotype, or any other <code>.cosm</code> file — to browse it in the cosm viewer; the <strong>project catalog</strong> button does the same for this project's own (<code>rness/canon.cosm</code>). a text that has an EMF twin wears a small tinted twin badge.
+open canon mode from the topbar for the two-pane view (project ↔ volumes): drag to copy a file between them, shift-drag to move, and use the ingest bar to ask your chief readvisor to pull a source into a volume — or, agent free, to see the source and its limits in a plain confirmation and run the ingest yourself. or just say so in the panel — your readvisors can list, create, and ingest into volumes when the "canon tools" broker toggle is on (url ingests also respect your fetch_url toggles). every volume keeps an auto-generated catalog of its contents (<code>canon.cosm</code>, read-only) and hidden metadata you don't touch. double-click that catalog — or a holotype, or any other <code>.cosm</code> file — to browse it in the cosm viewer; the <strong>project catalog</strong> button does the same for this project's own (<code>rness/canon.cosm</code>). a text that has a fabula wears a small tinted twin badge.
 
 ### ideas
 - ingest a docs site or a folder of notes so your readvisors can work from it offline.
@@ -301,7 +301,7 @@ name: cosm viewer
 path: *.cosm
 
 ### what
-the structured view of any <code>.cosm</code> volume — a canon volume's catalog, a comprise holotype, a text's EMF twin, a standalone product tree. the rail on the left shows the catalog (its name, the language it is written in, its address), its modules and kinds with how many items each holds, and the checks; the column beside it shows one card per item: its id, kind and status, its name and summary, then every other field. an id that points at another item is a link, and an open question is marked with a ringed <strong>?</strong>.
+the structured view of any <code>.cosm</code> volume — a canon volume's catalog, a comprise holotype, a text's fabula, a fabulac, a standalone product tree. the rail on the left shows the catalog (its name, the language it is written in, its address), its modules and kinds with how many items each holds, and the checks; the column beside it shows one card per item: its id, kind and status, its name and summary, then every other field. an id that points at another item is a link, and an open question is marked with a ringed <strong>?</strong>.
 
 ### how
 double-click a catalog, a holotype or any <code>.cosm</code> file in canon, or click a <code>.cosm</code> row in the file tree. click a module or kind in the rail to go there, and any linked id to jump to that item — a "back" pill takes you back. <strong>lens</strong> draws the volume as a diagram in merirmaid; shift-click a node there and pick <strong>show item</strong> to come back to its card. <strong>open raw</strong> shows the file itself as plain text, <strong>about this format</strong> opens the specification at the section on this volume's language, ⌘F finds words in the cards, and the size button docks the viewer to the side.
@@ -330,18 +330,47 @@ open the help center from <strong>help</strong> at the top of the ui window, and
 
 ## canon-chip
 name: canon chip
-path: notes.md → notes.md.cosm
+path: notes.md → notes.md.fabulan.cosm
 
 ### what
-the little group in a text's header, beside the convert chip, that says whether this text has an <strong>EMF twin</strong>: a <code>.cosm</code> file written beside it (<code>notes.md</code> → <code>notes.md.cosm</code>) that takes the text apart into the words it leans on, the people and things it names, the claims it makes and how it knows them, and the events it tells. the twin badge is tinted when there is a twin, hollow when there isn't, and wears a dot when the text has changed since its twin was written. nothing is decompiled on its own — only when you ask.
+the little group in a text's header, beside the convert chip, that says whether this text has a <strong>fabula</strong>, its twin: a <code>.cosm</code> file written beside it (<code>notes.md</code> → <code>notes.md.fabulan.cosm</code>) that takes the text apart into the words it leans on, the people and things it names, the claims it makes and how it knows them, and the events it tells. the twin badge is tinted when there is a twin, hollow when there isn't, and wears a dot when the text has changed since its twin was written. nothing is decompiled on its own — only when you ask.
 
 ### how
-<strong>twin</strong> turns the reader to the twin, at the same size, in place of the text: the cosm viewer's cards, with <strong>back to the text</strong> to return, <strong>compile a short</strong> to write the twin back out as a <em>short</em> — a new markdown telling beside the text, <code>notes.short-2026-10-23-1042.md</code>, as the author told it or by weight (the little ▾ chooses; the twin keeps a list of every short made from it) — <strong>lens</strong> for a diagram and <strong>open raw</strong> for the file itself. with no twin yet, twin decompiles first and turns over when it's done. the <strong>atem</strong> button gives you the whole text in one line (see the atem card). <strong>decompile</strong> makes the twin and <strong>refresh twin</strong> makes it again; when the twin is already up to date, enough asks first. the work shows as a toast you can cancel. with a model running it takes a while, and a chat message you send meanwhile waits its turn; with no model running you get a labelled scaffold — the words and the names, no claims yet — and agent free, the label says <em>agent-free</em>.
+<strong>twin</strong> turns the reader to the twin, at the same size, in place of the text: the cosm viewer's cards, with <strong>back to the text</strong> to return, <strong>compile a short</strong> to write the twin back out as a <em>short</em> — a new markdown telling beside the text, <code>notes.short-2026-10-23-1042.md</code>, as the author told it or by weight (the little ▾ chooses; the twin keeps a list of every short made from it) — <strong>lens</strong> for a diagram and <strong>open raw</strong> for the file itself. with no twin yet, twin decompiles first and turns over when it's done. the <strong>atem</strong> button gives you the whole text in one line (see the atem card). <strong>decompile</strong> makes the twin and <strong>refresh twin</strong> makes it again; both open a small card first: prose or verse (enough suggests one; the choice is yours) and where the model runs, and it says when the twin is already up to date. the work shows as a toast you can cancel. with a model running it takes a while, and a chat message you send meanwhile waits its turn; with no model running you get a labelled scaffold — the words and the names, no claims yet — and agent free, the label says <em>agent-free</em>.
 
 ### ideas
 - decompile a long chapter once, then read the twin's claims as a checklist of what the chapter really argues.
 - <strong>atem</strong> and <strong>decompile</strong> are also on canon's shift-click menu and the file tree's option-click menu, and <strong>atem</strong> is on merirmaid's node menu for a node that names a text.
 - a twin opened raw is plain text you can read and edit; the cosm viewer checks it for you.
+
+## fabula-card
+name: decompile… / the fabulac
+path: notes.md → notes.md.fabulan.cosm · tool/ → tool.fabulac.cosm
+
+### what
+the card that comes before a decompile, and the card of a folder's <strong>fabulac</strong>. on a text it asks two things: whether to read it as <strong>prose</strong> (a <code>fabulan</code>) or as <strong>verse</strong> (a <code>fabulap</code>) — enough suggests one from how the text looks, and the choice is yours — and where the model runs. it lists the twin the text already has of each kind, says when one is up to date, and when a twin still has its old name (<code>notes.md.cosm</code>) it says that decompiling again writes the new name and removes the old file. on a folder of python it shows the build of its fabulac, <code>tool.fabulac.cosm</code>, in five stages: survey and history by rules, then read, fold and question, which ask a model.
+
+### how
+<strong>decompile</strong> or <strong>refresh twin</strong> opens it on a text; <strong>build its fabulac…</strong> on a folder's option-click menu, or <strong>build and compile…</strong> on a fabulac in the cosm viewer, opens it on a folder. <strong>where the model runs</strong> is <em>here</em>, the model this machine runs, unless you choose the cloud for this one job, which is only offered while the cloud is open; a cloud build can take a ceiling on the model calls each stage makes. the build shows its stage, the files read and the model calls made; <strong>cancel</strong> keeps every stage that landed, and <strong>take up again</strong> goes on from where it stopped while the folder is unchanged. with no model, a build lands the <em>outline</em>, survey and history, and says what waits. <strong>compile</strong> tells the fabulac <strong>as code</strong>, a <em>cshort</em>, or as a <em>catem</em> at depth line, overview or manual; what it has made is listed underneath, each with <strong>open</strong>.
+
+### ideas
+- build a small tool's fabulac once, then read its catem at depth overview before you read its code.
+- agent free, a build still lands the outline: the files, their interfaces, the history and the licence.
+- a cshort is text to read: enough never runs it.
+
+## cshort
+name: cshort / catem
+path: tool.cshort-2026-11-05-1412/ · tool.catem-2026-11-05-1415.md
+
+### what
+what a fabulac compiles into, read here. a <strong>cshort</strong> is a folder of source code written from the fabulac alone, file by file, with <code>CSHORT.md</code> saying which item each file came from, the footer that says how it was made, and the licence of the source. a <strong>catem</strong> is markdown that says what a user can do with the program, at one depth: <code>line</code>, <code>overview</code> or <code>manual</code>.
+
+### how
+open one from the fabulac card's list, from a toast when a compile lands, or from the option-click menu of the cshort's folder or the catem's file. a cshort's files are on the left; click one to read it as plain text. nothing here runs it, opens it in a terminal or downloads it to run: enough never runs a cshort. esc closes the viewer.
+
+### ideas
+- read <code>CSHORT.md</code> first: it says which part of the fabulac every file was written from.
+- set a cshort beside the original and compare: what the fabulac missed is what the cshort lacks.
 
 ## atem-card
 name: atem card
@@ -351,7 +380,7 @@ path: (the atem of a text or a passage)
 an <strong>atem</strong> is the tightest fair, full, plain-English reduction of a text or of a passage. the card sets <em>the line</em> large — one sentence of fifteen to twenty-five words that says what the whole says — then three short parts: <strong>focus</strong>, what is happening and where the author points you; <strong>push</strong>, what the author wants you to take away; <strong>pull</strong>, what you should actually take away, with any hidden assumption or dependency named. where push and pull differ is usually the most useful thing on the card. rest the pointer on a label for its definition. when the model says how the claims are known, a strip shows the six stances with their counts.
 
 ### how
-ask for one with <strong>atem</strong> on the canon chip or a file menu (the whole text — its atem is kept in the text's EMF twin), or select a passage and right-click it: <strong>atem of selection</strong> is there in the reader, the editor, a wikisink article, the help center, the specification and a composure text page. while it reads, the card says so and offers cancel. <strong>copy</strong> copies the line (⇧-click copies all four parts), <strong>pin to twin</strong> keeps a passage's atem in the text's twin together with where it sits, and <strong>open twin</strong> shows the twin a whole-text atem went into. with no model running the card shows a scaffold: the line and the focus come from the text's first sentences, and push and pull stay open questions.
+ask for one with <strong>atem</strong> on the canon chip or a file menu (the whole text — its atem is kept in the text's fabula), or select a passage and right-click it: <strong>atem of selection</strong> is there in the reader, the editor, a wikisink article, the help center, the specification and a composure text page. while it reads, the card says so and offers cancel. <strong>copy</strong> copies the line (⇧-click copies all four parts), <strong>pin to twin</strong> keeps a passage's atem in the text's twin together with where it sits, and <strong>open twin</strong> shows the twin a whole-text atem went into. with no model running the card shows a scaffold: the line and the focus come from the text's first sentences, and push and pull stay open questions.
 
 ### ideas
 - read a draft's atem before you send it. if the line isn't what you meant, the draft isn't either.
@@ -544,7 +573,7 @@ name: package
 path: *.package.cosm · *.thym/
 
 ### what
-a <strong>package</strong> is a text that leaves the house with what describes it: the text exactly as written, its fabula (the EMF twin), the author's morph when there is one — how the text departs, on ten scales, from the plainest telling of the same fabula — and its context. it comes in two forms side by side: one file, <code>notes.package.cosm</code>, that travels, and a folder, <code>notes.thym/</code>, you can open file by file. its catalog lists every file with its digest, names the program and the run that made it, and never names the author unless the text does.
+a <strong>package</strong> is a text that leaves the house with what describes it: the text exactly as written, its fabula (its twin), the author's morph when there is one — how the text departs, on ten scales, from the plainest telling of the same fabula — and its context. it comes in two forms side by side: one file, <code>notes.package.cosm</code>, that travels, and a folder, <code>notes.thym/</code>, you can open file by file. its catalog lists every file with its digest, names the program and the run that made it, and never names the author unless the text does.
 
 ### how
 open either form and the cosm viewer shows the package's card: what it holds (each file a link, in the folder form), what made it and when, <strong>open the text</strong>, and <strong>read through…</strong>, which tells the text again in a morph you choose — the package's own, so you read it the author's way, one of yours, or the null morph. the text inside is never touched. <code>publish-story</code>, one of the programs shipped with enough, lands a package beside any text you run it on. <strong>package…</strong>, on a text whose twin is up to date, makes one by rule with no model asked and can seal it too, with a key shown to you once and kept nowhere; <strong>unpack…</strong>, on any form of a package, checks every digest first, writes the text and its twin back beside it, and asks for the key when the package is sealed.
@@ -563,7 +592,7 @@ path: *.read-*-YYYY-MM-DD-HHMM.md
 a <strong>reading</strong> is someone else's text told again through a morph — yours, the author's, or the null morph — on your machine, as a new file beside the text. it is labelled twice: <code>read_through:</code> at its top, and a footer line at its end: <em>a reading of notes.md through plain-letter, made here on … ; the text stands unchanged</em>. the band under the reader's header shows that label for as long as the reading is open, in either face and at either size, and it cannot be dismissed: a reading is never passed off as the text.
 
 ### how
-ask for one with <strong>read through…</strong> on a package, or on a text that has an EMF twin; pick a morph, and the reading opens when it is written, as <code>notes.read-plain-letter-2026-11-01-1042.md</code> (with <code>-2</code>, <code>-3</code> when one of that minute is already there). a reading needs a model — <code>read</code> has no rules-only stand-in — so agent free the card says so and reads nothing. a reading of a reading is refused: a reading reads a fabula, and a reading is a telling.
+ask for one with <strong>read through…</strong> on a package, or on a text that has a fabula; pick a morph, and the reading opens when it is written, as <code>notes.read-plain-letter-2026-11-01-1042.md</code> (with <code>-2</code>, <code>-3</code> when one of that minute is already there). a reading needs a model — <code>read</code> has no rules-only stand-in — so agent free the card says so and reads nothing. a reading of a reading is refused: a reading reads a fabula, and a reading is a telling.
 
 ### ideas
 - read a dense report through the null morph to see exactly what it claims, one claim to a sentence.

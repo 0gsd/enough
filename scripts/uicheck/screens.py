@@ -75,6 +75,17 @@ THYM_MORPH = "orchard/notes.morph.cosm"
 THYM_SEALED = "orchard/received/notes.thym.enc"
 #: What the key screen paints in place of a real key: it seals nothing.
 THYM_PLACEHOLDER_KEY = "AAAA-BBBB-CCCC-DDDD-EEEE-FFFF"
+# The fabula round (0.6, U1a), seeded by server._seed_fabula() in works/: a
+# Python tool with its finished fabulac, the cshort and the catem it compiled
+# into, a folder of Python with no fabulac yet, a poem with no twin and a
+# letter whose old-named twin sits beside its new one.
+FAB_TOOL = "works/tally"
+FAB_FABULAC = "works/tally.fabulac.cosm"
+FAB_CSHORT = "works/tally.cshort-2026-11-05-1412/"
+FAB_CATEM = "works/tally.catem-2026-11-05-1415.md"
+FAB_TINY = "works/tiny-tool"
+FAB_POEM = "works/rain.md"
+FAB_LETTER = "works/letter.md"
 
 Step = tuple[str, str]
 
@@ -269,7 +280,23 @@ def _docs(doc: str, density: str = "short", lang: str | None = None,
     if anchor:
         opts["anchor"] = anchor
     return ("eval", f"enterDocsMode({json.dumps(opts)})")
-#: The Canon chip knows the text's twin state (GET /api/canon/emf answered).
+#: The fabula card (0.6) has read what it shows: a text's twins, or a folder's build and what it made.
+FAB_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !(FAB.open && (FAB.face === 'text' ? !!FAB.flavour
+       : (FAB.build !== null && (FAB.build.error || !FAB.build.exists || FAB.compiled !== null)))); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+FAB_CLOSE: Step = ("eval", "(() => { try { fabCardClose(); } catch (e) {} return true; })()")
+#: The cshort / catem viewer has its file (a cshort: its first file's text too).
+FABV_READY: Step = ("eval_await", """(async () => {
+  for (let i = 0; i < 200 && !(FABV.open && (FABV.error || (FABV.data && (FABV.kind === 'catem'
+       || FABV.text !== null || FABV.ferror)))); i++) {
+    await new Promise((r) => setTimeout(r, 50));
+  }
+  return true; })()""")
+FABV_CLOSE: Step = ("eval", "(() => { try { fabViewClose(); } catch (e) {} return true; })()")
+#: The Canon chip knows the text's twin state (GET /api/fabula/twin answered).
 CANON_CHIP_READY: Step = ("eval_await", """(async () => {
   for (let i = 0; i < 200 && !(CANON.doc && CANON.doc.state); i++) {
     await new Promise((r) => setTimeout(r, 50));
@@ -872,6 +899,52 @@ PROJECT_SCREENS: list[Screen] = [
                     + EXIT_ALL_MODES,
            note="SHORT: the face's \"compile a short\" split button with its tiny menu open "
                 "(as the author told it / by weight, the default marked) over the cards"),
+
+    # --- 0.6, the fabula round (U1a): decompile, the fabulac, cshorts and catems ---
+    Screen("fabula-decompile", "project",
+           setup=(("eval_await", f"(async () => {{ await fabDecompileOpen('{FAB_POEM}', 'absent'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAB_READY, ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="the card before a decompile, on a poem with no twin: prose or verse with verse "
+                "marked as the suggestion, where each twin would be written, the model line "
+                "(here; the cloud is shut in the scratch environment), decompile"),
+
+    Screen("fabula-decompile-old", "project",
+           setup=(("eval_await", f"(async () => {{ await fabDecompileOpen('{EMF_TEXT}', 'fresh'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAB_READY, ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="the same card on the orchard notes, whose twin has the old name: its state, the "
+                "line that says decompiling again writes the new name and removes the old file, "
+                "the up-to-date note, decompile again"),
+
+    Screen("fabula-build", "project",
+           setup=(("eval_await", f"(async () => {{ await fabFolderOpen('{FAB_TOOL}'); return true; }})()"),
+                  ("wait_for", "#fabula-modal:not(.hidden)"), FAB_READY, ("wait_idle", "")),
+           teardown=(FAB_CLOSE,) + EXIT_ALL_MODES,
+           note="a folder's fabulac card, the build complete: the five stages with who ran them, "
+                "the model line, compile (as code or a catem at three depths), what it has made "
+                "(a cshort, a catem) with open, build again and open the fabulac"),
+
+    Screen("fabula-cosm", "project",
+           setup=(("eval", f"enterCosmMode('{FAB_FABULAC}')"), ("wait_for", "#cosm-mode.open"),
+                  COSM_READY, ("wait_idle", "")),
+           teardown=EXIT_ALL_MODES,
+           note="a fabulac in the cosm viewer: build and compile… in the toolbar, the rail with "
+                "who made it (model, route, its runs) and the source's licence, the modules I to "
+                "D with the fabulac's kinds"),
+
+    Screen("fabula-cshort", "project",
+           setup=(("eval_await", f"(async () => {{ await fabViewOpen('{FAB_CSHORT}'); return true; }})()"),
+                  ("wait_for", "#cshort-modal:not(.hidden)"), FABV_READY, ("wait_idle", "")),
+           teardown=(FABV_CLOSE,) + EXIT_ALL_MODES,
+           note="a cshort read: the line that says enough never runs it, the footer and the "
+                "licence, the file list and the first source file as monospaced text"),
+
+    Screen("fabula-catem", "project",
+           setup=(("eval_await", f"(async () => {{ await fabViewOpen('{FAB_CATEM}'); return true; }})()"),
+                  ("wait_for", "#cshort-modal:not(.hidden)"), FABV_READY, ("wait_idle", "")),
+           teardown=(FABV_CLOSE,) + EXIT_ALL_MODES,
+           note="a catem at depth overview: its depth line, the markdown, its footer"),
 
     # --- 0.5.0, Thym (U1): programs, plans, traces, the run card, readings ---
     Screen("thym-program", "project",

@@ -215,6 +215,36 @@ windfalls for the juice. Next year we will weigh them as well as count them.
 """
 CANON_VOLUME = "field-notes"   # in the scratch store: notes.md (+ twin), meadow/
 
+# The fabula round (0.6, U1a), seeded by _seed_fabula() into `works/`:
+# `tally/`, a small Python tool with its finished fabulac beside it (from
+# tests/fixtures/fabula/, with the five stages' runs written into its
+# `derived` so the build reads as complete), the cshort and the catem it
+# compiled into (the cshort's rebuilt files are the tool's own, as stand-ins:
+# the fixture ships only its CSHORT.md); `tiny-tool/`, a folder of Python with
+# no fabulac, which a build lands as the outline (no model in the scratch
+# environment); a poem with no twin, which the decompile card suggests
+# reading as verse; and a letter whose new-named twin sits beside its
+# old-named one, the old one listed as an ordinary file with its note.
+FABULA_FIXTURES = REPO / "tests" / "fixtures" / "fabula"
+FABULA_DIR = "works"
+FABULA_TOOL = "tally"
+FABULA_CSHORT = "tally.cshort-2026-11-05-1412"
+FABULA_CATEM = "tally.catem-2026-11-05-1415.md"
+FABULA_TINY = "tiny-tool"
+FABULA_POEM = "rain.md"
+FIXTURE_POEM = """Rain on the slates at four,
+the gutters full of it,
+a blackbird at the door
+who will not quit.
+
+The kettle starts to sing,
+the window runs with grey;
+I hold the warm cup's ring
+and let the day.
+"""
+FABULA_LETTER = "letter.md"
+FABULA_RUNS = ("survey-the-repo", "read-the-history", "read-every-file", "fold-the-whole", "raise-the-questions")
+
 
 def _seed_cosm(dest: Path, emf_dir: str) -> None:
     """A text with its EMF twin (in `dest/emf_dir`), and the meadow Holotype,
@@ -250,6 +280,42 @@ def seed_project(project: Path) -> None:
     twin = twin.replace("source: {path: notes.md,", f"source: {{path: {PRESS},", 1)
     (emf / f"{PRESS}.cosm").write_text(twin, encoding="utf-8")
     _seed_thym(emf)
+    _seed_fabula(project / FABULA_DIR)
+
+
+def _seed_fabula(works: Path) -> None:
+    """The fabula round's things (see FABULA_* above), all copies."""
+    works.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(FABULA_FIXTURES / FABULA_TOOL, works / FABULA_TOOL, dirs_exist_ok=True)
+    fab = (FABULA_FIXTURES / f"{FABULA_TOOL}.fabulac.cosm").read_text(encoding="utf-8")
+    # The fixture names its build `program: build-fabulac.thym`; the build's
+    # state reads a stage as landed from `derived.runs`, so the five runs go in.
+    runs = ", ".join(f"{{program: {p}, run: 2026-11-05-13{50 + i}-e4f{i}, at: 2026-11-05T13:{50 + i}:00Z, "
+                     f"model: anthropic/claude-opus-5.5, route: cloud, provider: openrouter}}"
+                     for i, p in enumerate(FABULA_RUNS))
+    fab = fab.replace("stages: [survey, history, read, fold, question]}",
+                      f"stages: [survey, history, read, fold, question], runs: [{runs}]}}", 1)
+    (works / f"{FABULA_TOOL}.fabulac.cosm").write_text(fab, encoding="utf-8")
+    cshort = works / FABULA_CSHORT
+    cshort.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(FABULA_FIXTURES / FABULA_CSHORT / "CSHORT.md", cshort / "CSHORT.md")
+    shutil.copyfile(FABULA_FIXTURES / FABULA_TOOL / "README.md", cshort / "README.md")
+    (cshort / FABULA_TOOL).mkdir(exist_ok=True)
+    for f in sorted((FABULA_FIXTURES / FABULA_TOOL / FABULA_TOOL).glob("*.py")):
+        shutil.copyfile(f, cshort / FABULA_TOOL / f.name)
+    shutil.copyfile(FABULA_FIXTURES / FABULA_CATEM, works / FABULA_CATEM)
+    shutil.copytree(THYM_FIXTURES / "inputs" / FABULA_TINY, works / FABULA_TINY, dirs_exist_ok=True)
+    (works / FABULA_POEM).write_text(FIXTURE_POEM, encoding="utf-8")
+    # A letter with its twin under the new name, and the old-named twin still
+    # beside it (the orchard notes' twin, declared fabula/1 under the new name).
+    shutil.copyfile(COSM_FIXTURES / "emf" / "notes.md", works / FABULA_LETTER)
+    old = (COSM_FIXTURES / "emf" / "notes.md.cosm").read_text(encoding="utf-8")
+    old = old.replace("id: emf/notes-md\n", "id: emf/works--letter-md\n", 1)
+    old = old.replace("source: {path: notes.md,", f"source: {{path: {FABULA_LETTER},", 1)
+    (works / f"{FABULA_LETTER}.cosm").write_text(old, encoding="utf-8")
+    new = old.replace("oes: emf/1\n", "oes: fabula/1\n", 1)
+    new = new.replace("id: emf/works--letter-md\n", "flavour: fabulan\nid: fabula/works--letter-md\n", 1)
+    (works / f"{FABULA_LETTER}.fabulan.cosm").write_text(new, encoding="utf-8")
 
 
 def _seed_thym(orchard: Path) -> None:
