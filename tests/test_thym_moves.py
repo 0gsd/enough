@@ -1290,6 +1290,7 @@ def test_a_trace_writes_posix_paths_whatever_system_made_them(monkeypatch):
     assert V.posix_path("odd\\name.md") == "odd\\name.md"                 # on POSIX a backslash is a letter of a name
     monkeypatch.setattr(V, "os", SimpleNamespace(sep="\\"))                 # as Windows reads a text it was given
     assert V.posix_path("inputs\\notes.md") == "inputs/notes.md"
+    assert V.posix_path("") == ""                                           # no path stays no path, never the folder `.`
     monkeypatch.undo()
     v = Value("text", "x", path=PureWindowsPath("C:\\runs\\outputs\\out.md"))
     assert T.digest_row("out", v)["path"] == "C:/runs/outputs/out.md"

@@ -1,7 +1,7 @@
 {
   "source_commit": "fbe5b08",
   "files": {
-    "defaults/cosm/manifests/comprise.manifest.cosm": "de6ee3f563d8036801b1f2f6f1b71af87a3f7c947e854dc1e837b9560e350b02",
+    "defaults/cosm/manifests/comprise.manifest.cosm": "cd439101c7cd5066755586ed819128b66246c973fa09e63faedf7151b9661745",
     "tests/fixtures/cosm/cosm02/meadow/README.md": "16191d33e16461b17c1014e0628b6f01f1e9fff51531d9f673b488420daed3c0",
     "tests/fixtures/cosm/cosm02/meadow/doc.cosm": "43bcda7bf2eef2909fd1578ce2eb494a9c8e0b012502f5c32daa6d52f75093f7",
     "tests/fixtures/cosm/cosm02/meadow/firm.cosm": "2608b4c70264d36392c8b6cda950de2cde430d2c6286bdbbc194b6f9c347be2e",
@@ -254,5 +254,5 @@
     "tests/fixtures/cosm/holotypes/wikimedia/atoms/wikimedia-foundation/S/vendors.cosm": "4afb533195221f2829757edc47e386987861ef4fb2a9f65db7850cc910c91905",
     "tests/fixtures/cosm/holotypes/wikimedia/holotype.cosm": "28bf13bf4ff0a7b093394e5d2e9add0a1377dbbc7ed1c4e0627a5650958dc7f6"
   },
-  "digest": "f5972000e49e765d6a816aaf16b549bb956df818ccfb558def9595f41fca80eb"
+  "digest": "617e5ea182a9e28269120f99bfbe346f22c89e6620b19987faab1af35ef5e2b5"
 }

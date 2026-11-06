@@ -455,12 +455,12 @@ dialectic:
         - {id: for-whom, about: N, asks: "Who is it for, and what do they already know?", kind: text, why: missing, writes: audience}
         - {id: never, about: N, asks: "What must it never do, whatever a user asks?", kind: text, why: intent, writes: requirement}
         - {id: left-out, about: N, asks: "What is deliberately left out, for now or for good?", kind: text, why: intent, writes: exclusion}
-        - {id: why-this, about: N:decision#because, asks: "Why was {name} chosen over the alternatives?", kind: text, why: intent}
-        - {id: tried, about: N:decision#over, asks: "What else was tried for {name} and dropped?", kind: text, why: missing}
-        - {id: intended, about: C:behaviour#intended, asks: "Is this behaviour intended, or an accident users now rely on: {name}?", kind: yes-no, why: intent}
-        - {id: public, about: C:interface#exported, asks: "Is {name} meant for others to call, or internal?", kind: yes-no, why: unsure}
-        - {id: bad-input, about: C:interface, asks: "What should {name} do with input it does not expect?", kind: text, why: missing, only-with: takes}
-        - {id: settings, about: C:setting, asks: "Is {name} meant to be changed by users?", kind: yes-no, why: unsure}
+        - {id: why-this, about: N:decision#because, asks: "Why was {name} chosen over the alternatives?", kind: text, why: intent, at-most: 5}
+        - {id: tried, about: N:decision#over, asks: "What else was tried for {name} and dropped?", kind: text, why: missing, at-most: 5}
+        - {id: intended, about: C:behaviour#intended, asks: "Is this behaviour intended, or an accident users now rely on: {name}?", kind: yes-no, why: intent, at-most: 5}
+        - {id: public, about: C:interface#exported, asks: "Is {name} meant for others to call, or internal?", kind: yes-no, why: unsure, at-most: 5}
+        - {id: bad-input, about: C:interface, asks: "What should {name} do with input it does not expect?", kind: text, why: missing, only-with: takes, at-most: 5}
+        - {id: settings, about: C:setting, asks: "Is {name} meant to be changed by users?", kind: yes-no, why: unsure, at-most: 5}
         - {id: first-read, about: C, asks: "Which file should a newcomer read first?", kind: ref, why: missing}
         - {id: changed, about: R:change#because, asks: "Why did {name} change?", kind: text, why: missing, at-most: 5}
         - {id: maintains, about: R, asks: "Who maintains it now?", kind: text, why: missing, writes: maker}

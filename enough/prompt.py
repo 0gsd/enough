@@ -688,7 +688,7 @@ moves (macrocosm-oes skill on). Without it, read `cosm_guide` before you derive.
 
 
 #: The fabula round's two tools (0.6), with the macrocosm-oes skill on (their guide, as for Thym's): a fresh
-#: project pays nothing for them. Capped like the MacroCOSM block (`tests/test_fabula_tools.py`).
+#: project pays nothing for them. Capped like the MacroCOSM block (`tests/test_prompt_weight.py`).
 FABULA_TOOL_INSTRUCTIONS = """\
 ## Dialectic and fabulacs
 

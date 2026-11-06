@@ -14,7 +14,9 @@ named by their place in an enough install:
   product trees.
 - `defaults/cosm/manifests/canon.manifest.cosm` — Canon volume catalogs and
   project catalogs (`canon.cosm`).
-- `defaults/cosm/manifests/emf.manifest.cosm` — EMF twins of texts.
+- `defaults/cosm/manifests/fabula.manifest.cosm` — the fabula of a text or of
+  a folder of code, in its three flavours (`oes: emf/1` is read as an old
+  spelling).
 - `defaults/cosm/manifests/doc.manifest.cosm` — DocOES: a document (this
   specification, the Help Center) enumerated into a doc volume.
 - `defaults/cosm/manifests/thym.manifest.cosm` — Thym 1: programs, morphs,
@@ -25,9 +27,8 @@ named by their place in an enough install:
   MiniCOSM offers to Thym, beside its byte-copied manifest.
 - `docs/THYM.md` — Thym (https://thym.cosmoes.org/), the MacroCOSM language: its
   programs, compiler and
-  runtime. `defaults/thym/` holds the three programs enough ships
-  (`publish-story`, `read-my-way`, `open-house`); `enough/thym/` is the
-  reference compiler and runtime.
+  runtime. `defaults/thym/` holds the programs enough ships; `enough/thym/`
+  is the reference compiler and runtime.
 - `docs/ASCRIBE.md` — Ascribe (https://ascribe.cosmoes.org/): a holograph, a self
   described with no name. `docs/COMPRISE_OES.md` — Comprise OES
   (https://comprise.cosmoes.org/): a company as Comprise describes one, the

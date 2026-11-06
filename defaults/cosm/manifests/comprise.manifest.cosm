@@ -52,11 +52,13 @@ volume:
   vendors: vendors/<domain>/<slug>/
   snapshots: snapshots/<stamp>/
   database: store.sqlite
-  outside-the-model: [people.yaml, people.proposed.yaml, feeds/, scans/, bindings/, reports/, logo.svg, logo.png]
+  outside-the-model: [people.yaml, people.proposed.yaml, feeds/, scans/, bindings/, reports/, codebases/, logo.svg, logo.png]
+  codebases: 'codebases/<name>.fabulac.cosm: the fabulacs S:codebase items name in fabula; read, never written'
 
 catalog:
-  keys: [oes, comprise, id, name, summary, sample, alignment, atoms, perspective, sources, attestations, grants, groups, limits,
-         store-key]
+  keys: [oes, comprise, id, name, summary, sample, alignment, atoms, perspective, sources, sessions, attestations, grants, groups,
+         limits, store-key]
+  sessions: 'one D:session record of the dialectic per elicitation sitting, id D:session/elicit-<date>-<hex>; the same id is declared in sources'
   id: holotype/<slug>
   id-absent: holotype/<folder name>
   sample: only the literal true
@@ -228,7 +230,7 @@ modules:
       function: {refs: [], level: 1}
       product: {refs: [], level: 0}
       service: {refs: [], level: 0}
-      release: {refs: [build, unit], note: declared in the schema; P's checks reject it as an unknown kind}
+      release: {refs: [build, unit], level: none, id: 'P:release/<unit>@<version>', note: 'outside the levels: no parts, in no item''s parts, unit a product or service of the tree; visibility its unit''s when absent'}
     tree:
       self-nesting: [suite, function]
       aggregates: [brand, suite, offering, function]
@@ -304,7 +306,7 @@ modules:
       integration: {refs: [from, to]}
       datastore: {refs: [system]}
       account: {refs: [system, holder]}
-      codebase: {refs: [runs]}
+      codebase: {refs: [runs], checked: [fabula], fabula: 'a path inside the Holotype to a .fabulac.cosm file (oes: fabula/1, flavour: fabulac), conventionally under codebases/'}
   E:
     name: Employees
     subtitle: 'The people: counted here, never named'
@@ -316,7 +318,7 @@ modules:
       credential: {refs: [], stored: database, table: credentials}
       intake: {refs: [], stored: database, table: persons.data}
       continuity: {refs: [], stored: database, table: persons.data}
-      access: {refs: [], stored: database, table: access}
+      access: {refs: [], stored: database, table: access, levels: [admin, steward, editor-of-own, viewer], sealed: false}
       broadcast: {refs: [], stored: database, status: not built}
 
 checks:
@@ -328,11 +330,11 @@ checks:
   load: [load]
   envelope: [id-grammar, id-module, id-atom, type, type-prefix, identity-min, provenance, source-undeclared, status,
              visibility, owner, ref, ref-grammar, ref-unresolved, vendor-missing, sku-unverified, no-humans, bond,
-             bond-mirror, aim, module-none]
+             bond-mirror, aim, codebase-fabula, module-none]
   products: [type, type-prefix, legacy, identity-min, visibility, strata, role-exists, brand-holds-nothing, flow-ends,
              external-exists, units, rule-syntax, override-explicit, affect-on-offerings, mattering, mattering-declared,
              mattering-weight, mattering-refs, mattering-because, mattering-on-offerings, mattering-inside, confidence,
-             no-humans, 'no-humans?', orphan, single-parent, acyclic, flow-mirror]
+             no-humans, 'no-humans?', orphan, single-parent, acyclic, release, flow-mirror]
   products-prefix: P
   equilibrium: [flow-balance, rule-consistency, closure, vocabulary-closure, role-coverage, affect-declared, mattering-declared]
   flow-balance-tolerance: 0.10
@@ -360,6 +362,20 @@ checks:
     - ids that differ only in case; slugs outside the path set
     - an M:account being restricted
 
+dialectic:                        # the question banks (spec section 8): one bank per module, read by core/elicit.py from the files named
+  writes: 'one field of the item asked about, with provenance {mode: dialectic, sources: [<session id>], confidence}; in P the session id joins sources'
+  session: 'a D:session record in the catalog''s sessions:, id D:session/elicit-<date>-<hex>; asked, answered and skipped hold atom/<concern>//<id>#<field path>'
+  dont-know: '{pending: "<their words>"}'
+  questions-items: none                # a Holotype holds no D:question items
+  banks:
+    C: {for: {module: C}, to: owner, from: core/banks/C.yaml}
+    O: {for: {module: O}, to: owner, from: core/banks/O.yaml}
+    M: {for: {module: M}, to: owner, from: core/banks/M.yaml}
+    P: {for: {module: P}, to: owner, from: core/vendor/comprise-oes/references/question-bank.md}
+    R: {for: {module: R}, to: owner, from: core/banks/R.yaml}
+    I: {for: {module: I}, to: owner, from: core/banks/I.yaml}
+    S: {for: {module: S}, to: owner, from: core/banks/S.yaml}
+
 open-questions:
   form: '{pending: "<the question>"}'
   answered-by: [the item's owner, the role itself (for a role), unassigned]
@@ -369,7 +385,7 @@ open-questions:
   command: python -m core pending <holotype>
 
 versions:
-  saved: {where: 'snapshots/<stamp>/', manifest: manifest.yaml, holds: [holotype.cosm, atoms/, bindings/, vendors/], never: [store.sqlite, people.yaml, feeds/, scans/]}
+  saved: {where: 'snapshots/<stamp>/', manifest: manifest.yaml, holds: [holotype.cosm, atoms/, bindings/, vendors/, codebases/], never: [store.sqlite, people.yaml, feeds/, scans/]}
   signed: {file: attestation.yaml, signature: Ed25519, requires: [ATTEST allowed, files match their hashes, a first-party perspective concern]}
   content-hash: sha256 of a concern's module files in path order, first 16 hex characters
   diff: item by item, with the field paths that moved

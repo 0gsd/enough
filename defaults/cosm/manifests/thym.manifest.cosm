@@ -45,16 +45,16 @@ format:
 
 volume:
   catalog: ['<name>.thym.cosm', '<name>.morph.cosm', '<name>.context.cosm', '<run-id>.plan.cosm', '<run-id>.trace.cosm', package.cosm,
-            '<name>.package.cosm']
+            '<name>.package.cosm', '<name>.folder.cosm']
   single-file: true
   built-into: 'a program volume beside its .thym file when asked; plans and traces under ENOUGH_THYM_ROOT/runs/, ~/enough/thym/ by default; a package where its owner puts it'
   program-file: '<name>.thym'     # the source a program volume is enumerated from; never committed as a volume, the file is the truth
 
 catalog:
   keys: [oes, macrocosm, id, name, kind, source, front, built, program, plan, inputs, estimate, environment, started, ended, outcome,
-         contents, made, notice, encrypted, nodes]
+         contents, made, notice, encrypted, path, tree, commit, origin, files, texts, nodes]   # path … texts: a run's snapshot of a folder
   id: thym/<slug>                 # thym/publish-story, thym/plain-letter, thym/2026-11-01-1042-7f3a, thym/orchard-notes
-  kind: [program, morph, context, plan, trace, package]
+  kind: [program, morph, context, plan, trace, package, folder]
   source-fields: [path, sha256, size]                      # a program volume: the .thym file it was enumerated from
   front: 'a program volume: everything before the first block, verbatim (the version line, use lines, comments)'
   built-fields: [at, by]

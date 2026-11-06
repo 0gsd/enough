@@ -309,8 +309,8 @@ def test_lint_a_holotype_names_what_comprise_keeps_in_one_line(project: Path):
     assert r.ok and "0 errors" in r.body and "56 open questions" in r.body, r.body
     assert "open questions (pending" in r.body and "… (31 more)" in r.body
     not_run = [ln for ln in r.body.splitlines() if ln.startswith("not run:")]
-    assert len(not_run) == 1 and "58 checks the comprise MiniCOSM keeps to its own tools" in not_run[0]
-    assert "(46 more)" in not_run[0]
+    assert len(not_run) == 1 and "60 checks the comprise MiniCOSM keeps to its own tools" in not_run[0]
+    assert "(48 more)" in not_run[0]
 
 
 def test_lint_a_clean_twin_and_a_refused_file(project: Path):

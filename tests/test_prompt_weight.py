@@ -752,3 +752,13 @@ def test_the_known_too_small_pairs_are_real_pairs():
 def test_the_reserve_is_the_preflights():
     from enough import preflight
     assert CTX_RESERVE == preflight.RESERVE
+
+
+def test_the_fabula_tools_block_keeps_under_the_cap():
+    """The dialectic's and the fabulac's tools are documented by the macrocosm-oes skill; their block in the prompt
+    names them and no more, under the same cap as the MacroCOSM block, and the line that stands in for it when the
+    skill is off is a single short line."""
+    from enough import prompt as P
+    assert len(P.FABULA_TOOL_INSTRUCTIONS) <= CANON_BLOCK_MAX, len(P.FABULA_TOOL_INSTRUCTIONS)
+    assert "dialectic" in P.FABULA_TOOL_INSTRUCTIONS and "fabulac" in P.FABULA_TOOL_INSTRUCTIONS
+    assert len(P.FABULA_ABSENT_INSTRUCTIONS) <= 100 and "\n" not in P.FABULA_ABSENT_INSTRUCTIONS.strip()

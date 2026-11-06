@@ -1323,8 +1323,8 @@ class _Run:
             want = (self.plan.get("program") or {}).get("name") if isinstance(self.plan.get("program"), dict) else None
             self.info = ProgramInfo.from_any(self.program, want)
         except OSError as e:
-            return Refusal("plan", "program", f"the program could not be read: {e.strerror or 'the system would not '
-                                                                                         'open it'}")
+            why = e.strerror or "the system would not open it"
+            return Refusal("plan", "program", f"the program could not be read: {why}")
         except ValueError:
             return Refusal("plan", "program", "the program could not be read: it is neither a .thym file nor a program "
                                               "volume")

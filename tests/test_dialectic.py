@@ -321,8 +321,11 @@ def test_a_bank_entry_bounds_itself():
     t = dl.open_twin(TALLY)
     r = dl.raise_questions(t, at=AT, pending=False, unsure=False)
     interfaces = [d for d in t.ledger.items if d["id"].startswith("C:interface/")]
-    assert [q["about"] for q in _from(r, "fabulac/bad-input")] == [d["id"] for d in interfaces if d.get("takes")]
-    assert len(_from(r, "fabulac/bad-input")) < len(interfaces)
+    taking = [d["id"] for d in interfaces if d.get("takes")]
+    assert len(taking) > 5 and len(taking) < len(interfaces)
+    assert [q["about"] for q in _from(r, "fabulac/bad-input")] == taking[-5:]     # only-with, then at most five
+    for entry in ("why-this", "tried", "intended", "public", "bad-input", "settings", "changed"):
+        assert len(_from(r, f"fabulac/{entry}")) <= 5, entry                      # no per-item entry floods a volume
     assert not _from(r, "fabulac/licence")                                       # its identifier was read
     lic = next(d for d in t.ledger.items if d["id"].startswith("R:licence/"))
     text = t.render().replace(f"identifier: {lic['identifier']}",
