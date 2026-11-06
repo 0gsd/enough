@@ -263,7 +263,12 @@ def test_the_question_prompts_one_per_flavour():
     code = D.question_messages({}, inputs("fabulac"))
     prose = D.question_messages({}, inputs("fabulan"))
     assert "poem" in verse[0]["content"] and "speaks" in verse[0]["content"] and "metre" in verse[0]["content"]
-    assert "intended" in code[0]["content"] and "never do" in code[0]["content"] and "tried" in code[0]["content"]
+    assert "docstring" in code[0]["content"] and "name the edge" in code[0]["content"] \
+        and "nothing a person cannot answer" not in verse[0]["content"]               # what is worth a person's time
+    assert "never \"is this behaviour intended?\" in general" in code[0]["content"]
+    for msgs in (verse, code, prose):                    # one question per address, and the quoting line, everywhere
+        assert "the only one about its item or field" in msgs[0]["content"]
+        assert "any value that is not a plain word or number" in msgs[0]["content"]
     assert "claim rests on" in prose[0]["content"] and "assumes" in prose[0]["content"]
     for m in (verse, code, prose):
         s = m[0]["content"]
@@ -725,3 +730,32 @@ def _text_blocks() -> list[str]:
     import re as _re
     text = (Path(__file__).resolve().parents[1] / "docs" / "THYM.md").read_text(encoding="utf-8")
     return [b for b in _re.findall(r"^```thym\n(.*?)^```", text, _re.S | _re.M)]
+
+
+def test_a_request_keeps_an_interface_with_its_behaviours_shows_no_bookkeeping_and_every_pending(tmp_path,
+                                                                                                monkeypatch):
+    """docs/fabula-landed-G3.md: an interface and the behaviours that cite it are read in one request; an item is
+    shown without the fields no person is asked about; every part lists the volume's pendings under Already asked."""
+    rows = [{"id": "C:interface/m.f", "type": "interface", "name": "f", "defined-in": "C:file/m", "exported": True,
+             "stance": "observed", "surface": "function", "span": {"file": "m.py", "lines": "1"},
+             "provenance": {"confidence": 1, "state": "known"}},
+            {"id": "C:interface/m.g", "type": "interface", "name": "g"},
+            {"id": "C:behaviour/m.g-does", "type": "behaviour", "of": ["C:interface/m.g"], "does": "x"},
+            {"id": "C:behaviour/m.f-does", "type": "behaviour", "of": ["C:interface/m.f"], "does": "y",
+             "stance": "deduced", "provenance": {"confidence": 0.7, "state": "known"}}]
+    assert [[i["id"] for i in g] for g in D._groups(rows)] == [
+        ["C:interface/m.f", "C:behaviour/m.f-does"], ["C:interface/m.g", "C:behaviour/m.g-does"]]
+    assert D._compact(rows[0], "fabulac") == {"id": "C:interface/m.f", "name": "f"}
+    assert D._compact(rows[3], "fabulac")["provenance"] == {"confidence": 0.7, "state": "known"}
+    assert "span" in D._compact(rows[0], "fabulan")                  # prose and verse keep what their lines need
+    v = fabula(TALLY)
+    pend = [q for q in dl.raise_questions(dl.open_twin(TALLY), at="2026-11-05T12:00:00Z").questions
+            if (q.get("raised") or {}).get("by") == "move"]
+    assert pend
+    monkeypatch.setattr(D, "CHUNK_ITEMS", 10)
+    n = len(D._chunks(doc(v)["nodes"], "fabulac"))
+    asker = Asker(["questions: []\n"] * n)
+    D.question(ctx_for(tmp_path, ask=asker), v)
+    for sent in asker.sent:
+        for q in pend:
+            assert q["asks"] in sent["inputs"]["asked"].payload

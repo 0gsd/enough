@@ -19,6 +19,7 @@ output:
   - package: pytest
     version: '>=8'
     scope: test
+    group: test
     line: 10
   scripts:
   - name: tiny

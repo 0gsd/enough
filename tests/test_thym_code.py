@@ -677,11 +677,19 @@ def test_tell_as_code_writes_the_cshort_file_by_file(built, tmp_path):
     assert isinstance(t, T.Trace) and t.landed, t.refusal
     out = t.dir / "outputs" / "code"
     assert sorted(p.relative_to(out).as_posix() for p in out.rglob("*") if p.is_file()) == [
-        "CSHORT.md", "README.md", "tiny/__init__.py", "tiny/__main__.py", "tiny/cli.py", "tiny/counting.py"]
+        "CSHORT.md", "README.md", "pyproject.toml", "tiny/__init__.py", "tiny/__main__.py", "tiny/cli.py",
+        "tiny/counting.py"]
     lines = (out / "CSHORT.md").read_text().strip().split("\n")
     assert lines[0] == "*a cshort of g.cosm, in Python, compiled on 2026-11-05 by scripted-1; never run*"
     assert lines[-1] == "Licence of the source: MIT"
-    assert "Not rebuilt: CHANGES.md, LICENSE, pyproject.toml, tests/test_counting.py." in lines
+    assert "Not rebuilt: CHANGES.md, LICENSE, tests/test_counting.py." in lines
+    # the packaging file is written by rules from what the survey recorded, never asked of the model
+    assert any(ln.startswith("| pyproject.toml | rules, from C:file/pyproject-toml | ") for ln in lines)
+    pack = (out / "pyproject.toml").read_text()
+    assert pack.startswith("# written by rules from g.cosm, not by a model")
+    assert 'name = "tiny-tool"' in pack and 'version = "0.2.0"' in pack and 'requires-python = ">=3.10"' in pack
+    assert '"test" = ["pytest>=8"]' in pack and 'packages = ["tiny"]' in pack
+    assert not [k for s, k, _c in cp.sent if k == "pyproject.toml"]
     assert [s for s, _k, _c in cp.sent].count("code") == 4 and [s for s, _k, _c in cp.sent].count("readme") == 1
     rec = next(r for r in t.records if r.get("name") == "tell f as code")
     assert [c["name"] for c in rec["checks"]] == ["parses", "interfaces-present", "files-present", "footer",
@@ -970,3 +978,201 @@ def test_history_places_a_tag_outside_the_log_by_its_release_commit_and_stays_sm
     change = items[rel["changes"][-1]]
     assert change["name"] == "Release v0.3.0." and change["nature"] == "build"
     assert all(it["began"] <= it["ended"] for it in items.values() if it["type"] == "phase")
+
+
+# ---------------------------------------------------------------------------
+# What seven readers met on real code (docs/fabula-landed-G3.md)
+# ---------------------------------------------------------------------------
+
+def _sib(tmp_path: Path) -> Path:
+    """A package whose module imports siblings by their package's name, whose plug-ins import a helper beside them
+    bare, typed in a stub, with its own [tool.<name>] table and an f-string help filled from a name."""
+    repo = tmp_path / "sib-tool"
+    (repo / "sib" / "plugins").mkdir(parents=True)
+    (repo / "sib" / "__init__.py").write_text("")
+    (repo / "sib" / "lines.py").write_text("def first(node):\n    return 1\n")
+    (repo / "sib" / "noqa.py").write_text("def parse(code):\n    return {}\n")
+    (repo / "sib" / "core.py").write_text(
+        "import argparse\nfrom sib import lines, noqa\n\ndef keyed(a, b=2):\n    return a\n\n"
+        "def main():\n    glob_help = 'Patterns may hold *.'\n    p = argparse.ArgumentParser(prog='sib')\n"
+        "    p.add_argument('--exclude', help=f'Paths to skip. {glob_help}')\n"
+        "    p.add_argument('--width', help=f'At most {WIDTH} wide.')\n    return lines.first(noqa.parse(p))\n")
+    (repo / "sib" / "core.pyi").write_text("def keyed(a: int, b: int = ...) -> str: ...\n")
+    (repo / "sib" / "plugins" / "__init__.py").write_text("")
+    (repo / "sib" / "plugins" / "helper.py").write_text("class Helper:\n    pass\n")
+    (repo / "sib" / "plugins" / "one.py").write_text("from helper import Helper\n\nHelper()\n")
+    (repo / "pyproject.toml").write_text(
+        '[project]\nname = "sib-tool"\nversion = "1.2"\nrequires-python = ">=3.10"\ndependencies = ["toml>=0.10"]\n'
+        '[project.optional-dependencies]\npint = ["pint"]\n\n[tool.sib-tool]\nexclude = ["build"]\n'
+        'min_confidence = 70\n\n[build-system]\nrequires = ["setuptools"]\nbuild-backend = "setuptools.build_meta"\n')
+    (repo / "LICENSE").write_text("MIT License\n\nCopyright (c) 2024 Ann Example\n")
+    return repo
+
+
+def test_survey_reads_siblings_stub_types_the_tools_table_and_a_filled_help(tmp_path):
+    _sib(tmp_path)
+    t = run_stage(tmp_path, DECOMPILE, "survey-the-repo", [{"name": "repo", "type": "folder", "path": "sib-tool"}])
+    _data, items = fabula_of(landed(t, "f"))
+    # `from sib import lines, noqa` is those two modules; a bare import of a module beside it is that module
+    assert {"C:component/sib.lines", "C:component/sib.noqa"} <= set(items["C:component/sib.core"]["uses"])
+    assert "C:component/sib" not in items["C:component/sib.core"]["uses"]
+    assert items["C:component/sib.plugins.one"]["uses"] == ["C:component/sib.plugins.helper"]
+    assert not any(i.startswith("C:dependency/helper") for i in items)
+    # the stub's types reach the interface
+    keyed = items["C:interface/sib.core.keyed"]
+    assert [x.get("type") for x in keyed["takes"]] == ["int", "int"] and keyed["gives"] == {"type": "str"}
+    assert "Typed in sib/core.pyi" in keyed["summary"]
+    # the program's own [tool.<name>] table, as settings; the packaging file names its project
+    tool = items["C:setting/pyproject.tool.sib-tool.min-confidence"]
+    assert (tool["set-in"], tool["key"], tool["default"]) == ("file", "min_confidence", "70")
+    assert items["C:file/pyproject-toml"]["holds"] == "packaging metadata of the project sib-tool, version 1.2, Python >=3.10"
+    assert "declared in the optional group `pint`" in items["C:dependency/pint"]["summary"]
+    # an f-string help filled from a name the file binds once; one no rule can fill says it is a template
+    assert items["C:setting/option.sib.exclude"]["means"] == "Paths to skip. Patterns may hold *."
+    assert items["C:setting/option.sib.width"]["means"].endswith("(an f-string: its {…} parts are filled in when "
+                                                                 "the program runs)")
+    assert not FAB.lint(landed(t, "f")).errors
+
+
+def test_a_test_file_takes_cases_and_structures_and_a_bare_file_a_structure():
+    with pytest.raises(ValueError, match="a test file takes cases, and structures .* also gives behaviours"):
+        CODE.parse_reading("behaviours: [{name: x, summary: y, does: z, of: [C:component/a]}]", path="tests/t.py",
+                           module="tests.t", n_lines=3, taken=set(), role="test")
+    got = CODE.parse_reading("structures: [{slug: lock, name: A lock, summary: It counts., shape: a class}]",
+                             path="tests/t.py", module="tests.t", n_lines=3, taken=set(), role="test")
+    assert [i["id"] for i in got] == ["C:structure/tests.t.lock"]
+    with pytest.raises(ValueError, match="no interface or component of its own"):
+        CODE.parse_reading("behaviours: [{name: x, summary: y, does: z, of: [C:file/dev]}]", path="dev/r.py",
+                           module="dev.r", n_lines=3, taken=set(), role="bare")
+    assert CODE.read_role("tests/test_a.py", []) == "test" and CODE.read_role("dev/r.py", [{"id": "C:file/x"}]) == "bare"
+    v = lambda s: (Value("string", s), "0" * 64)  # noqa: E731
+    msgs = FP.messages({}, {"fabulac": v("read"), "path": v("tests/t.py"), "code": v("1| x = 1"), "role": v("test"),
+                            "outline": v("[]"), "lines": v("1-1 of 1"), "elsewhere": v("[]"), "test": v("yes")})
+    assert "write only cases" in msgs[1]["content"] and "behaviours:" not in msgs[1]["content"]
+    assert "Terms the specification already has" not in msgs[1]["content"]       # no terms yet: no line
+    assert "any value that is not a plain word or number" in msgs[1]["content"]
+
+
+def test_a_component_is_covered_by_its_does_and_an_event_shows_ids():
+    local = [{"id": "C:component/a", "type": "component", "does": {"pending": "what?"}},
+             {"id": "C:interface/a.f", "type": "interface", "span": {"file": "a.py", "lines": "3-4"}}]
+    assert CODE.uncovered(local, []) == ["C:component/a", "C:interface/a.f"]
+    told = [{"id": "C:component/a", "does": "It counts."}]
+    assert CODE.uncovered(local, told) == ["C:interface/a.f"]                     # enrich covers a component only
+    assert CODE.uncovered(local, told + [{"id": "C:behaviour/a.f", "type": "behaviour", "of": ["C:interface/a.f"]}]) == []
+    assert "agent: C:interface/pkg.mod.main" in FP.READ_SHAPE and "after: T:event/pkg.mod.read-file" in FP.READ_SHAPE
+    assert "a component does; a setting means" in FP.READ_SYSTEM
+    # a long file's parts: each covers the interfaces whose first line it holds; the component in the first only
+    assert CODE.to_cover(local, "a.py", 1, 2, True) == ["C:component/a"]
+    assert CODE.to_cover(local, "a.py", 3, 9, False) == ["C:interface/a.f"]
+
+
+def _long_module(tmp_path: Path) -> Path:
+    repo = copy_tiny(tmp_path)
+    body = "".join(f"def f{i}(x):\n    return x + {i}\n\n" for i in range(4))
+    (repo / "tiny" / "counting.py").write_text((repo / "tiny" / "counting.py").read_text() + "\n" + body)
+    return repo
+
+
+def test_a_coverage_fault_is_asked_again_only_of_the_part_that_holds_it(tmp_path, monkeypatch):
+    """A long file is read in parts; the part whose lines hold an uncovered interface is asked again, with the
+    current verdict, and the other part's answer is kept."""
+    repo = _long_module(tmp_path)
+    n = len((repo / "tiny" / "counting.py").read_text().splitlines())
+    monkeypatch.setattr(CODE, "chunks_of", lambda text, size=600: [(1, 56), (57, n)])
+    tail = ("behaviours:\n" + "".join(f"  - {{slug: f{i}, name: f{i}, summary: f{i} adds {i}., of: "
+                                        f"[C:interface/tiny.counting.f{i}], does: Adds {i}., lines: \"{58 + 3 * i}\"}}\n"
+                                        for i in range(4)))
+    first = READ["tiny/counting.py"]
+    calls = {"n": 0}
+
+    def answer(inputs):
+        if _t(inputs, "lines").startswith("1-"):
+            calls["n"] += 1
+            return first
+        return tail if _t(inputs, "failed") else tail.split("  - {slug: f3")[0]
+    cp = Scripted(answers({("read", "tiny/counting.py"): answer}))
+    build(tmp_path, repo, cp, upto=3)
+    asked = cp.asked("read", "tiny/counting.py")
+    assert len(asked) == 3 and calls["n"] == 1                       # part 1 once; part 2 twice
+    again = [c for s, k, c in cp.sent if k == "tiny/counting.py"][2]
+    assert "tiny.counting.f3" in again["repair"]["failed"][0]["why"]
+
+
+def test_what_a_file_reaches_elsewhere_is_what_it_imports():
+    items = [{"id": "C:file/a", "type": "file", "path": "p/a.py"}, {"id": "C:file/b", "type": "file", "path": "p/b.py"},
+             {"id": "C:file/c", "type": "file", "path": "p/c.py"},
+             {"id": "C:component/p.a", "type": "component", "name": "p.a", "files": ["C:file/a"]},
+             {"id": "C:component/p.b", "type": "component", "name": "p.b", "files": ["C:file/b"]},
+             {"id": "C:component/p.c", "type": "component", "name": "p.c", "files": ["C:file/c"]},
+             {"id": "C:interface/p.b.go", "type": "interface", "name": "go", "defined-in": "C:file/b", "signature": "def go()"},
+             {"id": "C:interface/p.b.stop", "type": "interface", "name": "stop", "defined-in": "C:file/b"},
+             {"id": "C:interface/p.c.run", "type": "interface", "name": "run", "defined-in": "C:file/c"},
+             {"id": "C:setting/p.b.LIMIT", "type": "setting", "key": "LIMIT", "name": "LIMIT", "default": "3",
+              "span": {"file": "p/b.py", "lines": "1"}}]
+    ol = {"ok": True, "imports": [{"module": "p.b", "names": ["go", "LIMIT"], "line": 1}]}
+    got = CODE.elsewhere_of(items, "p/a.py", ol, test=False)
+    assert [r["id"] for r in got] == ["C:interface/p.b.go", "C:setting/p.b.LIMIT"]
+    whole = {"ok": True, "imports": [{"module": "p", "names": ["c"], "line": 1}]}
+    items.append({"id": "C:component/p", "type": "component", "name": "p", "files": []})
+    assert [r["id"] for r in CODE.elsewhere_of(items, "p/a.py", whole, test=False)] == ["C:interface/p.c.run"]
+
+
+def test_the_fold_cuts_documents_at_a_line_reference_before_the_change_log(tmp_path, monkeypatch):
+    repo = tmp_path / "docs-tool"
+    (repo / "docs").mkdir(parents=True)
+    (repo / "README.md").write_text("# t\n\nA tool.\n")
+    (repo / "CHANGELOG.md").write_text("".join(f"- change {i}\n" for i in range(400)))
+    (repo / "docs" / "api.md").write_text("".join(f"The reference, line {i}.\n" for i in range(50)))
+    from enough.thym import folder as FO
+    monkeypatch.setattr(CODE, "DOC_BUDGET", 2000)
+    text = CODE._documents(FO.read(repo), [])
+    assert text.index("=== docs/api.md") < text.index("=== CHANGELOG.md")
+    assert re.search(r"\(… \d+ more lines of CHANGELOG.md not shown\)", text)
+    assert all(ln.startswith(("===", "(", "")) or re.match(r"\s*\d+\| ", ln) for ln in text.split("\n"))
+
+
+def test_the_fold_keeps_one_term_per_word():
+    items = [{"id": "L:term/a.whitelist", "type": "term", "name": "whitelist", "sense": "A file of names.",
+              "provenance": {"sources": ["a.py#L1"]}},
+             {"id": "L:term/b.whitelist", "type": "term", "name": "Whitelist", "sense": "A module of uses.",
+              "provenance": {"sources": ["b.py#L2"]}},
+             {"id": "K:concept/x", "type": "concept", "defined-by": ["L:term/b.whitelist"]}]
+    got = CODE.merge_terms(items)
+    assert [i["id"] for i in got] == ["L:term/a.whitelist", "K:concept/x"]
+    assert got[0]["sense"] == "A file of names. Also: A module of uses." and got[1]["defined-by"] == ["L:term/a.whitelist"]
+    assert got[0]["provenance"]["sources"] == ["a.py#L1", "b.py#L2"]
+
+
+def test_a_file_brief_carries_the_cases_of_the_work_it_does_and_what_it_calls():
+    items = [{"id": "C:file/i", "type": "file", "path": "p/__init__.py"}, {"id": "C:file/w", "type": "file", "path": "p/_w.py"},
+             {"id": "C:component/p", "type": "component", "name": "p", "files": ["C:file/i"]},
+             {"id": "C:component/p._w", "type": "component", "name": "p._w", "files": ["C:file/w"]},
+             {"id": "C:interface/p.cached", "type": "interface", "name": "cached", "defined-in": "C:file/i",
+              "signature": "def cached(cache)"},
+             {"id": "C:interface/p._w._wrapper", "type": "interface", "name": "_wrapper", "defined-in": "C:file/w",
+              "signature": "def _wrapper(func)"},
+             {"id": "C:behaviour/p.cached-deco", "type": "behaviour", "of": ["C:interface/p.cached"],
+              "does": "Returns a decorator built by _wrapper from p._w."},
+             {"id": "C:behaviour/p._w.locked", "type": "behaviour", "of": ["C:interface/p._w._wrapper"],
+              "does": "Enters the lock twice on a miss; see `cached(`."},
+             {"id": "P:case/t.lock-count", "type": "case", "of": ["C:interface/p.cached"], "given": {}, "expect": {}},
+             {"id": "D:question/q1", "type": "question", "about": "C:behaviour/p._w.locked", "asks": "Why twice?",
+              "state": "open"}]
+    b = CODE.file_brief(items, items[1])
+    ids = [x["id"] for x in b["items"]]
+    assert "P:case/t.lock-count" in ids and len(ids) == len(set(ids))
+    assert b["open questions"] == [{"about": "C:behaviour/p._w.locked", "asks": "Why twice?"}]
+    assert [e["id"] for e in b["elsewhere"]] == ["C:interface/p.cached"] and b["elsewhere"][0]["does"]
+    # the README's request follows its format, and asks for typed commands only of a program that has some
+    v = lambda s: (Value("string", s), "0" * 64)  # noqa: E731
+    rst = FP.messages({}, {"fabulac": v("readme"), "path": v("README.rst"), "name": v("p"), "brief": v("{}"),
+                           "atem": v("{}"), "commands": v("no")})
+    assert "reStructuredText" in rst[0]["content"] and "commands a user types" not in rst[0]["content"]
+
+
+def test_a_catem_request_lists_every_item_it_may_cite():
+    items = [{"id": "K:concept/budget", "type": "concept", "name": "budget"}, {"id": "N:use/u", "type": "use"},
+             {"id": "C:structure/s", "type": "structure"}, {"id": "C:file/f", "type": "file"}]
+    got = mc.yaml_load(CODE._catem_outline(items, "manual"))
+    assert [i["id"] for i in got] == ["K:concept/budget", "N:use/u", "C:structure/s"]

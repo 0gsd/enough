@@ -313,6 +313,13 @@ def _usage(prog: str, args: list[dict], sub: dict | None = None, subs: list[str]
     return " ".join(parts + pos)
 
 
+def _help(a: dict) -> str:
+    """An argument's help as the syntax engine read it; an f-string whose parts no rule could fill says so, so that a
+    reader can tell a template (`{width}`) from words a user sees."""
+    h = str(a.get("help") or "")
+    return h + (" (an f-string: its {…} parts are filled in when the program runs)" if a.get("help_template") else "")
+
+
 def _takes_of_args(args: list[dict]) -> list[dict]:
     out = []
     for a in args:
@@ -333,7 +340,7 @@ def _takes_of_args(args: list[dict]) -> list[dict]:
         elif str(a.get("required") or "") == "True":
             row["required"] = True
         if a.get("help"):
-            row["means"] = str(a["help"])
+            row["means"] = _help(a)
         elif act == "version":
             row["means"] = "print the version and exit"
         if a.get("choices"):
@@ -417,6 +424,12 @@ def survey(ctx: Any, repo: Value, **_: Any) -> Value:
     slugs = _file_slugs(paths)
     top = {p.split("/", 1)[0] for p in paths if p.endswith("/__init__.py") and p.count("/") == 1}
     outlines = {e.path: syn.outline(e.path, f.text(e.path)) for e in py}
+    # a module typed only in its stub (`keys.py` beside `keys.pyi`): the stub's types reach its interfaces
+    have = {e.path for e in f.texts()}
+    for e in py:
+        stub = e.path[:-3] + ".pyi"
+        if stub in have and isinstance(outlines[e.path], dict) and outlines[e.path].get("ok"):
+            outlines[e.path] = _typed_by_stub(outlines[e.path], syn.outline(stub, f.text(stub)), stub)
     manifests = {e.path: syn.manifest(e.path, f.text(e.path)) for e in f.texts() if is_packaging(e.path)}
     manifests = {p: m for p, m in manifests.items() if isinstance(m, dict) and m.get("ok")}
     o = _Outline()
@@ -442,6 +455,7 @@ def survey(ctx: Any, repo: Value, **_: Any) -> Value:
     # -- dependencies
     req_python = next((m.get("requires_python") for m in manifests.values() if m.get("requires_python")), None)
     _survey_dependencies(o, outlines, mods, internal, manifests, req_python)
+    _survey_packaging(o, manifests, file_ids)
     # -- the licence and the means
     licence = _survey_licence(o, f, manifests)
     _survey_means(o, manifests, req_python, outlines)
@@ -464,6 +478,35 @@ def survey(ctx: Any, repo: Value, **_: Any) -> Value:
     return Value("fabula", cat)
 
 
+def _typed_by_stub(ol: dict, stub: Any, stub_path: str) -> dict:
+    """A module's outline with what its stub (`keys.pyi`) types and the code does not: each parameter's annotation,
+    the return type and the overloads, by the definition's qualified name; the definition says where its types are
+    written (`typed-in`). The code's own annotations stand."""
+    if not isinstance(stub, dict) or not stub.get("ok"):
+        return ol
+    sdefs = {str(d.get("qual")): d for d in stub.get("defs") or []}
+    out = copy.deepcopy(ol)
+    for d in out.get("defs") or []:
+        s = sdefs.get(str(d.get("qual")))
+        if s is None:
+            continue
+        sp = {str(p.get("name")): p for p in s.get("params") or []}
+        typed = False
+        for p in d.get("params") or []:
+            a = (sp.get(str(p.get("name"))) or {}).get("annotation")
+            if a and not p.get("annotation"):
+                p["annotation"], typed = a, True
+        if s.get("returns") and not d.get("returns"):
+            d["returns"], typed = s["returns"], True
+        if s.get("overloads") and not d.get("overloads"):
+            d["overloads"], typed = s["overloads"], True
+        if typed or (d.get("kind") == "class" and s.get("bases") != d.get("bases")):
+            d["typed-in"] = stub_path
+            if s.get("signature") != d.get("signature"):
+                d["stub-signature"] = s.get("signature")
+    return out
+
+
 def _import_target(imp: dict, mod: str, path: str) -> str:
     """The dotted module an import names, a relative one resolved against the importing module."""
     m = str(imp.get("module") or "")
@@ -473,6 +516,29 @@ def _import_target(imp: dict, mod: str, path: str) -> str:
     base = mod.split(".")
     pkg = ".".join(base[:len(base) - level + (1 if path.endswith("__init__.py") else 0)])
     return f"{pkg}.{m}" if m and pkg else (m or pkg)
+
+
+def imported_modules(imp: dict, mod: str, path: str, known: set[str]) -> list[str]:
+    """The modules of the tree one import reaches, by rules: a relative import resolved against the importing
+    module; `from pkg import sub` names the module `pkg.sub` where the tree holds one (else `pkg`); a bare import of
+    a sibling module (`from whitelist_utils import Whitelist`, beside it in the same folder) is that module, not a
+    package from outside. Empty when the import names nothing of the tree."""
+    target = _import_target(imp, mod, path)
+    if not int(imp.get("level") or 0) and not imp.get("stdlib") and target not in known \
+            and target.split(".", 1)[0] not in known:
+        here = mod if path.endswith("__init__.py") else (mod.rsplit(".", 1)[0] if "." in mod else "")
+        if here and (f"{here}.{target}" in known or f"{here}.{target.split('.', 1)[0]}" in known):
+            target = f"{here}.{target}"
+    out = [f"{target}.{n}" for n in imp.get("names") or [] if n != "*" and f"{target}.{n}" in known]
+    if not out:
+        if target in known:
+            out = [target]
+        elif target.split(".", 1)[0] in known:
+            parts = target.split(".")
+            while parts and ".".join(parts) not in known:
+                parts.pop()
+            out = [".".join(parts)] if parts else []
+    return [m for m in out if m != mod]
 
 
 def _reached_names(outlines: dict, mods: dict) -> dict[str, set[str]]:
@@ -486,8 +552,7 @@ def _reached_names(outlines: dict, mods: dict) -> dict[str, set[str]]:
             continue
         mod = mods[path]
         for imp in ol.get("imports") or []:
-            target = _import_target(imp, mod, path)
-            if target in known and target != mod:
+            for target in imported_modules(imp, mod, path, known):
                 out.setdefault(target, set()).update(n for n in imp.get("names") or [] if n != "*")
     return out
 
@@ -629,6 +694,9 @@ def _notes(d: dict, why: str | None) -> list[str]:
         notes.append(f"Not exported: {why}.")
     if d.get("cond"):
         notes.append(f"Defined only under `{d['cond']}`.")
+    if d.get("typed-in"):
+        notes.append(f"Typed in {d['typed-in']}" + (f": `{d['stub-signature']}`" if d.get("stub-signature") else "")
+                     + ".")
     if d.get("overloads"):
         notes.append("Typed by overloads: " + "; ".join(f"`{s}`" for s in d["overloads"]) + ".")
     if d.get("attrs"):
@@ -928,7 +996,7 @@ def _option_settings(o: _Outline, path: str, prog: str, cmd_id: str, args: list[
         elif str(a.get("action") or "") == "store_true":
             it["default"] = "False"
         if a.get("help"):
-            it["means"] = a["help"]
+            it["means"] = _help(a)
         it["read-by"] = [cmd_id]
         it["span"] = span(path, a["line"])
         it["provenance"] = prov([loc(path, a["line"])])
@@ -951,30 +1019,20 @@ def _survey_dependencies(o: _Outline, outlines: dict, mods: dict, internal: set,
         mod = mods[path]
         cid = f"C:component/{name_slug(mod)}"
         user = cid if cid in o.items else None
+        known = set(mods.values())
         for imp in ol.get("imports") or []:
             m = str(imp.get("module") or "")
             level = int(imp.get("level") or 0)
             if m == "__future__":
                 continue
-            if level > 0:
-                base = mod.split(".")
-                pkg = ".".join(base[:len(base) - level + (1 if path.endswith("__init__.py") else 0)])
-                targets = [f"{pkg}.{m}" if m else pkg]
-                if not m:
-                    targets = [f"{pkg}.{n}" for n in imp.get("names") or []] + [pkg]
-                for t in targets:
-                    tid = f"C:component/{name_slug(t)}"
-                    if user and tid in o.items and tid != user:
-                        comp_uses.setdefault(user, set()).add(tid)
-                        break
-                continue
             topname = m.split(".", 1)[0]
-            if m in internal or topname in internal:
-                for t in (m, topname):
+            inside = imported_modules(imp, mod, path, known)
+            if level > 0 or inside or m in internal or topname in internal:
+                # every module of the tree the import reaches: `from vulture import lines, noqa` is lines and noqa
+                for t in inside:
                     tid = f"C:component/{name_slug(t)}"
                     if user and tid in o.items and tid != user:
                         comp_uses.setdefault(user, set()).add(tid)
-                        break
                 continue
             if imp.get("stdlib"):
                 if is_test(path):                 # what the tests use is not what the program needs
@@ -1016,7 +1074,8 @@ def _survey_dependencies(o: _Outline, outlines: dict, mods: dict, internal: set,
             scope = "test"
         it = {"id": f"C:dependency/{slug(name)}", "type": "dependency", "name": name,
               "summary": f"{name}, a package from outside the tree" + (
-                  f", imported as {row['import']}" if row and row["import"] != name else "") + ".",
+                  f", imported as {row['import']}" if row and row["import"] != name else "") + (
+                  f", declared in the optional group `{dec['group']}`" if dec and dec.get("group") else "") + ".",
               "stance": "observed", "package": name, "scope": scope}
         if dec and dec.get("version"):
             it["version"] = dec["version"]
@@ -1045,6 +1104,35 @@ def _survey_dependencies(o: _Outline, outlines: dict, mods: dict, internal: set,
     for cid, uses in comp_uses.items():
         if cid in o.items:
             o.items[cid]["uses"] = sorted(uses)
+
+
+#: How a packaging file's `holds` names its project, so that a cshort's packaging file can be written by rules
+#: (`packaging_file`): "packaging metadata of the project vulture, version 2.14, Python >=3.9".
+_PROJECT = re.compile(r"of the project (?P<name>[A-Za-z0-9][A-Za-z0-9._-]*)(?:, version (?P<version>[^,\s]+))?"
+                      r"(?:, Python (?P<python>[^,]+?))?\.?$")
+
+
+def _survey_packaging(o: _Outline, manifests: dict, file_ids: dict) -> None:
+    """What a packaging file says by rules: the project it names (in its `C:file`'s `holds`), and the program's own
+    `[tool.<its name>]` table, each key a setting the program reads from the repository's pyproject.toml."""
+    for path, m in sorted(manifests.items()):
+        fid = file_ids.get(path)
+        if fid in o.items and m.get("name"):
+            o.items[fid]["holds"] = (f"packaging metadata of the project {m['name']}"
+                                     + (f", version {m['version']}" if m.get("version") else "")
+                                     + (f", Python {m['requires_python']}" if m.get("requires_python") else ""))
+        tool = m.get("tool")
+        if not isinstance(tool, dict):
+            continue
+        for row in tool.get("keys") or []:
+            key = str(row.get("key"))
+            o.add({"id": f"C:setting/pyproject.tool.{name_slug(slug(str(tool.get('name'))))}.{slug(key)}",
+                   "type": "setting", "name": f"[tool.{tool.get('name')}] {key}",
+                   "summary": f"The repository's own {path} sets {key} = {row.get('value')} in its "
+                              f"[tool.{tool.get('name')}] table, the table named for the program.",
+                   "stance": "observed", "key": key, "set-in": "file", "default": str(row.get("value")),
+                   "span": span(path, int(row.get("line") or 1)),
+                   "provenance": prov([loc(path, int(row.get("line") or 1))])})
 
 
 def _survey_licence(o: _Outline, f: Folder, manifests: dict) -> Any:
@@ -1443,7 +1531,7 @@ def _compact(it: dict) -> dict:
 #: What a reader is not shown of an outline item: the bookkeeping it cannot use (the file is the one it reads, the
 #: kind is in the id, the component's list of what it exposes is the interfaces that follow).
 _NOT_SHOWN = ("provenance", "made", "stance", "type", "defined-in", "sha256", "length", "exposes", "holds", "files",
-              "component", "language")
+              "component", "language", "used-by")
 
 
 def _shown(it: dict, path: str) -> dict:
@@ -1506,19 +1594,39 @@ def _lines_of(row: dict, a: int, b: int, n: int) -> tuple[int, int] | None:
     return min(nums), max(nums)
 
 
+#: What a reading of each role takes (`read_role`): a test file its cases and the structures its helpers are; a file
+#: with no interface or component of its own a structure that says what it is, and what its words assert.
+ROLE_SECTIONS = {"test": ("cases", "structures"),
+                 "bare": ("structures", "claims", "terms", "concepts", "cases")}
+ROLE_SAYS = {"test": "a test file takes cases, and structures for the helpers other tests use, only",
+             "bare": "this file has no interface or component of its own to be the subject of a behaviour: write a "
+                     "structure that says what it is for and what it does"}
+
+
 def parse_reading(out: Any, *, path: str, module: str, n_lines: int, taken: set[str], feed: Any = None,
-                  base: list[dict] | None = None) -> list[dict]:
+                  base: list[dict] | None = None, role: str = "code", told_elsewhere: Any = ()) -> list[dict]:
     """A model's reading of one file as items (strict: a ValueError says what is wrong, and the answer is asked
     again). Every entry is a mapping with a `slug`, a `name`, a `summary` and `lines`; its id is made here, in the
     file's own namespace (`C:behaviour/<module>.<slug>`), so that two files' readings never collide; its span is
     `{file: <path>, lines}`; behaviours, structures, cases and events are `observed` (read in the code) unless the
-    entry says `deduced`; a claim keeps the stance it gives."""
+    entry says `deduced`; a claim keeps the stance it gives. A reading of a test file, or of a file with no interface
+    or component of its own, takes only the sections of its role (`ROLE_SECTIONS`); a component another part of the
+    file tells (`told_elsewhere`) keeps the `does` that part gives, and one given here is let go."""
     data = answer_mapping(out)
     unknown = [k for k in data if k not in READ_KINDS and k not in ("engine", "enrich")]
     if unknown:
         raise ValueError(f"the answer has sections this reading does not take: {', '.join(map(str, unknown))}; "
                          f"use {', '.join(READ_KINDS)}, enrich")
-    items: list[dict] = enrichments(data.get("enrich"), base or [], path, n_lines)
+    if role in ROLE_SECTIONS:
+        extra = [k for k in data if k not in ROLE_SECTIONS[role] and k != "engine" and data.get(k)]
+        if extra:
+            raise ValueError(f"{ROLE_SAYS[role]}; this answer also gives {', '.join(map(str, extra))}")
+    rows = data.get("enrich")
+    if told_elsewhere and isinstance(rows, list):
+        rows = [r for r in ({k: v for k, v in r.items() if not (k == "does" and r.get("id") in told_elsewhere)}
+                            if isinstance(r, dict) else r for r in rows)
+                if not (isinstance(r, dict) and r.get("id") in told_elsewhere and set(r) <= {"id", "lines"})]
+    items: list[dict] = enrichments(rows, base or [], path, n_lines)
     used = set(taken)
     for section, (letter, kind) in READ_KINDS.items():
         rows = data.get(section) or []
@@ -1708,9 +1816,138 @@ def reading_value(cat: dict, items: list[dict], path: str, new: list[dict]) -> d
     return {**copy.deepcopy(cat), "nodes": list(new)}
 
 
+def _top_packages(items: list[dict]) -> set[str]:
+    paths = [str(it.get("path")) for it in items if item_kind(it) == "file"]
+    return {p.split("/", 1)[0] for p in paths if p.endswith("/__init__.py") and p.count("/") == 1}
+
+
+def _line_a(it: dict, path: str) -> int | None:
+    sp = it.get("span")
+    if not isinstance(sp, dict) or sp.get("file") != path:
+        return None
+    m = re.match(r"\s*(\d+)", str(sp.get("lines") or ""))
+    return int(m.group(1)) if m else None
+
+
+def read_role(path: str, local: list[dict]) -> str:
+    """What a file's reading may hold (THYM 20.6, as built here): `test` (cases, and structures for the helpers other
+    tests use), `bare` (a file the outline gives no interface or component: the repository's tooling, a helper; a
+    structure that says what it is for, and claims), or `code` (everything)."""
+    if is_test(path):
+        return "test"
+    if not [x for x in local if item_kind(x) in ("interface", "component")]:
+        return "bare"
+    return "code"
+
+
+def to_cover(local: list[dict], path: str, a: int, b: int, first: bool) -> list[str]:
+    """The ids one part of a file must cover: the interfaces whose first line is in its lines, and, in the first part
+    only, the file's components (a component is told once, by the part that reads its top)."""
+    out = []
+    for it in local:
+        k = item_kind(it)
+        if k == "component" and first:
+            out.append(it["id"])
+        elif k == "interface":
+            at = _line_a(it, path)
+            if at is None or a <= at <= b:
+                out.append(it["id"])
+    return out
+
+
+def elsewhere_of(items: list[dict], path: str, ol: Any, test: bool) -> list[dict]:
+    """What a file reaches in the other files, found from its own imports (the syntax engine's outline): the
+    interfaces of each module of the tree it imports (only the names it imports, when it names them), and the
+    structures and settings it imports by name; a test file gets every structure and setting of a module it imports
+    whole too. `[{id, signature | shape | default, in}]`."""
+    if not isinstance(ol, dict) or not ol.get("ok"):
+        return []
+    by = _by_id(items)
+    comps = {str(c.get("name")): c for c in items if item_kind(c) == "component"}
+    known = set(comps)
+    mod = module_name(path, _top_packages(items))
+    reach: dict[str, set[str] | None] = {}
+    for imp in ol.get("imports") or []:
+        names = [n for n in imp.get("names") or [] if n != "*"]
+        for m in imported_modules(imp, mod, path, known):
+            # a module imported whole, or by its name (`from vulture import utils`), or with a star
+            if not names or "*" in (imp.get("names") or []) or any(m.endswith("." + n) for n in names):
+                reach[m] = None
+            elif reach.get(m, set()) is not None:
+                reach.setdefault(m, set()).update(names)
+        target = _import_target(imp, mod, path)          # `from vulture import lines, Item`: Item is vulture's
+        rest = [x for x in names if f"{target}.{x}" not in known]
+        if rest and target in known and target != mod and reach.get(target, set()) is not None:
+            reach.setdefault(target, set()).update(rest)
+    out: list[dict] = []
+    for m, names in reach.items():
+        fids = set(comps[m].get("files") or [])
+        fpaths = {str(by.get(x, {}).get("path")) for x in fids}
+        for it in items:
+            k = item_kind(it)
+            root = str(it.get("name") or "").split(".", 1)[0]
+            named = names is not None and (root in names or str(it.get("key") or "") in names)
+            if k == "interface" and it.get("defined-in") in fids and (names is None or named):
+                out.append({"id": it["id"], "signature": it.get("signature"),
+                            "in": by.get(str(it.get("defined-in")), {}).get("path")})
+            elif k == "structure" and it.get("defined-in") in fids and (named or (names is None and test)):
+                out.append({"id": it["id"], "shape": it.get("shape"), **({"fields": [
+                    f.get("name") for f in it.get("fields") or [] if isinstance(f, dict)]} if it.get("fields") else {}),
+                    "in": by.get(str(it.get("defined-in")), {}).get("path")})
+            elif k == "setting" and isinstance(it.get("span"), dict) and it["span"].get("file") in fpaths and (
+                    named or (names is None and test)):
+                out.append({"id": it["id"], "default": it.get("default"), "in": it["span"].get("file")})
+    seen: set = set()
+    return [r for r in out if not (r["id"] in seen or seen.add(r["id"]))]
+
+
+def _part_outline(local: list[dict], path: str, first: bool) -> list[dict]:
+    """The outline a part of a file is shown: every local item (any may be cited), the component's open `does` only
+    in the first part, which tells it."""
+    out = []
+    for x in local:
+        s = _shown(x, path)
+        if not first and item_kind(x) == "component" and mc.is_pending(s.get("does")):
+            s.pop("does")
+        out.append(s)
+    return out
+
+
+_ANY_ID = re.compile(r"\b[A-Z]:[a-z][a-z0-9-]*/[^\s,;()'\"]+")
+
+
+def _faulty_parts(failed: list, per: list[list[dict]], parts: list[tuple[int, int]], local: list[dict],
+                  path: str) -> dict[int, list[str]]:
+    """Which parts of a long file a failed verdict is about, with the verdict's words for each: an id a part's own
+    answer made is that part's; an interface of the outline is the part that holds its first line, a component the
+    first part's. A verdict that names nothing of a part goes to every part."""
+    own = {}
+    for i, rows in enumerate(per):
+        for it in rows:
+            own.setdefault(str(it.get("id")), i)
+    for it in local:
+        k = item_kind(it)
+        if k == "component":
+            own.setdefault(it["id"], 0)
+        elif k in ("interface", "structure", "setting"):
+            at = _line_a(it, path)
+            hit = next((i for i, (a, b) in enumerate(parts) if at is not None and a <= at <= b), None)
+            if hit is not None:
+                own.setdefault(it["id"], hit)
+    out: dict[int, list[str]] = {}
+    for f in failed or []:
+        words = f"{f.get('name')}: {f.get('why') or 'does not hold'}"
+        hits = {own[x.rstrip('.:')] for x in _ANY_ID.findall(str(f.get("why") or "")) if x.rstrip('.:') in own}
+        for i in (hits or range(len(parts))):
+            out.setdefault(i, []).append(words)
+    return out
+
+
 def read_file(ctx: Any, t: Value, **mods: Any) -> Request | Value:
     """`derive t as code with f`: one Python file read against the outline (THYM 20.6, read), one model request per
-    file (several, keyed in order, for a file longer than `CHUNK_LINES`)."""
+    file (several, keyed in order, for a file longer than `CHUNK_LINES`). Each part of a long file covers the
+    interfaces whose lines it holds, and only the first tells the component; called again with what failed, the move
+    asks again only the part a verdict is about, with that verdict, and keeps the other parts' answers."""
     w = mods.get("with")
     if not isinstance(w, Value) or w.type != "fabula":
         raise MoveError("derive … as code reads a file against its outline: derive t as code with f")
@@ -1724,56 +1961,78 @@ def read_file(ctx: Any, t: Value, **mods: Any) -> Request | Value:
         raise MoveError(f"{path} is {files[path].get('language')}; this edition reads Python files as code")
     text = t.text()
     n = lines_in(text)
-    top = set()
-    module = module_name(path, top)
+    module = module_name(path, set())
     local = local_outline(items, path)
     taken = {str(it.get("id")) for it in items}
     terms = [{"id": it["id"], "name": it.get("name")} for it in items if item_kind(it) == "term"][:80]
-    others = [{"id": it["id"], "signature": it.get("signature")} for it in items if item_kind(it) == "interface"
-              and it.get("defined-in") != files[path]["id"]][:120]
     feed = (getattr(ctx, "engines", None) or {}).get("feed")
     parts = chunks_of(text)
-    defs = _definitions(engine(ctx, "syntax").outline(path, text))
+    ol = engine(ctx, "syntax").outline(path, text)
+    defs = _definitions(ol)
+    role = read_role(path, local)
+    others = elsewhere_of(items, path, ol, role == "test")
+    comps = [x["id"] for x in local if item_kind(x) == "component"]
 
-    def inputs(a: int, b: int) -> dict:
+    def inputs(a: int, b: int, first: bool) -> dict:
         lines = text.replace("\r\n", "\n").split("\n")
-        return {"fabulac": Value("string", "read"), "path": Value("string", path),
-                "lines": Value("string", f"{a}-{b} of {n}"),
-                "code": Value("string", _numbered("\n".join(lines[a - 1:b]), a)),
-                "outline": Value("string", _yaml([_shown(x, path) for x in local])),
-                "terms": Value("string", _yaml(terms) if terms else "[]"),
-                "elsewhere": Value("string", _yaml(others) if others else "[]"),
-                "definitions": Value("string", defs),
-                "test": Value("string", "yes" if is_test(path) else "no")}
+        ins = {"fabulac": Value("string", "read"), "path": Value("string", path),
+               "lines": Value("string", f"{a}-{b} of {n}"),
+               "code": Value("string", _numbered("\n".join(lines[a - 1:b]), a)),
+               "outline": Value("string", _yaml(_part_outline(local, path, first))),
+               "elsewhere": Value("string", _yaml(others) if others else "[]"),
+               "definitions": Value("string", defs),
+               "test": Value("string", "yes" if role == "test" else "no"),
+               "role": Value("string", role),
+               "cover": Value("string", _yaml(to_cover(local, path, a, b, first)) if role == "code" else "[]")}
+        if terms:
+            ins["terms"] = Value("string", _yaml(terms))
+        if len(parts) > 1:
+            ins["part"] = Value("string", f"{parts.index((a, b)) + 1} of {len(parts)}")
+        return ins
+
+    def read(out: Any, used: set[str], first: bool) -> list[dict]:
+        return parse_reading(out, path=path, module=module, n_lines=n, taken=used, feed=feed, base=items, role=role,
+                             told_elsewhere=() if first else comps)
 
     schema = {"format": "yaml", "stamp": "engine", "says": READ_SAYS}
     if len(parts) == 1:
         def parse(out: Any) -> Value:
-            new = parse_reading(out, path=path, module=module, n_lines=n, taken=taken, feed=feed, base=items)
+            new = read(out, taken, True)
             return Value("fabula", reading_value(cat, items, path, new), origin={"reading": {"path": path}})
-        return Request(contract={"schema": schema, "repair": ["drop-unresolved-refs"]}, inputs=inputs(1, n),
+        return Request(contract={"schema": schema, "repair": ["drop-unresolved-refs"]}, inputs=inputs(1, n, True),
                        parse=parse, repair=lambda v, failed: _drop_unresolved(v, failed, items))
-    # a long file: one request per chunk, through ctx.ask (keyed <node>, <node>-1, … and replayed in order)
-    new: list[dict] = []
-    for a, b in parts:
-        last_err = None
+    # a long file: one request per part, through ctx.ask (keyed <node>, <node>-1, … and replayed in order)
+    per: list[list[dict]] = [[] for _ in parts]
+    redo: dict[int, list[str]] = {i: [] for i in range(len(parts))}
+    prev, failed = getattr(ctx, "previous", None), getattr(ctx, "failed", None) or []
+    spans = ((prev.origin or {}).get("reading") or {}).get("parts") if isinstance(prev, Value) else None
+    if failed and isinstance(spans, list) and len(spans) == len(parts):
+        nodes = fabula_doc(prev)[1]
+        per = [copy.deepcopy(nodes[s:e]) for s, e in spans]
+        redo = _faulty_parts(failed, per, parts, local, path)
+    for k, (a, b) in enumerate(parts):
+        if k not in redo:
+            continue
+        used = taken | {str(i["id"]) for j, rows in enumerate(per) if j != k for i in rows}
+        last_err = "; ".join(redo[k]) or None
         for _try in range(2):
-            # ctx.ask takes `repair` as the list of repairs allowed, and carries only the runtime's failed verdicts;
-            # the reason this move could not read the last answer rides in the inputs, so the prompt says it
-            ins = inputs(a, b)
+            # the reason this part is asked again rides in the inputs, so the prompt says it for these lines alone
+            ins = inputs(a, b, k == 0)
             if last_err:
                 ins["failed"] = Value("string", last_err)
             cand = ctx.ask({"schema": schema, "repair": []}, ins)
             try:
-                got = parse_reading(cand.get("output"), path=path, module=module, n_lines=n,
-                                    taken=taken | {i["id"] for i in new}, feed=feed, base=items)
+                per[k] = read(cand.get("output"), used, k == 0)
                 break
             except ValueError as e:
                 last_err = str(e)
         else:
             raise MoveError(f"{path}, lines {a} to {b}: the reading could not be read: {last_err}")
-        new += got
-    return Value("fabula", reading_value(cat, items, path, new), origin={"reading": {"path": path}})
+    new, spans = [], []
+    for rows in per:
+        spans.append([len(new), len(new) + len(rows)])
+        new += rows
+    return Value("fabula", reading_value(cat, items, path, new), origin={"reading": {"path": path, "parts": spans}})
 
 
 def _drop_unresolved(v: Value, failed: list, base: list[dict] | None = None) -> Value | None:
@@ -1829,22 +2088,34 @@ DOC_BUDGET = 40_000
 
 
 def _documents(f: Folder, items: list[dict]) -> str:
-    """The repository's own words, for the fold: its README, its other documents and change log, each line
-    numbered, longest first cut at `DOC_BUDGET` characters."""
+    """The repository's own words, for the fold: its README first, then its other documents (the reference pages),
+    the change logs last, each line numbered, within `DOC_BUDGET` characters. A document that does not fit whole is
+    cut at the end of a line, and a marker says how many lines were left out; a change log's newest entries come
+    first in it, so what is cut is its oldest."""
     docs = []
     for e in f.texts():
         if e.path.endswith((".md", ".rst", ".txt")) and not is_licence_file(e.path) and not is_packaging(e.path):
             docs.append(e.path)
-    docs.sort(key=lambda p: (not is_readme(p), "/" in p, p))
+
+    def log(p: str) -> bool:
+        return bool(re.match(r"(changes|changelog|history|news)", p.rsplit("/", 1)[-1].lower()))
+    docs.sort(key=lambda p: (not is_readme(p), log(p), "/" in p, p))
     out, used = [], 0
     for p in docs:
-        body = _numbered(f.text(p))
-        if used + len(body) > DOC_BUDGET:
-            body = body[: max(0, DOC_BUDGET - used)]
-            if not body:
+        lines = _numbered(f.text(p)).split("\n")
+        keep, size = [], 0
+        for ln in lines:
+            if used + size + len(ln) + 1 > DOC_BUDGET:
                 break
-        out.append(f"=== {p}\n{body}")
-        used += len(body)
+            keep.append(ln)
+            size += len(ln) + 1
+        if not keep:
+            out.append(f"=== {p}\n(not shown: {len(lines)} lines, past what the fold reads)")
+            continue
+        if len(keep) < len(lines):
+            keep.append(f"(… {len(lines) - len(keep)} more lines of {p} not shown)")
+        out.append(f"=== {p}\n" + "\n".join(keep))
+        used += size
     return "\n\n".join(out) or "(no documents)"
 
 
@@ -1901,12 +2172,53 @@ def fold_folder(ctx: Any, repo: Value, **mods: Any) -> Request:
         d.setdefault("runs", []).append({k: v for k, v in run.items() if v})
         bad = [r for it in new for r in _refs(it) if r not in all_ids]
         del bad
-        return Value("fabula", {**c2, "nodes": items + new}, origin={"fold": {"atem-cites": cites,
-                                                                              "before": sorted(taken)}})
+        return Value("fabula", {**c2, "nodes": merge_terms(items) + new},
+                     origin={"fold": {"atem-cites": cites, "before": sorted(taken)}})
 
     return Request(contract={"schema": {"format": "yaml", "stamp": "engine", "says": FOLD_SAYS},
                              "repair": ["drop-unresolved-refs"]},
                    inputs=inputs, parse=parse, repair=lambda v, failed: _drop_unresolved_fold(v, failed, taken))
+
+
+def merge_terms(items: list[dict]) -> list[dict]:
+    """The files are read apart, so two readings may each define one word (`whitelist` under two modules): the fold
+    keeps one term per word, by rules: the first read, with the other's sources, and its sense added where it says
+    something else; every reference to a term let go names the one kept."""
+    def word(it: dict) -> str:
+        fd = it.get("feed") if isinstance(it.get("feed"), dict) else {}
+        return " ".join(str(fd.get("word") or it.get("name") or "").lower().replace("-", " ").split())
+    first: dict[str, dict] = {}
+    gone: dict[str, str] = {}
+    out = []
+    for it in items:
+        if item_kind(it) != "term" or not word(it):
+            out.append(it)
+            continue
+        w = word(it)
+        if w not in first:
+            first[w] = it = copy.deepcopy(it)
+            out.append(it)
+            continue
+        keep = first[w]
+        gone[str(it["id"])] = str(keep["id"])
+        if it.get("sense") and fold(str(it["sense"])) != fold(str(keep.get("sense") or "")):
+            keep["sense"] = fold(f"{keep.get('sense') or ''} Also: {it['sense']}")
+        srcs = (keep.setdefault("provenance", {})).setdefault("sources", [])
+        for s in (it.get("provenance") or {}).get("sources") or []:
+            if s not in srcs:
+                srcs.append(s)
+    if not gone:
+        return items
+
+    def swap(x: Any) -> Any:
+        if isinstance(x, str):
+            return gone.get(x, x)
+        if isinstance(x, list):
+            return [swap(v) for v in x]
+        if isinstance(x, dict):
+            return {k: (v if k in ("id", "provenance") else swap(v)) for k, v in x.items()}
+        return x
+    return [swap(it) for it in out]
 
 
 _FOLD_FIELDS = {
@@ -2082,11 +2394,123 @@ def rebuilt(items: list[dict]) -> tuple[list[dict], list[dict]]:
     return sorted(want, key=lambda it: path_key(str(it["path"]))), rest
 
 
+PACKAGING_PATH = "pyproject.toml"
+
+
+def _toml_str(s: str) -> str:
+    return '"' + str(s).replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def packaging_file(cat: dict, items: list[dict], fab_name: str) -> tuple[str | None, str]:
+    """A cshort's packaging file, written BY RULES and never by a model, from what the survey recorded: the
+    project's name and version (the packaging file's `holds`, else the version the package's `__version__` is set
+    to), the Python floor (`C:dependency/python`), the dependencies and the optional groups they are declared in,
+    and the modules and packages the cshort rebuilds, at their paths. `(text, why)`: the text with its first comment
+    line saying rules wrote it from the fabulac; or None and why it could not be written truthfully."""
+    want, _rest = rebuilt(items)
+    py = [str(x["path"]) for x in want if str(x.get("path")).endswith(".py")]
+    proj = None
+    for x in items:
+        if item_kind(x) == "file" and is_packaging(str(x.get("path"))) and isinstance(x.get("holds"), str):
+            proj = proj or _PROJECT.search(x["holds"])
+    if proj is None:
+        return None, ("the fabulac does not record the project's name (its survey read no packaging file that "
+                      "names one)")
+    means = [str(x.get("what") or x.get("name")) for x in items if item_kind(x) == "means"
+             and str(x.get("used-for") or "") == "building the package"]
+    if means and not any(m.lower() == "setuptools" for m in means):
+        return None, f"the project is built with {means[0]}, and these rules write a setuptools packaging file only"
+    version = proj.group("version")
+    if not version:
+        vs = [x for x in items if item_kind(x) == "setting" and x.get("key") == "__version__"
+              and isinstance(x.get("default"), str)]
+        v = vs[0]["default"].strip() if vs else ""
+        version = v[1:-1] if len(v) > 1 and v[0] == v[-1] and v[0] in "'\"" else None
+    if not version:
+        return None, "the fabulac records no version of the project"
+    pydep = next((x for x in items if x.get("id") == "C:dependency/python"), {})
+    floor = pydep.get("version") if isinstance(pydep.get("version"), str) else None
+    run, groups = [], {}
+    for x in items:
+        if item_kind(x) != "dependency" or x.get("id") == "C:dependency/python" or not x.get("package"):
+            continue
+        ver = x.get("version") if isinstance(x.get("version"), str) and x.get("version") not in ("any", "") else ""
+        spec = f"{x['package']}{ver if ver[:1] in '<>=!~' else (' ' + ver if ver else '')}".strip()
+        g = re.search(r"declared in the optional group `([^`]+)`", str(x.get("summary") or ""))
+        if g:
+            groups.setdefault(g.group(1), []).append(spec)
+        elif x.get("scope") == "run-time":
+            run.append(spec)
+    src = bool(py) and all(p.startswith("src/") for p in py)
+    base = [p[4:] if src else p for p in py]
+    packages = sorted({p.rsplit("/", 1)[0].replace("/", ".") for p in base if p.endswith("/__init__.py")})
+    modules = sorted(p[:-3] for p in base if "/" not in p and p not in ("setup.py", "conftest.py"))
+    loose = [p for p in base if "/" in p and p.rsplit("/", 1)[0].replace("/", ".") not in packages]
+    if loose:
+        return None, f"{loose[0]} lies in a folder with no __init__.py, a layout these rules do not write"
+    if not packages and not modules:
+        return None, "the cshort rebuilds no module or package"
+    out = [f"# written by rules from {fab_name}, not by a model: the project's name, version, Python, dependencies "
+           "and layout, as its survey recorded them",
+           "[build-system]", 'requires = ["setuptools>=61"]', 'build-backend = "setuptools.build_meta"', "",
+           "[project]", f"name = {_toml_str(proj.group('name'))}", f"version = {_toml_str(version)}"]
+    if floor:
+        out.append(f"requires-python = {_toml_str(floor)}")
+    if run:
+        out.append("dependencies = [" + ", ".join(_toml_str(r) for r in run) + "]")
+    if groups:
+        out += ["", "[project.optional-dependencies]"]
+        out += [f"{_toml_str(g)} = [" + ", ".join(_toml_str(r) for r in rs) + "]" for g, rs in groups.items()]
+    out += ["", "[tool.setuptools]"]
+    if modules:
+        out.append("py-modules = [" + ", ".join(_toml_str(m) for m in modules) + "]")
+    if packages:
+        out.append("packages = [" + ", ".join(_toml_str(p) for p in packages) + "]")
+    if src:
+        out.append('package-dir = {"" = "src"}')
+    return "\n".join(out) + "\n", ""
+
+
+def _module_of_file(items: list[dict]) -> dict[str, str]:
+    """Each `C:file` id's module name, from the component that holds it."""
+    return {fid: str(c.get("name")) for c in items if item_kind(c) == "component" for fid in c.get("files") or []}
+
+
+def _said(it: dict) -> str:
+    """The words of an item a rebuilder reads: its summary, when, what it does, its edges and errors."""
+    parts = [it.get(k) for k in ("summary", "when", "does", "edges", "errors")]
+    return " ".join(p if isinstance(p, str) else _yaml(plain(p)) for p in parts if p)
+
+
+def names_interface(text: str, qual: str, module: str, ambiguous: bool) -> bool:
+    """Whether words name an interface the way one writes about code: with its module (`noqa.parse_noqa`,
+    `cachetools._cached._wrapper`); else, when no other module defines the same name, as a call (`parse_noqa(`), in
+    backticks, or by a name no prose word has (a `snake_name`, a `CamelName`, a `Class.method`)."""
+    if not qual or not text:
+        return False
+    q = re.escape(qual)
+    last = re.escape(module.rsplit(".", 1)[-1])
+    if re.search(rf"(?<![\w]){last}\.{q}(?![\w])|(?<![\w.]){re.escape(module)}\.{q}(?![\w])", text):
+        return True
+    if ambiguous:
+        return False
+    if re.search(rf"(?<![\w.]){q}\s*\(|`{q}[`(]", text):
+        return True
+    distinct = "." in qual or "_" in qual.strip("_") or re.search(r"[a-z][A-Z]|^[A-Z][a-z0-9]+[A-Z]", qual)
+    return bool(distinct) and re.search(rf"(?<![\w.]){q}(?![\w])", text) is not None
+
+
+def _names_module(text: str, module: str) -> bool:
+    return "." in module and re.search(rf"(?<![\w.]){re.escape(module)}(?![\w])", text) is not None
+
+
 def file_brief(items: list[dict], it: dict) -> dict:
     """What one file's request carries (THYM 20.7): the file, its components, its interfaces with their parameters,
-    the structures defined in it, the behaviours and cases about them, the settings and dependencies it touches;
-    the shared terms and concepts; and the other files' interfaces it may call. For the README: the uses, aims,
-    requirements, commands, settings and cases."""
+    the structures defined in it, the behaviours and cases about them (and the cases of an interface another file
+    defines whose behaviours say this file does its work), the settings and dependencies it touches, the open
+    questions about any of them; the shared terms and concepts; and what it reaches in the other files: the
+    interfaces of the modules its component uses and those its own items name, each with the lines of the
+    behaviours about it. No item twice. For the README: the uses, aims, requirements, commands, settings and cases."""
     by = _by_id(items)
     fid = it["id"]
     path = str(it.get("path"))
@@ -2096,19 +2520,68 @@ def file_brief(items: list[dict], it: dict) -> dict:
         mine = [x for x in items if item_kind(x) in kinds] + [x for x in items if item_kind(x) == "interface"
                                                              and x.get("surface") == "command"]
         return {"file": _compact(it), "items": [_compact(x) for x in mine], "shared": [], "elsewhere": []}
+    mods = _module_of_file(items)
+    mine_mod = mods.get(fid, "")
     local = local_outline(items, path)
     lids = {x["id"] for x in local}
     about = [x for x in items if item_kind(x) in ("behaviour", "case", "structure", "event", "claim")
              and (set(_refs(x)) & lids or (isinstance(x.get("span"), dict) and x["span"].get("file") == path))]
+    # the cases of an interface another file defines, when that interface's behaviours say this file does the work
+    my_ifaces = [x for x in items if item_kind(x) == "interface" and x.get("defined-in") == fid]
+    quals: dict[str, int] = {}
+    for x in items:
+        if item_kind(x) == "interface":
+            quals[str(x.get("name"))] = quals.get(str(x.get("name")), 0) + 1
+    work_of = set()
+    for x in items:
+        if item_kind(x) != "interface" or x.get("defined-in") == fid:
+            continue
+        words = " ".join(_said(b) for b in items if item_kind(b) == "behaviour" and x["id"] in (b.get("of") or []))
+        # delegation: its behaviours name this module, or a private helper of it (`_cached._wrapper`); a public
+        # interface they name (a default key function) is one it uses, not one doing its work
+        if _names_module(words, mine_mod) or any(names_interface(words, str(m.get("name")), mine_mod,
+                                                                 quals.get(str(m.get("name")), 0) > 1)
+                                                 for m in my_ifaces if str(m.get("name")).startswith("_")):
+            work_of.add(x["id"])
+    about += [x for x in items if item_kind(x) == "case" and set(_refs(x)) & work_of]
+    seen: set = set()
+    mine = [x for x in local[1:] + about if not (x["id"] in seen or seen.add(x["id"]))]
     shared = [x for x in items if item_kind(x) in ("term", "concept")]
+    # what it reaches elsewhere: the modules its component uses, and the interfaces its own words name
     comps = [x for x in local if item_kind(x) == "component"]
-    used_comps = {u for c in comps for u in c.get("uses") or [] if u.startswith("C:component/")}
-    elsewhere = [{"id": x["id"], "signature": x.get("signature"), "in": by.get(str(x.get("defined-in")), {}).get("path")}
-                 for x in items if item_kind(x) == "interface" and x.get("defined-in") != fid and (
-                     not used_comps or any(by.get(c, {}).get("files") and x.get("defined-in") in by[c]["files"]
-                                           for c in used_comps))]
-    return {"file": _compact(it), "items": [_compact(x) for x in local[1:] + about],
-            "shared": [_compact(x) for x in shared], "elsewhere": elsewhere}
+    used_files = {f for c in comps for u in c.get("uses") or [] if u.startswith("C:component/")
+                  for f in by.get(u, {}).get("files") or []}
+    words = " ".join(_said(x) for x in [it] + mine)
+    elsewhere = []
+    for x in items:
+        if item_kind(x) != "interface" or x.get("defined-in") == fid:
+            continue
+        m = mods.get(str(x.get("defined-in")), "")
+        named = names_interface(words, str(x.get("name")), m, quals.get(str(x.get("name")), 0) > 1)
+        if not (named or x.get("defined-in") in used_files):
+            continue
+        row: dict = {"id": x["id"], "signature": x.get("signature"),
+                     "in": by.get(str(x.get("defined-in")), {}).get("path")}
+        if named:                     # what it calls: the lines of the behaviours about it, as the reading wrote them
+            does = [fold(str(b.get("does")))[:500] for b in items if item_kind(b) == "behaviour"
+                    and x["id"] in (b.get("of") or []) and b["id"] not in seen and isinstance(b.get("does"), str)]
+            if does:
+                row["does"] = does[:2]
+        elsewhere.append(row)
+    # and the constants of the modules it uses (`__version__` of vulture.version, which config imports)
+    used_paths = {str(by.get(f, {}).get("path")) for f in used_files}
+    elsewhere += [{"id": x["id"], "key": x.get("key"), "default": x.get("default"), "in": x["span"].get("file")}
+                  for x in items if item_kind(x) == "setting" and x.get("set-in") == "constant"
+                  and isinstance(x.get("span"), dict) and x["span"].get("file") in used_paths]
+    ids = {x["id"] for x in mine} | {fid}
+    questions = [{"about": q.get("about"), "asks": q.get("asks")} for q in items if item_kind(q) == "question"
+                 and q.get("state", "open") == "open" and isinstance(q.get("about"), str)
+                 and q["about"].split("#", 1)[0] in ids]
+    out = {"file": _compact(it), "items": [_compact(x) for x in mine],
+           "shared": [_compact(x) for x in shared], "elsewhere": elsewhere}
+    if questions:
+        out["open questions"] = questions
+    return out
 
 
 def _failed_paths(failed: list, paths: list[str]) -> set[str]:
@@ -2146,6 +2619,9 @@ def tell_code(ctx: Any, fab: Value, **mods: Any) -> Value:
         inputs = {"fabulac": Value("string", "readme" if is_readme(p) else "code"), "path": Value("string", p),
                   "name": Value("string", name), "brief": Value("string", _yaml(plain(brief))),
                   "atem": Value("string", _yaml(plain(cat.get("atem") or {})))}
+        if is_readme(p):                    # its format follows its name; commands only for a program that has one
+            inputs["commands"] = Value("string", "yes" if any(
+                item_kind(x) == "interface" and x.get("surface") == "command" for x in items) else "no")
         cand = ctx.ask({"schema": {"format": "markdown", "says": f"the whole of {p}, nothing else"}}, inputs)
         out = cand.get("output") if isinstance(cand, dict) else None
         texts[p] = _file_text(out)
@@ -2162,7 +2638,13 @@ def tell_code(ctx: Any, fab: Value, **mods: Any) -> Value:
             ol = syn.outline(p, texts[p])
             syntax[p] = {"sha256": hashlib.sha256(texts[p].encode("utf-8")).hexdigest(), "outline": ol}
     readme_rows = [(str(x["path"]), x["id"]) for x in want]
-    texts["CSHORT.md"] = cshort_md(ctx, cat, fab, readme_rows, texts, rest, meta)
+    pack, why_not = packaging_file(cat, items, fabulac_file(cat, fab))
+    if pack is not None:
+        texts[PACKAGING_PATH] = pack
+        orig = next((x for x in rest if str(x.get("path")) == PACKAGING_PATH), None)
+        readme_rows.append((PACKAGING_PATH, f"rules, from {orig['id']}" if orig else "rules"))
+        rest = [x for x in rest if str(x.get("path")) != PACKAGING_PATH]
+    texts["CSHORT.md"] = cshort_md(ctx, cat, fab, readme_rows, texts, rest, meta, no_packaging=why_not)
     folder = folder_of_texts(f"{fabulac_file(cat, fab).rsplit('.fabulac.cosm', 1)[0]}.cshort/", texts)
     return Value("folder", folder, origin={"cshort": {**meta, "syntax": syntax, "day": utc_day(ctx)}})
 
@@ -2202,9 +2684,10 @@ def _who(meta: dict) -> str:
 
 
 def cshort_md(ctx: Any, cat: dict, fab: Value, rows: list[tuple[str, str]], texts: dict, rest: list[dict],
-              meta: dict) -> str:
-    """`CSHORT.md` (MacroCOSM OES 18.4.7): the footer line first, the files written with their `C:file` and sha256,
-    what was not rebuilt, and last the source's licence line."""
+              meta: dict, no_packaging: str = "") -> str:
+    """`CSHORT.md` (MacroCOSM OES 18.4.7): the footer line first, the files written with their `C:file` (or `rules`,
+    for the packaging file rules wrote) and sha256, what was not rebuilt, why no packaging file was written when none
+    was, and last the source's licence line."""
     head = (f"*a cshort of {fabulac_file(cat, fab)}, in Python, compiled on {utc_day(ctx)} by {_who(meta)}; "
             "never run*")
     out = [head, "", "| file | from | sha256 |", "|---|---|---|"]
@@ -2214,6 +2697,9 @@ def cshort_md(ctx: Any, cat: dict, fab: Value, rows: list[tuple[str, str]], text
     if rest:
         out.append("Not rebuilt: " + ", ".join(str(x["path"]) for x in sorted(rest, key=lambda x: path_key(
             str(x["path"])))) + ".")
+        out.append("")
+    if no_packaging:
+        out.append(f"No packaging file was written: {no_packaging}.")
         out.append("")
     out.append(licence_line(cat))
     return "\n".join(out) + "\n"
@@ -2248,11 +2734,16 @@ def catem_footer(cat: dict, fab: Value, depth: str, day: str, who: str) -> str:
     return f"*a catem of {fabulac_file(cat, fab)}, at depth {depth}, compiled on {day} by {who}*"
 
 
+#: What a catem's request lists: every item a catem may cite (the request says "only ids listed under the items").
+CATEM_KINDS = ("use", "aim", "audience", "requirement", "exclusion", "setting", "case", "behaviour", "event",
+               "structure", "concept", "term")
+
+
 def _catem_outline(items: list[dict], depth: str) -> str:
-    kinds = {"use", "aim", "audience", "requirement", "exclusion", "setting", "case", "behaviour", "event"}
-    rows = [_compact(it) for it in items if item_kind(it) in kinds]
-    rows += [_compact(it) for it in reached(items)]
-    return _yaml(plain(rows))
+    """Every item a catem may cite, once: the kinds of `CATEM_KINDS` and the interfaces a person reaches."""
+    rows = [it for it in items if item_kind(it) in CATEM_KINDS] + reached(items)
+    seen: set = set()
+    return _yaml(plain([_compact(it) for it in rows if not (it["id"] in seen or seen.add(it["id"]))]))
 
 
 def tell_catem(ctx: Any, fab: Value, depth: str, **mods: Any) -> Request | Value:
@@ -2534,9 +3025,24 @@ def code_coverage(output: Value, inputs: dict) -> tuple[bool, str]:
     new, outline, path = _reading_parts(output, inputs)
     if path is None:
         return False, "no file to read the coverage of"
-    local = local_outline(outline, path)
+    del new                                            # the enrichments carry the outline's own ids: read them all
+    missing = uncovered(local_outline(outline, path), fabula_doc(output)[1], outline)
+    if missing:
+        return False, (f"{path}: {len(missing)} of the outline's interfaces and components "
+                       f"{'is' if len(missing) == 1 else 'are'} covered by nothing (an interface by a behaviour whose "
+                       f"of names it, or a structure of its name; a component by its does or a behaviour): "
+                       f"{', '.join(missing[:20])}" + (f" and {len(missing) - 20} more" if len(missing) > 20 else ""))
+    return True, ""
+
+
+def uncovered(local: list[dict], new: list[dict], outline: list[dict] | None = None) -> list[str]:
+    """The interfaces and components of a file's outline a reading leaves uncovered: an interface is covered by a
+    behaviour whose `of` names it or a structure of its name; a component by a behaviour about it or by its `does`
+    (the outline's, or the one the reading gives it by `enrich`)."""
     subjects = {r for it in new if item_kind(it) == "behaviour" for r in (it.get("of") or []) if isinstance(r, str)}
-    struct_names = {str(it.get("id")).split("/", 1)[1] for it in new + outline if item_kind(it) == "structure"}
+    told = {str(it.get("id")) for it in new if isinstance(it.get("does"), str) and it["does"].strip()
+            and str(it.get("id")).startswith("C:component/")}
+    struct_names = {str(it.get("id")).split("/", 1)[1] for it in new + (outline or []) if item_kind(it) == "structure"}
     missing = []
     for it in local:
         k = item_kind(it)
@@ -2545,11 +3051,10 @@ def code_coverage(output: Value, inputs: dict) -> tuple[bool, str]:
         tail = str(it["id"]).split("/", 1)[1]
         if it["id"] in subjects or tail in struct_names:
             continue
+        if k == "component" and (it["id"] in told or (isinstance(it.get("does"), str) and it["does"].strip())):
+            continue
         missing.append(it["id"])
-    if missing:
-        return False, (f"{path}: {len(missing)} of the outline's interfaces and components is the subject of no "
-                       f"behaviour or structure: {', '.join(missing[:6])}")
-    return True, ""
+    return missing
 
 
 @check("fold-grounded")
@@ -2742,11 +3247,17 @@ def _command_present(it: dict, ol: dict) -> str | None:
 def _files_present(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any) -> tuple[bool, str]:
     """The cshort holds every file it is required to rebuild, at its path, with `CSHORT.md`, and the digests
     `CSHORT.md` lists are the files' (THYM 7.3)."""
-    f, _cat, items, _fab = _cshort_parts(output, inputs)
+    f, cat, items, fab = _cshort_parts(output, inputs)
     if f is None:
         return False, "the output is not a folder"
     want, _rest = rebuilt(items)
-    missing = [str(x["path"]) for x in want if f.entry(str(x["path"])) is None]
+    want = [str(x["path"]) for x in want]
+    pack = packaging_file(cat, items, fabulac_file(cat, fab))[0] if fab is not None else None
+    if pack is not None:
+        want.append(PACKAGING_PATH)                 # written by rules whenever the fabulac records enough
+        if f.entry(PACKAGING_PATH) is not None and f.text(PACKAGING_PATH) != pack:
+            return False, f"{PACKAGING_PATH} is not the packaging file rules write from the fabulac"
+    missing = [p for p in want if f.entry(p) is None]
     if missing:
         return False, f"{', '.join(missing)} {'is' if len(missing) == 1 else 'are'} missing"
     if f.entry("CSHORT.md") is None:
@@ -2758,7 +3269,7 @@ def _files_present(output: Value, inputs: dict, node: dict, decl: Any, ctx: Any)
             return False, f"CSHORT.md lists {p}, which is not there"
         if e.sha256 != sha:
             return False, f"CSHORT.md lists {p} with another sha256 than the file's"
-    if {p for p, _ in listed} != {str(x["path"]) for x in want}:
+    if {p for p, _ in listed} != set(want):
         return False, "CSHORT.md does not list exactly the files rebuilt"
     return True, ""
 

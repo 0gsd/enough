@@ -462,7 +462,7 @@ dialectic:
         - {id: bad-input, about: C:interface, asks: "What should {name} do with input it does not expect?", kind: text, why: missing, only-with: takes, at-most: 5}
         - {id: settings, about: C:setting, asks: "Is {name} meant to be changed by users?", kind: yes-no, why: unsure, at-most: 5}
         - {id: first-read, about: C, asks: "Which file should a newcomer read first?", kind: ref, why: missing}
-        - {id: changed, about: R:change#because, asks: "Why did {name} change?", kind: text, why: missing, at-most: 5}
+        - {id: changed, about: R:change#because, asks: "Why was this change made: {name}?", kind: text, why: missing, at-most: 5}
         - {id: maintains, about: R, asks: "Who maintains it now?", kind: text, why: missing, writes: maker}
         - {id: licence, about: R:licence#identifier, asks: "Under which licence may it be used?", kind: text, why: missing}
         - {id: must-keep, about: P, asks: "Which example of use must keep working exactly as it does?", kind: text, why: intent, writes: case}

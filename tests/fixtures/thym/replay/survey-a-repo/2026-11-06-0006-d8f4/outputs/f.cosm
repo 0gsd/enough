@@ -16,13 +16,13 @@ derived:
   at: '2026-11-01T12:00:00Z'
   by: person
   program: survey-a-repo
-  run: 2026-11-05-2219-00fa
+  run: 2026-11-06-0006-d8f4
   mode: rules
   completeness: outline
   chunks: 0
   runs:
   - program: survey-a-repo
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     at: '2026-11-01T12:00:00Z'
 atem:
   line:
@@ -57,7 +57,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -84,7 +84,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -111,7 +111,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -122,7 +122,7 @@ nodes:
   stance: observed
   path: pyproject.toml
   language: toml
-  holds: packaging metadata
+  holds: packaging metadata of the project tiny-tool, version 0.2.0, Python >=3.10
   length:
     lines: 17
     bytes: 338
@@ -138,7 +138,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -165,7 +165,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -193,7 +193,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -222,7 +222,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -251,7 +251,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -279,7 +279,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -303,7 +303,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -326,7 +326,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -354,7 +354,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -386,7 +386,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -412,7 +412,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -443,7 +443,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -470,7 +470,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -502,7 +502,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -532,7 +532,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -558,7 +558,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -589,7 +589,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -615,7 +615,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -651,7 +651,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -675,7 +675,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -699,7 +699,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -732,7 +732,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -769,7 +769,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -799,7 +799,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -829,7 +829,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -866,7 +866,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -900,7 +900,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -925,7 +925,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -948,7 +948,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -971,7 +971,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -1005,14 +1005,14 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
 - id: C:dependency/pytest
   type: dependency
   name: pytest
-  summary: pytest, a package from outside the tree.
+  summary: pytest, a package from outside the tree, declared in the optional group `test`.
   stance: observed
   package: pytest
   scope: test
@@ -1030,7 +1030,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -1055,7 +1055,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -1078,7 +1078,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -1097,7 +1097,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code
@@ -1116,7 +1116,7 @@ nodes:
     state: known
   made:
     move: survey
-    run: 2026-11-05-2219-00fa
+    run: 2026-11-06-0006-d8f4
     step: 1
     node: '1'
     engine: code

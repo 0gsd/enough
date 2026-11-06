@@ -424,6 +424,7 @@ def _argparse(text: str, tree: ast.AST) -> list[dict]:
     parsers: dict[str, dict] = {}
     subs: dict[str, str] = {}                 # subparsers variable -> parent parser variable
     order: list[str] = []
+    strings = _string_names(tree)
 
     def target(n: ast.AST) -> str | None:
         return n.id if isinstance(n, ast.Name) else (f"self.{n.attr}" if isinstance(n, ast.Attribute) and
@@ -439,7 +440,8 @@ def _argparse(text: str, tree: ast.AST) -> list[dict]:
             continue
         if fname == "ArgumentParser":
             parsers[var] = {"var": var, "prog": _str_arg(_kw(call, "prog")), "parent": None, "command": None,
-                            "help": template(text, _kw(call, "description")), "epilog": template(text, _kw(call, "epilog")),
+                            "help": filled(text, _kw(call, "description"), strings)[0],
+                            "epilog": filled(text, _kw(call, "epilog"), strings)[0],
                             "line": n.lineno, "args": []}
             order.append(var)
         elif fname == "add_subparsers" and isinstance(f, ast.Attribute):
@@ -477,7 +479,11 @@ def _argparse(text: str, tree: ast.AST) -> list[dict]:
             for k in ("dest", "action", "type", "default", "nargs", "choices", "required", "help", "metavar"):
                 v = _kw(n, k)
                 if v is not None:
-                    said = template(text, v) if k == "help" else None     # an f-string help as its template
+                    said = None
+                    if k == "help":                 # an f-string help, filled from the file's own string names
+                        said, whole = filled(text, v, strings)
+                        if said is not None and not whole:
+                            row["help_template"] = True
                     row[k] = said if said is not None else _str_arg(v) if k in (
                         "help", "dest", "metavar", "action", "nargs") and _str_arg(v) is not None else _seg(text, v)
             parsers[var]["args"].append(row)
@@ -533,6 +539,43 @@ def template(text: str, node: ast.AST | None) -> str | None:
                 out.append("{" + (_seg(text, v.value) or "") + conv + spec + "}")
         return "".join(out)
     return None
+
+
+def _string_names(tree: ast.AST) -> dict[str, str]:
+    """The names a file binds, anywhere, to one string literal and never to anything else (`glob_help = "…"`): what
+    an f-string help may be filled from without running a line."""
+    seen: dict[str, Any] = {}
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Assign):
+            for t in n.targets:
+                if isinstance(t, ast.Name):
+                    v = n.value.value if isinstance(n.value, ast.Constant) and isinstance(n.value.value, str) else None
+                    seen[t.id] = v if t.id not in seen or seen[t.id] == v else None
+        elif isinstance(n, (ast.AnnAssign, ast.AugAssign)) and isinstance(n.target, ast.Name):
+            seen[n.target.id] = None
+    return {k: v for k, v in seen.items() if isinstance(v, str)}
+
+
+def filled(text: str, node: ast.AST | None, strings: dict[str, str]) -> tuple[str | None, bool]:
+    """A string literal, or an f-string with each `{name}` the file binds to one string literal filled in:
+    `(the words, whether every part was filled)`; an f-string with a part no rule can fill keeps that part as its
+    template (`{width}`), and says so with False. `(None, True)` for anything else."""
+    if not isinstance(node, ast.JoinedStr):
+        t = template(text, node)
+        return t, True
+    out, whole = [], True
+    for v in node.values:
+        if isinstance(v, ast.Constant):
+            out.append(str(v.value))
+        elif isinstance(v, ast.FormattedValue) and isinstance(v.value, ast.Name) and v.value.id in strings \
+                and v.conversion in (-1, 115) and v.format_spec is None:
+            out.append(strings[v.value.id])
+        elif isinstance(v, ast.FormattedValue):
+            whole = False
+            conv = {115: "!s", 114: "!r", 97: "!a"}.get(v.conversion, "")
+            spec = "" if v.format_spec is None else ":" + (template(text, v.format_spec) or "")
+            out.append("{" + (_seg(text, v.value) or "") + conv + spec + "}")
+    return "".join(out), whole
 
 
 _LOG_LEVELS = ("debug", "info", "warning", "warn", "error", "critical", "exception", "fatal")
@@ -920,11 +963,45 @@ def _line_of(text: str, needle: str) -> int:
     return 1
 
 
+def _toml_text(v: Any) -> str:
+    """A TOML value as TOML writes it (a string quoted, a list in brackets, true and false), never a float."""
+    if isinstance(v, bool):
+        return "true" if v else "false"
+    if isinstance(v, str):
+        return '"' + v.replace("\\", "\\\\").replace('"', '\\"') + '"'
+    if isinstance(v, list):
+        return "[" + ", ".join(_toml_text(x) for x in v) + "]"
+    if isinstance(v, dict):
+        return "{" + ", ".join(f"{k} = {_toml_text(x)}" for k, x in v.items()) + "}"
+    return str(v)
+
+
+def _own_tool(data: dict, name: Any, text: str) -> dict | None:
+    """The program's own table in its pyproject.toml, `[tool.<its name>]` (`[tool.vulture]`): what the program reads
+    there as its settings, `{name, keys: [{key, value, line}]}`, each value as TOML writes it."""
+    tool = data.get("tool") if isinstance(data.get("tool"), dict) else {}
+    if not isinstance(name, str) or not tool:
+        return None
+    want = re.sub(r"[-_.]+", "-", name).lower()
+    key = next((k for k in tool if re.sub(r"[-_.]+", "-", str(k)).lower() == want), None)
+    table = tool.get(key) if key is not None else None
+    if not isinstance(table, dict):
+        return None
+    head = next((i for i, ln in enumerate(text.splitlines(), 1) if re.match(rf"^\s*\[tool\.{re.escape(key)}\]", ln)), 1)
+    rows = []
+    for k, v in table.items():
+        line = next((i for i, ln in enumerate(text.splitlines(), 1) if i > head and
+                     re.match(rf"^\s*[\"']?{re.escape(str(k))}[\"']?\s*=", ln)), head)
+        rows.append({"key": str(k), "value": _toml_text(v), "line": line})
+    return {"name": str(key), "line": head, "keys": rows}
+
+
 def manifest(path: str, text: str) -> dict:
     """A packaging file read as text, never run: `pyproject.toml`, `setup.cfg`, `requirements*.txt`. Gives `{ok,
-    kind, name, version, requires_python, licence, dependencies: [{package, version, scope, line}], scripts:
-    [{name, target, line}], build: {backend, requires}}`; `{ok: null, why}` for any other file, `setup.py`
-    included (its outline is Python's)."""
+    kind, name, version, requires_python, licence, dependencies: [{package, version, scope, group, line}], scripts:
+    [{name, target, line}], build: {backend, requires}, tool: {name, line, keys: [{key, value, line}]}}` (`group` the
+    optional group a dependency is declared in; `tool` the program's own `[tool.<its name>]` table); `{ok: null,
+    why}` for any other file, `setup.py` included (its outline is Python's)."""
     name = path.rsplit("/", 1)[-1]
     out: dict = {"ok": True}
     deps: list[dict] = []
@@ -957,7 +1034,7 @@ def manifest(path: str, text: str) -> dict:
                     if isinstance(spec, str) and (r := _req(spec)):
                         scope = "test" if extra in ("test", "tests", "testing") else (
                             "build" if extra in ("dev", "docs", "lint") else "optional")
-                        deps.append({**r, "scope": scope, "line": _line_of(text, spec)})
+                        deps.append({**r, "scope": scope, "group": str(extra), "line": _line_of(text, spec)})
             for group, specs in (data.get("dependency-groups") or {}).items():
                 for spec in specs or []:
                     if isinstance(spec, str) and (r := _req(spec)):
@@ -976,7 +1053,10 @@ def manifest(path: str, text: str) -> dict:
                     else:
                         deps.append({"package": pk, "version": ver if isinstance(ver, str) else "",
                                      "scope": "run-time", "line": _line_of(text, pk)})
-            b = data.get("build-system") if isinstance(data.get("build-system"), dict) else {}
+            own = _own_tool(data, out.get("name"), text)
+            if own:
+                out["tool"] = own
+            b =data.get("build-system") if isinstance(data.get("build-system"), dict) else {}
             if b:
                 out["build"] = {"backend": b.get("build-backend") if isinstance(b.get("build-backend"), str) else
                                 None, "requires": [r for r in b.get("requires") or [] if isinstance(r, str)]}

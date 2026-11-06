@@ -230,7 +230,7 @@ def test_compile_lands_the_cshort_and_the_manual_and_records_both(project: Path,
     short, = doc["shorts"]
     assert {k: short[k] for k in ("path", "by", "mode", "order", "route", "language", "files")} == {
         "path": "tiny-tool.cshort-2026-11-05-1200/", "by": "scripted-1", "mode": "model", "order": "code",
-        "route": "local", "language": "python", "files": 5}
+        "route": "local", "language": "python", "files": 6}    # the packaging file written by rules is one of them
     catem, = doc["catems"]
     assert (catem["path"], catem["depth"], catem["mode"]) == ("tiny-tool.catem-2026-11-05-1200.md", "manual", "model")
     assert not canary.exists()                                    # nothing told was run or imported

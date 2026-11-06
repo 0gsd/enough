@@ -323,7 +323,9 @@ def test_a_bank_entry_bounds_itself():
     interfaces = [d for d in t.ledger.items if d["id"].startswith("C:interface/")]
     taking = [d["id"] for d in interfaces if d.get("takes")]
     assert len(taking) > 5 and len(taking) < len(interfaces)
-    assert [q["about"] for q in _from(r, "fabulac/bad-input")] == taking[-5:]     # only-with, then at most five
+    want = [d["id"] for d in dl._salient([d for d in interfaces if d.get("takes")], 5)]
+    assert [q["about"] for q in _from(r, "fabulac/bad-input")] == want            # only-with, then at most five
+    assert want[0] == "C:interface/command.tally"                                  # what a user reaches comes first
     for entry in ("why-this", "tried", "intended", "public", "bad-input", "settings", "changed"):
         assert len(_from(r, f"fabulac/{entry}")) <= 5, entry                      # no per-item entry floods a volume
     assert not _from(r, "fabulac/licence")                                       # its identifier was read
@@ -342,7 +344,7 @@ def test_a_bank_entry_bounds_itself():
                                      "fabulac/changed")]
     assert got == ["R:change/c3#because", "R:change/c7#because", "R:change/c5#because", "R:change/c6#because",
                    "R:change/c4#because"]                                        # the newest five, in volume order
-    assert dl._newest([{"id": "a"}, {"id": "b"}, {"id": "c"}], 2) == [{"id": "b"}, {"id": "c"}]
+    assert dl._salient([{"id": "a"}, {"id": "b"}, {"id": "c"}], 2) == [{"id": "b"}, {"id": "c"}]     # ties: newest
     assert dl._entry_bound({"at-most": 0}) == "a bank entry's at-most is a whole number above 0"
     assert dl._entry_bound({"only-with": ""}) == "a bank entry's only-with names a field"
     assert dl._entry_bound({"only-with": "takes", "at-most": 5}) == ("takes", 5)
@@ -1209,3 +1211,48 @@ def test_the_provenance_contract_catches_a_write_without_its_session():
     del t.ledger.item("N:audience/owners")["provenance"]["answered"]
     assert dl.provenance_written(t) == ["N:audience/owners#who was written by D:question/q1 without "
                                         "provenance.answered naming D:session/session-1"]
+
+
+def test_at_most_keeps_what_a_person_can_speak_to():
+    """docs/fabula-landed-G3.md: an `at-most` entry keeps, of the items it would be asked of, those a user reaches
+    before private, dunder or abstract ones, settings a user sets before constants, changes that say something before
+    releases; then the unsure or edged ones; ties to the newest. One rule for every format."""
+    rows = [{"id": "C:interface/m._helper", "name": "_helper"},
+            {"id": "C:interface/m.C.__getitem__", "name": "C.__getitem__"},
+            {"id": "C:interface/m.run", "name": "run"},
+            {"id": "C:interface/m.Base.go", "name": "Base.go", "signature": "@abstractmethod def go(self)"},
+            {"id": "C:interface/m.load", "name": "load", "edges": [{"given": "''", "then": "[]"}]}]
+    assert [d["id"] for d in dl._salient(rows, 2)] == ["C:interface/m.run", "C:interface/m.load"]
+    sets = [{"id": "C:setting/m.__version__", "key": "__version__", "set-in": "constant"},
+            {"id": "C:setting/m.HAS_LXML", "key": "HAS_LXML", "set-in": "constant"},
+            {"id": "C:setting/option.t.width", "key": "--width", "set-in": "option"}]
+    assert [d["id"] for d in dl._salient(sets, 1)] == ["C:setting/option.t.width"]
+    changes = [{"id": "R:change/a", "type": "change", "name": "Fix the expiry of an item at its exact time", "at": "1"},
+               {"id": "R:change/b", "type": "change", "name": "Update changelog", "at": "3"},
+               {"id": "R:change/c", "type": "change", "name": "Release v7.3.0.", "at": "4"}]
+    assert [d["id"] for d in dl._salient(changes, 1)] == ["R:change/a"]
+    assert dl.reach_rank({"id": "C:behaviour/x", "name": "x", "stance": "deduced"}) == (2, 2)
+    assert dl.reach_rank({"id": "C:interface/command.t", "name": "t", "surface": "command"})[0] == 3
+    assert dl.reach_rank({"id": "C:interface/m.L.append", "name": "L.append"})[0] == 1      # a method after a function
+
+
+def test_a_pending_that_is_no_question_is_asked_as_one_and_the_bank_does_not_ask_it_twice():
+    d = {"id": "N:exclusion/no-threads", "name": "Not thread-safe"}
+    asks, hint = dl.pending_question("The documents state the fact but not the reason", d, "because")
+    assert asks == 'What is the reason for "Not thread-safe"?' and hint.startswith("The documents state")
+    assert dl.pending_question("when did the work begin?", d, "began") == ("When did the work begin?", None)
+    t = dl.open_twin(TALLY)
+    dec = next(x for x in t.ledger.items if x["id"].startswith("N:decision/"))
+    text = t.render()
+    assert "because" not in dec or not mc.is_pending(dec.get("because"))
+    twin = dl.twin_from_text(text, filename=t.ledger.filename)
+    led = twin.ledger
+    for x in led.items:
+        if x["id"] == dec["id"]:
+            x["over"] = [{"option": "y", "because": {"pending": "The reason is not given"}}]
+            x.pop("because", None)
+    r = dl.raise_questions(led, at=AT)
+    about = [q["about"] for q in r.questions if q["about"].startswith(dec["id"])]
+    assert f"{dec['id']}#over[0].because" in about and f"{dec['id']}#because" not in about   # the pending asks it
+    q = next(q for q in r.questions if q["about"] == f"{dec['id']}#over[0].because")
+    assert q["asks"].endswith("?") and q["hint"] == "The reason is not given"

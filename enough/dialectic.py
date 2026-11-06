@@ -1062,9 +1062,11 @@ def _fill(text: str, item: dict | None, led: Ledger) -> str | None:
             raise KeyError(key)
         return str(v)
     try:
-        return _PLACEHOLDER.sub(one, text)
+        out = _PLACEHOLDER.sub(one, text)
     except KeyError:
         return None
+    # a name that ends a sentence of its own ("Simplify reachability code.") ends the question once: "…code?"
+    return re.sub(r"[.!?…]+\?$", "?", out) if text.rstrip().endswith("?") else out
 
 
 def _unique_slug(base: str, taken: set[str], led: Ledger) -> str:
@@ -1112,8 +1114,8 @@ def _unsure(d: dict) -> bool:
 
 def _entry_bound(e: dict) -> tuple[str | None, int | None] | str:
     """A bank entry's bounds (MacroCOSM 18.6.6): `only-with: <field>`, asked only of an item whose field holds a
-    value, and `at-most: <n>`, asked of at most n items, the newest. `(field or None, n or None)`, or why the entry
-    cannot be read."""
+    value, and `at-most: <n>`, asked of at most n items, those a person can best speak to (`_salient`). `(field or
+    None, n or None)`, or why the entry cannot be read."""
     ow, am = e.get("only-with"), e.get("at-most")
     if ow is not None and not (isinstance(ow, str) and ow.strip()):
         return "a bank entry's only-with names a field"
@@ -1128,11 +1130,76 @@ def _holds(d: dict, fpath: str) -> bool:
     return found and not mc.is_pending(v) and v not in (None, "", [], {})
 
 
-def _newest(items: list[dict], n: int) -> list[dict]:
-    """The newest n items, in the volume's order: by their `at` date where they carry one, then by their place in
-    the volume (a later item is newer)."""
-    ranked = sorted(range(len(items)), key=lambda i: (str(items[i].get("at") or ""), i), reverse=True)
+#: The words of an item that only keeps a record: a release, a version bump, a change log or documentation build
+#: entry, a merge; an availability flag or a version a program sets for itself.
+_BOOKKEEPING = re.compile(r"(?i)\b(release[ds]?|bump(ed)?|version|changelog|change log|changes\.|merge[ds]?|"
+                          r"prepare|typo|ci|workflow|sphinx|readthedocs|master_doc|copilot|pre-commit)\b"
+                          r"|^v?\d+(\.\d+)+\.?$")
+_FLAG = re.compile(r"^_*(has|is|use|with|have)_[A-Za-z0-9_]+$|^_*[A-Z0-9_]*(AVAILABLE|ENABLED|INSTALLED)$", re.I)
+
+
+def reach_rank(d: dict) -> tuple[int, int]:
+    """How much a person can say about an item, as `at-most` ranks it (MacroCOSM 18.6.6), the same for every format:
+    `(reach, marked)`. reach: 3 a command a user types; 2 a public name at the top of its module, a setting a user
+    sets, a change whose words say something; 1 another public name (a method); 0 a private, dunder or abstract name
+    or one not exported, a constant such as a version or an availability flag, a release or a change-log entry.
+    marked: 2 what the reading marked unsure (deduced, below 0.9, or pending), 1 what carries an edge, 0 the rest."""
+    name = str(d.get("name") or d.get("key") or "")
+    last = name.rsplit(".", 1)[-1].split(" ")[-1]
+    sig = str(d.get("signature") or "")
+    kind = _bare(str(d.get("id") or "")).split("/", 1)[0].partition(":")[2] or str(d.get("type") or "")
+    if last.startswith("_") or d.get("exported") is False or "abstractmethod" in sig:
+        reach = 0
+    elif d.get("surface") == "command":
+        reach = 3
+    elif kind == "setting":
+        si = str(d.get("set-in") or "")
+        reach = 0 if si == "constant" or last in ("__version__", "VERSION", "version") or _FLAG.match(last) else 2
+    elif kind in ("change", "release"):
+        reach = 0 if _BOOKKEEPING.search(name) or len(name.split()) < 3 else 2
+    else:
+        reach = 1 if "." in name else 2
+    conf = (d.get("provenance") or {}).get("confidence") if isinstance(d.get("provenance"), dict) else None
+    if (isinstance(conf, (int, float)) and not isinstance(conf, bool) and conf < 0.9) \
+            or d.get("stance") in ("deduced", "opinion", "assumed", "hearsay") or any(True for _ in mc.walk_pending(d)):
+        marked = 2
+    else:
+        marked = 1 if d.get("edges") else 0
+    return reach, marked
+
+
+def _salient(items: list[dict], n: int) -> list[dict]:
+    """The n items an `at-most` entry keeps, in the volume's order: those a person can best speak to (`reach_rank`:
+    reached by a user first, then marked unsure or carrying an edge), ties to the newest (by `at`, then the later in
+    the volume)."""
+    ranked = sorted(range(len(items)), key=lambda i: (*reach_rank(items[i]), str(items[i].get("at") or ""), i),
+                    reverse=True)
     return [items[i] for i in sorted(ranked[:n])]
+
+
+def _pends_on(d: dict, fpath: str) -> bool:
+    """Whether an item holds a pending on a field of this name, anywhere in it (`because`, `over[0].because`)."""
+    last = re.split(r"[.\[]", fpath)[-1]
+    return any(p == fpath or re.split(r"[.\[]", p)[-1] == last for p, _t in mc.walk_pending(d))
+
+
+#: How a pending that is no question is asked, by the field it stands in.
+_FIELD_ASKS = {"because": 'What is the reason for "{name}"?', "horizon": 'Is "{name}" left out for good, or for now?',
+               "began": 'When did "{name}" begin?', "ended": 'When did "{name}" end?',
+               "does": 'What is "{name}" responsible for?', "needed-for": 'What is "{name}" needed for?'}
+
+
+def pending_question(text: str, d: dict, fpath: str) -> tuple[str, str | None]:
+    """A pending's words as a question a person is asked: its own words when they are one (first letter
+    capitalised); else a question made from the field it stands in and the item's name, with the pending's words as
+    the hint (`What is the reason for "Not thread-safe"?`, hint "The documents state the fact but not the reason")."""
+    t = " ".join(str(text).split())
+    if t.endswith("?") and t.count("?") == 1:
+        return t[:1].upper() + t[1:], None
+    field = re.split(r"[.\[]", fpath)[-1] if fpath != WHOLE_ITEM else ""
+    name = " ".join(str(d.get("name") or _bare(str(d.get("id"))).split("/", 1)[-1]).split())[:100].rstrip(".?!")
+    frame = _FIELD_ASKS.get(field, 'What should the {field} of "{name}" say?' if field else 'What is "{name}"?')
+    return frame.replace("{name}", name).replace("{field}", field), t
 
 
 def default_to(src: Any) -> str:
@@ -1157,14 +1224,20 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
        where the field is absent or pending. A kind entry with no item of its kind raises nothing, and one whose
        words name no item (no `{name}`, no `{<field>}`) is asked once of the volume, about the kind's module (a
        question asked of each test case alike is one question). An entry may bound itself: `only-with: <field>`
-       asks it only of an item whose field holds a value, and `at-most: <n>` of at most n items, the newest (by
-       their `at`, then the later in the volume). `{name}` and `{<field>}` are filled from the item; an item that
-       cannot fill a placeholder is skipped. `raised: {by: bank, from: <bank>/<entry>}`. Ids: the entry's id (a
+       asks it only of an item whose field holds a value, and `at-most: <n>` of at most n items, those a person can
+       best speak to (`reach_rank`: a command, then a public name at the top of its module, then a public method,
+       never first a private, dunder or abstract one; a setting a user sets before a constant; a change whose words
+       say something before a release or a change-log entry; then one marked unsure, then one carrying an edge;
+       ties to the newest). A field entry is not asked of an
+       item that holds a pending of that field's name (`because`, `over[0].because`): the pending asks it, in the
+       reader's own words. `{name}` and `{<field>}` are filled from the item; an item that cannot fill a
+       placeholder is skipped. `raised: {by: bank, from: <bank>/<entry>}`. Ids: the entry's id (a
        module entry, or a kind entry asked once; `<bank>-<entry>` for a bank in the older shape, Ascribe's
        `ascribe-a1`), else `<entry>-<item slug>`.
     2. (`pending`) from every `{pending: "…"}` value of an item that is not of D, and every `pending:` on a whole item:
        `about: <item>#<field>` (or the item), `why: missing`, `asks` the pending's own text (its first letter
-       capitalised), `kind: text`. `raised: {by: move, from: question}`. Id `<item slug>-<field>`.
+       capitalised; words that are no question become one, `What is the reason for "<name>"?`, with the words as
+       its hint), `kind: text`. `raised: {by: move, from: question}`. Id `<item slug>-<field>`.
     3. (`unsure`) from every item below confidence 0.5 or with `provenance.state: pending` that holds no pending of its
        own (its pendings already ask what is unsure): `about: <item>`, `why: unsure`, `kind: text`. Id
        `<item slug>-unsure`.
@@ -1244,6 +1317,8 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                         found, v = get_field(d, fpath)
                         if found and not mc.is_pending(v):
                             continue
+                        if pending and _pends_on(d, fpath):
+                            continue                  # the reader's own pending asks it (raised below)
                     if only_with is not None and not _holds(d, only_with):
                         continue
                     cands.append(d)
@@ -1259,7 +1334,7 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                     add(_question_item(Q_PREFIX + slug, module, e["asks"], why, e, who(e.get("to")), {**raised}), frm)
                     continue
                 if at_most is not None:
-                    cands = _newest(cands, at_most)
+                    cands = _salient(cands, at_most)
                 for d in cands:
                     q_about = f"{d['id']}#{fpath}" if sep else d["id"]
                     asks = _fill(e["asks"], d, led)
@@ -1278,10 +1353,10 @@ def raise_questions(src: Any, *, rules: bool = True, banks: Iterable[str] | None
                 q_about = d["id"] if fpath == WHOLE_ITEM else f"{d['id']}#{fpath}"
                 if _about_key(q_about) in by_about:
                     continue
-                t = text.strip()
-                asks = t[:1].upper() + t[1:]
+                asks, hint = pending_question(text, d, fpath)
                 slug = _unique_slug(f"{_bare(d['id']).split('/', 1)[-1]}-{fpath}", taken, led)
-                add(_question_item(Q_PREFIX + slug, q_about, asks, "missing", {"kind": "text"}, who(None),
+                add(_question_item(Q_PREFIX + slug, q_about, asks, "missing",
+                                   {"kind": "text", **({"hint": hint} if hint else {})}, who(None),
                                    dict(raised_base, by="move", **{"from": "question"})), f"pending {q_about}")
     if rules and unsure:
         for d in led.items:

@@ -1,6 +1,6 @@
 oes: thym/1
 kind: plan
-id: thym/2026-11-05-2219-f363
+id: thym/2026-11-06-0006-f363
 name: survey-a-repo on tiny-tool
 program:
   name: survey-a-repo
@@ -18,7 +18,7 @@ estimate:
   largest_prompt: 0
   output_words: 0
 nodes:
-- id: R:plan/2026-11-05-2219-f363
+- id: R:plan/2026-11-06-0006-f363
   type: plan
   name: survey-a-repo on tiny-tool
   summary: One node, none of which asks the model.

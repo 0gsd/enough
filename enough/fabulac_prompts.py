@@ -56,74 +56,120 @@ READ_SYSTEM = (
     "Write:\n"
     "- behaviours: what happens for which input. when: the trigger. does: in plain words and in order, what is read, "
     "decided, written, printed; exact output formats and the exact words of every message a user sees. edges: "
-    "[{given, then}]. errors: [{when, message, exit}]. of: [ids of the outline it is about].\n"
-    "- enrich: for an interface, structure, component or setting of the outline, its id and what the code shows "
-    "that the outline lacks: takes [{name, means}], gives {means}, raises [{error, message, when}] (the message "
-    "as written); fields [{name, means}], invariants; does; means. Never restate what the outline says.\n"
+    "[{given, then}]. errors: [{when, message, exit}] (exit: a program's exit status). of: [outline ids].\n"
+    "- enrich: an outline item's id and only what the code shows that the outline lacks. An interface takes takes "
+    "[{name, means}], gives {means}, raises [{error, message, when}]; a structure fields [{name, means}], "
+    "invariants; a component does; a setting means.\n"
     "- structures the outline lacks (a file format, a record kept in a dict): shape, fields, invariants.\n"
     "- cases: from tests and docstring examples, exactly as pinned: of [ids], given {calls | arguments | input | "
     "env | file}, expect {value | output | error-output | exit | raises}.\n"
-    "- terms (the program's own words: word, pos, sense), concepts, claims (what comments and docstrings assert: "
-    "stance, salience), events (the steps of one use, in order: agent, after).\n"
-    "Every interface and component of the outline is the subject (of) of a behaviour, or has a structure. Cite only "
-    "ids the outline gives for this file; a test file's cases cite the ids under elsewhere. Each new entry has slug, "
-    "name, summary (one sentence naming its subject) and lines (\"12-40\", inside the file). No function bodies, "
-    "no line-by-line paraphrase. Where the code does not say, write the question; never guess a value. Return "
-    "only the YAML mapping.")
+    "- terms (word, pos, sense), concepts, claims (what comments and docstrings assert: stance, salience), events "
+    "(the steps of one use, in order: agent an interface or component id; after the id of the event before).\n"
+    "Cover every id under cover: an interface by a behaviour whose of names it, or a structure of its name; a "
+    "component by its does (enrich) or a behaviour. Enrich alone covers no interface. Cite only ids of the outline; "
+    "a test file's cases cite ids under elsewhere. Each new entry has slug, name, summary (one sentence) and lines "
+    "(\"12-40\"). No function bodies, no line-by-line paraphrase. Where the code does not say, write the question; "
+    "never guess a value. Return only the YAML mapping.")
 
 READ_SHAPE = """behaviours:
   - slug: count-words
     name: Counting words
-    summary: count_words counts the words of a text.
+    summary: 'count_words counts the words of a text.'
     of: [C:interface/pkg.mod.count_words]
-    when: count_words(text) is called
-    does: A word is a run of the letters A-Z or a-z; case is ignored. Returns how many there are.
+    when: 'count_words(text) is called'
+    does: 'A word is a run of the letters A-Z or a-z; case is ignored. Returns how many there are.'
     edges: [{given: '""', then: '0'}]
-    errors: [{when: the file cannot be read, message: 'tool: cannot read FILE: OSError', exit: 1}]
+    errors: [{when: 'the file cannot be read', message: 'tool: cannot read FILE: OSError', exit: 1}]
     lines: "20-24"
 enrich:
   - id: C:interface/pkg.mod.count_words
-    takes: [{name: text, means: the text whose words are counted}]
-    gives: {means: how many words the text holds}
-    raises: [{error: ValueError, message: 'not a text: {text!r}', when: text is not a string}]
+    takes: [{name: text, means: 'the text whose words are counted'}]
+    gives: {means: 'how many words the text holds'}
+    raises: [{error: ValueError, message: 'not a text: {text!r}', when: 'text is not a string'}]
     lines: "20-24"
-  - {id: C:structure/pkg.mod.Entry, fields: [{name: at, means: seconds since the epoch}], invariants: [delta is never 0]}
+  - {id: C:structure/pkg.mod.Entry, fields: [{name: at, means: 'seconds since the epoch'}], invariants: ['delta is never 0']}
+  - {id: C:component/pkg.mod, does: 'Counts the words of a text and ranks them.'}
 structures:
-  - {slug: ledger-line, name: A ledger line, summary: One JSON object per line., shape: a JSON object per line,
+  - {slug: ledger-line, name: 'A ledger line', summary: 'One JSON object per line.', shape: 'a JSON object per line',
      fields: [{name: at, type: float}], lines: "40-44"}
 cases:
   - slug: ties
     name: Ties break by letter
-    summary: top_words breaks ties alphabetically.
+    summary: 'top_words breaks ties alphabetically.'
     of: [C:interface/pkg.mod.top_words]
     given: {calls: ['top_words("b a b a c", 2)']}
     expect: {value: '[("a", 2), ("b", 2)]'}
     lines: "9-10"
-terms: [{slug: word, name: word, word: word, pos: noun, summary: The unit counted., sense: A run of letters., lines: "8"}]
+terms: [{slug: word, name: word, word: word, pos: noun, summary: 'The unit counted.', sense: 'A run of letters.', lines: "8"}]
 concepts: []
 claims: []
-events: []"""
+events:
+  - {slug: read-file, name: 'The file is read', summary: 'main reads the file.', agent: C:interface/pkg.mod.main, lines: "25"}
+  - {slug: print-count, name: 'The count is printed', summary: 'main prints one line.', agent: C:interface/pkg.mod.main,
+     after: T:event/pkg.mod.read-file, lines: "28"}"""
+
+#: The shape of a test file's reading: cases, and structures for the helpers other tests use.
+TEST_SHAPE = """cases:
+  - slug: ties
+    name: Ties break by letter
+    summary: 'top_words breaks ties alphabetically.'
+    of: [C:interface/pkg.mod.top_words]
+    given: {calls: ['top_words("b a b a c", 2)']}
+    expect: {value: '[("a", 2), ("b", 2)]'}
+    lines: "9-10"
+structures:
+  - {slug: counting-lock, name: 'A lock that counts', summary: 'CountedLock counts how often it is entered.',
+     shape: 'a context manager', fields: [{name: count, means: 'how many times it was entered'}], lines: "5-14"}"""
+
+#: The shape of a reading of a file with no interface or component of its own (tooling, a helper).
+BARE_SHAPE = """structures:
+  - {slug: release-notes, name: 'The release-notes script', summary: 'Prints the change log of one version as notes.',
+     shape: 'a script run by hand', fields: [{name: version, means: 'the version whose notes it prints'}],
+     invariants: ['it reads CHANGELOG.md and writes to standard output'], lines: "1-40"}
+claims: []"""
+
+ROLES = {
+    "test": ("This is a test file: write only cases (each test's given and expected, exactly as pinned) and structures "
+             "for the helpers and fixtures other tests use. There is nothing to cover.", TEST_SHAPE),
+    "bare": ("The outline gives this file no interface or component of its own (the repository's tooling, or a "
+             "helper): write a structure that says what it is for and what it does, and the claims its comments "
+             "make; no behaviour. There is nothing to cover.", BARE_SHAPE),
+}
 
 
-#: The one rule of YAML a model breaks most: inside `{ }` and `[ ]` an unquoted comma ends the value.
-QUOTING = ("Inside { } or [ ], put in single quotes every value that holds a comma, a colon, a # or a question mark "
-           "(write a quote inside one as two: 'it''s').")
+#: The one rule of YAML a model breaks most: a value that is not a plain word or number ends early, or does not read.
+QUOTING = ("Put in single quotes any value that is not a plain word or number: a sentence, a signature, anything "
+           "holding , : # ? [ ] { }, or starting with * & ! | > % @, a quote or a backtick (write a quote inside one "
+           "as two: 'it''s').")
 
 
 def read_messages(contract: dict, inputs: dict) -> list[dict]:
-    user = (f"File: {_text(inputs, 'path')} (lines {_text(inputs, 'lines')}). Test file: {_text(inputs, 'test')}.\n\n"
-            f"The outline for this file:\n```yaml\n{_text(inputs, 'outline')}```\n\n"
-            f"Terms the specification already has (reuse their words): {_text(inputs, 'terms')}\n\n"
-            f"Interfaces of the other files (elsewhere):\n```yaml\n{_text(inputs, 'elsewhere')}\n```\n\n"
+    role = _text(inputs, "role") or ("test" if _text(inputs, "test") == "yes" else "code")
+    say, shape = ROLES.get(role, ("", READ_SHAPE))
+    part = _text(inputs, "part")
+    head = f"File: {_text(inputs, 'path')} (lines {_text(inputs, 'lines')}). Test file: {_text(inputs, 'test')}.\n"
+    if say:
+        head += say + "\n"
+    if part:
+        head += (f"This is part {part} of the file; the other parts are read apart. Cover only the ids under cover; "
+                 "cite any id of the outline." + ("" if part.startswith("1 ") else " The component is told by part "
+                                                  "1: give no does for it.") + "\n")
+    if role not in ROLES:
+        head += f"Cover: {_text(inputs, 'cover') or '[]'}\n"
+    terms = _text(inputs, "terms")
+    user = (head + f"\nThe outline for this file:\n```yaml\n{_text(inputs, 'outline')}```\n\n"
+            + (f"Terms the specification already has (reuse their words): {terms}\n\n"
+               if terms and terms.strip() not in ("", "[]") else "")
+            + f"What this file imports from the other files (elsewhere):\n```yaml\n{_text(inputs, 'elsewhere')}\n```\n\n"
             + (f"Every definition of the file, private ones too (lines, name, signature). Tell a private helper "
                f"inside the behaviour of the interface that uses it, by its name and signature:\n```\n"
                f"{_text(inputs, 'definitions')}\n```\n\n" if _text(inputs, "definitions") else "")
             + f"The code, its lines numbered:\n```\n{_text(inputs, 'code')}\n```\n\n"
-            f"Answer in this shape (the values are examples):\n```yaml\n{READ_SHAPE}\n```\n"
+            f"Answer in this shape (the values are examples):\n```yaml\n{shape}\n```\n"
             f"{QUOTING}")
     msgs = [{"role": "system", "content": READ_SYSTEM}, {"role": "user", "content": user}]
     if _text(inputs, "failed"):
-        msgs.append({"role": "user", "content": "Your last answer for these lines could not be read: "
+        msgs.append({"role": "user", "content": "Your last answer for these lines could not be taken: "
                                                 f"{_text(inputs, 'failed')}. Answer again, whole, so that it can."})
     return msgs
 
@@ -175,7 +221,8 @@ CODE_SYSTEM = (
     "You write one file of a Python program from its specification alone; you have never seen its code. The "
     "specification lists the file, its components, its interfaces (exact signatures and parameters), the "
     "structures defined in it, the behaviours and cases about them, the settings and dependencies it touches, the "
-    "program's words, and the interfaces of the other files it may call (with the file each lives in).\n"
+    "program's words, the interfaces of the other files it reaches (with the file each lives in and what it does), "
+    "and the questions still open about its items (where one is open, do what the items say).\n"
     "Write the whole file:\n"
     "- every interface listed, with exactly its name, its kind (function, class or method) and its signature: the "
     "same parameters in the same order, with their annotations and defaults;\n"
@@ -189,16 +236,31 @@ CODE_SYSTEM = (
 
 README_SYSTEM = (
     "You write the README of a program from its specification alone: what it is for, the Python and packages it "
-    "needs, every use with the commands a user types and what they get (use the cases' exact outputs), the settings "
-    "a user can change, and what happens when something goes wrong. Plain words, short paragraphs, examples in "
-    "indented blocks. Say nothing the specification does not hold. Return only the markdown, in one fenced block.")
+    "needs, {uses}, the settings a user can change, and what happens when something goes wrong. Plain words, short "
+    "paragraphs, examples in indented blocks. Say nothing the specification does not hold. Write it in {format}, as "
+    "the file's name says, and return only that, in one fenced block.")
+
+#: How a README's uses are asked for: with the commands a user types only when the program has a command line.
+README_USES = {"yes": "every use with the commands a user types and what they get (use the cases' exact outputs)",
+               "no": "every use with the calls a program makes and what they give (use the cases' exact values)"}
+README_FORMATS = {"rst": "reStructuredText", "md": "Markdown", "txt": "plain text", "": "Markdown"}
+
+
+def readme_system(inputs: dict) -> str:
+    """The README's system prompt for this file: its format from its name, its uses as commands only when the
+    program has a command line."""
+    path = _text(inputs, "path")
+    ext = path.rsplit(".", 1)[-1].lower() if "." in path.rsplit("/", 1)[-1] else ""
+    return (README_SYSTEM.replace("{format}", README_FORMATS.get(ext, "Markdown"))
+            .replace("{uses}", README_USES.get(_text(inputs, "commands") or "yes", README_USES["yes"])))
 
 
 def code_messages(contract: dict, inputs: dict) -> list[dict]:
     readme = step(inputs) == "readme"
     user = (f"The program: {_text(inputs, 'name')}. Its atem:\n```yaml\n{_text(inputs, 'atem')}```\n\n"
             f"Write the file {_text(inputs, 'path')}. Its specification:\n```yaml\n{_text(inputs, 'brief')}```")
-    return [{"role": "system", "content": README_SYSTEM if readme else CODE_SYSTEM}, {"role": "user", "content": user}]
+    return [{"role": "system", "content": readme_system(inputs) if readme else CODE_SYSTEM},
+            {"role": "user", "content": user}]
 
 
 # ---------------------------------------------------------------------------
@@ -210,7 +272,8 @@ CATEM_SYSTEM = (
     "At depth overview, one section per use, each saying what a user types and what they get. At depth manual, "
     "every use and also every command and public interface a person reaches, with what each does, its options and "
     "its errors. Begin with an intro of one or two sentences. Use the cases' exact commands and outputs in backticks. "
-    "Every sentence cites the ids of the items it says; cite every id listed under must. Say nothing the items do "
+    "Every sentence cites the ids of the items it says, only ids listed under the items; cite every id listed under "
+    "must. Say nothing the items do "
     "not hold: no name, number or option they lack. Return only a YAML mapping:\n"
     "intro: [{say: <sentence>, cites: [<ids>]}]\n"
     "sections:\n  - heading: <a use's name, or an interface's>\n    sentences: [{say: <sentence>, cites: [<ids>]}]")

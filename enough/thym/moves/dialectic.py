@@ -211,12 +211,32 @@ def _program(ctx: Any) -> str | None:
 # question
 # ---------------------------------------------------------------------------
 
-def _compact(item: dict) -> dict:
-    """An item as the model reads it: everything but `made`; of its provenance, how sure it is and its state."""
-    out = {k: plain(v) for k, v in item.items() if k not in ("made", "provenance")}
+#: What a model raising questions over a fabulac is not shown of an item: the bookkeeping no person is asked about
+#: (the kind is in the id; where it lies, its digest and length, what a component lists, who reads a setting).
+CODE_BOOKKEEPING = frozenset({"type", "defined-in", "span", "sha256", "length", "files", "exposes", "holds",
+                              "language", "component", "used-by", "read-by"})
+
+
+def _compact(item: dict, flavour: str = "") -> dict:
+    """An item as the model reads it: everything but `made`; of its provenance, how sure it is and its state. Of a
+    fabulac, without its bookkeeping (`CODE_BOOKKEEPING`), its stance only when it is not `observed`, `exported` only
+    when false, `surface` only for a command, and its provenance only when it is unsure (below 0.9) or pending."""
+    code = flavour == "fabulac"
+    out = {k: plain(v) for k, v in item.items() if k not in ("made", "provenance")
+           and not (code and k in CODE_BOOKKEEPING)}
+    if code:
+        if out.get("stance") == "observed":
+            out.pop("stance")
+        if out.get("exported") is True:
+            out.pop("exported")
+        if out.get("surface") not in (None, "command"):
+            out.pop("surface")
     prov = item.get("provenance")
     if isinstance(prov, dict):
         keep = {k: prov[k] for k in ("confidence", "state") if k in prov}
+        if code and not ((isinstance(keep.get("confidence"), (int, float)) and keep["confidence"] < 0.9)
+                         or keep.get("state") == "pending"):
+            keep = {}
         if keep:
             out["provenance"] = plain(keep)
     return out
@@ -272,20 +292,51 @@ def asked_of(items: list[dict], flavour: str) -> list[dict]:
     return out
 
 
+def _groups(rows: list[dict]) -> list[list[dict]]:
+    """The items in the volume's order, each interface or component together with the behaviours whose `of` names
+    it (a behaviour goes with the first item it names that is read here), so that a request never shows an
+    interface without what the reading says it does."""
+    ids = {str(it.get("id")) for it in rows}
+    home: dict[str, str] = {}
+    for it in rows:
+        if _kind(it) == "behaviour":
+            of = it.get("of") if isinstance(it.get("of"), list) else [it.get("of")]
+            first = next((str(x) for x in of if isinstance(x, str) and x in ids), None)
+            if first is not None and first != it.get("id"):
+                home[str(it["id"])] = first
+    by_home: dict[str, list[dict]] = {}
+    for it in rows:
+        h = home.get(str(it.get("id")))
+        if h is not None:
+            by_home.setdefault(h, []).append(it)
+    out = []
+    for it in rows:
+        if str(it.get("id")) in home:
+            continue
+        out.append([it] + by_home.get(str(it.get("id")), []))
+    return out
+
+
 def _chunks(items: list[dict], flavour: str | None = None) -> list[list[dict]]:
-    """The items the model reads, in fewer, fuller requests: in the volume's order, at most `CHUNK_ITEMS` items and
-    about `CHUNK_CHARS` characters of them to a request (an item larger than that goes alone)."""
+    """The items the model reads, in fewer, fuller requests: in the volume's order, an interface with the behaviours
+    about it (`_groups`), at most `CHUNK_ITEMS` items and about `CHUNK_CHARS` characters of them to a request (a
+    group larger than that goes alone, and one larger than a request is split)."""
     rows = asked_of(items, flavour or "")
     out: list[list[dict]] = []
     cur: list[dict] = []
     size = 0
-    for it in rows:
-        n = len(mc.dump(_compact(it)))
-        if cur and (len(cur) >= CHUNK_ITEMS or size + n > CHUNK_CHARS):
+    for group in _groups(rows):
+        n = sum(len(mc.dump(_compact(it, flavour or ""))) for it in group)
+        if cur and (len(cur) + len(group) > CHUNK_ITEMS or size + n > CHUNK_CHARS):
             out.append(cur)
             cur, size = [], 0
-        cur.append(it)
-        size += n
+        for it in group:
+            m = len(mc.dump(_compact(it, flavour or "")))
+            if cur and (len(cur) >= CHUNK_ITEMS or (size + m > CHUNK_CHARS and len(group) > 1 and n > CHUNK_CHARS)):
+                out.append(cur)
+                cur, size = [], 0
+            cur.append(it)
+            size += m
     if cur:
         out.append(cur)
     return out
@@ -400,10 +451,11 @@ def _ask_chunk(ctx: Any, v: Value, vol: dict, chunk: list[dict], asked: list[dic
     """One chunk's request (asked again once when nothing could be kept): (kept proposals, dropped
     `{about, asks, why}`)."""
     by_id = {_bare(it["id"]): it for it in chunk}
+    # what is asked of these items, and every pending of the volume (short, and a part cannot see another's items)
     about_here = [q for q in asked if _bare(str(q.get("about", "")).partition("#")[0]) in by_id
-                  or not isinstance(q.get("about"), str)]
+                  or not isinstance(q.get("about"), str) or (q.get("raised") or {}).get("by") == "move"]
     inputs = {"flavour": Value("word", flavour), "volume": Value("string", name),
-              "items": Value("string", mc.dump({"items": [_compact(it) for it in chunk]})),
+              "items": Value("string", mc.dump({"items": [_compact(it, flavour) for it in chunk]})),
               "asked": Value("string", "\n".join(f"- {_about_key(q.get('about'))}: {q.get('asks')}"
                                                  for q in about_here) or "(nothing yet)")}
     passage = _passage(v, chunk)
@@ -653,7 +705,9 @@ Each question:
 ("Isn't it true that ..."); it may say "you" to the person asked;
 - is asked only where the fabula is unsure (a reading is a guess), ambiguous (two readings stand, and either might be \
 meant), in conflict (two items disagree), or silent on intent (why something was done, whether it was meant);
-- is never one the source or the fabula already answers, and never one in the list of what is already asked.
+- is never one the source or the fabula already answers, and never one in the list of what is already asked;
+- is the only one about its item or field: when two things about one item need a person, ask the one that matters \
+more, or name the field more precisely (<id>#takes, not <id>).
 
 Be exhaustive and quick: every place here that needs a person, and nothing else. No questions at all is a good answer \
 when nothing here needs one.
@@ -670,7 +724,10 @@ questions:
     hint: <one short line to show under it>  # optional
 
 kind is the shape of the answer: yes-no for a question answered yes or no, choice when the possible answers can be \
-listed, span when the answer is a place in the source, ref when it is one of the items, text otherwise."""
+listed, span when the answer is a place in the source, ref when it is one of the items, text otherwise.
+
+Put in single quotes any value that is not a plain word or number: a sentence, anything holding , : # ? [ ] { }, or \
+starting with * & ! | > % @, a quote or a backtick (write a quote inside one as two: 'it''s')."""
 
 FLAVOURS = {
     "fabulap": """This is a poem's fabula. Ask about:
@@ -681,13 +738,16 @@ FLAVOURS = {
 - the form's choices: where the metre breaks, whether on purpose; why the lines break where they do; why this stanza \
 shape, this rhyme or its absence;
 - a word that may be used in an old, regional or private sense.""",
-    "fabulac": """This is a program's fabula. Ask about:
-- why a decision was made, and what else was tried and dropped;
-- whether a behaviour is intended, or an accident that users now rely on;
-- whom it is for, and what they already know;
-- what it must never do, whatever a user asks;
-- what an interface should do with input it does not expect;
-- whether a setting is meant to be changed by the people who use it.""",
+    "fabulac": """This is a program's fabula, read so that someone can write the program again from it. Ask only \
+where the answer would change what that person writes, or what a reader believes:
+- a docstring, comment or document that says one thing while the behaviour read from the code does another;
+- an edge whose result looks accidental: an empty, repeated, too large, out-of-order or wrongly typed input, or two \
+options that clash; name the edge and the result the fabula gives for it ("Should top_words(text, 0) raise, as it \
+does now, or give an empty list?"), never "is this behaviour intended?" in general;
+- a promise in a name, a docstring or an option that nothing in the code keeps;
+- a decision with no reason given, where the reason would decide a rebuild's choice.
+Ask nothing a person cannot answer from knowing the program, nothing about a private helper's inner steps, and \
+nothing the bank's questions under "Already asked" already cover.""",
     "fabulan": """This is a prose text's fabula. Ask about:
 - what a claim rests on, when the text does not say;
 - who is meant by a group, a "you" or a "they";

@@ -102,7 +102,7 @@ def test_parse_says_where_a_file_breaks_and_runs_nothing(tmp_path):
 def test_packaging_files_are_read_as_text_never_run():
     m = RE.manifest("pyproject.toml", (TINY / "pyproject.toml").read_text())
     assert (m["name"], m["requires_python"], m["licence"]) == ("tiny-tool", ">=3.10", "MIT")
-    assert m["dependencies"] == [{"package": "pytest", "version": ">=8", "scope": "test", "line": 10}]
+    assert m["dependencies"] == [{"package": "pytest", "version": ">=8", "scope": "test", "group": "test", "line": 10}]
     assert m["scripts"] == [{"name": "tiny", "target": "tiny.cli:main", "line": 13}]
     assert m["build"]["backend"] == "setuptools.build_meta"
     cfg = RE.manifest("setup.cfg", "[metadata]\nname = a\nlicense = BSD\n[options]\npython_requires = >=3.9\n"
